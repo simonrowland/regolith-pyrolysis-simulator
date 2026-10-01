@@ -1750,31 +1750,31 @@ observations:
               value: g
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
           coefficient: '-2'
         - species:
-            formula: S
+            formula: S2
             phase:
               tag: value
-              value: cr
+              value: g
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
-          coefficient: '-1'
+          coefficient: -1/2
         - species:
             formula: Zn
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -1789,18 +1789,18 @@ observations:
             value: g
           polymorph:
             tag: not_applicable
-            reason: not crystal
+            reason: not crystalline
           charge:
             tag: value
             value: 0
       - - S
-        - formula: S
+        - formula: S2
           phase:
             tag: value
-            value: cr
+            value: g
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -1808,10 +1808,10 @@ observations:
         - formula: Zn
           phase:
             tag: value
-            value: cr
+            value: l
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -1866,7 +1866,9 @@ observations:
     note: as_published='-140.260'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=O=B1259 reference-state table p.59/PDF p.65, S=B1259 reference-state table p.63/PDF
+      p.69, Zn=B1259 reference-state table p.77/PDF p.83 (phase sentence says 1181 K; table break 1184 K)
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0173-zinkosite.json
     record: b1259-ht-0173-zinkosite
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0173-zinkosite.json
@@ -1940,7 +1942,7 @@ observations:
               value: g
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -1952,7 +1954,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: orthorhombic
             charge:
               tag: value
               value: 0
@@ -1979,7 +1981,7 @@ observations:
             value: g
           polymorph:
             tag: not_applicable
-            reason: not crystal
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -1990,7 +1992,7 @@ observations:
             value: cr
           polymorph:
             tag: value
-            value: reference
+            value: orthorhombic
           charge:
             tag: value
             value: 0
@@ -2056,7 +2058,9 @@ observations:
     note: as_published='-207.022'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=O=B1259 reference-state table p.59/PDF p.65, S=B1259 reference-state table p.63/PDF
+      p.69, Zn=B1259 reference-state table p.77/PDF p.83 (phase sentence says 1181 K; table break 1184 K)
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0173-zinkosite.json
     record: b1259-ht-0173-zinkosite
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0173-zinkosite.json
@@ -2130,7 +2134,7 @@ observations:
               value: g
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -2139,10 +2143,10 @@ observations:
             formula: S
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -2169,7 +2173,7 @@ observations:
             value: g
           polymorph:
             tag: not_applicable
-            reason: not crystal
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -2177,10 +2181,10 @@ observations:
         - formula: S
           phase:
             tag: value
-            value: cr
+            value: l
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -2246,7 +2250,9 @@ observations:
     note: as_published='-197.903'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=O=B1259 reference-state table p.59/PDF p.65, S=B1259 reference-state table p.63/PDF
+      p.69, Zn=B1259 reference-state table p.77/PDF p.83 (phase sentence says 1181 K; table break 1184 K)
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0173-zinkosite.json
     record: b1259-ht-0173-zinkosite
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0173-zinkosite.json
@@ -2320,7 +2326,7 @@ observations:
               value: g
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -2329,10 +2335,10 @@ observations:
             formula: S
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -2359,7 +2365,7 @@ observations:
             value: g
           polymorph:
             tag: not_applicable
-            reason: not crystal
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -2367,10 +2373,10 @@ observations:
         - formula: S
           phase:
             tag: value
-            value: cr
+            value: l
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -2436,7 +2442,9 @@ observations:
     note: as_published='-188.750'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=O=B1259 reference-state table p.59/PDF p.65, S=B1259 reference-state table p.63/PDF
+      p.69, Zn=B1259 reference-state table p.77/PDF p.83 (phase sentence says 1181 K; table break 1184 K)
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0173-zinkosite.json
     record: b1259-ht-0173-zinkosite
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0173-zinkosite.json
@@ -2510,7 +2518,7 @@ observations:
               value: g
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -2519,10 +2527,10 @@ observations:
             formula: S
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -2549,7 +2557,7 @@ observations:
             value: g
           polymorph:
             tag: not_applicable
-            reason: not crystal
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -2557,10 +2565,10 @@ observations:
         - formula: S
           phase:
             tag: value
-            value: cr
+            value: l
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -2626,7 +2634,9 @@ observations:
     note: as_published='-179.535'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=O=B1259 reference-state table p.59/PDF p.65, S=B1259 reference-state table p.63/PDF
+      p.69, Zn=B1259 reference-state table p.77/PDF p.83 (phase sentence says 1181 K; table break 1184 K)
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0173-zinkosite.json
     record: b1259-ht-0173-zinkosite
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0173-zinkosite.json
@@ -2700,31 +2710,31 @@ observations:
               value: g
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
           coefficient: '-2'
         - species:
-            formula: S
+            formula: S2
             phase:
               tag: value
-              value: cr
+              value: g
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
-          coefficient: '-1'
+          coefficient: -1/2
         - species:
             formula: Zn
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -2739,18 +2749,18 @@ observations:
             value: g
           polymorph:
             tag: not_applicable
-            reason: not crystal
+            reason: not crystalline
           charge:
             tag: value
             value: 0
       - - S
-        - formula: S
+        - formula: S2
           phase:
             tag: value
-            value: cr
+            value: g
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -2758,10 +2768,10 @@ observations:
         - formula: Zn
           phase:
             tag: value
-            value: cr
+            value: l
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -2816,7 +2826,9 @@ observations:
     note: as_published='-151.082'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=O=B1259 reference-state table p.59/PDF p.65, S=B1259 reference-state table p.63/PDF
+      p.69, Zn=B1259 reference-state table p.77/PDF p.83 (phase sentence says 1181 K; table break 1184 K)
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0173-zinkosite.json
     record: b1259-ht-0173-zinkosite
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0173-zinkosite.json
@@ -2890,31 +2902,31 @@ observations:
               value: g
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
           coefficient: '-2'
         - species:
-            formula: S
+            formula: S2
             phase:
               tag: value
-              value: cr
+              value: g
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
-          coefficient: '-1'
+          coefficient: -1/2
         - species:
             formula: Zn
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -2929,18 +2941,18 @@ observations:
             value: g
           polymorph:
             tag: not_applicable
-            reason: not crystal
+            reason: not crystalline
           charge:
             tag: value
             value: 0
       - - S
-        - formula: S
+        - formula: S2
           phase:
             tag: value
-            value: cr
+            value: g
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -2948,10 +2960,10 @@ observations:
         - formula: Zn
           phase:
             tag: value
-            value: cr
+            value: l
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -3006,7 +3018,9 @@ observations:
     note: as_published='247.892'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=O=B1259 reference-state table p.59/PDF p.65, S=B1259 reference-state table p.63/PDF
+      p.69, Zn=B1259 reference-state table p.77/PDF p.83 (phase sentence says 1181 K; table break 1184 K)
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0173-zinkosite.json
     record: b1259-ht-0173-zinkosite
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0173-zinkosite.json
@@ -3080,7 +3094,7 @@ observations:
               value: g
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -3092,7 +3106,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: orthorhombic
             charge:
               tag: value
               value: 0
@@ -3119,7 +3133,7 @@ observations:
             value: g
           polymorph:
             tag: not_applicable
-            reason: not crystal
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -3130,7 +3144,7 @@ observations:
             value: cr
           polymorph:
             tag: value
-            value: reference
+            value: orthorhombic
           charge:
             tag: value
             value: 0
@@ -3196,7 +3210,9 @@ observations:
     note: as_published='-233.600'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=O=B1259 reference-state table p.59/PDF p.65, S=B1259 reference-state table p.63/PDF
+      p.69, Zn=B1259 reference-state table p.77/PDF p.83 (phase sentence says 1181 K; table break 1184 K)
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0173-zinkosite.json
     record: b1259-ht-0173-zinkosite
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0173-zinkosite.json
@@ -3270,7 +3286,7 @@ observations:
               value: g
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -3279,10 +3295,10 @@ observations:
             formula: S
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -3309,7 +3325,7 @@ observations:
             value: g
           polymorph:
             tag: not_applicable
-            reason: not crystal
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -3317,10 +3333,10 @@ observations:
         - formula: S
           phase:
             tag: value
-            value: cr
+            value: l
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -3386,7 +3402,9 @@ observations:
     note: as_published='234.267'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=O=B1259 reference-state table p.59/PDF p.65, S=B1259 reference-state table p.63/PDF
+      p.69, Zn=B1259 reference-state table p.77/PDF p.83 (phase sentence says 1181 K; table break 1184 K)
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0173-zinkosite.json
     record: b1259-ht-0173-zinkosite
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0173-zinkosite.json
@@ -3460,7 +3478,7 @@ observations:
               value: g
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -3469,10 +3487,10 @@ observations:
             formula: S
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -3499,7 +3517,7 @@ observations:
             value: g
           polymorph:
             tag: not_applicable
-            reason: not crystal
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -3507,10 +3525,10 @@ observations:
         - formula: S
           phase:
             tag: value
-            value: cr
+            value: l
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -3576,7 +3594,9 @@ observations:
     note: as_published='234.708'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=O=B1259 reference-state table p.59/PDF p.65, S=B1259 reference-state table p.63/PDF
+      p.69, Zn=B1259 reference-state table p.77/PDF p.83 (phase sentence says 1181 K; table break 1184 K)
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0173-zinkosite.json
     record: b1259-ht-0173-zinkosite
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0173-zinkosite.json
@@ -3650,7 +3670,7 @@ observations:
               value: g
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -3659,10 +3679,10 @@ observations:
             formula: S
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -3689,7 +3709,7 @@ observations:
             value: g
           polymorph:
             tag: not_applicable
-            reason: not crystal
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -3697,10 +3717,10 @@ observations:
         - formula: S
           phase:
             tag: value
-            value: cr
+            value: l
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -3766,7 +3786,9 @@ observations:
     note: as_published='234.994'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=O=B1259 reference-state table p.59/PDF p.65, S=B1259 reference-state table p.63/PDF
+      p.69, Zn=B1259 reference-state table p.77/PDF p.83 (phase sentence says 1181 K; table break 1184 K)
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0173-zinkosite.json
     record: b1259-ht-0173-zinkosite
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0173-zinkosite.json
@@ -3840,31 +3862,31 @@ observations:
               value: g
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
           coefficient: '-2'
         - species:
-            formula: S
+            formula: S2
             phase:
               tag: value
-              value: cr
+              value: g
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
-          coefficient: '-1'
+          coefficient: -1/2
         - species:
             formula: Zn
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -3879,18 +3901,18 @@ observations:
             value: g
           polymorph:
             tag: not_applicable
-            reason: not crystal
+            reason: not crystalline
           charge:
             tag: value
             value: 0
       - - S
-        - formula: S
+        - formula: S2
           phase:
             tag: value
-            value: cr
+            value: g
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -3898,10 +3920,10 @@ observations:
         - formula: Zn
           phase:
             tag: value
-            value: cr
+            value: l
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -3956,7 +3978,9 @@ observations:
     note: as_published='248.897'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=O=B1259 reference-state table p.59/PDF p.65, S=B1259 reference-state table p.63/PDF
+      p.69, Zn=B1259 reference-state table p.77/PDF p.83 (phase sentence says 1181 K; table break 1184 K)
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0173-zinkosite.json
     record: b1259-ht-0173-zinkosite
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0173-zinkosite.json
@@ -4030,31 +4054,31 @@ observations:
               value: g
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
           coefficient: '-2'
         - species:
-            formula: S
+            formula: S2
             phase:
               tag: value
-              value: cr
+              value: g
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
-          coefficient: '-1'
+          coefficient: -1/2
         - species:
             formula: Zn
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -4069,18 +4093,18 @@ observations:
             value: g
           polymorph:
             tag: not_applicable
-            reason: not crystal
+            reason: not crystalline
           charge:
             tag: value
             value: 0
       - - S
-        - formula: S
+        - formula: S2
           phase:
             tag: value
-            value: cr
+            value: g
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -4088,10 +4112,10 @@ observations:
         - formula: Zn
           phase:
             tag: value
-            value: cr
+            value: l
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -4146,7 +4170,9 @@ observations:
     note: as_published='30.654'; unit='dimensionless' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=O=B1259 reference-state table p.59/PDF p.65, S=B1259 reference-state table p.63/PDF
+      p.69, Zn=B1259 reference-state table p.77/PDF p.83 (phase sentence says 1181 K; table break 1184 K)
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0173-zinkosite.json
     record: b1259-ht-0173-zinkosite
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0173-zinkosite.json
@@ -4211,7 +4237,7 @@ observations:
               value: g
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -4223,7 +4249,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: orthorhombic
             charge:
               tag: value
               value: 0
@@ -4250,7 +4276,7 @@ observations:
             value: g
           polymorph:
             tag: not_applicable
-            reason: not crystal
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -4261,7 +4287,7 @@ observations:
             value: cr
           polymorph:
             tag: value
-            value: reference
+            value: orthorhombic
           charge:
             tag: value
             value: 0
@@ -4327,7 +4353,9 @@ observations:
     note: as_published='151.751'; unit='dimensionless' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=O=B1259 reference-state table p.59/PDF p.65, S=B1259 reference-state table p.63/PDF
+      p.69, Zn=B1259 reference-state table p.77/PDF p.83 (phase sentence says 1181 K; table break 1184 K)
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0173-zinkosite.json
     record: b1259-ht-0173-zinkosite
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0173-zinkosite.json
@@ -4392,7 +4420,7 @@ observations:
               value: g
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -4401,10 +4429,10 @@ observations:
             formula: S
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -4431,7 +4459,7 @@ observations:
             value: g
           polymorph:
             tag: not_applicable
-            reason: not crystal
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -4439,10 +4467,10 @@ observations:
         - formula: S
           phase:
             tag: value
-            value: cr
+            value: l
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -4508,7 +4536,9 @@ observations:
     note: as_published='108.129'; unit='dimensionless' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=O=B1259 reference-state table p.59/PDF p.65, S=B1259 reference-state table p.63/PDF
+      p.69, Zn=B1259 reference-state table p.77/PDF p.83 (phase sentence says 1181 K; table break 1184 K)
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0173-zinkosite.json
     record: b1259-ht-0173-zinkosite
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0173-zinkosite.json
@@ -4573,7 +4603,7 @@ observations:
               value: g
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -4582,10 +4612,10 @@ observations:
             formula: S
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -4612,7 +4642,7 @@ observations:
             value: g
           polymorph:
             tag: not_applicable
-            reason: not crystal
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -4620,10 +4650,10 @@ observations:
         - formula: S
           phase:
             tag: value
-            value: cr
+            value: l
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -4689,7 +4719,9 @@ observations:
     note: as_published='82.502'; unit='dimensionless' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=O=B1259 reference-state table p.59/PDF p.65, S=B1259 reference-state table p.63/PDF
+      p.69, Zn=B1259 reference-state table p.77/PDF p.83 (phase sentence says 1181 K; table break 1184 K)
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0173-zinkosite.json
     record: b1259-ht-0173-zinkosite
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0173-zinkosite.json
@@ -4754,7 +4786,7 @@ observations:
               value: g
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -4763,10 +4795,10 @@ observations:
             formula: S
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -4793,7 +4825,7 @@ observations:
             value: g
           polymorph:
             tag: not_applicable
-            reason: not crystal
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -4801,10 +4833,10 @@ observations:
         - formula: S
           phase:
             tag: value
-            value: cr
+            value: l
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -4870,7 +4902,9 @@ observations:
     note: as_published='65.395'; unit='dimensionless' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=O=B1259 reference-state table p.59/PDF p.65, S=B1259 reference-state table p.63/PDF
+      p.69, Zn=B1259 reference-state table p.77/PDF p.83 (phase sentence says 1181 K; table break 1184 K)
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0173-zinkosite.json
     record: b1259-ht-0173-zinkosite
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0173-zinkosite.json
@@ -4935,31 +4969,31 @@ observations:
               value: g
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
           coefficient: '-2'
         - species:
-            formula: S
+            formula: S2
             phase:
               tag: value
-              value: cr
+              value: g
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
-          coefficient: '-1'
+          coefficient: -1/2
         - species:
             formula: Zn
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -4974,18 +5008,18 @@ observations:
             value: g
           polymorph:
             tag: not_applicable
-            reason: not crystal
+            reason: not crystalline
           charge:
             tag: value
             value: 0
       - - S
-        - formula: S
+        - formula: S2
           phase:
             tag: value
-            value: cr
+            value: g
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -4993,10 +5027,10 @@ observations:
         - formula: Zn
           phase:
             tag: value
-            value: cr
+            value: l
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -5051,7 +5085,9 @@ observations:
     note: as_published='36.688'; unit='dimensionless' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=O=B1259 reference-state table p.59/PDF p.65, S=B1259 reference-state table p.63/PDF
+      p.69, Zn=B1259 reference-state table p.77/PDF p.83 (phase sentence says 1181 K; table break 1184 K)
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0173-zinkosite.json
     record: b1259-ht-0173-zinkosite
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0173-zinkosite.json

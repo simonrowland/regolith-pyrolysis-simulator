@@ -22,6 +22,7 @@ from simulator.optimize.objective import (
     ObjectiveValue,
     ObjectiveVector,
     objective_definitions,
+    objective_scores,
     pareto_front,
 )
 from simulator.optimize.physics import GateMargin, ThresholdSpec
@@ -402,7 +403,9 @@ def test_stage0_seed_beam_entry_is_prefix_projected_with_exploration_floor() -> 
         if candidate.metadata["parent_candidate_id"] in seed_parent_ids
     )
     prefix_values = seed_child.metadata["prefix_patch_values"]
-    assert "campaigns.C0.temp_range_C" in prefix_values
+    seed_parent = next(candidate for candidate in stage0 if candidate.id in seed_parent_ids)
+    assert "campaigns.C0.temp_range_C" in seed_parent.metadata["stage_patch_values"]
+    assert "campaigns.C0.temp_range_C" not in prefix_values
     assert not any(key.startswith("campaigns.C0b_p_cleanup.") for key in prefix_values)
     assert seed_child.metadata["seed_lineage"] is True
 
@@ -2099,6 +2102,138 @@ def test_staged_beam_furnace_cost_is_tunable_and_not_a_hard_block() -> None:
     assert [member.candidate.id for member in archive] == ["satisfies"]
 
 
+def test_finite_infeasible_objectives_guide_stage_archive_below_feasible_results() -> None:
+    definitions = objective_definitions(PROFILE)
+    schema = RecipeSchema()
+    feasible_candidate = Candidate("feasible", RecipePatch({}))
+    strong_candidate = Candidate("strong-infeasible", RecipePatch({}))
+    weak_candidate = Candidate("weak-infeasible", RecipePatch({}))
+    feasible = _scored(
+        feasible_candidate.patch,
+        candidate_id=feasible_candidate.id,
+        cache_key_value="cache-feasible",
+        oxygen=0.0,
+        energy=50.0,
+    )
+
+    def failed(candidate: Candidate, key: str, oxygen: float, energy: float) -> ScoredResult:
+        return replace(
+            _scored(
+                candidate.patch,
+                candidate_id=candidate.id,
+                cache_key_value=key,
+                oxygen=oxygen,
+                energy=energy,
+            ),
+            feasible=False,
+            failure_category=FailureCategory.INFEASIBLE_RECIPE,
+            feasibility_margins={
+                "delivered_stream_purity": replace(
+                    _margin(),
+                    feasible=False,
+                    margin=-1.0,
+                )
+            },
+            failing_gates=("delivered_stream_purity",),
+        )
+
+    strong = failed(strong_candidate, "cache-strong", oxygen=20.0, energy=1.0)
+    weak = failed(weak_candidate, "cache-weak", oxygen=10.0, energy=2.0)
+    ranked = staged_module._rank_stage_results(
+        (
+            (weak_candidate, weak),
+            (strong_candidate, strong),
+            (feasible_candidate, feasible),
+        ),
+        definitions,
+        beam_width=3,
+    )
+
+    assert [candidate.id for _, candidate, _ in ranked] == [
+        "feasible",
+        "strong-infeasible",
+        "weak-infeasible",
+    ]
+    score_key = staged_module._score_key(strong_candidate, strong, definitions)
+    member = staged_module._ArchiveMember(
+        candidate=strong_candidate,
+        scored=strong,
+        node=staged_module._node_from_candidate(
+            strong_candidate,
+            strong,
+            score_key,
+            schema,
+        ),
+        joint_refine_trace_signals=(),
+    )
+    archive = staged_module._pareto_archive((member,), definitions)
+    assert [item.candidate.id for item in archive] == ["strong-infeasible"]
+    assert not archive[0].scored.feasible
+    assert archive[0].scored.failing_gates == ("delivered_stream_purity",)
+
+    missing_furnace = replace(
+        strong,
+        run_reference=replace(strong.run_reference, product_summary={}),
+    )
+    assert staged_module._scored_objective_scores(missing_furnace, definitions) == (
+        objective_scores(missing_furnace.objectives, definitions)
+    )
+    missing_furnace_member = replace(
+        member,
+        scored=missing_furnace,
+        node=staged_module._node_from_candidate(
+            strong_candidate,
+            missing_furnace,
+            staged_module._score_key(strong_candidate, missing_furnace, definitions),
+            schema,
+        ),
+    )
+    missing_furnace_archive = staged_module._pareto_archive(
+        (missing_furnace_member,), definitions
+    )
+    assert [item.candidate.id for item in missing_furnace_archive] == [
+        "strong-infeasible"
+    ]
+
+
+def test_staged_backward_parenting_matches_live_and_cached_infeasible_results(
+    tmp_path,
+) -> None:
+    seed_strategy = StagedStrategy(SCHEMA, seed=53, objective_profile=PROFILE)
+    candidate = seed_strategy.ask(1)[0]
+    live = replace(
+        _scored(
+            candidate.patch,
+            candidate_id=candidate.id,
+            oxygen=20.0,
+            energy=1.0,
+            margin=replace(_margin(), feasible=False, margin=-1.0),
+        ),
+        feasible=False,
+        failure_category=FailureCategory.INFEASIBLE_RECIPE,
+        failing_gates=("delivered_stream_purity",),
+    )
+    store = ResultStore(tmp_path / "staged-parent.sqlite")
+    store.store(live.eval_spec, live, created_at="2026-09-30T00:00:00Z")
+    cached = store.lookup(live.eval_spec)
+    assert cached is not None
+
+    def backward_parents(scored: ScoredResult) -> tuple[str, ...]:
+        strategy = StagedStrategy(SCHEMA, seed=53, objective_profile=PROFILE)
+        strategy._mode = "backward"
+        strategy._pending = []
+        strategy._expected_stage_ids = {candidate.id}
+        strategy._stage_results = {candidate.id: (candidate, scored)}
+        strategy._stage_joint_refine_trace_signals = {}
+        strategy._archive = ()
+        strategy._advance_completed_backward_pass()
+        return tuple(member.candidate.id for member in strategy._archive)
+
+    # Rehydration must keep the same finite objectives used by live backward parents.
+    assert cached.objectives == live.objectives
+    assert backward_parents(live) == backward_parents(cached) == (candidate.id,)
+
+
 def test_child_cache_key_duplicate_parent_raises() -> None:
     strategy = StagedStrategy(
         SCHEMA,
@@ -2293,6 +2428,19 @@ def test_beam_width_1_vs_k(tmp_path) -> None:
 
 def test_one_topology_vs_all_topologies_study(tmp_path) -> None:
     topologies = enumerate_topologies()
+    topology_rank = {topology.id: index for index, topology in enumerate(topologies)}
+
+    class IncreasingSpyEvaluator(SpyEvaluator):
+        def __call__(self, *args: Any, **kwargs: Any) -> ScoredResult:
+            scored = super().__call__(*args, **kwargs)
+            assert scored.candidate_id is not None
+            rank = topology_rank[_topology_id_from_candidate_id(scored.candidate_id)]
+            score = 100.0 + rank
+            return replace(
+                scored,
+                objectives=_objectives(oxygen=score, energy=score),
+            )
+
     store = SpyStore(tmp_path / "topologies.sqlite")
     profile = {
         **PROFILE,
@@ -2326,7 +2474,7 @@ def test_one_topology_vs_all_topologies_study(tmp_path) -> None:
         budget=len(topologies),
         out_dir=tmp_path / "all",
         seed=59,
-        evaluator=SpyEvaluator(),
+        evaluator=IncreasingSpyEvaluator(),
         result_store=store,
         topologies=topologies,
     )

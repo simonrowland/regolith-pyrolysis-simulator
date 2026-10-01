@@ -24,6 +24,7 @@ from simulator.optimize.objective import (
     ObjectiveDefinition,
     cost_adjusted_objective_scores,
     objective_definitions,
+    objective_scores,
     pareto_front,
 )
 from simulator.optimize.recipe import KeyPath, KnobSpec, RecipePatch, RecipeSchema
@@ -701,7 +702,7 @@ class StagedStrategy:
                 ),
             )
             for score_key, candidate, scored in ranked
-            if scored.feasible and scored.objectives is not None
+            if scored.objectives is not None
         )
         self._archive = _pareto_archive((*self._archive, *children), self._definitions)
         self._frontier = tuple(member.node for member in self._archive)
@@ -974,13 +975,13 @@ def _pareto_archive(
     members: Sequence[_ArchiveMember],
     definitions: Sequence[ObjectiveDefinition],
 ) -> tuple[_ArchiveMember, ...]:
-    feasible = tuple(
+    scoreable = tuple(
         member
         for member in members
-        if member.scored.feasible and member.scored.objectives is not None
+        if member.scored.objectives is not None
     )
     front = pareto_front(
-        feasible,
+        scoreable,
         definitions,
         objective_getter=lambda member: member.scored.objectives,
         score_getter=lambda member: _scored_objective_scores(
@@ -1048,15 +1049,17 @@ def _score_key(
     scored: ScoredResult,
     definitions: Sequence[ObjectiveDefinition],
 ) -> tuple[Any, ...]:
-    if scored.feasible and scored.objectives is not None:
-        scores = _scored_objective_scores(scored, definitions)
-        return (
-            0,
-            *_score_key_components(scores),
-            scored.cache_key or "",
-            candidate.id,
-        )
-    return (1, scored.cache_key or "", candidate.id)
+    scores = (
+        _scored_objective_scores(scored, definitions)
+        if scored.objectives is not None
+        else (None,) * len(definitions)
+    )
+    return (
+        0 if scored.feasible else 1,
+        *_score_key_components(scores),
+        scored.cache_key or "",
+        candidate.id,
+    )
 
 
 def _scored_objective_scores(
@@ -1064,11 +1067,17 @@ def _scored_objective_scores(
     definitions: Sequence[ObjectiveDefinition],
 ) -> tuple[float | None, ...]:
     reference = scored.run_reference
+    product_summary = reference.product_summary if reference is not None else {}
     try:
+        if (
+            not scored.feasible
+            and product_summary.get("furnace_amortization_status") != "available"
+        ):
+            return objective_scores(scored.objectives, definitions)
         return cost_adjusted_objective_scores(
             scored.objectives,
             definitions,
-            product_summary=(reference.product_summary if reference is not None else {}),
+            product_summary=product_summary,
         )
     except ObjectiveComputationError:
         return (None,) * len(definitions)

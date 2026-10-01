@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import copy
 from dataclasses import dataclass, replace
 import math
 from types import SimpleNamespace
@@ -29,7 +30,8 @@ from simulator.chemistry.kernel import (
 )
 from simulator.condensation import KnudsenRegimeRefusal
 from simulator.config import load_config_bundle
-from simulator.diagnostics import wall_deposit_sticking_authority_status
+from simulator.core import PoisonedHourError, PoisonedHourState
+from simulator.recipe_errors import MalformedRecipeError
 from simulator.electrolysis import (
     MRE_MULTI_OXIDE_PARTITION_REFUSAL,
     MRE_RAW_MARGIN_REFUSAL,
@@ -59,8 +61,8 @@ from simulator.optimize.objective import (
 )
 from simulator.optimize.physics import PhysicsConstraintSet
 from simulator.optimize.product_pools import forbidden_gates_for_pool
-from simulator.optimize.profiles import ProfileValidationError
-from simulator.optimize.recipe import RecipePatch
+from simulator.optimize.profiles import ProfileValidationError, load_profile
+from simulator.optimize.recipe import RecipePatch, RecipeSchema
 from simulator.optimize.results_store import (
     ResultStore,
     _deserialize_run_reference,
@@ -73,7 +75,7 @@ from simulator.reduced_real_determinism import PT0NonFinitePayload
 from simulator.run_executor import RunExecutor
 from simulator.runner import RunnerError, _force_builtin_vapor_pressure
 from simulator.session import SimSession, SimSessionConfig
-from simulator.state import CampaignPhase, EvaporationFlux, HourSnapshot
+from simulator.state import CampaignPhase, HourSnapshot
 from simulator.transport_regime import TransportRegimeRefusal
 from optimizer_fixtures import StubSmokeConstraintSet
 
@@ -325,13 +327,9 @@ def _trace(
         product_ledger_kg={"SiO": 95.0},
         terminal_rump_by_species_kg={"CaO": 2.0},
         condensed_by_stage_species_delta=condensed,
-        wall_deposit_by_segment_species_kg={("hot_wall", "SiO"): 0.0},
-        wall_zone_by_segment={"hot_wall": "Hot"},
+        wall_deposit_by_segment_species_kg={},
+        wall_zone_by_segment={},
         wall_deposit_by_segment_species_delta=({},),
-        wall_deposit_sticking_authority=wall_deposit_sticking_authority_status(
-            {("hot_wall", "SiO"): 0.0},
-            {},
-        ),
     )
 
 
@@ -2416,7 +2414,7 @@ def test_failed_runtime_backend_prefixed_message_is_engine_bug() -> None:
     assert raised.value.category is FailureCategory.ENGINE_BUG
 
 
-def test_objectives_populated_only_for_feasible_runs() -> None:
+def test_completed_infeasible_run_retains_derived_objectives() -> None:
     feasible = evaluate(
         _valid_patch(),
         "lunar_mare_low_ti",
@@ -2438,17 +2436,32 @@ def test_objectives_populated_only_for_feasible_runs() -> None:
     assert "not product" in notes
     assert "missing recorded pO2-hold -> pN2 SiO-release switch" in notes
 
+    mixed_stream_execution = _execution(trace=_trace(mixed_stream=True))
     infeasible = evaluate(
         _valid_patch(),
         "lunar_mare_low_ti",
         "fast",
         profile=PROFILE,
-        executor=FakeExecutor(_execution(trace=_trace(mixed_stream=True))),
+        executor=FakeExecutor(mixed_stream_execution),
+    )
+    same_run_without_purity_gate = evaluate(
+        _valid_patch(),
+        "lunar_mare_low_ti",
+        "fast",
+        profile=PROFILE,
+        executor=FakeExecutor(mixed_stream_execution),
+        constraints=PhysicsConstraintSet(active_gates=("knudsen_viscous",)),
     )
 
     assert not infeasible.feasible
     assert infeasible.failure_category is FailureCategory.INFEASIBLE_RECIPE
-    assert infeasible.objectives is None
+    assert infeasible.objectives is not None
+    assert same_run_without_purity_gate.feasible
+    assert same_run_without_purity_gate.objectives is not None
+    assert (
+        infeasible.objectives.as_mapping()
+        == same_run_without_purity_gate.objectives.as_mapping()
+    )
     assert infeasible.failing_gates == ("delivered_stream_purity",)
     assert infeasible.feasibility_margins["delivered_stream_purity"].margin < 0.0
 
@@ -2869,6 +2882,30 @@ def test_terminal_rump_completed_best_tap_uses_terminal_slag_not_cleaned_melt() 
     assert payload["resolved_composition"]["oxide_wt_pct"]["CaO"] == pytest.approx(0.0)
 
 
+def test_undeclared_thermal_window_schedules_run_hours_as_hold(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setattr(
+        evaluate_module,
+        "_furnace_ceiling_C",
+        lambda *args, **kwargs: (950.0, "test_ceiling"),
+    )
+
+    schedule = evaluate_module._profile_thermal_window_schedule(
+        PROFILE["run"],
+        profile=PROFILE,
+        recipe_patch=RecipePatch({}),
+        constraints=None,
+        setpoints={},
+    )
+
+    assert schedule is not None
+    assert schedule["campaign"] == "C0"
+    assert schedule["overrides"]["thermal_window_duration_h"] == pytest.approx(
+        PROFILE["run"]["hours"]
+    )
+
+
 def test_warm_start_mid_window_best_tap_is_absolute_truncated_with_preheat() -> None:
     target_id = "pc-warm-mid-window"
     result = evaluate(
@@ -3036,8 +3073,6 @@ def test_trace_only_out_of_domain_earned_rump_terminal_scores_earned_crash() -> 
 def test_composition_target_coating_gate_uses_runner_report_not_delta_heuristic() -> None:
     trace = _trace()
     delattr(trace, "wall_deposit_by_segment_species_delta")
-    delattr(trace, "wall_deposit_sticking_authority")
-    trace.wall_deposit_by_segment_species_kg = {}
     result = evaluate(
         _valid_patch(),
         "lunar_mare_low_ti",
@@ -3049,84 +3084,24 @@ def test_composition_target_coating_gate_uses_runner_report_not_delta_heuristic(
         executor=FakeExecutor(_execution(trace=trace)),
     )
 
-    assert not result.feasible
-    assert result.failure_category is FailureCategory.INFEASIBLE_RECIPE
-    assert result.objectives is None
-    assert result.failing_gates == ("coating",)
+    assert result.feasible
+    assert result.failure_category is None
+    assert result.objectives is not None
+    assert result.failing_gates == ()
     coating = result.feasibility_margins["coating"]
     # A non-authoritative runner report cannot turn nominal ledger zero into a pass.
     assert coating.observed is None
     assert coating.status == "unavailable"
     assert coating.authoritative is False
     assert coating.status_payload["coating_constraint_mode"] == (
-        "upstream_deposit_fraction"
+        "no_unqualified_deposition"
     )
     assert coating.status_payload["coating_constraint_authoritative"] is False
     # Sourcing proof: the delta heuristic was deleted from the trace above, so
     # the per-campaign deposition rate in the payload can only have come from
     # the runner wall-fouling report.
     assert coating.status_payload["wall_deposit_kg_per_campaign"] == 0.0
-    assert "coating unavailable" in coating.detail
-
-
-def test_diverted_stage3_bypass_wall_deposit_is_scored_as_upstream() -> None:
-    trace = _trace()
-    trace.stage3_route_diagnostic = {"stage3_route": "divert"}
-    trace.wall_deposit_by_segment_species_kg = {
-        ("stage_3_bypass_to_stage_4", "Na"): 0.75,
-    }
-    trace.wall_zone_by_segment = {"stage_3_bypass_to_stage_4": "Hot"}
-
-    result = evaluate(
-        _valid_patch(),
-        "lunar_mare_low_ti",
-        "fast",
-        profile=_composition_eval_profile(
-            "residual_rump_at_stop",
-            target_id="diverted-stage3-wall-deposit",
-        ),
-        executor=FakeExecutor(_execution(trace=trace)),
-    )
-
-    assert not result.feasible
-    assert result.failing_gates == ("coating",)
-    coating = result.feasibility_margins["coating"]
-    reason = coating.status_payload["coating_violation_reasons"][0]
-    record = coating.status_payload["upstream_wall_deposit_records"][0]
-    assert reason["reason"] == "upstream_wall_deposit_fraction_exceeded"
-    assert reason["segment"] == "stage_3_bypass_to_stage_4"
-    assert reason["deposit_kg_per_campaign"] == pytest.approx(0.75)
-    assert record["scope"] == "upstream"
-    assert record["segment"] == "stage_3_bypass_to_stage_4"
-
-
-def test_optimizer_overlay_bounds_refused_wall_species_from_snapshot_flux() -> None:
-    trace = _trace()
-    trace.wall_deposit_sticking_authority = {
-        "authoritative_for_deposit_mass": False,
-        "code": "wall_saturation_pressure_refused",
-        "wall_saturation_pressure_refused_species": ["CrO2"],
-    }
-    snapshot = _snapshot()
-    snapshot.duration_h = 2.0
-    snapshot.evap_flux = EvaporationFlux(species_kg_hr={"CrO2": 2.0e-4})
-    execution = _execution(trace=trace, snapshots=(snapshot,))
-
-    overlay = evaluate_module._trace_with_optimizer_coating_report(
-        execution,
-        PhysicsConstraintSet(active_gates=("coating",)),
-        spec=SimpleNamespace(mass_kg=1.0),
-    )
-    report = overlay.wall_fouling_report
-
-    assert report[
-        "wall_saturation_pressure_refused_flux_upper_bounds_kg_per_campaign"
-    ] == {"CrO2": pytest.approx(4.0e-4)}
-    coating = PhysicsConstraintSet(active_gates=("coating",)).coating(
-        overlay
-    )
-    assert coating.feasible
-    assert coating.status_payload["coating_warning_flags"][0]["species"] == "CrO2"
+    assert "non-authoritative: coating feasibility unconstrained" in coating.detail
 
 
 def test_optimizer_coating_overlay_preserves_proven_zero_authority() -> None:
@@ -3194,14 +3169,14 @@ def test_runner_wall_fouling_report_emits_continuous_optimizer_margin(
     assert result.feasible
     assert result.failing_gates == ()
     coating = result.feasibility_margins["coating"]
-    assert coating.margin == pytest.approx(0.0)
-    assert coating.observed == pytest.approx(5.0e-4)
+    assert coating.margin < 0.0
+    assert coating.observed == pytest.approx(9.0)
     assert coating.status_payload["campaigns_to_resinter_worst_segment"] == pytest.approx(9.0)
     assert coating.status_payload["campaigns_to_resinter_total"] == pytest.approx(12.0)
     assert coating.status_payload["resinter_threshold_kg"] == pytest.approx(4.5)
     assert coating.status_payload["wall_deposit_kg_per_campaign"] == pytest.approx(0.5)
     assert coating.status_payload["sticking_alpha_authority"] == {
-        "citation_status": "CITED",
+        "citation_status": "CITED"
     }
 
 
@@ -3261,11 +3236,11 @@ def test_parametric_runner_fouling_report_binds_no_unqualified_deposition(
         executor=FakeExecutor(_execution()),
     )
 
-    assert result.feasible
-    assert result.failing_gates == ()
+    assert not result.feasible
+    assert result.failing_gates == ("coating",)
     coating = result.feasibility_margins["coating"]
-    assert coating.feasible
-    assert coating.authoritative is False
+    assert not coating.feasible
+    assert coating.authoritative
     report = result.feasibility_margins["coating"].status_payload
     assert report["campaigns_to_resinter"] == "resinter_threshold_kg / 0.5"
     assert report["resinter_threshold_basis"] == "parameter required"
@@ -3276,7 +3251,7 @@ def test_parametric_runner_fouling_report_binds_no_unqualified_deposition(
     assert report["status"] == "warning"
     assert report["verdict"] == "non-authoritative"
     assert report["nominal_verdict"] == "slow-fouling"
-    assert report["coating_constraint_mode"] == "upstream_deposit_fraction"
+    assert report["coating_constraint_mode"] == "no_unqualified_deposition"
     assert report["coating_constraint_authoritative"] is True
 
 
@@ -3367,6 +3342,90 @@ def test_invalid_patch_rejected_before_run() -> None:
     assert result.objectives is None
     assert result.eval_spec is None
     assert executor.calls == 0
+
+
+@pytest.mark.parametrize(
+    "exc",
+    [
+        MalformedRecipeError("C0 recipe temperature endpoints no longer parse"),
+        MalformedRecipeError("C2A recipe ramp shape is malformed"),
+        PoisonedHourError(
+            PoisonedHourState(
+                hour=18,
+                committed_transition_count=1,
+                aborting_exception_summary=(
+                    "MalformedRecipeError: melt pressure config changed shape"
+                ),
+                aborting_exception_type=MalformedRecipeError,
+            )
+        ),
+    ],
+    ids=(
+    "malformed-temperature-new-wording",
+    "malformed-rate-new-wording",
+    "poisoned-hour-new-wording",
+    ),
+)
+def test_recipe_value_error_raised_by_executor_is_scored_with_artifacts(
+    exc: Exception,
+) -> None:
+    result = evaluate(
+        _valid_patch(),
+        "lunar_mare_low_ti",
+        "fast",
+        profile=PROFILE,
+        executor=FakeExecutor(exc=exc),
+    )
+
+    assert not result.feasible
+    assert result.failure_category is FailureCategory.INVALID_RECIPE
+    assert result.eval_spec is not None
+    assert result.cache_key == cache_key(result.eval_spec)
+    assert result.notes
+
+
+def test_scalar_c0_temperature_range_patch_is_scored_by_c1() -> None:
+    schema = RecipeSchema()
+    path = ("campaigns", "C0", "temp_range_C")
+    scalar = schema.spec_for(path).low
+
+    class MalformedRangeExecutor:
+        calls = 0
+        config: object | None = None
+
+        def execute(self, config: object) -> object:
+            self.calls += 1
+            self.config = config
+            raise MalformedRecipeError("unrecognized temperature-range payload")
+
+    executor = MalformedRangeExecutor()
+    result = evaluate(
+        RecipePatch({path: scalar}),
+        "lunar_mare_low_ti",
+        "fast",
+        profile=PROFILE,
+        executor=executor,
+        schema=schema,
+    )
+
+    assert executor.calls == 1
+    assert executor.config is not None
+    assert executor.config.setpoints["campaigns"]["C0"]["temp_range_C"] == scalar
+    assert not result.feasible
+    assert result.failure_category is FailureCategory.INVALID_RECIPE
+    assert result.eval_spec is not None
+    assert result.cache_key == cache_key(result.eval_spec)
+
+
+def test_unknown_value_error_still_aborts_as_engine_bug() -> None:
+    with pytest.raises(EngineBugAbort):
+        evaluate(
+            _valid_patch(),
+            "lunar_mare_low_ti",
+            "fast",
+            profile=PROFILE,
+            executor=FakeExecutor(exc=ValueError("unexpected evaluator bug")),
+        )
 
 
 def test_backend_unavailable_aborts_distinct_from_engine_bug() -> None:
@@ -3577,6 +3636,7 @@ def test_real_backend_not_converged_is_timeout_not_unavailable() -> None:
     assert not result.feasible
     assert result.failure_category is FailureCategory.TIMEOUT
     assert result.failure_category is not FailureCategory.BACKEND_UNAVAILABLE
+    assert result.objectives is None
     assert result.run_reference is not None
     assert result.run_reference.backend_status == "not_converged"
     assert any("not_converged" in note for note in result.notes)
@@ -3891,6 +3951,7 @@ def test_engine_worker_timeout_exception_is_not_unavailable() -> None:
     assert result.failure_category is FailureCategory.TIMEOUT
     assert result.failure_category is not FailureCategory.BACKEND_UNAVAILABLE
     assert result.failure_category is not FailureCategory.ENGINE_BUG
+    assert result.objectives is None
     assert result.run_reference is not None
     assert result.run_reference.backend_status == "not_converged"
 
@@ -4311,7 +4372,7 @@ def test_real_backend_out_of_domain_subsolidus_rump_terminal_is_scored_success()
     assert trace["terminal_rump_by_species_kg"] == {"CaO": 2.0}
 
 
-def test_out_of_domain_earned_rump_with_wall_deposit_is_excluded_by_coating_gate(
+def test_out_of_domain_earned_rump_terminal_composition_target_scores_success(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     import simulator.runner as runner_module
@@ -4337,7 +4398,7 @@ def test_out_of_domain_earned_rump_with_wall_deposit_is_excluded_by_coating_gate
     trace = _trace()
     delattr(trace, "terminal_rump_by_species_kg")
     trace.condensed_by_stage_species_delta = ({(3, "SiO"): 20.0},)
-    trace.wall_deposit_by_segment_species_kg = {("hot_wall", "SiO2"): 0.75}
+    trace.wall_deposit_by_segment_species_kg = {("hot_wall", "SiO2"): 0.25}
     trace.wall_zone_by_segment = {"hot_wall": "Hot"}
     profile = _composition_eval_profile(
         "terminal_rump_earned",
@@ -4371,17 +4432,34 @@ def test_out_of_domain_earned_rump_with_wall_deposit_is_excluded_by_coating_gate
         executor=FakeExecutor(execution),
     )
 
-    assert not result.feasible
-    assert result.failure_category is FailureCategory.INFEASIBLE_RECIPE
-    assert result.objectives is None
-    assert result.failing_gates == ("coating",)
+    assert result.feasible
+    assert result.failure_category is None
+    assert result.objectives is not None
+    assert result.objectives.as_mapping()["composition_target:pc-terminal-rump-earned"] == (
+        pytest.approx(1.0)
+    )
+    assert "rump_terminal" in result.feasibility_margins
+    rump_margin = result.feasibility_margins["rump_terminal"]
+    assert rump_margin.feasible
+    assert rump_margin.observed == pytest.approx(0.0)
+    assert rump_margin.margin >= 0.0
     assert result.run_reference is not None
+    result_trace = result.run_reference.trace
+    assert result_trace["rump_terminal"]["status"] == "earned"
+    assert result_trace["terminal_rump_by_species_kg"] == {"CaO": 2.0}
+    assert result_trace["composition_target"]["terminal_rump_source"] == "earned_crash"
+    saturation = result_trace["knob_saturation"]
+    assert saturation["schema_version"] == "knob-saturation-v1"
+    assert saturation["red_flag"] is False
+    assert {row["key"] for row in saturation["knobs"]} == {
+        "campaigns.C0b_p_cleanup.pO2_mbar_default"
+    }
     assert result.run_reference.product_summary[
         "wall_deposit_kg_by_segment_species"
-    ]["hot_wall"]["SiO2"] == pytest.approx(0.75)
+    ]["hot_wall"]["SiO2"] == pytest.approx(0.25)
     assert result.run_reference.product_summary[
         "wall_deposit_kg_by_zone_species"
-    ]["Hot"]["SiO2"] == pytest.approx(0.75)
+    ]["Hot"]["SiO2"] == pytest.approx(0.25)
 
 
 def test_kernel_liquidus_account_overrides_reach_alphamelts_provider() -> None:
@@ -4929,6 +5007,32 @@ def test_cached_real_profile_builds_honest_evalspec_and_cache_config(
     assert result.eval_spec.backend_name == "cached-real"
     assert executor.config.backend_name == "cached-real"
     assert executor.config.reduced_real_cache == cache_config
+
+
+def test_empty_cached_real_store_miss_still_aborts(tmp_path) -> None:
+    cache_config = {
+        "db_path": str(tmp_path / "empty-pt0-cache.sqlite"),
+        "miss_policy": "fail-loud",
+        "authorized_backend_name": "alphamelts",
+    }
+    profile = copy.deepcopy(PROFILE)
+    profile["fidelities"] = {
+        "high": {
+            "backend_name": "cached-real",
+            "hours": 1,
+            "reduced_real_cache": cache_config,
+        }
+    }
+
+    with pytest.raises(EvaluationAbort) as raised:
+        evaluate(
+            _valid_patch(),
+            "lunar_mare_low_ti",
+            "high",
+            profile=profile,
+        )
+
+    assert "PT-0 cached replay miss" in str(raised.value)
 
 
 def test_stub_fidelity_drops_inherited_cached_real_cache_config(tmp_path) -> None:
@@ -5510,3 +5614,48 @@ def test_the_run_execution_authority_reader_also_refuses_a_string():
     assert f(SimpleNamespace(backend_authoritative=None)) is None
     assert f(SimpleNamespace(backend_authoritative=True)) is True
     assert f(SimpleNamespace(backend_authoritative=False)) is False
+
+
+def test_lunar_highland_c0_horizon_changes_extracted_metals() -> None:
+    profile = copy.deepcopy(dict(load_profile("lunar_highland")))
+    # C0's extraction ends by hour 19, so 24 hours exercises the cap-derived
+    # metal difference without simulating the unused remainder of the 60-hour profile.
+    profile["run"]["hours"] = 24
+    for fidelity_options in profile["fidelities"].values():
+        fidelity_options["hours"] = 24
+
+    def product_summary(patch: RecipePatch):
+        result = evaluate(
+            patch,
+            "lunar_highland",
+            "fast",
+            profile=profile,
+        )
+        assert result.run_reference is not None
+        return result.run_reference.product_summary
+
+    baseline_patch = RecipePatch({})
+    baseline = product_summary(baseline_patch)
+    repeated = product_summary(baseline_patch)
+    capped = product_summary(RecipePatch({("furnace_max_T_C",): 1200.0}))
+
+    assert baseline == repeated
+    baseline_metals = float(
+        baseline["product_classes"]["metals_plus_O2"]["metals_total_kg"]
+    )
+    repeated_metals = float(
+        repeated["product_classes"]["metals_plus_O2"]["metals_total_kg"]
+    )
+    capped_metals = float(
+        capped["product_classes"]["metals_plus_O2"]["metals_total_kg"]
+    )
+    assert all(
+        math.isfinite(value)
+        for value in (baseline_metals, repeated_metals, capped_metals)
+    )
+
+    # Same-patch repeat delta captures run variation; a larger cap delta proves
+    # the trajectory reaches extraction without pinning a copied output value.
+    assert abs(baseline_metals - capped_metals) > abs(
+        baseline_metals - repeated_metals
+    ), "C4_HORIZON_RELATION: cap must change extracted metals beyond repeat variation"

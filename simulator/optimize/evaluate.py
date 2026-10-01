@@ -44,6 +44,7 @@ from simulator.condensation import (
     knudsen_regime_diagnostic,
 )
 from simulator.config import DEFAULT_DATA_DIR, load_config_bundle
+from simulator.core import PoisonedHourError
 from simulator.cost_energy import unavailable_quantity
 from simulator.cost_ledger import run_pumping_input_cost
 from simulator.cost_parameters import default_cost_parameters_block
@@ -133,6 +134,7 @@ from simulator.pumping_cost import (
 from simulator.reduced_real_determinism import PT0NonFinitePayload
 from simulator.mre_ladder import max_voltage_for_target, parse_ladder_from_setpoints
 from simulator.run_executor import RunExecutor
+from simulator.recipe_errors import MalformedRecipeError
 from simulator.scalar_boundary import is_declared_real_scalar
 from simulator.runner import (
     PyrolysisRun,
@@ -677,9 +679,6 @@ class ScoredResult:
                 raise ValueError("feasible result cannot carry failure_category")
             if self.objectives is None:
                 raise ValueError("feasible result requires objectives")
-        else:
-            if self.objectives is not None:
-                raise ValueError("infeasible result must not carry objectives")
         if self.failure_category is FailureCategory.PROPOSED:
             pumping_margin = self.feasibility_margins.get(PUMPING_FEASIBILITY_GATE)
             pressure_proposal = (
@@ -769,7 +768,7 @@ def evaluate(
     cost_parameters: Mapping[str, Any] | None = None,
     conditional_context: ConditionalExecutionContext | None = None,
 ) -> ScoredResult:
-    """Run one recipe candidate and return its feasible-only score."""
+    """Run one candidate and return feasibility plus any available objectives."""
 
     active_schema = schema or RecipeSchema()
     try:
@@ -964,6 +963,14 @@ def evaluate(
             message,
         )
     except Exception as exc:  # noqa: BLE001 -- crashes abort the study
+        if _is_malformed_recipe_error(exc):
+            return _malformed_recipe_result(
+                candidate_id,
+                spec,
+                key,
+                f"{type(exc).__name__}: {exc}",
+                profile=profile,
+            )
         honest = _result_from_honest_engine_exception(
             candidate_id,
             spec,
@@ -985,6 +992,15 @@ def evaluate(
     error_message = str(getattr(run_execution, "error_message", ""))
     if status == "failed":
         failure_exc = getattr(run_execution, "failure_exception", None)
+        if _is_malformed_recipe_error(failure_exc):
+            return _malformed_recipe_result(
+                candidate_id,
+                spec,
+                key,
+                str(failure_exc),
+                run_execution=run_execution,
+                profile=profile,
+            )
         if _is_backend_unavailable(failure_exc, carrier=run_execution):
             raise BackendUnavailableAbort(
                 error_message or "backend unavailable",
@@ -1135,7 +1151,32 @@ def evaluate(
             cache_key_value=key,
         ) from exc
     if not feasibility.feasible:
-        return _infeasible_result(candidate_id, spec, key, feasibility, run_execution, profile)
+        objectives = None
+        try:
+            pumping_diagnostic = _pumping_diagnostic_for_gate(
+                run_execution,
+                feedstock_id=spec.feedstock_id,
+            )
+            computed_objectives = _compute_objective_vector(
+                run_execution,
+                objective_profile,
+                pumping_diagnostic,
+                spec,
+            )
+            if all(value.value is not None for value in computed_objectives.values):
+                objectives = computed_objectives
+        except (OverflowError, ObjectiveComputationError):
+            # Keep the failed gate result; an unavailable vector remains unscored.
+            pass
+        return _infeasible_result(
+            candidate_id,
+            spec,
+            key,
+            feasibility,
+            run_execution,
+            profile,
+            objectives=objectives,
+        )
     pumping_diagnostic = _pumping_diagnostic_for_gate(
         run_execution,
         feedstock_id=spec.feedstock_id,
@@ -1188,15 +1229,12 @@ def evaluate(
             )
 
     try:
-        objectives = compute_objectives(
+        objectives = _compute_objective_vector(
+            run_execution,
             objective_profile,
-            _CertifiedPumpingDiagnosticRunExecution(
-                run_execution,
-                pumping_diagnostic,
-            ),
-            cost_parameters=spec.cost_parameters,
+            pumping_diagnostic,
+            spec,
         )
-        objectives = _objectives_with_thermal_window_metadata(objectives, spec)
         trace_payload = _composition_target_trace_payload(
             objective_profile,
             objectives,
@@ -3821,6 +3859,8 @@ def _campaign_max_hold_hr(
 def _thermal_window_duration_h(value: Any, *, run_hours: int) -> float:
     interval = _numeric_interval(value)
     if interval is None:
+        # For a single-campaign window, run.hours is the measured hold; only
+        # profiles without a window use it as a campaign-sequence horizon.
         return float(run_hours)
     low, high = interval
     if high < low:
@@ -4319,6 +4359,7 @@ def _infeasible_result(
     *,
     notes: tuple[str, ...] = (),
     trace_payload: Mapping[str, Any] | None = None,
+    objectives: ObjectiveVector | None = None,
 ) -> ScoredResult:
     trace_payload = _trace_payload_with_interpolation_feasibility(
         trace_payload,
@@ -4331,11 +4372,29 @@ def _infeasible_result(
         cache_key=key,
         feasible=False,
         failure_category=FailureCategory.INFEASIBLE_RECIPE,
+        objectives=objectives,
         feasibility_margins=feasibility.margins,
         failing_gates=feasibility.failing_gates,
         run_reference=_run_reference(run_execution, profile, trace_payload=trace_payload),
         notes=notes,
     )
+
+
+def _compute_objective_vector(
+    run_execution: Any,
+    objective_profile: Mapping[str, Any],
+    pumping_diagnostic: Mapping[str, Any],
+    spec: EvalSpec,
+) -> ObjectiveVector:
+    objectives = compute_objectives(
+        objective_profile,
+        _CertifiedPumpingDiagnosticRunExecution(
+            run_execution,
+            pumping_diagnostic,
+        ),
+        cost_parameters=spec.cost_parameters,
+    )
+    return _objectives_with_thermal_window_metadata(objectives, spec)
 
 
 def _target_infeasible_result(
@@ -5807,6 +5866,69 @@ def _invalid_recipe_result(
         failing_gates=("inventory_overdraw",),
         run_reference=run_reference,
         notes=tuple(notes),
+    )
+
+
+def _is_malformed_recipe_error(exc: BaseException | None) -> bool:
+    if isinstance(exc, (*_TYPED_ABSENCE_EXCEPTION_CLASSES, EngineBugAbort)):
+        return False
+    if isinstance(exc, MalformedRecipeError):
+        return True
+    return (
+        isinstance(exc, PoisonedHourError)
+        and exc.state.aborting_exception_type is MalformedRecipeError
+    )
+
+
+def _malformed_recipe_result(
+    candidate_id: str | None,
+    spec: EvalSpec,
+    key: str,
+    error_message: str,
+    *,
+    run_execution: Any | None = None,
+    profile: Mapping[str, Any] | None = None,
+) -> ScoredResult:
+    gate = "recipe_configuration_valid"
+    run_reference = (
+        _run_reference(run_execution, profile or {})
+        if run_execution is not None
+        else RunReference(
+            status="failed",
+            error_message=error_message,
+            reason="malformed_recipe",
+            trace=_synthetic_not_run_trace(),
+            backend_name=spec.backend_name,
+            backend_status=SYNTHETIC_BACKEND_NOT_RUN,
+            backend_authoritative=False,
+        )
+    )
+    threshold = ThresholdSpec(
+        id=gate,
+        value=1.0,
+        units="boolean",
+        source="code_default",
+        source_ref="simulator.optimize.evaluate: recipe configuration validity",
+    )
+    # Validity is boolean: invalid configuration is 0 against the required 1.
+    margin = GateMargin(
+        gate=gate,
+        feasible=False,
+        margin=-1.0,
+        threshold=threshold,
+        observed=0.0,
+        detail=error_message,
+    )
+    return ScoredResult(
+        candidate_id=candidate_id,
+        eval_spec=spec,
+        cache_key=key,
+        feasible=False,
+        failure_category=FailureCategory.INVALID_RECIPE,
+        feasibility_margins={gate: margin},
+        failing_gates=(gate,),
+        run_reference=run_reference,
+        notes=(error_message,),
     )
 
 

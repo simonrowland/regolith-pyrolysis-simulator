@@ -51,6 +51,7 @@ from simulator.optimize.objective import (
 )
 from simulator.optimize.physics import GateMargin, ThresholdSpec
 from simulator.backend_names import (
+    ANALYTICAL_BACKEND_SERIALIZATION_TOKEN,
     LEGACY_ANALYTICAL_BACKEND_DIAGNOSTIC_TOKEN,
     canonical_backend_name,
 )
@@ -788,7 +789,9 @@ def _row_to_scored_result(row: sqlite3.Row) -> ScoredResult:
         cache_key=row["cache_key"],
         feasible=feasible,
         failure_category=failure,
-        objectives=objectives if feasible else None,
+        # Preserve measured objectives on infeasible rows so cache replay tells
+        # the optimizer the same finite values as the live evaluation.
+        objectives=objectives,
         feasibility_margins=margins,
         failing_gates=grounded_failing_gates(
             tuple(_json_load(row["failing_gates"])),
@@ -884,7 +887,8 @@ def reground_scored_result(scored_result: ScoredResult) -> ScoredResult:
         cache_key=scored_result.cache_key,
         feasible=feasible,
         failure_category=None if feasible else scored_result.failure_category,
-        objectives=scored_result.objectives if feasible else None,
+        # Re-grounding feasibility must not erase finite measured objectives.
+        objectives=scored_result.objectives,
         feasibility_margins=scored_result.feasibility_margins,
         failing_gates=failing_gates,
         run_reference=scored_result.run_reference,
@@ -905,6 +909,12 @@ def _cache_write_rejections(scored_result: ScoredResult) -> tuple[str, ...]:
     reasons: list[str] = []
     backend_status = _agreed_carrier_value(trust.backend_statuses)
     backend_authoritative = _agreed_carrier_value(trust.backend_authorities)
+    allow_internal_analytical_cache = (
+        _agreed_carrier_value(trust.evidence_classes)
+        == ANALYTICAL_BACKEND_SERIALIZATION_TOKEN
+        and backend_authoritative is False
+        and not any(trust.certification_allowances)
+    )
     if backend_authoritative is not True:
         reasons.append("non_authoritative_backend")
     contradiction = _backend_authority_contradiction(
@@ -922,6 +932,20 @@ def _cache_write_rejections(scored_result: ScoredResult) -> tuple[str, ...]:
         reasons.append(closure_rejection)
     if _has_out_of_domain_provenance(scored_result):
         reasons.append("out_of_domain_provenance")
+    if allow_internal_analytical_cache:
+        # Keep analytical results reusable within their own evidence class;
+        # authority and certification remain false, and all other admission
+        # rejections continue to apply.
+        reasons = [
+            reason
+            for reason in reasons
+            if reason
+            not in {
+                "non_authoritative_backend",
+                "certification_forbidden",
+                "backend_name_non_authoritative:internal-analytical",
+            }
+        ]
     return tuple(dict.fromkeys(reasons))
 
 

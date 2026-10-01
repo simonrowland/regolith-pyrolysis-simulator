@@ -16,12 +16,12 @@ constraints:
   gates: [delivered_stream_purity, coating, extraction_completeness, knudsen_viscous, furnace_temperature]
   stream_purity_min: 0.95
 early_tap_mode: true
-run: {campaign: C0, hours: 1, mass_kg: 1000.0, backend_name: internal-analytical}
+run: {campaign: C0, hours: 60, mass_kg: 1000.0, backend_name: internal-analytical}
 fidelities:
-  internal-analytical: {backend_name: internal-analytical, hours: 1}
-  fast: {backend_name: internal-analytical, hours: 1}
-  high: {backend_name: internal-analytical, hours: 1}
-  auto: {backend_name: internal-analytical, hours: 1}
+  internal-analytical: {backend_name: internal-analytical, hours: 60}
+  fast: {backend_name: internal-analytical, hours: 60}
+  high: {backend_name: internal-analytical, hours: 60}
+  auto: {backend_name: internal-analytical, hours: 60}
 seed_recipes:
   - id: canonical-lunar-full-yield
     source_campaign: C2A_continuous

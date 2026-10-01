@@ -38,6 +38,7 @@ from simulator.optimize.results_store import (
     _deserialize_margins,
     _serialize_margins,
     grounded_result_feasible,
+    reground_scored_result,
 )
 from web.routes import _coating_readout
 
@@ -183,6 +184,30 @@ def _scored(
         ),
         notes=("stored",),
     )
+
+
+def _analytical_scored(
+    spec: EvalSpec,
+    *,
+    trace_overrides: Mapping[str, object] | None = None,
+    product_summary_overrides: Mapping[str, object] | None = None,
+) -> ScoredResult:
+    trace = {
+        "backend_name": ANALYTICAL_BACKEND_SERIALIZATION_TOKEN,
+        "backend_status": "diagnostic_stub",
+        "backend_authoritative": False,
+        "evidence_class": ANALYTICAL_BACKEND_SERIALIZATION_TOKEN,
+        "certification_allowed": False,
+        "snapshots": [{"mass_balance_error_pct": 0.0}],
+        **dict(trace_overrides or {}),
+    }
+    product_summary = {
+        "backend_name": ANALYTICAL_BACKEND_SERIALIZATION_TOKEN,
+        "oxygen_kg": 10.0,
+        "mass_closure": {"status": "closed", "mass_balance_error_pct": 0.0},
+        **dict(product_summary_overrides or {}),
+    }
+    return _scored(spec, result_blob=trace, product_summary=product_summary)
 
 
 def _eval_spec_payload(spec: EvalSpec) -> dict[str, object]:
@@ -353,6 +378,34 @@ def test_round_trip_lossless_lookup(tmp_path) -> None:
         "oxygen_kg": 10.0,
         "wall_deposit_kg": {},
     }
+
+
+def test_lookup_preserves_finite_objectives_on_infeasible_rows(tmp_path) -> None:
+    spec = _base_spec()
+    objectives = _objectives(oxygen=3.5, energy=8.25)
+    scored = replace(_infeasible(spec), objectives=objectives)
+    store = ResultStore(tmp_path / "infeasible-objectives.sqlite")
+
+    store.store(spec, scored, created_at="2026-09-30T00:00:00Z")
+
+    cached = store.lookup(spec)
+    assert cached is not None
+    assert cached.feasible is False
+    assert cached.objectives == objectives
+
+
+def test_regrounding_preserves_finite_objectives_when_it_flips_to_infeasible() -> None:
+    spec = _base_spec()
+    objectives = _objectives(oxygen=4.0, energy=7.0)
+    scored = replace(
+        _scored(spec, objectives=objectives),
+        feasibility_margins={"delivered_stream_purity": _margin(feasible=False)},
+    )
+
+    regrounded = reground_scored_result(scored)
+
+    assert regrounded.feasible is False
+    assert regrounded.objectives == objectives
 
 
 def test_thermoengine_version_identity_is_optimizer_key_neutral(
@@ -931,7 +984,12 @@ def test_feasible_backend_without_authority_rejected_from_cache_write(
     with pytest.raises(ResultStoreWriteRejected) as exc_info:
         store.store(spec, scored, created_at="2026-05-31T00:00:00Z")
 
-    assert "non_authoritative_backend" in exc_info.value.reasons
+    expected_reason = (
+        "evidence_class_non_authoritative:internal-analytical"
+        if backend_status == "diagnostic_stub"
+        else "non_authoritative_backend"
+    )
+    assert expected_reason in exc_info.value.reasons
     assert store.lookup(spec) is None
 
 
@@ -1123,8 +1181,21 @@ def test_lookup_fails_closed_for_ungroundable_feasibility_margins(
 
     assert loaded is not None
     assert loaded.feasible is False
-    assert loaded.objectives is None
+    # Bad feasibility evidence cannot invalidate a separately stored yield vector.
+    assert loaded.objectives == _objectives()
     assert loaded.feasibility_margins == {}
+
+
+def test_lookup_leaves_empty_objectives_empty_for_infeasible_rows(tmp_path) -> None:
+    spec = _base_spec(recipe_id="infeasible-empty-objectives")
+    store = ResultStore(tmp_path / "infeasible-empty.sqlite")
+    store.store(spec, _infeasible(spec), created_at="2026-09-30T00:00:00Z")
+
+    loaded = store.lookup(spec)
+
+    assert loaded is not None
+    assert loaded.feasible is False
+    assert loaded.objectives is None
 
 
 @pytest.mark.parametrize(
@@ -1248,7 +1319,7 @@ def test_lookup_fails_closed_for_ungroundable_feasibility_margins(
                     }
                 ),
             ),
-            "non_authoritative_backend",
+            "evidence_class_non_authoritative:internal-analytical",
         ),
         (
             lambda spec: _scored(
@@ -1333,6 +1404,44 @@ def test_store_accepts_closure_clean_authoritative_in_domain_cache_write(
     assert store.lookup(spec) is not None
     with sqlite3.connect(tmp_path / "results.sqlite") as conn:
         assert conn.execute("SELECT count(*) FROM results").fetchone()[0] == 1
+
+
+@pytest.mark.parametrize(
+    ("trace_overrides", "product_summary_overrides", "expected_reason"),
+    (
+        (
+            {"snapshots": [{"mass_balance_error_pct": 1.0}]},
+            {},
+            "mass_balance_closure_breach",
+        ),
+        ({"backend_status": "out_of_domain"}, {}, "out_of_domain_provenance"),
+        (
+            {"per_hour_summary": [{"reduced_real_cache_state": "cached_interpolated"}]},
+            {},
+            "approximate_reduced_real_cache_state:cached_interpolated",
+        ),
+        ({}, {"backend_name": "alphamelts"}, "backend_name_carrier_disagreement"),
+    ),
+)
+def test_internal_analytical_cache_keeps_other_write_rejections(
+    tmp_path,
+    trace_overrides: Mapping[str, object],
+    product_summary_overrides: Mapping[str, object],
+    expected_reason: str,
+) -> None:
+    spec = _base_spec()
+    scored = _analytical_scored(
+        spec,
+        trace_overrides=trace_overrides,
+        product_summary_overrides=product_summary_overrides,
+    )
+    store = ResultStore(tmp_path / "results.sqlite")
+
+    with pytest.raises(ResultStoreWriteRejected) as exc_info:
+        store.store(spec, scored, created_at="2026-06-01T00:00:00Z")
+
+    assert any(reason.startswith(expected_reason) for reason in exc_info.value.reasons)
+    assert store.lookup(spec) is None
 
 
 @pytest.mark.parametrize(

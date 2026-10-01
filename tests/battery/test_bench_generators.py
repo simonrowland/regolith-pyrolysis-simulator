@@ -18,7 +18,6 @@ from simulator.battery.records import (
 from simulator.battery.waypoints import (
     charge_moles_by_species, oxygen_condition, consumer_readiness,
     ENGINE_POINT_CONSUMERS, WaypointAuthority, ReadinessStatus, GapReason,
-    UnknownCompositionRelationError,
 )
 from tests.battery import factories as f
 
@@ -311,14 +310,14 @@ def test_gas_couple_route_obeys_mass_action(reduced, oxidized):
     assert values[1] - values[0] == pytest.approx(4)
 
 
-def test_engine_inputs_all_eight_and_provenance():
+def test_engine_inputs_active_set_and_provenance():
     experiment, bench, observation = case()
     bench = replace(bench, identity=BenchIdentity(BenchIdentityBasis.CITED_BY_AUTHOR,
         ref=BenchReference("cited", "Earlier apparatus paper", ("apparatus",), f.loc(source_path="cited.pdf", page=7))))
     inputs = collect_consumer_inputs(experiment, bench, observation)
     results = engine_point_requests(inputs)
     assert {item.payload["engine"] for item in results} == {
-        "internal-analytical", "alphamelts", "thermoengine", "vaporock", "magemin", "cached-real", "imcc_sf04", "imcc_sf04_ext", "openimcc"}
+        "internal-analytical", "alphamelts", "thermoengine", "vaporock", "magemin", "cached-real", "openimcc"}
     for result in results:
         assert result.payload["temperature_C"] == 1126.85
         assert result.payload["pressure_bar"] == 1e-5
@@ -414,15 +413,63 @@ def test_sossi_measured_compositions_replace_recipe_and_preserve_recipe_notice()
     assert measured_result.provenance["output_routes"]["composition_mol"]["notice"] == measured_result.payload["composition_notice"]
 
 
-def test_unknown_composition_relation_refuses_loudly():
+def test_unknown_composition_relation_is_a_typed_per_row_refusal():
     experiment, bench, observation = case()
     composition = Composition("unknown_relation", (("MgO", Decimal(".25")), ("SiO2", Decimal(".75"))), AmountBasis.MOLE_FRACTION)
     sample = replace(experiment.sample, printed_composition=None, initial_composition=Located(
         State.of(composition), locator=f.loc(),
         inference=Derivation(relation="not_a_production_relation", inputs=("unknown",), parameters=(), output_unit="mole_fraction"),
     ))
-    with pytest.raises(UnknownCompositionRelationError, match="unknown normalized composition relation"):
-        engine_point_requests(collect_consumer_inputs(replace(experiment, sample=sample), bench, observation))
+    readiness = consumer_readiness(replace(experiment, sample=sample), bench, observation)
+    assert {item.consumer for item in readiness} >= {"kems", "rps", "engine_point"}
+    inputs = collect_consumer_inputs(replace(experiment, sample=sample), bench, observation)
+    composition_result = inputs.waypoints["normalized_composition"]
+    assert composition_result.selected is None
+    assert composition_result.absence is not None
+    assert composition_result.absence.reason is GapReason.UNSUPPORTED_PRINT_FORM
+    assert any("not_a_production_relation" in path for path in composition_result.absence.missing)
+
+
+def test_binary_complement_wt_percent_relation_normalizes_generically():
+    experiment, bench, observation = case()
+    sample = replace(experiment.sample, initial_composition=None, printed_composition=Located(
+        State.of({"K2O": Decimal("50"), "SiO2": Decimal("50")}), locator=f.loc(),
+        inference=Derivation(
+            relation="SiO2_wt_pct=100-K2O_wt_pct;wt_pct_to_mole_fraction",
+            inputs=("printed K2O wt%", "SiO2=100-K2O", "original_unit=wt_pct"),
+            parameters=(), output_unit="mole_fraction",
+        ),
+    ))
+    result = collect_consumer_inputs(replace(experiment, sample=sample), bench, observation)
+    selected = result.waypoints["normalized_composition"].selected
+    assert selected is not None
+    assert abs(selected.value["K2O"] - Decimal("0.38945")) < Decimal("0.00001")
+    assert abs(selected.value["SiO2"] - Decimal("0.61055")) < Decimal("0.00001")
+    assert "printed binary oxide wt% composition" in selected.notice
+
+
+def test_binary_complement_relation_refuses_printed_trace_third_component():
+    experiment, bench, observation = case()
+    sample = replace(experiment.sample, initial_composition=None, printed_composition=Located(
+        State.of({"K2O": Decimal("50"), "SiO2": Decimal("50"), "Cl": Decimal("0.01")}),
+        locator=f.loc(),
+        inference=Derivation(
+            relation="SiO2_wt_pct=100-K2O_wt_pct;wt_pct_to_mole_fraction",
+            inputs=("printed K2O wt%", "SiO2=100-K2O", "original_unit=wt_pct"),
+            parameters=(), output_unit="mole_fraction",
+        ),
+    ))
+
+    result = collect_consumer_inputs(replace(experiment, sample=sample), bench, observation)
+    composition = result.waypoints["normalized_composition"]
+
+    assert composition.selected is None
+    assert composition.absence is not None
+    assert composition.absence.reason is GapReason.UNSUPPORTED_PRINT_FORM
+    assert any(
+        "SiO2_wt_pct=100-K2O_wt_pct;wt_pct_to_mole_fraction" in path
+        for path in composition.absence.missing
+    )
 
 
 def test_production_wt_pct_relation_reaches_engine_notice():

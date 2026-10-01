@@ -262,7 +262,7 @@ def test_feot_maps_to_feo_with_notice_and_printed_map_keeps_feot() -> None:
     assert "FeOT" in str(experiment.sample.printed_composition.state.value)
     assert experiment.sample.printed_composition.inference is None
     requests = engine_point_requests(collect_consumer_inputs(experiment, bench, observation))
-    assert len(requests) == 9
+    assert len(requests) == 7
     assert all(item.payload is not None for item in requests)
     assert all(
         "total_iron_as_FeO" in item.payload["composition_notice"]
@@ -325,7 +325,7 @@ def test_non_oxide_above_one_weight_percent_stays_refused() -> None:
     assert result.absence is not None
     assert result.absence.reason is GapReason.UNSUPPORTED_PRINT_FORM
     requests = engine_point_requests(collect_consumer_inputs(experiment, bench, observation))
-    assert len(requests) == 9
+    assert len(requests) == 7
     assert all(item.payload is None for item in requests)
     assert all(
         any(gap.reason is GapReason.UNSUPPORTED_PRINT_FORM for gap in item.readiness.gaps)
@@ -417,7 +417,7 @@ def test_amount_basis_is_enforced_before_mass_conversion() -> None:
     assert refused.absence is not None
     assert refused.absence.reason is GapReason.UNSUPPORTED_PRINT_FORM
     requests = engine_point_requests(collect_consumer_inputs(experiment, bench, observation))
-    assert len(requests) == 9
+    assert len(requests) == 7
     assert all(item.payload is None for item in requests)
 
     for basis in ("mol_inventory", "not_printed"):

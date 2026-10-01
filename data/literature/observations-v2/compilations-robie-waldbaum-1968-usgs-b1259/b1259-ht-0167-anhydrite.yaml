@@ -2174,23 +2174,23 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: beta
             charge:
               tag: value
               value: 0
           coefficient: '-1'
         - species:
-            formula: S
+            formula: S2
             phase:
               tag: value
-              value: cr
+              value: g
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
-          coefficient: '-4'
+          coefficient: '-2'
     formation_elements:
       tag: value
       value:
@@ -2201,18 +2201,18 @@ observations:
             value: cr
           polymorph:
             tag: value
-            value: reference
+            value: beta
           charge:
             tag: value
             value: 0
       - - S
-        - formula: S
+        - formula: S2
           phase:
             tag: value
-            value: cr
+            value: g
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -2267,7 +2267,9 @@ observations:
     note: as_published='-250.131'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=Ca=B1259 reference-state table p.37/PDF p.43, S=B1259 reference-state table p.63/PDF
+      p.69
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0167-anhydrite.json
     record: b1259-ht-0167-anhydrite
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0167-anhydrite.json
@@ -2341,23 +2343,23 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: beta
             charge:
               tag: value
               value: 0
           coefficient: '-1'
         - species:
-            formula: S
+            formula: S2
             phase:
               tag: value
-              value: cr
+              value: g
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
-          coefficient: '-4'
+          coefficient: '-2'
     formation_elements:
       tag: value
       value:
@@ -2368,18 +2370,18 @@ observations:
             value: cr
           polymorph:
             tag: value
-            value: reference
+            value: beta
           charge:
             tag: value
             value: 0
       - - S
-        - formula: S
+        - formula: S2
           phase:
             tag: value
-            value: cr
+            value: g
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -2434,7 +2436,9 @@ observations:
     note: as_published='-239.697'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=Ca=B1259 reference-state table p.37/PDF p.43, S=B1259 reference-state table p.63/PDF
+      p.69
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0167-anhydrite.json
     record: b1259-ht-0167-anhydrite
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0167-anhydrite.json
@@ -2505,26 +2509,26 @@ observations:
             formula: Ca
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
           coefficient: '-1'
         - species:
-            formula: S
+            formula: S2
             phase:
               tag: value
-              value: cr
+              value: g
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
-          coefficient: '-4'
+          coefficient: '-2'
     formation_elements:
       tag: value
       value:
@@ -2532,21 +2536,21 @@ observations:
         - formula: Ca
           phase:
             tag: value
-            value: cr
+            value: l
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
       - - S
-        - formula: S
+        - formula: S2
           phase:
             tag: value
-            value: cr
+            value: g
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -2601,7 +2605,9 @@ observations:
     note: as_published='-229.213'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=Ca=B1259 reference-state table p.37/PDF p.43, S=B1259 reference-state table p.63/PDF
+      p.69
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0167-anhydrite.json
     record: b1259-ht-0167-anhydrite
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0167-anhydrite.json
@@ -2672,26 +2678,26 @@ observations:
             formula: Ca
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
           coefficient: '-1'
         - species:
-            formula: S
+            formula: S2
             phase:
               tag: value
-              value: cr
+              value: g
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
-          coefficient: '-4'
+          coefficient: '-2'
     formation_elements:
       tag: value
       value:
@@ -2699,21 +2705,21 @@ observations:
         - formula: Ca
           phase:
             tag: value
-            value: cr
+            value: l
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
       - - S
-        - formula: S
+        - formula: S2
           phase:
             tag: value
-            value: cr
+            value: g
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -2768,7 +2774,9 @@ observations:
     note: as_published='-218.811'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=Ca=B1259 reference-state table p.37/PDF p.43, S=B1259 reference-state table p.63/PDF
+      p.69
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0167-anhydrite.json
     record: b1259-ht-0167-anhydrite
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0167-anhydrite.json
@@ -2839,26 +2847,26 @@ observations:
             formula: Ca
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
           coefficient: '-1'
         - species:
-            formula: S
+            formula: S2
             phase:
               tag: value
-              value: cr
+              value: g
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
-          coefficient: '-4'
+          coefficient: '-2'
     formation_elements:
       tag: value
       value:
@@ -2866,21 +2874,21 @@ observations:
         - formula: Ca
           phase:
             tag: value
-            value: cr
+            value: l
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
       - - S
-        - formula: S
+        - formula: S2
           phase:
             tag: value
-            value: cr
+            value: g
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -2935,7 +2943,9 @@ observations:
     note: as_published='-208.560'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=Ca=B1259 reference-state table p.37/PDF p.43, S=B1259 reference-state table p.63/PDF
+      p.69
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0167-anhydrite.json
     record: b1259-ht-0167-anhydrite
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0167-anhydrite.json
@@ -3009,7 +3019,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: alpha
             charge:
               tag: value
               value: 0
@@ -3018,10 +3028,10 @@ observations:
             formula: S
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -3036,7 +3046,7 @@ observations:
             value: cr
           polymorph:
             tag: value
-            value: reference
+            value: alpha
           charge:
             tag: value
             value: 0
@@ -3044,10 +3054,10 @@ observations:
         - formula: S
           phase:
             tag: value
-            value: cr
+            value: l
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -3102,7 +3112,9 @@ observations:
     note: as_published='-307.268'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=Ca=B1259 reference-state table p.37/PDF p.43, S=B1259 reference-state table p.63/PDF
+      p.69
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0167-anhydrite.json
     record: b1259-ht-0167-anhydrite
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0167-anhydrite.json
@@ -3176,7 +3188,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: alpha
             charge:
               tag: value
               value: 0
@@ -3185,10 +3197,10 @@ observations:
             formula: S
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -3203,7 +3215,7 @@ observations:
             value: cr
           polymorph:
             tag: value
-            value: reference
+            value: alpha
           charge:
             tag: value
             value: 0
@@ -3211,10 +3223,10 @@ observations:
         - formula: S
           phase:
             tag: value
-            value: cr
+            value: l
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -3269,7 +3281,9 @@ observations:
     note: as_published='-298.046'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=Ca=B1259 reference-state table p.37/PDF p.43, S=B1259 reference-state table p.63/PDF
+      p.69
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0167-anhydrite.json
     record: b1259-ht-0167-anhydrite
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0167-anhydrite.json
@@ -3343,7 +3357,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: alpha
             charge:
               tag: value
               value: 0
@@ -3352,10 +3366,10 @@ observations:
             formula: S
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -3370,7 +3384,7 @@ observations:
             value: cr
           polymorph:
             tag: value
-            value: reference
+            value: alpha
           charge:
             tag: value
             value: 0
@@ -3378,10 +3392,10 @@ observations:
         - formula: S
           phase:
             tag: value
-            value: cr
+            value: l
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -3436,7 +3450,9 @@ observations:
     note: as_published='-279.431'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=Ca=B1259 reference-state table p.37/PDF p.43, S=B1259 reference-state table p.63/PDF
+      p.69
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0167-anhydrite.json
     record: b1259-ht-0167-anhydrite
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0167-anhydrite.json
@@ -3510,23 +3526,23 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: beta
             charge:
               tag: value
               value: 0
           coefficient: '-1'
         - species:
-            formula: S
+            formula: S2
             phase:
               tag: value
-              value: cr
+              value: g
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
-          coefficient: '-4'
+          coefficient: '-2'
     formation_elements:
       tag: value
       value:
@@ -3537,18 +3553,18 @@ observations:
             value: cr
           polymorph:
             tag: value
-            value: reference
+            value: beta
           charge:
             tag: value
             value: 0
       - - S
-        - formula: S
+        - formula: S2
           phase:
             tag: value
-            value: cr
+            value: g
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -3603,7 +3619,9 @@ observations:
     note: as_published='-271.369'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=Ca=B1259 reference-state table p.37/PDF p.43, S=B1259 reference-state table p.63/PDF
+      p.69
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0167-anhydrite.json
     record: b1259-ht-0167-anhydrite
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0167-anhydrite.json
@@ -3677,23 +3695,23 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: beta
             charge:
               tag: value
               value: 0
           coefficient: '-1'
         - species:
-            formula: S
+            formula: S2
             phase:
               tag: value
-              value: cr
+              value: g
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
-          coefficient: '-4'
+          coefficient: '-2'
     formation_elements:
       tag: value
       value:
@@ -3704,18 +3722,18 @@ observations:
             value: cr
           polymorph:
             tag: value
-            value: reference
+            value: beta
           charge:
             tag: value
             value: 0
       - - S
-        - formula: S
+        - formula: S2
           phase:
             tag: value
-            value: cr
+            value: g
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -3770,7 +3788,9 @@ observations:
     note: as_published='-260.694'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=Ca=B1259 reference-state table p.37/PDF p.43, S=B1259 reference-state table p.63/PDF
+      p.69
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0167-anhydrite.json
     record: b1259-ht-0167-anhydrite
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0167-anhydrite.json
@@ -3844,23 +3864,23 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: beta
             charge:
               tag: value
               value: 0
           coefficient: '-1'
         - species:
-            formula: S
+            formula: S2
             phase:
               tag: value
-              value: cr
+              value: g
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
-          coefficient: '-4'
+          coefficient: '-2'
     formation_elements:
       tag: value
       value:
@@ -3871,18 +3891,18 @@ observations:
             value: cr
           polymorph:
             tag: value
-            value: reference
+            value: beta
           charge:
             tag: value
             value: 0
       - - S
-        - formula: S
+        - formula: S2
           phase:
             tag: value
-            value: cr
+            value: g
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -3937,7 +3957,9 @@ observations:
     note: as_published='-355.123'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=Ca=B1259 reference-state table p.37/PDF p.43, S=B1259 reference-state table p.63/PDF
+      p.69
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0167-anhydrite.json
     record: b1259-ht-0167-anhydrite
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0167-anhydrite.json
@@ -4011,23 +4033,23 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: beta
             charge:
               tag: value
               value: 0
           coefficient: '-1'
         - species:
-            formula: S
+            formula: S2
             phase:
               tag: value
-              value: cr
+              value: g
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
-          coefficient: '-4'
+          coefficient: '-2'
     formation_elements:
       tag: value
       value:
@@ -4038,18 +4060,18 @@ observations:
             value: cr
           polymorph:
             tag: value
-            value: reference
+            value: beta
           charge:
             tag: value
             value: 0
       - - S
-        - formula: S
+        - formula: S2
           phase:
             tag: value
-            value: cr
+            value: g
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -4104,7 +4126,9 @@ observations:
     note: as_published='-354.054'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=Ca=B1259 reference-state table p.37/PDF p.43, S=B1259 reference-state table p.63/PDF
+      p.69
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0167-anhydrite.json
     record: b1259-ht-0167-anhydrite
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0167-anhydrite.json
@@ -4175,26 +4199,26 @@ observations:
             formula: Ca
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
           coefficient: '-1'
         - species:
-            formula: S
+            formula: S2
             phase:
               tag: value
-              value: cr
+              value: g
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
-          coefficient: '-4'
+          coefficient: '-2'
     formation_elements:
       tag: value
       value:
@@ -4202,21 +4226,21 @@ observations:
         - formula: Ca
           phase:
             tag: value
-            value: cr
+            value: l
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
       - - S
-        - formula: S
+        - formula: S2
           phase:
             tag: value
-            value: cr
+            value: g
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -4271,7 +4295,9 @@ observations:
     note: as_published='-354.654'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=Ca=B1259 reference-state table p.37/PDF p.43, S=B1259 reference-state table p.63/PDF
+      p.69
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0167-anhydrite.json
     record: b1259-ht-0167-anhydrite
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0167-anhydrite.json
@@ -4342,26 +4368,26 @@ observations:
             formula: Ca
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
           coefficient: '-1'
         - species:
-            formula: S
+            formula: S2
             phase:
               tag: value
-              value: cr
+              value: g
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
-          coefficient: '-4'
+          coefficient: '-2'
     formation_elements:
       tag: value
       value:
@@ -4369,21 +4395,21 @@ observations:
         - formula: Ca
           phase:
             tag: value
-            value: cr
+            value: l
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
       - - S
-        - formula: S
+        - formula: S2
           phase:
             tag: value
-            value: cr
+            value: g
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -4438,7 +4464,9 @@ observations:
     note: as_published='-353.053'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=Ca=B1259 reference-state table p.37/PDF p.43, S=B1259 reference-state table p.63/PDF
+      p.69
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0167-anhydrite.json
     record: b1259-ht-0167-anhydrite
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0167-anhydrite.json
@@ -4509,26 +4537,26 @@ observations:
             formula: Ca
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
           coefficient: '-1'
         - species:
-            formula: S
+            formula: S2
             phase:
               tag: value
-              value: cr
+              value: g
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
-          coefficient: '-4'
+          coefficient: '-2'
     formation_elements:
       tag: value
       value:
@@ -4536,21 +4564,21 @@ observations:
         - formula: Ca
           phase:
             tag: value
-            value: cr
+            value: l
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
       - - S
-        - formula: S
+        - formula: S2
           phase:
             tag: value
-            value: cr
+            value: g
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -4605,7 +4633,9 @@ observations:
     note: as_published='-351.268'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=Ca=B1259 reference-state table p.37/PDF p.43, S=B1259 reference-state table p.63/PDF
+      p.69
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0167-anhydrite.json
     record: b1259-ht-0167-anhydrite
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0167-anhydrite.json
@@ -4679,7 +4709,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: alpha
             charge:
               tag: value
               value: 0
@@ -4691,7 +4721,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: orthorhombic
             charge:
               tag: value
               value: 0
@@ -4706,7 +4736,7 @@ observations:
             value: cr
           polymorph:
             tag: value
-            value: reference
+            value: alpha
           charge:
             tag: value
             value: 0
@@ -4717,7 +4747,7 @@ observations:
             value: cr
           polymorph:
             tag: value
-            value: reference
+            value: orthorhombic
           charge:
             tag: value
             value: 0
@@ -4772,7 +4802,9 @@ observations:
     note: as_published='343.321'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=Ca=B1259 reference-state table p.37/PDF p.43, S=B1259 reference-state table p.63/PDF
+      p.69
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0167-anhydrite.json
     record: b1259-ht-0167-anhydrite
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0167-anhydrite.json
@@ -4846,7 +4878,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: alpha
             charge:
               tag: value
               value: 0
@@ -4855,10 +4887,10 @@ observations:
             formula: S
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -4873,7 +4905,7 @@ observations:
             value: cr
           polymorph:
             tag: value
-            value: reference
+            value: alpha
           charge:
             tag: value
             value: 0
@@ -4881,10 +4913,10 @@ observations:
         - formula: S
           phase:
             tag: value
-            value: cr
+            value: l
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -4939,7 +4971,9 @@ observations:
     note: as_published='344.414'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=Ca=B1259 reference-state table p.37/PDF p.43, S=B1259 reference-state table p.63/PDF
+      p.69
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0167-anhydrite.json
     record: b1259-ht-0167-anhydrite
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0167-anhydrite.json
@@ -5013,7 +5047,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: alpha
             charge:
               tag: value
               value: 0
@@ -5022,10 +5056,10 @@ observations:
             formula: S
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -5040,7 +5074,7 @@ observations:
             value: cr
           polymorph:
             tag: value
-            value: reference
+            value: alpha
           charge:
             tag: value
             value: 0
@@ -5048,10 +5082,10 @@ observations:
         - formula: S
           phase:
             tag: value
-            value: cr
+            value: l
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -5106,7 +5140,9 @@ observations:
     note: as_published='344.655'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=Ca=B1259 reference-state table p.37/PDF p.43, S=B1259 reference-state table p.63/PDF
+      p.69
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0167-anhydrite.json
     record: b1259-ht-0167-anhydrite
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0167-anhydrite.json
@@ -5180,7 +5216,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: alpha
             charge:
               tag: value
               value: 0
@@ -5189,10 +5225,10 @@ observations:
             formula: S
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -5207,7 +5243,7 @@ observations:
             value: cr
           polymorph:
             tag: value
-            value: reference
+            value: alpha
           charge:
             tag: value
             value: 0
@@ -5215,10 +5251,10 @@ observations:
         - formula: S
           phase:
             tag: value
-            value: cr
+            value: l
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -5273,7 +5309,9 @@ observations:
     note: as_published='344.576'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=Ca=B1259 reference-state table p.37/PDF p.43, S=B1259 reference-state table p.63/PDF
+      p.69
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0167-anhydrite.json
     record: b1259-ht-0167-anhydrite
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0167-anhydrite.json
@@ -5347,23 +5385,23 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: beta
             charge:
               tag: value
               value: 0
           coefficient: '-1'
         - species:
-            formula: S
+            formula: S2
             phase:
               tag: value
-              value: cr
+              value: g
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
-          coefficient: '-4'
+          coefficient: '-2'
     formation_elements:
       tag: value
       value:
@@ -5374,18 +5412,18 @@ observations:
             value: cr
           polymorph:
             tag: value
-            value: reference
+            value: beta
           charge:
             tag: value
             value: 0
       - - S
-        - formula: S
+        - formula: S2
           phase:
             tag: value
-            value: cr
+            value: g
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -5440,7 +5478,9 @@ observations:
     note: as_published='357.232'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=Ca=B1259 reference-state table p.37/PDF p.43, S=B1259 reference-state table p.63/PDF
+      p.69
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0167-anhydrite.json
     record: b1259-ht-0167-anhydrite
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0167-anhydrite.json
@@ -5514,23 +5554,23 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: beta
             charge:
               tag: value
               value: 0
           coefficient: '-1'
         - species:
-            formula: S
+            formula: S2
             phase:
               tag: value
-              value: cr
+              value: g
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
-          coefficient: '-4'
+          coefficient: '-2'
     formation_elements:
       tag: value
       value:
@@ -5541,18 +5581,18 @@ observations:
             value: cr
           polymorph:
             tag: value
-            value: reference
+            value: beta
           charge:
             tag: value
             value: 0
       - - S
-        - formula: S
+        - formula: S2
           phase:
             tag: value
-            value: cr
+            value: g
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -5607,7 +5647,9 @@ observations:
     note: as_published='-356.178'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=Ca=B1259 reference-state table p.37/PDF p.43, S=B1259 reference-state table p.63/PDF
+      p.69
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0167-anhydrite.json
     record: b1259-ht-0167-anhydrite
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0167-anhydrite.json
@@ -5681,23 +5723,23 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: beta
             charge:
               tag: value
               value: 0
           coefficient: '-1'
         - species:
-            formula: S
+            formula: S2
             phase:
               tag: value
-              value: cr
+              value: g
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
-          coefficient: '-4'
+          coefficient: '-2'
     formation_elements:
       tag: value
       value:
@@ -5708,18 +5750,18 @@ observations:
             value: cr
           polymorph:
             tag: value
-            value: reference
+            value: beta
           charge:
             tag: value
             value: 0
       - - S
-        - formula: S
+        - formula: S2
           phase:
             tag: value
-            value: cr
+            value: g
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -5774,7 +5816,9 @@ observations:
     note: as_published='54.666'; unit='dimensionless' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=Ca=B1259 reference-state table p.37/PDF p.43, S=B1259 reference-state table p.63/PDF
+      p.69
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0167-anhydrite.json
     record: b1259-ht-0167-anhydrite
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0167-anhydrite.json
@@ -5839,23 +5883,23 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: beta
             charge:
               tag: value
               value: 0
           coefficient: '-1'
         - species:
-            formula: S
+            formula: S2
             phase:
               tag: value
-              value: cr
+              value: g
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
-          coefficient: '-4'
+          coefficient: '-2'
     formation_elements:
       tag: value
       value:
@@ -5866,18 +5910,18 @@ observations:
             value: cr
           polymorph:
             tag: value
-            value: reference
+            value: beta
           charge:
             tag: value
             value: 0
       - - S
-        - formula: S
+        - formula: S2
           phase:
             tag: value
-            value: cr
+            value: g
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -5932,7 +5976,9 @@ observations:
     note: as_published='47.623'; unit='dimensionless' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=Ca=B1259 reference-state table p.37/PDF p.43, S=B1259 reference-state table p.63/PDF
+      p.69
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0167-anhydrite.json
     record: b1259-ht-0167-anhydrite
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0167-anhydrite.json
@@ -5994,26 +6040,26 @@ observations:
             formula: Ca
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
           coefficient: '-1'
         - species:
-            formula: S
+            formula: S2
             phase:
               tag: value
-              value: cr
+              value: g
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
-          coefficient: '-4'
+          coefficient: '-2'
     formation_elements:
       tag: value
       value:
@@ -6021,21 +6067,21 @@ observations:
         - formula: Ca
           phase:
             tag: value
-            value: cr
+            value: l
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
       - - S
-        - formula: S
+        - formula: S2
           phase:
             tag: value
-            value: cr
+            value: g
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -6090,7 +6136,9 @@ observations:
     note: as_published='41.745'; unit='dimensionless' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=Ca=B1259 reference-state table p.37/PDF p.43, S=B1259 reference-state table p.63/PDF
+      p.69
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0167-anhydrite.json
     record: b1259-ht-0167-anhydrite
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0167-anhydrite.json
@@ -6152,26 +6200,26 @@ observations:
             formula: Ca
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
           coefficient: '-1'
         - species:
-            formula: S
+            formula: S2
             phase:
               tag: value
-              value: cr
+              value: g
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
-          coefficient: '-4'
+          coefficient: '-2'
     formation_elements:
       tag: value
       value:
@@ -6179,21 +6227,21 @@ observations:
         - formula: Ca
           phase:
             tag: value
-            value: cr
+            value: l
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
       - - S
-        - formula: S
+        - formula: S2
           phase:
             tag: value
-            value: cr
+            value: g
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -6248,7 +6296,9 @@ observations:
     note: as_published='36.785'; unit='dimensionless' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=Ca=B1259 reference-state table p.37/PDF p.43, S=B1259 reference-state table p.63/PDF
+      p.69
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0167-anhydrite.json
     record: b1259-ht-0167-anhydrite
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0167-anhydrite.json
@@ -6310,26 +6360,26 @@ observations:
             formula: Ca
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
           coefficient: '-1'
         - species:
-            formula: S
+            formula: S2
             phase:
               tag: value
-              value: cr
+              value: g
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
-          coefficient: '-4'
+          coefficient: '-2'
     formation_elements:
       tag: value
       value:
@@ -6337,21 +6387,21 @@ observations:
         - formula: Ca
           phase:
             tag: value
-            value: cr
+            value: l
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
       - - S
-        - formula: S
+        - formula: S2
           phase:
             tag: value
-            value: cr
+            value: g
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -6406,7 +6456,9 @@ observations:
     note: as_published='32.558'; unit='dimensionless' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=Ca=B1259 reference-state table p.37/PDF p.43, S=B1259 reference-state table p.63/PDF
+      p.69
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0167-anhydrite.json
     record: b1259-ht-0167-anhydrite
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0167-anhydrite.json
@@ -6471,7 +6523,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: alpha
             charge:
               tag: value
               value: 0
@@ -6480,10 +6532,10 @@ observations:
             formula: S
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -6498,7 +6550,7 @@ observations:
             value: cr
           polymorph:
             tag: value
-            value: reference
+            value: alpha
           charge:
             tag: value
             value: 0
@@ -6506,10 +6558,10 @@ observations:
         - formula: S
           phase:
             tag: value
-            value: cr
+            value: l
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -6564,7 +6616,9 @@ observations:
     note: as_published='167.883'; unit='dimensionless' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=Ca=B1259 reference-state table p.37/PDF p.43, S=B1259 reference-state table p.63/PDF
+      p.69
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0167-anhydrite.json
     record: b1259-ht-0167-anhydrite
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0167-anhydrite.json
@@ -6629,7 +6683,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: alpha
             charge:
               tag: value
               value: 0
@@ -6638,10 +6692,10 @@ observations:
             formula: S
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -6656,7 +6710,7 @@ observations:
             value: cr
           polymorph:
             tag: value
-            value: reference
+            value: alpha
           charge:
             tag: value
             value: 0
@@ -6664,10 +6718,10 @@ observations:
         - formula: S
           phase:
             tag: value
-            value: cr
+            value: l
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -6722,7 +6776,9 @@ observations:
     note: as_published='130.275'; unit='dimensionless' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=Ca=B1259 reference-state table p.37/PDF p.43, S=B1259 reference-state table p.63/PDF
+      p.69
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0167-anhydrite.json
     record: b1259-ht-0167-anhydrite
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0167-anhydrite.json
@@ -6787,7 +6843,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: alpha
             charge:
               tag: value
               value: 0
@@ -6796,10 +6852,10 @@ observations:
             formula: S
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -6814,7 +6870,7 @@ observations:
             value: cr
           polymorph:
             tag: value
-            value: reference
+            value: alpha
           charge:
             tag: value
             value: 0
@@ -6822,10 +6878,10 @@ observations:
         - formula: S
           phase:
             tag: value
-            value: cr
+            value: l
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -6880,7 +6936,9 @@ observations:
     note: as_published='87.242'; unit='dimensionless' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=Ca=B1259 reference-state table p.37/PDF p.43, S=B1259 reference-state table p.63/PDF
+      p.69
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0167-anhydrite.json
     record: b1259-ht-0167-anhydrite
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0167-anhydrite.json
@@ -6945,23 +7003,23 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: beta
             charge:
               tag: value
               value: 0
           coefficient: '-1'
         - species:
-            formula: S
+            formula: S2
             phase:
               tag: value
-              value: cr
+              value: g
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
-          coefficient: '-4'
+          coefficient: '-2'
     formation_elements:
       tag: value
       value:
@@ -6972,18 +7030,18 @@ observations:
             value: cr
           polymorph:
             tag: value
-            value: reference
+            value: beta
           charge:
             tag: value
             value: 0
       - - S
-        - formula: S
+        - formula: S2
           phase:
             tag: value
-            value: cr
+            value: g
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -7038,7 +7096,9 @@ observations:
     note: as_published='74.134'; unit='dimensionless' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=Ca=B1259 reference-state table p.37/PDF p.43, S=B1259 reference-state table p.63/PDF
+      p.69
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0167-anhydrite.json
     record: b1259-ht-0167-anhydrite
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0167-anhydrite.json
@@ -7103,23 +7163,23 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: beta
             charge:
               tag: value
               value: 0
           coefficient: '-1'
         - species:
-            formula: S
+            formula: S2
             phase:
               tag: value
-              value: cr
+              value: g
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
-          coefficient: '-4'
+          coefficient: '-2'
     formation_elements:
       tag: value
       value:
@@ -7130,18 +7190,18 @@ observations:
             value: cr
           polymorph:
             tag: value
-            value: reference
+            value: beta
           charge:
             tag: value
             value: 0
       - - S
-        - formula: S
+        - formula: S2
           phase:
             tag: value
-            value: cr
+            value: g
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -7196,7 +7256,9 @@ observations:
     note: as_published='63.305'; unit='dimensionless' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=Ca=B1259 reference-state table p.37/PDF p.43, S=B1259 reference-state table p.63/PDF
+      p.69
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0167-anhydrite.json
     record: b1259-ht-0167-anhydrite
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0167-anhydrite.json

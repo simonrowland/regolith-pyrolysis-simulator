@@ -5,6 +5,7 @@ from __future__ import annotations
 import importlib
 import logging
 import math
+from numbers import Real
 from types import MappingProxyType
 from typing import TYPE_CHECKING, Any, Mapping, Sequence
 
@@ -17,8 +18,16 @@ from simulator.optimize.objective import (
     canonical_objective_mapping,
     cost_adjusted_objective_scores,
     objective_definitions,
+    objective_scores,
 )
-from simulator.optimize.recipe import KeyPath, KnobSpec, RecipePatch, RecipeSchema
+from simulator.optimize.recipe import (
+    KeyPath,
+    KnobSpec,
+    RecipePatch,
+    RecipeSchema,
+    RecipeValidationError,
+    _default_setpoint_value,
+)
 from simulator.optimize.strategy.protocol import Candidate, WarmStartSeed
 
 if TYPE_CHECKING:
@@ -65,6 +74,7 @@ class OptunaTPEStrategy:
         profile: Mapping[str, Any] | None = None,
         n_startup_trials: int = 10,
         n_ei_candidates: int = 24,
+        parallel: int = 1,
         warm_start_seeds: Sequence[WarmStartSeed] | None = None,
     ) -> None:
         if isinstance(seed, bool) or not isinstance(seed, int) or seed < 0:
@@ -76,6 +86,7 @@ class OptunaTPEStrategy:
             raise ValueError("objective_profile is required")
         _validate_non_negative_int("n_startup_trials", n_startup_trials)
         _validate_positive_int("n_ei_candidates", n_ei_candidates)
+        _validate_positive_int("parallel", parallel)
 
         self.schema = schema or RecipeSchema()
         self._seed = seed
@@ -95,6 +106,8 @@ class OptunaTPEStrategy:
             n_startup_trials=n_startup_trials,
             n_ei_candidates=n_ei_candidates,
             constraints_func=_constraints_for_trial,
+            # Penalize pending trials only when concurrent suggestions can be in flight.
+            constant_liar=(parallel > 1),
         )
         self._study = optuna.create_study(
             directions=self._directions,
@@ -122,6 +135,7 @@ class OptunaTPEStrategy:
         self._trial_by_candidate_id: dict[str, Any] = {}
         self._result_by_id: dict[str, ScoredResult] = {}
         self._results: list[tuple[Candidate, ScoredResult]] = []
+        self._held_knob_paths: set[KeyPath] = set()
 
     @property
     def seed(self) -> int:
@@ -167,11 +181,17 @@ class OptunaTPEStrategy:
     def results(self) -> tuple[tuple[Candidate, "ScoredResult"], ...]:
         return tuple(self._results)
 
-    def ask(self, n: int) -> list[Candidate]:
+    def ask(
+        self,
+        n: int,
+        *,
+        knob_saturation_payloads: Sequence[Mapping[str, Any] | None] = (),
+    ) -> list[Candidate]:
         if isinstance(n, bool) or not isinstance(n, int) or n < 0:
             raise ValueError("n must be a non-negative int")
         if n == 0:
             return []
+        self._hold_objectively_flat_saturated_knobs(knob_saturation_payloads)
 
         candidates: list[Candidate] = []
         for _ in range(n):
@@ -181,11 +201,14 @@ class OptunaTPEStrategy:
                 if trial.number < len(self._warm_start_seeds)
                 else None
             )
-            values = {
-                spec.path: _suggest_value(trial, spec)
-                for spec in self._specs
-                if not self.schema.is_forbidden(spec.path)
-            }
+            values: dict[KeyPath, Any] = {}
+            for spec in self._specs:
+                if (
+                    self.schema.is_forbidden(spec.path)
+                    or spec.path in self._held_knob_paths
+                ):
+                    continue
+                values[spec.path] = _suggest_value(trial, spec)
             raw_values = dict(values)
             _couple_suggested_pressure_defaults(self.schema, values)
             _sync_conditioned_trial_params(trial, values, raw_values)
@@ -217,6 +240,79 @@ class OptunaTPEStrategy:
             self._trial_by_candidate_id[candidate.id] = trial
             candidates.append(candidate)
         return candidates
+
+    def _hold_objectively_flat_saturated_knobs(
+        self,
+        payloads: Sequence[Mapping[str, Any] | None],
+    ) -> None:
+        if not payloads:
+            return
+        if len(payloads) != len(self._results):
+            raise ValueError("knob saturation payloads must align with told results")
+
+        for current_index, (candidate, scored) in enumerate(self._results):
+            saturation = payloads[current_index]
+            if not isinstance(saturation, Mapping):
+                continue
+            objective_values = self._objective_values(scored)
+            if objective_values is None:
+                continue
+            for knob in saturation.get("knobs", ()):
+                if (
+                    not isinstance(knob, Mapping)
+                    or knob.get("pinned") not in {"low", "high"}
+                ):
+                    continue
+                knob_key = knob.get("key")
+                spec = next(
+                    (
+                        item
+                        for item in self._specs
+                        if ".".join(item.path) == knob_key
+                    ),
+                    None,
+                )
+                if spec is None:
+                    continue
+                candidate_context = {
+                    path: value
+                    for path, value in candidate.patch.values.items()
+                    if path != spec.path
+                }
+                for prior_index, (prior_candidate, prior_scored) in enumerate(
+                    self._results
+                ):
+                    if prior_index == current_index:
+                        continue
+                    prior_saturation = payloads[prior_index]
+                    if not isinstance(prior_saturation, Mapping):
+                        continue
+                    prior_knob = next(
+                        (
+                            row
+                            for row in prior_saturation.get("knobs", ())
+                            if isinstance(row, Mapping) and row.get("key") == knob_key
+                        ),
+                        None,
+                    )
+                    if (
+                        not isinstance(prior_knob, Mapping)
+                        or prior_knob.get("pinned") != "none"
+                    ):
+                        continue
+                    if prior_knob.get("value") == knob.get("value"):
+                        continue
+                    prior_context = {
+                        path: value
+                        for path, value in prior_candidate.patch.values.items()
+                        if path != spec.path
+                    }
+                    if prior_context != candidate_context:
+                        continue
+                    if self._objective_values(prior_scored) != objective_values:
+                        continue
+                    self._held_knob_paths.add(spec.path)
+                    break
 
     def tell(self, results: Sequence[tuple[Candidate, "ScoredResult"]]) -> None:
         batch: list[TellBatchRow] = []
@@ -298,20 +394,41 @@ def _optuna_params_from_seed(
     schema: RecipeSchema,
 ) -> dict[str, Any]:
     patch = seed.patch.validated(schema)
-    missing = [spec.path for spec in specs if spec.path not in patch.values]
-    if missing:
-        missing_names = ", ".join(".".join(path) for path in missing[:5])
-        if len(missing) > 5:
-            missing_names += ", ..."
-        raise ValueError(
-            f"warm-start seed {seed.id!r} is incomplete for Optuna enqueue: "
-            f"{missing_names}"
-        )
-    return {
-        ".".join(spec.path): patch.values[spec.path]
-        for spec in specs
-        if not schema.is_forbidden(spec.path)
-    }
+    params: dict[str, Any] = {}
+    for spec in specs:
+        if schema.is_forbidden(spec.path):
+            continue
+        if spec.path in patch.values:
+            value = patch.values[spec.path]
+        else:
+            try:
+                value = _default_setpoint_value(spec.path)
+            except RecipeValidationError as exc:
+                if str(exc).startswith(
+                    "recipe_pressure_total_default_missing: missing YAML default for "
+                ):
+                    continue
+                raise
+        # Optuna's distributions consume scalars; a valid pair-valued recipe patch
+        # does not identify one value for this search parameter.
+        if spec.kind == "float":
+            has_scalar_value = isinstance(value, Real) and not isinstance(value, bool)
+        elif spec.kind == "int":
+            # An integer knob can use an integral scalar, but no fractional part.
+            has_scalar_value = (
+                isinstance(value, Real)
+                and not isinstance(value, bool)
+                and float(value).is_integer()
+            )
+        elif spec.kind == "categorical":
+            has_scalar_value = value in (spec.choices or ())
+        else:
+            has_scalar_value = False
+        if not has_scalar_value:
+            continue
+
+        params[".".join(spec.path)] = value
+    return params
 
 
 def _require_optuna() -> Any:
@@ -384,7 +501,11 @@ def _numeric_bounds(spec: KnobSpec) -> tuple[float, float]:
 
 
 def _log_scale(spec: KnobSpec) -> bool:
-    return bool(getattr(spec, "log", False) or getattr(spec, "log_scale", False))
+    return bool(
+        getattr(spec, "log", False)
+        or getattr(spec, "log_scale", False)
+        or spec.scale == "log"
+    )
 
 
 def _objective_mapping(scored: "ScoredResult") -> Mapping[str, float | None]:
@@ -418,9 +539,11 @@ def _objective_values_for_definitions(
     scored: "ScoredResult",
     definitions: Sequence[ObjectiveDefinition],
 ) -> tuple[float, ...] | None:
-    if not bool(getattr(scored, "feasible", False)):
+    feasible = bool(getattr(scored, "feasible", False))
+    objectives = getattr(scored, "objectives", None)
+    if objectives is None and not feasible:
         return tuple(_bad_objective_value(definition) for definition in definitions)
-    if getattr(scored, "objectives", None) is None:
+    if objectives is None:
         return None
 
     mapping = _objective_mapping(scored)
@@ -429,16 +552,21 @@ def _objective_values_for_definitions(
     reference = getattr(scored, "run_reference", None)
     product_summary = getattr(reference, "product_summary", {}) if reference else {}
     if product_summary.get("furnace_amortization_status") != "available":
-        # Production results carry available furnace evidence. Direct/replayed or
-        # degraded results that do not remain unscoreable, not ranked as if capital
-        # were free. Once evidence claims to be available, malformed values are
-        # corruption and must propagate from the scorer instead of failing a trial.
-        return None
-    scores = cost_adjusted_objective_scores(
-        mapping,
-        definitions,
-        product_summary=product_summary,
-    )
+        if feasible:
+            # Production results carry available furnace evidence. Direct/replayed
+            # or degraded feasible results stay unscoreable, not ranked as if
+            # capital were free. Once evidence claims to be available, malformed
+            # values must propagate from the scorer instead of failing a trial.
+            return None
+        # An infeasible run can still guide the sampler with measured objectives;
+        # keep those raw because missing furnace evidence cannot support a cost.
+        scores = objective_scores(objectives, definitions)
+    else:
+        scores = cost_adjusted_objective_scores(
+            mapping,
+            definitions,
+            product_summary=product_summary,
+        )
     if any(score is None for score in scores):
         return None
     return tuple(

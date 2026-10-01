@@ -10,6 +10,7 @@ from pathlib import Path
 import yaml
 import pytest
 
+import simulator.optimize.doe as doe_module
 import simulator.optimize.study as study_module
 from simulator.chemistry.kernel import (
     OXYGEN_SINK_CHANNEL_MODE_KEY,
@@ -89,31 +90,22 @@ def test_t155_empty_patch_bytes_are_epoch_neutral_and_identity_moves() -> None:
     #   +  "furnace_max_T_C": null   (the explicit derate hook / lever anchor,
     #                                 null meaning "inherit from furnace_material")
     # No other key changed. The digest tracks file content by design.
-    # Recomputed 2026-09-26 (t-1004): the continuous C2A Stage-3 window
-    # defaults are now explicit setpoint values, so the resolved digest moves.
-    # t-1004 Stage-3 defaults change this executable resolved-setpoints digest;
-    # source: docs-private/research/2026-09-26-stack-merge-2/report.md.
     assert hashlib.sha256(resolved).hexdigest() == (
-        "bbcf3975992b7fdfa25776f5f586377dbee2d5d5aaeb8279d26839f9a8049df2"
+        "d8527229bbb3a92dacb0a4b248db38cce26c979e9864bcb19b8a402b03f6f6a2"
     )
-    # bounds_digest moved with the knob bounds themselves: the furnace envelope
-    # top (2000 -> catalog max), hot-wall ceiling (1750 -> inherited), and the
-    # two Stage-3 temperature-window knob bounds.
-    # This digest IS the cache-invalidation lever for a bounds change -- it fires
-    # automatically, which is why no allowlist_version bump is warranted here:
-    # the set of tunable PATHS did not change, only two paths' bounds.
+    # C2's loader-scalar pressure pairs add coupled constraints to the sampling
+    # domain, which the bounds digest tracks without an allowlist_version bump.
     assert schema.bounds_digest == (
-        "e8c157bdae8e20dc0d2cef4e739683b08b5e5ae3ea816882ddf6121722085789"
+        "21c0c4905a878d30051332ef69cc25cbd395a52ed5fd0f9a68484280efa7e0dc"
     )
     assert schema.bounds_digest != (
         "32e9d2e945bd870a2af90d5fc46259dd7b724404d9066c4505d98921b8fd4252"
     )
     # Moves with bounds_digest above -- that is the POINT of this test's name
     # ("identity moves"): the empty patch's own bytes stay neutral while identity
-    # tracks the schema. Recomputed 2026-08-29 (b-329), then 2026-09-26
-    # (t-1004) after adding the two searchable window knobs.
+    # tracks the schema. Recomputed 2026-09-29 for C2 loader-scalar pressure coupling.
     assert empty.recipe_id(schema) == (
-        "23a97e896e727718da5d186abd5e53734226c6b0c6861db2e5ef67fffdb9b03e"
+        "be70d44b9d30688788e535c9e84b42d51111956487b2b7e962deb1a70790d95e"
     )
     assert empty.recipe_id(schema) != (
         "defd94f2daff77987fe73577ffa5b87df51072d418794d41530accd88caf5907"
@@ -124,14 +116,9 @@ def test_t155_empty_patch_bytes_are_epoch_neutral_and_identity_moves() -> None:
     identity_digest = hashlib.sha256(
         canonical_json_dumps(dict(identity)).encode()
     ).hexdigest()
-    # Fourth and last digest in this test to move with the b-329 bounds change,
-    # for the same reason as the three above. Recomputed 2026-08-29, then
-    # 2026-09-26 (t-1004) after adding the two searchable window knobs.
+    # Pin the live search identity directly; retired list-shaped paths stay out.
     assert identity_digest == (
-        "727dcbbc4924b03fb4ffcb1f7015ea938d866a02834c25aa4629d913bb62db8e"
-    )
-    assert identity_digest != (
-        "a8ffba282e43fecbd31cd1816c92fb843c40504666580a2ff81ee05a1c02855d"
+        "0cfae3821a514712c36151ca997fd5d9381191deeccca66ceb807628e179b160"
     )
     subspace_digests = [
         c5_sampler_context(schema, active=active).conditional_subspace_digest
@@ -478,6 +465,36 @@ def test_pinned_c2a_temperature_targets_leave_other_knobs_searchable() -> None:
     ) not in {spec.path for spec in schema.allowlist}
 
 
+def test_c3_list_shaped_fields_are_not_searched_or_scalar_written() -> None:
+    schema = RecipeSchema()
+    c0_temp_range = ("campaigns", "C0", "temp_range_C")
+    c2a_early_rate_band = (
+        "campaigns",
+        "C2A_continuous",
+        "dT_dt_C_per_hr",
+        "early_ramp_1050_1320C",
+    )
+    c0_scalar_rate = ("campaigns", "C0", "dT_dt_C_per_hr")
+    search_paths = {spec.path for spec in schema.search_allowlist}
+
+    assert c0_temp_range not in search_paths
+    assert c2a_early_rate_band not in search_paths
+    assert c0_scalar_rate in search_paths
+    rate_spec = schema.spec_for(c0_scalar_rate)
+    rendered = schema.to_setpoints_patch(
+        RecipePatch({c0_scalar_rate: rate_spec.low}).validated(schema)
+    )
+
+    assert "temp_range_C" not in rendered["campaigns"]["C0"]
+    loaded = PyrolysisRun(
+        feedstock_id=FEEDSTOCK,
+        setpoints_patch=rendered,
+    )._session_config().setpoints
+    c0_loaded_temp_range = loaded["campaigns"]["C0"]["temp_range_C"]
+    assert isinstance(c0_loaded_temp_range, list)
+    assert len(c0_loaded_temp_range) == 2
+
+
 def test_numerical_depletion_tolerance_is_runtime_only_not_searchable() -> None:
     schema = RecipeSchema()
     tolerance_paths = {
@@ -544,12 +561,11 @@ def test_no_pin_schema_is_golden_neutral_for_search_and_evalspec_hash() -> None:
     schema = RecipeSchema()
     unpinned = schema.with_pinned_paths(())
     paths = [".".join(spec.path) for spec in unpinned.search_allowlist]
-
     assert unpinned is schema
-    assert len(paths) == 73
+    assert len(paths) == 65
     assert (
         hashlib.sha256(canonical_json_dumps(paths).encode("utf-8")).hexdigest()
-        == "02ec33ff6adb2658f11820de5090a99f3bf1e7c8c2068dbcca8cd035233b84c9"
+        == "2ec62a88bfd19a7ada68b2cef06882b85d218b2e57dfc753d5d3feb1cc91dec7"
     )
     spec, _ = _build_eval_inputs(
         RecipePatch({}),
@@ -659,9 +675,9 @@ def test_no_pin_schema_is_golden_neutral_for_search_and_evalspec_hash() -> None:
     # hashed the pre-VR-3 payload (fingerprints present, June corpus). That
     # payload is unreachable: current canonical_evalspec_json does not
     # serialize those fingerprints, and the June corpus is not interoperable.
-    # t-1004 Stage-3 vocabulary changes EvalSpec identity; recomputed from the
-    # executable cache_key(spec), source: stack-merge-2 report.
-    assert cache_key(spec) == "fddbc3ef49ec06580f9d70cf5d0dc4182eb7384e58cb2d3ab5490d12261cdbcd"
+    # Pin recomputed from this tree's executable cache_key(spec).
+    # 2026-09-30 C7d removed the physics-gate version and class from this digest.
+    assert cache_key(spec) == "f6d1c88ba2fcbcca5ae07e720bfe53a721601506fbd93611c907e8869352c7a3"
 
 
 def test_bounds_and_type_checks_for_allowlisted_knob() -> None:
@@ -1679,10 +1695,11 @@ def test_recipe_id_is_stable_and_schema_versioned() -> None:
     # inherits the furnace-material envelope, taking offset_min -443 -> -800 with
     # it. Note the -443 above was itself a re-derivation of this same pin: a
     # difference between two moving numbers, written down as a constant, goes
-    # stale every time either moves. It is now evaluated, not pinned.
+    # stale every time either moves. It is now evaluated, not pinned. Recomputed
+    # 2026-09-29 for C2 loader-scalar pressure coupling.
     assert (
         first.recipe_id()
-        == "1c22df778cc9950781f6ffba898d15c4194349bd22715ac71cec6c037e26cd9e"
+                == "cb77c9b93e43903f3820c491df51dce7a7a3d4f8784d9b55121f64906bca7b6d"
     )
     assert first.recipe_id(recipe_schema_version="recipe-schema-v2") != first.recipe_id()
     assert RecipePatch({PO2_DEFAULT: 8.0}).validated().recipe_id() != first.recipe_id()
@@ -2067,14 +2084,12 @@ def test_knob_bounds_source_provenance_is_honest() -> None:
             assert spec.high is not None
             assert yaml_value[0] <= spec.low <= spec.high <= yaml_value[1]
             range_sourced += 1
-        elif spec.bounds_source.startswith(("hot_wall_invariant:", "condensation_train ")):
+        elif spec.bounds_source.startswith(
+            ("hot_wall_invariant:", "condensation_train ")
+        ):
             assert spec.low is not None
             assert spec.high is not None
             assert spec.low <= spec.high
-            grounded_sources += 1
-        elif spec.bounds_source.startswith("owner-confirmed "):
-            assert spec.kind == "categorical"
-            assert spec.choices
             grounded_sources += 1
         else:
             assert spec.bounds_source.startswith("engineering_envelope"), (
@@ -2094,22 +2109,72 @@ def test_knob_bounds_source_provenance_is_honest() -> None:
 def test_pressure_default_pair_map_covers_allowlisted_siblings() -> None:
     schema = RecipeSchema()
     allowlisted = {spec.path for spec in schema.allowlist}
+    searchable = {spec.path for spec in schema.search_allowlist}
     setpoints = yaml.safe_load(SETPOINTS_PATH.read_text())
     expected_pairs = {}
 
     for path in allowlisted:
         if len(path) != 3:
             continue
-        if path[0] != "campaigns" or path[2] != "pO2_mbar_default":
+        if path[0] != "campaigns":
             continue
-        total_path = (path[0], path[1], "p_total_mbar_default")
-        if total_path not in allowlisted:
+        if path[2] == "pO2_mbar_default":
+            total_path = path[:2] + ("p_total_mbar_default",)
+            if total_path not in allowlisted:
+                continue
+        elif path[2] == "pO2_mbar" and path in searchable:
+            campaign = _lookup_setpoint(setpoints, ".".join(path[:2]))
+            total_key = (
+                "p_total_mbar"
+                if "p_total_mbar" in campaign
+                else "p_total_mbar_default"
+            )
+            total_path = path[:2] + (total_key,)
+        else:
             continue
         _lookup_setpoint(setpoints, ".".join(path))
         _lookup_setpoint(setpoints, ".".join(total_path))
         expected_pairs[path] = total_path
 
     assert dict(schema.PRESSURE_TOTAL_DEFAULT_BY_PO2_DEFAULT) == expected_pairs
+
+
+def test_pressure_conditioning_caps_searchable_scalar_draws() -> None:
+    schema = RecipeSchema()
+    setpoints = yaml.safe_load(SETPOINTS_PATH.read_text())
+    searchable = {spec.path: spec for spec in schema.search_allowlist}
+    scalar_po2_paths = tuple(
+        path
+        for path in searchable
+        if len(path) == 3
+        and path[0] == "campaigns"
+        and path[2] == "pO2_mbar"
+        and _lookup_setpoint(setpoints, ".".join(path)) is not None
+    )
+
+    assert scalar_po2_paths
+    for path in scalar_po2_paths:
+        campaign = _lookup_setpoint(setpoints, ".".join(path[:2]))
+        total_key = (
+            "p_total_mbar"
+            if "p_total_mbar" in campaign
+            else "p_total_mbar_default"
+        )
+        total_path = path[:2] + (total_key,)
+        total = float(_lookup_setpoint(setpoints, ".".join(total_path)))
+        spec = searchable[path]
+        unit_draw = 1.0
+        assert float(spec.high) > total
+        values = {path: float(spec.high)}
+
+        doe_module._condition_pressure_pair_values(
+            schema,
+            (spec,),
+            values,
+            {path: unit_draw},
+        )
+
+        assert values[path] <= total, (path, values[path], total_path, total)
 
 
 def test_to_setpoints_patch_validates_before_rendering_forbidden_paths() -> None:

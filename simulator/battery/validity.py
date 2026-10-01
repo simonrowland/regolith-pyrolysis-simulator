@@ -12,11 +12,9 @@ Ambiguity resolutions:
   O2 identity (ΔfG=0, log10 Kf=0) passes. The gate does not score engines.
 - Effusion Kn threshold is ``FREE_MOLECULAR_KNUDSEN_MIN`` (10) from
   transport_constants. Kn is the *orifice* (cell-local) number, not chamber
-  pressure masquerading as cell pressure. Unknown/missing chamber
-  background also fails this gate (v2.1: missing pressure already fails
-  effusion; the background-high gate does not double-count). A calibrated
-  KEMS pressure comparison with a wholly low typed background interval may
-  proceed without inventing an orifice Kn point; the check carries a flag.
+  pressure masquerading as cell pressure. When Kn is absent, grounded KEMS
+  calibration and a complete same-point printed in-cell pressure sum can
+  verify the regime; unstated chamber background is checked separately.
 - Background ≥ 1e-2 Pa fails KEMS *equilibrium* pressure/activity only.
   Millibar bench kinetic experiments are out of this gate's scope.
 - Apparatus determinants are those the actual derivation needs: calibrated
@@ -38,23 +36,32 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from decimal import Decimal
-from typing import Any, Mapping, Sequence
+from typing import Any, Iterable, Mapping, Sequence
 
 from simulator.battery.enums import (
+    AdmissionStatus,
+    EvidenceClass,
     MethodToken,
     Quantity,
     RefusalReason,
     StateTag,
     ValueKind,
 )
-from simulator.battery.identity import log10K_from_delta_fG_kJ_mol, quantity_token
+from simulator.battery.identity import (
+    Identity,
+    log10K_from_delta_fG_kJ_mol,
+    quantity_token,
+)
 from simulator.battery.records import (
+    Composition,
     Experiment,
     Located,
     Observation,
+    State,
     Value,
     as_decimal,
 )
+from simulator.reference_data.janaf import formula_composition
 from simulator.transport_constants import FREE_MOLECULAR_KNUDSEN_MIN
 
 # Printed-precision self-check floor. Same constant as
@@ -63,9 +70,16 @@ from simulator.transport_constants import FREE_MOLECULAR_KNUDSEN_MIN
 # a finding is reserved for residuals well above that grain.
 TABLE_SELF_CHECK_FINDING_DEX = Decimal("0.1")
 
-# KEMS equilibrium background ceiling (Pa). Missing pressure already fails
-# the effusion gate; this threshold does not forbid millibar kinetics.
+# KEMS equilibrium background ceiling (Pa). This remains a separate signal
+# quality check; it does not determine the in-cell effusion regime.
 KEMS_BACKGROUND_HIGH_PA = Decimal("1e-2")
+
+# Drowart et al. state that p/d <= 1 Pa/mm meets the mean-free-path criterion
+# in practice, and that about 10 Pa is the usual KEMS cell-pressure ceiling
+# (2005, p. 689). Use only these sourced limits; do not infer a kinetic limit
+# from an unsourced collision diameter. Without a located diameter, use the
+# ~10 Pa ceiling alone.
+KEMS_CELL_PRESSURE_MAX_PA = Decimal("10")
 
 
 @dataclass(frozen=True)
@@ -466,8 +480,11 @@ def underdetermined_apparatus(
 def effusion_regime_unverified(
     experiment: Experiment,
     quantity: Quantity,
+    *,
+    observation: Observation | None = None,
+    point_observations: Iterable[Observation] = (),
 ) -> GateOutcome:
-    """Check KEMS regime without inventing a missing orifice Kn point."""
+    """Prefer the published regime checks; use same-point pressures only as fallback."""
 
     method_state = experiment.method
     checks: list[GateCheck] = []
@@ -483,29 +500,64 @@ def effusion_regime_unverified(
         Quantity.ACTIVITY_COEFFICIENT,
     }:
         return _pass(checks)
-    total_bounds = _pressure_bounds(experiment.pressure_environment.total_pressure_Pa)
-    if total_bounds is None:
-        checks.append(
-            GateCheck(
-                "background_pressure_stated",
-                False,
-                {
-                    "reason": "unknown KEMS background pressure; missing pressure fails effusion",
-                },
-            )
-        )
-        return _fail(
-            RefusalReason.EFFUSION_REGIME_UNVERIFIED, checks, "background_pressure_stated"
-        )
     regime = experiment.pressure_environment.regime
     kn_located = regime.knudsen_number_orifice
     kn = _located_decimal(kn_located)
-    if kn is None:
+    if kn is not None:
+        molecular = kn >= Decimal(str(FREE_MOLECULAR_KNUDSEN_MIN))
+        checks.append(
+            GateCheck(
+                "orifice_knudsen",
+                molecular,
+                {
+                    "knudsen_number_orifice": str(kn),
+                    "threshold": str(FREE_MOLECULAR_KNUDSEN_MIN),
+                },
+            )
+        )
+        if not molecular:
+            return _fail(
+                RefusalReason.EFFUSION_REGIME_UNVERIFIED, checks, "orifice_knudsen"
+            )
+        return _pass(checks)
+
+    diameter = _printed_orifice_diameter(experiment)
+    cell_pressure = (
+        None if observation is None else _printed_in_cell_total_pressure(observation)
+    )
+    if diameter is not None and cell_pressure is not None and observation is not None:
+        pressure_limit = _in_cell_pressure_limit(experiment)
+        ratio_Pa_per_mm = cell_pressure / (diameter * Decimal("1000"))
+        passed = cell_pressure <= pressure_limit
+        checks.append(
+            GateCheck(
+                "orifice_pressure_to_diameter",
+                passed,
+                {
+                    "in_cell_total_pressure_Pa": str(cell_pressure),
+                    "orifice_diameter_m": str(diameter),
+                    "pressure_to_diameter_Pa_per_mm": str(ratio_Pa_per_mm),
+                    "threshold_Pa_per_mm": "1",
+                    "pressure_limit_Pa": str(pressure_limit),
+                    "limit_source": "Drowart et al. 2005, p. 689",
+                    "route": "printed_orifice_diameter_and_cell_pressure",
+                },
+            )
+        )
+        if not passed:
+            return _fail(
+                RefusalReason.EFFUSION_REGIME_UNVERIFIED,
+                checks,
+                "orifice_pressure_to_diameter",
+            )
+        return _pass(checks)
+
+    calibration = None if experiment.apparatus is None else experiment.apparatus.calibration
+    total_bounds = _pressure_bounds(experiment.pressure_environment.total_pressure_Pa)
+    if _calibration_grounded(calibration) and total_bounds is not None:
         _lower, upper, pressure_kind = total_bounds
-        calibration = None if experiment.apparatus is None else experiment.apparatus.calibration
         if (
-            _calibration_grounded(calibration)
-            and pressure_kind in {"interval", "upper_bound"}
+            pressure_kind in {"interval", "upper_bound"}
             and upper is not None
             and upper <= KEMS_BACKGROUND_HIGH_PA
         ):
@@ -534,22 +586,350 @@ def effusion_regime_unverified(
             )
         )
         return _fail(RefusalReason.EFFUSION_REGIME_UNVERIFIED, checks, "orifice_knudsen")
-    molecular = kn >= Decimal(str(FREE_MOLECULAR_KNUDSEN_MIN))
-    checks.append(
-        GateCheck(
-            "orifice_knudsen",
-            molecular,
-            {
-                "knudsen_number_orifice": str(kn),
-                "threshold": str(FREE_MOLECULAR_KNUDSEN_MIN),
-            },
+
+    if not _calibration_grounded(calibration):
+        checks.append(
+            GateCheck(
+                "in_cell_partial_pressure_sum",
+                False,
+                {
+                    "reason": "calibration is not grounded for the in-cell fallback",
+                    "route": "in_cell_fallback",
+                },
+            )
         )
-    )
-    if not molecular:
         return _fail(
-            RefusalReason.EFFUSION_REGIME_UNVERIFIED, checks, "orifice_knudsen"
+            RefusalReason.EFFUSION_REGIME_UNVERIFIED,
+            checks,
+            "in_cell_partial_pressure_sum",
+        )
+    if observation is None:
+        pressure_sum = None
+        pressure_detail = {"reason": "scored observation is unavailable"}
+    else:
+        pressure_sum, pressure_detail = _printed_in_cell_pressure_sum(
+            experiment,
+            observation,
+            point_observations,
+        )
+    if pressure_sum is None:
+        checks.append(
+            GateCheck(
+                "in_cell_partial_pressure_sum",
+                False,
+                {**pressure_detail, "route": "in_cell_fallback"},
+            )
+        )
+        return _fail(
+            RefusalReason.EFFUSION_REGIME_UNVERIFIED,
+            checks,
+            "in_cell_partial_pressure_sum",
+        )
+    pressure_limit = _in_cell_pressure_limit(experiment)
+    passed = pressure_sum <= pressure_limit
+    diameter_basis = (
+        "printed_orifice_diameter_p_over_d"
+        if diameter is not None
+        else "Drowart_standalone_usual_10_Pa_limit; no defensible d printed"
+    )
+    pressure_detail.update(
+        {
+            "pressure_limit_Pa": str(pressure_limit),
+            "limit_source": "Drowart et al. 2005, p. 689",
+            "limit_basis": diameter_basis,
+            "route": "in_cell_fallback",
+        }
+    )
+    if passed:
+        missing_orifice = "orifice Kn not printed" if diameter is not None else "orifice not printed"
+        pressure_detail["flag"] = (
+            f"{missing_orifice}; regime verified from printed in-cell pressure sum "
+            "(limit source: Drowart et al. 2005, p. 689; "
+            f"{diameter_basis})"
+        )
+    checks.append(
+        GateCheck("in_cell_partial_pressure_sum", passed, pressure_detail)
+    )
+    if not passed:
+        return _fail(
+            RefusalReason.EFFUSION_REGIME_UNVERIFIED,
+            checks,
+            "in_cell_partial_pressure_sum",
         )
     return _pass(checks)
+
+
+def _partial_pressure_observations_by_experiment(
+    observations: Iterable[Observation],
+) -> dict[str, tuple[Observation, ...]]:
+    grouped: dict[str, list[Observation]] = {}
+    for observation in observations:
+        identity = observation.identity
+        if (
+            isinstance(identity, Identity)
+            and quantity_token(identity) is Quantity.P_PARTIAL
+        ):
+            grouped.setdefault(observation.experiment_id, []).append(observation)
+    return {experiment_id: tuple(rows) for experiment_id, rows in grouped.items()}
+
+
+def _located_condition_value(value: object) -> tuple[bool, object | None]:
+    if not isinstance(value, Located) or not value.state.is_value:
+        return False, None
+    return True, value.state.value
+
+
+def _same_point_conditions(left: Observation, right: Observation) -> bool:
+    left_conditions = left.point_conditions
+    right_conditions = right.point_conditions
+    if not left_conditions or not right_conditions:
+        return False
+    if left_conditions.keys() != right_conditions.keys():
+        return False
+    for key in left_conditions:
+        left_known, left_value = _located_condition_value(left_conditions[key])
+        right_known, right_value = _located_condition_value(right_conditions[key])
+        if not left_known or not right_known or left_value != right_value:
+            return False
+    return True
+
+
+def _composition_components(
+    value: object | None,
+) -> tuple[tuple[str, Decimal], ...] | None:
+    if isinstance(value, State):
+        if not value.is_value:
+            return None
+        value = value.value
+    if isinstance(value, Located):
+        if not value.state.is_value:
+            return None
+        value = value.state.value
+    if isinstance(value, Composition):
+        value = value.components
+    elif isinstance(value, Mapping):
+        value = value.get("components", tuple(value.items()))
+    if not isinstance(value, (tuple, list)) or not value:
+        return None
+    components: list[tuple[str, Decimal]] = []
+    for item in value:
+        if not isinstance(item, (tuple, list)) or len(item) != 2:
+            return None
+        formula, raw_amount = item
+        try:
+            amount = as_decimal(raw_amount)
+        except (TypeError, ValueError):
+            return None
+        if not amount.is_finite() or amount < 0:
+            return None
+        components.append((str(formula), amount))
+    return tuple(sorted(components))
+
+
+def _observation_composition(
+    experiment: Experiment,
+    observation: Observation,
+) -> tuple[tuple[str, Decimal], ...] | None:
+    identity = observation.identity
+    if isinstance(identity, Identity) and identity.composition is not None:
+        components = _composition_components(identity.composition)
+        if components is not None:
+            return components
+    if observation.point_conditions:
+        for key, located in observation.point_conditions.items():
+            if key.lower() in {"composition", "sample_composition"}:
+                components = _composition_components(located)
+                if components is not None:
+                    return components
+    return _composition_components(experiment.sample.initial_composition)
+
+
+def _point_temperature(observation: Observation) -> Decimal | None:
+    identity = observation.identity
+    if not isinstance(identity, Identity):
+        return None
+    state = identity.temperature_K
+    if state is None or not state.is_value or state.value is None:
+        return None
+    value = as_decimal(state.value)
+    return value if value.is_finite() and value > 0 else None
+
+
+# Do not mistake nonmetal components such as sulfur in a sulfide for cations.
+_NON_METAL_ELEMENTS = frozenset(
+    {
+        "H",
+        "He",
+        "C",
+        "N",
+        "O",
+        "F",
+        "Ne",
+        "P",
+        "S",
+        "Cl",
+        "Ar",
+        "Se",
+        "Br",
+        "Kr",
+        "I",
+        "Xe",
+        "Rn",
+        "At",
+        "Ts",
+        "Og",
+    }
+)
+
+
+def _expected_dominant_vapours(
+    composition: tuple[tuple[str, Decimal], ...] | None,
+) -> tuple[str, ...] | None:
+    """Return composition cations covered by at least one measured vapour.
+
+    Oxygen species may be absent: they are usually calculated rather than
+    measured and are minor in the in-cell pressure sum. Every positive printed
+    species joins the sum, while unknown composition cannot claim coverage.
+    """
+    if not composition:
+        return None
+    present = [(formula, amount) for formula, amount in composition if amount > 0]
+    if not present:
+        return None
+    cations: set[str] = set()
+    for formula, _ in present:
+        elements = formula_composition(formula)
+        if elements is None:
+            return None
+        cations.update(
+            element for element, _ in elements if element not in _NON_METAL_ELEMENTS
+        )
+    if not cations:
+        return None
+    return tuple(sorted(cations))
+
+
+def _printed_in_cell_pressure_sum(
+    experiment: Experiment,
+    observation: Observation,
+    point_observations: Iterable[Observation],
+) -> tuple[Decimal | None, dict[str, Any]]:
+    temperature = _point_temperature(observation)
+    composition = _observation_composition(experiment, observation)
+    conditions = observation.point_conditions
+    if temperature is None or not conditions:
+        return None, {"reason": "same-point temperature/point_conditions are incomplete"}
+    if composition is None:
+        return None, {
+            "reason": "composition is unknown; printed species coverage cannot be established",
+            "typed_reason": RefusalReason.EFFUSION_REGIME_UNVERIFIED.value,
+        }
+    printed: dict[str, list[tuple[Decimal, str]]] = {}
+    for candidate in point_observations:
+        identity = candidate.identity
+        if (
+            candidate.experiment_id != observation.experiment_id
+            or not isinstance(identity, Identity)
+            or quantity_token(identity) is not Quantity.P_PARTIAL
+            or candidate.admission.status is not AdmissionStatus.ADMITTED
+            or not candidate.evidence.class_.is_value
+            or candidate.evidence.class_.value
+            not in {
+                EvidenceClass.MEASURED_DIRECT,
+                EvidenceClass.MEASURED_TABULATED,
+                EvidenceClass.MEASURED_REDUCED,
+            }
+            or candidate.locator is None
+            or not candidate.locator.has_location()
+            or _point_temperature(candidate) != temperature
+            or _observation_composition(experiment, candidate) != composition
+            or not _same_point_conditions(observation, candidate)
+            or candidate.value.kind is not ValueKind.POINT
+            or candidate.value.point is None
+        ):
+            continue
+        pressure = candidate.value.point
+        if pressure.is_finite() and pressure > 0:
+            printed.setdefault(identity.species.formula, []).append(
+                (pressure, candidate.observation_id)
+            )
+    if not printed:
+        return None, {"reason": "no admitted printed partial pressures at this exact point"}
+    expected = _expected_dominant_vapours(composition)
+    if expected is None:
+        return None, {
+            "reason": "composition does not establish which vapour species could dominate",
+            "typed_reason": RefusalReason.EFFUSION_REGIME_UNVERIFIED.value,
+            "printed_species": sorted(printed),
+        }
+    covered = set()
+    for formula in printed:
+        elements = formula_composition(formula)
+        if elements is not None:
+            covered.update(element for element, _ in elements)
+    missing = sorted(set(expected) - covered)
+    if missing:
+        return None, {
+            "reason": "incomplete printed species coverage; pressure sum is only a lower bound",
+            "typed_reason": RefusalReason.EFFUSION_REGIME_UNVERIFIED.value,
+            "required_dominant_species": list(expected),
+            "printed_species": sorted(printed),
+            "missing_species": missing,
+        }
+    # Multiple points for one species are repeated determinations, not distinct
+    # gases. Use the largest printed value to avoid double-counting and keep
+    # the total-pressure bound conservative.
+    selected = {
+        species: max(rows, key=lambda row: (row[0], row[1]))
+        for species, rows in printed.items()
+    }
+    pressure_sum = sum((row[0] for row in selected.values()), Decimal(0))
+    return pressure_sum, {
+        "printed_partial_pressure_sum_Pa": str(pressure_sum),
+        "printed_partial_pressures_Pa": {
+            species: str(row[0]) for species, row in sorted(selected.items())
+        },
+        "included_observation_ids": sorted(row[1] for row in selected.values()),
+        "point_condition_keys": sorted(conditions),
+        "required_dominant_species": list(expected),
+    }
+
+
+def _printed_orifice_diameter(experiment: Experiment) -> Decimal | None:
+    geometry = None if experiment.apparatus is None else experiment.apparatus.geometry
+    if geometry is not None:
+        located_diameter = geometry.orifice_diameter_m
+        if (
+            located_diameter is not None
+            and located_diameter.inference is None
+            and located_diameter.locator is not None
+            and located_diameter.locator.has_location()
+        ):
+            return _finite_positive(located_diameter)
+    return None
+
+
+def _printed_in_cell_total_pressure(observation: Observation) -> Decimal | None:
+    located = (observation.point_conditions or {}).get("total_pressure_Pa")
+    if (
+        not isinstance(located, Located)
+        or located.locator is None
+        or not located.locator.has_location()
+        or located.inference is not None
+    ):
+        return None
+    return _finite_positive(located)
+
+
+def _in_cell_pressure_limit(
+    experiment: Experiment,
+) -> Decimal:
+    diameter = _printed_orifice_diameter(experiment)
+    if diameter is None:
+        return KEMS_CELL_PRESSURE_MAX_PA
+    # Drowart's printed p/d <= 1 Pa/mm is 1000 Pa/m times the printed d.
+    pressure_to_diameter_limit = diameter * Decimal("1000")
+    return min(KEMS_CELL_PRESSURE_MAX_PA, pressure_to_diameter_limit)
 
 
 def background_pressure_high(
@@ -613,6 +993,7 @@ def run_validity_gates(
     *,
     table: dict[str, Any] | None = None,
     tables: Sequence[dict[str, Any]] | None = None,
+    point_observations: Iterable[Observation] | None = None,
 ) -> GateOutcome:
     """Run all four gates. Record every failure; first is the primary reason."""
 
@@ -648,8 +1029,19 @@ def run_validity_gates(
             )
         )
     if quantity is not None:
+        absorb(
+            effusion_regime_unverified(
+                experiment,
+                quantity,
+                observation=observation,
+                point_observations=(
+                    (observation,)
+                    if point_observations is None
+                    else point_observations
+                ),
+            )
+        )
         absorb(underdetermined_apparatus(experiment, quantity, observation=observation))
-        absorb(effusion_regime_unverified(experiment, quantity))
         absorb(background_pressure_high(experiment, quantity))
     if primary is not None:
         return GateOutcome(

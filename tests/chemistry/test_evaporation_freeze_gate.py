@@ -9,6 +9,7 @@ from types import SimpleNamespace
 
 import pytest
 
+from simulator import evaporation as evaporation_module
 from simulator.chemistry.kernel import (
     CapabilityProfile,
     ChemistryIntent,
@@ -172,6 +173,37 @@ def _freeze_gate_key_for_current_state(sim) -> tuple:
         pressure_bar=pressure_bar,
         fO2_log=redox_key_fO2_log,
     )
+
+
+def test_freeze_gate_cache_key_ignores_corpus_version(
+    monkeypatch,
+    vapor_pressure_data,
+    feedstocks_data,
+    setpoints_data,
+):
+    sim = _build_freeze_gate_sim(
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+        enabled=True,
+    )
+
+    monkeypatch.setattr(
+        evaporation_module,
+        'current_corpus_version',
+        lambda: 'corpus-before',
+        raising=False,
+    )
+    before = _freeze_gate_key_for_current_state(sim)
+    monkeypatch.setattr(
+        evaporation_module,
+        'current_corpus_version',
+        lambda: 'corpus-after',
+        raising=False,
+    )
+    after = _freeze_gate_key_for_current_state(sim)
+
+    assert before == after
 
 
 def test_native_fe_no_commit_split_suppresses_vapor_route(
@@ -2607,7 +2639,7 @@ def test_freeze_gate_cache_key_includes_pressure_and_fo2(
     assert different_fO2 != baseline
 
 
-def test_shared_freeze_gate_curve_cache_requires_engine_identity_and_version(
+def test_shared_freeze_gate_curve_cache_uses_melt_input_only(
     vapor_pressure_data,
     feedstocks_data,
     setpoints_data,
@@ -2650,15 +2682,15 @@ def test_shared_freeze_gate_curve_cache_requires_engine_identity_and_version(
         )
 
     first = sims[0]._freeze_gate_curve()
-    same_identity = sims[1]._freeze_gate_curve()
+    same_backend = sims[1]._freeze_gate_curve()
     different_backend = sims[2]._freeze_gate_curve()
     different_version = sims[3]._freeze_gate_curve()
 
-    assert calls == [0, 2, 3]
-    assert same_identity == first
-    assert different_backend == curves[2]
-    assert different_version == curves[3]
-    assert len(shared_cache) == 3
+    assert calls == [0]
+    assert same_backend == first
+    assert different_backend == first
+    assert different_version == first
+    assert len(shared_cache) == 1
 
 
 def test_shared_freeze_gate_curve_cache_splits_validation_map_dose_states(

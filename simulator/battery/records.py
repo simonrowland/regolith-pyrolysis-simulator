@@ -439,6 +439,8 @@ class Notice:
     band: str | None = None  # C(domain)
     dropped: tuple[str, ...] | None = None  # C(projection)
     dropped_mass_fraction: Decimal | None = None
+    authority: Authority | None = None
+    certification: str | None = None
 
     def __post_init__(self) -> None:
         if not self.affected_quantities:
@@ -447,6 +449,15 @@ class Notice:
             raise ValueError("Notice.reason is required")
         if not self.origin:
             raise ValueError("Notice.origin is required")
+        if self.kind is NoticeKind.REFERENCE_PHASE_BY_CONVENTION:
+            if self.authority is not Authority.CONVENTION:
+                raise ValueError(
+                    "reference_phase_by_convention requires convention authority"
+                )
+            if not self.certification:
+                raise ValueError(
+                    "reference_phase_by_convention requires certification"
+                )
         if self.original is not None:
             object.__setattr__(self, "original", as_decimal(self.original))
         if self.dropped_mass_fraction is not None:

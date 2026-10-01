@@ -244,8 +244,8 @@ observations:
   experiment_id: 10.1016/j.gca.2003.08.019::experiment::murchison-h2-pyrolysis-series
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'stable_isotope_delta'
+      tag: value
+      value: isotope_delta
     species:
       formula: C
       phase:
@@ -257,15 +257,55 @@ observations:
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: not_applicable
+      reason: profile isotope_delta does not use per
     temperature_K:
       tag: unknown
       reason: source T_range_K [493.15, 793.15]; no midpoint invented
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile isotope_delta does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile isotope_delta does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use fO2_Pa
     total_pressure_Pa:
-      tag: value
-      value: '15000000'
+      tag: not_applicable
+      reason: profile isotope_delta does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile isotope_delta does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile isotope_delta does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile isotope_delta does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile isotope_delta does not use wall
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: 'no mapped isotope_delta field selected; source fields: fraction, delta13C_permil, delta15N_permil,
+      method_class'
     approximate: false
   uncertainty:
     kind: printed
@@ -292,8 +332,8 @@ observations:
   experiment_id: 10.1016/j.gca.2003.08.019::experiment::murchison-h2-pyrolysis-series
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'stable_isotope_delta'
+      tag: value
+      value: isotope_delta
     species:
       formula: C
       phase:
@@ -305,15 +345,55 @@ observations:
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: not_applicable
+      reason: profile isotope_delta does not use per
     temperature_K:
       tag: unknown
       reason: source T_range_K [493.15, 793.15]; no midpoint invented
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile isotope_delta does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile isotope_delta does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use fO2_Pa
     total_pressure_Pa:
-      tag: value
-      value: '15000000'
+      tag: not_applicable
+      reason: profile isotope_delta does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile isotope_delta does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile isotope_delta does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile isotope_delta does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile isotope_delta does not use wall
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: 'no mapped isotope_delta field selected; source fields: fraction, delta13C_permil, delta15N_permil,
+      method_class, printed_as'
     approximate: false
   uncertainty:
     kind: printed
@@ -340,8 +420,8 @@ observations:
   experiment_id: 10.1016/j.gca.2003.08.019::experiment::murchison-h2-pyrolysis-series
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'stable_isotope_delta'
+      tag: value
+      value: isotope_delta
     species:
       formula: C
       phase:
@@ -353,15 +433,55 @@ observations:
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: not_applicable
+      reason: profile isotope_delta does not use per
     temperature_K:
       tag: unknown
       reason: source T_range_K [493.15, 793.15]; no midpoint invented
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile isotope_delta does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile isotope_delta does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile isotope_delta does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile isotope_delta does not use fO2_Pa
     total_pressure_Pa:
-      tag: value
-      value: '15000000'
+      tag: not_applicable
+      reason: profile isotope_delta does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile isotope_delta does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile isotope_delta does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile isotope_delta does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile isotope_delta does not use wall
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    unavailable_reason: 'no mapped isotope_delta field selected; source fields: fraction, delta13C_permil, delta15N_permil,
+      method_class, printed_as'
     approximate: false
   uncertainty:
     kind: printed

@@ -12,12 +12,9 @@ canonicalizes to itself; neither aliases to ``internal-analytical``,
 non-authoritative verdicts and may never certify (see
 ``simulator.fidelity_vocabulary``).
 
-IMCC-SF04 shadow names ``imcc-sf04`` (published model) and ``imcc-sf04-ext``
-(S/P extension model) also route through :func:`canonical_backend_name`.
-Hyphen and underscore spellings fold to the hyphenated token; they are not
-analytical aliases. Promotion into ``REAL_MELT_BACKEND_NAMES`` / active
-recipe eligibility is a separate owner-gated change after the battery
-result (t-890).
+The retired ``imcc-sf04`` and ``imcc-sf04-ext`` names remain
+canonicalization identities so old records still load. Backend selection
+rejects them with a typed retirement error that points to ``openimcc``.
 
 This module deliberately has no heavy dependencies so it can be imported from
 the EvalSpec cache-key path without pulling in ``simulator.core``.
@@ -49,8 +46,8 @@ RATIFIED_VAPOUR_ANALYTICAL_EVIDENCE_CLASSES = frozenset(
     }
 )
 
-# Shadow-tier IMCC-SF04 melt-activity backends. Selectable for diagnostics,
-# the battery, and shadow runs; not active-recipe eligible until t-890.
+# Retired IMCC producer identities. Keep their spelling for old records and
+# reject them at backend selection; they are never aliases for openimcc.
 IMCC_SF04_BACKEND_NAME = "imcc-sf04"
 IMCC_SF04_EXT_BACKEND_NAME = "imcc-sf04-ext"
 IMCC_SF04_BACKEND_NAMES = frozenset(
@@ -59,6 +56,8 @@ IMCC_SF04_BACKEND_NAMES = frozenset(
         IMCC_SF04_EXT_BACKEND_NAME,
     }
 )
+RETIRED_IMCC_BACKEND_NAMES = IMCC_SF04_BACKEND_NAMES
+OPENIMCC_BACKEND_NAME = "openimcc"
 
 ANALYTICAL_BACKEND_CLASS_DISPLAY_NAME = "InternalAnalyticalBackend"
 ANALYTICAL_BACKEND_QUALIFIED_CLASS_NAME = (
@@ -78,7 +77,7 @@ def canonical_backend_name(backend_name: str | None) -> str | None:
     match case-insensitively and canonicalize to themselves — they never fold
     into ``internal-analytical``. IMCC-SF04 shadow names ``imcc-sf04`` and
     ``imcc-sf04-ext`` match case-insensitively and fold hyphen/underscore
-    spellings to the hyphenated token. Every other value is returned
+    spellings to the retired hyphenated token. Every other value is returned
     byte-for-byte, preserving strict matching for real backends and
     unknown-name refusals. ``None`` is unchanged.
     """

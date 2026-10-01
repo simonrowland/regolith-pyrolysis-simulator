@@ -2785,10 +2785,7 @@ def physics_constraints_digest(constraints: Any | None = None) -> str:
 
     if constraints is None:
         constraints = PhysicsConstraintSet()
-    payload: dict[str, Any] = {
-        "version": PHYSICS_GATE_VERSION,
-        "class": f"{type(constraints).__module__}.{type(constraints).__qualname__}",
-    }
+    payload: dict[str, Any] = {}
     if isinstance(constraints, PhysicsConstraintSet):
         payload.update({
             "target_species": constraints.target_species,

@@ -42,6 +42,7 @@ from simulator.evaporation import EvaporationFluxRefusal
 from simulator.melt_backend.magemin import MAGEMinBackend
 from simulator.reduced_real_determinism import (
     ControlQuantization,
+    PHYSICS_BUCKET_SCHEMA_VERSION,
     PT0DeterminismStore,
     PT0NonFinitePayload,
     PT1_EQUILIBRIUM_TABLE,
@@ -928,7 +929,7 @@ def _merge_cache_shard(shard_path: Path, target_path: Path) -> dict[str, Any]:
                     row.get("corpus_version"),
                     row.get("engine_version"),
                     validated["data_digests_json"],
-                    str(physics_bucket_key.get("schema_version")),
+                    PHYSICS_BUCKET_SCHEMA_VERSION,
                     physics_bucket_hash,
                     _replay_scope_hash(physics_bucket_key),
                     sqlite3.Binary(physics_bucket_bytes),

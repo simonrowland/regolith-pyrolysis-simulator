@@ -1,4 +1,4 @@
-"""IMCC-SF04 resolve_backend shadow-tier registration."""
+"""Retired backend resolution aliases and openimcc behavior."""
 
 from __future__ import annotations
 
@@ -22,10 +22,7 @@ from simulator.backends import (
 )
 from simulator.engine_local_config import identity_for
 from simulator.melt_backend.base import InternalAnalyticalBackend
-from simulator.melt_backend.imcc_sf04.backend import (
-    ImccSf04Backend,
-    ImccSf04ExtBackend,
-)
+from simulator.melt_backend.openimcc_bridge import OpenImccMeltBackend
 from openimcc.kernel import _PUBLISHED_DATAPACK_SHA256
 
 
@@ -91,55 +88,44 @@ def test_imcc_names_are_ineligible_active_not_real_melt_backends() -> None:
     assert IMCC_SF04_EXT_BACKEND_NAME not in REAL_MELT_BACKEND_NAMES
 
 
-def test_resolve_backend_imcc_sf04_returns_adapter_on_laptop() -> None:
-    backend = resolve_backend(
-        "imcc-sf04", BackendSelectionPolicy.RUNNER_STRICT
-    )
+def test_resolve_backend_openimcc_returns_bridge_on_laptop() -> None:
+    backend = resolve_backend("openimcc", BackendSelectionPolicy.RUNNER_STRICT)
 
-    assert isinstance(backend, ImccSf04Backend)
+    assert isinstance(backend, OpenImccMeltBackend)
     assert backend.is_available() is True
-    assert backend.initialize({}) is True
-    assert backend.backend_authoritative is False
 
 
 @pytest.mark.parametrize(
-    ("name", "cls"),
+    "name",
     [
-        ("imcc-sf04", ImccSf04Backend),
-        ("imcc_sf04", ImccSf04Backend),
-        ("imcc-sf04-ext", ImccSf04ExtBackend),
-        ("imcc_sf04_ext", ImccSf04ExtBackend),
+        "imcc-sf04",
+        "imcc_sf04",
+        "IMCC-SF04",
+        " IMCC_SF04 ",
+        "imcc-sf04-ext",
+        "imcc_sf04_ext",
+        "IMCC-SF04-EXT",
+        " IMCC_SF04_EXT ",
     ],
 )
-def test_resolve_backend_imcc_names_and_underscores(name: str, cls: type) -> None:
-    backend = resolve_backend(name, BackendSelectionPolicy.RUNNER_STRICT)
-    assert isinstance(backend, cls)
-    assert backend.is_available() is True
+def test_resolve_backend_rejects_retired_imcc_spellings(name: str) -> None:
+    with pytest.raises(
+        BackendUnavailableError,
+        match="is retired; use openimcc instead",
+    ) as excinfo:
+        resolve_backend(name, BackendSelectionPolicy.RUNNER_STRICT)
 
-
-@pytest.mark.parametrize(
-    ("x_k2o", "expected_status"),
-    ((0.500002, "out_of_domain"), (0.5, "ok"), (0.500006, "out_of_domain")),
-)
-def test_backend_uses_strict_composition_envelope(
-    x_k2o: float, expected_status: str
-) -> None:
-    backend = ImccSf04Backend()
-    assert backend.initialize({})
-    result = backend.equilibrate(
-        temperature_C=1800.0 - 273.15,
-        composition_mol={"K2O": x_k2o, "SiO2": 1.0 - x_k2o},
-    )
-    assert result.status == expected_status
+    assert getattr(excinfo.value, "reason_code", None) == "backend_unavailable"
 
 
 @pytest.mark.parametrize("name", ["imcc-sf04", "imcc-sf04-ext", "imcc_sf04"])
-def test_resolve_imcc_as_active_is_typed_ineligible_refusal(name: str) -> None:
-    with pytest.raises(BackendUnavailableError, match="pending battery qualification") as excinfo:
+def test_resolve_retired_imcc_as_active_is_typed_refusal(name: str) -> None:
+    with pytest.raises(
+        BackendUnavailableError,
+        match="is retired; use openimcc instead",
+    ) as excinfo:
         resolve_backend(name, BackendSelectionPolicy.WEB_AUTODETECT)
 
-    message = str(excinfo.value)
-    assert "not eligible as the active melt backend" in message
     assert getattr(excinfo.value, "reason_code", None) == "backend_unavailable"
 
 
@@ -182,7 +168,7 @@ def test_runner_strict_auto_and_unknown_are_unchanged() -> None:
 
 def test_one_pot_equilibrate_returns_finite_activities() -> None:
     backend = resolve_backend(
-        "imcc-sf04", BackendSelectionPolicy.RUNNER_STRICT
+        "openimcc", BackendSelectionPolicy.RUNNER_STRICT
     )
     composition_wt_pct = _feo_mgo_sio2_wt_pct()
     composition_kg = {
@@ -203,9 +189,8 @@ def test_one_pot_equilibrate_returns_finite_activities() -> None:
 
 def test_engine_identity_digest_is_datapack_hash_not_engines_local_toml() -> None:
     # identity_for reads compiled-engine receipts from engines.local.toml
-    # (alphamelts / magemin / thermoengine binaries). IMCC-SF04 is in-tree
-    # Python plus a hashed JSON datapack, so that table has no IMCC row.
-    # The published digest lives on the kernel constant.
+    # (alphamelts / magemin / thermoengine binaries). OpenIMCC is a pinned
+    # package, so its published digest lives on the kernel constant.
     assert identity_for("imcc-sf04") is None
     assert identity_for("imcc-sf04-ext") is None
     assert len(_PUBLISHED_DATAPACK_SHA256) == 64

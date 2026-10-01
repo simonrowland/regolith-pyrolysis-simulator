@@ -1,9 +1,10 @@
 """Closed tokens for the empirical battery schema (v2.1).
 
 Ambiguity resolutions (simplest-correct; not owner questions):
-- Rail IDs are the eight owner-bound tokens from SCHEMA-PROPOSAL-v2.1
+- Rail IDs are the nine owner-bound tokens from SCHEMA-PROPOSAL-v2.1
   guard_09_05, stored as Residual.rail. Mandate §Prediction posture names
-  the same eight.
+  the same nine. The owner ratified ``residue_composition`` as the ninth
+  rail on 2026-10-01.
 - Reference-state *convention* tokens reuse the catalog's
   ``raoultian_pure_endmember`` and extend with ``henrian_solid``,
   ``henrian_liquid``, ``hypothetical_1wt_pct``. ``single_cation_oxide`` is
@@ -21,11 +22,7 @@ from enum import StrEnum
 
 
 class Engine(StrEnum):
-    """Closed first-class engine tokens. Not derived from resolve_backend.
-
-    Includes IMCC-SF04 / IMCC-SF04-EXT (simulator/melt_backend/imcc_sf04/)
-    alongside the analytical, builtin, and melt-engine identities.
-    """
+    """Closed first-class engine tokens. Not derived from resolve_backend."""
 
     INTERNAL_ANALYTICAL = "internal-analytical"
     NASA_CEA_9 = "nasa_cea_9"
@@ -36,13 +33,11 @@ class Engine(StrEnum):
     THERMOENGINE = "thermoengine"
     VAPOROCK = "vaporock"
     MAGEMIN = "magemin"
-    IMCC_SF04 = "imcc_sf04"
-    IMCC_SF04_EXT = "imcc_sf04_ext"
     OPENIMCC = "openimcc"
 
 
 class Rail(StrEnum):
-    """Eight owner-bound residual reporting rails (v2.1 guard_09_05)."""
+    """Owner-bound residual reporting rails."""
 
     VAPOUR = "vapour"
     MELT_ACTIVITY = "melt_activity"
@@ -52,6 +47,7 @@ class Rail(StrEnum):
     WALL_DEPOSITION = "wall_deposition"
     REDOX = "redox"
     ALKALI_SHUTTLE = "alkali_shuttle"
+    RESIDUE_COMPOSITION = "residue_composition"
 
 
 class Quantity(StrEnum):
@@ -94,6 +90,7 @@ class Quantity(StrEnum):
     EVOLVED_GAS_YIELD = "evolved_gas_yield"
     ION_INTENSITY = "ion_intensity"
     INTERACTION_PARAMETER = "interaction_parameter"
+    RESIDUE_COMPONENT_COMPOSITION = "residue_component_composition"
 
 
 class EvidenceClass(StrEnum):
@@ -199,6 +196,7 @@ class NoticeKind(StrEnum):
     UNVERIFIED_APPARATUS = "unverified_apparatus"
     COMPOSITION_FROM_SAMPLE_CATALOG = "composition_from_sample_catalog"
     IMCC_COMPLEX_SATURATION = "imcc_complex_saturation"
+    REFERENCE_PHASE_BY_CONVENTION = "reference_phase_by_convention"
 
 
 class ReferenceStateConvention(StrEnum):
@@ -363,6 +361,7 @@ class Authority(StrEnum):
     CERTIFIED = "certified"
     BRIDGE = "bridge"
     EXTRAPOLATED = "extrapolated"
+    CONVENTION = "convention"
     REFUSED = "refused"
 
 
@@ -475,6 +474,7 @@ QUANTITY_UNITS: dict[Quantity, str] = {
     Quantity.EVOLVED_GAS_YIELD: "mol_species_per_initial_kg",
     Quantity.ION_INTENSITY: "subtype_defined",
     Quantity.INTERACTION_PARAMETER: "subtype_defined",
+    Quantity.RESIDUE_COMPONENT_COMPOSITION: "subtype_defined",
 }
 
 MEASURED_EVIDENCE = frozenset(

@@ -1781,16 +1781,16 @@ observations:
             formula: Hg
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
           coefficient: '-1'
         - species:
-            formula: I
+            formula: I2
             phase:
               tag: value
               value: cr
@@ -1800,7 +1800,7 @@ observations:
             charge:
               tag: value
               value: 0
-          coefficient: '-2'
+          coefficient: '-1'
     formation_elements:
       tag: value
       value:
@@ -1808,15 +1808,15 @@ observations:
         - formula: Hg
           phase:
             tag: value
-            value: cr
+            value: l
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
       - - I
-        - formula: I
+        - formula: I2
           phase:
             tag: value
             value: cr
@@ -1877,7 +1877,9 @@ observations:
     note: as_published='-24.148'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=Hg=B1259 reference-state table p.48/PDF p.54, I=B1259 reference-state table p.49/PDF
+      p.55
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0154-coccinite.json
     record: b1259-ht-0154-coccinite
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0154-coccinite.json
@@ -1950,26 +1952,26 @@ observations:
             formula: Hg
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
           coefficient: '-1'
         - species:
-            formula: I
+            formula: I2
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
-          coefficient: '-2'
+          coefficient: '-1'
     formation_elements:
       tag: value
       value:
@@ -1977,21 +1979,21 @@ observations:
         - formula: Hg
           phase:
             tag: value
-            value: cr
+            value: l
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
       - - I
-        - formula: I
+        - formula: I2
           phase:
             tag: value
-            value: cr
+            value: l
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -2046,7 +2048,9 @@ observations:
     note: as_published='-23.634'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=Hg=B1259 reference-state table p.48/PDF p.54, I=B1259 reference-state table p.49/PDF
+      p.55
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0154-coccinite.json
     record: b1259-ht-0154-coccinite
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0154-coccinite.json
@@ -2119,26 +2123,26 @@ observations:
             formula: Hg
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
           coefficient: '-1'
         - species:
-            formula: I
+            formula: I2
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
-          coefficient: '-2'
+          coefficient: '-1'
     formation_elements:
       tag: value
       value:
@@ -2146,21 +2150,21 @@ observations:
         - formula: Hg
           phase:
             tag: value
-            value: cr
+            value: l
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
       - - I
-        - formula: I
+        - formula: I2
           phase:
             tag: value
-            value: cr
+            value: l
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -2215,7 +2219,9 @@ observations:
     note: as_published='-23.570'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=Hg=B1259 reference-state table p.48/PDF p.54, I=B1259 reference-state table p.49/PDF
+      p.55
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0154-coccinite.json
     record: b1259-ht-0154-coccinite
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0154-coccinite.json
@@ -2288,26 +2294,26 @@ observations:
             formula: Hg
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
           coefficient: '-1'
         - species:
-            formula: I
+            formula: I2
             phase:
               tag: value
-              value: cr
+              value: g
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
-          coefficient: '-2'
+          coefficient: '-1'
     formation_elements:
       tag: value
       value:
@@ -2315,21 +2321,21 @@ observations:
         - formula: Hg
           phase:
             tag: value
-            value: cr
+            value: l
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
       - - I
-        - formula: I
+        - formula: I2
           phase:
             tag: value
-            value: cr
+            value: g
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -2384,7 +2390,9 @@ observations:
     note: as_published='-21.446'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=Hg=B1259 reference-state table p.48/PDF p.54, I=B1259 reference-state table p.49/PDF
+      p.55
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0154-coccinite.json
     record: b1259-ht-0154-coccinite
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0154-coccinite.json
@@ -2457,26 +2465,26 @@ observations:
             formula: Hg
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
           coefficient: '-1'
         - species:
-            formula: I
+            formula: I2
             phase:
               tag: value
-              value: cr
+              value: g
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
-          coefficient: '-2'
+          coefficient: '-1'
     formation_elements:
       tag: value
       value:
@@ -2484,21 +2492,21 @@ observations:
         - formula: Hg
           phase:
             tag: value
-            value: cr
+            value: l
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
       - - I
-        - formula: I
+        - formula: I2
           phase:
             tag: value
-            value: cr
+            value: g
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -2553,7 +2561,9 @@ observations:
     note: as_published='-20.685'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=Hg=B1259 reference-state table p.48/PDF p.54, I=B1259 reference-state table p.49/PDF
+      p.55
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0154-coccinite.json
     record: b1259-ht-0154-coccinite
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0154-coccinite.json
@@ -2626,16 +2636,16 @@ observations:
             formula: Hg
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
           coefficient: '-1'
         - species:
-            formula: I
+            formula: I2
             phase:
               tag: value
               value: cr
@@ -2645,7 +2655,7 @@ observations:
             charge:
               tag: value
               value: 0
-          coefficient: '-2'
+          coefficient: '-1'
     formation_elements:
       tag: value
       value:
@@ -2653,15 +2663,15 @@ observations:
         - formula: Hg
           phase:
             tag: value
-            value: cr
+            value: l
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
       - - I
-        - formula: I
+        - formula: I2
           phase:
             tag: value
             value: cr
@@ -2722,7 +2732,9 @@ observations:
     note: as_published='25.200'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=Hg=B1259 reference-state table p.48/PDF p.54, I=B1259 reference-state table p.49/PDF
+      p.55
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0154-coccinite.json
     record: b1259-ht-0154-coccinite
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0154-coccinite.json
@@ -2795,26 +2807,26 @@ observations:
             formula: Hg
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
           coefficient: '-1'
         - species:
-            formula: I
+            formula: I2
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
-          coefficient: '-2'
+          coefficient: '-1'
     formation_elements:
       tag: value
       value:
@@ -2822,21 +2834,21 @@ observations:
         - formula: Hg
           phase:
             tag: value
-            value: cr
+            value: l
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
       - - I
-        - formula: I
+        - formula: I2
           phase:
             tag: value
-            value: cr
+            value: l
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -2891,7 +2903,9 @@ observations:
     note: as_published='29.184'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=Hg=B1259 reference-state table p.48/PDF p.54, I=B1259 reference-state table p.49/PDF
+      p.55
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0154-coccinite.json
     record: b1259-ht-0154-coccinite
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0154-coccinite.json
@@ -2964,26 +2978,26 @@ observations:
             formula: Hg
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
           coefficient: '-1'
         - species:
-            formula: I
+            formula: I2
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
-          coefficient: '-2'
+          coefficient: '-1'
     formation_elements:
       tag: value
       value:
@@ -2991,21 +3005,21 @@ observations:
         - formula: Hg
           phase:
             tag: value
-            value: cr
+            value: l
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
       - - I
-        - formula: I
+        - formula: I2
           phase:
             tag: value
-            value: cr
+            value: l
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -3060,7 +3074,9 @@ observations:
     note: as_published='29.207'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=Hg=B1259 reference-state table p.48/PDF p.54, I=B1259 reference-state table p.49/PDF
+      p.55
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0154-coccinite.json
     record: b1259-ht-0154-coccinite
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0154-coccinite.json
@@ -3133,26 +3149,26 @@ observations:
             formula: Hg
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
           coefficient: '-1'
         - species:
-            formula: I
+            formula: I2
             phase:
               tag: value
-              value: cr
+              value: g
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
-          coefficient: '-2'
+          coefficient: '-1'
     formation_elements:
       tag: value
       value:
@@ -3160,21 +3176,21 @@ observations:
         - formula: Hg
           phase:
             tag: value
-            value: cr
+            value: l
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
       - - I
-        - formula: I
+        - formula: I2
           phase:
             tag: value
-            value: cr
+            value: g
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -3229,7 +3245,9 @@ observations:
     note: as_published='38.694'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=Hg=B1259 reference-state table p.48/PDF p.54, I=B1259 reference-state table p.49/PDF
+      p.55
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0154-coccinite.json
     record: b1259-ht-0154-coccinite
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0154-coccinite.json
@@ -3302,26 +3320,26 @@ observations:
             formula: Hg
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
           coefficient: '-1'
         - species:
-            formula: I
+            formula: I2
             phase:
               tag: value
-              value: cr
+              value: g
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
-          coefficient: '-2'
+          coefficient: '-1'
     formation_elements:
       tag: value
       value:
@@ -3329,21 +3347,21 @@ observations:
         - formula: Hg
           phase:
             tag: value
-            value: cr
+            value: l
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
       - - I
-        - formula: I
+        - formula: I2
           phase:
             tag: value
-            value: cr
+            value: g
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -3398,7 +3416,9 @@ observations:
     note: as_published='34.087'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=Hg=B1259 reference-state table p.48/PDF p.54, I=B1259 reference-state table p.49/PDF
+      p.55
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0154-coccinite.json
     record: b1259-ht-0154-coccinite
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0154-coccinite.json
@@ -3471,26 +3491,26 @@ observations:
             formula: Hg
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
           coefficient: '-1'
         - species:
-            formula: I
+            formula: I2
             phase:
               tag: value
-              value: cr
+              value: g
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
-          coefficient: '-2'
+          coefficient: '-1'
     formation_elements:
       tag: value
       value:
@@ -3498,21 +3518,21 @@ observations:
         - formula: Hg
           phase:
             tag: value
-            value: cr
+            value: l
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
       - - I
-        - formula: I
+        - formula: I2
           phase:
             tag: value
-            value: cr
+            value: g
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -3567,7 +3587,9 @@ observations:
     note: as_published='38.587'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=Hg=B1259 reference-state table p.48/PDF p.54, I=B1259 reference-state table p.49/PDF
+      p.55
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0154-coccinite.json
     record: b1259-ht-0154-coccinite
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0154-coccinite.json
@@ -3640,26 +3662,26 @@ observations:
             formula: Hg
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
           coefficient: '-1'
         - species:
-            formula: I
+            formula: I2
             phase:
               tag: value
-              value: cr
+              value: g
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
-          coefficient: '-2'
+          coefficient: '-1'
     formation_elements:
       tag: value
       value:
@@ -3667,21 +3689,21 @@ observations:
         - formula: Hg
           phase:
             tag: value
-            value: cr
+            value: l
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
       - - I
-        - formula: I
+        - formula: I2
           phase:
             tag: value
-            value: cr
+            value: g
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -3736,7 +3758,9 @@ observations:
     note: as_published='33.350'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=Hg=B1259 reference-state table p.48/PDF p.54, I=B1259 reference-state table p.49/PDF
+      p.55
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0154-coccinite.json
     record: b1259-ht-0154-coccinite
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0154-coccinite.json
@@ -3809,16 +3833,16 @@ observations:
             formula: Hg
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
           coefficient: '-1'
         - species:
-            formula: I
+            formula: I2
             phase:
               tag: value
               value: cr
@@ -3828,7 +3852,7 @@ observations:
             charge:
               tag: value
               value: 0
-          coefficient: '-2'
+          coefficient: '-1'
     formation_elements:
       tag: value
       value:
@@ -3836,15 +3860,15 @@ observations:
         - formula: Hg
           phase:
             tag: value
-            value: cr
+            value: l
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
       - - I
-        - formula: I
+        - formula: I2
           phase:
             tag: value
             value: cr
@@ -3905,7 +3929,9 @@ observations:
     note: as_published='17.701'; unit='dimensionless' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=Hg=B1259 reference-state table p.48/PDF p.54, I=B1259 reference-state table p.49/PDF
+      p.55
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0154-coccinite.json
     record: b1259-ht-0154-coccinite
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0154-coccinite.json
@@ -3969,26 +3995,26 @@ observations:
             formula: Hg
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
           coefficient: '-1'
         - species:
-            formula: I
+            formula: I2
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
-          coefficient: '-2'
+          coefficient: '-1'
     formation_elements:
       tag: value
       value:
@@ -3996,21 +4022,21 @@ observations:
         - formula: Hg
           phase:
             tag: value
-            value: cr
+            value: l
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
       - - I
-        - formula: I
+        - formula: I2
           phase:
             tag: value
-            value: cr
+            value: l
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -4065,7 +4091,9 @@ observations:
     note: as_published='12.913'; unit='dimensionless' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=Hg=B1259 reference-state table p.48/PDF p.54, I=B1259 reference-state table p.49/PDF
+      p.55
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0154-coccinite.json
     record: b1259-ht-0154-coccinite
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0154-coccinite.json
@@ -4129,26 +4157,26 @@ observations:
             formula: Hg
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
           coefficient: '-1'
         - species:
-            formula: I
+            formula: I2
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
-          coefficient: '-2'
+          coefficient: '-1'
     formation_elements:
       tag: value
       value:
@@ -4156,21 +4184,21 @@ observations:
         - formula: Hg
           phase:
             tag: value
-            value: cr
+            value: l
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
       - - I
-        - formula: I
+        - formula: I2
           phase:
             tag: value
-            value: cr
+            value: l
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -4225,7 +4253,9 @@ observations:
     note: as_published='12.782'; unit='dimensionless' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=Hg=B1259 reference-state table p.48/PDF p.54, I=B1259 reference-state table p.49/PDF
+      p.55
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0154-coccinite.json
     record: b1259-ht-0154-coccinite
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0154-coccinite.json
@@ -4289,26 +4319,26 @@ observations:
             formula: Hg
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
           coefficient: '-1'
         - species:
-            formula: I
+            formula: I2
             phase:
               tag: value
-              value: cr
+              value: g
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
-          coefficient: '-2'
+          coefficient: '-1'
     formation_elements:
       tag: value
       value:
@@ -4316,21 +4346,21 @@ observations:
         - formula: Hg
           phase:
             tag: value
-            value: cr
+            value: l
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
       - - I
-        - formula: I
+        - formula: I2
           phase:
             tag: value
-            value: cr
+            value: g
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -4385,7 +4415,9 @@ observations:
     note: as_published='9.374'; unit='dimensionless' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=Hg=B1259 reference-state table p.48/PDF p.54, I=B1259 reference-state table p.49/PDF
+      p.55
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0154-coccinite.json
     record: b1259-ht-0154-coccinite
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0154-coccinite.json
@@ -4449,26 +4481,26 @@ observations:
             formula: Hg
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
           coefficient: '-1'
         - species:
-            formula: I
+            formula: I2
             phase:
               tag: value
-              value: cr
+              value: g
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
-          coefficient: '-2'
+          coefficient: '-1'
     formation_elements:
       tag: value
       value:
@@ -4476,21 +4508,21 @@ observations:
         - formula: Hg
           phase:
             tag: value
-            value: cr
+            value: l
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
       - - I
-        - formula: I
+        - formula: I2
           phase:
             tag: value
-            value: cr
+            value: g
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -4545,7 +4577,9 @@ observations:
     note: as_published='8.644'; unit='dimensionless' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=Hg=B1259 reference-state table p.48/PDF p.54, I=B1259 reference-state table p.49/PDF
+      p.55
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0154-coccinite.json
     record: b1259-ht-0154-coccinite
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0154-coccinite.json

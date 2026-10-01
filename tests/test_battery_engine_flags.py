@@ -120,7 +120,7 @@ def _mgo_sio2_pot() -> BinaryPot:
     )
 
 
-def _imcc_cell(handle: EngineHandle, temperature_K: float):
+def _openimcc_cell(handle: EngineHandle, temperature_K: float):
     return equilibrate_cell(
         handle,
         _mgo_sio2_pot(),
@@ -225,13 +225,13 @@ def test_vaporock_1773k_cell_keeps_extrapolated_flag(monkeypatch) -> None:
     assert cell_notices(Quantity.P_PARTIAL, Engine.VAPOROCK, warm) == ()
 
 
-def test_imcc_temperature_notice_survives_cell_notices() -> None:
-    handle = open_battery_engine("imcc_sf04")
+def test_openimcc_temperature_notice_survives_cell_notices() -> None:
+    handle = open_battery_engine("openimcc")
     handle.backend._gas = None
     handle.backend._gas_error = "test-only unavailable gas tables"
     assert handle.available is True
-    hot = _imcc_cell(handle, 800.0)
-    warm = _imcc_cell(handle, 1700.0)
+    hot = _openimcc_cell(handle, 800.0)
+    warm = _openimcc_cell(handle, 1700.0)
     kg, mol = composition_kg_and_mol(_mgo_sio2_pot().composition_wt_pct)
     direct = handle.backend.equilibrate(
         temperature_C=800.0 - 273.15,
@@ -248,26 +248,32 @@ def test_imcc_temperature_notice_survives_cell_notices() -> None:
     assert hot.gas_partial_pressures_Pa == direct_pressures
     assert hot.melt_activities["SiO2"] > 0.0
     kinds = [row.get("kind") for row in hot.notices]
-    assert kinds.count("imcc_temperature_extrapolated") == 1
+    assert kinds.count("openimcc_temperature_extrapolated") == 1
     assert len(kinds) == len(set(kinds))
-    scored = cell_notices(Quantity.ACTIVITY, Engine.IMCC_SF04, hot)
+    scored = cell_notices(Quantity.ACTIVITY, Engine.OPENIMCC, hot)
     band = [notice for notice in scored if notice.kind is NoticeKind.OUT_OF_CERTIFIED_BAND]
     assert len(band) == 1
-    assert "T outside datapack" in band[0].reason
+    assert "T outside openimcc datapack" in band[0].reason
 
     assert warm.status == "ok"
     assert warm.authority is None
     assert warm.melt_activities["SiO2"] != hot.melt_activities["SiO2"]
-    assert [row.get("kind") for row in warm.notices] == ["imcc_gas_unavailable"]
-    assert cell_notices(Quantity.ACTIVITY, Engine.IMCC_SF04, warm) == ()
+    warm_kinds = [row.get("kind") for row in warm.notices]
+    assert "openimcc_gas_unavailable" in warm_kinds
+    assert "openimcc_temperature_extrapolated" not in warm_kinds
+    warm_cell_notices = cell_notices(Quantity.ACTIVITY, Engine.OPENIMCC, warm)
+    assert not any(
+        notice.kind is NoticeKind.OUT_OF_CERTIFIED_BAND
+        for notice in warm_cell_notices
+    )
 
 
 def test_scoring_envelope_uses_cell_flag() -> None:
-    handle = open_battery_engine("imcc_sf04")
+    handle = open_battery_engine("openimcc")
     handle.backend._gas = None
     handle.backend._gas_error = "test-only unavailable gas tables"
-    hot = _imcc_cell(handle, 800.0)
-    warm = _imcc_cell(handle, 1700.0)
+    hot = _openimcc_cell(handle, 800.0)
+    warm = _openimcc_cell(handle, 1700.0)
     hot_pot = _scoring_pot(_mgo_sio2_pot(), 800.0)
     warm_pot = _scoring_pot(_mgo_sio2_pot(), 1700.0)
 
@@ -284,13 +290,13 @@ def test_scoring_envelope_uses_cell_flag() -> None:
     warm_row = row_for(warm_pot, warm)
     assert hot_row["predicted"] == hot.melt_activities["SiO2"]
     assert hot_row["authority"] == AUTHORITY_EXTRAPOLATED
-    assert "imcc_temperature_extrapolated" in hot_row["notices"]
-    assert hot_row["notices"].count("imcc_temperature_extrapolated") == 1
+    assert "openimcc_temperature_extrapolated" in hot_row["notices"]
+    assert hot_row["notices"].count("openimcc_temperature_extrapolated") == 1
     assert warm_row["predicted"] == warm.melt_activities["SiO2"]
     assert warm_row["predicted"] != hot_row["predicted"]
     assert warm_row["authority"] == "bridge"
-    assert "imcc_temperature_extrapolated" not in warm_row["notices"]
-    assert "imcc_gas_unavailable" in warm_row["notices"]
+    assert "openimcc_temperature_extrapolated" not in warm_row["notices"]
+    assert "openimcc_gas_unavailable" in warm_row["notices"]
 
     comparator = _activity_comparator(hot_pot)
     compared = _comparator_envelope(
@@ -302,7 +308,7 @@ def test_scoring_envelope_uses_cell_flag() -> None:
     )
     assert compared["predicted"] == hot.melt_activities["SiO2"]
     assert compared["authority"] == AUTHORITY_EXTRAPOLATED
-    assert "imcc_temperature_extrapolated" in compared["notices"]
+    assert "openimcc_temperature_extrapolated" in compared["notices"]
 
 
 def _partial_identity(temperature_K: str, composition: Composition):

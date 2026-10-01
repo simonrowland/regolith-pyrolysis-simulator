@@ -279,6 +279,19 @@ def test_default_published_imcc_pack_loads_through_real_configuration():
     assert engines[0]._load().version == "1.0.2"
 
 
+def test_imcc_benchmark_uses_openimcc():
+    fixture = benchmark.load_bench_set(benchmark.DEFAULT_BENCH_SET)
+    engine = benchmark.build_engines(
+        ["imcc-published"], fixture, alphamelts_timeout_s=1.0
+    )[0]
+    engine._load()
+    result = engine.evaluate({"K2O": 20.0, "SiO2": 80.0}, 1800.0, 1.0e-9)
+
+    assert result.status == "ok", result.reason
+    assert result.details["trust"] == "internal-analytical"
+    assert result.details["model_id"] == "IMCC-SF04"
+
+
 def test_coverage_map_records_melts_refusal_below_30_sio2():
     fixture = benchmark.load_bench_set(benchmark.DEFAULT_BENCH_SET)
     rows = benchmark.run_coverage_map(

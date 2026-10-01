@@ -1,9 +1,7 @@
 """Shared melt-backend selection and simulator construction helpers.
 
-IMCC-SF04 (``imcc-sf04``, ``imcc-sf04-ext``) is registered as a shadow /
-diagnostic backend, ineligible as the active recipe backend. Promotion
-into ``REAL_MELT_BACKEND_NAMES`` and active eligibility is a separate
-owner-gated change after the battery result (t-890).
+The old ``imcc-sf04`` and ``imcc-sf04-ext`` names are retired. Their
+requests fail with a typed error that points callers to ``openimcc``.
 """
 
 from __future__ import annotations
@@ -22,8 +20,9 @@ from simulator.backend_names import (  # noqa: F401 - re-exported for callers
     ANALYTICAL_BACKEND_DISPLAY_NAME,
     ANALYTICAL_BACKEND_SERIALIZATION_TOKEN,
     IMCC_SF04_BACKEND_NAME,
-    IMCC_SF04_BACKEND_NAMES,
     IMCC_SF04_EXT_BACKEND_NAME,
+    OPENIMCC_BACKEND_NAME,
+    RETIRED_IMCC_BACKEND_NAMES,
     canonical_backend_name,
 )
 from simulator.accounting.exceptions import AccountingError
@@ -50,21 +49,25 @@ INELIGIBLE_ACTIVE_BACKENDS = (
     "magemin",
     IMCC_SF04_BACKEND_NAME,
     IMCC_SF04_EXT_BACKEND_NAME,
+    OPENIMCC_BACKEND_NAME,
 )
 _INELIGIBLE_ACTIVE_BACKEND_LABELS = {
     "vaporock": "VapoRock",
     "magemin": "MAGEMin",
     IMCC_SF04_BACKEND_NAME: "IMCC-SF04",
     IMCC_SF04_EXT_BACKEND_NAME: "IMCC-SF04-EXT",
+    OPENIMCC_BACKEND_NAME: "openimcc",
 }
 
 
 def _ineligible_active_backend_message(name: str) -> str:
     label = _INELIGIBLE_ACTIVE_BACKEND_LABELS.get(name, name)
-    if name in IMCC_SF04_BACKEND_NAMES:
+    if name in RETIRED_IMCC_BACKEND_NAMES:
+        return f"{label} is retired; use {OPENIMCC_BACKEND_NAME} instead."
+    if name == OPENIMCC_BACKEND_NAME:
         return (
-            f"{label} is not eligible as the active melt backend "
-            "pending battery qualification; select alphamelts or auto."
+            "openimcc is not eligible as the active melt backend; "
+            "select alphamelts or auto."
         )
     return (
         f"{label} is not eligible as the active melt backend "
@@ -965,6 +968,10 @@ def resolve_backend(
     # only the 0.6 serialization token.
     backend_name = canonical_backend_name(backend_name)
     unavailable_error_cls = _unavailable_error_cls_with_reason(unavailable_error_cls)
+    if backend_name in RETIRED_IMCC_BACKEND_NAMES:
+        raise unavailable_error_cls(
+            f"{backend_name} is retired; use {OPENIMCC_BACKEND_NAME} instead."
+        )
 
     subprocess_required = requires_stage0_subprocess(
         feedstock_id,
@@ -1373,23 +1380,17 @@ def _resolve_runner_strict(
             cached_real_live_backend_cls=cached_real_live_backend_cls,
             backend_config=backend_config,
         )
-    if name in IMCC_SF04_BACKEND_NAMES:
-        from simulator.melt_backend.imcc_sf04.backend import (
-    ImccSf04Backend,
-    ImccSf04ExtBackend,
-)
+    if name in RETIRED_IMCC_BACKEND_NAMES:
+        raise unavailable_error_cls(_ineligible_active_backend_message(name))
+    if name == OPENIMCC_BACKEND_NAME:
+        from simulator.melt_backend.openimcc_bridge import OpenImccMeltBackend
 
-        backend_cls = (
-            ImccSf04ExtBackend
-            if name == IMCC_SF04_EXT_BACKEND_NAME
-            else ImccSf04Backend
-        )
-        backend = _try_backend(backend_cls, backend_config)
+        backend = _try_backend(OpenImccMeltBackend, backend_config)
         if backend is not None:
             return backend
-        label = _INELIGIBLE_ACTIVE_BACKEND_LABELS.get(name, name)
         raise unavailable_error_cls(
-            f"{label} unavailable; datapack missing or initialize() failed"
+            "openimcc unavailable; make the openimcc package importable and "
+            "retry."
         )
     raise unavailable_error_cls(f"unknown backend {name!r}")
 

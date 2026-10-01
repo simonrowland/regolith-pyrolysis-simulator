@@ -14,8 +14,10 @@ import math
 import re
 import socket
 import subprocess
+import sys
 import time
 import warnings
+from collections import defaultdict
 from dataclasses import dataclass, field, replace
 from decimal import Decimal, InvalidOperation
 from pathlib import Path
@@ -111,20 +113,19 @@ from simulator.battery.validate import (
 )
 from simulator.battery.validity import (
     GateOutcome,
+    _partial_pressure_observations_by_experiment,
     comparison_method_cell_constant_cancels,
     run_validity_gates,
 )
 from simulator.reference_data.janaf import formula_composition
 
-# Explicit closed set. IMCC is first-class. Do not build this from
+# Explicit closed set. openimcc is the only IMCC producer. Do not build this from
 # resolve_backend, BATTERY_ENGINE_NAMES, or any probe of installed backends.
 SCORE_ENGINE_SET: tuple[Engine, ...] = (
     Engine.VAPOROCK,
     Engine.ALPHAMELTS,
     Engine.THERMOENGINE,
     Engine.MAGEMIN,
-    Engine.IMCC_SF04,
-    Engine.IMCC_SF04_EXT,
     Engine.OPENIMCC,
     Engine.INTERNAL_ANALYTICAL,
 )
@@ -232,15 +233,13 @@ QUANTITY_METRIC: dict[Quantity, MetricOperation] = {
     Quantity.LIQUIDUS_COMPOSITION: MetricOperation.ABSOLUTE,
     Quantity.EVOLVED_GAS_YIELD: MetricOperation.RELATIVE,
     Quantity.ISOTOPE_DELTA: MetricOperation.ABSOLUTE,
+    Quantity.RESIDUE_COMPONENT_COMPOSITION: MetricOperation.ABSOLUTE,
 }
 
-# Sourced decision bands (not pins). Gibbs agreement_bands_kJ_mol from the
-# residual ledger headers, in kJ/mol. Applied only to formation energies
-# whose stored unit has that dimension (delta_fG, delta_fH). cp and S are
-# J/mol/K, H-H298 is not a formation energy, and log10_Kf is dimensionless:
-# they stay unbanded until a sourced band exists. Missing band, or a band
-# whose dimension differs from the quantity, → decision_rule_missing.
-# A borrowed number is never attached.
+# Legacy ΔfG bands from the residual ledger, retained as labeled fallbacks for
+# comparisons without a compilation-derived band. The independent value is
+# used for every relation: lineage labels do not select a decision threshold.
+# Printed cell uncertainty and family residual bands supersede these values.
 # Searched and not used as decision bands (do not invent a tolerance):
 # - data/vapour_rail_validation_pins.yaml policy.margin_dex 0.01 is a pin /
 #   regression envelope; SCHEMA-PROPOSAL-v2.1 forbids using a pin as the
@@ -248,7 +247,7 @@ QUANTITY_METRIC: dict[Quantity, MetricOperation] = {
 # - validation-data/vapour_rail_sf04_high_t_DECISION.md 0.5 dex is an SF04
 #   high-T species-disagreement check, "NOT evidence for a physical or
 #   numerical ceiling".
-# - docs/imcc-sf04-spec.md ±0.01 dex vs JANAF is an IMCC own-input pin.
+# - openimcc's published-pack SHA-256 pins the package data, not an accuracy band.
 # - engines/builtin/melt_effect_adjustment.py ±0.3 dex is a mixed-matte
 #   error estimate, not an activity agreement band.
 # - evaporation-α envelopes and the Robinot O2 error budget are value
@@ -261,19 +260,22 @@ THERMOCHEMISTRY_DECISION_BANDS: dict[SourceRelation, DecisionBand] = {
     SourceRelation.INDEPENDENT: DecisionBand(
         Decimal("1.0"),
         "kJ_per_declared_mol_basis",
-        "gibbs_battery_residual_ledger.yaml agreement_bands_kJ_mol.independent_tabulation",
+        "LEGACY fallback: gibbs_battery_residual_ledger.yaml agreement_bands_kJ_mol.independent_tabulation",
     ),
     SourceRelation.SAME_INPUT: DecisionBand(
         Decimal("0.05"),
         "kJ_per_declared_mol_basis",
-        "gibbs_battery_residual_ledger.yaml agreement_bands_kJ_mol.engine_own_input",
+        "LEGACY historical only: gibbs_battery_residual_ledger.yaml agreement_bands_kJ_mol.engine_own_input",
     ),
     SourceRelation.TRAINING: DecisionBand(
         Decimal("0.05"),
         "kJ_per_declared_mol_basis",
-        "gibbs_battery_residual_ledger.yaml agreement_bands_kJ_mol.engine_own_input",
+        "LEGACY historical only: gibbs_battery_residual_ledger.yaml agreement_bands_kJ_mol.engine_own_input",
     ),
 }
+
+# Statistical floor for estimating a MAD, not a physics threshold.
+MIN_DERIVED_BAND_N = 10
 
 # Formation Gibbs energies stored in kJ/mol. Not log10_Kf (dimensionless), not
 # cp/S (J/mol/K), not delta_fH or H-H298 (not sourced by this band).
@@ -302,8 +304,6 @@ ENGINE_CHANNELS: dict[Engine, str] = {
     Engine.ALPHAMELTS: "alphamelts",
     Engine.THERMOENGINE: "thermoengine",
     Engine.MAGEMIN: "magemin",
-    Engine.IMCC_SF04: "imcc_sf04",
-    Engine.IMCC_SF04_EXT: "imcc_sf04_ext",
     Engine.OPENIMCC: "openimcc",
     Engine.INTERNAL_ANALYTICAL: "internal-analytical",
 }
@@ -312,8 +312,6 @@ ENGINE_COEFFICIENT_SOURCES: dict[Engine, tuple[str, ...]] = {
     Engine.ALPHAMELTS: ("alphamelts",),
     Engine.THERMOENGINE: ("thermoengine",),
     Engine.MAGEMIN: ("magemin",),
-    Engine.IMCC_SF04: ("imcc-sf04-v1.0.2",),
-    Engine.IMCC_SF04_EXT: ("imcc-sf04-ext-v4",),
     Engine.OPENIMCC: ("openimcc-v1.0.2",),
     Engine.INTERNAL_ANALYTICAL: ("antoine_sidecar", "ellingham"),
 }
@@ -450,8 +448,32 @@ class EligibleConjuncts:
         return tuple(name for name, ok in self.as_mapping().items() if not ok)
 
 
+_RETIRED_SCORE_ENGINE_NAMES = frozenset({"imcc_sf04", "imcc_sf04_ext"})
+
+
 def parse_engine(name: str) -> Engine:
-    return Engine(str(name).strip())
+    value = str(name).strip()
+    if value in _RETIRED_SCORE_ENGINE_NAMES:
+        raise ValueError(
+            f"engine {value!r} is retired; use {Engine.OPENIMCC.value!r}"
+        )
+    return Engine(value)
+def _require_score_engine(engine: Engine) -> None:
+    if engine not in SCORE_ENGINE_SET:
+        raise ValueError(
+            f"engine {engine.value!r} is not in the explicit SCORE_ENGINE_SET"
+        )
+
+
+def _validated_score_engines(engines: Sequence[Engine]) -> tuple[Engine, ...]:
+    out: list[Engine] = []
+    seen: set[Engine] = set()
+    for engine in engines:
+        _require_score_engine(engine)
+        if engine not in seen:
+            seen.add(engine)
+            out.append(engine)
+    return tuple(out)
 
 
 def engines_from_names(names: Sequence[str] | None) -> tuple[Engine, ...]:
@@ -461,10 +483,7 @@ def engines_from_names(names: Sequence[str] | None) -> tuple[Engine, ...]:
     seen: set[Engine] = set()
     for raw in names:
         engine = parse_engine(raw)
-        if engine not in SCORE_ENGINE_SET:
-            raise ValueError(
-                f"engine {engine.value!r} is not in the explicit SCORE_ENGINE_SET"
-            )
+        _require_score_engine(engine)
         if engine not in seen:
             seen.add(engine)
             out.append(engine)
@@ -534,6 +553,8 @@ def rail_for_quantity(quantity: Quantity | None, *, species_formula: str = "") -
     does not fall through onto SiO_evolution.
     """
 
+    if quantity is Quantity.RESIDUE_COMPONENT_COMPOSITION:
+        return Rail.RESIDUE_COMPOSITION
     if quantity in _VAPOUR_EQUILIBRIUM:
         if species_formula in _SIO_FORMULAS:
             return Rail.SIO_EVOLUTION
@@ -1338,12 +1359,19 @@ def _printed_pressure_uncertainty_dex(observation: Observation) -> Decimal | Non
 def _observation_flagged_strata(
     observation: Observation,
     experiments: Mapping[str, Experiment],
+    point_observations_by_experiment: Mapping[str, tuple[Observation, ...]],
 ) -> tuple[str, ...]:
     existing = flagged_strata(observation.notices)
     experiment = experiments.get(observation.experiment_id)
     if experiment is None:
         return existing
-    gates = run_validity_gates(experiment, observation)
+    gates = run_validity_gates(
+        experiment,
+        observation,
+        point_observations=point_observations_by_experiment.get(
+            observation.experiment_id, ()
+        ),
+    )
     return tuple(
         dict.fromkeys(
             (*existing, *flagged_strata(_flagged_stratum_notices(observation, experiment, gates)))
@@ -1356,12 +1384,17 @@ def _kems_replicate_groups(
     experiments: Mapping[str, Experiment],
 ) -> tuple[tuple[Decimal, ...], ...]:
     groups: dict[tuple[object, ...], list[Decimal]] = {}
+    point_observations_by_experiment = _partial_pressure_observations_by_experiment(
+        observations.values()
+    )
     for observation in observations.values():
         identity = observation.identity
         quantity = quantity_token(identity) if isinstance(identity, Identity) else None
         if quantity is not Quantity.P_PARTIAL or not isinstance(identity, Identity):
             continue
-        if _observation_flagged_strata(observation, experiments):
+        if _observation_flagged_strata(
+            observation, experiments, point_observations_by_experiment
+        ):
             continue
         evidence = observation.evidence.class_
         if not evidence.is_value or evidence.value not in MEASURED_EVIDENCE:
@@ -1410,12 +1443,17 @@ def derive_kems_partial_pressure_band(
     """
 
     candidates = []
+    point_observations_by_experiment = _partial_pressure_observations_by_experiment(
+        observations.values()
+    )
     for observation in observations.values():
         identity = observation.identity
         quantity = quantity_token(identity) if isinstance(identity, Identity) else None
         if quantity is not Quantity.P_PARTIAL or not isinstance(identity, Identity):
             continue
-        if _observation_flagged_strata(observation, experiments):
+        if _observation_flagged_strata(
+            observation, experiments, point_observations_by_experiment
+        ):
             continue
         evidence = observation.evidence.class_
         if not evidence.is_value or evidence.value not in MEASURED_EVIDENCE:
@@ -1500,14 +1538,138 @@ def decision_band_for(
         band = derived_band or derive_kems_partial_pressure_band(observations, experiments)
         if band is not None and band_dimension_matches(quantity, band):
             return band
+    if derived_band is not None:
+        if band_dimension_matches(quantity, derived_band):
+            return derived_band
+        return None
     if quantity not in GIBBS_BAND_QUANTITIES:
         return None
-    band = THERMOCHEMISTRY_DECISION_BANDS.get(source_relation)
+    band = THERMOCHEMISTRY_DECISION_BANDS[SourceRelation.INDEPENDENT]
     if band is None:
         return None
     if not band_dimension_matches(quantity, band):
         return None
     return band
+
+
+def _printed_uncertainty_band(
+    quantity: Quantity,
+    uncertainty: Uncertainty | None,
+    reference: Decimal,
+    *,
+    source_observation: Observation | None = None,
+) -> DecisionBand | None:
+    """Convert a scalar printed cell uncertainty to the scorer's metric unit."""
+
+    if (
+        uncertainty is None
+        or uncertainty.kind is not UncertaintyKind.PRINTED
+        or not isinstance(uncertainty.verbatim, str)
+    ):
+        return None
+    match = re.fullmatch(
+        r"\s*(?:(?:±|\+/-)\s*)?\(?([+-]?(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][+-]?\d+)?)\)?\s*(%)?\s*",
+        uncertainty.verbatim,
+    )
+    if match is None:
+        return None
+    try:
+        width = abs(Decimal(match.group(1)))
+    except InvalidOperation:
+        return None
+    if not width.is_finite():
+        return None
+
+    operation = metric_operation(quantity)
+    if operation is None:
+        return None
+    percent = match.group(2) is not None
+    if operation is MetricOperation.RELATIVE:
+        if percent:
+            width /= Decimal(100)
+        elif reference != 0:
+            width /= abs(reference)
+        else:
+            return None
+        unit = "dimensionless"
+    elif operation is MetricOperation.DEX:
+        if reference <= 0:
+            return None
+        fraction = width / Decimal(100) if percent else width / reference
+        if fraction >= 1:
+            return None
+        ln10 = Decimal(10).ln()
+        width = max(
+            abs((Decimal(1) + fraction).ln() / ln10),
+            abs((Decimal(1) - fraction).ln() / ln10),
+        )
+        unit = "dimensionless"
+    else:
+        if percent:
+            return None
+        if source_observation is None:
+            return None
+        locator = source_observation.locator
+        derivation = source_observation.derivation
+        source_unit_match = (
+            re.search(r"\bunit='([^']+)'", locator.note)
+            if locator is not None and locator.note is not None
+            else None
+        )
+        if (
+            source_unit_match is None
+            or derivation is None
+            or derivation.output_unit != QUANTITY_UNITS[quantity]
+        ):
+            return None
+        source_unit = source_unit_match.group(1)
+        if quantity in {Quantity.DELTA_FG, Quantity.H_MINUS_H298}:
+            source_scale = {
+                "J/mol": Decimal("0.001"),
+                "kJ/mol": Decimal(1),
+                "kJ/mol at 298.15 K": Decimal(1),
+                "kcal gfw^-1": Decimal("4.184"),
+            }.get(source_unit)
+        elif quantity in {Quantity.CP, Quantity.S}:
+            source_scale = {
+                "J/mol·K": Decimal(1),
+                "cal deg^-1 gfw^-1": Decimal("4.184"),
+            }.get(source_unit)
+        elif quantity in {Quantity.LOG10_KF, Quantity.LOG10_K_STAR}:
+            source_scale = Decimal(1) if source_unit == "dimensionless" else None
+        else:
+            source_scale = None
+        if source_scale is None:
+            return None
+        width *= source_scale
+        unit = QUANTITY_UNITS[quantity]
+    return DecisionBand(width, unit, "source-printed per-cell uncertainty")
+
+
+def _residual_distribution_band(
+    values: Sequence[Decimal], *, unit: str, family: str, quantity: Quantity
+) -> DecisionBand | None:
+    """Twice the median absolute deviation for one family and quantity.
+
+    Center at the sample median, then estimate MAD as the sample median of
+    absolute deviations from that center (no normal-consistency multiplier).
+    The band's width is twice that estimator; membership is tested against
+    zero using ``abs(residual) <= width``.
+    """
+
+    if len(values) < MIN_DERIVED_BAND_N:
+        return None
+    center = _median(values)
+    if center is None:
+        return None
+    mad = _median([abs(value - center) for value in values])
+    if mad is None:
+        return None
+    return DecisionBand(
+        Decimal(2) * mad,
+        unit,
+        f"{family}/{quantity.value} residual distribution: 2x median absolute deviation; derived_n={len(values)}",
+    )
 
 
 def populate_numeric(
@@ -1732,6 +1894,15 @@ def cell_notices(
                         if row.get("dropped_mass_fraction") is None
                         else as_decimal(row["dropped_mass_fraction"])
                     ),
+                )
+            )
+        elif kind == NoticeKind.INPUT_OMITTED.value:
+            notices.append(
+                Notice(
+                    kind=NoticeKind.INPUT_OMITTED,
+                    affected_quantities=(quantity,),
+                    reason=str(row.get("reason") or kind),
+                    origin=f"engine:{engine.value}",
                 )
             )
         elif kind == "openimcc_notice":
@@ -2346,6 +2517,7 @@ def predict_with_engine(
 ) -> EnginePrediction:
     """Dispatch one engine at the observation Identity. Isolated MELTS cells."""
 
+    _require_score_engine(engine)
     from simulator.diagnostic_helpers.binary_pot_battery import (
         ARM_HEADLINE,
         ARM_QUALIFICATION,
@@ -2376,6 +2548,20 @@ def predict_with_engine(
             lineage_complete=False,
             refusal_reason=RefusalReason.IDENTITY_UNKNOWN,
             refusal_detail={"reason": "quantity_unknown"},
+        )
+    if quantity is Quantity.RESIDUE_COMPONENT_COMPOSITION:
+        return EnginePrediction(
+            engine=engine,
+            channel=channel,
+            execution=Execution(state=ExecutionState.UNSUPPORTED),
+            coefficient_sources=sources,
+            lineage_complete=False,
+            refusal_reason=RefusalReason.UNSUPPORTED,
+            refusal_detail={
+                "reason": "quantity_not_predicted",
+                "quantity": quantity.value,
+            },
+            identity=identity,
         )
     formula = identity.species.formula
     if parse_species_formula(formula) is None:
@@ -2734,10 +2920,23 @@ def predict_with_engine(
                 requested_composition=requested,
             )
 
-    handle_map = handles or {}
+    handle_map = handles if handles is not None else {}
     handle = handle_map.get(engine.value)
+    if handle is not None and (
+        not getattr(handle, "available", False)
+        or getattr(handle, "backend", None) is None
+    ):
+        if isinstance(handle_map, dict):
+            handle_map.pop(engine.value, None)
+        handle = None
     if handle is None:
         handle = open_battery_engine(engine.value)
+        if (
+            isinstance(handle_map, dict)
+            and getattr(handle, "available", False)
+            and getattr(handle, "backend", None) is not None
+        ):
+            handle_map[engine.value] = handle
     name = str(getattr(handle, "name", engine.value))
     engine_version: str | None = None
     if engine is Engine.OPENIMCC:
@@ -3175,7 +3374,9 @@ def compile_residual(
     lineage_observation_id: str | None = None,
     table_index: Mapping[tuple[str, Quantity], tuple[Observation, ...]] | None = None,
     derived_band: DecisionBand | None = None,
+    point_observations: Sequence[Observation] | None = None,
 ) -> tuple[Residual, Observation | None]:
+    _require_score_engine(engine)
     reference = _fusion_comparison_reference(reference)
     identity = reference.identity
     quantity = quantity_token(identity) if isinstance(identity, Identity) else None
@@ -3199,6 +3400,7 @@ def compile_residual(
             experiment,
             gate_reference,
             tables=_gate_tables(reference, context.observations, table_index),
+            point_observations=point_observations,
         )
     else:
         from simulator.battery.validity import GateCheck
@@ -3415,6 +3617,21 @@ def compile_residual(
             source_relation=source_relation,
         )
 
+    expected_unit = QUANTITY_UNITS[quantity]
+    if prediction.unit != expected_unit:
+        return _refused(
+            RefusalReason.UNSUPPORTED,
+            {
+                "reason": "engine_prediction_unit_mismatch",
+                "quantity": quantity.value,
+                "expected_unit": expected_unit,
+                "prediction_unit": prediction.unit,
+            },
+            execution=prediction.execution,
+            extra_notices=prediction.notices,
+            source_relation=source_relation,
+        )
+
     implied_alpha = implied_alpha_reference is not None
     if implied_alpha:
         if not _implied_alpha_coefficient_basis_matches(
@@ -3496,6 +3713,14 @@ def compile_residual(
     if implied_alpha:
         numeric, metric_reason, metric_detail = _implied_alpha_numeric(prediction.value)
     else:
+        cell_band = derived_band
+        if compilation and quantity is not Quantity.P_PARTIAL:
+            cell_band = _printed_uncertainty_band(
+                quantity,
+                reference.uncertainty,
+                ref_point,
+                source_observation=reference,
+            ) or cell_band
         numeric, metric_reason, metric_detail = populate_numeric(
             quantity=quantity,
             candidate=prediction.value,
@@ -3514,7 +3739,7 @@ def compile_residual(
             ),
             observations=context.observations,
             experiments=context.experiments,
-            derived_band=derived_band,
+            derived_band=cell_band,
         )
     if numeric is None:
         return _refused(
@@ -3702,7 +3927,7 @@ def diagnostic_references(context: ScoreContext) -> tuple[Observation, ...]:
     return tuple(sorted(out, key=lambda o: o.observation_id))
 
 
-def score_store(
+def _score_store_with_decisions(
     context: ScoreContext,
     *,
     engines: Sequence[Engine] | None = None,
@@ -3712,8 +3937,14 @@ def score_store(
     include_diagnostics: bool = True,
     predict: Callable[..., EnginePrediction] | None = None,
     handles: Mapping[str, object] | None = None,
-) -> tuple[tuple[Residual, ...], dict[str, Observation]]:
-    engine_set = tuple(engines) if engines is not None else SCORE_ENGINE_SET
+) -> tuple[tuple[Residual, ...], dict[str, Observation], list[dict[str, object]]]:
+    engine_set = (
+        _validated_score_engines(tuple(engines))
+        if engines is not None
+        else SCORE_ENGINE_SET
+    )
+    provided_handles = dict(handles or {})
+    resolved_handles = dict(provided_handles)
     refs = list(comparison_candidates(context))
     fusion_diagnostic_ids: set[str] = set()
     admitted_model_derived_ids: set[str] = set()
@@ -3766,6 +3997,7 @@ def score_store(
     if limit is not None:
         refs = refs[: int(limit)]
     from simulator.battery.compilation_tier import (
+        compilation_family,
         compilation_series_points,
         is_compilation_evidence,
     )
@@ -3773,11 +4005,15 @@ def score_store(
     comparison_ids = {o.observation_id for o in comparison_candidates(context)}
     residuals: list[Residual] = []
     candidates: dict[str, Observation] = {}
+    compilation_family_by_reference: dict[str, tuple[str, Quantity]] = {}
     # Snapshot. Engine candidates are returned separately and are not
     # lineage inputs. The work-input index is this snapshot.
     observations = dict(context.observations)
     origins = dict(context.origins)
     live_context = replace(context, observations=observations, origins=origins)
+    point_observations_by_experiment = _partial_pressure_observations_by_experiment(
+        observations.values()
+    )
     empirical_ids = comparison_ids
     expanded_refs = [
         (obs, compilation_series_points(obs, origins.get(obs.observation_id)))
@@ -3791,82 +4027,201 @@ def score_store(
 
     table_index = build_printed_thermo_index(observations)
     kems_band = derive_kems_partial_pressure_band(observations, context.experiments)
-    with bound_work_inputs(context.works, observations, context.experiments):
-        for obs, points in expanded_refs:
-            origin = origins.get(obs.observation_id)
-            for point in points:
-                if point.observation_id not in origins:
-                    origins[point.observation_id] = origin or ""
-                point_origin = origins.get(point.observation_id)
-                diagnostic = (
-                    obs.observation_id not in empirical_ids
-                    or is_internal_consistency(point_origin)
-                    or is_compilation_source(point.source_id, point_origin)
-                    or is_compilation_evidence(point)
-                    or is_sf04_workbook(point)
-                )
-                quantity = (
-                    quantity_token(point.identity)
-                    if isinstance(point.identity, Identity)
-                    else None
-                )
-                thermo = quantity in FORMATION_QUANTITIES or quantity in PURE_STANDARD_THERMO
-                compilation_thermo = (
-                    thermo
-                    and (
-                        is_compilation_evidence(point)
+    try:
+        with bound_work_inputs(context.works, observations, context.experiments):
+            for obs, points in expanded_refs:
+                origin = origins.get(obs.observation_id)
+                for point in points:
+                    if point.observation_id not in origins:
+                        origins[point.observation_id] = origin or ""
+                    point_origin = origins.get(point.observation_id)
+                    diagnostic = (
+                        obs.observation_id not in empirical_ids
+                        or is_internal_consistency(point_origin)
                         or is_compilation_source(point.source_id, point_origin)
+                        or is_compilation_evidence(point)
+                        or is_sf04_workbook(point)
                     )
-                    and not is_internal_consistency(point_origin)
-                    and not is_sf04_workbook(point)
+                    quantity = (
+                        quantity_token(point.identity)
+                        if isinstance(point.identity, Identity)
+                        else None
+                    )
+                    thermo = quantity in FORMATION_QUANTITIES or quantity in PURE_STANDARD_THERMO
+                    compilation_thermo = (
+                        thermo
+                        and (
+                            is_compilation_evidence(point)
+                            or is_compilation_source(point.source_id, point_origin)
+                        )
+                        and not is_internal_consistency(point_origin)
+                        and not is_sf04_workbook(point)
+                    )
+                    if compilation_thermo and quantity is not None:
+                        compilation_family_by_reference[point.observation_id] = (
+                            compilation_family(point.source_id, point_origin),
+                            quantity,
+                        )
+                    for engine in engine_set:
+                        prediction = None
+                        if (
+                            diagnostic
+                            and obs.observation_id not in admitted_model_derived_ids
+                            and point.observation_id not in fusion_diagnostic_ids
+                            and predict is None
+                            and not compilation_thermo
+                        ):
+                            prediction = EnginePrediction(
+                                engine=engine,
+                                channel=ENGINE_CHANNELS[engine],
+                                execution=Execution(state=ExecutionState.NOT_PROBED),
+                                coefficient_sources=ENGINE_COEFFICIENT_SOURCES[engine],
+                                lineage_complete=False,
+                                refusal_reason=RefusalReason.UNSUPPORTED,
+                                refusal_detail={"reason": "diagnostic_population"},
+                                identity=point.identity if isinstance(point.identity, Identity) else None,
+                            )
+                        residual, candidate = compile_residual(
+                            point,
+                            engine,
+                            context=live_context,
+                            prediction=prediction,
+                            comparison_ids=comparison_ids,
+                            predict=predict,
+                            handles=resolved_handles,
+                            lineage_observation_id=(
+                                obs.observation_id
+                                if point.observation_id != obs.observation_id
+                                else None
+                            ),
+                            table_index=table_index,
+                            derived_band=kems_band,
+                            point_observations=point_observations_by_experiment.get(
+                                point.experiment_id, ()
+                            ),
+                        )
+                        residuals.append(residual)
+                        if candidate is not None:
+                            candidates[candidate.observation_id] = candidate
+                        done += 1
+                        now = time.monotonic()
+                        if now - last_progress >= 60:
+                            print(
+                                f"score progress {done}/{total} residuals "
+                                f"{int(now - started)}s host={context.hostname}",
+                                flush=True,
+                            )
+                            last_progress = now
+    finally:
+        active_error = sys.exc_info()[1]
+        close_errors: list[BaseException] = []
+        for name, handle in resolved_handles.items():
+            if provided_handles.get(name) is handle:
+                continue
+            backend = getattr(handle, "backend", None)
+            close = getattr(backend, "close", None)
+            if callable(close):
+                try:
+                    close()
+                except BaseException as exc:  # noqa: BLE001 - close every owned handle
+                    close_errors.append(exc)
+        if close_errors:
+            if active_error is not None:
+                for error in close_errors:
+                    add_note = getattr(active_error, "add_note", None)
+                    if callable(add_note):
+                        add_note(f"engine handle cleanup failed: {error!r}")
+                if not callable(getattr(active_error, "add_note", None)):
+                    raise active_error from close_errors[0]
+            else:
+                first_error = close_errors[0]
+                for error in close_errors[1:]:
+                    add_note = getattr(first_error, "add_note", None)
+                    if callable(add_note):
+                        add_note(f"additional engine handle cleanup failure: {error!r}")
+                raise first_error
+
+    family_residuals: dict[tuple[str, Quantity, str, str], list[Decimal]] = {}
+    for residual in residuals:
+        family_quantity = compilation_family_by_reference.get(residual.reference)
+        if (
+            residual.numeric is None
+            or residual.status is ResidualStatus.REFUSED
+            or family_quantity is None
+        ):
+            continue
+        if residual.numeric.decision_band is not None and residual.numeric.decision_band.rule == "source-printed per-cell uncertainty":
+            continue
+        if any(
+            _is_flagged_stratum_notice(notice)
+            or _is_fusion_conversion_notice(notice)
+            for notice in residual.notices
+        ):
+            continue
+        family, quantity = family_quantity
+        engine = residual.key.rsplit("::", 1)[-1]
+        key = (family, quantity, residual.numeric.unit, engine)
+        family_residuals.setdefault(key, []).append(residual.numeric.value)
+    family_bands = {
+        key: _residual_distribution_band(
+            values, unit=key[2], family=key[0], quantity=key[1]
+        )
+        for key, values in family_residuals.items()
+    }
+    banded_residuals: list[Residual] = []
+    for residual in residuals:
+        family_quantity = compilation_family_by_reference.get(residual.reference)
+        numeric = residual.numeric
+        if (
+            numeric is None
+            or residual.status is ResidualStatus.REFUSED
+            or family_quantity is None
+            or (
+                numeric.decision_band is not None
+                and numeric.decision_band.rule == "source-printed per-cell uncertainty"
+            )
+            or any(
+                _is_flagged_stratum_notice(notice)
+                or _is_fusion_conversion_notice(notice)
+                for notice in residual.notices
+            )
+        ):
+            banded_residuals.append(residual)
+            continue
+        family, quantity = family_quantity
+        engine = residual.key.rsplit("::", 1)[-1]
+        band_key = (family, quantity, numeric.unit, engine)
+        band = family_bands.get(band_key)
+        # A real but undersized family pool is explicitly no-band. Keep the
+        # legacy fallback for rows with no eligible pool at all.
+        has_insufficient_pool = (
+            band is None
+            and 0 < len(family_residuals.get(band_key, ())) < MIN_DERIVED_BAND_N
+        )
+        if band is None and not has_insufficient_pool:
+            band = decision_band_for(quantity, residual.source_relation)
+        if has_insufficient_pool:
+            updated_numeric = replace(numeric, decision_band=None)
+            banded_residuals.append(
+                replace(
+                    residual,
+                    numeric=updated_numeric,
+                    status=ResidualStatus.NO_BAND,
                 )
-                for engine in engine_set:
-                    prediction = None
-                    if (
-                        diagnostic
-                        and obs.observation_id not in admitted_model_derived_ids
-                        and point.observation_id not in fusion_diagnostic_ids
-                        and predict is None
-                        and not compilation_thermo
-                    ):
-                        prediction = EnginePrediction(
-                            engine=engine,
-                            channel=ENGINE_CHANNELS[engine],
-                            execution=Execution(state=ExecutionState.NOT_PROBED),
-                            coefficient_sources=ENGINE_COEFFICIENT_SOURCES[engine],
-                            lineage_complete=False,
-                            refusal_reason=RefusalReason.UNSUPPORTED,
-                            refusal_detail={"reason": "diagnostic_population"},
-                            identity=point.identity if isinstance(point.identity, Identity) else None,
-                        )
-                    residual, candidate = compile_residual(
-                        point,
-                        engine,
-                        context=live_context,
-                        prediction=prediction,
-                        comparison_ids=comparison_ids,
-                        predict=predict,
-                        handles=handles,
-                        lineage_observation_id=(
-                            obs.observation_id
-                            if point.observation_id != obs.observation_id
-                            else None
-                        ),
-                        table_index=table_index,
-                        derived_band=kems_band,
-                    )
-                    residuals.append(residual)
-                    if candidate is not None:
-                        candidates[candidate.observation_id] = candidate
-                    done += 1
-                    now = time.monotonic()
-                    if now - last_progress >= 60:
-                        print(
-                            f"score progress {done}/{total} residuals "
-                            f"{int(now - started)}s host={context.hostname}",
-                            flush=True,
-                        )
-                        last_progress = now
+            )
+            continue
+        if band is None or not band_dimension_matches(quantity, band):
+            banded_residuals.append(residual)
+            continue
+        updated_numeric = replace(numeric, decision_band=band)
+        banded_residuals.append(
+            replace(
+                residual,
+                numeric=updated_numeric,
+                status=match_status(updated_numeric),
+            )
+        )
+    residuals = banded_residuals
     residuals.sort(
         key=lambda r: (
             "" if r.rail is None else r.rail.value,
@@ -3874,7 +4229,34 @@ def score_store(
             r.key,
         )
     )
-    return tuple(residuals), candidates
+    scored = tuple(residuals)
+    return scored, candidates, _compilation_decision_strata(scored, context)
+
+
+def score_store(
+    context: ScoreContext,
+    *,
+    engines: Sequence[Engine] | None = None,
+    rail: Rail | None = None,
+    work_id: str | None = None,
+    limit: int | None = None,
+    include_diagnostics: bool = True,
+    predict: Callable[..., EnginePrediction] | None = None,
+    handles: Mapping[str, object] | None = None,
+) -> tuple[tuple[Residual, ...], dict[str, Observation]]:
+    """Score the store and keep the historical residual/candidate return shape."""
+
+    residuals, candidates, _decision_strata = _score_store_with_decisions(
+        context,
+        engines=engines,
+        rail=rail,
+        work_id=work_id,
+        limit=limit,
+        include_diagnostics=include_diagnostics,
+        predict=predict,
+        handles=handles,
+    )
+    return residuals, candidates
 
 
 def residual_to_plain(
@@ -4096,6 +4478,14 @@ def _median(values: Sequence[Decimal]) -> Decimal | None:
     return (ordered[mid - 1] + ordered[mid]) / Decimal(2)
 
 
+def _bias_to_scatter_ratio(
+    signed_median: Decimal | None, mad: Decimal | None, n: int
+) -> Decimal | None:
+    if signed_median is None or mad is None or mad == 0 or n < MIN_DERIVED_BAND_N:
+        return None
+    return abs(signed_median) / mad
+
+
 def _rms(values: Sequence[Decimal]) -> Decimal | None:
     if not values:
         return None
@@ -4151,6 +4541,109 @@ def _compilation_residuals(
         )
         is not None
     ]
+
+
+def _compilation_decision_strata(
+    residuals: Sequence[Residual], context: ScoreContext | None
+) -> list[dict[str, object]]:
+    if context is None:
+        return []
+    from simulator.battery.compilation_tier import (
+        compilation_family,
+        compilation_origin,
+        compilation_row_observation,
+    )
+
+    strata: dict[tuple[str, str, str, str], list[Residual]] = defaultdict(list)
+    derived_n: dict[tuple[str, str, str], int] = defaultdict(int)
+    for residual in residuals:
+        if residual.numeric is None or residual.status is ResidualStatus.REFUSED or any(
+            _is_flagged_stratum_notice(notice)
+            or _is_fusion_conversion_notice(notice)
+            for notice in residual.notices
+        ):
+            continue
+        observation = compilation_row_observation(
+            residual.reference, context.observations, context.origins
+        )
+        if observation is None or not isinstance(observation.identity, Identity):
+            continue
+        quantity = quantity_token(observation.identity)
+        if quantity is None:
+            continue
+        family = compilation_family(
+            observation.source_id,
+            compilation_origin(residual.reference, context.origins),
+        )
+        engine = _engine_of(residual)
+        key = (family, quantity.value, engine)
+        band = None if residual.numeric is None else residual.numeric.decision_band
+        if (
+            residual.numeric is not None
+            and band is None
+            and not any(
+                _is_flagged_stratum_notice(notice)
+                or _is_fusion_conversion_notice(notice)
+                for notice in residual.notices
+            )
+        ):
+            derived_n[key] += 1
+        strata[(*key, residual.source_relation.value)].append(residual)
+
+    rendered = []
+    for (family, quantity, engine, relation), bucket in sorted(strata.items()):
+        values = [r.numeric.value for r in bucket if r.numeric is not None]
+        center = _median(values)
+        mad = None if center is None else _median([abs(value - center) for value in values])
+        bands = [r.numeric.decision_band for r in bucket if r.numeric is not None and r.numeric.decision_band is not None]
+        kinds = sorted({
+            "printed" if band.rule == "source-printed per-cell uncertainty"
+            else "derived_2xMAD" if "residual distribution" in band.rule
+            else "legacy_fallback"
+            for band in bands
+        }) or ["no_band"]
+        widths = sorted({str(band.value) for band in bands})
+        units = sorted({band.unit for band in bands})
+        band_n = sorted({
+            int(band.rule.rsplit("derived_n=", 1)[1])
+            for band in bands if "derived_n=" in band.rule
+        })
+        if not band_n and not bands and derived_n[(family, quantity, engine)] > 0:
+            band_n = [derived_n[(family, quantity, engine)]]
+        derived_rows = [
+            r for r in bucket
+            if r.numeric is not None
+            and r.numeric.decision_band is not None
+            and "residual distribution" in r.numeric.decision_band.rule
+        ]
+        tail_in = sum(1 for r in derived_rows if r.status is ResidualStatus.MATCH) if "derived_2xMAD" in kinds else None
+        tail_out = sum(1 for r in derived_rows if r.status is ResidualStatus.MISMATCH) if "derived_2xMAD" in kinds else None
+        rendered.append({
+            "family": family,
+            "quantity": quantity,
+            "engine": engine,
+            "relation": relation,
+            "n": len(values),
+            "signed_median_residual": None if center is None else str(center),
+            "mad": None if mad is None else str(mad),
+            "bias_to_scatter_ratio": (
+                None
+                if (ratio := _bias_to_scatter_ratio(center, mad, len(values))) is None
+                else str(ratio)
+            ),
+            "max_abs_residual": None if not values else str(max(abs(value) for value in values)),
+            "band_value": widths[0] if len(widths) == 1 else widths,
+            "unit": units[0] if len(units) == 1 else units or QUANTITY_UNITS[Quantity(quantity)],
+            "band_kind": kinds[0] if len(kinds) == 1 else kinds,
+            "band_derived_n": band_n[0] if len(band_n) == 1 else band_n,
+            "match_count": sum(1 for r in bucket if r.status is ResidualStatus.MATCH),
+            "mismatch_count": sum(1 for r in bucket if r.status is ResidualStatus.MISMATCH),
+            "no_band_count": sum(1 for r in bucket if r.status is ResidualStatus.NO_BAND),
+            "tail_in_count": tail_in,
+            "tail_out_count": tail_out,
+            "no_band_reason": "derived_band_insufficient_n" if not bands and 0 < derived_n[(family, quantity, engine)] < MIN_DERIVED_BAND_N else None,
+        })
+    return rendered
 
 
 def _headline_band_width(bucket: Sequence[Residual]) -> Decimal | None:
@@ -4225,6 +4718,11 @@ def _headline_metric_row(
         "n_inside_band": len(matches),
         "n_match": len(matches),
         "match_rate": match_rate,
+        "match_rate_label": (
+            "band membership; derived_2xMAD means tail membership, not accuracy"
+            if tier == "compilation"
+            else "band membership"
+        ),
         "rms_dex": None if rms is None else str(rms),
         "median_dex": None if signed_median is None else str(signed_median),
         "median_abs_dex": None if median is None else str(median),
@@ -4271,6 +4769,20 @@ def headline_rows(
     rows: list[dict[str, object]] = []
     for (rail, engine), bucket in sorted(groups.items()):
         row = _headline_metric_row(rail, engine, bucket, tier=tier)
+        row["decision_strata"] = (
+            _compilation_decision_strata(
+                [
+                    r
+                    for r in tier_residuals
+                    if _engine_of(r) == engine
+                    and r.rail is not None
+                    and r.rail.value == rail
+                ],
+                context,
+            )
+            if tier == "compilation"
+            else []
+        )
         row["n_eligible_references"] = sum(
             1
             for r in bucket
@@ -4323,7 +4835,7 @@ def headline_records(
     context: ScoreContext | None = None,
     engines: Sequence[Engine] | None = None,
 ) -> list[dict[str, object]]:
-    """Machine-readable measured and compilation accuracy records."""
+    """Machine-readable measured and compilation band-membership records."""
 
     return [
         *headline_rows(residuals, context=context, tier="measured", engines=engines),
@@ -4907,6 +5419,11 @@ def headline_payloads(
                 "n_inside_band": len(matches),
                 "n_match": len(matches),
                 "match_rate": None if not banded else len(matches) / len(banded),
+                "match_rate_label": (
+                    "band membership; derived_2xMAD means tail membership, not accuracy"
+                    if tier == "compilation"
+                    else "band membership"
+                ),
                 "rms_dex": None if rms is None else str(rms),
                 "median_dex": None if signed_median is None else str(signed_median),
                 "median_abs_dex": None if not dex_values else str(_median_abs(dex_values)),
@@ -4915,6 +5432,7 @@ def headline_payloads(
                 "n_no_band": sum(
                     1 for r in scored if r.get("status") == ResidualStatus.NO_BAND.value
                 ),
+                "decision_strata": [],
                 "data_scatter_ratio": None if rms_over_band is None else str(rms_over_band),
             }
         )
@@ -5037,10 +5555,118 @@ def headline_payload_records(
                 None, exclusions=row.get("exclusions")
             )
         ]
-    return [
+    records = [
         *headline_payloads(measured_rows, engines, tier="measured"),
         *headline_payloads(compilation_rows, engines, tier="compilation"),
     ]
+    if observations is not None and compilation_rows:
+        from simulator.battery.compilation_tier import (
+            compilation_family,
+            compilation_origin,
+            compilation_row_observation,
+        )
+
+        payload_groups: dict[
+            tuple[str, str, str, str, str],
+            list[tuple[Decimal, DecisionBand | None, str]],
+        ] = defaultdict(list)
+        derived_ns: dict[tuple[str, str, str], int] = defaultdict(int)
+        for row in compilation_rows:
+            reference = str(row.get("reference") or "")
+            observation = compilation_row_observation(reference, observations, origins)
+            numeric = row.get("numeric")
+            if observation is None or not isinstance(observation.identity, Identity) or not isinstance(numeric, Mapping):
+                continue
+            quantity = quantity_token(observation.identity)
+            if quantity is None:
+                continue
+            engine = str(
+                ((row.get("candidate_request") or {}) if isinstance(row.get("candidate_request"), Mapping) else {}).get("engine")
+                or str(row.get("key") or "").rsplit("::", 1)[-1]
+            )
+            family = compilation_family(observation.source_id, compilation_origin(reference, origins))
+            relation = str(row.get("source_relation") or SourceRelation.UNKNOWN.value)
+            key = (family, quantity.value, engine)
+            if str(row.get("status") or "") == ResidualStatus.REFUSED.value:
+                continue
+            band_data = numeric.get("decision_band")
+            band = None if not isinstance(band_data, Mapping) else DecisionBand(
+                as_decimal(band_data["value"]), str(band_data["unit"]), str(band_data["rule"])
+            )
+            flagged = bool(_flagged_payload_strata(row))
+            if flagged:
+                continue
+            if band is None and not flagged:
+                derived_ns[key] += 1
+            rail = str(row.get("rail") or "")
+            payload_groups[(*key, relation, rail)].append(
+                (as_decimal(numeric["value"]), band, str(row.get("status") or ""))
+            )
+        for record in records:
+            if record.get("tier") != "compilation":
+                continue
+            engine = str(record["engine"])
+            rail = str(record["rail"])
+            grouped = [
+                (key, values)
+                for key, values in payload_groups.items()
+                if key[2] == engine and key[4] == rail
+            ]
+            strata = []
+            for (family, quantity, _engine, relation, _rail), values in sorted(grouped):
+                residuals = [value for value, _band, _status in values]
+                center = _median(residuals)
+                mad = None if center is None else _median([abs(value - center) for value in residuals])
+                bands = [band for _value, band, _status in values if band is not None]
+                kinds = sorted({
+                    "printed" if band.rule == "source-printed per-cell uncertainty"
+                    else "derived_2xMAD" if "residual distribution" in band.rule
+                    else "legacy_fallback" for band in bands
+                }) or ["no_band"]
+                derived_n = sorted({int(band.rule.rsplit("derived_n=", 1)[1]) for band in bands if "derived_n=" in band.rule})
+                if not derived_n and not bands and derived_ns[(family, quantity, engine)] > 0:
+                    derived_n = [derived_ns[(family, quantity, engine)]]
+                widths = sorted({str(band.value) for band in bands})
+                units = sorted({band.unit for band in bands})
+                derived = "derived_2xMAD" in kinds
+                tail_in = sum(
+                    status == ResidualStatus.MATCH.value
+                    for _value, band, status in values
+                    if band is not None and "residual distribution" in band.rule
+                )
+                tail_out = sum(
+                    status == ResidualStatus.MISMATCH.value
+                    for _value, band, status in values
+                    if band is not None and "residual distribution" in band.rule
+                )
+                matches = sum(status == ResidualStatus.MATCH.value for _value, _band, status in values)
+                mismatches = sum(status == ResidualStatus.MISMATCH.value for _value, _band, status in values)
+                strata.append({
+                    "family": family, "quantity": quantity, "engine": engine, "relation": relation,
+                    "n": len(residuals),
+                    "signed_median_residual": None if center is None else str(center),
+                    "mad": None if mad is None else str(mad),
+                    "bias_to_scatter_ratio": (
+                        None
+                        if (ratio := _bias_to_scatter_ratio(center, mad, len(residuals))) is None
+                        else str(ratio)
+                    ),
+                    "max_abs_residual": None if not residuals else str(max(abs(value) for value in residuals)),
+                    "band_value": widths[0] if len(widths) == 1 else widths,
+                    "unit": units[0] if len(units) == 1 else units or QUANTITY_UNITS[Quantity(quantity)],
+                    "band_kind": kinds[0] if len(kinds) == 1 else kinds,
+                    "band_derived_n": derived_n[0] if len(derived_n) == 1 else derived_n,
+                    "match_count": matches, "mismatch_count": mismatches,
+                    "no_band_count": sum(
+                        status == ResidualStatus.NO_BAND.value
+                        for _value, _band, status in values
+                    ),
+                    "tail_in_count": tail_in if derived else None,
+                    "tail_out_count": tail_out if derived else None,
+                    "no_band_reason": "derived_band_insufficient_n" if not bands and 0 < derived_ns[(family, quantity, engine)] < MIN_DERIVED_BAND_N else None,
+                })
+            record["decision_strata"] = strata
+    return records
 
 
 def write_headline_summary_from_payloads_json(

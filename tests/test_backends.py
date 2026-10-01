@@ -12,16 +12,18 @@ from simulator.chemistry.kernel.capabilities import ChemistryIntent
 from simulator.melt_backend.base import InternalAnalyticalBackend
 
 
-def test_imcc_sf04_is_ineligible_active_not_a_real_melt_backend():
-    assert "imcc-sf04" in INELIGIBLE_ACTIVE_BACKENDS
-    assert "imcc-sf04-ext" in INELIGIBLE_ACTIVE_BACKENDS
-    assert "imcc-sf04" not in REAL_MELT_BACKEND_NAMES
-    assert "imcc-sf04-ext" not in REAL_MELT_BACKEND_NAMES
+def test_openimcc_is_diagnostic_not_a_real_melt_backend():
+    assert "openimcc" in INELIGIBLE_ACTIVE_BACKENDS
+    assert "openimcc" not in REAL_MELT_BACKEND_NAMES
+
+
+@pytest.mark.parametrize("retired_name", ("imcc-sf04", "imcc-sf04-ext"))
+def test_retired_imcc_names_raise_typed_error_recommending_openimcc(retired_name):
     with pytest.raises(
         BackendUnavailableError,
-        match="pending battery qualification",
+        match="openimcc",
     ):
-        resolve_backend("imcc-sf04", BackendSelectionPolicy.WEB_AUTODETECT)
+        resolve_backend(retired_name, BackendSelectionPolicy.WEB_AUTODETECT)
 
 
 def test_backend_honesty_internal_analytical_resolution_surfaces_unavailable_status():

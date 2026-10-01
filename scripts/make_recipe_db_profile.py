@@ -387,6 +387,14 @@ def _apply_cached_real(
     })
     profile["run"] = run
     fid = dict(profile.get("fidelities") or {})
+    # Generated profiles describe one bounded campaign window; inherited
+    # fidelity horizons from the multi-campaign base profile must use that same
+    # cap-adjusted hold, or validation interprets them as over-cap holds.
+    for name, options in fid.items():
+        if isinstance(options, Mapping):
+            bounded_options = dict(options)
+            bounded_options["hours"] = hours
+            fid[name] = bounded_options
     fid["high"] = {
         "backend_name": "cached-real",
         "hours": hours,

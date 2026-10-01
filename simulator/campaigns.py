@@ -40,6 +40,7 @@ from simulator.furnace_materials import (
     resolve_furnace_max_T_C,
     setpoints_furnace_ceiling_C,
 )
+from simulator.recipe_errors import MalformedRecipeError
 from simulator.scalar_boundary import is_declared_real_scalar
 from simulator.recipe import (
     C2A_STAGED_DEPLETION_LOG_SLOPE_EPSILON_FLOOR_PER_HR,
@@ -684,13 +685,15 @@ class CampaignManager:
             not isinstance(band, (list, tuple))
             or len(band) != 2
         ):
-            raise ValueError(
+            raise MalformedRecipeError(
                 f'Malformed campaign rate band {label}: expected [low, high]'
             )
         low = self._required_float(band[0], f'{label}[0]')
         high = self._required_float(band[1], f'{label}[1]')
         if not math.isfinite(low) or not math.isfinite(high):
-            raise ValueError(f'Malformed campaign rate band {label}: non-finite')
+            raise MalformedRecipeError(
+                f'Malformed campaign rate band {label}: non-finite'
+            )
         return (low + high) / 2.0
 
     def _configured_temperature_ramp(
@@ -704,7 +707,7 @@ class CampaignManager:
             not isinstance(temperature_range, (list, tuple))
             or len(temperature_range) != 2
         ):
-            raise ValueError(
+            raise MalformedRecipeError(
                 f'Malformed campaign temperature range: '
                 f'{campaign_key}.temp_range_C'
             )
@@ -1627,7 +1630,7 @@ class CampaignManager:
         )
         temperature_range = config.get('temp_range_C')
         if not isinstance(temperature_range, (list, tuple)) or len(temperature_range) != 2:
-            raise ValueError(
+            raise MalformedRecipeError(
                 f'Malformed campaign temperature range: '
                 f'{self._campaign_config_key(campaign)}.temp_range_C'
             )

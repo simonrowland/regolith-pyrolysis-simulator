@@ -921,6 +921,7 @@ class PoisonedHourState:
     hour: int
     committed_transition_count: int
     aborting_exception_summary: str
+    aborting_exception_type: type[BaseException] | None = None
 
 
 class PoisonedHourError(RuntimeError):
@@ -17905,6 +17906,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                         aborting_exception_summary=(
                             f'{type(exc).__name__}: {exc}'
                         ),
+                        aborting_exception_type=type(exc),
                     )
                 except BaseException:
                     pass
