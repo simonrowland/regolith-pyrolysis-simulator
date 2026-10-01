@@ -514,7 +514,16 @@ class EquilibriumMixin:
             speciation_authority = 'equality'
             speciation_regime = 'unclassified'
             speciation_flag = None
-        if raw_intrinsic_fO2_log is None:
+        if speciation_regime == 'ferrous_free_lower_bound':
+            # The clamped M3 key is a liquidus/PT-0 edge, not a measured melt
+            # equality. Keep the activity and dissociation paths absent.
+            intrinsic_fO2_log = (
+                None
+                if equality_fO2_log is None
+                else float(equality_fO2_log)
+            )
+            absent_regime = speciation_regime
+        elif raw_intrinsic_fO2_log is None:
             # Surface release already used interface_pO2_bar. Do not turn an
             # absent melt equality into 0 or into the 100 bar clamp.
             intrinsic_fO2_log = None

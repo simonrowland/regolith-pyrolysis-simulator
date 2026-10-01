@@ -13098,6 +13098,25 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             melt_presence_basis['melt_redox_speciation_flag'] = dict(
                 speciation_flag
             )
+        if speciation_regime == 'ferrous_free_lower_bound':
+            reason = 'ferrous_free_lower_bound'
+            note = f'SulfSat not evaluated: {reason}'
+            sulfur_result = SulfurSaturationResult(
+                warnings=[note],
+                calibration_status='not_evaluated',
+                melt_presence_basis=dict(melt_presence_basis),
+                not_evaluated_reason=reason,
+            )
+            self._last_sulfur_saturation_result = sulfur_result
+            try:
+                result.sulfur_saturation = sulfur_result
+            except AttributeError:
+                pass
+            warnings_list = getattr(result, 'warnings', None)
+            if isinstance(warnings_list, list):
+                warnings_list.append(f'SulfSat gate (not_evaluated): {note}')
+            self._note_sulfur_saturation_step(sulfur_result)
+            return
         if melt_presence_unavailable:
             reason = 'melt_presence_signal_unavailable'
             source = melt_presence_basis.get('source')
@@ -13834,6 +13853,11 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             speciation_authority = 'equality'
             speciation_regime = 'unclassified'
             speciation_flag = None
+        if speciation_regime == 'ferrous_free_lower_bound':
+            # M3's clamped key is for the freeze gate and PT-0 only. Vapor
+            # activities retain the absent-equality path instead of reading
+            # that edge as an intrinsic melt oxygen pressure.
+            intrinsic_fO2_log = None
         if (
             intrinsic_fO2_log is None
             and self._melt_redox_equality_is_absent()
@@ -13926,6 +13950,15 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             )
             if isinstance(equilibrium_warnings, list) and notice not in equilibrium_warnings:
                 equilibrium_warnings.append(notice)
+        if speciation_regime == 'ferrous_free_lower_bound':
+            diagnostic['a_FeO_calphad'] = {
+                'status': 'unavailable',
+                'reason': (
+                    'ferrous_free_lower_bound_has_no_melt_equality'
+                ),
+                'a_FeO_authoritative': None,
+                'sources': {},
+            }
         high_t_activity = dict(diagnostic.get("high_t_melt_activity") or {})
         if (
             getattr(self, '_high_t_melt_activity', 'openimcc') == 'openimcc'

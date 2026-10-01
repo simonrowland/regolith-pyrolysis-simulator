@@ -1018,6 +1018,107 @@ def _near_ferric_sim(n_feo_mol: float) -> PyrolysisSimulator:
     return sim
 
 
+def test_ferrous_free_bound_is_not_used_for_activity_or_sulfsat(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from types import SimpleNamespace
+
+    import simulator.equilibrium as equilibrium_module
+    from simulator.chemistry.kernel import ChemistryIntent
+    from simulator.melt_backend.sulfsat import SulfurSaturationResult
+
+    sim = _fully_ferric_sim()
+    key_fO2_log, authority, regime, _flag = sim._melt_redox_speciation_key()
+    assert key_fO2_log == 30.0
+    assert authority == "bound"
+    assert regime == "ferrous_free_lower_bound"
+
+    activity_calls: list[dict[str, Any]] = []
+    original_activity = equilibrium_module.calphad_ferrous_feo_activity_diagnostic
+
+    def observe_activity(**kwargs: Any) -> dict[str, Any]:
+        activity_calls.append(kwargs)
+        return original_activity(**kwargs)
+
+    monkeypatch.setattr(
+        equilibrium_module,
+        "calphad_ferrous_feo_activity_diagnostic",
+        observe_activity,
+    )
+    equilibrium = sim._internal_analytical_equilibrium()
+    melt_activity = equilibrium.diagnostics["a_FeO_calphad"]
+    assert melt_activity["status"] == "unavailable"
+    assert "ferrous_free_lower_bound" in melt_activity["reason"]
+    assert all(call["fO2_log"] != 30.0 for call in activity_calls)
+
+    vapor_dispatches: list[dict[str, Any]] = []
+    original_dispatch = sim._dispatch_only
+
+    def observe_vapor_dispatch(intent, **kwargs):
+        if intent == ChemistryIntent.VAPOR_PRESSURE:
+            vapor_dispatches.append(kwargs)
+        return original_dispatch(intent, **kwargs)
+
+    monkeypatch.setattr(sim, "_dispatch_only", observe_vapor_dispatch)
+    sim._refresh_vapor_pressures_from_kernel(equilibrium)
+    assert len(vapor_dispatches) == 1
+    vapor_inputs = vapor_dispatches[0]
+    assert vapor_inputs["fO2_log"] is None
+    assert vapor_inputs["control_inputs"]["intrinsic_fO2_log"] is None
+    vapor_activity = sim._last_vapor_pressure_diagnostic["a_FeO_calphad"]
+    assert vapor_activity["status"] == "unavailable"
+    assert "ferrous_free_lower_bound" in vapor_activity["reason"]
+
+    sulfur_calls: list[dict[str, Any]] = []
+
+    def unexpected_sulfsat(**kwargs: Any) -> SulfurSaturationResult:
+        sulfur_calls.append(kwargs)
+        return SulfurSaturationResult(calibration_status="in_range")
+
+    monkeypatch.setattr(
+        sim._sulfsat_gate,
+        "compute_sulfur_saturation",
+        unexpected_sulfsat,
+    )
+    sim._stage0_sulfur_input_ppm = lambda: 10.0
+    sulfur_equilibrium = SimpleNamespace(liquid_fraction=0.5, warnings=[])
+    sim._attach_post_equilibrium_sulfsat(sulfur_equilibrium)
+    assert sulfur_calls == []
+    assert sulfur_equilibrium.sulfur_saturation.calibration_status == (
+        "not_evaluated"
+    )
+    assert sulfur_equilibrium.sulfur_saturation.not_evaluated_reason == (
+        "ferrous_free_lower_bound"
+    )
+
+    m4 = _sim_with_oxides(feo_wt=10.0, fe2o3_wt=0.0, temperature_C=1400.0)
+    assert m4._melt_fO2_from_ledger() is None
+    m4_bound = m4._last_redox_domain["fO2_log_lower_bound"]
+    m4_equilibrium = m4._internal_analytical_equilibrium()
+    assert m4_equilibrium.diagnostics["a_FeO_calphad"]["status"] == "ok"
+    assert m4_equilibrium.diagnostics["a_FeO_calphad"][
+        "a_FeO_authoritative"
+    ] > 0.0
+
+    m4_sulfur_calls: list[dict[str, Any]] = []
+
+    def evaluate_m4_sulfsat(**kwargs: Any) -> SulfurSaturationResult:
+        m4_sulfur_calls.append(kwargs)
+        return SulfurSaturationResult(calibration_status="in_range")
+
+    monkeypatch.setattr(
+        m4._sulfsat_gate,
+        "compute_sulfur_saturation",
+        evaluate_m4_sulfsat,
+    )
+    m4._stage0_sulfur_input_ppm = lambda: 10.0
+    m4._attach_post_equilibrium_sulfsat(
+        SimpleNamespace(liquid_fraction=0.5, warnings=[])
+    )
+    assert len(m4_sulfur_calls) == 1
+    assert m4_sulfur_calls[0]["fO2_log"] == pytest.approx(m4_bound)
+
+
 def test_fully_ferric_zero_transfer_stays_on_the_lower_bound() -> None:
     """A zero transfer does not copy the gas into a ferrous-free melt."""
 
@@ -1576,6 +1677,12 @@ def test_ferrous_free_hour_releases_then_uses_real_ratio() -> None:
     absent._attach_post_equilibrium_sulfsat(_Result(None))
     sulfur_basis = absent._last_sulfur_saturation_result.melt_presence_basis
     assert sulfur_basis["melt_redox_speciation_key"]["authority"] == "bound"
+    assert absent._last_sulfur_saturation_result.calibration_status == (
+        "not_evaluated"
+    )
+    assert absent._last_sulfur_saturation_result.not_evaluated_reason == (
+        "ferrous_free_lower_bound"
+    )
     assert sulfur_basis["melt_redox_speciation_flag"]["code"] == (
         "melt_redox_speciation_from_bound"
     )
