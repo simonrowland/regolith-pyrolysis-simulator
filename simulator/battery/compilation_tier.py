@@ -47,6 +47,7 @@ from simulator.battery.identity import (
     identity_equal,
     log10K_from_delta_fG_kJ_mol,
     quantity_token,
+    standard_pressure_delta_g_kJ_per_mol,
 )
 from simulator.battery.records import (
     Notice,
@@ -68,6 +69,7 @@ from simulator.chemistry.ellingham_thermo import (
 _PRODUCT_RE = re.compile(
     r"->\s*(?:([0-9]+(?:/[0-9]+)?)\s+)?([A-Za-z][A-Za-z0-9]*)\(([^)]+)\)"
 )
+_PHASED_SPECIES_RE = re.compile(r"([A-Za-z][A-Za-z0-9]*)\(([^)]+)\)")
 
 # Berman symbols. The live pure-phase call returns the database formula;
 # a disagreement is a refusal, not a scored residual. Polymorph labels
@@ -434,10 +436,132 @@ def _ellingham_attempt(
             },
             call_evidence=call + ":outside-segment",
         )
+
     # dG is kJ/mol O2. mol-species divides by n_ox (mol oxide per mol O2).
     dG = Decimal(str(segment.delta_g_kJ_per_mol_O2(temperature)))
     per_species = dG / (Decimal(product.coeff.numerator) / Decimal(product.coeff.denominator))
     gibbs = per_species if per is PerBasis.MOL_SPECIES else dG
+
+    # Premise: this Ellingham fit is at 1 bar, while a compilation cell may
+    # print another ideal-gas standard pressure. Its explicit formation
+    # reaction supplies Δν_g, normalized below to the identity's declared
+    # molar basis. Algebra: ΔfG°(p2)-ΔfG°(p1) = Δν_g R T ln(p2/p1).
+    # log10 Kf is recomputed from that shifted ΔfG. S°_gas(p2)-S°_gas(p1)
+    # = -R ln(p2/p1) (this attempt emits no entropy). Unit check: R·T is
+    # J/mol, divided by 1000 gives kJ/mol; the log shift is dimensionless.
+    # Sanity: CaO from Ca(s)+½O2(g)→CaO(cr) has Δν_g=-½, so at 1000 K
+    # and 1 atm the ΔfG shift is -½·8.314·1000·ln(1.01325) ≈ -54.7 J/mol.
+    pressure_state = identity.standard_pressure_Pa
+    if (
+        isinstance(pressure_state, State)
+        and pressure_state.is_value
+        and pressure_state.value is not None
+    ):
+        printed_pressure = as_decimal(pressure_state.value)
+        if printed_pressure != _PA_PER_BAR:
+            if printed_pressure <= 0:
+                return _refuse(
+                    RefusalReason.IDENTITY_UNKNOWN,
+                    "standard-pressure-transform-pressure-nonpositive",
+                    quantity=quantity,
+                    origin=origin,
+                )
+            reaction_state = identity.reaction
+            reaction = (
+                reaction_state.value
+                if isinstance(reaction_state, State) and reaction_state.is_value
+                else None
+            )
+            reaction_phases = (
+                tuple(phase_token(term.species) for term in reaction.terms)
+                if reaction is not None
+                else ()
+            )
+            if reaction is not None and all(
+                phase is not None for phase in reaction_phases
+            ):
+                segment_reactant_phases = {
+                    formula: _product_phase(token)[0]
+                    for formula, token in _PHASED_SPECIES_RE.findall(
+                        segment.phase_basis.split("->", 1)[0]
+                    )
+                    if formula != "O2"
+                }
+                for term, cell_phase in zip(reaction.terms, reaction_phases):
+                    if term.coefficient >= 0 or term.species.formula == "O2":
+                        continue
+                    segment_phase = segment_reactant_phases.get(term.species.formula)
+                    if segment_phase is not cell_phase:
+                        return _refuse(
+                            RefusalReason.IDENTITY_MISMATCH,
+                            "identity-mismatch-element-reference-phase",
+                            quantity=quantity,
+                            origin=origin,
+                            extra={
+                                "element": term.species.formula,
+                                "cell_phase": cell_phase.value,
+                                "segment_phase": (
+                                    None if segment_phase is None else segment_phase.value
+                                ),
+                            },
+                        )
+            if reaction is None:
+                return _refuse(
+                    RefusalReason.IDENTITY_UNKNOWN,
+                    "standard-pressure-transform-reaction-unknown",
+                    quantity=quantity,
+                    origin=origin,
+                )
+            if any(phase is None for phase in reaction_phases):
+                return _refuse(
+                    RefusalReason.IDENTITY_UNKNOWN,
+                    "standard-pressure-transform-phase-unknown",
+                    quantity=quantity,
+                    origin=origin,
+                )
+            delta_n_g = sum(
+                (
+                    term.coefficient
+                    for term, phase in zip(reaction.terms, reaction_phases)
+                    if phase is Phase.G
+                ),
+                Fraction(0),
+            )
+            if per is PerBasis.MOL_SPECIES:
+                basis_coefficient = sum(
+                    (
+                        term.coefficient
+                        for term in reaction.terms
+                        if term.species == identity.species and term.coefficient > 0
+                    ),
+                    Fraction(0),
+                )
+            else:
+                basis_coefficient = sum(
+                    (
+                        -term.coefficient
+                        for term, phase in zip(reaction.terms, reaction_phases)
+                        if term.species.formula == "O2"
+                        and phase is Phase.G
+                        and term.coefficient < 0
+                    ),
+                    Fraction(0),
+                )
+            if basis_coefficient <= 0:
+                return _refuse(
+                    RefusalReason.IDENTITY_UNKNOWN,
+                    "standard-pressure-transform-reaction-basis-unknown",
+                    quantity=quantity,
+                    origin=origin,
+                )
+            delta_n_g /= basis_coefficient
+            delta_n_g_decimal = Decimal(delta_n_g.numerator) / Decimal(delta_n_g.denominator)
+            gibbs += standard_pressure_delta_g_kJ_per_mol(
+                delta_n_g_decimal,
+                temperature_K,
+                _PA_PER_BAR,
+                printed_pressure,
+            )
     if quantity is Quantity.LOG10_KF:
         value = log10K_from_delta_fG_kJ_mol(gibbs, temperature_K)
         unit = QUANTITY_UNITS[Quantity.LOG10_KF]
