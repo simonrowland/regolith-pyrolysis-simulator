@@ -4400,6 +4400,8 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 'finite_melt_driving_force_mol': float(
                     equilibrium_mol - ledger_o2_mol
                 ),
+                'interface_root_clamped': bool(root_clamped),
+                'interface_root_residual_mol_m2_s': float(residual),
             }
         log_pressure_delta = gas_log - interface_log
         if abs(log_pressure_delta) > 1.0e-15:
@@ -5491,6 +5493,12 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             'interface_pO2_bar': float(last_root['interface_pO2_bar']),
             'interface_flux_mol_m2_s': float(
                 last_root['interface_flux_mol_m2_s']
+            ),
+            'interface_root_clamped': bool(
+                last_root['interface_root_clamped']
+            ),
+            'interface_root_residual_mol_m2_s': float(
+                last_root['interface_root_residual_mol_m2_s']
             ),
             'finite_melt_driving_force_mol': float(
                 last_root['finite_melt_driving_force_mol']
@@ -10304,12 +10312,26 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             if abs(transfer_mol) <= OXYGEN_RESERVOIR_NOOP_MOL
             else float(finite_transfer['interface_pO2_bar'])
         )
-        # Publish the diagnostic captured for this exchange beside the
-        # accepted trajectory endpoint. Do not re-solve from the mutated
-        # ledger; a zero commit holds the interface at the gas pressure.
+        # Publish the diagnostic beside the accepted trajectory endpoint.
+        # Do not re-solve from the mutated ledger; a zero commit holds the
+        # interface at the gas pressure.
+        committed_interface_diagnostic = dict(interface_diagnostic)
+        committed_interface_diagnostic['interface_pO2_bar'] = (
+            committed_interface_pO2_bar
+        )
+        if abs(transfer_mol) > OXYGEN_RESERVOIR_NOOP_MOL:
+            committed_interface_diagnostic['interface_flux_mol_m2_s'] = float(
+                finite_transfer['interface_flux_mol_m2_s']
+            )
+            committed_interface_diagnostic['interface_root_clamped'] = bool(
+                finite_transfer['interface_root_clamped']
+            )
+            committed_interface_diagnostic[
+                'interface_root_residual_mol_m2_s'
+            ] = float(finite_transfer['interface_root_residual_mol_m2_s'])
         self._apply_oxygen_interface_diagnostic(
             reservoir,
-            state=interface_diagnostic,
+            state=committed_interface_diagnostic,
         )
         reservoir.interface_pO2_bar = committed_interface_pO2_bar
         reservoir.exchange_o2_mol = transfer_mol

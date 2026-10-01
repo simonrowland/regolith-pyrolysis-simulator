@@ -868,6 +868,10 @@ def test_internal_equilibrium_uses_interface_for_all_surface_release_consumers()
         assert diagnostics['interface_pO2_bar'] == pytest.approx(
             interface_pO2_bar
         )
+        assert (
+            sim._last_oxygen_interface_diagnostic['interface_pO2_bar']
+            == pytest.approx(interface_pO2_bar)
+        )
         assert diagnostics['interface_pO2_bar'] != pytest.approx(
             diagnostics['headspace_transport_pO2_bar']
         )
