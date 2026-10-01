@@ -13,6 +13,7 @@ from simulator.battery.enums import (
     QUANTITY_UNITS,
     EvidenceClass,
     Phase,
+    Polymorph,
     Quantity,
 )
 from simulator.battery.generators import usgs_b1259 as generator
@@ -149,6 +150,20 @@ def test_standard_pressure_is_one_atmosphere() -> None:
     assert generated.report["standard_pressure"]["standard_pressure_Pa"] == "101325"
 
 
+def test_formation_locator_keeps_the_tabulated_pdf_page() -> None:
+    generated = _generation(SILVER_298K)
+    enthalpy = _observations_for(
+        generated, Quantity.DELTA_FH, temperature="298.15", formula="Ag"
+    )
+    assert len(enthalpy) == 1
+    locator = enthalpy[0].locator
+    assert locator.published_page == 11
+    assert locator.pdf_page_index == 17
+    assert "Ag=B1259 reference-state table p.26/PDF p.32" in (
+        locator.note or ""
+    )
+
+
 def test_silver_400k_gibbs_function_sign_convention() -> None:
     generated = _generation(SILVER_HT)
     entropy = _observations_for(generated, Quantity.S, temperature="400", formula="Ag")
@@ -199,6 +214,20 @@ def test_formation_references_follow_b1259_temperature_schedules() -> None:
     assert calcium_term.coefficient == -1
 
     rutile = _generation("b1259-ht-0121-rutile")
+    rutile_at_beta = generator._formation_identity(
+        generator.make_species("TiO2", Phase.CR, charge=0),
+        "from_the_elements",
+        Decimal("1200"),
+    )
+    assert rutile_at_beta is not None
+    titanium_at_beta = dict(rutile_at_beta[1])["Ti"]
+    assert titanium_at_beta.polymorph.value.value == "beta"
+    rutile_at_transition = generator._formation_identity(
+        generator.make_species("TiO2", Phase.CR, charge=0),
+        "from_the_elements",
+        Decimal("1155"),
+    )
+    assert rutile_at_transition is None
     rutile_gibbs = _observations_for(
         rutile, Quantity.DELTA_FG, temperature="2000", formula="TiO2"
     )
@@ -227,6 +256,78 @@ def test_formation_references_follow_b1259_temperature_schedules() -> None:
     assert cobalt[0].polymorph.value.value == "beta"
     assert generator._element_reference_species("Co", Decimal("1394")) is None
     assert generator._element_reference_species("Ge", Decimal("1200")) is None
+    assert generator._B1259_ELEMENT_REFERENCE_STATES["Be"][:2] == (32, 38)
+    assert generator._B1259_ELEMENT_REFERENCE_STATES["Co"][:2] == (41, 47)
+    bromellite = _generation("b1259-ht-0073-bromellite")
+    assert any(
+        "Be=B1259 reference-state table p.32/PDF p.38" in (obs.locator.note or "")
+        for obs in bromellite.observations
+    )
+    cobalt_oxide = _generation("b1259-ht-0080-cobalt-oxide")
+    assert any(
+        "Co=B1259 reference-state table p.41/PDF p.47" in (obs.locator.note or "")
+        for obs in cobalt_oxide.observations
+    )
+
+
+def test_reference_schedule_transition_rows_match_b1259_tables() -> None:
+    expectations = (
+        ("Ba", "643", "648", Phase.CR, Polymorph.BETA),
+        ("Ni", "631", "630", Phase.CR, Polymorph.REFERENCE),
+        ("Cu", "1357", "1356", Phase.L, None),
+        ("Zn", "1184", "1181", Phase.G, None),
+        ("Te", "1262", "1260", Phase.G, None),
+    )
+    for (
+        symbol,
+        table_temperature,
+        sentence_temperature,
+        next_phase,
+        next_polymorph,
+    ) in expectations:
+        assert generator._element_reference_species(
+            symbol, Decimal(table_temperature)
+        ) is None
+        assert generator._element_reference_species(
+            symbol, Decimal(sentence_temperature)
+        ) is None
+        after_table = generator._element_reference_species(
+            symbol, Decimal(table_temperature) + 1
+        )
+        assert after_table is not None
+        assert after_table[0].phase.value is next_phase
+        if next_polymorph is not None:
+            assert after_table[0].polymorph.value is next_polymorph
+
+    for formula, temperatures in (
+        ("BaO", ("643", "648")),
+        ("NiO", ("630", "631")),
+        ("Cu2O", ("1356", "1357")),
+        ("ZnO", ("1181", "1184")),
+        ("TeO2", ("1260", "1262")),
+    ):
+        compound = generator.make_species(formula, Phase.CR, charge=0)
+        for temperature in temperatures:
+            assert generator._formation_identity(
+                compound, "from_the_elements", Decimal(temperature)
+            ) is None
+
+    assert generator._element_reference_species("Fe", Decimal("1033")) is None
+    iron_before = generator._element_reference_species("Fe", Decimal("1032"))
+    iron_after = generator._element_reference_species("Fe", Decimal("1034"))
+    assert iron_before is not None and iron_after is not None
+    assert iron_before[0].polymorph.value is Polymorph.ALPHA
+    assert iron_after[0].polymorph.value is Polymorph.ALPHA
+
+    strontium = generator._element_reference_species("Sr", Decimal("900"))
+    assert strontium is not None
+    assert strontium[0].polymorph.value is Polymorph.GAMMA
+
+    barium = _generation("b1259-298k-0129-barium-oxide")
+    assert any(
+        "phase sentence says 648 K; table break 643 K" in (obs.locator.note or "")
+        for obs in barium.observations
+    )
 
 
 def test_polyatomic_gaseous_reference_stoichiometry() -> None:
@@ -250,10 +351,26 @@ def test_polyatomic_gaseous_reference_stoichiometry() -> None:
     bromine_gas = generator._element_reference_species("Br", Decimal("400"))
     assert bromine_liquid is not None and bromine_gas is not None
     assert bromine_liquid[0].phase.value is Phase.L
-    assert bromine_liquid[0].formula == "Br"
+    assert bromine_liquid[0].formula == "Br2"
+    assert bromine_liquid[1] == 2
     assert bromine_gas[0].phase.value is Phase.G
     assert bromine_gas[0].formula == "Br2"
     assert bromine_gas[1] == 2
+    potassium_bromide = generator.make_species("KBr", Phase.CR, charge=0)
+    bromide_formation = generator._formation_identity(
+        potassium_bromide, "from_the_elements", Decimal("300")
+    )
+    assert bromide_formation is not None
+    bromine_term = next(
+        term for term in bromide_formation[0].terms if term.species.formula == "Br2"
+    )
+    assert bromine_term.coefficient == -Fraction(1, 2)
+
+    iodine_crystal = generator._element_reference_species("I", Decimal("300"))
+    iodine_liquid = generator._element_reference_species("I", Decimal("400"))
+    assert iodine_crystal is not None and iodine_liquid is not None
+    assert iodine_crystal[0].formula == iodine_liquid[0].formula == "I2"
+    assert iodine_crystal[1] == iodine_liquid[1] == 2
 
 
 def test_reference_schedule_covers_every_generated_b1259_element() -> None:

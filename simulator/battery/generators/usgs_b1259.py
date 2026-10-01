@@ -209,32 +209,34 @@ _TRAILING_JUNK_RE = re.compile(r"[^0-9eE.+-]+$")
 # (printed page, PDF page, initial phase, initial polymorph, initial formula,
 #  ((transition K, next phase, next polymorph, next formula), ...)).
 # Polymorph.REFERENCE is retained where the bulletin names a crystal form that
-# the closed polymorph vocabulary cannot represent.
+# the closed polymorph vocabulary cannot represent. A transition may retain
+# the same state to mark a sentence-only temperature whose exact axis is also
+# unknown when it conflicts with the tabulated break.
 _B1259_ELEMENT_REFERENCE_STATES = {
     "Ag": (26, 32, Phase.CR, Polymorph.REFERENCE, "Ag", (("1234", Phase.L, None, "Ag"),)),
     "Al": (27, 33, Phase.CR, Polymorph.REFERENCE, "Al", (("933", Phase.L, None, "Al"),)),
     "As": (28, 34, Phase.CR, Polymorph.REFERENCE, "As", (("885", Phase.G, None, "As4"),)),
     "Au": (29, 35, Phase.CR, Polymorph.REFERENCE, "Au", (("1336", Phase.L, None, "Au"),)),
     "B": (30, 36, Phase.CR, Polymorph.REFERENCE, "B", ()),
-    "Ba": (31, 37, Phase.CR, Polymorph.BCC, "Ba", (("648", Phase.CR, Polymorph.BETA, "Ba"), ("983", Phase.L, None, "Ba"), ("1895", Phase.G, None, "Ba"))),
-    "Be": (98, 104, Phase.CR, Polymorph.REFERENCE, "Be", (("1556", Phase.L, None, "Be"),)),
+    "Ba": (31, 37, Phase.CR, Polymorph.BCC, "Ba", (("643", Phase.CR, Polymorph.BETA, "Ba"), ("648", Phase.CR, Polymorph.BETA, "Ba"), ("983", Phase.L, None, "Ba"), ("1895", Phase.G, None, "Ba"))),
+    "Be": (32, 38, Phase.CR, Polymorph.REFERENCE, "Be", (("1556", Phase.L, None, "Be"),)),
     "Bi": (33, 39, Phase.CR, Polymorph.REFERENCE, "Bi", (("544.5", Phase.L, None, "Bi"),)),
-    "Br": (34, 40, Phase.L, None, "Br", (("332.62", Phase.G, None, "Br2"),)),
+    "Br": (34, 40, Phase.L, None, "Br2", (("332.62", Phase.G, None, "Br2"),)),
     "C": (35, 41, Phase.CR, Polymorph.REFERENCE, "C", ()),
     "Ca": (37, 43, Phase.CR, Polymorph.ALPHA, "Ca", (("737", Phase.CR, Polymorph.BETA, "Ca"), ("1123", Phase.L, None, "Ca"), ("1756", Phase.G, None, "Ca"))),
     "Ce": (39, 45, Phase.CR, Polymorph.ALPHA, "Ce", (("1003", Phase.CR, Polymorph.BETA, "Ce"), ("1077", Phase.L, None, "Ce"))),
     "Cd": (38, 44, Phase.CR, Polymorph.REFERENCE, "Cd", (("594.18", Phase.L, None, "Cd"), ("1040", Phase.G, None, "Cd"))),
     "Cl": (40, 46, Phase.G, None, "Cl2", ()),
-    "Co": (105, 111, Phase.CR, Polymorph.ALPHA, "Co", (("700", Phase.CR, Polymorph.BETA, "Co"), ("1394", Phase.CR, Polymorph.BETA, "Co"), ("1768", Phase.L, None, "Co"))),
+    "Co": (41, 47, Phase.CR, Polymorph.ALPHA, "Co", (("700", Phase.CR, Polymorph.BETA, "Co"), ("1394", Phase.CR, Polymorph.BETA, "Co"), ("1768", Phase.L, None, "Co"))),
     "Cr": (42, 48, Phase.CR, Polymorph.BCC, "Cr", ()),
-    "Cu": (43, 49, Phase.CR, Polymorph.REFERENCE, "Cu", (("1356", Phase.L, None, "Cu"),)),
+    "Cu": (43, 49, Phase.CR, Polymorph.REFERENCE, "Cu", (("1356", Phase.CR, Polymorph.REFERENCE, "Cu"), ("1357", Phase.L, None, "Cu"))),
     "F": (44, 50, Phase.G, None, "F2", ()),
-    "Fe": (45, 51, Phase.CR, Polymorph.ALPHA, "Fe", (("1184", Phase.CR, Polymorph.GAMMA, "Fe"), ("1665", Phase.CR, Polymorph.DELTA, "Fe"), ("1809", Phase.L, None, "Fe"))),
+    "Fe": (45, 51, Phase.CR, Polymorph.ALPHA, "Fe", (("1033", Phase.CR, Polymorph.ALPHA, "Fe"), ("1184", Phase.CR, Polymorph.GAMMA, "Fe"), ("1665", Phase.CR, Polymorph.DELTA, "Fe"), ("1809", Phase.L, None, "Fe"))),
     "Ge": (None, None, None, None, None, ()),
     "H": (46, 52, Phase.G, None, "H2", ()),
     "Hf": (47, 53, Phase.CR, Polymorph.REFERENCE, "Hf", ()),
     "Hg": (48, 54, Phase.L, None, "Hg", (("629.73", Phase.G, None, "Hg"),)),
-    "I": (49, 55, Phase.CR, Polymorph.REFERENCE, "I", (("386.75", Phase.L, None, "I"), ("458.39", Phase.G, None, "I2"))),
+    "I": (49, 55, Phase.CR, Polymorph.REFERENCE, "I2", (("386.75", Phase.L, None, "I2"), ("458.39", Phase.G, None, "I2"))),
     "K": (50, 56, Phase.CR, Polymorph.BCC, "K", (("336.4", Phase.L, None, "K"), ("1043.7", Phase.G, None, "K"))),
     "Li": (51, 57, Phase.CR, Polymorph.REFERENCE, "Li", (("453.69", Phase.L, None, "Li"), ("1638", Phase.G, None, "Li"))),
     "Mg": (52, 58, Phase.CR, Polymorph.REFERENCE, "Mg", (("922", Phase.L, None, "Mg"), ("1363", Phase.G, None, "Mg"))),
@@ -243,7 +245,7 @@ _B1259_ELEMENT_REFERENCE_STATES = {
     "N": (55, 61, Phase.G, None, "N2", ()),
     "Na": (56, 62, Phase.CR, Polymorph.BCC, "Na", (("370.98", Phase.L, None, "Na"), ("1176.9", Phase.G, None, "Na"))),
     "Nb": (57, 63, Phase.CR, Polymorph.BCC, "Nb", ()),
-    "Ni": (58, 64, Phase.CR, Polymorph.REFERENCE, "Ni", (("630", Phase.CR, Polymorph.REFERENCE, "Ni"), ("1726", Phase.L, None, "Ni"))),
+    "Ni": (58, 64, Phase.CR, Polymorph.REFERENCE, "Ni", (("630", Phase.CR, Polymorph.REFERENCE, "Ni"), ("631", Phase.CR, Polymorph.REFERENCE, "Ni"), ("1726", Phase.L, None, "Ni"))),
     "O": (59, 65, Phase.G, None, "O2", ()),
     "P": (60, 66, Phase.CR, Polymorph.RED, "P", (("704", Phase.G, None, "P2"),)),
     "Pb": (61, 67, Phase.CR, Polymorph.REFERENCE, "Pb", (("600.6", Phase.L, None, "Pb"),)),
@@ -253,14 +255,14 @@ _B1259_ELEMENT_REFERENCE_STATES = {
     "Se": (67, 73, Phase.CR, Polymorph.REFERENCE, "Se", (("490", Phase.L, None, "Se"), ("958", Phase.G, None, "Se2"))),
     "Si": (68, 74, Phase.CR, Polymorph.REFERENCE, "Si", (("1685", Phase.L, None, "Si"),)),
     "Sn": (69, 75, Phase.CR, Polymorph.REFERENCE, "Sn", (("505", Phase.L, None, "Sn"),)),
-    "Sr": (70, 76, Phase.CR, Polymorph.ALPHA, "Sr", (("862", Phase.CR, Polymorph.BETA, "Sr"), ("1043", Phase.L, None, "Sr"), ("1648", Phase.G, None, "Sr"))),
-    "Ti": (73, 79, Phase.CR, Polymorph.REFERENCE, "Ti", (("1943", Phase.L, None, "Ti"),)),
-    "Te": (71, 77, Phase.CR, Polymorph.REFERENCE, "Te", (("723", Phase.L, None, "Te"), ("1260", Phase.G, None, "Te2"))),
+    "Sr": (70, 76, Phase.CR, Polymorph.ALPHA, "Sr", (("862", Phase.CR, Polymorph.GAMMA, "Sr"), ("1043", Phase.L, None, "Sr"), ("1648", Phase.G, None, "Sr"))),
+    "Ti": (73, 79, Phase.CR, Polymorph.ALPHA, "Ti", (("1155", Phase.CR, Polymorph.BETA, "Ti"), ("1943", Phase.L, None, "Ti"))),
+    "Te": (71, 77, Phase.CR, Polymorph.REFERENCE, "Te", (("723", Phase.L, None, "Te"), ("1260", Phase.L, None, "Te"), ("1262", Phase.G, None, "Te2"))),
     "Th": (72, 78, Phase.CR, Polymorph.ALPHA, "Th", (("1673", Phase.CR, Polymorph.BETA, "Th"), ("1968", Phase.L, None, "Th"))),
     "U": (74, 80, Phase.CR, Polymorph.ALPHA, "U", (("941", Phase.CR, Polymorph.BETA, "U"), ("1048", Phase.CR, Polymorph.GAMMA, "U"), ("1405", Phase.L, None, "U"))),
     "V": (75, 81, Phase.CR, Polymorph.BCC, "V", ()),
     "W": (76, 82, Phase.CR, Polymorph.BCC, "W", ()),
-    "Zn": (77, 83, Phase.CR, Polymorph.REFERENCE, "Zn", (("692.7", Phase.L, None, "Zn"), ("1181", Phase.G, None, "Zn"))),
+    "Zn": (77, 83, Phase.CR, Polymorph.REFERENCE, "Zn", (("692.7", Phase.L, None, "Zn"), ("1181", Phase.L, None, "Zn"), ("1184", Phase.G, None, "Zn"))),
     "Zr": (78, 84, Phase.CR, Polymorph.REFERENCE, "Zr", (("1143.2", Phase.CR, Polymorph.BCC, "Zr"),)),
 }
 _SUBSCRIPT_TRANSLATION = str.maketrans(
@@ -1550,13 +1552,27 @@ def _observation(
                 if schedule is None or schedule[2] is None:
                     citations.append(f"{element}=no printed reference-state schedule")
                     continue
-                printed_page, pdf_page, *_ = schedule
-                source_kind = (
-                    "B1259 transition summary"
-                    if element in {"Be", "Co"}
-                    else "B1259 reference-state table"
+                printed_page, reference_pdf_page, *_ = schedule
+                citation = (
+                    f"{element}=B1259 reference-state table "
+                    f"p.{printed_page}/PDF p.{reference_pdf_page}"
                 )
-                citations.append(f"{element}={source_kind} p.{printed_page}/PDF p.{pdf_page}")
+                sentence_and_table_temperature = {
+                    "Ba": ("648", "643"),
+                    "Cu": ("1356", "1357"),
+                    "Ni": ("630", "631"),
+                    "Te": ("1260", "1262"),
+                    "Zn": ("1181", "1184"),
+                }.get(element)
+                if sentence_and_table_temperature is not None:
+                    sentence_temperature, table_temperature = (
+                        sentence_and_table_temperature
+                    )
+                    citation += (
+                        f" (phase sentence says {sentence_temperature} K; "
+                        f"table break {table_temperature} K)"
+                    )
+                citations.append(citation)
             note += "; elemental_reference_state_tables=" + ", ".join(citations)
     if reconstruction is not None:
         note += (
