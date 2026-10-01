@@ -16,7 +16,7 @@ provenance:
   sample_phase: "The paper does not label the sample solid or liquid. It states an incongruent melting point of 2163 ± 4 K; all Table 2 and Table 6 temperatures are below that value."
   cell_and_orifice: "The paper prints a molybdenum Knudsen effusion cell and a vaporization-to-effusion-orifice ratio of 400:1; no separate orifice material is stated."
   table_6_derivation: "Equations (12)–(13), p.480 (PDF page index 2), calculate the Table 6 activities from vapor pressures over mullite and pure-oxide reference pressures. p_O over mullite is author-calculated from vapor-phase equilibria; p_SiO and Al-bearing Table 2 pressures are measured by ion-current comparison. Pure-oxide reference pressures are not printed as Table 2 pressure cells."
-  oxygen_pressure_corroboration: "On p.479 the authors say p_O calculated from MoO3 ⇌ MoO2 + O and O2 ⇌ 2O corresponded within about 15% to values calculated using the AlO ⇌ Al + O, 2AlO ⇌ Al2O + O, Al2O ⇌ 2Al + O, and SiO2 ⇌ SiO + O equilibria (3)–(6). These Al/Si equilibria are a consistency check, not parents of p_O."
+  oxygen_pressure_corroboration: "On p. 479 the authors calculate p_O from MoO3 ⇌ MoO2 + O (1), then calculate p_O2 from O2 ⇌ 2O (2). Values from equilibria (1) and (2) correspond within about 15% to values calculated using AlO ⇌ Al + O, 2AlO ⇌ Al2O + O, Al2O ⇌ 2Al + O, and SiO2 ⇌ SiO + O equilibria (3)–(6); those Al/Si equilibria are a consistency check, not parents."
 benches:
   - id: shornikov-1994-mullite-kems
     identity: {basis: described_in_this_work}
@@ -875,6 +875,11 @@ species:
       regime: kems_effusion
       units: "atm as printed (p_O2 · 10^-11); pressure_atm = printed coefficient × 10^-11 atm"
       uncertainty: {note: "The printed ± term is retained in each point; no additional uncertainty was assigned."}
+      derived_from: [shornikov_1994_o_partial_pressure_1833k]
+      derivation:
+        relation: "p_O2 calculated from the same-temperature p_O by O2 ⇌ 2O, reaction (2); p. 479. Table 1 identifies MoO2+ and MoO3+ but not O+ or O2+, and the text says oxygen pressures were calculated."
+        inputs: [shornikov_1994_o_partial_pressure_1833k]
+        locator: {page: 479, published_page: 479, pdf_page_index: 1, note: "Paragraph beginning 'Partial vapour pressures of oxygen were calculated'; reaction O2 ⇌ 2O (2)."}
       point_conditions:
         composition:
           state: {tag: unknown, reason: "Table 2 reports vapor over mullite (3Al2O3·2SiO2); no row-specific mole fraction or weight percent is printed."}
@@ -884,10 +889,11 @@ species:
           locator: {published_page: 479, note: "No numeric KEMS in-cell total pressure is printed."}
       values:
         quantity: partial_pressure
-        method_class: measured
+        method_class: derived
         admission_status: admitted
-        method: ion-current-comparison
-        method_as_printed: "traditional comparison of ion currents using Ag and Au vapour pressures as standards"
+        method: author-equilibrium-calculation
+        method_as_printed: "p_O2 calculated from p_O using O2 ⇌ 2O, reaction (2)"
+        calculation_method: "vapor-phase equilibrium reaction (2), O2 ⇌ 2O"
         temperature_K: 1833.0
         pressure_scale_as_printed: "p_O2 · 10^-11"
         points:
@@ -906,6 +912,11 @@ species:
       regime: kems_effusion
       units: "atm as printed (p_O2 · 10^-11); pressure_atm = printed coefficient × 10^-11 atm"
       uncertainty: {note: "The printed ± term is retained in each point; no additional uncertainty was assigned."}
+      derived_from: [shornikov_1994_o_partial_pressure_1933k]
+      derivation:
+        relation: "p_O2 calculated from the same-temperature p_O by O2 ⇌ 2O, reaction (2); p. 479. Table 1 identifies MoO2+ and MoO3+ but not O+ or O2+, and the text says oxygen pressures were calculated."
+        inputs: [shornikov_1994_o_partial_pressure_1933k]
+        locator: {page: 479, published_page: 479, pdf_page_index: 1, note: "Paragraph beginning 'Partial vapour pressures of oxygen were calculated'; reaction O2 ⇌ 2O (2)."}
       point_conditions:
         composition:
           state: {tag: unknown, reason: "Table 2 reports vapor over mullite (3Al2O3·2SiO2); no row-specific mole fraction or weight percent is printed."}
@@ -915,10 +926,11 @@ species:
           locator: {published_page: 479, note: "No numeric KEMS in-cell total pressure is printed."}
       values:
         quantity: partial_pressure
-        method_class: measured
+        method_class: derived
         admission_status: admitted
-        method: ion-current-comparison
-        method_as_printed: "traditional comparison of ion currents using Ag and Au vapour pressures as standards"
+        method: author-equilibrium-calculation
+        method_as_printed: "p_O2 calculated from p_O using O2 ⇌ 2O, reaction (2)"
+        calculation_method: "vapor-phase equilibrium reaction (2), O2 ⇌ 2O"
         temperature_K: 1933.0
         pressure_scale_as_printed: "p_O2 · 10^-11"
         points:
@@ -937,6 +949,11 @@ species:
       regime: kems_effusion
       units: "atm as printed (p_O2 · 10^-11); pressure_atm = printed coefficient × 10^-11 atm"
       uncertainty: {note: "The printed ± term is retained in each point; no additional uncertainty was assigned."}
+      derived_from: [shornikov_1994_o_partial_pressure_1983k]
+      derivation:
+        relation: "p_O2 calculated from the same-temperature p_O by O2 ⇌ 2O, reaction (2); p. 479. Table 1 identifies MoO2+ and MoO3+ but not O+ or O2+, and the text says oxygen pressures were calculated."
+        inputs: [shornikov_1994_o_partial_pressure_1983k]
+        locator: {page: 479, published_page: 479, pdf_page_index: 1, note: "Paragraph beginning 'Partial vapour pressures of oxygen were calculated'; reaction O2 ⇌ 2O (2)."}
       point_conditions:
         composition:
           state: {tag: unknown, reason: "Table 2 reports vapor over mullite (3Al2O3·2SiO2); no row-specific mole fraction or weight percent is printed."}
@@ -946,10 +963,11 @@ species:
           locator: {published_page: 479, note: "No numeric KEMS in-cell total pressure is printed."}
       values:
         quantity: partial_pressure
-        method_class: measured
+        method_class: derived
         admission_status: admitted
-        method: ion-current-comparison
-        method_as_printed: "traditional comparison of ion currents using Ag and Au vapour pressures as standards"
+        method: author-equilibrium-calculation
+        method_as_printed: "p_O2 calculated from p_O using O2 ⇌ 2O, reaction (2)"
+        calculation_method: "vapor-phase equilibrium reaction (2), O2 ⇌ 2O"
         temperature_K: 1983.0
         pressure_scale_as_printed: "p_O2 · 10^-11"
         points:
@@ -968,6 +986,11 @@ species:
       regime: kems_effusion
       units: "atm as printed (p_O2 · 10^-11); pressure_atm = printed coefficient × 10^-11 atm"
       uncertainty: {note: "The printed ± term is retained in each point; no additional uncertainty was assigned."}
+      derived_from: [shornikov_1994_o_partial_pressure_2033k]
+      derivation:
+        relation: "p_O2 calculated from the same-temperature p_O by O2 ⇌ 2O, reaction (2); p. 479. Table 1 identifies MoO2+ and MoO3+ but not O+ or O2+, and the text says oxygen pressures were calculated."
+        inputs: [shornikov_1994_o_partial_pressure_2033k]
+        locator: {page: 479, published_page: 479, pdf_page_index: 1, note: "Paragraph beginning 'Partial vapour pressures of oxygen were calculated'; reaction O2 ⇌ 2O (2)."}
       point_conditions:
         composition:
           state: {tag: unknown, reason: "Table 2 reports vapor over mullite (3Al2O3·2SiO2); no row-specific mole fraction or weight percent is printed."}
@@ -977,10 +1000,11 @@ species:
           locator: {published_page: 479, note: "No numeric KEMS in-cell total pressure is printed."}
       values:
         quantity: partial_pressure
-        method_class: measured
+        method_class: derived
         admission_status: admitted
-        method: ion-current-comparison
-        method_as_printed: "traditional comparison of ion currents using Ag and Au vapour pressures as standards"
+        method: author-equilibrium-calculation
+        method_as_printed: "p_O2 calculated from p_O using O2 ⇌ 2O, reaction (2)"
+        calculation_method: "vapor-phase equilibrium reaction (2), O2 ⇌ 2O"
         temperature_K: 2033.0
         pressure_scale_as_printed: "p_O2 · 10^-11"
         points:
@@ -1001,11 +1025,11 @@ species:
       regime: kems_effusion
       units: "atm as printed (p_O · 10^-9); pressure_atm = printed coefficient × 10^-9 atm"
       uncertainty: {note: "The printed ± term is retained in each point; no additional uncertainty was assigned."}
-      derived_from: [shornikov_1994_moo2_partial_pressure_1833k, shornikov_1994_moo3_partial_pressure_1833k, shornikov_1994_o2_partial_pressure_1833k]
+      derived_from: [shornikov_1994_moo2_partial_pressure_1833k, shornikov_1994_moo3_partial_pressure_1833k]
       derivation:
-        relation: "p_O calculated using MoO3 ⇌ MoO2 + O and O2 ⇌ 2O, reactions (1)–(2); see p.479. The Al/Si reactions (3)–(6) are a consistency check reported within about 15%, not calculation inputs; see p.479."
-        inputs: [shornikov_1994_moo2_partial_pressure_1833k, shornikov_1994_moo3_partial_pressure_1833k, shornikov_1994_o2_partial_pressure_1833k]
-        locator: {page: 479, published_page: 479, pdf_page_index: 1, note: "Paragraph beginning 'Partial vapour pressures of oxygen were calculated'; reactions (1)–(2), followed by the approximately 15% check using reactions (3)–(6)."}
+        relation: "p_O calculated from the same-temperature MoO3 and MoO2 partial pressures by MoO3 ⇌ MoO2 + O, reaction (1); reaction (2) is used downstream to calculate p_O2, not as an input to p_O. The Al/Si reactions (3)–(6) are a consistency check reported within about 15%, not calculation inputs; see p. 479."
+        inputs: [shornikov_1994_moo2_partial_pressure_1833k, shornikov_1994_moo3_partial_pressure_1833k]
+        locator: {page: 479, published_page: 479, pdf_page_index: 1, note: "Paragraph beginning 'Partial vapour pressures of oxygen were calculated'; reaction (1) calculation and following approximately 15% consistency check using reactions (3)–(6)."}
         output_unit: atm
       point_conditions:
         composition:
@@ -1019,8 +1043,8 @@ species:
         method_class: derived
         admission_status: admitted
         method: author-equilibrium-calculation
-        method_as_printed: "oxygen partial pressures calculated from vapor-phase equilibria; reactions (1)–(6)"
-        calculation_method: "vapor-phase equilibrium reactions (1)–(6)"
+        method_as_printed: "oxygen partial pressures calculated from vapor-phase equilibria; p_O by reaction (1) and p_O2 by reaction (2)"
+        calculation_method: "p_O from reaction (1), MoO3 ⇌ MoO2 + O"
         temperature_K: 1833.0
         pressure_scale_as_printed: "p_O · 10^-9"
         points:
@@ -1039,11 +1063,11 @@ species:
       regime: kems_effusion
       units: "atm as printed (p_O · 10^-9); pressure_atm = printed coefficient × 10^-9 atm"
       uncertainty: {note: "The printed ± term is retained in each point; no additional uncertainty was assigned."}
-      derived_from: [shornikov_1994_moo2_partial_pressure_1933k, shornikov_1994_moo3_partial_pressure_1933k, shornikov_1994_o2_partial_pressure_1933k]
+      derived_from: [shornikov_1994_moo2_partial_pressure_1933k, shornikov_1994_moo3_partial_pressure_1933k]
       derivation:
-        relation: "p_O calculated using MoO3 ⇌ MoO2 + O and O2 ⇌ 2O, reactions (1)–(2); see p.479. The Al/Si reactions (3)–(6) are a consistency check reported within about 15%, not calculation inputs; see p.479."
-        inputs: [shornikov_1994_moo2_partial_pressure_1933k, shornikov_1994_moo3_partial_pressure_1933k, shornikov_1994_o2_partial_pressure_1933k]
-        locator: {page: 479, published_page: 479, pdf_page_index: 1, note: "Paragraph beginning 'Partial vapour pressures of oxygen were calculated'; reactions (1)–(2), followed by the approximately 15% check using reactions (3)–(6)."}
+        relation: "p_O calculated from the same-temperature MoO3 and MoO2 partial pressures by MoO3 ⇌ MoO2 + O, reaction (1); reaction (2) is used downstream to calculate p_O2, not as an input to p_O. The Al/Si reactions (3)–(6) are a consistency check reported within about 15%, not calculation inputs; see p. 479."
+        inputs: [shornikov_1994_moo2_partial_pressure_1933k, shornikov_1994_moo3_partial_pressure_1933k]
+        locator: {page: 479, published_page: 479, pdf_page_index: 1, note: "Paragraph beginning 'Partial vapour pressures of oxygen were calculated'; reaction (1) calculation and following approximately 15% consistency check using reactions (3)–(6)."}
         output_unit: atm
       point_conditions:
         composition:
@@ -1057,8 +1081,8 @@ species:
         method_class: derived
         admission_status: admitted
         method: author-equilibrium-calculation
-        method_as_printed: "oxygen partial pressures calculated from vapor-phase equilibria; reactions (1)–(6)"
-        calculation_method: "vapor-phase equilibrium reactions (1)–(6)"
+        method_as_printed: "oxygen partial pressures calculated from vapor-phase equilibria; p_O by reaction (1) and p_O2 by reaction (2)"
+        calculation_method: "p_O from reaction (1), MoO3 ⇌ MoO2 + O"
         temperature_K: 1933.0
         pressure_scale_as_printed: "p_O · 10^-9"
         points:
@@ -1077,11 +1101,11 @@ species:
       regime: kems_effusion
       units: "atm as printed (p_O · 10^-9); pressure_atm = printed coefficient × 10^-9 atm"
       uncertainty: {note: "The printed ± term is retained in each point; no additional uncertainty was assigned."}
-      derived_from: [shornikov_1994_moo2_partial_pressure_1983k, shornikov_1994_moo3_partial_pressure_1983k, shornikov_1994_o2_partial_pressure_1983k]
+      derived_from: [shornikov_1994_moo2_partial_pressure_1983k, shornikov_1994_moo3_partial_pressure_1983k]
       derivation:
-        relation: "p_O calculated using MoO3 ⇌ MoO2 + O and O2 ⇌ 2O, reactions (1)–(2); see p.479. The Al/Si reactions (3)–(6) are a consistency check reported within about 15%, not calculation inputs; see p.479."
-        inputs: [shornikov_1994_moo2_partial_pressure_1983k, shornikov_1994_moo3_partial_pressure_1983k, shornikov_1994_o2_partial_pressure_1983k]
-        locator: {page: 479, published_page: 479, pdf_page_index: 1, note: "Paragraph beginning 'Partial vapour pressures of oxygen were calculated'; reactions (1)–(2), followed by the approximately 15% check using reactions (3)–(6)."}
+        relation: "p_O calculated from the same-temperature MoO3 and MoO2 partial pressures by MoO3 ⇌ MoO2 + O, reaction (1); reaction (2) is used downstream to calculate p_O2, not as an input to p_O. The Al/Si reactions (3)–(6) are a consistency check reported within about 15%, not calculation inputs; see p. 479."
+        inputs: [shornikov_1994_moo2_partial_pressure_1983k, shornikov_1994_moo3_partial_pressure_1983k]
+        locator: {page: 479, published_page: 479, pdf_page_index: 1, note: "Paragraph beginning 'Partial vapour pressures of oxygen were calculated'; reaction (1) calculation and following approximately 15% consistency check using reactions (3)–(6)."}
         output_unit: atm
       point_conditions:
         composition:
@@ -1095,8 +1119,8 @@ species:
         method_class: derived
         admission_status: admitted
         method: author-equilibrium-calculation
-        method_as_printed: "oxygen partial pressures calculated from vapor-phase equilibria; reactions (1)–(6)"
-        calculation_method: "vapor-phase equilibrium reactions (1)–(6)"
+        method_as_printed: "oxygen partial pressures calculated from vapor-phase equilibria; p_O by reaction (1) and p_O2 by reaction (2)"
+        calculation_method: "p_O from reaction (1), MoO3 ⇌ MoO2 + O"
         temperature_K: 1983.0
         pressure_scale_as_printed: "p_O · 10^-9"
         points:
@@ -1115,11 +1139,11 @@ species:
       regime: kems_effusion
       units: "atm as printed (p_O · 10^-9); pressure_atm = printed coefficient × 10^-9 atm"
       uncertainty: {note: "The printed ± term is retained in each point; no additional uncertainty was assigned."}
-      derived_from: [shornikov_1994_moo2_partial_pressure_2033k, shornikov_1994_moo3_partial_pressure_2033k, shornikov_1994_o2_partial_pressure_2033k]
+      derived_from: [shornikov_1994_moo2_partial_pressure_2033k, shornikov_1994_moo3_partial_pressure_2033k]
       derivation:
-        relation: "p_O calculated using MoO3 ⇌ MoO2 + O and O2 ⇌ 2O, reactions (1)–(2); see p.479. The Al/Si reactions (3)–(6) are a consistency check reported within about 15%, not calculation inputs; see p.479."
-        inputs: [shornikov_1994_moo2_partial_pressure_2033k, shornikov_1994_moo3_partial_pressure_2033k, shornikov_1994_o2_partial_pressure_2033k]
-        locator: {page: 479, published_page: 479, pdf_page_index: 1, note: "Paragraph beginning 'Partial vapour pressures of oxygen were calculated'; reactions (1)–(2), followed by the approximately 15% check using reactions (3)–(6)."}
+        relation: "p_O calculated from the same-temperature MoO3 and MoO2 partial pressures by MoO3 ⇌ MoO2 + O, reaction (1); reaction (2) is used downstream to calculate p_O2, not as an input to p_O. The Al/Si reactions (3)–(6) are a consistency check reported within about 15%, not calculation inputs; see p. 479."
+        inputs: [shornikov_1994_moo2_partial_pressure_2033k, shornikov_1994_moo3_partial_pressure_2033k]
+        locator: {page: 479, published_page: 479, pdf_page_index: 1, note: "Paragraph beginning 'Partial vapour pressures of oxygen were calculated'; reaction (1) calculation and following approximately 15% consistency check using reactions (3)–(6)."}
         output_unit: atm
       point_conditions:
         composition:
@@ -1133,8 +1157,8 @@ species:
         method_class: derived
         admission_status: admitted
         method: author-equilibrium-calculation
-        method_as_printed: "oxygen partial pressures calculated from vapor-phase equilibria; reactions (1)–(6)"
-        calculation_method: "vapor-phase equilibrium reactions (1)–(6)"
+        method_as_printed: "oxygen partial pressures calculated from vapor-phase equilibria; p_O by reaction (1) and p_O2 by reaction (2)"
+        calculation_method: "p_O from reaction (1), MoO3 ⇌ MoO2 + O"
         temperature_K: 2033.0
         pressure_scale_as_printed: "p_O · 10^-9"
         points:
