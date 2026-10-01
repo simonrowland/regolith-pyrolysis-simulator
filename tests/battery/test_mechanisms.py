@@ -3374,7 +3374,7 @@ def test_mf_f04_printed_diameter_uses_cell_pressure_over_diameter() -> None:
     experiment = F.kems_experiment(kn=None)
     geometry = replace(
         experiment.apparatus.geometry,
-        orifice_diameter_m=F.located(Decimal("0.001")),
+        orifice_diameter_m=F.located(Decimal("0.01")),
     )
     experiment = replace(
         experiment,
@@ -3388,7 +3388,7 @@ def test_mf_f04_printed_diameter_uses_cell_pressure_over_diameter() -> None:
     )
     observation = replace(
         observation,
-        point_conditions={"total_pressure_Pa": F.located(Decimal("0.1"))},
+        point_conditions={"total_pressure_Pa": F.located(Decimal("1"))},
     )
 
     result = effusion_regime_unverified(

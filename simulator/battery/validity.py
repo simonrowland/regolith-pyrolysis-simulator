@@ -61,7 +61,6 @@ from simulator.battery.records import (
     Value,
     as_decimal,
 )
-from simulator.physical_constants import BOLTZMANN
 from simulator.reference_data.janaf import formula_composition
 from simulator.transport_constants import FREE_MOLECULAR_KNUDSEN_MIN
 
@@ -75,24 +74,12 @@ TABLE_SELF_CHECK_FINDING_DEX = Decimal("0.1")
 # quality check; it does not determine the in-cell effusion regime.
 KEMS_BACKGROUND_HIGH_PA = Decimal("1e-2")
 
-# Drowart et al. state that Knudsen-cell mean free path should exceed the
-# orifice diameter, that p/d <= 1 Pa/mm meets this condition in practice, and
-# that about 10 Pa is the usual KEMS cell-pressure ceiling (2005, p. 689).
-# Drowart p. 689 states lambda>d (Kn>1) and discusses equation validity for
-# K>8; this gate retains the existing stricter Kn threshold of 10.
-# For a hard-sphere gas, lambda = k_B*T/(sqrt(2)*pi*sigma^2*p), so
-# Kn=lambda/d >= FREE_MOLECULAR_KNUDSEN_MIN gives
-# p_max=k_B*T/(sqrt(2)*pi*sigma^2*FREE_MOLECULAR_KNUDSEN_MIN*d).
-# Unit check: (J/K*K)/(m^2*m) = J/m^3 = Pa. The 1 nm collision diameter used
-# when d is printed is deliberately large for small molecular vapours, making
-# lambda shorter and p_max smaller; it is not attributed to Drowart. Sanity: T=2000 K,
-# sigma=1 nm, d=1 mm and Kn_min=10 give p_max about 0.62 Pa. If d is absent,
-# never invent it: use only Drowart's printed ~10 Pa maximum-cell-pressure
-# bound. The printed p/d rule further caps p_max when d is available.
+# Drowart et al. state that p/d <= 1 Pa/mm meets the mean-free-path criterion
+# in practice, and that about 10 Pa is the usual KEMS cell-pressure ceiling
+# (2005, p. 689). Use only these sourced limits; do not infer a kinetic limit
+# from an unsourced collision diameter. Without a located diameter, use the
+# ~10 Pa ceiling alone.
 KEMS_CELL_PRESSURE_MAX_PA = Decimal("10")
-KEMS_VAPOUR_COLLISION_DIAMETER_M = Decimal("1e-9")
-KEMS_SQRT2 = Decimal("1.414213562373095048801688724")
-KEMS_PI = Decimal("3.141592653589793238462643383")
 
 
 @dataclass(frozen=True)
@@ -539,7 +526,7 @@ def effusion_regime_unverified(
         None if observation is None else _printed_in_cell_total_pressure(observation)
     )
     if diameter is not None and cell_pressure is not None and observation is not None:
-        pressure_limit = _in_cell_pressure_limit(experiment, observation)
+        pressure_limit = _in_cell_pressure_limit(experiment)
         ratio_Pa_per_mm = cell_pressure / (diameter * Decimal("1000"))
         passed = cell_pressure <= pressure_limit
         checks.append(
@@ -638,7 +625,7 @@ def effusion_regime_unverified(
             checks,
             "in_cell_partial_pressure_sum",
         )
-    pressure_limit = _in_cell_pressure_limit(experiment, observation)
+    pressure_limit = _in_cell_pressure_limit(experiment)
     passed = pressure_sum <= pressure_limit
     diameter_basis = (
         "printed_orifice_diameter_p_over_d"
@@ -936,24 +923,13 @@ def _printed_in_cell_total_pressure(observation: Observation) -> Decimal | None:
 
 def _in_cell_pressure_limit(
     experiment: Experiment,
-    observation: Observation,
 ) -> Decimal:
     diameter = _printed_orifice_diameter(experiment)
     if diameter is None:
         return KEMS_CELL_PRESSURE_MAX_PA
-    temperature = _point_temperature(observation)
-    if temperature is None:
-        return KEMS_CELL_PRESSURE_MAX_PA
-    sigma = KEMS_VAPOUR_COLLISION_DIAMETER_M
-    kn_min = Decimal(str(FREE_MOLECULAR_KNUDSEN_MIN))
-    kinetic_limit = (
-        Decimal(str(BOLTZMANN))
-        * temperature
-        / (KEMS_SQRT2 * KEMS_PI * sigma**2 * kn_min * diameter)
-    )
-    # IUPAC's printed p/d <= 1 Pa/mm is 1000 Pa/m times the printed d.
+    # Drowart's printed p/d <= 1 Pa/mm is 1000 Pa/m times the printed d.
     pressure_to_diameter_limit = diameter * Decimal("1000")
-    return min(KEMS_CELL_PRESSURE_MAX_PA, kinetic_limit, pressure_to_diameter_limit)
+    return min(KEMS_CELL_PRESSURE_MAX_PA, pressure_to_diameter_limit)
 
 
 def background_pressure_high(
