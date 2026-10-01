@@ -622,8 +622,11 @@ species:
       regime: kems_effusion
       units: "atm as printed (p_O · 10^-9); pressure_atm = printed coefficient × 10^-9 atm"
       uncertainty: {note: "The printed ± term is retained in each point; no additional uncertainty was assigned."}
+      derived_from: [shornikov_1994_al_partial_pressure_1833k, shornikov_1994_sio_partial_pressure_1833k]
       derivation:
-        relation: "The paper states that p_O was calculated from vapor-phase equilibria, including MoO3 ⇌ MoO2 + O and O2 ⇌ 2O, and checked against the Al- and Si-bearing dissociation equilibria."
+        relation: "p_O was calculated from vapor-phase equilibria (reactions (1)–(6)), including MoO3 ⇌ MoO2 + O and O2 ⇌ 2O, and checked against the measured Al- and Si-bearing dissociation equilibria; see p. 478, Table 2 and reactions (1)–(6)."
+        inputs: [shornikov_1994_al_partial_pressure_1833k, shornikov_1994_sio_partial_pressure_1833k]
+        output_unit: atm
       point_conditions:
         composition:
           state: {tag: unknown, reason: "Table 2 reports vapor over mullite (3Al2O3·2SiO2); no row-specific mole fraction or weight percent is printed."}
@@ -656,8 +659,11 @@ species:
       regime: kems_effusion
       units: "atm as printed (p_O · 10^-9); pressure_atm = printed coefficient × 10^-9 atm"
       uncertainty: {note: "The printed ± term is retained in each point; no additional uncertainty was assigned."}
+      derived_from: [shornikov_1994_al_partial_pressure_1933k, shornikov_1994_alo_partial_pressure_1933k, shornikov_1994_al2o_partial_pressure_1933k, shornikov_1994_alsio_partial_pressure_1933k, shornikov_1994_sio_partial_pressure_1933k]
       derivation:
-        relation: "The paper states that p_O was calculated from vapor-phase equilibria, including MoO3 ⇌ MoO2 + O and O2 ⇌ 2O, and checked against the Al- and Si-bearing dissociation equilibria."
+        relation: "p_O was calculated from vapor-phase equilibria (reactions (1)–(6)), including MoO3 ⇌ MoO2 + O and O2 ⇌ 2O, and checked against the measured Al- and Si-bearing dissociation equilibria; see p. 478, Table 2 and reactions (1)–(6)."
+        inputs: [shornikov_1994_al_partial_pressure_1933k, shornikov_1994_alo_partial_pressure_1933k, shornikov_1994_al2o_partial_pressure_1933k, shornikov_1994_alsio_partial_pressure_1933k, shornikov_1994_sio_partial_pressure_1933k]
+        output_unit: atm
       point_conditions:
         composition:
           state: {tag: unknown, reason: "Table 2 reports vapor over mullite (3Al2O3·2SiO2); no row-specific mole fraction or weight percent is printed."}
@@ -690,8 +696,11 @@ species:
       regime: kems_effusion
       units: "atm as printed (p_O · 10^-9); pressure_atm = printed coefficient × 10^-9 atm"
       uncertainty: {note: "The printed ± term is retained in each point; no additional uncertainty was assigned."}
+      derived_from: [shornikov_1994_al_partial_pressure_1983k, shornikov_1994_alo_partial_pressure_1983k, shornikov_1994_al2o_partial_pressure_1983k, shornikov_1994_alsio_partial_pressure_1983k, shornikov_1994_sio_partial_pressure_1983k]
       derivation:
-        relation: "The paper states that p_O was calculated from vapor-phase equilibria, including MoO3 ⇌ MoO2 + O and O2 ⇌ 2O, and checked against the Al- and Si-bearing dissociation equilibria."
+        relation: "p_O was calculated from vapor-phase equilibria (reactions (1)–(6)), including MoO3 ⇌ MoO2 + O and O2 ⇌ 2O, and checked against the measured Al- and Si-bearing dissociation equilibria; see p. 478, Table 2 and reactions (1)–(6)."
+        inputs: [shornikov_1994_al_partial_pressure_1983k, shornikov_1994_alo_partial_pressure_1983k, shornikov_1994_al2o_partial_pressure_1983k, shornikov_1994_alsio_partial_pressure_1983k, shornikov_1994_sio_partial_pressure_1983k]
+        output_unit: atm
       point_conditions:
         composition:
           state: {tag: unknown, reason: "Table 2 reports vapor over mullite (3Al2O3·2SiO2); no row-specific mole fraction or weight percent is printed."}
@@ -724,8 +733,11 @@ species:
       regime: kems_effusion
       units: "atm as printed (p_O · 10^-9); pressure_atm = printed coefficient × 10^-9 atm"
       uncertainty: {note: "The printed ± term is retained in each point; no additional uncertainty was assigned."}
+      derived_from: [shornikov_1994_al_partial_pressure_2033k, shornikov_1994_alo_partial_pressure_2033k, shornikov_1994_al2o_partial_pressure_2033k, shornikov_1994_alsio_partial_pressure_2033k, shornikov_1994_sio_partial_pressure_2033k]
       derivation:
-        relation: "The paper states that p_O was calculated from vapor-phase equilibria, including MoO3 ⇌ MoO2 + O and O2 ⇌ 2O, and checked against the Al- and Si-bearing dissociation equilibria."
+        relation: "p_O was calculated from vapor-phase equilibria (reactions (1)–(6)), including MoO3 ⇌ MoO2 + O and O2 ⇌ 2O, and checked against the measured Al- and Si-bearing dissociation equilibria; see p. 478, Table 2 and reactions (1)–(6)."
+        inputs: [shornikov_1994_al_partial_pressure_2033k, shornikov_1994_alo_partial_pressure_2033k, shornikov_1994_al2o_partial_pressure_2033k, shornikov_1994_alsio_partial_pressure_2033k, shornikov_1994_sio_partial_pressure_2033k]
+        output_unit: atm
       point_conditions:
         composition:
           state: {tag: unknown, reason: "Table 2 reports vapor over mullite (3Al2O3·2SiO2); no row-specific mole fraction or weight percent is printed."}
