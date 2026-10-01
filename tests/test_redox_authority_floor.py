@@ -1768,3 +1768,241 @@ def test_ferrous_free_hour_releases_then_uses_real_ratio() -> None:
     assert reservoir.shadow_oxygen_transfer["transfer_o2_mol"] == pytest.approx(
         transfer_mol
     )
+
+
+def _m2_ideal_fixture(
+    monkeypatch: pytest.MonkeyPatch,
+) -> PyrolysisSimulator:
+    """One mole FeO, one mole native Fe, and nine moles ideal SiO2 solvent."""
+
+    feo_mass = float(MOLAR_MASS["FeO"])
+    solvent_mass = 9.0 * float(MOLAR_MASS["SiO2"])
+    total_mass = feo_mass + solvent_mass
+    sim = _sim_with_oxides(
+        feo_wt=100.0 * feo_mass / total_mass,
+        fe2o3_wt=0.0,
+        temperature_C=1726.85,
+        mass_kg=total_mass / 1000.0,
+    )
+    _set_melt_iron_oxides(sim, n_feo_mol=1.0, n_fe2o3_mol=0.0)
+    sim.atom_ledger.load_external_mol(
+        "process.metal_phase",
+        {"Fe": 1.0},
+        source="M2 ideal finite-film fixture",
+        material_origin="feedstock",
+    )
+    sim._project_cleaned_melt_from_atom_ledger()
+
+    def ideal_activity(*, comp_wt: dict[str, float], **_kwargs: Any) -> dict[str, float]:
+        feo_mol = float(comp_wt.get("FeO", 0.0)) / float(MOLAR_MASS["FeO"])
+        solvent_mol = float(comp_wt.get("SiO2", 0.0)) / float(
+            MOLAR_MASS["SiO2"]
+        )
+        total = feo_mol + solvent_mol
+        return {
+            "a_FeO_authoritative": feo_mol / total if total > 0.0 else 0.0
+        }
+
+    monkeypatch.setattr(
+        core_module,
+        "calphad_ferrous_feo_activity_diagnostic",
+        ideal_activity,
+    )
+    monkeypatch.setattr(
+        core_module,
+        "feo_iw_log10_fO2_bar",
+        lambda _T_K, *, a_feo: -5.0,
+    )
+    return sim
+
+
+def _m2_ideal_buffer_pressure_pa(u_mol: float) -> float:
+    activity = (2.0 * u_mol) / (2.0 * u_mol + 9.0)
+    return activity * activity
+
+
+def test_m2_finite_metal_film_fixture_and_endpoint_complementarity(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from simulator.physical_constants import GAS_CONSTANT as physical_gas_constant
+
+    sim = _m2_ideal_fixture(monkeypatch)
+    k_g = 0.01
+    k_m = 1.0e-9
+    area = 1.0
+    depth = 0.1
+    gas_temperature = 2000.0
+    alpha = k_g / (physical_gas_constant * gas_temperature)
+    beta = k_m / (area * depth)
+
+    # The ideal FeO activity gives a strictly decreasing F(u) on the feasible
+    # surface inventory interval, with one sign change and therefore one root.
+    bracket = [index / 100.0 for index in range(101)]
+    residuals = [
+        alpha * (0.02 - _m2_ideal_buffer_pressure_pa(u))
+        - beta * (u - 0.5)
+        for u in bracket
+    ]
+    assert residuals[0] > 0.0 > residuals[-1]
+    assert all(left > right for left, right in zip(residuals, residuals[1:]))
+
+    root = sim._oxygen_finite_interface_root(
+        gas_pO2_bar=0.02 / 1.0e5,
+        melt_pO2_bar=0.01 / 1.0e5,
+        gas_temperature_K=gas_temperature,
+        k_g=k_g,
+        k_m=k_m,
+        surface_area_m2=area,
+        h_eff_m=depth,
+        kress91_evaluator=None,
+        n_feo_mol=1.0,
+        n_fe2o3_mol=0.0,
+        n_fe_metal_mol=1.0,
+        capacity_mol_per_ln_fO2=0.0,
+    )
+    interface_pa = float(root["interface_pO2_bar"]) * 1.0e5
+    assert interface_pa == pytest.approx(
+        0.017068850876654978,
+        rel=1.0e-9,
+    )
+    assert root["interface_root_clamped"] is False
+    assert root["gas_flux_mol_m2_s"] == pytest.approx(
+        root["melt_flux_mol_m2_s"], rel=1.0e-10, abs=2.0e-14
+    )
+
+    endpoint = sim._oxygen_finite_interface_root(
+        gas_pO2_bar=0.1 / 1.0e5,
+        melt_pO2_bar=0.01 / 1.0e5,
+        gas_temperature_K=gas_temperature,
+        k_g=k_g,
+        k_m=k_m,
+        surface_area_m2=area,
+        h_eff_m=depth,
+        kress91_evaluator=None,
+        n_feo_mol=1.0,
+        n_fe2o3_mol=0.0,
+        n_fe_metal_mol=1.0,
+        capacity_mol_per_ln_fO2=0.0,
+    )
+    assert endpoint["interface_root_clamped"] is True
+    assert endpoint["surface_inventory_o2_equivalent_mol"] == pytest.approx(1.0)
+    assert endpoint["surface_buffer_pO2_Pa"] == pytest.approx(
+        _m2_ideal_buffer_pressure_pa(1.0)
+    )
+    assert endpoint["interface_pO2_bar"] * 1.0e5 > endpoint[
+        "surface_buffer_pO2_Pa"
+    ]
+    assert endpoint["gas_flux_mol_m2_s"] == pytest.approx(
+        endpoint["melt_flux_mol_m2_s"], rel=1.0e-10, abs=2.0e-14
+    )
+
+
+@pytest.mark.parametrize(
+    ("gas_pressure_pa", "expected_sign"),
+    [(0.02, -1), (0.001, 1)],
+    ids=("oxidizing", "reducing"),
+)
+def test_m2_metal_exchange_stoichiometry_and_ledger_balance(
+    monkeypatch: pytest.MonkeyPatch,
+    gas_pressure_pa: float,
+    expected_sign: int,
+) -> None:
+    sim = _m2_ideal_fixture(monkeypatch)
+    _finite_gas_film(sim)
+    sim._overhead_headspace_config["enabled"] = True
+    sim.melt.melt_surface_area_m2 = 1.0
+    sim.overhead.headspace_temperature_K = 2000.0
+    sim.atom_ledger.load_external_mol(
+        "process.overhead_gas",
+        {"O2": 1.0},
+        source="M2 exchange gas boundary",
+        material_origin="feedstock",
+    )
+    gas_pressure_bar = gas_pressure_pa / 1.0e5
+    monkeypatch.setattr(
+        sim,
+        "_headspace_ledger_pO2_bar_from_o2_mol",
+        lambda _n: gas_pressure_bar,
+    )
+    monkeypatch.setattr(
+        sim,
+        "_headspace_transport_pO2_bar_from_ledger",
+        lambda *_args, **_kwargs: gas_pressure_bar,
+    )
+    monkeypatch.setattr(sim, "_headspace_floor_o2_mol", lambda: 0.0)
+    _old_k_m, _source, melt_transport = sim._oxygen_exchange_k_m_s(
+        sim.melt.temperature_C + 273.15
+    )
+    monkeypatch.setattr(
+        sim,
+        "_oxygen_exchange_k_m_s",
+        lambda _T_K: (1.0e-9, "M2 fixture", melt_transport),
+    )
+    monkeypatch.setattr(
+        sim,
+        "_oxygen_interface_gas_side_k_m_s",
+        lambda _T_K: (0.01, "M2 fixture"),
+    )
+    monkeypatch.setattr(sim, "_oxygen_exchange_effective_melt_depth_m", lambda: 0.1)
+    monkeypatch.setattr(sim, "_melt_redox_exchange_is_liquid", lambda *_a, **_k: True)
+
+    before_feo = _oxide_mol(sim, "FeO")
+    before_fe2o3 = _oxide_mol(sim, "Fe2O3")
+    before_metal = float(
+        sim.atom_ledger.project_account_mol("process.metal_phase").get("Fe", 0.0)
+    )
+    before_head_o2 = float(
+        sim.atom_ledger.mol_by_account("process.overhead_gas").get("O2", 0.0)
+    )
+    tracked_accounts = (
+        "process.cleaned_melt",
+        "process.metal_phase",
+        "process.overhead_gas",
+    )
+
+    def tracked_atoms(element: str) -> float:
+        total = 0.0
+        for account in tracked_accounts:
+            for species, amount in sim.atom_ledger.project_account_mol(account).items():
+                formula = resolve_species_formula(species, sim.atom_ledger.registry)
+                total += float(amount) * float(formula.elements.get(element, 0.0))
+        return total
+
+    before_fe_atoms = tracked_atoms("Fe")
+    before_o_atoms = tracked_atoms("O")
+    transitions_before = len(sim.atom_ledger.transitions)
+    reservoir = sim._apply_oxygen_reservoir_exchange()
+    shadow = reservoir.shadow_oxygen_transfer
+    transfer = float(reservoir.exchange_o2_mol)
+    assert shadow["status"] == "ok"
+    assert transfer * expected_sign > 0.0
+    assert shadow["fe2o3_mol_after"] == pytest.approx(before_fe2o3, abs=1.0e-12)
+    assert shadow["fe_metal_mol_after"] - before_metal == pytest.approx(
+        2.0 * transfer, abs=1.0e-12
+    )
+    assert shadow["fe_o_mol_after"] - before_feo == pytest.approx(
+        -2.0 * transfer, abs=1.0e-12
+    )
+    if transfer < 0.0:
+        assert -before_metal / 2.0 <= transfer < 0.0
+    else:
+        assert 0.0 < transfer <= before_feo / 2.0
+
+    after_feo = _oxide_mol(sim, "FeO")
+    after_fe2o3 = _oxide_mol(sim, "Fe2O3")
+    after_metal = float(
+        sim.atom_ledger.project_account_mol("process.metal_phase").get("Fe", 0.0)
+    )
+    after_head_o2 = float(
+        sim.atom_ledger.mol_by_account("process.overhead_gas").get("O2", 0.0)
+    )
+    assert after_metal - before_metal == pytest.approx(2.0 * transfer, abs=1.0e-12)
+    assert after_feo - before_feo == pytest.approx(-2.0 * transfer, abs=1.0e-12)
+    assert after_fe2o3 == pytest.approx(before_fe2o3, abs=1.0e-12)
+    assert after_head_o2 - before_head_o2 == pytest.approx(transfer, abs=1.0e-12)
+    assert tracked_atoms("Fe") == pytest.approx(before_fe_atoms, abs=1.0e-12)
+    assert tracked_atoms("O") == pytest.approx(before_o_atoms, abs=1.0e-12)
+    transitions = sim.atom_ledger.transitions[transitions_before:]
+    assert len(transitions) == 1
+    assert transitions[0].name == "oxygen_reservoir_exchange"
+    transitions[0].validate_conservation(sim.atom_ledger.registry)

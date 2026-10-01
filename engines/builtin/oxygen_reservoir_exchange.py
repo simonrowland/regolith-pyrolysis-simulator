@@ -20,6 +20,7 @@ from simulator.chemistry.kernel.dto import (
     LedgerTransitionProposal,
 )
 from simulator.chemistry.kernel.provider import ChemistryProvider
+from simulator.fe_redox import OXYGEN_RESERVOIR_NOOP_MOL
 
 
 PROCESS_OVERHEAD_GAS_ACCOUNT = "process.overhead_gas"
@@ -33,6 +34,8 @@ class BuiltinOxygenReservoirExchangeProvider(ChemistryProvider):
 
     name = "builtin-oxygen-reservoir-exchange"
     DECLARED_ACCOUNTS = frozenset({
+        "process.cleaned_melt",
+        "process.metal_phase",
         PROCESS_OVERHEAD_GAS_ACCOUNT,
         RESERVOIR_FO2_BUFFER_ACCOUNT,
     })
@@ -98,6 +101,100 @@ class BuiltinOxygenReservoirExchangeProvider(ChemistryProvider):
                 RESERVOIR_FO2_BUFFER_ACCOUNT: {OXYGEN_SPECIES: amount_mol}
             }
             direction = "headspace_to_melt"
+
+        cleaned_melt = dict(
+            request.account_view.accounts.get("process.cleaned_melt", {}) or {}
+        )
+        metal_phase = dict(
+            request.account_view.accounts.get("process.metal_phase", {}) or {}
+        )
+        feo_mol = max(0.0, float(cleaned_melt.get("FeO", 0.0) or 0.0))
+        metal_fe_mol = max(0.0, float(metal_phase.get("Fe", 0.0) or 0.0))
+        if (
+            bool(controls.get("m2_metal_reaction", False))
+            and feo_mol > OXYGEN_RESERVOIR_NOOP_MOL
+            and metal_fe_mol > OXYGEN_RESERVOIR_NOOP_MOL
+        ):
+            # On the retained Fe + FeO buffer, the exchanged gas oxygen is
+            # the metal reaction.  Keep this transition atomically balanced:
+            # FeO -> Fe + 1/2 O2 for d > 0, and its reverse for d < 0.
+            # The ferric inventory and the ferric oxygen buffer are spectators.
+            fe_extent_mol = 2.0 * amount_mol
+            if dn_to_headspace_mol > 0.0:
+                if fe_extent_mol > feo_mol:
+                    return IntentResult(
+                        intent=ChemistryIntent.OXYGEN_RESERVOIR_EXCHANGE,
+                        status="refused",
+                        control_audit=control_audit,
+                        diagnostic={
+                            "reason": "metal_reaction_exceeds_feo_inventory",
+                            "requested_fe_mol": fe_extent_mol,
+                            "available_feo_mol": feo_mol,
+                        },
+                    )
+                debits = {"process.cleaned_melt": {"FeO": fe_extent_mol}}
+                credits = {
+                    "process.metal_phase": {"Fe": fe_extent_mol},
+                    PROCESS_OVERHEAD_GAS_ACCOUNT: {
+                        OXYGEN_SPECIES: amount_mol
+                    },
+                }
+            else:
+                overhead_o2_mol = max(
+                    0.0,
+                    float(
+                        request.account_view.accounts.get(
+                            PROCESS_OVERHEAD_GAS_ACCOUNT, {}
+                        ).get(OXYGEN_SPECIES, 0.0)
+                        or 0.0
+                    ),
+                )
+                if fe_extent_mol > metal_fe_mol or amount_mol > overhead_o2_mol:
+                    return IntentResult(
+                        intent=ChemistryIntent.OXYGEN_RESERVOIR_EXCHANGE,
+                        status="refused",
+                        control_audit=control_audit,
+                        diagnostic={
+                            "reason": "metal_reaction_exceeds_inventory",
+                            "requested_fe_mol": fe_extent_mol,
+                            "available_metal_fe_mol": metal_fe_mol,
+                            "requested_o2_mol": amount_mol,
+                            "available_headspace_o2_mol": overhead_o2_mol,
+                        },
+                    )
+                debits = {
+                    "process.metal_phase": {"Fe": fe_extent_mol},
+                    PROCESS_OVERHEAD_GAS_ACCOUNT: {
+                        OXYGEN_SPECIES: amount_mol
+                    },
+                }
+                credits = {"process.cleaned_melt": {"FeO": fe_extent_mol}}
+            atom_proof = build_atom_balance_proof(
+                debits,
+                credits,
+                request.account_view.species_formula_registry,
+                resolve_species_formula,
+            )
+            proposal = LedgerTransitionProposal(
+                debits=debits,
+                credits=credits,
+                reason=TRANSITION_NAME,
+                atom_balance_proof=atom_proof,
+            )
+            return IntentResult(
+                intent=ChemistryIntent.OXYGEN_RESERVOIR_EXCHANGE,
+                status="ok",
+                transition=proposal,
+                control_audit=control_audit,
+                diagnostic={
+                    "exchange_o2_mol": dn_to_headspace_mol,
+                    "exchange_direction": direction,
+                    "m2_metal_reaction": True,
+                    "metal_fe_mol_delta": 2.0 * dn_to_headspace_mol,
+                    "feo_mol_delta": -2.0 * dn_to_headspace_mol,
+                    "fe2o3_mol_delta": 0.0,
+                },
+            )
 
         atom_proof = build_atom_balance_proof(
             debits,
