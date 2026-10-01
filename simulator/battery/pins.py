@@ -10,7 +10,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from decimal import Decimal
 from pathlib import Path
-from typing import Any, Mapping, Sequence
+from typing import Any, Iterable, Mapping, Sequence
 
 from simulator.battery.enums import MetricOperation, ResidualStatus
 from simulator.battery.migrate import REPO_ROOT, load_yaml
@@ -167,9 +167,39 @@ def pin_failures(
     Missing live result for a non-tombstone pin is a coverage failure.
     """
 
-    by_key: dict[str, Residual] = {}
+    wanted_keys = {key for record in records for key in (record.key, *record.aliases)}
+    by_key: dict[str, tuple[ResidualStatus, Decimal | None]] = {}
     for residual in residuals:
-        by_key[residual.key] = residual
+        if residual.key in wanted_keys:
+            by_key[residual.key] = (residual.status, live_numeric(residual))
+    return _pin_failures_from_live(records, by_key)
+
+
+def _pin_failures_from_payloads(
+    rows: Iterable[Mapping[str, object]],
+    records: Sequence[PinBandRecord],
+) -> list[dict[str, Any]]:
+    wanted_keys = {key for record in records for key in (record.key, *record.aliases)}
+    by_key: dict[str, tuple[ResidualStatus, Decimal | None]] = {}
+    for row in rows:
+        key = str(row.get("key") or "")
+        if key not in wanted_keys:
+            continue
+        status = ResidualStatus(str(row.get("status") or ""))
+        numeric = row.get("numeric")
+        value = (
+            as_decimal(numeric["value"])
+            if isinstance(numeric, Mapping) and numeric.get("value") is not None
+            else None
+        )
+        by_key[key] = (status, value)
+    return _pin_failures_from_live(records, by_key)
+
+
+def _pin_failures_from_live(
+    records: Sequence[PinBandRecord],
+    by_key: Mapping[str, tuple[ResidualStatus, Decimal | None]],
+) -> list[dict[str, Any]]:
     failures: list[dict[str, Any]] = []
     for record in records:
         live = by_key.get(record.key)
@@ -193,15 +223,16 @@ def pin_failures(
                 }
             )
             continue
-        if live.status.value != record.expected_outcome:
+        status, value = live
+        if status.value != record.expected_outcome:
             if record.expected_outcome == ResidualStatus.REFUSED.value:
-                if live.status is ResidualStatus.REFUSED:
+                if status is ResidualStatus.REFUSED:
                     continue
                 failures.append(
                     {
                         "key": record.key,
                         "reason": "expected_refusal_resurrected",
-                        "live": live.status.value,
+                        "live": status.value,
                         "centre": None if record.centre is None else str(record.centre),
                         "pin_band": None
                         if record.pin_band_value is None
@@ -211,13 +242,12 @@ def pin_failures(
                 continue
         if record.centre is None or record.pin_band_value is None:
             continue
-        value = live_numeric(live)
         if value is None:
             failures.append(
                 {
                     "key": record.key,
                     "reason": "coverage_failure",
-                    "live": live.status.value,
+                    "live": status.value,
                     "centre": str(record.centre),
                     "pin_band": str(record.pin_band_value),
                 }

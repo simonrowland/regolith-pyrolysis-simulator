@@ -10,6 +10,7 @@ regenerated from residuals.
 from __future__ import annotations
 
 import argparse
+import os
 import socket
 import subprocess
 import sys
@@ -24,24 +25,25 @@ from simulator.battery.migrate import canonicalize_rail  # noqa: E402
 from simulator.battery.pins import (  # noqa: E402
     load_pins,
     migrate_pin_records,
-    pin_failures,
+    _pin_failures_from_payloads,
     write_pins,
 )
 from simulator.battery.score import (  # noqa: E402
     SCORE_ENGINE_SET,
+    _render_score_report_from_payloads_legacy,
+    _ResidualJsonlRows,
+    _count_residuals_jsonl,
     derive_store_stamp,
     emit_store_stamp_mismatch_warning,
     engines_from_names,
     load_legacy_score_rows,
     load_residuals_stamp,
     load_score_context,
-    render_score_report,
-    residual_to_plain,
-    score_store,
+    render_score_report_from_payloads,
+    _score_store_to_jsonl,
     status_diff_rows,
     write_headline_summary_from_payloads_json,
-    write_headline_summary_json,
-    write_residuals_jsonl,
+    _write_headline_summary_from_accumulator_json,
 )
 
 STUDIO_HOST = "mac-studio-256-1"
@@ -179,12 +181,7 @@ def main(argv: list[str] | None = None) -> int:
     residuals_path = args.root / "data" / "battery" / "residuals.jsonl"
     report_path = args.root / "data" / "battery" / "score-report.md"
     if args.report_only:
-        from simulator.battery.score import (
-            load_residuals_jsonl,
-            render_score_report_from_payloads,
-        )
-
-        payloads = load_residuals_jsonl(residuals_path)
+        payloads = _ResidualJsonlRows(residuals_path)
         context = load_score_context(args.root)
         recorded = load_residuals_stamp(residuals_path)
         live = derive_store_stamp(args.root)
@@ -193,11 +190,21 @@ def main(argv: list[str] | None = None) -> int:
         unmapped: list[str] = []
         diffs: list[dict] = []
         pins_file = args.root / "data" / "battery" / "pins.yaml"
-        live_keys = {str(row.get("key") or "") for row in payloads}
         key_map: dict[str, str] = {}
         if pins_file.is_file():
             loaded = load_pins(pins_file)
             key_map = loaded["key_map"]
+            wanted_keys = {
+                key
+                for record in loaded["pin_band_records"]
+                if not record.tombstone
+                for key in (record.key, *record.aliases)
+            }
+            live_keys = {
+                str(row.get("key") or "")
+                for row in payloads
+                if str(row.get("key") or "") in wanted_keys
+            }
             for record in loaded["pin_band_records"]:
                 if record.tombstone:
                     continue
@@ -239,7 +246,10 @@ def main(argv: list[str] | None = None) -> int:
             origins=context.origins,
             store_stamp=recorded,
         )
-        print(f"report-only residuals={len(payloads)} pin_failures={len(failures)}")
+        print(
+            f"report-only residuals={_count_residuals_jsonl(residuals_path)} "
+            f"pin_failures={len(failures)}"
+        )
         return 0
 
     melts = [e.value for e in engines if e.value in {"alphamelts", "thermoengine", "magemin"}]
@@ -258,23 +268,25 @@ def main(argv: list[str] | None = None) -> int:
         engines = tuple(laptop)
 
     context = load_score_context(args.root)
-    residuals, candidates = score_store(
+    written, metadata = _score_store_to_jsonl(
         context,
+        residuals_path,
+        root=args.root,
         engines=engines,
         rail=rail,
         work_id=args.work,
         limit=args.limit,
     )
-    residuals_path = args.root / "data" / "battery" / "residuals.jsonl"
-    report_path = args.root / "data" / "battery" / "score-report.md"
-    write_residuals_jsonl(residuals, candidates, residuals_path, root=args.root)
-    write_headline_summary_json(
-        residuals,
-        args.root / "data" / "battery" / "score-summary.json",
-        context=context,
-        engines=engines,
-        root=args.root,
+    partial_path = residuals_path.with_name(residuals_path.name + ".partial")
+    payloads = _ResidualJsonlRows(
+        partial_path,
+        metadata=metadata,
     )
+    report_aggregate = metadata.aggregate
+    assert report_aggregate is not None
+    recorded = load_residuals_stamp(partial_path)
+    live = derive_store_stamp(args.root)
+    mismatch = emit_store_stamp_mismatch_warning(recorded, live)
 
     failures: list[dict] = []
     unmapped: list[str] = []
@@ -284,26 +296,37 @@ def main(argv: list[str] | None = None) -> int:
     if pins_file.is_file():
         loaded = load_pins(pins_file)
         key_map = loaded["key_map"]
-        failures = pin_failures(residuals, loaded["pin_band_records"])
+        failures = _pin_failures_from_payloads(
+            payloads,
+            loaded["pin_band_records"],
+        )
     diffs, unmapped = status_diff_rows(
         old_rows=load_legacy_score_rows(args.root),
-        new_rows=[residual_to_plain(residual) for residual in residuals],
+        new_rows=payloads,
         key_map=key_map,
     )
 
-    report = render_score_report(
-        residuals,
+    report = _render_score_report_from_payloads_legacy(
+        payloads,
         context=context,
         engines=engines if not args.studio else engines_from_names(args.engines.split(",")),
         pin_failures=failures,
         status_diff=diffs,
         unmapped_legacy_keys=unmapped,
         studio_hostname=studio_hostname,
-        root=args.root,
+        store_stamp=recorded,
+        _aggregate=report_aggregate,
+    )
+    _write_headline_summary_from_accumulator_json(
+        report_aggregate,
+        args.root / "data" / "battery" / "score-summary.json",
+        store_stamp=recorded,
     )
     report_path.write_text(report, encoding="utf-8")
+    scored = report_aggregate.scored_count
+    os.replace(partial_path, residuals_path)
     print(
-        f"residuals={len(residuals)} scored={sum(1 for r in residuals if r.score_eligible)} "
+        f"residuals={written} scored={scored} "
         f"pin_failures={len(failures)} host={context.hostname}"
     )
     return 0
