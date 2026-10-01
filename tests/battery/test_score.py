@@ -2252,6 +2252,37 @@ def test_vapour_rail_is_only_vapour_pressures() -> None:
     assert no_headline_rail_reason(Quantity.VISCOSITY) == "no_headline_rail:viscosity"
 
 
+def test_residue_composition_has_its_own_rail_and_typed_engine_refusal() -> None:
+    from simulator.battery.score import (
+        ENGINE_CHANNELS,
+        metric_operation,
+        predict_with_engine,
+        rail_for_quantity,
+    )
+
+    identity = replace(
+        F.psat_identity("Gd"),
+        quantity=Quantity.RESIDUE_COMPONENT_COMPOSITION,
+    )
+    observation = F.observation(
+        "gd-residue-composition",
+        "sossi-residue-composition",
+        identity,
+        Decimal("759.6"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="kems-012-sossi-2019",
+    )
+
+    assert rail_for_quantity(Quantity.RESIDUE_COMPONENT_COMPOSITION) is Rail.RESIDUE_COMPOSITION
+    assert metric_operation(Quantity.RESIDUE_COMPONENT_COMPOSITION) is MetricOperation.ABSOLUTE
+    for engine in ENGINE_CHANNELS:
+        prediction = predict_with_engine(engine, observation)
+        assert prediction.execution.state is ExecutionState.UNSUPPORTED
+        assert prediction.refusal_reason is RefusalReason.UNSUPPORTED
+        assert prediction.refusal_detail["reason"] == "quantity_not_predicted"
+        assert prediction.refusal_detail["quantity"] == "residue_component_composition"
+
+
 def test_non_alkali_alpha_is_refused_with_no_rail() -> None:
     ident = replace(
         F.psat_identity("Zn"), quantity=Quantity.EVAPORATION_COEFFICIENT_ALPHA

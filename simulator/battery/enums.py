@@ -36,7 +36,7 @@ class Engine(StrEnum):
 
 
 class Rail(StrEnum):
-    """Eight owner-bound residual reporting rails (v2.1 guard_09_05)."""
+    """Owner-bound residual reporting rails."""
 
     VAPOUR = "vapour"
     MELT_ACTIVITY = "melt_activity"
@@ -46,6 +46,7 @@ class Rail(StrEnum):
     WALL_DEPOSITION = "wall_deposition"
     REDOX = "redox"
     ALKALI_SHUTTLE = "alkali_shuttle"
+    RESIDUE_COMPOSITION = "residue_composition"
 
 
 class Quantity(StrEnum):
@@ -88,6 +89,7 @@ class Quantity(StrEnum):
     EVOLVED_GAS_YIELD = "evolved_gas_yield"
     ION_INTENSITY = "ion_intensity"
     INTERACTION_PARAMETER = "interaction_parameter"
+    RESIDUE_COMPONENT_COMPOSITION = "residue_component_composition"
 
 
 class EvidenceClass(StrEnum):
@@ -469,6 +471,7 @@ QUANTITY_UNITS: dict[Quantity, str] = {
     Quantity.EVOLVED_GAS_YIELD: "mol_species_per_initial_kg",
     Quantity.ION_INTENSITY: "subtype_defined",
     Quantity.INTERACTION_PARAMETER: "subtype_defined",
+    Quantity.RESIDUE_COMPONENT_COMPOSITION: "subtype_defined",
 }
 
 MEASURED_EVIDENCE = frozenset(
