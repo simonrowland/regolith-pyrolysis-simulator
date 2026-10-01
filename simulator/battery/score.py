@@ -1634,7 +1634,8 @@ def _residual_distribution_band(
 
     Center at the sample median, then estimate MAD as the sample median of
     absolute deviations from that center (no normal-consistency multiplier).
-    The band is twice that estimator; it is not centered on zero.
+    The band's width is twice that estimator; membership is tested against
+    zero using ``abs(residual) <= width``.
     """
 
     if len(values) < MIN_DERIVED_BAND_N:
@@ -3863,7 +3864,7 @@ def diagnostic_references(context: ScoreContext) -> tuple[Observation, ...]:
     return tuple(sorted(out, key=lambda o: o.observation_id))
 
 
-def score_store(
+def _score_store_with_decisions(
     context: ScoreContext,
     *,
     engines: Sequence[Engine] | None = None,
@@ -3873,7 +3874,7 @@ def score_store(
     include_diagnostics: bool = True,
     predict: Callable[..., EnginePrediction] | None = None,
     handles: Mapping[str, object] | None = None,
-) -> tuple[tuple[Residual, ...], dict[str, Observation]]:
+) -> tuple[tuple[Residual, ...], dict[str, Observation], list[dict[str, object]]]:
     engine_set = (
         _validated_score_engines(tuple(engines))
         if engines is not None
@@ -4042,7 +4043,11 @@ def score_store(
     family_residuals: dict[tuple[str, Quantity, str, str], list[Decimal]] = {}
     for residual in residuals:
         family_quantity = compilation_family_by_reference.get(residual.reference)
-        if residual.numeric is None or family_quantity is None:
+        if (
+            residual.numeric is None
+            or residual.status is ResidualStatus.REFUSED
+            or family_quantity is None
+        ):
             continue
         if residual.numeric.decision_band is not None and residual.numeric.decision_band.rule == "source-printed per-cell uncertainty":
             continue
@@ -4068,6 +4073,7 @@ def score_store(
         numeric = residual.numeric
         if (
             numeric is None
+            or residual.status is ResidualStatus.REFUSED
             or family_quantity is None
             or (
                 numeric.decision_band is not None
@@ -4122,7 +4128,34 @@ def score_store(
             r.key,
         )
     )
-    return tuple(residuals), candidates
+    scored = tuple(residuals)
+    return scored, candidates, _compilation_decision_strata(scored, context)
+
+
+def score_store(
+    context: ScoreContext,
+    *,
+    engines: Sequence[Engine] | None = None,
+    rail: Rail | None = None,
+    work_id: str | None = None,
+    limit: int | None = None,
+    include_diagnostics: bool = True,
+    predict: Callable[..., EnginePrediction] | None = None,
+    handles: Mapping[str, object] | None = None,
+) -> tuple[tuple[Residual, ...], dict[str, Observation]]:
+    """Score the store and keep the historical residual/candidate return shape."""
+
+    residuals, candidates, _decision_strata = _score_store_with_decisions(
+        context,
+        engines=engines,
+        rail=rail,
+        work_id=work_id,
+        limit=limit,
+        include_diagnostics=include_diagnostics,
+        predict=predict,
+        handles=handles,
+    )
+    return residuals, candidates
 
 
 def residual_to_plain(
@@ -4344,6 +4377,14 @@ def _median(values: Sequence[Decimal]) -> Decimal | None:
     return (ordered[mid - 1] + ordered[mid]) / Decimal(2)
 
 
+def _bias_to_scatter_ratio(
+    signed_median: Decimal | None, mad: Decimal | None, n: int
+) -> Decimal | None:
+    if signed_median is None or mad is None or mad == 0 or n < MIN_DERIVED_BAND_N:
+        return None
+    return abs(signed_median) / mad
+
+
 def _rms(values: Sequence[Decimal]) -> Decimal | None:
     if not values:
         return None
@@ -4415,6 +4456,12 @@ def _compilation_decision_strata(
     strata: dict[tuple[str, str, str, str], list[Residual]] = defaultdict(list)
     derived_n: dict[tuple[str, str, str], int] = defaultdict(int)
     for residual in residuals:
+        if residual.numeric is None or residual.status is ResidualStatus.REFUSED or any(
+            _is_flagged_stratum_notice(notice)
+            or _is_fusion_conversion_notice(notice)
+            for notice in residual.notices
+        ):
+            continue
         observation = compilation_row_observation(
             residual.reference, context.observations, context.origins
         )
@@ -4478,6 +4525,11 @@ def _compilation_decision_strata(
             "n": len(values),
             "signed_median_residual": None if center is None else str(center),
             "mad": None if mad is None else str(mad),
+            "bias_to_scatter_ratio": (
+                None
+                if (ratio := _bias_to_scatter_ratio(center, mad, len(values))) is None
+                else str(ratio)
+            ),
             "max_abs_residual": None if not values else str(max(abs(value) for value in values)),
             "band_value": widths[0] if len(widths) == 1 else widths,
             "unit": units[0] if len(units) == 1 else units or QUANTITY_UNITS[Quantity(quantity)],
@@ -4485,6 +4537,7 @@ def _compilation_decision_strata(
             "band_derived_n": band_n[0] if len(band_n) == 1 else band_n,
             "match_count": sum(1 for r in bucket if r.status is ResidualStatus.MATCH),
             "mismatch_count": sum(1 for r in bucket if r.status is ResidualStatus.MISMATCH),
+            "no_band_count": sum(1 for r in bucket if r.status is ResidualStatus.NO_BAND),
             "tail_in_count": tail_in,
             "tail_out_count": tail_out,
             "no_band_reason": "derived_band_insufficient_n" if not bands and 0 < derived_n[(family, quantity, engine)] < MIN_DERIVED_BAND_N else None,
@@ -4617,7 +4670,14 @@ def headline_rows(
         row = _headline_metric_row(rail, engine, bucket, tier=tier)
         row["decision_strata"] = (
             _compilation_decision_strata(
-                [r for r in tier_residuals if _engine_of(r) == engine], context
+                [
+                    r
+                    for r in tier_residuals
+                    if _engine_of(r) == engine
+                    and r.rail is not None
+                    and r.rail.value == rail
+                ],
+                context,
             )
             if tier == "compilation"
             else []
@@ -5405,7 +5465,10 @@ def headline_payload_records(
             compilation_row_observation,
         )
 
-        payload_groups: dict[tuple[str, str, str, str], list[tuple[Decimal, DecisionBand | None, str]]] = defaultdict(list)
+        payload_groups: dict[
+            tuple[str, str, str, str, str],
+            list[tuple[Decimal, DecisionBand | None, str]],
+        ] = defaultdict(list)
         derived_ns: dict[tuple[str, str, str], int] = defaultdict(int)
         for row in compilation_rows:
             reference = str(row.get("reference") or "")
@@ -5423,23 +5486,33 @@ def headline_payload_records(
             family = compilation_family(observation.source_id, compilation_origin(reference, origins))
             relation = str(row.get("source_relation") or SourceRelation.UNKNOWN.value)
             key = (family, quantity.value, engine)
+            if str(row.get("status") or "") == ResidualStatus.REFUSED.value:
+                continue
             band_data = numeric.get("decision_band")
             band = None if not isinstance(band_data, Mapping) else DecisionBand(
                 as_decimal(band_data["value"]), str(band_data["unit"]), str(band_data["rule"])
             )
             flagged = bool(_flagged_payload_strata(row))
+            if flagged:
+                continue
             if band is None and not flagged:
                 derived_ns[key] += 1
-            payload_groups[(*key, relation)].append((as_decimal(numeric["value"]), band, str(row.get("status") or "")))
+            rail = str(row.get("rail") or "")
+            payload_groups[(*key, relation, rail)].append(
+                (as_decimal(numeric["value"]), band, str(row.get("status") or ""))
+            )
         for record in records:
             if record.get("tier") != "compilation":
                 continue
             engine = str(record["engine"])
+            rail = str(record["rail"])
             grouped = [
-                (key, values) for key, values in payload_groups.items() if key[2] == engine
+                (key, values)
+                for key, values in payload_groups.items()
+                if key[2] == engine and key[4] == rail
             ]
             strata = []
-            for (family, quantity, _engine, relation), values in sorted(grouped):
+            for (family, quantity, _engine, relation, _rail), values in sorted(grouped):
                 residuals = [value for value, _band, _status in values]
                 center = _median(residuals)
                 mad = None if center is None else _median([abs(value - center) for value in residuals])
@@ -5472,12 +5545,21 @@ def headline_payload_records(
                     "n": len(residuals),
                     "signed_median_residual": None if center is None else str(center),
                     "mad": None if mad is None else str(mad),
+                    "bias_to_scatter_ratio": (
+                        None
+                        if (ratio := _bias_to_scatter_ratio(center, mad, len(residuals))) is None
+                        else str(ratio)
+                    ),
                     "max_abs_residual": None if not residuals else str(max(abs(value) for value in residuals)),
                     "band_value": widths[0] if len(widths) == 1 else widths,
                     "unit": units[0] if len(units) == 1 else units or QUANTITY_UNITS[Quantity(quantity)],
                     "band_kind": kinds[0] if len(kinds) == 1 else kinds,
                     "band_derived_n": derived_n[0] if len(derived_n) == 1 else derived_n,
                     "match_count": matches, "mismatch_count": mismatches,
+                    "no_band_count": sum(
+                        status == ResidualStatus.NO_BAND.value
+                        for _value, _band, status in values
+                    ),
                     "tail_in_count": tail_in if derived else None,
                     "tail_out_count": tail_out if derived else None,
                     "no_band_reason": "derived_band_insufficient_n" if not bands and 0 < derived_ns[(family, quantity, engine)] < MIN_DERIVED_BAND_N else None,

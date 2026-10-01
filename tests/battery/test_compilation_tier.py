@@ -373,8 +373,8 @@ def test_zero_kelvin_row_does_not_blank_later_series_points() -> None:
 
 def test_census_keeps_unknown_relation_decision_when_band_exists(monkeypatch) -> None:
     from simulator.battery import score as score_module
-    from simulator.battery.compilation_tier import ThermoAttempt, compilation_tier_census
-    from simulator.battery.records import Derivation, Locator
+    from simulator.battery.compilation_tier import compilation_tier_census
+    from simulator.battery.records import Derivation, Execution, Locator
 
     experiment = F.tabulation_experiment()
     identity = replace(
@@ -406,18 +406,21 @@ def test_census_keeps_unknown_relation_decision_when_band_exists(monkeypatch) ->
         "resolve_source_relation",
         lambda *args, **kwargs: SourceRelation.UNKNOWN,
     )
-    monkeypatch.setattr(
-        "simulator.battery.compilation_tier.predict_thermo_attempt",
-        lambda engine, obs, **kwargs: ThermoAttempt(
+    def predict(engine, obs, **kwargs):
+        del kwargs
+        return EnginePrediction(
+            engine=engine,
+            channel=score_module.ENGINE_CHANNELS[engine],
+            execution=Execution(ExecutionState.PRODUCED, "test"),
             value=obs.value.point + Decimal("1"),
             unit="J_per_declared_mol_basis_per_K",
             authority=Authority.CERTIFIED,
-            notices=(),
-            refusal_reason=None,
-            refusal_detail={},
-            call_evidence="test",
-        ),
-    )
+            coefficient_sources=("unmapped-test-source",),
+            lineage_complete=False,
+            identity=obs.identity,
+        )
+
+    monkeypatch.setattr(score_module, "predict_with_engine", predict)
     out = compilation_tier_census(
         _context(observation),
         engines=(Engine.INTERNAL_ANALYTICAL,),
@@ -444,8 +447,276 @@ def test_census_keeps_unknown_relation_decision_when_band_exists(monkeypatch) ->
     assert no_band["n"] == 1
     assert no_band["signed_median_residual"] == "1"
     assert no_band["mad"] == "0"
+    assert no_band["bias_to_scatter_ratio"] is None
     assert no_band["max_abs_residual"] == "1"
     assert no_band["tail_in_count"] is None
+
+
+def test_census_strata_use_scorer_pool_for_refusals_and_observation_flags(monkeypatch) -> None:
+    from simulator.battery import score as score_module
+    from simulator.battery.compilation_tier import ThermoAttempt, compilation_tier_census
+    from simulator.battery.records import Execution, Notice
+    from simulator.battery.score import score_store
+    from simulator.battery.validity import GateOutcome
+
+    monkeypatch.setattr(score_module, "run_validity_gates", lambda *args, **kwargs: GateOutcome(True))
+    monkeypatch.setattr(
+        "simulator.battery.validity.run_validity_gates",
+        lambda *args, **kwargs: GateOutcome(True),
+    )
+    monkeypatch.setattr(score_module, "resolve_source_relation", lambda *args, **kwargs: SourceRelation.UNKNOWN)
+    experiment = F.tabulation_experiment()
+    identity = replace(
+        _na2o_liquid(Quantity.CP),
+        reaction=State.not_applicable("not a formation quantity"),
+        formation_elements=State.not_applicable("not a formation quantity"),
+    )
+    offsets = [Decimal(value) for value in range(10)] + [Decimal("100"), Decimal("100")]
+    observations = []
+    for index, offset in enumerate(offsets):
+        observation = F.observation(
+            f"shared-pool-{index}",
+            experiment.experiment_id,
+            identity,
+            Decimal(10 + index),
+            evidence=EvidenceClass.COMPILATION_ASSESSED,
+            source_id="janaf-4th",
+        )
+        if index == 11:
+            observation = replace(
+                observation,
+                notices=(
+                    Notice(
+                        kind=NoticeKind.UNVERIFIED_APPARATUS,
+                        affected_quantities=(Quantity.CP,),
+                        reason="apparatus_unverified:test",
+                        origin=observation.observation_id,
+                    ),
+                ),
+            )
+        observations.append(observation)
+    context = _context(*observations)
+    offset_by_id = {
+        observation.observation_id: offset
+        for observation, offset in zip(observations, offsets)
+    }
+
+    def predict(engine, observation, **kwargs):
+        del kwargs
+        candidate_identity = observation.identity
+        if observation.observation_id == observations[10].observation_id:
+            candidate_identity = replace(
+                candidate_identity,
+                species=Species("MgO", Phase.L),
+            )
+        return EnginePrediction(
+            engine=engine,
+            channel=score_module.ENGINE_CHANNELS[engine],
+            execution=Execution(ExecutionState.PRODUCED, "test prediction"),
+            value=observation.value.point + offset_by_id[observation.observation_id],
+            unit="J_per_declared_mol_basis_per_K",
+            authority=Authority.CERTIFIED,
+            coefficient_sources=("unmapped-test-source",),
+            lineage_complete=False,
+            identity=candidate_identity,
+        )
+
+    monkeypatch.setattr(score_module, "predict_with_engine", predict)
+    monkeypatch.setattr(
+        "simulator.battery.compilation_tier.predict_thermo_attempt",
+        lambda engine, obs, **kwargs: ThermoAttempt(
+            value=obs.value.point + offset_by_id[obs.observation_id],
+            unit="J_per_declared_mol_basis_per_K",
+            authority=Authority.CERTIFIED,
+            notices=(),
+            refusal_reason=None,
+            refusal_detail={},
+            call_evidence="test",
+        ),
+    )
+    residuals, _ = score_store(
+        context,
+        engines=(Engine.INTERNAL_ANALYTICAL,),
+        predict=predict,
+    )
+    identity_refusal = next(
+        residual for residual in residuals if residual.reference == observations[10].observation_id
+    )
+    flagged = next(
+        residual for residual in residuals if residual.reference == observations[11].observation_id
+    )
+    assert identity_refusal.status is ResidualStatus.REFUSED
+    assert flagged.status is ResidualStatus.NO_BAND
+    assert any(notice.kind is NoticeKind.UNVERIFIED_APPARATUS for notice in flagged.notices)
+    scorer_stratum = score_module._compilation_decision_strata(residuals, context)[0]
+
+    census = compilation_tier_census(
+        context,
+        engines=(Engine.INTERNAL_ANALYTICAL,),
+        audit_compile_residual=False,
+    )
+    census_stratum = census["rows"][0]["decision_strata"][0]
+    for key in (
+        "n",
+        "signed_median_residual",
+        "band_value",
+        "bias_to_scatter_ratio",
+        "match_count",
+    ):
+        assert census_stratum[key] == scorer_stratum[key]
+    assert census_stratum["n"] == 10
+    assert census_stratum["signed_median_residual"] == "4.5"
+    assert census_stratum["bias_to_scatter_ratio"] == "1.8"
+    assert census_stratum["band_value"] == "5.0"
+    assert census_stratum["match_count"] == 6
+
+
+def test_census_decision_counters_partition_same_source_no_band_rows(monkeypatch) -> None:
+    from simulator.battery import score as score_module
+    from simulator.battery.compilation_tier import compilation_tier_census
+    from simulator.battery.records import Execution
+    from simulator.battery.validity import GateOutcome
+
+    monkeypatch.setattr(score_module, "run_validity_gates", lambda *args, **kwargs: GateOutcome(True))
+    monkeypatch.setattr(score_module, "resolve_source_relation", lambda *args, **kwargs: SourceRelation.SAME_INPUT)
+    experiment = F.tabulation_experiment()
+    identity = replace(
+        _na2o_liquid(Quantity.CP),
+        reaction=State.not_applicable("not a formation quantity"),
+        formation_elements=State.not_applicable("not a formation quantity"),
+    )
+    observation = F.observation(
+        "same-source-no-band",
+        experiment.experiment_id,
+        identity,
+        Decimal("10"),
+        evidence=EvidenceClass.COMPILATION_ASSESSED,
+        source_id="janaf-4th",
+    )
+
+    def predict(engine, reference, **kwargs):
+        del kwargs
+        return EnginePrediction(
+            engine=engine,
+            channel=score_module.ENGINE_CHANNELS[engine],
+            execution=Execution(ExecutionState.PRODUCED, "test prediction"),
+            value=reference.value.point + Decimal("1"),
+            unit="J_per_declared_mol_basis_per_K",
+            authority=Authority.CERTIFIED,
+            coefficient_sources=("unmapped-test-source",),
+            lineage_complete=False,
+            identity=reference.identity,
+        )
+
+    monkeypatch.setattr(score_module, "predict_with_engine", predict)
+    row = compilation_tier_census(
+        _context(observation),
+        engines=(Engine.INTERNAL_ANALYTICAL,),
+        audit_compile_residual=False,
+    )["rows"][0]
+    assert row["numeric"] == 1
+    assert row["no_band"] == 1
+    assert row["same_source"] == 0
+    assert row["independent"] == 0
+    assert row["unknown"] == 0
+    assert row["no_band"] + row["same_source"] + row["independent"] + row["unknown"] == row["numeric"]
+    stratum = row["decision_strata"][0]
+    assert stratum["n"] == 1
+    assert stratum["no_band_count"] + stratum["match_count"] + stratum["mismatch_count"] == stratum["n"]
+
+
+def test_headline_decision_strata_are_scoped_to_each_rail() -> None:
+    from simulator.battery.enums import MetricOperation, Rail
+    from simulator.battery.records import DecisionBand, ResidualNumeric
+    from simulator.battery.score import headline_payload_records, residual_to_plain
+
+    experiment = F.tabulation_experiment()
+    cp = replace(
+        _na2o_liquid(Quantity.CP),
+        reaction=State.not_applicable("not a formation quantity"),
+        formation_elements=State.not_applicable("not a formation quantity"),
+    )
+    cp_observation = F.observation(
+        "headline-cp-compilation",
+        experiment.experiment_id,
+        cp,
+        Decimal("100"),
+        evidence=EvidenceClass.COMPILATION_ASSESSED,
+        source_id="janaf-4th",
+    )
+    psat_observation = F.observation(
+        "headline-psat-compilation",
+        experiment.experiment_id,
+        F.psat_identity("Na"),
+        Decimal("101325"),
+        evidence=EvidenceClass.COMPILATION_ASSESSED,
+        source_id="janaf-4th",
+    )
+    context = _context(cp_observation, psat_observation)
+    cp_residual = F.residual(
+        "cp::thermochemistry::internal-analytical",
+        cp_observation.observation_id,
+        candidate="engine-cp",
+        status=ResidualStatus.MATCH,
+        rail=Rail.THERMOCHEMISTRY,
+        quantity=Quantity.CP,
+        numeric=ResidualNumeric(
+            operation=MetricOperation.ABSOLUTE,
+            unit="J_per_declared_mol_basis_per_K",
+            value=Decimal("1"),
+            decision_band=DecisionBand(
+                Decimal("2"),
+                "J_per_declared_mol_basis_per_K",
+                "compilation/cp residual distribution: 2x median absolute deviation; derived_n=10",
+            ),
+        ),
+    )
+    psat_residual = F.residual(
+        "psat::vapour::internal-analytical",
+        psat_observation.observation_id,
+        candidate="engine-psat",
+        status=ResidualStatus.MATCH,
+        rail=Rail.VAPOUR,
+        quantity=Quantity.P_SAT,
+        numeric=ResidualNumeric(
+            operation=MetricOperation.ABSOLUTE,
+            unit="Pa",
+            value=Decimal("1"),
+            decision_band=DecisionBand(
+                Decimal("2"), "Pa", "compilation/p_sat residual distribution; derived_n=10"
+            ),
+        ),
+    )
+    residuals = (cp_residual, psat_residual)
+    headlines = headline_rows(
+        residuals,
+        context=context,
+        engines=(Engine.INTERNAL_ANALYTICAL,),
+        tier="compilation",
+    )
+    by_rail = {
+        row["rail"]: {stratum["quantity"] for stratum in row["decision_strata"]}
+        for row in headlines
+        if row["engine"] == Engine.INTERNAL_ANALYTICAL.value
+    }
+    assert by_rail[Rail.THERMOCHEMISTRY.value] == {Quantity.CP.value}
+    assert by_rail[Rail.VAPOUR.value] == {Quantity.P_SAT.value}
+
+    payload_rows = [residual_to_plain(residual) for residual in residuals]
+    payload_headlines = headline_payload_records(
+        payload_rows,
+        engines=(Engine.INTERNAL_ANALYTICAL,),
+        observations=context.observations,
+        origins=context.origins,
+    )
+    payload_by_rail = {
+        row["rail"]: {stratum["quantity"] for stratum in row["decision_strata"]}
+        for row in payload_headlines
+        if row["engine"] == Engine.INTERNAL_ANALYTICAL.value
+        and row["tier"] == "compilation"
+    }
+    assert payload_by_rail[Rail.THERMOCHEMISTRY.value] == {Quantity.CP.value}
+    assert payload_by_rail[Rail.VAPOUR.value] == {Quantity.P_SAT.value}
 
 
 def test_non_positive_temperature_is_a_refusal_not_an_exception() -> None:
@@ -634,7 +905,7 @@ def test_compilation_tier_is_beside_measured_and_same_source_is_flagged() -> Non
     )[0]
     assert "implementation fidelity, not" in compilation_report
     assert (
-        "| compilation | rail | engine | relation | quantity | unit | n | signed median residual | MAD | max |residual| | median abs residual | "
+        "| compilation | rail | engine | relation | quantity | unit | n | signed median residual | MAD | bias-to-scatter ratio | max |residual| | median abs residual | "
         "RMS residual | band value | band kind | band derived n | no-band reason | band-kind-specific matches / tail-in | "
         "band-kind-specific mismatches / tail-out | n no band | n same-source |"
     ) in compilation_report
@@ -650,10 +921,11 @@ def test_compilation_tier_is_beside_measured_and_same_source_is_flagged() -> Non
         )
     )
     summary_cells = [cell.strip() for cell in summary.strip("|").split("|")]
+    assert "|residual| ≤ band width." in compilation_report
     assert summary_cells[5] == "kJ/mol"
     assert summary_cells[6] == "1"
     assert summary_cells[7] == str(residual.numeric.value)
-    assert summary_cells[16:] == ["legacy_fallback match=1", "legacy_fallback mismatch=0", "0", "1"]
+    assert summary_cells[17:] == ["legacy_fallback match=1", "legacy_fallback mismatch=0", "0", "1"]
     assert compilation_family("ATcT.yaml", None) == "ATcT"
     measured = [
         row
