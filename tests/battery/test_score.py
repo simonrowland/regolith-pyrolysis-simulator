@@ -3906,7 +3906,7 @@ def test_admitted_model_derived_rows_emit_residuals_per_imcc_engine() -> None:
     allibert_activities = {
         key
         for key, obs in observations.items()
-        if "allibert" in key.casefold()
+        if obs.source_id == "kems-051-allibert-1981"
         and isinstance(obs.identity, Identity)
         and quantity_token(obs.identity) is Quantity.ACTIVITY
     }
@@ -3919,14 +3919,24 @@ def test_admitted_model_derived_rows_emit_residuals_per_imcc_engine() -> None:
     stolyarova_activities = {
         key
         for key, obs in observations.items()
-        if "stolyarova" in key.casefold()
+        if obs.source_id == "kems-053-stolyarova-1991"
         and isinstance(obs.identity, Identity)
         and quantity_token(obs.identity) is Quantity.ACTIVITY
     }
     stolyarova_derived_pressures = {
         key
         for key, obs in observations.items()
-        if "stolyarova" in key.casefold()
+        if obs.source_id == "kems-053-stolyarova-1991"
+        and isinstance(obs.identity, Identity)
+        and quantity_token(obs.identity) is Quantity.P_PARTIAL
+        and obs.admission.status is AdmissionStatus.ADMITTED
+        and obs.evidence.class_.is_value
+        and obs.evidence.class_.value is EvidenceClass.MODEL_DERIVED
+    }
+    stolyarova_1995_derived_pressures = {
+        key
+        for key, obs in observations.items()
+        if obs.source_id == "stolyarova-1995-cao-alumina-kems"
         and isinstance(obs.identity, Identity)
         and quantity_token(obs.identity) is Quantity.P_PARTIAL
         and obs.admission.status is AdmissionStatus.ADMITTED
@@ -3936,23 +3946,29 @@ def test_admitted_model_derived_rows_emit_residuals_per_imcc_engine() -> None:
     kems_model_derived = {
         key
         for key, obs in observations.items()
-        if any(
-            source in key.casefold()
-            for source in ("kems-ms2000-044", "kems-012-sossi-2019")
-        )
+        if obs.source_id in {"kems-ms2000-044", "kems-012-sossi-2019"}
         and obs.admission.status is AdmissionStatus.ADMITTED
         and obs.evidence.class_.is_value
         and obs.evidence.class_.value is EvidenceClass.MODEL_DERIVED
     }
     headline_diagnostic_references = (
-        stolyarova_activities | stolyarova_derived_pressures | kems_model_derived
+        stolyarova_activities
+        | stolyarova_derived_pressures
+        | stolyarova_1995_derived_pressures
+        | kems_model_derived
     )
     assert len(allibert_admitted) == 16
     assert len(allibert_rejected) == 55
     assert len(stolyarova_activities) == 54
     assert len(stolyarova_derived_pressures) == 9
+    # Eqn 1 p_O (9), Eqn 2 p_O (8), and calculated p_O2 (9) are model-derived,
+    # not measured pressures (review, Derived O / O2).
+    assert len(stolyarova_1995_derived_pressures) == 26
     assert len(kems_model_derived) == 28
-    assert len(headline_diagnostic_references) == 91
+    assert len(
+        stolyarova_activities | stolyarova_derived_pressures | kems_model_derived
+    ) == 91
+    assert len(headline_diagnostic_references) == 117
     assert admitted_model_derived == (
         allibert_admitted | headline_diagnostic_references
     )
@@ -4059,16 +4075,16 @@ def test_admitted_model_derived_rows_emit_residuals_per_imcc_engine() -> None:
             headline_payloads(payload_rows, (engine,), tier="measured")
         )
 
-    def engine_rows(token: str, engine: Engine):
+    def engine_rows(source_ids: set[str], engine: Engine):
         return [
             residual
             for residual in residuals
-            if token in residual.reference.casefold()
+            if observations[residual.reference].source_id in source_ids
             and residual.key.rsplit("::", 1)[-1] == engine.value
         ]
 
     for engine in engines:
-        allibert_rows = engine_rows("allibert", engine)
+        allibert_rows = engine_rows({"kems-051-allibert-1981"}, engine)
         assert len(allibert_rows) == 16
         assert {row.reference for row in allibert_rows} == allibert_admitted
         assert all(row.status is ResidualStatus.REFUSED for row in allibert_rows)
@@ -4101,8 +4117,11 @@ def test_admitted_model_derived_rows_emit_residuals_per_imcc_engine() -> None:
         )
         assert not any(row.reference in allibert_rejected for row in residuals)
 
-        stolyarova_rows = engine_rows("stolyarova", engine)
-        assert len(stolyarova_rows) == 130
+        stolyarova_rows = engine_rows(
+            {"kems-053-stolyarova-1991", "stolyarova-1995-cao-alumina-kems"},
+            engine,
+        )
+        assert len(stolyarova_rows) == 180
         activity_rows = [
             row for row in stolyarova_rows if row.reference in stolyarova_activities
         ]
@@ -4113,6 +4132,12 @@ def test_admitted_model_derived_rows_emit_residuals_per_imcc_engine() -> None:
         ]
         assert len(activity_rows) == 54
         assert len(derived_pressure_rows) == 9
+        stolyarova_1995_rows = [
+            row
+            for row in stolyarova_rows
+            if row.reference in stolyarova_1995_derived_pressures
+        ]
+        assert len(stolyarova_1995_rows) == 26
         assert all(row.status is ResidualStatus.REFUSED for row in stolyarova_rows)
         assert all(row.status is ResidualStatus.REFUSED for row in activity_rows)
         assert all(
@@ -4131,6 +4156,7 @@ def test_admitted_model_derived_rows_emit_residuals_per_imcc_engine() -> None:
             for row in activity_rows
         )
         assert all(not row.score_eligible for row in stolyarova_rows)
+        assert all(row.status is ResidualStatus.REFUSED for row in stolyarova_1995_rows)
 
 
 def test_allibert_xcao_0_80_rows_refuse_bulk_not_liquid_composition(tmp_path: Path) -> None:
