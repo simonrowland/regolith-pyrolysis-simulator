@@ -6593,11 +6593,8 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 'missing_oxygen_reservoir',
                 'SSO-R interface requires a typed oxygen reservoir state',
             )
-        transport_pO2_bar = self._vapor_pressure_transport_pO2_bar()
-        self._apply_oxygen_interface_diagnostic(
-            reservoir,
-            transport_pO2_bar=transport_pO2_bar,
-        )
+        # G8: vapour must consume this hour's committed exchange, not re-solve
+        # a fresh two-film root from the post-commit ledger.
         return float(reservoir.interface_pO2_bar)
 
     def _vapor_pressure_dispatch_pO2_bar(self) -> float:
@@ -10545,15 +10542,16 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             )
             self._melt_redox_gate_authority_tick_hour = None
             gate_authority = self._establish_melt_redox_gate_authority_for_current_hour()
-        self._apply_oxygen_interface_diagnostic(
-            reservoir,
-            transport_pO2_bar=reservoir.headspace_transport_pO2_bar,
-            intrinsic_fO2_log=self._current_melt_redox_fO2_log(),
-        )
         if abs(transfer_mol) <= OXYGEN_RESERVOIR_NOOP_MOL:
             reservoir.interface_pO2_bar = max(
                 self._vacuum_floor_bar(),
                 float(reservoir.headspace_transport_pO2_bar),
+            )
+        else:
+            # Publish the accepted trajectory endpoint. A post-commit
+            # diagnostic root would describe a new, uncommitted exchange.
+            reservoir.interface_pO2_bar = float(
+                finite_transfer['interface_pO2_bar']
             )
         reservoir.exchange_o2_mol = transfer_mol
         reservoir.exchange_o2_kg = (

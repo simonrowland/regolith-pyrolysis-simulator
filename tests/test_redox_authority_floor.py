@@ -1077,6 +1077,83 @@ def _finite_gas_film(sim: PyrolysisSimulator) -> None:
     sim.melt.oxygen_reservoir.headspace_transport_pO2_bar = TRANSPORT_PO2_BAR
 
 
+def test_zero_exchange_vapour_reads_gas_without_a_fresh_interface_root(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    sim = _sim_with_oxides(feo_wt=10.0, fe2o3_wt=2.0, temperature_C=1400.0)
+    _set_melt_iron_oxides(sim, n_feo_mol=1.0, n_fe2o3_mol=0.2)
+    _finite_gas_film(sim)
+    melt_pO2 = 10.0 ** float(sim._melt_fO2_from_ledger())
+    gas_pO2 = sim.melt.oxygen_reservoir.headspace_transport_pO2_bar
+    assert melt_pO2 != gas_pO2
+    finite_state = sim._oxygen_interface_state(gas_pO2)
+    assert math.isfinite(float(finite_state["gas_side_k_m_s"]))
+    assert float(finite_state["gas_side_k_m_s"]) > 0.0
+
+    # Keep this reader test on the accepted zero-commit branch. The transport
+    # solver owns its own convergence threshold and is covered by later work.
+    monkeypatch.setattr(
+        sim,
+        "_oxygen_shadow_transfer",
+        lambda **_kwargs: {
+            "status": "ok",
+            "direction": "none:below_threshold",
+            "transfer_o2_mol": 0.0,
+            "interface_pO2_bar": float(finite_state["interface_pO2_bar"]),
+            "tau_hr": 0.0,
+        },
+    )
+
+    reservoir = sim._apply_oxygen_reservoir_exchange()
+    assert reservoir.exchange_o2_mol == 0.0
+    assert reservoir.interface_pO2_bar == reservoir.headspace_transport_pO2_bar
+
+    calls = 0
+    original_root = sim._oxygen_finite_interface_root
+
+    def counted_root(*args: Any, **kwargs: Any) -> dict[str, Any]:
+        nonlocal calls
+        calls += 1
+        return original_root(*args, **kwargs)
+
+    monkeypatch.setattr(sim, "_oxygen_finite_interface_root", counted_root)
+    before = calls
+    assert sim._interface_pO2_bar() == reservoir.headspace_transport_pO2_bar
+    assert calls == before
+
+
+def test_nonzero_exchange_vapour_reads_stored_endpoint_without_a_fresh_root(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    sim = _sim_with_oxides(feo_wt=10.0, fe2o3_wt=2.0, temperature_C=1400.0)
+    _set_melt_iron_oxides(sim, n_feo_mol=1.0, n_fe2o3_mol=0.2)
+    _finite_gas_film(sim)
+    sim.atom_ledger.load_external_mol(
+        "process.overhead_gas",
+        {"O2": 1.0},
+        source="test finite-film transport pressure",
+        material_origin="reagent",
+    )
+
+    reservoir = sim._apply_oxygen_reservoir_exchange()
+    assert abs(reservoir.exchange_o2_mol) > OXYGEN_RESERVOIR_NOOP_MOL
+    endpoint_pO2 = float(reservoir.shadow_oxygen_transfer["interface_pO2_bar"])
+    assert reservoir.interface_pO2_bar == endpoint_pO2
+
+    calls = 0
+    original_root = sim._oxygen_finite_interface_root
+
+    def counted_root(*args: Any, **kwargs: Any) -> dict[str, Any]:
+        nonlocal calls
+        calls += 1
+        return original_root(*args, **kwargs)
+
+    monkeypatch.setattr(sim, "_oxygen_finite_interface_root", counted_root)
+    before = calls
+    assert sim._interface_pO2_bar() == endpoint_pO2
+    assert calls == before
+
+
 def test_ferrous_free_interface_uses_saturated_drive_until_transfer_commits() -> None:
     """A zero commit publishes p_g while the lower bound supplies its 100 bar drive."""
 
