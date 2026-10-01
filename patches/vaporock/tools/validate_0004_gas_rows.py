@@ -44,6 +44,8 @@ FIELDS = (
     "H",
     "Ref",
 )
+GAS_CSV_PATH = "src/vaporock/data/JANAF-vapor-data-full.csv"
+PATCH_PATH = Path(__file__).resolve().parents[1] / "0004-gas-rows-from-openimcc-janaf.patch"
 EXCLUDED = {"Na2O(g)", "K2O(g)"}
 GAP_CHOICES = {
     "CaO(g)": "base",
@@ -126,6 +128,43 @@ def group_rows(rows: list[dict[str, str]]) -> dict[str, list[dict[str, str]]]:
     for row in rows:
         grouped[row["species_name"]].append(row)
     return dict(grouped)
+
+
+def patch_paths(path: Path) -> list[str]:
+    """Return every file the patch would touch, as git itself resolves it.
+
+    Git applies a hunk whether its file header is a ``diff --git`` line or a
+    plain ``---``/``+++`` pair (patch 0002 in this series uses the plain
+    form), so reading only ``diff --git`` headers misses real targets. The
+    authority is therefore ``git apply --numstat``, which parses the patch
+    exactly as ``git apply`` would. The ``+++`` headers are read as a second,
+    independent enumeration; the two must agree, so a header form that one
+    reader skips cannot hide a target.
+    """
+
+    numstat = subprocess.run(
+        ["git", "apply", "--numstat", str(path)],
+        check=True,
+        capture_output=True,
+        text=True,
+    ).stdout
+    applied = sorted(
+        {line.split("\t", 2)[2] for line in numstat.splitlines() if line.count("\t") >= 2}
+    )
+    headers = set()
+    for line in path.read_text(encoding="utf-8").splitlines():
+        if not line.startswith("+++ "):
+            continue
+        target = line[4:].split("\t", 1)[0].strip()
+        if target == "/dev/null":
+            continue
+        headers.add(target[2:] if target.startswith("b/") else target)
+    if sorted(headers) != applied:
+        raise ValueError(
+            f"{path}: '+++' headers {sorted(headers)} disagree with "
+            f"git apply --numstat {applied}"
+        )
+    return applied
 
 
 def numeric(row: dict[str, str], field: str) -> Decimal:
@@ -593,17 +632,28 @@ def main() -> int:
         base_rows, base_raw = read_csv(args.base_csv)
         candidate_rows, candidate_raw = read_csv(args.candidate_csv)
         source_rows, _ = read_csv(args.openimcc_csv)
+        touched_paths = patch_paths(PATCH_PATH)
     except (OSError, UnicodeError, ValueError, csv.Error) as exc:
         print(f"FAIL INPUT: {exc}")
         return 2
     base_groups = group_rows(base_rows)
     candidate_groups = group_rows(candidate_rows)
     source_groups = group_rows(source_rows)
-    imported_groups = {
-        species: rows for species, rows in source_groups.items() if species not in EXCLUDED
-    }
     base_species = set(base_groups)
+    imported_groups = {
+        species: rows
+        for species, rows in source_groups.items()
+        if species not in EXCLUDED and species in base_species
+    }
     candidate_species = set(candidate_groups)
+    report.check(
+        "I7",
+        touched_paths == [GAS_CSV_PATH] and candidate_species == base_species,
+        f"patch files={touched_paths}, expected={[GAS_CSV_PATH]}; "
+        f"base species={len(base_species)}, candidate species={len(candidate_species)}, "
+        f"added={sorted(candidate_species - base_species)}, "
+        f"deleted={sorted(base_species - candidate_species)}",
+    )
     missing = sorted(base_species - candidate_species)
     untouched = sorted(base_species - set(imported_groups))
     untouched_differences = [
@@ -625,7 +675,7 @@ def main() -> int:
         report.lines.append(f"  I2 detail: {problem}")
 
     janaf_points, reference_errors = load_janaf_points(
-        base_groups, source_groups, args.janaf_tables.resolve()
+        base_groups, imported_groups, args.janaf_tables.resolve()
     )
     for error in reference_errors:
         report.fail("I6", error)
@@ -744,7 +794,7 @@ def main() -> int:
     print(f"  declared-window coverage gains: {', '.join(declared_gains)}")
     print(
         f"PASS: {len(candidate_species)} species / {2 * len(probes)} whole-set evaluations; "
-        "I1–I6 satisfied"
+        "I1–I7 satisfied"
     )
     return 0
 

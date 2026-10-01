@@ -1,19 +1,20 @@
 0004-gas-rows-from-openimcc-janaf.patch
 =======================================
 
-Replace the 63 JANAF-fitted gas rows for 41 species using openimcc d2a7516
+Replace the JANAF-fitted gas rows for 35 species using openimcc d2a7516
 (src/openimcc/data/gas/gas-shomate.csv). Na2O(g) and K2O(g) are excluded:
 their openimcc provenance is LH84 plus NASA-Cp, not JANAF. Receipts:
 docs-private/research/2026-09-29-imcc-retirement/gas-table-receipts.md and
 docs-private/research/2026-10-01-vaporock-gas-0004/findings.md.
 
 The per-species imported window is the union of source intervals: 22 species
-have 500–1500 K and 1500–3000 K rows, 18 have only 1500–3000 K, and Cr(g)
+have 500–1500 K and 1500–3000 K rows, 12 have only 1500–3000 K rows, and Cr(g)
 has 1500–2900 K. Base rows are split at source bounds; existing coefficients
 remain outside imported windows except in the nine declared gaps below. Six
-source-only species (Nb, NbO, NbO2, V, VO, VO2) gain coverage. Prior effective
-behavior below 500 K is preserved for base species; this includes original
-large JANAF errors at low temperatures.
+source-only species are not imported because they have no parent oxide in
+VapoRock's melt model and cannot be used by its equilibrium engine. Prior
+effective behavior below 500 K is preserved for base species; this includes
+original large JANAF errors at low temperatures.
 
 Nine gaps use the fit having smaller maximum absolute error on the published
 JANAF grid strictly inside each gap, independent of seam jumps and battery
@@ -31,15 +32,11 @@ equals the species maximum to 1e8 K. The generated table has strict,
 contiguous intervals and unique extrema, so only each species' first row
 gets the lower extension and only its last row gets the upper extension.
 
-Nb/V gas rows require atomic masses in the existing map. Oxygen coefficient
-initialization skips a gas element with no parent melt oxide. These two
-internal changes let the configured Vapor(database="JANAF") construct and
-evaluate the whole species set.
-
 Based on VapoRock 0159678a after patches 0001–0003.
+diff --git a/src/vaporock/data/JANAF-vapor-data-full.csv b/src/vaporock/data/JANAF-vapor-data-full.csv
 --- a/src/vaporock/data/JANAF-vapor-data-full.csv
 +++ b/src/vaporock/data/JANAF-vapor-data-full.csv
-@@ -1,52 +1,144 @@
+@@ -1,52 +1,138 @@
  species_name,state,T_interval,cation,cat_num,oxy_num,T_min,T_max,A,B,C,D,E,F,G,H,Ref
 -O(g),g,1,,0,1,1000,3000,20.64313,0.2638286,-0.1708289,0.03796574,0.1402963,243.4458,186.6687,249.173,Fitted JANAF
 -O2(g),g,1,,0,2,700,2000,30.03235,8.772972,-3.988133,0.788313,-0.741599,-11.32468,236.1663,-48.593,JANAF
@@ -223,30 +220,3 @@ Based on VapoRock 0159678a after patches 0001–0003.
 +Co(g),g,2,Co,1,0,1500,3000,24.3334628692967,4.40171022820924,-2.20233209499101,0.319385312865899,-0.870162987301762,417.933016323793,206.319688128796,0,Co-005
 +Co(g),g,3,Co,1,0,3000,6000,20.480217,8.242199,-3.624190,0.504082,0.655469,423.537715,203.853011,0.000000,CEA_SHOMATE_FIT_t569
  NiO(g),g,1,Ni,1,1,1000.000,3000.000,37.145726,0.617012,-0.074933,0.008690,-0.830112,283.516700,272.094032,0.000000,CEA_SHOMATE_FIT_t569
-+Nb(g),g,1,Nb,1,0,1500,3000,40.5397920063068,-19.7958276787059,7.86033507471898,-0.856633951025123,-2.00802491553811,717.552498809248,235.701881866333,0,Nb-005
-+NbO(g),g,1,Nb,1,1,1500,3000,38.2063419640275,-0.106489773229331,-0.223265697771908,0.104713087955262,-1.78273238854477,183.041656322099,279.281709809099,0,Nb-011
-+NbO2(g),g,1,Nb,1,2,1500,3000,57.6602010632828,0.423386054956679,-0.127639520892688,0.0138671146882865,-2.28572431297795,-223.681771283647,332.812644614881,0,Nb-015
-+V(g),g,1,V,1,0,1500,3000,40.4734320023549,-14.7252953136433,4.19316869874628,-0.274112006772297,-4.57039547472753,493.837522830328,222.693791892025,0,V-005
-+VO(g),g,1,V,1,1,1500,3000,43.5983995995752,-5.5795888952999,1.73409242891195,-0.0941693699947594,-3.6966688748321,106.731188392487,274.753554409443,0,O-026
-+VO2(g),g,1,V,1,2,1500,3000,57.6602010632828,0.423386054956679,-0.127639520892688,0.0138671146882865,-2.28572431297795,-256.316771283647,325.160144614881,0,O-076
---- a/src/vaporock/equil.py
-+++ b/src/vaporock/equil.py
-@@ -455,6 +455,8 @@
-         'Mn':54.938,
-         'Ni':58.693,
-         'Co':58.933,
-+        'Nb':92.90638,
-+        'V':50.9415,
-     })
- 
-     def __init__(self, database):
-@@ -532,6 +534,9 @@
-         for metal in metals:
-             melt_component = melt_comps[melt_comps[metal]>0]
-             metal_species = species_comps[species_comps[metal]>0]
-+            if melt_component.empty:
-+                # Some JANAF gas elements have no parent in the melt oxides.
-+                continue
-             
-             melt_metal_coef = melt_component[metal].values[0]
-             melt_oxy_coef = melt_component['O'].values[0]
