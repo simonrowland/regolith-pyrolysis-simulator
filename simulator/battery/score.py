@@ -21,7 +21,7 @@ from collections import defaultdict
 from dataclasses import dataclass, field, replace
 from decimal import Decimal, InvalidOperation
 from pathlib import Path
-from typing import Callable, Iterable, Mapping, Sequence
+from typing import Any, Callable, Iterable, Mapping, Sequence
 
 from simulator.battery.enums import (
     QUANTITY_UNITS,
@@ -353,6 +353,7 @@ SCORE_ELIGIBLE_CONJUNCTS: tuple[str, ...] = (
 )
 
 FLAGGED_STRATUM_UNVERIFIED_APPARATUS = "unverified-apparatus"
+FLAGGED_STRATUM_CELL_MATERIAL_INFERRED = "cell-material-inferred"
 FLAGGED_STRATUM_CATALOGUE_COMPOSITION = "catalogue-composition"
 FLAGGED_STRATUM_SOURCE_INTERNALLY_INCONSISTENT = "source-internally-inconsistent"
 FLAGGED_STRATUM_IMCC_COMPLEX_SATURATION = "imcc_complex_saturation"
@@ -360,6 +361,7 @@ FLAGGED_STRATUM_REFERENCE_CONVERTED_VIA_FUSION = "reference_converted_via_fusion
 _FLAGGED_STRATUM_NOTICE_KINDS: frozenset[NoticeKind] = frozenset(
     {
         NoticeKind.UNVERIFIED_APPARATUS,
+        NoticeKind.CELL_MATERIAL_INFERRED,
         NoticeKind.COMPOSITION_FROM_SAMPLE_CATALOG,
         NoticeKind.IMCC_COMPLEX_SATURATION,
     }
@@ -873,11 +875,90 @@ def _flagged_stratum_notices(
     reference: Observation,
     experiment: Experiment | None,
     gates: GateOutcome,
+    bench: Bench | None = None,
 ) -> tuple[Notice, ...]:
     return union_notices(
         _unverified_apparatus_notices(reference, experiment, gates),
+        _cell_apparatus_inference_notices(reference, experiment, bench),
         (() if (notice := _catalogue_composition_notice(reference)) is None else (notice,)),
     )
+
+
+def _cell_apparatus_inference_notices(
+    reference: Observation,
+    experiment: Experiment | None,
+    bench: Bench | None,
+) -> tuple[Notice, ...]:
+    """Carry inferred values used by the reactive-cell and KEMS gates."""
+
+    if experiment is None or not experiment.method.is_value:
+        return ()
+    if experiment.method.value is not MethodToken.KNUDSEN_EFFUSION:
+        return ()
+    quantity = (
+        quantity_token(reference.identity)
+        if isinstance(reference.identity, Identity)
+        else None
+    )
+    if quantity is None:
+        return ()
+    fields: list[tuple[str, Located[Any]]] = []
+    uses_cell_material = (
+        quantity in _VAPOUR_EQUILIBRIUM
+        and not _has_printed_fo2(reference, reference.identity)
+    )
+    if bench is not None and uses_cell_material:
+        fields.extend(
+            (f"bench.cell_materials[{index}]", material)
+            for index, material in enumerate(bench.cell_materials or ())
+        )
+    pressure_environment = experiment.pressure_environment
+    knudsen_number = pressure_environment.regime.knudsen_number_orifice
+    if knudsen_number is not None:
+        fields.append(
+            (
+                "experiment.pressure_environment.regime.knudsen_number_orifice",
+                knudsen_number,
+            )
+        )
+    apparatus = experiment.apparatus
+    if apparatus is not None:
+        if apparatus.geometry is not None:
+            for name in (
+                "orifice_area_m2",
+                "orifice_diameter_m",
+                "clausing_factor",
+            ):
+                value = getattr(apparatus.geometry, name)
+                if value is not None:
+                    fields.append((f"experiment.apparatus.geometry.{name}", value))
+        fields.extend(
+            (f"experiment.apparatus.calibration.{name}", value)
+            for name, value in (apparatus.calibration or {}).items()
+        )
+    notices: list[Notice] = []
+    for field_name, located in fields:
+        if located.inference is None or not located.state.is_value:
+            continue
+        evidence = json.dumps(
+            {
+                "field": field_name,
+                "inference": to_plain(located.inference),
+                "locator": to_plain(located.locator),
+            },
+            ensure_ascii=False,
+            sort_keys=True,
+            separators=(",", ":"),
+        )
+        notices.append(
+            Notice(
+                kind=NoticeKind.CELL_MATERIAL_INFERRED,
+                affected_quantities=(quantity,),
+                reason=f"cell_material_inferred:{evidence}",
+                origin=reference.observation_id,
+            )
+        )
+    return tuple(notices)
 
 
 def flagged_strata(notices: Sequence[Notice]) -> tuple[str, ...]:
@@ -885,6 +966,8 @@ def flagged_strata(notices: Sequence[Notice]) -> tuple[str, ...]:
     kinds = {notice.kind for notice in notices}
     if NoticeKind.UNVERIFIED_APPARATUS in kinds:
         strata.append(FLAGGED_STRATUM_UNVERIFIED_APPARATUS)
+    if NoticeKind.CELL_MATERIAL_INFERRED in kinds:
+        strata.append(FLAGGED_STRATUM_CELL_MATERIAL_INFERRED)
     if NoticeKind.COMPOSITION_FROM_SAMPLE_CATALOG in kinds:
         strata.append(FLAGGED_STRATUM_CATALOGUE_COMPOSITION)
     if any(
@@ -1357,6 +1440,7 @@ def _observation_flagged_strata(
     observation: Observation,
     experiments: Mapping[str, Experiment],
     point_observations_by_experiment: Mapping[str, tuple[Observation, ...]],
+    benches: Mapping[str, Bench] | None = None,
 ) -> tuple[str, ...]:
     existing = flagged_strata(observation.notices)
     experiment = experiments.get(observation.experiment_id)
@@ -1369,9 +1453,19 @@ def _observation_flagged_strata(
             observation.experiment_id, ()
         ),
     )
+    bench = (
+        None
+        if experiment.bench_id is None or benches is None
+        else benches.get(experiment.bench_id)
+    )
     return tuple(
         dict.fromkeys(
-            (*existing, *flagged_strata(_flagged_stratum_notices(observation, experiment, gates)))
+            (
+                *existing,
+                *flagged_strata(
+                    _flagged_stratum_notices(observation, experiment, gates, bench)
+                ),
+            )
         )
     )
 
@@ -1432,6 +1526,14 @@ def derive_kems_partial_pressure_band(
     observations: Mapping[str, Observation],
     experiments: Mapping[str, Experiment],
 ) -> DecisionBand | None:
+    return _derive_kems_partial_pressure_band(observations, experiments, {})
+
+
+def _derive_kems_partial_pressure_band(
+    observations: Mapping[str, Observation],
+    experiments: Mapping[str, Experiment],
+    benches: Mapping[str, Bench],
+) -> DecisionBand | None:
     """Derive one KEMS p_partial band from admitted measured observations.
 
     Printed pressure uncertainty is preferred. If a row has no usable printed
@@ -1449,7 +1551,7 @@ def derive_kems_partial_pressure_band(
         if quantity is not Quantity.P_PARTIAL or not isinstance(identity, Identity):
             continue
         if _observation_flagged_strata(
-            observation, experiments, point_observations_by_experiment
+            observation, experiments, point_observations_by_experiment, benches
         ):
             continue
         evidence = observation.evidence.class_
@@ -3395,7 +3497,12 @@ def compile_residual(
             primary_check="experiment",
         )
 
-    flagged_notices = _flagged_stratum_notices(reference, experiment, gates)
+    bench = (
+        None
+        if experiment is None
+        else _bench_for_score(experiment, context.benches)
+    )
+    flagged_notices = _flagged_stratum_notices(reference, experiment, gates, bench)
     notices = union_notices(reference.notices, flagged_notices)
     comparison_ids = comparison_ids or {reference.observation_id}
 
@@ -4009,7 +4116,9 @@ def _score_store_with_decisions(
     from simulator.battery.validate import bound_work_inputs, build_printed_thermo_index
 
     table_index = build_printed_thermo_index(observations)
-    kems_band = derive_kems_partial_pressure_band(observations, context.experiments)
+    kems_band = _derive_kems_partial_pressure_band(
+        observations, context.experiments, context.benches
+    )
     try:
         with bound_work_inputs(context.works, observations, context.experiments):
             for obs, points in expanded_refs:
@@ -5432,6 +5541,8 @@ def _flagged_payload_strata(row: Mapping[str, object]) -> tuple[str, ...]:
     out: list[str] = []
     if NoticeKind.UNVERIFIED_APPARATUS.value in kinds:
         out.append(FLAGGED_STRATUM_UNVERIFIED_APPARATUS)
+    if NoticeKind.CELL_MATERIAL_INFERRED.value in kinds:
+        out.append(FLAGGED_STRATUM_CELL_MATERIAL_INFERRED)
     if NoticeKind.COMPOSITION_FROM_SAMPLE_CATALOG.value in kinds:
         out.append(FLAGGED_STRATUM_CATALOGUE_COMPOSITION)
     if any(

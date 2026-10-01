@@ -4179,3 +4179,234 @@ def test_sole_typed_bench_without_recorded_link_is_not_adopted() -> None:
     )
     assert residual.refusal is not None
     assert residual.refusal.detail.get("reason") == "cell_material_unknown"
+
+
+def _cell_material_score_case(material, inference):
+    from simulator.battery.enums import BenchIdentityBasis
+    from simulator.battery.records import Bench, BenchIdentity
+
+    bench_id = f"cell-{material.value}"
+    experiment = replace(F.kems_experiment(), bench_id=bench_id)
+    reference = F.observation(
+        f"{bench_id}-row",
+        experiment.experiment_id,
+        replace(
+            _partial_identity(),
+            species=Species("K", Phase.G),
+            total_pressure_Pa=State.of(Decimal("1e-6")),
+        ),
+        Decimal("1e-6"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="test-kems",
+    )
+    fo2_inference = Derivation(
+        relation="inferred fO2 from oxygen balance",
+        inputs=("printed oxygen-bearing species",),
+        parameters=(),
+        output_unit="Pa",
+    )
+    reference = replace(
+        reference,
+        point_conditions={
+            **(reference.point_conditions or {}),
+            "fO2_Pa": Located(
+                State.of(Decimal("1e-8")),
+                locator=F.loc(page=18, paragraph="Results"),
+                inference=fo2_inference,
+            ),
+        },
+    )
+    bench = Bench(
+        id=bench_id,
+        work_id=experiment.work_id or "work-1",
+        identity=BenchIdentity(
+            BenchIdentityBasis.INFERRED_FROM_EMBEDDED_EVIDENCE,
+            reason="cell material fixture",
+        ),
+        cell_materials=(F.located(material),)
+        if inference is None
+        else (
+            Located(
+                State.of(material),
+                locator=F.loc(page=18, paragraph="Results"),
+                inference=inference,
+            ),
+        ),
+    )
+    context = replace(
+        _context(F.work(), experiment, reference, review="reviewed"),
+        benches={bench.id: bench},
+    )
+    prediction = lambda engine, identity, **kwargs: EnginePrediction(
+        engine=engine,
+        channel=engine.value,
+        execution=Execution(state=ExecutionState.PRODUCED, call_evidence="test:predict"),
+        value=Decimal("1e-6"),
+        unit="Pa",
+        authority=Authority.CERTIFIED,
+        coefficient_sources=("test",),
+        lineage_complete=True,
+        identity=getattr(identity, "identity", identity),
+    )
+    return reference, context, bench, prediction
+
+
+def test_inferred_mo_cell_scores_and_is_visible_on_residual_row() -> None:
+    from simulator.battery.enums import CellMaterial
+
+    inference = Derivation(
+        relation="inferred from printed Mo oxide ions",
+        inputs=("Mo+;MoO+;MoO2+;MoO3+",),
+        parameters=(),
+        output_unit="cell material",
+    )
+    reference, context, _bench, prediction = _cell_material_score_case(
+        CellMaterial.MO, inference
+    )
+
+    residual, _candidate = compile_residual(
+        reference,
+        Engine.OPENIMCC,
+        context=context,
+        predict=prediction,
+    )
+
+    assert residual.status is ResidualStatus.NO_BAND
+    assert residual.numeric is not None
+    assert residual.numeric.decision_band is None
+    notice = next(
+        item for item in residual.notices
+        if item.kind is NoticeKind.CELL_MATERIAL_INFERRED
+    )
+    payload = residual_to_plain(residual)
+    serialized_notice = next(
+        item for item in payload["notices"]
+        if item["kind"] == NoticeKind.CELL_MATERIAL_INFERRED.value
+    )
+    evidence = json.loads(notice.reason.partition(":")[2])
+    assert evidence["field"] == "bench.cell_materials[0]"
+    assert evidence["inference"]["relation"] == "inferred from printed Mo oxide ions"
+    assert evidence["locator"]["page"] == 18
+    assert serialized_notice["reason"] == notice.reason
+    from simulator.battery.score import flagged_stratum_payloads
+
+    report_strata = flagged_stratum_payloads((payload,), (Engine.OPENIMCC,))
+    assert report_strata == [
+        {
+            "stratum": "cell-material-inferred",
+            "rail": Rail.VAPOUR.value,
+            "engine": Engine.OPENIMCC.value,
+            "n": 1,
+            "median_dex": "0",
+            "rms_dex": "0",
+        }
+    ]
+    replicate = replace(
+        reference,
+        observation_id=f"{reference.observation_id}-replicate",
+        value=Value.point_of(Decimal("2e-6")),
+    )
+    band_observations = {
+        item.observation_id: item for item in (reference, replicate)
+    }
+    assert derive_kems_partial_pressure_band(
+        band_observations, context.experiments
+    ) is not None
+    from simulator.battery.score import _derive_kems_partial_pressure_band
+
+    assert _derive_kems_partial_pressure_band(
+        band_observations, context.experiments, context.benches
+    ) is None
+
+
+def test_noninferred_cell_material_has_no_inference_notice() -> None:
+    from simulator.battery.enums import CellMaterial
+
+    reference, context, _bench, prediction = _cell_material_score_case(
+        CellMaterial.MO, None
+    )
+
+    residual, _candidate = compile_residual(
+        reference,
+        Engine.OPENIMCC,
+        context=context,
+        predict=prediction,
+    )
+
+    assert residual.status is not ResidualStatus.REFUSED
+    assert residual.numeric is not None
+    assert not any(
+        item.kind is NoticeKind.CELL_MATERIAL_INFERRED
+        for item in residual.notices
+    )
+
+
+def test_inferred_effusion_gate_value_is_reported() -> None:
+    from simulator.battery.enums import CellMaterial
+
+    reference, context, _bench, prediction = _cell_material_score_case(
+        CellMaterial.MO, None
+    )
+    inference = Derivation(
+        relation="inferred orifice Knudsen number",
+        inputs=("printed free-molecular description",),
+        parameters=(),
+        output_unit="dimensionless",
+    )
+    experiment = context.experiments[reference.experiment_id]
+    regime = replace(
+        experiment.pressure_environment.regime,
+        knudsen_number_orifice=Located(
+            State.of(Value.point_of(Decimal("20"))),
+            locator=F.loc(page=18, paragraph="Results"),
+            inference=inference,
+        ),
+    )
+    experiment = replace(
+        experiment,
+        pressure_environment=replace(experiment.pressure_environment, regime=regime),
+    )
+    context = replace(context, experiments={experiment.experiment_id: experiment})
+
+    residual, _candidate = compile_residual(
+        reference,
+        Engine.OPENIMCC,
+        context=context,
+        predict=prediction,
+    )
+
+    notice = next(
+        item for item in residual.notices
+        if item.kind is NoticeKind.CELL_MATERIAL_INFERRED
+    )
+    assert "inferred orifice Knudsen number" in notice.reason
+    assert "pressure_environment.regime.knudsen_number_orifice" in notice.reason
+    assert '"page":18' in notice.reason
+
+
+def test_inferred_nonmodelled_cell_still_refuses_oxygen_balance() -> None:
+    from simulator.battery.enums import CellMaterial
+
+    reference, context, _bench, _prediction = _cell_material_score_case(
+        CellMaterial.TA,
+        Derivation(
+            relation="inferred tantalum cell",
+            inputs=("printed Ta ion",),
+            parameters=(),
+            output_unit="cell material",
+        ),
+    )
+
+    residual, _candidate = compile_residual(
+        reference,
+        Engine.OPENIMCC,
+        context=context,
+    )
+
+    assert residual.status is ResidualStatus.REFUSED
+    assert residual.refusal is not None
+    assert residual.refusal.detail.get("reason") == "reactive_cell_oxygen_reservoir"
+    assert any(
+        item.kind is NoticeKind.CELL_MATERIAL_INFERRED
+        for item in residual.notices
+    )
