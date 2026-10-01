@@ -814,6 +814,34 @@ def _pure_phase_attempt(
             origin=origin,
             extra={"engine": engine.value},
         )
+    per = _state_value(identity.per)
+    if per is not PerBasis.MOL_SPECIES:
+        return _refuse(
+            RefusalReason.UNSUPPORTED,
+            "pure-phase-per-basis-mismatch",
+            quantity=quantity,
+            origin=origin,
+            extra={
+                "engine": engine.value,
+                "expected_per": PerBasis.MOL_SPECIES.value,
+                "actual_per": getattr(per, "value", None),
+            },
+        )
+    if quantity is Quantity.H_MINUS_H298:
+        anchor = _state_value(identity.subtype)
+        expected_anchor = "H(T)-H(298.15 K)"
+        if anchor != expected_anchor:
+            return _refuse(
+                RefusalReason.UNSUPPORTED,
+                "pure-phase-enthalpy-anchor-mismatch",
+                quantity=quantity,
+                origin=origin,
+                extra={
+                    "engine": engine.value,
+                    "expected_anchor": expected_anchor,
+                    "actual_anchor": anchor,
+                },
+            )
     symbol, why = _resolve_symbol(engine, identity)
     if symbol is None:
         reason = (

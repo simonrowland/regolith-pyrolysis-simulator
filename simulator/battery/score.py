@@ -3455,6 +3455,21 @@ def compile_residual(
             source_relation=source_relation,
         )
 
+    expected_unit = QUANTITY_UNITS[quantity]
+    if prediction.unit != expected_unit:
+        return _refused(
+            RefusalReason.UNSUPPORTED,
+            {
+                "reason": "engine_prediction_unit_mismatch",
+                "quantity": quantity.value,
+                "expected_unit": expected_unit,
+                "prediction_unit": prediction.unit,
+            },
+            execution=prediction.execution,
+            extra_notices=prediction.notices,
+            source_relation=source_relation,
+        )
+
     implied_alpha = implied_alpha_reference is not None
     if implied_alpha:
         if not _implied_alpha_coefficient_basis_matches(

@@ -37,6 +37,7 @@ from simulator.battery.enums import (
     PerBasis,
     Phase,
     Quantity,
+    QUANTITY_UNITS,
     Rail,
     RefusalReason,
     ResidualStatus,
@@ -185,12 +186,14 @@ def _context(work=None, experiment=None, *observations, review=None) -> ScoreCon
 
 
 def _predict(value: Decimal, identity, **kwargs) -> EnginePrediction:
+    quantity = quantity_token(identity)
+    assert quantity is not None
     return EnginePrediction(
         engine=Engine.INTERNAL_ANALYTICAL,
         channel="internal-analytical",
         execution=Execution(state=ExecutionState.PRODUCED, call_evidence="test:predict"),
         value=value,
-        unit="kJ_per_declared_mol_basis",
+        unit=QUANTITY_UNITS[quantity],
         authority=kwargs.get("authority", Authority.CERTIFIED),
         notices=kwargs.get("notices", ()),
         coefficient_sources=kwargs.get("coefficient_sources", ("nasa-cea-thermo",)),
@@ -238,6 +241,34 @@ def _partial_prediction(engine, observation, **_kwargs):
         lineage_complete=True,
         identity=observation.identity,
     )
+
+
+def test_compile_residual_refuses_prediction_unit_mismatch() -> None:
+    experiment = F.kems_experiment()
+    reference = F.observation(
+        "unit-mismatch-reference",
+        experiment.experiment_id,
+        _partial_identity(),
+        Decimal("1"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="plante-1979",
+    )
+    prediction = replace(
+        _partial_prediction(Engine.INTERNAL_ANALYTICAL, reference),
+        unit="kJ_per_declared_mol_basis",
+    )
+
+    residual, candidate = _compile(reference, experiment, prediction)
+
+    assert candidate is None
+    assert residual.status is ResidualStatus.REFUSED
+    assert residual.numeric is None
+    assert residual.score_eligible is False
+    assert residual.refusal is not None
+    assert residual.refusal.reason is RefusalReason.UNSUPPORTED
+    assert residual.refusal.detail["reason"] == "engine_prediction_unit_mismatch"
+    assert residual.refusal.detail["expected_unit"] == "Pa"
+    assert residual.refusal.detail["prediction_unit"] == "kJ_per_declared_mol_basis"
 
 
 def test_condensed_activity_axes_follow_composition_and_pressure() -> None:
