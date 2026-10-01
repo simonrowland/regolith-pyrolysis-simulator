@@ -10,6 +10,7 @@ from collections import Counter, defaultdict
 from copy import deepcopy
 from dataclasses import replace
 from decimal import Decimal, InvalidOperation
+from fractions import Fraction
 from pathlib import Path
 
 import pytest
@@ -21,11 +22,13 @@ from simulator.battery.migrate import iter_observation_store_paths
 from tests.battery import compilation_shard_observation_count
 from simulator.battery.identity import (
     Identity,
+    identity_equal,
     log10K_from_delta_fG_kJ_mol,
     profile_for,
     quantity_token,
 )
 from simulator.battery.records import Species
+from simulator.battery.stable_ids import phase_window_suffix
 from simulator.reference_data.janaf import (
     GRID_RANGE_REASON,
     INCONSISTENT_LAYOUT_REASON,
@@ -263,24 +266,51 @@ def test_generated_observations_state_the_schema_output_unit() -> None:
         assert observation.derivation.output_unit == QUANTITY_UNITS[quantity]
 
 
-def test_formation_basis_names_the_janaf_convention_without_an_invented_locator() -> None:
-    assert generator.FORMATION_BASIS_REASON == (
-        "JANAF formation from the elements in their reference states, as defined in "
-        "JANAF Thermochemical Tables, 4th edition, introduction; schema v2.1 has no "
-        "closed token for this convention, and the table does not print a "
-        "temperature-specific formation reaction"
+def test_formation_identity_uses_each_printed_element_reference_schedule() -> None:
+    generated = _generation("Al-009")
+    observation = next(
+        observation
+        for observation in _quantity_observations(generated, Quantity.DELTA_FH)
+        if observation.value.series
+        and any(temperature == Decimal("3000") for temperature, _ in observation.value.series)
     )
-    for quantity in (Quantity.DELTA_FH, Quantity.DELTA_FG, Quantity.LOG10_KF):
-        observation = _quantity_observations(_generation("Al-003"), quantity)[0]
-        assert observation.identity.reaction.reason == generator.FORMATION_BASIS_REASON
-        assert (
-            observation.identity.formation_elements.reason
-            == generator.FORMATION_BASIS_REASON
-        )
-        assert (
-            f"formation_basis={generator.FORMATION_BASIS_REASON}"
-            in observation.derivation.relation
-        )
+    assert observation.identity.reaction.is_value
+    assert observation.identity.formation_elements.is_value
+    assert identity_equal(observation.identity, observation.identity).fields == (
+        "temperature_K",
+    )
+    assert [
+        (term.species.formula, term.coefficient)
+        for term in observation.identity.reaction.value.terms
+    ] == [("AlBr", Fraction(1)), ("Al", Fraction(-1)), ("Br2", Fraction(-1, 2))]
+    assert "Al-001 (ref)" in observation.locator.note
+    assert "transition row 34" in observation.locator.note
+    assert "Br-038 (ref)" in observation.locator.note
+
+    exact_transition = generator._formation_basis_at_temperature(
+        "Al", Species("Al", Phase.G), Decimal("933.450")
+    )
+    assert exact_transition.reaction.is_unknown
+    assert exact_transition.formation_elements.is_unknown
+    assert "transition row 14" in exact_transition.locator_note
+
+    absent_schedule = generator._formation_basis_at_temperature(
+        "Ag", Species("Ag", Phase.G), Decimal("298.15")
+    )
+    assert absent_schedule.reaction.is_unknown
+    assert absent_schedule.formation_elements.is_unknown
+
+    unnamed_schedule = generator._formation_basis_at_temperature(
+        "O2", Species("O2", Phase.G), Decimal("298.15")
+    )
+    assert unnamed_schedule.reaction.is_unknown
+    assert unnamed_schedule.formation_elements.is_unknown
+
+    outside_printed_range = generator._formation_basis_at_temperature(
+        "Al", Species("Al", Phase.G), Decimal("7000")
+    )
+    assert outside_printed_range.reaction.is_unknown
+    assert outside_printed_range.formation_elements.is_unknown
 
 
 def test_units_formula_and_token_mismatches_stop_loudly() -> None:
@@ -539,9 +569,9 @@ def test_janaf_phase_labels_use_closed_tokens_without_collapsing_a_span() -> Non
 def test_liquid_glass_region_is_not_stamped_liquid() -> None:
     """Glass-side rows of a liquid table are not labelled phase l.
 
-    The printed GLASS <--> LIQUID temperature is the only boundary. The
-    series stays one observation (no new segment id). A two-phase transition
-    row stays unknown.
+    The printed GLASS <--> LIQUID temperature is the only compound-phase
+    boundary. Formation rows may also split at elemental reference transitions.
+    A two-phase transition row stays unknown.
     """
 
     label = "supercooled liquid / glass-transition region"
@@ -551,17 +581,26 @@ def test_liquid_glass_region_is_not_stamped_liquid() -> None:
         for observation in magnesium.observations
         if quantity_token(observation.identity) is not Quantity.TRANSITION_TEMPERATURE
     ]
-    assert [observation.observation_id for observation in series] == [
+    nonformation = [
+        observation
+        for observation in series
+        if quantity_token(observation.identity)
+        not in {Quantity.DELTA_FH, Quantity.DELTA_FG, Quantity.LOG10_KF}
+    ]
+    assert [observation.observation_id for observation in nonformation] == [
         f"nist-janaf-4th:Mg-013:{quantity}:phase-window:whole"
         for quantity in (
             "cp",
             "S",
             "H_minus_H298",
-            "delta_fH",
-            "delta_fG",
-            "log10_Kf",
         )
     ]
+    assert all(
+        ":formation-ref-" in observation.observation_id
+        for observation in series
+        if quantity_token(observation.identity)
+        in {Quantity.DELTA_FH, Quantity.DELTA_FG, Quantity.LOG10_KF}
+    )
     assert len(magnesium.report["phase_segments"]) == 1
     for observation in series:
         phase = observation.identity.species.phase
@@ -1551,15 +1590,29 @@ def test_full_corpus_control_cell_accounting_and_transcription_report() -> None:
                 document, quantity
             )
             quantity_observations = _quantity_observations(generated, quantity)
-            assert len(quantity_observations) == len(source_segments)
-            for observation, source_series, segment in zip(
-                quantity_observations,
-                source_segments,
-                generated.report["phase_segments"],
-                strict=True,
-            ):
-                if list(observation.value.series or ()) != source_series:
+            source_remaining = [Counter(source_series) for source_series in source_segments]
+            segment_by_prefix = {
+                f"{generator.SOURCE_ID}:{table_id}:"
+                + phase_window_suffix(
+                    quantity.value,
+                    lower_K=segment["lower_boundary_K"],
+                    upper_K=segment["upper_boundary_K"],
+                ): (index, segment)
+                for index, segment in enumerate(generated.report["phase_segments"])
+            }
+            for observation in quantity_observations:
+                prefix = observation.observation_id.split(":formation-ref-", 1)[0]
+                matched = segment_by_prefix.get(prefix)
+                if matched is None:
                     segment_control_mismatches += 1
+                    continue
+                segment_index, segment = matched
+                observation_points = Counter(observation.value.series or ())
+                remaining = source_remaining[segment_index]
+                if any(remaining[point] < count for point, count in observation_points.items()):
+                    segment_control_mismatches += 1
+                else:
+                    remaining.subtract(observation_points)
                 assert (
                     observation.identity.species.phase.tag.value
                     == segment["phase"]["tag"]
@@ -1569,6 +1622,8 @@ def test_full_corpus_control_cell_accounting_and_transcription_report() -> None:
                         observation.identity.species.phase.value.value
                         == segment["phase"]["value"]
                     )
+            if any(any(source.values()) for source in source_remaining):
+                segment_control_mismatches += 1
             actual = Counter(_series(generated, quantity))
             stored = Counter(expected.get(key, ()))
             if actual != stored:
@@ -1675,13 +1730,14 @@ def test_full_corpus_control_cell_accounting_and_transcription_report() -> None:
     ) == 1312
     assert stored_zero_merged_cells == 212
     assert refused_merged_cells == 1312
+    # Formation parents split where a printed elemental reference schedule changes.
     assert observations == {
         "cp": 2117,
         "S": 2117,
         "H_minus_H298": 2117,
-        "delta_fH": 2117,
-        "delta_fG": 2117,
-        "log10_Kf": 2117,
+        "delta_fH": 5511,
+        "delta_fG": 5502,
+        "log10_Kf": 5502,
         "transition_temperature": 979,
     }
     # 128 liquid tables store a printed GLASS <--> LIQUID/LIQ row. Those series

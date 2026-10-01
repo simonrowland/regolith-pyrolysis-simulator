@@ -10,6 +10,7 @@ import subprocess
 import sys
 import unicodedata
 from dataclasses import replace
+from decimal import Decimal
 from pathlib import Path
 
 import pytest
@@ -88,7 +89,15 @@ from simulator.battery.migrate import (
     write_outputs,
 
 )
-from simulator.battery.records import Bench, BenchIdentity, Reaction, Species, State, as_decimal
+from simulator.battery.records import (
+    Bench,
+    BenchIdentity,
+    Reaction,
+    Species,
+    State,
+    Value,
+    as_decimal,
+)
 from tests.battery import load_observation_store_summary
 from simulator.battery.validate import validate_corpus
 from simulator.yaml_cache import YAML12SafeLoader, load_cached_safe_yaml
@@ -227,6 +236,80 @@ def _run_migrate_cli(args: list[str]) -> subprocess.CompletedProcess[str]:
         text=True,
         env=env,
         check=False,
+    )
+
+
+def test_identity_complete_compilation_cells_are_admitted_at_source_level() -> None:
+    migrator = Migrator()
+    source = "data/literature/compilations/janaf/tables/O-029.yaml"
+    point = F.observation(
+        "compiled-point",
+        "compiled-work",
+        F.o2_identity(),
+        "0",
+        evidence=EvidenceClass.COMPILATION_ASSESSED,
+        admission=AdmissionStatus.PENDING,
+    )
+    migrator._add_observation(point, source)
+    assert (
+        migrator.result.observations["compiled-point"].admission.status
+        is AdmissionStatus.ADMITTED
+    )
+    assert (
+        migrator.result.observations["compiled-point"].evidence.class_.value
+        is EvidenceClass.COMPILATION_ASSESSED
+    )
+    assert (
+        migrator.result.observations["compiled-point"].admission.decided_by.evidence
+        == point.locator
+    )
+
+    series_identity = replace(
+        F.o2_identity(),
+        temperature_K=State.unknown("temperature is carried by the series T coordinate"),
+    )
+    series = replace(
+        F.observation(
+            "compiled-series",
+            "compiled-work",
+            series_identity,
+            "0",
+            evidence=EvidenceClass.COMPILATION_ASSESSED,
+            admission=AdmissionStatus.PENDING,
+        ),
+        value=Value(
+            ValueKind.SERIES,
+            series=((Decimal("298.15"), Decimal("0")),),
+        ),
+        point_conditions=None,
+    )
+    migrator._add_observation(series, source)
+    assert (
+        migrator.result.observations["compiled-series"].admission.status
+        is AdmissionStatus.ADMITTED
+    )
+
+    incomplete = replace(
+        point,
+        observation_id="compiled-incomplete",
+        identity=replace(
+            point.identity,
+            formation_elements=State.unknown("reference phase not printed"),
+        ),
+    )
+    migrator._add_observation(incomplete, source)
+    assert (
+        migrator.result.observations["compiled-incomplete"].admission.status
+        is AdmissionStatus.PENDING
+    )
+
+    outside_compilation = replace(point, observation_id="extract-point")
+    migrator._add_observation(
+        outside_compilation, "data/literature/extracts/fixture.yaml"
+    )
+    assert (
+        migrator.result.observations["extract-point"].admission.status
+        is AdmissionStatus.PENDING
     )
 
 
