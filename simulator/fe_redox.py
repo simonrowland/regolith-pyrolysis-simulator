@@ -376,23 +376,41 @@ def _validate_kress91_controls(
     T_K: float,
     pressure_bar: float,
 ) -> None:
-    controls = {
-        'fO2_log': (fO2_log, False),
-        'T_K': (T_K, True),
-        'pressure_bar': (pressure_bar, True),
-    }
-    for name, (value, positive) in controls.items():
+    try:
+        fO2 = float(fO2_log)
+    except (TypeError, ValueError) as exc:
+        raise Kress91InvalidControls(
+            'Kress91 invalid control fO2_log: expected finite value, '
+            f'got {fO2_log!r}'
+        ) from exc
+    if not math.isfinite(fO2):
+        raise Kress91InvalidControls(
+            'Kress91 invalid control fO2_log: expected finite value, '
+            f'got {fO2_log!r}'
+        )
+    _validate_kress91_temperature_pressure_controls(
+        T_K=T_K,
+        pressure_bar=pressure_bar,
+    )
+
+
+def _validate_kress91_temperature_pressure_controls(
+    *,
+    T_K: float,
+    pressure_bar: float,
+) -> None:
+    for name, value in (('T_K', T_K), ('pressure_bar', pressure_bar)):
         try:
             number = float(value)
         except (TypeError, ValueError) as exc:
             raise Kress91InvalidControls(
-                f'Kress91 invalid control {name}: expected finite'
-                f'{" positive" if positive else ""} value, got {value!r}'
+                f'Kress91 invalid control {name}: expected finite positive value, '
+                f'got {value!r}'
             ) from exc
-        if not math.isfinite(number) or (positive and number <= 0.0):
+        if not math.isfinite(number) or number <= 0.0:
             raise Kress91InvalidControls(
-                f'Kress91 invalid control {name}: expected finite'
-                f'{" positive" if positive else ""} value, got {value!r}'
+                f'Kress91 invalid control {name}: expected finite positive value, '
+                f'got {value!r}'
             )
 
 

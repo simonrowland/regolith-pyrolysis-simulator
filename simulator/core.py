@@ -402,6 +402,7 @@ from simulator.fe_redox import (
     _Kress91Evaluator,
     _kress91_ln_ratio,
     _kress91_log_fO2_from_fe_oxide_moles,
+    _validate_kress91_temperature_pressure_controls,
     calphad_ferrous_feo_activity_diagnostic,
     feo_iw_log10_fO2_bar,
     feot_equivalent_wt_pct,
@@ -11109,12 +11110,6 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 'melt_intrinsic_fO2_log',
                 getattr(self.melt, 'melt_fO2_log', None),
             )
-        if self._melt_redox_equality_is_absent():
-            return self._absent_melt_equality_fe_redox_split(T_K)
-        fO2_log = float(raw_fO2_log)
-        # Diagnostic-only construction via ``__new__`` predates the runtime
-        # projection. Preserve the exact pre-PHYS pressure source here only;
-        # authoritative callers of the shared accessor fail loud if absent.
         diagnostic_pressure_bar = (
             float(self.overhead.pressure_mbar) / 1000.0
             if getattr(self, '_melt_headspace_composition_mbar', None) is None
@@ -11124,6 +11119,16 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             diagnostic_pressure_bar,
             floor_bar=self._vacuum_floor_bar(),
         )
+        if self._melt_redox_equality_is_absent():
+            _validate_kress91_temperature_pressure_controls(
+                T_K=T_K,
+                pressure_bar=pressure_bar,
+            )
+            return self._absent_melt_equality_fe_redox_split(T_K)
+        fO2_log = float(raw_fO2_log)
+        # Diagnostic-only construction via ``__new__`` predates the runtime
+        # projection. Preserve the exact pre-PHYS pressure source here only;
+        # authoritative callers of the shared accessor fail loud if absent.
         log_iw = (
             -27215.0 / T_K + 6.57
             if T_K > 0.0
