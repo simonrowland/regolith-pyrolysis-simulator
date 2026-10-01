@@ -208,8 +208,16 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        table: He-001
+        note: 'NIST download_url: https://janaf.nist.gov/tables/He-001.txt'
+        source_path: data/literature/compilations/janaf/tables/He-001.yaml
+        record: He-001
   notices: []
   source_id: nist-janaf-4th
   locator:
@@ -432,8 +440,16 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        table: He-001
+        note: 'NIST download_url: https://janaf.nist.gov/tables/He-001.txt'
+        source_path: data/literature/compilations/janaf/tables/He-001.yaml
+        record: He-001
   notices: []
   source_id: nist-janaf-4th
   locator:
@@ -656,8 +672,16 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        table: He-001
+        note: 'NIST download_url: https://janaf.nist.gov/tables/He-001.txt'
+        source_path: data/literature/compilations/janaf/tables/He-001.yaml
+        record: He-001
   notices: []
   source_id: nist-janaf-4th
   locator:
@@ -675,7 +699,7 @@ observations:
     parameters: []
     output_unit: J_per_declared_mol_basis_per_K
     pure_substance_reference: true
-- observation_id: nist-janaf-4th:He-001:delta_fG:phase-window:whole
+- observation_id: nist-janaf-4th:He-001:delta_fG:phase-window:whole:formation-ref-He-001-no-transition
   experiment_id: nist-janaf-4th:He-001:tabulation
   identity:
     quantity:
@@ -705,15 +729,47 @@ observations:
       tag: value
       value: '100000'
     reaction:
-      tag: unknown
-      reason: JANAF formation from the elements in their reference states, as defined in JANAF Thermochemical Tables, 4th
-        edition, introduction; schema v2.1 has no closed token for this convention, and the table does not print a temperature-specific
-        formation reaction
+      tag: value
+      value:
+        terms:
+        - species:
+            formula: He
+            phase:
+              tag: value
+              value: g
+            polymorph:
+              tag: not_applicable
+              reason: not crystal
+            charge:
+              tag: value
+              value: 0
+          coefficient: '1'
+        - species:
+            formula: He
+            phase:
+              tag: value
+              value: g
+            polymorph:
+              tag: not_applicable
+              reason: not crystal
+            charge:
+              tag: value
+              value: 0
+          coefficient: '-1'
     formation_elements:
-      tag: unknown
-      reason: JANAF formation from the elements in their reference states, as defined in JANAF Thermochemical Tables, 4th
-        edition, introduction; schema v2.1 has no closed token for this convention, and the table does not print a temperature-specific
-        formation reaction
+      tag: value
+      value:
+      - - He
+        - formula: He
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
     reference_state:
       tag: not_applicable
       reason: profile delta_fG does not use reference_state
@@ -884,29 +940,44 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
-  notices: []
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        table: He-001
+        note: 'NIST download_url: https://janaf.nist.gov/tables/He-001.txt; printed JANAF (ref) schedules: He-001 (ref), ideal
+          gas by monograph convention over printed T range'
+        source_path: data/literature/compilations/janaf/tables/He-001.yaml
+        record: He-001
+  notices:
+  - kind: reference_phase_by_convention
+    affected_quantities:
+    - delta_fG
+    reason: JANAF web table prints no phase; ideal-gas reference state per the monograph convention, page not held
+    origin: He-001 (He) reference-element table
+    authority: convention
+    certification: fetch the JANAF 4th ed. printed page for the table
   source_id: nist-janaf-4th
   locator:
     table: He-001
-    note: 'NIST download_url: https://janaf.nist.gov/tables/He-001.txt'
+    note: 'NIST download_url: https://janaf.nist.gov/tables/He-001.txt; printed JANAF (ref) schedules: He-001 (ref), ideal
+      gas by monograph convention over printed T range'
     source_path: data/literature/compilations/janaf/tables/He-001.yaml
     record: He-001
   read_from: tables:nist-janaf-4th
   derivation:
-    relation: Direct JANAF tabulation; 0 printed cells blank or INFINITE; compilation_role engine_reference_input=true, scoring_eligible=false;
-      circularity_warning=Do not validate an engine against a compilation it consumes.; formation_basis=JANAF formation from
-      the elements in their reference states, as defined in JANAF Thermochemical Tables, 4th edition, introduction; schema
-      v2.1 has no closed token for this convention, and the table does not print a temperature-specific formation reaction;
-      phase_basis=JANAF documented reference-phase convention for elemental reference tables (Ar, C, Cl, F, H, He, N, Ne,
-      O)
+    relation: 'Direct JANAF tabulation; 0 printed cells blank or INFINITE; compilation_role engine_reference_input=true, scoring_eligible=false;
+      circularity_warning=Do not validate an engine against a compilation it consumes.; formation_reference_state_schedule=printed
+      JANAF (ref) schedules: He-001 (ref), ideal gas by monograph convention over printed T range; phase_basis=JANAF documented
+      reference-phase convention for elemental reference tables (Ar, C, Cl, F, H, He, N, Ne, O)'
     inputs:
     - tables:nist-janaf-4th
     parameters: []
     output_unit: kJ_per_declared_mol_basis
     pure_substance_reference: true
-- observation_id: nist-janaf-4th:He-001:delta_fH:phase-window:whole
+- observation_id: nist-janaf-4th:He-001:delta_fH:phase-window:whole:formation-ref-He-001-no-transition
   experiment_id: nist-janaf-4th:He-001:tabulation
   identity:
     quantity:
@@ -936,15 +1007,47 @@ observations:
       tag: value
       value: '100000'
     reaction:
-      tag: unknown
-      reason: JANAF formation from the elements in their reference states, as defined in JANAF Thermochemical Tables, 4th
-        edition, introduction; schema v2.1 has no closed token for this convention, and the table does not print a temperature-specific
-        formation reaction
+      tag: value
+      value:
+        terms:
+        - species:
+            formula: He
+            phase:
+              tag: value
+              value: g
+            polymorph:
+              tag: not_applicable
+              reason: not crystal
+            charge:
+              tag: value
+              value: 0
+          coefficient: '1'
+        - species:
+            formula: He
+            phase:
+              tag: value
+              value: g
+            polymorph:
+              tag: not_applicable
+              reason: not crystal
+            charge:
+              tag: value
+              value: 0
+          coefficient: '-1'
     formation_elements:
-      tag: unknown
-      reason: JANAF formation from the elements in their reference states, as defined in JANAF Thermochemical Tables, 4th
-        edition, introduction; schema v2.1 has no closed token for this convention, and the table does not print a temperature-specific
-        formation reaction
+      tag: value
+      value:
+      - - He
+        - formula: He
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
     reference_state:
       tag: not_applicable
       reason: profile delta_fH does not use reference_state
@@ -1115,29 +1218,44 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
-  notices: []
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        table: He-001
+        note: 'NIST download_url: https://janaf.nist.gov/tables/He-001.txt; printed JANAF (ref) schedules: He-001 (ref), ideal
+          gas by monograph convention over printed T range'
+        source_path: data/literature/compilations/janaf/tables/He-001.yaml
+        record: He-001
+  notices:
+  - kind: reference_phase_by_convention
+    affected_quantities:
+    - delta_fH
+    reason: JANAF web table prints no phase; ideal-gas reference state per the monograph convention, page not held
+    origin: He-001 (He) reference-element table
+    authority: convention
+    certification: fetch the JANAF 4th ed. printed page for the table
   source_id: nist-janaf-4th
   locator:
     table: He-001
-    note: 'NIST download_url: https://janaf.nist.gov/tables/He-001.txt'
+    note: 'NIST download_url: https://janaf.nist.gov/tables/He-001.txt; printed JANAF (ref) schedules: He-001 (ref), ideal
+      gas by monograph convention over printed T range'
     source_path: data/literature/compilations/janaf/tables/He-001.yaml
     record: He-001
   read_from: tables:nist-janaf-4th
   derivation:
-    relation: Direct JANAF tabulation; 0 printed cells blank or INFINITE; compilation_role engine_reference_input=true, scoring_eligible=false;
-      circularity_warning=Do not validate an engine against a compilation it consumes.; formation_basis=JANAF formation from
-      the elements in their reference states, as defined in JANAF Thermochemical Tables, 4th edition, introduction; schema
-      v2.1 has no closed token for this convention, and the table does not print a temperature-specific formation reaction;
-      phase_basis=JANAF documented reference-phase convention for elemental reference tables (Ar, C, Cl, F, H, He, N, Ne,
-      O)
+    relation: 'Direct JANAF tabulation; 0 printed cells blank or INFINITE; compilation_role engine_reference_input=true, scoring_eligible=false;
+      circularity_warning=Do not validate an engine against a compilation it consumes.; formation_reference_state_schedule=printed
+      JANAF (ref) schedules: He-001 (ref), ideal gas by monograph convention over printed T range; phase_basis=JANAF documented
+      reference-phase convention for elemental reference tables (Ar, C, Cl, F, H, He, N, Ne, O)'
     inputs:
     - tables:nist-janaf-4th
     parameters: []
     output_unit: kJ_per_declared_mol_basis
     pure_substance_reference: true
-- observation_id: nist-janaf-4th:He-001:log10_Kf:phase-window:whole
+- observation_id: nist-janaf-4th:He-001:log10_Kf:phase-window:whole:formation-ref-He-001-no-transition
   experiment_id: nist-janaf-4th:He-001:tabulation
   identity:
     quantity:
@@ -1167,15 +1285,47 @@ observations:
       tag: value
       value: '100000'
     reaction:
-      tag: unknown
-      reason: JANAF formation from the elements in their reference states, as defined in JANAF Thermochemical Tables, 4th
-        edition, introduction; schema v2.1 has no closed token for this convention, and the table does not print a temperature-specific
-        formation reaction
+      tag: value
+      value:
+        terms:
+        - species:
+            formula: He
+            phase:
+              tag: value
+              value: g
+            polymorph:
+              tag: not_applicable
+              reason: not crystal
+            charge:
+              tag: value
+              value: 0
+          coefficient: '1'
+        - species:
+            formula: He
+            phase:
+              tag: value
+              value: g
+            polymorph:
+              tag: not_applicable
+              reason: not crystal
+            charge:
+              tag: value
+              value: 0
+          coefficient: '-1'
     formation_elements:
-      tag: unknown
-      reason: JANAF formation from the elements in their reference states, as defined in JANAF Thermochemical Tables, 4th
-        edition, introduction; schema v2.1 has no closed token for this convention, and the table does not print a temperature-specific
-        formation reaction
+      tag: value
+      value:
+      - - He
+        - formula: He
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
     reference_state:
       tag: not_applicable
       reason: profile log10_Kf does not use reference_state
@@ -1346,23 +1496,38 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
-  notices: []
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        table: He-001
+        note: 'NIST download_url: https://janaf.nist.gov/tables/He-001.txt; printed JANAF (ref) schedules: He-001 (ref), ideal
+          gas by monograph convention over printed T range'
+        source_path: data/literature/compilations/janaf/tables/He-001.yaml
+        record: He-001
+  notices:
+  - kind: reference_phase_by_convention
+    affected_quantities:
+    - log10_Kf
+    reason: JANAF web table prints no phase; ideal-gas reference state per the monograph convention, page not held
+    origin: He-001 (He) reference-element table
+    authority: convention
+    certification: fetch the JANAF 4th ed. printed page for the table
   source_id: nist-janaf-4th
   locator:
     table: He-001
-    note: 'NIST download_url: https://janaf.nist.gov/tables/He-001.txt'
+    note: 'NIST download_url: https://janaf.nist.gov/tables/He-001.txt; printed JANAF (ref) schedules: He-001 (ref), ideal
+      gas by monograph convention over printed T range'
     source_path: data/literature/compilations/janaf/tables/He-001.yaml
     record: He-001
   read_from: tables:nist-janaf-4th
   derivation:
-    relation: Direct JANAF tabulation; 0 printed cells blank or INFINITE; compilation_role engine_reference_input=true, scoring_eligible=false;
-      circularity_warning=Do not validate an engine against a compilation it consumes.; formation_basis=JANAF formation from
-      the elements in their reference states, as defined in JANAF Thermochemical Tables, 4th edition, introduction; schema
-      v2.1 has no closed token for this convention, and the table does not print a temperature-specific formation reaction;
-      phase_basis=JANAF documented reference-phase convention for elemental reference tables (Ar, C, Cl, F, H, He, N, Ne,
-      O)
+    relation: 'Direct JANAF tabulation; 0 printed cells blank or INFINITE; compilation_role engine_reference_input=true, scoring_eligible=false;
+      circularity_warning=Do not validate an engine against a compilation it consumes.; formation_reference_state_schedule=printed
+      JANAF (ref) schedules: He-001 (ref), ideal gas by monograph convention over printed T range; phase_basis=JANAF documented
+      reference-phase convention for elemental reference tables (Ar, C, Cl, F, H, He, N, Ne, O)'
     inputs:
     - tables:nist-janaf-4th
     parameters: []
@@ -1573,8 +1738,16 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        table: He-002
+        note: 'NIST download_url: https://janaf.nist.gov/tables/He-002.txt'
+        source_path: data/literature/compilations/janaf/tables/He-002.yaml
+        record: He-002
   notices: []
   source_id: nist-janaf-4th
   locator:
@@ -1797,8 +1970,16 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        table: He-002
+        note: 'NIST download_url: https://janaf.nist.gov/tables/He-002.txt'
+        source_path: data/literature/compilations/janaf/tables/He-002.yaml
+        record: He-002
   notices: []
   source_id: nist-janaf-4th
   locator:
@@ -2021,8 +2202,16 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        table: He-002
+        note: 'NIST download_url: https://janaf.nist.gov/tables/He-002.txt'
+        source_path: data/literature/compilations/janaf/tables/He-002.yaml
+        record: He-002
   notices: []
   source_id: nist-janaf-4th
   locator:
@@ -2040,7 +2229,7 @@ observations:
     parameters: []
     output_unit: J_per_declared_mol_basis_per_K
     pure_substance_reference: true
-- observation_id: nist-janaf-4th:He-002:delta_fG:phase-window:whole
+- observation_id: nist-janaf-4th:He-002:delta_fG:phase-window:whole:formation-ref-He-001-no-transition
   experiment_id: nist-janaf-4th:He-002:tabulation
   identity:
     quantity:
@@ -2070,15 +2259,47 @@ observations:
       tag: value
       value: '100000'
     reaction:
-      tag: unknown
-      reason: JANAF formation from the elements in their reference states, as defined in JANAF Thermochemical Tables, 4th
-        edition, introduction; schema v2.1 has no closed token for this convention, and the table does not print a temperature-specific
-        formation reaction
+      tag: value
+      value:
+        terms:
+        - species:
+            formula: He
+            phase:
+              tag: value
+              value: g
+            polymorph:
+              tag: not_applicable
+              reason: index_entry.name / title_as_published qualifier 'Ion' is an ionization state, not a crystal type
+            charge:
+              tag: value
+              value: 1
+          coefficient: '1'
+        - species:
+            formula: He
+            phase:
+              tag: value
+              value: g
+            polymorph:
+              tag: not_applicable
+              reason: not crystal
+            charge:
+              tag: value
+              value: 0
+          coefficient: '-1'
     formation_elements:
-      tag: unknown
-      reason: JANAF formation from the elements in their reference states, as defined in JANAF Thermochemical Tables, 4th
-        edition, introduction; schema v2.1 has no closed token for this convention, and the table does not print a temperature-specific
-        formation reaction
+      tag: value
+      value:
+      - - He
+        - formula: He
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
     reference_state:
       tag: not_applicable
       reason: profile delta_fG does not use reference_state
@@ -2241,28 +2462,44 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
-  notices: []
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        table: He-002
+        note: 'NIST download_url: https://janaf.nist.gov/tables/He-002.txt; printed JANAF (ref) schedules: He-001 (ref), ideal
+          gas by monograph convention over printed T range'
+        source_path: data/literature/compilations/janaf/tables/He-002.yaml
+        record: He-002
+  notices:
+  - kind: reference_phase_by_convention
+    affected_quantities:
+    - delta_fG
+    reason: JANAF web table prints no phase; ideal-gas reference state per the monograph convention, page not held
+    origin: He-001 (He) reference-element table
+    authority: convention
+    certification: fetch the JANAF 4th ed. printed page for the table
   source_id: nist-janaf-4th
   locator:
     table: He-002
-    note: 'NIST download_url: https://janaf.nist.gov/tables/He-002.txt'
+    note: 'NIST download_url: https://janaf.nist.gov/tables/He-002.txt; printed JANAF (ref) schedules: He-001 (ref), ideal
+      gas by monograph convention over printed T range'
     source_path: data/literature/compilations/janaf/tables/He-002.yaml
     record: He-002
   read_from: tables:nist-janaf-4th
   derivation:
-    relation: Direct JANAF tabulation; 4 printed cells blank or INFINITE; compilation_role engine_reference_input=true, scoring_eligible=false;
-      circularity_warning=Do not validate an engine against a compilation it consumes.; formation_basis=JANAF formation from
-      the elements in their reference states, as defined in JANAF Thermochemical Tables, 4th edition, introduction; schema
-      v2.1 has no closed token for this convention, and the table does not print a temperature-specific formation reaction;
-      phase_basis=phase declared by JANAF index state 'g'
+    relation: 'Direct JANAF tabulation; 4 printed cells blank or INFINITE; compilation_role engine_reference_input=true, scoring_eligible=false;
+      circularity_warning=Do not validate an engine against a compilation it consumes.; formation_reference_state_schedule=printed
+      JANAF (ref) schedules: He-001 (ref), ideal gas by monograph convention over printed T range; phase_basis=phase declared
+      by JANAF index state ''g'''
     inputs:
     - tables:nist-janaf-4th
     parameters: []
     output_unit: kJ_per_declared_mol_basis
     pure_substance_reference: true
-- observation_id: nist-janaf-4th:He-002:delta_fH:phase-window:whole
+- observation_id: nist-janaf-4th:He-002:delta_fH:phase-window:whole:formation-ref-He-001-no-transition
   experiment_id: nist-janaf-4th:He-002:tabulation
   identity:
     quantity:
@@ -2292,15 +2529,47 @@ observations:
       tag: value
       value: '100000'
     reaction:
-      tag: unknown
-      reason: JANAF formation from the elements in their reference states, as defined in JANAF Thermochemical Tables, 4th
-        edition, introduction; schema v2.1 has no closed token for this convention, and the table does not print a temperature-specific
-        formation reaction
+      tag: value
+      value:
+        terms:
+        - species:
+            formula: He
+            phase:
+              tag: value
+              value: g
+            polymorph:
+              tag: not_applicable
+              reason: index_entry.name / title_as_published qualifier 'Ion' is an ionization state, not a crystal type
+            charge:
+              tag: value
+              value: 1
+          coefficient: '1'
+        - species:
+            formula: He
+            phase:
+              tag: value
+              value: g
+            polymorph:
+              tag: not_applicable
+              reason: not crystal
+            charge:
+              tag: value
+              value: 0
+          coefficient: '-1'
     formation_elements:
-      tag: unknown
-      reason: JANAF formation from the elements in their reference states, as defined in JANAF Thermochemical Tables, 4th
-        edition, introduction; schema v2.1 has no closed token for this convention, and the table does not print a temperature-specific
-        formation reaction
+      tag: value
+      value:
+      - - He
+        - formula: He
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
     reference_state:
       tag: not_applicable
       reason: profile delta_fH does not use reference_state
@@ -2465,28 +2734,44 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
-  notices: []
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        table: He-002
+        note: 'NIST download_url: https://janaf.nist.gov/tables/He-002.txt; printed JANAF (ref) schedules: He-001 (ref), ideal
+          gas by monograph convention over printed T range'
+        source_path: data/literature/compilations/janaf/tables/He-002.yaml
+        record: He-002
+  notices:
+  - kind: reference_phase_by_convention
+    affected_quantities:
+    - delta_fH
+    reason: JANAF web table prints no phase; ideal-gas reference state per the monograph convention, page not held
+    origin: He-001 (He) reference-element table
+    authority: convention
+    certification: fetch the JANAF 4th ed. printed page for the table
   source_id: nist-janaf-4th
   locator:
     table: He-002
-    note: 'NIST download_url: https://janaf.nist.gov/tables/He-002.txt'
+    note: 'NIST download_url: https://janaf.nist.gov/tables/He-002.txt; printed JANAF (ref) schedules: He-001 (ref), ideal
+      gas by monograph convention over printed T range'
     source_path: data/literature/compilations/janaf/tables/He-002.yaml
     record: He-002
   read_from: tables:nist-janaf-4th
   derivation:
-    relation: Direct JANAF tabulation; 3 printed cells blank or INFINITE; compilation_role engine_reference_input=true, scoring_eligible=false;
-      circularity_warning=Do not validate an engine against a compilation it consumes.; formation_basis=JANAF formation from
-      the elements in their reference states, as defined in JANAF Thermochemical Tables, 4th edition, introduction; schema
-      v2.1 has no closed token for this convention, and the table does not print a temperature-specific formation reaction;
-      phase_basis=phase declared by JANAF index state 'g'
+    relation: 'Direct JANAF tabulation; 3 printed cells blank or INFINITE; compilation_role engine_reference_input=true, scoring_eligible=false;
+      circularity_warning=Do not validate an engine against a compilation it consumes.; formation_reference_state_schedule=printed
+      JANAF (ref) schedules: He-001 (ref), ideal gas by monograph convention over printed T range; phase_basis=phase declared
+      by JANAF index state ''g'''
     inputs:
     - tables:nist-janaf-4th
     parameters: []
     output_unit: kJ_per_declared_mol_basis
     pure_substance_reference: true
-- observation_id: nist-janaf-4th:He-002:log10_Kf:phase-window:whole
+- observation_id: nist-janaf-4th:He-002:log10_Kf:phase-window:whole:formation-ref-He-001-no-transition
   experiment_id: nist-janaf-4th:He-002:tabulation
   identity:
     quantity:
@@ -2516,15 +2801,47 @@ observations:
       tag: value
       value: '100000'
     reaction:
-      tag: unknown
-      reason: JANAF formation from the elements in their reference states, as defined in JANAF Thermochemical Tables, 4th
-        edition, introduction; schema v2.1 has no closed token for this convention, and the table does not print a temperature-specific
-        formation reaction
+      tag: value
+      value:
+        terms:
+        - species:
+            formula: He
+            phase:
+              tag: value
+              value: g
+            polymorph:
+              tag: not_applicable
+              reason: index_entry.name / title_as_published qualifier 'Ion' is an ionization state, not a crystal type
+            charge:
+              tag: value
+              value: 1
+          coefficient: '1'
+        - species:
+            formula: He
+            phase:
+              tag: value
+              value: g
+            polymorph:
+              tag: not_applicable
+              reason: not crystal
+            charge:
+              tag: value
+              value: 0
+          coefficient: '-1'
     formation_elements:
-      tag: unknown
-      reason: JANAF formation from the elements in their reference states, as defined in JANAF Thermochemical Tables, 4th
-        edition, introduction; schema v2.1 has no closed token for this convention, and the table does not print a temperature-specific
-        formation reaction
+      tag: value
+      value:
+      - - He
+        - formula: He
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
     reference_state:
       tag: not_applicable
       reason: profile log10_Kf does not use reference_state
@@ -2687,22 +3004,38 @@ observations:
     original_method_class: assessed_thermodynamic_functions
     model: assessed_thermodynamic_functions
   admission:
-    status: pending
-    reason: source does not state admission_status
-  notices: []
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        table: He-002
+        note: 'NIST download_url: https://janaf.nist.gov/tables/He-002.txt; printed JANAF (ref) schedules: He-001 (ref), ideal
+          gas by monograph convention over printed T range'
+        source_path: data/literature/compilations/janaf/tables/He-002.yaml
+        record: He-002
+  notices:
+  - kind: reference_phase_by_convention
+    affected_quantities:
+    - log10_Kf
+    reason: JANAF web table prints no phase; ideal-gas reference state per the monograph convention, page not held
+    origin: He-001 (He) reference-element table
+    authority: convention
+    certification: fetch the JANAF 4th ed. printed page for the table
   source_id: nist-janaf-4th
   locator:
     table: He-002
-    note: 'NIST download_url: https://janaf.nist.gov/tables/He-002.txt'
+    note: 'NIST download_url: https://janaf.nist.gov/tables/He-002.txt; printed JANAF (ref) schedules: He-001 (ref), ideal
+      gas by monograph convention over printed T range'
     source_path: data/literature/compilations/janaf/tables/He-002.yaml
     record: He-002
   read_from: tables:nist-janaf-4th
   derivation:
-    relation: Direct JANAF tabulation; 4 printed cells blank or INFINITE; compilation_role engine_reference_input=true, scoring_eligible=false;
-      circularity_warning=Do not validate an engine against a compilation it consumes.; formation_basis=JANAF formation from
-      the elements in their reference states, as defined in JANAF Thermochemical Tables, 4th edition, introduction; schema
-      v2.1 has no closed token for this convention, and the table does not print a temperature-specific formation reaction;
-      phase_basis=phase declared by JANAF index state 'g'
+    relation: 'Direct JANAF tabulation; 4 printed cells blank or INFINITE; compilation_role engine_reference_input=true, scoring_eligible=false;
+      circularity_warning=Do not validate an engine against a compilation it consumes.; formation_reference_state_schedule=printed
+      JANAF (ref) schedules: He-001 (ref), ideal gas by monograph convention over printed T range; phase_basis=phase declared
+      by JANAF index state ''g'''
     inputs:
     - tables:nist-janaf-4th
     parameters: []
