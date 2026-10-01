@@ -33,7 +33,10 @@ from simulator.battery.enums import (
     SourceRelation,
     ValueKind,
 )
-from simulator.battery.identity import log10K_from_delta_fG_kJ_mol
+from simulator.battery.identity import (
+    log10K_from_delta_fG_kJ_mol,
+    standard_pressure_delta_g_kJ_per_mol,
+)
 from simulator.battery.records import Species, State, Uncertainty, Value
 from simulator.battery.score import (
     EnginePrediction,
@@ -181,6 +184,166 @@ def test_ellingham_na2o_matches_printed_janaf_within_fit_bound() -> None:
     assert abs(residual - Decimal("0.1832")) < Decimal("0.001")
     assert abs(residual) < Decimal("0.221")
     assert attempt.refusal_reason is None
+
+
+def test_ellingham_transforms_formation_values_to_printed_standard_pressure() -> None:
+    temperature = Decimal("1200")
+    bar_identity = F.cao_identity(
+        Phase.CR,
+        T_K=temperature,
+        metal_phase=Phase.L,
+        per=PerBasis.MOL_SPECIES,
+        p_std=Decimal("100000"),
+    )
+    atm_identity = replace(
+        bar_identity,
+        standard_pressure_Pa=State.of(Decimal("101325")),
+    )
+
+    def prediction(identity, observation_id: str, quantity: Quantity) -> Decimal:
+        attempt = predict_thermo_attempt(
+            Engine.INTERNAL_ANALYTICAL,
+            F.observation(
+                observation_id,
+                "exp-1",
+                replace(identity, quantity=quantity),
+                Decimal("0"),
+            ),
+        )
+        assert attempt.value is not None
+        assert attempt.refusal_reason is None
+        return attempt.value
+
+    bar_dfg = prediction(bar_identity, "cao-bar-dfg", Quantity.DELTA_FG)
+    atm_dfg = prediction(atm_identity, "cao-atm-dfg", Quantity.DELTA_FG)
+    pressure_log_ratio = (Decimal("101325") / Decimal("100000")).ln()
+    expected_dfg_shift = standard_pressure_delta_g_kJ_per_mol(
+        Fraction(-1, 2), temperature, Decimal("100000"), Decimal("101325")
+    )
+    assert abs((atm_dfg - bar_dfg) - expected_dfg_shift) < Decimal("1e-12")
+    assert Decimal("-0.0657") < expected_dfg_shift < Decimal("-0.0656")
+
+    bar_log_kf = prediction(bar_identity, "cao-bar-log-kf", Quantity.LOG10_KF)
+    atm_log_kf = prediction(atm_identity, "cao-atm-log-kf", Quantity.LOG10_KF)
+    expected_log_kf_shift = Decimal("0.5") * pressure_log_ratio / Decimal("10").ln()
+    assert abs((atm_log_kf - bar_log_kf) - expected_log_kf_shift) < Decimal("1e-12")
+
+    assert isinstance(bar_identity.reaction, State) and bar_identity.reaction.is_value
+    reaction = bar_identity.reaction.value
+    assert reaction is not None
+    scaled_reaction = replace(
+        reaction,
+        terms=tuple(
+            replace(term, coefficient=term.coefficient * 2)
+            for term in reaction.terms
+        ),
+    )
+    scaled_identity = replace(atm_identity, reaction=State.of(scaled_reaction))
+    scaled_dfg = prediction(scaled_identity, "cao-atm-scaled-reaction", Quantity.DELTA_FG)
+    assert scaled_dfg == atm_dfg
+
+    o2_bar_identity = F.cao_identity(
+        Phase.CR,
+        T_K=temperature,
+        metal_phase=Phase.L,
+        per=PerBasis.MOL_O2,
+        p_std=Decimal("100000"),
+    )
+    o2_atm_identity = replace(
+        o2_bar_identity,
+        standard_pressure_Pa=State.of(Decimal("101325")),
+    )
+    o2_bar_dfg = prediction(o2_bar_identity, "cao-o2-bar-dfg", Quantity.DELTA_FG)
+    o2_atm_dfg = prediction(o2_atm_identity, "cao-o2-atm-dfg", Quantity.DELTA_FG)
+    expected_o2_shift = standard_pressure_delta_g_kJ_per_mol(
+        Fraction(-1), temperature, Decimal("100000"), Decimal("101325")
+    )
+    assert abs((o2_atm_dfg - o2_bar_dfg) - expected_o2_shift) < Decimal("1e-12")
+
+
+def test_ellingham_rejects_element_reference_phase_mismatch() -> None:
+    condensed = F.cao_identity(
+        Phase.CR,
+        T_K=Decimal("1800"),
+        metal_phase=Phase.CR,
+        per=PerBasis.MOL_SPECIES,
+        p_std=Decimal("101325"),
+    )
+    refused = predict_thermo_attempt(
+        Engine.INTERNAL_ANALYTICAL,
+        F.observation("cao-condensed-reference", "exp-1", condensed, Decimal("0")),
+    )
+    assert refused.value is None
+    assert refused.refusal_reason is RefusalReason.IDENTITY_MISMATCH
+    assert refused.refusal_detail["reason"] == "identity-mismatch-element-reference-phase"
+    assert refused.refusal_detail["element"] == "Ca"
+    assert refused.refusal_detail["cell_phase"] == Phase.CR.value
+    assert refused.refusal_detail["segment_phase"] == Phase.G.value
+
+    gas_bar = F.cao_identity(
+        Phase.CR,
+        T_K=Decimal("1800"),
+        metal_phase=Phase.G,
+        per=PerBasis.MOL_SPECIES,
+        p_std=Decimal("100000"),
+    )
+    gas_atm = replace(gas_bar, standard_pressure_Pa=State.of(Decimal("101325")))
+    bar_attempt = predict_thermo_attempt(
+        Engine.INTERNAL_ANALYTICAL,
+        F.observation("cao-gas-bar", "exp-1", gas_bar, Decimal("0")),
+    )
+    atm_attempt = predict_thermo_attempt(
+        Engine.INTERNAL_ANALYTICAL,
+        F.observation("cao-gas-atm", "exp-1", gas_atm, Decimal("0")),
+    )
+    assert bar_attempt.value is not None
+    assert atm_attempt.value is not None
+    expected_shift = standard_pressure_delta_g_kJ_per_mol(
+        Fraction(-3, 2), Decimal("1800"), Decimal("100000"), Decimal("101325")
+    )
+    assert abs((atm_attempt.value - bar_attempt.value) - expected_shift) < Decimal("1e-12")
+
+
+def test_ellingham_pressure_transform_refuses_unknown_reaction_or_phase() -> None:
+    identity = F.cao_identity(
+        Phase.CR,
+        T_K=Decimal("1200"),
+        metal_phase=Phase.CR,
+        per=PerBasis.MOL_SPECIES,
+        p_std=Decimal("101325"),
+    )
+    no_reaction = replace(identity, reaction=State.unknown("not printed"))
+    refused_reaction = predict_thermo_attempt(
+        Engine.INTERNAL_ANALYTICAL,
+        F.observation("cao-no-reaction", "exp-1", no_reaction, Decimal("0")),
+    )
+    assert refused_reaction.value is None
+    assert refused_reaction.refusal_reason is RefusalReason.IDENTITY_UNKNOWN
+    assert refused_reaction.refusal_detail["reason"] == (
+        "standard-pressure-transform-reaction-unknown"
+    )
+
+    assert isinstance(identity.reaction, State) and identity.reaction.is_value
+    reaction = identity.reaction.value
+    assert reaction is not None
+    unknown_phase_term = replace(
+        reaction.terms[0],
+        species=replace(reaction.terms[0].species, phase=State.unknown("not printed")),
+    )
+    unknown_phase_reaction = replace(
+        reaction,
+        terms=(unknown_phase_term, *reaction.terms[1:]),
+    )
+    no_phase = replace(identity, reaction=State.of(unknown_phase_reaction))
+    refused_phase = predict_thermo_attempt(
+        Engine.INTERNAL_ANALYTICAL,
+        F.observation("cao-no-phase", "exp-1", no_phase, Decimal("0")),
+    )
+    assert refused_phase.value is None
+    assert refused_phase.refusal_reason is RefusalReason.IDENTITY_UNKNOWN
+    assert refused_phase.refusal_detail["reason"] == (
+        "standard-pressure-transform-phase-unknown"
+    )
 
 
 def test_log10_kf_follows_delta_fg_and_has_no_kj_band() -> None:
