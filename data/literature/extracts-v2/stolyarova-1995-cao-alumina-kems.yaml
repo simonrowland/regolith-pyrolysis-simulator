@@ -2294,8 +2294,8 @@ observations:
   experiment_id: 3de85f9d4109dc67bdbcbf64908515ae465e6f9a8d854334927fab28a71c0dae::stolyarova-1995-cao-alumina-kems
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'Al2O3_activity'
+      tag: value
+      value: activity
     species:
       formula: Al2O3
       phase:
@@ -2307,12 +2307,56 @@ observations:
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
     temperature_K:
       tag: value
       value: '1933'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: 'source standard_state is not typed: Al2O3 activity relative to the pure Al2O3 oxide reference in Eq. (8), p.
+        688; the paper describes vapor pressures over the "individual oxides".'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; unsupported quantity 'Al2O3_activity'; refusing to pick a number
+    unavailable_reason: 'no mapped activity field selected; source fields: quantity, composition_component, method_class,
+      evidence_class, admission_status, status, reason, series'
     approximate: false
   uncertainty:
     kind: none
@@ -2323,7 +2367,7 @@ observations:
     original_method_class: measured_reduced
   admission:
     status: rejected
-    reason: Figure-only activity curve; no values digitized.
+    reason: Figure-only Al2O3 activity curve relative to the pure Al2O3 oxide reference; no values digitized.
     decided_by:
       worker: codex
       date: '2026-09-30'
@@ -2384,7 +2428,7 @@ observations:
     original_method_class: kems_effusion
   admission:
     status: rejected
-    reason: Figure-only chemical-potential curves; no values digitized.
+    reason: Figure 3 reports Al2O3 chemical-potential curves (Δμ), not activities; no values digitized.
     decided_by:
       worker: codex
       date: '2026-09-30'
@@ -3549,8 +3593,8 @@ observations:
   experiment_id: 3de85f9d4109dc67bdbcbf64908515ae465e6f9a8d854334927fab28a71c0dae::stolyarova-1995-cao-alumina-kems
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'CaO_activity'
+      tag: value
+      value: activity
     species:
       formula: CaO
       phase:
@@ -3562,12 +3606,56 @@ observations:
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
     temperature_K:
       tag: value
       value: '1933'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: 'source standard_state is not typed: CaO activity relative to the pure CaO oxide reference in Eq. (7), p. 688;
+        the paper describes vapor pressures over the "individual oxides".'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; unsupported quantity 'CaO_activity'; refusing to pick a number
+    unavailable_reason: 'no mapped activity field selected; source fields: quantity, composition_component, method_class,
+      evidence_class, admission_status, status, reason, series'
     approximate: false
   uncertainty:
     kind: none
@@ -3578,7 +3666,7 @@ observations:
     original_method_class: measured_reduced
   admission:
     status: rejected
-    reason: Figure-only activity curve; no values digitized.
+    reason: Figure-only CaO activity curve relative to the pure CaO oxide reference; no values digitized.
     decided_by:
       worker: codex
       date: '2026-09-30'
@@ -3638,7 +3726,7 @@ observations:
     original_method_class: kems_effusion
   admission:
     status: rejected
-    reason: Figure-only chemical-potential curves; no values digitized.
+    reason: Figure 3 reports CaO chemical-potential curves (Δμ), not activities; no values digitized.
     decided_by:
       worker: codex
       date: '2026-09-30'

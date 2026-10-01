@@ -34,18 +34,25 @@ experiments:
     total_pressure_Pa:
       state:
         tag: unknown
-        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
-          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
-          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
-          / P_test_Torr in this extract
+        reason: not_published
+      locator:
+        published_page: 19
+        pdf_page_index: 0
+        section: Experimental
+        note: 'not printed in this paper: no chamber or background pressure is reported.'
     sweep_gas:
       state:
         tag: unknown
-        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+        reason: not_published
+      locator:
+        published_page: 19
+        pdf_page_index: 0
+        section: Experimental
+        note: 'not printed in this paper: no sweep gas is stated.'
     regime:
       regime_class:
         tag: unknown
-        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+        reason: not_published
   work_id: 14a28aff34522806bfbcdc28dd34f3b16c99a47bfee72e9bc2e1689f0cf73355
   locator:
     published_page: 19
@@ -54,14 +61,24 @@ experiments:
     note: CaO–Al2O3 vapor studied by Knudsen effusion mass spectrometry.
   apparatus:
     calibration:
-      calibration:
+      method:
         state:
           tag: value
-          value: Silver vapor used as the reference for comparison of ion currents
+          value: comparison of ion currents
         locator:
           published_page: 20
           pdf_page_index: 1
-          note: Table 2 method description; silver vapor reference
+          section: Results
+          note: The paper states "comparison of ion currents".
+      reference_substance:
+        state:
+          tag: value
+          value: silver vapor
+        locator:
+          published_page: 20
+          pdf_page_index: 1
+          section: Results
+          note: The paper states "silver vapor ... reference".
   bench_id: 14a28aff34522806bfbcdc28dd34f3b16c99a47bfee72e9bc2e1689f0cf73355::bench::shornikov-1997-mo-kems
 - experiment_id: 14a28aff34522806bfbcdc28dd34f3b16c99a47bfee72e9bc2e1689f0cf73355::shornikov-1997-cao-alumina-vapor
   kind: literature
@@ -109,6 +126,8 @@ benches:
       published_page: 19
       pdf_page_index: 0
       section: Experimental
+      note: The paper names an "MI-201" mass spectrometer modified for thermodynamic studies [36]; [36] is Shul’ts and Shornikov
+        (1995), Doklady Ross. Akad. Nauk 340(3), 350. No apparatus numbers are imported from that citation.
   cell_material_and_liner:
     state:
       tag: value
@@ -117,7 +136,7 @@ benches:
       published_page: 19
       pdf_page_index: 0
       section: Experimental
-      note: Cell material as printed; no liner material stated.
+      note: The cell material is printed as "molybdenum"; no liner material is stated.
   cell_materials:
   - state:
       tag: value
@@ -126,7 +145,38 @@ benches:
       published_page: 19
       pdf_page_index: 0
       section: Experimental
-      note: The paper specifies molybdenum Knudsen cells.
+      note: The paper specifies "molybdenum cells".
+  geometry:
+    orifice_diameter_m:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 19
+        pdf_page_index: 0
+        section: Experimental
+        note: 'not printed in this paper: an area ratio is printed, but no orifice diameter is stated.'
+    orifice_to_sample_area_ratio:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.0025'
+          approximate: false
+      locator:
+        published_page: 19
+        pdf_page_index: 0
+        section: Experimental
+        note: 'The paper prints "no less than 1 : 400" for effusion-hole cross-section/vaporization area; typed ratio is 1/400.'
+    orifice_channel_length_m:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 19
+        pdf_page_index: 0
+        section: Experimental
+        note: 'not printed in this paper: no orifice channel length is stated.'
   other_facts: []
 context:
 - observation_id: shornikov_1997_table1_al2o_signal_condition_i
