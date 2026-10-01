@@ -889,7 +889,7 @@ def _cell_apparatus_inference_notices(
     experiment: Experiment | None,
     bench: Bench | None,
 ) -> tuple[Notice, ...]:
-    """Carry inferred values used by the reactive-cell and KEMS gates."""
+    """Flag inferred cell materials used by the reactive-cell gate."""
 
     if experiment is None or not experiment.method.is_value:
         return ()
@@ -908,41 +908,30 @@ def _cell_apparatus_inference_notices(
         and not _has_printed_fo2(reference, reference.identity)
     )
     if bench is not None and uses_cell_material:
+        if bench.cell_material_and_liner is not None:
+            fields.append(("bench.cell_material_and_liner", bench.cell_material_and_liner))
         fields.extend(
             (f"bench.cell_materials[{index}]", material)
             for index, material in enumerate(bench.cell_materials or ())
         )
-    # The Knudsen number is a derived convenience value, not a physical
-    # apparatus fact.  The regime fallback requires a printed diameter, while
-    # geometry validation may read a supplied inferred diameter.
     apparatus = experiment.apparatus
-    if apparatus is not None and quantity in _VAPOUR_EQUILIBRIUM:
-        if apparatus.geometry is not None:
-            for name in (
-                "orifice_area_m2",
-                "orifice_diameter_m",
-                "clausing_factor",
-            ):
-                value = getattr(apparatus.geometry, name)
-                if value is not None:
-                    fields.append((f"experiment.apparatus.geometry.{name}", value))
-        fields.extend(
-            (f"experiment.apparatus.calibration.{name}", value)
-            for name, value in (apparatus.calibration or {}).items()
-        )
+    if apparatus is not None and uses_cell_material:
+        if apparatus.cell_material_and_liner is not None:
+            fields.append(
+                (
+                    "experiment.apparatus.cell_material_and_liner",
+                    apparatus.cell_material_and_liner,
+                )
+            )
     notices: list[Notice] = []
     for field_name, located in fields:
         if located.inference is None or not located.state.is_value:
             continue
-        # Unit conversions and extraction/identity derivations do not assert
-        # an inferred property of the physical apparatus.
-        if located.inference.relation in {
-            "mm_to_m",
-            "cm_to_m",
-            "identity:m",
-            "extract_inference",
-        }:
-            continue
+        # These records are cell-material facts: a derivation on one says what
+        # the cell was. A unit conversion or arithmetic normalization restates
+        # a printed numeric quantity (such as orifice diameter) and is not a
+        # material inference. Keep this semantic boundary here rather than
+        # trying to enumerate derivation relation names.
         evidence = json.dumps(
             {
                 "field": field_name,
@@ -1529,15 +1518,16 @@ def _kems_replicate_groups(
 def derive_kems_partial_pressure_band(
     observations: Mapping[str, Observation],
     experiments: Mapping[str, Experiment],
+    *,
+    benches: Mapping[str, Bench] | None = None,
 ) -> DecisionBand | None:
-    """Derive a band from the supplied rows without bench inference context.
+    """Derive a band from measured rows and their optional bench context.
 
-    This data-only API cannot discover inferred bench cell materials because
-    benches are not part of its inputs.  Scoring uses the private derivation
-    with its complete bench map; ``decision_band_for`` never falls back to
-    this context-free result when a bench-aware derived band is absent.
+    Pass the bench map when a row's cell material is stored on its Bench. The
+    private scorer path supplies the same map directly; a missing band never
+    falls back to this helper from ``decision_band_for``.
     """
-    return _derive_kems_partial_pressure_band(observations, experiments, {})
+    return _derive_kems_partial_pressure_band(observations, experiments, benches or {})
 
 
 def _derive_kems_partial_pressure_band(

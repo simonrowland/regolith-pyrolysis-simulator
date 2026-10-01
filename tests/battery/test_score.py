@@ -4251,6 +4251,319 @@ def _cell_material_score_case(material, inference):
     return reference, context, bench, prediction
 
 
+def _migrated_stolyarova_cell_context(tmp_path: Path) -> ScoreContext:
+    from simulator.battery.migrate import Migrator, write_outputs
+
+    fixture = (
+        Path(__file__).resolve().parents[1]
+        / "fixtures"
+        / "battery"
+        / "stolyarova-1996-inferred-cell.yaml"
+    )
+    root = tmp_path / "stolyarova-store"
+    extract_dir = root / "data" / "literature" / "extracts"
+    extract_dir.mkdir(parents=True)
+    shutil.copyfile(fixture, extract_dir / fixture.name)
+
+    migrator = Migrator(root, index={}, aliases={})
+    migrator.migrate_extracts()
+    migrator.finalize()
+    write_outputs(migrator.result, root)
+    context = load_score_context(root)
+    review = dict(context.extract_review)
+    review["stolyarova-1996-cao-alumina-silica-kems"] = "reviewed"
+    return replace(context, extract_review=review)
+
+
+@pytest.mark.parametrize(
+    "record_form",
+    (
+        "bench.cell_materials[0]",
+        "bench.cell_material_and_liner",
+        "experiment.apparatus.cell_material_and_liner",
+    ),
+)
+def test_inferred_cell_material_is_noticed_in_each_record_form(record_form: str) -> None:
+    from simulator.battery.enums import CellMaterial
+    from simulator.battery.records import Apparatus
+    from simulator.battery.score import _cell_apparatus_inference_notices
+
+    inference = Derivation(
+        relation="extract_inference",
+        inputs=("inferred=true", "Mo ions identify the cell material"),
+        parameters=(),
+        output_unit="as_published",
+    )
+    reference, context, bench, _prediction = _cell_material_score_case(
+        CellMaterial.MO, inference
+    )
+    experiment = context.experiments[reference.experiment_id]
+    if record_form == "bench.cell_material_and_liner":
+        bench = replace(
+            bench,
+            cell_materials=None,
+            cell_material_and_liner=Located(State.of("Mo"), inference=inference),
+        )
+    elif record_form == "experiment.apparatus.cell_material_and_liner":
+        bench = replace(bench, cell_materials=None)
+        experiment = replace(
+            experiment,
+            apparatus=Apparatus(
+                cell_material_and_liner=Located(State.of("Mo"), inference=inference)
+            ),
+        )
+
+    notices = _cell_apparatus_inference_notices(reference, experiment, bench)
+    notice = next(item for item in notices if item.kind is NoticeKind.CELL_MATERIAL_INFERRED)
+    assert json.loads(notice.reason.partition(":")[2])["field"] == record_form
+
+
+def test_real_stolyarova_cell_passes_mo_gate_and_scores_with_notice(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from simulator.battery.enums import CellMaterial
+    from simulator.battery.score import predict_with_engine
+    from simulator.diagnostic_helpers import binary_pot_battery as battery
+
+    context = _migrated_stolyarova_cell_context(tmp_path)
+    reference = next(
+        item
+        for item in context.observations.values()
+        if isinstance(item.identity, Identity)
+        and quantity_token(item.identity) is Quantity.P_PARTIAL
+        and item.evidence.class_.is_value
+        and item.evidence.class_.value is EvidenceClass.MEASURED_DIRECT
+    )
+    experiment = context.experiments[reference.experiment_id]
+    assert experiment.bench_id is not None
+    bench = context.benches[experiment.bench_id]
+    material = bench.cell_materials[0]
+    assert material.state.value is CellMaterial.MO
+    assert material.inference is not None
+    assert material.inference.relation == "extract_inference"
+    assert material.inference.inputs[0] == "inferred=true"
+
+    # Stolyarova does not publish orifice geometry. Supply valid test geometry
+    # so this integration case reaches prediction and residual scoring.
+    ordinary_kems = F.kems_experiment(
+        experiment.experiment_id, experiment.work_id or "work-1"
+    )
+    experiment = replace(
+        experiment,
+        apparatus=ordinary_kems.apparatus,
+        pressure_environment=ordinary_kems.pressure_environment,
+    )
+    engine_handle = battery.EngineHandle(
+        name=Engine.OPENIMCC.value,
+        backend=object(),
+        available=True,
+        unavailable_reason=None,
+        takes_fo2=False,
+        supports_intrinsic_fo2=True,
+        identity={"version": "test"},
+    )
+    prediction_inputs = []
+
+    def fake_equilibrate(_handle, pot, *, temperature_K, po2, **_kwargs):
+        prediction_inputs.append(po2)
+        return battery.EquilibrateCell(
+            pot_id=pot.pot_id,
+            engine=Engine.OPENIMCC.value,
+            temperature_K=temperature_K,
+            po2=po2,
+            status="ok",
+            refusal_reason=None,
+            engine_status="ok",
+            engine_reason=None,
+            melt_activities={},
+            gas_partial_pressures_Pa={
+                reference.identity.species.formula: float(reference.value.point)
+            },
+            liquid_fraction=1.0,
+            wall_s=0.0,
+            cpu_s=0.0,
+            hostname="test",
+        )
+
+    monkeypatch.setattr(battery, "open_battery_engine", lambda _name: engine_handle)
+    monkeypatch.setattr(battery, "equilibrate_cell", fake_equilibrate)
+    prediction = predict_with_engine(
+        Engine.OPENIMCC,
+        reference,
+        experiment=experiment,
+        bench=bench,
+    )
+    assert len(prediction_inputs) == 1
+    assert prediction_inputs[0].cell_material == "Mo"
+
+    # This legacy extract leaves several identity axes unresolved. Use a typed
+    # KEMS scoring identity for the residual while keeping the migrated row id,
+    # measured value, and inferred bench unchanged.
+    reference = replace(
+        reference,
+        identity=replace(
+            _partial_identity(),
+            species=Species("K", Phase.G),
+            temperature_K=reference.identity.temperature_K,
+            total_pressure_Pa=State.of(Decimal("1e-6")),
+        ),
+        point_conditions={
+            **(reference.point_conditions or {}),
+            "fO2_Pa": Located(
+                State.of(Decimal("1e-8")),
+                locator=F.loc(page=18, paragraph="Results"),
+                inference=Derivation(
+                    relation="inferred fO2 from oxygen balance",
+                    inputs=("printed oxygen-bearing species",),
+                    parameters=(),
+                    output_unit="Pa",
+                ),
+            ),
+        },
+    )
+    prediction = replace(prediction, identity=reference.identity)
+
+    context = replace(
+        context,
+        experiments={**context.experiments, experiment.experiment_id: experiment},
+    )
+    band = DecisionBand(Decimal("0.2"), "dimensionless", "clean KEMS band")
+    residual, _ = compile_residual(
+        reference,
+        Engine.OPENIMCC,
+        context=context,
+        prediction=prediction,
+        derived_band=band,
+    )
+    assert residual.status is ResidualStatus.MATCH
+    assert residual.numeric is not None
+    assert residual.numeric.decision_band == band
+    assert residual.score_eligible is False
+    assert any(
+        item.kind is NoticeKind.CELL_MATERIAL_INFERRED
+        for item in residual.notices
+    )
+    strata = flagged_stratum_payloads(
+        (residual_to_plain(residual),), (Engine.OPENIMCC,)
+    )
+    assert strata[0]["stratum"] == "cell-material-inferred"
+
+
+def test_stolyarova_rows_do_not_move_any_kems_band_path(tmp_path: Path) -> None:
+    from simulator.battery.enums import BenchIdentityBasis, CellMaterial
+    from simulator.battery.records import Bench, BenchIdentity
+    from simulator.battery.score import _derive_kems_partial_pressure_band
+
+    context = _migrated_stolyarova_cell_context(tmp_path)
+    flagged = next(
+        item
+        for item in context.observations.values()
+        if isinstance(item.identity, Identity)
+        and quantity_token(item.identity) is Quantity.P_PARTIAL
+        and item.evidence.class_.is_value
+        and item.evidence.class_.value is EvidenceClass.MEASURED_DIRECT
+    )
+    flagged_experiment = context.experiments[flagged.experiment_id]
+    flagged_bench = context.benches[flagged_experiment.bench_id]
+
+    ordinary_kems = F.kems_experiment(
+        "stolyarova-clean-kems", flagged_experiment.work_id or "work-1"
+    )
+    clean_bench = Bench(
+        id="stolyarova-clean-pt",
+        work_id=ordinary_kems.work_id or "work-1",
+        identity=BenchIdentity(BenchIdentityBasis.DESCRIBED_IN_THIS_WORK),
+        cell_materials=(F.located(CellMaterial.PT),),
+    )
+    clean_experiment = replace(ordinary_kems, bench_id=clean_bench.id)
+    band_identity = replace(
+        flagged.identity,
+        species=replace(flagged.identity.species, phase=State.of(Phase.G)),
+        composition=_partial_identity().composition,
+    )
+    clean_rows = tuple(
+        replace(
+            flagged,
+            observation_id=f"stolyarova-clean-{index}",
+            experiment_id=clean_experiment.experiment_id,
+            source_id="stolyarova-clean-test",
+            identity=band_identity,
+            value=Value.point_of(value),
+            notices=(),
+        )
+        for index, value in enumerate((Decimal("1e-4"), Decimal("2e-4")))
+    )
+    clean = {row.observation_id: row for row in clean_rows}
+    experiments = {
+        flagged_experiment.experiment_id: flagged_experiment,
+        clean_experiment.experiment_id: clean_experiment,
+    }
+    benches = {flagged_bench.id: flagged_bench, clean_bench.id: clean_bench}
+
+    printed_clean = {
+        row.observation_id: replace(
+            row,
+            uncertainty=Uncertainty(
+                UncertaintyKind.PRINTED,
+                verbatim="10% pressure error",
+            ),
+        )
+        for row in clean_rows
+    }
+    printed_flagged = replace(
+        flagged,
+        uncertainty=Uncertainty(
+            UncertaintyKind.PRINTED,
+            verbatim="80% pressure error",
+        ),
+    )
+    printed_flagged_replica = replace(
+        printed_flagged,
+        observation_id="stolyarova-inferred-printed-replica",
+        value=Value.point_of(Decimal("1e-2")),
+    )
+    printed_mixed = {
+        **printed_clean,
+        printed_flagged.observation_id: printed_flagged,
+        printed_flagged_replica.observation_id: printed_flagged_replica,
+    }
+    printed_baseline = _derive_kems_partial_pressure_band(
+        printed_clean, experiments, {clean_bench.id: clean_bench}
+    )
+    printed_mixed_band = _derive_kems_partial_pressure_band(
+        printed_mixed, experiments, benches
+    )
+    assert printed_baseline is not None
+    assert "printed pressure envelope" in printed_baseline.rule
+    assert printed_mixed_band == printed_baseline
+
+    flagged_replica = replace(
+        flagged,
+        observation_id="stolyarova-inferred-replicate",
+        identity=band_identity,
+        value=Value.point_of(Decimal("1e-2")),
+    )
+    replicate_flagged = replace(flagged, identity=band_identity)
+    replicate_mixed = {
+        **clean,
+        flagged.observation_id: replicate_flagged,
+        flagged_replica.observation_id: flagged_replica,
+    }
+    replicate_baseline = _derive_kems_partial_pressure_band(
+        clean, experiments, {clean_bench.id: clean_bench}
+    )
+    replicate_mixed_band = _derive_kems_partial_pressure_band(
+        replicate_mixed, experiments, benches
+    )
+    assert replicate_baseline is not None
+    assert "replicate scatter" in replicate_baseline.rule
+    assert replicate_mixed_band == replicate_baseline
+    assert derive_kems_partial_pressure_band(
+        replicate_mixed, experiments, benches=benches
+    ) == replicate_baseline
+
+
 def test_inferred_mo_cell_scores_and_is_visible_on_residual_row() -> None:
     from simulator.battery.enums import CellMaterial
 
@@ -4395,8 +4708,8 @@ def test_inferred_cell_replicates_do_not_move_fallback_band() -> None:
     )
     assert clean_band is not None
     assert mixed_band == clean_band
-    # The public helper lacks benches by design; scoring must retain the
-    # bench-aware None result instead of falling back to that helper.
+    # The public helper must receive the same bench map as scoring so it can
+    # exclude inferred cell materials itself.
     from simulator.battery.score import (
         derive_kems_partial_pressure_band,
         decision_band_for,
@@ -4408,6 +4721,11 @@ def test_inferred_cell_replicates_do_not_move_fallback_band() -> None:
     assert derive_kems_partial_pressure_band(
         inferred_only, {flagged_exp.experiment_id: flagged_exp}
     ) is not None
+    assert derive_kems_partial_pressure_band(
+        inferred_only,
+        {flagged_exp.experiment_id: flagged_exp},
+        benches={flagged_bench.id: flagged_bench},
+    ) is None
     assert _derive_kems_partial_pressure_band(
         inferred_only,
         {flagged_exp.experiment_id: flagged_exp},
