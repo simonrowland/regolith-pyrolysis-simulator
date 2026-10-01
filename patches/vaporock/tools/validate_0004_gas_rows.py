@@ -131,18 +131,40 @@ def group_rows(rows: list[dict[str, str]]) -> dict[str, list[dict[str, str]]]:
 
 
 def patch_paths(path: Path) -> list[str]:
-    paths = []
+    """Return every file the patch would touch, as git itself resolves it.
+
+    Git applies a hunk whether its file header is a ``diff --git`` line or a
+    plain ``---``/``+++`` pair (patch 0002 in this series uses the plain
+    form), so reading only ``diff --git`` headers misses real targets. The
+    authority is therefore ``git apply --numstat``, which parses the patch
+    exactly as ``git apply`` would. The ``+++`` headers are read as a second,
+    independent enumeration; the two must agree, so a header form that one
+    reader skips cannot hide a target.
+    """
+
+    numstat = subprocess.run(
+        ["git", "apply", "--numstat", str(path)],
+        check=True,
+        capture_output=True,
+        text=True,
+    ).stdout
+    applied = sorted(
+        {line.split("\t", 2)[2] for line in numstat.splitlines() if line.count("\t") >= 2}
+    )
+    headers = set()
     for line in path.read_text(encoding="utf-8").splitlines():
-        if not line.startswith("diff --git "):
+        if not line.startswith("+++ "):
             continue
-        parts = line.split()
-        if len(parts) != 4 or not parts[2].startswith("a/") or not parts[3].startswith("b/"):
-            raise ValueError(f"{path}: malformed diff header: {line}")
-        before, after = parts[2][2:], parts[3][2:]
-        if before != after:
-            raise ValueError(f"{path}: diff changes path {before} to {after}")
-        paths.append(after)
-    return paths
+        target = line[4:].split("\t", 1)[0].strip()
+        if target == "/dev/null":
+            continue
+        headers.add(target[2:] if target.startswith("b/") else target)
+    if sorted(headers) != applied:
+        raise ValueError(
+            f"{path}: '+++' headers {sorted(headers)} disagree with "
+            f"git apply --numstat {applied}"
+        )
+    return applied
 
 
 def numeric(row: dict[str, str], field: str) -> Decimal:
