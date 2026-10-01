@@ -26,7 +26,7 @@ from simulator.battery.polymorph_dictionary import (
     printed_qualifier_from_name,
     unrecognised_polymorph_spelling,
 )
-from simulator.battery.records import Species, State
+from simulator.battery.records import Reaction, Species, State
 from simulator.reference_data.janaf import TABLES_DIR, load_table_document
 from tests.battery.test_usgs_b1544_generator import _generation as _b1544
 from tests.battery.test_usgs_b1544_generator import _load as _load_b1544
@@ -73,6 +73,66 @@ def test_janaf_same_species_and_polymorph_compare_equal() -> None:
     entropy = _first_crystal_identity(generated, Quantity.S)
     aligned = replace(cp, species=entropy.species)
     assert identity_equal(cp, aligned).kind is IdentityEqualKind.EQUAL
+
+
+def test_formation_identity_terms_compare_as_multisets() -> None:
+    generated = _b1544("usgs-b1544-quartz")
+    identity = next(
+        observation.identity
+        for observation in generated.observations
+        if quantity_token(observation.identity) is Quantity.DELTA_FG
+        and observation.identity.species.polymorph.is_value
+        and observation.identity.species.polymorph.value is Polymorph.ALPHA
+    )
+    assert identity.reaction is not None and identity.reaction.is_value
+    assert identity.formation_elements is not None and identity.formation_elements.is_value
+
+    reaction = identity.reaction.value
+    elements = identity.formation_elements.value
+    reordered = replace(
+        identity,
+        reaction=State.of(Reaction(tuple(reversed(reaction.terms)))),
+        formation_elements=State.of(tuple(reversed(elements))),
+    )
+    assert identity_equal(identity, reordered).kind is IdentityEqualKind.EQUAL
+
+    phase_changed = replace(
+        identity,
+        reaction=State.of(
+            Reaction(
+                tuple(
+                    replace(term, species=replace(term.species, phase=Phase.L))
+                    if term.species.formula == "Si"
+                    else term
+                    for term in reaction.terms
+                )
+            )
+        ),
+        formation_elements=State.of(
+            tuple(
+                (element, replace(species, phase=Phase.L))
+                if element == "Si"
+                else (element, species)
+                for element, species in elements
+            )
+        ),
+    )
+    assert identity_equal(identity, phase_changed).kind is IdentityEqualKind.IDENTITY_MISMATCH
+
+    coefficient_changed = replace(
+        identity,
+        reaction=State.of(
+            Reaction(
+                tuple(
+                    replace(term, coefficient=term.coefficient * 2)
+                    if term.species.formula == "Si"
+                    else term
+                    for term in reaction.terms
+                )
+            )
+        ),
+    )
+    assert identity_equal(identity, coefficient_changed).kind is IdentityEqualKind.IDENTITY_MISMATCH
 
 
 def test_janaf_different_polymorphs_of_one_formula_are_unequal() -> None:
