@@ -21,14 +21,34 @@ benches:
   - id: shornikov-1994-mullite-kems
     identity: {basis: described_in_this_work}
     apparatus_family:
-      state: {tag: value, value: "Knudsen-cell mass spectrometry"}
-      locator: {page: 478, published_page: 478, pdf_page_index: 0, paragraph: "Experimental"}
+      state: {tag: value, value: "MI 1201 mass spectrometer modified for high-temperature mass spectrometric studies"}
+      locator:
+        page: 478
+        published_page: 478
+        pdf_page_index: 0
+        paragraph: "Experimental"
+        note: 'The paper identifies "MI 1201"; it attributes the modification to traditional approaches without citing an apparatus paper.'
     cell_materials:
       - state: {tag: value, value: Mo}
-        locator: {page: 478, published_page: 478, pdf_page_index: 0, paragraph: "Molybdenum Knudsen effusion cell"}
+        locator: {page: 478, published_page: 478, pdf_page_index: 0, paragraph: "Molybdenum Knudsen effusion cell", note: 'The printed material is "molybdenum".'}
     cell_material_and_liner:
       state: {tag: value, value: "molybdenum Knudsen effusion cell"}
-      locator: {page: 478, published_page: 478, pdf_page_index: 0, paragraph: "Molybdenum Knudsen effusion cell"}
+      locator: {page: 478, published_page: 478, pdf_page_index: 0, paragraph: "Molybdenum Knudsen effusion cell", note: 'The paper says "molybdenum Knudsen effusion cell".'}
+    geometry:
+      orifice_to_sample_area_ratio:
+        state: {tag: value, value: {kind: point, point: "0.0025"}}
+        locator:
+          page: 478
+          published_page: 478
+          pdf_page_index: 0
+          paragraph: Results and Discussion
+          note: 'The paper prints "400:1" for vaporization/effusion-orifice area; typed orifice/sample ratio is 1/400.'
+      orifice_diameter_m:
+        state: {tag: unknown, reason: not_published}
+        locator: {page: 478, published_page: 478, pdf_page_index: 0, paragraph: "Results and Discussion", note: "not printed in this paper: the article prints an area ratio, not an orifice diameter."}
+      orifice_channel_length_m:
+        state: {tag: unknown, reason: not_published}
+        locator: {page: 478, published_page: 478, pdf_page_index: 0, paragraph: "Results and Discussion", note: "not printed in this paper: no orifice channel length is stated."}
 experiments:
   - experiment_id: shornikov-1994-mullite-mo-cell
     bench_id: shornikov-1994-mullite-kems
@@ -37,12 +57,12 @@ experiments:
     apparatus:
       calibration:
         ion_current_pressure_standards:
-          state: {tag: value, value: "Silver and gold vapour pressures used as standards for the traditional comparison of ion currents"}
-          locator: {page: 479, published_page: 479, pdf_page_index: 1, paragraph: "Partial vapour pressures", note: "The paper states that silver and gold vapour pressures were used as standards for the measured partial pressures."}
+          state: {tag: value, value: "Silver and gold vapour pressures used as standards for the comparison of ion currents"}
+          locator: {page: 479, published_page: 479, pdf_page_index: 1, paragraph: "Partial vapour pressures", note: 'The paper says "silver and gold vapour pressures" were used as "standards" for the comparison of ion currents.'}
     pressure_environment:
       total_pressure_Pa:
         state: {tag: unknown, reason: not_published}
-        locator: {page: 478, published_page: 478, pdf_page_index: 0, paragraph: "Experimental", note: "The paper does not state chamber or background pressure."}
+        locator: {page: 478, published_page: 478, pdf_page_index: 0, paragraph: "Experimental", note: "not printed in this paper: the paper does not state chamber or background pressure."}
       sweep_gas:
         state: {tag: unknown, reason: not_published}
         locator: {page: 478, published_page: 478, pdf_page_index: 0, paragraph: "Experimental", note: "The paper does not state a sweep gas."}
@@ -107,6 +127,23 @@ species:
             pressure_atm: 3.55e-9
             sigma: 1.8e-10
             locator: {page: 478, published_page: 478, pdf_page_index: 0, table: "2", note: "Table 2 row p_Al, column 1833 K; value printed as 0.355 ± 0.018 under p_Al · 10^-8"}
+            point_conditions:
+              composition:
+                state:
+                  tag: value
+                  value:
+                    basis: derived_from_formula
+                    amount_basis: mole_fraction
+                    components:
+                    - - Al2O3
+                      - '0.6'
+                    - - SiO2
+                      - '0.4'
+                locator: {page: 478, published_page: 478, pdf_page_index: 0, table: "2", note: "Derived from the printed mullite formula 3Al2O3·2SiO2; Table 2 contains no compositional analysis."}
+                inference:
+                  relation: formula_stoichiometry_to_mole_fraction
+                  inputs: ["printed formula=3Al2O3·2SiO2", "x(Al2O3)=3/(3+2)=0.6", "x(SiO2)=2/(3+2)=0.4", "mole fractions sum to 1", "71.8 wt% Al2O3 sanity check", "derived, not printed compositional analysis"]
+                  output_unit: mole_fraction
     - observation_id: shornikov_1994_al_partial_pressure_1933k
       type: partial_pressure
       locator: {page: 478, published_page: 478, pdf_page_index: 0, table: "2"}
@@ -138,6 +175,23 @@ species:
             pressure_atm: 3.2900000000000003e-8
             sigma: 1.5e-9
             locator: {page: 478, published_page: 478, pdf_page_index: 0, table: "2", note: "Table 2 row p_Al, column 1933 K; value printed as 3.29 ± 0.15 under p_Al · 10^-8"}
+            point_conditions:
+              composition:
+                state:
+                  tag: value
+                  value:
+                    basis: derived_from_formula
+                    amount_basis: mole_fraction
+                    components:
+                    - - Al2O3
+                      - '0.6'
+                    - - SiO2
+                      - '0.4'
+                locator: {page: 478, published_page: 478, pdf_page_index: 0, table: "2", note: "Derived from the printed mullite formula 3Al2O3·2SiO2; Table 2 contains no compositional analysis."}
+                inference:
+                  relation: formula_stoichiometry_to_mole_fraction
+                  inputs: ["printed formula=3Al2O3·2SiO2", "x(Al2O3)=3/(3+2)=0.6", "x(SiO2)=2/(3+2)=0.4", "mole fractions sum to 1", "71.8 wt% Al2O3 sanity check", "derived, not printed compositional analysis"]
+                  output_unit: mole_fraction
     - observation_id: shornikov_1994_al_partial_pressure_1983k
       type: partial_pressure
       locator: {page: 478, published_page: 478, pdf_page_index: 0, table: "2"}
@@ -169,6 +223,23 @@ species:
             pressure_atm: 7.5e-8
             sigma: 3e-9
             locator: {page: 478, published_page: 478, pdf_page_index: 0, table: "2", note: "Table 2 row p_Al, column 1983 K; value printed as 7.50 ± 0.30 under p_Al · 10^-8"}
+            point_conditions:
+              composition:
+                state:
+                  tag: value
+                  value:
+                    basis: derived_from_formula
+                    amount_basis: mole_fraction
+                    components:
+                    - - Al2O3
+                      - '0.6'
+                    - - SiO2
+                      - '0.4'
+                locator: {page: 478, published_page: 478, pdf_page_index: 0, table: "2", note: "Derived from the printed mullite formula 3Al2O3·2SiO2; Table 2 contains no compositional analysis."}
+                inference:
+                  relation: formula_stoichiometry_to_mole_fraction
+                  inputs: ["printed formula=3Al2O3·2SiO2", "x(Al2O3)=3/(3+2)=0.6", "x(SiO2)=2/(3+2)=0.4", "mole fractions sum to 1", "71.8 wt% Al2O3 sanity check", "derived, not printed compositional analysis"]
+                  output_unit: mole_fraction
     - observation_id: shornikov_1994_al_partial_pressure_2033k
       type: partial_pressure
       locator: {page: 478, published_page: 478, pdf_page_index: 0, table: "2"}
@@ -200,6 +271,23 @@ species:
             pressure_atm: 2.1100000000000002e-7
             sigma: 8e-9
             locator: {page: 478, published_page: 478, pdf_page_index: 0, table: "2", note: "Table 2 row p_Al, column 2033 K; value printed as 21.1 ± 0.8 under p_Al · 10^-8"}
+            point_conditions:
+              composition:
+                state:
+                  tag: value
+                  value:
+                    basis: derived_from_formula
+                    amount_basis: mole_fraction
+                    components:
+                    - - Al2O3
+                      - '0.6'
+                    - - SiO2
+                      - '0.4'
+                locator: {page: 478, published_page: 478, pdf_page_index: 0, table: "2", note: "Derived from the printed mullite formula 3Al2O3·2SiO2; Table 2 contains no compositional analysis."}
+                inference:
+                  relation: formula_stoichiometry_to_mole_fraction
+                  inputs: ["printed formula=3Al2O3·2SiO2", "x(Al2O3)=3/(3+2)=0.6", "x(SiO2)=2/(3+2)=0.4", "mole fractions sum to 1", "71.8 wt% Al2O3 sanity check", "derived, not printed compositional analysis"]
+                  output_unit: mole_fraction
   AlO:
     observations:
     - observation_id: shornikov_1994_alo_partial_pressure_1933k
@@ -233,6 +321,23 @@ species:
             pressure_atm: 5.5300000000000005e-9
             sigma: 4e-10
             locator: {page: 478, published_page: 478, pdf_page_index: 0, table: "2", note: "Table 2 row p_AlO, column 1933 K; value printed as 0.553 ± 0.040 under p_AlO · 10^-8"}
+            point_conditions:
+              composition:
+                state:
+                  tag: value
+                  value:
+                    basis: derived_from_formula
+                    amount_basis: mole_fraction
+                    components:
+                    - - Al2O3
+                      - '0.6'
+                    - - SiO2
+                      - '0.4'
+                locator: {page: 478, published_page: 478, pdf_page_index: 0, table: "2", note: "Derived from the printed mullite formula 3Al2O3·2SiO2; Table 2 contains no compositional analysis."}
+                inference:
+                  relation: formula_stoichiometry_to_mole_fraction
+                  inputs: ["printed formula=3Al2O3·2SiO2", "x(Al2O3)=3/(3+2)=0.6", "x(SiO2)=2/(3+2)=0.4", "mole fractions sum to 1", "71.8 wt% Al2O3 sanity check", "derived, not printed compositional analysis"]
+                  output_unit: mole_fraction
     - observation_id: shornikov_1994_alo_partial_pressure_1983k
       type: partial_pressure
       locator: {page: 478, published_page: 478, pdf_page_index: 0, table: "2"}
@@ -264,6 +369,23 @@ species:
             pressure_atm: 1.5800000000000003e-8
             sigma: 9e-10
             locator: {page: 478, published_page: 478, pdf_page_index: 0, table: "2", note: "Table 2 row p_AlO, column 1983 K; value printed as 1.58 ± 0.09 under p_AlO · 10^-8"}
+            point_conditions:
+              composition:
+                state:
+                  tag: value
+                  value:
+                    basis: derived_from_formula
+                    amount_basis: mole_fraction
+                    components:
+                    - - Al2O3
+                      - '0.6'
+                    - - SiO2
+                      - '0.4'
+                locator: {page: 478, published_page: 478, pdf_page_index: 0, table: "2", note: "Derived from the printed mullite formula 3Al2O3·2SiO2; Table 2 contains no compositional analysis."}
+                inference:
+                  relation: formula_stoichiometry_to_mole_fraction
+                  inputs: ["printed formula=3Al2O3·2SiO2", "x(Al2O3)=3/(3+2)=0.6", "x(SiO2)=2/(3+2)=0.4", "mole fractions sum to 1", "71.8 wt% Al2O3 sanity check", "derived, not printed compositional analysis"]
+                  output_unit: mole_fraction
     - observation_id: shornikov_1994_alo_partial_pressure_2033k
       type: partial_pressure
       locator: {page: 478, published_page: 478, pdf_page_index: 0, table: "2"}
@@ -295,6 +417,23 @@ species:
             pressure_atm: 4.21e-8
             sigma: 1.8e-9
             locator: {page: 478, published_page: 478, pdf_page_index: 0, table: "2", note: "Table 2 row p_AlO, column 2033 K; value printed as 4.21 ± 0.18 under p_AlO · 10^-8"}
+            point_conditions:
+              composition:
+                state:
+                  tag: value
+                  value:
+                    basis: derived_from_formula
+                    amount_basis: mole_fraction
+                    components:
+                    - - Al2O3
+                      - '0.6'
+                    - - SiO2
+                      - '0.4'
+                locator: {page: 478, published_page: 478, pdf_page_index: 0, table: "2", note: "Derived from the printed mullite formula 3Al2O3·2SiO2; Table 2 contains no compositional analysis."}
+                inference:
+                  relation: formula_stoichiometry_to_mole_fraction
+                  inputs: ["printed formula=3Al2O3·2SiO2", "x(Al2O3)=3/(3+2)=0.6", "x(SiO2)=2/(3+2)=0.4", "mole fractions sum to 1", "71.8 wt% Al2O3 sanity check", "derived, not printed compositional analysis"]
+                  output_unit: mole_fraction
   Al2O:
     observations:
     - observation_id: shornikov_1994_al2o_partial_pressure_1933k
@@ -328,6 +467,23 @@ species:
             pressure_atm: 2.1000000000000003e-8
             sigma: 1.5e-9
             locator: {page: 478, published_page: 478, pdf_page_index: 0, table: "2", note: "Table 2 row p_Al2O, column 1933 K; value printed as 2.10 ± 0.15 under p_Al2O · 10^-8"}
+            point_conditions:
+              composition:
+                state:
+                  tag: value
+                  value:
+                    basis: derived_from_formula
+                    amount_basis: mole_fraction
+                    components:
+                    - - Al2O3
+                      - '0.6'
+                    - - SiO2
+                      - '0.4'
+                locator: {page: 478, published_page: 478, pdf_page_index: 0, table: "2", note: "Derived from the printed mullite formula 3Al2O3·2SiO2; Table 2 contains no compositional analysis."}
+                inference:
+                  relation: formula_stoichiometry_to_mole_fraction
+                  inputs: ["printed formula=3Al2O3·2SiO2", "x(Al2O3)=3/(3+2)=0.6", "x(SiO2)=2/(3+2)=0.4", "mole fractions sum to 1", "71.8 wt% Al2O3 sanity check", "derived, not printed compositional analysis"]
+                  output_unit: mole_fraction
     - observation_id: shornikov_1994_al2o_partial_pressure_1983k
       type: partial_pressure
       locator: {page: 478, published_page: 478, pdf_page_index: 0, table: "2"}
@@ -359,6 +515,23 @@ species:
             pressure_atm: 4.4699999999999997e-8
             sigma: 2.5e-9
             locator: {page: 478, published_page: 478, pdf_page_index: 0, table: "2", note: "Table 2 row p_Al2O, column 1983 K; value printed as 4.47 ± 0.25 under p_Al2O · 10^-8"}
+            point_conditions:
+              composition:
+                state:
+                  tag: value
+                  value:
+                    basis: derived_from_formula
+                    amount_basis: mole_fraction
+                    components:
+                    - - Al2O3
+                      - '0.6'
+                    - - SiO2
+                      - '0.4'
+                locator: {page: 478, published_page: 478, pdf_page_index: 0, table: "2", note: "Derived from the printed mullite formula 3Al2O3·2SiO2; Table 2 contains no compositional analysis."}
+                inference:
+                  relation: formula_stoichiometry_to_mole_fraction
+                  inputs: ["printed formula=3Al2O3·2SiO2", "x(Al2O3)=3/(3+2)=0.6", "x(SiO2)=2/(3+2)=0.4", "mole fractions sum to 1", "71.8 wt% Al2O3 sanity check", "derived, not printed compositional analysis"]
+                  output_unit: mole_fraction
     - observation_id: shornikov_1994_al2o_partial_pressure_2033k
       type: partial_pressure
       locator: {page: 478, published_page: 478, pdf_page_index: 0, table: "2"}
@@ -390,6 +563,23 @@ species:
             pressure_atm: 1.4500000000000001e-7
             sigma: 8e-9
             locator: {page: 478, published_page: 478, pdf_page_index: 0, table: "2", note: "Table 2 row p_Al2O, column 2033 K; value printed as 14.5 ± 0.8 under p_Al2O · 10^-8"}
+            point_conditions:
+              composition:
+                state:
+                  tag: value
+                  value:
+                    basis: derived_from_formula
+                    amount_basis: mole_fraction
+                    components:
+                    - - Al2O3
+                      - '0.6'
+                    - - SiO2
+                      - '0.4'
+                locator: {page: 478, published_page: 478, pdf_page_index: 0, table: "2", note: "Derived from the printed mullite formula 3Al2O3·2SiO2; Table 2 contains no compositional analysis."}
+                inference:
+                  relation: formula_stoichiometry_to_mole_fraction
+                  inputs: ["printed formula=3Al2O3·2SiO2", "x(Al2O3)=3/(3+2)=0.6", "x(SiO2)=2/(3+2)=0.4", "mole fractions sum to 1", "71.8 wt% Al2O3 sanity check", "derived, not printed compositional analysis"]
+                  output_unit: mole_fraction
   AlSiO:
     observations:
     - observation_id: shornikov_1994_alsio_partial_pressure_1933k
@@ -423,6 +613,23 @@ species:
             pressure_atm: 3.4100000000000004e-11
             sigma: 3e-12
             locator: {page: 478, published_page: 478, pdf_page_index: 0, table: "2", note: "Table 2 row p_AlSiO, column 1933 K; value printed as 0.341 ± 0.030 under p_AlSiO · 10^-10"}
+            point_conditions:
+              composition:
+                state:
+                  tag: value
+                  value:
+                    basis: derived_from_formula
+                    amount_basis: mole_fraction
+                    components:
+                    - - Al2O3
+                      - '0.6'
+                    - - SiO2
+                      - '0.4'
+                locator: {page: 478, published_page: 478, pdf_page_index: 0, table: "2", note: "Derived from the printed mullite formula 3Al2O3·2SiO2; Table 2 contains no compositional analysis."}
+                inference:
+                  relation: formula_stoichiometry_to_mole_fraction
+                  inputs: ["printed formula=3Al2O3·2SiO2", "x(Al2O3)=3/(3+2)=0.6", "x(SiO2)=2/(3+2)=0.4", "mole fractions sum to 1", "71.8 wt% Al2O3 sanity check", "derived, not printed compositional analysis"]
+                  output_unit: mole_fraction
     - observation_id: shornikov_1994_alsio_partial_pressure_1983k
       type: partial_pressure
       locator: {page: 478, published_page: 478, pdf_page_index: 0, table: "2"}
@@ -454,6 +661,23 @@ species:
             pressure_atm: 1.41e-10
             sigma: 1.1e-11
             locator: {page: 478, published_page: 478, pdf_page_index: 0, table: "2", note: "Table 2 row p_AlSiO, column 1983 K; value printed as 1.41 ± 0.11 under p_AlSiO · 10^-10"}
+            point_conditions:
+              composition:
+                state:
+                  tag: value
+                  value:
+                    basis: derived_from_formula
+                    amount_basis: mole_fraction
+                    components:
+                    - - Al2O3
+                      - '0.6'
+                    - - SiO2
+                      - '0.4'
+                locator: {page: 478, published_page: 478, pdf_page_index: 0, table: "2", note: "Derived from the printed mullite formula 3Al2O3·2SiO2; Table 2 contains no compositional analysis."}
+                inference:
+                  relation: formula_stoichiometry_to_mole_fraction
+                  inputs: ["printed formula=3Al2O3·2SiO2", "x(Al2O3)=3/(3+2)=0.6", "x(SiO2)=2/(3+2)=0.4", "mole fractions sum to 1", "71.8 wt% Al2O3 sanity check", "derived, not printed compositional analysis"]
+                  output_unit: mole_fraction
     - observation_id: shornikov_1994_alsio_partial_pressure_2033k
       type: partial_pressure
       locator: {page: 478, published_page: 478, pdf_page_index: 0, table: "2"}
@@ -485,6 +709,23 @@ species:
             pressure_atm: 5.34e-10
             sigma: 4.0000000000000004e-11
             locator: {page: 478, published_page: 478, pdf_page_index: 0, table: "2", note: "Table 2 row p_AlSiO, column 2033 K; value printed as 5.34 ± 0.40 under p_AlSiO · 10^-10"}
+            point_conditions:
+              composition:
+                state:
+                  tag: value
+                  value:
+                    basis: derived_from_formula
+                    amount_basis: mole_fraction
+                    components:
+                    - - Al2O3
+                      - '0.6'
+                    - - SiO2
+                      - '0.4'
+                locator: {page: 478, published_page: 478, pdf_page_index: 0, table: "2", note: "Derived from the printed mullite formula 3Al2O3·2SiO2; Table 2 contains no compositional analysis."}
+                inference:
+                  relation: formula_stoichiometry_to_mole_fraction
+                  inputs: ["printed formula=3Al2O3·2SiO2", "x(Al2O3)=3/(3+2)=0.6", "x(SiO2)=2/(3+2)=0.4", "mole fractions sum to 1", "71.8 wt% Al2O3 sanity check", "derived, not printed compositional analysis"]
+                  output_unit: mole_fraction
   SiO:
     observations:
     - observation_id: shornikov_1994_sio_partial_pressure_1833k
@@ -518,6 +759,23 @@ species:
             pressure_atm: 0.000039500000000000005
             sigma: 0.000008000000000000001
             locator: {page: 478, published_page: 478, pdf_page_index: 0, table: "2", note: "Table 2 row p_SiO, column 1833 K; value printed as 3.95 ± 0.80 under p_SiO · 10^-5"}
+            point_conditions:
+              composition:
+                state:
+                  tag: value
+                  value:
+                    basis: derived_from_formula
+                    amount_basis: mole_fraction
+                    components:
+                    - - Al2O3
+                      - '0.6'
+                    - - SiO2
+                      - '0.4'
+                locator: {page: 478, published_page: 478, pdf_page_index: 0, table: "2", note: "Derived from the printed mullite formula 3Al2O3·2SiO2; Table 2 contains no compositional analysis."}
+                inference:
+                  relation: formula_stoichiometry_to_mole_fraction
+                  inputs: ["printed formula=3Al2O3·2SiO2", "x(Al2O3)=3/(3+2)=0.6", "x(SiO2)=2/(3+2)=0.4", "mole fractions sum to 1", "71.8 wt% Al2O3 sanity check", "derived, not printed compositional analysis"]
+                  output_unit: mole_fraction
     - observation_id: shornikov_1994_sio_partial_pressure_1933k
       type: partial_pressure
       locator: {page: 478, published_page: 478, pdf_page_index: 0, table: "2"}
@@ -549,6 +807,23 @@ species:
             pressure_atm: 0.0000408
             sigma: 0.0000015
             locator: {page: 478, published_page: 478, pdf_page_index: 0, table: "2", note: "Table 2 row p_SiO, column 1933 K; value printed as 4.08 ± 0.15 under p_SiO · 10^-5"}
+            point_conditions:
+              composition:
+                state:
+                  tag: value
+                  value:
+                    basis: derived_from_formula
+                    amount_basis: mole_fraction
+                    components:
+                    - - Al2O3
+                      - '0.6'
+                    - - SiO2
+                      - '0.4'
+                locator: {page: 478, published_page: 478, pdf_page_index: 0, table: "2", note: "Derived from the printed mullite formula 3Al2O3·2SiO2; Table 2 contains no compositional analysis."}
+                inference:
+                  relation: formula_stoichiometry_to_mole_fraction
+                  inputs: ["printed formula=3Al2O3·2SiO2", "x(Al2O3)=3/(3+2)=0.6", "x(SiO2)=2/(3+2)=0.4", "mole fractions sum to 1", "71.8 wt% Al2O3 sanity check", "derived, not printed compositional analysis"]
+                  output_unit: mole_fraction
     - observation_id: shornikov_1994_sio_partial_pressure_1983k
       type: partial_pressure
       locator: {page: 478, published_page: 478, pdf_page_index: 0, table: "2"}
@@ -580,6 +855,23 @@ species:
             pressure_atm: 0.00008580000000000001
             sigma: 0.0000025
             locator: {page: 478, published_page: 478, pdf_page_index: 0, table: "2", note: "Table 2 row p_SiO, column 1983 K; value printed as 8.58 ± 0.25 under p_SiO · 10^-5"}
+            point_conditions:
+              composition:
+                state:
+                  tag: value
+                  value:
+                    basis: derived_from_formula
+                    amount_basis: mole_fraction
+                    components:
+                    - - Al2O3
+                      - '0.6'
+                    - - SiO2
+                      - '0.4'
+                locator: {page: 478, published_page: 478, pdf_page_index: 0, table: "2", note: "Derived from the printed mullite formula 3Al2O3·2SiO2; Table 2 contains no compositional analysis."}
+                inference:
+                  relation: formula_stoichiometry_to_mole_fraction
+                  inputs: ["printed formula=3Al2O3·2SiO2", "x(Al2O3)=3/(3+2)=0.6", "x(SiO2)=2/(3+2)=0.4", "mole fractions sum to 1", "71.8 wt% Al2O3 sanity check", "derived, not printed compositional analysis"]
+                  output_unit: mole_fraction
     - observation_id: shornikov_1994_sio_partial_pressure_2033k
       type: partial_pressure
       locator: {page: 478, published_page: 478, pdf_page_index: 0, table: "2"}
@@ -611,6 +903,23 @@ species:
             pressure_atm: 0.000232
             sigma: 0.000007
             locator: {page: 478, published_page: 478, pdf_page_index: 0, table: "2", note: "Table 2 row p_SiO, column 2033 K; value printed as 23.2 ± 0.7 under p_SiO · 10^-5"}
+            point_conditions:
+              composition:
+                state:
+                  tag: value
+                  value:
+                    basis: derived_from_formula
+                    amount_basis: mole_fraction
+                    components:
+                    - - Al2O3
+                      - '0.6'
+                    - - SiO2
+                      - '0.4'
+                locator: {page: 478, published_page: 478, pdf_page_index: 0, table: "2", note: "Derived from the printed mullite formula 3Al2O3·2SiO2; Table 2 contains no compositional analysis."}
+                inference:
+                  relation: formula_stoichiometry_to_mole_fraction
+                  inputs: ["printed formula=3Al2O3·2SiO2", "x(Al2O3)=3/(3+2)=0.6", "x(SiO2)=2/(3+2)=0.4", "mole fractions sum to 1", "71.8 wt% Al2O3 sanity check", "derived, not printed compositional analysis"]
+                  output_unit: mole_fraction
   MoO2:
     observations:
     - observation_id: shornikov_1994_moo2_partial_pressure_1833k
@@ -644,6 +953,23 @@ species:
             pressure_atm: 5.26e-9
             sigma: 5e-10
             locator: {page: 478, published_page: 478, pdf_page_index: 0, table: "2", note: "Table 2 row p_MoO2, column 1833 K; value printed as 0.526 ± 0.050 under p_MoO2 · 10^-8"}
+            point_conditions:
+              composition:
+                state:
+                  tag: value
+                  value:
+                    basis: derived_from_formula
+                    amount_basis: mole_fraction
+                    components:
+                    - - Al2O3
+                      - '0.6'
+                    - - SiO2
+                      - '0.4'
+                locator: {page: 478, published_page: 478, pdf_page_index: 0, table: "2", note: "Derived from the printed mullite formula 3Al2O3·2SiO2; Table 2 contains no compositional analysis."}
+                inference:
+                  relation: formula_stoichiometry_to_mole_fraction
+                  inputs: ["printed formula=3Al2O3·2SiO2", "x(Al2O3)=3/(3+2)=0.6", "x(SiO2)=2/(3+2)=0.4", "mole fractions sum to 1", "71.8 wt% Al2O3 sanity check", "derived, not printed compositional analysis"]
+                  output_unit: mole_fraction
     - observation_id: shornikov_1994_moo2_partial_pressure_1933k
       type: partial_pressure
       locator: {page: 478, published_page: 478, pdf_page_index: 0, table: "2"}
@@ -675,6 +1001,23 @@ species:
             pressure_atm: 1.91e-8
             sigma: 1.5e-9
             locator: {page: 478, published_page: 478, pdf_page_index: 0, table: "2", note: "Table 2 row p_MoO2, column 1933 K; value printed as 1.91 ± 0.15 under p_MoO2 · 10^-8"}
+            point_conditions:
+              composition:
+                state:
+                  tag: value
+                  value:
+                    basis: derived_from_formula
+                    amount_basis: mole_fraction
+                    components:
+                    - - Al2O3
+                      - '0.6'
+                    - - SiO2
+                      - '0.4'
+                locator: {page: 478, published_page: 478, pdf_page_index: 0, table: "2", note: "Derived from the printed mullite formula 3Al2O3·2SiO2; Table 2 contains no compositional analysis."}
+                inference:
+                  relation: formula_stoichiometry_to_mole_fraction
+                  inputs: ["printed formula=3Al2O3·2SiO2", "x(Al2O3)=3/(3+2)=0.6", "x(SiO2)=2/(3+2)=0.4", "mole fractions sum to 1", "71.8 wt% Al2O3 sanity check", "derived, not printed compositional analysis"]
+                  output_unit: mole_fraction
     - observation_id: shornikov_1994_moo2_partial_pressure_1983k
       type: partial_pressure
       locator: {page: 478, published_page: 478, pdf_page_index: 0, table: "2"}
@@ -706,6 +1049,23 @@ species:
             pressure_atm: 3.4e-8
             sigma: 2.5e-9
             locator: {page: 478, published_page: 478, pdf_page_index: 0, table: "2", note: "Table 2 row p_MoO2, column 1983 K; value printed as 3.40 ± 0.25 under p_MoO2 · 10^-8"}
+            point_conditions:
+              composition:
+                state:
+                  tag: value
+                  value:
+                    basis: derived_from_formula
+                    amount_basis: mole_fraction
+                    components:
+                    - - Al2O3
+                      - '0.6'
+                    - - SiO2
+                      - '0.4'
+                locator: {page: 478, published_page: 478, pdf_page_index: 0, table: "2", note: "Derived from the printed mullite formula 3Al2O3·2SiO2; Table 2 contains no compositional analysis."}
+                inference:
+                  relation: formula_stoichiometry_to_mole_fraction
+                  inputs: ["printed formula=3Al2O3·2SiO2", "x(Al2O3)=3/(3+2)=0.6", "x(SiO2)=2/(3+2)=0.4", "mole fractions sum to 1", "71.8 wt% Al2O3 sanity check", "derived, not printed compositional analysis"]
+                  output_unit: mole_fraction
     - observation_id: shornikov_1994_moo2_partial_pressure_2033k
       type: partial_pressure
       locator: {page: 478, published_page: 478, pdf_page_index: 0, table: "2"}
@@ -737,6 +1097,23 @@ species:
             pressure_atm: 5.78e-8
             sigma: 3e-9
             locator: {page: 478, published_page: 478, pdf_page_index: 0, table: "2", note: "Table 2 row p_MoO2, column 2033 K; value printed as 5.78 ± 0.30 under p_MoO2 · 10^-8"}
+            point_conditions:
+              composition:
+                state:
+                  tag: value
+                  value:
+                    basis: derived_from_formula
+                    amount_basis: mole_fraction
+                    components:
+                    - - Al2O3
+                      - '0.6'
+                    - - SiO2
+                      - '0.4'
+                locator: {page: 478, published_page: 478, pdf_page_index: 0, table: "2", note: "Derived from the printed mullite formula 3Al2O3·2SiO2; Table 2 contains no compositional analysis."}
+                inference:
+                  relation: formula_stoichiometry_to_mole_fraction
+                  inputs: ["printed formula=3Al2O3·2SiO2", "x(Al2O3)=3/(3+2)=0.6", "x(SiO2)=2/(3+2)=0.4", "mole fractions sum to 1", "71.8 wt% Al2O3 sanity check", "derived, not printed compositional analysis"]
+                  output_unit: mole_fraction
   MoO3:
     observations:
     - observation_id: shornikov_1994_moo3_partial_pressure_1833k
@@ -770,6 +1147,23 @@ species:
             pressure_atm: 1.24e-9
             sigma: 8e-11
             locator: {page: 478, published_page: 478, pdf_page_index: 0, table: "2", note: "Table 2 row p_MoO3, column 1833 K; value printed as 1.24 ± 0.08 under p_MoO3 · 10^-9"}
+            point_conditions:
+              composition:
+                state:
+                  tag: value
+                  value:
+                    basis: derived_from_formula
+                    amount_basis: mole_fraction
+                    components:
+                    - - Al2O3
+                      - '0.6'
+                    - - SiO2
+                      - '0.4'
+                locator: {page: 478, published_page: 478, pdf_page_index: 0, table: "2", note: "Derived from the printed mullite formula 3Al2O3·2SiO2; Table 2 contains no compositional analysis."}
+                inference:
+                  relation: formula_stoichiometry_to_mole_fraction
+                  inputs: ["printed formula=3Al2O3·2SiO2", "x(Al2O3)=3/(3+2)=0.6", "x(SiO2)=2/(3+2)=0.4", "mole fractions sum to 1", "71.8 wt% Al2O3 sanity check", "derived, not printed compositional analysis"]
+                  output_unit: mole_fraction
     - observation_id: shornikov_1994_moo3_partial_pressure_1933k
       type: partial_pressure
       locator: {page: 478, published_page: 478, pdf_page_index: 0, table: "2"}
@@ -801,6 +1195,23 @@ species:
             pressure_atm: 4.22e-9
             sigma: 2.5e-10
             locator: {page: 478, published_page: 478, pdf_page_index: 0, table: "2", note: "Table 2 row p_MoO3, column 1933 K; value printed as 4.22 ± 0.25 under p_MoO3 · 10^-9"}
+            point_conditions:
+              composition:
+                state:
+                  tag: value
+                  value:
+                    basis: derived_from_formula
+                    amount_basis: mole_fraction
+                    components:
+                    - - Al2O3
+                      - '0.6'
+                    - - SiO2
+                      - '0.4'
+                locator: {page: 478, published_page: 478, pdf_page_index: 0, table: "2", note: "Derived from the printed mullite formula 3Al2O3·2SiO2; Table 2 contains no compositional analysis."}
+                inference:
+                  relation: formula_stoichiometry_to_mole_fraction
+                  inputs: ["printed formula=3Al2O3·2SiO2", "x(Al2O3)=3/(3+2)=0.6", "x(SiO2)=2/(3+2)=0.4", "mole fractions sum to 1", "71.8 wt% Al2O3 sanity check", "derived, not printed compositional analysis"]
+                  output_unit: mole_fraction
     - observation_id: shornikov_1994_moo3_partial_pressure_1983k
       type: partial_pressure
       locator: {page: 478, published_page: 478, pdf_page_index: 0, table: "2"}
@@ -832,6 +1243,23 @@ species:
             pressure_atm: 7.64e-9
             sigma: 4e-10
             locator: {page: 478, published_page: 478, pdf_page_index: 0, table: "2", note: "Table 2 row p_MoO3, column 1983 K; value printed as 7.64 ± 0.40 under p_MoO3 · 10^-9"}
+            point_conditions:
+              composition:
+                state:
+                  tag: value
+                  value:
+                    basis: derived_from_formula
+                    amount_basis: mole_fraction
+                    components:
+                    - - Al2O3
+                      - '0.6'
+                    - - SiO2
+                      - '0.4'
+                locator: {page: 478, published_page: 478, pdf_page_index: 0, table: "2", note: "Derived from the printed mullite formula 3Al2O3·2SiO2; Table 2 contains no compositional analysis."}
+                inference:
+                  relation: formula_stoichiometry_to_mole_fraction
+                  inputs: ["printed formula=3Al2O3·2SiO2", "x(Al2O3)=3/(3+2)=0.6", "x(SiO2)=2/(3+2)=0.4", "mole fractions sum to 1", "71.8 wt% Al2O3 sanity check", "derived, not printed compositional analysis"]
+                  output_unit: mole_fraction
     - observation_id: shornikov_1994_moo3_partial_pressure_2033k
       type: partial_pressure
       locator: {page: 478, published_page: 478, pdf_page_index: 0, table: "2"}
@@ -863,6 +1291,23 @@ species:
             pressure_atm: 1.24e-8
             sigma: 6e-10
             locator: {page: 478, published_page: 478, pdf_page_index: 0, table: "2", note: "Table 2 row p_MoO3, column 2033 K; value printed as 12.4 ± 0.6 under p_MoO3 · 10^-9"}
+            point_conditions:
+              composition:
+                state:
+                  tag: value
+                  value:
+                    basis: derived_from_formula
+                    amount_basis: mole_fraction
+                    components:
+                    - - Al2O3
+                      - '0.6'
+                    - - SiO2
+                      - '0.4'
+                locator: {page: 478, published_page: 478, pdf_page_index: 0, table: "2", note: "Derived from the printed mullite formula 3Al2O3·2SiO2; Table 2 contains no compositional analysis."}
+                inference:
+                  relation: formula_stoichiometry_to_mole_fraction
+                  inputs: ["printed formula=3Al2O3·2SiO2", "x(Al2O3)=3/(3+2)=0.6", "x(SiO2)=2/(3+2)=0.4", "mole fractions sum to 1", "71.8 wt% Al2O3 sanity check", "derived, not printed compositional analysis"]
+                  output_unit: mole_fraction
   O2:
     observations:
     - observation_id: shornikov_1994_o2_partial_pressure_1833k
@@ -902,6 +1347,23 @@ species:
             pressure_atm: 5.21e-12
             sigma: 5e-13
             locator: {page: 478, published_page: 478, pdf_page_index: 0, table: "2", note: "Table 2 row p_O2, column 1833 K; value printed as 0.521 ± 0.050 under p_O2 · 10^-11"}
+            point_conditions:
+              composition:
+                state:
+                  tag: value
+                  value:
+                    basis: derived_from_formula
+                    amount_basis: mole_fraction
+                    components:
+                    - - Al2O3
+                      - '0.6'
+                    - - SiO2
+                      - '0.4'
+                locator: {page: 478, published_page: 478, pdf_page_index: 0, table: "2", note: "Derived from the printed mullite formula 3Al2O3·2SiO2; Table 2 contains no compositional analysis."}
+                inference:
+                  relation: formula_stoichiometry_to_mole_fraction
+                  inputs: ["printed formula=3Al2O3·2SiO2", "x(Al2O3)=3/(3+2)=0.6", "x(SiO2)=2/(3+2)=0.4", "mole fractions sum to 1", "71.8 wt% Al2O3 sanity check", "derived, not printed compositional analysis"]
+                  output_unit: mole_fraction
     - observation_id: shornikov_1994_o2_partial_pressure_1933k
       type: partial_pressure
       locator: {page: 478, published_page: 478, pdf_page_index: 0, table: "2"}
@@ -939,6 +1401,23 @@ species:
             pressure_atm: 4.59e-11
             sigma: 2.6e-12
             locator: {page: 478, published_page: 478, pdf_page_index: 0, table: "2", note: "Table 2 row p_O2, column 1933 K; value printed as 4.59 ± 0.26 under p_O2 · 10^-11"}
+            point_conditions:
+              composition:
+                state:
+                  tag: value
+                  value:
+                    basis: derived_from_formula
+                    amount_basis: mole_fraction
+                    components:
+                    - - Al2O3
+                      - '0.6'
+                    - - SiO2
+                      - '0.4'
+                locator: {page: 478, published_page: 478, pdf_page_index: 0, table: "2", note: "Derived from the printed mullite formula 3Al2O3·2SiO2; Table 2 contains no compositional analysis."}
+                inference:
+                  relation: formula_stoichiometry_to_mole_fraction
+                  inputs: ["printed formula=3Al2O3·2SiO2", "x(Al2O3)=3/(3+2)=0.6", "x(SiO2)=2/(3+2)=0.4", "mole fractions sum to 1", "71.8 wt% Al2O3 sanity check", "derived, not printed compositional analysis"]
+                  output_unit: mole_fraction
     - observation_id: shornikov_1994_o2_partial_pressure_1983k
       type: partial_pressure
       locator: {page: 478, published_page: 478, pdf_page_index: 0, table: "2"}
@@ -976,6 +1455,23 @@ species:
             pressure_atm: 1.37e-10
             sigma: 6e-12
             locator: {page: 478, published_page: 478, pdf_page_index: 0, table: "2", note: "Table 2 row p_O2, column 1983 K; value printed as 13.7 ± 0.6 under p_O2 · 10^-11"}
+            point_conditions:
+              composition:
+                state:
+                  tag: value
+                  value:
+                    basis: derived_from_formula
+                    amount_basis: mole_fraction
+                    components:
+                    - - Al2O3
+                      - '0.6'
+                    - - SiO2
+                      - '0.4'
+                locator: {page: 478, published_page: 478, pdf_page_index: 0, table: "2", note: "Derived from the printed mullite formula 3Al2O3·2SiO2; Table 2 contains no compositional analysis."}
+                inference:
+                  relation: formula_stoichiometry_to_mole_fraction
+                  inputs: ["printed formula=3Al2O3·2SiO2", "x(Al2O3)=3/(3+2)=0.6", "x(SiO2)=2/(3+2)=0.4", "mole fractions sum to 1", "71.8 wt% Al2O3 sanity check", "derived, not printed compositional analysis"]
+                  output_unit: mole_fraction
     - observation_id: shornikov_1994_o2_partial_pressure_2033k
       type: partial_pressure
       locator: {page: 478, published_page: 478, pdf_page_index: 0, table: "2"}
@@ -1013,6 +1509,23 @@ species:
             pressure_atm: 3.43e-10
             sigma: 1.7e-11
             locator: {page: 478, published_page: 478, pdf_page_index: 0, table: "2", note: "Table 2 row p_O2, column 2033 K; value printed as 34.3 ± 1.7 under p_O2 · 10^-11"}
+            point_conditions:
+              composition:
+                state:
+                  tag: value
+                  value:
+                    basis: derived_from_formula
+                    amount_basis: mole_fraction
+                    components:
+                    - - Al2O3
+                      - '0.6'
+                    - - SiO2
+                      - '0.4'
+                locator: {page: 478, published_page: 478, pdf_page_index: 0, table: "2", note: "Derived from the printed mullite formula 3Al2O3·2SiO2; Table 2 contains no compositional analysis."}
+                inference:
+                  relation: formula_stoichiometry_to_mole_fraction
+                  inputs: ["printed formula=3Al2O3·2SiO2", "x(Al2O3)=3/(3+2)=0.6", "x(SiO2)=2/(3+2)=0.4", "mole fractions sum to 1", "71.8 wt% Al2O3 sanity check", "derived, not printed compositional analysis"]
+                  output_unit: mole_fraction
   O:
     observations:
     - observation_id: shornikov_1994_o_partial_pressure_1833k
@@ -1053,6 +1566,23 @@ species:
             pressure_atm: 3.7500000000000005e-10
             sigma: 4.0000000000000004e-11
             locator: {page: 478, published_page: 478, pdf_page_index: 0, table: "2", note: "Table 2 row p_O, column 1833 K; value printed as 0.375 ± 0.040 under p_O · 10^-9"}
+            point_conditions:
+              composition:
+                state:
+                  tag: value
+                  value:
+                    basis: derived_from_formula
+                    amount_basis: mole_fraction
+                    components:
+                    - - Al2O3
+                      - '0.6'
+                    - - SiO2
+                      - '0.4'
+                locator: {page: 478, published_page: 478, pdf_page_index: 0, table: "2", note: "Derived from the printed mullite formula 3Al2O3·2SiO2; Table 2 contains no compositional analysis."}
+                inference:
+                  relation: formula_stoichiometry_to_mole_fraction
+                  inputs: ["printed formula=3Al2O3·2SiO2", "x(Al2O3)=3/(3+2)=0.6", "x(SiO2)=2/(3+2)=0.4", "mole fractions sum to 1", "71.8 wt% Al2O3 sanity check", "derived, not printed compositional analysis"]
+                  output_unit: mole_fraction
     - observation_id: shornikov_1994_o_partial_pressure_1933k
       type: partial_pressure
       locator: {page: 478, published_page: 478, pdf_page_index: 0, table: "2"}
@@ -1091,6 +1621,23 @@ species:
             pressure_atm: 2.65e-9
             sigma: 1.5e-10
             locator: {page: 478, published_page: 478, pdf_page_index: 0, table: "2", note: "Table 2 row p_O, column 1933 K; value printed as 2.65 ± 0.15 under p_O · 10^-9"}
+            point_conditions:
+              composition:
+                state:
+                  tag: value
+                  value:
+                    basis: derived_from_formula
+                    amount_basis: mole_fraction
+                    components:
+                    - - Al2O3
+                      - '0.6'
+                    - - SiO2
+                      - '0.4'
+                locator: {page: 478, published_page: 478, pdf_page_index: 0, table: "2", note: "Derived from the printed mullite formula 3Al2O3·2SiO2; Table 2 contains no compositional analysis."}
+                inference:
+                  relation: formula_stoichiometry_to_mole_fraction
+                  inputs: ["printed formula=3Al2O3·2SiO2", "x(Al2O3)=3/(3+2)=0.6", "x(SiO2)=2/(3+2)=0.4", "mole fractions sum to 1", "71.8 wt% Al2O3 sanity check", "derived, not printed compositional analysis"]
+                  output_unit: mole_fraction
     - observation_id: shornikov_1994_o_partial_pressure_1983k
       type: partial_pressure
       locator: {page: 478, published_page: 478, pdf_page_index: 0, table: "2"}
@@ -1129,6 +1676,23 @@ species:
             pressure_atm: 6.830000000000001e-9
             sigma: 3e-10
             locator: {page: 478, published_page: 478, pdf_page_index: 0, table: "2", note: "Table 2 row p_O, column 1983 K; value printed as 6.83 ± 0.30 under p_O · 10^-9"}
+            point_conditions:
+              composition:
+                state:
+                  tag: value
+                  value:
+                    basis: derived_from_formula
+                    amount_basis: mole_fraction
+                    components:
+                    - - Al2O3
+                      - '0.6'
+                    - - SiO2
+                      - '0.4'
+                locator: {page: 478, published_page: 478, pdf_page_index: 0, table: "2", note: "Derived from the printed mullite formula 3Al2O3·2SiO2; Table 2 contains no compositional analysis."}
+                inference:
+                  relation: formula_stoichiometry_to_mole_fraction
+                  inputs: ["printed formula=3Al2O3·2SiO2", "x(Al2O3)=3/(3+2)=0.6", "x(SiO2)=2/(3+2)=0.4", "mole fractions sum to 1", "71.8 wt% Al2O3 sanity check", "derived, not printed compositional analysis"]
+                  output_unit: mole_fraction
     - observation_id: shornikov_1994_o_partial_pressure_2033k
       type: partial_pressure
       locator: {page: 478, published_page: 478, pdf_page_index: 0, table: "2"}
@@ -1167,6 +1731,23 @@ species:
             pressure_atm: 1.5800000000000003e-8
             sigma: 8.000000000000001e-10
             locator: {page: 478, published_page: 478, pdf_page_index: 0, table: "2", note: "Table 2 row p_O, column 2033 K; value printed as 15.8 ± 0.8 under p_O · 10^-9"}
+            point_conditions:
+              composition:
+                state:
+                  tag: value
+                  value:
+                    basis: derived_from_formula
+                    amount_basis: mole_fraction
+                    components:
+                    - - Al2O3
+                      - '0.6'
+                    - - SiO2
+                      - '0.4'
+                locator: {page: 478, published_page: 478, pdf_page_index: 0, table: "2", note: "Derived from the printed mullite formula 3Al2O3·2SiO2; Table 2 contains no compositional analysis."}
+                inference:
+                  relation: formula_stoichiometry_to_mole_fraction
+                  inputs: ["printed formula=3Al2O3·2SiO2", "x(Al2O3)=3/(3+2)=0.6", "x(SiO2)=2/(3+2)=0.4", "mole fractions sum to 1", "71.8 wt% Al2O3 sanity check", "derived, not printed compositional analysis"]
+                  output_unit: mole_fraction
   Al2O3:
     observations:
     - observation_id: shornikov_1994_al2o3_activity_1833k

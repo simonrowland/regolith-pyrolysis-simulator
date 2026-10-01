@@ -19,7 +19,8 @@ extraction:
     using Eqn 2 at x_CaO=1.000) remain absent, never zero. Tables 3–5 report
     thermodynamic quantities rather than partial pressures and are outside this
     pressure extraction. Figures 1–4 are retained as figure-only placeholders;
-    no figure values were digitized.
+    no figure values were digitized. The article does not describe x(CaO)=0.75
+    or 0.86 as two-phase or lime-saturated (pp. 686–687).
   date: '2026-09-30'
   worker: codex
   provenance_path: raw/stolyarova-1995-cao-alumina-kems/ocr-mineru/full/vlm/stolyarova-1995-cao-alumina-kems.md
@@ -61,22 +62,26 @@ benches:
   - id: stolyarova-1995-molybdenum-cell
     identity: {basis: described_in_this_work}
     apparatus_family:
-      state: {tag: value, value: Knudsen-cell mass spectrometry}
-      locator: {published_page: 687, pdf_page_index: 1, section: Experimental}
+      state: {tag: value, value: "magnetic mass spectrometer model MI 1201"}
+      locator:
+        published_page: 686
+        pdf_page_index: 0
+        section: "Experimental"
+        note: 'The paper says "model MI 1201" and cites Drowart, Exsteen, and Verhaegen (1965), reference 37, for standard methods; no apparatus numbers are imported from that citation.'
     cell_materials:
       - state: {tag: value, value: Mo}
         locator:
           published_page: 687
           pdf_page_index: 1
           table: '1'
-          note: "Present-study column, row “Material of effusion cell”."
+          note: 'Present-study column, row "Material of effusion cell"; the printed value is "Mo".'
     cell_material_and_liner:
-      state: {tag: value, value: molybdenum effusion cell; no liner stated}
+      state: {tag: value, value: "molybdenum effusion cell; no liner stated"}
       locator:
         published_page: 687
         pdf_page_index: 1
         table: '1'
-        note: Present-study column identifies the effusion cell as Mo; no separate orifice material is stated.
+        note: 'Present-study column prints "Mo" for the effusion cell; no separate orifice material is stated.'
     geometry:
       orifice_to_sample_area_ratio:
         state: {tag: value, value: {kind: point, point: '0.01'}}
@@ -84,7 +89,13 @@ benches:
           published_page: 687
           pdf_page_index: 1
           section: Experimental
-          note: Printed vaporization-area/orifice-area ratio is 100:1; typed orifice/sample ratio is its reciprocal, 1:100 = 0.01.
+          note: 'The paper prints "100:1" for vaporization-area/effusion-orifice area; typed orifice/sample ratio is the reciprocal, 1:100 = 0.01.'
+      orifice_diameter_m:
+        state: {tag: unknown, reason: not_published}
+        locator: {published_page: 687, pdf_page_index: 1, section: "Experimental", note: "not printed in this paper: the printed geometry is an area ratio; the orifice diameter is not stated."}
+      orifice_channel_length_m:
+        state: {tag: unknown, reason: not_published}
+        locator: {published_page: 687, pdf_page_index: 1, section: "Experimental", note: "not printed in this paper: no orifice channel length is stated."}
 experiments:
   - experiment_id: stolyarova-1995-mo-cell
     bench_id: stolyarova-1995-molybdenum-cell
@@ -94,6 +105,39 @@ experiments:
       pdf_page_index: 1
       section: Experimental
       note: Knudsen effusion mass spectrometry; vaporization-area/orifice-area ratio 100:1.
+    apparatus:
+      calibration:
+        method:
+          state: {tag: value, value: "ion-current comparison method"}
+          locator:
+            published_page: 688
+            pdf_page_index: 2
+            section: Results and discussion
+            note: 'The paper says "ion current comparison method".'
+        reference_substance:
+          state: {tag: value, value: "silver vapor"}
+          locator:
+            published_page: 688
+            pdf_page_index: 2
+            section: Results and discussion
+            note: 'The paper says "silver vapor ... a standard" for the measurements.'
+    pressure_environment:
+      total_pressure_Pa:
+        state: {tag: unknown, reason: not_published}
+        locator:
+          published_page: 686
+          pdf_page_index: 0
+          section: Experimental
+          note: "not printed in this paper: the experimental description and Tables 1–3 report no background or residual pressure."
+      sweep_gas:
+        state: {tag: unknown, reason: not_published}
+        locator:
+          published_page: 686
+          pdf_page_index: 0
+          section: Experimental
+          note: "not printed in this paper: no sweep gas is stated."
+      regime:
+        regime_class: {tag: unknown, reason: not_published}
 species:
   Ca:
     observations:
@@ -185,7 +229,7 @@ species:
         equipment:
           cell_material_and_liner:
             value: Mo
-            locator: {page: 687, published_page: 687, pdf_page_index: 1, table: '1', note: "Present-study column, row “Material of effusion cell”."}
+            locator: {page: 687, published_page: 687, pdf_page_index: 1, table: '1', note: 'Present-study column, row "Material of effusion cell".'}
   Al:
     observations:
       - observation_id: stolyarova_1995_al_partial_pressure_table2
@@ -372,7 +416,7 @@ species:
         units: atm as printed (p_O × 10^9)
         derived_from: [stolyarova_1995_ca_partial_pressure_table2, stolyarova_1995_al_partial_pressure_table2, stolyarova_1995_alo_partial_pressure_table2]
         derivation:
-          relation: Author calculation of p_O using Eqn 1 and available vapor-equilibrium thermodynamic data.
+          relation: 'Table 2 “Eqn 1” p(O) uses MoO2+ and MoO3+ ion currents with MoO3 = MoO2 + O; “Eqn 2” p(O) uses Al+ and AlO+ ion currents with AlO = Al + O. The paper says “MoO2+ and MoO3+” for the first route and “Al+ and AlO+” for the second (p. 688, Eqs. 2–6). The table labels these calculations Eqn 1 and Eqn 2.'
           inputs: [stolyarova_1995_ca_partial_pressure_table2, stolyarova_1995_al_partial_pressure_table2, stolyarova_1995_alo_partial_pressure_table2]
           output_unit: atm
         values:
@@ -470,7 +514,7 @@ species:
         units: atm as printed (p_O × 10^9)
         derived_from: [stolyarova_1995_ca_partial_pressure_table2, stolyarova_1995_al_partial_pressure_table2, stolyarova_1995_alo_partial_pressure_table2]
         derivation:
-          relation: Author calculation of p_O using Eqn 2 and available vapor-equilibrium thermodynamic data.
+          relation: 'Table 2 “Eqn 2” p(O) uses Al+ and AlO+ ion currents with AlO = Al + O (p. 688, Eqs. 3 and 6); the paper says “Al+ and AlO+”.'
           inputs: [stolyarova_1995_ca_partial_pressure_table2, stolyarova_1995_al_partial_pressure_table2, stolyarova_1995_alo_partial_pressure_table2]
           output_unit: atm
         values:
@@ -562,7 +606,7 @@ species:
         units: atm as printed (p_O2 × 10^11)
         derived_from: [stolyarova_1995_ca_partial_pressure_table2, stolyarova_1995_al_partial_pressure_table2, stolyarova_1995_alo_partial_pressure_table2]
         derivation:
-          relation: Author calculation of p_O2 using available thermodynamic data for vapor equilibria, reference 42.
+          relation: 'p(O2) is calculated from p(O) using the printed gas-phase equilibrium O2 = 2O (p. 688, Eq. 4); the paper prints “O2 = 2O”. The cited thermodynamic data are reference 42.'
           inputs: [stolyarova_1995_ca_partial_pressure_table2, stolyarova_1995_al_partial_pressure_table2, stolyarova_1995_alo_partial_pressure_table2]
           output_unit: atm
         values:
@@ -659,13 +703,15 @@ species:
         phase: CaO–Al2O3 liquid oxide melt
         regime: kems_effusion
         units: dimensionless
+        standard_state: 'CaO activity relative to the pure CaO oxide reference in Eq. (7), p. 688; the paper describes vapor pressures over the "individual oxides".'
         values:
-          quantity: CaO_activity
+          quantity: activity
+          composition_component: CaO
           method_class: measured_reduced
           evidence_class: measured_reduced
           admission_status: figure_only
           status: typed_refusal
-          reason: Figure-only activity curve; no values digitized.
+          reason: Figure-only CaO activity curve relative to the pure CaO oxide reference; no values digitized.
           series: Figure 1(a), CaO activity
       - observation_id: stolyarova_1995_cao_chemical_potential_fig3_figure_only
         type: gibbs_table
@@ -678,7 +724,7 @@ species:
           quantity: CaO_chemical_potential
           admission_status: figure_only
           status: typed_refusal
-          reason: Figure-only chemical-potential curves; no values digitized.
+          reason: Figure 3 reports CaO chemical-potential curves (Δμ), not activities; no values digitized.
           series: Figure 3(a), CaO chemical-potential temperature dependencies
   Al2O3:
     observations:
@@ -689,13 +735,15 @@ species:
         phase: CaO–Al2O3 liquid oxide melt
         regime: kems_effusion
         units: dimensionless
+        standard_state: 'Al2O3 activity relative to the pure Al2O3 oxide reference in Eq. (8), p. 688; the paper describes vapor pressures over the "individual oxides".'
         values:
-          quantity: Al2O3_activity
+          quantity: activity
+          composition_component: Al2O3
           method_class: measured_reduced
           evidence_class: measured_reduced
           admission_status: figure_only
           status: typed_refusal
-          reason: Figure-only activity curve; no values digitized.
+          reason: Figure-only Al2O3 activity curve relative to the pure Al2O3 oxide reference; no values digitized.
           series: Figure 1(b), Al2O3 activity
       - observation_id: stolyarova_1995_alumina_chemical_potential_fig3_figure_only
         type: gibbs_table
@@ -708,7 +756,7 @@ species:
           quantity: Al2O3_chemical_potential
           admission_status: figure_only
           status: typed_refusal
-          reason: Figure-only chemical-potential curves; no values digitized.
+          reason: Figure 3 reports Al2O3 chemical-potential curves (Δμ), not activities; no values digitized.
           series: Figure 3(b), Al2O3 chemical-potential temperature dependencies
   CaO-Al2O3:
     observations:
