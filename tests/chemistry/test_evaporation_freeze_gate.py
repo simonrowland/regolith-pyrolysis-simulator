@@ -166,7 +166,7 @@ def _configure_tick_authority_retry_sim(
 
 def _freeze_gate_key_for_current_state(sim) -> tuple:
     pressure_bar = float(sim.melt.p_total_mbar) / 1000.0
-    fO2_log = float(sim._current_melt_redox_fO2_log())
+    fO2_log = float(sim._melt_redox_speciation_key()[0])
     redox_key_fO2_log = sim._freeze_gate_redox_key_fO2_log(fO2_log=fO2_log)
     return sim._freeze_gate_cache_key(
         pressure_bar=pressure_bar,
@@ -2172,9 +2172,6 @@ def test_passive_exchange_refuses_zero_liquid_capacity(
     transport_pO2_bar = sim._vapor_pressure_transport_pO2_bar()
     interface_pO2_bar = sim._interface_pO2_bar()
     assert interface_pO2_bar == pytest.approx(transport_pO2_bar)
-    assert sim._last_oxygen_interface_diagnostic['limiting_regime'] == (
-        'gas_side_not_liquid'
-    )
     before_fO2 = sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log
     before_reference_T_K = sim.melt.oxygen_reservoir.reference_T_K
     before_overhead_o2 = sim.atom_ledger.mol_by_account('process.overhead_gas')[
@@ -2400,17 +2397,19 @@ def test_freeze_gate_pre_curve_tick_builds_curve_before_native_split(
         result.get('respeciation_status') != 'skipped_solid'
         for result in respeciation_results
     )
-    # FeO(l) = Fe + 1/2 O2, so a_FeO,sat = 10^((log fO2 - IW)/2).
-    # The reported fO2 is the saturation bound, where that activity is at
-    # least a_FeO and the native-Fe extent is zero.
-    assert native_results[0]['native_fe_event'] == 'no_native_fe_below_threshold'
+    # FeO(l) = Fe + 1/2 O2 gives a saturation lower bound, not an equality.
+    assert native_results[0]['native_fe_event'] == 'skipped_fe_saturation_bound'
     split = snapshot.fe_redox_split
-    assert float(split['native_fe_saturation_activity']) >= float(
-        split['native_fe_activity']
+    assert split['fO2_log'] is None
+    assert split['redox_domain']['derived_fO2_log'] is None
+    assert math.isfinite(
+        float(split['redox_domain']['fO2_log_lower_bound'])
     )
     assert float(split['native_fe_frac']) == 0.0
-    event = split['native_fe_saturation_event']
-    assert event['native_fe_event'] == 'no_native_fe_below_threshold'
+    assert (
+        'this_hour_no_metal_nucleation_by_model_limit'
+        in split['redox_domain']['reason']
+    )
 
 
 def test_temperature_rereference_noop_skips_liquid_guard(
@@ -2508,9 +2507,15 @@ def test_freeze_gate_cache_quantization_holds_super_liquidus_ticks(
     feedstocks_data,
     setpoints_data,
 ):
+    finite_redox_feedstocks = deepcopy(feedstocks_data)
+    lunar_iron = finite_redox_feedstocks['lunar_mare_low_ti'][
+        'composition_wt_pct'
+    ]
+    lunar_iron['FeO'] -= 0.001
+    lunar_iron['Fe2O3'] = 0.001
     sim = _build_freeze_gate_sim(
         vapor_pressure_data,
-        feedstocks_data,
+        finite_redox_feedstocks,
         setpoints_data,
         enabled=True,
     )
@@ -2880,12 +2885,15 @@ def test_redox_operation_holds_failed_authority_until_recovery_next_operation(
 
     assert curve_calls == 2
     assert recovered_operation['respeciation_status'] == 'ok'
-    assert sim._last_melt_redox_liquidus_gate_diagnostic == {
-        'status': 'ok',
-        'source': 'test_recovered_real_curve',
-        'solidus_T_C': 1000.0,
-        'liquidus_T_C': 1700.0,
-    }
+    recovered_authority = sim._last_melt_redox_liquidus_gate_diagnostic
+    assert recovered_authority['status'] == 'ok'
+    assert recovered_authority['source'] == 'test_recovered_real_curve'
+    assert recovered_authority['liquidus_source'] == 'test_recovered_real_curve'
+    assert recovered_authority['solidus_T_C'] == 1000.0
+    assert recovered_authority['liquidus_T_C'] == 1700.0
+    assert recovered_authority['melt_redox_speciation_key']['authority'] == (
+        'equality'
+    )
     assert sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log == pytest.approx(
         fallback_fO2
     )

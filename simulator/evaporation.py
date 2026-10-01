@@ -1684,6 +1684,18 @@ class EvaporationMixin:
         else:
             curve = self._resolved_melt_redox_gate_authority(gate_authority)
         if not isinstance(curve, Mapping):
+            if self._melt_redox_equality_is_absent():
+                self._record_absent_melt_equality_liquidus_gate()
+                diagnostic = dict(
+                    self._last_melt_redox_liquidus_gate_diagnostic
+                )
+                raise EvaporationFluxRefusal(
+                    str(diagnostic["reason"]),
+                    {
+                        "reason_refused": diagnostic["source"],
+                        "source": diagnostic["source"],
+                    },
+                )
             reason = str(
                 getattr(curve, 'reason', '')
                 or 'no liquid-fraction authority is available'
@@ -2017,30 +2029,21 @@ class EvaporationMixin:
             },
         )
 
-    def _record_ferrous_free_liquidus_gate(self) -> None:
+    def _record_absent_melt_equality_liquidus_gate(self) -> None:
         # Same diagnostic the liquidus gate publishes. No numeric curve.
+        regime = self._melt_redox_absence_regime()
         self._last_melt_redox_liquidus_gate_diagnostic = {
             "status": "unavailable",
-            "source": "none:ferrous_free_lower_bound",
-            "reason": "ferrous_free_lower_bound has no equilibrium fO2",
+            "source": f"none:{regime}",
+            "reason": f"{regime} has no melt equality",
         }
 
     def _freeze_gate_curve(self) -> dict[str, Any]:
         pressure_bar = float(self.melt.p_total_mbar) / 1000.0
-        raw_fO2_log = self._current_melt_redox_fO2_log()
-        if raw_fO2_log is None and self._ferrous_free_scalar_absent():
-            # ferrous-free scalar: liquidus needs a melt fO2. The helper
-            # below turns TypeError into 0.0 (1 bar). Same flagged path
-            # as the liquidus gate; do not invent 0 or -9.
-            self._record_ferrous_free_liquidus_gate()
-            raise EvaporationFluxRefusal(
-                "ferrous_free_lower_bound has no equilibrium fO2",
-                {
-                    "reason_refused": "none:ferrous_free_lower_bound",
-                    "source": "none:ferrous_free_lower_bound",
-                },
-            )
-        fO2_log = self._freeze_gate_liquidus_fO2_log(float(raw_fO2_log))
+        speciation_fO2_log, _, _, _ = self._melt_redox_speciation_key()
+        fO2_log = self._freeze_gate_liquidus_fO2_log(
+            float(speciation_fO2_log)
+        )
         redox_key_fO2_log = self._freeze_gate_redox_key_fO2_log(
             fO2_log=fO2_log,
         )
@@ -2248,19 +2251,7 @@ class EvaporationMixin:
         reference_T_K: float | None = None,
     ) -> float:
         if fO2_log is None:
-            raw_fO2_log = self._current_melt_redox_fO2_log()
-            if raw_fO2_log is None and self._ferrous_free_scalar_absent():
-                # ferrous-free scalar: a missing key is not 0. The clamp
-                # helper maps TypeError to 0.0 (1 bar).
-                self._record_ferrous_free_liquidus_gate()
-                raise EvaporationFluxRefusal(
-                    "ferrous_free_lower_bound has no equilibrium fO2",
-                    {
-                        "reason_refused": "none:ferrous_free_lower_bound",
-                        "source": "none:ferrous_free_lower_bound",
-                    },
-                )
-            redox_input = float(raw_fO2_log)
+            redox_input = float(self._melt_redox_speciation_key()[0])
         else:
             redox_input = float(fO2_log)
         redox_fO2_log = self._freeze_gate_liquidus_fO2_log(redox_input)

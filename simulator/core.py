@@ -2549,7 +2549,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 and gate_authority is not _RESOLVE_MELT_REDOX_GATE_AUTHORITY
                 and not (
                     gate_authority is None
-                    and self._ferrous_free_scalar_absent()
+                    and self._melt_redox_equality_is_absent()
                 )
             ):
                 # ferrous-free scalar: a None gate is the flagged
@@ -2569,9 +2569,10 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 liquidus_temperature_C = gate_authority.get('liquidus_T_C')
 
             raw_fO2_log = self._current_melt_redox_fO2_log()
-            if raw_fO2_log is None and self._ferrous_free_scalar_absent():
-                # ferrous-free scalar: phase context keys a liquidus cache
-                # on melt fO2. There is none. Do not substitute 0 or -9.
+            if raw_fO2_log is None and self._melt_redox_equality_is_absent():
+                # Phase context keys its liquidus cache on melt equality.
+                # There is none. Do not substitute 0 or -9.
+                regime = self._melt_redox_absence_regime()
                 record = {
                     'schema': 'phase_context_diagnostic_v1',
                     'diagnostic_only': True,
@@ -2580,10 +2581,8 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                     'hour': int(self.melt.hour),
                     'campaign_hour': int(self.melt.campaign_hour),
                     'status': 'unavailable',
-                    'source': 'none:ferrous_free_lower_bound',
-                    'reason': (
-                        'ferrous_free_lower_bound has no equilibrium fO2'
-                    ),
+                    'source': f'none:{regime}',
+                    'reason': f'{regime} has no melt equality',
                 }
                 diagnostics = getattr(
                     self, '_last_phase_context_diagnostic', None,
@@ -4514,15 +4513,12 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         flux root is 9.91e-5 bar (9.9e4x). The discrepancy is the omitted
         gas/melt concentration ratio, not a tuning factor.
 
-        A ferrous-free lower bound is not an fO2 equality: Kress91's
-        ``ln(Fe2O3/FeO)`` diverges as FeO tends to zero. The bound replaces
-        only the reported fO2 scalar; release remains available while
-        ``n_Fe2O3/2 > 0``. Use the physical dissociation ceiling as its
-        saturated melt-side drive, solve the finite two-film root, then limit
-        the committed release by that directional capacity. The published
-        interface departs from the gas pressure only when this solve commits
-        release: the zero-transfer limits (hard vacuum, no gas film, or no
-        capacity) publish the gas pressure.
+        M3 and M4 have absent equalities. Their bounds are diagnostics, never
+        pressures. M3 can release its ferric inventory, so a private physical
+        dissociation ceiling brackets that finite-film solve. M4 has no ferric
+        release inventory and uses the gas pressure as its melt-side drive.
+        The published interface departs from gas pressure only after a
+        nonzero accepted transfer; zero commit publishes gas pressure.
 
         The gas coefficient is the same ``Sh D_AB / L`` coefficient used by
         ``engines.builtin.evaporation_flux`` for O2 as the tracer. At a vacuum
@@ -4551,17 +4547,17 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         if intrinsic_fO2_log is None:
             current_fO2 = getattr(self, '_current_melt_redox_fO2_log', None)
             if callable(current_fO2):
-                # ferrous-free scalar: None is not a pressure. The lower-bound
-                # branch below supplies a saturated physical drive instead.
+                # An absent equality is not a pressure. The private solver
+                # bracket below supplies a finite saturated physical drive.
                 intrinsic_fO2_log = current_fO2()
             else:
                 reservoir = getattr(self.melt, 'oxygen_reservoir', None)
                 intrinsic_fO2_log = getattr(
                     reservoir,
                     'melt_intrinsic_fO2_log',
-                    getattr(self.melt, 'melt_fO2_log', -9.0),
+                    getattr(self.melt, 'melt_fO2_log', None),
                 )
-        ferrous_free_bound = self._ferrous_free_scalar_absent()
+        melt_equality_absent = self._melt_redox_equality_is_absent()
         try:
             transport_pO2_bar = max(
                 self._vacuum_floor_bar(), float(transport_pO2_bar)
@@ -4579,13 +4575,10 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             0.0,
             float(melt_mol.get('Fe2O3', 0.0) or 0.0),
         )
-        if ferrous_free_bound:
-            # q=1 is only a one-sided inventory bound, not an fO2 equality.
-            # Thus the bound replaces only the reported fO2 scalar. Its
-            # saturated-drive interpretation is the physical dissociation
-            # ceiling; the two-film root solves the gas-film-limited flux and
-            # release is capped by n_Fe2O3/2. Only an actually committed
-            # transfer can move the published Pi away from Pg.
+        if melt_equality_absent:
+            # The stored lower bound is never used as a pressure. A private
+            # ceiling bounds the absent-equality solver branch; only a
+            # committed trajectory may publish an interface away from Pg.
             intrinsic_fO2_log = None
             if (
                 not math.isfinite(transport_pO2_bar)
@@ -4597,21 +4590,36 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                     'invalid_oxygen_interface_pressure',
                     f'transport={transport_pO2_bar!r} k_O={k_O!r}',
                 )
-            melt_pO2_bar = max(
-                self._vacuum_floor_bar(),
-                MELT_DISSOCIATION_PO2_MAX_BAR,
+            melt_pO2_bar = (
+                max(self._vacuum_floor_bar(), transport_pO2_bar)
+                if n_fe2o3_mol <= OXYGEN_RESERVOIR_NOOP_MOL
+                else max(
+                    self._vacuum_floor_bar(),
+                    MELT_DISSOCIATION_PO2_MAX_BAR,
+                )
             )
+            uptake_capacity_mol = n_feo_mol / 4.0
             release_capacity_mol = n_fe2o3_mol / 2.0
+            inventory_mol = self._cleaned_melt_fe_atom_mol()
+            if not self._melt_redox_exchange_is_liquid(T_K):
+                buffer_status = 'not_liquid'
+            elif inventory_mol <= OXYGEN_RESERVOIR_NOOP_MOL:
+                buffer_status = 'no_fe_redox_buffer'
+            elif max(uptake_capacity_mol, release_capacity_mol) <= OXYGEN_RESERVOIR_NOOP_MOL:
+                buffer_status = 'exhausted'
+            else:
+                buffer_status = 'available'
             redox_buffer_state = {
-                'status': (
-                    'available' if release_capacity_mol > 0.0 else 'exhausted'
-                ),
-                'inventory_mol': self._cleaned_melt_fe_atom_mol(),
+                'status': buffer_status,
+                'inventory_mol': inventory_mol,
                 'capacity_mol_per_ln_fO2': None,
                 'per_tick_o2_transfer_mol': self._per_tick_o2_transfer_mol(),
-                'directional_capacity_mol': release_capacity_mol,
+                'directional_capacity_mol': max(
+                    uptake_capacity_mol, release_capacity_mol
+                ),
                 'capacity_negligible': (
-                    release_capacity_mol <= OXYGEN_RESERVOIR_NOOP_MOL
+                    max(uptake_capacity_mol, release_capacity_mol)
+                    <= OXYGEN_RESERVOIR_NOOP_MOL
                 ),
             }
         else:
@@ -4679,12 +4687,12 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         interface_root_clamped = False
         interface_root_residual_mol_m2_s = None
         if (
-            ferrous_free_bound
+            melt_equality_absent
             and abs(self._handover_o2_transfer_mol())
             <= OXYGEN_RESERVOIR_NOOP_MOL
         ):
             interface_pO2_bar = transport_pO2_bar
-            limiting_regime = 'gas_side_ferrous_free_lower_bound'
+            limiting_regime = f'gas_side_{self._melt_redox_absence_regime()}'
         elif redox_buffer_status == 'no_fe_redox_buffer':
             interface_pO2_bar = transport_pO2_bar
             limiting_regime = 'gas_side_no_fe_redox_buffer'
@@ -5045,10 +5053,10 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             )
         if intrinsic_fO2_log is None:
             intrinsic_fO2_log = self._current_melt_redox_fO2_log()
-        ferrous_free_bound = (
-            intrinsic_fO2_log is None and self._ferrous_free_scalar_absent()
+        melt_equality_absent = (
+            intrinsic_fO2_log is None and self._melt_redox_equality_is_absent()
         )
-        if not ferrous_free_bound:
+        if not melt_equality_absent:
             intrinsic_fO2_log = float(intrinsic_fO2_log)
         if transport_pO2_bar is None:
             transport_pO2_bar = getattr(
@@ -5124,11 +5132,23 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             physical_melt_dissociation_pO2_bar,
         )
 
-        melt_pO2_bar = (
-            MELT_DISSOCIATION_PO2_MAX_BAR
-            if ferrous_free_bound
-            else physical_melt_dissociation_pO2_bar(intrinsic_fO2_log)[0]
-        )
+        if melt_equality_absent:
+            # This floor is only the exchange solver's lower root bracket for
+            # an all-ferrous ledger. It is not a measured melt pressure or a
+            # use of the speciation key; accepted uptake is driven by the
+            # gas-side equilibrium inventory and bounded by FeO.
+            melt_pO2_bar = (
+                self._vacuum_floor_bar()
+                if n_fe2o3_mol <= OXYGEN_RESERVOIR_NOOP_MOL
+                else max(
+                    self._vacuum_floor_bar(),
+                    MELT_DISSOCIATION_PO2_MAX_BAR,
+                )
+            )
+        else:
+            melt_pO2_bar = physical_melt_dissociation_pO2_bar(
+                intrinsic_fO2_log
+            )[0]
         k_m, melt_source, melt_transport = self._oxygen_exchange_k_m_s(T_K)
         h_eff_m = self._oxygen_exchange_effective_melt_depth_m()
         surface_area_m2 = float(
@@ -5166,7 +5186,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 f'headspace_temperature_K={gas_temperature_K!r}',
             )
         if capacity_mol_per_ln_fO2 is None:
-            if ferrous_free_bound:
+            if melt_equality_absent:
                 # There is no finite derivative at q=1. The finite root uses
                 # N_eq(Pi)-N_ledger directly, so C_m stays diagnostic only.
                 capacity_mol_per_ln_fO2 = 0.0
@@ -6636,12 +6656,124 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             return None
         return (2.0 * fe2o3_mol) / total_fe_mol
 
-    def _ferrous_free_scalar_absent(self) -> bool:
+    def _melt_redox_equality_is_absent(self) -> bool:
         domain = getattr(self, '_last_redox_domain', None) or {}
-        return domain.get('basis') in {
-            'ferrous_free_lower_bound',
-            'fe_feo_buffer_activity_unavailable',
-        }
+        if not bool(getattr(self, '_melt_redox_ledger_initialized', True)):
+            return False
+        return not isinstance(domain, Mapping) or domain.get(
+            'derived_fO2_log'
+        ) is None
+
+    def _melt_redox_absence_regime(self) -> str:
+        domain = getattr(self, '_last_redox_domain', None) or {}
+        basis = str(domain.get('basis') or '') if isinstance(domain, Mapping) else ''
+        return {
+            'fe_feo_buffer_activity_unavailable': 'fe_feo_buffer',
+        }.get(basis, basis or 'no_modelled_redox_couple')
+
+    def _melt_redox_speciation_key(
+        self,
+    ) -> tuple[float, str, str, dict[str, Any] | None]:
+        """Return the redox key for consumers that calculate iron speciation.
+
+        Liquidus and activity fO2 dependence enters through Fe3+/Fe2+
+        speciation. This key is not an equality or an oxygen pressure. In M4
+        the saturation bound is the least-reduced state consistent with no
+        metal; the ledger remains all-ferrous and native-Fe extent remains
+        zero, so the key predicts speciation without minting ferric iron.
+        Kress may predict a positive ferric fraction at this fixed point; the
+        flagged residual is that prediction minus the ledger's zero fraction.
+        """
+
+        equality = self._current_melt_redox_fO2_log()
+        domain = getattr(self, '_last_redox_domain', None) or {}
+        if equality is not None:
+            regime = str(
+                domain.get('basis') if isinstance(domain, Mapping) else ''
+            ) or 'bootstrap_intrinsic'
+            return float(equality), 'equality', regime, None
+
+        regime = self._melt_redox_absence_regime()
+        raw_bound = (
+            domain.get('fO2_log_lower_bound')
+            if isinstance(domain, Mapping)
+            else None
+        )
+        try:
+            bound = float(raw_bound)
+        except (TypeError, ValueError):
+            bound = math.nan
+        if math.isfinite(bound) and regime == 'fe_saturation_bound':
+            T_K = float(self.melt.temperature_C) + 273.15
+            pressure_bar = floor_vacuum_pressure_bar(
+                float(self.melt.p_total_mbar) / 1000.0,
+                floor_bar=self._vacuum_floor_bar(),
+            )
+            kress_ferric_fraction = self._fe3_over_sigma_fe_at_fO2(
+                self._cleaned_melt_ledger_wt_pct(),
+                fO2_log=bound,
+                T_K=T_K,
+                pressure_bar=pressure_bar,
+            )
+            ledger_ferric_fraction = self._ledger_fe3_over_sigma_fe() or 0.0
+            return (
+                bound,
+                'bound',
+                regime,
+                {
+                    'code': 'melt_redox_speciation_from_bound',
+                    'regime': regime,
+                    'reason': (
+                        'equality absent; ferric inventory <= NOOP; the bound '
+                        'is the least-reduced state consistent with no metal'
+                    ),
+                    'kress_ferric_fraction_at_bound': kress_ferric_fraction,
+                    'ledger_ferric_fraction': ledger_ferric_fraction,
+                    'ferric_fraction_residual': (
+                        kress_ferric_fraction - ledger_ferric_fraction
+                    ),
+                },
+            )
+        if math.isfinite(bound) and regime == 'ferrous_free_lower_bound':
+            liquidus_bound = self._freeze_gate_liquidus_fO2_log(bound)
+            return (
+                liquidus_bound,
+                'bound',
+                regime,
+                {
+                    'code': 'melt_redox_speciation_from_bound',
+                    'regime': regime,
+                    'reason': (
+                        'equality absent; ferrous inventory <= NOOP; the '
+                        'clamped mole-log edge is the last ferrous state '
+                        'consistent with the ledger'
+                    ),
+                },
+            )
+
+        interface_pO2_bar = max(
+            self._vacuum_floor_bar(),
+            float(self._interface_pO2_bar()),
+        )
+        reason = (
+            'iron speciation is uncoupled from the ledger; using the '
+            'committed interface pO2 as the prediction key'
+        )
+        if regime == 'fe_feo_buffer':
+            reason = (
+                'equality unavailable from FeO activity; using the '
+                'committed interface pO2 as the prediction key'
+            )
+        return (
+            math.log10(interface_pO2_bar),
+            'no_couple',
+            regime,
+            {
+                'code': 'melt_redox_speciation_from_interface',
+                'regime': regime,
+                'reason': reason,
+            },
+        )
 
     @staticmethod
     def _redox_domain_record(
@@ -6854,63 +6986,13 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self,
         *,
         endpoint_provenance: str,
-        handover_on_nonzero_transfer: bool,
         reason_detail: str,
-    ) -> float:
-        """Predict fO2 when no Fe redox couple can be evaluated.
+    ) -> None:
+        """Record absent melt equality when no Fe redox couple is modelled."""
 
-        Premise: a clamped ferric floor is not a measurement, and neither is
-        a missing couple. FeO and Fe2O3 both absent means uptake capacity
-        n_FeO/4 and release capacity n_Fe2O3/2 are both 0. The gas owns the
-        melt only when this tick's transfer exceeds that capacity. Otherwise
-        the interface pressure is the extension, flagged out of domain.
-
-        Algebra: gas owns the melt iff |dn_O2| > 1e-15 and 0 <= |dn_O2|.
-        Reported fO2 is log10(P_transport/bar) on both branches.
-        Units: mol O2, log10(bar). Limiting case: dn = 0 stays on
-        no_modelled_redox_couple; dn = 1e-6 mol with both oxides absent
-        is no_melt_redox_buffer. A positive FeO inventory whose activity
-        model still returns no a_FeO does not use the zero-capacity handover.
-        """
-
-        reservoir = getattr(self.melt, 'oxygen_reservoir', None)
-        transport_pO2_bar = self._melt_redox_transport_pO2_bar(reservoir)
         per_tick_transfer = self._handover_o2_transfer_mol()
-        gas_owns_melt = False
-        if handover_on_nonzero_transfer:
-            gas_owns_melt = (
-                self._melt_redox_transfer_exhausts_directional_capacity(
-                    directional_capacity_mol=0.0,
-                    per_tick_o2_transfer_mol=per_tick_transfer,
-                    native_buffer_active=False,
-                )
-            )
-        fO2_log = math.log10(transport_pO2_bar)
-        handover_text = (
-            f'capacity_O2=0; '
-            f'per_tick_o2_transfer_mol={per_tick_transfer:.17g}; '
-            f'{reason_detail}; {endpoint_provenance}'
-        )
-        if gas_owns_melt:
-            self._last_redox_domain = self._redox_domain_record(
-                fO2_log=fO2_log,
-                basis='no_melt_redox_buffer',
-                endpoint_clamped=True,
-                endpoint_epsilon=KRESS91_FERRIC_FRACTION_EPSILON,
-                endpoint_provenance=endpoint_provenance,
-                authority_level='gas_interface_controlled',
-                reason=(
-                    'out_of_domain:no_melt_redox_buffer; '
-                    'both iron oxides absent so directional O2 capacity '
-                    'is 0 in both directions; '
-                    'this tick interface O2 transfer exceeds that capacity; '
-                    f'{handover_text}'
-                ),
-                status_override='out_of_domain',
-            )
-            return fO2_log
         self._last_redox_domain = self._redox_domain_record(
-            fO2_log=fO2_log,
+            fO2_log=None,
             basis='no_modelled_redox_couple',
             endpoint_clamped=True,
             endpoint_epsilon=KRESS91_FERRIC_FRACTION_EPSILON,
@@ -6919,12 +7001,14 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             reason=(
                 'out_of_domain:no_modelled_redox_couple; '
                 'no evaluable Fe-FeO or Kress couple; '
-                'best extension is the interface pressure; '
-                f'{handover_text}'
+                'melt equality is absent; interface pressure remains a '
+                'separate exchange field; '
+                f'per_tick_o2_transfer_mol={per_tick_transfer:.17g}; '
+                f'{reason_detail}; {endpoint_provenance}'
             ),
             status_override='out_of_domain',
         )
-        return fO2_log
+        return None
 
     def _melt_fO2_from_ledger(
         self,
@@ -6964,7 +7048,6 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                     'ledger_iron_oxide_mol='
                     f'{total_fe_mol:.17g}; both_iron_oxides_absent'
                 ),
-                handover_on_nonzero_transfer=True,
                 reason_detail='both_iron_oxides_absent',
             )
         raw_ferric = (2.0 * fe2o3_mol) / total_fe_mol
@@ -7032,7 +7115,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 activity_fO2_log = getattr(
                     reservoir,
                     'melt_intrinsic_fO2_log',
-                    getattr(self.melt, 'melt_fO2_log', -9.0),
+                    getattr(self.melt, 'melt_fO2_log', None),
                 )
                 try:
                     activity = calphad_ferrous_feo_activity_diagnostic(
@@ -7122,18 +7205,31 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 comp=ledger_comp or comp,
             )
             if bound is None:
-                return self._fO2_without_modelled_iron_couple(
+                self._last_redox_domain = self._redox_domain_record(
+                    fO2_log=None,
+                    basis='fe_saturation_bound',
+                    endpoint_clamped=True,
+                    endpoint_epsilon=KRESS91_FERRIC_FRACTION_EPSILON,
                     endpoint_provenance=endpoint_provenance,
-                    handover_on_nonzero_transfer=False,
-                    reason_detail='a_FeO_not_positive',
+                    authority_level='extrapolated',
+                    reason=(
+                        'out_of_domain:fe_saturation_bound; '
+                        'a_FeO_not_positive; lower_bound_unavailable; '
+                        f'{endpoint_provenance}'
+                    ),
+                    status_override='out_of_domain',
                 )
+                return None
             bound_fO2_log, bound_a_feo = bound
             fO2_log = self._finite_oxygen_reservoir_fO2_log(
                 bound_fO2_log,
                 context='ledger_fe_saturation_bound',
             )
+            # Option B stores this fixed point as a lower bound. This hour
+            # does not nucleate metal: a model limit, not a phase prohibition.
             self._last_redox_domain = self._redox_domain_record(
-                fO2_log=fO2_log,
+                fO2_log=None,
+                fO2_log_lower_bound=fO2_log,
                 basis='fe_saturation_bound',
                 endpoint_clamped=True,
                 endpoint_epsilon=KRESS91_FERRIC_FRACTION_EPSILON,
@@ -7143,6 +7239,8 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                     'out_of_domain:fe_saturation_bound; '
                     'kress91_inverse_not_evaluated; '
                     'ferric_inventory_absent; '
+                    'native_fe_extent_is_zero_at_bound; '
+                    'this_hour_no_metal_nucleation_by_model_limit; '
                     'FeO(l)=Fe(s,l)+1/2 O2; '
                     'K=a_Fe*sqrt(fO2)/a_FeO; a_Fe=1; '
                     f'a_FeO={bound_a_feo:.17g}; '
@@ -7150,7 +7248,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 ),
                 status_override='out_of_domain',
             )
-            return fO2_log
+            return None
 
         ferrous_free = (
             feo_mol <= OXYGEN_RESERVOIR_NOOP_MOL
@@ -7277,7 +7375,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             if bool(getattr(self, '_melt_redox_ledger_initialized', True))
             else None
         )
-        if self._ferrous_free_scalar_absent():
+        if self._melt_redox_equality_is_absent():
             # Absence is not the previous equality and not -9.
             fO2_log = None
         elif derived_fO2_log is not None:
@@ -7306,16 +7404,14 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         )
         if derived_fO2_log is not None:
             return derived_fO2_log
-        if self._ferrous_free_scalar_absent():
+        if self._melt_redox_equality_is_absent():
             return None
         reservoir = getattr(self.melt, 'oxygen_reservoir', None)
         raw = getattr(reservoir, 'melt_intrinsic_fO2_log', None)
         if raw is None:
             raw = getattr(self.melt, 'melt_fO2_log', None)
         if raw is None:
-            if self._ferrous_free_scalar_absent():
-                return None
-            raw = -9.0
+            return None
         try:
             fO2_log = float(raw)
         except (TypeError, ValueError):
@@ -7527,16 +7623,30 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             reason=reason,
             liquidus_status=liquidus_status,
         )
+        fO2_log, authority, regime, flag = self._melt_redox_speciation_key()
+        diagnostic_source = (
+            f'{authority}:{regime}'
+            if authority in {'bound', 'no_couple'}
+            else source
+        )
         diagnostic = {
             'status': 'liquidus_unavailable_floor_fallback',
-            'source': source,
+            'source': diagnostic_source,
+            'liquidus_source': source,
             'reason': reason,
             'liquidus_status': liquidus_status,
             'floor_T_C': KRESS91_LIQUID_CALIBRATION_MIN_T_C,
             'hour': int(self.melt.hour),
             'campaign_hour': int(self.melt.campaign_hour),
             'campaign': self.melt.campaign.name,
+            'melt_redox_speciation_key': {
+                'fO2_log': float(fO2_log),
+                'authority': authority,
+                'regime': regime,
+            },
         }
+        if flag is not None:
+            diagnostic['melt_redox_speciation_flag'] = dict(flag)
         self._last_melt_redox_liquidus_gate_diagnostic = dict(diagnostic)
         fallback_diagnostics = getattr(
             self,
@@ -7791,22 +7901,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self,
     ) -> Mapping[str, Any] | _MeltRedoxLiquidusFloorFallback | None:
         pressure_bar = float(self.melt.p_total_mbar) / 1000.0
-        raw_fO2_log = self._current_melt_redox_fO2_log()
-        if raw_fO2_log is None and self._ferrous_free_scalar_absent():
-            # Premise: n_FeO = 0 has no finite Kress fO2, so there is no
-            # redox key for a liquidus curve. float(None) is not a
-            # measurement, and 0 would price the absence as 1 bar.
-            # This is not a failed liquidus lookup, so it does not arm
-            # the Kress floor fallback.
-            self._last_melt_redox_liquidus_gate_diagnostic = {
-                'status': 'unavailable',
-                'source': 'none:ferrous_free_lower_bound',
-                'reason': (
-                    'ferrous_free_lower_bound has no equilibrium fO2'
-                ),
-            }
-            return None
-        fO2_log = float(raw_fO2_log)
+        fO2_log, speciation_authority, speciation_regime, speciation_flag = (
+            self._melt_redox_speciation_key()
+        )
         redox_key_fO2_log = self._freeze_gate_redox_key_fO2_log(
             fO2_log=fO2_log,
         )
@@ -7938,6 +8035,12 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         normalized_curve = dict(curve)
         normalized_curve['solidus_T_C'] = solidus_T_C
         normalized_curve['liquidus_T_C'] = liquidus_T_C
+        curve_source = normalized_curve.get('source', 'liquidus_solidus')
+        redox_source = (
+            f'{speciation_authority}:{speciation_regime}'
+            if speciation_authority in {'bound', 'no_couple'}
+            else curve_source
+        )
         validated_cache = self._freeze_gate_liquid_fraction_cache
         if not (
             isinstance(validated_cache, dict)
@@ -7956,10 +8059,20 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         )
         gate_diagnostic = {
             'status': 'ok',
-            'source': normalized_curve.get('source', 'liquidus_solidus'),
+            'source': redox_source,
+            'liquidus_source': curve_source,
             'solidus_T_C': solidus_T_C,
             'liquidus_T_C': liquidus_T_C,
+            'melt_redox_speciation_key': {
+                'fO2_log': float(fO2_log),
+                'authority': speciation_authority,
+                'regime': speciation_regime,
+            },
         }
+        if speciation_flag is not None:
+            gate_diagnostic['melt_redox_speciation_flag'] = dict(
+                speciation_flag
+            )
         projected_notice = normalized_curve.get('composition_projected_notice')
         if isinstance(projected_notice, Mapping):
             gate_diagnostic['composition_projected_notice'] = dict(
@@ -7979,31 +8092,8 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
     ) -> float:
         curve = self._resolved_melt_redox_gate_authority(gate_authority)
         if curve is None:
-            gate_diagnostic = getattr(
-                self, '_last_melt_redox_liquidus_gate_diagnostic', None,
-            )
-            if (
-                isinstance(gate_diagnostic, Mapping)
-                and gate_diagnostic.get('source')
-                == 'none:ferrous_free_lower_bound'
-            ):
-                # ferrous-free scalar: no liquidus key. Returning 0 would
-                # price the melt as solid. Do not arm the Kress floor.
-                self._last_melt_redox_liquid_fraction_diagnostic = {
-                    'status': 'unavailable',
-                    'source': 'none:ferrous_free_lower_bound',
-                    'reason': (
-                        'ferrous_free_lower_bound has no equilibrium fO2'
-                    ),
-                }
-                from simulator.evaporation import EvaporationFluxRefusal
-                raise EvaporationFluxRefusal(
-                    'ferrous_free_lower_bound has no equilibrium fO2',
-                    {
-                        'reason_refused': 'none:ferrous_free_lower_bound',
-                        'source': 'none:ferrous_free_lower_bound',
-                    },
-                )
+            # A transient in-progress curve is the only remaining no-curve
+            # case. Equality absence itself is handled by the speciation key.
             self._last_melt_redox_liquid_fraction_diagnostic = {
                 'status': 'unavailable',
                 'source': 'none:liquidus_gate_in_progress',
@@ -8020,14 +8110,32 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 if temperature_C > KRESS91_LIQUID_CALIBRATION_MIN_T_C
                 else 0.0
             )
-            self._last_melt_redox_liquid_fraction_diagnostic = {
+            gate_diagnostic = getattr(
+                self, '_last_melt_redox_liquidus_gate_diagnostic', None,
+            )
+            gate_diagnostic = (
+                dict(gate_diagnostic)
+                if isinstance(gate_diagnostic, Mapping)
+                else {}
+            )
+            fraction_diagnostic = {
                 'status': 'liquidus_unavailable_floor_fallback',
-                'source': curve.source,
+                'source': gate_diagnostic.get('source', curve.source),
                 'reason': curve.reason,
                 'liquidus_status': curve.liquidus_status,
                 'liquid_fraction': liquid_fraction,
                 'floor_T_C': KRESS91_LIQUID_CALIBRATION_MIN_T_C,
             }
+            for field in (
+                'liquidus_source',
+                'melt_redox_speciation_key',
+                'melt_redox_speciation_flag',
+            ):
+                if field in gate_diagnostic:
+                    fraction_diagnostic[field] = gate_diagnostic[field]
+            self._last_melt_redox_liquid_fraction_diagnostic = (
+                fraction_diagnostic
+            )
             return liquid_fraction
         try:
             liquid_fraction = float(
@@ -8074,13 +8182,30 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 else 0.0
             )
         liquid_fraction = max(0.0, min(1.0, liquid_fraction))
+        gate_diagnostic = getattr(
+            self, '_last_melt_redox_liquidus_gate_diagnostic', None,
+        )
+        gate_diagnostic = (
+            dict(gate_diagnostic)
+            if isinstance(gate_diagnostic, Mapping)
+            else {}
+        )
         fraction_diagnostic = {
             'status': 'ok',
-            'source': curve.get('source', 'liquidus_solidus'),
+            'source': gate_diagnostic.get(
+                'source', curve.get('source', 'liquidus_solidus')
+            ),
             'liquid_fraction': liquid_fraction,
             'solidus_T_C': curve.get('solidus_T_C'),
             'liquidus_T_C': curve.get('liquidus_T_C'),
         }
+        for field in (
+            'liquidus_source',
+            'melt_redox_speciation_key',
+            'melt_redox_speciation_flag',
+        ):
+            if field in gate_diagnostic:
+                fraction_diagnostic[field] = gate_diagnostic[field]
         projected_notice = curve.get('composition_projected_notice')
         if isinstance(projected_notice, Mapping):
             fraction_diagnostic['composition_projected_notice'] = dict(
@@ -8099,16 +8224,6 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         ),
     ) -> bool:
         temperature_C = float(T_K) - 273.15
-        gate_diagnostic = getattr(
-            self, '_last_melt_redox_liquidus_gate_diagnostic', None,
-        )
-        if (
-            isinstance(gate_diagnostic, Mapping)
-            and gate_diagnostic.get('source') == 'none:ferrous_free_lower_bound'
-        ):
-            # ferrous-free scalar: no liquidus fO2 is not a solidus.
-            # Do not take the factor's refusal, and do not return 0.
-            return temperature_C > KRESS91_LIQUID_CALIBRATION_MIN_T_C
         liquid_fraction = self._melt_redox_liquid_fraction_factor(
             T_K,
             gate_authority=gate_authority,
@@ -8506,12 +8621,12 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 and is_liquid
             ):
                 reference_T_K = T_now
-            if self._ferrous_free_scalar_absent():
+            if self._melt_redox_equality_is_absent():
                 # ferrous-free scalar: no equality to carry through bootstrap.
                 return None, reference_T_K
             return self._current_melt_redox_fO2_log(), reference_T_K
         derived_fO2_log = self._melt_fO2_from_ledger(T_K=T_now)
-        if self._ferrous_free_scalar_absent():
+        if self._melt_redox_equality_is_absent():
             # ferrous-free scalar: do not re-reference an equality.
             return None, (T_now if is_liquid else reference_T_K)
         if derived_fO2_log is not None:
@@ -8567,7 +8682,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             if bool(getattr(self, '_melt_redox_ledger_initialized', True))
             else None
         )
-        if self._ferrous_free_scalar_absent():
+        if self._melt_redox_equality_is_absent():
             fO2_log = None
         elif derived_fO2_log is not None:
             fO2_log = derived_fO2_log
@@ -8662,7 +8777,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         )
         base_fO2_log = self._current_melt_redox_fO2_log()
         reference_T_K = self._current_melt_redox_reference_T_K()
-        if base_fO2_log is None and self._ferrous_free_scalar_absent():
+        if base_fO2_log is None and self._melt_redox_equality_is_absent():
             # ferrous-free scalar: Kress capacity needs an equality.
             # Do not evaluate it at 0 or -9. Terms stay diagnostic.
             C_m = None
@@ -8703,10 +8818,12 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         applied_delta_ln = 0.0
         # ferrous-free scalar: leave the reservoir capacity field untouched.
         # A stored 0 would look like a measured derivative.
-        skip_reason = 'ferrous_free_lower_bound' if C_m is None else ''
+        skip_reason = (
+            self._melt_redox_absence_regime() if C_m is None else ''
+        )
         refusal_context: Dict[str, Any] = {}
         if (
-            skip_reason != 'ferrous_free_lower_bound'
+            not skip_reason
             and abs(net_o2_equiv_mol) < OXYGEN_RESERVOIR_NOOP_MOL
         ):
             skip_reason = 'below_threshold'
@@ -8972,12 +9089,13 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             gate_authority=gate_authority,
         )
         current_fO2_log = self._current_melt_redox_fO2_log()
-        if current_fO2_log is None and self._ferrous_free_scalar_absent():
-            # ferrous-free scalar: no melt equality to difference against
-            # the bubbler target. Do not subtract from 0 or -9.
+        if current_fO2_log is None and self._melt_redox_equality_is_absent():
+            # There is no melt equality to difference against the bubbler
+            # target. Do not subtract from 0 or -9.
+            regime = self._melt_redox_absence_regime()
             diagnostic = {
                 'status': 'refused',
-                'reason': 'ferrous_free_lower_bound',
+                'reason': regime,
                 'rate_kg_per_hr': rate_kg_hr,
                 'eta_absorb': eta_absorb,
                 'injected_mol': 0.0,
@@ -9538,26 +9656,13 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             and buffer_capacity_mol > OXYGEN_RESERVOIR_NOOP_MOL
             and reported_basis == 'fe_saturation_bound'
         )
-        # The ferrous-free edge is not an FeO inventory. A call with no
-        # explicit interior target would mint FeO from a one-sided bound.
-        # Congruent evaporation passes target_ferric_fraction = Kress(P_interface),
-        # an interior equilibrium, and that call still runs.
-        ferrous_free_bound = (
-            reported_basis == 'ferrous_free_lower_bound'
+        # An absent equality cannot seed a bare respeciation. An explicit
+        # interior target may leave the absent regime; M4's evaporative O2
+        # coproduct remains the existing exception.
+        equality_absent = self._melt_redox_equality_is_absent()
+        interface_controlled = (
+            equality_absent
             and target_ferric_fraction is None
-        )
-        unavailable_buffer_activity = (
-            reported_basis == 'fe_feo_buffer_activity_unavailable'
-            and target_ferric_fraction is None
-        )
-        interface_controlled = ferrous_free_bound or unavailable_buffer_activity or (
-            target_ferric_fraction is None
-            and fO2_log_override is None
-            and bool(getattr(self, '_melt_redox_ledger_initialized', False))
-            and reported_basis in (
-                'no_melt_redox_buffer',
-                'fe_saturation_bound',
-            )
             and not evaporative_internal_oxygen
         )
         control_inputs = {
@@ -9575,29 +9680,11 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 target_ferric_fraction
             )
         if interface_controlled:
-            if reported_basis == 'ferrous_free_lower_bound':
-                respeciation_status = 'skipped_ferrous_free_lower_bound'
-                respeciation_reason = (
-                    'ferrous_free_lower_bound_is_not_an_feo_inventory; '
-                    'respeciation_would_mint_feo'
-                )
-            elif reported_basis == 'fe_feo_buffer_activity_unavailable':
-                respeciation_status = (
-                    'skipped_fe_feo_buffer_activity_unavailable'
-                )
-                respeciation_reason = (
-                    'fe_feo_buffer_activity_unavailable_has_no_equality'
-                )
-            elif reported_basis == 'fe_saturation_bound':
-                respeciation_status = 'skipped_fe_saturation_bound'
-                respeciation_reason = (
-                    'interface_controls_fO2_floor_is_not_a_measurement'
-                )
-            else:
-                respeciation_status = 'skipped_no_melt_redox_buffer'
-                respeciation_reason = (
-                    'interface_controls_fO2_floor_is_not_a_measurement'
-                )
+            regime = self._melt_redox_absence_regime()
+            respeciation_status = f'skipped_{regime}'
+            respeciation_reason = f'{regime}_has_no_melt_equality'
+            if regime == 'ferrous_free_lower_bound':
+                respeciation_reason += '; respeciation_would_mint_feo'
             diagnostic = {
                 'respeciation_status': respeciation_status,
                 'status': 'ok',
@@ -9654,7 +9741,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 if bool(getattr(self, '_melt_redox_ledger_initialized', False))
                 else None
             )
-            if self._ferrous_free_scalar_absent():
+            if self._melt_redox_equality_is_absent():
                 reservoir.melt_intrinsic_fO2_log = None
             elif derived_fO2_log is not None:
                 reservoir.melt_intrinsic_fO2_log = derived_fO2_log
@@ -9819,8 +9906,8 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             gate_authority=gate_authority,
         )
         base_fO2_log = self._current_melt_redox_fO2_log()
-        ferrous_free_bound = (
-            base_fO2_log is None and self._ferrous_free_scalar_absent()
+        melt_equality_absent = (
+            base_fO2_log is None and self._melt_redox_equality_is_absent()
         )
         reference_T_K = self._current_melt_redox_reference_T_K()
         control_floor = self._headspace_control_floor_pO2_bar()
@@ -9831,7 +9918,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             0.0,
             float(melt_mol.get('Fe2O3', 0.0) or 0.0),
         )
-        if ferrous_free_bound:
+        if melt_equality_absent:
             release_capacity_mol = n_fe2o3_mol / 2.0
             # The absent fO2 has no finite differential capacity, but the
             # ferric ledger still has a directional release inventory.
@@ -9857,7 +9944,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             )
         redox_buffer_status = str(redox_buffer_state['status'])
         raw_capacity = redox_buffer_state['capacity_mol_per_ln_fO2']
-        if raw_capacity is None and self._ferrous_free_scalar_absent():
+        if raw_capacity is None and self._melt_redox_equality_is_absent():
             # Do not float the absent derivative into 0.
             C_m = None
         else:
@@ -9870,7 +9957,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         # capacity floor bypass its transfer solver or hard-vacuum status.
         capacity_floor_engaged = bool(
             redox_buffer_state.get('capacity_negligible', False)
-        ) and not ferrous_free_bound
+        ) and not melt_equality_absent
         liquid_active = bool(redox_buffer_state.get('liquid_active', True))
         effective_floor_mol = self._effective_headspace_floor_o2_mol()
         C_h = max(head_o2_mol, effective_floor_mol)
@@ -10195,13 +10282,13 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             )
         )
         self._apply_headspace_transport_diagnostic(reservoir)
-        # The initial ferrous-free basis pins a no-key liquidus result for this
+        # An initial absent equality pins a no-key liquidus result for this
         # hour. A committed release changes the FeO/Fe2O3 ratio, so refresh the
         # gate against that real post-commit state before evaluating its next
         # interface root. If the ledger remains past the Kress edge, the
         # refreshed authority correctly remains the r8 lower-bound band.
         if (
-            ferrous_free_bound
+            melt_equality_absent
             and transfer_mol > OXYGEN_RESERVOIR_NOOP_MOL
         ):
             self._melt_redox_gate_authority_this_tick = (
@@ -10735,8 +10822,11 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         )
 
 
-    def _ferrous_free_fe_redox_split(self, temperature_K: float) -> Dict[str, Any]:
-        """Publish the ferrous-free edge as a bound, not as an fO2 equality."""
+    def _absent_melt_equality_fe_redox_split(
+        self,
+        temperature_K: float,
+    ) -> Dict[str, Any]:
+        """Publish ledger fractions and any bound without inventing equality."""
 
         domain = dict(getattr(self, '_last_redox_domain', {}) or {})
         bound = domain.get('fO2_log_lower_bound')
@@ -10756,6 +10846,16 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             else math.log10(self._vacuum_floor_bar())
         )
         comp = self._melt_oxide_wt_pct()
+        melt_mol = self.atom_ledger.project_account_mol('process.cleaned_melt')
+        feo_mol = max(0.0, float(melt_mol.get('FeO', 0.0) or 0.0))
+        fe2o3_mol = max(0.0, float(melt_mol.get('Fe2O3', 0.0) or 0.0))
+        total_fe_mol = feo_mol + 2.0 * fe2o3_mol
+        ferric_fraction = (
+            2.0 * fe2o3_mol / total_fe_mol
+            if total_fe_mol > OXYGEN_RESERVOIR_NOOP_MOL
+            else 0.0
+        )
+        regime = self._melt_redox_absence_regime()
         return {
             'fO2_log': None,
             'fO2_log_lower_bound': None if bound is None else float(bound),
@@ -10763,18 +10863,20 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             'pressure_bar': float(pressure_bar),
             'iw_log': float(log_iw),
             'native_fe_saturation': False,
-            'native_fe_threshold': 'IW',
+            'native_fe_threshold': regime,
             'reference': KRESS_CARMICHAEL_1991_REFERENCE,
             'diagnostic_only': True,
-            'status': 'ferrous_free_lower_bound',
-            'fe3_over_sigma_fe': 1.0,
-            'ferric_frac': 1.0,
-            'ferrous_frac': 0.0,
+            'status': regime,
+            'fe3_over_sigma_fe': ferric_fraction,
+            'ferric_frac': ferric_fraction,
+            'ferrous_frac': max(0.0, 1.0 - ferric_fraction),
             'native_fe_frac': 0.0,
-            'fe2o3_over_feo_molar': None,
+            'fe2o3_over_feo_molar': (
+                fe2o3_mol / feo_mol if feo_mol > 0.0 else None
+            ),
             'fe2o3_equiv_wt_pct': float(comp.get('Fe2O3', 0.0) or 0.0),
-            'feo_equiv_wt_pct': 0.0,
-            'source': 'ledger:ferrous_free_lower_bound',
+            'feo_equiv_wt_pct': float(comp.get('FeO', 0.0) or 0.0),
+            'source': f'ledger:{regime}',
             'authoritative': False,
             'extrapolation': True,
             'high_uncertainty': True,
@@ -10798,11 +10900,10 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             raw_fO2_log = getattr(
                 self.melt.oxygen_reservoir,
                 'melt_intrinsic_fO2_log',
-                getattr(self.melt, 'melt_fO2_log', -9.0),
+                getattr(self.melt, 'melt_fO2_log', None),
             )
-        if self._ferrous_free_scalar_absent():
-            # ferrous-free scalar: publish the bound, not a float equality.
-            return self._ferrous_free_fe_redox_split(T_K)
+        if self._melt_redox_equality_is_absent():
+            return self._absent_melt_equality_fe_redox_split(T_K)
         fO2_log = float(raw_fO2_log)
         # Diagnostic-only construction via ``__new__`` predates the runtime
         # projection. Preserve the exact pre-PHYS pressure source here only;
@@ -11097,24 +11198,20 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             current_fO2 = getattr(self, '_current_melt_redox_fO2_log', None)
             if callable(current_fO2):
                 raw_fO2_log = current_fO2()
-                if raw_fO2_log is None and self._ferrous_free_scalar_absent():
-                    # ferrous-free scalar: native Fe saturation is false.
-                    # Do not float the absent equality into 0 or -9.
-                    return {
-                        'native_fe_saturation': False,
-                        'native_fe_threshold': 'ferrous_free_lower_bound',
-                        'native_fe_frac': 0.0,
-                        'native_fe_mol': 0.0,
-                    }
-                melt_fO2_log = float(raw_fO2_log)
             else:
-                melt_fO2_log = float(
-                    getattr(
-                        self.melt.oxygen_reservoir,
-                        'melt_intrinsic_fO2_log',
-                        getattr(self.melt, 'melt_fO2_log', -9.0),
-                    )
+                raw_fO2_log = getattr(
+                    self.melt.oxygen_reservoir,
+                    'melt_intrinsic_fO2_log',
+                    getattr(self.melt, 'melt_fO2_log', None),
                 )
+            if raw_fO2_log is None:
+                return {
+                    'native_fe_saturation': False,
+                    'native_fe_threshold': self._melt_redox_absence_regime(),
+                    'native_fe_frac': 0.0,
+                    'native_fe_mol': 0.0,
+                }
+            melt_fO2_log = float(raw_fO2_log)
         pressure = (
             float(pressure_bar)
             if pressure_bar is not None
@@ -11494,16 +11591,13 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         )
         if (
             self._current_melt_redox_fO2_log() is None
-            and self._ferrous_free_scalar_absent()
+            and self._melt_redox_equality_is_absent()
         ):
-            # ferrous-free scalar: no equality, so no native-Fe target.
-            # This is not a frozen-melt deferral and not fO2 0 or -9.
+            regime = self._melt_redox_absence_regime()
             split = self._compute_fe_redox_split_diagnostic()
             event = {
-                'native_fe_event': 'skipped_ferrous_free_lower_bound',
-                'native_fe_event_reason': (
-                    'ferrous_free_lower_bound has no equilibrium fO2'
-                ),
+                'native_fe_event': f'skipped_{regime}',
+                'native_fe_event_reason': f'{regime} has no melt equality',
                 'native_fe_event_status': 'skipped',
             }
             self._last_native_fe_partition_diagnostic = {}
@@ -11752,13 +11846,11 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         })
         self._last_native_fe_partition_diagnostic = dict(partition)
         base_fO2_log = self._current_melt_redox_fO2_log()
-        if base_fO2_log is None and self._ferrous_free_scalar_absent():
-            # ferrous-free scalar: do not difference a target against 0 or -9.
+        if base_fO2_log is None and self._melt_redox_equality_is_absent():
+            regime = self._melt_redox_absence_regime()
             event = {
-                'native_fe_event': 'skipped_ferrous_free_lower_bound',
-                'native_fe_event_reason': (
-                    'ferrous_free_lower_bound has no equilibrium fO2'
-                ),
+                'native_fe_event': f'skipped_{regime}',
+                'native_fe_event_reason': f'{regime} has no melt equality',
                 'native_fe_event_status': 'skipped',
             }
             self._last_native_fe_saturation_event = dict(event)
@@ -12735,19 +12827,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 except AttributeError:
                     pass
                 return
-            if self._ferrous_free_scalar_absent():
-                # ferrous-free scalar: no melt fO2 for a liquidus fraction.
-                # Do not call the factor; a 0 return would price the melt solid.
-                self._last_melt_redox_liquid_fraction_diagnostic = {
-                    'status': 'unavailable',
-                    'source': 'none:ferrous_free_lower_bound',
-                    'reason': (
-                        'ferrous_free_lower_bound has no equilibrium fO2'
-                    ),
-                }
-                liquid_fraction = None
-            else:
-                liquid_fraction = self._melt_redox_liquid_fraction_factor(T_K)
+            liquid_fraction = self._melt_redox_liquid_fraction_factor(T_K)
             liquid_diagnostic = getattr(
                 self,
                 '_last_melt_redox_liquid_fraction_diagnostic',
@@ -12811,6 +12891,22 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         if not comp_wt:
             self._last_sulfur_saturation_result = None
             return
+        fO2_log, speciation_authority, speciation_regime, speciation_flag = (
+            self._melt_redox_speciation_key()
+        )
+        speciation_diagnostic = {
+            'fO2_log': float(fO2_log),
+            'authority': speciation_authority,
+            'regime': speciation_regime,
+        }
+        melt_presence_basis['melt_redox_speciation_key'] = (
+            speciation_diagnostic
+        )
+        if speciation_flag is not None:
+            speciation_diagnostic['flag'] = dict(speciation_flag)
+            melt_presence_basis['melt_redox_speciation_flag'] = dict(
+                speciation_flag
+            )
         if melt_presence_unavailable:
             reason = 'melt_presence_signal_unavailable'
             source = melt_presence_basis.get('source')
@@ -12837,27 +12933,6 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         if T_K <= 0.0:
             return
         P_bar = max(self.melt.p_total_mbar / 1000.0, 1.0e-6)
-        fO2_log = self._current_melt_redox_fO2_log()
-        if fO2_log is None and self._ferrous_free_scalar_absent():
-            # ferrous-free scalar: SulfSat needs an equality. Do not pass 0 or -9.
-            reason = 'ferrous_free_lower_bound'
-            note = f'SulfSat not evaluated: {reason}'
-            sulfur_result = SulfurSaturationResult(
-                warnings=[note],
-                calibration_status='not_evaluated',
-                melt_presence_basis=dict(melt_presence_basis),
-                not_evaluated_reason=reason,
-            )
-            self._last_sulfur_saturation_result = sulfur_result
-            try:
-                result.sulfur_saturation = sulfur_result
-            except AttributeError:
-                pass
-            warnings_list = getattr(result, 'warnings', None)
-            if isinstance(warnings_list, list):
-                warnings_list.append(f'SulfSat gate (not_evaluated): {note}')
-            self._note_sulfur_saturation_step(sulfur_result)
-            return
         self._sync_oxygen_reservoir_mirror()
         sulfur_result = self._sulfsat_gate.compute_sulfur_saturation(
             liquid_comp_wt=comp_wt,
@@ -12867,6 +12942,10 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             S_input_ppm=s_input_ppm,
         )
         sulfur_result.melt_presence_basis = dict(melt_presence_basis)
+        if speciation_flag is not None:
+            sulfur_result.warnings.append(
+                f"{speciation_flag['code']}: {speciation_flag['reason']}"
+            )
         self._last_sulfur_saturation_result = sulfur_result
         try:
             result.sulfur_saturation = sulfur_result
@@ -13135,23 +13214,21 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             return self._record_equilibrium_status(self._internal_analytical_equilibrium())
 
         diagnostic_silicate_equilibrium = False
+        speciation_authority = 'equality'
+        speciation_regime = 'unclassified'
+        speciation_flag = None
         try:
             backend_composition_by_account = (
                 self._backend_composition_mol_by_account())
             self._validate_backend_account_scope_support(
                 backend_composition_by_account)
-            raw_intrinsic_fO2_log = self._current_melt_redox_fO2_log()
-            if (
-                raw_intrinsic_fO2_log is None
-                and self._ferrous_free_scalar_absent()
-            ):
-                # ferrous-free scalar: silicate equilibrium has no melt
-                # fO2 key. Do not substitute 0 or -9. Evaporation pressure
-                # is the interface, held at the gas pressure.
-                return self._record_equilibrium_status(
-                    self._internal_analytical_equilibrium()
-                )
-            intrinsic_fO2_log = float(raw_intrinsic_fO2_log)
+            (
+                intrinsic_fO2_log,
+                speciation_authority,
+                speciation_regime,
+                speciation_flag,
+            ) = self._melt_redox_speciation_key()
+            intrinsic_fO2_log = float(intrinsic_fO2_log)
             temperature_C = float(self.melt.temperature_C)
             pressure_bar = float(self.melt.p_total_mbar) / 1000.0
             canonicalize_pt0_inputs = store is not None and getattr(
@@ -13313,6 +13390,23 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 balances_before,
             )
             self._project_cleaned_melt_from_atom_ledger()
+        result_diagnostics = dict(getattr(result, 'diagnostics', {}) or {})
+        result_diagnostics['melt_redox_speciation_key'] = {
+            'fO2_log': float(intrinsic_fO2_log),
+            'authority': speciation_authority,
+            'regime': speciation_regime,
+        }
+        if speciation_flag is not None:
+            result_diagnostics['melt_redox_speciation_flag'] = dict(
+                speciation_flag
+            )
+            warnings = getattr(result, 'warnings', None)
+            notice = (
+                f"{speciation_flag['code']}: {speciation_flag['reason']}"
+            )
+            if isinstance(warnings, list) and notice not in warnings:
+                warnings.append(notice)
+        result.diagnostics = result_diagnostics
         return self._record_equilibrium_status(result)
 
     def _record_equilibrium_status(self, result):
@@ -13521,25 +13615,37 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         # the same single path the rest of the simulator uses.
         transport_pO2_bar = self._vapor_pressure_transport_pO2_bar()
         interface_pO2_bar = self._vapor_pressure_dispatch_pO2_bar()
-        current_fO2 = getattr(self, '_current_melt_redox_fO2_log', None)
-        if callable(current_fO2):
-            intrinsic_fO2_log = current_fO2()
+        speciation_reader = getattr(self, '_melt_redox_speciation_key', None)
+        if callable(speciation_reader):
+            (
+                intrinsic_fO2_log,
+                speciation_authority,
+                speciation_regime,
+                speciation_flag,
+            ) = speciation_reader()
         else:
-            reservoir = getattr(self.melt, 'oxygen_reservoir', None)
-            intrinsic_fO2_log = getattr(
-                reservoir,
-                'melt_intrinsic_fO2_log',
-                getattr(self.melt, 'melt_fO2_log', None),
-            )
+            current_fO2 = getattr(self, '_current_melt_redox_fO2_log', None)
+            if callable(current_fO2):
+                intrinsic_fO2_log = current_fO2()
+            else:
+                reservoir = getattr(self.melt, 'oxygen_reservoir', None)
+                intrinsic_fO2_log = getattr(
+                    reservoir,
+                    'melt_intrinsic_fO2_log',
+                    getattr(self.melt, 'melt_fO2_log', None),
+                )
             if intrinsic_fO2_log is None:
                 intrinsic_fO2_log = getattr(
                     result,
                     'fO2_log',
                     getattr(self.melt, 'fO2_log', -9.0),
                 )
+            speciation_authority = 'equality'
+            speciation_regime = 'unclassified'
+            speciation_flag = None
         if (
             intrinsic_fO2_log is None
-            and self._ferrous_free_scalar_absent()
+            and self._melt_redox_equality_is_absent()
         ):
             # ferrous-free scalar: evaporation pressure is
             # interface_pO2_bar, already the gas pressure. Do not float
@@ -13610,6 +13716,25 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         )
         self._last_high_t_melt_activity_temperature_K = T_C + 273.15
         diagnostic = dict(kernel_result.diagnostic or {})
+        if intrinsic_fO2_log is not None:
+            diagnostic['source_reaction_fO2_log10'] = float(
+                intrinsic_fO2_log
+            )
+        diagnostic['melt_redox_speciation_key'] = {
+            'fO2_log': (
+                None if intrinsic_fO2_log is None else float(intrinsic_fO2_log)
+            ),
+            'authority': speciation_authority,
+            'regime': speciation_regime,
+        }
+        if speciation_flag is not None:
+            diagnostic['melt_redox_speciation_flag'] = dict(speciation_flag)
+            equilibrium_warnings = getattr(result, 'warnings', None)
+            notice = (
+                f"{speciation_flag['code']}: {speciation_flag['reason']}"
+            )
+            if isinstance(equilibrium_warnings, list) and notice not in equilibrium_warnings:
+                equilibrium_warnings.append(notice)
         high_t_activity = dict(diagnostic.get("high_t_melt_activity") or {})
         if (
             getattr(self, '_high_t_melt_activity', 'openimcc') == 'openimcc'

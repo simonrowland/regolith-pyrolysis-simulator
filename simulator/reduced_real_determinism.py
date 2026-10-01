@@ -274,21 +274,33 @@ class PT0NonFinitePayload(ValueError):
 
 
 def _authoritative_melt_fO2_log(sim: Any) -> float:
-    reader = getattr(sim, "_current_melt_redox_fO2_log", None)
-    if callable(reader):
-        value = reader()
+    speciation_key = getattr(sim, "_melt_redox_speciation_key", None)
+    if callable(speciation_key):
+        value, authority, regime, flag = speciation_key()
+        diagnostic = {
+            "fO2_log": float(value),
+            "authority": str(authority),
+            "regime": str(regime),
+        }
+        if flag is not None:
+            diagnostic["flag"] = dict(flag)
+        sim._last_pt0_melt_redox_speciation_diagnostic = diagnostic
     else:
-        reservoir = getattr(getattr(sim, "melt", None), "oxygen_reservoir", None)
-        value = getattr(reservoir, "melt_intrinsic_fO2_log", None)
-        if value is None:
-            value = getattr(getattr(sim, "melt", None), "melt_fO2_log", None)
-    absent = getattr(sim, "_ferrous_free_scalar_absent", None)
-    if value is None and callable(absent) and absent():
-        # ferrous-free scalar: a cache key cannot invent 0 or -9.
-        # There is no finite melt fO2 on this basis.
-        raise PT0InvalidControls(
-            "ferrous_free_lower_bound has no equilibrium fO2 for a PT-0 cache key"
-        )
+        reader = getattr(sim, "_current_melt_redox_fO2_log", None)
+        if callable(reader):
+            value = reader()
+        else:
+            reservoir = getattr(getattr(sim, "melt", None), "oxygen_reservoir", None)
+            value = getattr(reservoir, "melt_intrinsic_fO2_log", None)
+            if value is None:
+                value = getattr(getattr(sim, "melt", None), "melt_fO2_log", None)
+        absent = getattr(sim, "_melt_redox_equality_is_absent", None)
+        if value is None and callable(absent) and absent():
+            regime_reader = getattr(sim, "_melt_redox_absence_regime", None)
+            regime = regime_reader() if callable(regime_reader) else "melt_redox"
+            raise PT0InvalidControls(
+                f"{regime} has no equilibrium fO2 for a PT-0 cache key"
+            )
     try:
         fO2_log = float(value)
     except (TypeError, ValueError) as exc:

@@ -27,7 +27,7 @@ from simulator.physical_constants import (
     CATALOG_PHYSICAL_PRESSURE_CEILING_PA,
     GAS_CONSTANT,
 )
-from simulator.state import GAS_CONSTANT as STATE_GAS_CONSTANT, EvaporationFlux
+from simulator.state import EvaporationFlux
 from simulator.transport_constants import COLLISION_DIAMETERS_M
 from simulator.transport_regime import (
     FREE_MOLECULAR_KNUDSEN_MIN,
@@ -468,8 +468,8 @@ def test_co2_buffer_assumption_is_published_in_headspace_state():
     )
 
 
-def test_interface_po2_uses_finite_two_film_force_and_publishes_regime():
-    """The release boundary uses finite ledger O2 inventory, not a tangent law."""
+def test_absent_m4_interface_diagnostic_uses_gas_pressure():
+    """An absent M4 equality leaves a zero-commit interface at gas pressure."""
 
     sim = _transport_sim()
     sim.melt.temperature_C = 1500.0 - 273.15
@@ -494,64 +494,18 @@ def test_interface_po2_uses_finite_two_film_force_and_publishes_regime():
     reservoir.melt_intrinsic_fO2_log = sim._melt_fO2_from_ledger(
         T_K=sim.melt.temperature_C + 273.15
     )
+    sim._melt_redox_ledger_initialized = True
+    sim._sync_oxygen_reservoir_mirror()
 
-    sim._apply_oxygen_reservoir_exchange()
-    reservoir = sim.melt.oxygen_reservoir
-    interface_pO2_bar = sim._interface_pO2_bar()
-    diagnostic = sim._last_oxygen_interface_diagnostic
-    gas_k = diagnostic['gas_side_k_m_s']
-    melt_k = diagnostic['melt_side_k_O_m_s']
-    transport_pO2_bar = reservoir.headspace_transport_pO2_bar
-    melt_pO2_bar = diagnostic['melt_intrinsic_pO2_bar']
-    gas_temperature_K = float(
-        getattr(sim.overhead, 'headspace_temperature_K', 0.0)
-        or sim.melt.temperature_C + 273.15
+    assert sim._current_melt_redox_fO2_log() is None
+    diagnostic = sim._oxygen_interface_state(
+        reservoir.headspace_transport_pO2_bar
     )
-    gas_pressure_factor = 1.0e5 / (STATE_GAS_CONSTANT * gas_temperature_K)
-    melt_depth_m = float(
-        sim.setpoints['sso_r']['oxygen_exchange']['effective_melt_depth_m']
+    assert diagnostic['interface_pO2_bar'] == pytest.approx(
+        reservoir.headspace_transport_pO2_bar
     )
-    gas_flux = gas_k * gas_pressure_factor * (
-        transport_pO2_bar - interface_pO2_bar
-    )
-    melt_flux = melt_k * diagnostic['finite_melt_driving_force_mol'] / (
-        sim.melt.melt_surface_area_m2 * melt_depth_m
-    )
-    assert math.isfinite(gas_k) and gas_k > 0.0
-    assert diagnostic['finite_melt_driving_force_mol'] == pytest.approx(
-        diagnostic['melt_oxygen_equilibrium_mol']
-        - diagnostic['melt_oxygen_ledger_mol']
-    )
-    # The root stays inside the melt and transport pressures.  When those
-    # two pressures coincide, an exact closed bracket rejects the rounding.
-    low_pO2_bar = min(transport_pO2_bar, melt_pO2_bar)
-    high_pO2_bar = max(transport_pO2_bar, melt_pO2_bar)
-    bracket_ulp = 8.0 * max(low_pO2_bar, high_pO2_bar, 1.0e-30) * 2.220446049250313e-16
-    assert low_pO2_bar - bracket_ulp <= interface_pO2_bar <= high_pO2_bar + bracket_ulp
-    if diagnostic['interface_root_clamped']:
-        # The fixture is at a native-Fe/FeO ledger endpoint, so its formal
-        # Kress91 equilibrium can sit outside the gas/melt pressure bracket.
-        # The finite root must report that typed diagnostic instead of
-        # inventing a flux continuity point.
-        assert diagnostic['interface_root_residual_mol_m2_s'] != pytest.approx(
-            0.0,
-            abs=2.0e-14,
-        )
-    else:
-        assert gas_flux == pytest.approx(melt_flux, rel=1.0e-10, abs=2.0e-14)
-        assert diagnostic['interface_flux_mol_m2_s'] == pytest.approx(
-            gas_flux,
-            rel=1.0e-10,
-            abs=2.0e-14,
-        )
-    assert reservoir.interface_pO2_bar == pytest.approx(interface_pO2_bar)
-    assert reservoir.interface_pO2_limiting_regime == diagnostic[
-        'limiting_regime'
-    ]
-    assert diagnostic['limiting_regime'] in {
-        'gas_side_limited',
-        'melt_side_limited',
-    }
+    assert diagnostic['finite_melt_driving_force_mol'] is None
+    assert diagnostic['limiting_regime'] == 'gas_side_fe_saturation_bound'
 
 
 def test_finite_interface_root_conserves_flux_for_interior_inventory():
@@ -698,7 +652,7 @@ def test_interface_distinguishes_fe_free_from_capacity_exhaustion(monkeypatch):
     assert interface_pO2_bar == pytest.approx(1.0e-9)
     assert diagnostic['redox_buffer_status'] == 'no_fe_redox_buffer'
     assert diagnostic['redox_buffer_exhausted'] is False
-    assert diagnostic['limiting_regime'] == 'gas_side_no_fe_redox_buffer'
+    assert diagnostic['limiting_regime'] == 'gas_side_fe_saturation_bound'
 
     balances = sim.atom_ledger._balances['process.cleaned_melt']
     balances['FeO'] = 2.0 * OXYGEN_RESERVOIR_NOOP_MOL
@@ -720,9 +674,7 @@ def test_interface_distinguishes_fe_free_from_capacity_exhaustion(monkeypatch):
     )
     assert diagnostic['redox_buffer_status'] == 'exhausted'
     assert diagnostic['redox_buffer_exhausted'] is True
-    assert diagnostic['limiting_regime'] == (
-        'gas_side_redox_buffer_exhausted'
-    )
+    assert diagnostic['limiting_regime'] == 'gas_side_fe_saturation_bound'
     assert reservoir.interface_pO2_bar == pytest.approx(
         reservoir.headspace_transport_pO2_bar
     )

@@ -5,6 +5,8 @@ import importlib
 from pathlib import Path
 from typing import Any
 
+import math
+
 import pytest
 import yaml
 
@@ -251,8 +253,11 @@ def test_vapor_committed_native_fe_does_not_buffer_melt_redox() -> None:
         "Fe", 0.0
     ) == pytest.approx(0.0)
     assert sim._native_fe_feo_buffer_is_active() is False
-    assert sim._melt_fO2_from_ledger() is not None
-    assert sim._last_redox_domain["basis"] != "fe_feo_buffer"
+    assert sim._melt_fO2_from_ledger() is None
+    assert sim._last_redox_domain["basis"] == "fe_saturation_bound"
+    assert math.isfinite(
+        float(sim._last_redox_domain["fO2_log_lower_bound"])
+    )
 
 
 def test_native_fe_authoritative_extent_ignores_diagnostic_payload(

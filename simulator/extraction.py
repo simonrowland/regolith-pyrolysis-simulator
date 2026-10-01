@@ -1819,8 +1819,8 @@ class ExtractionMixin:
         if not is_plant:
             electrolysis_controls['commit_empty_transition'] = True
         melt_fO2_log = self._current_melt_redox_fO2_log()
-        if melt_fO2_log is None and self._ferrous_free_scalar_absent():
-            # ferrous-free scalar: MRE keeps the absent melt equality.
+        if melt_fO2_log is None:
+            # MRE keeps the absent melt equality.
             # The provider and dispatch fO2 already accept None.
             # Do not pass 0 or -9.
             electrolysis_controls['melt_fO2_log'] = None

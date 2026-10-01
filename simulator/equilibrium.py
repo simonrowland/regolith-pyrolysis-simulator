@@ -481,33 +481,55 @@ class EquilibriumMixin:
         pO2_bar = self._headspace_transport_pO2_bar()
         interface_pO2_bar = self._interface_pO2_bar()
         vacuum_floor_bar = self._vacuum_floor_bar()
-        current_fO2 = getattr(self, '_current_melt_redox_fO2_log', None)
-        if callable(current_fO2):
-            raw_intrinsic_fO2_log = current_fO2()
-        else:
-            reservoir = getattr(self.melt, "oxygen_reservoir", None)
-            raw_intrinsic_fO2_log = getattr(
-                reservoir, "melt_intrinsic_fO2_log", None
+        speciation_reader = getattr(self, '_melt_redox_speciation_key', None)
+        if callable(speciation_reader):
+            (
+                raw_intrinsic_fO2_log,
+                speciation_authority,
+                speciation_regime,
+                speciation_flag,
+            ) = speciation_reader()
+            equality_reader = getattr(
+                self, '_current_melt_redox_fO2_log', None
             )
-            if raw_intrinsic_fO2_log is None:
-                raw_intrinsic_fO2_log = getattr(self.melt, 'melt_fO2_log', None)
-            if raw_intrinsic_fO2_log is None:
-                raw_intrinsic_fO2_log = getattr(self.melt, 'fO2_log', -9.0)
-        if (
-            raw_intrinsic_fO2_log is None
-            and self._ferrous_free_scalar_absent()
-        ):
-            # ferrous-free scalar: surface release already used
-            # interface_pO2_bar (the gas pressure). Do not turn the
-            # missing equilibrium into 0 or into the 100 bar clamp.
+            equality_fO2_log = (
+                equality_reader() if callable(equality_reader) else None
+            )
+        else:
+            current_fO2 = getattr(self, '_current_melt_redox_fO2_log', None)
+            if callable(current_fO2):
+                raw_intrinsic_fO2_log = current_fO2()
+            else:
+                reservoir = getattr(self.melt, "oxygen_reservoir", None)
+                raw_intrinsic_fO2_log = getattr(
+                    reservoir, "melt_intrinsic_fO2_log", None
+                )
+                if raw_intrinsic_fO2_log is None:
+                    raw_intrinsic_fO2_log = getattr(
+                        self.melt, 'melt_fO2_log', None
+                    )
+                if raw_intrinsic_fO2_log is None:
+                    raw_intrinsic_fO2_log = getattr(self.melt, 'fO2_log', None)
+            equality_fO2_log = raw_intrinsic_fO2_log
+            speciation_authority = 'equality'
+            speciation_regime = 'unclassified'
+            speciation_flag = None
+        if raw_intrinsic_fO2_log is None:
+            # Surface release already used interface_pO2_bar. Do not turn an
+            # absent melt equality into 0 or into the 100 bar clamp.
             intrinsic_fO2_log = None
+            regime_reader = getattr(self, '_melt_redox_absence_regime', None)
+            absent_regime = (
+                regime_reader() if callable(regime_reader) else 'melt_redox'
+            )
         else:
             intrinsic_fO2_log = float(raw_intrinsic_fO2_log)
+            absent_regime = 'melt_redox'
 
         if intrinsic_fO2_log is None:
             warnings.append(
-                'melt_fO2_absent: ferrous_free_lower_bound has no '
-                'equilibrium fO2; dissociation clamp not applied'
+                f'melt_fO2_absent: {absent_regime} has no melt equality; '
+                'dissociation clamp not applied'
             )
         else:
             melt_dissociation_pO2_bar, melt_pO2_clamped = (
@@ -520,6 +542,10 @@ class EquilibriumMixin:
                     f"fO2_log={intrinsic_fO2_log:.6g} "
                     f"pO2_bar={melt_dissociation_pO2_bar:g}"
                 )
+        if speciation_flag is not None:
+            warnings.append(
+                f"{speciation_flag['code']}: {speciation_flag['reason']}"
+            )
         feo_activity_pressure_bar = kress91_furnace_activity_pressure_bar(
             pressure_bar=floor_vacuum_pressure_bar(
                 float(self.melt.p_total_mbar) / 1000.0,
@@ -553,7 +579,7 @@ class EquilibriumMixin:
         if intrinsic_fO2_log is None:
             feo_activity_diagnostic = {
                 'status': 'unavailable',
-                'reason': 'ferrous_free_lower_bound_has_no_equilibrium_fO2',
+                'reason': f'{absent_regime}_has_no_melt_equality',
                 'a_FeO_authoritative': None,
                 'sources': {},
             }
@@ -1353,6 +1379,16 @@ class EquilibriumMixin:
             },
             'activity_provenance': activity_provenance,
             'a_FeO_calphad': feo_activity_diagnostic,
+            'melt_redox_speciation_key': {
+                'fO2_log': intrinsic_fO2_log,
+                'authority': speciation_authority,
+                'regime': speciation_regime,
+                **(
+                    {'flag': dict(speciation_flag)}
+                    if speciation_flag is not None
+                    else {}
+                ),
+            },
             'ellingham_authority': ellingham_authority_diagnostic(
                 ellingham_extrapolations,
                 consumer='legacy-equilibrium-fallback',
@@ -1389,7 +1425,9 @@ class EquilibriumMixin:
                 for species in vapor_pressures
             },
             activity_coefficients=activities,
-            fO2_log=intrinsic_fO2_log,
+            fO2_log=(
+                None if equality_fO2_log is None else float(equality_fO2_log)
+            ),
             warnings=warnings,
             status='ok',
             diagnostics=_eq_diagnostics,

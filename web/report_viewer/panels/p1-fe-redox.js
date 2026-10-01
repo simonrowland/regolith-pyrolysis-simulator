@@ -306,14 +306,22 @@
 
   function meltFugacityValue(redox) {
     const domain = isRecord(redox.redox_domain) ? redox.redox_domain : {};
-    const basis = typeof domain.basis === "string" ? domain.basis : "";
     const bound = hasOwn(redox, "fO2_log_lower_bound") && isNumber(redox.fO2_log_lower_bound)
       ? redox.fO2_log_lower_bound
       : (isNumber(domain.fO2_log_lower_bound) ? domain.fO2_log_lower_bound : null);
-    if (basis === "ferrous_free_lower_bound") {
+    const equality = hasOwn(domain, "derived_fO2_log")
+      ? domain.derived_fO2_log
+      : redox.fO2_log;
+    if (!isNumber(equality)) {
+      const basis = typeof domain.basis === "string" ? domain.basis : "";
+      if (!basis && bound === null) return numberValue(redox, "fO2_log");
+      const regime = {
+        fe_feo_buffer_activity_unavailable: "fe_feo_buffer",
+        no_melt_redox_buffer: "no_modelled_redox_couple",
+      }[basis] || basis || "melt_redox";
       return bound === null
-        ? esc("not available (lower bound, ferrous-free)")
-        : esc(`> ${fmtNum(bound)} (lower bound, ferrous-free)`);
+        ? esc(`not available (${regime})`)
+        : esc(`> ${fmtNum(bound)} (lower bound, ${regime})`);
     }
     return numberValue(redox, "fO2_log");
   }

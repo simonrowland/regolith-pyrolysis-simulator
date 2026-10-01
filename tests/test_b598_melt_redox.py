@@ -37,7 +37,37 @@ def test_lunar_c2a_170h_keeps_ledger_redox_bounded_and_consistent() -> None:
     for snapshot, row in zip(execution.snapshots, execution.per_hour):
         assert abs(snapshot.mass_balance_error_pct) <= 5.0e-12
         reservoir = snapshot.oxygen_reservoir
-        fO2_log = float(reservoir["melt_intrinsic_fO2_log"])
+        raw_fO2_log = reservoir["melt_intrinsic_fO2_log"]
+        redox_domains = (
+            (row.get("fe_redox_split") or {}).get("redox_domain"),
+            (row.get("redox_source_breakdown") or {}).get("redox_domain"),
+        )
+        redox_domain = next(
+            (
+                dict(candidate)
+                for candidate in redox_domains
+                if isinstance(candidate, dict)
+                and candidate.get("basis") in {
+                    "no_modelled_redox_couple",
+                    "fe_saturation_bound",
+                    "ferrous_free_lower_bound",
+                    "fe_feo_buffer_activity_unavailable",
+                }
+            ),
+            {},
+        )
+        if raw_fO2_log is None:
+            assert redox_domain
+            assert redox_domain["derived_fO2_log"] is None
+            if redox_domain["basis"] in {
+                "fe_saturation_bound",
+                "ferrous_free_lower_bound",
+            }:
+                assert math.isfinite(float(redox_domain["fO2_log_lower_bound"]))
+            else:
+                assert "fO2_log_lower_bound" not in redox_domain
+            continue
+        fO2_log = float(raw_fO2_log)
         assert math.isfinite(fO2_log)
 
         overlay = row.get("vapour_batch_flux_overlay") or {}
@@ -77,38 +107,20 @@ def test_lunar_c2a_170h_keeps_ledger_redox_bounded_and_consistent() -> None:
                 assert fO2_log == pytest.approx(-9.0, abs=2.0e-12)
             continue
 
-        redox_domains = (
-            (row.get("fe_redox_split") or {}).get("redox_domain"),
-            (row.get("redox_source_breakdown") or {}).get("redox_domain"),
-        )
         redox_domain = next(
             (
                 dict(candidate)
                 for candidate in redox_domains
                 if isinstance(candidate, dict)
-                and candidate.get("basis")
-                in {
-                    "no_melt_redox_buffer",
+                and candidate.get("basis") in {
                     "kress91_inverse",
                     "fe_feo_buffer",
-                    "fe_saturation_bound",
-                    "ferrous_free_lower_bound",
                 }
             ),
             {},
         )
         if redox_domain:
-            if redox_domain["basis"] == "no_melt_redox_buffer":
-                assert redox_domain["status"] == "out_of_domain"
-                assert redox_domain["authority"] == "gas_interface_controlled"
-                assert tuple(redox_domain["certified_band"]["pO2_bar"]) == (
-                    1.0e-12,
-                    100.0,
-                )
-                assert "kress91_inverse_not_evaluated" in redox_domain[
-                    "reason"
-                ]
-            elif redox_domain["basis"] == "kress91_inverse":
+            if redox_domain["basis"] == "kress91_inverse":
                 assert redox_domain["status"] == "ok"
                 assert redox_domain["derived_fO2_log"] == pytest.approx(
                     fO2_log,
@@ -117,40 +129,6 @@ def test_lunar_c2a_170h_keeps_ledger_redox_bounded_and_consistent() -> None:
                 assert float(divergence["implied_ferric_fraction"]) == pytest.approx(
                     float(divergence["ledger_ferric_fraction"]),
                     abs=2.0e-12,
-                )
-            elif redox_domain["basis"] == "fe_saturation_bound":
-                assert redox_domain["status"] == "out_of_domain"
-                assert redox_domain["authority"] == "extrapolated"
-                assert "kress91_inverse_not_evaluated" in redox_domain[
-                    "reason"
-                ]
-                assert "ferric_inventory_absent" in redox_domain["reason"]
-                temperature_K = float(snapshot.temperature_C) + 273.15
-                pressure_bar = floor_vacuum_pressure_bar(
-                    float(row["P_total_bar"]),
-                    floor_bar=DEFAULT_VACUUM_FLOOR_BAR,
-                )
-                activity = calphad_ferrous_feo_activity_diagnostic(
-                    comp_wt=snapshot.composition_wt_pct,
-                    fO2_log=fO2_log,
-                    T_K=temperature_K,
-                    pressure_bar=pressure_bar,
-                )
-                a_feo = float(activity["a_FeO_authoritative"])
-                iw = feo_iw_log10_fO2_bar(temperature_K, a_feo=1.0)
-                assert fO2_log == pytest.approx(
-                    iw + 2.0 * math.log10(a_feo),
-                    abs=1.0e-6,
-                )
-            elif redox_domain["basis"] == "ferrous_free_lower_bound":
-                assert redox_domain["status"] == "out_of_domain"
-                assert redox_domain["authority"] == "extrapolated"
-                assert "one-sided lower bound, not an equality" in redox_domain[
-                    "reason"
-                ]
-                assert redox_domain["derived_fO2_log"] is None
-                assert math.isfinite(
-                    float(redox_domain["fO2_log_lower_bound"])
                 )
             else:
                 assert redox_domain["basis"] == "fe_feo_buffer"
