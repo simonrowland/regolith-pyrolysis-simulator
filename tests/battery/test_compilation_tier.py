@@ -308,7 +308,11 @@ def test_pure_phase_enthalpy_increment_uses_injected_accessor() -> None:
         metal_formula="Mg",
         polymorph=Polymorph.PERICLASE.value,
     )
-    identity = replace(identity, quantity=Quantity.H_MINUS_H298)
+    identity = replace(
+        identity,
+        quantity=Quantity.H_MINUS_H298,
+        subtype=State.of("H(T)-H(298.15 K)"),
+    )
 
     class _Props:
         def __init__(self, enthalpy):
@@ -331,6 +335,67 @@ def test_pure_phase_enthalpy_increment_uses_injected_accessor() -> None:
     assert attempt.value == Decimal("4")
     assert attempt.unit == "kJ_per_declared_mol_basis"
     assert attempt.refusal_reason is None
+
+
+def test_pure_phase_refuses_non_species_molar_basis_before_engine_call() -> None:
+    identity = F.oxide_identity(
+        "MgO",
+        Phase.CR,
+        T_K=Decimal("1000"),
+        per=PerBasis.MOL_ATOM,
+        metal_formula="Mg",
+        polymorph=Polymorph.PERICLASE.value,
+    )
+    identity = replace(identity, quantity=Quantity.CP)
+    calls = []
+
+    def pure_phase(*args):
+        calls.append(args)
+        raise AssertionError("basis mismatch must refuse before the engine call")
+
+    attempt = predict_thermo_attempt(
+        Engine.MAGEMIN,
+        F.observation("mgo-per-atom", "exp-1", identity, Decimal("4")),
+        pure_phase=pure_phase,
+    )
+    assert attempt.value is None
+    assert attempt.refusal_reason is RefusalReason.UNSUPPORTED
+    assert attempt.refusal_detail["reason"] == "pure-phase-per-basis-mismatch"
+    assert attempt.refusal_detail["expected_per"] == PerBasis.MOL_SPECIES.value
+    assert attempt.refusal_detail["actual_per"] == PerBasis.MOL_ATOM.value
+    assert calls == []
+
+
+def test_pure_phase_refuses_non_298_enthalpy_anchor_before_engine_call() -> None:
+    identity = F.oxide_identity(
+        "MgO",
+        Phase.CR,
+        T_K=Decimal("1000"),
+        per=PerBasis.MOL_SPECIES,
+        metal_formula="Mg",
+        polymorph=Polymorph.PERICLASE.value,
+    )
+    identity = replace(
+        identity,
+        quantity=Quantity.H_MINUS_H298,
+        subtype=State.of("apparent enthalpy, stable-phase anchor"),
+    )
+    calls = []
+
+    def pure_phase(*args):
+        calls.append(args)
+        raise AssertionError("anchor mismatch must refuse before the engine call")
+
+    attempt = predict_thermo_attempt(
+        Engine.MAGEMIN,
+        F.observation("mgo-wrong-anchor", "exp-1", identity, Decimal("4")),
+        pure_phase=pure_phase,
+    )
+    assert attempt.value is None
+    assert attempt.refusal_reason is RefusalReason.UNSUPPORTED
+    assert attempt.refusal_detail["reason"] == "pure-phase-enthalpy-anchor-mismatch"
+    assert attempt.refusal_detail["expected_anchor"] == "H(T)-H(298.15 K)"
+    assert calls == []
 
 
 def test_compilation_tier_is_beside_measured_and_same_source_is_flagged() -> None:
