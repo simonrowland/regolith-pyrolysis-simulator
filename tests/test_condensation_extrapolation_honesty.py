@@ -423,9 +423,24 @@ def test_predict_flag_rh03_recipe_completes_with_public_flags(
                 p_downstream_Pa=0.0,
                 species_kg_for_M_avg=before_species_kg,
             )
-            p_ss_Pa = math.sqrt(
+            choked_coefficient_kg_s_Pa = (
+                sim.overhead_model._choked_flow_coefficient_kg_s_Pa(
+                    sim.melt.temperature_C,
+                    species_kg_for_M_avg=before_species_kg,
+                )
+            )
+            poiseuille_pressure_ss_Pa = math.sqrt(
                 p_downstream_Pa ** 2 + source_mass_kg_s / k_kg_s_Pa2
             ) if k_kg_s_Pa2 > 0.0 else math.inf
+            choked_pressure_ss_Pa = (
+                source_mass_kg_s / choked_coefficient_kg_s_Pa
+                if choked_coefficient_kg_s_Pa > 0.0
+                else math.inf
+            )
+            p_ss_Pa = max(
+                poiseuille_pressure_ss_Pa,
+                choked_pressure_ss_Pa,
+            )
             p_end_Pa = max(p_commanded_Pa, p_ss_Pa)
             volume_m3 = sim._headspace_volume_m3()
             temperature_K = sim._headspace_temperature_K()
@@ -444,10 +459,13 @@ def test_predict_flag_rh03_recipe_completes_with_public_flags(
             if p_ss_Pa > p_commanded_Pa:
                 pipe_mass_rate_kg_s = source_mass_kg_s
             else:
-                pipe_mass_rate_kg_s = max(
-                    0.0,
-                    k_kg_s_Pa2
-                    * (p_commanded_Pa ** 2 - p_downstream_Pa ** 2),
+                pipe_mass_rate_kg_s = min(
+                    max(
+                        0.0,
+                        k_kg_s_Pa2
+                        * (p_commanded_Pa ** 2 - p_downstream_Pa ** 2),
+                    ),
+                    choked_coefficient_kg_s_Pa * p_commanded_Pa,
                 )
             mean_molar_mass_kg_mol = (
                 sum(before_species_kg.values()) / sum(before_mol.values())
@@ -481,6 +499,9 @@ def test_predict_flag_rh03_recipe_completes_with_public_flags(
                     * OXYGEN_MOLAR_MASS_KG_PER_MOL
                 ),
                 "k_kg_s_Pa2": k_kg_s_Pa2,
+                "choked_coefficient_kg_s_Pa": choked_coefficient_kg_s_Pa,
+                "poiseuille_pressure_ss_Pa": poiseuille_pressure_ss_Pa,
+                "choked_pressure_ss_Pa": choked_pressure_ss_Pa,
                 "mean_molar_mass_kg_mol": mean_molar_mass_kg_mol,
                 "pipe_diameter_m": sim.overhead_model.pipe_diameter_m,
                 "pipe_length_m": sim.overhead_model.pipe_length_m,
@@ -596,6 +617,15 @@ def test_predict_flag_rh03_recipe_completes_with_public_flags(
                     "source_mass_kg_s": trace["source_mass_kg_s"],
                     "source_o2_kg_s": trace["source_o2_kg_s"],
                     "k_kg_s_Pa2": trace["k_kg_s_Pa2"],
+                    "choked_coefficient_kg_s_Pa": trace[
+                        "choked_coefficient_kg_s_Pa"
+                    ],
+                    "poiseuille_pressure_ss_Pa": trace[
+                        "poiseuille_pressure_ss_Pa"
+                    ],
+                    "choked_pressure_ss_Pa": trace[
+                        "choked_pressure_ss_Pa"
+                    ],
                     "mean_molar_mass_kg_mol": trace[
                         "mean_molar_mass_kg_mol"
                     ],
@@ -613,10 +643,17 @@ def test_predict_flag_rh03_recipe_completes_with_public_flags(
             document["per_hour_summary"], execution.snapshots, headspace_trace
         ):
             total_pressure_Pa = float(row["P_total_bar"]) * 100000.0
-            expected_ss_Pa = math.sqrt(
+            poiseuille_ss_Pa = math.sqrt(
                 trace["outlet_pressure_Pa"] ** 2
                 + trace["source_mass_kg_s"] / trace["k_kg_s_Pa2"]
             ) if trace["source_mass_kg_s"] > 0.0 else trace["outlet_pressure_Pa"]
+            choked_ss_Pa = (
+                trace["source_mass_kg_s"]
+                / trace["choked_coefficient_kg_s_Pa"]
+                if trace["source_mass_kg_s"] > 0.0
+                else 0.0
+            )
+            expected_ss_Pa = max(poiseuille_ss_Pa, choked_ss_Pa)
             expected_end_Pa = max(
                 trace["commanded_pressure_Pa"],
                 expected_ss_Pa,
@@ -633,10 +670,15 @@ def test_predict_flag_rh03_recipe_completes_with_public_flags(
             )
             if trace["steady_pressure_Pa"] > trace["commanded_pressure_Pa"]:
                 assert snapshot.overhead.evap_exceeds_transport is True
-                assert snapshot.overhead.transport_binding_cause == (
-                    "headspace_pipe_undersized"
+                expected_cause = (
+                    "headspace_duct_choked"
+                    if choked_ss_Pa >= poiseuille_ss_Pa
+                    else "headspace_pipe_undersized"
                 )
-        assert float(document["per_hour_summary"][0]["P_total_bar"]) < 1.0
+                assert snapshot.overhead.transport_binding_cause == expected_cause
+        assert 1.0 <= float(
+            document["per_hour_summary"][0]["P_total_bar"]
+        ) <= 5.0
         if hours == 24:
             max_mass_balance_pct = max(
                 abs(float(row["mass_balance_pct"]))

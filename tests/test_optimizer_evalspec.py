@@ -2636,9 +2636,8 @@ def test_c2b_profile_window_schedules_measured_temperature_window(
     assert overrides["max_hours"] == pytest.approx(20.0)
 
     session = _force_builtin_run_from_config(run_config)._start_session()
-    # bbf0134 made transport use finite downstream pressure. C2B's controlled
-    # 1.5 mbar O2 equals its upstream pressure, so delta(P^2)=0 and the pipe
-    # correctly saturates. Vacuum downstream isolates this scheduler test.
+    # Vacuum downstream isolates this scheduler test from its commanded
+    # 1.5 mbar O2 boundary.
     session.simulator._overhead_headspace_config["downstream_pressure_bar"] = 0.0
     simulator = session.simulator
     from simulator.state import GAS_CONSTANT
@@ -2652,9 +2651,14 @@ def test_c2b_profile_window_schedules_measured_temperature_window(
         commanded_pressure_Pa = max(
             float(simulator.melt.p_total_mbar) * 100.0, 1.0
         )
-        downstream_pressure_Pa = simulator._headspace_downstream_pressure_bar(
-            kwargs.get("effective_transport_capacity")
-        ) * 100000.0
+        downstream_pressure_Pa = (
+            float(
+                simulator._overhead_headspace_config.get(
+                    "downstream_pressure_bar", 0.0
+                )
+            )
+            * 100000.0
+        )
         source_mass_kg_s = float(
             simulator._headspace_transport_source_mass_kg_s
         )
@@ -2664,9 +2668,24 @@ def test_c2b_profile_window_schedules_measured_temperature_window(
             p_downstream_Pa=0.0,
             species_kg_for_M_avg=before_species_kg,
         )
-        steady_pressure_Pa = math.sqrt(
+        choked_coefficient_kg_s_Pa = (
+            simulator.overhead_model._choked_flow_coefficient_kg_s_Pa(
+                simulator.melt.temperature_C,
+                species_kg_for_M_avg=before_species_kg,
+            )
+        )
+        poiseuille_pressure_Pa = math.sqrt(
             downstream_pressure_Pa ** 2 + source_mass_kg_s / k_kg_s_Pa2
         ) if k_kg_s_Pa2 > 0.0 else math.inf
+        choked_pressure_Pa = (
+            source_mass_kg_s / choked_coefficient_kg_s_Pa
+            if choked_coefficient_kg_s_Pa > 0.0
+            else math.inf
+        )
+        steady_pressure_Pa = max(
+            poiseuille_pressure_Pa,
+            choked_pressure_Pa,
+        )
         end_pressure_Pa = max(commanded_pressure_Pa, steady_pressure_Pa)
         volume_m3 = simulator._headspace_volume_m3()
         temperature_K = simulator._headspace_temperature_K()
@@ -2677,10 +2696,13 @@ def test_c2b_profile_window_schedules_measured_temperature_window(
         if steady_pressure_Pa > commanded_pressure_Pa:
             pipe_mass_rate_kg_s = source_mass_kg_s
         else:
-            pipe_mass_rate_kg_s = max(
-                0.0,
-                k_kg_s_Pa2
-                * (commanded_pressure_Pa ** 2 - downstream_pressure_Pa ** 2),
+            pipe_mass_rate_kg_s = min(
+                max(
+                    0.0,
+                    k_kg_s_Pa2
+                    * (commanded_pressure_Pa ** 2 - downstream_pressure_Pa ** 2),
+                ),
+                choked_coefficient_kg_s_Pa * commanded_pressure_Pa,
             )
         mean_molar_mass_kg_mol = (
             sum(before_species_kg.values()) / sum(before_mol.values())
@@ -2719,7 +2741,7 @@ def test_c2b_profile_window_schedules_measured_temperature_window(
     )
     snapshots = [session.advance().snapshot for _ in range(run_config.hours)]
     record_property(
-        "r12b_c2b_headspace_trace",
+        "r12c_c2b_headspace_trace",
         json.dumps([
             {"hour": index + 1, **trace}
             for index, trace in enumerate(headspace_trace)

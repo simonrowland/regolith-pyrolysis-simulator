@@ -27,6 +27,7 @@ from simulator.physical_constants import (
     GAS_CONSTANT,
 )
 from simulator.state import GAS_CONSTANT as STATE_GAS_CONSTANT, EvaporationFlux
+from simulator.state import MOLAR_MASS
 from simulator.transport_constants import COLLISION_DIAMETERS_M
 from simulator.transport_regime import (
     FREE_MOLECULAR_KNUDSEN_MIN,
@@ -53,6 +54,101 @@ def _transport_sim() -> PyrolysisSimulator:
     )
     sim.load_batch('lunar_mare_low_ti', mass_kg=1000.0)
     return sim
+
+
+@pytest.mark.parametrize(
+    ("source_fraction_of_crossover", "expected_choked"),
+    [(0.25, False), (1.0, True), (4.0, True)],
+)
+def test_quasi_steady_pressure_uses_poiseuille_and_sonic_branches(
+    source_fraction_of_crossover, expected_choked
+):
+    sim = _transport_sim()
+    sim.overhead_model.pipe_diameter_m = 0.12
+    sim.overhead_model.pipe_length_m = 1.0
+    sim.melt.temperature_C = 1000.0
+    sim.melt.p_total_mbar = 0.0
+    species_kg = {"O2": 1.0}
+    k_kg_s_Pa2 = sim.overhead_model._pipe_conductance(
+        1.0,
+        sim.melt.temperature_C,
+        species_kg_for_M_avg=species_kg,
+    )
+    c_choke_kg_s_Pa = sim.overhead_model._choked_flow_coefficient_kg_s_Pa(
+        sim.melt.temperature_C,
+        species_kg_for_M_avg=species_kg,
+    )
+    gamma = 1.4
+    T_K = sim.melt.temperature_C + 273.15
+    sonic_factor = (2.0 / (gamma + 1.0)) ** (
+        (gamma + 1.0) / (2.0 * (gamma - 1.0))
+    )
+    expected_choke_coefficient_kg_s_Pa = (
+        math.pi * sim.overhead_model.pipe_diameter_m**2 / 4.0
+        * math.sqrt(
+            gamma * (MOLAR_MASS["O2"] / 1000.0)
+            / (STATE_GAS_CONSTANT * T_K)
+        )
+        * sonic_factor
+    )
+    assert c_choke_kg_s_Pa == pytest.approx(
+        expected_choke_coefficient_kg_s_Pa, rel=1.0e-12
+    )
+    crossover_source_kg_s = c_choke_kg_s_Pa**2 / k_kg_s_Pa2
+    source_mass_kg_s = (
+        source_fraction_of_crossover * crossover_source_kg_s
+    )
+    sim._headspace_transport_source_mass_kg_s = source_mass_kg_s
+
+    pressure_Pa = sim._headspace_quasi_steady_pressure_Pa(
+        p_downstream_Pa=0.0,
+        species_kg_for_M_avg=species_kg,
+    )
+    poiseuille_pressure_Pa = math.sqrt(source_mass_kg_s / k_kg_s_Pa2)
+    choked_pressure_Pa = source_mass_kg_s / c_choke_kg_s_Pa
+    expected_pressure_Pa = max(
+        sim.melt.p_total_mbar * 100.0,
+        poiseuille_pressure_Pa,
+        choked_pressure_Pa,
+    )
+
+    assert pressure_Pa == pytest.approx(expected_pressure_Pa, rel=1.0e-12)
+    assert (choked_pressure_Pa >= poiseuille_pressure_Pa) is expected_choked
+    assert sim._headspace_duct_choked_this_tick is expected_choked
+    if source_fraction_of_crossover == 1.0:
+        assert poiseuille_pressure_Pa == pytest.approx(
+            choked_pressure_Pa, rel=1.0e-12
+        )
+
+
+def test_duct_capacity_is_capped_by_sonic_flow():
+    sim = _transport_sim()
+    sim.overhead_model.pipe_diameter_m = 0.02
+    sim.overhead_model.pipe_length_m = 0.063661977
+    sim.melt.temperature_C = 2200.0
+    species_kg = {"O2": 1.0}
+    pressure_Pa = 1.0e6
+    poiseuille_kg_s = sim.overhead_model._pipe_conductance(
+        pressure_Pa,
+        sim.melt.temperature_C,
+        species_kg_for_M_avg=species_kg,
+    )
+    sonic_kg_s = (
+        sim.overhead_model._choked_flow_coefficient_kg_s_Pa(
+            sim.melt.temperature_C,
+            species_kg_for_M_avg=species_kg,
+        )
+        * pressure_Pa
+    )
+
+    capacity_kg_s = sim.overhead_model._duct_mass_flow_capacity_kg_s(
+        pressure_Pa,
+        sim.melt.temperature_C,
+        species_kg_for_M_avg=species_kg,
+    )
+
+    assert poiseuille_kg_s > sonic_kg_s
+    assert capacity_kg_s == pytest.approx(sonic_kg_s, rel=1.0e-12)
 
 
 def _trace_fe_transport_sim() -> PyrolysisSimulator:
@@ -301,12 +397,24 @@ def test_large_o2_headspace_bolus_pumps_down_and_is_credited_once():
     initial_pressure_Pa = sim._headspace_upstream_pressure_Pa()
     initial_species_kg = sim._overhead_holdup_species_kg()
     initial_mass_kg = sum(initial_species_kg.values())
-    true_pipe_capacity_kg_hr = sim.overhead_model._pipe_conductance(
+    poiseuille_pipe_capacity_kg_hr = sim.overhead_model._pipe_conductance(
         initial_pressure_Pa,
         sim.melt.temperature_C,
         p_downstream_Pa=0.0,
         species_kg_for_M_avg=initial_species_kg,
     ) * 3600.0
+    choked_pipe_capacity_kg_hr = (
+        sim.overhead_model._choked_flow_coefficient_kg_s_Pa(
+            sim.melt.temperature_C,
+            species_kg_for_M_avg=initial_species_kg,
+        )
+        * initial_pressure_Pa
+        * 3600.0
+    )
+    true_pipe_capacity_kg_hr = min(
+        poiseuille_pipe_capacity_kg_hr,
+        choked_pipe_capacity_kg_hr,
+    )
     assert commanded_pipe_capacity_kg_hr < initial_mass_kg
     # k(P_up²-P_down²) makes the one-tick capacity exceed the whole bolus at
     # its true pressure, so the bounded result is the 13 mbar setpoint.
@@ -314,12 +422,26 @@ def test_large_o2_headspace_bolus_pumps_down_and_is_credited_once():
 
     flux = EvaporationFlux(species_kg_hr={"O2": 1.0})
     flux.update_totals()
-    true_controlled_pipe_capacity_kg_hr = sim.overhead_model._pipe_conductance(
-        initial_pressure_Pa,
-        sim.melt.temperature_C,
-        p_downstream_Pa=0.0,
-        species_kg_for_M_avg=flux.species_kg_hr,
-    ) * 3600.0
+    controlled_poiseuille_capacity_kg_hr = (
+        sim.overhead_model._pipe_conductance(
+            initial_pressure_Pa,
+            sim.melt.temperature_C,
+            p_downstream_Pa=0.0,
+            species_kg_for_M_avg=flux.species_kg_hr,
+        ) * 3600.0
+    )
+    controlled_choked_capacity_kg_hr = (
+        sim.overhead_model._choked_flow_coefficient_kg_s_Pa(
+            sim.melt.temperature_C,
+            species_kg_for_M_avg=flux.species_kg_hr,
+        )
+        * initial_pressure_Pa
+        * 3600.0
+    )
+    true_controlled_pipe_capacity_kg_hr = min(
+        controlled_poiseuille_capacity_kg_hr,
+        controlled_choked_capacity_kg_hr,
+    )
     controlled = sim._controlled_o2_transport_capacity(flux)
     assert controlled is not None
     assert controlled.upstream_pressure_bar == pytest.approx(

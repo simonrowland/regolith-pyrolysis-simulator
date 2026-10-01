@@ -17,8 +17,10 @@ state and the post-routing evaporation flux. For the equilibrium:
 the equilibrium solver outside this module applies the pO₂
 dependence; this module transports the resulting flux.
 
-Pipe transport (isothermal compressible Poiseuille flow at mbar pressures):
-    ṁ = π × d⁴ × M × (P₁² - P₂²) / (256 × η × L × R × T) [PIPE-1]
+Pipe transport uses isothermal compressible Poiseuille capacity, capped at
+the isentropic sonic mass flow through the duct area:
+    ṁ_pipe = min(ṁ_Poiseuille, ṁ_sonic) [PIPE-1]
+    ṁ_Poiseuille = π × d⁴ × M × (P₁² - P₂²) / (256 × η × L × R × T)
 
 where:
     d = pipe inner diameter (m)
@@ -35,7 +37,8 @@ therefore replaces the incompressible pressure difference with
 (P₁²-P₂²)/2, giving the denominator 256. Unit check:
 [m⁴·Pa²·kg/mol]/[(Pa·s)·m·(Pa·m³/(mol·K))·K] = kg/s.
 Sanity check: d=0.12 m, L=1 m, T=1773.15 K, pure SiO, P₁=1000 Pa,
-and P₂=0 gives 0.121878 kg/s; P₁=P₂ gives zero flow.
+and P₂=0 gives a Poiseuille capacity of 0.121878 kg/s before the sonic
+cap; P₁=P₂ gives zero forward flow.
 
 Feedback quantities exposed:
     [LOOP-1]  Backpressure: overhead partial pressures feed back as
@@ -728,7 +731,7 @@ class OverheadGasModel:
         p_downstream_bar: Optional[float] = None,
         effective_transport_capacity: Optional[EffectiveTransportCapacity] = None,
     ) -> dict[str, float]:
-        """Estimate pipe pressure/capacity with the existing Poiseuille model."""
+        """Estimate pipe pressure/capacity with Poiseuille and sonic limits."""
 
         conductance_temperature_C = _required_finite_float(
             melt.temperature_C,
@@ -775,7 +778,7 @@ class OverheadGasModel:
             conductance = pipe_conductance_kg_hr / 3600.0
             vapor_pressure_mbar = allowed_pressure_Pa / 100.0
         else:
-            conductance = self._pipe_conductance(  # kg/s — pipe mass-flow capacity at allowed upstream/downstream pressures
+            conductance = self._duct_mass_flow_capacity_kg_s(  # kg/s — pipe mass-flow capacity capped at sonic flow
                 allowed_pressure_Pa,
                 conductance_temperature_C,
                 p_downstream_Pa=downstream_pressure_Pa,
@@ -783,7 +786,7 @@ class OverheadGasModel:
             )
             pipe_conductance_kg_hr = conductance * 3600.0  # kg/hr — capacity at allowed pressure; kg/s -> kg/hr
         if not controlled_flow and conductance > 0.0:
-            vapor_pressure_mbar = self._vapor_pressure_mbar_from_flux(  # mbar — steady-state throughput pressure, sqrt(Poiseuille balance)
+            vapor_pressure_mbar = self._vapor_pressure_mbar_from_flux(  # mbar — max(Poiseuille, sonic) throughput pressure
                 total_evap_kg_hr / 3600.0,  # kg/s — evaporation mass flow
                 conductance_temperature_C,
                 p_downstream_bar=downstream_pressure_Pa / 1.0e5,
@@ -795,9 +798,9 @@ class OverheadGasModel:
             # until the allowed headspace pressure is reached and backpressure
             # suppresses the next tick's net HKL source.  Algebra is the closed
             # boundary P_vapor=P_up.  Unit check: Pa/100=mbar.  Limits: any
-            # positive conductance uses the Poiseuille inversion above; at
-            # P_down->P_up this full-upstream state makes the following live
-            # flux (and therefore saturation) recover instead of relatching.
+            # positive pipe capacity uses the Poiseuille and sonic inversion
+            # above; at P_down->P_up this full-upstream state makes the
+            # following live flux recover instead of relatching.
             vapor_pressure_mbar = allowed_pressure_Pa / 100.0
         pressure_mbar = max(vapor_pressure_mbar, allowed_pressure_mbar)  # mbar — reported total overhead pressure
         if controlled_flow:
@@ -895,7 +898,7 @@ class OverheadGasModel:
         pipe_capacity_kg_hr = (
             max(0.0, float(self._conductance_override)) * 3600.0
             if self._conductance_override is not None
-            else self._pipe_conductance(
+            else self._duct_mass_flow_capacity_kg_s(
                 allowed_pressure_Pa,
                 float(melt.temperature_C),
                 p_downstream_Pa=0.0,
@@ -1444,7 +1447,7 @@ class OverheadGasModel:
             return max(0.0, float(self._conductance_override))  # kg/s — configured bleed mass-flow capacity
         if self._bleed_model == 'constant':
             return max(0.0, float(derived_kg_s))  # kg/s — constant bleed mass-flow capacity
-        return max(0.0, float(derived_kg_s))  # kg/s — derived Poiseuille bleed mass-flow capacity
+        return max(0.0, float(derived_kg_s))  # kg/s — derived duct bleed mass-flow capacity
 
     def _resolve_downstream_pressure(self, melt: MeltState,
                                      explicit: Optional[float]) -> float:  # bar or None — explicit downstream pressure
@@ -1484,6 +1487,80 @@ class OverheadGasModel:
                 f'{field} must be finite, got {value!r}'
             )
         return max(0.0, pressure_bar)
+
+    def _choked_flow_coefficient_kg_s_Pa(
+        self,
+        T_C: float,
+        *,
+        species_kg_for_M_avg: Optional[Mapping[str, float]] = None,
+    ) -> float:
+        """Return the ideal sonic mass-flow coefficient, kg/(s·Pa)."""
+
+        try:
+            T_K = float(T_C) + CELSIUS_TO_KELVIN_OFFSET
+            diameter_m = float(self.pipe_diameter_m)
+        except (TypeError, ValueError):
+            return 0.0
+        if (
+            not math.isfinite(T_K)
+            or not math.isfinite(diameter_m)
+            or T_K <= 0.0
+            or diameter_m <= 0.0
+        ):
+            return 0.0
+        M_avg = _mean_molar_mass_kg_mol(
+            species_kg_for_M_avg,
+            fallback_engagement_recorder=(
+                self._record_pipe_m_avg_fallback_engagement
+            ),
+            species_formula_registry=self.species_formula_registry,
+        )
+        if not math.isfinite(M_avg) or M_avg <= 0.0:
+            return 0.0
+
+        # Isentropic flow reaches Mach 1 at the duct throat area A=πd²/4.
+        # With gamma=1.4 (the holdup species registry has no heat-capacity
+        # ratio), m_dot*=A*P_up*sqrt(gamma*M/(R*T))*(2/(gamma+1))^((gamma+1)/(2*(gamma-1))).
+        # Dividing by P_up gives C_choke [kg/(s·Pa)]. This is the sonic cap
+        # used with the independent Poiseuille capacity; their minimum is
+        # the duct's removal rate.
+        gamma = 1.4
+        sonic_factor = (
+            2.0 / (gamma + 1.0)
+        ) ** ((gamma + 1.0) / (2.0 * (gamma - 1.0)))
+        area_m2 = math.pi * diameter_m**2 / 4.0
+        return area_m2 * math.sqrt(
+            gamma * M_avg / (GAS_CONSTANT * T_K)
+        ) * sonic_factor
+
+    def _duct_mass_flow_capacity_kg_s(
+        self,
+        p_upstream_Pa: float,
+        T_C: float,
+        *,
+        p_downstream_Pa: float = 0.0,
+        species_kg_for_M_avg: Optional[Mapping[str, float]] = None,
+    ) -> float:
+        """Return min(Poiseuille, sonic) forward-flow capacity, kg/s."""
+
+        try:
+            p_upstream_Pa = max(0.0, float(p_upstream_Pa))
+        except (TypeError, ValueError):
+            return 0.0
+        poiseuille_kg_s = self._pipe_conductance(
+            p_upstream_Pa,
+            T_C,
+            p_downstream_Pa=p_downstream_Pa,
+            species_kg_for_M_avg=species_kg_for_M_avg,
+        )
+        choked_coefficient_kg_s_Pa = self._choked_flow_coefficient_kg_s_Pa(
+            T_C,
+            species_kg_for_M_avg=species_kg_for_M_avg,
+        )
+        return min(
+            poiseuille_kg_s,
+            choked_coefficient_kg_s_Pa * p_upstream_Pa,
+        )
 
     def _pipe_conductance(
         self,
@@ -1604,7 +1681,7 @@ class OverheadGasModel:
         p_downstream_bar: float = 0.0,  # bar — downstream/reference pressure
         species_kg_for_M_avg: Optional[Mapping[str, float]] = None,  # kg or kg/hr by species — M_avg basis
     ) -> float:
-        """Invert the shared compressible Poiseuille law."""
+        """Invert the Poiseuille capacity with its sonic-flow limit."""
 
         try:
             F_kg_s = float(total_evap_kg_s)  # kg/s — candidate vapor mass throughput
@@ -1656,7 +1733,17 @@ class OverheadGasModel:
         # unit check: numerator/denominator is Pa^2, and P_down^2 is Pa^2.
         # sanity: zero downstream reproduces the legacy sqrt(F/C); non-zero
         # downstream raises the required upstream pressure for the same flow.
-        pressure_Pa = math.sqrt(  # Pa — upstream pressure from pressure-square balance
+        poiseuille_pressure_Pa = math.sqrt(  # Pa — upstream pressure from pressure-square balance
             max(0.0, numerator / denominator + p_downstream_Pa**2)
         )
+        choked_coefficient_kg_s_Pa = self._choked_flow_coefficient_kg_s_Pa(
+            T_C,
+            species_kg_for_M_avg=species_kg_for_M_avg,
+        )
+        choked_pressure_Pa = (
+            F_kg_s / choked_coefficient_kg_s_Pa
+            if choked_coefficient_kg_s_Pa > 0.0
+            else math.inf
+        )
+        pressure_Pa = max(poiseuille_pressure_Pa, choked_pressure_Pa)
         return pressure_Pa / 100.0  # mbar — Pa -> mbar

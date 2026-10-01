@@ -498,11 +498,42 @@ def test_estimate_transport_state_threads_evap_flux_species_through():
     flux_fe = EvaporationFlux(species_kg_hr={"Fe": 1.0}, total_kg_hr=1.0)
     state_na = model.estimate_transport_state(flux_na, melt)
     state_fe = model.estimate_transport_state(flux_fe, melt)
-    # ``pipe_conductance_kg_hr`` propagates the W7 M_avg path.
-    assert state_fe["pipe_conductance_kg_hr"] > state_na["pipe_conductance_kg_hr"]
-    ratio = state_fe["pipe_conductance_kg_hr"] / state_na["pipe_conductance_kg_hr"]
-    expected = MOLAR_MASS["Fe"] / MOLAR_MASS["Na"]
-    assert ratio == pytest.approx(expected, rel=1e-6)
+    # ``pipe_conductance_kg_hr`` propagates the W7 M_avg path through both
+    # Poiseuille conductance and the composition-dependent sonic cap.
+    assert state_fe["pipe_conductance_kg_hr"] > state_na[
+        "pipe_conductance_kg_hr"
+    ]
+    ratio = (
+        state_fe["pipe_conductance_kg_hr"]
+        / state_na["pipe_conductance_kg_hr"]
+    )
+
+    def expected_capacity(species):
+        poiseuille = model._pipe_conductance(
+            1000.0,
+            melt.temperature_C,
+            species_kg_for_M_avg=species,
+        )
+        sonic = model._choked_flow_coefficient_kg_s_Pa(
+            melt.temperature_C,
+            species_kg_for_M_avg=species,
+        ) * 1000.0
+        return min(poiseuille, sonic)
+
+    expected_na = expected_capacity({"Na": 1.0})
+    expected_fe = expected_capacity({"Fe": 1.0})
+    assert state_na["pipe_conductance_kg_hr"] / 3600.0 == pytest.approx(
+        expected_na,
+        rel=1e-12,
+    )
+    assert state_fe["pipe_conductance_kg_hr"] / 3600.0 == pytest.approx(
+        expected_fe,
+        rel=1e-12,
+    )
+    assert ratio == pytest.approx(
+        expected_fe / expected_na,
+        rel=1e-12,
+    )
 
 
 @pytest.mark.parametrize(
@@ -816,23 +847,24 @@ def test_vapor_pressure_matches_closed_form_known_case():
     model.pipe_length_m = 2.0
     F_kg_s = 0.003
     T_C = 1200.0
-    T_K = T_C + 273.15
     species = {"SiO": 1.0}
-    M_avg = MOLAR_MASS["SiO"] / 1000.0
-    eta = model._gas_dynamic_viscosity_Pa_s(T_K)
 
-    expected_mbar = (
-        math.sqrt(
-            256.0
-            * eta
-            * model.pipe_length_m
-            * GAS_CONSTANT
-            * T_K
-            * F_kg_s
-            / (math.pi * M_avg * model.pipe_diameter_m**4)
-        )
-        / 100.0
+    k_kg_s_Pa2 = model._pipe_conductance(
+        1.0,
+        T_C,
+        species_kg_for_M_avg=species,
     )
+    poiseuille_pressure_Pa = math.sqrt(
+        F_kg_s / k_kg_s_Pa2
+    )
+    choked_pressure_Pa = F_kg_s / model._choked_flow_coefficient_kg_s_Pa(
+        T_C,
+        species_kg_for_M_avg=species,
+    )
+    expected_mbar = max(
+        poiseuille_pressure_Pa,
+        choked_pressure_Pa,
+    ) / 100.0
 
     actual_mbar = model._vapor_pressure_mbar_from_flux(
         F_kg_s,
@@ -887,13 +919,26 @@ def test_vapor_pressure_inverse_matches_forward_capacity_at_operating_point():
         1200.0,
         species_kg_for_M_avg=species,
     )
-    recovered_kg_s = model._pipe_conductance(
+    recovered_kg_s = model._duct_mass_flow_capacity_kg_s(
         required_mbar * 100.0,
         1200.0,
         species_kg_for_M_avg=species,
     )
 
-    assert required_mbar == pytest.approx(4.2645, rel=1.0e-5)
+    k_kg_s_Pa2 = model._pipe_conductance(
+        1.0,
+        1200.0,
+        species_kg_for_M_avg=species,
+    )
+    p_poiseuille_Pa = math.sqrt(target_kg_s / k_kg_s_Pa2)
+    p_choked_Pa = target_kg_s / model._choked_flow_coefficient_kg_s_Pa(
+        1200.0,
+        species_kg_for_M_avg=species,
+    )
+    assert required_mbar == pytest.approx(
+        max(p_poiseuille_Pa, p_choked_Pa) / 100.0,
+        rel=1.0e-12,
+    )
     assert recovered_kg_s == pytest.approx(target_kg_s, rel=1.0e-12)
 
 
@@ -905,11 +950,11 @@ def test_vapor_pressure_scales_with_square_root_of_flux():
     melt.p_total_mbar = 10.0
 
     base = model.estimate_transport_state(
-        EvaporationFlux(species_kg_hr={"SiO": 3.6}, total_kg_hr=3.6),
+        EvaporationFlux(species_kg_hr={"SiO": 0.0036}, total_kg_hr=0.0036),
         melt,
     )
     doubled = model.estimate_transport_state(
-        EvaporationFlux(species_kg_hr={"SiO": 7.2}, total_kg_hr=7.2),
+        EvaporationFlux(species_kg_hr={"SiO": 0.0072}, total_kg_hr=0.0072),
         melt,
     )
 
