@@ -4150,9 +4150,15 @@ def _score_store_with_decisions(
         )
         for key, values in family_residuals.items()
     }
+    family_pool_sizes = {
+        key: len(values)
+        for key, values in family_residuals.items()
+        if len(values) < MIN_DERIVED_BAND_N
+    }
+    family_residuals.clear()
     if _stream is not None:
         _stream.finalize(
-            family_residuals=family_residuals,
+            family_pool_sizes=family_pool_sizes,
             family_bands=family_bands,
             context=context,
             engines=engine_set,
@@ -4171,7 +4177,7 @@ def _score_store_with_decisions(
             source_relation=residual.source_relation,
             family_quantity=family_quantity,
             flagged=_has_flagged_decision_notice(residual),
-            family_residuals=family_residuals,
+            family_pool_sizes=family_pool_sizes,
             family_bands=family_bands,
         )
         if not apply:
@@ -5158,7 +5164,15 @@ class _ResidualRowsPayloadView:
         self._typed_tier_band_values = self.metadata.tier_band_values
 
     def __iter__(self) -> Iterable[dict[str, object]]:
-        return (residual_to_plain(residual) for residual in self.residuals)
+        def rows() -> Iterable[dict[str, object]]:
+            for residual in self.residuals:
+                payload = residual_to_plain(residual)
+                numeric = payload.get("numeric")
+                if residual.numeric is not None and isinstance(numeric, dict):
+                    numeric["value"] = str(residual.numeric.value)
+                yield payload
+
+        return rows()
 
 
 def _report_engine_set(rows: Iterable[Mapping[str, object]]) -> tuple[Engine, ...]:
@@ -5295,9 +5309,10 @@ def _render_score_report_from_payloads_legacy(
                 "|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|",
             ]
         )
-        report_engines = tuple(
-            Engine(name) for name in sorted(aggregate.report_engine_names)
-        )
+        report_engine_names = set(aggregate.report_engine_names)
+        if not report_engine_names:
+            report_engine_names = {engine.value for engine in SCORE_ENGINE_SET}
+        report_engines = tuple(Engine(name) for name in sorted(report_engine_names))
         for row in aggregate.headline_records(engines=report_engines):
             if row.get("tier") != "measured":
                 continue
@@ -5503,6 +5518,7 @@ def _headline_payload_record(
     stats: Mapping[str, object],
     *,
     typed_widths: Iterable[str] | None = None,
+    include_eligible_references: bool = True,
 ) -> dict[str, object]:
     dex_values = stats["dex_values"]
     band_widths = stats["band_widths"]
@@ -5517,7 +5533,7 @@ def _headline_payload_record(
         if rms is None or band_width is None or band_width <= 0
         else rms / band_width
     )
-    return {
+    record = {
         "tier": tier,
         "rail": rail,
         "engine": engine,
@@ -5548,6 +5564,9 @@ def _headline_payload_record(
         "decision_strata": [],
         "data_scatter_ratio": None if rms_over_band is None else str(rms_over_band),
     }
+    if not include_eligible_references:
+        record.pop("n_eligible_references")
+    return record
 
 
 def headline_payloads(
@@ -5607,7 +5626,11 @@ def headline_payloads(
             except (TypeError, ValueError, ArithmeticError):
                 pass
         band = numeric.get("decision_band")
-        if isinstance(band, Mapping) and band.get("unit") == "dimensionless":
+        if (
+            numeric.get("operation") == MetricOperation.DEX.value
+            and isinstance(band, Mapping)
+            and band.get("unit") == "dimensionless"
+        ):
             try:
                 stats["band_widths"].add(as_decimal(band.get("value")))  # type: ignore[union-attr]
             except (TypeError, ValueError, ArithmeticError):
@@ -5624,6 +5647,7 @@ def headline_payloads(
                 engine,
                 stats,
                 typed_widths=typed_widths,
+                include_eligible_references=False,
             )
         )
     return out
@@ -5692,7 +5716,7 @@ def _family_band_update(
     source_relation: SourceRelation,
     family_quantity: tuple[str, Quantity] | None,
     flagged: bool,
-    family_residuals: Mapping[tuple[str, Quantity, str, str], Sequence[Decimal]],
+    family_pool_sizes: Mapping[tuple[str, Quantity, str, str], int],
     family_bands: Mapping[tuple[str, Quantity, str, str], DecisionBand],
 ) -> tuple[bool, DecisionBand | None, bool]:
     if (
@@ -5712,7 +5736,7 @@ def _family_band_update(
     band = family_bands.get(band_key)
     has_insufficient_pool = (
         band is None
-        and 0 < len(family_residuals.get(band_key, ())) < MIN_DERIVED_BAND_N
+        and 0 < family_pool_sizes.get(band_key, 0) < MIN_DERIVED_BAND_N
     )
     if band is None and not has_insufficient_pool:
         band = decision_band_for(quantity, source_relation)
@@ -5737,7 +5761,6 @@ class _ResidualJsonlStream:
     ) -> None:
         self.partial_path = path.with_name(path.name + ".partial")
         path.parent.mkdir(parents=True, exist_ok=True)
-        path.unlink(missing_ok=True)
         self.file = self.partial_path.open("wb")
         self.file.write(
             (dumps_store_stamp(derive_store_stamp(root or REPO_ROOT)) + "\n").encode(
@@ -5759,12 +5782,12 @@ class _ResidualJsonlStream:
             "key TEXT NOT NULL, offset INTEGER NOT NULL, family TEXT, quantity TEXT, "
             "engine TEXT NOT NULL, relation TEXT NOT NULL, band_value TEXT, "
             "band_rule TEXT, status TEXT NOT NULL, flagged INTEGER NOT NULL, "
-            "has_numeric INTEGER NOT NULL)"
+            "has_numeric INTEGER NOT NULL, numeric_value TEXT)"
         )
         self._pending: list[
             tuple[
                 str, str, str, int, str | None, str | None, str, str,
-                str | None, str | None, str, int, int
+                str | None, str | None, str, int, int, str | None
             ]
         ] = []
         self.band_values: dict[tuple[str, str, str, str], set[str]] = defaultdict(set)
@@ -5789,6 +5812,7 @@ class _ResidualJsonlStream:
         decision_band = None if numeric is None else numeric.decision_band
         flagged = _has_flagged_decision_notice(residual)
         band_value = None if decision_band is None else str(decision_band.value)
+        numeric_value = None if numeric is None else str(numeric.value)
         self._pending.append(
             (
                 "" if residual.rail is None else residual.rail.value,
@@ -5804,6 +5828,7 @@ class _ResidualJsonlStream:
                 residual.status.value,
                 int(flagged),
                 int(numeric is not None),
+                numeric_value,
             )
         )
         self.count += 1
@@ -5818,8 +5843,8 @@ class _ResidualJsonlStream:
             return
         self._database.executemany(
             "INSERT INTO residual_order (rail, reference, key, offset, family, quantity, "
-            "engine, relation, band_value, band_rule, status, flagged, has_numeric) "
-            "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+            "engine, relation, band_value, band_rule, status, flagged, has_numeric, "
+            "numeric_value) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
             self._pending,
         )
         self._database.commit()
@@ -5832,9 +5857,7 @@ class _ResidualJsonlStream:
     def finalize(
         self,
         *,
-        family_residuals: Mapping[
-            tuple[str, Quantity, str, str], Sequence[Decimal]
-        ],
+        family_pool_sizes: Mapping[tuple[str, Quantity, str, str], int],
         family_bands: Mapping[tuple[str, Quantity, str, str], DecisionBand],
         context: ScoreContext,
         engines: Sequence[Engine],
@@ -5863,7 +5886,8 @@ class _ResidualJsonlStream:
                     output.write(source.readline())
                     rows = self._database.execute(
                         "SELECT offset, reference, family, quantity, engine, relation, "
-                        "band_value, band_rule, status, flagged, has_numeric "
+                        "band_value, band_rule, status, flagged, has_numeric, "
+                        "numeric_value "
                         "FROM residual_order "
                         "ORDER BY rail COLLATE BINARY, reference COLLATE BINARY, "
                         "key COLLATE BINARY, seq"
@@ -5880,6 +5904,7 @@ class _ResidualJsonlStream:
                         status,
                         flagged,
                         has_numeric,
+                        numeric_value,
                     ) in rows:
                         source.seek(offset)
                         raw_line = source.readline()
@@ -5897,7 +5922,7 @@ class _ResidualJsonlStream:
                         if can_apply_family_band:
                             applied, typed_band_value = _apply_family_band_to_payload(
                                 payload,
-                                family_residuals=family_residuals,
+                                family_pool_sizes=family_pool_sizes,
                                 family_bands=family_bands,
                                 family_quantity=(
                                     None
@@ -5906,7 +5931,18 @@ class _ResidualJsonlStream:
                                 ),
                             )
                         band_value = typed_band_value if applied else band_value
-                        row_metadata = report_aggregate.add(payload)
+                        numeric_payload = payload.get("numeric")
+                        report_payload = payload
+                        if (
+                            isinstance(numeric_payload, dict)
+                            and numeric_value is not None
+                            and str(numeric_payload.get("value")) != numeric_value
+                        ):
+                            report_numeric = dict(numeric_payload)
+                            report_numeric["value"] = numeric_value
+                            report_payload = dict(payload)
+                            report_payload["numeric"] = report_numeric
+                        row_metadata = report_aggregate.add(report_payload)
                         if band_value is not None:
                             self._collect_report_band_values(
                                 payload,
@@ -6017,7 +6053,7 @@ class _ResidualJsonlStream:
 def _apply_family_band_to_payload(
     payload: dict[str, object],
     *,
-    family_residuals: Mapping[tuple[str, Quantity, str, str], Sequence[Decimal]],
+    family_pool_sizes: Mapping[tuple[str, Quantity, str, str], int],
     family_bands: Mapping[tuple[str, Quantity, str, str], DecisionBand],
     family_quantity: tuple[str, Quantity] | None,
 ) -> tuple[bool, str | None]:
@@ -6049,7 +6085,7 @@ def _apply_family_band_to_payload(
         source_relation=source_relation,
         family_quantity=family_quantity,
         flagged=bool(_flagged_payload_strata(payload)),
-        family_residuals=family_residuals,
+        family_pool_sizes=family_pool_sizes,
         family_bands=family_bands,
     )
     if not apply:
@@ -6448,7 +6484,11 @@ class _ScorePayloadAccumulator:
         ):
             stats["dex_values"].append(numeric_value)
         band = numeric.get("decision_band")
-        if isinstance(band, Mapping) and band.get("unit") == "dimensionless":
+        if (
+            numeric.get("operation") == MetricOperation.DEX.value
+            and isinstance(band, Mapping)
+            and band.get("unit") == "dimensionless"
+        ):
             try:
                 stats["band_widths"].add(as_decimal(band.get("value")))
             except (TypeError, ValueError, ArithmeticError):
@@ -6652,10 +6692,10 @@ class _ScorePayloadAccumulator:
         compilation_observation = metadata.observation if metadata.is_compilation else None
         measured = metadata.is_measured
         if measured:
-            self.report_engine_names.add(engine)
             if _reference_has_measured_evidence(None, exclusions=exclusions):
                 rail = str(row.get("rail") or "")
                 if rail:
+                    self.report_engine_names.add(engine)
                     self._add_headline(
                         row,
                         tier="measured",

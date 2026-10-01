@@ -237,15 +237,20 @@ def main(argv: list[str] | None = None) -> int:
             observations=context.observations,
             origins=context.origins,
         )
-        report_path.write_text(report, encoding="utf-8")
+        summary_path = args.root / "data" / "battery" / "score-summary.json"
+        summary_partial_path = summary_path.with_name(summary_path.name + ".partial")
+        report_partial_path = report_path.with_name(report_path.name + ".partial")
+        report_partial_path.write_text(report, encoding="utf-8")
         write_headline_summary_from_payloads_json(
             payloads,
-            args.root / "data" / "battery" / "score-summary.json",
+            summary_partial_path,
             engines=engines,
             observations=context.observations,
             origins=context.origins,
             store_stamp=recorded,
         )
+        os.replace(summary_partial_path, summary_path)
+        os.replace(report_partial_path, report_path)
         print(
             f"report-only residuals={_count_residuals_jsonl(residuals_path)} "
             f"pin_failures={len(failures)}"
@@ -317,13 +322,18 @@ def main(argv: list[str] | None = None) -> int:
         store_stamp=recorded,
         _aggregate=report_aggregate,
     )
+    summary_path = args.root / "data" / "battery" / "score-summary.json"
+    summary_partial_path = summary_path.with_name(summary_path.name + ".partial")
+    report_partial_path = report_path.with_name(report_path.name + ".partial")
     _write_headline_summary_from_accumulator_json(
         report_aggregate,
-        args.root / "data" / "battery" / "score-summary.json",
+        summary_partial_path,
         store_stamp=recorded,
     )
-    report_path.write_text(report, encoding="utf-8")
+    report_partial_path.write_text(report, encoding="utf-8")
     scored = report_aggregate.scored_count
+    os.replace(summary_partial_path, summary_path)
+    os.replace(report_partial_path, report_path)
     os.replace(partial_path, residuals_path)
     print(
         f"residuals={written} scored={scored} "
