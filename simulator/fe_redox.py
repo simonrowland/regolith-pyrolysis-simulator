@@ -781,10 +781,11 @@ def _kress91_ferric_ln_ratio(fe3_over_sigma_fe: float) -> float:
         raise Kress91InvalidControls(
             f'Kress91 invalid control fe3_over_sigma_fe: expected finite value, got {fe3_over_sigma_fe!r}'
         )
-    q = max(
-        KRESS91_FERRIC_FRACTION_EPSILON,
-        min(1.0 - KRESS91_FERRIC_FRACTION_EPSILON, q),
-    )
+    if not 0.0 < q < 1.0:
+        raise Kress91InvalidControls(
+            'Kress91 invalid control fe3_over_sigma_fe: expected a value '
+            f'in (0, 1), got {fe3_over_sigma_fe!r}'
+        )
     ratio = q / (2.0 * (1.0 - q))
     return math.log(ratio)
 
@@ -795,6 +796,65 @@ def _kress91_inverse_from_ln_ratios(
     inverse_denominator: float,
 ) -> float:
     return (ferric_ln_ratio - base_ln_ratio) / inverse_denominator
+
+
+def _kress91_ferric_ln_ratio_from_moles(
+    *,
+    feo_mol: float,
+    fe2o3_mol: float,
+) -> float:
+    feo = float(feo_mol)
+    fe2o3 = float(fe2o3_mol)
+    if (
+        not math.isfinite(feo)
+        or not math.isfinite(fe2o3)
+        or feo <= 0.0
+        or fe2o3 <= 0.0
+    ):
+        raise Kress91InvalidControls(
+            'Kress91 invalid mole inventory: FeO and Fe2O3 must be finite '
+            f'and positive, got FeO={feo_mol!r}, Fe2O3={fe2o3_mol!r}'
+        )
+    return math.log(fe2o3) - math.log(feo)
+
+
+def _kress91_log_fO2_from_fe_oxide_moles(
+    *,
+    feo_mol: float,
+    fe2o3_mol: float,
+    mol_fractions: Mapping[str, float],
+    T_K: float,
+    pressure_bar: float,
+) -> float:
+    """Invert Kress91 from positive FeO and Fe2O3 mole inventories.
+
+    Kress91 gives ``ln(X_Fe2O3/X_FeO) = 0.196 ln(fO2/bar) + b(T,P,X)``.
+    Both mole fractions share the same total, so ``X_Fe2O3/X_FeO`` equals
+    ``n_Fe2O3/n_FeO``; subtracting their natural logs avoids a binary64
+    ferric fraction rounding to one. Mole units cancel in the ratio and fO2
+    is in bar. For ``n_FeO=1e-14 mol`` and ``n_Fe2O3=1000 mol``,
+    ``ln(r)=39.14394658089878`` remains finite.
+    """
+
+    _validate_kress91_controls(
+        fO2_log=0.0,
+        T_K=T_K,
+        pressure_bar=pressure_bar,
+    )
+    ln_mole_ratio = _kress91_ferric_ln_ratio_from_moles(
+        feo_mol=feo_mol,
+        fe2o3_mol=fe2o3_mol,
+    )
+    base_ln_ratio = _kress91_ln_ratio(
+        mol_fractions=mol_fractions,
+        T_K=T_K,
+        pressure_bar=pressure_bar,
+    )
+    return _kress91_inverse_from_ln_ratios(
+        ln_mole_ratio,
+        base_ln_ratio,
+        KRESS91_LN_FO2_COEFFICIENT * math.log(10.0),
+    )
 
 
 class _Kress91Evaluator:
@@ -859,6 +919,21 @@ class _Kress91Evaluator:
             self._inverse_denominator,
         )
 
+    def log_fO2_from_fe_oxide_moles(
+        self,
+        *,
+        feo_mol: float,
+        fe2o3_mol: float,
+    ) -> float:
+        return _kress91_inverse_from_ln_ratios(
+            _kress91_ferric_ln_ratio_from_moles(
+                feo_mol=feo_mol,
+                fe2o3_mol=fe2o3_mol,
+            ),
+            self._base_ln_ratio,
+            self._inverse_denominator,
+        )
+
 
 def kress91_log_fO2_from_fe3_over_sigma_fe(
     *,
@@ -872,9 +947,9 @@ def kress91_log_fO2_from_fe3_over_sigma_fe(
     Kress91 defines ``r = Fe2O3/FeO`` and ``q = Fe3+/sumFe`` as
     ``q = 2r/(2r+1)``.  Therefore ``r = q/[2(1-q)]`` and
     ``log10(fO2) = [ln(r) - b(T,P,X)] / [0.196 ln(10)]`` where ``b`` is the
-    shared non-fO2 term above.  The clamp keeps the derived state finite at
-    ledger endpoints; it does not alter atom counts or create an evaporation
-    flux.  Invalid controls still raise through the same Kress91 validator.
+    shared non-fO2 term above. This fraction form is defined only for
+    ``0 < q < 1``; ledger endpoints require mole-log handling. Invalid
+    controls still raise through the same Kress91 validator.
     """
 
     _validate_kress91_controls(

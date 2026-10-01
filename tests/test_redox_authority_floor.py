@@ -22,6 +22,7 @@ from simulator.state import MOLAR_MASS
 from simulator.fe_redox import (
     KRESS91_FERRIC_FRACTION_EPSILON,
     KRESS91_LN_FO2_COEFFICIENT,
+    Kress91InvalidControls,
     _kress91_ln_ratio,
     calphad_ferrous_feo_activity_diagnostic,
     feo_iw_log10_fO2_bar,
@@ -294,7 +295,7 @@ def test_unavailable_buffer_absence_survives_one_simulated_hour(
     assert visited_unavailable_basis
 
 
-def test_nonzero_release_with_no_ferric_inventory_follows_the_gas() -> None:
+def test_nonzero_release_with_no_ferric_inventory_keeps_the_bound() -> None:
     sim = _sim_with_oxides(feo_wt=10.0, fe2o3_wt=0.0, temperature_C=1220.0)
     bound = sim._melt_fO2_from_ledger()
     transport_pO2_bar = 10.0 ** (bound - 1.0)
@@ -303,9 +304,10 @@ def test_nonzero_release_with_no_ferric_inventory_follows_the_gas() -> None:
 
     fO2_log = sim._melt_fO2_from_ledger()
 
-    assert sim._last_redox_domain["basis"] == "no_melt_redox_buffer"
-    assert "kress91_inverse_not_evaluated" in sim._last_redox_domain["reason"]
-    assert fO2_log == pytest.approx(math.log10(transport_pO2_bar))
+    assert sim._last_redox_domain["basis"] == "fe_saturation_bound"
+    assert fO2_log == pytest.approx(bound, abs=1.0e-12)
+    assert fO2_log != pytest.approx(math.log10(transport_pO2_bar))
+    _assert_saturation_bound(sim, temperature_C=1220.0, fO2_log=fO2_log)
 
 
 def test_interior_ferric_ratio_still_inverts_kress() -> None:
@@ -314,18 +316,10 @@ def test_interior_ferric_ratio_still_inverts_kress() -> None:
     fe2o3_mol = _oxide_mol(sim, "Fe2O3")
     total_fe = feo_mol + 2.0 * fe2o3_mol
     raw_q = (2.0 * fe2o3_mol) / total_fe
-    assert KRESS91_FERRIC_FRACTION_EPSILON < raw_q < (
-        1.0 - KRESS91_FERRIC_FRACTION_EPSILON
-    )
+    assert 0.0 < raw_q < 1.0
 
     fO2_log = sim._melt_fO2_from_ledger()
-    composition = melt_mol_fractions_for_kress91(sim._melt_oxide_wt_pct())
-    expected = kress91_log_fO2_from_fe3_over_sigma_fe(
-        fe3_over_sigma_fe=raw_q,
-        mol_fractions=composition,
-        T_K=1400.0 + 273.15,
-        pressure_bar=_pressure_bar(sim),
-    )
+    expected = _mole_log_fO2_from_ledger(sim)
 
     assert sim._last_redox_domain["basis"] == "kress91_inverse"
     assert fO2_log == pytest.approx(expected, abs=1.0e-8)
@@ -403,6 +397,23 @@ def _ferrous_free_lower_bound_log10(
     )
 
 
+def _mole_log_fO2_from_ledger(sim: PyrolysisSimulator) -> float:
+    feo_mol = _oxide_mol(sim, "FeO")
+    fe2o3_mol = _oxide_mol(sim, "Fe2O3")
+    composition = melt_mol_fractions_for_kress91(
+        sim._cleaned_melt_ledger_wt_pct()
+    )
+    b_term = _kress91_ln_ratio(
+        mol_fractions=composition,
+        T_K=float(sim.melt.temperature_C) + 273.15,
+        pressure_bar=_pressure_bar(sim),
+    )
+    ln_ratio = math.log(fe2o3_mol) - math.log(feo_mol)
+    return (ln_ratio - b_term) / (
+        KRESS91_LN_FO2_COEFFICIENT * math.log(10.0)
+    )
+
+
 def _set_melt_feo_mol(sim: PyrolysisSimulator, n_feo_mol: float) -> None:
     """Place an exact FeO inventory on the cleaned melt.
 
@@ -436,24 +447,21 @@ def test_astra_feo_inventory_keeps_its_own_authority() -> None:
     assert feo_mol == pytest.approx(n_feo, rel=1.0e-9)
     assert capacity_o2 == pytest.approx(589.555, rel=1.0e-9)
     assert capacity_o2 > uptake
+    bound = sim._melt_fO2_from_ledger()
     sim.melt.oxygen_reservoir.headspace_transport_pO2_bar = 1.0
     sim.melt.oxygen_reservoir.exchange_o2_mol = -uptake
 
     fO2_log = sim._melt_fO2_from_ledger()
 
     assert sim._last_redox_domain["basis"] == "fe_saturation_bound"
-    assert f"capacity_O2={capacity_o2:.17g}" in sim._last_redox_domain["reason"]
-    assert f"per_tick_o2_transfer_mol={-uptake:.17g}" in (
-        sim._last_redox_domain["reason"]
-    )
+    assert fO2_log == pytest.approx(bound, abs=1.0e-12)
     assert fO2_log != pytest.approx(math.log10(1.0))
 
 
-def test_trace_feo_finite_uptake_hands_the_melt_to_the_gas() -> None:
+def test_trace_feo_finite_uptake_keeps_the_saturation_bound() -> None:
     """1e-13 mol FeO has capacity_O2 = 2.5e-14 mol.
 
-    A finite uptake above that capacity, and above the 1e-15 mol noop,
-    is more O2 than the inventory can take.  The melt follows the gas.
+    A finite transfer request cannot rename the M4 ledger regime.
     """
 
     n_feo = 1.0e-13
@@ -462,6 +470,7 @@ def test_trace_feo_finite_uptake_hands_the_melt_to_the_gas() -> None:
     _set_melt_feo_mol(sim, n_feo)
     feo_mol = _oxide_mol(sim, "FeO")
     capacity_o2 = feo_mol / 4.0
+    bound = sim._melt_fO2_from_ledger()
     assert feo_mol == pytest.approx(n_feo, rel=0.0, abs=1.0e-18)
     assert capacity_o2 == pytest.approx(n_feo / 4.0, rel=0.0, abs=1.0e-18)
     assert capacity_o2 > 1.0e-15
@@ -471,10 +480,8 @@ def test_trace_feo_finite_uptake_hands_the_melt_to_the_gas() -> None:
 
     fO2_log = sim._melt_fO2_from_ledger()
 
-    assert sim._last_redox_domain["basis"] == "no_melt_redox_buffer"
-    assert "kress91_inverse_not_evaluated" in sim._last_redox_domain["reason"]
-    assert f"capacity_O2={capacity_o2:.17g}" in sim._last_redox_domain["reason"]
-    assert fO2_log == pytest.approx(math.log10(1.0))
+    assert sim._last_redox_domain["basis"] == "fe_saturation_bound"
+    assert fO2_log == pytest.approx(bound, abs=1.0e-12)
 
 
 def test_zero_transfer_on_trace_feo_never_follows_the_gas() -> None:
@@ -493,8 +500,6 @@ def test_zero_transfer_on_trace_feo_never_follows_the_gas() -> None:
     fO2_log = sim._melt_fO2_from_ledger()
 
     assert sim._last_redox_domain["basis"] == "fe_saturation_bound"
-    assert f"capacity_O2={capacity_o2:.17g}" in sim._last_redox_domain["reason"]
-    assert "per_tick_o2_transfer_mol=0" in sim._last_redox_domain["reason"]
     assert fO2_log != pytest.approx(math.log10(1.0))
 
 
@@ -880,18 +885,6 @@ def _near_ferric_sim(n_feo_mol: float) -> PyrolysisSimulator:
     return sim
 
 
-def _near_ferric_lower_bound_log10(sim: PyrolysisSimulator) -> float:
-    composition = melt_mol_fractions_for_kress91(
-        sim._cleaned_melt_ledger_wt_pct()
-    )
-    return kress91_log_fO2_from_fe3_over_sigma_fe(
-        fe3_over_sigma_fe=1.0 - KRESS91_FERRIC_FRACTION_EPSILON,
-        mol_fractions=composition,
-        T_K=float(sim.melt.temperature_C) + 273.15,
-        pressure_bar=_pressure_bar(sim),
-    )
-
-
 def test_fully_ferric_zero_transfer_stays_on_the_lower_bound() -> None:
     """A zero transfer does not copy the gas into a ferrous-free melt."""
 
@@ -903,14 +896,15 @@ def test_fully_ferric_zero_transfer_stays_on_the_lower_bound() -> None:
         n_fe2o3_mol=2.0,
         temperature_C=1400.0,
     )
-    clamped = kress91_log_fO2_from_fe3_over_sigma_fe(
-        fe3_over_sigma_fe=1.0,
-        mol_fractions=melt_mol_fractions_for_kress91(
-            sim._cleaned_melt_ledger_wt_pct()
-        ),
-        T_K=1400.0 + 273.15,
-        pressure_bar=_pressure_bar(sim),
-    )
+    with pytest.raises(Kress91InvalidControls, match=r"\(0, 1\)"):
+        kress91_log_fO2_from_fe3_over_sigma_fe(
+            fe3_over_sigma_fe=1.0,
+            mol_fractions=melt_mol_fractions_for_kress91(
+                sim._cleaned_melt_ledger_wt_pct()
+            ),
+            T_K=1400.0 + 273.15,
+            pressure_bar=_pressure_bar(sim),
+        )
 
     fO2_log = sim._melt_fO2_from_ledger()
     domain = sim._last_redox_domain
@@ -921,15 +915,9 @@ def test_fully_ferric_zero_transfer_stays_on_the_lower_bound() -> None:
     assert "one-sided lower bound, not an equality" in domain["reason"]
     assert "the fO2 scalar is absent" in domain["reason"]
     assert "kress91_inverse_not_evaluated" in domain["reason"]
-    assert "capacity_O2=1" in domain["reason"]
-    assert "per_tick_o2_transfer_mol=0" in domain["reason"]
     assert fO2_log is None
     assert domain["derived_fO2_log"] is None
     assert domain["fO2_log_lower_bound"] == pytest.approx(expected, abs=1.0e-8)
-    assert domain["fO2_log_lower_bound"] != pytest.approx(
-        math.log10(TRANSPORT_PO2_BAR)
-    )
-    assert abs(domain["fO2_log_lower_bound"] - clamped) > 1.0
 
 
 def test_fully_ferric_release_below_capacity_stays_on_the_bound() -> None:
@@ -946,87 +934,73 @@ def test_fully_ferric_release_below_capacity_stays_on_the_bound() -> None:
     fO2_log = sim._melt_fO2_from_ledger()
 
     assert sim._last_redox_domain["basis"] == "ferrous_free_lower_bound"
-    assert "capacity_O2=1" in sim._last_redox_domain["reason"]
-    assert "per_tick_o2_transfer_mol=0.1" in sim._last_redox_domain["reason"]
     assert fO2_log is None
     assert sim._last_redox_domain["fO2_log_lower_bound"] == pytest.approx(
         expected, abs=1.0e-8
     )
-    assert sim._last_redox_domain["fO2_log_lower_bound"] != pytest.approx(
-        math.log10(TRANSPORT_PO2_BAR)
+    assert sim._last_redox_domain["fO2_log_lower_bound"] > math.log10(
+        TRANSPORT_PO2_BAR
     )
 
 
 @pytest.mark.parametrize("n_feo_mol", [1.0e-12, 1.0e-9, 4.0e-6])
-def test_near_ferric_zero_transfer_stays_on_the_lower_bound(
+def test_near_ferric_zero_transfer_uses_the_mole_log_inverse(
     n_feo_mol: float,
 ) -> None:
     sim = _near_ferric_sim(n_feo_mol)
-    expected = _near_ferric_lower_bound_log10(sim)
+    expected = _mole_log_fO2_from_ledger(sim)
 
     fO2_log = sim._melt_fO2_from_ledger()
     domain = sim._last_redox_domain
 
-    assert domain["basis"] == "ferrous_free_lower_bound"
-    assert domain["status"] == "out_of_domain"
-    assert domain["fO2_log_lower_bound"] == pytest.approx(expected, abs=1.0e-8)
-    assert "capacity_O2=1" in domain["reason"]
-    assert "per_tick_o2_transfer_mol=0" in domain["reason"]
-    assert fO2_log is None
-    assert domain["derived_fO2_log"] is None
+    assert domain["basis"] == "kress91_inverse"
+    assert domain["derived_fO2_log"] == pytest.approx(expected, abs=1.0e-8)
+    assert fO2_log == pytest.approx(expected, abs=1.0e-8)
 
 
-def test_near_ferric_release_below_capacity_stays_on_the_lower_bound() -> None:
+def test_near_ferric_release_below_capacity_keeps_m5_equality() -> None:
     sim = _near_ferric_sim(1.0e-9)
-    expected = _near_ferric_lower_bound_log10(sim)
+    expected = _mole_log_fO2_from_ledger(sim)
     sim.melt.oxygen_reservoir.exchange_o2_mol = 0.1
 
     fO2_log = sim._melt_fO2_from_ledger()
     domain = sim._last_redox_domain
 
-    assert domain["basis"] == "ferrous_free_lower_bound"
-    assert domain["fO2_log_lower_bound"] == pytest.approx(expected, abs=1.0e-8)
-    assert "capacity_O2=1" in domain["reason"]
-    assert "per_tick_o2_transfer_mol=0.1" in domain["reason"]
-    assert fO2_log is None
+    assert domain["basis"] == "kress91_inverse"
+    assert domain["derived_fO2_log"] == pytest.approx(expected, abs=1.0e-8)
+    assert fO2_log == pytest.approx(expected, abs=1.0e-8)
 
 
-def test_near_ferric_release_above_capacity_follows_the_gas() -> None:
+def test_near_ferric_exhausted_release_keeps_m5_equality() -> None:
     sim = _near_ferric_sim(1.0e-9)
+    expected = _mole_log_fO2_from_ledger(sim)
     sim.melt.oxygen_reservoir.exchange_o2_mol = 2.0
 
     fO2_log = sim._melt_fO2_from_ledger()
 
-    assert sim._last_redox_domain["basis"] == "no_melt_redox_buffer"
-    assert sim._last_redox_domain["authority"] == "gas_interface_controlled"
-    assert fO2_log == pytest.approx(math.log10(TRANSPORT_PO2_BAR))
+    assert sim._last_redox_domain["basis"] == "kress91_inverse"
+    assert fO2_log == pytest.approx(expected, abs=1.0e-8)
 
 
-def test_near_ferric_interface_uses_saturated_drive_without_committed_transfer() -> None:
+def test_near_ferric_interface_uses_m5_equality_without_committing_transfer() -> None:
     sim = _near_ferric_sim(1.0e-9)
     _finite_gas_film(sim)
 
-    assert sim._melt_fO2_from_ledger() is None
+    expected = _mole_log_fO2_from_ledger(sim)
+    assert sim._melt_fO2_from_ledger() == pytest.approx(expected, abs=1.0e-8)
     sim._sync_oxygen_reservoir_mirror()
     state = sim._oxygen_interface_state(TRANSPORT_PO2_BAR)
 
-    assert sim._last_redox_domain["basis"] == "ferrous_free_lower_bound"
-    assert state["interface_pO2_bar"] == pytest.approx(TRANSPORT_PO2_BAR)
-    assert state["limiting_regime"] == "gas_side_ferrous_free_lower_bound"
+    assert sim._last_redox_domain["basis"] == "kress91_inverse"
+    assert math.isfinite(state["interface_pO2_bar"])
+    assert expected > math.log10(MELT_DISSOCIATION_PO2_MAX_BAR)
     assert state["melt_intrinsic_pO2_bar"] == MELT_DISSOCIATION_PO2_MAX_BAR
+    assert state["limiting_regime"] != "gas_side_ferrous_free_lower_bound"
 
 
 def test_near_ferric_inventory_inside_kress_interval_is_unchanged() -> None:
     sim = _near_ferric_sim(1.0e-4)
-    ferric_fraction, *_ = _ferric_state(sim)
-    expected = kress91_log_fO2_from_fe3_over_sigma_fe(
-        fe3_over_sigma_fe=ferric_fraction,
-        mol_fractions=melt_mol_fractions_for_kress91(
-            sim._melt_oxide_wt_pct()
-        ),
-        T_K=float(sim.melt.temperature_C) + 273.15,
-        pressure_bar=_pressure_bar(sim),
-    )
+    expected = _mole_log_fO2_from_ledger(sim)
 
     fO2_log = sim._melt_fO2_from_ledger()
 
@@ -1035,19 +1009,89 @@ def test_near_ferric_inventory_inside_kress_interval_is_unchanged() -> None:
     assert fO2_log == pytest.approx(expected, abs=1.0e-8)
 
 
-def test_fully_ferric_release_above_capacity_follows_the_gas() -> None:
-    """2 mol O2 exceeds the 1 mol release capacity, so the gas owns the melt."""
+def test_m5_near_ferric_inventory_uses_the_mole_log_inverse() -> None:
+    sim = _sim_with_oxides(feo_wt=8.0, fe2o3_wt=2.0, temperature_C=1400.0)
+    _set_melt_iron_oxides(sim, n_feo_mol=5.0e-7, n_fe2o3_mol=0.5)
+    expected = _mole_log_fO2_from_ledger(sim)
+
+    fO2_log = sim._melt_fO2_from_ledger()
+
+    assert _oxide_mol(sim, "FeO") > OXYGEN_RESERVOIR_NOOP_MOL
+    assert _oxide_mol(sim, "Fe2O3") > OXYGEN_RESERVOIR_NOOP_MOL
+    assert sim._last_redox_domain["basis"] == "kress91_inverse"
+    assert fO2_log == pytest.approx(expected, abs=1.0e-8)
+
+
+def test_m5_finite_equality_survives_binary64_ferric_fraction_one() -> None:
+    sim = _sim_with_oxides(feo_wt=8.0, fe2o3_wt=2.0, temperature_C=1400.0)
+    _set_melt_iron_oxides(sim, n_feo_mol=1.0e-14, n_fe2o3_mol=1000.0)
+    ln_ratio = math.log(_oxide_mol(sim, "Fe2O3")) - math.log(
+        _oxide_mol(sim, "FeO")
+    )
+    expected = _mole_log_fO2_from_ledger(sim)
+
+    fO2_log = sim._melt_fO2_from_ledger()
+
+    assert ln_ratio == pytest.approx(39.14394658089878, abs=1.0e-14)
+    assert sim._ledger_fe3_over_sigma_fe() == 1.0
+    assert sim._last_redox_domain["basis"] == "kress91_inverse"
+    assert fO2_log is not None and math.isfinite(fO2_log)
+    assert fO2_log == pytest.approx(expected, abs=1.0e-8)
+
+
+@pytest.mark.parametrize("n_feo_mol", [0.0, OXYGEN_RESERVOIR_NOOP_MOL])
+def test_ferrous_inventory_at_or_below_noop_stays_m3(n_feo_mol: float) -> None:
+    sim = _fully_ferric_sim()
+    _set_melt_iron_oxides(sim, n_feo_mol=n_feo_mol, n_fe2o3_mol=2.0)
+
+    fO2_log = sim._melt_fO2_from_ledger()
+
+    assert sim._last_redox_domain["basis"] == "ferrous_free_lower_bound"
+    assert fO2_log is None
+    assert sim._last_redox_domain["fO2_log_lower_bound"] is not None
+
+
+def test_zero_ferric_inventory_reports_raw_zero_ratio() -> None:
+    sim = _sim_with_oxides(feo_wt=10.0, fe2o3_wt=0.0, temperature_C=1400.0)
+
+    assert sim._ledger_fe3_over_sigma_fe() == 0.0
+    assert sim._ledger_ferric_fraction_diagnostic()[
+        "ledger_ferric_fraction"
+    ] == 0.0
+
+
+@pytest.mark.parametrize("q", [0.0, 1.0, -0.1, 1.1])
+def test_fraction_inverse_refuses_values_outside_the_open_interval(q: float) -> None:
+    sim = _sim_with_oxides(feo_wt=8.0, fe2o3_wt=2.0, temperature_C=1400.0)
+    composition = melt_mol_fractions_for_kress91(sim._melt_oxide_wt_pct())
+
+    with pytest.raises(Kress91InvalidControls, match=r"\(0, 1\)"):
+        kress91_log_fO2_from_fe3_over_sigma_fe(
+            fe3_over_sigma_fe=q,
+            mol_fractions=composition,
+            T_K=1400.0 + 273.15,
+            pressure_bar=_pressure_bar(sim),
+        )
+
+
+def test_fully_ferric_exhausted_release_keeps_the_lower_bound() -> None:
+    """Transfer request does not change the M3 ledger classification."""
 
     sim = _fully_ferric_sim()
+    expected = _ferrous_free_lower_bound_log10(
+        sim,
+        n_fe2o3_mol=2.0,
+        temperature_C=1400.0,
+    )
     sim.melt.oxygen_reservoir.exchange_o2_mol = 2.0
 
     fO2_log = sim._melt_fO2_from_ledger()
 
-    assert sim._last_redox_domain["basis"] == "no_melt_redox_buffer"
-    assert sim._last_redox_domain["authority"] == "gas_interface_controlled"
-    assert "kress91_inverse_not_evaluated" in sim._last_redox_domain["reason"]
-    assert "capacity_O2=1" in sim._last_redox_domain["reason"]
-    assert fO2_log == pytest.approx(math.log10(TRANSPORT_PO2_BAR))
+    assert sim._last_redox_domain["basis"] == "ferrous_free_lower_bound"
+    assert fO2_log is None
+    assert sim._last_redox_domain["fO2_log_lower_bound"] == pytest.approx(
+        expected, abs=1.0e-8
+    )
 
 
 def test_fully_ferric_respeciation_does_not_mint_feo(

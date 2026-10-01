@@ -714,39 +714,28 @@ def test_interface_keeps_directional_inventory_when_differential_capacity_is_zer
     assert diagnostic['redox_buffer_exhausted'] is False
 
 
-def test_trace_fe_directional_inventory_uses_kress_inverse(
-    monkeypatch,
-):
+def test_trace_fe_directional_inventory_uses_mole_log_inverse():
     sim = _trace_fe_transport_sim()
-    ratios = iter((0.03, 0.9999))
-
-    def changing_ledger_ratio():
-        return next(ratios, 0.9999)
-
-    monkeypatch.setattr(sim, '_ledger_fe3_over_sigma_fe', changing_ledger_ratio)
-
-    inverse_evaluations = []
-    inverse = core_module.kress91_log_fO2_from_fe3_over_sigma_fe
-
-    def record_inverse(**kwargs):
-        result = inverse(**kwargs)
-        inverse_evaluations.append((
-            float(kwargs['fe3_over_sigma_fe']),
-            result,
-        ))
-        return result
-
-    monkeypatch.setattr(
-        core_module,
-        'kress91_log_fO2_from_fe3_over_sigma_fe',
-        record_inverse,
+    melt_mol = sim.atom_ledger.project_account_mol('process.cleaned_melt')
+    feo_mol = float(melt_mol['FeO'])
+    fe2o3_mol = float(melt_mol['Fe2O3'])
+    mol_fractions = core_module.melt_mol_fractions_for_kress91(
+        sim._cleaned_melt_ledger_wt_pct() or sim._melt_oxide_wt_pct()
     )
+    ln_ratio = math.log(fe2o3_mol) - math.log(feo_mol)
+    b_term = core_module._kress91_ln_ratio(
+        mol_fractions=mol_fractions,
+        T_K=sim.melt.temperature_C + 273.15,
+        pressure_bar=sim.melt.p_total_mbar / 1000.0,
+    )
+    expected_fO2_log = (ln_ratio - b_term) / (
+        core_module.KRESS91_LN_FO2_COEFFICIENT * math.log(10.0)
+    )
+    expected_q = (2.0 * fe2o3_mol) / (feo_mol + 2.0 * fe2o3_mol)
 
     samples = []
     for _ in range(2):
-        evaluation_start = len(inverse_evaluations)
         fO2_log = sim._current_melt_redox_fO2_log()
-        ferric_input, inverse_result = inverse_evaluations[evaluation_start]
         domain = dict(sim._last_redox_domain)
         interface_pO2_bar = sim._interface_pO2_bar()
         equilibrium = sim._internal_analytical_equilibrium()
@@ -755,15 +744,14 @@ def test_trace_fe_directional_inventory_uses_kress_inverse(
             domain,
             interface_pO2_bar,
             float(equilibrium.vapor_pressures_Pa['SiO']),
-            ferric_input,
-            inverse_result,
+            sim._ledger_fe3_over_sigma_fe(),
+            expected_fO2_log,
         ))
 
     transport_pO2_bar = sim.melt.oxygen_reservoir.headspace_transport_pO2_bar
     assert transport_pO2_bar == pytest.approx(1.0e-6)
-    expected_ferric_inputs = (0.03, 0.9999)
     assert [sample[4] for sample in samples] == pytest.approx(
-        expected_ferric_inputs
+        [expected_q, expected_q]
     )
     assert [sample[0] for sample in samples] == pytest.approx(
         [sample[5] for sample in samples]

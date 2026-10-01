@@ -8,11 +8,11 @@ import pytest
 
 from simulator.environment import DEFAULT_VACUUM_FLOOR_BAR
 from simulator.fe_redox import (
-    KRESS91_FERRIC_FRACTION_EPSILON,
+    KRESS91_LN_FO2_COEFFICIENT,
+    _kress91_ln_ratio,
     calphad_ferrous_feo_activity_diagnostic,
     feo_iw_log10_fO2_bar,
     floor_vacuum_pressure_bar,
-    kress91_log_fO2_from_fe3_over_sigma_fe,
     melt_mol_fractions_for_kress91,
 )
 from simulator.physical_constants import CATALOG_PHYSICAL_PRESSURE_CEILING_PA
@@ -183,27 +183,23 @@ def test_lunar_c2a_170h_keeps_ledger_redox_bounded_and_consistent() -> None:
         )
         ledger_q = float(divergence["ledger_ferric_fraction"])
 
-        lower_bound = kress91_log_fO2_from_fe3_over_sigma_fe(
-            fe3_over_sigma_fe=KRESS91_FERRIC_FRACTION_EPSILON,
-            mol_fractions=composition,
-            T_K=float(snapshot.temperature_C) + 273.15,
-            pressure_bar=pressure_bar,
-        )
-        upper_bound = kress91_log_fO2_from_fe3_over_sigma_fe(
-            fe3_over_sigma_fe=1.0 - KRESS91_FERRIC_FRACTION_EPSILON,
-            mol_fractions=composition,
-            T_K=float(snapshot.temperature_C) + 273.15,
-            pressure_bar=pressure_bar,
-        )
-        assert lower_bound - 2.0e-12 <= fO2_log <= upper_bound + 2.0e-12
-
         implied_q = float(divergence["implied_ferric_fraction"])
-        assert 1.0e-6 < ledger_q < 1.0 - 1.0e-6
+        feo_fraction = float(composition.get("FeO", 0.0) or 0.0)
+        fe2o3_fraction = float(composition.get("Fe2O3", 0.0) or 0.0)
+        ln_ratio = math.log(fe2o3_fraction) - math.log(feo_fraction)
+        if ln_ratio >= 0.0:
+            expected_q = 1.0 / (1.0 + 0.5 * math.exp(-ln_ratio))
+        else:
+            ratio = math.exp(ln_ratio)
+            expected_q = 2.0 * ratio / (2.0 * ratio + 1.0)
+        assert ledger_q == pytest.approx(expected_q, abs=2.0e-12)
         assert implied_q == pytest.approx(ledger_q, abs=2.0e-12)
-        expected_fO2_log = kress91_log_fO2_from_fe3_over_sigma_fe(
-            fe3_over_sigma_fe=ledger_q,
+        base_ln_ratio = _kress91_ln_ratio(
             mol_fractions=composition,
             T_K=float(snapshot.temperature_C) + 273.15,
             pressure_bar=pressure_bar,
+        )
+        expected_fO2_log = (ln_ratio - base_ln_ratio) / (
+            KRESS91_LN_FO2_COEFFICIENT * math.log(10.0)
         )
         assert fO2_log == pytest.approx(expected_fO2_log, abs=2.0e-12)
