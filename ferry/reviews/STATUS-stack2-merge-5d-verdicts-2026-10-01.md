@@ -4,6 +4,7 @@
 - **Seat:** `/workspace/repos/wt/slot-b565` (idle after review; `.slot-busy` cleared)
 - **REQ:** `REQ-stack2-merge-5d-from-regolith-physics-2026-10-01.md`
 - **Deliverable:** `REVIEW-stack2-merge-5d-regolith-physics-2026-10-01.md`
+- **Mailbox:** `82171b4ae88ae32f9d042bfb1c26b1aef6440aa3` on `empirical/reviews-batch-zv-2026-09-22`
 - **Date:** 2026-10-01 ~15:10 ET
 
 | Item | Full SHA | Verdict |
