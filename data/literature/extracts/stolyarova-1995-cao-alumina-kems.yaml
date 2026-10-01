@@ -1,0 +1,740 @@
+schema_version: literature_extract.v1
+source_id: stolyarova-1995-cao-alumina-kems
+source:
+  citation: >-
+    Stolyarova, V. L., Shornikov, S. I. and Shultz, M. M. (1995),
+    "High-temperature Mass Spectrometric Study of the Thermodynamic Properties
+    of the CaO–Al2O3 System."
+  year: 1995
+extraction:
+  method: >-
+    MinerU VLM OCR transcription checked against the scanned page images. Table 1
+    verification: the present-study cell-material cell was checked (1 checked,
+    0 corrected). Table 2 verification: all 54 pressure cells (50 numeric, 4
+    em dashes) and all 9 CaO mole-fraction cells were checked (0 corrected).
+    Table 2 prints positive scale headings p_Ca × 10^9, p_Al × 10^9,
+    p_AlO × 10^10, p_O × 10^9 and p_O2 × 10^11, with pressure in atm;
+    pressure_atm is declared as the printed coefficient multiplied by 10^-n atm.
+    The four printed em dashes (p_Ca at x_CaO=0.000; p_Al, p_AlO, and p_O
+    using Eqn 2 at x_CaO=1.000) remain absent, never zero. Tables 3–5 report
+    thermodynamic quantities rather than partial pressures and are outside this
+    pressure extraction. Figures 1–4 are retained as figure-only placeholders;
+    no figure values were digitized.
+  date: '2026-09-30'
+  worker: codex
+  provenance_path: raw/stolyarova-1995-cao-alumina-kems/ocr-mineru/full/vlm/stolyarova-1995-cao-alumina-kems.md
+review_status: draft
+fidelity_samples:
+  - path: species.Ca.observations[stolyarova_1995_ca_partial_pressure_table2].equipment.cell_material_and_liner.value
+    value: Mo
+    note: 'Table 1, present-study column, Material of effusion cell: Mo.'
+    locator: {page: 687, published_page: 687, pdf_page_index: 1, table: '1'}
+  - path: species.Ca.observations[stolyarova_1995_ca_partial_pressure_table2].values.points[0].p_Ca_times_10^9_atm_as_printed
+    value: 5.26
+    note: 'Table 2, x_CaO=0.143, p_Ca column.'
+    locator: {page: 687, published_page: 687, pdf_page_index: 1, table: '2'}
+  - path: species.Al.observations[stolyarova_1995_al_partial_pressure_table2].values.points[0].p_Al_times_10^9_atm_as_printed
+    value: 45.7
+    note: 'Table 2, x_CaO=0.000, p_Al column.'
+    locator: {page: 687, published_page: 687, pdf_page_index: 1, table: '2'}
+  - path: species.AlO.observations[stolyarova_1995_alo_partial_pressure_table2].values.points[2].p_AlO_times_10^10_atm_as_printed
+    value: 45.0
+    note: 'Table 2, x_CaO=0.333, p_AlO column.'
+    locator: {page: 687, published_page: 687, pdf_page_index: 1, table: '2'}
+  - path: species.O.observations[stolyarova_1995_o_partial_pressure_eqn1_table2].values.points[4].p_O_times_10^9_atm_as_printed
+    value: 2.89
+    note: 'Table 2, x_CaO=0.625, p_O calculated using Eqn 1.'
+    locator: {page: 687, published_page: 687, pdf_page_index: 1, table: '2'}
+  - path: species.O.observations[stolyarova_1995_o_partial_pressure_eqn2_table2].values.points[7].p_O_times_10^9_atm_as_printed
+    value: 3.30
+    note: 'Table 2, x_CaO=0.860, p_O calculated using Eqn 2.'
+    locator: {page: 687, published_page: 687, pdf_page_index: 1, table: '2'}
+  - path: species.O2.observations[stolyarova_1995_o2_partial_pressure_table2].values.points[3].p_O2_times_10^11_atm_as_printed
+    value: 4.53
+    note: 'Table 2, x_CaO=0.500, p_O2 column.'
+    locator: {page: 687, published_page: 687, pdf_page_index: 1, table: '2'}
+  - path: species.Ca.observations[stolyarova_1995_ca_partial_pressure_table2].values.points[5].p_Ca_times_10^9_atm_as_printed
+    value: 880
+    note: 'Table 2, x_CaO=0.750, p_Ca column.'
+    locator: {page: 687, published_page: 687, pdf_page_index: 1, table: '2'}
+benches:
+  - id: stolyarova-1995-molybdenum-cell
+    identity: {basis: described_in_this_work}
+    apparatus_family:
+      state: {tag: value, value: Knudsen-cell mass spectrometry}
+      locator: {published_page: 687, pdf_page_index: 1, section: Experimental}
+    cell_materials:
+      - state: {tag: value, value: Mo}
+        locator:
+          published_page: 687
+          pdf_page_index: 1
+          table: '1'
+          note: Present-study column, row “Material of effusion cell”.
+    cell_material_and_liner:
+      state: {tag: value, value: molybdenum effusion cell; no liner stated}
+      locator:
+        published_page: 687
+        pdf_page_index: 1
+        table: '1'
+        note: Present-study column identifies the effusion cell as Mo; no separate orifice material is stated.
+    geometry:
+      orifice_to_sample_area_ratio:
+        state: {tag: value, value: {kind: point, point: '0.01'}}
+        locator:
+          published_page: 687
+          pdf_page_index: 1
+          section: Experimental
+          note: Printed vaporization-area/orifice-area ratio is 100:1; typed orifice/sample ratio is its reciprocal, 1:100 = 0.01.
+experiments:
+  - experiment_id: stolyarova-1995-mo-cell
+    bench_id: stolyarova-1995-molybdenum-cell
+    method: knudsen_effusion
+    locator:
+      published_page: 687
+      pdf_page_index: 1
+      section: Experimental
+      note: Knudsen effusion mass spectrometry; vaporization-area/orifice-area ratio 100:1.
+species:
+  Ca:
+    observations:
+      - observation_id: stolyarova_1995_ca_partial_pressure_table2
+        type: partial_pressure
+        locator: {page: 687, published_page: 687, pdf_page_index: 1, table: '2'}
+        T_range_K: [1933.0, 1933.0]
+        phase: gas
+        experiment: stolyarova-1995-mo-cell
+        regime: kems_effusion
+        units: atm as printed (p_Ca × 10^9)
+        values:
+          quantity: partial_pressure
+          method_class: measured
+          evidence_class: measured_direct
+          admission_status: admitted
+          method: ion_current_comparison
+          method_as_printed: ion current comparison method
+          composition_component: CaO
+          composition_basis: mole fraction
+          temperature_K: 1933.0
+          pressure_scale_as_printed: p_Ca × 10^9 (atm)
+          series: Table 2 p_Ca column
+          points:
+            - CaO_mole_fraction_as_printed: '0.143'
+              T_K_as_printed: '1933'
+              p_Ca_times_10^9_atm_as_printed: 5.26
+              pressure_atm: 5.26e-9
+              point_conditions:
+                composition:
+                  state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.143'], [Al2O3, '0.857']]}}
+                  locator: {page: 687, published_page: 687, pdf_page_index: 1, table: '2', note: Printed x_CaO; x_Al2O3 is the binary complement, not separately printed.}
+            - CaO_mole_fraction_as_printed: '0.333'
+              T_K_as_printed: '1933'
+              p_Ca_times_10^9_atm_as_printed: 14.4
+              pressure_atm: 1.44e-8
+              point_conditions:
+                composition:
+                  state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.333'], [Al2O3, '0.667']]}}
+                  locator: {page: 687, published_page: 687, pdf_page_index: 1, table: '2', note: Printed x_CaO; x_Al2O3 is the binary complement, not separately printed.}
+            - CaO_mole_fraction_as_printed: '0.500'
+              T_K_as_printed: '1933'
+              p_Ca_times_10^9_atm_as_printed: 103
+              pressure_atm: 1.03e-7
+              point_conditions:
+                composition:
+                  state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.500'], [Al2O3, '0.500']]}}
+                  locator: {page: 687, published_page: 687, pdf_page_index: 1, table: '2', note: Printed x_CaO; x_Al2O3 is the binary complement, not separately printed.}
+            - CaO_mole_fraction_as_printed: '0.625'
+              T_K_as_printed: '1933'
+              p_Ca_times_10^9_atm_as_printed: 576
+              pressure_atm: 5.76e-7
+              point_conditions:
+                composition:
+                  state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.625'], [Al2O3, '0.375']]}}
+                  locator: {page: 687, published_page: 687, pdf_page_index: 1, table: '2', note: Printed x_CaO; x_Al2O3 is the binary complement, not separately printed.}
+            - CaO_mole_fraction_as_printed: '0.632'
+              T_K_as_printed: '1933'
+              p_Ca_times_10^9_atm_as_printed: 578
+              pressure_atm: 5.78e-7
+              point_conditions:
+                composition:
+                  state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.632'], [Al2O3, '0.368']]}}
+                  locator: {page: 687, published_page: 687, pdf_page_index: 1, table: '2', note: Printed x_CaO; x_Al2O3 is the binary complement, not separately printed.}
+            - CaO_mole_fraction_as_printed: '0.750'
+              T_K_as_printed: '1933'
+              p_Ca_times_10^9_atm_as_printed: 880
+              pressure_atm: 8.80e-7
+              point_conditions:
+                composition:
+                  state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.750'], [Al2O3, '0.250']]}}
+                  locator: {page: 687, published_page: 687, pdf_page_index: 1, table: '2', note: Printed x_CaO; x_Al2O3 is the binary complement, not separately printed.}
+            - CaO_mole_fraction_as_printed: '0.860'
+              T_K_as_printed: '1933'
+              p_Ca_times_10^9_atm_as_printed: 850
+              pressure_atm: 8.50e-7
+              point_conditions:
+                composition:
+                  state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.860'], [Al2O3, '0.140']]}}
+                  locator: {page: 687, published_page: 687, pdf_page_index: 1, table: '2', note: Printed x_CaO; x_Al2O3 is the binary complement, not separately printed.}
+            - CaO_mole_fraction_as_printed: '1.000'
+              T_K_as_printed: '1933'
+              p_Ca_times_10^9_atm_as_printed: 782
+              pressure_atm: 7.82e-7
+              point_conditions:
+                composition:
+                  state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '1.000'], [Al2O3, '0.000']]}}
+                  locator: {page: 687, published_page: 687, pdf_page_index: 1, table: '2', note: Printed x_CaO; x_Al2O3 is the binary complement, not separately printed.}
+        equipment:
+          cell_material_and_liner:
+            value: Mo
+            locator: {page: 687, published_page: 687, pdf_page_index: 1, table: '1', note: Present-study column, row “Material of effusion cell”.}
+  Al:
+    observations:
+      - observation_id: stolyarova_1995_al_partial_pressure_table2
+        type: partial_pressure
+        locator: {page: 687, published_page: 687, pdf_page_index: 1, table: '2'}
+        T_range_K: [1933.0, 1933.0]
+        phase: gas
+        experiment: stolyarova-1995-mo-cell
+        regime: kems_effusion
+        units: atm as printed (p_Al × 10^9)
+        values:
+          quantity: partial_pressure
+          method_class: measured
+          evidence_class: measured_direct
+          admission_status: admitted
+          method: ion_current_comparison
+          method_as_printed: ion current comparison method
+          composition_component: CaO
+          composition_basis: mole fraction
+          temperature_K: 1933.0
+          pressure_scale_as_printed: p_Al × 10^9 (atm)
+          series: Table 2 p_Al column
+          points:
+            - CaO_mole_fraction_as_printed: '0.000'
+              T_K_as_printed: '1933'
+              p_Al_times_10^9_atm_as_printed: 45.7
+              pressure_atm: 4.57e-8
+              point_conditions:
+                composition:
+                  state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.000'], [Al2O3, '1.000']]}}
+                  locator: {page: 687, published_page: 687, pdf_page_index: 1, table: '2', note: Printed x_CaO; x_Al2O3 is the binary complement, not separately printed.}
+            - CaO_mole_fraction_as_printed: '0.143'
+              T_K_as_printed: '1933'
+              p_Al_times_10^9_atm_as_printed: 41.7
+              pressure_atm: 4.17e-8
+              point_conditions:
+                composition:
+                  state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.143'], [Al2O3, '0.857']]}}
+                  locator: {page: 687, published_page: 687, pdf_page_index: 1, table: '2', note: Printed x_CaO; x_Al2O3 is the binary complement, not separately printed.}
+            - CaO_mole_fraction_as_printed: '0.333'
+              T_K_as_printed: '1933'
+              p_Al_times_10^9_atm_as_printed: 31.7
+              pressure_atm: 3.17e-8
+              point_conditions:
+                composition:
+                  state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.333'], [Al2O3, '0.667']]}}
+                  locator: {page: 687, published_page: 687, pdf_page_index: 1, table: '2', note: Printed x_CaO; x_Al2O3 is the binary complement, not separately printed.}
+            - CaO_mole_fraction_as_printed: '0.500'
+              T_K_as_printed: '1933'
+              p_Al_times_10^9_atm_as_printed: 13.8
+              pressure_atm: 1.38e-8
+              point_conditions:
+                composition:
+                  state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.500'], [Al2O3, '0.500']]}}
+                  locator: {page: 687, published_page: 687, pdf_page_index: 1, table: '2', note: Printed x_CaO; x_Al2O3 is the binary complement, not separately printed.}
+            - CaO_mole_fraction_as_printed: '0.625'
+              T_K_as_printed: '1933'
+              p_Al_times_10^9_atm_as_printed: 3.82
+              pressure_atm: 3.82e-9
+              point_conditions:
+                composition:
+                  state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.625'], [Al2O3, '0.375']]}}
+                  locator: {page: 687, published_page: 687, pdf_page_index: 1, table: '2', note: Printed x_CaO; x_Al2O3 is the binary complement, not separately printed.}
+            - CaO_mole_fraction_as_printed: '0.632'
+              T_K_as_printed: '1933'
+              p_Al_times_10^9_atm_as_printed: 3.29
+              pressure_atm: 3.29e-9
+              point_conditions:
+                composition:
+                  state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.632'], [Al2O3, '0.368']]}}
+                  locator: {page: 687, published_page: 687, pdf_page_index: 1, table: '2', note: Printed x_CaO; x_Al2O3 is the binary complement, not separately printed.}
+            - CaO_mole_fraction_as_printed: '0.750'
+              T_K_as_printed: '1933'
+              p_Al_times_10^9_atm_as_printed: 1.97
+              pressure_atm: 1.97e-9
+              point_conditions:
+                composition:
+                  state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.750'], [Al2O3, '0.250']]}}
+                  locator: {page: 687, published_page: 687, pdf_page_index: 1, table: '2', note: Printed x_CaO; x_Al2O3 is the binary complement, not separately printed.}
+            - CaO_mole_fraction_as_printed: '0.860'
+              T_K_as_printed: '1933'
+              p_Al_times_10^9_atm_as_printed: 1.68
+              pressure_atm: 1.68e-9
+              point_conditions:
+                composition:
+                  state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.860'], [Al2O3, '0.140']]}}
+                  locator: {page: 687, published_page: 687, pdf_page_index: 1, table: '2', note: Printed x_CaO; x_Al2O3 is the binary complement, not separately printed.}
+  AlO:
+    observations:
+      - observation_id: stolyarova_1995_alo_partial_pressure_table2
+        type: partial_pressure
+        locator: {page: 687, published_page: 687, pdf_page_index: 1, table: '2'}
+        T_range_K: [1933.0, 1933.0]
+        phase: gas
+        experiment: stolyarova-1995-mo-cell
+        regime: kems_effusion
+        units: atm as printed (p_AlO × 10^10)
+        values:
+          quantity: partial_pressure
+          method_class: measured
+          evidence_class: measured_direct
+          admission_status: admitted
+          method: ion_current_comparison
+          method_as_printed: ion current comparison method
+          composition_component: CaO
+          composition_basis: mole fraction
+          temperature_K: 1933.0
+          pressure_scale_as_printed: p_AlO × 10^10 (atm)
+          series: Table 2 p_AlO column
+          points:
+            - CaO_mole_fraction_as_printed: '0.000'
+              T_K_as_printed: '1933'
+              p_AlO_times_10^10_atm_as_printed: 55.1
+              pressure_atm: 5.51e-9
+              point_conditions:
+                composition:
+                  state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.000'], [Al2O3, '1.000']]}}
+                  locator: {page: 687, published_page: 687, pdf_page_index: 1, table: '2', note: Printed x_CaO; x_Al2O3 is the binary complement, not separately printed.}
+            - CaO_mole_fraction_as_printed: '0.143'
+              T_K_as_printed: '1933'
+              p_AlO_times_10^10_atm_as_printed: 51.8
+              pressure_atm: 5.18e-9
+              point_conditions:
+                composition:
+                  state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.143'], [Al2O3, '0.857']]}}
+                  locator: {page: 687, published_page: 687, pdf_page_index: 1, table: '2', note: Printed x_CaO; x_Al2O3 is the binary complement, not separately printed.}
+            - CaO_mole_fraction_as_printed: '0.333'
+              T_K_as_printed: '1933'
+              p_AlO_times_10^10_atm_as_printed: 45.0
+              pressure_atm: 4.50e-9
+              point_conditions:
+                composition:
+                  state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.333'], [Al2O3, '0.667']]}}
+                  locator: {page: 687, published_page: 687, pdf_page_index: 1, table: '2', note: Printed x_CaO; x_Al2O3 is the binary complement, not separately printed.}
+            - CaO_mole_fraction_as_printed: '0.500'
+              T_K_as_printed: '1933'
+              p_AlO_times_10^10_atm_as_printed: 20.1
+              pressure_atm: 2.01e-9
+              point_conditions:
+                composition:
+                  state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.500'], [Al2O3, '0.500']]}}
+                  locator: {page: 687, published_page: 687, pdf_page_index: 1, table: '2', note: Printed x_CaO; x_Al2O3 is the binary complement, not separately printed.}
+            - CaO_mole_fraction_as_printed: '0.625'
+              T_K_as_printed: '1933'
+              p_AlO_times_10^10_atm_as_printed: 6.15
+              pressure_atm: 6.15e-10
+              point_conditions:
+                composition:
+                  state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.625'], [Al2O3, '0.375']]}}
+                  locator: {page: 687, published_page: 687, pdf_page_index: 1, table: '2', note: Printed x_CaO; x_Al2O3 is the binary complement, not separately printed.}
+            - CaO_mole_fraction_as_printed: '0.632'
+              T_K_as_printed: '1933'
+              p_AlO_times_10^10_atm_as_printed: 5.50
+              pressure_atm: 5.50e-10
+              point_conditions:
+                composition:
+                  state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.632'], [Al2O3, '0.368']]}}
+                  locator: {page: 687, published_page: 687, pdf_page_index: 1, table: '2', note: Printed x_CaO; x_Al2O3 is the binary complement, not separately printed.}
+            - CaO_mole_fraction_as_printed: '0.750'
+              T_K_as_printed: '1933'
+              p_AlO_times_10^10_atm_as_printed: 3.50
+              pressure_atm: 3.50e-10
+              point_conditions:
+                composition:
+                  state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.750'], [Al2O3, '0.250']]}}
+                  locator: {page: 687, published_page: 687, pdf_page_index: 1, table: '2', note: Printed x_CaO; x_Al2O3 is the binary complement, not separately printed.}
+            - CaO_mole_fraction_as_printed: '0.860'
+              T_K_as_printed: '1933'
+              p_AlO_times_10^10_atm_as_printed: 3.00
+              pressure_atm: 3.00e-10
+              point_conditions:
+                composition:
+                  state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.860'], [Al2O3, '0.140']]}}
+                  locator: {page: 687, published_page: 687, pdf_page_index: 1, table: '2', note: Printed x_CaO; x_Al2O3 is the binary complement, not separately printed.}
+  O:
+    observations:
+      - observation_id: stolyarova_1995_o_partial_pressure_eqn1_table2
+        type: partial_pressure
+        locator: {page: 687, published_page: 687, pdf_page_index: 1, table: '2'}
+        T_range_K: [1933.0, 1933.0]
+        phase: gas
+        experiment: stolyarova-1995-mo-cell
+        regime: kems_effusion
+        units: atm as printed (p_O × 10^9)
+        derived_from: [stolyarova_1995_ca_partial_pressure_table2, stolyarova_1995_al_partial_pressure_table2, stolyarova_1995_alo_partial_pressure_table2]
+        derivation:
+          relation: Author calculation of p_O using Eqn 1 and available vapor-equilibrium thermodynamic data.
+          inputs: [stolyarova_1995_ca_partial_pressure_table2, stolyarova_1995_al_partial_pressure_table2, stolyarova_1995_alo_partial_pressure_table2]
+          output_unit: atm
+        values:
+          quantity: partial_pressure
+          method_class: model_derived
+          evidence_class: model_derived
+          admission_status: admitted
+          method: thermodynamic_equilibrium_calculation
+          method_as_printed: Calculation using Eqn 1
+          composition_component: CaO
+          composition_basis: mole fraction
+          temperature_K: 1933.0
+          pressure_scale_as_printed: p_O × 10^9 (atm), Calculation using Eqn 1
+          series: Table 2 p_O, Eqn 1
+          points:
+            - CaO_mole_fraction_as_printed: '0.000'
+              T_K_as_printed: '1933'
+              p_O_times_10^9_atm_as_printed: 2.11
+              pressure_atm: 2.11e-9
+              point_conditions:
+                composition:
+                  state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.000'], [Al2O3, '1.000']]}}
+                  locator: {page: 687, published_page: 687, pdf_page_index: 1, table: '2', note: Printed x_CaO; x_Al2O3 is the binary complement, not separately printed.}
+            - CaO_mole_fraction_as_printed: '0.143'
+              T_K_as_printed: '1933'
+              p_O_times_10^9_atm_as_printed: 2.24
+              pressure_atm: 2.24e-9
+              point_conditions:
+                composition:
+                  state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.143'], [Al2O3, '0.857']]}}
+                  locator: {page: 687, published_page: 687, pdf_page_index: 1, table: '2', note: Printed x_CaO; x_Al2O3 is the binary complement, not separately printed.}
+            - CaO_mole_fraction_as_printed: '0.333'
+              T_K_as_printed: '1933'
+              p_O_times_10^9_atm_as_printed: 2.50
+              pressure_atm: 2.50e-9
+              point_conditions:
+                composition:
+                  state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.333'], [Al2O3, '0.667']]}}
+                  locator: {page: 687, published_page: 687, pdf_page_index: 1, table: '2', note: Printed x_CaO; x_Al2O3 is the binary complement, not separately printed.}
+            - CaO_mole_fraction_as_printed: '0.500'
+              T_K_as_printed: '1933'
+              p_O_times_10^9_atm_as_printed: 2.63
+              pressure_atm: 2.63e-9
+              point_conditions:
+                composition:
+                  state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.500'], [Al2O3, '0.500']]}}
+                  locator: {page: 687, published_page: 687, pdf_page_index: 1, table: '2', note: Printed x_CaO; x_Al2O3 is the binary complement, not separately printed.}
+            - CaO_mole_fraction_as_printed: '0.625'
+              T_K_as_printed: '1933'
+              p_O_times_10^9_atm_as_printed: 2.89
+              pressure_atm: 2.89e-9
+              point_conditions:
+                composition:
+                  state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.625'], [Al2O3, '0.375']]}}
+                  locator: {page: 687, published_page: 687, pdf_page_index: 1, table: '2', note: Printed x_CaO; x_Al2O3 is the binary complement, not separately printed.}
+            - CaO_mole_fraction_as_printed: '0.632'
+              T_K_as_printed: '1933'
+              p_O_times_10^9_atm_as_printed: 3.03
+              pressure_atm: 3.03e-9
+              point_conditions:
+                composition:
+                  state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.632'], [Al2O3, '0.368']]}}
+                  locator: {page: 687, published_page: 687, pdf_page_index: 1, table: '2', note: Printed x_CaO; x_Al2O3 is the binary complement, not separately printed.}
+            - CaO_mole_fraction_as_printed: '0.750'
+              T_K_as_printed: '1933'
+              p_O_times_10^9_atm_as_printed: 3.16
+              pressure_atm: 3.16e-9
+              point_conditions:
+                composition:
+                  state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.750'], [Al2O3, '0.250']]}}
+                  locator: {page: 687, published_page: 687, pdf_page_index: 1, table: '2', note: Printed x_CaO; x_Al2O3 is the binary complement, not separately printed.}
+            - CaO_mole_fraction_as_printed: '0.860'
+              T_K_as_printed: '1933'
+              p_O_times_10^9_atm_as_printed: 3.25
+              pressure_atm: 3.25e-9
+              point_conditions:
+                composition:
+                  state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.860'], [Al2O3, '0.140']]}}
+                  locator: {page: 687, published_page: 687, pdf_page_index: 1, table: '2', note: Printed x_CaO; x_Al2O3 is the binary complement, not separately printed.}
+            - CaO_mole_fraction_as_printed: '1.000'
+              T_K_as_printed: '1933'
+              p_O_times_10^9_atm_as_printed: 3.51
+              pressure_atm: 3.51e-9
+              point_conditions:
+                composition:
+                  state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '1.000'], [Al2O3, '0.000']]}}
+                  locator: {page: 687, published_page: 687, pdf_page_index: 1, table: '2', note: Printed x_CaO; x_Al2O3 is the binary complement, not separately printed.}
+      - observation_id: stolyarova_1995_o_partial_pressure_eqn2_table2
+        type: partial_pressure
+        locator: {page: 687, published_page: 687, pdf_page_index: 1, table: '2'}
+        T_range_K: [1933.0, 1933.0]
+        phase: gas
+        experiment: stolyarova-1995-mo-cell
+        regime: kems_effusion
+        units: atm as printed (p_O × 10^9)
+        derived_from: [stolyarova_1995_ca_partial_pressure_table2, stolyarova_1995_al_partial_pressure_table2, stolyarova_1995_alo_partial_pressure_table2]
+        derivation:
+          relation: Author calculation of p_O using Eqn 2 and available vapor-equilibrium thermodynamic data.
+          inputs: [stolyarova_1995_ca_partial_pressure_table2, stolyarova_1995_al_partial_pressure_table2, stolyarova_1995_alo_partial_pressure_table2]
+          output_unit: atm
+        values:
+          quantity: partial_pressure
+          method_class: model_derived
+          evidence_class: model_derived
+          admission_status: admitted
+          method: thermodynamic_equilibrium_calculation
+          method_as_printed: Calculation using Eqn 2
+          composition_component: CaO
+          composition_basis: mole fraction
+          temperature_K: 1933.0
+          pressure_scale_as_printed: p_O × 10^9 (atm), Calculation using Eqn 2
+          series: Table 2 p_O, Eqn 2
+          points:
+            - CaO_mole_fraction_as_printed: '0.000'
+              T_K_as_printed: '1933'
+              p_O_times_10^9_atm_as_printed: 2.23
+              pressure_atm: 2.23e-9
+              point_conditions:
+                composition:
+                  state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.000'], [Al2O3, '1.000']]}}
+                  locator: {page: 687, published_page: 687, pdf_page_index: 1, table: '2', note: Printed x_CaO; x_Al2O3 is the binary complement, not separately printed.}
+            - CaO_mole_fraction_as_printed: '0.143'
+              T_K_as_printed: '1933'
+              p_O_times_10^9_atm_as_printed: 2.29
+              pressure_atm: 2.29e-9
+              point_conditions:
+                composition:
+                  state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.143'], [Al2O3, '0.857']]}}
+                  locator: {page: 687, published_page: 687, pdf_page_index: 1, table: '2', note: Printed x_CaO; x_Al2O3 is the binary complement, not separately printed.}
+            - CaO_mole_fraction_as_printed: '0.333'
+              T_K_as_printed: '1933'
+              p_O_times_10^9_atm_as_printed: 2.62
+              pressure_atm: 2.62e-9
+              point_conditions:
+                composition:
+                  state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.333'], [Al2O3, '0.667']]}}
+                  locator: {page: 687, published_page: 687, pdf_page_index: 1, table: '2', note: Printed x_CaO; x_Al2O3 is the binary complement, not separately printed.}
+            - CaO_mole_fraction_as_printed: '0.500'
+              T_K_as_printed: '1933'
+              p_O_times_10^9_atm_as_printed: 2.69
+              pressure_atm: 2.69e-9
+              point_conditions:
+                composition:
+                  state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.500'], [Al2O3, '0.500']]}}
+                  locator: {page: 687, published_page: 687, pdf_page_index: 1, table: '2', note: Printed x_CaO; x_Al2O3 is the binary complement, not separately printed.}
+            - CaO_mole_fraction_as_printed: '0.625'
+              T_K_as_printed: '1933'
+              p_O_times_10^9_atm_as_printed: 2.97
+              pressure_atm: 2.97e-9
+              point_conditions:
+                composition:
+                  state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.625'], [Al2O3, '0.375']]}}
+                  locator: {page: 687, published_page: 687, pdf_page_index: 1, table: '2', note: Printed x_CaO; x_Al2O3 is the binary complement, not separately printed.}
+            - CaO_mole_fraction_as_printed: '0.632'
+              T_K_as_printed: '1933'
+              p_O_times_10^9_atm_as_printed: 3.09
+              pressure_atm: 3.09e-9
+              point_conditions:
+                composition:
+                  state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.632'], [Al2O3, '0.368']]}}
+                  locator: {page: 687, published_page: 687, pdf_page_index: 1, table: '2', note: Printed x_CaO; x_Al2O3 is the binary complement, not separately printed.}
+            - CaO_mole_fraction_as_printed: '0.750'
+              T_K_as_printed: '1933'
+              p_O_times_10^9_atm_as_printed: 3.28
+              pressure_atm: 3.28e-9
+              point_conditions:
+                composition:
+                  state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.750'], [Al2O3, '0.250']]}}
+                  locator: {page: 687, published_page: 687, pdf_page_index: 1, table: '2', note: Printed x_CaO; x_Al2O3 is the binary complement, not separately printed.}
+            - CaO_mole_fraction_as_printed: '0.860'
+              T_K_as_printed: '1933'
+              p_O_times_10^9_atm_as_printed: 3.30
+              pressure_atm: 3.30e-9
+              point_conditions:
+                composition:
+                  state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.860'], [Al2O3, '0.140']]}}
+                  locator: {page: 687, published_page: 687, pdf_page_index: 1, table: '2', note: Printed x_CaO; x_Al2O3 is the binary complement, not separately printed.}
+  O2:
+    observations:
+      - observation_id: stolyarova_1995_o2_partial_pressure_table2
+        type: partial_pressure
+        locator: {page: 687, published_page: 687, pdf_page_index: 1, table: '2'}
+        T_range_K: [1933.0, 1933.0]
+        phase: gas
+        experiment: stolyarova-1995-mo-cell
+        regime: kems_effusion
+        units: atm as printed (p_O2 × 10^11)
+        derived_from: [stolyarova_1995_ca_partial_pressure_table2, stolyarova_1995_al_partial_pressure_table2, stolyarova_1995_alo_partial_pressure_table2]
+        derivation:
+          relation: Author calculation of p_O2 using available thermodynamic data for vapor equilibria, reference 42.
+          inputs: [stolyarova_1995_ca_partial_pressure_table2, stolyarova_1995_al_partial_pressure_table2, stolyarova_1995_alo_partial_pressure_table2]
+          output_unit: atm
+        values:
+          quantity: partial_pressure
+          method_class: model_derived
+          evidence_class: model_derived
+          admission_status: admitted
+          method: thermodynamic_equilibrium_calculation
+          method_as_printed: calculated from thermodynamic data for vapor equilibria
+          composition_component: CaO
+          composition_basis: mole fraction
+          temperature_K: 1933.0
+          pressure_scale_as_printed: p_O2 × 10^11 (atm)
+          series: Table 2 p_O2 column
+          points:
+            - CaO_mole_fraction_as_printed: '0.000'
+              T_K_as_printed: '1933'
+              p_O2_times_10^11_atm_as_printed: 2.91
+              pressure_atm: 2.91e-11
+              point_conditions:
+                composition:
+                  state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.000'], [Al2O3, '1.000']]}}
+                  locator: {page: 687, published_page: 687, pdf_page_index: 1, table: '2', note: Printed x_CaO; x_Al2O3 is the binary complement, not separately printed.}
+            - CaO_mole_fraction_as_printed: '0.143'
+              T_K_as_printed: '1933'
+              p_O2_times_10^11_atm_as_printed: 3.29
+              pressure_atm: 3.29e-11
+              point_conditions:
+                composition:
+                  state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.143'], [Al2O3, '0.857']]}}
+                  locator: {page: 687, published_page: 687, pdf_page_index: 1, table: '2', note: Printed x_CaO; x_Al2O3 is the binary complement, not separately printed.}
+            - CaO_mole_fraction_as_printed: '0.333'
+              T_K_as_printed: '1933'
+              p_O2_times_10^11_atm_as_printed: 4.09
+              pressure_atm: 4.09e-11
+              point_conditions:
+                composition:
+                  state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.333'], [Al2O3, '0.667']]}}
+                  locator: {page: 687, published_page: 687, pdf_page_index: 1, table: '2', note: Printed x_CaO; x_Al2O3 is the binary complement, not separately printed.}
+            - CaO_mole_fraction_as_printed: '0.500'
+              T_K_as_printed: '1933'
+              p_O2_times_10^11_atm_as_printed: 4.53
+              pressure_atm: 4.53e-11
+              point_conditions:
+                composition:
+                  state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.500'], [Al2O3, '0.500']]}}
+                  locator: {page: 687, published_page: 687, pdf_page_index: 1, table: '2', note: Printed x_CaO; x_Al2O3 is the binary complement, not separately printed.}
+            - CaO_mole_fraction_as_printed: '0.625'
+              T_K_as_printed: '1933'
+              p_O2_times_10^11_atm_as_printed: 5.47
+              pressure_atm: 5.47e-11
+              point_conditions:
+                composition:
+                  state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.625'], [Al2O3, '0.375']]}}
+                  locator: {page: 687, published_page: 687, pdf_page_index: 1, table: '2', note: Printed x_CaO; x_Al2O3 is the binary complement, not separately printed.}
+            - CaO_mole_fraction_as_printed: '0.632'
+              T_K_as_printed: '1933'
+              p_O2_times_10^11_atm_as_printed: 6.01
+              pressure_atm: 6.01e-11
+              point_conditions:
+                composition:
+                  state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.632'], [Al2O3, '0.368']]}}
+                  locator: {page: 687, published_page: 687, pdf_page_index: 1, table: '2', note: Printed x_CaO; x_Al2O3 is the binary complement, not separately printed.}
+            - CaO_mole_fraction_as_printed: '0.750'
+              T_K_as_printed: '1933'
+              p_O2_times_10^11_atm_as_printed: 6.54
+              pressure_atm: 6.54e-11
+              point_conditions:
+                composition:
+                  state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.750'], [Al2O3, '0.250']]}}
+                  locator: {page: 687, published_page: 687, pdf_page_index: 1, table: '2', note: Printed x_CaO; x_Al2O3 is the binary complement, not separately printed.}
+            - CaO_mole_fraction_as_printed: '0.860'
+              T_K_as_printed: '1933'
+              p_O2_times_10^11_atm_as_printed: 6.92
+              pressure_atm: 6.92e-11
+              point_conditions:
+                composition:
+                  state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '0.860'], [Al2O3, '0.140']]}}
+                  locator: {page: 687, published_page: 687, pdf_page_index: 1, table: '2', note: Printed x_CaO; x_Al2O3 is the binary complement, not separately printed.}
+            - CaO_mole_fraction_as_printed: '1.000'
+              T_K_as_printed: '1933'
+              p_O2_times_10^11_atm_as_printed: 8.07
+              pressure_atm: 8.07e-11
+              point_conditions:
+                composition:
+                  state: {tag: value, value: {basis: printed_mole_fraction, amount_basis: mole_fraction, components: [[CaO, '1.000'], [Al2O3, '0.000']]}}
+                  locator: {page: 687, published_page: 687, pdf_page_index: 1, table: '2', note: Printed x_CaO; x_Al2O3 is the binary complement, not separately printed.}
+  CaO:
+    observations:
+      - observation_id: stolyarova_1995_cao_activity_fig1_figure_only
+        type: activity_coefficient
+        locator: {figure: '1', page: 687, published_page: 687, pdf_page_index: 1}
+        T_range_K: [1933.0, 1933.0]
+        phase: CaO–Al2O3 liquid oxide melt
+        regime: kems_effusion
+        units: dimensionless
+        values:
+          quantity: CaO_activity
+          method_class: measured_reduced
+          evidence_class: measured_reduced
+          admission_status: figure_only
+          status: typed_refusal
+          reason: Figure-only activity curve; no values digitized.
+          series: Figure 1(a), CaO activity
+      - observation_id: stolyarova_1995_cao_chemical_potential_fig3_figure_only
+        type: gibbs_table
+        locator: {figure: '3', page: 688, published_page: 688, pdf_page_index: 2}
+        T_range_K: [1833.0, 2033.0]
+        phase: CaO–Al2O3 liquid oxide melt
+        regime: kems_effusion
+        units: kJ/mol
+        values:
+          quantity: CaO_chemical_potential
+          admission_status: figure_only
+          status: typed_refusal
+          reason: Figure-only chemical-potential curves; no values digitized.
+          series: Figure 3(a), CaO chemical-potential temperature dependencies
+  Al2O3:
+    observations:
+      - observation_id: stolyarova_1995_alumina_activity_fig1_figure_only
+        type: activity_coefficient
+        locator: {figure: '1', page: 687, published_page: 687, pdf_page_index: 1}
+        T_range_K: [1933.0, 1933.0]
+        phase: CaO–Al2O3 liquid oxide melt
+        regime: kems_effusion
+        units: dimensionless
+        values:
+          quantity: Al2O3_activity
+          method_class: measured_reduced
+          evidence_class: measured_reduced
+          admission_status: figure_only
+          status: typed_refusal
+          reason: Figure-only activity curve; no values digitized.
+          series: Figure 1(b), Al2O3 activity
+      - observation_id: stolyarova_1995_alumina_chemical_potential_fig3_figure_only
+        type: gibbs_table
+        locator: {figure: '3', page: 688, published_page: 688, pdf_page_index: 2}
+        T_range_K: [1833.0, 2033.0]
+        phase: CaO–Al2O3 liquid oxide melt
+        regime: kems_effusion
+        units: kJ/mol
+        values:
+          quantity: Al2O3_chemical_potential
+          admission_status: figure_only
+          status: typed_refusal
+          reason: Figure-only chemical-potential curves; no values digitized.
+          series: Figure 3(b), Al2O3 chemical-potential temperature dependencies
+  CaO-Al2O3:
+    observations:
+      - observation_id: stolyarova_1995_gibbs_energy_fig2_figure_only
+        type: gibbs_table
+        locator: {figure: '2', page: 687, published_page: 687, pdf_page_index: 1}
+        T_range_K: [1933.0, 2060.0]
+        phase: CaO–Al2O3 liquid oxide melt
+        regime: kems_effusion
+        units: kJ/mol
+        values:
+          quantity: integral_Gibbs_energy
+          admission_status: figure_only
+          status: typed_refusal
+          reason: Figure-only Gibbs-energy curves; no values digitized.
+          series: Figure 2, Gibbs energy for the system
+      - observation_id: stolyarova_1995_enthalpy_entropy_fig4_figure_only
+        type: gibbs_table
+        locator: {figure: '4', page: 688, published_page: 688, pdf_page_index: 2}
+        T_range_K: [1833.0, 2033.0]
+        phase: CaO–Al2O3 liquid oxide melt
+        regime: kems_effusion
+        units: kJ/mol and J/(K mol)
+        values:
+          quantity: integral_enthalpy_and_entropy
+          admission_status: figure_only
+          status: typed_refusal
+          reason: Figure-only enthalpy and entropy curves; no values digitized.
+          series: Figure 4, integral enthalpies and entropies
