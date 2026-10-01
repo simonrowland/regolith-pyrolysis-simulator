@@ -8,7 +8,7 @@
 - **Counts:** P0 0, P1 0, P2 0 (prior false Table-1 parents cleared; lineage completeness not a gate)
 - **Reason:** Mo cell recorded as inference (`inferred: true` / works `Located.inference`) with p.18 ions + p.19 MoO3/MoO2 evidence, not printed; three O blocks stay `model_derived` with false Table-1 parents removed (empty parents OK); measured values/units/exponents/conditions unchanged vs e311b68b2/9e79f3fa1; six Mo ion intensities still measured, notes describe one spectrum in three normalisations.
 - **Deliverable:** `REVIEW-stolyarova-1996-delta2-2026-10-01.md`
-- **Mailbox tip:** `1ce51a573cf4c9b190694c38b8709bf98f6a7b1d` on `empirical/reviews-batch-zv-2026-09-22` (artifacts `1ce51a573`)
+- **Mailbox tip:** `57affa33132946fe99cd0bb1ab59796b06451b6a` on `empirical/reviews-batch-zv-2026-09-22` (artifacts `1ce51a573`)
 - **Date:** 2026-10-01 ~10:54 ET
 
 — regolith-empirical
