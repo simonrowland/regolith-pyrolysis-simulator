@@ -10,6 +10,7 @@ import subprocess
 import sys
 import unicodedata
 from dataclasses import replace
+from decimal import Decimal
 from pathlib import Path
 
 import pytest
@@ -42,6 +43,7 @@ from simulator.battery.identity import atm_to_pa, identity_equal, quantity_token
 from simulator.battery.score import predict_with_engine
 from simulator.battery.migrate import (
     REPO_ROOT,
+    _notice_from_plain,
     DuplicateContextIdError,
     QUEUE_SCHEMA_VERSION,
     DuplicateObservationIdError,
@@ -88,7 +90,48 @@ from simulator.battery.migrate import (
     write_outputs,
 
 )
-from simulator.battery.records import Bench, BenchIdentity, Reaction, Species, State, as_decimal
+
+
+def test_reference_phase_convention_notice_round_trips_and_legacy_notice_stays_valid() -> None:
+    from simulator.battery.enums import Authority
+    from simulator.battery.records import Notice
+
+    notice = Notice(
+        kind=NoticeKind.REFERENCE_PHASE_BY_CONVENTION,
+        affected_quantities=(Quantity.DELTA_FG,),
+        reason=(
+            "JANAF web table prints no phase; ideal-gas reference state per the "
+            "monograph convention, page not held"
+        ),
+        origin="O-029 (O) reference-element table",
+        authority=Authority.CONVENTION,
+        certification="fetch the JANAF 4th ed. printed page for the table",
+    )
+    payload = to_plain(notice)
+    assert payload["kind"] == "reference_phase_by_convention"
+    assert payload["authority"] == "convention"
+    assert payload["certification"] == "fetch the JANAF 4th ed. printed page for the table"
+    assert _notice_from_plain(payload) == notice
+
+    legacy = {
+        "kind": "source_disagreement",
+        "affected_quantities": ["delta_fG"],
+        "reason": "legacy notice",
+        "origin": "legacy-source",
+    }
+    decoded_legacy = _notice_from_plain(legacy)
+    assert decoded_legacy.authority is None
+    assert decoded_legacy.certification is None
+    assert to_plain(decoded_legacy) == legacy
+from simulator.battery.records import (
+    Bench,
+    BenchIdentity,
+    Reaction,
+    Species,
+    State,
+    Value,
+    as_decimal,
+)
 from tests.battery import load_observation_store_summary
 from simulator.battery.validate import validate_corpus
 from simulator.yaml_cache import YAML12SafeLoader, load_cached_safe_yaml
@@ -173,7 +216,7 @@ def _write_min_tree(root: Path, extract: dict | None = None) -> Path:
     return root
 
 
-def _migrate_real_extract(tmp_path: Path, name: str):
+def _migrate_real_extract(tmp_path: Path, name: str, *, write: bool = False):
     src = REPO_ROOT / "data" / "literature" / "extracts" / name
     doc = yaml.safe_load(src.read_text(encoding="utf-8"))
     assert isinstance(doc, dict)
@@ -197,7 +240,7 @@ def _migrate_real_extract(tmp_path: Path, name: str):
         encoding="utf-8",
     )
     (extracts / name).write_text(src.read_text(encoding="utf-8"), encoding="utf-8")
-    return migrate(root, write=False)
+    return migrate(root, write=write)
 
 
 def _extract_observations(name: str) -> list[dict]:
@@ -227,6 +270,80 @@ def _run_migrate_cli(args: list[str]) -> subprocess.CompletedProcess[str]:
         text=True,
         env=env,
         check=False,
+    )
+
+
+def test_identity_complete_compilation_cells_are_admitted_at_source_level() -> None:
+    migrator = Migrator()
+    source = "data/literature/compilations/janaf/tables/O-029.yaml"
+    point = F.observation(
+        "compiled-point",
+        "compiled-work",
+        F.o2_identity(),
+        "0",
+        evidence=EvidenceClass.COMPILATION_ASSESSED,
+        admission=AdmissionStatus.PENDING,
+    )
+    migrator._add_observation(point, source)
+    assert (
+        migrator.result.observations["compiled-point"].admission.status
+        is AdmissionStatus.ADMITTED
+    )
+    assert (
+        migrator.result.observations["compiled-point"].evidence.class_.value
+        is EvidenceClass.COMPILATION_ASSESSED
+    )
+    assert (
+        migrator.result.observations["compiled-point"].admission.decided_by.evidence
+        == point.locator
+    )
+
+    series_identity = replace(
+        F.o2_identity(),
+        temperature_K=State.unknown("temperature is carried by the series T coordinate"),
+    )
+    series = replace(
+        F.observation(
+            "compiled-series",
+            "compiled-work",
+            series_identity,
+            "0",
+            evidence=EvidenceClass.COMPILATION_ASSESSED,
+            admission=AdmissionStatus.PENDING,
+        ),
+        value=Value(
+            ValueKind.SERIES,
+            series=((Decimal("298.15"), Decimal("0")),),
+        ),
+        point_conditions=None,
+    )
+    migrator._add_observation(series, source)
+    assert (
+        migrator.result.observations["compiled-series"].admission.status
+        is AdmissionStatus.ADMITTED
+    )
+
+    incomplete = replace(
+        point,
+        observation_id="compiled-incomplete",
+        identity=replace(
+            point.identity,
+            formation_elements=State.unknown("reference phase not printed"),
+        ),
+    )
+    migrator._add_observation(incomplete, source)
+    assert (
+        migrator.result.observations["compiled-incomplete"].admission.status
+        is AdmissionStatus.PENDING
+    )
+
+    outside_compilation = replace(point, observation_id="extract-point")
+    migrator._add_observation(
+        outside_compilation, "data/literature/extracts/fixture.yaml"
+    )
+    assert (
+        migrator.result.observations["extract-point"].admission.status
+        is AdmissionStatus.PENDING
     )
 
 
@@ -2427,6 +2544,8 @@ _CENSUS_QUANTITY_ALIASES = {
     "non_condensed_mass_loss_fraction": "mass_loss_fraction",
     "ion_current_ratio": "ion_intensity_ratio",
     "ion_intensity_ratio": "ion_intensity_ratio",
+    "open_furnace_residue_composition_vs_time": "residue_component_composition",
+    "residue_composition_vs_time": "residue_component_composition",
 }
 _CENSUS_CLOSED_QUANTITIES = {
     "p_sat",
@@ -2463,6 +2582,7 @@ _CENSUS_CLOSED_QUANTITIES = {
     "evolved_gas_yield",
     "ion_intensity",
     "interaction_parameter",
+    "residue_component_composition",
 }
 _CENSUS_TYPE_QUANTITY = {
     "psat_series": "p_sat",
@@ -2646,7 +2766,7 @@ def _census_expected_point(item: dict, q_token: str | None, units: str):
 def _series_census(
     extracts: Path, extracts_v2: Path
 ) -> tuple[dict[str, int], list[str], int, int, dict[str, dict[str, int]]]:
-    from decimal import Decimal
+    from decimal import Decimal, InvalidOperation
 
     census: dict[str, int] = {}
     per_source: dict[str, dict[str, int]] = {}
@@ -2672,8 +2792,7 @@ def _series_census(
         }
         source_id = str(source.get("source_id") or src_path.stem)
         used_stable_ids: set[str] = set()
-        species = source.get("species") or {}
-        for body in species.values():
+        for source_species, body in (source.get("species") or {}).items():
             if not isinstance(body, dict):
                 continue
             for row in body.get("observations") or []:
@@ -2689,6 +2808,75 @@ def _series_census(
                     if not isinstance(item, dict):
                         continue
                     oid = f"{source_id}::{raw_id}::point:{index}"
+                    if q_token == "residue_component_composition":
+                        residue_fields = (
+                            "residue_ppm",
+                            "SiO2_wt_pct",
+                            "Al2O3_wt_pct",
+                            "FeO_wt_pct",
+                            "MgO_wt_pct",
+                            "CaO_wt_pct",
+                        )
+                        for field in residue_fields:
+                            if field not in item:
+                                continue
+                            raw_amount = item[field]
+                            expected_amount = None
+                            if raw_amount is not None and raw_amount != "":
+                                try:
+                                    expected_amount = Decimal(str(raw_amount))
+                                except (InvalidOperation, ValueError, TypeError):
+                                    expected_amount = None
+                            if expected_amount is None:
+                                n_unavailable += 1
+                                continue
+                            component = (
+                                source_species
+                                if field == "residue_ppm"
+                                else field.removesuffix("_wt_pct")
+                            )
+                            stable_points = [
+                                observation
+                                for observation in stored_observations
+                                if str(observation.get("observation_id") or "").startswith(
+                                    f"{source_id}::{raw_id}::"
+                                )
+                                and str(observation.get("observation_id") or "")
+                                not in used_stable_ids
+                                and ((observation.get("identity") or {}).get("quantity") or {}).get(
+                                    "value"
+                                )
+                                == q_token
+                                and ((observation.get("identity") or {}).get("species") or {}).get(
+                                    "formula"
+                                )
+                                == component
+                            ]
+                            stored_obs = next(
+                                (
+                                    observation
+                                    for observation in stable_points
+                                    if (observation.get("value") or {}).get("kind")
+                                    == "point"
+                                    and Decimal(
+                                        str((observation.get("value") or {}).get("point"))
+                                    )
+                                    == expected_amount
+                                ),
+                                None,
+                            )
+                            if stored_obs is None:
+                                mismatches.append(
+                                    f"{oid} source field {field}={expected_amount} "
+                                    "has no matching residue component cell"
+                                )
+                                continue
+                            used_stable_ids.add(str(stored_obs["observation_id"]))
+                            n_numeric += 1
+                            census[q_token] = census.get(q_token, 0) + 1
+                            source_census = per_source.setdefault(source_id, {})
+                            source_census[q_token] = source_census.get(q_token, 0) + 1
+                        continue
                     expected = _census_expected_point(item, q_token, units)
                     stored_obs = by_id.get(oid)
                     if stored_obs is None:
@@ -2802,11 +2990,48 @@ def test_j01_store_census_series_numeric_matches_declared_field() -> None:
     assert per_source.get("ueshima-1982-fe-mo-thermal") == {
         "transition_temperature": 58
     }
+    # The reviewed residue-composition rail adds 516 Sossi ppm and 648 Hashimoto
+    # oxide cells. The independent source census validates each typed component
+    # against its own printed field; the seven all-null Hashimoto rows stay absent.
+    assert census.get("residue_component_composition") == 1164
+    assert per_source.get("kems-012-sossi-2019") == {"residue_component_composition": 516}
+    assert per_source.get("kems-015-hashimoto-1983") == {"residue_component_composition": 648}
     # Re-pinned for the loader-survival batch: Richter 2007 +50 printed mass-loss cells
     # (starting-material initial compositions now survive migration), on top of the
     # landed 450 (scorer p_partial +61, Holzheid +33): n_numeric 450->500; t-998 adds
-    # four Zhang Table 4 alpha cells, so the merged total is 504; mismatches remains 0.
-    assert n_numeric == 504, (n_numeric, census, n_unavailable)
+    # four Zhang Table 4 alpha cells, and 1164 residue components, so the merged
+    # total is 1668; mismatches remains 0.
+    assert n_numeric == 1668, (n_numeric, census, n_unavailable)
+
+
+def test_residue_point_condition_values_keep_their_printed_types() -> None:
+    from simulator.battery.migrate import _point_condition_from_plain
+
+    for key, value in (
+        ("fO2_control", "none"),
+        (
+            "atmosphere",
+            "No buffer gas or gas mix during the vacuum runs.",
+        ),
+    ):
+        condition = _point_condition_from_plain(
+            {"state": {"tag": "value", "value": value}},
+            key=key,
+        )
+        assert condition.state.is_value
+        assert condition.state.value == value
+
+    nominal_pressure = {
+        "value": "0.00015",
+        "units": "Torr",
+        "kind": "about_nominal_by_temperature",
+        "as_printed": "~1.5 × 10^{-4} Torr",
+    }
+    condition = _point_condition_from_plain(
+        {"state": {"tag": "value", "value": nominal_pressure}},
+        key="pressure_on_throw_Torr",
+    )
+    assert condition.state.value == nominal_pressure
 
 
 def test_j01_declared_quantity_accepts_one_decorated_source_field() -> None:
@@ -2893,7 +3118,7 @@ def test_dacko_partial_composition_is_typed_refusal_not_scored(tmp_path: Path) -
         composition = obs.identity.composition
         assert composition is not None and composition.is_unknown
         assert "partial_composition" in (composition.reason or "")
-        prediction = predict_with_engine(Engine.IMCC_SF04, obs)
+        prediction = predict_with_engine(Engine.OPENIMCC, obs)
         assert prediction.execution.state is ExecutionState.NOT_PROBED
         assert prediction.refusal_reason is RefusalReason.IDENTITY_INCOMPLETE
         assert prediction.requested_composition == composition
@@ -3687,6 +3912,9 @@ def test_l01_map_quantity_direct_witnesses() -> None:
         ("Fig. 4. Ion current ratios for the Fe-P system at 1600 C", Quantity.ION_INTENSITY_RATIO),
         ("Fig. 5 Experimental intensity ratios for the liquid Ti-Co alloys.", Quantity.ION_INTENSITY_RATIO),
         ("second_law_enthalpy_of_vaporization", Quantity.ENTHALPY_OF_VAPORIZATION_2ND_LAW),
+        ("stable_isotope_delta", Quantity.ISOTOPE_DELTA),
+        ("delta_53Cr_average", Quantity.ISOTOPE_DELTA),
+        ("delta_53Cr_reference_material", Quantity.ISOTOPE_DELTA),
     ],
 )
 def test_l02_empirical_quantity_aliases_are_closed(alias: str, expected: Quantity) -> None:
@@ -3724,6 +3952,24 @@ def test_l02_empirical_quantity_aliases_map_numeric_witnesses() -> None:
             {"quantity": "second_law_enthalpy_of_vaporization", "value": 42.0},
             "kcal/mol",
             Quantity.ENTHALPY_OF_VAPORIZATION_2ND_LAW,
+        ),
+        (
+            "stable_isotope_delta",
+            {"quantity": "stable_isotope_delta"},
+            "permil",
+            Quantity.ISOTOPE_DELTA,
+        ),
+        (
+            "delta_53Cr_average",
+            {"quantity": "delta_53Cr_average"},
+            "permil vs SRM 979",
+            Quantity.ISOTOPE_DELTA,
+        ),
+        (
+            "delta_53Cr_reference_material",
+            {"quantity": "delta_53Cr_reference_material"},
+            "permil vs SRM 979",
+            Quantity.ISOTOPE_DELTA,
         ),
     ]
     for alias, values, units, expected in cases:
@@ -7755,3 +8001,498 @@ def test_g4_choose_read_from_compilation_does_not_fall_through_to_pdf() -> None:
     read_from = choose_read_from(work, locator)
     assert str(read_from).startswith("unknown")
     assert not str(read_from).startswith("pdf:")
+
+
+def test_residue_component_quantity_aliases_keep_printed_values_and_missing_cells() -> None:
+    from decimal import Decimal
+
+    from simulator.battery.enums import QUANTITY_UNITS, Quantity
+    from simulator.battery.migrate import map_quantity, select_declared_source
+
+    cases = (
+        (
+            "open_furnace_residue_composition_vs_time",
+            "residue_ppm",
+            "ppm by mass in quenched glass",
+            "759.6",
+        ),
+        (
+            "residue_composition_vs_time",
+            "Al2O3_wt_pct",
+            "wt % (100% normalized) as published",
+            "3.57",
+        ),
+    )
+    assert QUANTITY_UNITS[Quantity.RESIDUE_COMPONENT_COMPOSITION] == "subtype_defined"
+    for legacy_quantity, field, units, printed_value in cases:
+        payload = {"quantity": legacy_quantity, field: printed_value}
+        quantity, reason = map_quantity("rate_series", payload, units=units)
+        assert quantity.is_value and quantity.value is Quantity.RESIDUE_COMPONENT_COMPOSITION
+        assert reason is None
+
+        selected = select_declared_source(quantity.value, units, payload)
+        assert selected.available
+        assert selected.field_name == field
+        assert selected.amount == Decimal(printed_value)
+
+        missing = select_declared_source(quantity.value, units, {field: None})
+        assert not missing.available
+        assert "null" in (missing.reason or "")
+
+
+def test_residue_store_write_files_cells_under_their_extract_sources(
+    tmp_path: Path,
+) -> None:
+    expected_counts = {
+        "kems-012-sossi-2019": 344,
+        "kems-015-hashimoto-1983": 120,
+    }
+    for source_id, expected_count in expected_counts.items():
+        _migrate_real_extract(
+            tmp_path / source_id,
+            f"{source_id}.yaml",
+            write=True,
+        )
+        store = tmp_path / source_id / "tree" / "data" / "literature"
+        source_file = store / "extracts-v2" / f"{source_id}.yaml"
+        payload = yaml.safe_load(source_file.read_text(encoding="utf-8"))
+        cells = [
+            row
+            for row in payload["observations"]
+            if row["source_id"] == source_id
+            and row["identity"]["quantity"].get("value")
+            == "residue_component_composition"
+            and row["value"].get("point") is not None
+            and row["admission"]["status"] != "superseded"
+        ]
+
+        assert len(cells) == expected_count
+        assert all(row["source_id"] == source_id for row in cells)
+        assert not (store / "observations-v2" / "CO2_sccm.yaml").exists()
+
+
+def test_residue_battery_ready_counts_one_cell_per_printed_component(
+    tmp_path: Path,
+) -> None:
+    from collections import Counter
+
+    from simulator.battery.enums import AdmissionStatus, Quantity
+    from simulator.battery.score import ScoreContext, comparison_candidates
+
+    expected = {
+        "kems-012-sossi-2019": {
+            "Mn": 43,
+            "Ti": 43,
+            "Sc": 43,
+            "V": 43,
+            "Zr": 43,
+            "La": 43,
+            "Gd": 43,
+            "Yb": 43,
+        },
+        "kems-015-hashimoto-1983": {
+            "SiO2": 24,
+            "Al2O3": 24,
+            "FeO": 24,
+            "MgO": 24,
+            "CaO": 24,
+        },
+    }
+    for source_id, component_counts in expected.items():
+        result = _migrate_real_extract(tmp_path / source_id, f"{source_id}.yaml")
+        live = [
+            obs
+            for obs in result.observations.values()
+            if obs.source_id == source_id
+            and obs.identity.quantity.is_value
+            and obs.identity.quantity.value is Quantity.RESIDUE_COMPONENT_COMPOSITION
+            and obs.value.point is not None
+            and obs.admission.status is not AdmissionStatus.SUPERSEDED
+        ]
+        assert Counter(obs.identity.species.formula for obs in live) == component_counts
+
+        context = ScoreContext(
+            works=result.works,
+            experiments=result.experiments,
+            observations=result.observations,
+        )
+        ready = [
+            obs
+            for obs in comparison_candidates(context)
+            if obs.source_id == source_id
+            and obs.identity.quantity.is_value
+            and obs.identity.quantity.value is Quantity.RESIDUE_COMPONENT_COMPOSITION
+        ]
+        assert Counter(obs.identity.species.formula for obs in ready) == component_counts
+        assert len(ready) == sum(component_counts.values())
+
+
+def test_residue_cells_keep_run_identity_and_printed_conditions(
+    tmp_path: Path,
+) -> None:
+    from collections import Counter
+    from decimal import Decimal
+
+    from simulator.battery.enums import AdmissionStatus, Quantity
+
+    sossi_id = "kems-012-sossi-2019"
+    sossi = _migrate_real_extract(tmp_path / "sossi", f"{sossi_id}.yaml")
+    sossi_source = yaml.safe_load(
+        (REPO_ROOT / "data" / "literature" / "extracts" / f"{sossi_id}.yaml")
+        .read_text(encoding="utf-8")
+    )
+    expected_sossi = Counter()
+    expected_sossi_conditions = {}
+    for formula, species in sossi_source["species"].items():
+        for source_obs in species.get("observations", []):
+            if not source_obs.get("observation_id", "").endswith("_quoted_20260906"):
+                continue
+            values = source_obs.get("values", {})
+            series = values.get("series") if isinstance(values, dict) else None
+            if not isinstance(series, list):
+                continue
+            for item in series:
+                if not isinstance(item, dict) or item.get("residue_ppm") is None:
+                    continue
+                run_id = str(item["run_id"]).strip().removesuffix("*").strip()
+                run_id = run_id.casefold().replace("/", "-")
+                temperature = (
+                    Decimal(str(item["T_K"]))
+                    if item.get("T_K") is not None
+                    else Decimal(str(item["T_C"])) + Decimal("273.15")
+                )
+                time_min = Decimal(str(item["t_min"]))
+                run_key = (formula, temperature, time_min, f"sossi-2019-run-{run_id}")
+                expected_sossi[run_key] += 1
+                expected_sossi_conditions[run_key] = (
+                    Decimal(str(item["log10_fO2"])),
+                    Decimal(str(values["starting_measured_ppm"])),
+                )
+
+    sossi_rows = [
+        obs
+        for obs in sossi.observations.values()
+        if obs.source_id == sossi_id
+        and obs.identity.quantity.is_value
+        and obs.identity.quantity.value is Quantity.RESIDUE_COMPONENT_COMPOSITION
+        and obs.value.point is not None
+        and obs.admission.status is not AdmissionStatus.SUPERSEDED
+    ]
+    actual_sossi = Counter()
+    for obs in sossi_rows:
+        conditions = obs.point_conditions or {}
+        actual_sossi[
+            (
+                obs.identity.species.formula,
+                conditions["temperature_K"].state.value,
+                conditions["time_min"].state.value,
+                obs.experiment_id.split("::experiment::")[-1],
+            )
+        ] += 1
+        run_key = (
+            obs.identity.species.formula,
+            conditions["temperature_K"].state.value,
+            conditions["time_min"].state.value,
+            obs.experiment_id.split("::experiment::")[-1],
+        )
+        expected_fO2, expected_starting = expected_sossi_conditions[run_key]
+        assert conditions["fO2_log"].state.value == expected_fO2
+        assert conditions["starting_component_ppm"].state.value == expected_starting
+        expected_pressure = sossi.experiments[obs.experiment_id].pressure_environment.total_pressure_Pa
+        assert conditions["total_pressure_Pa"].state == expected_pressure.state
+        for key in (
+            "temperature_K",
+            "time_min",
+            "fO2_log",
+            "starting_component_ppm",
+            "total_pressure_Pa",
+            "atmosphere",
+        ):
+            assert key in conditions
+            assert conditions[key].locator is not None
+        atmosphere = conditions["atmosphere"]
+        assert atmosphere.state.is_unknown
+        assert "CO" in atmosphere.locator.note and "CO2" in atmosphere.locator.note
+    assert actual_sossi == expected_sossi
+    assert len(sossi_rows) == 344
+
+    hashimoto_id = "kems-015-hashimoto-1983"
+    hashimoto = _migrate_real_extract(
+        tmp_path / "hashimoto", f"{hashimoto_id}.yaml"
+    )
+    hashimoto_source = _extract_observations(f"{hashimoto_id}.yaml")
+    run_sources = {}
+    for source_obs in hashimoto_source:
+        source_id = source_obs.get("observation_id", "")
+        run_id = source_obs.get("experiment")
+        if not source_id.startswith(
+            "hashimoto_1983_table3_residue_composition_series_quoted__run_"
+        ) or not isinstance(run_id, str):
+            continue
+        values = source_obs.get("values", {})
+        series = values.get("series") if isinstance(values, dict) else None
+        if isinstance(series, list) and series:
+            run_sources[run_id] = (values, series[0])
+
+    hashimoto_rows = [
+        obs
+        for obs in hashimoto.observations.values()
+        if obs.source_id == hashimoto_id
+        and obs.identity.quantity.is_value
+        and obs.identity.quantity.value is Quantity.RESIDUE_COMPONENT_COMPOSITION
+        and obs.value.point is not None
+        and obs.admission.status is not AdmissionStatus.SUPERSEDED
+    ]
+    expected_hashimoto = Counter()
+    for run_id, (values, item) in run_sources.items():
+        temperature = Decimal(str(item["T_K"]))
+        time_min = Decimal(str(item["t_min"]))
+        for field in ("SiO2_wt_pct", "Al2O3_wt_pct", "FeO_wt_pct", "MgO_wt_pct", "CaO_wt_pct"):
+            if item.get(field) is not None:
+                expected_hashimoto[
+                    (field.removesuffix("_wt_pct"), run_id, temperature, time_min)
+                ] += 1
+    actual_hashimoto = Counter()
+    for obs in hashimoto_rows:
+        conditions = obs.point_conditions or {}
+        run_id = obs.experiment_id.split("::experiment::")[-1]
+        actual_hashimoto[
+            (
+                obs.identity.species.formula,
+                run_id,
+                conditions["temperature_K"].state.value,
+                conditions["time_min"].state.value,
+            )
+        ] += 1
+        values, item = run_sources[run_id]
+        for key in (
+            "starting_composition",
+            "fO2_control",
+            "pressure_on_throw_Torr",
+            "total_pressure_Pa",
+            "atmosphere",
+        ):
+            assert key in conditions
+            assert conditions[key].state.is_value
+            assert conditions[key].locator is not None
+        starting = values["composition_wt_pct"]
+        assert conditions["starting_composition"].state.value == {
+            oxide: format(Decimal(str(amount)), "f")
+            for oxide, amount in starting.items()
+            if oxide != "locator"
+        }
+        fO2 = values["fO2_control"]
+        assert conditions["fO2_control"].state.value == fO2["during_run"]
+        assert conditions["atmosphere"].state.value == fO2["note"]
+        expected_pressure = hashimoto.experiments[obs.experiment_id].pressure_environment.total_pressure_Pa
+        assert conditions["total_pressure_Pa"].state == expected_pressure.state
+        pressure = values["pressure_on_throw_Torr"]
+        temperature_c = item["T_C"]
+        source_pressure = pressure["by_T_C"].get(temperature_c)
+        if source_pressure is None:
+            source_pressure = pressure["by_T_C"].get(str(temperature_c))
+        assert conditions["pressure_on_throw_Torr"].state.value["value"] == format(
+            Decimal(str(source_pressure)), "f"
+        )
+    assert actual_hashimoto == expected_hashimoto
+    assert len(hashimoto_rows) == 120
+
+
+def test_residue_identity_subtypes_preserve_printed_basis(tmp_path: Path) -> None:
+    from simulator.battery.enums import AdmissionStatus, Quantity
+    from simulator.battery.identity import profile_for
+
+    expected_subtypes = {
+        "kems-012-sossi-2019": "element_ppm_by_mass",
+        "kems-015-hashimoto-1983": "oxide_wt_percent",
+    }
+    for source_id, expected_subtype in expected_subtypes.items():
+        result = _migrate_real_extract(tmp_path / source_id, f"{source_id}.yaml")
+        cells = [
+            obs
+            for obs in result.observations.values()
+            if obs.source_id == source_id
+            and obs.identity.quantity.is_value
+            and obs.identity.quantity.value is Quantity.RESIDUE_COMPONENT_COMPOSITION
+            and obs.value.point is not None
+            and obs.admission.status is not AdmissionStatus.SUPERSEDED
+        ]
+        assert cells
+        assert all(
+            obs.identity.subtype is not None
+            and obs.identity.subtype.is_value
+            and obs.identity.subtype.value == expected_subtype
+            and "subtype" in profile_for(obs.identity).required
+            for obs in cells
+        )
+
+
+def test_residue_series_emits_numeric_component_cells_with_component_identity(
+    tmp_path: Path,
+) -> None:
+    from decimal import Decimal
+
+    from simulator.battery.enums import Quantity, Rail
+    from simulator.battery.score import ScoreContext, comparison_candidates, rail_for_quantity
+
+    def rows(result, source_id: str):
+        return [
+            obs
+            for obs in result.observations.values()
+            if obs.source_id == source_id
+            and obs.identity.quantity.is_value
+            and obs.identity.quantity.value is Quantity.RESIDUE_COMPONENT_COMPOSITION
+        ]
+
+    sossi_id = "kems-012-sossi-2019"
+    sossi = _migrate_real_extract(tmp_path / "sossi", f"{sossi_id}.yaml")
+    sossi_rows = rows(sossi, sossi_id)
+    assert len(sossi_rows) == 522
+    sossi_series_rows = [
+        obs
+        for obs in sossi_rows
+        if obs.point_conditions is not None and "time_min" in obs.point_conditions
+    ]
+    assert len(sossi_series_rows) == 516
+    assert all(
+        obs.point_conditions is not None
+        and {"total_pressure_Pa", "atmosphere"} <= set(obs.point_conditions)
+        and obs.point_conditions["total_pressure_Pa"].state.is_value
+        and obs.point_conditions["total_pressure_Pa"].state.value.point
+        == Decimal("101325")
+        for obs in sossi_series_rows
+    )
+    sossi_context = ScoreContext(
+        works=sossi.works,
+        experiments=sossi.experiments,
+        observations=sossi.observations,
+    )
+    sossi_candidates = [
+        obs
+        for obs in comparison_candidates(sossi_context)
+        if obs.source_id == sossi_id
+        and obs.identity.quantity.is_value
+        and obs.identity.quantity.value is Quantity.RESIDUE_COMPONENT_COMPOSITION
+    ]
+    assert sossi_candidates
+    assert all(
+        rail_for_quantity(obs.identity.quantity.value, species_formula=obs.identity.species.formula)
+        is Rail.RESIDUE_COMPOSITION
+        for obs in sossi_candidates
+    )
+    sossi_mn = next(
+        obs
+        for obs in sossi_rows
+        if obs.identity.species.formula == "Mn"
+        and obs.value.point == Decimal("759.6")
+        and "sossi_2019_mn_table2_open_furnace_residue_ppm_quoted_20260906" in obs.observation_id
+        and obs.point_conditions is not None
+        and obs.point_conditions["time_min"].state.value == Decimal("15")
+        and obs.point_conditions["fO2_log"].state.value == Decimal("-0.68")
+    )
+    assert sossi_mn.derivation is not None
+    assert sossi_mn.derivation.output_unit == "ppm by mass in quenched glass (as published Table 2)"
+    assert sossi_mn.locator is not None
+    assert {"temperature_K", "time_min", "fO2_log", "starting_component_ppm"} <= set(
+        sossi_mn.point_conditions or {}
+    )
+    assert sossi_mn.point_conditions is not None
+    assert sossi_mn.point_conditions["total_pressure_Pa"].state.value.point == Decimal("101325")
+    atmosphere = sossi_mn.point_conditions["atmosphere"]
+    assert atmosphere.state.is_unknown
+    assert atmosphere.locator is not None
+    assert "CO" in atmosphere.locator.note and "CO2" in atmosphere.locator.note
+
+    hashimoto_id = "kems-015-hashimoto-1983"
+    hashimoto = _migrate_real_extract(
+        tmp_path / "hashimoto", f"{hashimoto_id}.yaml"
+    )
+    hashimoto_rows = rows(hashimoto, hashimoto_id)
+    from collections import Counter
+
+    assert Counter(obs.identity.species.formula for obs in hashimoto_rows) == {
+        # Seven series rows explicitly have null for every oxide; absence
+        # stays absent rather than becoming a component observation.
+        "SiO2": 144,
+        "Al2O3": 144,
+        "FeO": 72,
+        "MgO": 144,
+        "CaO": 144,
+    }
+    assert all(
+        obs.point_conditions is not None
+        and {"total_pressure_Pa", "atmosphere"} <= set(obs.point_conditions)
+        and obs.point_conditions["total_pressure_Pa"].state.is_value
+        for obs in hashimoto_rows
+    )
+    hashimoto_context = ScoreContext(
+        works=hashimoto.works,
+        experiments=hashimoto.experiments,
+        observations=hashimoto.observations,
+    )
+    hashimoto_candidates = [
+        obs
+        for obs in comparison_candidates(hashimoto_context)
+        if obs.source_id == hashimoto_id
+        and obs.identity.quantity.is_value
+        and obs.identity.quantity.value is Quantity.RESIDUE_COMPONENT_COMPOSITION
+    ]
+    assert hashimoto_candidates
+    assert all(
+        rail_for_quantity(obs.identity.quantity.value, species_formula=obs.identity.species.formula)
+        is Rail.RESIDUE_COMPOSITION
+        for obs in hashimoto_candidates
+    )
+    row_cells = {
+        obs.identity.species.formula: obs.value.point
+        for obs in hashimoto_rows
+        if obs.value.point is not None
+        and "row=c3-(2)" in obs.observation_id
+        and obs.point_conditions is not None
+        and obs.point_conditions.get("temperature_K") is not None
+        and obs.point_conditions["temperature_K"].state.value == Decimal("1973.15")
+        and obs.point_conditions.get("time_min") is not None
+        and obs.point_conditions["time_min"].state.value == Decimal("16.7")
+    }
+    assert row_cells == {
+        "SiO2": Decimal("39.09"),
+        "Al2O3": Decimal("3.57"),
+        "FeO": Decimal("27.92"),
+        "MgO": Decimal("26.32"),
+        "CaO": Decimal("3.09"),
+    }
+    for obs in hashimoto_rows:
+        assert obs.derivation is not None
+        assert obs.derivation.output_unit == "wt % (100% normalized) as published"
+        assert obs.locator is not None
+        assert {"temperature_K", "time_min"} <= set(obs.point_conditions or {})
+    hashimoto_start = next(
+        obs
+        for obs in hashimoto_rows
+        if obs.identity.species.formula == "SiO2"
+        and "row=c3-(2)" in obs.observation_id
+        and obs.point_conditions is not None
+        and obs.point_conditions["temperature_K"].state.value == Decimal("1973.15")
+        and obs.point_conditions["time_min"].state.value == Decimal("16.7")
+    )
+    assert {
+        "temperature_K",
+        "time_min",
+        "starting_composition",
+        "atmosphere",
+        "fO2_control",
+        "pressure_on_throw_Torr",
+    } <= set(hashimoto_start.point_conditions or {})
+    assert hashimoto_start.point_conditions["starting_composition"].state.value == {
+        "SiO2": "35.43",
+        "Al2O3": "3.16",
+        "FeO": "35.04",
+        "MgO": "23.84",
+        "CaO": "2.53",
+    }
+    assert hashimoto_start.point_conditions["fO2_control"].state.value == "none"
+    assert "vacuum runs" in hashimoto_start.point_conditions["atmosphere"].state.value
+    pressure = hashimoto_start.point_conditions["pressure_on_throw_Torr"].state.value
+    assert pressure["value"] == "0.00015"
+    assert pressure["units"] == "Torr"
+    assert pressure["kind"] == "about_nominal_by_temperature"

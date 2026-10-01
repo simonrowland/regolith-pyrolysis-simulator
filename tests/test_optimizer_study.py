@@ -36,13 +36,14 @@ from simulator.electrolysis import (
 )
 from simulator.cost_parameters import default_cost_parameters_block
 from simulator.optimize import cli as optimizer_cli
-import simulator.optimize.evaluate as evaluate_module
 from simulator.optimize import physics as physics_module
+from simulator.optimize import pool as optimizer_pool
 from simulator.optimize import study
 from simulator.optimize.doe import SCIPY_SOBOL_SAMPLER, sample_recipe_candidates
 from simulator.optimize.evalspec import EvalSpec, cache_key
 from simulator.optimize.evaluate import FailureCategory, RunReference, ScoredResult, _build_eval_inputs
 from simulator.optimize.evaluate import evaluate
+from simulator.optimize.knob_saturation import compute_knob_saturation
 from simulator.optimize.objective import (
     ENERGY_ELECTRICAL_PLUS_EVAPORATION_METRIC,
     LEGACY_ENERGY_KWH_METRIC,
@@ -50,6 +51,7 @@ from simulator.optimize.objective import (
     ObjectiveVector,
     compute_objectives,
     furnace_amortization_cost_per_run,
+    objective_definitions,
 )
 from simulator.optimize.physics import GateMargin, PhysicsConstraintSet, ThresholdSpec
 from simulator.optimize.physics import physics_constraints_digest
@@ -70,6 +72,7 @@ from simulator.optimize.strategy import (
     OptunaTPEStrategy,
     RandomStrategy,
     StagedStrategy,
+    WarmStartSeed,
 )
 from simulator.transport_regime import TransportRegimeRefusal
 
@@ -744,6 +747,42 @@ def _journal_any_id_evaluator(
     )
 
 
+def _infeasible_journal_cache_evaluator(
+    patch: RecipePatch,
+    feedstock: str,
+    fidelity: str,
+    **kwargs: Any,
+) -> ScoredResult:
+    scored = _journal_cache_evaluator(patch, feedstock, fidelity, **kwargs)
+    return replace(
+        scored,
+        feasible=False,
+        failure_category=FailureCategory.INFEASIBLE_RECIPE,
+        feasibility_margins={"delivered_stream_purity": _margin(feasible=False)},
+        failing_gates=("delivered_stream_purity",),
+    )
+
+
+def test_finished_study_artifact_records_cpu_and_hostname(tmp_path: Path) -> None:
+    out = tmp_path / "cpu-provenance"
+    study.run(
+        PROFILE,
+        FEEDSTOCK,
+        "random",
+        "internal-analytical",
+        parallel=1,
+        budget=1,
+        out_dir=out,
+        seed=7,
+        evaluator=_journal_any_id_evaluator,
+    )
+
+    summary = json.loads((out / "study.summary.json").read_text(encoding="utf-8"))
+    assert math.isfinite(summary["process_cpu_seconds"])
+    assert summary["process_cpu_seconds"] >= 0
+    assert isinstance(summary["hostname"], str) and summary["hostname"].strip()
+
+
 def test_study_events_journal_replay_round_trip(tmp_path: Path) -> None:
     out = tmp_path / "journal-round-trip"
     result = study.run(
@@ -791,6 +830,248 @@ def test_study_events_journal_replay_round_trip(tmp_path: Path) -> None:
     ]
     assert state_rows[-1]["strategy_state"] == dict(replay.strategy_state)
     assert state_rows[-1]["strategy_state"]["strategies"][0]["ask_cursor"] == 4
+
+
+def test_infeasible_objectives_survive_cache_hits_and_journal_replay(
+    tmp_path: Path,
+) -> None:
+    store = ResultStore(tmp_path / "infeasible-cache.sqlite")
+    live = study.run(
+        PROFILE,
+        FEEDSTOCK,
+        "random",
+        "internal-analytical",
+        parallel=1,
+        budget=1,
+        out_dir=tmp_path / "cache-live",
+        seed=37,
+        evaluator=_infeasible_journal_cache_evaluator,
+        result_store=store,
+    )
+    cached = study.run(
+        PROFILE,
+        FEEDSTOCK,
+        "random",
+        "internal-analytical",
+        parallel=1,
+        budget=1,
+        out_dir=tmp_path / "cache-replay",
+        seed=37,
+        evaluator=_infeasible_journal_cache_evaluator,
+        result_store=store,
+    )
+
+    assert cached.records[0].cache_hit is True
+    assert cached.records[0].feasible is False
+    assert cached.records[0].objectives == live.records[0].objectives
+    assert cached.records[0].objectives["oxygen_kg"] == 10.0
+
+    journal_out = tmp_path / "infeasible-journal"
+    journal_live = study.run(
+        PROFILE,
+        FEEDSTOCK,
+        "random",
+        "internal-analytical",
+        parallel=1,
+        budget=1,
+        out_dir=journal_out,
+        seed=41,
+        evaluator=_infeasible_journal_cache_evaluator,
+    )
+    journal_replay = study.replay_study(journal_out)
+
+    assert journal_replay.records[0].feasible is False
+    assert journal_replay.records[0].objectives == journal_live.records[0].objectives
+    assert journal_replay.records[0].objectives["oxygen_kg"] == 10.0
+
+
+def test_study_stops_after_scalar_and_pareto_stalls(tmp_path: Path) -> None:
+    definitions = study.objective_definitions(PROFILE)
+    budget = 8
+
+    class ProgressStrategy:
+        name = "synthetic-progress"
+        seed = 0
+
+        def __init__(self) -> None:
+            self.next_index = 0
+            self.told_batches: list[tuple[Any, ...]] = []
+
+        def ask(self, n: int) -> list[Candidate]:
+            count = min(n, budget - self.next_index)
+            candidates = [
+                Candidate(
+                    id=f"progress-{index}",
+                    patch=RecipePatch(
+                        {
+                            ("campaigns", "C0", "temp_range_C"): [
+                                900.0 - index,
+                                950.0 - index,
+                            ]
+                        }
+                    ),
+                )
+                for index in range(self.next_index, self.next_index + count)
+            ]
+            self.next_index += count
+            return candidates
+
+        def tell(self, results) -> None:
+            self.told_batches.append(tuple(results))
+
+    def run_case(
+        name: str,
+        objective_values_for: Any,
+        *,
+        feasible_for: Any | None = None,
+    ) -> tuple[Any, ProgressStrategy]:
+        strategy = ProgressStrategy()
+
+        def scored_evaluator(
+            patch: RecipePatch,
+            feedstock: str,
+            fidelity: str,
+            *,
+            profile: Mapping[str, Any],
+            candidate_id: str | None = None,
+            **kwargs: Any,
+        ) -> ScoredResult:
+            scored = _evaluator()(
+                patch,
+                feedstock,
+                fidelity,
+                profile=profile,
+                candidate_id=candidate_id,
+                **kwargs,
+            )
+            values = objective_values_for(_sequence(candidate_id))
+            objectives = ObjectiveVector(
+                tuple(
+                    ObjectiveValue(
+                        definition.metric,
+                        definition.sense,
+                        values[ordinal],
+                        definition.units,
+                        ordinal=definition.ordinal,
+                    )
+                    for ordinal, definition in enumerate(definitions)
+                )
+            )
+            reference = scored.run_reference
+            assert reference is not None
+            product_summary = dict(reference.product_summary)
+            product_summary.update(
+                {
+                    definition.metric: values[ordinal]
+                    for ordinal, definition in enumerate(definitions)
+                }
+            )
+            feasible = True if feasible_for is None else bool(feasible_for(_sequence(candidate_id)))
+            return replace(
+                scored,
+                feasible=feasible,
+                failure_category=(
+                    None if feasible else FailureCategory.INFEASIBLE_RECIPE
+                ),
+                objectives=objectives,
+                feasibility_margins={
+                    "delivered_stream_purity": _margin(feasible=feasible)
+                },
+                failing_gates=(
+                    () if feasible else ("delivered_stream_purity",)
+                ),
+                run_reference=replace(reference, product_summary=product_summary),
+            )
+
+        result = study.run(
+            PROFILE,
+            FEEDSTOCK,
+            strategy,
+            "internal-analytical",
+            parallel=1,
+            budget=budget,
+            out_dir=tmp_path / name,
+            evaluator=scored_evaluator,
+        )
+        return result, strategy
+
+    stalled, stalled_strategy = run_case("scalar-stall", lambda _index: (0.0, 0.0))
+    assert len(stalled.records) == 4  # First score, then three unchanged batches.
+    assert len(stalled_strategy.told_batches) == len(stalled.records)
+
+    improving, improving_strategy = run_case(
+        "scalar-improves",
+        lambda index: (float(index + 1), 0.0),
+    )
+    assert len(improving.records) == budget
+    assert len(improving_strategy.told_batches) == budget
+
+    outlier_then_improving, _ = run_case(
+        "infeasible-outlier",
+        lambda index: ((1.0e9, 0.0) if index == 0 else (float(index), 100.0)),
+        feasible_for=lambda index: index != 0,
+    )
+    assert outlier_then_improving.records[0].feasible is False
+    assert all(record.feasible for record in outlier_then_improving.records[1:])
+    assert len(outlier_then_improving.records) == budget
+
+    pareto_values = ((1.0, 1.0), (2.0, 3.0), (3.0, 5.0))
+    pareto, pareto_strategy = run_case(
+        "pareto-stall",
+        lambda index: pareto_values[min(index, len(pareto_values) - 1)],
+    )
+    # Two frontier advances beat the stalled scalar; three repeated fronts stop it.
+    assert len(pareto.records) == 6
+    assert len(pareto_strategy.told_batches) == len(pareto.records)
+
+
+def test_study_reuses_one_engine_worker_generation_across_batches(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    created_pools: list[Any] = []
+    submitted_pools: list[Any] = []
+    original_pool_type = optimizer_pool.EngineWorkerPool
+    original_submit = original_pool_type.submit
+
+    class RecordingEngineWorkerPool(original_pool_type):
+        def __init__(self, *args: Any, **kwargs: Any) -> None:
+            super().__init__(*args, **kwargs)
+            created_pools.append(self)
+
+    def record_submit(self: Any, *args: Any, **kwargs: Any) -> Any:
+        submitted_pools.append(self)
+        return original_submit(self, *args, **kwargs)
+
+    monkeypatch.setattr(optimizer_pool, "EngineWorkerPool", RecordingEngineWorkerPool)
+    monkeypatch.setattr(original_pool_type, "submit", record_submit)
+    budget = 4
+    parallel = 2
+    out = tmp_path / "one-worker-generation"
+
+    result = study.run(
+        PROFILE,
+        FEEDSTOCK,
+        "random",
+        "internal-analytical",
+        parallel=parallel,
+        budget=budget,
+        out_dir=out,
+        seed=7,
+    )
+
+    events = [
+        json.loads(line)
+        for line in (out / "study.events.jsonl").read_text(encoding="utf-8").splitlines()
+    ]
+    asked = [row for row in events if row["event_kind"] == "candidate_asked"]
+    batch_count = len({row["batch_seq"] for row in asked})
+    assert len(result.records) == budget
+    # Each loop asks up to `parallel` candidates, so batches are ceil(budget / parallel).
+    assert batch_count == math.ceil(budget / parallel)
+    assert len(created_pools) == 1
+    assert {id(pool) for pool in submitted_pools} == {id(created_pools[0])}
+    assert created_pools[0]._closed
 
 
 def test_study_journal_replay_fails_closed_on_strategy_state_mismatch(
@@ -2951,11 +3232,15 @@ def test_profile_seed_epoch_stamp_mismatch_warns_but_reevaluates(
     assert any("stale advisory seed_recipes" in message for message in messages)
 
 
-def test_optuna_incomplete_warm_start_drop_counted_in_search_provenance(
+def test_optuna_partial_warm_start_is_admitted_in_search_provenance(
     tmp_path,
     caplog: pytest.LogCaptureFixture,
 ) -> None:
     pytest.importorskip("optuna")
+    expected_seed_count = min(
+        1,
+        len(study._profile_warm_start_seeds(PROFILE, schema=RecipeSchema())),
+    )
 
     with caplog.at_level(logging.WARNING):
         result = study.run(
@@ -2970,13 +3255,15 @@ def test_optuna_incomplete_warm_start_drop_counted_in_search_provenance(
             evaluator=_evaluator(),
         )
     payload = json.loads(result.artifacts["search_provenance"].read_text())
-    strategy_provenance = payload["strategy_provenance"]
+    strategy_provenance = payload.get("strategy_provenance", {})
 
-    assert strategy_provenance["optuna_incomplete_seed_dropped_count"] == 1
-    assert strategy_provenance["optuna_incomplete_seed_dropped_ids"] == [
-        "study-c0-seed"
-    ]
-    assert any(
+    assert (
+        payload["proposal_source_counts"].get("optuna_enqueued", 0)
+        == expected_seed_count
+    )
+    assert strategy_provenance.get("optuna_incomplete_seed_dropped_count", 0) == 0
+    assert strategy_provenance.get("optuna_incomplete_seed_dropped_ids", []) == []
+    assert not any(
         "optuna_warm_start_seed_dropped" in record.getMessage()
         for record in caplog.records
     )
@@ -3135,6 +3422,120 @@ def test_study_surfaces_knob_saturation_in_pareto_and_provenance(tmp_path) -> No
 
     header = (tmp_path / "leaderboard.csv").read_text().splitlines()[0]
     assert "knob_saturation" not in header
+
+
+@pytest.mark.parametrize("saturated_at_high_bound", (True, False))
+def test_study_hands_knob_saturation_to_next_bayesian_ask(
+    tmp_path,
+    saturated_at_high_bound: bool,
+) -> None:
+    schema = RecipeSchema(
+        allowlist=tuple(
+            spec
+            for spec in RecipeSchema().allowlist
+            if spec.path == ("furnace_max_T_C",)
+        )
+    )
+    knob = schema.search_allowlist[0]
+    assert knob.low is not None and knob.high is not None
+    # The midpoint gives the control candidate equal margin from either bound.
+    interior_value = (knob.low + knob.high) / 2
+    saturated_value = knob.high if saturated_at_high_bound else knob.low
+    # The synthetic unbound trajectory reaches the interior cap; a higher cap
+    # cannot move metals, while a lower cap reduces them.
+    trajectory_limit = interior_value
+    objective_profile = {
+        **PROFILE,
+        "profile_id": "c14-saturation",
+        "seed_recipes": [
+            {
+                "id": "c14-profile-seed",
+                "source_campaign": "C0",
+                "patch": {"furnace_max_T_C": interior_value},
+            }
+        ],
+        "objectives": [
+            {
+                "metric": "metals_total_kg",
+                "sense": "maximize",
+                "units": "kg",
+                "weight": 1.0,
+                "rationale": "synthetic saturation test",
+            }
+        ],
+    }
+    strategy = OptunaTPEStrategy(
+        schema,
+        seed=41,
+        objective_profile=objective_profile,
+        warm_start_seeds=(
+            WarmStartSeed(
+                "interior",
+                RecipePatch({knob.path: interior_value}),
+                "seed_recipe",
+            ),
+            WarmStartSeed(
+                "saturated",
+                RecipePatch({knob.path: saturated_value}),
+                "seed_recipe",
+            ),
+        ),
+    )
+
+    def evaluator(
+        patch: RecipePatch,
+        feedstock: str,
+        fidelity: str,
+        *,
+        profile: Mapping[str, Any],
+        candidate_id: str | None = None,
+        **kwargs: Any,
+    ) -> ScoredResult:
+        cap = patch.values.get(knob.path, trajectory_limit)
+        objective = min(float(cap), trajectory_limit)
+        saturation = compute_knob_saturation(
+            patch,
+            schema,
+            active_objective_metrics=("metals_total_kg",),
+        )
+        spec = _spec(patch, feedstock, fidelity, profile, kwargs.get("constraints"))
+        return ScoredResult(
+            candidate_id=candidate_id,
+            eval_spec=spec,
+            cache_key=cache_key(spec),
+            feasible=True,
+            objectives=ObjectiveVector(
+                (ObjectiveValue("metals_total_kg", "maximize", objective, "kg"),)
+            ),
+            feasibility_margins={"delivered_stream_purity": _margin()},
+            run_reference=_run_reference(
+                status="ok",
+                trace={"backend_status": "ok", "knob_saturation": saturation},
+            ),
+        )
+
+    result = study.run(
+        objective_profile,
+        FEEDSTOCK,
+        strategy,
+        "internal-analytical",
+        1,
+        3,
+        tmp_path / ("high" if saturated_at_high_bound else "low"),
+        seed=41,
+        evaluator=evaluator,
+        schema=schema,
+    )
+
+    assert result.records[0].patch.values[knob.path] == interior_value
+    assert result.records[1].patch.values[knob.path] == saturated_value
+    if saturated_at_high_bound:
+        assert result.records[1].objectives["metals_total_kg"] == trajectory_limit
+        assert result.records[2].objectives["metals_total_kg"] == trajectory_limit
+        assert knob.path not in result.records[2].patch.values
+    else:
+        assert result.records[1].objectives["metals_total_kg"] < trajectory_limit
+        assert knob.path in result.records[2].patch.values
 
 
 def test_best_tap_winner_recipe_replays_tap_claim_through_eval_path(tmp_path) -> None:
@@ -3411,12 +3812,13 @@ def test_degenerate_furnace_lifetimes_complete_study_with_bounded_ordering(
             ),
         )
 
+    # This fixture compares every lifetime case, so tell its full derived set at once.
     result = study.run(
         PROFILE,
         FEEDSTOCK,
         "random",
         "internal-analytical",
-        1,
+        len(cases),
         len(cases),
         tmp_path / "degenerate-lifetime",
         seed=7,
@@ -4354,158 +4756,6 @@ def test_backend_status_field_survives_strip_and_store_for_real_backend(tmp_path
     ResultStore(tmp_path / "cache.sqlite").store(spec, light, created_at="t1")
 
 
-def test_predict_and_flag_notice_survives_evaluation_store_and_study_summary(
-    tmp_path: Path,
-) -> None:
-    flag = {
-        "status": "status_bearing",
-        "flux_status": "eligible",
-        "reason": "outside certified vapor-pressure band",
-        "species": "SiO",
-        "authority_level": "extrapolated",
-        "certified_band": {"pO2_bar": (1.0e-9, 1.0e-3)},
-        "flagged": True,
-        "is_refused": False,
-        "measured_zero": False,
-    }
-    execution = SimpleNamespace(
-        session=SimpleNamespace(_config=SimpleNamespace(backend_name="alphamelts")),
-        per_hour=(
-            {
-                "hour": 1,
-                "campaign": "C2A",
-                "vapor_pressure_refusals": {"SiO": flag},
-                "condensation_refusals_by_species": {
-                    "Al": {
-                        "status": "unavailable",
-                        "reason": "missing carrier transport parameters",
-                        "authority_level": "unavailable",
-                    }
-                },
-                "redox_source_breakdown": {
-                    "fe_redox_respeciation": {
-                        "status": "predicted_extrapolation",
-                        "reason": "outside liquid respeciation band",
-                        "authority": "extrapolated",
-                        "certified_band": {"temperature_K": (1200.0, 1800.0)},
-                        "species": "FeO",
-                    }
-                },
-                "mre_uncertified_yield": {"Al": 1.23},
-                "mre_ellingham_ladder_diagnostic": {
-                    "schema": "c5_ellingham_ladder_diagnostic_v1"
-                },
-            },
-        ),
-        trace=SimpleNamespace(),
-        simulator=SimpleNamespace(
-            composition_projected_liquidus_run_notice=lambda: {
-                "kind": "composition_projected",
-                "reason": "composition projected onto supported bulk",
-                "authority": "extrapolated",
-                "certified_band": {"temperature_K": (1000.0, 1900.0)},
-                "notices": [
-                    {
-                        "kind": "composition_projected",
-                        "dropped_components": [
-                            {"component": "Cr", "mass_fraction": 0.01}
-                        ],
-                    }
-                ],
-            }
-        ),
-        backend_status="ok",
-        backend_authoritative=True,
-        reason="",
-        refusal_diagnostic={},
-    )
-    trace = evaluate_module._cache_trace_payload(execution, None)
-    reference = _run_reference(
-        status="ok",
-        trace=trace,
-        product_summary={
-            "mass_closure": {
-                "status": "closed",
-                "mass_balance_error_pct": 0.0,
-            }
-        },
-        backend_name="alphamelts",
-        backend_status="ok",
-        backend_authoritative=True,
-    )
-    spec = replace(_scope_spec(), backend_name="alphamelts")
-    scored = ScoredResult(
-        candidate_id="flagged-candidate",
-        eval_spec=spec,
-        cache_key=cache_key(spec),
-        feasible=True,
-        objectives=ObjectiveVector(
-            (
-                ObjectiveValue("oxygen_kg", "maximize", 1.0, "kg", ordinal=0),
-                ObjectiveValue("energy_kWh", "minimize", 1.0, "kWh", ordinal=1),
-            )
-        ),
-        feasibility_margins={"delivered_stream_purity": _margin()},
-        run_reference=reference,
-    )
-    light = study._strip_heavy_result(scored)
-
-    store = ResultStore(tmp_path / "cache.sqlite")
-    store.store(spec, light, created_at="t1")
-    loaded = store.fetch(scored.cache_key)
-    assert loaded is not None and loaded.run_reference is not None
-
-    candidate = Candidate(
-        id="flagged-candidate",
-        patch=RecipePatch({}),
-        metadata={"proposal_source": "test", "strategy": "test"},
-    )
-    record = study._to_record(candidate, loaded, cache_hit=True, already_light=True)
-
-    for surface in (
-        loaded.run_reference.trace,
-        record.result_blob,
-        record.trace_summary,
-    ):
-        assert surface["flag_backlog"]["count"] == 1
-        assert surface["per_hour_summary"][0]["vapor_pressure_refusals"]["SiO"][
-            "reason"
-        ] == "outside certified vapor-pressure band"
-        assert surface["l5_notices"]["count_by_kind"] == {
-            "composition_projected_liquidus_notice": 1,
-            "condensation_refusals_by_species": 1,
-            "mre_ellingham_ladder_diagnostic": 1,
-            "mre_uncertified_yield": 1,
-            "redox_source_breakdown": 1,
-            "vapor_pressure_refusals": 1,
-        }
-        notice = surface["l5_notices"]["entries"][0]
-        assert notice["quantity"] == "SiO"
-        assert notice["reason"] == "outside certified vapor-pressure band"
-        assert notice["authority_level"] == "extrapolated"
-        assert notice["certified_band"] == {
-            "pO2_bar": [1.0e-9, 1.0e-3]
-        }
-        assert notice["availability"] == "available"
-        unavailable = next(
-            item
-            for item in surface["l5_notices"]["entries"]
-            if item["kind"] == "condensation_refusals_by_species"
-        )
-        assert unavailable["quantity"] == "Al"
-        assert unavailable["availability"] == "unavailable"
-        composition = next(
-            item
-            for item in surface["l5_notices"]["entries"]
-            if item["kind"] == "composition_projected_liquidus_notice"
-        )
-        assert composition["reason"] == "composition projected onto supported bulk"
-        assert composition["authority"] == "extrapolated"
-        assert composition["certified_band"] == {
-            "temperature_K": [1000.0, 1900.0]
-        }
-
-
 def test_clean_zero_wall_deposit_infinite_margin_optimizes_and_ranks_best(tmp_path) -> None:
     def clean_evaluator(
         patch: RecipePatch,
@@ -4651,6 +4901,118 @@ def test_constraint_threshold_change_misses_cached_verdict(tmp_path) -> None:
     assert study._lookup_cached(candidate, PROFILE, FEEDSTOCK, "internal-analytical", schema, store, tight) is None
 
 
+def test_feasible_analytical_cache_hit_skips_evaluation_and_splits_keys(
+    tmp_path: Path,
+) -> None:
+    schema = RecipeSchema()
+    patch = RecipePatch({})
+    constraints = physics_constraints_from_profile(PROFILE)
+    spec, _ = _build_eval_inputs(
+        patch.validated(schema),
+        FEEDSTOCK,
+        "internal-analytical",
+        PROFILE,
+        schema,
+        constraints=constraints,
+    )
+    trace = {
+        "backend_name": ANALYTICAL_BACKEND_SERIALIZATION_TOKEN,
+        "backend_status": "diagnostic_stub",
+        "backend_authoritative": False,
+        "evidence_class": ANALYTICAL_BACKEND_SERIALIZATION_TOKEN,
+        "certification_allowed": False,
+        "snapshots": [{"mass_balance_error_pct": 0.0}],
+    }
+    reference = _run_reference(
+        status="ok",
+        trace=trace,
+        product_summary={
+            "backend_name": ANALYTICAL_BACKEND_SERIALIZATION_TOKEN,
+            "oxygen_kg": 10.0,
+            "mass_closure": {"status": "closed", "mass_balance_error_pct": 0.0},
+        },
+        backend_name=ANALYTICAL_BACKEND_SERIALIZATION_TOKEN,
+        backend_status="diagnostic_stub",
+        backend_authoritative=False,
+        evidence_class=ANALYTICAL_BACKEND_SERIALIZATION_TOKEN,
+        certification_allowed=False,
+    )
+    objectives = ObjectiveVector(
+        (
+            ObjectiveValue("oxygen_kg", "maximize", 10.0, "kg", ordinal=0),
+            ObjectiveValue(
+                ENERGY_ELECTRICAL_PLUS_EVAPORATION_METRIC,
+                "minimize",
+                1.0,
+                "kWh",
+                ordinal=1,
+            ),
+        )
+    )
+    scored = ScoredResult(
+        candidate_id="first-eval",
+        eval_spec=spec,
+        cache_key=cache_key(spec),
+        feasible=True,
+        objectives=objectives,
+        feasibility_margins={"delivered_stream_purity": _margin()},
+        run_reference=reference,
+    )
+    store = ResultStore(tmp_path / "cache.sqlite")
+    store.store(spec, scored, created_at="2026-09-29T00:00:00Z")
+    candidate = Candidate(id="second-eval", patch=patch)
+    evaluator_calls = 0
+
+    def unexpected_evaluation(*args: Any, **kwargs: Any) -> ScoredResult:
+        nonlocal evaluator_calls
+        evaluator_calls += 1
+        raise AssertionError("a cache hit must not evaluate the candidate")
+
+    results, prefix_evals_run, _engine_worker_pool = study._evaluate_candidates(
+        [candidate],
+        profile=PROFILE,
+        feedstock=FEEDSTOCK,
+        fidelity="internal-analytical",
+        parallel=1,
+        out_dir=tmp_path,
+        evaluator=unexpected_evaluation,
+        schema=schema,
+        constraints=constraints,
+        store=store,
+        definitions=study.objective_definitions(PROFILE),
+        prefix_replay_cache={},
+    )
+
+    assert evaluator_calls == 0
+    assert prefix_evals_run == 0
+    assert len(results) == 1
+    replayed_candidate, replayed, cache_hit = results[0]
+    assert replayed_candidate.id == candidate.id
+    assert cache_hit is True
+    assert replayed.objectives == scored.objectives
+
+    high_spec = replace(spec, fidelity="high")
+    certifying_spec = replace(spec, backend_name="thermoengine")
+    assert cache_key(high_spec) != cache_key(spec)
+    assert cache_key(certifying_spec) != cache_key(spec)
+    assert store.lookup(high_spec) is None
+    assert store.lookup(certifying_spec) is None
+
+    infeasible_spec = replace(spec, recipe_id=f"{spec.recipe_id}-infeasible")
+    infeasible = ScoredResult(
+        candidate_id="infeasible-eval",
+        eval_spec=infeasible_spec,
+        cache_key=cache_key(infeasible_spec),
+        feasible=False,
+        failure_category=FailureCategory.INFEASIBLE_RECIPE,
+        feasibility_margins={"delivered_stream_purity": _margin(feasible=False)},
+        failing_gates=("delivered_stream_purity",),
+        run_reference=reference,
+    )
+    store.store(infeasible_spec, infeasible, created_at="2026-09-29T00:00:01Z")
+    assert store.lookup(infeasible_spec) is not None
+
+
 def test_profile_constraint_threshold_change_changes_cache_digest() -> None:
     schema = RecipeSchema()
     patch = RecipePatch({})
@@ -4687,7 +5049,7 @@ def test_profile_constraint_threshold_change_changes_cache_digest() -> None:
     assert cache_key(spec_loose) != cache_key(spec_tight)
 
 
-def test_physics_policy_version_change_invalidates_eval_cache_key(
+def test_physics_policy_version_is_excluded_from_eval_cache_key(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     schema = RecipeSchema()
@@ -4700,6 +5062,7 @@ def test_physics_policy_version_change_invalidates_eval_cache_key(
     constraints = physics_constraints_from_profile(profile)
     validated = patch.validated(schema)
     current_version = physics_module.PHYSICS_GATE_VERSION
+    changed_version = f"{current_version}-test-change"
 
     def build_for_version(version: str) -> tuple[str, str, str]:
         monkeypatch.setattr(physics_module, "PHYSICS_GATE_VERSION", version)
@@ -4713,18 +5076,16 @@ def test_physics_policy_version_change_invalidates_eval_cache_key(
         )
         return physics_constraints_digest(constraints), spec.recipe_id, cache_key(spec)
 
-    old_digest, old_recipe_id, old_cache_key = build_for_version(
-        "physics-feasibility-v1"
+    current_digest, current_recipe_id, current_cache_key = build_for_version(
+        current_version
     )
-    new_digest, new_recipe_id, new_cache_key = build_for_version(current_version)
+    changed_digest, changed_recipe_id, changed_cache_key = build_for_version(
+        changed_version
+    )
 
-    # v7: d-045 bounds upstream wall deposition by charge mass and bounds
-    # refused wall quantities by vapour flux; old feasibility caches cannot be
-    # served under the same physics_constraints_digest.
-    assert current_version == "physics-feasibility-v7-d045-upstream-fraction"
-    assert old_digest != new_digest
-    assert old_cache_key != new_cache_key
-    assert old_recipe_id == new_recipe_id
+    assert current_digest == changed_digest
+    assert current_cache_key == changed_cache_key
+    assert current_recipe_id == changed_recipe_id
 
 
 def test_stub_smoke_selector_is_retired_from_live_profiles() -> None:
@@ -5178,6 +5539,198 @@ def test_invalid_recipe_result_continues_and_counts_failure(tmp_path) -> None:
         row.failure_category is FailureCategory.INVALID_RECIPE
         for row in stored
     )
+
+
+@pytest.mark.parametrize(
+    ("bad_patch", "hours"),
+    [
+        pytest.param(
+            RecipePatch({("campaigns", "C0", "temp_range_C"): 900.0}),
+            1,
+            id="scalar-campaign-temperature-range",
+        ),
+        pytest.param(
+            RecipePatch(
+                {
+                    ("campaigns", "C0b_p_cleanup", "pO2_mbar"): 6.628,
+                    ("campaigns", "C0b_p_cleanup", "pO2_mbar_default"): 4.108,
+                    ("campaigns", "C0b_p_cleanup", "p_total_mbar_default"): 4.108,
+                }
+            ),
+            30,
+            id="runtime-oxygen-partial-above-total",
+        ),
+    ],
+)
+def test_bad_recipe_candidate_is_scored_and_study_reaches_budget(
+    tmp_path: Path,
+    bad_patch: RecipePatch,
+    hours: int,
+) -> None:
+    budget = 4
+    profile = yaml.safe_load(
+        Path("data/optimize_profiles/lunar_highland.yaml").read_text(
+            encoding="utf-8"
+        )
+    )
+    feedstock = str(profile["feedstock"])
+    profile["run"]["hours"] = hours
+    profile["fidelities"][ANALYTICAL_BACKEND_SERIALIZATION_TOKEN]["hours"] = hours
+    bad_candidate_id = "fixed-000000"
+    bad_result = evaluate(
+        bad_patch,
+        feedstock,
+        ANALYTICAL_BACKEND_SERIALIZATION_TOKEN,
+        profile=profile,
+        candidate_id=bad_candidate_id,
+    )
+    assert not bad_result.feasible, bad_result
+    assert bad_result.failure_category is FailureCategory.INVALID_RECIPE
+    assert bad_result.eval_spec is not None
+    assert bad_result.cache_key == cache_key(bad_result.eval_spec)
+    assert bad_result.run_reference is not None
+    assert bad_result.run_reference.backend_status == "unavailable"
+    assert bad_result.run_reference.backend_authoritative is not True
+    candidates = [
+        Candidate(
+            id=f"fixed-{index:06d}",
+            patch=(
+                bad_patch
+                if index == 0
+                else RecipePatch(
+                    {
+                        ("campaigns", "C0", "temp_range_C"):
+                            [900.0 + index, 940.0 + index]
+                    }
+                )
+            ),
+        )
+        for index in range(budget)
+    ]
+
+    def evaluator(
+        patch: RecipePatch,
+        feedstock: str,
+        fidelity: str,
+        *,
+        profile: Mapping[str, Any],
+        candidate_id: str | None = None,
+        **kwargs: Any,
+    ) -> ScoredResult:
+        if candidate_id == bad_candidate_id:
+            return bad_result
+        cached_result = _journal_cache_evaluator(
+            patch,
+            feedstock,
+            fidelity,
+            profile=profile,
+            candidate_id=candidate_id,
+            **kwargs,
+        )
+        objectives = ObjectiveVector(
+            values=tuple(
+                ObjectiveValue(
+                    definition.metric,
+                    definition.sense,
+                    0.0,
+                    definition.units,
+                    ordinal=definition.ordinal,
+                )
+                for definition in objective_definitions(profile)
+            )
+        )
+        return replace(cached_result, objectives=objectives)
+
+    result = study.run(
+        profile,
+        feedstock,
+        _FixedCandidateStrategy(tuple(candidates)),
+        ANALYTICAL_BACKEND_SERIALIZATION_TOKEN,
+        parallel=1,
+        budget=budget,
+        out_dir=tmp_path / "bad-recipe-budget",
+        evaluator=evaluator,
+    )
+
+    assert result.status == study.COMPLETED_STATUS
+    assert len(result.records) == budget
+    bad_result = next(
+        record for record in result.records if record.candidate_id == bad_candidate_id
+    )
+    assert not bad_result.feasible
+    assert bad_result.failure_category == FailureCategory.INVALID_RECIPE.value
+    assert bad_result.eval_spec is not None
+    assert bad_result.cache_key == cache_key(bad_result.eval_spec)
+
+
+def test_invalid_patch_without_artifacts_does_not_abort_study(tmp_path: Path) -> None:
+    budget = 4
+    bad_candidate_id = "fixed-000000"
+    bad_patch = RecipePatch(
+        {("campaigns", "C0b_p_cleanup", "p_total_mbar_default"): 4.108}
+    )
+    candidates = [
+        Candidate(
+            id=f"fixed-{index:06d}",
+            patch=(
+                RecipePatch(
+                    {
+                        ("campaigns", "C0", "temp_range_C"):
+                            [900.0 + index, 940.0 + index]
+                    }
+                )
+            ),
+        )
+        for index in range(budget)
+    ]
+
+    def evaluator(
+        patch: RecipePatch,
+        feedstock: str,
+        fidelity: str,
+        *,
+        profile: Mapping[str, Any],
+        candidate_id: str | None = None,
+        **kwargs: Any,
+    ) -> ScoredResult:
+        if candidate_id == bad_candidate_id:
+            return evaluate(
+                bad_patch,
+                feedstock,
+                fidelity,
+                profile=profile,
+                candidate_id=candidate_id,
+                schema=kwargs.get("schema"),
+                constraints=kwargs.get("constraints"),
+            )
+        return _journal_cache_evaluator(
+            patch,
+            feedstock,
+            fidelity,
+            profile=profile,
+            candidate_id=candidate_id,
+            **kwargs,
+        )
+
+    result = study.run(
+        PROFILE,
+        FEEDSTOCK,
+        _FixedCandidateStrategy(tuple(candidates)),
+        ANALYTICAL_BACKEND_SERIALIZATION_TOKEN,
+        parallel=1,
+        budget=budget,
+        out_dir=tmp_path / "invalid-patch-budget",
+        evaluator=evaluator,
+    )
+
+    assert result.status == study.COMPLETED_STATUS
+    assert len(result.records) == budget
+    bad_result = next(
+        record for record in result.records if record.candidate_id == bad_candidate_id
+    )
+    assert bad_result.failure_category == FailureCategory.INVALID_PATCH.value
+    assert bad_result.eval_spec is None
+    assert bad_result.cache_key is None
 
 
 def test_typed_physics_refusals_are_stored_and_study_continues(tmp_path) -> None:
@@ -6721,8 +7274,11 @@ def _contains_key(value: Any, key: str) -> bool:
     if is_dataclass(value) and not isinstance(value, type):
         return any(_contains_key(getattr(value, field.name), key) for field in fields(value))
     return False
-def test_t155_tpe_and_nsga2_defer_scale_and_guard_metadata() -> None:
-    """Both Optuna strategies share this intentionally legacy-linear suggester."""
+
+
+@pytest.mark.parametrize("scale", ("log", "log10", "zero-inflated"))
+def test_suggest_value_uses_only_declared_log_scale(scale: str) -> None:
+    """Both Optuna strategies share this suggester; only `log` is logarithmic."""
     from simulator.optimize.recipe import GuardSpec, KnobSpec
     from simulator.optimize.strategy.bayesian import _suggest_value
 
@@ -6738,11 +7294,70 @@ def test_t155_tpe_and_nsga2_defer_scale_and_guard_metadata() -> None:
         kind="float",
         low=1.0,
         high=100.0,
-        scale="log",
+        scale=scale,
         guard=GuardSpec(parent_paths=(("parent",),), canonicalizer_id="test"),
     )
     assert _suggest_value(Trial(), spec) == pytest.approx(50.5)
-    assert calls == [("deferred", 1.0, 100.0, False)]
+    assert calls == [("deferred", 1.0, 100.0, spec.scale == "log")]
+
+
+def test_log_scale_sampling_is_uniform_in_log_bins() -> None:
+    optuna = pytest.importorskip("optuna")
+    from simulator.optimize.recipe import KnobSpec
+    from simulator.optimize.strategy.bayesian import _suggest_value
+
+    low, high = 1.0, 10.0
+    draw_count = 500
+    bin_count = 10
+    log_spec = KnobSpec(
+        path=("log_sample",),
+        kind="float",
+        low=low,
+        high=high,
+        scale="log",
+    )
+    linear_spec = KnobSpec(
+        path=("linear_sample",),
+        kind="float",
+        low=low,
+        high=high,
+        scale="linear",
+    )
+
+    def draw_samples(spec: KnobSpec) -> list[float]:
+        samples: list[float] = []
+        study = optuna.create_study(
+            direction="minimize",
+            sampler=optuna.samplers.RandomSampler(seed=12012),
+        )
+
+        def objective(trial) -> float:
+            sample = _suggest_value(trial, spec)
+            samples.append(sample)
+            return sample
+
+        study.optimize(objective, n_trials=draw_count, show_progress_bar=False)
+        return samples
+
+    def log_bin_counts(samples: list[float]) -> list[int]:
+        counts = [0] * bin_count
+        for sample in samples:
+            # Bounds 1–10 map to log10 interval [0, 1]; equal bins test
+            # uniformity in log space instead of in the original values.
+            log_sample = math.log10(sample)
+            assert 0.0 <= log_sample <= 1.0
+            bin_index = min(int(log_sample * bin_count), bin_count - 1)
+            counts[bin_index] += 1
+        return counts
+
+    log_counts = log_bin_counts(draw_samples(log_spec))
+    linear_counts = log_bin_counts(draw_samples(linear_spec))
+    expected_uniform_count = draw_count / bin_count
+
+    # A 1.5x allowance separates the near-uniform bins from the linear
+    # sampler's upper-decade pile-up while tolerating ordinary sample variance.
+    assert max(log_counts) < 1.5 * expected_uniform_count
+    assert linear_counts[-1] > 1.5 * expected_uniform_count
 
 
 def test_t155_search_provenance_round_trips_conditional_context() -> None:

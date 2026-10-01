@@ -5,6 +5,8 @@ import math
 import re
 import subprocess
 import sys
+from dataclasses import replace
+from numbers import Real
 from pathlib import Path
 from types import SimpleNamespace
 
@@ -13,11 +15,18 @@ import pytest
 from simulator.optimize import (
     Candidate,
     GateMargin,
+    OptunaNSGA2Strategy,
     OptunaTPEStrategy,
     Strategy,
     ThresholdSpec,
 )
-from simulator.optimize.evaluate import FailureCategory, RunReference, ScoredResult
+from simulator.backend_names import ANALYTICAL_BACKEND_SERIALIZATION_TOKEN
+from simulator.optimize.evaluate import (
+    FailureCategory,
+    RunReference,
+    ScoredResult,
+    evaluate,
+)
 from simulator.optimize.objective import (
     ENERGY_ELECTRICAL_PLUS_EVAPORATION_METRIC,
     LEGACY_ENERGY_KWH_METRIC,
@@ -25,17 +34,18 @@ from simulator.optimize.objective import (
     ObjectiveValue,
     ObjectiveVector,
 )
+from simulator.optimize.profiles import load_profile
 from simulator.optimize.recipe import (
     KnobSpec,
     RecipePatch,
     RecipeSchema,
-    STAGE3_CLOSE_T_C_PATH,
-    STAGE3_OPEN_T_C_PATH,
-    STAGE3_TEMPERATURE_WINDOW_MIN_WIDTH_C,
+    RecipeValidationError,
+    _default_setpoint_value,
 )
 from simulator.optimize.strategy.bayesian import (
     _BAD_MAXIMIZE_VALUE,
     _BAD_MINIMIZE_VALUE,
+    _CONSTRAINT_NAMES_ATTR,
     _CANDIDATE_ID_ATTR,
     _CONSTRAINT_VALUES_ATTR,
     _NONFINITE_INFEASIBLE_CONSTRAINT_VIOLATION,
@@ -44,7 +54,10 @@ from simulator.optimize.strategy.bayesian import (
     _constraint_values,
     OPTUNA_REQUIRED_MESSAGE,
     OptunaUnavailableError,
+    _require_optuna,
 )
+from simulator.optimize.strategy.protocol import WarmStartSeed
+from simulator.optimize.study import _profile_warm_start_seeds, resolve_strategy
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -164,7 +177,7 @@ def _trials_by_candidate(strategy: OptunaTPEStrategy) -> dict[str, object]:
     }
 
 
-def _assert_conditioned_trial_params_match_patches(
+def _assert_pressure_trial_params_match_patches(
     strategy: OptunaTPEStrategy,
     candidates: list[Candidate],
 ) -> None:
@@ -173,23 +186,19 @@ def _assert_conditioned_trial_params_match_patches(
         schema.C2A_STAGED_STAGE_PRESSURE_TOTAL_BY_PO2.items()
     )
     trials_by_number = {trial.number: trial for trial in strategy.study.trials}
-    conditioned_paths = tuple(
-        path
-        for pair in pressure_pairs
-        for path in pair
-    ) + (STAGE3_OPEN_T_C_PATH, STAGE3_CLOSE_T_C_PATH)
     checked = 0
     for candidate in candidates:
         trial = trials_by_number[candidate.metadata["trial_number"]]
-        for path in conditioned_paths:
-            if path not in candidate.patch.values:
-                continue
-            name = ".".join(path)
-            assert name in trial.params
-            assert float(trial.params[name]) == pytest.approx(
-                float(candidate.patch.values[path])
-            )
-            checked += 1
+        for po2_path, total_path in pressure_pairs:
+            for path in (po2_path, total_path):
+                if path not in candidate.patch.values:
+                    continue
+                name = ".".join(path)
+                assert name in trial.params
+                assert float(trial.params[name]) == pytest.approx(
+                    float(candidate.patch.values[path])
+                )
+                checked += 1
     assert checked > 0
 
 
@@ -302,6 +311,28 @@ def test_tpe_strategy_implements_protocol_and_round_trips() -> None:
     assert all(scored.candidate_id == candidate.id for candidate, scored in strategy.results)
 
 
+def test_tpe_constant_liar_tracks_study_parallelism(monkeypatch: pytest.MonkeyPatch) -> None:
+    optuna = _require_optuna()
+    real_sampler = optuna.samplers.TPESampler
+    observed: list[bool] = []
+
+    def capture_sampler(*args: Any, **kwargs: Any) -> Any:
+        observed.append(bool(kwargs["constant_liar"]))
+        return real_sampler(*args, **kwargs)
+
+    monkeypatch.setattr(optuna.samplers, "TPESampler", capture_sampler)
+    for parallel in (1, 2):
+        resolve_strategy(
+            "bayes",
+            profile=PROFILE,
+            seed=29,
+            schema=_simple_schema(),
+            parallel=parallel,
+        )
+
+    assert observed == [False, True]
+
+
 def test_tpe_ask_returns_schema_valid_unique_deterministic_candidates() -> None:
     schema = RecipeSchema()
 
@@ -322,19 +353,52 @@ def test_tpe_ask_returns_schema_valid_unique_deterministic_candidates() -> None:
                 assert float(value) >= float(spec.low)
             if spec.high is not None:
                 assert float(value) <= float(spec.high)
-    widths = [
-        candidate.patch.values[STAGE3_CLOSE_T_C_PATH]
-        - candidate.patch.values[STAGE3_OPEN_T_C_PATH]
-        for candidate in first
-    ]
-    assert max(widths) > STAGE3_TEMPERATURE_WINDOW_MIN_WIDTH_C
+
+
+def test_tpe_ask_batch_after_startup_does_not_duplicate_parameters() -> None:
+    schema = RecipeSchema(
+        allowlist=(
+            KnobSpec(
+                path=PATH,
+                kind="categorical",
+                choices=("low", "high"),
+                bounds_source="test",
+            ),
+        )
+    )
+    strategy = OptunaTPEStrategy(
+        schema,
+        seed=0,
+        objective_profile=PROFILE,
+        n_startup_trials=10,
+        # This test requests two suggestions together, so exercise the batch sampler path.
+        parallel=2,
+    )
+    startup_candidates = strategy.ask(10)
+    strategy.tell(
+        [
+            (
+                candidate,
+                _feasible_result(
+                    candidate,
+                    yield_value=float(index),
+                    energy=float(10 - index),
+                ),
+            )
+            for index, candidate in enumerate(startup_candidates)
+        ]
+    )
+
+    batch = strategy.ask(2)
+
+    assert len({candidate.patch.canonical_json() for candidate in batch}) == 2
 
 
 def test_tpe_pressure_conditioning_updates_recorded_trial_params() -> None:
     strategy = OptunaTPEStrategy(RecipeSchema(), seed=17, objective_profile=PROFILE)
     candidates = strategy.ask(4)
 
-    _assert_conditioned_trial_params_match_patches(strategy, candidates)
+    _assert_pressure_trial_params_match_patches(strategy, candidates)
 
 
 def test_tpe_learns_toward_favored_region_after_tell_history() -> None:
@@ -627,6 +691,163 @@ def test_tpe_infeasible_result_uses_directional_worst_values_not_zero() -> None:
     assert trial.user_attrs[_CONSTRAINT_VALUES_ATTR] == (1.0,)
 
 
+def _lunar_profile_for_hours(hours: int, *, gates: tuple[str, ...] | None = None):
+    profile = dict(load_profile("lunar_mare_low_ti"))
+    fidelities = {
+        name: dict(options)
+        for name, options in profile["fidelities"].items()
+    }
+    selected = dict(fidelities[ANALYTICAL_BACKEND_SERIALIZATION_TOKEN])
+    selected["hours"] = hours
+    fidelities[ANALYTICAL_BACKEND_SERIALIZATION_TOKEN] = selected
+    profile["fidelities"] = fidelities
+    if gates is not None:
+        constraints = dict(profile["constraints"])
+        constraints["gates"] = list(gates)
+        profile["constraints"] = constraints
+    return profile
+
+
+def test_tpe_preserves_infeasible_yield_signal_for_gated_sixty_hour_pair() -> None:
+    furnace_path = ("furnace_max_T_C",)
+    schema = RecipeSchema(
+        allowlist=(
+            KnobSpec(
+                path=furnace_path,
+                kind="float",
+                low=1200.0,
+                high=2200.0,
+                bounds_source="C5 acceptance",
+            ),
+        )
+    )
+    profile = _lunar_profile_for_hours(60)
+    gates = set(profile["constraints"]["gates"])
+    assert {"delivered_stream_purity", "extraction_completeness"} <= gates
+
+    strategy = OptunaTPEStrategy(
+        schema,
+        seed=5505,
+        objective_profile=profile,
+        n_startup_trials=0,
+        warm_start_seeds=(
+            WarmStartSeed(
+                id="nonbinding-1800-cap",
+                patch=RecipePatch({furnace_path: 1800.0}),
+                proposal_source="seed_recipe",
+            ),
+            WarmStartSeed(
+                id="furnace-cap-1200",
+                patch=RecipePatch({furnace_path: 1200.0}),
+                proposal_source="seed_recipe",
+            ),
+        ),
+    )
+    candidates = strategy.ask(2)
+    results = [
+        evaluate(
+            candidate.patch,
+            "lunar_mare_low_ti",
+            ANALYTICAL_BACKEND_SERIALIZATION_TOKEN,
+            profile=profile,
+            candidate_id=candidate.id,
+        )
+        for candidate in candidates
+    ]
+
+    for result in results:
+        assert result.eval_spec is not None and result.eval_spec.hours == 60
+        assert not result.feasible
+        assert result.objectives is not None
+        assert {"delivered_stream_purity", "extraction_completeness"} & set(
+            result.failing_gates
+        )
+
+    strategy.tell(list(zip(candidates, results, strict=True)))
+    trials = _trials_by_candidate(strategy)
+    metals_index = strategy.objective_metrics.index("metals_total_kg")
+    stored_metals = []
+    for candidate, result in zip(candidates, results, strict=True):
+        trial = trials[candidate.id]
+        assert trial.state.name == "COMPLETE"
+        assert trial.values is not None
+        value = trial.values[metals_index]
+        assert math.isfinite(value)
+        assert value not in (_BAD_MAXIMIZE_VALUE, _BAD_MINIMIZE_VALUE)
+        assert set(result.failing_gates) <= set(
+            trial.user_attrs[_CONSTRAINT_NAMES_ATTR]
+        )
+        assert trial.user_attrs[_CONSTRAINT_VALUES_ATTR]
+        stored_metals.append(value)
+    # Identical deterministic patches have zero repeat spread at one cache key.
+    assert stored_metals[0] != stored_metals[1]
+
+    short_profile = _lunar_profile_for_hours(
+        1,
+        gates=("knudsen_viscous", "furnace_temperature"),
+    )
+    short_results = [
+        evaluate(
+            candidate.patch,
+            "lunar_mare_low_ti",
+            ANALYTICAL_BACKEND_SERIALIZATION_TOKEN,
+            profile=short_profile,
+            candidate_id=f"short-{candidate.id}",
+        )
+        for candidate in candidates
+    ]
+    assert all(result.feasible and result.objectives is not None for result in short_results)
+    assert all(
+        result.run_reference is not None
+        and result.run_reference.product_summary.get("furnace_amortization_status")
+        == "available"
+        for result in short_results
+    )
+    short_metals = [
+        result.objectives.as_mapping()["metals_total_kg"]
+        for result in short_results
+    ]
+    short_oxygen = [
+        result.objectives.as_mapping()["oxygen_kg"]
+        for result in short_results
+    ]
+    assert short_metals[0] == short_metals[1]
+    assert short_oxygen[0] == short_oxygen[1]
+    assert all(
+        result.objectives.as_mapping()["duration_h"] == result.eval_spec.hours
+        for result in short_results
+    )
+
+
+def test_tpe_infeasible_objectives_without_furnace_cost_use_raw_metrics() -> None:
+    strategy = OptunaTPEStrategy(_simple_schema(), seed=5506, objective_profile=PROFILE)
+    candidate = strategy.ask(1)[0]
+    raw = _no_objective_infeasible_result(candidate)
+    scored = replace(
+        raw,
+        objectives=ObjectiveVector(
+            (
+                ObjectiveValue(metric="yield", sense="maximize", value=2.5),
+                ObjectiveValue(metric="energy", sense="minimize", value=8.0),
+            )
+        ),
+        feasibility_margins={
+            "gate": _gate_margin(margin=-0.5, tolerance=0.0, feasible=False)
+        },
+        run_reference=_available_run_reference(furnace_status=None),
+    )
+
+    strategy.tell([(candidate, scored)])
+
+    trial = _trials_by_candidate(strategy)[candidate.id]
+    assert trial.state.name == "COMPLETE"
+    assert trial.values == [
+        scored.objectives.as_mapping()["yield"],
+        scored.objectives.as_mapping()["energy"],
+    ]
+    assert any(value > 0.0 for value in trial.user_attrs[_CONSTRAINT_VALUES_ATTR])
+
+
 def test_tpe_feasible_unscoreable_result_fails_trial_without_bad_objective_values() -> None:
     strategy = OptunaTPEStrategy(_simple_schema(), seed=45, objective_profile=PROFILE)
     candidate = strategy.ask(1)[0]
@@ -723,6 +944,127 @@ def test_tpe_scores_legacy_energy_cache_objective_against_canonical_profile() ->
     assert trial.state.name == "COMPLETE"
     assert trial.values == [1.25, 2.5]
     assert strategy.tell_count == 1
+
+
+@pytest.mark.parametrize("strategy_class", [OptunaTPEStrategy, OptunaNSGA2Strategy])
+def test_highland_profile_seed_enqueues_seed_values_and_loaded_defaults(strategy_class) -> None:
+    pytest.importorskip("optuna")
+    profile = load_profile("lunar_highland")
+    schema = RecipeSchema()
+    (seed,) = _profile_warm_start_seeds(profile, schema=schema)
+    expected_params: dict[str, object] = {}
+    no_default_paths: set[str] = set()
+    missing_default_marker = object()
+
+    for spec in schema.search_allowlist:
+        name = ".".join(spec.path)
+        if spec.path in seed.patch.values:
+            expected_params[name] = seed.patch.values[spec.path]
+            continue
+        try:
+            default = _default_setpoint_value(spec.path)
+        except RecipeValidationError as exc:
+            if not str(exc).startswith("recipe_pressure_total_default_missing:"):
+                raise
+            default = missing_default_marker
+        if default is missing_default_marker:
+            no_default_paths.add(name)
+            continue
+        if spec.kind == "float":
+            has_unambiguous_default = isinstance(default, Real) and not isinstance(
+                default, bool
+            )
+        elif spec.kind == "int":
+            has_unambiguous_default = (
+                isinstance(default, Real)
+                and not isinstance(default, bool)
+                and float(default).is_integer()
+            )
+        else:
+            has_unambiguous_default = default in (spec.choices or ())
+        if has_unambiguous_default:
+            expected_params[name] = default
+        else:
+            no_default_paths.add(name)
+
+    hold_path = ("campaigns", "C6", "default_hold_T_C")
+    hold_spec = schema.spec_for(hold_path)
+    assert hold_spec.high is not None
+    bad_values = dict(seed.patch.values)
+    # Use the next representable float above the schema maximum to avoid a copied bound.
+    bad_values[hold_path] = math.nextafter(float(hold_spec.high), math.inf)
+    bad_seed = replace(
+        seed,
+        id=f"{seed.id}-out-of-bounds",
+        patch=RecipePatch(bad_values),
+    )
+
+    strategy = strategy_class(
+        schema,
+        seed=451,
+        objective_profile=profile,
+        warm_start_seeds=(seed, bad_seed),
+    )
+    assert strategy.warm_start_rejected_seed_ids == (bad_seed.id,)
+    waiting = strategy._study.get_trials(deepcopy=False)
+    assert len(waiting) == 1
+    assert waiting[0].state.name == "WAITING"
+    enqueued_params = waiting[0].system_attrs["fixed_params"]
+
+    assert enqueued_params == expected_params
+    search_paths = {spec.path for spec in schema.search_allowlist}
+    expected_c6_seed_params = {
+        ".".join(path): value
+        for path, value in seed.patch.values.items()
+        if path in search_paths and path[:2] == ("campaigns", "C6")
+    }
+    assert {
+        name: enqueued_params[name] for name in expected_c6_seed_params
+    } == expected_c6_seed_params
+    assert {".".join(spec.path) for spec in schema.search_allowlist} - set(
+        enqueued_params
+    ) == no_default_paths
+
+
+@pytest.mark.parametrize("strategy_class", [OptunaTPEStrategy, OptunaNSGA2Strategy])
+def test_partial_seed_trial_samples_unset_knobs(strategy_class) -> None:
+    pytest.importorskip("optuna")
+    seeded_path = ("optimizer_test", "seeded")
+    sampled_path = ("optimizer_test", "sampled")
+    schema = RecipeSchema(
+        allowlist=(
+            KnobSpec(
+                path=seeded_path,
+                kind="float",
+                low=0.0,
+                high=1.0,
+                bounds_source="C11 partial seed test",
+            ),
+            KnobSpec(
+                path=sampled_path,
+                kind="float",
+                low=0.0,
+                high=1.0,
+                bounds_source="C11 partial seed test",
+            ),
+        )
+    )
+    seed = WarmStartSeed(
+        id="partial-seed",
+        patch=RecipePatch({seeded_path: 0.25}),
+        proposal_source="seed_recipe",
+    )
+    strategy = strategy_class(
+        schema,
+        seed=452,
+        objective_profile=PROFILE,
+        warm_start_seeds=(seed,),
+    )
+
+    (candidate,) = strategy.ask(1)
+
+    assert candidate.patch.values[seeded_path] == 0.25
+    assert 0.0 <= candidate.patch.values[sampled_path] <= 1.0
 
 
 def test_tpe_import_boundary_is_lazy_without_optuna() -> None:

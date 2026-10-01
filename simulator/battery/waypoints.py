@@ -173,8 +173,6 @@ ENGINE_POINT_CONSUMERS = (
     "vaporock",
     "magemin",
     "cached-real",
-    "imcc_sf04",
-    "imcc_sf04_ext",
     "openimcc",
 )
 # Engines whose equilibrate result fills activity_coefficients.
@@ -182,8 +180,6 @@ ENGINE_POINT_CONSUMERS = (
 MELT_ACTIVITY_ENGINES = (
     "alphamelts",
     "thermoengine",
-    "imcc_sf04",
-    "imcc_sf04_ext",
     "openimcc",
 )
 # Activity and activity coefficient only. Interaction parameters stay on
@@ -820,10 +816,12 @@ def normalized_composition(
                         amounts[species] = as_decimal(weight) / molar_mass
                     # Premise: printed w_i are wt%, M_i are species molar masses.
                     # Algebra: n_i=m*w_i/(100*M_i); x_i=(w_i/M_i)/sum_j(w_j/M_j).
-                    # Units: w_i dimensionless, M_i kg/mol; (mol/kg)/(mol/kg)=1.
+                    # Units: w_i is dimensionless, M_i kg/mol, so each w_i/M_i
+                    # is mol/kg and the normalized ratio is dimensionless.
                     # Unknown common mass m cancels; no run mass is inferred.
                     # Sanity: pure Mg2SiO4 (M=0.140693 kg/mol) gives x=1;
-                    # weights proportional to molar masses give equal mole fractions.
+                    # 50/50 wt% K2O-SiO2 gives x_K2O=0.38945 from their
+                    # molar masses (0.094196 and 0.060084 kg/mol).
             elif raw.amount_basis in (AmountBasis.MOL_INVENTORY, AmountBasis.MOLE_FRACTION):
                 amounts = raw.as_map()
             else:
@@ -847,15 +845,39 @@ def normalized_composition(
                     "measured_oxide_wt_pct_and_trace_ppm_to_oxide_mole_fraction":
                         "measured composition",
                 }
-                try:
-                    origin = origins[located.inference.relation]
-                except KeyError as exc:
-                    raise UnknownCompositionRelationError(
-                        f"unknown normalized composition relation: {located.inference.relation!r}"
-                    ) from exc
+                relation = located.inference.relation
+                origin = origins.get(relation)
+                if origin is None:
+                    # Plante-style source note: X is printed and Y is its
+                    # complement to 100 wt%, followed by the ordinary oxide
+                    # wt%-to-mole-fraction conversion. Accept this grammar for
+                    # any two distinct oxide species, not just K2O-SiO2.
+                    printed, separator, complement = relation.partition("=100-")
+                    output_species = printed.removesuffix("_wt_pct")
+                    input_species = complement
+                    is_binary_complement = (
+                        separator == "=100-"
+                        and printed.endswith("_wt_pct")
+                        and complement.endswith("_wt_pct;wt_pct_to_mole_fraction")
+                    )
+                    input_species = input_species.removesuffix(
+                        ";wt_pct_to_mole_fraction"
+                    ).removesuffix("_wt_pct")
+                    if (
+                        is_binary_complement
+                        and output_species != input_species
+                        and output_species in _OXIDE_COMPONENT_KEYS
+                        and input_species in _OXIDE_COMPONENT_KEYS
+                        and printed_species == {output_species, input_species}
+                    ):
+                        origin = "printed binary oxide wt% composition"
+                    else:
+                        raise UnknownCompositionRelationError(
+                            f"unknown normalized composition relation: {relation!r}"
+                        )
                 notice = (
                     f"calculated from {origin}; "
-                    f"relation={located.inference.relation}; "
+                    f"relation={relation}; "
                     f"inputs={' | '.join(located.inference.inputs)}; locator={locator_text}"
                 )
             if basis_notice:
@@ -876,7 +898,8 @@ def normalized_composition(
                 directness = 2 if raw.amount_basis is AmountBasis.MOLE_FRACTION else 1
             evidence_ranks.append((not bool(located.inference), directness))
         except UnknownCompositionRelationError:
-            raise
+            unsupported = True
+            missing.append(f"{path} (unknown relation: {located.inference.relation})")
         except (ValueError, TypeError, ArithmeticError):
             unsupported = True
             missing.append(path)

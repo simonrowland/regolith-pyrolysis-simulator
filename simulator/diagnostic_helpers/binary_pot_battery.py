@@ -17,11 +17,13 @@ backend (``INELIGIBLE_ACTIVE_BACKENDS``).
 
 from __future__ import annotations
 
+import atexit
 import inspect
 import json
 import math
 import os
 import re
+import selectors
 import signal
 import socket
 import subprocess
@@ -41,6 +43,7 @@ from simulator.physical_constants import (
     MELT_DISSOCIATION_PO2_MIN_BAR,
     PA_PER_BAR,
 )
+from simulator.battery.enums import NoticeKind
 from simulator.yaml_cache import load_cached_safe_yaml
 from simulator.vapour_rail.engine_crosscheck import divergence_label
 
@@ -60,24 +63,36 @@ BATTERY_ENGINE_NAMES: tuple[str, ...] = (
     "vaporock",
     "magemin",
     "cached-real",
-    "imcc_sf04",
-    "imcc_sf04_ext",
     "openimcc",
 )
-LEGACY_IMCC_ENGINE_NAMES: tuple[str, ...] = ("imcc_sf04", "imcc_sf04_ext")
 OPENIMCC_ENGINE_NAMES: tuple[str, ...] = ("openimcc",)
-IMCC_ENGINE_NAMES: tuple[str, ...] = (*LEGACY_IMCC_ENGINE_NAMES, *OPENIMCC_ENGINE_NAMES)
-IMCC_MODEL_IDS: dict[str, str] = {
-    "imcc_sf04": "IMCC-SF04",
-    "imcc_sf04_ext": "IMCC-SF04-EXT",
-}
-IMCC_DATAPACK_LABELS: dict[str, str] = {
-    "imcc_sf04": "data/melt_activity/imcc/imcc-sf04-v1.0.2.json",
-    "imcc_sf04_ext": "data/melt_activity/imcc/imcc-sf04-ext-v4.json",
-}
+IMCC_ENGINE_NAMES: tuple[str, ...] = OPENIMCC_ENGINE_NAMES
 OPENIMCC_MODEL_IDS: dict[str, str] = {"openimcc": "IMCC-SF04"}
-ALL_IMCC_MODEL_IDS: dict[str, str] = {**IMCC_MODEL_IDS, **OPENIMCC_MODEL_IDS}
+ALL_IMCC_MODEL_IDS: dict[str, str] = OPENIMCC_MODEL_IDS
 MELTS_FAMILY_ENGINES: tuple[str, ...] = ("alphamelts", "thermoengine")
+
+
+def _openimcc_gas_channels_and_omission_notices(
+    parent_oxides: Sequence[str], datapack: Any, gas_result: Any | None = None
+) -> tuple[list[Any], tuple[dict[str, Any], ...]]:
+    """Return the active gas reactions and typed notices for omitted channels."""
+
+    from openimcc.gas import _default_reactions
+
+    channels, default_omissions = _default_reactions(parent_oxides, datapack)
+    omitted_channels = getattr(gas_result, "omitted_channels", default_omissions)
+    table_path = str(datapack.gas_path)
+    notices = tuple(
+        {
+            "kind": NoticeKind.INPUT_OMITTED.value,
+            "authority": None,
+            "reason": (
+                f"gas channel {name} omitted: {reason}; table: {table_path}"
+            ),
+        }
+        for name, reason in omitted_channels.items()
+    )
+    return channels, notices
 ARM_HEADLINE = "headline"
 ARM_QUALIFICATION = "qualification"
 
@@ -160,8 +175,6 @@ _ENGINE_OUTER_TIMEOUT_S: dict[str, float] = {
     "vaporock": 70.0,
     "magemin": 20.0,
     "cached-real": 30.0,
-    "imcc_sf04": 15.0,
-    "imcc_sf04_ext": 15.0,
     "openimcc": 15.0,
 }
 
@@ -182,12 +195,16 @@ QUALIFICATION_TEMPERATURES_K: tuple[float, ...] = (
 QUALIFICATION_SWEEP_T_K = 1700.0
 QUALIFICATION_SOURCE_POT_ID = "feo_mgo_sio2_30_20_50"
 
-_ISOLATED_CELL_BOOTSTRAP = (
-    "import json,sys;"
-    "from simulator.diagnostic_helpers.binary_pot_battery import "
-    "run_isolated_cell_worker;"
-    "run_isolated_cell_worker(json.load(sys.stdin))"
+_ISOLATED_CELL_BOOTSTRAP = """
+import json
+import sys
+
+from simulator.diagnostic_helpers.binary_pot_battery import (
+    _run_isolated_cell_worker_loop,
 )
+
+_run_isolated_cell_worker_loop()
+"""
 
 
 class BinaryPotBatteryError(RuntimeError):
@@ -1710,353 +1727,6 @@ def _solve_cell_oxygen_balance(
     return float(pO2_bar), pressures, balance, fraction, info
 
 
-class _ImccBatteryBackend:
-    """Thin MeltBackend-shaped wrapper around ``openimcc.evaluate``.
-
-    Not registered in ``simulator.backends``: IMCC is a diagnostic shadow
-    and has no ledger authority. The engine arm is the first caller.
-    """
-
-    supports_intrinsic_fO2 = False
-
-    def __init__(self, engine_name: str) -> None:
-        if engine_name not in IMCC_MODEL_IDS:
-            raise BinaryPotBatteryError(f"unknown IMCC engine {engine_name!r}")
-        self.engine_name = engine_name
-        self.model_id = IMCC_MODEL_IDS[engine_name]
-        self._pack: Any = None
-        self._gas: Any = None
-        self._gas_error: str | None = None
-        self._identity: dict[str, str] = {
-            "name": self.model_id,
-            "version": "",
-            "digest": "",
-        }
-        self._load()
-
-    def _load(self) -> None:
-        from simulator.melt_backend.openimcc_bridge import _require_openimcc
-
-        openimcc = _require_openimcc()
-        from importlib import resources
-
-        pack_name = (
-            "imcc-sf04-v1.0.2.json"
-            if self.engine_name == "imcc_sf04"
-            else "imcc-sf04-ext-v4.json"
-        )
-        pack_resource = resources.files("openimcc").joinpath(
-            "data", "packs", pack_name
-        )
-        with resources.as_file(pack_resource) as pack_path:
-            pack = openimcc.load_datapack(pack_path)
-        self._pack = pack
-        self._identity = {
-            "name": str(pack.model_id),
-            "version": str(pack.version),
-            "digest": str(
-                getattr(pack.kernel_datapack, "published_manifest_sha256", "") or ""
-            ),
-            "model_id": str(pack.model_id),
-                "datapack": IMCC_DATAPACK_LABELS[self.engine_name],
-        }
-        try:
-            from simulator.melt_backend.imcc_sf04.gas import load_gas_datapack
-
-            self._gas = load_gas_datapack()
-            self._gas_error = None
-        except Exception as exc:  # noqa: BLE001 - gas is optional; activities still run
-            self._gas = None
-            self._gas_error = f"{type(exc).__name__}: {exc}"
-
-    def equilibrate(
-        self,
-        temperature_C: float,
-        composition_kg: Mapping[str, float] | None = None,
-        fO2_log: float | None = None,
-        pressure_bar: float = 1.0e-6,
-        *,
-        composition_mol: Mapping[str, float] | None = None,
-        po2_request: Po2Request | None = None,
-        **_unused: object,
-    ) -> Any:
-        from types import SimpleNamespace
-
-        import openimcc
-        from openimcc.kernel import ImccRefusal
-
-        del pressure_bar
-        if self._pack is None:
-            raise RuntimeError("IMCC datapack failed to load")
-        if composition_mol:
-            composition = {
-                str(name): float(amount)
-                for name, amount in composition_mol.items()
-                if float(amount) > 0.0
-            }
-            basis_type = "mol"
-        else:
-            composition = {
-                str(name): float(mass_kg) * 100.0
-                for name, mass_kg in dict(composition_kg or {}).items()
-                if float(mass_kg) > 0.0
-            }
-            basis_type = "wt"
-        total = sum(composition.values())
-        temperature_K = float(temperature_C) + CELSIUS_TO_KELVIN_OFFSET
-        enable_sp = self.engine_name == "imcc_sf04_ext"
-        from simulator.melt_backend.imcc_sf04.adapter import evaluate as evaluate_imcc
-
-        result = evaluate_imcc(
-            composition,
-            temperature_K,
-            self._pack,
-            basis=total if total > 0.0 else None,
-            basis_type=basis_type,
-            enable_sp_extension=enable_sp,
-            allow_extrapolation=True,
-            allow_out_of_envelope=True,
-        )
-        activities: dict[str, float] = {}
-        for name, value in zip(
-            result.parent_oxides, result.parent_activity, strict=True
-        ):
-            number = _finite_float(value)
-            if number is not None and number > 0.0:
-                activities[str(name)] = number
-        if composition_mol is None:
-            from simulator.accounting.formulas import resolve_species_formula
-
-            composition_mol = {
-                name: mass / resolve_species_formula(name).molar_mass_kg_per_mol()
-                for name, mass in (composition_kg or {}).items()
-                if float(mass) > 0.0
-            }
-        gammas, gamma_details = _imcc_activity_coefficient_reports(
-            activities, composition_mol
-        )
-        notices: list[dict[str, Any]] = []
-        if result.extrapolated:
-            notices.append(
-                {
-                    "kind": "imcc_temperature_extrapolated",
-                    "authority": AUTHORITY_EXTRAPOLATED,
-                    "reason": "T outside datapack T_domain_K; evaluate(allow_extrapolation=True)",
-                }
-            )
-        envelope = getattr(getattr(result, "labels", None), "envelope_status", None)
-        if envelope == "outside_validated":
-            notices.append(
-                {
-                    "kind": "imcc_composition_outside_validated_envelope",
-                    "authority": AUTHORITY_EXTRAPOLATED,
-                    "reason": "X_Me2O above the validated 0.5 bound; evaluate(allow_out_of_envelope=True)",
-                }
-            )
-        from simulator.melt_backend.openimcc_bridge import (
-            imcc_complex_saturation_notice,
-        )
-
-        saturation_notice = imcc_complex_saturation_notice(
-            tuple(getattr(getattr(result, "labels", None), "flags", ()) or ()),
-            getattr(getattr(result, "labels", None), "acid_sink_ratio", None),
-        )
-        if saturation_notice is not None:
-            notices.append(saturation_notice)
-        pressures: dict[str, float] = {}
-        gas_error: str | None = None
-        if self._gas is None:
-            gas_error = self._gas_error or "imcc_gas_datapack_unavailable"
-            if (
-                po2_request is not None
-                and po2_request.mode == PO2_OXYGEN_BALANCE_EFFUSION
-            ):
-                raise _OxygenBalanceRefusal(
-                    "imcc_gas_datapack_unavailable",
-                    gas_error,
-                )
-        else:
-            try:
-                from simulator.melt_backend.imcc_sf04.gas import evaluate_gas
-
-                if (
-                    po2_request is not None
-                    and po2_request.mode == PO2_OXYGEN_BALANCE_EFFUSION
-                ):
-                    cell_material = po2_request.cell_material
-                    try:
-                        from openimcc import (
-                            oxygen_balance_from_pressure_model,
-                            oxygen_balance_species_metadata,
-                        )
-                    except (ImportError, AttributeError) as exc:
-                        from simulator.melt_backend.openimcc_bridge import (
-                            OPENIMCC_RECORDED_PIN,
-                        )
-
-                        raise _OxygenBalanceRefusal(
-                            "openimcc_oxygen_balance_unavailable",
-                            "installed openimcc does not expose the generic "
-                            "oxygen-balance core; remedy: install the recorded pin "
-                            f"{OPENIMCC_RECORDED_PIN}",
-                        ) from exc
-
-                    from simulator.melt_backend.imcc_sf04.gas import _SF04_REACTIONS
-
-                    try:
-                        species = oxygen_balance_species_metadata(
-                            {
-                                name: parent or None
-                                for name, (parent, _n_gas, _n_o2)
-                                in _SF04_REACTIONS.items()
-                            }
-                        )
-                    except Exception as exc:  # noqa: BLE001 - typed gas refusal
-                        raise _OxygenBalanceRefusal(
-                            "imcc_gas_oxygen_balance_failed",
-                            "cannot derive oxygen-balance metadata for VapoRock "
-                            f"species: {exc}",
-                        ) from exc
-                    missing_species = set(_SF04_REACTIONS) - set(species)
-                    if missing_species:
-                        missing = sorted(missing_species)[0]
-                        raise _OxygenBalanceRefusal(
-                            "imcc_gas_oxygen_balance_failed",
-                            f"VapoRock species {missing!r} has no oxygen-balance metadata",
-                        )
-
-                    for name, (_parent, n_gas, n_o2) in _SF04_REACTIONS.items():
-                        expected = (
-                            -n_o2 / n_gas
-                            if _parent
-                            else (1.0 if name == "O2" else 0.5)
-                        )
-                        if not math.isclose(
-                            species[name].pO2_exponent, expected, abs_tol=1e-12
-                        ):
-                            raise _OxygenBalanceRefusal(
-                                "imcc_gas_oxygen_balance_failed",
-                                f"VapoRock reaction exponent for species {name!r} "
-                                "does not match formula metadata",
-                            )
-
-                    def pressure_model(logp: float) -> Mapping[str, float]:
-                        return evaluate_gas(
-                            activities,
-                            temperature_K,
-                            10.0**logp,
-                            self._gas,
-                            parent_oxides=result.parent_oxides,
-                            allow_extrapolation=True,
-                        )
-
-                    if cell_material is None:
-                        try:
-                            po2_bar, gas_bar, balance = oxygen_balance_from_pressure_model(
-                                pressure_model, species, bracket=(-30.0, 0.0)
-                            )
-                        except Exception as exc:  # noqa: BLE001 - preserve typed solver refusal
-                            raise _OxygenBalanceRefusal(
-                                str(getattr(exc, "code", "") or "imcc_gas_oxygen_balance_failed"),
-                                str(exc),
-                            ) from exc
-                        cell_fraction = 0.0
-                        cell_info = {
-                            "cell_material": None,
-                            "cell_oxide_flux_fraction": 0.0,
-                            "buffer_pinned": False,
-                            "buffer_pO2_bar": None,
-                        }
-                    else:
-                        po2_bar, gas_bar, balance, cell_fraction, cell_info = (
-                            _solve_cell_oxygen_balance(
-                                pressure_model,
-                                species,
-                                temperature_K=temperature_K,
-                                cell_material=cell_material,
-                                oxygen_balance_from_pressure_model=(
-                                    oxygen_balance_from_pressure_model
-                                ),
-                            )
-                        )
-                    solved_notice = {
-                            "kind": "fo2_oxygen_balance_effusion_solved",
-                            "pO2_bar": float(po2_bar),
-                            "relative_residual": float(balance["residual"]),
-                            "bracket_log10_bar": list(balance["bracket"]),
-                            "dominant_O_carriers": list(
-                                balance["dominant_O_carriers"]
-                            ),
-                            "dominant_metal_carriers": list(
-                                balance["dominant_metal_carriers"]
-                            ),
-                            "cell_material": cell_material,
-                            "cell_oxide_flux_fraction": float(cell_fraction),
-                            "buffer_pinned": bool(cell_info["buffer_pinned"]),
-                            "buffer_pO2_bar": cell_info["buffer_pO2_bar"],
-                        }
-                    if cell_material is not None:
-                        solved_notice["cell_oxide_janaf_sources"] = cell_info[
-                            "cell_oxide_janaf_sources"
-                        ]
-                    notices.append(solved_notice)
-                else:
-                    fo2_bar = (
-                        10.0 ** float(fO2_log)
-                        if fO2_log is not None and math.isfinite(float(fO2_log))
-                        else 10.0 ** _DEFAULT_FO2_LOG
-                    )
-                    gas_bar = evaluate_gas(
-                        activities,
-                        temperature_K,
-                        fo2_bar,
-                        self._gas,
-                        parent_oxides=result.parent_oxides,
-                        allow_extrapolation=True,
-                    )
-                for name, value in dict(gas_bar).items():
-                    number = _finite_float(value)
-                    if number is not None and number > 0.0:
-                        pressures[str(name)] = number * PA_PER_BAR
-            except _OxygenBalanceRefusal:
-                raise
-            except ImccRefusal as exc:
-                gas_error = f"{getattr(exc, 'code', type(exc).__name__)}: {exc}"
-            except Exception as exc:  # noqa: BLE001 - gas is optional
-                gas_error = f"{type(exc).__name__}: {exc}"
-        if gas_error:
-            notices.append(
-                {
-                    "kind": "imcc_gas_unavailable",
-                    "authority": None,
-                    "reason": gas_error,
-                }
-            )
-        labels = getattr(result, "labels", None)
-        identity = dict(getattr(labels, "identity", None) or {})
-        diagnostics = {
-            "imcc_model_id": identity.get("model_id") or self.model_id,
-            "imcc_datapack_version": identity.get("datapack_version")
-            or self._identity.get("version"),
-            "imcc_extrapolated": bool(result.extrapolated),
-            "imcc_envelope_status": envelope,
-            "imcc_notices": notices,
-        }
-        return SimpleNamespace(
-            status="ok",
-            diagnostics=diagnostics,
-            warnings=[],
-            activity_coefficients=activities,
-            reported_activity_coefficients=gammas,
-            activity_coefficient_details=gamma_details,
-            vapor_pressures_Pa=pressures,
-            liquid_fraction=1.0,
-            phase_assemblage_available=True,
-            imcc_notices=notices,
-            imcc_model_id=identity.get("model_id") or self.model_id,
-        )
-
-
 # ---------------------------------------------------------------------------
 # openimcc battery adapter
 # ---------------------------------------------------------------------------
@@ -2232,7 +1902,6 @@ class _OpenImccBatteryBackend:
                         oxygen_balance_from_pressure_model,
                         oxygen_balance_species_metadata,
                     )
-                    from openimcc.gas import _default_reactions
                 except (ImportError, AttributeError) as exc:
                     raise _OxygenBalanceRefusal(
                         "openimcc_oxygen_balance_unavailable",
@@ -2240,7 +1909,11 @@ class _OpenImccBatteryBackend:
                         "model and oxygen-balance core needed for a reactive cell",
                     ) from exc
 
-                channels = _default_reactions(result.parent_oxides, self._gas)
+                channels, _omission_notices = (
+                    _openimcc_gas_channels_and_omission_notices(
+                        result.parent_oxides, self._gas
+                    )
+                )
                 base_species = oxygen_balance_species_metadata(
                     {name: parent or None for name, (parent, _ng, _no2) in channels}
                 )
@@ -2290,6 +1963,12 @@ class _OpenImccBatteryBackend:
                 gas_pressures.update(
                     {name: all_gas[name] for name in cell_info["cell_oxide_janaf_sources"] if name != "buffer_phase"}
                 )
+            _channels, omission_notices = (
+                _openimcc_gas_channels_and_omission_notices(
+                    result.parent_oxides, self._gas, gas_result
+                )
+            )
+            notices.extend(omission_notices)
             gas_diagnostics = {
                 "domain_flags": dict(getattr(gas_result, "domain_flags", {})),
                 "provenance_class": dict(getattr(gas_result, "provenance_class", {})),
@@ -2364,6 +2043,12 @@ class _OpenImccBatteryBackend:
                     parent_oxides=result.parent_oxides,
                     allow_extrapolation=True,
                 )
+                _channels, omission_notices = (
+                    _openimcc_gas_channels_and_omission_notices(
+                        result.parent_oxides, self._gas, gas_result
+                    )
+                )
+                notices.extend(omission_notices)
                 gas_diagnostics = {
                     "domain_flags": dict(gas_result.domain_flags),
                     "provenance_class": dict(gas_result.provenance_class),
@@ -2667,8 +2352,13 @@ def _bypass_melts_domain_gate(backend: Any) -> None:
         backend._domain_gate = _pass  # type: ignore[method-assign]
 
 
-def run_isolated_cell_worker(payload: Mapping[str, Any]) -> None:
-    """Child-process entry: one cell, JSON on stdout, crash becomes a signal."""
+def run_isolated_cell_worker(
+    payload: Mapping[str, Any],
+    *,
+    handles: dict[str, EngineHandle] | None = None,
+    protocol_stdout: Any | None = None,
+) -> None:
+    """Run one isolated cell and write one framed JSON response."""
 
     simulate = payload.get("simulate_crash")
     if simulate:
@@ -2693,13 +2383,30 @@ def run_isolated_cell_worker(payload: Mapping[str, Any]) -> None:
         ),
         cell_material=po2_raw.get("cell_material"),
     )
-    handle = open_battery_engine(str(payload["engine"]))
+    engine_name = str(payload["engine"])
+    handle = None if handles is None else handles.get(engine_name)
+    if handle is None:
+        handle = open_battery_engine(engine_name)
+        if (
+            handles is not None
+            and handle.available
+            and handle.backend is not None
+        ):
+            handles[engine_name] = handle
     if (
         bool(payload.get("qualification"))
         and handle.name in MELTS_FAMILY_ENGINES
         and handle.backend is not None
     ):
         _bypass_melts_domain_gate(handle.backend)
+    if handle.name == "alphamelts" and handle.backend is not None:
+        # A fresh per-cell backend used to start with an empty warning set.
+        # Keep that output behavior while the native transport is reused.
+        warning_seen = getattr(
+            handle.backend, "_pseudo_vapor_pressure_warning_seen", None
+        )
+        if isinstance(warning_seen, set):
+            warning_seen.clear()
     cell = equilibrate_cell(
         handle,
         pot,
@@ -2715,9 +2422,32 @@ def run_isolated_cell_worker(payload: Mapping[str, Any]) -> None:
         isolated=False,
         arm=str(payload.get("arm") or ARM_HEADLINE),
     )
-    sys.stdout.write(json.dumps(cell.as_payload(), default=str))
-    sys.stdout.write("\n")
-    sys.stdout.flush()
+    output = protocol_stdout if protocol_stdout is not None else sys.stdout
+    output.write("\x1e")
+    output.write(json.dumps(cell.as_payload(), default=str))
+    output.write("\n")
+    output.flush()
+
+
+def _run_isolated_cell_worker_loop() -> None:
+    protocol_stdout = sys.stdout
+    sys.stdout = sys.stderr
+    handles: dict[str, EngineHandle] = {}
+    try:
+        for line in sys.stdin:
+            run_isolated_cell_worker(
+                json.loads(line),
+                handles=handles,
+                protocol_stdout=protocol_stdout,
+            )
+    finally:
+        for handle in handles.values():
+            close = getattr(handle.backend, "close", None)
+            if callable(close):
+                try:
+                    close()
+                except BaseException:  # noqa: BLE001 - close every engine on exit
+                    pass
 
 
 def _crash_cell_from_returncode(
@@ -2794,6 +2524,208 @@ def _crash_cell_from_returncode(
     )
 
 
+class _IsolatedCellWorkerFailure(RuntimeError):
+    def __init__(
+        self,
+        *,
+        timed_out: bool = False,
+        returncode: int | None = None,
+        detail: str = "",
+    ) -> None:
+        super().__init__(detail)
+        self.timed_out = timed_out
+        self.returncode = returncode
+        self.detail = detail
+
+
+class _IsolatedCellWorker:
+    """Persistent engine process; a failed request retires its whole group."""
+
+    def __init__(self, engine: str) -> None:
+        self.engine = str(engine)
+        self.process: subprocess.Popen[bytes] | None = None
+        self.start_count = 0
+        self._stdout_buffer = bytearray()
+        self._lock = threading.Lock()
+
+    def _start(self) -> None:
+        env = dict(os.environ)
+        env.setdefault("PYTHONPATH", str(REPO_ROOT))
+        pythonpath = env.get("PYTHONPATH") or ""
+        if str(REPO_ROOT) not in pythonpath.split(os.pathsep):
+            env["PYTHONPATH"] = os.pathsep.join(
+                [str(REPO_ROOT), pythonpath] if pythonpath else [str(REPO_ROOT)]
+            )
+        self.process = subprocess.Popen(
+            [sys.executable, "-c", _ISOLATED_CELL_BOOTSTRAP],
+            cwd=str(REPO_ROOT),
+            env=env,
+            stdin=subprocess.PIPE,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.DEVNULL,
+            bufsize=0,
+            start_new_session=True,
+        )
+        self._stdout_buffer.clear()
+        self.start_count += 1
+
+    def _stop(self, *, kill_group: bool) -> int | None:
+        process = self.process
+        self.process = None
+        if process is None:
+            return None
+        if kill_group:
+            try:
+                os.killpg(process.pid, signal.SIGKILL)
+            except (OSError, ProcessLookupError):
+                if process.poll() is None:
+                    process.kill()
+        elif process.stdin is not None:
+            try:
+                process.stdin.close()
+            except OSError:
+                pass
+        try:
+            try:
+                process.wait(timeout=1.0)
+            except subprocess.TimeoutExpired:
+                try:
+                    os.killpg(process.pid, signal.SIGKILL)
+                except (OSError, ProcessLookupError):
+                    process.kill()
+                try:
+                    process.wait(timeout=1.0)
+                except subprocess.TimeoutExpired:
+                    process.kill()
+                    process.wait()
+        finally:
+            for stream in (process.stdin, process.stdout, process.stderr):
+                if stream is not None:
+                    try:
+                        stream.close()
+                    except OSError:
+                        pass
+        return process.returncode
+
+    def close(self) -> None:
+        with self._lock:
+            self._stop(kill_group=False)
+
+    def retire(self) -> None:
+        with self._lock:
+            self._stop(kill_group=True)
+
+    def _failed(self, *, timed_out: bool, detail: str) -> None:
+        process = self.process
+        returncode = None if process is None else process.poll()
+        if process is not None and process.stdout is not None:
+            detail = (
+                detail
+                or bytes(self._stdout_buffer[-400:]).decode("utf-8", "replace")
+            )
+        stopped_returncode = self._stop(kill_group=True)
+        if stopped_returncode is not None:
+            returncode = stopped_returncode
+        raise _IsolatedCellWorkerFailure(
+            timed_out=timed_out,
+            returncode=returncode,
+            detail=detail,
+        )
+
+    def request(
+        self, payload: Mapping[str, Any], *, timeout_s: float
+    ) -> dict[str, Any]:
+        with self._lock:
+            if self.process is not None and self.process.poll() is not None:
+                self._stop(kill_group=True)
+            if self.process is None:
+                try:
+                    self._start()
+                except OSError as exc:
+                    raise _IsolatedCellWorkerFailure(detail=str(exc)) from exc
+            process = self.process
+            assert process is not None
+            if process.stdin is None or process.stdout is None:
+                self._failed(timed_out=False, detail="worker pipes unavailable")
+            deadline = time.monotonic() + max(0.001, float(timeout_s))
+            try:
+                request_bytes = (json.dumps(payload) + "\n").encode("utf-8")
+                view = memoryview(request_bytes)
+                while view:
+                    written = os.write(process.stdin.fileno(), view)
+                    view = view[written:]
+            except OSError as exc:
+                self._failed(timed_out=False, detail=f"worker request failed: {exc}")
+
+            with selectors.DefaultSelector() as selector:
+                selector.register(process.stdout, selectors.EVENT_READ)
+                while True:
+                    remaining = deadline - time.monotonic()
+                    if remaining <= 0:
+                        self._failed(
+                            timed_out=True,
+                            detail="isolated cell exceeded hard timeout",
+                        )
+                    if not selector.select(remaining):
+                        self._failed(
+                            timed_out=True,
+                            detail="isolated cell exceeded hard timeout",
+                        )
+                    chunk = os.read(process.stdout.fileno(), 65536)
+                    if not chunk:
+                        self._failed(
+                            timed_out=False,
+                            detail=(
+                                "worker exited without a cell result "
+                                f"(returncode={process.poll()})"
+                            ),
+                        )
+                    self._stdout_buffer.extend(chunk)
+                    while b"\n" in self._stdout_buffer:
+                        line, _, remainder = self._stdout_buffer.partition(b"\n")
+                        self._stdout_buffer = bytearray(remainder)
+                        marker = line.rfind(b"\x1e")
+                        if marker < 0:
+                            continue
+                        try:
+                            result = json.loads(line[marker + 1 :])
+                        except (UnicodeDecodeError, json.JSONDecodeError) as exc:
+                            self._failed(
+                                timed_out=False,
+                                detail=f"invalid isolated worker response: {exc}",
+                            )
+                        if not isinstance(result, dict):
+                            self._failed(
+                                timed_out=False,
+                                detail="isolated worker response was not an object",
+                            )
+                        return result
+
+
+_ISOLATED_CELL_WORKERS: dict[str, _IsolatedCellWorker] = {}
+_ISOLATED_CELL_WORKERS_LOCK = threading.Lock()
+
+
+def _isolated_cell_worker(engine: str) -> _IsolatedCellWorker:
+    with _ISOLATED_CELL_WORKERS_LOCK:
+        worker = _ISOLATED_CELL_WORKERS.get(engine)
+        if worker is None:
+            worker = _IsolatedCellWorker(engine)
+            _ISOLATED_CELL_WORKERS[engine] = worker
+        return worker
+
+
+def _close_isolated_cell_workers() -> None:
+    with _ISOLATED_CELL_WORKERS_LOCK:
+        workers = tuple(_ISOLATED_CELL_WORKERS.values())
+        _ISOLATED_CELL_WORKERS.clear()
+    for worker in workers:
+        worker.close()
+
+
+atexit.register(_close_isolated_cell_workers)
+
+
 def _run_cell_in_subprocess(
     handle: EngineHandle,
     pot: BinaryPot,
@@ -2827,31 +2759,33 @@ def _run_cell_in_subprocess(
     }
     if physical_pressure_bar is not None:
         payload["physical_pressure_bar"] = float(physical_pressure_bar)
-    env = dict(os.environ)
-    env.setdefault("PYTHONPATH", str(REPO_ROOT))
-    pythonpath = env.get("PYTHONPATH") or ""
-    if str(REPO_ROOT) not in pythonpath.split(os.pathsep):
-        env["PYTHONPATH"] = os.pathsep.join(
-            [str(REPO_ROOT), pythonpath] if pythonpath else [str(REPO_ROOT)]
+    worker = _isolated_cell_worker(handle.name)
+    try:
+        raw = worker.request(
+            payload,
+            timeout_s=float(timeout_s) + 2.0,
+        )
+    except _IsolatedCellWorkerFailure as exc:
+        return _crash_cell_from_returncode(
+            handle=handle,
+            pot=pot,
+            temperature_K=temperature_K,
+            po2=po2,
+            wall0=wall0,
+            cpu0=cpu0,
+            hostname=hostname,
+            returncode=exc.returncode,
+            timed_out=exc.timed_out,
+            stderr=exc.detail,
+            arm=arm,
+            notices=notices,
+            authority=authority,
+            certified_band=certified_band,
         )
     try:
-        proc = subprocess.run(
-            [sys.executable, "-c", _ISOLATED_CELL_BOOTSTRAP],
-            input=json.dumps(payload),
-            cwd=str(REPO_ROOT),
-            env=env,
-            capture_output=True,
-            text=True,
-            timeout=float(timeout_s) + 2.0,
-            start_new_session=True,
-        )
-    except subprocess.TimeoutExpired as exc:
-        child = getattr(exc, "process", None)
-        if child is not None and getattr(child, "pid", None):
-            try:
-                os.killpg(child.pid, signal.SIGKILL)
-            except (OSError, ProcessLookupError):
-                pass
+        cell = EquilibrateCell.from_payload(raw)
+    except (KeyError, TypeError, ValueError) as exc:
+        worker.retire()
         return _crash_cell_from_returncode(
             handle=handle,
             pot=pot,
@@ -2861,50 +2795,15 @@ def _run_cell_in_subprocess(
             cpu0=cpu0,
             hostname=hostname,
             returncode=None,
-            timed_out=True,
-            stderr=str(getattr(exc, "stderr", "") or ""),
-            arm=arm,
-            notices=notices,
-            authority=authority,
-            certified_band=certified_band,
-        )
-    if proc.returncode != 0:
-        return _crash_cell_from_returncode(
-            handle=handle,
-            pot=pot,
-            temperature_K=temperature_K,
-            po2=po2,
-            wall0=wall0,
-            cpu0=cpu0,
-            hostname=hostname,
-            returncode=proc.returncode,
             timed_out=False,
-            stderr=proc.stderr or proc.stdout or "",
+            stderr=f"invalid isolated worker result ({exc})",
             arm=arm,
             notices=notices,
             authority=authority,
             certified_band=certified_band,
         )
-    try:
-        raw = json.loads(proc.stdout.strip().splitlines()[-1])
-    except (json.JSONDecodeError, IndexError) as exc:
-        return _crash_cell_from_returncode(
-            handle=handle,
-            pot=pot,
-            temperature_K=temperature_K,
-            po2=po2,
-            wall0=wall0,
-            cpu0=cpu0,
-            hostname=hostname,
-            returncode=proc.returncode,
-            timed_out=False,
-            stderr=f"unparseable worker stdout ({exc}): {proc.stdout[:400]}",
-            arm=arm,
-            notices=notices,
-            authority=authority,
-            certified_band=certified_band,
-        )
-    cell = EquilibrateCell.from_payload(raw)
+    if cell.refusal_reason == REFUSAL_TIMEOUT or cell.engine_status == "TimeoutError":
+        worker.retire()
     merged_notices: list[dict[str, Any]] = []
     seen: set[str] = set()
     for row in list(notices) + list(cell.notices):
@@ -2970,8 +2869,6 @@ def _open_resolved_backend(name: str) -> Any:
 
     if name in OPENIMCC_ENGINE_NAMES:
         return _OpenImccBatteryBackend(name)
-    if name in LEGACY_IMCC_ENGINE_NAMES:
-        return _ImccBatteryBackend(name)
     if name == "vaporock":
         return open_warm_vaporock_backend(warm_pool_size=1)
     if name == "magemin":
@@ -3775,18 +3672,6 @@ def qualification_section(
             ],
             "residuals_vs_imcc": rows_vs_imcc[:20],
             "residuals_vs_vaporock": rows_vs_vaporock[:20],
-            "residual_shift_vs_imcc": _residual_shift_in_vs_out_of_band(
-                headline_residuals,
-                qual_residuals,
-                engine=name,
-                peer="imcc_sf04",
-            ),
-            "residual_shift_vs_imcc_ext": _residual_shift_in_vs_out_of_band(
-                headline_residuals,
-                qual_residuals,
-                engine=name,
-                peer="imcc_sf04_ext",
-            ),
             "residual_shift_vs_vaporock": _residual_shift_in_vs_out_of_band(
                 headline_residuals,
                 qual_residuals,
@@ -4324,8 +4209,6 @@ def _render_qualification_markdown(
     for name in engine_names:
         block = per_engine.get(name) or {}
         for key, peer in (
-            ("residual_shift_vs_imcc", "imcc_sf04"),
-            ("residual_shift_vs_imcc_ext", "imcc_sf04_ext"),
             ("residual_shift_vs_vaporock", "vaporock"),
         ):
             shift = block.get(key) or {}

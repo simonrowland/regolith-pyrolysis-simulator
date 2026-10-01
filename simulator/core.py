@@ -405,6 +405,7 @@ from simulator.fe_redox import (
     _Kress91Evaluator,
     _kress91_ln_ratio,
     _kress91_log_fO2_from_fe_oxide_moles,
+    _validate_kress91_temperature_pressure_controls,
     calphad_ferrous_feo_activity_diagnostic,
     feo_iw_log10_fO2_bar,
     feot_equivalent_wt_pct,
@@ -924,6 +925,7 @@ class PoisonedHourState:
     hour: int
     committed_transition_count: int
     aborting_exception_summary: str
+    aborting_exception_type: type[BaseException] | None = None
 
 
 class PoisonedHourError(RuntimeError):
@@ -11467,6 +11469,20 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         )
 
 
+    def _native_fe_split_diagnostic_context(self) -> Dict[str, Any]:
+        """Return native-Fe events independently of melt equality authority."""
+
+        context: Dict[str, Any] = {}
+        partition = dict(
+            getattr(self, '_last_native_fe_partition_diagnostic', {}) or {}
+        )
+        if partition:
+            context['native_fe_partition'] = partition
+        event = dict(getattr(self, '_last_native_fe_saturation_event', {}) or {})
+        if event:
+            context['native_fe_saturation_event'] = event
+        return context
+
     def _absent_melt_equality_fe_redox_split(
         self,
         temperature_K: float,
@@ -11526,6 +11542,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             'extrapolation': True,
             'high_uncertainty': True,
             'redox_domain': domain,
+            **self._native_fe_split_diagnostic_context(),
         }
 
     def _compute_fe_redox_split_diagnostic(
@@ -11547,12 +11564,6 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 'melt_intrinsic_fO2_log',
                 getattr(self.melt, 'melt_fO2_log', None),
             )
-        if self._melt_redox_equality_is_absent():
-            return self._absent_melt_equality_fe_redox_split(T_K)
-        fO2_log = float(raw_fO2_log)
-        # Diagnostic-only construction via ``__new__`` predates the runtime
-        # projection. Preserve the exact pre-PHYS pressure source here only;
-        # authoritative callers of the shared accessor fail loud if absent.
         diagnostic_pressure_bar = (
             float(self.overhead.pressure_mbar) / 1000.0
             if getattr(self, '_melt_headspace_composition_mbar', None) is None
@@ -11562,6 +11573,16 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             diagnostic_pressure_bar,
             floor_bar=self._vacuum_floor_bar(),
         )
+        if self._melt_redox_equality_is_absent():
+            _validate_kress91_temperature_pressure_controls(
+                T_K=T_K,
+                pressure_bar=pressure_bar,
+            )
+            return self._absent_melt_equality_fe_redox_split(T_K)
+        fO2_log = float(raw_fO2_log)
+        # Diagnostic-only construction via ``__new__`` predates the runtime
+        # projection. Preserve the exact pre-PHYS pressure source here only;
+        # authoritative callers of the shared accessor fail loud if absent.
         log_iw = (
             -27215.0 / T_K + 6.57
             if T_K > 0.0
@@ -11725,26 +11746,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             'extrapolation': bool(split.get('extrapolation', False)),
             'high_uncertainty': bool(split.get('high_uncertainty', False)),
             **({'redox_domain': redox_domain} if redox_domain else {}),
-            **(
-                {'native_fe_partition': dict(
-                    getattr(self, '_last_native_fe_partition_diagnostic', {})
-                    or {}
-                )}
-                if getattr(self, '_last_native_fe_partition_diagnostic', {})
-                else {}
-            ),
-            # Surface the native-Fe saturation event (deferred /
-            # below-threshold / partitioned) so the live HourSnapshot and
-            # runner output show WHY there is (or is not) a partition this
-            # tick — otherwise the deferred-not-liquid label is write-only.
-            **(
-                {'native_fe_saturation_event': dict(
-                    getattr(self, '_last_native_fe_saturation_event', {})
-                    or {}
-                )}
-                if getattr(self, '_last_native_fe_saturation_event', {})
-                else {}
-            ),
+            **self._native_fe_split_diagnostic_context(),
         }
 
     def _native_fe_saturation_state(
@@ -18359,6 +18361,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                         aborting_exception_summary=(
                             f'{type(exc).__name__}: {exc}'
                         ),
+                        aborting_exception_type=type(exc),
                     )
                 except BaseException:
                     pass

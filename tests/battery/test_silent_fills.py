@@ -235,7 +235,7 @@ def test_zero_iron_does_not_hide_another_multivalent_oxide(monkeypatch) -> None:
         total_P=Decimal("1e5"),
     )
     obs = F.observation("ti", "exp", ident, Decimal("0.4"))
-    prediction = predict_with_engine(Engine.IMCC_SF04, obs, isolated=False)
+    prediction = predict_with_engine(Engine.OPENIMCC, obs, isolated=False)
     assert prediction.refusal_detail["reason"] == "missing_fO2"
     assert "TiO2" in prediction.refusal_detail["multivalent"]
     assert "FeO" not in prediction.refusal_detail["multivalent"]
@@ -264,7 +264,7 @@ def test_melt_without_a_multivalent_element_omits_oxygen(monkeypatch) -> None:
         total_P=Decimal("100000"),
     )
     obs = F.observation("cmas", "exp", ident, Decimal("0.5"))
-    prediction = predict_with_engine(Engine.IMCC_SF04, obs, isolated=False)
+    prediction = predict_with_engine(Engine.OPENIMCC, obs, isolated=False)
     assert seen["mode"] == PO2_NOT_AN_INPUT
     assert seen["po2_bar"] is None
     assert seen["mode"] != PO2_ENGINE_DEFAULT

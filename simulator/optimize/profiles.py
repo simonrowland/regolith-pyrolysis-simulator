@@ -1102,8 +1102,10 @@ def _validate_run_thermal_window_caps(
             f"{source}: {campaign}.temp_range_C must be ascending"
         )
     run_hours = int(float(run_options.get("hours", 24)))
+    duration_value = _profile_campaign_setting(profile, campaign, "duration_h")
+    campaign_max_hold_hr = _campaign_max_hold_hr_for_profile(source, campaign)
     duration_h = _thermal_window_duration_h(
-        _profile_campaign_setting(profile, campaign, "duration_h"),
+        duration_value,
         run_hours=run_hours,
     )
     preheat_ramp = _thermal_preheat_ramp_C_per_hr(profile, campaign)
@@ -1112,12 +1114,12 @@ def _validate_run_thermal_window_caps(
             max(0.0, low_C - DEFAULT_COLD_START_TEMPERATURE_C) / preheat_ramp
         )
     )
-    total_hours = int(math.ceil(preheat_hours + duration_h))
     max_hold_hr, max_hold_bound = _thermal_window_max_hold_bound(
         profile,
         campaign,
-        campaign_max_hold_hr=_campaign_max_hold_hr_for_profile(source, campaign),
+        campaign_max_hold_hr=campaign_max_hold_hr,
     )
+    total_hours = int(math.ceil(preheat_hours + duration_h))
     if max_hold_hr is None or float(total_hours) <= max_hold_hr:
         return
     raise ProfileValidationError(
@@ -1229,9 +1231,15 @@ def _thermal_window_max_hold_bound(
     return campaign_max_hold_hr, "campaign_max_hold_hr"
 
 
-def _thermal_window_duration_h(value: Any, *, run_hours: int) -> float:
+def _thermal_window_duration_h(
+    value: Any,
+    *,
+    run_hours: int,
+) -> float:
     interval = _numeric_interval_optional(value)
     if interval is None:
+        # A single-campaign thermal window uses run.hours as its hold; sequence
+        # profiles have no temp_range_C and never enter this cap check.
         return float(run_hours)
     low, high = interval
     if high < low:

@@ -1,0 +1,102 @@
+0003-condensate-na2o-al2o3-liquid-rows.patch
+==========================================
+
+Fixes two transcription defects in VapoRock's data/condensate-thermo-data.csv
+(upstream https://gitlab.com/ENKI-portal/vaporock.git @ 0159678; applies on top of
+0001 and 0002 of this series). Everything above the first `diff --git` line is a
+note; `git apply` ignores it.
+
+Scope and who is affected
+-------------------------
+VapoRock's own solver does not read this file: its oxide standard states come
+from the MELTS liquid (src/vaporock/equil.py loads only vapor-thermo-data.csv and
+the JANAF vapor CSVs), and no VapoRock Python code references
+condensate-thermo-data.csv. The defects therefore do not change VapoRock's own
+results. They do propagate to every consumer that copied the file as a
+Lamoreaux liquid-oxide table, including the vendored IMCC-SF04 gas layer
+(simulator/melt_backend/imcc_sf04/gas.py) and openimcc
+(src/openimcc/data/gas/condensate.csv), where they set the Na and Al gas pressures.
+
+Row format (as consumed by those gas layers)
+--------------------------------------------
+G(T) = R*1000*dH298_R - R*T*(dG_A + dG_B*t + dG_C*t^2 + dG_D*t^3 + dG_E*t^4),
+t = T/1000. This is the Lamoreaux-Hildenbrand form
+-(G_T - H_298)/(RT) = A + B*T + C*T^2 + D*T^3 (B, C, D scaled by 1e3/1e6/1e9 in the
+printed tables), anchored on the 298.15 K formation enthalpy of the phase that is
+stable at 298.15 K. LH84 p.153 states that transition enthalpies and entropies
+are included in the tabulated functions at the transition temperature.
+
+Defect 1: Na2O(l), line 7
+-------------------------
+  was: Na2O(l),l,Na,2,1,825,3000,-50.17,4.82,19.292,-5.267,0.623,0,LAM1984
+  now: Na2O(l),l,Na,2,1,1405,3000,-50.17,7.67,6.193,0,0,0,LAM1984
+
+The anchor -50.17 kK is correct: Lamoreaux & Hildenbrand (1984), Table 4, printed
+p.157, Na2O(s) dfH298/R = -50.17 +/- 0.50 kK. The coefficients
+(4.82, 19.292, -5.267, 0.623) and the 825 K lower bound belong to a different
+species: they are LH84 Table 2 (printed p.154), row "NaO2(l)", 825-3000 K. The
+Na2O(l) row of the same table is A = 7.67, 10^3 B = 6.193, 10^6 C = 0.000,
+10^9 D = 0.000, 1405-3000 K. Table 1 (p.153) gives Na2O Tm = 1405 +/- 100 K.
+- Effect: at 1900 K the wrong row makes Na2O(l) 92.1 kJ/mol too stable (101 kJ/mol
+  at 2200 K) against JANAF Na-013 liquid, which puts p(Na) about 1.58 dex (x38) too
+  low. With the correction, the Schaefer & Fegley (2004) Table 9 Na anchor at 1900 K
+  goes from a -1.42 dex residual to +0.17 dex.
+- Residual source difference, not part of this fix: corrected LH84 Na2O(l) is still
+  less stable than JANAF Na-013 at every liquid node from 1600 to 3000 K: +13.4 kJ/mol
+  at 1600 K, rising to +29.6 kJ/mol at 2400 K, and +17.7 kJ/mol at 3000 K.
+
+Defect 2: Al2O3(l), line 4
+--------------------------
+  was: Al2O3(l),l,Al,2,3,2327,3000,-188.14,...,LAM1987
+  now: Al2O3(l),l,Al,2,3,2327,3000,-201.54,...,LAM1987
+
+-188.14 = -201.54 + 13.40. That is the Lamoreaux, Hildenbrand & Brewer (1987)
+Table 3 Al2O3(s) anchor dfH298/R = -201.54 +/- 0.15 kK (printed p.424) with
+the Table 1 fusion enthalpy dfusH/R = 13.40 +/- 0.36 kK added a second time. The
+LH87 Table 2 (printed p.422) liquid function already carries the fusion terms at Tm = 2327 K, so
+the anchor must be the solid value. The coefficients and the 2327-3000 K range are
+correct as printed.
+- Check: with -201.54, the row reproduces JANAF Al-100 liquid
+  G = dfH298 + (H - H298) - T*S to within 0.1 kJ/mol at 2600-3000 K. With -188.14 it
+  is off by a constant +111.4 kJ/mol, which puts p(Al), p(AlO) and p(Al2O) about
+  1.3 dex too high at 2200 K (per Al atom).
+
+Not changed (verified correct against the same tables)
+------------------------------------------------------
+K2O(l) (LH84 Table 2/4), MgO(l), CaO(l), SiO2(l), SiO2(cr) (LH87 Tables 1-3), and
+FeO(l) (JANAF Fe-019). The Na2O(l) line carries a stray "-188.14" in an unnamed
+trailing column, apparently a spreadsheet leftover; this patch leaves it untouched.
+
+Sources
+-------
+- R. H. Lamoreaux, D. L. Hildenbrand, "High Temperature Vaporization Behavior of
+  Oxides. I. Alkali Metal Binary Oxides", J. Phys. Chem. Ref. Data 13, 151 (1984),
+  doi:10.1063/1.555706. Tables 1, 2 and 4, printed pp.153, 154 and 157.
+  NIST reprint: https://srd.nist.gov/JPCRD/jpcrd241.pdf
+  (sha256 3ecb3e3e9a5ee2487c92fdc185ef6b9e82d17c11bfe3e9969bb67abee943ba8a;
+  scanned, no text layer; read visually).
+- R. H. Lamoreaux, D. L. Hildenbrand, L. Brewer, "High-Temperature Vaporization
+  Behavior of Oxides II. Oxides of Be, Mg, Ca, Sr, Ba, B, Al, Ga, In, Tl, Si, Ge,
+  Sn, Pb, Zn, Cd, and Hg", J. Phys. Chem. Ref. Data 16, 419 (1987),
+  doi:10.1063/1.555799. Tables 1-3, printed pp.421-424.
+- NIST-JANAF 4th ed. tables Na-013 (Na2O liquid) and Al-100 (Al2O3 liquid).
+- L. Schaefer, B. Fegley, Icarus 169, 216 (2004), doi:10.1016/j.icarus.2003.08.023,
+  Tables 5 and 9 (Na check).
+
+diff --git a/data/condensate-thermo-data.csv b/data/condensate-thermo-data.csv
+index e70a0ca..3e20df1 100644
+--- a/data/condensate-thermo-data.csv
++++ b/data/condensate-thermo-data.csv
+@@ -1,9 +1,9 @@
+ ﻿species_name,state,cation,cat_num,oxy_num,T_min,T_max,dH298_R,dG_A,dG_B,dG_C,dG_D,dG_E,Ref,,,
+ MgO(l),l,Mg,1,1,3100,3500,-72.34,-0.804,5.1067,-0.3615,0,0,LAM1987,,,
+ CaO(l),l,Ca,1,1,2900,3800,-76.384,0.924,5.922,-0.7316,0.0436,0,LAM1987,,,
+-Al2O3(l),l,Al,2,3,2327,3000,-188.14,232.345,-336.622,193.672,-48.1032,4.4461,LAM1987,,,
++Al2O3(l),l,Al,2,3,2327,3000,-201.54,232.345,-336.622,193.672,-48.1032,4.4461,LAM1987,,,
+ SiO2(l),l,Si,1,2,1996,3000,-109.53,2.12,7.6492,-1.2588,0.0998,0,LAM1987,,,
+ SiO2(cr),s,Si,1,2,1000,1996,-109.53,1.937,8.59,-1.935,0.225,0,LAM1987,,,
+-Na2O(l),l,Na,2,1,825,3000,-50.17,4.82,19.292,-5.267,0.623,0,LAM1984,,,-188.14
++Na2O(l),l,Na,2,1,1405,3000,-50.17,7.67,6.193,0,0,0,LAM1984,,,-188.14
+ K2O(l),l,K,2,1,1190,3000,-43.58,0.8,18.889,-4.532,0.467,0,LAM1984,,,
+ FeO(l),l,Fe,1,1,1000,5000,-30.01,6.72,6.588,-1.248,0.150,-0.007697,JANAF,,,
+\ No newline at end of file

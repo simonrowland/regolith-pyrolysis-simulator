@@ -92,7 +92,10 @@ from simulator.battery.oxygen_balance import (
 )
 from simulator.battery.source_lineage import coefficient_lineage_sources
 from simulator.accounting.formulas import parse_formula
-from simulator.battery.validity import run_validity_gates
+from simulator.battery.validity import (
+    _partial_pressure_observations_by_experiment,
+    run_validity_gates,
+)
 from simulator.reference_data.janaf import formula_composition
 
 _PAREN_GROUP_RE = re.compile(r"\(([A-Za-z0-9]+)\)(\d*)")
@@ -472,12 +475,19 @@ def _term_composition(formula: str) -> tuple[tuple[str, float], ...] | None:
     return parsed
 
 
-def reaction_atom_balance(reaction: Reaction) -> dict[str, float]:
-    """Net element counts. Empty dict means balanced (within 1e-12)."""
+def _reaction_atom_balance(
+    reaction: Reaction, *, janaf_decimal_subscripts: bool = False
+) -> dict[str, float]:
+    """Net element counts using the source's unambiguous formula parser."""
 
     net: dict[str, float] = {}
     for term in reaction.terms:
-        parsed = _term_composition(term.species.formula)
+        formula = term.species.formula
+        parsed = (
+            formula_composition(formula)
+            if janaf_decimal_subscripts and "." in formula
+            else _term_composition(formula)
+        )
         if parsed is None:
             net[f"?{term.species.formula}"] = net.get(f"?{term.species.formula}", 0.0) + float(
                 term.coefficient
@@ -487,6 +497,12 @@ def reaction_atom_balance(reaction: Reaction) -> dict[str, float]:
         for element, count in parsed:
             net[element] = net.get(element, 0.0) + coeff * float(count)
     return {el: n for el, n in net.items() if abs(n) > 1e-12}
+
+
+def reaction_atom_balance(reaction: Reaction) -> dict[str, float]:
+    """Net element counts. Empty dict means balanced (within 1e-12)."""
+
+    return _reaction_atom_balance(reaction)
 
 
 def _check_species(path: str, species: Species, issues: list[ValidationIssue]) -> None:
@@ -537,7 +553,13 @@ def _check_species(path: str, species: Species, issues: list[ValidationIssue]) -
         )
 
 
-def _check_identity(path: str, identity: Identity, issues: list[ValidationIssue]) -> None:
+def _check_identity(
+    path: str,
+    identity: Identity,
+    issues: list[ValidationIssue],
+    *,
+    source_id: str | None = None,
+) -> None:
     _check_species(f"{path}.species", identity.species, issues)
     profile_outcome = validate_quantity_profile(identity)
     if profile_outcome.kind is IdentityEqualKind.INVALID_IDENTITY:
@@ -570,7 +592,10 @@ def _check_identity(path: str, identity: Identity, issues: list[ValidationIssue]
                 )
             )
     if identity.reaction is not None and identity.reaction.is_value and identity.reaction.value is not None:
-        residual = reaction_atom_balance(identity.reaction.value)
+        residual = _reaction_atom_balance(
+            identity.reaction.value,
+            janaf_decimal_subscripts=source_id == "nist-janaf-4th",
+        )
         if residual:
             issues.append(
                 _issue(
@@ -626,6 +651,20 @@ def _check_identity(path: str, identity: Identity, issues: list[ValidationIssue]
 
 
 def _check_notice(path: str, notice: Notice, issues: list[ValidationIssue]) -> None:
+    if notice.kind is NoticeKind.REFERENCE_PHASE_BY_CONVENTION:
+        if (
+            notice.authority is not Authority.CONVENTION
+            or not notice.certification
+            or notice.reason
+            != "JANAF web table prints no phase; ideal-gas reference state per the monograph convention, page not held"
+        ):
+            issues.append(
+                _issue(
+                    path,
+                    RefusalReason.CONDITIONAL_FIELD,
+                    "reference_phase_by_convention requires convention authority, its fixed reason, and certification",
+                )
+            )
     if notice.kind is NoticeKind.FLOOR_INVERSION:
         if notice.original is None or not notice.band:
             issues.append(
@@ -971,7 +1010,9 @@ def validate_observation(
             _issue(f"{path}.identity", RefusalReason.INVALID_IDENTITY, "identity is not an Identity")
         )
     else:
-        _check_identity(f"{path}.identity", identity, issues)
+        _check_identity(
+            f"{path}.identity", identity, issues, source_id=observation.source_id
+        )
         if experiment is not None:
             pc = observation.point_conditions or {}
             _reconcile_identity_axis(
@@ -1347,6 +1388,8 @@ def validate_residual(
     experiments: Mapping[str, Experiment],
     works: Mapping[str, Work] | None = None,
     path: str = "residual",
+    *,
+    point_observations: Sequence[Observation] | None = None,
 ) -> list[ValidationIssue]:
     issues: list[ValidationIssue] = []
     reference = observations.get(residual.reference)
@@ -1450,7 +1493,12 @@ def validate_residual(
         experiment = experiments.get(reference.experiment_id)
         if experiment is not None:
             tables = _table_payloads(reference, observations)
-            gates = run_validity_gates(experiment, reference, tables=tables)
+            gates = run_validity_gates(
+                experiment,
+                reference,
+                tables=tables,
+                point_observations=point_observations,
+            )
             if not gates.passed:
                 gate_reason = gates.reason or RefusalReason.INVALID_SOURCE
                 refusal = residual.refusal
@@ -1697,6 +1745,9 @@ def validate_corpus(
     work_map = _index_unique(works, "work_id", "work", issues)
     exp_map = _index_unique(experiments, "experiment_id", "experiment", issues)
     obs_map = _index_unique(observations, "observation_id", "observation", issues)
+    point_observations_by_experiment = _partial_pressure_observations_by_experiment(
+        obs_map.values()
+    )
     bench_map = None if benches is None else _index_unique(benches, "id", "bench", issues)
     context_map: dict[str, Mapping[str, Any]] | None = None
     if context_rows is not None:
@@ -1771,9 +1822,21 @@ def validate_corpus(
             )
         )
     for residual in res_items:
+        reference = obs_map.get(residual.reference)
         issues.extend(
             validate_residual(
-                residual, obs_map, exp_map, work_map, f"residual[{residual.key}]"
+                residual,
+                obs_map,
+                exp_map,
+                work_map,
+                f"residual[{residual.key}]",
+                point_observations=(
+                    ()
+                    if reference is None
+                    else point_observations_by_experiment.get(
+                        reference.experiment_id, ()
+                    )
+                ),
             )
         )
     return ValidationReport(tuple(issues))

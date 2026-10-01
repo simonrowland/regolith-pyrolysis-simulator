@@ -78,7 +78,7 @@ import math
 from dataclasses import dataclass
 from decimal import Decimal
 from fractions import Fraction
-from typing import Any
+from typing import Any, Callable
 
 from simulator.battery.enums import (
     CONDENSED_PHASES,
@@ -149,6 +149,9 @@ CELSIUS_OFFSET_DEC = Decimal(str(CELSIUS_TO_KELVIN_OFFSET))
 # Algebra: log10 Kf = −ΔfG / (R T ln 10), ΔfG in J/mol, T in K.
 # Unit check: J/mol / (J/(mol·K) · K) is dimensionless.
 # Sanity: ΔfG = 0 → log10 Kf = 0; at 298.15 K, 1 kJ/mol ≈ 0.1752 dex.
+# Propagating an energy uncertainty gives σ_logK = σ_ΔG / (R·T·ln 10).
+# Unit check: kJ/mol divided by [kJ/(mol·K)]·K is dimensionless (dex).
+# B1544's ±1.320 kJ/mol at 298.15 K gives 1.320/(R·T·ln 10) = 0.231 dex.
 LN10 = Decimal(str(math.log(10.0)))
 R_J_PER_MOL_K = Decimal(str(GAS_CONSTANT))
 R_KJ_PER_MOL_K = R_J_PER_MOL_K / Decimal("1000")
@@ -665,6 +668,8 @@ def profile_for(identity: Identity) -> QuantityProfile:
         else:
             na("composition")
         na("fO2_Pa")
+    elif q is Quantity.RESIDUE_COMPONENT_COMPOSITION:
+        req("temperature_K", "subtype")
     elif q in {
         Quantity.VISCOSITY,
         Quantity.DENSITY,
@@ -865,6 +870,10 @@ def _species_equal(a: Species, b: Species) -> IdentityEqualOutcome:
         fields.append("species.charge")
     elif charge_cmp.kind is IdentityEqualKind.INVALID_IDENTITY:
         return charge_cmp
+    if fields:
+        return IdentityEqualOutcome(
+            IdentityEqualKind.IDENTITY_MISMATCH, tuple(fields)
+        )
     a_token = phase_token(a)
     poly = _state_compare(
         "species.polymorph",
@@ -872,6 +881,14 @@ def _species_equal(a: Species, b: Species) -> IdentityEqualOutcome:
         b.polymorph,
         required=a_token is Phase.CR,
     )
+    if (
+        a.polymorph is not None
+        and b.polymorph is not None
+        and a.polymorph.is_value
+        and b.polymorph.is_value
+        and poly.kind is IdentityEqualKind.IDENTITY_MISMATCH
+    ):
+        return poly
     if a_token is Phase.CR:
         if poly.kind is not IdentityEqualKind.EQUAL:
             return poly
@@ -884,8 +901,6 @@ def _species_equal(a: Species, b: Species) -> IdentityEqualOutcome:
             )
     elif a_token is not None and poly.kind is IdentityEqualKind.INVALID_IDENTITY:
         return poly
-    if fields:
-        return IdentityEqualOutcome(IdentityEqualKind.IDENTITY_MISMATCH, tuple(fields))
     if unknown:
         return IdentityEqualOutcome(IdentityEqualKind.IDENTITY_UNKNOWN, tuple(unknown))
     return IdentityEqualOutcome(IdentityEqualKind.EQUAL)
@@ -932,6 +947,132 @@ def _mismatch(name: str) -> IdentityEqualOutcome:
     return IdentityEqualOutcome(IdentityEqualKind.IDENTITY_MISMATCH, (name,))
 
 
+def _species_axis_compare(
+    name: str, left: Species, right: Species
+) -> IdentityEqualOutcome:
+    outcome = _species_equal(left, right)
+    if outcome.kind is IdentityEqualKind.IDENTITY_MISMATCH:
+        return _mismatch(name)
+    return outcome
+
+
+def _multiset_compare(
+    name: str,
+    left: tuple[Any, ...],
+    right: tuple[Any, ...],
+    compare_items: Callable[[Any, Any], IdentityEqualOutcome],
+) -> IdentityEqualOutcome:
+    if len(left) != len(right):
+        return _mismatch(name)
+
+    # Compare semantically; hashing these records would make UNKNOWN reasons
+    # part of identity and would lose nested three-valued outcomes.
+    outcomes = [
+        [compare_items(left_item, right_item) for right_item in right]
+        for left_item in left
+    ]
+
+    # For these term lists, EQUAL means an all-EQUAL one-to-one pairing
+    # exists. MISMATCH means every one-to-one pairing contains a definite
+    # mismatch (including lists of different lengths). UNKNOWN is the
+    # remaining case: a pairing avoids definite mismatches and includes at
+    # least one UNKNOWN pair. INVALID_IDENTITY remains distinct when a
+    # mismatch-free pairing exists only through invalid pairs.
+    def matching(
+        allowed: frozenset[IdentityEqualKind],
+        *,
+        require_kind: IdentityEqualKind | None = None,
+    ) -> tuple[IdentityEqualOutcome, ...] | None:
+        def visit(
+            left_index: int,
+            available_right: frozenset[int],
+            required_kind_seen: bool,
+        ) -> tuple[IdentityEqualOutcome, ...] | None:
+            if left_index == len(left):
+                return () if required_kind_seen or require_kind is None else None
+            candidates = sorted(
+                (
+                    right_index
+                    for right_index in available_right
+                    if outcomes[left_index][right_index].kind in allowed
+                ),
+                key=lambda right_index: (
+                    outcomes[left_index][right_index].kind
+                    is not IdentityEqualKind.EQUAL,
+                    outcomes[left_index][right_index].kind
+                    is IdentityEqualKind.INVALID_IDENTITY,
+                    right_index,
+                ),
+            )
+            for right_index in candidates:
+                outcome = outcomes[left_index][right_index]
+                tail = visit(
+                    left_index + 1,
+                    available_right - {right_index},
+                    required_kind_seen or outcome.kind is require_kind,
+                )
+                if tail is not None:
+                    return (outcome, *tail)
+            return None
+
+        return visit(0, frozenset(range(len(right))), False)
+
+    equal_match = matching(frozenset({IdentityEqualKind.EQUAL}))
+    if equal_match is not None:
+        return IdentityEqualOutcome(IdentityEqualKind.EQUAL)
+
+    unknown_match = matching(
+        frozenset(
+            {
+                IdentityEqualKind.EQUAL,
+                IdentityEqualKind.IDENTITY_UNKNOWN,
+                IdentityEqualKind.INVALID_IDENTITY,
+            }
+        ),
+        require_kind=IdentityEqualKind.IDENTITY_UNKNOWN,
+    )
+    if unknown_match is not None:
+        unknown_outcomes = tuple(
+            outcome
+            for outcome in unknown_match
+            if outcome.kind is IdentityEqualKind.IDENTITY_UNKNOWN
+        )
+        fields = tuple(
+            dict.fromkeys(
+                field for outcome in unknown_outcomes for field in outcome.fields
+            )
+        )
+        detail = next(
+            (outcome.detail for outcome in unknown_outcomes if outcome.detail), ""
+        )
+        return IdentityEqualOutcome(
+            IdentityEqualKind.IDENTITY_UNKNOWN, fields or (name,), detail
+        )
+
+    invalid_match = matching(
+        frozenset({IdentityEqualKind.EQUAL, IdentityEqualKind.INVALID_IDENTITY}),
+        require_kind=IdentityEqualKind.INVALID_IDENTITY,
+    )
+    if invalid_match is not None:
+        invalid_outcomes = tuple(
+            outcome
+            for outcome in invalid_match
+            if outcome.kind is IdentityEqualKind.INVALID_IDENTITY
+        )
+        fields = tuple(
+            dict.fromkeys(
+                field for outcome in invalid_outcomes for field in outcome.fields
+            )
+        )
+        detail = next(
+            (outcome.detail for outcome in invalid_outcomes if outcome.detail), ""
+        )
+        return IdentityEqualOutcome(
+            IdentityEqualKind.INVALID_IDENTITY, fields or (name,), detail
+        )
+    return _mismatch(name)
+
+
 def _values_compare(name: str, left: Any, right: Any) -> IdentityEqualOutcome:
     if isinstance(left, Decimal) or isinstance(right, Decimal):
         if as_decimal(left) == as_decimal(right):
@@ -965,35 +1106,32 @@ def _values_compare(name: str, left: Any, right: Any) -> IdentityEqualOutcome:
             return IdentityEqualOutcome(IdentityEqualKind.EQUAL)
         return _mismatch(name)
     if isinstance(left, Reaction) and isinstance(right, Reaction):
-        if len(left.terms) != len(right.terms):
-            return _mismatch(name)
-        for a, b in zip(left.terms, right.terms, strict=True):
-            if a.coefficient != b.coefficient:
-                return _mismatch(name)
-            nested = _species_equal(a.species, b.species)
-            if nested.kind is IdentityEqualKind.IDENTITY_MISMATCH:
-                return _mismatch(name)
-            if nested.kind is not IdentityEqualKind.EQUAL:
-                return IdentityEqualOutcome(nested.kind, nested.fields or (name,), nested.detail)
-        return IdentityEqualOutcome(IdentityEqualKind.EQUAL)
+        return _multiset_compare(
+            name,
+            left.terms,
+            right.terms,
+            lambda a, b: (
+                _mismatch(name)
+                if a.coefficient != b.coefficient
+                else _species_axis_compare(name, a.species, b.species)
+            ),
+        )
+    if (
+        name == "formation_elements"
+        and isinstance(left, tuple)
+        and isinstance(right, tuple)
+    ):
+        return _multiset_compare(
+            name,
+            left,
+            right,
+            lambda a, b: (
+                _mismatch(name)
+                if a[0] != b[0]
+                else _species_axis_compare(name, a[1], b[1])
+            ),
+        )
     if isinstance(left, tuple) and isinstance(right, tuple):
-        if len(left) != len(right):
-            return _mismatch(name)
-        if left and isinstance(left[0], tuple) and len(left[0]) == 2:
-            if [k for k, _ in left] != [k for k, _ in right]:
-                return _mismatch(name)
-            for (_ka, sa), (_kb, sb) in zip(left, right, strict=True):
-                if isinstance(sa, Species) and isinstance(sb, Species):
-                    nested = _species_equal(sa, sb)
-                    if nested.kind is IdentityEqualKind.IDENTITY_MISMATCH:
-                        return _mismatch(name)
-                    if nested.kind is not IdentityEqualKind.EQUAL:
-                        return IdentityEqualOutcome(
-                            nested.kind, nested.fields or (name,), nested.detail
-                        )
-                elif sa != sb:
-                    return _mismatch(name)
-            return IdentityEqualOutcome(IdentityEqualKind.EQUAL)
         if left == right:
             return IdentityEqualOutcome(IdentityEqualKind.EQUAL)
         return _mismatch(name)

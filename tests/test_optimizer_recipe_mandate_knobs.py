@@ -273,7 +273,7 @@ def test_mandate_lever_paths_are_tunable_and_real_setpoint_paths() -> None:
             _lookup(setpoints, runtime_path)
         values = {spec.path: _sample_value(spec)}
         total_path = pair_map.get(spec.path)
-        if total_path is not None:
+        if total_path is not None and not isinstance(values[spec.path], list):
             total_spec = spec_by_path[total_path]
             values[total_path] = max(
                 float(values[spec.path]), float(_sample_value(total_spec))

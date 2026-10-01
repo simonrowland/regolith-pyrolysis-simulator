@@ -17,6 +17,8 @@ import logging
 import math
 from pathlib import Path
 import re
+import resource
+import socket
 from types import MappingProxyType
 from typing import Any
 
@@ -70,6 +72,7 @@ from simulator.optimize.objective import (
     canonical_objective_mapping,
     cost_adjusted_objective_scores,
     objective_definitions,
+    objective_importance_evidence,
     objective_scores,
     objective_value_for_metric,
     pareto_front,
@@ -77,7 +80,7 @@ from simulator.optimize.objective import (
 from simulator.optimize.pool import (
     DEFAULT_EVAL_TIMEOUT_SECONDS,
     PoolEvaluationRequest,
-    evaluate_batch,
+    _evaluate_batch,
     evaluate_request_supervised,
     resolve_eval_timeout_seconds,
 )
@@ -116,6 +119,7 @@ from simulator.optimize.results_store import (
 from simulator.optimize.strategy import (
     Candidate,
     MorrisScreenStrategy,
+    OptunaTPEStrategy,
     RandomStrategy,
     Strategy,
     WarmStartSeed,
@@ -557,6 +561,10 @@ def run(
 ) -> StudyResult:
     """Run one ask/evaluate/tell study and write Phase-O artifacts."""
 
+    study_cpu_start = (
+        resource.getrusage(resource.RUSAGE_SELF),
+        resource.getrusage(resource.RUSAGE_CHILDREN),
+    )
     fidelity = str(canonical_backend_name(fidelity))
     base_schema = schema or RecipeSchema()
     config = StudyConfig(
@@ -598,6 +606,12 @@ def run(
         cli_pinned_paths=_cli_pinned_paths(pinned_paths),
     )
     definitions = objective_definitions(resolved_profile)
+    importance_by_metric = {
+        row.metric: row.weight for row in objective_importance_evidence(resolved_profile)
+    }
+    objective_weights = tuple(
+        importance_by_metric[definition.metric] for definition in definitions
+    )
     two_phase = _resolve_two_phase_config(resolved_profile, two_phase_certify)
     _validate_inputs(config, resolved_profile)
     try:
@@ -639,6 +653,7 @@ def run(
             profile=resolved_profile,
             seed=config.seed,
             schema=active_schema,
+            parallel=config.parallel,
             warm_start_seeds=warm_start_seeds,
         )
         staged_strategies: tuple[StagedStrategy, ...] = ()
@@ -733,6 +748,15 @@ def run(
         provenance_mode = "a"
         if not pending_resume_candidates and evaluated == config.budget:
             provenance_mode = "r"
+    best_scalarized_score, best_pareto_signature = _study_progress(
+        records,
+        definitions,
+        objective_weights,
+    )
+    progress_has_feasible = any(record.feasible for record in records)
+    use_pareto_stall = len(best_pareto_signature) > 1
+    stalled_batches = 0
+    engine_worker_pool = None
     try:
         provenance_writer = _LockedLineWriter(provenance_path, provenance_mode, store)
         events_writer = _LockedLineWriter(events_path, journal_mode, store)
@@ -767,10 +791,10 @@ def run(
                         batch_size=batch_size,
                     )
                 else:
-                    candidates = active_strategy.ask(batch_size)
+                    candidates = _ask_strategy_candidates(active_strategy, batch_size)
                     if not candidates and isinstance(active_strategy, StagedStrategy):
                         if active_strategy.run_backward_pass() or active_strategy.joint_refine():
-                            candidates = active_strategy.ask(batch_size)
+                            candidates = _ask_strategy_candidates(active_strategy, batch_size)
                 if not candidates:
                     break
                 batch_seq += 1
@@ -787,7 +811,7 @@ def run(
                     strategy=active_strategy,
                     staged_strategies=staged_strategies,
                 )
-            results, prefix_evals_in_batch = _evaluate_candidates(
+            results, prefix_evals_in_batch, engine_worker_pool = _evaluate_candidates(
                 candidates,
                 profile=loop_profile,
                 feedstock=config.feedstock,
@@ -801,6 +825,8 @@ def run(
                 definitions=definitions,
                 prefix_replay_cache=prefix_replay_cache,
                 per_eval_timeout_seconds=config.per_eval_timeout_seconds,
+                engine_worker_pool=engine_worker_pool,
+                retain_engine_worker_pool=True,
             )
             # Owner decision deferred: debit config.budget here if prefix evals join it.
             prefix_evals_run += prefix_evals_in_batch
@@ -867,6 +893,45 @@ def run(
                 staged_strategies=staged_strategies,
             )
             evaluated += len(candidates)
+            scalarized_score, pareto_signature = _study_progress(
+                records,
+                definitions,
+                objective_weights,
+            )
+            has_feasible = any(record.feasible for record in records)
+            if has_feasible and not progress_has_feasible:
+                # The first feasible row starts a new stall baseline; do not
+                # compare its score with the infeasible-only scalar.
+                best_scalarized_score = scalarized_score
+                best_pareto_signature = pareto_signature
+                use_pareto_stall = len(pareto_signature) > 1
+                stalled_batches = 0
+                progress_has_feasible = True
+            elif not use_pareto_stall and len(pareto_signature) > 1:
+                # Multiple distinct non-dominated score vectors mean at least two
+                # objectives now provide separate ranking signals.
+                use_pareto_stall = True
+                best_pareto_signature = pareto_signature
+                stalled_batches = 0
+            elif use_pareto_stall:
+                if pareto_signature != best_pareto_signature:
+                    best_pareto_signature = pareto_signature
+                    stalled_batches = 0
+                else:
+                    stalled_batches += 1
+            elif scalarized_score is None:
+                # Refusals and incomplete objective vectors do not establish a stalled best.
+                pass
+            elif scalarized_score is not None and (
+                best_scalarized_score is None
+                or scalarized_score > best_scalarized_score
+            ):
+                best_scalarized_score = scalarized_score
+                stalled_batches = 0
+            else:
+                stalled_batches += 1
+            if stalled_batches >= 3:
+                break
     except (KeyboardInterrupt, StudyAbort):
         _write_aborted_artifacts_from_cache(
             out,
@@ -889,8 +954,12 @@ def run(
             constraints=active_constraints,
             write_store=store,
             prefix_evals_run=prefix_evals_run,
+            process_cpu_seconds=_process_cpu_seconds(study_cpu_start),
         )
         raise
+    finally:
+        if engine_worker_pool is not None:
+            engine_worker_pool.close()
 
     failure_counts = _failure_counts(records)
     feasible = tuple(record for record in records if record.feasible)
@@ -917,6 +986,7 @@ def run(
             constraints=active_constraints,
             write_store=store,
             prefix_evals_run=prefix_evals_run,
+            process_cpu_seconds=_process_cpu_seconds(study_cpu_start),
         )
         raise StudyNoFeasibleError("no candidates were evaluated")
     if records and non_finite_count == len(records):
@@ -931,6 +1001,7 @@ def run(
             constraints=active_constraints,
             write_store=store,
             prefix_evals_run=prefix_evals_run,
+            process_cpu_seconds=_process_cpu_seconds(study_cpu_start),
         )
         raise StudyNoFeasibleError(
             "all candidates failed with non_finite_payload; "
@@ -949,6 +1020,7 @@ def run(
                 constraints=active_constraints,
                 write_store=store,
                 prefix_evals_run=prefix_evals_run,
+                process_cpu_seconds=_process_cpu_seconds(study_cpu_start),
             )
             raise StudyNoFeasibleError(
                 "no feasible candidates due to config/runtime failure; "
@@ -978,6 +1050,7 @@ def run(
             study_status=COMPLETED_NO_FEASIBLE_WINNER_STATUS,
             write_store=store,
             prefix_evals_run=prefix_evals_run,
+            process_cpu_seconds=_process_cpu_seconds(study_cpu_start),
         )
         artifacts["provenance"] = provenance_path
         artifacts["store"] = store.path
@@ -1061,6 +1134,7 @@ def run(
         study_status=result_status,
         write_store=store,
         prefix_evals_run=prefix_evals_run,
+        process_cpu_seconds=_process_cpu_seconds(study_cpu_start),
     )
     artifacts["provenance"] = provenance_path
     artifacts["store"] = store.path
@@ -1754,6 +1828,7 @@ def _load_study_journal(
             profile=resolved_profile,
             seed=config.seed,
             schema=active_schema,
+            parallel=config.parallel,
             warm_start_seeds=warm_start_seeds,
         )
         staged_strategies: tuple[StagedStrategy, ...] = ()
@@ -1876,11 +1951,27 @@ def _replay_ask_batch(
             batch_size=batch_size,
         )
         return candidates, topology_cursor, owners
-    candidates = active_strategy.ask(batch_size)
+    candidates = _ask_strategy_candidates(active_strategy, batch_size)
     if not candidates and isinstance(active_strategy, StagedStrategy):
         if active_strategy.run_backward_pass() or active_strategy.joint_refine():
-            candidates = active_strategy.ask(batch_size)
+            candidates = _ask_strategy_candidates(active_strategy, batch_size)
     return candidates, topology_cursor, owners
+
+
+def _ask_strategy_candidates(
+    active_strategy: Strategy,
+    batch_size: int,
+) -> list[Candidate]:
+    if isinstance(active_strategy, OptunaTPEStrategy):
+        saturation_payloads = tuple(
+            _trace_summary_mapping(scored).get("knob_saturation")
+            for _, scored in active_strategy.results
+        )
+        return active_strategy.ask(
+            batch_size,
+            knob_saturation_payloads=saturation_payloads,
+        )
+    return active_strategy.ask(batch_size)
 
 
 def _replay_tell_batch(
@@ -2156,7 +2247,9 @@ def _scored_result_from_journal_payload(payload: Mapping[str, Any]) -> ScoredRes
         cache_key=str(payload["cache_key"]) if payload.get("cache_key") is not None else None,
         feasible=bool(payload.get("feasible", False)),
         failure_category=failure,
-        objectives=objectives if bool(payload.get("feasible", False)) else None,
+        # Journal replay keeps finite infeasible objectives so cached and live
+        # rows tell the optimizer the same measured yield vector.
+        objectives=objectives,
         feasibility_margins=_deserialize_margins(
             _mapping_of_mappings(payload.get("feasibility_margins", {}))
         ),
@@ -2585,7 +2678,7 @@ def _run_exact_certification(
 
     for explore_record in certification_pool:
         candidate = _certification_candidate_from_record(explore_record)
-        results, _ = _evaluate_candidates(
+        results, _, _ = _evaluate_candidates(
             [candidate],
             profile=profile,
             feedstock=feedstock,
@@ -2829,6 +2922,7 @@ def resolve_strategy(
     profile: Mapping[str, Any],
     seed: int,
     schema: RecipeSchema,
+    parallel: int = 1,
     warm_start_seeds: Sequence[WarmStartSeed] = (),
 ) -> Strategy:
     if not isinstance(strategy, str):
@@ -2851,6 +2945,7 @@ def resolve_strategy(
             schema,
             seed=seed,
             objective_profile=profile,
+            parallel=parallel,
             warm_start_seeds=warm_start_seeds,
         )
     if strategy == "nsga2":
@@ -3363,7 +3458,9 @@ def _evaluate_candidates(
     prefix_replay_cache: dict[str, ScoredResult],
     skip_store_lookup: bool = False,
     per_eval_timeout_seconds: float | None = None,
-) -> tuple[tuple[tuple[Candidate, ScoredResult, bool], ...], int]:
+    engine_worker_pool: Any = None,
+    retain_engine_worker_pool: bool = False,
+) -> tuple[tuple[tuple[Candidate, ScoredResult, bool], ...], int, Any]:
     results: list[tuple[Candidate, ScoredResult, bool] | None] = [None] * len(candidates)
     misses: list[tuple[int, Candidate]] = []
     staged_prefixes: dict[str, ScoredResult] = {}
@@ -3450,7 +3547,7 @@ def _evaluate_candidates(
                     evaluator_kwargs=evaluator_kwargs,
                 )
             )
-        batch = evaluate_batch(
+        batch, engine_worker_pool = _evaluate_batch(
             requests,
             profile=profile,
             max_workers=parallel,
@@ -3459,36 +3556,51 @@ def _evaluate_candidates(
             schema=schema,
             constraints=constraints,
             per_eval_timeout_seconds=per_eval_timeout_seconds,
+            engine_worker_pool=engine_worker_pool,
+            retain_engine_worker_pool=retain_engine_worker_pool,
         )
-        for (index, candidate), scored in zip(misses, batch):
-            scored = _with_candidate_id(scored, candidate.id)
-            staged_prefix = staged_prefixes.get(candidate.id)
-            if staged_prefix is not None and scored.eval_spec is not None:
-                try:
-                    spec, _ = _build_eval_inputs(
-                        candidate.patch.validated(schema),
-                        feedstock,
-                        fidelity,
-                        profile,
-                        schema,
-                        constraints=constraints,
-                        conditional_context=_full_evaluation_conditional_context(
-                            candidate
-                        ),
-                    )
-                except ProfileValidationError as exc:
-                    if _is_stale_profile_refusal(exc):
-                        scored = _stale_profile_result(candidate.id, str(exc))
+        try:
+            for (index, candidate), scored in zip(misses, batch):
+                scored = _with_candidate_id(scored, candidate.id)
+                staged_prefix = staged_prefixes.get(candidate.id)
+                if staged_prefix is not None and scored.eval_spec is not None:
+                    try:
+                        spec, _ = _build_eval_inputs(
+                            candidate.patch.validated(schema),
+                            feedstock,
+                            fidelity,
+                            profile,
+                            schema,
+                            constraints=constraints,
+                            conditional_context=_full_evaluation_conditional_context(
+                                candidate
+                            ),
+                        )
+                    except ProfileValidationError as exc:
+                        if _is_stale_profile_refusal(exc):
+                            scored = _stale_profile_result(candidate.id, str(exc))
+                        else:
+                            raise
                     else:
-                        raise
-                else:
-                    scored = replace(scored, eval_spec=spec, cache_key=cache_key(spec))
-            results[index] = (candidate, scored, False)
+                        scored = replace(
+                            scored,
+                            eval_spec=spec,
+                            cache_key=cache_key(spec),
+                        )
+                results[index] = (candidate, scored, False)
 
-    completed = tuple(result for result in results if result is not None)
-    if len(completed) != len(candidates):
-        raise RuntimeError("study evaluation ended without all candidate results")
-    return completed, prefix_evals_run
+            completed = tuple(result for result in results if result is not None)
+            if len(completed) != len(candidates):
+                raise RuntimeError("study evaluation ended without all candidate results")
+        except BaseException:
+            if retain_engine_worker_pool and engine_worker_pool is not None:
+                engine_worker_pool.close(cancel_pending=True)
+            raise
+    else:
+        completed = tuple(result for result in results if result is not None)
+        if len(completed) != len(candidates):
+            raise RuntimeError("study evaluation ended without all candidate results")
+    return completed, prefix_evals_run, engine_worker_pool
 
 
 def _ensure_staged_prefix_replay(
@@ -3994,6 +4106,12 @@ def _assert_honest_result(
             raise StudyAbort("timeout result cannot be feasible")
         if not scored.notes:
             raise StudyAbort("timeout result missing reason-coded note")
+        return
+    if scored.failure_category is FailureCategory.INVALID_PATCH:
+        if scored.feasible:
+            raise StudyAbort("invalid_patch result cannot be feasible")
+        if not scored.notes:
+            raise StudyAbort("invalid_patch result missing refusal message")
         return
     _assert_result_artifact_floor(scored)
     if scored.failure_category in {
@@ -4737,6 +4855,47 @@ def _record_objective_scores(
         return (None,) * len(definitions)
 
 
+def _study_progress(
+    records: Sequence[StudyRecord],
+    definitions: Sequence[ObjectiveDefinition],
+    weights: Sequence[float],
+) -> tuple[float | None, frozenset[tuple[float, ...]]]:
+    scored_records: list[StudyRecord] = []
+    scores_by_candidate: dict[str, tuple[float, ...]] = {}
+    scalarized_scores: list[float] = []
+    # Once a feasible result exists, infeasible outliers cannot pin the stall
+    # baseline or Pareto signature while the feasible front keeps improving.
+    progress_records = (
+        tuple(record for record in records if record.feasible)
+        if any(record.feasible for record in records)
+        else records
+    )
+    for record in progress_records:
+        scores = _record_objective_scores(record, definitions)
+        if len(scores) != len(weights) or any(score is None for score in scores):
+            continue
+        score_row = tuple(float(score) for score in scores)
+        # Objective scores already reverse minimized metrics; summing each by its
+        # profile weight makes larger weighted totals better across all objectives.
+        scalarized_scores.append(
+            math.fsum(weight * score for weight, score in zip(weights, score_row))
+        )
+        scored_records.append(record)
+        scores_by_candidate[record.candidate_id] = score_row
+    if not scored_records:
+        return None, frozenset()
+    front = pareto_front(
+        scored_records,
+        definitions,
+        objective_getter=lambda record: record.objectives,
+        score_getter=lambda record: scores_by_candidate[record.candidate_id],
+    )
+    pareto_signature = frozenset(
+        scores_by_candidate[record.candidate_id] for record in front
+    )
+    return max(scalarized_scores), pareto_signature
+
+
 def _rank_score_components(
     scores: Sequence[float | None],
 ) -> tuple[tuple[int, float], ...]:
@@ -4764,6 +4923,7 @@ def _write_artifacts(
     study_status: str | None = None,
     write_store: ResultStore | None = None,
     prefix_evals_run: int = 0,
+    process_cpu_seconds: float | None = None,
 ) -> dict[str, Path]:
     created_at = datetime.now(UTC).isoformat()
     resolved_study_status = study_status or (
@@ -4838,6 +4998,7 @@ def _write_artifacts(
         config=config,
         strategy_name=resolved_strategy,
         prefix_evals_run=prefix_evals_run,
+        process_cpu_seconds=process_cpu_seconds,
     )
     winner_written = False
     tap_sidecar_written = False
@@ -4984,6 +5145,7 @@ def _study_summary_payload(
     config: StudyConfig | None,
     strategy_name: str,
     prefix_evals_run: int = 0,
+    process_cpu_seconds: float | None = None,
 ) -> Mapping[str, Any]:
     feasible_count = sum(1 for record in leaderboard if record.feasible)
     infeasible_count = sum(int(value) for value in failure_counts.values())
@@ -4995,7 +5157,7 @@ def _study_summary_payload(
     if study_status == ABORTED_STATUS:
         source_record, products_source = None, "none"
     best_non_seeded = _best_non_seeded_lineage(leaderboard)
-    return {
+    payload = {
         "save_schema_version": SAVE_SCHEMA_VERSION,
         "member_schema_version": MEMBER_SCHEMA_VERSION,
         "study_id": study_id,
@@ -5045,6 +5207,10 @@ def _study_summary_payload(
         "origin": "local",
         "verification": None,
     }
+    if process_cpu_seconds is not None:
+        payload["process_cpu_seconds"] = process_cpu_seconds
+        payload["hostname"] = socket.gethostname()
+    return payload
 
 
 def _lineage_fields(config: StudyConfig | None) -> tuple[str | None, str | None]:
@@ -5279,6 +5445,22 @@ def _summary_honesty_payload(
     if evidence_rank is not None:
         payload["evidence_rank"] = evidence_rank
     return payload
+
+
+def _process_cpu_seconds(
+    start: tuple[Any, Any],
+) -> float:
+    self_usage = resource.getrusage(resource.RUSAGE_SELF)
+    children_usage = resource.getrusage(resource.RUSAGE_CHILDREN)
+    # CPU elapsed is the sum of user and system deltas for this process and its reaped children.
+    return math.fsum(
+        (
+            self_usage.ru_utime - start[0].ru_utime,
+            self_usage.ru_stime - start[0].ru_stime,
+            children_usage.ru_utime - start[1].ru_utime,
+            children_usage.ru_stime - start[1].ru_stime,
+        )
+    )
 
 
 def _summary_evidence_rank(label: Mapping[str, Any]) -> str | None:
@@ -5747,6 +5929,7 @@ def _write_aborted_artifacts_from_cache(
     constraints: Any = None,
     write_store: ResultStore | None = None,
     prefix_evals_run: int = 0,
+    process_cpu_seconds: float | None = None,
 ) -> bool:
     records = _records_from_cache_sqlite(
         out,
@@ -5802,6 +5985,7 @@ def _write_aborted_artifacts_from_cache(
         study_status=ABORTED_STATUS,
         write_store=write_store,
         prefix_evals_run=prefix_evals_run,
+        process_cpu_seconds=process_cpu_seconds,
     )
     return True
 
@@ -5891,6 +6075,7 @@ def _write_empty_artifacts(
     constraints: Any = None,
     write_store: ResultStore | None = None,
     prefix_evals_run: int = 0,
+    process_cpu_seconds: float | None = None,
 ) -> None:
     fidelity = str(canonical_backend_name(fidelity))
     schema = RecipeSchema()
@@ -5915,6 +6100,7 @@ def _write_empty_artifacts(
         constraints=constraints,
         write_store=write_store,
         prefix_evals_run=prefix_evals_run,
+        process_cpu_seconds=process_cpu_seconds,
     ):
         return
 
@@ -5956,6 +6142,7 @@ def _write_empty_artifacts(
                     config=config,
                     strategy_name=strategy_name,
                     prefix_evals_run=prefix_evals_run,
+                    process_cpu_seconds=process_cpu_seconds,
                 ),
                 indent=2,
                 sort_keys=True,

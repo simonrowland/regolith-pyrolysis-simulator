@@ -71,11 +71,9 @@ def test_per_mol_o2_rescaling_cao() -> None:
     assert rescale_energy_per_basis(per_species, PerBasis.MOL_SPECIES, PerBasis.MOL_O2, doubled) == Decimal("200")
 
 
-def test_engine_enum_is_closed_and_includes_imcc_sf04() -> None:
-    """Owner steer: first-class engines, never derived from resolve_backend."""
+def test_engine_enum_excludes_retired_imcc_identities() -> None:
+    """Retired IMCC names are not first-class engine tokens."""
 
-    assert Engine.IMCC_SF04.value == "imcc_sf04"
-    assert Engine.IMCC_SF04_EXT.value == "imcc_sf04_ext"
     assert {e.value for e in Engine} == {
         "internal-analytical",
         "nasa_cea_9",
@@ -86,8 +84,6 @@ def test_engine_enum_is_closed_and_includes_imcc_sf04() -> None:
         "thermoengine",
         "vaporock",
         "magemin",
-        "imcc_sf04",
-        "imcc_sf04_ext",
         "openimcc",
     }
     import ast
@@ -113,7 +109,7 @@ def test_engine_enum_is_closed_and_includes_imcc_sf04() -> None:
     )
 
 
-def test_eight_rails_are_the_owner_bound_set() -> None:
+def test_nine_rails_are_the_owner_bound_set() -> None:
     assert {r.value for r in Rail} == {
         "vapour",
         "melt_activity",
@@ -123,5 +119,6 @@ def test_eight_rails_are_the_owner_bound_set() -> None:
         "wall_deposition",
         "redox",
         "alkali_shuttle",
+        "residue_composition",
     }
     assert R_J_PER_MOL_K > 0

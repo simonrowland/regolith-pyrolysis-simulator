@@ -25,39 +25,29 @@ def test_optimizer_recipe_vocabulary_manifest_is_generated_and_self_pinned(tmp_p
     payload = json.loads(MANIFEST.read_text(encoding="utf-8"))
     digest = payload.pop("payload_digest")
     # Regenerated via scripts/generate_optimizer_recipe_vocabulary.py after the
-    # continuous C2A Stage-3 temperature-window knobs were added. The manifest
-    # still carries the four categorical C2A_staged.stage3_route leaves.
-    # Conditional dimensions are [67, 73] after the two continuous knobs.
+    # furnace-envelope rebind. All 17 changed leaves vs 082c2809:
+    #   1. furnace_max_T_C.high 2000 -> 2200 (c5434d19; zirconia_ysz
+    #      max_service_T_C)
+    #   2-7. six overhead_headspace *.default_C.high 1750 -> 2200
+    #      (36da8e17/b-329; liner, pipe default, stage_0..3_to_next; inherited
+    #      from FURNACE_MAX_T_BOUNDS_C[1], not an independent lever)
+    #   8. overhead_headspace.temperature_offset_K.low -443 -> -800
+    #      (1400 - 2200; 36da8e17)
+    #   9-14. those six overhead *.default_C.bounds_source: literal 1750 /
+    #      Doloma service text -> inherited-from-envelope text (36da8e17)
+    #   15. overhead_headspace.temperature_offset_K.bounds_source:
+    #      1843-dense-alumina derivation -> envelope-minus-1400 (36da8e17)
+    #   16. bounds_digest 5a5aba76...ecd9184 -> 9d87f239...df66cccd (derived)
+    #   17. payload_digest 77ff7776...d4ab6a0 -> 511c72ec...1dc56c12 (derived)
+    # C3 leaves C0.temp_range_C and the C2A early-ramp path in the full
+    # allowlist but disables both for search; this changes conditional subspace
+    # dimensions and derived digests.
     assert hashlib.sha256(MANIFEST.read_bytes()).hexdigest() == (
-        "524a187eb7868c9c02d817b5669c5247f44fe6f85e17378015106f445c9101fe"
+        "1a1cb3658e83c6ac45b5ca8ff0feae4a653349fee76c76dbf767d679d1534751"
     )
-    assert digest == "80960dcb8823df37ed2efafde15ac6f434d0094b2c7ede6a05dbd3892dab9db1"
+    assert digest == "0ab21330293ea06c2da8ed3e618c5410f69a39b8fa6abc87898daba5f3a85bcd"
     assert hashlib.sha256(canonical_json_dumps(payload).encode()).hexdigest() == digest
-    assert {
-        row["path"] for row in payload["allowlist"]
-        if row["path"].endswith(".stage3_route")
-    } == {
-        "campaigns.C2A_staged.stages.alkali_early_fe.stage3_route",
-        "campaigns.C2A_staged.stages.cool_for_na_shuttle.stage3_route",
-        "campaigns.C2A_staged.stages.fe_hot_hold.stage3_route",
-        "campaigns.C2A_staged.stages.sio_window.stage3_route",
-    }
     paths = {row["path"] for row in payload["allowlist"]}
-    window_rows = {
-        row["path"]: row
-        for row in payload["allowlist"]
-        if row["path"] in {
-            "campaigns.C2A_continuous.stage3_open_T_C",
-            "campaigns.C2A_continuous.stage3_close_T_C",
-        }
-    }
-    assert window_rows["campaigns.C2A_continuous.stage3_open_T_C"]["kind"] == "float"
-    assert window_rows["campaigns.C2A_continuous.stage3_open_T_C"]["low"] == 900.0
-    assert window_rows["campaigns.C2A_continuous.stage3_open_T_C"]["high"] == 1700.0
-    assert window_rows["campaigns.C2A_continuous.stage3_close_T_C"]["kind"] == "float"
-    assert window_rows["campaigns.C2A_continuous.stage3_close_T_C"]["low"] == 950.0
-    assert window_rows["campaigns.C2A_continuous.stage3_close_T_C"]["high"] == 2200.0
-    assert all(row["search_enabled"] for row in window_rows.values())
     forbidden_future_prefixes = (
         "campaigns.vacuum_dissociation",
         "condensation_train.ballistic_condenser",
@@ -70,4 +60,4 @@ def test_optimizer_recipe_vocabulary_manifest_is_generated_and_self_pinned(tmp_p
         for path in paths
         for prefix in forbidden_future_prefixes
     )
-    assert [item["dimension"] for item in payload["conditional_subspaces"]] == [67, 73]
+    assert [item["dimension"] for item in payload["conditional_subspaces"]] == [59, 65]

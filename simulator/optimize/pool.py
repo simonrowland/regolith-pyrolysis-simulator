@@ -132,13 +132,44 @@ def evaluate_batch(
     created_at: str | None = None,
     per_eval_timeout_seconds: float | None = None,
 ) -> tuple[ScoredResult, ...]:
+    """Evaluate requests in worker processes; parent owns result-store writes."""
+    completed, _ = _evaluate_batch(
+        requests,
+        profile=profile,
+        max_workers=max_workers,
+        output_root=output_root,
+        results_store=results_store,
+        evaluate_fn=evaluate_fn,
+        constraints=constraints,
+        schema=schema,
+        created_at=created_at,
+        per_eval_timeout_seconds=per_eval_timeout_seconds,
+    )
+    return completed
+
+
+def _evaluate_batch(
+    requests: Sequence[PoolEvaluationRequest | tuple[Any, ...]],
+    *,
+    profile: Mapping[str, Any] | None = None,
+    max_workers: int | None = None,
+    output_root: str | Path | None = None,
+    results_store: ResultStore | None = None,
+    evaluate_fn: Callable[..., ScoredResult] = evaluate,
+    constraints: Any = None,
+    schema: Any = None,
+    created_at: str | None = None,
+    per_eval_timeout_seconds: float | None = None,
+    engine_worker_pool: EngineWorkerPool | None = None,
+    retain_engine_worker_pool: bool = False,
+) -> tuple[tuple[ScoredResult, ...], EngineWorkerPool | None]:
     """Evaluate requests in worker processes; parent owns result-store writes.
 
     Empty batches are a no-touch operation: no store initialization, no output
     root creation, and no worker pool.
     """
     if not requests:
-        return ()
+        return (), engine_worker_pool if retain_engine_worker_pool else None
     root = Path(output_root) if output_root is not None else Path(
         tempfile.mkdtemp(prefix="regolith-optimizer-pool-")
     )
@@ -157,6 +188,9 @@ def evaluate_batch(
 
     use_serial_supervisor = not _is_picklable(evaluate_fn)
     if use_serial_supervisor:
+        if engine_worker_pool is not None:
+            engine_worker_pool.close()
+            engine_worker_pool = None
         completed = _evaluate_tasks_serial(
             tasks,
             evaluate_fn,
@@ -169,13 +203,45 @@ def evaluate_batch(
         for task in tasks:
             _assert_picklable(task, _task_label(task))
         try:
-            completed = _evaluate_tasks_in_pool(
-                tasks,
-                evaluate_fn,
-                max_workers=max_workers,
-                per_eval_timeout_seconds=timeout_seconds,
-            )
+            if retain_engine_worker_pool:
+                warm_runtime_spec = _warm_runtime_spec(tasks)
+                if warm_runtime_spec is not None and evaluate_fn is evaluate:
+                    if engine_worker_pool is None:
+                        engine_worker_pool = _create_engine_worker_pool(
+                            max_workers=max_workers,
+                            timeout_seconds=timeout_seconds,
+                            warm_runtime_spec=warm_runtime_spec,
+                        )
+                    completed = _evaluate_tasks_in_engine_worker_pool(
+                        tasks,
+                        evaluate_fn,
+                        max_workers=max_workers,
+                        per_eval_timeout_seconds=timeout_seconds,
+                        warm_runtime_spec=warm_runtime_spec,
+                        engine_worker_pool=engine_worker_pool,
+                        close_pool=False,
+                    )
+                else:
+                    if engine_worker_pool is not None:
+                        engine_worker_pool.close()
+                        engine_worker_pool = None
+                    completed = _evaluate_tasks_in_pool(
+                        tasks,
+                        evaluate_fn,
+                        max_workers=max_workers,
+                        per_eval_timeout_seconds=timeout_seconds,
+                    )
+            else:
+                completed = _evaluate_tasks_in_pool(
+                    tasks,
+                    evaluate_fn,
+                    max_workers=max_workers,
+                    per_eval_timeout_seconds=timeout_seconds,
+                )
         except _PoolUnavailableError as exc:
+            if engine_worker_pool is not None:
+                engine_worker_pool.close(cancel_pending=True)
+                engine_worker_pool = None
             _LOGGER.warning(
                 "process pool unavailable; falling back to serial optimizer "
                 "evaluation: %s",
@@ -186,28 +252,54 @@ def evaluate_batch(
                 evaluate_fn,
                 per_eval_timeout_seconds=timeout_seconds,
             )
-    if results_store is not None:
-        timestamp = created_at or datetime.now(UTC).isoformat()
-        stored_results: list[ScoredResult] = []
-        for task, result in zip(tasks, completed):
-            stored_result = _ensure_pool_backend_provenance(result, task)
-            if result.eval_spec is not None:
-                try:
-                    results_store.store(
-                        result.eval_spec,
-                        stored_result,
-                        created_at=timestamp,
-                    )
-                except ResultStoreWriteRejected as exc:
-                    _LOGGER.warning(
-                        "result_store_write_rejected candidate_id=%s cache_key=%s reasons=%s",
-                        result.candidate_id,
-                        result.cache_key,
-                        ",".join(exc.reasons),
-                    )
-            stored_results.append(stored_result)
-        completed = tuple(stored_results)
-    return completed
+    try:
+        if results_store is not None:
+            timestamp = created_at or datetime.now(UTC).isoformat()
+            stored_results: list[ScoredResult] = []
+            for task, result in zip(tasks, completed):
+                stored_result = _ensure_pool_backend_provenance(result, task)
+                if result.eval_spec is not None:
+                    try:
+                        results_store.store(
+                            result.eval_spec,
+                            stored_result,
+                            created_at=timestamp,
+                        )
+                    except ResultStoreWriteRejected as exc:
+                        _LOGGER.warning(
+                            "result_store_write_rejected candidate_id=%s cache_key=%s reasons=%s",
+                            result.candidate_id,
+                            result.cache_key,
+                            ",".join(exc.reasons),
+                        )
+                stored_results.append(stored_result)
+            completed = tuple(stored_results)
+    except BaseException:
+        if retain_engine_worker_pool and engine_worker_pool is not None:
+            engine_worker_pool.close(cancel_pending=True)
+        raise
+    return completed, engine_worker_pool if retain_engine_worker_pool else None
+
+
+def _create_engine_worker_pool(
+    *,
+    max_workers: int | None,
+    timeout_seconds: float,
+    warm_runtime_spec: _WarmRuntimeSpec,
+) -> EngineWorkerPool:
+    worker_count = max_workers or (os.cpu_count() or 1)
+    return EngineWorkerPool(
+        lambda index: WarmEngineWorker(
+            name=f'optimizer engine slot {index}',
+            bootstrap=_bootstrap_optimizer_engine_worker,
+            handler=_handle_optimizer_engine_request,
+            bootstrap_args=(warm_runtime_spec,),
+            startup_timeout_s=min(300.0, max(30.0, timeout_seconds)),
+            call_timeout_s=timeout_seconds,
+            daemon=False,
+        ),
+        size=worker_count,
+    )
 
 
 evaluate_in_process_pool = evaluate_batch
@@ -434,31 +526,28 @@ def _evaluate_tasks_in_engine_worker_pool(
     max_workers: int | None,
     per_eval_timeout_seconds: float | None,
     warm_runtime_spec: _WarmRuntimeSpec,
+    engine_worker_pool: EngineWorkerPool | None = None,
+    close_pool: bool = True,
 ) -> tuple[ScoredResult, ...]:
     """Queue engine-backed evals; a timeout evicts only its owning slot."""
     worker_count = max_workers or (os.cpu_count() or 1)
     timeout_s = per_eval_timeout_seconds or DEFAULT_EVAL_TIMEOUT_SECONDS
     results: list[ScoredResult | None] = [None] * len(tasks)
-    pool = EngineWorkerPool(
-        lambda index: WarmEngineWorker(
-            name=f'optimizer engine slot {index}',
-            bootstrap=_bootstrap_optimizer_engine_worker,
-            handler=_handle_optimizer_engine_request,
-            bootstrap_args=(warm_runtime_spec,),
-            startup_timeout_s=min(300.0, max(30.0, timeout_s)),
-            call_timeout_s=timeout_s,
-            daemon=False,
-        ),
-        size=worker_count,
+    pool = engine_worker_pool or _create_engine_worker_pool(
+        max_workers=worker_count,
+        timeout_seconds=timeout_s,
+        warm_runtime_spec=warm_runtime_spec,
     )
     task_queue = deque(tasks)
     futures: dict[Future[Any], _PoolTask] = {}
-    while task_queue and len(futures) < worker_count:
-        task = task_queue.popleft()
-        futures[pool.submit((task, evaluate_fn), timeout_s=timeout_s)] = task
-    pending = set(futures)
+    pending: set[Future[Any]] = set()
     completed_normally = False
     try:
+        while task_queue and len(futures) < worker_count:
+            task = task_queue.popleft()
+            future = pool.submit((task, evaluate_fn), timeout_s=timeout_s)
+            futures[future] = task
+            pending.add(future)
         while pending:
             done, pending = wait(pending, return_when=FIRST_COMPLETED)
             for future in done:
@@ -508,7 +597,8 @@ def _evaluate_tasks_in_engine_worker_pool(
                 _tracked_child_pids_for_tasks(tasks),
                 signal.SIGKILL,
             )
-        pool.close(cancel_pending=not completed_normally)
+        if not completed_normally or close_pool:
+            pool.close(cancel_pending=not completed_normally)
     completed = tuple(result for result in results if result is not None)
     if len(completed) != len(tasks):
         raise RuntimeError('engine worker pool ended without all results')

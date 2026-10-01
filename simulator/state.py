@@ -20,6 +20,7 @@ from simulator.condensation_routing import target_species_for_stage_number
 from simulator.environment import DEFAULT_VACUUM_FLOOR_BAR
 from simulator.fe_redox import OXYGEN_RESERVOIR_NOOP_MOL
 from simulator.scalar_boundary import is_declared_real_scalar
+from simulator.recipe_errors import MalformedRecipeError
 
 # ============================================================================
 # SECTION 1: CONSTANTS
@@ -703,7 +704,7 @@ class MeltState:
             1e-12 * max(1.0, abs(pO2), abs(p_total)),
         )
         if pO2 - p_total > tolerance:
-            raise ValueError(
+            raise MalformedRecipeError(
                 "melt_pressure_partial_exceeds_total: "
                 f"pO2_mbar={pO2:.12g} > p_total_mbar={p_total:.12g}; "
                 "oxygen partial pressure cannot exceed total pressure"

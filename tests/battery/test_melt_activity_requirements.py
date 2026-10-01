@@ -319,7 +319,7 @@ def test_activity_coefficient_uses_the_same_contract():
     assert activity[0].payload["quantity"] == "activity"
     assert activity[0].payload["quantity"] != results[0].payload["quantity"]
     assert activity[0].payload["reference_state"] == results[0].payload["reference_state"]
-    imcc = next(item for item in results if item.readiness.engine == "imcc_sf04")
+    imcc = next(item for item in results if item.readiness.engine == "openimcc")
     assert imcc.payload["reference_state"] == "raoultian_pure_liquid_oxide_parent"
     assert imcc.payload["quantity"] == "activity_coefficient"
 
@@ -335,7 +335,7 @@ def test_other_quantities_are_not_applicable_and_do_not_loosen_engine_point():
     assert all(item.readiness.gaps == () for item in results)
     engine_point = [
         item for item in consumer_readiness(experiment, bench, observation)
-        if item.consumer == "engine_point" and item.engine == "imcc_sf04"
+        if item.consumer == "engine_point" and item.engine == "openimcc"
     ]
     assert engine_point[0].status is not ReadinessStatus.READY
 
@@ -448,7 +448,7 @@ def test_mismatched_reference_state_is_refused(convention, phase, basis, formula
     assert gap.missing[0].startswith(convention.value)
     assert gap.missing[1] == "raoultian_pure_liquid_endmember"
     assert gap.missing[0] != gap.missing[1]
-    imcc = next(item for item in results if item.readiness.engine == "imcc_sf04")
+    imcc = next(item for item in results if item.readiness.engine == "openimcc")
     assert imcc.payload is None
     assert imcc.readiness.gaps[0].missing[1] == "raoultian_pure_liquid_oxide_parent"
 
@@ -541,7 +541,7 @@ def test_scorer_compares_activity_and_coefficient_to_different_maps(monkeypatch)
         composition=_composition(("Na2O", "0.4"), ("SiO2", "0.6")),
     )
     activity = predict_with_engine(
-        Engine.IMCC_SF04, observation, experiment=experiment, isolated=False,
+        Engine.OPENIMCC, observation, experiment=experiment, isolated=False,
     )
     assert seen["mode"] == "not_an_input"
     assert seen["po2_bar"] is None
@@ -553,7 +553,7 @@ def test_scorer_compares_activity_and_coefficient_to_different_maps(monkeypatch)
         identity=replace(observation.identity, quantity=State.of(Quantity.ACTIVITY_COEFFICIENT)),
     )
     coefficient = predict_with_engine(
-        Engine.IMCC_SF04, coefficient_observation, experiment=experiment, isolated=False,
+        Engine.OPENIMCC, coefficient_observation, experiment=experiment, isolated=False,
     )
     assert coefficient.value == Decimal("0.5")
     assert coefficient.value != activity.value
@@ -603,7 +603,7 @@ def test_printed_oxygen_is_commanded_and_not_the_engine_default(monkeypatch):
         oxygen=Decimal("-7"),
     )
     prediction = predict_with_engine(
-        Engine.IMCC_SF04, observation, experiment=experiment, isolated=False,
+        Engine.OPENIMCC, observation, experiment=experiment, isolated=False,
     )
     assert seen["mode"] == "commanded"
     assert seen["po2_bar"] == pytest.approx(1e-7)
@@ -651,7 +651,7 @@ def test_coefficient_without_a_gamma_map_is_refused(monkeypatch):
         quantity=Quantity.ACTIVITY_COEFFICIENT,
     )
     prediction = predict_with_engine(
-        Engine.IMCC_SF04, observation, experiment=experiment, isolated=False,
+        Engine.OPENIMCC, observation, experiment=experiment, isolated=False,
     )
     assert prediction.value is None
     assert prediction.refusal_detail["reason"] == "engine_reported_activity_not_coefficient"
@@ -677,7 +677,7 @@ def _by_engine(results):
 
 
 _MELTS_ACTIVITY = ("alphamelts", "thermoengine")
-_IMCC_ACTIVITY = ("imcc_sf04", "imcc_sf04_ext")
+_IMCC_ACTIVITY = ("openimcc",)
 
 
 def _assert_melts_parent_oxide_refused(item, formula: str) -> None:
@@ -718,7 +718,7 @@ def test_formula_basis_names_ts1985_parent_oxide_for_imcc():
         basis="Na2O",
     )
     results = _by_engine(_melt(experiment, bench, observation))
-    for engine in ("imcc_sf04", "imcc_sf04_ext", "openimcc"):
+    for engine in _IMCC_ACTIVITY:
         item = results[engine]
         assert item.readiness.status is ReadinessStatus.READY
         assert item.payload is not None
@@ -798,7 +798,7 @@ def test_single_cation_formula_with_oxide_token_is_not_scored_as_parent_oxide(mo
         gap = item.readiness.gaps[0]
         assert gap.reason is GapReason.REFERENCE_STATE_MISMATCH
         assert "NaO0.5" in gap.missing[0]
-    for engine in (Engine.ALPHAMELTS, Engine.THERMOENGINE, Engine.IMCC_SF04, Engine.IMCC_SF04_EXT):
+    for engine in (Engine.ALPHAMELTS, Engine.THERMOENGINE, Engine.OPENIMCC):
         prediction = predict_with_engine(
             engine, observation, experiment=experiment, isolated=False,
         )
@@ -861,7 +861,7 @@ def test_na2sio3_endmember_is_not_ready_for_imcc(monkeypatch):
         assert "Na2SiO3" in gap.missing[1]
     for engine in _MELTS_ACTIVITY:
         _assert_melts_parent_oxide_refused(results[engine], "Na2SiO3")
-    for engine in (Engine.IMCC_SF04, Engine.IMCC_SF04_EXT, Engine.ALPHAMELTS):
+    for engine in (Engine.OPENIMCC, Engine.ALPHAMELTS):
         prediction = predict_with_engine(
             engine, observation, experiment=experiment, isolated=False,
         )
@@ -968,7 +968,7 @@ def test_scorer_compares_canonical_oxide_activity_not_raw_labels(monkeypatch):
         composition=_composition(("SiO2", "0.6"), ("Al2O3", "0.4")),
         formula="SiO2",
     )
-    for engine in (Engine.ALPHAMELTS, Engine.THERMOENGINE, Engine.IMCC_SF04):
+    for engine in (Engine.ALPHAMELTS, Engine.THERMOENGINE, Engine.OPENIMCC):
         prediction = predict_with_engine(
             engine, observation, experiment=experiment, isolated=False,
         )
@@ -982,7 +982,7 @@ def test_scorer_compares_canonical_oxide_activity_not_raw_labels(monkeypatch):
         formula="SiO2",
         species_formula="Na",
     )
-    for engine in (Engine.ALPHAMELTS, Engine.IMCC_SF04):
+    for engine in (Engine.ALPHAMELTS, Engine.OPENIMCC):
         element = predict_with_engine(
             engine, element_observation, experiment=element_experiment, isolated=False,
         )
@@ -1085,7 +1085,7 @@ def test_h2o_endmember_is_refused_when_melts_adapter_rejects_composition(monkeyp
         assert prediction.refusal_detail["reason"] == "reference_state_mismatch"
     imcc_before = len(opened)
     imcc = predict_with_engine(
-        Engine.IMCC_SF04, observation, experiment=experiment, isolated=False,
+        Engine.OPENIMCC, observation, experiment=experiment, isolated=False,
     )
     assert imcc.value is None
     assert imcc.value != Decimal("0.3")
@@ -1124,7 +1124,7 @@ def test_scorer_compares_the_admitted_endmember_not_a_different_species(monkeypa
         )
         return prediction, opened
 
-    imcc_compound_only, opened = _score(Engine.IMCC_SF04, "Na2SiO3", {"Na2SiO3": 0.2})
+    imcc_compound_only, opened = _score(Engine.OPENIMCC, "Na2SiO3", {"Na2SiO3": 0.2})
     assert imcc_compound_only.value is None
     assert imcc_compound_only.value != Decimal("0.2")
     assert imcc_compound_only.refusal_detail["reason"] == "reference_state_mismatch"
@@ -1146,7 +1146,7 @@ def test_scorer_compares_the_admitted_endmember_not_a_different_species(monkeypa
     assert opened == []
 
     imcc_both, opened = _score(
-        Engine.IMCC_SF04,
+        Engine.OPENIMCC,
         "Na2O",
         {"Na2O": 0.2, "SiO2": 0.55},
     )
@@ -1155,7 +1155,7 @@ def test_scorer_compares_the_admitted_endmember_not_a_different_species(monkeypa
     assert opened == []
 
     imcc_compound, opened = _score(
-        Engine.IMCC_SF04,
+        Engine.OPENIMCC,
         "Na2SiO3",
         {"Na2SiO3": 0.2, "SiO2": 0.55},
     )
@@ -1173,7 +1173,7 @@ def test_scorer_compares_the_admitted_endmember_not_a_different_species(monkeypa
     assert opened == []
 
     coefficient, opened = _score(
-        Engine.IMCC_SF04,
+        Engine.OPENIMCC,
         "Na2SiO3",
         {"Na2SiO3": 0.2, "SiO2": 0.55},
         {"Na2SiO3": 9.9, "SiO2": 1.5},

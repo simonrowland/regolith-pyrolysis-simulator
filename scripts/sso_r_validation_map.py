@@ -37,7 +37,7 @@ from simulator.runner import _deep_merge_setpoints, build_per_hour_summary
 from simulator.state import Atmosphere, CampaignPhase
 
 
-SCHEMA_VERSION = "sso-r-validation-map-v2"
+SCHEMA_VERSION = "sso-r-validation-map-v3"
 GOLDEN_SCHEMA_VERSION = "sso-r-validation-map-golden-v2"
 FEEDSTOCK = "lunar_mare_low_ti"
 BATCH_KG = 1000.0
@@ -89,8 +89,10 @@ ROW_UNITS = {
     "dose_kg": "kg Na loaded",
     "dose_consumed_kg": "kg Na consumed",
     "dose_feo_reduced_mol": "mol FeO reduced by Na dose",
-    "post_exchange_fO2_log_diagnostic": "log10 fO2, post-exchange diagnostic only",
-    "post_exchange_delta_IW_diagnostic": "log10 fO2 minus IW, post-exchange diagnostic only",
+    "post_exchange_fO2_log_diagnostic": "log10 fO2 equality or null when absent; diagnostic only",
+    "post_exchange_delta_IW_diagnostic": "log10 fO2 minus IW or null when equality is absent",
+    "melt_redox_speciation_key": "structured redox prediction key; not an equality",
+    "melt_redox_speciation_flag": "typed notice for a non-equality prediction key, or null",
     "redox_source_delta_ln_fO2": "natural-log fO2 increment applied this row",
     "native_fe_pool_mol": "mol Fe in native-Fe pool",
     "native_fe_tap_mol": "mol Fe routed to tap",
@@ -589,6 +591,24 @@ def run_row(
         str(k): str(v)
         for k, v in dict(redox.get("skipped_reasons_by_label", {}) or {}).items()
     }
+    post_exchange_fO2 = sim._current_melt_redox_fO2_log()
+    (
+        speciation_fO2_log,
+        speciation_authority,
+        speciation_regime,
+        speciation_flag,
+    ) = sim._melt_redox_speciation_key()
+    post_exchange_delta_IW = None
+    if post_exchange_fO2 is not None:
+        iw_log = snapshot.fe_redox_split.get("iw_log")
+        if iw_log is not None:
+            post_exchange_delta_IW = float(post_exchange_fO2) - float(iw_log)
+    speciation_key = {
+        "fO2_log": float(speciation_fO2_log),
+        "authority": speciation_authority,
+        "regime": speciation_regime,
+    }
+    speciation_flag = dict(speciation_flag) if speciation_flag is not None else None
     material_divergence = (
         bool(ferric_divergence.get("warning"))
         or str(ferric_divergence.get("status", "")) == "warning"
@@ -616,13 +636,19 @@ def run_row(
         "dose_transition_name": str(dose_result.get("dose_transition_name", "")),
         "dose_transition_reason": str(dose_result.get("dose_transition_reason", "")),
         "dose_feo_reduced_mol": float(dose_result.get("dose_feo_reduced_mol", 0.0) or 0.0),
-        "post_exchange_fO2_log_diagnostic": float(
-            sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log
+        "post_exchange_fO2_log_diagnostic": (
+            None if post_exchange_fO2 is None else float(post_exchange_fO2)
         ),
-        "post_exchange_delta_IW_diagnostic": float(snapshot.fe_redox_split.get("fO2_log", 0.0) or 0.0)
-        - float(snapshot.fe_redox_split.get("iw_log", 0.0) or 0.0),
+        "post_exchange_delta_IW_diagnostic": post_exchange_delta_IW,
+        "melt_redox_speciation_key": speciation_key,
+        "melt_redox_speciation_flag": speciation_flag,
         "fO2_diagnostic_status": (
-            "diagnostic_only_not_manual_anchor_scale; do not use as certification value"
+            (
+                "diagnostic_only_equality_absent; see melt_redox_speciation_key; "
+                "do not use as certification value"
+            )
+            if post_exchange_fO2 is None
+            else "diagnostic_only_not_manual_anchor_scale; do not use as certification value"
         ),
         "redox_source_net_mol_o2_equiv": float(
             redox.get("net_mol_o2_equiv", 0.0) or 0.0

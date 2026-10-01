@@ -182,6 +182,48 @@ def test_profile_catalog_matches_feedstocks_and_validates_seeds() -> None:
             RecipePatch.from_nested(seed["patch"]).validated(RecipeSchema())
 
 
+def test_optimizer_window_profiles_fit_caps_and_sequences_load_at_60_hours() -> None:
+    loaded_profiles = {}
+    failures = {}
+    window_profiles = set()
+    sequence_profiles = set()
+    profile_dir = DEFAULT_DATA_DIR / "optimize_profiles"
+    for path in sorted(profile_dir.glob("*.yaml")):
+        feedstock = path.stem
+        try:
+            loaded_profiles[feedstock] = profiles.load_profile(feedstock)
+        except ProfileValidationError as exc:
+            failures[feedstock] = str(exc)
+
+    assert not failures, f"failed profile ids: {', '.join(sorted(failures))}"
+    assert len(loaded_profiles) == 24
+    for feedstock, profile in loaded_profiles.items():
+        campaign = str(profile["run"]["campaign"])
+        if profiles._profile_campaign_setting(profile, campaign, "temp_range_C") is not None:
+            window_profiles.add(feedstock)
+            assert profile["run"]["hours"] == 25, feedstock
+            expected_fidelity_hours = {25}
+        else:
+            sequence_profiles.add(feedstock)
+            assert profile["run"]["hours"] == 60, feedstock
+            expected_fidelity_hours = {60}
+        assert {
+            options["hours"] for options in profile["fidelities"].values()
+        } == expected_fidelity_hours, feedstock
+
+    assert window_profiles == {
+        "ceres_regolith",
+        "ci_carbonaceous_chondrite",
+        "cm_carbonaceous_chondrite",
+        "comet_nucleus",
+        "mars_basalt",
+        "mars_perchlorate_rich",
+        "mars_phyllosilicate_clay",
+        "mars_sulfate_rich",
+    }
+    assert len(sequence_profiles) == 16
+
+
 def test_seed_source_campaigns_rejects_non_list_and_bad_entries() -> None:
     for bad in ("C2A_continuous", 7, {}, [], ["C2A_continuous", ""], [3]):
         profile = _profile_copy("lunar_mare_low_ti")
@@ -500,7 +542,13 @@ def test_runtime_loader_refuses_over_cap_stored_thermal_window_profile() -> None
         {
             "id": "stale-c4-window",
             "source_campaign": "C4",
-            "patch": {"campaigns": {"C4": {"temp_range_C": [1580.0, 1670.0]}}},
+            "patch": {
+                "campaigns": {
+                    "C4": {
+                        "temp_range_C": [1580.0, 1670.0],
+                    }
+                }
+            },
         }
     ]
 
@@ -536,6 +584,95 @@ def test_default_c2a_profile_still_refuses_over_campaign_cap() -> None:
             r"thermal_window_campaign_max_hold_hr refusal.*"
             r"requested 31 h.*campaign_max_hold_hr 30 h"
         ),
+    ):
+        validate_profile(profile, expected_feedstock="lunar_mare_low_ti")
+
+
+def test_explicit_duration_above_campaign_cap_is_still_refused() -> None:
+    profile = _profile_copy("lunar_mare_low_ti")
+    profile["run"].update({"campaign": "C0", "hours": 60})
+    profile["fidelities"] = {
+        "internal-analytical": {
+            "backend_name": "internal-analytical",
+            "hours": 60,
+        }
+    }
+    profile["seed_recipes"] = [
+        {
+            "id": "over-cap-explicit-c0-window",
+            "source_campaign": "C0",
+            "patch": {
+                "campaigns": {
+                    "C0": {
+                        "temp_range_C": [20.0, 950.0],
+                        "duration_h": 26,
+                    }
+                }
+            },
+        }
+    ]
+
+    with pytest.raises(
+        ProfileValidationError,
+        match=(
+            r"thermal_window_campaign_max_hold_hr refusal.*"
+            r"requested 26 h.*campaign_max_hold_hr 25 h"
+        ),
+    ):
+        validate_profile(profile, expected_feedstock="lunar_mare_low_ti")
+
+
+def test_undeclared_zero_preheat_window_hold_above_cap_is_refused() -> None:
+    profile = _profile_copy("lunar_mare_low_ti")
+    profile["run"].update({"campaign": "C0", "hours": 26})
+    profile["fidelities"] = {
+        "internal-analytical": {
+            "backend_name": "internal-analytical",
+            "hours": 26,
+        }
+    }
+    profile["seed_recipes"] = [
+        {
+            "id": "undeclared-c0-window",
+            "source_campaign": "C0",
+            "patch": {"campaigns": {"C0": {"temp_range_C": [20.0, 900.0]}}},
+        }
+    ]
+
+    with pytest.raises(
+        ProfileValidationError,
+        match=(
+            r"thermal_window_campaign_max_hold_hr refusal.*"
+            r"requested 26 h \(preheat 0 h \+ hold 26 h\).*25 h"
+        ),
+    ):
+        validate_profile(profile, expected_feedstock="lunar_mare_low_ti")
+
+
+def test_undeclared_zero_preheat_window_obeys_tighter_recipe_local_cap() -> None:
+    profile = _profile_copy("lunar_mare_low_ti")
+    profile["run"].update({"campaign": "C0", "hours": 60})
+    profile["fidelities"] = {
+        "internal-analytical": {
+            "backend_name": "internal-analytical",
+            "hours": 60,
+        }
+    }
+    profile["seed_recipes"] = [
+        {
+            "id": "undeclared-c0-window-with-local-cap",
+            "source_campaign": "C0",
+            "patch": {
+                "campaigns": {
+                    "C0": {"temp_range_C": [20.0, 900.0], "max_hold_hr": 20}
+                }
+            },
+        }
+    ]
+
+    with pytest.raises(
+        ProfileValidationError,
+        match=r"recipe_local_max_hold_hr refusal.*requested 60 h.*recipe_local_max_hold_hr 20 h",
     ):
         validate_profile(profile, expected_feedstock="lunar_mare_low_ti")
 

@@ -24,7 +24,7 @@ from simulator.melt_backend.base import (
     InternalAnalyticalBackend,
 )
 from simulator.melt_backend.vaporock import VapoRockBackend
-from simulator.state import OXIDE_SPECIES
+from simulator.state import OXIDE_SPECIES, OxygenReservoirState
 
 
 def _install_fake_import(monkeypatch, fake_module):
@@ -701,7 +701,18 @@ def test_core_does_not_consume_non_authoritative_vaporock_pressures(monkeypatch)
     provider = VapoRockProvider(backend=backend, vapor_pressure_data={})
 
     sim = object.__new__(PyrolysisSimulator)
-    sim.melt = types.SimpleNamespace(temperature_C=1600.0, melt_fO2_log=-8.0)
+    sim.setpoints = {
+        "sso_r": {"oxygen_exchange": {"effective_melt_depth_m": 0.2}}
+    }
+    sim.melt = types.SimpleNamespace(
+        temperature_C=1600.0,
+        melt_fO2_log=-8.0,
+        oxygen_reservoir=OxygenReservoirState(
+            melt_intrinsic_fO2_log=-8.0,
+            headspace_transport_pO2_bar=1e-6,
+            interface_pO2_bar=1e-6,
+        ),
+    )
     sim._allow_fallback_vapor = True
     sim._commanded_pO2_bar = lambda: 1e-6
     sim._vapor_pressure_transport_pO2_bar = lambda: 1e-6

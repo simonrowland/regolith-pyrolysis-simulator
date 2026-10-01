@@ -693,8 +693,6 @@ def test_multicomponent_engine_charge_is_not_structural_failure() -> None:
         "vaporock",
         "magemin",
         "cached-real",
-        "imcc_sf04",
-        "imcc_sf04_ext",
         "openimcc",
     ]
     assert all(item.status is ReadinessStatus.READY for item in engines)
