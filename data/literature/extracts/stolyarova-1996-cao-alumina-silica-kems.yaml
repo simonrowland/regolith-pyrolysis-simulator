@@ -3310,7 +3310,30 @@ species:
       - 1933.0
       - 1933.0
       phase: CaO-Al2O3-SiO2 liquid oxide melt
-      standard_state: individual pure-oxide comparison standard; physical reference phase not stated
+      standard_state:
+        state:
+          tag: value
+          value:
+            convention: raoultian_pure_endmember
+            endmember:
+              formula: SiO2
+              phase:
+                tag: value
+                value: cr
+              polymorph:
+                tag: value
+                value: cristobalite_high
+            component_basis: SiO2
+        inferred: true
+        inference: >-
+          Extract inference (owner ruling d-053): Eqs. (10)–(13), p. 19, compare ion currents over the melt with those over the individual pure oxides at the experiment temperature; the paper does not name the physical reference phases. The Al2O3 Gibbs–Duhem/Belton–Fruehan reductions, Eqs. (14)–(15), p. 20, extend that activity basis. At 1933 K all three standards are solid per JANAF 4th ed.: CaO Tm=3200 K, Al2O3 Tm≈2327 K, SiO2 high-cristobalite Tm≈1996 K (only 63 K above 1933 K).
+        locator:
+          page: 19
+          published_page: 19
+          pdf_page_index: 4
+          section: Results
+          equation: '10–13'
+          note: "Eqs. (10)–(13) compare activity currents over the ternary melt with currents over individual pure-oxide samples."
       experiment: stolyarova-1996-mi1201-1933k
       regime: kems_effusion
       units: dimensionless activity as printed
@@ -6066,7 +6089,30 @@ species:
       - 1933.0
       - 1933.0
       phase: CaO-Al2O3-SiO2 liquid oxide melt
-      standard_state: individual pure-oxide comparison standard; physical reference phase not stated
+      standard_state:
+        state:
+          tag: value
+          value:
+            convention: raoultian_pure_endmember
+            endmember:
+              formula: CaO
+              phase:
+                tag: value
+                value: cr
+              polymorph:
+                tag: value
+                value: lime
+            component_basis: CaO
+        inferred: true
+        inference: >-
+          Extract inference (owner ruling d-053): Eqs. (10)–(13), p. 19, compare ion currents over the melt with those over the individual pure oxides at the experiment temperature; the paper does not name the physical reference phases. The Al2O3 Gibbs–Duhem/Belton–Fruehan reductions, Eqs. (14)–(15), p. 20, extend that activity basis. At 1933 K all three standards are solid per JANAF 4th ed.: CaO Tm=3200 K, Al2O3 Tm≈2327 K, SiO2 high-cristobalite Tm≈1996 K (only 63 K above 1933 K).
+        locator:
+          page: 19
+          published_page: 19
+          pdf_page_index: 4
+          section: Results
+          equation: '10–13'
+          note: "Eqs. (10)–(13) compare activity currents over the ternary melt with currents over individual pure-oxide samples."
       experiment: stolyarova-1996-mi1201-1933k
       regime: kems_effusion
       units: dimensionless activity as printed
@@ -7054,7 +7100,30 @@ species:
       - 1933.0
       - 1933.0
       phase: CaO-Al2O3-SiO2 liquid oxide melt
-      standard_state: individual pure-oxide comparison standard; physical reference phase not stated
+      standard_state:
+        state:
+          tag: value
+          value:
+            convention: raoultian_pure_endmember
+            endmember:
+              formula: Al2O3
+              phase:
+                tag: value
+                value: cr
+              polymorph:
+                tag: value
+                value: corundum
+            component_basis: Al2O3
+        inferred: true
+        inference: >-
+          Extract inference (owner ruling d-053): Eqs. (10)–(13), p. 19, compare ion currents over the melt with those over the individual pure oxides at the experiment temperature; the paper does not name the physical reference phases. The Al2O3 Gibbs–Duhem/Belton–Fruehan reductions, Eqs. (14)–(15), p. 20, extend that activity basis. At 1933 K all three standards are solid per JANAF 4th ed.: CaO Tm=3200 K, Al2O3 Tm≈2327 K, SiO2 high-cristobalite Tm≈1996 K (only 63 K above 1933 K).
+        locator:
+          page: 19
+          published_page: 19
+          pdf_page_index: 4
+          section: Results
+          equation: '10–13'
+          note: "Eqs. (10)–(13) compare activity currents over the ternary melt with currents over individual pure-oxide samples."
       experiment: stolyarova-1996-mi1201-1933k
       regime: kems_effusion
       units: dimensionless activity as printed
@@ -7780,7 +7849,30 @@ species:
       - 1933.0
       - 1933.0
       phase: CaO-Al2O3-SiO2 liquid oxide melt
-      standard_state: individual pure-oxide comparison standard; physical reference phase not stated
+      standard_state:
+        state:
+          tag: value
+          value:
+            convention: raoultian_pure_endmember
+            endmember:
+              formula: Al2O3
+              phase:
+                tag: value
+                value: cr
+              polymorph:
+                tag: value
+                value: corundum
+            component_basis: Al2O3
+        inferred: true
+        inference: >-
+          Extract inference (owner ruling d-053): Eqs. (10)–(13), p. 19, compare ion currents over the melt with those over the individual pure oxides at the experiment temperature; the paper does not name the physical reference phases. The Al2O3 Gibbs–Duhem/Belton–Fruehan reductions, Eqs. (14)–(15), p. 20, extend that activity basis. At 1933 K all three standards are solid per JANAF 4th ed.: CaO Tm=3200 K, Al2O3 Tm≈2327 K, SiO2 high-cristobalite Tm≈1996 K (only 63 K above 1933 K).
+        locator:
+          page: 19
+          published_page: 19
+          pdf_page_index: 4
+          section: Results
+          equation: '10–13'
+          note: "Eqs. (10)–(13) compare activity currents over the ternary melt with currents over individual pure-oxide samples."
       experiment: stolyarova-1996-mi1201-1933k
       regime: kems_effusion
       units: dimensionless activity as printed
@@ -8656,7 +8748,30 @@ species:
       - 1933.0
       - 1933.0
       phase: CaO-Al2O3-SiO2 liquid oxide melt
-      standard_state: individual pure-oxide comparison standard; physical reference phase not stated
+      standard_state:
+        state:
+          tag: value
+          value:
+            convention: raoultian_pure_endmember
+            endmember:
+              formula: Al2O3
+              phase:
+                tag: value
+                value: cr
+              polymorph:
+                tag: value
+                value: corundum
+            component_basis: Al2O3
+        inferred: true
+        inference: >-
+          Extract inference (owner ruling d-053): Eqs. (10)–(13), p. 19, compare ion currents over the melt with those over the individual pure oxides at the experiment temperature; the paper does not name the physical reference phases. The Al2O3 Gibbs–Duhem/Belton–Fruehan reductions, Eqs. (14)–(15), p. 20, extend that activity basis. At 1933 K all three standards are solid per JANAF 4th ed.: CaO Tm=3200 K, Al2O3 Tm≈2327 K, SiO2 high-cristobalite Tm≈1996 K (only 63 K above 1933 K).
+        locator:
+          page: 19
+          published_page: 19
+          pdf_page_index: 4
+          section: Results
+          equation: '10–13'
+          note: "Eqs. (10)–(13) compare activity currents over the ternary melt with currents over individual pure-oxide samples."
       experiment: stolyarova-1996-mi1201-1933k
       regime: kems_effusion
       units: dimensionless activity as printed
