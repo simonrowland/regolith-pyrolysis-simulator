@@ -6659,7 +6659,10 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
 
     def _ferrous_free_scalar_absent(self) -> bool:
         domain = getattr(self, '_last_redox_domain', None) or {}
-        return domain.get('basis') == 'ferrous_free_lower_bound'
+        return domain.get('basis') in {
+            'ferrous_free_lower_bound',
+            'fe_feo_buffer_activity_unavailable',
+        }
 
     @staticmethod
     def _redox_domain_record(
@@ -9889,7 +9892,11 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             reported_basis == 'ferrous_free_lower_bound'
             and target_ferric_fraction is None
         )
-        interface_controlled = ferrous_free_bound or (
+        unavailable_buffer_activity = (
+            reported_basis == 'fe_feo_buffer_activity_unavailable'
+            and target_ferric_fraction is None
+        )
+        interface_controlled = ferrous_free_bound or unavailable_buffer_activity or (
             target_ferric_fraction is None
             and fO2_log_override is None
             and bool(getattr(self, '_melt_redox_ledger_initialized', False))
@@ -9919,6 +9926,13 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 respeciation_reason = (
                     'ferrous_free_lower_bound_is_not_an_feo_inventory; '
                     'respeciation_would_mint_feo'
+                )
+            elif reported_basis == 'fe_feo_buffer_activity_unavailable':
+                respeciation_status = (
+                    'skipped_fe_feo_buffer_activity_unavailable'
+                )
+                respeciation_reason = (
+                    'fe_feo_buffer_activity_unavailable_has_no_equality'
                 )
             elif reported_basis == 'fe_saturation_bound':
                 respeciation_status = 'skipped_fe_saturation_bound'

@@ -14,6 +14,10 @@ import simulator.core as core_module
 from simulator.core import OXYGEN_RESERVOIR_NOOP_MOL, PyrolysisSimulator
 from simulator.accounting.formulas import resolve_species_formula
 from simulator.physical_constants import MELT_DISSOCIATION_PO2_MAX_BAR
+from simulator.reduced_real_determinism import (
+    PT0InvalidControls,
+    _authoritative_melt_fO2_log,
+)
 from simulator.state import MOLAR_MASS
 from simulator.fe_redox import (
     KRESS91_FERRIC_FRACTION_EPSILON,
@@ -212,6 +216,74 @@ def test_unavailable_fe_feo_buffer_returns_absent_without_gas_or_kress(
     assert sim._last_redox_domain["basis"] == "fe_feo_buffer_activity_unavailable"
     assert sim._last_redox_domain["basis"] != "no_melt_redox_buffer"
     assert sim.melt.oxygen_reservoir.interface_pO2_bar == initial_interface
+
+
+@pytest.mark.parametrize("cached_fO2_log", [-8.0, None])
+def test_unavailable_buffer_absence_does_not_fall_back_to_cached_scalar(
+    monkeypatch: pytest.MonkeyPatch,
+    cached_fO2_log: float | None,
+) -> None:
+    sim = _sim_with_oxides(feo_wt=10.0, fe2o3_wt=0.0, temperature_C=1400.0)
+    _set_melt_iron_oxides(sim, n_feo_mol=1.0, n_fe2o3_mol=0.0)
+    sim.atom_ledger.load_external_mol(
+        "process.metal_phase",
+        {"Fe": 1.0},
+        source="test retained native Fe",
+        material_origin="feedstock",
+    )
+    reservoir = sim.melt.oxygen_reservoir
+    reservoir.headspace_transport_pO2_bar = TRANSPORT_PO2_BAR
+    reservoir.exchange_o2_mol = 0.0
+    reservoir.melt_intrinsic_fO2_log = cached_fO2_log
+    sim.melt.melt_fO2_log = cached_fO2_log
+    monkeypatch.setattr(
+        core_module,
+        "calphad_ferrous_feo_activity_diagnostic",
+        lambda **_kwargs: {"a_FeO_authoritative": 0.0},
+    )
+
+    current_fO2_log = sim._current_melt_redox_fO2_log()
+
+    assert current_fO2_log is None, f"stale fallback returned {current_fO2_log!r}"
+    with pytest.raises(PT0InvalidControls, match="has no equilibrium fO2"):
+        _authoritative_melt_fO2_log(sim)
+
+
+def test_unavailable_buffer_absence_survives_one_simulated_hour(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    sim = _sim_with_oxides(feo_wt=10.0, fe2o3_wt=0.0, temperature_C=1400.0)
+    _set_melt_iron_oxides(sim, n_feo_mol=1.0, n_fe2o3_mol=0.0)
+    sim.atom_ledger.load_external_mol(
+        "process.metal_phase",
+        {"Fe": 1.0},
+        source="test retained native Fe",
+        material_origin="feedstock",
+    )
+    sim.melt.oxygen_reservoir.headspace_transport_pO2_bar = TRANSPORT_PO2_BAR
+    sim.melt.oxygen_reservoir.exchange_o2_mol = 0.0
+    monkeypatch.setattr(
+        core_module,
+        "calphad_ferrous_feo_activity_diagnostic",
+        lambda **_kwargs: {"a_FeO_authoritative": 0.0},
+    )
+    visited_unavailable_basis = False
+    derive = sim._melt_fO2_from_ledger
+
+    def track_unavailable_basis(**kwargs: Any) -> float | None:
+        nonlocal visited_unavailable_basis
+        fO2_log = derive(**kwargs)
+        visited_unavailable_basis = visited_unavailable_basis or (
+            sim._last_redox_domain.get("basis")
+            == "fe_feo_buffer_activity_unavailable"
+        )
+        return fO2_log
+
+    monkeypatch.setattr(sim, "_melt_fO2_from_ledger", track_unavailable_basis)
+
+    sim._step_one_hour()
+
+    assert visited_unavailable_basis
 
 
 def test_nonzero_release_with_no_ferric_inventory_follows_the_gas() -> None:
