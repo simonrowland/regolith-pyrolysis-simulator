@@ -4279,6 +4279,136 @@ species:
         semantics: bound_not_point_ordering
       uncertainty:
         note: Figure not digitized; not applicable.
+  MoO2:
+    observations:
+    - observation_id: stolyarova_1996_table1_moo2_ion_current_col1_1933k
+      type: rate_series
+      locator:
+        page: 19
+        published_page: 19
+        pdf_page_index: 4
+        table: '1'
+        note: "Table 1, CaO·Al2O3·SiO2 melt group, first unlabeled relative-unit column; MoO2+ ion current."
+      T_range_K: [1933.0, 1933.0]
+      phase: vapor over CaO-Al2O3-SiO2 melt
+      experiment: stolyarova-1996-mi1201-1933k
+      regime: kems_effusion
+      units: relative mass-spectrum units as printed
+      values:
+        quantity: ion_intensity
+        method_class: measured_direct
+        evidence_class: measured_direct
+        gas_species: MoO2(g)
+        ion_as_printed: MoO2+
+        ion_intensity: "0.25"
+        table_column_as_printed: 1
+    - observation_id: stolyarova_1996_table1_moo2_ion_current_col2_1933k
+      type: rate_series
+      locator:
+        page: 19
+        published_page: 19
+        pdf_page_index: 4
+        table: '1'
+        note: "Table 1, CaO·Al2O3·SiO2 melt group, second unlabeled relative-unit column; MoO2+ ion current."
+      T_range_K: [1933.0, 1933.0]
+      phase: vapor over CaO-Al2O3-SiO2 melt
+      experiment: stolyarova-1996-mi1201-1933k
+      regime: kems_effusion
+      units: relative mass-spectrum units as printed
+      values:
+        quantity: ion_intensity
+        method_class: measured_direct
+        evidence_class: measured_direct
+        gas_species: MoO2(g)
+        ion_as_printed: MoO2+
+        ion_intensity: "7.3"
+        table_column_as_printed: 2
+    - observation_id: stolyarova_1996_table1_moo2_ion_current_col3_1933k
+      type: rate_series
+      locator:
+        page: 19
+        published_page: 19
+        pdf_page_index: 4
+        table: '1'
+        note: "Table 1, CaO·Al2O3·SiO2 melt group, third unlabeled relative-unit column; MoO2+ ion current."
+      T_range_K: [1933.0, 1933.0]
+      phase: vapor over CaO-Al2O3-SiO2 melt
+      experiment: stolyarova-1996-mi1201-1933k
+      regime: kems_effusion
+      units: relative mass-spectrum units as printed
+      values:
+        quantity: ion_intensity
+        method_class: measured_direct
+        evidence_class: measured_direct
+        gas_species: MoO2(g)
+        ion_as_printed: MoO2+
+        ion_intensity: "0.017"
+        table_column_as_printed: 3
+  MoO3:
+    observations:
+    - observation_id: stolyarova_1996_table1_moo3_ion_current_col1_1933k
+      type: rate_series
+      locator:
+        page: 19
+        published_page: 19
+        pdf_page_index: 4
+        table: '1'
+        note: "Table 1, CaO·Al2O3·SiO2 melt group, first unlabeled relative-unit column; MoO3+ ion current."
+      T_range_K: [1933.0, 1933.0]
+      phase: vapor over CaO-Al2O3-SiO2 melt
+      experiment: stolyarova-1996-mi1201-1933k
+      regime: kems_effusion
+      units: relative mass-spectrum units as printed
+      values:
+        quantity: ion_intensity
+        method_class: measured_direct
+        evidence_class: measured_direct
+        gas_species: MoO3(g)
+        ion_as_printed: MoO3+
+        ion_intensity: "0.05"
+        table_column_as_printed: 1
+    - observation_id: stolyarova_1996_table1_moo3_ion_current_col2_1933k
+      type: rate_series
+      locator:
+        page: 19
+        published_page: 19
+        pdf_page_index: 4
+        table: '1'
+        note: "Table 1, CaO·Al2O3·SiO2 melt group, second unlabeled relative-unit column; MoO3+ ion current."
+      T_range_K: [1933.0, 1933.0]
+      phase: vapor over CaO-Al2O3-SiO2 melt
+      experiment: stolyarova-1996-mi1201-1933k
+      regime: kems_effusion
+      units: relative mass-spectrum units as printed
+      values:
+        quantity: ion_intensity
+        method_class: measured_direct
+        evidence_class: measured_direct
+        gas_species: MoO3(g)
+        ion_as_printed: MoO3+
+        ion_intensity: "1.4"
+        table_column_as_printed: 2
+    - observation_id: stolyarova_1996_table1_moo3_ion_current_col3_1933k
+      type: rate_series
+      locator:
+        page: 19
+        published_page: 19
+        pdf_page_index: 4
+        table: '1'
+        note: "Table 1, CaO·Al2O3·SiO2 melt group, third unlabeled relative-unit column; MoO3+ ion current."
+      T_range_K: [1933.0, 1933.0]
+      phase: vapor over CaO-Al2O3-SiO2 melt
+      experiment: stolyarova-1996-mi1201-1933k
+      regime: kems_effusion
+      units: relative mass-spectrum units as printed
+      values:
+        quantity: ion_intensity
+        method_class: measured_direct
+        evidence_class: measured_direct
+        gas_species: MoO3(g)
+        ion_as_printed: MoO3+
+        ion_intensity: "0.003"
+        table_column_as_printed: 3
   O:
     observations:
     - observation_id: stolyarova_1996_table2_pO_1933k
@@ -4303,6 +4433,23 @@ species:
         admission_status: admitted
         method: "thermodynamic equilibrium calculation"
         method_as_printed: "Author-calculated atomic oxygen partial-pressure estimate from thermodynamic equilibrium Eq. (7) (MoO3 = MoO2 + O); Table 2 prints this result, it is not a measured direct pressure."
+        derived_from:
+        - stolyarova_1996_table1_moo3_ion_current_col1_1933k
+        - stolyarova_1996_table1_moo2_ion_current_col1_1933k
+        - stolyarova_1996_table1_moo3_ion_current_col2_1933k
+        - stolyarova_1996_table1_moo2_ion_current_col2_1933k
+        - stolyarova_1996_table1_moo3_ion_current_col3_1933k
+        - stolyarova_1996_table1_moo2_ion_current_col3_1933k
+        derivation:
+          relation: "Table 2 p_O calculated by Eq. (7), p_O = K2^o [I_MoO3+ × σ(MoO2) / (I_MoO2+ × σ(MoO2))], printed p. 19"
+          inputs:
+          - stolyarova_1996_table1_moo3_ion_current_col1_1933k
+          - stolyarova_1996_table1_moo2_ion_current_col1_1933k
+          - stolyarova_1996_table1_moo3_ion_current_col2_1933k
+          - stolyarova_1996_table1_moo2_ion_current_col2_1933k
+          - stolyarova_1996_table1_moo3_ion_current_col3_1933k
+          - stolyarova_1996_table1_moo2_ion_current_col3_1933k
+          output_unit: atm
         composition_component: CaO-Al2O3-SiO2 melt
         composition_basis: printed xA/xC ratio and xS mole fraction; normalized components explicitly derived for scoring
         composition_conversion: x_CaO=(1-xS)/(1+xA/xC); x_Al2O3=(xA/xC)*x_CaO; x_SiO2=xS
@@ -5175,6 +5322,15 @@ species:
         admission_status: admitted
         method: "thermodynamic equilibrium calculation"
         method_as_printed: "Author-calculated atomic oxygen partial-pressure estimate from thermodynamic equilibrium Eq. (8) (AlO = Al + O); Table 2 prints this result, it is not a measured direct pressure."
+        derived_from:
+        - stolyarova_1996_table2_pAl_1933k
+        - stolyarova_1996_table2_pAlO_1933k
+        derivation:
+          relation: "Table 2 p'_O calculated by Eq. (8), p'_O = K3^o [I_AlO+ × σ(Al) / (I_Al+ × σ(AlO))], printed p. 19"
+          inputs:
+          - stolyarova_1996_table2_pAl_1933k
+          - stolyarova_1996_table2_pAlO_1933k
+          output_unit: atm
         composition_component: CaO-Al2O3-SiO2 melt
         composition_basis: printed xA/xC ratio and xS mole fraction; normalized components explicitly derived for scoring
         composition_conversion: x_CaO=(1-xS)/(1+xA/xC); x_Al2O3=(xA/xC)*x_CaO; x_SiO2=xS
@@ -5487,6 +5643,15 @@ species:
         admission_status: admitted
         method: "thermodynamic equilibrium calculation"
         method_as_printed: "Author-calculated atomic oxygen partial-pressure estimate from thermodynamic equilibrium Eq. (9) (SiO2 = SiO + O); Table 2 prints this result, it is not a measured direct pressure."
+        derived_from:
+        - stolyarova_1996_table2_pSiO_1933k
+        - stolyarova_1996_table2_pSiO2_1933k
+        derivation:
+          relation: "Table 2 p''_O calculated by Eq. (9), p''_O = K4^o [I_SiO+ × σ(SiO) / (I_SiO2+ × σ(SiO2))], printed p. 19"
+          inputs:
+          - stolyarova_1996_table2_pSiO_1933k
+          - stolyarova_1996_table2_pSiO2_1933k
+          output_unit: atm
         composition_component: CaO-Al2O3-SiO2 melt
         composition_basis: printed xA/xC ratio and xS mole fraction; normalized components explicitly derived for scoring
         composition_conversion: x_CaO=(1-xS)/(1+xA/xC); x_Al2O3=(xA/xC)*x_CaO; x_SiO2=xS
