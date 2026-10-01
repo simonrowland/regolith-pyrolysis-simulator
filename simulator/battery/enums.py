@@ -1,9 +1,10 @@
 """Closed tokens for the empirical battery schema (v2.1).
 
 Ambiguity resolutions (simplest-correct; not owner questions):
-- Rail IDs are the eight owner-bound tokens from SCHEMA-PROPOSAL-v2.1
+- Rail IDs are the nine owner-bound tokens from SCHEMA-PROPOSAL-v2.1
   guard_09_05, stored as Residual.rail. Mandate §Prediction posture names
-  the same eight.
+  the same nine. The owner ratified ``residue_composition`` as the ninth
+  rail on 2026-10-01.
 - Reference-state *convention* tokens reuse the catalog's
   ``raoultian_pure_endmember`` and extend with ``henrian_solid``,
   ``henrian_liquid``, ``hypothetical_1wt_pct``. ``single_cation_oxide`` is

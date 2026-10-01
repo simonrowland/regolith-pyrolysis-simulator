@@ -2427,6 +2427,8 @@ _CENSUS_QUANTITY_ALIASES = {
     "non_condensed_mass_loss_fraction": "mass_loss_fraction",
     "ion_current_ratio": "ion_intensity_ratio",
     "ion_intensity_ratio": "ion_intensity_ratio",
+    "open_furnace_residue_composition_vs_time": "residue_component_composition",
+    "residue_composition_vs_time": "residue_component_composition",
 }
 _CENSUS_CLOSED_QUANTITIES = {
     "p_sat",
@@ -2463,6 +2465,7 @@ _CENSUS_CLOSED_QUANTITIES = {
     "evolved_gas_yield",
     "ion_intensity",
     "interaction_parameter",
+    "residue_component_composition",
 }
 _CENSUS_TYPE_QUANTITY = {
     "psat_series": "p_sat",
@@ -2646,7 +2649,7 @@ def _census_expected_point(item: dict, q_token: str | None, units: str):
 def _series_census(
     extracts: Path, extracts_v2: Path
 ) -> tuple[dict[str, int], list[str], int, int, dict[str, dict[str, int]]]:
-    from decimal import Decimal
+    from decimal import Decimal, InvalidOperation
 
     census: dict[str, int] = {}
     per_source: dict[str, dict[str, int]] = {}
@@ -2672,8 +2675,7 @@ def _series_census(
         }
         source_id = str(source.get("source_id") or src_path.stem)
         used_stable_ids: set[str] = set()
-        species = source.get("species") or {}
-        for body in species.values():
+        for source_species, body in (source.get("species") or {}).items():
             if not isinstance(body, dict):
                 continue
             for row in body.get("observations") or []:
@@ -2689,6 +2691,75 @@ def _series_census(
                     if not isinstance(item, dict):
                         continue
                     oid = f"{source_id}::{raw_id}::point:{index}"
+                    if q_token == "residue_component_composition":
+                        residue_fields = (
+                            "residue_ppm",
+                            "SiO2_wt_pct",
+                            "Al2O3_wt_pct",
+                            "FeO_wt_pct",
+                            "MgO_wt_pct",
+                            "CaO_wt_pct",
+                        )
+                        for field in residue_fields:
+                            if field not in item:
+                                continue
+                            raw_amount = item[field]
+                            expected_amount = None
+                            if raw_amount is not None and raw_amount != "":
+                                try:
+                                    expected_amount = Decimal(str(raw_amount))
+                                except (InvalidOperation, ValueError, TypeError):
+                                    expected_amount = None
+                            if expected_amount is None:
+                                n_unavailable += 1
+                                continue
+                            component = (
+                                source_species
+                                if field == "residue_ppm"
+                                else field.removesuffix("_wt_pct")
+                            )
+                            stable_points = [
+                                observation
+                                for observation in stored_observations
+                                if str(observation.get("observation_id") or "").startswith(
+                                    f"{source_id}::{raw_id}::"
+                                )
+                                and str(observation.get("observation_id") or "")
+                                not in used_stable_ids
+                                and ((observation.get("identity") or {}).get("quantity") or {}).get(
+                                    "value"
+                                )
+                                == q_token
+                                and ((observation.get("identity") or {}).get("species") or {}).get(
+                                    "formula"
+                                )
+                                == component
+                            ]
+                            stored_obs = next(
+                                (
+                                    observation
+                                    for observation in stable_points
+                                    if (observation.get("value") or {}).get("kind")
+                                    == "point"
+                                    and Decimal(
+                                        str((observation.get("value") or {}).get("point"))
+                                    )
+                                    == expected_amount
+                                ),
+                                None,
+                            )
+                            if stored_obs is None:
+                                mismatches.append(
+                                    f"{oid} source field {field}={expected_amount} "
+                                    "has no matching residue component cell"
+                                )
+                                continue
+                            used_stable_ids.add(str(stored_obs["observation_id"]))
+                            n_numeric += 1
+                            census[q_token] = census.get(q_token, 0) + 1
+                            source_census = per_source.setdefault(source_id, {})
+                            source_census[q_token] = source_census.get(q_token, 0) + 1
+                        continue
                     expected = _census_expected_point(item, q_token, units)
                     stored_obs = by_id.get(oid)
                     if stored_obs is None:
@@ -2802,11 +2873,48 @@ def test_j01_store_census_series_numeric_matches_declared_field() -> None:
     assert per_source.get("ueshima-1982-fe-mo-thermal") == {
         "transition_temperature": 58
     }
+    # The reviewed residue-composition rail adds 516 Sossi ppm and 648 Hashimoto
+    # oxide cells. The independent source census validates each typed component
+    # against its own printed field; the seven all-null Hashimoto rows stay absent.
+    assert census.get("residue_component_composition") == 1164
+    assert per_source.get("kems-012-sossi-2019") == {"residue_component_composition": 516}
+    assert per_source.get("kems-015-hashimoto-1983") == {"residue_component_composition": 648}
     # Re-pinned for the loader-survival batch: Richter 2007 +50 printed mass-loss cells
     # (starting-material initial compositions now survive migration), on top of the
     # landed 450 (scorer p_partial +61, Holzheid +33): n_numeric 450->500; t-998 adds
-    # four Zhang Table 4 alpha cells, so the merged total is 504; mismatches remains 0.
-    assert n_numeric == 504, (n_numeric, census, n_unavailable)
+    # four Zhang Table 4 alpha cells, and 1164 residue components, so the merged
+    # total is 1668; mismatches remains 0.
+    assert n_numeric == 1668, (n_numeric, census, n_unavailable)
+
+
+def test_residue_point_condition_values_keep_their_printed_types() -> None:
+    from simulator.battery.migrate import _point_condition_from_plain
+
+    for key, value in (
+        ("fO2_control", "none"),
+        (
+            "atmosphere",
+            "No buffer gas or gas mix during the vacuum runs.",
+        ),
+    ):
+        condition = _point_condition_from_plain(
+            {"state": {"tag": "value", "value": value}},
+            key=key,
+        )
+        assert condition.state.is_value
+        assert condition.state.value == value
+
+    nominal_pressure = {
+        "value": "0.00015",
+        "units": "Torr",
+        "kind": "about_nominal_by_temperature",
+        "as_printed": "~1.5 × 10^{-4} Torr",
+    }
+    condition = _point_condition_from_plain(
+        {"state": {"tag": "value", "value": nominal_pressure}},
+        key="pressure_on_throw_Torr",
+    )
+    assert condition.state.value == nominal_pressure
 
 
 def test_j01_declared_quantity_accepts_one_decorated_source_field() -> None:

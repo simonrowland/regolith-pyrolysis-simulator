@@ -905,6 +905,20 @@ def _point_condition_from_plain(
 
     if isinstance(payload, Located):
         return payload
+    if key in {"fO2_control", "atmosphere"}:
+        return _located_from_plain(
+            payload,
+            lambda value: value if isinstance(value, str) else as_decimal(value),
+        )
+    if key == "pressure_on_throw_Torr":
+        return _located_from_plain(
+            payload,
+            lambda value: dict(value)
+            if isinstance(value, Mapping)
+            else value
+            if isinstance(value, str)
+            else as_decimal(value),
+        )
     if isinstance(payload, Mapping) and "state" not in payload:
         if "kind" in payload:
             return _located_from_plain(payload, _value_or_point_from_plain)
@@ -13280,7 +13294,7 @@ class Migrator:
         doc = load_yaml(path)
         if not isinstance(doc, Mapping):
             return
-        # battery field is a ledger name, not an 8-rail token — do not rail-map it.
+        # battery field is a ledger name, not a rail token — do not rail-map it.
         metric_units = str(doc.get("metric_units") or "").strip()
         energy_unit_ok = metric_units in {"", "kJ/mol", "kJ_per_mol"}
         points = doc.get("points") or []
