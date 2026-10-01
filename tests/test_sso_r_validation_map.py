@@ -192,6 +192,8 @@ def test_smoke_rows_have_owner_readable_schema_and_source_label_reader(
         "dose_kg",
         "post_exchange_fO2_log_diagnostic",
         "post_exchange_delta_IW_diagnostic",
+        "melt_redox_speciation_key",
+        "melt_redox_speciation_flag",
         "fO2_diagnostic_status",
         "redox_source_terms_mol_o2_equiv_by_label",
         "redox_source_reader",
@@ -264,10 +266,10 @@ def test_sio_vapor_pressure_responds_to_requested_po2(smoke_payload):
     low_interface_pO2_bar = float(low["SiO_provider_pO2_bar"])
     high_interface_pO2_bar = float(high["SiO_provider_pO2_bar"])
     assert low_interface_pO2_bar == pytest.approx(1.0e-9)
-    # The universal two-film interface is slightly below the requested gas
-    # pO2 at 10 mbar; use the published interface value at the assertion site,
-    # not the upstream command, for the SiO mass-action ratio.
-    assert high_interface_pO2_bar < 1.0e-3
+    # The committed interface may equal the requested gas pO2 when this row
+    # has no exchange shift; use the interface value for the SiO mass-action
+    # ratio rather than assuming it is strictly below the upstream command.
+    assert high_interface_pO2_bar <= 1.0e-3
     assert high_interface_pO2_bar > low_interface_pO2_bar
     assert low["SiO_P_reference_Antoine_Pa"] == pytest.approx(
         high["SiO_P_reference_Antoine_Pa"]
@@ -301,12 +303,21 @@ def test_exact_full_dose_oxidizing_pn2_row_applies_authoritative_redox_source():
         grid_scope_label=validation_map.GRID_SCOPE_FULL,
     )
 
-    assert math.isfinite(row["post_exchange_fO2_log_diagnostic"])
+    assert row["post_exchange_fO2_log_diagnostic"] is None
+    assert row["post_exchange_delta_IW_diagnostic"] is None
+    assert row["melt_redox_speciation_key"]["authority"] == "bound"
+    assert math.isfinite(row["melt_redox_speciation_key"]["fO2_log"])
+    assert row["melt_redox_speciation_flag"]["code"] == (
+        "melt_redox_speciation_from_bound"
+    )
     assert math.isfinite(row["redox_source_delta_ln_fO2"])
     # b-598 ledger-owned redox capacity applies the staged Na shuttle source; see redox.md.
-    assert row["redox_source_skip_reason"] == ""
-    assert row["redox_source_skipped_terms_mol_o2_equiv_by_label"] == {}
-    assert row["redox_source_skipped_reasons_by_label"] == {}
+    assert row["redox_source_skip_reason"] == "fe_saturation_bound"
+    skipped = row["redox_source_skipped_terms_mol_o2_equiv_by_label"]
+    assert skipped["redox_source:evaporative_oxygen_loss"] < 0.0
+    assert row["redox_source_skipped_reasons_by_label"][
+        "redox_source:evaporative_oxygen_loss"
+    ] == "fe_saturation_bound"
     applied = row["redox_source_applied_terms_mol_o2_equiv_by_label"]
     # FeO + 2 Na -> Fe + Na2O removes one O atom per FeO, or 1/2 mol O2
     # equivalent; the redox source records oxygen consumption with a negative sign.
@@ -315,13 +326,12 @@ def test_exact_full_dose_oxidizing_pn2_row_applies_authoritative_redox_source():
         rel=1.0e-12,
         abs=1.0e-12,
     )
-    # O-bearing vapor exports oxygen from the melt, so its signed O2-equivalent
-    # source is a loss; a positive term would add oxygen back to the melt.
-    assert applied["redox_source:evaporative_oxygen_loss"] < 0.0
+    # Evaporative oxygen loss is recorded but skipped because M4 has no melt
+    # equality to respeciate; it must not synthesize a scalar at the bound.
     assert row["redox_source_refusal_context"] == {}
 
 
-def test_axis_covering_validation_rows_never_emit_nonfinite_fo2():
+def test_axis_covering_rows_report_absent_equality_and_finite_speciation_keys():
     setpoints, feedstocks, vapor_pressures, calibration = _calibrated_inputs()
     freeze_gate_curve_cache = {}
     exact_gas = validation_map.GasPoint(0.1, 5.0, "n2_carrier")
@@ -338,6 +348,7 @@ def test_axis_covering_validation_rows_never_emit_nonfinite_fo2():
         for dose_fraction in validation_map.DOSE_FRACTIONS
     )
 
+    absent_equality_rows = 0
     for temperature_C, gas, dose_fraction in sorted(
         cases,
         key=lambda item: (
@@ -358,8 +369,22 @@ def test_axis_covering_validation_rows_never_emit_nonfinite_fo2():
             grid_scope_label=validation_map.GRID_SCOPE_FULL,
             freeze_gate_curve_cache=freeze_gate_curve_cache,
         )
-        assert math.isfinite(row["post_exchange_fO2_log_diagnostic"])
+        equality = row["post_exchange_fO2_log_diagnostic"]
+        if equality is None:
+            absent_equality_rows += 1
+            assert "equality_absent" in row["fO2_diagnostic_status"]
+            assert row["melt_redox_speciation_key"]["authority"] != "equality"
+            assert row["melt_redox_speciation_flag"]
+            assert row["melt_redox_speciation_flag"]["code"]
+            assert row["post_exchange_delta_IW_diagnostic"] is None
+        else:
+            assert math.isfinite(equality)
+            assert row["melt_redox_speciation_key"]["authority"] == "equality"
+            assert row["melt_redox_speciation_flag"] is None
+            assert math.isfinite(row["post_exchange_delta_IW_diagnostic"])
+        assert math.isfinite(row["melt_redox_speciation_key"]["fO2_log"])
         assert math.isfinite(row["redox_source_delta_ln_fO2"])
+    assert absent_equality_rows > 0
 
 
 def test_run_row_does_not_emit_dead_evaporative_metal_source_branch(

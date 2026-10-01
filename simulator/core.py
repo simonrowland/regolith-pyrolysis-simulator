@@ -11014,6 +11014,20 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         )
 
 
+    def _native_fe_split_diagnostic_context(self) -> Dict[str, Any]:
+        """Return native-Fe events independently of melt equality authority."""
+
+        context: Dict[str, Any] = {}
+        partition = dict(
+            getattr(self, '_last_native_fe_partition_diagnostic', {}) or {}
+        )
+        if partition:
+            context['native_fe_partition'] = partition
+        event = dict(getattr(self, '_last_native_fe_saturation_event', {}) or {})
+        if event:
+            context['native_fe_saturation_event'] = event
+        return context
+
     def _absent_melt_equality_fe_redox_split(
         self,
         temperature_K: float,
@@ -11073,6 +11087,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             'extrapolation': True,
             'high_uncertainty': True,
             'redox_domain': domain,
+            **self._native_fe_split_diagnostic_context(),
         }
 
     def _compute_fe_redox_split_diagnostic(
@@ -11272,26 +11287,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             'extrapolation': bool(split.get('extrapolation', False)),
             'high_uncertainty': bool(split.get('high_uncertainty', False)),
             **({'redox_domain': redox_domain} if redox_domain else {}),
-            **(
-                {'native_fe_partition': dict(
-                    getattr(self, '_last_native_fe_partition_diagnostic', {})
-                    or {}
-                )}
-                if getattr(self, '_last_native_fe_partition_diagnostic', {})
-                else {}
-            ),
-            # Surface the native-Fe saturation event (deferred /
-            # below-threshold / partitioned) so the live HourSnapshot and
-            # runner output show WHY there is (or is not) a partition this
-            # tick — otherwise the deferred-not-liquid label is write-only.
-            **(
-                {'native_fe_saturation_event': dict(
-                    getattr(self, '_last_native_fe_saturation_event', {})
-                    or {}
-                )}
-                if getattr(self, '_last_native_fe_saturation_event', {})
-                else {}
-            ),
+            **self._native_fe_split_diagnostic_context(),
         }
 
     def _native_fe_saturation_state(
