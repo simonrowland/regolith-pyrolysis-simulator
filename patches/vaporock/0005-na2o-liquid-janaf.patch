@@ -1,0 +1,30 @@
+0005-na2o-liquid-janaf.patch
+================================
+
+Replace the Na2O(l) row introduced by patch 0003 with the two JANAF Na-013
+rows packaged by openimcc e724b6b (NIST-JANAF 4th ed.). The quartics fit the
+apparent Gibbs-energy function divided by R: the supercooled 1000–1500 K fit
+uses six nodes, including recovered 1500 K thermal cells, and has a maximum
+residual of 0.484144162619486 J/mol; the 1500–3000 K fit uses 16 nodes and has
+a maximum residual of 5.21823957213201 J/mol. The high interval is listed
+second to follow VapoRock's ascending-temperature multi-row convention; the
+openimcc reader selects the row with greatest T_min, including the high row
+at the shared 1500 K boundary. Its numeric fields and Ref are copied exactly
+from openimcc's packaged rows. The three unnamed trailing columns are empty:
+no VapoRock code reads this condensate CSV, and no meaning is established for
+the former stray value. This supersedes only the Na2O(l) part of patch 0003;
+the Al2O3(l) row remains unchanged. The choice is for source fidelity.
+
+diff --git a/data/condensate-thermo-data.csv b/data/condensate-thermo-data.csv
+--- a/data/condensate-thermo-data.csv
++++ b/data/condensate-thermo-data.csv
+@@ -4,6 +4,7 @@
+ Al2O3(l),l,Al,2,3,2327,3000,-201.54,232.345,-336.622,193.672,-48.1032,4.4461,LAM1987,,,
+ SiO2(l),l,Si,1,2,1996,3000,-109.53,2.12,7.6492,-1.2588,0.0998,0,LAM1987,,,
+ SiO2(cr),s,Si,1,2,1000,1996,-109.53,1.937,8.59,-1.935,0.225,0,LAM1987,,,
+-Na2O(l),l,Na,2,1,1405,3000,-50.17,7.67,6.193,0,0,0,LAM1984,,,-188.14
++Na2O(l),l,Na,2,1,1200,1500,-44.8427056720216,5.37629004861128,15.9145037641667,-4.57747615825875,0.726170803003458,-0.0269424627020659,Na-013,,,
++Na2O(l),l,Na,2,1,1500,3000,-44.8427056720216,5.80795016652333,15.2327690696853,-4.31343306861092,0.775422945866502,-0.0603564181113987,Na-013,,,
+ K2O(l),l,K,2,1,1190,3000,-43.58,0.8,18.889,-4.532,0.467,0,LAM1984,,,
+ FeO(l),l,Fe,1,1,1000,5000,-30.01,6.72,6.588,-1.248,0.150,-0.007697,JANAF,,,
+\ No newline at end of file
