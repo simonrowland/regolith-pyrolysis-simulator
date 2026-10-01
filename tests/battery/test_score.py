@@ -1423,7 +1423,7 @@ def test_comparison_activity_cancels_cell_geometry_only_for_activity() -> None:
     assert partial_gate.primary_check == "kems_calibration"
 
 
-def test_unverified_kems_value_is_numeric_flagged_but_missing_value_refuses() -> None:
+def test_unverified_kems_value_refuses_without_printed_in_cell_pressures() -> None:
     experiment = F.kems_experiment(calibrated=True, kn=None)
     experiment = replace(
         experiment,
@@ -1459,16 +1459,12 @@ def test_unverified_kems_value_is_numeric_flagged_but_missing_value_refuses() ->
         context=context,
         prediction=prediction,
     )
-    assert residual.status is ResidualStatus.NO_BAND
-    assert residual.numeric is not None
-    assert residual.numeric.decision_band is None
+    assert residual.status is ResidualStatus.REFUSED
+    assert residual.numeric is None
     assert residual.score_eligible is False
-    assert "not_flagged_stratum" in residual.exclusions
-    assert any(
-        notice.kind is NoticeKind.UNVERIFIED_APPARATUS
-        and notice.reason == "apparatus_unverified:background_pressure"
-        for notice in residual.notices
-    )
+    assert residual.refusal is not None
+    assert residual.refusal.reason is RefusalReason.EFFUSION_REGIME_UNVERIFIED
+    assert residual.refusal.detail["primary_check"] == "in_cell_partial_pressure_sum"
 
     missing = replace(
         reference,
@@ -3686,7 +3682,8 @@ def test_admitted_model_derived_rows_emit_residuals_per_imcc_engine() -> None:
         assert all(row.status is ResidualStatus.REFUSED for row in allibert_rows)
         # b-617 types Allibert's printed per-point phases: the two xCaO = 0.80
         # "CaO + melt" points refuse as two-phase bulk compositions; the 14
-        # single-phase points keep the identity refusal in this reduced context.
+        # single-phase points lack the pressure set required by the in-cell
+        # fallback and refuse as an unverified effusion regime.
         assert all(row.refusal is not None for row in allibert_rows)
         assert (
             sum(
@@ -3697,7 +3694,7 @@ def test_admitted_model_derived_rows_emit_residuals_per_imcc_engine() -> None:
         )
         assert (
             sum(
-                row.refusal.reason is RefusalReason.IDENTITY_UNKNOWN
+                row.refusal.reason is RefusalReason.EFFUSION_REGIME_UNVERIFIED
                 for row in allibert_rows
             )
             == 14
@@ -3728,20 +3725,17 @@ def test_admitted_model_derived_rows_emit_residuals_per_imcc_engine() -> None:
         assert all(row.status is ResidualStatus.REFUSED for row in activity_rows)
         assert all(
             row.refusal is not None
-            and row.refusal.reason
-            in {
-                RefusalReason.IDENTITY_INCOMPLETE,
-                RefusalReason.UNDERDETERMINED_APPARATUS,
-            }
+                and row.refusal.reason
+                in {
+                    RefusalReason.EFFUSION_REGIME_UNVERIFIED,
+                    RefusalReason.IDENTITY_INCOMPLETE,
+                    RefusalReason.UNDERDETERMINED_APPARATUS,
+                }
             for row in activity_rows
         )
         assert any(
             row.refusal is not None
-            and row.refusal.reason is RefusalReason.IDENTITY_INCOMPLETE
-            and any(
-                gap.get("waypoint") == "reference_state"
-                for gap in row.refusal.detail.get("gaps", ())
-            )
+            and row.refusal.reason is RefusalReason.EFFUSION_REGIME_UNVERIFIED
             for row in activity_rows
         )
         assert all(not row.score_eligible for row in stolyarova_rows)

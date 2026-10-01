@@ -1170,7 +1170,10 @@ def compilation_tier_census(
         rail_for_quantity,
         resolve_source_relation,
     )
-    from simulator.battery.validity import run_validity_gates
+    from simulator.battery.validity import (
+        _partial_pressure_observations_by_experiment,
+        run_validity_gates,
+    )
 
     engine_set = (
         _validated_score_engines(tuple(engines))
@@ -1210,7 +1213,10 @@ def compilation_tier_census(
         return found
 
     relations: dict[str, dict[Engine, SourceRelation]] = {}
-    gate_keys: dict[tuple[str, str], str | None] = {}
+    point_observations_by_experiment = _partial_pressure_observations_by_experiment(
+        context.observations.values()
+    )
+    gate_keys: dict[tuple[str, str, str], str | None] = {}
     audited = 0
 
     def relation_for(parent: Observation, engine: Engine) -> SourceRelation:
@@ -1237,13 +1243,23 @@ def compilation_tier_census(
         return found[engine]
 
     def gate_token(parent: Observation, quantity: Quantity | None) -> str | None:
-        key = (parent.experiment_id, "" if quantity is None else quantity.value)
+        key = (
+            parent.experiment_id,
+            "" if quantity is None else quantity.value,
+            parent.observation_id,
+        )
         if key not in gate_keys:
             experiment = context.experiments.get(parent.experiment_id)
             if experiment is None:
                 gate_keys[key] = RefusalReason.REFERENTIAL_INTEGRITY.value
             else:
-                gates = run_validity_gates(experiment, parent)
+                gates = run_validity_gates(
+                    experiment,
+                    parent,
+                    point_observations=point_observations_by_experiment.get(
+                        parent.experiment_id, ()
+                    ),
+                )
                 gate_keys[key] = None if gates.passed else (
                     gates.reason.value if gates.reason is not None else "validity"
                 )

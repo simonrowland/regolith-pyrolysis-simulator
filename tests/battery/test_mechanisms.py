@@ -58,6 +58,7 @@ from simulator.battery.records import (
     Execution,
     Located,
     Notice,
+    Observation,
     Reaction,
     ReactionTerm,
     Residual,
@@ -3083,30 +3084,17 @@ def test_mf_f04_f16_scoped_notices_and_explicit_apparatus_gate() -> None:
     assert effusion_regime_unverified(unknown_kn, Quantity.P_SAT).reason is RefusalReason.EFFUSION_REGIME_UNVERIFIED
     low_kn = F.kems_experiment(kn=Decimal("0.5"))
     assert effusion_regime_unverified(low_kn, Quantity.P_SAT).reason is RefusalReason.EFFUSION_REGIME_UNVERIFIED
-    from dataclasses import replace as _replace
-
-    from simulator.battery.records import Located as _Located
-
-    unknown_bg = _replace(
-        F.kems_experiment(),
-        pressure_environment=_replace(
-            F.kems_experiment().pressure_environment,
-            total_pressure_Pa=_Located(State.unknown("not printed"), locator=F.loc()),
-        ),
-    )
-    unknown_effusion = effusion_regime_unverified(unknown_bg, Quantity.P_SAT)
-    assert unknown_effusion.passed is False
-    assert unknown_effusion.reason is RefusalReason.EFFUSION_REGIME_UNVERIFIED
-    ident_psat = F.psat_identity("Na")
-    obs_psat = F.observation("kems-unknown-bg", unknown_bg.experiment_id, ident_psat, Decimal("1"))
-    combined = run_validity_gates(unknown_bg, obs_psat)
-    assert combined.passed is False
-    assert combined.reason is RefusalReason.EFFUSION_REGIME_UNVERIFIED
     stated = F.kems_experiment(total_P=Decimal("1e-6"))
     assert effusion_regime_unverified(stated, Quantity.P_SAT).passed
     assert background_pressure_high(stated, Quantity.P_SAT).passed
     assert run_validity_gates(
-        stated, F.observation("kems-stated-bg", stated.experiment_id, ident_psat, Decimal("1"))
+        stated,
+        F.observation(
+            "kems-stated-bg",
+            stated.experiment_id,
+            F.psat_identity("Na"),
+            Decimal("1"),
+        ),
     ).passed
 
 
@@ -3142,12 +3130,14 @@ def test_kems_background_interval_uses_bounds_without_inventing_a_point() -> Non
     calibrated_without_kn = with_interval("1e-6", "1e-3", kn=None)
     regime = effusion_regime_unverified(calibrated_without_kn, Quantity.P_PARTIAL)
     assert regime.passed
-    assert regime.checks[-1].detail["flag"] == "orifice_knudsen_not_published"
+    assert regime.checks[0].detail["flag"] == "orifice_knudsen_not_published"
+    assert not any(check.name == "in_cell_partial_pressure_sum" for check in regime.checks)
     partial = _replace(F.psat_identity("K"), quantity=Quantity.P_PARTIAL)
-    assert run_validity_gates(
+    combined = run_validity_gates(
         calibrated_without_kn,
         F.observation("interval-kems", calibrated_without_kn.experiment_id, partial, Decimal("1")),
-    ).passed
+    )
+    assert combined.passed
 
     high = background_pressure_high(
         with_interval("0.02", "0.03"), Quantity.P_PARTIAL
@@ -3159,6 +3149,258 @@ def test_kems_background_interval_uses_bounds_without_inventing_a_point() -> Non
     )
     assert straddled.reason is RefusalReason.BACKGROUND_PRESSURE_INTERVAL_STRADDLES
     assert straddled.checks[0].detail["flag"] == "background_pressure_interval_straddles"
+
+
+def _printed_kems_partial_pressure(
+    observation_id: str,
+    experiment_id: str,
+    species: str,
+    pressure_Pa: str,
+    composition: Composition,
+) -> Observation:
+    from dataclasses import replace
+
+    temperature = Decimal("1500")
+    identity = replace(
+        F.psat_identity(species, T_K=temperature),
+        quantity=Quantity.P_PARTIAL,
+        composition=State.of(composition),
+        reservoir=State.not_applicable("mixture partial pressure"),
+    )
+    observation = F.observation(
+        observation_id,
+        experiment_id,
+        identity,
+        Decimal(pressure_Pa),
+        evidence=EvidenceClass.MEASURED_TABULATED,
+        source_id="kems-pressure-gate-test",
+    )
+    return replace(
+        observation,
+        point_conditions={
+            "temperature_K": F.located(temperature),
+            "composition": F.located(composition),
+        },
+    )
+
+
+def _kems_without_background(experiment):
+    from dataclasses import replace
+
+    return replace(
+        experiment,
+        pressure_environment=replace(
+            experiment.pressure_environment,
+            total_pressure_Pa=Located(
+                State.unknown("not printed"),
+                locator=F.loc(),
+            ),
+        ),
+    )
+
+
+def test_mf_f04_in_cell_pressure_sum_passes_with_unstated_background_flagged() -> None:
+    composition = Composition(
+        basis="printed_mole_fraction",
+        components=(("CaO", Decimal("0.25")), ("SiO2", Decimal("0.75"))),
+        amount_basis=AmountBasis.MOLE_FRACTION,
+    )
+    experiment = _kems_without_background(F.kems_experiment(kn=None))
+    pressures = (
+        _printed_kems_partial_pressure(
+            "kems-o2", experiment.experiment_id, "O2", "0.2", composition
+        ),
+        _printed_kems_partial_pressure(
+            "kems-sio", experiment.experiment_id, "SiO", "0.4", composition
+        ),
+    )
+    result = run_validity_gates(
+        experiment,
+        pressures[0],
+        point_observations=pressures,
+    )
+    assert result.passed
+    pressure_check = next(
+        check for check in result.checks if check.name == "in_cell_partial_pressure_sum"
+    )
+    assert pressure_check.detail["printed_partial_pressure_sum_Pa"] == "0.6"
+    assert pressure_check.detail["pressure_limit_Pa"] == "10"
+    assert pressure_check.detail["flag"] == (
+        "orifice not printed; regime verified from printed in-cell pressure sum "
+        "(limit source: Drowart et al. 2005, p. 689; "
+        "Drowart_standalone_usual_10_Pa_limit; no defensible d printed)"
+    )
+    assert not any(check.name == "background_pressure_stated" for check in result.checks)
+
+
+def test_mf_f04_in_cell_pressure_sum_above_limit_refuses() -> None:
+    composition = Composition(
+        basis="printed_mole_fraction",
+        components=(("CaO", Decimal("0.25")), ("SiO2", Decimal("0.75"))),
+        amount_basis=AmountBasis.MOLE_FRACTION,
+    )
+    experiment = _kems_without_background(F.kems_experiment(kn=None))
+    pressures = (
+        _printed_kems_partial_pressure(
+            "high-o2", experiment.experiment_id, "O2", "6", composition
+        ),
+        _printed_kems_partial_pressure(
+            "high-sio", experiment.experiment_id, "SiO", "5", composition
+        ),
+    )
+    result = run_validity_gates(
+        experiment,
+        pressures[0],
+        point_observations=pressures,
+    )
+    assert result.reason is RefusalReason.EFFUSION_REGIME_UNVERIFIED
+    pressure_check = next(
+        check for check in result.checks if check.name == "in_cell_partial_pressure_sum"
+    )
+    assert pressure_check.passed is False
+    assert pressure_check.detail["printed_partial_pressure_sum_Pa"] == "11"
+    assert pressure_check.detail["pressure_limit_Pa"] == "10"
+
+
+def test_mf_f04_in_cell_pressure_sum_refuses_missing_dominant_species() -> None:
+    composition = Composition(
+        basis="printed_mole_fraction",
+        components=(("CaO", Decimal("0.25")), ("SiO2", Decimal("0.75"))),
+        amount_basis=AmountBasis.MOLE_FRACTION,
+    )
+    experiment = _kems_without_background(F.kems_experiment(kn=None))
+    oxygen = _printed_kems_partial_pressure(
+        "incomplete-o2", experiment.experiment_id, "O2", "0.2", composition
+    )
+    result = run_validity_gates(
+        experiment,
+        oxygen,
+        point_observations=(oxygen,),
+    )
+    assert result.reason is RefusalReason.EFFUSION_REGIME_UNVERIFIED
+    pressure_check = next(
+        check for check in result.checks if check.name == "in_cell_partial_pressure_sum"
+    )
+    assert pressure_check.passed is False
+    assert pressure_check.detail["missing_species"] == ["SiO"]
+    assert pressure_check.detail["reason"] == (
+        "incomplete printed species coverage; pressure sum is only a lower bound"
+    )
+
+    calcium_oxide = Composition(
+        basis="printed_mole_fraction",
+        components=(("CaO", Decimal("1")),),
+        amount_basis=AmountBasis.MOLE_FRACTION,
+    )
+    calcium = _printed_kems_partial_pressure(
+        "incomplete-ca-o2", experiment.experiment_id, "Ca", "0.2", calcium_oxide
+    )
+    oxygen_missing = run_validity_gates(
+        experiment,
+        calcium,
+        point_observations=(calcium,),
+    )
+    oxygen_check = next(
+        check
+        for check in oxygen_missing.checks
+        if check.name == "in_cell_partial_pressure_sum"
+    )
+    assert oxygen_missing.reason is RefusalReason.EFFUSION_REGIME_UNVERIFIED
+    assert oxygen_check.detail["missing_species"] == ["O2"]
+
+
+def test_mf_f04_printed_orifice_kn_path_is_unchanged() -> None:
+    experiment = _kems_without_background(
+        F.kems_experiment(kn=Decimal("20"))
+    )
+    observation = F.observation(
+        "printed-kn-reference",
+        experiment.experiment_id,
+        F.psat_identity("Na"),
+        Decimal("1"),
+    )
+    result = run_validity_gates(experiment, observation)
+    assert result.passed
+    kn_check = next(check for check in result.checks if check.name == "orifice_knudsen")
+    assert kn_check.detail["knudsen_number_orifice"] == "20"
+    assert kn_check.detail["threshold"] == "10.0"
+
+
+def test_mf_f04_printed_diameter_uses_cell_pressure_over_diameter() -> None:
+    from dataclasses import replace
+
+    experiment = F.kems_experiment(kn=None)
+    geometry = replace(
+        experiment.apparatus.geometry,
+        orifice_diameter_m=F.located(Decimal("0.001")),
+    )
+    experiment = replace(
+        experiment,
+        apparatus=replace(experiment.apparatus, geometry=geometry),
+    )
+    observation = F.observation(
+        "printed-diameter-reference",
+        experiment.experiment_id,
+        F.psat_identity("K"),
+        Decimal("1"),
+    )
+    observation = replace(
+        observation,
+        point_conditions={"total_pressure_Pa": F.located(Decimal("0.1"))},
+    )
+
+    result = effusion_regime_unverified(
+        experiment,
+        Quantity.P_SAT,
+        observation=observation,
+    )
+    assert result.passed
+    check = next(c for c in result.checks if c.name == "orifice_pressure_to_diameter")
+    assert check.detail["pressure_to_diameter_Pa_per_mm"] == "0.1"
+    assert check.detail["threshold_Pa_per_mm"] == "1"
+
+
+def test_mf_f04_calibrated_background_route_skips_in_cell_fallback(monkeypatch) -> None:
+    from dataclasses import replace
+
+    import simulator.battery.validity as validity
+
+    experiment = F.kems_experiment(kn=None, calibrated=True)
+    background = Located(
+        State.of(
+            Value(
+                ValueKind.INTERVAL,
+                interval_low=Decimal("1e-6"),
+                interval_high=Decimal("1e-3"),
+            )
+        ),
+        locator=F.loc(),
+    )
+    experiment = replace(
+        experiment,
+        pressure_environment=replace(
+            experiment.pressure_environment,
+            total_pressure_Pa=background,
+        ),
+    )
+    observation = F.observation(
+        "calibrated-background-route",
+        experiment.experiment_id,
+        replace(F.psat_identity("K"), quantity=Quantity.P_PARTIAL),
+        Decimal("1"),
+    )
+
+    def fallback_must_not_run(*_args, **_kwargs):
+        raise AssertionError("calibrated-background route must precede fallback")
+
+    monkeypatch.setattr(validity, "_printed_in_cell_pressure_sum", fallback_must_not_run)
+    result = run_validity_gates(experiment, observation, point_observations=())
+    assert result.passed
+    assert any(
+        check.detail.get("flag") == "orifice_knudsen_not_published"
+        for check in result.checks
+    )
+    assert not any(check.name == "in_cell_partial_pressure_sum" for check in result.checks)
 
 
 def test_physics_false_refuse_compilation_not_applicable_axes_equal() -> None:
