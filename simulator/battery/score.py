@@ -354,6 +354,7 @@ SCORE_ELIGIBLE_CONJUNCTS: tuple[str, ...] = (
 )
 
 FLAGGED_STRATUM_UNVERIFIED_APPARATUS = "unverified-apparatus"
+FLAGGED_STRATUM_CALIBRATION_NOT_GROUNDED = "calibration-not-grounded"
 FLAGGED_STRATUM_CELL_MATERIAL_INFERRED = "cell-material-inferred"
 FLAGGED_STRATUM_CATALOGUE_COMPOSITION = "catalogue-composition"
 FLAGGED_STRATUM_SOURCE_INTERNALLY_INCONSISTENT = "source-internally-inconsistent"
@@ -811,7 +812,7 @@ def _unverified_apparatus_notices(
 ) -> tuple[Notice, ...]:
     """Return the narrow predict-and-flag admission for printed KEMS rows."""
 
-    if experiment is None or gates.passed:
+    if experiment is None:
         return ()
     identity = reference.identity
     if not isinstance(identity, Identity):
@@ -848,15 +849,47 @@ def _unverified_apparatus_notices(
         and reference.evidence.class_.is_value
         and reference.evidence.class_.value in MEASURED_EVIDENCE
     )
-    if not (measured_pressure or comparison_activity):
+    calibration_flagged_partial_pressure = (
+        quantity is Quantity.P_PARTIAL
+        and reference.evidence.class_.is_value
+        and reference.evidence.class_.value in MEASURED_EVIDENCE
+        and any(
+            getattr(check, "passed", True)
+            and str(getattr(check, "name", ""))
+            in {"kems_calibration", "in_cell_partial_pressure_sum"}
+            and isinstance(getattr(check, "detail", {}), Mapping)
+            and check.detail.get("flag") == "calibration_not_grounded"
+            for check in gates.checks
+        )
+    )
+    if not (measured_pressure or comparison_activity or calibration_flagged_partial_pressure):
         return ()
+    allow_calibration = author_reported_pressure or comparison_activity
     missing: set[str] = set()
+    calibration_notice = None
+    calibration_reason = None
     for check in gates.checks:
+        detail = getattr(check, "detail", {})
+        if not isinstance(detail, Mapping):
+            detail = {}
         if getattr(check, "passed", True):
+            if (
+                (allow_calibration or calibration_flagged_partial_pressure)
+                and str(getattr(check, "name", ""))
+                in {"kems_calibration", "in_cell_partial_pressure_sum"}
+                and detail.get("flag") == "calibration_not_grounded"
+            ):
+                missing.add("calibration_not_grounded")
+                notice_text = detail.get("calibration_notice")
+                if isinstance(notice_text, str):
+                    calibration_notice = notice_text
+                    reason = detail.get("reason")
+                    if isinstance(reason, str):
+                        calibration_reason = reason
             continue
         fact = _missing_apparatus_fact(
             check,
-            allow_calibration=author_reported_pressure or comparison_activity,
+            allow_calibration=allow_calibration,
         )
         if fact is None:
             return ()
@@ -867,7 +900,17 @@ def _unverified_apparatus_notices(
         Notice(
             kind=NoticeKind.UNVERIFIED_APPARATUS,
             affected_quantities=(quantity,),
-            reason=f"apparatus_unverified:{fact}",
+            reason=(
+                "calibration_not_grounded: "
+                f"{calibration_notice or 'Calibration is not grounded.'}"
+                + (
+                    f" ({calibration_reason})"
+                    if calibration_reason
+                    else ""
+                )
+                if fact == "calibration_not_grounded"
+                else f"apparatus_unverified:{fact}"
+            ),
             origin=reference.observation_id,
         )
         for fact in sorted(missing)
@@ -959,7 +1002,17 @@ def _cell_apparatus_inference_notices(
 def flagged_strata(notices: Sequence[Notice]) -> tuple[str, ...]:
     strata: list[str] = []
     kinds = {notice.kind for notice in notices}
-    if NoticeKind.UNVERIFIED_APPARATUS in kinds:
+    unverified_apparatus = tuple(
+        notice
+        for notice in notices
+        if notice.kind is NoticeKind.UNVERIFIED_APPARATUS
+    )
+    if any(_is_calibration_not_grounded_reason(n.reason) for n in unverified_apparatus):
+        strata.append(FLAGGED_STRATUM_CALIBRATION_NOT_GROUNDED)
+    if any(
+        not _is_calibration_not_grounded_reason(notice.reason)
+        for notice in unverified_apparatus
+    ):
         strata.append(FLAGGED_STRATUM_UNVERIFIED_APPARATUS)
     if NoticeKind.CELL_MATERIAL_INFERRED in kinds:
         strata.append(FLAGGED_STRATUM_CELL_MATERIAL_INFERRED)
@@ -975,6 +1028,10 @@ def flagged_strata(notices: Sequence[Notice]) -> tuple[str, ...]:
     if any(_is_fusion_conversion_notice(notice) for notice in notices):
         strata.append(FLAGGED_STRATUM_REFERENCE_CONVERTED_VIA_FUSION)
     return tuple(strata)
+
+
+def _is_calibration_not_grounded_reason(reason: object) -> bool:
+    return isinstance(reason, str) and reason.startswith("calibration_not_grounded:")
 
 
 def _is_fusion_conversion_notice(notice: Notice) -> bool:
@@ -5576,7 +5633,20 @@ def _flagged_payload_strata(row: Mapping[str, object]) -> tuple[str, ...]:
     )
     kinds = {str(notice.get("kind")) for notice in notices if notice.get("kind")}
     out: list[str] = []
-    if NoticeKind.UNVERIFIED_APPARATUS.value in kinds:
+    unverified_apparatus = tuple(
+        notice
+        for notice in notices
+        if notice.get("kind") == NoticeKind.UNVERIFIED_APPARATUS.value
+    )
+    if any(
+        _is_calibration_not_grounded_reason(notice.get("reason"))
+        for notice in unverified_apparatus
+    ):
+        out.append(FLAGGED_STRATUM_CALIBRATION_NOT_GROUNDED)
+    if any(
+        not _is_calibration_not_grounded_reason(notice.get("reason"))
+        for notice in unverified_apparatus
+    ):
         out.append(FLAGGED_STRATUM_UNVERIFIED_APPARATUS)
     if NoticeKind.CELL_MATERIAL_INFERRED.value in kinds:
         out.append(FLAGGED_STRATUM_CELL_MATERIAL_INFERRED)
