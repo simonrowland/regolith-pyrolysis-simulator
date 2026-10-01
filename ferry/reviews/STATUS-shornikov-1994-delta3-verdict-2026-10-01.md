@@ -8,7 +8,7 @@
 - **Counts:** P0 0, P1 0, P2 0 (prior O2 circularity cleared)
 - **Reason:** O2 retagged `model_derived`/`derived` (not measured); MoO2/MoO3 stay measured with Table 2 printed values (page-checked); p_O parents = MoO2+MoO3 only; relation describes (2) as downstream p_O2 calc, not p_O input; lineage graph no cycle; census 41 unchanged; validate OK. Lineage completeness not a gate.
 - **Deliverable:** `REVIEW-shornikov-1994-mullite-delta3-2026-10-01.md`
-- **Mailbox tip:** _(pending push)_ on `empirical/reviews-batch-zv-2026-09-22`
+- **Mailbox tip:** `b31564e5c6b722299e48b3bf5f3a9406dfa90f33` on `empirical/reviews-batch-zv-2026-09-22` (artifacts `b31564e5c`)
 - **Date:** 2026-10-01 ~10:25 ET
 
 — regolith-empirical
