@@ -227,7 +227,7 @@ def test_score_store_uses_printed_cell_then_family_mad_for_unknown_relation(
         reaction=State.not_applicable("not a formation quantity"),
         formation_elements=State.not_applicable("not a formation quantity"),
     )
-    offsets = ("-2", "-1", "0", "1", "10", "0.4")
+    offsets = ("-2", "-1", "0", "1", "10", "-2", "-1", "0", "1", "10", "0.4")
     observations = []
     origins = {}
     for index, offset in enumerate(offsets):
@@ -239,7 +239,7 @@ def test_score_store_uses_printed_cell_then_family_mad_for_unknown_relation(
             evidence=EvidenceClass.COMPILATION_ASSESSED,
             source_id="janaf-4th",
         )
-        if index == 5:
+        if index == 10:
             observation = replace(
                 observation,
                 uncertainty=Uncertainty(
@@ -265,11 +265,12 @@ def test_score_store_uses_printed_cell_then_family_mad_for_unknown_relation(
 
     def predict(engine, observation, **kwargs):
         del kwargs
+        scale = Decimal("10") if engine is Engine.VAPOROCK else Decimal("1")
         return EnginePrediction(
             engine=engine,
             channel="internal-analytical",
             execution=Execution(ExecutionState.PRODUCED, "test prediction"),
-            value=observation.value.point + offset_by_id[observation.observation_id],
+            value=observation.value.point + offset_by_id[observation.observation_id] * scale,
             unit="J_per_declared_mol_basis_per_K",
             authority=Authority.CERTIFIED,
             coefficient_sources=("unmapped-test-source",),
@@ -279,12 +280,15 @@ def test_score_store_uses_printed_cell_then_family_mad_for_unknown_relation(
 
     residuals, _ = score_store(
         ctx,
-        engines=(Engine.INTERNAL_ANALYTICAL,),
+        engines=(Engine.INTERNAL_ANALYTICAL, Engine.VAPOROCK),
         predict=predict,
     )
-    by_reference = {residual.reference: residual for residual in residuals}
-    for observation, offset in zip(observations[:5], offsets[:5]):
-        residual = by_reference[observation.observation_id]
+    by_reference = {
+        (residual.reference, residual.key.rsplit("::", 1)[-1]): residual
+        for residual in residuals
+    }
+    for observation, offset in zip(observations[:10], offsets[:10]):
+        residual = by_reference[(observation.observation_id, Engine.INTERNAL_ANALYTICAL.value)]
         assert residual.source_relation is SourceRelation.UNKNOWN
         assert residual.numeric is not None
         assert residual.numeric.decision_band is not None
@@ -295,13 +299,30 @@ def test_score_store_uses_printed_cell_then_family_mad_for_unknown_relation(
         assert residual.status is (
             ResidualStatus.MISMATCH if Decimal(offset) == Decimal("10") else ResidualStatus.MATCH
         )
-    printed = by_reference[observations[5].observation_id]
+    printed = by_reference[(observations[10].observation_id, Engine.INTERNAL_ANALYTICAL.value)]
     assert printed.source_relation is SourceRelation.UNKNOWN
     assert printed.numeric is not None
     assert printed.numeric.decision_band is not None
     assert printed.numeric.decision_band.value == Decimal("0.1")
     assert printed.numeric.decision_band.rule == "source-printed per-cell uncertainty"
     assert printed.status is ResidualStatus.MISMATCH
+    vaporock = by_reference[(observations[0].observation_id, Engine.VAPOROCK.value)]
+    assert vaporock.numeric is not None
+    assert vaporock.numeric.decision_band is not None
+    assert vaporock.numeric.decision_band.value == Decimal("20")
+    assert "derived_n=10" in vaporock.numeric.decision_band.rule
+    small_ctx = _context(
+        *observations[:9],
+        origins={item.observation_id: origins[item.observation_id] for item in observations[:9]},
+    )
+    small, _ = score_store(
+        small_ctx,
+        engines=(Engine.INTERNAL_ANALYTICAL,),
+        predict=predict,
+    )
+    assert len(small) == 9
+    assert all(item.status is ResidualStatus.NO_BAND for item in small)
+    assert all(item.numeric is not None and item.numeric.decision_band is None for item in small)
 
 
 def test_log10_k_star_stays_typed_outside_formation_ellingham() -> None:
@@ -348,6 +369,83 @@ def test_zero_kelvin_row_does_not_blank_later_series_points() -> None:
     assert row["reachable"] == 2
     assert row["refused"]["identity_unknown:temperature-not-positive"] == 1
     assert row["refused"]["unsupported:engine-thermo-does-not-emit"] == 1
+
+
+def test_census_keeps_unknown_relation_decision_when_band_exists(monkeypatch) -> None:
+    from simulator.battery import score as score_module
+    from simulator.battery.compilation_tier import ThermoAttempt, compilation_tier_census
+    from simulator.battery.records import Derivation, Locator
+
+    experiment = F.tabulation_experiment()
+    identity = replace(
+        _na2o_liquid(Quantity.CP),
+        reaction=State.not_applicable("not a formation quantity"),
+        formation_elements=State.not_applicable("not a formation quantity"),
+    )
+    observation = F.observation(
+        "unknown-census-cp",
+        experiment.experiment_id,
+        identity,
+        Decimal("10"),
+        evidence=EvidenceClass.COMPILATION_ASSESSED,
+        source_id="janaf-4th",
+    )
+    observation = replace(
+        observation,
+        uncertainty=Uncertainty(kind=UncertaintyKind.PRINTED, verbatim="0.1"),
+        locator=Locator(record="printed cp cell", note="unit='J/mol·K'"),
+        derivation=Derivation(
+            relation="source unit normalization",
+            inputs=(observation.observation_id,),
+            parameters=(),
+            output_unit="J_per_declared_mol_basis_per_K",
+        ),
+    )
+    monkeypatch.setattr(
+        score_module,
+        "resolve_source_relation",
+        lambda *args, **kwargs: SourceRelation.UNKNOWN,
+    )
+    monkeypatch.setattr(
+        "simulator.battery.compilation_tier.predict_thermo_attempt",
+        lambda engine, obs, **kwargs: ThermoAttempt(
+            value=obs.value.point + Decimal("1"),
+            unit="J_per_declared_mol_basis_per_K",
+            authority=Authority.CERTIFIED,
+            notices=(),
+            refusal_reason=None,
+            refusal_detail={},
+            call_evidence="test",
+        ),
+    )
+    out = compilation_tier_census(
+        _context(observation),
+        engines=(Engine.INTERNAL_ANALYTICAL,),
+        audit_compile_residual=False,
+    )
+    stratum = out["rows"][0]["decision_strata"][0]
+    assert stratum["relation"] == "unknown"
+    assert stratum["band_kind"] == "printed"
+    assert stratum["mismatch_count"] == 1
+    unprinted = replace(
+        observation,
+        uncertainty=Uncertainty(kind=UncertaintyKind.NONE),
+        locator=None,
+        derivation=None,
+    )
+    no_band = compilation_tier_census(
+        _context(unprinted),
+        engines=(Engine.INTERNAL_ANALYTICAL,),
+        audit_compile_residual=False,
+    )["rows"][0]["decision_strata"][0]
+    assert no_band["band_kind"] == "no_band"
+    assert no_band["no_band_reason"] == "derived_band_insufficient_n"
+    assert no_band["band_derived_n"] == 1
+    assert no_band["n"] == 1
+    assert no_band["signed_median_residual"] == "1"
+    assert no_band["mad"] == "0"
+    assert no_band["max_abs_residual"] == "1"
+    assert no_band["tail_in_count"] is None
 
 
 def test_non_positive_temperature_is_a_refusal_not_an_exception() -> None:
@@ -536,9 +634,9 @@ def test_compilation_tier_is_beside_measured_and_same_source_is_flagged() -> Non
     )[0]
     assert "implementation fidelity, not" in compilation_report
     assert (
-        "| compilation | rail | engine | relation | quantity | unit | n | median abs(C−R) | "
-        "RMS (C−R) | n match | "
-        "n mismatch | n no band | n same-source |"
+        "| compilation | rail | engine | relation | quantity | unit | n | signed median residual | MAD | max |residual| | median abs residual | "
+        "RMS residual | band value | band kind | band derived n | no-band reason | band-kind-specific matches / tail-in | "
+        "band-kind-specific mismatches / tail-out | n no band | n same-source |"
     ) in compilation_report
     assert (
         f"`compilations-janaf` | `delta_fG` | 1 | 1 | 0 | "
@@ -554,8 +652,8 @@ def test_compilation_tier_is_beside_measured_and_same_source_is_flagged() -> Non
     summary_cells = [cell.strip() for cell in summary.strip("|").split("|")]
     assert summary_cells[5] == "kJ/mol"
     assert summary_cells[6] == "1"
-    assert summary_cells[7] == str(abs(residual.numeric.value))
-    assert summary_cells[9:] == ["1", "0", "0", "1"]
+    assert summary_cells[7] == str(residual.numeric.value)
+    assert summary_cells[16:] == ["legacy_fallback match=1", "legacy_fallback mismatch=0", "0", "1"]
     assert compilation_family("ATcT.yaml", None) == "ATcT"
     measured = [
         row

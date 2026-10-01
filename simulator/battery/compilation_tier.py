@@ -47,6 +47,7 @@ from simulator.battery.identity import (
     quantity_token,
 )
 from simulator.battery.records import (
+    DecisionBand,
     Notice,
     Observation,
     State,
@@ -878,6 +879,14 @@ def _median_abs(values: Sequence[Decimal]) -> str | None:
     return str((ordered[mid - 1] + ordered[mid]) / Decimal(2))
 
 
+def _decision_band_from_payload(raw: Mapping[str, object]) -> DecisionBand:
+    return DecisionBand(
+        as_decimal(raw["value"]),
+        str(raw["unit"]),
+        str(raw["rule"]),
+    )
+
+
 @dataclass(frozen=True)
 class _TierCell:
     rail: str
@@ -890,18 +899,25 @@ class _TierCell:
     family: str
     quantity: str
     uncertainty: str
+    band_value: Decimal | None = None
+    band_kind: str = "no_band"
+    band_derived_n: int | None = None
+    derive_eligible: bool = True
 
 
 def _tier_markdown(cells: Sequence[_TierCell]) -> list[str]:
+    from simulator.battery.score import MIN_DERIVED_BAND_N, _median
+
     by_engine: dict[str, list[_TierCell]] = defaultdict(list)
     by_source: dict[tuple[str, str], list[_TierCell]] = defaultdict(list)
     by_family_rail_engine_quantity: dict[
         tuple[str, str, str, str, str, str], list[_TierCell]
     ] = defaultdict(list)
+    derived_pool_n: dict[tuple[str, str, str, str], int] = defaultdict(int)
     for cell in cells:
         by_engine[cell.engine].append(cell)
         by_source[(cell.family, cell.quantity)].append(cell)
-        if cell.numeric is not None and cell.operation is MetricOperation.ABSOLUTE:
+        if cell.numeric is not None and cell.operation is not None:
             by_family_rail_engine_quantity[
                 (
                     cell.family,
@@ -912,6 +928,8 @@ def _tier_markdown(cells: Sequence[_TierCell]) -> list[str]:
                     cell.unit,
                 )
             ].append(cell)
+            if cell.band_value is None and cell.derive_eligible:
+                derived_pool_n[(cell.family, cell.quantity, cell.engine, cell.unit)] += 1
     lines = [
         "## Compilation tier",
         "",
@@ -924,15 +942,15 @@ def _tier_markdown(cells: Sequence[_TierCell]) -> list[str]:
         "unchanged. Printed uncertainty is the reference observation's",
         "uncertainty (often none on a grid).",
         "",
-        "| compilation | rail | engine | relation | quantity | unit | n | median abs(C−R) | "
-        "RMS (C−R) | n match | "
-        "n mismatch | n no band | n same-source |",
-        "|---|---|---|---|---|---|---:|---:|---:|---:|---:|---:|---:|",
+        "| compilation | rail | engine | relation | quantity | unit | n | signed median residual | MAD | max |residual| | median abs residual | "
+        "RMS residual | band value | band kind | band derived n | no-band reason | band-kind-specific matches / tail-in | "
+        "band-kind-specific mismatches / tail-out | n no band | n same-source |",
+        "|---|---|---|---|---|---|---:|---:|---:|---:|---:|---:|---:|---|---:|---:|---:|---:|---:|",
     ]
     if not by_family_rail_engine_quantity:
         lines.append(
             "| (none) | (none) | (none) | (none) | (none) | (none) | 0 | — | — | "
-            "0 | 0 | 0 | 0 |"
+            "— | — | — | — | — | — | — | 0 | 0 | 0 | 0 |"
         )
     for (family, rail, engine, relation, quantity, unit), bucket in sorted(
         by_family_rail_engine_quantity.items()
@@ -942,8 +960,6 @@ def _tier_markdown(cells: Sequence[_TierCell]) -> list[str]:
             sum((value * value for value in values), Decimal(0))
             / Decimal(len(values))
         ).sqrt()
-        matches = [row for row in bucket if row.status is ResidualStatus.MATCH]
-        mismatches = [row for row in bucket if row.status is ResidualStatus.MISMATCH]
         same_source = [
             row
             for row in bucket
@@ -952,10 +968,41 @@ def _tier_markdown(cells: Sequence[_TierCell]) -> list[str]:
         display_unit = (
             "kJ/mol" if unit == "kJ_per_declared_mol_basis" else unit
         )
+        center = _median(values)
+        mad = None if center is None else _median([abs(value - center) for value in values])
+        band_values = sorted({str(row.band_value) for row in bucket if row.band_value is not None})
+        band_kinds = sorted({row.band_kind for row in bucket})
+        derived_ns = sorted({row.band_derived_n for row in bucket if row.band_derived_n is not None})
+        pool_n = derived_pool_n[(family, quantity, engine, unit)]
+        if not derived_ns and any(row.status is ResidualStatus.NO_BAND for row in bucket):
+            derived_ns = [pool_n]
+        matches_by_kind = {
+            kind: sum(1 for row in bucket if row.band_kind == kind and row.status is ResidualStatus.MATCH)
+            for kind in band_kinds
+        }
+        mismatches_by_kind = {
+            kind: sum(1 for row in bucket if row.band_kind == kind and row.status is ResidualStatus.MISMATCH)
+            for kind in band_kinds
+        }
+        match_display = "; ".join(
+            f"{kind} {'tail-in' if kind == 'derived_2xMAD' else 'match'}={count}"
+            for kind, count in matches_by_kind.items()
+        ) or "—"
+        mismatch_display = "; ".join(
+            f"{kind} {'tail-out' if kind == 'derived_2xMAD' else 'mismatch'}={count}"
+            for kind, count in mismatches_by_kind.items()
+        ) or "—"
+        no_band_reason = (
+            "derived_band_insufficient_n"
+            if 0 < pool_n < MIN_DERIVED_BAND_N
+            and any(row.status is ResidualStatus.NO_BAND for row in bucket)
+            else "—"
+        )
         lines.append(
             f"| {family} | {rail} | {engine} | {relation} | {quantity} | {display_unit} | "
-            f"{len(values)} | "
-            f"{_median_abs(values)} | {rms} | {len(matches)} | {len(mismatches)} | "
+            f"{len(values)} | {center} | {mad} | {max((abs(value) for value in values), default=None)} | "
+            f"{_median_abs(values)} | {rms} | {','.join(band_values) or '—'} | {','.join(band_kinds)} | {','.join(str(value) for value in derived_ns) or '—'} | {no_band_reason} | "
+            f"{match_display} | {mismatch_display} | "
             f"{sum(1 for row in bucket if row.status is ResidualStatus.NO_BAND)} | "
             f"{len(same_source)} |"
         )
@@ -1013,6 +1060,8 @@ def _cell_from_observation(
     unit: str,
     observation: Observation,
     origin: str | None,
+    decision_band=None,
+    derive_eligible: bool = True,
 ) -> _TierCell:
     quantity = "unknown"
     rail = "none"
@@ -1038,6 +1087,19 @@ def _cell_from_observation(
         family=compilation_family(observation.source_id, origin),
         quantity=quantity,
         uncertainty=uncertainty_text(observation.uncertainty),
+        band_value=None if decision_band is None else decision_band.value,
+        band_kind=(
+            "no_band" if decision_band is None
+            else "printed" if decision_band.rule == "source-printed per-cell uncertainty"
+            else "derived_2xMAD" if "residual distribution" in decision_band.rule
+            else "legacy_fallback"
+        ),
+        band_derived_n=(
+            int(decision_band.rule.rsplit("derived_n=", 1)[1])
+            if decision_band is not None and "derived_n=" in decision_band.rule
+            else None
+        ),
+        derive_eligible=derive_eligible,
     )
 
 
@@ -1048,7 +1110,11 @@ def compilation_tier_lines(
 ) -> list[str]:
     """Compilation tier beside the measured tier. The two counts are not added."""
 
-    from simulator.battery.score import Residual
+    from simulator.battery.score import (
+        Residual,
+        _is_flagged_stratum_notice,
+        _is_fusion_conversion_notice,
+    )
 
     cells: list[_TierCell] = []
     for residual in residuals:
@@ -1071,6 +1137,12 @@ def compilation_tier_lines(
                 unit="" if residual.numeric is None else residual.numeric.unit,
                 observation=observation,
                 origin=compilation_origin(residual.reference, origins),
+                decision_band=None if residual.numeric is None else residual.numeric.decision_band,
+                derive_eligible=not any(
+                    _is_flagged_stratum_notice(notice)
+                    or _is_fusion_conversion_notice(notice)
+                    for notice in residual.notices
+                ),
             )
         )
     return _tier_markdown(cells)
@@ -1082,6 +1154,8 @@ def compilation_tier_lines_from_payloads(
     origins: Mapping[str, str] | None = None,
 ) -> list[str]:
     """Same compilation table from a residuals.jsonl payload."""
+
+    from simulator.battery.score import _flagged_payload_strata
 
     cells: list[_TierCell] = []
     for row in rows:
@@ -1117,6 +1191,12 @@ def compilation_tier_lines_from_payloads(
                 unit=unit,
                 observation=observation,
                 origin=compilation_origin(reference, origins),
+                decision_band=(
+                    None if not isinstance(raw_numeric, Mapping) else
+                    None if not isinstance(raw_numeric.get("decision_band"), Mapping) else
+                    _decision_band_from_payload(raw_numeric["decision_band"])
+                ),
+                derive_eligible=not bool(_flagged_payload_strata(row)),
             )
         )
     return _tier_markdown(cells)
@@ -1188,6 +1268,10 @@ def compilation_tier_census(
         _validated_score_engines,
         _printed_uncertainty_band,
         _residual_distribution_band,
+        _median,
+        MIN_DERIVED_BAND_N,
+        _is_flagged_stratum_notice,
+        _is_fusion_conversion_notice,
         comparison_candidates,
         decision_band_for,
         expand_coefficient_sources,
@@ -1296,7 +1380,14 @@ def compilation_tier_census(
             residual = attempt.value - reference
             row["numeric"] += 1
             row["residuals"].append(residual)
-            row["comparisons"].append((relation, residual, printed_band))
+            derive_ok = not any(
+                _is_flagged_stratum_notice(notice)
+                or _is_fusion_conversion_notice(notice)
+                for notice in attempt.notices
+            )
+            row["comparisons"].append(
+                (engine.value, relation, residual, printed_band, derive_ok)
+            )
             return "numeric"
         key = _refusal_key(attempt.refusal_reason or RefusalReason.UNSUPPORTED, attempt.refusal_detail)
         row["refused"][key] += 1
@@ -1456,30 +1547,94 @@ def compilation_tier_census(
         for (family, quantity_name), row in buckets.items():
             quantity = Quantity(quantity_name)
             comparisons = row["comparisons"]
-            family_band = _residual_distribution_band(
-                [
-                    residual
-                    for _relation, residual, printed_band in comparisons
-                    if printed_band is None
-                ],
-                unit=QUANTITY_UNITS[quantity],
-                family=family,
-                quantity=quantity,
-            )
-            for relation, residual, printed_band in comparisons:
-                band = printed_band or family_band
-                if band is None:
-                    band = decision_band_for(quantity, relation)
-                if band is None:
-                    row["no_band"] += 1
-                elif relation in {SourceRelation.SAME_INPUT, SourceRelation.TRAINING}:
-                    row["same_source"] += 1
-                    if abs(residual) <= band.value:
-                        row["match_same_source"] += 1
-                elif relation is SourceRelation.INDEPENDENT:
-                    row["independent"] += 1
-                    if abs(residual) <= band.value:
-                        row["match_independent"] += 1
+            by_engine: dict[str, list[tuple[SourceRelation, Decimal, object, bool]]] = defaultdict(list)
+            for engine_name, relation, residual, printed_band, derive_ok in comparisons:
+                by_engine[engine_name].append((relation, residual, printed_band, derive_ok))
+            decisions: dict[tuple[str, SourceRelation], dict[str, object]] = {}
+            for engine_name, engine_comparisons in by_engine.items():
+                family_band = _residual_distribution_band(
+                    [residual for _relation, residual, printed_band, derive_ok in engine_comparisons if printed_band is None and derive_ok],
+                    unit=QUANTITY_UNITS[quantity],
+                    family=family,
+                    quantity=quantity,
+                )
+                derived_n = sum(1 for _relation, _residual, printed_band, derive_ok in engine_comparisons if printed_band is None and derive_ok)
+                for relation, residual, printed_band, derive_ok in engine_comparisons:
+                    band = printed_band or (family_band if derive_ok else None)
+                    kind = "printed" if printed_band is not None else "derived_2xMAD"
+                    if band is None:
+                        if not (derive_ok and derived_n > 0):
+                            band = decision_band_for(quantity, relation)
+                        kind = "legacy_fallback" if band is not None else "no_band"
+                    if band is None:
+                        row["no_band"] += 1
+                    if relation in {SourceRelation.SAME_INPUT, SourceRelation.TRAINING}:
+                        row["same_source"] += 1
+                    elif relation is SourceRelation.INDEPENDENT:
+                        row["independent"] += 1
+                    stratum = decisions.setdefault(
+                        (engine_name, relation),
+                        {
+                            "residuals": [], "bands": set(), "kinds": set(),
+                            "derived_ns": set(), "insufficient_ns": set(),
+                            "matches": 0, "mismatches": 0, "no_band": 0,
+                            "tail_in": 0, "tail_out": 0,
+                        },
+                    )
+                    stratum["residuals"].append(residual)
+                    stratum["kinds"].add(kind)
+                    if band is not None:
+                        stratum["bands"].add((str(band.value), band.unit))
+                    if printed_band is None and derive_ok and kind in {"derived_2xMAD", "no_band"}:
+                        stratum["derived_ns"].add(derived_n)
+                    if band is None and derive_ok and derived_n < MIN_DERIVED_BAND_N and printed_band is None:
+                        stratum["insufficient_ns"].add(derived_n)
+                    if band is None:
+                        stratum["no_band"] += 1
+                    elif abs(residual) <= band.value:
+                        stratum["matches"] += 1
+                        if kind == "derived_2xMAD":
+                            stratum["tail_in"] += 1
+                        if relation in {SourceRelation.SAME_INPUT, SourceRelation.TRAINING}:
+                            row["match_same_source"] += 1
+                        elif relation is SourceRelation.INDEPENDENT:
+                            row["match_independent"] += 1
+                    else:
+                        stratum["mismatches"] += 1
+                        if kind == "derived_2xMAD":
+                            stratum["tail_out"] += 1
+            def render_decision_stratum(engine_name, relation, stratum):
+                values = stratum["residuals"]
+                center = _median(values)
+                mad = None if center is None else _median([abs(value - center) for value in values])
+                bands = sorted(stratum["bands"])
+                band_values = sorted({value for value, _unit in bands})
+                band_units = sorted({unit for _value, unit in bands}) or [QUANTITY_UNITS[quantity]]
+                kinds = sorted(stratum["kinds"])
+                derived_ns = sorted(stratum["derived_ns"])
+                insufficient_ns = sorted(stratum["insufficient_ns"])
+                return {
+                    "engine": engine_name,
+                    "relation": relation.value,
+                    "n": len(values),
+                    "signed_median_residual": None if center is None else str(center),
+                    "mad": None if mad is None else str(mad),
+                    "max_abs_residual": None if not values else str(max(abs(value) for value in values)),
+                    "band_value": band_values[0] if len(band_values) == 1 else band_values or None,
+                    "unit": band_units[0] if len(band_units) == 1 else band_units,
+                    "band_kind": kinds[0] if len(kinds) == 1 else kinds,
+                    "band_derived_n": derived_ns[0] if len(derived_ns) == 1 else derived_ns or None,
+                    "match_count": stratum["matches"],
+                    "mismatch_count": stratum["mismatches"],
+                    "tail_in_count": stratum["tail_in"] if "derived_2xMAD" in kinds else None,
+                    "tail_out_count": stratum["tail_out"] if "derived_2xMAD" in kinds else None,
+                    "no_band_reason": "derived_band_insufficient_n" if insufficient_ns else None,
+                }
+
+            row["decision_strata"] = [
+                render_decision_stratum(engine_name, relation, stratum)
+                for (engine_name, relation), stratum in sorted(decisions.items(), key=lambda item: (item[0][0], item[0][1].value))
+            ]
         rendered = []
         for (family, quantity), row in sorted(buckets.items()):
             rendered.append(
@@ -1495,6 +1650,7 @@ def compilation_tier_census(
                     "match_independent": row["match_independent"],
                     "no_band": row["no_band"],
                     "median_abs_residual": _median_abs(row["residuals"]),
+                    "decision_strata": row.get("decision_strata", []),
                     "refused": dict(sorted(row["refused"].items())),
                 }
             )
