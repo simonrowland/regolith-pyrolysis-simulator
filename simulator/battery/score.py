@@ -912,17 +912,11 @@ def _cell_apparatus_inference_notices(
             (f"bench.cell_materials[{index}]", material)
             for index, material in enumerate(bench.cell_materials or ())
         )
-    pressure_environment = experiment.pressure_environment
-    knudsen_number = pressure_environment.regime.knudsen_number_orifice
-    if knudsen_number is not None:
-        fields.append(
-            (
-                "experiment.pressure_environment.regime.knudsen_number_orifice",
-                knudsen_number,
-            )
-        )
+    # The Knudsen number is a derived convenience value, not a physical
+    # apparatus fact.  The regime fallback requires a printed diameter, while
+    # geometry validation may read a supplied inferred diameter.
     apparatus = experiment.apparatus
-    if apparatus is not None:
+    if apparatus is not None and quantity in _VAPOUR_EQUILIBRIUM:
         if apparatus.geometry is not None:
             for name in (
                 "orifice_area_m2",
@@ -939,6 +933,15 @@ def _cell_apparatus_inference_notices(
     notices: list[Notice] = []
     for field_name, located in fields:
         if located.inference is None or not located.state.is_value:
+            continue
+        # Unit conversions and extraction/identity derivations do not assert
+        # an inferred property of the physical apparatus.
+        if located.inference.relation in {
+            "mm_to_m",
+            "cm_to_m",
+            "identity:m",
+            "extract_inference",
+        }:
             continue
         evidence = json.dumps(
             {
@@ -1473,6 +1476,7 @@ def _observation_flagged_strata(
 def _kems_replicate_groups(
     observations: Mapping[str, Observation],
     experiments: Mapping[str, Experiment],
+    benches: Mapping[str, Bench],
 ) -> tuple[tuple[Decimal, ...], ...]:
     groups: dict[tuple[object, ...], list[Decimal]] = {}
     point_observations_by_experiment = _partial_pressure_observations_by_experiment(
@@ -1484,7 +1488,7 @@ def _kems_replicate_groups(
         if quantity is not Quantity.P_PARTIAL or not isinstance(identity, Identity):
             continue
         if _observation_flagged_strata(
-            observation, experiments, point_observations_by_experiment
+            observation, experiments, point_observations_by_experiment, benches
         ):
             continue
         evidence = observation.evidence.class_
@@ -1526,6 +1530,13 @@ def derive_kems_partial_pressure_band(
     observations: Mapping[str, Observation],
     experiments: Mapping[str, Experiment],
 ) -> DecisionBand | None:
+    """Derive a band from the supplied rows without bench inference context.
+
+    This data-only API cannot discover inferred bench cell materials because
+    benches are not part of its inputs.  Scoring uses the private derivation
+    with its complete bench map; ``decision_band_for`` never falls back to
+    this context-free result when a bench-aware derived band is absent.
+    """
     return _derive_kems_partial_pressure_band(observations, experiments, {})
 
 
@@ -1602,7 +1613,7 @@ def _derive_kems_partial_pressure_band(
         return DecisionBand(width, "dimensionless", rule)
 
     replicate_scatter = pooled_log_pressure_sd(
-        _kems_replicate_groups(observations, experiments)
+        _kems_replicate_groups(observations, experiments, benches)
     )
     if replicate_scatter is None:
         return None
@@ -1634,7 +1645,10 @@ def decision_band_for(
         and observations is not None
         and experiments is not None
     ):
-        band = derived_band or derive_kems_partial_pressure_band(observations, experiments)
+        # A None band is meaningful: the bench-aware scoring derivation found
+        # no unflagged candidates.  Do not refill it with the public helper,
+        # whose inputs cannot include the bench map.
+        band = derived_band
         if band is not None and band_dimension_matches(quantity, band):
             return band
     if derived_band is not None:
@@ -3804,6 +3818,17 @@ def compile_residual(
         numeric, metric_reason, metric_detail = _implied_alpha_numeric(prediction.value)
     else:
         cell_band = derived_band
+        if (
+            cell_band is None
+            and quantity is Quantity.P_PARTIAL
+            and rail is Rail.VAPOUR
+            and experiment is not None
+            and experiment.method.is_value
+            and experiment.method.value is MethodToken.KNUDSEN_EFFUSION
+        ):
+            cell_band = _derive_kems_partial_pressure_band(
+                context.observations, context.experiments, context.benches
+            )
         if compilation and quantity is not Quantity.P_PARTIAL:
             cell_band = _printed_uncertainty_band(
                 quantity,
@@ -3841,7 +3866,10 @@ def compile_residual(
             source_relation=source_relation,
             exclusions=("valid_metric_domain",),
         )
-    has_no_band_flag = bool(flagged_notices) or any(
+    has_no_band_flag = any(
+        notice.kind is not NoticeKind.CELL_MATERIAL_INFERRED
+        for notice in flagged_notices
+    ) or any(
         _is_fusion_conversion_notice(notice) for notice in notices
     )
     if has_no_band_flag:
@@ -5248,8 +5276,10 @@ def render_score_report(
             "## Flagged strata",
             "",
             "These numeric diagnostics carry an explicit source or apparatus flag. "
-            "They are excluded from measured headlines, bands, and band statistics; "
-            "a row carrying both flags appears in both strata.",
+            "Flagged rows do not derive measurement bands or enter unflagged headlines. "
+            "Cell-material-inferred residuals are still judged against the band; other "
+            "flag kinds retain their existing scoring rules. A row carrying both flags "
+            "appears in both strata.",
             "",
             "| stratum | rail | engine | n | median dex | RMS dex |",
             "|---|---|---|---:|---:|---:|",

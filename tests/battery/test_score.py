@@ -4260,8 +4260,36 @@ def test_inferred_mo_cell_scores_and_is_visible_on_residual_row() -> None:
         parameters=(),
         output_unit="cell material",
     )
-    reference, context, _bench, prediction = _cell_material_score_case(
+    reference, context, bench, prediction = _cell_material_score_case(
         CellMaterial.MO, inference
+    )
+    clean_exp = replace(
+        context.experiments[reference.experiment_id],
+        experiment_id="clean-for-score",
+        bench_id="clean-pt",
+    )
+    clean_rows = tuple(
+        replace(
+            reference,
+            observation_id=f"clean-for-score-{index}",
+            experiment_id=clean_exp.experiment_id,
+            value=Value.point_of(value),
+        )
+        for index, value in enumerate((Decimal("1e-6"), Decimal("2e-6")))
+    )
+    clean_bench = replace(
+        bench,
+        id="clean-pt",
+        cell_materials=(F.located(CellMaterial.PT),),
+    )
+    context = replace(
+        context,
+        observations={
+            **context.observations,
+            **{row.observation_id: row for row in clean_rows},
+        },
+        experiments={**context.experiments, clean_exp.experiment_id: clean_exp},
+        benches={**context.benches, clean_bench.id: clean_bench},
     )
 
     residual, _candidate = compile_residual(
@@ -4271,9 +4299,11 @@ def test_inferred_mo_cell_scores_and_is_visible_on_residual_row() -> None:
         predict=prediction,
     )
 
-    assert residual.status is ResidualStatus.NO_BAND
+    assert residual.status is ResidualStatus.MATCH
     assert residual.numeric is not None
-    assert residual.numeric.decision_band is None
+    assert residual.numeric.decision_band is not None
+    assert residual.score_eligible is False
+    assert "not_flagged_stratum" in residual.exclusions
     notice = next(
         item for item in residual.notices
         if item.kind is NoticeKind.CELL_MATERIAL_INFERRED
@@ -4301,22 +4331,131 @@ def test_inferred_mo_cell_scores_and_is_visible_on_residual_row() -> None:
             "rms_dex": "0",
         }
     ]
-    replicate = replace(
-        reference,
-        observation_id=f"{reference.observation_id}-replicate",
-        value=Value.point_of(Decimal("2e-6")),
-    )
-    band_observations = {
-        item.observation_id: item for item in (reference, replicate)
-    }
-    assert derive_kems_partial_pressure_band(
-        band_observations, context.experiments
-    ) is not None
     from simulator.battery.score import _derive_kems_partial_pressure_band
 
     assert _derive_kems_partial_pressure_band(
-        band_observations, context.experiments, context.benches
+        context.observations, context.experiments, context.benches
+    ) == residual.numeric.decision_band
+
+
+def test_inferred_cell_replicates_do_not_move_fallback_band() -> None:
+    from simulator.battery.enums import CellMaterial
+    from simulator.battery.score import _derive_kems_partial_pressure_band
+
+    inference = Derivation(
+        relation="inferred from printed Mo oxide ions",
+        inputs=("Mo+;MoO+;MoO2+;MoO3+",),
+        parameters=(),
+        output_unit="cell material",
+    )
+    flagged, flagged_context, flagged_bench, _ = _cell_material_score_case(
+        CellMaterial.MO, inference
+    )
+    flagged_exp = flagged_context.experiments[flagged.experiment_id]
+    flagged_replica = replace(
+        flagged,
+        observation_id="inferred-replica",
+        value=Value.point_of(Decimal("1e-3")),
+    )
+
+    clean_exp = replace(flagged_exp, experiment_id="clean-kems", bench_id="clean-cell")
+    clean = replace(
+        flagged,
+        observation_id="clean-row",
+        experiment_id=clean_exp.experiment_id,
+        value=Value.point_of(Decimal("1e-6")),
+    )
+    clean_replica = replace(
+        clean,
+        observation_id="clean-replica",
+        value=Value.point_of(Decimal("2e-6")),
+    )
+    clean_bench = replace(
+        flagged_bench,
+        id="clean-cell",
+        cell_materials=(F.located(CellMaterial.PT),),
+    )
+    experiments = {
+        flagged_exp.experiment_id: flagged_exp,
+        clean_exp.experiment_id: clean_exp,
+    }
+    clean_rows = {row.observation_id: row for row in (clean, clean_replica)}
+    mixed_rows = {
+        row.observation_id: row
+        for row in (clean, clean_replica, flagged, flagged_replica)
+    }
+
+    clean_band = _derive_kems_partial_pressure_band(
+        clean_rows, experiments, {clean_bench.id: clean_bench}
+    )
+    mixed_band = _derive_kems_partial_pressure_band(
+        mixed_rows,
+        experiments,
+        {clean_bench.id: clean_bench, flagged_bench.id: flagged_bench},
+    )
+    assert clean_band is not None
+    assert mixed_band == clean_band
+    # The public helper lacks benches by design; scoring must retain the
+    # bench-aware None result instead of falling back to that helper.
+    from simulator.battery.score import (
+        derive_kems_partial_pressure_band,
+        decision_band_for,
+    )
+
+    inferred_only = {
+        row.observation_id: row for row in (flagged, flagged_replica)
+    }
+    assert derive_kems_partial_pressure_band(
+        inferred_only, {flagged_exp.experiment_id: flagged_exp}
+    ) is not None
+    assert _derive_kems_partial_pressure_band(
+        inferred_only,
+        {flagged_exp.experiment_id: flagged_exp},
+        {flagged_bench.id: flagged_bench},
     ) is None
+    assert decision_band_for(
+        Quantity.P_PARTIAL,
+        SourceRelation.INDEPENDENT,
+        rail=Rail.VAPOUR,
+        method=MethodToken.KNUDSEN_EFFUSION,
+        observations=inferred_only,
+        experiments={flagged_exp.experiment_id: flagged_exp},
+        derived_band=None,
+    ) is None
+
+
+@pytest.mark.parametrize(
+    "relation", ("mm_to_m", "cm_to_m", "identity:m", "extract_inference")
+)
+@pytest.mark.parametrize("field", ("orifice_area_m2", "orifice_diameter_m"))
+def test_derived_apparatus_convenience_value_does_not_raise_inference_notice(
+    relation: str,
+    field: str,
+) -> None:
+    from simulator.battery.records import ApparatusGeometry
+    from simulator.battery.score import _cell_apparatus_inference_notices
+
+    reference = F.observation(
+        "converted-orifice",
+        "converted-kems",
+        _partial_identity(),
+        Decimal("1e-6"),
+    )
+    conversion = Derivation(
+        relation=relation,
+        inputs=("printed orifice geometry",),
+        parameters=(),
+        output_unit="m" if field == "orifice_diameter_m" else "m2",
+    )
+    area = replace(F.located(Decimal("1e-6")), inference=conversion)
+    experiment = replace(
+        F.kems_experiment("converted-kems"),
+        apparatus=replace(
+            F.kems_experiment("converted-kems").apparatus,
+            geometry=ApparatusGeometry(**{field: area}),
+        ),
+    )
+    assert _cell_apparatus_inference_notices(reference, experiment, None) == ()
 
 
 def test_noninferred_cell_material_has_no_inference_notice() -> None:
@@ -4341,7 +4480,7 @@ def test_noninferred_cell_material_has_no_inference_notice() -> None:
     )
 
 
-def test_inferred_effusion_gate_value_is_reported() -> None:
+def test_derived_effusion_knudsen_number_does_not_raise_apparatus_notice() -> None:
     from simulator.battery.enums import CellMaterial
 
     reference, context, _bench, prediction = _cell_material_score_case(
@@ -4375,13 +4514,10 @@ def test_inferred_effusion_gate_value_is_reported() -> None:
         predict=prediction,
     )
 
-    notice = next(
-        item for item in residual.notices
-        if item.kind is NoticeKind.CELL_MATERIAL_INFERRED
+    assert not any(
+        item.kind is NoticeKind.CELL_MATERIAL_INFERRED
+        for item in residual.notices
     )
-    assert "inferred orifice Knudsen number" in notice.reason
-    assert "pressure_environment.regime.knudsen_number_orifice" in notice.reason
-    assert '"page":18' in notice.reason
 
 
 def test_inferred_nonmodelled_cell_still_refuses_oxygen_balance() -> None:
