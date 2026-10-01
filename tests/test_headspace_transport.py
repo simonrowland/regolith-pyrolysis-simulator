@@ -364,6 +364,102 @@ def test_large_o2_headspace_bolus_pumps_down_and_is_credited_once():
         transition.validate_conservation(sim.atom_ledger.registry)
 
 
+@pytest.mark.parametrize("outlet_config", ["headspace", "train"])
+def test_quasi_steady_bleed_uses_configured_outlet_pressure(outlet_config):
+    sim = _transport_sim()
+    sim._overhead_headspace_config.update({"enabled": True, "volume_m3": 1.0})
+    sim.overhead_model.pipe_diameter_m = 0.12
+    sim.overhead_model.pipe_length_m = 1.0
+    sim.melt.temperature_C = 1000.0
+    sim.melt.atmosphere = Atmosphere.CONTROLLED_O2
+    sim.melt.p_total_mbar = 13.0
+    sim.melt.pO2_mbar = 13.0
+    outlet_pressure_bar = 0.2
+    if outlet_config == "headspace":
+        sim._overhead_headspace_config["downstream_pressure_bar"] = (
+            outlet_pressure_bar
+        )
+    else:
+        sim.overhead_model._downstream_pressure_override = outlet_pressure_bar
+
+    initial_pressure_Pa = 0.3e5
+    initial_mol = (
+        initial_pressure_Pa
+        * sim._headspace_volume_m3()
+        / (STATE_GAS_CONSTANT * sim._headspace_temperature_K())
+    )
+    sim.atom_ledger.load_external_mol(
+        "process.overhead_gas",
+        {"O2": initial_mol},
+        source="configured-outlet headspace pressure test",
+        material_origin="feedstock",
+    )
+
+    sim._dispatch_overhead_bleed()
+
+    remaining_mol = sum(sim._overhead_holdup_mol().values())
+    actual_pressure_bar = (
+        remaining_mol
+        * STATE_GAS_CONSTANT
+        * sim._headspace_temperature_K()
+        / sim._headspace_volume_m3()
+        / 1.0e5
+    )
+    assert actual_pressure_bar == pytest.approx(outlet_pressure_bar, rel=1.0e-12)
+
+
+def test_stale_headspace_bolus_drains_to_command_when_source_stops():
+    sim = _transport_sim()
+    sim._overhead_headspace_config.update({"enabled": True, "volume_m3": 1.0})
+    sim.overhead_model.pipe_diameter_m = 0.12
+    sim.overhead_model.pipe_length_m = 1.0
+    sim.melt.temperature_C = 1000.0
+    sim.melt.atmosphere = Atmosphere.HARD_VACUUM
+    sim.melt.p_total_mbar = 13.0
+    steady_pressure_Pa = 0.3e5
+    species_basis = {"O2": 1.0}
+    k_kg_s_Pa2 = sim.overhead_model._pipe_conductance(
+        1.0,
+        sim.melt.temperature_C,
+        p_downstream_Pa=0.0,
+        species_kg_for_M_avg=species_basis,
+    )
+    sim._headspace_transport_source_mass_kg_s = (
+        k_kg_s_Pa2 * steady_pressure_Pa**2
+    )
+    bolus_mol = (
+        steady_pressure_Pa
+        * sim._headspace_volume_m3()
+        / (STATE_GAS_CONSTANT * sim._headspace_temperature_K())
+    )
+    sim.atom_ledger.load_external_mol(
+        "process.overhead_gas",
+        {"O2": bolus_mol},
+        source="stale headspace bolus test",
+        material_origin="feedstock",
+    )
+
+    sim._dispatch_overhead_bleed()
+    after_source_mol = sum(sim._overhead_holdup_mol().values())
+    source_pressure_Pa = (
+        after_source_mol
+        * STATE_GAS_CONSTANT
+        * sim._headspace_temperature_K()
+        / sim._headspace_volume_m3()
+    )
+    assert source_pressure_Pa == pytest.approx(steady_pressure_Pa, rel=1.0e-12)
+
+    sim._headspace_transport_source_mass_kg_s = 0.0
+    sim._dispatch_overhead_bleed()
+    final_pressure_Pa = (
+        sum(sim._overhead_holdup_mol().values())
+        * STATE_GAS_CONSTANT
+        * sim._headspace_temperature_K()
+        / sim._headspace_volume_m3()
+    )
+    assert final_pressure_Pa == pytest.approx(13.0e2, rel=1.0e-12)
+
+
 def test_steady_headspace_source_reaches_pressure_and_removes_source_each_tick():
     sim = _transport_sim()
     sim._overhead_headspace_config.update({"enabled": True, "volume_m3": 1.0})

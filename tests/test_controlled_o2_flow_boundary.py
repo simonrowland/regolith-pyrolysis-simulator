@@ -54,6 +54,21 @@ def test_committed_disposition_uses_shared_flow_not_diagnostic_pressure():
     ]
 
     assert committed == pytest.approx([0.4, 0.4, 0.4])
+    assert flow.downstream_pressure_bar == 0.0
+
+
+def test_equipment_binding_reports_implied_pipe_backpressure():
+    flow = controlled_flow_capacity(
+        pipe_capacity_kg_hr=1.0,
+        equipment_capacity_kg_hr=0.5,
+        evolved_flux_kg_hr=0.8,
+        upstream_pressure_bar=2.0,
+    )
+
+    assert flow.binding_cause == "controlled_o2_equipment"
+    assert flow.downstream_pressure_bar == pytest.approx(
+        2.0 * math.sqrt(1.0 - 0.5 / 1.0)
+    )
 
 
 def test_finite_headspace_quasi_steady_debit_respects_shared_flow_limit():
@@ -79,6 +94,32 @@ def test_finite_headspace_quasi_steady_debit_respects_shared_flow_limit():
     )
 
     assert bled["O2"] * molar_mass_kg_mol == pytest.approx(0.4)
+
+
+def test_no_equipment_quasi_steady_debit_uses_pipe_capacity():
+    flow = controlled_flow_capacity(
+        pipe_capacity_kg_hr=10.0,
+        equipment_capacity_kg_hr=None,
+        evolved_flux_kg_hr=0.4,
+        equipment_capacity_required=False,
+        upstream_pressure_bar=0.001,
+    )
+    holdup_mol = 1.0 / 0.032
+    bled = BuiltinOverheadBleedProvider._bled_species_mol(
+        {"O2": holdup_mol},
+        total_mol=holdup_mol,
+        total_kg=1.0,
+        controls={
+            "dt_hr": 1.0,
+            "effective_transport_capacity": flow,
+            "headspace_volume_m3": 1.0,
+            "headspace_temperature_K": 300.0,
+            "p_total_bar": 0.0,
+        },
+    )
+
+    assert flow.binding_cause == "controlled_o2_no_equipment"
+    assert bled["O2"] * 0.032 == pytest.approx(1.0)
 
 
 def test_retained_holdup_drains_and_throttle_clears_only_after_evacuation():
@@ -161,3 +202,4 @@ def test_disabled_runtime_policy_stays_on_no_equipment_path():
     )
     assert math.isfinite(flow.saturation)
     assert flow.binding_cause == "controlled_o2_no_equipment"
+    assert flow.downstream_pressure_bar == 0.0

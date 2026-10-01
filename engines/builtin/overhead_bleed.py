@@ -121,16 +121,23 @@ def controlled_flow_capacity(
     else:
         binding_cause = "pipe"
 
-    if upstream_pressure <= 0.0 or pipe_capacity <= 0.0:
+    equipment_binds = (
+        binding_cause == "controlled_o2_equipment"
+        and demand_flux >= equipment_capacity
+    )
+    if not equipment_binds:
+        downstream_pressure = 0.0
+    elif upstream_pressure <= 0.0 or pipe_capacity <= 0.0:
         downstream_pressure = upstream_pressure
     else:
-        # Premise: integrated compressible Poiseuille flow is
-        # C(P1,P2)=k(P1^2-P2^2), while C0=k*P1^2 is the vacuum carrying
-        # limit. Algebra gives P2=sqrt(max(P1^2-C/k,0)) =
-        # P1*sqrt(max(1-C/C0,0)). Here C is the flow the equipment can
-        # actually swallow this tick. Units: C/k is bar^2, so P2 is bar.
-        # Limits: C->0 gives P2->P1; C->C0 gives P2->0; requested C>C0
-        # has no real forward-flow solution and is reported by saturation.
+        # This inversion is an equipment-backpressure diagnostic only when
+        # equipment capacity actually binds. It is not the duct's outlet
+        # boundary; without that condition report the vacuum/cistern outlet.
+        # For a binding equipment flow C, Poiseuille gives
+        # C=k(P1^2-P2^2), with C0=k*P1^2 against vacuum, so
+        # P2=P1*sqrt(max(1-C/C0,0)). Units: C/C0 is dimensionless and P2
+        # is bar. C->0 approaches P1, which is why this diagnostic cannot be
+        # reused as the configured outlet when equipment does not bind.
         downstream_pressure = upstream_pressure * math.sqrt(
             max(1.0 - swallowed_flux / pipe_capacity, 0.0)
         )
@@ -533,8 +540,17 @@ class BuiltinOverheadBleedProvider(ChemistryProvider):
             # remains a hard cap on the mass that can leave this tick.
             bleed_total_mol = requested_bleed_mol
             if isinstance(flow_capacity, EffectiveTransportCapacity):
+                # With no equipment, swallowed_flux is only the estimated
+                # source-plus-holdup demand. The ledger already includes the
+                # committed source, so that estimate can be short; the actual
+                # removal limit is the pipe capacity.
+                bleed_capacity_kg_hr = (
+                    flow_capacity.effective_capacity_kg_hr
+                    if flow_capacity.binding_cause == "controlled_o2_no_equipment"
+                    else flow_capacity.swallowed_flux_kg_hr
+                )
                 bleed_capacity_kg = (
-                    max(0.0, flow_capacity.swallowed_flux_kg_hr) * dt_hr
+                    max(0.0, bleed_capacity_kg_hr) * dt_hr
                 )
                 average_molar_mass_kg_mol = total_kg / total_mol
                 bleed_total_mol = min(

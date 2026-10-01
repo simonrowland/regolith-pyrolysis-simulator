@@ -3988,8 +3988,13 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         if k_kg_s_Pa2 <= 0.0:
             return math.inf
 
-        # Quasi-steady balance: source S_mass [kg/s] = k [kg/(s·Pa²)] ×
-        # (P_ss²-P_down²) [Pa²], hence P_ss=sqrt(P_down²+S_mass/k) [Pa].
+        # P_out is the configured duct outlet boundary, not the transport
+        # capacity's inverted P2 diagnostic: that P2 is inferred from current
+        # upstream pressure and swallowed flow, so it approaches P_up when
+        # equipment does not bind and is not an outlet condition.
+        # Quasi-steady balance: S [kg/s] = k [kg/(s·Pa²)] ×
+        # (P_ss²-P_out²) [Pa²], hence P_ss=sqrt(P_out²+S/k) [Pa].
+        # For a vacuum/cistern P_out -> 0, this reduces to sqrt(S/k).
         # End pressure is max(commanded pressure, P_ss); this is the target
         # inventory used by OVERHEAD_BLEED. Valid when the residence time
         # tau=n(P_end)/Q(P_end) [mol/(mol/s)=s] is much shorter than this
@@ -10641,14 +10646,21 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
     ) -> IntentResult:
         diagnostic = self._overhead_gas_equilibrium_diagnostic()
         species_kg_for_M_avg = self._overhead_holdup_species_kg()
-        configured_downstream_pressure_bar = self._overhead_headspace_config.get(
-            'downstream_pressure_bar'
+        configured_downstream_pressure_bar = (
+            self._overhead_headspace_config.get('downstream_pressure_bar')
         )
+        if configured_downstream_pressure_bar is None:
+            configured_downstream_pressure_bar = getattr(
+                self.overhead_model,
+                '_downstream_pressure_override',
+                None,
+            )
         p_downstream_bar = (
-            configured_downstream_pressure_bar
-            if configured_downstream_pressure_bar is not None
-            else self._headspace_downstream_pressure_bar(
-                effective_transport_capacity
+            0.0
+            if configured_downstream_pressure_bar is None
+            else self.overhead_model._resolve_downstream_pressure(
+                self.melt,
+                configured_downstream_pressure_bar,
             )
         )
         explicit_capacity_override = (
