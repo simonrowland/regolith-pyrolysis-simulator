@@ -44,6 +44,8 @@ FIELDS = (
     "H",
     "Ref",
 )
+GAS_CSV_PATH = "src/vaporock/data/JANAF-vapor-data-full.csv"
+PATCH_PATH = Path(__file__).resolve().parents[1] / "0004-gas-rows-from-openimcc-janaf.patch"
 EXCLUDED = {"Na2O(g)", "K2O(g)"}
 GAP_CHOICES = {
     "CaO(g)": "base",
@@ -126,6 +128,21 @@ def group_rows(rows: list[dict[str, str]]) -> dict[str, list[dict[str, str]]]:
     for row in rows:
         grouped[row["species_name"]].append(row)
     return dict(grouped)
+
+
+def patch_paths(path: Path) -> list[str]:
+    paths = []
+    for line in path.read_text(encoding="utf-8").splitlines():
+        if not line.startswith("diff --git "):
+            continue
+        parts = line.split()
+        if len(parts) != 4 or not parts[2].startswith("a/") or not parts[3].startswith("b/"):
+            raise ValueError(f"{path}: malformed diff header: {line}")
+        before, after = parts[2][2:], parts[3][2:]
+        if before != after:
+            raise ValueError(f"{path}: diff changes path {before} to {after}")
+        paths.append(after)
+    return paths
 
 
 def numeric(row: dict[str, str], field: str) -> Decimal:
@@ -593,17 +610,28 @@ def main() -> int:
         base_rows, base_raw = read_csv(args.base_csv)
         candidate_rows, candidate_raw = read_csv(args.candidate_csv)
         source_rows, _ = read_csv(args.openimcc_csv)
+        touched_paths = patch_paths(PATCH_PATH)
     except (OSError, UnicodeError, ValueError, csv.Error) as exc:
         print(f"FAIL INPUT: {exc}")
         return 2
     base_groups = group_rows(base_rows)
     candidate_groups = group_rows(candidate_rows)
     source_groups = group_rows(source_rows)
-    imported_groups = {
-        species: rows for species, rows in source_groups.items() if species not in EXCLUDED
-    }
     base_species = set(base_groups)
+    imported_groups = {
+        species: rows
+        for species, rows in source_groups.items()
+        if species not in EXCLUDED and species in base_species
+    }
     candidate_species = set(candidate_groups)
+    report.check(
+        "I7",
+        touched_paths == [GAS_CSV_PATH] and candidate_species == base_species,
+        f"patch files={touched_paths}, expected={[GAS_CSV_PATH]}; "
+        f"base species={len(base_species)}, candidate species={len(candidate_species)}, "
+        f"added={sorted(candidate_species - base_species)}, "
+        f"deleted={sorted(base_species - candidate_species)}",
+    )
     missing = sorted(base_species - candidate_species)
     untouched = sorted(base_species - set(imported_groups))
     untouched_differences = [
@@ -625,7 +653,7 @@ def main() -> int:
         report.lines.append(f"  I2 detail: {problem}")
 
     janaf_points, reference_errors = load_janaf_points(
-        base_groups, source_groups, args.janaf_tables.resolve()
+        base_groups, imported_groups, args.janaf_tables.resolve()
     )
     for error in reference_errors:
         report.fail("I6", error)
@@ -744,7 +772,7 @@ def main() -> int:
     print(f"  declared-window coverage gains: {', '.join(declared_gains)}")
     print(
         f"PASS: {len(candidate_species)} species / {2 * len(probes)} whole-set evaluations; "
-        "I1–I6 satisfied"
+        "I1–I7 satisfied"
     )
     return 0
 

@@ -24,6 +24,10 @@ simulator's hash-verified NIST-JANAF compilation; seam size and battery
 residuals did not select the fit. Na2O(g) and K2O(g) are excluded because their
 openimcc provenance is LH84 plus NASA-Cp, not JANAF.
 
+Import source rows only for species already present in the 0001--0003 base
+table. Openimcc-only species have no parent oxide in VapoRock's melt model and
+cannot be used by its equilibrium engine.
+
 VapoRock's configured selector replaces every row at a species' minimum
 T_min with 0 K and every row at its maximum T_max with 1e8 K. Generated rows
 have strict, contiguous intervals with unique extrema, so only the first
@@ -164,9 +168,6 @@ def generated_species_rows(
     species: str, base_rows: list[CsvRow], source_rows: list[CsvRow]
 ) -> list[dict[str, str]]:
     source = check_contiguous(species, source_rows)
-    if not base_rows:
-        return [dict(row.values, T_interval=str(index)) for index, row in enumerate(source, 1)]
-
     base = check_contiguous(species, base_rows)
     source_low = decimal(source[0], "T_min")
     source_top = decimal(source[-1], "T_max")
@@ -245,7 +246,7 @@ def build(base_path: Path, source_path: Path) -> str:
     targets = {
         species: check_contiguous(species, rows)
         for species, rows in source_groups.items()
-        if species not in EXCLUDED
+        if species not in EXCLUDED and species in base_groups
     }
     generated = {
         species: generated_species_rows(species, base_groups.get(species, []), rows)
@@ -306,9 +307,13 @@ def main() -> int:
         parser.exit(2, f"build_0004_gas_rows.py: {exc}\n")
     base_groups = grouped(parse_csv(base_path)[1])
     source_groups = grouped(parse_csv(source_path)[1])
-    imported_species = len(set(source_groups) - EXCLUDED)
-    imported_rows = sum(len(rows) for name, rows in source_groups.items() if name not in EXCLUDED)
-    final_species = len(set(base_groups) | (set(source_groups) - EXCLUDED))
+    imported_species = len((set(source_groups) - EXCLUDED) & set(base_groups))
+    imported_rows = sum(
+        len(rows)
+        for name, rows in source_groups.items()
+        if name not in EXCLUDED and name in base_groups
+    )
+    final_species = len(base_groups)
     print(
         f"generated {final_species} species; {imported_rows} rows across "
         f"{imported_species} imported species; "
