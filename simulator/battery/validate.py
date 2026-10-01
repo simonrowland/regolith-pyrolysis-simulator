@@ -92,7 +92,10 @@ from simulator.battery.oxygen_balance import (
 )
 from simulator.battery.source_lineage import coefficient_lineage_sources
 from simulator.accounting.formulas import parse_formula
-from simulator.battery.validity import run_validity_gates
+from simulator.battery.validity import (
+    _partial_pressure_observations_by_experiment,
+    run_validity_gates,
+)
 from simulator.reference_data.janaf import formula_composition
 
 _PAREN_GROUP_RE = re.compile(r"\(([A-Za-z0-9]+)\)(\d*)")
@@ -1347,6 +1350,8 @@ def validate_residual(
     experiments: Mapping[str, Experiment],
     works: Mapping[str, Work] | None = None,
     path: str = "residual",
+    *,
+    point_observations: Sequence[Observation] | None = None,
 ) -> list[ValidationIssue]:
     issues: list[ValidationIssue] = []
     reference = observations.get(residual.reference)
@@ -1450,7 +1455,12 @@ def validate_residual(
         experiment = experiments.get(reference.experiment_id)
         if experiment is not None:
             tables = _table_payloads(reference, observations)
-            gates = run_validity_gates(experiment, reference, tables=tables)
+            gates = run_validity_gates(
+                experiment,
+                reference,
+                tables=tables,
+                point_observations=point_observations,
+            )
             if not gates.passed:
                 gate_reason = gates.reason or RefusalReason.INVALID_SOURCE
                 refusal = residual.refusal
@@ -1697,6 +1707,9 @@ def validate_corpus(
     work_map = _index_unique(works, "work_id", "work", issues)
     exp_map = _index_unique(experiments, "experiment_id", "experiment", issues)
     obs_map = _index_unique(observations, "observation_id", "observation", issues)
+    point_observations_by_experiment = _partial_pressure_observations_by_experiment(
+        obs_map.values()
+    )
     bench_map = None if benches is None else _index_unique(benches, "id", "bench", issues)
     context_map: dict[str, Mapping[str, Any]] | None = None
     if context_rows is not None:
@@ -1771,9 +1784,21 @@ def validate_corpus(
             )
         )
     for residual in res_items:
+        reference = obs_map.get(residual.reference)
         issues.extend(
             validate_residual(
-                residual, obs_map, exp_map, work_map, f"residual[{residual.key}]"
+                residual,
+                obs_map,
+                exp_map,
+                work_map,
+                f"residual[{residual.key}]",
+                point_observations=(
+                    ()
+                    if reference is None
+                    else point_observations_by_experiment.get(
+                        reference.experiment_id, ()
+                    )
+                ),
             )
         )
     return ValidationReport(tuple(issues))

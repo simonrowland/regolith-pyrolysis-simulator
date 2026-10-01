@@ -112,6 +112,7 @@ from simulator.battery.validate import (
 )
 from simulator.battery.validity import (
     GateOutcome,
+    _partial_pressure_observations_by_experiment,
     comparison_method_cell_constant_cancels,
     run_validity_gates,
 )
@@ -1354,12 +1355,19 @@ def _printed_pressure_uncertainty_dex(observation: Observation) -> Decimal | Non
 def _observation_flagged_strata(
     observation: Observation,
     experiments: Mapping[str, Experiment],
+    point_observations_by_experiment: Mapping[str, tuple[Observation, ...]],
 ) -> tuple[str, ...]:
     existing = flagged_strata(observation.notices)
     experiment = experiments.get(observation.experiment_id)
     if experiment is None:
         return existing
-    gates = run_validity_gates(experiment, observation)
+    gates = run_validity_gates(
+        experiment,
+        observation,
+        point_observations=point_observations_by_experiment.get(
+            observation.experiment_id, ()
+        ),
+    )
     return tuple(
         dict.fromkeys(
             (*existing, *flagged_strata(_flagged_stratum_notices(observation, experiment, gates)))
@@ -1372,12 +1380,17 @@ def _kems_replicate_groups(
     experiments: Mapping[str, Experiment],
 ) -> tuple[tuple[Decimal, ...], ...]:
     groups: dict[tuple[object, ...], list[Decimal]] = {}
+    point_observations_by_experiment = _partial_pressure_observations_by_experiment(
+        observations.values()
+    )
     for observation in observations.values():
         identity = observation.identity
         quantity = quantity_token(identity) if isinstance(identity, Identity) else None
         if quantity is not Quantity.P_PARTIAL or not isinstance(identity, Identity):
             continue
-        if _observation_flagged_strata(observation, experiments):
+        if _observation_flagged_strata(
+            observation, experiments, point_observations_by_experiment
+        ):
             continue
         evidence = observation.evidence.class_
         if not evidence.is_value or evidence.value not in MEASURED_EVIDENCE:
@@ -1426,12 +1439,17 @@ def derive_kems_partial_pressure_band(
     """
 
     candidates = []
+    point_observations_by_experiment = _partial_pressure_observations_by_experiment(
+        observations.values()
+    )
     for observation in observations.values():
         identity = observation.identity
         quantity = quantity_token(identity) if isinstance(identity, Identity) else None
         if quantity is not Quantity.P_PARTIAL or not isinstance(identity, Identity):
             continue
-        if _observation_flagged_strata(observation, experiments):
+        if _observation_flagged_strata(
+            observation, experiments, point_observations_by_experiment
+        ):
             continue
         evidence = observation.evidence.class_
         if not evidence.is_value or evidence.value not in MEASURED_EVIDENCE:
@@ -3214,6 +3232,7 @@ def compile_residual(
     lineage_observation_id: str | None = None,
     table_index: Mapping[tuple[str, Quantity], tuple[Observation, ...]] | None = None,
     derived_band: DecisionBand | None = None,
+    point_observations: Sequence[Observation] | None = None,
 ) -> tuple[Residual, Observation | None]:
     _require_score_engine(engine)
     reference = _fusion_comparison_reference(reference)
@@ -3239,6 +3258,7 @@ def compile_residual(
             experiment,
             gate_reference,
             tables=_gate_tables(reference, context.observations, table_index),
+            point_observations=point_observations,
         )
     else:
         from simulator.battery.validity import GateCheck
@@ -3824,6 +3844,9 @@ def score_store(
     observations = dict(context.observations)
     origins = dict(context.origins)
     live_context = replace(context, observations=observations, origins=origins)
+    point_observations_by_experiment = _partial_pressure_observations_by_experiment(
+        observations.values()
+    )
     empirical_ids = comparison_ids
     expanded_refs = [
         (obs, compilation_series_points(obs, origins.get(obs.observation_id)))
@@ -3901,6 +3924,9 @@ def score_store(
                             ),
                             table_index=table_index,
                             derived_band=kems_band,
+                            point_observations=point_observations_by_experiment.get(
+                                point.experiment_id, ()
+                            ),
                         )
                         residuals.append(residual)
                         if candidate is not None:
