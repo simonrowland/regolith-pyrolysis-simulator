@@ -18,6 +18,7 @@ from typing import Any, Dict, Iterable, List, Tuple
 from simulator.accounting.formulas import ATOMIC_WEIGHTS_G_PER_MOL
 from simulator.condensation_routing import target_species_for_stage_number
 from simulator.environment import DEFAULT_VACUUM_FLOOR_BAR
+from simulator.fe_redox import OXYGEN_RESERVOIR_NOOP_MOL
 from simulator.scalar_boundary import is_declared_real_scalar
 
 # ============================================================================
@@ -508,12 +509,25 @@ class OxygenReservoirState:
     redox_source_net_mol_o2_equiv: float = 0.0
     redox_source_delta_ln_fO2: float = 0.0
     redox_source_delta_log10_fO2: float = 0.0
+
     redox_source_refusal_context: Dict[str, Any] = field(default_factory=dict)
     ferric_divergence: Dict[str, Any] = field(default_factory=dict)
     # Finite-driving-force transfer plan and commit receipt. The integrated
     # amount is the sole passive exchange; this payload keeps its solver
     # bounds, interface flux, and exact ledger-coupling evidence together.
     shadow_oxygen_transfer: Dict[str, Any] = field(default_factory=dict)
+
+    def __setattr__(self, name: str, value: Any) -> None:
+        object.__setattr__(self, name, value)
+        if name not in {'headspace_transport_pO2_bar', 'exchange_o2_mol'}:
+            return
+        exchange = float(getattr(self, 'exchange_o2_mol', 0.0) or 0.0)
+        transport = getattr(self, 'headspace_transport_pO2_bar', None)
+        if (
+            transport is not None
+            and abs(exchange) <= OXYGEN_RESERVOIR_NOOP_MOL
+        ):
+            object.__setattr__(self, 'interface_pO2_bar', float(transport))
 
 
 @dataclass

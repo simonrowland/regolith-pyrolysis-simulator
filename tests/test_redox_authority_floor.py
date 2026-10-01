@@ -218,6 +218,14 @@ def test_unavailable_fe_feo_buffer_returns_absent_without_gas_or_kress(
     assert sim.melt.oxygen_reservoir.interface_pO2_bar == initial_interface
 
 
+def test_uncommitted_reservoir_construction_publishes_transport_interface() -> None:
+    sim = _fully_ferric_sim()
+
+    reservoir = sim._refresh_oxygen_reservoir_without_exchange()
+
+    assert reservoir.interface_pO2_bar == reservoir.headspace_transport_pO2_bar
+
+
 @pytest.mark.parametrize("cached_fO2_log", [-8.0, None])
 def test_unavailable_buffer_absence_does_not_fall_back_to_cached_scalar(
     monkeypatch: pytest.MonkeyPatch,
@@ -1138,6 +1146,8 @@ def test_nonzero_exchange_vapour_reads_stored_endpoint_without_a_fresh_root(
     reservoir = sim._apply_oxygen_reservoir_exchange()
     assert abs(reservoir.exchange_o2_mol) > OXYGEN_RESERVOIR_NOOP_MOL
     endpoint_pO2 = float(reservoir.shadow_oxygen_transfer["interface_pO2_bar"])
+    assert reservoir.interface_pO2_bar == endpoint_pO2
+    reservoir.headspace_transport_pO2_bar *= 2.0
     assert reservoir.interface_pO2_bar == endpoint_pO2
 
     calls = 0

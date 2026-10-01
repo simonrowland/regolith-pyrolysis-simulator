@@ -8937,16 +8937,16 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             )
         ))
         ledger_pO2 = self._headspace_ledger_pO2_bar_from_o2_mol(head_o2_mol)
+        transport_pO2 = self._headspace_transport_pO2_bar_from_ledger(
+            ledger_pO2,
+            head_o2_mol=head_o2_mol,
+        )
         reservoir = OxygenReservoirState(
             melt_intrinsic_fO2_log=fO2_log,
             reference_T_K=reference_T,
             headspace_ledger_pO2_bar=ledger_pO2,
-            headspace_transport_pO2_bar=(
-                self._headspace_transport_pO2_bar_from_ledger(
-                    ledger_pO2,
-                    head_o2_mol=head_o2_mol,
-                )
-            ),
+            headspace_transport_pO2_bar=transport_pO2,
+            interface_pO2_bar=transport_pO2,
             headspace_control_floor_pO2_bar=self._headspace_control_floor_pO2_bar(),
             exchange_direction=exchange_direction,
             shadow_oxygen_transfer=shadow_oxygen_transfer,
@@ -10156,6 +10156,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         # classifying the pre-solve redox direction.
         self.melt.oxygen_reservoir.headspace_ledger_pO2_bar = ledger_pO2
         self.melt.oxygen_reservoir.headspace_transport_pO2_bar = transport_pO2
+        self.melt.oxygen_reservoir.interface_pO2_bar = transport_pO2
         self._re_reference_melt_fO2_to_temperature(
             T_K,
             gate_authority=gate_authority,
@@ -10231,6 +10232,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             reference_T_K=reference_T_K,
             headspace_ledger_pO2_bar=ledger_pO2,
             headspace_transport_pO2_bar=transport_pO2,
+            interface_pO2_bar=transport_pO2,
             headspace_control_floor_pO2_bar=control_floor,
             k_O_m_s=k_O,
             k_O_source=k_source,
