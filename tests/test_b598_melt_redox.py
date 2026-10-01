@@ -89,8 +89,10 @@ def test_lunar_c2a_170h_keeps_ledger_redox_bounded_and_consistent() -> None:
                 and candidate.get("basis")
                 in {
                     "no_melt_redox_buffer",
+                    "kress91_inverse",
                     "fe_feo_buffer",
                     "fe_saturation_bound",
+                    "ferrous_free_lower_bound",
                 }
             ),
             {},
@@ -106,6 +108,16 @@ def test_lunar_c2a_170h_keeps_ledger_redox_bounded_and_consistent() -> None:
                 assert "kress91_inverse_not_evaluated" in redox_domain[
                     "reason"
                 ]
+            elif redox_domain["basis"] == "kress91_inverse":
+                assert redox_domain["status"] == "ok"
+                assert redox_domain["derived_fO2_log"] == pytest.approx(
+                    fO2_log,
+                    abs=2.0e-12,
+                )
+                assert float(divergence["implied_ferric_fraction"]) == pytest.approx(
+                    float(divergence["ledger_ferric_fraction"]),
+                    abs=2.0e-12,
+                )
             elif redox_domain["basis"] == "fe_saturation_bound":
                 assert redox_domain["status"] == "out_of_domain"
                 assert redox_domain["authority"] == "extrapolated"
@@ -129,6 +141,16 @@ def test_lunar_c2a_170h_keeps_ledger_redox_bounded_and_consistent() -> None:
                 assert fO2_log == pytest.approx(
                     iw + 2.0 * math.log10(a_feo),
                     abs=1.0e-6,
+                )
+            elif redox_domain["basis"] == "ferrous_free_lower_bound":
+                assert redox_domain["status"] == "out_of_domain"
+                assert redox_domain["authority"] == "extrapolated"
+                assert "one-sided lower bound, not an equality" in redox_domain[
+                    "reason"
+                ]
+                assert redox_domain["derived_fO2_log"] is None
+                assert math.isfinite(
+                    float(redox_domain["fO2_log_lower_bound"])
                 )
             else:
                 assert redox_domain["basis"] == "fe_feo_buffer"
@@ -184,8 +206,13 @@ def test_lunar_c2a_170h_keeps_ledger_redox_bounded_and_consistent() -> None:
         ledger_q = float(divergence["ledger_ferric_fraction"])
 
         implied_q = float(divergence["implied_ferric_fraction"])
+        assert implied_q == pytest.approx(ledger_q, abs=2.0e-12)
         feo_fraction = float(composition.get("FeO", 0.0) or 0.0)
         fe2o3_fraction = float(composition.get("Fe2O3", 0.0) or 0.0)
+        if feo_fraction <= 0.0 or fe2o3_fraction <= 0.0:
+            # The snapshot composition can omit ledger-owned oxide inventory;
+            # without both oxides it cannot independently reconstruct ledger q.
+            continue
         ln_ratio = math.log(fe2o3_fraction) - math.log(feo_fraction)
         if ln_ratio >= 0.0:
             expected_q = 1.0 / (1.0 + 0.5 * math.exp(-ln_ratio))
@@ -193,7 +220,6 @@ def test_lunar_c2a_170h_keeps_ledger_redox_bounded_and_consistent() -> None:
             ratio = math.exp(ln_ratio)
             expected_q = 2.0 * ratio / (2.0 * ratio + 1.0)
         assert ledger_q == pytest.approx(expected_q, abs=2.0e-12)
-        assert implied_q == pytest.approx(ledger_q, abs=2.0e-12)
         base_ln_ratio = _kress91_ln_ratio(
             mol_fractions=composition,
             T_K=float(snapshot.temperature_C) + 273.15,
