@@ -12,7 +12,7 @@
 - **Nine-rail guard:** exact set equality (incl. `residue_composition`)
 - **Tests:** 9 targeted residue/nine-rail passed; no full W3
 - **Deliverable:** `REVIEW-residue-rail-delta-2026-10-01.md`
-- **Mailbox tip:** _(pending push)_ on `empirical/reviews-batch-zv-2026-09-22`
+- **Mailbox tip:**  on  (artifacts )`empirical/reviews-batch-zv-2026-09-22`
 - **Date:** 2026-10-01 ~10:08 ET
 
 — regolith-empirical
