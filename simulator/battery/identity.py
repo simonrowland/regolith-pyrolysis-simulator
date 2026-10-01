@@ -149,6 +149,9 @@ CELSIUS_OFFSET_DEC = Decimal(str(CELSIUS_TO_KELVIN_OFFSET))
 # Algebra: log10 Kf = −ΔfG / (R T ln 10), ΔfG in J/mol, T in K.
 # Unit check: J/mol / (J/(mol·K) · K) is dimensionless.
 # Sanity: ΔfG = 0 → log10 Kf = 0; at 298.15 K, 1 kJ/mol ≈ 0.1752 dex.
+# Propagating an energy uncertainty gives σ_logK = σ_ΔG / (R·T·ln 10).
+# Unit check: kJ/mol divided by [kJ/(mol·K)]·K is dimensionless (dex).
+# B1544's ±1.320 kJ/mol at 298.15 K gives 1.320/(R·T·ln 10) = 0.231 dex.
 LN10 = Decimal(str(math.log(10.0)))
 R_J_PER_MOL_K = Decimal(str(GAS_CONSTANT))
 R_KJ_PER_MOL_K = R_J_PER_MOL_K / Decimal("1000")

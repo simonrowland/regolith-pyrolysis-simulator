@@ -2020,7 +2020,7 @@ def test_non_thermo_quantities_keep_numeric_residual_without_invented_band() -> 
     )
     assert reason is None
     assert thermo is not None
-    assert thermo.decision_band.rule.startswith("gibbs_battery_residual_ledger.yaml")
+    assert thermo.decision_band.rule.startswith("LEGACY fallback: gibbs_battery_residual_ledger.yaml")
 
     exp = F.tabulation_experiment()
     ident = F.psat_identity("Na")
@@ -2065,7 +2065,11 @@ def test_no_band_residual_carries_printed_uncertainty() -> None:
 
 
 def test_headline_records_keep_tiers_separate_and_count_no_band() -> None:
-    from simulator.battery.score import headline_records
+    from simulator.battery.score import (
+        headline_payload_records,
+        headline_records,
+        residual_to_plain,
+    )
 
     exp = F.tabulation_experiment()
     measured_obs = F.observation(
@@ -2089,6 +2093,11 @@ def test_headline_records_keep_tiers_separate_and_count_no_band() -> None:
         origins={compilation_obs.observation_id: "compilations-janaf/Na.yaml"},
     )
     band = DecisionBand(Decimal("0.1"), "dimensionless", "test")
+    derived_band = DecisionBand(
+        Decimal("0.1"),
+        "dimensionless",
+        "test residual distribution: 2x median absolute deviation; derived_n=10",
+    )
     measured = F.residual(
         "headline-measured::p_sat::vapour::internal-analytical",
         measured_obs.observation_id,
@@ -2127,7 +2136,7 @@ def test_headline_records_keep_tiers_separate_and_count_no_band() -> None:
             operation=MetricOperation.DEX,
             unit="dimensionless",
             value=Decimal("0.3"),
-            decision_band=band,
+            decision_band=derived_band,
         ),
     )
     records = headline_records(
@@ -2150,6 +2159,28 @@ def test_headline_records_keep_tiers_separate_and_count_no_band() -> None:
     assert by_tier["compilation"]["n"] == 1
     assert by_tier["compilation"]["n_no_band"] == 0
     assert by_tier["compilation"]["rms_dex"] == "0.3"
+    stratum = by_tier["compilation"]["decision_strata"][0]
+    assert stratum["band_kind"] == "derived_2xMAD"
+    assert stratum["band_derived_n"] == 10
+    assert stratum["tail_out_count"] == 1
+    assert stratum["tail_in_count"] == 0
+    assert "tail membership, not accuracy" in by_tier["compilation"]["match_rate_label"]
+    payload_record = next(
+        row
+        for row in headline_payload_records(
+            [residual_to_plain(compilation)],
+            engines=(Engine.INTERNAL_ANALYTICAL,),
+            observations=ctx.observations,
+            origins=ctx.origins,
+        )
+        if row["tier"] == "compilation"
+        and row["rail"] == Rail.VAPOUR.value
+        and row["engine"] == Engine.INTERNAL_ANALYTICAL.value
+    )
+    payload_stratum = payload_record["decision_strata"][0]
+    assert payload_stratum["band_kind"] == "derived_2xMAD"
+    assert payload_stratum["tail_out_count"] == 1
+    assert "tail membership, not accuracy" in payload_record["match_rate_label"]
 
 
 def test_pyrolysis_yield_keeps_residual_without_robinot_floor() -> None:
@@ -2246,8 +2277,8 @@ def test_non_alkali_alpha_is_refused_with_no_rail() -> None:
     assert "::vapour::" not in residual.key
 
 
-def test_gibbs_band_applies_only_to_formation_energies() -> None:
-    """Only formation Gibbs energy uses the sourced 1.0 kJ/mol band."""
+def test_legacy_gibbs_band_is_relation_agnostic_and_derived_band_wins() -> None:
+    """Legacy ΔfG fallback ignores lineage; a supplied quantity band wins."""
 
     from simulator.battery.score import decision_band_for, populate_numeric
 
@@ -2269,11 +2300,21 @@ def test_gibbs_band_applies_only_to_formation_energies() -> None:
         assert reason is None
         assert detail == {}
     assert decision_band_for(Quantity.DELTA_FH, SourceRelation.INDEPENDENT) is None
-    for quantity in (Quantity.DELTA_FG,):
-        band = decision_band_for(quantity, SourceRelation.INDEPENDENT)
+    for relation in SourceRelation:
+        band = decision_band_for(Quantity.DELTA_FG, relation)
         assert band is not None
         assert band.value == Decimal("1.0")
         assert band.unit == "kJ_per_declared_mol_basis"
+        assert band.rule.startswith("LEGACY fallback:")
+    family_band = DecisionBand(
+        Decimal("0.25"), "J_per_declared_mol_basis_per_K", "family residuals"
+    )
+    assert (
+        decision_band_for(
+            Quantity.CP, SourceRelation.UNKNOWN, derived_band=family_band
+        )
+        == family_band
+    )
     numeric, reason, _detail = populate_numeric(
         quantity=Quantity.DELTA_FG,
         candidate=Decimal("1"),
@@ -2283,6 +2324,96 @@ def test_gibbs_band_applies_only_to_formation_energies() -> None:
     assert reason is None
     assert numeric is not None
     assert numeric.decision_band.unit == "kJ_per_declared_mol_basis"
+
+
+def test_printed_cell_uncertainty_and_family_mad_are_quantity_scaled() -> None:
+    from types import SimpleNamespace
+
+    from simulator.battery.enums import QUANTITY_UNITS
+    from simulator.battery.score import (
+        _printed_uncertainty_band,
+        _residual_distribution_band,
+    )
+
+    def source(quantity: Quantity, unit: str):
+        return SimpleNamespace(
+            locator=SimpleNamespace(note=f"printed unit='{unit}'"),
+            derivation=SimpleNamespace(output_unit=QUANTITY_UNITS[quantity]),
+        )
+
+    printed = _printed_uncertainty_band(
+        Quantity.CP,
+        Uncertainty(kind=UncertaintyKind.PRINTED, verbatim="±0.24"),
+        Decimal("300"),
+        source_observation=source(Quantity.CP, "J/mol·K"),
+    )
+    assert printed == DecisionBand(
+        Decimal("0.24"),
+        "J_per_declared_mol_basis_per_K",
+        "source-printed per-cell uncertainty",
+    )
+    relative_printed = _printed_uncertainty_band(
+        Quantity.O2_YIELD,
+        Uncertainty(kind=UncertaintyKind.PRINTED, verbatim="2%"),
+        Decimal("0.5"),
+    )
+    assert relative_printed is not None
+    assert relative_printed.value == Decimal("0.02")
+    assert relative_printed.unit == "dimensionless"
+
+    kcal_printed = _printed_uncertainty_band(
+        Quantity.DELTA_FG,
+        Uncertainty(kind=UncertaintyKind.PRINTED, verbatim="0.137"),
+        Decimal("-1"),
+        source_observation=source(Quantity.DELTA_FG, "kcal gfw^-1"),
+    )
+    assert kcal_printed is not None
+    assert kcal_printed.value == Decimal("0.573208")
+
+    joule_printed = _printed_uncertainty_band(
+        Quantity.DELTA_FG,
+        Uncertainty(kind=UncertaintyKind.PRINTED, verbatim="100"),
+        Decimal("77.077"),
+        source_observation=source(Quantity.DELTA_FG, "J/mol"),
+    )
+    assert joule_printed is not None
+    assert joule_printed.value == Decimal("0.100")
+
+    parenthetical_printed = _printed_uncertainty_band(
+        Quantity.DELTA_FG,
+        Uncertainty(kind=UncertaintyKind.PRINTED, verbatim="(0.389)"),
+        Decimal("-2095.071"),
+        source_observation=source(Quantity.DELTA_FG, "kJ/mol"),
+    )
+    assert parenthetical_printed is not None
+    assert parenthetical_printed.value == Decimal("0.389")
+
+    log_k_printed = _printed_uncertainty_band(
+        Quantity.LOG10_KF,
+        Uncertainty(kind=UncertaintyKind.PRINTED, verbatim="(0.068)"),
+        Decimal("109.436"),
+        source_observation=source(Quantity.LOG10_KF, "dimensionless"),
+    )
+    assert log_k_printed is not None
+    assert log_k_printed.value == Decimal("0.068")
+
+    family = _residual_distribution_band(
+        [Decimal(value) for value in ("-10", "-1", "0", "1", "10") * 2],
+        unit="J_per_declared_mol_basis_per_K",
+        family="USGS",
+        quantity=Quantity.CP,
+    )
+    assert family is not None
+    assert family.value == Decimal("2")
+    assert family.unit == "J_per_declared_mol_basis_per_K"
+    assert "2x median absolute deviation" in family.rule
+    assert "derived_n=10" in family.rule
+    assert _residual_distribution_band(
+        [Decimal(value) for value in ("-10", "-1", "0", "1", "10")],
+        unit="J_per_declared_mol_basis_per_K",
+        family="USGS",
+        quantity=Quantity.CP,
+    ) is None
 
 
 def test_applying_kj_band_to_cp_is_refused(monkeypatch: pytest.MonkeyPatch) -> None:
