@@ -2985,6 +2985,744 @@ def test_write_residuals_stamps_derived_store_and_load_skips_it(tmp_path: Path) 
     assert "kind" not in rows[0] or rows[0].get("kind") != STORE_STAMP_KIND
 
 
+def _streaming_score_fixture():
+    from simulator.battery.records import Residual, ResidualRefusal
+    from simulator.battery.score import rail_for_quantity
+
+    work = F.work()
+    experiment = F.tabulation_experiment(work_id=work.work_id)
+    engine = Engine.INTERNAL_ANALYTICAL
+    thermo_rail = rail_for_quantity(Quantity.DELTA_FG, species_formula="O2")
+    unit = QUANTITY_UNITS[Quantity.DELTA_FG]
+    observations = []
+    origins: dict[str, str] = {}
+    residuals: dict[str, Residual] = {}
+    candidates: dict[str, object] = {}
+
+    def add_residual(
+        reference,
+        *,
+        rail,
+        status,
+        numeric=None,
+        refusal=None,
+        candidate_id=None,
+        eligible=False,
+    ):
+        residual = Residual(
+            key=f"fixture::{reference.observation_id}::{engine.value}",
+            reference=reference.observation_id,
+            execution=Execution(state=ExecutionState.NOT_PROBED),
+            rail=rail,
+            status=status,
+            source_relation=SourceRelation.UNKNOWN,
+            score_eligible=eligible,
+            exclusions=(),
+            notices=(),
+            candidate=candidate_id,
+            numeric=numeric,
+            refusal=refusal,
+        )
+        residuals[reference.observation_id] = residual
+
+    measured = F.observation(
+        "fixture-measured-vapour",
+        experiment.experiment_id,
+        F.psat_identity("Na"),
+        Decimal("0.5"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id=work.work_id,
+    )
+    candidate = F.observation(
+        "fixture-vapour-candidate",
+        experiment.experiment_id,
+        F.psat_identity("Na"),
+        Decimal("0.6"),
+        evidence=EvidenceClass.MODEL_DERIVED,
+        source_id=work.work_id,
+    )
+    observations.append(measured)
+    measured_numeric = ResidualNumeric(
+        MetricOperation.DEX,
+        "dimensionless",
+        Decimal("0.5"),
+        DecisionBand(Decimal("1"), "dimensionless", "measured fixture band"),
+    )
+    add_residual(
+        measured,
+        rail=Rail.VAPOUR,
+        status=ResidualStatus.MATCH,
+        numeric=measured_numeric,
+        candidate_id=candidate.observation_id,
+        eligible=True,
+    )
+    candidates[candidate.observation_id] = candidate
+
+    refusal_reference = F.observation(
+        "fixture-measured-refusal",
+        experiment.experiment_id,
+        F.psat_identity("Mg"),
+        Decimal("1"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id=work.work_id,
+    )
+    observations.append(refusal_reference)
+    add_residual(
+        refusal_reference,
+        rail=Rail.VAPOUR,
+        status=ResidualStatus.REFUSED,
+        refusal=ResidualRefusal(
+            RefusalReason.UNSUPPORTED,
+            {"reason": "fixture_unavailable"},
+        ),
+    )
+
+    derived_values = ("0", "0", "0", "1", "1", "2", "2", "3", "4", "50")
+    for index, raw_value in enumerate(derived_values):
+        reference = F.observation(
+            f"fixture-derived-{index:02d}",
+            experiment.experiment_id,
+            F.o2_identity(),
+            Decimal(raw_value),
+            evidence=EvidenceClass.COMPILATION_ASSESSED,
+            admission=AdmissionStatus.PENDING,
+            source_id="nist-janaf-4th",
+        )
+        observations.append(reference)
+        origins[reference.observation_id] = (
+            f"compilations-janaf/{reference.observation_id}.yaml"
+        )
+        add_residual(
+            reference,
+            rail=thermo_rail,
+            status=ResidualStatus.NO_BAND,
+            numeric=ResidualNumeric(
+                MetricOperation.ABSOLUTE,
+                unit,
+                Decimal(raw_value),
+                None,
+            ),
+        )
+
+    no_band_reference = F.observation(
+        "fixture-no-band",
+        experiment.experiment_id,
+        F.o2_identity(),
+        Decimal("7"),
+        evidence=EvidenceClass.COMPILATION_ASSESSED,
+        admission=AdmissionStatus.PENDING,
+        source_id="other-compilation",
+    )
+    observations.append(no_band_reference)
+    origins[no_band_reference.observation_id] = "compilations-other/no-band.yaml"
+    add_residual(
+        no_band_reference,
+        rail=thermo_rail,
+        status=ResidualStatus.NO_BAND,
+        numeric=ResidualNumeric(
+            MetricOperation.ABSOLUTE,
+            unit,
+            Decimal("7"),
+            None,
+        ),
+    )
+
+    printed_reference = F.observation(
+        "fixture-printed",
+        experiment.experiment_id,
+        F.o2_identity(),
+        Decimal("1"),
+        evidence=EvidenceClass.COMPILATION_ASSESSED,
+        admission=AdmissionStatus.PENDING,
+        source_id="nist-janaf-4th",
+    )
+    observations.append(printed_reference)
+    origins[printed_reference.observation_id] = "compilations-janaf/printed.yaml"
+    add_residual(
+        printed_reference,
+        rail=thermo_rail,
+        status=ResidualStatus.MATCH,
+        numeric=ResidualNumeric(
+            MetricOperation.ABSOLUTE,
+            unit,
+            Decimal("1"),
+            DecisionBand(
+                Decimal("2"),
+                unit,
+                "source-printed per-cell uncertainty",
+            ),
+        ),
+    )
+    non_dex_dimensionless_reference = F.observation(
+        "fixture-non-dex-dimensionless-band",
+        experiment.experiment_id,
+        F.o2_identity(),
+        Decimal("3"),
+        evidence=EvidenceClass.COMPILATION_ASSESSED,
+        admission=AdmissionStatus.PENDING,
+        source_id="nist-janaf-4th",
+    )
+    observations.append(non_dex_dimensionless_reference)
+    origins[non_dex_dimensionless_reference.observation_id] = (
+        "compilations-janaf/fixture-log10-kf.yaml"
+    )
+    add_residual(
+        non_dex_dimensionless_reference,
+        rail=thermo_rail,
+        status=ResidualStatus.MATCH,
+        numeric=ResidualNumeric(
+            MetricOperation.ABSOLUTE,
+            "dimensionless",
+            Decimal("3"),
+            DecisionBand(
+                Decimal("0.231"),
+                "dimensionless",
+                "source-printed per-cell uncertainty",
+            ),
+        ),
+    )
+    for reference_id, raw_value in (
+        ("fixture-scaled-max-first", "0.240"),
+        ("fixture-scaled-max-second", "-0.24"),
+    ):
+        reference = F.observation(
+            reference_id,
+            experiment.experiment_id,
+            replace(F.o2_identity(), quantity=Quantity.S),
+            Decimal(raw_value),
+            evidence=EvidenceClass.COMPILATION_ASSESSED,
+            admission=AdmissionStatus.PENDING,
+            source_id="nist-janaf-4th",
+        )
+        observations.append(reference)
+        origins[reference.observation_id] = "compilations-janaf/scale-check.yaml"
+        add_residual(
+            reference,
+            rail=Rail.THERMOCHEMISTRY,
+            status=ResidualStatus.NO_BAND,
+            numeric=ResidualNumeric(
+                MetricOperation.ABSOLUTE,
+                "J_per_declared_mol_basis_per_K",
+                Decimal(raw_value),
+                None,
+            ),
+        )
+    context = replace(_context(work, experiment, *observations), origins=origins)
+    return context, engine, residuals, candidates
+
+
+def test_streamed_scoring_is_byte_identical_to_legacy_fixture(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    import simulator.battery.score as score_mod
+    from simulator.battery.pins import _pin_failures_from_payloads
+
+    context, engine, fixture_residuals, fixture_candidates = _streaming_score_fixture()
+    monkeypatch.setattr(
+        score_mod,
+        "compile_residual",
+        lambda reference, engine, **_kwargs: (
+            fixture_residuals[reference.observation_id],
+            fixture_candidates.get(
+                fixture_residuals[reference.observation_id].candidate or ""
+            ),
+        ),
+    )
+    engines = (engine,)
+    legacy_residuals, candidates = score_mod.score_store(context, engines=engines)
+    legacy_path = tmp_path / "legacy-residuals.jsonl"
+    score_mod.write_residuals_jsonl(
+        legacy_residuals,
+        candidates,
+        legacy_path,
+        root=score_mod.REPO_ROOT,
+    )
+    streamed_path = tmp_path / "residuals.jsonl"
+    written, metadata = score_mod._score_store_to_jsonl(
+        context,
+        streamed_path,
+        root=score_mod.REPO_ROOT,
+        engines=engines,
+    )
+    partial_path = tmp_path / "residuals.jsonl.partial"
+    assert written == len(legacy_residuals)
+    assert partial_path.read_bytes() == legacy_path.read_bytes()
+
+    payloads = score_mod._ResidualJsonlRows(
+        partial_path,
+        metadata=metadata,
+    )
+    pin = PinBandRecord(
+        key=next(r.key for r in legacy_residuals if r.reference == "fixture-measured-vapour"),
+        expected_outcome=ResidualStatus.MATCH.value,
+        evidence="fixture",
+        centre=Decimal("0"),
+        pin_band_value=Decimal("0.1"),
+    )
+    old_pin_failures = pin_failures(legacy_residuals, (pin,))
+    assert old_pin_failures[0]["reason"] == "outside_pin_band"
+    assert _pin_failures_from_payloads(payloads, (pin,)) == old_pin_failures
+
+    legacy_summary = tmp_path / "legacy-summary.json"
+    streamed_summary = tmp_path / "streamed-summary.json"
+    score_mod.write_headline_summary_json(
+        legacy_residuals,
+        legacy_summary,
+        context=context,
+        engines=engines,
+        root=score_mod.REPO_ROOT,
+    )
+    stamp = score_mod.derive_store_stamp(score_mod.REPO_ROOT)
+    assert metadata.aggregate is not None
+    score_mod._write_headline_summary_from_accumulator_json(
+        metadata.aggregate,
+        streamed_summary,
+        store_stamp=stamp,
+    )
+    assert streamed_summary.read_bytes() == legacy_summary.read_bytes()
+    import json
+
+    summary = json.loads(streamed_summary.read_text(encoding="utf-8"))
+    compilation = next(
+        row
+        for row in summary["records"]
+        if row["tier"] == "compilation"
+        and row["rail"] == "thermochemistry"
+        and row["engine"] == engine.value
+    )
+    assert compilation["band_width_dex"] is None
+    scale_stratum = next(
+        stratum
+        for row in summary["records"]
+        for stratum in row.get("decision_strata", [])
+        if stratum["quantity"] == Quantity.S.value
+    )
+    assert scale_stratum["max_abs_residual"] == "0.240"
+
+    old_report = score_mod.render_score_report(
+        legacy_residuals,
+        context=context,
+        engines=engines,
+        pin_failures=old_pin_failures,
+        root=score_mod.REPO_ROOT,
+    )
+    import hashlib
+
+    assert hashlib.sha256(old_report.encode("utf-8")).hexdigest() == (
+        "fe5f3347e1f6972780fe77b7c987f1bdf6c51f94980bf0017a5c0079b9d1351d"
+    )
+    streamed_report = score_mod._render_score_report_from_payloads_legacy(
+        payloads,
+        context=context,
+        engines=engines,
+        pin_failures=old_pin_failures,
+        store_stamp=stamp,
+        _aggregate=metadata.aggregate,
+    )
+    assert streamed_report.encode("utf-8") == old_report.encode("utf-8")
+
+    rows = score_mod.load_residuals_jsonl(partial_path)
+    assert any(
+        row.get("rail") == Rail.VAPOUR.value
+        and isinstance(row.get("numeric"), dict)
+        and row["numeric"].get("decision_band")
+        for row in rows
+    )
+    assert any(
+        isinstance(row.get("numeric"), dict)
+        and isinstance(row["numeric"].get("decision_band"), dict)
+        and row["numeric"]["decision_band"].get("rule")
+        == "source-printed per-cell uncertainty"
+        for row in rows
+    )
+    assert any(
+        isinstance(row.get("numeric"), dict)
+        and isinstance(row["numeric"].get("decision_band"), dict)
+        and "residual distribution" in row["numeric"]["decision_band"].get("rule", "")
+        for row in rows
+    )
+    assert any(row.get("status") == ResidualStatus.NO_BAND.value for row in rows)
+    assert any(row.get("status") == ResidualStatus.REFUSED.value for row in rows)
+
+
+def test_streamed_unrailed_measured_tier_matches_legacy_zero_grid(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    import simulator.battery.score as score_mod
+
+    context, engine, fixture_residuals, _fixture_candidates = _streaming_score_fixture()
+    measured_ids = {"fixture-measured-vapour"}
+    context = replace(
+        context,
+        observations={
+            key: observation
+            for key, observation in context.observations.items()
+            if key not in measured_ids
+        },
+        origins={
+            key: origin for key, origin in context.origins.items() if key not in measured_ids
+        },
+    )
+    fixture_residuals = {
+        key: residual
+        for key, residual in fixture_residuals.items()
+        if key not in measured_ids
+    }
+    fixture_residuals["fixture-measured-refusal"] = replace(
+        fixture_residuals["fixture-measured-refusal"], rail=None
+    )
+    monkeypatch.setattr(
+        score_mod,
+        "compile_residual",
+        lambda reference, engine, **_kwargs: (
+            fixture_residuals[reference.observation_id],
+            None,
+        ),
+    )
+    engines = (engine,)
+    legacy_residuals, candidates = score_mod.score_store(context, engines=engines)
+    path = tmp_path / "residuals.jsonl"
+    _written, metadata = score_mod._score_store_to_jsonl(
+        context,
+        path,
+        root=score_mod.REPO_ROOT,
+        engines=engines,
+    )
+    stamp = score_mod.derive_store_stamp(score_mod.REPO_ROOT)
+    legacy_report = score_mod.render_score_report(
+        legacy_residuals,
+        context=context,
+        engines=engines,
+        root=score_mod.REPO_ROOT,
+    )
+    assert metadata.aggregate is not None
+    streamed_report = score_mod._render_score_report_from_payloads_legacy(
+        score_mod._ResidualJsonlRows(path.with_name(path.name + ".partial"), metadata=metadata),
+        context=context,
+        engines=engines,
+        store_stamp=stamp,
+        _aggregate=metadata.aggregate,
+    )
+    assert streamed_report == legacy_report
+    from simulator.battery.score import SCORE_ENGINE_SET
+
+    for rail in Rail:
+        for report_engine in SCORE_ENGINE_SET:
+            assert f"| {rail.value} | {report_engine.value} | 0 |" in streamed_report
+
+
+def test_streamed_measured_grid_omits_selected_engine_without_rail_rows(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    import simulator.battery.score as score_mod
+
+    context, engine, fixture_residuals, fixture_candidates = _streaming_score_fixture()
+    monkeypatch.setattr(
+        score_mod,
+        "compile_residual",
+        lambda reference, _engine, **_kwargs: (
+            fixture_residuals[reference.observation_id],
+            fixture_candidates.get(
+                fixture_residuals[reference.observation_id].candidate or ""
+            ),
+        ),
+    )
+    engines = (engine, Engine.VAPOROCK)
+    legacy_residuals, _candidates = score_mod.score_store(context, engines=(engine,))
+    path = tmp_path / "residuals.jsonl"
+    _written, metadata = score_mod._score_store_to_jsonl(
+        context,
+        path,
+        root=score_mod.REPO_ROOT,
+        engines=(engine,),
+    )
+    stamp = score_mod.derive_store_stamp(score_mod.REPO_ROOT)
+    legacy_report = score_mod.render_score_report(
+        legacy_residuals,
+        context=context,
+        engines=engines,
+        root=score_mod.REPO_ROOT,
+    )
+    assert metadata.aggregate is not None
+    streamed_report = score_mod._render_score_report_from_payloads_legacy(
+        score_mod._ResidualJsonlRows(path.with_name(path.name + ".partial"), metadata=metadata),
+        context=context,
+        engines=engines,
+        store_stamp=stamp,
+        _aggregate=metadata.aggregate,
+    )
+    measured_table = streamed_report.split("## Measured tier", 1)[1].split(
+        "## Flagged strata", 1
+    )[0]
+    assert f"| {Rail.VAPOUR.value} | {Engine.VAPOROCK.value} |" not in measured_table
+    assert streamed_report == legacy_report
+
+
+def test_streaming_interruption_preserves_previous_complete_file(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    import simulator.battery.score as score_mod
+    from simulator.battery.records import Residual
+
+    work = F.work()
+    experiment = F.tabulation_experiment(work_id=work.work_id)
+    references = tuple(
+        F.observation(
+            f"fixture-partial-{index}",
+            experiment.experiment_id,
+            F.psat_identity("Na"),
+            Decimal("1"),
+            evidence=EvidenceClass.MEASURED_DIRECT,
+            source_id=work.work_id,
+        )
+        for index in range(3)
+    )
+    context = _context(work, experiment, *references)
+    emitted: list[str] = []
+    calls = 0
+
+    def interrupt_after_two(reference, engine, **_kwargs):
+        nonlocal calls
+        calls += 1
+        if calls == 3:
+            raise RuntimeError("injected scorer stop")
+        residual = Residual(
+            key=f"fixture::{reference.observation_id}::{engine.value}",
+            reference=reference.observation_id,
+            execution=Execution(state=ExecutionState.NOT_PROBED),
+            rail=Rail.VAPOUR,
+            status=ResidualStatus.NO_BAND,
+            source_relation=SourceRelation.UNKNOWN,
+            score_eligible=False,
+            exclusions=(),
+            notices=(),
+        )
+        emitted.append(residual.key)
+        return residual, None
+
+    monkeypatch.setattr(score_mod, "compile_residual", interrupt_after_two)
+    target = tmp_path / "residuals.jsonl"
+    previous = b"previous complete result\n"
+    target.write_bytes(previous)
+    with pytest.raises(RuntimeError, match="injected scorer stop"):
+        score_mod._score_store_to_jsonl(
+            context,
+            target,
+            root=score_mod.REPO_ROOT,
+            engines=(Engine.INTERNAL_ANALYTICAL,),
+            include_diagnostics=False,
+        )
+    partial = tmp_path / "residuals.jsonl.partial"
+    assert partial.is_file()
+    assert target.read_bytes() == previous
+    rows = score_mod.load_residuals_jsonl(partial)
+    assert [str(row["key"]) for row in rows] == emitted
+
+
+@pytest.mark.parametrize("failure_stage", ("scoring", "summary", "report"))
+def test_battery_failed_rerun_preserves_published_output_set(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    failure_stage: str,
+) -> None:
+    import simulator.battery.score as score_mod
+    from scripts import battery_score
+    from simulator.battery.records import Residual
+
+    work = F.work()
+    experiment = F.tabulation_experiment(work_id=work.work_id)
+    references = tuple(
+        F.observation(
+            f"fixture-preserved-{index}",
+            experiment.experiment_id,
+            F.psat_identity("Na"),
+            Decimal("1"),
+            evidence=EvidenceClass.MEASURED_DIRECT,
+            source_id=work.work_id,
+        )
+        for index in range(3)
+    )
+    context = _context(work, experiment, *references)
+    root = tmp_path / "rerun-root"
+    battery = root / "data" / "battery"
+    battery.mkdir(parents=True)
+    (battery / "pins.yaml").touch()
+    paths = {
+        "residuals": battery / "residuals.jsonl",
+        "summary": battery / "score-summary.json",
+        "report": battery / "score-report.md",
+    }
+    previous = {
+        "residuals": b"previous residuals\n",
+        "summary": b"previous summary\n",
+        "report": b"previous report\n",
+    }
+    for name, path in paths.items():
+        path.write_bytes(previous[name])
+
+    stamp = score_mod.derive_store_stamp(score_mod.REPO_ROOT)
+    monkeypatch.setattr(score_mod, "derive_store_stamp", lambda _root: stamp)
+    monkeypatch.setattr(battery_score, "derive_store_stamp", lambda _root: stamp)
+    monkeypatch.setattr(battery_score, "load_score_context", lambda _root: context)
+    monkeypatch.setattr(battery_score, "emit_store_stamp_mismatch_warning", lambda *_: None)
+    monkeypatch.setattr(battery_score, "load_legacy_score_rows", lambda _root: [])
+    monkeypatch.setattr(
+        battery_score,
+        "load_pins",
+        lambda _path: {"key_map": {}, "pin_band_records": []},
+    )
+    calls = 0
+
+    def compile_stub(reference, engine, **_kwargs):
+        nonlocal calls
+        calls += 1
+        if failure_stage == "scoring" and calls == 3:
+            raise RuntimeError("injected scorer stop")
+        return (
+            Residual(
+                key=f"fixture::{reference.observation_id}::{engine.value}",
+                reference=reference.observation_id,
+                execution=Execution(state=ExecutionState.NOT_PROBED),
+                rail=Rail.VAPOUR,
+                status=ResidualStatus.NO_BAND,
+                source_relation=SourceRelation.UNKNOWN,
+                score_eligible=False,
+                exclusions=(),
+                notices=(),
+            ),
+            None,
+        )
+
+    monkeypatch.setattr(score_mod, "compile_residual", compile_stub)
+    if failure_stage == "summary":
+        original_write_summary = battery_score._write_headline_summary_from_accumulator_json
+
+        def write_then_fail(aggregate, path, *, store_stamp):
+            original_write_summary(aggregate, path, store_stamp=store_stamp)
+            raise RuntimeError("injected summary stop")
+
+        monkeypatch.setattr(
+            battery_score,
+            "_write_headline_summary_from_accumulator_json",
+            write_then_fail,
+        )
+    elif failure_stage == "report":
+        original_write_text = Path.write_text
+
+        def write_report_then_fail(path, data, *args, **kwargs):
+            written = original_write_text(path, data, *args, **kwargs)
+            if path.name.startswith("score-report.md"):
+                raise RuntimeError("injected report stop")
+            return written
+
+        monkeypatch.setattr(Path, "write_text", write_report_then_fail)
+
+    message = {
+        "scoring": "injected scorer stop",
+        "summary": "injected summary stop",
+        "report": "injected report stop",
+    }[failure_stage]
+    with pytest.raises(RuntimeError, match=message):
+        battery_score.main(
+            ["--root", str(root), "--engines", Engine.INTERNAL_ANALYTICAL.value]
+        )
+    assert {name: path.read_bytes() for name, path in paths.items()} == previous
+
+
+def test_battery_report_only_streams_residual_jsonl(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
+) -> None:
+    import simulator.battery.score as score_mod
+    from scripts import battery_score
+    from simulator.battery.records import Residual, ResidualNumeric
+    from simulator.battery.score import MetricOperation
+
+    work = F.work()
+    experiment = F.tabulation_experiment(work_id=work.work_id)
+    reference = F.observation(
+        "report-only-stream-row",
+        experiment.experiment_id,
+        F.psat_identity("Na"),
+        Decimal("1"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id=work.work_id,
+    )
+    context = _context(work, experiment, reference)
+    residual = Residual(
+        key=f"fixture::{reference.observation_id}::{Engine.INTERNAL_ANALYTICAL.value}",
+        reference=reference.observation_id,
+        execution=Execution(state=ExecutionState.NOT_PROBED),
+        rail=Rail.VAPOUR,
+        status=ResidualStatus.MATCH,
+        source_relation=SourceRelation.UNKNOWN,
+        score_eligible=False,
+        exclusions=(),
+        notices=(),
+        numeric=ResidualNumeric(
+            MetricOperation.ABSOLUTE,
+            "dimensionless",
+            Decimal("1"),
+            DecisionBand(Decimal("0.231"), "dimensionless", "fixture non-DEX band"),
+        ),
+    )
+    root = tmp_path / "report-root"
+    battery = root / "data" / "battery"
+    battery.mkdir(parents=True)
+    (battery / "pins.yaml").touch()
+    residual_path = battery / "residuals.jsonl"
+    score_mod.write_residuals_jsonl(
+        (residual,),
+        {},
+        residual_path,
+        root=score_mod.REPO_ROOT,
+    )
+    stamp = score_mod.derive_store_stamp(score_mod.REPO_ROOT)
+    monkeypatch.setattr(battery_score, "load_score_context", lambda _root: context)
+    monkeypatch.setattr(battery_score, "derive_store_stamp", lambda _root: stamp)
+    monkeypatch.setattr(
+        battery_score,
+        "emit_store_stamp_mismatch_warning",
+        lambda _recorded, _live: None,
+    )
+    monkeypatch.setattr(battery_score, "load_legacy_score_rows", lambda _root: [])
+    monkeypatch.setattr(
+        battery_score,
+        "load_pins",
+        lambda _path: {"key_map": {}, "pin_band_records": []},
+    )
+
+    def reject_full_load(_path):
+        pytest.fail("report-only loaded the complete residual file")
+
+    monkeypatch.setattr(score_mod, "load_residuals_jsonl", reject_full_load)
+    assert (
+        battery_score.main(
+            [
+                "--report-only",
+                "--root",
+                str(root),
+                "--engines",
+                Engine.INTERNAL_ANALYTICAL.value,
+            ]
+        )
+        == 0
+    )
+    printed = capsys.readouterr().out
+    assert "report-only residuals=1" in printed
+    assert (battery / "score-report.md").is_file()
+    assert (battery / "score-summary.json").is_file()
+    import json
+
+    summary = json.loads((battery / "score-summary.json").read_text(encoding="utf-8"))
+    assert all("n_eligible_references" not in row for row in summary["records"])
+    measured_vapour = next(
+        row
+        for row in summary["records"]
+        if row["tier"] == "measured" and row["rail"] == Rail.VAPOUR.value
+    )
+    assert measured_vapour["band_width_dex"] is None
+
+
 def test_write_headline_summary_has_tier_and_null_data_scatter_slot(tmp_path: Path) -> None:
     import json
 
