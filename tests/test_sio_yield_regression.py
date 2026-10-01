@@ -1165,7 +1165,9 @@ def test_po2_wall_sweep_mode_uses_interface_pressure_for_sio_release():
         return {
             "released_sio_kg": sio_mol * sio_molar_mass_kg_mol,
             "transport_pO2_bar": sim.melt.oxygen_reservoir.headspace_transport_pO2_bar,
-            "interface_pO2_bar": sim.melt.oxygen_reservoir.interface_pO2_bar,
+            "interface_pO2_bar": sim._last_vapor_pressure_diagnostic[
+                "interface_pO2_bar"
+            ],
             "source_pO2_bar": provenance["pO2_bar"],
             "p_sio_Pa": provenance["P_eq_Pa"],
             "activity_factor": provenance["activity_factor"],
@@ -1177,7 +1179,7 @@ def test_po2_wall_sweep_mode_uses_interface_pressure_for_sio_release():
     for result in (low_setpoint, high_setpoint):
         assert result["released_sio_kg"] > 0.0
         assert result["source_pO2_bar"] == pytest.approx(
-            result["interface_pO2_bar"]
+            result["interface_pO2_bar"], rel=1.0e-12, abs=0.0
         )
 
     # For SiO2(l) -> SiO(g) + 1/2 O2(g), p_SiO scales as

@@ -2981,11 +2981,14 @@ def test_pn2_native_fe_partition_e2e_drains_tap_and_reports_stage3_fe_wt() -> No
     assert 1650.0 <= snapshot.temperature_C <= 1700.0
     assert summary["P_total_bar"] == pytest.approx(0.01)
     assert snapshot.overhead.composition["N2"] == pytest.approx(10.0)
-    assert event == {
-        "native_fe_event": "deferred_for_staged_na_shuttle",
-        "native_fe_event_reason": "staged_path_reserves_feo_for_na_shuttle",
-        "native_fe_event_status": "deferred",
-    }
+    assert event["native_fe_event"] == "deferred_for_staged_na_shuttle"
+    assert event["native_fe_event_reason"].startswith(
+        "staged_path_reserves_feo_for_na_shuttle"
+    )
+    assert "secondary: fe_saturation_bound has no melt equality" in event[
+        "native_fe_event_reason"
+    ]
+    assert event["native_fe_event_status"] == "deferred"
     assert partition["native_fe_source_account"] == "process.metal_phase"
     assert partition["native_fe_pool_mol"] > 0.0
     assert partition["native_fe_tap_mol"] > partition["native_fe_vapor_mol"]

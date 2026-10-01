@@ -489,8 +489,8 @@ def test_step_mre_dispatch_uses_selected_runtime_max_voltage():
     assert captured["voltage_V"] == pytest.approx(1.7)
     assert captured["current_A"] == pytest.approx(mre_ladder.C5_LIMITED_MRE_CURRENT_A)
     assert captured["allowed_oxides"] == ["SiO2"]
-    assert captured["melt_fO2_log"] == pytest.approx(-9.0)
-    assert captured["fO2_log"] == pytest.approx(-9.0)
+    assert captured["melt_fO2_log"] is None
+    assert captured["fO2_log"] is None
     assert captured["fe_redox_policy"] == "kress91_live"
 
 

@@ -12039,11 +12039,20 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         base_fO2_log = self._current_melt_redox_fO2_log()
         if base_fO2_log is None and self._melt_redox_equality_is_absent():
             regime = self._melt_redox_absence_regime()
-            event = {
-                'native_fe_event': f'skipped_{regime}',
-                'native_fe_event_reason': f'{regime} has no melt equality',
-                'native_fe_event_status': 'skipped',
-            }
+            if staged_na_shuttle_event is not None:
+                event = dict(staged_na_shuttle_event)
+                event['native_fe_event_reason'] = (
+                    f"{event['native_fe_event_reason']}; secondary: "
+                    f'{regime} has no melt equality'
+                )
+            else:
+                event = {
+                    'native_fe_event': f'skipped_{regime}',
+                    'native_fe_event_reason': (
+                        f'{regime} has no melt equality'
+                    ),
+                    'native_fe_event_status': 'skipped',
+                }
             self._last_native_fe_saturation_event = dict(event)
             return {**split, 'native_fe_partition': dict(partition), **event}
         target_fO2_log = self._native_fe_saturation_target_fO2_log(base_fO2_log)
