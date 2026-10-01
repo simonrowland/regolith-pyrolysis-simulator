@@ -448,6 +448,8 @@ QUANTITY_ALIASES = {
     "stable_isotope_delta": Quantity.ISOTOPE_DELTA,
     "delta_53Cr_average": Quantity.ISOTOPE_DELTA,
     "delta_53Cr_reference_material": Quantity.ISOTOPE_DELTA,
+    "open_furnace_residue_composition_vs_time": Quantity.RESIDUE_COMPONENT_COMPOSITION,
+    "residue_composition_vs_time": Quantity.RESIDUE_COMPONENT_COMPOSITION,
 }
 
 # guard_09_05: legacy rail names including underscored aliases.
@@ -906,6 +908,20 @@ def _point_condition_from_plain(
 
     if isinstance(payload, Located):
         return payload
+    if key in {"fO2_control", "atmosphere"}:
+        return _located_from_plain(
+            payload,
+            lambda value: value if isinstance(value, str) else as_decimal(value),
+        )
+    if key == "pressure_on_throw_Torr":
+        return _located_from_plain(
+            payload,
+            lambda value: dict(value)
+            if isinstance(value, Mapping)
+            else value
+            if isinstance(value, str)
+            else as_decimal(value),
+        )
     if isinstance(payload, Mapping) and "state" not in payload:
         if "kind" in payload:
             return _located_from_plain(payload, _value_or_point_from_plain)
@@ -6676,6 +6692,14 @@ QUANTITY_SOURCE_FIELDS: dict[Quantity, tuple[str, ...]] = {
         "T_C",
         "T",
     ),
+    Quantity.RESIDUE_COMPONENT_COMPOSITION: (
+        "residue_ppm",
+        "SiO2_wt_pct",
+        "Al2O3_wt_pct",
+        "FeO_wt_pct",
+        "MgO_wt_pct",
+        "CaO_wt_pct",
+    ),
 }
 
 _CONDITION_RANGE_KEYS = ("T_range_K", "temperature_range_k", "temperature_range_K")
@@ -11459,6 +11483,53 @@ class Migrator:
             locator,
             skip_tables=True,
         )
+        if q_token is Quantity.RESIDUE_COMPONENT_COMPOSITION:
+            residue_conditions = dict(point_conditions or {})
+            starting_ppm = _as_dec_or_none(values.get("starting_measured_ppm"))
+            raw_uncertainty = obs.get("uncertainty")
+            starting_locator = (
+                _locator_from_plain(raw_uncertainty.get("locator"))
+                if isinstance(raw_uncertainty, Mapping)
+                else None
+            )
+            if starting_ppm is not None and starting_locator is not None:
+                residue_conditions["starting_component_ppm"] = Located(
+                    State.of(starting_ppm), locator=starting_locator
+                )
+            raw_starting_composition = values.get("composition_wt_pct")
+            starting_composition = _mass_percent_printed_from_plain(
+                raw_starting_composition
+            )
+            if starting_composition is None:
+                starting_oxide_map = _oxide_map_from_mapping(raw_starting_composition)
+                if starting_oxide_map:
+                    starting_locator = (
+                        _locator_from_plain(raw_starting_composition.get("locator"))
+                        if isinstance(raw_starting_composition, Mapping)
+                        else None
+                    )
+                    starting_composition = located_value(
+                        _printed_map_payload(starting_oxide_map), starting_locator
+                    )
+            if starting_composition is not None:
+                residue_conditions["starting_composition"] = starting_composition
+            raw_fo2_control = values.get("fO2_control")
+            if isinstance(raw_fo2_control, Mapping):
+                fo2_locator = _locator_from_plain(raw_fo2_control.get("locator"))
+                during_run = raw_fo2_control.get("during_run")
+                if during_run not in (None, ""):
+                    residue_conditions["fO2_control"] = located_value(
+                        during_run, fo2_locator
+                    )
+                atmosphere_note = raw_fo2_control.get("note")
+                if (
+                    isinstance(atmosphere_note, str)
+                    and "vacuum" in atmosphere_note.casefold()
+                ):
+                    residue_conditions["atmosphere"] = located_value(
+                        atmosphere_note, fo2_locator
+                    )
+            point_conditions = residue_conditions or None
         experiment_identity, experiment_provenance = self._experiment_identity_fields(
             experiment_id,
             ident_kwargs,
@@ -11655,6 +11726,79 @@ class Migrator:
                 )
             if self._count(source_key).observations_out > before:
                 return
+        if (
+            q_token is Quantity.RESIDUE_COMPONENT_COMPOSITION
+            and isinstance(values.get("series"), list)
+            and values["series"]
+        ):
+            residue_fields = QUANTITY_SOURCE_FIELDS[q_token]
+            oxide_fields = tuple(
+                field for field in residue_fields if field.endswith("_wt_pct")
+            )
+            for point in exploded:
+                raw_item = point.get("item")
+                if not isinstance(raw_item, Mapping):
+                    continue
+                component_fields = (
+                    oxide_fields
+                    if any(field in raw_item for field in oxide_fields)
+                    else (("residue_ppm",) if "residue_ppm" in raw_item else ())
+                )
+                point_index = int(point.get("index", 0))
+                for component_index, field in enumerate(component_fields):
+                    cell_units = str(obs.get("units") or "")
+                    if (
+                        field.endswith("_wt_pct")
+                        and cell_units
+                        == "wt % (100% normalized) and VF wt % as published"
+                    ):
+                        cell_units = "wt % (100% normalized) as published"
+                    cell_selection = select_declared_source(
+                        quantity, cell_units, {field: raw_item.get(field)}
+                    )
+                    if not cell_selection.available:
+                        continue
+                    cell_item = dict(raw_item)
+                    for other in residue_fields:
+                        if other != field:
+                            cell_item.pop(other, None)
+                    point_species = species
+                    if field.endswith("_wt_pct"):
+                        point_species = make_species(
+                            field.removesuffix("_wt_pct"),
+                            species.phase,
+                            polymorph=species.polymorph,
+                            charge=species.charge,
+                        )
+                    self._emit_exploded_point(
+                        parent_id=obs_id,
+                        item={
+                            "index": point_index * len(residue_fields) + component_index,
+                            "item": cell_item,
+                            "units": cell_units,
+                        },
+                        work=work,
+                        source_id=source_id,
+                        source_key=source_key,
+                        experiment_id=experiment_id,
+                        locator=locator,
+                        identity_base=(quantity, point_species, ident_kwargs),
+                        evidence=evidence,
+                        admission=admission,
+                        uncertainty=uncertainty_for(obs.get("uncertainty")),
+                        units=cell_units,
+                        read_from=read_from,
+                        derived_from=derived_from,
+                        source_derivation=source_derivation,
+                        phase_provenance=phase_provenance,
+                        identity_provenance=identity_provenance,
+                        equipment=obs.get("equipment"),
+                        parent_reason=hold_reason,
+                        parent_values=values,
+                        provenance=observation_provenance,
+                        parent_point_conditions=point_conditions,
+                    )
+            return
         row_point_containers: list[tuple[str, list[Any]]] = []
         if isinstance(values, Mapping):
             row_items = values.get("rows")
@@ -11954,7 +12098,11 @@ class Migrator:
             )
             sample = raw_item.get("sample") or raw_item.get("id")
             sample_label = sample.strip() if isinstance(sample, str) else None
-            point_oxide_map = _oxide_map_from_mapping(raw_item)
+            point_oxide_map = (
+                None
+                if q_for_species is Quantity.RESIDUE_COMPONENT_COMPOSITION
+                else _oxide_map_from_mapping(raw_item)
+            )
             if q_for_species in _BULK_PROPERTY_QUANTITIES:
                 species_formula = bulk_property_species_formula(
                     quantity=q_for_species,
@@ -11968,7 +12116,7 @@ class Migrator:
                     polymorph=species.polymorph,
                     charge=species.charge,
                 )
-            elif sample_label:
+            elif sample_label and q_for_species is not Quantity.RESIDUE_COMPONENT_COMPOSITION:
                 species = make_species(
                     sample_label,
                     species.phase,
@@ -12117,6 +12265,15 @@ class Migrator:
             if printed_phase_text is not None
             else None
         )
+        if (
+            q_token_point is Quantity.RESIDUE_COMPONENT_COMPOSITION
+            and value_sel is not None
+            and value_sel.field_name is not None
+        ):
+            if value_sel.field_name == "residue_ppm":
+                ident_kwargs["subtype"] = State.of("element_ppm_by_mass")
+            elif value_sel.field_name.endswith("_wt_pct"):
+                ident_kwargs["subtype"] = State.of("oxide_wt_percent")
         if printed_phase_kind == "liquid":
             species = make_species(species.formula, Phase.L, charge=species.charge)
         elif printed_phase_kind == "two_phase":
@@ -12263,6 +12420,127 @@ class Migrator:
                 **(point_conditions or {}),
                 "composition": point_composition_located,
             }
+        if (
+            q_token_point is Quantity.RESIDUE_COMPONENT_COMPOSITION
+            and isinstance(raw_item, Mapping)
+        ):
+            run_ref = raw_item.get("run_id") or raw_item.get("experiment")
+            # Table 2's trailing * marks repeat experiments; it is not part of the run id.
+            run_text = (
+                str(run_ref).strip().removesuffix("*").strip()
+                if run_ref is not None
+                else None
+            )
+            normalized_run = (
+                run_text.casefold().replace("/", "-")
+                if run_text is not None
+                else None
+            )
+            run_suffix = f"run-{normalized_run}" if normalized_run else None
+            sample_label = raw_item.get("sample")
+            sample_number = None
+            if isinstance(sample_label, str) and sample_label.endswith(")"):
+                candidate_number = sample_label.rsplit("(", 1)[-1][:-1].strip()
+                if candidate_number.isdigit():
+                    sample_number = candidate_number
+            if run_suffix is not None and sample_number is not None:
+                run_suffix = f"{run_suffix}-{sample_number}"
+            matching_experiments = [
+                experiment
+                for experiment_id, experiment in self.result.experiments.items()
+                if run_suffix is not None
+                and experiment.work_id == work.work_id
+                and experiment_id.casefold().endswith(run_suffix)
+            ]
+            run_experiment = (
+                matching_experiments[0] if len(matching_experiments) == 1 else None
+            )
+            if run_experiment is None:
+                run_experiment = self.result.experiments.get(experiment_id)
+            if run_experiment is not None:
+                experiment_id = run_experiment.experiment_id
+                pressure_environment = run_experiment.pressure_environment
+                total_pressure = pressure_environment.total_pressure_Pa
+                if not total_pressure.state.is_value:
+                    source_pressure = next(
+                        (
+                            experiment.pressure_environment.total_pressure_Pa
+                            for experiment in self.result.experiments.values()
+                            if experiment.work_id == work.work_id
+                            and experiment.pressure_environment.total_pressure_Pa.state.is_value
+                        ),
+                        None,
+                    )
+                    if source_pressure is not None:
+                        total_pressure = source_pressure
+                condition_updates = {
+                    "total_pressure_Pa": total_pressure
+                }
+                parent_atmosphere = (parent_point_conditions or {}).get(
+                    "atmosphere"
+                )
+                point_atmosphere = (point_conditions or {}).get("atmosphere")
+                if parent_atmosphere is not None and parent_atmosphere.state.is_value:
+                    condition_updates["atmosphere"] = parent_atmosphere
+                elif point_atmosphere is None or not point_atmosphere.state.is_value:
+                    condition_updates["atmosphere"] = Located(
+                        pressure_environment.sweep_gas.state,
+                        locator=(
+                            pressure_environment.sweep_gas.locator
+                            or run_experiment.locator
+                            or point_locator
+                        ),
+                    )
+                point_conditions = {
+                    **(point_conditions or {}),
+                    **condition_updates,
+                }
+            for source_condition_key, condition_key in (
+                ("t_min", "time_min"),
+                ("CO_sccm", "CO_sccm"),
+                ("CO2_sccm", "CO2_sccm"),
+            ):
+                amount = _as_dec_or_none(raw_item.get(source_condition_key))
+                if amount is not None:
+                    point_conditions = {
+                        **(point_conditions or {}),
+                        condition_key: Located(State.of(amount), locator=point_locator),
+                    }
+            parent_pressure = (
+                parent_values.get("pressure_on_throw_Torr")
+                if isinstance(parent_values, Mapping)
+                else None
+            )
+            pressure_by_temperature = (
+                parent_pressure.get("by_T_C")
+                if isinstance(parent_pressure, Mapping)
+                else None
+            )
+            temperature_c = _as_dec_or_none(raw_item.get("T_C"))
+            if (
+                isinstance(pressure_by_temperature, Mapping)
+                and temperature_c is not None
+                and temperature_c == temperature_c.to_integral_value()
+            ):
+                temperature_key = int(temperature_c)
+                raw_pressure = pressure_by_temperature.get(temperature_key)
+                if raw_pressure is None:
+                    raw_pressure = pressure_by_temperature.get(str(temperature_key))
+                pressure_amount = _as_dec_or_none(raw_pressure)
+                if pressure_amount is not None:
+                    pressure_value = {"value": _dec_str(pressure_amount)}
+                    for key in ("units", "kind", "as_printed"):
+                        if parent_pressure.get(key) not in (None, ""):
+                            pressure_value[key] = str(parent_pressure[key])
+                    pressure_locator = _locator_from_plain(
+                        parent_pressure.get("locator")
+                    ) or point_locator
+                    point_conditions = {
+                        **(point_conditions or {}),
+                        "pressure_on_throw_Torr": Located(
+                            State.of(pressure_value), locator=pressure_locator
+                        ),
+                    }
         if isinstance(raw_item, Mapping):
             raw_point_conditions = raw_item.get("point_conditions")
             if isinstance(raw_point_conditions, Mapping):
@@ -13067,7 +13345,7 @@ class Migrator:
         doc = load_yaml(path)
         if not isinstance(doc, Mapping):
             return
-        # battery field is a ledger name, not an 8-rail token — do not rail-map it.
+        # battery field is a ledger name, not a rail token — do not rail-map it.
         metric_units = str(doc.get("metric_units") or "").strip()
         energy_unit_ok = metric_units in {"", "kJ/mol", "kJ_per_mol"}
         points = doc.get("points") or []

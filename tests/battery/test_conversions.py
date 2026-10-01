@@ -109,7 +109,7 @@ def test_engine_enum_excludes_retired_imcc_identities() -> None:
     )
 
 
-def test_eight_rails_are_the_owner_bound_set() -> None:
+def test_nine_rails_are_the_owner_bound_set() -> None:
     assert {r.value for r in Rail} == {
         "vapour",
         "melt_activity",
@@ -119,5 +119,6 @@ def test_eight_rails_are_the_owner_bound_set() -> None:
         "wall_deposition",
         "redox",
         "alkali_shuttle",
+        "residue_composition",
     }
     assert R_J_PER_MOL_K > 0
