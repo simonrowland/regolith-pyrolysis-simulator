@@ -7,7 +7,7 @@
 - **Counts:** P0 0, P1 0, P2 1 (O2-as-parent of p_O is circular)
 - **Reason:** Table 2 MoO₂/MoO₃/O₂ **values PASS** (page-checked). MoO₂/MoO₃ are **measured** (Table 1 ions); O/O₂ are **calculated** (p. 479; no O⁺/O₂⁺ in Table 1). Paper path: Mo → p_O via (1) → p_O₂ via (2). Delta parents p_O on MoO2+MoO3+**O2** and tags O2 `measured_direct` — circular. Al/Si parents correctly removed; relation/locator p.479 (1)–(2) calc / (3)–(6) check otherwise OK; census 29→41 (+12) confined; cell untouched.
 - **Deliverable:** `REVIEW-shornikov-1994-mullite-delta2-2026-10-01.md`
-- **Mailbox tip:** `3d1f76dadd46d61fd968c543c9bce864a3b6633f` on `empirical/reviews-batch-zv-2026-09-22` (artifacts `7497be8dc`)
+- **Mailbox tip:** `d6a6a5f60f84f869f623d9e51046b7ab468f869e` on `empirical/reviews-batch-zv-2026-09-22` (artifacts `7497be8dc`)
 - **Date:** 2026-10-01 ~09:35 ET
 
 — regolith-empirical
