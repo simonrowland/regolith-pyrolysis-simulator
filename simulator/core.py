@@ -6667,6 +6667,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         fO2_log: float | None,
         basis: Literal[
             'fe_feo_buffer',
+            'fe_feo_buffer_activity_unavailable',
             'fe_saturation_bound',
             'ferrous_free_lower_bound',
             'kress91_inverse',
@@ -7104,6 +7105,26 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 buffer_failure_reason = (
                     'fe_feo_buffer_unavailable_nonpositive_a_FeO'
                 )
+            # R-b/R-c: without positive a_FeO the Fe-FeO buffer has no
+            # defined equality. The phase rule keeps retained Fe and FeO on
+            # that buffer; transport pressure belongs to interface exchange,
+            # so it cannot stand in for the absent melt equality.
+            self._last_redox_domain = self._redox_domain_record(
+                fO2_log=None,
+                basis='fe_feo_buffer_activity_unavailable',
+                endpoint_clamped=endpoint_clamped,
+                endpoint_epsilon=KRESS91_FERRIC_FRACTION_EPSILON,
+                endpoint_provenance=endpoint_provenance,
+                authority_level='extrapolated',
+                reason=(
+                    'out_of_domain:fe_feo_buffer_activity_unavailable; '
+                    f'{buffer_failure_reason}; '
+                    'retained_native_fe_and_feo_require_a_defined_buffer_'
+                    'activity; kress91_inverse_not_evaluated'
+                ),
+                status_override='out_of_domain',
+            )
+            return None
 
         reservoir = getattr(self.melt, 'oxygen_reservoir', None)
         # Premise: Kress91 maps the open interval (epsilon, 1-epsilon) of

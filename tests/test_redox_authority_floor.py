@@ -10,6 +10,7 @@ from typing import Any
 import pytest
 import yaml
 
+import simulator.core as core_module
 from simulator.core import OXYGEN_RESERVOIR_NOOP_MOL, PyrolysisSimulator
 from simulator.accounting.formulas import resolve_species_formula
 from simulator.physical_constants import MELT_DISSOCIATION_PO2_MAX_BAR
@@ -165,6 +166,52 @@ def test_zero_transfer_below_the_bound_does_not_follow_the_gas() -> None:
 
     assert sim._last_redox_domain["basis"] == "fe_saturation_bound"
     assert fO2_log == pytest.approx(bound, abs=1.0e-8)
+
+
+def test_unavailable_fe_feo_buffer_returns_absent_without_gas_or_kress(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    sim = _sim_with_oxides(feo_wt=10.0, fe2o3_wt=0.0, temperature_C=1400.0)
+    _set_melt_iron_oxides(sim, n_feo_mol=1.0, n_fe2o3_mol=0.0)
+    sim.atom_ledger.load_external_mol(
+        "process.metal_phase",
+        {"Fe": 1.0},
+        source="test retained native Fe",
+        material_origin="feedstock",
+    )
+    sim.melt.oxygen_reservoir.headspace_transport_pO2_bar = TRANSPORT_PO2_BAR
+    sim.melt.oxygen_reservoir.exchange_o2_mol = 0.0
+    initial_interface = 4.0e-7
+    sim.melt.oxygen_reservoir.interface_pO2_bar = initial_interface
+
+    monkeypatch.setattr(
+        core_module,
+        "calphad_ferrous_feo_activity_diagnostic",
+        lambda **_kwargs: {"a_FeO_authoritative": 0.0},
+    )
+
+    def unexpected_kress_inverse(*_args: Any, **_kwargs: Any) -> float:
+        raise AssertionError("Kress inverse must not run without buffer activity")
+
+    monkeypatch.setattr(
+        core_module,
+        "kress91_log_fO2_from_fe3_over_sigma_fe",
+        unexpected_kress_inverse,
+    )
+
+    fO2_log = sim._melt_fO2_from_ledger()
+
+    assert _oxide_mol(sim, "FeO") == pytest.approx(1.0)
+    metal_mol = sim.atom_ledger.project_account_mol("process.metal_phase")["Fe"]
+    assert metal_mol == pytest.approx(1.0)
+    assert fO2_log is None, (
+        f"reported={fO2_log!r}, basis={sim._last_redox_domain.get('basis')!r}"
+    )
+    assert fO2_log != -8.0
+    assert sim._last_redox_domain["derived_fO2_log"] is None
+    assert sim._last_redox_domain["basis"] == "fe_feo_buffer_activity_unavailable"
+    assert sim._last_redox_domain["basis"] != "no_melt_redox_buffer"
+    assert sim.melt.oxygen_reservoir.interface_pO2_bar == initial_interface
 
 
 def test_nonzero_release_with_no_ferric_inventory_follows_the_gas() -> None:

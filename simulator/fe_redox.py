@@ -68,6 +68,7 @@ class RedoxDomainRecord(TypedDict):
     fO2_log_lower_bound: NotRequired[float]
     basis: Literal[
         'fe_feo_buffer',
+        'fe_feo_buffer_activity_unavailable',
         'fe_saturation_bound',
         'ferrous_free_lower_bound',
         'kress91_inverse',
