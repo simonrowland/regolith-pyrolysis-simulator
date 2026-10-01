@@ -5,7 +5,7 @@ Ack already on Dropbox: `STATUS-req-alkali-couple-design-acked-2026-10-01.md` (n
 
 **Seat:** `slot-b565` @ `8a75858b` (idle after composition2; design-only, no code).
 **Sources:** `redox-design-r3.md` + attached `metallothermic_step-e7bd0cd52.py` (tip `e7bd0cd5243ea7aa7e3eb565ed94b36f866f1c4c` push-pending; origin stack2-redox still `c5674a2d`).
-**Mailbox:** (filled after push) on `empirical/reviews-batch-zv-2026-09-22`.
+**Mailbox:** `515532205910e393d3c29df6672b5f053389dd50` on `empirical/reviews-batch-zv-2026-09-22`.
 
 ## Conclusions (short)
 - **M6** new regime (not fold into M1); M2 keeps Fe–FeO equality while metal+FeO remain.
