@@ -7,7 +7,7 @@
 - **Counts:** P0 0, P1 0, P2 1 (standing ancestry — false parents)
 - **Reason:** p. 479 — p_O **calculated** from MoO₃ ⇌ MoO₂ + O and O₂ ⇌ 2O; Al/Si reactions (3)–(6) only **checked** (“corresponded to … ~15%”). Delta linked Al/Si as `derived_from`, clearing J02 without true lineage. MoO₂/MoO₃/O₂ printed in Table 2 but not extracted; no invent.
 - **Deliverable:** `REVIEW-shornikov-1994-mullite-delta-2026-10-01.md`
-- **Mailbox:** `09deb4b8a93e814c5f5e97b320cc3080bff554fa` on `empirical/reviews-batch-zv-2026-09-22`
+- **Mailbox tip:** `7a8f5e6aa68a3f706f0b2ae4bbeab09da8000f47` on `empirical/reviews-batch-zv-2026-09-22` (artifacts `2201741e1`)
 - **Date:** 2026-10-01 ~08:20 ET
 
 — regolith-empirical
