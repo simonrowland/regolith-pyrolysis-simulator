@@ -17,11 +17,13 @@ backend (``INELIGIBLE_ACTIVE_BACKENDS``).
 
 from __future__ import annotations
 
+import atexit
 import inspect
 import json
 import math
 import os
 import re
+import selectors
 import signal
 import socket
 import subprocess
@@ -193,12 +195,16 @@ QUALIFICATION_TEMPERATURES_K: tuple[float, ...] = (
 QUALIFICATION_SWEEP_T_K = 1700.0
 QUALIFICATION_SOURCE_POT_ID = "feo_mgo_sio2_30_20_50"
 
-_ISOLATED_CELL_BOOTSTRAP = (
-    "import json,sys;"
-    "from simulator.diagnostic_helpers.binary_pot_battery import "
-    "run_isolated_cell_worker;"
-    "run_isolated_cell_worker(json.load(sys.stdin))"
+_ISOLATED_CELL_BOOTSTRAP = """
+import json
+import sys
+
+from simulator.diagnostic_helpers.binary_pot_battery import (
+    _run_isolated_cell_worker_loop,
 )
+
+_run_isolated_cell_worker_loop()
+"""
 
 
 class BinaryPotBatteryError(RuntimeError):
@@ -2346,8 +2352,13 @@ def _bypass_melts_domain_gate(backend: Any) -> None:
         backend._domain_gate = _pass  # type: ignore[method-assign]
 
 
-def run_isolated_cell_worker(payload: Mapping[str, Any]) -> None:
-    """Child-process entry: one cell, JSON on stdout, crash becomes a signal."""
+def run_isolated_cell_worker(
+    payload: Mapping[str, Any],
+    *,
+    handles: dict[str, EngineHandle] | None = None,
+    protocol_stdout: Any | None = None,
+) -> None:
+    """Run one isolated cell and write one framed JSON response."""
 
     simulate = payload.get("simulate_crash")
     if simulate:
@@ -2372,13 +2383,30 @@ def run_isolated_cell_worker(payload: Mapping[str, Any]) -> None:
         ),
         cell_material=po2_raw.get("cell_material"),
     )
-    handle = open_battery_engine(str(payload["engine"]))
+    engine_name = str(payload["engine"])
+    handle = None if handles is None else handles.get(engine_name)
+    if handle is None:
+        handle = open_battery_engine(engine_name)
+        if (
+            handles is not None
+            and handle.available
+            and handle.backend is not None
+        ):
+            handles[engine_name] = handle
     if (
         bool(payload.get("qualification"))
         and handle.name in MELTS_FAMILY_ENGINES
         and handle.backend is not None
     ):
         _bypass_melts_domain_gate(handle.backend)
+    if handle.name == "alphamelts" and handle.backend is not None:
+        # A fresh per-cell backend used to start with an empty warning set.
+        # Keep that output behavior while the native transport is reused.
+        warning_seen = getattr(
+            handle.backend, "_pseudo_vapor_pressure_warning_seen", None
+        )
+        if isinstance(warning_seen, set):
+            warning_seen.clear()
     cell = equilibrate_cell(
         handle,
         pot,
@@ -2394,9 +2422,32 @@ def run_isolated_cell_worker(payload: Mapping[str, Any]) -> None:
         isolated=False,
         arm=str(payload.get("arm") or ARM_HEADLINE),
     )
-    sys.stdout.write(json.dumps(cell.as_payload(), default=str))
-    sys.stdout.write("\n")
-    sys.stdout.flush()
+    output = protocol_stdout if protocol_stdout is not None else sys.stdout
+    output.write("\x1e")
+    output.write(json.dumps(cell.as_payload(), default=str))
+    output.write("\n")
+    output.flush()
+
+
+def _run_isolated_cell_worker_loop() -> None:
+    protocol_stdout = sys.stdout
+    sys.stdout = sys.stderr
+    handles: dict[str, EngineHandle] = {}
+    try:
+        for line in sys.stdin:
+            run_isolated_cell_worker(
+                json.loads(line),
+                handles=handles,
+                protocol_stdout=protocol_stdout,
+            )
+    finally:
+        for handle in handles.values():
+            close = getattr(handle.backend, "close", None)
+            if callable(close):
+                try:
+                    close()
+                except BaseException:  # noqa: BLE001 - close every engine on exit
+                    pass
 
 
 def _crash_cell_from_returncode(
@@ -2473,6 +2524,208 @@ def _crash_cell_from_returncode(
     )
 
 
+class _IsolatedCellWorkerFailure(RuntimeError):
+    def __init__(
+        self,
+        *,
+        timed_out: bool = False,
+        returncode: int | None = None,
+        detail: str = "",
+    ) -> None:
+        super().__init__(detail)
+        self.timed_out = timed_out
+        self.returncode = returncode
+        self.detail = detail
+
+
+class _IsolatedCellWorker:
+    """Persistent engine process; a failed request retires its whole group."""
+
+    def __init__(self, engine: str) -> None:
+        self.engine = str(engine)
+        self.process: subprocess.Popen[bytes] | None = None
+        self.start_count = 0
+        self._stdout_buffer = bytearray()
+        self._lock = threading.Lock()
+
+    def _start(self) -> None:
+        env = dict(os.environ)
+        env.setdefault("PYTHONPATH", str(REPO_ROOT))
+        pythonpath = env.get("PYTHONPATH") or ""
+        if str(REPO_ROOT) not in pythonpath.split(os.pathsep):
+            env["PYTHONPATH"] = os.pathsep.join(
+                [str(REPO_ROOT), pythonpath] if pythonpath else [str(REPO_ROOT)]
+            )
+        self.process = subprocess.Popen(
+            [sys.executable, "-c", _ISOLATED_CELL_BOOTSTRAP],
+            cwd=str(REPO_ROOT),
+            env=env,
+            stdin=subprocess.PIPE,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.DEVNULL,
+            bufsize=0,
+            start_new_session=True,
+        )
+        self._stdout_buffer.clear()
+        self.start_count += 1
+
+    def _stop(self, *, kill_group: bool) -> int | None:
+        process = self.process
+        self.process = None
+        if process is None:
+            return None
+        if kill_group:
+            try:
+                os.killpg(process.pid, signal.SIGKILL)
+            except (OSError, ProcessLookupError):
+                if process.poll() is None:
+                    process.kill()
+        elif process.stdin is not None:
+            try:
+                process.stdin.close()
+            except OSError:
+                pass
+        try:
+            try:
+                process.wait(timeout=1.0)
+            except subprocess.TimeoutExpired:
+                try:
+                    os.killpg(process.pid, signal.SIGKILL)
+                except (OSError, ProcessLookupError):
+                    process.kill()
+                try:
+                    process.wait(timeout=1.0)
+                except subprocess.TimeoutExpired:
+                    process.kill()
+                    process.wait()
+        finally:
+            for stream in (process.stdin, process.stdout, process.stderr):
+                if stream is not None:
+                    try:
+                        stream.close()
+                    except OSError:
+                        pass
+        return process.returncode
+
+    def close(self) -> None:
+        with self._lock:
+            self._stop(kill_group=False)
+
+    def retire(self) -> None:
+        with self._lock:
+            self._stop(kill_group=True)
+
+    def _failed(self, *, timed_out: bool, detail: str) -> None:
+        process = self.process
+        returncode = None if process is None else process.poll()
+        if process is not None and process.stdout is not None:
+            detail = (
+                detail
+                or bytes(self._stdout_buffer[-400:]).decode("utf-8", "replace")
+            )
+        stopped_returncode = self._stop(kill_group=True)
+        if stopped_returncode is not None:
+            returncode = stopped_returncode
+        raise _IsolatedCellWorkerFailure(
+            timed_out=timed_out,
+            returncode=returncode,
+            detail=detail,
+        )
+
+    def request(
+        self, payload: Mapping[str, Any], *, timeout_s: float
+    ) -> dict[str, Any]:
+        with self._lock:
+            if self.process is not None and self.process.poll() is not None:
+                self._stop(kill_group=True)
+            if self.process is None:
+                try:
+                    self._start()
+                except OSError as exc:
+                    raise _IsolatedCellWorkerFailure(detail=str(exc)) from exc
+            process = self.process
+            assert process is not None
+            if process.stdin is None or process.stdout is None:
+                self._failed(timed_out=False, detail="worker pipes unavailable")
+            deadline = time.monotonic() + max(0.001, float(timeout_s))
+            try:
+                request_bytes = (json.dumps(payload) + "\n").encode("utf-8")
+                view = memoryview(request_bytes)
+                while view:
+                    written = os.write(process.stdin.fileno(), view)
+                    view = view[written:]
+            except OSError as exc:
+                self._failed(timed_out=False, detail=f"worker request failed: {exc}")
+
+            with selectors.DefaultSelector() as selector:
+                selector.register(process.stdout, selectors.EVENT_READ)
+                while True:
+                    remaining = deadline - time.monotonic()
+                    if remaining <= 0:
+                        self._failed(
+                            timed_out=True,
+                            detail="isolated cell exceeded hard timeout",
+                        )
+                    if not selector.select(remaining):
+                        self._failed(
+                            timed_out=True,
+                            detail="isolated cell exceeded hard timeout",
+                        )
+                    chunk = os.read(process.stdout.fileno(), 65536)
+                    if not chunk:
+                        self._failed(
+                            timed_out=False,
+                            detail=(
+                                "worker exited without a cell result "
+                                f"(returncode={process.poll()})"
+                            ),
+                        )
+                    self._stdout_buffer.extend(chunk)
+                    while b"\n" in self._stdout_buffer:
+                        line, _, remainder = self._stdout_buffer.partition(b"\n")
+                        self._stdout_buffer = bytearray(remainder)
+                        marker = line.rfind(b"\x1e")
+                        if marker < 0:
+                            continue
+                        try:
+                            result = json.loads(line[marker + 1 :])
+                        except (UnicodeDecodeError, json.JSONDecodeError) as exc:
+                            self._failed(
+                                timed_out=False,
+                                detail=f"invalid isolated worker response: {exc}",
+                            )
+                        if not isinstance(result, dict):
+                            self._failed(
+                                timed_out=False,
+                                detail="isolated worker response was not an object",
+                            )
+                        return result
+
+
+_ISOLATED_CELL_WORKERS: dict[str, _IsolatedCellWorker] = {}
+_ISOLATED_CELL_WORKERS_LOCK = threading.Lock()
+
+
+def _isolated_cell_worker(engine: str) -> _IsolatedCellWorker:
+    with _ISOLATED_CELL_WORKERS_LOCK:
+        worker = _ISOLATED_CELL_WORKERS.get(engine)
+        if worker is None:
+            worker = _IsolatedCellWorker(engine)
+            _ISOLATED_CELL_WORKERS[engine] = worker
+        return worker
+
+
+def _close_isolated_cell_workers() -> None:
+    with _ISOLATED_CELL_WORKERS_LOCK:
+        workers = tuple(_ISOLATED_CELL_WORKERS.values())
+        _ISOLATED_CELL_WORKERS.clear()
+    for worker in workers:
+        worker.close()
+
+
+atexit.register(_close_isolated_cell_workers)
+
+
 def _run_cell_in_subprocess(
     handle: EngineHandle,
     pot: BinaryPot,
@@ -2506,31 +2759,33 @@ def _run_cell_in_subprocess(
     }
     if physical_pressure_bar is not None:
         payload["physical_pressure_bar"] = float(physical_pressure_bar)
-    env = dict(os.environ)
-    env.setdefault("PYTHONPATH", str(REPO_ROOT))
-    pythonpath = env.get("PYTHONPATH") or ""
-    if str(REPO_ROOT) not in pythonpath.split(os.pathsep):
-        env["PYTHONPATH"] = os.pathsep.join(
-            [str(REPO_ROOT), pythonpath] if pythonpath else [str(REPO_ROOT)]
+    worker = _isolated_cell_worker(handle.name)
+    try:
+        raw = worker.request(
+            payload,
+            timeout_s=float(timeout_s) + 2.0,
+        )
+    except _IsolatedCellWorkerFailure as exc:
+        return _crash_cell_from_returncode(
+            handle=handle,
+            pot=pot,
+            temperature_K=temperature_K,
+            po2=po2,
+            wall0=wall0,
+            cpu0=cpu0,
+            hostname=hostname,
+            returncode=exc.returncode,
+            timed_out=exc.timed_out,
+            stderr=exc.detail,
+            arm=arm,
+            notices=notices,
+            authority=authority,
+            certified_band=certified_band,
         )
     try:
-        proc = subprocess.run(
-            [sys.executable, "-c", _ISOLATED_CELL_BOOTSTRAP],
-            input=json.dumps(payload),
-            cwd=str(REPO_ROOT),
-            env=env,
-            capture_output=True,
-            text=True,
-            timeout=float(timeout_s) + 2.0,
-            start_new_session=True,
-        )
-    except subprocess.TimeoutExpired as exc:
-        child = getattr(exc, "process", None)
-        if child is not None and getattr(child, "pid", None):
-            try:
-                os.killpg(child.pid, signal.SIGKILL)
-            except (OSError, ProcessLookupError):
-                pass
+        cell = EquilibrateCell.from_payload(raw)
+    except (KeyError, TypeError, ValueError) as exc:
+        worker.retire()
         return _crash_cell_from_returncode(
             handle=handle,
             pot=pot,
@@ -2540,50 +2795,15 @@ def _run_cell_in_subprocess(
             cpu0=cpu0,
             hostname=hostname,
             returncode=None,
-            timed_out=True,
-            stderr=str(getattr(exc, "stderr", "") or ""),
-            arm=arm,
-            notices=notices,
-            authority=authority,
-            certified_band=certified_band,
-        )
-    if proc.returncode != 0:
-        return _crash_cell_from_returncode(
-            handle=handle,
-            pot=pot,
-            temperature_K=temperature_K,
-            po2=po2,
-            wall0=wall0,
-            cpu0=cpu0,
-            hostname=hostname,
-            returncode=proc.returncode,
             timed_out=False,
-            stderr=proc.stderr or proc.stdout or "",
+            stderr=f"invalid isolated worker result ({exc})",
             arm=arm,
             notices=notices,
             authority=authority,
             certified_band=certified_band,
         )
-    try:
-        raw = json.loads(proc.stdout.strip().splitlines()[-1])
-    except (json.JSONDecodeError, IndexError) as exc:
-        return _crash_cell_from_returncode(
-            handle=handle,
-            pot=pot,
-            temperature_K=temperature_K,
-            po2=po2,
-            wall0=wall0,
-            cpu0=cpu0,
-            hostname=hostname,
-            returncode=proc.returncode,
-            timed_out=False,
-            stderr=f"unparseable worker stdout ({exc}): {proc.stdout[:400]}",
-            arm=arm,
-            notices=notices,
-            authority=authority,
-            certified_band=certified_band,
-        )
-    cell = EquilibrateCell.from_payload(raw)
+    if cell.refusal_reason == REFUSAL_TIMEOUT or cell.engine_status == "TimeoutError":
+        worker.retire()
     merged_notices: list[dict[str, Any]] = []
     seen: set[str] = set()
     for row in list(notices) + list(cell.notices):
