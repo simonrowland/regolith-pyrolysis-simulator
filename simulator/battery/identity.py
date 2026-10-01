@@ -865,6 +865,10 @@ def _species_equal(a: Species, b: Species) -> IdentityEqualOutcome:
         fields.append("species.charge")
     elif charge_cmp.kind is IdentityEqualKind.INVALID_IDENTITY:
         return charge_cmp
+    if fields:
+        return IdentityEqualOutcome(
+            IdentityEqualKind.IDENTITY_MISMATCH, tuple(fields)
+        )
     a_token = phase_token(a)
     poly = _state_compare(
         "species.polymorph",
@@ -872,6 +876,14 @@ def _species_equal(a: Species, b: Species) -> IdentityEqualOutcome:
         b.polymorph,
         required=a_token is Phase.CR,
     )
+    if (
+        a.polymorph is not None
+        and b.polymorph is not None
+        and a.polymorph.is_value
+        and b.polymorph.is_value
+        and poly.kind is IdentityEqualKind.IDENTITY_MISMATCH
+    ):
+        return poly
     if a_token is Phase.CR:
         if poly.kind is not IdentityEqualKind.EQUAL:
             return poly
@@ -884,8 +896,6 @@ def _species_equal(a: Species, b: Species) -> IdentityEqualOutcome:
             )
     elif a_token is not None and poly.kind is IdentityEqualKind.INVALID_IDENTITY:
         return poly
-    if fields:
-        return IdentityEqualOutcome(IdentityEqualKind.IDENTITY_MISMATCH, tuple(fields))
     if unknown:
         return IdentityEqualOutcome(IdentityEqualKind.IDENTITY_UNKNOWN, tuple(unknown))
     return IdentityEqualOutcome(IdentityEqualKind.EQUAL)
@@ -957,14 +967,24 @@ def _multiset_compare(
         for left_item in left
     ]
 
+    # For these term lists, EQUAL means an all-EQUAL one-to-one pairing
+    # exists. MISMATCH means every one-to-one pairing contains a definite
+    # mismatch (including lists of different lengths). UNKNOWN is the
+    # remaining case: a pairing avoids definite mismatches and includes at
+    # least one UNKNOWN pair. INVALID_IDENTITY remains distinct when a
+    # mismatch-free pairing exists only through invalid pairs.
     def matching(
         allowed: frozenset[IdentityEqualKind],
+        *,
+        require_kind: IdentityEqualKind | None = None,
     ) -> tuple[IdentityEqualOutcome, ...] | None:
         def visit(
-            left_index: int, available_right: frozenset[int]
+            left_index: int,
+            available_right: frozenset[int],
+            required_kind_seen: bool,
         ) -> tuple[IdentityEqualOutcome, ...] | None:
             if left_index == len(left):
-                return ()
+                return () if required_kind_seen or require_kind is None else None
             candidates = sorted(
                 (
                     right_index
@@ -974,48 +994,77 @@ def _multiset_compare(
                 key=lambda right_index: (
                     outcomes[left_index][right_index].kind
                     is not IdentityEqualKind.EQUAL,
+                    outcomes[left_index][right_index].kind
+                    is IdentityEqualKind.INVALID_IDENTITY,
                     right_index,
                 ),
             )
             for right_index in candidates:
+                outcome = outcomes[left_index][right_index]
                 tail = visit(
                     left_index + 1,
                     available_right - {right_index},
+                    required_kind_seen or outcome.kind is require_kind,
                 )
                 if tail is not None:
-                    return (outcomes[left_index][right_index], *tail)
+                    return (outcome, *tail)
             return None
 
-        return visit(0, frozenset(range(len(right))))
+        return visit(0, frozenset(range(len(right))), False)
 
-    match_kinds = (
-        (frozenset({IdentityEqualKind.EQUAL}), IdentityEqualKind.EQUAL),
-        (
-            frozenset({IdentityEqualKind.EQUAL, IdentityEqualKind.IDENTITY_UNKNOWN}),
-            IdentityEqualKind.IDENTITY_UNKNOWN,
+    equal_match = matching(frozenset({IdentityEqualKind.EQUAL}))
+    if equal_match is not None:
+        return IdentityEqualOutcome(IdentityEqualKind.EQUAL)
+
+    unknown_match = matching(
+        frozenset(
+            {
+                IdentityEqualKind.EQUAL,
+                IdentityEqualKind.IDENTITY_UNKNOWN,
+                IdentityEqualKind.INVALID_IDENTITY,
+            }
         ),
-        (
-            frozenset(
-                {
-                    IdentityEqualKind.EQUAL,
-                    IdentityEqualKind.IDENTITY_UNKNOWN,
-                    IdentityEqualKind.INVALID_IDENTITY,
-                }
-            ),
-            IdentityEqualKind.INVALID_IDENTITY,
-        ),
+        require_kind=IdentityEqualKind.IDENTITY_UNKNOWN,
     )
-    for allowed, kind in match_kinds:
-        matched = matching(allowed)
-        if matched is None:
-            continue
-        if kind is IdentityEqualKind.EQUAL:
-            return IdentityEqualOutcome(kind)
-        fields = tuple(
-            dict.fromkeys(field for outcome in matched for field in outcome.fields)
+    if unknown_match is not None:
+        unknown_outcomes = tuple(
+            outcome
+            for outcome in unknown_match
+            if outcome.kind is IdentityEqualKind.IDENTITY_UNKNOWN
         )
-        detail = next((outcome.detail for outcome in matched if outcome.detail), "")
-        return IdentityEqualOutcome(kind, fields or (name,), detail)
+        fields = tuple(
+            dict.fromkeys(
+                field for outcome in unknown_outcomes for field in outcome.fields
+            )
+        )
+        detail = next(
+            (outcome.detail for outcome in unknown_outcomes if outcome.detail), ""
+        )
+        return IdentityEqualOutcome(
+            IdentityEqualKind.IDENTITY_UNKNOWN, fields or (name,), detail
+        )
+
+    invalid_match = matching(
+        frozenset({IdentityEqualKind.EQUAL, IdentityEqualKind.INVALID_IDENTITY}),
+        require_kind=IdentityEqualKind.INVALID_IDENTITY,
+    )
+    if invalid_match is not None:
+        invalid_outcomes = tuple(
+            outcome
+            for outcome in invalid_match
+            if outcome.kind is IdentityEqualKind.INVALID_IDENTITY
+        )
+        fields = tuple(
+            dict.fromkeys(
+                field for outcome in invalid_outcomes for field in outcome.fields
+            )
+        )
+        detail = next(
+            (outcome.detail for outcome in invalid_outcomes if outcome.detail), ""
+        )
+        return IdentityEqualOutcome(
+            IdentityEqualKind.INVALID_IDENTITY, fields or (name,), detail
+        )
     return _mismatch(name)
 
 
