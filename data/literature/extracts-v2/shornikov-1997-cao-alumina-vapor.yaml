@@ -2154,6 +2154,1206 @@ observations:
           table: '2'
           note: Printed x(CaO)=0.333; x(Al2O3)=0.667 is the documented binary complement, not printed; pAlO coefficient 45.0
     output_unit: Pa
+- observation_id: shornikov-1997-cao-alumina-vapor::shornikov_1997_ca_pressure_table2_1933k::T=1933.0:h=1ae88c580f38
+  experiment_id: 14a28aff34522806bfbcdc28dd34f3b16c99a47bfee72e9bc2e1689f0cf73355::experiment::shornikov-1997-mo-cell-kems
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: Ca
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '1933'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source gas standard state not grounded
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - CaO
+          - '0.625'
+        - - Al2O3
+          - '0.375'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '0.0583632'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No individual uncertainty or background pressure is printed for the Ca pressure cells.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: codex
+      date: '2026-09-30'
+      evidence:
+        published_page: 20
+        pdf_page_index: 1
+        table: '2'
+  notices: []
+  source_id: shornikov-1997-cao-alumina-vapor
+  locator:
+    published_page: 20
+    pdf_page_index: 1
+    table: '2'
+    note: Printed x(CaO)=0.625; pCa coefficient 576
+  read_from: unknown:shornikov-1997-cao-alumina-vapor
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1933'
+      locator:
+        published_page: 20
+        pdf_page_index: 1
+        table: '2'
+        note: Printed x(CaO)=0.625; pCa coefficient 576
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_mole_fraction
+          components:
+          - - CaO
+            - '0.625'
+          - - Al2O3
+            - '0.375'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 20
+        pdf_page_index: 1
+        table: '2'
+        note: Printed x(CaO)=0.625; pCa coefficient 576
+  derivation:
+    relation: atm_to_Pa
+    inputs:
+    - unknown:shornikov-1997-cao-alumina-vapor
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.000000576'
+        locator:
+          published_page: 20
+          pdf_page_index: 1
+          table: '2'
+          note: Printed x(CaO)=0.625; pCa coefficient 576
+    - - factor
+      - state:
+          tag: value
+          value: '101325'
+        locator:
+          published_page: 20
+          pdf_page_index: 1
+          table: '2'
+          note: Printed x(CaO)=0.625; pCa coefficient 576
+    output_unit: Pa
+- observation_id: shornikov-1997-cao-alumina-vapor::shornikov_1997_ca_pressure_table2_1933k::T=1933.0:h=44b4d7c48417
+  experiment_id: 14a28aff34522806bfbcdc28dd34f3b16c99a47bfee72e9bc2e1689f0cf73355::experiment::shornikov-1997-mo-cell-kems
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: Ca
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '1933'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source gas standard state not grounded
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - CaO
+          - '0.143'
+        - - Al2O3
+          - '0.857'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '0.0005329695'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No individual uncertainty or background pressure is printed for the Ca pressure cells.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: codex
+      date: '2026-09-30'
+      evidence:
+        published_page: 20
+        pdf_page_index: 1
+        table: '2'
+  notices: []
+  source_id: shornikov-1997-cao-alumina-vapor
+  locator:
+    published_page: 20
+    pdf_page_index: 1
+    table: '2'
+    note: Printed x(CaO)=0.143; pCa coefficient 5.26
+  read_from: unknown:shornikov-1997-cao-alumina-vapor
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1933'
+      locator:
+        published_page: 20
+        pdf_page_index: 1
+        table: '2'
+        note: Printed x(CaO)=0.143; pCa coefficient 5.26
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_mole_fraction
+          components:
+          - - CaO
+            - '0.143'
+          - - Al2O3
+            - '0.857'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 20
+        pdf_page_index: 1
+        table: '2'
+        note: Printed x(CaO)=0.143; pCa coefficient 5.26
+  derivation:
+    relation: atm_to_Pa
+    inputs:
+    - unknown:shornikov-1997-cao-alumina-vapor
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.00000000526'
+        locator:
+          published_page: 20
+          pdf_page_index: 1
+          table: '2'
+          note: Printed x(CaO)=0.143; pCa coefficient 5.26
+    - - factor
+      - state:
+          tag: value
+          value: '101325'
+        locator:
+          published_page: 20
+          pdf_page_index: 1
+          table: '2'
+          note: Printed x(CaO)=0.143; pCa coefficient 5.26
+    output_unit: Pa
+- observation_id: shornikov-1997-cao-alumina-vapor::shornikov_1997_ca_pressure_table2_1933k::T=1933.0:h=70699b2705d9
+  experiment_id: 14a28aff34522806bfbcdc28dd34f3b16c99a47bfee72e9bc2e1689f0cf73355::experiment::shornikov-1997-mo-cell-kems
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: Ca
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '1933'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source gas standard state not grounded
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - CaO
+          - '0.5'
+        - - Al2O3
+          - '0.5'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '0.010436475'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No individual uncertainty or background pressure is printed for the Ca pressure cells.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: codex
+      date: '2026-09-30'
+      evidence:
+        published_page: 20
+        pdf_page_index: 1
+        table: '2'
+  notices: []
+  source_id: shornikov-1997-cao-alumina-vapor
+  locator:
+    published_page: 20
+    pdf_page_index: 1
+    table: '2'
+    note: Printed x(CaO)=0.500; pCa coefficient 103
+  read_from: unknown:shornikov-1997-cao-alumina-vapor
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1933'
+      locator:
+        published_page: 20
+        pdf_page_index: 1
+        table: '2'
+        note: Printed x(CaO)=0.500; pCa coefficient 103
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_mole_fraction
+          components:
+          - - CaO
+            - '0.5'
+          - - Al2O3
+            - '0.5'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 20
+        pdf_page_index: 1
+        table: '2'
+        note: Printed x(CaO)=0.500; pCa coefficient 103
+  derivation:
+    relation: atm_to_Pa
+    inputs:
+    - unknown:shornikov-1997-cao-alumina-vapor
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.000000103'
+        locator:
+          published_page: 20
+          pdf_page_index: 1
+          table: '2'
+          note: Printed x(CaO)=0.500; pCa coefficient 103
+    - - factor
+      - state:
+          tag: value
+          value: '101325'
+        locator:
+          published_page: 20
+          pdf_page_index: 1
+          table: '2'
+          note: Printed x(CaO)=0.500; pCa coefficient 103
+    output_unit: Pa
+- observation_id: shornikov-1997-cao-alumina-vapor::shornikov_1997_ca_pressure_table2_1933k::T=1933.0:h=9da20dfe3aa1
+  experiment_id: 14a28aff34522806bfbcdc28dd34f3b16c99a47bfee72e9bc2e1689f0cf73355::experiment::shornikov-1997-mo-cell-kems
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: Ca
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '1933'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source gas standard state not grounded
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - CaO
+          - '0.632'
+        - - Al2O3
+          - '0.368'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '0.05856585'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No individual uncertainty or background pressure is printed for the Ca pressure cells.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: codex
+      date: '2026-09-30'
+      evidence:
+        published_page: 20
+        pdf_page_index: 1
+        table: '2'
+  notices: []
+  source_id: shornikov-1997-cao-alumina-vapor
+  locator:
+    published_page: 20
+    pdf_page_index: 1
+    table: '2'
+    note: Printed x(CaO)=0.632; pCa coefficient 578
+  read_from: unknown:shornikov-1997-cao-alumina-vapor
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1933'
+      locator:
+        published_page: 20
+        pdf_page_index: 1
+        table: '2'
+        note: Printed x(CaO)=0.632; pCa coefficient 578
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_mole_fraction
+          components:
+          - - CaO
+            - '0.632'
+          - - Al2O3
+            - '0.368'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 20
+        pdf_page_index: 1
+        table: '2'
+        note: Printed x(CaO)=0.632; pCa coefficient 578
+  derivation:
+    relation: atm_to_Pa
+    inputs:
+    - unknown:shornikov-1997-cao-alumina-vapor
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.000000578'
+        locator:
+          published_page: 20
+          pdf_page_index: 1
+          table: '2'
+          note: Printed x(CaO)=0.632; pCa coefficient 578
+    - - factor
+      - state:
+          tag: value
+          value: '101325'
+        locator:
+          published_page: 20
+          pdf_page_index: 1
+          table: '2'
+          note: Printed x(CaO)=0.632; pCa coefficient 578
+    output_unit: Pa
+- observation_id: shornikov-1997-cao-alumina-vapor::shornikov_1997_ca_pressure_table2_1933k::T=1933.0:h=b4a6dfcece6b
+  experiment_id: 14a28aff34522806bfbcdc28dd34f3b16c99a47bfee72e9bc2e1689f0cf73355::experiment::shornikov-1997-mo-cell-kems
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: Ca
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '1933'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source gas standard state not grounded
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - CaO
+          - '0.86'
+        - - Al2O3
+          - '0.14'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '0.08612625'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No individual uncertainty or background pressure is printed for the Ca pressure cells.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: codex
+      date: '2026-09-30'
+      evidence:
+        published_page: 20
+        pdf_page_index: 1
+        table: '2'
+  notices: []
+  source_id: shornikov-1997-cao-alumina-vapor
+  locator:
+    published_page: 20
+    pdf_page_index: 1
+    table: '2'
+    note: Printed x(CaO)=0.860; pCa coefficient 850
+  read_from: unknown:shornikov-1997-cao-alumina-vapor
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1933'
+      locator:
+        published_page: 20
+        pdf_page_index: 1
+        table: '2'
+        note: Printed x(CaO)=0.860; pCa coefficient 850
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_mole_fraction
+          components:
+          - - CaO
+            - '0.86'
+          - - Al2O3
+            - '0.14'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 20
+        pdf_page_index: 1
+        table: '2'
+        note: Printed x(CaO)=0.860; pCa coefficient 850
+  derivation:
+    relation: atm_to_Pa
+    inputs:
+    - unknown:shornikov-1997-cao-alumina-vapor
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.00000085'
+        locator:
+          published_page: 20
+          pdf_page_index: 1
+          table: '2'
+          note: Printed x(CaO)=0.860; pCa coefficient 850
+    - - factor
+      - state:
+          tag: value
+          value: '101325'
+        locator:
+          published_page: 20
+          pdf_page_index: 1
+          table: '2'
+          note: Printed x(CaO)=0.860; pCa coefficient 850
+    output_unit: Pa
+- observation_id: shornikov-1997-cao-alumina-vapor::shornikov_1997_ca_pressure_table2_1933k::T=1933.0:h=b9fb591dfb81
+  experiment_id: 14a28aff34522806bfbcdc28dd34f3b16c99a47bfee72e9bc2e1689f0cf73355::experiment::shornikov-1997-mo-cell-kems
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: Ca
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '1933'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source gas standard state not grounded
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - CaO
+          - '0.75'
+        - - Al2O3
+          - '0.25'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '0.089166'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No individual uncertainty or background pressure is printed for the Ca pressure cells.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: codex
+      date: '2026-09-30'
+      evidence:
+        published_page: 20
+        pdf_page_index: 1
+        table: '2'
+  notices: []
+  source_id: shornikov-1997-cao-alumina-vapor
+  locator:
+    published_page: 20
+    pdf_page_index: 1
+    table: '2'
+    note: Printed x(CaO)=0.750; pCa coefficient 880
+  read_from: unknown:shornikov-1997-cao-alumina-vapor
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1933'
+      locator:
+        published_page: 20
+        pdf_page_index: 1
+        table: '2'
+        note: Printed x(CaO)=0.750; pCa coefficient 880
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_mole_fraction
+          components:
+          - - CaO
+            - '0.75'
+          - - Al2O3
+            - '0.25'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 20
+        pdf_page_index: 1
+        table: '2'
+        note: Printed x(CaO)=0.750; pCa coefficient 880
+  derivation:
+    relation: atm_to_Pa
+    inputs:
+    - unknown:shornikov-1997-cao-alumina-vapor
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.00000088'
+        locator:
+          published_page: 20
+          pdf_page_index: 1
+          table: '2'
+          note: Printed x(CaO)=0.750; pCa coefficient 880
+    - - factor
+      - state:
+          tag: value
+          value: '101325'
+        locator:
+          published_page: 20
+          pdf_page_index: 1
+          table: '2'
+          note: Printed x(CaO)=0.750; pCa coefficient 880
+    output_unit: Pa
+- observation_id: shornikov-1997-cao-alumina-vapor::shornikov_1997_ca_pressure_table2_1933k::T=1933.0:h=e456e61c3768
+  experiment_id: 14a28aff34522806bfbcdc28dd34f3b16c99a47bfee72e9bc2e1689f0cf73355::experiment::shornikov-1997-mo-cell-kems
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: Ca
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '1933'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source gas standard state not grounded
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - CaO
+          - '0.333'
+        - - Al2O3
+          - '0.667'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '0.00145908'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No individual uncertainty or background pressure is printed for the Ca pressure cells.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: codex
+      date: '2026-09-30'
+      evidence:
+        published_page: 20
+        pdf_page_index: 1
+        table: '2'
+  notices: []
+  source_id: shornikov-1997-cao-alumina-vapor
+  locator:
+    published_page: 20
+    pdf_page_index: 1
+    table: '2'
+    note: Printed x(CaO)=0.333; pCa coefficient 14.4
+  read_from: unknown:shornikov-1997-cao-alumina-vapor
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1933'
+      locator:
+        published_page: 20
+        pdf_page_index: 1
+        table: '2'
+        note: Printed x(CaO)=0.333; pCa coefficient 14.4
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_mole_fraction
+          components:
+          - - CaO
+            - '0.333'
+          - - Al2O3
+            - '0.667'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 20
+        pdf_page_index: 1
+        table: '2'
+        note: Printed x(CaO)=0.333; pCa coefficient 14.4
+  derivation:
+    relation: atm_to_Pa
+    inputs:
+    - unknown:shornikov-1997-cao-alumina-vapor
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.0000000144'
+        locator:
+          published_page: 20
+          pdf_page_index: 1
+          table: '2'
+          note: Printed x(CaO)=0.333; pCa coefficient 14.4
+    - - factor
+      - state:
+          tag: value
+          value: '101325'
+        locator:
+          published_page: 20
+          pdf_page_index: 1
+          table: '2'
+          note: Printed x(CaO)=0.333; pCa coefficient 14.4
+    output_unit: Pa
+- observation_id: shornikov-1997-cao-alumina-vapor::shornikov_1997_ca_pressure_table2_1933k::T=1933.0:h=faad5894052f
+  experiment_id: 14a28aff34522806bfbcdc28dd34f3b16c99a47bfee72e9bc2e1689f0cf73355::experiment::shornikov-1997-mo-cell-kems
+  identity:
+    quantity:
+      tag: value
+      value: p_partial
+    species:
+      formula: Ca
+      phase:
+        tag: value
+        value: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '1933'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source reaction/equilibrium not grounded
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source gas standard state not grounded
+    reservoir:
+      tag: unknown
+      reason: source condensed reservoir not grounded
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - CaO
+          - '1'
+        - - Al2O3
+          - '0'
+        amount_basis: mole_fraction
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: in_cell_total_pressure_not_derivable
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: point
+    point: '0.07923615'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No individual uncertainty or background pressure is printed for the Ca pressure cells.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: codex
+      date: '2026-09-30'
+      evidence:
+        published_page: 20
+        pdf_page_index: 1
+        table: '2'
+  notices: []
+  source_id: shornikov-1997-cao-alumina-vapor
+  locator:
+    published_page: 20
+    pdf_page_index: 1
+    table: '2'
+    note: Printed x(CaO)=1.000; pCa coefficient 782
+  read_from: unknown:shornikov-1997-cao-alumina-vapor
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1933'
+      locator:
+        published_page: 20
+        pdf_page_index: 1
+        table: '2'
+        note: Printed x(CaO)=1.000; pCa coefficient 782
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_mole_fraction
+          components:
+          - - CaO
+            - '1'
+          - - Al2O3
+            - '0'
+          amount_basis: mole_fraction
+      locator:
+        published_page: 20
+        pdf_page_index: 1
+        table: '2'
+        note: Printed x(CaO)=1.000; pCa coefficient 782
+  derivation:
+    relation: atm_to_Pa
+    inputs:
+    - unknown:shornikov-1997-cao-alumina-vapor
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '0.000000782'
+        locator:
+          published_page: 20
+          pdf_page_index: 1
+          table: '2'
+          note: Printed x(CaO)=1.000; pCa coefficient 782
+    - - factor
+      - state:
+          tag: value
+          value: '101325'
+        locator:
+          published_page: 20
+          pdf_page_index: 1
+          table: '2'
+          note: Printed x(CaO)=1.000; pCa coefficient 782
+    output_unit: Pa
 - observation_id: shornikov-1997-cao-alumina-vapor::shornikov_1997_cao_activities_fig1_figure_only
   experiment_id: 14a28aff34522806bfbcdc28dd34f3b16c99a47bfee72e9bc2e1689f0cf73355::shornikov-1997-cao-alumina-vapor
   identity:

@@ -1,10 +1,10 @@
 # Battery v2.1 migration report
 
-rows in: 47306
-records out (observations): 109982
-works: 257
-experiments: 3502
-queue size: 76636
+rows in: 47312
+records out (observations): 110007
+works: 258
+experiments: 3504
+queue size: 76642
 identical-payload dedupe aliases: 342
 metadata files: 39
 index sources: 168
@@ -14,21 +14,21 @@ hard issues: 3180
 
 | count | spec | measured |
 |---|---:|---:|
-| citations | 147 | 260 (mismatch) |
+| citations | 147 | 261 (mismatch) |
 | doi_works | 56 | 123 (mismatch) |
-| no_doi_works | 91 | 134 (mismatch) |
-| admission_statuses | 374 | 947 (mismatch) |
+| no_doi_works | 91 | 135 (mismatch) |
+| admission_statuses | 374 | 953 (mismatch) |
 | supersedes | 422 | 649 (mismatch) |
 | series | 60 | 592 (mismatch) |
 | gibbs_reference_pressures | 1617 | 1635 (mismatch) |
 | gibbs_reference_100000 | 1023 | 1029 (mismatch) |
 | gibbs_reference_101325 | 594 | 594 |
 | formulas | 1625 | 2030 (mismatch) |
-| equipment_payloads | 670 | 971 (mismatch) |
+| equipment_payloads | 670 | 974 (mismatch) |
 | absent_admissions | 3511 | 4767 (mismatch) |
 | absent_classes | 2174 | 2201 (mismatch) |
 | range_only_T | 3125 | 2743 (mismatch) |
-| system_like_phases | 1065 | 2608 (mismatch) |
+| system_like_phases | 1065 | 2611 (mismatch) |
 | missing_phases | 237 | 367 (mismatch) |
 | tabulated_lists | — | 6 |
 
@@ -18161,6 +18161,7 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/extracts/senior-1991-vacuum-pyrolysis.yaml` | 0 | 0 | 1 |
 | `data/literature/extracts/senior-1992-vacuum-pyrolysis.yaml` | 0 | 0 | 1 |
 | `data/literature/extracts/sf04-magma-companion-workbook.yaml` | 7 | 56 | 77 |
+| `data/literature/extracts/shornikov-1997-cao-alumina-vapor.yaml` | 6 | 25 | 6 |
 | `data/literature/extracts/slag-001-banya-1993.yaml` | 48 | 67 | 346 |
 | `data/literature/extracts/slag-002-banya-hino-nagasaka-1993.yaml` | 27 | 27 | 155 |
 | `data/literature/extracts/slag-003-hino-kitagawa-banya-1993.yaml` | 18 | 18 | 96 |
@@ -18271,8 +18272,8 @@ MODEL_DERIVED / MEASURED_REDUCED keep their mapped evidence class. Parent pointe
 
 ## Advisory issue census
 
-advisory issues: 216363
+advisory issues: 216473
 
 | kind | count |
 |---|---:|
-| `identity_incomplete` | 216363 |
+| `identity_incomplete` | 216473 |
