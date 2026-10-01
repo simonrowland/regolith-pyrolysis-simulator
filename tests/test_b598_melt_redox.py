@@ -64,8 +64,41 @@ def test_lunar_c2a_170h_keeps_ledger_redox_bounded_and_consistent() -> None:
                 "ferrous_free_lower_bound",
             }:
                 assert math.isfinite(float(redox_domain["fO2_log_lower_bound"]))
+                assert redox_domain["status"] == "out_of_domain"
+                assert "kress91_inverse_not_evaluated" in redox_domain[
+                    "reason"
+                ]
+                if redox_domain["basis"] == "fe_saturation_bound":
+                    assert redox_domain["authority"] == "extrapolated"
+                    assert "ferric_inventory_absent" in redox_domain["reason"]
+                    temperature_K = float(snapshot.temperature_C) + 273.15
+                    pressure_bar = floor_vacuum_pressure_bar(
+                        float(row["P_total_bar"]),
+                        floor_bar=DEFAULT_VACUUM_FLOOR_BAR,
+                    )
+                    activity = calphad_ferrous_feo_activity_diagnostic(
+                        comp_wt=snapshot.composition_wt_pct,
+                        fO2_log=float(redox_domain["fO2_log_lower_bound"]),
+                        T_K=temperature_K,
+                        pressure_bar=pressure_bar,
+                    )
+                    a_feo = float(activity["a_FeO_authoritative"])
+                    iw = feo_iw_log10_fO2_bar(temperature_K, a_feo=1.0)
+                    assert float(redox_domain["fO2_log_lower_bound"]) == pytest.approx(
+                        iw + 2.0 * math.log10(a_feo),
+                        abs=1.0e-6,
+                    )
             else:
                 assert "fO2_log_lower_bound" not in redox_domain
+                if redox_domain["basis"] == "no_modelled_redox_couple":
+                    assert redox_domain["status"] == "out_of_domain"
+                    assert tuple(redox_domain["certified_band"]["pO2_bar"]) == (
+                        1.0e-12,
+                        100.0,
+                    )
+                    assert "kress91_inverse_not_evaluated" in redox_domain[
+                        "reason"
+                    ]
             continue
         fO2_log = float(raw_fO2_log)
         assert math.isfinite(fO2_log)

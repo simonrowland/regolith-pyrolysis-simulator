@@ -440,11 +440,21 @@ def test_live_headspace_bleed_conductance_uses_headspace_species_m_avg(
         material_origin="feedstock",
     )
 
-    expected = sim.overhead_model._pipe_conductance(
-        1000.0,
+    upstream_pressure_Pa = sim._headspace_upstream_pressure_Pa()
+    species_kg = {"Na": 1.0}
+    poiseuille_capacity_kg_s = sim.overhead_model._pipe_conductance(
+        upstream_pressure_Pa,
         1500.0,
-        species_kg_for_M_avg={"Na": 1.0},
+        species_kg_for_M_avg=species_kg,
     )
+    sonic_capacity_kg_s = (
+        sim.overhead_model._choked_flow_coefficient_kg_s_Pa(
+            1500.0,
+            species_kg_for_M_avg=species_kg,
+        )
+        * upstream_pressure_Pa
+    )
+    expected = min(poiseuille_capacity_kg_s, sonic_capacity_kg_s)
 
     assert sim._headspace_bleed_conductance_kg_s() == pytest.approx(expected)
 

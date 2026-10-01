@@ -3927,6 +3927,112 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self.overhead.composition = composition
         self.overhead.pressure_mbar = p_total_mbar
 
+    def _headspace_upstream_pressure_Pa(self) -> float:
+        commanded_pressure_Pa = max(
+            float(self.melt.p_total_mbar) * 100.0,
+            1.0,
+        )
+        if not self._overhead_headspace_enabled():
+            return commanded_pressure_Pa
+        n_gas_mol = sum(self._overhead_holdup_mol().values())
+        if n_gas_mol <= 0.0:
+            return commanded_pressure_Pa
+
+        # Flow is driven by actual upstream pressure: the ledger's n_gas R T/V
+        # [Pa] supplies P_up, while the pipe law is k(P_up²-P_down²) [kg/s].
+        # Thus an empty ledger falls back exactly to the commanded setpoint;
+        # a large bolus drains back toward it within one tick when the pipe can
+        # carry the excess inventory at its true pressure.
+        ledger_pressure_Pa = (
+            n_gas_mol
+            * GAS_CONSTANT
+            * self._headspace_temperature_K()
+            / self._headspace_volume_m3()
+        )
+        return max(commanded_pressure_Pa, ledger_pressure_Pa)
+
+    def _headspace_quasi_steady_pressure_Pa(
+        self,
+        *,
+        p_downstream_Pa: float,
+        species_kg_for_M_avg: Optional[Mapping[str, float]] = None,
+    ) -> float:
+        commanded_pressure_Pa = max(
+            float(self.melt.p_total_mbar) * 100.0,
+            1.0,
+        )
+        if species_kg_for_M_avg is None:
+            species_kg_for_M_avg = self._overhead_holdup_species_kg()
+        source_mass_kg_s = max(
+            0.0,
+            float(getattr(
+                self,
+                '_headspace_transport_source_mass_kg_s',
+                0.0,
+            ) or 0.0),
+        )
+        p_downstream_Pa = max(0.0, float(p_downstream_Pa))
+        self._headspace_duct_choked_this_tick = False
+        if source_mass_kg_s <= 0.0:
+            return max(commanded_pressure_Pa, p_downstream_Pa)
+
+        # _pipe_conductance(1 Pa, P_down=0) returns k because its law is
+        # k(P_up²-P_down²), with kg/s divided by Pa² for k. Explicit kg/s
+        # capacity overrides have no pressure-square coefficient and retain
+        # their existing bounded-capacity path in _dispatch_overhead_bleed.
+        k_kg_s_Pa2 = self.overhead_model._pipe_conductance(
+            1.0,
+            self.melt.temperature_C,
+            p_downstream_Pa=0.0,
+            species_kg_for_M_avg=species_kg_for_M_avg,
+        )
+        if k_kg_s_Pa2 <= 0.0:
+            return math.inf
+
+        # P_out is the configured duct outlet boundary, not the transport
+        # capacity's inverted P2 diagnostic: that P2 is inferred from current
+        # upstream pressure and swallowed flow, so it approaches P_up when
+        # equipment does not bind and is not an outlet condition.
+        # Poiseuille branch: S [kg/s] = k [kg/(s·Pa²)] ×
+        # (P_ss²-P_out²) [Pa²], so P_Pois=sqrt(P_out²+S/k) [Pa]. For an
+        # isentropic sonic throat, m_dot*=A*P_up*sqrt(gamma*M/(R*T))*
+        # (2/(gamma+1))^((gamma+1)/(2*(gamma-1))) [kg/s], hence
+        # C_choke=m_dot*/P_up [kg/(s·Pa)] and P_choke=S/C_choke [Pa].
+        # Both candidate removal rates are kg/s; the duct carries their
+        # minimum, so required pressure is max(P_Pois,P_choke). For small S
+        # Poiseuille sets P~sqrt(S/k) when P_out->0; at large S the sonic
+        # branch sets P~S/C_choke, linear in source. gamma defaults to 1.4
+        # because the holdup species registry has no heat-capacity ratio.
+        # Flag choking only when its branch sets an above-command pressure.
+        # End pressure is max(commanded pressure, P_ss); this is the target
+        # inventory used by OVERHEAD_BLEED. Valid when the residence time
+        # tau=n(P_end)/Q(P_end) [mol/(mol/s)=s] is much shorter than this
+        # one-hour tick. At P_ss>commanded, Q=S_mass; at/below setpoint Q is
+        # evaluated at the commanded pressure and the controller holds it.
+        poiseuille_pressure_ss_Pa = math.sqrt(
+            p_downstream_Pa ** 2 + source_mass_kg_s / k_kg_s_Pa2
+        )
+        choked_coefficient_kg_s_Pa = (
+            self.overhead_model._choked_flow_coefficient_kg_s_Pa(
+                self.melt.temperature_C,
+                species_kg_for_M_avg=species_kg_for_M_avg,
+            )
+        )
+        choked_pressure_ss_Pa = (
+            source_mass_kg_s / choked_coefficient_kg_s_Pa
+            if choked_coefficient_kg_s_Pa > 0.0
+            else math.inf
+        )
+        pressure_ss_Pa = max(
+            poiseuille_pressure_ss_Pa,
+            choked_pressure_ss_Pa,
+        )
+        self._headspace_duct_choked_this_tick = (
+            choked_pressure_ss_Pa >= poiseuille_pressure_ss_Pa
+            and choked_pressure_ss_Pa > commanded_pressure_Pa
+        )
+        return max(commanded_pressure_Pa, pressure_ss_Pa)
+
     def _headspace_bleed_conductance_kg_s(
         self,
         *,
@@ -3948,14 +4054,14 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             return value
         if species_kg_for_M_avg is None:
             species_kg_for_M_avg = self._overhead_holdup_species_kg()
-        p_mean_Pa = max(float(self.melt.p_total_mbar) * 100.0, 1.0)
+        p_upstream_Pa = self._headspace_upstream_pressure_Pa()
         # This is the upstream-to-vacuum carrying limit C0. Controlled-pO2
         # runtime passes it through the provider-owned flow-capacity result;
         # pressure-bound modes retain the provider's finite-P2 derate.
         return max(
             0.0,
-            float(self.overhead_model._pipe_conductance(
-                p_mean_Pa,
+            float(self.overhead_model._duct_mass_flow_capacity_kg_s(
+                p_upstream_Pa,
                 self.melt.temperature_C,
                 p_downstream_Pa=0.0,
                 species_kg_for_M_avg=species_kg_for_M_avg,
@@ -10364,11 +10470,12 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             max(0.0, float(mass_kg))
             for mass_kg in self._overhead_holdup_species_kg().values()
         )
-        return self.overhead_model.controlled_o2_transport_capacity(
+        return self.overhead_model._controlled_o2_transport_capacity(
             evap_flux,
             self.melt,
             cold_train_capacity=capacity,
             retained_holdup_kg=retained_holdup_kg,
+            upstream_pressure_Pa=self._headspace_upstream_pressure_Pa(),
             dt_hr=dt_hr,
         )
 
@@ -10381,11 +10488,77 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
     ) -> IntentResult:
         diagnostic = self._overhead_gas_equilibrium_diagnostic()
         species_kg_for_M_avg = self._overhead_holdup_species_kg()
-        configured_downstream_pressure_bar = self._overhead_headspace_config.get(
-            'downstream_pressure_bar'
+        configured_downstream_pressure_bar = (
+            self._overhead_headspace_config.get('downstream_pressure_bar')
         )
+        if configured_downstream_pressure_bar is None:
+            configured_downstream_pressure_bar = getattr(
+                self.overhead_model,
+                '_downstream_pressure_override',
+                None,
+            )
+        p_downstream_bar = (
+            configured_downstream_pressure_bar
+            if force_drain_all and configured_downstream_pressure_bar is not None
+            else (
+                0.0
+                if configured_downstream_pressure_bar is None
+                else self.overhead_model._resolve_downstream_pressure(
+                    self.melt,
+                    configured_downstream_pressure_bar,
+                )
+            )
+        )
+        explicit_capacity_override = (
+            self._overhead_headspace_config.get('conductance_kg_s') is not None
+            or self._overhead_headspace_config.get(
+                'conductance_kg_s_per_bar'
+            ) is not None
+            or getattr(self.overhead_model, '_conductance_override', None)
+            is not None
+        )
+        quasi_steady_enabled = (
+            self._overhead_headspace_enabled()
+            and not force_drain_all
+            and not explicit_capacity_override
+        )
+        if quasi_steady_enabled:
+            p_end_Pa = self._headspace_quasi_steady_pressure_Pa(
+                p_downstream_Pa=float(p_downstream_bar) * 100000.0,
+                species_kg_for_M_avg=species_kg_for_M_avg,
+            )
+            self._headspace_pressure_above_commanded_this_tick = (
+                p_end_Pa > max(float(self.melt.p_total_mbar) * 100.0, 1.0)
+            )
+        else:
+            p_end_Pa = max(
+                float(diagnostic.get('p_total_bar') or 0.0) * 100000.0,
+                0.0,
+            )
+            self._headspace_pressure_above_commanded_this_tick = False
+        ledger_target_pressure_Pa = p_end_Pa
+        if quasi_steady_enabled and getattr(
+            self.melt.atmosphere, 'name', ''
+        ) in {'PN2_SWEEP', 'ARGON_FLOW'}:
+            # Sweep carrier pressure is an external boundary floor, not
+            # process.overhead_gas inventory. Exclude its commanded partial
+            # from the ideal-gas debit target so a carrier-only setpoint does
+            # not leave a phantom ledgered O2 residue.
+            external_carrier_floor_Pa = max(
+                0.0,
+                float(self.melt.p_total_mbar)
+                - float(self.melt.pO2_mbar),
+            ) * 100.0
+            ledger_target_pressure_Pa = max(
+                0.0,
+                p_end_Pa - external_carrier_floor_Pa,
+            )
         controls: Dict[str, Any] = {
-            'headspace_volume_m3': self._headspace_volume_m3(),
+            'headspace_volume_m3': (
+                self._headspace_volume_m3()
+                if quasi_steady_enabled
+                else 0.0
+            ),
             'headspace_temperature_K': self._headspace_temperature_K(),
             'bleed_conductance_kg_s': (
                 effective_transport_capacity.pipe_capacity_kg_hr / 3600.0
@@ -10394,14 +10567,8 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                     species_kg_for_M_avg=species_kg_for_M_avg,
                 )
             ),
-            'p_total_bar': diagnostic.get('p_total_bar'),
-            'p_downstream_bar': (
-                configured_downstream_pressure_bar
-                if configured_downstream_pressure_bar is not None
-                else self._headspace_downstream_pressure_bar(
-                    effective_transport_capacity
-                )
-            ),
+            'p_total_bar': ledger_target_pressure_Pa / 100000.0,
+            'p_downstream_bar': p_downstream_bar,
             'dt_hr': 1.0,
             'force_drain_all': bool(force_drain_all),
             'external_o2_in_overhead_mol': getattr(
@@ -10410,6 +10577,8 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 0.0,
             ),
         }
+        if force_drain_all and diagnostic.get('p_total_bar') is None:
+            controls['p_total_bar'] = None
         if effective_transport_capacity is not None:
             controls['effective_transport_capacity'] = (
                 effective_transport_capacity
@@ -10454,10 +10623,10 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                         .cavern_capacity_kg
                     ),
                 })
-            if capacity_result is not None:
-                controls['p_total_bar'] = sum(
-                    capacity_result.partial_pressures_Pa.values()
-                ) / 100000.0
+        if not quasi_steady_enabled and capacity_result is not None:
+            controls['p_total_bar'] = sum(
+                capacity_result.partial_pressures_Pa.values()
+            ) / 100000.0
         result = self._dispatch_and_commit(
             ChemistryIntent.OVERHEAD_BLEED,
             control_inputs=controls,
@@ -18115,6 +18284,17 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             self.overhead.evap_exceeds_transport = (
                 capacity_result.saturation.combined > 1.0
             )
+        if getattr(
+            self,
+            '_headspace_pressure_above_commanded_this_tick',
+            False,
+        ):
+            self.overhead.transport_binding_cause = (
+                'headspace_duct_choked'
+                if getattr(self, '_headspace_duct_choked_this_tick', False)
+                else 'headspace_pipe_undersized'
+            )
+            self.overhead.evap_exceeds_transport = True
 
         # Track cumulative O₂ vented and stored
         if not finite_headspace_enabled:

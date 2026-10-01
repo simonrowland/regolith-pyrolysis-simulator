@@ -2615,7 +2615,9 @@ def test_evaluate_names_recipe_local_bound_when_it_refuses_window() -> None:
         )
 
 
-def test_c2b_profile_window_schedules_measured_temperature_window() -> None:
+def test_c2b_profile_window_schedules_measured_temperature_window(
+    monkeypatch, record_property
+) -> None:
     spec, run_config = _build_eval_inputs(
         RecipePatch({}),
         "lunar_mare_low_ti",
@@ -2634,19 +2636,122 @@ def test_c2b_profile_window_schedules_measured_temperature_window() -> None:
     assert overrides["max_hours"] == pytest.approx(20.0)
 
     session = _force_builtin_run_from_config(run_config)._start_session()
-    # bbf0134 made transport use finite downstream pressure. C2B's controlled
-    # 1.5 mbar O2 equals its upstream pressure, so delta(P^2)=0 and the pipe
-    # correctly saturates. Vacuum downstream isolates this scheduler test.
+    # Vacuum downstream isolates this scheduler test from its commanded
+    # 1.5 mbar O2 boundary.
     session.simulator._overhead_headspace_config["downstream_pressure_bar"] = 0.0
+    simulator = session.simulator
+    from simulator.state import GAS_CONSTANT
+
+    original_bleed = simulator._dispatch_overhead_bleed
+    headspace_trace = []
+
+    def capture_headspace_balance(**kwargs):
+        before_mol = simulator._overhead_holdup_mol()
+        before_species_kg = simulator._overhead_holdup_species_kg(before_mol)
+        commanded_pressure_Pa = max(
+            float(simulator.melt.p_total_mbar) * 100.0, 1.0
+        )
+        downstream_pressure_Pa = (
+            float(
+                simulator._overhead_headspace_config.get(
+                    "downstream_pressure_bar", 0.0
+                )
+            )
+            * 100000.0
+        )
+        source_mass_kg_s = float(
+            simulator._headspace_transport_source_mass_kg_s
+        )
+        k_kg_s_Pa2 = simulator.overhead_model._pipe_conductance(
+            1.0,
+            simulator.melt.temperature_C,
+            p_downstream_Pa=0.0,
+            species_kg_for_M_avg=before_species_kg,
+        )
+        choked_coefficient_kg_s_Pa = (
+            simulator.overhead_model._choked_flow_coefficient_kg_s_Pa(
+                simulator.melt.temperature_C,
+                species_kg_for_M_avg=before_species_kg,
+            )
+        )
+        poiseuille_pressure_Pa = math.sqrt(
+            downstream_pressure_Pa ** 2 + source_mass_kg_s / k_kg_s_Pa2
+        ) if k_kg_s_Pa2 > 0.0 else math.inf
+        choked_pressure_Pa = (
+            source_mass_kg_s / choked_coefficient_kg_s_Pa
+            if choked_coefficient_kg_s_Pa > 0.0
+            else math.inf
+        )
+        steady_pressure_Pa = max(
+            poiseuille_pressure_Pa,
+            choked_pressure_Pa,
+        )
+        end_pressure_Pa = max(commanded_pressure_Pa, steady_pressure_Pa)
+        volume_m3 = simulator._headspace_volume_m3()
+        temperature_K = simulator._headspace_temperature_K()
+        end_mol = end_pressure_Pa * volume_m3 / (GAS_CONSTANT * temperature_K)
+        source_mol_s = float(
+            simulator._headspace_transport_source_total_mol_s
+        )
+        if steady_pressure_Pa > commanded_pressure_Pa:
+            pipe_mass_rate_kg_s = source_mass_kg_s
+        else:
+            pipe_mass_rate_kg_s = min(
+                max(
+                    0.0,
+                    k_kg_s_Pa2
+                    * (commanded_pressure_Pa ** 2 - downstream_pressure_Pa ** 2),
+                ),
+                choked_coefficient_kg_s_Pa * commanded_pressure_Pa,
+            )
+        mean_molar_mass_kg_mol = (
+            sum(before_species_kg.values()) / sum(before_mol.values())
+            if sum(before_mol.values()) > 0.0
+            else (
+                source_mass_kg_s / source_mol_s
+                if source_mol_s > 0.0
+                else 0.0
+            )
+        )
+        removal_rate_mol_s = (
+            pipe_mass_rate_kg_s / mean_molar_mass_kg_mol
+            if mean_molar_mass_kg_mol > 0.0
+            else 0.0
+        )
+        result = original_bleed(**kwargs)
+        after_mol = simulator._overhead_holdup_mol()
+        headspace_trace.append({
+            "commanded_mbar": commanded_pressure_Pa / 100.0,
+            "steady_mbar": steady_pressure_Pa / 100.0,
+            "over_command_mbar": max(
+                0.0, steady_pressure_Pa - commanded_pressure_Pa
+            ) / 100.0,
+            "source_mol_s": source_mol_s,
+            "tau_s": (
+                end_mol / removal_rate_mol_s
+                if removal_rate_mol_s > 0.0
+                else math.inf
+            ),
+            "removed_mol": sum(before_mol.values()) - sum(after_mol.values()),
+        })
+        return result
+
+    monkeypatch.setattr(
+        simulator, "_dispatch_overhead_bleed", capture_headspace_balance
+    )
     snapshots = [session.advance().snapshot for _ in range(run_config.hours)]
+    record_property(
+        "r12c_c2b_headspace_trace",
+        json.dumps([
+            {"hour": index + 1, **trace}
+            for index, trace in enumerate(headspace_trace)
+        ], separators=(",", ":")),
+    )
     temperatures = [snapshot.temperature_C for snapshot in snapshots]
 
     assert temperatures[0] == pytest.approx(625.0)
     assert temperatures[1] == pytest.approx(1225.0)
     assert temperatures[2] == pytest.approx(1320.0)
-    # Evaporative oxygen can throttle the requested ramp. Derive the measured
-    # endpoint from the per-hour applied-ramp telemetry instead of assuming
-    # the nominal target is reachable in the scheduled window.
     expected_endpoint_C = temperatures[2]
     for snapshot in snapshots[3:]:
         expected_endpoint_C = min(
@@ -2654,6 +2759,7 @@ def test_c2b_profile_window_schedules_measured_temperature_window() -> None:
             expected_endpoint_C + snapshot.actual_ramp_rate_C_hr,
         )
     assert temperatures[-1] == pytest.approx(expected_endpoint_C)
+    assert temperatures[-1] == pytest.approx(1480.0)
     assert temperatures[-1] <= 1480.0
     assert max(temperatures) >= 1320.0
 

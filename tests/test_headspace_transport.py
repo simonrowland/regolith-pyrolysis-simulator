@@ -27,7 +27,8 @@ from simulator.physical_constants import (
     CATALOG_PHYSICAL_PRESSURE_CEILING_PA,
     GAS_CONSTANT,
 )
-from simulator.state import EvaporationFlux
+from simulator.state import GAS_CONSTANT as STATE_GAS_CONSTANT, EvaporationFlux
+from simulator.state import MOLAR_MASS
 from simulator.transport_constants import COLLISION_DIAMETERS_M
 from simulator.transport_regime import (
     FREE_MOLECULAR_KNUDSEN_MIN,
@@ -54,6 +55,101 @@ def _transport_sim() -> PyrolysisSimulator:
     )
     sim.load_batch('lunar_mare_low_ti', mass_kg=1000.0)
     return sim
+
+
+@pytest.mark.parametrize(
+    ("source_fraction_of_crossover", "expected_choked"),
+    [(0.25, False), (1.0, True), (4.0, True)],
+)
+def test_quasi_steady_pressure_uses_poiseuille_and_sonic_branches(
+    source_fraction_of_crossover, expected_choked
+):
+    sim = _transport_sim()
+    sim.overhead_model.pipe_diameter_m = 0.12
+    sim.overhead_model.pipe_length_m = 1.0
+    sim.melt.temperature_C = 1000.0
+    sim.melt.p_total_mbar = 0.0
+    species_kg = {"O2": 1.0}
+    k_kg_s_Pa2 = sim.overhead_model._pipe_conductance(
+        1.0,
+        sim.melt.temperature_C,
+        species_kg_for_M_avg=species_kg,
+    )
+    c_choke_kg_s_Pa = sim.overhead_model._choked_flow_coefficient_kg_s_Pa(
+        sim.melt.temperature_C,
+        species_kg_for_M_avg=species_kg,
+    )
+    gamma = 1.4
+    T_K = sim.melt.temperature_C + 273.15
+    sonic_factor = (2.0 / (gamma + 1.0)) ** (
+        (gamma + 1.0) / (2.0 * (gamma - 1.0))
+    )
+    expected_choke_coefficient_kg_s_Pa = (
+        math.pi * sim.overhead_model.pipe_diameter_m**2 / 4.0
+        * math.sqrt(
+            gamma * (MOLAR_MASS["O2"] / 1000.0)
+            / (STATE_GAS_CONSTANT * T_K)
+        )
+        * sonic_factor
+    )
+    assert c_choke_kg_s_Pa == pytest.approx(
+        expected_choke_coefficient_kg_s_Pa, rel=1.0e-12
+    )
+    crossover_source_kg_s = c_choke_kg_s_Pa**2 / k_kg_s_Pa2
+    source_mass_kg_s = (
+        source_fraction_of_crossover * crossover_source_kg_s
+    )
+    sim._headspace_transport_source_mass_kg_s = source_mass_kg_s
+
+    pressure_Pa = sim._headspace_quasi_steady_pressure_Pa(
+        p_downstream_Pa=0.0,
+        species_kg_for_M_avg=species_kg,
+    )
+    poiseuille_pressure_Pa = math.sqrt(source_mass_kg_s / k_kg_s_Pa2)
+    choked_pressure_Pa = source_mass_kg_s / c_choke_kg_s_Pa
+    expected_pressure_Pa = max(
+        sim.melt.p_total_mbar * 100.0,
+        poiseuille_pressure_Pa,
+        choked_pressure_Pa,
+    )
+
+    assert pressure_Pa == pytest.approx(expected_pressure_Pa, rel=1.0e-12)
+    assert (choked_pressure_Pa >= poiseuille_pressure_Pa) is expected_choked
+    assert sim._headspace_duct_choked_this_tick is expected_choked
+    if source_fraction_of_crossover == 1.0:
+        assert poiseuille_pressure_Pa == pytest.approx(
+            choked_pressure_Pa, rel=1.0e-12
+        )
+
+
+def test_duct_capacity_is_capped_by_sonic_flow():
+    sim = _transport_sim()
+    sim.overhead_model.pipe_diameter_m = 0.02
+    sim.overhead_model.pipe_length_m = 0.063661977
+    sim.melt.temperature_C = 2200.0
+    species_kg = {"O2": 1.0}
+    pressure_Pa = 1.0e6
+    poiseuille_kg_s = sim.overhead_model._pipe_conductance(
+        pressure_Pa,
+        sim.melt.temperature_C,
+        species_kg_for_M_avg=species_kg,
+    )
+    sonic_kg_s = (
+        sim.overhead_model._choked_flow_coefficient_kg_s_Pa(
+            sim.melt.temperature_C,
+            species_kg_for_M_avg=species_kg,
+        )
+        * pressure_Pa
+    )
+
+    capacity_kg_s = sim.overhead_model._duct_mass_flow_capacity_kg_s(
+        pressure_Pa,
+        sim.melt.temperature_C,
+        species_kg_for_M_avg=species_kg,
+    )
+
+    assert poiseuille_kg_s > sonic_kg_s
+    assert capacity_kg_s == pytest.approx(sonic_kg_s, rel=1.0e-12)
 
 
 def _trace_fe_transport_sim() -> PyrolysisSimulator:
@@ -267,6 +363,303 @@ def test_venting_refuses_missing_duct_geometry():
 
     with pytest.raises(OverheadConfigurationError):
         sim._refresh_oxygen_reservoir_transport_pO2_for_vapor()
+
+
+def test_large_o2_headspace_bolus_pumps_down_and_is_credited_once():
+    sim = _transport_sim()
+    sim._overhead_headspace_config.update({"enabled": True, "volume_m3": 1.0})
+    sim.overhead_model.pipe_diameter_m = 0.01
+    sim.overhead_model.pipe_length_m = 1.0
+    sim.melt.temperature_C = 1000.0
+    sim.melt.atmosphere = Atmosphere.CONTROLLED_O2
+    sim.melt.p_total_mbar = 13.0
+    sim.melt.pO2_mbar = 13.0
+
+    commanded_pressure_Pa = sim.melt.p_total_mbar * 100.0
+    assert sim._headspace_upstream_pressure_Pa() == pytest.approx(
+        commanded_pressure_Pa
+    )
+    o2_kg_per_mol = sim._overhead_holdup_species_kg({"O2": 1.0})["O2"]
+    commanded_pipe_capacity_kg_hr = sim.overhead_model._pipe_conductance(
+        commanded_pressure_Pa,
+        sim.melt.temperature_C,
+        p_downstream_Pa=0.0,
+        species_kg_for_M_avg={"O2": 1.0},
+    ) * 3600.0
+    bolus_kg = max(2.0 * commanded_pipe_capacity_kg_hr, 0.1)
+    bolus_mol = bolus_kg / o2_kg_per_mol
+    sim.atom_ledger.load_external_mol(
+        "process.overhead_gas",
+        {"O2": bolus_mol},
+        source="test finite headspace O2 bolus",
+        material_origin="feedstock",
+    )
+
+    initial_pressure_Pa = sim._headspace_upstream_pressure_Pa()
+    initial_species_kg = sim._overhead_holdup_species_kg()
+    initial_mass_kg = sum(initial_species_kg.values())
+    poiseuille_pipe_capacity_kg_hr = sim.overhead_model._pipe_conductance(
+        initial_pressure_Pa,
+        sim.melt.temperature_C,
+        p_downstream_Pa=0.0,
+        species_kg_for_M_avg=initial_species_kg,
+    ) * 3600.0
+    choked_pipe_capacity_kg_hr = (
+        sim.overhead_model._choked_flow_coefficient_kg_s_Pa(
+            sim.melt.temperature_C,
+            species_kg_for_M_avg=initial_species_kg,
+        )
+        * initial_pressure_Pa
+        * 3600.0
+    )
+    true_pipe_capacity_kg_hr = min(
+        poiseuille_pipe_capacity_kg_hr,
+        choked_pipe_capacity_kg_hr,
+    )
+    assert commanded_pipe_capacity_kg_hr < initial_mass_kg
+    # k(P_up²-P_down²) makes the one-tick capacity exceed the whole bolus at
+    # its true pressure, so the bounded result is the 13 mbar setpoint.
+    assert true_pipe_capacity_kg_hr >= initial_mass_kg
+
+    flux = EvaporationFlux(species_kg_hr={"O2": 1.0})
+    flux.update_totals()
+    controlled_poiseuille_capacity_kg_hr = (
+        sim.overhead_model._pipe_conductance(
+            initial_pressure_Pa,
+            sim.melt.temperature_C,
+            p_downstream_Pa=0.0,
+            species_kg_for_M_avg=flux.species_kg_hr,
+        ) * 3600.0
+    )
+    controlled_choked_capacity_kg_hr = (
+        sim.overhead_model._choked_flow_coefficient_kg_s_Pa(
+            sim.melt.temperature_C,
+            species_kg_for_M_avg=flux.species_kg_hr,
+        )
+        * initial_pressure_Pa
+        * 3600.0
+    )
+    true_controlled_pipe_capacity_kg_hr = min(
+        controlled_poiseuille_capacity_kg_hr,
+        controlled_choked_capacity_kg_hr,
+    )
+    controlled = sim._controlled_o2_transport_capacity(flux)
+    assert controlled is not None
+    assert controlled.upstream_pressure_bar == pytest.approx(
+        initial_pressure_Pa / 1.0e5
+    )
+    assert controlled.pipe_capacity_kg_hr == pytest.approx(
+        true_controlled_pipe_capacity_kg_hr
+    )
+
+    sim.melt.atmosphere = Atmosphere.HARD_VACUUM
+    assert sim._headspace_bleed_conductance_kg_s() * 3600.0 == pytest.approx(
+        true_pipe_capacity_kg_hr
+    )
+    transitions_before = len(sim.atom_ledger.transitions)
+    offgas_account = "terminal.oxygen_melt_offgas_stored"
+    offgas_before_mol = sim.atom_ledger.mol_by_account(offgas_account).get(
+        "O2", 0.0
+    )
+
+    sim._dispatch_overhead_bleed()
+
+    remaining_mol = sim.atom_ledger.mol_by_account(
+        "process.overhead_gas"
+    ).get("O2", 0.0)
+    removed_mol = bolus_mol - remaining_mol
+    offgas_after_mol = sim.atom_ledger.mol_by_account(offgas_account).get(
+        "O2", 0.0
+    )
+    target_mol = (
+        commanded_pressure_Pa
+        * sim._headspace_volume_m3()
+        / (STATE_GAS_CONSTANT * sim._headspace_temperature_K())
+    )
+    assert remaining_mol == pytest.approx(target_mol, rel=1e-12)
+    assert offgas_after_mol - offgas_before_mol == pytest.approx(
+        removed_mol
+    )
+    assert sim._headspace_upstream_pressure_Pa() == pytest.approx(
+        commanded_pressure_Pa
+    )
+    for transition in sim.atom_ledger.transitions[transitions_before:]:
+        transition.validate_conservation(sim.atom_ledger.registry)
+
+
+@pytest.mark.parametrize("outlet_config", ["headspace", "train"])
+def test_quasi_steady_bleed_uses_configured_outlet_pressure(outlet_config):
+    sim = _transport_sim()
+    sim._overhead_headspace_config.update({"enabled": True, "volume_m3": 1.0})
+    sim.overhead_model.pipe_diameter_m = 0.12
+    sim.overhead_model.pipe_length_m = 1.0
+    sim.melt.temperature_C = 1000.0
+    sim.melt.atmosphere = Atmosphere.CONTROLLED_O2
+    sim.melt.p_total_mbar = 13.0
+    sim.melt.pO2_mbar = 13.0
+    outlet_pressure_bar = 0.2
+    if outlet_config == "headspace":
+        sim._overhead_headspace_config["downstream_pressure_bar"] = (
+            outlet_pressure_bar
+        )
+    else:
+        sim.overhead_model._downstream_pressure_override = outlet_pressure_bar
+
+    initial_pressure_Pa = 0.3e5
+    initial_mol = (
+        initial_pressure_Pa
+        * sim._headspace_volume_m3()
+        / (STATE_GAS_CONSTANT * sim._headspace_temperature_K())
+    )
+    sim.atom_ledger.load_external_mol(
+        "process.overhead_gas",
+        {"O2": initial_mol},
+        source="configured-outlet headspace pressure test",
+        material_origin="feedstock",
+    )
+
+    sim._dispatch_overhead_bleed()
+
+    remaining_mol = sum(sim._overhead_holdup_mol().values())
+    actual_pressure_bar = (
+        remaining_mol
+        * STATE_GAS_CONSTANT
+        * sim._headspace_temperature_K()
+        / sim._headspace_volume_m3()
+        / 1.0e5
+    )
+    assert actual_pressure_bar == pytest.approx(outlet_pressure_bar, rel=1.0e-12)
+
+
+def test_stale_headspace_bolus_drains_to_command_when_source_stops():
+    sim = _transport_sim()
+    sim._overhead_headspace_config.update({"enabled": True, "volume_m3": 1.0})
+    sim.overhead_model.pipe_diameter_m = 0.12
+    sim.overhead_model.pipe_length_m = 1.0
+    sim.melt.temperature_C = 1000.0
+    sim.melt.atmosphere = Atmosphere.HARD_VACUUM
+    sim.melt.p_total_mbar = 13.0
+    steady_pressure_Pa = 0.3e5
+    species_basis = {"O2": 1.0}
+    k_kg_s_Pa2 = sim.overhead_model._pipe_conductance(
+        1.0,
+        sim.melt.temperature_C,
+        p_downstream_Pa=0.0,
+        species_kg_for_M_avg=species_basis,
+    )
+    sim._headspace_transport_source_mass_kg_s = (
+        k_kg_s_Pa2 * steady_pressure_Pa**2
+    )
+    bolus_mol = (
+        steady_pressure_Pa
+        * sim._headspace_volume_m3()
+        / (STATE_GAS_CONSTANT * sim._headspace_temperature_K())
+    )
+    sim.atom_ledger.load_external_mol(
+        "process.overhead_gas",
+        {"O2": bolus_mol},
+        source="stale headspace bolus test",
+        material_origin="feedstock",
+    )
+
+    sim._dispatch_overhead_bleed()
+    after_source_mol = sum(sim._overhead_holdup_mol().values())
+    source_pressure_Pa = (
+        after_source_mol
+        * STATE_GAS_CONSTANT
+        * sim._headspace_temperature_K()
+        / sim._headspace_volume_m3()
+    )
+    assert source_pressure_Pa == pytest.approx(steady_pressure_Pa, rel=1.0e-12)
+
+    sim._headspace_transport_source_mass_kg_s = 0.0
+    sim._dispatch_overhead_bleed()
+    final_pressure_Pa = (
+        sum(sim._overhead_holdup_mol().values())
+        * STATE_GAS_CONSTANT
+        * sim._headspace_temperature_K()
+        / sim._headspace_volume_m3()
+    )
+    assert final_pressure_Pa == pytest.approx(13.0e2, rel=1.0e-12)
+
+
+def test_steady_headspace_source_reaches_pressure_and_removes_source_each_tick():
+    sim = _transport_sim()
+    sim._overhead_headspace_config.update({"enabled": True, "volume_m3": 1.0})
+    sim.overhead_model.pipe_diameter_m = 0.01
+    sim.overhead_model.pipe_length_m = 1.0
+    sim.melt.temperature_C = 1000.0
+    sim.melt.atmosphere = Atmosphere.HARD_VACUUM
+    sim.melt.p_total_mbar = 13.0
+
+    commanded_pressure_Pa = sim.melt.p_total_mbar * 100.0
+    volume_m3 = sim._headspace_volume_m3()
+    temperature_K = sim._headspace_temperature_K()
+    species_basis = {"O2": 1.0}
+    k_kg_s_Pa2 = sim.overhead_model._pipe_conductance(
+        1.0,
+        sim.melt.temperature_C,
+        p_downstream_Pa=0.0,
+        species_kg_for_M_avg=species_basis,
+    )
+    assert k_kg_s_Pa2 > 0.0
+    steady_pressure_Pa = 2.0 * commanded_pressure_Pa
+    source_mass_kg_s = k_kg_s_Pa2 * steady_pressure_Pa ** 2
+    oxygen_molar_mass_kg_mol = core_module.OXYGEN_MOLAR_MASS_KG_PER_MOL
+    source_mol_per_tick = source_mass_kg_s * 3600.0 / oxygen_molar_mass_kg_mol
+
+    sim.atom_ledger.load_external_mol(
+        "process.overhead_gas",
+        {
+            "O2": (
+                commanded_pressure_Pa * volume_m3
+                / (STATE_GAS_CONSTANT * temperature_K)
+            )
+        },
+        source="steady-headspace test setpoint inventory",
+        material_origin="feedstock",
+    )
+
+    removed_per_tick = []
+    pressure_per_tick = []
+    for hour in range(2):
+        sim.atom_ledger.load_external_mol(
+            "process.overhead_gas",
+            {"O2": source_mol_per_tick},
+            source=f"steady-headspace test source hour {hour + 1}",
+            material_origin="feedstock",
+        )
+        sim._headspace_transport_source_mass_kg_s = source_mass_kg_s
+        sim._headspace_transport_source_total_mol_s = (
+            source_mass_kg_s / oxygen_molar_mass_kg_mol
+        )
+        sim._headspace_transport_source_o2_mol_s = (
+            source_mass_kg_s / oxygen_molar_mass_kg_mol
+        )
+        before_mol = sum(sim._overhead_holdup_mol().values())
+        result = sim._dispatch_overhead_bleed()
+        after_mol = sum(sim._overhead_holdup_mol().values())
+        removed_per_tick.append(before_mol - after_mol)
+        pressure_per_tick.append(
+            after_mol * STATE_GAS_CONSTANT * temperature_K / volume_m3
+        )
+        expected_remaining_mol = (
+            steady_pressure_Pa * volume_m3
+            / (STATE_GAS_CONSTANT * temperature_K)
+        )
+        assert removed_per_tick[-1] == pytest.approx(
+            max(0.0, before_mol - expected_remaining_mol), rel=1.0e-12
+        )
+        assert result.status == "ok"
+
+    assert pressure_per_tick == pytest.approx(
+        [steady_pressure_Pa, steady_pressure_Pa], rel=1.0e-12
+    )
+    # First tick fills the difference between commanded and steady inventory;
+    # once at steady state, the next tick's removal equals its source exactly.
+    assert removed_per_tick[1] == pytest.approx(
+        source_mol_per_tick, rel=1.0e-12
+    )
 
 
 def test_evaporation_buffer_source_reaches_transport_ledger():
@@ -508,6 +901,97 @@ def test_absent_m4_interface_diagnostic_uses_gas_pressure():
     assert diagnostic['limiting_regime'] == 'gas_side_fe_saturation_bound'
 
 
+def test_interface_po2_uses_finite_two_film_force_and_publishes_regime():
+    """The release boundary uses finite ledger O2 inventory, not a tangent law."""
+
+    sim = _transport_sim()
+    sim.melt.temperature_C = 1500.0 - 273.15
+    sim.melt.atmosphere = Atmosphere.PN2_SWEEP
+    sim._overhead_headspace_config['enabled'] = True
+    # 100 mbar puts the declared 12 cm duct in the continuum Sherwood branch;
+    # the lunar C0 vacuum path below is separately covered by the inf limit.
+    sim.melt.p_total_mbar = 100.0
+    sim._melt_headspace_composition_mbar = {'N2': 1.0}
+    sim.atom_ledger.load_external_mol(
+        'process.cleaned_melt',
+        {'Fe2O3': 100.0},
+        source='test ferric melt for committed interface exchange',
+        material_origin='feedstock',
+    )
+    sim._project_cleaned_melt_from_atom_ledger()
+    sim._melt_redox_ledger_initialized = True
+    sim._sync_oxygen_reservoir_mirror()
+    sim.overhead.composition = {'N2': 1.0e6}
+    gas_k_with_downstream_report, gas_source = (
+        sim._oxygen_interface_gas_side_k_m_s(1773.15)
+    )
+    sim.overhead.composition = {}
+    gas_k_without_downstream_report, _ = (
+        sim._oxygen_interface_gas_side_k_m_s(1773.15)
+    )
+    assert gas_source == 'evaporation_sherwood_chapman_enskog_O2'
+    assert gas_k_with_downstream_report == pytest.approx(
+        gas_k_without_downstream_report
+    )
+    reservoir = sim.melt.oxygen_reservoir
+    reservoir.headspace_transport_pO2_bar = 1.0e-6
+
+    sim._apply_oxygen_reservoir_exchange()
+    interface_pO2_bar = sim._interface_pO2_bar()
+    diagnostic = sim._last_oxygen_interface_diagnostic
+    gas_k = diagnostic['gas_side_k_m_s']
+    melt_k = diagnostic['melt_side_k_O_m_s']
+    transport_pO2_bar = reservoir.headspace_transport_pO2_bar
+    melt_pO2_bar = diagnostic['melt_intrinsic_pO2_bar']
+    gas_temperature_K = float(
+        getattr(sim.overhead, 'headspace_temperature_K', 0.0)
+        or sim.melt.temperature_C + 273.15
+    )
+    gas_pressure_factor = 1.0e5 / (STATE_GAS_CONSTANT * gas_temperature_K)
+    melt_depth_m = float(
+        sim.setpoints['sso_r']['oxygen_exchange']['effective_melt_depth_m']
+    )
+    gas_flux = gas_k * gas_pressure_factor * (
+        transport_pO2_bar - interface_pO2_bar
+    )
+    melt_flux = melt_k * diagnostic['finite_melt_driving_force_mol'] / (
+        sim.melt.melt_surface_area_m2 * melt_depth_m
+    )
+    assert math.isfinite(gas_k) and gas_k > 0.0
+    assert diagnostic['finite_melt_driving_force_mol'] == pytest.approx(
+        diagnostic['melt_oxygen_equilibrium_mol']
+        - diagnostic['melt_oxygen_ledger_mol']
+    )
+    # The root stays inside the melt and transport pressures. When those two
+    # pressures coincide, an exact closed bracket rejects the rounding.
+    low_pO2_bar = min(transport_pO2_bar, melt_pO2_bar)
+    high_pO2_bar = max(transport_pO2_bar, melt_pO2_bar)
+    bracket_ulp = 8.0 * max(low_pO2_bar, high_pO2_bar, 1.0e-30) * 2.220446049250313e-16
+    assert low_pO2_bar - bracket_ulp <= interface_pO2_bar <= high_pO2_bar + bracket_ulp
+    if diagnostic['interface_root_clamped']:
+        # A native-Fe/FeO endpoint can put formal Kress91 equilibrium outside
+        # the gas/melt pressure bracket, so the diagnostic must expose that.
+        assert diagnostic['interface_root_residual_mol_m2_s'] != pytest.approx(
+            0.0,
+            abs=2.0e-14,
+        )
+    else:
+        assert gas_flux == pytest.approx(melt_flux, rel=1.0e-10, abs=2.0e-14)
+        assert diagnostic['interface_flux_mol_m2_s'] == pytest.approx(
+            gas_flux,
+            rel=1.0e-10,
+            abs=2.0e-14,
+        )
+    assert reservoir.interface_pO2_bar == pytest.approx(interface_pO2_bar)
+    assert reservoir.interface_pO2_limiting_regime == diagnostic[
+        'limiting_regime'
+    ]
+    assert diagnostic['limiting_regime'] in {
+        'gas_side_limited',
+        'melt_side_limited',
+    }
+
+
 def test_finite_interface_root_conserves_flux_for_interior_inventory():
     sim = _transport_sim()
     sim.melt.temperature_C = 1500.0 - 273.15
@@ -745,6 +1229,85 @@ def test_trace_fe_directional_inventory_uses_mole_log_inverse():
         [sample[5] for sample in samples]
     )
     for fO2_log, domain, interface_pO2_bar, sio_p, _, _ in samples:
+        assert domain['basis'] == 'kress91_inverse'
+        melt_pO2_bar = 10.0 ** fO2_log
+        assert min(melt_pO2_bar, transport_pO2_bar) * (1.0 - 1.0e-6) <= (
+            interface_pO2_bar
+        )
+        assert interface_pO2_bar <= max(melt_pO2_bar, transport_pO2_bar) * (
+            1.0 + 1.0e-6
+        )
+        assert math.isfinite(sio_p) and sio_p > 0.0
+
+
+def test_trace_fe_directional_inventory_uses_ledger_inverse(monkeypatch):
+    sim = _trace_fe_transport_sim()
+    melt_mol = sim.atom_ledger.project_account_mol('process.cleaned_melt')
+    feo_mol = float(melt_mol['FeO'])
+    fe2o3_mol = float(melt_mol['Fe2O3'])
+    mol_fractions = core_module.melt_mol_fractions_for_kress91(
+        sim._cleaned_melt_ledger_wt_pct() or sim._melt_oxide_wt_pct()
+    )
+    ln_ratio = math.log(fe2o3_mol) - math.log(feo_mol)
+    b_term = core_module._kress91_ln_ratio(
+        mol_fractions=mol_fractions,
+        T_K=sim.melt.temperature_C + 273.15,
+        pressure_bar=sim.melt.p_total_mbar / 1000.0,
+    )
+    expected_fO2_log = (ln_ratio - b_term) / (
+        core_module.KRESS91_LN_FO2_COEFFICIENT * math.log(10.0)
+    )
+    ratios = iter((0.03, 0.9999))
+
+    def changing_ledger_ratio():
+        return next(ratios, 0.9999)
+
+    monkeypatch.setattr(sim, '_ledger_fe3_over_sigma_fe', changing_ledger_ratio)
+
+    inverse_evaluations = []
+    inverse = core_module.kress91_log_fO2_from_fe3_over_sigma_fe
+
+    def record_inverse(**kwargs):
+        result = inverse(**kwargs)
+        inverse_evaluations.append((
+            float(kwargs['fe3_over_sigma_fe']),
+            result,
+        ))
+        return result
+
+    monkeypatch.setattr(
+        core_module,
+        'kress91_log_fO2_from_fe3_over_sigma_fe',
+        record_inverse,
+    )
+
+    samples = []
+    expected_ferric_inputs = (0.03, 0.9999)
+    for expected_ferric_input in expected_ferric_inputs:
+        ferric_input = sim._ledger_fe3_over_sigma_fe()
+        assert ferric_input == pytest.approx(expected_ferric_input)
+        fO2_log = sim._current_melt_redox_fO2_log()
+        domain = dict(sim._last_redox_domain)
+        interface_pO2_bar = sim._interface_pO2_bar()
+        equilibrium = sim._internal_analytical_equilibrium()
+        samples.append((
+            fO2_log,
+            domain,
+            interface_pO2_bar,
+            float(equilibrium.vapor_pressures_Pa['SiO']),
+            ferric_input,
+        ))
+
+    transport_pO2_bar = sim.melt.oxygen_reservoir.headspace_transport_pO2_bar
+    assert transport_pO2_bar == pytest.approx(1.0e-6)
+    assert [sample[4] for sample in samples] == pytest.approx(
+        expected_ferric_inputs
+    )
+    assert inverse_evaluations == []
+    assert [sample[0] for sample in samples] == pytest.approx(
+        [expected_fO2_log, expected_fO2_log]
+    )
+    for fO2_log, domain, interface_pO2_bar, sio_p, _ in samples:
         assert domain['basis'] == 'kress91_inverse'
         melt_pO2_bar = 10.0 ** fO2_log
         assert min(melt_pO2_bar, transport_pO2_bar) * (1.0 - 1.0e-6) <= (
