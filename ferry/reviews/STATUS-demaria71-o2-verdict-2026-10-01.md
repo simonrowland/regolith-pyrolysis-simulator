@@ -7,6 +7,7 @@
 - **Counts:** P0 0, P1 1, P2 0
 - **Reason:** Extract Table 1 (7/7), 12022 Kushiro/Engel/Na2O/Cr→Cr2O3 attach, cross-bind, and refuse funnel (2× Re `reactive_cell_oxygen_reservoir` + 5× composition refuse; 0 scoreable) all check out on live migrate, but `extracts-v2` was not regenerated after `0ef83826a` — `check_store_freshness.py` STALE; series census missing the seven split O2 store points (same class as Shornikov c6a78).
 - **Deliverable:** `/workspace/ferry-inbox/from-empirical/REVIEW-demaria71-o2-2026-10-01.md`
+- **Mailbox:** `70ed1e25a2e6a0891e310f8176c804dde3b6921e` on `empirical/reviews-batch-zv-2026-09-22`
 - **Date:** 2026-10-01 ~07:45 ET
 
 — regolith-empirical
