@@ -7,7 +7,7 @@
 - **Counts:** P0 0, P1 0, P2 0
 - **Reason:** Quote-only fix for YAML flow-scalar comma splits. Tip extracts: 0 phantom keys (prior 51); 50 Printed + 2 Material notes load full text. Phantom-stripped+note-masked deep-compare tip vs b64efca6f is identity for extracts and extracts-v2 (values/units/exponents/conditions/oids unchanged). Sibling v2 hand-edit restores the 50 truncated composition notes to the fixed v1 string and matches regen content structurally; full migrator not run (heavy); landing regen overwrites dump bytes either way.
 - **Deliverable:** `REVIEW-stolyarova-1995-delta2-2026-10-01.md`
-- **Mailbox tip:** `39242f6b3ded9baa47bf65b32d713b00e757744d` on `empirical/reviews-batch-zv-2026-09-22`
+- **Mailbox tip:** `4480056b5a98381e4e179ded04ded5f45c2ae5d3` on `empirical/reviews-batch-zv-2026-09-22` (artifacts `39242f6b3`)
 - **Date:** 2026-10-01 ~11:58 ET
 
 — regolith-empirical
