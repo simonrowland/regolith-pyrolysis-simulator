@@ -88,8 +88,23 @@ species:
       uncertainty: {note: "The printed ± term is retained in each point; no additional uncertainty was assigned."}
       point_conditions:
         composition:
-          state: {tag: unknown, reason: "Table 2 reports vapor over mullite (3Al2O3·2SiO2); no row-specific mole fraction or weight percent is printed."}
-          locator: {page: 478, published_page: 478, pdf_page_index: 0, table: "2", note: "Mullite formula is stated in the article; no mole fraction or weight percent is tabulated."}
+          state:
+            tag: value
+            value:
+              basis: printed_oxides
+              amount_basis: mole_fraction
+              components:
+              - [Al2O3, '0.6']
+              - [SiO2, '0.4']
+          locator: {page: 478, published_page: 478, pdf_page_index: 0, table: "2", note: "Oxide mole fractions derived from the printed mullite formula 3Al2O3·2SiO2."}
+          method_class: calculated
+          inference:
+            relation: formula_to_oxide_mole_fraction
+            inputs:
+            - "Printed formula: 3Al2O3·2SiO2 (Table 2, p. 478)."
+            - "x_Al2O3 = 3/(3+2) = 0.6; x_SiO2 = 2/(3+2) = 0.4; sum = 1."
+            - "Sanity check: Al2O3 wt fraction = (3×101.961)/(3×101.961 + 2×60.084) = 0.7180 (71.8 wt%)."
+            output_unit: mole_fraction
         total_pressure_Pa:
           state: {tag: unknown, reason: "The article describes Knudsen effusion but prints no numeric in-cell total pressure."}
           locator: {published_page: 479, note: "No numeric KEMS in-cell total pressure is printed."}
@@ -119,8 +134,23 @@ species:
       uncertainty: {note: "The printed ± term is retained in each point; no additional uncertainty was assigned."}
       point_conditions:
         composition:
-          state: {tag: unknown, reason: "Table 2 reports vapor over mullite (3Al2O3·2SiO2); no row-specific mole fraction or weight percent is printed."}
-          locator: {page: 478, published_page: 478, pdf_page_index: 0, table: "2", note: "Mullite formula is stated in the article; no mole fraction or weight percent is tabulated."}
+          state:
+            tag: value
+            value:
+              basis: printed_oxides
+              amount_basis: mole_fraction
+              components:
+              - [Al2O3, '0.6']
+              - [SiO2, '0.4']
+          locator: {page: 478, published_page: 478, pdf_page_index: 0, table: "2", note: "Oxide mole fractions derived from the printed mullite formula 3Al2O3·2SiO2."}
+          method_class: calculated
+          inference:
+            relation: formula_to_oxide_mole_fraction
+            inputs:
+            - "Printed formula: 3Al2O3·2SiO2 (Table 2, p. 478)."
+            - "x_Al2O3 = 3/(3+2) = 0.6; x_SiO2 = 2/(3+2) = 0.4; sum = 1."
+            - "Sanity check: Al2O3 wt fraction = (3×101.961)/(3×101.961 + 2×60.084) = 0.7180 (71.8 wt%)."
+            output_unit: mole_fraction
         total_pressure_Pa:
           state: {tag: unknown, reason: "The article describes Knudsen effusion but prints no numeric in-cell total pressure."}
           locator: {published_page: 479, note: "No numeric KEMS in-cell total pressure is printed."}
@@ -150,8 +180,23 @@ species:
       uncertainty: {note: "The printed ± term is retained in each point; no additional uncertainty was assigned."}
       point_conditions:
         composition:
-          state: {tag: unknown, reason: "Table 2 reports vapor over mullite (3Al2O3·2SiO2); no row-specific mole fraction or weight percent is printed."}
-          locator: {page: 478, published_page: 478, pdf_page_index: 0, table: "2", note: "Mullite formula is stated in the article; no mole fraction or weight percent is tabulated."}
+          state:
+            tag: value
+            value:
+              basis: printed_oxides
+              amount_basis: mole_fraction
+              components:
+              - [Al2O3, '0.6']
+              - [SiO2, '0.4']
+          locator: {page: 478, published_page: 478, pdf_page_index: 0, table: "2", note: "Oxide mole fractions derived from the printed mullite formula 3Al2O3·2SiO2."}
+          method_class: calculated
+          inference:
+            relation: formula_to_oxide_mole_fraction
+            inputs:
+            - "Printed formula: 3Al2O3·2SiO2 (Table 2, p. 478)."
+            - "x_Al2O3 = 3/(3+2) = 0.6; x_SiO2 = 2/(3+2) = 0.4; sum = 1."
+            - "Sanity check: Al2O3 wt fraction = (3×101.961)/(3×101.961 + 2×60.084) = 0.7180 (71.8 wt%)."
+            output_unit: mole_fraction
         total_pressure_Pa:
           state: {tag: unknown, reason: "The article describes Knudsen effusion but prints no numeric in-cell total pressure."}
           locator: {published_page: 479, note: "No numeric KEMS in-cell total pressure is printed."}
@@ -181,8 +226,23 @@ species:
       uncertainty: {note: "The printed ± term is retained in each point; no additional uncertainty was assigned."}
       point_conditions:
         composition:
-          state: {tag: unknown, reason: "Table 2 reports vapor over mullite (3Al2O3·2SiO2); no row-specific mole fraction or weight percent is printed."}
-          locator: {page: 478, published_page: 478, pdf_page_index: 0, table: "2", note: "Mullite formula is stated in the article; no mole fraction or weight percent is tabulated."}
+          state:
+            tag: value
+            value:
+              basis: printed_oxides
+              amount_basis: mole_fraction
+              components:
+              - [Al2O3, '0.6']
+              - [SiO2, '0.4']
+          locator: {page: 478, published_page: 478, pdf_page_index: 0, table: "2", note: "Oxide mole fractions derived from the printed mullite formula 3Al2O3·2SiO2."}
+          method_class: calculated
+          inference:
+            relation: formula_to_oxide_mole_fraction
+            inputs:
+            - "Printed formula: 3Al2O3·2SiO2 (Table 2, p. 478)."
+            - "x_Al2O3 = 3/(3+2) = 0.6; x_SiO2 = 2/(3+2) = 0.4; sum = 1."
+            - "Sanity check: Al2O3 wt fraction = (3×101.961)/(3×101.961 + 2×60.084) = 0.7180 (71.8 wt%)."
+            output_unit: mole_fraction
         total_pressure_Pa:
           state: {tag: unknown, reason: "The article describes Knudsen effusion but prints no numeric in-cell total pressure."}
           locator: {published_page: 479, note: "No numeric KEMS in-cell total pressure is printed."}
@@ -214,8 +274,23 @@ species:
       uncertainty: {note: "The printed ± term is retained in each point; no additional uncertainty was assigned."}
       point_conditions:
         composition:
-          state: {tag: unknown, reason: "Table 2 reports vapor over mullite (3Al2O3·2SiO2); no row-specific mole fraction or weight percent is printed."}
-          locator: {page: 478, published_page: 478, pdf_page_index: 0, table: "2", note: "Mullite formula is stated in the article; no mole fraction or weight percent is tabulated."}
+          state:
+            tag: value
+            value:
+              basis: printed_oxides
+              amount_basis: mole_fraction
+              components:
+              - [Al2O3, '0.6']
+              - [SiO2, '0.4']
+          locator: {page: 478, published_page: 478, pdf_page_index: 0, table: "2", note: "Oxide mole fractions derived from the printed mullite formula 3Al2O3·2SiO2."}
+          method_class: calculated
+          inference:
+            relation: formula_to_oxide_mole_fraction
+            inputs:
+            - "Printed formula: 3Al2O3·2SiO2 (Table 2, p. 478)."
+            - "x_Al2O3 = 3/(3+2) = 0.6; x_SiO2 = 2/(3+2) = 0.4; sum = 1."
+            - "Sanity check: Al2O3 wt fraction = (3×101.961)/(3×101.961 + 2×60.084) = 0.7180 (71.8 wt%)."
+            output_unit: mole_fraction
         total_pressure_Pa:
           state: {tag: unknown, reason: "The article describes Knudsen effusion but prints no numeric in-cell total pressure."}
           locator: {published_page: 479, note: "No numeric KEMS in-cell total pressure is printed."}
@@ -245,8 +320,23 @@ species:
       uncertainty: {note: "The printed ± term is retained in each point; no additional uncertainty was assigned."}
       point_conditions:
         composition:
-          state: {tag: unknown, reason: "Table 2 reports vapor over mullite (3Al2O3·2SiO2); no row-specific mole fraction or weight percent is printed."}
-          locator: {page: 478, published_page: 478, pdf_page_index: 0, table: "2", note: "Mullite formula is stated in the article; no mole fraction or weight percent is tabulated."}
+          state:
+            tag: value
+            value:
+              basis: printed_oxides
+              amount_basis: mole_fraction
+              components:
+              - [Al2O3, '0.6']
+              - [SiO2, '0.4']
+          locator: {page: 478, published_page: 478, pdf_page_index: 0, table: "2", note: "Oxide mole fractions derived from the printed mullite formula 3Al2O3·2SiO2."}
+          method_class: calculated
+          inference:
+            relation: formula_to_oxide_mole_fraction
+            inputs:
+            - "Printed formula: 3Al2O3·2SiO2 (Table 2, p. 478)."
+            - "x_Al2O3 = 3/(3+2) = 0.6; x_SiO2 = 2/(3+2) = 0.4; sum = 1."
+            - "Sanity check: Al2O3 wt fraction = (3×101.961)/(3×101.961 + 2×60.084) = 0.7180 (71.8 wt%)."
+            output_unit: mole_fraction
         total_pressure_Pa:
           state: {tag: unknown, reason: "The article describes Knudsen effusion but prints no numeric in-cell total pressure."}
           locator: {published_page: 479, note: "No numeric KEMS in-cell total pressure is printed."}
@@ -276,8 +366,23 @@ species:
       uncertainty: {note: "The printed ± term is retained in each point; no additional uncertainty was assigned."}
       point_conditions:
         composition:
-          state: {tag: unknown, reason: "Table 2 reports vapor over mullite (3Al2O3·2SiO2); no row-specific mole fraction or weight percent is printed."}
-          locator: {page: 478, published_page: 478, pdf_page_index: 0, table: "2", note: "Mullite formula is stated in the article; no mole fraction or weight percent is tabulated."}
+          state:
+            tag: value
+            value:
+              basis: printed_oxides
+              amount_basis: mole_fraction
+              components:
+              - [Al2O3, '0.6']
+              - [SiO2, '0.4']
+          locator: {page: 478, published_page: 478, pdf_page_index: 0, table: "2", note: "Oxide mole fractions derived from the printed mullite formula 3Al2O3·2SiO2."}
+          method_class: calculated
+          inference:
+            relation: formula_to_oxide_mole_fraction
+            inputs:
+            - "Printed formula: 3Al2O3·2SiO2 (Table 2, p. 478)."
+            - "x_Al2O3 = 3/(3+2) = 0.6; x_SiO2 = 2/(3+2) = 0.4; sum = 1."
+            - "Sanity check: Al2O3 wt fraction = (3×101.961)/(3×101.961 + 2×60.084) = 0.7180 (71.8 wt%)."
+            output_unit: mole_fraction
         total_pressure_Pa:
           state: {tag: unknown, reason: "The article describes Knudsen effusion but prints no numeric in-cell total pressure."}
           locator: {published_page: 479, note: "No numeric KEMS in-cell total pressure is printed."}
@@ -309,8 +414,23 @@ species:
       uncertainty: {note: "The printed ± term is retained in each point; no additional uncertainty was assigned."}
       point_conditions:
         composition:
-          state: {tag: unknown, reason: "Table 2 reports vapor over mullite (3Al2O3·2SiO2); no row-specific mole fraction or weight percent is printed."}
-          locator: {page: 478, published_page: 478, pdf_page_index: 0, table: "2", note: "Mullite formula is stated in the article; no mole fraction or weight percent is tabulated."}
+          state:
+            tag: value
+            value:
+              basis: printed_oxides
+              amount_basis: mole_fraction
+              components:
+              - [Al2O3, '0.6']
+              - [SiO2, '0.4']
+          locator: {page: 478, published_page: 478, pdf_page_index: 0, table: "2", note: "Oxide mole fractions derived from the printed mullite formula 3Al2O3·2SiO2."}
+          method_class: calculated
+          inference:
+            relation: formula_to_oxide_mole_fraction
+            inputs:
+            - "Printed formula: 3Al2O3·2SiO2 (Table 2, p. 478)."
+            - "x_Al2O3 = 3/(3+2) = 0.6; x_SiO2 = 2/(3+2) = 0.4; sum = 1."
+            - "Sanity check: Al2O3 wt fraction = (3×101.961)/(3×101.961 + 2×60.084) = 0.7180 (71.8 wt%)."
+            output_unit: mole_fraction
         total_pressure_Pa:
           state: {tag: unknown, reason: "The article describes Knudsen effusion but prints no numeric in-cell total pressure."}
           locator: {published_page: 479, note: "No numeric KEMS in-cell total pressure is printed."}
@@ -340,8 +460,23 @@ species:
       uncertainty: {note: "The printed ± term is retained in each point; no additional uncertainty was assigned."}
       point_conditions:
         composition:
-          state: {tag: unknown, reason: "Table 2 reports vapor over mullite (3Al2O3·2SiO2); no row-specific mole fraction or weight percent is printed."}
-          locator: {page: 478, published_page: 478, pdf_page_index: 0, table: "2", note: "Mullite formula is stated in the article; no mole fraction or weight percent is tabulated."}
+          state:
+            tag: value
+            value:
+              basis: printed_oxides
+              amount_basis: mole_fraction
+              components:
+              - [Al2O3, '0.6']
+              - [SiO2, '0.4']
+          locator: {page: 478, published_page: 478, pdf_page_index: 0, table: "2", note: "Oxide mole fractions derived from the printed mullite formula 3Al2O3·2SiO2."}
+          method_class: calculated
+          inference:
+            relation: formula_to_oxide_mole_fraction
+            inputs:
+            - "Printed formula: 3Al2O3·2SiO2 (Table 2, p. 478)."
+            - "x_Al2O3 = 3/(3+2) = 0.6; x_SiO2 = 2/(3+2) = 0.4; sum = 1."
+            - "Sanity check: Al2O3 wt fraction = (3×101.961)/(3×101.961 + 2×60.084) = 0.7180 (71.8 wt%)."
+            output_unit: mole_fraction
         total_pressure_Pa:
           state: {tag: unknown, reason: "The article describes Knudsen effusion but prints no numeric in-cell total pressure."}
           locator: {published_page: 479, note: "No numeric KEMS in-cell total pressure is printed."}
@@ -371,8 +506,23 @@ species:
       uncertainty: {note: "The printed ± term is retained in each point; no additional uncertainty was assigned."}
       point_conditions:
         composition:
-          state: {tag: unknown, reason: "Table 2 reports vapor over mullite (3Al2O3·2SiO2); no row-specific mole fraction or weight percent is printed."}
-          locator: {page: 478, published_page: 478, pdf_page_index: 0, table: "2", note: "Mullite formula is stated in the article; no mole fraction or weight percent is tabulated."}
+          state:
+            tag: value
+            value:
+              basis: printed_oxides
+              amount_basis: mole_fraction
+              components:
+              - [Al2O3, '0.6']
+              - [SiO2, '0.4']
+          locator: {page: 478, published_page: 478, pdf_page_index: 0, table: "2", note: "Oxide mole fractions derived from the printed mullite formula 3Al2O3·2SiO2."}
+          method_class: calculated
+          inference:
+            relation: formula_to_oxide_mole_fraction
+            inputs:
+            - "Printed formula: 3Al2O3·2SiO2 (Table 2, p. 478)."
+            - "x_Al2O3 = 3/(3+2) = 0.6; x_SiO2 = 2/(3+2) = 0.4; sum = 1."
+            - "Sanity check: Al2O3 wt fraction = (3×101.961)/(3×101.961 + 2×60.084) = 0.7180 (71.8 wt%)."
+            output_unit: mole_fraction
         total_pressure_Pa:
           state: {tag: unknown, reason: "The article describes Knudsen effusion but prints no numeric in-cell total pressure."}
           locator: {published_page: 479, note: "No numeric KEMS in-cell total pressure is printed."}
@@ -404,8 +554,23 @@ species:
       uncertainty: {note: "The printed ± term is retained in each point; no additional uncertainty was assigned."}
       point_conditions:
         composition:
-          state: {tag: unknown, reason: "Table 2 reports vapor over mullite (3Al2O3·2SiO2); no row-specific mole fraction or weight percent is printed."}
-          locator: {page: 478, published_page: 478, pdf_page_index: 0, table: "2", note: "Mullite formula is stated in the article; no mole fraction or weight percent is tabulated."}
+          state:
+            tag: value
+            value:
+              basis: printed_oxides
+              amount_basis: mole_fraction
+              components:
+              - [Al2O3, '0.6']
+              - [SiO2, '0.4']
+          locator: {page: 478, published_page: 478, pdf_page_index: 0, table: "2", note: "Oxide mole fractions derived from the printed mullite formula 3Al2O3·2SiO2."}
+          method_class: calculated
+          inference:
+            relation: formula_to_oxide_mole_fraction
+            inputs:
+            - "Printed formula: 3Al2O3·2SiO2 (Table 2, p. 478)."
+            - "x_Al2O3 = 3/(3+2) = 0.6; x_SiO2 = 2/(3+2) = 0.4; sum = 1."
+            - "Sanity check: Al2O3 wt fraction = (3×101.961)/(3×101.961 + 2×60.084) = 0.7180 (71.8 wt%)."
+            output_unit: mole_fraction
         total_pressure_Pa:
           state: {tag: unknown, reason: "The article describes Knudsen effusion but prints no numeric in-cell total pressure."}
           locator: {published_page: 479, note: "No numeric KEMS in-cell total pressure is printed."}
@@ -435,8 +600,23 @@ species:
       uncertainty: {note: "The printed ± term is retained in each point; no additional uncertainty was assigned."}
       point_conditions:
         composition:
-          state: {tag: unknown, reason: "Table 2 reports vapor over mullite (3Al2O3·2SiO2); no row-specific mole fraction or weight percent is printed."}
-          locator: {page: 478, published_page: 478, pdf_page_index: 0, table: "2", note: "Mullite formula is stated in the article; no mole fraction or weight percent is tabulated."}
+          state:
+            tag: value
+            value:
+              basis: printed_oxides
+              amount_basis: mole_fraction
+              components:
+              - [Al2O3, '0.6']
+              - [SiO2, '0.4']
+          locator: {page: 478, published_page: 478, pdf_page_index: 0, table: "2", note: "Oxide mole fractions derived from the printed mullite formula 3Al2O3·2SiO2."}
+          method_class: calculated
+          inference:
+            relation: formula_to_oxide_mole_fraction
+            inputs:
+            - "Printed formula: 3Al2O3·2SiO2 (Table 2, p. 478)."
+            - "x_Al2O3 = 3/(3+2) = 0.6; x_SiO2 = 2/(3+2) = 0.4; sum = 1."
+            - "Sanity check: Al2O3 wt fraction = (3×101.961)/(3×101.961 + 2×60.084) = 0.7180 (71.8 wt%)."
+            output_unit: mole_fraction
         total_pressure_Pa:
           state: {tag: unknown, reason: "The article describes Knudsen effusion but prints no numeric in-cell total pressure."}
           locator: {published_page: 479, note: "No numeric KEMS in-cell total pressure is printed."}
@@ -466,8 +646,23 @@ species:
       uncertainty: {note: "The printed ± term is retained in each point; no additional uncertainty was assigned."}
       point_conditions:
         composition:
-          state: {tag: unknown, reason: "Table 2 reports vapor over mullite (3Al2O3·2SiO2); no row-specific mole fraction or weight percent is printed."}
-          locator: {page: 478, published_page: 478, pdf_page_index: 0, table: "2", note: "Mullite formula is stated in the article; no mole fraction or weight percent is tabulated."}
+          state:
+            tag: value
+            value:
+              basis: printed_oxides
+              amount_basis: mole_fraction
+              components:
+              - [Al2O3, '0.6']
+              - [SiO2, '0.4']
+          locator: {page: 478, published_page: 478, pdf_page_index: 0, table: "2", note: "Oxide mole fractions derived from the printed mullite formula 3Al2O3·2SiO2."}
+          method_class: calculated
+          inference:
+            relation: formula_to_oxide_mole_fraction
+            inputs:
+            - "Printed formula: 3Al2O3·2SiO2 (Table 2, p. 478)."
+            - "x_Al2O3 = 3/(3+2) = 0.6; x_SiO2 = 2/(3+2) = 0.4; sum = 1."
+            - "Sanity check: Al2O3 wt fraction = (3×101.961)/(3×101.961 + 2×60.084) = 0.7180 (71.8 wt%)."
+            output_unit: mole_fraction
         total_pressure_Pa:
           state: {tag: unknown, reason: "The article describes Knudsen effusion but prints no numeric in-cell total pressure."}
           locator: {published_page: 479, note: "No numeric KEMS in-cell total pressure is printed."}
@@ -499,8 +694,23 @@ species:
       uncertainty: {note: "The printed ± term is retained in each point; no additional uncertainty was assigned."}
       point_conditions:
         composition:
-          state: {tag: unknown, reason: "Table 2 reports vapor over mullite (3Al2O3·2SiO2); no row-specific mole fraction or weight percent is printed."}
-          locator: {page: 478, published_page: 478, pdf_page_index: 0, table: "2", note: "Mullite formula is stated in the article; no mole fraction or weight percent is tabulated."}
+          state:
+            tag: value
+            value:
+              basis: printed_oxides
+              amount_basis: mole_fraction
+              components:
+              - [Al2O3, '0.6']
+              - [SiO2, '0.4']
+          locator: {page: 478, published_page: 478, pdf_page_index: 0, table: "2", note: "Oxide mole fractions derived from the printed mullite formula 3Al2O3·2SiO2."}
+          method_class: calculated
+          inference:
+            relation: formula_to_oxide_mole_fraction
+            inputs:
+            - "Printed formula: 3Al2O3·2SiO2 (Table 2, p. 478)."
+            - "x_Al2O3 = 3/(3+2) = 0.6; x_SiO2 = 2/(3+2) = 0.4; sum = 1."
+            - "Sanity check: Al2O3 wt fraction = (3×101.961)/(3×101.961 + 2×60.084) = 0.7180 (71.8 wt%)."
+            output_unit: mole_fraction
         total_pressure_Pa:
           state: {tag: unknown, reason: "The article describes Knudsen effusion but prints no numeric in-cell total pressure."}
           locator: {published_page: 479, note: "No numeric KEMS in-cell total pressure is printed."}
@@ -530,8 +740,23 @@ species:
       uncertainty: {note: "The printed ± term is retained in each point; no additional uncertainty was assigned."}
       point_conditions:
         composition:
-          state: {tag: unknown, reason: "Table 2 reports vapor over mullite (3Al2O3·2SiO2); no row-specific mole fraction or weight percent is printed."}
-          locator: {page: 478, published_page: 478, pdf_page_index: 0, table: "2", note: "Mullite formula is stated in the article; no mole fraction or weight percent is tabulated."}
+          state:
+            tag: value
+            value:
+              basis: printed_oxides
+              amount_basis: mole_fraction
+              components:
+              - [Al2O3, '0.6']
+              - [SiO2, '0.4']
+          locator: {page: 478, published_page: 478, pdf_page_index: 0, table: "2", note: "Oxide mole fractions derived from the printed mullite formula 3Al2O3·2SiO2."}
+          method_class: calculated
+          inference:
+            relation: formula_to_oxide_mole_fraction
+            inputs:
+            - "Printed formula: 3Al2O3·2SiO2 (Table 2, p. 478)."
+            - "x_Al2O3 = 3/(3+2) = 0.6; x_SiO2 = 2/(3+2) = 0.4; sum = 1."
+            - "Sanity check: Al2O3 wt fraction = (3×101.961)/(3×101.961 + 2×60.084) = 0.7180 (71.8 wt%)."
+            output_unit: mole_fraction
         total_pressure_Pa:
           state: {tag: unknown, reason: "The article describes Knudsen effusion but prints no numeric in-cell total pressure."}
           locator: {published_page: 479, note: "No numeric KEMS in-cell total pressure is printed."}
@@ -561,8 +786,23 @@ species:
       uncertainty: {note: "The printed ± term is retained in each point; no additional uncertainty was assigned."}
       point_conditions:
         composition:
-          state: {tag: unknown, reason: "Table 2 reports vapor over mullite (3Al2O3·2SiO2); no row-specific mole fraction or weight percent is printed."}
-          locator: {page: 478, published_page: 478, pdf_page_index: 0, table: "2", note: "Mullite formula is stated in the article; no mole fraction or weight percent is tabulated."}
+          state:
+            tag: value
+            value:
+              basis: printed_oxides
+              amount_basis: mole_fraction
+              components:
+              - [Al2O3, '0.6']
+              - [SiO2, '0.4']
+          locator: {page: 478, published_page: 478, pdf_page_index: 0, table: "2", note: "Oxide mole fractions derived from the printed mullite formula 3Al2O3·2SiO2."}
+          method_class: calculated
+          inference:
+            relation: formula_to_oxide_mole_fraction
+            inputs:
+            - "Printed formula: 3Al2O3·2SiO2 (Table 2, p. 478)."
+            - "x_Al2O3 = 3/(3+2) = 0.6; x_SiO2 = 2/(3+2) = 0.4; sum = 1."
+            - "Sanity check: Al2O3 wt fraction = (3×101.961)/(3×101.961 + 2×60.084) = 0.7180 (71.8 wt%)."
+            output_unit: mole_fraction
         total_pressure_Pa:
           state: {tag: unknown, reason: "The article describes Knudsen effusion but prints no numeric in-cell total pressure."}
           locator: {published_page: 479, note: "No numeric KEMS in-cell total pressure is printed."}
@@ -592,8 +832,23 @@ species:
       uncertainty: {note: "The printed ± term is retained in each point; no additional uncertainty was assigned."}
       point_conditions:
         composition:
-          state: {tag: unknown, reason: "Table 2 reports vapor over mullite (3Al2O3·2SiO2); no row-specific mole fraction or weight percent is printed."}
-          locator: {page: 478, published_page: 478, pdf_page_index: 0, table: "2", note: "Mullite formula is stated in the article; no mole fraction or weight percent is tabulated."}
+          state:
+            tag: value
+            value:
+              basis: printed_oxides
+              amount_basis: mole_fraction
+              components:
+              - [Al2O3, '0.6']
+              - [SiO2, '0.4']
+          locator: {page: 478, published_page: 478, pdf_page_index: 0, table: "2", note: "Oxide mole fractions derived from the printed mullite formula 3Al2O3·2SiO2."}
+          method_class: calculated
+          inference:
+            relation: formula_to_oxide_mole_fraction
+            inputs:
+            - "Printed formula: 3Al2O3·2SiO2 (Table 2, p. 478)."
+            - "x_Al2O3 = 3/(3+2) = 0.6; x_SiO2 = 2/(3+2) = 0.4; sum = 1."
+            - "Sanity check: Al2O3 wt fraction = (3×101.961)/(3×101.961 + 2×60.084) = 0.7180 (71.8 wt%)."
+            output_unit: mole_fraction
         total_pressure_Pa:
           state: {tag: unknown, reason: "The article describes Knudsen effusion but prints no numeric in-cell total pressure."}
           locator: {published_page: 479, note: "No numeric KEMS in-cell total pressure is printed."}
@@ -625,8 +880,23 @@ species:
       uncertainty: {note: "The printed ± term is retained in each point; no additional uncertainty was assigned."}
       point_conditions:
         composition:
-          state: {tag: unknown, reason: "Table 2 reports vapor over mullite (3Al2O3·2SiO2); no row-specific mole fraction or weight percent is printed."}
-          locator: {page: 478, published_page: 478, pdf_page_index: 0, table: "2", note: "Mullite formula is stated in the article; no mole fraction or weight percent is tabulated."}
+          state:
+            tag: value
+            value:
+              basis: printed_oxides
+              amount_basis: mole_fraction
+              components:
+              - [Al2O3, '0.6']
+              - [SiO2, '0.4']
+          locator: {page: 478, published_page: 478, pdf_page_index: 0, table: "2", note: "Oxide mole fractions derived from the printed mullite formula 3Al2O3·2SiO2."}
+          method_class: calculated
+          inference:
+            relation: formula_to_oxide_mole_fraction
+            inputs:
+            - "Printed formula: 3Al2O3·2SiO2 (Table 2, p. 478)."
+            - "x_Al2O3 = 3/(3+2) = 0.6; x_SiO2 = 2/(3+2) = 0.4; sum = 1."
+            - "Sanity check: Al2O3 wt fraction = (3×101.961)/(3×101.961 + 2×60.084) = 0.7180 (71.8 wt%)."
+            output_unit: mole_fraction
         total_pressure_Pa:
           state: {tag: unknown, reason: "The article describes Knudsen effusion but prints no numeric in-cell total pressure."}
           locator: {published_page: 479, note: "No numeric KEMS in-cell total pressure is printed."}
@@ -656,8 +926,23 @@ species:
       uncertainty: {note: "The printed ± term is retained in each point; no additional uncertainty was assigned."}
       point_conditions:
         composition:
-          state: {tag: unknown, reason: "Table 2 reports vapor over mullite (3Al2O3·2SiO2); no row-specific mole fraction or weight percent is printed."}
-          locator: {page: 478, published_page: 478, pdf_page_index: 0, table: "2", note: "Mullite formula is stated in the article; no mole fraction or weight percent is tabulated."}
+          state:
+            tag: value
+            value:
+              basis: printed_oxides
+              amount_basis: mole_fraction
+              components:
+              - [Al2O3, '0.6']
+              - [SiO2, '0.4']
+          locator: {page: 478, published_page: 478, pdf_page_index: 0, table: "2", note: "Oxide mole fractions derived from the printed mullite formula 3Al2O3·2SiO2."}
+          method_class: calculated
+          inference:
+            relation: formula_to_oxide_mole_fraction
+            inputs:
+            - "Printed formula: 3Al2O3·2SiO2 (Table 2, p. 478)."
+            - "x_Al2O3 = 3/(3+2) = 0.6; x_SiO2 = 2/(3+2) = 0.4; sum = 1."
+            - "Sanity check: Al2O3 wt fraction = (3×101.961)/(3×101.961 + 2×60.084) = 0.7180 (71.8 wt%)."
+            output_unit: mole_fraction
         total_pressure_Pa:
           state: {tag: unknown, reason: "The article describes Knudsen effusion but prints no numeric in-cell total pressure."}
           locator: {published_page: 479, note: "No numeric KEMS in-cell total pressure is printed."}
@@ -687,8 +972,23 @@ species:
       uncertainty: {note: "The printed ± term is retained in each point; no additional uncertainty was assigned."}
       point_conditions:
         composition:
-          state: {tag: unknown, reason: "Table 2 reports vapor over mullite (3Al2O3·2SiO2); no row-specific mole fraction or weight percent is printed."}
-          locator: {page: 478, published_page: 478, pdf_page_index: 0, table: "2", note: "Mullite formula is stated in the article; no mole fraction or weight percent is tabulated."}
+          state:
+            tag: value
+            value:
+              basis: printed_oxides
+              amount_basis: mole_fraction
+              components:
+              - [Al2O3, '0.6']
+              - [SiO2, '0.4']
+          locator: {page: 478, published_page: 478, pdf_page_index: 0, table: "2", note: "Oxide mole fractions derived from the printed mullite formula 3Al2O3·2SiO2."}
+          method_class: calculated
+          inference:
+            relation: formula_to_oxide_mole_fraction
+            inputs:
+            - "Printed formula: 3Al2O3·2SiO2 (Table 2, p. 478)."
+            - "x_Al2O3 = 3/(3+2) = 0.6; x_SiO2 = 2/(3+2) = 0.4; sum = 1."
+            - "Sanity check: Al2O3 wt fraction = (3×101.961)/(3×101.961 + 2×60.084) = 0.7180 (71.8 wt%)."
+            output_unit: mole_fraction
         total_pressure_Pa:
           state: {tag: unknown, reason: "The article describes Knudsen effusion but prints no numeric in-cell total pressure."}
           locator: {published_page: 479, note: "No numeric KEMS in-cell total pressure is printed."}
@@ -718,8 +1018,23 @@ species:
       uncertainty: {note: "The printed ± term is retained in each point; no additional uncertainty was assigned."}
       point_conditions:
         composition:
-          state: {tag: unknown, reason: "Table 2 reports vapor over mullite (3Al2O3·2SiO2); no row-specific mole fraction or weight percent is printed."}
-          locator: {page: 478, published_page: 478, pdf_page_index: 0, table: "2", note: "Mullite formula is stated in the article; no mole fraction or weight percent is tabulated."}
+          state:
+            tag: value
+            value:
+              basis: printed_oxides
+              amount_basis: mole_fraction
+              components:
+              - [Al2O3, '0.6']
+              - [SiO2, '0.4']
+          locator: {page: 478, published_page: 478, pdf_page_index: 0, table: "2", note: "Oxide mole fractions derived from the printed mullite formula 3Al2O3·2SiO2."}
+          method_class: calculated
+          inference:
+            relation: formula_to_oxide_mole_fraction
+            inputs:
+            - "Printed formula: 3Al2O3·2SiO2 (Table 2, p. 478)."
+            - "x_Al2O3 = 3/(3+2) = 0.6; x_SiO2 = 2/(3+2) = 0.4; sum = 1."
+            - "Sanity check: Al2O3 wt fraction = (3×101.961)/(3×101.961 + 2×60.084) = 0.7180 (71.8 wt%)."
+            output_unit: mole_fraction
         total_pressure_Pa:
           state: {tag: unknown, reason: "The article describes Knudsen effusion but prints no numeric in-cell total pressure."}
           locator: {published_page: 479, note: "No numeric KEMS in-cell total pressure is printed."}
@@ -751,8 +1066,23 @@ species:
       uncertainty: {note: "The printed ± term is retained in each point; no additional uncertainty was assigned."}
       point_conditions:
         composition:
-          state: {tag: unknown, reason: "Table 2 reports vapor over mullite (3Al2O3·2SiO2); no row-specific mole fraction or weight percent is printed."}
-          locator: {page: 478, published_page: 478, pdf_page_index: 0, table: "2", note: "Mullite formula is stated in the article; no mole fraction or weight percent is tabulated."}
+          state:
+            tag: value
+            value:
+              basis: printed_oxides
+              amount_basis: mole_fraction
+              components:
+              - [Al2O3, '0.6']
+              - [SiO2, '0.4']
+          locator: {page: 478, published_page: 478, pdf_page_index: 0, table: "2", note: "Oxide mole fractions derived from the printed mullite formula 3Al2O3·2SiO2."}
+          method_class: calculated
+          inference:
+            relation: formula_to_oxide_mole_fraction
+            inputs:
+            - "Printed formula: 3Al2O3·2SiO2 (Table 2, p. 478)."
+            - "x_Al2O3 = 3/(3+2) = 0.6; x_SiO2 = 2/(3+2) = 0.4; sum = 1."
+            - "Sanity check: Al2O3 wt fraction = (3×101.961)/(3×101.961 + 2×60.084) = 0.7180 (71.8 wt%)."
+            output_unit: mole_fraction
         total_pressure_Pa:
           state: {tag: unknown, reason: "The article describes Knudsen effusion but prints no numeric in-cell total pressure."}
           locator: {published_page: 479, note: "No numeric KEMS in-cell total pressure is printed."}
@@ -782,8 +1112,23 @@ species:
       uncertainty: {note: "The printed ± term is retained in each point; no additional uncertainty was assigned."}
       point_conditions:
         composition:
-          state: {tag: unknown, reason: "Table 2 reports vapor over mullite (3Al2O3·2SiO2); no row-specific mole fraction or weight percent is printed."}
-          locator: {page: 478, published_page: 478, pdf_page_index: 0, table: "2", note: "Mullite formula is stated in the article; no mole fraction or weight percent is tabulated."}
+          state:
+            tag: value
+            value:
+              basis: printed_oxides
+              amount_basis: mole_fraction
+              components:
+              - [Al2O3, '0.6']
+              - [SiO2, '0.4']
+          locator: {page: 478, published_page: 478, pdf_page_index: 0, table: "2", note: "Oxide mole fractions derived from the printed mullite formula 3Al2O3·2SiO2."}
+          method_class: calculated
+          inference:
+            relation: formula_to_oxide_mole_fraction
+            inputs:
+            - "Printed formula: 3Al2O3·2SiO2 (Table 2, p. 478)."
+            - "x_Al2O3 = 3/(3+2) = 0.6; x_SiO2 = 2/(3+2) = 0.4; sum = 1."
+            - "Sanity check: Al2O3 wt fraction = (3×101.961)/(3×101.961 + 2×60.084) = 0.7180 (71.8 wt%)."
+            output_unit: mole_fraction
         total_pressure_Pa:
           state: {tag: unknown, reason: "The article describes Knudsen effusion but prints no numeric in-cell total pressure."}
           locator: {published_page: 479, note: "No numeric KEMS in-cell total pressure is printed."}
@@ -813,8 +1158,23 @@ species:
       uncertainty: {note: "The printed ± term is retained in each point; no additional uncertainty was assigned."}
       point_conditions:
         composition:
-          state: {tag: unknown, reason: "Table 2 reports vapor over mullite (3Al2O3·2SiO2); no row-specific mole fraction or weight percent is printed."}
-          locator: {page: 478, published_page: 478, pdf_page_index: 0, table: "2", note: "Mullite formula is stated in the article; no mole fraction or weight percent is tabulated."}
+          state:
+            tag: value
+            value:
+              basis: printed_oxides
+              amount_basis: mole_fraction
+              components:
+              - [Al2O3, '0.6']
+              - [SiO2, '0.4']
+          locator: {page: 478, published_page: 478, pdf_page_index: 0, table: "2", note: "Oxide mole fractions derived from the printed mullite formula 3Al2O3·2SiO2."}
+          method_class: calculated
+          inference:
+            relation: formula_to_oxide_mole_fraction
+            inputs:
+            - "Printed formula: 3Al2O3·2SiO2 (Table 2, p. 478)."
+            - "x_Al2O3 = 3/(3+2) = 0.6; x_SiO2 = 2/(3+2) = 0.4; sum = 1."
+            - "Sanity check: Al2O3 wt fraction = (3×101.961)/(3×101.961 + 2×60.084) = 0.7180 (71.8 wt%)."
+            output_unit: mole_fraction
         total_pressure_Pa:
           state: {tag: unknown, reason: "The article describes Knudsen effusion but prints no numeric in-cell total pressure."}
           locator: {published_page: 479, note: "No numeric KEMS in-cell total pressure is printed."}
@@ -844,8 +1204,23 @@ species:
       uncertainty: {note: "The printed ± term is retained in each point; no additional uncertainty was assigned."}
       point_conditions:
         composition:
-          state: {tag: unknown, reason: "Table 2 reports vapor over mullite (3Al2O3·2SiO2); no row-specific mole fraction or weight percent is printed."}
-          locator: {page: 478, published_page: 478, pdf_page_index: 0, table: "2", note: "Mullite formula is stated in the article; no mole fraction or weight percent is tabulated."}
+          state:
+            tag: value
+            value:
+              basis: printed_oxides
+              amount_basis: mole_fraction
+              components:
+              - [Al2O3, '0.6']
+              - [SiO2, '0.4']
+          locator: {page: 478, published_page: 478, pdf_page_index: 0, table: "2", note: "Oxide mole fractions derived from the printed mullite formula 3Al2O3·2SiO2."}
+          method_class: calculated
+          inference:
+            relation: formula_to_oxide_mole_fraction
+            inputs:
+            - "Printed formula: 3Al2O3·2SiO2 (Table 2, p. 478)."
+            - "x_Al2O3 = 3/(3+2) = 0.6; x_SiO2 = 2/(3+2) = 0.4; sum = 1."
+            - "Sanity check: Al2O3 wt fraction = (3×101.961)/(3×101.961 + 2×60.084) = 0.7180 (71.8 wt%)."
+            output_unit: mole_fraction
         total_pressure_Pa:
           state: {tag: unknown, reason: "The article describes Knudsen effusion but prints no numeric in-cell total pressure."}
           locator: {published_page: 479, note: "No numeric KEMS in-cell total pressure is printed."}
@@ -882,8 +1257,23 @@ species:
         locator: {page: 479, published_page: 479, pdf_page_index: 1, note: "Paragraph beginning 'Partial vapour pressures of oxygen were calculated'; reaction O2 ⇌ 2O (2)."}
       point_conditions:
         composition:
-          state: {tag: unknown, reason: "Table 2 reports vapor over mullite (3Al2O3·2SiO2); no row-specific mole fraction or weight percent is printed."}
-          locator: {page: 478, published_page: 478, pdf_page_index: 0, table: "2", note: "Mullite formula is stated in the article; no mole fraction or weight percent is tabulated."}
+          state:
+            tag: value
+            value:
+              basis: printed_oxides
+              amount_basis: mole_fraction
+              components:
+              - [Al2O3, '0.6']
+              - [SiO2, '0.4']
+          locator: {page: 478, published_page: 478, pdf_page_index: 0, table: "2", note: "Oxide mole fractions derived from the printed mullite formula 3Al2O3·2SiO2."}
+          method_class: calculated
+          inference:
+            relation: formula_to_oxide_mole_fraction
+            inputs:
+            - "Printed formula: 3Al2O3·2SiO2 (Table 2, p. 478)."
+            - "x_Al2O3 = 3/(3+2) = 0.6; x_SiO2 = 2/(3+2) = 0.4; sum = 1."
+            - "Sanity check: Al2O3 wt fraction = (3×101.961)/(3×101.961 + 2×60.084) = 0.7180 (71.8 wt%)."
+            output_unit: mole_fraction
         total_pressure_Pa:
           state: {tag: unknown, reason: "The article describes Knudsen effusion but prints no numeric in-cell total pressure."}
           locator: {published_page: 479, note: "No numeric KEMS in-cell total pressure is printed."}
@@ -919,8 +1309,23 @@ species:
         locator: {page: 479, published_page: 479, pdf_page_index: 1, note: "Paragraph beginning 'Partial vapour pressures of oxygen were calculated'; reaction O2 ⇌ 2O (2)."}
       point_conditions:
         composition:
-          state: {tag: unknown, reason: "Table 2 reports vapor over mullite (3Al2O3·2SiO2); no row-specific mole fraction or weight percent is printed."}
-          locator: {page: 478, published_page: 478, pdf_page_index: 0, table: "2", note: "Mullite formula is stated in the article; no mole fraction or weight percent is tabulated."}
+          state:
+            tag: value
+            value:
+              basis: printed_oxides
+              amount_basis: mole_fraction
+              components:
+              - [Al2O3, '0.6']
+              - [SiO2, '0.4']
+          locator: {page: 478, published_page: 478, pdf_page_index: 0, table: "2", note: "Oxide mole fractions derived from the printed mullite formula 3Al2O3·2SiO2."}
+          method_class: calculated
+          inference:
+            relation: formula_to_oxide_mole_fraction
+            inputs:
+            - "Printed formula: 3Al2O3·2SiO2 (Table 2, p. 478)."
+            - "x_Al2O3 = 3/(3+2) = 0.6; x_SiO2 = 2/(3+2) = 0.4; sum = 1."
+            - "Sanity check: Al2O3 wt fraction = (3×101.961)/(3×101.961 + 2×60.084) = 0.7180 (71.8 wt%)."
+            output_unit: mole_fraction
         total_pressure_Pa:
           state: {tag: unknown, reason: "The article describes Knudsen effusion but prints no numeric in-cell total pressure."}
           locator: {published_page: 479, note: "No numeric KEMS in-cell total pressure is printed."}
@@ -956,8 +1361,23 @@ species:
         locator: {page: 479, published_page: 479, pdf_page_index: 1, note: "Paragraph beginning 'Partial vapour pressures of oxygen were calculated'; reaction O2 ⇌ 2O (2)."}
       point_conditions:
         composition:
-          state: {tag: unknown, reason: "Table 2 reports vapor over mullite (3Al2O3·2SiO2); no row-specific mole fraction or weight percent is printed."}
-          locator: {page: 478, published_page: 478, pdf_page_index: 0, table: "2", note: "Mullite formula is stated in the article; no mole fraction or weight percent is tabulated."}
+          state:
+            tag: value
+            value:
+              basis: printed_oxides
+              amount_basis: mole_fraction
+              components:
+              - [Al2O3, '0.6']
+              - [SiO2, '0.4']
+          locator: {page: 478, published_page: 478, pdf_page_index: 0, table: "2", note: "Oxide mole fractions derived from the printed mullite formula 3Al2O3·2SiO2."}
+          method_class: calculated
+          inference:
+            relation: formula_to_oxide_mole_fraction
+            inputs:
+            - "Printed formula: 3Al2O3·2SiO2 (Table 2, p. 478)."
+            - "x_Al2O3 = 3/(3+2) = 0.6; x_SiO2 = 2/(3+2) = 0.4; sum = 1."
+            - "Sanity check: Al2O3 wt fraction = (3×101.961)/(3×101.961 + 2×60.084) = 0.7180 (71.8 wt%)."
+            output_unit: mole_fraction
         total_pressure_Pa:
           state: {tag: unknown, reason: "The article describes Knudsen effusion but prints no numeric in-cell total pressure."}
           locator: {published_page: 479, note: "No numeric KEMS in-cell total pressure is printed."}
@@ -993,8 +1413,23 @@ species:
         locator: {page: 479, published_page: 479, pdf_page_index: 1, note: "Paragraph beginning 'Partial vapour pressures of oxygen were calculated'; reaction O2 ⇌ 2O (2)."}
       point_conditions:
         composition:
-          state: {tag: unknown, reason: "Table 2 reports vapor over mullite (3Al2O3·2SiO2); no row-specific mole fraction or weight percent is printed."}
-          locator: {page: 478, published_page: 478, pdf_page_index: 0, table: "2", note: "Mullite formula is stated in the article; no mole fraction or weight percent is tabulated."}
+          state:
+            tag: value
+            value:
+              basis: printed_oxides
+              amount_basis: mole_fraction
+              components:
+              - [Al2O3, '0.6']
+              - [SiO2, '0.4']
+          locator: {page: 478, published_page: 478, pdf_page_index: 0, table: "2", note: "Oxide mole fractions derived from the printed mullite formula 3Al2O3·2SiO2."}
+          method_class: calculated
+          inference:
+            relation: formula_to_oxide_mole_fraction
+            inputs:
+            - "Printed formula: 3Al2O3·2SiO2 (Table 2, p. 478)."
+            - "x_Al2O3 = 3/(3+2) = 0.6; x_SiO2 = 2/(3+2) = 0.4; sum = 1."
+            - "Sanity check: Al2O3 wt fraction = (3×101.961)/(3×101.961 + 2×60.084) = 0.7180 (71.8 wt%)."
+            output_unit: mole_fraction
         total_pressure_Pa:
           state: {tag: unknown, reason: "The article describes Knudsen effusion but prints no numeric in-cell total pressure."}
           locator: {published_page: 479, note: "No numeric KEMS in-cell total pressure is printed."}
@@ -1033,8 +1468,23 @@ species:
         output_unit: atm
       point_conditions:
         composition:
-          state: {tag: unknown, reason: "Table 2 reports vapor over mullite (3Al2O3·2SiO2); no row-specific mole fraction or weight percent is printed."}
-          locator: {page: 478, published_page: 478, pdf_page_index: 0, table: "2", note: "Mullite formula is stated in the article; no mole fraction or weight percent is tabulated."}
+          state:
+            tag: value
+            value:
+              basis: printed_oxides
+              amount_basis: mole_fraction
+              components:
+              - [Al2O3, '0.6']
+              - [SiO2, '0.4']
+          locator: {page: 478, published_page: 478, pdf_page_index: 0, table: "2", note: "Oxide mole fractions derived from the printed mullite formula 3Al2O3·2SiO2."}
+          method_class: calculated
+          inference:
+            relation: formula_to_oxide_mole_fraction
+            inputs:
+            - "Printed formula: 3Al2O3·2SiO2 (Table 2, p. 478)."
+            - "x_Al2O3 = 3/(3+2) = 0.6; x_SiO2 = 2/(3+2) = 0.4; sum = 1."
+            - "Sanity check: Al2O3 wt fraction = (3×101.961)/(3×101.961 + 2×60.084) = 0.7180 (71.8 wt%)."
+            output_unit: mole_fraction
         total_pressure_Pa:
           state: {tag: unknown, reason: "The article describes Knudsen effusion but prints no numeric in-cell total pressure."}
           locator: {published_page: 479, note: "No numeric KEMS in-cell total pressure is printed."}
@@ -1071,8 +1521,23 @@ species:
         output_unit: atm
       point_conditions:
         composition:
-          state: {tag: unknown, reason: "Table 2 reports vapor over mullite (3Al2O3·2SiO2); no row-specific mole fraction or weight percent is printed."}
-          locator: {page: 478, published_page: 478, pdf_page_index: 0, table: "2", note: "Mullite formula is stated in the article; no mole fraction or weight percent is tabulated."}
+          state:
+            tag: value
+            value:
+              basis: printed_oxides
+              amount_basis: mole_fraction
+              components:
+              - [Al2O3, '0.6']
+              - [SiO2, '0.4']
+          locator: {page: 478, published_page: 478, pdf_page_index: 0, table: "2", note: "Oxide mole fractions derived from the printed mullite formula 3Al2O3·2SiO2."}
+          method_class: calculated
+          inference:
+            relation: formula_to_oxide_mole_fraction
+            inputs:
+            - "Printed formula: 3Al2O3·2SiO2 (Table 2, p. 478)."
+            - "x_Al2O3 = 3/(3+2) = 0.6; x_SiO2 = 2/(3+2) = 0.4; sum = 1."
+            - "Sanity check: Al2O3 wt fraction = (3×101.961)/(3×101.961 + 2×60.084) = 0.7180 (71.8 wt%)."
+            output_unit: mole_fraction
         total_pressure_Pa:
           state: {tag: unknown, reason: "The article describes Knudsen effusion but prints no numeric in-cell total pressure."}
           locator: {published_page: 479, note: "No numeric KEMS in-cell total pressure is printed."}
@@ -1109,8 +1574,23 @@ species:
         output_unit: atm
       point_conditions:
         composition:
-          state: {tag: unknown, reason: "Table 2 reports vapor over mullite (3Al2O3·2SiO2); no row-specific mole fraction or weight percent is printed."}
-          locator: {page: 478, published_page: 478, pdf_page_index: 0, table: "2", note: "Mullite formula is stated in the article; no mole fraction or weight percent is tabulated."}
+          state:
+            tag: value
+            value:
+              basis: printed_oxides
+              amount_basis: mole_fraction
+              components:
+              - [Al2O3, '0.6']
+              - [SiO2, '0.4']
+          locator: {page: 478, published_page: 478, pdf_page_index: 0, table: "2", note: "Oxide mole fractions derived from the printed mullite formula 3Al2O3·2SiO2."}
+          method_class: calculated
+          inference:
+            relation: formula_to_oxide_mole_fraction
+            inputs:
+            - "Printed formula: 3Al2O3·2SiO2 (Table 2, p. 478)."
+            - "x_Al2O3 = 3/(3+2) = 0.6; x_SiO2 = 2/(3+2) = 0.4; sum = 1."
+            - "Sanity check: Al2O3 wt fraction = (3×101.961)/(3×101.961 + 2×60.084) = 0.7180 (71.8 wt%)."
+            output_unit: mole_fraction
         total_pressure_Pa:
           state: {tag: unknown, reason: "The article describes Knudsen effusion but prints no numeric in-cell total pressure."}
           locator: {published_page: 479, note: "No numeric KEMS in-cell total pressure is printed."}
@@ -1147,8 +1627,23 @@ species:
         output_unit: atm
       point_conditions:
         composition:
-          state: {tag: unknown, reason: "Table 2 reports vapor over mullite (3Al2O3·2SiO2); no row-specific mole fraction or weight percent is printed."}
-          locator: {page: 478, published_page: 478, pdf_page_index: 0, table: "2", note: "Mullite formula is stated in the article; no mole fraction or weight percent is tabulated."}
+          state:
+            tag: value
+            value:
+              basis: printed_oxides
+              amount_basis: mole_fraction
+              components:
+              - [Al2O3, '0.6']
+              - [SiO2, '0.4']
+          locator: {page: 478, published_page: 478, pdf_page_index: 0, table: "2", note: "Oxide mole fractions derived from the printed mullite formula 3Al2O3·2SiO2."}
+          method_class: calculated
+          inference:
+            relation: formula_to_oxide_mole_fraction
+            inputs:
+            - "Printed formula: 3Al2O3·2SiO2 (Table 2, p. 478)."
+            - "x_Al2O3 = 3/(3+2) = 0.6; x_SiO2 = 2/(3+2) = 0.4; sum = 1."
+            - "Sanity check: Al2O3 wt fraction = (3×101.961)/(3×101.961 + 2×60.084) = 0.7180 (71.8 wt%)."
+            output_unit: mole_fraction
         total_pressure_Pa:
           state: {tag: unknown, reason: "The article describes Knudsen effusion but prints no numeric in-cell total pressure."}
           locator: {published_page: 479, note: "No numeric KEMS in-cell total pressure is printed."}
@@ -1174,7 +1669,7 @@ species:
       locator: {page: 479, published_page: 479, pdf_page_index: 1, table: "6"}
       T_range_K: [1833.0, 1833.0]
       phase: "mullite (3Al2O3·2SiO2); phase not specified by the article"
-      standard_state: "Al2O3 activity relative to the pure oxide reference defined by p_i° in equations (12)–(13)."
+      standard_state: "Al2O3 activity relative to the pure oxide reference defined by p_i° in equations (12)–(13). The article states, “p_i° and p_i are the partial pressures of vapour species over alumina or silica and over mullite, respectively” (p. 480, equations 12–13); it does not specify the phase of the pure-oxide reference."
       experiment: shornikov-1994-mullite-mo-cell
       regime: kems_effusion
       units: dimensionless activity, as printed
@@ -1206,7 +1701,7 @@ species:
       locator: {page: 479, published_page: 479, pdf_page_index: 1, table: "6"}
       T_range_K: [1933.0, 1933.0]
       phase: "mullite (3Al2O3·2SiO2); phase not specified by the article"
-      standard_state: "Al2O3 activity relative to the pure oxide reference defined by p_i° in equations (12)–(13)."
+      standard_state: "Al2O3 activity relative to the pure oxide reference defined by p_i° in equations (12)–(13). The article states, “p_i° and p_i are the partial pressures of vapour species over alumina or silica and over mullite, respectively” (p. 480, equations 12–13); it does not specify the phase of the pure-oxide reference."
       experiment: shornikov-1994-mullite-mo-cell
       regime: kems_effusion
       units: dimensionless activity, as printed
@@ -1238,7 +1733,7 @@ species:
       locator: {page: 479, published_page: 479, pdf_page_index: 1, table: "6"}
       T_range_K: [1983.0, 1983.0]
       phase: "mullite (3Al2O3·2SiO2); phase not specified by the article"
-      standard_state: "Al2O3 activity relative to the pure oxide reference defined by p_i° in equations (12)–(13)."
+      standard_state: "Al2O3 activity relative to the pure oxide reference defined by p_i° in equations (12)–(13). The article states, “p_i° and p_i are the partial pressures of vapour species over alumina or silica and over mullite, respectively” (p. 480, equations 12–13); it does not specify the phase of the pure-oxide reference."
       experiment: shornikov-1994-mullite-mo-cell
       regime: kems_effusion
       units: dimensionless activity, as printed
@@ -1270,7 +1765,7 @@ species:
       locator: {page: 479, published_page: 479, pdf_page_index: 1, table: "6"}
       T_range_K: [2033.0, 2033.0]
       phase: "mullite (3Al2O3·2SiO2); phase not specified by the article"
-      standard_state: "Al2O3 activity relative to the pure oxide reference defined by p_i° in equations (12)–(13)."
+      standard_state: "Al2O3 activity relative to the pure oxide reference defined by p_i° in equations (12)–(13). The article states, “p_i° and p_i are the partial pressures of vapour species over alumina or silica and over mullite, respectively” (p. 480, equations 12–13); it does not specify the phase of the pure-oxide reference."
       experiment: shornikov-1994-mullite-mo-cell
       regime: kems_effusion
       units: dimensionless activity, as printed
@@ -1304,7 +1799,7 @@ species:
       locator: {page: 479, published_page: 479, pdf_page_index: 1, table: "6"}
       T_range_K: [1833.0, 1833.0]
       phase: "mullite (3Al2O3·2SiO2); phase not specified by the article"
-      standard_state: "SiO2 activity relative to the pure oxide reference defined by p_i° in equations (12)–(13)."
+      standard_state: "SiO2 activity relative to the pure oxide reference defined by p_i° in equations (12)–(13). The article states, “p_i° and p_i are the partial pressures of vapour species over alumina or silica and over mullite, respectively” (p. 480, equations 12–13); it does not specify the phase of the pure-oxide reference."
       experiment: shornikov-1994-mullite-mo-cell
       regime: kems_effusion
       units: dimensionless activity, as printed
@@ -1336,7 +1831,7 @@ species:
       locator: {page: 479, published_page: 479, pdf_page_index: 1, table: "6"}
       T_range_K: [1933.0, 1933.0]
       phase: "mullite (3Al2O3·2SiO2); phase not specified by the article"
-      standard_state: "SiO2 activity relative to the pure oxide reference defined by p_i° in equations (12)–(13)."
+      standard_state: "SiO2 activity relative to the pure oxide reference defined by p_i° in equations (12)–(13). The article states, “p_i° and p_i are the partial pressures of vapour species over alumina or silica and over mullite, respectively” (p. 480, equations 12–13); it does not specify the phase of the pure-oxide reference."
       experiment: shornikov-1994-mullite-mo-cell
       regime: kems_effusion
       units: dimensionless activity, as printed
@@ -1368,7 +1863,7 @@ species:
       locator: {page: 479, published_page: 479, pdf_page_index: 1, table: "6"}
       T_range_K: [1983.0, 1983.0]
       phase: "mullite (3Al2O3·2SiO2); phase not specified by the article"
-      standard_state: "SiO2 activity relative to the pure oxide reference defined by p_i° in equations (12)–(13)."
+      standard_state: "SiO2 activity relative to the pure oxide reference defined by p_i° in equations (12)–(13). The article states, “p_i° and p_i are the partial pressures of vapour species over alumina or silica and over mullite, respectively” (p. 480, equations 12–13); it does not specify the phase of the pure-oxide reference."
       experiment: shornikov-1994-mullite-mo-cell
       regime: kems_effusion
       units: dimensionless activity, as printed
@@ -1400,7 +1895,7 @@ species:
       locator: {page: 479, published_page: 479, pdf_page_index: 1, table: "6"}
       T_range_K: [2033.0, 2033.0]
       phase: "mullite (3Al2O3·2SiO2); phase not specified by the article"
-      standard_state: "SiO2 activity relative to the pure oxide reference defined by p_i° in equations (12)–(13)."
+      standard_state: "SiO2 activity relative to the pure oxide reference defined by p_i° in equations (12)–(13). The article states, “p_i° and p_i are the partial pressures of vapour species over alumina or silica and over mullite, respectively” (p. 480, equations 12–13); it does not specify the phase of the pure-oxide reference."
       experiment: shornikov-1994-mullite-mo-cell
       regime: kems_effusion
       units: dimensionless activity, as printed
