@@ -8,7 +8,7 @@
 - **Counts:** P0 0, P1 0, P2 0
 - **Reason:** Calibration standard, area-ratio DIRECTION (100:1 / 1:400 / 400:1), cell and instrument match each paper's Experimental / Results text for THIS experiment; unknowns tagged not-printed; area ratio recorded as ratio (diameter unknown) — `in_cell_fallback` 50/50 and 22/22 rest on printed silver calibration + printed pressures under Drowart limit, not a mistyped diameter; no measured values/units/exponents/conditions changed; four Stolyarova figure-only rows: two activities retyped with Eqs. 7–8 / individual-oxide reference, two Δμ rows correctly not retyped as activities; validate OK; extracts-v2 untouched.
 - **Deliverable:** `REVIEW-kems-calibration-extracts-2026-10-01.md`
-- **Mailbox tip:** `dfdc86d830d52b204cf42610bc3d15462548a025` on `empirical/reviews-batch-zv-2026-09-22` (artifacts `22f71d033`)
+- **Mailbox tip:** `22f71d0338dc6c625ba3b6c31fba5e5634c05985` on `empirical/reviews-batch-zv-2026-09-22` (artifacts `22f71d033`; STATUS freeze follows)
 - **Date:** 2026-10-01 ~16:02 ET
 
 — regolith-empirical
