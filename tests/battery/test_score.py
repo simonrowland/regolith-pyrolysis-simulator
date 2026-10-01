@@ -3912,6 +3912,16 @@ def test_admitted_model_derived_rows_emit_residuals_per_imcc_engine() -> None:
         and obs.evidence.class_.is_value
         and obs.evidence.class_.value is EvidenceClass.MODEL_DERIVED
     }
+    stolyarova_1996_derived_pressures = {
+        key
+        for key, obs in observations.items()
+        if obs.source_id == "stolyarova-1996-cao-alumina-silica-kems"
+        and isinstance(obs.identity, Identity)
+        and quantity_token(obs.identity) is Quantity.P_PARTIAL
+        and obs.admission.status is AdmissionStatus.ADMITTED
+        and obs.evidence.class_.is_value
+        and obs.evidence.class_.value is EvidenceClass.MODEL_DERIVED
+    }
     kems_model_derived = {
         key
         for key, obs in observations.items()
@@ -3924,6 +3934,7 @@ def test_admitted_model_derived_rows_emit_residuals_per_imcc_engine() -> None:
         stolyarova_activities
         | stolyarova_derived_pressures
         | stolyarova_1995_derived_pressures
+        | stolyarova_1996_derived_pressures
         | kems_model_derived
     )
     assert len(allibert_admitted) == 16
@@ -3933,11 +3944,33 @@ def test_admitted_model_derived_rows_emit_residuals_per_imcc_engine() -> None:
     # Eqn 1 p_O (9), Eqn 2 p_O (8), and calculated p_O2 (9) are model-derived,
     # not measured pressures (review, Derived O / O2).
     assert len(stolyarova_1995_derived_pressures) == 26
+    # Table 2's calculated 1933 K oxygen-pressure columns contain 30 pO,
+    # 10 p'O, and 15 p''O observations, all model-derived.
+    assert len(stolyarova_1996_derived_pressures) == 55
+    assert {
+        observations[key].observation_id.split("::")[1]
+        for key in stolyarova_1996_derived_pressures
+    } == {
+        "stolyarova_1996_table2_pO_1933k",
+        "stolyarova_1996_table2_pO_prime_1933k",
+        "stolyarova_1996_table2_pO_double_prime_1933k",
+    }
+    assert [
+        sum(
+            observations[key].observation_id.split("::")[1] == observation_id
+            for key in stolyarova_1996_derived_pressures
+        )
+        for observation_id in (
+            "stolyarova_1996_table2_pO_1933k",
+            "stolyarova_1996_table2_pO_prime_1933k",
+            "stolyarova_1996_table2_pO_double_prime_1933k",
+        )
+    ] == [30, 10, 15]
     assert len(kems_model_derived) == 28
     assert len(
         stolyarova_activities | stolyarova_derived_pressures | kems_model_derived
     ) == 91
-    assert len(headline_diagnostic_references) == 117
+    assert len(headline_diagnostic_references) == 172
     assert admitted_model_derived == (
         allibert_admitted | headline_diagnostic_references
     )
@@ -4090,7 +4123,13 @@ def test_admitted_model_derived_rows_emit_residuals_per_imcc_engine() -> None:
             {"kems-053-stolyarova-1991", "stolyarova-1995-cao-alumina-kems"},
             engine,
         )
-        assert len(stolyarova_rows) == 180
+        stolyarova_rows.extend(
+            row
+            for row in residuals
+            if row.reference in stolyarova_1996_derived_pressures
+            and row.key.rsplit("::", 1)[-1] == engine.value
+        )
+        assert len(stolyarova_rows) == 235
         activity_rows = [
             row for row in stolyarova_rows if row.reference in stolyarova_activities
         ]
@@ -4107,6 +4146,22 @@ def test_admitted_model_derived_rows_emit_residuals_per_imcc_engine() -> None:
             if row.reference in stolyarova_1995_derived_pressures
         ]
         assert len(stolyarova_1995_rows) == 26
+        stolyarova_1996_rows = [
+            row
+            for row in stolyarova_rows
+            if row.reference in stolyarova_1996_derived_pressures
+        ]
+        assert len(stolyarova_1996_rows) == 55
+        assert all(row.status is ResidualStatus.REFUSED for row in stolyarova_1996_rows)
+        assert all(not row.score_eligible for row in stolyarova_1996_rows)
+        assert {
+            row.refusal.reason
+            for row in stolyarova_1996_rows
+            if row.refusal is not None
+        } == {
+            RefusalReason.IDENTITY_INCOMPLETE,
+            RefusalReason.EFFUSION_REGIME_UNVERIFIED,
+        }
         assert all(row.status is ResidualStatus.REFUSED for row in stolyarova_rows)
         assert all(row.status is ResidualStatus.REFUSED for row in activity_rows)
         assert all(
