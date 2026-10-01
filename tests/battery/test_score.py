@@ -10,6 +10,7 @@ import hashlib
 import inspect
 import json
 import math
+import os
 import shutil
 import subprocess
 import sys
@@ -3152,6 +3153,156 @@ def test_fusion_conversion_without_unique_janaf_crossing_returns_typed_notice(
     notice = next(n for n in result.notices if n.kind is NoticeKind.OUT_OF_GAMMA_DOMAIN)
     assert "CaO" in notice.reason
     assert "expected one JANAF cr/l crossing" in notice.reason
+
+
+def test_score_store_reuses_and_closes_engine_handles_for_100_cells(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from simulator.diagnostic_helpers import binary_pot_battery as battery
+    from simulator.diagnostic_helpers.binary_pot_battery import EngineHandle
+
+    class _PoolLikeBackend:
+        def __init__(self) -> None:
+            self.read_fd, self.write_fd = os.pipe()
+            self.calls = 0
+            self.closed = False
+
+        def equilibrate(self, **_kwargs):
+            self.calls += 1
+            raise RuntimeError("fd regression probe")
+
+        def close(self) -> None:
+            if self.closed:
+                return
+            os.close(self.read_fd)
+            os.close(self.write_fd)
+            self.closed = True
+
+    opened = []
+
+    def open_probe_engine(name: str) -> EngineHandle:
+        backend = _PoolLikeBackend()
+        opened.append(backend)
+        return EngineHandle(
+            name=name,
+            backend=backend,
+            available=True,
+            unavailable_reason=None,
+            takes_fo2=False,
+            supports_intrinsic_fo2=True,
+        )
+
+    monkeypatch.setattr(battery, "open_battery_engine", open_probe_engine)
+    experiment = F.tabulation_experiment()
+    reference = F.observation(
+        "fd-leak-reference",
+        experiment.experiment_id,
+        F.psat_identity("Na"),
+        Decimal("0.1"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="work-1",
+    )
+    context = _context(F.work(), experiment, reference, review="reviewed")
+
+    equilibrate_cell_calls = 0
+    real_equilibrate_cell = battery.equilibrate_cell
+
+    def count_equilibrate_cell(*args, **kwargs):
+        nonlocal equilibrate_cell_calls
+        equilibrate_cell_calls += 1
+        return real_equilibrate_cell(*args, **kwargs)
+
+    monkeypatch.setattr(battery, "equilibrate_cell", count_equilibrate_cell)
+    import simulator.battery.score as score_module
+
+    monkeypatch.setattr(
+        score_module,
+        "comparison_candidates",
+        lambda _context: (reference,) * 100,
+    )
+    fd_before = len(os.listdir("/dev/fd"))
+    try:
+        residuals, _ = score_store(
+            context,
+            engines=(Engine.VAPOROCK,),
+            include_diagnostics=False,
+        )
+        fd_after = len(os.listdir("/dev/fd"))
+        assert len(residuals) == 100
+        assert fd_after <= fd_before + 2, (
+            f"file descriptors grew from {fd_before} to {fd_after} across "
+            "100 cell calls"
+        )
+        assert len(opened) == 1
+        assert opened[0].calls == 100
+        assert equilibrate_cell_calls == 100
+    finally:
+        for backend in opened:
+            backend.close()
+    assert len(os.listdir("/dev/fd")) <= fd_before + 1
+
+
+def test_score_store_attempts_all_owned_handle_closes(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from simulator.diagnostic_helpers import binary_pot_battery as battery
+    from simulator.diagnostic_helpers.binary_pot_battery import EngineHandle
+
+    class _Backend:
+        def __init__(self, fail_close: bool) -> None:
+            self.fail_close = fail_close
+            self.closed = False
+
+        def equilibrate(self, **_kwargs):
+            raise RuntimeError("engine probe")
+
+        def close(self) -> None:
+            self.closed = True
+            if self.fail_close:
+                raise RuntimeError("close probe")
+
+    opened = []
+
+    def open_probe_engine(name: str) -> EngineHandle:
+        backend = _Backend(fail_close=not opened)
+        opened.append(backend)
+        return EngineHandle(
+            name=name,
+            backend=backend,
+            available=True,
+            unavailable_reason=None,
+            takes_fo2=False,
+            supports_intrinsic_fo2=True,
+        )
+
+    monkeypatch.setattr(battery, "open_battery_engine", open_probe_engine)
+    experiment = F.tabulation_experiment()
+    reference = F.observation(
+        "fd-close-reference",
+        experiment.experiment_id,
+        F.psat_identity("Na"),
+        Decimal("0.1"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="work-1",
+    )
+    context = _context(F.work(), experiment, reference, review="reviewed")
+
+    import simulator.battery.score as score_module
+
+    monkeypatch.setattr(
+        score_module,
+        "comparison_candidates",
+        lambda _context: (reference,),
+    )
+    with pytest.raises(RuntimeError, match="close probe"):
+        score_store(
+            context,
+            engines=(Engine.VAPOROCK, Engine.MAGEMIN),
+            include_diagnostics=False,
+        )
+
+    assert len(opened) == 2
+    assert all(backend.closed for backend in opened)
 
 
 def test_out_of_janaf_range_activity_notice_does_not_abort_score_store() -> None:
