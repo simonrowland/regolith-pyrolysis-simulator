@@ -148,6 +148,25 @@ def run(args: argparse.Namespace) -> list[str]:
         f"I5 {'PASS' if continuity_ok else 'FAIL'}: |ΔG(1500 K)|={continuity_delta} J/mol; "
         f"derived tolerance={tolerance} J/mol"
     )
+    # I6 is a byte check on the physical Na2O(l) lines. The parsed-field checks
+    # above cannot see a line ending or a value left in the unnamed trailing
+    # columns: csv.reader drops the terminator, and I3 compares only the copied
+    # fields. Each new line must be openimcc's 14 fields verbatim, then the
+    # three unnamed columns empty, then the file's own line terminator (taken
+    # from the unchanged header line), in ascending T_min order.
+    terminator = base_raw[0][len(base_raw[0].rstrip(b"\r\n")):]
+    expected_lines = [
+        (",".join(row) + "," * (len(FIELDS) - len(SOURCE_FIELDS))).encode("utf-8") + terminator
+        for row in source_na
+    ]
+    candidate_na_lines = [
+        raw for row, raw in zip(candidate_rows, candidate_raw[1:]) if row[0] == SPECIES
+    ]
+    bytes_ok = bool(terminator) and candidate_na_lines == expected_lines
+    results.append(
+        f"I6 {'PASS' if bytes_ok else 'FAIL'}: Na2O(l) physical lines byte-equal to openimcc fields + "
+        f"empty trailing columns + file terminator {terminator!r}"
+    )
     return results
 
 
@@ -168,7 +187,7 @@ def main() -> int:
     if failed:
         print(f"FAIL: {failed} validation condition(s) failed")
         return 1
-    print("PASS: I1–I5 satisfied")
+    print("PASS: I1–I6 satisfied")
     return 0
 
 
