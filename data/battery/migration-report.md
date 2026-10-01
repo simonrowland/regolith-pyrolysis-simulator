@@ -1,10 +1,10 @@
 # Battery v2.1 migration report
 
-rows in: 47306
-records out (observations): 120146
-works: 257
-experiments: 3502
-queue size: 77716
+rows in: 47353
+records out (observations): 120479
+works: 259
+experiments: 3505
+queue size: 76609
 identical-payload dedupe aliases: 342
 metadata files: 39
 index sources: 168
@@ -14,21 +14,21 @@ hard issues: 3180
 
 | count | spec | measured |
 |---|---:|---:|
-| citations | 147 | 260 (mismatch) |
+| citations | 147 | 262 (mismatch) |
 | doi_works | 56 | 123 (mismatch) |
-| no_doi_works | 91 | 134 (mismatch) |
-| admission_statuses | 374 | 947 (mismatch) |
+| no_doi_works | 91 | 136 (mismatch) |
+| admission_statuses | 374 | 994 (mismatch) |
 | supersedes | 422 | 649 (mismatch) |
 | series | 60 | 592 (mismatch) |
 | gibbs_reference_pressures | 1617 | 1635 (mismatch) |
 | gibbs_reference_100000 | 1023 | 1029 (mismatch) |
 | gibbs_reference_101325 | 594 | 594 |
 | formulas | 1625 | 2030 (mismatch) |
-| equipment_payloads | 670 | 971 (mismatch) |
+| equipment_payloads | 670 | 974 (mismatch) |
 | absent_admissions | 3511 | 4767 (mismatch) |
 | absent_classes | 2174 | 2201 (mismatch) |
 | range_only_T | 3125 | 2743 (mismatch) |
-| system_like_phases | 1065 | 2608 (mismatch) |
+| system_like_phases | 1065 | 2619 (mismatch) |
 | missing_phases | 237 | 367 (mismatch) |
 | tabulated_lists | — | 6 |
 
@@ -18001,9 +18001,9 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/extracts/kems-009-safarian-2013.yaml` | 2 | 2 | 10 |
 | `data/literature/extracts/kems-010-richter-2007.yaml` | 156 | 156 | 365 |
 | `data/literature/extracts/kems-011-wetzel-gail-2013.yaml` | 17 | 17 | 89 |
-| `data/literature/extracts/kems-012-sossi-2019.yaml` | 192 | 612 | 931 |
+| `data/literature/extracts/kems-012-sossi-2019.yaml` | 192 | 612 | 313 |
 | `data/literature/extracts/kems-014-drowart-2005.yaml` | 8 | 17 | 45 |
-| `data/literature/extracts/kems-015-hashimoto-1983.yaml` | 167 | 414 | 803 |
+| `data/literature/extracts/kems-015-hashimoto-1983.yaml` | 167 | 681 | 292 |
 | `data/literature/extracts/kems-016-stolyarova-1992.yaml` | 10 | 23 | 69 |
 | `data/literature/extracts/kems-017-stolyarova-2013.yaml` | 11 | 11 | 50 |
 | `data/literature/extracts/kems-018-stolyarova-2012.yaml` | 1 | 1 | 5 |
@@ -18161,6 +18161,8 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/extracts/senior-1991-vacuum-pyrolysis.yaml` | 0 | 0 | 1 |
 | `data/literature/extracts/senior-1992-vacuum-pyrolysis.yaml` | 0 | 0 | 1 |
 | `data/literature/extracts/sf04-magma-companion-workbook.yaml` | 7 | 56 | 77 |
+| `data/literature/extracts/shornikov-1994-mullite-kems.yaml` | 41 | 41 | 16 |
+| `data/literature/extracts/shornikov-1997-cao-alumina-vapor.yaml` | 6 | 25 | 6 |
 | `data/literature/extracts/slag-001-banya-1993.yaml` | 48 | 67 | 346 |
 | `data/literature/extracts/slag-002-banya-hino-nagasaka-1993.yaml` | 27 | 27 | 155 |
 | `data/literature/extracts/slag-003-hino-kitagawa-banya-1993.yaml` | 18 | 18 | 96 |
@@ -18271,8 +18273,8 @@ MODEL_DERIVED / MEASURED_REDUCED keep their mapped evidence class. Parent pointe
 
 ## Advisory issue census
 
-advisory issues: 216323
+advisory issues: 216634
 
 | kind | count |
 |---|---:|
-| `identity_incomplete` | 216323 |
+| `identity_incomplete` | 216634 |
