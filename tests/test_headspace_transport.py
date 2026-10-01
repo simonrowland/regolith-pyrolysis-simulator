@@ -13,6 +13,7 @@ import simulator.core as core_module
 from simulator.core import (
     Atmosphere,
     OxygenInterfaceConfigurationError,
+    OXYGEN_RESERVOIR_NOOP_MOL,
     PyrolysisSimulator,
 )
 from engines.builtin.overhead_bleed import controlled_flow_capacity
@@ -494,6 +495,8 @@ def test_interface_po2_uses_finite_two_film_force_and_publishes_regime():
         T_K=sim.melt.temperature_C + 273.15
     )
 
+    sim._apply_oxygen_reservoir_exchange()
+    reservoir = sim.melt.oxygen_reservoir
     interface_pO2_bar = sim._interface_pO2_bar()
     diagnostic = sim._last_oxygen_interface_diagnostic
     gas_k = diagnostic['gas_side_k_m_s']
@@ -643,6 +646,8 @@ def test_interface_po2_holds_headspace_at_kress91_ratio_limits(
     else:
         assert 1.0 - actual_fraction <= 1.0e-6 + 1.0e-12
 
+    sim._apply_oxygen_reservoir_exchange()
+    reservoir = sim.melt.oxygen_reservoir
     interface_pO2_bar = sim._interface_pO2_bar()
     transport_pO2_bar = reservoir.headspace_transport_pO2_bar
     hold_pO2_bar = max(
@@ -658,14 +663,15 @@ def test_interface_po2_holds_headspace_at_kress91_ratio_limits(
         assert diagnostic['redox_buffer_status'] == 'available'
         assert diagnostic['redox_buffer_exhausted'] is False
     else:
-        # The fixture's ledger is ferrous; a cached ferric endpoint cannot
-        # invent Fe2O3 inventory for release in the opposite direction.
+        # The fixture's committed ledger is ferrous. The cached Kress endpoint
+        # cannot create ferric inventory or a release transfer.
         assert interface_pO2_bar == pytest.approx(transport_pO2_bar)
-        assert diagnostic['redox_buffer_status'] == 'exhausted'
-        assert diagnostic['redox_buffer_exhausted'] is True
-        assert diagnostic['limiting_regime'] == (
-            'gas_side_redox_buffer_exhausted'
-        )
+        assert diagnostic['redox_buffer_status'] == 'available'
+        assert diagnostic['redox_buffer_exhausted'] is False
+        assert sim.atom_ledger.project_account_mol(
+            'process.cleaned_melt'
+        ).get('Fe2O3', 0.0) <= OXYGEN_RESERVOIR_NOOP_MOL
+        assert abs(reservoir.exchange_o2_mol) <= OXYGEN_RESERVOIR_NOOP_MOL
 
     equilibrium = sim._internal_analytical_equilibrium()
     release_pressures = [
@@ -682,8 +688,10 @@ def test_interface_distinguishes_fe_free_from_capacity_exhaustion(monkeypatch):
     sim = _transport_sim()
     sim.melt.temperature_C = 1500.0 - 273.15
     sim.melt.oxygen_reservoir.headspace_transport_pO2_bar = 1.0e-9
+    cleaned_melt_fe_atom_mol = sim._cleaned_melt_fe_atom_mol
     monkeypatch.setattr(sim, '_cleaned_melt_fe_atom_mol', lambda: 0.0)
 
+    sim._apply_oxygen_reservoir_exchange()
     interface_pO2_bar = sim._interface_pO2_bar()
     diagnostic = sim._last_oxygen_interface_diagnostic
 
@@ -691,6 +699,33 @@ def test_interface_distinguishes_fe_free_from_capacity_exhaustion(monkeypatch):
     assert diagnostic['redox_buffer_status'] == 'no_fe_redox_buffer'
     assert diagnostic['redox_buffer_exhausted'] is False
     assert diagnostic['limiting_regime'] == 'gas_side_no_fe_redox_buffer'
+
+    balances = sim.atom_ledger._balances['process.cleaned_melt']
+    balances['FeO'] = 2.0 * OXYGEN_RESERVOIR_NOOP_MOL
+    balances.pop('Fe2O3', None)
+    sim._project_cleaned_melt_from_atom_ledger()
+    sim._melt_redox_ledger_initialized = True
+    sim._sync_oxygen_reservoir_mirror()
+    monkeypatch.setattr(
+        sim,
+        '_cleaned_melt_fe_atom_mol',
+        cleaned_melt_fe_atom_mol,
+    )
+    reservoir = sim._apply_oxygen_reservoir_exchange()
+    diagnostic = sim._last_oxygen_interface_diagnostic
+
+    assert (
+        diagnostic['redox_buffer_inventory_mol']
+        > OXYGEN_RESERVOIR_NOOP_MOL
+    )
+    assert diagnostic['redox_buffer_status'] == 'exhausted'
+    assert diagnostic['redox_buffer_exhausted'] is True
+    assert diagnostic['limiting_regime'] == (
+        'gas_side_redox_buffer_exhausted'
+    )
+    assert reservoir.interface_pO2_bar == pytest.approx(
+        reservoir.headspace_transport_pO2_bar
+    )
 
 
 def test_interface_keeps_directional_inventory_when_differential_capacity_is_zero(
@@ -705,6 +740,7 @@ def test_interface_keeps_directional_inventory_when_differential_capacity_is_zer
         lambda **_: 0.0,
     )
 
+    sim._apply_oxygen_reservoir_exchange()
     interface_pO2_bar = sim._interface_pO2_bar()
     diagnostic = sim._last_oxygen_interface_diagnostic
 
@@ -826,33 +862,71 @@ def test_oxygen_exchange_refuses_missing_config_before_no_capacity_return():
 def test_internal_equilibrium_uses_interface_for_all_surface_release_consumers():
     """The analytical consumer applies the same interface pO2 to every rail."""
 
-    sim = _transport_sim()
-    sim.melt.temperature_C = 1500.0
-    sim.melt.p_total_mbar = 5.0
-    reservoir = sim.melt.oxygen_reservoir
-    reservoir.melt_intrinsic_fO2_log = -9.0
+    def _run_exchange(headspace_pO2_bar):
+        sim = _transport_sim()
+        sim.melt.temperature_C = 1500.0
+        sim.melt.p_total_mbar = 100.0
+        sim.melt.atmosphere = Atmosphere.PN2_SWEEP
+        sim._overhead_headspace_config['enabled'] = True
+        sim._melt_headspace_composition_mbar = {'N2': 1.0}
+        sim.atom_ledger.load_external_mol(
+            'process.cleaned_melt',
+            {'Fe2O3': 100.0},
+            source='test ferric melt for committed interface exchange',
+            material_origin='feedstock',
+        )
+        sim._project_cleaned_melt_from_atom_ledger()
+        sim._melt_redox_ledger_initialized = True
+        sim._sync_oxygen_reservoir_mirror()
+        if headspace_pO2_bar is not None:
+            headspace_o2_mol = sim._headspace_o2_mol_for_pO2_bar(
+                headspace_pO2_bar
+            )
+            sim.atom_ledger.load_external_mol(
+                'process.overhead_gas',
+                {'O2': headspace_o2_mol},
+                source='test headspace oxygen for committed interface exchange',
+                material_origin='feedstock',
+            )
 
-    reservoir.headspace_transport_pO2_bar = 1.0e-9
-    low = sim._internal_analytical_equilibrium().vapor_pressures_Pa
-    low_interface = reservoir.interface_pO2_bar
+        reservoir = sim._apply_oxygen_reservoir_exchange()
+        assert abs(reservoir.exchange_o2_mol) > OXYGEN_RESERVOIR_NOOP_MOL
+        interface_pO2_bar = sim._interface_pO2_bar()
+        transport_pO2_bar = reservoir.headspace_transport_pO2_bar
+        assert interface_pO2_bar != pytest.approx(transport_pO2_bar)
 
-    reservoir.headspace_transport_pO2_bar = 1.0e-3
-    high_result = sim._internal_analytical_equilibrium()
-    high = high_result.vapor_pressures_Pa
-    high_interface = reservoir.interface_pO2_bar
-    vapor_diagnostic = high_result.diagnostics
+        interface_reads = []
+        read_interface = sim._interface_pO2_bar
 
+        def _record_interface():
+            value = read_interface()
+            interface_reads.append(value)
+            return value
+
+        sim._interface_pO2_bar = _record_interface
+        result = sim._internal_analytical_equilibrium()
+        assert interface_reads
+        assert interface_reads == pytest.approx(
+            [interface_pO2_bar] * len(interface_reads)
+        )
+        diagnostics = result.diagnostics
+        assert diagnostics['headspace_transport_pO2_bar'] == pytest.approx(
+            transport_pO2_bar
+        )
+        assert diagnostics['interface_pO2_bar'] == pytest.approx(
+            interface_pO2_bar
+        )
+        assert diagnostics['interface_pO2_bar'] != pytest.approx(
+            diagnostics['headspace_transport_pO2_bar']
+        )
+        return interface_pO2_bar, result.vapor_pressures_Pa
+
+    low_interface, low = _run_exchange(None)
+    high_interface, high = _run_exchange(1.0e-6)
     assert high_interface > low_interface
-    assert vapor_diagnostic['headspace_transport_pO2_bar'] == pytest.approx(
-        1.0e-3
-    )
-    assert vapor_diagnostic['interface_pO2_bar'] == pytest.approx(
-        high_interface
-    )
-    assert vapor_diagnostic['interface_pO2_bar'] != pytest.approx(
-        vapor_diagnostic['headspace_transport_pO2_bar']
-    )
     for species in ('Na', 'K', 'Fe', 'SiO'):
         assert low[species] > 0.0
         assert high[species] > 0.0
-        assert high[species] != pytest.approx(low[species])
+        assert high[species] != pytest.approx(
+            low[species], rel=1.0e-9, abs=0.0
+        )

@@ -4951,19 +4951,8 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self,
         reservoir: OxygenReservoirState,
         *,
-        transport_pO2_bar: Optional[float] = None,
-        intrinsic_fO2_log: Optional[float] = None,
+        state: Mapping[str, Any],
     ) -> None:
-        if transport_pO2_bar is None:
-            transport_pO2_bar = getattr(
-                reservoir,
-                'headspace_transport_pO2_bar',
-                self._vapor_pressure_transport_pO2_bar(),
-            )
-        state = self._oxygen_interface_state(
-            float(transport_pO2_bar),
-            intrinsic_fO2_log=intrinsic_fO2_log,
-        )
         reservoir.interface_pO2_bar = max(
             self._vacuum_floor_bar(),
             float(state['interface_pO2_bar']),
@@ -6592,6 +6581,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 'missing_oxygen_reservoir',
                 'SSO-R interface requires a typed oxygen reservoir state',
             )
+        self._require_oxygen_exchange_config()
         # G8: vapour must consume this hour's committed exchange, not re-solve
         # a fresh two-film root from the post-commit ledger.
         return float(reservoir.interface_pO2_bar)
@@ -10030,9 +10020,8 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             self._sync_oxygen_reservoir_mirror()
             return reservoir
 
-        self._apply_oxygen_interface_diagnostic(
-            reservoir,
-            transport_pO2_bar=transport_pO2,
+        interface_diagnostic = self._oxygen_interface_state(
+            float(transport_pO2),
             intrinsic_fO2_log=base_fO2_log,
         )
         transfer_status = str(finite_transfer.get('status', '') or '')
@@ -10220,17 +10209,22 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             )
             self._melt_redox_gate_authority_tick_hour = None
             gate_authority = self._establish_melt_redox_gate_authority_for_current_hour()
-        if abs(transfer_mol) <= OXYGEN_RESERVOIR_NOOP_MOL:
-            reservoir.interface_pO2_bar = max(
+        committed_interface_pO2_bar = (
+            max(
                 self._vacuum_floor_bar(),
                 float(reservoir.headspace_transport_pO2_bar),
             )
-        else:
-            # Publish the accepted trajectory endpoint. A post-commit
-            # diagnostic root would describe a new, uncommitted exchange.
-            reservoir.interface_pO2_bar = float(
-                finite_transfer['interface_pO2_bar']
-            )
+            if abs(transfer_mol) <= OXYGEN_RESERVOIR_NOOP_MOL
+            else float(finite_transfer['interface_pO2_bar'])
+        )
+        # Publish the diagnostic captured for this exchange beside the
+        # accepted trajectory endpoint. Do not re-solve from the mutated
+        # ledger; a zero commit holds the interface at the gas pressure.
+        self._apply_oxygen_interface_diagnostic(
+            reservoir,
+            state=interface_diagnostic,
+        )
+        reservoir.interface_pO2_bar = committed_interface_pO2_bar
         reservoir.exchange_o2_mol = transfer_mol
         reservoir.exchange_o2_kg = (
             transfer_mol * OXYGEN_MOLAR_MASS_KG_PER_MOL
