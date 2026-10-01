@@ -1,10 +1,10 @@
 # Battery v2.1 migration report
 
-rows in: 47353
-records out (observations): 120479
-works: 259
-experiments: 3505
-queue size: 76609
+rows in: 47365
+records out (observations): 120535
+works: 260
+experiments: 3507
+queue size: 76637
 identical-payload dedupe aliases: 342
 metadata files: 39
 index sources: 168
@@ -14,21 +14,21 @@ hard issues: 3180
 
 | count | spec | measured |
 |---|---:|---:|
-| citations | 147 | 262 (mismatch) |
+| citations | 147 | 263 (mismatch) |
 | doi_works | 56 | 123 (mismatch) |
-| no_doi_works | 91 | 136 (mismatch) |
-| admission_statuses | 374 | 994 (mismatch) |
+| no_doi_works | 91 | 137 (mismatch) |
+| admission_statuses | 374 | 1006 (mismatch) |
 | supersedes | 422 | 649 (mismatch) |
 | series | 60 | 592 (mismatch) |
 | gibbs_reference_pressures | 1617 | 1635 (mismatch) |
 | gibbs_reference_100000 | 1023 | 1029 (mismatch) |
 | gibbs_reference_101325 | 594 | 594 |
 | formulas | 1625 | 2030 (mismatch) |
-| equipment_payloads | 670 | 974 (mismatch) |
+| equipment_payloads | 670 | 975 (mismatch) |
 | absent_admissions | 3511 | 4767 (mismatch) |
-| absent_classes | 2174 | 2201 (mismatch) |
-| range_only_T | 3125 | 2743 (mismatch) |
-| system_like_phases | 1065 | 2619 (mismatch) |
+| absent_classes | 2174 | 2205 (mismatch) |
+| range_only_T | 3125 | 2747 (mismatch) |
+| system_like_phases | 1065 | 2625 (mismatch) |
 | missing_phases | 237 | 367 (mismatch) |
 | tabulated_lists | — | 6 |
 
@@ -36,11 +36,11 @@ hard issues: 3180
 
 | source method_class | count |
 |---|---:|
-| `absent` | 575 |
+| `absent` | 579 |
 | `compilation_assessed` | 95 |
 | `method_only` | 38 |
+| `measured_reduced` | 23 |
 | `quoted_attributed` | 22 |
-| `measured_reduced` | 21 |
 | `measured_tabulated` | 16 |
 | `author_estimate` | 11 |
 | `derived_from_kems_equilibrium_constants` | 8 |
@@ -18173,6 +18173,7 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/extracts/stebbins-carmichael-weill-1983.yaml` | 5 | 5 | 35 |
 | `data/literature/extracts/steurer-1985-vapor-phase-pyrolysis.yaml` | 8 | 43 | 151 |
 | `data/literature/extracts/steurer-1992-vapor-phase-pyrolysis.yaml` | 2 | 11 | 39 |
+| `data/literature/extracts/stolyarova-1995-cao-alumina-kems.yaml` | 12 | 56 | 28 |
 | `data/literature/extracts/street-2010-thermal-properties-simulants.yaml` | 7 | 13 | 35 |
 | `data/literature/extracts/sublimation-kinetics-2023-minerals.yaml` | 19 | 57 | 84 |
 | `data/literature/extracts/ta-badro-2021.yaml` | 28 | 28 | 64 |
@@ -18273,8 +18274,8 @@ MODEL_DERIVED / MEASURED_REDUCED keep their mapped evidence class. Parent pointe
 
 ## Advisory issue census
 
-advisory issues: 216634
+advisory issues: 216934
 
 | kind | count |
 |---|---:|
-| `identity_incomplete` | 216634 |
+| `identity_incomplete` | 216934 |
