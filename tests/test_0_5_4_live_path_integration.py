@@ -93,17 +93,16 @@ def test_w7_pipe_conductance_uses_live_evap_flux_species():
     melt)`` threads ``evap_flux.species_kg_hr`` through to
     ``_pipe_conductance`` as the source for M_avg. With a
     Na-only flux vs a Fe-only flux at the same total mass rate
-    and same pressure / T, the resulting conductance scales by
-    ``M_Fe / M_Na ≈ 2.43``. End-to-end check that the W7 wire is
-    live in the production callsite (not just the unit-test
-    monkey-patch)."""
+    and same pressure / T, the resulting capacity follows the
+    minimum of the Poiseuille and sonic limits. End-to-end check
+    that the W7 wire is live in the production callsite (not just
+    the unit-test monkey-patch)."""
     from simulator.overhead import OverheadGasModel
     from simulator.state import (
         Atmosphere,
         CondensationTrain,
         EvaporationFlux,
         MeltState,
-        MOLAR_MASS,
     )
 
     melt = MeltState()
@@ -120,16 +119,37 @@ def test_w7_pipe_conductance_uses_live_evap_flux_species():
     state_na = model.estimate_transport_state(flux_na, melt)
     state_fe = model.estimate_transport_state(flux_fe, melt)
 
-    # End-to-end ratio: Fe (56 g/mol) conductance / Na (23 g/mol)
-    # conductance == M_Fe / M_Na (the rest of the formula is
-    # identical across both calls).
+    # Derive each expected capacity from the same dual law used by
+    # transport: min(Poiseuille capacity, sonic capacity) at the
+    # fixture's allowed upstream pressure and downstream boundary.
     conductance_na = state_na["pipe_conductance_kg_hr"]
     conductance_fe = state_fe["pipe_conductance_kg_hr"]
-    expected_ratio = MOLAR_MASS["Fe"] / MOLAR_MASS["Na"]
+
+    upstream_Pa = max(melt.p_total_mbar * 100.0, 1.0)
+    downstream_Pa = model._resolve_downstream_pressure(melt, None) * 1.0e5
+
+    def expected_capacity(species):
+        poiseuille = model._pipe_conductance(
+            upstream_Pa,
+            melt.temperature_C,
+            p_downstream_Pa=downstream_Pa,
+            species_kg_for_M_avg=species,
+        )
+        sonic = model._choked_flow_coefficient_kg_s_Pa(
+            melt.temperature_C,
+            species_kg_for_M_avg=species,
+        ) * upstream_Pa
+        return min(poiseuille, sonic)
+
+    expected_na = expected_capacity({"Na": 1.0})
+    expected_fe = expected_capacity({"Fe": 1.0})
+    assert conductance_na / 3600.0 == pytest.approx(expected_na, rel=1e-12)
+    assert conductance_fe / 3600.0 == pytest.approx(expected_fe, rel=1e-12)
     actual_ratio = conductance_fe / conductance_na
-    assert actual_ratio == pytest.approx(expected_ratio, rel=1e-6), (
+    expected_ratio = expected_fe / expected_na
+    assert actual_ratio == pytest.approx(expected_ratio, rel=1e-12), (
         f"W7 wire broken: live mixture ratio {actual_ratio} "
-        f"!= expected M_Fe/M_Na ratio {expected_ratio}"
+        f"!= dual-law capacity ratio {expected_ratio}"
     )
 
 

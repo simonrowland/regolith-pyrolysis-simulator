@@ -372,6 +372,7 @@ def test_per_hour_alkali_series_separate_cumulative_condensate_from_live_product
     session = run._start_session()
     rows = []
     terminal_offgas = []
+    overhead_gas = []
     for _ in range(12):
         decision = session.pending_decision()
         if decision is not None:
@@ -383,6 +384,12 @@ def test_per_hour_alkali_series_separate_cumulative_condensate_from_live_product
         )
         terminal_offgas.append(
             {species: float(offgas.get(species, 0.0)) for species in ("Na", "K")}
+        )
+        headspace = session.simulator.atom_ledger.project_account_kg(
+            "process.overhead_gas"
+        )
+        overhead_gas.append(
+            {species: float(headspace.get(species, 0.0)) for species in ("Na", "K")}
         )
 
     def alkali_total(row: dict, key: str) -> float:
@@ -400,10 +407,14 @@ def test_per_hour_alkali_series_separate_cumulative_condensate_from_live_product
         values = [alkali_total(row, key) for row in rows]
         assert values == sorted(values), key
 
-    for row, offgas in zip(rows, terminal_offgas):
+    # The product-ledger projection includes process.overhead_gas. With
+    # finite headspace, close gross condensation after accounting for the
+    # vapor still in that live gas inventory as well as terminal offgas.
+    for row, offgas, headspace in zip(rows, terminal_offgas, overhead_gas):
         for species in ("Na", "K"):
             assert (
                 row["condensation_train_kg_cumulative"].get(species, 0.0)
+                + headspace[species]
                 == pytest.approx(
                     row["product_ledger_kg_at_hour"].get(species, 0.0)
                     + row["recycled_to_reagent_kg_cumulative"].get(species, 0.0)
