@@ -10,13 +10,16 @@ from collections import Counter, defaultdict
 from dataclasses import dataclass
 from decimal import Decimal, InvalidOperation
 from functools import lru_cache
+from fractions import Fraction
 from pathlib import Path
 from typing import Any, Iterable, Mapping, Sequence
 
 from simulator.battery.enums import (
     QUANTITY_UNITS,
     AdmissionStatus,
+    Authority,
     EvidenceClass,
+    NoticeKind,
     PerBasis,
     Phase,
     Polymorph,
@@ -43,7 +46,11 @@ from simulator.battery.records import (
     Derivation,
     Evidence,
     Locator,
+    Notice,
     Observation,
+    Reaction,
+    ReactionTerm,
+    Species,
     State,
     Uncertainty,
     Value,
@@ -75,12 +82,6 @@ STANDARD_PRESSURE_PA = Decimal("100000")
 # use 1986 CODATA; the printed constants table, and the log Kf column
 # identity against it, keep 8.31441. Do not substitute CODATA 2018.
 JANAF_R_J_PER_MOL_K = Decimal("8.31441")
-FORMATION_BASIS_REASON = (
-    "JANAF formation from the elements in their reference states, as defined in "
-    "JANAF Thermochemical Tables, 4th edition, introduction; schema v2.1 has no "
-    "closed token for this convention, and the table does not print a "
-    "temperature-specific formation reaction"
-)
 MERGED_FORMATION_REFUSAL_REASON = (
     "NIST's rendering drops minus signs in space-joined formation fields; "
     "a nonzero printed token is sign-ambiguous"
@@ -203,16 +204,15 @@ _FORMATION_PAIR_COLUMNS = (
 )
 _SINGLE_PHASES = {"g": Phase.G, "cr": Phase.CR, "l": Phase.L}
 _COMBINED_STATES = frozenset({"cr,l", "ref", "l,g"})
+# If a held JANAF (ref) table for one of these exact formulas has neither a
+# phase in its heading nor transition rows, use the monograph's ideal-gas
+# convention and mark every dependent observation because that page is not held.
+JANAF_REFERENCE_PHASE_BY_CONVENTION = frozenset(
+    {"O2", "H2", "N2", "F2", "Cl2", "He", "Ne", "Ar", "Kr", "Xe", "Rn"}
+)
 _FIXED_REFERENCE_PHASES = {
-    "Ar": Phase.G,
     "C": Phase.CR,
-    "Cl2": Phase.G,
-    "F2": Phase.G,
-    "H2": Phase.G,
-    "He": Phase.G,
-    "N2": Phase.G,
-    "Ne": Phase.G,
-    "O2": Phase.G,
+    **{formula: Phase.G for formula in JANAF_REFERENCE_PHASE_BY_CONVENTION},
 }
 _PHASE_SIDE = {
     "CRYSTAL": Phase.CR,
@@ -283,6 +283,48 @@ class _Segment:
     lower_K: Decimal | None
     upper_K: Decimal | None
     boundary_labels: tuple[str, ...]
+
+
+@dataclass(frozen=True)
+class _ElementReferenceSchedule:
+    table_id: str
+    formula: str
+    lower_K: Decimal
+    upper_K: Decimal
+    boundaries: tuple[_Boundary, ...]
+    segments: tuple[_Segment, ...]
+    heading_phase: Phase | None
+
+
+@dataclass(frozen=True)
+class _FormationBasis:
+    reaction: State[Reaction]
+    formation_elements: State[tuple[tuple[str, Species], ...]]
+    reference_locator_key: tuple[tuple[str, str, int | None, int | None], ...]
+    locator_note: str
+    convention_tables: tuple[tuple[str, str], ...] = ()
+
+    @property
+    def identity_suffix(self) -> str:
+        parts = []
+        for element, table_id, lower_line, upper_line in self.reference_locator_key:
+            if table_id == "missing":
+                parts.append(f"{element}-no-ref")
+            elif lower_line == -1:
+                parts.append(f"{table_id}-below-range")
+            elif lower_line == -2:
+                parts.append(f"{table_id}-above-range")
+            elif lower_line is None and upper_line is None:
+                parts.append(f"{table_id}-no-transition")
+            elif lower_line is not None and lower_line == upper_line:
+                parts.append(f"{table_id}-at-{lower_line}")
+            elif lower_line is not None and upper_line is None:
+                parts.append(f"{table_id}-after-{lower_line}")
+            elif lower_line is None and upper_line is not None:
+                parts.append(f"{table_id}-before-{upper_line}")
+            else:
+                parts.append(f"{table_id}-{lower_line}-{upper_line}")
+        return "formation-ref-" + "-".join(parts)
 
 
 def _published_decimal(token: object) -> Decimal | None:
@@ -807,6 +849,14 @@ def _phase_state(phase: Phase | None, reason: str) -> State[Phase]:
     return State.of(phase) if phase is not None else State.unknown(reason)
 
 
+def _printed_heading_phase(name: str, title: str) -> Phase | None:
+    heading = f"{name} {title}".upper()
+    for spelling, phase in sorted(_PHASE_SIDE.items(), key=lambda item: -len(item[0])):
+        if re.search(rf"(?<![A-Z]){re.escape(spelling)}(?![A-Z])", heading):
+            return phase
+    return None
+
+
 def _polymorph_from_resolve(
     tag: StateTag, value: Polymorph | None, reason: str
 ) -> State[Polymorph]:
@@ -996,6 +1046,276 @@ def _segments(
             )
         )
     return tuple(result)
+
+
+@lru_cache(maxsize=None)
+def _element_reference_schedule(element: str) -> _ElementReferenceSchedule | None:
+    """Load this element's printed (ref) table, if the corpus has one."""
+
+    matches: list[tuple[Path, Mapping[str, Any], str]] = []
+    for path in sorted(TABLES_DIR.glob(f"{element}-*.yaml")):
+        table = _unwrap_table(load_table_document(path))
+        entry = table.get("index_entry")
+        if not isinstance(entry, Mapping) or entry.get("state") != "ref":
+            continue
+        formula = str(entry.get("formula_normalised") or "")
+        composition = formula_composition(formula)
+        if (
+            composition is not None
+            and len(composition) == 1
+            and composition[0][0] == element
+        ):
+            matches.append((path, table, formula))
+    if len(matches) != 1:
+        return None
+
+    path, table, formula = matches[0]
+    table_id = str(table.get("table_id") or path.stem)
+    entry = table.get("index_entry")
+    assert isinstance(entry, Mapping)
+    name = str(entry.get("name") or "")
+    title = str(table.get("title_as_published") or "")
+    heading_phase = _printed_heading_phase(name, title)
+    structured = _structured_rows(table, table_id)
+    printed_temperatures = table_printed_temperatures(
+        row.temperature_token for row in structured
+    )
+    if not printed_temperatures:
+        return None
+    short, _refused = _short_rows(table, table_id)
+    boundaries = tuple(
+        _Boundary(row.temperature, row.label or "", *parts, row.order)
+        for row in short
+        if (parts := _phase_change(row.label)) is not None
+    )
+    if not boundaries:
+        # The (ref) designation identifies the table, but this table prints no
+        # phase schedule from which a Phase token can be taken.
+        segments: tuple[_Segment, ...] = ()
+    else:
+        segments = _segments(
+            "ref",
+            formula,
+            boundaries,
+            name=name,
+            title=title,
+        )
+    return _ElementReferenceSchedule(
+        table_id=table_id,
+        formula=formula,
+        lower_K=min(printed_temperatures),
+        upper_K=max(printed_temperatures),
+        boundaries=boundaries,
+        segments=segments,
+        heading_phase=heading_phase,
+    )
+
+
+@lru_cache(maxsize=None)
+def _element_reference_state(
+    element: str, temperature: Decimal
+) -> tuple[
+    State[Species],
+    Fraction | None,
+    tuple[str, str, int | None, int | None],
+    str,
+    bool,
+]:
+    schedule = _element_reference_schedule(element)
+    if schedule is None:
+        reason = (
+            f"JANAF printed corpus has no unique (ref) table for element {element}"
+        )
+        return (
+            State.unknown(reason),
+            None,
+            (element, "missing", None, None),
+            reason,
+            False,
+        )
+
+    table_prefix = f"{schedule.table_id} (ref)"
+    if not schedule.lower_K <= temperature <= schedule.upper_K:
+        below = temperature < schedule.lower_K
+        direction = "below" if below else "above"
+        reason = (
+            f"printed series temperature is {direction} the {table_prefix} range "
+            f"{schedule.lower_K}–{schedule.upper_K} K"
+        )
+        return (
+            State.unknown(reason),
+            None,
+            (element, schedule.table_id, -1 if below else -2, None),
+            reason,
+            False,
+        )
+    if not schedule.boundaries:
+        if schedule.heading_phase is not None:
+            species = make_species(
+                schedule.formula, State.of(schedule.heading_phase), None
+            )
+            composition = formula_composition(schedule.formula)
+            assert composition is not None and len(composition) == 1
+            return (
+                State.of(species),
+                Fraction(str(composition[0][1])),
+                (element, schedule.table_id, None, None),
+                f"{table_prefix}, single phase printed in heading",
+                False,
+            )
+        if schedule.formula in JANAF_REFERENCE_PHASE_BY_CONVENTION:
+            # The table itself prints no phase; the allowed monograph
+            # convention is explicitly carried as an observation notice.
+            composition = formula_composition(schedule.formula)
+            assert composition is not None and len(composition) == 1
+            species = make_species(schedule.formula, State.of(Phase.G), None)
+            return (
+                State.of(species),
+                Fraction(str(composition[0][1])),
+                (element, schedule.table_id, None, None),
+                f"{table_prefix}, ideal gas by monograph convention over printed T range",
+                True,
+            )
+        reason = f"{table_prefix} prints no phase transition naming a phase"
+        return (
+            State.unknown(reason),
+            None,
+            (element, schedule.table_id, None, None),
+            reason,
+            False,
+        )
+
+    exact = tuple(
+        boundary
+        for boundary in schedule.boundaries
+        if boundary.temperature == temperature
+    )
+    if exact:
+        lines = tuple(boundary.row_order for boundary in exact)
+        line_note = ", ".join(str(line) for line in lines)
+        reason = (
+            f"printed {table_prefix} transition row {line_note} is exact; "
+            "both phases apply"
+        )
+        return (
+            State.unknown(reason),
+            None,
+            (element, schedule.table_id, lines[0], lines[0]),
+            reason,
+            False,
+        )
+
+    lower = max(
+        (boundary for boundary in schedule.boundaries if boundary.temperature < temperature),
+        key=lambda boundary: boundary.temperature,
+        default=None,
+    )
+    upper = min(
+        (boundary for boundary in schedule.boundaries if boundary.temperature > temperature),
+        key=lambda boundary: boundary.temperature,
+        default=None,
+    )
+    lower_line = lower.row_order if lower is not None else None
+    upper_line = upper.row_order if upper is not None else None
+    if lower is not None and upper is not None:
+        bracket = f"transition rows {lower_line} and {upper_line} bracket series T"
+    elif lower is not None:
+        bracket = f"transition row {lower_line} brackets lower series T"
+    else:
+        bracket = f"transition row {upper_line} brackets upper series T"
+    locator_note = f"{table_prefix}, {bracket}"
+
+    segment_index = sum(
+        boundary.temperature < temperature for boundary in schedule.boundaries
+    )
+    segment = schedule.segments[segment_index]
+    if segment.phase.is_unknown:
+        reason = segment.phase.reason or f"{table_prefix} does not name a phase"
+        return (
+            State.unknown(reason),
+            None,
+            (element, schedule.table_id, lower_line, upper_line),
+            f"{locator_note}; phase unknown: {reason}",
+            False,
+        )
+    composition = formula_composition(schedule.formula)
+    if composition is None or len(composition) != 1 or composition[0][0] != element:
+        reason = f"{table_prefix} does not give a single-element reference formula"
+        return (
+            State.unknown(reason),
+            None,
+            (element, schedule.table_id, lower_line, upper_line),
+            f"{locator_note}; {reason}",
+            False,
+        )
+    reference_atom_count = Fraction(str(composition[0][1]))
+    species = make_species(schedule.formula, segment.phase, segment.polymorph)
+    return (
+        State.of(species),
+        reference_atom_count,
+        (element, schedule.table_id, lower_line, upper_line),
+        locator_note,
+        False,
+    )
+
+
+def _formation_basis_at_temperature(
+    formula: str, product: Species, temperature: Decimal
+) -> _FormationBasis:
+    composition = formula_composition(formula)
+    if composition is None:
+        reason = f"JANAF formula {formula!r} has no parsed formation composition"
+        return _FormationBasis(
+            State.unknown(reason),
+            State.unknown(reason),
+            (),
+            reason,
+        )
+
+    terms = [ReactionTerm(product, Fraction(1))]
+    formation_elements: list[tuple[str, Species]] = []
+    reference_locator_key = []
+    locator_notes = []
+    convention_tables: list[tuple[str, str]] = []
+    unknown_reasons = []
+    for element, amount in composition:
+        species_state, reference_atom_count, locator_key, locator_note, convention = (
+            _element_reference_state(element, temperature)
+        )
+        reference_locator_key.append(locator_key)
+        locator_notes.append(locator_note)
+        if convention:
+            convention_tables.append((element, locator_key[1]))
+        if not species_state.is_value or reference_atom_count is None:
+            unknown_reasons.append(species_state.reason or locator_note)
+            continue
+        reference_species = species_state.value
+        formation_elements.append((element, reference_species))
+        terms.append(
+            ReactionTerm(
+                reference_species,
+                -Fraction(str(amount)) / reference_atom_count,
+            )
+        )
+
+    locator_note = "printed JANAF (ref) schedules: " + "; ".join(locator_notes)
+    key = tuple(reference_locator_key)
+    if unknown_reasons:
+        reason = "; ".join(unknown_reasons)
+        return _FormationBasis(
+            State.unknown(reason),
+            State.unknown(reason),
+            key,
+            locator_note,
+            tuple(convention_tables),
+        )
+    return _FormationBasis(
+        State.of(Reaction(tuple(terms))),
+        State.of(tuple(formation_elements)),
+        key,
+        locator_note,
+        tuple(convention_tables),
+    )
 
 
 def _decimal_grain(token: str) -> Decimal:
@@ -1233,6 +1553,17 @@ def _neighbour_sign_hits(observations: Sequence[Observation]) -> list[dict[str, 
     return hits
 
 
+def _observation_series_key(observation: Observation) -> str:
+    """Series group key shared by quantities in one compound/ref-state window."""
+
+    parts = observation.observation_id.split(":", 3)
+    return (
+        f"{parts[0]}:{parts[1]}:{parts[3]}"
+        if len(parts) == 4
+        else observation.observation_id
+    )
+
+
 def _stored_pair_identity_denominator(
     observations: Sequence[Observation],
     failures: Sequence[Mapping[str, str]],
@@ -1249,9 +1580,7 @@ def _stored_pair_identity_denominator(
     for observation in observations:
         quantity = observation.identity.quantity.value
         if quantity in {Quantity.DELTA_FG, Quantity.LOG10_KF}:
-            by_segment[observation.observation_id.rsplit(":", 1)[-1]][quantity] = (
-                observation
-            )
+            by_segment[_observation_series_key(observation)][quantity] = observation
     eligible_delta_fG = 0
     eligible_log10_Kf = 0
     checked = 0
@@ -1292,7 +1621,7 @@ def _stored_pair_identity_failures_from_observations(
         quantity = observation.identity.quantity.value
         if quantity not in {Quantity.DELTA_FG, Quantity.LOG10_KF}:
             continue
-        segment = observation.observation_id.rsplit(":", 1)[-1]
+        segment = _observation_series_key(observation)
         by_segment[segment][quantity] = observation
     failures: list[dict[str, str]] = []
     for quantity_map in by_segment.values():
@@ -1430,6 +1759,7 @@ def _observation(
     transition_label: str | None = None,
     transition_pressure_Pa: Decimal | None = None,
     transition_pressure_basis: str | None = None,
+    formation_basis: _FormationBasis | None = None,
 ) -> Observation:
     species = make_species(formula, phase, polymorph, charge=charge)
     known: dict[str, Any] = {}
@@ -1449,9 +1779,34 @@ def _observation(
         if quantity is Quantity.H_MINUS_H298:
             known["subtype"] = State.of("H(T)-H(298.15 K)")
         if quantity in {Quantity.DELTA_FH, Quantity.DELTA_FG, Quantity.LOG10_KF}:
-            known["reaction"] = State.unknown(FORMATION_BASIS_REASON)
-            known["formation_elements"] = State.unknown(FORMATION_BASIS_REASON)
+            if formation_basis is None:
+                reason = (
+                    "JANAF formation observation has no printed T coordinate "
+                    "for the element reference-state schedule"
+                )
+                known["reaction"] = State.unknown(reason)
+                known["formation_elements"] = State.unknown(reason)
+            else:
+                known["reaction"] = formation_basis.reaction
+                known["formation_elements"] = formation_basis.formation_elements
     identity = fill_identity(quantity, species, **known)
+    notices = tuple(
+        Notice(
+            kind=NoticeKind.REFERENCE_PHASE_BY_CONVENTION,
+            affected_quantities=(quantity,),
+            reason=(
+                "JANAF web table prints no phase; ideal-gas reference state per "
+                "the monograph convention, page not held"
+            ),
+            origin=f"{reference_table} ({reference_element}) reference-element table",
+            authority=Authority.CONVENTION,
+            certification="fetch the JANAF 4th ed. printed page for the table",
+        )
+        for reference_element, reference_table in (
+            () if formation_basis is None else formation_basis.convention_tables
+        )
+        if quantity in {Quantity.DELTA_FH, Quantity.DELTA_FG, Quantity.LOG10_KF}
+    )
     role_note = (
         "compilation_role engine_reference_input=true, scoring_eligible=false; "
         f"circularity_warning={CIRCULARITY_WARNING}"
@@ -1467,14 +1822,24 @@ def _observation(
             f"{role_note}"
         )
         if quantity in {Quantity.DELTA_FH, Quantity.DELTA_FG, Quantity.LOG10_KF}:
-            relation += f"; formation_basis={FORMATION_BASIS_REASON}"
+            if formation_basis is not None:
+                relation += (
+                    "; formation_reference_state_schedule="
+                    f"{formation_basis.locator_note}"
+                )
         if segment is not None:
             relation += f"; phase_basis={segment.phase_basis}"
+    locator_note = f"NIST download_url: {download_url}"
+    identity_suffix = ""
+    if quantity in {Quantity.DELTA_FH, Quantity.DELTA_FG, Quantity.LOG10_KF}:
+        if formation_basis is not None:
+            locator_note += f"; {formation_basis.locator_note}"
+            identity_suffix = f":{formation_basis.identity_suffix}"
     locator = Locator(
         table=table_id,
         source_path=source_path,
         record=table_id,
-        note=f"NIST download_url: {download_url}",
+        note=locator_note,
     )
     if quantity is Quantity.TRANSITION_TEMPERATURE:
         # Content-stable: printed T, not the mutable subtype label (F4 R-label).
@@ -1492,7 +1857,7 @@ def _observation(
             upper_K=segment.upper_K,
         )
     return Observation(
-        observation_id=f"{SOURCE_ID}:{table_id}:{suffix}",
+        observation_id=f"{SOURCE_ID}:{table_id}:{suffix}{identity_suffix}",
         experiment_id=f"{SOURCE_ID}:{table_id}:tabulation",
         identity=identity,
         value=value,
@@ -1506,7 +1871,7 @@ def _observation(
             status=AdmissionStatus.PENDING,
             reason="source does not state admission_status",
         ),
-        notices=(),
+        notices=notices,
         source_id=SOURCE_ID,
         locator=locator,
         read_from=f"unknown:{SOURCE_ID}",
@@ -1758,9 +2123,65 @@ def generate_table(
 
     observations: list[Observation] = []
     counts_by_segment: dict[str, Counter[str]] = defaultdict(Counter)
+    formation_basis_cache: dict[tuple[int, Decimal], _FormationBasis] = {}
     for segment in segments:
         for column, quantity in _COLUMN_QUANTITIES.items():
             series = sorted(points.get((segment.index, column), ()), key=lambda p: (p[0], p[2]))
+            if series and quantity in {
+                Quantity.DELTA_FH,
+                Quantity.DELTA_FG,
+                Quantity.LOG10_KF,
+            }:
+                product = make_species(
+                    formula, segment.phase, segment.polymorph, charge=charge
+                )
+                grouped: dict[
+                    tuple[State[Reaction], State[tuple[tuple[str, Species], ...]], tuple],
+                    tuple[_FormationBasis, list[tuple[Decimal, Decimal, int]]],
+                ] = {}
+                for point in series:
+                    basis_key = (segment.index, point[0])
+                    basis = formation_basis_cache.get(basis_key)
+                    if basis is None:
+                        basis = _formation_basis_at_temperature(
+                            formula, product, point[0]
+                        )
+                        formation_basis_cache[basis_key] = basis
+                    key = (
+                        basis.reaction,
+                        basis.formation_elements,
+                        basis.reference_locator_key,
+                    )
+                    if key not in grouped:
+                        grouped[key] = (basis, [])
+                    grouped[key][1].append(point)
+                for basis, basis_series in grouped.values():
+                    value = Value(
+                        kind=ValueKind.SERIES,
+                        series=tuple(
+                            (temperature, amount)
+                            for temperature, amount, _ in basis_series
+                        ),
+                    )
+                    observations.append(
+                        _observation(
+                            table_id=table_id,
+                            formula=formula,
+                            phase=segment.phase,
+                            polymorph=segment.polymorph,
+                            charge=charge,
+                            quantity=quantity,
+                            value=value,
+                            source_path=source_path,
+                            download_url=download_url,
+                            segment=segment,
+                            null_count=nulls[(segment.index, column)],
+                            formation_basis=basis,
+                        )
+                    )
+                    counts_by_segment[f"segment-{segment.index}"][quantity.value] += 1
+                continue
+
             value = (
                 Value(
                     kind=ValueKind.SERIES,
@@ -1775,20 +2196,21 @@ def generate_table(
                     ),
                 )
             )
-            observation = _observation(
-                table_id=table_id,
-                formula=formula,
-                phase=segment.phase,
-                polymorph=segment.polymorph,
-                charge=charge,
-                quantity=quantity,
-                value=value,
-                source_path=source_path,
-                download_url=download_url,
-                segment=segment,
-                null_count=nulls[(segment.index, column)],
+            observations.append(
+                _observation(
+                    table_id=table_id,
+                    formula=formula,
+                    phase=segment.phase,
+                    polymorph=segment.polymorph,
+                    charge=charge,
+                    quantity=quantity,
+                    value=value,
+                    source_path=source_path,
+                    download_url=download_url,
+                    segment=segment,
+                    null_count=nulls[(segment.index, column)],
+                )
             )
-            observations.append(observation)
             counts_by_segment[f"segment-{segment.index}"][quantity.value] += 1
 
     transition_rows: list[dict[str, Any]] = []

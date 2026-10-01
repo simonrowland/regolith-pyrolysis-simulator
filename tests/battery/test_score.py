@@ -682,6 +682,53 @@ def test_derived_oxygen_condition_notice_reaches_residual() -> None:
     )
 
 
+def test_reference_phase_convention_notice_is_reported_without_blocking_score() -> None:
+    from simulator.battery.score import residual_to_plain
+
+    notice = Notice(
+        kind=NoticeKind.REFERENCE_PHASE_BY_CONVENTION,
+        affected_quantities=(Quantity.DELTA_FG,),
+        reason=(
+            "JANAF web table prints no phase; ideal-gas reference state per the "
+            "monograph convention, page not held"
+        ),
+        origin="O-029 (O) reference-element table",
+        authority=Authority.CONVENTION,
+        certification="fetch the JANAF 4th ed. printed page for the table",
+    )
+    experiment = F.tabulation_experiment()
+    reference = F.observation(
+        "janaf-reference-phase-convention",
+        experiment.experiment_id,
+        F.o2_identity(),
+        Decimal("0"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="nist-janaf-4th",
+        notices=(notice,),
+    )
+    prediction = _predict(Decimal("0"), reference.identity)
+    residual, _ = _compile(reference, experiment, prediction)
+    baseline = replace(
+        reference,
+        observation_id="janaf-reference-phase-baseline",
+        notices=(),
+    )
+    baseline_residual, _ = _compile(
+        baseline, experiment, _predict(Decimal("0"), baseline.identity)
+    )
+    assert residual.status is baseline_residual.status
+    assert residual.score_eligible is baseline_residual.score_eligible
+    assert residual.numeric is not None
+    assert notice in residual.notices
+    report_row = residual_to_plain(residual)
+    assert any(
+        row["kind"] == "reference_phase_by_convention"
+        and row["authority"] == "convention"
+        and row["certification"] == "fetch the JANAF 4th ed. printed page for the table"
+        for row in report_row["notices"]
+    )
+
+
 def test_solved_effusion_lifts_only_derived_oxygen_provenance_blocker() -> None:
     experiment = replace(
         F.kems_experiment(),

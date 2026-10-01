@@ -14,7 +14,7 @@ from simulator.battery.enums import (
 )
 from simulator.battery.generators import janaf as janaf_generator
 from simulator.battery.generators import usgs_b1544 as b1544_generator
-from simulator.battery.identity import identity_equal, quantity_token
+from simulator.battery.identity import _species_equal, identity_equal, quantity_token
 from simulator.battery.migrate import migrate_species_payload, to_plain
 from simulator.battery.polymorph_dictionary import (
     CROSS_SOURCE_EQUIVALENCES,
@@ -26,7 +26,7 @@ from simulator.battery.polymorph_dictionary import (
     printed_qualifier_from_name,
     unrecognised_polymorph_spelling,
 )
-from simulator.battery.records import Species, State
+from simulator.battery.records import Reaction, ReactionTerm, Species, State
 from simulator.reference_data.janaf import TABLES_DIR, load_table_document
 from tests.battery.test_usgs_b1544_generator import _generation as _b1544
 from tests.battery.test_usgs_b1544_generator import _load as _load_b1544
@@ -59,6 +59,56 @@ def _at_T(ident, temperature: Decimal = Decimal("298.15")):
     return replace(ident, temperature_K=State.of(temperature))
 
 
+def _quartz_alpha_identity():
+    generated = _b1544("usgs-b1544-quartz")
+    return next(
+        observation.identity
+        for observation in generated.observations
+        if quantity_token(observation.identity) is Quantity.DELTA_FG
+        and observation.identity.species.polymorph.is_value
+        and observation.identity.species.polymorph.value is Polymorph.ALPHA
+    )
+
+
+def _crystal_species(
+    formula: str,
+    polymorph: Polymorph | None,
+    *,
+    phase: Phase = Phase.CR,
+    charge: int = -1,
+) -> Species:
+    polymorph_state = (
+        State.unknown("test polymorph unknown")
+        if polymorph is None
+        else State.of(polymorph)
+    )
+    return Species(formula, phase, polymorph_state, charge=charge)
+
+
+def _identity_with_terms(
+    identity,
+    species_terms: tuple[tuple[Species, int], ...],
+    *,
+    formation_elements: tuple[tuple[str, Species], ...] | None = None,
+):
+    if formation_elements is None:
+        formation_elements = tuple(
+            (species.formula, species) for species, _ in species_terms
+        )
+    return replace(
+        identity,
+        reaction=State.of(
+            Reaction(
+                tuple(
+                    ReactionTerm(species, coefficient)
+                    for species, coefficient in species_terms
+                )
+            )
+        ),
+        formation_elements=State.of(formation_elements),
+    )
+
+
 def test_janaf_crystal_row_equals_itself() -> None:
     ident = _at_T(_first_crystal_identity(_janaf("Al-096")))
     outcome = identity_equal(ident, ident)
@@ -73,6 +123,185 @@ def test_janaf_same_species_and_polymorph_compare_equal() -> None:
     entropy = _first_crystal_identity(generated, Quantity.S)
     aligned = replace(cp, species=entropy.species)
     assert identity_equal(cp, aligned).kind is IdentityEqualKind.EQUAL
+
+
+def test_formation_identity_terms_compare_as_multisets() -> None:
+    identity = _quartz_alpha_identity()
+    assert identity.reaction is not None and identity.reaction.is_value
+    assert identity.formation_elements is not None and identity.formation_elements.is_value
+
+    reaction = identity.reaction.value
+    elements = identity.formation_elements.value
+    reordered = replace(
+        identity,
+        reaction=State.of(Reaction(tuple(reversed(reaction.terms)))),
+        formation_elements=State.of(tuple(reversed(elements))),
+    )
+    assert identity_equal(identity, reordered).kind is IdentityEqualKind.EQUAL
+
+    phase_changed = replace(
+        identity,
+        reaction=State.of(
+            Reaction(
+                tuple(
+                    replace(term, species=replace(term.species, phase=Phase.L))
+                    if term.species.formula == "Si"
+                    else term
+                    for term in reaction.terms
+                )
+            )
+        ),
+        formation_elements=State.of(
+            tuple(
+                (element, replace(species, phase=Phase.L))
+                if element == "Si"
+                else (element, species)
+                for element, species in elements
+            )
+        ),
+    )
+    assert identity_equal(identity, phase_changed).kind is IdentityEqualKind.IDENTITY_MISMATCH
+
+    coefficient_changed = replace(
+        identity,
+        reaction=State.of(
+            Reaction(
+                tuple(
+                    replace(term, coefficient=term.coefficient * 2)
+                    if term.species.formula == "Si"
+                    else term
+                    for term in reaction.terms
+                )
+            )
+        ),
+    )
+    assert identity_equal(identity, coefficient_changed).kind is IdentityEqualKind.IDENTITY_MISMATCH
+
+
+def test_known_polymorph_mismatch_cannot_be_hidden_by_an_unknown_pairing() -> None:
+    identity = _quartz_alpha_identity()
+    ca_alpha = _crystal_species("Ca", Polymorph.ALPHA)
+    ca_beta = _crystal_species("Ca", Polymorph.BETA)
+    si_unknown = _crystal_species("Si", None)
+    elements = identity.formation_elements.value
+    left = _identity_with_terms(
+        identity,
+        ((ca_alpha, -1), (si_unknown, -1)),
+        formation_elements=elements,
+    )
+    right = _identity_with_terms(
+        identity,
+        ((ca_beta, -1), (si_unknown, -1)),
+        formation_elements=elements,
+    )
+
+    assert identity_equal(left, right).kind is IdentityEqualKind.IDENTITY_MISMATCH
+    assert identity_equal(right, left).kind is IdentityEqualKind.IDENTITY_MISMATCH
+
+
+def test_unknown_pairing_is_order_insensitive_when_no_pair_mismatches() -> None:
+    identity = _quartz_alpha_identity()
+    ca_alpha = _crystal_species("Ca", Polymorph.ALPHA)
+    si_unknown = _crystal_species("Si", None)
+    elements = identity.formation_elements.value
+    left = _identity_with_terms(
+        identity,
+        ((ca_alpha, -1), (si_unknown, -1)),
+        formation_elements=elements,
+    )
+    aligned = _identity_with_terms(
+        identity,
+        ((ca_alpha, -1), (si_unknown, -1)),
+        formation_elements=elements,
+    )
+    reordered = _identity_with_terms(
+        identity,
+        ((si_unknown, -1), (ca_alpha, -1)),
+        formation_elements=elements,
+    )
+
+    aligned_outcome = identity_equal(left, aligned)
+    reordered_outcome = identity_equal(left, reordered)
+    assert aligned_outcome.kind is IdentityEqualKind.IDENTITY_UNKNOWN
+    assert reordered_outcome == aligned_outcome
+
+
+def test_formula_mismatch_precedes_unknown_polymorph() -> None:
+    identity = _quartz_alpha_identity()
+    ca_unknown = _crystal_species("Ca", None)
+    si_unknown = _crystal_species("Si", None)
+    assert (
+        _species_equal(ca_unknown, si_unknown).kind
+        is IdentityEqualKind.IDENTITY_MISMATCH
+    )
+    assert _species_equal(
+        ca_unknown,
+        _crystal_species("Ca", None, phase=Phase.L),
+    ).kind is IdentityEqualKind.IDENTITY_MISMATCH
+    assert _species_equal(
+        ca_unknown,
+        _crystal_species("Ca", None, charge=0),
+    ).kind is IdentityEqualKind.IDENTITY_MISMATCH
+    phase_unknown_alpha = Species(
+        "Ca",
+        State.unknown("test phase unknown"),
+        State.of(Polymorph.ALPHA),
+        charge=-1,
+    )
+    phase_unknown_beta = Species(
+        "Ca",
+        State.unknown("test phase unknown"),
+        State.of(Polymorph.BETA),
+        charge=-1,
+    )
+    assert (
+        _species_equal(phase_unknown_alpha, phase_unknown_beta).kind
+        is IdentityEqualKind.IDENTITY_MISMATCH
+    )
+
+    # Keep the element axis equal so this assertion exercises the reaction pair.
+    elements = identity.formation_elements.value
+    left = _identity_with_terms(
+        identity,
+        ((ca_unknown, -1),),
+        formation_elements=elements,
+    )
+    right = _identity_with_terms(
+        identity,
+        ((si_unknown, -1),),
+        formation_elements=elements,
+    )
+    assert identity_equal(left, right).kind is IdentityEqualKind.IDENTITY_MISMATCH
+
+    # The product species is another non-list caller of _species_equal.
+    left_product = replace(identity, species=ca_unknown)
+    right_product = replace(identity, species=si_unknown)
+    assert (
+        identity_equal(left_product, right_product).kind
+        is IdentityEqualKind.IDENTITY_MISMATCH
+    )
+
+
+def test_reaction_terms_mismatch_on_coefficient_or_length() -> None:
+    identity = _quartz_alpha_identity()
+    ca_alpha = _crystal_species("Ca", Polymorph.ALPHA)
+    si_unknown = _crystal_species("Si", None)
+    single_left = _identity_with_terms(identity, ((ca_alpha, -1),))
+    different_coefficient = _identity_with_terms(identity, ((ca_alpha, -2),))
+    different_length = _identity_with_terms(
+        identity,
+        ((ca_alpha, -1), (si_unknown, -1)),
+        formation_elements=single_left.formation_elements.value,
+    )
+
+    assert (
+        identity_equal(single_left, different_coefficient).kind
+        is IdentityEqualKind.IDENTITY_MISMATCH
+    )
+    assert (
+        identity_equal(single_left, different_length).kind
+        is IdentityEqualKind.IDENTITY_MISMATCH
+    )
 
 
 def test_janaf_different_polymorphs_of_one_formula_are_unequal() -> None:
