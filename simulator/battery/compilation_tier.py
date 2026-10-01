@@ -15,12 +15,15 @@ are not collapsed. ``transition_temperature`` series are not expanded.
 
 from __future__ import annotations
 
+import hashlib
 import os
 import re
+import subprocess
 from collections import defaultdict
 from dataclasses import dataclass, replace
 from decimal import Decimal
 from fractions import Fraction
+from pathlib import Path
 from typing import Callable, Mapping, Sequence
 
 from simulator.battery.enums import (
@@ -31,6 +34,7 @@ from simulator.battery.enums import (
     Authority,
     Engine,
     EvidenceClass,
+    IdentityEqualKind,
     NoticeKind,
     PerBasis,
     Phase,
@@ -43,8 +47,10 @@ from simulator.battery.enums import (
 )
 from simulator.battery.identity import (
     Identity,
+    identity_equal,
     log10K_from_delta_fG_kJ_mol,
     quantity_token,
+    standard_pressure_delta_g_kJ_per_mol,
 )
 from simulator.battery.records import (
     Notice,
@@ -66,6 +72,7 @@ from simulator.chemistry.ellingham_thermo import (
 _PRODUCT_RE = re.compile(
     r"->\s*(?:([0-9]+(?:/[0-9]+)?)\s+)?([A-Za-z][A-Za-z0-9]*)\(([^)]+)\)"
 )
+_PHASED_SPECIES_RE = re.compile(r"([A-Za-z][A-Za-z0-9]*)\(([^)]+)\)")
 
 # Berman symbols. The live pure-phase call returns the database formula;
 # a disagreement is a refusal, not a scored residual. Polymorph labels
@@ -300,6 +307,40 @@ def _phase_compatible(product: _Product, identity: Identity) -> bool:
     return identity_name == product.polymorph
 
 
+def _vaporock_gas_provenance(equil_module) -> str:
+    """Identify the loaded JANAF table and checkout once per process."""
+    cached = getattr(_vaporock_gas_provenance, "_identity", None)
+    if cached is None:
+        module_path = Path(equil_module.__file__).resolve()
+        table_path = (
+            module_path.parent / "data" / "JANAF-vapor-data-full.csv"
+        ).resolve(strict=True)
+        table_sha256 = hashlib.sha256(table_path.read_bytes()).hexdigest()
+        checkout = module_path.parents[2]
+        git_sha = subprocess.run(
+            ["git", "-C", str(checkout), "rev-parse", "HEAD"],
+            check=True,
+            capture_output=True,
+            text=True,
+            timeout=10,
+        ).stdout.strip()
+        dirty = bool(
+            subprocess.run(
+                ["git", "-C", str(checkout), "status", "--porcelain"],
+                check=True,
+                capture_output=True,
+                text=True,
+                timeout=10,
+            ).stdout.strip()
+        )
+        cached = (
+            f"janaf_csv_path={table_path}:janaf_csv_sha256={table_sha256}:"
+            f"vaporock_git_sha={git_sha}:vaporock_git_dirty={str(dirty).lower()}"
+        )
+        setattr(_vaporock_gas_provenance, "_identity", cached)
+    return cached
+
+
 def _refuse(
     reason: RefusalReason,
     detail: str,
@@ -432,10 +473,132 @@ def _ellingham_attempt(
             },
             call_evidence=call + ":outside-segment",
         )
+
     # dG is kJ/mol O2. mol-species divides by n_ox (mol oxide per mol O2).
     dG = Decimal(str(segment.delta_g_kJ_per_mol_O2(temperature)))
     per_species = dG / (Decimal(product.coeff.numerator) / Decimal(product.coeff.denominator))
     gibbs = per_species if per is PerBasis.MOL_SPECIES else dG
+
+    # Premise: this Ellingham fit is at 1 bar, while a compilation cell may
+    # print another ideal-gas standard pressure. Its explicit formation
+    # reaction supplies Δν_g, normalized below to the identity's declared
+    # molar basis. Algebra: ΔfG°(p2)-ΔfG°(p1) = Δν_g R T ln(p2/p1).
+    # log10 Kf is recomputed from that shifted ΔfG. S°_gas(p2)-S°_gas(p1)
+    # = -R ln(p2/p1) (this attempt emits no entropy). Unit check: R·T is
+    # J/mol, divided by 1000 gives kJ/mol; the log shift is dimensionless.
+    # Sanity: CaO from Ca(s)+½O2(g)→CaO(cr) has Δν_g=-½, so at 1000 K
+    # and 1 atm the ΔfG shift is -½·8.314·1000·ln(1.01325) ≈ -54.7 J/mol.
+    pressure_state = identity.standard_pressure_Pa
+    if (
+        isinstance(pressure_state, State)
+        and pressure_state.is_value
+        and pressure_state.value is not None
+    ):
+        printed_pressure = as_decimal(pressure_state.value)
+        if printed_pressure != _PA_PER_BAR:
+            if printed_pressure <= 0:
+                return _refuse(
+                    RefusalReason.IDENTITY_UNKNOWN,
+                    "standard-pressure-transform-pressure-nonpositive",
+                    quantity=quantity,
+                    origin=origin,
+                )
+            reaction_state = identity.reaction
+            reaction = (
+                reaction_state.value
+                if isinstance(reaction_state, State) and reaction_state.is_value
+                else None
+            )
+            reaction_phases = (
+                tuple(phase_token(term.species) for term in reaction.terms)
+                if reaction is not None
+                else ()
+            )
+            if reaction is not None and all(
+                phase is not None for phase in reaction_phases
+            ):
+                segment_reactant_phases = {
+                    formula: _product_phase(token)[0]
+                    for formula, token in _PHASED_SPECIES_RE.findall(
+                        segment.phase_basis.split("->", 1)[0]
+                    )
+                    if formula != "O2"
+                }
+                for term, cell_phase in zip(reaction.terms, reaction_phases):
+                    if term.coefficient >= 0 or term.species.formula == "O2":
+                        continue
+                    segment_phase = segment_reactant_phases.get(term.species.formula)
+                    if segment_phase is not cell_phase:
+                        return _refuse(
+                            RefusalReason.IDENTITY_MISMATCH,
+                            "identity-mismatch-element-reference-phase",
+                            quantity=quantity,
+                            origin=origin,
+                            extra={
+                                "element": term.species.formula,
+                                "cell_phase": cell_phase.value,
+                                "segment_phase": (
+                                    None if segment_phase is None else segment_phase.value
+                                ),
+                            },
+                        )
+            if reaction is None:
+                return _refuse(
+                    RefusalReason.IDENTITY_UNKNOWN,
+                    "standard-pressure-transform-reaction-unknown",
+                    quantity=quantity,
+                    origin=origin,
+                )
+            if any(phase is None for phase in reaction_phases):
+                return _refuse(
+                    RefusalReason.IDENTITY_UNKNOWN,
+                    "standard-pressure-transform-phase-unknown",
+                    quantity=quantity,
+                    origin=origin,
+                )
+            delta_n_g = sum(
+                (
+                    term.coefficient
+                    for term, phase in zip(reaction.terms, reaction_phases)
+                    if phase is Phase.G
+                ),
+                Fraction(0),
+            )
+            if per is PerBasis.MOL_SPECIES:
+                basis_coefficient = sum(
+                    (
+                        term.coefficient
+                        for term in reaction.terms
+                        if term.species == identity.species and term.coefficient > 0
+                    ),
+                    Fraction(0),
+                )
+            else:
+                basis_coefficient = sum(
+                    (
+                        -term.coefficient
+                        for term, phase in zip(reaction.terms, reaction_phases)
+                        if term.species.formula == "O2"
+                        and phase is Phase.G
+                        and term.coefficient < 0
+                    ),
+                    Fraction(0),
+                )
+            if basis_coefficient <= 0:
+                return _refuse(
+                    RefusalReason.IDENTITY_UNKNOWN,
+                    "standard-pressure-transform-reaction-basis-unknown",
+                    quantity=quantity,
+                    origin=origin,
+                )
+            delta_n_g /= basis_coefficient
+            delta_n_g_decimal = Decimal(delta_n_g.numerator) / Decimal(delta_n_g.denominator)
+            gibbs += standard_pressure_delta_g_kJ_per_mol(
+                delta_n_g_decimal,
+                temperature_K,
+                _PA_PER_BAR,
+                printed_pressure,
+            )
     if quantity is Quantity.LOG10_KF:
         value = log10K_from_delta_fG_kJ_mol(gibbs, temperature_K)
         unit = QUANTITY_UNITS[Quantity.LOG10_KF]
@@ -651,6 +814,34 @@ def _pure_phase_attempt(
             origin=origin,
             extra={"engine": engine.value},
         )
+    per = _state_value(identity.per)
+    if per is not PerBasis.MOL_SPECIES:
+        return _refuse(
+            RefusalReason.UNSUPPORTED,
+            "pure-phase-per-basis-mismatch",
+            quantity=quantity,
+            origin=origin,
+            extra={
+                "engine": engine.value,
+                "expected_per": PerBasis.MOL_SPECIES.value,
+                "actual_per": getattr(per, "value", None),
+            },
+        )
+    if quantity is Quantity.H_MINUS_H298:
+        anchor = _state_value(identity.subtype)
+        expected_anchor = "H(T)-H(298.15 K)"
+        if anchor != expected_anchor:
+            return _refuse(
+                RefusalReason.UNSUPPORTED,
+                "pure-phase-enthalpy-anchor-mismatch",
+                quantity=quantity,
+                origin=origin,
+                extra={
+                    "engine": engine.value,
+                    "expected_anchor": expected_anchor,
+                    "actual_anchor": anchor,
+                },
+            )
     symbol, why = _resolve_symbol(engine, identity)
     if symbol is None:
         reason = (
@@ -693,7 +884,7 @@ def _pure_phase_attempt(
             origin=origin,
             extra={"engine": engine.value, "detail": str(exc)},
         )
-    except (ValueError, OSError, RuntimeError) as exc:
+    except (ImportError, ValueError, OSError, RuntimeError) as exc:
         return _refuse(
             RefusalReason.ATTEMPTED_UNAVAILABLE,
             "pure-phase-unavailable",
@@ -742,6 +933,187 @@ def _pure_phase_attempt(
         refusal_reason=None,
         refusal_detail={},
         call_evidence=f"pure-phase:{engine.value}:{symbol}:T={temperature_K}",
+    )
+
+
+def _vaporock_gas_attempt(
+    identity: Identity,
+    quantity: Quantity,
+    temperature_K: Decimal,
+    *,
+    origin: str,
+) -> ThermoAttempt:
+    phase = identity.species.phase
+    if (
+        not isinstance(phase, State)
+        or not phase.is_value
+        or phase.value is not Phase.G
+        or quantity not in {Quantity.CP, Quantity.S, Quantity.H_MINUS_H298}
+    ):
+        return _refuse(
+            RefusalReason.UNSUPPORTED,
+            "engine-thermo-does-not-emit",
+            quantity=quantity,
+            origin=origin,
+            extra={"engine": Engine.VAPOROCK.value},
+        )
+    if (
+        not isinstance(identity.per, State)
+        or not identity.per.is_value
+        or identity.per.value is not PerBasis.MOL_SPECIES
+    ):
+        return _refuse(
+            RefusalReason.IDENTITY_UNKNOWN,
+            "vaporock-gas-thermo-requires-mol-species-basis",
+            quantity=quantity,
+            origin=origin,
+        )
+
+    charge = identity.species.charge
+    if not isinstance(charge, State) or not charge.is_value:
+        return _refuse(
+            RefusalReason.IDENTITY_UNKNOWN,
+            "vaporock-gas-charge-unknown",
+            quantity=quantity,
+            origin=origin,
+        )
+    if as_decimal(charge.value) != 0:
+        return _refuse(
+            RefusalReason.OUTSIDE_SUPPORTED_SPECIES,
+            "vaporock-charged-species-not-in-janaf-table",
+            quantity=quantity,
+            origin=origin,
+            extra={"engine": Engine.VAPOROCK.value, "charge": str(charge.value)},
+        )
+
+    try:
+        vapor = getattr(_vaporock_gas_attempt, "_janaf_vapor", None)
+        if vapor is None:
+            from vaporock.equil import Vapor
+
+            vapor = Vapor(database="JANAF")
+            setattr(_vaporock_gas_attempt, "_janaf_vapor", vapor)
+        import vaporock.equil as vaporock_equil
+
+        provenance = _vaporock_gas_provenance(vaporock_equil)
+    except Exception as exc:  # noqa: BLE001 - optional engine import boundary
+        return _refuse(
+            RefusalReason.ATTEMPTED_UNAVAILABLE,
+            "vaporock-janaf-unavailable",
+            quantity=quantity,
+            origin=origin,
+            extra={"engine": Engine.VAPOROCK.value, "detail": str(exc)},
+            call_evidence="vaporock-janaf-provenance-unavailable",
+        )
+
+    formula = identity.species.formula
+    species_name = formula if formula.endswith("(g)") else f"{formula}(g)"
+    call_evidence = (
+        f"vaporock-janaf-implementation-fidelity:{species_name}:"
+        f"T={temperature_K}:{provenance}"
+    )
+    try:
+        rows = vapor.vapor_coefs.loc[species_name]
+    except KeyError:
+        return _refuse(
+            RefusalReason.OUTSIDE_SUPPORTED_SPECIES,
+            "vaporock-species-not-in-janaf-table",
+            quantity=quantity,
+            origin=origin,
+            extra={"engine": Engine.VAPOROCK.value, "species": species_name},
+            call_evidence=call_evidence,
+        )
+    except Exception as exc:  # noqa: BLE001 - optional engine data boundary
+        return _refuse(
+            RefusalReason.ATTEMPTED_UNAVAILABLE,
+            "vaporock-janaf-unavailable",
+            quantity=quantity,
+            origin=origin,
+            extra={"engine": Engine.VAPOROCK.value, "detail": str(exc)},
+            call_evidence=call_evidence,
+        )
+
+    table_rows = (
+        (rows,)
+        if getattr(rows, "ndim", 1) == 1
+        else tuple(rows.iloc[index] for index in range(len(rows)))
+    )
+    temperature = float(temperature_K)
+    matching_rows = tuple(
+        row
+        for row in table_rows
+        if temperature > float(row["T_min"]) and temperature <= float(row["T_max"])
+    )
+    if not matching_rows:
+        return _refuse(
+            RefusalReason.UNSUPPORTED,
+            "vaporock-temperature-outside-janaf-row",
+            quantity=quantity,
+            origin=origin,
+            extra={"engine": Engine.VAPOROCK.value, "species": species_name},
+            call_evidence=call_evidence,
+        )
+    if len(matching_rows) != 1:
+        return _refuse(
+            RefusalReason.IDENTITY_INCOMPLETE,
+            "vaporock-janaf-interval-ambiguous",
+            quantity=quantity,
+            origin=origin,
+            extra={"engine": Engine.VAPOROCK.value, "species": species_name},
+            call_evidence=call_evidence,
+        )
+    row = matching_rows[0]
+
+    # Shomate forms use t=T/1000: Cp=A+Bt+Ct²+Dt³+E/t² and
+    # S=A ln(t)+Bt+Ct²/2+Dt³/3−E/(2t²)+G, both J/(mol·K);
+    # H−H298=At+Bt²/2+Ct³/3+Dt⁴/4−E/t+F−H, in kJ/mol. Cp uses
+    # the selected VapoRock row; its native evaluators supply S and
+    # _janaf_dH's apparent H(T) terms through +F, not H−H298. Subtract the
+    # selected row's H coefficient per the Shomate form. Unit check: kJ/mol
+    # remains kJ/mol.
+    # Sanity: K(g), 1200 K gives 18.7461926 kJ/mol vs printed JANAF
+    # K-005 H−H298 = 18.746 kJ/mol.
+    try:
+        t = temperature / 1000.0
+        if quantity is Quantity.CP:
+            raw = (
+                row["A"]
+                + row["B"] * t
+                + row["C"] * t**2
+                + row["D"] * t**3
+                + row["E"] / t**2
+            )
+        elif quantity is Quantity.S:
+            raw = vapor._janaf_S(temperature, row)
+        else:
+            raw = vapor._janaf_dH(temperature, row) - row["H"]
+        value = as_decimal(str(float(raw)))
+    except Exception as exc:  # noqa: BLE001 - optional engine evaluator boundary
+        return _refuse(
+            RefusalReason.ATTEMPTED_UNAVAILABLE,
+            "vaporock-janaf-evaluation-unavailable",
+            quantity=quantity,
+            origin=origin,
+            extra={"engine": Engine.VAPOROCK.value, "detail": str(exc)},
+            call_evidence=call_evidence,
+        )
+    if not value.is_finite():
+        return _refuse(
+            RefusalReason.METRIC_DOMAIN,
+            "nonfinite-engine-value",
+            quantity=quantity,
+            origin=origin,
+            extra={"engine": Engine.VAPOROCK.value},
+            call_evidence=call_evidence,
+        )
+    return ThermoAttempt(
+        value=value,
+        unit=QUANTITY_UNITS[quantity],
+        authority=Authority.BRIDGE,
+        notices=(),
+        refusal_reason=None,
+        refusal_detail={},
+        call_evidence=call_evidence,
     )
 
 
@@ -795,6 +1167,8 @@ def predict_thermo_attempt(
         )
     if engine is Engine.INTERNAL_ANALYTICAL:
         return _ellingham_attempt(identity, quantity, temperature_K, origin=origin)
+    if engine is Engine.VAPOROCK:
+        return _vaporock_gas_attempt(identity, quantity, temperature_K, origin=origin)
     if engine in {Engine.THERMOENGINE, Engine.MAGEMIN}:
         return _pure_phase_attempt(
             engine,
@@ -1169,10 +1543,12 @@ def compilation_tier_census(
     thermochemistry refusal does not depend on which printed temperature
     it is, so it is computed once per series when pure-phase is not
     invoked. An invoked pure-phase value depends on T and is not reused.
-    ``invoke_pure_phase`` false records ``pure-phase-call-required``
-    instead of opening MAGEMin or ThermoEngine. Relation and validity gates are the same functions
-    ``compile_residual`` uses. A sample of points is checked against
-    ``compile_residual`` when ``audit_compile_residual`` is set.
+    Pure-phase access runs only after the formula and validity gates pass;
+    the existing resolver limits calls to mapped crystals. Setting
+    ``invoke_pure_phase`` false records ``pure-phase-call-required``.
+    Relation and validity gates are the same functions ``compile_residual``
+    uses. A sample of points is checked against ``compile_residual`` when
+    ``audit_compile_residual`` is set.
     """
 
     from simulator.battery.score import (
@@ -1190,7 +1566,10 @@ def compilation_tier_census(
         rail_for_quantity,
         resolve_source_relation,
     )
-    from simulator.battery.validity import run_validity_gates
+    from simulator.battery.validity import (
+        _partial_pressure_observations_by_experiment,
+        run_validity_gates,
+    )
 
     engine_set = (
         _validated_score_engines(tuple(engines))
@@ -1202,7 +1581,10 @@ def compilation_tier_census(
     for obs in comparison_candidates(context):
         quantity = quantity_token(obs.identity) if isinstance(obs.identity, Identity) else None
         formula = obs.identity.species.formula if isinstance(obs.identity, Identity) else ""
-        measured[rail_for_quantity(quantity, species_formula=formula).value] += 1
+        rail = getattr(
+            rail_for_quantity(quantity, species_formula=formula), "value", None
+        )
+        measured["none" if rail is None else rail] += 1
 
     series_cells = 0
     banded_series_cells = 0
@@ -1230,7 +1612,10 @@ def compilation_tier_census(
         return found
 
     relations: dict[str, dict[Engine, SourceRelation]] = {}
-    gate_keys: dict[tuple[str, str], str | None] = {}
+    point_observations_by_experiment = _partial_pressure_observations_by_experiment(
+        context.observations.values()
+    )
+    gate_keys: dict[tuple[str, str, str], str | None] = {}
     audited = 0
 
     def relation_for(parent: Observation, engine: Engine) -> SourceRelation:
@@ -1257,13 +1642,23 @@ def compilation_tier_census(
         return found[engine]
 
     def gate_token(parent: Observation, quantity: Quantity | None) -> str | None:
-        key = (parent.experiment_id, "" if quantity is None else quantity.value)
+        key = (
+            parent.experiment_id,
+            "" if quantity is None else quantity.value,
+            parent.observation_id,
+        )
         if key not in gate_keys:
             experiment = context.experiments.get(parent.experiment_id)
             if experiment is None:
                 gate_keys[key] = RefusalReason.REFERENTIAL_INTEGRITY.value
             else:
-                gates = run_validity_gates(experiment, parent)
+                gates = run_validity_gates(
+                    experiment,
+                    parent,
+                    point_observations=point_observations_by_experiment.get(
+                        parent.experiment_id, ()
+                    ),
+                )
                 gate_keys[key] = None if gates.passed else (
                     gates.reason.value if gates.reason is not None else "validity"
                 )
@@ -1352,6 +1747,26 @@ def compilation_tier_census(
                 row["reachable"] += 1
                 reachable += 1
                 reference = point.value.point
+                temperature_state = (
+                    point.identity.temperature_K
+                    if isinstance(point.identity, Identity)
+                    else None
+                )
+                nonpositive = (
+                    isinstance(temperature_state, State)
+                    and temperature_state.is_value
+                    and temperature_state.value is not None
+                    and as_decimal(temperature_state.value) <= 0
+                )
+                identity_outcome = (
+                    identity_equal(point.identity, point.identity)
+                    if isinstance(point.identity, Identity)
+                    else None
+                )
+                identity_equal_cell = (
+                    identity_outcome is not None
+                    and identity_outcome.kind is IdentityEqualKind.EQUAL
+                )
                 for engine in engine_set:
                     attempt: ThermoAttempt | None
                     if token not in _THERMO_QUANTITIES:
@@ -1361,25 +1776,76 @@ def compilation_tier_census(
                             quantity=token or Quantity.DELTA_FG,
                             origin=point.observation_id,
                         )
-                    else:
-                        temperature_state = (
-                            point.identity.temperature_K
-                            if isinstance(point.identity, Identity)
-                            else None
+                    elif nonpositive:
+                        attempt = predict_thermo_attempt(
+                            engine, point, invoke_pure_phase=False
                         )
-                        nonpositive = (
+                    elif (
+                        not identity_equal_cell
+                        and not formula_bad
+                        and gate is None
+                    ):
+                        kind = (
+                            IdentityEqualKind.IDENTITY_UNKNOWN
+                            if identity_outcome is None
+                            else identity_outcome.kind
+                        )
+                        reason = (
+                            RefusalReason.IDENTITY_MISMATCH
+                            if kind is IdentityEqualKind.IDENTITY_MISMATCH
+                            else RefusalReason.INVALID_IDENTITY
+                            if kind is IdentityEqualKind.INVALID_IDENTITY
+                            else RefusalReason.IDENTITY_UNKNOWN
+                        )
+                        attempt = _refuse(
+                            reason,
+                            "identity_equal",
+                            quantity=token,
+                            origin=point.observation_id,
+                            extra={
+                                "fields": []
+                                if identity_outcome is None
+                                else list(identity_outcome.fields),
+                                "detail": None
+                                if identity_outcome is None
+                                else identity_outcome.detail,
+                            },
+                        )
+                    else:
+                        positive = (
                             isinstance(temperature_state, State)
                             and temperature_state.is_value
                             and temperature_state.value is not None
-                            and as_decimal(temperature_state.value) <= 0
+                            and as_decimal(temperature_state.value) > 0
+                        )
+                        invoke_point = (
+                            invoke_pure_phase
+                            and not formula_bad
+                            and gate is None
+                            and reference is not None
+                            and positive
+                            and token in {Quantity.CP, Quantity.S, Quantity.H_MINUS_H298}
+                            and engine in {Engine.THERMOENGINE, Engine.MAGEMIN}
+                            and isinstance(point.identity, Identity)
+                            and identity_equal_cell
+                            and _resolve_symbol(engine, point.identity)[0] is not None
+                        )
+                        vaporock_gas_table = (
+                            engine is Engine.VAPOROCK
+                            and isinstance(point.identity, Identity)
+                            and isinstance(point.identity.species.phase, State)
+                            and point.identity.species.phase.is_value
+                            and point.identity.species.phase.value is Phase.G
                         )
                         # A 0 K refusal is not reused. A pure-phase value
                         # depends on T, so an invoked call is not reused either.
-                        # The uninvoked refusal does not depend on T.
+                        # VapoRock gas-table values depend on T even when
+                        # pure-phase invocation is disabled.
                         reuse = (
                             not nonpositive
                             and engine is not Engine.INTERNAL_ANALYTICAL
-                            and not invoke_pure_phase
+                            and not invoke_point
+                            and not vaporock_gas_table
                         )
                         if reuse and engine in reused:
                             attempt = reused[engine]
@@ -1387,7 +1853,7 @@ def compilation_tier_census(
                             attempt = predict_thermo_attempt(
                                 engine,
                                 point,
-                                invoke_pure_phase=invoke_pure_phase,
+                                invoke_pure_phase=invoke_point,
                             )
                             if reuse:
                                 reused[engine] = attempt

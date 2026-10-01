@@ -770,7 +770,7 @@ def test_stolyarova_1991_w_cell_pressure_and_residual_report() -> None:
         assert len(point_rows) == 1, x_sio2
 
 
-def test_stolyarova_typed_w_cell_scores_through_cell_oxide_reservoir(tmp_path: Path) -> None:
+def test_stolyarova_typed_w_cell_keeps_reservoir_notice_but_refuses_unverified_regime(tmp_path: Path) -> None:
     # Suppose my change is wrong in the way that matters most: restoring the
     # old reactive_cell_oxygen_reservoir refusal makes this red, because typed
     # [W] rows never request oxygen_balance_effusion with cell_material W.
@@ -858,6 +858,12 @@ def test_stolyarova_typed_w_cell_scores_through_cell_oxide_reservoir(tmp_path: P
             {
                 "engine": engine.value,
                 "n": len(scored),
+                "n_effusion_refused": sum(
+                    1
+                    for residual in bucket
+                    if residual.refusal is not None
+                    and residual.refusal.reason is RefusalReason.EFFUSION_REGIME_UNVERIFIED
+                ),
                 "n_score_eligible": sum(1 for residual in scored if residual.score_eligible),
                 "n_inside_band": sum(
                     1 for residual in scored if residual.status is ResidualStatus.MATCH
@@ -871,7 +877,7 @@ def test_stolyarova_typed_w_cell_scores_through_cell_oxide_reservoir(tmp_path: P
         "STOLYAROVA_FLAGGED="
         + json.dumps(flagged_stratum_rows(tuple(residuals), engines=engines), sort_keys=True)
     )
-    assert all(row["n"] > 0 for row in report)
+    assert all(row["n"] == 0 and row["n_effusion_refused"] > 0 for row in report)
 
 
 
@@ -1024,28 +1030,12 @@ print(json.dumps({"available": handle.available, "reason": handle.unavailable_re
     assert "remedy:" in payload["reason"]
 
 
-def test_vendored_imcc_unimportable_default_path_scores_openimcc_plante() -> None:
+def test_openimcc_scores_plante_with_independent_lineage() -> None:
     _require_oxygen_balance()
     code = r'''
-import importlib.abc
 import json
 import runpy
-import sys
 
-blocked = []
-
-class BlockVendoredImcc(importlib.abc.MetaPathFinder):
-    def find_spec(self, fullname, path=None, target=None):
-        if fullname == "simulator.melt_backend.imcc_sf04" or fullname.startswith(
-            "simulator.melt_backend.imcc_sf04."
-        ):
-            blocked.append(fullname)
-            raise ModuleNotFoundError(
-                f"{fullname} blocked by default-path import proof"
-            )
-        return None
-
-sys.meta_path.insert(0, BlockVendoredImcc())
 import simulator.diagnostic_helpers.binary_pot_battery
 import simulator.backends
 import simulator.battery.score
@@ -1084,8 +1074,7 @@ assert summary["n_score_eligible"] == 162
 assert summary["n_inside_band"] == 112
 assert abs(float(summary["median_dex"]) - 0.0748) < 0.00005
 assert abs(float(summary["rms_dex"]) - 0.1617) < 0.00005
-assert blocked == [], blocked
-print(json.dumps({"headline": summary, "lineage": "independent", "blocked": blocked}))
+print(json.dumps({"headline": summary, "lineage": "independent"}))
 '''
     env = {
         "PATH": os.environ.get("PATH", ""),
@@ -1109,7 +1098,6 @@ print(json.dumps({"headline": summary, "lineage": "independent", "blocked": bloc
     assert float(result["headline"]["median_dex"]) == pytest.approx(0.0748, abs=0.00005)
     assert float(result["headline"]["rms_dex"]) == pytest.approx(0.1617, abs=0.00005)
     assert result["lineage"] == "independent"
-    assert result["blocked"] == []
 
 
 def test_openimcc_unsupported_cr_gas_species_is_typed() -> None:
@@ -1554,33 +1542,16 @@ def test_openimcc_gas_table_mutation_to_vaporock_changes_prediction(monkeypatch)
 
 
 
-def test_allibert_single_phase_table_ii_residuals_are_unchanged() -> None:
-    """The 14 printed-melt rows keep their openimcc residuals."""
+def test_allibert_single_phase_table_ii_refuses_without_in_cell_pressures() -> None:
+    """The 14 printed-melt rows lack the evidence needed for the flow fallback."""
 
-    import math
     import tempfile
     from pathlib import Path
 
-    from simulator.battery.enums import ExecutionState
+    from simulator.battery.enums import RefusalReason
     from simulator.battery.identity import quantity_token
     from tests.battery.test_migrate import _migrate_real_extract
 
-    expected = {
-        ("Al2O3", Decimal("0.352")): Decimal("-0.4352878073629644"),
-        ("Al2O3", Decimal("0.414")): Decimal("-0.4368858361185386"),
-        ("Al2O3", Decimal("0.438")): Decimal("-0.7676943822462646"),
-        ("Al2O3", Decimal("0.495")): Decimal("-0.5785927361457213"),
-        ("Al2O3", Decimal("0.548")): Decimal("-0.16244321866738143"),
-        ("Al2O3", Decimal("0.578")): Decimal("-0.18296065968799388"),
-        ("Al2O3", Decimal("0.645")): Decimal("-1.5247529304755827"),
-        ("CaO", Decimal("0.352")): Decimal("-0.05660903970583223"),
-        ("CaO", Decimal("0.414")): Decimal("0.2193957906740513"),
-        ("CaO", Decimal("0.438")): Decimal("0.2974060565321931"),
-        ("CaO", Decimal("0.495")): Decimal("0.20712743938341197"),
-        ("CaO", Decimal("0.548")): Decimal("0.07227258108505644"),
-        ("CaO", Decimal("0.578")): Decimal("-0.005642551875408192"),
-        ("CaO", Decimal("0.645")): Decimal("0.7184208476485777"),
-    }
     with tempfile.TemporaryDirectory() as tmp:
         result = _migrate_real_extract(Path(tmp), "kems-051-allibert-1981.yaml")
     rows = []
@@ -1614,34 +1585,15 @@ def test_allibert_single_phase_table_ii_residuals_are_unchanged() -> None:
         engines=(Engine.OPENIMCC,),
         include_diagnostics=True,
     )
-    by_id = {observation.observation_id: observation for observation in rows}
-    seen: dict[tuple[str, Decimal, str], Decimal] = {}
-    for residual in residuals:
-        observation = by_id[residual.reference]
-        composition = observation.identity.composition
-        assert composition is not None and composition.value is not None
-        cao = next(
-            amount
-            for name, amount in composition.value.components
-            if name == "CaO"
-        )
-        engine = residual.key.rsplit("::", 1)[-1]
-        assert residual.numeric is not None
-        assert residual.execution.state is ExecutionState.PRODUCED
-        seen[(observation.identity.species.formula, cao, engine)] = residual.numeric.value
-        assert residual.status is ResidualStatus.NO_BAND
-        assert abs(
-            residual.numeric.value - expected[(observation.identity.species.formula, cao)]
-        ) <= Decimal("1e-12")
-    assert len(seen) == 14
-    one_engine = [
-        value
-        for (formula, cao, engine), value in seen.items()
-        if engine == Engine.OPENIMCC.value
-    ]
-    assert len(one_engine) == 14
-    rms = math.sqrt(sum(float(value) ** 2 for value in one_engine) / len(one_engine))
-    assert rms == pytest.approx(0.560, abs=0.001)
+    assert len(residuals) == 14
+    assert all(residual.status is ResidualStatus.REFUSED for residual in residuals)
+    assert all(residual.numeric is None for residual in residuals)
+    assert all(
+        residual.refusal is not None
+        and residual.refusal.reason is RefusalReason.EFFUSION_REGIME_UNVERIFIED
+        and residual.refusal.detail["primary_check"] == "in_cell_partial_pressure_sum"
+        for residual in residuals
+    )
 
 
 def statistics_median(values: list[float]) -> float:

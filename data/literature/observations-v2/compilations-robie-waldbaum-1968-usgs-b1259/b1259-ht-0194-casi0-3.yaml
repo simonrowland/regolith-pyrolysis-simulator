@@ -3234,7 +3234,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: beta
             charge:
               tag: value
               value: 0
@@ -3261,7 +3261,7 @@ observations:
             value: cr
           polymorph:
             tag: value
-            value: reference
+            value: beta
           charge:
             tag: value
             value: 0
@@ -3327,7 +3327,9 @@ observations:
     note: as_published='-322.545'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=Ca=B1259 reference-state table p.37/PDF p.43, Si=B1259 reference-state table p.68/PDF
+      p.74
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0194-casi0-3.json
     record: b1259-ht-0194-casi0-3
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0194-casi0-3.json
@@ -3401,7 +3403,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: beta
             charge:
               tag: value
               value: 0
@@ -3428,7 +3430,7 @@ observations:
             value: cr
           polymorph:
             tag: value
-            value: reference
+            value: beta
           charge:
             tag: value
             value: 0
@@ -3494,7 +3496,9 @@ observations:
     note: as_published='-316.004'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=Ca=B1259 reference-state table p.37/PDF p.43, Si=B1259 reference-state table p.68/PDF
+      p.74
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0194-casi0-3.json
     record: b1259-ht-0194-casi0-3
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0194-casi0-3.json
@@ -3565,10 +3569,10 @@ observations:
             formula: Ca
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -3592,10 +3596,10 @@ observations:
         - formula: Ca
           phase:
             tag: value
-            value: cr
+            value: l
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -3661,7 +3665,9 @@ observations:
     note: as_published='-302.652'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=Ca=B1259 reference-state table p.37/PDF p.43, Si=B1259 reference-state table p.68/PDF
+      p.74
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0194-casi0-3.json
     record: b1259-ht-0194-casi0-3
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0194-casi0-3.json
@@ -3732,10 +3738,10 @@ observations:
             formula: Ca
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -3759,10 +3765,10 @@ observations:
         - formula: Ca
           phase:
             tag: value
-            value: cr
+            value: l
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -3828,7 +3834,9 @@ observations:
     note: as_published='-296.008'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=Ca=B1259 reference-state table p.37/PDF p.43, Si=B1259 reference-state table p.68/PDF
+      p.74
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0194-casi0-3.json
     record: b1259-ht-0194-casi0-3
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0194-casi0-3.json
@@ -3899,10 +3907,10 @@ observations:
             formula: Ca
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -3926,10 +3934,10 @@ observations:
         - formula: Ca
           phase:
             tag: value
-            value: cr
+            value: l
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -3995,7 +4003,9 @@ observations:
     note: as_published='-289.396'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=Ca=B1259 reference-state table p.37/PDF p.43, Si=B1259 reference-state table p.68/PDF
+      p.74
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0194-casi0-3.json
     record: b1259-ht-0194-casi0-3
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0194-casi0-3.json
@@ -4066,10 +4076,10 @@ observations:
             formula: Ca
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -4093,10 +4103,10 @@ observations:
         - formula: Ca
           phase:
             tag: value
-            value: cr
+            value: l
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -4162,7 +4172,9 @@ observations:
     note: as_published='-282.805'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=Ca=B1259 reference-state table p.37/PDF p.43, Si=B1259 reference-state table p.68/PDF
+      p.74
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0194-casi0-3.json
     record: b1259-ht-0194-casi0-3
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0194-casi0-3.json
@@ -4233,10 +4245,10 @@ observations:
             formula: Ca
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -4245,10 +4257,10 @@ observations:
             formula: Si
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -4260,10 +4272,10 @@ observations:
         - formula: Ca
           phase:
             tag: value
-            value: cr
+            value: l
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -4271,10 +4283,10 @@ observations:
         - formula: Si
           phase:
             tag: value
-            value: cr
+            value: l
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -4329,7 +4341,9 @@ observations:
     note: as_published='-276.136'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=Ca=B1259 reference-state table p.37/PDF p.43, Si=B1259 reference-state table p.68/PDF
+      p.74
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0194-casi0-3.json
     record: b1259-ht-0194-casi0-3
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0194-casi0-3.json
@@ -4403,7 +4417,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: alpha
             charge:
               tag: value
               value: 0
@@ -4430,7 +4444,7 @@ observations:
             value: cr
           polymorph:
             tag: value
-            value: reference
+            value: alpha
           charge:
             tag: value
             value: 0
@@ -4496,7 +4510,9 @@ observations:
     note: as_published='-369.081'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=Ca=B1259 reference-state table p.37/PDF p.43, Si=B1259 reference-state table p.68/PDF
+      p.74
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0194-casi0-3.json
     record: b1259-ht-0194-casi0-3
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0194-casi0-3.json
@@ -4570,7 +4586,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: alpha
             charge:
               tag: value
               value: 0
@@ -4597,7 +4613,7 @@ observations:
             value: cr
           polymorph:
             tag: value
-            value: reference
+            value: alpha
           charge:
             tag: value
             value: 0
@@ -4663,7 +4679,9 @@ observations:
     note: as_published='-362.254'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=Ca=B1259 reference-state table p.37/PDF p.43, Si=B1259 reference-state table p.68/PDF
+      p.74
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0194-casi0-3.json
     record: b1259-ht-0194-casi0-3
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0194-casi0-3.json
@@ -4737,7 +4755,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: alpha
             charge:
               tag: value
               value: 0
@@ -4764,7 +4782,7 @@ observations:
             value: cr
           polymorph:
             tag: value
-            value: reference
+            value: alpha
           charge:
             tag: value
             value: 0
@@ -4830,7 +4848,9 @@ observations:
     note: as_published='-355.569'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=Ca=B1259 reference-state table p.37/PDF p.43, Si=B1259 reference-state table p.68/PDF
+      p.74
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0194-casi0-3.json
     record: b1259-ht-0194-casi0-3
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0194-casi0-3.json
@@ -4904,7 +4924,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: alpha
             charge:
               tag: value
               value: 0
@@ -4931,7 +4951,7 @@ observations:
             value: cr
           polymorph:
             tag: value
-            value: reference
+            value: alpha
           charge:
             tag: value
             value: 0
@@ -4997,7 +5017,9 @@ observations:
     note: as_published='-348.918'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=Ca=B1259 reference-state table p.37/PDF p.43, Si=B1259 reference-state table p.68/PDF
+      p.74
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0194-casi0-3.json
     record: b1259-ht-0194-casi0-3
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0194-casi0-3.json
@@ -5071,7 +5093,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: alpha
             charge:
               tag: value
               value: 0
@@ -5098,7 +5120,7 @@ observations:
             value: cr
           polymorph:
             tag: value
-            value: reference
+            value: alpha
           charge:
             tag: value
             value: 0
@@ -5164,7 +5186,9 @@ observations:
     note: as_published='-342.290'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=Ca=B1259 reference-state table p.37/PDF p.43, Si=B1259 reference-state table p.68/PDF
+      p.74
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0194-casi0-3.json
     record: b1259-ht-0194-casi0-3
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0194-casi0-3.json
@@ -5238,7 +5262,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: beta
             charge:
               tag: value
               value: 0
@@ -5265,7 +5289,7 @@ observations:
             value: cr
           polymorph:
             tag: value
-            value: reference
+            value: beta
           charge:
             tag: value
             value: 0
@@ -5331,7 +5355,9 @@ observations:
     note: as_published='-329.109'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=Ca=B1259 reference-state table p.37/PDF p.43, Si=B1259 reference-state table p.68/PDF
+      p.74
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0194-casi0-3.json
     record: b1259-ht-0194-casi0-3
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0194-casi0-3.json
@@ -5405,7 +5431,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: beta
             charge:
               tag: value
               value: 0
@@ -5432,7 +5458,7 @@ observations:
             value: cr
           polymorph:
             tag: value
-            value: reference
+            value: beta
           charge:
             tag: value
             value: 0
@@ -5498,7 +5524,9 @@ observations:
     note: as_published='-388.051'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=Ca=B1259 reference-state table p.37/PDF p.43, Si=B1259 reference-state table p.68/PDF
+      p.74
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0194-casi0-3.json
     record: b1259-ht-0194-casi0-3
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0194-casi0-3.json
@@ -5572,7 +5600,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: beta
             charge:
               tag: value
               value: 0
@@ -5599,7 +5627,7 @@ observations:
             value: cr
           polymorph:
             tag: value
-            value: reference
+            value: beta
           charge:
             tag: value
             value: 0
@@ -5665,7 +5693,9 @@ observations:
     note: as_published='-387.949'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=Ca=B1259 reference-state table p.37/PDF p.43, Si=B1259 reference-state table p.68/PDF
+      p.74
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0194-casi0-3.json
     record: b1259-ht-0194-casi0-3
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0194-casi0-3.json
@@ -5736,10 +5766,10 @@ observations:
             formula: Ca
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -5763,10 +5793,10 @@ observations:
         - formula: Ca
           phase:
             tag: value
-            value: cr
+            value: l
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -5832,7 +5862,9 @@ observations:
     note: as_published='-389.284'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=Ca=B1259 reference-state table p.37/PDF p.43, Si=B1259 reference-state table p.68/PDF
+      p.74
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0194-casi0-3.json
     record: b1259-ht-0194-casi0-3
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0194-casi0-3.json
@@ -5903,10 +5935,10 @@ observations:
             formula: Ca
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -5930,10 +5962,10 @@ observations:
         - formula: Ca
           phase:
             tag: value
-            value: cr
+            value: l
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -5999,7 +6031,9 @@ observations:
     note: as_published='-388.898'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=Ca=B1259 reference-state table p.37/PDF p.43, Si=B1259 reference-state table p.68/PDF
+      p.74
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0194-casi0-3.json
     record: b1259-ht-0194-casi0-3
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0194-casi0-3.json
@@ -6070,10 +6104,10 @@ observations:
             formula: Ca
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -6097,10 +6131,10 @@ observations:
         - formula: Ca
           phase:
             tag: value
-            value: cr
+            value: l
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -6166,7 +6200,9 @@ observations:
     note: as_published='-388.489'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=Ca=B1259 reference-state table p.37/PDF p.43, Si=B1259 reference-state table p.68/PDF
+      p.74
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0194-casi0-3.json
     record: b1259-ht-0194-casi0-3
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0194-casi0-3.json
@@ -6237,10 +6273,10 @@ observations:
             formula: Ca
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -6264,10 +6300,10 @@ observations:
         - formula: Ca
           phase:
             tag: value
-            value: cr
+            value: l
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -6333,7 +6369,9 @@ observations:
     note: as_published='-388.054'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=Ca=B1259 reference-state table p.37/PDF p.43, Si=B1259 reference-state table p.68/PDF
+      p.74
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0194-casi0-3.json
     record: b1259-ht-0194-casi0-3
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0194-casi0-3.json
@@ -6404,10 +6442,10 @@ observations:
             formula: Ca
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -6416,10 +6454,10 @@ observations:
             formula: Si
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -6431,10 +6469,10 @@ observations:
         - formula: Ca
           phase:
             tag: value
-            value: cr
+            value: l
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -6442,10 +6480,10 @@ observations:
         - formula: Si
           phase:
             tag: value
-            value: cr
+            value: l
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -6500,7 +6538,9 @@ observations:
     note: as_published='-399.663'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=Ca=B1259 reference-state table p.37/PDF p.43, Si=B1259 reference-state table p.68/PDF
+      p.74
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0194-casi0-3.json
     record: b1259-ht-0194-casi0-3
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0194-casi0-3.json
@@ -6574,7 +6614,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: alpha
             charge:
               tag: value
               value: 0
@@ -6601,7 +6641,7 @@ observations:
             value: cr
           polymorph:
             tag: value
-            value: reference
+            value: alpha
           charge:
             tag: value
             value: 0
@@ -6667,7 +6707,9 @@ observations:
     note: as_published='-389.070'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=Ca=B1259 reference-state table p.37/PDF p.43, Si=B1259 reference-state table p.68/PDF
+      p.74
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0194-casi0-3.json
     record: b1259-ht-0194-casi0-3
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0194-casi0-3.json
@@ -6741,7 +6783,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: alpha
             charge:
               tag: value
               value: 0
@@ -6768,7 +6810,7 @@ observations:
             value: cr
           polymorph:
             tag: value
-            value: reference
+            value: alpha
           charge:
             tag: value
             value: 0
@@ -6834,7 +6876,9 @@ observations:
     note: as_published='-389.032'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=Ca=B1259 reference-state table p.37/PDF p.43, Si=B1259 reference-state table p.68/PDF
+      p.74
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0194-casi0-3.json
     record: b1259-ht-0194-casi0-3
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0194-casi0-3.json
@@ -6908,7 +6952,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: alpha
             charge:
               tag: value
               value: 0
@@ -6935,7 +6979,7 @@ observations:
             value: cr
           polymorph:
             tag: value
-            value: reference
+            value: alpha
           charge:
             tag: value
             value: 0
@@ -7001,7 +7045,9 @@ observations:
     note: as_published='-388.939'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=Ca=B1259 reference-state table p.37/PDF p.43, Si=B1259 reference-state table p.68/PDF
+      p.74
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0194-casi0-3.json
     record: b1259-ht-0194-casi0-3
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0194-casi0-3.json
@@ -7075,7 +7121,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: alpha
             charge:
               tag: value
               value: 0
@@ -7102,7 +7148,7 @@ observations:
             value: cr
           polymorph:
             tag: value
-            value: reference
+            value: alpha
           charge:
             tag: value
             value: 0
@@ -7168,7 +7214,9 @@ observations:
     note: as_published='-388.749'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=Ca=B1259 reference-state table p.37/PDF p.43, Si=B1259 reference-state table p.68/PDF
+      p.74
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0194-casi0-3.json
     record: b1259-ht-0194-casi0-3
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0194-casi0-3.json
@@ -7242,7 +7290,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: beta
             charge:
               tag: value
               value: 0
@@ -7269,7 +7317,7 @@ observations:
             value: cr
           polymorph:
             tag: value
-            value: reference
+            value: beta
           charge:
             tag: value
             value: 0
@@ -7335,7 +7383,9 @@ observations:
     note: as_published='-388.201'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=Ca=B1259 reference-state table p.37/PDF p.43, Si=B1259 reference-state table p.68/PDF
+      p.74
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0194-casi0-3.json
     record: b1259-ht-0194-casi0-3
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0194-casi0-3.json
@@ -7409,7 +7459,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: beta
             charge:
               tag: value
               value: 0
@@ -7436,7 +7486,7 @@ observations:
             value: cr
           polymorph:
             tag: value
-            value: reference
+            value: beta
           charge:
             tag: value
             value: 0
@@ -7502,7 +7552,9 @@ observations:
     note: as_published='70.492'; unit='dimensionless' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=Ca=B1259 reference-state table p.37/PDF p.43, Si=B1259 reference-state table p.68/PDF
+      p.74
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0194-casi0-3.json
     record: b1259-ht-0194-casi0-3
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0194-casi0-3.json
@@ -7564,10 +7616,10 @@ observations:
             formula: Ca
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -7591,10 +7643,10 @@ observations:
         - formula: Ca
           phase:
             tag: value
-            value: cr
+            value: l
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -7660,7 +7712,9 @@ observations:
     note: as_published='56.339'; unit='dimensionless' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=Ca=B1259 reference-state table p.37/PDF p.43, Si=B1259 reference-state table p.68/PDF
+      p.74
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0194-casi0-3.json
     record: b1259-ht-0194-casi0-3
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0194-casi0-3.json
@@ -7722,10 +7776,10 @@ observations:
             formula: Ca
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -7749,10 +7803,10 @@ observations:
         - formula: Ca
           phase:
             tag: value
-            value: cr
+            value: l
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -7818,7 +7872,9 @@ observations:
     note: as_published='50.880'; unit='dimensionless' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=Ca=B1259 reference-state table p.37/PDF p.43, Si=B1259 reference-state table p.68/PDF
+      p.74
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0194-casi0-3.json
     record: b1259-ht-0194-casi0-3
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0194-casi0-3.json
@@ -7880,10 +7936,10 @@ observations:
             formula: Ca
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -7907,10 +7963,10 @@ observations:
         - formula: Ca
           phase:
             tag: value
-            value: cr
+            value: l
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -7976,7 +8032,9 @@ observations:
     note: as_published='46.209'; unit='dimensionless' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=Ca=B1259 reference-state table p.37/PDF p.43, Si=B1259 reference-state table p.68/PDF
+      p.74
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0194-casi0-3.json
     record: b1259-ht-0194-casi0-3
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0194-casi0-3.json
@@ -8038,10 +8096,10 @@ observations:
             formula: Ca
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -8050,10 +8108,10 @@ observations:
             formula: Si
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -8065,10 +8123,10 @@ observations:
         - formula: Ca
           phase:
             tag: value
-            value: cr
+            value: l
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -8076,10 +8134,10 @@ observations:
         - formula: Si
           phase:
             tag: value
-            value: cr
+            value: l
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -8134,7 +8192,9 @@ observations:
     note: as_published='35.500'; unit='dimensionless' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=Ca=B1259 reference-state table p.37/PDF p.43, Si=B1259 reference-state table p.68/PDF
+      p.74
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0194-casi0-3.json
     record: b1259-ht-0194-casi0-3
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0194-casi0-3.json
@@ -8199,7 +8259,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: alpha
             charge:
               tag: value
               value: 0
@@ -8226,7 +8286,7 @@ observations:
             value: cr
           polymorph:
             tag: value
-            value: reference
+            value: alpha
           charge:
             tag: value
             value: 0
@@ -8292,7 +8352,9 @@ observations:
     note: as_published='270.543'; unit='dimensionless' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=Ca=B1259 reference-state table p.37/PDF p.43, Si=B1259 reference-state table p.68/PDF
+      p.74
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0194-casi0-3.json
     record: b1259-ht-0194-casi0-3
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0194-casi0-3.json
@@ -8357,7 +8419,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: alpha
             charge:
               tag: value
               value: 0
@@ -8384,7 +8446,7 @@ observations:
             value: cr
           polymorph:
             tag: value
-            value: reference
+            value: alpha
           charge:
             tag: value
             value: 0
@@ -8450,7 +8512,9 @@ observations:
     note: as_published='197.926'; unit='dimensionless' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=Ca=B1259 reference-state table p.37/PDF p.43, Si=B1259 reference-state table p.68/PDF
+      p.74
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0194-casi0-3.json
     record: b1259-ht-0194-casi0-3
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0194-casi0-3.json
@@ -8515,7 +8579,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: alpha
             charge:
               tag: value
               value: 0
@@ -8542,7 +8606,7 @@ observations:
             value: cr
           polymorph:
             tag: value
-            value: reference
+            value: alpha
           charge:
             tag: value
             value: 0
@@ -8608,7 +8672,9 @@ observations:
     note: as_published='155.419'; unit='dimensionless' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=Ca=B1259 reference-state table p.37/PDF p.43, Si=B1259 reference-state table p.68/PDF
+      p.74
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0194-casi0-3.json
     record: b1259-ht-0194-casi0-3
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0194-casi0-3.json
@@ -8673,7 +8739,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: alpha
             charge:
               tag: value
               value: 0
@@ -8700,7 +8766,7 @@ observations:
             value: cr
           polymorph:
             tag: value
-            value: reference
+            value: alpha
           charge:
             tag: value
             value: 0
@@ -8766,7 +8832,9 @@ observations:
     note: as_published='127.093'; unit='dimensionless' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=Ca=B1259 reference-state table p.37/PDF p.43, Si=B1259 reference-state table p.68/PDF
+      p.74
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0194-casi0-3.json
     record: b1259-ht-0194-casi0-3
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0194-casi0-3.json
@@ -8831,7 +8899,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: alpha
             charge:
               tag: value
               value: 0
@@ -8858,7 +8926,7 @@ observations:
             value: cr
           polymorph:
             tag: value
-            value: reference
+            value: alpha
           charge:
             tag: value
             value: 0
@@ -8924,7 +8992,9 @@ observations:
     note: as_published='106.867'; unit='dimensionless' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=Ca=B1259 reference-state table p.37/PDF p.43, Si=B1259 reference-state table p.68/PDF
+      p.74
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0194-casi0-3.json
     record: b1259-ht-0194-casi0-3
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0194-casi0-3.json
@@ -8989,7 +9059,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: beta
             charge:
               tag: value
               value: 0
@@ -9016,7 +9086,7 @@ observations:
             value: cr
           polymorph:
             tag: value
-            value: reference
+            value: beta
           charge:
             tag: value
             value: 0
@@ -9082,7 +9152,9 @@ observations:
     note: as_published='91.708'; unit='dimensionless' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=Ca=B1259 reference-state table p.37/PDF p.43, Si=B1259 reference-state table p.68/PDF
+      p.74
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0194-casi0-3.json
     record: b1259-ht-0194-casi0-3
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0194-casi0-3.json
@@ -9147,7 +9219,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: beta
             charge:
               tag: value
               value: 0
@@ -9174,7 +9246,7 @@ observations:
             value: cr
           polymorph:
             tag: value
-            value: reference
+            value: beta
           charge:
             tag: value
             value: 0
@@ -9240,7 +9312,9 @@ observations:
     note: as_published='79.918'; unit='dimensionless' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=Ca=B1259 reference-state table p.37/PDF p.43, Si=B1259 reference-state table p.68/PDF
+      p.74
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0194-casi0-3.json
     record: b1259-ht-0194-casi0-3
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0194-casi0-3.json

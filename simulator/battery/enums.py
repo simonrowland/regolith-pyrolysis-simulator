@@ -21,11 +21,7 @@ from enum import StrEnum
 
 
 class Engine(StrEnum):
-    """Closed first-class engine tokens. Not derived from resolve_backend.
-
-    Retired IMCC-SF04 / IMCC-SF04-EXT values remain so historical ledgers
-    load. New IMCC predictions use OPENIMCC.
-    """
+    """Closed first-class engine tokens. Not derived from resolve_backend."""
 
     INTERNAL_ANALYTICAL = "internal-analytical"
     NASA_CEA_9 = "nasa_cea_9"
@@ -36,9 +32,6 @@ class Engine(StrEnum):
     THERMOENGINE = "thermoengine"
     VAPOROCK = "vaporock"
     MAGEMIN = "magemin"
-    # Retired producer identities; retained for historical ledger decoding.
-    IMCC_SF04 = "imcc_sf04"
-    IMCC_SF04_EXT = "imcc_sf04_ext"
     OPENIMCC = "openimcc"
 
 

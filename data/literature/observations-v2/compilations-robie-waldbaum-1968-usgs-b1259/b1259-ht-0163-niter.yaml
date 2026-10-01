@@ -1978,7 +1978,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: bcc
             charge:
               tag: value
               value: 0
@@ -1990,7 +1990,7 @@ observations:
               value: g
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -2002,7 +2002,7 @@ observations:
               value: g
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -2017,7 +2017,7 @@ observations:
             value: cr
           polymorph:
             tag: value
-            value: reference
+            value: bcc
           charge:
             tag: value
             value: 0
@@ -2028,7 +2028,7 @@ observations:
             value: g
           polymorph:
             tag: not_applicable
-            reason: not crystal
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -2039,7 +2039,7 @@ observations:
             value: g
           polymorph:
             tag: not_applicable
-            reason: not crystal
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -2094,7 +2094,9 @@ observations:
     note: as_published='-93.893'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=K=B1259 reference-state table p.50/PDF p.56, N=B1259 reference-state table p.55/PDF
+      p.61, O=B1259 reference-state table p.59/PDF p.65
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0163-niter.json
     record: b1259-ht-0163-niter
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0163-niter.json
@@ -2165,10 +2167,10 @@ observations:
             formula: K
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -2180,7 +2182,7 @@ observations:
               value: g
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -2192,7 +2194,7 @@ observations:
               value: g
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -2204,10 +2206,10 @@ observations:
         - formula: K
           phase:
             tag: value
-            value: cr
+            value: l
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -2218,7 +2220,7 @@ observations:
             value: g
           polymorph:
             tag: not_applicable
-            reason: not crystal
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -2229,7 +2231,7 @@ observations:
             value: g
           polymorph:
             tag: not_applicable
-            reason: not crystal
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -2284,7 +2286,9 @@ observations:
     note: as_published='-85.675'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=K=B1259 reference-state table p.50/PDF p.56, N=B1259 reference-state table p.55/PDF
+      p.61, O=B1259 reference-state table p.59/PDF p.65
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0163-niter.json
     record: b1259-ht-0163-niter
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0163-niter.json
@@ -2355,10 +2359,10 @@ observations:
             formula: K
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -2370,7 +2374,7 @@ observations:
               value: g
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -2382,7 +2386,7 @@ observations:
               value: g
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -2394,10 +2398,10 @@ observations:
         - formula: K
           phase:
             tag: value
-            value: cr
+            value: l
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -2408,7 +2412,7 @@ observations:
             value: g
           polymorph:
             tag: not_applicable
-            reason: not crystal
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -2419,7 +2423,7 @@ observations:
             value: g
           polymorph:
             tag: not_applicable
-            reason: not crystal
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -2474,7 +2478,9 @@ observations:
     note: as_published='-85.600'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=K=B1259 reference-state table p.50/PDF p.56, N=B1259 reference-state table p.55/PDF
+      p.61, O=B1259 reference-state table p.59/PDF p.65
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0163-niter.json
     record: b1259-ht-0163-niter
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0163-niter.json
@@ -2545,10 +2551,10 @@ observations:
             formula: K
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -2560,7 +2566,7 @@ observations:
               value: g
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -2572,7 +2578,7 @@ observations:
               value: g
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -2584,10 +2590,10 @@ observations:
         - formula: K
           phase:
             tag: value
-            value: cr
+            value: l
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -2598,7 +2604,7 @@ observations:
             value: g
           polymorph:
             tag: not_applicable
-            reason: not crystal
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -2609,7 +2615,7 @@ observations:
             value: g
           polymorph:
             tag: not_applicable
-            reason: not crystal
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -2664,7 +2670,9 @@ observations:
     note: as_published='-78.011'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=K=B1259 reference-state table p.50/PDF p.56, N=B1259 reference-state table p.55/PDF
+      p.61, O=B1259 reference-state table p.59/PDF p.65
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0163-niter.json
     record: b1259-ht-0163-niter
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0163-niter.json
@@ -2735,10 +2743,10 @@ observations:
             formula: K
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -2750,7 +2758,7 @@ observations:
               value: g
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -2762,7 +2770,7 @@ observations:
               value: g
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -2774,10 +2782,10 @@ observations:
         - formula: K
           phase:
             tag: value
-            value: cr
+            value: l
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -2788,7 +2796,7 @@ observations:
             value: g
           polymorph:
             tag: not_applicable
-            reason: not crystal
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -2799,7 +2807,7 @@ observations:
             value: g
           polymorph:
             tag: not_applicable
-            reason: not crystal
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -2854,7 +2862,9 @@ observations:
     note: as_published='-70.486'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=K=B1259 reference-state table p.50/PDF p.56, N=B1259 reference-state table p.55/PDF
+      p.61, O=B1259 reference-state table p.59/PDF p.65
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0163-niter.json
     record: b1259-ht-0163-niter
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0163-niter.json
@@ -2925,10 +2935,10 @@ observations:
             formula: K
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -2940,7 +2950,7 @@ observations:
               value: g
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -2952,7 +2962,7 @@ observations:
               value: g
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -2964,10 +2974,10 @@ observations:
         - formula: K
           phase:
             tag: value
-            value: cr
+            value: l
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -2978,7 +2988,7 @@ observations:
             value: g
           polymorph:
             tag: not_applicable
-            reason: not crystal
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -2989,7 +2999,7 @@ observations:
             value: g
           polymorph:
             tag: not_applicable
-            reason: not crystal
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -3044,7 +3054,9 @@ observations:
     note: as_published='-69.730'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=K=B1259 reference-state table p.50/PDF p.56, N=B1259 reference-state table p.55/PDF
+      p.61, O=B1259 reference-state table p.59/PDF p.65
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0163-niter.json
     record: b1259-ht-0163-niter
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0163-niter.json
@@ -3115,10 +3127,10 @@ observations:
             formula: K
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -3130,7 +3142,7 @@ observations:
               value: g
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -3142,7 +3154,7 @@ observations:
               value: g
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -3154,10 +3166,10 @@ observations:
         - formula: K
           phase:
             tag: value
-            value: cr
+            value: l
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -3168,7 +3180,7 @@ observations:
             value: g
           polymorph:
             tag: not_applicable
-            reason: not crystal
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -3179,7 +3191,7 @@ observations:
             value: g
           polymorph:
             tag: not_applicable
-            reason: not crystal
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -3234,7 +3246,9 @@ observations:
     note: as_published='-63.421'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=K=B1259 reference-state table p.50/PDF p.56, N=B1259 reference-state table p.55/PDF
+      p.61, O=B1259 reference-state table p.59/PDF p.65
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0163-niter.json
     record: b1259-ht-0163-niter
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0163-niter.json
@@ -3308,7 +3322,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: bcc
             charge:
               tag: value
               value: 0
@@ -3320,7 +3334,7 @@ observations:
               value: g
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -3332,7 +3346,7 @@ observations:
               value: g
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -3347,7 +3361,7 @@ observations:
             value: cr
           polymorph:
             tag: value
-            value: reference
+            value: bcc
           charge:
             tag: value
             value: 0
@@ -3358,7 +3372,7 @@ observations:
             value: g
           polymorph:
             tag: not_applicable
-            reason: not crystal
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -3369,7 +3383,7 @@ observations:
             value: g
           polymorph:
             tag: not_applicable
-            reason: not crystal
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -3424,7 +3438,9 @@ observations:
     note: as_published='-117.760'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=K=B1259 reference-state table p.50/PDF p.56, N=B1259 reference-state table p.55/PDF
+      p.61, O=B1259 reference-state table p.59/PDF p.65
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0163-niter.json
     record: b1259-ht-0163-niter
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0163-niter.json
@@ -3495,10 +3511,10 @@ observations:
             formula: K
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -3510,7 +3526,7 @@ observations:
               value: g
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -3522,7 +3538,7 @@ observations:
               value: g
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -3534,10 +3550,10 @@ observations:
         - formula: K
           phase:
             tag: value
-            value: cr
+            value: l
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -3548,7 +3564,7 @@ observations:
             value: g
           polymorph:
             tag: not_applicable
-            reason: not crystal
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -3559,7 +3575,7 @@ observations:
             value: g
           polymorph:
             tag: not_applicable
-            reason: not crystal
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -3614,7 +3630,9 @@ observations:
     note: as_published='116.630'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=K=B1259 reference-state table p.50/PDF p.56, N=B1259 reference-state table p.55/PDF
+      p.61, O=B1259 reference-state table p.59/PDF p.65
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0163-niter.json
     record: b1259-ht-0163-niter
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0163-niter.json
@@ -3685,10 +3703,10 @@ observations:
             formula: K
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -3700,7 +3718,7 @@ observations:
               value: g
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -3712,7 +3730,7 @@ observations:
               value: g
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -3724,10 +3742,10 @@ observations:
         - formula: K
           phase:
             tag: value
-            value: cr
+            value: l
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -3738,7 +3756,7 @@ observations:
             value: g
           polymorph:
             tag: not_applicable
-            reason: not crystal
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -3749,7 +3767,7 @@ observations:
             value: g
           polymorph:
             tag: not_applicable
-            reason: not crystal
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -3804,7 +3822,9 @@ observations:
     note: as_published='115.939'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=K=B1259 reference-state table p.50/PDF p.56, N=B1259 reference-state table p.55/PDF
+      p.61, O=B1259 reference-state table p.59/PDF p.65
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0163-niter.json
     record: b1259-ht-0163-niter
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0163-niter.json
@@ -3875,10 +3895,10 @@ observations:
             formula: K
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -3890,7 +3910,7 @@ observations:
               value: g
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -3902,7 +3922,7 @@ observations:
               value: g
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -3914,10 +3934,10 @@ observations:
         - formula: K
           phase:
             tag: value
-            value: cr
+            value: l
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -3928,7 +3948,7 @@ observations:
             value: g
           polymorph:
             tag: not_applicable
-            reason: not crystal
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -3939,7 +3959,7 @@ observations:
             value: g
           polymorph:
             tag: not_applicable
-            reason: not crystal
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -3994,7 +4014,9 @@ observations:
     note: as_published='115.273'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=K=B1259 reference-state table p.50/PDF p.56, N=B1259 reference-state table p.55/PDF
+      p.61, O=B1259 reference-state table p.59/PDF p.65
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0163-niter.json
     record: b1259-ht-0163-niter
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0163-niter.json
@@ -4065,10 +4087,10 @@ observations:
             formula: K
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -4080,7 +4102,7 @@ observations:
               value: g
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -4092,7 +4114,7 @@ observations:
               value: g
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -4104,10 +4126,10 @@ observations:
         - formula: K
           phase:
             tag: value
-            value: cr
+            value: l
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -4118,7 +4140,7 @@ observations:
             value: g
           polymorph:
             tag: not_applicable
-            reason: not crystal
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -4129,7 +4151,7 @@ observations:
             value: g
           polymorph:
             tag: not_applicable
-            reason: not crystal
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -4184,7 +4206,9 @@ observations:
     note: as_published='112.797'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=K=B1259 reference-state table p.50/PDF p.56, N=B1259 reference-state table p.55/PDF
+      p.61, O=B1259 reference-state table p.59/PDF p.65
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0163-niter.json
     record: b1259-ht-0163-niter
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0163-niter.json
@@ -4255,10 +4279,10 @@ observations:
             formula: K
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -4270,7 +4294,7 @@ observations:
               value: g
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -4282,7 +4306,7 @@ observations:
               value: g
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -4294,10 +4318,10 @@ observations:
         - formula: K
           phase:
             tag: value
-            value: cr
+            value: l
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -4308,7 +4332,7 @@ observations:
             value: g
           polymorph:
             tag: not_applicable
-            reason: not crystal
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -4319,7 +4343,7 @@ observations:
             value: g
           polymorph:
             tag: not_applicable
-            reason: not crystal
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -4374,7 +4398,9 @@ observations:
     note: as_published='115.210'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=K=B1259 reference-state table p.50/PDF p.56, N=B1259 reference-state table p.55/PDF
+      p.61, O=B1259 reference-state table p.59/PDF p.65
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0163-niter.json
     record: b1259-ht-0163-niter
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0163-niter.json
@@ -4445,10 +4471,10 @@ observations:
             formula: K
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -4460,7 +4486,7 @@ observations:
               value: g
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -4472,7 +4498,7 @@ observations:
               value: g
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -4484,10 +4510,10 @@ observations:
         - formula: K
           phase:
             tag: value
-            value: cr
+            value: l
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -4498,7 +4524,7 @@ observations:
             value: g
           polymorph:
             tag: not_applicable
-            reason: not crystal
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -4509,7 +4535,7 @@ observations:
             value: g
           polymorph:
             tag: not_applicable
-            reason: not crystal
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -4564,7 +4590,9 @@ observations:
     note: as_published='112.167'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=K=B1259 reference-state table p.50/PDF p.56, N=B1259 reference-state table p.55/PDF
+      p.61, O=B1259 reference-state table p.59/PDF p.65
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0163-niter.json
     record: b1259-ht-0163-niter
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0163-niter.json
@@ -4638,7 +4666,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: bcc
             charge:
               tag: value
               value: 0
@@ -4650,7 +4678,7 @@ observations:
               value: g
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -4662,7 +4690,7 @@ observations:
               value: g
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -4677,7 +4705,7 @@ observations:
             value: cr
           polymorph:
             tag: value
-            value: reference
+            value: bcc
           charge:
             tag: value
             value: 0
@@ -4688,7 +4716,7 @@ observations:
             value: g
           polymorph:
             tag: not_applicable
-            reason: not crystal
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -4699,7 +4727,7 @@ observations:
             value: g
           polymorph:
             tag: not_applicable
-            reason: not crystal
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -4754,7 +4782,9 @@ observations:
     note: as_published='68.826'; unit='dimensionless' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=K=B1259 reference-state table p.50/PDF p.56, N=B1259 reference-state table p.55/PDF
+      p.61, O=B1259 reference-state table p.59/PDF p.65
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0163-niter.json
     record: b1259-ht-0163-niter
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0163-niter.json
@@ -4816,10 +4846,10 @@ observations:
             formula: K
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -4831,7 +4861,7 @@ observations:
               value: g
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -4843,7 +4873,7 @@ observations:
               value: g
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -4855,10 +4885,10 @@ observations:
         - formula: K
           phase:
             tag: value
-            value: cr
+            value: l
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -4869,7 +4899,7 @@ observations:
             value: g
           polymorph:
             tag: not_applicable
-            reason: not crystal
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -4880,7 +4910,7 @@ observations:
             value: g
           polymorph:
             tag: not_applicable
-            reason: not crystal
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -4935,7 +4965,9 @@ observations:
     note: as_published='46.810'; unit='dimensionless' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=K=B1259 reference-state table p.50/PDF p.56, N=B1259 reference-state table p.55/PDF
+      p.61, O=B1259 reference-state table p.59/PDF p.65
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0163-niter.json
     record: b1259-ht-0163-niter
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0163-niter.json
@@ -4997,10 +5029,10 @@ observations:
             formula: K
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -5012,7 +5044,7 @@ observations:
               value: g
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -5024,7 +5056,7 @@ observations:
               value: g
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -5036,10 +5068,10 @@ observations:
         - formula: K
           phase:
             tag: value
-            value: cr
+            value: l
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -5050,7 +5082,7 @@ observations:
             value: g
           polymorph:
             tag: not_applicable
-            reason: not crystal
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -5061,7 +5093,7 @@ observations:
             value: g
           polymorph:
             tag: not_applicable
-            reason: not crystal
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -5116,7 +5148,9 @@ observations:
     note: as_published='46.654'; unit='dimensionless' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=K=B1259 reference-state table p.50/PDF p.56, N=B1259 reference-state table p.55/PDF
+      p.61, O=B1259 reference-state table p.59/PDF p.65
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0163-niter.json
     record: b1259-ht-0163-niter
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0163-niter.json
@@ -5178,10 +5212,10 @@ observations:
             formula: K
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -5193,7 +5227,7 @@ observations:
               value: g
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -5205,7 +5239,7 @@ observations:
               value: g
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -5217,10 +5251,10 @@ observations:
         - formula: K
           phase:
             tag: value
-            value: cr
+            value: l
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -5231,7 +5265,7 @@ observations:
             value: g
           polymorph:
             tag: not_applicable
-            reason: not crystal
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -5242,7 +5276,7 @@ observations:
             value: g
           polymorph:
             tag: not_applicable
-            reason: not crystal
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -5297,7 +5331,9 @@ observations:
     note: as_published='34.098'; unit='dimensionless' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=K=B1259 reference-state table p.50/PDF p.56, N=B1259 reference-state table p.55/PDF
+      p.61, O=B1259 reference-state table p.59/PDF p.65
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0163-niter.json
     record: b1259-ht-0163-niter
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0163-niter.json
@@ -5359,10 +5395,10 @@ observations:
             formula: K
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -5374,7 +5410,7 @@ observations:
               value: g
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -5386,7 +5422,7 @@ observations:
               value: g
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -5398,10 +5434,10 @@ observations:
         - formula: K
           phase:
             tag: value
-            value: cr
+            value: l
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -5412,7 +5448,7 @@ observations:
             value: g
           polymorph:
             tag: not_applicable
-            reason: not crystal
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -5423,7 +5459,7 @@ observations:
             value: g
           polymorph:
             tag: not_applicable
-            reason: not crystal
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -5478,7 +5514,9 @@ observations:
     note: as_published='25.675'; unit='dimensionless' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=K=B1259 reference-state table p.50/PDF p.56, N=B1259 reference-state table p.55/PDF
+      p.61, O=B1259 reference-state table p.59/PDF p.65
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0163-niter.json
     record: b1259-ht-0163-niter
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0163-niter.json
@@ -5540,10 +5578,10 @@ observations:
             formula: K
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -5555,7 +5593,7 @@ observations:
               value: g
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -5567,7 +5605,7 @@ observations:
               value: g
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -5579,10 +5617,10 @@ observations:
         - formula: K
           phase:
             tag: value
-            value: cr
+            value: l
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -5593,7 +5631,7 @@ observations:
             value: g
           polymorph:
             tag: not_applicable
-            reason: not crystal
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -5604,7 +5642,7 @@ observations:
             value: g
           polymorph:
             tag: not_applicable
-            reason: not crystal
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -5659,7 +5697,9 @@ observations:
     note: as_published='24.983'; unit='dimensionless' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=K=B1259 reference-state table p.50/PDF p.56, N=B1259 reference-state table p.55/PDF
+      p.61, O=B1259 reference-state table p.59/PDF p.65
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0163-niter.json
     record: b1259-ht-0163-niter
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0163-niter.json
@@ -5721,10 +5761,10 @@ observations:
             formula: K
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -5736,7 +5776,7 @@ observations:
               value: g
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -5748,7 +5788,7 @@ observations:
               value: g
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -5760,10 +5800,10 @@ observations:
         - formula: K
           phase:
             tag: value
-            value: cr
+            value: l
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -5774,7 +5814,7 @@ observations:
             value: g
           polymorph:
             tag: not_applicable
-            reason: not crystal
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -5785,7 +5825,7 @@ observations:
             value: g
           polymorph:
             tag: not_applicable
-            reason: not crystal
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -5840,7 +5880,9 @@ observations:
     note: as_published='19.801'; unit='dimensionless' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=K=B1259 reference-state table p.50/PDF p.56, N=B1259 reference-state table p.55/PDF
+      p.61, O=B1259 reference-state table p.59/PDF p.65
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0163-niter.json
     record: b1259-ht-0163-niter
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0163-niter.json

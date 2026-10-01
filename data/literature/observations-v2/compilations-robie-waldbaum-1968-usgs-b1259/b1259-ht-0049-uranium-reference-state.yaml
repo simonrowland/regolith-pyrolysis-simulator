@@ -5036,7 +5036,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: beta
             charge:
               tag: value
               value: 0
@@ -5051,7 +5051,7 @@ observations:
             value: cr
           polymorph:
             tag: value
-            value: reference
+            value: beta
           charge:
             tag: value
             value: 0
@@ -5106,7 +5106,8 @@ observations:
     note: as_published='.000'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance table;
       H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=U=B1259 reference-state table p.74/PDF p.80
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0049-uranium-reference-state.json
     record: b1259-ht-0049-uranium-reference-state
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0049-uranium-reference-state.json
@@ -5158,47 +5159,11 @@ observations:
       tag: value
       value: '101325'
     reaction:
-      tag: value
-      value:
-        terms:
-        - species:
-            formula: U
-            phase:
-              tag: value
-              value: cr
-            polymorph:
-              tag: value
-              value: reference
-            charge:
-              tag: value
-              value: 0
-          coefficient: '1'
-        - species:
-            formula: U
-            phase:
-              tag: value
-              value: cr
-            polymorph:
-              tag: value
-              value: reference
-            charge:
-              tag: value
-              value: 0
-          coefficient: '-1'
+      tag: unknown
+      reason: formula 'U' has no closed from_the_elements reaction at 1048 K using B1259's printed elemental reference states
     formation_elements:
-      tag: value
-      value:
-      - - U
-        - formula: U
-          phase:
-            tag: value
-            value: cr
-          polymorph:
-            tag: value
-            value: reference
-          charge:
-            tag: value
-            value: 0
+      tag: unknown
+      reason: formula 'U' has no closed from_the_elements reaction at 1048 K using B1259's printed elemental reference states
     reference_state:
       tag: not_applicable
       reason: profile delta_fG does not use reference_state
@@ -5250,7 +5215,8 @@ observations:
     note: as_published='.000'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance table;
       H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=U=B1259 reference-state table p.74/PDF p.80
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0049-uranium-reference-state.json
     record: b1259-ht-0049-uranium-reference-state
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0049-uranium-reference-state.json
@@ -5324,7 +5290,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: gamma
             charge:
               tag: value
               value: 0
@@ -5339,7 +5305,7 @@ observations:
             value: cr
           polymorph:
             tag: value
-            value: reference
+            value: gamma
           charge:
             tag: value
             value: 0
@@ -5394,7 +5360,8 @@ observations:
     note: as_published='.000'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance table;
       H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=U=B1259 reference-state table p.74/PDF p.80
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0049-uranium-reference-state.json
     record: b1259-ht-0049-uranium-reference-state
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0049-uranium-reference-state.json
@@ -5468,7 +5435,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: gamma
             charge:
               tag: value
               value: 0
@@ -5483,7 +5450,7 @@ observations:
             value: cr
           polymorph:
             tag: value
-            value: reference
+            value: gamma
           charge:
             tag: value
             value: 0
@@ -5538,7 +5505,8 @@ observations:
     note: as_published='.000'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance table;
       H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=U=B1259 reference-state table p.74/PDF p.80
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0049-uranium-reference-state.json
     record: b1259-ht-0049-uranium-reference-state
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0049-uranium-reference-state.json
@@ -5612,7 +5580,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: gamma
             charge:
               tag: value
               value: 0
@@ -5627,7 +5595,7 @@ observations:
             value: cr
           polymorph:
             tag: value
-            value: reference
+            value: gamma
           charge:
             tag: value
             value: 0
@@ -5682,7 +5650,8 @@ observations:
     note: as_published='.000'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance table;
       H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=U=B1259 reference-state table p.74/PDF p.80
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0049-uranium-reference-state.json
     record: b1259-ht-0049-uranium-reference-state
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0049-uranium-reference-state.json
@@ -5756,7 +5725,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: gamma
             charge:
               tag: value
               value: 0
@@ -5771,7 +5740,7 @@ observations:
             value: cr
           polymorph:
             tag: value
-            value: reference
+            value: gamma
           charge:
             tag: value
             value: 0
@@ -5826,7 +5795,8 @@ observations:
     note: as_published='.000'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance table;
       H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=U=B1259 reference-state table p.74/PDF p.80
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0049-uranium-reference-state.json
     record: b1259-ht-0049-uranium-reference-state
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0049-uranium-reference-state.json
@@ -5878,47 +5848,11 @@ observations:
       tag: value
       value: '101325'
     reaction:
-      tag: value
-      value:
-        terms:
-        - species:
-            formula: U
-            phase:
-              tag: value
-              value: cr
-            polymorph:
-              tag: value
-              value: reference
-            charge:
-              tag: value
-              value: 0
-          coefficient: '1'
-        - species:
-            formula: U
-            phase:
-              tag: value
-              value: cr
-            polymorph:
-              tag: value
-              value: reference
-            charge:
-              tag: value
-              value: 0
-          coefficient: '-1'
+      tag: unknown
+      reason: formula 'U' has no closed from_the_elements reaction at 1405 K using B1259's printed elemental reference states
     formation_elements:
-      tag: value
-      value:
-      - - U
-        - formula: U
-          phase:
-            tag: value
-            value: cr
-          polymorph:
-            tag: value
-            value: reference
-          charge:
-            tag: value
-            value: 0
+      tag: unknown
+      reason: formula 'U' has no closed from_the_elements reaction at 1405 K using B1259's printed elemental reference states
     reference_state:
       tag: not_applicable
       reason: profile delta_fG does not use reference_state
@@ -5970,7 +5904,8 @@ observations:
     note: as_published='.000'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance table;
       H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=U=B1259 reference-state table p.74/PDF p.80
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0049-uranium-reference-state.json
     record: b1259-ht-0049-uranium-reference-state
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0049-uranium-reference-state.json
@@ -6041,10 +5976,10 @@ observations:
             formula: U
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -6056,10 +5991,10 @@ observations:
         - formula: U
           phase:
             tag: value
-            value: cr
+            value: l
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -6114,7 +6049,8 @@ observations:
     note: as_published='.000'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance table;
       H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=U=B1259 reference-state table p.74/PDF p.80
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0049-uranium-reference-state.json
     record: b1259-ht-0049-uranium-reference-state
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0049-uranium-reference-state.json
@@ -6185,10 +6121,10 @@ observations:
             formula: U
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -6200,10 +6136,10 @@ observations:
         - formula: U
           phase:
             tag: value
-            value: cr
+            value: l
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -6258,7 +6194,8 @@ observations:
     note: as_published='.000'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance table;
       H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=U=B1259 reference-state table p.74/PDF p.80
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0049-uranium-reference-state.json
     record: b1259-ht-0049-uranium-reference-state
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0049-uranium-reference-state.json
@@ -6329,10 +6266,10 @@ observations:
             formula: U
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -6344,10 +6281,10 @@ observations:
         - formula: U
           phase:
             tag: value
-            value: cr
+            value: l
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -6402,7 +6339,8 @@ observations:
     note: as_published='.000'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance table;
       H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=U=B1259 reference-state table p.74/PDF p.80
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0049-uranium-reference-state.json
     record: b1259-ht-0049-uranium-reference-state
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0049-uranium-reference-state.json
@@ -6473,10 +6411,10 @@ observations:
             formula: U
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -6488,10 +6426,10 @@ observations:
         - formula: U
           phase:
             tag: value
-            value: cr
+            value: l
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -6546,7 +6484,8 @@ observations:
     note: as_published='.000'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance table;
       H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=U=B1259 reference-state table p.74/PDF p.80
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0049-uranium-reference-state.json
     record: b1259-ht-0049-uranium-reference-state
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0049-uranium-reference-state.json
@@ -6617,10 +6556,10 @@ observations:
             formula: U
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -6632,10 +6571,10 @@ observations:
         - formula: U
           phase:
             tag: value
-            value: cr
+            value: l
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -6690,7 +6629,8 @@ observations:
     note: as_published='.000'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance table;
       H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=U=B1259 reference-state table p.74/PDF p.80
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0049-uranium-reference-state.json
     record: b1259-ht-0049-uranium-reference-state
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0049-uranium-reference-state.json
@@ -6761,10 +6701,10 @@ observations:
             formula: U
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -6776,10 +6716,10 @@ observations:
         - formula: U
           phase:
             tag: value
-            value: cr
+            value: l
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -6834,7 +6774,8 @@ observations:
     note: as_published='.000'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance table;
       H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=U=B1259 reference-state table p.74/PDF p.80
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0049-uranium-reference-state.json
     record: b1259-ht-0049-uranium-reference-state
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0049-uranium-reference-state.json
@@ -6908,7 +6849,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: alpha
             charge:
               tag: value
               value: 0
@@ -6923,7 +6864,7 @@ observations:
             value: cr
           polymorph:
             tag: value
-            value: reference
+            value: alpha
           charge:
             tag: value
             value: 0
@@ -6978,7 +6919,8 @@ observations:
     note: as_published='0.000'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance table;
       H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=U=B1259 reference-state table p.74/PDF p.80
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0049-uranium-reference-state.json
     record: b1259-ht-0049-uranium-reference-state
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0049-uranium-reference-state.json
@@ -7052,7 +6994,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: alpha
             charge:
               tag: value
               value: 0
@@ -7067,7 +7009,7 @@ observations:
             value: cr
           polymorph:
             tag: value
-            value: reference
+            value: alpha
           charge:
             tag: value
             value: 0
@@ -7122,7 +7064,8 @@ observations:
     note: as_published='.000'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance table;
       H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=U=B1259 reference-state table p.74/PDF p.80
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0049-uranium-reference-state.json
     record: b1259-ht-0049-uranium-reference-state
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0049-uranium-reference-state.json
@@ -7196,7 +7139,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: alpha
             charge:
               tag: value
               value: 0
@@ -7211,7 +7154,7 @@ observations:
             value: cr
           polymorph:
             tag: value
-            value: reference
+            value: alpha
           charge:
             tag: value
             value: 0
@@ -7266,7 +7209,8 @@ observations:
     note: as_published='.000'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance table;
       H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=U=B1259 reference-state table p.74/PDF p.80
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0049-uranium-reference-state.json
     record: b1259-ht-0049-uranium-reference-state
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0049-uranium-reference-state.json
@@ -7340,7 +7284,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: alpha
             charge:
               tag: value
               value: 0
@@ -7355,7 +7299,7 @@ observations:
             value: cr
           polymorph:
             tag: value
-            value: reference
+            value: alpha
           charge:
             tag: value
             value: 0
@@ -7410,7 +7354,8 @@ observations:
     note: as_published='.000'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance table;
       H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=U=B1259 reference-state table p.74/PDF p.80
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0049-uranium-reference-state.json
     record: b1259-ht-0049-uranium-reference-state
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0049-uranium-reference-state.json
@@ -7484,7 +7429,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: alpha
             charge:
               tag: value
               value: 0
@@ -7499,7 +7444,7 @@ observations:
             value: cr
           polymorph:
             tag: value
-            value: reference
+            value: alpha
           charge:
             tag: value
             value: 0
@@ -7554,7 +7499,8 @@ observations:
     note: as_published='.000'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance table;
       H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=U=B1259 reference-state table p.74/PDF p.80
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0049-uranium-reference-state.json
     record: b1259-ht-0049-uranium-reference-state
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0049-uranium-reference-state.json
@@ -7628,7 +7574,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: alpha
             charge:
               tag: value
               value: 0
@@ -7643,7 +7589,7 @@ observations:
             value: cr
           polymorph:
             tag: value
-            value: reference
+            value: alpha
           charge:
             tag: value
             value: 0
@@ -7698,7 +7644,8 @@ observations:
     note: as_published='.000'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance table;
       H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=U=B1259 reference-state table p.74/PDF p.80
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0049-uranium-reference-state.json
     record: b1259-ht-0049-uranium-reference-state
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0049-uranium-reference-state.json
@@ -7772,7 +7719,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: alpha
             charge:
               tag: value
               value: 0
@@ -7787,7 +7734,7 @@ observations:
             value: cr
           polymorph:
             tag: value
-            value: reference
+            value: alpha
           charge:
             tag: value
             value: 0
@@ -7842,7 +7789,8 @@ observations:
     note: as_published='.000'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance table;
       H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=U=B1259 reference-state table p.74/PDF p.80
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0049-uranium-reference-state.json
     record: b1259-ht-0049-uranium-reference-state
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0049-uranium-reference-state.json
@@ -7894,47 +7842,11 @@ observations:
       tag: value
       value: '101325'
     reaction:
-      tag: value
-      value:
-        terms:
-        - species:
-            formula: U
-            phase:
-              tag: value
-              value: cr
-            polymorph:
-              tag: value
-              value: reference
-            charge:
-              tag: value
-              value: 0
-          coefficient: '1'
-        - species:
-            formula: U
-            phase:
-              tag: value
-              value: cr
-            polymorph:
-              tag: value
-              value: reference
-            charge:
-              tag: value
-              value: 0
-          coefficient: '-1'
+      tag: unknown
+      reason: formula 'U' has no closed from_the_elements reaction at 941 K using B1259's printed elemental reference states
     formation_elements:
-      tag: value
-      value:
-      - - U
-        - formula: U
-          phase:
-            tag: value
-            value: cr
-          polymorph:
-            tag: value
-            value: reference
-          charge:
-            tag: value
-            value: 0
+      tag: unknown
+      reason: formula 'U' has no closed from_the_elements reaction at 941 K using B1259's printed elemental reference states
     reference_state:
       tag: not_applicable
       reason: profile delta_fG does not use reference_state
@@ -7986,7 +7898,8 @@ observations:
     note: as_published='.000'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance table;
       H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=U=B1259 reference-state table p.74/PDF p.80
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0049-uranium-reference-state.json
     record: b1259-ht-0049-uranium-reference-state
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0049-uranium-reference-state.json
@@ -8060,7 +7973,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: beta
             charge:
               tag: value
               value: 0
@@ -8075,7 +7988,7 @@ observations:
             value: cr
           polymorph:
             tag: value
-            value: reference
+            value: beta
           charge:
             tag: value
             value: 0
@@ -8130,7 +8043,8 @@ observations:
     note: as_published='.000'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance table;
       H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=U=B1259 reference-state table p.74/PDF p.80
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0049-uranium-reference-state.json
     record: b1259-ht-0049-uranium-reference-state
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0049-uranium-reference-state.json
@@ -8182,47 +8096,11 @@ observations:
       tag: value
       value: '101325'
     reaction:
-      tag: value
-      value:
-        terms:
-        - species:
-            formula: U
-            phase:
-              tag: value
-              value: cr
-            polymorph:
-              tag: value
-              value: reference
-            charge:
-              tag: value
-              value: 0
-          coefficient: '1'
-        - species:
-            formula: U
-            phase:
-              tag: value
-              value: cr
-            polymorph:
-              tag: value
-              value: reference
-            charge:
-              tag: value
-              value: 0
-          coefficient: '-1'
+      tag: unknown
+      reason: formula 'U' has no closed from_the_elements reaction at 1048 K using B1259's printed elemental reference states
     formation_elements:
-      tag: value
-      value:
-      - - U
-        - formula: U
-          phase:
-            tag: value
-            value: cr
-          polymorph:
-            tag: value
-            value: reference
-          charge:
-            tag: value
-            value: 0
+      tag: unknown
+      reason: formula 'U' has no closed from_the_elements reaction at 1048 K using B1259's printed elemental reference states
     reference_state:
       tag: not_applicable
       reason: profile delta_fH does not use reference_state
@@ -8274,7 +8152,8 @@ observations:
     note: as_published='.000'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance table;
       H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=U=B1259 reference-state table p.74/PDF p.80
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0049-uranium-reference-state.json
     record: b1259-ht-0049-uranium-reference-state
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0049-uranium-reference-state.json
@@ -8348,7 +8227,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: gamma
             charge:
               tag: value
               value: 0
@@ -8363,7 +8242,7 @@ observations:
             value: cr
           polymorph:
             tag: value
-            value: reference
+            value: gamma
           charge:
             tag: value
             value: 0
@@ -8418,7 +8297,8 @@ observations:
     note: as_published='.000'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance table;
       H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=U=B1259 reference-state table p.74/PDF p.80
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0049-uranium-reference-state.json
     record: b1259-ht-0049-uranium-reference-state
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0049-uranium-reference-state.json
@@ -8492,7 +8372,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: gamma
             charge:
               tag: value
               value: 0
@@ -8507,7 +8387,7 @@ observations:
             value: cr
           polymorph:
             tag: value
-            value: reference
+            value: gamma
           charge:
             tag: value
             value: 0
@@ -8562,7 +8442,8 @@ observations:
     note: as_published='.000'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance table;
       H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=U=B1259 reference-state table p.74/PDF p.80
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0049-uranium-reference-state.json
     record: b1259-ht-0049-uranium-reference-state
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0049-uranium-reference-state.json
@@ -8636,7 +8517,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: gamma
             charge:
               tag: value
               value: 0
@@ -8651,7 +8532,7 @@ observations:
             value: cr
           polymorph:
             tag: value
-            value: reference
+            value: gamma
           charge:
             tag: value
             value: 0
@@ -8706,7 +8587,8 @@ observations:
     note: as_published='.000'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance table;
       H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=U=B1259 reference-state table p.74/PDF p.80
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0049-uranium-reference-state.json
     record: b1259-ht-0049-uranium-reference-state
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0049-uranium-reference-state.json
@@ -8780,7 +8662,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: gamma
             charge:
               tag: value
               value: 0
@@ -8795,7 +8677,7 @@ observations:
             value: cr
           polymorph:
             tag: value
-            value: reference
+            value: gamma
           charge:
             tag: value
             value: 0
@@ -8850,7 +8732,8 @@ observations:
     note: as_published='.000'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance table;
       H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=U=B1259 reference-state table p.74/PDF p.80
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0049-uranium-reference-state.json
     record: b1259-ht-0049-uranium-reference-state
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0049-uranium-reference-state.json
@@ -8902,47 +8785,11 @@ observations:
       tag: value
       value: '101325'
     reaction:
-      tag: value
-      value:
-        terms:
-        - species:
-            formula: U
-            phase:
-              tag: value
-              value: cr
-            polymorph:
-              tag: value
-              value: reference
-            charge:
-              tag: value
-              value: 0
-          coefficient: '1'
-        - species:
-            formula: U
-            phase:
-              tag: value
-              value: cr
-            polymorph:
-              tag: value
-              value: reference
-            charge:
-              tag: value
-              value: 0
-          coefficient: '-1'
+      tag: unknown
+      reason: formula 'U' has no closed from_the_elements reaction at 1405 K using B1259's printed elemental reference states
     formation_elements:
-      tag: value
-      value:
-      - - U
-        - formula: U
-          phase:
-            tag: value
-            value: cr
-          polymorph:
-            tag: value
-            value: reference
-          charge:
-            tag: value
-            value: 0
+      tag: unknown
+      reason: formula 'U' has no closed from_the_elements reaction at 1405 K using B1259's printed elemental reference states
     reference_state:
       tag: not_applicable
       reason: profile delta_fH does not use reference_state
@@ -8994,7 +8841,8 @@ observations:
     note: as_published='.000'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance table;
       H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=U=B1259 reference-state table p.74/PDF p.80
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0049-uranium-reference-state.json
     record: b1259-ht-0049-uranium-reference-state
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0049-uranium-reference-state.json
@@ -9065,10 +8913,10 @@ observations:
             formula: U
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -9080,10 +8928,10 @@ observations:
         - formula: U
           phase:
             tag: value
-            value: cr
+            value: l
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -9138,7 +8986,8 @@ observations:
     note: as_published='.000'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance table;
       H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=U=B1259 reference-state table p.74/PDF p.80
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0049-uranium-reference-state.json
     record: b1259-ht-0049-uranium-reference-state
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0049-uranium-reference-state.json
@@ -9209,10 +9058,10 @@ observations:
             formula: U
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -9224,10 +9073,10 @@ observations:
         - formula: U
           phase:
             tag: value
-            value: cr
+            value: l
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -9282,7 +9131,8 @@ observations:
     note: as_published='.000'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance table;
       H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=U=B1259 reference-state table p.74/PDF p.80
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0049-uranium-reference-state.json
     record: b1259-ht-0049-uranium-reference-state
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0049-uranium-reference-state.json
@@ -9353,10 +9203,10 @@ observations:
             formula: U
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -9368,10 +9218,10 @@ observations:
         - formula: U
           phase:
             tag: value
-            value: cr
+            value: l
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -9426,7 +9276,8 @@ observations:
     note: as_published='.000'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance table;
       H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=U=B1259 reference-state table p.74/PDF p.80
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0049-uranium-reference-state.json
     record: b1259-ht-0049-uranium-reference-state
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0049-uranium-reference-state.json
@@ -9497,10 +9348,10 @@ observations:
             formula: U
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -9512,10 +9363,10 @@ observations:
         - formula: U
           phase:
             tag: value
-            value: cr
+            value: l
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -9570,7 +9421,8 @@ observations:
     note: as_published='.000'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance table;
       H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=U=B1259 reference-state table p.74/PDF p.80
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0049-uranium-reference-state.json
     record: b1259-ht-0049-uranium-reference-state
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0049-uranium-reference-state.json
@@ -9641,10 +9493,10 @@ observations:
             formula: U
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -9656,10 +9508,10 @@ observations:
         - formula: U
           phase:
             tag: value
-            value: cr
+            value: l
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -9714,7 +9566,8 @@ observations:
     note: as_published='.000'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance table;
       H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=U=B1259 reference-state table p.74/PDF p.80
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0049-uranium-reference-state.json
     record: b1259-ht-0049-uranium-reference-state
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0049-uranium-reference-state.json
@@ -9785,10 +9638,10 @@ observations:
             formula: U
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -9800,10 +9653,10 @@ observations:
         - formula: U
           phase:
             tag: value
-            value: cr
+            value: l
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -9858,7 +9711,8 @@ observations:
     note: as_published='.000'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance table;
       H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=U=B1259 reference-state table p.74/PDF p.80
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0049-uranium-reference-state.json
     record: b1259-ht-0049-uranium-reference-state
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0049-uranium-reference-state.json
@@ -9932,7 +9786,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: alpha
             charge:
               tag: value
               value: 0
@@ -9947,7 +9801,7 @@ observations:
             value: cr
           polymorph:
             tag: value
-            value: reference
+            value: alpha
           charge:
             tag: value
             value: 0
@@ -10002,7 +9856,8 @@ observations:
     note: as_published='0.000'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance table;
       H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=U=B1259 reference-state table p.74/PDF p.80
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0049-uranium-reference-state.json
     record: b1259-ht-0049-uranium-reference-state
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0049-uranium-reference-state.json
@@ -10076,7 +9931,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: alpha
             charge:
               tag: value
               value: 0
@@ -10091,7 +9946,7 @@ observations:
             value: cr
           polymorph:
             tag: value
-            value: reference
+            value: alpha
           charge:
             tag: value
             value: 0
@@ -10146,7 +10001,8 @@ observations:
     note: as_published='.000'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance table;
       H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=U=B1259 reference-state table p.74/PDF p.80
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0049-uranium-reference-state.json
     record: b1259-ht-0049-uranium-reference-state
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0049-uranium-reference-state.json
@@ -10220,7 +10076,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: alpha
             charge:
               tag: value
               value: 0
@@ -10235,7 +10091,7 @@ observations:
             value: cr
           polymorph:
             tag: value
-            value: reference
+            value: alpha
           charge:
             tag: value
             value: 0
@@ -10290,7 +10146,8 @@ observations:
     note: as_published='.000'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance table;
       H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=U=B1259 reference-state table p.74/PDF p.80
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0049-uranium-reference-state.json
     record: b1259-ht-0049-uranium-reference-state
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0049-uranium-reference-state.json
@@ -10364,7 +10221,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: alpha
             charge:
               tag: value
               value: 0
@@ -10379,7 +10236,7 @@ observations:
             value: cr
           polymorph:
             tag: value
-            value: reference
+            value: alpha
           charge:
             tag: value
             value: 0
@@ -10434,7 +10291,8 @@ observations:
     note: as_published='.000'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance table;
       H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=U=B1259 reference-state table p.74/PDF p.80
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0049-uranium-reference-state.json
     record: b1259-ht-0049-uranium-reference-state
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0049-uranium-reference-state.json
@@ -10508,7 +10366,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: alpha
             charge:
               tag: value
               value: 0
@@ -10523,7 +10381,7 @@ observations:
             value: cr
           polymorph:
             tag: value
-            value: reference
+            value: alpha
           charge:
             tag: value
             value: 0
@@ -10578,7 +10436,8 @@ observations:
     note: as_published='.000'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance table;
       H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=U=B1259 reference-state table p.74/PDF p.80
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0049-uranium-reference-state.json
     record: b1259-ht-0049-uranium-reference-state
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0049-uranium-reference-state.json
@@ -10652,7 +10511,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: alpha
             charge:
               tag: value
               value: 0
@@ -10667,7 +10526,7 @@ observations:
             value: cr
           polymorph:
             tag: value
-            value: reference
+            value: alpha
           charge:
             tag: value
             value: 0
@@ -10722,7 +10581,8 @@ observations:
     note: as_published='.000'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance table;
       H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=U=B1259 reference-state table p.74/PDF p.80
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0049-uranium-reference-state.json
     record: b1259-ht-0049-uranium-reference-state
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0049-uranium-reference-state.json
@@ -10796,7 +10656,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: alpha
             charge:
               tag: value
               value: 0
@@ -10811,7 +10671,7 @@ observations:
             value: cr
           polymorph:
             tag: value
-            value: reference
+            value: alpha
           charge:
             tag: value
             value: 0
@@ -10866,7 +10726,8 @@ observations:
     note: as_published='.000'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance table;
       H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=U=B1259 reference-state table p.74/PDF p.80
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0049-uranium-reference-state.json
     record: b1259-ht-0049-uranium-reference-state
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0049-uranium-reference-state.json
@@ -10918,47 +10779,11 @@ observations:
       tag: value
       value: '101325'
     reaction:
-      tag: value
-      value:
-        terms:
-        - species:
-            formula: U
-            phase:
-              tag: value
-              value: cr
-            polymorph:
-              tag: value
-              value: reference
-            charge:
-              tag: value
-              value: 0
-          coefficient: '1'
-        - species:
-            formula: U
-            phase:
-              tag: value
-              value: cr
-            polymorph:
-              tag: value
-              value: reference
-            charge:
-              tag: value
-              value: 0
-          coefficient: '-1'
+      tag: unknown
+      reason: formula 'U' has no closed from_the_elements reaction at 941 K using B1259's printed elemental reference states
     formation_elements:
-      tag: value
-      value:
-      - - U
-        - formula: U
-          phase:
-            tag: value
-            value: cr
-          polymorph:
-            tag: value
-            value: reference
-          charge:
-            tag: value
-            value: 0
+      tag: unknown
+      reason: formula 'U' has no closed from_the_elements reaction at 941 K using B1259's printed elemental reference states
     reference_state:
       tag: not_applicable
       reason: profile delta_fH does not use reference_state
@@ -11010,7 +10835,8 @@ observations:
     note: as_published='.000'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance table;
       H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=U=B1259 reference-state table p.74/PDF p.80
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0049-uranium-reference-state.json
     record: b1259-ht-0049-uranium-reference-state
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0049-uranium-reference-state.json
@@ -11084,7 +10910,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: beta
             charge:
               tag: value
               value: 0
@@ -11099,7 +10925,7 @@ observations:
             value: cr
           polymorph:
             tag: value
-            value: reference
+            value: beta
           charge:
             tag: value
             value: 0
@@ -11154,7 +10980,8 @@ observations:
     note: as_published='.000'; unit='dimensionless' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=U=B1259 reference-state table p.74/PDF p.80
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0049-uranium-reference-state.json
     record: b1259-ht-0049-uranium-reference-state
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0049-uranium-reference-state.json
@@ -11197,47 +11024,11 @@ observations:
       tag: value
       value: '101325'
     reaction:
-      tag: value
-      value:
-        terms:
-        - species:
-            formula: U
-            phase:
-              tag: value
-              value: cr
-            polymorph:
-              tag: value
-              value: reference
-            charge:
-              tag: value
-              value: 0
-          coefficient: '1'
-        - species:
-            formula: U
-            phase:
-              tag: value
-              value: cr
-            polymorph:
-              tag: value
-              value: reference
-            charge:
-              tag: value
-              value: 0
-          coefficient: '-1'
+      tag: unknown
+      reason: formula 'U' has no closed from_the_elements reaction at 1048 K using B1259's printed elemental reference states
     formation_elements:
-      tag: value
-      value:
-      - - U
-        - formula: U
-          phase:
-            tag: value
-            value: cr
-          polymorph:
-            tag: value
-            value: reference
-          charge:
-            tag: value
-            value: 0
+      tag: unknown
+      reason: formula 'U' has no closed from_the_elements reaction at 1048 K using B1259's printed elemental reference states
     reference_state:
       tag: not_applicable
       reason: profile log10_Kf does not use reference_state
@@ -11289,7 +11080,8 @@ observations:
     note: as_published='.000'; unit='dimensionless' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=U=B1259 reference-state table p.74/PDF p.80
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0049-uranium-reference-state.json
     record: b1259-ht-0049-uranium-reference-state
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0049-uranium-reference-state.json
@@ -11354,7 +11146,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: gamma
             charge:
               tag: value
               value: 0
@@ -11369,7 +11161,7 @@ observations:
             value: cr
           polymorph:
             tag: value
-            value: reference
+            value: gamma
           charge:
             tag: value
             value: 0
@@ -11424,7 +11216,8 @@ observations:
     note: as_published='.000'; unit='dimensionless' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=U=B1259 reference-state table p.74/PDF p.80
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0049-uranium-reference-state.json
     record: b1259-ht-0049-uranium-reference-state
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0049-uranium-reference-state.json
@@ -11489,7 +11282,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: gamma
             charge:
               tag: value
               value: 0
@@ -11504,7 +11297,7 @@ observations:
             value: cr
           polymorph:
             tag: value
-            value: reference
+            value: gamma
           charge:
             tag: value
             value: 0
@@ -11559,7 +11352,8 @@ observations:
     note: as_published='.000'; unit='dimensionless' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=U=B1259 reference-state table p.74/PDF p.80
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0049-uranium-reference-state.json
     record: b1259-ht-0049-uranium-reference-state
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0049-uranium-reference-state.json
@@ -11624,7 +11418,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: gamma
             charge:
               tag: value
               value: 0
@@ -11639,7 +11433,7 @@ observations:
             value: cr
           polymorph:
             tag: value
-            value: reference
+            value: gamma
           charge:
             tag: value
             value: 0
@@ -11694,7 +11488,8 @@ observations:
     note: as_published='.000'; unit='dimensionless' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=U=B1259 reference-state table p.74/PDF p.80
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0049-uranium-reference-state.json
     record: b1259-ht-0049-uranium-reference-state
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0049-uranium-reference-state.json
@@ -11759,7 +11554,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: gamma
             charge:
               tag: value
               value: 0
@@ -11774,7 +11569,7 @@ observations:
             value: cr
           polymorph:
             tag: value
-            value: reference
+            value: gamma
           charge:
             tag: value
             value: 0
@@ -11829,7 +11624,8 @@ observations:
     note: as_published='.000'; unit='dimensionless' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=U=B1259 reference-state table p.74/PDF p.80
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0049-uranium-reference-state.json
     record: b1259-ht-0049-uranium-reference-state
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0049-uranium-reference-state.json
@@ -11872,47 +11668,11 @@ observations:
       tag: value
       value: '101325'
     reaction:
-      tag: value
-      value:
-        terms:
-        - species:
-            formula: U
-            phase:
-              tag: value
-              value: cr
-            polymorph:
-              tag: value
-              value: reference
-            charge:
-              tag: value
-              value: 0
-          coefficient: '1'
-        - species:
-            formula: U
-            phase:
-              tag: value
-              value: cr
-            polymorph:
-              tag: value
-              value: reference
-            charge:
-              tag: value
-              value: 0
-          coefficient: '-1'
+      tag: unknown
+      reason: formula 'U' has no closed from_the_elements reaction at 1405 K using B1259's printed elemental reference states
     formation_elements:
-      tag: value
-      value:
-      - - U
-        - formula: U
-          phase:
-            tag: value
-            value: cr
-          polymorph:
-            tag: value
-            value: reference
-          charge:
-            tag: value
-            value: 0
+      tag: unknown
+      reason: formula 'U' has no closed from_the_elements reaction at 1405 K using B1259's printed elemental reference states
     reference_state:
       tag: not_applicable
       reason: profile log10_Kf does not use reference_state
@@ -11964,7 +11724,8 @@ observations:
     note: as_published='.000'; unit='dimensionless' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=U=B1259 reference-state table p.74/PDF p.80
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0049-uranium-reference-state.json
     record: b1259-ht-0049-uranium-reference-state
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0049-uranium-reference-state.json
@@ -12026,10 +11787,10 @@ observations:
             formula: U
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -12041,10 +11802,10 @@ observations:
         - formula: U
           phase:
             tag: value
-            value: cr
+            value: l
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -12099,7 +11860,8 @@ observations:
     note: as_published='.000'; unit='dimensionless' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=U=B1259 reference-state table p.74/PDF p.80
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0049-uranium-reference-state.json
     record: b1259-ht-0049-uranium-reference-state
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0049-uranium-reference-state.json
@@ -12161,10 +11923,10 @@ observations:
             formula: U
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -12176,10 +11938,10 @@ observations:
         - formula: U
           phase:
             tag: value
-            value: cr
+            value: l
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -12234,7 +11996,8 @@ observations:
     note: as_published='.000'; unit='dimensionless' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=U=B1259 reference-state table p.74/PDF p.80
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0049-uranium-reference-state.json
     record: b1259-ht-0049-uranium-reference-state
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0049-uranium-reference-state.json
@@ -12296,10 +12059,10 @@ observations:
             formula: U
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -12311,10 +12074,10 @@ observations:
         - formula: U
           phase:
             tag: value
-            value: cr
+            value: l
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -12369,7 +12132,8 @@ observations:
     note: as_published='.000'; unit='dimensionless' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=U=B1259 reference-state table p.74/PDF p.80
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0049-uranium-reference-state.json
     record: b1259-ht-0049-uranium-reference-state
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0049-uranium-reference-state.json
@@ -12431,10 +12195,10 @@ observations:
             formula: U
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -12446,10 +12210,10 @@ observations:
         - formula: U
           phase:
             tag: value
-            value: cr
+            value: l
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -12504,7 +12268,8 @@ observations:
     note: as_published='.000'; unit='dimensionless' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=U=B1259 reference-state table p.74/PDF p.80
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0049-uranium-reference-state.json
     record: b1259-ht-0049-uranium-reference-state
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0049-uranium-reference-state.json
@@ -12566,10 +12331,10 @@ observations:
             formula: U
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -12581,10 +12346,10 @@ observations:
         - formula: U
           phase:
             tag: value
-            value: cr
+            value: l
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -12639,7 +12404,8 @@ observations:
     note: as_published='.000'; unit='dimensionless' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=U=B1259 reference-state table p.74/PDF p.80
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0049-uranium-reference-state.json
     record: b1259-ht-0049-uranium-reference-state
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0049-uranium-reference-state.json
@@ -12701,10 +12467,10 @@ observations:
             formula: U
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -12716,10 +12482,10 @@ observations:
         - formula: U
           phase:
             tag: value
-            value: cr
+            value: l
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -12774,7 +12540,8 @@ observations:
     note: as_published='.000'; unit='dimensionless' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=U=B1259 reference-state table p.74/PDF p.80
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0049-uranium-reference-state.json
     record: b1259-ht-0049-uranium-reference-state
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0049-uranium-reference-state.json
@@ -12839,7 +12606,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: alpha
             charge:
               tag: value
               value: 0
@@ -12854,7 +12621,7 @@ observations:
             value: cr
           polymorph:
             tag: value
-            value: reference
+            value: alpha
           charge:
             tag: value
             value: 0
@@ -12909,7 +12676,8 @@ observations:
     note: as_published='0.000'; unit='dimensionless' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=U=B1259 reference-state table p.74/PDF p.80
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0049-uranium-reference-state.json
     record: b1259-ht-0049-uranium-reference-state
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0049-uranium-reference-state.json
@@ -12974,7 +12742,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: alpha
             charge:
               tag: value
               value: 0
@@ -12989,7 +12757,7 @@ observations:
             value: cr
           polymorph:
             tag: value
-            value: reference
+            value: alpha
           charge:
             tag: value
             value: 0
@@ -13044,7 +12812,8 @@ observations:
     note: as_published='.000'; unit='dimensionless' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=U=B1259 reference-state table p.74/PDF p.80
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0049-uranium-reference-state.json
     record: b1259-ht-0049-uranium-reference-state
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0049-uranium-reference-state.json
@@ -13109,7 +12878,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: alpha
             charge:
               tag: value
               value: 0
@@ -13124,7 +12893,7 @@ observations:
             value: cr
           polymorph:
             tag: value
-            value: reference
+            value: alpha
           charge:
             tag: value
             value: 0
@@ -13179,7 +12948,8 @@ observations:
     note: as_published='.000'; unit='dimensionless' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=U=B1259 reference-state table p.74/PDF p.80
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0049-uranium-reference-state.json
     record: b1259-ht-0049-uranium-reference-state
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0049-uranium-reference-state.json
@@ -13244,7 +13014,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: alpha
             charge:
               tag: value
               value: 0
@@ -13259,7 +13029,7 @@ observations:
             value: cr
           polymorph:
             tag: value
-            value: reference
+            value: alpha
           charge:
             tag: value
             value: 0
@@ -13314,7 +13084,8 @@ observations:
     note: as_published='.000'; unit='dimensionless' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=U=B1259 reference-state table p.74/PDF p.80
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0049-uranium-reference-state.json
     record: b1259-ht-0049-uranium-reference-state
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0049-uranium-reference-state.json
@@ -13379,7 +13150,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: alpha
             charge:
               tag: value
               value: 0
@@ -13394,7 +13165,7 @@ observations:
             value: cr
           polymorph:
             tag: value
-            value: reference
+            value: alpha
           charge:
             tag: value
             value: 0
@@ -13449,7 +13220,8 @@ observations:
     note: as_published='.000'; unit='dimensionless' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=U=B1259 reference-state table p.74/PDF p.80
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0049-uranium-reference-state.json
     record: b1259-ht-0049-uranium-reference-state
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0049-uranium-reference-state.json
@@ -13514,7 +13286,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: alpha
             charge:
               tag: value
               value: 0
@@ -13529,7 +13301,7 @@ observations:
             value: cr
           polymorph:
             tag: value
-            value: reference
+            value: alpha
           charge:
             tag: value
             value: 0
@@ -13584,7 +13356,8 @@ observations:
     note: as_published='.000'; unit='dimensionless' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=U=B1259 reference-state table p.74/PDF p.80
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0049-uranium-reference-state.json
     record: b1259-ht-0049-uranium-reference-state
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0049-uranium-reference-state.json
@@ -13649,7 +13422,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: alpha
             charge:
               tag: value
               value: 0
@@ -13664,7 +13437,7 @@ observations:
             value: cr
           polymorph:
             tag: value
-            value: reference
+            value: alpha
           charge:
             tag: value
             value: 0
@@ -13719,7 +13492,8 @@ observations:
     note: as_published='.000'; unit='dimensionless' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=U=B1259 reference-state table p.74/PDF p.80
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0049-uranium-reference-state.json
     record: b1259-ht-0049-uranium-reference-state
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0049-uranium-reference-state.json
@@ -13762,47 +13536,11 @@ observations:
       tag: value
       value: '101325'
     reaction:
-      tag: value
-      value:
-        terms:
-        - species:
-            formula: U
-            phase:
-              tag: value
-              value: cr
-            polymorph:
-              tag: value
-              value: reference
-            charge:
-              tag: value
-              value: 0
-          coefficient: '1'
-        - species:
-            formula: U
-            phase:
-              tag: value
-              value: cr
-            polymorph:
-              tag: value
-              value: reference
-            charge:
-              tag: value
-              value: 0
-          coefficient: '-1'
+      tag: unknown
+      reason: formula 'U' has no closed from_the_elements reaction at 941 K using B1259's printed elemental reference states
     formation_elements:
-      tag: value
-      value:
-      - - U
-        - formula: U
-          phase:
-            tag: value
-            value: cr
-          polymorph:
-            tag: value
-            value: reference
-          charge:
-            tag: value
-            value: 0
+      tag: unknown
+      reason: formula 'U' has no closed from_the_elements reaction at 941 K using B1259's printed elemental reference states
     reference_state:
       tag: not_applicable
       reason: profile log10_Kf does not use reference_state
@@ -13854,7 +13592,8 @@ observations:
     note: as_published='.000'; unit='dimensionless' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=U=B1259 reference-state table p.74/PDF p.80
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0049-uranium-reference-state.json
     record: b1259-ht-0049-uranium-reference-state
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0049-uranium-reference-state.json

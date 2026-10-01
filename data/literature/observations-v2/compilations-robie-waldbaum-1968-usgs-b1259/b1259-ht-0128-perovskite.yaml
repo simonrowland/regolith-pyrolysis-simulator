@@ -4082,7 +4082,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: beta
             charge:
               tag: value
               value: 0
@@ -4094,7 +4094,7 @@ observations:
               value: g
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -4106,7 +4106,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: alpha
             charge:
               tag: value
               value: 0
@@ -4121,7 +4121,7 @@ observations:
             value: cr
           polymorph:
             tag: value
-            value: reference
+            value: beta
           charge:
             tag: value
             value: 0
@@ -4132,7 +4132,7 @@ observations:
             value: g
           polymorph:
             tag: not_applicable
-            reason: not crystal
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -4143,7 +4143,7 @@ observations:
             value: cr
           polymorph:
             tag: value
-            value: reference
+            value: alpha
           charge:
             tag: value
             value: 0
@@ -4198,7 +4198,9 @@ observations:
     note: as_published='-330.130'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=Ca=B1259 reference-state table p.37/PDF p.43, O=B1259 reference-state table p.59/PDF
+      p.65, Ti=B1259 reference-state table p.73/PDF p.79
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0128-perovskite.json
     record: b1259-ht-0128-perovskite
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0128-perovskite.json
@@ -4269,10 +4271,10 @@ observations:
             formula: Ca
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -4284,7 +4286,7 @@ observations:
               value: g
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -4296,7 +4298,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: beta
             charge:
               tag: value
               value: 0
@@ -4308,10 +4310,10 @@ observations:
         - formula: Ca
           phase:
             tag: value
-            value: cr
+            value: l
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -4322,7 +4324,7 @@ observations:
             value: g
           polymorph:
             tag: not_applicable
-            reason: not crystal
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -4333,7 +4335,7 @@ observations:
             value: cr
           polymorph:
             tag: value
-            value: reference
+            value: beta
           charge:
             tag: value
             value: 0
@@ -4388,7 +4390,9 @@ observations:
     note: as_published='-310.335'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=Ca=B1259 reference-state table p.37/PDF p.43, O=B1259 reference-state table p.59/PDF
+      p.65, Ti=B1259 reference-state table p.73/PDF p.79
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0128-perovskite.json
     record: b1259-ht-0128-perovskite
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0128-perovskite.json
@@ -4459,10 +4463,10 @@ observations:
             formula: Ca
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -4474,7 +4478,7 @@ observations:
               value: g
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -4486,7 +4490,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: beta
             charge:
               tag: value
               value: 0
@@ -4498,10 +4502,10 @@ observations:
         - formula: Ca
           phase:
             tag: value
-            value: cr
+            value: l
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -4512,7 +4516,7 @@ observations:
             value: g
           polymorph:
             tag: not_applicable
-            reason: not crystal
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -4523,7 +4527,7 @@ observations:
             value: cr
           polymorph:
             tag: value
-            value: reference
+            value: beta
           charge:
             tag: value
             value: 0
@@ -4578,7 +4582,9 @@ observations:
     note: as_published='-303.703'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=Ca=B1259 reference-state table p.37/PDF p.43, O=B1259 reference-state table p.59/PDF
+      p.65, Ti=B1259 reference-state table p.73/PDF p.79
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0128-perovskite.json
     record: b1259-ht-0128-perovskite
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0128-perovskite.json
@@ -4649,10 +4655,10 @@ observations:
             formula: Ca
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -4664,7 +4670,7 @@ observations:
               value: g
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -4676,7 +4682,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: beta
             charge:
               tag: value
               value: 0
@@ -4688,10 +4694,10 @@ observations:
         - formula: Ca
           phase:
             tag: value
-            value: cr
+            value: l
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -4702,7 +4708,7 @@ observations:
             value: g
           polymorph:
             tag: not_applicable
-            reason: not crystal
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -4713,7 +4719,7 @@ observations:
             value: cr
           polymorph:
             tag: value
-            value: reference
+            value: beta
           charge:
             tag: value
             value: 0
@@ -4768,7 +4774,9 @@ observations:
     note: as_published='-297.080'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=Ca=B1259 reference-state table p.37/PDF p.43, O=B1259 reference-state table p.59/PDF
+      p.65, Ti=B1259 reference-state table p.73/PDF p.79
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0128-perovskite.json
     record: b1259-ht-0128-perovskite
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0128-perovskite.json
@@ -4839,10 +4847,10 @@ observations:
             formula: Ca
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -4854,7 +4862,7 @@ observations:
               value: g
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -4866,7 +4874,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: beta
             charge:
               tag: value
               value: 0
@@ -4878,10 +4886,10 @@ observations:
         - formula: Ca
           phase:
             tag: value
-            value: cr
+            value: l
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -4892,7 +4900,7 @@ observations:
             value: g
           polymorph:
             tag: not_applicable
-            reason: not crystal
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -4903,7 +4911,7 @@ observations:
             value: cr
           polymorph:
             tag: value
-            value: reference
+            value: beta
           charge:
             tag: value
             value: 0
@@ -4958,7 +4966,9 @@ observations:
     note: as_published='-295.096'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=Ca=B1259 reference-state table p.37/PDF p.43, O=B1259 reference-state table p.59/PDF
+      p.65, Ti=B1259 reference-state table p.73/PDF p.79
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0128-perovskite.json
     record: b1259-ht-0128-perovskite
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0128-perovskite.json
@@ -5029,10 +5039,10 @@ observations:
             formula: Ca
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -5044,7 +5054,7 @@ observations:
               value: g
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -5056,7 +5066,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: beta
             charge:
               tag: value
               value: 0
@@ -5068,10 +5078,10 @@ observations:
         - formula: Ca
           phase:
             tag: value
-            value: cr
+            value: l
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -5082,7 +5092,7 @@ observations:
             value: g
           polymorph:
             tag: not_applicable
-            reason: not crystal
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -5093,7 +5103,7 @@ observations:
             value: cr
           polymorph:
             tag: value
-            value: reference
+            value: beta
           charge:
             tag: value
             value: 0
@@ -5148,7 +5158,9 @@ observations:
     note: as_published='-290.509'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=Ca=B1259 reference-state table p.37/PDF p.43, O=B1259 reference-state table p.59/PDF
+      p.65, Ti=B1259 reference-state table p.73/PDF p.79
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0128-perovskite.json
     record: b1259-ht-0128-perovskite
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0128-perovskite.json
@@ -5219,10 +5231,10 @@ observations:
             formula: Ca
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -5234,7 +5246,7 @@ observations:
               value: g
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -5246,7 +5258,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: beta
             charge:
               tag: value
               value: 0
@@ -5258,10 +5270,10 @@ observations:
         - formula: Ca
           phase:
             tag: value
-            value: cr
+            value: l
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -5272,7 +5284,7 @@ observations:
             value: g
           polymorph:
             tag: not_applicable
-            reason: not crystal
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -5283,7 +5295,7 @@ observations:
             value: cr
           polymorph:
             tag: value
-            value: reference
+            value: beta
           charge:
             tag: value
             value: 0
@@ -5338,7 +5350,9 @@ observations:
     note: as_published='-283.968'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=Ca=B1259 reference-state table p.37/PDF p.43, O=B1259 reference-state table p.59/PDF
+      p.65, Ti=B1259 reference-state table p.73/PDF p.79
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0128-perovskite.json
     record: b1259-ht-0128-perovskite
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0128-perovskite.json
@@ -5409,10 +5423,10 @@ observations:
             formula: Ca
             phase:
               tag: value
-              value: cr
+              value: g
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -5424,7 +5438,7 @@ observations:
               value: g
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -5436,7 +5450,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: beta
             charge:
               tag: value
               value: 0
@@ -5448,10 +5462,10 @@ observations:
         - formula: Ca
           phase:
             tag: value
-            value: cr
+            value: g
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -5462,7 +5476,7 @@ observations:
             value: g
           polymorph:
             tag: not_applicable
-            reason: not crystal
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -5473,7 +5487,7 @@ observations:
             value: cr
           polymorph:
             tag: value
-            value: reference
+            value: beta
           charge:
             tag: value
             value: 0
@@ -5528,7 +5542,9 @@ observations:
     note: as_published='-276.545'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=Ca=B1259 reference-state table p.37/PDF p.43, O=B1259 reference-state table p.59/PDF
+      p.65, Ti=B1259 reference-state table p.73/PDF p.79
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0128-perovskite.json
     record: b1259-ht-0128-perovskite
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0128-perovskite.json
@@ -5599,10 +5615,10 @@ observations:
             formula: Ca
             phase:
               tag: value
-              value: cr
+              value: g
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -5614,7 +5630,7 @@ observations:
               value: g
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -5626,7 +5642,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: beta
             charge:
               tag: value
               value: 0
@@ -5638,10 +5654,10 @@ observations:
         - formula: Ca
           phase:
             tag: value
-            value: cr
+            value: g
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -5652,7 +5668,7 @@ observations:
             value: g
           polymorph:
             tag: not_applicable
-            reason: not crystal
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -5663,7 +5679,7 @@ observations:
             value: cr
           polymorph:
             tag: value
-            value: reference
+            value: beta
           charge:
             tag: value
             value: 0
@@ -5718,7 +5734,9 @@ observations:
     note: as_published='-267.965'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=Ca=B1259 reference-state table p.37/PDF p.43, O=B1259 reference-state table p.59/PDF
+      p.65, Ti=B1259 reference-state table p.73/PDF p.79
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0128-perovskite.json
     record: b1259-ht-0128-perovskite
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0128-perovskite.json
@@ -5789,10 +5807,10 @@ observations:
             formula: Ca
             phase:
               tag: value
-              value: cr
+              value: g
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -5804,7 +5822,7 @@ observations:
               value: g
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -5813,10 +5831,10 @@ observations:
             formula: Ti
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -5828,10 +5846,10 @@ observations:
         - formula: Ca
           phase:
             tag: value
-            value: cr
+            value: g
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -5842,7 +5860,7 @@ observations:
             value: g
           polymorph:
             tag: not_applicable
-            reason: not crystal
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -5850,10 +5868,10 @@ observations:
         - formula: Ti
           phase:
             tag: value
-            value: cr
+            value: l
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -5908,7 +5926,9 @@ observations:
     note: as_published='-259.320'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=Ca=B1259 reference-state table p.37/PDF p.43, O=B1259 reference-state table p.59/PDF
+      p.65, Ti=B1259 reference-state table p.73/PDF p.79
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0128-perovskite.json
     record: b1259-ht-0128-perovskite
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0128-perovskite.json
@@ -5982,7 +6002,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: alpha
             charge:
               tag: value
               value: 0
@@ -5994,7 +6014,7 @@ observations:
               value: g
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -6006,7 +6026,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: alpha
             charge:
               tag: value
               value: 0
@@ -6021,7 +6041,7 @@ observations:
             value: cr
           polymorph:
             tag: value
-            value: reference
+            value: alpha
           charge:
             tag: value
             value: 0
@@ -6032,7 +6052,7 @@ observations:
             value: g
           polymorph:
             tag: not_applicable
-            reason: not crystal
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -6043,7 +6063,7 @@ observations:
             value: cr
           polymorph:
             tag: value
-            value: reference
+            value: alpha
           charge:
             tag: value
             value: 0
@@ -6098,7 +6118,9 @@ observations:
     note: as_published='-376.517'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=Ca=B1259 reference-state table p.37/PDF p.43, O=B1259 reference-state table p.59/PDF
+      p.65, Ti=B1259 reference-state table p.73/PDF p.79
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0128-perovskite.json
     record: b1259-ht-0128-perovskite
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0128-perovskite.json
@@ -6172,7 +6194,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: alpha
             charge:
               tag: value
               value: 0
@@ -6184,7 +6206,7 @@ observations:
               value: g
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -6196,7 +6218,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: alpha
             charge:
               tag: value
               value: 0
@@ -6211,7 +6233,7 @@ observations:
             value: cr
           polymorph:
             tag: value
-            value: reference
+            value: alpha
           charge:
             tag: value
             value: 0
@@ -6222,7 +6244,7 @@ observations:
             value: g
           polymorph:
             tag: not_applicable
-            reason: not crystal
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -6233,7 +6255,7 @@ observations:
             value: cr
           polymorph:
             tag: value
-            value: reference
+            value: alpha
           charge:
             tag: value
             value: 0
@@ -6288,7 +6310,9 @@ observations:
     note: as_published='-369.593'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=Ca=B1259 reference-state table p.37/PDF p.43, O=B1259 reference-state table p.59/PDF
+      p.65, Ti=B1259 reference-state table p.73/PDF p.79
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0128-perovskite.json
     record: b1259-ht-0128-perovskite
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0128-perovskite.json
@@ -6362,7 +6386,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: alpha
             charge:
               tag: value
               value: 0
@@ -6374,7 +6398,7 @@ observations:
               value: g
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -6386,7 +6410,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: alpha
             charge:
               tag: value
               value: 0
@@ -6401,7 +6425,7 @@ observations:
             value: cr
           polymorph:
             tag: value
-            value: reference
+            value: alpha
           charge:
             tag: value
             value: 0
@@ -6412,7 +6436,7 @@ observations:
             value: g
           polymorph:
             tag: not_applicable
-            reason: not crystal
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -6423,7 +6447,7 @@ observations:
             value: cr
           polymorph:
             tag: value
-            value: reference
+            value: alpha
           charge:
             tag: value
             value: 0
@@ -6478,7 +6502,9 @@ observations:
     note: as_published='-362.887'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=Ca=B1259 reference-state table p.37/PDF p.43, O=B1259 reference-state table p.59/PDF
+      p.65, Ti=B1259 reference-state table p.73/PDF p.79
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0128-perovskite.json
     record: b1259-ht-0128-perovskite
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0128-perovskite.json
@@ -6552,7 +6578,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: alpha
             charge:
               tag: value
               value: 0
@@ -6564,7 +6590,7 @@ observations:
               value: g
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -6576,7 +6602,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: alpha
             charge:
               tag: value
               value: 0
@@ -6591,7 +6617,7 @@ observations:
             value: cr
           polymorph:
             tag: value
-            value: reference
+            value: alpha
           charge:
             tag: value
             value: 0
@@ -6602,7 +6628,7 @@ observations:
             value: g
           polymorph:
             tag: not_applicable
-            reason: not crystal
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -6613,7 +6639,7 @@ observations:
             value: cr
           polymorph:
             tag: value
-            value: reference
+            value: alpha
           charge:
             tag: value
             value: 0
@@ -6668,7 +6694,9 @@ observations:
     note: as_published='-356.247'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=Ca=B1259 reference-state table p.37/PDF p.43, O=B1259 reference-state table p.59/PDF
+      p.65, Ti=B1259 reference-state table p.73/PDF p.79
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0128-perovskite.json
     record: b1259-ht-0128-perovskite
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0128-perovskite.json
@@ -6742,7 +6770,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: alpha
             charge:
               tag: value
               value: 0
@@ -6754,7 +6782,7 @@ observations:
               value: g
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -6766,7 +6794,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: alpha
             charge:
               tag: value
               value: 0
@@ -6781,7 +6809,7 @@ observations:
             value: cr
           polymorph:
             tag: value
-            value: reference
+            value: alpha
           charge:
             tag: value
             value: 0
@@ -6792,7 +6820,7 @@ observations:
             value: g
           polymorph:
             tag: not_applicable
-            reason: not crystal
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -6803,7 +6831,7 @@ observations:
             value: cr
           polymorph:
             tag: value
-            value: reference
+            value: alpha
           charge:
             tag: value
             value: 0
@@ -6858,7 +6886,9 @@ observations:
     note: as_published='-349.656'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=Ca=B1259 reference-state table p.37/PDF p.43, O=B1259 reference-state table p.59/PDF
+      p.65, Ti=B1259 reference-state table p.73/PDF p.79
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0128-perovskite.json
     record: b1259-ht-0128-perovskite
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0128-perovskite.json
@@ -6932,7 +6962,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: beta
             charge:
               tag: value
               value: 0
@@ -6944,7 +6974,7 @@ observations:
               value: g
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -6956,7 +6986,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: alpha
             charge:
               tag: value
               value: 0
@@ -6971,7 +7001,7 @@ observations:
             value: cr
           polymorph:
             tag: value
-            value: reference
+            value: beta
           charge:
             tag: value
             value: 0
@@ -6982,7 +7012,7 @@ observations:
             value: g
           polymorph:
             tag: not_applicable
-            reason: not crystal
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -6993,7 +7023,7 @@ observations:
             value: cr
           polymorph:
             tag: value
-            value: reference
+            value: alpha
           charge:
             tag: value
             value: 0
@@ -7048,7 +7078,9 @@ observations:
     note: as_published='-336.611'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=Ca=B1259 reference-state table p.37/PDF p.43, O=B1259 reference-state table p.59/PDF
+      p.65, Ti=B1259 reference-state table p.73/PDF p.79
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0128-perovskite.json
     record: b1259-ht-0128-perovskite
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0128-perovskite.json
@@ -7122,7 +7154,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: beta
             charge:
               tag: value
               value: 0
@@ -7134,7 +7166,7 @@ observations:
               value: g
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -7146,7 +7178,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: alpha
             charge:
               tag: value
               value: 0
@@ -7161,7 +7193,7 @@ observations:
             value: cr
           polymorph:
             tag: value
-            value: reference
+            value: beta
           charge:
             tag: value
             value: 0
@@ -7172,7 +7204,7 @@ observations:
             value: g
           polymorph:
             tag: not_applicable
-            reason: not crystal
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -7183,7 +7215,7 @@ observations:
             value: cr
           polymorph:
             tag: value
-            value: reference
+            value: alpha
           charge:
             tag: value
             value: 0
@@ -7238,7 +7270,9 @@ observations:
     note: as_published='-394.886'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=Ca=B1259 reference-state table p.37/PDF p.43, O=B1259 reference-state table p.59/PDF
+      p.65, Ti=B1259 reference-state table p.73/PDF p.79
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0128-perovskite.json
     record: b1259-ht-0128-perovskite
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0128-perovskite.json
@@ -7312,7 +7346,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: beta
             charge:
               tag: value
               value: 0
@@ -7324,7 +7358,7 @@ observations:
               value: g
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -7336,7 +7370,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: alpha
             charge:
               tag: value
               value: 0
@@ -7351,7 +7385,7 @@ observations:
             value: cr
           polymorph:
             tag: value
-            value: reference
+            value: beta
           charge:
             tag: value
             value: 0
@@ -7362,7 +7396,7 @@ observations:
             value: g
           polymorph:
             tag: not_applicable
-            reason: not crystal
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -7373,7 +7407,7 @@ observations:
             value: cr
           polymorph:
             tag: value
-            value: reference
+            value: alpha
           charge:
             tag: value
             value: 0
@@ -7428,7 +7462,9 @@ observations:
     note: as_published='-394.780'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=Ca=B1259 reference-state table p.37/PDF p.43, O=B1259 reference-state table p.59/PDF
+      p.65, Ti=B1259 reference-state table p.73/PDF p.79
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0128-perovskite.json
     record: b1259-ht-0128-perovskite
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0128-perovskite.json
@@ -7499,10 +7535,10 @@ observations:
             formula: Ca
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -7514,7 +7550,7 @@ observations:
               value: g
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -7526,7 +7562,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: beta
             charge:
               tag: value
               value: 0
@@ -7538,10 +7574,10 @@ observations:
         - formula: Ca
           phase:
             tag: value
-            value: cr
+            value: l
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -7552,7 +7588,7 @@ observations:
             value: g
           polymorph:
             tag: not_applicable
-            reason: not crystal
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -7563,7 +7599,7 @@ observations:
             value: cr
           polymorph:
             tag: value
-            value: reference
+            value: beta
           charge:
             tag: value
             value: 0
@@ -7618,7 +7654,9 @@ observations:
     note: as_published='-397.006'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=Ca=B1259 reference-state table p.37/PDF p.43, O=B1259 reference-state table p.59/PDF
+      p.65, Ti=B1259 reference-state table p.73/PDF p.79
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0128-perovskite.json
     record: b1259-ht-0128-perovskite
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0128-perovskite.json
@@ -7689,10 +7727,10 @@ observations:
             formula: Ca
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -7704,7 +7742,7 @@ observations:
               value: g
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -7716,7 +7754,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: beta
             charge:
               tag: value
               value: 0
@@ -7728,10 +7766,10 @@ observations:
         - formula: Ca
           phase:
             tag: value
-            value: cr
+            value: l
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -7742,7 +7780,7 @@ observations:
             value: g
           polymorph:
             tag: not_applicable
-            reason: not crystal
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -7753,7 +7791,7 @@ observations:
             value: cr
           polymorph:
             tag: value
-            value: reference
+            value: beta
           charge:
             tag: value
             value: 0
@@ -7808,7 +7846,9 @@ observations:
     note: as_published='-396.579'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=Ca=B1259 reference-state table p.37/PDF p.43, O=B1259 reference-state table p.59/PDF
+      p.65, Ti=B1259 reference-state table p.73/PDF p.79
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0128-perovskite.json
     record: b1259-ht-0128-perovskite
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0128-perovskite.json
@@ -7879,10 +7919,10 @@ observations:
             formula: Ca
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -7894,7 +7934,7 @@ observations:
               value: g
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -7906,7 +7946,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: beta
             charge:
               tag: value
               value: 0
@@ -7918,10 +7958,10 @@ observations:
         - formula: Ca
           phase:
             tag: value
-            value: cr
+            value: l
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -7932,7 +7972,7 @@ observations:
             value: g
           polymorph:
             tag: not_applicable
-            reason: not crystal
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -7943,7 +7983,7 @@ observations:
             value: cr
           polymorph:
             tag: value
-            value: reference
+            value: beta
           charge:
             tag: value
             value: 0
@@ -7998,7 +8038,9 @@ observations:
     note: as_published='-396.158'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=Ca=B1259 reference-state table p.37/PDF p.43, O=B1259 reference-state table p.59/PDF
+      p.65, Ti=B1259 reference-state table p.73/PDF p.79
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0128-perovskite.json
     record: b1259-ht-0128-perovskite
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0128-perovskite.json
@@ -8069,10 +8111,10 @@ observations:
             formula: Ca
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -8084,7 +8126,7 @@ observations:
               value: g
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -8096,7 +8138,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: beta
             charge:
               tag: value
               value: 0
@@ -8108,10 +8150,10 @@ observations:
         - formula: Ca
           phase:
             tag: value
-            value: cr
+            value: l
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -8122,7 +8164,7 @@ observations:
             value: g
           polymorph:
             tag: not_applicable
-            reason: not crystal
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -8133,7 +8175,7 @@ observations:
             value: cr
           polymorph:
             tag: value
-            value: reference
+            value: beta
           charge:
             tag: value
             value: 0
@@ -8188,7 +8230,9 @@ observations:
     note: as_published='-395.483'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=Ca=B1259 reference-state table p.37/PDF p.43, O=B1259 reference-state table p.59/PDF
+      p.65, Ti=B1259 reference-state table p.73/PDF p.79
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0128-perovskite.json
     record: b1259-ht-0128-perovskite
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0128-perovskite.json
@@ -8259,10 +8303,10 @@ observations:
             formula: Ca
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -8274,7 +8318,7 @@ observations:
               value: g
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -8286,7 +8330,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: beta
             charge:
               tag: value
               value: 0
@@ -8298,10 +8342,10 @@ observations:
         - formula: Ca
           phase:
             tag: value
-            value: cr
+            value: l
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -8312,7 +8356,7 @@ observations:
             value: g
           polymorph:
             tag: not_applicable
-            reason: not crystal
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -8323,7 +8367,7 @@ observations:
             value: cr
           polymorph:
             tag: value
-            value: reference
+            value: beta
           charge:
             tag: value
             value: 0
@@ -8378,7 +8422,9 @@ observations:
     note: as_published='-396.033'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=Ca=B1259 reference-state table p.37/PDF p.43, O=B1259 reference-state table p.59/PDF
+      p.65, Ti=B1259 reference-state table p.73/PDF p.79
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0128-perovskite.json
     record: b1259-ht-0128-perovskite
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0128-perovskite.json
@@ -8449,10 +8495,10 @@ observations:
             formula: Ca
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -8464,7 +8510,7 @@ observations:
               value: g
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -8476,7 +8522,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: beta
             charge:
               tag: value
               value: 0
@@ -8488,10 +8534,10 @@ observations:
         - formula: Ca
           phase:
             tag: value
-            value: cr
+            value: l
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -8502,7 +8548,7 @@ observations:
             value: g
           polymorph:
             tag: not_applicable
-            reason: not crystal
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -8513,7 +8559,7 @@ observations:
             value: cr
           polymorph:
             tag: value
-            value: reference
+            value: beta
           charge:
             tag: value
             value: 0
@@ -8568,7 +8614,9 @@ observations:
     note: as_published='-395.230'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=Ca=B1259 reference-state table p.37/PDF p.43, O=B1259 reference-state table p.59/PDF
+      p.65, Ti=B1259 reference-state table p.73/PDF p.79
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0128-perovskite.json
     record: b1259-ht-0128-perovskite
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0128-perovskite.json
@@ -8639,10 +8687,10 @@ observations:
             formula: Ca
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -8654,7 +8702,7 @@ observations:
               value: g
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -8666,7 +8714,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: beta
             charge:
               tag: value
               value: 0
@@ -8678,10 +8726,10 @@ observations:
         - formula: Ca
           phase:
             tag: value
-            value: cr
+            value: l
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -8692,7 +8740,7 @@ observations:
             value: g
           polymorph:
             tag: not_applicable
-            reason: not crystal
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -8703,7 +8751,7 @@ observations:
             value: cr
           polymorph:
             tag: value
-            value: reference
+            value: beta
           charge:
             tag: value
             value: 0
@@ -8758,7 +8806,9 @@ observations:
     note: as_published='-394.915'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=Ca=B1259 reference-state table p.37/PDF p.43, O=B1259 reference-state table p.59/PDF
+      p.65, Ti=B1259 reference-state table p.73/PDF p.79
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0128-perovskite.json
     record: b1259-ht-0128-perovskite
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0128-perovskite.json
@@ -8829,10 +8879,10 @@ observations:
             formula: Ca
             phase:
               tag: value
-              value: cr
+              value: g
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -8844,7 +8894,7 @@ observations:
               value: g
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -8856,7 +8906,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: beta
             charge:
               tag: value
               value: 0
@@ -8868,10 +8918,10 @@ observations:
         - formula: Ca
           phase:
             tag: value
-            value: cr
+            value: g
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -8882,7 +8932,7 @@ observations:
             value: g
           polymorph:
             tag: not_applicable
-            reason: not crystal
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -8893,7 +8943,7 @@ observations:
             value: cr
           polymorph:
             tag: value
-            value: reference
+            value: beta
           charge:
             tag: value
             value: 0
@@ -8948,7 +8998,9 @@ observations:
     note: as_published='-430.905'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=Ca=B1259 reference-state table p.37/PDF p.43, O=B1259 reference-state table p.59/PDF
+      p.65, Ti=B1259 reference-state table p.73/PDF p.79
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0128-perovskite.json
     record: b1259-ht-0128-perovskite
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0128-perovskite.json
@@ -9019,10 +9071,10 @@ observations:
             formula: Ca
             phase:
               tag: value
-              value: cr
+              value: g
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -9034,7 +9086,7 @@ observations:
               value: g
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -9046,7 +9098,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: beta
             charge:
               tag: value
               value: 0
@@ -9058,10 +9110,10 @@ observations:
         - formula: Ca
           phase:
             tag: value
-            value: cr
+            value: g
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -9072,7 +9124,7 @@ observations:
             value: g
           polymorph:
             tag: not_applicable
-            reason: not crystal
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -9083,7 +9135,7 @@ observations:
             value: cr
           polymorph:
             tag: value
-            value: reference
+            value: beta
           charge:
             tag: value
             value: 0
@@ -9138,7 +9190,9 @@ observations:
     note: as_published='-430.398'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=Ca=B1259 reference-state table p.37/PDF p.43, O=B1259 reference-state table p.59/PDF
+      p.65, Ti=B1259 reference-state table p.73/PDF p.79
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0128-perovskite.json
     record: b1259-ht-0128-perovskite
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0128-perovskite.json
@@ -9209,10 +9263,10 @@ observations:
             formula: Ca
             phase:
               tag: value
-              value: cr
+              value: g
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -9224,7 +9278,7 @@ observations:
               value: g
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -9233,10 +9287,10 @@ observations:
             formula: Ti
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -9248,10 +9302,10 @@ observations:
         - formula: Ca
           phase:
             tag: value
-            value: cr
+            value: g
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -9262,7 +9316,7 @@ observations:
             value: g
           polymorph:
             tag: not_applicable
-            reason: not crystal
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -9270,10 +9324,10 @@ observations:
         - formula: Ti
           phase:
             tag: value
-            value: cr
+            value: l
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -9328,7 +9382,9 @@ observations:
     note: as_published='-433.605'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=Ca=B1259 reference-state table p.37/PDF p.43, O=B1259 reference-state table p.59/PDF
+      p.65, Ti=B1259 reference-state table p.73/PDF p.79
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0128-perovskite.json
     record: b1259-ht-0128-perovskite
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0128-perovskite.json
@@ -9402,7 +9458,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: alpha
             charge:
               tag: value
               value: 0
@@ -9414,7 +9470,7 @@ observations:
               value: g
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -9426,7 +9482,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: alpha
             charge:
               tag: value
               value: 0
@@ -9441,7 +9497,7 @@ observations:
             value: cr
           polymorph:
             tag: value
-            value: reference
+            value: alpha
           charge:
             tag: value
             value: 0
@@ -9452,7 +9508,7 @@ observations:
             value: g
           polymorph:
             tag: not_applicable
-            reason: not crystal
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -9463,7 +9519,7 @@ observations:
             value: cr
           polymorph:
             tag: value
-            value: reference
+            value: alpha
           charge:
             tag: value
             value: 0
@@ -9518,7 +9574,9 @@ observations:
     note: as_published='-396.900'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=Ca=B1259 reference-state table p.37/PDF p.43, O=B1259 reference-state table p.59/PDF
+      p.65, Ti=B1259 reference-state table p.73/PDF p.79
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0128-perovskite.json
     record: b1259-ht-0128-perovskite
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0128-perovskite.json
@@ -9592,7 +9650,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: alpha
             charge:
               tag: value
               value: 0
@@ -9604,7 +9662,7 @@ observations:
               value: g
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -9616,7 +9674,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: alpha
             charge:
               tag: value
               value: 0
@@ -9631,7 +9689,7 @@ observations:
             value: cr
           polymorph:
             tag: value
-            value: reference
+            value: alpha
           charge:
             tag: value
             value: 0
@@ -9642,7 +9700,7 @@ observations:
             value: g
           polymorph:
             tag: not_applicable
-            reason: not crystal
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -9653,7 +9711,7 @@ observations:
             value: cr
           polymorph:
             tag: value
-            value: reference
+            value: alpha
           charge:
             tag: value
             value: 0
@@ -9708,7 +9766,9 @@ observations:
     note: as_published='-396.583'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=Ca=B1259 reference-state table p.37/PDF p.43, O=B1259 reference-state table p.59/PDF
+      p.65, Ti=B1259 reference-state table p.73/PDF p.79
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0128-perovskite.json
     record: b1259-ht-0128-perovskite
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0128-perovskite.json
@@ -9782,7 +9842,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: alpha
             charge:
               tag: value
               value: 0
@@ -9794,7 +9854,7 @@ observations:
               value: g
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -9806,7 +9866,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: alpha
             charge:
               tag: value
               value: 0
@@ -9821,7 +9881,7 @@ observations:
             value: cr
           polymorph:
             tag: value
-            value: reference
+            value: alpha
           charge:
             tag: value
             value: 0
@@ -9832,7 +9892,7 @@ observations:
             value: g
           polymorph:
             tag: not_applicable
-            reason: not crystal
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -9843,7 +9903,7 @@ observations:
             value: cr
           polymorph:
             tag: value
-            value: reference
+            value: alpha
           charge:
             tag: value
             value: 0
@@ -9898,7 +9958,9 @@ observations:
     note: as_published='-396.257'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=Ca=B1259 reference-state table p.37/PDF p.43, O=B1259 reference-state table p.59/PDF
+      p.65, Ti=B1259 reference-state table p.73/PDF p.79
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0128-perovskite.json
     record: b1259-ht-0128-perovskite
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0128-perovskite.json
@@ -9972,7 +10034,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: alpha
             charge:
               tag: value
               value: 0
@@ -9984,7 +10046,7 @@ observations:
               value: g
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -9996,7 +10058,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: alpha
             charge:
               tag: value
               value: 0
@@ -10011,7 +10073,7 @@ observations:
             value: cr
           polymorph:
             tag: value
-            value: reference
+            value: alpha
           charge:
             tag: value
             value: 0
@@ -10022,7 +10084,7 @@ observations:
             value: g
           polymorph:
             tag: not_applicable
-            reason: not crystal
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -10033,7 +10095,7 @@ observations:
             value: cr
           polymorph:
             tag: value
-            value: reference
+            value: alpha
           charge:
             tag: value
             value: 0
@@ -10088,7 +10150,9 @@ observations:
     note: as_published='-395.910'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=Ca=B1259 reference-state table p.37/PDF p.43, O=B1259 reference-state table p.59/PDF
+      p.65, Ti=B1259 reference-state table p.73/PDF p.79
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0128-perovskite.json
     record: b1259-ht-0128-perovskite
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0128-perovskite.json
@@ -10162,7 +10226,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: alpha
             charge:
               tag: value
               value: 0
@@ -10174,7 +10238,7 @@ observations:
               value: g
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -10186,7 +10250,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: alpha
             charge:
               tag: value
               value: 0
@@ -10201,7 +10265,7 @@ observations:
             value: cr
           polymorph:
             tag: value
-            value: reference
+            value: alpha
           charge:
             tag: value
             value: 0
@@ -10212,7 +10276,7 @@ observations:
             value: g
           polymorph:
             tag: not_applicable
-            reason: not crystal
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -10223,7 +10287,7 @@ observations:
             value: cr
           polymorph:
             tag: value
-            value: reference
+            value: alpha
           charge:
             tag: value
             value: 0
@@ -10278,7 +10342,9 @@ observations:
     note: as_published='-395.571'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=Ca=B1259 reference-state table p.37/PDF p.43, O=B1259 reference-state table p.59/PDF
+      p.65, Ti=B1259 reference-state table p.73/PDF p.79
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0128-perovskite.json
     record: b1259-ht-0128-perovskite
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0128-perovskite.json
@@ -10352,7 +10418,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: beta
             charge:
               tag: value
               value: 0
@@ -10364,7 +10430,7 @@ observations:
               value: g
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -10376,7 +10442,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: alpha
             charge:
               tag: value
               value: 0
@@ -10391,7 +10457,7 @@ observations:
             value: cr
           polymorph:
             tag: value
-            value: reference
+            value: beta
           charge:
             tag: value
             value: 0
@@ -10402,7 +10468,7 @@ observations:
             value: g
           polymorph:
             tag: not_applicable
-            reason: not crystal
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -10413,7 +10479,7 @@ observations:
             value: cr
           polymorph:
             tag: value
-            value: reference
+            value: alpha
           charge:
             tag: value
             value: 0
@@ -10468,7 +10534,9 @@ observations:
     note: as_published='-395.055'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=Ca=B1259 reference-state table p.37/PDF p.43, O=B1259 reference-state table p.59/PDF
+      p.65, Ti=B1259 reference-state table p.73/PDF p.79
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0128-perovskite.json
     record: b1259-ht-0128-perovskite
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0128-perovskite.json
@@ -10542,7 +10610,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: beta
             charge:
               tag: value
               value: 0
@@ -10554,7 +10622,7 @@ observations:
               value: g
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -10566,7 +10634,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: alpha
             charge:
               tag: value
               value: 0
@@ -10581,7 +10649,7 @@ observations:
             value: cr
           polymorph:
             tag: value
-            value: reference
+            value: beta
           charge:
             tag: value
             value: 0
@@ -10592,7 +10660,7 @@ observations:
             value: g
           polymorph:
             tag: not_applicable
-            reason: not crystal
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -10603,7 +10671,7 @@ observations:
             value: cr
           polymorph:
             tag: value
-            value: reference
+            value: alpha
           charge:
             tag: value
             value: 0
@@ -10658,7 +10726,9 @@ observations:
     note: as_published='72.150'; unit='dimensionless' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=Ca=B1259 reference-state table p.37/PDF p.43, O=B1259 reference-state table p.59/PDF
+      p.65, Ti=B1259 reference-state table p.73/PDF p.79
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0128-perovskite.json
     record: b1259-ht-0128-perovskite
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0128-perovskite.json
@@ -10720,10 +10790,10 @@ observations:
             formula: Ca
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -10735,7 +10805,7 @@ observations:
               value: g
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -10747,7 +10817,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: beta
             charge:
               tag: value
               value: 0
@@ -10759,10 +10829,10 @@ observations:
         - formula: Ca
           phase:
             tag: value
-            value: cr
+            value: l
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -10773,7 +10843,7 @@ observations:
             value: g
           polymorph:
             tag: not_applicable
-            reason: not crystal
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -10784,7 +10854,7 @@ observations:
             value: cr
           polymorph:
             tag: value
-            value: reference
+            value: beta
           charge:
             tag: value
             value: 0
@@ -10839,7 +10909,9 @@ observations:
     note: as_published='52.172'; unit='dimensionless' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=Ca=B1259 reference-state table p.37/PDF p.43, O=B1259 reference-state table p.59/PDF
+      p.65, Ti=B1259 reference-state table p.73/PDF p.79
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0128-perovskite.json
     record: b1259-ht-0128-perovskite
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0128-perovskite.json
@@ -10901,10 +10973,10 @@ observations:
             formula: Ca
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -10916,7 +10988,7 @@ observations:
               value: g
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -10928,7 +11000,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: beta
             charge:
               tag: value
               value: 0
@@ -10940,10 +11012,10 @@ observations:
         - formula: Ca
           phase:
             tag: value
-            value: cr
+            value: l
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -10954,7 +11026,7 @@ observations:
             value: g
           polymorph:
             tag: not_applicable
-            reason: not crystal
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -10965,7 +11037,7 @@ observations:
             value: cr
           polymorph:
             tag: value
-            value: reference
+            value: beta
           charge:
             tag: value
             value: 0
@@ -11020,7 +11092,9 @@ observations:
     note: as_published='47.410'; unit='dimensionless' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=Ca=B1259 reference-state table p.37/PDF p.43, O=B1259 reference-state table p.59/PDF
+      p.65, Ti=B1259 reference-state table p.73/PDF p.79
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0128-perovskite.json
     record: b1259-ht-0128-perovskite
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0128-perovskite.json
@@ -11082,10 +11156,10 @@ observations:
             formula: Ca
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -11097,7 +11171,7 @@ observations:
               value: g
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -11109,7 +11183,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: beta
             charge:
               tag: value
               value: 0
@@ -11121,10 +11195,10 @@ observations:
         - formula: Ca
           phase:
             tag: value
-            value: cr
+            value: l
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -11135,7 +11209,7 @@ observations:
             value: g
           polymorph:
             tag: not_applicable
-            reason: not crystal
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -11146,7 +11220,7 @@ observations:
             value: cr
           polymorph:
             tag: value
-            value: reference
+            value: beta
           charge:
             tag: value
             value: 0
@@ -11201,7 +11275,9 @@ observations:
     note: as_published='43.284'; unit='dimensionless' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=Ca=B1259 reference-state table p.37/PDF p.43, O=B1259 reference-state table p.59/PDF
+      p.65, Ti=B1259 reference-state table p.73/PDF p.79
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0128-perovskite.json
     record: b1259-ht-0128-perovskite
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0128-perovskite.json
@@ -11263,10 +11339,10 @@ observations:
             formula: Ca
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -11278,7 +11354,7 @@ observations:
               value: g
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -11290,7 +11366,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: beta
             charge:
               tag: value
               value: 0
@@ -11302,10 +11378,10 @@ observations:
         - formula: Ca
           phase:
             tag: value
-            value: cr
+            value: l
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -11316,7 +11392,7 @@ observations:
             value: g
           polymorph:
             tag: not_applicable
-            reason: not crystal
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -11327,7 +11403,7 @@ observations:
             value: cr
           polymorph:
             tag: value
-            value: reference
+            value: beta
           charge:
             tag: value
             value: 0
@@ -11382,7 +11458,9 @@ observations:
     note: as_published='42.152'; unit='dimensionless' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=Ca=B1259 reference-state table p.37/PDF p.43, O=B1259 reference-state table p.59/PDF
+      p.65, Ti=B1259 reference-state table p.73/PDF p.79
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0128-perovskite.json
     record: b1259-ht-0128-perovskite
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0128-perovskite.json
@@ -11444,10 +11522,10 @@ observations:
             formula: Ca
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -11459,7 +11537,7 @@ observations:
               value: g
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -11471,7 +11549,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: beta
             charge:
               tag: value
               value: 0
@@ -11483,10 +11561,10 @@ observations:
         - formula: Ca
           phase:
             tag: value
-            value: cr
+            value: l
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -11497,7 +11575,7 @@ observations:
             value: g
           polymorph:
             tag: not_applicable
-            reason: not crystal
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -11508,7 +11586,7 @@ observations:
             value: cr
           polymorph:
             tag: value
-            value: reference
+            value: beta
           charge:
             tag: value
             value: 0
@@ -11563,7 +11641,9 @@ observations:
     note: as_published='39.682'; unit='dimensionless' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=Ca=B1259 reference-state table p.37/PDF p.43, O=B1259 reference-state table p.59/PDF
+      p.65, Ti=B1259 reference-state table p.73/PDF p.79
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0128-perovskite.json
     record: b1259-ht-0128-perovskite
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0128-perovskite.json
@@ -11625,10 +11705,10 @@ observations:
             formula: Ca
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -11640,7 +11720,7 @@ observations:
               value: g
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -11652,7 +11732,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: beta
             charge:
               tag: value
               value: 0
@@ -11664,10 +11744,10 @@ observations:
         - formula: Ca
           phase:
             tag: value
-            value: cr
+            value: l
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -11678,7 +11758,7 @@ observations:
             value: g
           polymorph:
             tag: not_applicable
-            reason: not crystal
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -11689,7 +11769,7 @@ observations:
             value: cr
           polymorph:
             tag: value
-            value: reference
+            value: beta
           charge:
             tag: value
             value: 0
@@ -11744,7 +11824,9 @@ observations:
     note: as_published='36.506'; unit='dimensionless' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=Ca=B1259 reference-state table p.37/PDF p.43, O=B1259 reference-state table p.59/PDF
+      p.65, Ti=B1259 reference-state table p.73/PDF p.79
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0128-perovskite.json
     record: b1259-ht-0128-perovskite
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0128-perovskite.json
@@ -11806,10 +11888,10 @@ observations:
             formula: Ca
             phase:
               tag: value
-              value: cr
+              value: g
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -11821,7 +11903,7 @@ observations:
               value: g
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -11833,7 +11915,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: beta
             charge:
               tag: value
               value: 0
@@ -11845,10 +11927,10 @@ observations:
         - formula: Ca
           phase:
             tag: value
-            value: cr
+            value: g
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -11859,7 +11941,7 @@ observations:
             value: g
           polymorph:
             tag: not_applicable
-            reason: not crystal
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -11870,7 +11952,7 @@ observations:
             value: cr
           polymorph:
             tag: value
-            value: reference
+            value: beta
           charge:
             tag: value
             value: 0
@@ -11925,7 +12007,9 @@ observations:
     note: as_published='33.577'; unit='dimensionless' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=Ca=B1259 reference-state table p.37/PDF p.43, O=B1259 reference-state table p.59/PDF
+      p.65, Ti=B1259 reference-state table p.73/PDF p.79
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0128-perovskite.json
     record: b1259-ht-0128-perovskite
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0128-perovskite.json
@@ -11987,10 +12071,10 @@ observations:
             formula: Ca
             phase:
               tag: value
-              value: cr
+              value: g
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -12002,7 +12086,7 @@ observations:
               value: g
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -12014,7 +12098,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: beta
             charge:
               tag: value
               value: 0
@@ -12026,10 +12110,10 @@ observations:
         - formula: Ca
           phase:
             tag: value
-            value: cr
+            value: g
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -12040,7 +12124,7 @@ observations:
             value: g
           polymorph:
             tag: not_applicable
-            reason: not crystal
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -12051,7 +12135,7 @@ observations:
             value: cr
           polymorph:
             tag: value
-            value: reference
+            value: beta
           charge:
             tag: value
             value: 0
@@ -12106,7 +12190,9 @@ observations:
     note: as_published='30.823'; unit='dimensionless' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=Ca=B1259 reference-state table p.37/PDF p.43, O=B1259 reference-state table p.59/PDF
+      p.65, Ti=B1259 reference-state table p.73/PDF p.79
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0128-perovskite.json
     record: b1259-ht-0128-perovskite
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0128-perovskite.json
@@ -12168,10 +12254,10 @@ observations:
             formula: Ca
             phase:
               tag: value
-              value: cr
+              value: g
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -12183,7 +12269,7 @@ observations:
               value: g
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -12192,10 +12278,10 @@ observations:
             formula: Ti
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -12207,10 +12293,10 @@ observations:
         - formula: Ca
           phase:
             tag: value
-            value: cr
+            value: g
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -12221,7 +12307,7 @@ observations:
             value: g
           polymorph:
             tag: not_applicable
-            reason: not crystal
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -12229,10 +12315,10 @@ observations:
         - formula: Ti
           phase:
             tag: value
-            value: cr
+            value: l
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -12287,7 +12373,9 @@ observations:
     note: as_published='28.337'; unit='dimensionless' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=Ca=B1259 reference-state table p.37/PDF p.43, O=B1259 reference-state table p.59/PDF
+      p.65, Ti=B1259 reference-state table p.73/PDF p.79
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0128-perovskite.json
     record: b1259-ht-0128-perovskite
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0128-perovskite.json
@@ -12352,7 +12440,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: alpha
             charge:
               tag: value
               value: 0
@@ -12364,7 +12452,7 @@ observations:
               value: g
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -12376,7 +12464,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: alpha
             charge:
               tag: value
               value: 0
@@ -12391,7 +12479,7 @@ observations:
             value: cr
           polymorph:
             tag: value
-            value: reference
+            value: alpha
           charge:
             tag: value
             value: 0
@@ -12402,7 +12490,7 @@ observations:
             value: g
           polymorph:
             tag: not_applicable
-            reason: not crystal
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -12413,7 +12501,7 @@ observations:
             value: cr
           polymorph:
             tag: value
-            value: reference
+            value: alpha
           charge:
             tag: value
             value: 0
@@ -12468,7 +12556,9 @@ observations:
     note: as_published='275.994'; unit='dimensionless' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=Ca=B1259 reference-state table p.37/PDF p.43, O=B1259 reference-state table p.59/PDF
+      p.65, Ti=B1259 reference-state table p.73/PDF p.79
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0128-perovskite.json
     record: b1259-ht-0128-perovskite
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0128-perovskite.json
@@ -12533,7 +12623,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: alpha
             charge:
               tag: value
               value: 0
@@ -12545,7 +12635,7 @@ observations:
               value: g
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -12557,7 +12647,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: alpha
             charge:
               tag: value
               value: 0
@@ -12572,7 +12662,7 @@ observations:
             value: cr
           polymorph:
             tag: value
-            value: reference
+            value: alpha
           charge:
             tag: value
             value: 0
@@ -12583,7 +12673,7 @@ observations:
             value: g
           polymorph:
             tag: not_applicable
-            reason: not crystal
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -12594,7 +12684,7 @@ observations:
             value: cr
           polymorph:
             tag: value
-            value: reference
+            value: alpha
           charge:
             tag: value
             value: 0
@@ -12649,7 +12739,9 @@ observations:
     note: as_published='201.936'; unit='dimensionless' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=Ca=B1259 reference-state table p.37/PDF p.43, O=B1259 reference-state table p.59/PDF
+      p.65, Ti=B1259 reference-state table p.73/PDF p.79
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0128-perovskite.json
     record: b1259-ht-0128-perovskite
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0128-perovskite.json
@@ -12714,7 +12806,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: alpha
             charge:
               tag: value
               value: 0
@@ -12726,7 +12818,7 @@ observations:
               value: g
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -12738,7 +12830,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: alpha
             charge:
               tag: value
               value: 0
@@ -12753,7 +12845,7 @@ observations:
             value: cr
           polymorph:
             tag: value
-            value: reference
+            value: alpha
           charge:
             tag: value
             value: 0
@@ -12764,7 +12856,7 @@ observations:
             value: g
           polymorph:
             tag: not_applicable
-            reason: not crystal
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -12775,7 +12867,7 @@ observations:
             value: cr
           polymorph:
             tag: value
-            value: reference
+            value: alpha
           charge:
             tag: value
             value: 0
@@ -12830,7 +12922,9 @@ observations:
     note: as_published='158.617'; unit='dimensionless' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=Ca=B1259 reference-state table p.37/PDF p.43, O=B1259 reference-state table p.59/PDF
+      p.65, Ti=B1259 reference-state table p.73/PDF p.79
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0128-perovskite.json
     record: b1259-ht-0128-perovskite
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0128-perovskite.json
@@ -12895,7 +12989,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: alpha
             charge:
               tag: value
               value: 0
@@ -12907,7 +13001,7 @@ observations:
               value: g
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -12919,7 +13013,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: alpha
             charge:
               tag: value
               value: 0
@@ -12934,7 +13028,7 @@ observations:
             value: cr
           polymorph:
             tag: value
-            value: reference
+            value: alpha
           charge:
             tag: value
             value: 0
@@ -12945,7 +13039,7 @@ observations:
             value: g
           polymorph:
             tag: not_applicable
-            reason: not crystal
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -12956,7 +13050,7 @@ observations:
             value: cr
           polymorph:
             tag: value
-            value: reference
+            value: alpha
           charge:
             tag: value
             value: 0
@@ -13011,7 +13105,9 @@ observations:
     note: as_published='129.763'; unit='dimensionless' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=Ca=B1259 reference-state table p.37/PDF p.43, O=B1259 reference-state table p.59/PDF
+      p.65, Ti=B1259 reference-state table p.73/PDF p.79
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0128-perovskite.json
     record: b1259-ht-0128-perovskite
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0128-perovskite.json
@@ -13076,7 +13172,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: alpha
             charge:
               tag: value
               value: 0
@@ -13088,7 +13184,7 @@ observations:
               value: g
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -13100,7 +13196,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: alpha
             charge:
               tag: value
               value: 0
@@ -13115,7 +13211,7 @@ observations:
             value: cr
           polymorph:
             tag: value
-            value: reference
+            value: alpha
           charge:
             tag: value
             value: 0
@@ -13126,7 +13222,7 @@ observations:
             value: g
           polymorph:
             tag: not_applicable
-            reason: not crystal
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -13137,7 +13233,7 @@ observations:
             value: cr
           polymorph:
             tag: value
-            value: reference
+            value: alpha
           charge:
             tag: value
             value: 0
@@ -13192,7 +13288,9 @@ observations:
     note: as_published='109.167'; unit='dimensionless' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=Ca=B1259 reference-state table p.37/PDF p.43, O=B1259 reference-state table p.59/PDF
+      p.65, Ti=B1259 reference-state table p.73/PDF p.79
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0128-perovskite.json
     record: b1259-ht-0128-perovskite
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0128-perovskite.json
@@ -13257,7 +13355,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: beta
             charge:
               tag: value
               value: 0
@@ -13269,7 +13367,7 @@ observations:
               value: g
             polymorph:
               tag: not_applicable
-              reason: not crystal
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -13281,7 +13379,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: alpha
             charge:
               tag: value
               value: 0
@@ -13296,7 +13394,7 @@ observations:
             value: cr
           polymorph:
             tag: value
-            value: reference
+            value: beta
           charge:
             tag: value
             value: 0
@@ -13307,7 +13405,7 @@ observations:
             value: g
           polymorph:
             tag: not_applicable
-            reason: not crystal
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -13318,7 +13416,7 @@ observations:
             value: cr
           polymorph:
             tag: value
-            value: reference
+            value: alpha
           charge:
             tag: value
             value: 0
@@ -13373,7 +13471,9 @@ observations:
     note: as_published='81.740'; unit='dimensionless' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=Ca=B1259 reference-state table p.37/PDF p.43, O=B1259 reference-state table p.59/PDF
+      p.65, Ti=B1259 reference-state table p.73/PDF p.79
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0128-perovskite.json
     record: b1259-ht-0128-perovskite
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0128-perovskite.json

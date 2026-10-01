@@ -33,7 +33,10 @@ from simulator.battery.enums import (
     SourceRelation,
     ValueKind,
 )
-from simulator.battery.identity import log10K_from_delta_fG_kJ_mol
+from simulator.battery.identity import (
+    log10K_from_delta_fG_kJ_mol,
+    standard_pressure_delta_g_kJ_per_mol,
+)
 from simulator.battery.records import Species, State, Uncertainty, Value
 from simulator.battery.score import (
     EnginePrediction,
@@ -64,6 +67,57 @@ def _na2o_liquid(quantity: Quantity = Quantity.DELTA_FG):
     )
     if quantity is not Quantity.DELTA_FG:
         identity = replace(identity, quantity=quantity)
+    return identity
+
+
+def _pure_phase_identity(
+    quantity: Quantity = Quantity.CP,
+    *,
+    polymorph: str | None = Polymorph.PERICLASE.value,
+):
+    identity = F.oxide_identity(
+        "MgO",
+        Phase.CR,
+        T_K=Decimal("1000"),
+        per=PerBasis.MOL_SPECIES,
+        metal_formula="Mg",
+        polymorph=(
+            Polymorph.PERICLASE.value if polymorph is None else polymorph
+        ),
+    )
+    if polymorph is None:
+        identity = replace(
+            identity,
+            species=replace(
+                identity.species,
+                polymorph=State.unknown("printed polymorph unknown"),
+            ),
+        )
+    return _pure_standard_identity(identity, quantity)
+
+
+def _pure_standard_identity(identity, quantity: Quantity):
+    return replace(
+        identity,
+        quantity=quantity,
+        reaction=State.not_applicable("not a formation quantity"),
+        formation_elements=State.not_applicable("not a formation quantity"),
+    )
+
+
+def _gas_thermo(
+    formula: str = "K",
+    quantity: Quantity = Quantity.CP,
+    temperature_K: Decimal = Decimal("1200"),
+):
+    identity = F.o2_identity(temperature_K)
+    identity = replace(
+        identity,
+        quantity=quantity,
+        species=Species(formula, Phase.G),
+        reaction=State.not_applicable("pure standard-state thermo"),
+        formation_elements=State.not_applicable("not a formation quantity"),
+    )
     return identity
 
 
@@ -183,6 +237,166 @@ def test_ellingham_na2o_matches_printed_janaf_within_fit_bound() -> None:
     assert attempt.refusal_reason is None
 
 
+def test_ellingham_transforms_formation_values_to_printed_standard_pressure() -> None:
+    temperature = Decimal("1200")
+    bar_identity = F.cao_identity(
+        Phase.CR,
+        T_K=temperature,
+        metal_phase=Phase.L,
+        per=PerBasis.MOL_SPECIES,
+        p_std=Decimal("100000"),
+    )
+    atm_identity = replace(
+        bar_identity,
+        standard_pressure_Pa=State.of(Decimal("101325")),
+    )
+
+    def prediction(identity, observation_id: str, quantity: Quantity) -> Decimal:
+        attempt = predict_thermo_attempt(
+            Engine.INTERNAL_ANALYTICAL,
+            F.observation(
+                observation_id,
+                "exp-1",
+                replace(identity, quantity=quantity),
+                Decimal("0"),
+            ),
+        )
+        assert attempt.value is not None
+        assert attempt.refusal_reason is None
+        return attempt.value
+
+    bar_dfg = prediction(bar_identity, "cao-bar-dfg", Quantity.DELTA_FG)
+    atm_dfg = prediction(atm_identity, "cao-atm-dfg", Quantity.DELTA_FG)
+    pressure_log_ratio = (Decimal("101325") / Decimal("100000")).ln()
+    expected_dfg_shift = standard_pressure_delta_g_kJ_per_mol(
+        Fraction(-1, 2), temperature, Decimal("100000"), Decimal("101325")
+    )
+    assert abs((atm_dfg - bar_dfg) - expected_dfg_shift) < Decimal("1e-12")
+    assert Decimal("-0.0657") < expected_dfg_shift < Decimal("-0.0656")
+
+    bar_log_kf = prediction(bar_identity, "cao-bar-log-kf", Quantity.LOG10_KF)
+    atm_log_kf = prediction(atm_identity, "cao-atm-log-kf", Quantity.LOG10_KF)
+    expected_log_kf_shift = Decimal("0.5") * pressure_log_ratio / Decimal("10").ln()
+    assert abs((atm_log_kf - bar_log_kf) - expected_log_kf_shift) < Decimal("1e-12")
+
+    assert isinstance(bar_identity.reaction, State) and bar_identity.reaction.is_value
+    reaction = bar_identity.reaction.value
+    assert reaction is not None
+    scaled_reaction = replace(
+        reaction,
+        terms=tuple(
+            replace(term, coefficient=term.coefficient * 2)
+            for term in reaction.terms
+        ),
+    )
+    scaled_identity = replace(atm_identity, reaction=State.of(scaled_reaction))
+    scaled_dfg = prediction(scaled_identity, "cao-atm-scaled-reaction", Quantity.DELTA_FG)
+    assert scaled_dfg == atm_dfg
+
+    o2_bar_identity = F.cao_identity(
+        Phase.CR,
+        T_K=temperature,
+        metal_phase=Phase.L,
+        per=PerBasis.MOL_O2,
+        p_std=Decimal("100000"),
+    )
+    o2_atm_identity = replace(
+        o2_bar_identity,
+        standard_pressure_Pa=State.of(Decimal("101325")),
+    )
+    o2_bar_dfg = prediction(o2_bar_identity, "cao-o2-bar-dfg", Quantity.DELTA_FG)
+    o2_atm_dfg = prediction(o2_atm_identity, "cao-o2-atm-dfg", Quantity.DELTA_FG)
+    expected_o2_shift = standard_pressure_delta_g_kJ_per_mol(
+        Fraction(-1), temperature, Decimal("100000"), Decimal("101325")
+    )
+    assert abs((o2_atm_dfg - o2_bar_dfg) - expected_o2_shift) < Decimal("1e-12")
+
+
+def test_ellingham_rejects_element_reference_phase_mismatch() -> None:
+    condensed = F.cao_identity(
+        Phase.CR,
+        T_K=Decimal("1800"),
+        metal_phase=Phase.CR,
+        per=PerBasis.MOL_SPECIES,
+        p_std=Decimal("101325"),
+    )
+    refused = predict_thermo_attempt(
+        Engine.INTERNAL_ANALYTICAL,
+        F.observation("cao-condensed-reference", "exp-1", condensed, Decimal("0")),
+    )
+    assert refused.value is None
+    assert refused.refusal_reason is RefusalReason.IDENTITY_MISMATCH
+    assert refused.refusal_detail["reason"] == "identity-mismatch-element-reference-phase"
+    assert refused.refusal_detail["element"] == "Ca"
+    assert refused.refusal_detail["cell_phase"] == Phase.CR.value
+    assert refused.refusal_detail["segment_phase"] == Phase.G.value
+
+    gas_bar = F.cao_identity(
+        Phase.CR,
+        T_K=Decimal("1800"),
+        metal_phase=Phase.G,
+        per=PerBasis.MOL_SPECIES,
+        p_std=Decimal("100000"),
+    )
+    gas_atm = replace(gas_bar, standard_pressure_Pa=State.of(Decimal("101325")))
+    bar_attempt = predict_thermo_attempt(
+        Engine.INTERNAL_ANALYTICAL,
+        F.observation("cao-gas-bar", "exp-1", gas_bar, Decimal("0")),
+    )
+    atm_attempt = predict_thermo_attempt(
+        Engine.INTERNAL_ANALYTICAL,
+        F.observation("cao-gas-atm", "exp-1", gas_atm, Decimal("0")),
+    )
+    assert bar_attempt.value is not None
+    assert atm_attempt.value is not None
+    expected_shift = standard_pressure_delta_g_kJ_per_mol(
+        Fraction(-3, 2), Decimal("1800"), Decimal("100000"), Decimal("101325")
+    )
+    assert abs((atm_attempt.value - bar_attempt.value) - expected_shift) < Decimal("1e-12")
+
+
+def test_ellingham_pressure_transform_refuses_unknown_reaction_or_phase() -> None:
+    identity = F.cao_identity(
+        Phase.CR,
+        T_K=Decimal("1200"),
+        metal_phase=Phase.CR,
+        per=PerBasis.MOL_SPECIES,
+        p_std=Decimal("101325"),
+    )
+    no_reaction = replace(identity, reaction=State.unknown("not printed"))
+    refused_reaction = predict_thermo_attempt(
+        Engine.INTERNAL_ANALYTICAL,
+        F.observation("cao-no-reaction", "exp-1", no_reaction, Decimal("0")),
+    )
+    assert refused_reaction.value is None
+    assert refused_reaction.refusal_reason is RefusalReason.IDENTITY_UNKNOWN
+    assert refused_reaction.refusal_detail["reason"] == (
+        "standard-pressure-transform-reaction-unknown"
+    )
+
+    assert isinstance(identity.reaction, State) and identity.reaction.is_value
+    reaction = identity.reaction.value
+    assert reaction is not None
+    unknown_phase_term = replace(
+        reaction.terms[0],
+        species=replace(reaction.terms[0].species, phase=State.unknown("not printed")),
+    )
+    unknown_phase_reaction = replace(
+        reaction,
+        terms=(unknown_phase_term, *reaction.terms[1:]),
+    )
+    no_phase = replace(identity, reaction=State.of(unknown_phase_reaction))
+    refused_phase = predict_thermo_attempt(
+        Engine.INTERNAL_ANALYTICAL,
+        F.observation("cao-no-phase", "exp-1", no_phase, Decimal("0")),
+    )
+    assert refused_phase.value is None
+    assert refused_phase.refusal_reason is RefusalReason.IDENTITY_UNKNOWN
+    assert refused_phase.refusal_detail["reason"] == (
+        "standard-pressure-transform-phase-unknown"
+    )
+
+
 def test_log10_kf_follows_delta_fg_and_has_no_kj_band() -> None:
     identity = _na2o_liquid(Quantity.LOG10_KF)
     attempt = predict_thermo_attempt(
@@ -254,6 +468,27 @@ def test_zero_kelvin_row_does_not_blank_later_series_points() -> None:
     assert row["refused"]["unsupported:engine-thermo-does-not-emit"] == 1
 
 
+def test_compilation_census_counts_measured_candidates_without_a_rail() -> None:
+    from simulator.battery.compilation_tier import compilation_tier_census
+
+    identity = _na2o_liquid(Quantity.VISCOSITY)
+    observation = F.observation(
+        "viscosity-no-rail",
+        "exp-1",
+        identity,
+        Decimal("1"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+    )
+    result = compilation_tier_census(
+        _context(observation),
+        engines=(Engine.MAGEMIN,),
+        audit_compile_residual=False,
+    )
+
+    assert result["comparison_candidates"] == 1
+    assert result["measured_candidates_by_rail"] == {"none": 1}
+
+
 def test_non_positive_temperature_is_a_refusal_not_an_exception() -> None:
     identity = replace(_na2o_liquid(), temperature_K=State.of(Decimal("0")))
     attempt = predict_thermo_attempt(
@@ -308,7 +543,11 @@ def test_pure_phase_enthalpy_increment_uses_injected_accessor() -> None:
         metal_formula="Mg",
         polymorph=Polymorph.PERICLASE.value,
     )
-    identity = replace(identity, quantity=Quantity.H_MINUS_H298)
+    identity = replace(
+        identity,
+        quantity=Quantity.H_MINUS_H298,
+        subtype=State.of("H(T)-H(298.15 K)"),
+    )
 
     class _Props:
         def __init__(self, enthalpy):
@@ -318,7 +557,10 @@ def test_pure_phase_enthalpy_increment_uses_injected_accessor() -> None:
             self.S_J_K_mol = 30.0
             self.absences = ()
 
+    calls = []
+
     def pure_phase(_engine, _symbol, temperature_K, _pressure_bar):
+        calls.append(temperature_K)
         if abs(temperature_K - 298.15) < 1e-6:
             return _Props(1000.0)
         return _Props(5000.0)
@@ -331,6 +573,393 @@ def test_pure_phase_enthalpy_increment_uses_injected_accessor() -> None:
     assert attempt.value == Decimal("4")
     assert attempt.unit == "kJ_per_declared_mol_basis"
     assert attempt.refusal_reason is None
+    assert calls == [1000.0, 298.15]
+
+    calls.clear()
+    refused = predict_thermo_attempt(
+        Engine.MAGEMIN,
+        F.observation("mgo", "exp-1", identity, Decimal("4")),
+        invoke_pure_phase=False,
+        pure_phase=pure_phase,
+    )
+    assert refused.refusal_detail["reason"] == "pure-phase-call-required"
+    assert calls == []
+
+
+def test_thermoengine_import_failure_is_typed_in_score_and_census(monkeypatch) -> None:
+    from simulator.battery import compilation_tier
+
+    identity = _pure_phase_identity()
+    observation = F.observation(
+        "mgo-cp-import-failure",
+        "exp-1",
+        identity,
+        Decimal("40"),
+        evidence=EvidenceClass.COMPILATION_ASSESSED,
+        source_id="nist-janaf-4th",
+    )
+
+    def fail_thermoengine_import(*_args, **_kwargs):
+        raise ImportError("No module named 'thermoengine'")
+
+    monkeypatch.setattr(
+        compilation_tier, "default_pure_phase", fail_thermoengine_import
+    )
+    residual, _ = compile_residual(
+        observation,
+        Engine.THERMOENGINE,
+        context=_context(observation),
+        comparison_ids=set(),
+    )
+    assert residual.status is ResidualStatus.REFUSED
+    assert residual.refusal is not None
+    assert residual.refusal.reason is RefusalReason.ATTEMPTED_UNAVAILABLE
+    assert residual.refusal.detail["reason"] == "pure-phase-unavailable"
+
+    census = compilation_tier.compilation_tier_census(
+        _context(observation),
+        engines=(Engine.THERMOENGINE,),
+        invoke_pure_phase=True,
+        audit_compile_residual=False,
+    )
+    row = next(row for row in census["rows"] if row["quantity"] == Quantity.CP.value)
+    assert row["numeric"] == 0
+    assert row["refused"]["attempted_unavailable:pure-phase-unavailable"] == 1
+
+
+def test_compilation_census_calls_only_resolved_pure_phases(monkeypatch) -> None:
+    from simulator.battery.compilation_tier import compilation_tier_census
+
+    identity = _pure_phase_identity()
+    crystal = F.observation(
+        "mgo-cp",
+        "exp-1",
+        identity,
+        Decimal("40"),
+        evidence=EvidenceClass.COMPILATION_ASSESSED,
+        source_id="nist-janaf-4th",
+    )
+    liquid = F.observation(
+        "na2o-cp",
+        "exp-1",
+        _pure_standard_identity(_na2o_liquid(Quantity.CP), Quantity.CP),
+        Decimal("80"),
+        evidence=EvidenceClass.COMPILATION_ASSESSED,
+        source_id="nist-janaf-4th",
+    )
+    calls = []
+
+    class _Props:
+        formula = "MgO"
+        Cp_J_K_mol = 40.0
+        H_J_mol = 0.0
+        S_J_K_mol = 30.0
+        absences = ()
+
+    def pure_phase(engine, symbol, temperature_K, pressure_bar):
+        calls.append((engine, symbol, temperature_K, pressure_bar))
+        return _Props()
+
+    monkeypatch.setattr(
+        "simulator.battery.compilation_tier.default_pure_phase", pure_phase
+    )
+    result = compilation_tier_census(
+        _context(crystal, liquid),
+        engines=(Engine.MAGEMIN,),
+        invoke_pure_phase=True,
+        audit_compile_residual=False,
+    )
+
+    assert len(calls) == 1
+    assert calls[0][0] is Engine.MAGEMIN
+    row = next(row for row in result["rows"] if row["quantity"] == Quantity.CP.value)
+    assert row["numeric"] == 1
+    assert row["refused"]["unsupported:pure-phase-is-crystal-only"] == 1
+
+
+def test_compilation_census_does_not_call_pure_phase_by_default(monkeypatch) -> None:
+    from simulator.battery import compilation_tier
+
+    observation = F.observation(
+        "mgo-cp-default-census",
+        "exp-1",
+        _pure_phase_identity(),
+        Decimal("40"),
+        evidence=EvidenceClass.COMPILATION_ASSESSED,
+        source_id="nist-janaf-4th",
+    )
+    calls = []
+
+    class _Props:
+        formula = "MgO"
+        Cp_J_K_mol = 40.0
+        H_J_mol = 0.0
+        S_J_K_mol = 30.0
+        absences = ()
+
+    def pure_phase(engine, symbol, temperature_K, pressure_bar):
+        calls.append((engine, symbol, temperature_K, pressure_bar))
+        return _Props()
+
+    monkeypatch.setattr(compilation_tier, "default_pure_phase", pure_phase)
+    result = compilation_tier.compilation_tier_census(
+        _context(observation),
+        engines=(Engine.MAGEMIN,),
+        audit_compile_residual=False,
+    )
+    row = next(row for row in result["rows"] if row["quantity"] == Quantity.CP.value)
+
+    assert calls == []
+    assert row["numeric"] == 0
+    assert row["refused"]["not_probed:pure-phase-call-required"] == 1
+
+
+def test_compilation_census_requires_identity_equal_before_pure_phase(monkeypatch) -> None:
+    from simulator.battery import compilation_tier
+    from simulator.battery.enums import IdentityEqualKind
+    from simulator.battery.identity import identity_equal
+
+    identity = _pure_phase_identity(polymorph=None)
+    assert identity_equal(identity, identity).kind is IdentityEqualKind.IDENTITY_UNKNOWN
+    observation = F.observation(
+        "mgo-cp-unknown-polymorph",
+        "exp-1",
+        identity,
+        Decimal("40"),
+        evidence=EvidenceClass.COMPILATION_ASSESSED,
+        source_id="nist-janaf-4th",
+    )
+    calls = []
+
+    class _Props:
+        formula = "MgO"
+        Cp_J_K_mol = 40.0
+        H_J_mol = 0.0
+        S_J_K_mol = 30.0
+        absences = ()
+
+    def pure_phase(engine, symbol, temperature_K, pressure_bar):
+        calls.append((engine, symbol, temperature_K, pressure_bar))
+        return _Props()
+
+    monkeypatch.setattr(compilation_tier, "default_pure_phase", pure_phase)
+    for engine in (Engine.THERMOENGINE, Engine.MAGEMIN):
+        assert compilation_tier._resolve_symbol(engine, identity)[0] is not None
+        result = compilation_tier.compilation_tier_census(
+            _context(observation),
+            engines=(engine,),
+            invoke_pure_phase=True,
+            audit_compile_residual=False,
+        )
+        row = next(
+            row for row in result["rows"] if row["quantity"] == Quantity.CP.value
+        )
+        assert row["numeric"] == 0
+        assert row["refused"]["identity_unknown:identity_equal"] == 1
+    assert calls == []
+
+
+def test_vaporock_gas_shomate_values_are_janaf_fidelity_checks() -> None:
+    import hashlib
+    from pathlib import Path
+
+    import pytest
+
+    pytest.importorskip("vaporock.equil")
+
+    identity = _gas_thermo(temperature_K=Decimal("1200"))
+    expected = {
+        Quantity.CP: (Decimal("20.787"), Decimal("0.01")),
+        Quantity.S: (Decimal("189.284"), Decimal("0.3")),
+        Quantity.H_MINUS_H298: (Decimal("18.746"), Decimal("0.001")),
+    }
+    attempts = {}
+    for quantity, (printed, tolerance) in expected.items():
+        attempt = predict_thermo_attempt(
+            Engine.VAPOROCK,
+            F.observation(
+                f"kgas-{quantity.value}",
+                "exp-1",
+                replace(identity, quantity=quantity),
+                printed,
+            ),
+        )
+        assert attempt.refusal_reason is None
+        assert attempt.value is not None
+        assert abs(attempt.value - printed) < tolerance
+        assert "implementation-fidelity" in attempt.call_evidence
+        attempts[quantity] = attempt
+
+    evidence = attempts[Quantity.CP].call_evidence
+    fields = dict(
+        item.split("=", 1)
+        for item in evidence.split(":")
+        if "=" in item
+    )
+    table_path = Path(fields["janaf_csv_path"])
+    assert table_path.is_file()
+    table_sha256 = hashlib.sha256(table_path.read_bytes()).hexdigest()
+    assert fields["janaf_csv_sha256"] == table_sha256
+    assert len(fields["vaporock_git_sha"]) == 40
+    assert fields["vaporock_git_dirty"] in {"true", "false"}
+    assert all(
+        all(f"{name}=" in attempt.call_evidence for name in fields)
+        for attempt in attempts.values()
+    )
+
+    assert attempts[Quantity.CP].unit == "J_per_declared_mol_basis_per_K"
+    assert attempts[Quantity.S].unit == "J_per_declared_mol_basis_per_K"
+    assert attempts[Quantity.H_MINUS_H298].unit == "kJ_per_declared_mol_basis"
+
+    reference = F.observation(
+        "kgas-cp-janaf",
+        "exp-1",
+        replace(identity, quantity=Quantity.CP),
+        Decimal("20.787"),
+        evidence=EvidenceClass.COMPILATION_ASSESSED,
+        source_id="nist-janaf-4th",
+    )
+    residual, candidate = compile_residual(
+        reference,
+        Engine.VAPOROCK,
+        context=_context(reference),
+        comparison_ids=set(),
+    )
+    assert candidate is not None
+    assert residual.source_relation is SourceRelation.SAME_INPUT
+    assert all(
+        f"{name}=" in residual.execution.call_evidence for name in fields
+    )
+    assert any(
+        notice.kind is NoticeKind.DERIVATION_USES_COMPILATION
+        for notice in residual.notices
+    )
+    assert "implementation-fidelity" in residual.execution.call_evidence
+    assert decision_band_for(Quantity.CP, SourceRelation.SAME_INPUT) is None
+
+
+def test_vaporock_gas_refuses_missing_species_and_out_of_interval() -> None:
+    import pytest
+
+    pytest.importorskip("vaporock.equil")
+
+    identity = _gas_thermo()
+    charged = replace(
+        identity,
+        species=replace(identity.species, charge=State.of(Decimal("1"))),
+    )
+    charged_attempt = predict_thermo_attempt(
+        Engine.VAPOROCK,
+        F.observation("k-plus-gas", "exp-1", charged, Decimal("0")),
+    )
+    assert charged_attempt.value is None
+    assert charged_attempt.refusal_reason is RefusalReason.OUTSIDE_SUPPORTED_SPECIES
+    assert charged_attempt.refusal_detail["reason"] == "vaporock-charged-species-not-in-janaf-table"
+
+    missing = predict_thermo_attempt(
+        Engine.VAPOROCK,
+        F.observation("krypton", "exp-1", _gas_thermo("Kr"), Decimal("0")),
+    )
+    assert missing.value is None
+    assert missing.refusal_reason is RefusalReason.OUTSIDE_SUPPORTED_SPECIES
+
+    outside = predict_thermo_attempt(
+        Engine.VAPOROCK,
+        F.observation(
+            "potassium-below-table",
+            "exp-1",
+            _gas_thermo(temperature_K=Decimal("1000")),
+            Decimal("0"),
+        ),
+    )
+    assert outside.value is None
+    assert outside.refusal_reason is RefusalReason.UNSUPPORTED
+    assert outside.refusal_detail["reason"] == "vaporock-temperature-outside-janaf-row"
+
+
+def test_vaporock_import_failure_is_a_typed_unavailable_refusal(monkeypatch) -> None:
+    import builtins
+
+    from simulator.battery import compilation_tier
+
+    monkeypatch.delattr(
+        compilation_tier._vaporock_gas_attempt, "_janaf_vapor", raising=False
+    )
+    original_import = builtins.__import__
+
+    def unavailable(name, *args, **kwargs):
+        if name == "vaporock.equil":
+            raise ImportError("test-only missing VapoRock")
+        return original_import(name, *args, **kwargs)
+
+    monkeypatch.setattr(builtins, "__import__", unavailable)
+    attempt = predict_thermo_attempt(
+        Engine.VAPOROCK,
+        F.observation("kgas-unavailable", "exp-1", _gas_thermo(), Decimal("0")),
+    )
+    assert attempt.value is None
+    assert attempt.refusal_reason is RefusalReason.ATTEMPTED_UNAVAILABLE
+
+
+def test_pure_phase_refuses_non_species_molar_basis_before_engine_call() -> None:
+    identity = F.oxide_identity(
+        "MgO",
+        Phase.CR,
+        T_K=Decimal("1000"),
+        per=PerBasis.MOL_ATOM,
+        metal_formula="Mg",
+        polymorph=Polymorph.PERICLASE.value,
+    )
+    identity = replace(identity, quantity=Quantity.CP)
+    calls = []
+
+    def pure_phase(*args):
+        calls.append(args)
+        raise AssertionError("basis mismatch must refuse before the engine call")
+
+    attempt = predict_thermo_attempt(
+        Engine.MAGEMIN,
+        F.observation("mgo-per-atom", "exp-1", identity, Decimal("4")),
+        pure_phase=pure_phase,
+    )
+    assert attempt.value is None
+    assert attempt.refusal_reason is RefusalReason.UNSUPPORTED
+    assert attempt.refusal_detail["reason"] == "pure-phase-per-basis-mismatch"
+    assert attempt.refusal_detail["expected_per"] == PerBasis.MOL_SPECIES.value
+    assert attempt.refusal_detail["actual_per"] == PerBasis.MOL_ATOM.value
+    assert calls == []
+
+
+def test_pure_phase_refuses_non_298_enthalpy_anchor_before_engine_call() -> None:
+    identity = F.oxide_identity(
+        "MgO",
+        Phase.CR,
+        T_K=Decimal("1000"),
+        per=PerBasis.MOL_SPECIES,
+        metal_formula="Mg",
+        polymorph=Polymorph.PERICLASE.value,
+    )
+    identity = replace(
+        identity,
+        quantity=Quantity.H_MINUS_H298,
+        subtype=State.of("apparent enthalpy, stable-phase anchor"),
+    )
+    calls = []
+
+    def pure_phase(*args):
+        calls.append(args)
+        raise AssertionError("anchor mismatch must refuse before the engine call")
+
+    attempt = predict_thermo_attempt(
+        Engine.MAGEMIN,
+        F.observation("mgo-wrong-anchor", "exp-1", identity, Decimal("4")),
+        pure_phase=pure_phase,
+    )
+    assert attempt.value is None
+    assert attempt.refusal_reason is RefusalReason.UNSUPPORTED
+    assert attempt.refusal_detail["reason"] == "pure-phase-enthalpy-anchor-mismatch"
+    assert attempt.refusal_detail["expected_anchor"] == "H(T)-H(298.15 K)"
+    assert calls == []
 
 
 def test_compilation_tier_is_beside_measured_and_same_source_is_flagged() -> None:
@@ -684,7 +1313,10 @@ def test_pure_phase_value_is_not_reused_at_the_next_temperature(monkeypatch) -> 
         )
 
     monkeypatch.setattr("simulator.battery.compilation_tier.predict_thermo_attempt", fake)
-    identity = replace(_na2o_liquid(Quantity.CP), temperature_K=State.unknown("series"))
+    identity = replace(
+        _pure_phase_identity(),
+        temperature_K=State.unknown("series"),
+    )
     series = F.observation(
         "cp-series",
         "exp-1",
@@ -707,7 +1339,7 @@ def test_pure_phase_value_is_not_reused_at_the_next_temperature(monkeypatch) -> 
     ctx = _context(series)
     compilation_tier_census(
         ctx,
-        engines=(Engine.VAPOROCK,),
+        engines=(Engine.MAGEMIN,),
         invoke_pure_phase=True,
         audit_compile_residual=False,
     )
@@ -715,11 +1347,64 @@ def test_pure_phase_value_is_not_reused_at_the_next_temperature(monkeypatch) -> 
     calls.clear()
     compilation_tier_census(
         ctx,
-        engines=(Engine.VAPOROCK,),
+        engines=(Engine.MAGEMIN,),
         invoke_pure_phase=False,
         audit_compile_residual=False,
     )
     assert calls == [Decimal("0"), Decimal("500")]
+
+
+def test_vaporock_gas_series_attempts_each_temperature(monkeypatch) -> None:
+    from simulator.battery.compilation_tier import ThermoAttempt, compilation_tier_census
+
+    calls: list[Decimal] = []
+
+    def fake(engine, observation, **kwargs):
+        del engine, kwargs
+        temperature = observation.identity.temperature_K.value
+        calls.append(temperature)
+        return ThermoAttempt(
+            value=temperature,
+            unit="J_per_declared_mol_basis_per_K",
+            authority=Authority.BRIDGE,
+            notices=(),
+            refusal_reason=None,
+            refusal_detail={},
+            call_evidence=f"T={temperature}",
+        )
+
+    monkeypatch.setattr("simulator.battery.compilation_tier.predict_thermo_attempt", fake)
+    identity = replace(
+        _gas_thermo("K", Quantity.CP),
+        temperature_K=State.unknown("series"),
+    )
+    series = F.observation(
+        "kgas-cp-series",
+        "exp-1",
+        identity,
+        Decimal("0"),
+        evidence=EvidenceClass.COMPILATION_ASSESSED,
+        source_id="nist-janaf-4th",
+    )
+    series = replace(
+        series,
+        value=Value(
+            ValueKind.SERIES,
+            series=(
+                (Decimal("1200"), Decimal("20.787")),
+                (Decimal("1400"), Decimal("20.793")),
+            ),
+        ),
+    )
+
+    compilation_tier_census(
+        _context(series),
+        engines=(Engine.VAPOROCK,),
+        invoke_pure_phase=False,
+        audit_compile_residual=False,
+    )
+
+    assert calls == [Decimal("1200"), Decimal("1400")]
 
 
 def test_report_rebuilt_from_payloads_keeps_the_tier_split() -> None:

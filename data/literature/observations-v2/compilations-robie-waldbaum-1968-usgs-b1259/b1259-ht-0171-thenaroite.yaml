@@ -2701,26 +2701,26 @@ observations:
             formula: Na
             phase:
               tag: value
-              value: cr
+              value: g
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
           coefficient: '-2'
         - species:
-            formula: S
+            formula: S2
             phase:
               tag: value
-              value: cr
+              value: g
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
-          coefficient: '-4'
+          coefficient: '-2'
     formation_elements:
       tag: value
       value:
@@ -2728,21 +2728,21 @@ observations:
         - formula: Na
           phase:
             tag: value
-            value: cr
+            value: g
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
       - - S
-        - formula: S
+        - formula: S2
           phase:
             tag: value
-            value: cr
+            value: g
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -2797,7 +2797,9 @@ observations:
     note: as_published='-160.772'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=Na=B1259 reference-state table p.56/PDF p.62, S=B1259 reference-state table p.63/PDF
+      p.69
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0171-thenaroite.json
     record: b1259-ht-0171-thenaroite
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0171-thenaroite.json
@@ -2868,26 +2870,26 @@ observations:
             formula: Na
             phase:
               tag: value
-              value: cr
+              value: g
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
           coefficient: '-2'
         - species:
-            formula: S
+            formula: S2
             phase:
               tag: value
-              value: cr
+              value: g
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
-          coefficient: '-4'
+          coefficient: '-2'
     formation_elements:
       tag: value
       value:
@@ -2895,21 +2897,21 @@ observations:
         - formula: Na
           phase:
             tag: value
-            value: cr
+            value: g
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
       - - S
-        - formula: S
+        - formula: S2
           phase:
             tag: value
-            value: cr
+            value: g
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -2964,7 +2966,9 @@ observations:
     note: as_published='-134.519'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=Na=B1259 reference-state table p.56/PDF p.62, S=B1259 reference-state table p.63/PDF
+      p.69
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0171-thenaroite.json
     record: b1259-ht-0171-thenaroite
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0171-thenaroite.json
@@ -3035,10 +3039,10 @@ observations:
             formula: Na
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -3047,10 +3051,10 @@ observations:
             formula: S
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -3062,10 +3066,10 @@ observations:
         - formula: Na
           phase:
             tag: value
-            value: cr
+            value: l
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -3073,10 +3077,10 @@ observations:
         - formula: S
           phase:
             tag: value
-            value: cr
+            value: l
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -3131,7 +3135,9 @@ observations:
     note: as_published='-283.844'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=Na=B1259 reference-state table p.56/PDF p.62, S=B1259 reference-state table p.63/PDF
+      p.69
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0171-thenaroite.json
     record: b1259-ht-0171-thenaroite
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0171-thenaroite.json
@@ -3202,26 +3208,26 @@ observations:
             formula: Na
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
           coefficient: '-2'
         - species:
-            formula: S
+            formula: S2
             phase:
               tag: value
-              value: cr
+              value: g
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
-          coefficient: '-4'
+          coefficient: '-2'
     formation_elements:
       tag: value
       value:
@@ -3229,21 +3235,21 @@ observations:
         - formula: Na
           phase:
             tag: value
-            value: cr
+            value: l
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
       - - S
-        - formula: S
+        - formula: S2
           phase:
             tag: value
-            value: cr
+            value: g
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -3298,7 +3304,9 @@ observations:
     note: as_published='-340.398'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=Na=B1259 reference-state table p.56/PDF p.62, S=B1259 reference-state table p.63/PDF
+      p.69
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0171-thenaroite.json
     record: b1259-ht-0171-thenaroite
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0171-thenaroite.json
@@ -3369,26 +3377,26 @@ observations:
             formula: Na
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
           coefficient: '-2'
         - species:
-            formula: S
+            formula: S2
             phase:
               tag: value
-              value: cr
+              value: g
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
-          coefficient: '-4'
+          coefficient: '-2'
     formation_elements:
       tag: value
       value:
@@ -3396,21 +3404,21 @@ observations:
         - formula: Na
           phase:
             tag: value
-            value: cr
+            value: l
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
       - - S
-        - formula: S
+        - formula: S2
           phase:
             tag: value
-            value: cr
+            value: g
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -3465,7 +3473,9 @@ observations:
     note: as_published='-338.931'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=Na=B1259 reference-state table p.56/PDF p.62, S=B1259 reference-state table p.63/PDF
+      p.69
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0171-thenaroite.json
     record: b1259-ht-0171-thenaroite
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0171-thenaroite.json
@@ -3536,26 +3546,26 @@ observations:
             formula: Na
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
           coefficient: '-2'
         - species:
-            formula: S
+            formula: S2
             phase:
               tag: value
-              value: cr
+              value: g
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
-          coefficient: '-4'
+          coefficient: '-2'
     formation_elements:
       tag: value
       value:
@@ -3563,21 +3573,21 @@ observations:
         - formula: Na
           phase:
             tag: value
-            value: cr
+            value: l
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
       - - S
-        - formula: S
+        - formula: S2
           phase:
             tag: value
-            value: cr
+            value: g
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -3632,7 +3642,9 @@ observations:
     note: as_published='-332.330'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=Na=B1259 reference-state table p.56/PDF p.62, S=B1259 reference-state table p.63/PDF
+      p.69
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0171-thenaroite.json
     record: b1259-ht-0171-thenaroite
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0171-thenaroite.json
@@ -3703,26 +3715,26 @@ observations:
             formula: Na
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
           coefficient: '-2'
         - species:
-            formula: S
+            formula: S2
             phase:
               tag: value
-              value: cr
+              value: g
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
-          coefficient: '-4'
+          coefficient: '-2'
     formation_elements:
       tag: value
       value:
@@ -3730,21 +3742,21 @@ observations:
         - formula: Na
           phase:
             tag: value
-            value: cr
+            value: l
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
       - - S
-        - formula: S
+        - formula: S2
           phase:
             tag: value
-            value: cr
+            value: g
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -3799,7 +3811,9 @@ observations:
     note: as_published='-338.000'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=Na=B1259 reference-state table p.56/PDF p.62, S=B1259 reference-state table p.63/PDF
+      p.69
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0171-thenaroite.json
     record: b1259-ht-0171-thenaroite
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0171-thenaroite.json
@@ -3870,26 +3884,26 @@ observations:
             formula: Na
             phase:
               tag: value
-              value: cr
+              value: g
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
           coefficient: '-2'
         - species:
-            formula: S
+            formula: S2
             phase:
               tag: value
-              value: cr
+              value: g
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
-          coefficient: '-4'
+          coefficient: '-2'
     formation_elements:
       tag: value
       value:
@@ -3897,21 +3911,21 @@ observations:
         - formula: Na
           phase:
             tag: value
-            value: cr
+            value: g
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
       - - S
-        - formula: S
+        - formula: S2
           phase:
             tag: value
-            value: cr
+            value: g
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -3966,7 +3980,9 @@ observations:
     note: as_published='-378.351'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=Na=B1259 reference-state table p.56/PDF p.62, S=B1259 reference-state table p.63/PDF
+      p.69
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0171-thenaroite.json
     record: b1259-ht-0171-thenaroite
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0171-thenaroite.json
@@ -4037,26 +4053,26 @@ observations:
             formula: Na
             phase:
               tag: value
-              value: cr
+              value: g
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
           coefficient: '-2'
         - species:
-            formula: S
+            formula: S2
             phase:
               tag: value
-              value: cr
+              value: g
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
-          coefficient: '-4'
+          coefficient: '-2'
     formation_elements:
       tag: value
       value:
@@ -4064,21 +4080,21 @@ observations:
         - formula: Na
           phase:
             tag: value
-            value: cr
+            value: g
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
       - - S
-        - formula: S
+        - formula: S2
           phase:
             tag: value
-            value: cr
+            value: g
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -4133,7 +4149,9 @@ observations:
     note: as_published='-376.794'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=Na=B1259 reference-state table p.56/PDF p.62, S=B1259 reference-state table p.63/PDF
+      p.69
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0171-thenaroite.json
     record: b1259-ht-0171-thenaroite
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0171-thenaroite.json
@@ -4204,26 +4222,26 @@ observations:
             formula: Na
             phase:
               tag: value
-              value: cr
+              value: g
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
           coefficient: '-2'
         - species:
-            formula: S
+            formula: S2
             phase:
               tag: value
-              value: cr
+              value: g
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
-          coefficient: '-4'
+          coefficient: '-2'
     formation_elements:
       tag: value
       value:
@@ -4231,21 +4249,21 @@ observations:
         - formula: Na
           phase:
             tag: value
-            value: cr
+            value: g
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
       - - S
-        - formula: S
+        - formula: S2
           phase:
             tag: value
-            value: cr
+            value: g
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -4300,7 +4318,9 @@ observations:
     note: as_published='-375.243'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=Na=B1259 reference-state table p.56/PDF p.62, S=B1259 reference-state table p.63/PDF
+      p.69
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0171-thenaroite.json
     record: b1259-ht-0171-thenaroite
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0171-thenaroite.json
@@ -4371,26 +4391,26 @@ observations:
             formula: Na
             phase:
               tag: value
-              value: cr
+              value: g
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
           coefficient: '-2'
         - species:
-            formula: S
+            formula: S2
             phase:
               tag: value
-              value: cr
+              value: g
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
-          coefficient: '-4'
+          coefficient: '-2'
     formation_elements:
       tag: value
       value:
@@ -4398,21 +4418,21 @@ observations:
         - formula: Na
           phase:
             tag: value
-            value: cr
+            value: g
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
       - - S
-        - formula: S
+        - formula: S2
           phase:
             tag: value
-            value: cr
+            value: g
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -4467,7 +4487,9 @@ observations:
     note: as_published='-373.707'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=Na=B1259 reference-state table p.56/PDF p.62, S=B1259 reference-state table p.63/PDF
+      p.69
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0171-thenaroite.json
     record: b1259-ht-0171-thenaroite
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0171-thenaroite.json
@@ -4538,26 +4560,26 @@ observations:
             formula: Na
             phase:
               tag: value
-              value: cr
+              value: g
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
           coefficient: '-2'
         - species:
-            formula: S
+            formula: S2
             phase:
               tag: value
-              value: cr
+              value: g
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
-          coefficient: '-4'
+          coefficient: '-2'
     formation_elements:
       tag: value
       value:
@@ -4565,21 +4587,21 @@ observations:
         - formula: Na
           phase:
             tag: value
-            value: cr
+            value: g
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
       - - S
-        - formula: S
+        - formula: S2
           phase:
             tag: value
-            value: cr
+            value: g
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -4634,7 +4656,9 @@ observations:
     note: as_published='-372.183'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=Na=B1259 reference-state table p.56/PDF p.62, S=B1259 reference-state table p.63/PDF
+      p.69
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0171-thenaroite.json
     record: b1259-ht-0171-thenaroite
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0171-thenaroite.json
@@ -4705,26 +4729,26 @@ observations:
             formula: Na
             phase:
               tag: value
-              value: cr
+              value: g
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
           coefficient: '-2'
         - species:
-            formula: S
+            formula: S2
             phase:
               tag: value
-              value: cr
+              value: g
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
-          coefficient: '-4'
+          coefficient: '-2'
     formation_elements:
       tag: value
       value:
@@ -4732,21 +4756,21 @@ observations:
         - formula: Na
           phase:
             tag: value
-            value: cr
+            value: g
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
       - - S
-        - formula: S
+        - formula: S2
           phase:
             tag: value
-            value: cr
+            value: g
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -4801,7 +4825,9 @@ observations:
     note: as_published='-370.668'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=Na=B1259 reference-state table p.56/PDF p.62, S=B1259 reference-state table p.63/PDF
+      p.69
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0171-thenaroite.json
     record: b1259-ht-0171-thenaroite
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0171-thenaroite.json
@@ -4872,26 +4898,26 @@ observations:
             formula: Na
             phase:
               tag: value
-              value: cr
+              value: g
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
           coefficient: '-2'
         - species:
-            formula: S
+            formula: S2
             phase:
               tag: value
-              value: cr
+              value: g
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
-          coefficient: '-4'
+          coefficient: '-2'
     formation_elements:
       tag: value
       value:
@@ -4899,21 +4925,21 @@ observations:
         - formula: Na
           phase:
             tag: value
-            value: cr
+            value: g
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
       - - S
-        - formula: S
+        - formula: S2
           phase:
             tag: value
-            value: cr
+            value: g
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -4968,7 +4994,9 @@ observations:
     note: as_published='-369.180'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=Na=B1259 reference-state table p.56/PDF p.62, S=B1259 reference-state table p.63/PDF
+      p.69
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0171-thenaroite.json
     record: b1259-ht-0171-thenaroite
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0171-thenaroite.json
@@ -5042,7 +5070,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: bcc
             charge:
               tag: value
               value: 0
@@ -5054,7 +5082,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: orthorhombic
             charge:
               tag: value
               value: 0
@@ -5069,7 +5097,7 @@ observations:
             value: cr
           polymorph:
             tag: value
-            value: reference
+            value: bcc
           charge:
             tag: value
             value: 0
@@ -5080,7 +5108,7 @@ observations:
             value: cr
           polymorph:
             tag: value
-            value: reference
+            value: orthorhombic
           charge:
             tag: value
             value: 0
@@ -5135,7 +5163,9 @@ observations:
     note: as_published='-331.528'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=Na=B1259 reference-state table p.56/PDF p.62, S=B1259 reference-state table p.63/PDF
+      p.69
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0171-thenaroite.json
     record: b1259-ht-0171-thenaroite
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0171-thenaroite.json
@@ -5206,10 +5236,10 @@ observations:
             formula: Na
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -5218,10 +5248,10 @@ observations:
             formula: S
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -5233,10 +5263,10 @@ observations:
         - formula: Na
           phase:
             tag: value
-            value: cr
+            value: l
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -5244,10 +5274,10 @@ observations:
         - formula: S
           phase:
             tag: value
-            value: cr
+            value: l
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -5302,7 +5332,9 @@ observations:
     note: as_published='-333.277'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=Na=B1259 reference-state table p.56/PDF p.62, S=B1259 reference-state table p.63/PDF
+      p.69
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0171-thenaroite.json
     record: b1259-ht-0171-thenaroite
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0171-thenaroite.json
@@ -5373,10 +5405,10 @@ observations:
             formula: Na
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -5385,10 +5417,10 @@ observations:
             formula: S
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -5400,10 +5432,10 @@ observations:
         - formula: Na
           phase:
             tag: value
-            value: cr
+            value: l
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -5411,10 +5443,10 @@ observations:
         - formula: S
           phase:
             tag: value
-            value: cr
+            value: l
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -5469,7 +5501,9 @@ observations:
     note: as_published='-333.280'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=Na=B1259 reference-state table p.56/PDF p.62, S=B1259 reference-state table p.63/PDF
+      p.69
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0171-thenaroite.json
     record: b1259-ht-0171-thenaroite
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0171-thenaroite.json
@@ -5540,10 +5574,10 @@ observations:
             formula: Na
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -5552,10 +5586,10 @@ observations:
             formula: S
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -5567,10 +5601,10 @@ observations:
         - formula: Na
           phase:
             tag: value
-            value: cr
+            value: l
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -5578,10 +5612,10 @@ observations:
         - formula: S
           phase:
             tag: value
-            value: cr
+            value: l
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -5636,7 +5670,9 @@ observations:
     note: as_published='-332.540'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=Na=B1259 reference-state table p.56/PDF p.62, S=B1259 reference-state table p.63/PDF
+      p.69
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0171-thenaroite.json
     record: b1259-ht-0171-thenaroite
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0171-thenaroite.json
@@ -5707,10 +5743,10 @@ observations:
             formula: Na
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -5719,10 +5755,10 @@ observations:
             formula: S
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -5734,10 +5770,10 @@ observations:
         - formula: Na
           phase:
             tag: value
-            value: cr
+            value: l
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -5745,10 +5781,10 @@ observations:
         - formula: S
           phase:
             tag: value
-            value: cr
+            value: l
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -5803,7 +5839,9 @@ observations:
     note: as_published='-332.550'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=Na=B1259 reference-state table p.56/PDF p.62, S=B1259 reference-state table p.63/PDF
+      p.69
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0171-thenaroite.json
     record: b1259-ht-0171-thenaroite
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0171-thenaroite.json
@@ -5874,10 +5912,10 @@ observations:
             formula: Na
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -5886,10 +5924,10 @@ observations:
             formula: S
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -5901,10 +5939,10 @@ observations:
         - formula: Na
           phase:
             tag: value
-            value: cr
+            value: l
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -5912,10 +5950,10 @@ observations:
         - formula: S
           phase:
             tag: value
-            value: cr
+            value: l
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -5970,7 +6008,9 @@ observations:
     note: as_published='-332.500'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=Na=B1259 reference-state table p.56/PDF p.62, S=B1259 reference-state table p.63/PDF
+      p.69
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0171-thenaroite.json
     record: b1259-ht-0171-thenaroite
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0171-thenaroite.json
@@ -6041,10 +6081,10 @@ observations:
             formula: Na
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -6053,10 +6093,10 @@ observations:
             formula: S
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -6068,10 +6108,10 @@ observations:
         - formula: Na
           phase:
             tag: value
-            value: cr
+            value: l
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -6079,10 +6119,10 @@ observations:
         - formula: S
           phase:
             tag: value
-            value: cr
+            value: l
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -6137,7 +6177,9 @@ observations:
     note: as_published='-330.820'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=Na=B1259 reference-state table p.56/PDF p.62, S=B1259 reference-state table p.63/PDF
+      p.69
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0171-thenaroite.json
     record: b1259-ht-0171-thenaroite
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0171-thenaroite.json
@@ -6208,10 +6250,10 @@ observations:
             formula: Na
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -6220,10 +6262,10 @@ observations:
             formula: S
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -6235,10 +6277,10 @@ observations:
         - formula: Na
           phase:
             tag: value
-            value: cr
+            value: l
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -6246,10 +6288,10 @@ observations:
         - formula: S
           phase:
             tag: value
-            value: cr
+            value: l
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -6304,7 +6346,9 @@ observations:
     note: as_published='-330.668'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=Na=B1259 reference-state table p.56/PDF p.62, S=B1259 reference-state table p.63/PDF
+      p.69
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0171-thenaroite.json
     record: b1259-ht-0171-thenaroite
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0171-thenaroite.json
@@ -6375,10 +6419,10 @@ observations:
             formula: Na
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -6387,10 +6431,10 @@ observations:
             formula: S
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -6402,10 +6446,10 @@ observations:
         - formula: Na
           phase:
             tag: value
-            value: cr
+            value: l
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -6413,10 +6457,10 @@ observations:
         - formula: S
           phase:
             tag: value
-            value: cr
+            value: l
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -6471,7 +6515,9 @@ observations:
     note: as_published='-330.256'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=Na=B1259 reference-state table p.56/PDF p.62, S=B1259 reference-state table p.63/PDF
+      p.69
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0171-thenaroite.json
     record: b1259-ht-0171-thenaroite
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0171-thenaroite.json
@@ -6542,26 +6588,26 @@ observations:
             formula: Na
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
           coefficient: '-2'
         - species:
-            formula: S
+            formula: S2
             phase:
               tag: value
-              value: cr
+              value: g
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
-          coefficient: '-4'
+          coefficient: '-2'
     formation_elements:
       tag: value
       value:
@@ -6569,21 +6615,21 @@ observations:
         - formula: Na
           phase:
             tag: value
-            value: cr
+            value: l
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
       - - S
-        - formula: S
+        - formula: S2
           phase:
             tag: value
-            value: cr
+            value: g
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -6638,7 +6684,9 @@ observations:
     note: as_published='-342.727'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=Na=B1259 reference-state table p.56/PDF p.62, S=B1259 reference-state table p.63/PDF
+      p.69
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0171-thenaroite.json
     record: b1259-ht-0171-thenaroite
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0171-thenaroite.json
@@ -6709,26 +6757,26 @@ observations:
             formula: Na
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
           coefficient: '-2'
         - species:
-            formula: S
+            formula: S2
             phase:
               tag: value
-              value: cr
+              value: g
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
-          coefficient: '-4'
+          coefficient: '-2'
     formation_elements:
       tag: value
       value:
@@ -6736,21 +6784,21 @@ observations:
         - formula: Na
           phase:
             tag: value
-            value: cr
+            value: l
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
       - - S
-        - formula: S
+        - formula: S2
           phase:
             tag: value
-            value: cr
+            value: g
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -6805,7 +6853,9 @@ observations:
     note: as_published='-341.653'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=Na=B1259 reference-state table p.56/PDF p.62, S=B1259 reference-state table p.63/PDF
+      p.69
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0171-thenaroite.json
     record: b1259-ht-0171-thenaroite
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0171-thenaroite.json
@@ -6876,26 +6926,26 @@ observations:
             formula: Na
             phase:
               tag: value
-              value: cr
+              value: g
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
           coefficient: '-2'
         - species:
-            formula: S
+            formula: S2
             phase:
               tag: value
-              value: cr
+              value: g
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
-          coefficient: '-4'
+          coefficient: '-2'
     formation_elements:
       tag: value
       value:
@@ -6903,21 +6953,21 @@ observations:
         - formula: Na
           phase:
             tag: value
-            value: cr
+            value: g
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
       - - S
-        - formula: S
+        - formula: S2
           phase:
             tag: value
-            value: cr
+            value: g
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -6972,7 +7022,9 @@ observations:
     note: as_published='21.960'; unit='dimensionless' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=Na=B1259 reference-state table p.56/PDF p.62, S=B1259 reference-state table p.63/PDF
+      p.69
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0171-thenaroite.json
     record: b1259-ht-0171-thenaroite
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0171-thenaroite.json
@@ -7034,26 +7086,26 @@ observations:
             formula: Na
             phase:
               tag: value
-              value: cr
+              value: g
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
           coefficient: '-2'
         - species:
-            formula: S
+            formula: S2
             phase:
               tag: value
-              value: cr
+              value: g
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
-          coefficient: '-4'
+          coefficient: '-2'
     formation_elements:
       tag: value
       value:
@@ -7061,21 +7113,21 @@ observations:
         - formula: Na
           phase:
             tag: value
-            value: cr
+            value: g
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
       - - S
-        - formula: S
+        - formula: S2
           phase:
             tag: value
-            value: cr
+            value: g
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -7130,7 +7182,9 @@ observations:
     note: as_published='16.333'; unit='dimensionless' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=Na=B1259 reference-state table p.56/PDF p.62, S=B1259 reference-state table p.63/PDF
+      p.69
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0171-thenaroite.json
     record: b1259-ht-0171-thenaroite
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0171-thenaroite.json
@@ -7192,10 +7246,10 @@ observations:
             formula: Na
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -7204,10 +7258,10 @@ observations:
             formula: S
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
@@ -7219,10 +7273,10 @@ observations:
         - formula: Na
           phase:
             tag: value
-            value: cr
+            value: l
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -7230,10 +7284,10 @@ observations:
         - formula: S
           phase:
             tag: value
-            value: cr
+            value: l
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -7288,7 +7342,9 @@ observations:
     note: as_published='124.068'; unit='dimensionless' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=Na=B1259 reference-state table p.56/PDF p.62, S=B1259 reference-state table p.63/PDF
+      p.69
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0171-thenaroite.json
     record: b1259-ht-0171-thenaroite
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0171-thenaroite.json
@@ -7350,26 +7406,26 @@ observations:
             formula: Na
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
           coefficient: '-2'
         - species:
-            formula: S
+            formula: S2
             phase:
               tag: value
-              value: cr
+              value: g
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
-          coefficient: '-4'
+          coefficient: '-2'
     formation_elements:
       tag: value
       value:
@@ -7377,21 +7433,21 @@ observations:
         - formula: Na
           phase:
             tag: value
-            value: cr
+            value: l
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
       - - S
-        - formula: S
+        - formula: S2
           phase:
             tag: value
-            value: cr
+            value: g
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -7446,7 +7502,9 @@ observations:
     note: as_published='207'; unit='dimensionless' quoted from high-T table header (units_as_published on each substance table;
       H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=Na=B1259 reference-state table p.56/PDF p.62, S=B1259 reference-state table p.63/PDF
+      p.69
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0171-thenaroite.json
     record: b1259-ht-0171-thenaroite
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0171-thenaroite.json

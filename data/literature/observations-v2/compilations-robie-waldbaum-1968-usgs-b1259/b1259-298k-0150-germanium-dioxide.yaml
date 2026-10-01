@@ -136,70 +136,13 @@ observations:
       tag: value
       value: '101325'
     reaction:
-      tag: value
-      value:
-        terms:
-        - species:
-            formula: GeO2
-            phase:
-              tag: value
-              value: cr
-            polymorph:
-              tag: value
-              value: quartz
-            charge:
-              tag: value
-              value: 0
-          coefficient: '1'
-        - species:
-            formula: Ge
-            phase:
-              tag: value
-              value: cr
-            polymorph:
-              tag: value
-              value: reference
-            charge:
-              tag: value
-              value: 0
-          coefficient: '-1'
-        - species:
-            formula: O2
-            phase:
-              tag: value
-              value: g
-            polymorph:
-              tag: not_applicable
-              reason: not crystal
-            charge:
-              tag: value
-              value: 0
-          coefficient: '-1'
+      tag: unknown
+      reason: formula 'GeO2' has no closed from_the_elements reaction at 298.15 K using B1259's printed elemental reference
+        states
     formation_elements:
-      tag: value
-      value:
-      - - Ge
-        - formula: Ge
-          phase:
-            tag: value
-            value: cr
-          polymorph:
-            tag: value
-            value: reference
-          charge:
-            tag: value
-            value: 0
-      - - O
-        - formula: O2
-          phase:
-            tag: value
-            value: g
-          polymorph:
-            tag: not_applicable
-            reason: not crystal
-          charge:
-            tag: value
-            value: 0
+      tag: unknown
+      reason: formula 'GeO2' has no closed from_the_elements reaction at 298.15 K using B1259's printed elemental reference
+        states
     reference_state:
       tag: not_applicable
       reason: profile delta_fG does not use reference_state
@@ -251,7 +194,8 @@ observations:
     note: as_published='-116195'; unit='cal gfw^-1' quoted from Table 1 PDF p. 9 / printed p. 3; captured units_as_published
       ignored; printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184
       J/cal); standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure);
-      formation_basis=from_the_elements
+      formation_basis=from_the_elements; elemental_reference_state_tables=Ge=no printed reference-state schedule, O=B1259
+      reference-state table p.59/PDF p.65
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-298k-0150-germanium-dioxide.json
     record: b1259-298k-0150-germanium-dioxide
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-298k-0150-germanium-dioxide.json
@@ -302,70 +246,13 @@ observations:
       tag: value
       value: '101325'
     reaction:
-      tag: value
-      value:
-        terms:
-        - species:
-            formula: GeO2
-            phase:
-              tag: value
-              value: cr
-            polymorph:
-              tag: value
-              value: quartz
-            charge:
-              tag: value
-              value: 0
-          coefficient: '1'
-        - species:
-            formula: Ge
-            phase:
-              tag: value
-              value: cr
-            polymorph:
-              tag: value
-              value: reference
-            charge:
-              tag: value
-              value: 0
-          coefficient: '-1'
-        - species:
-            formula: O2
-            phase:
-              tag: value
-              value: g
-            polymorph:
-              tag: not_applicable
-              reason: not crystal
-            charge:
-              tag: value
-              value: 0
-          coefficient: '-1'
+      tag: unknown
+      reason: formula 'GeO2' has no closed from_the_elements reaction at 298.15 K using B1259's printed elemental reference
+        states
     formation_elements:
-      tag: value
-      value:
-      - - Ge
-        - formula: Ge
-          phase:
-            tag: value
-            value: cr
-          polymorph:
-            tag: value
-            value: reference
-          charge:
-            tag: value
-            value: 0
-      - - O
-        - formula: O2
-          phase:
-            tag: value
-            value: g
-          polymorph:
-            tag: not_applicable
-            reason: not crystal
-          charge:
-            tag: value
-            value: 0
+      tag: unknown
+      reason: formula 'GeO2' has no closed from_the_elements reaction at 298.15 K using B1259's printed elemental reference
+        states
     reference_state:
       tag: not_applicable
       reason: profile delta_fH does not use reference_state
@@ -417,7 +304,8 @@ observations:
     note: as_published='-129080'; unit='cal gfw^-1' quoted from Table 1 PDF p. 9 / printed p. 3; captured units_as_published
       ignored; printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184
       J/cal); standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure);
-      formation_basis=from_the_elements
+      formation_basis=from_the_elements; elemental_reference_state_tables=Ge=no printed reference-state schedule, O=B1259
+      reference-state table p.59/PDF p.65
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-298k-0150-germanium-dioxide.json
     record: b1259-298k-0150-germanium-dioxide
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-298k-0150-germanium-dioxide.json
@@ -468,70 +356,13 @@ observations:
       tag: value
       value: '101325'
     reaction:
-      tag: value
-      value:
-        terms:
-        - species:
-            formula: GeO2
-            phase:
-              tag: value
-              value: cr
-            polymorph:
-              tag: value
-              value: quartz
-            charge:
-              tag: value
-              value: 0
-          coefficient: '1'
-        - species:
-            formula: Ge
-            phase:
-              tag: value
-              value: cr
-            polymorph:
-              tag: value
-              value: reference
-            charge:
-              tag: value
-              value: 0
-          coefficient: '-1'
-        - species:
-            formula: O2
-            phase:
-              tag: value
-              value: g
-            polymorph:
-              tag: not_applicable
-              reason: not crystal
-            charge:
-              tag: value
-              value: 0
-          coefficient: '-1'
+      tag: unknown
+      reason: formula 'GeO2' has no closed from_the_elements reaction at 298.15 K using B1259's printed elemental reference
+        states
     formation_elements:
-      tag: value
-      value:
-      - - Ge
-        - formula: Ge
-          phase:
-            tag: value
-            value: cr
-          polymorph:
-            tag: value
-            value: reference
-          charge:
-            tag: value
-            value: 0
-      - - O
-        - formula: O2
-          phase:
-            tag: value
-            value: g
-          polymorph:
-            tag: not_applicable
-            reason: not crystal
-          charge:
-            tag: value
-            value: 0
+      tag: unknown
+      reason: formula 'GeO2' has no closed from_the_elements reaction at 298.15 K using B1259's printed elemental reference
+        states
     reference_state:
       tag: not_applicable
       reason: profile log10_Kf does not use reference_state
@@ -583,7 +414,8 @@ observations:
     note: as_published='85.173'; unit='dimensionless' quoted from Table 1 PDF p. 9 / printed p. 3; captured units_as_published
       ignored; printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184
       J/cal); standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure);
-      formation_basis=from_the_elements
+      formation_basis=from_the_elements; elemental_reference_state_tables=Ge=no printed reference-state schedule, O=B1259
+      reference-state table p.59/PDF p.65
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-298k-0150-germanium-dioxide.json
     record: b1259-298k-0150-germanium-dioxide
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-298k-0150-germanium-dioxide.json

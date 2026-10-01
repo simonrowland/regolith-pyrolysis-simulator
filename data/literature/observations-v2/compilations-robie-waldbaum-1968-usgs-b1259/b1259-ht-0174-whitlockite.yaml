@@ -3373,23 +3373,23 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: beta
             charge:
               tag: value
               value: 0
           coefficient: '-3'
         - species:
-            formula: P
+            formula: P2
             phase:
               tag: value
-              value: cr
+              value: g
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
-          coefficient: '-8'
+          coefficient: '-4'
     formation_elements:
       tag: value
       value:
@@ -3400,18 +3400,18 @@ observations:
             value: cr
           polymorph:
             tag: value
-            value: reference
+            value: beta
           charge:
             tag: value
             value: 0
       - - P
-        - formula: P
+        - formula: P2
           phase:
             tag: value
-            value: cr
+            value: g
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -3466,7 +3466,9 @@ observations:
     note: as_published='-811.632'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=Ca=B1259 reference-state table p.37/PDF p.43, P=B1259 reference-state table p.60/PDF
+      p.66
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0174-whitlockite.json
     record: b1259-ht-0174-whitlockite
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0174-whitlockite.json
@@ -3542,23 +3544,23 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: beta
             charge:
               tag: value
               value: 0
           coefficient: '-3'
         - species:
-            formula: P
+            formula: P2
             phase:
               tag: value
-              value: cr
+              value: g
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
-          coefficient: '-8'
+          coefficient: '-4'
     formation_elements:
       tag: value
       value:
@@ -3569,18 +3571,18 @@ observations:
             value: cr
           polymorph:
             tag: value
-            value: reference
+            value: beta
           charge:
             tag: value
             value: 0
       - - P
-        - formula: P
+        - formula: P2
           phase:
             tag: value
-            value: cr
+            value: g
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -3635,7 +3637,9 @@ observations:
     note: as_published='-790.689'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=Ca=B1259 reference-state table p.37/PDF p.43, P=B1259 reference-state table p.60/PDF
+      p.66
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0174-whitlockite.json
     record: b1259-ht-0174-whitlockite
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0174-whitlockite.json
@@ -3708,26 +3712,26 @@ observations:
             formula: Ca
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
           coefficient: '-3'
         - species:
-            formula: P
+            formula: P2
             phase:
               tag: value
-              value: cr
+              value: g
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
-          coefficient: '-8'
+          coefficient: '-4'
     formation_elements:
       tag: value
       value:
@@ -3735,21 +3739,21 @@ observations:
         - formula: Ca
           phase:
             tag: value
-            value: cr
+            value: l
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
       - - P
-        - formula: P
+        - formula: P2
           phase:
             tag: value
-            value: cr
+            value: g
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -3804,7 +3808,9 @@ observations:
     note: as_published='-769.511'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=Ca=B1259 reference-state table p.37/PDF p.43, P=B1259 reference-state table p.60/PDF
+      p.66
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0174-whitlockite.json
     record: b1259-ht-0174-whitlockite
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0174-whitlockite.json
@@ -3877,26 +3883,26 @@ observations:
             formula: Ca
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
           coefficient: '-3'
         - species:
-            formula: P
+            formula: P2
             phase:
               tag: value
-              value: cr
+              value: g
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
-          coefficient: '-8'
+          coefficient: '-4'
     formation_elements:
       tag: value
       value:
@@ -3904,21 +3910,21 @@ observations:
         - formula: Ca
           phase:
             tag: value
-            value: cr
+            value: l
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
       - - P
-        - formula: P
+        - formula: P2
           phase:
             tag: value
-            value: cr
+            value: g
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -3973,7 +3979,9 @@ observations:
     note: as_published='-748.452'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=Ca=B1259 reference-state table p.37/PDF p.43, P=B1259 reference-state table p.60/PDF
+      p.66
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0174-whitlockite.json
     record: b1259-ht-0174-whitlockite
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0174-whitlockite.json
@@ -4046,26 +4054,26 @@ observations:
             formula: Ca
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
           coefficient: '-3'
         - species:
-            formula: P
+            formula: P2
             phase:
               tag: value
-              value: cr
+              value: g
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
-          coefficient: '-8'
+          coefficient: '-4'
     formation_elements:
       tag: value
       value:
@@ -4073,21 +4081,21 @@ observations:
         - formula: Ca
           phase:
             tag: value
-            value: cr
+            value: l
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
       - - P
-        - formula: P
+        - formula: P2
           phase:
             tag: value
-            value: cr
+            value: g
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -4142,7 +4150,9 @@ observations:
     note: as_published='-733.320'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=Ca=B1259 reference-state table p.37/PDF p.43, P=B1259 reference-state table p.60/PDF
+      p.66
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0174-whitlockite.json
     record: b1259-ht-0174-whitlockite
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0174-whitlockite.json
@@ -4215,26 +4225,26 @@ observations:
             formula: Ca
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
           coefficient: '-3'
         - species:
-            formula: P
+            formula: P2
             phase:
               tag: value
-              value: cr
+              value: g
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
-          coefficient: '-8'
+          coefficient: '-4'
     formation_elements:
       tag: value
       value:
@@ -4242,21 +4252,21 @@ observations:
         - formula: Ca
           phase:
             tag: value
-            value: cr
+            value: l
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
       - - P
-        - formula: P
+        - formula: P2
           phase:
             tag: value
-            value: cr
+            value: g
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -4311,7 +4321,9 @@ observations:
     note: as_published='-727.782'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=Ca=B1259 reference-state table p.37/PDF p.43, P=B1259 reference-state table p.60/PDF
+      p.66
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0174-whitlockite.json
     record: b1259-ht-0174-whitlockite
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0174-whitlockite.json
@@ -4384,26 +4396,26 @@ observations:
             formula: Ca
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
           coefficient: '-3'
         - species:
-            formula: P
+            formula: P2
             phase:
               tag: value
-              value: cr
+              value: g
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
-          coefficient: '-8'
+          coefficient: '-4'
     formation_elements:
       tag: value
       value:
@@ -4411,21 +4423,21 @@ observations:
         - formula: Ca
           phase:
             tag: value
-            value: cr
+            value: l
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
       - - P
-        - formula: P
+        - formula: P2
           phase:
             tag: value
-            value: cr
+            value: g
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -4480,7 +4492,9 @@ observations:
     note: as_published='-707.377'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=Ca=B1259 reference-state table p.37/PDF p.43, P=B1259 reference-state table p.60/PDF
+      p.66
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0174-whitlockite.json
     record: b1259-ht-0174-whitlockite
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0174-whitlockite.json
@@ -4556,7 +4570,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: alpha
             charge:
               tag: value
               value: 0
@@ -4568,7 +4582,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: red
             charge:
               tag: value
               value: 0
@@ -4583,7 +4597,7 @@ observations:
             value: cr
           polymorph:
             tag: value
-            value: reference
+            value: alpha
           charge:
             tag: value
             value: 0
@@ -4594,7 +4608,7 @@ observations:
             value: cr
           polymorph:
             tag: value
-            value: reference
+            value: red
           charge:
             tag: value
             value: 0
@@ -4649,7 +4663,9 @@ observations:
     note: as_published='-932.785'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=Ca=B1259 reference-state table p.37/PDF p.43, P=B1259 reference-state table p.60/PDF
+      p.66
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0174-whitlockite.json
     record: b1259-ht-0174-whitlockite
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0174-whitlockite.json
@@ -4725,7 +4741,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: alpha
             charge:
               tag: value
               value: 0
@@ -4737,7 +4753,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: red
             charge:
               tag: value
               value: 0
@@ -4752,7 +4768,7 @@ observations:
             value: cr
           polymorph:
             tag: value
-            value: reference
+            value: alpha
           charge:
             tag: value
             value: 0
@@ -4763,7 +4779,7 @@ observations:
             value: cr
           polymorph:
             tag: value
-            value: reference
+            value: red
           charge:
             tag: value
             value: 0
@@ -4818,7 +4834,9 @@ observations:
     note: as_published='-914.532'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=Ca=B1259 reference-state table p.37/PDF p.43, P=B1259 reference-state table p.60/PDF
+      p.66
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0174-whitlockite.json
     record: b1259-ht-0174-whitlockite
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0174-whitlockite.json
@@ -4894,7 +4912,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: alpha
             charge:
               tag: value
               value: 0
@@ -4906,7 +4924,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: red
             charge:
               tag: value
               value: 0
@@ -4921,7 +4939,7 @@ observations:
             value: cr
           polymorph:
             tag: value
-            value: reference
+            value: alpha
           charge:
             tag: value
             value: 0
@@ -4932,7 +4950,7 @@ observations:
             value: cr
           polymorph:
             tag: value
-            value: reference
+            value: red
           charge:
             tag: value
             value: 0
@@ -4987,7 +5005,9 @@ observations:
     note: as_published='-896.660'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=Ca=B1259 reference-state table p.37/PDF p.43, P=B1259 reference-state table p.60/PDF
+      p.66
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0174-whitlockite.json
     record: b1259-ht-0174-whitlockite
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0174-whitlockite.json
@@ -5063,7 +5083,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: alpha
             charge:
               tag: value
               value: 0
@@ -5075,7 +5095,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: red
             charge:
               tag: value
               value: 0
@@ -5090,7 +5110,7 @@ observations:
             value: cr
           polymorph:
             tag: value
-            value: reference
+            value: alpha
           charge:
             tag: value
             value: 0
@@ -5101,7 +5121,7 @@ observations:
             value: cr
           polymorph:
             tag: value
-            value: reference
+            value: red
           charge:
             tag: value
             value: 0
@@ -5156,7 +5176,9 @@ observations:
     note: as_published='-878.842'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=Ca=B1259 reference-state table p.37/PDF p.43, P=B1259 reference-state table p.60/PDF
+      p.66
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0174-whitlockite.json
     record: b1259-ht-0174-whitlockite
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0174-whitlockite.json
@@ -5232,7 +5254,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: alpha
             charge:
               tag: value
               value: 0
@@ -5244,7 +5266,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: red
             charge:
               tag: value
               value: 0
@@ -5259,7 +5281,7 @@ observations:
             value: cr
           polymorph:
             tag: value
-            value: reference
+            value: alpha
           charge:
             tag: value
             value: 0
@@ -5270,7 +5292,7 @@ observations:
             value: cr
           polymorph:
             tag: value
-            value: reference
+            value: red
           charge:
             tag: value
             value: 0
@@ -5325,7 +5347,9 @@ observations:
     note: as_published='-861.098'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=Ca=B1259 reference-state table p.37/PDF p.43, P=B1259 reference-state table p.60/PDF
+      p.66
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0174-whitlockite.json
     record: b1259-ht-0174-whitlockite
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0174-whitlockite.json
@@ -5401,23 +5425,23 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: beta
             charge:
               tag: value
               value: 0
           coefficient: '-3'
         - species:
-            formula: P
+            formula: P2
             phase:
               tag: value
-              value: cr
+              value: g
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
-          coefficient: '-8'
+          coefficient: '-4'
     formation_elements:
       tag: value
       value:
@@ -5428,18 +5452,18 @@ observations:
             value: cr
           polymorph:
             tag: value
-            value: reference
+            value: beta
           charge:
             tag: value
             value: 0
       - - P
-        - formula: P
+        - formula: P2
           phase:
             tag: value
-            value: cr
+            value: g
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -5494,7 +5518,9 @@ observations:
     note: as_published='-854.036'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=Ca=B1259 reference-state table p.37/PDF p.43, P=B1259 reference-state table p.60/PDF
+      p.66
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0174-whitlockite.json
     record: b1259-ht-0174-whitlockite
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0174-whitlockite.json
@@ -5570,23 +5596,23 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: beta
             charge:
               tag: value
               value: 0
           coefficient: '-3'
         - species:
-            formula: P
+            formula: P2
             phase:
               tag: value
-              value: cr
+              value: g
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
-          coefficient: '-8'
+          coefficient: '-4'
     formation_elements:
       tag: value
       value:
@@ -5597,18 +5623,18 @@ observations:
             value: cr
           polymorph:
             tag: value
-            value: reference
+            value: beta
           charge:
             tag: value
             value: 0
       - - P
-        - formula: P
+        - formula: P2
           phase:
             tag: value
-            value: cr
+            value: g
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -5663,7 +5689,9 @@ observations:
     note: as_published='-1022.088'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=Ca=B1259 reference-state table p.37/PDF p.43, P=B1259 reference-state table p.60/PDF
+      p.66
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0174-whitlockite.json
     record: b1259-ht-0174-whitlockite
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0174-whitlockite.json
@@ -5739,23 +5767,23 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: beta
             charge:
               tag: value
               value: 0
           coefficient: '-3'
         - species:
-            formula: P
+            formula: P2
             phase:
               tag: value
-              value: cr
+              value: g
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
-          coefficient: '-8'
+          coefficient: '-4'
     formation_elements:
       tag: value
       value:
@@ -5766,18 +5794,18 @@ observations:
             value: cr
           polymorph:
             tag: value
-            value: reference
+            value: beta
           charge:
             tag: value
             value: 0
       - - P
-        - formula: P
+        - formula: P2
           phase:
             tag: value
-            value: cr
+            value: g
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -5832,7 +5860,9 @@ observations:
     note: as_published='-1020.206'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=Ca=B1259 reference-state table p.37/PDF p.43, P=B1259 reference-state table p.60/PDF
+      p.66
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0174-whitlockite.json
     record: b1259-ht-0174-whitlockite
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0174-whitlockite.json
@@ -5905,26 +5935,26 @@ observations:
             formula: Ca
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
           coefficient: '-3'
         - species:
-            formula: P
+            formula: P2
             phase:
               tag: value
-              value: cr
+              value: g
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
-          coefficient: '-8'
+          coefficient: '-4'
     formation_elements:
       tag: value
       value:
@@ -5932,21 +5962,21 @@ observations:
         - formula: Ca
           phase:
             tag: value
-            value: cr
+            value: l
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
       - - P
-        - formula: P
+        - formula: P2
           phase:
             tag: value
-            value: cr
+            value: g
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -6001,7 +6031,9 @@ observations:
     note: as_published='-1023.364'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=Ca=B1259 reference-state table p.37/PDF p.43, P=B1259 reference-state table p.60/PDF
+      p.66
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0174-whitlockite.json
     record: b1259-ht-0174-whitlockite
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0174-whitlockite.json
@@ -6074,26 +6106,26 @@ observations:
             formula: Ca
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
           coefficient: '-3'
         - species:
-            formula: P
+            formula: P2
             phase:
               tag: value
-              value: cr
+              value: g
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
-          coefficient: '-8'
+          coefficient: '-4'
     formation_elements:
       tag: value
       value:
@@ -6101,21 +6133,21 @@ observations:
         - formula: Ca
           phase:
             tag: value
-            value: cr
+            value: l
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
       - - P
-        - formula: P
+        - formula: P2
           phase:
             tag: value
-            value: cr
+            value: g
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -6170,7 +6202,9 @@ observations:
     note: as_published='-1020.100'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=Ca=B1259 reference-state table p.37/PDF p.43, P=B1259 reference-state table p.60/PDF
+      p.66
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0174-whitlockite.json
     record: b1259-ht-0174-whitlockite
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0174-whitlockite.json
@@ -6243,26 +6277,26 @@ observations:
             formula: Ca
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
           coefficient: '-3'
         - species:
-            formula: P
+            formula: P2
             phase:
               tag: value
-              value: cr
+              value: g
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
-          coefficient: '-8'
+          coefficient: '-4'
     formation_elements:
       tag: value
       value:
@@ -6270,21 +6304,21 @@ observations:
         - formula: Ca
           phase:
             tag: value
-            value: cr
+            value: l
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
       - - P
-        - formula: P
+        - formula: P2
           phase:
             tag: value
-            value: cr
+            value: g
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -6339,7 +6373,9 @@ observations:
     note: as_published='-1017.520'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=Ca=B1259 reference-state table p.37/PDF p.43, P=B1259 reference-state table p.60/PDF
+      p.66
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0174-whitlockite.json
     record: b1259-ht-0174-whitlockite
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0174-whitlockite.json
@@ -6412,26 +6448,26 @@ observations:
             formula: Ca
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
           coefficient: '-3'
         - species:
-            formula: P
+            formula: P2
             phase:
               tag: value
-              value: cr
+              value: g
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
-          coefficient: '-8'
+          coefficient: '-4'
     formation_elements:
       tag: value
       value:
@@ -6439,21 +6475,21 @@ observations:
         - formula: Ca
           phase:
             tag: value
-            value: cr
+            value: l
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
       - - P
-        - formula: P
+        - formula: P2
           phase:
             tag: value
-            value: cr
+            value: g
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -6508,7 +6544,9 @@ observations:
     note: as_published='-1013.820'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=Ca=B1259 reference-state table p.37/PDF p.43, P=B1259 reference-state table p.60/PDF
+      p.66
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0174-whitlockite.json
     record: b1259-ht-0174-whitlockite
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0174-whitlockite.json
@@ -6581,26 +6619,26 @@ observations:
             formula: Ca
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
           coefficient: '-3'
         - species:
-            formula: P
+            formula: P2
             phase:
               tag: value
-              value: cr
+              value: g
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
-          coefficient: '-8'
+          coefficient: '-4'
     formation_elements:
       tag: value
       value:
@@ -6608,21 +6646,21 @@ observations:
         - formula: Ca
           phase:
             tag: value
-            value: cr
+            value: l
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
       - - P
-        - formula: P
+        - formula: P2
           phase:
             tag: value
-            value: cr
+            value: g
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -6677,7 +6715,9 @@ observations:
     note: as_published='-1013.466'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=Ca=B1259 reference-state table p.37/PDF p.43, P=B1259 reference-state table p.60/PDF
+      p.66
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0174-whitlockite.json
     record: b1259-ht-0174-whitlockite
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0174-whitlockite.json
@@ -6750,26 +6790,26 @@ observations:
             formula: Ca
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
           coefficient: '-3'
         - species:
-            formula: P
+            formula: P2
             phase:
               tag: value
-              value: cr
+              value: g
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
-          coefficient: '-8'
+          coefficient: '-4'
     formation_elements:
       tag: value
       value:
@@ -6777,21 +6817,21 @@ observations:
         - formula: Ca
           phase:
             tag: value
-            value: cr
+            value: l
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
       - - P
-        - formula: P
+        - formula: P2
           phase:
             tag: value
-            value: cr
+            value: g
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -6846,7 +6886,9 @@ observations:
     note: as_published='-1012.162'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=Ca=B1259 reference-state table p.37/PDF p.43, P=B1259 reference-state table p.60/PDF
+      p.66
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0174-whitlockite.json
     record: b1259-ht-0174-whitlockite
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0174-whitlockite.json
@@ -6919,26 +6961,26 @@ observations:
             formula: Ca
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
           coefficient: '-3'
         - species:
-            formula: P
+            formula: P2
             phase:
               tag: value
-              value: cr
+              value: g
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
-          coefficient: '-8'
+          coefficient: '-4'
     formation_elements:
       tag: value
       value:
@@ -6946,21 +6988,21 @@ observations:
         - formula: Ca
           phase:
             tag: value
-            value: cr
+            value: l
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
       - - P
-        - formula: P
+        - formula: P2
           phase:
             tag: value
-            value: cr
+            value: g
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -7015,7 +7057,9 @@ observations:
     note: as_published='-1010.884'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=Ca=B1259 reference-state table p.37/PDF p.43, P=B1259 reference-state table p.60/PDF
+      p.66
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0174-whitlockite.json
     record: b1259-ht-0174-whitlockite
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0174-whitlockite.json
@@ -7091,7 +7135,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: alpha
             charge:
               tag: value
               value: 0
@@ -7103,7 +7147,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: red
             charge:
               tag: value
               value: 0
@@ -7118,7 +7162,7 @@ observations:
             value: cr
           polymorph:
             tag: value
-            value: reference
+            value: alpha
           charge:
             tag: value
             value: 0
@@ -7129,7 +7173,7 @@ observations:
             value: cr
           polymorph:
             tag: value
-            value: reference
+            value: red
           charge:
             tag: value
             value: 0
@@ -7184,7 +7228,9 @@ observations:
     note: as_published='-986.200'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=Ca=B1259 reference-state table p.37/PDF p.43, P=B1259 reference-state table p.60/PDF
+      p.66
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0174-whitlockite.json
     record: b1259-ht-0174-whitlockite
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0174-whitlockite.json
@@ -7260,7 +7306,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: alpha
             charge:
               tag: value
               value: 0
@@ -7272,7 +7318,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: red
             charge:
               tag: value
               value: 0
@@ -7287,7 +7333,7 @@ observations:
             value: cr
           polymorph:
             tag: value
-            value: reference
+            value: alpha
           charge:
             tag: value
             value: 0
@@ -7298,7 +7344,7 @@ observations:
             value: cr
           polymorph:
             tag: value
-            value: reference
+            value: red
           charge:
             tag: value
             value: 0
@@ -7353,7 +7399,9 @@ observations:
     note: as_published='-986.130'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=Ca=B1259 reference-state table p.37/PDF p.43, P=B1259 reference-state table p.60/PDF
+      p.66
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0174-whitlockite.json
     record: b1259-ht-0174-whitlockite
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0174-whitlockite.json
@@ -7429,7 +7477,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: alpha
             charge:
               tag: value
               value: 0
@@ -7441,7 +7489,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: red
             charge:
               tag: value
               value: 0
@@ -7456,7 +7504,7 @@ observations:
             value: cr
           polymorph:
             tag: value
-            value: reference
+            value: alpha
           charge:
             tag: value
             value: 0
@@ -7467,7 +7515,7 @@ observations:
             value: cr
           polymorph:
             tag: value
-            value: reference
+            value: red
           charge:
             tag: value
             value: 0
@@ -7522,7 +7570,9 @@ observations:
     note: as_published='-985.951'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=Ca=B1259 reference-state table p.37/PDF p.43, P=B1259 reference-state table p.60/PDF
+      p.66
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0174-whitlockite.json
     record: b1259-ht-0174-whitlockite
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0174-whitlockite.json
@@ -7598,7 +7648,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: alpha
             charge:
               tag: value
               value: 0
@@ -7610,7 +7660,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: red
             charge:
               tag: value
               value: 0
@@ -7625,7 +7675,7 @@ observations:
             value: cr
           polymorph:
             tag: value
-            value: reference
+            value: alpha
           charge:
             tag: value
             value: 0
@@ -7636,7 +7686,7 @@ observations:
             value: cr
           polymorph:
             tag: value
-            value: reference
+            value: red
           charge:
             tag: value
             value: 0
@@ -7691,7 +7741,9 @@ observations:
     note: as_published='-985.548'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=Ca=B1259 reference-state table p.37/PDF p.43, P=B1259 reference-state table p.60/PDF
+      p.66
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0174-whitlockite.json
     record: b1259-ht-0174-whitlockite
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0174-whitlockite.json
@@ -7767,7 +7819,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: alpha
             charge:
               tag: value
               value: 0
@@ -7779,7 +7831,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: red
             charge:
               tag: value
               value: 0
@@ -7794,7 +7846,7 @@ observations:
             value: cr
           polymorph:
             tag: value
-            value: reference
+            value: alpha
           charge:
             tag: value
             value: 0
@@ -7805,7 +7857,7 @@ observations:
             value: cr
           polymorph:
             tag: value
-            value: reference
+            value: red
           charge:
             tag: value
             value: 0
@@ -7860,7 +7912,9 @@ observations:
     note: as_published='-984.921'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=Ca=B1259 reference-state table p.37/PDF p.43, P=B1259 reference-state table p.60/PDF
+      p.66
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0174-whitlockite.json
     record: b1259-ht-0174-whitlockite
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0174-whitlockite.json
@@ -7936,23 +7990,23 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: beta
             charge:
               tag: value
               value: 0
           coefficient: '-3'
         - species:
-            formula: P
+            formula: P2
             phase:
               tag: value
-              value: cr
+              value: g
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
-          coefficient: '-8'
+          coefficient: '-4'
     formation_elements:
       tag: value
       value:
@@ -7963,18 +8017,18 @@ observations:
             value: cr
           polymorph:
             tag: value
-            value: reference
+            value: beta
           charge:
             tag: value
             value: 0
       - - P
-        - formula: P
+        - formula: P2
           phase:
             tag: value
-            value: cr
+            value: g
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -8029,7 +8083,9 @@ observations:
     note: as_published='-1023.752'; unit='kcal gfw^-1' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=Ca=B1259 reference-state table p.37/PDF p.43, P=B1259 reference-state table p.60/PDF
+      p.66
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0174-whitlockite.json
     record: b1259-ht-0174-whitlockite
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0174-whitlockite.json
@@ -8105,23 +8161,23 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: beta
             charge:
               tag: value
               value: 0
           coefficient: '-3'
         - species:
-            formula: P
+            formula: P2
             phase:
               tag: value
-              value: cr
+              value: g
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
-          coefficient: '-8'
+          coefficient: '-4'
     formation_elements:
       tag: value
       value:
@@ -8132,18 +8188,18 @@ observations:
             value: cr
           polymorph:
             tag: value
-            value: reference
+            value: beta
           charge:
             tag: value
             value: 0
       - - P
-        - formula: P
+        - formula: P2
           phase:
             tag: value
-            value: cr
+            value: g
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -8198,7 +8254,9 @@ observations:
     note: as_published='177.382'; unit='dimensionless' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=Ca=B1259 reference-state table p.37/PDF p.43, P=B1259 reference-state table p.60/PDF
+      p.66
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0174-whitlockite.json
     record: b1259-ht-0174-whitlockite
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0174-whitlockite.json
@@ -8265,23 +8323,23 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: beta
             charge:
               tag: value
               value: 0
           coefficient: '-3'
         - species:
-            formula: P
+            formula: P2
             phase:
               tag: value
-              value: cr
+              value: g
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
-          coefficient: '-8'
+          coefficient: '-4'
     formation_elements:
       tag: value
       value:
@@ -8292,18 +8350,18 @@ observations:
             value: cr
           polymorph:
             tag: value
-            value: reference
+            value: beta
           charge:
             tag: value
             value: 0
       - - P
-        - formula: P
+        - formula: P2
           phase:
             tag: value
-            value: cr
+            value: g
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -8358,7 +8416,9 @@ observations:
     note: as_published='157.095'; unit='dimensionless' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=Ca=B1259 reference-state table p.37/PDF p.43, P=B1259 reference-state table p.60/PDF
+      p.66
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0174-whitlockite.json
     record: b1259-ht-0174-whitlockite
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0174-whitlockite.json
@@ -8422,26 +8482,26 @@ observations:
             formula: Ca
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
           coefficient: '-3'
         - species:
-            formula: P
+            formula: P2
             phase:
               tag: value
-              value: cr
+              value: g
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
-          coefficient: '-8'
+          coefficient: '-4'
     formation_elements:
       tag: value
       value:
@@ -8449,21 +8509,21 @@ observations:
         - formula: Ca
           phase:
             tag: value
-            value: cr
+            value: l
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
       - - P
-        - formula: P
+        - formula: P2
           phase:
             tag: value
-            value: cr
+            value: g
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -8518,7 +8578,9 @@ observations:
     note: as_published='140.147'; unit='dimensionless' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=Ca=B1259 reference-state table p.37/PDF p.43, P=B1259 reference-state table p.60/PDF
+      p.66
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0174-whitlockite.json
     record: b1259-ht-0174-whitlockite
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0174-whitlockite.json
@@ -8582,26 +8644,26 @@ observations:
             formula: Ca
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
           coefficient: '-3'
         - species:
-            formula: P
+            formula: P2
             phase:
               tag: value
-              value: cr
+              value: g
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
-          coefficient: '-8'
+          coefficient: '-4'
     formation_elements:
       tag: value
       value:
@@ -8609,21 +8671,21 @@ observations:
         - formula: Ca
           phase:
             tag: value
-            value: cr
+            value: l
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
       - - P
-        - formula: P
+        - formula: P2
           phase:
             tag: value
-            value: cr
+            value: g
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -8678,7 +8740,9 @@ observations:
     note: as_published='125.826'; unit='dimensionless' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=Ca=B1259 reference-state table p.37/PDF p.43, P=B1259 reference-state table p.60/PDF
+      p.66
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0174-whitlockite.json
     record: b1259-ht-0174-whitlockite
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0174-whitlockite.json
@@ -8742,26 +8806,26 @@ observations:
             formula: Ca
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
           coefficient: '-3'
         - species:
-            formula: P
+            formula: P2
             phase:
               tag: value
-              value: cr
+              value: g
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
-          coefficient: '-8'
+          coefficient: '-4'
     formation_elements:
       tag: value
       value:
@@ -8769,21 +8833,21 @@ observations:
         - formula: Ca
           phase:
             tag: value
-            value: cr
+            value: l
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
       - - P
-        - formula: P
+        - formula: P2
           phase:
             tag: value
-            value: cr
+            value: g
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -8838,7 +8902,9 @@ observations:
     note: as_published='116.728'; unit='dimensionless' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=Ca=B1259 reference-state table p.37/PDF p.43, P=B1259 reference-state table p.60/PDF
+      p.66
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0174-whitlockite.json
     record: b1259-ht-0174-whitlockite
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0174-whitlockite.json
@@ -8902,26 +8968,26 @@ observations:
             formula: Ca
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
           coefficient: '-3'
         - species:
-            formula: P
+            formula: P2
             phase:
               tag: value
-              value: cr
+              value: g
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
-          coefficient: '-8'
+          coefficient: '-4'
     formation_elements:
       tag: value
       value:
@@ -8929,21 +8995,21 @@ observations:
         - formula: Ca
           phase:
             tag: value
-            value: cr
+            value: l
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
       - - P
-        - formula: P
+        - formula: P2
           phase:
             tag: value
-            value: cr
+            value: g
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -8998,7 +9064,9 @@ observations:
     note: as_published='113.612'; unit='dimensionless' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=Ca=B1259 reference-state table p.37/PDF p.43, P=B1259 reference-state table p.60/PDF
+      p.66
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0174-whitlockite.json
     record: b1259-ht-0174-whitlockite
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0174-whitlockite.json
@@ -9062,26 +9130,26 @@ observations:
             formula: Ca
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
           coefficient: '-3'
         - species:
-            formula: P
+            formula: P2
             phase:
               tag: value
-              value: cr
+              value: g
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
-          coefficient: '-8'
+          coefficient: '-4'
     formation_elements:
       tag: value
       value:
@@ -9089,21 +9157,21 @@ observations:
         - formula: Ca
           phase:
             tag: value
-            value: cr
+            value: l
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
       - - P
-        - formula: P
+        - formula: P2
           phase:
             tag: value
-            value: cr
+            value: g
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -9158,7 +9226,9 @@ observations:
     note: as_published='103.064'; unit='dimensionless' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=Ca=B1259 reference-state table p.37/PDF p.43, P=B1259 reference-state table p.60/PDF
+      p.66
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0174-whitlockite.json
     record: b1259-ht-0174-whitlockite
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0174-whitlockite.json
@@ -9222,26 +9292,26 @@ observations:
             formula: Ca
             phase:
               tag: value
-              value: cr
+              value: l
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
           coefficient: '-3'
         - species:
-            formula: P
+            formula: P2
             phase:
               tag: value
-              value: cr
+              value: g
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
-          coefficient: '-8'
+          coefficient: '-4'
     formation_elements:
       tag: value
       value:
@@ -9249,21 +9319,21 @@ observations:
         - formula: Ca
           phase:
             tag: value
-            value: cr
+            value: l
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
       - - P
-        - formula: P
+        - formula: P2
           phase:
             tag: value
-            value: cr
+            value: g
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -9318,7 +9388,9 @@ observations:
     note: as_published='93.859'; unit='dimensionless' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=Ca=B1259 reference-state table p.37/PDF p.43, P=B1259 reference-state table p.60/PDF
+      p.66
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0174-whitlockite.json
     record: b1259-ht-0174-whitlockite
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0174-whitlockite.json
@@ -9385,7 +9457,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: alpha
             charge:
               tag: value
               value: 0
@@ -9397,7 +9469,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: red
             charge:
               tag: value
               value: 0
@@ -9412,7 +9484,7 @@ observations:
             value: cr
           polymorph:
             tag: value
-            value: reference
+            value: alpha
           charge:
             tag: value
             value: 0
@@ -9423,7 +9495,7 @@ observations:
             value: cr
           polymorph:
             tag: value
-            value: reference
+            value: red
           charge:
             tag: value
             value: 0
@@ -9478,7 +9550,9 @@ observations:
     note: as_published='683.748'; unit='dimensionless' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=Ca=B1259 reference-state table p.37/PDF p.43, P=B1259 reference-state table p.60/PDF
+      p.66
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0174-whitlockite.json
     record: b1259-ht-0174-whitlockite
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0174-whitlockite.json
@@ -9545,7 +9619,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: alpha
             charge:
               tag: value
               value: 0
@@ -9557,7 +9631,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: red
             charge:
               tag: value
               value: 0
@@ -9572,7 +9646,7 @@ observations:
             value: cr
           polymorph:
             tag: value
-            value: reference
+            value: alpha
           charge:
             tag: value
             value: 0
@@ -9583,7 +9657,7 @@ observations:
             value: cr
           polymorph:
             tag: value
-            value: reference
+            value: red
           charge:
             tag: value
             value: 0
@@ -9638,7 +9712,9 @@ observations:
     note: as_published='499.676'; unit='dimensionless' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=Ca=B1259 reference-state table p.37/PDF p.43, P=B1259 reference-state table p.60/PDF
+      p.66
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0174-whitlockite.json
     record: b1259-ht-0174-whitlockite
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0174-whitlockite.json
@@ -9705,7 +9781,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: alpha
             charge:
               tag: value
               value: 0
@@ -9717,7 +9793,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: red
             charge:
               tag: value
               value: 0
@@ -9732,7 +9808,7 @@ observations:
             value: cr
           polymorph:
             tag: value
-            value: reference
+            value: alpha
           charge:
             tag: value
             value: 0
@@ -9743,7 +9819,7 @@ observations:
             value: cr
           polymorph:
             tag: value
-            value: reference
+            value: red
           charge:
             tag: value
             value: 0
@@ -9798,7 +9874,9 @@ observations:
     note: as_published='391.929'; unit='dimensionless' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=Ca=B1259 reference-state table p.37/PDF p.43, P=B1259 reference-state table p.60/PDF
+      p.66
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0174-whitlockite.json
     record: b1259-ht-0174-whitlockite
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0174-whitlockite.json
@@ -9865,7 +9943,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: alpha
             charge:
               tag: value
               value: 0
@@ -9877,7 +9955,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: red
             charge:
               tag: value
               value: 0
@@ -9892,7 +9970,7 @@ observations:
             value: cr
           polymorph:
             tag: value
-            value: reference
+            value: alpha
           charge:
             tag: value
             value: 0
@@ -9903,7 +9981,7 @@ observations:
             value: cr
           polymorph:
             tag: value
-            value: reference
+            value: red
           charge:
             tag: value
             value: 0
@@ -9958,7 +10036,9 @@ observations:
     note: as_published='320.117'; unit='dimensionless' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=Ca=B1259 reference-state table p.37/PDF p.43, P=B1259 reference-state table p.60/PDF
+      p.66
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0174-whitlockite.json
     record: b1259-ht-0174-whitlockite
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0174-whitlockite.json
@@ -10025,7 +10105,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: alpha
             charge:
               tag: value
               value: 0
@@ -10037,7 +10117,7 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: red
             charge:
               tag: value
               value: 0
@@ -10052,7 +10132,7 @@ observations:
             value: cr
           polymorph:
             tag: value
-            value: reference
+            value: alpha
           charge:
             tag: value
             value: 0
@@ -10063,7 +10143,7 @@ observations:
             value: cr
           polymorph:
             tag: value
-            value: reference
+            value: red
           charge:
             tag: value
             value: 0
@@ -10118,7 +10198,9 @@ observations:
     note: as_published='268.846'; unit='dimensionless' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=Ca=B1259 reference-state table p.37/PDF p.43, P=B1259 reference-state table p.60/PDF
+      p.66
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0174-whitlockite.json
     record: b1259-ht-0174-whitlockite
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0174-whitlockite.json
@@ -10185,23 +10267,23 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: beta
             charge:
               tag: value
               value: 0
           coefficient: '-3'
         - species:
-            formula: P
+            formula: P2
             phase:
               tag: value
-              value: cr
+              value: g
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
-          coefficient: '-8'
+          coefficient: '-4'
     formation_elements:
       tag: value
       value:
@@ -10212,18 +10294,18 @@ observations:
             value: cr
           polymorph:
             tag: value
-            value: reference
+            value: beta
           charge:
             tag: value
             value: 0
       - - P
-        - formula: P
+        - formula: P2
           phase:
             tag: value
-            value: cr
+            value: g
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -10278,7 +10360,9 @@ observations:
     note: as_published='233.325'; unit='dimensionless' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=Ca=B1259 reference-state table p.37/PDF p.43, P=B1259 reference-state table p.60/PDF
+      p.66
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0174-whitlockite.json
     record: b1259-ht-0174-whitlockite
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0174-whitlockite.json
@@ -10345,23 +10429,23 @@ observations:
               value: cr
             polymorph:
               tag: value
-              value: reference
+              value: beta
             charge:
               tag: value
               value: 0
           coefficient: '-3'
         - species:
-            formula: P
+            formula: P2
             phase:
               tag: value
-              value: cr
+              value: g
             polymorph:
-              tag: value
-              value: reference
+              tag: not_applicable
+              reason: not crystalline
             charge:
               tag: value
               value: 0
-          coefficient: '-8'
+          coefficient: '-4'
     formation_elements:
       tag: value
       value:
@@ -10372,18 +10456,18 @@ observations:
             value: cr
           polymorph:
             tag: value
-            value: reference
+            value: beta
           charge:
             tag: value
             value: 0
       - - P
-        - formula: P
+        - formula: P2
           phase:
             tag: value
-            value: cr
+            value: g
           polymorph:
-            tag: value
-            value: reference
+            tag: not_applicable
+            reason: not crystalline
           charge:
             tag: value
             value: 0
@@ -10438,7 +10522,9 @@ observations:
     note: as_published='202.223'; unit='dimensionless' quoted from high-T table header (units_as_published on each substance
       table; H−H298 and Δf in kcal gfw^-1, S and −(G−H298)/T in cal deg^-1 gfw^-1); captured units_as_published ignored; printed
       value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184 J/cal); standard_pressure=1
-      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements
+      atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure); formation_basis=from_the_elements;
+      elemental_reference_state_tables=Ca=B1259 reference-state table p.37/PDF p.43, P=B1259 reference-state table p.60/PDF
+      p.66
     source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0174-whitlockite.json
     record: b1259-ht-0174-whitlockite
   read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0174-whitlockite.json
