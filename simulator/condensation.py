@@ -4545,6 +4545,37 @@ class CondensationModel:
                     wall_carrier_authority_by_species[str(species)] = (
                         copy.deepcopy(dict(prior_record))
                     )
+                else:
+                    prior_extra = prior_record.get('extra', {})
+                    current_extra = (
+                        current_record.get('extra', {})
+                        if isinstance(current_record, Mapping)
+                        else {}
+                    )
+                    prior_notice = (
+                        prior_extra.get('extrapolation_notice')
+                        if isinstance(prior_extra, Mapping)
+                        else None
+                    )
+                    current_notice = (
+                        current_extra.get('extrapolation_notice')
+                        if isinstance(current_extra, Mapping)
+                        else None
+                    )
+                    if (
+                        isinstance(prior_notice, Mapping)
+                        and not isinstance(current_notice, Mapping)
+                        and isinstance(current_record, Mapping)
+                    ):
+                        merged_record = copy.deepcopy(dict(current_record))
+                        merged_extra = dict(current_extra)
+                        merged_extra['extrapolation_notice'] = copy.deepcopy(
+                            dict(prior_notice)
+                        )
+                        merged_record['extra'] = merged_extra
+                        wall_carrier_authority_by_species[str(species)] = (
+                            merged_record
+                        )
         sticking_notice['vapour_carrier_authority_required'] = True
         sticking_notice['vapour_carrier_authority_by_species'] = (
             wall_carrier_authority_by_species

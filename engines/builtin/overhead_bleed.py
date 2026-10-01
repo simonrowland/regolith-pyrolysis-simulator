@@ -504,7 +504,49 @@ class BuiltinOverheadBleedProvider(ChemistryProvider):
         conductance = max(0.0, float(conductance_raw or 0.0))
         dt_hr = max(0.0, float(controls.get("dt_hr", 1.0)))
         flow_capacity = controls.get("effective_transport_capacity")
-        if isinstance(flow_capacity, EffectiveTransportCapacity):
+        headspace_volume_m3 = max(
+            0.0, float(controls.get("headspace_volume_m3") or 0.0)
+        )
+        headspace_temperature_K = max(
+            0.0, float(controls.get("headspace_temperature_K") or 0.0)
+        )
+        if headspace_volume_m3 > 0.0 and headspace_temperature_K > 0.0:
+            # The finite-headspace caller supplies p_total_bar as the predicted
+            # post-bleed pressure-equivalent for ledgered gases. Any external
+            # carrier pressure floor is excluded from process inventory. Debit
+            # exactly the excess inventory, subject to the shared flow boundary.
+            from simulator.state import GAS_CONSTANT
+
+            target_total_mol = (
+                max(0.0, float(controls.get("p_total_bar") or 0.0))
+                * 100000.0
+                * headspace_volume_m3
+                / (GAS_CONSTANT * headspace_temperature_K)
+            )
+            requested_bleed_mol = max(0.0, total_mol - target_total_mol)
+            if requested_bleed_mol <= 0.0:
+                return {}
+            # The quasi-steady pressure was solved from this tick's source and
+            # the pipe law. Apply its inventory balance exactly; an earlier
+            # one-hour effective-flow estimate must not leave the headspace
+            # above the solved end pressure. A shared pump/cold-train boundary
+            # remains a hard cap on the mass that can leave this tick.
+            bleed_total_mol = requested_bleed_mol
+            if isinstance(flow_capacity, EffectiveTransportCapacity):
+                bleed_capacity_kg = (
+                    max(0.0, flow_capacity.swallowed_flux_kg_hr) * dt_hr
+                )
+                average_molar_mass_kg_mol = total_kg / total_mol
+                bleed_total_mol = min(
+                    requested_bleed_mol,
+                    bleed_capacity_kg / average_molar_mass_kg_mol,
+                )
+            return {
+                species: min(mol, mol * bleed_total_mol / total_mol)
+                for species, mol in holdup_mol.items()
+                if mol > 0.0
+            }
+        elif isinstance(flow_capacity, EffectiveTransportCapacity):
             # The shared boundary already resolved the one allowed mass flow.
             # Downstream pressure is its diagnostic inversion only; it must
             # never be fed back into committed disposition.

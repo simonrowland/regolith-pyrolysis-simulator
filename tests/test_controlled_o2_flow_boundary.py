@@ -56,6 +56,31 @@ def test_committed_disposition_uses_shared_flow_not_diagnostic_pressure():
     assert committed == pytest.approx([0.4, 0.4, 0.4])
 
 
+def test_finite_headspace_quasi_steady_debit_respects_shared_flow_limit():
+    flow = controlled_flow_capacity(
+        pipe_capacity_kg_hr=1.0,
+        equipment_capacity_kg_hr=0.5,
+        evolved_flux_kg_hr=0.4,
+        upstream_pressure_bar=0.001,
+    )
+    molar_mass_kg_mol = 0.032
+    holdup_mol = 1.0 / molar_mass_kg_mol
+    bled = BuiltinOverheadBleedProvider._bled_species_mol(
+        {"O2": holdup_mol},
+        total_mol=holdup_mol,
+        total_kg=1.0,
+        controls={
+            "dt_hr": 1.0,
+            "effective_transport_capacity": flow,
+            "headspace_volume_m3": 1.0,
+            "headspace_temperature_K": 300.0,
+            "p_total_bar": 0.0,
+        },
+    )
+
+    assert bled["O2"] * molar_mass_kg_mol == pytest.approx(0.4)
+
+
 def test_retained_holdup_drains_and_throttle_clears_only_after_evacuation():
     first_tick = controlled_flow_capacity(
         pipe_capacity_kg_hr=10.0,

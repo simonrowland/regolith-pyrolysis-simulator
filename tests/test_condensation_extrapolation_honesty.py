@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 import math
 
 import pytest
@@ -375,10 +376,103 @@ def test_predict_flag_finite_below_band_wall_input_completes():
 
 
 @pytest.mark.parametrize("hours", [2, 24])
-def test_predict_flag_rh03_recipe_completes_with_public_flags(hours):
+def test_predict_flag_rh03_recipe_completes_with_public_flags(
+    hours, monkeypatch, record_property
+):
     from simulator.runner import PyrolysisRun
     from simulator.run_executor import RunExecutor
     from tests.test_lab_geometry_runtime import dynamic_lab_schedule, dynamic_surface_geometry_fixture
+
+    headspace_trace = []
+    if hours == 24:
+        from simulator.core import PyrolysisSimulator
+        from simulator.state import GAS_CONSTANT
+
+        original_dispatch = PyrolysisSimulator._dispatch_overhead_bleed
+
+        def capture_headspace_balance(sim, **kwargs):
+            before_mol = sim._overhead_holdup_mol()
+            before_species_kg = sim._overhead_holdup_species_kg(before_mol)
+            p_commanded_Pa = max(float(sim.melt.p_total_mbar) * 100.0, 1.0)
+            p_downstream_Pa = sim._headspace_downstream_pressure_bar(
+                kwargs.get("effective_transport_capacity")
+            ) * 100000.0
+            source_mass_kg_s = float(
+                sim._headspace_transport_source_mass_kg_s
+            )
+            k_kg_s_Pa2 = sim.overhead_model._pipe_conductance(
+                1.0,
+                sim.melt.temperature_C,
+                p_downstream_Pa=0.0,
+                species_kg_for_M_avg=before_species_kg,
+            )
+            p_ss_Pa = math.sqrt(
+                p_downstream_Pa ** 2 + source_mass_kg_s / k_kg_s_Pa2
+            ) if k_kg_s_Pa2 > 0.0 else math.inf
+            p_end_Pa = max(p_commanded_Pa, p_ss_Pa)
+            volume_m3 = sim._headspace_volume_m3()
+            temperature_K = sim._headspace_temperature_K()
+            expected_end_mol = (
+                p_end_Pa * volume_m3 / (GAS_CONSTANT * temperature_K)
+            )
+            source_mol_s = float(
+                sim._headspace_transport_source_total_mol_s
+            )
+            # At a supersaturated steady state the defining balance makes
+            # Q_mass equal to the source. Use that analytic equality instead
+            # of subtracting two near-equal pressure squares at high pressure.
+            if p_ss_Pa > p_commanded_Pa:
+                pipe_mass_rate_kg_s = source_mass_kg_s
+            else:
+                pipe_mass_rate_kg_s = max(
+                    0.0,
+                    k_kg_s_Pa2
+                    * (p_commanded_Pa ** 2 - p_downstream_Pa ** 2),
+                )
+            mean_molar_mass_kg_mol = (
+                sum(before_species_kg.values()) / sum(before_mol.values())
+                if sum(before_mol.values()) > 0.0
+                else (
+                    source_mass_kg_s / source_mol_s
+                    if source_mol_s > 0.0
+                    else 0.0
+                )
+            )
+            removal_rate_mol_s = (
+                pipe_mass_rate_kg_s / mean_molar_mass_kg_mol
+                if mean_molar_mass_kg_mol > 0.0
+                else 0.0
+            )
+            result = original_dispatch(sim, **kwargs)
+            after_mol = sim._overhead_holdup_mol()
+            headspace_trace.append({
+                "commanded_pressure_Pa": p_commanded_Pa,
+                "steady_pressure_Pa": p_ss_Pa,
+                "end_pressure_Pa": p_end_Pa,
+                "actual_pressure_Pa": (
+                    sum(after_mol.values()) * GAS_CONSTANT * temperature_K
+                    / volume_m3
+                ),
+                "source_mass_kg_s": source_mass_kg_s,
+                "source_mol_s": source_mol_s,
+                "removed_mol": sum(before_mol.values())
+                - sum(after_mol.values()),
+                "expected_removed_mol": max(
+                    0.0, sum(before_mol.values()) - expected_end_mol
+                ),
+                "residence_time_s": (
+                    expected_end_mol / removal_rate_mol_s
+                    if removal_rate_mol_s > 0.0
+                    else math.inf
+                ),
+            })
+            return result
+
+        monkeypatch.setattr(
+            PyrolysisSimulator,
+            "_dispatch_overhead_bleed",
+            capture_headspace_balance,
+        )
 
     schedule = dynamic_lab_schedule()
     schedule["id"] = "RH03-paired-temperature"
@@ -434,13 +528,89 @@ def test_predict_flag_rh03_recipe_completes_with_public_flags(hours):
         )
     assert document["per_hour_summary"][0]["T_C"] == 2200.0
     if hours == 24:
-        total_pressures_bar = [
-            float(row["P_total_bar"])
+        assert len(headspace_trace) == len(document["per_hour_summary"]) == 24
+        record_property(
+            "r12b_rh03_headspace_trace",
+            json.dumps([
+                {
+                    "hour": index + 1,
+                    "commanded_mbar": trace["commanded_pressure_Pa"] / 100.0,
+                    "steady_mbar": trace["steady_pressure_Pa"] / 100.0,
+                    "over_command_mbar": max(
+                        0.0,
+                        trace["steady_pressure_Pa"]
+                        - trace["commanded_pressure_Pa"],
+                    ) / 100.0,
+                    "source_mol_s": trace["source_mol_s"],
+                    "tau_s": trace["residence_time_s"],
+                }
+                for index, trace in enumerate(headspace_trace)
+            ], separators=(",", ":")),
+        )
+        for row, snapshot, trace in zip(
+            document["per_hour_summary"], execution.snapshots, headspace_trace
+        ):
+            total_pressure_Pa = float(row["P_total_bar"]) * 100000.0
+            assert total_pressure_Pa == pytest.approx(
+                trace["end_pressure_Pa"], rel=1.0e-9, abs=0.0,
+            ), f"hour {row['hour']}: {trace!r}"
+            assert total_pressure_Pa >= trace["commanded_pressure_Pa"]
+            assert trace["removed_mol"] == pytest.approx(
+                trace["expected_removed_mol"], rel=1.0e-9, abs=1.0e-12
+            )
+            if trace["steady_pressure_Pa"] > trace["commanded_pressure_Pa"]:
+                assert snapshot.overhead.evap_exceeds_transport is True
+                assert snapshot.overhead.transport_binding_cause == (
+                    "headspace_pipe_undersized"
+                )
+        max_mass_balance_pct = max(
+            abs(float(row["mass_balance_pct"]))
             for row in document["per_hour_summary"]
-        ]
-        commanded_pressure_bar = 13.0 / 1000.0
-        assert max(total_pressures_bar) <= commanded_pressure_bar * 1.1
-        assert min(total_pressures_bar) >= commanded_pressure_bar * 0.9
+        )
+        record_property(
+            "r12b_rh03_max_mass_balance_pct",
+            str(max_mass_balance_pct),
+        )
+        assert max_mass_balance_pct <= 5.0e-12
+        assert all(
+            math.isfinite(trace["residence_time_s"])
+            for trace in headspace_trace
+            if trace["source_mass_kg_s"] > 0.0
+        )
+        kn_trace = []
+        for row in document["per_hour_summary"]:
+            if row["hour"] not in {21, 24}:
+                continue
+            wall_authority = row["vapour_batch_summary"]["metadata"].get(
+                "wall_deposit_sticking_authority", {}
+            )
+            notice = wall_authority[
+                "evaporation_transport_notices_by_species"
+            ]["SiO"]["evaporation"]
+            actual_pressure_mbar = float(row["P_total_bar"]) * 1000.0
+            actual_diagnostic = condensation.knudsen_regime_diagnostic(
+                overhead_pressure_mbar=actual_pressure_mbar,
+                gas_temperature_C=row["T_C"],
+                pipe_diameter_m=notice["pipe_diameter_m"],
+                carrier_gas=notice["carrier_gas"],
+            )
+            kn_trace.append({
+                "hour": row["hour"],
+                "row_kn": row["Kn"],
+                "flow_pressure_mbar": notice["overhead_pressure_mbar"],
+                "actual_pressure_mbar": actual_pressure_mbar,
+                "actual_kn": (
+                    actual_diagnostic["mean_free_path_m"]
+                    / notice["pipe_diameter_m"]
+                ),
+                "gas_temperature_C": row["T_C"],
+                "pipe_diameter_m": notice["pipe_diameter_m"],
+                "carrier_gas": notice["carrier_gas"],
+            })
+        record_property(
+            "r12b_rh03_kn_trace",
+            json.dumps(kn_trace, separators=(",", ":")),
+        )
         assert not any(record.get("refusal_type") == "DepositionInputRefusal"
                        for records in refused.values() for record in records.values())
         active_sio_rows = [

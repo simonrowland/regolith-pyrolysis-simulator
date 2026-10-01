@@ -334,13 +334,9 @@ def test_large_o2_headspace_bolus_pumps_down_and_is_credited_once():
         true_pipe_capacity_kg_hr
     )
     transitions_before = len(sim.atom_ledger.transitions)
-    terminal_accounts = (
-        "terminal.oxygen_melt_offgas_stored",
-        "terminal.oxygen_melt_offgas_vented_to_vacuum",
-    )
-    terminal_before_mol = sum(
-        sim.atom_ledger.mol_by_account(account).get("O2", 0.0)
-        for account in terminal_accounts
+    offgas_account = "terminal.oxygen_melt_offgas_stored"
+    offgas_before_mol = sim.atom_ledger.mol_by_account(offgas_account).get(
+        "O2", 0.0
     )
 
     sim._dispatch_overhead_bleed()
@@ -349,12 +345,16 @@ def test_large_o2_headspace_bolus_pumps_down_and_is_credited_once():
         "process.overhead_gas"
     ).get("O2", 0.0)
     removed_mol = bolus_mol - remaining_mol
-    terminal_after_mol = sum(
-        sim.atom_ledger.mol_by_account(account).get("O2", 0.0)
-        for account in terminal_accounts
+    offgas_after_mol = sim.atom_ledger.mol_by_account(offgas_account).get(
+        "O2", 0.0
     )
-    assert remaining_mol == pytest.approx(0.0, abs=1e-10)
-    assert terminal_after_mol - terminal_before_mol == pytest.approx(
+    target_mol = (
+        commanded_pressure_Pa
+        * sim._headspace_volume_m3()
+        / (STATE_GAS_CONSTANT * sim._headspace_temperature_K())
+    )
+    assert remaining_mol == pytest.approx(target_mol, rel=1e-12)
+    assert offgas_after_mol - offgas_before_mol == pytest.approx(
         removed_mol
     )
     assert sim._headspace_upstream_pressure_Pa() == pytest.approx(
@@ -362,6 +362,85 @@ def test_large_o2_headspace_bolus_pumps_down_and_is_credited_once():
     )
     for transition in sim.atom_ledger.transitions[transitions_before:]:
         transition.validate_conservation(sim.atom_ledger.registry)
+
+
+def test_steady_headspace_source_reaches_pressure_and_removes_source_each_tick():
+    sim = _transport_sim()
+    sim._overhead_headspace_config.update({"enabled": True, "volume_m3": 1.0})
+    sim.overhead_model.pipe_diameter_m = 0.01
+    sim.overhead_model.pipe_length_m = 1.0
+    sim.melt.temperature_C = 1000.0
+    sim.melt.atmosphere = Atmosphere.HARD_VACUUM
+    sim.melt.p_total_mbar = 13.0
+
+    commanded_pressure_Pa = sim.melt.p_total_mbar * 100.0
+    volume_m3 = sim._headspace_volume_m3()
+    temperature_K = sim._headspace_temperature_K()
+    species_basis = {"O2": 1.0}
+    k_kg_s_Pa2 = sim.overhead_model._pipe_conductance(
+        1.0,
+        sim.melt.temperature_C,
+        p_downstream_Pa=0.0,
+        species_kg_for_M_avg=species_basis,
+    )
+    assert k_kg_s_Pa2 > 0.0
+    steady_pressure_Pa = 2.0 * commanded_pressure_Pa
+    source_mass_kg_s = k_kg_s_Pa2 * steady_pressure_Pa ** 2
+    oxygen_molar_mass_kg_mol = core_module.OXYGEN_MOLAR_MASS_KG_PER_MOL
+    source_mol_per_tick = source_mass_kg_s * 3600.0 / oxygen_molar_mass_kg_mol
+
+    sim.atom_ledger.load_external_mol(
+        "process.overhead_gas",
+        {
+            "O2": (
+                commanded_pressure_Pa * volume_m3
+                / (STATE_GAS_CONSTANT * temperature_K)
+            )
+        },
+        source="steady-headspace test setpoint inventory",
+        material_origin="feedstock",
+    )
+
+    removed_per_tick = []
+    pressure_per_tick = []
+    for hour in range(2):
+        sim.atom_ledger.load_external_mol(
+            "process.overhead_gas",
+            {"O2": source_mol_per_tick},
+            source=f"steady-headspace test source hour {hour + 1}",
+            material_origin="feedstock",
+        )
+        sim._headspace_transport_source_mass_kg_s = source_mass_kg_s
+        sim._headspace_transport_source_total_mol_s = (
+            source_mass_kg_s / oxygen_molar_mass_kg_mol
+        )
+        sim._headspace_transport_source_o2_mol_s = (
+            source_mass_kg_s / oxygen_molar_mass_kg_mol
+        )
+        before_mol = sum(sim._overhead_holdup_mol().values())
+        result = sim._dispatch_overhead_bleed()
+        after_mol = sum(sim._overhead_holdup_mol().values())
+        removed_per_tick.append(before_mol - after_mol)
+        pressure_per_tick.append(
+            after_mol * STATE_GAS_CONSTANT * temperature_K / volume_m3
+        )
+        expected_remaining_mol = (
+            steady_pressure_Pa * volume_m3
+            / (STATE_GAS_CONSTANT * temperature_K)
+        )
+        assert removed_per_tick[-1] == pytest.approx(
+            max(0.0, before_mol - expected_remaining_mol), rel=1.0e-12
+        )
+        assert result.status == "ok"
+
+    assert pressure_per_tick == pytest.approx(
+        [steady_pressure_Pa, steady_pressure_Pa], rel=1.0e-12
+    )
+    # First tick fills the difference between commanded and steady inventory;
+    # once at steady state, the next tick's removal equals its source exactly.
+    assert removed_per_tick[1] == pytest.approx(
+        source_mol_per_tick, rel=1.0e-12
+    )
 
 
 def test_evaporation_buffer_source_reaches_transport_ledger():
