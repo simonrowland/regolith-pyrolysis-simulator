@@ -204,7 +204,65 @@ INTEGER_GLUE_NO_UNIQUE_SPLIT = (
 FORMULA_UNRESOLVED_REASON_PREFIX = "no page-grounded formula;"
 FORMULA_CONFLICT_REASON_PREFIX = "conflicting page-grounded formulas;"
 _TRAILING_JUNK_RE = re.compile(r"[^0-9eE.+-]+$")
-_DIATOMIC_GASES = frozenset({"O", "H", "N", "F", "Cl"})
+# B1259 prints these reference-state schedules in its element tables and
+# transition summary. Each entry is:
+# (printed page, PDF page, initial phase, initial polymorph, initial formula,
+#  ((transition K, next phase, next polymorph, next formula), ...)).
+# Polymorph.REFERENCE is retained where the bulletin names a crystal form that
+# the closed polymorph vocabulary cannot represent.
+_B1259_ELEMENT_REFERENCE_STATES = {
+    "Ag": (26, 32, Phase.CR, Polymorph.REFERENCE, "Ag", (("1234", Phase.L, None, "Ag"),)),
+    "Al": (27, 33, Phase.CR, Polymorph.REFERENCE, "Al", (("933", Phase.L, None, "Al"),)),
+    "As": (28, 34, Phase.CR, Polymorph.REFERENCE, "As", (("885", Phase.G, None, "As4"),)),
+    "Au": (29, 35, Phase.CR, Polymorph.REFERENCE, "Au", (("1336", Phase.L, None, "Au"),)),
+    "B": (30, 36, Phase.CR, Polymorph.REFERENCE, "B", ()),
+    "Ba": (31, 37, Phase.CR, Polymorph.BCC, "Ba", (("648", Phase.CR, Polymorph.BETA, "Ba"), ("983", Phase.L, None, "Ba"), ("1895", Phase.G, None, "Ba"))),
+    "Be": (98, 104, Phase.CR, Polymorph.REFERENCE, "Be", (("1556", Phase.L, None, "Be"),)),
+    "Bi": (33, 39, Phase.CR, Polymorph.REFERENCE, "Bi", (("544.5", Phase.L, None, "Bi"),)),
+    "Br": (34, 40, Phase.L, None, "Br", (("332.62", Phase.G, None, "Br2"),)),
+    "C": (35, 41, Phase.CR, Polymorph.REFERENCE, "C", ()),
+    "Ca": (37, 43, Phase.CR, Polymorph.ALPHA, "Ca", (("737", Phase.CR, Polymorph.BETA, "Ca"), ("1123", Phase.L, None, "Ca"), ("1756", Phase.G, None, "Ca"))),
+    "Ce": (39, 45, Phase.CR, Polymorph.ALPHA, "Ce", (("1003", Phase.CR, Polymorph.BETA, "Ce"), ("1077", Phase.L, None, "Ce"))),
+    "Cd": (38, 44, Phase.CR, Polymorph.REFERENCE, "Cd", (("594.18", Phase.L, None, "Cd"), ("1040", Phase.G, None, "Cd"))),
+    "Cl": (40, 46, Phase.G, None, "Cl2", ()),
+    "Co": (105, 111, Phase.CR, Polymorph.ALPHA, "Co", (("700", Phase.CR, Polymorph.BETA, "Co"), ("1394", Phase.CR, Polymorph.BETA, "Co"), ("1768", Phase.L, None, "Co"))),
+    "Cr": (42, 48, Phase.CR, Polymorph.BCC, "Cr", ()),
+    "Cu": (43, 49, Phase.CR, Polymorph.REFERENCE, "Cu", (("1356", Phase.L, None, "Cu"),)),
+    "F": (44, 50, Phase.G, None, "F2", ()),
+    "Fe": (45, 51, Phase.CR, Polymorph.ALPHA, "Fe", (("1184", Phase.CR, Polymorph.GAMMA, "Fe"), ("1665", Phase.CR, Polymorph.DELTA, "Fe"), ("1809", Phase.L, None, "Fe"))),
+    "Ge": (None, None, None, None, None, ()),
+    "H": (46, 52, Phase.G, None, "H2", ()),
+    "Hf": (47, 53, Phase.CR, Polymorph.REFERENCE, "Hf", ()),
+    "Hg": (48, 54, Phase.L, None, "Hg", (("629.73", Phase.G, None, "Hg"),)),
+    "I": (49, 55, Phase.CR, Polymorph.REFERENCE, "I", (("386.75", Phase.L, None, "I"), ("458.39", Phase.G, None, "I2"))),
+    "K": (50, 56, Phase.CR, Polymorph.BCC, "K", (("336.4", Phase.L, None, "K"), ("1043.7", Phase.G, None, "K"))),
+    "Li": (51, 57, Phase.CR, Polymorph.REFERENCE, "Li", (("453.69", Phase.L, None, "Li"), ("1638", Phase.G, None, "Li"))),
+    "Mg": (52, 58, Phase.CR, Polymorph.REFERENCE, "Mg", (("922", Phase.L, None, "Mg"), ("1363", Phase.G, None, "Mg"))),
+    "Mn": (53, 59, Phase.CR, Polymorph.ALPHA, "Mn", (("990", Phase.CR, Polymorph.BETA, "Mn"), ("1360", Phase.CR, Polymorph.GAMMA, "Mn"), ("1410", Phase.CR, Polymorph.DELTA, "Mn"), ("1517", Phase.L, None, "Mn"))),
+    "Mo": (54, 60, Phase.CR, Polymorph.BCC, "Mo", ()),
+    "N": (55, 61, Phase.G, None, "N2", ()),
+    "Na": (56, 62, Phase.CR, Polymorph.BCC, "Na", (("370.98", Phase.L, None, "Na"), ("1176.9", Phase.G, None, "Na"))),
+    "Nb": (57, 63, Phase.CR, Polymorph.BCC, "Nb", ()),
+    "Ni": (58, 64, Phase.CR, Polymorph.REFERENCE, "Ni", (("630", Phase.CR, Polymorph.REFERENCE, "Ni"), ("1726", Phase.L, None, "Ni"))),
+    "O": (59, 65, Phase.G, None, "O2", ()),
+    "P": (60, 66, Phase.CR, Polymorph.RED, "P", (("704", Phase.G, None, "P2"),)),
+    "Pb": (61, 67, Phase.CR, Polymorph.REFERENCE, "Pb", (("600.6", Phase.L, None, "Pb"),)),
+    "Pt": (62, 68, Phase.CR, Polymorph.REFERENCE, "Pt", ()),
+    "S": (63, 69, Phase.CR, Polymorph.ORTHORHOMBIC, "S", (("368.54", Phase.CR, Polymorph.MONOCLINIC, "S"), ("388.36", Phase.L, None, "S"), ("717.75", Phase.G, None, "S2"))),
+    "Sb": (66, 72, Phase.CR, Polymorph.REFERENCE, "Sb", (("903", Phase.L, None, "Sb"), ("1908", Phase.G, None, "Sb2"))),
+    "Se": (67, 73, Phase.CR, Polymorph.REFERENCE, "Se", (("490", Phase.L, None, "Se"), ("958", Phase.G, None, "Se2"))),
+    "Si": (68, 74, Phase.CR, Polymorph.REFERENCE, "Si", (("1685", Phase.L, None, "Si"),)),
+    "Sn": (69, 75, Phase.CR, Polymorph.REFERENCE, "Sn", (("505", Phase.L, None, "Sn"),)),
+    "Sr": (70, 76, Phase.CR, Polymorph.ALPHA, "Sr", (("862", Phase.CR, Polymorph.BETA, "Sr"), ("1043", Phase.L, None, "Sr"), ("1648", Phase.G, None, "Sr"))),
+    "Ti": (73, 79, Phase.CR, Polymorph.REFERENCE, "Ti", (("1943", Phase.L, None, "Ti"),)),
+    "Te": (71, 77, Phase.CR, Polymorph.REFERENCE, "Te", (("723", Phase.L, None, "Te"), ("1260", Phase.G, None, "Te2"))),
+    "Th": (72, 78, Phase.CR, Polymorph.ALPHA, "Th", (("1673", Phase.CR, Polymorph.BETA, "Th"), ("1968", Phase.L, None, "Th"))),
+    "U": (74, 80, Phase.CR, Polymorph.ALPHA, "U", (("941", Phase.CR, Polymorph.BETA, "U"), ("1048", Phase.CR, Polymorph.GAMMA, "U"), ("1405", Phase.L, None, "U"))),
+    "V": (75, 81, Phase.CR, Polymorph.BCC, "V", ()),
+    "W": (76, 82, Phase.CR, Polymorph.BCC, "W", ()),
+    "Zn": (77, 83, Phase.CR, Polymorph.REFERENCE, "Zn", (("692.7", Phase.L, None, "Zn"), ("1181", Phase.G, None, "Zn"))),
+    "Zr": (78, 84, Phase.CR, Polymorph.REFERENCE, "Zr", (("1143.2", Phase.CR, Polymorph.BCC, "Zr"),)),
+}
 _SUBSCRIPT_TRANSLATION = str.maketrans(
     {
         "₀": "0",
@@ -1294,50 +1352,73 @@ def _phase_state(record: Mapping[str, Any]) -> tuple[State[Phase], State[Polymor
     return phase, polymorph
 
 
-def _element_reference_species(symbol: str) -> Species:
-    if symbol in _DIATOMIC_GASES:
-        return make_species(f"{symbol}2", Phase.G, charge=0)
-    token = resolve_printed_name_polymorph("reference")
-    polymorph = (
-        State.of(token)
-        if token is not None
-        else State.unknown("elemental reference crystals")
+def _element_reference_species(
+    symbol: str, temperature: Decimal
+) -> tuple[Species, Fraction] | None:
+    """Return B1259's elemental reference species and atoms per formula unit."""
+
+    schedule = _B1259_ELEMENT_REFERENCE_STATES.get(symbol)
+    if (
+        schedule is None
+        or schedule[2] is None
+        or temperature < Decimal("298.15")
+        or temperature > Decimal("2000")
+    ):
+        return None
+    _page, _pdf_page, phase, polymorph, formula, transitions = schedule
+    for transition, next_phase, next_polymorph, next_formula in transitions:
+        transition_temperature = Decimal(transition)
+        if temperature == transition_temperature:
+            return None
+        if temperature > transition_temperature:
+            phase, polymorph, formula = next_phase, next_polymorph, next_formula
+    counts = _parse_counts(formula)
+    atom_count = counts.get(symbol) if counts is not None else None
+    if atom_count is None:
+        return None
+    polymorph_state = (
+        State.of(polymorph)
+        if polymorph is not None
+        else State.not_applicable("not crystalline")
     )
-    return make_species(symbol, Phase.CR, polymorph, charge=0)
+    return make_species(formula, phase, polymorph_state, charge=0), atom_count
 
 
 def _formation_identity(
-    product: Species, basis: str
+    product: Species, basis: str, temperature: Decimal
 ) -> tuple[Reaction, tuple[tuple[str, Species], ...]] | None:
     counts = _parse_counts(product.formula)
     if counts is None:
         return None
-    elements = tuple(
-        (element, _element_reference_species(element)) for element in sorted(counts)
-    )
     terms = [ReactionTerm(product, Fraction(1))]
     if basis != "from_the_elements":
         return None
+    elements: list[tuple[str, Species]] = []
     for element, amount in counts.items():
-        if element in _DIATOMIC_GASES:
-            terms.append(ReactionTerm(_element_reference_species(element), -amount / 2))
-        else:
-            terms.append(ReactionTerm(_element_reference_species(element), -amount))
-    return Reaction(tuple(terms)), elements
+        reference = _element_reference_species(element, temperature)
+        if reference is None:
+            return None
+        species, atoms_per_formula = reference
+        elements.append((element, species))
+        terms.append(
+            ReactionTerm(species, -amount / atoms_per_formula)
+        )
+    return Reaction(tuple(terms)), tuple(sorted(elements))
 
 
 def _basis_states(
-    product: Species, basis: str | None
+    product: Species, basis: str | None, temperature: Decimal
 ) -> tuple[State[Reaction], State[tuple[tuple[str, Species], ...]]]:
     if basis not in FORMATION_BASIS_REASON:
         return (
             State.unknown(MISSING_FORMATION_BASIS_REASON),
             State.unknown(MISSING_FORMATION_BASIS_REASON),
         )
-    built = _formation_identity(product, basis)
+    built = _formation_identity(product, basis, temperature)
     if built is None:
         reason = (
-            f"formula {product.formula!r} does not parse to a closed {basis} reaction"
+            f"formula {product.formula!r} has no closed {basis} reaction at "
+            f"{temperature} K using B1259's printed elemental reference states"
         )
         return State.unknown(reason), State.unknown(reason)
     reaction, elements = built
@@ -1440,7 +1521,9 @@ def _observation(
         "standard_pressure_Pa": State.of(STANDARD_PRESSURE_PA),
     }
     if quantity in {Quantity.DELTA_FH, Quantity.DELTA_FG, Quantity.LOG10_KF}:
-        known["reaction"], known["formation_elements"] = _basis_states(species, basis)
+        known["reaction"], known["formation_elements"] = _basis_states(
+            species, basis, temperature
+        )
     identity = fill_identity(quantity, species, **known)
     published_page, pdf_page = _pages(record)
     unit = _page_units(token.table_kind, token.column)
@@ -1459,6 +1542,22 @@ def _observation(
     )
     if basis:
         note += f"; formation_basis={basis}"
+        counts = _parse_counts(species.formula)
+        if counts is not None:
+            citations = []
+            for element in sorted(counts):
+                schedule = _B1259_ELEMENT_REFERENCE_STATES.get(element)
+                if schedule is None or schedule[2] is None:
+                    citations.append(f"{element}=no printed reference-state schedule")
+                    continue
+                printed_page, pdf_page, *_ = schedule
+                source_kind = (
+                    "B1259 transition summary"
+                    if element in {"Be", "Co"}
+                    else "B1259 reference-state table"
+                )
+                citations.append(f"{element}={source_kind} p.{printed_page}/PDF p.{pdf_page}")
+            note += "; elemental_reference_state_tables=" + ", ".join(citations)
     if reconstruction is not None:
         note += (
             f"; reconstructed={reconstruction['value']!s} "

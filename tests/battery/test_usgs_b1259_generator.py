@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import json
 from decimal import Decimal
+from fractions import Fraction
 from pathlib import Path
 
 import yaml
@@ -178,6 +179,93 @@ def test_silver_400k_gibbs_function_sign_convention() -> None:
     assert gef
     assert "-(G_T-H_298)/T" in gef[0]["reason"]
     assert generated.report["gibbs_function_sign"]["printed_column"] == "-(G_T-H_298)/T"
+
+
+def test_formation_references_follow_b1259_temperature_schedules() -> None:
+    lime = _generation("b1259-ht-0077-lime")
+    lime_gibbs = _observations_for(
+        lime, Quantity.DELTA_FG, temperature="1200", formula="CaO"
+    )
+    assert len(lime_gibbs) == 1
+    lime_obs = lime_gibbs[0]
+    lime_elements = dict(lime_obs.identity.formation_elements.value)
+    assert lime_elements["Ca"].formula == "Ca"
+    assert lime_elements["Ca"].phase.value is Phase.L
+    assert "Ca=B1259 reference-state table p.37/PDF p.43" in (
+        lime_obs.locator.note or ""
+    )
+    lime_reaction = lime_obs.identity.reaction.value
+    calcium_term = next(term for term in lime_reaction.terms if term.species.formula == "Ca")
+    assert calcium_term.coefficient == -1
+
+    rutile = _generation("b1259-ht-0121-rutile")
+    rutile_gibbs = _observations_for(
+        rutile, Quantity.DELTA_FG, temperature="2000", formula="TiO2"
+    )
+    assert len(rutile_gibbs) == 1
+    rutile_elements = dict(rutile_gibbs[0].identity.formation_elements.value)
+    assert rutile_elements["Ti"].phase.value is Phase.L
+    assert "Ti=B1259 reference-state table p.73/PDF p.79" in (
+        rutile_gibbs[0].locator.note or ""
+    )
+
+    for symbol, transition in (
+        ("Ca", "737"),
+        ("Ca", "1123"),
+        ("Ca", "1756"),
+        ("Ti", "1943"),
+        ("S", "368.54"),
+        ("Zr", "1143.2"),
+    ):
+        assert generator._element_reference_species(symbol, Decimal(transition)) is None
+    beryllium = generator._element_reference_species("Be", Decimal("1200"))
+    assert beryllium is not None
+    assert beryllium[0].phase.value is Phase.CR
+    assert generator._element_reference_species("Be", Decimal("1556")) is None
+    cobalt = generator._element_reference_species("Co", Decimal("1200"))
+    assert cobalt is not None
+    assert cobalt[0].polymorph.value.value == "beta"
+    assert generator._element_reference_species("Co", Decimal("1394")) is None
+    assert generator._element_reference_species("Ge", Decimal("1200")) is None
+
+
+def test_polyatomic_gaseous_reference_stoichiometry() -> None:
+    arsenic = generator._element_reference_species("As", Decimal("900"))
+    assert arsenic is not None
+    arsenic_species, atoms_per_formula = arsenic
+    assert arsenic_species.formula == "As4"
+    assert arsenic_species.phase.value is Phase.G
+    assert atoms_per_formula == 4
+    arsenic_oxide = generator.make_species("As2O3", Phase.CR, charge=0)
+    formation = generator._formation_identity(
+        arsenic_oxide, "from_the_elements", Decimal("900")
+    )
+    assert formation is not None
+    arsenic_term = next(
+        term for term in formation[0].terms if term.species.formula == "As4"
+    )
+    assert arsenic_term.coefficient == -Fraction(1, 2)
+
+    bromine_liquid = generator._element_reference_species("Br", Decimal("300"))
+    bromine_gas = generator._element_reference_species("Br", Decimal("400"))
+    assert bromine_liquid is not None and bromine_gas is not None
+    assert bromine_liquid[0].phase.value is Phase.L
+    assert bromine_liquid[0].formula == "Br"
+    assert bromine_gas[0].phase.value is Phase.G
+    assert bromine_gas[0].formula == "Br2"
+    assert bromine_gas[1] == 2
+
+
+def test_reference_schedule_covers_every_generated_b1259_element() -> None:
+    used = set()
+    for path in RECORDS_DIR.glob("*.json"):
+        for observation in generator.generate_record(
+            json.loads(path.read_text(encoding="utf-8"))
+        ).observations:
+            counts = generator._parse_counts(observation.identity.species.formula)
+            if counts is not None:
+                used.update(counts)
+    assert used == set(generator._B1259_ELEMENT_REFERENCE_STATES)
 
 
 def test_ag_ion_logkf_identity_uses_calorie_r() -> None:
