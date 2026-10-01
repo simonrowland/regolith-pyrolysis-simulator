@@ -910,7 +910,7 @@ def _printed_orifice_diameter(experiment: Experiment) -> Decimal | None:
 
 
 def _printed_in_cell_total_pressure(observation: Observation) -> Decimal | None:
-    located = observation.point_conditions.get("total_pressure_Pa")
+    located = (observation.point_conditions or {}).get("total_pressure_Pa")
     if (
         not isinstance(located, Located)
         or located.locator is None
