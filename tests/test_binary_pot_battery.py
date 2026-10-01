@@ -3,6 +3,9 @@
 from __future__ import annotations
 
 import json
+import os
+import resource
+import time
 from pathlib import Path
 from types import SimpleNamespace
 
@@ -1343,6 +1346,172 @@ def test_simulated_crash_yields_engine_crash() -> None:
     assert cell.arm == ARM_QUALIFICATION
     assert cell.authority == AUTHORITY_EXTRAPOLATED
     assert any(notice.get("kind") == "melts_domain_gate" for notice in cell.notices)
+
+
+_TEST_ISOLATED_CELL_BOOTSTRAP = r"""
+import json
+import os
+import subprocess
+import sys
+import time
+from pathlib import Path
+
+from simulator.diagnostic_helpers.binary_pot_battery import EquilibrateCell, Po2Request
+
+for line in sys.stdin:
+    request = json.loads(line)
+    mode = request.get("simulate_crash")
+    if mode == "exit":
+        os._exit(73)
+    if mode == "grandchild":
+        marker = Path(request["why"])
+        child_code = (
+            "import time; from pathlib import Path; "
+            f"time.sleep(2.5); Path({str(marker)!r}).write_text('survived')"
+        )
+        child = subprocess.Popen([sys.executable, "-c", child_code])
+        marker.with_suffix(".pid").write_text(str(child.pid))
+        time.sleep(30)
+    po2_raw = request["po2"]
+    cell = EquilibrateCell(
+        pot_id=request["pot_id"],
+        engine=request["engine"],
+        temperature_K=float(request["temperature_K"]),
+        po2=Po2Request(
+            mode=po2_raw["mode"],
+            po2_bar=po2_raw["po2_bar"],
+            cell_material=po2_raw.get("cell_material"),
+        ),
+        status="ok",
+        refusal_reason=None,
+        engine_status="ok",
+        engine_reason=None,
+        melt_activities={},
+        gas_partial_pressures_Pa={},
+        liquid_fraction=None,
+        wall_s=0.0,
+        cpu_s=0.0,
+        hostname="worker-test",
+        arm=request["arm"],
+    )
+    sys.stdout.write(chr(30) + json.dumps(cell.as_payload()) + chr(10))
+    sys.stdout.flush()
+"""
+
+
+def _install_fake_isolated_cell_worker(
+    monkeypatch: pytest.MonkeyPatch,
+):
+    import simulator.diagnostic_helpers.binary_pot_battery as battery
+
+    battery._close_isolated_cell_workers()
+    monkeypatch.setattr(
+        battery,
+        "_ISOLATED_CELL_BOOTSTRAP",
+        _TEST_ISOLATED_CELL_BOOTSTRAP,
+    )
+    return battery
+
+
+def _run_fake_isolated_cell(
+    battery,
+    *,
+    pot_id: str,
+    simulate_crash: str | None = None,
+    why: str = "worker-test",
+    timeout_s: float = 10.0,
+) -> EquilibrateCell:
+    handle = EngineHandle(
+        name="alphamelts",
+        backend=object(),
+        available=True,
+        unavailable_reason=None,
+        takes_fo2=True,
+        supports_intrinsic_fo2=False,
+    )
+    pot = BinaryPot(
+        pot_id=pot_id,
+        kato_1993_table4_system=None,
+        why=why,
+        composition_wt_pct={"SiO2": 20.0, "FeO": 48.0, "MgO": 32.0},
+    )
+    return battery._run_cell_in_subprocess(
+        handle,
+        pot,
+        temperature_K=1700.0,
+        po2=Po2Request(mode="engine_default", po2_bar=None),
+        timeout_s=timeout_s,
+        qualification=False,
+        arm="headline",
+        notices=(),
+        authority=None,
+        certified_band=None,
+        simulate_crash=simulate_crash,
+    )
+
+
+def test_isolated_cell_worker_reuses_one_process_and_keeps_fds_bounded(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    battery = _install_fake_isolated_cell_worker(monkeypatch)
+    soft, hard = resource.getrlimit(resource.RLIMIT_NOFILE)
+    capped_soft = 256 if hard == resource.RLIM_INFINITY else min(256, hard)
+    resource.setrlimit(resource.RLIMIT_NOFILE, (capped_soft, hard))
+    fd_before = len(os.listdir("/dev/fd"))
+    try:
+        for index in range(300):
+            cell = _run_fake_isolated_cell(battery, pot_id=f"worker-{index}")
+            assert cell.status == "ok"
+        worker = battery._ISOLATED_CELL_WORKERS["alphamelts"]
+        assert worker.start_count == 1
+        assert len(os.listdir("/dev/fd")) <= fd_before + 2
+    finally:
+        battery._close_isolated_cell_workers()
+        resource.setrlimit(resource.RLIMIT_NOFILE, (soft, hard))
+
+
+def test_isolated_cell_worker_crash_refuses_one_cell_then_restarts(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    battery = _install_fake_isolated_cell_worker(monkeypatch)
+    try:
+        crashed = _run_fake_isolated_cell(
+            battery,
+            pot_id="worker-crash",
+            simulate_crash="exit",
+        )
+        assert crashed.refusal_reason == REFUSAL_ENGINE_CRASH
+        assert crashed.exit_code == 73
+        recovered = _run_fake_isolated_cell(battery, pot_id="worker-recovered")
+        assert recovered.status == "ok"
+        assert battery._ISOLATED_CELL_WORKERS["alphamelts"].start_count == 2
+    finally:
+        battery._close_isolated_cell_workers()
+
+
+def test_isolated_cell_worker_timeout_kills_sleeping_grandchild(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
+    battery = _install_fake_isolated_cell_worker(monkeypatch)
+    marker = tmp_path / "grandchild.sentinel"
+    try:
+        timed_out = _run_fake_isolated_cell(
+            battery,
+            pot_id="worker-timeout",
+            simulate_crash="grandchild",
+            why=str(marker),
+            timeout_s=0.001,
+        )
+        assert timed_out.refusal_reason == REFUSAL_TIMEOUT
+        assert marker.with_suffix(".pid").is_file()
+        time.sleep(1.0)
+        assert not marker.exists(), "worker timeout left its sleeping grandchild alive"
+        recovered = _run_fake_isolated_cell(battery, pot_id="worker-after-timeout")
+        assert recovered.status == "ok"
+        assert battery._ISOLATED_CELL_WORKERS["alphamelts"].start_count == 2
+    finally:
+        battery._close_isolated_cell_workers()
 
 
 def test_qualification_inline_adapter_gate_is_gate_refused_in_adapter() -> None:
