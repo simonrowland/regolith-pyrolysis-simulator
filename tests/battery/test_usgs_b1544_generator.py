@@ -1053,17 +1053,20 @@ def test_store_identity_gap_vs_janaf_after_polymorph_closure() -> None:
     al096 = next(
         row
         for row in janaf_al["observations"]
-        if row["observation_id"] == "nist-janaf-4th:Al-096:delta_fG:phase-window:whole"
+        if row["observation_id"]
+        == "nist-janaf-4th:Al-096:delta_fG:phase-window:whole:formation-ref-Al-001-14-34-O-029-no-transition"
     )
     o037_alpha = next(
         row
         for row in janaf_o["observations"]
-        if row["observation_id"] == "nist-janaf-4th:O-037:delta_fG:phase-window:T=open..847.000"
+        if row["observation_id"]
+        == "nist-janaf-4th:O-037:delta_fG:phase-window:T=open..847.000:formation-ref-O-029-no-transition-Si-001-before-21"
     )
     o037_beta = next(
         row
         for row in janaf_o["observations"]
-        if row["observation_id"] == "nist-janaf-4th:O-037:delta_fG:phase-window:T=847.000..open"
+        if row["observation_id"]
+        == "nist-janaf-4th:O-037:delta_fG:phase-window:T=847.000..open:formation-ref-O-029-no-transition-Si-001-21-42"
     )
 
     b1544_al = observation_from_plain(corundum)
@@ -1081,27 +1084,27 @@ def test_store_identity_gap_vs_janaf_after_polymorph_closure() -> None:
     assert janaf_beta.identity.species.polymorph.value is Polymorph.BETA
     assert b1544_beta.identity.species.polymorph.value is Polymorph.BETA
 
-    remaining_unknown = ("temperature_K", "reaction", "formation_elements")
+    remaining_mismatch = ("reaction", "formation_elements")
     al_gap = identity_equal(janaf_al2o3.identity, b1544_al.identity)
     sio2_alpha_gap = identity_equal(janaf_alpha.identity, b1544_alpha.identity)
     sio2_beta_gap = identity_equal(janaf_beta.identity, b1544_beta.identity)
-    assert al_gap.kind is IdentityEqualKind.IDENTITY_UNKNOWN
-    assert al_gap.fields == remaining_unknown
+    assert al_gap.kind is IdentityEqualKind.IDENTITY_MISMATCH
+    assert al_gap.fields == remaining_mismatch
     assert "species.polymorph" not in al_gap.fields
-    assert sio2_alpha_gap.kind is IdentityEqualKind.IDENTITY_UNKNOWN
-    assert sio2_alpha_gap.fields == remaining_unknown
+    assert sio2_alpha_gap.kind is IdentityEqualKind.IDENTITY_MISMATCH
+    assert sio2_alpha_gap.fields == remaining_mismatch
     assert "species.polymorph" not in sio2_alpha_gap.fields
-    assert sio2_beta_gap.kind is IdentityEqualKind.IDENTITY_UNKNOWN
-    assert sio2_beta_gap.fields == remaining_unknown
+    assert sio2_beta_gap.kind is IdentityEqualKind.IDENTITY_MISMATCH
+    assert sio2_beta_gap.fields == remaining_mismatch
 
-    # Remaining gap: JANAF series leave T / reaction / formation_elements
-    # unknown; B1544 stores a point with a filled formation reaction.
-    # identity_equal has no series-vs-point comparison.
+    # JANAF now carries its formation-reference reaction and elemental basis.
+    # Those identities differ from the B1544 formation-from-elements points.
+    # That reaction/basis mismatch is observable before the series/point difference.
     assert janaf_al2o3.value.kind is ValueKind.SERIES
     assert b1544_al.value.kind is ValueKind.POINT
     assert janaf_al2o3.identity.temperature_K.is_unknown
     assert b1544_al.identity.temperature_K.is_value
-    assert janaf_al2o3.identity.reaction.is_unknown
+    assert janaf_al2o3.identity.reaction.is_value
     assert b1544_al.identity.reaction.is_value
-    assert janaf_al2o3.identity.formation_elements.is_unknown
+    assert janaf_al2o3.identity.formation_elements.is_value
     assert b1544_al.identity.formation_elements.is_value
