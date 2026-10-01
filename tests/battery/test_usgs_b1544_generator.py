@@ -1035,7 +1035,7 @@ def _b1544_quartz_delta_fg(rows: list[dict], token: Polymorph) -> dict:
 
 
 def test_store_identity_gap_vs_janaf_after_polymorph_closure() -> None:
-    """Polymorph now agrees; identity_equal still cannot unify JANAF series vs B1544 points."""
+    """Temperature-matched JANAF series leave only temperature and reference polymorph unknown."""
 
     b1544_rows = _load_b1544_store_observations()
     corundum = next(
@@ -1050,20 +1050,36 @@ def test_store_identity_gap_vs_janaf_after_polymorph_closure() -> None:
 
     janaf_al = _load_yaml(JANAF_STORE_DIR / "compilations-janaf" / "janaf-Al.yaml")
     janaf_o = _load_yaml(JANAF_STORE_DIR / "compilations-janaf" / "janaf-O.yaml")
+    # B1544 Al2O3(corundum) ΔfG at 298.15 K pairs with JANAF id
+    # nist-janaf-4th:Al-096:delta_fG:phase-window:whole:formation-ref-Al-001-before-14-O-029-no-transition,
+    # whose 0–900 K crystal slice contains the point. Both references are
+    # Al(cr), but JANAF's CRYSTAL label leaves its reference polymorph unknown.
     al096 = next(
         row
         for row in janaf_al["observations"]
-        if row["observation_id"] == "nist-janaf-4th:Al-096:delta_fG:phase-window:whole"
+        if row["observation_id"]
+        == "nist-janaf-4th:Al-096:delta_fG:phase-window:whole:formation-ref-Al-001-before-14-O-029-no-transition"
     )
+    # B1544 SiO2(alpha) ΔfG at 298.15 K pairs with JANAF id
+    # nist-janaf-4th:O-037:delta_fG:phase-window:T=open..847.000:formation-ref-O-029-no-transition-Si-001-before-21,
+    # the same ten 0–800 K cells, which contain the point. Si is crystalline
+    # on both sides; JANAF does not name its crystal polymorph, so this is unknown.
     o037_alpha = next(
         row
         for row in janaf_o["observations"]
-        if row["observation_id"] == "nist-janaf-4th:O-037:delta_fG:phase-window:T=open..847.000"
+        if row["observation_id"]
+        == "nist-janaf-4th:O-037:delta_fG:phase-window:T=open..847.000:formation-ref-O-029-no-transition-Si-001-before-21"
     )
+    # B1544 SiO2(beta) ΔfG at 1000 K pairs with JANAF id
+    # nist-janaf-4th:O-037:delta_fG:phase-window:T=847.000..open:formation-ref-O-029-no-transition-Si-001-before-21,
+    # whose 900–1600 K crystal slice contains the point. Both references are
+    # Si(cr), but only B1544 names "reference" while JANAF says CRYSTAL, so
+    # the polymorph is unknown.
     o037_beta = next(
         row
         for row in janaf_o["observations"]
-        if row["observation_id"] == "nist-janaf-4th:O-037:delta_fG:phase-window:T=847.000..open"
+        if row["observation_id"]
+        == "nist-janaf-4th:O-037:delta_fG:phase-window:T=847.000..open:formation-ref-O-029-no-transition-Si-001-before-21"
     )
 
     b1544_al = observation_from_plain(corundum)
@@ -1081,27 +1097,28 @@ def test_store_identity_gap_vs_janaf_after_polymorph_closure() -> None:
     assert janaf_beta.identity.species.polymorph.value is Polymorph.BETA
     assert b1544_beta.identity.species.polymorph.value is Polymorph.BETA
 
-    remaining_unknown = ("temperature_K", "reaction", "formation_elements")
+    remaining_unknown = (
+        "temperature_K",
+        "species.polymorph",
+        "species.polymorph",
+    )
     al_gap = identity_equal(janaf_al2o3.identity, b1544_al.identity)
     sio2_alpha_gap = identity_equal(janaf_alpha.identity, b1544_alpha.identity)
     sio2_beta_gap = identity_equal(janaf_beta.identity, b1544_beta.identity)
     assert al_gap.kind is IdentityEqualKind.IDENTITY_UNKNOWN
     assert al_gap.fields == remaining_unknown
-    assert "species.polymorph" not in al_gap.fields
     assert sio2_alpha_gap.kind is IdentityEqualKind.IDENTITY_UNKNOWN
     assert sio2_alpha_gap.fields == remaining_unknown
-    assert "species.polymorph" not in sio2_alpha_gap.fields
     assert sio2_beta_gap.kind is IdentityEqualKind.IDENTITY_UNKNOWN
     assert sio2_beta_gap.fields == remaining_unknown
 
-    # Remaining gap: JANAF series leave T / reaction / formation_elements
-    # unknown; B1544 stores a point with a filled formation reaction.
-    # identity_equal has no series-vs-point comparison.
+    # JANAF stores a series coordinate rather than an identity temperature; the
+    # explicit B1544 points are temperature-matched cells within those series.
     assert janaf_al2o3.value.kind is ValueKind.SERIES
     assert b1544_al.value.kind is ValueKind.POINT
     assert janaf_al2o3.identity.temperature_K.is_unknown
     assert b1544_al.identity.temperature_K.is_value
-    assert janaf_al2o3.identity.reaction.is_unknown
+    assert janaf_al2o3.identity.reaction.is_value
     assert b1544_al.identity.reaction.is_value
-    assert janaf_al2o3.identity.formation_elements.is_unknown
+    assert janaf_al2o3.identity.formation_elements.is_value
     assert b1544_al.identity.formation_elements.is_value

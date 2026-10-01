@@ -55,9 +55,11 @@ from simulator.battery.enums import (
     AdmissionStatus,
     AmountBasis,
     AssetRole,
+    Authority,
     EvidenceClass,
     ExperimentKind,
     FO2Channel,
+    IdentityEqualKind,
     MEASURED_EVIDENCE,
     MethodToken,
     NoticeKind,
@@ -85,6 +87,7 @@ from simulator.battery.identity import (
     bar_to_pa,
     celsius_to_kelvin,
     _melt_activity_uncompared_axes,
+    identity_equal,
     profile_for,
 )
 from simulator.battery.stable_ids import (
@@ -1393,6 +1396,10 @@ def _notice_from_plain(payload: object) -> Notice:
         dropped_mass_fraction=None
         if payload.get("dropped_mass_fraction") is None
         else as_decimal(payload["dropped_mass_fraction"]),
+        authority=None
+        if payload.get("authority") is None
+        else Authority(str(payload["authority"])),
+        certification=payload.get("certification"),
     )
 
 
@@ -10309,6 +10316,50 @@ class Migrator:
         *,
         source_row_index: int | None = None,
     ) -> None:
+        source_parts = Path(source_key).parts
+        evidence_class = observation.evidence.class_
+        if (
+            observation.admission.status is AdmissionStatus.PENDING
+            and source_parts[:3] == ("data", "literature", "compilations")
+            and evidence_class.is_value
+            and evidence_class.value is EvidenceClass.COMPILATION_ASSESSED
+            and observation.locator is not None
+        ):
+            identity_outcome = identity_equal(
+                observation.identity, observation.identity
+            )
+            complete = identity_outcome.kind is IdentityEqualKind.EQUAL
+            if (
+                not complete
+                and identity_outcome.kind is IdentityEqualKind.IDENTITY_UNKNOWN
+                and identity_outcome.fields == ("temperature_K",)
+                and observation.value.kind is ValueKind.SERIES
+                and bool(observation.value.series)
+                and all(
+                    isinstance(temperature, Decimal)
+                    for temperature, _value in observation.value.series
+                )
+            ):
+                complete = True
+            if complete and observation.value.kind in {
+                ValueKind.POINT,
+                ValueKind.SERIES,
+            }:
+                observation = replace(
+                    observation,
+                    admission=Admission(
+                        status=AdmissionStatus.ADMITTED,
+                        reason=(
+                            "identity-complete printed cell admitted under the "
+                            "2026-09-30 compilation ruling"
+                        ),
+                        decided_by=AdmissionDecision(
+                            worker="source-level compilation ruling",
+                            date="2026-09-30",
+                            evidence=observation.locator,
+                        ),
+                    ),
+                )
         oid = observation.observation_id
         existing = self.result.observations.get(oid)
         if existing is not None:
