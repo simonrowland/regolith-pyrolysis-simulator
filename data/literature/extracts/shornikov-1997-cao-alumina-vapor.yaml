@@ -1,0 +1,801 @@
+schema_version: literature_extract.v1
+source_id: shornikov-1997-cao-alumina-vapor
+source:
+  citation: Shornikov, S. I., Stolyarova, V. L., and Shul’ts, M. M. (1997), "A Mass-Spectrometric Study of Vapor Composition and Thermodynamic Properties of CaO–Al2O3 Melts", Russian Journal of Physical Chemistry 71(1):19–22 (translation of Zh. Fiz. Khim. 71(1):23–27)
+  year: 1997
+  corpus_asset: shornikov-1997-cao-alumina-vapor.pdf
+  corpus_sha256: 77e3fd13ba6ce30de43945c4d80be1f439de1fa93dd7685f6f7dff91afe69d90
+extraction:
+  method: pdftotext -layout transcription checked against the rendered PDF page; Table 2 measured p(Ca), p(Al), and p(AlO) pressures retained, Table 1 relative ion signals retained as unscored context, Figs. 1–2 left figure-only. The printed p(O) and p(O2) columns are excluded because the paper calculates them from equilibria (1)–(3).
+  date: '2026-09-30'
+  worker: codex
+review_status: draft
+fidelity_samples:
+- species: Al
+  observation_id: shornikov_1997_table1_al_signal_condition_i
+  observable: mass_spectrum
+  field: relative_ion_intensity_as_printed
+  value: '0.12'
+  locator:
+    table: '1'
+    published_page: 20
+    pdf_page_index: 1
+    note: Condition I, x(CaO)=0.86, 1933 K
+- species: AlO
+  observation_id: shornikov_1997_table1_alo_signal_condition_i
+  observable: mass_spectrum
+  field: relative_ion_intensity_as_printed
+  value: '0.026'
+  locator:
+    table: '1'
+    published_page: 20
+    pdf_page_index: 1
+    note: Condition I, x(CaO)=0.86, 1933 K
+- species: Al2O
+  observation_id: shornikov_1997_table1_al2o_signal_condition_i
+  observable: mass_spectrum
+  field: relative_ion_intensity_as_printed
+  value: '0.010'
+  locator:
+    table: '1'
+    published_page: 20
+    pdf_page_index: 1
+    note: Condition I, x(CaO)=0.86, 1933 K; ion signal only, not a partial pressure
+- path: species.Al.observations[shornikov_1997_al_pressure_table2_1933k].values.points[0].P_Al_times_10^9_atm_as_printed
+  value: '41.7'
+  locator:
+    table: '2'
+    published_page: 20
+    pdf_page_index: 1
+    note: x(CaO)=0.143; pAl × 10^9
+- path: species.AlO.observations[shornikov_1997_alo_pressure_table2_1933k].values.points[1].P_AlO_times_10^10_atm_as_printed
+  value: '45.0'
+  locator:
+    table: '2'
+    published_page: 20
+    pdf_page_index: 1
+    note: x(CaO)=0.333; pAlO × 10^10
+- path: species.Al.observations[shornikov_1997_al_pressure_table2_1933k].values.points[3].P_Al_times_10^9_atm_as_printed
+  value: '3.82'
+  locator:
+    table: '2'
+    published_page: 20
+    pdf_page_index: 1
+    note: x(CaO)=0.625; pAl × 10^9
+- path: species.AlO.observations[shornikov_1997_alo_pressure_table2_1933k].values.points[5].P_AlO_times_10^10_atm_as_printed
+  value: '3.50'
+  locator:
+    table: '2'
+    published_page: 20
+    pdf_page_index: 1
+    note: x(CaO)=0.750; pAlO × 10^10
+- path: species.Al.observations[shornikov_1997_al_pressure_table2_1933k].values.points[6].P_Al_times_10^9_atm_as_printed
+  value: '1.68'
+  locator:
+    table: '2'
+    published_page: 20
+    pdf_page_index: 1
+    note: x(CaO)=0.860; pAl × 10^9
+- path: species.Ca.observations[shornikov_1997_ca_pressure_table2_1933k].values.points[0].P_Ca_times_10^9_atm_as_printed
+  value: '5.26'
+  locator:
+    table: '2'
+    published_page: 20
+    pdf_page_index: 1
+    note: x(CaO)=0.143; pCa × 10^9
+benches:
+- id: shornikov-1997-mo-kems
+  identity:
+    basis: described_in_this_work
+  apparatus_family:
+    state:
+      tag: value
+      value: MI-201 mass spectrometer with Knudsen cells
+    locator:
+      published_page: 19
+      pdf_page_index: 0
+      section: Experimental
+  cell_materials:
+  - state:
+      tag: value
+      value: Mo
+    locator:
+      published_page: 19
+      pdf_page_index: 0
+      section: Experimental
+      note: The paper specifies molybdenum Knudsen cells.
+  cell_material_and_liner:
+    state:
+      tag: value
+      value: Molybdenum Knudsen cells
+    locator:
+      published_page: 19
+      pdf_page_index: 0
+      section: Experimental
+      note: Cell material as printed; no liner material stated.
+experiments:
+- experiment_id: shornikov-1997-mo-cell-kems
+  bench_id: shornikov-1997-mo-kems
+  method: knudsen_effusion
+  locator:
+    published_page: 19
+    pdf_page_index: 0
+    section: Experimental
+    note: CaO–Al2O3 vapor studied by Knudsen effusion mass spectrometry.
+species:
+  Ca:
+    observations:
+    - observation_id: shornikov_1997_ca_pressure_table2_1933k
+      type: partial_pressure
+      locator:
+        table: '2'
+        published_page: 20
+        pdf_page_index: 1
+      T_range_K:
+      - 1933.0
+      - 1933.0
+      phase: gas
+      experiment: shornikov-1997-mo-cell-kems
+      regime: kems_effusion
+      units: atm as printed (pCa × 10^9); pressure_atm is normalized as printed coefficient × 10^-9 atm
+      uncertainty:
+        note: No individual uncertainty or background pressure is printed for the Ca pressure cells.
+      equipment:
+        orifice_to_sample_area_ratio:
+          value: no less than 1:400 (effusion-hole cross-section to vaporization area)
+          locator:
+            published_page: 19
+            pdf_page_index: 0
+            section: Experimental
+        calibration:
+          value: Silver vapor used as the reference for comparison of ion currents
+          locator:
+            published_page: 20
+            pdf_page_index: 1
+            note: Table 2 method description; silver vapor reference
+      values:
+        quantity: partial_pressure
+        gas_species: Ca(g)
+        method_class: measured_direct
+        admission_status: admitted
+        method: comparison of ion currents
+        method_as_printed: comparison of ion currents
+        reference_as_printed: silver vapor
+        ionization_cross_sections: calculated by the additivity rule
+        composition_component: CaO
+        composition_basis: mole fraction
+        temperature_K: 1933.0
+        pressure_scale_as_printed: pCa × 10^9
+        pressure_atm_conversion: pressure_atm = printed pCa coefficient × 10^-9 atm
+        note: The printed p(O) and p(O2) columns are author-calculated from gas-phase equilibria (1)–(3), not measured partial pressures, and are not included in this extract.
+        points:
+        - CaO_mole_fraction_as_printed: '0.143'
+          composition_mol: {CaO: '0.143', Al2O3: '0.857'}
+          P_Ca_times_10^9_atm_as_printed: '5.26'
+          pressure_atm: 5.26e-09
+          T_K: 1933.0
+          locator: {table: '2', published_page: 20, pdf_page_index: 1, note: Printed x(CaO)=0.143; pCa coefficient 5.26}
+        - CaO_mole_fraction_as_printed: '0.333'
+          composition_mol: {CaO: '0.333', Al2O3: '0.667'}
+          P_Ca_times_10^9_atm_as_printed: '14.4'
+          pressure_atm: 1.44e-08
+          T_K: 1933.0
+          locator: {table: '2', published_page: 20, pdf_page_index: 1, note: Printed x(CaO)=0.333; pCa coefficient 14.4}
+        - CaO_mole_fraction_as_printed: '0.500'
+          composition_mol: {CaO: '0.500', Al2O3: '0.500'}
+          P_Ca_times_10^9_atm_as_printed: '103'
+          pressure_atm: 1.03e-07
+          T_K: 1933.0
+          locator: {table: '2', published_page: 20, pdf_page_index: 1, note: Printed x(CaO)=0.500; pCa coefficient 103}
+        - CaO_mole_fraction_as_printed: '0.625'
+          composition_mol: {CaO: '0.625', Al2O3: '0.375'}
+          P_Ca_times_10^9_atm_as_printed: '576'
+          pressure_atm: 5.76e-07
+          T_K: 1933.0
+          locator: {table: '2', published_page: 20, pdf_page_index: 1, note: Printed x(CaO)=0.625; pCa coefficient 576}
+        - CaO_mole_fraction_as_printed: '0.632'
+          composition_mol: {CaO: '0.632', Al2O3: '0.368'}
+          P_Ca_times_10^9_atm_as_printed: '578'
+          pressure_atm: 5.78e-07
+          T_K: 1933.0
+          locator: {table: '2', published_page: 20, pdf_page_index: 1, note: Printed x(CaO)=0.632; pCa coefficient 578}
+        - CaO_mole_fraction_as_printed: '0.750'
+          composition_mol: {CaO: '0.750', Al2O3: '0.250'}
+          P_Ca_times_10^9_atm_as_printed: '880'
+          pressure_atm: 8.8e-07
+          T_K: 1933.0
+          locator: {table: '2', published_page: 20, pdf_page_index: 1, note: Printed x(CaO)=0.750; pCa coefficient 880}
+        - CaO_mole_fraction_as_printed: '0.860'
+          composition_mol: {CaO: '0.860', Al2O3: '0.140'}
+          P_Ca_times_10^9_atm_as_printed: '850'
+          pressure_atm: 8.5e-07
+          T_K: 1933.0
+          locator: {table: '2', published_page: 20, pdf_page_index: 1, note: Printed x(CaO)=0.860; pCa coefficient 850}
+        - CaO_mole_fraction_as_printed: '1.000'
+          composition_mol: {CaO: '1.000', Al2O3: '0.000'}
+          P_Ca_times_10^9_atm_as_printed: '782'
+          pressure_atm: 7.82e-07
+          T_K: 1933.0
+          locator: {table: '2', published_page: 20, pdf_page_index: 1, note: Printed x(CaO)=1.000; pCa coefficient 782}
+  Al:
+    context:
+    - observation_id: shornikov_1997_table1_al_signal_condition_i
+      type: mass_spectrum
+      locator:
+        table: '1'
+        published_page: 20
+        pdf_page_index: 1
+        note: Condition I; this work; (Al)+ column
+      units: relative ion intensity as printed ((Ca)+ = 100.00)
+      values:
+        quantity: relative_ion_intensity
+        method_class: measured_direct
+        relative_ion_intensity_as_printed: '0.12'
+        CaO_mole_fraction_as_printed: '0.86'
+        temperature_K: 1933.0
+        ionization_voltage_eV_as_printed: 70
+        note: Mass-spectral signal only; the paper does not report a partial pressure for this Table 1 cell.
+    observations:
+    - observation_id: shornikov_1997_al_pressure_table2_1933k
+      type: partial_pressure
+      locator:
+        table: '2'
+        published_page: 20
+        pdf_page_index: 1
+      T_range_K:
+      - 1933.0
+      - 1933.0
+      phase: gas
+      experiment: shornikov-1997-mo-cell-kems
+      regime: kems_effusion
+      units: atm as printed (pAl × 10^9); pressure_atm is normalized as printed coefficient × 10^-9 atm
+      uncertainty:
+        note: No individual uncertainty is printed for the Al pressure cells.
+      equipment:
+        orifice_to_sample_area_ratio:
+          value: no less than 1:400 (effusion-hole cross-section to vaporization area)
+          locator:
+            published_page: 19
+            pdf_page_index: 0
+            section: Experimental
+        calibration:
+          value: Silver vapor used as the reference for comparison of ion currents
+          locator:
+            published_page: 20
+            pdf_page_index: 1
+            note: Table 2 method description; silver vapor reference
+      values:
+        quantity: partial_pressure
+        gas_species: Al(g)
+        method_class: measured_direct
+        admission_status: admitted
+        method: comparison of ion currents
+        method_as_printed: comparison of ion currents
+        reference_as_printed: silver vapor
+        ionization_cross_sections: calculated by the additivity rule
+        composition_component: CaO
+        composition_basis: mole fraction
+        temperature_K: 1933.0
+        pressure_scale_as_printed: pAl × 10^9
+        pressure_atm_conversion: pressure_atm = printed pAl coefficient × 10^-9 atm
+        points:
+        - CaO_mole_fraction_as_printed: '0.143'
+          composition_mol: {CaO: '0.143', Al2O3: '0.857'}
+          P_Al_times_10^9_atm_as_printed: '41.7'
+          pressure_atm: 4.17e-08
+          T_K: 1933.0
+          point_conditions:
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: printed_mole_fraction
+                  amount_basis: mole_fraction
+                  components:
+                  - - CaO
+                    - '0.143'
+                  - - Al2O3
+                    - '0.857'
+              locator:
+                table: '2'
+                published_page: 20
+                pdf_page_index: 1
+                note: Printed x(CaO)=0.143; x(Al2O3)=1−x(CaO)=0.857 is the documented binary complement, not printed.
+          locator:
+            table: '2'
+            published_page: 20
+            pdf_page_index: 1
+            note: Printed x(CaO)=0.143; x(Al2O3)=0.857 is the documented binary complement, not printed; pAl coefficient 41.7
+        - CaO_mole_fraction_as_printed: '0.333'
+          composition_mol: {CaO: '0.333', Al2O3: '0.667'}
+          P_Al_times_10^9_atm_as_printed: '31.7'
+          pressure_atm: 3.17e-08
+          T_K: 1933.0
+          point_conditions:
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: printed_mole_fraction
+                  amount_basis: mole_fraction
+                  components:
+                  - - CaO
+                    - '0.333'
+                  - - Al2O3
+                    - '0.667'
+              locator:
+                table: '2'
+                published_page: 20
+                pdf_page_index: 1
+                note: Printed x(CaO)=0.333; x(Al2O3)=1−x(CaO)=0.667 is the documented binary complement, not printed.
+          locator:
+            table: '2'
+            published_page: 20
+            pdf_page_index: 1
+            note: Printed x(CaO)=0.333; x(Al2O3)=0.667 is the documented binary complement, not printed; pAl coefficient 31.7
+        - CaO_mole_fraction_as_printed: '0.500'
+          composition_mol: {CaO: '0.500', Al2O3: '0.500'}
+          P_Al_times_10^9_atm_as_printed: '13.8'
+          pressure_atm: 1.38e-08
+          T_K: 1933.0
+          point_conditions:
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: printed_mole_fraction
+                  amount_basis: mole_fraction
+                  components:
+                  - - CaO
+                    - '0.500'
+                  - - Al2O3
+                    - '0.500'
+              locator:
+                table: '2'
+                published_page: 20
+                pdf_page_index: 1
+                note: Printed x(CaO)=0.500; x(Al2O3)=1−x(CaO)=0.500 is the documented binary complement, not printed.
+          locator:
+            table: '2'
+            published_page: 20
+            pdf_page_index: 1
+            note: Printed x(CaO)=0.500; x(Al2O3)=0.500 is the documented binary complement, not printed; pAl coefficient 13.8
+        - CaO_mole_fraction_as_printed: '0.625'
+          composition_mol: {CaO: '0.625', Al2O3: '0.375'}
+          P_Al_times_10^9_atm_as_printed: '3.82'
+          pressure_atm: 3.82e-09
+          T_K: 1933.0
+          point_conditions:
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: printed_mole_fraction
+                  amount_basis: mole_fraction
+                  components:
+                  - - CaO
+                    - '0.625'
+                  - - Al2O3
+                    - '0.375'
+              locator:
+                table: '2'
+                published_page: 20
+                pdf_page_index: 1
+                note: Printed x(CaO)=0.625; x(Al2O3)=1−x(CaO)=0.375 is the documented binary complement, not printed.
+          locator:
+            table: '2'
+            published_page: 20
+            pdf_page_index: 1
+            note: Printed x(CaO)=0.625; x(Al2O3)=0.375 is the documented binary complement, not printed; pAl coefficient 3.82
+        - CaO_mole_fraction_as_printed: '0.632'
+          composition_mol: {CaO: '0.632', Al2O3: '0.368'}
+          P_Al_times_10^9_atm_as_printed: '3.29'
+          pressure_atm: 3.29e-09
+          T_K: 1933.0
+          point_conditions:
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: printed_mole_fraction
+                  amount_basis: mole_fraction
+                  components:
+                  - - CaO
+                    - '0.632'
+                  - - Al2O3
+                    - '0.368'
+              locator:
+                table: '2'
+                published_page: 20
+                pdf_page_index: 1
+                note: Printed x(CaO)=0.632; x(Al2O3)=1−x(CaO)=0.368 is the documented binary complement, not printed.
+          locator:
+            table: '2'
+            published_page: 20
+            pdf_page_index: 1
+            note: Printed x(CaO)=0.632; x(Al2O3)=0.368 is the documented binary complement, not printed; pAl coefficient 3.29
+        - CaO_mole_fraction_as_printed: '0.750'
+          composition_mol: {CaO: '0.750', Al2O3: '0.250'}
+          P_Al_times_10^9_atm_as_printed: '1.97'
+          pressure_atm: 1.97e-09
+          T_K: 1933.0
+          point_conditions:
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: printed_mole_fraction
+                  amount_basis: mole_fraction
+                  components:
+                  - - CaO
+                    - '0.750'
+                  - - Al2O3
+                    - '0.250'
+              locator:
+                table: '2'
+                published_page: 20
+                pdf_page_index: 1
+                note: Printed x(CaO)=0.750; x(Al2O3)=1−x(CaO)=0.250 is the documented binary complement, not printed.
+          locator:
+            table: '2'
+            published_page: 20
+            pdf_page_index: 1
+            note: Printed x(CaO)=0.750; x(Al2O3)=0.250 is the documented binary complement, not printed; pAl coefficient 1.97
+        - CaO_mole_fraction_as_printed: '0.860'
+          composition_mol: {CaO: '0.860', Al2O3: '0.140'}
+          P_Al_times_10^9_atm_as_printed: '1.68'
+          pressure_atm: 1.68e-09
+          T_K: 1933.0
+          point_conditions:
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: printed_mole_fraction
+                  amount_basis: mole_fraction
+                  components:
+                  - - CaO
+                    - '0.860'
+                  - - Al2O3
+                    - '0.140'
+              locator:
+                table: '2'
+                published_page: 20
+                pdf_page_index: 1
+                note: Printed x(CaO)=0.860; x(Al2O3)=1−x(CaO)=0.140 is the documented binary complement, not printed.
+          locator:
+            table: '2'
+            published_page: 20
+            pdf_page_index: 1
+            note: Printed x(CaO)=0.860; x(Al2O3)=0.140 is the documented binary complement, not printed; pAl coefficient 1.68
+  AlO:
+    context:
+    - observation_id: shornikov_1997_table1_alo_signal_condition_i
+      type: mass_spectrum
+      locator:
+        table: '1'
+        published_page: 20
+        pdf_page_index: 1
+        note: Condition I; this work; (AlO)+ column
+      units: relative ion intensity as printed ((Ca)+ = 100.00)
+      values:
+        quantity: relative_ion_intensity
+        method_class: measured_direct
+        relative_ion_intensity_as_printed: '0.026'
+        CaO_mole_fraction_as_printed: '0.86'
+        temperature_K: 1933.0
+        ionization_voltage_eV_as_printed: 70
+        note: Mass-spectral signal only; the paper does not report a partial pressure for this Table 1 cell.
+    observations:
+    - observation_id: shornikov_1997_alo_pressure_table2_1933k
+      type: partial_pressure
+      locator:
+        table: '2'
+        published_page: 20
+        pdf_page_index: 1
+      T_range_K:
+      - 1933.0
+      - 1933.0
+      phase: gas
+      experiment: shornikov-1997-mo-cell-kems
+      regime: kems_effusion
+      units: atm as printed (pAlO × 10^10); pressure_atm is normalized as printed coefficient × 10^-10 atm
+      uncertainty:
+        note: No individual uncertainty is printed for the AlO pressure cells.
+      equipment:
+        orifice_to_sample_area_ratio:
+          value: no less than 1:400 (effusion-hole cross-section to vaporization area)
+          locator:
+            published_page: 19
+            pdf_page_index: 0
+            section: Experimental
+        calibration:
+          value: Silver vapor used as the reference for comparison of ion currents
+          locator:
+            published_page: 20
+            pdf_page_index: 1
+            note: Table 2 method description; silver vapor reference
+      values:
+        quantity: partial_pressure
+        gas_species: AlO(g)
+        method_class: measured_direct
+        admission_status: admitted
+        method: comparison of ion currents
+        method_as_printed: comparison of ion currents
+        reference_as_printed: silver vapor
+        ionization_cross_sections: calculated by the additivity rule
+        composition_component: CaO
+        composition_basis: mole fraction
+        temperature_K: 1933.0
+        pressure_scale_as_printed: pAlO × 10^10
+        pressure_atm_conversion: pressure_atm = printed pAlO coefficient × 10^-10 atm
+        points:
+        - CaO_mole_fraction_as_printed: '0.143'
+          composition_mol: {CaO: '0.143', Al2O3: '0.857'}
+          P_AlO_times_10^10_atm_as_printed: '51.8'
+          pressure_atm: 5.18e-09
+          T_K: 1933.0
+          point_conditions:
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: printed_mole_fraction
+                  amount_basis: mole_fraction
+                  components:
+                  - - CaO
+                    - '0.143'
+                  - - Al2O3
+                    - '0.857'
+              locator:
+                table: '2'
+                published_page: 20
+                pdf_page_index: 1
+                note: Printed x(CaO)=0.143; x(Al2O3)=1−x(CaO)=0.857 is the documented binary complement, not printed.
+          locator:
+            table: '2'
+            published_page: 20
+            pdf_page_index: 1
+            note: Printed x(CaO)=0.143; x(Al2O3)=0.857 is the documented binary complement, not printed; pAlO coefficient 51.8
+        - CaO_mole_fraction_as_printed: '0.333'
+          composition_mol: {CaO: '0.333', Al2O3: '0.667'}
+          P_AlO_times_10^10_atm_as_printed: '45.0'
+          pressure_atm: 4.5e-09
+          T_K: 1933.0
+          point_conditions:
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: printed_mole_fraction
+                  amount_basis: mole_fraction
+                  components:
+                  - - CaO
+                    - '0.333'
+                  - - Al2O3
+                    - '0.667'
+              locator:
+                table: '2'
+                published_page: 20
+                pdf_page_index: 1
+                note: Printed x(CaO)=0.333; x(Al2O3)=1−x(CaO)=0.667 is the documented binary complement, not printed.
+          locator:
+            table: '2'
+            published_page: 20
+            pdf_page_index: 1
+            note: Printed x(CaO)=0.333; x(Al2O3)=0.667 is the documented binary complement, not printed; pAlO coefficient 45.0
+        - CaO_mole_fraction_as_printed: '0.500'
+          composition_mol: {CaO: '0.500', Al2O3: '0.500'}
+          P_AlO_times_10^10_atm_as_printed: '20.1'
+          pressure_atm: 2.01e-09
+          T_K: 1933.0
+          point_conditions:
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: printed_mole_fraction
+                  amount_basis: mole_fraction
+                  components:
+                  - - CaO
+                    - '0.500'
+                  - - Al2O3
+                    - '0.500'
+              locator:
+                table: '2'
+                published_page: 20
+                pdf_page_index: 1
+                note: Printed x(CaO)=0.500; x(Al2O3)=1−x(CaO)=0.500 is the documented binary complement, not printed.
+          locator:
+            table: '2'
+            published_page: 20
+            pdf_page_index: 1
+            note: Printed x(CaO)=0.500; x(Al2O3)=0.500 is the documented binary complement, not printed; pAlO coefficient 20.1
+        - CaO_mole_fraction_as_printed: '0.625'
+          composition_mol: {CaO: '0.625', Al2O3: '0.375'}
+          P_AlO_times_10^10_atm_as_printed: '6.15'
+          pressure_atm: 6.15e-10
+          T_K: 1933.0
+          point_conditions:
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: printed_mole_fraction
+                  amount_basis: mole_fraction
+                  components:
+                  - - CaO
+                    - '0.625'
+                  - - Al2O3
+                    - '0.375'
+              locator:
+                table: '2'
+                published_page: 20
+                pdf_page_index: 1
+                note: Printed x(CaO)=0.625; x(Al2O3)=1−x(CaO)=0.375 is the documented binary complement, not printed.
+          locator:
+            table: '2'
+            published_page: 20
+            pdf_page_index: 1
+            note: Printed x(CaO)=0.625; x(Al2O3)=0.375 is the documented binary complement, not printed; pAlO coefficient 6.15
+        - CaO_mole_fraction_as_printed: '0.632'
+          composition_mol: {CaO: '0.632', Al2O3: '0.368'}
+          P_AlO_times_10^10_atm_as_printed: '5.50'
+          pressure_atm: 5.5e-10
+          T_K: 1933.0
+          point_conditions:
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: printed_mole_fraction
+                  amount_basis: mole_fraction
+                  components:
+                  - - CaO
+                    - '0.632'
+                  - - Al2O3
+                    - '0.368'
+              locator:
+                table: '2'
+                published_page: 20
+                pdf_page_index: 1
+                note: Printed x(CaO)=0.632; x(Al2O3)=1−x(CaO)=0.368 is the documented binary complement, not printed.
+          locator:
+            table: '2'
+            published_page: 20
+            pdf_page_index: 1
+            note: Printed x(CaO)=0.632; x(Al2O3)=0.368 is the documented binary complement, not printed; pAlO coefficient 5.50
+        - CaO_mole_fraction_as_printed: '0.750'
+          composition_mol: {CaO: '0.750', Al2O3: '0.250'}
+          P_AlO_times_10^10_atm_as_printed: '3.50'
+          pressure_atm: 3.5e-10
+          T_K: 1933.0
+          point_conditions:
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: printed_mole_fraction
+                  amount_basis: mole_fraction
+                  components:
+                  - - CaO
+                    - '0.750'
+                  - - Al2O3
+                    - '0.250'
+              locator:
+                table: '2'
+                published_page: 20
+                pdf_page_index: 1
+                note: Printed x(CaO)=0.750; x(Al2O3)=1−x(CaO)=0.250 is the documented binary complement, not printed.
+          locator:
+            table: '2'
+            published_page: 20
+            pdf_page_index: 1
+            note: Printed x(CaO)=0.750; x(Al2O3)=0.250 is the documented binary complement, not printed; pAlO coefficient 3.50
+        - CaO_mole_fraction_as_printed: '0.860'
+          composition_mol: {CaO: '0.860', Al2O3: '0.140'}
+          P_AlO_times_10^10_atm_as_printed: '3.00'
+          pressure_atm: 3.0e-10
+          T_K: 1933.0
+          point_conditions:
+            composition:
+              state:
+                tag: value
+                value:
+                  basis: printed_mole_fraction
+                  amount_basis: mole_fraction
+                  components:
+                  - - CaO
+                    - '0.860'
+                  - - Al2O3
+                    - '0.140'
+              locator:
+                table: '2'
+                published_page: 20
+                pdf_page_index: 1
+                note: Printed x(CaO)=0.860; x(Al2O3)=1−x(CaO)=0.140 is the documented binary complement, not printed.
+          locator:
+            table: '2'
+            published_page: 20
+            pdf_page_index: 1
+            note: Printed x(CaO)=0.860; x(Al2O3)=0.140 is the documented binary complement, not printed; pAlO coefficient 3.00
+  Al2O:
+    context:
+    - observation_id: shornikov_1997_table1_al2o_signal_condition_i
+      type: mass_spectrum
+      locator:
+        table: '1'
+        published_page: 20
+        pdf_page_index: 1
+        note: Condition I; this work; (Al2O)+ column
+      units: relative ion intensity as printed ((Ca)+ = 100.00)
+      values:
+        quantity: relative_ion_intensity
+        method_class: measured_direct
+        relative_ion_intensity_as_printed: '0.010'
+        CaO_mole_fraction_as_printed: '0.86'
+        temperature_K: 1933.0
+        ionization_voltage_eV_as_printed: 70
+        note: Mass-spectral signal only; Table 2 has no Al2O partial-pressure column. No partial pressure is inferred from ion intensity.
+    observations: []
+  CaO:
+    observations:
+    - observation_id: shornikov_1997_cao_activities_fig1_figure_only
+      type: activity_coefficient
+      locator:
+        figure: '1'
+        published_page: 21
+        pdf_page_index: 2
+        note: This-work KEMS curve (1) at 1933 K; figure also compares earlier measurements and models.
+      T_range_K:
+      - 1933.0
+      - 1933.0
+      phase: CaO–Al2O3 melt
+      regime: kems_effusion
+      units: dimensionless activity as plotted
+      values:
+        quantity: CaO_activity_figure_only
+        method_class: figure_only
+        admission_status: figure_only
+        semantics: bound_not_point_ordering
+        reason: Figure 1 is not digitized; the CaO activity is reduced from measured partial pressures by the comparison method.
+  Al2O3:
+    observations:
+    - observation_id: shornikov_1997_al2o3_activities_fig1_figure_only
+      type: activity_coefficient
+      locator:
+        figure: '1'
+        published_page: 21
+        pdf_page_index: 2
+        note: This-work KEMS curve (1) at 1933 K; figure also compares earlier measurements and models.
+      T_range_K:
+      - 1933.0
+      - 1933.0
+      phase: CaO–Al2O3 melt
+      regime: kems_effusion
+      units: dimensionless activity as plotted
+      values:
+        quantity: Al2O3_activity_figure_only
+        method_class: figure_only
+        admission_status: figure_only
+        semantics: bound_not_point_ordering
+        reason: Figure 1 is not digitized; the Al2O3 activity is reduced from measured partial pressures by the comparison method.
+    - observation_id: shornikov_1997_gibbs_energy_fig2_figure_only
+      type: gibbs_table
+      locator:
+        figure: '2'
+        published_page: 21
+        pdf_page_index: 2
+        note: Formation Gibbs energy of CaO–Al2O3 melts at 1933 K; figure includes this-work KEMS results and calculated curves.
+      T_range_K:
+      - 1933.0
+      - 1933.0
+      phase: CaO–Al2O3 melt
+      regime: kems_effusion
+      units: kJ/mol as plotted
+      values:
+        quantity: CaO_Al2O3_formation_Gibbs_energy_figure_only
+        method_class: figure_only
+        admission_status: figure_only
+        semantics: bound_not_point_ordering
+        reason: Figure 2 is not digitized; no numeric Gibbs-energy points are transcribed.
