@@ -102,6 +102,22 @@ def _pure_standard_identity(identity, quantity: Quantity):
     )
 
 
+def _gas_thermo(
+    formula: str = "K",
+    quantity: Quantity = Quantity.CP,
+    temperature_K: Decimal = Decimal("1200"),
+):
+    identity = F.o2_identity(temperature_K)
+    identity = replace(
+        identity,
+        quantity=quantity,
+        species=Species(formula, Phase.G),
+        reaction=State.not_applicable("pure standard-state thermo"),
+        formation_elements=State.not_applicable("not a formation quantity"),
+    )
+    return identity
+
+
 def _context(*observations, works=None, experiments=None, origins=None):
     work = replace(
         F.work(),
@@ -576,6 +592,148 @@ def test_compilation_census_requires_identity_equal_before_pure_phase(monkeypatc
     assert calls == []
 
 
+def test_vaporock_gas_shomate_values_are_janaf_fidelity_checks() -> None:
+    import hashlib
+    from pathlib import Path
+
+    import pytest
+
+    pytest.importorskip("vaporock.equil")
+
+    identity = _gas_thermo(temperature_K=Decimal("1200"))
+    expected = {
+        Quantity.CP: (Decimal("20.787"), Decimal("0.01")),
+        Quantity.S: (Decimal("189.284"), Decimal("0.3")),
+        Quantity.H_MINUS_H298: (Decimal("18.746"), Decimal("0.001")),
+    }
+    attempts = {}
+    for quantity, (printed, tolerance) in expected.items():
+        attempt = predict_thermo_attempt(
+            Engine.VAPOROCK,
+            F.observation(
+                f"kgas-{quantity.value}",
+                "exp-1",
+                replace(identity, quantity=quantity),
+                printed,
+            ),
+        )
+        assert attempt.refusal_reason is None
+        assert attempt.value is not None
+        assert abs(attempt.value - printed) < tolerance
+        assert "implementation-fidelity" in attempt.call_evidence
+        attempts[quantity] = attempt
+
+    evidence = attempts[Quantity.CP].call_evidence
+    fields = dict(
+        item.split("=", 1)
+        for item in evidence.split(":")
+        if "=" in item
+    )
+    table_path = Path(fields["janaf_csv_path"])
+    assert table_path.is_file()
+    table_sha256 = hashlib.sha256(table_path.read_bytes()).hexdigest()
+    assert fields["janaf_csv_sha256"] == table_sha256
+    assert len(fields["vaporock_git_sha"]) == 40
+    assert fields["vaporock_git_dirty"] in {"true", "false"}
+    assert all(
+        all(f"{name}=" in attempt.call_evidence for name in fields)
+        for attempt in attempts.values()
+    )
+
+    assert attempts[Quantity.CP].unit == "J_per_declared_mol_basis_per_K"
+    assert attempts[Quantity.S].unit == "J_per_declared_mol_basis_per_K"
+    assert attempts[Quantity.H_MINUS_H298].unit == "kJ_per_declared_mol_basis"
+
+    reference = F.observation(
+        "kgas-cp-janaf",
+        "exp-1",
+        replace(identity, quantity=Quantity.CP),
+        Decimal("20.787"),
+        evidence=EvidenceClass.COMPILATION_ASSESSED,
+        source_id="nist-janaf-4th",
+    )
+    residual, candidate = compile_residual(
+        reference,
+        Engine.VAPOROCK,
+        context=_context(reference),
+        comparison_ids=set(),
+    )
+    assert candidate is not None
+    assert residual.source_relation is SourceRelation.SAME_INPUT
+    assert all(
+        f"{name}=" in residual.execution.call_evidence for name in fields
+    )
+    assert any(
+        notice.kind is NoticeKind.DERIVATION_USES_COMPILATION
+        for notice in residual.notices
+    )
+    assert "implementation-fidelity" in residual.execution.call_evidence
+    assert decision_band_for(Quantity.CP, SourceRelation.SAME_INPUT) is None
+
+
+def test_vaporock_gas_refuses_missing_species_and_out_of_interval() -> None:
+    import pytest
+
+    pytest.importorskip("vaporock.equil")
+
+    identity = _gas_thermo()
+    charged = replace(
+        identity,
+        species=replace(identity.species, charge=State.of(Decimal("1"))),
+    )
+    charged_attempt = predict_thermo_attempt(
+        Engine.VAPOROCK,
+        F.observation("k-plus-gas", "exp-1", charged, Decimal("0")),
+    )
+    assert charged_attempt.value is None
+    assert charged_attempt.refusal_reason is RefusalReason.OUTSIDE_SUPPORTED_SPECIES
+    assert charged_attempt.refusal_detail["reason"] == "vaporock-charged-species-not-in-janaf-table"
+
+    missing = predict_thermo_attempt(
+        Engine.VAPOROCK,
+        F.observation("krypton", "exp-1", _gas_thermo("Kr"), Decimal("0")),
+    )
+    assert missing.value is None
+    assert missing.refusal_reason is RefusalReason.OUTSIDE_SUPPORTED_SPECIES
+
+    outside = predict_thermo_attempt(
+        Engine.VAPOROCK,
+        F.observation(
+            "potassium-below-table",
+            "exp-1",
+            _gas_thermo(temperature_K=Decimal("1000")),
+            Decimal("0"),
+        ),
+    )
+    assert outside.value is None
+    assert outside.refusal_reason is RefusalReason.UNSUPPORTED
+    assert outside.refusal_detail["reason"] == "vaporock-temperature-outside-janaf-row"
+
+
+def test_vaporock_import_failure_is_a_typed_unavailable_refusal(monkeypatch) -> None:
+    import builtins
+
+    from simulator.battery import compilation_tier
+
+    monkeypatch.delattr(
+        compilation_tier._vaporock_gas_attempt, "_janaf_vapor", raising=False
+    )
+    original_import = builtins.__import__
+
+    def unavailable(name, *args, **kwargs):
+        if name == "vaporock.equil":
+            raise ImportError("test-only missing VapoRock")
+        return original_import(name, *args, **kwargs)
+
+    monkeypatch.setattr(builtins, "__import__", unavailable)
+    attempt = predict_thermo_attempt(
+        Engine.VAPOROCK,
+        F.observation("kgas-unavailable", "exp-1", _gas_thermo(), Decimal("0")),
+    )
+    assert attempt.value is None
+    assert attempt.refusal_reason is RefusalReason.ATTEMPTED_UNAVAILABLE
+
+
 def test_compilation_tier_is_beside_measured_and_same_source_is_flagged() -> None:
     experiment = F.tabulation_experiment()
     identity = _na2o_liquid()
@@ -966,6 +1124,59 @@ def test_pure_phase_value_is_not_reused_at_the_next_temperature(monkeypatch) -> 
         audit_compile_residual=False,
     )
     assert calls == [Decimal("0"), Decimal("500")]
+
+
+def test_vaporock_gas_series_attempts_each_temperature(monkeypatch) -> None:
+    from simulator.battery.compilation_tier import ThermoAttempt, compilation_tier_census
+
+    calls: list[Decimal] = []
+
+    def fake(engine, observation, **kwargs):
+        del engine, kwargs
+        temperature = observation.identity.temperature_K.value
+        calls.append(temperature)
+        return ThermoAttempt(
+            value=temperature,
+            unit="J_per_declared_mol_basis_per_K",
+            authority=Authority.BRIDGE,
+            notices=(),
+            refusal_reason=None,
+            refusal_detail={},
+            call_evidence=f"T={temperature}",
+        )
+
+    monkeypatch.setattr("simulator.battery.compilation_tier.predict_thermo_attempt", fake)
+    identity = replace(
+        _gas_thermo("K", Quantity.CP),
+        temperature_K=State.unknown("series"),
+    )
+    series = F.observation(
+        "kgas-cp-series",
+        "exp-1",
+        identity,
+        Decimal("0"),
+        evidence=EvidenceClass.COMPILATION_ASSESSED,
+        source_id="nist-janaf-4th",
+    )
+    series = replace(
+        series,
+        value=Value(
+            ValueKind.SERIES,
+            series=(
+                (Decimal("1200"), Decimal("20.787")),
+                (Decimal("1400"), Decimal("20.793")),
+            ),
+        ),
+    )
+
+    compilation_tier_census(
+        _context(series),
+        engines=(Engine.VAPOROCK,),
+        invoke_pure_phase=False,
+        audit_compile_residual=False,
+    )
+
+    assert calls == [Decimal("1200"), Decimal("1400")]
 
 
 def test_report_rebuilt_from_payloads_keeps_the_tier_split() -> None:
