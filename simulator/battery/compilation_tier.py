@@ -896,14 +896,21 @@ def _tier_markdown(cells: Sequence[_TierCell]) -> list[str]:
     by_engine: dict[str, list[_TierCell]] = defaultdict(list)
     by_source: dict[tuple[str, str], list[_TierCell]] = defaultdict(list)
     by_family_rail_engine_quantity: dict[
-        tuple[str, str, str, str, str], list[_TierCell]
+        tuple[str, str, str, str, str, str], list[_TierCell]
     ] = defaultdict(list)
     for cell in cells:
         by_engine[cell.engine].append(cell)
         by_source[(cell.family, cell.quantity)].append(cell)
         if cell.numeric is not None and cell.operation is MetricOperation.ABSOLUTE:
             by_family_rail_engine_quantity[
-                (cell.family, cell.rail, cell.engine, cell.quantity, cell.unit)
+                (
+                    cell.family,
+                    cell.rail,
+                    cell.engine,
+                    cell.relation.value,
+                    cell.quantity,
+                    cell.unit,
+                )
             ].append(cell)
     lines = [
         "## Compilation tier",
@@ -917,17 +924,17 @@ def _tier_markdown(cells: Sequence[_TierCell]) -> list[str]:
         "unchanged. Printed uncertainty is the reference observation's",
         "uncertainty (often none on a grid).",
         "",
-        "| compilation | rail | engine | quantity | unit | n | median abs(C−R) | "
+        "| compilation | rail | engine | relation | quantity | unit | n | median abs(C−R) | "
         "RMS (C−R) | n match | "
         "n mismatch | n no band | n same-source |",
-        "|---|---|---|---|---|---:|---:|---:|---:|---:|---:|---:|",
+        "|---|---|---|---|---|---|---:|---:|---:|---:|---:|---:|---:|",
     ]
     if not by_family_rail_engine_quantity:
         lines.append(
-            "| (none) | (none) | (none) | (none) | (none) | 0 | — | — | "
+            "| (none) | (none) | (none) | (none) | (none) | (none) | 0 | — | — | "
             "0 | 0 | 0 | 0 |"
         )
-    for (family, rail, engine, quantity, unit), bucket in sorted(
+    for (family, rail, engine, relation, quantity, unit), bucket in sorted(
         by_family_rail_engine_quantity.items()
     ):
         values = [row.numeric for row in bucket if row.numeric is not None]
@@ -946,7 +953,7 @@ def _tier_markdown(cells: Sequence[_TierCell]) -> list[str]:
             "kJ/mol" if unit == "kJ_per_declared_mol_basis" else unit
         )
         lines.append(
-            f"| {family} | {rail} | {engine} | {quantity} | {display_unit} | "
+            f"| {family} | {rail} | {engine} | {relation} | {quantity} | {display_unit} | "
             f"{len(values)} | "
             f"{_median_abs(values)} | {rms} | {len(matches)} | {len(mismatches)} | "
             f"{sum(1 for row in bucket if row.status is ResidualStatus.NO_BAND)} | "
@@ -1179,6 +1186,8 @@ def compilation_tier_census(
         ENGINE_COEFFICIENT_SOURCES,
         SCORE_ENGINE_SET,
         _validated_score_engines,
+        _printed_uncertainty_band,
+        _residual_distribution_band,
         comparison_candidates,
         decision_band_for,
         expand_coefficient_sources,
@@ -1224,6 +1233,7 @@ def compilation_tier_census(
                 "match_independent": 0,
                 "no_band": 0,
                 "residuals": [],
+                "comparisons": [],
                 "refused": defaultdict(int),
             }
             buckets[key] = found
@@ -1269,7 +1279,7 @@ def compilation_tier_census(
                 )
         return gate_keys[key]
 
-    def account(row: dict[str, object], *, attempt: ThermoAttempt | None, relation: SourceRelation, reference: Decimal | None, formula_bad: bool, gate: str | None, quantity: Quantity | None) -> str:
+    def account(row: dict[str, object], *, attempt: ThermoAttempt | None, relation: SourceRelation, reference: Decimal | None, printed_band, formula_bad: bool, gate: str | None, quantity: Quantity | None) -> str:
         if formula_bad:
             key = "identity_unknown:species_formula_unparsed"
             row["refused"][key] += 1
@@ -1283,21 +1293,10 @@ def compilation_tier_census(
             return key
         if attempt.value is not None:
             row["engine_values"] += 1
-            band = decision_band_for(quantity, relation)
             residual = attempt.value - reference
             row["numeric"] += 1
             row["residuals"].append(residual)
-            if band is None:
-                row["no_band"] += 1
-                return "no_band"
-            if relation in {SourceRelation.SAME_INPUT, SourceRelation.TRAINING}:
-                row["same_source"] += 1
-                if abs(residual) <= band.value:
-                    row["match_same_source"] += 1
-            elif relation is SourceRelation.INDEPENDENT:
-                row["independent"] += 1
-                if abs(residual) <= band.value:
-                    row["match_independent"] += 1
+            row["comparisons"].append((relation, residual, printed_band))
             return "numeric"
         key = _refusal_key(attempt.refusal_reason or RefusalReason.UNSUPPORTED, attempt.refusal_detail)
         row["refused"][key] += 1
@@ -1397,6 +1396,16 @@ def compilation_tier_census(
                         attempt=attempt,
                         relation=relation,
                         reference=reference,
+                        printed_band=(
+                            _printed_uncertainty_band(
+                                token,
+                                point.uncertainty,
+                                reference,
+                                source_observation=point,
+                            )
+                            if token is not None and reference is not None
+                            else None
+                        ),
                         formula_bad=formula_bad,
                         gate=gate,
                         quantity=token,
@@ -1432,10 +1441,7 @@ def compilation_tier_census(
                             ) if residual.refusal is not None else "none"
                         else:
                             got = f"numeric:{residual.numeric.value}:{residual.source_relation.value}"
-                        expect_band = decision_band_for(token, relation)
-                        if attempt.value is not None and expect_band is not None:
-                            expect = f"numeric:{attempt.value - reference}:{relation.value}"
-                        elif attempt.value is not None:
+                        if attempt.value is not None:
                             expect = f"numeric:{attempt.value - reference}:{relation.value}"
                         else:
                             expect = _refusal_key(
@@ -1447,6 +1453,33 @@ def compilation_tier_census(
                                 f"census/compile_residual mismatch {point.observation_id}: {got} != {expect}"
                             )
                         audited += 1
+        for (family, quantity_name), row in buckets.items():
+            quantity = Quantity(quantity_name)
+            comparisons = row["comparisons"]
+            family_band = _residual_distribution_band(
+                [
+                    residual
+                    for _relation, residual, printed_band in comparisons
+                    if printed_band is None
+                ],
+                unit=QUANTITY_UNITS[quantity],
+                family=family,
+                quantity=quantity,
+            )
+            for relation, residual, printed_band in comparisons:
+                band = printed_band or family_band
+                if band is None:
+                    band = decision_band_for(quantity, relation)
+                if band is None:
+                    row["no_band"] += 1
+                elif relation in {SourceRelation.SAME_INPUT, SourceRelation.TRAINING}:
+                    row["same_source"] += 1
+                    if abs(residual) <= band.value:
+                        row["match_same_source"] += 1
+                elif relation is SourceRelation.INDEPENDENT:
+                    row["independent"] += 1
+                    if abs(residual) <= band.value:
+                        row["match_independent"] += 1
         rendered = []
         for (family, quantity), row in sorted(buckets.items()):
             rendered.append(

@@ -31,6 +31,7 @@ from simulator.battery.enums import (
     RefusalReason,
     ResidualStatus,
     SourceRelation,
+    UncertaintyKind,
     ValueKind,
 )
 from simulator.battery.identity import log10K_from_delta_fG_kJ_mol
@@ -208,6 +209,101 @@ def test_log10_kf_follows_delta_fg_and_has_no_kj_band() -> None:
         assert decision_band_for(quantity, SourceRelation.SAME_INPUT) is None
 
 
+def test_score_store_uses_printed_cell_then_family_mad_for_unknown_relation(
+    monkeypatch,
+) -> None:
+    from simulator.battery import score as score_module
+    from simulator.battery.records import Derivation, Execution, Locator
+    from simulator.battery.score import EnginePrediction, score_store
+    from simulator.battery.validity import GateOutcome
+
+    monkeypatch.setattr(
+        score_module, "run_validity_gates", lambda *args, **kwargs: GateOutcome(True)
+    )
+
+    experiment = F.tabulation_experiment()
+    identity = replace(
+        _na2o_liquid(Quantity.CP),
+        reaction=State.not_applicable("not a formation quantity"),
+        formation_elements=State.not_applicable("not a formation quantity"),
+    )
+    offsets = ("-2", "-1", "0", "1", "10", "0.4")
+    observations = []
+    origins = {}
+    for index, offset in enumerate(offsets):
+        observation = F.observation(
+            f"cp-cell-{index}",
+            experiment.experiment_id,
+            identity,
+            Decimal(10 + index),
+            evidence=EvidenceClass.COMPILATION_ASSESSED,
+            source_id="janaf-4th",
+        )
+        if index == 5:
+            observation = replace(
+                observation,
+                uncertainty=Uncertainty(
+                    kind=UncertaintyKind.PRINTED, verbatim="0.1"
+                ),
+                locator=Locator(
+                    record="printed cp cell", note="unit='J/mol·K'"
+                ),
+                derivation=Derivation(
+                    relation="source unit normalization",
+                    inputs=(observation.observation_id,),
+                    parameters=(),
+                    output_unit="J_per_declared_mol_basis_per_K",
+                ),
+            )
+        observations.append(observation)
+        origins[observation.observation_id] = "compilations-usgs-b1452/grid.yaml"
+    ctx = _context(*observations, origins=origins)
+    offset_by_id = {
+        observation.observation_id: Decimal(offset)
+        for observation, offset in zip(observations, offsets)
+    }
+
+    def predict(engine, observation, **kwargs):
+        del kwargs
+        return EnginePrediction(
+            engine=engine,
+            channel="internal-analytical",
+            execution=Execution(ExecutionState.PRODUCED, "test prediction"),
+            value=observation.value.point + offset_by_id[observation.observation_id],
+            unit="J_per_declared_mol_basis_per_K",
+            authority=Authority.CERTIFIED,
+            coefficient_sources=("unmapped-test-source",),
+            lineage_complete=False,
+            identity=observation.identity,
+        )
+
+    residuals, _ = score_store(
+        ctx,
+        engines=(Engine.INTERNAL_ANALYTICAL,),
+        predict=predict,
+    )
+    by_reference = {residual.reference: residual for residual in residuals}
+    for observation, offset in zip(observations[:5], offsets[:5]):
+        residual = by_reference[observation.observation_id]
+        assert residual.source_relation is SourceRelation.UNKNOWN
+        assert residual.numeric is not None
+        assert residual.numeric.decision_band is not None
+        assert residual.numeric.decision_band.value == Decimal("2")
+        assert residual.numeric.decision_band.rule.startswith(
+            "compilations-usgs-b1452/cp residual distribution"
+        )
+        assert residual.status is (
+            ResidualStatus.MISMATCH if Decimal(offset) == Decimal("10") else ResidualStatus.MATCH
+        )
+    printed = by_reference[observations[5].observation_id]
+    assert printed.source_relation is SourceRelation.UNKNOWN
+    assert printed.numeric is not None
+    assert printed.numeric.decision_band is not None
+    assert printed.numeric.decision_band.value == Decimal("0.1")
+    assert printed.numeric.decision_band.rule == "source-printed per-cell uncertainty"
+    assert printed.status is ResidualStatus.MISMATCH
+
+
 def test_log10_k_star_stays_typed_outside_formation_ellingham() -> None:
     attempt = predict_thermo_attempt(
         Engine.INTERNAL_ANALYTICAL,
@@ -360,7 +456,7 @@ def test_compilation_tier_is_beside_measured_and_same_source_is_flagged() -> Non
     assert residual.numeric.unit == "kJ_per_declared_mol_basis"
     assert residual.numeric.operation.value == "absolute"
     assert residual.source_relation is SourceRelation.SAME_INPUT
-    assert residual.status is ResidualStatus.MISMATCH
+    assert residual.status is ResidualStatus.MATCH
     assert any(
         notice.kind is NoticeKind.DERIVATION_USES_COMPILATION
         and "nist-janaf-4th" in notice.reason
@@ -412,40 +508,6 @@ def test_compilation_tier_is_beside_measured_and_same_source_is_flagged() -> Non
         for notice in independent.notices
     )
 
-    ledger = replace(reference, observation_id="ledger-row", evidence=replace(
-        reference.evidence, class_=State.of(EvidenceClass.MEASURED_DIRECT)
-    ))
-    ledger_ctx = replace(
-        ctx,
-        observations={ledger.observation_id: ledger, reference.observation_id: reference},
-        origins={ledger.observation_id: "gibbs_battery_residual_ledger.yaml"},
-    )
-    from simulator.battery.records import Execution
-    from simulator.battery.score import EnginePrediction
-
-    forced, _ = compile_residual(
-        ledger,
-        Engine.INTERNAL_ANALYTICAL,
-        context=ledger_ctx,
-        comparison_ids={ledger.observation_id},
-        predict=lambda engine, obs, **kwargs: EnginePrediction(
-            engine=engine,
-            channel="internal-analytical",
-            execution=Execution(state=ExecutionState.PRODUCED, call_evidence="test"),
-            value=_PRINTED_DFG,
-            unit="kJ_per_declared_mol_basis",
-            authority=Authority.CERTIFIED,
-            coefficient_sources=("nasa-cea-thermo",),
-            lineage_complete=True,
-            identity=obs.identity,
-        ),
-    )
-    assert forced.source_relation is SourceRelation.UNKNOWN
-    assert forced.status is ResidualStatus.NO_BAND
-    assert forced.numeric is not None
-    assert forced.numeric.decision_band is None
-    assert forced.refusal is None
-
     both = replace(
         independent_ctx,
         observations={
@@ -474,7 +536,7 @@ def test_compilation_tier_is_beside_measured_and_same_source_is_flagged() -> Non
     )[0]
     assert "implementation fidelity, not" in compilation_report
     assert (
-        "| compilation | rail | engine | quantity | unit | n | median abs(C−R) | "
+        "| compilation | rail | engine | relation | quantity | unit | n | median abs(C−R) | "
         "RMS (C−R) | n match | "
         "n mismatch | n no band | n same-source |"
     ) in compilation_report
@@ -486,14 +548,14 @@ def test_compilation_tier_is_beside_measured_and_same_source_is_flagged() -> Non
         row
         for row in compilation_report.splitlines()
         if row.startswith(
-            "| compilations-janaf | thermochemistry | internal-analytical | delta_fG |"
+            "| compilations-janaf | thermochemistry | internal-analytical | same_input | delta_fG |"
         )
     )
     summary_cells = [cell.strip() for cell in summary.strip("|").split("|")]
-    assert summary_cells[4] == "kJ/mol"
-    assert summary_cells[5] == "1"
-    assert summary_cells[6] == str(abs(residual.numeric.value))
-    assert summary_cells[8:] == ["0", "1", "0", "1"]
+    assert summary_cells[5] == "kJ/mol"
+    assert summary_cells[6] == "1"
+    assert summary_cells[7] == str(abs(residual.numeric.value))
+    assert summary_cells[9:] == ["1", "0", "0", "1"]
     assert compilation_family("ATcT.yaml", None) == "ATcT"
     measured = [
         row
@@ -504,6 +566,48 @@ def test_compilation_tier_is_beside_measured_and_same_source_is_flagged() -> Non
     assert measured[0]["n_refused"] == 0
     assert measured[0]["n_scored"] == 0
     assert "| internal-analytical | 2 |" in report
+
+
+def test_unknown_relation_uses_legacy_delta_fg_fallback() -> None:
+    from simulator.battery.records import Execution
+    from simulator.battery.score import EnginePrediction
+
+    experiment = F.tabulation_experiment()
+    reference = F.observation(
+        "ledger-row",
+        experiment.experiment_id,
+        _na2o_liquid(),
+        _PRINTED_DFG,
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="nist-janaf-4th",
+    )
+    ctx = _context(
+        reference,
+        origins={reference.observation_id: "gibbs_battery_residual_ledger.yaml"},
+    )
+    residual, _ = compile_residual(
+        reference,
+        Engine.INTERNAL_ANALYTICAL,
+        context=ctx,
+        comparison_ids={reference.observation_id},
+        predict=lambda engine, obs, **kwargs: EnginePrediction(
+            engine=engine,
+            channel="internal-analytical",
+            execution=Execution(ExecutionState.PRODUCED, "test prediction"),
+            value=_PRINTED_DFG,
+            unit="kJ_per_declared_mol_basis",
+            authority=Authority.CERTIFIED,
+            coefficient_sources=("nasa-cea-thermo",),
+            lineage_complete=True,
+            identity=obs.identity,
+        ),
+    )
+    assert residual.source_relation is SourceRelation.UNKNOWN
+    assert residual.status is ResidualStatus.MATCH
+    assert residual.numeric is not None
+    assert residual.numeric.decision_band is not None
+    assert residual.numeric.decision_band.value == Decimal("1.0")
+    assert residual.numeric.decision_band.rule.startswith("LEGACY fallback:")
 
 
 def test_out_of_range_reaction_is_not_formation_gibbs() -> None:

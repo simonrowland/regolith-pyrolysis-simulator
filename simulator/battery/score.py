@@ -232,13 +232,10 @@ QUANTITY_METRIC: dict[Quantity, MetricOperation] = {
     Quantity.ISOTOPE_DELTA: MetricOperation.ABSOLUTE,
 }
 
-# Sourced decision bands (not pins). Gibbs agreement_bands_kJ_mol from the
-# residual ledger headers, in kJ/mol. Applied only to formation energies
-# whose stored unit has that dimension (delta_fG, delta_fH). cp and S are
-# J/mol/K, H-H298 is not a formation energy, and log10_Kf is dimensionless:
-# they stay unbanded until a sourced band exists. Missing band, or a band
-# whose dimension differs from the quantity, → decision_rule_missing.
-# A borrowed number is never attached.
+# Legacy ΔfG bands from the residual ledger, retained as labeled fallbacks for
+# comparisons without a compilation-derived band. The independent value is
+# used for every relation: lineage labels do not select a decision threshold.
+# Printed cell uncertainty and family residual bands supersede these values.
 # Searched and not used as decision bands (do not invent a tolerance):
 # - data/vapour_rail_validation_pins.yaml policy.margin_dex 0.01 is a pin /
 #   regression envelope; SCHEMA-PROPOSAL-v2.1 forbids using a pin as the
@@ -259,17 +256,17 @@ THERMOCHEMISTRY_DECISION_BANDS: dict[SourceRelation, DecisionBand] = {
     SourceRelation.INDEPENDENT: DecisionBand(
         Decimal("1.0"),
         "kJ_per_declared_mol_basis",
-        "gibbs_battery_residual_ledger.yaml agreement_bands_kJ_mol.independent_tabulation",
+        "LEGACY fallback: gibbs_battery_residual_ledger.yaml agreement_bands_kJ_mol.independent_tabulation",
     ),
     SourceRelation.SAME_INPUT: DecisionBand(
         Decimal("0.05"),
         "kJ_per_declared_mol_basis",
-        "gibbs_battery_residual_ledger.yaml agreement_bands_kJ_mol.engine_own_input",
+        "LEGACY historical only: gibbs_battery_residual_ledger.yaml agreement_bands_kJ_mol.engine_own_input",
     ),
     SourceRelation.TRAINING: DecisionBand(
         Decimal("0.05"),
         "kJ_per_declared_mol_basis",
-        "gibbs_battery_residual_ledger.yaml agreement_bands_kJ_mol.engine_own_input",
+        "LEGACY historical only: gibbs_battery_residual_ledger.yaml agreement_bands_kJ_mol.engine_own_input",
     ),
 }
 
@@ -1518,14 +1515,130 @@ def decision_band_for(
         band = derived_band or derive_kems_partial_pressure_band(observations, experiments)
         if band is not None and band_dimension_matches(quantity, band):
             return band
+    if derived_band is not None:
+        if band_dimension_matches(quantity, derived_band):
+            return derived_band
+        return None
     if quantity not in GIBBS_BAND_QUANTITIES:
         return None
-    band = THERMOCHEMISTRY_DECISION_BANDS.get(source_relation)
+    band = THERMOCHEMISTRY_DECISION_BANDS[SourceRelation.INDEPENDENT]
     if band is None:
         return None
     if not band_dimension_matches(quantity, band):
         return None
     return band
+
+
+def _printed_uncertainty_band(
+    quantity: Quantity,
+    uncertainty: Uncertainty | None,
+    reference: Decimal,
+    *,
+    source_observation: Observation | None = None,
+) -> DecisionBand | None:
+    """Convert a scalar printed cell uncertainty to the scorer's metric unit."""
+
+    if (
+        uncertainty is None
+        or uncertainty.kind is not UncertaintyKind.PRINTED
+        or not isinstance(uncertainty.verbatim, str)
+    ):
+        return None
+    match = re.fullmatch(
+        r"\s*(?:(?:±|\+/-)\s*)?\(?([+-]?(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][+-]?\d+)?)\)?\s*(%)?\s*",
+        uncertainty.verbatim,
+    )
+    if match is None:
+        return None
+    try:
+        width = abs(Decimal(match.group(1)))
+    except InvalidOperation:
+        return None
+    if not width.is_finite():
+        return None
+
+    operation = metric_operation(quantity)
+    if operation is None:
+        return None
+    percent = match.group(2) is not None
+    if operation is MetricOperation.RELATIVE:
+        if percent:
+            width /= Decimal(100)
+        elif reference != 0:
+            width /= abs(reference)
+        else:
+            return None
+        unit = "dimensionless"
+    elif operation is MetricOperation.DEX:
+        if reference <= 0:
+            return None
+        fraction = width / Decimal(100) if percent else width / reference
+        if fraction >= 1:
+            return None
+        ln10 = Decimal(10).ln()
+        width = max(
+            abs((Decimal(1) + fraction).ln() / ln10),
+            abs((Decimal(1) - fraction).ln() / ln10),
+        )
+        unit = "dimensionless"
+    else:
+        if percent:
+            return None
+        if source_observation is None:
+            return None
+        locator = source_observation.locator
+        derivation = source_observation.derivation
+        source_unit_match = (
+            re.search(r"\bunit='([^']+)'", locator.note)
+            if locator is not None and locator.note is not None
+            else None
+        )
+        if (
+            source_unit_match is None
+            or derivation is None
+            or derivation.output_unit != QUANTITY_UNITS[quantity]
+        ):
+            return None
+        source_unit = source_unit_match.group(1)
+        if quantity in {Quantity.DELTA_FG, Quantity.H_MINUS_H298}:
+            source_scale = {
+                "J/mol": Decimal("0.001"),
+                "kJ/mol": Decimal(1),
+                "kJ/mol at 298.15 K": Decimal(1),
+                "kcal gfw^-1": Decimal("4.184"),
+            }.get(source_unit)
+        elif quantity in {Quantity.CP, Quantity.S}:
+            source_scale = {
+                "J/mol·K": Decimal(1),
+                "cal deg^-1 gfw^-1": Decimal("4.184"),
+            }.get(source_unit)
+        elif quantity in {Quantity.LOG10_KF, Quantity.LOG10_K_STAR}:
+            source_scale = Decimal(1) if source_unit == "dimensionless" else None
+        else:
+            source_scale = None
+        if source_scale is None:
+            return None
+        width *= source_scale
+        unit = QUANTITY_UNITS[quantity]
+    return DecisionBand(width, unit, "source-printed per-cell uncertainty")
+
+
+def _residual_distribution_band(
+    values: Sequence[Decimal], *, unit: str, family: str, quantity: Quantity
+) -> DecisionBand | None:
+    """Twice the median absolute deviation for one family and quantity."""
+
+    center = _median(values)
+    if center is None:
+        return None
+    mad = _median([abs(value - center) for value in values])
+    if mad is None:
+        return None
+    return DecisionBand(
+        Decimal(2) * mad,
+        unit,
+        f"{family}/{quantity.value} residual distribution: 2x median absolute deviation",
+    )
 
 
 def populate_numeric(
@@ -3525,6 +3638,14 @@ def compile_residual(
     if implied_alpha:
         numeric, metric_reason, metric_detail = _implied_alpha_numeric(prediction.value)
     else:
+        cell_band = derived_band
+        if compilation and quantity is not Quantity.P_PARTIAL:
+            cell_band = _printed_uncertainty_band(
+                quantity,
+                reference.uncertainty,
+                ref_point,
+                source_observation=reference,
+            ) or cell_band
         numeric, metric_reason, metric_detail = populate_numeric(
             quantity=quantity,
             candidate=prediction.value,
@@ -3543,7 +3664,7 @@ def compile_residual(
             ),
             observations=context.observations,
             experiments=context.experiments,
-            derived_band=derived_band,
+            derived_band=cell_band,
         )
     if numeric is None:
         return _refused(
@@ -3799,6 +3920,7 @@ def score_store(
     if limit is not None:
         refs = refs[: int(limit)]
     from simulator.battery.compilation_tier import (
+        compilation_family,
         compilation_series_points,
         is_compilation_evidence,
     )
@@ -3806,6 +3928,7 @@ def score_store(
     comparison_ids = {o.observation_id for o in comparison_candidates(context)}
     residuals: list[Residual] = []
     candidates: dict[str, Observation] = {}
+    compilation_family_by_reference: dict[str, tuple[str, Quantity]] = {}
     # Snapshot. Engine candidates are returned separately and are not
     # lineage inputs. The work-input index is this snapshot.
     observations = dict(context.observations)
@@ -3853,6 +3976,11 @@ def score_store(
                     and not is_internal_consistency(point_origin)
                     and not is_sf04_workbook(point)
                 )
+                if compilation_thermo and quantity is not None:
+                    compilation_family_by_reference[point.observation_id] = (
+                        compilation_family(point.source_id, point_origin),
+                        quantity,
+                    )
                 for engine in engine_set:
                     prediction = None
                     if (
@@ -3900,6 +4028,63 @@ def score_store(
                             flush=True,
                         )
                         last_progress = now
+    family_residuals: dict[tuple[str, Quantity, str], list[Decimal]] = {}
+    for residual in residuals:
+        family_quantity = compilation_family_by_reference.get(residual.reference)
+        if residual.numeric is None or family_quantity is None:
+            continue
+        if residual.numeric.decision_band is not None and residual.numeric.decision_band.rule == "source-printed per-cell uncertainty":
+            continue
+        if any(
+            _is_flagged_stratum_notice(notice)
+            or _is_fusion_conversion_notice(notice)
+            for notice in residual.notices
+        ):
+            continue
+        family, quantity = family_quantity
+        key = (family, quantity, residual.numeric.unit)
+        family_residuals.setdefault(key, []).append(residual.numeric.value)
+    family_bands = {
+        key: _residual_distribution_band(
+            values, unit=key[2], family=key[0], quantity=key[1]
+        )
+        for key, values in family_residuals.items()
+    }
+    banded_residuals: list[Residual] = []
+    for residual in residuals:
+        family_quantity = compilation_family_by_reference.get(residual.reference)
+        numeric = residual.numeric
+        if (
+            numeric is None
+            or family_quantity is None
+            or (
+                numeric.decision_band is not None
+                and numeric.decision_band.rule == "source-printed per-cell uncertainty"
+            )
+            or any(
+                _is_flagged_stratum_notice(notice)
+                or _is_fusion_conversion_notice(notice)
+                for notice in residual.notices
+            )
+        ):
+            banded_residuals.append(residual)
+            continue
+        family, quantity = family_quantity
+        band = family_bands.get((family, quantity, numeric.unit))
+        if band is None:
+            band = decision_band_for(quantity, residual.source_relation)
+        if band is None or not band_dimension_matches(quantity, band):
+            banded_residuals.append(residual)
+            continue
+        updated_numeric = replace(numeric, decision_band=band)
+        banded_residuals.append(
+            replace(
+                residual,
+                numeric=updated_numeric,
+                status=match_status(updated_numeric),
+            )
+        )
+    residuals = banded_residuals
     residuals.sort(
         key=lambda r: (
             "" if r.rail is None else r.rail.value,
