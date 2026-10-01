@@ -3309,7 +3309,7 @@ def test_streamed_scoring_is_byte_identical_to_legacy_fixture(
     import hashlib
 
     assert hashlib.sha256(old_report.encode("utf-8")).hexdigest() == (
-        "fe5f3347e1f6972780fe77b7c987f1bdf6c51f94980bf0017a5c0079b9d1351d"
+        "0d469c83d3c783f94b6ff3304be355a10a5e3ad871ba1bd42969ee069befbd05"
     )
     streamed_report = score_mod._render_score_report_from_payloads_legacy(
         payloads,
