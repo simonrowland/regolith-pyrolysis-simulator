@@ -55,6 +55,7 @@ from simulator.battery.enums import (
     AdmissionStatus,
     AmountBasis,
     AssetRole,
+    Authority,
     EvidenceClass,
     ExperimentKind,
     FO2Channel,
@@ -1395,6 +1396,10 @@ def _notice_from_plain(payload: object) -> Notice:
         dropped_mass_fraction=None
         if payload.get("dropped_mass_fraction") is None
         else as_decimal(payload["dropped_mass_fraction"]),
+        authority=None
+        if payload.get("authority") is None
+        else Authority(str(payload["authority"])),
+        certification=payload.get("certification"),
     )
 
 

@@ -43,6 +43,7 @@ from simulator.battery.identity import atm_to_pa, identity_equal, quantity_token
 from simulator.battery.score import predict_with_engine
 from simulator.battery.migrate import (
     REPO_ROOT,
+    _notice_from_plain,
     DuplicateContextIdError,
     QUEUE_SCHEMA_VERSION,
     DuplicateObservationIdError,
@@ -89,6 +90,39 @@ from simulator.battery.migrate import (
     write_outputs,
 
 )
+
+
+def test_reference_phase_convention_notice_round_trips_and_legacy_notice_stays_valid() -> None:
+    from simulator.battery.enums import Authority
+    from simulator.battery.records import Notice
+
+    notice = Notice(
+        kind=NoticeKind.REFERENCE_PHASE_BY_CONVENTION,
+        affected_quantities=(Quantity.DELTA_FG,),
+        reason=(
+            "JANAF web table prints no phase; ideal-gas reference state per the "
+            "monograph convention, page not held"
+        ),
+        origin="O-029 (O) reference-element table",
+        authority=Authority.CONVENTION,
+        certification="fetch the JANAF 4th ed. printed page for the table",
+    )
+    payload = to_plain(notice)
+    assert payload["kind"] == "reference_phase_by_convention"
+    assert payload["authority"] == "convention"
+    assert payload["certification"] == "fetch the JANAF 4th ed. printed page for the table"
+    assert _notice_from_plain(payload) == notice
+
+    legacy = {
+        "kind": "source_disagreement",
+        "affected_quantities": ["delta_fG"],
+        "reason": "legacy notice",
+        "origin": "legacy-source",
+    }
+    decoded_legacy = _notice_from_plain(legacy)
+    assert decoded_legacy.authority is None
+    assert decoded_legacy.certification is None
+    assert to_plain(decoded_legacy) == legacy
 from simulator.battery.records import (
     Bench,
     BenchIdentity,

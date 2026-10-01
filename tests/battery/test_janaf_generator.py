@@ -36,6 +36,7 @@ from simulator.reference_data.janaf import (
     STRUCTURED_LAYOUT_REASON,
     TABLES_DIR,
     TRAILING_EMPTY_LAYOUT_REASON,
+    formula_composition,
     iter_table_paths,
     load_table_document,
     parse_janaf_txt,
@@ -301,7 +302,7 @@ def test_formation_identity_uses_each_printed_element_reference_schedule() -> No
     assert absent_schedule.formation_elements.is_unknown
 
     unnamed_schedule = generator._formation_basis_at_temperature(
-        "O2", Species("O2", Phase.G), Decimal("298.15")
+        "C", Species("C", Phase.G), Decimal("298.15")
     )
     assert unnamed_schedule.reaction.is_unknown
     assert unnamed_schedule.formation_elements.is_unknown
@@ -311,6 +312,93 @@ def test_formation_identity_uses_each_printed_element_reference_schedule() -> No
     )
     assert outside_printed_range.reaction.is_unknown
     assert outside_printed_range.formation_elements.is_unknown
+
+
+def test_reference_phase_convention_is_flagged_and_element_rows_are_zero() -> None:
+    from simulator.battery.enums import Authority, NoticeKind
+
+    oxide = _generation("Al-096")
+    al2o3 = next(
+        observation
+        for observation in _quantity_observations(oxide, Quantity.DELTA_FH)
+        if observation.value.series
+        and any(
+            temperature == Decimal("1100")
+            for temperature, _ in observation.value.series
+        )
+    )
+    assert al2o3.identity.reaction.is_value
+    assert al2o3.identity.formation_elements.is_value
+    oxygen = dict(al2o3.identity.formation_elements.value)["O"]
+    assert oxygen.formula == "O2"
+    assert oxygen.phase.is_value and oxygen.phase.value is Phase.G
+    flag = next(
+        notice
+        for notice in al2o3.notices
+        if notice.kind is NoticeKind.REFERENCE_PHASE_BY_CONVENTION
+    )
+    assert flag.authority is Authority.CONVENTION
+    assert flag.origin.startswith("O-029 (O) reference-element table")
+    assert flag.reason == (
+        "JANAF web table prints no phase; ideal-gas reference state per the "
+        "monograph convention, page not held"
+    )
+    assert flag.certification == "fetch the JANAF 4th ed. printed page for the table"
+
+    for table_id in (
+        "Ar-001",
+        "Cl-073",
+        "F-054",
+        "H-050",
+        "He-001",
+        "N-023",
+        "Ne-001",
+        "O-029",
+    ):
+        generated = _generation(table_id)
+        document = load_table_document(TABLES_DIR / f"{table_id}.yaml")
+        element = document["table"]["index_entry"]["formula_normalised"]
+        schedule = generator._element_reference_schedule(
+            formula_composition(element)[0][0]
+        )
+        assert schedule is not None
+        assert schedule.boundaries == ()
+        assert schedule.heading_phase is None
+        printed_rows = document["table"]["values"]
+        for quantity in (Quantity.DELTA_FH, Quantity.DELTA_FG, Quantity.LOG10_KF):
+            observations = _quantity_observations(generated, quantity)
+            assert observations
+            values = [
+                (temperature, amount)
+                for observation in observations
+                for temperature, amount in (observation.value.series or ())
+            ]
+            assert len(values) == len(printed_rows), (table_id, quantity)
+            assert all(
+                amount == 0 for _temperature, amount in values
+            ), (table_id, quantity)
+            # Each listed reference element is its own reference throughout;
+            # any transition would make one of these printed formation rows nonzero.
+            assert all(
+                any(
+                    notice.kind is NoticeKind.REFERENCE_PHASE_BY_CONVENTION
+                    for notice in observation.notices
+                )
+                for observation in observations
+            )
+
+    from simulator.battery.enums import RefusalReason
+    from simulator.battery.validate import validate_observation
+
+    hemihexahydrate = _generation("H-097")
+    h97_formation = next(
+        observation
+        for observation in hemihexahydrate.observations
+        if quantity_token(observation.identity) is Quantity.DELTA_FH
+        and observation.identity.reaction.is_value
+    )
+    issues = validate_observation(h97_formation, {}, {h97_formation.observation_id: h97_formation})
+    assert not any(issue.reason is RefusalReason.REACTION_UNBALANCED for issue in issues)
 
 
 def test_units_formula_and_token_mismatches_stop_loudly() -> None:

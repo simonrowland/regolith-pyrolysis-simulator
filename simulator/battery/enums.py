@@ -200,6 +200,7 @@ class NoticeKind(StrEnum):
     UNVERIFIED_APPARATUS = "unverified_apparatus"
     COMPOSITION_FROM_SAMPLE_CATALOG = "composition_from_sample_catalog"
     IMCC_COMPLEX_SATURATION = "imcc_complex_saturation"
+    REFERENCE_PHASE_BY_CONVENTION = "reference_phase_by_convention"
 
 
 class ReferenceStateConvention(StrEnum):
@@ -364,6 +365,7 @@ class Authority(StrEnum):
     CERTIFIED = "certified"
     BRIDGE = "bridge"
     EXTRAPOLATED = "extrapolated"
+    CONVENTION = "convention"
     REFUSED = "refused"
 
 

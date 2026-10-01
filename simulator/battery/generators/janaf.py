@@ -17,7 +17,9 @@ from typing import Any, Iterable, Mapping, Sequence
 from simulator.battery.enums import (
     QUANTITY_UNITS,
     AdmissionStatus,
+    Authority,
     EvidenceClass,
+    NoticeKind,
     PerBasis,
     Phase,
     Polymorph,
@@ -44,6 +46,7 @@ from simulator.battery.records import (
     Derivation,
     Evidence,
     Locator,
+    Notice,
     Observation,
     Reaction,
     ReactionTerm,
@@ -201,16 +204,15 @@ _FORMATION_PAIR_COLUMNS = (
 )
 _SINGLE_PHASES = {"g": Phase.G, "cr": Phase.CR, "l": Phase.L}
 _COMBINED_STATES = frozenset({"cr,l", "ref", "l,g"})
+# If a held JANAF (ref) table for one of these exact formulas has neither a
+# phase in its heading nor transition rows, use the monograph's ideal-gas
+# convention and mark every dependent observation because that page is not held.
+JANAF_REFERENCE_PHASE_BY_CONVENTION = frozenset(
+    {"O2", "H2", "N2", "F2", "Cl2", "He", "Ne", "Ar", "Kr", "Xe", "Rn"}
+)
 _FIXED_REFERENCE_PHASES = {
-    "Ar": Phase.G,
     "C": Phase.CR,
-    "Cl2": Phase.G,
-    "F2": Phase.G,
-    "H2": Phase.G,
-    "He": Phase.G,
-    "N2": Phase.G,
-    "Ne": Phase.G,
-    "O2": Phase.G,
+    **{formula: Phase.G for formula in JANAF_REFERENCE_PHASE_BY_CONVENTION},
 }
 _PHASE_SIDE = {
     "CRYSTAL": Phase.CR,
@@ -291,6 +293,7 @@ class _ElementReferenceSchedule:
     upper_K: Decimal
     boundaries: tuple[_Boundary, ...]
     segments: tuple[_Segment, ...]
+    heading_phase: Phase | None
 
 
 @dataclass(frozen=True)
@@ -299,6 +302,7 @@ class _FormationBasis:
     formation_elements: State[tuple[tuple[str, Species], ...]]
     reference_locator_key: tuple[tuple[str, str, int | None, int | None], ...]
     locator_note: str
+    convention_tables: tuple[tuple[str, str], ...] = ()
 
     @property
     def identity_suffix(self) -> str:
@@ -845,6 +849,14 @@ def _phase_state(phase: Phase | None, reason: str) -> State[Phase]:
     return State.of(phase) if phase is not None else State.unknown(reason)
 
 
+def _printed_heading_phase(name: str, title: str) -> Phase | None:
+    heading = f"{name} {title}".upper()
+    for spelling, phase in sorted(_PHASE_SIDE.items(), key=lambda item: -len(item[0])):
+        if re.search(rf"(?<![A-Z]){re.escape(spelling)}(?![A-Z])", heading):
+            return phase
+    return None
+
+
 def _polymorph_from_resolve(
     tag: StateTag, value: Polymorph | None, reason: str
 ) -> State[Polymorph]:
@@ -1059,6 +1071,11 @@ def _element_reference_schedule(element: str) -> _ElementReferenceSchedule | Non
 
     path, table, formula = matches[0]
     table_id = str(table.get("table_id") or path.stem)
+    entry = table.get("index_entry")
+    assert isinstance(entry, Mapping)
+    name = str(entry.get("name") or "")
+    title = str(table.get("title_as_published") or "")
+    heading_phase = _printed_heading_phase(name, title)
     structured = _structured_rows(table, table_id)
     printed_temperatures = table_printed_temperatures(
         row.temperature_token for row in structured
@@ -1076,14 +1093,12 @@ def _element_reference_schedule(element: str) -> _ElementReferenceSchedule | Non
         # phase schedule from which a Phase token can be taken.
         segments: tuple[_Segment, ...] = ()
     else:
-        entry = table.get("index_entry")
-        assert isinstance(entry, Mapping)
         segments = _segments(
             "ref",
             formula,
             boundaries,
-            name=str(entry.get("name") or ""),
-            title=str(table.get("title_as_published") or ""),
+            name=name,
+            title=title,
         )
     return _ElementReferenceSchedule(
         table_id=table_id,
@@ -1092,6 +1107,7 @@ def _element_reference_schedule(element: str) -> _ElementReferenceSchedule | Non
         upper_K=max(printed_temperatures),
         boundaries=boundaries,
         segments=segments,
+        heading_phase=heading_phase,
     )
 
 
@@ -1103,6 +1119,7 @@ def _element_reference_state(
     Fraction | None,
     tuple[str, str, int | None, int | None],
     str,
+    bool,
 ]:
     schedule = _element_reference_schedule(element)
     if schedule is None:
@@ -1114,6 +1131,7 @@ def _element_reference_state(
             None,
             (element, "missing", None, None),
             reason,
+            False,
         )
 
     table_prefix = f"{schedule.table_id} (ref)"
@@ -1129,14 +1147,42 @@ def _element_reference_state(
             None,
             (element, schedule.table_id, -1 if below else -2, None),
             reason,
+            False,
         )
     if not schedule.boundaries:
+        if schedule.heading_phase is not None:
+            species = make_species(
+                schedule.formula, State.of(schedule.heading_phase), None
+            )
+            composition = formula_composition(schedule.formula)
+            assert composition is not None and len(composition) == 1
+            return (
+                State.of(species),
+                Fraction(str(composition[0][1])),
+                (element, schedule.table_id, None, None),
+                f"{table_prefix}, single phase printed in heading",
+                False,
+            )
+        if schedule.formula in JANAF_REFERENCE_PHASE_BY_CONVENTION:
+            # The table itself prints no phase; the allowed monograph
+            # convention is explicitly carried as an observation notice.
+            composition = formula_composition(schedule.formula)
+            assert composition is not None and len(composition) == 1
+            species = make_species(schedule.formula, State.of(Phase.G), None)
+            return (
+                State.of(species),
+                Fraction(str(composition[0][1])),
+                (element, schedule.table_id, None, None),
+                f"{table_prefix}, ideal gas by monograph convention over printed T range",
+                True,
+            )
         reason = f"{table_prefix} prints no phase transition naming a phase"
         return (
             State.unknown(reason),
             None,
             (element, schedule.table_id, None, None),
             reason,
+            False,
         )
 
     exact = tuple(
@@ -1156,6 +1202,7 @@ def _element_reference_state(
             None,
             (element, schedule.table_id, lines[0], lines[0]),
             reason,
+            False,
         )
 
     lower = max(
@@ -1189,6 +1236,7 @@ def _element_reference_state(
             None,
             (element, schedule.table_id, lower_line, upper_line),
             f"{locator_note}; phase unknown: {reason}",
+            False,
         )
     composition = formula_composition(schedule.formula)
     if composition is None or len(composition) != 1 or composition[0][0] != element:
@@ -1198,6 +1246,7 @@ def _element_reference_state(
             None,
             (element, schedule.table_id, lower_line, upper_line),
             f"{locator_note}; {reason}",
+            False,
         )
     reference_atom_count = Fraction(str(composition[0][1]))
     species = make_species(schedule.formula, segment.phase, segment.polymorph)
@@ -1206,6 +1255,7 @@ def _element_reference_state(
         reference_atom_count,
         (element, schedule.table_id, lower_line, upper_line),
         locator_note,
+        False,
     )
 
 
@@ -1226,13 +1276,16 @@ def _formation_basis_at_temperature(
     formation_elements: list[tuple[str, Species]] = []
     reference_locator_key = []
     locator_notes = []
+    convention_tables: list[tuple[str, str]] = []
     unknown_reasons = []
     for element, amount in composition:
-        species_state, reference_atom_count, locator_key, locator_note = (
+        species_state, reference_atom_count, locator_key, locator_note, convention = (
             _element_reference_state(element, temperature)
         )
         reference_locator_key.append(locator_key)
         locator_notes.append(locator_note)
+        if convention:
+            convention_tables.append((element, locator_key[1]))
         if not species_state.is_value or reference_atom_count is None:
             unknown_reasons.append(species_state.reason or locator_note)
             continue
@@ -1254,12 +1307,14 @@ def _formation_basis_at_temperature(
             State.unknown(reason),
             key,
             locator_note,
+            tuple(convention_tables),
         )
     return _FormationBasis(
         State.of(Reaction(tuple(terms))),
         State.of(tuple(formation_elements)),
         key,
         locator_note,
+        tuple(convention_tables),
     )
 
 
@@ -1735,6 +1790,23 @@ def _observation(
                 known["reaction"] = formation_basis.reaction
                 known["formation_elements"] = formation_basis.formation_elements
     identity = fill_identity(quantity, species, **known)
+    notices = tuple(
+        Notice(
+            kind=NoticeKind.REFERENCE_PHASE_BY_CONVENTION,
+            affected_quantities=(quantity,),
+            reason=(
+                "JANAF web table prints no phase; ideal-gas reference state per "
+                "the monograph convention, page not held"
+            ),
+            origin=f"{reference_table} ({reference_element}) reference-element table",
+            authority=Authority.CONVENTION,
+            certification="fetch the JANAF 4th ed. printed page for the table",
+        )
+        for reference_element, reference_table in (
+            () if formation_basis is None else formation_basis.convention_tables
+        )
+        if quantity in {Quantity.DELTA_FH, Quantity.DELTA_FG, Quantity.LOG10_KF}
+    )
     role_note = (
         "compilation_role engine_reference_input=true, scoring_eligible=false; "
         f"circularity_warning={CIRCULARITY_WARNING}"
@@ -1799,7 +1871,7 @@ def _observation(
             status=AdmissionStatus.PENDING,
             reason="source does not state admission_status",
         ),
-        notices=(),
+        notices=notices,
         source_id=SOURCE_ID,
         locator=locator,
         read_from=f"unknown:{SOURCE_ID}",
