@@ -16,6 +16,7 @@ provenance:
   sample_phase: "The paper does not label the sample solid or liquid. It states an incongruent melting point of 2163 ± 4 K; all Table 2 and Table 6 temperatures are below that value."
   cell_and_orifice: "The paper prints a molybdenum Knudsen effusion cell and a vaporization-to-effusion-orifice ratio of 400:1; no separate orifice material is stated."
   table_6_derivation: "Equations (12)–(13), p.480 (PDF page index 2), calculate the Table 6 activities from vapor pressures over mullite and pure-oxide reference pressures. p_O over mullite is author-calculated from vapor-phase equilibria; p_SiO and Al-bearing Table 2 pressures are measured by ion-current comparison. Pure-oxide reference pressures are not printed as Table 2 pressure cells."
+  oxygen_pressure_corroboration: "On p.479 the authors say p_O calculated from MoO3 ⇌ MoO2 + O and O2 ⇌ 2O corresponded within about 15% to values calculated using the AlO ⇌ Al + O, 2AlO ⇌ Al2O + O, Al2O ⇌ 2Al + O, and SiO2 ⇌ SiO + O equilibria (3)–(6). These Al/Si equilibria are a consistency check, not parents of p_O."
 benches:
   - id: shornikov-1994-mullite-kems
     identity: {basis: described_in_this_work}
@@ -610,6 +611,384 @@ species:
             pressure_atm: 0.000232
             sigma: 0.000007
             locator: {page: 478, published_page: 478, pdf_page_index: 0, table: "2", note: "Table 2 row p_SiO, column 2033 K; value printed as 23.2 ± 0.7 under p_SiO · 10^-5"}
+  MoO2:
+    observations:
+    - observation_id: shornikov_1994_moo2_partial_pressure_1833k
+      type: partial_pressure
+      locator: {page: 478, published_page: 478, pdf_page_index: 0, table: "2"}
+      T_range_K: [1833.0, 1833.0]
+      phase: "mullite (3Al2O3·2SiO2); phase not specified by the article"
+      standard_state: "MoO2(g) partial pressure; source unit atm"
+      experiment: shornikov-1994-mullite-mo-cell
+      regime: kems_effusion
+      units: "atm as printed (p_MoO2 · 10^-8); pressure_atm = printed coefficient × 10^-8 atm"
+      uncertainty: {note: "The printed ± term is retained in each point; no additional uncertainty was assigned."}
+      point_conditions:
+        composition:
+          state: {tag: unknown, reason: "Table 2 reports vapor over mullite (3Al2O3·2SiO2); no row-specific mole fraction or weight percent is printed."}
+          locator: {page: 478, published_page: 478, pdf_page_index: 0, table: "2", note: "Mullite formula is stated in the article; no mole fraction or weight percent is tabulated."}
+        total_pressure_Pa:
+          state: {tag: unknown, reason: "The article describes Knudsen effusion but prints no numeric in-cell total pressure."}
+          locator: {published_page: 479, note: "No numeric KEMS in-cell total pressure is printed."}
+      values:
+        quantity: partial_pressure
+        method_class: measured
+        admission_status: admitted
+        method: ion-current-comparison
+        method_as_printed: "traditional comparison of ion currents using Ag and Au vapour pressures as standards"
+        temperature_K: 1833.0
+        pressure_scale_as_printed: "p_MoO2 · 10^-8"
+        points:
+          - temperature_K: 1833.0
+            p_MoO2_times_10^-8_atm_as_printed: "0.526 ± 0.050"
+            pressure_atm: 5.26e-9
+            sigma: 5e-10
+            locator: {page: 478, published_page: 478, pdf_page_index: 0, table: "2", note: "Table 2 row p_MoO2, column 1833 K; value printed as 0.526 ± 0.050 under p_MoO2 · 10^-8"}
+    - observation_id: shornikov_1994_moo2_partial_pressure_1933k
+      type: partial_pressure
+      locator: {page: 478, published_page: 478, pdf_page_index: 0, table: "2"}
+      T_range_K: [1933.0, 1933.0]
+      phase: "mullite (3Al2O3·2SiO2); phase not specified by the article"
+      standard_state: "MoO2(g) partial pressure; source unit atm"
+      experiment: shornikov-1994-mullite-mo-cell
+      regime: kems_effusion
+      units: "atm as printed (p_MoO2 · 10^-8); pressure_atm = printed coefficient × 10^-8 atm"
+      uncertainty: {note: "The printed ± term is retained in each point; no additional uncertainty was assigned."}
+      point_conditions:
+        composition:
+          state: {tag: unknown, reason: "Table 2 reports vapor over mullite (3Al2O3·2SiO2); no row-specific mole fraction or weight percent is printed."}
+          locator: {page: 478, published_page: 478, pdf_page_index: 0, table: "2", note: "Mullite formula is stated in the article; no mole fraction or weight percent is tabulated."}
+        total_pressure_Pa:
+          state: {tag: unknown, reason: "The article describes Knudsen effusion but prints no numeric in-cell total pressure."}
+          locator: {published_page: 479, note: "No numeric KEMS in-cell total pressure is printed."}
+      values:
+        quantity: partial_pressure
+        method_class: measured
+        admission_status: admitted
+        method: ion-current-comparison
+        method_as_printed: "traditional comparison of ion currents using Ag and Au vapour pressures as standards"
+        temperature_K: 1933.0
+        pressure_scale_as_printed: "p_MoO2 · 10^-8"
+        points:
+          - temperature_K: 1933.0
+            p_MoO2_times_10^-8_atm_as_printed: "1.91 ± 0.15"
+            pressure_atm: 1.91e-8
+            sigma: 1.5e-9
+            locator: {page: 478, published_page: 478, pdf_page_index: 0, table: "2", note: "Table 2 row p_MoO2, column 1933 K; value printed as 1.91 ± 0.15 under p_MoO2 · 10^-8"}
+    - observation_id: shornikov_1994_moo2_partial_pressure_1983k
+      type: partial_pressure
+      locator: {page: 478, published_page: 478, pdf_page_index: 0, table: "2"}
+      T_range_K: [1983.0, 1983.0]
+      phase: "mullite (3Al2O3·2SiO2); phase not specified by the article"
+      standard_state: "MoO2(g) partial pressure; source unit atm"
+      experiment: shornikov-1994-mullite-mo-cell
+      regime: kems_effusion
+      units: "atm as printed (p_MoO2 · 10^-8); pressure_atm = printed coefficient × 10^-8 atm"
+      uncertainty: {note: "The printed ± term is retained in each point; no additional uncertainty was assigned."}
+      point_conditions:
+        composition:
+          state: {tag: unknown, reason: "Table 2 reports vapor over mullite (3Al2O3·2SiO2); no row-specific mole fraction or weight percent is printed."}
+          locator: {page: 478, published_page: 478, pdf_page_index: 0, table: "2", note: "Mullite formula is stated in the article; no mole fraction or weight percent is tabulated."}
+        total_pressure_Pa:
+          state: {tag: unknown, reason: "The article describes Knudsen effusion but prints no numeric in-cell total pressure."}
+          locator: {published_page: 479, note: "No numeric KEMS in-cell total pressure is printed."}
+      values:
+        quantity: partial_pressure
+        method_class: measured
+        admission_status: admitted
+        method: ion-current-comparison
+        method_as_printed: "traditional comparison of ion currents using Ag and Au vapour pressures as standards"
+        temperature_K: 1983.0
+        pressure_scale_as_printed: "p_MoO2 · 10^-8"
+        points:
+          - temperature_K: 1983.0
+            p_MoO2_times_10^-8_atm_as_printed: "3.40 ± 0.25"
+            pressure_atm: 3.4e-8
+            sigma: 2.5e-9
+            locator: {page: 478, published_page: 478, pdf_page_index: 0, table: "2", note: "Table 2 row p_MoO2, column 1983 K; value printed as 3.40 ± 0.25 under p_MoO2 · 10^-8"}
+    - observation_id: shornikov_1994_moo2_partial_pressure_2033k
+      type: partial_pressure
+      locator: {page: 478, published_page: 478, pdf_page_index: 0, table: "2"}
+      T_range_K: [2033.0, 2033.0]
+      phase: "mullite (3Al2O3·2SiO2); phase not specified by the article"
+      standard_state: "MoO2(g) partial pressure; source unit atm"
+      experiment: shornikov-1994-mullite-mo-cell
+      regime: kems_effusion
+      units: "atm as printed (p_MoO2 · 10^-8); pressure_atm = printed coefficient × 10^-8 atm"
+      uncertainty: {note: "The printed ± term is retained in each point; no additional uncertainty was assigned."}
+      point_conditions:
+        composition:
+          state: {tag: unknown, reason: "Table 2 reports vapor over mullite (3Al2O3·2SiO2); no row-specific mole fraction or weight percent is printed."}
+          locator: {page: 478, published_page: 478, pdf_page_index: 0, table: "2", note: "Mullite formula is stated in the article; no mole fraction or weight percent is tabulated."}
+        total_pressure_Pa:
+          state: {tag: unknown, reason: "The article describes Knudsen effusion but prints no numeric in-cell total pressure."}
+          locator: {published_page: 479, note: "No numeric KEMS in-cell total pressure is printed."}
+      values:
+        quantity: partial_pressure
+        method_class: measured
+        admission_status: admitted
+        method: ion-current-comparison
+        method_as_printed: "traditional comparison of ion currents using Ag and Au vapour pressures as standards"
+        temperature_K: 2033.0
+        pressure_scale_as_printed: "p_MoO2 · 10^-8"
+        points:
+          - temperature_K: 2033.0
+            p_MoO2_times_10^-8_atm_as_printed: "5.78 ± 0.30"
+            pressure_atm: 5.78e-8
+            sigma: 3e-9
+            locator: {page: 478, published_page: 478, pdf_page_index: 0, table: "2", note: "Table 2 row p_MoO2, column 2033 K; value printed as 5.78 ± 0.30 under p_MoO2 · 10^-8"}
+  MoO3:
+    observations:
+    - observation_id: shornikov_1994_moo3_partial_pressure_1833k
+      type: partial_pressure
+      locator: {page: 478, published_page: 478, pdf_page_index: 0, table: "2"}
+      T_range_K: [1833.0, 1833.0]
+      phase: "mullite (3Al2O3·2SiO2); phase not specified by the article"
+      standard_state: "MoO3(g) partial pressure; source unit atm"
+      experiment: shornikov-1994-mullite-mo-cell
+      regime: kems_effusion
+      units: "atm as printed (p_MoO3 · 10^-9); pressure_atm = printed coefficient × 10^-9 atm"
+      uncertainty: {note: "The printed ± term is retained in each point; no additional uncertainty was assigned."}
+      point_conditions:
+        composition:
+          state: {tag: unknown, reason: "Table 2 reports vapor over mullite (3Al2O3·2SiO2); no row-specific mole fraction or weight percent is printed."}
+          locator: {page: 478, published_page: 478, pdf_page_index: 0, table: "2", note: "Mullite formula is stated in the article; no mole fraction or weight percent is tabulated."}
+        total_pressure_Pa:
+          state: {tag: unknown, reason: "The article describes Knudsen effusion but prints no numeric in-cell total pressure."}
+          locator: {published_page: 479, note: "No numeric KEMS in-cell total pressure is printed."}
+      values:
+        quantity: partial_pressure
+        method_class: measured
+        admission_status: admitted
+        method: ion-current-comparison
+        method_as_printed: "traditional comparison of ion currents using Ag and Au vapour pressures as standards"
+        temperature_K: 1833.0
+        pressure_scale_as_printed: "p_MoO3 · 10^-9"
+        points:
+          - temperature_K: 1833.0
+            p_MoO3_times_10^-9_atm_as_printed: "1.24 ± 0.08"
+            pressure_atm: 1.24e-9
+            sigma: 8e-11
+            locator: {page: 478, published_page: 478, pdf_page_index: 0, table: "2", note: "Table 2 row p_MoO3, column 1833 K; value printed as 1.24 ± 0.08 under p_MoO3 · 10^-9"}
+    - observation_id: shornikov_1994_moo3_partial_pressure_1933k
+      type: partial_pressure
+      locator: {page: 478, published_page: 478, pdf_page_index: 0, table: "2"}
+      T_range_K: [1933.0, 1933.0]
+      phase: "mullite (3Al2O3·2SiO2); phase not specified by the article"
+      standard_state: "MoO3(g) partial pressure; source unit atm"
+      experiment: shornikov-1994-mullite-mo-cell
+      regime: kems_effusion
+      units: "atm as printed (p_MoO3 · 10^-9); pressure_atm = printed coefficient × 10^-9 atm"
+      uncertainty: {note: "The printed ± term is retained in each point; no additional uncertainty was assigned."}
+      point_conditions:
+        composition:
+          state: {tag: unknown, reason: "Table 2 reports vapor over mullite (3Al2O3·2SiO2); no row-specific mole fraction or weight percent is printed."}
+          locator: {page: 478, published_page: 478, pdf_page_index: 0, table: "2", note: "Mullite formula is stated in the article; no mole fraction or weight percent is tabulated."}
+        total_pressure_Pa:
+          state: {tag: unknown, reason: "The article describes Knudsen effusion but prints no numeric in-cell total pressure."}
+          locator: {published_page: 479, note: "No numeric KEMS in-cell total pressure is printed."}
+      values:
+        quantity: partial_pressure
+        method_class: measured
+        admission_status: admitted
+        method: ion-current-comparison
+        method_as_printed: "traditional comparison of ion currents using Ag and Au vapour pressures as standards"
+        temperature_K: 1933.0
+        pressure_scale_as_printed: "p_MoO3 · 10^-9"
+        points:
+          - temperature_K: 1933.0
+            p_MoO3_times_10^-9_atm_as_printed: "4.22 ± 0.25"
+            pressure_atm: 4.22e-9
+            sigma: 2.5e-10
+            locator: {page: 478, published_page: 478, pdf_page_index: 0, table: "2", note: "Table 2 row p_MoO3, column 1933 K; value printed as 4.22 ± 0.25 under p_MoO3 · 10^-9"}
+    - observation_id: shornikov_1994_moo3_partial_pressure_1983k
+      type: partial_pressure
+      locator: {page: 478, published_page: 478, pdf_page_index: 0, table: "2"}
+      T_range_K: [1983.0, 1983.0]
+      phase: "mullite (3Al2O3·2SiO2); phase not specified by the article"
+      standard_state: "MoO3(g) partial pressure; source unit atm"
+      experiment: shornikov-1994-mullite-mo-cell
+      regime: kems_effusion
+      units: "atm as printed (p_MoO3 · 10^-9); pressure_atm = printed coefficient × 10^-9 atm"
+      uncertainty: {note: "The printed ± term is retained in each point; no additional uncertainty was assigned."}
+      point_conditions:
+        composition:
+          state: {tag: unknown, reason: "Table 2 reports vapor over mullite (3Al2O3·2SiO2); no row-specific mole fraction or weight percent is printed."}
+          locator: {page: 478, published_page: 478, pdf_page_index: 0, table: "2", note: "Mullite formula is stated in the article; no mole fraction or weight percent is tabulated."}
+        total_pressure_Pa:
+          state: {tag: unknown, reason: "The article describes Knudsen effusion but prints no numeric in-cell total pressure."}
+          locator: {published_page: 479, note: "No numeric KEMS in-cell total pressure is printed."}
+      values:
+        quantity: partial_pressure
+        method_class: measured
+        admission_status: admitted
+        method: ion-current-comparison
+        method_as_printed: "traditional comparison of ion currents using Ag and Au vapour pressures as standards"
+        temperature_K: 1983.0
+        pressure_scale_as_printed: "p_MoO3 · 10^-9"
+        points:
+          - temperature_K: 1983.0
+            p_MoO3_times_10^-9_atm_as_printed: "7.64 ± 0.40"
+            pressure_atm: 7.64e-9
+            sigma: 4e-10
+            locator: {page: 478, published_page: 478, pdf_page_index: 0, table: "2", note: "Table 2 row p_MoO3, column 1983 K; value printed as 7.64 ± 0.40 under p_MoO3 · 10^-9"}
+    - observation_id: shornikov_1994_moo3_partial_pressure_2033k
+      type: partial_pressure
+      locator: {page: 478, published_page: 478, pdf_page_index: 0, table: "2"}
+      T_range_K: [2033.0, 2033.0]
+      phase: "mullite (3Al2O3·2SiO2); phase not specified by the article"
+      standard_state: "MoO3(g) partial pressure; source unit atm"
+      experiment: shornikov-1994-mullite-mo-cell
+      regime: kems_effusion
+      units: "atm as printed (p_MoO3 · 10^-9); pressure_atm = printed coefficient × 10^-9 atm"
+      uncertainty: {note: "The printed ± term is retained in each point; no additional uncertainty was assigned."}
+      point_conditions:
+        composition:
+          state: {tag: unknown, reason: "Table 2 reports vapor over mullite (3Al2O3·2SiO2); no row-specific mole fraction or weight percent is printed."}
+          locator: {page: 478, published_page: 478, pdf_page_index: 0, table: "2", note: "Mullite formula is stated in the article; no mole fraction or weight percent is tabulated."}
+        total_pressure_Pa:
+          state: {tag: unknown, reason: "The article describes Knudsen effusion but prints no numeric in-cell total pressure."}
+          locator: {published_page: 479, note: "No numeric KEMS in-cell total pressure is printed."}
+      values:
+        quantity: partial_pressure
+        method_class: measured
+        admission_status: admitted
+        method: ion-current-comparison
+        method_as_printed: "traditional comparison of ion currents using Ag and Au vapour pressures as standards"
+        temperature_K: 2033.0
+        pressure_scale_as_printed: "p_MoO3 · 10^-9"
+        points:
+          - temperature_K: 2033.0
+            p_MoO3_times_10^-9_atm_as_printed: "12.4 ± 0.6"
+            pressure_atm: 1.24e-8
+            sigma: 6e-10
+            locator: {page: 478, published_page: 478, pdf_page_index: 0, table: "2", note: "Table 2 row p_MoO3, column 2033 K; value printed as 12.4 ± 0.6 under p_MoO3 · 10^-9"}
+  O2:
+    observations:
+    - observation_id: shornikov_1994_o2_partial_pressure_1833k
+      type: partial_pressure
+      locator: {page: 478, published_page: 478, pdf_page_index: 0, table: "2"}
+      T_range_K: [1833.0, 1833.0]
+      phase: "mullite (3Al2O3·2SiO2); phase not specified by the article"
+      standard_state: "O2(g) partial pressure; source unit atm"
+      experiment: shornikov-1994-mullite-mo-cell
+      regime: kems_effusion
+      units: "atm as printed (p_O2 · 10^-11); pressure_atm = printed coefficient × 10^-11 atm"
+      uncertainty: {note: "The printed ± term is retained in each point; no additional uncertainty was assigned."}
+      point_conditions:
+        composition:
+          state: {tag: unknown, reason: "Table 2 reports vapor over mullite (3Al2O3·2SiO2); no row-specific mole fraction or weight percent is printed."}
+          locator: {page: 478, published_page: 478, pdf_page_index: 0, table: "2", note: "Mullite formula is stated in the article; no mole fraction or weight percent is tabulated."}
+        total_pressure_Pa:
+          state: {tag: unknown, reason: "The article describes Knudsen effusion but prints no numeric in-cell total pressure."}
+          locator: {published_page: 479, note: "No numeric KEMS in-cell total pressure is printed."}
+      values:
+        quantity: partial_pressure
+        method_class: measured
+        admission_status: admitted
+        method: ion-current-comparison
+        method_as_printed: "traditional comparison of ion currents using Ag and Au vapour pressures as standards"
+        temperature_K: 1833.0
+        pressure_scale_as_printed: "p_O2 · 10^-11"
+        points:
+          - temperature_K: 1833.0
+            p_O2_times_10^-11_atm_as_printed: "0.521 ± 0.050"
+            pressure_atm: 5.21e-12
+            sigma: 5e-13
+            locator: {page: 478, published_page: 478, pdf_page_index: 0, table: "2", note: "Table 2 row p_O2, column 1833 K; value printed as 0.521 ± 0.050 under p_O2 · 10^-11"}
+    - observation_id: shornikov_1994_o2_partial_pressure_1933k
+      type: partial_pressure
+      locator: {page: 478, published_page: 478, pdf_page_index: 0, table: "2"}
+      T_range_K: [1933.0, 1933.0]
+      phase: "mullite (3Al2O3·2SiO2); phase not specified by the article"
+      standard_state: "O2(g) partial pressure; source unit atm"
+      experiment: shornikov-1994-mullite-mo-cell
+      regime: kems_effusion
+      units: "atm as printed (p_O2 · 10^-11); pressure_atm = printed coefficient × 10^-11 atm"
+      uncertainty: {note: "The printed ± term is retained in each point; no additional uncertainty was assigned."}
+      point_conditions:
+        composition:
+          state: {tag: unknown, reason: "Table 2 reports vapor over mullite (3Al2O3·2SiO2); no row-specific mole fraction or weight percent is printed."}
+          locator: {page: 478, published_page: 478, pdf_page_index: 0, table: "2", note: "Mullite formula is stated in the article; no mole fraction or weight percent is tabulated."}
+        total_pressure_Pa:
+          state: {tag: unknown, reason: "The article describes Knudsen effusion but prints no numeric in-cell total pressure."}
+          locator: {published_page: 479, note: "No numeric KEMS in-cell total pressure is printed."}
+      values:
+        quantity: partial_pressure
+        method_class: measured
+        admission_status: admitted
+        method: ion-current-comparison
+        method_as_printed: "traditional comparison of ion currents using Ag and Au vapour pressures as standards"
+        temperature_K: 1933.0
+        pressure_scale_as_printed: "p_O2 · 10^-11"
+        points:
+          - temperature_K: 1933.0
+            p_O2_times_10^-11_atm_as_printed: "4.59 ± 0.26"
+            pressure_atm: 4.59e-11
+            sigma: 2.6e-12
+            locator: {page: 478, published_page: 478, pdf_page_index: 0, table: "2", note: "Table 2 row p_O2, column 1933 K; value printed as 4.59 ± 0.26 under p_O2 · 10^-11"}
+    - observation_id: shornikov_1994_o2_partial_pressure_1983k
+      type: partial_pressure
+      locator: {page: 478, published_page: 478, pdf_page_index: 0, table: "2"}
+      T_range_K: [1983.0, 1983.0]
+      phase: "mullite (3Al2O3·2SiO2); phase not specified by the article"
+      standard_state: "O2(g) partial pressure; source unit atm"
+      experiment: shornikov-1994-mullite-mo-cell
+      regime: kems_effusion
+      units: "atm as printed (p_O2 · 10^-11); pressure_atm = printed coefficient × 10^-11 atm"
+      uncertainty: {note: "The printed ± term is retained in each point; no additional uncertainty was assigned."}
+      point_conditions:
+        composition:
+          state: {tag: unknown, reason: "Table 2 reports vapor over mullite (3Al2O3·2SiO2); no row-specific mole fraction or weight percent is printed."}
+          locator: {page: 478, published_page: 478, pdf_page_index: 0, table: "2", note: "Mullite formula is stated in the article; no mole fraction or weight percent is tabulated."}
+        total_pressure_Pa:
+          state: {tag: unknown, reason: "The article describes Knudsen effusion but prints no numeric in-cell total pressure."}
+          locator: {published_page: 479, note: "No numeric KEMS in-cell total pressure is printed."}
+      values:
+        quantity: partial_pressure
+        method_class: measured
+        admission_status: admitted
+        method: ion-current-comparison
+        method_as_printed: "traditional comparison of ion currents using Ag and Au vapour pressures as standards"
+        temperature_K: 1983.0
+        pressure_scale_as_printed: "p_O2 · 10^-11"
+        points:
+          - temperature_K: 1983.0
+            p_O2_times_10^-11_atm_as_printed: "13.7 ± 0.6"
+            pressure_atm: 1.37e-10
+            sigma: 6e-12
+            locator: {page: 478, published_page: 478, pdf_page_index: 0, table: "2", note: "Table 2 row p_O2, column 1983 K; value printed as 13.7 ± 0.6 under p_O2 · 10^-11"}
+    - observation_id: shornikov_1994_o2_partial_pressure_2033k
+      type: partial_pressure
+      locator: {page: 478, published_page: 478, pdf_page_index: 0, table: "2"}
+      T_range_K: [2033.0, 2033.0]
+      phase: "mullite (3Al2O3·2SiO2); phase not specified by the article"
+      standard_state: "O2(g) partial pressure; source unit atm"
+      experiment: shornikov-1994-mullite-mo-cell
+      regime: kems_effusion
+      units: "atm as printed (p_O2 · 10^-11); pressure_atm = printed coefficient × 10^-11 atm"
+      uncertainty: {note: "The printed ± term is retained in each point; no additional uncertainty was assigned."}
+      point_conditions:
+        composition:
+          state: {tag: unknown, reason: "Table 2 reports vapor over mullite (3Al2O3·2SiO2); no row-specific mole fraction or weight percent is printed."}
+          locator: {page: 478, published_page: 478, pdf_page_index: 0, table: "2", note: "Mullite formula is stated in the article; no mole fraction or weight percent is tabulated."}
+        total_pressure_Pa:
+          state: {tag: unknown, reason: "The article describes Knudsen effusion but prints no numeric in-cell total pressure."}
+          locator: {published_page: 479, note: "No numeric KEMS in-cell total pressure is printed."}
+      values:
+        quantity: partial_pressure
+        method_class: measured
+        admission_status: admitted
+        method: ion-current-comparison
+        method_as_printed: "traditional comparison of ion currents using Ag and Au vapour pressures as standards"
+        temperature_K: 2033.0
+        pressure_scale_as_printed: "p_O2 · 10^-11"
+        points:
+          - temperature_K: 2033.0
+            p_O2_times_10^-11_atm_as_printed: "34.3 ± 1.7"
+            pressure_atm: 3.43e-10
+            sigma: 1.7e-11
+            locator: {page: 478, published_page: 478, pdf_page_index: 0, table: "2", note: "Table 2 row p_O2, column 2033 K; value printed as 34.3 ± 1.7 under p_O2 · 10^-11"}
   O:
     observations:
     - observation_id: shornikov_1994_o_partial_pressure_1833k
@@ -622,10 +1001,11 @@ species:
       regime: kems_effusion
       units: "atm as printed (p_O · 10^-9); pressure_atm = printed coefficient × 10^-9 atm"
       uncertainty: {note: "The printed ± term is retained in each point; no additional uncertainty was assigned."}
-      derived_from: [shornikov_1994_al_partial_pressure_1833k, shornikov_1994_sio_partial_pressure_1833k]
+      derived_from: [shornikov_1994_moo2_partial_pressure_1833k, shornikov_1994_moo3_partial_pressure_1833k, shornikov_1994_o2_partial_pressure_1833k]
       derivation:
-        relation: "p_O was calculated from vapor-phase equilibria (reactions (1)–(6)), including MoO3 ⇌ MoO2 + O and O2 ⇌ 2O, and checked against the measured Al- and Si-bearing dissociation equilibria; see p. 478, Table 2 and reactions (1)–(6)."
-        inputs: [shornikov_1994_al_partial_pressure_1833k, shornikov_1994_sio_partial_pressure_1833k]
+        relation: "p_O calculated using MoO3 ⇌ MoO2 + O and O2 ⇌ 2O, reactions (1)–(2); see p.479. The Al/Si reactions (3)–(6) are a consistency check reported within about 15%, not calculation inputs; see p.479."
+        inputs: [shornikov_1994_moo2_partial_pressure_1833k, shornikov_1994_moo3_partial_pressure_1833k, shornikov_1994_o2_partial_pressure_1833k]
+        locator: {page: 479, published_page: 479, pdf_page_index: 1, note: "Paragraph beginning 'Partial vapour pressures of oxygen were calculated'; reactions (1)–(2), followed by the approximately 15% check using reactions (3)–(6)."}
         output_unit: atm
       point_conditions:
         composition:
@@ -659,10 +1039,11 @@ species:
       regime: kems_effusion
       units: "atm as printed (p_O · 10^-9); pressure_atm = printed coefficient × 10^-9 atm"
       uncertainty: {note: "The printed ± term is retained in each point; no additional uncertainty was assigned."}
-      derived_from: [shornikov_1994_al_partial_pressure_1933k, shornikov_1994_alo_partial_pressure_1933k, shornikov_1994_al2o_partial_pressure_1933k, shornikov_1994_alsio_partial_pressure_1933k, shornikov_1994_sio_partial_pressure_1933k]
+      derived_from: [shornikov_1994_moo2_partial_pressure_1933k, shornikov_1994_moo3_partial_pressure_1933k, shornikov_1994_o2_partial_pressure_1933k]
       derivation:
-        relation: "p_O was calculated from vapor-phase equilibria (reactions (1)–(6)), including MoO3 ⇌ MoO2 + O and O2 ⇌ 2O, and checked against the measured Al- and Si-bearing dissociation equilibria; see p. 478, Table 2 and reactions (1)–(6)."
-        inputs: [shornikov_1994_al_partial_pressure_1933k, shornikov_1994_alo_partial_pressure_1933k, shornikov_1994_al2o_partial_pressure_1933k, shornikov_1994_alsio_partial_pressure_1933k, shornikov_1994_sio_partial_pressure_1933k]
+        relation: "p_O calculated using MoO3 ⇌ MoO2 + O and O2 ⇌ 2O, reactions (1)–(2); see p.479. The Al/Si reactions (3)–(6) are a consistency check reported within about 15%, not calculation inputs; see p.479."
+        inputs: [shornikov_1994_moo2_partial_pressure_1933k, shornikov_1994_moo3_partial_pressure_1933k, shornikov_1994_o2_partial_pressure_1933k]
+        locator: {page: 479, published_page: 479, pdf_page_index: 1, note: "Paragraph beginning 'Partial vapour pressures of oxygen were calculated'; reactions (1)–(2), followed by the approximately 15% check using reactions (3)–(6)."}
         output_unit: atm
       point_conditions:
         composition:
@@ -696,10 +1077,11 @@ species:
       regime: kems_effusion
       units: "atm as printed (p_O · 10^-9); pressure_atm = printed coefficient × 10^-9 atm"
       uncertainty: {note: "The printed ± term is retained in each point; no additional uncertainty was assigned."}
-      derived_from: [shornikov_1994_al_partial_pressure_1983k, shornikov_1994_alo_partial_pressure_1983k, shornikov_1994_al2o_partial_pressure_1983k, shornikov_1994_alsio_partial_pressure_1983k, shornikov_1994_sio_partial_pressure_1983k]
+      derived_from: [shornikov_1994_moo2_partial_pressure_1983k, shornikov_1994_moo3_partial_pressure_1983k, shornikov_1994_o2_partial_pressure_1983k]
       derivation:
-        relation: "p_O was calculated from vapor-phase equilibria (reactions (1)–(6)), including MoO3 ⇌ MoO2 + O and O2 ⇌ 2O, and checked against the measured Al- and Si-bearing dissociation equilibria; see p. 478, Table 2 and reactions (1)–(6)."
-        inputs: [shornikov_1994_al_partial_pressure_1983k, shornikov_1994_alo_partial_pressure_1983k, shornikov_1994_al2o_partial_pressure_1983k, shornikov_1994_alsio_partial_pressure_1983k, shornikov_1994_sio_partial_pressure_1983k]
+        relation: "p_O calculated using MoO3 ⇌ MoO2 + O and O2 ⇌ 2O, reactions (1)–(2); see p.479. The Al/Si reactions (3)–(6) are a consistency check reported within about 15%, not calculation inputs; see p.479."
+        inputs: [shornikov_1994_moo2_partial_pressure_1983k, shornikov_1994_moo3_partial_pressure_1983k, shornikov_1994_o2_partial_pressure_1983k]
+        locator: {page: 479, published_page: 479, pdf_page_index: 1, note: "Paragraph beginning 'Partial vapour pressures of oxygen were calculated'; reactions (1)–(2), followed by the approximately 15% check using reactions (3)–(6)."}
         output_unit: atm
       point_conditions:
         composition:
@@ -733,10 +1115,11 @@ species:
       regime: kems_effusion
       units: "atm as printed (p_O · 10^-9); pressure_atm = printed coefficient × 10^-9 atm"
       uncertainty: {note: "The printed ± term is retained in each point; no additional uncertainty was assigned."}
-      derived_from: [shornikov_1994_al_partial_pressure_2033k, shornikov_1994_alo_partial_pressure_2033k, shornikov_1994_al2o_partial_pressure_2033k, shornikov_1994_alsio_partial_pressure_2033k, shornikov_1994_sio_partial_pressure_2033k]
+      derived_from: [shornikov_1994_moo2_partial_pressure_2033k, shornikov_1994_moo3_partial_pressure_2033k, shornikov_1994_o2_partial_pressure_2033k]
       derivation:
-        relation: "p_O was calculated from vapor-phase equilibria (reactions (1)–(6)), including MoO3 ⇌ MoO2 + O and O2 ⇌ 2O, and checked against the measured Al- and Si-bearing dissociation equilibria; see p. 478, Table 2 and reactions (1)–(6)."
-        inputs: [shornikov_1994_al_partial_pressure_2033k, shornikov_1994_alo_partial_pressure_2033k, shornikov_1994_al2o_partial_pressure_2033k, shornikov_1994_alsio_partial_pressure_2033k, shornikov_1994_sio_partial_pressure_2033k]
+        relation: "p_O calculated using MoO3 ⇌ MoO2 + O and O2 ⇌ 2O, reactions (1)–(2); see p.479. The Al/Si reactions (3)–(6) are a consistency check reported within about 15%, not calculation inputs; see p.479."
+        inputs: [shornikov_1994_moo2_partial_pressure_2033k, shornikov_1994_moo3_partial_pressure_2033k, shornikov_1994_o2_partial_pressure_2033k]
+        locator: {page: 479, published_page: 479, pdf_page_index: 1, note: "Paragraph beginning 'Partial vapour pressures of oxygen were calculated'; reactions (1)–(2), followed by the approximately 15% check using reactions (3)–(6)."}
         output_unit: atm
       point_conditions:
         composition:
