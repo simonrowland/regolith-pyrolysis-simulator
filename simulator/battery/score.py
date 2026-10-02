@@ -42,6 +42,7 @@ from simulator.battery.enums import (
     NoticeKind,
     PerBasis,
     Phase,
+    Polymorph,
     PURE_STANDARD_THERMO,
     Quantity,
     ReferenceStateConvention,
@@ -94,6 +95,7 @@ from simulator.battery.records import (
     _is_source_internally_inconsistent,
     as_decimal,
     phase_token,
+    polymorph_token,
     Species,
     StandardState,
     union_notices,
@@ -995,8 +997,10 @@ def _is_flagged_stratum_notice(notice: Notice) -> bool:
     )
 
 
-def _fusion_comparison_reference(reference: Observation) -> Observation:
-    """Return an in-memory liquid-reference view when JANAF supports conversion."""
+def _fusion_comparison_reference(
+    reference: Observation, *, engine: Engine | None = None
+) -> Observation:
+    """Return the liquid-reference comparison view for a solid activity row."""
 
     identity = reference.identity
     if (
@@ -1020,9 +1024,42 @@ def _fusion_comparison_reference(reference: Observation) -> Observation:
         or reference.value.point <= 0
     ):
         return reference
+
+    if engine is not None:
+        from simulator.battery.waypoints import MELT_ACTIVITY_ENGINES
+
+        if engine.value not in MELT_ACTIVITY_ENGINES:
+            notice = Notice(
+                kind=NoticeKind.OUT_OF_GAMMA_DOMAIN,
+                affected_quantities=(Quantity.ACTIVITY,),
+                reason=(
+                    "solid/liquid reference conversion skipped: engine reference "
+                    f"is unestablished for {engine.value}; measured "
+                    "solid-reference value left unchanged"
+                ),
+                origin=reference.observation_id,
+                band=f"engine activity reference unestablished: {engine.value}",
+            )
+            return replace(
+                reference,
+                notices=union_notices(reference.notices, (notice,)),
+            )
+
     temperature_K = temperature_of(identity)
     if temperature_K is None:
-        return reference
+        if engine is None:
+            return reference
+        notice = Notice(
+            kind=NoticeKind.OUT_OF_GAMMA_DOMAIN,
+            affected_quantities=(Quantity.ACTIVITY,),
+            reason=(
+                "fusion conversion missing input: activity observation has no "
+                "temperature_K"
+            ),
+            origin=reference.observation_id,
+            band="JANAF fusion conversion requires temperature_K",
+        )
+        return replace(reference, notices=union_notices(reference.notices, (notice,)))
 
     from simulator.battery.generators.janaf import (
         JANAF_R_J_PER_MOL_K,
@@ -1041,29 +1078,55 @@ def _fusion_comparison_reference(reference: Observation) -> Observation:
                 "expected one JANAF cr/l crossing",
                 "outside the JANAF table range",
                 "is not bracketed by JANAF table rows",
+                "needed JANAF formation Gibbs row missing",
+                "needed JANAF table node row missing or changed",
+                "JANAF cached table is incomplete",
+                "JANAF table values are missing",
+                "JANAF table has fewer than two Gibbs points",
             )
         ):
             raise
         notice = Notice(
             kind=NoticeKind.OUT_OF_GAMMA_DOMAIN,
             affected_quantities=(Quantity.ACTIVITY,),
-            reason=f"fusion conversion for {formula} was skipped: {reason}",
+            reason=f"fusion conversion missing input for {formula}: {reason}",
             origin=reference.observation_id,
             band=f"JANAF fusion data for {formula}: {reason}",
         )
         return replace(reference, notices=union_notices(reference.notices, (notice,)))
 
-    delta_g_fus_J_per_mol = fusion.delta_g_fus_kJ_per_mol * Decimal(1000)
+    expected_polymorph = {
+        "Ca-027": Polymorph.LIME,
+        "Al-096": Polymorph.CORUNDUM,
+        "O-035": Polymorph.CRISTOBALITE_HIGH,
+    }.get(fusion.crystal_table)
+    observed_polymorph = polymorph_token(standard_state.endmember)
+    if (
+        expected_polymorph is not None
+        and observed_polymorph is not expected_polymorph
+    ):
+        observed = "unknown" if observed_polymorph is None else observed_polymorph.value
+        notice = Notice(
+            kind=NoticeKind.OUT_OF_GAMMA_DOMAIN,
+            affected_quantities=(Quantity.ACTIVITY,),
+            reason=(
+                "fusion conversion missing input: JANAF solid table "
+                f"{fusion.crystal_table} represents polymorph "
+                f"{expected_polymorph.value}, but measured reference polymorph "
+                f"is {observed}"
+            ),
+            origin=reference.observation_id,
+            band=(
+                f"JANAF {fusion.crystal_table} requires "
+                f"{expected_polymorph.value} solid reference"
+            ),
+        )
+        return replace(reference, notices=union_notices(reference.notices, (notice,)))
 
-    # Premise: at a common T and pressure, μ=G°+RT ln(a) is unchanged when
-    # the pure-oxide reference moves from solid to liquid. Thus
-    # G_s+RT ln(a_s)=G_l+RT ln(a_l), so ln(a_l)=ln(a_s)−ΔG_fus/(RT),
-    # where ΔG_fus=G_l−G_s. JANAF G values are kJ/mol and its R is J/mol/K,
-    # so multiply ΔG by 1000 before division. At the JANAF cr/l crossing,
-    # G_l=G_s, ΔG_fus=0, and the conversion leaves activity unchanged.
-    converted_activity = reference.value.point * (
-        -delta_g_fus_J_per_mol / (JANAF_R_J_PER_MOL_K * temperature_K)
-    ).exp()
+    delta_g_fus_J_per_mol = fusion.delta_g_fus_kJ_per_mol * Decimal(1000)
+    offset_dex = delta_g_fus_J_per_mol / (
+        JANAF_R_J_PER_MOL_K * temperature_K * Decimal(10).ln()
+    )
     liquid_endmember = replace(
         standard_state.endmember,
         phase=Phase.L,
@@ -1076,6 +1139,68 @@ def _fusion_comparison_reference(reference: Observation) -> Observation:
     comparison_identity = replace(
         identity, reference_state=State.of(liquid_state)
     )
+
+    melts_notice: Notice | None = None
+    if engine is not None and engine.value in {"alphamelts", "thermoengine"}:
+        if formula == "SiO2":
+            gap = (
+                "measured MELTS/JANAF liquid-reference gap: |delta| <= 0.005 "
+                "dex over 1600–2300 K"
+            )
+        elif formula == "Al2O3":
+            gap = (
+                "measured MELTS/JANAF liquid-reference gap: the JANAF fusion "
+                "shift under-corrects by +0.03 dex at 1933 K, up to +0.11 dex "
+                "at 1600 K, and 0 dex at 2300 K; not computed below 1600 K"
+            )
+        else:
+            gap = None
+        if gap is not None:
+            melts_notice = Notice(
+                kind=NoticeKind.DERIVATION_USES_COMPILATION,
+                affected_quantities=(Quantity.ACTIVITY,),
+                reason=(
+                    "MELTS liquid-endmember reference differs from the JANAF "
+                    f"liquid reference; applied shift is approximate; {gap}; "
+                    "source=docs-private/research/2026-10-02-melts-vs-janaf-liquid/findings.md"
+                ),
+                origin=reference.observation_id,
+                band="MELTS/JANAF liquid reference gap",
+            )
+
+    if temperature_K >= fusion.melting_temperature_K:
+        notice = Notice(
+            kind=NoticeKind.OUT_OF_GAMMA_DOMAIN,
+            affected_quantities=(Quantity.ACTIVITY,),
+            reason=(
+                f"solid reference recorded at T={temperature_K} K >= "
+                f"JANAF T_fus={fusion.melting_temperature_K} K; no numeric "
+                "reference-state conversion applied because liquid is natural"
+            ),
+            origin=reference.observation_id,
+            band=(
+                f"JANAF fusion crossing {fusion.melting_temperature_K} K; "
+                f"tables={fusion.crystal_table}/{fusion.liquid_table}"
+            ),
+        )
+        notices = (notice,) if melts_notice is None else (notice, melts_notice)
+        return replace(
+            reference,
+            identity=comparison_identity,
+            notices=union_notices(reference.notices, notices),
+        )
+
+    # Activity is a_i=exp[(mu_i-mu_i°)/(R*T)]. For the same mu_i,
+    # log10(a_solid)=log10(a_liquid)+[G_l°(T)-G_s°(T)]/(R*T*ln(10));
+    # the element terms cancel because both JANAF formation energies use the
+    # same elements. A liquid engine prediction gains this positive offset
+    # before comparison with a solid measurement. This helper makes the
+    # algebraically equivalent comparison by translating that measurement to
+    # a liquid-reference view and subtracting the same offset. JANAF G is
+    # kJ/mol, so multiply by 1000 to obtain J/mol; R=8.314462618 J/(mol*K).
+    converted_activity = reference.value.point * (
+        -delta_g_fus_J_per_mol / (JANAF_R_J_PER_MOL_K * temperature_K)
+    ).exp()
     mismatch_K = fusion.melting_temperature_K - fusion.accepted_melting_temperature_K
     extrapolation_K = fusion.melting_temperature_K - temperature_K
     notice = Notice(
@@ -1083,8 +1208,10 @@ def _fusion_comparison_reference(reference: Observation) -> Observation:
         affected_quantities=(Quantity.ACTIVITY,),
         reason=(
             f"{FLAGGED_STRATUM_REFERENCE_CONVERTED_VIA_FUSION}; "
+            "reference-state conversion (not model error); "
             f"oxide={formula}; source_activity_solid={reference.value.point}; "
             f"converted_activity_liquid={converted_activity}; "
+            f"offset_dex=+{offset_dex}; "
             f"DeltaG_fus={fusion.delta_g_fus_kJ_per_mol} kJ/mol; T={temperature_K} K; "
             f"JANAF_Tm={fusion.melting_temperature_K} K; "
             f"distance_below_JANAF_Tm={extrapolation_K} K; "
@@ -1107,7 +1234,10 @@ def _fusion_comparison_reference(reference: Observation) -> Observation:
                 "activity converted from a solid to liquid reference with JANAF fusion Gibbs energy"
             ),
         ),
-        notices=union_notices(reference.notices, (notice,)),
+        notices=union_notices(
+            reference.notices,
+            (notice,) if melts_notice is None else (notice, melts_notice),
+        ),
     )
 
 
@@ -3483,7 +3613,7 @@ def compile_residual(
     point_observations: Sequence[Observation] | None = None,
 ) -> tuple[Residual, Observation | None]:
     _require_score_engine(engine)
-    reference = _fusion_comparison_reference(reference)
+    reference = _fusion_comparison_reference(reference, engine=engine)
     identity = reference.identity
     quantity = quantity_token(identity) if isinstance(identity, Identity) else None
     formula = identity.species.formula if isinstance(identity, Identity) else ""
@@ -3629,6 +3759,33 @@ def compile_residual(
             {"primary_check": gates.primary_check, "checks": [c.name for c in gates.checks]},
             execution=Execution(state=ExecutionState.NOT_PROBED),
             exclusions=("validity_gates_pass", "status_match_or_mismatch"),
+        )
+
+    missing_fusion_input = next(
+        (
+            notice
+            for notice in notices
+            if notice.reason.startswith("fusion conversion missing input:")
+            or notice.reason.startswith("fusion conversion missing input for ")
+        ),
+        None,
+    )
+    if missing_fusion_input is not None:
+        if "JANAF solid table " in missing_fusion_input.reason:
+            missing_input = "JANAF solid polymorph matching the selected table"
+        elif "no temperature_K" in missing_fusion_input.reason:
+            missing_input = "activity observation temperature_K"
+        else:
+            missing_input = "JANAF solid/liquid formation Gibbs rows"
+        return _refused(
+            RefusalReason.IDENTITY_INCOMPLETE,
+            {
+                "reason": "solid_liquid_reference_conversion_missing_input",
+                "missing_input": missing_input,
+                "notice": missing_fusion_input.reason,
+            },
+            execution=Execution(state=ExecutionState.NOT_PROBED),
+            exclusions=("reference_state_conversion_inputs_present",),
         )
 
     if prediction is None:
