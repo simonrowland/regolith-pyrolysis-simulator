@@ -184,6 +184,27 @@ def _calibration_grounded(calibration: object) -> bool:
     return True
 
 
+def _calibration_not_grounded_detail(calibration: object) -> dict[str, str] | None:
+    if calibration is None or (isinstance(calibration, dict) and not calibration):
+        return {
+            "flag": "calibration_not_grounded",
+            "calibration_record_status": "not_recorded",
+            "calibration_notice": "No calibration entry has been recorded yet.",
+        }
+    if isinstance(calibration, dict) and any(
+        isinstance(located, Located)
+        and not located.state.is_value
+        and "not printed" in (located.state.reason or "").casefold()
+        for located in calibration.values()
+    ):
+        return {
+            "flag": "calibration_not_grounded",
+            "calibration_record_status": "not_printed",
+            "calibration_notice": "The source record says the calibration was not printed.",
+        }
+    return None
+
+
 def table_self_consistency(
     *,
     delta_fG_kJ_mol: object,
@@ -367,10 +388,16 @@ def underdetermined_apparatus(
         # p = (dm/dt)/(A W) * sqrt(2 pi R T / M).
         calibration = None if experiment.apparatus is None else experiment.apparatus.calibration
         calibrated = _calibration_grounded(calibration)
+        ungrounded_detail = (
+            None if calibrated else _calibration_not_grounded_detail(calibration)
+        )
+        calibration_flagged = (
+            quantity is Quantity.P_PARTIAL and ungrounded_detail is not None
+        )
         checks.append(
             GateCheck(
                 "kems_calibration",
-                calibrated,
+                calibrated or calibration_flagged,
                 {
                     "missing": [] if calibrated else ["calibration"],
                     "method": method.value,
@@ -378,10 +405,11 @@ def underdetermined_apparatus(
                     "reason": None
                     if calibrated
                     else "KEMS pressure requires a recorded calibration",
+                    **(ungrounded_detail if calibration_flagged else {}),
                 },
             )
         )
-        if not calibrated:
+        if not calibrated and not calibration_flagged:
             return _fail(RefusalReason.UNDERDETERMINED_APPARATUS, checks, "kems_calibration")
         # A calibrated KEMS pressure does not need geometry when it is absent,
         # but supplied geometry must still be a usable point. Never let an
@@ -588,21 +616,72 @@ def effusion_regime_unverified(
         return _fail(RefusalReason.EFFUSION_REGIME_UNVERIFIED, checks, "orifice_knudsen")
 
     if not _calibration_grounded(calibration):
+        ungrounded_detail = (
+            _calibration_not_grounded_detail(calibration)
+            if quantity is Quantity.P_PARTIAL
+            else None
+        )
+        if ungrounded_detail is None:
+            checks.append(
+                GateCheck(
+                    "in_cell_partial_pressure_sum",
+                    False,
+                    {
+                        "reason": "calibration is not grounded for the in-cell fallback",
+                        "route": "in_cell_fallback",
+                    },
+                )
+            )
+            return _fail(
+                RefusalReason.EFFUSION_REGIME_UNVERIFIED,
+                checks,
+                "in_cell_partial_pressure_sum",
+            )
+        if observation is None:
+            pressure_sum = None
+            pressure_detail = {"reason": "scored observation is unavailable"}
+        else:
+            pressure_sum, pressure_detail = _printed_in_cell_pressure_sum(
+                experiment,
+                observation,
+                point_observations,
+            )
+        pressure_limit = _in_cell_pressure_limit(experiment)
+        diameter_basis = (
+            "printed_orifice_diameter_p_over_d"
+            if diameter is not None
+            else "Drowart_standalone_usual_10_Pa_limit; no defensible d printed"
+        )
+        pressure_detail.update(
+            {
+                "pressure_limit_Pa": str(pressure_limit),
+                "limit_source": "Drowart et al. 2005, p. 689",
+                "limit_basis": diameter_basis,
+                "route": "in_cell_fallback",
+            }
+        )
+        if pressure_sum is not None and pressure_sum > pressure_limit:
+            checks.append(
+                GateCheck("in_cell_partial_pressure_sum", False, pressure_detail)
+            )
+            return _fail(
+                RefusalReason.EFFUSION_REGIME_UNVERIFIED,
+                checks,
+                "in_cell_partial_pressure_sum",
+            )
         checks.append(
             GateCheck(
                 "in_cell_partial_pressure_sum",
-                False,
+                True,
                 {
+                    **ungrounded_detail,
                     "reason": "calibration is not grounded for the in-cell fallback",
                     "route": "in_cell_fallback",
+                    "pressure_sum_detail": pressure_detail,
                 },
             )
         )
-        return _fail(
-            RefusalReason.EFFUSION_REGIME_UNVERIFIED,
-            checks,
-            "in_cell_partial_pressure_sum",
-        )
+        return _pass(checks)
     if observation is None:
         pressure_sum = None
         pressure_detail = {"reason": "scored observation is unavailable"}
