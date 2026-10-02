@@ -1411,6 +1411,18 @@ from pathlib import Path
 
 from simulator.diagnostic_helpers.binary_pot_battery import EquilibrateCell, Po2Request
 
+# Give the worker its own tight descriptor ceiling. It inherits the parent's
+# soft limit, which the fd test raises above 256 when the parent is busy, so
+# without this a one-fd-per-cell leak inside the worker could go unnoticed.
+import resource
+_fd_now = len(os.listdir("/dev/fd"))
+_soft, _hard = resource.getrlimit(resource.RLIMIT_NOFILE)
+_cap = _fd_now + 64
+if _hard != resource.RLIM_INFINITY:
+    _cap = min(_cap, _hard)
+if _soft == resource.RLIM_INFINITY or _cap < _soft:
+    resource.setrlimit(resource.RLIMIT_NOFILE, (_cap, _hard))
+
 for line in sys.stdin:
     request = json.loads(line)
     mode = request.get("simulate_crash")
