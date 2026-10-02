@@ -772,6 +772,44 @@ def test_uncalibrated_kems_partial_pressure_scores_with_calibration_notice(
     assert "calibration-not-grounded | vapour | internal-analytical | 1" in report
 
 
+def test_uncalibrated_kems_residual_matches_between_oxygen_balance_engines() -> None:
+    from simulator.battery.score import FLAGGED_STRATUM_CALIBRATION_NOT_GROUNDED
+    from simulator.battery.score import flagged_strata
+
+    experiment = F.kems_experiment(kn=None, calibrated=False)
+    reference = _uncalibrated_kems_partial_row(
+        experiment, "uncalibrated-kems-engine-parity", Decimal("10")
+    )
+    context = _context(F.work(), experiment, reference, review="reviewed")
+    residuals = {
+        engine: compile_residual(
+            reference,
+            engine,
+            context=context,
+            prediction=_partial_prediction(engine, reference),
+        )[0]
+        for engine in (Engine.OPENIMCC, Engine.INTERNAL_ANALYTICAL)
+    }
+
+    openimcc = residuals[Engine.OPENIMCC]
+    internal_analytical = residuals[Engine.INTERNAL_ANALYTICAL]
+    assert replace(
+        openimcc,
+        key=internal_analytical.key,
+        candidate=internal_analytical.candidate,
+    ) == internal_analytical
+    assert openimcc.notices == internal_analytical.notices
+    assert openimcc.numeric == internal_analytical.numeric
+    assert openimcc.status is internal_analytical.status is ResidualStatus.NO_BAND
+    assert openimcc.score_eligible is internal_analytical.score_eligible is False
+    assert flagged_strata(openimcc.notices) == (
+        FLAGGED_STRATUM_CALIBRATION_NOT_GROUNDED,
+    )
+    assert flagged_strata(internal_analytical.notices) == flagged_strata(
+        openimcc.notices
+    )
+
+
 def test_uncalibrated_kems_partial_pressure_is_excluded_from_band_population() -> None:
     experiment = F.kems_experiment(kn=None, calibrated=False)
     first = _uncalibrated_kems_partial_row(
