@@ -8,7 +8,7 @@
 - **Checks:** (1) additive — Stolyarova 169 common identical, 143 silent→typed; worker batch 180 fixed matching table; chunk kems-008…016 zero lost/changed outcomes; 4 refusal-detail enrichments only — PASS. (2) refusals reuse `IDENTITY_UNKNOWN` with `activity_reference_state_unknown` / categorical `quantity_unknown` — PASS. (3) spot20 of remainder: superseded/pending-unavailable legit; pending categorical/quoted/model_derived still silent (NOT-FIXED) — PASS. (4) tip⋈refconv `c9b6e545d` merges clean; 137 activity points convert via JANAF fusion notices; 0 reference-state refusals — PASS.
 - **Targeted tests:** three new tip `test_score` tests passed (`-o addopts=''`); no full W3 on VPS.
 - **Deliverable:** `REVIEW-b644-drop-6dc16819-2026-10-01.md`
-- **Mailbox tip:** `bdbbcd63dd35cb3825bf7b355edb13e4cab2a101` on `empirical/reviews-batch-zv-2026-09-22` (artifacts `1f011fbb0fc75e9659f0665af5a586944d7f55b9`)
+- **Mailbox tip:** `93819ca87b6916b5d8b60a26bdd57924d85470ef` on `empirical/reviews-batch-zv-2026-09-22` (artifacts `1f011fbb0fc75e9659f0665af5a586944d7f55b9`)
 - **Date:** 2026-10-01 ~21:42 ET
 
 — regolith-empirical
