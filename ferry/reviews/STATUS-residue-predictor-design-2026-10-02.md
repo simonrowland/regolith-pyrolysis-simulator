@@ -7,9 +7,8 @@ Design-only; no product code; no invent of extract data.
 **Seat:** `slot-y17` @ `ad3ca2a4b320de0c8fc11f835490ee826ce06d7e`
 (`origin/work-v064-green`). Idle after clear `.slot-busy`.
 **Pattern tip (read-only):** `76b550019` (IA battery wiring).
-**Mailbox:** `empirical/reviews-batch-zv-2026-09-22` →
-`ferry/reviews/DESIGN-residue-predictor-regolith-physics-2026-10-02.md` +
-this STATUS tip .
+**Mailbox:** empirical/reviews-batch-zv-2026-09-22 -> ferry/reviews/DESIGN-residue-predictor-regolith-physics-2026-10-02.md + this STATUS.
+**Mailbox tip:** 798ee5711d5fb0e9769ef8e072b64abd52ae63ff
 
 ## Covered (REQ §§1–7 + addenda a–b)
 
