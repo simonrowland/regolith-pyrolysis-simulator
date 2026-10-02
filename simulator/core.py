@@ -4431,6 +4431,23 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 'invalid_oxygen_interface_tolerance',
                 'flux residual tolerance must be finite and positive',
             )
+
+        def scaled_flux_tolerance(*flux_terms: float) -> float:
+            scale = max(
+                (abs(float(term)) for term in flux_terms),
+                default=0.0,
+            )
+            # The caller supplies the absolute flux limit derived from its
+            # hourly mole budget. Subtracting the two interface fluxes cannot
+            # resolve a residual below a few ulps of either term, so use the
+            # larger of that limit and a 1e-15 relative/4-ulp floor. This is a
+            # representability limit, not a looser physical budget.
+            return max(
+                flux_residual_tolerance_mol_m2_s,
+                1.0e-15 * scale,
+                4.0 * math.ulp(scale),
+            )
+
         gas_pressure_factor_mol_m3_per_bar = 1.0e5 / (
             GAS_CONSTANT * float(gas_temperature_K)
         )
@@ -4571,8 +4588,16 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                     surface_pressure_pa,
                 )
 
-            f_zero, *_ = metal_flux_values(0.0)
-            f_total, *_ = metal_flux_values(total_surface_o2_mol)
+            f_zero, gas_zero, melt_zero, _ = metal_flux_values(0.0)
+            f_total, gas_total, melt_total, _ = metal_flux_values(
+                total_surface_o2_mol
+            )
+            root_flux_tolerance = scaled_flux_tolerance(
+                gas_zero,
+                melt_zero,
+                gas_total,
+                melt_total,
+            )
             root_clamped = False
             root_converged = False
             root_residual = math.nan
@@ -4618,7 +4643,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                         if (
                             pressure_width_dex <= 1.0e-10
                             and abs(f_mid)
-                            <= flux_residual_tolerance_mol_m2_s
+                            <= root_flux_tolerance
                         ):
                             root_residual = f_mid
                             root_converged = True
@@ -4670,7 +4695,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                             if (
                                 pressure_width_dex <= 1.0e-8
                                 and abs(candidate_residual)
-                                <= flux_residual_tolerance_mol_m2_s
+                                <= root_flux_tolerance
                             ):
                                 surface_o2_mol_precise = candidate_u
                                 surface_o2_mol = float(candidate_u)
@@ -4699,14 +4724,8 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                     if final_pi_lo_pa > 0.0 and final_pi_hi_pa > 0.0
                     else math.inf
                 )
-                raise OxygenInterfaceConfigurationError(
-                    'oxygen_interface_root_nonconverged',
-                    'M2 surface-inventory root did not meet pressure-bracket '
-                    'and flux-residual tolerances in 80 iterations '
-                    f'(residual={root_residual!r}, '
-                    f'tolerance={flux_residual_tolerance_mol_m2_s!r}, '
-                    f'bracket_dex={final_pressure_width_dex!r})',
-                )
+            else:
+                final_pressure_width_dex = 0.0
             interface_pressure_pa = gas_pressure_pa - melt_flux / alpha
             if (
                 not math.isfinite(interface_pressure_pa)
@@ -4806,7 +4825,11 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 ),
                 'interface_root_clamped': bool(root_clamped),
                 'interface_root_residual_mol_m2_s': float(root_residual),
+                'interface_root_tolerance_mol_m2_s': float(
+                    root_flux_tolerance
+                ),
                 'interface_root_converged': bool(root_converged),
+                'interface_root_bracket_dex': float(final_pressure_width_dex),
                 'limiting_regime': limiting_regime,
                 'gas_flux_mol_m2_s': float(gas_flux),
                 'melt_flux_mol_m2_s': float(melt_flux),
@@ -4937,8 +4960,14 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         hi = max(gas_log, melt_log)
         root_log_lo = lo
         root_log_hi = hi
-        lo_residual, *_ = flux_values(lo)
-        hi_residual, *_ = flux_values(hi)
+        lo_residual, lo_gas_flux, lo_melt_flux, _ = flux_values(lo)
+        hi_residual, hi_gas_flux, hi_melt_flux, _ = flux_values(hi)
+        root_flux_tolerance = scaled_flux_tolerance(
+            lo_gas_flux,
+            lo_melt_flux,
+            hi_gas_flux,
+            hi_melt_flux,
+        )
         root_clamped = False
         root_converged = False
         precise_result: tuple[Decimal, float, float, float, Decimal] | None = None
@@ -4970,7 +4999,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 if (
                     hi - lo <= math.log(10.0) * 1.0e-8
                     and abs(residual)
-                    <= flux_residual_tolerance_mol_m2_s
+                    <= root_flux_tolerance
                 ):
                     interface_log = mid
                     root_converged = True
@@ -5013,12 +5042,17 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 lo_flux, *_ = precise_flux_values(lo_precise)
                 hi_flux, *_ = precise_flux_values(hi_precise)
                 tolerance_precise = Decimal.from_float(
-                    flux_residual_tolerance_mol_m2_s
+                    root_flux_tolerance
                 )
+                best_precise_log: Decimal | None = None
+                best_precise_residual = Decimal('Infinity')
                 for _ in range(80):
                     mid_precise = (lo_precise + hi_precise) / 2
                     precise_result = precise_flux_values(mid_precise)
                     mid_flux = precise_result[0]
+                    if abs(mid_flux) < abs(best_precise_residual):
+                        best_precise_log = mid_precise
+                        best_precise_residual = mid_flux
                     if mid_flux == 0:
                         lo_precise = hi_precise = mid_precise
                     elif lo_flux * mid_flux <= 0:
@@ -5036,20 +5070,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                         residual = float(mid_flux)
                         root_converged = True
                         break
-
-        if not root_converged:
-            raise OxygenInterfaceConfigurationError(
-                'oxygen_interface_root_nonconverged',
-                'ferric interface root did not meet pressure-bracket and '
-                'flux-residual tolerances in 80 iterations '
-                f'(residual={residual!r}, '
-                f'tolerance={flux_residual_tolerance_mol_m2_s!r}, '
-                f'bracket_dex={(hi - lo) / math.log(10.0)!r}, '
-                f'precise_residual={None if precise_result is None else str(precise_result[0])!r}, '
-                f'gas_pO2_bar={gas_pO2_bar!r}, melt_pO2_bar={melt_pO2_bar!r}, '
-                f'lo_residual={lo_residual!r}, hi_residual={hi_residual!r}, '
-                f'n_FeO={n_feo_mol!r}, n_Fe2O3={n_fe2o3_mol!r})',
-            )
+                if not root_converged and best_precise_log is not None:
+                    interface_log = best_precise_log
+                    residual = float(best_precise_residual)
 
         if precise_result is not None and isinstance(interface_log, Decimal):
             residual_decimal, gas_flux, melt_flux, equilibrium_mol, p_bar = (
@@ -5123,6 +5146,12 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             'interface_root_converged': bool(root_converged),
             'interface_root_clamped': bool(root_clamped),
             'interface_root_residual_mol_m2_s': float(residual),
+            'interface_root_tolerance_mol_m2_s': float(
+                root_flux_tolerance
+            ),
+            'interface_root_bracket_dex': float(
+                (hi - lo) / math.log(10.0)
+            ),
             'limiting_regime': limiting_regime,
             'gas_flux_mol_m2_s': float(gas_flux),
             'melt_flux_mol_m2_s': float(melt_flux),
@@ -5735,7 +5764,15 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         to 1/lambda without crossing the local equilibrium. The first omitted
         local term is h^3 f'' f^2/6, so the smooth-branch global error is
         second order. Whole-hour refinement, not a substep-size heuristic,
-        controls that nonlinear error.
+        controls that nonlinear error. Each candidate root retains the
+        absolute flux limit implied by the hourly mole budget; the requested
+        limit is min(1e-14, 0.01*budget/(A*dt)), and the effective tolerance is
+        the maximum of that limit, 1e-15 times the largest interface flux
+        term, and four ulps of that term. The relative and ulp terms prevent
+        asking binary64 subtraction to resolve below its representable scale.
+        If refinement or an inner root cannot certify the requested accuracy,
+        publish the finest converged trajectory, or the bounded candidate with
+        the smallest root residual, together with its error estimate and flag.
         """
 
         dt_s = float(dt_s)
@@ -6146,11 +6183,6 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 flux_residual_tolerance_mol_m2_s=flux_tolerance,
                 diagnostics=False,
             )
-            if root.get('interface_root_converged') is not True:
-                raise OxygenInterfaceConfigurationError(
-                    'oxygen_interface_root_nonconverged',
-                    'finite interface root returned without convergence evidence',
-                )
             flux = float(root['interface_flux_mol_m2_s'])
             if not math.isfinite(flux):
                 raise OxygenInterfaceConfigurationError(
@@ -6247,14 +6279,45 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         previous: Dict[str, Any] | None = None
         consecutive = 0
         accepted: Dict[str, Any] | None = None
-        accepted_count = 0
         first_state: Dict[str, Any] | None = None
         last_refinement_issue = 'no comparison completed'
 
         def run_refinement(count: int) -> Dict[str, Any] | None:
             nonlocal first_state, last_refinement_issue
+            root_misses: list[Dict[str, float]] = []
+
+            def evaluate_candidate(
+                amount_mol: float,
+                *,
+                uptake_at_origin: bool = False,
+            ) -> Dict[str, Any]:
+                candidate_state = evaluate(
+                    amount_mol,
+                    uptake_at_origin=uptake_at_origin,
+                )
+                root = candidate_state['root']
+                if root.get('interface_root_converged') is not True:
+                    root_misses.append({
+                        'residual_mol_m2_s': abs(float(
+                            root.get(
+                                'interface_root_residual_mol_m2_s',
+                                math.inf,
+                            )
+                        )),
+                        'tolerance_mol_m2_s': float(
+                            root.get(
+                                'interface_root_tolerance_mol_m2_s',
+                                flux_tolerance,
+                            )
+                        ),
+                        'bracket_dex': float(
+                            root.get('interface_root_bracket_dex', math.inf)
+                        ),
+                    })
+                return candidate_state
+
             d_mol = 0.0
-            state = evaluate(d_mol)
+            state = evaluate_candidate(d_mol)
             if (
                 melt_equality_absent
                 and not metal_law_active
@@ -6264,7 +6327,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 # branch from the ferric-forming side, while release uses the
                 # private dissociation ceiling. Re-evaluate the origin on the
                 # incident uptake branch before stepping into that inventory.
-                state = evaluate(d_mol, uptake_at_origin=True)
+                state = evaluate_candidate(d_mol, uptake_at_origin=True)
             if first_state is None:
                 first_state = state
             step_s = dt_s / count
@@ -6335,7 +6398,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                             else step_s
                         )
                     if 0.0 < event_s < step_s:
-                        endpoint = evaluate(gas_floor_mol)
+                        endpoint = evaluate_candidate(gas_floor_mol)
                         d_mol = gas_floor_mol
                         state = endpoint
                         elapsed_in_step_s = event_s
@@ -6415,7 +6478,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                             if f_mol_s != 0.0
                             else remaining_step_s
                         )
-                    state = evaluate(next_cap)
+                    state = evaluate_candidate(next_cap)
                     d_mol = next_cap
                     capped = True
                     cap_kind = next_cap_kind
@@ -6442,7 +6505,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                     )
                     return None
                 if endpoint is None or candidate_mol != d_mol:
-                    endpoint = evaluate(candidate_mol)
+                    endpoint = evaluate_candidate(candidate_mol)
                 endpoint_field = float(endpoint['f_mol_s'])
                 roundoff_field_tolerance = 32.0 * math.ulp(1.0) * max(
                     abs(f_mol_s),
@@ -6502,7 +6565,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                                 f'lambda_end={endpoint_rate!r})'
                             )
                             return None
-                        endpoint = evaluate(safe_candidate)
+                        endpoint = evaluate_candidate(safe_candidate)
                         safe_field = float(endpoint['f_mol_s'])
                         if safe_field * f_mol_s <= 0.0:
                             last_refinement_issue = (
@@ -6529,14 +6592,27 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 'capped': capped,
                 'cap_kind': cap_kind,
                 'cap_context': cap_context,
+                'root_misses': root_misses,
+                'root_converged': not root_misses,
+                'refinement_count': count,
             }
 
+        refinement_candidates: list[Dict[str, Any]] = []
+        solver_failure: OxygenInterfaceConfigurationError | None = None
         for count in refinement_counts:
-            current = run_refinement(count)
+            try:
+                current = run_refinement(count)
+            except OxygenInterfaceConfigurationError as exc:
+                if exc.reason != 'oxygen_interface_activity_fixed_point_nonconverged':
+                    raise
+                solver_failure = exc
+                last_refinement_issue = str(exc)
+                break
             if current is None:
                 previous = None
                 consecutive = 0
                 continue
+            refinement_candidates.append(current)
             if previous is None:
                 passed = False
             else:
@@ -6555,6 +6631,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                     float(previous['state']['root']['interface_pO2_bar']),
                 ))
                 passed = (
+                    bool(current['root_converged'])
+                    and bool(previous['root_converged'])
+                    and
                     amount_difference <= amount_limit
                     and abs(current_log_pressure - previous_log_pressure)
                     <= 1.0e-4
@@ -6570,27 +6649,142 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             consecutive = consecutive + 1 if passed else 0
             if consecutive >= 2:
                 accepted = current
-                accepted_count = count
                 break
             previous = current
 
-        if accepted is None:
-            raise OxygenInterfaceConfigurationError(
-                'oxygen_exchange_refinement_nonconverged',
-                'whole-hour exponential refinement exhausted N=256 without '
-                'two successive accepted comparisons; '
-                f'{last_refinement_issue}',
+        finest_root_converged = next(
+            (
+                candidate
+                for candidate in reversed(refinement_candidates)
+                if candidate['root_converged']
+            ),
+            None,
+        )
+        if accepted is not None:
+            selected = accepted
+        elif finest_root_converged is not None:
+            selected = finest_root_converged
+        elif refinement_candidates:
+            selected = min(
+                refinement_candidates,
+                key=lambda candidate: max(
+                    (
+                        miss['residual_mol_m2_s']
+                        / max(miss['tolerance_mol_m2_s'], 1.0e-300)
+                        for miss in candidate['root_misses']
+                    ),
+                    default=0.0,
+                ),
             )
-        if first_state is None:
-            raise OxygenInterfaceConfigurationError(
-                'oxygen_exchange_refinement_nonconverged',
-                'no initial finite interface state was evaluated',
-            )
+        else:
+            selected = None
 
-        transfer_mol = float(accepted['d_mol'])
-        final_state = accepted['state']
+        prediction_flags: list[Dict[str, Any]] = []
+        amount_error_estimate_mol = 0.0
+        pressure_error_estimate_dex = 0.0
+        if solver_failure is not None:
+            prediction_flags.append({
+                'flag': 'oxygen_exchange_activity_fixed_point_nonconverged',
+                'detail': str(solver_failure),
+            })
+        if selected is not None:
+            preceding = next(
+                (
+                    candidate
+                    for candidate in reversed(refinement_candidates)
+                    if candidate['refinement_count']
+                    < selected['refinement_count']
+                    and candidate['root_converged']
+                ),
+                None,
+            )
+            if preceding is not None:
+                amount_error_estimate_mol = abs(
+                    float(selected['d_mol']) - float(preceding['d_mol'])
+                )
+                pressure_error_estimate_dex = abs(
+                    math.log10(max(
+                        self._vacuum_floor_bar(),
+                        float(selected['state']['root']['interface_pO2_bar']),
+                    ))
+                    - math.log10(max(
+                        self._vacuum_floor_bar(),
+                        float(preceding['state']['root']['interface_pO2_bar']),
+                    ))
+                )
+            if accepted is None and solver_failure is None:
+                amount_limit = 0.1 * (
+                    1.0e-12 + 1.0e-3 * abs(float(selected['d_mol']))
+                )
+                prediction_flags.append({
+                    'flag': 'oxygen_exchange_refinement_exhausted',
+                    'refinement_count': int(selected['refinement_count']),
+                    'amount_residual_mol': amount_error_estimate_mol,
+                    'amount_tolerance_mol': amount_limit,
+                    'interface_pressure_residual_dex': (
+                        pressure_error_estimate_dex
+                    ),
+                    'interface_pressure_tolerance_dex': 1.0e-4,
+                    'detail': last_refinement_issue,
+                })
+            if selected['root_misses']:
+                worst_root_miss = max(
+                    selected['root_misses'],
+                    key=lambda miss: miss['residual_mol_m2_s'],
+                )
+                prediction_flags.append({
+                    'flag': 'oxygen_exchange_root_tolerance_unmet',
+                    **worst_root_miss,
+                })
+                amount_error_estimate_mol = max(
+                    amount_error_estimate_mol,
+                    worst_root_miss['residual_mol_m2_s']
+                    * surface_area_m2
+                    * dt_s,
+                )
+
+        if selected is None:
+            prediction_flags.append({
+                'flag': 'oxygen_exchange_candidate_solve_incomplete',
+                'detail': last_refinement_issue,
+            })
+            return {
+                'authority': 'diagnostic_only',
+                'status': 'ok',
+                'solver': 'exponential_local_jacobian_refinement',
+                'transfer_o2_mol': 0.0,
+                'transfer_o2_kg': 0.0,
+                'requested_transfer_o2_mol': 0.0,
+                'unbacked_transfer_o2_mol': 0.0,
+                'availability_clamped': False,
+                'direction': 'none:numerically_unresolved',
+                'substeps': 0,
+                'requested_substeps': 0,
+                'refinement_levels': tuple(refinement_counts),
+                'amount_bisections': 0,
+                'interface_evaluations': interface_evaluations,
+                'bounded': True,
+                'finite': True,
+                'interface_pO2_bar': transport_pO2_bar,
+                'interface_flux_mol_m2_s': 0.0,
+                'interface_root_converged': False,
+                'interface_root_residual_mol_m2_s': None,
+                'interface_root_tolerance_mol_m2_s': flux_tolerance,
+                'refinement_error_estimate_o2_mol': amount_error_estimate_mol,
+                'refinement_error_estimate_interface_pO2_dex': (
+                    pressure_error_estimate_dex
+                ),
+                'prediction_flags': prediction_flags,
+            }
+
+        transfer_mol = float(selected['d_mol'])
+        final_state = selected['state']
         last_root = final_state['root']
-        initial_root = first_state['root']
+        initial_root = (
+            first_state['root']
+            if first_state is not None
+            else final_state['root']
+        )
         initial_lambda = float(first_state['lambda_s'])
         gas_conductance = float(
             initial_root['gas_conductance_mol_m2_s_per_ln']
@@ -6631,13 +6825,13 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             tau_s = math.inf
 
         availability_clamped = bool(
-            accepted['capped']
-            and accepted['cap_kind'] == 'lower'
+            selected['capped']
+            and selected['cap_kind'] == 'lower'
             and headspace_lower_bound_mol >= chemical_lower_bound_mol
         )
         unbacked_transfer_mol = 0.0
-        if availability_clamped and accepted['cap_context'] is not None:
-            cap_context = accepted['cap_context']
+        if availability_clamped and selected['cap_context'] is not None:
+            cap_context = selected['cap_context']
             remaining_s = float(cap_context['remaining_s'])
             f_at_cap = float(cap_context['f_mol_s'])
             rate_at_cap = float(cap_context['lambda_s'])
@@ -6698,8 +6892,8 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             'unbacked_transfer_o2_mol': unbacked_transfer_mol,
             'availability_clamped': availability_clamped,
             'direction': direction,
-            'substeps': accepted_count,
-            'requested_substeps': accepted_count,
+            'substeps': int(selected['refinement_count']),
+            'requested_substeps': int(selected['refinement_count']),
             'refinement_levels': tuple(refinement_counts),
             'amount_bisections': 0,
             'interface_evaluations': interface_evaluations,
@@ -6734,9 +6928,20 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             'interface_root_residual_mol_m2_s': float(
                 last_root['interface_root_residual_mol_m2_s']
             ),
+            'interface_root_tolerance_mol_m2_s': float(
+                last_root.get(
+                    'interface_root_tolerance_mol_m2_s',
+                    flux_tolerance,
+                )
+            ),
             'interface_root_converged': bool(
                 last_root['interface_root_converged']
             ),
+            'refinement_error_estimate_o2_mol': amount_error_estimate_mol,
+            'refinement_error_estimate_interface_pO2_dex': (
+                pressure_error_estimate_dex
+            ),
+            'prediction_flags': prediction_flags,
             'finite_melt_driving_force_mol': float(
                 last_root['finite_melt_driving_force_mol']
             ),

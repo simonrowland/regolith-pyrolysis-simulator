@@ -8,7 +8,6 @@ from simulator.accounting import AccountingError, MaterialLot
 from simulator.condensation import CondensationRouteResult
 from simulator.core import (
     OXYGEN_RESERVOIR_NOOP_MOL,
-    OxygenInterfaceConfigurationError,
     PyrolysisSimulator,
 )
 from simulator.melt_backend.base import InternalAnalyticalBackend
@@ -1289,7 +1288,7 @@ def test_fe_redox_and_sio_use_coupled_oxygen_reservoirs():
     sim._headspace_transport_pO2_bar = real_transport
 
 
-def test_nonconverged_finite_oxygen_transfer_does_not_commit():
+def test_nonconverged_finite_oxygen_transfer_commits_flagged_prediction():
     sim = _sio_o2_train_sim()
     sim.melt.temperature_C = 1600.0
     sim.melt.atmosphere = Atmosphere.PN2_SWEEP
@@ -1313,17 +1312,24 @@ def test_nonconverged_finite_oxygen_transfer_does_not_commit():
     )
     sim._melt_redox_ledger_initialized = True
     sim.melt.stir_state.radial = 0.0
-    ledger_before = sim.atom_ledger.mol_by_account()
-    transitions_before = len(sim.atom_ledger.transitions)
+    drift_before = sim.atom_ledger.element_atom_drift_report()
+    reservoir = sim._apply_oxygen_reservoir_exchange()
 
-    with pytest.raises(
-        OxygenInterfaceConfigurationError,
-        match="oxygen_exchange_refinement_nonconverged",
+    shadow = reservoir.shadow_oxygen_transfer
+    assert shadow['status'] == 'ok'
+    assert shadow['bounded'] is True
+    assert shadow['prediction_flags']
+    assert shadow['refinement_error_estimate_o2_mol'] >= 0.0
+    assert abs(reservoir.exchange_o2_mol) > 0.0
+    drift_after = sim.atom_ledger.element_atom_drift_report()
+    for report_key in (
+        'accepted_transition_residual_mol_atoms',
+        'whole_run_boundary_residual_mol_atoms',
     ):
-        sim._apply_oxygen_reservoir_exchange()
-
-    assert sim.atom_ledger.mol_by_account() == ledger_before
-    assert len(sim.atom_ledger.transitions) == transitions_before
+        for element, value in drift_after[report_key].items():
+            assert value == pytest.approx(
+                drift_before[report_key][element], abs=5.0e-12
+            )
 
 
 def test_evaporation_flux_does_not_reapply_commanded_po2():

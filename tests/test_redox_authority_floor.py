@@ -268,7 +268,7 @@ def test_unavailable_buffer_absence_does_not_fall_back_to_cached_scalar(
     assert _authoritative_melt_fO2_log(sim) == pytest.approx(key_fO2_log)
 
 
-def test_unavailable_buffer_activity_failure_is_typed_and_transactional(
+def test_unavailable_buffer_activity_failure_is_predicted_and_flagged(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     sim = _sim_with_oxides(feo_wt=10.0, fe2o3_wt=0.0, temperature_C=1400.0)
@@ -300,17 +300,25 @@ def test_unavailable_buffer_activity_failure_is_typed_and_transactional(
 
     monkeypatch.setattr(sim, "_melt_fO2_from_ledger", track_unavailable_basis)
 
-    ledger_before = sim.atom_ledger.mol_by_account()
-    transitions_before = len(sim.atom_ledger.transitions)
-    with pytest.raises(
-        core_module.OxygenInterfaceConfigurationError,
-        match="oxygen_interface_activity_fixed_point_nonconverged",
-    ):
-        sim._step_one_hour()
-
+    drift_before = sim.atom_ledger.element_atom_drift_report()
+    sim._step_one_hour()
     assert visited_unavailable_basis
-    assert sim.atom_ledger.mol_by_account() == ledger_before
-    assert len(sim.atom_ledger.transitions) == transitions_before
+    shadow = sim.melt.oxygen_reservoir.shadow_oxygen_transfer
+    assert shadow["status"] == "ok"
+    assert shadow["transfer_o2_mol"] == 0.0
+    assert any(
+        item["flag"] == "oxygen_exchange_activity_fixed_point_nonconverged"
+        for item in shadow["prediction_flags"]
+    )
+    drift_after = sim.atom_ledger.element_atom_drift_report()
+    for report_key in (
+        "accepted_transition_residual_mol_atoms",
+        "whole_run_boundary_residual_mol_atoms",
+    ):
+        for element, value in drift_after[report_key].items():
+            assert value == pytest.approx(
+                drift_before[report_key][element], abs=5.0e-12
+            )
 
 
 def test_nonzero_release_with_no_ferric_inventory_keeps_the_bound() -> None:
@@ -1577,8 +1585,8 @@ def test_ferrous_free_split_and_per_hour_summary_publish_the_bound() -> None:
     json.dumps(summary, allow_nan=False)
 
 
-def test_ferrous_free_refinement_failure_preserves_bound_consumers() -> None:
-    """An uncertified ferrous-free hour refuses commit but retains its bound."""
+def test_ferrous_free_refinement_prediction_preserves_bound_consumers() -> None:
+    """An uncertified ferrous-free hour commits a flagged bounded prediction."""
     sim = _fully_ferric_sim()
     expected = _ferrous_free_lower_bound_log10(
         sim,
@@ -1590,15 +1598,24 @@ def test_ferrous_free_refinement_failure_preserves_bound_consumers() -> None:
         expected, abs=1.0e-8
     )
 
-    ledger_before = sim.atom_ledger.mol_by_account()
-    transitions_before = len(sim.atom_ledger.transitions)
-    with pytest.raises(
-        core_module.OxygenInterfaceConfigurationError,
-        match="oxygen_exchange_refinement_nonconverged",
+    drift_before = sim.atom_ledger.element_atom_drift_report()
+    sim.step()
+    shadow = sim.melt.oxygen_reservoir.shadow_oxygen_transfer
+    assert shadow['status'] == 'ok'
+    assert shadow['bounded'] is True
+    assert any(
+        item['flag'] == 'oxygen_exchange_refinement_exhausted'
+        for item in shadow['prediction_flags']
+    )
+    drift_after = sim.atom_ledger.element_atom_drift_report()
+    for report_key in (
+        'accepted_transition_residual_mol_atoms',
+        'whole_run_boundary_residual_mol_atoms',
     ):
-        sim.step()
-    assert sim.atom_ledger.mol_by_account() == ledger_before
-    assert len(sim.atom_ledger.transitions) == transitions_before
+        for element, value in drift_after[report_key].items():
+            assert value == pytest.approx(
+                drift_before[report_key][element], abs=5.0e-12
+            )
 
     absent = _fully_ferric_sim()
     assert absent._melt_fO2_from_ledger() is None
@@ -1621,11 +1638,12 @@ def test_ferrous_free_refinement_failure_preserves_bound_consumers() -> None:
     )
 
     absent_ledger_before = absent.atom_ledger.mol_by_account()
-    with pytest.raises(
-        core_module.OxygenInterfaceConfigurationError,
-        match="oxygen_exchange_refinement_nonconverged",
-    ):
-        absent._oxygen_shadow_transfer()
+    predicted = absent._oxygen_shadow_transfer()
+    assert predicted['status'] == 'ok'
+    assert any(
+        item['flag'] == 'oxygen_exchange_refinement_exhausted'
+        for item in predicted['prediction_flags']
+    )
     assert absent.atom_ledger.mol_by_account() == absent_ledger_before
 
     extent = absent._compute_native_fe_saturation_extent()
@@ -2460,40 +2478,46 @@ def _failure_fixture(
     return sim
 
 
-def _assert_shadow_failure_keeps_ledger(
+def _assert_shadow_prediction_keeps_ledger(
     sim: PyrolysisSimulator,
-    monkeypatch: pytest.MonkeyPatch,
     *,
-    reason: str,
+    flag: str,
 ) -> None:
     before = sim.atom_ledger.mol_by_account()
     transitions_before = len(sim.atom_ledger.transitions)
-    with pytest.raises(
-        core_module.OxygenInterfaceConfigurationError,
-        match=reason,
-    ):
-        sim._oxygen_shadow_transfer(dt_s=1.0)
+    result = sim._oxygen_shadow_transfer(dt_s=1.0)
+    assert result['status'] == 'ok'
+    assert result['bounded'] is True
+    assert result['finite'] is True
+    assert any(item['flag'] == flag for item in result['prediction_flags'])
+    assert result['refinement_error_estimate_o2_mol'] >= 0.0
     assert sim.atom_ledger.mol_by_account() == before
     assert len(sim.atom_ledger.transitions) == transitions_before
 
 
-def test_exponential_interface_nonconvergence_is_typed_and_pure(
+def test_exponential_interface_root_miss_is_predicted_and_flagged(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     sim = _failure_fixture(monkeypatch)
+    original_root = sim._oxygen_finite_interface_root
+
+    def root_without_convergence(**kwargs: Any) -> dict[str, Any]:
+        result = original_root(**kwargs)
+        result['interface_root_converged'] = False
+        return result
+
     monkeypatch.setattr(
         sim,
         "_oxygen_finite_interface_root",
-        lambda **_kwargs: {"interface_root_converged": False},
+        root_without_convergence,
     )
-    _assert_shadow_failure_keeps_ledger(
+    _assert_shadow_prediction_keeps_ledger(
         sim,
-        monkeypatch,
-        reason="oxygen_interface_root_nonconverged",
+        flag='oxygen_exchange_root_tolerance_unmet',
     )
 
 
-def test_exponential_m2_activity_failure_is_typed_and_pure(
+def test_exponential_m2_activity_failure_is_predicted_and_flagged(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     sim = _m2_ideal_fixture(monkeypatch)
@@ -2517,14 +2541,13 @@ def test_exponential_m2_activity_failure_is_typed_and_pure(
         "_fe_saturation_bound_fO2_log",
         lambda **_kwargs: None,
     )
-    _assert_shadow_failure_keeps_ledger(
+    _assert_shadow_prediction_keeps_ledger(
         sim,
-        monkeypatch,
-        reason="oxygen_interface_activity_fixed_point_nonconverged",
+        flag='oxygen_exchange_activity_fixed_point_nonconverged',
     )
 
 
-def test_exponential_refinement_exhaustion_is_typed_and_pure(
+def test_exponential_refinement_exhaustion_is_predicted_and_flagged(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     sim = _failure_fixture(monkeypatch)
@@ -2544,11 +2567,26 @@ def test_exponential_refinement_exhaustion_is_typed_and_pure(
         "_oxygen_finite_interface_root",
         alternating_pressure_root,
     )
-    _assert_shadow_failure_keeps_ledger(
-        sim,
-        monkeypatch,
-        reason="oxygen_exchange_refinement_nonconverged",
+    drift_before = sim.atom_ledger.element_atom_drift_report()
+    reservoir = sim._apply_oxygen_reservoir_exchange()
+    shadow = reservoir.shadow_oxygen_transfer
+    assert shadow['status'] == 'ok'
+    assert shadow['bounded'] is True
+    assert any(
+        item['flag'] == 'oxygen_exchange_refinement_exhausted'
+        for item in shadow['prediction_flags']
     )
+    assert shadow['refinement_error_estimate_o2_mol'] > 0.0
+    assert abs(reservoir.exchange_o2_mol) > OXYGEN_RESERVOIR_NOOP_MOL
+    drift_after = sim.atom_ledger.element_atom_drift_report()
+    for report_key in (
+        'accepted_transition_residual_mol_atoms',
+        'whole_run_boundary_residual_mol_atoms',
+    ):
+        for element, value in drift_after[report_key].items():
+            assert value == pytest.approx(
+                drift_before[report_key][element], abs=5.0e-12
+            )
 
 
 def test_exponential_e0_returns_without_interface_roots(

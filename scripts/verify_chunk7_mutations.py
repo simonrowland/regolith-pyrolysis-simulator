@@ -154,25 +154,25 @@ def main() -> None:
         mutated_source=no_convergence_guard,
         node_id=(
             "tests/test_redox_authority_floor.py::"
-            "test_exponential_interface_nonconvergence_is_typed_and_pure"
+            "test_exponential_interface_root_miss_is_predicted_and_flagged"
         ),
-        expected_output="interface_flux_mol_m2_s",
+        expected_output="assert any",
     )
 
-    no_exhaustion_failure = _replace_once(
+    no_exhaustion_notice = _replace_once(
         original,
-        "        if accepted is None:\n",
-        "        if False and accepted is None:\n",
-        "refinement exhaustion guard",
+        "            if accepted is None and solver_failure is None:\n",
+        "            if False:\n",
+        "refinement exhaustion notice",
     )
     _run_expected_failure(
-        label="ignored refinement exhaustion",
-        mutated_source=no_exhaustion_failure,
+        label="unflagged refinement exhaustion",
+        mutated_source=no_exhaustion_notice,
         node_id=(
             "tests/test_redox_authority_floor.py::"
-            "test_exponential_refinement_exhaustion_is_typed_and_pure"
+            "test_exponential_refinement_exhaustion_is_predicted_and_flagged"
         ),
-        expected_output="NoneType",
+        expected_output="assert any",
     )
 
     if CORE_PATH.read_bytes() != original_bytes:
