@@ -6,11 +6,822 @@ source:
   url: https://ntrs.nasa.gov/citations/20150002321
   year: 2015
 extraction:
-  method: OCR-artifact transcription (MinerU vlm) + figure vision for α points
-  date: '2026-08-03'
-  worker: ocr-phase2-gk
-  provenance_path: docs-private/research/ocr-artifacts/kems-007-costa-2015/
+  method: "OCR-artifact transcription for legacy rows; 300 dpi figure digitization for new Fe/Mg observations"
+  date: "2026-10-01"
+  worker: "codex-assisted"
+  provenance_path: docs-private/research/2026-10-01-femg-costa-2015/
 review_status: draft
+benches:
+- id: mo-cell
+  identity:
+    basis: described_in_this_work
+  apparatus_family:
+    state:
+      tag: value
+      value: Nuclide/MAAS/PATCO 12-90-HT single-focus 90-degree magnetic-sector mass
+        spectrometer
+    locator:
+      page: 4
+      pdf_page_index: 3
+      section: experimental apparatus
+      note: Instrument name and configuration as printed.
+  method:
+    state:
+      tag: value
+      value: Knudsen effusion mass spectrometry
+    locator:
+      page: 8
+      pdf_page_index: 7
+      section: 'Results: Time to Equilibration'
+      note: Caption identifies panel A as a molybdenum Knudsen cell.
+  geometry:
+    orifice_diameter_m:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 8
+        pdf_page_index: 7
+        section: 'Results: Time to Equilibration'
+        note: The article gives no numeric effusion-orifice diameter for this cell.
+    cell_internal_dimensions:
+      diameter_m:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          page: 8
+          pdf_page_index: 7
+          section: 'Results: Time to Equilibration'
+          note: Internal cell diameter not stated numerically.
+      height_m:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          page: 8
+          pdf_page_index: 7
+          section: 'Results: Time to Equilibration'
+          note: Internal cell height not stated numerically.
+  cell_materials:
+  - state:
+      tag: value
+      value: Mo
+    locator:
+      page: 8
+      pdf_page_index: 7
+      section: 'Results: Time to Equilibration'
+      note: Caption identifies panel A as a molybdenum Knudsen cell.
+  cell_material_and_liner:
+    state:
+      tag: value
+      value: Molybdenum Knudsen cell
+    locator:
+      page: 8
+      pdf_page_index: 7
+      section: 'Results: Time to Equilibration'
+      note: Caption identifies panel A as a molybdenum Knudsen cell.
+  detector:
+    state:
+      tag: value
+      value: 90-degree magnetic-sector mass spectrometer with ion counting
+    locator:
+      page: 4
+      pdf_page_index: 3
+      section: experimental apparatus
+      note: Mass spectrometer and ion-counting detection as printed.
+  temperature_calibration:
+    standard:
+      state:
+        tag: value
+        value: Au melting point (ITS-90 standard)
+      locator:
+        page: 4
+        pdf_page_index: 3
+        section: experimental apparatus
+        note: Temperature calibration from melting point of Au; ITS-90 standard.
+- id: ir-liner-graphite-cell
+  identity:
+    basis: described_in_this_work
+  apparatus_family:
+    state:
+      tag: value
+      value: Nuclide/MAAS/PATCO 12-90-HT single-focus 90-degree magnetic-sector mass
+        spectrometer
+    locator:
+      page: 4
+      pdf_page_index: 3
+      section: experimental apparatus
+      note: Instrument name and configuration as printed.
+  method:
+    state:
+      tag: value
+      value: Knudsen effusion mass spectrometry
+    locator:
+      page: 8
+      pdf_page_index: 7
+      section: 'Results: Time to Equilibration'
+      note: Caption identifies panel B as an iridium Knudsen cell; method text identifies
+        Ir liners in a graphite cell.
+  geometry:
+    orifice_diameter_m:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 8
+        pdf_page_index: 7
+        section: 'Results: Time to Equilibration'
+        note: The article gives no numeric effusion-orifice diameter for this cell.
+    cell_internal_dimensions:
+      diameter_m:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          page: 8
+          pdf_page_index: 7
+          section: 'Results: Time to Equilibration'
+          note: Internal cell diameter not stated numerically.
+      height_m:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          page: 8
+          pdf_page_index: 7
+          section: 'Results: Time to Equilibration'
+          note: Internal cell height not stated numerically.
+  cell_materials:
+  - state:
+      tag: value
+      value: Ir
+    locator:
+      page: 8
+      pdf_page_index: 7
+      section: 'Results: Time to Equilibration'
+      note: Caption identifies panel B as an iridium Knudsen cell; method text identifies
+        Ir liners in a graphite cell.
+  - state:
+      tag: value
+      value: C_graphite
+    locator:
+      page: 8
+      pdf_page_index: 7
+      section: 'Results: Time to Equilibration'
+      note: Caption identifies panel B as an iridium Knudsen cell; method text identifies
+        Ir liners in a graphite cell.
+  cell_material_and_liner:
+    state:
+      tag: value
+      value: Ir liner in graphite cell; authors state Ir liners in a graphite cell
+        proved unreactive
+    locator:
+      page: 8
+      pdf_page_index: 7
+      section: 'Results: Time to Equilibration'
+      note: Caption identifies panel B as an iridium Knudsen cell; method text identifies
+        Ir liners in a graphite cell.
+  detector:
+    state:
+      tag: value
+      value: 90-degree magnetic-sector mass spectrometer with ion counting
+    locator:
+      page: 4
+      pdf_page_index: 3
+      section: experimental apparatus
+      note: Mass spectrometer and ion-counting detection as printed.
+  temperature_calibration:
+    standard:
+      state:
+        tag: value
+        value: Au melting point (ITS-90 standard)
+      locator:
+        page: 4
+        pdf_page_index: 3
+        section: experimental apparatus
+        note: Temperature calibration from melting point of Au; ITS-90 standard.
+- id: mo-multi-orifice-cells
+  identity:
+    basis: described_in_this_work
+  apparatus_family:
+    state:
+      tag: value
+      value: Nuclide/MAAS/PATCO 12-90-HT single-focus 90-degree magnetic-sector mass
+        spectrometer
+    locator:
+      page: 4
+      pdf_page_index: 3
+      section: experimental apparatus
+      note: Instrument name and configuration as printed.
+  method:
+    state:
+      tag: value
+      value: Knudsen effusion mass spectrometry
+    locator:
+      page: 11
+      pdf_page_index: 10
+      section: Vaporization coefficients
+      note: Caption states three Mo Knudsen cells with different orifice sizes; no
+        numeric sizes.
+  geometry:
+    orifice_diameter_m:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 11
+        pdf_page_index: 10
+        section: Vaporization coefficients
+        note: Three different orifice sizes are stated, but no numeric effusion-orifice
+          diameters are printed.
+    cell_internal_dimensions:
+      diameter_m:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          page: 11
+          pdf_page_index: 10
+          section: Vaporization coefficients
+          note: Internal cell diameter not stated numerically.
+      height_m:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          page: 11
+          pdf_page_index: 10
+          section: Vaporization coefficients
+          note: Internal cell height not stated numerically.
+  cell_materials:
+  - state:
+      tag: value
+      value: Mo
+    locator:
+      page: 11
+      pdf_page_index: 10
+      section: Vaporization coefficients
+      note: Caption states three Mo Knudsen cells with different orifice sizes; no
+        numeric sizes.
+  cell_material_and_liner:
+    state:
+      tag: value
+      value: Three Mo Knudsen cells with different orifice sizes; numeric diameters
+        not printed
+    locator:
+      page: 11
+      pdf_page_index: 10
+      section: Vaporization coefficients
+      note: Caption states three Mo Knudsen cells with different orifice sizes; no
+        numeric sizes.
+  detector:
+    state:
+      tag: value
+      value: 90-degree magnetic-sector mass spectrometer with ion counting
+    locator:
+      page: 4
+      pdf_page_index: 3
+      section: experimental apparatus
+      note: Mass spectrometer and ion-counting detection as printed.
+  temperature_calibration:
+    standard:
+      state:
+        tag: value
+        value: Au melting point (ITS-90 standard)
+      locator:
+        page: 4
+        pdf_page_index: 3
+        section: experimental apparatus
+        note: Temperature calibration from melting point of Au; ITS-90 standard.
+- id: ratio-figure-cell-unspecified
+  identity:
+    basis: described_in_this_work
+  apparatus_family:
+    state:
+      tag: value
+      value: Nuclide/MAAS/PATCO 12-90-HT single-focus 90-degree magnetic-sector mass
+        spectrometer
+    locator:
+      page: 4
+      pdf_page_index: 3
+      section: experimental apparatus
+      note: Instrument name and configuration as printed.
+  method:
+    state:
+      tag: value
+      value: Knudsen effusion mass spectrometry
+    locator:
+      page: 10
+      pdf_page_index: 9
+      section: Determine Melting with Ion Intensity Ratios
+      note: This figure's caption does not identify the cell material.
+  geometry:
+    orifice_diameter_m:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 10
+        pdf_page_index: 9
+        section: Determine Melting with Ion Intensity Ratios
+        note: The article gives no numeric effusion-orifice diameter for this cell.
+    cell_internal_dimensions:
+      diameter_m:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          page: 10
+          pdf_page_index: 9
+          section: Determine Melting with Ion Intensity Ratios
+          note: Internal cell diameter not stated numerically.
+      height_m:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          page: 10
+          pdf_page_index: 9
+          section: Determine Melting with Ion Intensity Ratios
+          note: Internal cell height not stated numerically.
+  cell_material_and_liner:
+    state:
+      tag: unknown
+      reason: not_published
+    locator:
+      page: 10
+      pdf_page_index: 9
+      section: Determine Melting with Ion Intensity Ratios
+      note: This figure does not identify the cell material; no material is inferred
+        from the separate Mo and Ir experiments.
+  detector:
+    state:
+      tag: value
+      value: 90-degree magnetic-sector mass spectrometer with ion counting
+    locator:
+      page: 4
+      pdf_page_index: 3
+      section: experimental apparatus
+      note: Mass spectrometer and ion-counting detection as printed.
+  temperature_calibration:
+    standard:
+      state:
+        tag: value
+        value: Au melting point (ITS-90 standard)
+      locator:
+        page: 4
+        pdf_page_index: 3
+        section: experimental apparatus
+        note: Temperature calibration from melting point of Au; ITS-90 standard.
+- id: piacente-re-comparator
+  identity:
+    basis: described_in_this_work
+  apparatus_family:
+    state:
+      tag: value
+      value: Nuclide/MAAS/PATCO 12-90-HT single-focus 90-degree magnetic-sector mass
+        spectrometer
+    locator:
+      page: 4
+      pdf_page_index: 3
+      section: experimental apparatus
+      note: Instrument name and configuration as printed.
+  method:
+    state:
+      tag: value
+      value: Knudsen effusion mass spectrometry
+    locator:
+      page: 9
+      pdf_page_index: 8
+      section: van't Hoff Plot
+      note: Figure caption attributes the open-triangle series to a Re cell and Piacente
+        et al. 5.
+  geometry:
+    orifice_diameter_m:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 9
+        pdf_page_index: 8
+        section: van't Hoff Plot
+        note: The article gives no numeric effusion-orifice diameter for this cell.
+    cell_internal_dimensions:
+      diameter_m:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          page: 9
+          pdf_page_index: 8
+          section: van't Hoff Plot
+          note: Internal cell diameter not stated numerically.
+      height_m:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          page: 9
+          pdf_page_index: 8
+          section: van't Hoff Plot
+          note: Internal cell height not stated numerically.
+  cell_materials:
+  - state:
+      tag: value
+      value: Re
+    locator:
+      page: 9
+      pdf_page_index: 8
+      section: van't Hoff Plot
+      note: Figure caption attributes the open-triangle series to a Re cell and Piacente
+        et al. 5.
+  cell_material_and_liner:
+    state:
+      tag: value
+      value: Re Knudsen cell; comparator attributed to Piacente et al. (1975)
+    locator:
+      page: 9
+      pdf_page_index: 8
+      section: van't Hoff Plot
+      note: Figure caption attributes the open-triangle series to a Re cell and Piacente
+        et al. 5.
+experiments:
+- experiment_id: time_mo_1669
+  bench_id: mo-cell
+  method: knudsen_effusion
+  locator:
+    page: 8
+    pdf_page_index: 7
+    figure: Time to Equilibration (unnumbered figure caption)
+    note: Experiment series and cell identity as stated by the figure caption.
+  sample:
+    characterization:
+      state:
+        tag: value
+        value: Fo93Fa7 (93% forsterite, 7% fayalite; percent basis not separately
+          stated)
+      locator:
+        page: 8
+        pdf_page_index: 7
+        figure: Time to Equilibration (unnumbered figure caption)
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: 1669
+      locator:
+        page: 8
+        pdf_page_index: 7
+        figure: Time to Equilibration (unnumbered figure caption)
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 8
+        pdf_page_index: 7
+        figure: Time to Equilibration (unnumbered figure caption)
+        note: No numeric chamber/background (residual-gas) pressure near the cell
+          is printed in this paper.
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 8
+        pdf_page_index: 7
+        figure: Time to Equilibration (unnumbered figure caption)
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+- experiment_id: time_ir_1851
+  bench_id: ir-liner-graphite-cell
+  method: knudsen_effusion
+  locator:
+    page: 8
+    pdf_page_index: 7
+    figure: Time to Equilibration (unnumbered figure caption)
+    note: Experiment series and cell identity as stated by the figure caption.
+  sample:
+    characterization:
+      state:
+        tag: value
+        value: Fo93Fa7 (93% forsterite, 7% fayalite; percent basis not separately
+          stated)
+      locator:
+        page: 8
+        pdf_page_index: 7
+        figure: Time to Equilibration (unnumbered figure caption)
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: 1851
+      locator:
+        page: 8
+        pdf_page_index: 7
+        figure: Time to Equilibration (unnumbered figure caption)
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 8
+        pdf_page_index: 7
+        figure: Time to Equilibration (unnumbered figure caption)
+        note: No numeric chamber/background (residual-gas) pressure near the cell
+          is printed in this paper.
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 8
+        pdf_page_index: 7
+        figure: Time to Equilibration (unnumbered figure caption)
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+- experiment_id: pressure_ir
+  bench_id: ir-liner-graphite-cell
+  method: knudsen_effusion
+  locator:
+    page: 9
+    pdf_page_index: 8
+    figure: van't Hoff plot of the main species vaporized from the olivine samples
+      (unnumbered figure caption)
+    note: Experiment series and cell identity as stated by the figure caption.
+  sample:
+    characterization:
+      state:
+        tag: value
+        value: Fo93Fa7 (93% forsterite, 7% fayalite; percent basis not separately
+          stated)
+      locator:
+        page: 9
+        pdf_page_index: 8
+        figure: van't Hoff plot of the main species vaporized from the olivine samples
+          (unnumbered figure caption)
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: varies_by_digitized_point
+      locator:
+        page: 9
+        pdf_page_index: 8
+        figure: van't Hoff plot of the main species vaporized from the olivine samples
+          (unnumbered figure caption)
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 9
+        pdf_page_index: 8
+        figure: van't Hoff plot of the main species vaporized from the olivine samples
+          (unnumbered figure caption)
+        note: No numeric chamber/background (residual-gas) pressure near the cell
+          is printed in this paper.
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 9
+        pdf_page_index: 8
+        figure: van't Hoff plot of the main species vaporized from the olivine samples
+          (unnumbered figure caption)
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+- experiment_id: pressure_mo
+  bench_id: mo-cell
+  method: knudsen_effusion
+  locator:
+    page: 9
+    pdf_page_index: 8
+    figure: van't Hoff plot of the main species vaporized from the olivine samples
+      (unnumbered figure caption)
+    note: Experiment series and cell identity as stated by the figure caption.
+  sample:
+    characterization:
+      state:
+        tag: value
+        value: Fo93Fa7 (93% forsterite, 7% fayalite; percent basis not separately
+          stated)
+      locator:
+        page: 9
+        pdf_page_index: 8
+        figure: van't Hoff plot of the main species vaporized from the olivine samples
+          (unnumbered figure caption)
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: varies_by_digitized_point
+      locator:
+        page: 9
+        pdf_page_index: 8
+        figure: van't Hoff plot of the main species vaporized from the olivine samples
+          (unnumbered figure caption)
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 9
+        pdf_page_index: 8
+        figure: van't Hoff plot of the main species vaporized from the olivine samples
+          (unnumbered figure caption)
+        note: No numeric chamber/background (residual-gas) pressure near the cell
+          is printed in this paper.
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 9
+        pdf_page_index: 8
+        figure: van't Hoff plot of the main species vaporized from the olivine samples
+          (unnumbered figure caption)
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+- experiment_id: pressure_re_comparator
+  bench_id: piacente-re-comparator
+  method: knudsen_effusion
+  locator:
+    page: 9
+    pdf_page_index: 8
+    figure: van't Hoff plot of the main species vaporized from the olivine samples
+      (unnumbered figure caption)
+    note: Experiment series and cell identity as stated by the figure caption.
+  sample:
+    characterization:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 9
+        pdf_page_index: 8
+        figure: van't Hoff plot of the main species vaporized from the olivine samples
+          (unnumbered figure caption)
+        note: The composition of Piacente et al.'s comparator series is not stated
+          in Costa's figure.
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: varies_by_digitized_point
+      locator:
+        page: 9
+        pdf_page_index: 8
+        figure: van't Hoff plot of the main species vaporized from the olivine samples
+          (unnumbered figure caption)
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 9
+        pdf_page_index: 8
+        figure: van't Hoff plot of the main species vaporized from the olivine samples
+          (unnumbered figure caption)
+        note: No numeric chamber/background (residual-gas) pressure near the cell
+          is printed in this paper.
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 9
+        pdf_page_index: 8
+        figure: van't Hoff plot of the main species vaporized from the olivine samples
+          (unnumbered figure caption)
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+- experiment_id: ratio_temperature_dependence
+  bench_id: ratio-figure-cell-unspecified
+  method: knudsen_effusion
+  locator:
+    page: 10
+    pdf_page_index: 9
+    figure: Temperature dependence of ion intensity ratios (unnumbered figure caption)
+    note: Experiment series and cell identity as stated by the figure caption.
+  sample:
+    characterization:
+      state:
+        tag: value
+        value: Fo93Fa7 (93% forsterite, 7% fayalite; percent basis not separately
+          stated)
+      locator:
+        page: 10
+        pdf_page_index: 9
+        figure: Temperature dependence of ion intensity ratios (unnumbered figure
+          caption)
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: varies_by_digitized_point
+      locator:
+        page: 10
+        pdf_page_index: 9
+        figure: Temperature dependence of ion intensity ratios (unnumbered figure
+          caption)
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 10
+        pdf_page_index: 9
+        figure: Temperature dependence of ion intensity ratios (unnumbered figure
+          caption)
+        note: No numeric chamber/background (residual-gas) pressure near the cell
+          is printed in this paper.
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 10
+        pdf_page_index: 9
+        figure: Temperature dependence of ion intensity ratios (unnumbered figure
+          caption)
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+- experiment_id: alpha_mo_multi_orifice
+  bench_id: mo-multi-orifice-cells
+  method: knudsen_effusion
+  locator:
+    page: 11
+    pdf_page_index: 10
+    figure: Measured vaporization coefficients of Fe+ and SiO+ (unnumbered figure
+      caption)
+    note: Experiment series and cell identity as stated by the figure caption.
+  sample:
+    characterization:
+      state:
+        tag: value
+        value: Fo93Fa7 (93% forsterite, 7% fayalite; percent basis not separately
+          stated)
+      locator:
+        page: 11
+        pdf_page_index: 10
+        figure: Measured vaporization coefficients of Fe+ and SiO+ (unnumbered figure
+          caption)
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: varies_by_digitized_point
+      locator:
+        page: 11
+        pdf_page_index: 10
+        figure: Measured vaporization coefficients of Fe+ and SiO+ (unnumbered figure
+          caption)
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 11
+        pdf_page_index: 10
+        figure: Measured vaporization coefficients of Fe+ and SiO+ (unnumbered figure
+          caption)
+        note: No numeric chamber/background (residual-gas) pressure near the cell
+          is printed in this paper.
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 11
+        pdf_page_index: 10
+        figure: Measured vaporization coefficients of Fe+ and SiO+ (unnumbered figure
+          caption)
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
 species:
   Fe:
     observations:
@@ -196,6 +1007,3301 @@ species:
             source_path: docs-private/research/ocr-artifacts/kems-007-costa-2015/spool/out/kems-007-costa-2015/vlm/kems-007-costa-2015.md
             paragraph: Mo forms compounds / Ir cell liners in graphite unreactive
             line_range: '259'
+    - observation_id: costa_2015_fe_time_equilibrium_mo_1669
+      type: rate_series
+      experiment: time_mo_1669
+      locator:
+        page: 8
+        pdf_page_index: 7
+        figure: Time to Equilibration (unnumbered figure caption)
+        note: Panel A; one record is a plotted series; migration emits one child observation
+          per marker
+      phase: gas
+      standard_state: Costa & Jacobson (2015) measured KEMS signal; sample composition
+        is recorded in provenance
+      regime: kems_effusion
+      units: ion counts as plotted
+      values:
+        quantity: ion_intensity
+        method_class: measured_direct
+        admission_status: admitted
+        points:
+        - pixel_x: 549.5
+          pixel_y: 751.0
+          elapsed_time_min: 93.45
+          T_K: 1669
+          ion_intensity: 11869.1
+          axis_conversion: Panel A hh:mm ticks converted to elapsed minutes; panel B time
+            ticks converted to minutes
+          sigma: 218.7
+          point_conditions:
+            elapsed_time_min:
+              state:
+                tag: value
+                value: 93.45
+              locator:
+                page: 8
+                pdf_page_index: 7
+                figure: Time to Equilibration
+          locator:
+            page: 8
+            pdf_page_index: 7
+            figure: Time to Equilibration (unnumbered figure caption)
+            note: Panel A; digitized marker center pixel=(549.5,751.0) at 300 dpi; pixel
+              uncertainty +/-(11.0,11.0) px
+        - pixel_x: 652.5
+          pixel_y: 808.0
+          elapsed_time_min: 197.63
+          T_K: 1669
+          ion_intensity: 10735.7
+          axis_conversion: Panel A hh:mm ticks converted to elapsed minutes; panel B time
+            ticks converted to minutes
+          sigma: 218.7
+          point_conditions:
+            elapsed_time_min:
+              state:
+                tag: value
+                value: 197.63
+              locator:
+                page: 8
+                pdf_page_index: 7
+                figure: Time to Equilibration
+          locator:
+            page: 8
+            pdf_page_index: 7
+            figure: Time to Equilibration (unnumbered figure caption)
+            note: Panel A; digitized marker center pixel=(652.5,808.0) at 300 dpi; pixel
+              uncertainty +/-(11.0,11.0) px
+        - pixel_x: 749.0
+          pixel_y: 822.5
+          elapsed_time_min: 295.23
+          T_K: 1669
+          ion_intensity: 10447.4
+          axis_conversion: Panel A hh:mm ticks converted to elapsed minutes; panel B time
+            ticks converted to minutes
+          sigma: 218.7
+          point_conditions:
+            elapsed_time_min:
+              state:
+                tag: value
+                value: 295.23
+              locator:
+                page: 8
+                pdf_page_index: 7
+                figure: Time to Equilibration
+          locator:
+            page: 8
+            pdf_page_index: 7
+            figure: Time to Equilibration (unnumbered figure caption)
+            note: Panel A; digitized marker center pixel=(749.0,822.5) at 300 dpi; pixel
+              uncertainty +/-(11.0,11.0) px
+        - pixel_x: 811.5
+          pixel_y: 861.5
+          elapsed_time_min: 358.45
+          T_K: 1669
+          ion_intensity: 9671.9
+          axis_conversion: Panel A hh:mm ticks converted to elapsed minutes; panel B time
+            ticks converted to minutes
+          sigma: 218.7
+          point_conditions:
+            elapsed_time_min:
+              state:
+                tag: value
+                value: 358.45
+              locator:
+                page: 8
+                pdf_page_index: 7
+                figure: Time to Equilibration
+          locator:
+            page: 8
+            pdf_page_index: 7
+            figure: Time to Equilibration (unnumbered figure caption)
+            note: Panel A; digitized marker center pixel=(811.5,861.5) at 300 dpi; pixel
+              uncertainty +/-(11.0,11.0) px
+        - pixel_x: 905.5
+          pixel_y: 870.0
+          elapsed_time_min: 453.52
+          T_K: 1669
+          ion_intensity: 9502.9
+          axis_conversion: Panel A hh:mm ticks converted to elapsed minutes; panel B time
+            ticks converted to minutes
+          sigma: 218.7
+          point_conditions:
+            elapsed_time_min:
+              state:
+                tag: value
+                value: 453.52
+              locator:
+                page: 8
+                pdf_page_index: 7
+                figure: Time to Equilibration
+          locator:
+            page: 8
+            pdf_page_index: 7
+            figure: Time to Equilibration (unnumbered figure caption)
+            note: Panel A; digitized marker center pixel=(905.5,870.0) at 300 dpi; pixel
+              uncertainty +/-(11.0,11.0) px
+        - pixel_x: 971.5
+          pixel_y: 876.5
+          elapsed_time_min: 520.28
+          T_K: 1669
+          ion_intensity: 9373.7
+          axis_conversion: Panel A hh:mm ticks converted to elapsed minutes; panel B time
+            ticks converted to minutes
+          sigma: 218.7
+          point_conditions:
+            elapsed_time_min:
+              state:
+                tag: value
+                value: 520.28
+              locator:
+                page: 8
+                pdf_page_index: 7
+                figure: Time to Equilibration
+          locator:
+            page: 8
+            pdf_page_index: 7
+            figure: Time to Equilibration (unnumbered figure caption)
+            note: Panel A; digitized marker center pixel=(971.5,876.5) at 300 dpi; pixel
+              uncertainty +/-(11.0,11.0) px
+        - pixel_x: 1039.5
+          pixel_y: 879.0
+          elapsed_time_min: 589.05
+          T_K: 1669
+          ion_intensity: 9323.9
+          axis_conversion: Panel A hh:mm ticks converted to elapsed minutes; panel B time
+            ticks converted to minutes
+          sigma: 218.7
+          point_conditions:
+            elapsed_time_min:
+              state:
+                tag: value
+                value: 589.05
+              locator:
+                page: 8
+                pdf_page_index: 7
+                figure: Time to Equilibration
+          locator:
+            page: 8
+            pdf_page_index: 7
+            figure: Time to Equilibration (unnumbered figure caption)
+            note: Panel A; digitized marker center pixel=(1039.5,879.0) at 300 dpi; pixel
+              uncertainty +/-(11.0,11.0) px
+        - pixel_x: 1130.5
+          pixel_y: 877.5
+          elapsed_time_min: 681.1
+          T_K: 1669
+          ion_intensity: 9353.8
+          axis_conversion: Panel A hh:mm ticks converted to elapsed minutes; panel B time
+            ticks converted to minutes
+          sigma: 218.7
+          point_conditions:
+            elapsed_time_min:
+              state:
+                tag: value
+                value: 681.1
+              locator:
+                page: 8
+                pdf_page_index: 7
+                figure: Time to Equilibration
+          locator:
+            page: 8
+            pdf_page_index: 7
+            figure: Time to Equilibration (unnumbered figure caption)
+            note: Panel A; digitized marker center pixel=(1130.5,877.5) at 300 dpi; pixel
+              uncertainty +/-(11.0,11.0) px
+        - pixel_x: 1193.5
+          pixel_y: 884.0
+          elapsed_time_min: 744.82
+          T_K: 1669
+          ion_intensity: 9224.5
+          axis_conversion: Panel A hh:mm ticks converted to elapsed minutes; panel B time
+            ticks converted to minutes
+          sigma: 218.7
+          point_conditions:
+            elapsed_time_min:
+              state:
+                tag: value
+                value: 744.82
+              locator:
+                page: 8
+                pdf_page_index: 7
+                figure: Time to Equilibration
+          locator:
+            page: 8
+            pdf_page_index: 7
+            figure: Time to Equilibration (unnumbered figure caption)
+            note: Panel A; digitized marker center pixel=(1193.5,884.0) at 300 dpi; pixel
+              uncertainty +/-(11.0,11.0) px
+        - pixel_x: 1244.5
+          pixel_y: 880.5
+          elapsed_time_min: 796.4
+          T_K: 1669
+          ion_intensity: 9294.1
+          axis_conversion: Panel A hh:mm ticks converted to elapsed minutes; panel B time
+            ticks converted to minutes
+          sigma: 218.7
+          point_conditions:
+            elapsed_time_min:
+              state:
+                tag: value
+                value: 796.4
+              locator:
+                page: 8
+                pdf_page_index: 7
+                figure: Time to Equilibration
+          locator:
+            page: 8
+            pdf_page_index: 7
+            figure: Time to Equilibration (unnumbered figure caption)
+            note: Panel A; digitized marker center pixel=(1244.5,880.5) at 300 dpi; pixel
+              uncertainty +/-(11.0,11.0) px
+        - pixel_x: 1347.5
+          pixel_y: 897.5
+          elapsed_time_min: 900.58
+          T_K: 1669
+          ion_intensity: 8956.1
+          axis_conversion: Panel A hh:mm ticks converted to elapsed minutes; panel B time
+            ticks converted to minutes
+          sigma: 218.7
+          point_conditions:
+            elapsed_time_min:
+              state:
+                tag: value
+                value: 900.58
+              locator:
+                page: 8
+                pdf_page_index: 7
+                figure: Time to Equilibration
+          locator:
+            page: 8
+            pdf_page_index: 7
+            figure: Time to Equilibration (unnumbered figure caption)
+            note: Panel A; digitized marker center pixel=(1347.5,897.5) at 300 dpi; pixel
+              uncertainty +/-(11.0,11.0) px
+        provenance:
+          digitization_method: 300 dpi pdftoppm raster; marker centers digitized from
+            the plotted symbols; connecting/fitted lines are not data points
+          render_dpi: 300
+          figure_caption_as_printed: Time to Equilibration (unnumbered figure caption)
+          panel_as_printed: A
+          axis_calibration:
+            x:
+              axis_label_as_printed: Time (h:min)
+              pixel_to_value_points:
+              - - 576
+                - 120
+              - - 694
+                - 240
+              - - 813
+                - 360
+              - - 932
+                - 480
+              - - 1050
+                - 600
+              - - 1169
+                - 720
+              - - 1288
+                - 840
+              - - 1406
+                - 960
+              fit_value_per_px: 1.011437792414724
+              fit_intercept: -462.3348522829915
+              pixel_residual_rms: 0.28347350887872624
+              scale: linear on displayed axis
+              declared_transform: axis ticks in h:min converted to elapsed minutes
+            y:
+              axis_label_as_printed: Intensity (counts)
+              pixel_to_value_points:
+              - - 644
+                - 14000
+              - - 744
+                - 12000
+              - - 845
+                - 10000
+              - - 946
+                - 8000
+              - - 1046
+                - 6000
+              - - 1147
+                - 4000
+              - - 1247
+                - 2000
+              - - 1348
+                - 0
+              fit_value_per_px: -19.88398264475914
+              fit_intercept: 26801.961216349508
+              pixel_residual_rms: 0.2700310477862427
+              scale: linear on displayed axis
+          uncertainty_rule: pixel half-width/half-height of marker (or axis calibration
+            residual if larger); per-point pixel and transformed-axis bounds are retained
+            in the point locator and values
+          sample_composition_as_printed: Fo93Fa7 (93% forsterite, 7% fayalite; percent
+            basis not separately stated)
+          cell_configuration_as_printed: Mo
+          paper_page_number: not printed; page is the one-based PDF page
+          panel_temperature_K_as_printed: 1669
+          ion_species_as_plotted: Fe+
+        formula: Fe+
+      uncertainty:
+        note: Per-point sigma is estimated from the larger of half marker width/height
+          or axis-calibration residual; pixel coordinate and transformed-axis uncertainty
+          are retained per point.
+    - observation_id: costa_2015_fe_time_equilibrium_ir_1851
+      type: rate_series
+      experiment: time_ir_1851
+      locator:
+        page: 8
+        pdf_page_index: 7
+        figure: Time to Equilibration (unnumbered figure caption)
+        note: Panel B; one record is a plotted series; migration emits one child observation
+          per marker
+      phase: gas
+      standard_state: Costa & Jacobson (2015) measured KEMS signal; sample composition
+        is recorded in provenance
+      regime: kems_effusion
+      units: ion counts as plotted
+      values:
+        quantity: ion_intensity
+        method_class: measured_direct
+        admission_status: admitted
+        points:
+        - pixel_x: 1883.5
+          pixel_y: 950.0
+          elapsed_time_min: 0.22
+          T_K: 1851
+          ion_intensity: 6582.6
+          axis_conversion: Panel A hh:mm ticks converted to elapsed minutes; panel B time
+            ticks converted to minutes
+          sigma: 171.9
+          point_conditions:
+            elapsed_time_min:
+              state:
+                tag: value
+                value: 0.22
+              locator:
+                page: 8
+                pdf_page_index: 7
+                figure: Time to Equilibration
+          locator:
+            page: 8
+            pdf_page_index: 7
+            figure: Time to Equilibration (unnumbered figure caption)
+            note: Panel B; digitized marker center pixel=(1883.5,950.0) at 300 dpi; pixel
+              uncertainty +/-(11.0,11.0) px
+        - pixel_x: 1963.5
+          pixel_y: 862.0
+          elapsed_time_min: 66.66
+          T_K: 1851
+          ion_intensity: 7957.6
+          axis_conversion: Panel A hh:mm ticks converted to elapsed minutes; panel B time
+            ticks converted to minutes
+          sigma: 171.9
+          point_conditions:
+            elapsed_time_min:
+              state:
+                tag: value
+                value: 66.66
+              locator:
+                page: 8
+                pdf_page_index: 7
+                figure: Time to Equilibration
+          locator:
+            page: 8
+            pdf_page_index: 7
+            figure: Time to Equilibration (unnumbered figure caption)
+            note: Panel B; digitized marker center pixel=(1963.5,862.0) at 300 dpi; pixel
+              uncertainty +/-(11.0,11.0) px
+        - pixel_x: 2052.5
+          pixel_y: 821.0
+          elapsed_time_min: 140.59
+          T_K: 1851
+          ion_intensity: 8598.2
+          axis_conversion: Panel A hh:mm ticks converted to elapsed minutes; panel B time
+            ticks converted to minutes
+          sigma: 171.9
+          point_conditions:
+            elapsed_time_min:
+              state:
+                tag: value
+                value: 140.59
+              locator:
+                page: 8
+                pdf_page_index: 7
+                figure: Time to Equilibration
+          locator:
+            page: 8
+            pdf_page_index: 7
+            figure: Time to Equilibration (unnumbered figure caption)
+            note: Panel B; digitized marker center pixel=(2052.5,821.0) at 300 dpi; pixel
+              uncertainty +/-(11.0,11.0) px
+        - pixel_x: 2135.5
+          pixel_y: 800.0
+          elapsed_time_min: 209.53
+          T_K: 1851
+          ion_intensity: 8926.3
+          axis_conversion: Panel A hh:mm ticks converted to elapsed minutes; panel B time
+            ticks converted to minutes
+          sigma: 171.9
+          point_conditions:
+            elapsed_time_min:
+              state:
+                tag: value
+                value: 209.53
+              locator:
+                page: 8
+                pdf_page_index: 7
+                figure: Time to Equilibration
+          locator:
+            page: 8
+            pdf_page_index: 7
+            figure: Time to Equilibration (unnumbered figure caption)
+            note: Panel B; digitized marker center pixel=(2135.5,800.0) at 300 dpi; pixel
+              uncertainty +/-(11.0,11.0) px
+        - pixel_x: 2207.5
+          pixel_y: 785.5
+          elapsed_time_min: 269.33
+          T_K: 1851
+          ion_intensity: 9152.9
+          axis_conversion: Panel A hh:mm ticks converted to elapsed minutes; panel B time
+            ticks converted to minutes
+          sigma: 171.9
+          point_conditions:
+            elapsed_time_min:
+              state:
+                tag: value
+                value: 269.33
+              locator:
+                page: 8
+                pdf_page_index: 7
+                figure: Time to Equilibration
+          locator:
+            page: 8
+            pdf_page_index: 7
+            figure: Time to Equilibration (unnumbered figure caption)
+            note: Panel B; digitized marker center pixel=(2207.5,785.5) at 300 dpi; pixel
+              uncertainty +/-(11.0,11.0) px
+        - pixel_x: 2287.5
+          pixel_y: 771.5
+          elapsed_time_min: 335.77
+          T_K: 1851
+          ion_intensity: 9371.6
+          axis_conversion: Panel A hh:mm ticks converted to elapsed minutes; panel B time
+            ticks converted to minutes
+          sigma: 171.9
+          point_conditions:
+            elapsed_time_min:
+              state:
+                tag: value
+                value: 335.77
+              locator:
+                page: 8
+                pdf_page_index: 7
+                figure: Time to Equilibration
+          locator:
+            page: 8
+            pdf_page_index: 7
+            figure: Time to Equilibration (unnumbered figure caption)
+            note: Panel B; digitized marker center pixel=(2287.5,771.5) at 300 dpi; pixel
+              uncertainty +/-(11.0,11.0) px
+        - pixel_x: 2364.0
+          pixel_y: 770.5
+          elapsed_time_min: 399.31
+          T_K: 1851
+          ion_intensity: 9387.3
+          axis_conversion: Panel A hh:mm ticks converted to elapsed minutes; panel B time
+            ticks converted to minutes
+          sigma: 171.9
+          point_conditions:
+            elapsed_time_min:
+              state:
+                tag: value
+                value: 399.31
+              locator:
+                page: 8
+                pdf_page_index: 7
+                figure: Time to Equilibration
+          locator:
+            page: 8
+            pdf_page_index: 7
+            figure: Time to Equilibration (unnumbered figure caption)
+            note: Panel B; digitized marker center pixel=(2364.0,770.5) at 300 dpi; pixel
+              uncertainty +/-(11.0,11.0) px
+        - pixel_x: 2433.5
+          pixel_y: 764.0
+          elapsed_time_min: 457.04
+          T_K: 1851
+          ion_intensity: 9488.8
+          axis_conversion: Panel A hh:mm ticks converted to elapsed minutes; panel B time
+            ticks converted to minutes
+          sigma: 171.9
+          point_conditions:
+            elapsed_time_min:
+              state:
+                tag: value
+                value: 457.04
+              locator:
+                page: 8
+                pdf_page_index: 7
+                figure: Time to Equilibration
+          locator:
+            page: 8
+            pdf_page_index: 7
+            figure: Time to Equilibration (unnumbered figure caption)
+            note: Panel B; digitized marker center pixel=(2433.5,764.0) at 300 dpi; pixel
+              uncertainty +/-(11.0,11.0) px
+        - pixel_x: 2511.5
+          pixel_y: 775.0
+          elapsed_time_min: 521.83
+          T_K: 1851
+          ion_intensity: 9317.0
+          axis_conversion: Panel A hh:mm ticks converted to elapsed minutes; panel B time
+            ticks converted to minutes
+          sigma: 171.9
+          point_conditions:
+            elapsed_time_min:
+              state:
+                tag: value
+                value: 521.83
+              locator:
+                page: 8
+                pdf_page_index: 7
+                figure: Time to Equilibration
+          locator:
+            page: 8
+            pdf_page_index: 7
+            figure: Time to Equilibration (unnumbered figure caption)
+            note: Panel B; digitized marker center pixel=(2511.5,775.0) at 300 dpi; pixel
+              uncertainty +/-(11.0,11.0) px
+        - pixel_x: 2577.5
+          pixel_y: 771.5
+          elapsed_time_min: 576.64
+          T_K: 1851
+          ion_intensity: 9371.6
+          axis_conversion: Panel A hh:mm ticks converted to elapsed minutes; panel B time
+            ticks converted to minutes
+          sigma: 171.9
+          point_conditions:
+            elapsed_time_min:
+              state:
+                tag: value
+                value: 576.64
+              locator:
+                page: 8
+                pdf_page_index: 7
+                figure: Time to Equilibration
+          locator:
+            page: 8
+            pdf_page_index: 7
+            figure: Time to Equilibration (unnumbered figure caption)
+            note: Panel B; digitized marker center pixel=(2577.5,771.5) at 300 dpi; pixel
+              uncertainty +/-(11.0,11.0) px
+        - pixel_x: 2656.5
+          pixel_y: 770.5
+          elapsed_time_min: 642.26
+          T_K: 1851
+          ion_intensity: 9387.3
+          axis_conversion: Panel A hh:mm ticks converted to elapsed minutes; panel B time
+            ticks converted to minutes
+          sigma: 171.9
+          point_conditions:
+            elapsed_time_min:
+              state:
+                tag: value
+                value: 642.26
+              locator:
+                page: 8
+                pdf_page_index: 7
+                figure: Time to Equilibration
+          locator:
+            page: 8
+            pdf_page_index: 7
+            figure: Time to Equilibration (unnumbered figure caption)
+            note: Panel B; digitized marker center pixel=(2656.5,770.5) at 300 dpi; pixel
+              uncertainty +/-(11.0,11.0) px
+        provenance:
+          digitization_method: 300 dpi pdftoppm raster; marker centers digitized from
+            the plotted symbols; connecting/fitted lines are not data points
+          render_dpi: 300
+          figure_caption_as_printed: Time to Equilibration (unnumbered figure caption)
+          panel_as_printed: B
+          axis_calibration:
+            x:
+              axis_label_as_printed: Time (h:min)
+              pixel_to_value_points:
+              - - 1883
+                - 0
+              - - 2057
+                - 144
+              - - 2230
+                - 288
+              - - 2403
+                - 432
+              - - 2577
+                - 576
+              - - 2750
+                - 720
+              fit_value_per_px: 0.830586022554733
+              fit_intercept: -1564.190952251798
+              pixel_residual_rms: 0.26427509432536983
+              scale: linear on displayed axis
+              declared_transform: axis ticks in h:min converted to elapsed minutes
+            y:
+              axis_label_as_printed: Intensity (counts)
+              pixel_to_value_points:
+              - - 604
+                - 12000
+              - - 731
+                - 10000
+              - - 859
+                - 8000
+              - - 987
+                - 6000
+              - - 1115
+                - 4000
+              - - 1243
+                - 2000
+              - - 1372
+                - 0
+              fit_value_per_px: -15.62495134329864
+              fit_intercept: 21426.29124764813
+              pixel_residual_rms: 0.45175465484167776
+              scale: linear on displayed axis
+          uncertainty_rule: pixel half-width/half-height of marker (or axis calibration
+            residual if larger); per-point pixel and transformed-axis bounds are retained
+            in the point locator and values
+          sample_composition_as_printed: Fo93Fa7 (93% forsterite, 7% fayalite; percent
+            basis not separately stated)
+          cell_configuration_as_printed: Ir
+          paper_page_number: not printed; page is the one-based PDF page
+          panel_temperature_K_as_printed: 1851
+          ion_species_as_plotted: Fe+
+        formula: Fe+
+      uncertainty:
+        note: Per-point sigma is estimated from the larger of half marker width/height
+          or axis-calibration residual; pixel coordinate and transformed-axis uncertainty
+          are retained per point.
+    - observation_id: costa_2015_fe_partial_pressure_ir_digitized
+      type: partial_pressure
+      experiment: pressure_ir
+      locator:
+        page: 9
+        pdf_page_index: 8
+        figure: van't Hoff plot of the main species vaporized from the olivine samples
+          (unnumbered figure caption)
+        note: Panel A (closed squares; Ir Knudsen cell, this study); one record is a plotted
+          series; migration emits one child observation per marker
+      phase: gas
+      standard_state: partial pressure over the plotted olivine sample; plotted pressure
+        unit is kPa before declared conversion to Pa
+      regime: kems_effusion
+      units: P plotted as -log10(P/kPa); p_Pa = 1000*10^(-axis value)
+      values:
+        quantity: partial_pressure
+        method_class: measured_direct
+        admission_status: admitted
+        points:
+        - pixel_x: 580.0
+          pixel_y: 900.0
+          inv_T_times_1e4_K_inv: 4.963195
+          T_K: 2014.83
+          minus_log10_P_kPa_as_plotted: 2.91564
+          p_kPa: 0.001214395462
+          p_Pa: 1.214395462383
+          axis_conversion: T_K = 10000 / (10^4/T); p_Pa = 1000 * 10^(-(-log10(P/kPa)))
+          sigma: 0.188740570987
+          locator:
+            page: 9
+            pdf_page_index: 8
+            figure: van't Hoff plot of the main species vaporized from the olivine samples
+              (unnumbered figure caption)
+            note: Panel A (closed squares; Ir Knudsen cell, this study); digitized marker
+              center pixel=(580.0,900.0) at 300 dpi; pixel uncertainty +/-(11.0,11.0)
+              px
+        - pixel_x: 689.0
+          pixel_y: 950.0
+          inv_T_times_1e4_K_inv: 5.103259
+          T_K: 1959.53
+          minus_log10_P_kPa_as_plotted: 3.20082
+          p_kPa: 0.000629767066
+          p_Pa: 0.6297670661
+          axis_conversion: T_K = 10000 / (10^4/T); p_Pa = 1000 * 10^(-(-log10(P/kPa)))
+          sigma: 0.097877997181
+          locator:
+            page: 9
+            pdf_page_index: 8
+            figure: van't Hoff plot of the main species vaporized from the olivine samples
+              (unnumbered figure caption)
+            note: Panel A (closed squares; Ir Knudsen cell, this study); digitized marker
+              center pixel=(689.0,950.0) at 300 dpi; pixel uncertainty +/-(11.0,11.0)
+              px
+        - pixel_x: 787.0
+          pixel_y: 1013.0
+          inv_T_times_1e4_K_inv: 5.229188
+          T_K: 1912.34
+          minus_log10_P_kPa_as_plotted: 3.56015
+          p_kPa: 0.000275329601
+          p_Pa: 0.275329600922
+          axis_conversion: T_K = 10000 / (10^4/T); p_Pa = 1000 * 10^(-(-log10(P/kPa)))
+          sigma: 0.042791551597
+          locator:
+            page: 9
+            pdf_page_index: 8
+            figure: van't Hoff plot of the main species vaporized from the olivine samples
+              (unnumbered figure caption)
+            note: Panel A (closed squares; Ir Knudsen cell, this study); digitized marker
+              center pixel=(787.0,1013.0) at 300 dpi; pixel uncertainty +/-(11.0,11.0)
+              px
+        - pixel_x: 914.0
+          pixel_y: 1095.0
+          inv_T_times_1e4_K_inv: 5.392382
+          T_K: 1854.47
+          minus_log10_P_kPa_as_plotted: 4.02784
+          p_kPa: 9.3790185e-05
+          p_Pa: 0.093790185077
+          axis_conversion: T_K = 10000 / (10^4/T); p_Pa = 1000 * 10^(-(-log10(P/kPa)))
+          sigma: 0.014576810959
+          locator:
+            page: 9
+            pdf_page_index: 8
+            figure: van't Hoff plot of the main species vaporized from the olivine samples
+              (unnumbered figure caption)
+            note: Panel A (closed squares; Ir Knudsen cell, this study); digitized marker
+              center pixel=(914.0,1095.0) at 300 dpi; pixel uncertainty +/-(11.0,11.0)
+              px
+        provenance:
+          digitization_method: 300 dpi pdftoppm raster; marker centers digitized from
+            the plotted symbols; connecting/fitted lines are not data points
+          render_dpi: 300
+          figure_caption_as_printed: van't Hoff plot of the main species vaporized from
+            the olivine samples (unnumbered figure caption)
+          panel_as_printed: A (closed squares; Ir Knudsen cell, this study)
+          axis_calibration:
+            x:
+              axis_label_as_printed: 10^4 T^-1 (K^-1)
+              pixel_to_value_points:
+              - - 454
+                - 4.8
+              - - 608
+                - 5.0
+              - - 764
+                - 5.2
+              - - 920
+                - 5.4
+              - - 1075
+                - 5.6
+              - - 1231
+                - 5.8
+              - - 1387
+                - 6.0
+              - - 1543
+                - 6.2
+              fit_value_per_px: 0.0012849904097491792
+              fit_intercept: 4.2179008186727565
+              pixel_residual_rms: 0.5175497145197939
+              scale: linear on displayed axis
+              declared_transform: T_K = 10000 / x; x is 10^4/T
+            y:
+              axis_label_as_printed: -log P (kPa)
+              pixel_to_value_points:
+              - - 565
+                - 1.0
+              - - 652
+                - 1.5
+              - - 739
+                - 2.0
+              - - 827
+                - 2.5
+              - - 914
+                - 3.0
+              - - 1002
+                - 3.5
+              - - 1090
+                - 4.0
+              - - 1178
+                - 4.5
+              - - 1266
+                - 5.0
+              - - 1353
+                - 5.5
+              - - 1441
+                - 6.0
+              fit_value_per_px: 0.005703603809966264
+              fit_intercept: -2.2176035647725447
+              pixel_residual_rms: 0.4554542528774025
+              scale: linear on displayed axis
+              declared_transform: display is -log10(P/kPa); p_Pa = 1000 * 10^(-display
+                value)
+          uncertainty_rule: pixel half-width/half-height of marker (or axis calibration
+            residual if larger); per-point pixel and transformed-axis bounds are retained
+            in the point locator and values
+          sample_composition_as_printed: Fo93Fa7 (93% forsterite, 7% fayalite; percent
+            basis not separately stated)
+          cell_configuration_as_printed: Ir liner in graphite cell
+          paper_page_number: not printed; page is the one-based PDF page
+          cell_series_letter_as_captioned: IR
+          marker_shape_as_captioned: closed squares
+          series_attribution: Costa & Jacobson (2015), this study
+          fit_equations_printed_beside_plot: not digitized; only marker points are extracted
+          printed_calibration: Au melting point temperature calibration is printed; no
+            pressure calibration is printed
+        gas_species: Fe(g)
+      uncertainty:
+        note: Digitization uncertainty uses an 11 px half marker dimension or the larger
+          axis calibration residual. For P, vertical pixel uncertainty is propagated through
+          the plotted -log10(P/kPa) axis and kPa-to-Pa conversion.
+    - observation_id: costa_2015_fe_partial_pressure_mo_digitized
+      type: partial_pressure
+      experiment: pressure_mo
+      locator:
+        page: 9
+        pdf_page_index: 8
+        figure: van't Hoff plot of the main species vaporized from the olivine samples
+          (unnumbered figure caption)
+        note: Panel B (closed circles; Mo Knudsen cell, this study); one record is a plotted
+          series; migration emits one child observation per marker
+      phase: gas
+      standard_state: partial pressure over the plotted olivine sample; plotted pressure
+        unit is kPa before declared conversion to Pa
+      regime: kems_effusion
+      units: P plotted as -log10(P/kPa); p_Pa = 1000*10^(-axis value)
+      values:
+        quantity: partial_pressure
+        method_class: measured_direct
+        admission_status: admitted
+        points:
+        - pixel_x: 1043.0
+          pixel_y: 962.0
+          inv_T_times_1e4_K_inv: 5.558146
+          T_K: 1799.16
+          minus_log10_P_kPa_as_plotted: 3.26926
+          p_kPa: 0.000537943544
+          p_Pa: 0.537943543733
+          axis_conversion: T_K = 10000 / (10^4/T); p_Pa = 1000 * 10^(-(-log10(P/kPa)))
+          sigma: 0.083606843691
+          locator:
+            page: 9
+            pdf_page_index: 8
+            figure: van't Hoff plot of the main species vaporized from the olivine samples
+              (unnumbered figure caption)
+            note: Panel B (closed circles; Mo Knudsen cell, this study); digitized marker
+              center pixel=(1043.0,962.0) at 300 dpi; pixel uncertainty +/-(11.0,11.0)
+              px
+        - pixel_x: 1055.0
+          pixel_y: 981.0
+          inv_T_times_1e4_K_inv: 5.573566
+          T_K: 1794.18
+          minus_log10_P_kPa_as_plotted: 3.37763
+          p_kPa: 0.0004191488
+          p_Pa: 0.419148800058
+          axis_conversion: T_K = 10000 / (10^4/T); p_Pa = 1000 * 10^(-(-log10(P/kPa)))
+          sigma: 0.065143840126
+          locator:
+            page: 9
+            pdf_page_index: 8
+            figure: van't Hoff plot of the main species vaporized from the olivine samples
+              (unnumbered figure caption)
+            note: Panel B (closed circles; Mo Knudsen cell, this study); digitized marker
+              center pixel=(1055.0,981.0) at 300 dpi; pixel uncertainty +/-(11.0,11.0)
+              px
+        - pixel_x: 1155.0
+          pixel_y: 1019.0
+          inv_T_times_1e4_K_inv: 5.702065
+          T_K: 1753.75
+          minus_log10_P_kPa_as_plotted: 3.59437
+          p_kPa: 0.00025446689
+          p_Pa: 0.254466890213
+          axis_conversion: T_K = 10000 / (10^4/T); p_Pa = 1000 * 10^(-(-log10(P/kPa)))
+          sigma: 0.039549082357
+          locator:
+            page: 9
+            pdf_page_index: 8
+            figure: van't Hoff plot of the main species vaporized from the olivine samples
+              (unnumbered figure caption)
+            note: Panel B (closed circles; Mo Knudsen cell, this study); digitized marker
+              center pixel=(1155.0,1019.0) at 300 dpi; pixel uncertainty +/-(11.0,11.0)
+              px
+        - pixel_x: 1232.0
+          pixel_y: 1051.0
+          inv_T_times_1e4_K_inv: 5.801009
+          T_K: 1723.84
+          minus_log10_P_kPa_as_plotted: 3.77688
+          p_kPa: 0.000167153687
+          p_Pa: 0.167153686998
+          axis_conversion: T_K = 10000 / (10^4/T); p_Pa = 1000 * 10^(-(-log10(P/kPa)))
+          sigma: 0.025978919803
+          locator:
+            page: 9
+            pdf_page_index: 8
+            figure: van't Hoff plot of the main species vaporized from the olivine samples
+              (unnumbered figure caption)
+            note: Panel B (closed circles; Mo Knudsen cell, this study); digitized marker
+              center pixel=(1232.0,1051.0) at 300 dpi; pixel uncertainty +/-(11.0,11.0)
+              px
+        - pixel_x: 1294.0
+          pixel_y: 1074.0
+          inv_T_times_1e4_K_inv: 5.880678
+          T_K: 1700.48
+          minus_log10_P_kPa_as_plotted: 3.90807
+          p_kPa: 0.000123575698
+          p_Pa: 0.123575698193
+          axis_conversion: T_K = 10000 / (10^4/T); p_Pa = 1000 * 10^(-(-log10(P/kPa)))
+          sigma: 0.019206056478
+          locator:
+            page: 9
+            pdf_page_index: 8
+            figure: van't Hoff plot of the main species vaporized from the olivine samples
+              (unnumbered figure caption)
+            note: Panel B (closed circles; Mo Knudsen cell, this study); digitized marker
+              center pixel=(1294.0,1074.0) at 300 dpi; pixel uncertainty +/-(11.0,11.0)
+              px
+        provenance:
+          digitization_method: 300 dpi pdftoppm raster; marker centers digitized from
+            the plotted symbols; connecting/fitted lines are not data points
+          render_dpi: 300
+          figure_caption_as_printed: van't Hoff plot of the main species vaporized from
+            the olivine samples (unnumbered figure caption)
+          panel_as_printed: B (closed circles; Mo Knudsen cell, this study)
+          axis_calibration:
+            x:
+              axis_label_as_printed: 10^4 T^-1 (K^-1)
+              pixel_to_value_points:
+              - - 454
+                - 4.8
+              - - 608
+                - 5.0
+              - - 764
+                - 5.2
+              - - 920
+                - 5.4
+              - - 1075
+                - 5.6
+              - - 1231
+                - 5.8
+              - - 1387
+                - 6.0
+              - - 1543
+                - 6.2
+              fit_value_per_px: 0.0012849904097491792
+              fit_intercept: 4.2179008186727565
+              pixel_residual_rms: 0.5175497145197939
+              scale: linear on displayed axis
+              declared_transform: T_K = 10000 / x; x is 10^4/T
+            y:
+              axis_label_as_printed: -log P (kPa)
+              pixel_to_value_points:
+              - - 565
+                - 1.0
+              - - 652
+                - 1.5
+              - - 739
+                - 2.0
+              - - 827
+                - 2.5
+              - - 914
+                - 3.0
+              - - 1002
+                - 3.5
+              - - 1090
+                - 4.0
+              - - 1178
+                - 4.5
+              - - 1266
+                - 5.0
+              - - 1353
+                - 5.5
+              - - 1441
+                - 6.0
+              fit_value_per_px: 0.005703603809966264
+              fit_intercept: -2.2176035647725447
+              pixel_residual_rms: 0.4554542528774025
+              scale: linear on displayed axis
+              declared_transform: display is -log10(P/kPa); p_Pa = 1000 * 10^(-display
+                value)
+          uncertainty_rule: pixel half-width/half-height of marker (or axis calibration
+            residual if larger); per-point pixel and transformed-axis bounds are retained
+            in the point locator and values
+          sample_composition_as_printed: Fo93Fa7 (93% forsterite, 7% fayalite; percent
+            basis not separately stated)
+          cell_configuration_as_printed: Mo
+          paper_page_number: not printed; page is the one-based PDF page
+          cell_series_letter_as_captioned: MO
+          marker_shape_as_captioned: closed circles
+          series_attribution: Costa & Jacobson (2015), this study
+          fit_equations_printed_beside_plot: not digitized; only marker points are extracted
+          printed_calibration: Au melting point temperature calibration is printed; no
+            pressure calibration is printed
+        gas_species: Fe(g)
+      uncertainty:
+        note: Digitization uncertainty uses an 11 px half marker dimension or the larger
+          axis calibration residual. For P, vertical pixel uncertainty is propagated through
+          the plotted -log10(P/kPa) axis and kPa-to-Pa conversion.
+    - observation_id: costa_2015_fe_partial_pressure_re_piacente_comparator
+      type: partial_pressure
+      experiment: pressure_re_comparator
+      locator:
+        page: 9
+        pdf_page_index: 8
+        figure: van't Hoff plot of the main species vaporized from the olivine samples
+          (unnumbered figure caption)
+        note: Panel C (open triangles; Re Knudsen cell; Piacente et al. 1975); one record
+          is a plotted series; migration emits one child observation per marker
+      phase: gas
+      standard_state: partial pressure over the plotted olivine sample; plotted pressure
+        unit is kPa before declared conversion to Pa
+      regime: kems_effusion
+      units: P plotted as -log10(P/kPa); p_Pa = 1000*10^(-axis value)
+      values:
+        quantity: partial_pressure
+        method_class: quoted_attributed
+        admission_status: admitted
+        points:
+        - pixel_x: 815.0
+          pixel_y: 732.0
+          inv_T_times_1e4_K_inv: 5.265168
+          T_K: 1899.27
+          minus_log10_P_kPa_as_plotted: 1.95743
+          p_kPa: 0.011029747639
+          p_Pa: 11.029747638895
+          axis_conversion: T_K = 10000 / (10^4/T); p_Pa = 1000 * 10^(-(-log10(P/kPa)))
+          sigma: 1.714236368375
+          locator:
+            page: 9
+            pdf_page_index: 8
+            figure: van't Hoff plot of the main species vaporized from the olivine samples
+              (unnumbered figure caption)
+            note: Panel C (open triangles; Re Knudsen cell; Piacente et al. 1975); digitized
+              marker center pixel=(815.0,732.0) at 300 dpi; pixel uncertainty +/-(11.0,11.0)
+              px
+        - pixel_x: 907.0
+          pixel_y: 782.0
+          inv_T_times_1e4_K_inv: 5.383387
+          T_K: 1857.57
+          minus_log10_P_kPa_as_plotted: 2.24261
+          p_kPa: 0.00571985982
+          p_Pa: 5.719859819581
+          axis_conversion: T_K = 10000 / (10^4/T); p_Pa = 1000 * 10^(-(-log10(P/kPa)))
+          sigma: 0.888976978055
+          locator:
+            page: 9
+            pdf_page_index: 8
+            figure: van't Hoff plot of the main species vaporized from the olivine samples
+              (unnumbered figure caption)
+            note: Panel C (open triangles; Re Knudsen cell; Piacente et al. 1975); digitized
+              marker center pixel=(907.0,782.0) at 300 dpi; pixel uncertainty +/-(11.0,11.0)
+              px
+        - pixel_x: 951.0
+          pixel_y: 806.0
+          inv_T_times_1e4_K_inv: 5.439927
+          T_K: 1838.26
+          minus_log10_P_kPa_as_plotted: 2.3795
+          p_kPa: 0.004173485356
+          p_Pa: 4.173485355616
+          axis_conversion: T_K = 10000 / (10^4/T); p_Pa = 1000 * 10^(-(-log10(P/kPa)))
+          sigma: 0.648640441622
+          locator:
+            page: 9
+            pdf_page_index: 8
+            figure: van't Hoff plot of the main species vaporized from the olivine samples
+              (unnumbered figure caption)
+            note: Panel C (open triangles; Re Knudsen cell; Piacente et al. 1975); digitized
+              marker center pixel=(951.0,806.0) at 300 dpi; pixel uncertainty +/-(11.0,11.0)
+              px
+        - pixel_x: 1026.0
+          pixel_y: 846.0
+          inv_T_times_1e4_K_inv: 5.536301
+          T_K: 1806.26
+          minus_log10_P_kPa_as_plotted: 2.60765
+          p_kPa: 0.002468054477
+          p_Pa: 2.468054476753
+          axis_conversion: T_K = 10000 / (10^4/T); p_Pa = 1000 * 10^(-(-log10(P/kPa)))
+          sigma: 0.383583458271
+          locator:
+            page: 9
+            pdf_page_index: 8
+            figure: van't Hoff plot of the main species vaporized from the olivine samples
+              (unnumbered figure caption)
+            note: Panel C (open triangles; Re Knudsen cell; Piacente et al. 1975); digitized
+              marker center pixel=(1026.0,846.0) at 300 dpi; pixel uncertainty +/-(11.0,11.0)
+              px
+        - pixel_x: 1084.0
+          pixel_y: 877.0
+          inv_T_times_1e4_K_inv: 5.61083
+          T_K: 1782.27
+          minus_log10_P_kPa_as_plotted: 2.78446
+          p_kPa: 0.00164264238
+          p_Pa: 1.642642380168
+          axis_conversion: T_K = 10000 / (10^4/T); p_Pa = 1000 * 10^(-(-log10(P/kPa)))
+          sigma: 0.255298434788
+          locator:
+            page: 9
+            pdf_page_index: 8
+            figure: van't Hoff plot of the main species vaporized from the olivine samples
+              (unnumbered figure caption)
+            note: Panel C (open triangles; Re Knudsen cell; Piacente et al. 1975); digitized
+              marker center pixel=(1084.0,877.0) at 300 dpi; pixel uncertainty +/-(11.0,11.0)
+              px
+        - pixel_x: 1134.0
+          pixel_y: 904.0
+          inv_T_times_1e4_K_inv: 5.67508
+          T_K: 1762.09
+          minus_log10_P_kPa_as_plotted: 2.93845
+          p_kPa: 0.001152247357
+          p_Pa: 1.152247356842
+          axis_conversion: T_K = 10000 / (10^4/T); p_Pa = 1000 * 10^(-(-log10(P/kPa)))
+          sigma: 0.17908155192
+          locator:
+            page: 9
+            pdf_page_index: 8
+            figure: van't Hoff plot of the main species vaporized from the olivine samples
+              (unnumbered figure caption)
+            note: Panel C (open triangles; Re Knudsen cell; Piacente et al. 1975); digitized
+              marker center pixel=(1134.0,904.0) at 300 dpi; pixel uncertainty +/-(11.0,11.0)
+              px
+        - pixel_x: 1206.0
+          pixel_y: 943.0
+          inv_T_times_1e4_K_inv: 5.767599
+          T_K: 1733.82
+          minus_log10_P_kPa_as_plotted: 3.16089
+          p_kPa: 0.000690406978
+          p_Pa: 0.690406977674
+          axis_conversion: T_K = 10000 / (10^4/T); p_Pa = 1000 * 10^(-(-log10(P/kPa)))
+          sigma: 0.1073026137
+          locator:
+            page: 9
+            pdf_page_index: 8
+            figure: van't Hoff plot of the main species vaporized from the olivine samples
+              (unnumbered figure caption)
+            note: Panel C (open triangles; Re Knudsen cell; Piacente et al. 1975); digitized
+              marker center pixel=(1206.0,943.0) at 300 dpi; pixel uncertainty +/-(11.0,11.0)
+              px
+        - pixel_x: 1270.0
+          pixel_y: 978.0
+          inv_T_times_1e4_K_inv: 5.849839
+          T_K: 1709.45
+          minus_log10_P_kPa_as_plotted: 3.36052
+          p_kPa: 0.00043599252
+          p_Pa: 0.435992520162
+          axis_conversion: T_K = 10000 / (10^4/T); p_Pa = 1000 * 10^(-(-log10(P/kPa)))
+          sigma: 0.0677616804
+          locator:
+            page: 9
+            pdf_page_index: 8
+            figure: van't Hoff plot of the main species vaporized from the olivine samples
+              (unnumbered figure caption)
+            note: Panel C (open triangles; Re Knudsen cell; Piacente et al. 1975); digitized
+              marker center pixel=(1270.0,978.0) at 300 dpi; pixel uncertainty +/-(11.0,11.0)
+              px
+        - pixel_x: 1323.0
+          pixel_y: 1006.0
+          inv_T_times_1e4_K_inv: 5.917943
+          T_K: 1689.78
+          minus_log10_P_kPa_as_plotted: 3.52022
+          p_kPa: 0.000301840931
+          p_Pa: 0.301840931147
+          axis_conversion: T_K = 10000 / (10^4/T); p_Pa = 1000 * 10^(-(-log10(P/kPa)))
+          sigma: 0.046911925692
+          locator:
+            page: 9
+            pdf_page_index: 8
+            figure: van't Hoff plot of the main species vaporized from the olivine samples
+              (unnumbered figure caption)
+            note: Panel C (open triangles; Re Knudsen cell; Piacente et al. 1975); digitized
+              marker center pixel=(1323.0,1006.0) at 300 dpi; pixel uncertainty +/-(11.0,11.0)
+              px
+        - pixel_x: 1379.0
+          pixel_y: 1037.0
+          inv_T_times_1e4_K_inv: 5.989903
+          T_K: 1669.48
+          minus_log10_P_kPa_as_plotted: 3.69703
+          p_kPa: 0.000200893745
+          p_Pa: 0.200893744543
+          axis_conversion: T_K = 10000 / (10^4/T); p_Pa = 1000 * 10^(-(-log10(P/kPa)))
+          sigma: 0.031222778104
+          locator:
+            page: 9
+            pdf_page_index: 8
+            figure: van't Hoff plot of the main species vaporized from the olivine samples
+              (unnumbered figure caption)
+            note: Panel C (open triangles; Re Knudsen cell; Piacente et al. 1975); digitized
+              marker center pixel=(1379.0,1037.0) at 300 dpi; pixel uncertainty +/-(11.0,11.0)
+              px
+        provenance:
+          digitization_method: 300 dpi pdftoppm raster; marker centers digitized from
+            the plotted symbols; connecting/fitted lines are not data points
+          render_dpi: 300
+          figure_caption_as_printed: van't Hoff plot of the main species vaporized from
+            the olivine samples (unnumbered figure caption)
+          panel_as_printed: C (open triangles; Re Knudsen cell; Piacente et al. 1975)
+          axis_calibration:
+            x:
+              axis_label_as_printed: 10^4 T^-1 (K^-1)
+              pixel_to_value_points:
+              - - 454
+                - 4.8
+              - - 608
+                - 5.0
+              - - 764
+                - 5.2
+              - - 920
+                - 5.4
+              - - 1075
+                - 5.6
+              - - 1231
+                - 5.8
+              - - 1387
+                - 6.0
+              - - 1543
+                - 6.2
+              fit_value_per_px: 0.0012849904097491792
+              fit_intercept: 4.2179008186727565
+              pixel_residual_rms: 0.5175497145197939
+              scale: linear on displayed axis
+              declared_transform: T_K = 10000 / x; x is 10^4/T
+            y:
+              axis_label_as_printed: -log P (kPa)
+              pixel_to_value_points:
+              - - 565
+                - 1.0
+              - - 652
+                - 1.5
+              - - 739
+                - 2.0
+              - - 827
+                - 2.5
+              - - 914
+                - 3.0
+              - - 1002
+                - 3.5
+              - - 1090
+                - 4.0
+              - - 1178
+                - 4.5
+              - - 1266
+                - 5.0
+              - - 1353
+                - 5.5
+              - - 1441
+                - 6.0
+              fit_value_per_px: 0.005703603809966264
+              fit_intercept: -2.2176035647725447
+              pixel_residual_rms: 0.4554542528774025
+              scale: linear on displayed axis
+              declared_transform: display is -log10(P/kPa); p_Pa = 1000 * 10^(-display
+                value)
+          uncertainty_rule: pixel half-width/half-height of marker (or axis calibration
+            residual if larger); per-point pixel and transformed-axis bounds are retained
+            in the point locator and values
+          sample_composition_as_printed: not stated for this attributed comparator series
+          cell_configuration_as_printed: Re comparator cell
+          paper_page_number: not printed; page is the one-based PDF page
+          cell_series_letter_as_captioned: RE
+          marker_shape_as_captioned: open triangles
+          series_attribution: Piacente et al. (1975), as attributed by Costa & Jacobson
+            (2015); composition not stated for this comparator
+          fit_equations_printed_beside_plot: not digitized; only marker points are extracted
+          printed_calibration: Au melting point temperature calibration is printed; no
+            pressure calibration is printed
+        gas_species: Fe(g)
+      uncertainty:
+        note: Digitization uncertainty uses an 11 px half marker dimension or the larger
+          axis calibration residual. For P, vertical pixel uncertainty is propagated through
+          the plotted -log10(P/kPa) axis and kPa-to-Pa conversion.
+      quote: opened triangles, C, Re Knudsen cell; Piacente et al. 5
+    - observation_id: costa_2015_fe_siO_ion_intensity_ratio_digitized
+      type: rate_series
+      experiment: ratio_temperature_dependence
+      locator:
+        page: 10
+        pdf_page_index: 9
+        figure: Temperature dependence of ion intensity ratios (unnumbered figure caption)
+        note: Panel Fe+; one record is a plotted series; migration emits one child observation
+          per marker
+      phase: gas
+      standard_state: Costa & Jacobson (2015) measured KEMS signal; sample composition
+        is recorded in provenance
+      regime: kems_effusion
+      units: dimensionless ratio; plotted natural-log ratio converted by exp()
+      values:
+        quantity: ion_intensity_ratio
+        method_class: measured_direct
+        admission_status: admitted
+        points:
+        - pixel_x: 575.0
+          pixel_y: 752.0
+          inv_T_times_1e4_K_inv: 4.809297
+          T_K: 2079.31
+          ln_ratio_as_plotted: 0.224276
+          ion_intensity_ratio: 1.25141653
+          axis_conversion: T_K = 10000 / (10^4/T); I_species+/I_SiO+ = exp(ln ratio)
+          sigma: 0.06413991
+          locator:
+            page: 10
+            pdf_page_index: 9
+            figure: Temperature dependence of ion intensity ratios (unnumbered figure
+              caption)
+            note: Panel Fe+; digitized marker center pixel=(575.0,752.0) at 300 dpi; pixel
+              uncertainty +/-(11.0,11.0) px
+        - pixel_x: 603.0
+          pixel_y: 743.0
+          inv_T_times_1e4_K_inv: 4.832702
+          T_K: 2069.24
+          ln_ratio_as_plotted: 0.265172
+          ion_intensity_ratio: 1.30365492
+          axis_conversion: T_K = 10000 / (10^4/T); I_species+/I_SiO+ = exp(ln ratio)
+          sigma: 0.06681733
+          locator:
+            page: 10
+            pdf_page_index: 9
+            figure: Temperature dependence of ion intensity ratios (unnumbered figure
+              caption)
+            note: Panel Fe+; digitized marker center pixel=(603.0,743.0) at 300 dpi; pixel
+              uncertainty +/-(11.0,11.0) px
+        - pixel_x: 761.0
+          pixel_y: 754.0
+          inv_T_times_1e4_K_inv: 4.964772
+          T_K: 2014.19
+          ln_ratio_as_plotted: 0.215188
+          ion_intensity_ratio: 1.24009527
+          axis_conversion: T_K = 10000 / (10^4/T); I_species+/I_SiO+ = exp(ln ratio)
+          sigma: 0.06355965
+          locator:
+            page: 10
+            pdf_page_index: 9
+            figure: Temperature dependence of ion intensity ratios (unnumbered figure
+              caption)
+            note: Panel Fe+; digitized marker center pixel=(761.0,754.0) at 300 dpi; pixel
+              uncertainty +/-(11.0,11.0) px
+        - pixel_x: 928.0
+          pixel_y: 762.0
+          inv_T_times_1e4_K_inv: 5.104365
+          T_K: 1959.11
+          ln_ratio_as_plotted: 0.178837
+          ion_intensity_ratio: 1.19582522
+          axis_conversion: T_K = 10000 / (10^4/T); I_species+/I_SiO+ = exp(ln ratio)
+          sigma: 0.06129064
+          locator:
+            page: 10
+            pdf_page_index: 9
+            figure: Temperature dependence of ion intensity ratios (unnumbered figure
+              caption)
+            note: Panel Fe+; digitized marker center pixel=(928.0,762.0) at 300 dpi; pixel
+              uncertainty +/-(11.0,11.0) px
+        - pixel_x: 1078.0
+          pixel_y: 767.0
+          inv_T_times_1e4_K_inv: 5.229748
+          T_K: 1912.14
+          ln_ratio_as_plotted: 0.156117
+          ion_intensity_ratio: 1.1689626
+          axis_conversion: T_K = 10000 / (10^4/T); I_species+/I_SiO+ = exp(ln ratio)
+          sigma: 0.05991383
+          locator:
+            page: 10
+            pdf_page_index: 9
+            figure: Temperature dependence of ion intensity ratios (unnumbered figure
+              caption)
+            note: Panel Fe+; digitized marker center pixel=(1078.0,767.0) at 300 dpi;
+              pixel uncertainty +/-(11.0,11.0) px
+        - pixel_x: 1273.0
+          pixel_y: 775.0
+          inv_T_times_1e4_K_inv: 5.392746
+          T_K: 1854.34
+          ln_ratio_as_plotted: 0.119765
+          ion_intensity_ratio: 1.1272319
+          axis_conversion: T_K = 10000 / (10^4/T); I_species+/I_SiO+ = exp(ln ratio)
+          sigma: 0.05777497
+          locator:
+            page: 10
+            pdf_page_index: 9
+            figure: Temperature dependence of ion intensity ratios (unnumbered figure
+              caption)
+            note: Panel Fe+; digitized marker center pixel=(1273.0,775.0) at 300 dpi;
+              pixel uncertainty +/-(11.0,11.0) px
+        provenance:
+          digitization_method: 300 dpi pdftoppm raster; marker centers digitized from
+            the plotted symbols; connecting/fitted lines are not data points
+          render_dpi: 300
+          figure_caption_as_printed: Temperature dependence of ion intensity ratios (unnumbered
+            figure caption)
+          panel_as_printed: Fe+
+          axis_calibration:
+            x:
+              axis_label_as_printed: 10^4 T^-1 (K^-1)
+              pixel_to_value_points:
+              - - 444
+                - 4.7
+              - - 564
+                - 4.8
+              - - 684
+                - 4.9
+              - - 803
+                - 5.0
+              - - 923
+                - 5.1
+              - - 1042
+                - 5.2
+              - - 1162
+                - 5.3
+              - - 1281
+                - 5.4
+              - - 1402
+                - 5.5
+              fit_value_per_px: 0.0008358859845409872
+              fit_intercept: 4.328662988709677
+              pixel_residual_rms: 0.40673380188617897
+              scale: linear on displayed axis
+              declared_transform: T_K = 10000 / x; x is 10^4/T
+            y:
+              axis_label_as_printed: ln(I_Mg or Fe / I_SiO+)
+              pixel_to_value_points:
+              - - 471
+                - 1.5
+              - - 581
+                - 1.0
+              - - 692
+                - 0.5
+              - - 801
+                - 0.0
+              - - 912
+                - -0.5
+              - - 1021
+                - -1.0
+              - - 1132
+                - -1.5
+              - - 1241
+                - -2.0
+              fit_value_per_px: -0.004543962952174827
+              fit_intercept: 3.6413362731687178
+              pixel_residual_rms: 0.47715761223810316
+              scale: linear on displayed axis
+              declared_transform: I_species+/I_SiO+ = exp(ln ratio); ratio is dimensionless
+          uncertainty_rule: pixel half-width/half-height of marker (or axis calibration
+            residual if larger); per-point pixel and transformed-axis bounds are retained
+            in the point locator and values
+          sample_composition_as_printed: Fo93Fa7 (93% forsterite, 7% fayalite; percent
+            basis not separately stated)
+          cell_configuration_as_printed: not separately identified by this figure
+          paper_page_number: not printed; page is the one-based PDF page
+          ratio_definition: I_Fe+/I_SiO+
+          denominator_species: SiO+
+          figure_cell_identity: not separately stated in this figure
+          measured_quantity: ion intensity ratio plotted as natural logarithm
+        formula: Fe+
+      uncertainty:
+        note: Digitization uncertainty uses an 11 px half marker dimension or the larger
+          axis calibration residual; vertical uncertainty in ln ratio is propagated through
+          exp() to the stored dimensionless ratio.
+    - observation_id: costa_2015_fe_vaporization_coefficient_alpha_digitized
+      type: alpha
+      experiment: alpha_mo_multi_orifice
+      locator:
+        page: 11
+        pdf_page_index: 10
+        figure: Measured vaporization coefficients of Fe+ and SiO+ (unnumbered figure
+          caption)
+        note: Panel Fe+; one record is a plotted series; migration emits one child observation
+          per marker
+      phase: gas
+      standard_state: Fe vaporization coefficient on the Fo93Fa7 olivine sample as plotted
+      regime: kems_effusion
+      units: dimensionless
+      values:
+        quantity: evaporation_coefficient_alpha
+        method_class: measured_direct
+        admission_status: admitted
+        points:
+        - pixel_x: 509.0
+          pixel_y: 1415.0
+          T_K: 1700.75
+          alpha: 0.016269
+          sigma: 0.000358
+          axis_conversion: T_K and dimensionless D(alpha) read from calibrated linear
+            axes
+          locator:
+            page: 11
+            pdf_page_index: 10
+            figure: Measured vaporization coefficients of Fe+ and SiO+ (unnumbered figure
+              caption)
+            note: Panel Fe+; digitized marker center pixel=(509.0,1415.0) at 300 dpi;
+              pixel uncertainty +/-(10.0,10.0) px
+        - pixel_x: 702.0
+          pixel_y: 1436.0
+          T_K: 1722.97
+          alpha: 0.015517
+          sigma: 0.000358
+          axis_conversion: T_K and dimensionless D(alpha) read from calibrated linear
+            axes
+          locator:
+            page: 11
+            pdf_page_index: 10
+            figure: Measured vaporization coefficients of Fe+ and SiO+ (unnumbered figure
+              caption)
+            note: Panel Fe+; digitized marker center pixel=(702.0,1436.0) at 300 dpi;
+              pixel uncertainty +/-(10.0,10.0) px
+        - pixel_x: 970.0
+          pixel_y: 1317.0
+          T_K: 1753.84
+          alpha: 0.01978
+          sigma: 0.000358
+          axis_conversion: T_K and dimensionless D(alpha) read from calibrated linear
+            axes
+          locator:
+            page: 11
+            pdf_page_index: 10
+            figure: Measured vaporization coefficients of Fe+ and SiO+ (unnumbered figure
+              caption)
+            note: Panel Fe+; digitized marker center pixel=(970.0,1317.0) at 300 dpi;
+              pixel uncertainty +/-(10.0,10.0) px
+        - pixel_x: 1321.0
+          pixel_y: 1548.0
+          T_K: 1794.26
+          alpha: 0.011505
+          sigma: 0.000358
+          axis_conversion: T_K and dimensionless D(alpha) read from calibrated linear
+            axes
+          locator:
+            page: 11
+            pdf_page_index: 10
+            figure: Measured vaporization coefficients of Fe+ and SiO+ (unnumbered figure
+              caption)
+            note: Panel Fe+; digitized marker center pixel=(1321.0,1548.0) at 300 dpi;
+              pixel uncertainty +/-(10.0,10.0) px
+        - pixel_x: 1368.0
+          pixel_y: 1505.0
+          T_K: 1799.68
+          alpha: 0.013045
+          sigma: 0.000358
+          axis_conversion: T_K and dimensionless D(alpha) read from calibrated linear
+            axes
+          locator:
+            page: 11
+            pdf_page_index: 10
+            figure: Measured vaporization coefficients of Fe+ and SiO+ (unnumbered figure
+              caption)
+            note: Panel Fe+; digitized marker center pixel=(1368.0,1505.0) at 300 dpi;
+              pixel uncertainty +/-(10.0,10.0) px
+        provenance:
+          digitization_method: 300 dpi pdftoppm raster; marker centers digitized from
+            the plotted symbols; connecting/fitted lines are not data points
+          render_dpi: 300
+          figure_caption_as_printed: Measured vaporization coefficients of Fe+ and SiO+
+            (unnumbered figure caption)
+          panel_as_printed: Fe+
+          axis_calibration:
+            x:
+              axis_label_as_printed: T (K)
+              pixel_to_value_points:
+              - - 503
+                - 1700
+              - - 676
+                - 1720
+              - - 850
+                - 1740
+              - - 1023
+                - 1760
+              - - 1196
+                - 1780
+              - - 1372
+                - 1800
+              fit_value_per_px: 0.11516874868150288
+              fit_intercept: 1642.1252720683256
+              pixel_residual_rms: 0.738941902825029
+              scale: linear on displayed axis
+            y:
+              axis_label_as_printed: D (dimensionless vaporization coefficient)
+              pixel_to_value_points:
+              - - 1032
+                - 0.03
+              - - 1171
+                - 0.025
+              - - 1311
+                - 0.02
+              - - 1450
+                - 0.015
+              - - 1590
+                - 0.01
+              - - 1730
+                - 0.005
+              - - 1869
+                - 0.0
+              fit_value_per_px: -3.58239133395493e-05
+              fit_intercept: 0.06696002744806342
+              pixel_residual_rms: 0.2857144353766819
+              scale: linear on displayed axis
+          uncertainty_rule: pixel half-width/half-height of marker (or axis calibration
+            residual if larger); per-point pixel and transformed-axis bounds are retained
+            in the point locator and values
+          sample_composition_as_printed: Fo93Fa7 (93% forsterite, 7% fayalite; percent
+            basis not separately stated)
+          cell_configuration_as_printed: three Mo Knudsen cells with different orifice
+            sizes
+          paper_page_number: not printed; page is the one-based PDF page
+          printed_cell_configuration: three Mo Knudsen cells with different orifice sizes
+          orifice_diameters: different sizes stated; numeric diameters not printed
+          printed_calibration: Au melting point temperature calibration is printed; no
+            pressure calibration is printed
+        formula: Fe
+        gas_species: Fe(g)
+      uncertainty:
+        note: Digitization uncertainty uses a 10 px half marker dimension or the larger
+          axis calibration residual; alpha uncertainty is derived from the calibrated
+          D-axis pixel interval.
+  Mg:
+    observations:
+    - observation_id: costa_2015_mg_time_equilibrium_mo_1669
+      type: rate_series
+      experiment: time_mo_1669
+      locator:
+        page: 8
+        pdf_page_index: 7
+        figure: Time to Equilibration (unnumbered figure caption)
+        note: Panel A; one record is a plotted series; migration emits one child observation
+          per marker
+      phase: gas
+      standard_state: Costa & Jacobson (2015) measured KEMS signal; sample composition
+        is recorded in provenance
+      regime: kems_effusion
+      units: ion counts as plotted
+      values:
+        quantity: ion_intensity
+        method_class: measured_direct
+        admission_status: admitted
+        points:
+        - pixel_x: 548.0
+          pixel_y: 1296.5
+          elapsed_time_min: 91.93
+          T_K: 1669
+          ion_intensity: 1022.4
+          axis_conversion: Panel A hh:mm ticks converted to elapsed minutes; panel B
+            time ticks converted to minutes
+          sigma: 218.7
+          point_conditions:
+            elapsed_time_min:
+              state:
+                tag: value
+                value: 91.93
+              locator:
+                page: 8
+                pdf_page_index: 7
+                figure: Time to Equilibration
+          locator:
+            page: 8
+            pdf_page_index: 7
+            figure: Time to Equilibration (unnumbered figure caption)
+            note: Panel A; digitized marker center pixel=(548.0,1296.5) at 300 dpi;
+              pixel uncertainty +/-(11.0,11.0) px
+        - pixel_x: 654.0
+          pixel_y: 1296.0
+          elapsed_time_min: 199.15
+          T_K: 1669
+          ion_intensity: 1032.3
+          axis_conversion: Panel A hh:mm ticks converted to elapsed minutes; panel B
+            time ticks converted to minutes
+          sigma: 218.7
+          point_conditions:
+            elapsed_time_min:
+              state:
+                tag: value
+                value: 199.15
+              locator:
+                page: 8
+                pdf_page_index: 7
+                figure: Time to Equilibration
+          locator:
+            page: 8
+            pdf_page_index: 7
+            figure: Time to Equilibration (unnumbered figure caption)
+            note: Panel A; digitized marker center pixel=(654.0,1296.0) at 300 dpi;
+              pixel uncertainty +/-(11.0,11.0) px
+        - pixel_x: 747.5
+          pixel_y: 1295.5
+          elapsed_time_min: 293.71
+          T_K: 1669
+          ion_intensity: 1042.3
+          axis_conversion: Panel A hh:mm ticks converted to elapsed minutes; panel B
+            time ticks converted to minutes
+          sigma: 218.7
+          point_conditions:
+            elapsed_time_min:
+              state:
+                tag: value
+                value: 293.71
+              locator:
+                page: 8
+                pdf_page_index: 7
+                figure: Time to Equilibration
+          locator:
+            page: 8
+            pdf_page_index: 7
+            figure: Time to Equilibration (unnumbered figure caption)
+            note: Panel A; digitized marker center pixel=(747.5,1295.5) at 300 dpi;
+              pixel uncertainty +/-(11.0,11.0) px
+        - pixel_x: 810.5
+          pixel_y: 1293.0
+          elapsed_time_min: 357.44
+          T_K: 1669
+          ion_intensity: 1092.0
+          axis_conversion: Panel A hh:mm ticks converted to elapsed minutes; panel B
+            time ticks converted to minutes
+          sigma: 218.7
+          point_conditions:
+            elapsed_time_min:
+              state:
+                tag: value
+                value: 357.44
+              locator:
+                page: 8
+                pdf_page_index: 7
+                figure: Time to Equilibration
+          locator:
+            page: 8
+            pdf_page_index: 7
+            figure: Time to Equilibration (unnumbered figure caption)
+            note: Panel A; digitized marker center pixel=(810.5,1293.0) at 300 dpi;
+              pixel uncertainty +/-(11.0,11.0) px
+        - pixel_x: 905.5
+          pixel_y: 1289.5
+          elapsed_time_min: 453.52
+          T_K: 1669
+          ion_intensity: 1161.6
+          axis_conversion: Panel A hh:mm ticks converted to elapsed minutes; panel B
+            time ticks converted to minutes
+          sigma: 218.7
+          point_conditions:
+            elapsed_time_min:
+              state:
+                tag: value
+                value: 453.52
+              locator:
+                page: 8
+                pdf_page_index: 7
+                figure: Time to Equilibration
+          locator:
+            page: 8
+            pdf_page_index: 7
+            figure: Time to Equilibration (unnumbered figure caption)
+            note: Panel A; digitized marker center pixel=(905.5,1289.5) at 300 dpi;
+              pixel uncertainty +/-(11.0,11.0) px
+        - pixel_x: 969.5
+          pixel_y: 1289.0
+          elapsed_time_min: 518.25
+          T_K: 1669
+          ion_intensity: 1171.5
+          axis_conversion: Panel A hh:mm ticks converted to elapsed minutes; panel B
+            time ticks converted to minutes
+          sigma: 218.7
+          point_conditions:
+            elapsed_time_min:
+              state:
+                tag: value
+                value: 518.25
+              locator:
+                page: 8
+                pdf_page_index: 7
+                figure: Time to Equilibration
+          locator:
+            page: 8
+            pdf_page_index: 7
+            figure: Time to Equilibration (unnumbered figure caption)
+            note: Panel A; digitized marker center pixel=(969.5,1289.0) at 300 dpi;
+              pixel uncertainty +/-(11.0,11.0) px
+        - pixel_x: 1037.5
+          pixel_y: 1286.0
+          elapsed_time_min: 587.03
+          T_K: 1669
+          ion_intensity: 1231.2
+          axis_conversion: Panel A hh:mm ticks converted to elapsed minutes; panel B
+            time ticks converted to minutes
+          sigma: 218.7
+          point_conditions:
+            elapsed_time_min:
+              state:
+                tag: value
+                value: 587.03
+              locator:
+                page: 8
+                pdf_page_index: 7
+                figure: Time to Equilibration
+          locator:
+            page: 8
+            pdf_page_index: 7
+            figure: Time to Equilibration (unnumbered figure caption)
+            note: Panel A; digitized marker center pixel=(1037.5,1286.0) at 300 dpi;
+              pixel uncertainty +/-(11.0,11.0) px
+        - pixel_x: 1130.0
+          pixel_y: 1284.5
+          elapsed_time_min: 680.59
+          T_K: 1669
+          ion_intensity: 1261.0
+          axis_conversion: Panel A hh:mm ticks converted to elapsed minutes; panel B
+            time ticks converted to minutes
+          sigma: 218.7
+          point_conditions:
+            elapsed_time_min:
+              state:
+                tag: value
+                value: 680.59
+              locator:
+                page: 8
+                pdf_page_index: 7
+                figure: Time to Equilibration
+          locator:
+            page: 8
+            pdf_page_index: 7
+            figure: Time to Equilibration (unnumbered figure caption)
+            note: Panel A; digitized marker center pixel=(1130.0,1284.5) at 300 dpi;
+              pixel uncertainty +/-(11.0,11.0) px
+        - pixel_x: 1192.0
+          pixel_y: 1281.0
+          elapsed_time_min: 743.3
+          T_K: 1669
+          ion_intensity: 1330.6
+          axis_conversion: Panel A hh:mm ticks converted to elapsed minutes; panel B
+            time ticks converted to minutes
+          sigma: 218.7
+          point_conditions:
+            elapsed_time_min:
+              state:
+                tag: value
+                value: 743.3
+              locator:
+                page: 8
+                pdf_page_index: 7
+                figure: Time to Equilibration
+          locator:
+            page: 8
+            pdf_page_index: 7
+            figure: Time to Equilibration (unnumbered figure caption)
+            note: Panel A; digitized marker center pixel=(1192.0,1281.0) at 300 dpi;
+              pixel uncertainty +/-(11.0,11.0) px
+        - pixel_x: 1243.5
+          pixel_y: 1279.0
+          elapsed_time_min: 795.39
+          T_K: 1669
+          ion_intensity: 1370.3
+          axis_conversion: Panel A hh:mm ticks converted to elapsed minutes; panel B
+            time ticks converted to minutes
+          sigma: 218.7
+          point_conditions:
+            elapsed_time_min:
+              state:
+                tag: value
+                value: 795.39
+              locator:
+                page: 8
+                pdf_page_index: 7
+                figure: Time to Equilibration
+          locator:
+            page: 8
+            pdf_page_index: 7
+            figure: Time to Equilibration (unnumbered figure caption)
+            note: Panel A; digitized marker center pixel=(1243.5,1279.0) at 300 dpi;
+              pixel uncertainty +/-(11.0,11.0) px
+        - pixel_x: 1346.5
+          pixel_y: 1277.0
+          elapsed_time_min: 899.57
+          T_K: 1669
+          ion_intensity: 1410.1
+          axis_conversion: Panel A hh:mm ticks converted to elapsed minutes; panel B
+            time ticks converted to minutes
+          sigma: 218.7
+          point_conditions:
+            elapsed_time_min:
+              state:
+                tag: value
+                value: 899.57
+              locator:
+                page: 8
+                pdf_page_index: 7
+                figure: Time to Equilibration
+          locator:
+            page: 8
+            pdf_page_index: 7
+            figure: Time to Equilibration (unnumbered figure caption)
+            note: Panel A; digitized marker center pixel=(1346.5,1277.0) at 300 dpi;
+              pixel uncertainty +/-(11.0,11.0) px
+        provenance:
+          digitization_method: 300 dpi pdftoppm raster; marker centers digitized from
+            the plotted symbols; connecting/fitted lines are not data points
+          render_dpi: 300
+          figure_caption_as_printed: Time to Equilibration (unnumbered figure caption)
+          panel_as_printed: A
+          axis_calibration:
+            x:
+              axis_label_as_printed: Time (h:min)
+              pixel_to_value_points:
+              - - 576
+                - 120
+              - - 694
+                - 240
+              - - 813
+                - 360
+              - - 932
+                - 480
+              - - 1050
+                - 600
+              - - 1169
+                - 720
+              - - 1288
+                - 840
+              - - 1406
+                - 960
+              fit_value_per_px: 1.011437792414724
+              fit_intercept: -462.3348522829915
+              pixel_residual_rms: 0.28347350887872624
+              scale: linear on displayed axis
+              declared_transform: axis ticks in h:min converted to elapsed minutes
+            y:
+              axis_label_as_printed: Intensity (counts)
+              pixel_to_value_points:
+              - - 644
+                - 14000
+              - - 744
+                - 12000
+              - - 845
+                - 10000
+              - - 946
+                - 8000
+              - - 1046
+                - 6000
+              - - 1147
+                - 4000
+              - - 1247
+                - 2000
+              - - 1348
+                - 0
+              fit_value_per_px: -19.88398264475914
+              fit_intercept: 26801.961216349508
+              pixel_residual_rms: 0.2700310477862427
+              scale: linear on displayed axis
+          uncertainty_rule: pixel half-width/half-height of marker (or axis calibration
+            residual if larger); per-point pixel and transformed-axis bounds are retained
+            in the point locator and values
+          sample_composition_as_printed: Fo93Fa7 (93% forsterite, 7% fayalite; percent
+            basis not separately stated)
+          cell_configuration_as_printed: Mo
+          paper_page_number: not printed; page is the one-based PDF page
+          panel_temperature_K_as_printed: 1669
+          ion_species_as_plotted: Mg+
+        formula: Mg+
+      uncertainty:
+        note: Per-point sigma is estimated from the larger of half marker width/height
+          or axis-calibration residual; pixel coordinate and transformed-axis uncertainty
+          are retained per point.
+    - observation_id: costa_2015_mg_time_equilibrium_ir_1851
+      type: rate_series
+      experiment: time_ir_1851
+      locator:
+        page: 8
+        pdf_page_index: 7
+        figure: Time to Equilibration (unnumbered figure caption)
+        note: Panel B; one record is a plotted series; migration emits one child observation
+          per marker
+      phase: gas
+      standard_state: Costa & Jacobson (2015) measured KEMS signal; sample composition
+        is recorded in provenance
+      regime: kems_effusion
+      units: ion counts as plotted
+      values:
+        quantity: ion_intensity
+        method_class: measured_direct
+        admission_status: admitted
+        points:
+        - pixel_x: 1886.0
+          pixel_y: 1333.5
+          elapsed_time_min: 2.29
+          T_K: 1851
+          ion_intensity: 590.4
+          axis_conversion: Panel A hh:mm ticks converted to elapsed minutes; panel B
+            time ticks converted to minutes
+          sigma: 171.9
+          point_conditions:
+            elapsed_time_min:
+              state:
+                tag: value
+                value: 2.29
+              locator:
+                page: 8
+                pdf_page_index: 7
+                figure: Time to Equilibration
+          locator:
+            page: 8
+            pdf_page_index: 7
+            figure: Time to Equilibration (unnumbered figure caption)
+            note: Panel B; digitized marker center pixel=(1886.0,1333.5) at 300 dpi;
+              pixel uncertainty +/-(11.0,11.0) px
+        - pixel_x: 1971.5
+          pixel_y: 1324.0
+          elapsed_time_min: 73.31
+          T_K: 1851
+          ion_intensity: 738.9
+          axis_conversion: Panel A hh:mm ticks converted to elapsed minutes; panel B
+            time ticks converted to minutes
+          sigma: 171.9
+          point_conditions:
+            elapsed_time_min:
+              state:
+                tag: value
+                value: 73.31
+              locator:
+                page: 8
+                pdf_page_index: 7
+                figure: Time to Equilibration
+          locator:
+            page: 8
+            pdf_page_index: 7
+            figure: Time to Equilibration (unnumbered figure caption)
+            note: Panel B; digitized marker center pixel=(1971.5,1324.0) at 300 dpi;
+              pixel uncertainty +/-(11.0,11.0) px
+        - pixel_x: 2051.0
+          pixel_y: 1321.0
+          elapsed_time_min: 139.34
+          T_K: 1851
+          ion_intensity: 785.7
+          axis_conversion: Panel A hh:mm ticks converted to elapsed minutes; panel B
+            time ticks converted to minutes
+          sigma: 171.9
+          point_conditions:
+            elapsed_time_min:
+              state:
+                tag: value
+                value: 139.34
+              locator:
+                page: 8
+                pdf_page_index: 7
+                figure: Time to Equilibration
+          locator:
+            page: 8
+            pdf_page_index: 7
+            figure: Time to Equilibration (unnumbered figure caption)
+            note: Panel B; digitized marker center pixel=(2051.0,1321.0) at 300 dpi;
+              pixel uncertainty +/-(11.0,11.0) px
+        - pixel_x: 2133.5
+          pixel_y: 1319.0
+          elapsed_time_min: 207.86
+          T_K: 1851
+          ion_intensity: 817.0
+          axis_conversion: Panel A hh:mm ticks converted to elapsed minutes; panel B
+            time ticks converted to minutes
+          sigma: 171.9
+          point_conditions:
+            elapsed_time_min:
+              state:
+                tag: value
+                value: 207.86
+              locator:
+                page: 8
+                pdf_page_index: 7
+                figure: Time to Equilibration
+          locator:
+            page: 8
+            pdf_page_index: 7
+            figure: Time to Equilibration (unnumbered figure caption)
+            note: Panel B; digitized marker center pixel=(2133.5,1319.0) at 300 dpi;
+              pixel uncertainty +/-(11.0,11.0) px
+        - pixel_x: 2205.5
+          pixel_y: 1316.5
+          elapsed_time_min: 267.67
+          T_K: 1851
+          ion_intensity: 856.0
+          axis_conversion: Panel A hh:mm ticks converted to elapsed minutes; panel B
+            time ticks converted to minutes
+          sigma: 171.9
+          point_conditions:
+            elapsed_time_min:
+              state:
+                tag: value
+                value: 267.67
+              locator:
+                page: 8
+                pdf_page_index: 7
+                figure: Time to Equilibration
+          locator:
+            page: 8
+            pdf_page_index: 7
+            figure: Time to Equilibration (unnumbered figure caption)
+            note: Panel B; digitized marker center pixel=(2205.5,1316.5) at 300 dpi;
+              pixel uncertainty +/-(11.0,11.0) px
+        - pixel_x: 2286.0
+          pixel_y: 1314.0
+          elapsed_time_min: 334.53
+          T_K: 1851
+          ion_intensity: 895.1
+          axis_conversion: Panel A hh:mm ticks converted to elapsed minutes; panel B
+            time ticks converted to minutes
+          sigma: 171.9
+          point_conditions:
+            elapsed_time_min:
+              state:
+                tag: value
+                value: 334.53
+              locator:
+                page: 8
+                pdf_page_index: 7
+                figure: Time to Equilibration
+          locator:
+            page: 8
+            pdf_page_index: 7
+            figure: Time to Equilibration (unnumbered figure caption)
+            note: Panel B; digitized marker center pixel=(2286.0,1314.0) at 300 dpi;
+              pixel uncertainty +/-(11.0,11.0) px
+        - pixel_x: 2362.0
+          pixel_y: 1313.0
+          elapsed_time_min: 397.65
+          T_K: 1851
+          ion_intensity: 910.7
+          axis_conversion: Panel A hh:mm ticks converted to elapsed minutes; panel B
+            time ticks converted to minutes
+          sigma: 171.9
+          point_conditions:
+            elapsed_time_min:
+              state:
+                tag: value
+                value: 397.65
+              locator:
+                page: 8
+                pdf_page_index: 7
+                figure: Time to Equilibration
+          locator:
+            page: 8
+            pdf_page_index: 7
+            figure: Time to Equilibration (unnumbered figure caption)
+            note: Panel B; digitized marker center pixel=(2362.0,1313.0) at 300 dpi;
+              pixel uncertainty +/-(11.0,11.0) px
+        - pixel_x: 2438.5
+          pixel_y: 1311.0
+          elapsed_time_min: 461.19
+          T_K: 1851
+          ion_intensity: 942.0
+          axis_conversion: Panel A hh:mm ticks converted to elapsed minutes; panel B
+            time ticks converted to minutes
+          sigma: 171.9
+          point_conditions:
+            elapsed_time_min:
+              state:
+                tag: value
+                value: 461.19
+              locator:
+                page: 8
+                pdf_page_index: 7
+                figure: Time to Equilibration
+          locator:
+            page: 8
+            pdf_page_index: 7
+            figure: Time to Equilibration (unnumbered figure caption)
+            note: Panel B; digitized marker center pixel=(2438.5,1311.0) at 300 dpi;
+              pixel uncertainty +/-(11.0,11.0) px
+        - pixel_x: 2510.0
+          pixel_y: 1310.0
+          elapsed_time_min: 520.58
+          T_K: 1851
+          ion_intensity: 957.6
+          axis_conversion: Panel A hh:mm ticks converted to elapsed minutes; panel B
+            time ticks converted to minutes
+          sigma: 171.9
+          point_conditions:
+            elapsed_time_min:
+              state:
+                tag: value
+                value: 520.58
+              locator:
+                page: 8
+                pdf_page_index: 7
+                figure: Time to Equilibration
+          locator:
+            page: 8
+            pdf_page_index: 7
+            figure: Time to Equilibration (unnumbered figure caption)
+            note: Panel B; digitized marker center pixel=(2510.0,1310.0) at 300 dpi;
+              pixel uncertainty +/-(11.0,11.0) px
+        - pixel_x: 2574.0
+          pixel_y: 1310.0
+          elapsed_time_min: 573.74
+          T_K: 1851
+          ion_intensity: 957.6
+          axis_conversion: Panel A hh:mm ticks converted to elapsed minutes; panel B
+            time ticks converted to minutes
+          sigma: 171.9
+          point_conditions:
+            elapsed_time_min:
+              state:
+                tag: value
+                value: 573.74
+              locator:
+                page: 8
+                pdf_page_index: 7
+                figure: Time to Equilibration
+          locator:
+            page: 8
+            pdf_page_index: 7
+            figure: Time to Equilibration (unnumbered figure caption)
+            note: Panel B; digitized marker center pixel=(2574.0,1310.0) at 300 dpi;
+              pixel uncertainty +/-(11.0,11.0) px
+        - pixel_x: 2653.0
+          pixel_y: 1308.0
+          elapsed_time_min: 639.35
+          T_K: 1851
+          ion_intensity: 988.9
+          axis_conversion: Panel A hh:mm ticks converted to elapsed minutes; panel B
+            time ticks converted to minutes
+          sigma: 171.9
+          point_conditions:
+            elapsed_time_min:
+              state:
+                tag: value
+                value: 639.35
+              locator:
+                page: 8
+                pdf_page_index: 7
+                figure: Time to Equilibration
+          locator:
+            page: 8
+            pdf_page_index: 7
+            figure: Time to Equilibration (unnumbered figure caption)
+            note: Panel B; digitized marker center pixel=(2653.0,1308.0) at 300 dpi;
+              pixel uncertainty +/-(11.0,11.0) px
+        provenance:
+          digitization_method: 300 dpi pdftoppm raster; marker centers digitized from
+            the plotted symbols; connecting/fitted lines are not data points
+          render_dpi: 300
+          figure_caption_as_printed: Time to Equilibration (unnumbered figure caption)
+          panel_as_printed: B
+          axis_calibration:
+            x:
+              axis_label_as_printed: Time (h:min)
+              pixel_to_value_points:
+              - - 1883
+                - 0
+              - - 2057
+                - 144
+              - - 2230
+                - 288
+              - - 2403
+                - 432
+              - - 2577
+                - 576
+              - - 2750
+                - 720
+              fit_value_per_px: 0.830586022554733
+              fit_intercept: -1564.190952251798
+              pixel_residual_rms: 0.26427509432536983
+              scale: linear on displayed axis
+              declared_transform: axis ticks in h:min converted to elapsed minutes
+            y:
+              axis_label_as_printed: Intensity (counts)
+              pixel_to_value_points:
+              - - 604
+                - 12000
+              - - 731
+                - 10000
+              - - 859
+                - 8000
+              - - 987
+                - 6000
+              - - 1115
+                - 4000
+              - - 1243
+                - 2000
+              - - 1372
+                - 0
+              fit_value_per_px: -15.62495134329864
+              fit_intercept: 21426.29124764813
+              pixel_residual_rms: 0.45175465484167776
+              scale: linear on displayed axis
+          uncertainty_rule: pixel half-width/half-height of marker (or axis calibration
+            residual if larger); per-point pixel and transformed-axis bounds are retained
+            in the point locator and values
+          sample_composition_as_printed: Fo93Fa7 (93% forsterite, 7% fayalite; percent
+            basis not separately stated)
+          cell_configuration_as_printed: Ir
+          paper_page_number: not printed; page is the one-based PDF page
+          panel_temperature_K_as_printed: 1851
+          ion_species_as_plotted: Mg+
+        formula: Mg+
+      uncertainty:
+        note: Per-point sigma is estimated from the larger of half marker width/height
+          or axis-calibration residual; pixel coordinate and transformed-axis uncertainty
+          are retained per point.
+    - observation_id: costa_2015_mg_partial_pressure_ir_digitized
+      type: partial_pressure
+      experiment: pressure_ir
+      locator:
+        page: 9
+        pdf_page_index: 8
+        figure: van't Hoff plot of the main species vaporized from the olivine samples
+          (unnumbered figure caption)
+        note: Panel A (closed squares; Ir Knudsen cell, this study); one record is a
+          plotted series; migration emits one child observation per marker
+      phase: gas
+      standard_state: partial pressure over the plotted olivine sample; plotted pressure
+        unit is kPa before declared conversion to Pa
+      regime: kems_effusion
+      units: P plotted as -log10(P/kPa); p_Pa = 1000*10^(-axis value)
+      values:
+        quantity: partial_pressure
+        method_class: measured_direct
+        admission_status: admitted
+        points:
+        - pixel_x: 580.0
+          pixel_y: 955.0
+          inv_T_times_1e4_K_inv: 4.963195
+          T_K: 2014.83
+          minus_log10_P_kPa_as_plotted: 3.22934
+          p_kPa: 0.000589741821
+          p_Pa: 0.589741820715
+          axis_conversion: T_K = 10000 / (10^4/T); p_Pa = 1000 * 10^(-(-log10(P/kPa)))
+          sigma: 0.091657298981
+          locator:
+            page: 9
+            pdf_page_index: 8
+            figure: van't Hoff plot of the main species vaporized from the olivine samples
+              (unnumbered figure caption)
+            note: Panel A (closed squares; Ir Knudsen cell, this study); digitized marker
+              center pixel=(580.0,955.0) at 300 dpi; pixel uncertainty +/-(11.0,11.0)
+              px
+        - pixel_x: 689.0
+          pixel_y: 1048.0
+          inv_T_times_1e4_K_inv: 5.103259
+          T_K: 1959.53
+          minus_log10_P_kPa_as_plotted: 3.75977
+          p_kPa: 0.000173870848
+          p_Pa: 0.173870847867
+          axis_conversion: T_K = 10000 / (10^4/T); p_Pa = 1000 * 10^(-(-log10(P/kPa)))
+          sigma: 0.027022896676
+          locator:
+            page: 9
+            pdf_page_index: 8
+            figure: van't Hoff plot of the main species vaporized from the olivine samples
+              (unnumbered figure caption)
+            note: Panel A (closed squares; Ir Knudsen cell, this study); digitized marker
+              center pixel=(689.0,1048.0) at 300 dpi; pixel uncertainty +/-(11.0,11.0)
+              px
+        - pixel_x: 787.0
+          pixel_y: 1144.0
+          inv_T_times_1e4_K_inv: 5.229188
+          T_K: 1912.34
+          minus_log10_P_kPa_as_plotted: 4.30732
+          p_kPa: 4.9281147e-05
+          p_Pa: 0.04928114687
+          axis_conversion: T_K = 10000 / (10^4/T); p_Pa = 1000 * 10^(-(-log10(P/kPa)))
+          sigma: 0.007659244527
+          locator:
+            page: 9
+            pdf_page_index: 8
+            figure: van't Hoff plot of the main species vaporized from the olivine samples
+              (unnumbered figure caption)
+            note: Panel A (closed squares; Ir Knudsen cell, this study); digitized marker
+              center pixel=(787.0,1144.0) at 300 dpi; pixel uncertainty +/-(11.0,11.0)
+              px
+        - pixel_x: 914.0
+          pixel_y: 1253.0
+          inv_T_times_1e4_K_inv: 5.392382
+          T_K: 1854.47
+          minus_log10_P_kPa_as_plotted: 4.92901
+          p_kPa: 1.1775734e-05
+          p_Pa: 0.011775734108
+          axis_conversion: T_K = 10000 / (10^4/T); p_Pa = 1000 * 10^(-(-log10(P/kPa)))
+          sigma: 0.001830177111
+          locator:
+            page: 9
+            pdf_page_index: 8
+            figure: van't Hoff plot of the main species vaporized from the olivine samples
+              (unnumbered figure caption)
+            note: Panel A (closed squares; Ir Knudsen cell, this study); digitized marker
+              center pixel=(914.0,1253.0) at 300 dpi; pixel uncertainty +/-(11.0,11.0)
+              px
+        provenance:
+          digitization_method: 300 dpi pdftoppm raster; marker centers digitized from
+            the plotted symbols; connecting/fitted lines are not data points
+          render_dpi: 300
+          figure_caption_as_printed: van't Hoff plot of the main species vaporized from
+            the olivine samples (unnumbered figure caption)
+          panel_as_printed: A (closed squares; Ir Knudsen cell, this study)
+          axis_calibration:
+            x:
+              axis_label_as_printed: 10^4 T^-1 (K^-1)
+              pixel_to_value_points:
+              - - 454
+                - 4.8
+              - - 608
+                - 5.0
+              - - 764
+                - 5.2
+              - - 920
+                - 5.4
+              - - 1075
+                - 5.6
+              - - 1231
+                - 5.8
+              - - 1387
+                - 6.0
+              - - 1543
+                - 6.2
+              fit_value_per_px: 0.0012849904097491792
+              fit_intercept: 4.2179008186727565
+              pixel_residual_rms: 0.5175497145197939
+              scale: linear on displayed axis
+              declared_transform: T_K = 10000 / x; x is 10^4/T
+            y:
+              axis_label_as_printed: -log P (kPa)
+              pixel_to_value_points:
+              - - 565
+                - 1.0
+              - - 652
+                - 1.5
+              - - 739
+                - 2.0
+              - - 827
+                - 2.5
+              - - 914
+                - 3.0
+              - - 1002
+                - 3.5
+              - - 1090
+                - 4.0
+              - - 1178
+                - 4.5
+              - - 1266
+                - 5.0
+              - - 1353
+                - 5.5
+              - - 1441
+                - 6.0
+              fit_value_per_px: 0.005703603809966264
+              fit_intercept: -2.2176035647725447
+              pixel_residual_rms: 0.4554542528774025
+              scale: linear on displayed axis
+              declared_transform: display is -log10(P/kPa); p_Pa = 1000 * 10^(-display
+                value)
+          uncertainty_rule: pixel half-width/half-height of marker (or axis calibration
+            residual if larger); per-point pixel and transformed-axis bounds are retained
+            in the point locator and values
+          sample_composition_as_printed: Fo93Fa7 (93% forsterite, 7% fayalite; percent
+            basis not separately stated)
+          cell_configuration_as_printed: Ir liner in graphite cell
+          paper_page_number: not printed; page is the one-based PDF page
+          cell_series_letter_as_captioned: IR
+          marker_shape_as_captioned: closed squares
+          series_attribution: Costa & Jacobson (2015), this study
+          fit_equations_printed_beside_plot: not digitized; only marker points are extracted
+          printed_calibration: Au melting point temperature calibration is printed;
+            no pressure calibration is printed
+        gas_species: Mg(g)
+      uncertainty:
+        note: Digitization uncertainty uses an 11 px half marker dimension or the larger
+          axis calibration residual. For P, vertical pixel uncertainty is propagated
+          through the plotted -log10(P/kPa) axis and kPa-to-Pa conversion.
+    - observation_id: costa_2015_mg_partial_pressure_mo_digitized
+      type: partial_pressure
+      experiment: pressure_mo
+      locator:
+        page: 9
+        pdf_page_index: 8
+        figure: van't Hoff plot of the main species vaporized from the olivine samples
+          (unnumbered figure caption)
+        note: Panel B (closed circles; Mo Knudsen cell, this study); one record is a
+          plotted series; migration emits one child observation per marker
+      phase: gas
+      standard_state: partial pressure over the plotted olivine sample; plotted pressure
+        unit is kPa before declared conversion to Pa
+      regime: kems_effusion
+      units: P plotted as -log10(P/kPa); p_Pa = 1000*10^(-axis value)
+      values:
+        quantity: partial_pressure
+        method_class: measured_direct
+        admission_status: admitted
+        points:
+        - pixel_x: 1042.0
+          pixel_y: 1103.0
+          inv_T_times_1e4_K_inv: 5.556861
+          T_K: 1799.58
+          minus_log10_P_kPa_as_plotted: 4.07347
+          p_kPa: 8.4436177e-05
+          p_Pa: 0.084436177149
+          axis_conversion: T_K = 10000 / (10^4/T); p_Pa = 1000 * 10^(-(-log10(P/kPa)))
+          sigma: 0.013123016991
+          locator:
+            page: 9
+            pdf_page_index: 8
+            figure: van't Hoff plot of the main species vaporized from the olivine samples
+              (unnumbered figure caption)
+            note: Panel B (closed circles; Mo Knudsen cell, this study); digitized marker
+              center pixel=(1042.0,1103.0) at 300 dpi; pixel uncertainty +/-(11.0,11.0)
+              px
+        - pixel_x: 1055.0
+          pixel_y: 1110.0
+          inv_T_times_1e4_K_inv: 5.573566
+          T_K: 1794.18
+          minus_log10_P_kPa_as_plotted: 4.1134
+          p_kPa: 7.7019968e-05
+          p_Pa: 0.07701996833
+          axis_conversion: T_K = 10000 / (10^4/T); p_Pa = 1000 * 10^(-(-log10(P/kPa)))
+          sigma: 0.01197039453
+          locator:
+            page: 9
+            pdf_page_index: 8
+            figure: van't Hoff plot of the main species vaporized from the olivine samples
+              (unnumbered figure caption)
+            note: Panel B (closed circles; Mo Knudsen cell, this study); digitized marker
+              center pixel=(1055.0,1110.0) at 300 dpi; pixel uncertainty +/-(11.0,11.0)
+              px
+        - pixel_x: 1155.0
+          pixel_y: 1188.0
+          inv_T_times_1e4_K_inv: 5.702065
+          T_K: 1753.75
+          minus_log10_P_kPa_as_plotted: 4.55828
+          p_kPa: 2.7651726e-05
+          p_Pa: 0.0276517256
+          axis_conversion: T_K = 10000 / (10^4/T); p_Pa = 1000 * 10^(-(-log10(P/kPa)))
+          sigma: 0.004297613619
+          locator:
+            page: 9
+            pdf_page_index: 8
+            figure: van't Hoff plot of the main species vaporized from the olivine samples
+              (unnumbered figure caption)
+            note: Panel B (closed circles; Mo Knudsen cell, this study); digitized marker
+              center pixel=(1155.0,1188.0) at 300 dpi; pixel uncertainty +/-(11.0,11.0)
+              px
+        - pixel_x: 1235.0
+          pixel_y: 1230.0
+          inv_T_times_1e4_K_inv: 5.804864
+          T_K: 1722.69
+          minus_log10_P_kPa_as_plotted: 4.79783
+          p_kPa: 1.5928353e-05
+          p_Pa: 0.015928353245
+          axis_conversion: T_K = 10000 / (10^4/T); p_Pa = 1000 * 10^(-(-log10(P/kPa)))
+          sigma: 0.002475574538
+          locator:
+            page: 9
+            pdf_page_index: 8
+            figure: van't Hoff plot of the main species vaporized from the olivine samples
+              (unnumbered figure caption)
+            note: Panel B (closed circles; Mo Knudsen cell, this study); digitized marker
+              center pixel=(1235.0,1230.0) at 300 dpi; pixel uncertainty +/-(11.0,11.0)
+              px
+        - pixel_x: 1294.0
+          pixel_y: 1274.0
+          inv_T_times_1e4_K_inv: 5.880678
+          T_K: 1700.48
+          minus_log10_P_kPa_as_plotted: 5.04879
+          p_kPa: 8.937423e-06
+          p_Pa: 0.008937422953
+          axis_conversion: T_K = 10000 / (10^4/T); p_Pa = 1000 * 10^(-(-log10(P/kPa)))
+          sigma: 0.001389048595
+          locator:
+            page: 9
+            pdf_page_index: 8
+            figure: van't Hoff plot of the main species vaporized from the olivine samples
+              (unnumbered figure caption)
+            note: Panel B (closed circles; Mo Knudsen cell, this study); digitized marker
+              center pixel=(1294.0,1274.0) at 300 dpi; pixel uncertainty +/-(11.0,11.0)
+              px
+        provenance:
+          digitization_method: 300 dpi pdftoppm raster; marker centers digitized from
+            the plotted symbols; connecting/fitted lines are not data points
+          render_dpi: 300
+          figure_caption_as_printed: van't Hoff plot of the main species vaporized from
+            the olivine samples (unnumbered figure caption)
+          panel_as_printed: B (closed circles; Mo Knudsen cell, this study)
+          axis_calibration:
+            x:
+              axis_label_as_printed: 10^4 T^-1 (K^-1)
+              pixel_to_value_points:
+              - - 454
+                - 4.8
+              - - 608
+                - 5.0
+              - - 764
+                - 5.2
+              - - 920
+                - 5.4
+              - - 1075
+                - 5.6
+              - - 1231
+                - 5.8
+              - - 1387
+                - 6.0
+              - - 1543
+                - 6.2
+              fit_value_per_px: 0.0012849904097491792
+              fit_intercept: 4.2179008186727565
+              pixel_residual_rms: 0.5175497145197939
+              scale: linear on displayed axis
+              declared_transform: T_K = 10000 / x; x is 10^4/T
+            y:
+              axis_label_as_printed: -log P (kPa)
+              pixel_to_value_points:
+              - - 565
+                - 1.0
+              - - 652
+                - 1.5
+              - - 739
+                - 2.0
+              - - 827
+                - 2.5
+              - - 914
+                - 3.0
+              - - 1002
+                - 3.5
+              - - 1090
+                - 4.0
+              - - 1178
+                - 4.5
+              - - 1266
+                - 5.0
+              - - 1353
+                - 5.5
+              - - 1441
+                - 6.0
+              fit_value_per_px: 0.005703603809966264
+              fit_intercept: -2.2176035647725447
+              pixel_residual_rms: 0.4554542528774025
+              scale: linear on displayed axis
+              declared_transform: display is -log10(P/kPa); p_Pa = 1000 * 10^(-display
+                value)
+          uncertainty_rule: pixel half-width/half-height of marker (or axis calibration
+            residual if larger); per-point pixel and transformed-axis bounds are retained
+            in the point locator and values
+          sample_composition_as_printed: Fo93Fa7 (93% forsterite, 7% fayalite; percent
+            basis not separately stated)
+          cell_configuration_as_printed: Mo
+          paper_page_number: not printed; page is the one-based PDF page
+          cell_series_letter_as_captioned: MO
+          marker_shape_as_captioned: closed circles
+          series_attribution: Costa & Jacobson (2015), this study
+          fit_equations_printed_beside_plot: not digitized; only marker points are extracted
+          printed_calibration: Au melting point temperature calibration is printed;
+            no pressure calibration is printed
+        gas_species: Mg(g)
+      uncertainty:
+        note: Digitization uncertainty uses an 11 px half marker dimension or the larger
+          axis calibration residual. For P, vertical pixel uncertainty is propagated
+          through the plotted -log10(P/kPa) axis and kPa-to-Pa conversion.
+    - observation_id: costa_2015_mg_partial_pressure_re_piacente_comparator
+      type: partial_pressure
+      experiment: pressure_re_comparator
+      locator:
+        page: 9
+        pdf_page_index: 8
+        figure: van't Hoff plot of the main species vaporized from the olivine samples
+          (unnumbered figure caption)
+        note: Panel C (open triangles; Re Knudsen cell; Piacente et al. 1975); one record
+          is a plotted series; migration emits one child observation per marker
+      phase: gas
+      standard_state: partial pressure over the plotted olivine sample; plotted pressure
+        unit is kPa before declared conversion to Pa
+      regime: kems_effusion
+      units: P plotted as -log10(P/kPa); p_Pa = 1000*10^(-axis value)
+      values:
+        quantity: partial_pressure
+        method_class: quoted_attributed
+        admission_status: admitted
+        points:
+        - pixel_x: 785.0
+          pixel_y: 870.0
+          inv_T_times_1e4_K_inv: 5.226618
+          T_K: 1913.28
+          minus_log10_P_kPa_as_plotted: 2.74453
+          p_kPa: 0.001800811478
+          p_Pa: 1.800811477989
+          axis_conversion: T_K = 10000 / (10^4/T); p_Pa = 1000 * 10^(-(-log10(P/kPa)))
+          sigma: 0.279880975451
+          locator:
+            page: 9
+            pdf_page_index: 8
+            figure: van't Hoff plot of the main species vaporized from the olivine samples
+              (unnumbered figure caption)
+            note: Panel C (open triangles; Re Knudsen cell; Piacente et al. 1975); digitized
+              marker center pixel=(785.0,870.0) at 300 dpi; pixel uncertainty +/-(11.0,11.0)
+              px
+        - pixel_x: 798.0
+          pixel_y: 881.0
+          inv_T_times_1e4_K_inv: 5.243323
+          T_K: 1907.19
+          minus_log10_P_kPa_as_plotted: 2.80727
+          p_kPa: 0.001558578239
+          p_Pa: 1.558578238651
+          axis_conversion: T_K = 10000 / (10^4/T); p_Pa = 1000 * 10^(-(-log10(P/kPa)))
+          sigma: 0.242233239338
+          locator:
+            page: 9
+            pdf_page_index: 8
+            figure: van't Hoff plot of the main species vaporized from the olivine samples
+              (unnumbered figure caption)
+            note: Panel C (open triangles; Re Knudsen cell; Piacente et al. 1975); digitized
+              marker center pixel=(798.0,881.0) at 300 dpi; pixel uncertainty +/-(11.0,11.0)
+              px
+        - pixel_x: 817.0
+          pixel_y: 893.0
+          inv_T_times_1e4_K_inv: 5.267738
+          T_K: 1898.35
+          minus_log10_P_kPa_as_plotted: 2.87571
+          p_kPa: 0.001331328909
+          p_Pa: 1.331328908763
+          axis_conversion: T_K = 10000 / (10^4/T); p_Pa = 1000 * 10^(-(-log10(P/kPa)))
+          sigma: 0.206914292909
+          locator:
+            page: 9
+            pdf_page_index: 8
+            figure: van't Hoff plot of the main species vaporized from the olivine samples
+              (unnumbered figure caption)
+            note: Panel C (open triangles; Re Knudsen cell; Piacente et al. 1975); digitized
+              marker center pixel=(817.0,893.0) at 300 dpi; pixel uncertainty +/-(11.0,11.0)
+              px
+        - pixel_x: 834.0
+          pixel_y: 905.0
+          inv_T_times_1e4_K_inv: 5.289583
+          T_K: 1890.51
+          minus_log10_P_kPa_as_plotted: 2.94416
+          p_kPa: 0.001137213788
+          p_Pa: 1.137213788409
+          axis_conversion: T_K = 10000 / (10^4/T); p_Pa = 1000 * 10^(-(-log10(P/kPa)))
+          sigma: 0.176745044269
+          locator:
+            page: 9
+            pdf_page_index: 8
+            figure: van't Hoff plot of the main species vaporized from the olivine samples
+              (unnumbered figure caption)
+            note: Panel C (open triangles; Re Knudsen cell; Piacente et al. 1975); digitized
+              marker center pixel=(834.0,905.0) at 300 dpi; pixel uncertainty +/-(11.0,11.0)
+              px
+        - pixel_x: 853.0
+          pixel_y: 919.0
+          inv_T_times_1e4_K_inv: 5.313998
+          T_K: 1881.82
+          minus_log10_P_kPa_as_plotted: 3.02401
+          p_kPa: 0.000946218998
+          p_Pa: 0.946218997856
+          axis_conversion: T_K = 10000 / (10^4/T); p_Pa = 1000 * 10^(-(-log10(P/kPa)))
+          sigma: 0.147060755302
+          locator:
+            page: 9
+            pdf_page_index: 8
+            figure: van't Hoff plot of the main species vaporized from the olivine samples
+              (unnumbered figure caption)
+            note: Panel C (open triangles; Re Knudsen cell; Piacente et al. 1975); digitized
+              marker center pixel=(853.0,919.0) at 300 dpi; pixel uncertainty +/-(11.0,11.0)
+              px
+        - pixel_x: 883.0
+          pixel_y: 936.0
+          inv_T_times_1e4_K_inv: 5.352547
+          T_K: 1868.27
+          minus_log10_P_kPa_as_plotted: 3.12097
+          p_kPa: 0.000756885872
+          p_Pa: 0.756885871745
+          axis_conversion: T_K = 10000 / (10^4/T); p_Pa = 1000 * 10^(-(-log10(P/kPa)))
+          sigma: 0.117634721168
+          locator:
+            page: 9
+            pdf_page_index: 8
+            figure: van't Hoff plot of the main species vaporized from the olivine samples
+              (unnumbered figure caption)
+            note: Panel C (open triangles; Re Knudsen cell; Piacente et al. 1975); digitized
+              marker center pixel=(883.0,936.0) at 300 dpi; pixel uncertainty +/-(11.0,11.0)
+              px
+        - pixel_x: 905.0
+          pixel_y: 951.0
+          inv_T_times_1e4_K_inv: 5.380817
+          T_K: 1858.45
+          minus_log10_P_kPa_as_plotted: 3.20652
+          p_kPa: 0.000621550387
+          p_Pa: 0.621550387424
+          axis_conversion: T_K = 10000 / (10^4/T); p_Pa = 1000 * 10^(-(-log10(P/kPa)))
+          sigma: 0.096600966204
+          locator:
+            page: 9
+            pdf_page_index: 8
+            figure: van't Hoff plot of the main species vaporized from the olivine samples
+              (unnumbered figure caption)
+            note: Panel C (open triangles; Re Knudsen cell; Piacente et al. 1975); digitized
+              marker center pixel=(905.0,951.0) at 300 dpi; pixel uncertainty +/-(11.0,11.0)
+              px
+        - pixel_x: 931.0
+          pixel_y: 966.0
+          inv_T_times_1e4_K_inv: 5.414227
+          T_K: 1846.99
+          minus_log10_P_kPa_as_plotted: 3.29208
+          p_kPa: 0.000510413655
+          p_Pa: 0.510413654857
+          axis_conversion: T_K = 10000 / (10^4/T); p_Pa = 1000 * 10^(-(-log10(P/kPa)))
+          sigma: 0.079328165858
+          locator:
+            page: 9
+            pdf_page_index: 8
+            figure: van't Hoff plot of the main species vaporized from the olivine samples
+              (unnumbered figure caption)
+            note: Panel C (open triangles; Re Knudsen cell; Piacente et al. 1975); digitized
+              marker center pixel=(931.0,966.0) at 300 dpi; pixel uncertainty +/-(11.0,11.0)
+              px
+        - pixel_x: 955.0
+          pixel_y: 982.0
+          inv_T_times_1e4_K_inv: 5.445067
+          T_K: 1836.52
+          minus_log10_P_kPa_as_plotted: 3.38334
+          p_kPa: 0.000413680094
+          p_Pa: 0.41368009394
+          axis_conversion: T_K = 10000 / (10^4/T); p_Pa = 1000 * 10^(-(-log10(P/kPa)))
+          sigma: 0.064293897297
+          locator:
+            page: 9
+            pdf_page_index: 8
+            figure: van't Hoff plot of the main species vaporized from the olivine samples
+              (unnumbered figure caption)
+            note: Panel C (open triangles; Re Knudsen cell; Piacente et al. 1975); digitized
+              marker center pixel=(955.0,982.0) at 300 dpi; pixel uncertainty +/-(11.0,11.0)
+              px
+        - pixel_x: 993.0
+          pixel_y: 1008.0
+          inv_T_times_1e4_K_inv: 5.493896
+          T_K: 1820.2
+          minus_log10_P_kPa_as_plotted: 3.53163
+          p_kPa: 0.000294015973
+          p_Pa: 0.294015972571
+          axis_conversion: T_K = 10000 / (10^4/T); p_Pa = 1000 * 10^(-(-log10(P/kPa)))
+          sigma: 0.045695775603
+          locator:
+            page: 9
+            pdf_page_index: 8
+            figure: van't Hoff plot of the main species vaporized from the olivine samples
+              (unnumbered figure caption)
+            note: Panel C (open triangles; Re Knudsen cell; Piacente et al. 1975); digitized
+              marker center pixel=(993.0,1008.0) at 300 dpi; pixel uncertainty +/-(11.0,11.0)
+              px
+        - pixel_x: 1027.0
+          pixel_y: 1030.0
+          inv_T_times_1e4_K_inv: 5.537586
+          T_K: 1805.84
+          minus_log10_P_kPa_as_plotted: 3.65711
+          p_kPa: 0.000220237689
+          p_Pa: 0.220237688615
+          axis_conversion: T_K = 10000 / (10^4/T); p_Pa = 1000 * 10^(-(-log10(P/kPa)))
+          sigma: 0.034229201598
+          locator:
+            page: 9
+            pdf_page_index: 8
+            figure: van't Hoff plot of the main species vaporized from the olivine samples
+              (unnumbered figure caption)
+            note: Panel C (open triangles; Re Knudsen cell; Piacente et al. 1975); digitized
+              marker center pixel=(1027.0,1030.0) at 300 dpi; pixel uncertainty +/-(11.0,11.0)
+              px
+        - pixel_x: 1067.0
+          pixel_y: 1054.0
+          inv_T_times_1e4_K_inv: 5.588986
+          T_K: 1789.23
+          minus_log10_P_kPa_as_plotted: 3.79399
+          p_kPa: 0.000160696031
+          p_Pa: 0.160696030529
+          axis_conversion: T_K = 10000 / (10^4/T); p_Pa = 1000 * 10^(-(-log10(P/kPa)))
+          sigma: 0.024975274939
+          locator:
+            page: 9
+            pdf_page_index: 8
+            figure: van't Hoff plot of the main species vaporized from the olivine samples
+              (unnumbered figure caption)
+            note: Panel C (open triangles; Re Knudsen cell; Piacente et al. 1975); digitized
+              marker center pixel=(1067.0,1054.0) at 300 dpi; pixel uncertainty +/-(11.0,11.0)
+              px
+        - pixel_x: 1094.0
+          pixel_y: 1068.0
+          inv_T_times_1e4_K_inv: 5.62368
+          T_K: 1778.19
+          minus_log10_P_kPa_as_plotted: 3.87385
+          p_kPa: 0.00013370717
+          p_Pa: 0.133707169678
+          axis_conversion: T_K = 10000 / (10^4/T); p_Pa = 1000 * 10^(-(-log10(P/kPa)))
+          sigma: 0.020780683337
+          locator:
+            page: 9
+            pdf_page_index: 8
+            figure: van't Hoff plot of the main species vaporized from the olivine samples
+              (unnumbered figure caption)
+            note: Panel C (open triangles; Re Knudsen cell; Piacente et al. 1975); digitized
+              marker center pixel=(1094.0,1068.0) at 300 dpi; pixel uncertainty +/-(11.0,11.0)
+              px
+        - pixel_x: 1119.0
+          pixel_y: 1083.0
+          inv_T_times_1e4_K_inv: 5.655805
+          T_K: 1768.09
+          minus_log10_P_kPa_as_plotted: 3.9594
+          p_kPa: 0.00010979957
+          p_Pa: 0.109799569812
+          axis_conversion: T_K = 10000 / (10^4/T); p_Pa = 1000 * 10^(-(-log10(P/kPa)))
+          sigma: 0.01706497936
+          locator:
+            page: 9
+            pdf_page_index: 8
+            figure: van't Hoff plot of the main species vaporized from the olivine samples
+              (unnumbered figure caption)
+            note: Panel C (open triangles; Re Knudsen cell; Piacente et al. 1975); digitized
+              marker center pixel=(1119.0,1083.0) at 300 dpi; pixel uncertainty +/-(11.0,11.0)
+              px
+        - pixel_x: 1144.0
+          pixel_y: 1098.0
+          inv_T_times_1e4_K_inv: 5.68793
+          T_K: 1758.11
+          minus_log10_P_kPa_as_plotted: 4.04495
+          p_kPa: 9.0166784e-05
+          p_Pa: 0.090166784324
+          axis_conversion: T_K = 10000 / (10^4/T); p_Pa = 1000 * 10^(-(-log10(P/kPa)))
+          sigma: 0.014013664317
+          locator:
+            page: 9
+            pdf_page_index: 8
+            figure: van't Hoff plot of the main species vaporized from the olivine samples
+              (unnumbered figure caption)
+            note: Panel C (open triangles; Re Knudsen cell; Piacente et al. 1975); digitized
+              marker center pixel=(1144.0,1098.0) at 300 dpi; pixel uncertainty +/-(11.0,11.0)
+              px
+        - pixel_x: 1160.0
+          pixel_y: 1110.0
+          inv_T_times_1e4_K_inv: 5.70849
+          T_K: 1751.78
+          minus_log10_P_kPa_as_plotted: 4.1134
+          p_kPa: 7.7019968e-05
+          p_Pa: 0.07701996833
+          axis_conversion: T_K = 10000 / (10^4/T); p_Pa = 1000 * 10^(-(-log10(P/kPa)))
+          sigma: 0.01197039453
+          locator:
+            page: 9
+            pdf_page_index: 8
+            figure: van't Hoff plot of the main species vaporized from the olivine samples
+              (unnumbered figure caption)
+            note: Panel C (open triangles; Re Knudsen cell; Piacente et al. 1975); digitized
+              marker center pixel=(1160.0,1110.0) at 300 dpi; pixel uncertainty +/-(11.0,11.0)
+              px
+        - pixel_x: 1180.0
+          pixel_y: 1118.0
+          inv_T_times_1e4_K_inv: 5.73419
+          T_K: 1743.93
+          minus_log10_P_kPa_as_plotted: 4.15903
+          p_kPa: 6.933851e-05
+          p_Pa: 0.069338510043
+          axis_conversion: T_K = 10000 / (10^4/T); p_Pa = 1000 * 10^(-(-log10(P/kPa)))
+          sigma: 0.010776547165
+          locator:
+            page: 9
+            pdf_page_index: 8
+            figure: van't Hoff plot of the main species vaporized from the olivine samples
+              (unnumbered figure caption)
+            note: Panel C (open triangles; Re Knudsen cell; Piacente et al. 1975); digitized
+              marker center pixel=(1180.0,1118.0) at 300 dpi; pixel uncertainty +/-(11.0,11.0)
+              px
+        - pixel_x: 1205.0
+          pixel_y: 1136.0
+          inv_T_times_1e4_K_inv: 5.766314
+          T_K: 1734.21
+          minus_log10_P_kPa_as_plotted: 4.26169
+          p_kPa: 5.4740611e-05
+          p_Pa: 0.054740610505
+          axis_conversion: T_K = 10000 / (10^4/T); p_Pa = 1000 * 10^(-(-log10(P/kPa)))
+          sigma: 0.008507750896
+          locator:
+            page: 9
+            pdf_page_index: 8
+            figure: van't Hoff plot of the main species vaporized from the olivine samples
+              (unnumbered figure caption)
+            note: Panel C (open triangles; Re Knudsen cell; Piacente et al. 1975); digitized
+              marker center pixel=(1205.0,1136.0) at 300 dpi; pixel uncertainty +/-(11.0,11.0)
+              px
+        - pixel_x: 1223.0
+          pixel_y: 1154.0
+          inv_T_times_1e4_K_inv: 5.789444
+          T_K: 1727.28
+          minus_log10_P_kPa_as_plotted: 4.36436
+          p_kPa: 4.321602e-05
+          p_Pa: 0.043216020024
+          axis_conversion: T_K = 10000 / (10^4/T); p_Pa = 1000 * 10^(-(-log10(P/kPa)))
+          sigma: 0.006716606367
+          locator:
+            page: 9
+            pdf_page_index: 8
+            figure: van't Hoff plot of the main species vaporized from the olivine samples
+              (unnumbered figure caption)
+            note: Panel C (open triangles; Re Knudsen cell; Piacente et al. 1975); digitized
+              marker center pixel=(1223.0,1154.0) at 300 dpi; pixel uncertainty +/-(11.0,11.0)
+              px
+        - pixel_x: 1240.0
+          pixel_y: 1169.0
+          inv_T_times_1e4_K_inv: 5.811289
+          T_K: 1720.79
+          minus_log10_P_kPa_as_plotted: 4.44991
+          p_kPa: 3.5488751e-05
+          p_Pa: 0.035488750671
+          axis_conversion: T_K = 10000 / (10^4/T); p_Pa = 1000 * 10^(-(-log10(P/kPa)))
+          sigma: 0.005515639075
+          locator:
+            page: 9
+            pdf_page_index: 8
+            figure: van't Hoff plot of the main species vaporized from the olivine samples
+              (unnumbered figure caption)
+            note: Panel C (open triangles; Re Knudsen cell; Piacente et al. 1975); digitized
+              marker center pixel=(1240.0,1169.0) at 300 dpi; pixel uncertainty +/-(11.0,11.0)
+              px
+        provenance:
+          digitization_method: 300 dpi pdftoppm raster; marker centers digitized from
+            the plotted symbols; connecting/fitted lines are not data points
+          render_dpi: 300
+          figure_caption_as_printed: van't Hoff plot of the main species vaporized from
+            the olivine samples (unnumbered figure caption)
+          panel_as_printed: C (open triangles; Re Knudsen cell; Piacente et al. 1975)
+          axis_calibration:
+            x:
+              axis_label_as_printed: 10^4 T^-1 (K^-1)
+              pixel_to_value_points:
+              - - 454
+                - 4.8
+              - - 608
+                - 5.0
+              - - 764
+                - 5.2
+              - - 920
+                - 5.4
+              - - 1075
+                - 5.6
+              - - 1231
+                - 5.8
+              - - 1387
+                - 6.0
+              - - 1543
+                - 6.2
+              fit_value_per_px: 0.0012849904097491792
+              fit_intercept: 4.2179008186727565
+              pixel_residual_rms: 0.5175497145197939
+              scale: linear on displayed axis
+              declared_transform: T_K = 10000 / x; x is 10^4/T
+            y:
+              axis_label_as_printed: -log P (kPa)
+              pixel_to_value_points:
+              - - 565
+                - 1.0
+              - - 652
+                - 1.5
+              - - 739
+                - 2.0
+              - - 827
+                - 2.5
+              - - 914
+                - 3.0
+              - - 1002
+                - 3.5
+              - - 1090
+                - 4.0
+              - - 1178
+                - 4.5
+              - - 1266
+                - 5.0
+              - - 1353
+                - 5.5
+              - - 1441
+                - 6.0
+              fit_value_per_px: 0.005703603809966264
+              fit_intercept: -2.2176035647725447
+              pixel_residual_rms: 0.4554542528774025
+              scale: linear on displayed axis
+              declared_transform: display is -log10(P/kPa); p_Pa = 1000 * 10^(-display
+                value)
+          uncertainty_rule: pixel half-width/half-height of marker (or axis calibration
+            residual if larger); per-point pixel and transformed-axis bounds are retained
+            in the point locator and values
+          sample_composition_as_printed: not stated for this attributed comparator series
+          cell_configuration_as_printed: Re comparator cell
+          paper_page_number: not printed; page is the one-based PDF page
+          cell_series_letter_as_captioned: RE
+          marker_shape_as_captioned: open triangles
+          series_attribution: Piacente et al. (1975), as attributed by Costa & Jacobson
+            (2015); composition not stated for this comparator
+          fit_equations_printed_beside_plot: not digitized; only marker points are extracted
+          printed_calibration: Au melting point temperature calibration is printed;
+            no pressure calibration is printed
+        gas_species: Mg(g)
+      uncertainty:
+        note: Digitization uncertainty uses an 11 px half marker dimension or the larger
+          axis calibration residual. For P, vertical pixel uncertainty is propagated
+          through the plotted -log10(P/kPa) axis and kPa-to-Pa conversion.
+      quote: opened triangles, C, Re Knudsen cell; Piacente et al. 5
+    - observation_id: costa_2015_mg_siO_ion_intensity_ratio_digitized
+      type: rate_series
+      experiment: ratio_temperature_dependence
+      locator:
+        page: 10
+        pdf_page_index: 9
+        figure: Temperature dependence of ion intensity ratios (unnumbered figure caption)
+        note: Panel Mg+; one record is a plotted series; migration emits one child observation
+          per marker
+      phase: gas
+      standard_state: Costa & Jacobson (2015) measured KEMS signal; sample composition
+        is recorded in provenance
+      regime: kems_effusion
+      units: dimensionless ratio; plotted natural-log ratio converted by exp()
+      values:
+        quantity: ion_intensity_ratio
+        method_class: measured_direct
+        admission_status: admitted
+        points:
+        - pixel_x: 576.0
+          pixel_y: 614.0
+          inv_T_times_1e4_K_inv: 4.810133
+          T_K: 2078.94
+          ln_ratio_as_plotted: 0.851343
+          ion_intensity_ratio: 2.34279116
+          axis_conversion: T_K = 10000 / (10^4/T); I_species+/I_SiO+ = exp(ln ratio)
+          sigma: 0.12007706
+          locator:
+            page: 10
+            pdf_page_index: 9
+            figure: Temperature dependence of ion intensity ratios (unnumbered figure
+              caption)
+            note: Panel Mg+; digitized marker center pixel=(576.0,614.0) at 300 dpi;
+              pixel uncertainty +/-(11.0,11.0) px
+        - pixel_x: 603.0
+          pixel_y: 604.0
+          inv_T_times_1e4_K_inv: 4.832702
+          T_K: 2069.24
+          ln_ratio_as_plotted: 0.896783
+          ion_intensity_ratio: 2.45170242
+          axis_conversion: T_K = 10000 / (10^4/T); I_species+/I_SiO+ = exp(ln ratio)
+          sigma: 0.12565918
+          locator:
+            page: 10
+            pdf_page_index: 9
+            figure: Temperature dependence of ion intensity ratios (unnumbered figure
+              caption)
+            note: Panel Mg+; digitized marker center pixel=(603.0,604.0) at 300 dpi;
+              pixel uncertainty +/-(11.0,11.0) px
+        - pixel_x: 761.0
+          pixel_y: 779.0
+          inv_T_times_1e4_K_inv: 4.964772
+          T_K: 2014.19
+          ln_ratio_as_plotted: 0.101589
+          ion_intensity_ratio: 1.10692858
+          axis_conversion: T_K = 10000 / (10^4/T); I_species+/I_SiO+ = exp(ln ratio)
+          sigma: 0.05673435
+          locator:
+            page: 10
+            pdf_page_index: 9
+            figure: Temperature dependence of ion intensity ratios (unnumbered figure
+              caption)
+            note: Panel Mg+; digitized marker center pixel=(761.0,779.0) at 300 dpi;
+              pixel uncertainty +/-(11.0,11.0) px
+        - pixel_x: 928.0
+          pixel_y: 906.0
+          inv_T_times_1e4_K_inv: 5.104365
+          T_K: 1959.11
+          ln_ratio_as_plotted: -0.475494
+          ion_intensity_ratio: 0.62157782
+          axis_conversion: T_K = 10000 / (10^4/T); I_species+/I_SiO+ = exp(ln ratio)
+          sigma: 0.03185825
+          locator:
+            page: 10
+            pdf_page_index: 9
+            figure: Temperature dependence of ion intensity ratios (unnumbered figure
+              caption)
+            note: Panel Mg+; digitized marker center pixel=(928.0,906.0) at 300 dpi;
+              pixel uncertainty +/-(11.0,11.0) px
+        - pixel_x: 1078.0
+          pixel_y: 1030.0
+          inv_T_times_1e4_K_inv: 5.229748
+          T_K: 1912.14
+          ln_ratio_as_plotted: -1.038946
+          ion_intensity_ratio: 0.35382757
+          axis_conversion: T_K = 10000 / (10^4/T); I_species+/I_SiO+ = exp(ln ratio)
+          sigma: 0.01813502
+          locator:
+            page: 10
+            pdf_page_index: 9
+            figure: Temperature dependence of ion intensity ratios (unnumbered figure
+              caption)
+            note: Panel Mg+; digitized marker center pixel=(1078.0,1030.0) at 300 dpi;
+              pixel uncertainty +/-(11.0,11.0) px
+        - pixel_x: 1274.0
+          pixel_y: 1132.0
+          inv_T_times_1e4_K_inv: 5.393582
+          T_K: 1854.06
+          ln_ratio_as_plotted: -1.50243
+          ion_intensity_ratio: 0.22258866
+          axis_conversion: T_K = 10000 / (10^4/T); I_species+/I_SiO+ = exp(ln ratio)
+          sigma: 0.01140853
+          locator:
+            page: 10
+            pdf_page_index: 9
+            figure: Temperature dependence of ion intensity ratios (unnumbered figure
+              caption)
+            note: Panel Mg+; digitized marker center pixel=(1274.0,1132.0) at 300 dpi;
+              pixel uncertainty +/-(11.0,11.0) px
+        provenance:
+          digitization_method: 300 dpi pdftoppm raster; marker centers digitized from
+            the plotted symbols; connecting/fitted lines are not data points
+          render_dpi: 300
+          figure_caption_as_printed: Temperature dependence of ion intensity ratios
+            (unnumbered figure caption)
+          panel_as_printed: Mg+
+          axis_calibration:
+            x:
+              axis_label_as_printed: 10^4 T^-1 (K^-1)
+              pixel_to_value_points:
+              - - 444
+                - 4.7
+              - - 564
+                - 4.8
+              - - 684
+                - 4.9
+              - - 803
+                - 5.0
+              - - 923
+                - 5.1
+              - - 1042
+                - 5.2
+              - - 1162
+                - 5.3
+              - - 1281
+                - 5.4
+              - - 1402
+                - 5.5
+              fit_value_per_px: 0.0008358859845409872
+              fit_intercept: 4.328662988709677
+              pixel_residual_rms: 0.40673380188617897
+              scale: linear on displayed axis
+              declared_transform: T_K = 10000 / x; x is 10^4/T
+            y:
+              axis_label_as_printed: ln(I_Mg or Fe / I_SiO+)
+              pixel_to_value_points:
+              - - 471
+                - 1.5
+              - - 581
+                - 1.0
+              - - 692
+                - 0.5
+              - - 801
+                - 0.0
+              - - 912
+                - -0.5
+              - - 1021
+                - -1.0
+              - - 1132
+                - -1.5
+              - - 1241
+                - -2.0
+              fit_value_per_px: -0.004543962952174827
+              fit_intercept: 3.6413362731687178
+              pixel_residual_rms: 0.47715761223810316
+              scale: linear on displayed axis
+              declared_transform: I_species+/I_SiO+ = exp(ln ratio); ratio is dimensionless
+          uncertainty_rule: pixel half-width/half-height of marker (or axis calibration
+            residual if larger); per-point pixel and transformed-axis bounds are retained
+            in the point locator and values
+          sample_composition_as_printed: Fo93Fa7 (93% forsterite, 7% fayalite; percent
+            basis not separately stated)
+          cell_configuration_as_printed: not separately identified by this figure
+          paper_page_number: not printed; page is the one-based PDF page
+          ratio_definition: I_Mg+/I_SiO+
+          denominator_species: SiO+
+          figure_cell_identity: not separately stated in this figure
+          measured_quantity: ion intensity ratio plotted as natural logarithm
+        formula: Mg+
+      uncertainty:
+        note: Digitization uncertainty uses an 11 px half marker dimension or the larger
+          axis calibration residual; vertical uncertainty in ln ratio is propagated
+          through exp() to the stored dimensionless ratio.
   SiO:
     observations:
     - observation_id: costa_2015_sio_olivine_kems_alpha_multicell
@@ -351,3 +4457,89 @@ fidelity_samples:
     source_path: docs-private/research/ocr-artifacts/kems-007-costa-2015/spool/out/kems-007-costa-2015/vlm/kems-007-costa-2015.md
     paragraph: three Knudsen cells with different orifice sizes
     line_range: '179-386'
+- path: species.Fe.observations[costa_2015_fe_time_equilibrium_mo_1669].values.points[2].ion_intensity
+  value: 10447.4
+  note: 'Independent readings: first marker-center read (749.0,822.5) px -> 10447.4;
+    second local color-mask centroid (749.2,825.4) px -> 10390.674. This is one plotted
+    marker, not a line fit.'
+  locator:
+    page: 8
+    pdf_page_index: 7
+    figure: Time to Equilibration (unnumbered figure caption)
+    note: Panel A; digitized marker center pixel=(749.0,822.5) at 300 dpi; pixel uncertainty
+      +/-(11.0,11.0) px; independent second read center=(749.2,825.4) px
+- path: species.Mg.observations[costa_2015_mg_time_equilibrium_ir_1851].values.points[4].ion_intensity
+  value: 856.0
+  note: 'Independent readings: first marker-center read (2205.5,1316.5) px -> 856;
+    second local color-mask centroid (2212.0,1316.5) px -> 856.61281. This is one
+    plotted marker, not a line fit.'
+  locator:
+    page: 8
+    pdf_page_index: 7
+    figure: Time to Equilibration (unnumbered figure caption)
+    note: Panel B; digitized marker center pixel=(2205.5,1316.5) at 300 dpi; pixel
+      uncertainty +/-(11.0,11.0) px; independent second read center=(2212.0,1316.5)
+      px
+- path: species.Fe.observations[costa_2015_fe_partial_pressure_ir_digitized].values.points[2].p_Pa
+  value: 0.275329600922
+  note: 'Independent readings: first marker-center read (787.0,1013.0) px -> 0.2753296;
+    second local color-mask centroid (787.0,1013.7) px -> 0.27292046. This is one
+    plotted marker, not a line fit.'
+  locator:
+    page: 9
+    pdf_page_index: 8
+    figure: van't Hoff plot of the main species vaporized from the olivine samples
+      (unnumbered figure caption)
+    note: Panel A (closed squares; Ir Knudsen cell, this study); digitized marker
+      center pixel=(787.0,1013.0) at 300 dpi; pixel uncertainty +/-(11.0,11.0) px;
+      independent second read center=(787.0,1013.7) px
+- path: species.Mg.observations[costa_2015_mg_partial_pressure_mo_digitized].values.points[2].p_Pa
+  value: 0.0276517256
+  note: 'Independent readings: first marker-center read (1155.0,1188.0) px -> 0.027651726;
+    second local color-mask centroid (1155.4,1188.3) px -> 0.027545598. This is one
+    plotted marker, not a line fit.'
+  locator:
+    page: 9
+    pdf_page_index: 8
+    figure: van't Hoff plot of the main species vaporized from the olivine samples
+      (unnumbered figure caption)
+    note: Panel B (closed circles; Mo Knudsen cell, this study); digitized marker
+      center pixel=(1155.0,1188.0) at 300 dpi; pixel uncertainty +/-(11.0,11.0) px;
+      independent second read center=(1155.4,1188.3) px
+- path: species.Fe.observations[costa_2015_fe_siO_ion_intensity_ratio_digitized].values.points[2].ion_intensity_ratio
+  value: 1.24009527
+  note: 'Independent readings: first marker-center read (761.0,754.0) px -> 1.2400953;
+    second local color-mask centroid (760.8,754.6) px -> 1.2369469. This is one plotted
+    marker, not a line fit.'
+  locator:
+    page: 10
+    pdf_page_index: 9
+    figure: Temperature dependence of ion intensity ratios (unnumbered figure caption)
+    note: Panel Fe+; digitized marker center pixel=(761.0,754.0) at 300 dpi; pixel
+      uncertainty +/-(11.0,11.0) px; independent second read center=(760.8,754.6)
+      px
+- path: species.Mg.observations[costa_2015_mg_siO_ion_intensity_ratio_digitized].values.points[4].ion_intensity_ratio
+  value: 0.35382757
+  note: 'Independent readings: first marker-center read (1078.0,1030.0) px -> 0.35382757;
+    second local color-mask centroid (1077.5,1030.0) px -> 0.35382757. This is one
+    plotted marker, not a line fit.'
+  locator:
+    page: 10
+    pdf_page_index: 9
+    figure: Temperature dependence of ion intensity ratios (unnumbered figure caption)
+    note: Panel Mg+; digitized marker center pixel=(1078.0,1030.0) at 300 dpi; pixel
+      uncertainty +/-(11.0,11.0) px; independent second read center=(1077.5,1030.0)
+      px
+- path: species.Fe.observations[costa_2015_fe_vaporization_coefficient_alpha_digitized].values.points[2].alpha
+  value: 0.01978
+  note: 'Independent readings: first marker-center read (970.0,1317.0) px -> 0.01978;
+    second local color-mask centroid (969.7,1317.2) px -> 0.019772108. This is one
+    plotted marker, not a line fit.'
+  locator:
+    page: 11
+    pdf_page_index: 10
+    figure: Measured vaporization coefficients of Fe+ and SiO+ (unnumbered figure
+      caption)
+    note: Panel Fe+; digitized marker center pixel=(970.0,1317.0) at 300 dpi; pixel
+      uncertainty +/-(10.0,10.0) px; independent second read center=(969.7,1317.2)
+      px

@@ -3043,7 +3043,12 @@ def test_j01_store_census_series_numeric_matches_declared_field() -> None:
     # activity_coefficient 128->161, n_numeric 356->389. This census counts printed
     # cells that survive migration regardless of evidence class (as for Ueshima
     # model_derived above) - mismatches stays 0.
-    assert census.get("activity_coefficient") == 161
+    # Re-pinned for the O'Neill & Eggins 2002 extract (Chem. Geol. 186, Table 7): 91 printed
+    # gamma cells for FeO, NiO, CoO, MoO2, MoO3 in CMAS melts at 1400 C. Per-source delta:
+    # oneill-2002-feo-activity-coefficients-cmas 0->91; activity_coefficient 161->252.
+    # The count moved because data became visible, not because a check was relaxed -
+    # mismatches stays 0.
+    assert census.get("activity_coefficient") == 252
     # Re-pinned with data/literature/extracts/pahlevan-2026-protolunar-volatile-outflows.yaml
     # (51 p_partial points, 2026-09-24): p_partial 18->69 and n_numeric 223->274.
     # The counts moved because data became visible, not because a check was relaxed - mismatches stays 0.
@@ -3089,7 +3094,8 @@ def test_j01_store_census_series_numeric_matches_declared_field() -> None:
     # landed 450 (scorer p_partial +61, Holzheid +33): n_numeric 450->500; t-998 adds
     # four Zhang Table 4 alpha cells, and 1164 residue components, so the merged
     # total is 1668; mismatches remains 0.
-    assert n_numeric == 1668, (n_numeric, census, n_unavailable)
+    # O'Neill & Eggins 2002 adds 91 activity_coefficient cells: n_numeric 1668->1759.
+    assert n_numeric == 1759, (n_numeric, census, n_unavailable)
 
 
 def test_residue_point_condition_values_keep_their_printed_types() -> None:
