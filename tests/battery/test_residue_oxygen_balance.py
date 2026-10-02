@@ -1,0 +1,400 @@
+from __future__ import annotations
+
+import math
+from dataclasses import replace
+from functools import lru_cache
+from pathlib import Path
+
+import pytest
+
+from simulator.accounting.formulas import parse_formula
+from simulator.battery.oxygen_balance import (
+    _OXYGEN_GAS_ALPHA,
+    _OXYGEN_GAS_ALPHA_SOURCE,
+    _VacuumOxygenChannel,
+    _solve_vacuum_oxygen_balance,
+)
+from simulator.physical_constants import GAS_CONSTANT
+
+
+ROOT = Path(__file__).resolve().parents[2]
+COMMON_UNITY_SOURCE = (
+    "Hashimoto assumed_unity_ratio_not_measured_alpha; "
+    "declared common-unity sensitivity"
+)
+PA_PER_BAR = 100_000.0
+
+
+def _hashimoto_start() -> tuple[float, float, dict[str, float]]:
+    import yaml
+
+    source = yaml.safe_load(
+        (ROOT / "data/literature/extracts/kems-015-hashimoto-1983.yaml").read_text()
+    )
+    run = next(
+        experiment
+        for experiment in source["experiments"]
+        if experiment["experiment_id"] == "hashimoto-1983-run-18b6-1"
+    )
+    temperature_K = float(run["conditions"]["temperature_K"]["state"]["value"])
+    pressure_pa = float(
+        run["pressure_environment"]["total_pressure_Pa"]["state"]["value"]["point"]
+    )
+    printed_mass_kg = float(
+        run["sample"]["mass_kg"]["state"]["value"]["point"]
+    )
+    oxide_wt_pct = run["sample"]["printed_composition"]["state"]["value"]
+    composition_kg = {
+        oxide: float(wt_pct) * printed_mass_kg / 100.0
+        for oxide, wt_pct in oxide_wt_pct.items()
+    }
+    return temperature_K, pressure_pa / PA_PER_BAR, composition_kg
+
+
+def _runtime_catalog_rows() -> dict[str, dict[str, object]]:
+    import yaml
+
+    from simulator.vapour_rail.catalog import vapor_pressure_legacy_view
+
+    document = yaml.safe_load((ROOT / "data/vapor_pressures.yaml").read_text())
+    legacy = vapor_pressure_legacy_view(document)
+    rows: dict[str, dict[str, object]] = {}
+    for group in legacy.values():
+        if not isinstance(group, dict):
+            continue
+        for species, row in group.items():
+            if isinstance(row, dict) and row.get("formula"):
+                rows[str(species)] = row
+    return rows
+
+
+def _species_metadata(
+    formula_text: str, parent_oxide: str | None, *, alpha: float
+) -> _VacuumOxygenChannel:
+    gas_formula = parse_formula(formula_text)
+    oxygen_atoms = float(gas_formula.elements.get("O", 0.0))
+    metal_atoms = math.fsum(
+        float(count)
+        for element, count in gas_formula.elements.items()
+        if element != "O"
+    )
+    if parent_oxide:
+        parent_formula = parse_formula(parent_oxide)
+        parent_metals = math.fsum(
+            float(count)
+            for element, count in parent_formula.elements.items()
+            if element != "O"
+        )
+        parent_oxygen_demand = (
+            oxygen_atoms
+            if parent_metals == 0.0
+            else metal_atoms
+            * float(parent_formula.elements.get("O", 0.0))
+            / parent_metals
+        )
+    else:
+        parent_oxygen_demand = 0.0
+    pO2_exponent = (oxygen_atoms - parent_oxygen_demand) / 2.0
+    return _VacuumOxygenChannel(
+        species="",
+        molar_mass_kg_per_mol=gas_formula.molar_mass_kg_per_mol(),
+        oxygen_atoms=oxygen_atoms,
+        parent_oxygen_demand=parent_oxygen_demand,
+        pO2_exponent=pO2_exponent,
+        alpha=alpha,
+        alpha_source=COMMON_UNITY_SOURCE,
+    )
+
+
+def _alpha_source_for_catalog_row(
+    species: str, row: dict[str, object]
+) -> str:
+    alpha = row.get("evaporation_alpha")
+    source = alpha.get("source") if isinstance(alpha, dict) else None
+    if source:
+        return f"{COMMON_UNITY_SOURCE}; runtime catalog {species}: {source}"
+    return f"{COMMON_UNITY_SOURCE}; runtime catalog {species}: no alpha row"
+
+
+def _catalog_match(
+    rows: dict[str, dict[str, object]], formula: str, parent_oxide: str
+) -> tuple[str, dict[str, object]] | None:
+    matches = [
+        (species, row)
+        for species, row in rows.items()
+        if row.get("formula") == formula and row.get("parent_oxide") == parent_oxide
+    ]
+    if not matches:
+        return None
+    active = [
+        item for item in matches if item[1].get("flux_dormant") is not True
+    ]
+    return (active or matches)[0]
+
+
+@lru_cache(maxsize=1)
+def _engine_models():
+    """Build each engine's own melt-pressure model at Hashimoto's start."""
+
+    pytest.importorskip("openimcc")
+    from openimcc import evaluate_gas, load_gas_datapack
+    from simulator.diagnostic_helpers.binary_pot_battery import (
+        PO2_COMMANDED,
+        Po2Request,
+        _InternalAnalyticalBatteryBackend,
+        _openimcc_gas_channels_and_omission_notices,
+    )
+    from simulator.melt_backend import openimcc_bridge
+
+    temperature_K, total_pressure_bar, composition_kg = _hashimoto_start()
+    catalog_rows = _runtime_catalog_rows()
+    gas_pack = load_gas_datapack()
+    openimcc_state = openimcc_bridge.evaluate(
+        temperature_K=temperature_K,
+        composition_kg=composition_kg,
+        allow_extrapolation=True,
+        allow_out_of_envelope=True,
+    )
+    openimcc_channels, _ = _openimcc_gas_channels_and_omission_notices(
+        openimcc_state.parent_oxides, gas_pack
+    )
+    openimcc_channel_rows: list[_VacuumOxygenChannel] = []
+    for species, (parent, _gas_molecules, _oxygen_molecules) in openimcc_channels:
+        if species in {"O", "O2"}:
+            is_active = True
+            alpha_source = _OXYGEN_GAS_ALPHA_SOURCE
+        else:
+            if parent and float(
+                openimcc_state.parent_oxide_activities.get(parent, 0.0) or 0.0
+            ) <= 0.0:
+                continue
+            match = _catalog_match(catalog_rows, species, parent)
+            assert match is not None, f"runtime catalog has no {species}/{parent} channel"
+            catalog_name, row = match
+            is_active = row.get("flux_dormant") is not True
+            alpha_source = _alpha_source_for_catalog_row(catalog_name, row)
+        channel = _species_metadata(
+            species, parent or None, alpha=_OXYGEN_GAS_ALPHA
+        )
+        openimcc_channel_rows.append(
+            replace(
+                channel,
+                species=species,
+                alpha_source=alpha_source,
+                active=is_active,
+            )
+        )
+
+    def openimcc_pressure_model(log10_pO2_bar: float) -> dict[str, float]:
+        pressures = evaluate_gas(
+            openimcc_state.parent_oxide_activities,
+            temperature_K,
+            10.0**log10_pO2_bar,
+            gas_pack,
+            parent_oxides=openimcc_state.parent_oxides,
+            allow_extrapolation=True,
+        )
+        return {str(species): float(value) * PA_PER_BAR for species, value in pressures.items()}
+
+    ia_backend = _InternalAnalyticalBatteryBackend()
+    ia_probe = ia_backend.equilibrate(
+        temperature_C=temperature_K - 273.15,
+        composition_kg=composition_kg,
+        fO2_log=-5.0,
+        pressure_bar=total_pressure_bar,
+        po2_request=Po2Request(mode=PO2_COMMANDED, po2_bar=1.0e-5),
+    )
+    assert ia_probe.status == "ok"
+    ia_channel_rows: list[_VacuumOxygenChannel] = []
+    for species in sorted(ia_probe.vapor_pressures_Pa):
+        match = catalog_rows.get(species)
+        assert match is not None, f"runtime catalog has no internal channel {species!r}"
+        formula = str(match["formula"])
+        parent = str(match.get("parent_oxide") or "")
+        channel = _species_metadata(
+            formula, parent or None, alpha=_OXYGEN_GAS_ALPHA
+        )
+        ia_channel_rows.append(
+            replace(
+                channel,
+                species=species,
+                alpha_source=_alpha_source_for_catalog_row(species, match),
+                active=match.get("flux_dormant") is not True,
+            )
+        )
+
+    # The internal-analytical melt kernel has no O/O2 entries in its
+    # vapor-pressure table. O2 is the surface fugacity itself; atomic O follows
+    # the shared gas-phase O2(g) <=> 2 O(g) thermochemical relation. This uses
+    # only the oxygen coproduct law, never OpenIMCC's solved pO2 for IA.
+    oxygen_at_1_bar = evaluate_gas(
+        openimcc_state.parent_oxide_activities,
+        temperature_K,
+        1.0,
+        gas_pack,
+        parent_oxides=openimcc_state.parent_oxides,
+        allow_extrapolation=True,
+    )
+    oxygen_pressure_factor_bar = float(oxygen_at_1_bar["O"])
+    for species, exponent in (("O", 0.5), ("O2", 1.0)):
+        channel = _species_metadata(
+            species, None, alpha=_OXYGEN_GAS_ALPHA
+        )
+        ia_channel_rows.append(
+            replace(
+                channel,
+                species=species,
+                pO2_exponent=exponent,
+                alpha_source=_OXYGEN_GAS_ALPHA_SOURCE,
+            )
+        )
+
+    @lru_cache(maxsize=256)
+    def ia_pressure_model(log10_pO2_bar: float) -> dict[str, float]:
+        pO2_bar = 10.0**log10_pO2_bar
+        result = ia_backend.equilibrate(
+            temperature_C=temperature_K - 273.15,
+            composition_kg=composition_kg,
+            fO2_log=log10_pO2_bar,
+            pressure_bar=total_pressure_bar,
+            po2_request=Po2Request(mode=PO2_COMMANDED, po2_bar=pO2_bar),
+        )
+        if result.status != "ok":
+            raise AssertionError(f"internal-analytical pressure model refused: {result.status}")
+        pressures = {
+            species: float(result.vapor_pressures_Pa.get(species, 0.0))
+            for species in (channel.species for channel in ia_channel_rows)
+            if species not in {"O", "O2"}
+        }
+        pressures["O"] = (
+            PA_PER_BAR * oxygen_pressure_factor_bar * math.sqrt(pO2_bar)
+        )
+        pressures["O2"] = PA_PER_BAR * pO2_bar
+        return pressures
+
+    return {
+        "openimcc": (openimcc_pressure_model, tuple(openimcc_channel_rows)),
+        "internal-analytical": (ia_pressure_model, tuple(ia_channel_rows)),
+    }
+
+
+def _with_parent_alpha(
+    channels: tuple[_VacuumOxygenChannel, ...], alpha: float
+) -> tuple[_VacuumOxygenChannel, ...]:
+    return tuple(
+        replace(
+            channel,
+            alpha=alpha if channel.parent_oxygen_demand > 0.0 else 1.0,
+            alpha_source=(
+                f"{COMMON_UNITY_SOURCE}; parent-bearing channels alpha={alpha}"
+                if channel.parent_oxygen_demand > 0.0
+                else channel.alpha_source
+            ),
+        )
+        for channel in channels
+    )
+
+
+def _relative_residual_at(
+    pressure_model,
+    channels: tuple[_VacuumOxygenChannel, ...],
+    temperature_K: float,
+    pO2_bar: float,
+) -> float:
+    pressures = pressure_model(math.log10(pO2_bar))
+    oxygen_flux = 0.0
+    parent_flux = 0.0
+    for channel in channels:
+        if not channel.active or channel.alpha == 0.0:
+            continue
+        molar_flux = channel.alpha * pressures[channel.species] / math.sqrt(
+            2.0 * math.pi * GAS_CONSTANT * temperature_K
+            * channel.molar_mass_kg_per_mol
+        )
+        oxygen_flux += channel.oxygen_atoms * molar_flux
+        parent_flux += channel.parent_oxygen_demand * molar_flux
+    return abs(oxygen_flux - parent_flux) / max(oxygen_flux, parent_flux, 1.0e-300)
+
+
+def test_hashimoto_vacuum_oxygen_balance_is_engine_specific_and_alpha_weighted() -> None:
+    temperature_K, _total_pressure_bar, _composition_kg = _hashimoto_start()
+    models = _engine_models()
+    solved: dict[str, dict[float, object]] = {}
+
+    for engine, (pressure_model, catalog_channels) in models.items():
+        solved[engine] = {}
+        for parent_alpha in (1.0, 0.25):
+            channels = _with_parent_alpha(catalog_channels, parent_alpha)
+            result = _solve_vacuum_oxygen_balance(
+                pressure_model,
+                channels,
+                temperature_K=temperature_K,
+            )
+            assert result.relative_residual < 1.0e-9
+            assert set(result.alpha_sources) == {
+                channel.species
+                for channel in channels
+                if channel.active and channel.alpha > 0.0
+            }
+            assert result.alpha_sources["O"] == _OXYGEN_GAS_ALPHA_SOURCE
+            assert result.alpha_sources["O2"] == _OXYGEN_GAS_ALPHA_SOURCE
+            dormant_species = (
+                "FeO" if engine == "openimcc" else "FeO_association_gas"
+            )
+            assert dormant_species not in result.alpha_sources
+            solved[engine][parent_alpha] = result
+
+        unity = solved[engine][1.0]
+        quarter = solved[engine][0.25]
+        assert not math.isclose(unity.pO2_bar, quarter.pO2_bar, rel_tol=1.0e-3)
+        assert _relative_residual_at(
+            pressure_model,
+            _with_parent_alpha(catalog_channels, 0.25),
+            temperature_K,
+            unity.pO2_bar,
+        ) > 1.0e-3
+
+        uniformly_halved = tuple(
+            replace(
+                channel,
+                alpha=channel.alpha * 0.5,
+                alpha_source="common factor cancellation check",
+            )
+            for channel in _with_parent_alpha(catalog_channels, 1.0)
+        )
+        common_factor_result = _solve_vacuum_oxygen_balance(
+            pressure_model,
+            uniformly_halved,
+            temperature_K=temperature_K,
+        )
+        assert common_factor_result.pO2_bar == pytest.approx(
+            unity.pO2_bar, rel=1.0e-9
+        )
+
+    # These values pin the independent review's Hashimoto-start probe. The two
+    # engines must use their own melt channel pressures for both alpha arms.
+    assert solved["openimcc"][1.0].pO2_bar * PA_PER_BAR == pytest.approx(
+        0.799303, rel=2.0e-5
+    )
+    assert solved["openimcc"][0.25].pO2_bar * PA_PER_BAR == pytest.approx(
+        0.289332, rel=2.0e-5
+    )
+    assert solved["internal-analytical"][1.0].pO2_bar * PA_PER_BAR == pytest.approx(
+        1.025329, rel=2.0e-5
+    )
+    assert solved["internal-analytical"][0.25].pO2_bar * PA_PER_BAR == pytest.approx(
+        0.374487, rel=2.0e-5
+    )
+
+    # Replacing either engine's root by the other's does not close that engine's
+    # channel balance, which catches the old IA adapter's borrowed-root pattern.
+    ia_unity = solved["internal-analytical"][1.0]
+    imcc_unity = solved["openimcc"][1.0]
+    ia_model, ia_channels = models["internal-analytical"]
+    imcc_model, imcc_channels = models["openimcc"]
+    assert _relative_residual_at(
+        ia_model, _with_parent_alpha(ia_channels, 1.0), temperature_K, imcc_unity.pO2_bar
+    ) > 1.0e-3
+    assert _relative_residual_at(
+        imcc_model, _with_parent_alpha(imcc_channels, 1.0), temperature_K, ia_unity.pO2_bar
+    ) > 1.0e-3
