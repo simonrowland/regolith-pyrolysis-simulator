@@ -9,7 +9,7 @@
 - **VERDICT: LAND 9e434da92623a4c4c6c887bd1659e3a876906d91**
 - **Deliverable:** `REVIEW-residue-batch-9e434da9-2026-10-02.md`
 - **Date:** 2026-10-02 ~16:50 ET
-- **Mailbox tip:** _(filled after push)_
+- **Mailbox tip:** `PENDING` on `empirical/reviews-batch-zv-2026-09-22` (artifacts `a5dbdfd55d57c170d4dfeb43207f5849f4ef6b0b`).
 
 Attacks (1)–(2) PASS (fix: no schema change in fix; refusal intact; trace start via run join; merge-tree clean). (3) whole-store regen+load **not** completed on ~16GB VPS — Sossi-targeted migrate+mutation PASS; **Mac Studio ASK** for regen + `test_validate_corpus_zero_hard_issues_on_migrated_store`. (4) score admitted-model PASS; validity[6] PASS; validate_corpus TIMEOUT on VPS load (not hard-issue fail). Targeted: residue identity migrate 1 PASS; seat Sossi script PASS. No P1 REVISE. Mailbox note: REVIEW+STATUS under ferry/reviews; no extract edits; Mac listen pools not armed.
 
