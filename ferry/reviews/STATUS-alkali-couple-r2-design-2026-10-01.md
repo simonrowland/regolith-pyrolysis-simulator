@@ -5,7 +5,7 @@ Ack already on Dropbox: `STATUS-req-alkali-couple-r2-acked-2026-10-01.md` (not r
 
 **Seat:** `slot-z14` @ green `696299350e98b67f786c334b4b4ccc8856149379` (design-only; no stack2 product commits).
 **Sources folded:** r1 DESIGN; sol-review (UNSOUND→corrected); AMEND titration; AMEND2 sites; RULING Q-A..Q-D; redox-design-r3; attached `metallothermic_step-e7bd0cd52.py`.
-**Mailbox tip:**  on  (artifacts ).
+**Mailbox tip:** PENDING_FREEZE on `empirical/reviews-batch-zv-2026-09-22` (artifacts `20512ad1e6d70844220c80192d42c99fcbc29a94`).
 
 ## Conclusions (short)
 - **Corrections (seat-run):** Kelvin Ellingham → K_Na(1423.15 K)=1.515e-7; dissoc +185.8 kJ/mol; M6 fO2=2.295e-22 bar at a=1e-8, p=0.01; formal SiO amp 2.09e9; Na/Fe margin +11.1 kJ/mol O2. K_x=K_FeO/K_Na=4.810. Ti 4a xi_max=min(n_Na/2, n_TiO2/2). p_Na→0 ⇒ fO2→∞ at fixed Ka.
