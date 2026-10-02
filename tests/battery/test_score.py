@@ -266,6 +266,24 @@ def _partial_prediction(engine, observation, **_kwargs):
     )
 
 
+def _uncalibrated_kems_partial_row(
+    experiment, observation_id: str, pressure_Pa: Decimal
+):
+    identity = replace(
+        _partial_identity(),
+        total_pressure_Pa=State.of(Decimal("1e-6")),
+    )
+    observation = F.observation(
+        observation_id,
+        experiment.experiment_id,
+        identity,
+        pressure_Pa,
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="halwax_sergeev_mueller_schenk_2024",
+    )
+    return observation
+
+
 def test_compile_residual_refuses_prediction_unit_mismatch() -> None:
     experiment = F.kems_experiment()
     reference = F.observation(
@@ -509,6 +527,122 @@ def test_kems_band_prefers_printed_envelope_over_replicate_scatter() -> None:
     assert band.value == Decimal("1.4").ln() / Decimal("10").ln()
     assert "source-printed" in band.rule
     assert "pooled replicate" not in band.rule
+
+
+@pytest.mark.parametrize(
+    ("typed_not_printed", "expected_notice"),
+    (
+        (False, "No calibration entry has been recorded yet."),
+        (True, "The source record says the calibration was not printed."),
+    ),
+)
+def test_uncalibrated_kems_partial_pressure_scores_with_calibration_notice(
+    typed_not_printed: bool,
+    expected_notice: str,
+) -> None:
+    from simulator.battery.validity import run_validity_gates
+    from simulator.battery.score import (
+        FLAGGED_STRATUM_CALIBRATION_NOT_GROUNDED,
+        flagged_strata,
+        flagged_stratum_rows,
+        render_score_report_from_payloads,
+    )
+
+    experiment = F.kems_experiment(kn=None, calibrated=False)
+    if typed_not_printed:
+        assert experiment.apparatus is not None
+        experiment = replace(
+            experiment,
+            apparatus=replace(
+                experiment.apparatus,
+                calibration={
+                    "standard": Located(
+                        State.unknown("not printed"), locator=F.loc(page=271)
+                    )
+                },
+            ),
+        )
+    reference = _uncalibrated_kems_partial_row(
+        experiment, "uncalibrated-kems-pressure", Decimal("10")
+    )
+    gates = run_validity_gates(
+        experiment, reference, point_observations=(reference,)
+    )
+    pressure_check = next(
+        check for check in gates.checks if check.name == "in_cell_partial_pressure_sum"
+    )
+    assert gates.passed
+    assert pressure_check.passed
+    assert pressure_check.detail["flag"] == "calibration_not_grounded"
+    assert pressure_check.detail["reason"] == (
+        "calibration is not grounded for the in-cell fallback"
+    )
+    assert pressure_check.detail["calibration_record_status"] == (
+        "not_printed" if typed_not_printed else "not_recorded"
+    )
+    residual, _ = compile_residual(
+        reference,
+        Engine.INTERNAL_ANALYTICAL,
+        context=_context(F.work(), experiment, reference, review="reviewed"),
+        prediction=_partial_prediction(Engine.INTERNAL_ANALYTICAL, reference),
+    )
+
+    assert residual.status is ResidualStatus.NO_BAND
+    assert residual.numeric is not None
+    assert residual.score_eligible is False
+    notice = next(
+        item for item in residual.notices
+        if item.kind is NoticeKind.UNVERIFIED_APPARATUS
+    )
+    assert notice.reason.startswith("calibration_not_grounded:")
+    assert expected_notice in notice.reason
+    assert flagged_strata(residual.notices) == (
+        FLAGGED_STRATUM_CALIBRATION_NOT_GROUNDED,
+    )
+
+    diagnostic = flagged_stratum_rows(
+        (residual,), engines=(Engine.INTERNAL_ANALYTICAL,)
+    )
+    assert diagnostic[0]["stratum"] == FLAGGED_STRATUM_CALIBRATION_NOT_GROUNDED
+    assert diagnostic[0]["n"] == 1
+    assert diagnostic[0]["median_dex"] is not None
+    assert diagnostic[0]["rms_dex"] is not None
+
+    payload = residual_to_plain(residual)
+    summary_rows = flagged_stratum_payloads(
+        (payload,), (Engine.INTERNAL_ANALYTICAL,)
+    )
+    assert summary_rows[0]["stratum"] == FLAGGED_STRATUM_CALIBRATION_NOT_GROUNDED
+    assert summary_rows[0]["n"] == 1
+    assert summary_rows[0]["median_dex"] is not None
+    assert summary_rows[0]["rms_dex"] is not None
+    report = render_score_report_from_payloads(
+        (payload,), engines=(Engine.INTERNAL_ANALYTICAL,), hostname="test"
+    )
+    assert "calibration-not-grounded | vapour | internal-analytical | 1" in report
+
+
+def test_uncalibrated_kems_partial_pressure_is_excluded_from_band_population() -> None:
+    experiment = F.kems_experiment(kn=None, calibrated=False)
+    first = _uncalibrated_kems_partial_row(
+        experiment, "uncalibrated-kems-replicate-1", Decimal("10")
+    )
+    second = _uncalibrated_kems_partial_row(
+        experiment, "uncalibrated-kems-replicate-2", Decimal("100")
+    )
+    printed_pressure_error = Uncertainty(
+        kind=UncertaintyKind.PRINTED,
+        verbatim="10% pressure error",
+    )
+    first = replace(first, uncertainty=printed_pressure_error)
+    second = replace(second, uncertainty=printed_pressure_error)
+
+    band = derive_kems_partial_pressure_band(
+        {first.observation_id: first, second.observation_id: second},
+        {experiment.experiment_id: experiment},
+    )
+
+    assert band is None
 
 
 def test_zhang_alpha_gamma_bound_uses_implied_alpha_verdict() -> None:
@@ -1445,12 +1579,17 @@ def test_calibrated_kems_pressure_needs_no_effusion_geometry(quantity: Quantity)
         orifice_area=None, clausing=None, kn=None, calibrated=False
     )
     gate = underdetermined_apparatus(incomplete, quantity)
-    assert gate.passed is False
-    assert gate.reason is RefusalReason.UNDERDETERMINED_APPARATUS
-    assert gate.primary_check == "kems_calibration"
     check = next(c for c in gate.checks if c.name == "kems_calibration")
     assert check.detail["missing"] == ["calibration"]
     assert "calibration" in check.detail["reason"]
+    if quantity is Quantity.P_PARTIAL:
+        assert gate.passed
+        assert check.detail["flag"] == "calibration_not_grounded"
+        assert check.detail["calibration_record_status"] == "not_recorded"
+    else:
+        assert gate.passed is False
+        assert gate.reason is RefusalReason.UNDERDETERMINED_APPARATUS
+        assert gate.primary_check == "kems_calibration"
 
     complete = F.kems_experiment()
     assert underdetermined_apparatus(complete, Quantity.P_PARTIAL).passed
@@ -1522,8 +1661,11 @@ def test_comparison_activity_cancels_cell_geometry_only_for_activity() -> None:
     partial_gate = underdetermined_apparatus(
         uncalibrated, Quantity.P_PARTIAL, observation=partial
     )
-    assert partial_gate.reason is RefusalReason.UNDERDETERMINED_APPARATUS
-    assert partial_gate.primary_check == "kems_calibration"
+    assert partial_gate.passed
+    partial_check = next(
+        check for check in partial_gate.checks if check.name == "kems_calibration"
+    )
+    assert partial_check.detail["flag"] == "calibration_not_grounded"
 
 
 def test_unverified_kems_value_refuses_without_printed_in_cell_pressures() -> None:

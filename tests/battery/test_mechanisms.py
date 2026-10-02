@@ -3268,6 +3268,43 @@ def test_mf_f04_in_cell_pressure_sum_above_limit_refuses() -> None:
     assert pressure_check.detail["pressure_limit_Pa"] == "10"
 
 
+def test_mf_f04_uncalibrated_in_cell_pressure_sum_above_limit_still_refuses() -> None:
+    composition = Composition(
+        basis="printed_mole_fraction",
+        components=(("CaO", Decimal("0.25")), ("SiO2", Decimal("0.75"))),
+        amount_basis=AmountBasis.MOLE_FRACTION,
+    )
+    experiment = _kems_without_background(
+        F.kems_experiment(kn=None, calibrated=False)
+    )
+    pressures = (
+        _printed_kems_partial_pressure(
+            "uncalibrated-high-o2", experiment.experiment_id, "O2", "6", composition
+        ),
+        _printed_kems_partial_pressure(
+            "uncalibrated-high-ca", experiment.experiment_id, "Ca", "1", composition
+        ),
+        _printed_kems_partial_pressure(
+            "uncalibrated-high-sio", experiment.experiment_id, "SiO", "5", composition
+        ),
+    )
+
+    result = run_validity_gates(
+        experiment,
+        pressures[0],
+        point_observations=pressures,
+    )
+
+    assert result.reason is RefusalReason.EFFUSION_REGIME_UNVERIFIED
+    assert result.primary_check == "in_cell_partial_pressure_sum"
+    pressure_check = next(
+        check for check in result.checks if check.name == "in_cell_partial_pressure_sum"
+    )
+    assert pressure_check.passed is False
+    assert pressure_check.detail["printed_partial_pressure_sum_Pa"] == "12"
+    assert pressure_check.detail["pressure_limit_Pa"] == "10"
+
+
 def test_mf_f04_in_cell_pressure_sum_refuses_missing_dominant_species() -> None:
     composition = Composition(
         basis="printed_mole_fraction",
