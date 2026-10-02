@@ -2853,6 +2853,20 @@ def predict_with_engine(
             refusal_detail={"reason": "quantity_unknown"},
         )
     if quantity is Quantity.RESIDUE_COMPONENT_COMPOSITION:
+        if engine in OXYGEN_BALANCE_EFFUSION_ENGINES:
+            return EnginePrediction(
+                engine=engine,
+                channel=channel,
+                execution=Execution(state=ExecutionState.NOT_PROBED),
+                coefficient_sources=sources,
+                lineage_complete=False,
+                refusal_reason=RefusalReason.IDENTITY_INCOMPLETE,
+                refusal_detail={
+                    "reason": "melt_surface_area_evolution_missing",
+                    "quantity": quantity.value,
+                },
+                identity=identity,
+            )
         return EnginePrediction(
             engine=engine,
             channel=channel,

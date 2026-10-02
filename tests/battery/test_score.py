@@ -2658,6 +2658,7 @@ def test_vapour_rail_is_only_vapour_pressures() -> None:
 def test_residue_composition_has_its_own_rail_and_typed_engine_refusal() -> None:
     from simulator.battery.score import (
         ENGINE_CHANNELS,
+        OXYGEN_BALANCE_EFFUSION_ENGINES,
         metric_operation,
         predict_with_engine,
         rail_for_quantity,
@@ -2680,9 +2681,16 @@ def test_residue_composition_has_its_own_rail_and_typed_engine_refusal() -> None
     assert metric_operation(Quantity.RESIDUE_COMPONENT_COMPOSITION) is MetricOperation.ABSOLUTE
     for engine in ENGINE_CHANNELS:
         prediction = predict_with_engine(engine, observation)
-        assert prediction.execution.state is ExecutionState.UNSUPPORTED
-        assert prediction.refusal_reason is RefusalReason.UNSUPPORTED
-        assert prediction.refusal_detail["reason"] == "quantity_not_predicted"
+        if engine in OXYGEN_BALANCE_EFFUSION_ENGINES:
+            assert prediction.execution.state is ExecutionState.NOT_PROBED
+            assert prediction.refusal_reason is RefusalReason.IDENTITY_INCOMPLETE
+            assert prediction.refusal_detail["reason"] == (
+                "melt_surface_area_evolution_missing"
+            )
+        else:
+            assert prediction.execution.state is ExecutionState.UNSUPPORTED
+            assert prediction.refusal_reason is RefusalReason.UNSUPPORTED
+            assert prediction.refusal_detail["reason"] == "quantity_not_predicted"
         assert prediction.refusal_detail["quantity"] == "residue_component_composition"
 
 

@@ -398,3 +398,210 @@ def test_hashimoto_vacuum_oxygen_balance_is_engine_specific_and_alpha_weighted()
     assert _relative_residual_at(
         imcc_model, _with_parent_alpha(imcc_channels, 1.0), temperature_K, ia_unity.pO2_bar
     ) > 1.0e-3
+
+
+def _residue_catalog_alpha(species: str) -> tuple[float, str]:
+    row = _runtime_catalog_rows()[species]
+    alpha_row = row["evaporation_alpha"]
+    assert isinstance(alpha_row, dict)
+    return float(alpha_row["value"]), str(alpha_row["source"])
+
+
+def _residue_channels(*, fe_alpha: float | None = None):
+    from simulator.battery.oxygen_balance import _OXYGEN_GAS_ALPHA_SOURCE
+    from simulator.battery.residue import ResidueChannel
+
+    catalog_fe_alpha, fe_source = _residue_catalog_alpha("Fe")
+    catalog_mg_alpha, mg_source = _residue_catalog_alpha("Mg")
+    return (
+        ResidueChannel(
+            "Fe", "Fe", "FeO",
+            catalog_fe_alpha if fe_alpha is None else fe_alpha,
+            fe_source,
+        ),
+        ResidueChannel("Mg", "Mg", "MgO", catalog_mg_alpha, mg_source),
+        ResidueChannel("O2", "O2", None, 1.0, _OXYGEN_GAS_ALPHA_SOURCE),
+    )
+
+
+def _residue_pressure_model(inventory: dict[str, float], log10_pO2_bar: float):
+    pO2_bar = 10.0**log10_pO2_bar
+    pO2_root = math.sqrt(pO2_bar)
+    return {
+        "Fe": 1.0e-3 * inventory.get("FeO", 0.0) / pO2_root,
+        "Mg": 1.0e-3 * inventory.get("MgO", 0.0) / pO2_root,
+        "O2": 1.0e5 * pO2_bar,
+    }
+
+
+def _assert_residue_atoms_close(
+    starting: dict[str, float], residue: dict[str, float], evaporated: dict[str, float]
+) -> None:
+    def atom_totals(inventory: dict[str, float]) -> dict[str, float]:
+        totals: dict[str, float] = {}
+        for species, amount in inventory.items():
+            formula = parse_formula(species)
+            for element, count in formula.elements.items():
+                totals[element] = totals.get(element, 0.0) + amount * float(count)
+        return totals
+
+    start_atoms = atom_totals(starting)
+    end_atoms = atom_totals({**residue, **evaporated})
+    for element in set(start_atoms) | set(end_atoms):
+        assert start_atoms.get(element, 0.0) == pytest.approx(
+            end_atoms.get(element, 0.0), rel=5.0e-12, abs=1.0e-15
+        )
+
+
+def test_residue_two_channel_hkl_and_parent_stoichiometric_anchors() -> None:
+    from simulator.battery.residue import integrate_residue_inventory
+
+    temperature_K = 2073.0
+    duration_s = 100.0
+    area_m2 = 1.0e-4
+    starting = {"FeO": 1.0e-3}
+    channels = (_residue_channels()[0], _residue_channels()[2])
+
+    def pressure_model(_inventory: dict[str, float], log10_pO2_bar: float):
+        pO2_bar = 10.0**log10_pO2_bar
+        return {"Fe": 1.0e-3 / math.sqrt(pO2_bar), "O2": 1.0e5 * pO2_bar}
+
+    result = integrate_residue_inventory(
+        starting,
+        channels,
+        pressure_model,
+        temperature_K=temperature_K,
+        duration_s=duration_s,
+        area_evolution_m2=(area_m2,),
+    )
+    alpha, _source = _residue_catalog_alpha("Fe")
+    fe_molar_mass = parse_formula("Fe").molar_mass_kg_per_mol()
+    root_bar = result.pO2_bar_by_step[0]
+    assert root_bar is not None
+    p_fe_pa = 1.0e-3 / math.sqrt(root_bar)
+    # External Safarian–Engh Hertz–Knudsen–Langmuir form, converted to mol/s.
+    requested_fe_mol_s = alpha * p_fe_pa / math.sqrt(
+        2.0 * math.pi * fe_molar_mass * GAS_CONSTANT * temperature_K
+    ) * area_m2
+    expected_fe_mol = starting["FeO"] * -math.expm1(
+        -requested_fe_mol_s * duration_s / starting["FeO"]
+    )
+    assert result.evaporated_mol["Fe"] == pytest.approx(expected_fe_mol, rel=1.0e-10)
+    # FeO -> Fe + 1/2 O2: one parent oxide molecule is debited per Fe atom.
+    assert result.residue_mol["FeO"] == pytest.approx(
+        starting["FeO"] - expected_fe_mol, rel=1.0e-12
+    )
+    assert result.evaporated_mol["O2"] == pytest.approx(expected_fe_mol / 2.0, rel=1.0e-12)
+    _assert_residue_atoms_close(
+        starting, dict(result.residue_mol), dict(result.evaporated_mol)
+    )
+
+
+@pytest.mark.parametrize(
+    ("alpha", "zero_parent_pressure"),
+    ((0.0, False), (0.2, True)),
+)
+def test_residue_zero_alpha_or_zero_pressure_is_no_change(
+    alpha: float, zero_parent_pressure: bool
+) -> None:
+    from simulator.battery.residue import integrate_residue_inventory
+
+    channels = list(_residue_channels())
+    channels[0] = replace(channels[0], alpha=alpha)
+    if alpha == 0.0:
+        channels[1] = replace(channels[1], alpha=0.0)
+        channels[2] = replace(channels[2], alpha=0.0)
+    starting = {"FeO": 0.01, "MgO": 0.01}
+
+    def pressure_model(inventory: dict[str, float], log10_pO2_bar: float):
+        pressures = _residue_pressure_model(inventory, log10_pO2_bar)
+        if zero_parent_pressure:
+            pressures["Fe"] = 0.0
+            pressures["Mg"] = 0.0
+        return pressures
+
+    result = integrate_residue_inventory(
+        starting,
+        tuple(channels),
+        pressure_model,
+        temperature_K=2073.0,
+        duration_s=60.0,
+        area_evolution_m2=(0.01, 0.01),
+    )
+    assert result.residue_mol == starting
+    assert result.evaporated_mol == {}
+    _assert_residue_atoms_close(starting, dict(result.residue_mol), {})
+
+
+def test_residue_finite_step_oxygen_tracks_actual_parent_depletion_and_re_solves() -> None:
+    from simulator.battery.residue import integrate_residue_inventory
+
+    starting = {"FeO": 1.0, "MgO": 1.0}
+    channels = _residue_channels()
+    sampled_compositions: list[dict[str, float]] = []
+
+    def pressure_model(inventory: dict[str, float], log10_pO2_bar: float):
+        if not sampled_compositions or sampled_compositions[-1] != inventory:
+            sampled_compositions.append(dict(inventory))
+        return _residue_pressure_model(inventory, log10_pO2_bar)
+
+    result = integrate_residue_inventory(
+        starting,
+        channels,
+        pressure_model,
+        temperature_K=2073.0,
+        duration_s=200.0,
+        area_evolution_m2=(1.0, 1.0),
+    )
+    assert len(result.pO2_bar_by_step) == 2
+    assert result.pO2_bar_by_step[0] != pytest.approx(result.pO2_bar_by_step[1], rel=1.0e-6)
+    assert len(sampled_compositions) == 2
+    for pO2_bar, composition in zip(result.pO2_bar_by_step, sampled_compositions, strict=True):
+        assert pO2_bar is not None
+        pressures = _residue_pressure_model(composition, math.log10(pO2_bar))
+        channels_for_root = (
+            replace(
+                _species_metadata("Fe", "FeO", alpha=channels[0].alpha),
+                species="Fe",
+            ),
+            replace(
+                _species_metadata("Mg", "MgO", alpha=channels[1].alpha),
+                species="Mg",
+            ),
+            replace(_species_metadata("O2", None, alpha=1.0), species="O2"),
+        )
+        root_residual = _relative_residual_at(
+            lambda _logp, pressures=pressures: pressures,
+            channels_for_root,
+            2073.0,
+            pO2_bar,
+        )
+        assert root_residual < 1.0e-9
+
+    oxygen_from_parent_debits = (
+        starting["FeO"] - result.residue_mol["FeO"]
+        + starting["MgO"] - result.residue_mol["MgO"]
+    )
+    assert result.evaporated_mol["O2"] == pytest.approx(
+        oxygen_from_parent_debits / 2.0, rel=1.0e-12
+    )
+    _assert_residue_atoms_close(
+        starting, dict(result.residue_mol), dict(result.evaporated_mol)
+    )
+
+
+def test_residue_missing_area_evolution_is_typed_absence() -> None:
+    from simulator.battery.residue import (
+        ResidueInventoryRefusal,
+        integrate_residue_inventory,
+    )
+
+    with pytest.raises(ResidueInventoryRefusal) as refusal:
+        integrate_residue_inventory(
+            {"FeO": 1.0},
+            (_residue_channels()[0], _residue_channels()[2]),
+            lambda _inventory, _logp: {},
+            temperature_K=2073.0,
+            duration_s=1.0,
+        )
+    assert refusal.value.reason == "melt_surface_area_evolution_missing"
