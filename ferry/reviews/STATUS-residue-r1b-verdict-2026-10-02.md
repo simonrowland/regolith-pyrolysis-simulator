@@ -8,7 +8,7 @@
 - **VERDICT: LAND 69f5828c4ec70877a6d390d712e50ff5909ece49**
 - **Deliverable:** `REVIEW-residue-r1b-69f5828c4-2026-10-02.md`
 - **Date:** 2026-10-02 ~15:07 ET
-- **Mailbox tip:** `7e5fb40f56a91b0eb146f14f2f29c84f08c9f788` on `empirical/reviews-batch-zv-2026-09-22` (artifacts `fe24eee46bc8883562e84f857c1ffe77fcac9969`).
+- **Mailbox tip:** `9f9da06bc3a1c38ee8aeb07bf401f48e26ca90ea` on `empirical/reviews-batch-zv-2026-09-22` (artifacts `fe24eee46bc8883562e84f857c1ffe77fcac9969`).
 
 Attacks (1)–(6) PASS. Finite-step O from actual parent debits (O2≡Σdebit/2, rel ≤1e-12); scale-aware atom tol; mutations 3/3 detected (gas-kg-as-oxide; frozen pO2; forced α=1 @ finite p); external HKL Fe mol rel 9.2e-12 vs Safarian–Engh; single BuiltinEvaporationFluxProvider path (no inline HKL); score.py +14 typed absence only. Targeted: residue oxygen 6 PASS; residue_composition score 1 PASS. No P1 REVISE. Mailbox note: REVIEW+STATUS under ferry/reviews; no extract edits; Mac listen pools not armed.
 
