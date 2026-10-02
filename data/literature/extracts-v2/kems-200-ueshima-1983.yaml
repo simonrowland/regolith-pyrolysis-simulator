@@ -8592,9 +8592,14 @@ observations:
       value: measured_direct
     original_method_class: measured
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - transition_temperature
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: kems-200-ueshima-1983::ueshima_1983_pure_Fe_melting_check
   source_id: kems-200-ueshima-1983
   locator:
     published_page: 561

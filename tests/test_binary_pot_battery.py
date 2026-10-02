@@ -29,6 +29,7 @@ from simulator.diagnostic_helpers.binary_pot_battery import (
     REFUSAL_UNAVAILABLE,
     REFUSAL_VALUE_IS_FLOOR,
     _FLOOR_INVERSION_REASON,
+    _internal_analytical_vapor_pressure_adapter,
     BinaryPot,
     EngineHandle,
     EquilibrateCell,
@@ -36,10 +37,12 @@ from simulator.diagnostic_helpers.binary_pot_battery import (
     assess_qualification_gate,
     classify_equilibrate_outcome,
     classify_reported_value,
+    cell_score_authority,
     collect_floor_refusals,
     equilibrate_cell,
     extract_reported_quantities,
     extract_vapor_authority,
+    engine_flags_from_result,
     finding_class_for_pair,
     load_binary_pots,
     melts_certified_band,
@@ -66,6 +69,56 @@ FIXTURE_REPORT = (
     / "binary_pot_battery"
     / "engine_arm_report.json"
 )
+
+
+def test_missing_internal_vapor_authority_status_stays_unknown_for_scoring() -> None:
+    class Core:
+        def __init__(self) -> None:
+            self.melt = SimpleNamespace(
+                oxygen_reservoir=SimpleNamespace(),
+                update_total_mass=lambda: None,
+            )
+
+        def _new_atom_ledger(self):
+            return object()
+
+        def _load_ledger_account(self, *args, **kwargs):
+            pass
+
+        def _build_chemistry_kernel(self):
+            return None
+
+        def _refresh_vapor_pressures_from_kernel(self, equilibrium):
+            equilibrium.vapor_pressures_Pa = {"SiO": 1.0}
+            equilibrium.vapor_pressures_source = {
+                "SiO": "builtin_authoritative:test"
+            }
+            self._last_vapor_pressure_diagnostic = {
+                "vapor_pressure_authority": {},
+            }
+
+    result = _internal_analytical_vapor_pressure_adapter(
+        core=Core(),
+        temperature_C=1500.0,
+        pressure_bar=1.0,
+        composition_kg={"SiO2": 1.0},
+        composition_mol=None,
+        fO2_log=None,
+        po2_request=Po2Request(mode="commanded", po2_bar=1e-8),
+    )
+
+    assert (
+        result.diagnostics["internal_analytical_provenance"]["authority"]
+        == "unknown"
+    )
+    assert result.diagnostics["vapor_pressure_backend_status"] == "unknown"
+    assert result.diagnostics["authoritative_for_requested_vapor_pressure"] is False
+    _, authority, _ = engine_flags_from_result(result)
+    assert authority == "unknown"
+    assert (
+        cell_score_authority(SimpleNamespace(authority=authority), refused=False)
+        != "certified"
+    )
 
 
 def test_pots_load_and_sum_to_100_wt_pct() -> None:

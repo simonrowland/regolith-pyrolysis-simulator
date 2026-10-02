@@ -211,6 +211,15 @@ class BinaryPotBatteryError(RuntimeError):
     """Raised when the pot catalog or residual inputs violate a hard contract."""
 
 
+class _InternalAnalyticalInputRefusal(ValueError):
+    """Typed missing/invalid input at the core VAPOR_PRESSURE adapter boundary."""
+
+    def __init__(self, category: int, reason_code: str, detail: str) -> None:
+        super().__init__(detail)
+        self.category = category
+        self.code = reason_code
+
+
 @dataclass(frozen=True)
 class BinaryPot:
     pot_id: str
@@ -2118,6 +2127,366 @@ class _OpenImccBatteryBackend:
         )
 
 
+_INTERNAL_ANALYTICAL_VAPOR_PRESSURE_PATH = (
+    "PyrolysisSimulator._refresh_vapor_pressures_from_kernel"
+    " -> PyrolysisSimulator._dispatch_only(ChemistryIntent.VAPOR_PRESSURE)"
+    " -> BuiltinVaporPressureProvider"
+)
+
+
+def _new_internal_analytical_core() -> Any:
+    """Build the simulator core with its product VAPOR_PRESSURE provider."""
+
+    from simulator.core import PyrolysisSimulator
+    from simulator.melt_backend.base import InternalAnalyticalBackend
+
+    def load_data(name: str) -> Any:
+        return load_cached_safe_yaml(
+            (REPO_ROOT / "data" / name).read_text(encoding="utf-8")
+        ) or {}
+
+    return PyrolysisSimulator(
+        InternalAnalyticalBackend(),
+        load_data("setpoints.yaml"),
+        {},
+        load_data("vapor_pressures.yaml"),
+    )
+
+
+def _internal_analytical_vapor_pressure_adapter(
+    *,
+    core: Any,
+    temperature_C: float,
+    pressure_bar: float,
+    composition_kg: Mapping[str, float] | None,
+    composition_mol: Mapping[str, float] | None,
+    fO2_log: float | None,
+    po2_request: Po2Request | None,
+    oxygen_balance_backend: Any | None = None,
+) -> Any:
+    """Evaluate a battery observation through the simulator VAPOR_PRESSURE intent.
+
+    The producer supplies only its observation-derived oxide inventory,
+    temperature, pressure and existing battery oxygen-condition request.
+    """
+
+    from types import SimpleNamespace
+    from simulator.state import Atmosphere
+
+    if not composition_kg and not composition_mol:
+        raise _InternalAnalyticalInputRefusal(
+            1,
+            "internal_analytical_missing_composition",
+            "observation carries no usable oxide composition",
+        )
+
+    temperature = _finite_float(temperature_C)
+    if (
+        isinstance(temperature_C, bool)
+        or temperature is None
+        or temperature + CELSIUS_TO_KELVIN_OFFSET <= 0.0
+    ):
+        raise _InternalAnalyticalInputRefusal(
+            2,
+            "internal_analytical_invalid_temperature",
+            f"temperature_C must be finite and above absolute zero; got {temperature_C!r}",
+        )
+    pressure = _finite_float(pressure_bar)
+    if isinstance(pressure_bar, bool) or pressure is None or pressure < 0.0:
+        raise _InternalAnalyticalInputRefusal(
+            2,
+            "internal_analytical_invalid_total_pressure",
+            f"pressure_bar must be finite and non-negative; got {pressure_bar!r}",
+        )
+
+    melt_composition_kg: dict[str, float] = {}
+    if composition_kg:
+        for species, raw in composition_kg.items():
+            value = _finite_float(raw)
+            if isinstance(raw, bool) or value is None or value < 0.0:
+                raise _InternalAnalyticalInputRefusal(
+                    2,
+                    "internal_analytical_invalid_composition",
+                    f"oxide mass for {species!r} must be finite and non-negative; got {raw!r}",
+                )
+            if value > 0.0:
+                melt_composition_kg[str(species)] = value
+    else:
+        from simulator.accounting.formulas import resolve_species_formula
+
+        for species, raw in (composition_mol or {}).items():
+            amount = _finite_float(raw)
+            if isinstance(raw, bool) or amount is None or amount < 0.0:
+                raise _InternalAnalyticalInputRefusal(
+                    2,
+                    "internal_analytical_invalid_composition",
+                    f"oxide amount for {species!r} must be finite and non-negative; got {raw!r}",
+                )
+            if amount > 0.0:
+                try:
+                    formula = resolve_species_formula(
+                        str(species), core.species_formula_registry
+                    )
+                    mass_kg = amount * formula.molar_mass_kg_per_mol()
+                except Exception as exc:  # noqa: BLE001 - invalid oxide input
+                    raise _InternalAnalyticalInputRefusal(
+                        2,
+                        "internal_analytical_invalid_composition",
+                        f"oxide formula for {species!r} is invalid: {exc}",
+                    ) from exc
+                if not math.isfinite(mass_kg) or mass_kg <= 0.0:
+                    raise _InternalAnalyticalInputRefusal(
+                        2,
+                        "internal_analytical_invalid_composition",
+                        f"oxide amount for {species!r} does not yield a positive finite mass",
+                    )
+                melt_composition_kg[str(species)] = mass_kg
+    if not melt_composition_kg:
+        raise _InternalAnalyticalInputRefusal(
+            2,
+            "internal_analytical_invalid_composition",
+            "oxide composition has no finite positive amount",
+        )
+
+    if po2_request is None:
+        raise _InternalAnalyticalInputRefusal(
+            1,
+            "internal_analytical_missing_oxygen_condition",
+            "observation carries no oxygen condition",
+        )
+    oxygen_notices: list[dict[str, Any]] = []
+    if po2_request.mode == PO2_COMMANDED:
+        po2_bar = _finite_float(po2_request.po2_bar)
+        if (
+            isinstance(po2_request.po2_bar, bool)
+            or po2_bar is None
+            or po2_bar <= 0.0
+        ):
+            raise _InternalAnalyticalInputRefusal(
+                2,
+                "internal_analytical_invalid_oxygen_condition",
+                f"commanded pO2 must be finite and positive; got {po2_request.po2_bar!r}",
+            )
+        oxygen_source = "battery_observation_commanded_pO2"
+    elif po2_request.mode == PO2_OXYGEN_BALANCE_EFFUSION:
+        if oxygen_balance_backend is None:
+            oxygen_balance_backend = _OpenImccBatteryBackend("openimcc")
+        try:
+            oxygen_result = oxygen_balance_backend.equilibrate(
+                temperature_C=temperature,
+                composition_kg=composition_kg,
+                composition_mol=composition_mol,
+                fO2_log=None,
+                pressure_bar=pressure,
+                po2_request=po2_request,
+            )
+        except Exception as exc:  # noqa: BLE001 - keep the input refusal typed
+            reason_code = str(
+                getattr(exc, "reason_code", "") or getattr(exc, "code", "")
+            )
+            if reason_code:
+                raise _InternalAnalyticalInputRefusal(
+                    1,
+                    "internal_analytical_oxygen_balance_unavailable",
+                    f"cell oxygen condition could not be derived: {reason_code}: {exc}",
+                ) from exc
+            raise
+        solved = next(
+            (
+                dict(row)
+                for row in (oxygen_result.diagnostics or {}).get("imcc_notices", ())
+                if isinstance(row, Mapping)
+                and row.get("kind") == "fo2_oxygen_balance_effusion_solved"
+            ),
+            None,
+        )
+        po2_bar = None if solved is None else _finite_float(solved.get("pO2_bar"))
+        if oxygen_result.status != "ok" or po2_bar is None or po2_bar <= 0.0:
+            raise _InternalAnalyticalInputRefusal(
+                1,
+                "internal_analytical_oxygen_balance_unavailable",
+                "the existing battery oxygen-balance convention did not produce a positive pO2",
+            )
+        oxygen_source = "openimcc_oxygen_balance_condition_only"
+        oxygen_notices.append(
+            {
+                **solved,
+                "oxygen_condition_source": oxygen_source,
+                "pressure_prediction_source": "internal-analytical core",
+            }
+        )
+    else:
+        raise _InternalAnalyticalInputRefusal(
+            1,
+            "internal_analytical_missing_oxygen_condition",
+            f"oxygen condition is undefined for request mode {po2_request.mode!r}",
+        )
+
+    # Score maps the battery's fugacity in Pa to pO2 in bar using the stated
+    # ideal-gas assumption. The effusion branch uses the already-derived pO2.
+    fO2_log_used = math.log10(po2_bar)
+
+    core.atom_ledger = core._new_atom_ledger()
+    try:
+        core._load_ledger_account(
+            "process.cleaned_melt",
+            melt_composition_kg,
+            source="battery observation composition",
+        )
+    except Exception as exc:  # noqa: BLE001 - malformed oxides are category 2
+        raise _InternalAnalyticalInputRefusal(
+            2,
+            "internal_analytical_invalid_composition",
+            f"oxide composition cannot seed the simulator melt: {exc}",
+        ) from exc
+    core.melt.composition_kg = dict(melt_composition_kg)
+    core.melt.update_total_mass()
+    core.melt.temperature_C = temperature
+    core.melt.p_total_mbar = pressure * 1000.0
+    core.melt.atmosphere = Atmosphere.CONTROLLED_O2
+    core.melt.pO2_mbar = po2_bar * 1000.0
+    core.melt.fO2_log = fO2_log_used
+    core.melt.melt_fO2_log = fO2_log_used
+    core.melt.oxygen_reservoir.melt_intrinsic_fO2_log = fO2_log_used
+    core.melt.oxygen_reservoir.headspace_transport_pO2_bar = po2_bar
+    core.melt.oxygen_reservoir.headspace_ledger_pO2_bar = po2_bar
+    core._chem_kernel = core._build_chemistry_kernel()
+
+    equilibrium = SimpleNamespace(
+        vapor_pressures_Pa={},
+        vapor_pressures_source={},
+        liquid_fraction=None,
+    )
+    core._refresh_vapor_pressures_from_kernel(equilibrium)
+    core_diagnostic = dict(core._last_vapor_pressure_diagnostic)
+    core_flags: list[dict[str, Any]] = []
+    for field_name in (
+        "extrapolated_beyond_valid_range_K",
+        "ellingham_extrapolated_beyond_fit_range_K",
+    ):
+        field = core_diagnostic.get(field_name)
+        if isinstance(field, Mapping):
+            for species, detail in field.items():
+                core_flags.append(
+                    {
+                        "kind": "out_of_certified_band",
+                        "authority": AUTHORITY_EXTRAPOLATED,
+                        "reason": f"{field_name}:{species}:{detail}",
+                        "band": str(detail),
+                    }
+                )
+    for authority_field in ("vapor_pressure_authority", "ellingham_authority"):
+        authority = core_diagnostic.get(authority_field)
+        limits = (
+            authority.get("authority_limits")
+            if isinstance(authority, Mapping)
+            else None
+        )
+        if isinstance(limits, Mapping):
+            for species, detail in limits.items():
+                core_flags.append(
+                    {
+                        "kind": "out_of_certified_band",
+                        "authority": AUTHORITY_EXTRAPOLATED,
+                        "reason": f"{authority_field}:{species}:{detail}",
+                        "band": str(detail),
+                    }
+                )
+    floor_notices = core_diagnostic.get("pO2_floor_inversion_notices_by_species")
+    if isinstance(floor_notices, Mapping):
+        for species, detail in floor_notices.items():
+            core_flags.append(
+                {
+                    "kind": "floor_inversion",
+                    "authority": AUTHORITY_EXTRAPOLATED,
+                    "reason": f"{_FLOOR_INVERSION_REASON}:{species}:{detail}",
+                }
+            )
+
+    vapor_authority = core_diagnostic.get("vapor_pressure_authority")
+    authority_status = (
+        str(vapor_authority.get("status") or "unknown")
+        if isinstance(vapor_authority, Mapping)
+        else "unknown"
+    )
+    authority_is_authoritative = authority_status == "authoritative"
+    provenance = {
+        "code_path": _INTERNAL_ANALYTICAL_VAPOR_PRESSURE_PATH,
+        "authority": authority_status,
+        "vapor_pressures_source": dict(equilibrium.vapor_pressures_source),
+        "core_flags": core_flags,
+        "oxygen_condition_source": oxygen_source,
+        "oxygen_balance": oxygen_notices,
+    }
+    diagnostics = {
+        "internal_analytical_provenance": provenance,
+        "vapor_pressure_backend_status": (
+            "builtin_authoritative" if authority_is_authoritative else authority_status
+        ),
+        "vapor_pressure_backend_status_reason": json.dumps(
+            provenance, sort_keys=True, default=str, separators=(",", ":")
+        ),
+        "authoritative_for_requested_vapor_pressure": authority_is_authoritative,
+        "authority": (
+            AUTHORITY_EXTRAPOLATED
+            if core_flags
+            else "bridge" if authority_is_authoritative else authority_status
+        ),
+        "vapor_pressure_diagnostic": core_diagnostic,
+        "imcc_notices": oxygen_notices,
+    }
+    return SimpleNamespace(
+        status="ok",
+        diagnostics=diagnostics,
+        warnings=[],
+        activity_coefficients=dict(core_diagnostic.get("activities") or {}),
+        vapor_pressures_Pa=dict(equilibrium.vapor_pressures_Pa or {}),
+        vapor_pressures_source=dict(equilibrium.vapor_pressures_source or {}),
+        vapor_pressure_backend_status=diagnostics["vapor_pressure_backend_status"],
+        authoritative_for_requested_vapor_pressure=authority_is_authoritative,
+        liquid_fraction=None,
+        phase_assemblage_available=False,
+    )
+
+
+class _InternalAnalyticalBatteryBackend:
+    """Battery adapter for the simulator core's own analytical vapor path."""
+
+    supports_intrinsic_fo2 = True
+
+    def __init__(self) -> None:
+        self._core = _new_internal_analytical_core()
+        self._oxygen_balance_backend: Any | None = None
+
+    def equilibrate(
+        self,
+        temperature_C: float,
+        composition_kg: Mapping[str, float] | None = None,
+        fO2_log: float | None = None,
+        pressure_bar: float = 1.0e-6,
+        *,
+        composition_mol: Mapping[str, float] | None = None,
+        po2_request: Po2Request | None = None,
+        **_unused: object,
+    ) -> Any:
+        if (
+            po2_request is not None
+            and po2_request.mode == PO2_OXYGEN_BALANCE_EFFUSION
+            and self._oxygen_balance_backend is None
+        ):
+            self._oxygen_balance_backend = _OpenImccBatteryBackend("openimcc")
+        return _internal_analytical_vapor_pressure_adapter(
+            core=self._core,
+            temperature_C=temperature_C,
+            pressure_bar=pressure_bar,
+            composition_kg=composition_kg,
+            composition_mol=composition_mol,
+            fO2_log=fO2_log,
+            po2_request=po2_request,
+            oxygen_balance_backend=self._oxygen_balance_backend,
+        )
+
+
 # ---------------------------------------------------------------------------
 # Qualification (out-of-domain) MELTS arm
 # ---------------------------------------------------------------------------
@@ -2869,6 +3238,8 @@ def _open_resolved_backend(name: str) -> Any:
 
     if name in OPENIMCC_ENGINE_NAMES:
         return _OpenImccBatteryBackend(name)
+    if name == "internal-analytical":
+        return _InternalAnalyticalBatteryBackend()
     if name == "vaporock":
         return open_warm_vaporock_backend(warm_pool_size=1)
     if name == "magemin":

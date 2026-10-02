@@ -92,9 +92,14 @@ observations:
       value: measured_direct
     original_method_class: measured_direct
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - p_partial
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: kems-029-yakovlev-shornikov-2011::yakovlev_shornikov_2011_CAI_SiO_highT_about_1e-6_bar
   source_id: kems-029-yakovlev-shornikov-2011
   locator:
     published_page: 2

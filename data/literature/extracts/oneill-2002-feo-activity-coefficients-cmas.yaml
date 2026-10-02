@@ -1,0 +1,3262 @@
+schema_version: literature_extract.v1
+source_id: oneill-2002-feo-activity-coefficients-cmas
+source:
+  citation: >-
+    O'Neill, H.St.C. & Eggins, S.M. (2002), The effect of melt composition on trace element partitioning: an experimental investigation of the activity coefficients of FeO, NiO, CoO, MoO2 and MoO3 in silicate melts, Chemical Geology 186, 151-181.
+  doi: 10.1016/S0009-2541(01)00414-4
+  year: 2002
+  sha256: d4006f3272e7f2d4c869e18b11fecf4e3597f7ee32547777e29832a93f84c887
+extraction:
+  method: >-
+    Manual transcription checked against the supplied PDF and layout-preserving pdftotext. Table 7 activity coefficients are transcribed for every numeric cell; Table 4 Fe-equilibrated melt compositions are paired by melt name. Table 1 describes Mo/Ni/Co run products and is not substituted for the Fe-equilibrated Table 4 compositions. Table 4 does not label the major-oxide columns wt.%; their wt.% basis is inferred from electron-microprobe compositions summing to about 100 and is flagged in each row. Table 7 prints 1400 °C; the stored kelvin condition is converted by T_K = T_C + 273.15 = 1673.15 K. Table 4 prints log fO2 = -12.61; the experimental text identifies fO2 = 10^-12.61 bars and says it was calculated from the CO-CO2 gas mixture. Gamma values are author-calculated from measured compositions and oxygen fugacity, so evidence_class is measured_reduced. Table 6 supplies the standard-state thermodynamic data. Dashes in Table 7 for MoO2 and MoO3 at CMAS7 G and CAS3 remain unreported and are not zero or observations. The study uses wire-loop equilibration in a vertical tube furnace; it does not report KEMS cell/orifice, chamber pressure, orifice dimensions, orifice calibration, or a mass spectrometer.
+  date: '2026-10-01'
+  worker: codex
+review_status: draft
+experiments:
+  - experiment_id: oneill-2002-fe-saturated-cmas
+    method: quench_equilibration
+    method_as_printed: "Samples were equilibrated using the wire-loop method in a conventional vertical tube furnace equipped for gas mixing, using CO – CO2 mixtures to control fO2."
+    locator:
+      page: 155
+      published_page: 155
+      pdf_page_index: 4
+      section: Sample equilibration
+    conditions:
+      temperature_K:
+        state:
+          tag: value
+          value: '1673.15'
+        locator:
+          page: 163
+          published_page: 163
+          pdf_page_index: 12
+          table: '7'
+          note: "Table 7 gives 1400 °C; converted using T_K = T_C + 273.15."
+        inference:
+          relation: celsius_to_kelvin
+          inputs:
+            - "T_K = T_C + 273.15"
+            - "original_unit=C"
+          output_unit: K
+fidelity_samples:
+- path: species.FeO.observations[oneill_2002_table7_feo].values.series[0].gamma
+  value: '1.367'
+  locator:
+    page: 163
+    published_page: 163
+    pdf_page_index: 12
+    table: '7'
+    row: AD eutectic
+    note: Table 7 gamma_FeO cell as printed 1.367 (11)
+- path: species.NiO.observations[oneill_2002_table7_nio].values.series[1].gamma
+  value: '2.70'
+  locator:
+    page: 163
+    published_page: 163
+    pdf_page_index: 12
+    table: '7'
+    row: AD+Fo
+    note: Table 7 gamma_NiO cell as printed 2.70 (7)
+- path: species.CoO.observations[oneill_2002_table7_coo].values.series[6].gamma
+  value: '1.00'
+  locator:
+    page: 163
+    published_page: 163
+    pdf_page_index: 12
+    table: '7'
+    row: A
+    note: Table 7 gamma_CoO cell as printed 1.00 (3)
+- path: species.MoO2.observations[oneill_2002_table7_moo2].values.series[7].gamma
+  value: '209'
+  locator:
+    page: 163
+    published_page: 163
+    pdf_page_index: 12
+    table: '7'
+    row: B
+    note: Table 7 gamma_MoO2 cell as printed 209 (12)
+- path: species.MoO3.observations[oneill_2002_table7_moo3].values.series[12].gamma
+  value: '1.37'
+  locator:
+    page: 163
+    published_page: 163
+    pdf_page_index: 12
+    table: '7'
+    row: MAS1
+    note: Table 7 gamma_MoO3 cell as printed 1.37 (24)
+- path: species.FeO.observations[oneill_2002_table7_feo].values.series[2].oxides_wt_pct
+  value:
+    CaO: '14.1'
+    MgO: '20.0'
+    Al2O3: '9.3'
+    SiO2: '52.4'
+    FeO: '4.22'
+  locator:
+    page: 161
+    published_page: 161
+    pdf_page_index: 10
+    table: '4'
+    row: AD + En
+    note: Table 4 major-oxide composition cells; wt.% basis inferred and stated in the extract
+- path: species.NiO.observations[oneill_2002_table7_nio].values.series[9].oxides_wt_pct
+  value:
+    CaO: '12.1'
+    MgO: '17.4'
+    Al2O3: '20.7'
+    SiO2: '46.7'
+    FeO: '2.82'
+  locator:
+    page: 161
+    published_page: 161
+    pdf_page_index: 10
+    table: '4'
+    row: D
+    note: Table 4 major-oxide composition cells; wt.% basis inferred and stated in the extract
+- path: species.CoO.observations[oneill_2002_table7_coo].values.series[13].oxides_wt_pct
+  value:
+    MgO: '19.3'
+    Al2O3: '17.2'
+    SiO2: '58.7'
+    FeO: '4.76'
+  locator:
+    page: 161
+    published_page: 161
+    pdf_page_index: 10
+    table: '4'
+    row: MAS1
+    note: Table 4 major-oxide composition cells; CaO is printed as a dash
+species:
+  FeO:
+    observations:
+    - observation_id: oneill_2002_table7_feo
+      experiment: oneill-2002-fe-saturated-cmas
+      type: activity_coefficient
+      locator:
+        page: 163
+        published_page: 163
+        pdf_page_index: 12
+        table: '7'
+        note: Table 7 gamma_FeO by melt at 1400 °C
+      T_range_K: [1673.15, 1673.15]
+      phase: condensed_liquid
+      standard_state: pure liquid FeO at the temperature and pressure of interest; Table 6 (p. 163) gives Fe(s) + 0.5 O2 = FeO(liq) at 1 bar. The paper's general statement is on p. 153.
+      standard_state_locator:
+        page: 153
+        published_page: 153
+        pdf_page_index: 2
+        section: Definition of activity coefficients
+      standard_state_thermodynamic_locator:
+        page: 163
+        published_page: 163
+        pdf_page_index: 12
+        table: '6'
+        row: Fe(s) + 0.5O2 = FeO(liq)
+      regime: quench_equilibration
+      units: dimensionless activity coefficient; Table 4 composition values interpreted as wt.%
+      uncertainty:
+        note: Table 7 parenthetical uncertainties are one standard deviation and exclude systematic errors, including standard-state thermodynamic data.
+      values:
+        quantity: activity_coefficient
+        method_class: directly_reduced_measurement
+        evidence_class: measured_reduced
+        admission_status: admitted
+        reference_state_note: "The paper describes the oxide reference as 'pure liquid MOx/2 at the temperature and pressure of interest' (p. 153)."
+        temperature_conversion: T_K = T_C + 273.15; 1400 °C -> 1673.15 K
+        composition_basis_note: >-
+          Table 4 does not print wt.% in its major-oxide column heading; wt.% is inferred because the EDS compositions sum to about 100 and is also consistent with Table 1. Each composition_mol identity map is converted from its Table 4 mass-percent values using oxide formula weights; the printed mass-percent cells and Table 4 locators remain in point_conditions.
+        log_fO2:
+          value: '-12.61'
+          units: log10(bar)
+          method_class: model_derived
+          derivation: Calculated by the authors from the CO-CO2 gas mixture; the source says the Fe experiments used 10^-12.61 bars (99% CO).
+          locator:
+            page: 161
+            published_page: 161
+            pdf_page_index: 10
+            table: '4'
+            note: Table 4 caption prints log fO2 = -12.61; p. 156 identifies bars and the CO-CO2 calculation.
+        oxygen_partial_pressure:
+          value: '2.454708915685030356082721740674509764216E-13'
+          units: bar
+          method_class: model_derived
+          derivation: "Converted fO2, not a separately measured pO2: fO2_Pa = 10^(-12.61 log10(bar)) x 100000 Pa/bar."
+          locator:
+            page: 161
+            published_page: 161
+            pdf_page_index: 10
+            table: '4'
+            note: "log fO2 = -12.61 is printed in the Table 4 caption; its conversion to Pa is explicit."
+        series:
+        - melt: AD eutectic
+          T_C: '1400'
+          composition_mol: {CaO: '0.2395476833737006039648512809', MgO: '0.1464703803974999618031867505', Al2O3: '0.08743865016052613478135698287', SiO2: '0.4972810973602597828812586196', FeO: '0.02926218870801351656934636637'}
+          oxides_wt_pct: &comp_ad_eutectic
+            CaO: '22.3'
+            MgO: '9.8'
+            Al2O3: '14.8'
+            SiO2: '49.6'
+            FeO: '3.49'
+          FeO_wt_pct_as_printed: '3.49 (3)'
+          X_FeO_as_printed: '0.0269 (2)'
+          point_conditions:
+            printed_composition:
+              amount_basis: mass_percent
+              components: *comp_ad_eutectic
+              locator: &loc4_ad_eutectic
+                page: 161
+                published_page: 161
+                pdf_page_index: 10
+                table: '4'
+                row: AD eutectic
+            composition:
+              state:
+                tag: value
+                value:
+                  amount_basis: mass_percent
+                  components: *comp_ad_eutectic
+              locator: *loc4_ad_eutectic
+          gamma: '1.367'
+          gamma_as_printed: '1.367 (11)'
+          admission_status: admitted
+          method_class: directly_reduced_measurement
+          evidence_class: measured_reduced
+          locator:
+            page: 163
+            published_page: 163
+            pdf_page_index: 12
+            table: '7'
+            row: AD eutectic
+            note: gamma_FeO cell 1.367 (11)
+        - melt: AD+Fo
+          T_C: '1400'
+          composition_mol: {CaO: '0.2046259823531954587397318513', MgO: '0.2329416906776256921620698445', Al2O3: '0.07161776260449380624655933938', SiO2: '0.4639528276434844818997229048', FeO: '0.02686173672120056095191605975'}
+          oxides_wt_pct: &comp_ad_fo
+            CaO: '19.8'
+            MgO: '16.2'
+            Al2O3: '12.6'
+            SiO2: '48.1'
+            FeO: '3.33'
+          FeO_wt_pct_as_printed: '3.33 (6)'
+          X_FeO_as_printed: '0.0251 (4)'
+          point_conditions:
+            printed_composition:
+              amount_basis: mass_percent
+              components: *comp_ad_fo
+              locator: &loc4_ad_fo
+                page: 161
+                published_page: 161
+                pdf_page_index: 10
+                table: '4'
+                row: AD + Fo
+            composition:
+              state:
+                tag: value
+                value:
+                  amount_basis: mass_percent
+                  components: *comp_ad_fo
+              locator: *loc4_ad_fo
+          gamma: '1.468'
+          gamma_as_printed: '1.468 (25)'
+          admission_status: admitted
+          method_class: directly_reduced_measurement
+          evidence_class: measured_reduced
+          locator:
+            page: 163
+            published_page: 163
+            pdf_page_index: 12
+            table: '7'
+            row: AD+Fo
+            note: gamma_FeO cell 1.468 (25)
+        - melt: AD+En
+          T_C: '1400'
+          composition_mol: {CaO: '0.1420768698048428114478889478', MgO: '0.2803954002082812838015344920', Al2O3: '0.05153969369449843119465991054', SiO2: '0.4927977509476186345442647830', FeO: '0.03319028534475883901165186711'}
+          oxides_wt_pct: &comp_ad_en
+            CaO: '14.1'
+            MgO: '20.0'
+            Al2O3: '9.3'
+            SiO2: '52.4'
+            FeO: '4.22'
+          FeO_wt_pct_as_printed: '4.22 (3)'
+          X_FeO_as_printed: '0.0315 (3)'
+          point_conditions:
+            printed_composition:
+              amount_basis: mass_percent
+              components: *comp_ad_en
+              locator: &loc4_ad_en
+                page: 161
+                published_page: 161
+                pdf_page_index: 10
+                table: '4'
+                row: AD + En
+            composition:
+              state:
+                tag: value
+                value:
+                  amount_basis: mass_percent
+                  components: *comp_ad_en
+              locator: *loc4_ad_en
+          gamma: '1.167'
+          gamma_as_printed: '1.167 (10)'
+          admission_status: admitted
+          method_class: directly_reduced_measurement
+          evidence_class: measured_reduced
+          locator:
+            page: 163
+            published_page: 163
+            pdf_page_index: 12
+            table: '7'
+            row: AD+En
+            note: gamma_FeO cell 1.167 (10)
+        - melt: AD+Wo
+          T_C: '1400'
+          composition_mol: {CaO: '0.3898630016633270125324746873', MgO: '0.05541963075337089436894889451', Al2O3: '0.03370297720146439921165065789', SiO2: '0.4900892847777544695987172534', FeO: '0.03092510560408322428820850686'}
+          oxides_wt_pct: &comp_ad_wo
+            CaO: '36.9'
+            MgO: '3.77'
+            Al2O3: '5.8'
+            SiO2: '49.7'
+            FeO: '3.75'
+          FeO_wt_pct_as_printed: '3.75 (2)'
+          X_FeO_as_printed: '0.0299 (5)'
+          point_conditions:
+            printed_composition:
+              amount_basis: mass_percent
+              components: *comp_ad_wo
+              locator: &loc4_ad_wo
+                page: 161
+                published_page: 161
+                pdf_page_index: 10
+                table: '4'
+                row: AD + Wo
+            composition:
+              state:
+                tag: value
+                value:
+                  amount_basis: mass_percent
+                  components: *comp_ad_wo
+              locator: *loc4_ad_wo
+          gamma: '1.231'
+          gamma_as_printed: '1.231 (19)'
+          admission_status: admitted
+          method_class: directly_reduced_measurement
+          evidence_class: measured_reduced
+          locator:
+            page: 163
+            published_page: 163
+            pdf_page_index: 12
+            table: '7'
+            row: AD+Wo
+            note: gamma_FeO cell 1.231 (19)
+        - melt: AD+Qz
+          T_C: '1400'
+          composition_mol: {CaO: '0.1710064278788063571672337845', MgO: '0.1032526063669301861305397336', Al2O3: '0.06151815006217203091120533269', SiO2: '0.6293844578953213506513830837', FeO: '0.03483835779677007513963806587'}
+          oxides_wt_pct: &comp_ad_qz
+            CaO: '15.9'
+            MgO: '6.9'
+            Al2O3: '10.4'
+            SiO2: '62.7'
+            FeO: '4.15'
+          FeO_wt_pct_as_printed: '4.15 (7)'
+          X_FeO_as_printed: '0.0328 (6)'
+          point_conditions:
+            printed_composition:
+              amount_basis: mass_percent
+              components: *comp_ad_qz
+              locator: &loc4_ad_qz
+                page: 161
+                published_page: 161
+                pdf_page_index: 10
+                table: '4'
+                row: AD + Qz
+            composition:
+              state:
+                tag: value
+                value:
+                  amount_basis: mass_percent
+                  components: *comp_ad_qz
+              locator: *loc4_ad_qz
+          gamma: '1.121'
+          gamma_as_printed: '1.121 (19)'
+          admission_status: admitted
+          method_class: directly_reduced_measurement
+          evidence_class: measured_reduced
+          locator:
+            page: 163
+            published_page: 163
+            pdf_page_index: 12
+            table: '7'
+            row: AD+Qz
+            note: gamma_FeO cell 1.121 (19)
+        - melt: AD+TiO2
+          T_C: '1400'
+          composition_mol: {CaO: '0.2034204136391513867887786321', MgO: '0.1226459614954305721042851811', Al2O3: '0.07272144614178499166037962981', SiO2: '0.4081935664269725324671084372', FeO: '0.04225244148257064772294461469', TiO2: '0.1507661708140898692565035049'}
+          oxides_wt_pct: &comp_ad_tio2
+            CaO: '18.0'
+            MgO: '7.8'
+            Al2O3: '11.7'
+            SiO2: '38.7'
+            FeO: '4.79'
+            TiO2: '19.0'
+          FeO_wt_pct_as_printed: '4.79 (9)'
+          X_FeO_as_printed: '0.0394 (7)'
+          composition_footnote_as_printed: Plus 19.0 wt.% TiO2
+          point_conditions:
+            printed_composition:
+              amount_basis: mass_percent
+              components: *comp_ad_tio2
+              locator: &loc4_ad_tio2
+                page: 161
+                published_page: 161
+                pdf_page_index: 10
+                table: '4'
+                row: AD + TiO2
+                note: Table 4 footnote adds 19.0 wt.% TiO2
+            composition:
+              state:
+                tag: value
+                value:
+                  amount_basis: mass_percent
+                  components: *comp_ad_tio2
+              locator: *loc4_ad_tio2
+          gamma: '0.935'
+          gamma_as_printed: '0.935 (17)'
+          admission_status: admitted
+          method_class: directly_reduced_measurement
+          evidence_class: measured_reduced
+          locator:
+            page: 163
+            published_page: 163
+            pdf_page_index: 12
+            table: '7'
+            row: AD+TiO2
+            note: gamma_FeO cell 0.935 (17)
+        - melt: A
+          T_C: '1400'
+          composition_mol: {CaO: '0.1639545793340269390243703904', MgO: '0.1744434245164470366869916513', Al2O3: '0.08899460600318690450509220578', SiO2: '0.5430816295960116400349109303', FeO: '0.02952576055032747974863482184'}
+          oxides_wt_pct: &comp_cmas_a
+            CaO: '15.3'
+            MgO: '11.7'
+            Al2O3: '15.1'
+            SiO2: '54.3'
+            FeO: '3.53'
+          FeO_wt_pct_as_printed: '3.53 (6)'
+          X_FeO_as_printed: '0.0271 (4)'
+          point_conditions:
+            printed_composition:
+              amount_basis: mass_percent
+              components: *comp_cmas_a
+              locator: &loc4_cmas_a
+                page: 161
+                published_page: 161
+                pdf_page_index: 10
+                table: '4'
+                row: A
+            composition:
+              state:
+                tag: value
+                value:
+                  amount_basis: mass_percent
+                  components: *comp_cmas_a
+              locator: *loc4_cmas_a
+          gamma: '1.359'
+          gamma_as_printed: '1.359 (22)'
+          admission_status: admitted
+          method_class: directly_reduced_measurement
+          evidence_class: measured_reduced
+          locator:
+            page: 163
+            published_page: 163
+            pdf_page_index: 12
+            table: '7'
+            row: A
+            note: gamma_FeO cell 1.359 (22)
+        - melt: B
+          T_C: '1400'
+          composition_mol: {CaO: '0.08462769908233249307829158939', MgO: '0.2771357875021520015067019929', Al2O3: '0.07719553938694261039037044487', SiO2: '0.5278522799211289994662747778', FeO: '0.03318869410744389555836119490'}
+          oxides_wt_pct: &comp_cmas_b
+            CaO: '8.2'
+            MgO: '19.3'
+            Al2O3: '13.6'
+            SiO2: '54.8'
+            FeO: '4.12'
+          FeO_wt_pct_as_printed: '4.12 (9)'
+          X_FeO_as_printed: '0.0308 (7)'
+          point_conditions:
+            printed_composition:
+              amount_basis: mass_percent
+              components: *comp_cmas_b
+              locator: &loc4_cmas_b
+                page: 161
+                published_page: 161
+                pdf_page_index: 10
+                table: '4'
+                row: B
+            composition:
+              state:
+                tag: value
+                value:
+                  amount_basis: mass_percent
+                  components: *comp_cmas_b
+              locator: *loc4_cmas_b
+          gamma: '1.193'
+          gamma_as_printed: '1.193 (27)'
+          admission_status: admitted
+          method_class: directly_reduced_measurement
+          evidence_class: measured_reduced
+          locator:
+            page: 163
+            published_page: 163
+            pdf_page_index: 12
+            table: '7'
+            row: B
+            note: gamma_FeO cell 1.193 (27)
+        - melt: C
+          T_C: '1400'
+          composition_mol: {CaO: '0.1531759919511611841390538443', MgO: '0.2604818686512999299140490716', Al2O3: '0.03468921220336584774653559358', SiO2: '0.5167227280754903830019521196', FeO: '0.03493019911868265519840937078'}
+          oxides_wt_pct: &comp_cmas_c
+            CaO: '15.3'
+            MgO: '18.7'
+            Al2O3: '6.3'
+            SiO2: '55.3'
+            FeO: '4.47'
+          FeO_wt_pct_as_printed: '4.47 (6)'
+          X_FeO_as_printed: '0.0337 (4)'
+          point_conditions:
+            printed_composition:
+              amount_basis: mass_percent
+              components: *comp_cmas_c
+              locator: &loc4_cmas_c
+                page: 161
+                published_page: 161
+                pdf_page_index: 10
+                table: '4'
+                row: C
+            composition:
+              state:
+                tag: value
+                value:
+                  amount_basis: mass_percent
+                  components: *comp_cmas_c
+              locator: *loc4_cmas_c
+          gamma: '1.091'
+          gamma_as_printed: '1.091 (14)'
+          admission_status: admitted
+          method_class: directly_reduced_measurement
+          evidence_class: measured_reduced
+          locator:
+            page: 163
+            published_page: 163
+            pdf_page_index: 12
+            table: '7'
+            row: C
+            note: gamma_FeO cell 1.091 (14)
+        - melt: D
+          T_C: '1400'
+          composition_mol: {CaO: '0.1294370798815711221573950444', MgO: '0.2589758136432293119413493786', Al2O3: '0.1217862614184145547892351871', SiO2: '0.4662548682336967889842514676', FeO: '0.02354597682308822212776892231'}
+          oxides_wt_pct: &comp_cmas_d
+            CaO: '12.1'
+            MgO: '17.4'
+            Al2O3: '20.7'
+            SiO2: '46.7'
+            FeO: '2.82'
+          FeO_wt_pct_as_printed: '2.82 (16)'
+          X_FeO_as_printed: '0.0210 (12)'
+          point_conditions:
+            printed_composition:
+              amount_basis: mass_percent
+              components: *comp_cmas_d
+              locator: &loc4_cmas_d
+                page: 161
+                published_page: 161
+                pdf_page_index: 10
+                table: '4'
+                row: D
+            composition:
+              state:
+                tag: value
+                value:
+                  amount_basis: mass_percent
+                  components: *comp_cmas_d
+              locator: *loc4_cmas_d
+          gamma: '1.76'
+          gamma_as_printed: '1.76 (10)'
+          admission_status: admitted
+          method_class: directly_reduced_measurement
+          evidence_class: measured_reduced
+          locator:
+            page: 163
+            published_page: 163
+            pdf_page_index: 12
+            table: '7'
+            row: D
+            note: gamma_FeO cell 1.76 (10)
+        - melt: E
+          T_C: '1400'
+          composition_mol: {CaO: '0.2046748295492861733326789229', MgO: '0.2565789818944866245855560407', Al2O3: '0.05516998673198008273247909129', SiO2: '0.4567655709300863518885037851', FeO: '0.02681063089416076746078216000'}
+          oxides_wt_pct: &comp_cmas_e
+            CaO: '20.2'
+            MgO: '18.2'
+            Al2O3: '9.9'
+            SiO2: '48.3'
+            FeO: '3.39'
+          FeO_wt_pct_as_printed: '3.39 (6)'
+          X_FeO_as_printed: '0.0254 (4)'
+          point_conditions:
+            printed_composition:
+              amount_basis: mass_percent
+              components: *comp_cmas_e
+              locator: &loc4_cmas_e
+                page: 161
+                published_page: 161
+                pdf_page_index: 10
+                table: '4'
+                row: E
+            composition:
+              state:
+                tag: value
+                value:
+                  amount_basis: mass_percent
+                  components: *comp_cmas_e
+              locator: *loc4_cmas_e
+          gamma: '1.450'
+          gamma_as_printed: '1.450 (24)'
+          admission_status: admitted
+          method_class: directly_reduced_measurement
+          evidence_class: measured_reduced
+          locator:
+            page: 163
+            published_page: 163
+            pdf_page_index: 12
+            table: '7'
+            row: E
+            note: gamma_FeO cell 1.450 (24)
+        - melt: F
+          T_C: '1400'
+          composition_mol: {CaO: '0.1766895209435497532958889768', MgO: '0.1858071064811051202536236540', Al2O3: '0.03220414838054885584150419080', SiO2: '0.5618406073001673338148125838', FeO: '0.04345861689462893679417059484'}
+          oxides_wt_pct: &comp_cmas_f
+            CaO: '17.2'
+            MgO: '13.0'
+            Al2O3: '5.7'
+            SiO2: '58.6'
+            FeO: '5.42'
+          FeO_wt_pct_as_printed: '5.42 (5)'
+          X_FeO_as_printed: '0.0420 (4)'
+          point_conditions:
+            printed_composition:
+              amount_basis: mass_percent
+              components: *comp_cmas_f
+              locator: &loc4_cmas_f
+                page: 161
+                published_page: 161
+                pdf_page_index: 10
+                table: '4'
+                row: F
+            composition:
+              state:
+                tag: value
+                value:
+                  amount_basis: mass_percent
+                  components: *comp_cmas_f
+              locator: *loc4_cmas_f
+          gamma: '0.875'
+          gamma_as_printed: '0.875 (9)'
+          admission_status: admitted
+          method_class: directly_reduced_measurement
+          evidence_class: measured_reduced
+          locator:
+            page: 163
+            published_page: 163
+            pdf_page_index: 12
+            table: '7'
+            row: F
+            note: gamma_FeO cell 0.875 (9)
+        - melt: G
+          T_C: '1400'
+          composition_mol: {CaO: '0.2689467533507900805946178514', MgO: '0.03373927779290808373505206172', Al2O3: '0.07153409776416408462999311478', SiO2: '0.5894734702530859009653081748', FeO: '0.03630640083905185007502879729'}
+          oxides_wt_pct: &comp_cmas_g
+            CaO: '24.4'
+            MgO: '2.2'
+            Al2O3: '11.8'
+            SiO2: '57.3'
+            FeO: '4.22'
+          FeO_wt_pct_as_printed: '4.22 (4)'
+          X_FeO_as_printed: '0.0339 (3)'
+          point_conditions:
+            printed_composition:
+              amount_basis: mass_percent
+              components: *comp_cmas_g
+              locator: &loc4_cmas_g
+                page: 161
+                published_page: 161
+                pdf_page_index: 10
+                table: '4'
+                row: G
+            composition:
+              state:
+                tag: value
+                value:
+                  amount_basis: mass_percent
+                  components: *comp_cmas_g
+              locator: *loc4_cmas_g
+          gamma: '1.091'
+          gamma_as_printed: '1.091 (14)'
+          admission_status: admitted
+          method_class: directly_reduced_measurement
+          evidence_class: measured_reduced
+          locator:
+            page: 163
+            published_page: 163
+            pdf_page_index: 12
+            table: '7'
+            row: G
+            note: gamma_FeO cell 1.091 (14)
+        - melt: MAS1
+          T_C: '1400'
+          composition_mol: {MgO: '0.2832170034603230148358687136', Al2O3: '0.09977194916288513031802540654', SiO2: '0.5778254372541017835256762252', FeO: '0.03918561012269007132042965467'}
+          oxides_wt_pct: &comp_mas1
+            MgO: '19.3'
+            Al2O3: '17.2'
+            SiO2: '58.7'
+            FeO: '4.76'
+          missing_component_as_printed: CaO dash
+          FeO_wt_pct_as_printed: '4.76 (8)'
+          X_FeO_as_printed: '0.0356 (6)'
+          point_conditions:
+            printed_composition:
+              amount_basis: mass_percent
+              components: *comp_mas1
+              locator: &loc4_mas1
+                page: 161
+                published_page: 161
+                pdf_page_index: 10
+                table: '4'
+                row: MAS1
+            composition:
+              state:
+                tag: value
+                value:
+                  amount_basis: mass_percent
+                  components: *comp_mas1
+              locator: *loc4_mas1
+          gamma: '1.034'
+          gamma_as_printed: '1.034 (17)'
+          admission_status: admitted
+          method_class: directly_reduced_measurement
+          evidence_class: measured_reduced
+          locator:
+            page: 163
+            published_page: 163
+            pdf_page_index: 12
+            table: '7'
+            row: MAS1
+            note: gamma_FeO cell 1.034 (17)
+        - melt: MAS2
+          T_C: '1400'
+          composition_mol: {MgO: '0.3517971111438944156128231023', Al2O3: '0.1297917358677614490071632726', SiO2: '0.4788577595294352878920577415', FeO: '0.03955339345890884748795588319'}
+          oxides_wt_pct: &comp_mas2
+            MgO: '24.0'
+            Al2O3: '22.4'
+            SiO2: '48.7'
+            FeO: '4.81'
+          missing_component_as_printed: CaO dash
+          FeO_wt_pct_as_printed: '4.81 (7)'
+          X_FeO_as_printed: '0.0350 (5)'
+          point_conditions:
+            printed_composition:
+              amount_basis: mass_percent
+              components: *comp_mas2
+              locator: &loc4_mas2
+                page: 161
+                published_page: 161
+                pdf_page_index: 10
+                table: '4'
+                row: MAS2
+            composition:
+              state:
+                tag: value
+                value:
+                  amount_basis: mass_percent
+                  components: *comp_mas2
+              locator: *loc4_mas2
+          gamma: '1.052'
+          gamma_as_printed: '1.052 (14)'
+          admission_status: admitted
+          method_class: directly_reduced_measurement
+          evidence_class: measured_reduced
+          locator:
+            page: 163
+            published_page: 163
+            pdf_page_index: 12
+            table: '7'
+            row: MAS2
+            note: gamma_FeO cell 1.052 (14)
+        - melt: CAS1
+          T_C: '1400'
+          composition_mol: {CaO: '0.4171010373483131102047565835', Al2O3: '0.1165707725802238571633031329', SiO2: '0.4442995815019372510197883464', FeO: '0.02202860856952578161215193720'}
+          oxides_wt_pct: &comp_cas1
+            CaO: '36.8'
+            Al2O3: '18.7'
+            SiO2: '42.0'
+            FeO: '2.49'
+          missing_component_as_printed: MgO dash
+          FeO_wt_pct_as_printed: '2.49 (6)'
+          X_FeO_as_printed: '0.0198 (4)'
+          point_conditions:
+            printed_composition:
+              amount_basis: mass_percent
+              components: *comp_cas1
+              locator: &loc4_cas1
+                page: 161
+                published_page: 161
+                pdf_page_index: 10
+                table: '4'
+                row: CAS1
+            composition:
+              state:
+                tag: value
+                value:
+                  amount_basis: mass_percent
+                  components: *comp_cas1
+              locator: *loc4_cas1
+          gamma: '1.863'
+          gamma_as_printed: '1.863 (45)'
+          admission_status: admitted
+          method_class: directly_reduced_measurement
+          evidence_class: measured_reduced
+          locator:
+            page: 163
+            published_page: 163
+            pdf_page_index: 12
+            table: '7'
+            row: CAS1
+            note: gamma_FeO cell 1.863 (45)
+        - melt: CAS2
+          T_C: '1400'
+          composition_mol: {CaO: '0.4942932757515537509706927259', Al2O3: '0.06661378273140381126346998076', SiO2: '0.4175452232201360482791470713', FeO: '0.02154771829690638948669022160'}
+          oxides_wt_pct: &comp_cas2
+            CaO: '45.3'
+            Al2O3: '11.1'
+            SiO2: '41.0'
+            FeO: '2.53'
+          missing_component_as_printed: MgO dash
+          FeO_wt_pct_as_printed: '2.53 (16)'
+          X_FeO_as_printed: '0.0202 (12)'
+          point_conditions:
+            printed_composition:
+              amount_basis: mass_percent
+              components: *comp_cas2
+              locator: &loc4_cas2
+                page: 161
+                published_page: 161
+                pdf_page_index: 10
+                table: '4'
+                row: CAS2
+            composition:
+              state:
+                tag: value
+                value:
+                  amount_basis: mass_percent
+                  components: *comp_cas2
+              locator: *loc4_cas2
+          gamma: '1.82'
+          gamma_as_printed: '1.82 (11)'
+          admission_status: admitted
+          method_class: directly_reduced_measurement
+          evidence_class: measured_reduced
+          locator:
+            page: 163
+            published_page: 163
+            pdf_page_index: 12
+            table: '7'
+            row: CAS2
+            note: gamma_FeO cell 1.82 (11)
+        - melt: CAS3
+          T_C: '1400'
+          composition_mol: {CaO: '0.1207486979492877099854773387', Al2O3: '0.1251583431825471213650975677', SiO2: '0.7357869042373753013092770664', FeO: '0.01830605463078986734014802770'}
+          oxides_wt_pct: &comp_cas3
+            CaO: '10.4'
+            Al2O3: '19.6'
+            SiO2: '67.9'
+            FeO: '2.02'
+          missing_component_as_printed: MgO dash
+          FeO_wt_pct_as_printed: '2.02 (6)'
+          X_FeO_as_printed: '0.0163 (4)'
+          point_conditions:
+            printed_composition:
+              amount_basis: mass_percent
+              components: *comp_cas3
+              locator: &loc4_cas3
+                page: 161
+                published_page: 161
+                pdf_page_index: 10
+                table: '4'
+                row: CAS3
+            composition:
+              state:
+                tag: value
+                value:
+                  amount_basis: mass_percent
+                  components: *comp_cas3
+              locator: *loc4_cas3
+          gamma: '2.263'
+          gamma_as_printed: '2.263 (59)'
+          admission_status: admitted
+          method_class: directly_reduced_measurement
+          evidence_class: measured_reduced
+          locator:
+            page: 163
+            published_page: 163
+            pdf_page_index: 12
+            table: '7'
+            row: CAS3
+            note: gamma_FeO cell 2.263 (59)
+        - melt: CAS4
+          T_C: '1400'
+          composition_mol: {CaO: '0.3490509413115862968772554503', Al2O3: '0.07313312355507193463851658587', SiO2: '0.5439978288499368860915170413', FeO: '0.03381810628340488239271092275'}
+          oxides_wt_pct: &comp_cas4
+            CaO: '31.5'
+            Al2O3: '12.0'
+            SiO2: '52.6'
+            FeO: '3.91'
+          missing_component_as_printed: MgO dash
+          FeO_wt_pct_as_printed: '3.91 (4)'
+          X_FeO_as_printed: '0.0315 (4)'
+          point_conditions:
+            printed_composition:
+              amount_basis: mass_percent
+              components: *comp_cas4
+              locator: &loc4_cas4
+                page: 161
+                published_page: 161
+                pdf_page_index: 10
+                table: '4'
+                row: CAS4
+            composition:
+              state:
+                tag: value
+                value:
+                  amount_basis: mass_percent
+                  components: *comp_cas4
+              locator: *loc4_cas4
+          gamma: '1.168'
+          gamma_as_printed: '1.168 (13)'
+          admission_status: admitted
+          method_class: directly_reduced_measurement
+          evidence_class: measured_reduced
+          locator:
+            page: 163
+            published_page: 163
+            pdf_page_index: 12
+            table: '7'
+            row: CAS4
+            note: gamma_FeO cell 1.168 (13)
+  NiO:
+    observations:
+    - observation_id: oneill_2002_table7_nio
+      experiment: oneill-2002-fe-saturated-cmas
+      type: activity_coefficient
+      locator:
+        page: 163
+        published_page: 163
+        pdf_page_index: 12
+        table: '7'
+        note: Table 7 gamma_NiO by melt at 1400 °C
+      T_range_K: [1673.15, 1673.15]
+      phase: condensed_liquid
+      standard_state: pure liquid NiO at the temperature and pressure of interest; Table 6 (p. 163) gives Ni(s) + 0.5 O2 = NiO(liq) at 1 bar. The paper's general statement is on p. 153.
+      standard_state_locator:
+        page: 153
+        published_page: 153
+        pdf_page_index: 2
+        section: Definition of activity coefficients
+      standard_state_thermodynamic_locator:
+        page: 163
+        published_page: 163
+        pdf_page_index: 12
+        table: '6'
+        row: Ni(s) + 0.5O2 = NiO(liq)
+      regime: quench_equilibration
+      units: dimensionless activity coefficient; Table 4 composition values interpreted as wt.%
+      uncertainty:
+        note: Table 7 parenthetical uncertainties are one standard deviation and exclude systematic errors, including standard-state thermodynamic data.
+      values:
+        quantity: activity_coefficient
+        method_class: directly_reduced_measurement
+        evidence_class: measured_reduced
+        admission_status: admitted
+        reference_state_note: "The paper describes the oxide reference as 'pure liquid MOx/2 at the temperature and pressure of interest' (p. 153)."
+        temperature_conversion: T_K = T_C + 273.15; 1400 °C -> 1673.15 K
+        composition_basis_note: Table 4 does not print wt.% in its major-oxide column heading; wt.% is inferred because the EDS compositions sum to about 100 and is also consistent with Table 1.
+        log_fO2:
+          value: '-12.61'
+          units: log10(bar)
+          method_class: model_derived
+          derivation: Calculated by the authors from the CO-CO2 gas mixture; the source says the Fe experiments used 10^-12.61 bars (99% CO).
+          locator:
+            page: 161
+            published_page: 161
+            pdf_page_index: 10
+            table: '4'
+            note: Table 4 caption prints log fO2 = -12.61; p. 156 identifies bars and the CO-CO2 calculation.
+        series:
+        - melt: AD eutectic
+          T_C: '1400'
+          oxides_wt_pct: *comp_ad_eutectic
+          FeO_wt_pct_as_printed: '3.49 (3)'
+          X_FeO_as_printed: '0.0269 (2)'
+          point_conditions:
+            printed_composition:
+              amount_basis: mass_percent
+              components: *comp_ad_eutectic
+              locator: *loc4_ad_eutectic
+            composition:
+              state:
+                tag: value
+                value:
+                  amount_basis: mass_percent
+                  components: *comp_ad_eutectic
+              locator: *loc4_ad_eutectic
+          gamma: '2.52'
+          gamma_as_printed: '2.52 (6)'
+          admission_status: admitted
+          method_class: directly_reduced_measurement
+          evidence_class: measured_reduced
+          locator:
+            page: 163
+            published_page: 163
+            pdf_page_index: 12
+            table: '7'
+            row: AD eutectic
+            note: gamma_NiO cell 2.52 (6)
+        - melt: AD+Fo
+          T_C: '1400'
+          oxides_wt_pct: *comp_ad_fo
+          FeO_wt_pct_as_printed: '3.33 (6)'
+          X_FeO_as_printed: '0.0251 (4)'
+          point_conditions:
+            printed_composition:
+              amount_basis: mass_percent
+              components: *comp_ad_fo
+              locator: *loc4_ad_fo
+            composition:
+              state:
+                tag: value
+                value:
+                  amount_basis: mass_percent
+                  components: *comp_ad_fo
+              locator: *loc4_ad_fo
+          gamma: '2.70'
+          gamma_as_printed: '2.70 (7)'
+          admission_status: admitted
+          method_class: directly_reduced_measurement
+          evidence_class: measured_reduced
+          locator:
+            page: 163
+            published_page: 163
+            pdf_page_index: 12
+            table: '7'
+            row: AD+Fo
+            note: gamma_NiO cell 2.70 (7)
+        - melt: AD+En
+          T_C: '1400'
+          oxides_wt_pct: *comp_ad_en
+          FeO_wt_pct_as_printed: '4.22 (3)'
+          X_FeO_as_printed: '0.0315 (3)'
+          point_conditions:
+            printed_composition:
+              amount_basis: mass_percent
+              components: *comp_ad_en
+              locator: *loc4_ad_en
+            composition:
+              state:
+                tag: value
+                value:
+                  amount_basis: mass_percent
+                  components: *comp_ad_en
+              locator: *loc4_ad_en
+          gamma: '2.30'
+          gamma_as_printed: '2.30 (5)'
+          admission_status: admitted
+          method_class: directly_reduced_measurement
+          evidence_class: measured_reduced
+          locator:
+            page: 163
+            published_page: 163
+            pdf_page_index: 12
+            table: '7'
+            row: AD+En
+            note: gamma_NiO cell 2.30 (5)
+        - melt: AD+Wo
+          T_C: '1400'
+          oxides_wt_pct: *comp_ad_wo
+          FeO_wt_pct_as_printed: '3.75 (2)'
+          X_FeO_as_printed: '0.0299 (5)'
+          point_conditions:
+            printed_composition:
+              amount_basis: mass_percent
+              components: *comp_ad_wo
+              locator: *loc4_ad_wo
+            composition:
+              state:
+                tag: value
+                value:
+                  amount_basis: mass_percent
+                  components: *comp_ad_wo
+              locator: *loc4_ad_wo
+          gamma: '2.12'
+          gamma_as_printed: '2.12 (5)'
+          admission_status: admitted
+          method_class: directly_reduced_measurement
+          evidence_class: measured_reduced
+          locator:
+            page: 163
+            published_page: 163
+            pdf_page_index: 12
+            table: '7'
+            row: AD+Wo
+            note: gamma_NiO cell 2.12 (5)
+        - melt: AD+Qz
+          T_C: '1400'
+          oxides_wt_pct: *comp_ad_qz
+          FeO_wt_pct_as_printed: '4.15 (7)'
+          X_FeO_as_printed: '0.0328 (6)'
+          point_conditions:
+            printed_composition:
+              amount_basis: mass_percent
+              components: *comp_ad_qz
+              locator: *loc4_ad_qz
+            composition:
+              state:
+                tag: value
+                value:
+                  amount_basis: mass_percent
+                  components: *comp_ad_qz
+              locator: *loc4_ad_qz
+          gamma: '2.86'
+          gamma_as_printed: '2.86 (7)'
+          admission_status: admitted
+          method_class: directly_reduced_measurement
+          evidence_class: measured_reduced
+          locator:
+            page: 163
+            published_page: 163
+            pdf_page_index: 12
+            table: '7'
+            row: AD+Qz
+            note: gamma_NiO cell 2.86 (7)
+        - melt: AD+TiO2
+          T_C: '1400'
+          oxides_wt_pct: *comp_ad_tio2
+          FeO_wt_pct_as_printed: '4.79 (9)'
+          X_FeO_as_printed: '0.0394 (7)'
+          composition_footnote_as_printed: Plus 19.0 wt.% TiO2
+          point_conditions:
+            printed_composition:
+              amount_basis: mass_percent
+              components: *comp_ad_tio2
+              locator: *loc4_ad_tio2
+            composition:
+              state:
+                tag: value
+                value:
+                  amount_basis: mass_percent
+                  components: *comp_ad_tio2
+              locator: *loc4_ad_tio2
+          gamma: '1.44'
+          gamma_as_printed: '1.44 (3)'
+          admission_status: admitted
+          method_class: directly_reduced_measurement
+          evidence_class: measured_reduced
+          locator:
+            page: 163
+            published_page: 163
+            pdf_page_index: 12
+            table: '7'
+            row: AD+TiO2
+            note: gamma_NiO cell 1.44 (3)
+        - melt: A
+          T_C: '1400'
+          oxides_wt_pct: *comp_cmas_a
+          FeO_wt_pct_as_printed: '3.53 (6)'
+          X_FeO_as_printed: '0.0271 (4)'
+          point_conditions:
+            printed_composition:
+              amount_basis: mass_percent
+              components: *comp_cmas_a
+              locator: *loc4_cmas_a
+            composition:
+              state:
+                tag: value
+                value:
+                  amount_basis: mass_percent
+                  components: *comp_cmas_a
+              locator: *loc4_cmas_a
+          gamma: '2.42'
+          gamma_as_printed: '2.42 (5)'
+          admission_status: admitted
+          method_class: directly_reduced_measurement
+          evidence_class: measured_reduced
+          locator:
+            page: 163
+            published_page: 163
+            pdf_page_index: 12
+            table: '7'
+            row: A
+            note: gamma_NiO cell 2.42 (5)
+        - melt: B
+          T_C: '1400'
+          oxides_wt_pct: *comp_cmas_b
+          FeO_wt_pct_as_printed: '4.12 (9)'
+          X_FeO_as_printed: '0.0308 (7)'
+          point_conditions:
+            printed_composition:
+              amount_basis: mass_percent
+              components: *comp_cmas_b
+              locator: *loc4_cmas_b
+            composition:
+              state:
+                tag: value
+                value:
+                  amount_basis: mass_percent
+                  components: *comp_cmas_b
+              locator: *loc4_cmas_b
+          gamma: '2.12'
+          gamma_as_printed: '2.12 (5)'
+          admission_status: admitted
+          method_class: directly_reduced_measurement
+          evidence_class: measured_reduced
+          locator:
+            page: 163
+            published_page: 163
+            pdf_page_index: 12
+            table: '7'
+            row: B
+            note: gamma_NiO cell 2.12 (5)
+        - melt: C
+          T_C: '1400'
+          oxides_wt_pct: *comp_cmas_c
+          FeO_wt_pct_as_printed: '4.47 (6)'
+          X_FeO_as_printed: '0.0337 (4)'
+          point_conditions:
+            printed_composition:
+              amount_basis: mass_percent
+              components: *comp_cmas_c
+              locator: *loc4_cmas_c
+            composition:
+              state:
+                tag: value
+                value:
+                  amount_basis: mass_percent
+                  components: *comp_cmas_c
+              locator: *loc4_cmas_c
+          gamma: '2.03'
+          gamma_as_printed: '2.03 (3)'
+          admission_status: admitted
+          method_class: directly_reduced_measurement
+          evidence_class: measured_reduced
+          locator:
+            page: 163
+            published_page: 163
+            pdf_page_index: 12
+            table: '7'
+            row: C
+            note: gamma_NiO cell 2.03 (3)
+        - melt: D
+          T_C: '1400'
+          oxides_wt_pct: *comp_cmas_d
+          FeO_wt_pct_as_printed: '2.82 (16)'
+          X_FeO_as_printed: '0.0210 (12)'
+          point_conditions:
+            printed_composition:
+              amount_basis: mass_percent
+              components: *comp_cmas_d
+              locator: *loc4_cmas_d
+            composition:
+              state:
+                tag: value
+                value:
+                  amount_basis: mass_percent
+                  components: *comp_cmas_d
+              locator: *loc4_cmas_d
+          gamma: '2.37'
+          gamma_as_printed: '2.37 (7)'
+          admission_status: admitted
+          method_class: directly_reduced_measurement
+          evidence_class: measured_reduced
+          locator:
+            page: 163
+            published_page: 163
+            pdf_page_index: 12
+            table: '7'
+            row: D
+            note: gamma_NiO cell 2.37 (7)
+        - melt: E
+          T_C: '1400'
+          oxides_wt_pct: *comp_cmas_e
+          FeO_wt_pct_as_printed: '3.39 (6)'
+          X_FeO_as_printed: '0.0254 (4)'
+          point_conditions:
+            printed_composition:
+              amount_basis: mass_percent
+              components: *comp_cmas_e
+              locator: *loc4_cmas_e
+            composition:
+              state:
+                tag: value
+                value:
+                  amount_basis: mass_percent
+                  components: *comp_cmas_e
+              locator: *loc4_cmas_e
+          gamma: '2.70'
+          gamma_as_printed: '2.70 (7)'
+          admission_status: admitted
+          method_class: directly_reduced_measurement
+          evidence_class: measured_reduced
+          locator:
+            page: 163
+            published_page: 163
+            pdf_page_index: 12
+            table: '7'
+            row: E
+            note: gamma_NiO cell 2.70 (7)
+        - melt: F
+          T_C: '1400'
+          oxides_wt_pct: *comp_cmas_f
+          FeO_wt_pct_as_printed: '5.42 (5)'
+          X_FeO_as_printed: '0.0420 (4)'
+          point_conditions:
+            printed_composition:
+              amount_basis: mass_percent
+              components: *comp_cmas_f
+              locator: *loc4_cmas_f
+            composition:
+              state:
+                tag: value
+                value:
+                  amount_basis: mass_percent
+                  components: *comp_cmas_f
+              locator: *loc4_cmas_f
+          gamma: '2.15'
+          gamma_as_printed: '2.15 (4)'
+          admission_status: admitted
+          method_class: directly_reduced_measurement
+          evidence_class: measured_reduced
+          locator:
+            page: 163
+            published_page: 163
+            pdf_page_index: 12
+            table: '7'
+            row: F
+            note: gamma_NiO cell 2.15 (4)
+        - melt: G
+          T_C: '1400'
+          oxides_wt_pct: *comp_cmas_g
+          FeO_wt_pct_as_printed: '4.22 (4)'
+          X_FeO_as_printed: '0.0339 (3)'
+          point_conditions:
+            printed_composition:
+              amount_basis: mass_percent
+              components: *comp_cmas_g
+              locator: *loc4_cmas_g
+            composition:
+              state:
+                tag: value
+                value:
+                  amount_basis: mass_percent
+                  components: *comp_cmas_g
+              locator: *loc4_cmas_g
+          gamma: '2.40'
+          gamma_as_printed: '2.40 (6)'
+          admission_status: admitted
+          method_class: directly_reduced_measurement
+          evidence_class: measured_reduced
+          locator:
+            page: 163
+            published_page: 163
+            pdf_page_index: 12
+            table: '7'
+            row: G
+            note: gamma_NiO cell 2.40 (6)
+        - melt: MAS1
+          T_C: '1400'
+          oxides_wt_pct: *comp_mas1
+          missing_component_as_printed: CaO dash
+          FeO_wt_pct_as_printed: '4.76 (8)'
+          X_FeO_as_printed: '0.0356 (6)'
+          point_conditions:
+            printed_composition:
+              amount_basis: mass_percent
+              components: *comp_mas1
+              locator: *loc4_mas1
+            composition:
+              state:
+                tag: value
+                value:
+                  amount_basis: mass_percent
+                  components: *comp_mas1
+              locator: *loc4_mas1
+          gamma: '2.04'
+          gamma_as_printed: '2.04 (5)'
+          admission_status: admitted
+          method_class: directly_reduced_measurement
+          evidence_class: measured_reduced
+          locator:
+            page: 163
+            published_page: 163
+            pdf_page_index: 12
+            table: '7'
+            row: MAS1
+            note: gamma_NiO cell 2.04 (5)
+        - melt: MAS2
+          T_C: '1400'
+          oxides_wt_pct: *comp_mas2
+          missing_component_as_printed: CaO dash
+          FeO_wt_pct_as_printed: '4.81 (7)'
+          X_FeO_as_printed: '0.0350 (5)'
+          point_conditions:
+            printed_composition:
+              amount_basis: mass_percent
+              components: *comp_mas2
+              locator: *loc4_mas2
+            composition:
+              state:
+                tag: value
+                value:
+                  amount_basis: mass_percent
+                  components: *comp_mas2
+              locator: *loc4_mas2
+          gamma: '1.94'
+          gamma_as_printed: '1.94 (6)'
+          admission_status: admitted
+          method_class: directly_reduced_measurement
+          evidence_class: measured_reduced
+          locator:
+            page: 163
+            published_page: 163
+            pdf_page_index: 12
+            table: '7'
+            row: MAS2
+            note: gamma_NiO cell 1.94 (6)
+        - melt: CAS1
+          T_C: '1400'
+          oxides_wt_pct: *comp_cas1
+          missing_component_as_printed: MgO dash
+          FeO_wt_pct_as_printed: '2.49 (6)'
+          X_FeO_as_printed: '0.0198 (4)'
+          point_conditions:
+            printed_composition:
+              amount_basis: mass_percent
+              components: *comp_cas1
+              locator: *loc4_cas1
+            composition:
+              state:
+                tag: value
+                value:
+                  amount_basis: mass_percent
+                  components: *comp_cas1
+              locator: *loc4_cas1
+          gamma: '3.56'
+          gamma_as_printed: '3.56 (9)'
+          admission_status: admitted
+          method_class: directly_reduced_measurement
+          evidence_class: measured_reduced
+          locator:
+            page: 163
+            published_page: 163
+            pdf_page_index: 12
+            table: '7'
+            row: CAS1
+            note: gamma_NiO cell 3.56 (9)
+        - melt: CAS2
+          T_C: '1400'
+          oxides_wt_pct: *comp_cas2
+          missing_component_as_printed: MgO dash
+          FeO_wt_pct_as_printed: '2.53 (16)'
+          X_FeO_as_printed: '0.0202 (12)'
+          point_conditions:
+            printed_composition:
+              amount_basis: mass_percent
+              components: *comp_cas2
+              locator: *loc4_cas2
+            composition:
+              state:
+                tag: value
+                value:
+                  amount_basis: mass_percent
+                  components: *comp_cas2
+              locator: *loc4_cas2
+          gamma: '3.48'
+          gamma_as_printed: '3.48 (9)'
+          admission_status: admitted
+          method_class: directly_reduced_measurement
+          evidence_class: measured_reduced
+          locator:
+            page: 163
+            published_page: 163
+            pdf_page_index: 12
+            table: '7'
+            row: CAS2
+            note: gamma_NiO cell 3.48 (9)
+        - melt: CAS3
+          T_C: '1400'
+          oxides_wt_pct: *comp_cas3
+          missing_component_as_printed: MgO dash
+          FeO_wt_pct_as_printed: '2.02 (6)'
+          X_FeO_as_printed: '0.0163 (4)'
+          point_conditions:
+            printed_composition:
+              amount_basis: mass_percent
+              components: *comp_cas3
+              locator: *loc4_cas3
+            composition:
+              state:
+                tag: value
+                value:
+                  amount_basis: mass_percent
+                  components: *comp_cas3
+              locator: *loc4_cas3
+          gamma: '4.39'
+          gamma_as_printed: '4.39 (11)'
+          admission_status: admitted
+          method_class: directly_reduced_measurement
+          evidence_class: measured_reduced
+          locator:
+            page: 163
+            published_page: 163
+            pdf_page_index: 12
+            table: '7'
+            row: CAS3
+            note: gamma_NiO cell 4.39 (11)
+        - melt: CAS4
+          T_C: '1400'
+          oxides_wt_pct: *comp_cas4
+          missing_component_as_printed: MgO dash
+          FeO_wt_pct_as_printed: '3.91 (4)'
+          X_FeO_as_printed: '0.0315 (4)'
+          point_conditions:
+            printed_composition:
+              amount_basis: mass_percent
+              components: *comp_cas4
+              locator: *loc4_cas4
+            composition:
+              state:
+                tag: value
+                value:
+                  amount_basis: mass_percent
+                  components: *comp_cas4
+              locator: *loc4_cas4
+          gamma: '2.54'
+          gamma_as_printed: '2.54 (5)'
+          admission_status: admitted
+          method_class: directly_reduced_measurement
+          evidence_class: measured_reduced
+          locator:
+            page: 163
+            published_page: 163
+            pdf_page_index: 12
+            table: '7'
+            row: CAS4
+            note: gamma_NiO cell 2.54 (5)
+  CoO:
+    observations:
+    - observation_id: oneill_2002_table7_coo
+      experiment: oneill-2002-fe-saturated-cmas
+      type: activity_coefficient
+      locator:
+        page: 163
+        published_page: 163
+        pdf_page_index: 12
+        table: '7'
+        note: Table 7 gamma_CoO by melt at 1400 °C
+      T_range_K: [1673.15, 1673.15]
+      phase: condensed_liquid
+      standard_state: pure liquid CoO at the temperature and pressure of interest; Table 6 (p. 163) gives Co(s) + 0.5 O2 = CoO(liq) at 1 bar. The paper's general statement is on p. 153.
+      standard_state_locator:
+        page: 153
+        published_page: 153
+        pdf_page_index: 2
+        section: Definition of activity coefficients
+      standard_state_thermodynamic_locator:
+        page: 163
+        published_page: 163
+        pdf_page_index: 12
+        table: '6'
+        row: Co(s) + 0.5O2 = CoO(liq)
+      regime: quench_equilibration
+      units: dimensionless activity coefficient; Table 4 composition values interpreted as wt.%
+      uncertainty:
+        note: Table 7 parenthetical uncertainties are one standard deviation and exclude systematic errors, including standard-state thermodynamic data.
+      values:
+        quantity: activity_coefficient
+        method_class: directly_reduced_measurement
+        evidence_class: measured_reduced
+        admission_status: admitted
+        reference_state_note: "The paper describes the oxide reference as 'pure liquid MOx/2 at the temperature and pressure of interest' (p. 153)."
+        temperature_conversion: T_K = T_C + 273.15; 1400 °C -> 1673.15 K
+        composition_basis_note: Table 4 does not print wt.% in its major-oxide column heading; wt.% is inferred because the EDS compositions sum to about 100 and is also consistent with Table 1.
+        log_fO2:
+          value: '-12.61'
+          units: log10(bar)
+          method_class: model_derived
+          derivation: Calculated by the authors from the CO-CO2 gas mixture; the source says the Fe experiments used 10^-12.61 bars (99% CO).
+          locator:
+            page: 161
+            published_page: 161
+            pdf_page_index: 10
+            table: '4'
+            note: Table 4 caption prints log fO2 = -12.61; p. 156 identifies bars and the CO-CO2 calculation.
+        series:
+        - melt: AD eutectic
+          T_C: '1400'
+          oxides_wt_pct: *comp_ad_eutectic
+          FeO_wt_pct_as_printed: '3.49 (3)'
+          X_FeO_as_printed: '0.0269 (2)'
+          point_conditions:
+            printed_composition:
+              amount_basis: mass_percent
+              components: *comp_ad_eutectic
+              locator: *loc4_ad_eutectic
+            composition:
+              state:
+                tag: value
+                value:
+                  amount_basis: mass_percent
+                  components: *comp_ad_eutectic
+              locator: *loc4_ad_eutectic
+          gamma: '1.12'
+          gamma_as_printed: '1.12 (3)'
+          admission_status: admitted
+          method_class: directly_reduced_measurement
+          evidence_class: measured_reduced
+          locator:
+            page: 163
+            published_page: 163
+            pdf_page_index: 12
+            table: '7'
+            row: AD eutectic
+            note: gamma_CoO cell 1.12 (3)
+        - melt: AD+Fo
+          T_C: '1400'
+          oxides_wt_pct: *comp_ad_fo
+          FeO_wt_pct_as_printed: '3.33 (6)'
+          X_FeO_as_printed: '0.0251 (4)'
+          point_conditions:
+            printed_composition:
+              amount_basis: mass_percent
+              components: *comp_ad_fo
+              locator: *loc4_ad_fo
+            composition:
+              state:
+                tag: value
+                value:
+                  amount_basis: mass_percent
+                  components: *comp_ad_fo
+              locator: *loc4_ad_fo
+          gamma: '1.11'
+          gamma_as_printed: '1.11 (3)'
+          admission_status: admitted
+          method_class: directly_reduced_measurement
+          evidence_class: measured_reduced
+          locator:
+            page: 163
+            published_page: 163
+            pdf_page_index: 12
+            table: '7'
+            row: AD+Fo
+            note: gamma_CoO cell 1.11 (3)
+        - melt: AD+En
+          T_C: '1400'
+          oxides_wt_pct: *comp_ad_en
+          FeO_wt_pct_as_printed: '4.22 (3)'
+          X_FeO_as_printed: '0.0315 (3)'
+          point_conditions:
+            printed_composition:
+              amount_basis: mass_percent
+              components: *comp_ad_en
+              locator: *loc4_ad_en
+            composition:
+              state:
+                tag: value
+                value:
+                  amount_basis: mass_percent
+                  components: *comp_ad_en
+              locator: *loc4_ad_en
+          gamma: '0.88'
+          gamma_as_printed: '0.88 (2)'
+          admission_status: admitted
+          method_class: directly_reduced_measurement
+          evidence_class: measured_reduced
+          locator:
+            page: 163
+            published_page: 163
+            pdf_page_index: 12
+            table: '7'
+            row: AD+En
+            note: gamma_CoO cell 0.88 (2)
+        - melt: AD+Wo
+          T_C: '1400'
+          oxides_wt_pct: *comp_ad_wo
+          FeO_wt_pct_as_printed: '3.75 (2)'
+          X_FeO_as_printed: '0.0299 (5)'
+          point_conditions:
+            printed_composition:
+              amount_basis: mass_percent
+              components: *comp_ad_wo
+              locator: *loc4_ad_wo
+            composition:
+              state:
+                tag: value
+                value:
+                  amount_basis: mass_percent
+                  components: *comp_ad_wo
+              locator: *loc4_ad_wo
+          gamma: '0.98'
+          gamma_as_printed: '0.98 (3)'
+          admission_status: admitted
+          method_class: directly_reduced_measurement
+          evidence_class: measured_reduced
+          locator:
+            page: 163
+            published_page: 163
+            pdf_page_index: 12
+            table: '7'
+            row: AD+Wo
+            note: gamma_CoO cell 0.98 (3)
+        - melt: AD+Qz
+          T_C: '1400'
+          oxides_wt_pct: *comp_ad_qz
+          FeO_wt_pct_as_printed: '4.15 (7)'
+          X_FeO_as_printed: '0.0328 (6)'
+          point_conditions:
+            printed_composition:
+              amount_basis: mass_percent
+              components: *comp_ad_qz
+              locator: *loc4_ad_qz
+            composition:
+              state:
+                tag: value
+                value:
+                  amount_basis: mass_percent
+                  components: *comp_ad_qz
+              locator: *loc4_ad_qz
+          gamma: '1.08'
+          gamma_as_printed: '1.08 (3)'
+          admission_status: admitted
+          method_class: directly_reduced_measurement
+          evidence_class: measured_reduced
+          locator:
+            page: 163
+            published_page: 163
+            pdf_page_index: 12
+            table: '7'
+            row: AD+Qz
+            note: gamma_CoO cell 1.08 (3)
+        - melt: AD+TiO2
+          T_C: '1400'
+          oxides_wt_pct: *comp_ad_tio2
+          FeO_wt_pct_as_printed: '4.79 (9)'
+          X_FeO_as_printed: '0.0394 (7)'
+          composition_footnote_as_printed: Plus 19.0 wt.% TiO2
+          point_conditions:
+            printed_composition:
+              amount_basis: mass_percent
+              components: *comp_ad_tio2
+              locator: *loc4_ad_tio2
+            composition:
+              state:
+                tag: value
+                value:
+                  amount_basis: mass_percent
+                  components: *comp_ad_tio2
+              locator: *loc4_ad_tio2
+          gamma: '0.61'
+          gamma_as_printed: '0.61 (2)'
+          admission_status: admitted
+          method_class: directly_reduced_measurement
+          evidence_class: measured_reduced
+          locator:
+            page: 163
+            published_page: 163
+            pdf_page_index: 12
+            table: '7'
+            row: AD+TiO2
+            note: gamma_CoO cell 0.61 (2)
+        - melt: A
+          T_C: '1400'
+          oxides_wt_pct: *comp_cmas_a
+          FeO_wt_pct_as_printed: '3.53 (6)'
+          X_FeO_as_printed: '0.0271 (4)'
+          point_conditions:
+            printed_composition:
+              amount_basis: mass_percent
+              components: *comp_cmas_a
+              locator: *loc4_cmas_a
+            composition:
+              state:
+                tag: value
+                value:
+                  amount_basis: mass_percent
+                  components: *comp_cmas_a
+              locator: *loc4_cmas_a
+          gamma: '1.00'
+          gamma_as_printed: '1.00 (3)'
+          admission_status: admitted
+          method_class: directly_reduced_measurement
+          evidence_class: measured_reduced
+          locator:
+            page: 163
+            published_page: 163
+            pdf_page_index: 12
+            table: '7'
+            row: A
+            note: gamma_CoO cell 1.00 (3)
+        - melt: B
+          T_C: '1400'
+          oxides_wt_pct: *comp_cmas_b
+          FeO_wt_pct_as_printed: '4.12 (9)'
+          X_FeO_as_printed: '0.0308 (7)'
+          point_conditions:
+            printed_composition:
+              amount_basis: mass_percent
+              components: *comp_cmas_b
+              locator: *loc4_cmas_b
+            composition:
+              state:
+                tag: value
+                value:
+                  amount_basis: mass_percent
+                  components: *comp_cmas_b
+              locator: *loc4_cmas_b
+          gamma: '0.90'
+          gamma_as_printed: '0.90 (2)'
+          admission_status: admitted
+          method_class: directly_reduced_measurement
+          evidence_class: measured_reduced
+          locator:
+            page: 163
+            published_page: 163
+            pdf_page_index: 12
+            table: '7'
+            row: B
+            note: gamma_CoO cell 0.90 (2)
+        - melt: C
+          T_C: '1400'
+          oxides_wt_pct: *comp_cmas_c
+          FeO_wt_pct_as_printed: '4.47 (6)'
+          X_FeO_as_printed: '0.0337 (4)'
+          point_conditions:
+            printed_composition:
+              amount_basis: mass_percent
+              components: *comp_cmas_c
+              locator: *loc4_cmas_c
+            composition:
+              state:
+                tag: value
+                value:
+                  amount_basis: mass_percent
+                  components: *comp_cmas_c
+              locator: *loc4_cmas_c
+          gamma: '0.85'
+          gamma_as_printed: '0.85 (2)'
+          admission_status: admitted
+          method_class: directly_reduced_measurement
+          evidence_class: measured_reduced
+          locator:
+            page: 163
+            published_page: 163
+            pdf_page_index: 12
+            table: '7'
+            row: C
+            note: gamma_CoO cell 0.85 (2)
+        - melt: D
+          T_C: '1400'
+          oxides_wt_pct: *comp_cmas_d
+          FeO_wt_pct_as_printed: '2.82 (16)'
+          X_FeO_as_printed: '0.0210 (12)'
+          point_conditions:
+            printed_composition:
+              amount_basis: mass_percent
+              components: *comp_cmas_d
+              locator: *loc4_cmas_d
+            composition:
+              state:
+                tag: value
+                value:
+                  amount_basis: mass_percent
+                  components: *comp_cmas_d
+              locator: *loc4_cmas_d
+          gamma: '1.15'
+          gamma_as_printed: '1.15 (3)'
+          admission_status: admitted
+          method_class: directly_reduced_measurement
+          evidence_class: measured_reduced
+          locator:
+            page: 163
+            published_page: 163
+            pdf_page_index: 12
+            table: '7'
+            row: D
+            note: gamma_CoO cell 1.15 (3)
+        - melt: E
+          T_C: '1400'
+          oxides_wt_pct: *comp_cmas_e
+          FeO_wt_pct_as_printed: '3.39 (6)'
+          X_FeO_as_printed: '0.0254 (4)'
+          point_conditions:
+            printed_composition:
+              amount_basis: mass_percent
+              components: *comp_cmas_e
+              locator: *loc4_cmas_e
+            composition:
+              state:
+                tag: value
+                value:
+                  amount_basis: mass_percent
+                  components: *comp_cmas_e
+              locator: *loc4_cmas_e
+          gamma: '1.09'
+          gamma_as_printed: '1.09 (3)'
+          admission_status: admitted
+          method_class: directly_reduced_measurement
+          evidence_class: measured_reduced
+          locator:
+            page: 163
+            published_page: 163
+            pdf_page_index: 12
+            table: '7'
+            row: E
+            note: gamma_CoO cell 1.09 (3)
+        - melt: F
+          T_C: '1400'
+          oxides_wt_pct: *comp_cmas_f
+          FeO_wt_pct_as_printed: '5.42 (5)'
+          X_FeO_as_printed: '0.0420 (4)'
+          point_conditions:
+            printed_composition:
+              amount_basis: mass_percent
+              components: *comp_cmas_f
+              locator: *loc4_cmas_f
+            composition:
+              state:
+                tag: value
+                value:
+                  amount_basis: mass_percent
+                  components: *comp_cmas_f
+              locator: *loc4_cmas_f
+          gamma: '0.82'
+          gamma_as_printed: '0.82 (2)'
+          admission_status: admitted
+          method_class: directly_reduced_measurement
+          evidence_class: measured_reduced
+          locator:
+            page: 163
+            published_page: 163
+            pdf_page_index: 12
+            table: '7'
+            row: F
+            note: gamma_CoO cell 0.82 (2)
+        - melt: G
+          T_C: '1400'
+          oxides_wt_pct: *comp_cmas_g
+          FeO_wt_pct_as_printed: '4.22 (4)'
+          X_FeO_as_printed: '0.0339 (3)'
+          point_conditions:
+            printed_composition:
+              amount_basis: mass_percent
+              components: *comp_cmas_g
+              locator: *loc4_cmas_g
+            composition:
+              state:
+                tag: value
+                value:
+                  amount_basis: mass_percent
+                  components: *comp_cmas_g
+              locator: *loc4_cmas_g
+          gamma: '0.95'
+          gamma_as_printed: '0.95 (3)'
+          admission_status: admitted
+          method_class: directly_reduced_measurement
+          evidence_class: measured_reduced
+          locator:
+            page: 163
+            published_page: 163
+            pdf_page_index: 12
+            table: '7'
+            row: G
+            note: gamma_CoO cell 0.95 (3)
+        - melt: MAS1
+          T_C: '1400'
+          oxides_wt_pct: *comp_mas1
+          missing_component_as_printed: CaO dash
+          FeO_wt_pct_as_printed: '4.76 (8)'
+          X_FeO_as_printed: '0.0356 (6)'
+          point_conditions:
+            printed_composition:
+              amount_basis: mass_percent
+              components: *comp_mas1
+              locator: *loc4_mas1
+            composition:
+              state:
+                tag: value
+                value:
+                  amount_basis: mass_percent
+                  components: *comp_mas1
+              locator: *loc4_mas1
+          gamma: '0.81'
+          gamma_as_printed: '0.81 (2)'
+          admission_status: admitted
+          method_class: directly_reduced_measurement
+          evidence_class: measured_reduced
+          locator:
+            page: 163
+            published_page: 163
+            pdf_page_index: 12
+            table: '7'
+            row: MAS1
+            note: gamma_CoO cell 0.81 (2)
+        - melt: MAS2
+          T_C: '1400'
+          oxides_wt_pct: *comp_mas2
+          missing_component_as_printed: CaO dash
+          FeO_wt_pct_as_printed: '4.81 (7)'
+          X_FeO_as_printed: '0.0350 (5)'
+          point_conditions:
+            printed_composition:
+              amount_basis: mass_percent
+              components: *comp_mas2
+              locator: *loc4_mas2
+            composition:
+              state:
+                tag: value
+                value:
+                  amount_basis: mass_percent
+                  components: *comp_mas2
+              locator: *loc4_mas2
+          gamma: '0.81'
+          gamma_as_printed: '0.81 (2)'
+          admission_status: admitted
+          method_class: directly_reduced_measurement
+          evidence_class: measured_reduced
+          locator:
+            page: 163
+            published_page: 163
+            pdf_page_index: 12
+            table: '7'
+            row: MAS2
+            note: gamma_CoO cell 0.81 (2)
+        - melt: CAS1
+          T_C: '1400'
+          oxides_wt_pct: *comp_cas1
+          missing_component_as_printed: MgO dash
+          FeO_wt_pct_as_printed: '2.49 (6)'
+          X_FeO_as_printed: '0.0198 (4)'
+          point_conditions:
+            printed_composition:
+              amount_basis: mass_percent
+              components: *comp_cas1
+              locator: *loc4_cas1
+            composition:
+              state:
+                tag: value
+                value:
+                  amount_basis: mass_percent
+                  components: *comp_cas1
+              locator: *loc4_cas1
+          gamma: '1.62'
+          gamma_as_printed: '1.62 (4)'
+          admission_status: admitted
+          method_class: directly_reduced_measurement
+          evidence_class: measured_reduced
+          locator:
+            page: 163
+            published_page: 163
+            pdf_page_index: 12
+            table: '7'
+            row: CAS1
+            note: gamma_CoO cell 1.62 (4)
+        - melt: CAS2
+          T_C: '1400'
+          oxides_wt_pct: *comp_cas2
+          missing_component_as_printed: MgO dash
+          FeO_wt_pct_as_printed: '2.53 (16)'
+          X_FeO_as_printed: '0.0202 (12)'
+          point_conditions:
+            printed_composition:
+              amount_basis: mass_percent
+              components: *comp_cas2
+              locator: *loc4_cas2
+            composition:
+              state:
+                tag: value
+                value:
+                  amount_basis: mass_percent
+                  components: *comp_cas2
+              locator: *loc4_cas2
+          gamma: '1.58'
+          gamma_as_printed: '1.58 (4)'
+          admission_status: admitted
+          method_class: directly_reduced_measurement
+          evidence_class: measured_reduced
+          locator:
+            page: 163
+            published_page: 163
+            pdf_page_index: 12
+            table: '7'
+            row: CAS2
+            note: gamma_CoO cell 1.58 (4)
+        - melt: CAS3
+          T_C: '1400'
+          oxides_wt_pct: *comp_cas3
+          missing_component_as_printed: MgO dash
+          FeO_wt_pct_as_printed: '2.02 (6)'
+          X_FeO_as_printed: '0.0163 (4)'
+          point_conditions:
+            printed_composition:
+              amount_basis: mass_percent
+              components: *comp_cas3
+              locator: *loc4_cas3
+            composition:
+              state:
+                tag: value
+                value:
+                  amount_basis: mass_percent
+                  components: *comp_cas3
+              locator: *loc4_cas3
+          gamma: '1.29'
+          gamma_as_printed: '1.29 (2)'
+          admission_status: admitted
+          method_class: directly_reduced_measurement
+          evidence_class: measured_reduced
+          locator:
+            page: 163
+            published_page: 163
+            pdf_page_index: 12
+            table: '7'
+            row: CAS3
+            note: gamma_CoO cell 1.29 (2)
+        - melt: CAS4
+          T_C: '1400'
+          oxides_wt_pct: *comp_cas4
+          missing_component_as_printed: MgO dash
+          FeO_wt_pct_as_printed: '3.91 (4)'
+          X_FeO_as_printed: '0.0315 (4)'
+          point_conditions:
+            printed_composition:
+              amount_basis: mass_percent
+              components: *comp_cas4
+              locator: *loc4_cas4
+            composition:
+              state:
+                tag: value
+                value:
+                  amount_basis: mass_percent
+                  components: *comp_cas4
+              locator: *loc4_cas4
+          gamma: '0.94'
+          gamma_as_printed: '0.94 (2)'
+          admission_status: admitted
+          method_class: directly_reduced_measurement
+          evidence_class: measured_reduced
+          locator:
+            page: 163
+            published_page: 163
+            pdf_page_index: 12
+            table: '7'
+            row: CAS4
+            note: gamma_CoO cell 0.94 (2)
+  MoO2:
+    observations:
+    - observation_id: oneill_2002_table7_moo2
+      experiment: oneill-2002-fe-saturated-cmas
+      type: activity_coefficient
+      locator:
+        page: 163
+        published_page: 163
+        pdf_page_index: 12
+        table: '7'
+        note: Table 7 gamma_MoO2 by melt at 1400 °C; pure-liquid MoO2 standard state is hypothetical
+      T_range_K: [1673.15, 1673.15]
+      phase: condensed_liquid
+      standard_state: pure liquid MoO2 (hypothetical); Table 6 (p. 163) estimates MoO2(s) = MoO2(liq) using a hypothetical melting point of 2200 K and entropy of melting 31.4 J K-1 mol-1. The paper's general statement is on p. 153.
+      standard_state_locator:
+        page: 153
+        published_page: 153
+        pdf_page_index: 2
+        section: Definition of activity coefficients
+      standard_state_thermodynamic_locator:
+        page: 163
+        published_page: 163
+        pdf_page_index: 12
+        table: '6'
+        row: MoO2(s) = MoO2(liq)
+      regime: quench_equilibration
+      units: dimensionless activity coefficient; Table 4 composition values interpreted as wt.%
+      uncertainty:
+        note: Table 7 parenthetical uncertainties are one standard deviation and exclude systematic errors, including standard-state thermodynamic data.
+      values:
+        quantity: activity_coefficient
+        method_class: directly_reduced_measurement
+        evidence_class: measured_reduced
+        admission_status: admitted
+        reference_state_note: "The paper describes the oxide reference as 'pure liquid MOx/2 at the temperature and pressure of interest' (p. 153); MoO2(liq) is a hypothetical pure-liquid standard."
+        temperature_conversion: T_K = T_C + 273.15; 1400 °C -> 1673.15 K
+        composition_basis_note: Table 4 does not print wt.% in its major-oxide column heading; wt.% is inferred because the EDS compositions sum to about 100 and is also consistent with Table 1.
+        log_fO2:
+          value: '-12.61'
+          units: log10(bar)
+          method_class: model_derived
+          derivation: Calculated by the authors from the CO-CO2 gas mixture; the source says the Fe experiments used 10^-12.61 bars (99% CO).
+          locator:
+            page: 161
+            published_page: 161
+            pdf_page_index: 10
+            table: '4'
+            note: Table 4 caption prints log fO2 = -12.61; p. 156 identifies bars and the CO-CO2 calculation.
+        series:
+        - melt: AD eutectic
+          T_C: '1400'
+          oxides_wt_pct: *comp_ad_eutectic
+          FeO_wt_pct_as_printed: '3.49 (3)'
+          X_FeO_as_printed: '0.0269 (2)'
+          point_conditions:
+            printed_composition:
+              amount_basis: mass_percent
+              components: *comp_ad_eutectic
+              locator: *loc4_ad_eutectic
+            composition:
+              state:
+                tag: value
+                value:
+                  amount_basis: mass_percent
+                  components: *comp_ad_eutectic
+              locator: *loc4_ad_eutectic
+          gamma: '136'
+          gamma_as_printed: '136 (12)'
+          admission_status: admitted
+          method_class: directly_reduced_measurement
+          evidence_class: measured_reduced
+          locator:
+            page: 163
+            published_page: 163
+            pdf_page_index: 12
+            table: '7'
+            row: AD eutectic
+            note: gamma_MoO2 cell 136 (12)
+        - melt: AD+Fo
+          T_C: '1400'
+          oxides_wt_pct: *comp_ad_fo
+          FeO_wt_pct_as_printed: '3.33 (6)'
+          X_FeO_as_printed: '0.0251 (4)'
+          point_conditions:
+            printed_composition:
+              amount_basis: mass_percent
+              components: *comp_ad_fo
+              locator: *loc4_ad_fo
+            composition:
+              state:
+                tag: value
+                value:
+                  amount_basis: mass_percent
+                  components: *comp_ad_fo
+              locator: *loc4_ad_fo
+          gamma: '131'
+          gamma_as_printed: '131 (14)'
+          admission_status: admitted
+          method_class: directly_reduced_measurement
+          evidence_class: measured_reduced
+          locator:
+            page: 163
+            published_page: 163
+            pdf_page_index: 12
+            table: '7'
+            row: AD+Fo
+            note: gamma_MoO2 cell 131 (14)
+        - melt: AD+En
+          T_C: '1400'
+          oxides_wt_pct: *comp_ad_en
+          FeO_wt_pct_as_printed: '4.22 (3)'
+          X_FeO_as_printed: '0.0315 (3)'
+          point_conditions:
+            printed_composition:
+              amount_basis: mass_percent
+              components: *comp_ad_en
+              locator: *loc4_ad_en
+            composition:
+              state:
+                tag: value
+                value:
+                  amount_basis: mass_percent
+                  components: *comp_ad_en
+              locator: *loc4_ad_en
+          gamma: '168'
+          gamma_as_printed: '168 (13)'
+          admission_status: admitted
+          method_class: directly_reduced_measurement
+          evidence_class: measured_reduced
+          locator:
+            page: 163
+            published_page: 163
+            pdf_page_index: 12
+            table: '7'
+            row: AD+En
+            note: gamma_MoO2 cell 168 (13)
+        - melt: AD+Wo
+          T_C: '1400'
+          oxides_wt_pct: *comp_ad_wo
+          FeO_wt_pct_as_printed: '3.75 (2)'
+          X_FeO_as_printed: '0.0299 (5)'
+          point_conditions:
+            printed_composition:
+              amount_basis: mass_percent
+              components: *comp_ad_wo
+              locator: *loc4_ad_wo
+            composition:
+              state:
+                tag: value
+                value:
+                  amount_basis: mass_percent
+                  components: *comp_ad_wo
+              locator: *loc4_ad_wo
+          gamma: '68'
+          gamma_as_printed: '68 (8)'
+          admission_status: admitted
+          method_class: directly_reduced_measurement
+          evidence_class: measured_reduced
+          locator:
+            page: 163
+            published_page: 163
+            pdf_page_index: 12
+            table: '7'
+            row: AD+Wo
+            note: gamma_MoO2 cell 68 (8)
+        - melt: AD+Qz
+          T_C: '1400'
+          oxides_wt_pct: *comp_ad_qz
+          FeO_wt_pct_as_printed: '4.15 (7)'
+          X_FeO_as_printed: '0.0328 (6)'
+          point_conditions:
+            printed_composition:
+              amount_basis: mass_percent
+              components: *comp_ad_qz
+              locator: *loc4_ad_qz
+            composition:
+              state:
+                tag: value
+                value:
+                  amount_basis: mass_percent
+                  components: *comp_ad_qz
+              locator: *loc4_ad_qz
+          gamma: '227'
+          gamma_as_printed: '227 (16)'
+          admission_status: admitted
+          method_class: directly_reduced_measurement
+          evidence_class: measured_reduced
+          locator:
+            page: 163
+            published_page: 163
+            pdf_page_index: 12
+            table: '7'
+            row: AD+Qz
+            note: gamma_MoO2 cell 227 (16)
+        - melt: AD+TiO2
+          T_C: '1400'
+          oxides_wt_pct: *comp_ad_tio2
+          FeO_wt_pct_as_printed: '4.79 (9)'
+          X_FeO_as_printed: '0.0394 (7)'
+          composition_footnote_as_printed: Plus 19.0 wt.% TiO2
+          point_conditions:
+            printed_composition:
+              amount_basis: mass_percent
+              components: *comp_ad_tio2
+              locator: *loc4_ad_tio2
+            composition:
+              state:
+                tag: value
+                value:
+                  amount_basis: mass_percent
+                  components: *comp_ad_tio2
+              locator: *loc4_ad_tio2
+          gamma: '67'
+          gamma_as_printed: '67 (4)'
+          admission_status: admitted
+          method_class: directly_reduced_measurement
+          evidence_class: measured_reduced
+          locator:
+            page: 163
+            published_page: 163
+            pdf_page_index: 12
+            table: '7'
+            row: AD+TiO2
+            note: gamma_MoO2 cell 67 (4)
+        - melt: A
+          T_C: '1400'
+          oxides_wt_pct: *comp_cmas_a
+          FeO_wt_pct_as_printed: '3.53 (6)'
+          X_FeO_as_printed: '0.0271 (4)'
+          point_conditions:
+            printed_composition:
+              amount_basis: mass_percent
+              components: *comp_cmas_a
+              locator: *loc4_cmas_a
+            composition:
+              state:
+                tag: value
+                value:
+                  amount_basis: mass_percent
+                  components: *comp_cmas_a
+              locator: *loc4_cmas_a
+          gamma: '183'
+          gamma_as_printed: '183 (11)'
+          admission_status: admitted
+          method_class: directly_reduced_measurement
+          evidence_class: measured_reduced
+          locator:
+            page: 163
+            published_page: 163
+            pdf_page_index: 12
+            table: '7'
+            row: A
+            note: gamma_MoO2 cell 183 (11)
+        - melt: B
+          T_C: '1400'
+          oxides_wt_pct: *comp_cmas_b
+          FeO_wt_pct_as_printed: '4.12 (9)'
+          X_FeO_as_printed: '0.0308 (7)'
+          point_conditions:
+            printed_composition:
+              amount_basis: mass_percent
+              components: *comp_cmas_b
+              locator: *loc4_cmas_b
+            composition:
+              state:
+                tag: value
+                value:
+                  amount_basis: mass_percent
+                  components: *comp_cmas_b
+              locator: *loc4_cmas_b
+          gamma: '209'
+          gamma_as_printed: '209 (12)'
+          admission_status: admitted
+          method_class: directly_reduced_measurement
+          evidence_class: measured_reduced
+          locator:
+            page: 163
+            published_page: 163
+            pdf_page_index: 12
+            table: '7'
+            row: B
+            note: gamma_MoO2 cell 209 (12)
+        - melt: C
+          T_C: '1400'
+          oxides_wt_pct: *comp_cmas_c
+          FeO_wt_pct_as_printed: '4.47 (6)'
+          X_FeO_as_printed: '0.0337 (4)'
+          point_conditions:
+            printed_composition:
+              amount_basis: mass_percent
+              components: *comp_cmas_c
+              locator: *loc4_cmas_c
+            composition:
+              state:
+                tag: value
+                value:
+                  amount_basis: mass_percent
+                  components: *comp_cmas_c
+              locator: *loc4_cmas_c
+          gamma: '150'
+          gamma_as_printed: '150 (10)'
+          admission_status: admitted
+          method_class: directly_reduced_measurement
+          evidence_class: measured_reduced
+          locator:
+            page: 163
+            published_page: 163
+            pdf_page_index: 12
+            table: '7'
+            row: C
+            note: gamma_MoO2 cell 150 (10)
+        - melt: D
+          T_C: '1400'
+          oxides_wt_pct: *comp_cmas_d
+          FeO_wt_pct_as_printed: '2.82 (16)'
+          X_FeO_as_printed: '0.0210 (12)'
+          point_conditions:
+            printed_composition:
+              amount_basis: mass_percent
+              components: *comp_cmas_d
+              locator: *loc4_cmas_d
+            composition:
+              state:
+                tag: value
+                value:
+                  amount_basis: mass_percent
+                  components: *comp_cmas_d
+              locator: *loc4_cmas_d
+          gamma: '188'
+          gamma_as_printed: '188 (12)'
+          admission_status: admitted
+          method_class: directly_reduced_measurement
+          evidence_class: measured_reduced
+          locator:
+            page: 163
+            published_page: 163
+            pdf_page_index: 12
+            table: '7'
+            row: D
+            note: gamma_MoO2 cell 188 (12)
+        - melt: E
+          T_C: '1400'
+          oxides_wt_pct: *comp_cmas_e
+          FeO_wt_pct_as_printed: '3.39 (6)'
+          X_FeO_as_printed: '0.0254 (4)'
+          point_conditions:
+            printed_composition:
+              amount_basis: mass_percent
+              components: *comp_cmas_e
+              locator: *loc4_cmas_e
+            composition:
+              state:
+                tag: value
+                value:
+                  amount_basis: mass_percent
+                  components: *comp_cmas_e
+              locator: *loc4_cmas_e
+          gamma: '114'
+          gamma_as_printed: '114 (9)'
+          admission_status: admitted
+          method_class: directly_reduced_measurement
+          evidence_class: measured_reduced
+          locator:
+            page: 163
+            published_page: 163
+            pdf_page_index: 12
+            table: '7'
+            row: E
+            note: gamma_MoO2 cell 114 (9)
+        - melt: F
+          T_C: '1400'
+          oxides_wt_pct: *comp_cmas_f
+          FeO_wt_pct_as_printed: '5.42 (5)'
+          X_FeO_as_printed: '0.0420 (4)'
+          point_conditions:
+            printed_composition:
+              amount_basis: mass_percent
+              components: *comp_cmas_f
+              locator: *loc4_cmas_f
+            composition:
+              state:
+                tag: value
+                value:
+                  amount_basis: mass_percent
+                  components: *comp_cmas_f
+              locator: *loc4_cmas_f
+          gamma: '152'
+          gamma_as_printed: '152 (10)'
+          admission_status: admitted
+          method_class: directly_reduced_measurement
+          evidence_class: measured_reduced
+          locator:
+            page: 163
+            published_page: 163
+            pdf_page_index: 12
+            table: '7'
+            row: F
+            note: gamma_MoO2 cell 152 (10)
+        - melt: MAS1
+          T_C: '1400'
+          oxides_wt_pct: *comp_mas1
+          missing_component_as_printed: CaO dash
+          FeO_wt_pct_as_printed: '4.76 (8)'
+          X_FeO_as_printed: '0.0356 (6)'
+          point_conditions:
+            printed_composition:
+              amount_basis: mass_percent
+              components: *comp_mas1
+              locator: *loc4_mas1
+            composition:
+              state:
+                tag: value
+                value:
+                  amount_basis: mass_percent
+                  components: *comp_mas1
+              locator: *loc4_mas1
+          gamma: '446'
+          gamma_as_printed: '446 (117)'
+          admission_status: admitted
+          method_class: directly_reduced_measurement
+          evidence_class: measured_reduced
+          locator:
+            page: 163
+            published_page: 163
+            pdf_page_index: 12
+            table: '7'
+            row: MAS1
+            note: gamma_MoO2 cell 446 (117)
+        - melt: MAS2
+          T_C: '1400'
+          oxides_wt_pct: *comp_mas2
+          missing_component_as_printed: CaO dash
+          FeO_wt_pct_as_printed: '4.81 (7)'
+          X_FeO_as_printed: '0.0350 (5)'
+          point_conditions:
+            printed_composition:
+              amount_basis: mass_percent
+              components: *comp_mas2
+              locator: *loc4_mas2
+            composition:
+              state:
+                tag: value
+                value:
+                  amount_basis: mass_percent
+                  components: *comp_mas2
+              locator: *loc4_mas2
+          gamma: '221'
+          gamma_as_printed: '221 (12)'
+          admission_status: admitted
+          method_class: directly_reduced_measurement
+          evidence_class: measured_reduced
+          locator:
+            page: 163
+            published_page: 163
+            pdf_page_index: 12
+            table: '7'
+            row: MAS2
+            note: gamma_MoO2 cell 221 (12)
+        - melt: CAS1
+          T_C: '1400'
+          oxides_wt_pct: *comp_cas1
+          missing_component_as_printed: MgO dash
+          FeO_wt_pct_as_printed: '2.49 (6)'
+          X_FeO_as_printed: '0.0198 (4)'
+          point_conditions:
+            printed_composition:
+              amount_basis: mass_percent
+              components: *comp_cas1
+              locator: *loc4_cas1
+            composition:
+              state:
+                tag: value
+                value:
+                  amount_basis: mass_percent
+                  components: *comp_cas1
+              locator: *loc4_cas1
+          gamma: '44'
+          gamma_as_printed: '44 (5)'
+          admission_status: admitted
+          method_class: directly_reduced_measurement
+          evidence_class: measured_reduced
+          locator:
+            page: 163
+            published_page: 163
+            pdf_page_index: 12
+            table: '7'
+            row: CAS1
+            note: gamma_MoO2 cell 44 (5)
+        - melt: CAS2
+          T_C: '1400'
+          oxides_wt_pct: *comp_cas2
+          missing_component_as_printed: MgO dash
+          FeO_wt_pct_as_printed: '2.53 (16)'
+          X_FeO_as_printed: '0.0202 (12)'
+          point_conditions:
+            printed_composition:
+              amount_basis: mass_percent
+              components: *comp_cas2
+              locator: *loc4_cas2
+            composition:
+              state:
+                tag: value
+                value:
+                  amount_basis: mass_percent
+                  components: *comp_cas2
+              locator: *loc4_cas2
+          gamma: '19'
+          gamma_as_printed: '19 (2)'
+          admission_status: admitted
+          method_class: directly_reduced_measurement
+          evidence_class: measured_reduced
+          locator:
+            page: 163
+            published_page: 163
+            pdf_page_index: 12
+            table: '7'
+            row: CAS2
+            note: gamma_MoO2 cell 19 (2)
+        - melt: CAS4
+          T_C: '1400'
+          oxides_wt_pct: *comp_cas4
+          missing_component_as_printed: MgO dash
+          FeO_wt_pct_as_printed: '3.91 (4)'
+          X_FeO_as_printed: '0.0315 (4)'
+          point_conditions:
+            printed_composition:
+              amount_basis: mass_percent
+              components: *comp_cas4
+              locator: *loc4_cas4
+            composition:
+              state:
+                tag: value
+                value:
+                  amount_basis: mass_percent
+                  components: *comp_cas4
+              locator: *loc4_cas4
+          gamma: '83'
+          gamma_as_printed: '83 (8)'
+          admission_status: admitted
+          method_class: directly_reduced_measurement
+          evidence_class: measured_reduced
+          locator:
+            page: 163
+            published_page: 163
+            pdf_page_index: 12
+            table: '7'
+            row: CAS4
+            note: gamma_MoO2 cell 83 (8)
+  MoO3:
+    observations:
+    - observation_id: oneill_2002_table7_moo3
+      experiment: oneill-2002-fe-saturated-cmas
+      type: activity_coefficient
+      locator:
+        page: 163
+        published_page: 163
+        pdf_page_index: 12
+        table: '7'
+        note: Table 7 gamma_MoO3 by melt at 1400 °C
+      T_range_K: [1673.15, 1673.15]
+      phase: condensed_liquid
+      standard_state: pure liquid MoO3; Table 6 (p. 163) gives Mo(s) + 1.5O2 = MoO3(liq) at 1 bar. The paper's general statement is on p. 153.
+      standard_state_locator:
+        page: 153
+        published_page: 153
+        pdf_page_index: 2
+        section: Definition of activity coefficients
+      standard_state_thermodynamic_locator:
+        page: 163
+        published_page: 163
+        pdf_page_index: 12
+        table: '6'
+        row: Mo(s) + 1.5O2 = MoO3(liq)
+      regime: quench_equilibration
+      units: dimensionless activity coefficient; Table 4 composition values interpreted as wt.%
+      uncertainty:
+        note: Table 7 parenthetical uncertainties are one standard deviation and exclude systematic errors, including standard-state thermodynamic data.
+      values:
+        quantity: activity_coefficient
+        method_class: directly_reduced_measurement
+        evidence_class: measured_reduced
+        admission_status: admitted
+        reference_state_note: "The paper describes the oxide reference as 'pure liquid MOx/2 at the temperature and pressure of interest' (p. 153)."
+        temperature_conversion: T_K = T_C + 273.15; 1400 °C -> 1673.15 K
+        composition_basis_note: Table 4 does not print wt.% in its major-oxide column heading; wt.% is inferred because the EDS compositions sum to about 100 and is also consistent with Table 1.
+        log_fO2:
+          value: '-12.61'
+          units: log10(bar)
+          method_class: model_derived
+          derivation: Calculated by the authors from the CO-CO2 gas mixture; the source says the Fe experiments used 10^-12.61 bars (99% CO).
+          locator:
+            page: 161
+            published_page: 161
+            pdf_page_index: 10
+            table: '4'
+            note: Table 4 caption prints log fO2 = -12.61; p. 156 identifies bars and the CO-CO2 calculation.
+        series:
+        - melt: AD eutectic
+          T_C: '1400'
+          oxides_wt_pct: *comp_ad_eutectic
+          FeO_wt_pct_as_printed: '3.49 (3)'
+          X_FeO_as_printed: '0.0269 (2)'
+          point_conditions:
+            printed_composition:
+              amount_basis: mass_percent
+              components: *comp_ad_eutectic
+              locator: *loc4_ad_eutectic
+            composition:
+              state:
+                tag: value
+                value:
+                  amount_basis: mass_percent
+                  components: *comp_ad_eutectic
+              locator: *loc4_ad_eutectic
+          gamma: '0.303'
+          gamma_as_printed: '0.303 (25)'
+          admission_status: admitted
+          method_class: directly_reduced_measurement
+          evidence_class: measured_reduced
+          locator:
+            page: 163
+            published_page: 163
+            pdf_page_index: 12
+            table: '7'
+            row: AD eutectic
+            note: gamma_MoO3 cell 0.303 (25)
+        - melt: AD+Fo
+          T_C: '1400'
+          oxides_wt_pct: *comp_ad_fo
+          FeO_wt_pct_as_printed: '3.33 (6)'
+          X_FeO_as_printed: '0.0251 (4)'
+          point_conditions:
+            printed_composition:
+              amount_basis: mass_percent
+              components: *comp_ad_fo
+              locator: *loc4_ad_fo
+            composition:
+              state:
+                tag: value
+                value:
+                  amount_basis: mass_percent
+                  components: *comp_ad_fo
+              locator: *loc4_ad_fo
+          gamma: '0.290'
+          gamma_as_printed: '0.290 (33)'
+          admission_status: admitted
+          method_class: directly_reduced_measurement
+          evidence_class: measured_reduced
+          locator:
+            page: 163
+            published_page: 163
+            pdf_page_index: 12
+            table: '7'
+            row: AD+Fo
+            note: gamma_MoO3 cell 0.290 (33)
+        - melt: AD+En
+          T_C: '1400'
+          oxides_wt_pct: *comp_ad_en
+          FeO_wt_pct_as_printed: '4.22 (3)'
+          X_FeO_as_printed: '0.0315 (3)'
+          point_conditions:
+            printed_composition:
+              amount_basis: mass_percent
+              components: *comp_ad_en
+              locator: *loc4_ad_en
+            composition:
+              state:
+                tag: value
+                value:
+                  amount_basis: mass_percent
+                  components: *comp_ad_en
+              locator: *loc4_ad_en
+          gamma: '0.433'
+          gamma_as_printed: '0.433 (38)'
+          admission_status: admitted
+          method_class: directly_reduced_measurement
+          evidence_class: measured_reduced
+          locator:
+            page: 163
+            published_page: 163
+            pdf_page_index: 12
+            table: '7'
+            row: AD+En
+            note: gamma_MoO3 cell 0.433 (38)
+        - melt: AD+Wo
+          T_C: '1400'
+          oxides_wt_pct: *comp_ad_wo
+          FeO_wt_pct_as_printed: '3.75 (2)'
+          X_FeO_as_printed: '0.0299 (5)'
+          point_conditions:
+            printed_composition:
+              amount_basis: mass_percent
+              components: *comp_ad_wo
+              locator: *loc4_ad_wo
+            composition:
+              state:
+                tag: value
+                value:
+                  amount_basis: mass_percent
+                  components: *comp_ad_wo
+              locator: *loc4_ad_wo
+          gamma: '0.094'
+          gamma_as_printed: '0.094 (7)'
+          admission_status: admitted
+          method_class: directly_reduced_measurement
+          evidence_class: measured_reduced
+          locator:
+            page: 163
+            published_page: 163
+            pdf_page_index: 12
+            table: '7'
+            row: AD+Wo
+            note: gamma_MoO3 cell 0.094 (7)
+        - melt: AD+Qz
+          T_C: '1400'
+          oxides_wt_pct: *comp_ad_qz
+          FeO_wt_pct_as_printed: '4.15 (7)'
+          X_FeO_as_printed: '0.0328 (6)'
+          point_conditions:
+            printed_composition:
+              amount_basis: mass_percent
+              components: *comp_ad_qz
+              locator: *loc4_ad_qz
+            composition:
+              state:
+                tag: value
+                value:
+                  amount_basis: mass_percent
+                  components: *comp_ad_qz
+              locator: *loc4_ad_qz
+          gamma: '0.793'
+          gamma_as_printed: '0.793 (78)'
+          admission_status: admitted
+          method_class: directly_reduced_measurement
+          evidence_class: measured_reduced
+          locator:
+            page: 163
+            published_page: 163
+            pdf_page_index: 12
+            table: '7'
+            row: AD+Qz
+            note: gamma_MoO3 cell 0.793 (78)
+        - melt: AD+TiO2
+          T_C: '1400'
+          oxides_wt_pct: *comp_ad_tio2
+          FeO_wt_pct_as_printed: '4.79 (9)'
+          X_FeO_as_printed: '0.0394 (7)'
+          composition_footnote_as_printed: Plus 19.0 wt.% TiO2
+          point_conditions:
+            printed_composition:
+              amount_basis: mass_percent
+              components: *comp_ad_tio2
+              locator: *loc4_ad_tio2
+            composition:
+              state:
+                tag: value
+                value:
+                  amount_basis: mass_percent
+                  components: *comp_ad_tio2
+              locator: *loc4_ad_tio2
+          gamma: '0.325'
+          gamma_as_printed: '0.325 (36)'
+          admission_status: admitted
+          method_class: directly_reduced_measurement
+          evidence_class: measured_reduced
+          locator:
+            page: 163
+            published_page: 163
+            pdf_page_index: 12
+            table: '7'
+            row: AD+TiO2
+            note: gamma_MoO3 cell 0.325 (36)
+        - melt: A
+          T_C: '1400'
+          oxides_wt_pct: *comp_cmas_a
+          FeO_wt_pct_as_printed: '3.53 (6)'
+          X_FeO_as_printed: '0.0271 (4)'
+          point_conditions:
+            printed_composition:
+              amount_basis: mass_percent
+              components: *comp_cmas_a
+              locator: *loc4_cmas_a
+            composition:
+              state:
+                tag: value
+                value:
+                  amount_basis: mass_percent
+                  components: *comp_cmas_a
+              locator: *loc4_cmas_a
+          gamma: '0.692'
+          gamma_as_printed: '0.692 (51)'
+          admission_status: admitted
+          method_class: directly_reduced_measurement
+          evidence_class: measured_reduced
+          locator:
+            page: 163
+            published_page: 163
+            pdf_page_index: 12
+            table: '7'
+            row: A
+            note: gamma_MoO3 cell 0.692 (51)
+        - melt: B
+          T_C: '1400'
+          oxides_wt_pct: *comp_cmas_b
+          FeO_wt_pct_as_printed: '4.12 (9)'
+          X_FeO_as_printed: '0.0308 (7)'
+          point_conditions:
+            printed_composition:
+              amount_basis: mass_percent
+              components: *comp_cmas_b
+              locator: *loc4_cmas_b
+            composition:
+              state:
+                tag: value
+                value:
+                  amount_basis: mass_percent
+                  components: *comp_cmas_b
+              locator: *loc4_cmas_b
+          gamma: '0.814'
+          gamma_as_printed: '0.814 (61)'
+          admission_status: admitted
+          method_class: directly_reduced_measurement
+          evidence_class: measured_reduced
+          locator:
+            page: 163
+            published_page: 163
+            pdf_page_index: 12
+            table: '7'
+            row: B
+            note: gamma_MoO3 cell 0.814 (61)
+        - melt: C
+          T_C: '1400'
+          oxides_wt_pct: *comp_cmas_c
+          FeO_wt_pct_as_printed: '4.47 (6)'
+          X_FeO_as_printed: '0.0337 (4)'
+          point_conditions:
+            printed_composition:
+              amount_basis: mass_percent
+              components: *comp_cmas_c
+              locator: *loc4_cmas_c
+            composition:
+              state:
+                tag: value
+                value:
+                  amount_basis: mass_percent
+                  components: *comp_cmas_c
+              locator: *loc4_cmas_c
+          gamma: '0.463'
+          gamma_as_printed: '0.463 (32)'
+          admission_status: admitted
+          method_class: directly_reduced_measurement
+          evidence_class: measured_reduced
+          locator:
+            page: 163
+            published_page: 163
+            pdf_page_index: 12
+            table: '7'
+            row: C
+            note: gamma_MoO3 cell 0.463 (32)
+        - melt: D
+          T_C: '1400'
+          oxides_wt_pct: *comp_cmas_d
+          FeO_wt_pct_as_printed: '2.82 (16)'
+          X_FeO_as_printed: '0.0210 (12)'
+          point_conditions:
+            printed_composition:
+              amount_basis: mass_percent
+              components: *comp_cmas_d
+              locator: *loc4_cmas_d
+            composition:
+              state:
+                tag: value
+                value:
+                  amount_basis: mass_percent
+                  components: *comp_cmas_d
+              locator: *loc4_cmas_d
+          gamma: '0.569'
+          gamma_as_printed: '0.569 (39)'
+          admission_status: admitted
+          method_class: directly_reduced_measurement
+          evidence_class: measured_reduced
+          locator:
+            page: 163
+            published_page: 163
+            pdf_page_index: 12
+            table: '7'
+            row: D
+            note: gamma_MoO3 cell 0.569 (39)
+        - melt: E
+          T_C: '1400'
+          oxides_wt_pct: *comp_cmas_e
+          FeO_wt_pct_as_printed: '3.39 (6)'
+          X_FeO_as_printed: '0.0254 (4)'
+          point_conditions:
+            printed_composition:
+              amount_basis: mass_percent
+              components: *comp_cmas_e
+              locator: *loc4_cmas_e
+            composition:
+              state:
+                tag: value
+                value:
+                  amount_basis: mass_percent
+                  components: *comp_cmas_e
+              locator: *loc4_cmas_e
+          gamma: '0.240'
+          gamma_as_printed: '0.240 (15)'
+          admission_status: admitted
+          method_class: directly_reduced_measurement
+          evidence_class: measured_reduced
+          locator:
+            page: 163
+            published_page: 163
+            pdf_page_index: 12
+            table: '7'
+            row: E
+            note: gamma_MoO3 cell 0.240 (15)
+        - melt: F
+          T_C: '1400'
+          oxides_wt_pct: *comp_cmas_f
+          FeO_wt_pct_as_printed: '5.42 (5)'
+          X_FeO_as_printed: '0.0420 (4)'
+          point_conditions:
+            printed_composition:
+              amount_basis: mass_percent
+              components: *comp_cmas_f
+              locator: *loc4_cmas_f
+            composition:
+              state:
+                tag: value
+                value:
+                  amount_basis: mass_percent
+                  components: *comp_cmas_f
+              locator: *loc4_cmas_f
+          gamma: '0.496'
+          gamma_as_printed: '0.496 (35)'
+          admission_status: admitted
+          method_class: directly_reduced_measurement
+          evidence_class: measured_reduced
+          locator:
+            page: 163
+            published_page: 163
+            pdf_page_index: 12
+            table: '7'
+            row: F
+            note: gamma_MoO3 cell 0.496 (35)
+        - melt: MAS1
+          T_C: '1400'
+          oxides_wt_pct: *comp_mas1
+          missing_component_as_printed: CaO dash
+          FeO_wt_pct_as_printed: '4.76 (8)'
+          X_FeO_as_printed: '0.0356 (6)'
+          point_conditions:
+            printed_composition:
+              amount_basis: mass_percent
+              components: *comp_mas1
+              locator: *loc4_mas1
+            composition:
+              state:
+                tag: value
+                value:
+                  amount_basis: mass_percent
+                  components: *comp_mas1
+              locator: *loc4_mas1
+          gamma: '1.37'
+          gamma_as_printed: '1.37 (24)'
+          admission_status: admitted
+          method_class: directly_reduced_measurement
+          evidence_class: measured_reduced
+          locator:
+            page: 163
+            published_page: 163
+            pdf_page_index: 12
+            table: '7'
+            row: MAS1
+            note: gamma_MoO3 cell 1.37 (24)
+        - melt: MAS2
+          T_C: '1400'
+          oxides_wt_pct: *comp_mas2
+          missing_component_as_printed: CaO dash
+          FeO_wt_pct_as_printed: '4.81 (7)'
+          X_FeO_as_printed: '0.0350 (5)'
+          point_conditions:
+            printed_composition:
+              amount_basis: mass_percent
+              components: *comp_mas2
+              locator: *loc4_mas2
+            composition:
+              state:
+                tag: value
+                value:
+                  amount_basis: mass_percent
+                  components: *comp_mas2
+              locator: *loc4_mas2
+          gamma: '1.64'
+          gamma_as_printed: '1.64 (23)'
+          admission_status: admitted
+          method_class: directly_reduced_measurement
+          evidence_class: measured_reduced
+          locator:
+            page: 163
+            published_page: 163
+            pdf_page_index: 12
+            table: '7'
+            row: MAS2
+            note: gamma_MoO3 cell 1.64 (23)
+        - melt: CAS1
+          T_C: '1400'
+          oxides_wt_pct: *comp_cas1
+          missing_component_as_printed: MgO dash
+          FeO_wt_pct_as_printed: '2.49 (6)'
+          X_FeO_as_printed: '0.0198 (4)'
+          point_conditions:
+            printed_composition:
+              amount_basis: mass_percent
+              components: *comp_cas1
+              locator: *loc4_cas1
+            composition:
+              state:
+                tag: value
+                value:
+                  amount_basis: mass_percent
+                  components: *comp_cas1
+              locator: *loc4_cas1
+          gamma: '0.079'
+          gamma_as_printed: '0.079 (6)'
+          admission_status: admitted
+          method_class: directly_reduced_measurement
+          evidence_class: measured_reduced
+          locator:
+            page: 163
+            published_page: 163
+            pdf_page_index: 12
+            table: '7'
+            row: CAS1
+            note: gamma_MoO3 cell 0.079 (6)
+        - melt: CAS2
+          T_C: '1400'
+          oxides_wt_pct: *comp_cas2
+          missing_component_as_printed: MgO dash
+          FeO_wt_pct_as_printed: '2.53 (16)'
+          X_FeO_as_printed: '0.0202 (12)'
+          point_conditions:
+            printed_composition:
+              amount_basis: mass_percent
+              components: *comp_cas2
+              locator: *loc4_cas2
+            composition:
+              state:
+                tag: value
+                value:
+                  amount_basis: mass_percent
+                  components: *comp_cas2
+              locator: *loc4_cas2
+          gamma: '0.027'
+          gamma_as_printed: '0.027 (2)'
+          admission_status: admitted
+          method_class: directly_reduced_measurement
+          evidence_class: measured_reduced
+          locator:
+            page: 163
+            published_page: 163
+            pdf_page_index: 12
+            table: '7'
+            row: CAS2
+            note: gamma_MoO3 cell 0.027 (2)
+        - melt: CAS4
+          T_C: '1400'
+          oxides_wt_pct: *comp_cas4
+          missing_component_as_printed: MgO dash
+          FeO_wt_pct_as_printed: '3.91 (4)'
+          X_FeO_as_printed: '0.0315 (4)'
+          point_conditions:
+            printed_composition:
+              amount_basis: mass_percent
+              components: *comp_cas4
+              locator: *loc4_cas4
+            composition:
+              state:
+                tag: value
+                value:
+                  amount_basis: mass_percent
+                  components: *comp_cas4
+              locator: *loc4_cas4
+          gamma: '0.201'
+          gamma_as_printed: '0.201 (18)'
+          admission_status: admitted
+          method_class: directly_reduced_measurement
+          evidence_class: measured_reduced
+          locator:
+            page: 163
+            published_page: 163
+            pdf_page_index: 12
+            table: '7'
+            row: CAS4
+            note: gamma_MoO3 cell 0.201 (18)

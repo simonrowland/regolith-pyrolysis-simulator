@@ -194,9 +194,12 @@ class NoticeKind(StrEnum):
     COMPARISON_METHOD_CELL_CONSTANT_CANCELS = "comparison_method_cell_constant_cancels"
     PROBABLE_SOURCE_MISPRINT = "probable_source_misprint"
     UNVERIFIED_APPARATUS = "unverified_apparatus"
+    CELL_MATERIAL_INFERRED = "cell_material_inferred"
     COMPOSITION_FROM_SAMPLE_CATALOG = "composition_from_sample_catalog"
     IMCC_COMPLEX_SATURATION = "imcc_complex_saturation"
     REFERENCE_PHASE_BY_CONVENTION = "reference_phase_by_convention"
+    # Extract omitted admission or said pending/pending_validation; d-056 admits by default, not a reviewer decision.
+    ADMISSION_DEFAULTED = "admission_defaulted"
 
 
 class ReferenceStateConvention(StrEnum):

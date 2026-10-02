@@ -24,11 +24,12 @@ YAML and risk fidelity-sample drift. Sibling files leave extracts untouched.
 
 Residuals are not generated (chunk 2). Pins are not touched.
 
-Absence is never a measured zero: missing admission/class/pressure/phase/
-method become ``unknown`` (or ``pending`` for admission), never admitted /
-certified / 101325 Pa / liquid / knudsen_effusion. Unknown rail spellings
-raise. Unmapped phase strings are ``State.unknown`` on ``Species.phase``
-and queued; they are never stored as gas.
+Absence is never a measured zero: a numbered literature row with missing
+admission is admitted by default with a visible notice under owner ruling
+d-056; no-number rows remain pending. Missing class/pressure/phase/method
+remain unknown, never certified / 101325 Pa / liquid / knudsen_effusion.
+Unknown rail spellings raise. Unmapped phase strings are ``State.unknown``
+on ``Species.phase`` and queued; they are never stored as gas.
 """
 
 from __future__ import annotations
@@ -86,7 +87,7 @@ from simulator.battery.identity import (
     atm_to_pa,
     bar_to_pa,
     celsius_to_kelvin,
-    _melt_activity_uncompared_axes,
+    _uncompared_axes_for,
     identity_equal,
     profile_for,
 )
@@ -1376,7 +1377,59 @@ def _evidence_from_plain(payload: object) -> Evidence:
     )
 
 
-def _admission_from_plain(payload: object) -> Admission:
+_NO_ADMISSION_STATUS_REASON = "no observation admission_status mapped from source"
+_ADMISSION_DEFAULTED_PREFIX = "admission_defaulted:"
+_DEFAULTABLE_PENDING_REASONS = {
+    _NO_ADMISSION_STATUS_REASON,
+    "source admission_status=pending",
+    "source admission_status=pending_validation is not a closed v2.1 token",
+}
+_NUMERIC_OBSERVATION_VALUE_KINDS = frozenset(
+    {
+        "point",
+        "series",
+        "bound",
+        "interval",
+        "relative_series",
+    }
+)
+
+
+def _defaulted_admission(source_reason: str) -> Admission:
+    return Admission(
+        status=AdmissionStatus.ADMITTED,
+        reason=(
+            f"{_ADMISSION_DEFAULTED_PREFIX} {source_reason}; "
+            "owner ruling d-056; not a reviewer decision"
+        ),
+    )
+
+
+def _admission_default_notice(
+    admission: Admission,
+    quantity: Quantity | State[Quantity],
+    observation_id: str,
+) -> Notice | None:
+    if (
+        admission.status is not AdmissionStatus.ADMITTED
+        or not admission.reason.startswith(_ADMISSION_DEFAULTED_PREFIX)
+    ):
+        return None
+    if isinstance(quantity, State):
+        if not quantity.is_value:
+            return None
+        quantity = quantity.value
+    if not isinstance(quantity, Quantity):
+        return None
+    return Notice(
+        kind=NoticeKind.ADMISSION_DEFAULTED,
+        affected_quantities=(quantity,),
+        reason=admission.reason,
+        origin=observation_id,
+    )
+
+
+def _admission_from_plain(payload: object, *, value: Value) -> Admission:
     assert isinstance(payload, Mapping)
     decided = None
     raw_decided = payload.get("decided_by")
@@ -1387,9 +1440,28 @@ def _admission_from_plain(payload: object) -> Admission:
             evidence=_locator_from_plain(raw_decided.get("evidence"))
             or Locator(note="admission-decision"),
         )
+    raw_status = payload.get("status")
+    reason = str(payload.get("reason") or _NO_ADMISSION_STATUS_REASON)
+    status_text = str(raw_status or "pending")
+    has_numeric_value = value.kind.value in _NUMERIC_OBSERVATION_VALUE_KINDS
+    if (
+        not payload.get("superseded_by")
+        and decided is None
+        and has_numeric_value
+        and (
+            (status_text == "pending" and reason in _DEFAULTABLE_PENDING_REASONS)
+            or status_text == "pending_validation"
+        )
+    ):
+        default_reason = (
+            reason
+            if reason in _DEFAULTABLE_PENDING_REASONS
+            else f"source admission_status={status_text}"
+        )
+        return _defaulted_admission(default_reason)
     return Admission(
-        status=AdmissionStatus(str(payload.get("status") or "pending")),
-        reason=str(payload.get("reason") or "no observation admission_status mapped from source"),
+        status=AdmissionStatus(status_text),
+        reason=reason,
         superseded_by=payload.get("superseded_by"),
         decided_by=decided,
     )
@@ -1888,6 +1960,15 @@ def experiment_from_plain(payload: object) -> Experiment:
 def observation_from_plain(payload: object) -> Observation:
     assert isinstance(payload, Mapping)
     notices = tuple(_notice_from_plain(n) for n in (payload.get("notices") or ()))
+    observation_id = str(payload["observation_id"])
+    identity = _identity_from_plain(payload["identity"])
+    value = _value_from_plain(payload["value"])
+    admission = _admission_from_plain(payload["admission"], value=value)
+    admission_notice = _admission_default_notice(
+        admission, identity.quantity, observation_id
+    )
+    if admission_notice is not None and admission_notice not in notices:
+        notices += (admission_notice,)
     point_conditions = None
     raw_pc = payload.get("point_conditions")
     if isinstance(raw_pc, Mapping):
@@ -1903,13 +1984,13 @@ def observation_from_plain(payload: object) -> Observation:
             for k in ("crystal_system", "space_group", "transition_note")
         })
     return Observation(
-        observation_id=str(payload["observation_id"]),
+        observation_id=observation_id,
         experiment_id=str(payload["experiment_id"]),
-        identity=_identity_from_plain(payload["identity"]),
-        value=_value_from_plain(payload["value"]),
+        identity=identity,
+        value=value,
         uncertainty=_uncertainty_from_plain(payload.get("uncertainty")),
         evidence=_evidence_from_plain(payload["evidence"]),
-        admission=_admission_from_plain(payload["admission"]),
+        admission=admission,
         notices=notices,
         provenance=dict(payload["provenance"])
         if isinstance(payload.get("provenance"), Mapping)
@@ -5238,11 +5319,10 @@ def admission_for(
             decided_by=decided,
         )
     if raw_status is None or raw_status == "":
-        return Admission(
-            status=AdmissionStatus.PENDING,
-            reason="no observation admission_status mapped from source",
-        )
+        return _defaulted_admission(_NO_ADMISSION_STATUS_REASON)
     text = str(raw_status)
+    if text in {AdmissionStatus.PENDING.value, "pending_validation"}:
+        return _defaulted_admission(f"source admission_status={text}")
     closed = {s.value: s for s in AdmissionStatus}
     if text in closed:
         status = closed[text]
@@ -5578,18 +5658,26 @@ def reference_state_from_extract(
     species_formula: str,
     values: Mapping[str, Any],
 ) -> State[StandardState] | None:
-    """Lift an explicit extract ``standard_state`` into the typed identity.
+    """Lift a typed or prose extract ``standard_state`` into the identity.
 
-    The extract field is source prose, so an unrecognised or explicitly
-    unprinted statement remains an unknown rather than becoming a convention
-    by inference. A printed Raoultian activity standard is not overridden by
-    an infinite-dilution coefficient in the same sentence. The phase is the
-    phase printed for that endmember. Reference pressure is a printed bar
-    number, never a default of 1 bar.
+    Structured payloads use the same StandardState shape as stored identities.
+    Unrecognised prose remains unknown rather than becoming a convention by
+    inference. A printed Raoultian activity standard is not overridden by an
+    infinite-dilution coefficient in the same sentence. Reference pressure is
+    a printed bar number, never a default of 1 bar.
     """
 
     if raw in (None, ""):
         return None
+    if isinstance(raw, Mapping):
+        try:
+            if raw.get("state") is not None:
+                return _located_from_plain(raw, _standard_state_from_plain).state
+            if raw.get("convention") is not None:
+                return State.of(_standard_state_from_plain(raw))
+        except (KeyError, TypeError, ValueError):
+            return State.unknown("source typed standard_state is not decodable")
+        return State.unknown("source typed standard_state is not decodable")
     text = " ".join(str(raw).split())
     lowered = text.casefold()
     if not text:
@@ -6494,10 +6582,10 @@ def fill_identity(
     species: Species,
     **known: Any,
 ) -> Identity:
-    """Fill required/uncompared axes as unknown, permitted-not-applicable axes as N/A.
+    """Fill required/uncompared axes as unknown and permitted axes as N/A.
 
-    A VALUE on an axis the profile does not require is invalid (v2.1), except
-    for physically omitted melt-activity axes, whose known values are retained.
+    Keep source values on explicitly uncompared axes even when they are not
+    required, including p_partial reaction/reference/reservoir metadata.
     Transition temperatures store T as the observable, never as
     ``identity.temperature_K``.
     """
@@ -6513,7 +6601,7 @@ def fill_identity(
 
     for _ in range(4):
         profile = profile_for(identity)
-        uncompared_axes = _melt_activity_uncompared_axes((identity,))
+        uncompared_axes = _uncompared_axes_for(identity)
         payload = {item.name: getattr(identity, item.name) for item in fields(identity)}
         changed = False
         for name in profile.required:
@@ -11219,6 +11307,21 @@ class Migrator:
         value, exploded, value_sel = empty_value_from_payload(
             values, obs_type, obs.get("units"), quantity=quantity
         )
+        if (
+            admission.reason.startswith(_ADMISSION_DEFAULTED_PREFIX)
+            and value.kind.value not in _NUMERIC_OBSERVATION_VALUE_KINDS
+        ):
+            raw_source_admission = (
+                raw_adm
+                if raw_adm is not None
+                else obs.get("admission_status")
+            )
+            reason = (
+                _NO_ADMISSION_STATUS_REASON
+                if raw_source_admission in (None, "")
+                else f"source admission_status={raw_source_admission}"
+            )
+            admission = Admission(status=AdmissionStatus.PENDING, reason=reason)
         hold_reason = str(values.get("reason") or obs.get("reason") or "").strip()
         if isinstance(values.get("series"), list) and values.get("series"):
             measured.series += 1
@@ -11331,7 +11434,10 @@ class Migrator:
                 source=source_key,
                 observation_id=obs_id,
             )
-        if q_token in {Quantity.ACTIVITY, Quantity.ACTIVITY_COEFFICIENT}:
+        if (
+            q_token in {Quantity.ACTIVITY, Quantity.ACTIVITY_COEFFICIENT}
+            and not isinstance(obs.get("standard_state"), Mapping)
+        ):
             reference_state = _standard_state_from_extract_text(
                 obs.get("standard_state"),
                 species.formula,
@@ -11550,7 +11656,7 @@ class Migrator:
             else None
         )
         uncompared_identity_axes = (
-            _melt_activity_uncompared_axes((identity_for_profile,))
+            _uncompared_axes_for(identity_for_profile)
             if identity_for_profile is not None
             else frozenset()
         )
@@ -12859,6 +12965,14 @@ class Migrator:
                 source=source_key,
                 observation_id=observation_id,
             )
+        admission = (
+            _defaulted_admission(_NO_ADMISSION_STATUS_REASON)
+            if value.kind.value in _NUMERIC_OBSERVATION_VALUE_KINDS
+            else Admission(
+                status=AdmissionStatus.PENDING,
+                reason=_NO_ADMISSION_STATUS_REASON,
+            )
+        )
         observation = Observation(
             observation_id=observation_id,
             experiment_id=experiment_id,
@@ -12866,10 +12980,7 @@ class Migrator:
             value=value,
             uncertainty=uncertainty or Uncertainty(kind=UncertaintyKind.NONE),
             evidence=evidence,
-            admission=Admission(
-                status=AdmissionStatus.PENDING,
-                reason="no observation admission_status mapped from source",
-            ),
+            admission=admission,
             notices=notices,
             source_id=source_id,
             locator=locator,
@@ -14196,6 +14307,22 @@ class Migrator:
             new_obs = self.result.observations[surviving_new]
             for match_id in matches:
                 old_obs = self.result.observations[match_id]
+                if old_obs.admission.reason.startswith(_ADMISSION_DEFAULTED_PREFIX):
+                    object.__setattr__(
+                        old_obs,
+                        "notices",
+                        tuple(
+                            notice
+                            for notice in old_obs.notices
+                            if not (
+                                notice.kind is NoticeKind.PRESSURE_PROVENANCE_UNKNOWN
+                                and notice.origin == old_obs.observation_id
+                                and notice.reason.startswith(
+                                    "fO2_Pa is a DERIVED condition, not a measurement:"
+                                )
+                            )
+                        ),
+                    )
                 decided = old_obs.admission.decided_by or new_obs.admission.decided_by
                 if decided is None and old_obs.locator is not None:
                     decided = AdmissionDecision(
@@ -14344,6 +14471,17 @@ class Migrator:
                         status=AdmissionStatus.PENDING,
                         reason=f"unresolved supersedes target {target}",
                     ),
+                )
+        for observation_id, observation in list(self.result.observations.items()):
+            admission_notice = _admission_default_notice(
+                observation.admission,
+                observation.identity.quantity,
+                observation_id,
+            )
+            if admission_notice is not None and admission_notice not in observation.notices:
+                self.result.observations[observation_id] = replace(
+                    observation,
+                    notices=(*observation.notices, admission_notice),
                 )
         for work in self.result.works.values():
             if work.doi:

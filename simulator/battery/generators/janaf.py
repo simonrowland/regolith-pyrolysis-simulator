@@ -2527,13 +2527,29 @@ class JANAFFusionEnergy:
 _FUSION_TABLES = {
     "CaO": ("Ca-027", "Ca-028"),
     "Al2O3": ("Al-096", "Al-100"),
+    # Mg-009 is the MgO(l) Gibbs function; like Al-100 and Ca-028, its
+    # observation series is phase-unknown around JANAF's GLASS <--> LIQUID row.
+    "MgO": ("Mg-008", "Mg-009"),
     # High cristobalite is the high-temperature solid branch immediately
     # below the accepted SiO2 melting point; the quartz table is metastable.
     "SiO2": ("O-035", "O-038"),
 }
+# The source hashes identify the JANAF text; pin the extracted temperature-node
+# sets too so a dropped compiled row cannot silently widen interpolation.
+_FUSION_NODE_SET_SHA256 = {
+    "Al-096": "4fdff7891379ea07bbc7c0ca5254fdec29a4c5d3a6d35e1b8098004da618f6dc",
+    "Al-100": "516fee6dda1c692a9b05507efce187256bec6f22b7928058f585834d2e28164d",
+    "Ca-027": "376641f4fa64958a281184501eb5d3b621da105aee6bc625b26dd35e5d0ff061",
+    "Ca-028": "045d9b4eca578094b9321cbdb0c1db10dcea80f2ca925fc59ae86f01c8069acd",
+    "Mg-008": "d90e9f5d25d9202d685f0690078ba27104b1446d12b46644a7d24a4a44c2505e",
+    "Mg-009": "1444ecc52a9e18a3cb76a953750798bc18b74661abfc721e41dc1a3aa8620a7e",
+    "O-035": "86986e6bc3d75c0fec4c3a034a1deab91e966c42d5e0f1cb4080a33d10aa6bed",
+    "O-038": "c0cbb21a4e8d7387b9a379c21edc29a61d124efb398711e402fe5c3ff9038791",
+}
 _ACCEPTED_MELTING_K = {
     "CaO": Decimal("2886"),
     "Al2O3": Decimal("2327"),
+    "MgO": Decimal("3100"),
     "SiO2": Decimal("1986"),
 }
 
@@ -2554,21 +2570,63 @@ def _fusion_table_points(table_id: str) -> tuple[tuple[tuple[Decimal, Decimal], 
     if not isinstance(rows, list):
         raise ValueError(f"{table_id}: JANAF table values are missing")
     points: list[tuple[Decimal, Decimal]] = []
+    temperatures: set[Decimal] = set()
     for row in rows:
         if not isinstance(row, Mapping):
             continue
         temperature = row.get("temperature")
         gibbs = row.get("formation_gibbs_energy")
-        if not isinstance(temperature, Mapping) or not isinstance(gibbs, Mapping):
+        if not isinstance(temperature, Mapping):
             continue
-        t_value, g_value = temperature.get("value"), gibbs.get("value")
-        if t_value is None or g_value is None:
+        t_value = temperature.get("value")
+        if t_value is None:
             continue
-        points.append((Decimal(str(t_value)), Decimal(str(g_value))))
+        t = Decimal(str(t_value))
+        temperatures.add(t)
+        g_value = gibbs.get("value") if isinstance(gibbs, Mapping) else None
+        if g_value is not None:
+            points.append((t, Decimal(str(g_value))))
+    node_set_sha256 = hashlib.sha256(
+        "\n".join(
+            str(temperature.normalize()) for temperature in sorted(temperatures)
+        ).encode()
+    ).hexdigest()
+    expected_node_set_sha256 = _FUSION_NODE_SET_SHA256.get(table_id)
+    if (
+        expected_node_set_sha256 is not None
+        and node_set_sha256 != expected_node_set_sha256
+    ):
+        raise ValueError(f"{table_id}: needed JANAF table node row missing or changed")
     points.sort()
     if len(points) < 2:
         raise ValueError(f"{table_id}: JANAF table has fewer than two Gibbs points")
     return tuple(points), digest
+
+
+@lru_cache(maxsize=2 * len(_FUSION_TABLES))
+def _fusion_missing_gibbs_temperatures(table_id: str) -> tuple[Decimal, ...]:
+    """Return table nodes with a temperature but no formation-Gibbs value."""
+
+    document = load_table_document(TABLES_DIR / f"{table_id}.yaml")
+    table = document.get("table")
+    if not isinstance(table, Mapping):
+        raise ValueError(f"{table_id}: JANAF cached table is incomplete")
+    rows = table.get("values")
+    if not isinstance(rows, list):
+        raise ValueError(f"{table_id}: JANAF table values are missing")
+    missing: set[Decimal] = set()
+    for row in rows:
+        if not isinstance(row, Mapping):
+            continue
+        temperature = row.get("temperature")
+        gibbs = row.get("formation_gibbs_energy")
+        if not isinstance(temperature, Mapping):
+            continue
+        temperature_value = temperature.get("value")
+        gibbs_value = gibbs.get("value") if isinstance(gibbs, Mapping) else None
+        if temperature_value is not None and gibbs_value is None:
+            missing.add(Decimal(str(temperature_value)))
+    return tuple(sorted(missing))
 
 
 def _interpolate_formation_gibbs(
@@ -2584,6 +2642,22 @@ def _interpolate_formation_gibbs(
                 return g1
             return g0 + (g1 - g0) * (temperature_K - t0) / (t1 - t0)
     raise ValueError(f"{temperature_K} K is not bracketed by JANAF table rows")
+
+
+def _missing_node_for_interpolation(
+    points: tuple[tuple[Decimal, Decimal], ...],
+    missing_nodes: tuple[Decimal, ...],
+    temperature_K: Decimal,
+) -> Decimal | None:
+    if any(node_temperature == temperature_K for node_temperature, _ in points):
+        return None
+    for (left, _), (right, _) in zip(points, points[1:]):
+        if left < temperature_K < right:
+            return next(
+                (node for node in missing_nodes if left < node < right),
+                None,
+            )
+    return None
 
 
 def janaf_fusion_energy(oxide: str, temperature_K: Decimal) -> JANAFFusionEnergy:
@@ -2605,7 +2679,9 @@ def janaf_fusion_energy(oxide: str, temperature_K: Decimal) -> JANAFFusionEnergy
         raise ValueError(f"{oxide}: JANAF crystal/liquid tables do not overlap")
 
     def difference(t: Decimal) -> Decimal:
-        return _interpolate_formation_gibbs(liquid, t) - _interpolate_formation_gibbs(crystal, t)
+        return _interpolate_formation_gibbs(
+            liquid, t
+        ) - _interpolate_formation_gibbs(crystal, t)
 
     crossings: list[Decimal] = []
     for left, right in zip(overlap, overlap[1:]):
@@ -2619,6 +2695,21 @@ def janaf_fusion_energy(oxide: str, temperature_K: Decimal) -> JANAFFusionEnergy
     if len(crossings) != 1:
         raise ValueError(f"{oxide}: expected one JANAF cr/l crossing, got {crossings}")
     tm = crossings[0]
+    for table_id, points in (
+        (crystal_table, crystal),
+        (liquid_table, liquid),
+    ):
+        missing_nodes = _fusion_missing_gibbs_temperatures(table_id)
+        for interpolation_temperature in (temperature_K, tm):
+            missing_node = _missing_node_for_interpolation(
+                points, missing_nodes, interpolation_temperature
+            )
+            if missing_node is not None:
+                raise ValueError(
+                    f"{table_id}: needed JANAF formation Gibbs row missing at "
+                    f"{missing_node} K for interpolation at "
+                    f"{interpolation_temperature} K"
+                )
     try:
         delta_g = difference(temperature_K)
     except ValueError as exc:

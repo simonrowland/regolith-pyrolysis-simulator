@@ -181,9 +181,14 @@ observations:
       value: measured_direct
     original_method_class: measured_direct
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - p_partial
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: kems-028-yakovlev-1984::yakovlev_1984_CAI_SiO_max_1875C
   source_id: kems-028-yakovlev-1984
   locator:
     published_page: 946
@@ -311,7 +316,10 @@ observations:
   uncertainty:
     kind: printed
     verbatim:
-      note: Calculated p(O2); no numeric uncertainty printed. Typewriter I.4 read as 1.4.
+      note: No mass-spectrum or ion-current table is printed in this abstract. The table values are calculated p(O2), not
+        observed O2+ ion pressures. The printed relation is AlO = Al + O followed by O2 = 2 O. No same-condition measured
+        parent pressures are published in this abstract, so no parent observations are assigned. No numeric uncertainty printed.
+        Typewriter I.4 read as 1.4.
   evidence:
     class:
       tag: value
@@ -322,8 +330,17 @@ observations:
       at the conditions with higher Po2 (table).
     model: model_derived
   admission:
-    status: pending
-    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: extract-kems-026
+      date: '2026-09-12'
+      evidence:
+        published_page: 946
+        pdf_page_index: 2
+        table: Po2
+        note: Po2 pressure in the vapor during the vaporization of hightemperature residuals of chondrite Murchison and CAI
+          inclusions of Efremovka. The abstract gives sample names but no numerical bulk compositions.
   notices: []
   source_id: kems-028-yakovlev-1984
   locator:
@@ -331,7 +348,7 @@ observations:
     pdf_page_index: 2
     table: Po2
     note: Po2 pressure in the vapor during the vaporization of hightemperature residuals of chondrite Murchison and CAI inclusions
-      of Efremovka
+      of Efremovka. The abstract gives sample names but no numerical bulk compositions.
   read_from: pdf:kems-028-yakovlev-1984
   point_conditions:
     temperature_K:
@@ -343,7 +360,7 @@ observations:
         pdf_page_index: 2
         table: Po2
         note: Po2 pressure in the vapor during the vaporization of hightemperature residuals of chondrite Murchison and CAI
-          inclusions of Efremovka
+          inclusions of Efremovka. The abstract gives sample names but no numerical bulk compositions.
       inference:
         relation: celsius_to_kelvin
         inputs:
@@ -359,7 +376,7 @@ observations:
               pdf_page_index: 2
               table: Po2
               note: Po2 pressure in the vapor during the vaporization of hightemperature residuals of chondrite Murchison
-                and CAI inclusions of Efremovka
+                and CAI inclusions of Efremovka. The abstract gives sample names but no numerical bulk compositions.
         - - factor
           - state:
               tag: value
@@ -369,7 +386,7 @@ observations:
               pdf_page_index: 2
               table: Po2
               note: Po2 pressure in the vapor during the vaporization of hightemperature residuals of chondrite Murchison
-                and CAI inclusions of Efremovka
+                and CAI inclusions of Efremovka. The abstract gives sample names but no numerical bulk compositions.
         output_unit: K
   derivation:
     relation: identity:Pa
@@ -460,7 +477,10 @@ observations:
   uncertainty:
     kind: printed
     verbatim:
-      note: Calculated p(O2); no numeric uncertainty printed. Typewriter I.4 read as 1.4.
+      note: No mass-spectrum or ion-current table is printed in this abstract. The table values are calculated p(O2), not
+        observed O2+ ion pressures. The printed relation is AlO = Al + O followed by O2 = 2 O. No same-condition measured
+        parent pressures are published in this abstract, so no parent observations are assigned. No numeric uncertainty printed.
+        Typewriter I.4 read as 1.4.
   evidence:
     class:
       tag: value
@@ -471,8 +491,17 @@ observations:
       at the conditions with higher Po2 (table).
     model: model_derived
   admission:
-    status: pending
-    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: extract-kems-026
+      date: '2026-09-12'
+      evidence:
+        published_page: 946
+        pdf_page_index: 2
+        table: Po2
+        note: Po2 pressure in the vapor during the vaporization of hightemperature residuals of chondrite Murchison and CAI
+          inclusions of Efremovka. The abstract gives sample names but no numerical bulk compositions.
   notices: []
   source_id: kems-028-yakovlev-1984
   locator:
@@ -480,7 +509,7 @@ observations:
     pdf_page_index: 2
     table: Po2
     note: Po2 pressure in the vapor during the vaporization of hightemperature residuals of chondrite Murchison and CAI inclusions
-      of Efremovka
+      of Efremovka. The abstract gives sample names but no numerical bulk compositions.
   read_from: pdf:kems-028-yakovlev-1984
   point_conditions:
     temperature_K:
@@ -492,7 +521,7 @@ observations:
         pdf_page_index: 2
         table: Po2
         note: Po2 pressure in the vapor during the vaporization of hightemperature residuals of chondrite Murchison and CAI
-          inclusions of Efremovka
+          inclusions of Efremovka. The abstract gives sample names but no numerical bulk compositions.
       inference:
         relation: celsius_to_kelvin
         inputs:
@@ -508,7 +537,7 @@ observations:
               pdf_page_index: 2
               table: Po2
               note: Po2 pressure in the vapor during the vaporization of hightemperature residuals of chondrite Murchison
-                and CAI inclusions of Efremovka
+                and CAI inclusions of Efremovka. The abstract gives sample names but no numerical bulk compositions.
         - - factor
           - state:
               tag: value
@@ -518,7 +547,7 @@ observations:
               pdf_page_index: 2
               table: Po2
               note: Po2 pressure in the vapor during the vaporization of hightemperature residuals of chondrite Murchison
-                and CAI inclusions of Efremovka
+                and CAI inclusions of Efremovka. The abstract gives sample names but no numerical bulk compositions.
         output_unit: K
   derivation:
     relation: identity:Pa
@@ -609,7 +638,10 @@ observations:
   uncertainty:
     kind: printed
     verbatim:
-      note: Calculated p(O2); no numeric uncertainty printed. Typewriter I.4 read as 1.4.
+      note: No mass-spectrum or ion-current table is printed in this abstract. The table values are calculated p(O2), not
+        observed O2+ ion pressures. The printed relation is AlO = Al + O followed by O2 = 2 O. No same-condition measured
+        parent pressures are published in this abstract, so no parent observations are assigned. No numeric uncertainty printed.
+        Typewriter I.4 read as 1.4.
   evidence:
     class:
       tag: value
@@ -620,8 +652,17 @@ observations:
       at the conditions with higher Po2 (table).
     model: model_derived
   admission:
-    status: pending
-    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: extract-kems-026
+      date: '2026-09-12'
+      evidence:
+        published_page: 946
+        pdf_page_index: 2
+        table: Po2
+        note: Po2 pressure in the vapor during the vaporization of hightemperature residuals of chondrite Murchison and CAI
+          inclusions of Efremovka. The abstract gives sample names but no numerical bulk compositions.
   notices: []
   source_id: kems-028-yakovlev-1984
   locator:
@@ -629,7 +670,7 @@ observations:
     pdf_page_index: 2
     table: Po2
     note: Po2 pressure in the vapor during the vaporization of hightemperature residuals of chondrite Murchison and CAI inclusions
-      of Efremovka
+      of Efremovka. The abstract gives sample names but no numerical bulk compositions.
   read_from: pdf:kems-028-yakovlev-1984
   point_conditions:
     temperature_K:
@@ -641,7 +682,7 @@ observations:
         pdf_page_index: 2
         table: Po2
         note: Po2 pressure in the vapor during the vaporization of hightemperature residuals of chondrite Murchison and CAI
-          inclusions of Efremovka
+          inclusions of Efremovka. The abstract gives sample names but no numerical bulk compositions.
       inference:
         relation: celsius_to_kelvin
         inputs:
@@ -657,7 +698,7 @@ observations:
               pdf_page_index: 2
               table: Po2
               note: Po2 pressure in the vapor during the vaporization of hightemperature residuals of chondrite Murchison
-                and CAI inclusions of Efremovka
+                and CAI inclusions of Efremovka. The abstract gives sample names but no numerical bulk compositions.
         - - factor
           - state:
               tag: value
@@ -667,7 +708,7 @@ observations:
               pdf_page_index: 2
               table: Po2
               note: Po2 pressure in the vapor during the vaporization of hightemperature residuals of chondrite Murchison
-                and CAI inclusions of Efremovka
+                and CAI inclusions of Efremovka. The abstract gives sample names but no numerical bulk compositions.
         output_unit: K
   derivation:
     relation: identity:Pa
@@ -758,7 +799,10 @@ observations:
   uncertainty:
     kind: printed
     verbatim:
-      note: Calculated p(O2); no numeric uncertainty printed. Typewriter I.4 read as 1.4.
+      note: No mass-spectrum or ion-current table is printed in this abstract. The table values are calculated p(O2), not
+        observed O2+ ion pressures. The printed relation is AlO = Al + O followed by O2 = 2 O. No same-condition measured
+        parent pressures are published in this abstract, so no parent observations are assigned. No numeric uncertainty printed.
+        Typewriter I.4 read as 1.4.
   evidence:
     class:
       tag: value
@@ -769,8 +813,17 @@ observations:
       at the conditions with higher Po2 (table).
     model: model_derived
   admission:
-    status: pending
-    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: extract-kems-026
+      date: '2026-09-12'
+      evidence:
+        published_page: 946
+        pdf_page_index: 2
+        table: Po2
+        note: Po2 pressure in the vapor during the vaporization of hightemperature residuals of chondrite Murchison and CAI
+          inclusions of Efremovka. The abstract gives sample names but no numerical bulk compositions.
   notices: []
   source_id: kems-028-yakovlev-1984
   locator:
@@ -778,7 +831,7 @@ observations:
     pdf_page_index: 2
     table: Po2
     note: Po2 pressure in the vapor during the vaporization of hightemperature residuals of chondrite Murchison and CAI inclusions
-      of Efremovka
+      of Efremovka. The abstract gives sample names but no numerical bulk compositions.
   read_from: pdf:kems-028-yakovlev-1984
   point_conditions:
     temperature_K:
@@ -790,7 +843,7 @@ observations:
         pdf_page_index: 2
         table: Po2
         note: Po2 pressure in the vapor during the vaporization of hightemperature residuals of chondrite Murchison and CAI
-          inclusions of Efremovka
+          inclusions of Efremovka. The abstract gives sample names but no numerical bulk compositions.
       inference:
         relation: celsius_to_kelvin
         inputs:
@@ -806,7 +859,7 @@ observations:
               pdf_page_index: 2
               table: Po2
               note: Po2 pressure in the vapor during the vaporization of hightemperature residuals of chondrite Murchison
-                and CAI inclusions of Efremovka
+                and CAI inclusions of Efremovka. The abstract gives sample names but no numerical bulk compositions.
         - - factor
           - state:
               tag: value
@@ -816,7 +869,7 @@ observations:
               pdf_page_index: 2
               table: Po2
               note: Po2 pressure in the vapor during the vaporization of hightemperature residuals of chondrite Murchison
-                and CAI inclusions of Efremovka
+                and CAI inclusions of Efremovka. The abstract gives sample names but no numerical bulk compositions.
         output_unit: K
   derivation:
     relation: identity:Pa
@@ -907,7 +960,10 @@ observations:
   uncertainty:
     kind: printed
     verbatim:
-      note: Calculated p(O2); no numeric uncertainty printed. Typewriter I.4 read as 1.4.
+      note: No mass-spectrum or ion-current table is printed in this abstract. The table values are calculated p(O2), not
+        observed O2+ ion pressures. The printed relation is AlO = Al + O followed by O2 = 2 O. No same-condition measured
+        parent pressures are published in this abstract, so no parent observations are assigned. No numeric uncertainty printed.
+        Typewriter I.4 read as 1.4.
   evidence:
     class:
       tag: value
@@ -918,8 +974,17 @@ observations:
       at the conditions with higher Po2 (table).
     model: model_derived
   admission:
-    status: pending
-    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: extract-kems-026
+      date: '2026-09-12'
+      evidence:
+        published_page: 946
+        pdf_page_index: 2
+        table: Po2
+        note: Po2 pressure in the vapor during the vaporization of hightemperature residuals of chondrite Murchison and CAI
+          inclusions of Efremovka. The abstract gives sample names but no numerical bulk compositions.
   notices: []
   source_id: kems-028-yakovlev-1984
   locator:
@@ -927,7 +992,7 @@ observations:
     pdf_page_index: 2
     table: Po2
     note: Po2 pressure in the vapor during the vaporization of hightemperature residuals of chondrite Murchison and CAI inclusions
-      of Efremovka
+      of Efremovka. The abstract gives sample names but no numerical bulk compositions.
   read_from: pdf:kems-028-yakovlev-1984
   point_conditions:
     temperature_K:
@@ -939,7 +1004,7 @@ observations:
         pdf_page_index: 2
         table: Po2
         note: Po2 pressure in the vapor during the vaporization of hightemperature residuals of chondrite Murchison and CAI
-          inclusions of Efremovka
+          inclusions of Efremovka. The abstract gives sample names but no numerical bulk compositions.
       inference:
         relation: celsius_to_kelvin
         inputs:
@@ -955,7 +1020,7 @@ observations:
               pdf_page_index: 2
               table: Po2
               note: Po2 pressure in the vapor during the vaporization of hightemperature residuals of chondrite Murchison
-                and CAI inclusions of Efremovka
+                and CAI inclusions of Efremovka. The abstract gives sample names but no numerical bulk compositions.
         - - factor
           - state:
               tag: value
@@ -965,7 +1030,7 @@ observations:
               pdf_page_index: 2
               table: Po2
               note: Po2 pressure in the vapor during the vaporization of hightemperature residuals of chondrite Murchison
-                and CAI inclusions of Efremovka
+                and CAI inclusions of Efremovka. The abstract gives sample names but no numerical bulk compositions.
         output_unit: K
   derivation:
     relation: identity:Pa
@@ -1056,7 +1121,10 @@ observations:
   uncertainty:
     kind: printed
     verbatim:
-      note: Calculated p(O2); no numeric uncertainty printed. Typewriter I.4 read as 1.4.
+      note: No mass-spectrum or ion-current table is printed in this abstract. The table values are calculated p(O2), not
+        observed O2+ ion pressures. The printed relation is AlO = Al + O followed by O2 = 2 O. No same-condition measured
+        parent pressures are published in this abstract, so no parent observations are assigned. No numeric uncertainty printed.
+        Typewriter I.4 read as 1.4.
   evidence:
     class:
       tag: value
@@ -1067,8 +1135,17 @@ observations:
       at the conditions with higher Po2 (table).
     model: model_derived
   admission:
-    status: pending
-    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: extract-kems-026
+      date: '2026-09-12'
+      evidence:
+        published_page: 946
+        pdf_page_index: 2
+        table: Po2
+        note: Po2 pressure in the vapor during the vaporization of hightemperature residuals of chondrite Murchison and CAI
+          inclusions of Efremovka. The abstract gives sample names but no numerical bulk compositions.
   notices: []
   source_id: kems-028-yakovlev-1984
   locator:
@@ -1076,7 +1153,7 @@ observations:
     pdf_page_index: 2
     table: Po2
     note: Po2 pressure in the vapor during the vaporization of hightemperature residuals of chondrite Murchison and CAI inclusions
-      of Efremovka
+      of Efremovka. The abstract gives sample names but no numerical bulk compositions.
   read_from: pdf:kems-028-yakovlev-1984
   point_conditions:
     temperature_K:
@@ -1088,7 +1165,7 @@ observations:
         pdf_page_index: 2
         table: Po2
         note: Po2 pressure in the vapor during the vaporization of hightemperature residuals of chondrite Murchison and CAI
-          inclusions of Efremovka
+          inclusions of Efremovka. The abstract gives sample names but no numerical bulk compositions.
       inference:
         relation: celsius_to_kelvin
         inputs:
@@ -1104,7 +1181,7 @@ observations:
               pdf_page_index: 2
               table: Po2
               note: Po2 pressure in the vapor during the vaporization of hightemperature residuals of chondrite Murchison
-                and CAI inclusions of Efremovka
+                and CAI inclusions of Efremovka. The abstract gives sample names but no numerical bulk compositions.
         - - factor
           - state:
               tag: value
@@ -1114,7 +1191,7 @@ observations:
               pdf_page_index: 2
               table: Po2
               note: Po2 pressure in the vapor during the vaporization of hightemperature residuals of chondrite Murchison
-                and CAI inclusions of Efremovka
+                and CAI inclusions of Efremovka. The abstract gives sample names but no numerical bulk compositions.
         output_unit: K
   derivation:
     relation: identity:Pa
@@ -1205,7 +1282,10 @@ observations:
   uncertainty:
     kind: printed
     verbatim:
-      note: Calculated p(O2); no numeric uncertainty printed. Typewriter I.4 read as 1.4.
+      note: No mass-spectrum or ion-current table is printed in this abstract. The table values are calculated p(O2), not
+        observed O2+ ion pressures. The printed relation is AlO = Al + O followed by O2 = 2 O. No same-condition measured
+        parent pressures are published in this abstract, so no parent observations are assigned. No numeric uncertainty printed.
+        Typewriter I.4 read as 1.4.
   evidence:
     class:
       tag: value
@@ -1216,8 +1296,17 @@ observations:
       at the conditions with higher Po2 (table).
     model: model_derived
   admission:
-    status: pending
-    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: extract-kems-026
+      date: '2026-09-12'
+      evidence:
+        published_page: 946
+        pdf_page_index: 2
+        table: Po2
+        note: Po2 pressure in the vapor during the vaporization of hightemperature residuals of chondrite Murchison and CAI
+          inclusions of Efremovka. The abstract gives sample names but no numerical bulk compositions.
   notices: []
   source_id: kems-028-yakovlev-1984
   locator:
@@ -1225,7 +1314,7 @@ observations:
     pdf_page_index: 2
     table: Po2
     note: Po2 pressure in the vapor during the vaporization of hightemperature residuals of chondrite Murchison and CAI inclusions
-      of Efremovka
+      of Efremovka. The abstract gives sample names but no numerical bulk compositions.
   read_from: pdf:kems-028-yakovlev-1984
   point_conditions:
     temperature_K:
@@ -1237,7 +1326,7 @@ observations:
         pdf_page_index: 2
         table: Po2
         note: Po2 pressure in the vapor during the vaporization of hightemperature residuals of chondrite Murchison and CAI
-          inclusions of Efremovka
+          inclusions of Efremovka. The abstract gives sample names but no numerical bulk compositions.
       inference:
         relation: celsius_to_kelvin
         inputs:
@@ -1253,7 +1342,7 @@ observations:
               pdf_page_index: 2
               table: Po2
               note: Po2 pressure in the vapor during the vaporization of hightemperature residuals of chondrite Murchison
-                and CAI inclusions of Efremovka
+                and CAI inclusions of Efremovka. The abstract gives sample names but no numerical bulk compositions.
         - - factor
           - state:
               tag: value
@@ -1263,7 +1352,7 @@ observations:
               pdf_page_index: 2
               table: Po2
               note: Po2 pressure in the vapor during the vaporization of hightemperature residuals of chondrite Murchison
-                and CAI inclusions of Efremovka
+                and CAI inclusions of Efremovka. The abstract gives sample names but no numerical bulk compositions.
         output_unit: K
   derivation:
     relation: identity:Pa
@@ -1354,7 +1443,10 @@ observations:
   uncertainty:
     kind: printed
     verbatim:
-      note: Calculated p(O2); no numeric uncertainty printed. Typewriter I.4 read as 1.4.
+      note: No mass-spectrum or ion-current table is printed in this abstract. The table values are calculated p(O2), not
+        observed O2+ ion pressures. The printed relation is AlO = Al + O followed by O2 = 2 O. No same-condition measured
+        parent pressures are published in this abstract, so no parent observations are assigned. No numeric uncertainty printed.
+        Typewriter I.4 read as 1.4.
   evidence:
     class:
       tag: value
@@ -1365,8 +1457,17 @@ observations:
       at the conditions with higher Po2 (table).
     model: model_derived
   admission:
-    status: pending
-    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: extract-kems-026
+      date: '2026-09-12'
+      evidence:
+        published_page: 946
+        pdf_page_index: 2
+        table: Po2
+        note: Po2 pressure in the vapor during the vaporization of hightemperature residuals of chondrite Murchison and CAI
+          inclusions of Efremovka. The abstract gives sample names but no numerical bulk compositions.
   notices: []
   source_id: kems-028-yakovlev-1984
   locator:
@@ -1374,7 +1475,7 @@ observations:
     pdf_page_index: 2
     table: Po2
     note: Po2 pressure in the vapor during the vaporization of hightemperature residuals of chondrite Murchison and CAI inclusions
-      of Efremovka
+      of Efremovka. The abstract gives sample names but no numerical bulk compositions.
   read_from: pdf:kems-028-yakovlev-1984
   point_conditions:
     temperature_K:
@@ -1386,7 +1487,7 @@ observations:
         pdf_page_index: 2
         table: Po2
         note: Po2 pressure in the vapor during the vaporization of hightemperature residuals of chondrite Murchison and CAI
-          inclusions of Efremovka
+          inclusions of Efremovka. The abstract gives sample names but no numerical bulk compositions.
       inference:
         relation: celsius_to_kelvin
         inputs:
@@ -1402,7 +1503,7 @@ observations:
               pdf_page_index: 2
               table: Po2
               note: Po2 pressure in the vapor during the vaporization of hightemperature residuals of chondrite Murchison
-                and CAI inclusions of Efremovka
+                and CAI inclusions of Efremovka. The abstract gives sample names but no numerical bulk compositions.
         - - factor
           - state:
               tag: value
@@ -1412,7 +1513,7 @@ observations:
               pdf_page_index: 2
               table: Po2
               note: Po2 pressure in the vapor during the vaporization of hightemperature residuals of chondrite Murchison
-                and CAI inclusions of Efremovka
+                and CAI inclusions of Efremovka. The abstract gives sample names but no numerical bulk compositions.
         output_unit: K
   derivation:
     relation: identity:Pa
@@ -1503,7 +1604,10 @@ observations:
   uncertainty:
     kind: printed
     verbatim:
-      note: Calculated p(O2); no numeric uncertainty printed. Typewriter I.4 read as 1.4.
+      note: No mass-spectrum or ion-current table is printed in this abstract. The table values are calculated p(O2), not
+        observed O2+ ion pressures. The printed relation is AlO = Al + O followed by O2 = 2 O. No same-condition measured
+        parent pressures are published in this abstract, so no parent observations are assigned. No numeric uncertainty printed.
+        Typewriter I.4 read as 1.4.
   evidence:
     class:
       tag: value
@@ -1514,8 +1618,17 @@ observations:
       at the conditions with higher Po2 (table).
     model: model_derived
   admission:
-    status: pending
-    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: extract-kems-026
+      date: '2026-09-12'
+      evidence:
+        published_page: 946
+        pdf_page_index: 2
+        table: Po2
+        note: Po2 pressure in the vapor during the vaporization of hightemperature residuals of chondrite Murchison and CAI
+          inclusions of Efremovka. The abstract gives sample names but no numerical bulk compositions.
   notices: []
   source_id: kems-028-yakovlev-1984
   locator:
@@ -1523,7 +1636,7 @@ observations:
     pdf_page_index: 2
     table: Po2
     note: Po2 pressure in the vapor during the vaporization of hightemperature residuals of chondrite Murchison and CAI inclusions
-      of Efremovka
+      of Efremovka. The abstract gives sample names but no numerical bulk compositions.
   read_from: pdf:kems-028-yakovlev-1984
   point_conditions:
     temperature_K:
@@ -1535,7 +1648,7 @@ observations:
         pdf_page_index: 2
         table: Po2
         note: Po2 pressure in the vapor during the vaporization of hightemperature residuals of chondrite Murchison and CAI
-          inclusions of Efremovka
+          inclusions of Efremovka. The abstract gives sample names but no numerical bulk compositions.
       inference:
         relation: celsius_to_kelvin
         inputs:
@@ -1551,7 +1664,7 @@ observations:
               pdf_page_index: 2
               table: Po2
               note: Po2 pressure in the vapor during the vaporization of hightemperature residuals of chondrite Murchison
-                and CAI inclusions of Efremovka
+                and CAI inclusions of Efremovka. The abstract gives sample names but no numerical bulk compositions.
         - - factor
           - state:
               tag: value
@@ -1561,7 +1674,7 @@ observations:
               pdf_page_index: 2
               table: Po2
               note: Po2 pressure in the vapor during the vaporization of hightemperature residuals of chondrite Murchison
-                and CAI inclusions of Efremovka
+                and CAI inclusions of Efremovka. The abstract gives sample names but no numerical bulk compositions.
         output_unit: K
   derivation:
     relation: identity:Pa
@@ -1652,7 +1765,10 @@ observations:
   uncertainty:
     kind: printed
     verbatim:
-      note: Calculated p(O2); no numeric uncertainty printed. Typewriter I.4 read as 1.4.
+      note: No mass-spectrum or ion-current table is printed in this abstract. The table values are calculated p(O2), not
+        observed O2+ ion pressures. The printed relation is AlO = Al + O followed by O2 = 2 O. No same-condition measured
+        parent pressures are published in this abstract, so no parent observations are assigned. No numeric uncertainty printed.
+        Typewriter I.4 read as 1.4.
   evidence:
     class:
       tag: value
@@ -1663,8 +1779,17 @@ observations:
       at the conditions with higher Po2 (table).
     model: model_derived
   admission:
-    status: pending
-    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: extract-kems-026
+      date: '2026-09-12'
+      evidence:
+        published_page: 946
+        pdf_page_index: 2
+        table: Po2
+        note: Po2 pressure in the vapor during the vaporization of hightemperature residuals of chondrite Murchison and CAI
+          inclusions of Efremovka. The abstract gives sample names but no numerical bulk compositions.
   notices: []
   source_id: kems-028-yakovlev-1984
   locator:
@@ -1672,7 +1797,7 @@ observations:
     pdf_page_index: 2
     table: Po2
     note: Po2 pressure in the vapor during the vaporization of hightemperature residuals of chondrite Murchison and CAI inclusions
-      of Efremovka
+      of Efremovka. The abstract gives sample names but no numerical bulk compositions.
   read_from: pdf:kems-028-yakovlev-1984
   point_conditions:
     temperature_K:
@@ -1684,7 +1809,7 @@ observations:
         pdf_page_index: 2
         table: Po2
         note: Po2 pressure in the vapor during the vaporization of hightemperature residuals of chondrite Murchison and CAI
-          inclusions of Efremovka
+          inclusions of Efremovka. The abstract gives sample names but no numerical bulk compositions.
       inference:
         relation: celsius_to_kelvin
         inputs:
@@ -1700,7 +1825,7 @@ observations:
               pdf_page_index: 2
               table: Po2
               note: Po2 pressure in the vapor during the vaporization of hightemperature residuals of chondrite Murchison
-                and CAI inclusions of Efremovka
+                and CAI inclusions of Efremovka. The abstract gives sample names but no numerical bulk compositions.
         - - factor
           - state:
               tag: value
@@ -1710,7 +1835,7 @@ observations:
               pdf_page_index: 2
               table: Po2
               note: Po2 pressure in the vapor during the vaporization of hightemperature residuals of chondrite Murchison
-                and CAI inclusions of Efremovka
+                and CAI inclusions of Efremovka. The abstract gives sample names but no numerical bulk compositions.
         output_unit: K
   derivation:
     relation: identity:Pa
@@ -1801,7 +1926,10 @@ observations:
   uncertainty:
     kind: printed
     verbatim:
-      note: Calculated p(O2); no numeric uncertainty printed. Typewriter I.4 read as 1.4.
+      note: No mass-spectrum or ion-current table is printed in this abstract. The table values are calculated p(O2), not
+        observed O2+ ion pressures. The printed relation is AlO = Al + O followed by O2 = 2 O. No same-condition measured
+        parent pressures are published in this abstract, so no parent observations are assigned. No numeric uncertainty printed.
+        Typewriter I.4 read as 1.4.
   evidence:
     class:
       tag: value
@@ -1812,8 +1940,17 @@ observations:
       at the conditions with higher Po2 (table).
     model: model_derived
   admission:
-    status: pending
-    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: extract-kems-026
+      date: '2026-09-12'
+      evidence:
+        published_page: 946
+        pdf_page_index: 2
+        table: Po2
+        note: Po2 pressure in the vapor during the vaporization of hightemperature residuals of chondrite Murchison and CAI
+          inclusions of Efremovka. The abstract gives sample names but no numerical bulk compositions.
   notices: []
   source_id: kems-028-yakovlev-1984
   locator:
@@ -1821,7 +1958,7 @@ observations:
     pdf_page_index: 2
     table: Po2
     note: Po2 pressure in the vapor during the vaporization of hightemperature residuals of chondrite Murchison and CAI inclusions
-      of Efremovka
+      of Efremovka. The abstract gives sample names but no numerical bulk compositions.
   read_from: pdf:kems-028-yakovlev-1984
   point_conditions:
     temperature_K:
@@ -1833,7 +1970,7 @@ observations:
         pdf_page_index: 2
         table: Po2
         note: Po2 pressure in the vapor during the vaporization of hightemperature residuals of chondrite Murchison and CAI
-          inclusions of Efremovka
+          inclusions of Efremovka. The abstract gives sample names but no numerical bulk compositions.
       inference:
         relation: celsius_to_kelvin
         inputs:
@@ -1849,7 +1986,7 @@ observations:
               pdf_page_index: 2
               table: Po2
               note: Po2 pressure in the vapor during the vaporization of hightemperature residuals of chondrite Murchison
-                and CAI inclusions of Efremovka
+                and CAI inclusions of Efremovka. The abstract gives sample names but no numerical bulk compositions.
         - - factor
           - state:
               tag: value
@@ -1859,7 +1996,7 @@ observations:
               pdf_page_index: 2
               table: Po2
               note: Po2 pressure in the vapor during the vaporization of hightemperature residuals of chondrite Murchison
-                and CAI inclusions of Efremovka
+                and CAI inclusions of Efremovka. The abstract gives sample names but no numerical bulk compositions.
         output_unit: K
   derivation:
     relation: identity:Pa
@@ -2089,9 +2226,14 @@ observations:
       value: measured_direct
     original_method_class: measured_direct
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - p_partial
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: kems-028-yakovlev-1984::yakovlev_1984_murchison_Al_max_2100C
   source_id: kems-028-yakovlev-1984
   locator:
     published_page: 945
@@ -2230,9 +2372,14 @@ observations:
       value: measured_direct
     original_method_class: measured_direct
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - p_partial
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: kems-028-yakovlev-1984::yakovlev_1984_murchison_Ca_1825C
   source_id: kems-028-yakovlev-1984
   locator:
     published_page: 945
@@ -2281,8 +2428,8 @@ observations:
   experiment_id: 9c23c4aa30f9099447a3f6d06f4ae200c16b33be0e601ff7552ed76d597be4d3::kems-028-yakovlev-1984
   identity:
     quantity:
-      tag: value
-      value: p_partial
+      tag: unknown
+      reason: source semantics bound_not_point_ordering is ordering/categorical, not p_partial
     species:
       formula: Ca
       phase:
@@ -2294,94 +2441,43 @@ observations:
       charge:
         tag: value
         value: 0
-    subtype:
-      tag: not_applicable
-      reason: profile p_partial does not use subtype
-    per:
-      tag: not_applicable
-      reason: profile p_partial does not use per
     temperature_K:
       tag: unknown
       reason: source T_range_K [2223.15, 2298.15]; no midpoint invented
-    standard_pressure_Pa:
-      tag: not_applicable
-      reason: profile p_partial does not use standard_pressure_Pa
-    reaction:
-      tag: unknown
-      reason: source reaction/equilibrium not grounded
-    formation_elements:
-      tag: not_applicable
-      reason: profile p_partial does not use formation_elements
-    reference_state:
-      tag: value
-      value:
-        convention: raoultian_pure_endmember
-        endmember:
-          formula: Ca
-          phase:
-            tag: value
-            value: g
-          polymorph:
-            tag: not_applicable
-            reason: not crystal
-          charge:
-            tag: value
-            value: 0
-        component_basis: Ca
-        reference_pressure_bar: '1'
-    reservoir:
-      tag: unknown
-      reason: source condensed reservoir not grounded
-    composition:
-      tag: unknown
-      reason: no composition mapped from source
-    fO2_Pa:
-      tag: unknown
-      reason: no fO2_Pa mapped from source
-    total_pressure_Pa:
-      tag: unknown
-      reason: in_cell_total_pressure_not_derivable
-    sweep_gas:
-      tag: not_applicable
-      reason: profile p_partial does not use sweep_gas
-    exposure:
-      tag: not_applicable
-      reason: profile p_partial does not use exposure
-    sample_mass_kg:
-      tag: not_applicable
-      reason: profile p_partial does not use sample_mass_kg
-    wall:
-      tag: not_applicable
-      reason: profile p_partial does not use wall
   value:
-    kind: point
-    point: '0.05866168'
+    kind: categorical
+    categorical: bound_not_point_ordering
     approximate: false
   uncertainty:
     kind: printed
     verbatim:
-      note: Maximum in a T window as printed.
+      note: The prose gives a range maximum, not a point; it is retained categorically and rejected from point-pressure scoring.
   evidence:
     class:
       tag: value
       value: measured_direct
     original_method_class: measured_direct
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
+    status: rejected
+    reason: Maximum over a temperature range is not a single-temperature point pressure.
+    decided_by:
+      worker: extract-kems-026
+      date: '2026-09-12'
+      evidence:
+        published_page: 945
+        pdf_page_index: 1
+        paragraph: Calcium reaches the maximum pressure (P_Ca=4.4×10^-4 tor) at temperatures 1950-2025 C
+        note: 'Printed wording: “Calcium reaches the maximum pressure (P_Ca=4.4×10^-4 tor) at temperatures 1950-2025 C.” This
+          is a range maximum, not a point pressure.'
   notices: []
   source_id: kems-028-yakovlev-1984
   locator:
     published_page: 945
     pdf_page_index: 1
     paragraph: Calcium reaches the maximum pressure (P_Ca=4.4×10^-4 tor) at temperatures 1950-2025 C
+    note: 'Printed wording: “Calcium reaches the maximum pressure (P_Ca=4.4×10^-4 tor) at temperatures 1950-2025 C.” This
+      is a range maximum, not a point pressure.'
   read_from: pdf:kems-028-yakovlev-1984
-  derivation:
-    relation: identity.reference_state=ideal-gas Ca(g) at 1 bar from source-declared partial pressure
-    inputs:
-    - pdf:kems-028-yakovlev-1984
-    parameters: []
-    output_unit: Pa
 - observation_id: kems-028-yakovlev-1984::yakovlev_1984_murchison_FeO_top_1650C
   experiment_id: 9c23c4aa30f9099447a3f6d06f4ae200c16b33be0e601ff7552ed76d597be4d3::kems-028-yakovlev-1984
   identity:
@@ -2465,21 +2561,33 @@ observations:
   uncertainty:
     kind: printed
     verbatim:
-      note: No numeric uncertainty printed. Distinct from the 10^-2 torr Fe maximum in the same T window.
+      note: No numeric uncertainty printed. The preceding range sentence assigns the 10^-2 torr maximum to P_FeO and conflicts
+        with this point.
   evidence:
     class:
       tag: value
       value: measured_direct
     original_method_class: measured_direct
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: extract-kems-026
+      date: '2026-09-12'
+      evidence:
+        published_page: 945
+        pdf_page_index: 1
+        paragraph: The top pressure of iron oxide (P_FeO=8.1×10^-5 tor) relates to T=1650 C
+        note: This is the printed FeO point. The preceding sentence gives a conflicting P_FeO=10^-2 tor maximum over 1450–1725
+          C. Murchison chondrite is named as the sample; no numerical bulk composition is printed in this abstract.
   notices: []
   source_id: kems-028-yakovlev-1984
   locator:
     published_page: 945
     pdf_page_index: 1
     paragraph: The top pressure of iron oxide (P_FeO=8.1×10^-5 tor) relates to T=1650 C
+    note: This is the printed FeO point. The preceding sentence gives a conflicting P_FeO=10^-2 tor maximum over 1450–1725
+      C. Murchison chondrite is named as the sample; no numerical bulk composition is printed in this abstract.
   read_from: pdf:kems-028-yakovlev-1984
   point_conditions:
     temperature_K:
@@ -2490,6 +2598,8 @@ observations:
         published_page: 945
         pdf_page_index: 1
         paragraph: The top pressure of iron oxide (P_FeO=8.1×10^-5 tor) relates to T=1650 C
+        note: This is the printed FeO point. The preceding sentence gives a conflicting P_FeO=10^-2 tor maximum over 1450–1725
+          C. Murchison chondrite is named as the sample; no numerical bulk composition is printed in this abstract.
       inference:
         relation: celsius_to_kelvin
         inputs:
@@ -2504,6 +2614,9 @@ observations:
               published_page: 945
               pdf_page_index: 1
               paragraph: The top pressure of iron oxide (P_FeO=8.1×10^-5 tor) relates to T=1650 C
+              note: This is the printed FeO point. The preceding sentence gives a conflicting P_FeO=10^-2 tor maximum over
+                1450–1725 C. Murchison chondrite is named as the sample; no numerical bulk composition is printed in this
+                abstract.
         - - factor
           - state:
               tag: value
@@ -2512,6 +2625,9 @@ observations:
               published_page: 945
               pdf_page_index: 1
               paragraph: The top pressure of iron oxide (P_FeO=8.1×10^-5 tor) relates to T=1650 C
+              note: This is the printed FeO point. The preceding sentence gives a conflicting P_FeO=10^-2 tor maximum over
+                1450–1725 C. Murchison chondrite is named as the sample; no numerical bulk composition is printed in this
+                abstract.
         output_unit: K
   derivation:
     relation: species.phase=gas declared by source standard_state FeO(g); identity.reference_state=ideal-gas FeO(g) at 1 bar
@@ -2524,8 +2640,8 @@ observations:
   experiment_id: 9c23c4aa30f9099447a3f6d06f4ae200c16b33be0e601ff7552ed76d597be4d3::kems-028-yakovlev-1984
   identity:
     quantity:
-      tag: value
-      value: p_partial
+      tag: unknown
+      reason: source semantics bound_not_point_ordering is ordering/categorical, not p_partial
     species:
       formula: Fe
       phase:
@@ -2537,94 +2653,46 @@ observations:
       charge:
         tag: value
         value: 0
-    subtype:
-      tag: not_applicable
-      reason: profile p_partial does not use subtype
-    per:
-      tag: not_applicable
-      reason: profile p_partial does not use per
     temperature_K:
       tag: unknown
       reason: source T_range_K [1723.15, 1998.15]; no midpoint invented
-    standard_pressure_Pa:
-      tag: not_applicable
-      reason: profile p_partial does not use standard_pressure_Pa
-    reaction:
-      tag: unknown
-      reason: source reaction/equilibrium not grounded
-    formation_elements:
-      tag: not_applicable
-      reason: profile p_partial does not use formation_elements
-    reference_state:
-      tag: value
-      value:
-        convention: raoultian_pure_endmember
-        endmember:
-          formula: Fe
-          phase:
-            tag: value
-            value: g
-          polymorph:
-            tag: not_applicable
-            reason: not crystal
-          charge:
-            tag: value
-            value: 0
-        component_basis: Fe
-        reference_pressure_bar: '1'
-    reservoir:
-      tag: unknown
-      reason: source condensed reservoir not grounded
-    composition:
-      tag: unknown
-      reason: no composition mapped from source
-    fO2_Pa:
-      tag: unknown
-      reason: no fO2_Pa mapped from source
-    total_pressure_Pa:
-      tag: unknown
-      reason: in_cell_total_pressure_not_derivable
-    sweep_gas:
-      tag: not_applicable
-      reason: profile p_partial does not use sweep_gas
-    exposure:
-      tag: not_applicable
-      reason: profile p_partial does not use exposure
-    sample_mass_kg:
-      tag: not_applicable
-      reason: profile p_partial does not use sample_mass_kg
-    wall:
-      tag: not_applicable
-      reason: profile p_partial does not use wall
   value:
-    kind: point
-    point: '1.33322'
+    kind: categorical
+    categorical: bound_not_point_ordering
     approximate: false
   uncertainty:
     kind: printed
     verbatim:
-      note: Order-of-magnitude maximum (10^-2 torr) as printed; not a single T point.
+      note: The prose gives a range maximum, not a point; it is retained categorically and rejected from point-pressure scoring.
   evidence:
     class:
       tag: value
       value: measured_direct
     original_method_class: measured_direct
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
+    status: rejected
+    reason: Maximum over a temperature range is not a single-temperature point pressure.
+    decided_by:
+      worker: extract-kems-026
+      date: '2026-09-12'
+      evidence:
+        published_page: 945
+        pdf_page_index: 1
+        paragraph: Maximum P_FeO=10^-2 tor is watched in the wide temperature range (T=1450-1725 C).
+        note: The next sentence states “The top pressure of iron oxide (P_FeO=8.1×10^-5 tor) relates to T=1650 C.” This conflicts
+          with the range maximum printed as P_FeO=10^-2 tor. The existing Fe(g) assignment follows Fig. 1's Fe label; no figure
+          values are digitised. Murchison chondrite is named as the sample; no numerical bulk composition is printed in this
+          abstract.
   notices: []
   source_id: kems-028-yakovlev-1984
   locator:
     published_page: 945
     pdf_page_index: 1
-    paragraph: Maximum P=10^-2 tor is watched in the wide temperature range (T=1450-1725 C)
+    paragraph: Maximum P_FeO=10^-2 tor is watched in the wide temperature range (T=1450-1725 C).
+    note: The next sentence states “The top pressure of iron oxide (P_FeO=8.1×10^-5 tor) relates to T=1650 C.” This conflicts
+      with the range maximum printed as P_FeO=10^-2 tor. The existing Fe(g) assignment follows Fig. 1's Fe label; no figure
+      values are digitised. Murchison chondrite is named as the sample; no numerical bulk composition is printed in this abstract.
   read_from: pdf:kems-028-yakovlev-1984
-  derivation:
-    relation: identity.reference_state=ideal-gas Fe(g) at 1 bar from source-declared partial pressure
-    inputs:
-    - pdf:kems-028-yakovlev-1984
-    parameters: []
-    output_unit: Pa
 - observation_id: kems-028-yakovlev-1984::yakovlev_1984_murchison_Fe_troilite_1050C
   experiment_id: 9c23c4aa30f9099447a3f6d06f4ae200c16b33be0e601ff7552ed76d597be4d3::kems-028-yakovlev-1984
   identity:
@@ -2715,8 +2783,17 @@ observations:
       value: measured_direct
     original_method_class: measured_direct
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: extract-kems-026
+      date: '2026-09-12'
+      evidence:
+        published_page: 945
+        pdf_page_index: 1
+        paragraph: Iron on the level of pressure 1.8×10^-5 tor have been already observed at T=1050 C and that is clearly
+          connected with the decay of troilite
+        note: Murchison chondrite is named as the sample; no numerical bulk composition is printed in this abstract.
   notices: []
   source_id: kems-028-yakovlev-1984
   locator:
@@ -2724,6 +2801,7 @@ observations:
     pdf_page_index: 1
     paragraph: Iron on the level of pressure 1.8×10^-5 tor have been already observed at T=1050 C and that is clearly connected
       with the decay of troilite
+    note: Murchison chondrite is named as the sample; no numerical bulk composition is printed in this abstract.
   read_from: pdf:kems-028-yakovlev-1984
   point_conditions:
     temperature_K:
@@ -2735,6 +2813,7 @@ observations:
         pdf_page_index: 1
         paragraph: Iron on the level of pressure 1.8×10^-5 tor have been already observed at T=1050 C and that is clearly
           connected with the decay of troilite
+        note: Murchison chondrite is named as the sample; no numerical bulk composition is printed in this abstract.
       inference:
         relation: celsius_to_kelvin
         inputs:
@@ -2750,6 +2829,7 @@ observations:
               pdf_page_index: 1
               paragraph: Iron on the level of pressure 1.8×10^-5 tor have been already observed at T=1050 C and that is clearly
                 connected with the decay of troilite
+              note: Murchison chondrite is named as the sample; no numerical bulk composition is printed in this abstract.
         - - factor
           - state:
               tag: value
@@ -2759,6 +2839,7 @@ observations:
               pdf_page_index: 1
               paragraph: Iron on the level of pressure 1.8×10^-5 tor have been already observed at T=1050 C and that is clearly
                 connected with the decay of troilite
+              note: Murchison chondrite is named as the sample; no numerical bulk composition is printed in this abstract.
         output_unit: K
   derivation:
     relation: identity.reference_state=ideal-gas Fe(g) at 1 bar from source-declared partial pressure
@@ -2856,9 +2937,14 @@ observations:
       value: measured_direct
     original_method_class: measured_direct
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - p_partial
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: kems-028-yakovlev-1984::yakovlev_1984_murchison_K_P_1225C
   source_id: kems-028-yakovlev-1984
   locator:
     published_page: 945
@@ -2907,8 +2993,8 @@ observations:
   experiment_id: 9c23c4aa30f9099447a3f6d06f4ae200c16b33be0e601ff7552ed76d597be4d3::kems-028-yakovlev-1984
   identity:
     quantity:
-      tag: value
-      value: p_partial
+      tag: unknown
+      reason: source semantics bound_not_point_ordering is ordering/categorical, not p_partial
     species:
       formula: Mg
       phase:
@@ -2920,94 +3006,41 @@ observations:
       charge:
         tag: value
         value: 0
-    subtype:
-      tag: not_applicable
-      reason: profile p_partial does not use subtype
-    per:
-      tag: not_applicable
-      reason: profile p_partial does not use per
     temperature_K:
       tag: unknown
       reason: source T_range_K [2023.15, 2098.15]; no midpoint invented
-    standard_pressure_Pa:
-      tag: not_applicable
-      reason: profile p_partial does not use standard_pressure_Pa
-    reaction:
-      tag: unknown
-      reason: source reaction/equilibrium not grounded
-    formation_elements:
-      tag: not_applicable
-      reason: profile p_partial does not use formation_elements
-    reference_state:
-      tag: value
-      value:
-        convention: raoultian_pure_endmember
-        endmember:
-          formula: Mg
-          phase:
-            tag: value
-            value: g
-          polymorph:
-            tag: not_applicable
-            reason: not crystal
-          charge:
-            tag: value
-            value: 0
-        component_basis: Mg
-        reference_pressure_bar: '1'
-    reservoir:
-      tag: unknown
-      reason: source condensed reservoir not grounded
-    composition:
-      tag: unknown
-      reason: no composition mapped from source
-    fO2_Pa:
-      tag: unknown
-      reason: no fO2_Pa mapped from source
-    total_pressure_Pa:
-      tag: unknown
-      reason: in_cell_total_pressure_not_derivable
-    sweep_gas:
-      tag: not_applicable
-      reason: profile p_partial does not use sweep_gas
-    exposure:
-      tag: not_applicable
-      reason: profile p_partial does not use exposure
-    sample_mass_kg:
-      tag: not_applicable
-      reason: profile p_partial does not use sample_mass_kg
-    wall:
-      tag: not_applicable
-      reason: profile p_partial does not use wall
   value:
-    kind: point
-    point: '1.1065726'
+    kind: categorical
+    categorical: bound_not_point_ordering
     approximate: false
   uncertainty:
     kind: printed
     verbatim:
-      note: Maximum in a T window as printed.
+      note: The prose gives a range maximum, not a point; it is retained categorically and rejected from point-pressure scoring.
   evidence:
     class:
       tag: value
       value: measured_direct
     original_method_class: measured_direct
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
+    status: rejected
+    reason: Maximum over a temperature range is not a single-temperature point pressure.
+    decided_by:
+      worker: extract-kems-026
+      date: '2026-09-12'
+      evidence:
+        published_page: 945
+        pdf_page_index: 1
+        paragraph: Maximum P_SiO and P_Mg in the temperature range 1750-1825 C are accordingly 2×10^-2 tor and 8.3×10^-3 tor
+        note: Murchison chondrite is named as the sample; no numerical bulk composition is printed in this abstract.
   notices: []
   source_id: kems-028-yakovlev-1984
   locator:
     published_page: 945
     pdf_page_index: 1
     paragraph: Maximum P_SiO and P_Mg in the temperature range 1750-1825 C are accordingly 2×10^-2 tor and 8.3×10^-3 tor
+    note: Murchison chondrite is named as the sample; no numerical bulk composition is printed in this abstract.
   read_from: pdf:kems-028-yakovlev-1984
-  derivation:
-    relation: identity.reference_state=ideal-gas Mg(g) at 1 bar from source-declared partial pressure
-    inputs:
-    - pdf:kems-028-yakovlev-1984
-    parameters: []
-    output_unit: Pa
 - observation_id: kems-028-yakovlev-1984::yakovlev_1984_murchison_Na_P_1225C
   experiment_id: 9c23c4aa30f9099447a3f6d06f4ae200c16b33be0e601ff7552ed76d597be4d3::kems-028-yakovlev-1984
   identity:
@@ -3099,9 +3132,14 @@ observations:
       value: measured_direct
     original_method_class: measured_direct
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - p_partial
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: kems-028-yakovlev-1984::yakovlev_1984_murchison_Na_P_1225C
   source_id: kems-028-yakovlev-1984
   locator:
     published_page: 945
@@ -3150,8 +3188,8 @@ observations:
   experiment_id: 9c23c4aa30f9099447a3f6d06f4ae200c16b33be0e601ff7552ed76d597be4d3::kems-028-yakovlev-1984
   identity:
     quantity:
-      tag: value
-      value: p_partial
+      tag: unknown
+      reason: source semantics bound_not_point_ordering is ordering/categorical, not p_partial
     species:
       formula: SiO
       phase:
@@ -3163,94 +3201,43 @@ observations:
       charge:
         tag: value
         value: 0
-    subtype:
-      tag: not_applicable
-      reason: profile p_partial does not use subtype
-    per:
-      tag: not_applicable
-      reason: profile p_partial does not use per
     temperature_K:
       tag: unknown
       reason: source T_range_K [2023.15, 2098.15]; no midpoint invented
-    standard_pressure_Pa:
-      tag: not_applicable
-      reason: profile p_partial does not use standard_pressure_Pa
-    reaction:
-      tag: unknown
-      reason: source reaction/equilibrium not grounded
-    formation_elements:
-      tag: not_applicable
-      reason: profile p_partial does not use formation_elements
-    reference_state:
-      tag: value
-      value:
-        convention: raoultian_pure_endmember
-        endmember:
-          formula: SiO
-          phase:
-            tag: value
-            value: g
-          polymorph:
-            tag: not_applicable
-            reason: not crystal
-          charge:
-            tag: value
-            value: 0
-        component_basis: SiO
-        reference_pressure_bar: '1'
-    reservoir:
-      tag: unknown
-      reason: source condensed reservoir not grounded
-    composition:
-      tag: unknown
-      reason: no composition mapped from source
-    fO2_Pa:
-      tag: unknown
-      reason: no fO2_Pa mapped from source
-    total_pressure_Pa:
-      tag: unknown
-      reason: in_cell_total_pressure_not_derivable
-    sweep_gas:
-      tag: not_applicable
-      reason: profile p_partial does not use sweep_gas
-    exposure:
-      tag: not_applicable
-      reason: profile p_partial does not use exposure
-    sample_mass_kg:
-      tag: not_applicable
-      reason: profile p_partial does not use sample_mass_kg
-    wall:
-      tag: not_applicable
-      reason: profile p_partial does not use wall
   value:
-    kind: point
-    point: '2.66644'
+    kind: categorical
+    categorical: bound_not_point_ordering
     approximate: false
   uncertainty:
     kind: printed
     verbatim:
-      note: Maximum in a T window as printed; not a single T point.
+      note: The prose gives a range maximum, not a point; it is retained categorically and rejected from point-pressure scoring.
   evidence:
     class:
       tag: value
       value: measured_direct
     original_method_class: measured_direct
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
+    status: rejected
+    reason: Maximum over a temperature range is not a single-temperature point pressure.
+    decided_by:
+      worker: extract-kems-026
+      date: '2026-09-12'
+      evidence:
+        published_page: 945
+        pdf_page_index: 1
+        paragraph: Maximum P_SiO and P_Mg in the temperature range 1750-1825 C are accordingly 2×10^-2 tor and 8.3×10^-3 tor
+        note: 'Printed range maximum: “Maximum P_SiO and P_Mg in the temperature range 1750-1825 C are accordingly 2×10^-2
+          tor and 8.3×10^-3 tor.” The stated SiO maximum is not a point pressure.'
   notices: []
   source_id: kems-028-yakovlev-1984
   locator:
     published_page: 945
     pdf_page_index: 1
     paragraph: Maximum P_SiO and P_Mg in the temperature range 1750-1825 C are accordingly 2×10^-2 tor and 8.3×10^-3 tor
+    note: 'Printed range maximum: “Maximum P_SiO and P_Mg in the temperature range 1750-1825 C are accordingly 2×10^-2 tor
+      and 8.3×10^-3 tor.” The stated SiO maximum is not a point pressure.'
   read_from: pdf:kems-028-yakovlev-1984
-  derivation:
-    relation: identity.reference_state=ideal-gas SiO(g) at 1 bar from source-declared partial pressure
-    inputs:
-    - pdf:kems-028-yakovlev-1984
-    parameters: []
-    output_unit: Pa
 - observation_id: kems-028-yakovlev-1984::yakovlev_1984_murchison_TiO_gt_TiO2_at_Ca_max
   experiment_id: 9c23c4aa30f9099447a3f6d06f4ae200c16b33be0e601ff7552ed76d597be4d3::kems-028-yakovlev-1984
   identity:

@@ -703,19 +703,99 @@ def test_series_row_point_conditions_preserve_pressure_interval(tmp_path: Path) 
     assert pressure.state.value.interval_high == as_decimal("20")
 
 
-def test_no_default_property_blanked_admission_is_unknown(tmp_path: Path) -> None:
+def test_missing_admission_status_defaults_with_notice_even_when_class_unknown(
+    tmp_path: Path,
+) -> None:
     extract = yaml.safe_load(yaml.safe_dump(FIXTURE_EXTRACT))
     extract["species"]["Na"]["observations"][0]["values"].pop("admission_status")
     extract["species"]["Na"]["observations"][0]["values"].pop("method_class")
     root = _write_min_tree(tmp_path, extract)
     result = migrate(root, write=False)
     obs = next(iter(result.observations.values()))
-    assert obs.admission.status is AdmissionStatus.PENDING
-    assert obs.admission.reason == "no observation admission_status mapped from source"
+    assert obs.admission.status is AdmissionStatus.ADMITTED
+    admission_notice = next(
+        notice
+        for notice in obs.notices
+        if notice.kind is NoticeKind.ADMISSION_DEFAULTED
+    )
+    assert "not a reviewer decision" in admission_notice.reason
+    assert admission_notice.origin == obs.observation_id
     assert obs.evidence.class_.tag is StateTag.UNKNOWN
     # Phase was stated as gas — that is a lift, not a default.
     assert obs.identity.species.phase.is_value
     assert obs.identity.species.phase.value is Phase.G
+
+
+def test_missing_admission_status_keeps_unmeasured_row_pending(tmp_path: Path) -> None:
+    extract = yaml.safe_load(yaml.safe_dump(FIXTURE_EXTRACT))
+    values = extract["species"]["Na"]["observations"][0]["values"]
+    values.pop("admission_status")
+    values.pop("series")
+    values["method_class"] = "figure_only"
+    root = _write_min_tree(tmp_path, extract)
+
+    observation = next(iter(migrate(root, write=False).observations.values()))
+
+    assert observation.value.kind is ValueKind.UNAVAILABLE
+    assert observation.admission.status is AdmissionStatus.PENDING
+    assert not any(
+        notice.kind is NoticeKind.ADMISSION_DEFAULTED
+        for notice in observation.notices
+    )
+
+
+@pytest.mark.parametrize(
+    ("source_status", "expected_status", "defaulted"),
+    [
+        ("pending", AdmissionStatus.ADMITTED, True),
+        ("pending_validation", AdmissionStatus.ADMITTED, True),
+        ("figure_only", AdmissionStatus.PENDING, False),
+        ("model_output_not_measurement", AdmissionStatus.PENDING, False),
+        (
+            "rejected_model_output_not_measurement",
+            AdmissionStatus.REJECTED,
+            False,
+        ),
+        ("admitted", AdmissionStatus.ADMITTED, False),
+    ],
+)
+def test_source_admission_default_scope(
+    tmp_path: Path,
+    source_status: str,
+    expected_status: AdmissionStatus,
+    defaulted: bool,
+) -> None:
+    extract = yaml.safe_load(yaml.safe_dump(FIXTURE_EXTRACT))
+    extract["species"]["Na"]["observations"][0]["values"][
+        "admission_status"
+    ] = source_status
+    root = _write_min_tree(tmp_path, extract)
+    result = migrate(root, write=False)
+    obs = next(iter(result.observations.values()))
+
+    assert obs.admission.status is expected_status
+    assert any(
+        notice.kind is NoticeKind.ADMISSION_DEFAULTED for notice in obs.notices
+    ) is defaulted
+
+
+def test_plain_pending_without_source_decision_defaults_and_adds_notice(
+    tmp_path: Path,
+) -> None:
+    from simulator.battery.migrate import observation_from_plain
+
+    result = migrate(_write_min_tree(tmp_path), write=False)
+    observation = next(iter(result.observations.values()))
+    payload = to_plain(observation)
+    payload["admission"] = {"reason": "no observation admission_status mapped from source"}
+    payload["notices"] = []
+
+    decoded = observation_from_plain(payload)
+
+    assert decoded.admission.status is AdmissionStatus.ADMITTED
+    assert any(
+        notice.kind is NoticeKind.ADMISSION_DEFAULTED for notice in decoded.notices
+    )
 
 
 def test_h07_write_outputs_prunes_stale_work_files(tmp_path: Path) -> None:
@@ -876,6 +956,14 @@ def test_validate_corpus_zero_hard_issues_on_migrated_store() -> None:
     works, experiments, observations = load_migrated_store(REPO_ROOT)
     assert works
     assert observations
+    figure_only = observations[
+        "1997jonesthermo::jones_1997_imcc_mgo_activity_comparison"
+    ]
+    assert figure_only.admission.status is AdmissionStatus.PENDING
+    assert not any(
+        notice.kind is NoticeKind.ADMISSION_DEFAULTED
+        for notice in figure_only.notices
+    )
     report = validate_corpus(works, experiments, observations, residuals=None)
     # J02 restored C(derived) derived_from+derivation. Unstated ancestry is a
     # hard conditional_field, not a silent pass. Other reasons must stay zero.
@@ -2955,7 +3043,12 @@ def test_j01_store_census_series_numeric_matches_declared_field() -> None:
     # activity_coefficient 128->161, n_numeric 356->389. This census counts printed
     # cells that survive migration regardless of evidence class (as for Ueshima
     # model_derived above) - mismatches stays 0.
-    assert census.get("activity_coefficient") == 161
+    # Re-pinned for the O'Neill & Eggins 2002 extract (Chem. Geol. 186, Table 7): 91 printed
+    # gamma cells for FeO, NiO, CoO, MoO2, MoO3 in CMAS melts at 1400 C. Per-source delta:
+    # oneill-2002-feo-activity-coefficients-cmas 0->91; activity_coefficient 161->252.
+    # The count moved because data became visible, not because a check was relaxed -
+    # mismatches stays 0.
+    assert census.get("activity_coefficient") == 252
     # Re-pinned with data/literature/extracts/pahlevan-2026-protolunar-volatile-outflows.yaml
     # (51 p_partial points, 2026-09-24): p_partial 18->69 and n_numeric 223->274.
     # The counts moved because data became visible, not because a check was relaxed - mismatches stays 0.
@@ -3001,7 +3094,8 @@ def test_j01_store_census_series_numeric_matches_declared_field() -> None:
     # landed 450 (scorer p_partial +61, Holzheid +33): n_numeric 450->500; t-998 adds
     # four Zhang Table 4 alpha cells, and 1164 residue components, so the merged
     # total is 1668; mismatches remains 0.
-    assert n_numeric == 1668, (n_numeric, census, n_unavailable)
+    # O'Neill & Eggins 2002 adds 91 activity_coefficient cells: n_numeric 1668->1759.
+    assert n_numeric == 1759, (n_numeric, census, n_unavailable)
 
 
 def test_residue_point_condition_values_keep_their_printed_types() -> None:
@@ -4371,6 +4465,72 @@ def test_activity_standard_state_source_prose_lifts_typed_reference(tmp_path: Pa
     assert reference_state.value.endmember.formula == "Na2O"
     assert reference_state.value.endmember.phase.value is Phase.L
     assert reference_state.value.reference_pressure_bar is None
+
+
+def test_guo_structured_standard_state_lifts_periclase_reference(tmp_path: Path) -> None:
+    source = REPO_ROOT / "data/literature/extracts/guo-2021-mgo-activity-cmas-slag.yaml"
+    extract = yaml.safe_load(source.read_text(encoding="utf-8"))
+    row = extract["species"]["MgO"]["observations"][0]
+    row["standard_state"] = {
+        "state": {
+            "tag": "value",
+            "value": {
+                "convention": "raoultian_pure_endmember",
+                "endmember": {
+                    "formula": "MgO",
+                    "phase": {"tag": "value", "value": "cr"},
+                    "polymorph": {"tag": "value", "value": "periclase"},
+                },
+                "component_basis": "MgO",
+            },
+        },
+        "inferred": False,
+        "note": "Typed crystal MgO as periclase; the extract states pure solid MgO.",
+        "locator": {
+            "published_page": 2728,
+            "pdf_page_index": 4,
+            "table": "5",
+            "note": "Table 5 activity standard state",
+        },
+    }
+    root = _write_min_tree(tmp_path, extract)
+    result = migrate(root, write=False)
+    observations = [
+        obs
+        for obs in result.observations.values()
+        if "guo_2021_table5_mgo_activities_1873k" in obs.observation_id
+    ]
+    assert len(observations) == 8
+    for obs in observations:
+        reference_state = obs.identity.reference_state
+        assert reference_state is not None and reference_state.is_value
+        assert reference_state.value.convention is ReferenceStateConvention.RAOULTIAN_PURE_ENDMEMBER
+        assert reference_state.value.endmember.formula == "MgO"
+        assert reference_state.value.endmember.phase.value is Phase.CR
+        assert reference_state.value.endmember.polymorph.value is Polymorph.PERICLASE
+
+
+def test_stolyarova_table3_137_row_ids_and_reference_states_unchanged(
+    tmp_path: Path,
+) -> None:
+    result = _migrate_real_extract(
+        tmp_path, "stolyarova-1996-cao-alumina-silica-kems.yaml"
+    )
+    rows = sorted(
+        (oid, obs)
+        for oid, obs in result.observations.items()
+        if "stolyarova_1996_table3_" in oid
+    )
+    assert len(rows) == 137
+    payload = [(oid, to_plain(obs.identity.reference_state)) for oid, obs in rows]
+    digest = hashlib.sha256(
+        json.dumps(
+            payload, sort_keys=True, separators=(",", ":"), ensure_ascii=False
+        ).encode()
+    ).hexdigest()
+    # Pinned to the digest on green c9b6e545d, whose Stolyarova 1996 locator notes carry the
+    # Table 1 caption and Eq. (13) quotes; this change must leave it unchanged.
+    assert digest == "a3f9988c9f64bb73c07eefa07b1d2edaac77abb0b2496799dba925c6bedaa968"
 
 
 def test_reference_prose_keeps_printed_endmember_and_does_not_stamp_one_bar() -> None:
@@ -7032,8 +7192,8 @@ def test_store_pyrolysis_yield_census_is_honest() -> None:
     assert len(candidates) == 26
     admitted = [o for o in candidates if o.admission.status is AdmissionStatus.ADMITTED]
     pending = [o for o in candidates if o.admission.status is AdmissionStatus.PENDING]
-    assert len(admitted) == 18
-    assert len(pending) == 8
+    assert len(admitted) == 22
+    assert len(pending) == 4
     disagreed = [
         o
         for o in pending
@@ -7069,8 +7229,10 @@ def test_vacuum_pyrolysis_sidecar_loads_pomeroy_not_robinot_duplicates(
     assert pomeroy.value.kind is ValueKind.POINT
     assert pomeroy.value.point == as_decimal("0.0117")
     assert float(pomeroy.identity.temperature_K.value) == 1400.0 + 273.15
-    assert pomeroy.admission.status is AdmissionStatus.PENDING
-    assert "sample mass" in pomeroy.admission.reason or "not reported" in pomeroy.admission.reason or pomeroy.admission.reason.startswith("no observation admission_status")
+    assert pomeroy.admission.status is AdmissionStatus.ADMITTED
+    assert any(
+        notice.kind is NoticeKind.ADMISSION_DEFAULTED for notice in pomeroy.notices
+    )
     work = result.works[result.experiments[pomeroy.experiment_id].work_id]
     asset_ids = {f.asset_id for f in work.source_files.files}
     assert pomeroy.read_from in asset_ids

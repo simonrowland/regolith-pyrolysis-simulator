@@ -11,17 +11,20 @@ from __future__ import annotations
 
 import json
 import math
+import os
 import re
+import sqlite3
 import socket
 import subprocess
 import sys
+import tempfile
 import time
 import warnings
 from collections import defaultdict
 from dataclasses import dataclass, field, replace
 from decimal import Decimal, InvalidOperation
 from pathlib import Path
-from typing import Callable, Iterable, Mapping, Sequence
+from typing import Any, Callable, Iterable, Mapping, Sequence
 
 from simulator.battery.enums import (
     QUANTITY_UNITS,
@@ -42,6 +45,7 @@ from simulator.battery.enums import (
     NoticeKind,
     PerBasis,
     Phase,
+    Polymorph,
     PURE_STANDARD_THERMO,
     Quantity,
     ReferenceStateConvention,
@@ -94,12 +98,14 @@ from simulator.battery.records import (
     _is_source_internally_inconsistent,
     as_decimal,
     phase_token,
+    polymorph_token,
     Species,
     StandardState,
     union_notices,
 )
 from simulator.battery.oxygen_balance import (
     IMCC_ENGINES,
+    OXYGEN_BALANCE_EFFUSION_ENGINES,
     OXYGEN_BALANCE_NOTICE_PREFIX,
     has_own_engine_solved_oxygen_balance,
 )
@@ -354,6 +360,8 @@ SCORE_ELIGIBLE_CONJUNCTS: tuple[str, ...] = (
 )
 
 FLAGGED_STRATUM_UNVERIFIED_APPARATUS = "unverified-apparatus"
+FLAGGED_STRATUM_CALIBRATION_NOT_GROUNDED = "calibration-not-grounded"
+FLAGGED_STRATUM_CELL_MATERIAL_INFERRED = "cell-material-inferred"
 FLAGGED_STRATUM_CATALOGUE_COMPOSITION = "catalogue-composition"
 FLAGGED_STRATUM_SOURCE_INTERNALLY_INCONSISTENT = "source-internally-inconsistent"
 FLAGGED_STRATUM_IMCC_COMPLEX_SATURATION = "imcc_complex_saturation"
@@ -361,6 +369,7 @@ FLAGGED_STRATUM_REFERENCE_CONVERTED_VIA_FUSION = "reference_converted_via_fusion
 _FLAGGED_STRATUM_NOTICE_KINDS: frozenset[NoticeKind] = frozenset(
     {
         NoticeKind.UNVERIFIED_APPARATUS,
+        NoticeKind.CELL_MATERIAL_INFERRED,
         NoticeKind.COMPOSITION_FROM_SAMPLE_CATALOG,
         NoticeKind.IMCC_COMPLEX_SATURATION,
     }
@@ -809,7 +818,7 @@ def _unverified_apparatus_notices(
 ) -> tuple[Notice, ...]:
     """Return the narrow predict-and-flag admission for printed KEMS rows."""
 
-    if experiment is None or gates.passed:
+    if experiment is None:
         return ()
     identity = reference.identity
     if not isinstance(identity, Identity):
@@ -846,15 +855,47 @@ def _unverified_apparatus_notices(
         and reference.evidence.class_.is_value
         and reference.evidence.class_.value in MEASURED_EVIDENCE
     )
-    if not (measured_pressure or comparison_activity):
+    calibration_flagged_partial_pressure = (
+        quantity is Quantity.P_PARTIAL
+        and reference.evidence.class_.is_value
+        and reference.evidence.class_.value in MEASURED_EVIDENCE
+        and any(
+            getattr(check, "passed", True)
+            and str(getattr(check, "name", ""))
+            in {"kems_calibration", "in_cell_partial_pressure_sum"}
+            and isinstance(getattr(check, "detail", {}), Mapping)
+            and check.detail.get("flag") == "calibration_not_grounded"
+            for check in gates.checks
+        )
+    )
+    if not (measured_pressure or comparison_activity or calibration_flagged_partial_pressure):
         return ()
+    allow_calibration = author_reported_pressure or comparison_activity
     missing: set[str] = set()
+    calibration_notice = None
+    calibration_reason = None
     for check in gates.checks:
+        detail = getattr(check, "detail", {})
+        if not isinstance(detail, Mapping):
+            detail = {}
         if getattr(check, "passed", True):
+            if (
+                (allow_calibration or calibration_flagged_partial_pressure)
+                and str(getattr(check, "name", ""))
+                in {"kems_calibration", "in_cell_partial_pressure_sum"}
+                and detail.get("flag") == "calibration_not_grounded"
+            ):
+                missing.add("calibration_not_grounded")
+                notice_text = detail.get("calibration_notice")
+                if isinstance(notice_text, str):
+                    calibration_notice = notice_text
+                    reason = detail.get("reason")
+                    if isinstance(reason, str):
+                        calibration_reason = reason
             continue
         fact = _missing_apparatus_fact(
             check,
-            allow_calibration=author_reported_pressure or comparison_activity,
+            allow_calibration=allow_calibration,
         )
         if fact is None:
             return ()
@@ -865,7 +906,17 @@ def _unverified_apparatus_notices(
         Notice(
             kind=NoticeKind.UNVERIFIED_APPARATUS,
             affected_quantities=(quantity,),
-            reason=f"apparatus_unverified:{fact}",
+            reason=(
+                "calibration_not_grounded: "
+                f"{calibration_notice or 'Calibration is not grounded.'}"
+                + (
+                    f" ({calibration_reason})"
+                    if calibration_reason
+                    else ""
+                )
+                if fact == "calibration_not_grounded"
+                else f"apparatus_unverified:{fact}"
+            ),
             origin=reference.observation_id,
         )
         for fact in sorted(missing)
@@ -876,18 +927,101 @@ def _flagged_stratum_notices(
     reference: Observation,
     experiment: Experiment | None,
     gates: GateOutcome,
+    bench: Bench | None = None,
 ) -> tuple[Notice, ...]:
     return union_notices(
         _unverified_apparatus_notices(reference, experiment, gates),
+        _cell_apparatus_inference_notices(reference, experiment, bench),
         (() if (notice := _catalogue_composition_notice(reference)) is None else (notice,)),
     )
+
+
+def _cell_apparatus_inference_notices(
+    reference: Observation,
+    experiment: Experiment | None,
+    bench: Bench | None,
+) -> tuple[Notice, ...]:
+    """Flag inferred cell materials used by the reactive-cell gate."""
+
+    if experiment is None or not experiment.method.is_value:
+        return ()
+    if experiment.method.value is not MethodToken.KNUDSEN_EFFUSION:
+        return ()
+    quantity = (
+        quantity_token(reference.identity)
+        if isinstance(reference.identity, Identity)
+        else None
+    )
+    if quantity is None:
+        return ()
+    fields: list[tuple[str, Located[Any]]] = []
+    uses_cell_material = (
+        quantity in _VAPOUR_EQUILIBRIUM
+        and not _has_printed_fo2(reference, reference.identity)
+    )
+    if bench is not None and uses_cell_material:
+        if bench.cell_material_and_liner is not None:
+            fields.append(("bench.cell_material_and_liner", bench.cell_material_and_liner))
+        fields.extend(
+            (f"bench.cell_materials[{index}]", material)
+            for index, material in enumerate(bench.cell_materials or ())
+        )
+    apparatus = experiment.apparatus
+    if apparatus is not None and uses_cell_material:
+        if apparatus.cell_material_and_liner is not None:
+            fields.append(
+                (
+                    "experiment.apparatus.cell_material_and_liner",
+                    apparatus.cell_material_and_liner,
+                )
+            )
+    notices: list[Notice] = []
+    for field_name, located in fields:
+        if located.inference is None or not located.state.is_value:
+            continue
+        # These records are cell-material facts: a derivation on one says what
+        # the cell was. A unit conversion or arithmetic normalization restates
+        # a printed numeric quantity (such as orifice diameter) and is not a
+        # material inference. Keep this semantic boundary here rather than
+        # trying to enumerate derivation relation names.
+        evidence = json.dumps(
+            {
+                "field": field_name,
+                "inference": to_plain(located.inference),
+                "locator": to_plain(located.locator),
+            },
+            ensure_ascii=False,
+            sort_keys=True,
+            separators=(",", ":"),
+        )
+        notices.append(
+            Notice(
+                kind=NoticeKind.CELL_MATERIAL_INFERRED,
+                affected_quantities=(quantity,),
+                reason=f"cell_material_inferred:{evidence}",
+                origin=reference.observation_id,
+            )
+        )
+    return tuple(notices)
 
 
 def flagged_strata(notices: Sequence[Notice]) -> tuple[str, ...]:
     strata: list[str] = []
     kinds = {notice.kind for notice in notices}
-    if NoticeKind.UNVERIFIED_APPARATUS in kinds:
+    unverified_apparatus = tuple(
+        notice
+        for notice in notices
+        if notice.kind is NoticeKind.UNVERIFIED_APPARATUS
+    )
+    if any(_is_calibration_not_grounded_reason(n.reason) for n in unverified_apparatus):
+        strata.append(FLAGGED_STRATUM_CALIBRATION_NOT_GROUNDED)
+    if any(
+        not _is_calibration_not_grounded_reason(notice.reason)
+        for notice in unverified_apparatus
+    ):
         strata.append(FLAGGED_STRATUM_UNVERIFIED_APPARATUS)
+    if NoticeKind.CELL_MATERIAL_INFERRED in kinds:
+        strata.append(FLAGGED_STRATUM_CELL_MATERIAL_INFERRED)
     if NoticeKind.COMPOSITION_FROM_SAMPLE_CATALOG in kinds:
         strata.append(FLAGGED_STRATUM_CATALOGUE_COMPOSITION)
     if any(
@@ -900,6 +1034,10 @@ def flagged_strata(notices: Sequence[Notice]) -> tuple[str, ...]:
     if any(_is_fusion_conversion_notice(notice) for notice in notices):
         strata.append(FLAGGED_STRATUM_REFERENCE_CONVERTED_VIA_FUSION)
     return tuple(strata)
+
+
+def _is_calibration_not_grounded_reason(reason: object) -> bool:
+    return isinstance(reason, str) and reason.startswith("calibration_not_grounded:")
 
 
 def _is_fusion_conversion_notice(notice: Notice) -> bool:
@@ -920,8 +1058,10 @@ def _is_flagged_stratum_notice(notice: Notice) -> bool:
     )
 
 
-def _fusion_comparison_reference(reference: Observation) -> Observation:
-    """Return an in-memory liquid-reference view when JANAF supports conversion."""
+def _fusion_comparison_reference(
+    reference: Observation, *, engine: Engine | None = None
+) -> Observation:
+    """Return the liquid-reference comparison view for a solid activity row."""
 
     identity = reference.identity
     if (
@@ -945,9 +1085,42 @@ def _fusion_comparison_reference(reference: Observation) -> Observation:
         or reference.value.point <= 0
     ):
         return reference
+
+    if engine is not None:
+        from simulator.battery.waypoints import MELT_ACTIVITY_ENGINES
+
+        if engine.value not in MELT_ACTIVITY_ENGINES:
+            notice = Notice(
+                kind=NoticeKind.OUT_OF_GAMMA_DOMAIN,
+                affected_quantities=(Quantity.ACTIVITY,),
+                reason=(
+                    "solid/liquid reference conversion skipped: engine reference "
+                    f"is unestablished for {engine.value}; measured "
+                    "solid-reference value left unchanged"
+                ),
+                origin=reference.observation_id,
+                band=f"engine activity reference unestablished: {engine.value}",
+            )
+            return replace(
+                reference,
+                notices=union_notices(reference.notices, (notice,)),
+            )
+
     temperature_K = temperature_of(identity)
     if temperature_K is None:
-        return reference
+        if engine is None:
+            return reference
+        notice = Notice(
+            kind=NoticeKind.OUT_OF_GAMMA_DOMAIN,
+            affected_quantities=(Quantity.ACTIVITY,),
+            reason=(
+                "fusion conversion missing input: activity observation has no "
+                "temperature_K"
+            ),
+            origin=reference.observation_id,
+            band="JANAF fusion conversion requires temperature_K",
+        )
+        return replace(reference, notices=union_notices(reference.notices, (notice,)))
 
     from simulator.battery.generators.janaf import (
         JANAF_R_J_PER_MOL_K,
@@ -966,29 +1139,61 @@ def _fusion_comparison_reference(reference: Observation) -> Observation:
                 "expected one JANAF cr/l crossing",
                 "outside the JANAF table range",
                 "is not bracketed by JANAF table rows",
+                "needed JANAF formation Gibbs row missing",
+                "needed JANAF table node row missing or changed",
+                "JANAF cached table is incomplete",
+                "JANAF table values are missing",
+                "JANAF table has fewer than two Gibbs points",
             )
         ):
             raise
         notice = Notice(
             kind=NoticeKind.OUT_OF_GAMMA_DOMAIN,
             affected_quantities=(Quantity.ACTIVITY,),
-            reason=f"fusion conversion for {formula} was skipped: {reason}",
+            reason=f"fusion conversion missing input for {formula}: {reason}",
             origin=reference.observation_id,
             band=f"JANAF fusion data for {formula}: {reason}",
         )
         return replace(reference, notices=union_notices(reference.notices, (notice,)))
 
-    delta_g_fus_J_per_mol = fusion.delta_g_fus_kJ_per_mol * Decimal(1000)
+    # JANAF Mg-008 (MgO(cr), periclase) and Mg-009 (MgO(l)) give, by node
+    # interpolation at 1873 K, G_s°=-345.91812 and G_l°=-317.44751 kJ/mol.
+    # Thus ΔG_fus=+28.47061 kJ/mol and Δlog10(a)=ΔG_fus*1000/(R*T*ln(10))
+    # = +0.793984 dex (R=8.31441 J mol^-1 K^-1). Their branches cross at
+    # 3104.945598 K, where ΔG_fus and the reference shift go to zero.
+    expected_polymorph = {
+        "Ca-027": Polymorph.LIME,
+        "Al-096": Polymorph.CORUNDUM,
+        "Mg-008": Polymorph.PERICLASE,
+        "O-035": Polymorph.CRISTOBALITE_HIGH,
+    }.get(fusion.crystal_table)
+    observed_polymorph = polymorph_token(standard_state.endmember)
+    if (
+        expected_polymorph is not None
+        and observed_polymorph is not expected_polymorph
+    ):
+        observed = "unknown" if observed_polymorph is None else observed_polymorph.value
+        notice = Notice(
+            kind=NoticeKind.OUT_OF_GAMMA_DOMAIN,
+            affected_quantities=(Quantity.ACTIVITY,),
+            reason=(
+                "fusion conversion missing input: JANAF solid table "
+                f"{fusion.crystal_table} represents polymorph "
+                f"{expected_polymorph.value}, but measured reference polymorph "
+                f"is {observed}"
+            ),
+            origin=reference.observation_id,
+            band=(
+                f"JANAF {fusion.crystal_table} requires "
+                f"{expected_polymorph.value} solid reference"
+            ),
+        )
+        return replace(reference, notices=union_notices(reference.notices, (notice,)))
 
-    # Premise: at a common T and pressure, μ=G°+RT ln(a) is unchanged when
-    # the pure-oxide reference moves from solid to liquid. Thus
-    # G_s+RT ln(a_s)=G_l+RT ln(a_l), so ln(a_l)=ln(a_s)−ΔG_fus/(RT),
-    # where ΔG_fus=G_l−G_s. JANAF G values are kJ/mol and its R is J/mol/K,
-    # so multiply ΔG by 1000 before division. At the JANAF cr/l crossing,
-    # G_l=G_s, ΔG_fus=0, and the conversion leaves activity unchanged.
-    converted_activity = reference.value.point * (
-        -delta_g_fus_J_per_mol / (JANAF_R_J_PER_MOL_K * temperature_K)
-    ).exp()
+    delta_g_fus_J_per_mol = fusion.delta_g_fus_kJ_per_mol * Decimal(1000)
+    offset_dex = delta_g_fus_J_per_mol / (
+        JANAF_R_J_PER_MOL_K * temperature_K * Decimal(10).ln()
+    )
     liquid_endmember = replace(
         standard_state.endmember,
         phase=Phase.L,
@@ -1001,6 +1206,68 @@ def _fusion_comparison_reference(reference: Observation) -> Observation:
     comparison_identity = replace(
         identity, reference_state=State.of(liquid_state)
     )
+
+    melts_notice: Notice | None = None
+    if engine is not None and engine.value in {"alphamelts", "thermoengine"}:
+        if formula == "SiO2":
+            gap = (
+                "measured MELTS/JANAF liquid-reference gap: |delta| <= 0.005 "
+                "dex over 1600–2300 K"
+            )
+        elif formula == "Al2O3":
+            gap = (
+                "measured MELTS/JANAF liquid-reference gap: the JANAF fusion "
+                "shift under-corrects by +0.03 dex at 1933 K, up to +0.11 dex "
+                "at 1600 K, and 0 dex at 2300 K; not computed below 1600 K"
+            )
+        else:
+            gap = None
+        if gap is not None:
+            melts_notice = Notice(
+                kind=NoticeKind.DERIVATION_USES_COMPILATION,
+                affected_quantities=(Quantity.ACTIVITY,),
+                reason=(
+                    "MELTS liquid-endmember reference differs from the JANAF "
+                    f"liquid reference; applied shift is approximate; {gap}; "
+                    "source=docs-private/research/2026-10-02-melts-vs-janaf-liquid/findings.md"
+                ),
+                origin=reference.observation_id,
+                band="MELTS/JANAF liquid reference gap",
+            )
+
+    if temperature_K >= fusion.melting_temperature_K:
+        notice = Notice(
+            kind=NoticeKind.OUT_OF_GAMMA_DOMAIN,
+            affected_quantities=(Quantity.ACTIVITY,),
+            reason=(
+                f"solid reference recorded at T={temperature_K} K >= "
+                f"JANAF T_fus={fusion.melting_temperature_K} K; no numeric "
+                "reference-state conversion applied because liquid is natural"
+            ),
+            origin=reference.observation_id,
+            band=(
+                f"JANAF fusion crossing {fusion.melting_temperature_K} K; "
+                f"tables={fusion.crystal_table}/{fusion.liquid_table}"
+            ),
+        )
+        notices = (notice,) if melts_notice is None else (notice, melts_notice)
+        return replace(
+            reference,
+            identity=comparison_identity,
+            notices=union_notices(reference.notices, notices),
+        )
+
+    # Activity is a_i=exp[(mu_i-mu_i°)/(R*T)]. For the same mu_i,
+    # log10(a_solid)=log10(a_liquid)+[G_l°(T)-G_s°(T)]/(R*T*ln(10));
+    # the element terms cancel because both JANAF formation energies use the
+    # same elements. A liquid engine prediction gains this positive offset
+    # before comparison with a solid measurement. This helper makes the
+    # algebraically equivalent comparison by translating that measurement to
+    # a liquid-reference view and subtracting the same offset. JANAF G is
+    # kJ/mol, so multiply by 1000 to obtain J/mol; R=8.314462618 J/(mol*K).
+    converted_activity = reference.value.point * (
+        -delta_g_fus_J_per_mol / (JANAF_R_J_PER_MOL_K * temperature_K)
+    ).exp()
     mismatch_K = fusion.melting_temperature_K - fusion.accepted_melting_temperature_K
     extrapolation_K = fusion.melting_temperature_K - temperature_K
     notice = Notice(
@@ -1008,8 +1275,10 @@ def _fusion_comparison_reference(reference: Observation) -> Observation:
         affected_quantities=(Quantity.ACTIVITY,),
         reason=(
             f"{FLAGGED_STRATUM_REFERENCE_CONVERTED_VIA_FUSION}; "
+            "reference-state conversion (not model error); "
             f"oxide={formula}; source_activity_solid={reference.value.point}; "
             f"converted_activity_liquid={converted_activity}; "
+            f"offset_dex=+{offset_dex}; "
             f"DeltaG_fus={fusion.delta_g_fus_kJ_per_mol} kJ/mol; T={temperature_K} K; "
             f"JANAF_Tm={fusion.melting_temperature_K} K; "
             f"distance_below_JANAF_Tm={extrapolation_K} K; "
@@ -1032,7 +1301,10 @@ def _fusion_comparison_reference(reference: Observation) -> Observation:
                 "activity converted from a solid to liquid reference with JANAF fusion Gibbs energy"
             ),
         ),
-        notices=union_notices(reference.notices, (notice,)),
+        notices=union_notices(
+            reference.notices,
+            (notice,) if melts_notice is None else (notice, melts_notice),
+        ),
     )
 
 
@@ -1360,6 +1632,7 @@ def _observation_flagged_strata(
     observation: Observation,
     experiments: Mapping[str, Experiment],
     point_observations_by_experiment: Mapping[str, tuple[Observation, ...]],
+    benches: Mapping[str, Bench] | None = None,
 ) -> tuple[str, ...]:
     existing = flagged_strata(observation.notices)
     experiment = experiments.get(observation.experiment_id)
@@ -1372,9 +1645,19 @@ def _observation_flagged_strata(
             observation.experiment_id, ()
         ),
     )
+    bench = (
+        None
+        if experiment.bench_id is None or benches is None
+        else benches.get(experiment.bench_id)
+    )
     return tuple(
         dict.fromkeys(
-            (*existing, *flagged_strata(_flagged_stratum_notices(observation, experiment, gates)))
+            (
+                *existing,
+                *flagged_strata(
+                    _flagged_stratum_notices(observation, experiment, gates, bench)
+                ),
+            )
         )
     )
 
@@ -1382,6 +1665,7 @@ def _observation_flagged_strata(
 def _kems_replicate_groups(
     observations: Mapping[str, Observation],
     experiments: Mapping[str, Experiment],
+    benches: Mapping[str, Bench],
 ) -> tuple[tuple[Decimal, ...], ...]:
     groups: dict[tuple[object, ...], list[Decimal]] = {}
     point_observations_by_experiment = _partial_pressure_observations_by_experiment(
@@ -1393,7 +1677,7 @@ def _kems_replicate_groups(
         if quantity is not Quantity.P_PARTIAL or not isinstance(identity, Identity):
             continue
         if _observation_flagged_strata(
-            observation, experiments, point_observations_by_experiment
+            observation, experiments, point_observations_by_experiment, benches
         ):
             continue
         evidence = observation.evidence.class_
@@ -1434,6 +1718,22 @@ def _kems_replicate_groups(
 def derive_kems_partial_pressure_band(
     observations: Mapping[str, Observation],
     experiments: Mapping[str, Experiment],
+    *,
+    benches: Mapping[str, Bench] | None = None,
+) -> DecisionBand | None:
+    """Derive a band from measured rows and their optional bench context.
+
+    Pass the bench map when a row's cell material is stored on its Bench. The
+    private scorer path supplies the same map directly; a missing band never
+    falls back to this helper from ``decision_band_for``.
+    """
+    return _derive_kems_partial_pressure_band(observations, experiments, benches or {})
+
+
+def _derive_kems_partial_pressure_band(
+    observations: Mapping[str, Observation],
+    experiments: Mapping[str, Experiment],
+    benches: Mapping[str, Bench],
 ) -> DecisionBand | None:
     """Derive one KEMS p_partial band from admitted measured observations.
 
@@ -1452,7 +1752,7 @@ def derive_kems_partial_pressure_band(
         if quantity is not Quantity.P_PARTIAL or not isinstance(identity, Identity):
             continue
         if _observation_flagged_strata(
-            observation, experiments, point_observations_by_experiment
+            observation, experiments, point_observations_by_experiment, benches
         ):
             continue
         evidence = observation.evidence.class_
@@ -1503,7 +1803,7 @@ def derive_kems_partial_pressure_band(
         return DecisionBand(width, "dimensionless", rule)
 
     replicate_scatter = pooled_log_pressure_sd(
-        _kems_replicate_groups(observations, experiments)
+        _kems_replicate_groups(observations, experiments, benches)
     )
     if replicate_scatter is None:
         return None
@@ -1535,7 +1835,10 @@ def decision_band_for(
         and observations is not None
         and experiments is not None
     ):
-        band = derived_band or derive_kems_partial_pressure_band(observations, experiments)
+        # A None band is meaningful: the bench-aware scoring derivation found
+        # no unflagged candidates.  Do not refill it with the public helper,
+        # whose inputs cannot include the bench map.
+        band = derived_band
         if band is not None and band_dimension_matches(quantity, band):
             return band
     if derived_band is not None:
@@ -2857,7 +3160,7 @@ def predict_with_engine(
                 },
                 notices=tuple(input_notices),
             )
-        if engine not in IMCC_ENGINES:
+        if engine not in OXYGEN_BALANCE_EFFUSION_ENGINES:
             return _input_refusal(
                 engine=engine,
                 channel=channel,
@@ -3039,6 +3342,11 @@ def predict_with_engine(
         f"equilibrate_cell:{name}:host={getattr(cell, 'hostname', '')}"
         f":exit={getattr(cell, 'exit_code', None)}"
     )
+    if engine is Engine.INTERNAL_ANALYTICAL:
+        engine_version = (
+            getattr(cell, "vapor_pressure_backend_status_reason", None)
+            or "PyrolysisSimulator VAPOR_PRESSURE core route"
+        )
     if status != "ok":
         typed = str(refusal or status or "unavailable")
         engine_side_reason = str(getattr(cell, "engine_reason", None) or "")
@@ -3084,6 +3392,18 @@ def predict_with_engine(
         elif openimcc_outside_species:
             exec_state = ExecutionState.UNSUPPORTED
             reason = RefusalReason.OUTSIDE_SUPPORTED_SPECIES
+        elif engine is Engine.INTERNAL_ANALYTICAL and (
+            engine_side_reason.startswith("internal_analytical_missing_")
+            or engine_side_reason
+            == "internal_analytical_oxygen_balance_unavailable"
+        ):
+            exec_state = ExecutionState.NOT_PROBED
+            reason = RefusalReason.IDENTITY_INCOMPLETE
+        elif engine is Engine.INTERNAL_ANALYTICAL and engine_side_reason.startswith(
+            "internal_analytical_invalid_"
+        ):
+            exec_state = ExecutionState.NOT_PROBED
+            reason = RefusalReason.INVALID_IDENTITY
         else:
             exec_state = ExecutionState.UNSUPPORTED
             reason = RefusalReason.UNSUPPORTED
@@ -3377,7 +3697,7 @@ def compile_residual(
     point_observations: Sequence[Observation] | None = None,
 ) -> tuple[Residual, Observation | None]:
     _require_score_engine(engine)
-    reference = _fusion_comparison_reference(reference)
+    reference = _fusion_comparison_reference(reference, engine=engine)
     identity = reference.identity
     quantity = quantity_token(identity) if isinstance(identity, Identity) else None
     formula = identity.species.formula if isinstance(identity, Identity) else ""
@@ -3412,7 +3732,12 @@ def compile_residual(
             primary_check="experiment",
         )
 
-    flagged_notices = _flagged_stratum_notices(reference, experiment, gates)
+    bench = (
+        None
+        if experiment is None
+        else _bench_for_score(experiment, context.benches)
+    )
+    flagged_notices = _flagged_stratum_notices(reference, experiment, gates, bench)
     notices = union_notices(reference.notices, flagged_notices)
     comparison_ids = comparison_ids or {reference.observation_id}
 
@@ -3460,9 +3785,14 @@ def compile_residual(
         )
 
     if quantity is None:
+        detail: dict[str, object] = {"reason": "quantity_unknown"}
+        if reference.value.kind is ValueKind.CATEGORICAL:
+            detail["value_kind"] = ValueKind.CATEGORICAL.value
+            if isinstance(identity, Identity) and identity.quantity.is_unknown:
+                detail["quantity_reason"] = identity.quantity.reason
         return _refused(
             RefusalReason.IDENTITY_UNKNOWN,
-            {"reason": "quantity_unknown"},
+            detail,
             execution=Execution(state=ExecutionState.NOT_PROBED),
             exclusions=("status_match_or_mismatch", "finite_numeric_point_endpoints"),
         )
@@ -3486,6 +3816,23 @@ def compile_residual(
                 "engine": engine.value,
             },
             execution=Execution(state=ExecutionState.NOT_PROBED),
+        )
+    if (
+        quantity is Quantity.ACTIVITY
+        and reference.evidence.class_.is_unknown
+        and isinstance(identity, Identity)
+        and identity.reference_state is not None
+        and identity.reference_state.is_unknown
+    ):
+        return _refused(
+            RefusalReason.IDENTITY_UNKNOWN,
+            {
+                "fields": ["reference_state"],
+                "reason": "activity_reference_state_unknown",
+                "detail": identity.reference_state.reason,
+            },
+            execution=Execution(state=ExecutionState.NOT_PROBED),
+            exclusions=("identity_equal", "status_match_or_mismatch"),
         )
     if point_magnitude(reference.value) is None:
         reason_token = "value_unknown"
@@ -3518,6 +3865,33 @@ def compile_residual(
             {"primary_check": gates.primary_check, "checks": [c.name for c in gates.checks]},
             execution=Execution(state=ExecutionState.NOT_PROBED),
             exclusions=("validity_gates_pass", "status_match_or_mismatch"),
+        )
+
+    missing_fusion_input = next(
+        (
+            notice
+            for notice in notices
+            if notice.reason.startswith("fusion conversion missing input:")
+            or notice.reason.startswith("fusion conversion missing input for ")
+        ),
+        None,
+    )
+    if missing_fusion_input is not None:
+        if "JANAF solid table " in missing_fusion_input.reason:
+            missing_input = "JANAF solid polymorph matching the selected table"
+        elif "no temperature_K" in missing_fusion_input.reason:
+            missing_input = "activity observation temperature_K"
+        else:
+            missing_input = "JANAF solid/liquid formation Gibbs rows"
+        return _refused(
+            RefusalReason.IDENTITY_INCOMPLETE,
+            {
+                "reason": "solid_liquid_reference_conversion_missing_input",
+                "missing_input": missing_input,
+                "notice": missing_fusion_input.reason,
+            },
+            execution=Execution(state=ExecutionState.NOT_PROBED),
+            exclusions=("reference_state_conversion_inputs_present",),
         )
 
     if prediction is None:
@@ -3714,6 +4088,17 @@ def compile_residual(
         numeric, metric_reason, metric_detail = _implied_alpha_numeric(prediction.value)
     else:
         cell_band = derived_band
+        if (
+            cell_band is None
+            and quantity is Quantity.P_PARTIAL
+            and rail is Rail.VAPOUR
+            and experiment is not None
+            and experiment.method.is_value
+            and experiment.method.value is MethodToken.KNUDSEN_EFFUSION
+        ):
+            cell_band = _derive_kems_partial_pressure_band(
+                context.observations, context.experiments, context.benches
+            )
         if compilation and quantity is not Quantity.P_PARTIAL:
             cell_band = _printed_uncertainty_band(
                 quantity,
@@ -3751,7 +4136,10 @@ def compile_residual(
             source_relation=source_relation,
             exclusions=("valid_metric_domain",),
         )
-    has_no_band_flag = bool(flagged_notices) or any(
+    has_no_band_flag = any(
+        notice.kind is not NoticeKind.CELL_MATERIAL_INFERRED
+        for notice in flagged_notices
+    ) or any(
         _is_fusion_conversion_notice(notice) for notice in notices
     )
     if has_no_band_flag:
@@ -3927,6 +4315,32 @@ def diagnostic_references(context: ScoreContext) -> tuple[Observation, ...]:
     return tuple(sorted(out, key=lambda o: o.observation_id))
 
 
+def _refusal_diagnostic_references(context: ScoreContext) -> tuple[Observation, ...]:
+    """Rows excluded from comparisons but retained so scoring can explain why."""
+
+    out: list[Observation] = []
+    for obs in context.observations.values():
+        if not isinstance(obs.identity, Identity):
+            continue
+        evidence_class = obs.evidence.class_
+        status = obs.admission.status
+        activity_reference_unknown = (
+            status in {AdmissionStatus.ADMITTED, AdmissionStatus.PENDING}
+            and evidence_class.is_unknown
+            and quantity_token(obs.identity) is Quantity.ACTIVITY
+            and obs.identity.reference_state is not None
+            and obs.identity.reference_state.is_unknown
+        )
+        categorical_quantity_unknown = (
+            status is AdmissionStatus.REJECTED
+            and obs.value.kind is ValueKind.CATEGORICAL
+            and obs.identity.quantity.is_unknown
+        )
+        if activity_reference_unknown or categorical_quantity_unknown:
+            out.append(obs)
+    return tuple(sorted(out, key=lambda o: o.observation_id))
+
+
 def _score_store_with_decisions(
     context: ScoreContext,
     *,
@@ -3937,6 +4351,7 @@ def _score_store_with_decisions(
     include_diagnostics: bool = True,
     predict: Callable[..., EnginePrediction] | None = None,
     handles: Mapping[str, object] | None = None,
+    _stream: _ResidualJsonlStream | None = None,
 ) -> tuple[tuple[Residual, ...], dict[str, Observation], list[dict[str, object]]]:
     engine_set = (
         _validated_score_engines(tuple(engines))
@@ -3976,6 +4391,10 @@ def _score_store_with_decisions(
             refs.append(obs)
             seen.add(obs.observation_id)
             admitted_model_derived_ids.add(obs.observation_id)
+        for obs in _refusal_diagnostic_references(context):
+            if obs.observation_id not in seen:
+                refs.append(obs)
+                seen.add(obs.observation_id)
     if work_id:
         filtered: list[Observation] = []
         for obs in refs:
@@ -3998,43 +4417,45 @@ def _score_store_with_decisions(
         refs = refs[: int(limit)]
     from simulator.battery.compilation_tier import (
         compilation_family,
-        compilation_series_points,
+        _compilation_series_point_count,
+        _iter_compilation_series_points,
         is_compilation_evidence,
     )
 
     comparison_ids = {o.observation_id for o in comparison_candidates(context)}
-    residuals: list[Residual] = []
+    residuals: list[Residual] | None = [] if _stream is None else None
     candidates: dict[str, Observation] = {}
     compilation_family_by_reference: dict[str, tuple[str, Quantity]] = {}
     # Snapshot. Engine candidates are returned separately and are not
     # lineage inputs. The work-input index is this snapshot.
     observations = dict(context.observations)
-    origins = dict(context.origins)
+    origins = context.origins
     live_context = replace(context, observations=observations, origins=origins)
     point_observations_by_experiment = _partial_pressure_observations_by_experiment(
         observations.values()
     )
     empirical_ids = comparison_ids
-    expanded_refs = [
-        (obs, compilation_series_points(obs, origins.get(obs.observation_id)))
-        for obs in refs
-    ]
     started = time.monotonic()
     last_progress = started
     done = 0
-    total = sum(len(points) for _, points in expanded_refs) * max(len(engine_set), 1)
+    total = sum(
+        _compilation_series_point_count(obs, origins.get(obs.observation_id))
+        for obs in refs
+    ) * max(len(engine_set), 1)
+    family_residuals: dict[tuple[str, Quantity, str, str], list[Decimal]] = {}
     from simulator.battery.validate import bound_work_inputs, build_printed_thermo_index
 
     table_index = build_printed_thermo_index(observations)
-    kems_band = derive_kems_partial_pressure_band(observations, context.experiments)
+    kems_band = _derive_kems_partial_pressure_band(
+        observations, context.experiments, context.benches
+    )
     try:
         with bound_work_inputs(context.works, observations, context.experiments):
-            for obs, points in expanded_refs:
+            for obs in refs:
                 origin = origins.get(obs.observation_id)
-                for point in points:
-                    if point.observation_id not in origins:
-                        origins[point.observation_id] = origin or ""
-                    point_origin = origins.get(point.observation_id)
+                for point in _iter_compilation_series_points(obs, origin):
+                    family_quantity: tuple[str, Quantity] | None = None
+                    point_origin = origins.get(point.observation_id, origin or "")
                     diagnostic = (
                         obs.observation_id not in empirical_ids
                         or is_internal_consistency(point_origin)
@@ -4058,10 +4479,12 @@ def _score_store_with_decisions(
                         and not is_sf04_workbook(point)
                     )
                     if compilation_thermo and quantity is not None:
-                        compilation_family_by_reference[point.observation_id] = (
+                        family_quantity = (
                             compilation_family(point.source_id, point_origin),
                             quantity,
                         )
+                        if _stream is None:
+                            compilation_family_by_reference[point.observation_id] = family_quantity
                     for engine in engine_set:
                         prediction = None
                         if (
@@ -4100,15 +4523,29 @@ def _score_store_with_decisions(
                                 point.experiment_id, ()
                             ),
                         )
-                        residuals.append(residual)
-                        if candidate is not None:
+                        if _stream is None:
+                            assert residuals is not None
+                            residuals.append(residual)
+                        else:
+                            _stream.append(residual, candidate, family_quantity)
+                        family_key = _family_pool_key(residual, family_quantity)
+                        if family_key is not None:
+                            family_residuals.setdefault(family_key, []).append(
+                                residual.numeric.value  # type: ignore[union-attr]
+                            )
+                        if candidate is not None and _stream is None:
                             candidates[candidate.observation_id] = candidate
                         done += 1
                         now = time.monotonic()
                         if now - last_progress >= 60:
+                            if _stream is not None:
+                                _stream.flush()
+                            progress = f"score progress {done}/{total} residuals"
+                            if _stream is not None:
+                                progress += f" written={_stream.count}"
                             print(
-                                f"score progress {done}/{total} residuals "
-                                f"{int(now - started)}s host={context.hostname}",
+                                f"{progress} {int(now - started)}s "
+                                f"host={context.hostname}",
                                 flush=True,
                             )
                             last_progress = now
@@ -4141,66 +4578,47 @@ def _score_store_with_decisions(
                         add_note(f"additional engine handle cleanup failure: {error!r}")
                 raise first_error
 
-    family_residuals: dict[tuple[str, Quantity, str, str], list[Decimal]] = {}
-    for residual in residuals:
-        family_quantity = compilation_family_by_reference.get(residual.reference)
-        if (
-            residual.numeric is None
-            or residual.status is ResidualStatus.REFUSED
-            or family_quantity is None
-        ):
-            continue
-        if residual.numeric.decision_band is not None and residual.numeric.decision_band.rule == "source-printed per-cell uncertainty":
-            continue
-        if any(
-            _is_flagged_stratum_notice(notice)
-            or _is_fusion_conversion_notice(notice)
-            for notice in residual.notices
-        ):
-            continue
-        family, quantity = family_quantity
-        engine = residual.key.rsplit("::", 1)[-1]
-        key = (family, quantity, residual.numeric.unit, engine)
-        family_residuals.setdefault(key, []).append(residual.numeric.value)
     family_bands = {
         key: _residual_distribution_band(
             values, unit=key[2], family=key[0], quantity=key[1]
         )
         for key, values in family_residuals.items()
     }
+    family_pool_sizes = {
+        key: len(values)
+        for key, values in family_residuals.items()
+        if len(values) < MIN_DERIVED_BAND_N
+    }
+    family_residuals.clear()
+    if _stream is not None:
+        _stream.finalize(
+            family_pool_sizes=family_pool_sizes,
+            family_bands=family_bands,
+            context=context,
+            engines=engine_set,
+        )
+        return (), {}, []
+
+    assert residuals is not None
     banded_residuals: list[Residual] = []
     for residual in residuals:
         family_quantity = compilation_family_by_reference.get(residual.reference)
         numeric = residual.numeric
-        if (
-            numeric is None
-            or residual.status is ResidualStatus.REFUSED
-            or family_quantity is None
-            or (
-                numeric.decision_band is not None
-                and numeric.decision_band.rule == "source-printed per-cell uncertainty"
-            )
-            or any(
-                _is_flagged_stratum_notice(notice)
-                or _is_fusion_conversion_notice(notice)
-                for notice in residual.notices
-            )
-        ):
+        apply, band, no_band = _family_band_update(
+            numeric=numeric,
+            status=residual.status,
+            key=residual.key,
+            source_relation=residual.source_relation,
+            family_quantity=family_quantity,
+            flagged=_has_flagged_decision_notice(residual),
+            family_pool_sizes=family_pool_sizes,
+            family_bands=family_bands,
+        )
+        if not apply:
             banded_residuals.append(residual)
             continue
-        family, quantity = family_quantity
-        engine = residual.key.rsplit("::", 1)[-1]
-        band_key = (family, quantity, numeric.unit, engine)
-        band = family_bands.get(band_key)
-        # A real but undersized family pool is explicitly no-band. Keep the
-        # legacy fallback for rows with no eligible pool at all.
-        has_insufficient_pool = (
-            band is None
-            and 0 < len(family_residuals.get(band_key, ())) < MIN_DERIVED_BAND_N
-        )
-        if band is None and not has_insufficient_pool:
-            band = decision_band_for(quantity, residual.source_relation)
-        if has_insufficient_pool:
+        assert numeric is not None
+        if no_band:
             updated_numeric = replace(numeric, decision_band=None)
             banded_residuals.append(
                 replace(
@@ -4210,9 +4628,7 @@ def _score_store_with_decisions(
                 )
             )
             continue
-        if band is None or not band_dimension_matches(quantity, band):
-            banded_residuals.append(residual)
-            continue
+        assert band is not None
         updated_numeric = replace(numeric, decision_band=band)
         banded_residuals.append(
             replace(
@@ -4231,6 +4647,44 @@ def _score_store_with_decisions(
     )
     scored = tuple(residuals)
     return scored, candidates, _compilation_decision_strata(scored, context)
+
+
+def _score_store_to_jsonl(
+    context: ScoreContext,
+    path: Path,
+    *,
+    root: Path | None = None,
+    engines: Sequence[Engine] | None = None,
+    rail: Rail | None = None,
+    work_id: str | None = None,
+    limit: int | None = None,
+    include_diagnostics: bool = True,
+    predict: Callable[..., EnginePrediction] | None = None,
+    handles: Mapping[str, object] | None = None,
+) -> tuple[int, _ResidualReportMetadata]:
+    """Score directly to a sorted ``.partial`` JSONL without retaining rows."""
+
+    stream = _ResidualJsonlStream(path, root=root)
+    try:
+        _score_store_with_decisions(
+            context,
+            engines=engines,
+            rail=rail,
+            work_id=work_id,
+            limit=limit,
+            include_diagnostics=include_diagnostics,
+            predict=predict,
+            handles=handles,
+            _stream=stream,
+        )
+        return stream.count, _ResidualReportMetadata(
+            family_band_values=dict(stream.band_values),
+            headline_band_values=dict(stream.headline_band_values),
+            tier_band_values=dict(stream.tier_band_values),
+            aggregate=stream.report_aggregate,
+        )
+    finally:
+        stream.close()
 
 
 def score_store(
@@ -4340,9 +4794,8 @@ def stamp_existing_residuals_jsonl(
 ) -> None:
     """Refuse to stamp a residuals ledger this run did not regenerate.
 
-    The only writer is write_residuals_jsonl, which emits the stamp with
-    the residual body produced in the same scoring run. This named path
-    exists so a prepend onto an already-written body cannot recur.
+    A scoring-run writer emits the stamp with the residual body it produces.
+    This named path exists so a prepend onto an already-written body cannot recur.
     """
 
     del path, stamp, root
@@ -4365,13 +4818,12 @@ def store_stamp_has_known_revision(stamp: Mapping[str, object] | None) -> bool:
 def load_residuals_stamp(path: Path) -> dict[str, object] | None:
     if not path.is_file():
         return None
-    for line in path.read_text(encoding="utf-8").splitlines():
-        if not line.strip():
-            continue
-        payload = json.loads(line)
-        if is_store_stamp_payload(payload):
-            return dict(payload)
-        return None
+    with path.open(encoding="utf-8") as stream:
+        for line in stream:
+            if not line.strip():
+                continue
+            payload = json.loads(line)
+            return dict(payload) if is_store_stamp_payload(payload) else None
     return None
 
 
@@ -4454,6 +4906,54 @@ def load_residuals_jsonl(path: Path) -> tuple[dict[str, object], ...]:
         if isinstance(payload, dict) and not is_store_stamp_payload(payload):
             rows.append(payload)
     return tuple(rows)
+
+
+def _iter_residuals_jsonl(path: Path) -> Iterable[dict[str, object]]:
+    if not path.is_file():
+        return
+    with path.open(encoding="utf-8") as stream:
+        for line in stream:
+            if not line.strip():
+                continue
+            payload = json.loads(line)
+            if isinstance(payload, dict) and not is_store_stamp_payload(payload):
+                yield payload
+
+
+@dataclass(frozen=True)
+class _ResidualReportMetadata:
+    family_band_values: Mapping[tuple[str, str, str, str], set[str]]
+    headline_band_values: Mapping[tuple[str, str, str], set[str]]
+    tier_band_values: Mapping[tuple[str, str, str, str, str, str], set[str]]
+    aggregate: _ScorePayloadAccumulator | None = None
+
+
+class _ResidualJsonlRows:
+    """A replayable, line-at-a-time view of a residual JSONL file."""
+
+    def __init__(
+        self,
+        path: Path,
+        *,
+        metadata: _ResidualReportMetadata | None = None,
+    ) -> None:
+        self.path = path
+        self._typed_family_band_values = (
+            {} if metadata is None else metadata.family_band_values
+        )
+        self._typed_headline_band_values = (
+            {} if metadata is None else metadata.headline_band_values
+        )
+        self._typed_tier_band_values = (
+            {} if metadata is None else metadata.tier_band_values
+        )
+
+    def __iter__(self) -> Iterable[dict[str, object]]:
+        return _iter_residuals_jsonl(self.path)
+
+
+def _count_residuals_jsonl(path: Path) -> int:
+    return sum(1 for _ in _iter_residuals_jsonl(path))
 
 
 def _median_abs(values: Sequence[Decimal]) -> Decimal | None:
@@ -4944,7 +5444,7 @@ def admission_census(
     }
 
 
-def admission_census_payloads(rows: Sequence[Mapping[str, object]]) -> dict[str, int]:
+def admission_census_payloads(rows: Iterable[Mapping[str, object]]) -> dict[str, int]:
     with_admission = 0
     admission_alone = 0
     admission_alone_refs: set[str] = set()
@@ -5041,6 +5541,88 @@ def _census_count_line(row: Mapping[str, object], label: str) -> str:
     )
 
 
+class _ResidualRowsPayloadView:
+    def __init__(self, residuals: Sequence[Residual], context: ScoreContext) -> None:
+        self.residuals = residuals
+        family_values: dict[tuple[str, str, str, str], set[str]] = defaultdict(set)
+        headline_values: dict[tuple[str, str, str], set[str]] = defaultdict(set)
+        tier_values: dict[tuple[str, str, str, str, str, str], set[str]] = defaultdict(set)
+        from simulator.battery.compilation_tier import (
+            compilation_family,
+            compilation_origin,
+            compilation_row_observation,
+        )
+
+        for residual in residuals:
+            numeric = residual.numeric
+            if (
+                numeric is None
+                or numeric.decision_band is None
+                or residual.status is ResidualStatus.REFUSED
+                or _has_flagged_decision_notice(residual)
+            ):
+                continue
+            value = str(numeric.decision_band.value)
+            observation = compilation_row_observation(
+                residual.reference, context.observations, context.origins
+            )
+            if observation is None:
+                if _reference_has_measured_evidence(
+                    context.observations.get(residual.reference),
+                    exclusions=residual.exclusions,
+                ) and numeric.operation is MetricOperation.DEX and numeric.decision_band.unit == "dimensionless":
+                    headline_values[("measured", residual.rail.value if residual.rail else "", _engine_of(residual))].add(value)
+                continue
+            family = compilation_family(
+                observation.source_id,
+                compilation_origin(residual.reference, context.origins),
+            )
+            quantity = quantity_token(observation.identity) if isinstance(observation.identity, Identity) else None
+            if quantity is None:
+                continue
+            engine = _engine_of(residual)
+            relation = residual.source_relation.value
+            family_values[(family, quantity.value, engine, relation)].add(value)
+            rail = residual.rail.value if residual.rail else "none"
+            if numeric.operation is MetricOperation.DEX and numeric.decision_band.unit == "dimensionless":
+                headline_values[("compilation", rail, engine)].add(value)
+            if numeric.operation is not None:
+                tier_values[(family, rail, engine, relation, quantity.value, numeric.unit)].add(value)
+        self.metadata = _ResidualReportMetadata(
+            family_band_values=dict(family_values),
+            headline_band_values=dict(headline_values),
+            tier_band_values=dict(tier_values),
+        )
+        self._typed_family_band_values = self.metadata.family_band_values
+        self._typed_headline_band_values = self.metadata.headline_band_values
+        self._typed_tier_band_values = self.metadata.tier_band_values
+
+    def __iter__(self) -> Iterable[dict[str, object]]:
+        def rows() -> Iterable[dict[str, object]]:
+            for residual in self.residuals:
+                payload = residual_to_plain(residual)
+                numeric = payload.get("numeric")
+                if residual.numeric is not None and isinstance(numeric, dict):
+                    numeric["value"] = str(residual.numeric.value)
+                yield payload
+
+        return rows()
+
+
+def _report_engine_set(rows: Iterable[Mapping[str, object]]) -> tuple[Engine, ...]:
+    names = set()
+    for row in rows:
+        request = row.get("candidate_request")
+        engine = (
+            str(request.get("engine"))
+            if isinstance(request, Mapping) and request.get("engine")
+            else str(row.get("key") or "").rsplit("::", 1)[-1]
+        )
+        if engine:
+            names.add(engine)
+    return tuple(Engine(name) for name in sorted(names))
+
+
 def render_score_report(
     residuals: Sequence[Residual],
     *,
@@ -5052,7 +5634,34 @@ def render_score_report(
     studio_hostname: str | None = None,
     root: Path | None = None,
 ) -> str:
-    stamp = derive_store_stamp(root or REPO_ROOT)
+    return _render_score_report_from_payloads_legacy(
+        _ResidualRowsPayloadView(residuals, context),
+        context=context,
+        engines=engines,
+        pin_failures=pin_failures,
+        status_diff=status_diff,
+        unmapped_legacy_keys=unmapped_legacy_keys,
+        studio_hostname=studio_hostname,
+        store_stamp=derive_store_stamp(root or REPO_ROOT),
+    )
+
+
+def _render_score_report_from_payloads_legacy(
+    rows: Iterable[Mapping[str, object]],
+    *,
+    context: ScoreContext,
+    engines: Sequence[Engine],
+    pin_failures: Sequence[Mapping[str, object]] = (),
+    status_diff: Sequence[Mapping[str, object]] = (),
+    unmapped_legacy_keys: Sequence[str] = (),
+    studio_hostname: str | None = None,
+    store_stamp: Mapping[str, object] | None = None,
+    _aggregate: _ScorePayloadAccumulator | None = None,
+) -> str:
+    aggregate = _aggregate or _ScorePayloadAccumulator.from_rows(
+        rows, context=context, engines=engines
+    )
+    has_residuals = aggregate.count > 0
     lines: list[str] = [
         "# Battery score report (schema v2.1)",
         "",
@@ -5067,9 +5676,10 @@ def render_score_report(
     ]
     if studio_hostname:
         lines.append(f"Studio hostname: `{studio_hostname}`.")
+    stamp = derive_store_stamp(REPO_ROOT) if store_stamp is None else store_stamp
     lines.extend(["", *format_store_stamp_report_lines(stamp)])
     lines.extend(["", f"Engines: {', '.join(e.value for e in engines)}."])
-    if not residuals:
+    if not has_residuals:
         lines.extend(
             [
                 "",
@@ -5112,7 +5722,6 @@ def render_score_report(
     else:
         for row in unassigned_census:
             lines.append(_census_count_line(row, f"`{row['reason']}`"))
-
     lines.extend(
         [
             "",
@@ -5123,10 +5732,8 @@ def render_score_report(
             "",
         ]
     )
-    if not residuals:
-        lines.append(
-            "Not regenerated. Match rate is blank. score_eligible is 0."
-        )
+    if not has_residuals:
+        lines.append("Not regenerated. Match rate is blank. score_eligible is 0.")
     else:
         lines.extend(
             [
@@ -5136,18 +5743,21 @@ def render_score_report(
                 "|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|",
             ]
         )
-        for row in headline_rows(residuals, context=context):
+        report_engine_names = set(aggregate.report_engine_names)
+        if not report_engine_names:
+            report_engine_names = {engine.value for engine in SCORE_ENGINE_SET}
+        report_engines = tuple(Engine(name) for name in sorted(report_engine_names))
+        for row in aggregate.headline_records(engines=report_engines):
+            if row.get("tier") != "measured":
+                continue
             rate = row["match_rate"]
             rate_s = "—" if rate is None else f"{rate:.3f}"
-            rms = row["rms_dex"] or "—"
-            med = row["median_dex"] or "—"
-            med_abs = row["median_abs_dex"] or "—"
-            band = row["band_width_dex"] or "—"
-            ratio = row["rms_over_band"] or "—"
             lines.append(
                 f"| {row['rail']} | {row['engine']} | {row['n_candidates']} | "
                 f"{row['n_refused']} | {row['n']} | {row['n_score_eligible']} | "
-                f"{row['n_inside_band']} | {rms} | {med} | {med_abs} | {band} | {ratio} | "
+                f"{row['n_inside_band']} | {row['rms_dex'] or '—'} | "
+                f"{row['median_dex'] or '—'} | {row['median_abs_dex'] or '—'} | "
+                f"{row['band_width_dex'] or '—'} | {row['rms_over_band'] or '—'} | "
                 f"{row['n_no_band']} | {rate_s} |"
             )
     lines.extend(
@@ -5156,14 +5766,16 @@ def render_score_report(
             "## Flagged strata",
             "",
             "These numeric diagnostics carry an explicit source or apparatus flag. "
-            "They are excluded from measured headlines, bands, and band statistics; "
-            "a row carrying both flags appears in both strata.",
+            "Flagged rows do not derive measurement bands or enter unflagged headlines. "
+            "Cell-material-inferred residuals are still judged against the band; other "
+            "flag kinds retain their existing scoring rules. A row carrying both flags "
+            "appears in both strata.",
             "",
             "| stratum | rail | engine | n | median dex | RMS dex |",
             "|---|---|---|---:|---:|---:|",
         ]
     )
-    flagged_rows = flagged_stratum_rows(residuals, engines=engines)
+    flagged_rows = aggregate.flagged_records()
     if not flagged_rows:
         lines.append("| (none) | — | — | 0 | — | — |")
     else:
@@ -5172,14 +5784,14 @@ def render_score_report(
                 f"| {row['stratum']} | {row['rail']} | {row['engine']} | "
                 f"{row['n']} | {row['median_dex'] or '—'} | {row['rms_dex'] or '—'} |"
             )
-
-    from simulator.battery.compilation_tier import compilation_tier_lines
-
     lines.extend(
-        ["", *compilation_tier_lines(residuals, context.observations, context.origins)]
+        [
+            "",
+            *aggregate.compilation_lines(),
+        ]
     )
     lines.extend(["", "## Refusal census", ""])
-    if not residuals:
+    if not has_residuals:
         lines.append(
             "Engine refusals were not regenerated with this census. "
             "Rows with no headline rail are counted above and are not hidden."
@@ -5193,13 +5805,24 @@ def render_score_report(
                 "|---|---:|",
             ]
         )
-        census = refusal_census(_measured_residuals(residuals, context))
+        census = dict(sorted(aggregate.refusal_counts.items()))
         if not census:
             lines.append("| (none) | 0 |")
         else:
             for reason, n in census.items():
                 lines.append(f"| `{reason}` | {n} |")
-    admit = admission_census(residuals, context=context)
+    admit = {
+        "residuals_with_admission_exclusion": aggregate.admission_with,
+        "residuals_admission_alone": aggregate.admission_alone,
+        "unique_obs_admission_alone": aggregate.admission_alone_unique,
+    }
+    pending = 0
+    admitted = 0
+    for observation in comparison_candidates(context):
+        if observation.admission.status is AdmissionStatus.PENDING:
+            pending += 1
+        elif observation.admission.status is AdmissionStatus.ADMITTED:
+            admitted += 1
     lines.extend(
         [
             "",
@@ -5211,8 +5834,8 @@ def render_score_report(
             "",
             "| count | n |",
             "|---|---:|",
-            f"| comparison candidates pending | {admit['comparison_candidates_pending']} |",
-            f"| comparison candidates admitted | {admit['comparison_candidates_admitted']} |",
+            f"| comparison candidates pending | {pending} |",
+            f"| comparison candidates admitted | {admitted} |",
             f"| residuals with admission_admitted exclusion | {admit['residuals_with_admission_exclusion']} |",
             f"| residuals that die on admission alone | {admit['residuals_admission_alone']} |",
             f"| unique observations that die on admission alone | {admit['unique_obs_admission_alone']} |",
@@ -5227,12 +5850,13 @@ def render_score_report(
             "|---|---:|",
         ]
     )
-    backlog = notice_backlog(residuals)
+    backlog = dict(sorted(aggregate.notice_counts.items()))
     if not backlog:
         lines.append("| (none) | 0 |")
     else:
         for kind, n in backlog.items():
             lines.append(f"| `{kind}` | {n} |")
+    n_diag = aggregate.diagnostic_count
     lines.extend(
         [
             "",
@@ -5244,41 +5868,23 @@ def render_score_report(
             "compilation tier above, still COMPILATION_ASSESSED, and never added",
             "to the measured tier. " + CIRCULARITY_WARNING,
             "",
+            f"Diagnostic residuals in this file: {n_diag}.",
+            "",
+            "## Pin failures",
+            "",
         ]
     )
-    from simulator.battery.compilation_tier import parent_observation_id, reference_observation
-
-    n_diag = sum(
-        1
-        for r in residuals
-        if "reference_measured_evidence" in r.exclusions
-        or is_internal_consistency(
-            context.origins.get(r.reference)
-            or context.origins.get(parent_observation_id(r.reference))
-        )
-        or is_compilation_source(
-            (
-                reference_observation(context.observations, r.reference).source_id
-                if reference_observation(context.observations, r.reference) is not None
-                else None
-            ),
-            context.origins.get(r.reference)
-            or context.origins.get(parent_observation_id(r.reference)),
-        )
-    )
-    lines.append(f"Diagnostic residuals in this file: {n_diag}.")
-    lines.extend(["", "## Pin failures", ""])
-    if not residuals and not pin_failures:
+    if not has_residuals and not pin_failures:
         lines.append(
             "Pins were not compared; no residuals ledger was regenerated for this store revision."
         )
     elif not pin_failures:
         lines.append("None.")
     else:
-        lines.append(f"{len(pin_failures)} pin failures (coverage or outside pin_band). A live residual outside its pin_band is a failure, never a re-centre.")
-        lines.append("")
-        lines.append("| key | reason | live | centre | pin_band |")
-        lines.append("|---|---|---:|---:|---:|")
+        lines.append(
+            f"{len(pin_failures)} pin failures (coverage or outside pin_band). A live residual outside its pin_band is a failure, never a re-centre."
+        )
+        lines.extend(["", "| key | reason | live | centre | pin_band |", "|---|---|---:|---:|---:|"])
         for failure in list(pin_failures)[:50]:
             lines.append(
                 f"| `{failure.get('key')}` | {failure.get('reason')} | {failure.get('live')} | "
@@ -5287,15 +5893,14 @@ def render_score_report(
         if len(pin_failures) > 50:
             lines.append(f"| … | {len(pin_failures) - 50} more | | | |")
     lines.extend(["", "## status_diff vs old scorers", ""])
-    if not residuals and not status_diff:
+    if not has_residuals and not status_diff:
         lines.append(
             "status_diff was not run; no residuals ledger was regenerated for this store revision."
         )
     elif not status_diff:
         lines.append("No mapped outcome changes.")
     else:
-        lines.append("| old key | old | new | axis |")
-        lines.append("|---|---|---|---|")
+        lines.extend(["| old key | old | new | axis |", "|---|---|---|---|"])
         for row in status_diff:
             lines.append(
                 f"| `{row.get('old_key')}` | {row.get('old')} | {row.get('new')} | "
@@ -5303,18 +5908,15 @@ def render_score_report(
             )
     if unmapped_legacy_keys:
         lines.extend(
-            [
-                "",
-                f"Unmapped legacy keys: {len(unmapped_legacy_keys)}. Old ledgers retained.",
-            ]
+            ["", f"Unmapped legacy keys: {len(unmapped_legacy_keys)}. Old ledgers retained."]
         )
-    elif residuals:
+    elif has_residuals:
         lines.extend(["", "All mapped legacy keys have a v2.1 comparison slot."])
     lines.append("")
     return "\n".join(lines)
 
 
-def refusal_census_payloads(rows: Sequence[Mapping[str, object]]) -> dict[str, int]:
+def refusal_census_payloads(rows: Iterable[Mapping[str, object]]) -> dict[str, int]:
     counts: dict[str, int] = {}
     for row in rows:
         if row.get("status") != ResidualStatus.REFUSED.value:
@@ -5330,19 +5932,92 @@ def refusal_census_payloads(rows: Sequence[Mapping[str, object]]) -> dict[str, i
     return dict(sorted(counts.items()))
 
 
+def _empty_headline_payload_stats() -> dict[str, object]:
+    return {
+        "n_candidates": 0,
+        "n_refused": 0,
+        "n_eligible_references": 0,
+        "n_scored": 0,
+        "n_score_eligible": 0,
+        "n_inside_band": 0,
+        "n_banded": 0,
+        "n_no_band": 0,
+        "dex_values": [],
+        "band_widths": set(),
+    }
+
+
+def _headline_payload_record(
+    tier: str,
+    rail: str,
+    engine: str,
+    stats: Mapping[str, object],
+    *,
+    typed_widths: Iterable[str] | None = None,
+    include_eligible_references: bool = True,
+) -> dict[str, object]:
+    dex_values = stats["dex_values"]
+    band_widths = stats["band_widths"]
+    if typed_widths is not None:
+        band_widths = {as_decimal(value) for value in typed_widths}
+    n_scored = int(stats["n_scored"])
+    rms = _rms(dex_values)
+    signed_median = _median(dex_values)
+    band_width = next(iter(band_widths)) if len(band_widths) == 1 else None
+    rms_over_band = (
+        None
+        if rms is None or band_width is None or band_width <= 0
+        else rms / band_width
+    )
+    record = {
+        "tier": tier,
+        "rail": rail,
+        "engine": engine,
+        "n": n_scored,
+        "n_candidates": stats["n_candidates"],
+        "n_refused": stats["n_refused"],
+        "n_eligible_references": stats["n_eligible_references"],
+        "n_scored": n_scored,
+        "n_score_eligible": stats["n_score_eligible"],
+        "n_inside_band": stats["n_inside_band"],
+        "n_match": stats["n_inside_band"],
+        "match_rate": (
+            None
+            if not stats["n_banded"]
+            else int(stats["n_inside_band"]) / int(stats["n_banded"])
+        ),
+        "match_rate_label": (
+            "band membership; derived_2xMAD means tail membership, not accuracy"
+            if tier == "compilation"
+            else "band membership"
+        ),
+        "rms_dex": None if rms is None else str(rms),
+        "median_dex": None if signed_median is None else str(signed_median),
+        "median_abs_dex": None if not dex_values else str(_median_abs(dex_values)),
+        "band_width_dex": None if band_width is None else str(band_width),
+        "rms_over_band": None if rms_over_band is None else str(rms_over_band),
+        "n_no_band": stats["n_no_band"],
+        "decision_strata": [],
+        "data_scatter_ratio": None if rms_over_band is None else str(rms_over_band),
+    }
+    if not include_eligible_references:
+        record.pop("n_eligible_references")
+    return record
+
+
 def headline_payloads(
-    rows: Sequence[Mapping[str, object]],
+    rows: Iterable[Mapping[str, object]],
     engines: Sequence[Engine],
     *,
     tier: str = "measured",
 ) -> list[dict[str, object]]:
     if tier not in {"measured", "compilation"}:
         raise ValueError(f"unknown headline tier {tier!r}")
-    groups: dict[tuple[str, str], list[Mapping[str, object]]] = {}
+    groups: dict[tuple[str, str], dict[str, object]] = {}
     engine_names = [e.value for e in engines]
     for rail in Rail:
         for engine in engine_names:
-            groups[(rail.value, engine)] = []
+            groups[(rail.value, engine)] = _empty_headline_payload_stats()
     for row in rows:
         if _flagged_payload_strata(row):
             continue
@@ -5358,83 +6033,58 @@ def headline_payloads(
             ((row.get("candidate_request") or {}) if isinstance(row.get("candidate_request"), Mapping) else {}).get("engine")
             or str(row.get("key") or "").rsplit("::", 1)[-1]
         )
-        groups.setdefault((rail, engine), []).append(row)
-    out: list[dict[str, object]] = []
-    for (rail, engine), bucket in sorted(groups.items()):
-        if tier == "measured":
-            scored = [
-                r
-                for r in bucket
-                if isinstance(r.get("numeric"), Mapping)
-            ]
-        else:
-            scored = [r for r in bucket if isinstance(r.get("numeric"), Mapping)]
-        matches = [
-            r for r in scored if r.get("status") == ResidualStatus.MATCH.value
-        ]
-        banded = [
-            r
-            for r in scored
-            if r.get("status")
-            in {ResidualStatus.MATCH.value, ResidualStatus.MISMATCH.value}
-        ]
-        dex_values = []
-        band_widths = []
-        for r in scored:
-            numeric = r.get("numeric") if isinstance(r.get("numeric"), Mapping) else None
-            if numeric and numeric.get("operation") == MetricOperation.DEX.value:
-                try:
-                    dex_values.append(as_decimal(numeric.get("value")))
-                except (TypeError, ValueError, ArithmeticError):
-                    pass
-                band = numeric.get("decision_band")
-                if isinstance(band, Mapping) and band.get("unit") == "dimensionless":
-                    try:
-                        band_widths.append(as_decimal(band.get("value")))
-                    except (TypeError, ValueError, ArithmeticError):
-                        pass
-        n_scored = len(scored)
-        rms = _rms(dex_values)
-        signed_median = _median(dex_values)
-        band_width = (
-            band_widths[0]
-            if band_widths and all(value == band_widths[0] for value in band_widths)
-            else None
+        stats = groups.setdefault(
+            (rail, engine),
+            _empty_headline_payload_stats(),
         )
-        rms_over_band = (
-            None
-            if rms is None or band_width is None or band_width <= 0
-            else rms / band_width
+        stats["n_candidates"] = int(stats["n_candidates"]) + 1
+        status = str(row.get("status") or "")
+        exclusions = tuple(row.get("exclusions") or ())
+        if row.get("score_eligible") or "reference_measured_evidence" not in exclusions:
+            stats["n_eligible_references"] = int(stats["n_eligible_references"]) + 1
+        if status == ResidualStatus.REFUSED.value:
+            stats["n_refused"] = int(stats["n_refused"]) + 1
+        numeric = row.get("numeric")
+        if not isinstance(numeric, Mapping):
+            continue
+        stats["n_scored"] = int(stats["n_scored"]) + 1
+        if row.get("score_eligible"):
+            stats["n_score_eligible"] = int(stats["n_score_eligible"]) + 1
+        if status == ResidualStatus.MATCH.value:
+            stats["n_inside_band"] = int(stats["n_inside_band"]) + 1
+        if status in {ResidualStatus.MATCH.value, ResidualStatus.MISMATCH.value}:
+            stats["n_banded"] = int(stats["n_banded"]) + 1
+        if status == ResidualStatus.NO_BAND.value:
+            stats["n_no_band"] = int(stats["n_no_band"]) + 1
+        if numeric.get("operation") == MetricOperation.DEX.value:
+            try:
+                stats["dex_values"].append(as_decimal(numeric.get("value")))  # type: ignore[union-attr]
+            except (TypeError, ValueError, ArithmeticError):
+                pass
+        band = numeric.get("decision_band")
+        if (
+            numeric.get("operation") == MetricOperation.DEX.value
+            and isinstance(band, Mapping)
+            and band.get("unit") == "dimensionless"
+        ):
+            try:
+                stats["band_widths"].add(as_decimal(band.get("value")))  # type: ignore[union-attr]
+            except (TypeError, ValueError, ArithmeticError):
+                pass
+    out: list[dict[str, object]] = []
+    for (rail, engine), stats in sorted(groups.items()):
+        typed_widths = getattr(rows, "_typed_headline_band_values", {}).get(
+            (tier, rail, engine)
         )
         out.append(
-            {
-                "tier": tier,
-                "rail": rail,
-                "engine": engine,
-                "n": n_scored,
-                "n_candidates": len(bucket),
-                "n_refused": sum(1 for r in bucket if r.get("status") == ResidualStatus.REFUSED.value),
-                "n_scored": n_scored,
-                "n_score_eligible": sum(1 for r in scored if r.get("score_eligible")),
-                "n_inside_band": len(matches),
-                "n_match": len(matches),
-                "match_rate": None if not banded else len(matches) / len(banded),
-                "match_rate_label": (
-                    "band membership; derived_2xMAD means tail membership, not accuracy"
-                    if tier == "compilation"
-                    else "band membership"
-                ),
-                "rms_dex": None if rms is None else str(rms),
-                "median_dex": None if signed_median is None else str(signed_median),
-                "median_abs_dex": None if not dex_values else str(_median_abs(dex_values)),
-                "band_width_dex": None if band_width is None else str(band_width),
-                "rms_over_band": None if rms_over_band is None else str(rms_over_band),
-                "n_no_band": sum(
-                    1 for r in scored if r.get("status") == ResidualStatus.NO_BAND.value
-                ),
-                "decision_strata": [],
-                "data_scatter_ratio": None if rms_over_band is None else str(rms_over_band),
-            }
+            _headline_payload_record(
+                tier,
+                rail,
+                engine,
+                stats,
+                typed_widths=typed_widths,
+                include_eligible_references=False,
+            )
         )
     return out
 
@@ -5447,8 +6097,23 @@ def _flagged_payload_strata(row: Mapping[str, object]) -> tuple[str, ...]:
     )
     kinds = {str(notice.get("kind")) for notice in notices if notice.get("kind")}
     out: list[str] = []
-    if NoticeKind.UNVERIFIED_APPARATUS.value in kinds:
+    unverified_apparatus = tuple(
+        notice
+        for notice in notices
+        if notice.get("kind") == NoticeKind.UNVERIFIED_APPARATUS.value
+    )
+    if any(
+        _is_calibration_not_grounded_reason(notice.get("reason"))
+        for notice in unverified_apparatus
+    ):
+        out.append(FLAGGED_STRATUM_CALIBRATION_NOT_GROUNDED)
+    if any(
+        not _is_calibration_not_grounded_reason(notice.get("reason"))
+        for notice in unverified_apparatus
+    ):
         out.append(FLAGGED_STRATUM_UNVERIFIED_APPARATUS)
+    if NoticeKind.CELL_MATERIAL_INFERRED.value in kinds:
+        out.append(FLAGGED_STRATUM_CELL_MATERIAL_INFERRED)
     if NoticeKind.COMPOSITION_FROM_SAMPLE_CATALOG.value in kinds:
         out.append(FLAGGED_STRATUM_CATALOGUE_COMPOSITION)
     if any(
@@ -5465,8 +6130,431 @@ def _flagged_payload_strata(row: Mapping[str, object]) -> tuple[str, ...]:
     return tuple(out)
 
 
+def _has_flagged_decision_notice(residual: Residual) -> bool:
+    return any(
+        _is_flagged_stratum_notice(notice)
+        or _is_fusion_conversion_notice(notice)
+        for notice in residual.notices
+    )
+
+
+def _family_pool_key(
+    residual: Residual,
+    family_quantity: tuple[str, Quantity] | None,
+) -> tuple[str, Quantity, str, str] | None:
+    numeric = residual.numeric
+    if (
+        numeric is None
+        or residual.status is ResidualStatus.REFUSED
+        or family_quantity is None
+        or (
+            numeric.decision_band is not None
+            and numeric.decision_band.rule == "source-printed per-cell uncertainty"
+        )
+        or _has_flagged_decision_notice(residual)
+    ):
+        return None
+    family, quantity = family_quantity
+    engine = residual.key.rsplit("::", 1)[-1]
+    return (family, quantity, numeric.unit, engine)
+
+
+def _family_band_update(
+    *,
+    numeric: ResidualNumeric | None,
+    status: ResidualStatus,
+    key: str,
+    source_relation: SourceRelation,
+    family_quantity: tuple[str, Quantity] | None,
+    flagged: bool,
+    family_pool_sizes: Mapping[tuple[str, Quantity, str, str], int],
+    family_bands: Mapping[tuple[str, Quantity, str, str], DecisionBand],
+) -> tuple[bool, DecisionBand | None, bool]:
+    if (
+        numeric is None
+        or status is ResidualStatus.REFUSED
+        or family_quantity is None
+        or (
+            numeric.decision_band is not None
+            and numeric.decision_band.rule == "source-printed per-cell uncertainty"
+        )
+        or flagged
+    ):
+        return False, None, False
+    family, quantity = family_quantity
+    engine = key.rsplit("::", 1)[-1]
+    band_key = (family, quantity, numeric.unit, engine)
+    band = family_bands.get(band_key)
+    has_insufficient_pool = (
+        band is None
+        and 0 < family_pool_sizes.get(band_key, 0) < MIN_DERIVED_BAND_N
+    )
+    if band is None and not has_insufficient_pool:
+        band = decision_band_for(quantity, source_relation)
+    if has_insufficient_pool:
+        return True, None, True
+    if band is None or not band_dimension_matches(quantity, band):
+        return False, None, False
+    return True, band, False
+
+
+class _ResidualJsonlStream:
+    """Keep the in-flight JSONL on disk and sort rows without retaining them."""
+
+    _FLUSH_LINES = 1000
+    _INDEX_BATCH = 10_000
+
+    def __init__(
+        self,
+        path: Path,
+        *,
+        root: Path | None = None,
+    ) -> None:
+        self.partial_path = path.with_name(path.name + ".partial")
+        path.parent.mkdir(parents=True, exist_ok=True)
+        self.file = self.partial_path.open("wb")
+        self.file.write(
+            (dumps_store_stamp(derive_store_stamp(root or REPO_ROOT)) + "\n").encode(
+                "utf-8"
+            )
+        )
+        self.file.flush()
+        self._temporary = tempfile.TemporaryDirectory(prefix="battery-score-index-")
+        self._database = sqlite3.connect(
+            Path(self._temporary.name) / "residual-order.sqlite"
+        )
+        self._database.execute("PRAGMA cache_size=-16384")
+        self._database.execute("PRAGMA temp_store=FILE")
+        self._database.execute("PRAGMA journal_mode=OFF")
+        self._database.execute("PRAGMA synchronous=OFF")
+        self._database.execute(
+            "CREATE TABLE residual_order ("
+            "seq INTEGER PRIMARY KEY, rail TEXT NOT NULL, reference TEXT NOT NULL, "
+            "key TEXT NOT NULL, offset INTEGER NOT NULL, family TEXT, quantity TEXT, "
+            "engine TEXT NOT NULL, relation TEXT NOT NULL, band_value TEXT, "
+            "band_rule TEXT, status TEXT NOT NULL, flagged INTEGER NOT NULL, "
+            "has_numeric INTEGER NOT NULL, numeric_value TEXT)"
+        )
+        self._pending: list[
+            tuple[
+                str, str, str, int, str | None, str | None, str, str,
+                str | None, str | None, str, int, int, str | None
+            ]
+        ] = []
+        self.band_values: dict[tuple[str, str, str, str], set[str]] = defaultdict(set)
+        self.headline_band_values: dict[tuple[str, str, str], set[str]] = defaultdict(set)
+        self.tier_band_values: dict[
+            tuple[str, str, str, str, str, str], set[str]
+        ] = defaultdict(set)
+        self.report_aggregate: _ScorePayloadAccumulator | None = None
+        self.count = 0
+        self._last_flush = time.monotonic()
+
+    def append(
+        self,
+        residual: Residual,
+        candidate: Observation | None,
+        family_quantity: tuple[str, Quantity] | None,
+    ) -> None:
+        offset = self.file.tell()
+        line = dumps_residual_line(residual, candidate).encode("utf-8")
+        self.file.write(line + b"\n")
+        numeric = residual.numeric
+        decision_band = None if numeric is None else numeric.decision_band
+        flagged = _has_flagged_decision_notice(residual)
+        band_value = None if decision_band is None else str(decision_band.value)
+        numeric_value = None if numeric is None else str(numeric.value)
+        self._pending.append(
+            (
+                "" if residual.rail is None else residual.rail.value,
+                residual.reference,
+                residual.key,
+                offset,
+                None if family_quantity is None else family_quantity[0],
+                None if family_quantity is None else family_quantity[1].value,
+                residual.key.rsplit("::", 1)[-1],
+                residual.source_relation.value,
+                band_value,
+                None if decision_band is None else decision_band.rule,
+                residual.status.value,
+                int(flagged),
+                int(numeric is not None),
+                numeric_value,
+            )
+        )
+        self.count += 1
+        if len(self._pending) >= self._INDEX_BATCH:
+            self._flush_index()
+        now = time.monotonic()
+        if self.count % self._FLUSH_LINES == 0 or now - self._last_flush >= 5:
+            self.flush()
+
+    def _flush_index(self) -> None:
+        if not self._pending:
+            return
+        self._database.executemany(
+            "INSERT INTO residual_order (rail, reference, key, offset, family, quantity, "
+            "engine, relation, band_value, band_rule, status, flagged, has_numeric, "
+            "numeric_value) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+            self._pending,
+        )
+        self._database.commit()
+        self._pending.clear()
+
+    def flush(self) -> None:
+        self.file.flush()
+        self._last_flush = time.monotonic()
+
+    def finalize(
+        self,
+        *,
+        family_pool_sizes: Mapping[tuple[str, Quantity, str, str], int],
+        family_bands: Mapping[tuple[str, Quantity, str, str], DecisionBand],
+        context: ScoreContext,
+        engines: Sequence[Engine],
+    ) -> None:
+        self.flush()
+        self._flush_index()
+        self._database.execute(
+            "CREATE INDEX residual_order_key ON residual_order("
+            "rail COLLATE BINARY, reference COLLATE BINARY, key COLLATE BINARY, seq)"
+        )
+        report_aggregate = _ScorePayloadAccumulator(
+            context,
+            engines,
+            typed_family_band_values=self.band_values,
+            typed_headline_band_values=self.headline_band_values,
+            typed_tier_band_values=self.tier_band_values,
+        )
+        temporary_path: Path | None = None
+        try:
+            with tempfile.NamedTemporaryFile(
+                mode="wb", prefix=".residuals-final-", dir=self.partial_path.parent,
+                delete=False,
+            ) as output:
+                temporary_path = Path(output.name)
+                with self.partial_path.open("rb") as source:
+                    output.write(source.readline())
+                    rows = self._database.execute(
+                        "SELECT offset, reference, family, quantity, engine, relation, "
+                        "band_value, band_rule, status, flagged, has_numeric, "
+                        "numeric_value "
+                        "FROM residual_order "
+                        "ORDER BY rail COLLATE BINARY, reference COLLATE BINARY, "
+                        "key COLLATE BINARY, seq"
+                    )
+                    for (
+                        offset,
+                        reference,
+                        family,
+                        quantity,
+                        engine,
+                        relation,
+                        band_value,
+                        band_rule,
+                        status,
+                        flagged,
+                        has_numeric,
+                        numeric_value,
+                    ) in rows:
+                        source.seek(offset)
+                        raw_line = source.readline()
+                        can_apply_family_band = (
+                            family is not None
+                            and quantity is not None
+                            and status != ResidualStatus.REFUSED.value
+                            and band_rule != "source-printed per-cell uncertainty"
+                            and not flagged
+                            and has_numeric
+                        )
+                        payload = json.loads(raw_line)
+                        applied = False
+                        typed_band_value = None
+                        if can_apply_family_band:
+                            applied, typed_band_value = _apply_family_band_to_payload(
+                                payload,
+                                family_pool_sizes=family_pool_sizes,
+                                family_bands=family_bands,
+                                family_quantity=(
+                                    None
+                                    if family is None or quantity is None
+                                    else (family, Quantity(quantity))
+                                ),
+                            )
+                        band_value = typed_band_value if applied else band_value
+                        numeric_payload = payload.get("numeric")
+                        report_payload = payload
+                        if (
+                            isinstance(numeric_payload, dict)
+                            and numeric_value is not None
+                            and str(numeric_payload.get("value")) != numeric_value
+                        ):
+                            report_numeric = dict(numeric_payload)
+                            report_numeric["value"] = numeric_value
+                            report_payload = dict(payload)
+                            report_payload["numeric"] = report_numeric
+                        row_metadata = report_aggregate.add(report_payload)
+                        if band_value is not None:
+                            self._collect_report_band_values(
+                                payload,
+                                typed_value=str(band_value),
+                                row_metadata=row_metadata,
+                            )
+                        if applied:
+                            raw_line = json.dumps(
+                                payload,
+                                sort_keys=True,
+                                ensure_ascii=False,
+                                separators=(",", ":"),
+                            ).encode("utf-8") + b"\n"
+                        output.write(raw_line)
+                output.flush()
+            self.report_aggregate = report_aggregate
+            os.replace(temporary_path, self.partial_path)
+            temporary_path = None
+        finally:
+            if temporary_path is not None:
+                temporary_path.unlink(missing_ok=True)
+
+    def _collect_report_band_values(
+        self,
+        payload: Mapping[str, object],
+        *,
+        typed_value: str,
+        row_metadata: _ScorePayloadRowMetadata,
+    ) -> None:
+        numeric = payload.get("numeric")
+        if not isinstance(numeric, Mapping):
+            return
+        rail = str(payload.get("rail") or "")
+        flags = _flagged_payload_strata(payload)
+        if (
+            not rail
+            or payload.get("status") == ResidualStatus.REFUSED.value
+            or flags
+        ):
+            return
+        band = numeric.get("decision_band")
+        if not isinstance(band, Mapping):
+            return
+        self._collect_report_band_values_from_fields(
+            typed_value=typed_value,
+            rail=rail,
+            status=str(payload.get("status") or ""),
+            flagged=bool(flags),
+            operation=str(numeric.get("operation") or ""),
+            unit=str(numeric.get("unit") or ""),
+            band_unit=str(band.get("unit") or ""),
+            source_relation=str(payload.get("source_relation") or ""),
+            row_metadata=row_metadata,
+        )
+
+    def _collect_report_band_values_from_fields(
+        self,
+        *,
+        typed_value: str,
+        rail: str,
+        status: str,
+        flagged: bool,
+        operation: str,
+        unit: str,
+        band_unit: str,
+        source_relation: str,
+        row_metadata: _ScorePayloadRowMetadata,
+    ) -> None:
+        if not rail or status == ResidualStatus.REFUSED.value or flagged:
+            return
+        if row_metadata.is_compilation:
+            tier = "compilation"
+        elif row_metadata.is_measured:
+            tier = "measured"
+        else:
+            return
+        if (
+            operation == MetricOperation.DEX.value
+            and band_unit == "dimensionless"
+        ):
+            self.headline_band_values[
+                (tier, rail, row_metadata.engine)
+            ].add(typed_value)
+        family_quantity = row_metadata.family_quantity
+        if family_quantity is None or not operation or not unit:
+            return
+        family, quantity = family_quantity
+        self.band_values[
+            (family, quantity.value, row_metadata.engine, source_relation)
+        ].add(typed_value)
+        key = (
+            family,
+            rail,
+            row_metadata.engine,
+            source_relation or SourceRelation.UNKNOWN.value,
+            quantity.value,
+            unit,
+        )
+        self.tier_band_values[key].add(typed_value)
+
+    def close(self) -> None:
+        if not self.file.closed:
+            self.file.close()
+        self._database.close()
+        self._temporary.cleanup()
+
+
+def _apply_family_band_to_payload(
+    payload: dict[str, object],
+    *,
+    family_pool_sizes: Mapping[tuple[str, Quantity, str, str], int],
+    family_bands: Mapping[tuple[str, Quantity, str, str], DecisionBand],
+    family_quantity: tuple[str, Quantity] | None,
+) -> tuple[bool, str | None]:
+    numeric_payload = payload.get("numeric")
+    if not isinstance(numeric_payload, dict):
+        return False, None
+    raw_band = numeric_payload.get("decision_band")
+    band = (
+        DecisionBand(
+            as_decimal(raw_band["value"]),
+            str(raw_band["unit"]),
+            str(raw_band["rule"]),
+        )
+        if isinstance(raw_band, Mapping)
+        else None
+    )
+    numeric = ResidualNumeric(
+        operation=MetricOperation(str(numeric_payload["operation"])),
+        unit=str(numeric_payload["unit"]),
+        value=as_decimal(numeric_payload["value"]),
+        decision_band=band,
+    )
+    status = ResidualStatus(str(payload["status"]))
+    source_relation = SourceRelation(str(payload["source_relation"]))
+    apply, updated_band, no_band = _family_band_update(
+        numeric=numeric,
+        status=status,
+        key=str(payload.get("key") or ""),
+        source_relation=source_relation,
+        family_quantity=family_quantity,
+        flagged=bool(_flagged_payload_strata(payload)),
+        family_pool_sizes=family_pool_sizes,
+        family_bands=family_bands,
+    )
+    if not apply:
+        return False, None
+    if no_band:
+        numeric_payload.pop("decision_band", None)
+        payload["status"] = ResidualStatus.NO_BAND.value
+    else:
+        assert updated_band is not None
+        plain_band = to_plain(updated_band)
+        numeric_payload["decision_band"] = plain_band
+        updated_numeric = replace(numeric, decision_band=updated_band)
+        payload["status"] = match_status(updated_numeric).value
+    return True, None if no_band else str(updated_band.value)
+
+
 def flagged_stratum_payloads(
-    rows: Sequence[Mapping[str, object]],
+    rows: Iterable[Mapping[str, object]],
     engines: Sequence[Engine],
 ) -> list[dict[str, object]]:
     groups: dict[tuple[str, str, str], list[Decimal]] = {}
@@ -5518,7 +6606,7 @@ def flagged_stratum_payloads(
 
 
 def headline_payload_records(
-    rows: Sequence[Mapping[str, object]],
+    rows: Iterable[Mapping[str, object]],
     *,
     engines: Sequence[Engine],
     observations: Mapping[str, Observation] | None = None,
@@ -5526,50 +6614,48 @@ def headline_payload_records(
 ) -> list[dict[str, object]]:
     """Machine-readable headline records from residual payloads."""
 
-    measured_rows: Sequence[Mapping[str, object]] = rows
-    compilation_rows: Sequence[Mapping[str, object]] = ()
+    measured_rows: Iterable[Mapping[str, object]]
+    compilation_rows: Iterable[Mapping[str, object]] = ()
     if observations is not None:
         from simulator.battery.compilation_tier import compilation_row_observation
 
-        measured_rows = []
-        compilation_rows = []
-        for row in rows:
-            reference = observations.get(str(row.get("reference") or ""))
-            is_compilation = (
+        def is_compilation(row: Mapping[str, object]) -> bool:
+            return (
                 compilation_row_observation(
                     str(row.get("reference") or ""), observations, origins
                 )
                 is not None
             )
-            if is_compilation:
-                compilation_rows.append(row)
-            elif _reference_has_measured_evidence(
+
+        def is_measured(row: Mapping[str, object]) -> bool:
+            reference = observations.get(str(row.get("reference") or ""))
+            return not is_compilation(row) and _reference_has_measured_evidence(
                 reference, exclusions=row.get("exclusions")
-            ):
-                measured_rows.append(row)
+            )
+
+        measured_rows = (row for row in rows if is_measured(row))
+        compilation_rows = (row for row in rows if is_compilation(row))
     else:
-        measured_rows = [
+        measured_rows = (
             row
             for row in rows
             if _reference_has_measured_evidence(
                 None, exclusions=row.get("exclusions")
             )
-        ]
+        )
     records = [
         *headline_payloads(measured_rows, engines, tier="measured"),
         *headline_payloads(compilation_rows, engines, tier="compilation"),
     ]
-    if observations is not None and compilation_rows:
+    if observations is not None:
+        compilation_rows = (row for row in rows if is_compilation(row))
         from simulator.battery.compilation_tier import (
             compilation_family,
             compilation_origin,
             compilation_row_observation,
         )
 
-        payload_groups: dict[
-            tuple[str, str, str, str, str],
-            list[tuple[Decimal, DecisionBand | None, str]],
-        ] = defaultdict(list)
+        payload_groups: dict[tuple[str, str, str, str, str], dict[str, object]] = {}
         derived_ns: dict[tuple[str, str, str], int] = defaultdict(int)
         for row in compilation_rows:
             reference = str(row.get("reference") or "")
@@ -5599,78 +6685,694 @@ def headline_payload_records(
             if band is None and not flagged:
                 derived_ns[key] += 1
             rail = str(row.get("rail") or "")
-            payload_groups[(*key, relation, rail)].append(
-                (as_decimal(numeric["value"]), band, str(row.get("status") or ""))
+            group = payload_groups.setdefault(
+                (*key, relation, rail),
+                {
+                    "values": [],
+                    "kinds": set(),
+                    "widths": set(),
+                    "units": set(),
+                    "band_derived_n": set(),
+                    "match_count": 0,
+                    "mismatch_count": 0,
+                    "no_band_count": 0,
+                    "tail_in_count": 0,
+                    "tail_out_count": 0,
+                },
             )
+            value = as_decimal(numeric["value"])
+            group["values"].append(value)  # type: ignore[union-attr]
+            status = str(row.get("status") or "")
+            if status == ResidualStatus.MATCH.value:
+                group["match_count"] = int(group["match_count"]) + 1
+            elif status == ResidualStatus.MISMATCH.value:
+                group["mismatch_count"] = int(group["mismatch_count"]) + 1
+            elif status == ResidualStatus.NO_BAND.value:
+                group["no_band_count"] = int(group["no_band_count"]) + 1
+            if band is None:
+                continue
+            if band.rule == "source-printed per-cell uncertainty":
+                group["kinds"].add("printed")  # type: ignore[union-attr]
+            elif "residual distribution" in band.rule:
+                group["kinds"].add("derived_2xMAD")  # type: ignore[union-attr]
+                if status == ResidualStatus.MATCH.value:
+                    group["tail_in_count"] = int(group["tail_in_count"]) + 1
+                elif status == ResidualStatus.MISMATCH.value:
+                    group["tail_out_count"] = int(group["tail_out_count"]) + 1
+            else:
+                group["kinds"].add("legacy_fallback")  # type: ignore[union-attr]
+            group["widths"].add(str(band_data["value"]))  # type: ignore[union-attr]
+            group["units"].add(band.unit)  # type: ignore[union-attr]
+            if "derived_n=" in band.rule:
+                group["band_derived_n"].add(  # type: ignore[union-attr]
+                    int(band.rule.rsplit("derived_n=", 1)[1])
+                )
+        typed_band_values = getattr(rows, "_typed_family_band_values", {})
+        for (family, quantity, engine, relation, _rail), group in payload_groups.items():
+            exact_values = typed_band_values.get(
+                (family, quantity, engine, relation)
+            )
+            if exact_values is not None:
+                group["widths"] = set(exact_values)
         for record in records:
             if record.get("tier") != "compilation":
                 continue
             engine = str(record["engine"])
             rail = str(record["rail"])
             grouped = [
-                (key, values)
-                for key, values in payload_groups.items()
+                (key, group)
+                for key, group in payload_groups.items()
                 if key[2] == engine and key[4] == rail
             ]
             strata = []
-            for (family, quantity, _engine, relation, _rail), values in sorted(grouped):
-                residuals = [value for value, _band, _status in values]
-                center = _median(residuals)
-                mad = None if center is None else _median([abs(value - center) for value in residuals])
-                bands = [band for _value, band, _status in values if band is not None]
-                kinds = sorted({
-                    "printed" if band.rule == "source-printed per-cell uncertainty"
-                    else "derived_2xMAD" if "residual distribution" in band.rule
-                    else "legacy_fallback" for band in bands
-                }) or ["no_band"]
-                derived_n = sorted({int(band.rule.rsplit("derived_n=", 1)[1]) for band in bands if "derived_n=" in band.rule})
-                if not derived_n and not bands and derived_ns[(family, quantity, engine)] > 0:
+            for (family, quantity, _engine, relation, _rail), group in sorted(grouped):
+                values = group["values"]
+                center = _median(values)
+                mad = None if center is None else _median([abs(value - center) for value in values])
+                kinds = sorted(group["kinds"]) or ["no_band"]
+                derived_n = sorted(group["band_derived_n"])
+                if not derived_n and not group["widths"] and derived_ns[(family, quantity, engine)] > 0:
                     derived_n = [derived_ns[(family, quantity, engine)]]
-                widths = sorted({str(band.value) for band in bands})
-                units = sorted({band.unit for band in bands})
+                widths = sorted(group["widths"])
+                units = sorted(group["units"])
                 derived = "derived_2xMAD" in kinds
-                tail_in = sum(
-                    status == ResidualStatus.MATCH.value
-                    for _value, band, status in values
-                    if band is not None and "residual distribution" in band.rule
-                )
-                tail_out = sum(
-                    status == ResidualStatus.MISMATCH.value
-                    for _value, band, status in values
-                    if band is not None and "residual distribution" in band.rule
-                )
-                matches = sum(status == ResidualStatus.MATCH.value for _value, _band, status in values)
-                mismatches = sum(status == ResidualStatus.MISMATCH.value for _value, _band, status in values)
                 strata.append({
                     "family": family, "quantity": quantity, "engine": engine, "relation": relation,
-                    "n": len(residuals),
+                    "n": len(values),
                     "signed_median_residual": None if center is None else str(center),
                     "mad": None if mad is None else str(mad),
                     "bias_to_scatter_ratio": (
                         None
-                        if (ratio := _bias_to_scatter_ratio(center, mad, len(residuals))) is None
+                        if (ratio := _bias_to_scatter_ratio(center, mad, len(values))) is None
                         else str(ratio)
                     ),
-                    "max_abs_residual": None if not residuals else str(max(abs(value) for value in residuals)),
+                    "max_abs_residual": None if not values else str(max(abs(value) for value in values)),
                     "band_value": widths[0] if len(widths) == 1 else widths,
                     "unit": units[0] if len(units) == 1 else units or QUANTITY_UNITS[Quantity(quantity)],
                     "band_kind": kinds[0] if len(kinds) == 1 else kinds,
                     "band_derived_n": derived_n[0] if len(derived_n) == 1 else derived_n,
-                    "match_count": matches, "mismatch_count": mismatches,
-                    "no_band_count": sum(
-                        status == ResidualStatus.NO_BAND.value
-                        for _value, _band, status in values
-                    ),
-                    "tail_in_count": tail_in if derived else None,
-                    "tail_out_count": tail_out if derived else None,
-                    "no_band_reason": "derived_band_insufficient_n" if not bands and 0 < derived_ns[(family, quantity, engine)] < MIN_DERIVED_BAND_N else None,
+                    "match_count": group["match_count"],
+                    "mismatch_count": group["mismatch_count"],
+                    "no_band_count": group["no_band_count"],
+                    "tail_in_count": group["tail_in_count"] if derived else None,
+                    "tail_out_count": group["tail_out_count"] if derived else None,
+                    "no_band_reason": "derived_band_insufficient_n" if not group["widths"] and 0 < derived_ns[(family, quantity, engine)] < MIN_DERIVED_BAND_N else None,
                 })
             record["decision_strata"] = strata
     return records
 
 
+@dataclass(frozen=True)
+class _ScorePayloadRowMetadata:
+    reference: str
+    engine: str
+    observation: Observation | None
+    origin: str | None
+    is_compilation: bool
+    is_measured: bool
+    flags: tuple[str, ...]
+    family_quantity: tuple[str, Quantity] | None
+    tier_family: str
+    tier_quantity: str
+    tier_rail: str
+    tier_uncertainty: str
+
+
+class _ScorePayloadAccumulator:
+    """Compact report statistics collected in one pass over residual payloads."""
+
+    def __init__(
+        self,
+        context: ScoreContext,
+        engines: Sequence[Engine],
+        *,
+        typed_family_band_values: Mapping[
+            tuple[str, str, str, str], set[str]
+        ] | None = None,
+        typed_headline_band_values: Mapping[
+            tuple[str, str, str], set[str]
+        ] | None = None,
+        typed_tier_band_values: Mapping[
+            tuple[str, str, str, str, str, str], set[str]
+        ] | None = None,
+    ) -> None:
+        from simulator.battery.compilation_tier import _TierMarkdownAccumulator
+
+        self.context = context
+        self.engines = tuple(engines)
+        self.engine_names = {engine.value for engine in engines}
+        self._row_metadata_cache: dict[
+            str,
+            tuple[
+                Observation | None,
+                str | None,
+                bool,
+                tuple[str, Quantity] | None,
+                str,
+                str,
+                str,
+                str,
+            ],
+        ] = {}
+        self.typed_family_band_values = (
+            {} if typed_family_band_values is None else typed_family_band_values
+        )
+        self.typed_headline_band_values = (
+            {} if typed_headline_band_values is None else typed_headline_band_values
+        )
+        self.typed_tier_band_values = (
+            {} if typed_tier_band_values is None else typed_tier_band_values
+        )
+        self.headline_groups: dict[
+            str, dict[tuple[str, str], dict[str, object]]
+        ] = {"measured": {}, "compilation": {}}
+        self.report_engine_names: set[str] = set()
+        self.count = 0
+        self.scored_count = 0
+        self.flagged_counts: dict[tuple[str, str, str], int] = defaultdict(int)
+        self.flagged_values: dict[tuple[str, str, str], list[Decimal]] = defaultdict(list)
+        self.compilation_groups: dict[
+            tuple[str, str, str, str, str], dict[str, object]
+        ] = {}
+        self.derived_ns: dict[tuple[str, str, str], int] = defaultdict(int)
+        self.refusal_counts: dict[str, int] = defaultdict(int)
+        self.admission_with = 0
+        self.admission_alone = 0
+        self.admission_alone_unique = 0
+        self._last_admission_reference: str | None = None
+        self.notice_counts: dict[str, int] = defaultdict(int)
+        self.diagnostic_count = 0
+        self.tier_accumulator = _TierMarkdownAccumulator(self.typed_tier_band_values)
+
+        for tier in self.headline_groups:
+            for rail in Rail:
+                for engine in engines:
+                    self.headline_groups[tier][(rail.value, engine.value)] = (
+                        _empty_headline_payload_stats()
+                    )
+
+    @classmethod
+    def from_rows(
+        cls,
+        rows: Iterable[Mapping[str, object]],
+        *,
+        context: ScoreContext,
+        engines: Sequence[Engine],
+    ) -> _ScorePayloadAccumulator:
+        aggregate = cls(
+            context,
+            engines,
+            typed_family_band_values=getattr(rows, "_typed_family_band_values", None),
+            typed_headline_band_values=getattr(rows, "_typed_headline_band_values", None),
+            typed_tier_band_values=getattr(rows, "_typed_tier_band_values", None),
+        )
+        for row in rows:
+            aggregate.add(row)
+        return aggregate
+
+    @staticmethod
+    def _engine(row: Mapping[str, object]) -> str:
+        request = row.get("candidate_request")
+        return str(
+            request.get("engine")
+            if isinstance(request, Mapping) and request.get("engine")
+            else str(row.get("key") or "").rsplit("::", 1)[-1]
+        )
+
+    def _add_headline(
+        self,
+        row: Mapping[str, object],
+        *,
+        tier: str,
+        rail: str,
+        engine: str,
+        numeric_value: Decimal | None,
+    ) -> None:
+        groups = self.headline_groups[tier]
+        stats = groups.setdefault((rail, engine), _empty_headline_payload_stats())
+        stats["n_candidates"] = int(stats["n_candidates"]) + 1
+        status = str(row.get("status") or "")
+        exclusions = tuple(row.get("exclusions") or ())
+        if row.get("score_eligible") or "reference_measured_evidence" not in exclusions:
+            stats["n_eligible_references"] = int(stats["n_eligible_references"]) + 1
+        if status == ResidualStatus.REFUSED.value:
+            stats["n_refused"] = int(stats["n_refused"]) + 1
+        numeric = row.get("numeric")
+        if not isinstance(numeric, Mapping):
+            return
+        stats["n_scored"] = int(stats["n_scored"]) + 1
+        if row.get("score_eligible"):
+            stats["n_score_eligible"] = int(stats["n_score_eligible"]) + 1
+        if status == ResidualStatus.MATCH.value:
+            stats["n_inside_band"] = int(stats["n_inside_band"]) + 1
+        if status in {ResidualStatus.MATCH.value, ResidualStatus.MISMATCH.value}:
+            stats["n_banded"] = int(stats["n_banded"]) + 1
+        if status == ResidualStatus.NO_BAND.value:
+            stats["n_no_band"] = int(stats["n_no_band"]) + 1
+        if (
+            numeric.get("operation") == MetricOperation.DEX.value
+            and numeric_value is not None
+        ):
+            stats["dex_values"].append(numeric_value)
+        band = numeric.get("decision_band")
+        if (
+            numeric.get("operation") == MetricOperation.DEX.value
+            and isinstance(band, Mapping)
+            and band.get("unit") == "dimensionless"
+        ):
+            try:
+                stats["band_widths"].add(as_decimal(band.get("value")))
+            except (TypeError, ValueError, ArithmeticError):
+                pass
+
+    def _add_compilation_decision(
+        self,
+        row: Mapping[str, object],
+        *,
+        family_quantity: tuple[str, Quantity] | None,
+        engine: str,
+        flagged: bool,
+        numeric_value: Decimal | None,
+    ) -> None:
+        numeric = row.get("numeric")
+        if family_quantity is None or not isinstance(numeric, Mapping):
+            return
+        family, quantity = family_quantity
+        status = str(row.get("status") or "")
+        if status == ResidualStatus.REFUSED.value:
+            return
+        band_data = numeric.get("decision_band")
+        if flagged:
+            return
+        key = (family, quantity.value, engine)
+        if not isinstance(band_data, Mapping):
+            self.derived_ns[key] += 1
+        relation = str(row.get("source_relation") or SourceRelation.UNKNOWN.value)
+        rail = str(row.get("rail") or "")
+        group_key = (*key, relation, rail)
+        group = self.compilation_groups.setdefault(
+            group_key,
+            {
+                "values": [],
+                "kinds": set(),
+                "widths": set(),
+                "units": set(),
+                "band_derived_n": set(),
+                "match_count": 0,
+                "mismatch_count": 0,
+                "no_band_count": 0,
+                "tail_in_count": 0,
+                "tail_out_count": 0,
+            },
+        )
+        value = numeric_value
+        if value is None:
+            value = as_decimal(numeric["value"])
+        group["values"].append(value)
+        if status == ResidualStatus.MATCH.value:
+            group["match_count"] = int(group["match_count"]) + 1
+        elif status == ResidualStatus.MISMATCH.value:
+            group["mismatch_count"] = int(group["mismatch_count"]) + 1
+        elif status == ResidualStatus.NO_BAND.value:
+            group["no_band_count"] = int(group["no_band_count"]) + 1
+        if not isinstance(band_data, Mapping):
+            return
+        band_rule = str(band_data["rule"])
+        if band_rule == "source-printed per-cell uncertainty":
+            group["kinds"].add("printed")
+        elif "residual distribution" in band_rule:
+            group["kinds"].add("derived_2xMAD")
+            if status == ResidualStatus.MATCH.value:
+                group["tail_in_count"] = int(group["tail_in_count"]) + 1
+            elif status == ResidualStatus.MISMATCH.value:
+                group["tail_out_count"] = int(group["tail_out_count"]) + 1
+        else:
+            group["kinds"].add("legacy_fallback")
+        group["widths"].add(str(band_data["value"]))
+        group["units"].add(str(band_data["unit"]))
+        if "derived_n=" in band_rule:
+            group["band_derived_n"].add(int(band_rule.rsplit("derived_n=", 1)[1]))
+
+    def _row_metadata(
+        self, row: Mapping[str, object]
+    ) -> _ScorePayloadRowMetadata:
+        from simulator.battery.compilation_tier import (
+            compilation_family,
+            is_compilation_evidence,
+            parent_observation_id,
+            uncertainty_text,
+        )
+
+        reference = str(row.get("reference") or "")
+        engine = self._engine(row)
+        flags = _flagged_payload_strata(row)
+        flagged = bool(flags)
+        exclusions = row.get("exclusions")
+        parent = parent_observation_id(reference)
+        reference_observation = self.context.observations.get(reference)
+        cache_key = (
+            reference
+            if reference_observation is not None or reference in self.context.origins
+            else parent
+        )
+        cached = self._row_metadata_cache.get(cache_key)
+        if cached is None:
+            observation = reference_observation or self.context.observations.get(parent)
+            origin = self.context.origins.get(reference) or self.context.origins.get(parent)
+            is_compilation = bool(
+                observation is not None
+                and (
+                    is_compilation_evidence(observation)
+                    or is_compilation_source(observation.source_id, origin)
+                )
+            )
+            family = ""
+            tier_quantity = "unknown"
+            tier_rail = "none"
+            tier_uncertainty = ""
+            family_quantity = None
+            if is_compilation and observation is not None:
+                family = compilation_family(observation.source_id, origin)
+                token = (
+                    quantity_token(observation.identity)
+                    if isinstance(observation.identity, Identity)
+                    else None
+                )
+                tier_quantity = token.value if token is not None else "unknown"
+                formula = (
+                    observation.identity.species.formula
+                    if isinstance(observation.identity, Identity)
+                    else ""
+                )
+                headline_rail = rail_for_quantity(token, species_formula=formula)
+                if headline_rail is not None:
+                    tier_rail = headline_rail.value
+                tier_uncertainty = uncertainty_text(observation.uncertainty)
+                if token is not None:
+                    family_quantity = (family, token)
+            cached = (
+                observation,
+                origin,
+                is_compilation,
+                family_quantity,
+                family,
+                tier_quantity,
+                tier_rail,
+                tier_uncertainty,
+            )
+            self._row_metadata_cache[cache_key] = cached
+        (
+            observation,
+            origin,
+            is_compilation,
+            family_quantity,
+            family,
+            tier_quantity,
+            tier_rail,
+            tier_uncertainty,
+        ) = cached
+        measured = (
+            not flagged
+            and not is_compilation
+            and _reference_has_measured_evidence(
+                reference_observation, exclusions=exclusions
+            )
+        )
+        return _ScorePayloadRowMetadata(
+            reference=reference,
+            engine=engine,
+            observation=observation,
+            origin=origin,
+            is_compilation=is_compilation,
+            is_measured=measured,
+            flags=flags,
+            family_quantity=family_quantity,
+            tier_family=family,
+            tier_quantity=tier_quantity,
+            tier_rail=tier_rail,
+            tier_uncertainty=tier_uncertainty,
+        )
+
+    def add(
+        self,
+        row: Mapping[str, object],
+        *,
+        row_metadata: _ScorePayloadRowMetadata | None = None,
+    ) -> _ScorePayloadRowMetadata:
+        from simulator.battery.compilation_tier import _tier_cell_from_payload_fields
+
+        metadata = row_metadata or self._row_metadata(row)
+        self.count += 1
+        if row.get("score_eligible"):
+            self.scored_count += 1
+        numeric_payload = row.get("numeric")
+        numeric_value = None
+        if (
+            isinstance(numeric_payload, Mapping)
+            and numeric_payload.get("value") is not None
+        ):
+            try:
+                numeric_value = as_decimal(numeric_payload["value"])
+            except (TypeError, ValueError, ArithmeticError):
+                pass
+        reference = metadata.reference
+        engine = metadata.engine
+        flags = metadata.flags
+        flagged = bool(flags)
+        exclusions = row.get("exclusions")
+        compilation_observation = metadata.observation if metadata.is_compilation else None
+        measured = metadata.is_measured
+        if measured:
+            if _reference_has_measured_evidence(None, exclusions=exclusions):
+                rail = str(row.get("rail") or "")
+                if rail:
+                    self.report_engine_names.add(engine)
+                    self._add_headline(
+                        row,
+                        tier="measured",
+                        rail=rail,
+                        engine=engine,
+                        numeric_value=numeric_value,
+                    )
+            if row.get("status") == ResidualStatus.REFUSED.value:
+                refusal = row.get("refusal") or {}
+                if isinstance(refusal, Mapping):
+                    reason = str(refusal.get("reason") or "refused")
+                    detail = (
+                        refusal.get("detail")
+                        if isinstance(refusal.get("detail"), Mapping)
+                        else {}
+                    )
+                    token = _short_refusal_token((detail or {}).get("reason"))
+                    key = reason if token is None else f"{reason}:{token}"
+                    self.refusal_counts[key] += 1
+        if compilation_observation is not None:
+            self.tier_accumulator.add(
+                _tier_cell_from_payload_fields(
+                    row,
+                    family=metadata.tier_family,
+                    quantity=metadata.tier_quantity,
+                    rail=metadata.tier_rail,
+                    uncertainty=metadata.tier_uncertainty,
+                    derive_eligible=not flagged,
+                    numeric_value=numeric_value,
+                )
+            )
+            if not flagged:
+                rail = str(row.get("rail") or "")
+                if rail:
+                    self._add_headline(
+                        row,
+                        tier="compilation",
+                        rail=rail,
+                        engine=engine,
+                        numeric_value=numeric_value,
+                    )
+            self._add_compilation_decision(
+                row,
+                family_quantity=metadata.family_quantity,
+                engine=engine,
+                flagged=flagged,
+                numeric_value=numeric_value,
+            )
+        numeric = row.get("numeric")
+        rail = str(row.get("rail") or "")
+        if (
+            isinstance(numeric, Mapping)
+            and rail
+            and (not self.engine_names or engine in self.engine_names)
+        ):
+            dex = (
+                numeric.get("value")
+                if numeric.get("operation") == MetricOperation.DEX.value
+                else None
+            )
+            for stratum in flags:
+                key = (stratum, rail, engine)
+                self.flagged_counts[key] += 1
+                if dex is not None and numeric_value is not None:
+                    self.flagged_values[key].append(numeric_value)
+        exclusions_tuple = tuple(exclusions or ())
+        if "admission_admitted" in exclusions_tuple:
+            self.admission_with += 1
+            if all(name == "admission_admitted" for name in exclusions_tuple):
+                self.admission_alone += 1
+                if reference != self._last_admission_reference:
+                    self.admission_alone_unique += 1
+                    self._last_admission_reference = reference
+        for notice in row.get("notices") or ():
+            if isinstance(notice, Mapping) and notice.get("kind"):
+                self.notice_counts[str(notice["kind"])] += 1
+        if (
+            "reference_measured_evidence" in exclusions_tuple
+            or is_internal_consistency(metadata.origin)
+            or is_compilation_source(
+                None if metadata.observation is None else metadata.observation.source_id,
+                metadata.origin,
+            )
+        ):
+            self.diagnostic_count += 1
+        return metadata
+
+    def headline_records(
+        self,
+        *,
+        engines: Sequence[Engine] | None = None,
+    ) -> list[dict[str, object]]:
+        selected_names = (
+            self.engine_names if engines is None else {engine.value for engine in engines}
+        )
+        records: list[dict[str, object]] = []
+        for tier in ("measured", "compilation"):
+            groups = self.headline_groups[tier]
+            keys = {
+                key for key in groups
+                if engines is None or key[1] in selected_names
+            }
+            for rail in Rail:
+                for engine in selected_names:
+                    keys.add((rail.value, engine))
+            for rail, engine in sorted(keys):
+                stats = groups.get((rail, engine), _empty_headline_payload_stats())
+                records.append(
+                    _headline_payload_record(
+                        tier,
+                        rail,
+                        engine,
+                        stats,
+                        typed_widths=self.typed_headline_band_values.get(
+                            (tier, rail, engine)
+                        ),
+                    )
+                )
+        self._add_compilation_decision_strata(records)
+        return records
+
+    def _add_compilation_decision_strata(
+        self, records: list[dict[str, object]]
+    ) -> None:
+        for (family, quantity, engine, relation, _rail), group in self.compilation_groups.items():
+            exact = self.typed_family_band_values.get(
+                (family, quantity, engine, relation)
+            )
+            if exact is not None:
+                group["widths"] = set(exact)
+        for record in records:
+            if record.get("tier") != "compilation":
+                continue
+            engine = str(record["engine"])
+            rail = str(record["rail"])
+            grouped = [
+                (key, group)
+                for key, group in self.compilation_groups.items()
+                if key[2] == engine and key[4] == rail
+            ]
+            strata = []
+            for (family, quantity, _engine, relation, _rail), group in sorted(grouped):
+                values = group["values"]
+                center = _median(values)
+                mad = None if center is None else _median(
+                    [abs(value - center) for value in values]
+                )
+                kinds = sorted(group["kinds"]) or ["no_band"]
+                derived_n = sorted(group["band_derived_n"])
+                if (
+                    not derived_n
+                    and not group["widths"]
+                    and self.derived_ns[(family, quantity, engine)] > 0
+                ):
+                    derived_n = [self.derived_ns[(family, quantity, engine)]]
+                widths = sorted(group["widths"])
+                units = sorted(group["units"])
+                derived = "derived_2xMAD" in kinds
+                strata.append(
+                    {
+                        "family": family,
+                        "quantity": quantity,
+                        "engine": engine,
+                        "relation": relation,
+                        "n": len(values),
+                        "signed_median_residual": None if center is None else str(center),
+                        "mad": None if mad is None else str(mad),
+                        "bias_to_scatter_ratio": (
+                            None
+                            if (ratio := _bias_to_scatter_ratio(center, mad, len(values))) is None
+                            else str(ratio)
+                        ),
+                        "max_abs_residual": None if not values else str(max(abs(value) for value in values)),
+                        "band_value": widths[0] if len(widths) == 1 else widths,
+                        "unit": units[0] if len(units) == 1 else units or QUANTITY_UNITS[Quantity(quantity)],
+                        "band_kind": kinds[0] if len(kinds) == 1 else kinds,
+                        "band_derived_n": derived_n[0] if len(derived_n) == 1 else derived_n,
+                        "match_count": group["match_count"],
+                        "mismatch_count": group["mismatch_count"],
+                        "no_band_count": group["no_band_count"],
+                        "tail_in_count": group["tail_in_count"] if derived else None,
+                        "tail_out_count": group["tail_out_count"] if derived else None,
+                        "no_band_reason": (
+                            "derived_band_insufficient_n"
+                            if not group["widths"]
+                            and 0 < self.derived_ns[(family, quantity, engine)] < MIN_DERIVED_BAND_N
+                            else None
+                        ),
+                    }
+                )
+            record["decision_strata"] = strata
+
+    def flagged_records(self) -> list[dict[str, object]]:
+        return [
+            {
+                "stratum": stratum,
+                "rail": rail,
+                "engine": engine,
+                "n": self.flagged_counts[(stratum, rail, engine)],
+                "median_dex": (
+                    None
+                    if not self.flagged_values.get((stratum, rail, engine))
+                    else str(_median(self.flagged_values[(stratum, rail, engine)]))
+                ),
+                "rms_dex": (
+                    None
+                    if not self.flagged_values.get((stratum, rail, engine))
+                    else str(_rms(self.flagged_values[(stratum, rail, engine)]))
+                ),
+            }
+            for stratum, rail, engine in sorted(self.flagged_counts)
+        ]
+
+    def compilation_lines(self) -> list[str]:
+        from simulator.battery.compilation_tier import _tier_markdown
+
+        return _tier_markdown((), accumulator=self.tier_accumulator)
+
+    def summary_payload(self, store_stamp: Mapping[str, object] | None) -> dict[str, object]:
+        return headline_summary_payload(
+            self.headline_records(), store_stamp=store_stamp
+        )
+
+
 def write_headline_summary_from_payloads_json(
-    rows: Sequence[Mapping[str, object]],
+    rows: Iterable[Mapping[str, object]],
     path: Path,
     *,
     engines: Sequence[Engine],
@@ -5687,6 +7389,24 @@ def write_headline_summary_from_payloads_json(
         ),
         store_stamp=store_stamp,
     )
+    _write_headline_summary_payload_json(payload, path)
+
+
+def _write_headline_summary_from_accumulator_json(
+    aggregate: _ScorePayloadAccumulator,
+    path: Path,
+    *,
+    store_stamp: Mapping[str, object] | None,
+) -> None:
+    _write_headline_summary_payload_json(
+        aggregate.summary_payload(store_stamp), path
+    )
+
+
+def _write_headline_summary_payload_json(
+    payload: Mapping[str, object],
+    path: Path,
+) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(
         json.dumps(payload, sort_keys=True, ensure_ascii=False, indent=2) + "\n",
@@ -5694,7 +7414,7 @@ def write_headline_summary_from_payloads_json(
     )
 
 
-def notice_backlog_payloads(rows: Sequence[Mapping[str, object]]) -> dict[str, int]:
+def notice_backlog_payloads(rows: Iterable[Mapping[str, object]]) -> dict[str, int]:
     counts: dict[str, int] = {}
     for row in rows:
         for notice in row.get("notices") or ():
@@ -5704,8 +7424,28 @@ def notice_backlog_payloads(rows: Sequence[Mapping[str, object]]) -> dict[str, i
     return dict(sorted(counts.items()))
 
 
+class _FilteredPayloadRows:
+    def __init__(
+        self,
+        rows: Iterable[Mapping[str, object]],
+        predicate: Callable[[Mapping[str, object]], bool],
+    ) -> None:
+        self.rows = rows
+        self.predicate = predicate
+        for name in (
+            "_typed_family_band_values",
+            "_typed_headline_band_values",
+            "_typed_tier_band_values",
+        ):
+            if hasattr(rows, name):
+                setattr(self, name, getattr(rows, name))
+
+    def __iter__(self) -> Iterable[Mapping[str, object]]:
+        return (row for row in self.rows if self.predicate(row))
+
+
 def render_score_report_from_payloads(
-    rows: Sequence[Mapping[str, object]],
+    rows: Iterable[Mapping[str, object]],
     *,
     engines: Sequence[Engine],
     hostname: str,
@@ -5718,8 +7458,10 @@ def render_score_report_from_payloads(
     observations: Mapping[str, Observation] | None = None,
     origins: Mapping[str, str] | None = None,
 ) -> str:
-    unflagged_rows = tuple(row for row in rows if not _flagged_payload_strata(row))
-    measured_rows: Sequence[Mapping[str, object]] = unflagged_rows
+    unflagged_rows = _FilteredPayloadRows(
+        rows, lambda row: not _flagged_payload_strata(row)
+    )
+    measured_rows: Iterable[Mapping[str, object]] = unflagged_rows
     compilation_lines: list[str] = []
     if observations is not None:
         from simulator.battery.compilation_tier import (
@@ -5727,18 +7469,17 @@ def render_score_report_from_payloads(
             compilation_tier_lines_from_payloads,
         )
 
-        measured_rows = [
-            row
-            for row in unflagged_rows
-            if _reference_has_measured_evidence(
+        measured_rows = _FilteredPayloadRows(
+            unflagged_rows,
+            lambda row: _reference_has_measured_evidence(
                 observations.get(str(row.get("reference") or "")),
                 exclusions=row.get("exclusions"),
             )
             and compilation_row_observation(
                 str(row.get("reference") or ""), observations, origins
             )
-            is None
-        ]
+            is None,
+        )
         compilation_lines = compilation_tier_lines_from_payloads(
             unflagged_rows, observations, origins
         )
@@ -6001,7 +7742,7 @@ def load_legacy_score_rows(root: Path | None = None) -> list[dict[str, object]]:
 def status_diff_rows(
     *,
     old_rows: Sequence[Mapping[str, object]],
-    new_rows: Sequence[Mapping[str, object]],
+    new_rows: Iterable[Mapping[str, object]],
     key_map: Mapping[str, str],
 ) -> tuple[list[dict[str, object]], list[str]]:
     """Category-by-category diff: scored/refused/excluded and match/mismatch.
@@ -6010,7 +7751,12 @@ def status_diff_rows(
     so the caller can keep the old ledger.
     """
 
-    new_by_key = {str(row.get("key") or ""): row for row in new_rows}
+    wanted_keys = set(key_map.values())
+    new_by_key: dict[str, Mapping[str, object]] = {}
+    for row in new_rows:
+        key = str(row.get("key") or "")
+        if key in wanted_keys:
+            new_by_key[key] = row
     mapped_old: set[str] = set()
     diffs: list[dict[str, object]] = []
     unmapped: list[str] = []

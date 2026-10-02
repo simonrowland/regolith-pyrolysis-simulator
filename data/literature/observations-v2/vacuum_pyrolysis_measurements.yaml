@@ -81,9 +81,14 @@ observations:
       value: measured_direct
     original_method_class: measured_direct
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - mass_loss_fraction
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: pomeroy_cardiff_2006_measurements:pomeroy_non_condensed_mass_loss_fraction
   source_id: pomeroy_cardiff_2006_measurements
   locator:
     note: citation_id=pomeroy_cardiff_2006; source_location=LPI_Contribution_1332_p47_results; extraction_method=text

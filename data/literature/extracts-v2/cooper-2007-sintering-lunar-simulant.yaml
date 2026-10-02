@@ -309,9 +309,14 @@ observations:
       reason: unmapped method_class quoted_attributed
     original_method_class: quoted_attributed
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - transition_temperature
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: cooper-2007-sintering-lunar-simulant::cooper_2007_jsc1a_sintering_1050c_three_hours
   source_id: cooper-2007-sintering-lunar-simulant
   locator:
     pdf_page_index: 2
@@ -422,9 +427,14 @@ observations:
       reason: unmapped method_class quoted_attributed
     original_method_class: quoted_attributed
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - transition_temperature
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: cooper-2007-sintering-lunar-simulant::cooper_2007_jsc1a_sintering_1100c_quoted
   source_id: cooper-2007-sintering-lunar-simulant
   locator:
     pdf_page_index: 2

@@ -112,8 +112,8 @@ observations:
         table: '6'
         note: Table 6 row a_Al2O3, column 1833 K; value printed as 1.05 ± 0.07
   derived_from:
-  - shornikov-1994-mullite-kems::shornikov_1994_al_partial_pressure_1833k::T=1833.0:h=b88c911ec335
-  - shornikov-1994-mullite-kems::shornikov_1994_o_partial_pressure_1833k::T=1833.0:h=5434ab0a4925
+  - shornikov-1994-mullite-kems::shornikov_1994_al_partial_pressure_1833k::T=1833.0:h=743c0b2be08a
+  - shornikov-1994-mullite-kems::shornikov_1994_o_partial_pressure_1833k::T=1833.0:h=75ece12ebffd
   derivation:
     relation: as_published
     inputs:
@@ -251,8 +251,8 @@ observations:
         table: '6'
         note: Table 6 row a_Al2O3, column 1933 K; value printed as 1.01 ± 0.05
   derived_from:
-  - shornikov-1994-mullite-kems::shornikov_1994_al_partial_pressure_1933k::T=1933.0:h=b97d68fa976a
-  - shornikov-1994-mullite-kems::shornikov_1994_o_partial_pressure_1933k::T=1933.0:h=cd77705b953e
+  - shornikov-1994-mullite-kems::shornikov_1994_al_partial_pressure_1933k::T=1933.0:h=8c32ba33c045
+  - shornikov-1994-mullite-kems::shornikov_1994_o_partial_pressure_1933k::T=1933.0:h=6b0b63a7fa98
   derivation:
     relation: as_published
     inputs:
@@ -390,8 +390,8 @@ observations:
         table: '6'
         note: Table 6 row a_Al2O3, column 1983 K; value printed as 1.01 ± 0.05
   derived_from:
-  - shornikov-1994-mullite-kems::shornikov_1994_al_partial_pressure_1983k::T=1983.0:h=20d6618bbbb1
-  - shornikov-1994-mullite-kems::shornikov_1994_o_partial_pressure_1983k::T=1983.0:h=19f9a01ddfe7
+  - shornikov-1994-mullite-kems::shornikov_1994_al_partial_pressure_1983k::T=1983.0:h=62fe7ea06a9c
+  - shornikov-1994-mullite-kems::shornikov_1994_o_partial_pressure_1983k::T=1983.0:h=cef43b1ef525
   derivation:
     relation: as_published
     inputs:
@@ -529,8 +529,8 @@ observations:
         table: '6'
         note: Table 6 row a_Al2O3, column 2033 K; value printed as 1.01 ± 0.03
   derived_from:
-  - shornikov-1994-mullite-kems::shornikov_1994_al_partial_pressure_2033k::T=2033.0:h=85daaf6bbad4
-  - shornikov-1994-mullite-kems::shornikov_1994_o_partial_pressure_2033k::T=2033.0:h=fa86784dd138
+  - shornikov-1994-mullite-kems::shornikov_1994_al_partial_pressure_2033k::T=2033.0:h=1790e13711c3
+  - shornikov-1994-mullite-kems::shornikov_1994_o_partial_pressure_2033k::T=2033.0:h=664cdb5e7181
   derivation:
     relation: as_published
     inputs:
@@ -558,7 +558,7 @@ observations:
       O2 ⇌ 2O (2). Values from equilibria (1) and (2) correspond within about 15% to values calculated using AlO ⇌ Al + O,
       2AlO ⇌ Al2O + O, Al2O ⇌ 2Al + O, and SiO2 ⇌ SiO + O equilibria (3)–(6); those Al/Si equilibria are a consistency check,
       not parents.
-- observation_id: shornikov-1994-mullite-kems::shornikov_1994_al2o_partial_pressure_1933k::T=1933.0:h=e7132e9ce3a1
+- observation_id: shornikov-1994-mullite-kems::shornikov_1994_al2o_partial_pressure_1933k::T=1933.0:h=101cbe59442c
   experiment_id: 04459da7a91ec367c3975a168873132911f51814775a7ecaad0d347d7baa05ea::experiment::shornikov-1994-mullite-mo-cell
   identity:
     quantity:
@@ -679,6 +679,34 @@ observations:
         pdf_page_index: 0
         table: '2'
         note: Table 2 row p_Al2O, column 1933 K; value printed as 2.10 ± 0.15 under p_Al2O · 10^-8
+    composition:
+      state:
+        tag: value
+        value:
+          basis: derived_from_formula
+          components:
+          - - Al2O3
+            - '0.6'
+          - - SiO2
+            - '0.4'
+          amount_basis: mole_fraction
+      locator:
+        page: 478
+        published_page: 478
+        pdf_page_index: 0
+        table: '2'
+        note: Derived from the printed mullite formula 3Al2O3·2SiO2; Table 2 contains no compositional analysis.
+      inference:
+        relation: formula_stoichiometry_to_mole_fraction
+        inputs:
+        - printed formula=3Al2O3·2SiO2
+        - x(Al2O3)=3/(3+2)=0.6
+        - x(SiO2)=2/(3+2)=0.4
+        - mole fractions sum to 1
+        - 71.8 wt% Al2O3 sanity check
+        - derived, not printed compositional analysis
+        parameters: []
+        output_unit: mole_fraction
   derivation:
     relation: atm_to_Pa
     inputs:
@@ -726,7 +754,7 @@ observations:
       O2 ⇌ 2O (2). Values from equilibria (1) and (2) correspond within about 15% to values calculated using AlO ⇌ Al + O,
       2AlO ⇌ Al2O + O, Al2O ⇌ 2Al + O, and SiO2 ⇌ SiO + O equilibria (3)–(6); those Al/Si equilibria are a consistency check,
       not parents.
-- observation_id: shornikov-1994-mullite-kems::shornikov_1994_al2o_partial_pressure_1983k::T=1983.0:h=b9748d956acd
+- observation_id: shornikov-1994-mullite-kems::shornikov_1994_al2o_partial_pressure_1983k::T=1983.0:h=b481031f8fd7
   experiment_id: 04459da7a91ec367c3975a168873132911f51814775a7ecaad0d347d7baa05ea::experiment::shornikov-1994-mullite-mo-cell
   identity:
     quantity:
@@ -847,6 +875,34 @@ observations:
         pdf_page_index: 0
         table: '2'
         note: Table 2 row p_Al2O, column 1983 K; value printed as 4.47 ± 0.25 under p_Al2O · 10^-8
+    composition:
+      state:
+        tag: value
+        value:
+          basis: derived_from_formula
+          components:
+          - - Al2O3
+            - '0.6'
+          - - SiO2
+            - '0.4'
+          amount_basis: mole_fraction
+      locator:
+        page: 478
+        published_page: 478
+        pdf_page_index: 0
+        table: '2'
+        note: Derived from the printed mullite formula 3Al2O3·2SiO2; Table 2 contains no compositional analysis.
+      inference:
+        relation: formula_stoichiometry_to_mole_fraction
+        inputs:
+        - printed formula=3Al2O3·2SiO2
+        - x(Al2O3)=3/(3+2)=0.6
+        - x(SiO2)=2/(3+2)=0.4
+        - mole fractions sum to 1
+        - 71.8 wt% Al2O3 sanity check
+        - derived, not printed compositional analysis
+        parameters: []
+        output_unit: mole_fraction
   derivation:
     relation: atm_to_Pa
     inputs:
@@ -894,7 +950,7 @@ observations:
       O2 ⇌ 2O (2). Values from equilibria (1) and (2) correspond within about 15% to values calculated using AlO ⇌ Al + O,
       2AlO ⇌ Al2O + O, Al2O ⇌ 2Al + O, and SiO2 ⇌ SiO + O equilibria (3)–(6); those Al/Si equilibria are a consistency check,
       not parents.
-- observation_id: shornikov-1994-mullite-kems::shornikov_1994_al2o_partial_pressure_2033k::T=2033.0:h=535e3a22d7c0
+- observation_id: shornikov-1994-mullite-kems::shornikov_1994_al2o_partial_pressure_2033k::T=2033.0:h=851208a10b67
   experiment_id: 04459da7a91ec367c3975a168873132911f51814775a7ecaad0d347d7baa05ea::experiment::shornikov-1994-mullite-mo-cell
   identity:
     quantity:
@@ -1015,6 +1071,34 @@ observations:
         pdf_page_index: 0
         table: '2'
         note: Table 2 row p_Al2O, column 2033 K; value printed as 14.5 ± 0.8 under p_Al2O · 10^-8
+    composition:
+      state:
+        tag: value
+        value:
+          basis: derived_from_formula
+          components:
+          - - Al2O3
+            - '0.6'
+          - - SiO2
+            - '0.4'
+          amount_basis: mole_fraction
+      locator:
+        page: 478
+        published_page: 478
+        pdf_page_index: 0
+        table: '2'
+        note: Derived from the printed mullite formula 3Al2O3·2SiO2; Table 2 contains no compositional analysis.
+      inference:
+        relation: formula_stoichiometry_to_mole_fraction
+        inputs:
+        - printed formula=3Al2O3·2SiO2
+        - x(Al2O3)=3/(3+2)=0.6
+        - x(SiO2)=2/(3+2)=0.4
+        - mole fractions sum to 1
+        - 71.8 wt% Al2O3 sanity check
+        - derived, not printed compositional analysis
+        parameters: []
+        output_unit: mole_fraction
   derivation:
     relation: atm_to_Pa
     inputs:
@@ -1062,7 +1146,7 @@ observations:
       O2 ⇌ 2O (2). Values from equilibria (1) and (2) correspond within about 15% to values calculated using AlO ⇌ Al + O,
       2AlO ⇌ Al2O + O, Al2O ⇌ 2Al + O, and SiO2 ⇌ SiO + O equilibria (3)–(6); those Al/Si equilibria are a consistency check,
       not parents.
-- observation_id: shornikov-1994-mullite-kems::shornikov_1994_al_partial_pressure_1833k::T=1833.0:h=b88c911ec335
+- observation_id: shornikov-1994-mullite-kems::shornikov_1994_al_partial_pressure_1833k::T=1833.0:h=743c0b2be08a
   experiment_id: 04459da7a91ec367c3975a168873132911f51814775a7ecaad0d347d7baa05ea::experiment::shornikov-1994-mullite-mo-cell
   identity:
     quantity:
@@ -1183,6 +1267,34 @@ observations:
         pdf_page_index: 0
         table: '2'
         note: Table 2 row p_Al, column 1833 K; value printed as 0.355 ± 0.018 under p_Al · 10^-8
+    composition:
+      state:
+        tag: value
+        value:
+          basis: derived_from_formula
+          components:
+          - - Al2O3
+            - '0.6'
+          - - SiO2
+            - '0.4'
+          amount_basis: mole_fraction
+      locator:
+        page: 478
+        published_page: 478
+        pdf_page_index: 0
+        table: '2'
+        note: Derived from the printed mullite formula 3Al2O3·2SiO2; Table 2 contains no compositional analysis.
+      inference:
+        relation: formula_stoichiometry_to_mole_fraction
+        inputs:
+        - printed formula=3Al2O3·2SiO2
+        - x(Al2O3)=3/(3+2)=0.6
+        - x(SiO2)=2/(3+2)=0.4
+        - mole fractions sum to 1
+        - 71.8 wt% Al2O3 sanity check
+        - derived, not printed compositional analysis
+        parameters: []
+        output_unit: mole_fraction
   derivation:
     relation: atm_to_Pa
     inputs:
@@ -1230,7 +1342,7 @@ observations:
       O2 ⇌ 2O (2). Values from equilibria (1) and (2) correspond within about 15% to values calculated using AlO ⇌ Al + O,
       2AlO ⇌ Al2O + O, Al2O ⇌ 2Al + O, and SiO2 ⇌ SiO + O equilibria (3)–(6); those Al/Si equilibria are a consistency check,
       not parents.
-- observation_id: shornikov-1994-mullite-kems::shornikov_1994_al_partial_pressure_1933k::T=1933.0:h=b97d68fa976a
+- observation_id: shornikov-1994-mullite-kems::shornikov_1994_al_partial_pressure_1933k::T=1933.0:h=8c32ba33c045
   experiment_id: 04459da7a91ec367c3975a168873132911f51814775a7ecaad0d347d7baa05ea::experiment::shornikov-1994-mullite-mo-cell
   identity:
     quantity:
@@ -1351,6 +1463,34 @@ observations:
         pdf_page_index: 0
         table: '2'
         note: Table 2 row p_Al, column 1933 K; value printed as 3.29 ± 0.15 under p_Al · 10^-8
+    composition:
+      state:
+        tag: value
+        value:
+          basis: derived_from_formula
+          components:
+          - - Al2O3
+            - '0.6'
+          - - SiO2
+            - '0.4'
+          amount_basis: mole_fraction
+      locator:
+        page: 478
+        published_page: 478
+        pdf_page_index: 0
+        table: '2'
+        note: Derived from the printed mullite formula 3Al2O3·2SiO2; Table 2 contains no compositional analysis.
+      inference:
+        relation: formula_stoichiometry_to_mole_fraction
+        inputs:
+        - printed formula=3Al2O3·2SiO2
+        - x(Al2O3)=3/(3+2)=0.6
+        - x(SiO2)=2/(3+2)=0.4
+        - mole fractions sum to 1
+        - 71.8 wt% Al2O3 sanity check
+        - derived, not printed compositional analysis
+        parameters: []
+        output_unit: mole_fraction
   derivation:
     relation: atm_to_Pa
     inputs:
@@ -1398,7 +1538,7 @@ observations:
       O2 ⇌ 2O (2). Values from equilibria (1) and (2) correspond within about 15% to values calculated using AlO ⇌ Al + O,
       2AlO ⇌ Al2O + O, Al2O ⇌ 2Al + O, and SiO2 ⇌ SiO + O equilibria (3)–(6); those Al/Si equilibria are a consistency check,
       not parents.
-- observation_id: shornikov-1994-mullite-kems::shornikov_1994_al_partial_pressure_1983k::T=1983.0:h=20d6618bbbb1
+- observation_id: shornikov-1994-mullite-kems::shornikov_1994_al_partial_pressure_1983k::T=1983.0:h=62fe7ea06a9c
   experiment_id: 04459da7a91ec367c3975a168873132911f51814775a7ecaad0d347d7baa05ea::experiment::shornikov-1994-mullite-mo-cell
   identity:
     quantity:
@@ -1519,6 +1659,34 @@ observations:
         pdf_page_index: 0
         table: '2'
         note: Table 2 row p_Al, column 1983 K; value printed as 7.50 ± 0.30 under p_Al · 10^-8
+    composition:
+      state:
+        tag: value
+        value:
+          basis: derived_from_formula
+          components:
+          - - Al2O3
+            - '0.6'
+          - - SiO2
+            - '0.4'
+          amount_basis: mole_fraction
+      locator:
+        page: 478
+        published_page: 478
+        pdf_page_index: 0
+        table: '2'
+        note: Derived from the printed mullite formula 3Al2O3·2SiO2; Table 2 contains no compositional analysis.
+      inference:
+        relation: formula_stoichiometry_to_mole_fraction
+        inputs:
+        - printed formula=3Al2O3·2SiO2
+        - x(Al2O3)=3/(3+2)=0.6
+        - x(SiO2)=2/(3+2)=0.4
+        - mole fractions sum to 1
+        - 71.8 wt% Al2O3 sanity check
+        - derived, not printed compositional analysis
+        parameters: []
+        output_unit: mole_fraction
   derivation:
     relation: atm_to_Pa
     inputs:
@@ -1566,7 +1734,7 @@ observations:
       O2 ⇌ 2O (2). Values from equilibria (1) and (2) correspond within about 15% to values calculated using AlO ⇌ Al + O,
       2AlO ⇌ Al2O + O, Al2O ⇌ 2Al + O, and SiO2 ⇌ SiO + O equilibria (3)–(6); those Al/Si equilibria are a consistency check,
       not parents.
-- observation_id: shornikov-1994-mullite-kems::shornikov_1994_al_partial_pressure_2033k::T=2033.0:h=85daaf6bbad4
+- observation_id: shornikov-1994-mullite-kems::shornikov_1994_al_partial_pressure_2033k::T=2033.0:h=1790e13711c3
   experiment_id: 04459da7a91ec367c3975a168873132911f51814775a7ecaad0d347d7baa05ea::experiment::shornikov-1994-mullite-mo-cell
   identity:
     quantity:
@@ -1687,6 +1855,34 @@ observations:
         pdf_page_index: 0
         table: '2'
         note: Table 2 row p_Al, column 2033 K; value printed as 21.1 ± 0.8 under p_Al · 10^-8
+    composition:
+      state:
+        tag: value
+        value:
+          basis: derived_from_formula
+          components:
+          - - Al2O3
+            - '0.6'
+          - - SiO2
+            - '0.4'
+          amount_basis: mole_fraction
+      locator:
+        page: 478
+        published_page: 478
+        pdf_page_index: 0
+        table: '2'
+        note: Derived from the printed mullite formula 3Al2O3·2SiO2; Table 2 contains no compositional analysis.
+      inference:
+        relation: formula_stoichiometry_to_mole_fraction
+        inputs:
+        - printed formula=3Al2O3·2SiO2
+        - x(Al2O3)=3/(3+2)=0.6
+        - x(SiO2)=2/(3+2)=0.4
+        - mole fractions sum to 1
+        - 71.8 wt% Al2O3 sanity check
+        - derived, not printed compositional analysis
+        parameters: []
+        output_unit: mole_fraction
   derivation:
     relation: atm_to_Pa
     inputs:
@@ -1734,7 +1930,7 @@ observations:
       O2 ⇌ 2O (2). Values from equilibria (1) and (2) correspond within about 15% to values calculated using AlO ⇌ Al + O,
       2AlO ⇌ Al2O + O, Al2O ⇌ 2Al + O, and SiO2 ⇌ SiO + O equilibria (3)–(6); those Al/Si equilibria are a consistency check,
       not parents.
-- observation_id: shornikov-1994-mullite-kems::shornikov_1994_alo_partial_pressure_1933k::T=1933.0:h=6aa2ae8a0d30
+- observation_id: shornikov-1994-mullite-kems::shornikov_1994_alo_partial_pressure_1933k::T=1933.0:h=46a9453d47c2
   experiment_id: 04459da7a91ec367c3975a168873132911f51814775a7ecaad0d347d7baa05ea::experiment::shornikov-1994-mullite-mo-cell
   identity:
     quantity:
@@ -1855,6 +2051,34 @@ observations:
         pdf_page_index: 0
         table: '2'
         note: Table 2 row p_AlO, column 1933 K; value printed as 0.553 ± 0.040 under p_AlO · 10^-8
+    composition:
+      state:
+        tag: value
+        value:
+          basis: derived_from_formula
+          components:
+          - - Al2O3
+            - '0.6'
+          - - SiO2
+            - '0.4'
+          amount_basis: mole_fraction
+      locator:
+        page: 478
+        published_page: 478
+        pdf_page_index: 0
+        table: '2'
+        note: Derived from the printed mullite formula 3Al2O3·2SiO2; Table 2 contains no compositional analysis.
+      inference:
+        relation: formula_stoichiometry_to_mole_fraction
+        inputs:
+        - printed formula=3Al2O3·2SiO2
+        - x(Al2O3)=3/(3+2)=0.6
+        - x(SiO2)=2/(3+2)=0.4
+        - mole fractions sum to 1
+        - 71.8 wt% Al2O3 sanity check
+        - derived, not printed compositional analysis
+        parameters: []
+        output_unit: mole_fraction
   derivation:
     relation: atm_to_Pa
     inputs:
@@ -1902,7 +2126,7 @@ observations:
       O2 ⇌ 2O (2). Values from equilibria (1) and (2) correspond within about 15% to values calculated using AlO ⇌ Al + O,
       2AlO ⇌ Al2O + O, Al2O ⇌ 2Al + O, and SiO2 ⇌ SiO + O equilibria (3)–(6); those Al/Si equilibria are a consistency check,
       not parents.
-- observation_id: shornikov-1994-mullite-kems::shornikov_1994_alo_partial_pressure_1983k::T=1983.0:h=fefae60d03a4
+- observation_id: shornikov-1994-mullite-kems::shornikov_1994_alo_partial_pressure_1983k::T=1983.0:h=f121c8aeaa39
   experiment_id: 04459da7a91ec367c3975a168873132911f51814775a7ecaad0d347d7baa05ea::experiment::shornikov-1994-mullite-mo-cell
   identity:
     quantity:
@@ -2023,6 +2247,34 @@ observations:
         pdf_page_index: 0
         table: '2'
         note: Table 2 row p_AlO, column 1983 K; value printed as 1.58 ± 0.09 under p_AlO · 10^-8
+    composition:
+      state:
+        tag: value
+        value:
+          basis: derived_from_formula
+          components:
+          - - Al2O3
+            - '0.6'
+          - - SiO2
+            - '0.4'
+          amount_basis: mole_fraction
+      locator:
+        page: 478
+        published_page: 478
+        pdf_page_index: 0
+        table: '2'
+        note: Derived from the printed mullite formula 3Al2O3·2SiO2; Table 2 contains no compositional analysis.
+      inference:
+        relation: formula_stoichiometry_to_mole_fraction
+        inputs:
+        - printed formula=3Al2O3·2SiO2
+        - x(Al2O3)=3/(3+2)=0.6
+        - x(SiO2)=2/(3+2)=0.4
+        - mole fractions sum to 1
+        - 71.8 wt% Al2O3 sanity check
+        - derived, not printed compositional analysis
+        parameters: []
+        output_unit: mole_fraction
   derivation:
     relation: atm_to_Pa
     inputs:
@@ -2070,7 +2322,7 @@ observations:
       O2 ⇌ 2O (2). Values from equilibria (1) and (2) correspond within about 15% to values calculated using AlO ⇌ Al + O,
       2AlO ⇌ Al2O + O, Al2O ⇌ 2Al + O, and SiO2 ⇌ SiO + O equilibria (3)–(6); those Al/Si equilibria are a consistency check,
       not parents.
-- observation_id: shornikov-1994-mullite-kems::shornikov_1994_alo_partial_pressure_2033k::T=2033.0:h=4479dd896464
+- observation_id: shornikov-1994-mullite-kems::shornikov_1994_alo_partial_pressure_2033k::T=2033.0:h=57bccb271ea8
   experiment_id: 04459da7a91ec367c3975a168873132911f51814775a7ecaad0d347d7baa05ea::experiment::shornikov-1994-mullite-mo-cell
   identity:
     quantity:
@@ -2191,6 +2443,34 @@ observations:
         pdf_page_index: 0
         table: '2'
         note: Table 2 row p_AlO, column 2033 K; value printed as 4.21 ± 0.18 under p_AlO · 10^-8
+    composition:
+      state:
+        tag: value
+        value:
+          basis: derived_from_formula
+          components:
+          - - Al2O3
+            - '0.6'
+          - - SiO2
+            - '0.4'
+          amount_basis: mole_fraction
+      locator:
+        page: 478
+        published_page: 478
+        pdf_page_index: 0
+        table: '2'
+        note: Derived from the printed mullite formula 3Al2O3·2SiO2; Table 2 contains no compositional analysis.
+      inference:
+        relation: formula_stoichiometry_to_mole_fraction
+        inputs:
+        - printed formula=3Al2O3·2SiO2
+        - x(Al2O3)=3/(3+2)=0.6
+        - x(SiO2)=2/(3+2)=0.4
+        - mole fractions sum to 1
+        - 71.8 wt% Al2O3 sanity check
+        - derived, not printed compositional analysis
+        parameters: []
+        output_unit: mole_fraction
   derivation:
     relation: atm_to_Pa
     inputs:
@@ -2238,7 +2518,7 @@ observations:
       O2 ⇌ 2O (2). Values from equilibria (1) and (2) correspond within about 15% to values calculated using AlO ⇌ Al + O,
       2AlO ⇌ Al2O + O, Al2O ⇌ 2Al + O, and SiO2 ⇌ SiO + O equilibria (3)–(6); those Al/Si equilibria are a consistency check,
       not parents.
-- observation_id: shornikov-1994-mullite-kems::shornikov_1994_alsio_partial_pressure_1933k::T=1933.0:h=cb22ef895c11
+- observation_id: shornikov-1994-mullite-kems::shornikov_1994_alsio_partial_pressure_1933k::T=1933.0:h=19aeb6d0542e
   experiment_id: 04459da7a91ec367c3975a168873132911f51814775a7ecaad0d347d7baa05ea::experiment::shornikov-1994-mullite-mo-cell
   identity:
     quantity:
@@ -2359,6 +2639,34 @@ observations:
         pdf_page_index: 0
         table: '2'
         note: Table 2 row p_AlSiO, column 1933 K; value printed as 0.341 ± 0.030 under p_AlSiO · 10^-10
+    composition:
+      state:
+        tag: value
+        value:
+          basis: derived_from_formula
+          components:
+          - - Al2O3
+            - '0.6'
+          - - SiO2
+            - '0.4'
+          amount_basis: mole_fraction
+      locator:
+        page: 478
+        published_page: 478
+        pdf_page_index: 0
+        table: '2'
+        note: Derived from the printed mullite formula 3Al2O3·2SiO2; Table 2 contains no compositional analysis.
+      inference:
+        relation: formula_stoichiometry_to_mole_fraction
+        inputs:
+        - printed formula=3Al2O3·2SiO2
+        - x(Al2O3)=3/(3+2)=0.6
+        - x(SiO2)=2/(3+2)=0.4
+        - mole fractions sum to 1
+        - 71.8 wt% Al2O3 sanity check
+        - derived, not printed compositional analysis
+        parameters: []
+        output_unit: mole_fraction
   derivation:
     relation: atm_to_Pa
     inputs:
@@ -2406,7 +2714,7 @@ observations:
       O2 ⇌ 2O (2). Values from equilibria (1) and (2) correspond within about 15% to values calculated using AlO ⇌ Al + O,
       2AlO ⇌ Al2O + O, Al2O ⇌ 2Al + O, and SiO2 ⇌ SiO + O equilibria (3)–(6); those Al/Si equilibria are a consistency check,
       not parents.
-- observation_id: shornikov-1994-mullite-kems::shornikov_1994_alsio_partial_pressure_1983k::T=1983.0:h=0c3dabf3da51
+- observation_id: shornikov-1994-mullite-kems::shornikov_1994_alsio_partial_pressure_1983k::T=1983.0:h=f5ebd28af352
   experiment_id: 04459da7a91ec367c3975a168873132911f51814775a7ecaad0d347d7baa05ea::experiment::shornikov-1994-mullite-mo-cell
   identity:
     quantity:
@@ -2527,6 +2835,34 @@ observations:
         pdf_page_index: 0
         table: '2'
         note: Table 2 row p_AlSiO, column 1983 K; value printed as 1.41 ± 0.11 under p_AlSiO · 10^-10
+    composition:
+      state:
+        tag: value
+        value:
+          basis: derived_from_formula
+          components:
+          - - Al2O3
+            - '0.6'
+          - - SiO2
+            - '0.4'
+          amount_basis: mole_fraction
+      locator:
+        page: 478
+        published_page: 478
+        pdf_page_index: 0
+        table: '2'
+        note: Derived from the printed mullite formula 3Al2O3·2SiO2; Table 2 contains no compositional analysis.
+      inference:
+        relation: formula_stoichiometry_to_mole_fraction
+        inputs:
+        - printed formula=3Al2O3·2SiO2
+        - x(Al2O3)=3/(3+2)=0.6
+        - x(SiO2)=2/(3+2)=0.4
+        - mole fractions sum to 1
+        - 71.8 wt% Al2O3 sanity check
+        - derived, not printed compositional analysis
+        parameters: []
+        output_unit: mole_fraction
   derivation:
     relation: atm_to_Pa
     inputs:
@@ -2574,7 +2910,7 @@ observations:
       O2 ⇌ 2O (2). Values from equilibria (1) and (2) correspond within about 15% to values calculated using AlO ⇌ Al + O,
       2AlO ⇌ Al2O + O, Al2O ⇌ 2Al + O, and SiO2 ⇌ SiO + O equilibria (3)–(6); those Al/Si equilibria are a consistency check,
       not parents.
-- observation_id: shornikov-1994-mullite-kems::shornikov_1994_alsio_partial_pressure_2033k::T=2033.0:h=60e2d3190883
+- observation_id: shornikov-1994-mullite-kems::shornikov_1994_alsio_partial_pressure_2033k::T=2033.0:h=b913b7f09063
   experiment_id: 04459da7a91ec367c3975a168873132911f51814775a7ecaad0d347d7baa05ea::experiment::shornikov-1994-mullite-mo-cell
   identity:
     quantity:
@@ -2695,6 +3031,34 @@ observations:
         pdf_page_index: 0
         table: '2'
         note: Table 2 row p_AlSiO, column 2033 K; value printed as 5.34 ± 0.40 under p_AlSiO · 10^-10
+    composition:
+      state:
+        tag: value
+        value:
+          basis: derived_from_formula
+          components:
+          - - Al2O3
+            - '0.6'
+          - - SiO2
+            - '0.4'
+          amount_basis: mole_fraction
+      locator:
+        page: 478
+        published_page: 478
+        pdf_page_index: 0
+        table: '2'
+        note: Derived from the printed mullite formula 3Al2O3·2SiO2; Table 2 contains no compositional analysis.
+      inference:
+        relation: formula_stoichiometry_to_mole_fraction
+        inputs:
+        - printed formula=3Al2O3·2SiO2
+        - x(Al2O3)=3/(3+2)=0.6
+        - x(SiO2)=2/(3+2)=0.4
+        - mole fractions sum to 1
+        - 71.8 wt% Al2O3 sanity check
+        - derived, not printed compositional analysis
+        parameters: []
+        output_unit: mole_fraction
   derivation:
     relation: atm_to_Pa
     inputs:
@@ -2742,7 +3106,7 @@ observations:
       O2 ⇌ 2O (2). Values from equilibria (1) and (2) correspond within about 15% to values calculated using AlO ⇌ Al + O,
       2AlO ⇌ Al2O + O, Al2O ⇌ 2Al + O, and SiO2 ⇌ SiO + O equilibria (3)–(6); those Al/Si equilibria are a consistency check,
       not parents.
-- observation_id: shornikov-1994-mullite-kems::shornikov_1994_moo2_partial_pressure_1833k::T=1833.0:h=425eda035a82
+- observation_id: shornikov-1994-mullite-kems::shornikov_1994_moo2_partial_pressure_1833k::T=1833.0:h=11b9cf0af49b
   experiment_id: 04459da7a91ec367c3975a168873132911f51814775a7ecaad0d347d7baa05ea::experiment::shornikov-1994-mullite-mo-cell
   identity:
     quantity:
@@ -2863,6 +3227,34 @@ observations:
         pdf_page_index: 0
         table: '2'
         note: Table 2 row p_MoO2, column 1833 K; value printed as 0.526 ± 0.050 under p_MoO2 · 10^-8
+    composition:
+      state:
+        tag: value
+        value:
+          basis: derived_from_formula
+          components:
+          - - Al2O3
+            - '0.6'
+          - - SiO2
+            - '0.4'
+          amount_basis: mole_fraction
+      locator:
+        page: 478
+        published_page: 478
+        pdf_page_index: 0
+        table: '2'
+        note: Derived from the printed mullite formula 3Al2O3·2SiO2; Table 2 contains no compositional analysis.
+      inference:
+        relation: formula_stoichiometry_to_mole_fraction
+        inputs:
+        - printed formula=3Al2O3·2SiO2
+        - x(Al2O3)=3/(3+2)=0.6
+        - x(SiO2)=2/(3+2)=0.4
+        - mole fractions sum to 1
+        - 71.8 wt% Al2O3 sanity check
+        - derived, not printed compositional analysis
+        parameters: []
+        output_unit: mole_fraction
   derivation:
     relation: atm_to_Pa
     inputs:
@@ -2910,7 +3302,7 @@ observations:
       O2 ⇌ 2O (2). Values from equilibria (1) and (2) correspond within about 15% to values calculated using AlO ⇌ Al + O,
       2AlO ⇌ Al2O + O, Al2O ⇌ 2Al + O, and SiO2 ⇌ SiO + O equilibria (3)–(6); those Al/Si equilibria are a consistency check,
       not parents.
-- observation_id: shornikov-1994-mullite-kems::shornikov_1994_moo2_partial_pressure_1933k::T=1933.0:h=a7e75196ff28
+- observation_id: shornikov-1994-mullite-kems::shornikov_1994_moo2_partial_pressure_1933k::T=1933.0:h=4c075eac1c32
   experiment_id: 04459da7a91ec367c3975a168873132911f51814775a7ecaad0d347d7baa05ea::experiment::shornikov-1994-mullite-mo-cell
   identity:
     quantity:
@@ -3031,6 +3423,34 @@ observations:
         pdf_page_index: 0
         table: '2'
         note: Table 2 row p_MoO2, column 1933 K; value printed as 1.91 ± 0.15 under p_MoO2 · 10^-8
+    composition:
+      state:
+        tag: value
+        value:
+          basis: derived_from_formula
+          components:
+          - - Al2O3
+            - '0.6'
+          - - SiO2
+            - '0.4'
+          amount_basis: mole_fraction
+      locator:
+        page: 478
+        published_page: 478
+        pdf_page_index: 0
+        table: '2'
+        note: Derived from the printed mullite formula 3Al2O3·2SiO2; Table 2 contains no compositional analysis.
+      inference:
+        relation: formula_stoichiometry_to_mole_fraction
+        inputs:
+        - printed formula=3Al2O3·2SiO2
+        - x(Al2O3)=3/(3+2)=0.6
+        - x(SiO2)=2/(3+2)=0.4
+        - mole fractions sum to 1
+        - 71.8 wt% Al2O3 sanity check
+        - derived, not printed compositional analysis
+        parameters: []
+        output_unit: mole_fraction
   derivation:
     relation: atm_to_Pa
     inputs:
@@ -3078,7 +3498,7 @@ observations:
       O2 ⇌ 2O (2). Values from equilibria (1) and (2) correspond within about 15% to values calculated using AlO ⇌ Al + O,
       2AlO ⇌ Al2O + O, Al2O ⇌ 2Al + O, and SiO2 ⇌ SiO + O equilibria (3)–(6); those Al/Si equilibria are a consistency check,
       not parents.
-- observation_id: shornikov-1994-mullite-kems::shornikov_1994_moo2_partial_pressure_1983k::T=1983.0:h=ee48e349a8d0
+- observation_id: shornikov-1994-mullite-kems::shornikov_1994_moo2_partial_pressure_1983k::T=1983.0:h=49ca4fb6359c
   experiment_id: 04459da7a91ec367c3975a168873132911f51814775a7ecaad0d347d7baa05ea::experiment::shornikov-1994-mullite-mo-cell
   identity:
     quantity:
@@ -3199,6 +3619,34 @@ observations:
         pdf_page_index: 0
         table: '2'
         note: Table 2 row p_MoO2, column 1983 K; value printed as 3.40 ± 0.25 under p_MoO2 · 10^-8
+    composition:
+      state:
+        tag: value
+        value:
+          basis: derived_from_formula
+          components:
+          - - Al2O3
+            - '0.6'
+          - - SiO2
+            - '0.4'
+          amount_basis: mole_fraction
+      locator:
+        page: 478
+        published_page: 478
+        pdf_page_index: 0
+        table: '2'
+        note: Derived from the printed mullite formula 3Al2O3·2SiO2; Table 2 contains no compositional analysis.
+      inference:
+        relation: formula_stoichiometry_to_mole_fraction
+        inputs:
+        - printed formula=3Al2O3·2SiO2
+        - x(Al2O3)=3/(3+2)=0.6
+        - x(SiO2)=2/(3+2)=0.4
+        - mole fractions sum to 1
+        - 71.8 wt% Al2O3 sanity check
+        - derived, not printed compositional analysis
+        parameters: []
+        output_unit: mole_fraction
   derivation:
     relation: atm_to_Pa
     inputs:
@@ -3246,7 +3694,7 @@ observations:
       O2 ⇌ 2O (2). Values from equilibria (1) and (2) correspond within about 15% to values calculated using AlO ⇌ Al + O,
       2AlO ⇌ Al2O + O, Al2O ⇌ 2Al + O, and SiO2 ⇌ SiO + O equilibria (3)–(6); those Al/Si equilibria are a consistency check,
       not parents.
-- observation_id: shornikov-1994-mullite-kems::shornikov_1994_moo2_partial_pressure_2033k::T=2033.0:h=10a374af3218
+- observation_id: shornikov-1994-mullite-kems::shornikov_1994_moo2_partial_pressure_2033k::T=2033.0:h=6894f2932d0c
   experiment_id: 04459da7a91ec367c3975a168873132911f51814775a7ecaad0d347d7baa05ea::experiment::shornikov-1994-mullite-mo-cell
   identity:
     quantity:
@@ -3367,6 +3815,34 @@ observations:
         pdf_page_index: 0
         table: '2'
         note: Table 2 row p_MoO2, column 2033 K; value printed as 5.78 ± 0.30 under p_MoO2 · 10^-8
+    composition:
+      state:
+        tag: value
+        value:
+          basis: derived_from_formula
+          components:
+          - - Al2O3
+            - '0.6'
+          - - SiO2
+            - '0.4'
+          amount_basis: mole_fraction
+      locator:
+        page: 478
+        published_page: 478
+        pdf_page_index: 0
+        table: '2'
+        note: Derived from the printed mullite formula 3Al2O3·2SiO2; Table 2 contains no compositional analysis.
+      inference:
+        relation: formula_stoichiometry_to_mole_fraction
+        inputs:
+        - printed formula=3Al2O3·2SiO2
+        - x(Al2O3)=3/(3+2)=0.6
+        - x(SiO2)=2/(3+2)=0.4
+        - mole fractions sum to 1
+        - 71.8 wt% Al2O3 sanity check
+        - derived, not printed compositional analysis
+        parameters: []
+        output_unit: mole_fraction
   derivation:
     relation: atm_to_Pa
     inputs:
@@ -3414,7 +3890,7 @@ observations:
       O2 ⇌ 2O (2). Values from equilibria (1) and (2) correspond within about 15% to values calculated using AlO ⇌ Al + O,
       2AlO ⇌ Al2O + O, Al2O ⇌ 2Al + O, and SiO2 ⇌ SiO + O equilibria (3)–(6); those Al/Si equilibria are a consistency check,
       not parents.
-- observation_id: shornikov-1994-mullite-kems::shornikov_1994_moo3_partial_pressure_1833k::T=1833.0:h=fa8973d09faa
+- observation_id: shornikov-1994-mullite-kems::shornikov_1994_moo3_partial_pressure_1833k::T=1833.0:h=502dc81cede6
   experiment_id: 04459da7a91ec367c3975a168873132911f51814775a7ecaad0d347d7baa05ea::experiment::shornikov-1994-mullite-mo-cell
   identity:
     quantity:
@@ -3535,6 +4011,34 @@ observations:
         pdf_page_index: 0
         table: '2'
         note: Table 2 row p_MoO3, column 1833 K; value printed as 1.24 ± 0.08 under p_MoO3 · 10^-9
+    composition:
+      state:
+        tag: value
+        value:
+          basis: derived_from_formula
+          components:
+          - - Al2O3
+            - '0.6'
+          - - SiO2
+            - '0.4'
+          amount_basis: mole_fraction
+      locator:
+        page: 478
+        published_page: 478
+        pdf_page_index: 0
+        table: '2'
+        note: Derived from the printed mullite formula 3Al2O3·2SiO2; Table 2 contains no compositional analysis.
+      inference:
+        relation: formula_stoichiometry_to_mole_fraction
+        inputs:
+        - printed formula=3Al2O3·2SiO2
+        - x(Al2O3)=3/(3+2)=0.6
+        - x(SiO2)=2/(3+2)=0.4
+        - mole fractions sum to 1
+        - 71.8 wt% Al2O3 sanity check
+        - derived, not printed compositional analysis
+        parameters: []
+        output_unit: mole_fraction
   derivation:
     relation: atm_to_Pa
     inputs:
@@ -3582,7 +4086,7 @@ observations:
       O2 ⇌ 2O (2). Values from equilibria (1) and (2) correspond within about 15% to values calculated using AlO ⇌ Al + O,
       2AlO ⇌ Al2O + O, Al2O ⇌ 2Al + O, and SiO2 ⇌ SiO + O equilibria (3)–(6); those Al/Si equilibria are a consistency check,
       not parents.
-- observation_id: shornikov-1994-mullite-kems::shornikov_1994_moo3_partial_pressure_1933k::T=1933.0:h=021438811458
+- observation_id: shornikov-1994-mullite-kems::shornikov_1994_moo3_partial_pressure_1933k::T=1933.0:h=18325524f78a
   experiment_id: 04459da7a91ec367c3975a168873132911f51814775a7ecaad0d347d7baa05ea::experiment::shornikov-1994-mullite-mo-cell
   identity:
     quantity:
@@ -3703,6 +4207,34 @@ observations:
         pdf_page_index: 0
         table: '2'
         note: Table 2 row p_MoO3, column 1933 K; value printed as 4.22 ± 0.25 under p_MoO3 · 10^-9
+    composition:
+      state:
+        tag: value
+        value:
+          basis: derived_from_formula
+          components:
+          - - Al2O3
+            - '0.6'
+          - - SiO2
+            - '0.4'
+          amount_basis: mole_fraction
+      locator:
+        page: 478
+        published_page: 478
+        pdf_page_index: 0
+        table: '2'
+        note: Derived from the printed mullite formula 3Al2O3·2SiO2; Table 2 contains no compositional analysis.
+      inference:
+        relation: formula_stoichiometry_to_mole_fraction
+        inputs:
+        - printed formula=3Al2O3·2SiO2
+        - x(Al2O3)=3/(3+2)=0.6
+        - x(SiO2)=2/(3+2)=0.4
+        - mole fractions sum to 1
+        - 71.8 wt% Al2O3 sanity check
+        - derived, not printed compositional analysis
+        parameters: []
+        output_unit: mole_fraction
   derivation:
     relation: atm_to_Pa
     inputs:
@@ -3750,7 +4282,7 @@ observations:
       O2 ⇌ 2O (2). Values from equilibria (1) and (2) correspond within about 15% to values calculated using AlO ⇌ Al + O,
       2AlO ⇌ Al2O + O, Al2O ⇌ 2Al + O, and SiO2 ⇌ SiO + O equilibria (3)–(6); those Al/Si equilibria are a consistency check,
       not parents.
-- observation_id: shornikov-1994-mullite-kems::shornikov_1994_moo3_partial_pressure_1983k::T=1983.0:h=4c1270e41cde
+- observation_id: shornikov-1994-mullite-kems::shornikov_1994_moo3_partial_pressure_1983k::T=1983.0:h=e8a8d18ece93
   experiment_id: 04459da7a91ec367c3975a168873132911f51814775a7ecaad0d347d7baa05ea::experiment::shornikov-1994-mullite-mo-cell
   identity:
     quantity:
@@ -3871,6 +4403,34 @@ observations:
         pdf_page_index: 0
         table: '2'
         note: Table 2 row p_MoO3, column 1983 K; value printed as 7.64 ± 0.40 under p_MoO3 · 10^-9
+    composition:
+      state:
+        tag: value
+        value:
+          basis: derived_from_formula
+          components:
+          - - Al2O3
+            - '0.6'
+          - - SiO2
+            - '0.4'
+          amount_basis: mole_fraction
+      locator:
+        page: 478
+        published_page: 478
+        pdf_page_index: 0
+        table: '2'
+        note: Derived from the printed mullite formula 3Al2O3·2SiO2; Table 2 contains no compositional analysis.
+      inference:
+        relation: formula_stoichiometry_to_mole_fraction
+        inputs:
+        - printed formula=3Al2O3·2SiO2
+        - x(Al2O3)=3/(3+2)=0.6
+        - x(SiO2)=2/(3+2)=0.4
+        - mole fractions sum to 1
+        - 71.8 wt% Al2O3 sanity check
+        - derived, not printed compositional analysis
+        parameters: []
+        output_unit: mole_fraction
   derivation:
     relation: atm_to_Pa
     inputs:
@@ -3918,7 +4478,7 @@ observations:
       O2 ⇌ 2O (2). Values from equilibria (1) and (2) correspond within about 15% to values calculated using AlO ⇌ Al + O,
       2AlO ⇌ Al2O + O, Al2O ⇌ 2Al + O, and SiO2 ⇌ SiO + O equilibria (3)–(6); those Al/Si equilibria are a consistency check,
       not parents.
-- observation_id: shornikov-1994-mullite-kems::shornikov_1994_moo3_partial_pressure_2033k::T=2033.0:h=d46f349cc053
+- observation_id: shornikov-1994-mullite-kems::shornikov_1994_moo3_partial_pressure_2033k::T=2033.0:h=d8e17bb85ab8
   experiment_id: 04459da7a91ec367c3975a168873132911f51814775a7ecaad0d347d7baa05ea::experiment::shornikov-1994-mullite-mo-cell
   identity:
     quantity:
@@ -4039,6 +4599,34 @@ observations:
         pdf_page_index: 0
         table: '2'
         note: Table 2 row p_MoO3, column 2033 K; value printed as 12.4 ± 0.6 under p_MoO3 · 10^-9
+    composition:
+      state:
+        tag: value
+        value:
+          basis: derived_from_formula
+          components:
+          - - Al2O3
+            - '0.6'
+          - - SiO2
+            - '0.4'
+          amount_basis: mole_fraction
+      locator:
+        page: 478
+        published_page: 478
+        pdf_page_index: 0
+        table: '2'
+        note: Derived from the printed mullite formula 3Al2O3·2SiO2; Table 2 contains no compositional analysis.
+      inference:
+        relation: formula_stoichiometry_to_mole_fraction
+        inputs:
+        - printed formula=3Al2O3·2SiO2
+        - x(Al2O3)=3/(3+2)=0.6
+        - x(SiO2)=2/(3+2)=0.4
+        - mole fractions sum to 1
+        - 71.8 wt% Al2O3 sanity check
+        - derived, not printed compositional analysis
+        parameters: []
+        output_unit: mole_fraction
   derivation:
     relation: atm_to_Pa
     inputs:
@@ -4086,7 +4674,7 @@ observations:
       O2 ⇌ 2O (2). Values from equilibria (1) and (2) correspond within about 15% to values calculated using AlO ⇌ Al + O,
       2AlO ⇌ Al2O + O, Al2O ⇌ 2Al + O, and SiO2 ⇌ SiO + O equilibria (3)–(6); those Al/Si equilibria are a consistency check,
       not parents.
-- observation_id: shornikov-1994-mullite-kems::shornikov_1994_o2_partial_pressure_1833k::T=1833.0:h=6efc85c70891
+- observation_id: shornikov-1994-mullite-kems::shornikov_1994_o2_partial_pressure_1833k::T=1833.0:h=bb47c1f6da19
   experiment_id: 04459da7a91ec367c3975a168873132911f51814775a7ecaad0d347d7baa05ea::experiment::shornikov-1994-mullite-mo-cell
   identity:
     quantity:
@@ -4208,8 +4796,36 @@ observations:
         pdf_page_index: 0
         table: '2'
         note: Table 2 row p_O2, column 1833 K; value printed as 0.521 ± 0.050 under p_O2 · 10^-11
+    composition:
+      state:
+        tag: value
+        value:
+          basis: derived_from_formula
+          components:
+          - - Al2O3
+            - '0.6'
+          - - SiO2
+            - '0.4'
+          amount_basis: mole_fraction
+      locator:
+        page: 478
+        published_page: 478
+        pdf_page_index: 0
+        table: '2'
+        note: Derived from the printed mullite formula 3Al2O3·2SiO2; Table 2 contains no compositional analysis.
+      inference:
+        relation: formula_stoichiometry_to_mole_fraction
+        inputs:
+        - printed formula=3Al2O3·2SiO2
+        - x(Al2O3)=3/(3+2)=0.6
+        - x(SiO2)=2/(3+2)=0.4
+        - mole fractions sum to 1
+        - 71.8 wt% Al2O3 sanity check
+        - derived, not printed compositional analysis
+        parameters: []
+        output_unit: mole_fraction
   derived_from:
-  - shornikov-1994-mullite-kems::shornikov_1994_o_partial_pressure_1833k::T=1833.0:h=5434ab0a4925
+  - shornikov-1994-mullite-kems::shornikov_1994_o_partial_pressure_1833k::T=1833.0:h=75ece12ebffd
   derivation:
     relation: atm_to_Pa
     inputs:
@@ -4257,7 +4873,7 @@ observations:
       O2 ⇌ 2O (2). Values from equilibria (1) and (2) correspond within about 15% to values calculated using AlO ⇌ Al + O,
       2AlO ⇌ Al2O + O, Al2O ⇌ 2Al + O, and SiO2 ⇌ SiO + O equilibria (3)–(6); those Al/Si equilibria are a consistency check,
       not parents.
-- observation_id: shornikov-1994-mullite-kems::shornikov_1994_o2_partial_pressure_1933k::T=1933.0:h=89b09da2bfc6
+- observation_id: shornikov-1994-mullite-kems::shornikov_1994_o2_partial_pressure_1933k::T=1933.0:h=50b6472e60a3
   experiment_id: 04459da7a91ec367c3975a168873132911f51814775a7ecaad0d347d7baa05ea::experiment::shornikov-1994-mullite-mo-cell
   identity:
     quantity:
@@ -4379,8 +4995,36 @@ observations:
         pdf_page_index: 0
         table: '2'
         note: Table 2 row p_O2, column 1933 K; value printed as 4.59 ± 0.26 under p_O2 · 10^-11
+    composition:
+      state:
+        tag: value
+        value:
+          basis: derived_from_formula
+          components:
+          - - Al2O3
+            - '0.6'
+          - - SiO2
+            - '0.4'
+          amount_basis: mole_fraction
+      locator:
+        page: 478
+        published_page: 478
+        pdf_page_index: 0
+        table: '2'
+        note: Derived from the printed mullite formula 3Al2O3·2SiO2; Table 2 contains no compositional analysis.
+      inference:
+        relation: formula_stoichiometry_to_mole_fraction
+        inputs:
+        - printed formula=3Al2O3·2SiO2
+        - x(Al2O3)=3/(3+2)=0.6
+        - x(SiO2)=2/(3+2)=0.4
+        - mole fractions sum to 1
+        - 71.8 wt% Al2O3 sanity check
+        - derived, not printed compositional analysis
+        parameters: []
+        output_unit: mole_fraction
   derived_from:
-  - shornikov-1994-mullite-kems::shornikov_1994_o_partial_pressure_1933k::T=1933.0:h=cd77705b953e
+  - shornikov-1994-mullite-kems::shornikov_1994_o_partial_pressure_1933k::T=1933.0:h=6b0b63a7fa98
   derivation:
     relation: atm_to_Pa
     inputs:
@@ -4428,7 +5072,7 @@ observations:
       O2 ⇌ 2O (2). Values from equilibria (1) and (2) correspond within about 15% to values calculated using AlO ⇌ Al + O,
       2AlO ⇌ Al2O + O, Al2O ⇌ 2Al + O, and SiO2 ⇌ SiO + O equilibria (3)–(6); those Al/Si equilibria are a consistency check,
       not parents.
-- observation_id: shornikov-1994-mullite-kems::shornikov_1994_o2_partial_pressure_1983k::T=1983.0:h=dfc07a7eb6af
+- observation_id: shornikov-1994-mullite-kems::shornikov_1994_o2_partial_pressure_1983k::T=1983.0:h=48be02bbd1a9
   experiment_id: 04459da7a91ec367c3975a168873132911f51814775a7ecaad0d347d7baa05ea::experiment::shornikov-1994-mullite-mo-cell
   identity:
     quantity:
@@ -4550,8 +5194,36 @@ observations:
         pdf_page_index: 0
         table: '2'
         note: Table 2 row p_O2, column 1983 K; value printed as 13.7 ± 0.6 under p_O2 · 10^-11
+    composition:
+      state:
+        tag: value
+        value:
+          basis: derived_from_formula
+          components:
+          - - Al2O3
+            - '0.6'
+          - - SiO2
+            - '0.4'
+          amount_basis: mole_fraction
+      locator:
+        page: 478
+        published_page: 478
+        pdf_page_index: 0
+        table: '2'
+        note: Derived from the printed mullite formula 3Al2O3·2SiO2; Table 2 contains no compositional analysis.
+      inference:
+        relation: formula_stoichiometry_to_mole_fraction
+        inputs:
+        - printed formula=3Al2O3·2SiO2
+        - x(Al2O3)=3/(3+2)=0.6
+        - x(SiO2)=2/(3+2)=0.4
+        - mole fractions sum to 1
+        - 71.8 wt% Al2O3 sanity check
+        - derived, not printed compositional analysis
+        parameters: []
+        output_unit: mole_fraction
   derived_from:
-  - shornikov-1994-mullite-kems::shornikov_1994_o_partial_pressure_1983k::T=1983.0:h=19f9a01ddfe7
+  - shornikov-1994-mullite-kems::shornikov_1994_o_partial_pressure_1983k::T=1983.0:h=cef43b1ef525
   derivation:
     relation: atm_to_Pa
     inputs:
@@ -4599,7 +5271,7 @@ observations:
       O2 ⇌ 2O (2). Values from equilibria (1) and (2) correspond within about 15% to values calculated using AlO ⇌ Al + O,
       2AlO ⇌ Al2O + O, Al2O ⇌ 2Al + O, and SiO2 ⇌ SiO + O equilibria (3)–(6); those Al/Si equilibria are a consistency check,
       not parents.
-- observation_id: shornikov-1994-mullite-kems::shornikov_1994_o2_partial_pressure_2033k::T=2033.0:h=4ada010435d4
+- observation_id: shornikov-1994-mullite-kems::shornikov_1994_o2_partial_pressure_2033k::T=2033.0:h=010c28ee5494
   experiment_id: 04459da7a91ec367c3975a168873132911f51814775a7ecaad0d347d7baa05ea::experiment::shornikov-1994-mullite-mo-cell
   identity:
     quantity:
@@ -4721,8 +5393,36 @@ observations:
         pdf_page_index: 0
         table: '2'
         note: Table 2 row p_O2, column 2033 K; value printed as 34.3 ± 1.7 under p_O2 · 10^-11
+    composition:
+      state:
+        tag: value
+        value:
+          basis: derived_from_formula
+          components:
+          - - Al2O3
+            - '0.6'
+          - - SiO2
+            - '0.4'
+          amount_basis: mole_fraction
+      locator:
+        page: 478
+        published_page: 478
+        pdf_page_index: 0
+        table: '2'
+        note: Derived from the printed mullite formula 3Al2O3·2SiO2; Table 2 contains no compositional analysis.
+      inference:
+        relation: formula_stoichiometry_to_mole_fraction
+        inputs:
+        - printed formula=3Al2O3·2SiO2
+        - x(Al2O3)=3/(3+2)=0.6
+        - x(SiO2)=2/(3+2)=0.4
+        - mole fractions sum to 1
+        - 71.8 wt% Al2O3 sanity check
+        - derived, not printed compositional analysis
+        parameters: []
+        output_unit: mole_fraction
   derived_from:
-  - shornikov-1994-mullite-kems::shornikov_1994_o_partial_pressure_2033k::T=2033.0:h=fa86784dd138
+  - shornikov-1994-mullite-kems::shornikov_1994_o_partial_pressure_2033k::T=2033.0:h=664cdb5e7181
   derivation:
     relation: atm_to_Pa
     inputs:
@@ -4770,7 +5470,7 @@ observations:
       O2 ⇌ 2O (2). Values from equilibria (1) and (2) correspond within about 15% to values calculated using AlO ⇌ Al + O,
       2AlO ⇌ Al2O + O, Al2O ⇌ 2Al + O, and SiO2 ⇌ SiO + O equilibria (3)–(6); those Al/Si equilibria are a consistency check,
       not parents.
-- observation_id: shornikov-1994-mullite-kems::shornikov_1994_o_partial_pressure_1833k::T=1833.0:h=5434ab0a4925
+- observation_id: shornikov-1994-mullite-kems::shornikov_1994_o_partial_pressure_1833k::T=1833.0:h=75ece12ebffd
   experiment_id: 04459da7a91ec367c3975a168873132911f51814775a7ecaad0d347d7baa05ea::experiment::shornikov-1994-mullite-mo-cell
   identity:
     quantity:
@@ -4892,9 +5592,37 @@ observations:
         pdf_page_index: 0
         table: '2'
         note: Table 2 row p_O, column 1833 K; value printed as 0.375 ± 0.040 under p_O · 10^-9
+    composition:
+      state:
+        tag: value
+        value:
+          basis: derived_from_formula
+          components:
+          - - Al2O3
+            - '0.6'
+          - - SiO2
+            - '0.4'
+          amount_basis: mole_fraction
+      locator:
+        page: 478
+        published_page: 478
+        pdf_page_index: 0
+        table: '2'
+        note: Derived from the printed mullite formula 3Al2O3·2SiO2; Table 2 contains no compositional analysis.
+      inference:
+        relation: formula_stoichiometry_to_mole_fraction
+        inputs:
+        - printed formula=3Al2O3·2SiO2
+        - x(Al2O3)=3/(3+2)=0.6
+        - x(SiO2)=2/(3+2)=0.4
+        - mole fractions sum to 1
+        - 71.8 wt% Al2O3 sanity check
+        - derived, not printed compositional analysis
+        parameters: []
+        output_unit: mole_fraction
   derived_from:
-  - shornikov-1994-mullite-kems::shornikov_1994_moo2_partial_pressure_1833k::T=1833.0:h=425eda035a82
-  - shornikov-1994-mullite-kems::shornikov_1994_moo3_partial_pressure_1833k::T=1833.0:h=fa8973d09faa
+  - shornikov-1994-mullite-kems::shornikov_1994_moo2_partial_pressure_1833k::T=1833.0:h=11b9cf0af49b
+  - shornikov-1994-mullite-kems::shornikov_1994_moo3_partial_pressure_1833k::T=1833.0:h=502dc81cede6
   derivation:
     relation: atm_to_Pa
     inputs:
@@ -4942,7 +5670,7 @@ observations:
       O2 ⇌ 2O (2). Values from equilibria (1) and (2) correspond within about 15% to values calculated using AlO ⇌ Al + O,
       2AlO ⇌ Al2O + O, Al2O ⇌ 2Al + O, and SiO2 ⇌ SiO + O equilibria (3)–(6); those Al/Si equilibria are a consistency check,
       not parents.
-- observation_id: shornikov-1994-mullite-kems::shornikov_1994_o_partial_pressure_1933k::T=1933.0:h=cd77705b953e
+- observation_id: shornikov-1994-mullite-kems::shornikov_1994_o_partial_pressure_1933k::T=1933.0:h=6b0b63a7fa98
   experiment_id: 04459da7a91ec367c3975a168873132911f51814775a7ecaad0d347d7baa05ea::experiment::shornikov-1994-mullite-mo-cell
   identity:
     quantity:
@@ -5064,9 +5792,37 @@ observations:
         pdf_page_index: 0
         table: '2'
         note: Table 2 row p_O, column 1933 K; value printed as 2.65 ± 0.15 under p_O · 10^-9
+    composition:
+      state:
+        tag: value
+        value:
+          basis: derived_from_formula
+          components:
+          - - Al2O3
+            - '0.6'
+          - - SiO2
+            - '0.4'
+          amount_basis: mole_fraction
+      locator:
+        page: 478
+        published_page: 478
+        pdf_page_index: 0
+        table: '2'
+        note: Derived from the printed mullite formula 3Al2O3·2SiO2; Table 2 contains no compositional analysis.
+      inference:
+        relation: formula_stoichiometry_to_mole_fraction
+        inputs:
+        - printed formula=3Al2O3·2SiO2
+        - x(Al2O3)=3/(3+2)=0.6
+        - x(SiO2)=2/(3+2)=0.4
+        - mole fractions sum to 1
+        - 71.8 wt% Al2O3 sanity check
+        - derived, not printed compositional analysis
+        parameters: []
+        output_unit: mole_fraction
   derived_from:
-  - shornikov-1994-mullite-kems::shornikov_1994_moo2_partial_pressure_1933k::T=1933.0:h=a7e75196ff28
-  - shornikov-1994-mullite-kems::shornikov_1994_moo3_partial_pressure_1933k::T=1933.0:h=021438811458
+  - shornikov-1994-mullite-kems::shornikov_1994_moo2_partial_pressure_1933k::T=1933.0:h=4c075eac1c32
+  - shornikov-1994-mullite-kems::shornikov_1994_moo3_partial_pressure_1933k::T=1933.0:h=18325524f78a
   derivation:
     relation: atm_to_Pa
     inputs:
@@ -5114,7 +5870,7 @@ observations:
       O2 ⇌ 2O (2). Values from equilibria (1) and (2) correspond within about 15% to values calculated using AlO ⇌ Al + O,
       2AlO ⇌ Al2O + O, Al2O ⇌ 2Al + O, and SiO2 ⇌ SiO + O equilibria (3)–(6); those Al/Si equilibria are a consistency check,
       not parents.
-- observation_id: shornikov-1994-mullite-kems::shornikov_1994_o_partial_pressure_1983k::T=1983.0:h=19f9a01ddfe7
+- observation_id: shornikov-1994-mullite-kems::shornikov_1994_o_partial_pressure_1983k::T=1983.0:h=cef43b1ef525
   experiment_id: 04459da7a91ec367c3975a168873132911f51814775a7ecaad0d347d7baa05ea::experiment::shornikov-1994-mullite-mo-cell
   identity:
     quantity:
@@ -5236,9 +5992,37 @@ observations:
         pdf_page_index: 0
         table: '2'
         note: Table 2 row p_O, column 1983 K; value printed as 6.83 ± 0.30 under p_O · 10^-9
+    composition:
+      state:
+        tag: value
+        value:
+          basis: derived_from_formula
+          components:
+          - - Al2O3
+            - '0.6'
+          - - SiO2
+            - '0.4'
+          amount_basis: mole_fraction
+      locator:
+        page: 478
+        published_page: 478
+        pdf_page_index: 0
+        table: '2'
+        note: Derived from the printed mullite formula 3Al2O3·2SiO2; Table 2 contains no compositional analysis.
+      inference:
+        relation: formula_stoichiometry_to_mole_fraction
+        inputs:
+        - printed formula=3Al2O3·2SiO2
+        - x(Al2O3)=3/(3+2)=0.6
+        - x(SiO2)=2/(3+2)=0.4
+        - mole fractions sum to 1
+        - 71.8 wt% Al2O3 sanity check
+        - derived, not printed compositional analysis
+        parameters: []
+        output_unit: mole_fraction
   derived_from:
-  - shornikov-1994-mullite-kems::shornikov_1994_moo2_partial_pressure_1983k::T=1983.0:h=ee48e349a8d0
-  - shornikov-1994-mullite-kems::shornikov_1994_moo3_partial_pressure_1983k::T=1983.0:h=4c1270e41cde
+  - shornikov-1994-mullite-kems::shornikov_1994_moo2_partial_pressure_1983k::T=1983.0:h=49ca4fb6359c
+  - shornikov-1994-mullite-kems::shornikov_1994_moo3_partial_pressure_1983k::T=1983.0:h=e8a8d18ece93
   derivation:
     relation: atm_to_Pa
     inputs:
@@ -5286,7 +6070,7 @@ observations:
       O2 ⇌ 2O (2). Values from equilibria (1) and (2) correspond within about 15% to values calculated using AlO ⇌ Al + O,
       2AlO ⇌ Al2O + O, Al2O ⇌ 2Al + O, and SiO2 ⇌ SiO + O equilibria (3)–(6); those Al/Si equilibria are a consistency check,
       not parents.
-- observation_id: shornikov-1994-mullite-kems::shornikov_1994_o_partial_pressure_2033k::T=2033.0:h=fa86784dd138
+- observation_id: shornikov-1994-mullite-kems::shornikov_1994_o_partial_pressure_2033k::T=2033.0:h=664cdb5e7181
   experiment_id: 04459da7a91ec367c3975a168873132911f51814775a7ecaad0d347d7baa05ea::experiment::shornikov-1994-mullite-mo-cell
   identity:
     quantity:
@@ -5408,9 +6192,37 @@ observations:
         pdf_page_index: 0
         table: '2'
         note: Table 2 row p_O, column 2033 K; value printed as 15.8 ± 0.8 under p_O · 10^-9
+    composition:
+      state:
+        tag: value
+        value:
+          basis: derived_from_formula
+          components:
+          - - Al2O3
+            - '0.6'
+          - - SiO2
+            - '0.4'
+          amount_basis: mole_fraction
+      locator:
+        page: 478
+        published_page: 478
+        pdf_page_index: 0
+        table: '2'
+        note: Derived from the printed mullite formula 3Al2O3·2SiO2; Table 2 contains no compositional analysis.
+      inference:
+        relation: formula_stoichiometry_to_mole_fraction
+        inputs:
+        - printed formula=3Al2O3·2SiO2
+        - x(Al2O3)=3/(3+2)=0.6
+        - x(SiO2)=2/(3+2)=0.4
+        - mole fractions sum to 1
+        - 71.8 wt% Al2O3 sanity check
+        - derived, not printed compositional analysis
+        parameters: []
+        output_unit: mole_fraction
   derived_from:
-  - shornikov-1994-mullite-kems::shornikov_1994_moo2_partial_pressure_2033k::T=2033.0:h=10a374af3218
-  - shornikov-1994-mullite-kems::shornikov_1994_moo3_partial_pressure_2033k::T=2033.0:h=d46f349cc053
+  - shornikov-1994-mullite-kems::shornikov_1994_moo2_partial_pressure_2033k::T=2033.0:h=6894f2932d0c
+  - shornikov-1994-mullite-kems::shornikov_1994_moo3_partial_pressure_2033k::T=2033.0:h=d8e17bb85ab8
   derivation:
     relation: atm_to_Pa
     inputs:
@@ -5568,8 +6380,8 @@ observations:
         table: '6'
         note: Table 6 row a_SiO2, column 1833 K; value printed as 0.37 ± 0.09
   derived_from:
-  - shornikov-1994-mullite-kems::shornikov_1994_sio_partial_pressure_1833k::T=1833.0:h=3165dd1c75a9
-  - shornikov-1994-mullite-kems::shornikov_1994_o_partial_pressure_1833k::T=1833.0:h=5434ab0a4925
+  - shornikov-1994-mullite-kems::shornikov_1994_sio_partial_pressure_1833k::T=1833.0:h=0b601ffb3b61
+  - shornikov-1994-mullite-kems::shornikov_1994_o_partial_pressure_1833k::T=1833.0:h=75ece12ebffd
   derivation:
     relation: as_published
     inputs:
@@ -5707,8 +6519,8 @@ observations:
         table: '6'
         note: Table 6 row a_SiO2, column 1933 K; value printed as 0.19 ± 0.02
   derived_from:
-  - shornikov-1994-mullite-kems::shornikov_1994_sio_partial_pressure_1933k::T=1933.0:h=ad3bf4c24fa3
-  - shornikov-1994-mullite-kems::shornikov_1994_o_partial_pressure_1933k::T=1933.0:h=cd77705b953e
+  - shornikov-1994-mullite-kems::shornikov_1994_sio_partial_pressure_1933k::T=1933.0:h=a5cdfc44a10f
+  - shornikov-1994-mullite-kems::shornikov_1994_o_partial_pressure_1933k::T=1933.0:h=6b0b63a7fa98
   derivation:
     relation: as_published
     inputs:
@@ -5846,8 +6658,8 @@ observations:
         table: '6'
         note: Table 6 row a_SiO2, column 1983 K; value printed as 0.18 ± 0.02
   derived_from:
-  - shornikov-1994-mullite-kems::shornikov_1994_sio_partial_pressure_1983k::T=1983.0:h=82e368317a80
-  - shornikov-1994-mullite-kems::shornikov_1994_o_partial_pressure_1983k::T=1983.0:h=19f9a01ddfe7
+  - shornikov-1994-mullite-kems::shornikov_1994_sio_partial_pressure_1983k::T=1983.0:h=528fe3c411bf
+  - shornikov-1994-mullite-kems::shornikov_1994_o_partial_pressure_1983k::T=1983.0:h=cef43b1ef525
   derivation:
     relation: as_published
     inputs:
@@ -5985,8 +6797,8 @@ observations:
         table: '6'
         note: Table 6 row a_SiO2, column 2033 K; value printed as 0.17 ± 0.01
   derived_from:
-  - shornikov-1994-mullite-kems::shornikov_1994_sio_partial_pressure_2033k::T=2033.0:h=1fc1f540f2e3
-  - shornikov-1994-mullite-kems::shornikov_1994_o_partial_pressure_2033k::T=2033.0:h=fa86784dd138
+  - shornikov-1994-mullite-kems::shornikov_1994_sio_partial_pressure_2033k::T=2033.0:h=84544cf3337a
+  - shornikov-1994-mullite-kems::shornikov_1994_o_partial_pressure_2033k::T=2033.0:h=664cdb5e7181
   derivation:
     relation: as_published
     inputs:
@@ -6014,7 +6826,7 @@ observations:
       O2 ⇌ 2O (2). Values from equilibria (1) and (2) correspond within about 15% to values calculated using AlO ⇌ Al + O,
       2AlO ⇌ Al2O + O, Al2O ⇌ 2Al + O, and SiO2 ⇌ SiO + O equilibria (3)–(6); those Al/Si equilibria are a consistency check,
       not parents.
-- observation_id: shornikov-1994-mullite-kems::shornikov_1994_sio_partial_pressure_1833k::T=1833.0:h=3165dd1c75a9
+- observation_id: shornikov-1994-mullite-kems::shornikov_1994_sio_partial_pressure_1833k::T=1833.0:h=0b601ffb3b61
   experiment_id: 04459da7a91ec367c3975a168873132911f51814775a7ecaad0d347d7baa05ea::experiment::shornikov-1994-mullite-mo-cell
   identity:
     quantity:
@@ -6135,6 +6947,34 @@ observations:
         pdf_page_index: 0
         table: '2'
         note: Table 2 row p_SiO, column 1833 K; value printed as 3.95 ± 0.80 under p_SiO · 10^-5
+    composition:
+      state:
+        tag: value
+        value:
+          basis: derived_from_formula
+          components:
+          - - Al2O3
+            - '0.6'
+          - - SiO2
+            - '0.4'
+          amount_basis: mole_fraction
+      locator:
+        page: 478
+        published_page: 478
+        pdf_page_index: 0
+        table: '2'
+        note: Derived from the printed mullite formula 3Al2O3·2SiO2; Table 2 contains no compositional analysis.
+      inference:
+        relation: formula_stoichiometry_to_mole_fraction
+        inputs:
+        - printed formula=3Al2O3·2SiO2
+        - x(Al2O3)=3/(3+2)=0.6
+        - x(SiO2)=2/(3+2)=0.4
+        - mole fractions sum to 1
+        - 71.8 wt% Al2O3 sanity check
+        - derived, not printed compositional analysis
+        parameters: []
+        output_unit: mole_fraction
   derivation:
     relation: atm_to_Pa
     inputs:
@@ -6182,7 +7022,7 @@ observations:
       O2 ⇌ 2O (2). Values from equilibria (1) and (2) correspond within about 15% to values calculated using AlO ⇌ Al + O,
       2AlO ⇌ Al2O + O, Al2O ⇌ 2Al + O, and SiO2 ⇌ SiO + O equilibria (3)–(6); those Al/Si equilibria are a consistency check,
       not parents.
-- observation_id: shornikov-1994-mullite-kems::shornikov_1994_sio_partial_pressure_1933k::T=1933.0:h=ad3bf4c24fa3
+- observation_id: shornikov-1994-mullite-kems::shornikov_1994_sio_partial_pressure_1933k::T=1933.0:h=a5cdfc44a10f
   experiment_id: 04459da7a91ec367c3975a168873132911f51814775a7ecaad0d347d7baa05ea::experiment::shornikov-1994-mullite-mo-cell
   identity:
     quantity:
@@ -6303,6 +7143,34 @@ observations:
         pdf_page_index: 0
         table: '2'
         note: Table 2 row p_SiO, column 1933 K; value printed as 4.08 ± 0.15 under p_SiO · 10^-5
+    composition:
+      state:
+        tag: value
+        value:
+          basis: derived_from_formula
+          components:
+          - - Al2O3
+            - '0.6'
+          - - SiO2
+            - '0.4'
+          amount_basis: mole_fraction
+      locator:
+        page: 478
+        published_page: 478
+        pdf_page_index: 0
+        table: '2'
+        note: Derived from the printed mullite formula 3Al2O3·2SiO2; Table 2 contains no compositional analysis.
+      inference:
+        relation: formula_stoichiometry_to_mole_fraction
+        inputs:
+        - printed formula=3Al2O3·2SiO2
+        - x(Al2O3)=3/(3+2)=0.6
+        - x(SiO2)=2/(3+2)=0.4
+        - mole fractions sum to 1
+        - 71.8 wt% Al2O3 sanity check
+        - derived, not printed compositional analysis
+        parameters: []
+        output_unit: mole_fraction
   derivation:
     relation: atm_to_Pa
     inputs:
@@ -6350,7 +7218,7 @@ observations:
       O2 ⇌ 2O (2). Values from equilibria (1) and (2) correspond within about 15% to values calculated using AlO ⇌ Al + O,
       2AlO ⇌ Al2O + O, Al2O ⇌ 2Al + O, and SiO2 ⇌ SiO + O equilibria (3)–(6); those Al/Si equilibria are a consistency check,
       not parents.
-- observation_id: shornikov-1994-mullite-kems::shornikov_1994_sio_partial_pressure_1983k::T=1983.0:h=82e368317a80
+- observation_id: shornikov-1994-mullite-kems::shornikov_1994_sio_partial_pressure_1983k::T=1983.0:h=528fe3c411bf
   experiment_id: 04459da7a91ec367c3975a168873132911f51814775a7ecaad0d347d7baa05ea::experiment::shornikov-1994-mullite-mo-cell
   identity:
     quantity:
@@ -6471,6 +7339,34 @@ observations:
         pdf_page_index: 0
         table: '2'
         note: Table 2 row p_SiO, column 1983 K; value printed as 8.58 ± 0.25 under p_SiO · 10^-5
+    composition:
+      state:
+        tag: value
+        value:
+          basis: derived_from_formula
+          components:
+          - - Al2O3
+            - '0.6'
+          - - SiO2
+            - '0.4'
+          amount_basis: mole_fraction
+      locator:
+        page: 478
+        published_page: 478
+        pdf_page_index: 0
+        table: '2'
+        note: Derived from the printed mullite formula 3Al2O3·2SiO2; Table 2 contains no compositional analysis.
+      inference:
+        relation: formula_stoichiometry_to_mole_fraction
+        inputs:
+        - printed formula=3Al2O3·2SiO2
+        - x(Al2O3)=3/(3+2)=0.6
+        - x(SiO2)=2/(3+2)=0.4
+        - mole fractions sum to 1
+        - 71.8 wt% Al2O3 sanity check
+        - derived, not printed compositional analysis
+        parameters: []
+        output_unit: mole_fraction
   derivation:
     relation: atm_to_Pa
     inputs:
@@ -6518,7 +7414,7 @@ observations:
       O2 ⇌ 2O (2). Values from equilibria (1) and (2) correspond within about 15% to values calculated using AlO ⇌ Al + O,
       2AlO ⇌ Al2O + O, Al2O ⇌ 2Al + O, and SiO2 ⇌ SiO + O equilibria (3)–(6); those Al/Si equilibria are a consistency check,
       not parents.
-- observation_id: shornikov-1994-mullite-kems::shornikov_1994_sio_partial_pressure_2033k::T=2033.0:h=1fc1f540f2e3
+- observation_id: shornikov-1994-mullite-kems::shornikov_1994_sio_partial_pressure_2033k::T=2033.0:h=84544cf3337a
   experiment_id: 04459da7a91ec367c3975a168873132911f51814775a7ecaad0d347d7baa05ea::experiment::shornikov-1994-mullite-mo-cell
   identity:
     quantity:
@@ -6639,6 +7535,34 @@ observations:
         pdf_page_index: 0
         table: '2'
         note: Table 2 row p_SiO, column 2033 K; value printed as 23.2 ± 0.7 under p_SiO · 10^-5
+    composition:
+      state:
+        tag: value
+        value:
+          basis: derived_from_formula
+          components:
+          - - Al2O3
+            - '0.6'
+          - - SiO2
+            - '0.4'
+          amount_basis: mole_fraction
+      locator:
+        page: 478
+        published_page: 478
+        pdf_page_index: 0
+        table: '2'
+        note: Derived from the printed mullite formula 3Al2O3·2SiO2; Table 2 contains no compositional analysis.
+      inference:
+        relation: formula_stoichiometry_to_mole_fraction
+        inputs:
+        - printed formula=3Al2O3·2SiO2
+        - x(Al2O3)=3/(3+2)=0.6
+        - x(SiO2)=2/(3+2)=0.4
+        - mole fractions sum to 1
+        - 71.8 wt% Al2O3 sanity check
+        - derived, not printed compositional analysis
+        parameters: []
+        output_unit: mole_fraction
   derivation:
     relation: atm_to_Pa
     inputs:

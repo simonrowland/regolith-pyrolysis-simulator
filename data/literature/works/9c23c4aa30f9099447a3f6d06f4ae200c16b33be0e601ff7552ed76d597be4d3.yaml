@@ -87,5 +87,52 @@ benches:
     locator:
       published_page: 945
       pdf_page_index: 1
-      note: The experiments are described as using a Knudsen effusion cell; the cell material is not stated.
-  other_facts: []
+      paragraph: The experiments were carried out using the Knudsen effusion cell. The brief description of the technique
+        was given in /I/.
+      note: Cell material and liner are not named in this abstract.
+  geometry:
+    orifice_diameter_m:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 945
+        pdf_page_index: 1
+        note: Effusion-orifice diameter is not stated in this abstract.
+  other_facts:
+  - name: cell_dimensions
+    value:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 945
+        pdf_page_index: 1
+        note: Cell dimensions are not stated in this abstract.
+  - name: background_residual_gas_pressure_near_cell
+    value:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 945
+        pdf_page_index: 1
+        note: Chamber or background pressure near the cell is not stated in this abstract.
+  - name: partial_pressure_calibration_standard
+    value:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 945
+        pdf_page_index: 1
+        note: No pressure-calibration standard is stated in this abstract.
+  - name: mass_spectrometer_instrument_model
+    value:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 945
+        pdf_page_index: 1
+        note: No instrument model is stated in this abstract.

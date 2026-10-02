@@ -80,9 +80,14 @@ observations:
       reason: unmapped regime 'langmuir_free_evaporation'
     original_method_class: langmuir_free_evaporation
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - evaporation_coefficient_alpha
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: safarian-engh-2013-si-pure-langmuir::safarian_engh_2013_si_pure_langmuir
   source_id: safarian-engh-2013-si-pure-langmuir
   locator:
     note: Safarian, J. & Engh, T. A. (2013), Metall. Mater. Trans. A 44:747-753, DOI 10.1007/s11661-012-1464-2

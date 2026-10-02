@@ -20,11 +20,11 @@ import os
 import re
 import subprocess
 from collections import defaultdict
-from dataclasses import dataclass, replace
+from dataclasses import dataclass, field, replace
 from decimal import Decimal
 from fractions import Fraction
 from pathlib import Path
-from typing import Callable, Mapping, Sequence
+from typing import Callable, Iterable, Mapping, Sequence
 
 from simulator.battery.enums import (
     EQUILIBRIUM_FIT_QUANTITIES,
@@ -212,27 +212,51 @@ def compilation_series_points(
     they are. Empirical series are not compilation series.
     """
 
+    return tuple(_iter_compilation_series_points(observation, origin))
+
+
+def _compilation_series_pairs(
+    observation: Observation,
+    origin: str | None,
+) -> tuple[tuple[object, object], ...] | None:
     is_compilation_source, is_internal_consistency, is_sf04_workbook, _parse = (
         _score_predicates()
     )
     if is_internal_consistency(origin) or is_sf04_workbook(observation):
-        return (observation,)
+        return None
     compilation = is_compilation_evidence(observation) or is_compilation_source(
         observation.source_id, origin
     )
-    if not compilation:
-        return (observation,)
     value = observation.value
-    if value.kind is not ValueKind.SERIES or not value.series:
-        return (observation,)
-    if not isinstance(observation.identity, Identity):
-        return (observation,)
-    quantity = quantity_token(observation.identity)
-    if quantity is Quantity.TRANSITION_TEMPERATURE:
-        return (observation,)
-    points: list[Observation] = []
+    if (
+        not compilation
+        or value.kind is not ValueKind.SERIES
+        or not value.series
+        or not isinstance(observation.identity, Identity)
+        or quantity_token(observation.identity) is Quantity.TRANSITION_TEMPERATURE
+    ):
+        return None
+    return value.series
+
+
+def _compilation_series_point_count(
+    observation: Observation,
+    origin: str | None = None,
+) -> int:
+    pairs = _compilation_series_pairs(observation, origin)
+    return 1 if pairs is None else len(pairs)
+
+
+def _iter_compilation_series_points(
+    observation: Observation,
+    origin: str | None = None,
+) -> Iterable[Observation]:
+    pairs = _compilation_series_pairs(observation, origin)
+    if pairs is None:
+        yield observation
+        return
     seen: dict[str, int] = {}
-    for temperature, magnitude in value.series:
+    for temperature, magnitude in pairs:
         temp_d = as_decimal(temperature)
         mag_d = as_decimal(magnitude)
         key = f"{_decimal_token(temp_d)}|{_decimal_token(mag_d)}"
@@ -242,19 +266,16 @@ def compilation_series_points(
             observation.identity,
             temperature_K=State.of(temp_d),
         )
-        points.append(
-            replace(
-                observation,
-                observation_id=compilation_point_id(
-                    observation.observation_id, temp_d, mag_d, occurrence
-                ),
-                identity=identity,
-                value=Value.point_of(mag_d),
-                derived_from=(observation.observation_id,)
-                + tuple(observation.derived_from or ()),
-            )
+        yield replace(
+            observation,
+            observation_id=compilation_point_id(
+                observation.observation_id, temp_d, mag_d, occurrence
+            ),
+            identity=identity,
+            value=Value.point_of(mag_d),
+            derived_from=(observation.observation_id,)
+            + tuple(observation.derived_from or ()),
         )
-    return tuple(points)
 
 
 def _state_value(state: object) -> object | None:
@@ -1253,14 +1274,6 @@ def _median_abs(values: Sequence[Decimal]) -> str | None:
     return str((ordered[mid - 1] + ordered[mid]) / Decimal(2))
 
 
-def _decision_band_from_payload(raw: Mapping[str, object]) -> DecisionBand:
-    return DecisionBand(
-        as_decimal(raw["value"]),
-        str(raw["unit"]),
-        str(raw["rule"]),
-    )
-
-
 @dataclass(frozen=True)
 class _TierCell:
     rail: str
@@ -1273,45 +1286,119 @@ class _TierCell:
     family: str
     quantity: str
     uncertainty: str
-    band_value: Decimal | None = None
+    band_value: Decimal | str | None = None
     band_kind: str = "no_band"
     band_derived_n: int | None = None
     derive_eligible: bool = True
 
 
-def _tier_markdown(cells: Sequence[_TierCell]) -> list[str]:
+@dataclass
+class _TierAggregate:
+    count: int = 0
+    refused: int = 0
+    numeric_count: int = 0
+    numeric_values: list[Decimal] = field(default_factory=list)
+    same_source_count: int = 0
+    independent_count: int = 0
+    matched_same_source: int = 0
+    matched_independent: int = 0
+    no_band: int = 0
+    band_values: set[str] = field(default_factory=set)
+    band_kinds: set[str] = field(default_factory=set)
+    derived_ns: set[int] = field(default_factory=set)
+    matches_by_kind: dict[str, int] = field(default_factory=lambda: defaultdict(int))
+    mismatches_by_kind: dict[str, int] = field(default_factory=lambda: defaultdict(int))
+    uncertainty: str | None = None
+
+    def add(self, cell: _TierCell, *, keep_values: bool) -> None:
+        self.count += 1
+        if self.uncertainty is None:
+            self.uncertainty = cell.uncertainty
+        self.refused += cell.status is ResidualStatus.REFUSED
+        self.no_band += cell.status is ResidualStatus.NO_BAND
+        if cell.numeric is None:
+            return
+        self.numeric_count += 1
+        if keep_values:
+            self.numeric_values.append(cell.numeric)
+        if cell.relation in {SourceRelation.SAME_INPUT, SourceRelation.TRAINING}:
+            self.same_source_count += 1
+            if cell.status is ResidualStatus.MATCH:
+                self.matched_same_source += 1
+        elif cell.relation is SourceRelation.INDEPENDENT:
+            self.independent_count += 1
+            if cell.status is ResidualStatus.MATCH:
+                self.matched_independent += 1
+        if cell.band_value is not None:
+            self.band_values.add(str(cell.band_value))
+        self.band_kinds.add(cell.band_kind)
+        if cell.band_derived_n is not None:
+            self.derived_ns.add(cell.band_derived_n)
+        if cell.status is ResidualStatus.MATCH:
+            self.matches_by_kind[cell.band_kind] += 1
+        elif cell.status is ResidualStatus.MISMATCH:
+            self.mismatches_by_kind[cell.band_kind] += 1
+
+
+class _TierMarkdownAccumulator:
+    def __init__(
+        self,
+        typed_band_values: Mapping[
+            tuple[str, str, str, str, str, str], set[str]
+        ] | None = None,
+    ) -> None:
+        self.typed_band_values = (
+            {} if typed_band_values is None else typed_band_values
+        )
+        self.by_engine: dict[str, _TierAggregate] = defaultdict(_TierAggregate)
+        self.by_source: dict[tuple[str, str], _TierAggregate] = defaultdict(_TierAggregate)
+        self.by_family_rail_engine_quantity: dict[
+            tuple[str, str, str, str, str, str], _TierAggregate
+        ] = defaultdict(_TierAggregate)
+        self.derived_pool_n: dict[tuple[str, str, str, str], int] = defaultdict(int)
+
+    def add(self, cell: _TierCell) -> None:
+        self.by_engine[cell.engine].add(cell, keep_values=False)
+        self.by_source[(cell.family, cell.quantity)].add(cell, keep_values=True)
+        if (
+            cell.numeric is not None
+            and cell.operation is not None
+            and cell.derive_eligible
+        ):
+            key = (
+                cell.family,
+                cell.rail,
+                cell.engine,
+                cell.relation.value,
+                cell.quantity,
+                cell.unit,
+            )
+            self.by_family_rail_engine_quantity[key].add(cell, keep_values=True)
+            if cell.band_value is None:
+                self.derived_pool_n[(cell.family, cell.quantity, cell.engine, cell.unit)] += 1
+
+
+def _tier_markdown(
+    cells: Iterable[_TierCell],
+    *,
+    typed_band_values: Mapping[tuple[str, str, str, str, str, str], set[str]] | None = None,
+    accumulator: _TierMarkdownAccumulator | None = None,
+) -> list[str]:
     from simulator.battery.score import (
         MIN_DERIVED_BAND_N,
         _bias_to_scatter_ratio,
         _median,
     )
 
-    by_engine: dict[str, list[_TierCell]] = defaultdict(list)
-    by_source: dict[tuple[str, str], list[_TierCell]] = defaultdict(list)
-    by_family_rail_engine_quantity: dict[
-        tuple[str, str, str, str, str, str], list[_TierCell]
-    ] = defaultdict(list)
-    derived_pool_n: dict[tuple[str, str, str, str], int] = defaultdict(int)
-    for cell in cells:
-        by_engine[cell.engine].append(cell)
-        by_source[(cell.family, cell.quantity)].append(cell)
-        if (
-            cell.numeric is not None
-            and cell.operation is not None
-            and cell.derive_eligible
-        ):
-            by_family_rail_engine_quantity[
-                (
-                    cell.family,
-                    cell.rail,
-                    cell.engine,
-                    cell.relation.value,
-                    cell.quantity,
-                    cell.unit,
-                )
-            ].append(cell)
-            if cell.band_value is None and cell.derive_eligible:
-                derived_pool_n[(cell.family, cell.quantity, cell.engine, cell.unit)] += 1
+    if accumulator is None:
+        accumulator = _TierMarkdownAccumulator(typed_band_values)
+        for cell in cells:
+            accumulator.add(cell)
+    by_engine = accumulator.by_engine
+    by_source = accumulator.by_source
+    by_family_rail_engine_quantity = accumulator.by_family_rail_engine_quantity
+    derived_pool_n = accumulator.derived_pool_n
+    typed_band_values = accumulator.typed_band_values
     lines = [
         "## Compilation tier",
         "",
@@ -1339,48 +1426,40 @@ def _tier_markdown(cells: Sequence[_TierCell]) -> list[str]:
     for (family, rail, engine, relation, quantity, unit), bucket in sorted(
         by_family_rail_engine_quantity.items()
     ):
-        values = [row.numeric for row in bucket if row.numeric is not None]
+        values = bucket.numeric_values
         rms = (
             sum((value * value for value in values), Decimal(0))
             / Decimal(len(values))
         ).sqrt()
-        same_source = [
-            row
-            for row in bucket
-            if row.relation in {SourceRelation.SAME_INPUT, SourceRelation.TRAINING}
-        ]
         display_unit = (
             "kJ/mol" if unit == "kJ_per_declared_mol_basis" else unit
         )
         center = _median(values)
         mad = None if center is None else _median([abs(value - center) for value in values])
         ratio = _bias_to_scatter_ratio(center, mad, len(values))
-        band_values = sorted({str(row.band_value) for row in bucket if row.band_value is not None})
-        band_kinds = sorted({row.band_kind for row in bucket})
-        derived_ns = sorted({row.band_derived_n for row in bucket if row.band_derived_n is not None})
+        band_values = sorted(
+            (typed_band_values or {}).get(
+                (family, rail, engine, relation, quantity, unit),
+                bucket.band_values,
+            )
+        )
+        band_kinds = sorted(bucket.band_kinds)
+        derived_ns = sorted(bucket.derived_ns)
         pool_n = derived_pool_n[(family, quantity, engine, unit)]
-        if not derived_ns and any(row.status is ResidualStatus.NO_BAND for row in bucket):
+        if not derived_ns and bucket.no_band:
             derived_ns = [pool_n]
-        matches_by_kind = {
-            kind: sum(1 for row in bucket if row.band_kind == kind and row.status is ResidualStatus.MATCH)
-            for kind in band_kinds
-        }
-        mismatches_by_kind = {
-            kind: sum(1 for row in bucket if row.band_kind == kind and row.status is ResidualStatus.MISMATCH)
-            for kind in band_kinds
-        }
         match_display = "; ".join(
-            f"{kind} {'tail-in' if kind == 'derived_2xMAD' else 'match'}={count}"
-            for kind, count in matches_by_kind.items()
+            f"{kind} {'tail-in' if kind == 'derived_2xMAD' else 'match'}={bucket.matches_by_kind[kind]}"
+            for kind in band_kinds
         ) or "—"
         mismatch_display = "; ".join(
-            f"{kind} {'tail-out' if kind == 'derived_2xMAD' else 'mismatch'}={count}"
-            for kind, count in mismatches_by_kind.items()
+            f"{kind} {'tail-out' if kind == 'derived_2xMAD' else 'mismatch'}={bucket.mismatches_by_kind[kind]}"
+            for kind in band_kinds
         ) or "—"
         no_band_reason = (
             "derived_band_insufficient_n"
             if 0 < pool_n < MIN_DERIVED_BAND_N
-            and any(row.status is ResidualStatus.NO_BAND for row in bucket)
+            and bucket.no_band
             else "—"
         )
         lines.append(
@@ -1389,8 +1468,8 @@ def _tier_markdown(cells: Sequence[_TierCell]) -> list[str]:
             f"{max((abs(value) for value in values), default=None)} | "
             f"{_median_abs(values)} | {rms} | {','.join(band_values) or '—'} | {','.join(band_kinds)} | {','.join(str(value) for value in derived_ns) or '—'} | {no_band_reason} | "
             f"{match_display} | {mismatch_display} | "
-            f"{sum(1 for row in bucket if row.status is ResidualStatus.NO_BAND)} | "
-            f"{len(same_source)} |"
+            f"{bucket.no_band} | "
+            f"{bucket.same_source_count} |"
         )
     lines.extend(
         [
@@ -1402,19 +1481,10 @@ def _tier_markdown(cells: Sequence[_TierCell]) -> list[str]:
     if not by_engine:
         lines.append("| (none) | 0 | 0 | 0 | 0 | 0 | 0 | 0 |")
     for engine, bucket in sorted(by_engine.items()):
-        numeric = [row for row in bucket if row.numeric is not None]
-        same = [
-            row
-            for row in numeric
-            if row.relation in {SourceRelation.SAME_INPUT, SourceRelation.TRAINING}
-        ]
-        independent = [row for row in numeric if row.relation is SourceRelation.INDEPENDENT]
         lines.append(
-            f"| {engine} | {len(bucket)} | "
-            f"{sum(1 for row in bucket if row.status is ResidualStatus.REFUSED)} | "
-            f"{len(numeric)} | {len(same)} | {len(independent)} | "
-            f"{sum(1 for row in same if row.status is ResidualStatus.MATCH)} | "
-            f"{sum(1 for row in independent if row.status is ResidualStatus.MATCH)} |"
+            f"| {engine} | {bucket.count} | {bucket.refused} | {bucket.numeric_count} | "
+            f"{bucket.same_source_count} | {bucket.independent_count} | "
+            f"{bucket.matched_same_source} | {bucket.matched_independent} |"
         )
     lines.extend(
         [
@@ -1426,11 +1496,11 @@ def _tier_markdown(cells: Sequence[_TierCell]) -> list[str]:
     if not by_source:
         lines.append("| (none) |  | 0 | 0 | 0 | — |  |")
     for (family, quantity), bucket in sorted(by_source.items()):
-        numeric_values = [row.numeric for row in bucket if row.numeric is not None]
+        numeric_values = bucket.numeric_values
         lines.append(
-            f"| `{family}` | `{quantity}` | {len(bucket)} | {len(numeric_values)} | "
-            f"{sum(1 for row in bucket if row.status is ResidualStatus.REFUSED)} | "
-            f"{_median_abs(numeric_values) or '—'} | {bucket[0].uncertainty} |"
+            f"| `{family}` | `{quantity}` | {bucket.count} | {len(numeric_values)} | "
+            f"{bucket.refused} | {_median_abs(numeric_values) or '—'} | "
+            f"{bucket.uncertainty or ''} |"
         )
     lines.append("")
     return lines
@@ -1489,8 +1559,107 @@ def _cell_from_observation(
     )
 
 
+def _tier_cell_from_payload(
+    row: Mapping[str, object],
+    *,
+    reference: str,
+    observation: Observation,
+    origins: Mapping[str, str] | None,
+    derive_eligible: bool,
+) -> _TierCell:
+    from simulator.battery.score import rail_for_quantity
+
+    token = quantity_token(observation.identity) if isinstance(observation.identity, Identity) else None
+    rail = "none"
+    if isinstance(observation.identity, Identity):
+        headline_rail = rail_for_quantity(
+            token, species_formula=observation.identity.species.formula
+        )
+        if headline_rail is not None:
+            rail = headline_rail.value
+    return _tier_cell_from_payload_fields(
+        row,
+        family=compilation_family(
+            observation.source_id, compilation_origin(reference, origins)
+        ),
+        quantity=token.value if token is not None else "unknown",
+        rail=rail,
+        uncertainty=uncertainty_text(observation.uncertainty),
+        derive_eligible=derive_eligible,
+    )
+
+
+def _tier_cell_from_payload_fields(
+    row: Mapping[str, object],
+    *,
+    family: str,
+    quantity: str,
+    rail: str,
+    uncertainty: str,
+    derive_eligible: bool,
+    numeric_value: Decimal | None = None,
+) -> _TierCell:
+    request = row.get("candidate_request")
+    engine = (
+        str(request["engine"])
+        if isinstance(request, Mapping) and request.get("engine")
+        else str(row.get("key") or "").rsplit("::", 1)[-1]
+    )
+    raw_numeric = row.get("numeric")
+    numeric = None
+    operation = None
+    if isinstance(raw_numeric, Mapping) and raw_numeric.get("value") is not None:
+        numeric = (
+            numeric_value
+            if numeric_value is not None
+            else as_decimal(raw_numeric["value"])
+        )
+        if raw_numeric.get("operation") is not None:
+            operation = MetricOperation(str(raw_numeric["operation"]))
+    unit = (
+        str(raw_numeric.get("unit") or "")
+        if isinstance(raw_numeric, Mapping)
+        else ""
+    )
+    band_data = (
+        raw_numeric.get("decision_band")
+        if isinstance(raw_numeric, Mapping)
+        else None
+    )
+    band = band_data if isinstance(band_data, Mapping) else None
+    band_rule = "" if band is None else str(band.get("rule") or "")
+    band_value = None if band is None else str(band["value"])
+    return _TierCell(
+        rail=rail,
+        engine=engine or "unknown",
+        status=ResidualStatus(str(row.get("status"))),
+        relation=SourceRelation(
+            str(row.get("source_relation") or SourceRelation.UNKNOWN.value)
+        ),
+        numeric=numeric,
+        operation=operation,
+        unit=unit,
+        family=family,
+        quantity=quantity,
+        uncertainty=uncertainty,
+        band_value=band_value,
+        band_kind=(
+            "no_band" if band is None
+            else "printed" if band_rule == "source-printed per-cell uncertainty"
+            else "derived_2xMAD" if "residual distribution" in band_rule
+            else "legacy_fallback"
+        ),
+        band_derived_n=(
+            int(band_rule.rsplit("derived_n=", 1)[1])
+            if "derived_n=" in band_rule
+            else None
+        ),
+        derive_eligible=derive_eligible,
+    )
+
+
 def compilation_tier_lines(
-    residuals: Sequence[object],
+    residuals: Iterable[object],
     observations: Mapping[str, Observation],
     origins: Mapping[str, str] | None = None,
 ) -> list[str]:
@@ -1502,17 +1671,16 @@ def compilation_tier_lines(
         _is_fusion_conversion_notice,
     )
 
-    cells: list[_TierCell] = []
-    for residual in residuals:
-        if not isinstance(residual, Residual):
-            continue
-        observation = compilation_row_observation(
-            residual.reference, observations, origins
-        )
-        if observation is None:
-            continue
-        cells.append(
-            _cell_from_observation(
+    def cells() -> Iterable[_TierCell]:
+        for residual in residuals:
+            if not isinstance(residual, Residual):
+                continue
+            observation = compilation_row_observation(
+                residual.reference, observations, origins
+            )
+            if observation is None:
+                continue
+            yield _cell_from_observation(
                 engine=residual.key.rsplit("::", 1)[-1],
                 status=residual.status,
                 relation=residual.source_relation,
@@ -1530,12 +1698,12 @@ def compilation_tier_lines(
                     for notice in residual.notices
                 ),
             )
-        )
-    return _tier_markdown(cells)
+
+    return _tier_markdown(cells())
 
 
 def compilation_tier_lines_from_payloads(
-    rows: Sequence[Mapping[str, object]],
+    rows: Iterable[Mapping[str, object]],
     observations: Mapping[str, Observation],
     origins: Mapping[str, str] | None = None,
 ) -> list[str]:
@@ -1543,49 +1711,24 @@ def compilation_tier_lines_from_payloads(
 
     from simulator.battery.score import _flagged_payload_strata
 
-    cells: list[_TierCell] = []
-    for row in rows:
-        reference = str(row.get("reference") or "")
-        observation = compilation_row_observation(reference, observations, origins)
-        if observation is None:
-            continue
-        request = row.get("candidate_request")
-        engine = ""
-        if isinstance(request, Mapping) and request.get("engine"):
-            engine = str(request["engine"])
-        if not engine:
-            engine = str(row.get("key") or "").rsplit("::", 1)[-1]
-        raw_numeric = row.get("numeric")
-        numeric = None
-        operation = None
-        if isinstance(raw_numeric, Mapping) and raw_numeric.get("value") is not None:
-            numeric = as_decimal(raw_numeric["value"])
-            if raw_numeric.get("operation") is not None:
-                operation = MetricOperation(str(raw_numeric["operation"]))
-        unit = (
-            str(raw_numeric.get("unit") or "")
-            if isinstance(raw_numeric, Mapping)
-            else ""
-        )
-        cells.append(
-            _cell_from_observation(
-                engine=engine or "unknown",
-                status=ResidualStatus(str(row.get("status"))),
-                relation=SourceRelation(str(row.get("source_relation") or SourceRelation.UNKNOWN.value)),
-                numeric=numeric,
-                operation=operation,
-                unit=unit,
+    def cells() -> Iterable[_TierCell]:
+        for row in rows:
+            reference = str(row.get("reference") or "")
+            observation = compilation_row_observation(reference, observations, origins)
+            if observation is None:
+                continue
+            yield _tier_cell_from_payload(
+                row,
+                reference=reference,
                 observation=observation,
-                origin=compilation_origin(reference, origins),
-                decision_band=(
-                    None if not isinstance(raw_numeric, Mapping) else
-                    None if not isinstance(raw_numeric.get("decision_band"), Mapping) else
-                    _decision_band_from_payload(raw_numeric["decision_band"])
-                ),
+                origins=origins,
                 derive_eligible=not bool(_flagged_payload_strata(row)),
             )
-        )
-    return _tier_markdown(cells)
+
+    return _tier_markdown(
+        cells(),
+        typed_band_values=getattr(rows, "_typed_tier_band_values", None),
+    )
 
 
 def _prediction_from_attempt(engine: Engine, observation: Observation, attempt: ThermoAttempt):
@@ -1813,12 +1956,12 @@ def compilation_tier_census(
         ):
             transition_series_cells += len(obs.value.series)
             continue
-        points = compilation_series_points(obs, origin)
-        expanded = bool(points) and points[0].observation_id != obs.observation_id
+        expanded = _compilation_series_pairs(obs, origin) is not None
         if expanded:
-            series_cells += len(points)
+            point_count = _compilation_series_point_count(obs, origin)
+            series_cells += point_count
             if quantity in _THERMO_QUANTITIES:
-                banded_series_cells += len(points)
+                banded_series_cells += point_count
         family = compilation_family(obs.source_id, origin)
         walked += 1
         if walked % 2000 == 0:
@@ -1826,7 +1969,7 @@ def compilation_tier_census(
                 f"compilation census observations={walked} points={reachable}",
                 flush=True,
             )
-        for point in points:
+        for point in _iter_compilation_series_points(obs, origin):
             if point.value.kind is not ValueKind.POINT or point.value.point is None:
                 continue
             token = quantity_token(point.identity) if isinstance(point.identity, Identity) else None

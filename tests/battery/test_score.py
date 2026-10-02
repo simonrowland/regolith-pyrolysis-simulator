@@ -52,7 +52,15 @@ from simulator.battery.pins import (
     pin_failures,
     tombstone_for_changed_identity,
 )
-from simulator.battery.identity import Exposure, Identity, SweepIdentity, identity_equal, quantity_token
+from simulator.battery.identity import (
+    Exposure,
+    Identity,
+    SweepIdentity,
+    identity_equal,
+    profile_for,
+    quantity_token,
+    validate_quantity_profile,
+)
 from simulator.battery.records import (
     Apparatus,
     ApparatusGeometry,
@@ -185,6 +193,29 @@ def _context(work=None, experiment=None, *observations, review=None) -> ScoreCon
     )
 
 
+def _with_activity_reference_polymorph(
+    identity: Identity, polymorph: str | None
+) -> Identity:
+    reference_state = identity.reference_state
+    assert reference_state is not None and reference_state.is_value
+    assert reference_state.value is not None
+    endmember = reference_state.value.endmember
+    polymorph_state = (
+        State.unknown("solid-reference polymorph is not established")
+        if polymorph is None
+        else State.of(polymorph)
+    )
+    return replace(
+        identity,
+        reference_state=State.of(
+            replace(
+                reference_state.value,
+                endmember=replace(endmember, polymorph=polymorph_state),
+            )
+        ),
+    )
+
+
 def _predict(value: Decimal, identity, **kwargs) -> EnginePrediction:
     quantity = quantity_token(identity)
     assert quantity is not None
@@ -241,6 +272,24 @@ def _partial_prediction(engine, observation, **_kwargs):
         lineage_complete=True,
         identity=observation.identity,
     )
+
+
+def _uncalibrated_kems_partial_row(
+    experiment, observation_id: str, pressure_Pa: Decimal
+):
+    identity = replace(
+        _partial_identity(),
+        total_pressure_Pa=State.of(Decimal("1e-6")),
+    )
+    observation = F.observation(
+        observation_id,
+        experiment.experiment_id,
+        identity,
+        pressure_Pa,
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="halwax_sergeev_mueller_schenk_2024",
+    )
+    return observation
 
 
 def test_compile_residual_refuses_prediction_unit_mismatch() -> None:
@@ -368,6 +417,148 @@ def test_condensed_activity_axes_follow_composition_and_pressure() -> None:
     assert {"fO2_Pa", "total_pressure_Pa"}.issubset(vapour_outcome.fields)
 
 
+@pytest.mark.parametrize("axis", ("reaction", "reference_state", "reservoir"))
+def test_p_partial_optional_axes_do_not_block_identity_or_score(axis: str) -> None:
+    experiment = F.kems_experiment()
+    base = replace(
+        _partial_identity(),
+        fO2_Pa=State.of(Decimal("100000")),
+        total_pressure_Pa=State.of(Decimal("100000")),
+    )
+    profile = profile_for(base)
+    assert axis not in profile.required
+    assert axis not in profile.permitted_not_applicable
+    assert {
+        "temperature_K",
+        "composition",
+        "fO2_Pa",
+        "total_pressure_Pa",
+    }.issubset(profile.required)
+    assert len(base.composition.value.components) > 1
+
+    missing_metadata = replace(base, **{axis: State.unknown("not printed")})
+    assert validate_quantity_profile(missing_metadata).kind is IdentityEqualKind.EQUAL
+    assert identity_equal(base, missing_metadata).kind is IdentityEqualKind.EQUAL
+
+    reference = F.observation(
+        f"p-partial-optional-{axis}",
+        experiment.experiment_id,
+        missing_metadata,
+        Decimal("1"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="plante-1979",
+    )
+    residual, candidate = _compile(
+        reference,
+        experiment,
+        _partial_prediction(Engine.INTERNAL_ANALYTICAL, reference),
+    )
+    assert candidate is not None
+    assert residual.numeric is not None
+    assert residual.refusal is None
+
+
+def test_migrated_p_partial_optional_axes_are_retained_without_changing_score(
+    tmp_path: Path,
+) -> None:
+    """Source-printed optional axes survive migration and do not affect scoring."""
+
+    from simulator.battery.migrate import migrate
+    from tests.battery.test_migrate import _copy_extract, _write_min_tree
+
+    root = _write_min_tree(tmp_path)
+    _copy_extract(root, "kems-042-plante-1979.yaml")
+    _copy_extract(root, "stolyarova-1995-cao-alumina-kems.yaml")
+    migrated = migrate(root, write=False)
+    rows = tuple(migrated.observations.values())
+
+    def first_partial_pressure(source_id: str):
+        return next(
+            observation
+            for observation in rows
+            if observation.source_id == source_id
+            and quantity_token(observation.identity) is Quantity.P_PARTIAL
+        )
+
+    plante = first_partial_pressure("kems-042-plante-1979")
+    stolyarova = first_partial_pressure("stolyarova-1995-cao-alumina-kems")
+    assert all(
+        state is not None and state.is_value
+        for state in (
+            plante.identity.reaction,
+            plante.identity.reference_state,
+            plante.identity.reservoir,
+        )
+    )
+    assert all(
+        state is not None and state.is_unknown
+        for state in (
+            stolyarova.identity.reaction,
+            stolyarova.identity.reference_state,
+            stolyarova.identity.reservoir,
+        )
+    )
+
+    # Apply only the migrated metadata to a shared complete fixture so the
+    # identity difference is what each source did or did not print. The real
+    # Stolyarova observations remain model-derived and are not score-eligible.
+    experiment = F.kems_experiment()
+    base = replace(
+        _partial_identity(),
+        fO2_Pa=State.of(Decimal("100000")),
+        total_pressure_Pa=State.of(Decimal("100000")),
+    )
+    plante_identity = replace(
+        base,
+        reaction=plante.identity.reaction,
+        reference_state=plante.identity.reference_state,
+        reservoir=plante.identity.reservoir,
+    )
+    stolyarova_identity = replace(
+        base,
+        reaction=stolyarova.identity.reaction,
+        reference_state=stolyarova.identity.reference_state,
+        reservoir=stolyarova.identity.reservoir,
+    )
+    assert (
+        identity_equal(plante_identity, stolyarova_identity).kind
+        is IdentityEqualKind.EQUAL
+    )
+
+    for source, identity in (
+        ("plante", plante_identity),
+        ("stolyarova-1995", stolyarova_identity),
+    ):
+        reference = F.observation(
+            f"migrated-p-partial-{source}",
+            experiment.experiment_id,
+            identity,
+            Decimal("1"),
+            evidence=EvidenceClass.MEASURED_DIRECT,
+            source_id=f"p-partial-{source}",
+        )
+        residual, candidate = _compile(
+            reference,
+            experiment,
+            _partial_prediction(Engine.INTERNAL_ANALYTICAL, reference),
+        )
+        assert candidate is not None
+        assert residual.numeric is not None
+        assert residual.refusal is None
+
+
+def test_p_partial_without_composition_still_refuses_identity() -> None:
+    base = replace(
+        _partial_identity(),
+        fO2_Pa=State.of(Decimal("100000")),
+        total_pressure_Pa=State.of(Decimal("100000")),
+        composition=State.unknown("composition not printed"),
+    )
+    outcome = identity_equal(base, base)
+    assert outcome.kind is IdentityEqualKind.IDENTITY_UNKNOWN
+    assert "composition" in outcome.fields
+
+
 def test_pooled_log_pressure_sd_known_replicates() -> None:
     assert pooled_log_pressure_sd(((-1, 0, 1), (9, 10, 11))) == Decimal("1")
 
@@ -486,6 +677,164 @@ def test_kems_band_prefers_printed_envelope_over_replicate_scatter() -> None:
     assert band.value == Decimal("1.4").ln() / Decimal("10").ln()
     assert "source-printed" in band.rule
     assert "pooled replicate" not in band.rule
+
+
+@pytest.mark.parametrize(
+    ("typed_not_printed", "expected_notice"),
+    (
+        (False, "No calibration entry has been recorded yet."),
+        (True, "The source record says the calibration was not printed."),
+    ),
+)
+def test_uncalibrated_kems_partial_pressure_scores_with_calibration_notice(
+    typed_not_printed: bool,
+    expected_notice: str,
+) -> None:
+    from simulator.battery.validity import run_validity_gates
+    from simulator.battery.score import (
+        FLAGGED_STRATUM_CALIBRATION_NOT_GROUNDED,
+        flagged_strata,
+        flagged_stratum_rows,
+        render_score_report_from_payloads,
+    )
+
+    experiment = F.kems_experiment(kn=None, calibrated=False)
+    if typed_not_printed:
+        assert experiment.apparatus is not None
+        experiment = replace(
+            experiment,
+            apparatus=replace(
+                experiment.apparatus,
+                calibration={
+                    "standard": Located(
+                        State.unknown("not printed"), locator=F.loc(page=271)
+                    )
+                },
+            ),
+        )
+    reference = _uncalibrated_kems_partial_row(
+        experiment, "uncalibrated-kems-pressure", Decimal("10")
+    )
+    gates = run_validity_gates(
+        experiment, reference, point_observations=(reference,)
+    )
+    pressure_check = next(
+        check for check in gates.checks if check.name == "in_cell_partial_pressure_sum"
+    )
+    assert gates.passed
+    assert pressure_check.passed
+    assert pressure_check.detail["flag"] == "calibration_not_grounded"
+    assert pressure_check.detail["reason"] == (
+        "calibration is not grounded for the in-cell fallback"
+    )
+    assert pressure_check.detail["calibration_record_status"] == (
+        "not_printed" if typed_not_printed else "not_recorded"
+    )
+    residual, _ = compile_residual(
+        reference,
+        Engine.INTERNAL_ANALYTICAL,
+        context=_context(F.work(), experiment, reference, review="reviewed"),
+        prediction=_partial_prediction(Engine.INTERNAL_ANALYTICAL, reference),
+    )
+
+    assert residual.status is ResidualStatus.NO_BAND
+    assert residual.numeric is not None
+    assert residual.score_eligible is False
+    notice = next(
+        item for item in residual.notices
+        if item.kind is NoticeKind.UNVERIFIED_APPARATUS
+    )
+    assert notice.reason.startswith("calibration_not_grounded:")
+    assert expected_notice in notice.reason
+    assert flagged_strata(residual.notices) == (
+        FLAGGED_STRATUM_CALIBRATION_NOT_GROUNDED,
+    )
+
+    diagnostic = flagged_stratum_rows(
+        (residual,), engines=(Engine.INTERNAL_ANALYTICAL,)
+    )
+    assert diagnostic[0]["stratum"] == FLAGGED_STRATUM_CALIBRATION_NOT_GROUNDED
+    assert diagnostic[0]["n"] == 1
+    assert diagnostic[0]["median_dex"] is not None
+    assert diagnostic[0]["rms_dex"] is not None
+
+    payload = residual_to_plain(residual)
+    summary_rows = flagged_stratum_payloads(
+        (payload,), (Engine.INTERNAL_ANALYTICAL,)
+    )
+    assert summary_rows[0]["stratum"] == FLAGGED_STRATUM_CALIBRATION_NOT_GROUNDED
+    assert summary_rows[0]["n"] == 1
+    assert summary_rows[0]["median_dex"] is not None
+    assert summary_rows[0]["rms_dex"] is not None
+    report = render_score_report_from_payloads(
+        (payload,), engines=(Engine.INTERNAL_ANALYTICAL,), hostname="test"
+    )
+    assert "calibration-not-grounded | vapour | internal-analytical | 1" in report
+
+
+def test_uncalibrated_kems_residual_matches_between_oxygen_balance_engines() -> None:
+    from simulator.battery.score import FLAGGED_STRATUM_CALIBRATION_NOT_GROUNDED
+    from simulator.battery.score import flagged_strata
+
+    experiment = F.kems_experiment(kn=None, calibrated=False)
+    reference = _uncalibrated_kems_partial_row(
+        experiment, "uncalibrated-kems-engine-parity", Decimal("10")
+    )
+    context = _context(F.work(), experiment, reference, review="reviewed")
+    residuals = {
+        engine: compile_residual(
+            reference,
+            engine,
+            context=context,
+            prediction=_partial_prediction(engine, reference),
+        )[0]
+        for engine in (Engine.OPENIMCC, Engine.INTERNAL_ANALYTICAL)
+    }
+
+    openimcc = residuals[Engine.OPENIMCC]
+    internal_analytical = residuals[Engine.INTERNAL_ANALYTICAL]
+    assert replace(
+        openimcc,
+        key=internal_analytical.key,
+        candidate=internal_analytical.candidate,
+    ) == internal_analytical
+    assert openimcc.notices == internal_analytical.notices
+    assert openimcc.numeric == internal_analytical.numeric
+    assert openimcc.status is internal_analytical.status is ResidualStatus.NO_BAND
+    assert openimcc.score_eligible is internal_analytical.score_eligible is False
+    assert openimcc.numeric is not None
+    assert openimcc.numeric.decision_band is None
+    assert internal_analytical.numeric is not None
+    assert internal_analytical.numeric.decision_band is None
+    assert flagged_strata(openimcc.notices) == (
+        FLAGGED_STRATUM_CALIBRATION_NOT_GROUNDED,
+    )
+    assert flagged_strata(internal_analytical.notices) == flagged_strata(
+        openimcc.notices
+    )
+
+
+def test_uncalibrated_kems_partial_pressure_is_excluded_from_band_population() -> None:
+    experiment = F.kems_experiment(kn=None, calibrated=False)
+    first = _uncalibrated_kems_partial_row(
+        experiment, "uncalibrated-kems-replicate-1", Decimal("10")
+    )
+    second = _uncalibrated_kems_partial_row(
+        experiment, "uncalibrated-kems-replicate-2", Decimal("100")
+    )
+    printed_pressure_error = Uncertainty(
+        kind=UncertaintyKind.PRINTED,
+        verbatim="10% pressure error",
+    )
+    first = replace(first, uncertainty=printed_pressure_error)
+    second = replace(second, uncertainty=printed_pressure_error)
+
+    band = derive_kems_partial_pressure_band(
+        {first.observation_id: first, second.observation_id: second},
+        {experiment.experiment_id: experiment},
+    )
+
+    assert band is None
 
 
 def test_zhang_alpha_gamma_bound_uses_implied_alpha_verdict() -> None:
@@ -726,6 +1075,47 @@ def test_reference_phase_convention_notice_is_reported_without_blocking_score() 
         and row["authority"] == "convention"
         and row["certification"] == "fetch the JANAF 4th ed. printed page for the table"
         for row in report_row["notices"]
+    )
+
+
+def test_default_admission_notice_is_visible_without_changing_score() -> None:
+    notice = Notice(
+        kind=NoticeKind.ADMISSION_DEFAULTED,
+        affected_quantities=(Quantity.DELTA_FG,),
+        reason=(
+            "admission_defaulted: no observation admission_status mapped from source; "
+            "owner ruling d-056; not a reviewer decision"
+        ),
+        origin="janaf-defaulted-admission",
+    )
+    experiment = F.tabulation_experiment()
+    reference = F.observation(
+        "janaf-defaulted-admission",
+        experiment.experiment_id,
+        F.o2_identity(),
+        Decimal("0"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="nist-janaf-4th",
+        notices=(notice,),
+    )
+    residual, _ = _compile(
+        reference, experiment, _predict(Decimal("0"), reference.identity)
+    )
+    baseline = replace(
+        reference,
+        observation_id="janaf-defaulted-admission-baseline",
+        notices=(),
+    )
+    baseline_residual, _ = _compile(
+        baseline, experiment, _predict(Decimal("0"), baseline.identity)
+    )
+
+    assert residual.status is baseline_residual.status
+    assert residual.score_eligible is baseline_residual.score_eligible
+    assert notice in residual.notices
+    assert any(
+        row["kind"] == "admission_defaulted"
+        for row in residual_to_plain(residual)["notices"]
     )
 
 
@@ -1422,12 +1812,17 @@ def test_calibrated_kems_pressure_needs_no_effusion_geometry(quantity: Quantity)
         orifice_area=None, clausing=None, kn=None, calibrated=False
     )
     gate = underdetermined_apparatus(incomplete, quantity)
-    assert gate.passed is False
-    assert gate.reason is RefusalReason.UNDERDETERMINED_APPARATUS
-    assert gate.primary_check == "kems_calibration"
     check = next(c for c in gate.checks if c.name == "kems_calibration")
     assert check.detail["missing"] == ["calibration"]
     assert "calibration" in check.detail["reason"]
+    if quantity is Quantity.P_PARTIAL:
+        assert gate.passed
+        assert check.detail["flag"] == "calibration_not_grounded"
+        assert check.detail["calibration_record_status"] == "not_recorded"
+    else:
+        assert gate.passed is False
+        assert gate.reason is RefusalReason.UNDERDETERMINED_APPARATUS
+        assert gate.primary_check == "kems_calibration"
 
     complete = F.kems_experiment()
     assert underdetermined_apparatus(complete, Quantity.P_PARTIAL).passed
@@ -1499,8 +1894,11 @@ def test_comparison_activity_cancels_cell_geometry_only_for_activity() -> None:
     partial_gate = underdetermined_apparatus(
         uncalibrated, Quantity.P_PARTIAL, observation=partial
     )
-    assert partial_gate.reason is RefusalReason.UNDERDETERMINED_APPARATUS
-    assert partial_gate.primary_check == "kems_calibration"
+    assert partial_gate.passed
+    partial_check = next(
+        check for check in partial_gate.checks if check.name == "kems_calibration"
+    )
+    assert partial_check.detail["flag"] == "calibration_not_grounded"
 
 
 def test_unverified_kems_value_refuses_without_printed_in_cell_pressures() -> None:
@@ -2985,6 +3383,742 @@ def test_write_residuals_stamps_derived_store_and_load_skips_it(tmp_path: Path) 
     assert "kind" not in rows[0] or rows[0].get("kind") != STORE_STAMP_KIND
 
 
+def _streaming_score_fixture():
+    from simulator.battery.records import Residual, ResidualRefusal
+    from simulator.battery.score import rail_for_quantity
+
+    work = F.work()
+    experiment = F.tabulation_experiment(work_id=work.work_id)
+    engine = Engine.INTERNAL_ANALYTICAL
+    thermo_rail = rail_for_quantity(Quantity.DELTA_FG, species_formula="O2")
+    unit = QUANTITY_UNITS[Quantity.DELTA_FG]
+    observations = []
+    origins: dict[str, str] = {}
+    residuals: dict[str, Residual] = {}
+    candidates: dict[str, object] = {}
+
+    def add_residual(
+        reference,
+        *,
+        rail,
+        status,
+        numeric=None,
+        refusal=None,
+        candidate_id=None,
+        eligible=False,
+    ):
+        residual = Residual(
+            key=f"fixture::{reference.observation_id}::{engine.value}",
+            reference=reference.observation_id,
+            execution=Execution(state=ExecutionState.NOT_PROBED),
+            rail=rail,
+            status=status,
+            source_relation=SourceRelation.UNKNOWN,
+            score_eligible=eligible,
+            exclusions=(),
+            notices=(),
+            candidate=candidate_id,
+            numeric=numeric,
+            refusal=refusal,
+        )
+        residuals[reference.observation_id] = residual
+
+    measured = F.observation(
+        "fixture-measured-vapour",
+        experiment.experiment_id,
+        F.psat_identity("Na"),
+        Decimal("0.5"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id=work.work_id,
+    )
+    candidate = F.observation(
+        "fixture-vapour-candidate",
+        experiment.experiment_id,
+        F.psat_identity("Na"),
+        Decimal("0.6"),
+        evidence=EvidenceClass.MODEL_DERIVED,
+        source_id=work.work_id,
+    )
+    observations.append(measured)
+    measured_numeric = ResidualNumeric(
+        MetricOperation.DEX,
+        "dimensionless",
+        Decimal("0.5"),
+        DecisionBand(Decimal("1"), "dimensionless", "measured fixture band"),
+    )
+    add_residual(
+        measured,
+        rail=Rail.VAPOUR,
+        status=ResidualStatus.MATCH,
+        numeric=measured_numeric,
+        candidate_id=candidate.observation_id,
+        eligible=True,
+    )
+    candidates[candidate.observation_id] = candidate
+
+    refusal_reference = F.observation(
+        "fixture-measured-refusal",
+        experiment.experiment_id,
+        F.psat_identity("Mg"),
+        Decimal("1"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id=work.work_id,
+    )
+    observations.append(refusal_reference)
+    add_residual(
+        refusal_reference,
+        rail=Rail.VAPOUR,
+        status=ResidualStatus.REFUSED,
+        refusal=ResidualRefusal(
+            RefusalReason.UNSUPPORTED,
+            {"reason": "fixture_unavailable"},
+        ),
+    )
+
+    derived_values = ("0", "0", "0", "1", "1", "2", "2", "3", "4", "50")
+    for index, raw_value in enumerate(derived_values):
+        reference = F.observation(
+            f"fixture-derived-{index:02d}",
+            experiment.experiment_id,
+            F.o2_identity(),
+            Decimal(raw_value),
+            evidence=EvidenceClass.COMPILATION_ASSESSED,
+            admission=AdmissionStatus.PENDING,
+            source_id="nist-janaf-4th",
+        )
+        observations.append(reference)
+        origins[reference.observation_id] = (
+            f"compilations-janaf/{reference.observation_id}.yaml"
+        )
+        add_residual(
+            reference,
+            rail=thermo_rail,
+            status=ResidualStatus.NO_BAND,
+            numeric=ResidualNumeric(
+                MetricOperation.ABSOLUTE,
+                unit,
+                Decimal(raw_value),
+                None,
+            ),
+        )
+
+    no_band_reference = F.observation(
+        "fixture-no-band",
+        experiment.experiment_id,
+        F.o2_identity(),
+        Decimal("7"),
+        evidence=EvidenceClass.COMPILATION_ASSESSED,
+        admission=AdmissionStatus.PENDING,
+        source_id="other-compilation",
+    )
+    observations.append(no_band_reference)
+    origins[no_band_reference.observation_id] = "compilations-other/no-band.yaml"
+    add_residual(
+        no_band_reference,
+        rail=thermo_rail,
+        status=ResidualStatus.NO_BAND,
+        numeric=ResidualNumeric(
+            MetricOperation.ABSOLUTE,
+            unit,
+            Decimal("7"),
+            None,
+        ),
+    )
+
+    printed_reference = F.observation(
+        "fixture-printed",
+        experiment.experiment_id,
+        F.o2_identity(),
+        Decimal("1"),
+        evidence=EvidenceClass.COMPILATION_ASSESSED,
+        admission=AdmissionStatus.PENDING,
+        source_id="nist-janaf-4th",
+    )
+    observations.append(printed_reference)
+    origins[printed_reference.observation_id] = "compilations-janaf/printed.yaml"
+    add_residual(
+        printed_reference,
+        rail=thermo_rail,
+        status=ResidualStatus.MATCH,
+        numeric=ResidualNumeric(
+            MetricOperation.ABSOLUTE,
+            unit,
+            Decimal("1"),
+            DecisionBand(
+                Decimal("2"),
+                unit,
+                "source-printed per-cell uncertainty",
+            ),
+        ),
+    )
+    non_dex_dimensionless_reference = F.observation(
+        "fixture-non-dex-dimensionless-band",
+        experiment.experiment_id,
+        F.o2_identity(),
+        Decimal("3"),
+        evidence=EvidenceClass.COMPILATION_ASSESSED,
+        admission=AdmissionStatus.PENDING,
+        source_id="nist-janaf-4th",
+    )
+    observations.append(non_dex_dimensionless_reference)
+    origins[non_dex_dimensionless_reference.observation_id] = (
+        "compilations-janaf/fixture-log10-kf.yaml"
+    )
+    add_residual(
+        non_dex_dimensionless_reference,
+        rail=thermo_rail,
+        status=ResidualStatus.MATCH,
+        numeric=ResidualNumeric(
+            MetricOperation.ABSOLUTE,
+            "dimensionless",
+            Decimal("3"),
+            DecisionBand(
+                Decimal("0.231"),
+                "dimensionless",
+                "source-printed per-cell uncertainty",
+            ),
+        ),
+    )
+    for reference_id, raw_value in (
+        ("fixture-scaled-max-first", "0.240"),
+        ("fixture-scaled-max-second", "-0.24"),
+    ):
+        reference = F.observation(
+            reference_id,
+            experiment.experiment_id,
+            replace(F.o2_identity(), quantity=Quantity.S),
+            Decimal(raw_value),
+            evidence=EvidenceClass.COMPILATION_ASSESSED,
+            admission=AdmissionStatus.PENDING,
+            source_id="nist-janaf-4th",
+        )
+        observations.append(reference)
+        origins[reference.observation_id] = "compilations-janaf/scale-check.yaml"
+        add_residual(
+            reference,
+            rail=Rail.THERMOCHEMISTRY,
+            status=ResidualStatus.NO_BAND,
+            numeric=ResidualNumeric(
+                MetricOperation.ABSOLUTE,
+                "J_per_declared_mol_basis_per_K",
+                Decimal(raw_value),
+                None,
+            ),
+        )
+    context = replace(_context(work, experiment, *observations), origins=origins)
+    return context, engine, residuals, candidates
+
+
+def test_streamed_scoring_is_byte_identical_to_legacy_fixture(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    import simulator.battery.score as score_mod
+    from simulator.battery.pins import _pin_failures_from_payloads
+
+    context, engine, fixture_residuals, fixture_candidates = _streaming_score_fixture()
+    monkeypatch.setattr(
+        score_mod,
+        "compile_residual",
+        lambda reference, engine, **_kwargs: (
+            fixture_residuals[reference.observation_id],
+            fixture_candidates.get(
+                fixture_residuals[reference.observation_id].candidate or ""
+            ),
+        ),
+    )
+    engines = (engine,)
+    legacy_residuals, candidates = score_mod.score_store(context, engines=engines)
+    legacy_path = tmp_path / "legacy-residuals.jsonl"
+    score_mod.write_residuals_jsonl(
+        legacy_residuals,
+        candidates,
+        legacy_path,
+        root=score_mod.REPO_ROOT,
+    )
+    streamed_path = tmp_path / "residuals.jsonl"
+    written, metadata = score_mod._score_store_to_jsonl(
+        context,
+        streamed_path,
+        root=score_mod.REPO_ROOT,
+        engines=engines,
+    )
+    partial_path = tmp_path / "residuals.jsonl.partial"
+    assert written == len(legacy_residuals)
+    assert partial_path.read_bytes() == legacy_path.read_bytes()
+
+    payloads = score_mod._ResidualJsonlRows(
+        partial_path,
+        metadata=metadata,
+    )
+    pin = PinBandRecord(
+        key=next(r.key for r in legacy_residuals if r.reference == "fixture-measured-vapour"),
+        expected_outcome=ResidualStatus.MATCH.value,
+        evidence="fixture",
+        centre=Decimal("0"),
+        pin_band_value=Decimal("0.1"),
+    )
+    old_pin_failures = pin_failures(legacy_residuals, (pin,))
+    assert old_pin_failures[0]["reason"] == "outside_pin_band"
+    assert _pin_failures_from_payloads(payloads, (pin,)) == old_pin_failures
+
+    legacy_summary = tmp_path / "legacy-summary.json"
+    streamed_summary = tmp_path / "streamed-summary.json"
+    score_mod.write_headline_summary_json(
+        legacy_residuals,
+        legacy_summary,
+        context=context,
+        engines=engines,
+        root=score_mod.REPO_ROOT,
+    )
+    stamp = score_mod.derive_store_stamp(score_mod.REPO_ROOT)
+    assert metadata.aggregate is not None
+    score_mod._write_headline_summary_from_accumulator_json(
+        metadata.aggregate,
+        streamed_summary,
+        store_stamp=stamp,
+    )
+    assert streamed_summary.read_bytes() == legacy_summary.read_bytes()
+    import json
+
+    summary = json.loads(streamed_summary.read_text(encoding="utf-8"))
+    compilation = next(
+        row
+        for row in summary["records"]
+        if row["tier"] == "compilation"
+        and row["rail"] == "thermochemistry"
+        and row["engine"] == engine.value
+    )
+    assert compilation["band_width_dex"] is None
+    scale_stratum = next(
+        stratum
+        for row in summary["records"]
+        for stratum in row.get("decision_strata", [])
+        if stratum["quantity"] == Quantity.S.value
+    )
+    assert scale_stratum["max_abs_residual"] == "0.240"
+
+    old_report = score_mod.render_score_report(
+        legacy_residuals,
+        context=context,
+        engines=engines,
+        pin_failures=old_pin_failures,
+        root=score_mod.REPO_ROOT,
+    )
+    # Parity is the claim: the streamed render must equal the legacy render
+    # byte for byte. The legacy render itself legitimately changes with every
+    # store landing, so its absolute hash is not pinned here.
+    streamed_report = score_mod._render_score_report_from_payloads_legacy(
+        payloads,
+        context=context,
+        engines=engines,
+        pin_failures=old_pin_failures,
+        store_stamp=stamp,
+        _aggregate=metadata.aggregate,
+    )
+    assert streamed_report.encode("utf-8") == old_report.encode("utf-8")
+
+    rows = score_mod.load_residuals_jsonl(partial_path)
+    assert any(
+        row.get("rail") == Rail.VAPOUR.value
+        and isinstance(row.get("numeric"), dict)
+        and row["numeric"].get("decision_band")
+        for row in rows
+    )
+    assert any(
+        isinstance(row.get("numeric"), dict)
+        and isinstance(row["numeric"].get("decision_band"), dict)
+        and row["numeric"]["decision_band"].get("rule")
+        == "source-printed per-cell uncertainty"
+        for row in rows
+    )
+    assert any(
+        isinstance(row.get("numeric"), dict)
+        and isinstance(row["numeric"].get("decision_band"), dict)
+        and "residual distribution" in row["numeric"]["decision_band"].get("rule", "")
+        for row in rows
+    )
+    assert any(row.get("status") == ResidualStatus.NO_BAND.value for row in rows)
+    assert any(row.get("status") == ResidualStatus.REFUSED.value for row in rows)
+
+
+def test_streamed_unrailed_measured_tier_matches_legacy_zero_grid(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    import simulator.battery.score as score_mod
+
+    context, engine, fixture_residuals, _fixture_candidates = _streaming_score_fixture()
+    measured_ids = {"fixture-measured-vapour"}
+    context = replace(
+        context,
+        observations={
+            key: observation
+            for key, observation in context.observations.items()
+            if key not in measured_ids
+        },
+        origins={
+            key: origin for key, origin in context.origins.items() if key not in measured_ids
+        },
+    )
+    fixture_residuals = {
+        key: residual
+        for key, residual in fixture_residuals.items()
+        if key not in measured_ids
+    }
+    fixture_residuals["fixture-measured-refusal"] = replace(
+        fixture_residuals["fixture-measured-refusal"], rail=None
+    )
+    monkeypatch.setattr(
+        score_mod,
+        "compile_residual",
+        lambda reference, engine, **_kwargs: (
+            fixture_residuals[reference.observation_id],
+            None,
+        ),
+    )
+    engines = (engine,)
+    legacy_residuals, candidates = score_mod.score_store(context, engines=engines)
+    path = tmp_path / "residuals.jsonl"
+    _written, metadata = score_mod._score_store_to_jsonl(
+        context,
+        path,
+        root=score_mod.REPO_ROOT,
+        engines=engines,
+    )
+    stamp = score_mod.derive_store_stamp(score_mod.REPO_ROOT)
+    legacy_report = score_mod.render_score_report(
+        legacy_residuals,
+        context=context,
+        engines=engines,
+        root=score_mod.REPO_ROOT,
+    )
+    assert metadata.aggregate is not None
+    streamed_report = score_mod._render_score_report_from_payloads_legacy(
+        score_mod._ResidualJsonlRows(path.with_name(path.name + ".partial"), metadata=metadata),
+        context=context,
+        engines=engines,
+        store_stamp=stamp,
+        _aggregate=metadata.aggregate,
+    )
+    assert streamed_report == legacy_report
+    from simulator.battery.score import SCORE_ENGINE_SET
+
+    for rail in Rail:
+        for report_engine in SCORE_ENGINE_SET:
+            assert f"| {rail.value} | {report_engine.value} | 0 |" in streamed_report
+
+
+def test_streamed_measured_grid_omits_selected_engine_without_rail_rows(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    import simulator.battery.score as score_mod
+
+    context, engine, fixture_residuals, fixture_candidates = _streaming_score_fixture()
+    monkeypatch.setattr(
+        score_mod,
+        "compile_residual",
+        lambda reference, _engine, **_kwargs: (
+            fixture_residuals[reference.observation_id],
+            fixture_candidates.get(
+                fixture_residuals[reference.observation_id].candidate or ""
+            ),
+        ),
+    )
+    engines = (engine, Engine.VAPOROCK)
+    legacy_residuals, _candidates = score_mod.score_store(context, engines=(engine,))
+    path = tmp_path / "residuals.jsonl"
+    _written, metadata = score_mod._score_store_to_jsonl(
+        context,
+        path,
+        root=score_mod.REPO_ROOT,
+        engines=(engine,),
+    )
+    stamp = score_mod.derive_store_stamp(score_mod.REPO_ROOT)
+    legacy_report = score_mod.render_score_report(
+        legacy_residuals,
+        context=context,
+        engines=engines,
+        root=score_mod.REPO_ROOT,
+    )
+    assert metadata.aggregate is not None
+    streamed_report = score_mod._render_score_report_from_payloads_legacy(
+        score_mod._ResidualJsonlRows(path.with_name(path.name + ".partial"), metadata=metadata),
+        context=context,
+        engines=engines,
+        store_stamp=stamp,
+        _aggregate=metadata.aggregate,
+    )
+    measured_table = streamed_report.split("## Measured tier", 1)[1].split(
+        "## Flagged strata", 1
+    )[0]
+    assert f"| {Rail.VAPOUR.value} | {Engine.VAPOROCK.value} |" not in measured_table
+    assert streamed_report == legacy_report
+
+
+def test_streaming_interruption_preserves_previous_complete_file(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    import simulator.battery.score as score_mod
+    from simulator.battery.records import Residual
+
+    work = F.work()
+    experiment = F.tabulation_experiment(work_id=work.work_id)
+    references = tuple(
+        F.observation(
+            f"fixture-partial-{index}",
+            experiment.experiment_id,
+            F.psat_identity("Na"),
+            Decimal("1"),
+            evidence=EvidenceClass.MEASURED_DIRECT,
+            source_id=work.work_id,
+        )
+        for index in range(3)
+    )
+    context = _context(work, experiment, *references)
+    emitted: list[str] = []
+    calls = 0
+
+    def interrupt_after_two(reference, engine, **_kwargs):
+        nonlocal calls
+        calls += 1
+        if calls == 3:
+            raise RuntimeError("injected scorer stop")
+        residual = Residual(
+            key=f"fixture::{reference.observation_id}::{engine.value}",
+            reference=reference.observation_id,
+            execution=Execution(state=ExecutionState.NOT_PROBED),
+            rail=Rail.VAPOUR,
+            status=ResidualStatus.NO_BAND,
+            source_relation=SourceRelation.UNKNOWN,
+            score_eligible=False,
+            exclusions=(),
+            notices=(),
+        )
+        emitted.append(residual.key)
+        return residual, None
+
+    monkeypatch.setattr(score_mod, "compile_residual", interrupt_after_two)
+    target = tmp_path / "residuals.jsonl"
+    previous = b"previous complete result\n"
+    target.write_bytes(previous)
+    with pytest.raises(RuntimeError, match="injected scorer stop"):
+        score_mod._score_store_to_jsonl(
+            context,
+            target,
+            root=score_mod.REPO_ROOT,
+            engines=(Engine.INTERNAL_ANALYTICAL,),
+            include_diagnostics=False,
+        )
+    partial = tmp_path / "residuals.jsonl.partial"
+    assert partial.is_file()
+    assert target.read_bytes() == previous
+    rows = score_mod.load_residuals_jsonl(partial)
+    assert [str(row["key"]) for row in rows] == emitted
+
+
+@pytest.mark.parametrize("failure_stage", ("scoring", "summary", "report"))
+def test_battery_failed_rerun_preserves_published_output_set(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    failure_stage: str,
+) -> None:
+    import simulator.battery.score as score_mod
+    from scripts import battery_score
+    from simulator.battery.records import Residual
+
+    work = F.work()
+    experiment = F.tabulation_experiment(work_id=work.work_id)
+    references = tuple(
+        F.observation(
+            f"fixture-preserved-{index}",
+            experiment.experiment_id,
+            F.psat_identity("Na"),
+            Decimal("1"),
+            evidence=EvidenceClass.MEASURED_DIRECT,
+            source_id=work.work_id,
+        )
+        for index in range(3)
+    )
+    context = _context(work, experiment, *references)
+    root = tmp_path / "rerun-root"
+    battery = root / "data" / "battery"
+    battery.mkdir(parents=True)
+    (battery / "pins.yaml").touch()
+    paths = {
+        "residuals": battery / "residuals.jsonl",
+        "summary": battery / "score-summary.json",
+        "report": battery / "score-report.md",
+    }
+    previous = {
+        "residuals": b"previous residuals\n",
+        "summary": b"previous summary\n",
+        "report": b"previous report\n",
+    }
+    for name, path in paths.items():
+        path.write_bytes(previous[name])
+
+    stamp = score_mod.derive_store_stamp(score_mod.REPO_ROOT)
+    monkeypatch.setattr(score_mod, "derive_store_stamp", lambda _root: stamp)
+    monkeypatch.setattr(battery_score, "derive_store_stamp", lambda _root: stamp)
+    monkeypatch.setattr(battery_score, "load_score_context", lambda _root: context)
+    monkeypatch.setattr(battery_score, "emit_store_stamp_mismatch_warning", lambda *_: None)
+    monkeypatch.setattr(battery_score, "load_legacy_score_rows", lambda _root: [])
+    monkeypatch.setattr(
+        battery_score,
+        "load_pins",
+        lambda _path: {"key_map": {}, "pin_band_records": []},
+    )
+    calls = 0
+
+    def compile_stub(reference, engine, **_kwargs):
+        nonlocal calls
+        calls += 1
+        if failure_stage == "scoring" and calls == 3:
+            raise RuntimeError("injected scorer stop")
+        return (
+            Residual(
+                key=f"fixture::{reference.observation_id}::{engine.value}",
+                reference=reference.observation_id,
+                execution=Execution(state=ExecutionState.NOT_PROBED),
+                rail=Rail.VAPOUR,
+                status=ResidualStatus.NO_BAND,
+                source_relation=SourceRelation.UNKNOWN,
+                score_eligible=False,
+                exclusions=(),
+                notices=(),
+            ),
+            None,
+        )
+
+    monkeypatch.setattr(score_mod, "compile_residual", compile_stub)
+    if failure_stage == "summary":
+        original_write_summary = battery_score._write_headline_summary_from_accumulator_json
+
+        def write_then_fail(aggregate, path, *, store_stamp):
+            original_write_summary(aggregate, path, store_stamp=store_stamp)
+            raise RuntimeError("injected summary stop")
+
+        monkeypatch.setattr(
+            battery_score,
+            "_write_headline_summary_from_accumulator_json",
+            write_then_fail,
+        )
+    elif failure_stage == "report":
+        original_write_text = Path.write_text
+
+        def write_report_then_fail(path, data, *args, **kwargs):
+            written = original_write_text(path, data, *args, **kwargs)
+            if path.name.startswith("score-report.md"):
+                raise RuntimeError("injected report stop")
+            return written
+
+        monkeypatch.setattr(Path, "write_text", write_report_then_fail)
+
+    message = {
+        "scoring": "injected scorer stop",
+        "summary": "injected summary stop",
+        "report": "injected report stop",
+    }[failure_stage]
+    with pytest.raises(RuntimeError, match=message):
+        battery_score.main(
+            ["--root", str(root), "--engines", Engine.INTERNAL_ANALYTICAL.value]
+        )
+    assert {name: path.read_bytes() for name, path in paths.items()} == previous
+
+
+def test_battery_report_only_streams_residual_jsonl(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
+) -> None:
+    import simulator.battery.score as score_mod
+    from scripts import battery_score
+    from simulator.battery.records import Residual, ResidualNumeric
+    from simulator.battery.score import MetricOperation
+
+    work = F.work()
+    experiment = F.tabulation_experiment(work_id=work.work_id)
+    reference = F.observation(
+        "report-only-stream-row",
+        experiment.experiment_id,
+        F.psat_identity("Na"),
+        Decimal("1"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id=work.work_id,
+    )
+    context = _context(work, experiment, reference)
+    residual = Residual(
+        key=f"fixture::{reference.observation_id}::{Engine.INTERNAL_ANALYTICAL.value}",
+        reference=reference.observation_id,
+        execution=Execution(state=ExecutionState.NOT_PROBED),
+        rail=Rail.VAPOUR,
+        status=ResidualStatus.MATCH,
+        source_relation=SourceRelation.UNKNOWN,
+        score_eligible=False,
+        exclusions=(),
+        notices=(),
+        numeric=ResidualNumeric(
+            MetricOperation.ABSOLUTE,
+            "dimensionless",
+            Decimal("1"),
+            DecisionBand(Decimal("0.231"), "dimensionless", "fixture non-DEX band"),
+        ),
+    )
+    root = tmp_path / "report-root"
+    battery = root / "data" / "battery"
+    battery.mkdir(parents=True)
+    (battery / "pins.yaml").touch()
+    residual_path = battery / "residuals.jsonl"
+    score_mod.write_residuals_jsonl(
+        (residual,),
+        {},
+        residual_path,
+        root=score_mod.REPO_ROOT,
+    )
+    stamp = score_mod.derive_store_stamp(score_mod.REPO_ROOT)
+    monkeypatch.setattr(battery_score, "load_score_context", lambda _root: context)
+    monkeypatch.setattr(battery_score, "derive_store_stamp", lambda _root: stamp)
+    monkeypatch.setattr(
+        battery_score,
+        "emit_store_stamp_mismatch_warning",
+        lambda _recorded, _live: None,
+    )
+    monkeypatch.setattr(battery_score, "load_legacy_score_rows", lambda _root: [])
+    monkeypatch.setattr(
+        battery_score,
+        "load_pins",
+        lambda _path: {"key_map": {}, "pin_band_records": []},
+    )
+
+    def reject_full_load(_path):
+        pytest.fail("report-only loaded the complete residual file")
+
+    monkeypatch.setattr(score_mod, "load_residuals_jsonl", reject_full_load)
+    assert (
+        battery_score.main(
+            [
+                "--report-only",
+                "--root",
+                str(root),
+                "--engines",
+                Engine.INTERNAL_ANALYTICAL.value,
+            ]
+        )
+        == 0
+    )
+    printed = capsys.readouterr().out
+    assert "report-only residuals=1" in printed
+    assert (battery / "score-report.md").is_file()
+    assert (battery / "score-summary.json").is_file()
+    import json
+
+    summary = json.loads((battery / "score-summary.json").read_text(encoding="utf-8"))
+    assert all("n_eligible_references" not in row for row in summary["records"])
+    measured_vapour = next(
+        row
+        for row in summary["records"]
+        if row["tier"] == "measured" and row["rail"] == Rail.VAPOUR.value
+    )
+    assert measured_vapour["band_width_dex"] is None
+
+
 def test_write_headline_summary_has_tier_and_null_data_scatter_slot(tmp_path: Path) -> None:
     import json
 
@@ -3305,12 +4439,15 @@ def test_non_allibert_typed_solid_activity_uses_fusion_conversion() -> None:
         amount_basis=AmountBasis.MOLE_FRACTION,
     )
     experiment = F.kems_experiment()
-    identity = F.activity_identity(
-        formula="CaO",
-        T_K=temperature,
-        endmember_phase=Phase.CR,
-        component_basis="CaO",
-        composition=composition,
+    identity = _with_activity_reference_polymorph(
+        F.activity_identity(
+            formula="CaO",
+            T_K=temperature,
+            endmember_phase=Phase.CR,
+            component_basis="CaO",
+            composition=composition,
+        ),
+        "lime",
     )
     reference = F.observation(
         "other-source-cao-solid-activity",
@@ -3327,6 +4464,417 @@ def test_non_allibert_typed_solid_activity_uses_fusion_conversion() -> None:
     assert converted.value.point == expected
     assert converted.identity.reference_state.value.endmember.phase.value is Phase.L
     assert converted.source_id == "another-source"
+
+
+@pytest.mark.parametrize(
+    ("formula", "polymorph", "expected_offset", "tables"),
+    (
+        ("Al2O3", "corundum", Decimal("0.455"), ("Al-096", "Al-100")),
+        ("CaO", "lime", Decimal("0.842"), ("Ca-027", "Ca-028")),
+        (
+            "SiO2",
+            "cristobalite_high",
+            Decimal("0.008"),
+            ("O-035", "O-038"),
+        ),
+    ),
+)
+def test_solid_activity_fusion_conversion_reports_positive_offset(
+    formula: str,
+    polymorph: str,
+    expected_offset: Decimal,
+    tables: tuple[str, str],
+) -> None:
+    from simulator.battery.enums import Polymorph
+    from simulator.battery.generators.janaf import janaf_fusion_energy
+    from simulator.battery.score import _fusion_comparison_reference
+
+    temperature = Decimal("1933")
+    experiment = F.kems_experiment()
+    identity = F.activity_identity(
+        formula=formula,
+        T_K=temperature,
+        endmember_phase=Phase.CR,
+        component_basis=formula,
+    )
+    reference_state = identity.reference_state
+    assert reference_state is not None and reference_state.is_value
+    assert reference_state.value is not None
+    endmember = replace(
+        reference_state.value.endmember,
+        polymorph=State.of(Polymorph(polymorph)),
+    )
+    identity = replace(
+        identity,
+        reference_state=State.of(
+            replace(reference_state.value, endmember=endmember)
+        ),
+    )
+    reference = F.observation(
+        f"{formula}-solid-activity-at-1933K",
+        experiment.experiment_id,
+        identity,
+        Decimal("1"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="synthetic-solid-reference-anchor",
+    )
+
+    converted = _fusion_comparison_reference(reference, engine=Engine.OPENIMCC)
+    notice = next(
+        item
+        for item in converted.notices
+        if item.reason.startswith("reference_converted_via_fusion;")
+    )
+    offset = Decimal(notice.reason.partition("offset_dex=+")[2].split(";")[0])
+    fusion = janaf_fusion_energy(formula, temperature)
+    assert abs(offset - expected_offset) <= Decimal("0.002")
+    assert fusion.crystal_table == tables[0]
+    assert fusion.liquid_table == tables[1]
+    assert f"tables={tables[0]}/{tables[1]}" in notice.reason
+    assert f"T={temperature} K" in notice.reason
+    assert "reference-state conversion (not model error)" in notice.reason
+    assert converted.identity.reference_state.value.endmember.phase.value is Phase.L
+
+
+def test_periclase_solid_activity_fusion_conversion_uses_janaf_nodes() -> None:
+    """At 1873 K, Mg-008 and Mg-009 give the expected periclase-to-liquid shift.
+
+    Linear interpolation uses 73/100 of each table's 1800-to-1900 K span:
+    G_s° = -360.851 + 0.73*(-340.395 + 360.851) = -345.91812 kJ/mol;
+    G_l° = -330.816 + 0.73*(-312.503 + 330.816) = -317.44751 kJ/mol.
+    ΔG_fus = G_l° - G_s° = +28.47061 kJ/mol, so
+    Δlog10(a) = 28.47061*1000/(8.31441*1873*ln(10)) = +0.793984 dex.
+    """
+    from simulator.battery.generators.janaf import janaf_fusion_energy
+    from simulator.battery.score import _fusion_comparison_reference
+
+    temperature = Decimal("1873")
+    fusion = janaf_fusion_energy("MgO", temperature)
+    assert fusion.crystal_table == "Mg-008"
+    assert fusion.liquid_table == "Mg-009"
+    assert fusion.delta_g_fus_kJ_per_mol > 0
+    assert abs(
+        fusion.melting_temperature_K - Decimal("3104.945598")
+    ) < Decimal("0.00001")
+    at_melting = janaf_fusion_energy("MgO", fusion.melting_temperature_K)
+    assert abs(at_melting.delta_g_fus_kJ_per_mol) < Decimal("1e-20")
+
+    experiment = F.kems_experiment()
+    identity = _with_activity_reference_polymorph(
+        F.activity_identity(
+            formula="MgO",
+            T_K=temperature,
+            endmember_phase=Phase.CR,
+            component_basis="MgO",
+        ),
+        "periclase",
+    )
+    reference = F.observation(
+        "mgo-periclase-solid-activity-at-1873K",
+        experiment.experiment_id,
+        identity,
+        Decimal("0.2"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="synthetic-mgo-solid-reference-anchor",
+    )
+    converted = _fusion_comparison_reference(reference, engine=Engine.OPENIMCC)
+    notice = next(
+        item
+        for item in converted.notices
+        if item.reason.startswith("reference_converted_via_fusion;")
+    )
+    offset = Decimal(notice.reason.partition("offset_dex=+")[2].split(";")[0])
+    assert abs(offset - Decimal("0.793984")) <= Decimal("0.002")
+    assert converted.identity.reference_state.value.endmember.phase.value is Phase.L
+
+    wrong_polymorph = replace(
+        reference,
+        identity=_with_activity_reference_polymorph(identity, "spinel"),
+    )
+    refused = _fusion_comparison_reference(
+        wrong_polymorph, engine=Engine.OPENIMCC
+    )
+    assert refused.value.point == reference.value.point
+    assert refused.identity.reference_state.value.endmember.phase.value is Phase.CR
+    assert any(
+        "Mg-008 represents polymorph periclase" in notice.reason
+        for notice in refused.notices
+    )
+
+
+@pytest.mark.parametrize("polymorph", (None, "quartz"))
+def test_solid_activity_with_unmatched_polymorph_refuses_conversion(
+    polymorph: str | None,
+) -> None:
+    from simulator.battery.score import _fusion_comparison_reference
+
+    experiment = F.kems_experiment()
+    identity = _with_activity_reference_polymorph(
+        F.activity_identity(
+            formula="SiO2",
+            T_K=Decimal("1933"),
+            endmember_phase=Phase.CR,
+            component_basis="SiO2",
+        ),
+        polymorph,
+    )
+    reference = F.observation(
+        f"silica-solid-activity-{polymorph or 'unknown'}-polymorph",
+        experiment.experiment_id,
+        identity,
+        Decimal("0.3"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="synthetic-unmatched-solid-polymorph",
+    )
+
+    comparison = _fusion_comparison_reference(reference, engine=Engine.OPENIMCC)
+    assert comparison.value.point == reference.value.point
+    assert comparison.identity.reference_state.value.endmember.phase.value is Phase.CR
+    assert any(
+        "fusion conversion missing input" in notice.reason
+        and "O-035 represents polymorph cristobalite_high" in notice.reason
+        for notice in comparison.notices
+    )
+
+    residual, _candidate = compile_residual(
+        reference,
+        Engine.OPENIMCC,
+        context=_context(F.work(), experiment, reference, review="reviewed"),
+    )
+    assert residual.status is ResidualStatus.REFUSED
+    assert residual.refusal is not None
+    assert residual.refusal.reason is RefusalReason.IDENTITY_INCOMPLETE
+    assert residual.refusal.detail["missing_input"] == (
+        "JANAF solid polymorph matching the selected table"
+    )
+
+
+def test_missing_janaf_fusion_node_refuses_activity_residual(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from copy import deepcopy
+
+    from simulator.battery.generators import janaf
+
+    original_loader = janaf.load_table_document
+
+    def missing_alumina_row(path):
+        document = original_loader(path)
+        if path.name != "Al-096.yaml":
+            return document
+        incomplete = deepcopy(document)
+        incomplete["table"]["values"] = [
+            row
+            for row in incomplete["table"]["values"]
+            if row["temperature"].get("value") != 1900
+        ]
+        return incomplete
+
+    monkeypatch.setattr(janaf, "load_table_document", missing_alumina_row)
+    janaf._fusion_table_points.cache_clear()
+    janaf._fusion_missing_gibbs_temperatures.cache_clear()
+
+    experiment = F.kems_experiment()
+    identity = _with_activity_reference_polymorph(
+        F.activity_identity(
+            formula="Al2O3",
+            T_K=Decimal("1933"),
+            endmember_phase=Phase.CR,
+            component_basis="Al2O3",
+        ),
+        "corundum",
+    )
+    reference = F.observation(
+        "alumina-solid-activity-with-missing-janaf-node",
+        experiment.experiment_id,
+        identity,
+        Decimal("0.3"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="synthetic-missing-janaf-node",
+    )
+
+    residual, _candidate = compile_residual(
+        reference,
+        Engine.OPENIMCC,
+        context=_context(F.work(), experiment, reference, review="reviewed"),
+    )
+    assert residual.status is ResidualStatus.REFUSED
+    assert residual.refusal is not None
+    assert residual.refusal.reason is RefusalReason.IDENTITY_INCOMPLETE
+    assert residual.refusal.detail["missing_input"] == (
+        "JANAF solid/liquid formation Gibbs rows"
+    )
+    assert any(
+        "needed JANAF table node row missing or changed" in notice.reason
+        and "Al-096" in notice.reason
+        for notice in residual.notices
+    )
+
+
+def test_liquid_activity_reference_is_not_shifted() -> None:
+    from simulator.battery.score import _fusion_comparison_reference
+
+    experiment = F.kems_experiment()
+    identity = F.activity_identity(
+        formula="Al2O3",
+        T_K=Decimal("1933"),
+        endmember_phase=Phase.L,
+        component_basis="Al2O3",
+    )
+    reference = F.observation(
+        "alumina-liquid-activity",
+        experiment.experiment_id,
+        identity,
+        Decimal("0.2"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="synthetic-liquid-reference",
+    )
+
+    assert _fusion_comparison_reference(reference, engine=Engine.OPENIMCC) is reference
+
+
+def test_solid_activity_at_or_above_fusion_is_unshifted() -> None:
+    from simulator.battery.generators.janaf import janaf_fusion_energy
+    from simulator.battery.score import _fusion_comparison_reference
+
+    temperature = Decimal("3300")
+    fusion = janaf_fusion_energy("CaO", temperature)
+    assert temperature > fusion.melting_temperature_K
+    experiment = F.kems_experiment()
+    reference = F.observation(
+        "cao-solid-activity-above-fusion",
+        experiment.experiment_id,
+        _with_activity_reference_polymorph(
+            F.activity_identity(
+                formula="CaO",
+                T_K=temperature,
+                endmember_phase=Phase.CR,
+                component_basis="CaO",
+            ),
+            "lime",
+        ),
+        Decimal("0.4"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="synthetic-above-fusion",
+    )
+
+    comparison = _fusion_comparison_reference(reference, engine=Engine.OPENIMCC)
+    assert comparison.value.point == reference.value.point
+    assert comparison.identity.reference_state.value.endmember.phase.value is Phase.L
+    assert any(
+        "no numeric reference-state conversion applied" in item.reason
+        and f"T_fus={fusion.melting_temperature_K} K" in item.reason
+        for item in comparison.notices
+    )
+
+
+@pytest.mark.parametrize(
+    ("engine", "formula", "bound"),
+    (
+        (Engine.ALPHAMELTS, "SiO2", "|delta| <= 0.005 dex over 1600–2300 K"),
+        (Engine.THERMOENGINE, "SiO2", "|delta| <= 0.005 dex over 1600–2300 K"),
+        (Engine.ALPHAMELTS, "Al2O3", "under-corrects by +0.03 dex at 1933 K"),
+        (Engine.THERMOENGINE, "Al2O3", "under-corrects by +0.03 dex at 1933 K"),
+    ),
+)
+def test_melts_liquid_reference_gap_is_attached_to_fusion_shift(
+    engine: Engine, formula: str, bound: str
+) -> None:
+    from simulator.battery.score import _fusion_comparison_reference
+
+    experiment = F.kems_experiment()
+    reference = F.observation(
+        f"{engine.value}-{formula}-solid-activity",
+        experiment.experiment_id,
+        _with_activity_reference_polymorph(
+            F.activity_identity(
+                formula=formula,
+                T_K=Decimal("1933"),
+                endmember_phase=Phase.CR,
+                component_basis=formula,
+            ),
+            "corundum" if formula == "Al2O3" else "cristobalite_high",
+        ),
+        Decimal("0.3"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="synthetic-melts-reference-gap",
+    )
+
+    converted = _fusion_comparison_reference(reference, engine=engine)
+    assert converted.value.point != reference.value.point
+    assert any(
+        item.kind is NoticeKind.DERIVATION_USES_COMPILATION
+        and "applied shift is approximate" in item.reason
+        and bound in item.reason
+        and "2026-10-02-melts-vs-janaf-liquid/findings.md" in item.reason
+        for item in converted.notices
+    )
+
+
+def test_unestablished_engine_reference_keeps_solid_value_and_notices_residual() -> None:
+    from simulator.battery.score import _fusion_comparison_reference
+
+    inference_notice = Notice(
+        kind=NoticeKind.DERIVATION_USES_COMPILATION,
+        affected_quantities=(Quantity.ACTIVITY,),
+        reason="relation=extract_inference; standard state source inference retained",
+        origin="synthetic-reference-state-inference",
+    )
+    experiment = F.kems_experiment()
+    identity = F.activity_identity(
+        formula="CaO",
+        T_K=Decimal("1933"),
+        endmember_phase=Phase.CR,
+        component_basis="CaO",
+    )
+    reference = F.observation(
+        "cao-solid-activity-unestablished-engine",
+        experiment.experiment_id,
+        identity,
+        Decimal("1"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="synthetic-unestablished-engine",
+        notices=(inference_notice,),
+    )
+
+    untouched = _fusion_comparison_reference(
+        reference, engine=Engine.INTERNAL_ANALYTICAL
+    )
+    assert untouched.value.point == reference.value.point
+    assert untouched.identity.reference_state.value.endmember.phase.value is Phase.CR
+    assert any(
+        "engine reference is unestablished" in item.reason
+        for item in untouched.notices
+    )
+
+    prediction = EnginePrediction(
+        engine=Engine.INTERNAL_ANALYTICAL,
+        channel="internal-analytical",
+        execution=Execution(
+            state=ExecutionState.PRODUCED,
+            call_evidence="test:unestablished-activity-reference",
+        ),
+        value=Decimal("0.5"),
+        unit="dimensionless",
+        authority=Authority.CERTIFIED,
+        coefficient_sources=("nasa-cea-thermo",),
+        lineage_complete=True,
+        identity=reference.identity,
+    )
+    context = _context(F.work(), experiment, reference, review="reviewed")
+    residual, _candidate = compile_residual(
+        reference,
+        Engine.INTERNAL_ANALYTICAL,
+        context=context,
+        prediction=prediction,
+    )
+    assert residual.numeric is not None
+    assert abs(residual.numeric.value - Decimal("0.5").log10()) < Decimal("0.000001")
+    assert inference_notice in residual.notices
+    assert any(
+        "engine reference is unestablished" in item.reason
+        for item in residual.notices
+    )
 
 
 def test_fusion_conversion_without_janaf_pair_returns_typed_notice() -> None:
@@ -3541,7 +5089,16 @@ def test_score_store_attempts_all_owned_handle_closes(
     assert all(backend.closed for backend in opened)
 
 
-def test_out_of_janaf_range_activity_notice_does_not_abort_score_store() -> None:
+@pytest.mark.parametrize(
+    ("formula", "temperature", "missing_reason"),
+    (
+        ("CaO", Decimal("100"), "outside the JANAF table range"),
+        ("NaO0.5", Decimal("1000"), "no JANAF fusion table pair"),
+    ),
+)
+def test_missing_janaf_fusion_input_refuses_activity_residual(
+    formula: str, temperature: Decimal, missing_reason: str
+) -> None:
     from simulator.battery.score import (
         FLAGGED_STRATUM_REFERENCE_CONVERTED_VIA_FUSION,
         _fusion_comparison_reference,
@@ -3549,13 +5106,13 @@ def test_out_of_janaf_range_activity_notice_does_not_abort_score_store() -> None
 
     experiment = F.kems_experiment()
     identity = F.activity_identity(
-        formula="CaO",
-        T_K=Decimal("100"),
+        formula=formula,
+        T_K=temperature,
         endmember_phase=Phase.CR,
-        component_basis="CaO",
+        component_basis=formula,
     )
     reference = F.observation(
-        "out-of-janaf-range-cao-activity",
+        f"missing-janaf-{formula}-activity",
         experiment.experiment_id,
         identity,
         Decimal("1"),
@@ -3573,17 +5130,25 @@ def test_out_of_janaf_range_activity_notice_does_not_abort_score_store() -> None
 
     residuals, _ = score_store(
         _context(F.work(), experiment, reference, review="reviewed"),
-        engines=(Engine.INTERNAL_ANALYTICAL,),
+        engines=(Engine.OPENIMCC,),
     )
     assert len(residuals) == 1
+    assert residuals[0].status is ResidualStatus.REFUSED
+    assert residuals[0].refusal is not None
+    assert residuals[0].refusal.reason is RefusalReason.IDENTITY_INCOMPLETE
+    assert (
+        residuals[0].refusal.detail["missing_input"]
+        == "JANAF solid/liquid formation Gibbs rows"
+    )
     notice = next(
         notice
         for notice in residuals[0].notices
         if notice.kind is NoticeKind.OUT_OF_GAMMA_DOMAIN
     )
-    assert "CaO" in notice.reason
-    assert "outside the JANAF table range" in notice.reason
-    assert "JANAF table ranges" in notice.band
+    assert formula in notice.reason
+    assert missing_reason in notice.reason
+    if formula == "CaO":
+        assert "JANAF table ranges" in notice.band
 
 
 def test_allibert_solid_activity_fusion_conversion_is_diagnostic_only(
@@ -3612,12 +5177,15 @@ def test_allibert_solid_activity_fusion_conversion_is_diagnostic_only(
         amount_basis=AmountBasis.MOLE_FRACTION,
     )
     experiment = F.kems_experiment()
-    identity = F.activity_identity(
-        formula="CaO",
-        T_K=temperature,
-        endmember_phase=Phase.CR,
-        component_basis="CaO",
-        composition=composition,
+    identity = _with_activity_reference_polymorph(
+        F.activity_identity(
+            formula="CaO",
+            T_K=temperature,
+            endmember_phase=Phase.CR,
+            component_basis="CaO",
+            composition=composition,
+        ),
+        "lime",
     )
     reference = F.observation(
         "allibert-cao-solid-activity",
@@ -3653,12 +5221,15 @@ def test_allibert_solid_activity_fusion_conversion_is_diagnostic_only(
     alumina_reference = replace(
         reference,
         observation_id="allibert-alumina-solid-activity",
-        identity=F.activity_identity(
-            formula="Al2O3",
-            T_K=Decimal("2060"),
-            endmember_phase=Phase.CR,
-            component_basis="Al2O3",
-            composition=composition,
+        identity=_with_activity_reference_polymorph(
+            F.activity_identity(
+                formula="Al2O3",
+                T_K=Decimal("2060"),
+                endmember_phase=Phase.CR,
+                component_basis="Al2O3",
+                composition=composition,
+            ),
+            "corundum",
         ),
     )
     converted_alumina = _fusion_comparison_reference(alumina_reference)
@@ -3688,8 +5259,8 @@ def test_allibert_solid_activity_fusion_conversion_is_diagnostic_only(
     assert reference.identity.reference_state.value.endmember.phase.value is Phase.CR
 
     prediction = EnginePrediction(
-        engine=Engine.INTERNAL_ANALYTICAL,
-        channel="internal-analytical",
+        engine=Engine.OPENIMCC,
+        channel="openimcc",
         execution=Execution(
             state=ExecutionState.PRODUCED,
             call_evidence="test:liquid-reference-activity",
@@ -3704,7 +5275,7 @@ def test_allibert_solid_activity_fusion_conversion_is_diagnostic_only(
     context = _context(F.work(), experiment, reference, review="reviewed")
     residual, candidate = compile_residual(
         reference,
-        Engine.INTERNAL_ANALYTICAL,
+        Engine.OPENIMCC,
         context=context,
         prediction=prediction,
     )
@@ -3720,17 +5291,20 @@ def test_allibert_solid_activity_fusion_conversion_is_diagnostic_only(
         notice.reason.startswith(
             f"{FLAGGED_STRATUM_REFERENCE_CONVERTED_VIA_FUSION};"
         )
+        and "reference-state conversion (not model error)" in notice.reason
+        and "offset_dex=+" in notice.reason
+        and "tables=Ca-027/Ca-028" in notice.reason
         and "distance_below_JANAF_Tm=1200" in notice.reason
         and "accepted_Tm~2886 K" in notice.reason
         for notice in residual.notices
     )
     assert headline_rows(
-        (residual,), context=context, engines=(Engine.INTERNAL_ANALYTICAL,)
+        (residual,), context=context, engines=(Engine.OPENIMCC,)
     )[0]["n"] == 0
     assert [
         (row["stratum"], row["n"])
         for row in flagged_stratum_rows(
-            (residual,), engines=(Engine.INTERNAL_ANALYTICAL,)
+            (residual,), engines=(Engine.OPENIMCC,)
         )
     ] == [(FLAGGED_STRATUM_REFERENCE_CONVERTED_VIA_FUSION, 1)]
 
@@ -3739,7 +5313,7 @@ def test_allibert_solid_activity_fusion_conversion_is_diagnostic_only(
         headline = next(
             row
             for row in headline_payloads(
-                (payload,), (Engine.INTERNAL_ANALYTICAL,), tier=tier
+                (payload,), (Engine.OPENIMCC,), tier=tier
             )
             if row["rail"] == residual.rail.value
         )
@@ -3748,19 +5322,19 @@ def test_allibert_solid_activity_fusion_conversion_is_diagnostic_only(
     assert [
         (row["stratum"], row["n"])
         for row in flagged_stratum_payloads(
-            (payload,), (Engine.INTERNAL_ANALYTICAL,)
+            (payload,), (Engine.OPENIMCC,)
         )
     ] == [(FLAGGED_STRATUM_REFERENCE_CONVERTED_VIA_FUSION, 1)]
     report = render_score_report_from_payloads(
-        (payload,), engines=(Engine.INTERNAL_ANALYTICAL,), hostname="test"
+        (payload,), engines=(Engine.OPENIMCC,), hostname="test"
     )
     assert (
-        f"| {residual.rail.value} | {Engine.INTERNAL_ANALYTICAL.value} | "
+        f"| {residual.rail.value} | {Engine.OPENIMCC.value} | "
         "0 | 0 | 0 | 0 |"
     ) in report
     assert (
         f"| {FLAGGED_STRATUM_REFERENCE_CONVERTED_VIA_FUSION} | "
-        f"{residual.rail.value} | {Engine.INTERNAL_ANALYTICAL.value} | 1 |"
+        f"{residual.rail.value} | {Engine.OPENIMCC.value} | 1 |"
     ) in report
 
     source_point_reference = replace(
@@ -3808,6 +5382,13 @@ def test_allibert_solid_activity_fusion_conversion_is_diagnostic_only(
     )
     assert converted_alumina_source_point.identity.species.phase.is_unknown
     from simulator.battery.generators.bench import activity_request_for_engine
+    from types import SimpleNamespace
+
+    monkeypatch.setitem(
+        sys.modules,
+        "openimcc",
+        SimpleNamespace(IMCC_PARENT_OXIDES=("CaO", "Al2O3", "SiO2", "MgO")),
+    )
 
     activity_request = activity_request_for_engine(
         experiment, converted_alumina, Engine.ALPHAMELTS.value
@@ -4143,7 +5724,8 @@ def test_admitted_model_derived_rows_emit_residuals_per_imcc_engine() -> None:
         assert all(not row.score_eligible for row in allibert_rows)
         assert all(
             any(
-                "reference_converted_via_fusion" in notice.reason
+                "fusion conversion missing input" in notice.reason
+                and "measured reference polymorph is unknown" in notice.reason
                 for notice in row.notices
             )
             for row in allibert_rows
@@ -4338,3 +5920,825 @@ def test_sole_typed_bench_without_recorded_link_is_not_adopted() -> None:
     )
     assert residual.refusal is not None
     assert residual.refusal.detail.get("reason") == "cell_material_unknown"
+
+
+def _cell_material_score_case(material, inference):
+    from simulator.battery.enums import BenchIdentityBasis
+    from simulator.battery.records import Bench, BenchIdentity
+
+    bench_id = f"cell-{material.value}"
+    experiment = replace(F.kems_experiment(), bench_id=bench_id)
+    reference = F.observation(
+        f"{bench_id}-row",
+        experiment.experiment_id,
+        replace(
+            _partial_identity(),
+            species=Species("K", Phase.G),
+            total_pressure_Pa=State.of(Decimal("1e-6")),
+        ),
+        Decimal("1e-6"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="test-kems",
+    )
+    fo2_inference = Derivation(
+        relation="inferred fO2 from oxygen balance",
+        inputs=("printed oxygen-bearing species",),
+        parameters=(),
+        output_unit="Pa",
+    )
+    reference = replace(
+        reference,
+        point_conditions={
+            **(reference.point_conditions or {}),
+            "fO2_Pa": Located(
+                State.of(Decimal("1e-8")),
+                locator=F.loc(page=18, paragraph="Results"),
+                inference=fo2_inference,
+            ),
+        },
+    )
+    bench = Bench(
+        id=bench_id,
+        work_id=experiment.work_id or "work-1",
+        identity=BenchIdentity(
+            BenchIdentityBasis.INFERRED_FROM_EMBEDDED_EVIDENCE,
+            reason="cell material fixture",
+        ),
+        cell_materials=(F.located(material),)
+        if inference is None
+        else (
+            Located(
+                State.of(material),
+                locator=F.loc(page=18, paragraph="Results"),
+                inference=inference,
+            ),
+        ),
+    )
+    context = replace(
+        _context(F.work(), experiment, reference, review="reviewed"),
+        benches={bench.id: bench},
+    )
+    prediction = lambda engine, identity, **kwargs: EnginePrediction(
+        engine=engine,
+        channel=engine.value,
+        execution=Execution(state=ExecutionState.PRODUCED, call_evidence="test:predict"),
+        value=Decimal("1e-6"),
+        unit="Pa",
+        authority=Authority.CERTIFIED,
+        coefficient_sources=("test",),
+        lineage_complete=True,
+        identity=getattr(identity, "identity", identity),
+    )
+    return reference, context, bench, prediction
+
+
+def _migrated_stolyarova_cell_context(tmp_path: Path) -> ScoreContext:
+    from simulator.battery.migrate import Migrator, write_outputs
+
+    fixture = (
+        Path(__file__).resolve().parents[1]
+        / "fixtures"
+        / "battery"
+        / "stolyarova-1996-inferred-cell.yaml"
+    )
+    root = tmp_path / "stolyarova-store"
+    extract_dir = root / "data" / "literature" / "extracts"
+    extract_dir.mkdir(parents=True)
+    shutil.copyfile(fixture, extract_dir / fixture.name)
+
+    migrator = Migrator(root, index={}, aliases={})
+    migrator.migrate_extracts()
+    migrator.finalize()
+    write_outputs(migrator.result, root)
+    context = load_score_context(root)
+    review = dict(context.extract_review)
+    review["stolyarova-1996-cao-alumina-silica-kems"] = "reviewed"
+    return replace(context, extract_review=review)
+
+
+@pytest.mark.parametrize(
+    "record_form",
+    (
+        "bench.cell_materials[0]",
+        "bench.cell_material_and_liner",
+        "experiment.apparatus.cell_material_and_liner",
+    ),
+)
+def test_inferred_cell_material_is_noticed_in_each_record_form(record_form: str) -> None:
+    from simulator.battery.enums import CellMaterial
+    from simulator.battery.records import Apparatus
+    from simulator.battery.score import _cell_apparatus_inference_notices
+
+    inference = Derivation(
+        relation="extract_inference",
+        inputs=("inferred=true", "Mo ions identify the cell material"),
+        parameters=(),
+        output_unit="as_published",
+    )
+    reference, context, bench, _prediction = _cell_material_score_case(
+        CellMaterial.MO, inference
+    )
+    experiment = context.experiments[reference.experiment_id]
+    if record_form == "bench.cell_material_and_liner":
+        bench = replace(
+            bench,
+            cell_materials=None,
+            cell_material_and_liner=Located(State.of("Mo"), inference=inference),
+        )
+    elif record_form == "experiment.apparatus.cell_material_and_liner":
+        bench = replace(bench, cell_materials=None)
+        experiment = replace(
+            experiment,
+            apparatus=Apparatus(
+                cell_material_and_liner=Located(State.of("Mo"), inference=inference)
+            ),
+        )
+
+    notices = _cell_apparatus_inference_notices(reference, experiment, bench)
+    notice = next(item for item in notices if item.kind is NoticeKind.CELL_MATERIAL_INFERRED)
+    assert json.loads(notice.reason.partition(":")[2])["field"] == record_form
+
+
+def test_real_stolyarova_cell_passes_mo_gate_and_scores_with_notice(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from simulator.battery.enums import CellMaterial
+    from simulator.battery.score import predict_with_engine
+    from simulator.diagnostic_helpers import binary_pot_battery as battery
+
+    context = _migrated_stolyarova_cell_context(tmp_path)
+    reference = next(
+        item
+        for item in context.observations.values()
+        if isinstance(item.identity, Identity)
+        and quantity_token(item.identity) is Quantity.P_PARTIAL
+        and item.evidence.class_.is_value
+        and item.evidence.class_.value is EvidenceClass.MEASURED_DIRECT
+    )
+    experiment = context.experiments[reference.experiment_id]
+    assert experiment.bench_id is not None
+    bench = context.benches[experiment.bench_id]
+    material = bench.cell_materials[0]
+    assert material.state.value is CellMaterial.MO
+    assert material.inference is not None
+    assert material.inference.relation == "extract_inference"
+    assert material.inference.inputs[0] == "inferred=true"
+
+    # Stolyarova does not publish orifice geometry. Supply valid test geometry
+    # so this integration case reaches prediction and residual scoring.
+    ordinary_kems = F.kems_experiment(
+        experiment.experiment_id, experiment.work_id or "work-1"
+    )
+    experiment = replace(
+        experiment,
+        apparatus=ordinary_kems.apparatus,
+        pressure_environment=ordinary_kems.pressure_environment,
+    )
+    engine_handle = battery.EngineHandle(
+        name=Engine.OPENIMCC.value,
+        backend=object(),
+        available=True,
+        unavailable_reason=None,
+        takes_fo2=False,
+        supports_intrinsic_fo2=True,
+        identity={"version": "test"},
+    )
+    prediction_inputs = []
+
+    def fake_equilibrate(_handle, pot, *, temperature_K, po2, **_kwargs):
+        prediction_inputs.append(po2)
+        return battery.EquilibrateCell(
+            pot_id=pot.pot_id,
+            engine=Engine.OPENIMCC.value,
+            temperature_K=temperature_K,
+            po2=po2,
+            status="ok",
+            refusal_reason=None,
+            engine_status="ok",
+            engine_reason=None,
+            melt_activities={},
+            gas_partial_pressures_Pa={
+                reference.identity.species.formula: float(reference.value.point)
+            },
+            liquid_fraction=1.0,
+            wall_s=0.0,
+            cpu_s=0.0,
+            hostname="test",
+        )
+
+    monkeypatch.setattr(battery, "open_battery_engine", lambda _name: engine_handle)
+    monkeypatch.setattr(battery, "equilibrate_cell", fake_equilibrate)
+    prediction = predict_with_engine(
+        Engine.OPENIMCC,
+        reference,
+        experiment=experiment,
+        bench=bench,
+    )
+    assert len(prediction_inputs) == 1
+    assert prediction_inputs[0].cell_material == "Mo"
+
+    # This legacy extract leaves several identity axes unresolved. Use a typed
+    # KEMS scoring identity for the residual while keeping the migrated row id,
+    # measured value, and inferred bench unchanged.
+    reference = replace(
+        reference,
+        identity=replace(
+            _partial_identity(),
+            species=Species("K", Phase.G),
+            temperature_K=reference.identity.temperature_K,
+            total_pressure_Pa=State.of(Decimal("1e-6")),
+        ),
+        point_conditions={
+            **(reference.point_conditions or {}),
+            "fO2_Pa": Located(
+                State.of(Decimal("1e-8")),
+                locator=F.loc(page=18, paragraph="Results"),
+                inference=Derivation(
+                    relation="inferred fO2 from oxygen balance",
+                    inputs=("printed oxygen-bearing species",),
+                    parameters=(),
+                    output_unit="Pa",
+                ),
+            ),
+        },
+    )
+    prediction = replace(prediction, identity=reference.identity)
+
+    context = replace(
+        context,
+        experiments={**context.experiments, experiment.experiment_id: experiment},
+    )
+    band = DecisionBand(Decimal("0.2"), "dimensionless", "clean KEMS band")
+    residual, _ = compile_residual(
+        reference,
+        Engine.OPENIMCC,
+        context=context,
+        prediction=prediction,
+        derived_band=band,
+    )
+    assert residual.status is ResidualStatus.MATCH
+    assert residual.numeric is not None
+    assert residual.numeric.decision_band == band
+    assert residual.score_eligible is False
+    assert any(
+        item.kind is NoticeKind.CELL_MATERIAL_INFERRED
+        for item in residual.notices
+    )
+    strata = flagged_stratum_payloads(
+        (residual_to_plain(residual),), (Engine.OPENIMCC,)
+    )
+    assert strata[0]["stratum"] == "cell-material-inferred"
+
+
+def test_stolyarova_rows_do_not_move_any_kems_band_path(tmp_path: Path) -> None:
+    from simulator.battery.enums import BenchIdentityBasis, CellMaterial
+    from simulator.battery.records import Bench, BenchIdentity
+    from simulator.battery.score import _derive_kems_partial_pressure_band
+
+    context = _migrated_stolyarova_cell_context(tmp_path)
+    flagged = next(
+        item
+        for item in context.observations.values()
+        if isinstance(item.identity, Identity)
+        and quantity_token(item.identity) is Quantity.P_PARTIAL
+        and item.evidence.class_.is_value
+        and item.evidence.class_.value is EvidenceClass.MEASURED_DIRECT
+    )
+    flagged_experiment = context.experiments[flagged.experiment_id]
+    flagged_bench = context.benches[flagged_experiment.bench_id]
+
+    ordinary_kems = F.kems_experiment(
+        "stolyarova-clean-kems", flagged_experiment.work_id or "work-1"
+    )
+    clean_bench = Bench(
+        id="stolyarova-clean-pt",
+        work_id=ordinary_kems.work_id or "work-1",
+        identity=BenchIdentity(BenchIdentityBasis.DESCRIBED_IN_THIS_WORK),
+        cell_materials=(F.located(CellMaterial.PT),),
+    )
+    clean_experiment = replace(ordinary_kems, bench_id=clean_bench.id)
+    band_identity = replace(
+        flagged.identity,
+        species=replace(flagged.identity.species, phase=State.of(Phase.G)),
+        composition=_partial_identity().composition,
+    )
+    clean_rows = tuple(
+        replace(
+            flagged,
+            observation_id=f"stolyarova-clean-{index}",
+            experiment_id=clean_experiment.experiment_id,
+            source_id="stolyarova-clean-test",
+            identity=band_identity,
+            value=Value.point_of(value),
+            notices=(),
+        )
+        for index, value in enumerate((Decimal("1e-4"), Decimal("2e-4")))
+    )
+    clean = {row.observation_id: row for row in clean_rows}
+    experiments = {
+        flagged_experiment.experiment_id: flagged_experiment,
+        clean_experiment.experiment_id: clean_experiment,
+    }
+    benches = {flagged_bench.id: flagged_bench, clean_bench.id: clean_bench}
+
+    printed_clean = {
+        row.observation_id: replace(
+            row,
+            uncertainty=Uncertainty(
+                UncertaintyKind.PRINTED,
+                verbatim="10% pressure error",
+            ),
+        )
+        for row in clean_rows
+    }
+    printed_flagged = replace(
+        flagged,
+        uncertainty=Uncertainty(
+            UncertaintyKind.PRINTED,
+            verbatim="80% pressure error",
+        ),
+    )
+    printed_flagged_replica = replace(
+        printed_flagged,
+        observation_id="stolyarova-inferred-printed-replica",
+        value=Value.point_of(Decimal("1e-2")),
+    )
+    printed_mixed = {
+        **printed_clean,
+        printed_flagged.observation_id: printed_flagged,
+        printed_flagged_replica.observation_id: printed_flagged_replica,
+    }
+    printed_baseline = _derive_kems_partial_pressure_band(
+        printed_clean, experiments, {clean_bench.id: clean_bench}
+    )
+    printed_mixed_band = _derive_kems_partial_pressure_band(
+        printed_mixed, experiments, benches
+    )
+    assert printed_baseline is not None
+    assert "printed pressure envelope" in printed_baseline.rule
+    assert printed_mixed_band == printed_baseline
+
+    flagged_replica = replace(
+        flagged,
+        observation_id="stolyarova-inferred-replicate",
+        identity=band_identity,
+        value=Value.point_of(Decimal("1e-2")),
+    )
+    replicate_flagged = replace(flagged, identity=band_identity)
+    replicate_mixed = {
+        **clean,
+        flagged.observation_id: replicate_flagged,
+        flagged_replica.observation_id: flagged_replica,
+    }
+    replicate_baseline = _derive_kems_partial_pressure_band(
+        clean, experiments, {clean_bench.id: clean_bench}
+    )
+    replicate_mixed_band = _derive_kems_partial_pressure_band(
+        replicate_mixed, experiments, benches
+    )
+    assert replicate_baseline is not None
+    assert "replicate scatter" in replicate_baseline.rule
+    assert replicate_mixed_band == replicate_baseline
+    assert derive_kems_partial_pressure_band(
+        replicate_mixed, experiments, benches=benches
+    ) == replicate_baseline
+
+
+def test_inferred_mo_cell_scores_and_is_visible_on_residual_row() -> None:
+    from simulator.battery.enums import CellMaterial
+
+    inference = Derivation(
+        relation="inferred from printed Mo oxide ions",
+        inputs=("Mo+;MoO+;MoO2+;MoO3+",),
+        parameters=(),
+        output_unit="cell material",
+    )
+    reference, context, bench, prediction = _cell_material_score_case(
+        CellMaterial.MO, inference
+    )
+    clean_exp = replace(
+        context.experiments[reference.experiment_id],
+        experiment_id="clean-for-score",
+        bench_id="clean-pt",
+    )
+    clean_rows = tuple(
+        replace(
+            reference,
+            observation_id=f"clean-for-score-{index}",
+            experiment_id=clean_exp.experiment_id,
+            value=Value.point_of(value),
+        )
+        for index, value in enumerate((Decimal("1e-6"), Decimal("2e-6")))
+    )
+    clean_bench = replace(
+        bench,
+        id="clean-pt",
+        cell_materials=(F.located(CellMaterial.PT),),
+    )
+    context = replace(
+        context,
+        observations={
+            **context.observations,
+            **{row.observation_id: row for row in clean_rows},
+        },
+        experiments={**context.experiments, clean_exp.experiment_id: clean_exp},
+        benches={**context.benches, clean_bench.id: clean_bench},
+    )
+
+    residual, _candidate = compile_residual(
+        reference,
+        Engine.OPENIMCC,
+        context=context,
+        predict=prediction,
+    )
+
+    assert residual.status is ResidualStatus.MATCH
+    assert residual.numeric is not None
+    assert residual.numeric.decision_band is not None
+    assert residual.score_eligible is False
+    assert "not_flagged_stratum" in residual.exclusions
+    notice = next(
+        item for item in residual.notices
+        if item.kind is NoticeKind.CELL_MATERIAL_INFERRED
+    )
+    payload = residual_to_plain(residual)
+    serialized_notice = next(
+        item for item in payload["notices"]
+        if item["kind"] == NoticeKind.CELL_MATERIAL_INFERRED.value
+    )
+    evidence = json.loads(notice.reason.partition(":")[2])
+    assert evidence["field"] == "bench.cell_materials[0]"
+    assert evidence["inference"]["relation"] == "inferred from printed Mo oxide ions"
+    assert evidence["locator"]["page"] == 18
+    assert serialized_notice["reason"] == notice.reason
+    from simulator.battery.score import flagged_stratum_payloads
+
+    report_strata = flagged_stratum_payloads((payload,), (Engine.OPENIMCC,))
+    assert report_strata == [
+        {
+            "stratum": "cell-material-inferred",
+            "rail": Rail.VAPOUR.value,
+            "engine": Engine.OPENIMCC.value,
+            "n": 1,
+            "median_dex": "0",
+            "rms_dex": "0",
+        }
+    ]
+    from simulator.battery.score import _derive_kems_partial_pressure_band
+
+    assert _derive_kems_partial_pressure_band(
+        context.observations, context.experiments, context.benches
+    ) == residual.numeric.decision_band
+
+
+def test_inferred_cell_replicates_do_not_move_fallback_band() -> None:
+    from simulator.battery.enums import CellMaterial
+    from simulator.battery.score import _derive_kems_partial_pressure_band
+
+    inference = Derivation(
+        relation="inferred from printed Mo oxide ions",
+        inputs=("Mo+;MoO+;MoO2+;MoO3+",),
+        parameters=(),
+        output_unit="cell material",
+    )
+    flagged, flagged_context, flagged_bench, _ = _cell_material_score_case(
+        CellMaterial.MO, inference
+    )
+    flagged_exp = flagged_context.experiments[flagged.experiment_id]
+    flagged_replica = replace(
+        flagged,
+        observation_id="inferred-replica",
+        value=Value.point_of(Decimal("1e-3")),
+    )
+
+    clean_exp = replace(flagged_exp, experiment_id="clean-kems", bench_id="clean-cell")
+    clean = replace(
+        flagged,
+        observation_id="clean-row",
+        experiment_id=clean_exp.experiment_id,
+        value=Value.point_of(Decimal("1e-6")),
+    )
+    clean_replica = replace(
+        clean,
+        observation_id="clean-replica",
+        value=Value.point_of(Decimal("2e-6")),
+    )
+    clean_bench = replace(
+        flagged_bench,
+        id="clean-cell",
+        cell_materials=(F.located(CellMaterial.PT),),
+    )
+    experiments = {
+        flagged_exp.experiment_id: flagged_exp,
+        clean_exp.experiment_id: clean_exp,
+    }
+    clean_rows = {row.observation_id: row for row in (clean, clean_replica)}
+    mixed_rows = {
+        row.observation_id: row
+        for row in (clean, clean_replica, flagged, flagged_replica)
+    }
+
+    clean_band = _derive_kems_partial_pressure_band(
+        clean_rows, experiments, {clean_bench.id: clean_bench}
+    )
+    mixed_band = _derive_kems_partial_pressure_band(
+        mixed_rows,
+        experiments,
+        {clean_bench.id: clean_bench, flagged_bench.id: flagged_bench},
+    )
+    assert clean_band is not None
+    assert mixed_band == clean_band
+    # The public helper must receive the same bench map as scoring so it can
+    # exclude inferred cell materials itself.
+    from simulator.battery.score import (
+        derive_kems_partial_pressure_band,
+        decision_band_for,
+    )
+
+    inferred_only = {
+        row.observation_id: row for row in (flagged, flagged_replica)
+    }
+    assert derive_kems_partial_pressure_band(
+        inferred_only, {flagged_exp.experiment_id: flagged_exp}
+    ) is not None
+    assert derive_kems_partial_pressure_band(
+        inferred_only,
+        {flagged_exp.experiment_id: flagged_exp},
+        benches={flagged_bench.id: flagged_bench},
+    ) is None
+    assert _derive_kems_partial_pressure_band(
+        inferred_only,
+        {flagged_exp.experiment_id: flagged_exp},
+        {flagged_bench.id: flagged_bench},
+    ) is None
+    assert decision_band_for(
+        Quantity.P_PARTIAL,
+        SourceRelation.INDEPENDENT,
+        rail=Rail.VAPOUR,
+        method=MethodToken.KNUDSEN_EFFUSION,
+        observations=inferred_only,
+        experiments={flagged_exp.experiment_id: flagged_exp},
+        derived_band=None,
+    ) is None
+
+
+@pytest.mark.parametrize(
+    "relation", ("mm_to_m", "cm_to_m", "identity:m", "extract_inference")
+)
+@pytest.mark.parametrize("field", ("orifice_area_m2", "orifice_diameter_m"))
+def test_derived_apparatus_convenience_value_does_not_raise_inference_notice(
+    relation: str,
+    field: str,
+) -> None:
+    from simulator.battery.records import ApparatusGeometry
+    from simulator.battery.score import _cell_apparatus_inference_notices
+
+    reference = F.observation(
+        "converted-orifice",
+        "converted-kems",
+        _partial_identity(),
+        Decimal("1e-6"),
+    )
+    conversion = Derivation(
+        relation=relation,
+        inputs=("printed orifice geometry",),
+        parameters=(),
+        output_unit="m" if field == "orifice_diameter_m" else "m2",
+    )
+    area = replace(F.located(Decimal("1e-6")), inference=conversion)
+    experiment = replace(
+        F.kems_experiment("converted-kems"),
+        apparatus=replace(
+            F.kems_experiment("converted-kems").apparatus,
+            geometry=ApparatusGeometry(**{field: area}),
+        ),
+    )
+    assert _cell_apparatus_inference_notices(reference, experiment, None) == ()
+
+
+def test_noninferred_cell_material_has_no_inference_notice() -> None:
+    from simulator.battery.enums import CellMaterial
+
+    reference, context, _bench, prediction = _cell_material_score_case(
+        CellMaterial.MO, None
+    )
+
+    residual, _candidate = compile_residual(
+        reference,
+        Engine.OPENIMCC,
+        context=context,
+        predict=prediction,
+    )
+
+    assert residual.status is not ResidualStatus.REFUSED
+    assert residual.numeric is not None
+    assert not any(
+        item.kind is NoticeKind.CELL_MATERIAL_INFERRED
+        for item in residual.notices
+    )
+
+
+def test_derived_effusion_knudsen_number_does_not_raise_apparatus_notice() -> None:
+    from simulator.battery.enums import CellMaterial
+
+    reference, context, _bench, prediction = _cell_material_score_case(
+        CellMaterial.MO, None
+    )
+    inference = Derivation(
+        relation="inferred orifice Knudsen number",
+        inputs=("printed free-molecular description",),
+        parameters=(),
+        output_unit="dimensionless",
+    )
+    experiment = context.experiments[reference.experiment_id]
+    regime = replace(
+        experiment.pressure_environment.regime,
+        knudsen_number_orifice=Located(
+            State.of(Value.point_of(Decimal("20"))),
+            locator=F.loc(page=18, paragraph="Results"),
+            inference=inference,
+        ),
+    )
+    experiment = replace(
+        experiment,
+        pressure_environment=replace(experiment.pressure_environment, regime=regime),
+    )
+    context = replace(context, experiments={experiment.experiment_id: experiment})
+
+    residual, _candidate = compile_residual(
+        reference,
+        Engine.OPENIMCC,
+        context=context,
+        predict=prediction,
+    )
+
+    assert not any(
+        item.kind is NoticeKind.CELL_MATERIAL_INFERRED
+        for item in residual.notices
+    )
+
+
+def test_inferred_nonmodelled_cell_still_refuses_oxygen_balance() -> None:
+    from simulator.battery.enums import CellMaterial
+
+    reference, context, _bench, _prediction = _cell_material_score_case(
+        CellMaterial.TA,
+        Derivation(
+            relation="inferred tantalum cell",
+            inputs=("printed Ta ion",),
+            parameters=(),
+            output_unit="cell material",
+        ),
+    )
+
+    residual, _candidate = compile_residual(
+        reference,
+        Engine.OPENIMCC,
+        context=context,
+    )
+
+    assert residual.status is ResidualStatus.REFUSED
+    assert residual.refusal is not None
+    assert residual.refusal.detail.get("reason") == "reactive_cell_oxygen_reservoir"
+    assert any(
+        item.kind is NoticeKind.CELL_MATERIAL_INFERRED
+        for item in residual.notices
+    )
+
+
+def test_score_store_refuses_synthetic_unknown_reference_activity_point() -> None:
+    work = F.work("unknown-activity-reference-fixture")
+    experiment = F.tabulation_experiment(
+        "unknown-activity-reference-experiment", work.work_id
+    )
+    identity = replace(
+        F.activity_identity(formula="CaO"),
+        reference_state=State.unknown("source reference state not printed"),
+    )
+    observation = F.observation(
+        "unknown-activity-reference-fixture::activity",
+        experiment.experiment_id,
+        identity,
+        Decimal("0.42"),
+        source_id=work.work_id,
+    )
+    observation = replace(
+        observation,
+        evidence=replace(
+            observation.evidence,
+            class_=State.unknown("method class not established"),
+        ),
+    )
+    context = _context(work, experiment, observation)
+
+    def no_prediction(*args, **kwargs):
+        pytest.fail("unknown activity reference state must refuse before prediction")
+
+    residuals, _ = score_store(
+        context,
+        engines=(Engine.INTERNAL_ANALYTICAL,),
+        include_diagnostics=True,
+        predict=no_prediction,
+    )
+
+    assert len(residuals) == 1
+    residual = residuals[0]
+    assert residual.reference == observation.observation_id
+    assert residual.status is ResidualStatus.REFUSED
+    assert residual.refusal is not None
+    assert residual.refusal.reason is RefusalReason.IDENTITY_UNKNOWN
+    assert residual.refusal.detail["reason"] == "activity_reference_state_unknown"
+    assert residual.refusal.detail["fields"] == ["reference_state"]
+
+
+def test_score_store_refuses_categorical_stolyarova_figure_only_row() -> None:
+    source_id = "stolyarova-1996-cao-alumina-silica-kems"
+    context = load_score_context(sources=(source_id,))
+    figure_row = next(
+        obs
+        for obs in context.observations.values()
+        if obs.source_id == source_id and obs.value.kind is ValueKind.CATEGORICAL
+    )
+    figure_context = replace(
+        context,
+        observations={figure_row.observation_id: figure_row},
+        origins={
+            figure_row.observation_id: context.origins[figure_row.observation_id]
+        }
+        if figure_row.observation_id in context.origins
+        else {},
+    )
+    residuals, _ = score_store(
+        figure_context,
+        engines=(Engine.INTERNAL_ANALYTICAL,),
+        include_diagnostics=True,
+    )
+
+    assert len(residuals) == 1
+    refusal = residuals[0].refusal
+    assert refusal is not None
+    assert refusal.reason is RefusalReason.IDENTITY_UNKNOWN
+    assert "figure_only" in refusal.detail["quantity_reason"]
+    assert refusal.detail["value_kind"] == ValueKind.CATEGORICAL.value
+
+
+def test_score_store_records_each_in_scope_observation_in_small_fixture() -> None:
+    work = F.work("score-drop-fixture")
+    experiment = F.tabulation_experiment(
+        "score-drop-fixture-experiment", work.work_id
+    )
+    activity_identity = replace(
+        F.activity_identity(formula="CaO"),
+        reference_state=State.unknown("source reference state not printed"),
+    )
+    activity = F.observation(
+        "score-drop-fixture::activity",
+        experiment.experiment_id,
+        activity_identity,
+        Decimal("0.42"),
+        evidence=EvidenceClass.MEASURED_REDUCED,
+        source_id=work.work_id,
+    )
+    activity = replace(
+        activity,
+        evidence=replace(
+            activity.evidence,
+            class_=State.unknown("unmapped method_class measured_reduced"),
+        ),
+    )
+    figure_identity = replace(
+        activity_identity,
+        quantity=State.unknown("unsupported quantity 'CaO_activity_figure_only'"),
+    )
+    figure = F.observation(
+        "score-drop-fixture::figure-only",
+        experiment.experiment_id,
+        figure_identity,
+        Decimal("0"),
+        evidence=EvidenceClass.FIGURE_ONLY,
+        admission=AdmissionStatus.REJECTED,
+        source_id=work.work_id,
+    )
+    figure = replace(
+        figure,
+        value=Value(
+            kind=ValueKind.CATEGORICAL,
+            categorical="bound_not_point_ordering",
+        ),
+    )
+    context = _context(work, experiment, activity, figure)
+
+    def no_prediction(*args, **kwargs):
+        pytest.fail("fixture observations must refuse before prediction")
+
+    residuals, _ = score_store(
+        context,
+        engines=(Engine.INTERNAL_ANALYTICAL,),
+        include_diagnostics=True,
+        predict=no_prediction,
+    )
+
+    records_by_reference = Counter(row.reference for row in residuals)
+    assert records_by_reference.keys() == {activity.observation_id, figure.observation_id}
+    assert all(records_by_reference[obs.observation_id] >= 1 for obs in (activity, figure))

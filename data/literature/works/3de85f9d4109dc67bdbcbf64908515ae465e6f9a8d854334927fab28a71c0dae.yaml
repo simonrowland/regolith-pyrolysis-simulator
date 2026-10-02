@@ -33,24 +33,51 @@ experiments:
     total_pressure_Pa:
       state:
         tag: unknown
-        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
-          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
-          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
-          / P_test_Torr in this extract
+        reason: not_published
+      locator:
+        published_page: 686
+        pdf_page_index: 0
+        section: Experimental
+        note: 'not printed in this paper: the experimental description and Tables 1–3 report no background or residual pressure.'
     sweep_gas:
       state:
         tag: unknown
-        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+        reason: not_published
+      locator:
+        published_page: 686
+        pdf_page_index: 0
+        section: Experimental
+        note: 'not printed in this paper: no sweep gas is stated.'
     regime:
       regime_class:
         tag: unknown
-        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+        reason: not_published
   work_id: 3de85f9d4109dc67bdbcbf64908515ae465e6f9a8d854334927fab28a71c0dae
   locator:
     published_page: 687
     pdf_page_index: 1
     section: Experimental
     note: Knudsen effusion mass spectrometry; vaporization-area/orifice-area ratio 100:1.
+  apparatus:
+    calibration:
+      method:
+        state:
+          tag: value
+          value: ion-current comparison method
+        locator:
+          published_page: 688
+          pdf_page_index: 2
+          section: Results and discussion
+          note: The paper says "ion current comparison method".
+      reference_substance:
+        state:
+          tag: value
+          value: silver vapor
+        locator:
+          published_page: 688
+          pdf_page_index: 2
+          section: Results and discussion
+          note: The paper says "silver vapor ... a standard" for the measurements.
   bench_id: 3de85f9d4109dc67bdbcbf64908515ae465e6f9a8d854334927fab28a71c0dae::bench::stolyarova-1995-molybdenum-cell
 - experiment_id: 3de85f9d4109dc67bdbcbf64908515ae465e6f9a8d854334927fab28a71c0dae::stolyarova-1995-cao-alumina-kems
   kind: literature
@@ -93,11 +120,13 @@ benches:
   apparatus_family:
     state:
       tag: value
-      value: Knudsen-cell mass spectrometry
+      value: magnetic mass spectrometer model MI 1201
     locator:
-      published_page: 687
-      pdf_page_index: 1
+      published_page: 686
+      pdf_page_index: 0
       section: Experimental
+      note: The paper says "model MI 1201" and cites Drowart, Exsteen, and Verhaegen (1965), reference 37, for standard methods;
+        no apparatus numbers are imported from that citation.
   cell_material_and_liner:
     state:
       tag: value
@@ -106,7 +135,7 @@ benches:
       published_page: 687
       pdf_page_index: 1
       table: '1'
-      note: Present-study column identifies the effusion cell as Mo; no separate orifice material is stated.
+      note: Present-study column prints "Mo" for the effusion cell; no separate orifice material is stated.
   cell_materials:
   - state:
       tag: value
@@ -115,8 +144,17 @@ benches:
       published_page: 687
       pdf_page_index: 1
       table: '1'
-      note: Present-study column, row “Material of effusion cell”.
+      note: Present-study column, row "Material of effusion cell"; the printed value is "Mo".
   geometry:
+    orifice_diameter_m:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 687
+        pdf_page_index: 1
+        section: Experimental
+        note: 'not printed in this paper: the printed geometry is an area ratio; the orifice diameter is not stated.'
     orifice_to_sample_area_ratio:
       state:
         tag: value
@@ -128,6 +166,15 @@ benches:
         published_page: 687
         pdf_page_index: 1
         section: Experimental
-        note: Printed vaporization-area/orifice-area ratio is 100:1; typed orifice/sample ratio is its reciprocal, 1:100 =
-          0.01.
+        note: The paper prints "100:1" for vaporization-area/effusion-orifice area; typed orifice/sample ratio is the reciprocal,
+          1:100 = 0.01.
+    orifice_channel_length_m:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 687
+        pdf_page_index: 1
+        section: Experimental
+        note: 'not printed in this paper: no orifice channel length is stated.'
   other_facts: []
