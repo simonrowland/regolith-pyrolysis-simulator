@@ -4400,6 +4400,7 @@ species:
             CaO: 2.53
             locator:
               published_page: 113
+              pdf_page_index: 3
               table: '1'
               note: Table 1 row (1) Ave.; regarded as the starting composition in the experiments
           sample_form:
@@ -6814,6 +6815,7 @@ species:
       locator:
         published_page: 116
         table: '3'
+        pdf_page_index: 6
         note: Run-mapped Fe Table 3 observation for printed physical charge C3 (2).
       phase: silicate_melt_FCMAS_solar_abundance
       condensed_form:
@@ -6827,6 +6829,10 @@ species:
       values:
         <<: *hashimoto_1983_lab_harvest
         quantity: residue_composition_vs_time
+        admission_status: admitted
+        composition_derivation: >-
+          Table 1 row (1) Ave. prints the starting oxide composition in wt%.
+          Observation identity mole fractions use the declared wt_pct_to_mole_fraction conversion.
         method_class: measured_direct
         semantics: composition_table_not_species_rate
         system_class: silicate_melt
@@ -6844,6 +6850,28 @@ species:
           T_C: 1700
           T_K: 1973.15
           t_min: 16.7
+          point_conditions:
+            temperature_K:
+              state: {tag: value, value: '1973.15'}
+              locator:
+                published_page: 114
+                pdf_page_index: 4
+                table: '2'
+                note: "Table 2 prints 1700 deg C; T_K = T_C + 273.15 = 1973.15 K."
+            time_min:
+              state: {tag: value, value: '16.7'}
+              locator:
+                published_page: 114
+                pdf_page_index: 4
+                table: '2'
+                note: "Table 2 row for run 17C3 prints 16.7 min."
+            VF_wt_pct:
+              state: {tag: value, value: '10.8'}
+              locator:
+                published_page: 116
+                pdf_page_index: 6
+                table: '3'
+                note: "Table 3 row C3 (2) prints VF = 10.8 wt %."
           VF_wt_pct: 10.8
           splash: 'no'
           composition_status: measured
@@ -7007,6 +7035,7 @@ species:
       locator:
         published_page: 116
         table: '3'
+        pdf_page_index: 6
         note: Run-mapped Fe Table 3 observation for printed physical charge C5 (1).
       phase: silicate_melt_FCMAS_solar_abundance
       condensed_form:
@@ -7020,6 +7049,10 @@ species:
       values:
         <<: *hashimoto_1983_lab_harvest
         quantity: residue_composition_vs_time
+        admission_status: admitted
+        composition_derivation: >-
+          Table 1 row (1) Ave. prints the starting oxide composition in wt%.
+          Observation identity mole fractions use the declared wt_pct_to_mole_fraction conversion.
         method_class: measured_direct
         semantics: composition_table_not_species_rate
         system_class: silicate_melt
@@ -7037,6 +7070,28 @@ species:
           T_C: 1700
           T_K: 1973.15
           t_min: 27.8
+          point_conditions:
+            temperature_K:
+              state: {tag: value, value: '1973.15'}
+              locator:
+                published_page: 114
+                pdf_page_index: 4
+                table: '2'
+                note: "Table 2 prints 1700 deg C; T_K = T_C + 273.15 = 1973.15 K."
+            time_min:
+              state: {tag: value, value: '27.8'}
+              locator:
+                published_page: 114
+                pdf_page_index: 4
+                table: '2'
+                note: "Table 2 row for run 17C5 prints 27.8 min."
+            VF_wt_pct:
+              state: {tag: value, value: '18.6'}
+              locator:
+                published_page: 116
+                pdf_page_index: 6
+                table: '3'
+                note: "Table 3 row C5 (1) prints VF = 18.6 wt %."
           VF_wt_pct: 18.6
           splash: 'no'
           composition_status: measured
@@ -7377,6 +7432,7 @@ species:
       locator:
         published_page: 116
         table: '3'
+        pdf_page_index: 6
         note: Run-mapped Fe Table 3 observation for printed physical charge C5 (3).
       phase: silicate_melt_FCMAS_solar_abundance
       condensed_form:
@@ -7390,6 +7446,10 @@ species:
       values:
         <<: *hashimoto_1983_lab_harvest
         quantity: residue_composition_vs_time
+        admission_status: admitted
+        composition_derivation: >-
+          Table 1 row (1) Ave. prints the starting oxide composition in wt%.
+          Observation identity mole fractions use the declared wt_pct_to_mole_fraction conversion.
         method_class: measured_direct
         semantics: composition_table_not_species_rate
         system_class: silicate_melt
@@ -7407,6 +7467,28 @@ species:
           T_C: 1700
           T_K: 1973.15
           t_min: 27.8
+          point_conditions:
+            temperature_K:
+              state: {tag: value, value: '1973.15'}
+              locator:
+                published_page: 114
+                pdf_page_index: 4
+                table: '2'
+                note: "Table 2 prints 1700 deg C; T_K = T_C + 273.15 = 1973.15 K."
+            time_min:
+              state: {tag: value, value: '27.8'}
+              locator:
+                published_page: 114
+                pdf_page_index: 4
+                table: '2'
+                note: "Table 2 row for run 17C5 prints 27.8 min."
+            VF_wt_pct:
+              state: {tag: value, value: '19.7'}
+              locator:
+                published_page: 116
+                pdf_page_index: 6
+                table: '3'
+                note: "Table 3 row C5 (3) prints VF = 19.7 wt %."
           VF_wt_pct: 19.7
           splash: 'no'
           composition_status: measured
@@ -7565,6 +7647,7 @@ species:
       locator:
         published_page: 116
         table: '3'
+        pdf_page_index: 6
         note: Run-mapped Fe Table 3 observation for printed physical charge C7.
       phase: silicate_melt_FCMAS_solar_abundance
       condensed_form:
@@ -7578,6 +7661,10 @@ species:
       values:
         <<: *hashimoto_1983_lab_harvest
         quantity: residue_composition_vs_time
+        admission_status: admitted
+        composition_derivation: >-
+          Table 1 row (1) Ave. prints the starting oxide composition in wt%.
+          Observation identity mole fractions use the declared wt_pct_to_mole_fraction conversion.
         method_class: measured_direct
         semantics: composition_table_not_species_rate
         system_class: silicate_melt
@@ -7595,6 +7682,28 @@ species:
           T_C: 1700
           T_K: 1973.15
           t_min: 46.4
+          point_conditions:
+            temperature_K:
+              state: {tag: value, value: '1973.15'}
+              locator:
+                published_page: 114
+                pdf_page_index: 4
+                table: '2'
+                note: "Table 2 prints 1700 deg C; T_K = T_C + 273.15 = 1973.15 K."
+            time_min:
+              state: {tag: value, value: '46.4'}
+              locator:
+                published_page: 114
+                pdf_page_index: 4
+                table: '2'
+                note: "Table 2 row for run 17C7 prints 46.4 min."
+            VF_wt_pct:
+              state: {tag: value, value: '27.2'}
+              locator:
+                published_page: 116
+                pdf_page_index: 6
+                table: '3'
+                note: "Table 3 row C7 prints VF = 27.2 wt %."
           VF_wt_pct: 27.2
           splash: 'no'
           composition_status: measured
@@ -7755,6 +7864,7 @@ species:
       locator:
         published_page: 116
         table: '3'
+        pdf_page_index: 6
         note: Run-mapped Fe Table 3 observation for printed physical charge C9 (2).
       phase: silicate_melt_FCMAS_solar_abundance
       condensed_form:
@@ -7768,6 +7878,10 @@ species:
       values:
         <<: *hashimoto_1983_lab_harvest
         quantity: residue_composition_vs_time
+        admission_status: admitted
+        composition_derivation: >-
+          Table 1 row (1) Ave. prints the starting oxide composition in wt%.
+          Observation identity mole fractions use the declared wt_pct_to_mole_fraction conversion.
         method_class: measured_direct
         semantics: composition_table_not_species_rate
         system_class: silicate_melt
@@ -7785,6 +7899,28 @@ species:
           T_C: 1700
           T_K: 1973.15
           t_min: 77.4
+          point_conditions:
+            temperature_K:
+              state: {tag: value, value: '1973.15'}
+              locator:
+                published_page: 114
+                pdf_page_index: 4
+                table: '2'
+                note: "Table 2 prints 1700 deg C; T_K = T_C + 273.15 = 1973.15 K."
+            time_min:
+              state: {tag: value, value: '77.4'}
+              locator:
+                published_page: 114
+                pdf_page_index: 4
+                table: '2'
+                note: "Table 2 row for run 17C9 prints 77.4 min."
+            VF_wt_pct:
+              state: {tag: value, value: '35.5'}
+              locator:
+                published_page: 116
+                pdf_page_index: 6
+                table: '3'
+                note: "Table 3 row C9 (2) prints VF = 35.5 wt %."
           VF_wt_pct: 35.5
           splash: 'no'
           composition_status: measured
@@ -7945,6 +8081,7 @@ species:
       locator:
         published_page: 116
         table: '3'
+        pdf_page_index: 6
         note: Run-mapped Fe Table 3 observation for printed physical charge D2.
       phase: silicate_melt_FCMAS_solar_abundance
       condensed_form:
@@ -7958,6 +8095,10 @@ species:
       values:
         <<: *hashimoto_1983_lab_harvest
         quantity: residue_composition_vs_time
+        admission_status: admitted
+        composition_derivation: >-
+          Table 1 row (1) Ave. prints the starting oxide composition in wt%.
+          Observation identity mole fractions use the declared wt_pct_to_mole_fraction conversion.
         method_class: measured_direct
         semantics: composition_table_not_species_rate
         system_class: silicate_melt
@@ -7975,6 +8116,28 @@ species:
           T_C: 1700
           T_K: 1973.15
           t_min: 129.0
+          point_conditions:
+            temperature_K:
+              state: {tag: value, value: '1973.15'}
+              locator:
+                published_page: 114
+                pdf_page_index: 4
+                table: '2'
+                note: "Table 2 prints 1700 deg C; T_K = T_C + 273.15 = 1973.15 K."
+            time_min:
+              state: {tag: value, value: '129.0'}
+              locator:
+                published_page: 114
+                pdf_page_index: 4
+                table: '2'
+                note: "Table 2 row for run 17D2 prints 129.0 min."
+            VF_wt_pct:
+              state: {tag: value, value: '43.3'}
+              locator:
+                published_page: 116
+                pdf_page_index: 6
+                table: '3'
+                note: "Table 3 row D2 prints VF = 43.3 wt %."
           VF_wt_pct: 43.3
           splash: 'no'
           composition_status: measured
@@ -8315,6 +8478,7 @@ species:
       locator:
         published_page: 116
         table: '3'
+        pdf_page_index: 6
         note: Run-mapped Fe Table 3 observation for printed physical charge B6 (2).
       phase: silicate_melt_FCMAS_solar_abundance
       condensed_form:
@@ -8328,6 +8492,10 @@ species:
       values:
         <<: *hashimoto_1983_lab_harvest
         quantity: residue_composition_vs_time
+        admission_status: admitted
+        composition_derivation: >-
+          Table 1 row (1) Ave. prints the starting oxide composition in wt%.
+          Observation identity mole fractions use the declared wt_pct_to_mole_fraction conversion.
         method_class: measured_direct
         semantics: composition_table_not_species_rate
         system_class: silicate_melt
@@ -8345,6 +8513,28 @@ species:
           T_C: 1800
           T_K: 2073.15
           t_min: 3.59
+          point_conditions:
+            temperature_K:
+              state: {tag: value, value: '2073.15'}
+              locator:
+                published_page: 114
+                pdf_page_index: 4
+                table: '2'
+                note: "Table 2 prints 1800 deg C; T_K = T_C + 273.15 = 2073.15 K."
+            time_min:
+              state: {tag: value, value: '3.59'}
+              locator:
+                published_page: 114
+                pdf_page_index: 4
+                table: '2'
+                note: "Table 2 row for run 18B6 prints 3.59 min."
+            VF_wt_pct:
+              state: {tag: value, value: '12.3'}
+              locator:
+                published_page: 116
+                pdf_page_index: 6
+                table: '3'
+                note: "Table 3 row B6 (2) prints VF = 12.3 wt %."
           VF_wt_pct: 12.3
           splash: 'no'
           composition_status: measured
@@ -8503,6 +8693,7 @@ species:
       locator:
         published_page: 116
         table: '3'
+        pdf_page_index: 6
         note: Run-mapped Fe Table 3 observation for printed physical charge B8 (1).
       phase: silicate_melt_FCMAS_solar_abundance
       condensed_form:
@@ -8516,6 +8707,10 @@ species:
       values:
         <<: *hashimoto_1983_lab_harvest
         quantity: residue_composition_vs_time
+        admission_status: admitted
+        composition_derivation: >-
+          Table 1 row (1) Ave. prints the starting oxide composition in wt%.
+          Observation identity mole fractions use the declared wt_pct_to_mole_fraction conversion.
         method_class: measured_direct
         semantics: composition_table_not_species_rate
         system_class: silicate_melt
@@ -8533,6 +8728,28 @@ species:
           T_C: 1800
           T_K: 2073.15
           t_min: 5.99
+          point_conditions:
+            temperature_K:
+              state: {tag: value, value: '2073.15'}
+              locator:
+                published_page: 114
+                pdf_page_index: 4
+                table: '2'
+                note: "Table 2 prints 1800 deg C; T_K = T_C + 273.15 = 2073.15 K."
+            time_min:
+              state: {tag: value, value: '5.99'}
+              locator:
+                published_page: 114
+                pdf_page_index: 4
+                table: '2'
+                note: "Table 2 row for run 18B8 prints 5.99 min."
+            VF_wt_pct:
+              state: {tag: value, value: '17.2'}
+              locator:
+                published_page: 116
+                pdf_page_index: 6
+                table: '3'
+                note: "Table 3 row B8 (1) prints VF = 17.2 wt %."
           VF_wt_pct: 17.2
           splash: 'no'
           composition_status: measured
@@ -8693,6 +8910,7 @@ species:
       locator:
         published_page: 116
         table: '3'
+        pdf_page_index: 6
         note: Run-mapped Fe Table 3 observation for printed physical charge B8 (2).
       phase: silicate_melt_FCMAS_solar_abundance
       condensed_form:
@@ -8706,6 +8924,10 @@ species:
       values:
         <<: *hashimoto_1983_lab_harvest
         quantity: residue_composition_vs_time
+        admission_status: admitted
+        composition_derivation: >-
+          Table 1 row (1) Ave. prints the starting oxide composition in wt%.
+          Observation identity mole fractions use the declared wt_pct_to_mole_fraction conversion.
         method_class: measured_direct
         semantics: composition_table_not_species_rate
         system_class: silicate_melt
@@ -8723,6 +8945,28 @@ species:
           T_C: 1800
           T_K: 2073.15
           t_min: 5.99
+          point_conditions:
+            temperature_K:
+              state: {tag: value, value: '2073.15'}
+              locator:
+                published_page: 114
+                pdf_page_index: 4
+                table: '2'
+                note: "Table 2 prints 1800 deg C; T_K = T_C + 273.15 = 2073.15 K."
+            time_min:
+              state: {tag: value, value: '5.99'}
+              locator:
+                published_page: 114
+                pdf_page_index: 4
+                table: '2'
+                note: "Table 2 row for run 18B8 prints 5.99 min."
+            VF_wt_pct:
+              state: {tag: value, value: '15.8'}
+              locator:
+                published_page: 116
+                pdf_page_index: 6
+                table: '3'
+                note: "Table 3 row B8 (2) prints VF = 15.8 wt %."
           VF_wt_pct: 15.8
           splash: 'no'
           composition_status: measured
@@ -9059,6 +9303,7 @@ species:
       locator:
         published_page: 116
         table: '3'
+        pdf_page_index: 6
         note: Run-mapped Fe Table 3 observation for printed physical charge C1 (1).
       phase: silicate_melt_FCMAS_solar_abundance
       condensed_form:
@@ -9072,6 +9317,10 @@ species:
       values:
         <<: *hashimoto_1983_lab_harvest
         quantity: residue_composition_vs_time
+        admission_status: admitted
+        composition_derivation: >-
+          Table 1 row (1) Ave. prints the starting oxide composition in wt%.
+          Observation identity mole fractions use the declared wt_pct_to_mole_fraction conversion.
         method_class: measured_direct
         semantics: composition_table_not_species_rate
         system_class: silicate_melt
@@ -9089,6 +9338,28 @@ species:
           T_C: 1800
           T_K: 2073.15
           t_min: 10.0
+          point_conditions:
+            temperature_K:
+              state: {tag: value, value: '2073.15'}
+              locator:
+                published_page: 114
+                pdf_page_index: 4
+                table: '2'
+                note: "Table 2 prints 1800 deg C; T_K = T_C + 273.15 = 2073.15 K."
+            time_min:
+              state: {tag: value, value: '10.0'}
+              locator:
+                published_page: 114
+                pdf_page_index: 4
+                table: '2'
+                note: "Table 2 row for run 18C1 prints 10.0 min."
+            VF_wt_pct:
+              state: {tag: value, value: '31.3'}
+              locator:
+                published_page: 116
+                pdf_page_index: 6
+                table: '3'
+                note: "Table 3 row C1 (1) prints VF = 31.3 wt %."
           VF_wt_pct: 31.3
           splash: 'yes'
           composition_status: measured
@@ -9249,6 +9520,7 @@ species:
       locator:
         published_page: 116
         table: '3'
+        pdf_page_index: 6
         note: Run-mapped Fe Table 3 observation for printed physical charge C1 (2).
       phase: silicate_melt_FCMAS_solar_abundance
       condensed_form:
@@ -9262,6 +9534,10 @@ species:
       values:
         <<: *hashimoto_1983_lab_harvest
         quantity: residue_composition_vs_time
+        admission_status: admitted
+        composition_derivation: >-
+          Table 1 row (1) Ave. prints the starting oxide composition in wt%.
+          Observation identity mole fractions use the declared wt_pct_to_mole_fraction conversion.
         method_class: measured_direct
         semantics: composition_table_not_species_rate
         system_class: silicate_melt
@@ -9279,6 +9555,28 @@ species:
           T_C: 1800
           T_K: 2073.15
           t_min: 10.0
+          point_conditions:
+            temperature_K:
+              state: {tag: value, value: '2073.15'}
+              locator:
+                published_page: 114
+                pdf_page_index: 4
+                table: '2'
+                note: "Table 2 prints 1800 deg C; T_K = T_C + 273.15 = 2073.15 K."
+            time_min:
+              state: {tag: value, value: '10.0'}
+              locator:
+                published_page: 114
+                pdf_page_index: 4
+                table: '2'
+                note: "Table 2 row for run 18C1 prints 10.0 min."
+            VF_wt_pct:
+              state: {tag: value, value: '25.0'}
+              locator:
+                published_page: 116
+                pdf_page_index: 6
+                table: '3'
+                note: "Table 3 row C1 (2) prints VF = 25.0 wt %."
           VF_wt_pct: 25.0
           splash: 'no'
           composition_status: measured
@@ -9616,6 +9914,7 @@ species:
       locator:
         published_page: 116
         table: '3'
+        pdf_page_index: 6
         note: Run-mapped Fe Table 3 observation for printed physical charge C3 (1).
       phase: silicate_melt_FCMAS_solar_abundance
       condensed_form:
@@ -9629,6 +9928,10 @@ species:
       values:
         <<: *hashimoto_1983_lab_harvest
         quantity: residue_composition_vs_time
+        admission_status: admitted
+        composition_derivation: >-
+          Table 1 row (1) Ave. prints the starting oxide composition in wt%.
+          Observation identity mole fractions use the declared wt_pct_to_mole_fraction conversion.
         method_class: measured_direct
         semantics: composition_table_not_species_rate
         system_class: silicate_melt
@@ -9646,6 +9949,28 @@ species:
           T_C: 1800
           T_K: 2073.15
           t_min: 16.7
+          point_conditions:
+            temperature_K:
+              state: {tag: value, value: '2073.15'}
+              locator:
+                published_page: 114
+                pdf_page_index: 4
+                table: '2'
+                note: "Table 2 prints 1800 deg C; T_K = T_C + 273.15 = 2073.15 K."
+            time_min:
+              state: {tag: value, value: '16.7'}
+              locator:
+                published_page: 114
+                pdf_page_index: 4
+                table: '2'
+                note: "Table 2 row for run 18C3 prints 16.7 min."
+            VF_wt_pct:
+              state: {tag: value, value: '41.1'}
+              locator:
+                published_page: 116
+                pdf_page_index: 6
+                table: '3'
+                note: "Table 3 row C3 (1) prints VF = 41.1 wt %."
           VF_wt_pct: 41.1
           splash: 'yes'
           composition_status: measured
@@ -9806,6 +10131,7 @@ species:
       locator:
         published_page: 116
         table: '3'
+        pdf_page_index: 6
         note: Run-mapped Fe Table 3 observation for printed physical charge C3 (2).
       phase: silicate_melt_FCMAS_solar_abundance
       condensed_form:
@@ -9819,6 +10145,10 @@ species:
       values:
         <<: *hashimoto_1983_lab_harvest
         quantity: residue_composition_vs_time
+        admission_status: admitted
+        composition_derivation: >-
+          Table 1 row (1) Ave. prints the starting oxide composition in wt%.
+          Observation identity mole fractions use the declared wt_pct_to_mole_fraction conversion.
         method_class: measured_direct
         semantics: composition_table_not_species_rate
         system_class: silicate_melt
@@ -9836,6 +10166,28 @@ species:
           T_C: 1800
           T_K: 2073.15
           t_min: 16.7
+          point_conditions:
+            temperature_K:
+              state: {tag: value, value: '2073.15'}
+              locator:
+                published_page: 114
+                pdf_page_index: 4
+                table: '2'
+                note: "Table 2 prints 1800 deg C; T_K = T_C + 273.15 = 2073.15 K."
+            time_min:
+              state: {tag: value, value: '16.7'}
+              locator:
+                published_page: 114
+                pdf_page_index: 4
+                table: '2'
+                note: "Table 2 row for run 18C3 prints 16.7 min."
+            VF_wt_pct:
+              state: {tag: value, value: '33.1'}
+              locator:
+                published_page: 116
+                pdf_page_index: 6
+                table: '3'
+                note: "Table 3 row C3 (2) prints VF = 33.1 wt %."
           VF_wt_pct: 33.1
           splash: 'no'
           composition_status: measured
@@ -9994,6 +10346,7 @@ species:
       locator:
         published_page: 116
         table: '3'
+        pdf_page_index: 6
         note: Run-mapped Fe Table 3 observation for printed physical charge C3 (3).
       phase: silicate_melt_FCMAS_solar_abundance
       condensed_form:
@@ -10007,6 +10360,10 @@ species:
       values:
         <<: *hashimoto_1983_lab_harvest
         quantity: residue_composition_vs_time
+        admission_status: admitted
+        composition_derivation: >-
+          Table 1 row (1) Ave. prints the starting oxide composition in wt%.
+          Observation identity mole fractions use the declared wt_pct_to_mole_fraction conversion.
         method_class: measured_direct
         semantics: composition_table_not_species_rate
         system_class: silicate_melt
@@ -10024,6 +10381,28 @@ species:
           T_C: 1800
           T_K: 2073.15
           t_min: 16.7
+          point_conditions:
+            temperature_K:
+              state: {tag: value, value: '2073.15'}
+              locator:
+                published_page: 114
+                pdf_page_index: 4
+                table: '2'
+                note: "Table 2 prints 1800 deg C; T_K = T_C + 273.15 = 2073.15 K."
+            time_min:
+              state: {tag: value, value: '16.7'}
+              locator:
+                published_page: 114
+                pdf_page_index: 4
+                table: '2'
+                note: "Table 2 row for run 18C3 prints 16.7 min."
+            VF_wt_pct:
+              state: {tag: value, value: '42.3'}
+              locator:
+                published_page: 116
+                pdf_page_index: 6
+                table: '3'
+                note: "Table 3 row C3 (3) prints VF = 42.3 wt %."
           VF_wt_pct: 42.3
           splash: 'yes'
           composition_status: measured
@@ -10362,6 +10741,7 @@ species:
       locator:
         published_page: 116
         table: '3'
+        pdf_page_index: 6
         note: Run-mapped Fe Table 3 observation for printed physical charge C5 (1).
       phase: silicate_melt_FCMAS_solar_abundance
       condensed_form:
@@ -10375,6 +10755,10 @@ species:
       values:
         <<: *hashimoto_1983_lab_harvest
         quantity: residue_composition_vs_time
+        admission_status: admitted
+        composition_derivation: >-
+          Table 1 row (1) Ave. prints the starting oxide composition in wt%.
+          Observation identity mole fractions use the declared wt_pct_to_mole_fraction conversion.
         method_class: measured_direct
         semantics: composition_table_not_species_rate
         system_class: silicate_melt
@@ -10392,6 +10776,28 @@ species:
           T_C: 1800
           T_K: 2073.15
           t_min: 27.8
+          point_conditions:
+            temperature_K:
+              state: {tag: value, value: '2073.15'}
+              locator:
+                published_page: 114
+                pdf_page_index: 4
+                table: '2'
+                note: "Table 2 prints 1800 deg C; T_K = T_C + 273.15 = 2073.15 K."
+            time_min:
+              state: {tag: value, value: '27.8'}
+              locator:
+                published_page: 114
+                pdf_page_index: 4
+                table: '2'
+                note: "Table 2 row for run 18C5 prints 27.8 min."
+            VF_wt_pct:
+              state: {tag: value, value: '45.0'}
+              locator:
+                published_page: 116
+                pdf_page_index: 6
+                table: '3'
+                note: "Table 3 row C5 (1) prints VF = 45.0 wt %."
           VF_wt_pct: 45.0
           splash: 'no'
           composition_status: measured
@@ -10552,6 +10958,7 @@ species:
       locator:
         published_page: 116
         table: '3'
+        pdf_page_index: 6
         note: Run-mapped Fe Table 3 observation for printed physical charge C5 (2).
       phase: silicate_melt_FCMAS_solar_abundance
       condensed_form:
@@ -10565,6 +10972,10 @@ species:
       values:
         <<: *hashimoto_1983_lab_harvest
         quantity: residue_composition_vs_time
+        admission_status: admitted
+        composition_derivation: >-
+          Table 1 row (1) Ave. prints the starting oxide composition in wt%.
+          Observation identity mole fractions use the declared wt_pct_to_mole_fraction conversion.
         method_class: measured_direct
         semantics: composition_table_not_species_rate
         system_class: silicate_melt
@@ -10582,6 +10993,28 @@ species:
           T_C: 1800
           T_K: 2073.15
           t_min: 27.8
+          point_conditions:
+            temperature_K:
+              state: {tag: value, value: '2073.15'}
+              locator:
+                published_page: 114
+                pdf_page_index: 4
+                table: '2'
+                note: "Table 2 prints 1800 deg C; T_K = T_C + 273.15 = 2073.15 K."
+            time_min:
+              state: {tag: value, value: '27.8'}
+              locator:
+                published_page: 114
+                pdf_page_index: 4
+                table: '2'
+                note: "Table 2 row for run 18C5 prints 27.8 min."
+            VF_wt_pct:
+              state: {tag: value, value: '49.4'}
+              locator:
+                published_page: 116
+                pdf_page_index: 6
+                table: '3'
+                note: "Table 3 row C5 (2) prints VF = 49.4 wt %."
           VF_wt_pct: 49.4
           splash: 'yes'
           composition_status: measured
@@ -10742,6 +11175,7 @@ species:
       locator:
         published_page: 116
         table: '3'
+        pdf_page_index: 6
         note: Run-mapped Fe Table 3 observation for printed physical charge 19B2.
       phase: silicate_melt_FCMAS_solar_abundance
       condensed_form:
@@ -10755,6 +11189,10 @@ species:
       values:
         <<: *hashimoto_1983_lab_harvest
         quantity: residue_composition_vs_time
+        admission_status: admitted
+        composition_derivation: >-
+          Table 1 row (1) Ave. prints the starting oxide composition in wt%.
+          Observation identity mole fractions use the declared wt_pct_to_mole_fraction conversion.
         method_class: measured_direct
         semantics: composition_table_not_species_rate
         system_class: silicate_melt
@@ -10772,6 +11210,28 @@ species:
           T_C: 1900
           T_K: 2173.15
           t_min: 1.29
+          point_conditions:
+            temperature_K:
+              state: {tag: value, value: '2173.15'}
+              locator:
+                published_page: 114
+                pdf_page_index: 4
+                table: '2'
+                note: "Table 2 prints 1900 deg C; T_K = T_C + 273.15 = 2173.15 K."
+            time_min:
+              state: {tag: value, value: '1.29'}
+              locator:
+                published_page: 114
+                pdf_page_index: 4
+                table: '2'
+                note: "Table 2 row for run 19B2 prints 1.29 min."
+            VF_wt_pct:
+              state: {tag: value, value: '12.2'}
+              locator:
+                published_page: 116
+                pdf_page_index: 6
+                table: '3'
+                note: "Table 3 row 19B2 prints VF = 12.2 wt %."
           VF_wt_pct: 12.2
           splash: 'no'
           composition_status: measured
@@ -10930,6 +11390,7 @@ species:
       locator:
         published_page: 116
         table: '3'
+        pdf_page_index: 6
         note: Run-mapped Fe Table 3 observation for printed physical charge B4.
       phase: silicate_melt_FCMAS_solar_abundance
       condensed_form:
@@ -10943,6 +11404,10 @@ species:
       values:
         <<: *hashimoto_1983_lab_harvest
         quantity: residue_composition_vs_time
+        admission_status: admitted
+        composition_derivation: >-
+          Table 1 row (1) Ave. prints the starting oxide composition in wt%.
+          Observation identity mole fractions use the declared wt_pct_to_mole_fraction conversion.
         method_class: measured_direct
         semantics: composition_table_not_species_rate
         system_class: silicate_melt
@@ -10960,6 +11425,28 @@ species:
           T_C: 1900
           T_K: 2173.15
           t_min: 2.15
+          point_conditions:
+            temperature_K:
+              state: {tag: value, value: '2173.15'}
+              locator:
+                published_page: 114
+                pdf_page_index: 4
+                table: '2'
+                note: "Table 2 prints 1900 deg C; T_K = T_C + 273.15 = 2173.15 K."
+            time_min:
+              state: {tag: value, value: '2.15'}
+              locator:
+                published_page: 114
+                pdf_page_index: 4
+                table: '2'
+                note: "Table 2 row for run 19B4 prints 2.15 min."
+            VF_wt_pct:
+              state: {tag: value, value: '17.2'}
+              locator:
+                published_page: 116
+                pdf_page_index: 6
+                table: '3'
+                note: "Table 3 row B4 prints VF = 17.2 wt %."
           VF_wt_pct: 17.2
           splash: 'no'
           composition_status: measured
@@ -11118,6 +11605,7 @@ species:
       locator:
         published_page: 116
         table: '3'
+        pdf_page_index: 6
         note: Run-mapped Fe Table 3 observation for printed physical charge B6.
       phase: silicate_melt_FCMAS_solar_abundance
       condensed_form:
@@ -11131,6 +11619,10 @@ species:
       values:
         <<: *hashimoto_1983_lab_harvest
         quantity: residue_composition_vs_time
+        admission_status: admitted
+        composition_derivation: >-
+          Table 1 row (1) Ave. prints the starting oxide composition in wt%.
+          Observation identity mole fractions use the declared wt_pct_to_mole_fraction conversion.
         method_class: measured_direct
         semantics: composition_table_not_species_rate
         system_class: silicate_melt
@@ -11148,6 +11640,28 @@ species:
           T_C: 1900
           T_K: 2173.15
           t_min: 3.59
+          point_conditions:
+            temperature_K:
+              state: {tag: value, value: '2173.15'}
+              locator:
+                published_page: 114
+                pdf_page_index: 4
+                table: '2'
+                note: "Table 2 prints 1900 deg C; T_K = T_C + 273.15 = 2173.15 K."
+            time_min:
+              state: {tag: value, value: '3.59'}
+              locator:
+                published_page: 114
+                pdf_page_index: 4
+                table: '2'
+                note: "Table 2 row for run 19B6 prints 3.59 min."
+            VF_wt_pct:
+              state: {tag: value, value: '26.3'}
+              locator:
+                published_page: 116
+                pdf_page_index: 6
+                table: '3'
+                note: "Table 3 row B6 prints VF = 26.3 wt %."
           VF_wt_pct: 26.3
           splash: 'no'
           composition_status: measured
@@ -11308,6 +11822,7 @@ species:
       locator:
         published_page: 116
         table: '3'
+        pdf_page_index: 6
         note: Run-mapped Fe Table 3 observation for printed physical charge B8.
       phase: silicate_melt_FCMAS_solar_abundance
       condensed_form:
@@ -11321,6 +11836,10 @@ species:
       values:
         <<: *hashimoto_1983_lab_harvest
         quantity: residue_composition_vs_time
+        admission_status: admitted
+        composition_derivation: >-
+          Table 1 row (1) Ave. prints the starting oxide composition in wt%.
+          Observation identity mole fractions use the declared wt_pct_to_mole_fraction conversion.
         method_class: measured_direct
         semantics: composition_table_not_species_rate
         system_class: silicate_melt
@@ -11338,6 +11857,28 @@ species:
           T_C: 1900
           T_K: 2173.15
           t_min: 5.99
+          point_conditions:
+            temperature_K:
+              state: {tag: value, value: '2173.15'}
+              locator:
+                published_page: 114
+                pdf_page_index: 4
+                table: '2'
+                note: "Table 2 prints 1900 deg C; T_K = T_C + 273.15 = 2173.15 K."
+            time_min:
+              state: {tag: value, value: '5.99'}
+              locator:
+                published_page: 114
+                pdf_page_index: 4
+                table: '2'
+                note: "Table 2 row for run 19B8 prints 5.99 min."
+            VF_wt_pct:
+              state: {tag: value, value: '38.7'}
+              locator:
+                published_page: 116
+                pdf_page_index: 6
+                table: '3'
+                note: "Table 3 row B8 prints VF = 38.7 wt %."
           VF_wt_pct: 38.7
           splash: 'no'
           composition_status: measured
@@ -11498,6 +12039,7 @@ species:
       locator:
         published_page: 116
         table: '3'
+        pdf_page_index: 6
         note: Run-mapped Fe Table 3 observation for printed physical charge C1.
       phase: silicate_melt_FCMAS_solar_abundance
       condensed_form:
@@ -11511,6 +12053,10 @@ species:
       values:
         <<: *hashimoto_1983_lab_harvest
         quantity: residue_composition_vs_time
+        admission_status: admitted
+        composition_derivation: >-
+          Table 1 row (1) Ave. prints the starting oxide composition in wt%.
+          Observation identity mole fractions use the declared wt_pct_to_mole_fraction conversion.
         method_class: measured_direct
         semantics: composition_table_not_species_rate
         system_class: silicate_melt
@@ -11528,6 +12074,28 @@ species:
           T_C: 1900
           T_K: 2173.15
           t_min: 10.0
+          point_conditions:
+            temperature_K:
+              state: {tag: value, value: '2173.15'}
+              locator:
+                published_page: 114
+                pdf_page_index: 4
+                table: '2'
+                note: "Table 2 prints 1900 deg C; T_K = T_C + 273.15 = 2173.15 K."
+            time_min:
+              state: {tag: value, value: '10.0'}
+              locator:
+                published_page: 114
+                pdf_page_index: 4
+                table: '2'
+                note: "Table 2 row for run 19C1 prints 10.0 min."
+            VF_wt_pct:
+              state: {tag: value, value: '49.3'}
+              locator:
+                published_page: 116
+                pdf_page_index: 6
+                table: '3'
+                note: "Table 3 row C1 prints VF = 49.3 wt %."
           VF_wt_pct: 49.3
           splash: 'no'
           composition_status: measured
@@ -11688,6 +12256,7 @@ species:
       locator:
         published_page: 116
         table: '3'
+        pdf_page_index: 6
         note: Run-mapped Fe Table 3 observation for printed physical charge 20B2.
       phase: silicate_melt_FCMAS_solar_abundance
       condensed_form:
@@ -11701,6 +12270,10 @@ species:
       values:
         <<: *hashimoto_1983_lab_harvest
         quantity: residue_composition_vs_time
+        admission_status: admitted
+        composition_derivation: >-
+          Table 1 row (1) Ave. prints the starting oxide composition in wt%.
+          Observation identity mole fractions use the declared wt_pct_to_mole_fraction conversion.
         method_class: measured_direct
         semantics: composition_table_not_species_rate
         system_class: silicate_melt
@@ -11718,6 +12291,28 @@ species:
           T_C: 2000
           T_K: 2273.15
           t_min: 1.29
+          point_conditions:
+            temperature_K:
+              state: {tag: value, value: '2273.15'}
+              locator:
+                published_page: 114
+                pdf_page_index: 4
+                table: '2'
+                note: "Table 2 prints 2000 deg C; T_K = T_C + 273.15 = 2273.15 K."
+            time_min:
+              state: {tag: value, value: '1.29'}
+              locator:
+                published_page: 114
+                pdf_page_index: 4
+                table: '2'
+                note: "Table 2 row for run 20B2 prints 1.29 min."
+            VF_wt_pct:
+              state: {tag: value, value: '27.0'}
+              locator:
+                published_page: 116
+                pdf_page_index: 6
+                table: '3'
+                note: "Table 3 row 20B2 prints VF = 27.0 wt %."
           VF_wt_pct: 27.0
           splash: 'no'
           composition_status: measured
@@ -11876,6 +12471,7 @@ species:
       locator:
         published_page: 116
         table: '3'
+        pdf_page_index: 6
         note: Run-mapped Fe Table 3 observation for printed physical charge B4.
       phase: silicate_melt_FCMAS_solar_abundance
       condensed_form:
@@ -11889,6 +12485,10 @@ species:
       values:
         <<: *hashimoto_1983_lab_harvest
         quantity: residue_composition_vs_time
+        admission_status: admitted
+        composition_derivation: >-
+          Table 1 row (1) Ave. prints the starting oxide composition in wt%.
+          Observation identity mole fractions use the declared wt_pct_to_mole_fraction conversion.
         method_class: measured_direct
         semantics: composition_table_not_species_rate
         system_class: silicate_melt
@@ -11906,6 +12506,28 @@ species:
           T_C: 2000
           T_K: 2273.15
           t_min: 2.15
+          point_conditions:
+            temperature_K:
+              state: {tag: value, value: '2273.15'}
+              locator:
+                published_page: 114
+                pdf_page_index: 4
+                table: '2'
+                note: "Table 2 prints 2000 deg C; T_K = T_C + 273.15 = 2273.15 K."
+            time_min:
+              state: {tag: value, value: '2.15'}
+              locator:
+                published_page: 114
+                pdf_page_index: 4
+                table: '2'
+                note: "Table 2 row for run 20B4 prints 2.15 min."
+            VF_wt_pct:
+              state: {tag: value, value: '40.5'}
+              locator:
+                published_page: 116
+                pdf_page_index: 6
+                table: '3'
+                note: "Table 3 row B4 prints VF = 40.5 wt %."
           VF_wt_pct: 40.5
           splash: 'no'
           composition_status: measured
@@ -12066,6 +12688,7 @@ species:
       locator:
         published_page: 116
         table: '3'
+        pdf_page_index: 6
         note: Run-mapped Fe Table 3 observation for printed physical charge B6.
       phase: silicate_melt_FCMAS_solar_abundance
       condensed_form:
@@ -12079,6 +12702,10 @@ species:
       values:
         <<: *hashimoto_1983_lab_harvest
         quantity: residue_composition_vs_time
+        admission_status: admitted
+        composition_derivation: >-
+          Table 1 row (1) Ave. prints the starting oxide composition in wt%.
+          Observation identity mole fractions use the declared wt_pct_to_mole_fraction conversion.
         method_class: measured_direct
         semantics: composition_table_not_species_rate
         system_class: silicate_melt
@@ -12096,6 +12723,28 @@ species:
           T_C: 2000
           T_K: 2273.15
           t_min: 3.59
+          point_conditions:
+            temperature_K:
+              state: {tag: value, value: '2273.15'}
+              locator:
+                published_page: 114
+                pdf_page_index: 4
+                table: '2'
+                note: "Table 2 prints 2000 deg C; T_K = T_C + 273.15 = 2273.15 K."
+            time_min:
+              state: {tag: value, value: '3.59'}
+              locator:
+                published_page: 114
+                pdf_page_index: 4
+                table: '2'
+                note: "Table 2 row for run 20B6 prints 3.59 min."
+            VF_wt_pct:
+              state: {tag: value, value: '52.5'}
+              locator:
+                published_page: 116
+                pdf_page_index: 6
+                table: '3'
+                note: "Table 3 row B6 prints VF = 52.5 wt %."
           VF_wt_pct: 52.5
           splash: 'no'
           composition_status: measured
@@ -32033,117 +32682,6 @@ species:
 fidelity_samples:
 - species: Fe
   observable: rate_series
-  observation_id: hashimoto_1983_fe_fcmas_free_evap_geometry
-  field: starting_tube_hole_mm
-  value: 1.2
-  locator:
-    source_path: docs-private/research/ocr-artifacts/kems-015-hashimoto-1983/spool/out/kems-015-hashimoto-1983/vlm/kems-015-hashimoto-1983.md
-    paragraph: tubes of 4mm height and 4mm diameter with a straight hole of 1.2mm diameter
-    line_range: '37'
-- species: Fe
-  observable: rate_series
-  observation_id: hashimoto_1983_fe_fcmas_free_evap_geometry
-  field: vacuum_during_run_Torr
-  value: 0.0001
-  locator:
-    source_path: docs-private/research/ocr-artifacts/kems-015-hashimoto-1983/spool/out/kems-015-hashimoto-1983/vlm/kems-015-hashimoto-1983.md
-    paragraph: vacuum level in the chamber was about 10^-4 Torr during the experiments
-    line_range: '160'
-- species: Fe
-  observable: rate_series
-  observation_id: hashimoto_1983_fe_fcmas_free_evap_geometry
-  field: initial_sample_mass_mg
-  value:
-    value: 100.0
-    units: mg
-    locator:
-      published_page: 112
-      section: Sample preparation
-      paragraph: finally their weights were adjusted to 100.0mg with a knife
-  locator:
-    published_page: 112
-    section: Sample preparation
-- species: Fe
-  observable: rate_series
-  observation_id: hashimoto_1983_fe_fcmas_free_evap_geometry
-  field: pump_maximum_vacuum_Torr
-  value:
-    value: 7.0e-8
-    units: Torr
-    kind: pump_ultimate
-    as_printed: 7 × 10^{-8} Torr
-    locator:
-      published_page: 114
-      section: Experimental device
-      paragraph: maximum vacuum reached 7 × 10^{-8} Torr
-  locator:
-    published_page: 114
-    section: Experimental device
-- species: Fe
-  observable: rate_series
-  observation_id: hashimoto_1983_fe_fcmas_free_evap_geometry
-  field: vacuum_chamber_height_mm
-  value:
-    value: 400
-    units: mm
-    locator:
-      published_page: 112
-      section: Experimental device
-      paragraph: vacuum chamber (400mm height, 300mm diameter)
-  locator:
-    published_page: 112
-    section: Experimental device
-- species: Fe
-  observable: rate_series
-  observation_id: hashimoto_1983_fe_fcmas_free_evap_geometry
-  field: pyrometer_emissivity
-  value:
-    value: 0.95
-    units: '1'
-    note: graphite rough surface
-    locator:
-      published_page: 113
-      section: Experimental device
-      paragraph: reading was corrected for a thermal emissivity of 0.95 (graphite rough surface)
-  locator:
-    published_page: 113
-    section: Experimental device
-- species: Fe
-  observable: rate_series
-  observation_id: hashimoto_1983_fcmas_qualitative_volatility_order
-  field: source_reported_sequence
-  value:
-  - Fe
-  - Mg
-  - Si
-  - Ca
-  - Al
-  locator:
-    source_path: docs-private/research/ocr-artifacts/kems-015-hashimoto-1983/spool/out/kems-015-hashimoto-1983/vlm/kems-015-hashimoto-1983.md
-    paragraph: gross order of evaporation is Fe, Mg, Si, Ca, and Al
-    line_range: '11'
-- species: Ca
-  observable: rate_series
-  observation_id: hashimoto_1983_cao_al2o3_residue_enrichment
-  field: enriched_components
-  value:
-  - CaO
-  - Al2O3
-  locator:
-    source_path: docs-private/research/ocr-artifacts/kems-015-hashimoto-1983/spool/out/kems-015-hashimoto-1983/vlm/kems-015-hashimoto-1983.md
-    paragraph: CaO and Al2O3 are enriched in the residual melts
-    line_range: 883-927
-- species: Ca
-  observable: rate_series
-  observation_id: hashimoto_1983_stage_iv_cao_relative_volatility
-  field: relative_volatility_approx
-  value: 0.3333333333333333
-  locator:
-    source_path: docs-private/research/ocr-artifacts/kems-015-hashimoto-1983/spool/out/kems-015-hashimoto-1983/vlm/kems-015-hashimoto-1983.md
-    paragraph: volatility of CaO is about one third of that of SiO2 in Stage IV
-    line_range: '931'
-- species: Fe
-  observable: rate_series
   observation_id: hashimoto_1983_table1_starting_composition
   field: starting_Ave_SiO2_wt_pct
   value: 35.43
@@ -32151,7 +32689,7 @@ fidelity_samples:
     published_page: 113
     pdf_page_index: 3
     table: '1'
-    note: Table 1 row (1) Ave. SiO2 wt %
+    note: Table 1 row (1) Ave. SiO2 wt %.
 - species: Fe
   observable: rate_series
   observation_id: hashimoto_1983_table2_run_conditions
@@ -32161,7 +32699,7 @@ fidelity_samples:
     published_page: 114
     pdf_page_index: 4
     table: '2'
-    note: 19B8 is 1,900 C - 5.99 minutes
+    note: Run 19B8 is printed at 1900 deg C and 5.99 min.
 - species: Fe
   observable: rate_series
   observation_id: hashimoto_1983_table3_residue_composition_series
@@ -32171,47 +32709,7 @@ fidelity_samples:
     published_page: 116
     pdf_page_index: 6
     table: '3'
-    note: 17C5 (1) FeO wt % 22.74
-- species: Fe
-  observable: rate_series
-  observation_id: hashimoto_1983_table3_residue_composition_series
-  field: pin_20B6_VF_wt_pct
-  value: 52.5
-  locator:
-    published_page: 116
-    pdf_page_index: 6
-    table: '3'
-    note: 20B6 VF wt % 52.5
-- species: Fe
-  observable: rate_series
-  observation_id: hashimoto_1983_table4_phase_compositions
-  field: pin_18B6_magnetite_Fe2O3_wt_pct
-  value: 59.94
-  locator:
-    published_page: 118
-    pdf_page_index: 8
-    table: '4'
-    note: 18B6(1) magnetite Fe2O3 wt %
-- species: Fe
-  observable: rate_series
-  observation_id: hashimoto_1983_table5_initial_vaporization_rate_F
-  field: F_mol_s_at_1800C
-  value: 1.6e-6
-  locator:
-    published_page: 122
-    pdf_page_index: 12
-    table: '5'
-    note: F at 1,800 C = 1.6 x 10^-6 mol/s
-- species: Fe
-  observable: alpha
-  observation_id: hashimoto_1983_alpha_hertz_knudsen_assumed_unity_ratio
-  field: alpha_i_over_alpha_j_assumed
-  value: 1.0
-  locator:
-    published_page: 128
-    pdf_page_index: 18
-    equation: '16'
-    note: alpha_i/alpha_j = 1 is assumed in eqn 16; Hertz-Knudsen eqn (14) is published p. 128 / PDF p. 18
+    note: Run 17C5 (1) FeO wt %.
 - species: Mg
   observable: rate_series
   observation_id: hashimoto_1983_table3_mgo_residue_series
@@ -32221,313 +32719,43 @@ fidelity_samples:
     published_page: 116
     pdf_page_index: 6
     table: '3'
-    note: 20B6 MgO wt % 41.10
-- species: Mg
+    note: Run 20B6 MgO wt %.
+- species: Fe
   observable: rate_series
-  observation_id: hashimoto_1983_derived_mgo_activation_energy
-  field: E_kcal_mol
-  value: 123.6
+  observation_id: hashimoto_1983_table4_phase_compositions
+  field: pin_18B6_magnetite_Fe2O3_wt_pct
+  value: 59.94
   locator:
-    published_page: 123
-    pdf_page_index: 13
-    figure: '10'
-    note: MgO activation energy 123.6 kcal/mol as printed
-- species: SiO
+    published_page: 118
+    pdf_page_index: 8
+    table: '4'
+    note: Run 18B6 (1) magnetite Fe2O3 wt %.
+- path: species.Fe.observations[hashimoto_1983_table4_phase_compositions].values.samples[4].MgO_wt_pct
+  value: 41.24
+  note: Run 17C1 olivine MgO wt %.
+  locator:
+    published_page: 118
+    pdf_page_index: 8
+    table: '4'
+    note: Run 17C1 olivine MgO wt %.
+- species: Fe
   observable: rate_series
-  observation_id: hashimoto_1983_derived_sio2_activation_energy
-  field: E_kcal_mol
-  value: 131.6
+  observation_id: hashimoto_1983_table5_initial_vaporization_rate_F
+  field: F_mol_s_at_1800C
+  value: 1.6e-06
   locator:
-    published_page: 123
-    pdf_page_index: 13
-    figure: '10'
-    note: SiO2 activation energy 131.6 kcal/mol as printed
-- species: SiO
-  observable: gibbs_table
-  observation_id: hashimoto_1983_table6_sio2_vaporization_enthalpies
-  field: pin_reaction_13_delta_H_over_z_kcal_mol
-  value: 122.799
+    published_page: 122
+    pdf_page_index: 12
+    table: '5'
+    note: F at 1800 deg C is 1.6 x 10^-6 mol/s.
+- path: species.Mg.observations[hashimoto_1983_table6_mgo_vaporization_enthalpies_quoted].values.reactions[0].delta_H_over_z_kcal_mol
+  value: 104.235
+  note: Reaction 18 Delta H/z = 104.235 kcal/mol.
   locator:
     published_page: 124
     pdf_page_index: 14
     table: '6'
-    note: Table 6 reaction 13 Delta H / z = 122.799 kcal/mol
-- species: Fe
-  observation_id: hashimoto_1983_table3_residue_composition_series_quoted
-  field: pin_17C5_1_FeO_wt_pct
-  value: 22.74
-  locator:
-    published_page: 116
-    table: '3'
-  quote: 'sample_as_printed,VF_wt_pct,splash,SiO2_wt_pct,Al2O3_wt_pct,FeO_wt_pct,MgO_wt_pct,CaO_wt_pct,n_analyses,texture,minerals,composition_status
-
-    17C1,8.2,no,,,,,,,B,MP+OL+G,n.d.
-
-    C3 (1),17.0,yes,,,,,,,B,MD+OL+G,n.d.
-
-    C3 (2),10.8,no,39.09,3.57,27.92,26.32,3.09,14,,,measured
-
-    C5 (1),18.6,no,41.74,4.11,22.74,27.88,3.52,30,B,MD+OL+G,measured
-
-    C5 (2),18.4,no,,,,,,,B,MD+OL+G,n.d.
-
-    C5 (3),19.7,no,41.74,3.83,21.81,29.09,3.53,16,,,measured
-
-    C7,27.2,no,45.24,4.49,15.53,30.97,3.78,30,B,OL+G,measured
-
-    C9 (2),35.5,no,48.04,4.92,8.56,34.34,4.14,20,C,OL+G,measured
-
-    D2,43.3,no,49.03,5.48,2.88,37.81,4.80,20,C&B,OL+G,measured
-
-    18B6 (1),11.2,no,,,,,,,B,MP+OL+G,n.d.
-
-    B6 (2),12.3,no,38.73,3.55,28.40,26.26,3.07,14,,,measured
-
-    B8 (1),17.2,no,40.41,3.80,23.82,28.56,3.40,30,B,MP+OL+G,measured
-
-    B8 (2),15.8,no,39.55,3.88,25.78,27.26,3.53,24,,,measured
-
-    B8 (3),20.2,yes,,,,,,,,,valence_only
-
-    C1 (1),31.3,yes,44.22,4.87,14.39,32.49,4.05,30,B&C,OL+G,measured
-
-    C1 (2),25.0,no,42.84,4.05,19.10,30.41,3.59,16,,,measured
-
-    C1 (3),,no,,,,,,,,,valence_only_VF_absent
-
-    C3 (1),41.1,yes,45.60,4.61,11.84,33.89,4.06,20,B,OL+G,measured
-
-    C3 (2),33.1,no,45.30,4.33,12.87,33.57,3.93,16,,,measured
-
-    C3 (3),42.3,yes,46.12,4.99,9.95,34.38,4.55,20,B&C,OL+G,measured
-
-    C3 (4),41.8,yes,,,,,,,,,valence_only
-
-    C5 (1),45.0,no,47.35,5.33,4.18,38.43,4.70,20,C,OL+(G),measured
-
-    C5 (2),49.4,yes,47.05,5.14,3.85,39.14,4.82,20,C,OL+(G),measured
-
-    19B2,12.2,no,37.94,3.55,29.14,26.09,3.29,20,,,measured
-
-    B4,17.2,no,39.64,3.74,25.60,27.76,3.27,14,,,measured
-
-    B6,26.3,no,41.09,4.02,20.59,30.74,3.56,30,B,MD+OL+G,measured
-
-    B8,38.7,no,44.23,5.03,11.49,34.77,4.48,20,B&C,OL+G,measured
-
-    C1,49.3,no,45.56,5.88,4.55,38.94,5.07,20,C,OL+(G),measured
-
-    20B2,27.0,no,40.87,4.14,20.46,30.81,3.72,16,,,measured
-
-    B4,40.5,no,43.00,5.40,12.27,34.56,4.76,20,B,OL+G,measured
-
-    B6,52.5,no,43.74,6.24,3.15,41.10,5.77,20,C,OL+(G),measured'
-- species: Fe
-  observation_id: hashimoto_1983_table6_feo_vaporization_enthalpies_quoted
-  field: pin_reaction_2_delta_H_over_z_kcal_mol
-  value: 100.425
-  locator:
-    published_page: 124
-    table: '6'
-  quote: 'no,reactant,products,delta_H_kcal_mol,delta_H_over_z_kcal_mol
-
-    1,Fe,Fe,89.243,89.243
-
-    2,FeO,Fe + 1/2 O2,150.637,100.425
-
-    3,FeO,Fe + O,211.657,105.829
-
-    4,FeO,FeO,109.476,109.476
-
-    5,Fe2O3,2Fe + 3/2 O2,352.832,100.809
-
-    6,Fe2O3,2Fe + 3O,535.892,107.178
-
-    7,Fe3O4,3Fe + 2 O2,506.610,101.322
-
-    8,Fe3O4,3Fe + 4O,750.690,107.241
-
-    9,Fe2O3,2FeO + 1/2 O2,270.510,108.204
-
-    10,Fe2O3,2FeO + O,331.530,110.510
-
-    11,Fe3O4,3FeO + 1/2 O2,383.127,109.465
-
-    12,Fe3O4,3FeO + O,444.147,111.037
-
-    13,SiO2,SiO + 1/2 O2,184.198,122.799
-
-    14,SiO2,SiO + O,245.218,122.609
-
-    15,SiO2,SiO2,137.071,137.071
-
-    16,SiO2,Si + O2,317.250,158.625
-
-    17,SiO2,Si + 2O,439.290,146.430
-
-    18,MgO,Mg + 1/2 O2,156.353,104.235
-
-    19,MgO,Mg + O,217.373,108.687
-
-    20,MgO,MgO,121.392,121.392'
-- species: Fe
-  observation_id: hashimoto_1983_derived_feo_activation_energy_quoted
-  field: E_kcal_mol_range
-  value:
-  - 93.7
-  - 107.9
-  locator:
-    published_page: 123
-    figure: '10'
-  quote: The activation energy of FeO vaporization lies in the range 93.7-107.9 kcal/mol, and shows a
-    trend to increase with lowering molar concentration of FeO. For SiO2 and MgO, the values 131.6 and
-    123.6 kcal/mol are derived, respectively.
-- species: Fe
-  observation_id: hashimoto_1983_alpha_hertz_knudsen_assumed_unity_ratio_quoted
-  field: alpha_i_over_alpha_j_assumed
-  value: 1.0
-  locator:
-    published_page: 133
-    equation: '16'
-  quote: If αi/αj is assumed to be unity in eqn. (16), the ratio is 0.36 (at 1,600°C)
-- species: Mg
-  observation_id: hashimoto_1983_table3_mgo_residue_series_quoted
-  field: pin_20B6_MgO_wt_pct
-  value: 41.1
-  locator:
-    published_page: 116
-    table: '3'
-  quote: 'sample_as_printed,VF_wt_pct,splash,SiO2_wt_pct,Al2O3_wt_pct,FeO_wt_pct,MgO_wt_pct,CaO_wt_pct,n_analyses,texture,minerals,composition_status
-
-    17C1,8.2,no,,,,,,,B,MP+OL+G,n.d.
-
-    C3 (1),17.0,yes,,,,,,,B,MD+OL+G,n.d.
-
-    C3 (2),10.8,no,39.09,3.57,27.92,26.32,3.09,14,,,measured
-
-    C5 (1),18.6,no,41.74,4.11,22.74,27.88,3.52,30,B,MD+OL+G,measured
-
-    C5 (2),18.4,no,,,,,,,B,MD+OL+G,n.d.
-
-    C5 (3),19.7,no,41.74,3.83,21.81,29.09,3.53,16,,,measured
-
-    C7,27.2,no,45.24,4.49,15.53,30.97,3.78,30,B,OL+G,measured
-
-    C9 (2),35.5,no,48.04,4.92,8.56,34.34,4.14,20,C,OL+G,measured
-
-    D2,43.3,no,49.03,5.48,2.88,37.81,4.80,20,C&B,OL+G,measured
-
-    18B6 (1),11.2,no,,,,,,,B,MP+OL+G,n.d.
-
-    B6 (2),12.3,no,38.73,3.55,28.40,26.26,3.07,14,,,measured
-
-    B8 (1),17.2,no,40.41,3.80,23.82,28.56,3.40,30,B,MP+OL+G,measured
-
-    B8 (2),15.8,no,39.55,3.88,25.78,27.26,3.53,24,,,measured
-
-    B8 (3),20.2,yes,,,,,,,,,valence_only
-
-    C1 (1),31.3,yes,44.22,4.87,14.39,32.49,4.05,30,B&C,OL+G,measured
-
-    C1 (2),25.0,no,42.84,4.05,19.10,30.41,3.59,16,,,measured
-
-    C1 (3),,no,,,,,,,,,valence_only_VF_absent
-
-    C3 (1),41.1,yes,45.60,4.61,11.84,33.89,4.06,20,B,OL+G,measured
-
-    C3 (2),33.1,no,45.30,4.33,12.87,33.57,3.93,16,,,measured
-
-    C3 (3),42.3,yes,46.12,4.99,9.95,34.38,4.55,20,B&C,OL+G,measured
-
-    C3 (4),41.8,yes,,,,,,,,,valence_only
-
-    C5 (1),45.0,no,47.35,5.33,4.18,38.43,4.70,20,C,OL+(G),measured
-
-    C5 (2),49.4,yes,47.05,5.14,3.85,39.14,4.82,20,C,OL+(G),measured
-
-    19B2,12.2,no,37.94,3.55,29.14,26.09,3.29,20,,,measured
-
-    B4,17.2,no,39.64,3.74,25.60,27.76,3.27,14,,,measured
-
-    B6,26.3,no,41.09,4.02,20.59,30.74,3.56,30,B,MD+OL+G,measured
-
-    B8,38.7,no,44.23,5.03,11.49,34.77,4.48,20,B&C,OL+G,measured
-
-    C1,49.3,no,45.56,5.88,4.55,38.94,5.07,20,C,OL+(G),measured
-
-    20B2,27.0,no,40.87,4.14,20.46,30.81,3.72,16,,,measured
-
-    B4,40.5,no,43.00,5.40,12.27,34.56,4.76,20,B,OL+G,measured
-
-    B6,52.5,no,43.74,6.24,3.15,41.10,5.77,20,C,OL+(G),measured'
-- species: Mg
-  observation_id: hashimoto_1983_derived_mgo_activation_energy_quoted
-  field: E_kcal_mol
-  value: 123.6
-  locator:
-    published_page: 123
-    figure: '10'
-  quote: The activation energy of FeO vaporization lies in the range 93.7-107.9 kcal/mol, and shows a
-    trend to increase with lowering molar concentration of FeO. For SiO2 and MgO, the values 131.6 and
-    123.6 kcal/mol are derived, respectively.
-- species: SiO
-  observation_id: hashimoto_1983_derived_sio2_activation_energy_quoted
-  field: E_kcal_mol
-  value: 131.6
-  locator:
-    published_page: 123
-    figure: '10'
-  quote: The activation energy of FeO vaporization lies in the range 93.7-107.9 kcal/mol, and shows a
-    trend to increase with lowering molar concentration of FeO. For SiO2 and MgO, the values 131.6 and
-    123.6 kcal/mol are derived, respectively.
-- species: SiO
-  observation_id: hashimoto_1983_table6_sio2_vaporization_enthalpies_quoted
-  field: pin_reaction_13_delta_H_over_z_kcal_mol
-  value: 122.799
-  locator:
-    published_page: 124
-    table: '6'
-  quote: 'no,reactant,products,delta_H_kcal_mol,delta_H_over_z_kcal_mol
-
-    1,Fe,Fe,89.243,89.243
-
-    2,FeO,Fe + 1/2 O2,150.637,100.425
-
-    3,FeO,Fe + O,211.657,105.829
-
-    4,FeO,FeO,109.476,109.476
-
-    5,Fe2O3,2Fe + 3/2 O2,352.832,100.809
-
-    6,Fe2O3,2Fe + 3O,535.892,107.178
-
-    7,Fe3O4,3Fe + 2 O2,506.610,101.322
-
-    8,Fe3O4,3Fe + 4O,750.690,107.241
-
-    9,Fe2O3,2FeO + 1/2 O2,270.510,108.204
-
-    10,Fe2O3,2FeO + O,331.530,110.510
-
-    11,Fe3O4,3FeO + 1/2 O2,383.127,109.465
-
-    12,Fe3O4,3FeO + O,444.147,111.037
-
-    13,SiO2,SiO + 1/2 O2,184.198,122.799
-
-    14,SiO2,SiO + O,245.218,122.609
-
-    15,SiO2,SiO2,137.071,137.071
-
-    16,SiO2,Si + O2,317.250,158.625
-
-    17,SiO2,Si + 2O,439.290,146.430
-
-    18,MgO,Mg + 1/2 O2,156.353,104.235
-
-    19,MgO,Mg + O,217.373,108.687
-
-    20,MgO,MgO,121.392,121.392'
+    note: Reaction 18 Delta H/z = 104.235 kcal/mol.
 metadata:
 - observation_id: hashimoto_1983_fe_fcmas_free_evap_geometry_quoted
   locator:
