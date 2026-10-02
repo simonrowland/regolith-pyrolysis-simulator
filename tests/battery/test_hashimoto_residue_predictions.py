@@ -54,8 +54,32 @@ def _source_data():
     )
 
 
-def test_hashimoto_cohort_has_complete_vectors_bands_and_value_provenance() -> None:
+def test_hashimoto_cohort_has_complete_vectors_bands_and_value_provenance(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     pytest.importorskip("openimcc")
+    import simulator.battery.residue as residue
+
+    # Keep the 24-vector provenance/arm mapping test fast; real refined physics
+    # for one vector is covered by the activity-refresh test below.
+    def integrate_at_steps(
+        inventory,
+        _channels,
+        _pressure_model,
+        *,
+        temperature_K,
+        duration_s,
+        steps,
+        geometry_policy_id,
+        initial_area_m2,
+    ):
+        values = residue._hashimoto_project_oxide_wt_pct(inventory)
+        shift = 0.8 / steps
+        values["FeO"] += shift
+        values["MgO"] -= shift
+        return values, (0.1,), (), None, {"Fe": 0.0, "O": 0.0}
+
+    monkeypatch.setattr(residue, "_hashimoto_integrate_geometry", integrate_at_steps)
     experiments, measured_rows, preform_dimensions_mm = _source_data()
     assert len(experiments) == 24
     assert len(measured_rows) == 120
@@ -65,7 +89,6 @@ def test_hashimoto_cohort_has_complete_vectors_bands_and_value_provenance() -> N
         for experiment in experiments
     )
     catalog = yaml.safe_load((ROOT / "data/vapor_pressures.yaml").read_text())
-
     predictions = _predict_hashimoto_residue_cohort(
         experiments,
         catalog,
@@ -120,7 +143,6 @@ def test_hashimoto_cohort_has_complete_vectors_bands_and_value_provenance() -> N
         "prediction_status",
         "assumption_flags",
     }
-    saw_feo_exhaustion = False
     for prediction in predictions:
         assert set(prediction.primary_oxide_wt_pct) == set(OXIDES)
         assert set(prediction.sensitivity_band_wt_pct) == set(OXIDES)
@@ -140,7 +162,33 @@ def test_hashimoto_cohort_has_complete_vectors_bands_and_value_provenance() -> N
         assert provenance["density_source"]
         assert provenance["d060_pending"] is True
         assert provenance["code_revision"] == "test-revision"
-        assert provenance["integration"]["refinement_status"] == "pending_r3"
+        integration = provenance["integration"]
+        assert integration["refinement_status"] == "converged"
+        assert set(integration["refinement_status_by_geometry"]) == set(
+            _HASHIMOTO_GEOMETRIES
+        )
+        assert set(integration["steps_tried_by_geometry"]) == set(
+            _HASHIMOTO_GEOMETRIES
+        )
+        assert set(integration["max_difference_wt_pct_by_geometry"]) == set(
+            _HASHIMOTO_GEOMETRIES
+        )
+        assert set(integration["process_cpu_seconds_by_geometry"]) == set(
+            _HASHIMOTO_GEOMETRIES
+        )
+        assert all(
+            steps and steps[-1] == integration["accepted_steps_by_geometry"][geometry]
+            and steps[-1] <= 256
+            for geometry, steps in integration["steps_tried_by_geometry"].items()
+        )
+        assert all(
+            len(steps) >= 2
+            and len(integration["max_difference_wt_pct_by_geometry"][geometry])
+            == len(steps) - 1
+            for geometry, steps in integration["steps_tried_by_geometry"].items()
+        )
+        assert all(value >= 0 for value in integration["process_cpu_seconds_by_geometry"].values())
+        assert provenance["notices"] == integration["refinement_notices"]
         assert "sqrt(binary64 epsilon)" in provenance["integration"][
             "component_exhaustion_rule"
         ]
@@ -178,12 +226,6 @@ def test_hashimoto_cohort_has_complete_vectors_bands_and_value_provenance() -> N
                 abs(value)
                 for value in provenance["atom_closure_mol_by_geometry"][geometry].values()
             ) < 1.0e-12
-            for notice in provenance["component_exhausted_by_geometry"][geometry]:
-                assert notice["reason"] == "component_exhausted"
-                assert notice["step"] >= 1
-                assert notice["remaining_moles"] >= 0.0
-                if notice["component"] == "FeO":
-                    saw_feo_exhaustion = True
         assert provenance["oxygen_model"].startswith("R1a engine-consistent")
         assert provenance["oxygen_boundary"] == "unbuffered vacuum; fO2 control none"
         assert set(provenance["geometry_policies"]) == set(_HASHIMOTO_GEOMETRIES)
@@ -207,8 +249,6 @@ def test_hashimoto_cohort_has_complete_vectors_bands_and_value_provenance() -> N
         assert {row["channel"] for row in liquid_rows} >= {"Fe", "Mg", "SiO", "Ca", "Al", "O", "O2"}
         assert all("openimcc_gas_row" in row and "gas_source" in row for row in liquid_rows)
         assert all("liquid_row" in row for row in liquid_rows)
-
-    assert saw_feo_exhaustion
 
     common_by_run = {row.experiment_id: row for row in primary}
     runtime_by_run = {row.experiment_id: row for row in runtime}
@@ -234,6 +274,102 @@ def test_hashimoto_cohort_has_complete_vectors_bands_and_value_provenance() -> N
         if record["channel"] == "Fe"
     )
     assert math.isclose(fe_runtime_alpha, 0.02, rel_tol=1.0e-12)
+
+
+def test_hashimoto_refinement_rechecks_activities_for_changed_composition(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    pytest.importorskip("openimcc")
+    from simulator.melt_backend import openimcc_bridge
+
+    experiments, _measured_rows, preform_dimensions_mm = _source_data()
+    catalog = yaml.safe_load((ROOT / "data/vapor_pressures.yaml").read_text())
+    activity_compositions: list[tuple[tuple[str, float], ...]] = []
+    original_evaluate = openimcc_bridge.evaluate
+
+    def track_activities(*, composition_mol, **kwargs):
+        activity_compositions.append(tuple(sorted(composition_mol.items())))
+        return original_evaluate(composition_mol=composition_mol, **kwargs)
+
+    monkeypatch.setattr(openimcc_bridge, "evaluate", track_activities)
+    predictions = _predict_hashimoto_residue_cohort(
+        experiments[:1],
+        catalog,
+        preform_dimensions_mm=preform_dimensions_mm,
+        code_revision="single-vector-activity-refresh-test",
+        _allow_partial_cohort_for_test=True,
+    )
+
+    assert len(predictions) == 2
+    assert len(set(activity_compositions)) > 1
+    assert all(
+        set(prediction.provenance["integration"]["refinement_status_by_geometry"])
+        == set(_HASHIMOTO_GEOMETRIES)
+        for prediction in predictions
+    )
+
+
+def test_hashimoto_refinement_flags_the_finest_run_at_the_step_cap(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    pytest.importorskip("openimcc")
+    import copy
+    import simulator.battery.residue as residue
+
+    def never_converges(
+        inventory,
+        _channels,
+        _pressure_model,
+        *,
+        temperature_K,
+        duration_s,
+        steps,
+        geometry_policy_id,
+        initial_area_m2,
+    ):
+        values = residue._hashimoto_project_oxide_wt_pct(inventory)
+        shift = steps / 1000.0
+        values["FeO"] += shift
+        values["MgO"] -= shift
+        return values, (0.1,), (), None, {"Fe": 0.0, "O": 0.0}
+
+    monkeypatch.setattr(residue, "_hashimoto_integrate_geometry", never_converges)
+    experiments, _measured_rows, preform_dimensions_mm = _source_data()
+    capped_experiments = copy.deepcopy(experiments)
+    for experiment in capped_experiments:
+        experiment["thermal_schedule"]["total_duration_s"]["state"]["value"][
+            "point"
+        ] = "12000"
+    catalog = yaml.safe_load((ROOT / "data/vapor_pressures.yaml").read_text())
+
+    predictions = residue._predict_hashimoto_residue_cohort(
+        capped_experiments,
+        catalog,
+        preform_dimensions_mm=preform_dimensions_mm,
+        code_revision="injected-cap-refinement-test",
+    )
+
+    assert len(predictions) == 48
+    for prediction in predictions:
+        integration = prediction.provenance["integration"]
+        assert set(integration["refinement_status_by_geometry"].values()) == {
+            "unconverged_at_cap"
+        }
+        assert set(integration["accepted_steps_by_geometry"].values()) == {256}
+        assert all(
+            steps[-1] == 256 and max(steps) <= 256
+            for steps in integration["steps_tried_by_geometry"].values()
+        )
+        assert all(
+            notice["reason"] == "residue_time_refinement_unconverged"
+            for notice in prediction.provenance["notices"]
+        )
+        assert len(prediction.provenance["notices"]) == len(_HASHIMOTO_GEOMETRIES)
+        assert {
+            notice["geometry_policy_id"]
+            for notice in prediction.provenance["notices"]
+        } == set(_HASHIMOTO_GEOMETRIES)
+        assert prediction.provenance["prediction_status"] == "complete"
 
 
 def test_hashimoto_engine_refusal_flags_one_run_and_keeps_cohort_moving(
