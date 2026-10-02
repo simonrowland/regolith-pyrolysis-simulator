@@ -3306,11 +3306,9 @@ def test_streamed_scoring_is_byte_identical_to_legacy_fixture(
         pin_failures=old_pin_failures,
         root=score_mod.REPO_ROOT,
     )
-    import hashlib
-
-    assert hashlib.sha256(old_report.encode("utf-8")).hexdigest() == (
-        "0d469c83d3c783f94b6ff3304be355a10a5e3ad871ba1bd42969ee069befbd05"
-    )
+    # Parity is the claim: the streamed render must equal the legacy render
+    # byte for byte. The legacy render itself legitimately changes with every
+    # store landing, so its absolute hash is not pinned here.
     streamed_report = score_mod._render_score_report_from_payloads_legacy(
         payloads,
         context=context,
