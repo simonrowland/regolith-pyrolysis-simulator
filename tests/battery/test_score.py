@@ -1560,6 +1560,53 @@ def test_unverified_kems_value_refuses_without_printed_in_cell_pressures() -> No
     assert refused.numeric is None
 
 
+def test_kems_pressure_without_printed_calibration_is_scored_and_flagged() -> None:
+    experiment = F.kems_experiment(calibrated=False, kn=None)
+    experiment = replace(
+        experiment,
+        pressure_environment=replace(
+            experiment.pressure_environment,
+            total_pressure_Pa=Located(State.unknown("not printed")),
+        ),
+    )
+    identity = replace(
+        _partial_identity(),
+        total_pressure_Pa=State.of(Decimal("1e-6")),
+    )
+    reference = F.observation(
+        "uncalibrated-pressure",
+        experiment.experiment_id,
+        identity,
+        Decimal("0.2"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="kems-025-markova-1983",
+    )
+    reference = replace(
+        reference,
+        evidence=replace(
+            reference.evidence,
+            original_method_class="measured_direct",
+        ),
+    )
+    prediction = _partial_prediction(Engine.INTERNAL_ANALYTICAL, reference)
+    context = _context(F.work(), experiment, reference, review="reviewed")
+    residual, _ = compile_residual(
+        reference,
+        Engine.INTERNAL_ANALYTICAL,
+        context=context,
+        prediction=prediction,
+    )
+
+    assert residual.status is not ResidualStatus.REFUSED
+    assert residual.numeric is not None
+    assert residual.refusal is None
+    assert residual.score_eligible is False
+    assert any(
+        notice.kind is NoticeKind.UNVERIFIED_APPARATUS
+        for notice in residual.notices
+    )
+
+
 def test_catalogue_composition_is_flagged_and_excluded_from_headline() -> None:
     experiment = F.kems_experiment()
     composition = Composition(

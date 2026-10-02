@@ -786,6 +786,15 @@ def _missing_apparatus_fact(
         detail = {}
     if name == "kems_calibration" and allow_calibration:
         return "calibration"
+    # The in-cell fallback repeats this same missing-calibration failure.
+    if (
+        name == "in_cell_partial_pressure_sum"
+        and allow_calibration
+        and detail.get("route") == "in_cell_fallback"
+        and detail.get("reason")
+        == "calibration is not grounded for the in-cell fallback"
+    ):
+        return "calibration"
     if name == "background_pressure_stated" and not getattr(check, "passed", True):
         return "background_pressure"
     if name == "orifice_knudsen" and not getattr(check, "passed", True):
