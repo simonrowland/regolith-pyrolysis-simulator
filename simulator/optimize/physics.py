@@ -153,6 +153,15 @@ def _normalized_gate_margin_feasibility(
         return bool(feasible)
     verdict = status_payload.get("coating_verdict")
     if verdict in {"violated", "unavailable"}:
+        sticking_authority = status_payload.get("sticking_alpha_authority")
+        if (
+            verdict == "unavailable"
+            and status_payload.get("coating_constraint_mode")
+            == "no_unqualified_deposition"
+            and isinstance(sticking_authority, Mapping)
+            and sticking_authority.get("code") == "wall_deposit_coverage_unknown"
+        ):
+            return bool(feasible)
         return False
     if (
         margin == -math.inf
@@ -840,22 +849,48 @@ class PhysicsConstraintSet:
                     "require_coating_gate with no sourced resinter capacity"
                 ),
             )
+            sticking_authority = report.get("sticking_alpha_authority")
             coating_authoritative = (
-                _authority_is_authoritative(authority_payload)
-                if "sticking_alpha_authority" in report
-                else bool(report.get("authoritative_for_resinter", True))
+                report.get("coating_constraint_authoritative") is True
+                and not (
+                    isinstance(sticking_authority, Mapping)
+                    and sticking_authority.get(
+                        "authoritative_for_deposit_mass"
+                    ) is False
+                )
+                if constraint_mode == "no_unqualified_deposition"
+                else (
+                    _authority_is_authoritative(authority_payload)
+                    if "sticking_alpha_authority" in report
+                    else bool(report.get("authoritative_for_resinter", True))
+                )
             )
             constraint_authoritative = (
                 report.get("coating_constraint_authoritative") is True
             )
-            if unavailable_reason:
+            priced_status_bearing_quantity = (
+                (constraint_mode == "no_unqualified_deposition"
+                 or threshold_is_unqualified)
+                and (
+                    "unqualified_deposition_rate_kg_per_campaign" in report
+                    or "wall_deposit_kg_per_campaign" in report
+                )
+                and authority_payload.get("code")
+                == "wall_deposit_vapour_carrier_non_authoritative"
+                and authority_payload.get("wall_quantity_unavailable") is not True
+            )
+            if unavailable_reason and not priced_status_bearing_quantity:
                 return GateMargin(
                     gate="coating",
                     feasible=False,
                     margin=-math.inf,
                     threshold=threshold,
                     observed=None,
-                    detail=f"coating unavailable: {unavailable_reason}",
+                    detail=(
+                        "non-authoritative: coating feasibility unconstrained; "
+                        f"output_status={output_status}; "
+                        f"status_reason={unavailable_reason}"
+                    ),
                     status="unavailable",
                     authoritative=False,
                     output_status=output_status,
@@ -947,7 +982,14 @@ class PhysicsConstraintSet:
         reasons = _coating_violation_reasons(
             authority=authority_payload,
             deposit_records=deposit_records,
-            aggregate_deposit_kg=aggregate_deposit,
+            aggregate_deposit_kg=(
+                aggregate_deposit
+                if (
+                    threshold_is_unqualified
+                    or constraint_mode == "no_unqualified_deposition"
+                )
+                else None
+            ),
             diagnostics=diagnostics,
             explicit_reasons=report.get("coating_violation_reasons", ()),
         )

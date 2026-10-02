@@ -1690,7 +1690,35 @@ def _evaluate_physics_constraints(
             },
         )
     feasibility = _with_knudsen_fallback_margin_detail(feasibility, prepared_trace)
-    return _with_extraction_not_attempted_verdicts(feasibility, prepared_trace)
+    feasibility = _with_extraction_not_attempted_verdicts(
+        feasibility,
+        prepared_trace,
+    )
+    coating = feasibility.margins.get("coating")
+    coating_authority = (
+        coating.status_payload.get("sticking_alpha_authority")
+        if coating is not None
+        else None
+    )
+    if (
+        coating is not None
+        and coating.status == "unavailable"
+        and not coating.authoritative
+        and isinstance(coating_authority, MappingABC)
+        and coating_authority.get("code") == "wall_deposit_coverage_unknown"
+    ):
+        margins = dict(feasibility.margins)
+        margins["coating"] = replace(coating, feasible=True)
+        feasibility = FeasibilityResult(
+            feasible=all(margin.feasible for margin in margins.values()),
+            margins={
+                gate: margins[gate]
+                for gate in GATE_ORDER
+                if gate in margins
+            },
+            version=feasibility.version,
+        )
+    return feasibility
 
 
 def _trace_with_optimizer_coating_report(
@@ -1836,7 +1864,27 @@ def _trace_with_optimizer_coating_report(
                 refusal_payload[key] = wall_authority[key]
         if refusal_payload:
             report["sticking_alpha_authority"] = refusal_payload
-    if charge_mass_kg is not None:
+    if refused_species:
+        report[
+            "wall_saturation_pressure_refused_flux_upper_bounds_kg_per_campaign"
+        ] = refused_flux_bounds
+    has_priced_wall_quantity = any(
+        kg > COATING_POSITIVE_DEPOSIT_TOLERANCE_KG_PER_CAMPAIGN
+        for kg in normalized_deposit.values()
+    ) or bool(refused_flux_bounds)
+    if threshold_parametric:
+        report["unqualified_deposition_rate_kg_per_campaign"] = float(
+            runner_report.get("wall_deposit_kg_per_campaign", 0.0) or 0.0
+        )
+        report.update(
+            coating_constraint_mode="no_unqualified_deposition",
+            coating_constraint_authoritative=True,
+            coating_constraint_reason=(
+                "without a finite material damage capacity, no positive "
+                "continuous deposition rate has a qualified liner lifespan"
+            ),
+        )
+    elif charge_mass_kg is not None and has_priced_wall_quantity:
         report.update(
             feedstock_charge_mass_kg=charge_mass_kg,
             coating_constraint_mode="upstream_deposit_fraction",
@@ -1845,23 +1893,6 @@ def _trace_with_optimizer_coating_report(
                 "d-045 upstream wall deposit fraction per campaign"
             ),
         )
-    if refused_species:
-        report[
-            "wall_saturation_pressure_refused_flux_upper_bounds_kg_per_campaign"
-        ] = refused_flux_bounds
-    if threshold_parametric:
-        report["unqualified_deposition_rate_kg_per_campaign"] = float(
-            runner_report.get("wall_deposit_kg_per_campaign", 0.0) or 0.0
-        )
-        if charge_mass_kg is None:
-            report.update(
-                coating_constraint_mode="no_unqualified_deposition",
-                coating_constraint_authoritative=True,
-                coating_constraint_reason=(
-                    "without a finite material damage capacity, no positive "
-                    "continuous deposition rate has a qualified liner lifespan"
-                ),
-            )
     if not authoritative:
         report.update(
             authoritative=False,
