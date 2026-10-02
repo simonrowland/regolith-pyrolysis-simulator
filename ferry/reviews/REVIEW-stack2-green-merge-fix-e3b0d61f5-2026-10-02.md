@@ -110,4 +110,21 @@ Non-blocking known gap for this REVIEW OF RECORD (REQ asked silent-vs-flagged; n
 
 Attacks (1)–(5) answered with code + targeted tests + seat probes. Controller rejection of +30→vapour routing is closed by `e3b0d61f5`; optimizer flagged/bounded pricing holds; gas partial vs scheduled pO2 consumers correct; a8cefc8ba merge-tree clean as a sibling of this tip.
 
-— regolith-empirical
+## Independent re-seat confirmation
+
+Prior seat executor disappeared mid-flight; this REVIEW OF RECORD was re-done from scratch on the same checkout (`slot-b565` @ `e3b0d61f5`) at **2026-10-02 ~19:40–20:05 ET**. Independent code+test evidence confirms the same verdict:
+
+| Attack | Re-seat result |
+| --- | --- |
+| (1) +30 → a_FeO / vapour / SulfSat | **PASS (no)**: tip nulls `intrinsic_fO2_log` for `ferrous_free_lower_bound`; a_FeO unavailable; Fe activity = Kress@iface ≠ Kress@+30; SulfSat `not_evaluated`/`ferrous_free_lower_bound`. Pin passed. |
+| (2) flagged/bounded wall pricing | **PASS**: refused flux upper bounds; missing never zero; `warning` retained; status-bearing wall priced non-authoritative. Pins passed. |
+| (3) gas partial vs scheduled pO2 | **PASS**: `e7bd0cd52` test-only; `build_per_hour_summary.pO2_bar` from overhead O2 partial; interface separate. |
+| (4) M3 Fe channel hour silence | **ANSWERED**: Fe activity flagged on VP provenance (`fe_activity_from_interface_in_ferrous_free_melt`); hour `vapor_species_kg_hr` / summary lack Fe eligibility notice → flux silence is known non-blocking gap. |
+| (5) a8cefc8ba merge-tree | **PASS**: not ancestor; merge-base green `91567188d`; `merge-tree --write-tree` clean vs `a8cefc8ba` and vs moved green `e620b4dd5`. |
+
+Targeted VPS re-seat pins (4): ferrous-free vapour activity, ferrous-free hour split publish, preset-bridge pO2, refused-wall pricing — **all passed**.
+
+**LAND** `e3b0d61f59aa5edd48bdb0c255a103c956cfa9bc` unchanged.
+
+— regolith-empirical (re-seat)
+
