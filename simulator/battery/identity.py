@@ -794,6 +794,14 @@ def _melt_activity_uncompared_axes(
     return frozenset(omitted)
 
 
+def _uncompared_axes_for(identity: Identity) -> frozenset[str]:
+    """Return axes that may retain values without becoming comparison keys."""
+
+    if quantity_token(identity) is Quantity.P_PARTIAL:
+        return _P_PARTIAL_UNCOMPARED_AXES
+    return _melt_activity_uncompared_axes((identity,))
+
+
 def _comparison_profile(left: Identity, right: Identity) -> QuantityProfile:
     left_profile = profile_for(left)
     right_profile = profile_for(right)
@@ -1206,12 +1214,9 @@ def validate_quantity_profile(identity: Identity) -> IdentityEqualOutcome:
     if quantity_token(identity) is None:
         return IdentityEqualOutcome(IdentityEqualKind.EQUAL)
     profile = profile_for(identity)
-    uncompared_axes = _melt_activity_uncompared_axes((identity,))
-    if quantity_token(identity) is Quantity.P_PARTIAL:
-        # Unlike N/A axes, these may still carry source-printed values (for
-        # example Plante's reaction and K2O reservoir). They remain valid
-        # metadata but are not equality keys or prediction inputs.
-        uncompared_axes |= _P_PARTIAL_UNCOMPARED_AXES
+    # p_partial's optional reaction/reference/reservoir values and melt
+    # activity's omitted pressure axes remain metadata, not comparison keys.
+    uncompared_axes = _uncompared_axes_for(identity)
     bad: list[str] = []
     for name in _AXIS_NAMES:
         state = _axis_state(identity, name)
