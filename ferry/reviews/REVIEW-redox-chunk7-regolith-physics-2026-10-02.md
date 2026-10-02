@@ -11,7 +11,7 @@
 - **REQ:** `/workspace/ferry-inbox/REQ-redox-c7-from-regolith-physics-2026-10-02.md`
 - **Worker report:** `/workspace/ferry-inbox/regolith-physics-redox-2026-09-30/c7-report.md`
 - **Design:** r3 §7 chunk 7 (CONVERGED under `REVIEW-redox-design-r3-confirm-2026-09-30.md`); North Star predict-and-flag
-- **Date:** 2026-10-02 ~14:38–15:15 ET
+- **Date:** 2026-10-02 ~14:38–15:15 ET (initial b565 draft); re-seat confirm ~15:03–15:35 ET on slot-z14
 - **Mode:** read-only for product code; extracts not edited; no push of empirical feature branches. Targeted VPS unit tests only (no full W3).
 
 ## Scope
@@ -33,6 +33,17 @@ Chunk 7: replace nested amount-bisection BE with exponential local-Jacobian step
 **Atom balance on flagged commit:** `test_directionally_available_fe2o3_predicts_release_after_larger_prior_tick`, `test_nonconverged_finite_oxygen_transfer_commits_flagged_prediction`, M2 stoichiometry oxidizing/reducing — **passed**. Flagged path is honest (published residual) and ledger-closed.
 
 ### (2) Does any path still abort a whole run? — **FAIL → drives REVISE**
+
+**Re-seat confirmation (slot-z14, 2026-10-02 ~15:30 ET):** independent probe with `_fe_saturation_bound_fO2_log → None` reproduced:
+
+```
+SHADOW status ok flags [activity_fixed_point_nonconverged, candidate_solve_incomplete] transfer 0.0
+CONFIRMED APPLY ABORT: oxygen_interface_activity_fixed_point_nonconverged
+CONFIRMED HOUR ABORT: oxygen_interface_activity_fixed_point_nonconverged
+```
+
+Additional z14 evidence: ferric z=1/100 seat probe atom-balanced (Fe/O closed, `amount_bisections` path unused, error estimates ≤2e-13, no flags); `scripts/verify_chunk7_mutations.py` detected all four mutations and restored; c6 LAND + green `e7bd0cd52` confirmed ancestors; `--remerge-diff` empty on `385db7dd1` for `simulator/core.py`.
+
 
 Predict-and-flag works for:
 
