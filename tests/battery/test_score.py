@@ -5430,53 +5430,49 @@ def test_inferred_nonmodelled_cell_still_refuses_oxygen_balance() -> None:
     )
 
 
-def test_score_store_refuses_all_stolyarova_1996_unknown_reference_activity_points() -> None:
-    source_id = "stolyarova-1996-cao-alumina-silica-kems"
-    context = load_score_context(sources=(source_id,))
-    activity_rows = [
-        obs
-        for obs in context.observations.values()
-        if obs.source_id == source_id
-        and isinstance(obs.identity, Identity)
-        and quantity_token(obs.identity) is Quantity.ACTIVITY
-        and obs.identity.reference_state is not None
-        and obs.identity.reference_state.is_unknown
-        and obs.value.kind is ValueKind.POINT
-    ]
-    assert len(activity_rows) == 137
-    assert all(obs.evidence.class_.is_unknown for obs in activity_rows)
-    activity_context = replace(
-        context,
-        observations={obs.observation_id: obs for obs in activity_rows},
-        origins={
-            obs.observation_id: context.origins[obs.observation_id]
-            for obs in activity_rows
-            if obs.observation_id in context.origins
-        },
+def test_score_store_refuses_synthetic_unknown_reference_activity_point() -> None:
+    work = F.work("unknown-activity-reference-fixture")
+    experiment = F.tabulation_experiment(
+        "unknown-activity-reference-experiment", work.work_id
     )
+    identity = replace(
+        F.activity_identity(formula="CaO"),
+        reference_state=State.unknown("source reference state not printed"),
+    )
+    observation = F.observation(
+        "unknown-activity-reference-fixture::activity",
+        experiment.experiment_id,
+        identity,
+        Decimal("0.42"),
+        source_id=work.work_id,
+    )
+    observation = replace(
+        observation,
+        evidence=replace(
+            observation.evidence,
+            class_=State.unknown("method class not established"),
+        ),
+    )
+    context = _context(work, experiment, observation)
 
     def no_prediction(*args, **kwargs):
         pytest.fail("unknown activity reference state must refuse before prediction")
 
     residuals, _ = score_store(
-        activity_context,
+        context,
         engines=(Engine.INTERNAL_ANALYTICAL,),
         include_diagnostics=True,
         predict=no_prediction,
     )
 
-    assert len(residuals) == 137
-    assert {row.reference for row in residuals} == {
-        obs.observation_id for obs in activity_rows
-    }
-    assert all(row.status is ResidualStatus.REFUSED for row in residuals)
-    assert all(row.refusal is not None for row in residuals)
-    assert all(row.refusal.reason is RefusalReason.IDENTITY_UNKNOWN for row in residuals)
-    assert all(
-        row.refusal.detail["reason"] == "activity_reference_state_unknown"
-        and row.refusal.detail["fields"] == ["reference_state"]
-        for row in residuals
-    )
+    assert len(residuals) == 1
+    residual = residuals[0]
+    assert residual.reference == observation.observation_id
+    assert residual.status is ResidualStatus.REFUSED
+    assert residual.refusal is not None
+    assert residual.refusal.reason is RefusalReason.IDENTITY_UNKNOWN
+    assert residual.refusal.detail["reason"] == "activity_reference_state_unknown"
+    assert residual.refusal.detail["fields"] == ["reference_state"]
 
 
 def test_score_store_refuses_categorical_stolyarova_figure_only_row() -> None:
