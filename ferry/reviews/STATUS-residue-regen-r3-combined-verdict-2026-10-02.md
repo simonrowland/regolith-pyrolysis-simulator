@@ -9,7 +9,7 @@
 - **VERDICT R3: LAND 50da4a5e9c300b03b770945640076e4d6ab709f6**
 - **Deliverable:** `REVIEW-residue-regen-r3-combined-2026-10-02.md`
 - **Date:** 2026-10-02 ~19:25 ET
-- **Mailbox tip:** `61198107464ca7c9ecc267675fede0da346aee08` on `empirical/reviews-batch-zv-2026-09-22`
+- **Mailbox tip:** `7e42049908500499667b42553ca1ca6f93f661f4` on `empirical/reviews-batch-zv-2026-09-22` (artifacts `188b6a97fb6ac4438d318146cd7307bfedeb4777`).
 
 Attacks PASS. Both tips share base `b13a98ae0`; merge-tree clean. Regen: Sossi 612/44 + Hashimoto 681/27 counts and observation_ids unchanged; 522 Sossi + 648 Hashimoto identity.composition null→printed_oxides; starting_component_ppm unchanged; Hashimoto VF_wt_pct fills/locator-note rewrites with state.value stable (120/120); no hand-edit (3-file commit, systematic cohort). OpenIMCC pin `afcb5d8` in shared venv; oxygen-balance green on pin. Targeted on regen: **110 PASS** (~156 s). R3 spot-check: tip+constants intact; **15 PASS** (~36 s); prior LAND retained. Full store 263/3518/121085 not re-run on VPS — **ASK Mac Studio** for corpus validate / full pytest green gate if needed before merge (do not block LAND on sample-diff + targeted PASS). No extract invention; Mac listen pools not armed; product review branches not pushed; mailbox artifacts only on `empirical/reviews-batch-zv-2026-09-22`.
 
