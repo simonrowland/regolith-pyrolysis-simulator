@@ -119,9 +119,14 @@ observations:
       value: compilation_assessed
     original_method_class: review_compilation
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - evaporation_coefficient_alpha
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: kems-009-safarian-2013::safarian_2013_si_pure_liquid_alpha_b1
   source_id: kems-009-safarian-2013
   locator:
     paragraph: liquid metal evaporation; 0.844 n_Max intensive vacuum limit

@@ -1682,9 +1682,14 @@ observations:
       reason: unmapped regime 'kems_effusion'
     original_method_class: kems_effusion
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - activity
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: kems-022-demaria-1971::demaria_1971_fe_activity_multi_rotating_cell
   source_id: kems-022-demaria-1971
   locator:
     figure: '3'
@@ -1768,9 +1773,14 @@ observations:
       reason: unmapped regime 'kems_effusion'
     original_method_class: kems_effusion
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - activity
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: kems-022-demaria-1971::demaria_1971_fe_lunar_basalt_kems_main_cell
   source_id: kems-022-demaria-1971
   locator:
     figure: '3'

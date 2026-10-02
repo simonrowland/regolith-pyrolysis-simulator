@@ -78,9 +78,14 @@ observations:
       reason: unmapped regime 'langmuir_free_evaporation'
     original_method_class: langmuir_free_evaporation
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - evaporation_coefficient_alpha
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: kems-037-richter-2002::richter_2002_mg_cai_langmuir_gamma
   source_id: kems-037-richter-2002
   locator:
     table: '1'
@@ -169,9 +174,14 @@ observations:
       value: measured_direct
     original_method_class: measured_direct
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - evaporation_coefficient_alpha
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: kems-037-richter-2002::richter_2002_mg_table1_per_run_areas_b1
   source_id: kems-037-richter-2002
   locator:
     table: '1'

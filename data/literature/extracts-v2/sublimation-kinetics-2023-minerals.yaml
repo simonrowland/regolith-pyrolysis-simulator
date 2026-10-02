@@ -1037,9 +1037,14 @@ observations:
     original_method_class: quoted_from_other_workers
     attribution: For BET calculations a sample density of 3.03 g/cm3 was used as per LMS-1 simulant specifications [10].
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - density
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: sublimation-kinetics-2023-minerals::shaw_2023_lms1_quoted_spec_density
   source_id: sublimation-kinetics-2023-minerals
   locator:
     published_page: 3

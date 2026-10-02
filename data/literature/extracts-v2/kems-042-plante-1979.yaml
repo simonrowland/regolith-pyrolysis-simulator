@@ -89701,8 +89701,8 @@ observations:
     original_method_class: directly_reduced_measurement
     attribution: 1356a | 21.14 | 2.51E-7
   admission:
-    status: pending
-    reason: source admission_status=pending
+    status: admitted
+    reason: 'admission_defaulted: source admission_status=pending; owner ruling d-056; not a reviewer decision'
   notices:
   - kind: out_of_certified_band
     affected_quantities:
@@ -89710,6 +89710,17 @@ observations:
     reason: Printed pressure retained; no equilibrium comparator claimed for bulk composition in the two-phase region.
     origin: kems-042-plante-1979::plante1979_table2_s1123_r030_quoted
     band: two_phase_bulk_composition_not_liquid_composition
+  - kind: pressure_provenance_unknown
+    affected_quantities:
+    - p_partial
+    reason: 'fO2_Pa is a DERIVED condition, not a measurement: congruent vaporization K2O(l) -> 2K + 1/2 O2; P_O2/P_K=(1/4)*sqrt(32.00/39.10)=0.2262
+      (Plante printed 0.226).'
+    origin: kems-042-plante-1979::plante1979_table2_s1123_r030_quoted
+  - kind: admission_defaulted
+    affected_quantities:
+    - p_partial
+    reason: 'admission_defaulted: source admission_status=pending; owner ruling d-056; not a reviewer decision'
+    origin: kems-042-plante-1979::plante1979_table2_s1123_r030_quoted
   source_id: kems-042-plante-1979
   locator:
     published_page: 277
@@ -89906,8 +89917,8 @@ observations:
     original_method_class: directly_reduced_measurement
     attribution: 1298a | 21.14 | 1.04E-7
   admission:
-    status: pending
-    reason: source admission_status=pending
+    status: admitted
+    reason: 'admission_defaulted: source admission_status=pending; owner ruling d-056; not a reviewer decision'
   notices:
   - kind: out_of_certified_band
     affected_quantities:
@@ -89915,6 +89926,17 @@ observations:
     reason: Printed pressure retained; no equilibrium comparator claimed for bulk composition in the two-phase region.
     origin: kems-042-plante-1979::plante1979_table2_s1123_r031_quoted
     band: two_phase_bulk_composition_not_liquid_composition
+  - kind: pressure_provenance_unknown
+    affected_quantities:
+    - p_partial
+    reason: 'fO2_Pa is a DERIVED condition, not a measurement: congruent vaporization K2O(l) -> 2K + 1/2 O2; P_O2/P_K=(1/4)*sqrt(32.00/39.10)=0.2262
+      (Plante printed 0.226).'
+    origin: kems-042-plante-1979::plante1979_table2_s1123_r031_quoted
+  - kind: admission_defaulted
+    affected_quantities:
+    - p_partial
+    reason: 'admission_defaulted: source admission_status=pending; owner ruling d-056; not a reviewer decision'
+    origin: kems-042-plante-1979::plante1979_table2_s1123_r031_quoted
   source_id: kems-042-plante-1979
   locator:
     published_page: 277
@@ -90111,8 +90133,8 @@ observations:
     original_method_class: directly_reduced_measurement
     attribution: 1368a | 21.13 | 3.33E-7
   admission:
-    status: pending
-    reason: source admission_status=pending
+    status: admitted
+    reason: 'admission_defaulted: source admission_status=pending; owner ruling d-056; not a reviewer decision'
   notices:
   - kind: out_of_certified_band
     affected_quantities:
@@ -90120,6 +90142,17 @@ observations:
     reason: Printed pressure retained; no equilibrium comparator claimed for bulk composition in the two-phase region.
     origin: kems-042-plante-1979::plante1979_table2_s1126_r001_quoted
     band: two_phase_bulk_composition_not_liquid_composition
+  - kind: pressure_provenance_unknown
+    affected_quantities:
+    - p_partial
+    reason: 'fO2_Pa is a DERIVED condition, not a measurement: congruent vaporization K2O(l) -> 2K + 1/2 O2; P_O2/P_K=(1/4)*sqrt(32.00/39.10)=0.2262
+      (Plante printed 0.226).'
+    origin: kems-042-plante-1979::plante1979_table2_s1126_r001_quoted
+  - kind: admission_defaulted
+    affected_quantities:
+    - p_partial
+    reason: 'admission_defaulted: source admission_status=pending; owner ruling d-056; not a reviewer decision'
+    origin: kems-042-plante-1979::plante1979_table2_s1126_r001_quoted
   source_id: kems-042-plante-1979
   locator:
     published_page: 277
@@ -95266,8 +95299,8 @@ observations:
     original_method_class: directly_reduced_measurement
     attribution: 1561a | 16.72 | 6.41E-6
   admission:
-    status: pending
-    reason: source admission_status=pending
+    status: admitted
+    reason: 'admission_defaulted: source admission_status=pending; owner ruling d-056; not a reviewer decision'
   notices:
   - kind: out_of_certified_band
     affected_quantities:
@@ -95275,6 +95308,17 @@ observations:
     reason: Printed pressure retained; no equilibrium comparator claimed for bulk composition in the two-phase region.
     origin: kems-042-plante-1979::plante1979_table2_s1126_r017_quoted
     band: two_phase_bulk_composition_not_liquid_composition
+  - kind: pressure_provenance_unknown
+    affected_quantities:
+    - p_partial
+    reason: 'fO2_Pa is a DERIVED condition, not a measurement: congruent vaporization K2O(l) -> 2K + 1/2 O2; P_O2/P_K=(1/4)*sqrt(32.00/39.10)=0.2262
+      (Plante printed 0.226).'
+    origin: kems-042-plante-1979::plante1979_table2_s1126_r017_quoted
+  - kind: admission_defaulted
+    affected_quantities:
+    - p_partial
+    reason: 'admission_defaulted: source admission_status=pending; owner ruling d-056; not a reviewer decision'
+    origin: kems-042-plante-1979::plante1979_table2_s1126_r017_quoted
   source_id: kems-042-plante-1979
   locator:
     published_page: 277
@@ -95471,8 +95515,8 @@ observations:
     original_method_class: directly_reduced_measurement
     attribution: 1524a | 16.67 | 3.57E-6
   admission:
-    status: pending
-    reason: source admission_status=pending
+    status: admitted
+    reason: 'admission_defaulted: source admission_status=pending; owner ruling d-056; not a reviewer decision'
   notices:
   - kind: out_of_certified_band
     affected_quantities:
@@ -95480,6 +95524,17 @@ observations:
     reason: Printed pressure retained; no equilibrium comparator claimed for bulk composition in the two-phase region.
     origin: kems-042-plante-1979::plante1979_table2_s1126_r018_quoted
     band: two_phase_bulk_composition_not_liquid_composition
+  - kind: pressure_provenance_unknown
+    affected_quantities:
+    - p_partial
+    reason: 'fO2_Pa is a DERIVED condition, not a measurement: congruent vaporization K2O(l) -> 2K + 1/2 O2; P_O2/P_K=(1/4)*sqrt(32.00/39.10)=0.2262
+      (Plante printed 0.226).'
+    origin: kems-042-plante-1979::plante1979_table2_s1126_r018_quoted
+  - kind: admission_defaulted
+    affected_quantities:
+    - p_partial
+    reason: 'admission_defaulted: source admission_status=pending; owner ruling d-056; not a reviewer decision'
+    origin: kems-042-plante-1979::plante1979_table2_s1126_r018_quoted
   source_id: kems-042-plante-1979
   locator:
     published_page: 277
@@ -95676,8 +95731,8 @@ observations:
     original_method_class: directly_reduced_measurement
     attribution: 1488a | 16.64 | 2.01E-6
   admission:
-    status: pending
-    reason: source admission_status=pending
+    status: admitted
+    reason: 'admission_defaulted: source admission_status=pending; owner ruling d-056; not a reviewer decision'
   notices:
   - kind: out_of_certified_band
     affected_quantities:
@@ -95685,6 +95740,17 @@ observations:
     reason: Printed pressure retained; no equilibrium comparator claimed for bulk composition in the two-phase region.
     origin: kems-042-plante-1979::plante1979_table2_s1126_r019_quoted
     band: two_phase_bulk_composition_not_liquid_composition
+  - kind: pressure_provenance_unknown
+    affected_quantities:
+    - p_partial
+    reason: 'fO2_Pa is a DERIVED condition, not a measurement: congruent vaporization K2O(l) -> 2K + 1/2 O2; P_O2/P_K=(1/4)*sqrt(32.00/39.10)=0.2262
+      (Plante printed 0.226).'
+    origin: kems-042-plante-1979::plante1979_table2_s1126_r019_quoted
+  - kind: admission_defaulted
+    affected_quantities:
+    - p_partial
+    reason: 'admission_defaulted: source admission_status=pending; owner ruling d-056; not a reviewer decision'
+    origin: kems-042-plante-1979::plante1979_table2_s1126_r019_quoted
   source_id: kems-042-plante-1979
   locator:
     published_page: 277
@@ -95881,8 +95947,8 @@ observations:
     original_method_class: directly_reduced_measurement
     attribution: 1443a | 16.62 | 9.50E-7
   admission:
-    status: pending
-    reason: source admission_status=pending
+    status: admitted
+    reason: 'admission_defaulted: source admission_status=pending; owner ruling d-056; not a reviewer decision'
   notices:
   - kind: out_of_certified_band
     affected_quantities:
@@ -95890,6 +95956,17 @@ observations:
     reason: Printed pressure retained; no equilibrium comparator claimed for bulk composition in the two-phase region.
     origin: kems-042-plante-1979::plante1979_table2_s1126_r020_quoted
     band: two_phase_bulk_composition_not_liquid_composition
+  - kind: pressure_provenance_unknown
+    affected_quantities:
+    - p_partial
+    reason: 'fO2_Pa is a DERIVED condition, not a measurement: congruent vaporization K2O(l) -> 2K + 1/2 O2; P_O2/P_K=(1/4)*sqrt(32.00/39.10)=0.2262
+      (Plante printed 0.226).'
+    origin: kems-042-plante-1979::plante1979_table2_s1126_r020_quoted
+  - kind: admission_defaulted
+    affected_quantities:
+    - p_partial
+    reason: 'admission_defaulted: source admission_status=pending; owner ruling d-056; not a reviewer decision'
+    origin: kems-042-plante-1979::plante1979_table2_s1126_r020_quoted
   source_id: kems-042-plante-1979
   locator:
     published_page: 277
@@ -96086,8 +96163,8 @@ observations:
     original_method_class: directly_reduced_measurement
     attribution: 1400a | 16.62 | 4.97E-7
   admission:
-    status: pending
-    reason: source admission_status=pending
+    status: admitted
+    reason: 'admission_defaulted: source admission_status=pending; owner ruling d-056; not a reviewer decision'
   notices:
   - kind: out_of_certified_band
     affected_quantities:
@@ -96095,6 +96172,17 @@ observations:
     reason: Printed pressure retained; no equilibrium comparator claimed for bulk composition in the two-phase region.
     origin: kems-042-plante-1979::plante1979_table2_s1126_r021_quoted
     band: two_phase_bulk_composition_not_liquid_composition
+  - kind: pressure_provenance_unknown
+    affected_quantities:
+    - p_partial
+    reason: 'fO2_Pa is a DERIVED condition, not a measurement: congruent vaporization K2O(l) -> 2K + 1/2 O2; P_O2/P_K=(1/4)*sqrt(32.00/39.10)=0.2262
+      (Plante printed 0.226).'
+    origin: kems-042-plante-1979::plante1979_table2_s1126_r021_quoted
+  - kind: admission_defaulted
+    affected_quantities:
+    - p_partial
+    reason: 'admission_defaulted: source admission_status=pending; owner ruling d-056; not a reviewer decision'
+    origin: kems-042-plante-1979::plante1979_table2_s1126_r021_quoted
   source_id: kems-042-plante-1979
   locator:
     published_page: 277
@@ -96291,8 +96379,8 @@ observations:
     original_method_class: directly_reduced_measurement
     attribution: 1359a | 16.62 | 2.20E-7
   admission:
-    status: pending
-    reason: source admission_status=pending
+    status: admitted
+    reason: 'admission_defaulted: source admission_status=pending; owner ruling d-056; not a reviewer decision'
   notices:
   - kind: out_of_certified_band
     affected_quantities:
@@ -96300,6 +96388,17 @@ observations:
     reason: Printed pressure retained; no equilibrium comparator claimed for bulk composition in the two-phase region.
     origin: kems-042-plante-1979::plante1979_table2_s1126_r022_quoted
     band: two_phase_bulk_composition_not_liquid_composition
+  - kind: pressure_provenance_unknown
+    affected_quantities:
+    - p_partial
+    reason: 'fO2_Pa is a DERIVED condition, not a measurement: congruent vaporization K2O(l) -> 2K + 1/2 O2; P_O2/P_K=(1/4)*sqrt(32.00/39.10)=0.2262
+      (Plante printed 0.226).'
+    origin: kems-042-plante-1979::plante1979_table2_s1126_r022_quoted
+  - kind: admission_defaulted
+    affected_quantities:
+    - p_partial
+    reason: 'admission_defaulted: source admission_status=pending; owner ruling d-056; not a reviewer decision'
+    origin: kems-042-plante-1979::plante1979_table2_s1126_r022_quoted
   source_id: kems-042-plante-1979
   locator:
     published_page: 277
@@ -96496,8 +96595,8 @@ observations:
     original_method_class: directly_reduced_measurement
     attribution: 1310a | 16.62 | 9.59E-8
   admission:
-    status: pending
-    reason: source admission_status=pending
+    status: admitted
+    reason: 'admission_defaulted: source admission_status=pending; owner ruling d-056; not a reviewer decision'
   notices:
   - kind: out_of_certified_band
     affected_quantities:
@@ -96505,6 +96604,17 @@ observations:
     reason: Printed pressure retained; no equilibrium comparator claimed for bulk composition in the two-phase region.
     origin: kems-042-plante-1979::plante1979_table2_s1126_r023_quoted
     band: two_phase_bulk_composition_not_liquid_composition
+  - kind: pressure_provenance_unknown
+    affected_quantities:
+    - p_partial
+    reason: 'fO2_Pa is a DERIVED condition, not a measurement: congruent vaporization K2O(l) -> 2K + 1/2 O2; P_O2/P_K=(1/4)*sqrt(32.00/39.10)=0.2262
+      (Plante printed 0.226).'
+    origin: kems-042-plante-1979::plante1979_table2_s1126_r023_quoted
+  - kind: admission_defaulted
+    affected_quantities:
+    - p_partial
+    reason: 'admission_defaulted: source admission_status=pending; owner ruling d-056; not a reviewer decision'
+    origin: kems-042-plante-1979::plante1979_table2_s1126_r023_quoted
   source_id: kems-042-plante-1979
   locator:
     published_page: 277
@@ -96701,8 +96811,8 @@ observations:
     original_method_class: directly_reduced_measurement
     attribution: 1373a | 16.60 | 3.64E-7
   admission:
-    status: pending
-    reason: source admission_status=pending
+    status: admitted
+    reason: 'admission_defaulted: source admission_status=pending; owner ruling d-056; not a reviewer decision'
   notices:
   - kind: out_of_certified_band
     affected_quantities:
@@ -96710,6 +96820,17 @@ observations:
     reason: Printed pressure retained; no equilibrium comparator claimed for bulk composition in the two-phase region.
     origin: kems-042-plante-1979::plante1979_table2_s1129_r001_quoted
     band: two_phase_bulk_composition_not_liquid_composition
+  - kind: pressure_provenance_unknown
+    affected_quantities:
+    - p_partial
+    reason: 'fO2_Pa is a DERIVED condition, not a measurement: congruent vaporization K2O(l) -> 2K + 1/2 O2; P_O2/P_K=(1/4)*sqrt(32.00/39.10)=0.2262
+      (Plante printed 0.226).'
+    origin: kems-042-plante-1979::plante1979_table2_s1129_r001_quoted
+  - kind: admission_defaulted
+    affected_quantities:
+    - p_partial
+    reason: 'admission_defaulted: source admission_status=pending; owner ruling d-056; not a reviewer decision'
+    origin: kems-042-plante-1979::plante1979_table2_s1129_r001_quoted
   source_id: kems-042-plante-1979
   locator:
     published_page: 277
@@ -96906,8 +97027,8 @@ observations:
     original_method_class: directly_reduced_measurement
     attribution: 1416a | 16.60 | 7.52E-7
   admission:
-    status: pending
-    reason: source admission_status=pending
+    status: admitted
+    reason: 'admission_defaulted: source admission_status=pending; owner ruling d-056; not a reviewer decision'
   notices:
   - kind: out_of_certified_band
     affected_quantities:
@@ -96915,6 +97036,17 @@ observations:
     reason: Printed pressure retained; no equilibrium comparator claimed for bulk composition in the two-phase region.
     origin: kems-042-plante-1979::plante1979_table2_s1129_r002_quoted
     band: two_phase_bulk_composition_not_liquid_composition
+  - kind: pressure_provenance_unknown
+    affected_quantities:
+    - p_partial
+    reason: 'fO2_Pa is a DERIVED condition, not a measurement: congruent vaporization K2O(l) -> 2K + 1/2 O2; P_O2/P_K=(1/4)*sqrt(32.00/39.10)=0.2262
+      (Plante printed 0.226).'
+    origin: kems-042-plante-1979::plante1979_table2_s1129_r002_quoted
+  - kind: admission_defaulted
+    affected_quantities:
+    - p_partial
+    reason: 'admission_defaulted: source admission_status=pending; owner ruling d-056; not a reviewer decision'
+    origin: kems-042-plante-1979::plante1979_table2_s1129_r002_quoted
   source_id: kems-042-plante-1979
   locator:
     published_page: 277
@@ -97111,8 +97243,8 @@ observations:
     original_method_class: directly_reduced_measurement
     attribution: 1308a | 16.59 | 1.15E-7
   admission:
-    status: pending
-    reason: source admission_status=pending
+    status: admitted
+    reason: 'admission_defaulted: source admission_status=pending; owner ruling d-056; not a reviewer decision'
   notices:
   - kind: out_of_certified_band
     affected_quantities:
@@ -97120,6 +97252,17 @@ observations:
     reason: Printed pressure retained; no equilibrium comparator claimed for bulk composition in the two-phase region.
     origin: kems-042-plante-1979::plante1979_table2_s1129_r003_quoted
     band: two_phase_bulk_composition_not_liquid_composition
+  - kind: pressure_provenance_unknown
+    affected_quantities:
+    - p_partial
+    reason: 'fO2_Pa is a DERIVED condition, not a measurement: congruent vaporization K2O(l) -> 2K + 1/2 O2; P_O2/P_K=(1/4)*sqrt(32.00/39.10)=0.2262
+      (Plante printed 0.226).'
+    origin: kems-042-plante-1979::plante1979_table2_s1129_r003_quoted
+  - kind: admission_defaulted
+    affected_quantities:
+    - p_partial
+    reason: 'admission_defaulted: source admission_status=pending; owner ruling d-056; not a reviewer decision'
+    origin: kems-042-plante-1979::plante1979_table2_s1129_r003_quoted
   source_id: kems-042-plante-1979
   locator:
     published_page: 277
@@ -97316,8 +97459,8 @@ observations:
     original_method_class: directly_reduced_measurement
     attribution: 1313a | 16.59 | 1.11E-7
   admission:
-    status: pending
-    reason: source admission_status=pending
+    status: admitted
+    reason: 'admission_defaulted: source admission_status=pending; owner ruling d-056; not a reviewer decision'
   notices:
   - kind: out_of_certified_band
     affected_quantities:
@@ -97325,6 +97468,17 @@ observations:
     reason: Printed pressure retained; no equilibrium comparator claimed for bulk composition in the two-phase region.
     origin: kems-042-plante-1979::plante1979_table2_s1129_r004_quoted
     band: two_phase_bulk_composition_not_liquid_composition
+  - kind: pressure_provenance_unknown
+    affected_quantities:
+    - p_partial
+    reason: 'fO2_Pa is a DERIVED condition, not a measurement: congruent vaporization K2O(l) -> 2K + 1/2 O2; P_O2/P_K=(1/4)*sqrt(32.00/39.10)=0.2262
+      (Plante printed 0.226).'
+    origin: kems-042-plante-1979::plante1979_table2_s1129_r004_quoted
+  - kind: admission_defaulted
+    affected_quantities:
+    - p_partial
+    reason: 'admission_defaulted: source admission_status=pending; owner ruling d-056; not a reviewer decision'
+    origin: kems-042-plante-1979::plante1979_table2_s1129_r004_quoted
   source_id: kems-042-plante-1979
   locator:
     published_page: 277
@@ -97521,8 +97675,8 @@ observations:
     original_method_class: directly_reduced_measurement
     attribution: 1316a | 16.59 | 1.11E-7
   admission:
-    status: pending
-    reason: source admission_status=pending
+    status: admitted
+    reason: 'admission_defaulted: source admission_status=pending; owner ruling d-056; not a reviewer decision'
   notices:
   - kind: out_of_certified_band
     affected_quantities:
@@ -97530,6 +97684,17 @@ observations:
     reason: Printed pressure retained; no equilibrium comparator claimed for bulk composition in the two-phase region.
     origin: kems-042-plante-1979::plante1979_table2_s1129_r005_quoted
     band: two_phase_bulk_composition_not_liquid_composition
+  - kind: pressure_provenance_unknown
+    affected_quantities:
+    - p_partial
+    reason: 'fO2_Pa is a DERIVED condition, not a measurement: congruent vaporization K2O(l) -> 2K + 1/2 O2; P_O2/P_K=(1/4)*sqrt(32.00/39.10)=0.2262
+      (Plante printed 0.226).'
+    origin: kems-042-plante-1979::plante1979_table2_s1129_r005_quoted
+  - kind: admission_defaulted
+    affected_quantities:
+    - p_partial
+    reason: 'admission_defaulted: source admission_status=pending; owner ruling d-056; not a reviewer decision'
+    origin: kems-042-plante-1979::plante1979_table2_s1129_r005_quoted
   source_id: kems-042-plante-1979
   locator:
     published_page: 277
@@ -97726,8 +97891,8 @@ observations:
     original_method_class: directly_reduced_measurement
     attribution: 1368a | 16.59 | 2.60E-7
   admission:
-    status: pending
-    reason: source admission_status=pending
+    status: admitted
+    reason: 'admission_defaulted: source admission_status=pending; owner ruling d-056; not a reviewer decision'
   notices:
   - kind: out_of_certified_band
     affected_quantities:
@@ -97735,6 +97900,17 @@ observations:
     reason: Printed pressure retained; no equilibrium comparator claimed for bulk composition in the two-phase region.
     origin: kems-042-plante-1979::plante1979_table2_s1129_r006_quoted
     band: two_phase_bulk_composition_not_liquid_composition
+  - kind: pressure_provenance_unknown
+    affected_quantities:
+    - p_partial
+    reason: 'fO2_Pa is a DERIVED condition, not a measurement: congruent vaporization K2O(l) -> 2K + 1/2 O2; P_O2/P_K=(1/4)*sqrt(32.00/39.10)=0.2262
+      (Plante printed 0.226).'
+    origin: kems-042-plante-1979::plante1979_table2_s1129_r006_quoted
+  - kind: admission_defaulted
+    affected_quantities:
+    - p_partial
+    reason: 'admission_defaulted: source admission_status=pending; owner ruling d-056; not a reviewer decision'
+    origin: kems-042-plante-1979::plante1979_table2_s1129_r006_quoted
   source_id: kems-042-plante-1979
   locator:
     published_page: 277
@@ -97931,8 +98107,8 @@ observations:
     original_method_class: directly_reduced_measurement
     attribution: 1410a | 16.58 | 5.71E-7
   admission:
-    status: pending
-    reason: source admission_status=pending
+    status: admitted
+    reason: 'admission_defaulted: source admission_status=pending; owner ruling d-056; not a reviewer decision'
   notices:
   - kind: out_of_certified_band
     affected_quantities:
@@ -97940,6 +98116,17 @@ observations:
     reason: Printed pressure retained; no equilibrium comparator claimed for bulk composition in the two-phase region.
     origin: kems-042-plante-1979::plante1979_table2_s1129_r007_quoted
     band: two_phase_bulk_composition_not_liquid_composition
+  - kind: pressure_provenance_unknown
+    affected_quantities:
+    - p_partial
+    reason: 'fO2_Pa is a DERIVED condition, not a measurement: congruent vaporization K2O(l) -> 2K + 1/2 O2; P_O2/P_K=(1/4)*sqrt(32.00/39.10)=0.2262
+      (Plante printed 0.226).'
+    origin: kems-042-plante-1979::plante1979_table2_s1129_r007_quoted
+  - kind: admission_defaulted
+    affected_quantities:
+    - p_partial
+    reason: 'admission_defaulted: source admission_status=pending; owner ruling d-056; not a reviewer decision'
+    origin: kems-042-plante-1979::plante1979_table2_s1129_r007_quoted
   source_id: kems-042-plante-1979
   locator:
     published_page: 277
@@ -98136,8 +98323,8 @@ observations:
     original_method_class: directly_reduced_measurement
     attribution: 1454a | 16.58 | 1.22E-6
   admission:
-    status: pending
-    reason: source admission_status=pending
+    status: admitted
+    reason: 'admission_defaulted: source admission_status=pending; owner ruling d-056; not a reviewer decision'
   notices:
   - kind: out_of_certified_band
     affected_quantities:
@@ -98145,6 +98332,17 @@ observations:
     reason: Printed pressure retained; no equilibrium comparator claimed for bulk composition in the two-phase region.
     origin: kems-042-plante-1979::plante1979_table2_s1129_r008_quoted
     band: two_phase_bulk_composition_not_liquid_composition
+  - kind: pressure_provenance_unknown
+    affected_quantities:
+    - p_partial
+    reason: 'fO2_Pa is a DERIVED condition, not a measurement: congruent vaporization K2O(l) -> 2K + 1/2 O2; P_O2/P_K=(1/4)*sqrt(32.00/39.10)=0.2262
+      (Plante printed 0.226).'
+    origin: kems-042-plante-1979::plante1979_table2_s1129_r008_quoted
+  - kind: admission_defaulted
+    affected_quantities:
+    - p_partial
+    reason: 'admission_defaulted: source admission_status=pending; owner ruling d-056; not a reviewer decision'
+    origin: kems-042-plante-1979::plante1979_table2_s1129_r008_quoted
   source_id: kems-042-plante-1979
   locator:
     published_page: 277
@@ -98341,8 +98539,8 @@ observations:
     original_method_class: directly_reduced_measurement
     attribution: 1494a | 16.56 | 2.27E-6
   admission:
-    status: pending
-    reason: source admission_status=pending
+    status: admitted
+    reason: 'admission_defaulted: source admission_status=pending; owner ruling d-056; not a reviewer decision'
   notices:
   - kind: out_of_certified_band
     affected_quantities:
@@ -98350,6 +98548,17 @@ observations:
     reason: Printed pressure retained; no equilibrium comparator claimed for bulk composition in the two-phase region.
     origin: kems-042-plante-1979::plante1979_table2_s1129_r009_quoted
     band: two_phase_bulk_composition_not_liquid_composition
+  - kind: pressure_provenance_unknown
+    affected_quantities:
+    - p_partial
+    reason: 'fO2_Pa is a DERIVED condition, not a measurement: congruent vaporization K2O(l) -> 2K + 1/2 O2; P_O2/P_K=(1/4)*sqrt(32.00/39.10)=0.2262
+      (Plante printed 0.226).'
+    origin: kems-042-plante-1979::plante1979_table2_s1129_r009_quoted
+  - kind: admission_defaulted
+    affected_quantities:
+    - p_partial
+    reason: 'admission_defaulted: source admission_status=pending; owner ruling d-056; not a reviewer decision'
+    origin: kems-042-plante-1979::plante1979_table2_s1129_r009_quoted
   source_id: kems-042-plante-1979
   locator:
     published_page: 277
@@ -98546,8 +98755,8 @@ observations:
     original_method_class: directly_reduced_measurement
     attribution: 1543a | 16.52 | 5.36E-6
   admission:
-    status: pending
-    reason: source admission_status=pending
+    status: admitted
+    reason: 'admission_defaulted: source admission_status=pending; owner ruling d-056; not a reviewer decision'
   notices:
   - kind: out_of_certified_band
     affected_quantities:
@@ -98555,6 +98764,17 @@ observations:
     reason: Printed pressure retained; no equilibrium comparator claimed for bulk composition in the two-phase region.
     origin: kems-042-plante-1979::plante1979_table2_s1129_r010_quoted
     band: two_phase_bulk_composition_not_liquid_composition
+  - kind: pressure_provenance_unknown
+    affected_quantities:
+    - p_partial
+    reason: 'fO2_Pa is a DERIVED condition, not a measurement: congruent vaporization K2O(l) -> 2K + 1/2 O2; P_O2/P_K=(1/4)*sqrt(32.00/39.10)=0.2262
+      (Plante printed 0.226).'
+    origin: kems-042-plante-1979::plante1979_table2_s1129_r010_quoted
+  - kind: admission_defaulted
+    affected_quantities:
+    - p_partial
+    reason: 'admission_defaulted: source admission_status=pending; owner ruling d-056; not a reviewer decision'
+    origin: kems-042-plante-1979::plante1979_table2_s1129_r010_quoted
   source_id: kems-042-plante-1979
   locator:
     published_page: 277
@@ -101391,8 +101611,8 @@ observations:
     original_method_class: directly_reduced_measurement
     attribution: 1646a | 12.10 | 2.74E-5
   admission:
-    status: pending
-    reason: source admission_status=pending
+    status: admitted
+    reason: 'admission_defaulted: source admission_status=pending; owner ruling d-056; not a reviewer decision'
   notices:
   - kind: out_of_certified_band
     affected_quantities:
@@ -101400,6 +101620,17 @@ observations:
     reason: Printed pressure retained; no equilibrium comparator claimed for bulk composition in the two-phase region.
     origin: kems-042-plante-1979::plante1979_table2_s1129_r019_quoted
     band: two_phase_bulk_composition_not_liquid_composition
+  - kind: pressure_provenance_unknown
+    affected_quantities:
+    - p_partial
+    reason: 'fO2_Pa is a DERIVED condition, not a measurement: congruent vaporization K2O(l) -> 2K + 1/2 O2; P_O2/P_K=(1/4)*sqrt(32.00/39.10)=0.2262
+      (Plante printed 0.226).'
+    origin: kems-042-plante-1979::plante1979_table2_s1129_r019_quoted
+  - kind: admission_defaulted
+    affected_quantities:
+    - p_partial
+    reason: 'admission_defaulted: source admission_status=pending; owner ruling d-056; not a reviewer decision'
+    origin: kems-042-plante-1979::plante1979_table2_s1129_r019_quoted
   source_id: kems-042-plante-1979
   locator:
     published_page: 277
@@ -101596,8 +101827,8 @@ observations:
     original_method_class: directly_reduced_measurement
     attribution: 1608a | 11.92 | 1.47E-5
   admission:
-    status: pending
-    reason: source admission_status=pending
+    status: admitted
+    reason: 'admission_defaulted: source admission_status=pending; owner ruling d-056; not a reviewer decision'
   notices:
   - kind: out_of_certified_band
     affected_quantities:
@@ -101605,6 +101836,17 @@ observations:
     reason: Printed pressure retained; no equilibrium comparator claimed for bulk composition in the two-phase region.
     origin: kems-042-plante-1979::plante1979_table2_s1129_r020_quoted
     band: two_phase_bulk_composition_not_liquid_composition
+  - kind: pressure_provenance_unknown
+    affected_quantities:
+    - p_partial
+    reason: 'fO2_Pa is a DERIVED condition, not a measurement: congruent vaporization K2O(l) -> 2K + 1/2 O2; P_O2/P_K=(1/4)*sqrt(32.00/39.10)=0.2262
+      (Plante printed 0.226).'
+    origin: kems-042-plante-1979::plante1979_table2_s1129_r020_quoted
+  - kind: admission_defaulted
+    affected_quantities:
+    - p_partial
+    reason: 'admission_defaulted: source admission_status=pending; owner ruling d-056; not a reviewer decision'
+    origin: kems-042-plante-1979::plante1979_table2_s1129_r020_quoted
   source_id: kems-042-plante-1979
   locator:
     published_page: 277
@@ -101801,8 +102043,8 @@ observations:
     original_method_class: directly_reduced_measurement
     attribution: 1315a | 11.86 | 1.29E-7
   admission:
-    status: pending
-    reason: source admission_status=pending
+    status: admitted
+    reason: 'admission_defaulted: source admission_status=pending; owner ruling d-056; not a reviewer decision'
   notices:
   - kind: out_of_certified_band
     affected_quantities:
@@ -101810,6 +102052,17 @@ observations:
     reason: Printed pressure retained; no equilibrium comparator claimed for bulk composition in the two-phase region.
     origin: kems-042-plante-1979::plante1979_table2_s1214_r001_quoted
     band: two_phase_bulk_composition_not_liquid_composition
+  - kind: pressure_provenance_unknown
+    affected_quantities:
+    - p_partial
+    reason: 'fO2_Pa is a DERIVED condition, not a measurement: congruent vaporization K2O(l) -> 2K + 1/2 O2; P_O2/P_K=(1/4)*sqrt(32.00/39.10)=0.2262
+      (Plante printed 0.226).'
+    origin: kems-042-plante-1979::plante1979_table2_s1214_r001_quoted
+  - kind: admission_defaulted
+    affected_quantities:
+    - p_partial
+    reason: 'admission_defaulted: source admission_status=pending; owner ruling d-056; not a reviewer decision'
+    origin: kems-042-plante-1979::plante1979_table2_s1214_r001_quoted
   source_id: kems-042-plante-1979
   locator:
     published_page: 277
@@ -102006,8 +102259,8 @@ observations:
     original_method_class: directly_reduced_measurement
     attribution: 1295a | 11.86 | 8.18E-8
   admission:
-    status: pending
-    reason: source admission_status=pending
+    status: admitted
+    reason: 'admission_defaulted: source admission_status=pending; owner ruling d-056; not a reviewer decision'
   notices:
   - kind: out_of_certified_band
     affected_quantities:
@@ -102015,6 +102268,17 @@ observations:
     reason: Printed pressure retained; no equilibrium comparator claimed for bulk composition in the two-phase region.
     origin: kems-042-plante-1979::plante1979_table2_s1214_r002_quoted
     band: two_phase_bulk_composition_not_liquid_composition
+  - kind: pressure_provenance_unknown
+    affected_quantities:
+    - p_partial
+    reason: 'fO2_Pa is a DERIVED condition, not a measurement: congruent vaporization K2O(l) -> 2K + 1/2 O2; P_O2/P_K=(1/4)*sqrt(32.00/39.10)=0.2262
+      (Plante printed 0.226).'
+    origin: kems-042-plante-1979::plante1979_table2_s1214_r002_quoted
+  - kind: admission_defaulted
+    affected_quantities:
+    - p_partial
+    reason: 'admission_defaulted: source admission_status=pending; owner ruling d-056; not a reviewer decision'
+    origin: kems-042-plante-1979::plante1979_table2_s1214_r002_quoted
   source_id: kems-042-plante-1979
   locator:
     published_page: 277
@@ -102211,8 +102475,8 @@ observations:
     original_method_class: directly_reduced_measurement
     attribution: 1357a | 11.85 | 2.14E-7
   admission:
-    status: pending
-    reason: source admission_status=pending
+    status: admitted
+    reason: 'admission_defaulted: source admission_status=pending; owner ruling d-056; not a reviewer decision'
   notices:
   - kind: out_of_certified_band
     affected_quantities:
@@ -102220,6 +102484,17 @@ observations:
     reason: Printed pressure retained; no equilibrium comparator claimed for bulk composition in the two-phase region.
     origin: kems-042-plante-1979::plante1979_table2_s1214_r003_quoted
     band: two_phase_bulk_composition_not_liquid_composition
+  - kind: pressure_provenance_unknown
+    affected_quantities:
+    - p_partial
+    reason: 'fO2_Pa is a DERIVED condition, not a measurement: congruent vaporization K2O(l) -> 2K + 1/2 O2; P_O2/P_K=(1/4)*sqrt(32.00/39.10)=0.2262
+      (Plante printed 0.226).'
+    origin: kems-042-plante-1979::plante1979_table2_s1214_r003_quoted
+  - kind: admission_defaulted
+    affected_quantities:
+    - p_partial
+    reason: 'admission_defaulted: source admission_status=pending; owner ruling d-056; not a reviewer decision'
+    origin: kems-042-plante-1979::plante1979_table2_s1214_r003_quoted
   source_id: kems-042-plante-1979
   locator:
     published_page: 277
@@ -102416,8 +102691,8 @@ observations:
     original_method_class: directly_reduced_measurement
     attribution: 1401a | 11.84 | 4.58E-7
   admission:
-    status: pending
-    reason: source admission_status=pending
+    status: admitted
+    reason: 'admission_defaulted: source admission_status=pending; owner ruling d-056; not a reviewer decision'
   notices:
   - kind: out_of_certified_band
     affected_quantities:
@@ -102425,6 +102700,17 @@ observations:
     reason: Printed pressure retained; no equilibrium comparator claimed for bulk composition in the two-phase region.
     origin: kems-042-plante-1979::plante1979_table2_s1214_r004_quoted
     band: two_phase_bulk_composition_not_liquid_composition
+  - kind: pressure_provenance_unknown
+    affected_quantities:
+    - p_partial
+    reason: 'fO2_Pa is a DERIVED condition, not a measurement: congruent vaporization K2O(l) -> 2K + 1/2 O2; P_O2/P_K=(1/4)*sqrt(32.00/39.10)=0.2262
+      (Plante printed 0.226).'
+    origin: kems-042-plante-1979::plante1979_table2_s1214_r004_quoted
+  - kind: admission_defaulted
+    affected_quantities:
+    - p_partial
+    reason: 'admission_defaulted: source admission_status=pending; owner ruling d-056; not a reviewer decision'
+    origin: kems-042-plante-1979::plante1979_table2_s1214_r004_quoted
   source_id: kems-042-plante-1979
   locator:
     published_page: 277
@@ -102621,8 +102907,8 @@ observations:
     original_method_class: directly_reduced_measurement
     attribution: 1444a | 11.84 | 1.00E-6
   admission:
-    status: pending
-    reason: source admission_status=pending
+    status: admitted
+    reason: 'admission_defaulted: source admission_status=pending; owner ruling d-056; not a reviewer decision'
   notices:
   - kind: out_of_certified_band
     affected_quantities:
@@ -102630,6 +102916,17 @@ observations:
     reason: Printed pressure retained; no equilibrium comparator claimed for bulk composition in the two-phase region.
     origin: kems-042-plante-1979::plante1979_table2_s1214_r005_quoted
     band: two_phase_bulk_composition_not_liquid_composition
+  - kind: pressure_provenance_unknown
+    affected_quantities:
+    - p_partial
+    reason: 'fO2_Pa is a DERIVED condition, not a measurement: congruent vaporization K2O(l) -> 2K + 1/2 O2; P_O2/P_K=(1/4)*sqrt(32.00/39.10)=0.2262
+      (Plante printed 0.226).'
+    origin: kems-042-plante-1979::plante1979_table2_s1214_r005_quoted
+  - kind: admission_defaulted
+    affected_quantities:
+    - p_partial
+    reason: 'admission_defaulted: source admission_status=pending; owner ruling d-056; not a reviewer decision'
+    origin: kems-042-plante-1979::plante1979_table2_s1214_r005_quoted
   source_id: kems-042-plante-1979
   locator:
     published_page: 277
@@ -102826,8 +103123,8 @@ observations:
     original_method_class: directly_reduced_measurement
     attribution: 1482a | 11.82 | 1.79E-6
   admission:
-    status: pending
-    reason: source admission_status=pending
+    status: admitted
+    reason: 'admission_defaulted: source admission_status=pending; owner ruling d-056; not a reviewer decision'
   notices:
   - kind: out_of_certified_band
     affected_quantities:
@@ -102835,6 +103132,17 @@ observations:
     reason: Printed pressure retained; no equilibrium comparator claimed for bulk composition in the two-phase region.
     origin: kems-042-plante-1979::plante1979_table2_s1214_r006_quoted
     band: two_phase_bulk_composition_not_liquid_composition
+  - kind: pressure_provenance_unknown
+    affected_quantities:
+    - p_partial
+    reason: 'fO2_Pa is a DERIVED condition, not a measurement: congruent vaporization K2O(l) -> 2K + 1/2 O2; P_O2/P_K=(1/4)*sqrt(32.00/39.10)=0.2262
+      (Plante printed 0.226).'
+    origin: kems-042-plante-1979::plante1979_table2_s1214_r006_quoted
+  - kind: admission_defaulted
+    affected_quantities:
+    - p_partial
+    reason: 'admission_defaulted: source admission_status=pending; owner ruling d-056; not a reviewer decision'
+    origin: kems-042-plante-1979::plante1979_table2_s1214_r006_quoted
   source_id: kems-042-plante-1979
   locator:
     published_page: 277
@@ -103031,8 +103339,8 @@ observations:
     original_method_class: directly_reduced_measurement
     attribution: 1538a | 11.77 | 4.11E-6
   admission:
-    status: pending
-    reason: source admission_status=pending
+    status: admitted
+    reason: 'admission_defaulted: source admission_status=pending; owner ruling d-056; not a reviewer decision'
   notices:
   - kind: out_of_certified_band
     affected_quantities:
@@ -103040,6 +103348,17 @@ observations:
     reason: Printed pressure retained; no equilibrium comparator claimed for bulk composition in the two-phase region.
     origin: kems-042-plante-1979::plante1979_table2_s1214_r007_quoted
     band: two_phase_bulk_composition_not_liquid_composition
+  - kind: pressure_provenance_unknown
+    affected_quantities:
+    - p_partial
+    reason: 'fO2_Pa is a DERIVED condition, not a measurement: congruent vaporization K2O(l) -> 2K + 1/2 O2; P_O2/P_K=(1/4)*sqrt(32.00/39.10)=0.2262
+      (Plante printed 0.226).'
+    origin: kems-042-plante-1979::plante1979_table2_s1214_r007_quoted
+  - kind: admission_defaulted
+    affected_quantities:
+    - p_partial
+    reason: 'admission_defaulted: source admission_status=pending; owner ruling d-056; not a reviewer decision'
+    origin: kems-042-plante-1979::plante1979_table2_s1214_r007_quoted
   source_id: kems-042-plante-1979
   locator:
     published_page: 277
@@ -103236,8 +103555,8 @@ observations:
     original_method_class: directly_reduced_measurement
     attribution: 1582a | 11.68 | 7.81E-6
   admission:
-    status: pending
-    reason: source admission_status=pending
+    status: admitted
+    reason: 'admission_defaulted: source admission_status=pending; owner ruling d-056; not a reviewer decision'
   notices:
   - kind: out_of_certified_band
     affected_quantities:
@@ -103245,6 +103564,17 @@ observations:
     reason: Printed pressure retained; no equilibrium comparator claimed for bulk composition in the two-phase region.
     origin: kems-042-plante-1979::plante1979_table2_s1214_r008_quoted
     band: two_phase_bulk_composition_not_liquid_composition
+  - kind: pressure_provenance_unknown
+    affected_quantities:
+    - p_partial
+    reason: 'fO2_Pa is a DERIVED condition, not a measurement: congruent vaporization K2O(l) -> 2K + 1/2 O2; P_O2/P_K=(1/4)*sqrt(32.00/39.10)=0.2262
+      (Plante printed 0.226).'
+    origin: kems-042-plante-1979::plante1979_table2_s1214_r008_quoted
+  - kind: admission_defaulted
+    affected_quantities:
+    - p_partial
+    reason: 'admission_defaulted: source admission_status=pending; owner ruling d-056; not a reviewer decision'
+    origin: kems-042-plante-1979::plante1979_table2_s1214_r008_quoted
   source_id: kems-042-plante-1979
   locator:
     published_page: 277
@@ -103441,8 +103771,8 @@ observations:
     original_method_class: directly_reduced_measurement
     attribution: 1635a | 11.52 | 1.55E-5
   admission:
-    status: pending
-    reason: source admission_status=pending
+    status: admitted
+    reason: 'admission_defaulted: source admission_status=pending; owner ruling d-056; not a reviewer decision'
   notices:
   - kind: out_of_certified_band
     affected_quantities:
@@ -103450,6 +103780,17 @@ observations:
     reason: Printed pressure retained; no equilibrium comparator claimed for bulk composition in the two-phase region.
     origin: kems-042-plante-1979::plante1979_table2_s1214_r009_quoted
     band: two_phase_bulk_composition_not_liquid_composition
+  - kind: pressure_provenance_unknown
+    affected_quantities:
+    - p_partial
+    reason: 'fO2_Pa is a DERIVED condition, not a measurement: congruent vaporization K2O(l) -> 2K + 1/2 O2; P_O2/P_K=(1/4)*sqrt(32.00/39.10)=0.2262
+      (Plante printed 0.226).'
+    origin: kems-042-plante-1979::plante1979_table2_s1214_r009_quoted
+  - kind: admission_defaulted
+    affected_quantities:
+    - p_partial
+    reason: 'admission_defaulted: source admission_status=pending; owner ruling d-056; not a reviewer decision'
+    origin: kems-042-plante-1979::plante1979_table2_s1214_r009_quoted
   source_id: kems-042-plante-1979
   locator:
     published_page: 277
@@ -103646,8 +103987,8 @@ observations:
     original_method_class: directly_reduced_measurement
     attribution: 1678a | 11.21 | 2.70E-5
   admission:
-    status: pending
-    reason: source admission_status=pending
+    status: admitted
+    reason: 'admission_defaulted: source admission_status=pending; owner ruling d-056; not a reviewer decision'
   notices:
   - kind: out_of_certified_band
     affected_quantities:
@@ -103655,6 +103996,17 @@ observations:
     reason: Printed pressure retained; no equilibrium comparator claimed for bulk composition in the two-phase region.
     origin: kems-042-plante-1979::plante1979_table2_s1214_r010_quoted
     band: two_phase_bulk_composition_not_liquid_composition
+  - kind: pressure_provenance_unknown
+    affected_quantities:
+    - p_partial
+    reason: 'fO2_Pa is a DERIVED condition, not a measurement: congruent vaporization K2O(l) -> 2K + 1/2 O2; P_O2/P_K=(1/4)*sqrt(32.00/39.10)=0.2262
+      (Plante printed 0.226).'
+    origin: kems-042-plante-1979::plante1979_table2_s1214_r010_quoted
+  - kind: admission_defaulted
+    affected_quantities:
+    - p_partial
+    reason: 'admission_defaulted: source admission_status=pending; owner ruling d-056; not a reviewer decision'
+    origin: kems-042-plante-1979::plante1979_table2_s1214_r010_quoted
   source_id: kems-042-plante-1979
   locator:
     published_page: 277
@@ -103851,8 +104203,8 @@ observations:
     original_method_class: directly_reduced_measurement
     attribution: 1727a | 10.88 | 4.79E-5
   admission:
-    status: pending
-    reason: source admission_status=pending
+    status: admitted
+    reason: 'admission_defaulted: source admission_status=pending; owner ruling d-056; not a reviewer decision'
   notices:
   - kind: out_of_certified_band
     affected_quantities:
@@ -103860,6 +104212,17 @@ observations:
     reason: Printed pressure retained; no equilibrium comparator claimed for bulk composition in the two-phase region.
     origin: kems-042-plante-1979::plante1979_table2_s1214_r011_quoted
     band: two_phase_bulk_composition_not_liquid_composition
+  - kind: pressure_provenance_unknown
+    affected_quantities:
+    - p_partial
+    reason: 'fO2_Pa is a DERIVED condition, not a measurement: congruent vaporization K2O(l) -> 2K + 1/2 O2; P_O2/P_K=(1/4)*sqrt(32.00/39.10)=0.2262
+      (Plante printed 0.226).'
+    origin: kems-042-plante-1979::plante1979_table2_s1214_r011_quoted
+  - kind: admission_defaulted
+    affected_quantities:
+    - p_partial
+    reason: 'admission_defaulted: source admission_status=pending; owner ruling d-056; not a reviewer decision'
+    origin: kems-042-plante-1979::plante1979_table2_s1214_r011_quoted
   source_id: kems-042-plante-1979
   locator:
     published_page: 277
@@ -104056,8 +104419,8 @@ observations:
     original_method_class: directly_reduced_measurement
     attribution: 1707a | 10.64 | 3.21E-5
   admission:
-    status: pending
-    reason: source admission_status=pending
+    status: admitted
+    reason: 'admission_defaulted: source admission_status=pending; owner ruling d-056; not a reviewer decision'
   notices:
   - kind: out_of_certified_band
     affected_quantities:
@@ -104065,6 +104428,17 @@ observations:
     reason: Printed pressure retained; no equilibrium comparator claimed for bulk composition in the two-phase region.
     origin: kems-042-plante-1979::plante1979_table2_s1214_r012_quoted
     band: two_phase_bulk_composition_not_liquid_composition
+  - kind: pressure_provenance_unknown
+    affected_quantities:
+    - p_partial
+    reason: 'fO2_Pa is a DERIVED condition, not a measurement: congruent vaporization K2O(l) -> 2K + 1/2 O2; P_O2/P_K=(1/4)*sqrt(32.00/39.10)=0.2262
+      (Plante printed 0.226).'
+    origin: kems-042-plante-1979::plante1979_table2_s1214_r012_quoted
+  - kind: admission_defaulted
+    affected_quantities:
+    - p_partial
+    reason: 'admission_defaulted: source admission_status=pending; owner ruling d-056; not a reviewer decision'
+    origin: kems-042-plante-1979::plante1979_table2_s1214_r012_quoted
   source_id: kems-042-plante-1979
   locator:
     published_page: 277
@@ -104261,8 +104635,8 @@ observations:
     original_method_class: directly_reduced_measurement
     attribution: 1628a | 10.40 | 1.26E-5
   admission:
-    status: pending
-    reason: source admission_status=pending
+    status: admitted
+    reason: 'admission_defaulted: source admission_status=pending; owner ruling d-056; not a reviewer decision'
   notices:
   - kind: out_of_certified_band
     affected_quantities:
@@ -104270,6 +104644,17 @@ observations:
     reason: Printed pressure retained; no equilibrium comparator claimed for bulk composition in the two-phase region.
     origin: kems-042-plante-1979::plante1979_table2_s1214_r013_quoted
     band: two_phase_bulk_composition_not_liquid_composition
+  - kind: pressure_provenance_unknown
+    affected_quantities:
+    - p_partial
+    reason: 'fO2_Pa is a DERIVED condition, not a measurement: congruent vaporization K2O(l) -> 2K + 1/2 O2; P_O2/P_K=(1/4)*sqrt(32.00/39.10)=0.2262
+      (Plante printed 0.226).'
+    origin: kems-042-plante-1979::plante1979_table2_s1214_r013_quoted
+  - kind: admission_defaulted
+    affected_quantities:
+    - p_partial
+    reason: 'admission_defaulted: source admission_status=pending; owner ruling d-056; not a reviewer decision'
+    origin: kems-042-plante-1979::plante1979_table2_s1214_r013_quoted
   source_id: kems-042-plante-1979
   locator:
     published_page: 277
@@ -104466,8 +104851,8 @@ observations:
     original_method_class: directly_reduced_measurement
     attribution: 1672a | 10.16 | 2.11E-5
   admission:
-    status: pending
-    reason: source admission_status=pending
+    status: admitted
+    reason: 'admission_defaulted: source admission_status=pending; owner ruling d-056; not a reviewer decision'
   notices:
   - kind: out_of_certified_band
     affected_quantities:
@@ -104475,6 +104860,17 @@ observations:
     reason: Printed pressure retained; no equilibrium comparator claimed for bulk composition in the two-phase region.
     origin: kems-042-plante-1979::plante1979_table2_s1214_r014_quoted
     band: two_phase_bulk_composition_not_liquid_composition
+  - kind: pressure_provenance_unknown
+    affected_quantities:
+    - p_partial
+    reason: 'fO2_Pa is a DERIVED condition, not a measurement: congruent vaporization K2O(l) -> 2K + 1/2 O2; P_O2/P_K=(1/4)*sqrt(32.00/39.10)=0.2262
+      (Plante printed 0.226).'
+    origin: kems-042-plante-1979::plante1979_table2_s1214_r014_quoted
+  - kind: admission_defaulted
+    affected_quantities:
+    - p_partial
+    reason: 'admission_defaulted: source admission_status=pending; owner ruling d-056; not a reviewer decision'
+    origin: kems-042-plante-1979::plante1979_table2_s1214_r014_quoted
   source_id: kems-042-plante-1979
   locator:
     published_page: 278
@@ -104671,8 +105067,8 @@ observations:
     original_method_class: directly_reduced_measurement
     attribution: 1640a | 9.96 | 1.47E-5
   admission:
-    status: pending
-    reason: source admission_status=pending
+    status: admitted
+    reason: 'admission_defaulted: source admission_status=pending; owner ruling d-056; not a reviewer decision'
   notices:
   - kind: out_of_certified_band
     affected_quantities:
@@ -104680,6 +105076,17 @@ observations:
     reason: Printed pressure retained; no equilibrium comparator claimed for bulk composition in the two-phase region.
     origin: kems-042-plante-1979::plante1979_table2_s1214_r015_quoted
     band: two_phase_bulk_composition_not_liquid_composition
+  - kind: pressure_provenance_unknown
+    affected_quantities:
+    - p_partial
+    reason: 'fO2_Pa is a DERIVED condition, not a measurement: congruent vaporization K2O(l) -> 2K + 1/2 O2; P_O2/P_K=(1/4)*sqrt(32.00/39.10)=0.2262
+      (Plante printed 0.226).'
+    origin: kems-042-plante-1979::plante1979_table2_s1214_r015_quoted
+  - kind: admission_defaulted
+    affected_quantities:
+    - p_partial
+    reason: 'admission_defaulted: source admission_status=pending; owner ruling d-056; not a reviewer decision'
+    origin: kems-042-plante-1979::plante1979_table2_s1214_r015_quoted
   source_id: kems-042-plante-1979
   locator:
     published_page: 278
@@ -104876,8 +105283,8 @@ observations:
     original_method_class: directly_reduced_measurement
     attribution: 1685a | 9.70 | 2.42E-5
   admission:
-    status: pending
-    reason: source admission_status=pending
+    status: admitted
+    reason: 'admission_defaulted: source admission_status=pending; owner ruling d-056; not a reviewer decision'
   notices:
   - kind: out_of_certified_band
     affected_quantities:
@@ -104885,6 +105292,17 @@ observations:
     reason: Printed pressure retained; no equilibrium comparator claimed for bulk composition in the two-phase region.
     origin: kems-042-plante-1979::plante1979_table2_s1214_r016_quoted
     band: two_phase_bulk_composition_not_liquid_composition
+  - kind: pressure_provenance_unknown
+    affected_quantities:
+    - p_partial
+    reason: 'fO2_Pa is a DERIVED condition, not a measurement: congruent vaporization K2O(l) -> 2K + 1/2 O2; P_O2/P_K=(1/4)*sqrt(32.00/39.10)=0.2262
+      (Plante printed 0.226).'
+    origin: kems-042-plante-1979::plante1979_table2_s1214_r016_quoted
+  - kind: admission_defaulted
+    affected_quantities:
+    - p_partial
+    reason: 'admission_defaulted: source admission_status=pending; owner ruling d-056; not a reviewer decision'
+    origin: kems-042-plante-1979::plante1979_table2_s1214_r016_quoted
   source_id: kems-042-plante-1979
   locator:
     published_page: 278
@@ -105081,8 +105499,8 @@ observations:
     original_method_class: directly_reduced_measurement
     attribution: 1582a | 9.46 | 5.77E-6
   admission:
-    status: pending
-    reason: source admission_status=pending
+    status: admitted
+    reason: 'admission_defaulted: source admission_status=pending; owner ruling d-056; not a reviewer decision'
   notices:
   - kind: out_of_certified_band
     affected_quantities:
@@ -105090,6 +105508,17 @@ observations:
     reason: Printed pressure retained; no equilibrium comparator claimed for bulk composition in the two-phase region.
     origin: kems-042-plante-1979::plante1979_table2_s1214_r017_quoted
     band: two_phase_bulk_composition_not_liquid_composition
+  - kind: pressure_provenance_unknown
+    affected_quantities:
+    - p_partial
+    reason: 'fO2_Pa is a DERIVED condition, not a measurement: congruent vaporization K2O(l) -> 2K + 1/2 O2; P_O2/P_K=(1/4)*sqrt(32.00/39.10)=0.2262
+      (Plante printed 0.226).'
+    origin: kems-042-plante-1979::plante1979_table2_s1214_r017_quoted
+  - kind: admission_defaulted
+    affected_quantities:
+    - p_partial
+    reason: 'admission_defaulted: source admission_status=pending; owner ruling d-056; not a reviewer decision'
+    origin: kems-042-plante-1979::plante1979_table2_s1214_r017_quoted
   source_id: kems-042-plante-1979
   locator:
     published_page: 278
@@ -105286,8 +105715,8 @@ observations:
     original_method_class: directly_reduced_measurement
     attribution: 1335a | 9.40 | 1.22E-7
   admission:
-    status: pending
-    reason: source admission_status=pending
+    status: admitted
+    reason: 'admission_defaulted: source admission_status=pending; owner ruling d-056; not a reviewer decision'
   notices:
   - kind: out_of_certified_band
     affected_quantities:
@@ -105295,6 +105724,17 @@ observations:
     reason: Printed pressure retained; no equilibrium comparator claimed for bulk composition in the two-phase region.
     origin: kems-042-plante-1979::plante1979_table2_s1214_r018_quoted
     band: two_phase_bulk_composition_not_liquid_composition
+  - kind: pressure_provenance_unknown
+    affected_quantities:
+    - p_partial
+    reason: 'fO2_Pa is a DERIVED condition, not a measurement: congruent vaporization K2O(l) -> 2K + 1/2 O2; P_O2/P_K=(1/4)*sqrt(32.00/39.10)=0.2262
+      (Plante printed 0.226).'
+    origin: kems-042-plante-1979::plante1979_table2_s1214_r018_quoted
+  - kind: admission_defaulted
+    affected_quantities:
+    - p_partial
+    reason: 'admission_defaulted: source admission_status=pending; owner ruling d-056; not a reviewer decision'
+    origin: kems-042-plante-1979::plante1979_table2_s1214_r018_quoted
   source_id: kems-042-plante-1979
   locator:
     published_page: 278
@@ -105491,8 +105931,8 @@ observations:
     original_method_class: directly_reduced_measurement
     attribution: 1379a | 9.39 | 2.60E-7
   admission:
-    status: pending
-    reason: source admission_status=pending
+    status: admitted
+    reason: 'admission_defaulted: source admission_status=pending; owner ruling d-056; not a reviewer decision'
   notices:
   - kind: out_of_certified_band
     affected_quantities:
@@ -105500,6 +105940,17 @@ observations:
     reason: Printed pressure retained; no equilibrium comparator claimed for bulk composition in the two-phase region.
     origin: kems-042-plante-1979::plante1979_table2_s1214_r019_quoted
     band: two_phase_bulk_composition_not_liquid_composition
+  - kind: pressure_provenance_unknown
+    affected_quantities:
+    - p_partial
+    reason: 'fO2_Pa is a DERIVED condition, not a measurement: congruent vaporization K2O(l) -> 2K + 1/2 O2; P_O2/P_K=(1/4)*sqrt(32.00/39.10)=0.2262
+      (Plante printed 0.226).'
+    origin: kems-042-plante-1979::plante1979_table2_s1214_r019_quoted
+  - kind: admission_defaulted
+    affected_quantities:
+    - p_partial
+    reason: 'admission_defaulted: source admission_status=pending; owner ruling d-056; not a reviewer decision'
+    origin: kems-042-plante-1979::plante1979_table2_s1214_r019_quoted
   source_id: kems-042-plante-1979
   locator:
     published_page: 278
@@ -105696,8 +106147,8 @@ observations:
     original_method_class: directly_reduced_measurement
     attribution: 1435a | 9.38 | 6.12E-7
   admission:
-    status: pending
-    reason: source admission_status=pending
+    status: admitted
+    reason: 'admission_defaulted: source admission_status=pending; owner ruling d-056; not a reviewer decision'
   notices:
   - kind: out_of_certified_band
     affected_quantities:
@@ -105705,6 +106156,17 @@ observations:
     reason: Printed pressure retained; no equilibrium comparator claimed for bulk composition in the two-phase region.
     origin: kems-042-plante-1979::plante1979_table2_s1214_r020_quoted
     band: two_phase_bulk_composition_not_liquid_composition
+  - kind: pressure_provenance_unknown
+    affected_quantities:
+    - p_partial
+    reason: 'fO2_Pa is a DERIVED condition, not a measurement: congruent vaporization K2O(l) -> 2K + 1/2 O2; P_O2/P_K=(1/4)*sqrt(32.00/39.10)=0.2262
+      (Plante printed 0.226).'
+    origin: kems-042-plante-1979::plante1979_table2_s1214_r020_quoted
+  - kind: admission_defaulted
+    affected_quantities:
+    - p_partial
+    reason: 'admission_defaulted: source admission_status=pending; owner ruling d-056; not a reviewer decision'
+    origin: kems-042-plante-1979::plante1979_table2_s1214_r020_quoted
   source_id: kems-042-plante-1979
   locator:
     published_page: 278
@@ -105901,8 +106363,8 @@ observations:
     original_method_class: directly_reduced_measurement
     attribution: 1484a | 9.36 | 1.61E-6
   admission:
-    status: pending
-    reason: source admission_status=pending
+    status: admitted
+    reason: 'admission_defaulted: source admission_status=pending; owner ruling d-056; not a reviewer decision'
   notices:
   - kind: out_of_certified_band
     affected_quantities:
@@ -105910,6 +106372,17 @@ observations:
     reason: Printed pressure retained; no equilibrium comparator claimed for bulk composition in the two-phase region.
     origin: kems-042-plante-1979::plante1979_table2_s1214_r021_quoted
     band: two_phase_bulk_composition_not_liquid_composition
+  - kind: pressure_provenance_unknown
+    affected_quantities:
+    - p_partial
+    reason: 'fO2_Pa is a DERIVED condition, not a measurement: congruent vaporization K2O(l) -> 2K + 1/2 O2; P_O2/P_K=(1/4)*sqrt(32.00/39.10)=0.2262
+      (Plante printed 0.226).'
+    origin: kems-042-plante-1979::plante1979_table2_s1214_r021_quoted
+  - kind: admission_defaulted
+    affected_quantities:
+    - p_partial
+    reason: 'admission_defaulted: source admission_status=pending; owner ruling d-056; not a reviewer decision'
+    origin: kems-042-plante-1979::plante1979_table2_s1214_r021_quoted
   source_id: kems-042-plante-1979
   locator:
     published_page: 278
@@ -106106,8 +106579,8 @@ observations:
     original_method_class: directly_reduced_measurement
     attribution: 1534a | 9.32 | 2.88E-6
   admission:
-    status: pending
-    reason: source admission_status=pending
+    status: admitted
+    reason: 'admission_defaulted: source admission_status=pending; owner ruling d-056; not a reviewer decision'
   notices:
   - kind: out_of_certified_band
     affected_quantities:
@@ -106115,6 +106588,17 @@ observations:
     reason: Printed pressure retained; no equilibrium comparator claimed for bulk composition in the two-phase region.
     origin: kems-042-plante-1979::plante1979_table2_s1214_r022_quoted
     band: two_phase_bulk_composition_not_liquid_composition
+  - kind: pressure_provenance_unknown
+    affected_quantities:
+    - p_partial
+    reason: 'fO2_Pa is a DERIVED condition, not a measurement: congruent vaporization K2O(l) -> 2K + 1/2 O2; P_O2/P_K=(1/4)*sqrt(32.00/39.10)=0.2262
+      (Plante printed 0.226).'
+    origin: kems-042-plante-1979::plante1979_table2_s1214_r022_quoted
+  - kind: admission_defaulted
+    affected_quantities:
+    - p_partial
+    reason: 'admission_defaulted: source admission_status=pending; owner ruling d-056; not a reviewer decision'
+    origin: kems-042-plante-1979::plante1979_table2_s1214_r022_quoted
   source_id: kems-042-plante-1979
   locator:
     published_page: 278
@@ -106311,8 +106795,8 @@ observations:
     original_method_class: directly_reduced_measurement
     attribution: 1582a | 9.30 | 6.14E-6
   admission:
-    status: pending
-    reason: source admission_status=pending
+    status: admitted
+    reason: 'admission_defaulted: source admission_status=pending; owner ruling d-056; not a reviewer decision'
   notices:
   - kind: out_of_certified_band
     affected_quantities:
@@ -106320,6 +106804,17 @@ observations:
     reason: Printed pressure retained; no equilibrium comparator claimed for bulk composition in the two-phase region.
     origin: kems-042-plante-1979::plante1979_table2_s1214_r023_quoted
     band: two_phase_bulk_composition_not_liquid_composition
+  - kind: pressure_provenance_unknown
+    affected_quantities:
+    - p_partial
+    reason: 'fO2_Pa is a DERIVED condition, not a measurement: congruent vaporization K2O(l) -> 2K + 1/2 O2; P_O2/P_K=(1/4)*sqrt(32.00/39.10)=0.2262
+      (Plante printed 0.226).'
+    origin: kems-042-plante-1979::plante1979_table2_s1214_r023_quoted
+  - kind: admission_defaulted
+    affected_quantities:
+    - p_partial
+    reason: 'admission_defaulted: source admission_status=pending; owner ruling d-056; not a reviewer decision'
+    origin: kems-042-plante-1979::plante1979_table2_s1214_r023_quoted
   source_id: kems-042-plante-1979
   locator:
     published_page: 278
@@ -106516,8 +107011,8 @@ observations:
     original_method_class: directly_reduced_measurement
     attribution: 1620a | 9.10 | 8.53E-6
   admission:
-    status: pending
-    reason: source admission_status=pending
+    status: admitted
+    reason: 'admission_defaulted: source admission_status=pending; owner ruling d-056; not a reviewer decision'
   notices:
   - kind: out_of_certified_band
     affected_quantities:
@@ -106525,6 +107020,17 @@ observations:
     reason: Printed pressure retained; no equilibrium comparator claimed for bulk composition in the two-phase region.
     origin: kems-042-plante-1979::plante1979_table2_s1214_r024_quoted
     band: two_phase_bulk_composition_not_liquid_composition
+  - kind: pressure_provenance_unknown
+    affected_quantities:
+    - p_partial
+    reason: 'fO2_Pa is a DERIVED condition, not a measurement: congruent vaporization K2O(l) -> 2K + 1/2 O2; P_O2/P_K=(1/4)*sqrt(32.00/39.10)=0.2262
+      (Plante printed 0.226).'
+    origin: kems-042-plante-1979::plante1979_table2_s1214_r024_quoted
+  - kind: admission_defaulted
+    affected_quantities:
+    - p_partial
+    reason: 'admission_defaulted: source admission_status=pending; owner ruling d-056; not a reviewer decision'
+    origin: kems-042-plante-1979::plante1979_table2_s1214_r024_quoted
   source_id: kems-042-plante-1979
   locator:
     published_page: 278
@@ -106721,8 +107227,8 @@ observations:
     original_method_class: directly_reduced_measurement
     attribution: 1664a | 8.88 | 1.37E-5
   admission:
-    status: pending
-    reason: source admission_status=pending
+    status: admitted
+    reason: 'admission_defaulted: source admission_status=pending; owner ruling d-056; not a reviewer decision'
   notices:
   - kind: out_of_certified_band
     affected_quantities:
@@ -106730,6 +107236,17 @@ observations:
     reason: Printed pressure retained; no equilibrium comparator claimed for bulk composition in the two-phase region.
     origin: kems-042-plante-1979::plante1979_table2_s1214_r025_quoted
     band: two_phase_bulk_composition_not_liquid_composition
+  - kind: pressure_provenance_unknown
+    affected_quantities:
+    - p_partial
+    reason: 'fO2_Pa is a DERIVED condition, not a measurement: congruent vaporization K2O(l) -> 2K + 1/2 O2; P_O2/P_K=(1/4)*sqrt(32.00/39.10)=0.2262
+      (Plante printed 0.226).'
+    origin: kems-042-plante-1979::plante1979_table2_s1214_r025_quoted
+  - kind: admission_defaulted
+    affected_quantities:
+    - p_partial
+    reason: 'admission_defaulted: source admission_status=pending; owner ruling d-056; not a reviewer decision'
+    origin: kems-042-plante-1979::plante1979_table2_s1214_r025_quoted
   source_id: kems-042-plante-1979
   locator:
     published_page: 278
@@ -106926,8 +107443,8 @@ observations:
     original_method_class: directly_reduced_measurement
     attribution: 1702a | 8.77 | 2.16E-5
   admission:
-    status: pending
-    reason: source admission_status=pending
+    status: admitted
+    reason: 'admission_defaulted: source admission_status=pending; owner ruling d-056; not a reviewer decision'
   notices:
   - kind: out_of_certified_band
     affected_quantities:
@@ -106935,6 +107452,17 @@ observations:
     reason: Printed pressure retained; no equilibrium comparator claimed for bulk composition in the two-phase region.
     origin: kems-042-plante-1979::plante1979_table2_s1214_r026_quoted
     band: two_phase_bulk_composition_not_liquid_composition
+  - kind: pressure_provenance_unknown
+    affected_quantities:
+    - p_partial
+    reason: 'fO2_Pa is a DERIVED condition, not a measurement: congruent vaporization K2O(l) -> 2K + 1/2 O2; P_O2/P_K=(1/4)*sqrt(32.00/39.10)=0.2262
+      (Plante printed 0.226).'
+    origin: kems-042-plante-1979::plante1979_table2_s1214_r026_quoted
+  - kind: admission_defaulted
+    affected_quantities:
+    - p_partial
+    reason: 'admission_defaulted: source admission_status=pending; owner ruling d-056; not a reviewer decision'
+    origin: kems-042-plante-1979::plante1979_table2_s1214_r026_quoted
   source_id: kems-042-plante-1979
   locator:
     published_page: 278
@@ -107131,8 +107659,8 @@ observations:
     original_method_class: directly_reduced_measurement
     attribution: 1738a | 7.88 | 4.00E-5
   admission:
-    status: pending
-    reason: source admission_status=pending
+    status: admitted
+    reason: 'admission_defaulted: source admission_status=pending; owner ruling d-056; not a reviewer decision'
   notices:
   - kind: out_of_certified_band
     affected_quantities:
@@ -107140,6 +107668,17 @@ observations:
     reason: Printed pressure retained; no equilibrium comparator claimed for bulk composition in the two-phase region.
     origin: kems-042-plante-1979::plante1979_table2_s1214_r027_quoted
     band: two_phase_bulk_composition_not_liquid_composition
+  - kind: pressure_provenance_unknown
+    affected_quantities:
+    - p_partial
+    reason: 'fO2_Pa is a DERIVED condition, not a measurement: congruent vaporization K2O(l) -> 2K + 1/2 O2; P_O2/P_K=(1/4)*sqrt(32.00/39.10)=0.2262
+      (Plante printed 0.226).'
+    origin: kems-042-plante-1979::plante1979_table2_s1214_r027_quoted
+  - kind: admission_defaulted
+    affected_quantities:
+    - p_partial
+    reason: 'admission_defaulted: source admission_status=pending; owner ruling d-056; not a reviewer decision'
+    origin: kems-042-plante-1979::plante1979_table2_s1214_r027_quoted
   source_id: kems-042-plante-1979
   locator:
     published_page: 278
@@ -107336,8 +107875,8 @@ observations:
     original_method_class: directly_reduced_measurement
     attribution: 1696a | 7.36 | 2.39E-5
   admission:
-    status: pending
-    reason: source admission_status=pending
+    status: admitted
+    reason: 'admission_defaulted: source admission_status=pending; owner ruling d-056; not a reviewer decision'
   notices:
   - kind: out_of_certified_band
     affected_quantities:
@@ -107345,6 +107884,17 @@ observations:
     reason: Printed pressure retained; no equilibrium comparator claimed for bulk composition in the two-phase region.
     origin: kems-042-plante-1979::plante1979_table2_s1214_r028_quoted
     band: two_phase_bulk_composition_not_liquid_composition
+  - kind: pressure_provenance_unknown
+    affected_quantities:
+    - p_partial
+    reason: 'fO2_Pa is a DERIVED condition, not a measurement: congruent vaporization K2O(l) -> 2K + 1/2 O2; P_O2/P_K=(1/4)*sqrt(32.00/39.10)=0.2262
+      (Plante printed 0.226).'
+    origin: kems-042-plante-1979::plante1979_table2_s1214_r028_quoted
+  - kind: admission_defaulted
+    affected_quantities:
+    - p_partial
+    reason: 'admission_defaulted: source admission_status=pending; owner ruling d-056; not a reviewer decision'
+    origin: kems-042-plante-1979::plante1979_table2_s1214_r028_quoted
   source_id: kems-042-plante-1979
   locator:
     published_page: 278
@@ -107541,8 +108091,8 @@ observations:
     original_method_class: directly_reduced_measurement
     attribution: 1649a | 7.08 | 1.32E-5
   admission:
-    status: pending
-    reason: source admission_status=pending
+    status: admitted
+    reason: 'admission_defaulted: source admission_status=pending; owner ruling d-056; not a reviewer decision'
   notices:
   - kind: out_of_certified_band
     affected_quantities:
@@ -107550,6 +108100,17 @@ observations:
     reason: Printed pressure retained; no equilibrium comparator claimed for bulk composition in the two-phase region.
     origin: kems-042-plante-1979::plante1979_table2_s1214_r029_quoted
     band: two_phase_bulk_composition_not_liquid_composition
+  - kind: pressure_provenance_unknown
+    affected_quantities:
+    - p_partial
+    reason: 'fO2_Pa is a DERIVED condition, not a measurement: congruent vaporization K2O(l) -> 2K + 1/2 O2; P_O2/P_K=(1/4)*sqrt(32.00/39.10)=0.2262
+      (Plante printed 0.226).'
+    origin: kems-042-plante-1979::plante1979_table2_s1214_r029_quoted
+  - kind: admission_defaulted
+    affected_quantities:
+    - p_partial
+    reason: 'admission_defaulted: source admission_status=pending; owner ruling d-056; not a reviewer decision'
+    origin: kems-042-plante-1979::plante1979_table2_s1214_r029_quoted
   source_id: kems-042-plante-1979
   locator:
     published_page: 278
@@ -107746,8 +108307,8 @@ observations:
     original_method_class: directly_reduced_measurement
     attribution: 1612a | 6.96 | 7.62E-6
   admission:
-    status: pending
-    reason: source admission_status=pending
+    status: admitted
+    reason: 'admission_defaulted: source admission_status=pending; owner ruling d-056; not a reviewer decision'
   notices:
   - kind: out_of_certified_band
     affected_quantities:
@@ -107755,6 +108316,17 @@ observations:
     reason: Printed pressure retained; no equilibrium comparator claimed for bulk composition in the two-phase region.
     origin: kems-042-plante-1979::plante1979_table2_s1214_r030_quoted
     band: two_phase_bulk_composition_not_liquid_composition
+  - kind: pressure_provenance_unknown
+    affected_quantities:
+    - p_partial
+    reason: 'fO2_Pa is a DERIVED condition, not a measurement: congruent vaporization K2O(l) -> 2K + 1/2 O2; P_O2/P_K=(1/4)*sqrt(32.00/39.10)=0.2262
+      (Plante printed 0.226).'
+    origin: kems-042-plante-1979::plante1979_table2_s1214_r030_quoted
+  - kind: admission_defaulted
+    affected_quantities:
+    - p_partial
+    reason: 'admission_defaulted: source admission_status=pending; owner ruling d-056; not a reviewer decision'
+    origin: kems-042-plante-1979::plante1979_table2_s1214_r030_quoted
   source_id: kems-042-plante-1979
   locator:
     published_page: 278
@@ -107951,8 +108523,8 @@ observations:
     original_method_class: directly_reduced_measurement
     attribution: 1571a | 6.88 | 4.28E-6
   admission:
-    status: pending
-    reason: source admission_status=pending
+    status: admitted
+    reason: 'admission_defaulted: source admission_status=pending; owner ruling d-056; not a reviewer decision'
   notices:
   - kind: out_of_certified_band
     affected_quantities:
@@ -107960,6 +108532,17 @@ observations:
     reason: Printed pressure retained; no equilibrium comparator claimed for bulk composition in the two-phase region.
     origin: kems-042-plante-1979::plante1979_table2_s1214_r031_quoted
     band: two_phase_bulk_composition_not_liquid_composition
+  - kind: pressure_provenance_unknown
+    affected_quantities:
+    - p_partial
+    reason: 'fO2_Pa is a DERIVED condition, not a measurement: congruent vaporization K2O(l) -> 2K + 1/2 O2; P_O2/P_K=(1/4)*sqrt(32.00/39.10)=0.2262
+      (Plante printed 0.226).'
+    origin: kems-042-plante-1979::plante1979_table2_s1214_r031_quoted
+  - kind: admission_defaulted
+    affected_quantities:
+    - p_partial
+    reason: 'admission_defaulted: source admission_status=pending; owner ruling d-056; not a reviewer decision'
+    origin: kems-042-plante-1979::plante1979_table2_s1214_r031_quoted
   source_id: kems-042-plante-1979
   locator:
     published_page: 278
@@ -108156,8 +108739,8 @@ observations:
     original_method_class: directly_reduced_measurement
     attribution: 1524a | 6.83 | 2.16E-6
   admission:
-    status: pending
-    reason: source admission_status=pending
+    status: admitted
+    reason: 'admission_defaulted: source admission_status=pending; owner ruling d-056; not a reviewer decision'
   notices:
   - kind: out_of_certified_band
     affected_quantities:
@@ -108165,6 +108748,17 @@ observations:
     reason: Printed pressure retained; no equilibrium comparator claimed for bulk composition in the two-phase region.
     origin: kems-042-plante-1979::plante1979_table2_s1214_r032_quoted
     band: two_phase_bulk_composition_not_liquid_composition
+  - kind: pressure_provenance_unknown
+    affected_quantities:
+    - p_partial
+    reason: 'fO2_Pa is a DERIVED condition, not a measurement: congruent vaporization K2O(l) -> 2K + 1/2 O2; P_O2/P_K=(1/4)*sqrt(32.00/39.10)=0.2262
+      (Plante printed 0.226).'
+    origin: kems-042-plante-1979::plante1979_table2_s1214_r032_quoted
+  - kind: admission_defaulted
+    affected_quantities:
+    - p_partial
+    reason: 'admission_defaulted: source admission_status=pending; owner ruling d-056; not a reviewer decision'
+    origin: kems-042-plante-1979::plante1979_table2_s1214_r032_quoted
   source_id: kems-042-plante-1979
   locator:
     published_page: 278
@@ -108361,8 +108955,8 @@ observations:
     original_method_class: directly_reduced_measurement
     attribution: 1493a | 6.80 | 1.26E-6
   admission:
-    status: pending
-    reason: source admission_status=pending
+    status: admitted
+    reason: 'admission_defaulted: source admission_status=pending; owner ruling d-056; not a reviewer decision'
   notices:
   - kind: out_of_certified_band
     affected_quantities:
@@ -108370,6 +108964,17 @@ observations:
     reason: Printed pressure retained; no equilibrium comparator claimed for bulk composition in the two-phase region.
     origin: kems-042-plante-1979::plante1979_table2_s1214_r033_quoted
     band: two_phase_bulk_composition_not_liquid_composition
+  - kind: pressure_provenance_unknown
+    affected_quantities:
+    - p_partial
+    reason: 'fO2_Pa is a DERIVED condition, not a measurement: congruent vaporization K2O(l) -> 2K + 1/2 O2; P_O2/P_K=(1/4)*sqrt(32.00/39.10)=0.2262
+      (Plante printed 0.226).'
+    origin: kems-042-plante-1979::plante1979_table2_s1214_r033_quoted
+  - kind: admission_defaulted
+    affected_quantities:
+    - p_partial
+    reason: 'admission_defaulted: source admission_status=pending; owner ruling d-056; not a reviewer decision'
+    origin: kems-042-plante-1979::plante1979_table2_s1214_r033_quoted
   source_id: kems-042-plante-1979
   locator:
     published_page: 278
@@ -108566,8 +109171,8 @@ observations:
     original_method_class: directly_reduced_measurement
     attribution: 1457a | 6.78 | 7.11E-7
   admission:
-    status: pending
-    reason: source admission_status=pending
+    status: admitted
+    reason: 'admission_defaulted: source admission_status=pending; owner ruling d-056; not a reviewer decision'
   notices:
   - kind: out_of_certified_band
     affected_quantities:
@@ -108575,6 +109180,17 @@ observations:
     reason: Printed pressure retained; no equilibrium comparator claimed for bulk composition in the two-phase region.
     origin: kems-042-plante-1979::plante1979_table2_s1214_r034_quoted
     band: two_phase_bulk_composition_not_liquid_composition
+  - kind: pressure_provenance_unknown
+    affected_quantities:
+    - p_partial
+    reason: 'fO2_Pa is a DERIVED condition, not a measurement: congruent vaporization K2O(l) -> 2K + 1/2 O2; P_O2/P_K=(1/4)*sqrt(32.00/39.10)=0.2262
+      (Plante printed 0.226).'
+    origin: kems-042-plante-1979::plante1979_table2_s1214_r034_quoted
+  - kind: admission_defaulted
+    affected_quantities:
+    - p_partial
+    reason: 'admission_defaulted: source admission_status=pending; owner ruling d-056; not a reviewer decision'
+    origin: kems-042-plante-1979::plante1979_table2_s1214_r034_quoted
   source_id: kems-042-plante-1979
   locator:
     published_page: 278
@@ -108771,8 +109387,8 @@ observations:
     original_method_class: directly_reduced_measurement
     attribution: 1416a | 6.77 | 3.77E-7
   admission:
-    status: pending
-    reason: source admission_status=pending
+    status: admitted
+    reason: 'admission_defaulted: source admission_status=pending; owner ruling d-056; not a reviewer decision'
   notices:
   - kind: out_of_certified_band
     affected_quantities:
@@ -108780,6 +109396,17 @@ observations:
     reason: Printed pressure retained; no equilibrium comparator claimed for bulk composition in the two-phase region.
     origin: kems-042-plante-1979::plante1979_table2_s1214_r035_quoted
     band: two_phase_bulk_composition_not_liquid_composition
+  - kind: pressure_provenance_unknown
+    affected_quantities:
+    - p_partial
+    reason: 'fO2_Pa is a DERIVED condition, not a measurement: congruent vaporization K2O(l) -> 2K + 1/2 O2; P_O2/P_K=(1/4)*sqrt(32.00/39.10)=0.2262
+      (Plante printed 0.226).'
+    origin: kems-042-plante-1979::plante1979_table2_s1214_r035_quoted
+  - kind: admission_defaulted
+    affected_quantities:
+    - p_partial
+    reason: 'admission_defaulted: source admission_status=pending; owner ruling d-056; not a reviewer decision'
+    origin: kems-042-plante-1979::plante1979_table2_s1214_r035_quoted
   source_id: kems-042-plante-1979
   locator:
     published_page: 278
@@ -108976,8 +109603,8 @@ observations:
     original_method_class: directly_reduced_measurement
     attribution: 1379a | 6.77 | 1.98E-7
   admission:
-    status: pending
-    reason: source admission_status=pending
+    status: admitted
+    reason: 'admission_defaulted: source admission_status=pending; owner ruling d-056; not a reviewer decision'
   notices:
   - kind: out_of_certified_band
     affected_quantities:
@@ -108985,6 +109612,17 @@ observations:
     reason: Printed pressure retained; no equilibrium comparator claimed for bulk composition in the two-phase region.
     origin: kems-042-plante-1979::plante1979_table2_s1214_r036_quoted
     band: two_phase_bulk_composition_not_liquid_composition
+  - kind: pressure_provenance_unknown
+    affected_quantities:
+    - p_partial
+    reason: 'fO2_Pa is a DERIVED condition, not a measurement: congruent vaporization K2O(l) -> 2K + 1/2 O2; P_O2/P_K=(1/4)*sqrt(32.00/39.10)=0.2262
+      (Plante printed 0.226).'
+    origin: kems-042-plante-1979::plante1979_table2_s1214_r036_quoted
+  - kind: admission_defaulted
+    affected_quantities:
+    - p_partial
+    reason: 'admission_defaulted: source admission_status=pending; owner ruling d-056; not a reviewer decision'
+    origin: kems-042-plante-1979::plante1979_table2_s1214_r036_quoted
   source_id: kems-042-plante-1979
   locator:
     published_page: 278
@@ -109181,8 +109819,8 @@ observations:
     original_method_class: directly_reduced_measurement
     attribution: 1335a | 6.76 | 1.01E-7
   admission:
-    status: pending
-    reason: source admission_status=pending
+    status: admitted
+    reason: 'admission_defaulted: source admission_status=pending; owner ruling d-056; not a reviewer decision'
   notices:
   - kind: out_of_certified_band
     affected_quantities:
@@ -109190,6 +109828,17 @@ observations:
     reason: Printed pressure retained; no equilibrium comparator claimed for bulk composition in the two-phase region.
     origin: kems-042-plante-1979::plante1979_table2_s1214_r037_quoted
     band: two_phase_bulk_composition_not_liquid_composition
+  - kind: pressure_provenance_unknown
+    affected_quantities:
+    - p_partial
+    reason: 'fO2_Pa is a DERIVED condition, not a measurement: congruent vaporization K2O(l) -> 2K + 1/2 O2; P_O2/P_K=(1/4)*sqrt(32.00/39.10)=0.2262
+      (Plante printed 0.226).'
+    origin: kems-042-plante-1979::plante1979_table2_s1214_r037_quoted
+  - kind: admission_defaulted
+    affected_quantities:
+    - p_partial
+    reason: 'admission_defaulted: source admission_status=pending; owner ruling d-056; not a reviewer decision'
+    origin: kems-042-plante-1979::plante1979_table2_s1214_r037_quoted
   source_id: kems-042-plante-1979
   locator:
     published_page: 278

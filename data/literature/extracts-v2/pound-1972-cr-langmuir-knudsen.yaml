@@ -80,9 +80,14 @@ observations:
       reason: unmapped regime 'langmuir_free_evaporation'
     original_method_class: langmuir_free_evaporation
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - evaporation_coefficient_alpha
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: pound-1972-cr-langmuir-knudsen::pound_1972_cr_langmuir_knudsen
   source_id: pound-1972-cr-langmuir-knudsen
   locator:
     note: Pound, G. M. (1972), J. Phys. Chem. Ref. Data 1:135-146 Table 1, DOI 10.1063/1.3253096; primary McCabe, Hudson &
