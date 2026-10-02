@@ -16,6 +16,6 @@ VERDICT: LAND 4b04c2290552fca19b7d9c48b68066115a6787da
 - **Deliverable:** `REVIEW-femg-batch1-2026-10-01.md`
 - **Dropbox:** shipped to from-empirical/ 2026-10-01 ~22:47 ET
 - **Store regen:** VPS box offline mid-seat; values guards complete — migrate counts not re-confirmed this turn
-- **Mailbox tip:** (filled after commit)
+- **Mailbox tip:** `24454c0ff245a62997a1b0273c09f65c3792d1d1` on `empirical/reviews-batch-zv-2026-09-22`
 
 — regolith-empirical
