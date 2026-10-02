@@ -268,7 +268,7 @@ def test_unavailable_buffer_absence_does_not_fall_back_to_cached_scalar(
     assert _authoritative_melt_fO2_log(sim) == pytest.approx(key_fO2_log)
 
 
-def test_unavailable_buffer_absence_survives_one_simulated_hour(
+def test_unavailable_buffer_activity_failure_is_typed_and_transactional(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     sim = _sim_with_oxides(feo_wt=10.0, fe2o3_wt=0.0, temperature_C=1400.0)
@@ -300,9 +300,17 @@ def test_unavailable_buffer_absence_survives_one_simulated_hour(
 
     monkeypatch.setattr(sim, "_melt_fO2_from_ledger", track_unavailable_basis)
 
-    sim._step_one_hour()
+    ledger_before = sim.atom_ledger.mol_by_account()
+    transitions_before = len(sim.atom_ledger.transitions)
+    with pytest.raises(
+        core_module.OxygenInterfaceConfigurationError,
+        match="oxygen_interface_activity_fixed_point_nonconverged",
+    ):
+        sim._step_one_hour()
 
     assert visited_unavailable_basis
+    assert sim.atom_ledger.mol_by_account() == ledger_before
+    assert len(sim.atom_ledger.transitions) == transitions_before
 
 
 def test_nonzero_release_with_no_ferric_inventory_keeps_the_bound() -> None:
@@ -1569,11 +1577,8 @@ def test_ferrous_free_split_and_per_hour_summary_publish_the_bound() -> None:
     json.dumps(summary, allow_nan=False)
 
 
-def test_ferrous_free_hour_releases_then_uses_real_ratio() -> None:
-    """The lower bound permits release, then Kress sees the committed ratio."""
-
-    from simulator.runner import build_per_hour_summary
-
+def test_ferrous_free_refinement_failure_preserves_bound_consumers() -> None:
+    """An uncertified ferrous-free hour refuses commit but retains its bound."""
     sim = _fully_ferric_sim()
     expected = _ferrous_free_lower_bound_log10(
         sim,
@@ -1585,38 +1590,15 @@ def test_ferrous_free_hour_releases_then_uses_real_ratio() -> None:
         expected, abs=1.0e-8
     )
 
-    snapshot = sim.step()
-    summary = build_per_hour_summary(sim, snapshot)
-    json.dumps(summary, allow_nan=False)
-
-    reservoir = sim.melt.oxygen_reservoir
-    exported = summary["fe_redox_split"]
-    transfer_mol = reservoir.exchange_o2_mol
-    assert transfer_mol > OXYGEN_RESERVOIR_NOOP_MOL
-    assert transfer_mol <= 1.0  # initial n_Fe2O3 / 2
-    assert reservoir.shadow_oxygen_transfer["status"] == "ok"
-    assert reservoir.shadow_oxygen_transfer["committed_o2_mol"] == pytest.approx(
-        transfer_mol
-    )
-    assert _oxide_mol(sim, "FeO") == pytest.approx(4.0 * transfer_mol)
-    assert _oxide_mol(sim, "Fe2O3") == pytest.approx(2.0 - 2.0 * transfer_mol)
-    assert sim._current_melt_redox_fO2_log() == pytest.approx(
-        exported["fO2_log"]
-    )
-    assert exported["fO2_log"] is not None
-    assert "fO2_log_lower_bound" not in exported
-    assert exported["redox_domain"]["basis"] == "kress91_inverse"
-    assert reservoir.melt_intrinsic_fO2_log == pytest.approx(
-        exported["fO2_log"]
-    )
-    assert sim._last_melt_redox_liquidus_gate_diagnostic["source"] != (
-        "bound:ferrous_free_lower_bound"
-    )
-    assert (
-        reservoir.headspace_transport_pO2_bar
-        < reservoir.interface_pO2_bar
-        <= MELT_DISSOCIATION_PO2_MAX_BAR
-    )
+    ledger_before = sim.atom_ledger.mol_by_account()
+    transitions_before = len(sim.atom_ledger.transitions)
+    with pytest.raises(
+        core_module.OxygenInterfaceConfigurationError,
+        match="oxygen_exchange_refinement_nonconverged",
+    ):
+        sim.step()
+    assert sim.atom_ledger.mol_by_account() == ledger_before
+    assert len(sim.atom_ledger.transitions) == transitions_before
 
     absent = _fully_ferric_sim()
     assert absent._melt_fO2_from_ledger() is None
@@ -1638,9 +1620,13 @@ def test_ferrous_free_hour_releases_then_uses_real_ratio() -> None:
         "bound:ferrous_free_lower_bound"
     )
 
-    shadow = absent._oxygen_shadow_transfer()
-    assert shadow["status"] == "ok"
-    assert OXYGEN_RESERVOIR_NOOP_MOL < shadow["transfer_o2_mol"] <= 1.0
+    absent_ledger_before = absent.atom_ledger.mol_by_account()
+    with pytest.raises(
+        core_module.OxygenInterfaceConfigurationError,
+        match="oxygen_exchange_refinement_nonconverged",
+    ):
+        absent._oxygen_shadow_transfer()
+    assert absent.atom_ledger.mol_by_account() == absent_ledger_before
 
     extent = absent._compute_native_fe_saturation_extent()
     assert extent["native_fe_saturation"] is False
@@ -1764,11 +1750,6 @@ def test_ferrous_free_hour_releases_then_uses_real_ratio() -> None:
     _apply_sio_wall_sweep_controls(sweep, pO2_mbar=1.0)
     assert sweep.melt.oxygen_reservoir.melt_intrinsic_fO2_log is None
     assert sweep._current_melt_redox_fO2_log() is None
-
-    assert reservoir.shadow_oxygen_transfer["transfer_o2_mol"] == pytest.approx(
-        transfer_mol
-    )
-
 
 def _m2_ideal_fixture(
     monkeypatch: pytest.MonkeyPatch,
@@ -2006,3 +1987,585 @@ def test_m2_metal_exchange_stoichiometry_and_ledger_balance(
     assert len(transitions) == 1
     assert transitions[0].name == "oxygen_reservoir_exchange"
     transitions[0].validate_conservation(sim.atom_ledger.registry)
+
+
+@pytest.mark.parametrize("z", [0.01, 1.0, 100.0])
+@pytest.mark.parametrize("equilibrium_mol", [0.25, -0.25], ids=("release", "uptake"))
+def test_exponential_linear_relaxation_is_exact(
+    monkeypatch: pytest.MonkeyPatch,
+    z: float,
+    equilibrium_mol: float,
+) -> None:
+    sim = _sim_with_oxides(
+        feo_wt=10.0,
+        fe2o3_wt=10.0,
+        temperature_C=1400.0,
+    )
+    _set_melt_iron_oxides(sim, n_feo_mol=10.0, n_fe2o3_mol=10.0)
+    _finite_gas_film(sim)
+    sim._overhead_headspace_config["enabled"] = True
+    sim.melt.melt_surface_area_m2 = 1.0
+    sim.overhead.headspace_temperature_K = 2000.0
+    sim._headspace_ledger_pO2_bar_from_o2_mol = lambda _n: 0.01
+    sim._headspace_transport_pO2_bar_from_ledger = (
+        lambda *_args, **_kwargs: 0.01
+    )
+    sim.atom_ledger.load_external_mol(
+        "process.overhead_gas",
+        {"O2": 1.0},
+        source="linear exponential relaxation fixture",
+        material_origin="feedstock",
+    )
+    h_eff_m = sim._oxygen_exchange_effective_melt_depth_m()
+    monkeypatch.setattr(
+        sim,
+        "_oxygen_exchange_k_m_s",
+        lambda _T_K: (2.0 * z * h_eff_m, "linear fixture", {}),
+    )
+    n_feo0 = _oxide_mol(sim, "FeO")
+    interface_calls = 0
+
+    def linear_root(**kwargs: Any) -> dict[str, Any]:
+        nonlocal interface_calls
+        interface_calls += 1
+        d_mol = (float(kwargs["n_feo_mol"]) - n_feo0) / 4.0
+        vector_field = z * (equilibrium_mol - d_mol)
+        return {
+            "interface_pO2_bar": 0.01 * 10.0 ** (0.1 * d_mol),
+            "interface_flux_mol_m2_s": -vector_field,
+            "finite_melt_driving_force_mol": equilibrium_mol - d_mol,
+            "interface_root_clamped": False,
+            "interface_root_residual_mol_m2_s": 0.0,
+            "interface_root_converged": True,
+            "gas_conductance_mol_m2_s_per_ln": 1.0,
+            "melt_conductance_mol_m2_s_per_ln": 1.0,
+            "capacity_mol_per_ln_fO2": 1.0,
+        }
+
+    monkeypatch.setattr(sim, "_oxygen_finite_interface_root", linear_root)
+    transfer = sim._oxygen_shadow_transfer(dt_s=1.0)
+    assert transfer["interface_evaluations"] == interface_calls
+    assert transfer["interface_evaluations"] <= 520
+    assert transfer["amount_bisections"] == 0
+    expected = equilibrium_mol * -math.expm1(-z)
+
+    assert transfer["transfer_o2_mol"] == pytest.approx(
+        expected,
+        rel=2.0e-14,
+        abs=2.0e-15,
+    )
+    assert transfer["bounded"] is True
+    assert transfer["transfer_o2_mol"] * equilibrium_mol >= 0.0
+    assert abs(transfer["transfer_o2_mol"]) <= abs(equilibrium_mol)
+
+
+def _prepare_exponential_exchange_case(
+    sim: PyrolysisSimulator,
+    monkeypatch: pytest.MonkeyPatch,
+    *,
+    law: str,
+    direction: str,
+) -> tuple[float, float, float, float, float, float, float, Any, float]:
+    _finite_gas_film(sim)
+    sim._overhead_headspace_config["enabled"] = True
+    sim.melt.melt_surface_area_m2 = 1.0
+    sim.overhead.headspace_temperature_K = 2000.0
+    if law == "m2":
+        gas_pressure_pa = 0.8 if direction == "release" else 1.2
+        gas_pressure_bar = gas_pressure_pa / 1.0e5
+
+        def ideal_surface_bound(**kwargs: Any) -> tuple[float, float]:
+            composition = kwargs["comp"]
+            feo_mol = float(composition.get("FeO", 0.0)) / MOLAR_MASS["FeO"]
+            solvent_mol = float(composition.get("SiO2", 0.0)) / MOLAR_MASS["SiO2"]
+            activity = feo_mol / (feo_mol + solvent_mol)
+            return -5.0 + 2.0 * math.log10(activity), activity
+
+        sim._fe_saturation_bound_fO2_log = ideal_surface_bound
+    else:
+        _set_melt_iron_oxides(sim, n_feo_mol=1.0, n_fe2o3_mol=0.2)
+        intrinsic = sim._current_melt_redox_fO2_log()
+        assert intrinsic is not None
+        from engines.builtin.vapor_pressure import (
+            physical_melt_dissociation_pO2_bar,
+        )
+
+        melt_pressure_bar = physical_melt_dissociation_pO2_bar(intrinsic)[0]
+        gas_pressure_bar = melt_pressure_bar * (
+            0.8 if direction == "release" else 1.2
+        )
+        gas_pressure_pa = gas_pressure_bar * 1.0e5
+
+    sim.atom_ledger.load_external_mol(
+        "process.overhead_gas",
+        {"O2": 1.0},
+        source=f"{law} exponential exchange fixture",
+        material_origin="feedstock",
+    )
+    sim._headspace_ledger_pO2_bar_from_o2_mol = (
+        lambda _n: gas_pressure_bar
+    )
+    sim._headspace_transport_pO2_bar_from_ledger = (
+        lambda *_args, **_kwargs: gas_pressure_bar
+    )
+    sim._headspace_floor_o2_mol = lambda: 0.0
+    h_eff_m = 0.1
+    if law == "m2":
+        # Keep z=100 on an interior equilibrium branch with a representable
+        # flux-residual budget; the smaller rate makes its duration so large
+        # that binary64 interface-pressure rounding dominates the root budget.
+        k_m = 1.0e-7
+        k_g = 10.0
+    else:
+        k_m = 1.0e-7
+        k_g = 1.0
+    melt_transport = sim._oxygen_exchange_k_m_s(
+        float(sim.melt.temperature_C) + 273.15
+    )[2]
+    monkeypatch.setattr(
+        sim,
+        "_oxygen_exchange_k_m_s",
+        lambda _T_K: (k_m, f"{law} reference fixture", melt_transport),
+    )
+    monkeypatch.setattr(
+        sim,
+        "_oxygen_exchange_effective_melt_depth_m",
+        lambda: h_eff_m,
+    )
+    monkeypatch.setattr(
+        sim,
+        "_oxygen_interface_gas_side_k_m_s",
+        lambda _T_K: (k_g, f"{law} reference fixture"),
+    )
+    sim.melt.oxygen_reservoir.headspace_transport_pO2_bar = gas_pressure_bar
+    n_feo = _oxide_mol(sim, "FeO")
+    n_fe2o3 = _oxide_mol(sim, "Fe2O3")
+    n_metal = float(
+        sim.atom_ledger.project_account_mol("process.metal_phase").get(
+            "Fe", 0.0
+        )
+    )
+    comp = sim._melt_oxide_wt_pct()
+    mol_fractions = melt_mol_fractions_for_kress91(comp)
+    evaluator = (
+        core_module._Kress91Evaluator(
+            mol_fractions=mol_fractions,
+            T_K=float(sim.melt.temperature_C) + 273.15,
+            pressure_bar=_pressure_bar(sim),
+        )
+        if mol_fractions
+        else None
+    )
+    intrinsic_log = sim._current_melt_redox_fO2_log()
+    if intrinsic_log is None:
+        melt_pressure_bar = sim._vacuum_floor_bar()
+    else:
+        from engines.builtin.vapor_pressure import (
+            physical_melt_dissociation_pO2_bar,
+        )
+
+        melt_pressure_bar = physical_melt_dissociation_pO2_bar(intrinsic_log)[0]
+    return (
+        gas_pressure_bar,
+        k_m,
+        k_g,
+        h_eff_m,
+        n_feo,
+        n_fe2o3,
+        n_metal,
+        evaluator,
+        melt_pressure_bar,
+    )
+
+
+@pytest.mark.parametrize("z", [0.01, 1.0, 100.0])
+@pytest.mark.parametrize("law", ["ferric", "m2"])
+@pytest.mark.parametrize("direction", ["release", "uptake"])
+def test_exponential_transfer_matches_converged_reference(
+    monkeypatch: pytest.MonkeyPatch,
+    law: str,
+    direction: str,
+    z: float,
+) -> None:
+    """DOP853 at rtol 1e-12 and 1e-13 supplies the independent ODE reference.
+
+    The two references must agree to 1e-14 + 1e-5 relative moles and 1e-6
+    dex before the candidate is checked against the r3 acceptance tolerances.
+    """
+    from scipy.integrate import solve_ivp
+
+    if law == "m2":
+        sim = _m2_ideal_fixture(monkeypatch)
+    else:
+        sim = _sim_with_oxides(
+            feo_wt=10.0,
+            fe2o3_wt=2.0,
+            temperature_C=1400.0,
+        )
+    (
+        gas_pressure_bar,
+        k_m,
+        k_g,
+        h_eff_m,
+        n_feo0,
+        n_fe2o30,
+        n_metal0,
+        evaluator,
+        melt_pressure_bar,
+    ) = _prepare_exponential_exchange_case(
+        sim,
+        monkeypatch,
+        law=law,
+        direction=direction,
+    )
+    area = float(sim.melt.melt_surface_area_m2)
+    gas_temperature_K = float(sim.overhead.headspace_temperature_K)
+    initial = sim._oxygen_shadow_transfer(
+        dt_s=1.0,
+        transport_pO2_bar=gas_pressure_bar,
+    )
+    relaxation_rate = float(initial["initial_relaxation_rate_s"])
+    assert math.isfinite(relaxation_rate) and relaxation_rate > 0.0
+    duration_s = z / relaxation_rate
+
+    def state_at(d_mol: float) -> tuple[float, dict[str, Any]]:
+        if law == "m2":
+            feo_mol = n_feo0 - 2.0 * d_mol
+            ferric_mol = n_fe2o30
+            metal_fe_mol = n_metal0 + 2.0 * d_mol
+            melt_pressure = melt_pressure_bar
+        else:
+            feo_mol = n_feo0 + 4.0 * d_mol
+            ferric_mol = n_fe2o30 - 2.0 * d_mol
+            metal_fe_mol = n_metal0
+            melt_pressure = sim._oxygen_melt_pO2_bar_for_inventory(
+                n_feo_mol=feo_mol,
+                n_fe2o3_mol=ferric_mol,
+                kress91_evaluator=evaluator,
+                fallback_pO2_bar=melt_pressure_bar,
+            )
+        root = sim._oxygen_finite_interface_root(
+            gas_pO2_bar=gas_pressure_bar,
+            melt_pO2_bar=melt_pressure,
+            gas_temperature_K=gas_temperature_K,
+            k_g=k_g,
+            k_m=k_m,
+            surface_area_m2=area,
+            h_eff_m=h_eff_m,
+            kress91_evaluator=evaluator,
+            n_feo_mol=feo_mol,
+            n_fe2o3_mol=ferric_mol,
+            n_fe_metal_mol=metal_fe_mol,
+            capacity_mol_per_ln_fO2=0.0,
+            diagnostics=False,
+        )
+        return -area * float(root["interface_flux_mol_m2_s"]), root
+
+    def reference(rtol: float) -> tuple[float, float]:
+        result = solve_ivp(
+            lambda _time, y: [state_at(float(y[0]))[0]],
+            (0.0, duration_s),
+            [0.0],
+            method="DOP853",
+            rtol=rtol,
+            atol=1.0e-15,
+        )
+        assert result.success
+        amount = float(result.y[0, -1])
+        pressure = float(state_at(amount)[1]["interface_pO2_bar"])
+        return amount, math.log10(pressure)
+
+    ref_loose = reference(1.0e-12)
+    ref_tight = reference(1.0e-13)
+    amount_ref, log_pressure_ref = ref_tight
+    assert abs(ref_loose[0] - amount_ref) <= (
+        1.0e-14 + 1.0e-5 * abs(amount_ref)
+    )
+    assert abs(ref_loose[1] - log_pressure_ref) <= 1.0e-6
+    initial_field = state_at(0.0)[0]
+    final_field = state_at(amount_ref)[0]
+    assert initial_field * amount_ref > 0.0
+    assert initial_field * final_field >= -abs(initial_field) * 1.0e-8
+
+    shadow = sim._oxygen_shadow_transfer(
+        dt_s=duration_s,
+        transport_pO2_bar=gas_pressure_bar,
+    )
+    assert abs(float(shadow["transfer_o2_mol"]) - amount_ref) <= (
+        1.0e-12 + 1.0e-3 * abs(amount_ref)
+    )
+    candidate_root_pressure = float(
+        state_at(float(shadow["transfer_o2_mol"]))[1]["interface_pO2_bar"]
+    )
+    assert float(shadow["interface_pO2_bar"]) == pytest.approx(
+        candidate_root_pressure,
+        rel=1.0e-10,
+    )
+    assert abs(
+        math.log10(float(shadow["interface_pO2_bar"]))
+        - log_pressure_ref
+    ) <= 1.0e-4, (
+        f"d={shadow['transfer_o2_mol']!r}, d_ref={amount_ref!r}, "
+        f"d_delta={float(shadow['transfer_o2_mol']) - amount_ref!r}, "
+        f"N={shadow['substeps']!r}"
+    )
+    assert shadow["bounded"] is True
+    assert shadow["amount_bisections"] == 0
+    assert shadow["interface_evaluations"] <= 520
+
+    # Run the same passive interval through its publisher and verify that it
+    # stores the endpoint root used by the accepted trajectory.
+    original_root = sim._oxygen_finite_interface_root
+    shadow_root_calls = 0
+    inside_shadow = False
+
+    def counted_root(*args: Any, **kwargs: Any) -> dict[str, Any]:
+        nonlocal shadow_root_calls
+        if inside_shadow:
+            shadow_root_calls += 1
+        return original_root(*args, **kwargs)
+
+    monkeypatch.setattr(sim, "_oxygen_finite_interface_root", counted_root)
+    original_shadow = sim._oxygen_shadow_transfer
+
+    def target_duration(**kwargs: Any) -> dict[str, Any]:
+        nonlocal inside_shadow
+        kwargs["dt_s"] = duration_s
+        inside_shadow = True
+        try:
+            return original_shadow(**kwargs)
+        finally:
+            inside_shadow = False
+
+    monkeypatch.setattr(sim, "_oxygen_shadow_transfer", target_duration)
+    reservoir = sim._apply_oxygen_reservoir_exchange()
+    published = reservoir.shadow_oxygen_transfer
+    assert published["interface_pO2_bar"] == pytest.approx(
+        reservoir.interface_pO2_bar,
+        rel=1.0e-13,
+    )
+    assert shadow_root_calls == published["interface_evaluations"]
+    assert shadow_root_calls <= 520
+    assert published["amount_bisections"] == 0
+    assert _oxide_mol(sim, "FeO") >= 0.0
+    assert _oxide_mol(sim, "Fe2O3") >= 0.0
+
+
+def test_exponential_binding_caps_stop_outward_and_publish_successor(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    sim = _sim_with_oxides(
+        feo_wt=10.0,
+        fe2o3_wt=0.1,
+        temperature_C=1400.0,
+    )
+    _set_melt_iron_oxides(sim, n_feo_mol=10.0, n_fe2o3_mol=0.02)
+    _finite_gas_film(sim)
+    sim._overhead_headspace_config["enabled"] = True
+    sim.melt.melt_surface_area_m2 = 1.0
+    sim.overhead.headspace_temperature_K = 2000.0
+    sim.atom_ledger.load_external_mol(
+        "process.overhead_gas",
+        {"O2": 1.0},
+        source="outward cap fixture",
+        material_origin="feedstock",
+    )
+    h_eff_m = sim._oxygen_exchange_effective_melt_depth_m()
+    monkeypatch.setattr(
+        sim,
+        "_oxygen_exchange_k_m_s",
+        lambda _T_K: (200.0 * h_eff_m, "outward cap fixture", {}),
+    )
+    n_feo0 = _oxide_mol(sim, "FeO")
+    root_calls = 0
+
+    def outward_root(**kwargs: Any) -> dict[str, Any]:
+        nonlocal root_calls
+        root_calls += 1
+        d_mol = (float(kwargs["n_feo_mol"]) - n_feo0) / 4.0
+        vector_field = 100.0 * (1.0 - d_mol)
+        return {
+            "interface_pO2_bar": 0.01 * 10.0 ** (0.1 * d_mol),
+            "interface_flux_mol_m2_s": -vector_field,
+            "finite_melt_driving_force_mol": 1.0 - d_mol,
+            "interface_root_clamped": False,
+            "interface_root_residual_mol_m2_s": 0.0,
+            "interface_root_converged": True,
+            "gas_conductance_mol_m2_s_per_ln": 1.0,
+            "melt_conductance_mol_m2_s_per_ln": 1.0,
+            "capacity_mol_per_ln_fO2": 1.0,
+        }
+
+    monkeypatch.setattr(sim, "_oxygen_finite_interface_root", outward_root)
+    transfer = sim._oxygen_shadow_transfer(dt_s=100.0)
+    upper_cap = 0.02 / 2.0
+    assert transfer["transfer_o2_mol"] == pytest.approx(upper_cap)
+    assert transfer["fe2o3_mol_after"] == pytest.approx(0.0, abs=1.0e-15)
+    assert transfer["interface_evaluations"] == root_calls
+    assert transfer["interface_evaluations"] <= 529
+    assert transfer["amount_bisections"] == 0
+    assert transfer["interface_root_converged"] is True
+    assert transfer["interface_flux_mol_m2_s"] < 0.0
+    assert transfer["interface_pO2_bar"] == pytest.approx(
+        0.01 * 10.0 ** (0.1 * upper_cap)
+    )
+    assert transfer["bounded"] is True
+
+
+def _failure_fixture(
+    monkeypatch: pytest.MonkeyPatch,
+) -> PyrolysisSimulator:
+    sim = _sim_with_oxides(
+        feo_wt=10.0,
+        fe2o3_wt=2.0,
+        temperature_C=1400.0,
+    )
+    _set_melt_iron_oxides(sim, n_feo_mol=1.0, n_fe2o3_mol=0.2)
+    _finite_gas_film(sim)
+    sim._overhead_headspace_config["enabled"] = True
+    sim.melt.melt_surface_area_m2 = 1.0
+    sim.overhead.headspace_temperature_K = 2000.0
+    sim.atom_ledger.load_external_mol(
+        "process.overhead_gas",
+        {"O2": 1.0},
+        source="numerical failure fixture",
+        material_origin="feedstock",
+    )
+    gas_pressure_bar = 1.0e-4
+    sim._headspace_ledger_pO2_bar_from_o2_mol = (
+        lambda _n: gas_pressure_bar
+    )
+    sim._headspace_transport_pO2_bar_from_ledger = (
+        lambda *_args, **_kwargs: gas_pressure_bar
+    )
+    sim._headspace_floor_o2_mol = lambda: 0.0
+    melt_transport = sim._oxygen_exchange_k_m_s(
+        float(sim.melt.temperature_C) + 273.15
+    )[2]
+    monkeypatch.setattr(
+        sim,
+        "_oxygen_exchange_k_m_s",
+        lambda _T_K: (1.0e-9, "numerical failure fixture", melt_transport),
+    )
+    monkeypatch.setattr(
+        sim,
+        "_oxygen_exchange_effective_melt_depth_m",
+        lambda: 0.1,
+    )
+    monkeypatch.setattr(
+        sim,
+        "_oxygen_interface_gas_side_k_m_s",
+        lambda _T_K: (0.01, "numerical failure fixture"),
+    )
+    return sim
+
+
+def _assert_shadow_failure_keeps_ledger(
+    sim: PyrolysisSimulator,
+    monkeypatch: pytest.MonkeyPatch,
+    *,
+    reason: str,
+) -> None:
+    before = sim.atom_ledger.mol_by_account()
+    transitions_before = len(sim.atom_ledger.transitions)
+    with pytest.raises(
+        core_module.OxygenInterfaceConfigurationError,
+        match=reason,
+    ):
+        sim._oxygen_shadow_transfer(dt_s=1.0)
+    assert sim.atom_ledger.mol_by_account() == before
+    assert len(sim.atom_ledger.transitions) == transitions_before
+
+
+def test_exponential_interface_nonconvergence_is_typed_and_pure(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    sim = _failure_fixture(monkeypatch)
+    monkeypatch.setattr(
+        sim,
+        "_oxygen_finite_interface_root",
+        lambda **_kwargs: {"interface_root_converged": False},
+    )
+    _assert_shadow_failure_keeps_ledger(
+        sim,
+        monkeypatch,
+        reason="oxygen_interface_root_nonconverged",
+    )
+
+
+def test_exponential_m2_activity_failure_is_typed_and_pure(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    sim = _m2_ideal_fixture(monkeypatch)
+    _finite_gas_film(sim)
+    sim._overhead_headspace_config["enabled"] = True
+    sim.melt.melt_surface_area_m2 = 1.0
+    sim.overhead.headspace_temperature_K = 2000.0
+    sim.atom_ledger.load_external_mol(
+        "process.overhead_gas",
+        {"O2": 1.0},
+        source="M2 fixed-point failure fixture",
+        material_origin="feedstock",
+    )
+    sim._headspace_ledger_pO2_bar_from_o2_mol = lambda _n: 0.02 / 1.0e5
+    sim._headspace_transport_pO2_bar_from_ledger = (
+        lambda *_args, **_kwargs: 0.02 / 1.0e5
+    )
+    sim._headspace_floor_o2_mol = lambda: 0.0
+    monkeypatch.setattr(
+        sim,
+        "_fe_saturation_bound_fO2_log",
+        lambda **_kwargs: None,
+    )
+    _assert_shadow_failure_keeps_ledger(
+        sim,
+        monkeypatch,
+        reason="oxygen_interface_activity_fixed_point_nonconverged",
+    )
+
+
+def test_exponential_refinement_exhaustion_is_typed_and_pure(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    sim = _failure_fixture(monkeypatch)
+    original_root = sim._oxygen_finite_interface_root
+    call_count = 0
+
+    def alternating_pressure_root(**kwargs: Any) -> dict[str, Any]:
+        nonlocal call_count
+        call_count += 1
+        root = original_root(**kwargs)
+        factor = 10.0 if call_count % 3 == 1 else 0.1
+        root["interface_pO2_bar"] *= factor
+        return root
+
+    monkeypatch.setattr(
+        sim,
+        "_oxygen_finite_interface_root",
+        alternating_pressure_root,
+    )
+    _assert_shadow_failure_keeps_ledger(
+        sim,
+        monkeypatch,
+        reason="oxygen_exchange_refinement_nonconverged",
+    )
+
+
+def test_exponential_e0_returns_without_interface_roots(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    sim = _failure_fixture(monkeypatch)
+    monkeypatch.setattr(
+        sim,
+        "_oxygen_interface_gas_side_k_m_s",
+        lambda _T_K: (math.inf, "hard vacuum fixture"),
+    )
+
+    def forbidden_root(**_kwargs: Any) -> dict[str, Any]:
+        raise AssertionError("E0 must return before the interface root")
+
+    monkeypatch.setattr(sim, "_oxygen_finite_interface_root", forbidden_root)
+    result = sim._oxygen_shadow_transfer(dt_s=3600.0)
+    assert result["status"] == "hard_vacuum_no_passive_exchange"
+    assert result["interface_evaluations"] == 0
+    assert result["amount_bisections"] == 0

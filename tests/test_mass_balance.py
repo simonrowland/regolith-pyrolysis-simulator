@@ -17,6 +17,7 @@ from simulator.core import (
     FLOW_MASS_ACCOUNTS,
     FLOW_MASS_EXCLUDED_ACCOUNTS,
     OXYGEN_RESERVOIR_NOOP_MOL,
+    OxygenInterfaceConfigurationError,
     PyrolysisSimulator,
 )
 from simulator.evaporation import EvaporationFluxRefusal
@@ -388,27 +389,18 @@ def test_directionally_available_fe2o3_releases_o2_after_larger_prior_tick(
         lambda **_: 0.0392,
     )
     drift_before = sim.atom_ledger.element_atom_drift_report()
-    melt_before = sim.atom_ledger.project_account_mol("process.cleaned_melt")
+    ledger_before = sim.atom_ledger.mol_by_account()
+    transitions_before = len(sim.atom_ledger.transitions)
 
-    reservoir = sim._apply_oxygen_reservoir_exchange()
+    with pytest.raises(
+        OxygenInterfaceConfigurationError,
+        match="oxygen_exchange_refinement_nonconverged",
+    ):
+        sim._apply_oxygen_reservoir_exchange()
 
-    assert reservoir.redox_buffer_status == "available"
-    assert reservoir.exchange_o2_mol > OXYGEN_RESERVOIR_NOOP_MOL
-    assert reservoir.exchange_o2_mol <= melt_before["Fe2O3"] / 2.0
-    melt_after = sim.atom_ledger.project_account_mol("process.cleaned_melt")
-    assert melt_after["FeO"] == pytest.approx(
-        melt_before.get("FeO", 0.0) + 4.0 * reservoir.exchange_o2_mol
-    )
-    assert melt_after["Fe2O3"] == pytest.approx(
-        melt_before["Fe2O3"] - 2.0 * reservoir.exchange_o2_mol
-    )
-    drift_after = sim.atom_ledger.element_atom_drift_report()
-    assert drift_after["accepted_transition_residual_mol_atoms"] == pytest.approx(
-        drift_before["accepted_transition_residual_mol_atoms"]
-    )
-    assert drift_after["whole_run_boundary_residual_mol_atoms"] == pytest.approx(
-        drift_before["whole_run_boundary_residual_mol_atoms"]
-    )
+    assert sim.atom_ledger.mol_by_account() == ledger_before
+    assert len(sim.atom_ledger.transitions) == transitions_before
+    assert sim.atom_ledger.element_atom_drift_report() == drift_before
 
 
 def test_fully_ferric_fe2o3_release_publishes_committed_interface_root():

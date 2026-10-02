@@ -52,6 +52,7 @@ from collections import deque
 from dataclasses import dataclass
 import logging
 import math
+from decimal import Decimal, localcontext
 from pathlib import Path
 from types import MappingProxyType
 from typing import Any, Dict, Literal, Mapping, Optional, Tuple
@@ -4393,6 +4394,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         n_fe2o3_mol: float,
         capacity_mol_per_ln_fO2: float,
         n_fe_metal_mol: float = 0.0,
+        flux_residual_tolerance_mol_m2_s: float = 1.0e-14,
         diagnostics: bool = True,
     ) -> Dict[str, Any]:
         """Solve the finite-inventory two-film interface without mutation.
@@ -4418,6 +4420,17 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             0.0,
             float(capacity_mol_per_ln_fO2),
         )
+        flux_residual_tolerance_mol_m2_s = float(
+            flux_residual_tolerance_mol_m2_s
+        )
+        if (
+            not math.isfinite(flux_residual_tolerance_mol_m2_s)
+            or flux_residual_tolerance_mol_m2_s <= 0.0
+        ):
+            raise OxygenInterfaceConfigurationError(
+                'invalid_oxygen_interface_tolerance',
+                'flux residual tolerance must be finite and positive',
+            )
         gas_pressure_factor_mol_m3_per_bar = 1.0e5 / (
             GAS_CONSTANT * float(gas_temperature_K)
         )
@@ -4461,34 +4474,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 / 1000.0,
                 floor_bar=self._vacuum_floor_bar(),
             )
-            surface_activity_unavailable = False
-
-            def unavailable_surface_result() -> Dict[str, Any]:
-                return {
-                    'interface_pO2_bar': gas_pO2_bar,
-                    'interface_flux_mol_m2_s': 0.0,
-                    'finite_melt_driving_force_mol': 0.0,
-                    'melt_oxygen_equilibrium_mol': float(n_bulk_o2_mol),
-                    'melt_oxygen_ledger_mol': float(n_bulk_o2_mol),
-                    'melt_conductance_mol_m2_s_per_ln': 0.0,
-                    'gas_conductance_mol_m2_s_per_ln': 0.0,
-                    'gas_reference_concentration_mol_m3': None,
-                    'melt_reference_concentration_mol_m3_per_ln': 0.0,
-                    'capacity_mol_per_ln_fO2': 0.0,
-                    'surface_inventory_o2_equivalent_mol': float(
-                        n_bulk_o2_mol
-                    ),
-                    'surface_buffer_pO2_Pa': None,
-                    'surface_activity_available': False,
-                    'interface_root_clamped': False,
-                    'interface_root_residual_mol_m2_s': 0.0,
-                    'limiting_regime': 'surface_activity_unavailable',
-                    'gas_flux_mol_m2_s': 0.0,
-                    'melt_flux_mol_m2_s': 0.0,
-                }
-
             def surface_buffer_pressure_pa(u_mol: float) -> float:
-                nonlocal surface_activity_unavailable
                 surface_feo_mol = max(0.0, 2.0 * float(u_mol))
                 if surface_feo_mol == 0.0:
                     return 0.0
@@ -4510,11 +4496,31 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                     max_iterations=40,
                 )
                 if fixed_point is None:
-                    surface_activity_unavailable = True
-                    return 0.0
-                fO2_log, _ = fixed_point
+                    raise OxygenInterfaceConfigurationError(
+                        'oxygen_interface_activity_fixed_point_nonconverged',
+                        'M2 surface FeO activity fixed point returned no root',
+                    )
+                fO2_log, a_feo = map(float, fixed_point)
+                if not math.isfinite(a_feo) or a_feo <= 0.0:
+                    raise OxygenInterfaceConfigurationError(
+                        'oxygen_interface_activity_fixed_point_nonconverged',
+                        f'invalid M2 surface FeO activity={a_feo!r}',
+                    )
+                iw_log = feo_iw_log10_fO2_bar(T_melt_K, a_feo=1.0)
+                fixed_point_residual = (
+                    iw_log + 2.0 * math.log10(a_feo) - fO2_log
+                )
+                if (
+                    not math.isfinite(fixed_point_residual)
+                    or abs(fixed_point_residual) > 1.0e-9
+                ):
+                    raise OxygenInterfaceConfigurationError(
+                        'oxygen_interface_activity_fixed_point_nonconverged',
+                        'M2 surface FeO activity fixed point residual '
+                        f'{fixed_point_residual!r} log10(bar)',
+                    )
                 try:
-                    p_bar = 10.0 ** float(fO2_log)
+                    p_bar = 10.0 ** fO2_log
                 except (OverflowError, ValueError) as exc:
                     raise OxygenInterfaceConfigurationError(
                         'invalid_oxygen_interface_transport',
@@ -4531,40 +4537,67 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             gas_pressure_pa = gas_pO2_bar * 1.0e5
 
             def metal_flux_values(
-                u_mol: float,
+                u_mol: float | Decimal,
             ) -> tuple[float, float, float, float]:
-                surface_pressure_pa = surface_buffer_pressure_pa(u_mol)
-                melt_flux = beta * (float(u_mol) - n_bulk_o2_mol)
-                gas_flux = alpha * (gas_pressure_pa - surface_pressure_pa)
-                return gas_flux - melt_flux, gas_flux, melt_flux, surface_pressure_pa
+                surface_u_mol = float(u_mol)
+                surface_pressure_pa = surface_buffer_pressure_pa(
+                    surface_u_mol
+                )
+                with localcontext() as context:
+                    context.prec = 50
+                    precise_u_mol = (
+                        u_mol
+                        if isinstance(u_mol, Decimal)
+                        else Decimal.from_float(surface_u_mol)
+                    )
+                    gas_flux_precise = (
+                        Decimal.from_float(alpha)
+                        * (
+                            Decimal.from_float(gas_pressure_pa)
+                            - Decimal.from_float(surface_pressure_pa)
+                        )
+                    )
+                    melt_flux_precise = Decimal.from_float(beta) * (
+                        precise_u_mol
+                        - Decimal.from_float(n_bulk_o2_mol)
+                    )
+                    residual = (
+                        gas_flux_precise - melt_flux_precise
+                    )
+                return (
+                    float(residual),
+                    float(gas_flux_precise),
+                    float(melt_flux_precise),
+                    surface_pressure_pa,
+                )
 
             f_zero, *_ = metal_flux_values(0.0)
-            if surface_activity_unavailable:
-                return unavailable_surface_result()
             f_total, *_ = metal_flux_values(total_surface_o2_mol)
-            if surface_activity_unavailable:
-                return unavailable_surface_result()
             root_clamped = False
+            root_converged = False
+            root_residual = math.nan
+            surface_o2_mol = 0.0
+            surface_o2_mol_precise: Decimal | None = None
             if f_zero < 0.0:
                 surface_o2_mol = 0.0
                 root_clamped = True
+                root_residual = f_zero
+                root_converged = True
             elif f_total > 0.0:
                 surface_o2_mol = total_surface_o2_mol
                 root_clamped = True
+                root_residual = f_total
+                root_converged = True
             else:
                 lo = 0.0
                 hi = total_surface_o2_mol
                 for _ in range(80):
                     mid = 0.5 * (lo + hi)
                     f_mid, *_ = metal_flux_values(mid)
-                    if surface_activity_unavailable:
-                        return unavailable_surface_result()
-                    if (
-                        f_mid == 0.0
-                        or hi - lo
-                        <= max(total_surface_o2_mol, 1.0e-300) * 1.0e-12
-                    ):
+                    if f_mid == 0.0:
                         lo = hi = mid
+                        root_residual = f_mid
+                        root_converged = True
                         break
                     # F is decreasing: positive values are the low-u side,
                     # negative values the high-u side.
@@ -4572,11 +4605,108 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                         lo = mid
                     else:
                         hi = mid
-                surface_o2_mol = 0.5 * (lo + hi)
+                    pi_lo_pa = gas_pressure_pa - beta * (
+                        lo - n_bulk_o2_mol
+                    ) / alpha
+                    pi_hi_pa = gas_pressure_pa - beta * (
+                        hi - n_bulk_o2_mol
+                    ) / alpha
+                    if pi_lo_pa > 0.0 and pi_hi_pa > 0.0:
+                        pressure_width_dex = abs(
+                            math.log10(pi_lo_pa) - math.log10(pi_hi_pa)
+                        )
+                        if (
+                            pressure_width_dex <= 1.0e-10
+                            and abs(f_mid)
+                            <= flux_residual_tolerance_mol_m2_s
+                        ):
+                            root_residual = f_mid
+                            root_converged = True
+                            break
+                if not root_converged and beta > 0.0 and hi >= lo:
+                    # The activity law returns a binary64 pressure, so the
+                    # last float inventory bin can straddle a flux residual
+                    # just outside the hour budget. Solve the linear film
+                    # balance at either adjacent activity value using a
+                    # fractional Decimal inventory inside that same bin.
+                    with localcontext() as context:
+                        context.prec = 50
+                        lo_decimal = Decimal.from_float(lo)
+                        hi_decimal = Decimal.from_float(hi)
+                        alpha_decimal = Decimal.from_float(alpha)
+                        beta_decimal = Decimal.from_float(beta)
+                        bulk_decimal = Decimal.from_float(n_bulk_o2_mol)
+                        gas_decimal = Decimal.from_float(gas_pressure_pa)
+                        for activity_u in (lo, hi):
+                            surface_pressure = Decimal.from_float(
+                                surface_buffer_pressure_pa(activity_u)
+                            )
+                            candidate_u = bulk_decimal + (
+                                alpha_decimal
+                                * (gas_decimal - surface_pressure)
+                                / beta_decimal
+                            )
+                            if not lo_decimal <= candidate_u <= hi_decimal:
+                                continue
+                            if float(candidate_u) != activity_u:
+                                continue
+                            candidate_residual, *_ = metal_flux_values(
+                                candidate_u
+                            )
+                            pi_lo_pa = gas_pressure_pa - beta * (
+                                lo - n_bulk_o2_mol
+                            ) / alpha
+                            pi_hi_pa = gas_pressure_pa - beta * (
+                                hi - n_bulk_o2_mol
+                            ) / alpha
+                            pressure_width_dex = (
+                                abs(
+                                    math.log10(pi_lo_pa)
+                                    - math.log10(pi_hi_pa)
+                                )
+                                if pi_lo_pa > 0.0 and pi_hi_pa > 0.0
+                                else math.inf
+                            )
+                            if (
+                                pressure_width_dex <= 1.0e-8
+                                and abs(candidate_residual)
+                                <= flux_residual_tolerance_mol_m2_s
+                            ):
+                                surface_o2_mol_precise = candidate_u
+                                surface_o2_mol = float(candidate_u)
+                                root_residual = candidate_residual
+                                root_converged = True
+                                break
+                if surface_o2_mol_precise is None:
+                    surface_o2_mol = 0.5 * (lo + hi)
 
-            _, _, melt_flux, surface_pressure_pa = metal_flux_values(
-                surface_o2_mol
+            root_residual, _, melt_flux, surface_pressure_pa = (
+                metal_flux_values(
+                    surface_o2_mol
+                    if surface_o2_mol_precise is None
+                    else surface_o2_mol_precise
+                )
             )
+            if not root_converged and not root_clamped:
+                final_pi_lo_pa = gas_pressure_pa - beta * (
+                    lo - n_bulk_o2_mol
+                ) / alpha
+                final_pi_hi_pa = gas_pressure_pa - beta * (
+                    hi - n_bulk_o2_mol
+                ) / alpha
+                final_pressure_width_dex = (
+                    abs(math.log10(final_pi_lo_pa) - math.log10(final_pi_hi_pa))
+                    if final_pi_lo_pa > 0.0 and final_pi_hi_pa > 0.0
+                    else math.inf
+                )
+                raise OxygenInterfaceConfigurationError(
+                    'oxygen_interface_root_nonconverged',
+                    'M2 surface-inventory root did not meet pressure-bracket '
+                    'and flux-residual tolerances in 80 iterations '
+                    f'(residual={root_residual!r}, '
+                    f'tolerance={flux_residual_tolerance_mol_m2_s!r}, '
+                    f'bracket_dex={final_pressure_width_dex!r})',
+                )
             interface_pressure_pa = gas_pressure_pa - melt_flux / alpha
             if (
                 not math.isfinite(interface_pressure_pa)
@@ -4588,19 +4718,45 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 )
             interface_pO2_bar = interface_pressure_pa / 1.0e5
             gas_flux = alpha * (gas_pressure_pa - interface_pressure_pa)
-            residual = gas_flux - melt_flux
-
+            surface_pressure_slope_pa_per_mol = None
             capacity_m2 = 0.0
-            if diagnostics:
-                du = min(n_bulk_o2_mol, total_surface_o2_mol - n_bulk_o2_mol)
-                du = min(du * 1.0e-4, max(total_surface_o2_mol * 1.0e-7, 1.0e-300))
-                if du > 0.0:
-                    p_lo = surface_buffer_pressure_pa(n_bulk_o2_mol - du)
-                    p_hi = surface_buffer_pressure_pa(n_bulk_o2_mol + du)
-                    if p_lo > 0.0 and p_hi > p_lo:
-                        dlnp_du = math.log(p_hi / p_lo) / (2.0 * du)
-                        if dlnp_du > 0.0 and math.isfinite(dlnp_du):
-                            capacity_m2 = 1.0 / dlnp_du
+            if not root_clamped:
+                margin = min(
+                    surface_o2_mol,
+                    total_surface_o2_mol - surface_o2_mol,
+                )
+                du = min(
+                    margin * 0.5,
+                    max(total_surface_o2_mol * 1.0e-7, margin * 1.0e-4),
+                )
+                if du <= 0.0:
+                    raise OxygenInterfaceConfigurationError(
+                        'oxygen_interface_activity_fixed_point_nonconverged',
+                        'M2 surface activity derivative has no interior interval',
+                    )
+                p_lo = surface_buffer_pressure_pa(surface_o2_mol - du)
+                p_hi = surface_buffer_pressure_pa(surface_o2_mol + du)
+                if p_lo <= 0.0 or p_hi <= p_lo:
+                    raise OxygenInterfaceConfigurationError(
+                        'oxygen_interface_activity_fixed_point_nonconverged',
+                        'M2 surface activity derivative is not positive',
+                    )
+                dlnp_du = math.log(p_hi / p_lo) / (2.0 * du)
+                surface_pressure_slope_pa_per_mol = (
+                    surface_pressure_pa * dlnp_du
+                )
+                if (
+                    not math.isfinite(surface_pressure_slope_pa_per_mol)
+                    or surface_pressure_slope_pa_per_mol <= 0.0
+                ):
+                    raise OxygenInterfaceConfigurationError(
+                        'oxygen_interface_activity_fixed_point_nonconverged',
+                        'M2 surface activity derivative is non-finite',
+                    )
+                capacity_m2 = (
+                    interface_pressure_pa
+                    / surface_pressure_slope_pa_per_mol
+                )
             gas_conductance = (
                 math.inf
                 if math.isinf(float(k_g))
@@ -4642,28 +4798,20 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 'capacity_mol_per_ln_fO2': float(capacity_m2),
                 'surface_inventory_o2_equivalent_mol': float(surface_o2_mol),
                 'surface_buffer_pO2_Pa': float(surface_pressure_pa),
-                'surface_activity_available': not surface_activity_unavailable,
+                'surface_activity_available': True,
+                'surface_buffer_pressure_slope_pa_per_mol': (
+                    None
+                    if surface_pressure_slope_pa_per_mol is None
+                    else float(surface_pressure_slope_pa_per_mol)
+                ),
                 'interface_root_clamped': bool(root_clamped),
-                'interface_root_residual_mol_m2_s': float(residual),
+                'interface_root_residual_mol_m2_s': float(root_residual),
+                'interface_root_converged': bool(root_converged),
                 'limiting_regime': limiting_regime,
                 'gas_flux_mol_m2_s': float(gas_flux),
                 'melt_flux_mol_m2_s': float(melt_flux),
             }
-            if diagnostics:
-                return result
-            return {
-                'interface_pO2_bar': result['interface_pO2_bar'],
-                'interface_flux_mol_m2_s': result[
-                    'interface_flux_mol_m2_s'
-                ],
-                'finite_melt_driving_force_mol': result[
-                    'finite_melt_driving_force_mol'
-                ],
-                'interface_root_clamped': result['interface_root_clamped'],
-                'interface_root_residual_mol_m2_s': result[
-                    'interface_root_residual_mol_m2_s'
-                ],
-            }
+            return result
 
         melt_conductance = (
             float(k_m) * capacity_mol_per_ln_fO2 / melt_volume_m3
@@ -4681,6 +4829,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 'melt_reference_concentration_mol_m3_per_ln': 0.0,
                 'interface_root_clamped': False,
                 'interface_root_residual_mol_m2_s': 0.0,
+                'interface_root_converged': True,
                 'limiting_regime': 'gas_side_no_fe_redox_buffer',
             }
 
@@ -4706,61 +4855,227 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             melt_flux = float(k_m) * (
                 equilibrium_mol - ledger_o2_mol
             ) / melt_volume_m3
-            return gas_flux - melt_flux, gas_flux, melt_flux, equilibrium_mol
+            with localcontext() as context:
+                context.prec = 50
+                residual = (
+                    Decimal.from_float(float(k_g))
+                    * Decimal.from_float(
+                        gas_pressure_factor_mol_m3_per_bar
+                    )
+                    * (
+                        Decimal.from_float(gas_pO2_bar)
+                        - Decimal.from_float(interface_pressure_bar)
+                    )
+                    - Decimal.from_float(float(k_m))
+                    * (
+                        Decimal.from_float(equilibrium_mol)
+                        - Decimal.from_float(ledger_o2_mol)
+                    )
+                    / Decimal.from_float(melt_volume_m3)
+                )
+            return (
+                float(residual),
+                gas_flux,
+                melt_flux,
+                equilibrium_mol,
+            )
+
+        def precise_flux_values(
+            interface_log: Decimal,
+        ) -> tuple[Decimal, float, float, float, Decimal]:
+            with localcontext() as context:
+                context.prec = 50
+                interface_pressure_bar = interface_log.exp()
+                # The float evaluator is the constitutive source. Evaluate its
+                # same logistic Kress map at Decimal pressure during the final
+                # root polish so the flux residual can fall below one float
+                # pressure ULP when the hour budget is especially small.
+                ratio = (
+                    Decimal.from_float(KRESS91_LN_FO2_COEFFICIENT)
+                    * interface_log
+                    + Decimal.from_float(
+                        float(kress91_evaluator._base_ln_ratio)
+                    )
+                ).exp()
+                q_eq = 2 * ratio / (2 * ratio + 1)
+                equilibrium_precise = (
+                    Decimal.from_float(total_fe_mol) * q_eq / 4
+                )
+                equilibrium_mol = float(equilibrium_precise)
+                gas_flux_decimal = (
+                    Decimal.from_float(float(k_g))
+                    * Decimal.from_float(
+                        gas_pressure_factor_mol_m3_per_bar
+                    )
+                    * (
+                        Decimal.from_float(gas_pO2_bar)
+                        - interface_pressure_bar
+                    )
+                )
+                melt_flux_decimal = (
+                    Decimal.from_float(float(k_m))
+                    * (
+                        equilibrium_precise
+                        - Decimal.from_float(ledger_o2_mol)
+                    )
+                    / Decimal.from_float(melt_volume_m3)
+                )
+                residual_decimal = gas_flux_decimal - melt_flux_decimal
+                gas_flux = float(gas_flux_decimal)
+                melt_flux = float(melt_flux_decimal)
+            return (
+                residual_decimal,
+                gas_flux,
+                melt_flux,
+                equilibrium_mol,
+                interface_pressure_bar,
+            )
 
         gas_log = math.log(gas_pO2_bar)
         melt_log = math.log(melt_pO2_bar)
         lo = min(gas_log, melt_log)
         hi = max(gas_log, melt_log)
+        root_log_lo = lo
+        root_log_hi = hi
         lo_residual, *_ = flux_values(lo)
         hi_residual, *_ = flux_values(hi)
         root_clamped = False
+        root_converged = False
+        precise_result: tuple[Decimal, float, float, float, Decimal] | None = None
         if lo == hi:
             interface_log = lo
-            root_clamped = abs(lo_residual) > 1.0e-14
+            residual = lo_residual
+            root_converged = True
+            root_clamped = abs(residual) > flux_residual_tolerance_mol_m2_s
         elif lo_residual == 0.0:
             interface_log = lo
+            residual = 0.0
+            root_converged = True
         elif hi_residual == 0.0:
             interface_log = hi
+            residual = 0.0
+            root_converged = True
         elif lo_residual * hi_residual < 0.0:
+            residual = math.inf
             for _ in range(80):
                 mid = 0.5 * (lo + hi)
                 mid_residual, *_ = flux_values(mid)
-                if abs(mid_residual) <= 1.0e-14:
-                    lo = hi = mid
-                    break
                 if lo_residual * mid_residual <= 0.0:
                     hi = mid
                     hi_residual = mid_residual
                 else:
                     lo = mid
                     lo_residual = mid_residual
-            interface_log = 0.5 * (lo + hi)
+                residual = mid_residual
+                if (
+                    hi - lo <= math.log(10.0) * 1.0e-8
+                    and abs(residual)
+                    <= flux_residual_tolerance_mol_m2_s
+                ):
+                    interface_log = mid
+                    root_converged = True
+                    break
+            else:
+                interface_log = 0.5 * (lo + hi)
         else:
-            # Native-Fe buffering or a ledger endpoint can leave the Kress
-            # equilibrium outside the current gas/melt bracket.  Clamp the
-            # diagnostic root to the nearest feasible pressure; authority
-            # remains disabled until the exact ledger transition lands.
+            # Complementarity accepts a surface endpoint only when its
+            # one-sided residual points out of the feasible pressure interval.
             root_clamped = True
-            interface_log = (
-                lo if abs(lo_residual) <= abs(hi_residual) else hi
+            if lo_residual < 0.0 and hi_residual < 0.0:
+                interface_log = lo
+                residual = lo_residual
+                root_converged = True
+            elif lo_residual > 0.0 and hi_residual > 0.0:
+                interface_log = hi
+                residual = hi_residual
+                root_converged = True
+            else:
+                interface_log = lo if abs(lo_residual) <= abs(hi_residual) else hi
+                residual = min((lo_residual, hi_residual), key=abs)
+
+        if (
+            not root_converged
+            and not root_clamped
+            and lo_residual * hi_residual <= 0.0
+        ):
+            # A float log-pressure can stop one ULP short while its flux
+            # residual is still above the hour's mole-error budget. Continue
+            # the same bracket in Decimal precision; Kress evaluations remain
+            # on the executable float law, and pressure remains continuous
+            # inside that final float bin.
+            with localcontext() as context:
+                context.prec = 50
+                # Use the original physical bracket. The float bisection can
+                # collapse across a one-ULP jump in q before the smoother
+                # Decimal evaluation reaches a very small hour flux budget.
+                lo_precise = Decimal.from_float(root_log_lo)
+                hi_precise = Decimal.from_float(root_log_hi)
+                lo_flux, *_ = precise_flux_values(lo_precise)
+                hi_flux, *_ = precise_flux_values(hi_precise)
+                tolerance_precise = Decimal.from_float(
+                    flux_residual_tolerance_mol_m2_s
+                )
+                for _ in range(80):
+                    mid_precise = (lo_precise + hi_precise) / 2
+                    precise_result = precise_flux_values(mid_precise)
+                    mid_flux = precise_result[0]
+                    if mid_flux == 0:
+                        lo_precise = hi_precise = mid_precise
+                    elif lo_flux * mid_flux <= 0:
+                        hi_precise = mid_precise
+                        hi_flux = mid_flux
+                    else:
+                        lo_precise = mid_precise
+                        lo_flux = mid_flux
+                    if (
+                        hi_precise - lo_precise
+                        <= Decimal.from_float(math.log(10.0) * 1.0e-8)
+                        and abs(mid_flux) <= tolerance_precise
+                    ):
+                        interface_log = mid_precise
+                        residual = float(mid_flux)
+                        root_converged = True
+                        break
+
+        if not root_converged:
+            raise OxygenInterfaceConfigurationError(
+                'oxygen_interface_root_nonconverged',
+                'ferric interface root did not meet pressure-bracket and '
+                'flux-residual tolerances in 80 iterations '
+                f'(residual={residual!r}, '
+                f'tolerance={flux_residual_tolerance_mol_m2_s!r}, '
+                f'bracket_dex={(hi - lo) / math.log(10.0)!r}, '
+                f'precise_residual={None if precise_result is None else str(precise_result[0])!r}, '
+                f'gas_pO2_bar={gas_pO2_bar!r}, melt_pO2_bar={melt_pO2_bar!r}, '
+                f'lo_residual={lo_residual!r}, hi_residual={hi_residual!r}, '
+                f'n_FeO={n_feo_mol!r}, n_Fe2O3={n_fe2o3_mol!r})',
             )
 
-        residual, gas_flux, melt_flux, equilibrium_mol = flux_values(
-            interface_log
+        if precise_result is not None and isinstance(interface_log, Decimal):
+            residual_decimal, gas_flux, melt_flux, equilibrium_mol, p_bar = (
+                precise_flux_values(interface_log)
+            )
+            residual = float(residual_decimal)
+            interface_pO2_bar = float(p_bar)
+        else:
+            residual, gas_flux, melt_flux, equilibrium_mol = flux_values(
+                float(interface_log)
+            )
+            interface_pO2_bar = math.exp(float(interface_log))
+        q_interface = (
+            4.0 * equilibrium_mol / total_fe_mol
+            if total_fe_mol > 0.0
+            else 0.0
         )
-        interface_pO2_bar = math.exp(interface_log)
-        if not diagnostics:
-            return {
-                'interface_pO2_bar': interface_pO2_bar,
-                'interface_flux_mol_m2_s': float(gas_flux),
-                'finite_melt_driving_force_mol': float(
-                    equilibrium_mol - ledger_o2_mol
-                ),
-                'interface_root_clamped': bool(root_clamped),
-                'interface_root_residual_mol_m2_s': float(residual),
-            }
-        log_pressure_delta = gas_log - interface_log
+        surface_capacity_mol_per_ln = (
+            0.196 * total_fe_mol / 4.0
+            * max(0.0, min(1.0, q_interface))
+            * (1.0 - max(0.0, min(1.0, q_interface)))
+        )
+        melt_conductance = (
+            float(k_m) * surface_capacity_mol_per_ln / melt_volume_m3
+        )
+        log_pressure_delta = gas_log - float(interface_log)
         if abs(log_pressure_delta) > 1.0e-15:
             gas_reference_concentration = (
                 gas_pressure_factor_mol_m3_per_bar
@@ -4778,7 +5093,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             * gas_pressure_factor_mol_m3_per_bar
             * interface_pO2_bar
         )
-        melt_reference_concentration = capacity_mol_per_ln_fO2 / melt_volume_m3
+        melt_reference_concentration = (
+            surface_capacity_mol_per_ln / melt_volume_m3
+        )
         limiting_regime = (
             'gas_side_limited'
             if gas_conductance <= melt_conductance
@@ -4800,6 +5117,10 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             'melt_reference_concentration_mol_m3_per_ln': float(
                 melt_reference_concentration
             ),
+            'capacity_mol_per_ln_fO2': float(
+                surface_capacity_mol_per_ln
+            ),
+            'interface_root_converged': bool(root_converged),
             'interface_root_clamped': bool(root_clamped),
             'interface_root_residual_mol_m2_s': float(residual),
             'limiting_regime': limiting_regime,
@@ -5398,17 +5719,32 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         intrinsic_fO2_log: Optional[float] = None,
         capacity_mol_per_ln_fO2: Optional[float] = None,
     ) -> Dict[str, Any]:
-        """Integrate one finite passive transfer without touching the ledger.
+        """Integrate a passive oxygen transfer on a provisional ledger.
 
-        Backward Euler advances signed O2 amount ``d`` (positive melt to
-        headspace), with one finite two-film solve per provisional substep.
-        FeO/Fe2O3 and headspace amounts are local trial values; the caller
-        pairs the accepted amount with the authoritative ledger transitions.
+        Premise: over this passive interval, geometry and transport coefficients
+        are fixed and the signed ledger amount d has vector field
+        f(d) = -A J(S(d)) in mol/s. The finite interface root supplies both
+        J and the local derivative of that same constitutive law.
+
+        For f(d) = lambda (d_eq - d), the exact advance over h is
+        d_next = d + (1 - exp(-lambda*h)) f(d)/lambda. For a nonlinear law,
+        freeze lambda = -f'(d) at the step start and use that exact linear
+        solution locally. The coefficient -expm1(-lambda*h)/lambda has units
+        seconds, so its product with f is mol. Its limit as lambda -> 0 is h;
+        as z=lambda*h -> 0 it gives h + O(z*h), and as z -> infinity it tends
+        to 1/lambda without crossing the local equilibrium. The first omitted
+        local term is h^3 f'' f^2/6, so the smooth-branch global error is
+        second order. Whole-hour refinement, not a substep-size heuristic,
+        controls that nonlinear error.
         """
 
         dt_s = float(dt_s)
         if not math.isfinite(dt_s) or dt_s <= 0.0:
             raise ValueError(f'dt_s must be finite and positive; got {dt_s!r}')
+        empty_counts = {
+            'interface_evaluations': 0,
+            'amount_bisections': 0,
+        }
         if not self._overhead_headspace_enabled():
             return {
                 'authority': 'diagnostic_only',
@@ -5419,6 +5755,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 'substeps': 0,
                 'bounded': True,
                 'finite': True,
+                **empty_counts,
             }
 
         T_K = float(self.melt.temperature_C) + 273.15
@@ -5449,11 +5786,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 'invalid_oxygen_interface_pressure',
                 f'transport_pO2_bar={transport_pO2_bar!r}',
             )
-        # The initial transport pressure can include current ledger O2.
-        # Recompute only independent control/source terms at zero O2 inventory
-        # so provisional uptake can lower its own pressure.
         transport_pO2_floor_bar = max(
             self._vacuum_floor_bar(),
+            self._headspace_control_floor_pO2_bar(),
             float(self._headspace_transport_pO2_bar_from_ledger(
                 0.0,
                 head_o2_mol=0.0,
@@ -5477,10 +5812,6 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             'process.metal_phase'
         )
         n_fe_metal_mol = max(0.0, float(metal_mol.get('Fe', 0.0) or 0.0))
-        metal_buffer_active = (
-            n_fe_metal_mol > OXYGEN_RESERVOIR_NOOP_MOL
-            and n_feo_mol > OXYGEN_RESERVOIR_NOOP_MOL
-        )
         total_fe_mol = n_feo_mol + 2.0 * n_fe2o3_mol
         if total_fe_mol <= OXYGEN_RESERVOIR_NOOP_MOL:
             return {
@@ -5492,8 +5823,13 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 'substeps': 0,
                 'bounded': True,
                 'finite': True,
+                **empty_counts,
             }
 
+        metal_law_active = (
+            n_fe_metal_mol > OXYGEN_RESERVOIR_NOOP_MOL
+            and n_feo_mol > OXYGEN_RESERVOIR_NOOP_MOL
+        )
         head_o2_mol = max(0.0, float(
             self.atom_ledger.mol_by_account('process.overhead_gas').get(
                 OXYGEN_SPECIES,
@@ -5501,15 +5837,19 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             )
         ))
         n_floor_mol = self._headspace_floor_o2_mol()
-        lower_bound_mol = -min(
+        chemical_lower_bound_mol = -(
             n_fe_metal_mol / 2.0
-            if metal_buffer_active
-            else n_feo_mol / 4.0,
-            max(0.0, head_o2_mol - n_floor_mol),
+            if metal_law_active
+            else n_feo_mol / 4.0
+        )
+        headspace_lower_bound_mol = -max(0.0, head_o2_mol - n_floor_mol)
+        lower_bound_mol = max(
+            chemical_lower_bound_mol,
+            headspace_lower_bound_mol,
         )
         upper_bound_mol = (
             n_feo_mol / 2.0
-            if metal_buffer_active
+            if metal_law_active
             else n_fe2o3_mol / 2.0
         )
         comp = self._melt_oxide_wt_pct()
@@ -5523,10 +5863,6 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         )
 
         if melt_equality_absent:
-            # This floor is only the exchange solver's lower root bracket for
-            # an all-ferrous ledger. It is not a measured melt pressure or a
-            # use of the speciation key; accepted uptake is driven by the
-            # gas-side equilibrium inventory and bounded by FeO.
             melt_pO2_bar = (
                 self._vacuum_floor_bar()
                 if n_fe2o3_mol <= OXYGEN_RESERVOIR_NOOP_MOL
@@ -5569,6 +5905,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 'melt_side_source': melt_source,
                 'gas_side_source': gas_source,
                 'melt_side_transport': melt_transport,
+                **empty_counts,
             }
         if not math.isfinite(gas_temperature_K) or gas_temperature_K <= 0.0:
             raise OxygenInterfaceConfigurationError(
@@ -5576,9 +5913,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 f'headspace_temperature_K={gas_temperature_K!r}',
             )
         if capacity_mol_per_ln_fO2 is None:
-            if melt_equality_absent or metal_buffer_active:
-                # There is no finite derivative at q=1. The finite root uses
-                # the inventory map directly, so C_m stays diagnostic only.
+            if melt_equality_absent or metal_law_active:
                 capacity_mol_per_ln_fO2 = 0.0
             else:
                 capacity_state = self._melt_redox_buffer_capacity_state(
@@ -5598,17 +5933,12 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             ledger_pressure = self._headspace_ledger_pO2_bar_from_o2_mol(
                 max(0.0, n_head_mol)
             )
-            # At fixed headspace volume and temperature, inventory pressure
-            # follows n_O2.  Each implicit trial therefore uses the trial
-            # inventory plus only independent floors; the initial aggregate
-            # transport pressure is not a fixed boundary condition.
             return max(
                 self._vacuum_floor_bar(),
                 transport_pO2_floor_bar,
                 ledger_pressure,
             )
 
-        initial_gas_pressure_bar = gas_pressure_from_headspace(head_o2_mol)
         mol_fractions = melt_mol_fractions_for_kress91(comp)
         kress91_evaluator = (
             _Kress91Evaluator(
@@ -5619,24 +5949,649 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             if mol_fractions
             else None
         )
-        initial_root = self._oxygen_finite_interface_root(
-            gas_pO2_bar=initial_gas_pressure_bar,
-            melt_pO2_bar=melt_pO2_bar,
-            gas_temperature_K=gas_temperature_K,
-            k_g=k_g,
-            k_m=k_m,
-            surface_area_m2=surface_area_m2,
-            h_eff_m=h_eff_m,
-            kress91_evaluator=kress91_evaluator,
-            n_feo_mol=n_feo_mol,
-            n_fe2o3_mol=n_fe2o3_mol,
-            n_fe_metal_mol=n_fe_metal_mol,
-            capacity_mol_per_ln_fO2=capacity_mol_per_ln_fO2,
+        interface_evaluations = 0
+        evaluation_cache: Dict[tuple[float, bool], Dict[str, Any]] = {}
+        flux_budget_mol = 1.0e-12
+        flux_tolerance = min(
+            1.0e-14,
+            0.01 * flux_budget_mol / (surface_area_m2 * dt_s),
         )
-        if metal_buffer_active:
-            capacity_mol_per_ln_fO2 = float(
-                initial_root['capacity_mol_per_ln_fO2']
+
+        def pressure_for_inventory(
+            feo_mol: float,
+            ferric_mol: float,
+            *,
+            uptake_direction: bool = False,
+        ) -> float:
+            if (
+                metal_law_active
+                and feo_mol > OXYGEN_RESERVOIR_NOOP_MOL
+                and n_fe_metal_mol > OXYGEN_RESERVOIR_NOOP_MOL
+            ):
+                return melt_pO2_bar
+            if (
+                melt_equality_absent
+                and not metal_law_active
+            ):
+                if uptake_direction and ferric_mol > OXYGEN_RESERVOIR_NOOP_MOL:
+                    return self._oxygen_melt_pO2_bar_for_inventory(
+                        n_feo_mol=feo_mol,
+                        n_fe2o3_mol=ferric_mol,
+                        kress91_evaluator=kress91_evaluator,
+                        fallback_pO2_bar=melt_pO2_bar,
+                    )
+                return (
+                    self._vacuum_floor_bar()
+                    if ferric_mol <= OXYGEN_RESERVOIR_NOOP_MOL
+                    else max(
+                        self._vacuum_floor_bar(),
+                        MELT_DISSOCIATION_PO2_MAX_BAR,
+                    )
+                )
+            if (
+                metal_law_active
+                and ferric_mol <= OXYGEN_RESERVOIR_NOOP_MOL
+                and feo_mol > OXYGEN_RESERVOIR_NOOP_MOL
+            ):
+                masses = {
+                    str(species): max(0.0, float(kg or 0.0))
+                    for species, kg in self.atom_ledger.kg_by_account(
+                        'process.cleaned_melt'
+                    ).items()
+                }
+                masses['FeO'] = (
+                    feo_mol * float(MOLAR_MASS['FeO']) / 1000.0
+                )
+                masses['Fe2O3'] = 0.0
+                total_mass = sum(masses.values())
+                comp_wt = {
+                    species: 100.0 * mass / total_mass
+                    for species, mass in masses.items()
+                    if mass > 0.0 and total_mass > 0.0
+                }
+                fixed_point = self._fe_saturation_bound_fO2_log(
+                    T_K=T_K,
+                    pressure_bar=pressure_bar,
+                    comp=comp_wt,
+                    tolerance=1.0e-11,
+                    max_iterations=80,
+                )
+                if fixed_point is None:
+                    raise OxygenInterfaceConfigurationError(
+                        'oxygen_interface_activity_fixed_point_nonconverged',
+                        'successor Fe-FeO activity fixed point returned no root',
+                    )
+                fO2_log, a_feo = map(float, fixed_point)
+                residual = (
+                    feo_iw_log10_fO2_bar(T_K, a_feo=1.0)
+                    + 2.0 * math.log10(a_feo)
+                    - fO2_log
+                )
+                if (
+                    not math.isfinite(residual)
+                    or abs(residual) > 1.0e-9
+                    or not math.isfinite(fO2_log)
+                ):
+                    raise OxygenInterfaceConfigurationError(
+                        'oxygen_interface_activity_fixed_point_nonconverged',
+                        'successor Fe-FeO activity fixed point did not converge',
+                    )
+                try:
+                    pressure = 10.0 ** fO2_log
+                except (OverflowError, ValueError) as exc:
+                    raise OxygenInterfaceConfigurationError(
+                        'invalid_oxygen_interface_transport',
+                        f'invalid successor fO2 log={fO2_log!r}',
+                    ) from exc
+                return max(self._vacuum_floor_bar(), pressure)
+            return self._oxygen_melt_pO2_bar_for_inventory(
+                n_feo_mol=feo_mol,
+                n_fe2o3_mol=ferric_mol,
+                kress91_evaluator=kress91_evaluator,
+                fallback_pO2_bar=melt_pO2_bar,
             )
+
+        def gas_pressure_derivative_pa_per_mol(
+            n_head_mol: float,
+            direction: float,
+        ) -> float:
+            if n_head_mol <= 0.0:
+                return 0.0
+            ledger_bar = self._headspace_ledger_pO2_bar_from_o2_mol(
+                n_head_mol
+            )
+            independent_floor = max(
+                self._vacuum_floor_bar(),
+                transport_pO2_floor_bar,
+            )
+            at_kink = math.isclose(
+                ledger_bar,
+                independent_floor,
+                rel_tol=1.0e-12,
+                abs_tol=1.0e-300,
+            )
+            if ledger_bar < independent_floor and not at_kink:
+                return 0.0
+            if at_kink and direction < 0.0:
+                return 0.0
+            # This is R*T/V for the active ideal-gas inventory branch. Take
+            # the one-sided slope of the same frozen pressure map so the
+            # Jacobian follows its active floor branch exactly.
+            step_mol = max(abs(n_head_mol) * 1.0e-6, 1.0e-12)
+            pressure_here = gas_pressure_from_headspace(n_head_mol)
+            if direction > 0.0:
+                pressure_next = gas_pressure_from_headspace(
+                    n_head_mol + step_mol
+                )
+                slope = (pressure_next - pressure_here) / step_mol
+            else:
+                pressure_previous = gas_pressure_from_headspace(
+                    n_head_mol - step_mol
+                )
+                slope = (pressure_here - pressure_previous) / step_mol
+            return max(0.0, slope * 1.0e5)
+
+        def evaluate(
+            d_mol: float,
+            *,
+            uptake_at_origin: bool = False,
+        ) -> Dict[str, Any]:
+            nonlocal interface_evaluations
+            uptake_direction = d_mol < 0.0 or uptake_at_origin
+            cache_key = (float(d_mol), uptake_direction)
+            cached = evaluation_cache.get(cache_key)
+            if cached is not None:
+                return cached
+            if metal_law_active:
+                feo_mol = n_feo_mol - 2.0 * d_mol
+                ferric_mol = n_fe2o3_mol
+                metal_fe_mol = n_fe_metal_mol + 2.0 * d_mol
+            else:
+                feo_mol = n_feo_mol + 4.0 * d_mol
+                ferric_mol = n_fe2o3_mol - 2.0 * d_mol
+                metal_fe_mol = n_fe_metal_mol
+            feo_mol = max(0.0, feo_mol)
+            ferric_mol = max(0.0, ferric_mol)
+            metal_fe_mol = max(0.0, metal_fe_mol)
+            n_head_mol = head_o2_mol + d_mol
+            gas_pO2 = gas_pressure_from_headspace(n_head_mol)
+            if not math.isfinite(gas_pO2) or gas_pO2 <= 0.0:
+                raise OxygenInterfaceConfigurationError(
+                    'invalid_oxygen_interface_pressure',
+                    f'provisional gas pO2={gas_pO2!r}',
+                )
+            provisional_melt_pO2 = pressure_for_inventory(
+                feo_mol,
+                ferric_mol,
+                uptake_direction=(
+                    uptake_direction
+                    and melt_equality_absent
+                    and not metal_law_active
+                ),
+            )
+            interface_evaluations += 1
+            root = self._oxygen_finite_interface_root(
+                gas_pO2_bar=gas_pO2,
+                melt_pO2_bar=provisional_melt_pO2,
+                gas_temperature_K=gas_temperature_K,
+                k_g=k_g,
+                k_m=k_m,
+                surface_area_m2=surface_area_m2,
+                h_eff_m=h_eff_m,
+                kress91_evaluator=kress91_evaluator,
+                n_feo_mol=feo_mol,
+                n_fe2o3_mol=ferric_mol,
+                n_fe_metal_mol=metal_fe_mol,
+                capacity_mol_per_ln_fO2=capacity_mol_per_ln_fO2,
+                flux_residual_tolerance_mol_m2_s=flux_tolerance,
+                diagnostics=False,
+            )
+            if root.get('interface_root_converged') is not True:
+                raise OxygenInterfaceConfigurationError(
+                    'oxygen_interface_root_nonconverged',
+                    'finite interface root returned without convergence evidence',
+                )
+            flux = float(root['interface_flux_mol_m2_s'])
+            if not math.isfinite(flux):
+                raise OxygenInterfaceConfigurationError(
+                    'invalid_oxygen_interface_transport',
+                    f'non-finite interface flux={flux!r}',
+                )
+            vector_field = -surface_area_m2 * flux
+            slope_direction = (
+                1.0 if vector_field > 0.0 else -1.0
+            )
+            beta_pa_per_mol = gas_pressure_derivative_pa_per_mol(
+                n_head_mol,
+                slope_direction,
+            )
+            if metal_law_active and (
+                feo_mol > OXYGEN_RESERVOIR_NOOP_MOL
+                and metal_fe_mol > OXYGEN_RESERVOIR_NOOP_MOL
+            ):
+                if bool(root['interface_root_clamped']):
+                    relaxation_rate = k_m / h_eff_m
+                else:
+                    alpha = k_g / (
+                        PHYSICAL_GAS_CONSTANT * gas_temperature_K
+                    )
+                    B = k_m / (surface_area_m2 * h_eff_m)
+                    pressure_slope = root.get(
+                        'surface_buffer_pressure_slope_pa_per_mol'
+                    )
+                    if (
+                        pressure_slope is None
+                        or not math.isfinite(float(pressure_slope))
+                        or float(pressure_slope) <= 0.0
+                    ):
+                        raise OxygenInterfaceConfigurationError(
+                            'oxygen_interface_activity_fixed_point_nonconverged',
+                            'M2 surface interface omitted a positive pressure derivative',
+                        )
+                    pressure_slope = float(pressure_slope)
+                    denominator = alpha * pressure_slope + B
+                    relaxation_rate = (
+                        0.0
+                        if denominator <= 0.0
+                        else surface_area_m2
+                        * alpha
+                        * B
+                        * (beta_pa_per_mol + pressure_slope)
+                        / denominator
+                    )
+            else:
+                gas_conductance = float(
+                    root['gas_conductance_mol_m2_s_per_ln']
+                )
+                melt_conductance = float(
+                    root['melt_conductance_mol_m2_s_per_ln']
+                )
+                if (
+                    math.isinf(gas_conductance)
+                    or math.isinf(melt_conductance)
+                ):
+                    relaxation_rate = k_m / h_eff_m
+                elif gas_conductance + melt_conductance <= 0.0:
+                    relaxation_rate = 0.0
+                else:
+                    relaxation_rate = (
+                        (
+                            surface_area_m2 * k_g * beta_pa_per_mol
+                            / (PHYSICAL_GAS_CONSTANT * gas_temperature_K)
+                        )
+                        * melt_conductance
+                        + (k_m / h_eff_m) * gas_conductance
+                    ) / (gas_conductance + melt_conductance)
+            if (
+                not math.isfinite(relaxation_rate)
+                or relaxation_rate < 0.0
+            ):
+                raise OxygenInterfaceConfigurationError(
+                    'invalid_oxygen_interface_jacobian',
+                    f'non-decaying local relaxation rate={relaxation_rate!r}',
+                )
+            result = {
+                'd_mol': float(d_mol),
+                'feo_mol': feo_mol,
+                'ferric_mol': ferric_mol,
+                'metal_fe_mol': metal_fe_mol,
+                'head_o2_mol': n_head_mol,
+                'f_mol_s': vector_field,
+                'lambda_s': float(relaxation_rate),
+                'root': root,
+            }
+            evaluation_cache[cache_key] = result
+            return result
+
+        refinement_counts = (1, 2, 4, 8, 16, 32, 64, 128, 256)
+        previous: Dict[str, Any] | None = None
+        consecutive = 0
+        accepted: Dict[str, Any] | None = None
+        accepted_count = 0
+        first_state: Dict[str, Any] | None = None
+        last_refinement_issue = 'no comparison completed'
+
+        def run_refinement(count: int) -> Dict[str, Any] | None:
+            nonlocal first_state, last_refinement_issue
+            d_mol = 0.0
+            state = evaluate(d_mol)
+            if (
+                melt_equality_absent
+                and not metal_law_active
+                and float(state['f_mol_s']) < 0.0
+            ):
+                # At the ferric-free origin, uptake approaches the Kress
+                # branch from the ferric-forming side, while release uses the
+                # private dissociation ceiling. Re-evaluate the origin on the
+                # incident uptake branch before stepping into that inventory.
+                state = evaluate(d_mol, uptake_at_origin=True)
+            if first_state is None:
+                first_state = state
+            step_s = dt_s / count
+            capped = False
+            cap_kind: str | None = None
+            cap_context: Dict[str, float] | None = None
+            for index in range(count):
+                f_mol_s = float(state['f_mol_s'])
+                if f_mol_s == 0.0:
+                    break
+                relaxation_rate = float(state['lambda_s'])
+                if relaxation_rate == 0.0:
+                    coefficient_s = step_s
+                    equilibrium_mol = (
+                        math.inf if f_mol_s > 0.0 else -math.inf
+                    )
+                else:
+                    coefficient_s = (
+                        -math.expm1(-relaxation_rate * step_s)
+                        / relaxation_rate
+                    )
+                    equilibrium_mol = (
+                        d_mol + f_mol_s / relaxation_rate
+                    )
+                candidate_mol = d_mol + coefficient_s * f_mol_s
+                if relaxation_rate > 0.0:
+                    if f_mol_s > 0.0:
+                        candidate_mol = min(candidate_mol, equilibrium_mol)
+                    else:
+                        candidate_mol = max(candidate_mol, equilibrium_mol)
+                if not math.isfinite(candidate_mol):
+                    last_refinement_issue = f'N={count} produced a non-finite amount'
+                    return None
+                # The gas-pressure floor is a piecewise-smooth branch. If a
+                # provisional exponential step crosses its inventory kink,
+                # land on that one-sided boundary and spend the remainder of
+                # this same time step using the Jacobian of the newly active
+                # branch. Otherwise a zero slope on the floor branch can
+                # carry the whole interval across the sharply changing gas
+                # film before refinement sees its derivative.
+                gas_floor_mol = self._headspace_o2_mol_for_pO2_bar(max(
+                    self._vacuum_floor_bar(),
+                    transport_pO2_floor_bar,
+                )) - head_o2_mol
+                crosses_gas_floor = (
+                    (f_mol_s > 0.0 and d_mol < gas_floor_mol < candidate_mol)
+                    or (f_mol_s < 0.0 and candidate_mol < gas_floor_mol < d_mol)
+                )
+                elapsed_in_step_s = 0.0
+                endpoint: Dict[str, Any] | None = None
+                remaining_step_s = step_s
+                if crosses_gas_floor:
+                    if relaxation_rate > 0.0:
+                        ratio = (
+                            (equilibrium_mol - gas_floor_mol)
+                            / (equilibrium_mol - d_mol)
+                        )
+                        event_s = (
+                            -math.log(ratio)
+                            / relaxation_rate
+                            if 0.0 < ratio < 1.0
+                            else step_s
+                        )
+                    else:
+                        event_s = (
+                            (gas_floor_mol - d_mol) / f_mol_s
+                            if f_mol_s != 0.0
+                            else step_s
+                        )
+                    if 0.0 < event_s < step_s:
+                        endpoint = evaluate(gas_floor_mol)
+                        d_mol = gas_floor_mol
+                        state = endpoint
+                        elapsed_in_step_s = event_s
+                        remaining_step_s = step_s - event_s
+                        f_mol_s = float(state['f_mol_s'])
+                        relaxation_rate = float(state['lambda_s'])
+                        if f_mol_s == 0.0:
+                            candidate_mol = d_mol
+                            equilibrium_mol = d_mol
+                            remaining_step_s = 0.0
+                        elif relaxation_rate == 0.0:
+                            coefficient_s = remaining_step_s
+                            equilibrium_mol = (
+                                math.inf if f_mol_s > 0.0 else -math.inf
+                            )
+                        else:
+                            coefficient_s = (
+                                -math.expm1(
+                                    -relaxation_rate * remaining_step_s
+                                ) / relaxation_rate
+                            )
+                            equilibrium_mol = (
+                                d_mol + f_mol_s / relaxation_rate
+                            )
+                        if f_mol_s != 0.0:
+                            candidate_mol = d_mol + coefficient_s * f_mol_s
+                            if relaxation_rate > 0.0:
+                                if f_mol_s > 0.0:
+                                    candidate_mol = min(
+                                        candidate_mol,
+                                        equilibrium_mol,
+                                    )
+                                else:
+                                    candidate_mol = max(
+                                        candidate_mol,
+                                        equilibrium_mol,
+                                    )
+                next_cap: float | None = None
+                next_cap_kind: str | None = None
+                if f_mol_s < 0.0 and candidate_mol <= lower_bound_mol:
+                    next_cap = lower_bound_mol
+                    next_cap_kind = 'lower'
+                elif f_mol_s > 0.0 and candidate_mol >= upper_bound_mol:
+                    next_cap = upper_bound_mol
+                    next_cap_kind = 'upper'
+                if next_cap is not None:
+                    outward = (
+                        equilibrium_mol < lower_bound_mol
+                        if next_cap_kind == 'lower'
+                        else equilibrium_mol > upper_bound_mol
+                    )
+                    if not outward:
+                        last_refinement_issue = (
+                            f'N={count} reached {next_cap_kind} cap without '
+                            'an outward local vector field'
+                        )
+                        return None
+                    elapsed_before = (
+                        index * step_s + elapsed_in_step_s
+                    )
+                    if relaxation_rate > 0.0:
+                        numerator = equilibrium_mol - next_cap
+                        denominator = equilibrium_mol - d_mol
+                        ratio = (
+                            numerator / denominator
+                            if denominator != 0.0
+                            else 0.0
+                        )
+                        hit_s = (
+                            -math.log(ratio) / relaxation_rate
+                            if 0.0 < ratio <= 1.0
+                            else remaining_step_s
+                        )
+                    else:
+                        hit_s = (
+                            (next_cap - d_mol) / f_mol_s
+                            if f_mol_s != 0.0
+                            else remaining_step_s
+                        )
+                    state = evaluate(next_cap)
+                    d_mol = next_cap
+                    capped = True
+                    cap_kind = next_cap_kind
+                    cap_context = {
+                        'remaining_s': max(
+                            0.0,
+                            dt_s
+                            - elapsed_before
+                            - min(remaining_step_s, hit_s),
+                        ),
+                        'f_mol_s': f_mol_s,
+                        'lambda_s': relaxation_rate,
+                        'equilibrium_mol': equilibrium_mol,
+                        'candidate_mol': candidate_mol,
+                    }
+                    break
+                if (
+                    candidate_mol < lower_bound_mol
+                    or candidate_mol > upper_bound_mol
+                ):
+                    last_refinement_issue = (
+                        f'N={count} left the feasible interval before a '
+                        'binding cap'
+                    )
+                    return None
+                if endpoint is None or candidate_mol != d_mol:
+                    endpoint = evaluate(candidate_mol)
+                endpoint_field = float(endpoint['f_mol_s'])
+                roundoff_field_tolerance = 32.0 * math.ulp(1.0) * max(
+                    abs(f_mol_s),
+                    abs(endpoint_field),
+                )
+                if (
+                    f_mol_s * endpoint_field < 0.0
+                    and abs(endpoint_field)
+                    > max(
+                        surface_area_m2 * flux_tolerance,
+                        roundoff_field_tolerance,
+                    )
+                ):
+                    equilibrium_distance = (
+                        abs(f_mol_s / relaxation_rate)
+                        if relaxation_rate > 0.0
+                        else math.inf
+                    )
+                    terminal_amount_budget = 0.1 * (
+                        1.0e-12 + 1.0e-3 * abs(candidate_mol)
+                    )
+                    endpoint_rate = float(endpoint['lambda_s'])
+                    endpoint_equilibrium_distance = (
+                        abs(endpoint_field / endpoint_rate)
+                        if endpoint_rate > 0.0
+                        else math.inf
+                    )
+                    if equilibrium_distance <= terminal_amount_budget:
+                        # The incident state is already within the terminal
+                        # amount budget of the local equilibrium, so keep it
+                        # rather than publishing a rounded point across it.
+                        break
+                    if (
+                        endpoint_equilibrium_distance
+                        <= terminal_amount_budget
+                    ):
+                        # The endpoint root is only a roundoff-sized distance
+                        # beyond equilibrium. Use its same-law Jacobian to
+                        # estimate the zero, then publish a point halfway
+                        # back on the incident side. Verify that correction
+                        # with one more interface evaluation.
+                        estimated_equilibrium = (
+                            candidate_mol + endpoint_field / endpoint_rate
+                        )
+                        safe_candidate = (
+                            d_mol
+                            + 0.5 * (estimated_equilibrium - d_mol)
+                        )
+                        if (safe_candidate - d_mol) * f_mol_s <= 0.0:
+                            last_refinement_issue = (
+                                f'N={count} could not correct the terminal '
+                                'equilibrium crossing from the incident side '
+                                f'(d={d_mol!r}, candidate={candidate_mol!r}, '
+                                f'estimated_equilibrium={estimated_equilibrium!r}, '
+                                f'f_start={f_mol_s!r}, '
+                                f'f_end={endpoint_field!r}, '
+                                f'lambda_end={endpoint_rate!r})'
+                            )
+                            return None
+                        endpoint = evaluate(safe_candidate)
+                        safe_field = float(endpoint['f_mol_s'])
+                        if safe_field * f_mol_s <= 0.0:
+                            last_refinement_issue = (
+                                f'N={count} terminal equilibrium correction '
+                                'did not remain on the incident side'
+                            )
+                            return None
+                        candidate_mol = safe_candidate
+                    else:
+                        last_refinement_issue = (
+                            f'N={count} crossed an interior equilibrium '
+                            f'(f_start={f_mol_s!r}, '
+                            f'f_end={endpoint_field!r}, '
+                            f'equilibrium_distance={equilibrium_distance!r} mol, '
+                            f'terminal_budget={terminal_amount_budget!r} mol)'
+                        )
+                        return None
+                d_mol = candidate_mol
+                state = endpoint
+            return {
+                'd_mol': float(d_mol),
+                'state': state,
+                'steps': index + 1 if count else 0,
+                'capped': capped,
+                'cap_kind': cap_kind,
+                'cap_context': cap_context,
+            }
+
+        for count in refinement_counts:
+            current = run_refinement(count)
+            if current is None:
+                previous = None
+                consecutive = 0
+                continue
+            if previous is None:
+                passed = False
+            else:
+                amount_difference = abs(
+                    float(current['d_mol']) - float(previous['d_mol'])
+                )
+                amount_limit = 0.1 * (
+                    1.0e-12 + 1.0e-3 * abs(float(current['d_mol']))
+                )
+                current_log_pressure = math.log10(max(
+                    self._vacuum_floor_bar(),
+                    float(current['state']['root']['interface_pO2_bar']),
+                ))
+                previous_log_pressure = math.log10(max(
+                    self._vacuum_floor_bar(),
+                    float(previous['state']['root']['interface_pO2_bar']),
+                ))
+                passed = (
+                    amount_difference <= amount_limit
+                    and abs(current_log_pressure - previous_log_pressure)
+                    <= 1.0e-4
+                )
+                if not passed:
+                    last_refinement_issue = (
+                        f'N={count} comparison failed '
+                        f'(d={float(current["d_mol"])!r} mol, '
+                        f'(amount_delta={amount_difference!r} mol, '
+                        'log10_pO2_delta='
+                        f'{abs(current_log_pressure - previous_log_pressure)!r} dex)'
+                    )
+            consecutive = consecutive + 1 if passed else 0
+            if consecutive >= 2:
+                accepted = current
+                accepted_count = count
+                break
+            previous = current
+
+        if accepted is None:
+            raise OxygenInterfaceConfigurationError(
+                'oxygen_exchange_refinement_nonconverged',
+                'whole-hour exponential refinement exhausted N=256 without '
+                'two successive accepted comparisons; '
+                f'{last_refinement_issue}',
+            )
+        if first_state is None:
+            raise OxygenInterfaceConfigurationError(
+                'oxygen_exchange_refinement_nonconverged',
+                'no initial finite interface state was evaluated',
+            )
+
+        transfer_mol = float(accepted['d_mol'])
+        final_state = accepted['state']
+        last_root = final_state['root']
+        initial_root = first_state['root']
+        initial_lambda = float(first_state['lambda_s'])
         gas_conductance = float(
             initial_root['gas_conductance_mol_m2_s_per_ln']
         )
@@ -5653,228 +6608,80 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             effective_conductance = 1.0 / (
                 1.0 / gas_conductance + 1.0 / melt_conductance
             )
+        initial_capacity = float(
+            initial_root.get(
+                'capacity_mol_per_ln_fO2',
+                capacity_mol_per_ln_fO2,
+            )
+            or 0.0
+        )
         headspace_capacity_mol = max(n_floor_mol, head_o2_mol)
-        if capacity_mol_per_ln_fO2 <= OXYGEN_RESERVOIR_NOOP_MOL:
-            # As C_m tends to zero, G_m tends to zero and the relaxation time
-            # is the stirred-film time h_eff/k_m.  Do not replace C_m with a
-            # fake floor in the transfer equation itself.
+        if initial_capacity <= OXYGEN_RESERVOIR_NOOP_MOL:
             tau_s = h_eff_m / k_m
-        elif (
-            effective_conductance > 0.0
-            and headspace_capacity_mol > 0.0
-        ):
+        elif effective_conductance > 0.0 and headspace_capacity_mol > 0.0:
             tau_s = 1.0 / (
                 surface_area_m2
                 * effective_conductance
                 * (
-                    1.0 / capacity_mol_per_ln_fO2
+                    1.0 / initial_capacity
                     + 1.0 / headspace_capacity_mol
                 )
             )
         else:
             tau_s = math.inf
-        requested_substeps = max(
-            1,
-            int(math.ceil(dt_s / (0.1 * tau_s)))
-            if math.isfinite(tau_s) and tau_s > 0.0
-            else 1,
+
+        availability_clamped = bool(
+            accepted['capped']
+            and accepted['cap_kind'] == 'lower'
+            and headspace_lower_bound_mol >= chemical_lower_bound_mol
         )
-        # The backward-Euler amount solve is stable even when the diagnostic
-        # floor makes C_h tiny at an empty headspace.  Cap only the number of
-        # nonlinear solves: otherwise a numerical floor, rather than physical
-        # inventory, can demand hundreds of thousands of identical substeps.
-        substeps = min(requested_substeps, 256)
-        step_dt_s = dt_s / substeps
-        n_head_mol = head_o2_mol
-        transfer_mol = 0.0
-        requested_transfer_mol = 0.0
         unbacked_transfer_mol = 0.0
-        availability_clamped = False
-        bounded = True
-        last_root = initial_root
-        for _ in range(substeps):
-            step_metal_buffer_active = (
-                n_fe_metal_mol > OXYGEN_RESERVOIR_NOOP_MOL
-                and n_feo_mol > OXYGEN_RESERVOIR_NOOP_MOL
-            )
-            # M2 consumes metal for uptake and FeO for release. Other melt
-            # regimes retain the ferric capacities. Intersect either chemical
-            # interval with the existing headspace floor.
-            step_lower = -min(
-                n_fe_metal_mol / 2.0
-                if step_metal_buffer_active
-                else n_feo_mol / 4.0,
-                max(0.0, n_head_mol - n_floor_mol),
-            )
-            step_upper = (
-                n_feo_mol / 2.0
-                if step_metal_buffer_active
-                else n_fe2o3_mol / 2.0
-            )
-
-            def residual_for_amount(
-                amount_mol: float,
-            ) -> tuple[float, Dict[str, Any]]:
-                # Positive J is gas -> melt, so the signed amount convention
-                # is d = -dt*A*J: d>0 releases O2 to the headspace.  The
-                # backward-Euler residual is therefore d + dt*A*J(S_{s+1})
-                # in mol, with the provisional Fe/headspace state evaluated
-                # at the accepted amount itself.
-                if step_metal_buffer_active:
-                    provisional_feo = n_feo_mol - 2.0 * amount_mol
-                    provisional_fe2o3 = n_fe2o3_mol
-                    provisional_fe_metal = n_fe_metal_mol + 2.0 * amount_mol
-                    provisional_melt_pO2 = melt_pO2_bar
-                else:
-                    provisional_feo = n_feo_mol + 4.0 * amount_mol
-                    provisional_fe2o3 = n_fe2o3_mol - 2.0 * amount_mol
-                    provisional_fe_metal = n_fe_metal_mol
-                    provisional_melt_pO2 = (
-                        self._oxygen_melt_pO2_bar_for_inventory(
-                            n_feo_mol=provisional_feo,
-                            n_fe2o3_mol=provisional_fe2o3,
-                            kress91_evaluator=kress91_evaluator,
-                            fallback_pO2_bar=melt_pO2_bar,
-                        )
-                    )
-                root = self._oxygen_finite_interface_root(
-                    gas_pO2_bar=gas_pressure_from_headspace(
-                        n_head_mol + amount_mol
-                    ),
-                    melt_pO2_bar=provisional_melt_pO2,
-                    gas_temperature_K=gas_temperature_K,
-                    k_g=k_g,
-                    k_m=k_m,
-                    surface_area_m2=surface_area_m2,
-                    h_eff_m=h_eff_m,
-                    kress91_evaluator=kress91_evaluator,
-                    n_feo_mol=provisional_feo,
-                    n_fe2o3_mol=provisional_fe2o3,
-                    n_fe_metal_mol=provisional_fe_metal,
-                    capacity_mol_per_ln_fO2=capacity_mol_per_ln_fO2,
-                    diagnostics=False,
+        if availability_clamped and accepted['cap_context'] is not None:
+            cap_context = accepted['cap_context']
+            remaining_s = float(cap_context['remaining_s'])
+            f_at_cap = float(cap_context['f_mol_s'])
+            rate_at_cap = float(cap_context['lambda_s'])
+            eq_mol = float(cap_context['equilibrium_mol'])
+            cap_mol = transfer_mol
+            if rate_at_cap > 0.0:
+                f_at_cap = rate_at_cap * (eq_mol - cap_mol)
+                extra_coefficient_s = (
+                    -math.expm1(-rate_at_cap * remaining_s)
+                    / rate_at_cap
                 )
-                flux = float(root['interface_flux_mol_m2_s'])
-                return amount_mol + step_dt_s * surface_area_m2 * flux, root
-
-            def solve_amount(
-                lower_bound: float,
-                upper_bound: float,
-            ) -> tuple[float, Dict[str, Any]]:
-                accepted_root: Dict[str, Any] | None = None
-                if lower_bound == upper_bound:
-                    amount = lower_bound
-                else:
-                    lo = lower_bound
-                    hi = upper_bound
-                    lo_residual, lo_root = residual_for_amount(lo)
-                    hi_residual, hi_root = residual_for_amount(hi)
-                    if lo_residual == 0.0:
-                        amount = lo
-                        accepted_root = lo_root
-                    elif hi_residual == 0.0:
-                        amount = hi
-                        accepted_root = hi_root
-                    elif lo_residual * hi_residual < 0.0:
-                        for _ in range(80):
-                            mid = 0.5 * (lo + hi)
-                            mid_residual, mid_root = residual_for_amount(mid)
-                            if abs(mid_residual) <= 1.0e-14:
-                                lo = hi = mid
-                                accepted_root = mid_root
-                                break
-                            if lo_residual * mid_residual <= 0.0:
-                                hi = mid
-                                hi_residual = mid_residual
-                                hi_root = mid_root
-                            else:
-                                lo = mid
-                                lo_residual = mid_residual
-                                lo_root = mid_root
-                        amount = 0.5 * (lo + hi)
-                    elif lo_residual > 0.0 and hi_residual > 0.0:
-                        amount = lo
-                        accepted_root = lo_root
-                    elif lo_residual < 0.0 and hi_residual < 0.0:
-                        amount = hi
-                        accepted_root = hi_root
-                    else:
-                        if abs(lo_residual) <= abs(hi_residual):
-                            amount = lo
-                            accepted_root = lo_root
-                        else:
-                            amount = hi
-                            accepted_root = hi_root
-                amount = max(lower_bound, min(upper_bound, amount))
-                if accepted_root is not None:
-                    return amount, accepted_root
-                _, root = residual_for_amount(amount)
-                return amount, root
-
-            unrestricted_lower = (
-                -n_fe_metal_mol / 2.0
-                if step_metal_buffer_active
-                else -n_feo_mol / 4.0
-            )
-            if step_lower == step_upper:
-                # A directional endpoint can collapse the feasible interval
-                # to zero (for example, a ferrous melt with no real O2 above
-                # the headspace floor).  Solve the unconstrained request once
-                # for the refused-availability diagnostic, then stop; a
-                # repeated zero solve would turn a typed refusal into an
-                # unbounded loop over stability substeps.
-                requested_amount, _ = solve_amount(
-                    unrestricted_lower,
-                    step_upper,
-                )
-                amount_mol = step_lower
-                _, last_root = residual_for_amount(amount_mol)
-            elif step_lower == unrestricted_lower:
-                amount_mol, last_root = solve_amount(
-                    step_lower,
-                    step_upper,
-                )
-                requested_amount = amount_mol
             else:
-                requested_amount, _ = solve_amount(
-                    unrestricted_lower,
-                    step_upper,
-                )
-                amount_mol, last_root = solve_amount(
-                    step_lower,
-                    step_upper,
-                )
-            requested_transfer_mol += requested_amount
-            if (
-                requested_amount < step_lower - OXYGEN_RESERVOIR_NOOP_MOL
-                and step_lower > unrestricted_lower
-            ):
-                availability_clamped = True
-                unbacked_transfer_mol += requested_amount - step_lower
-            bounded = bounded and step_lower <= amount_mol <= step_upper
-            if step_metal_buffer_active:
-                n_feo_mol -= 2.0 * amount_mol
-                n_fe_metal_mol += 2.0 * amount_mol
-            else:
-                n_feo_mol += 4.0 * amount_mol
-                n_fe2o3_mol -= 2.0 * amount_mol
-            n_head_mol += amount_mol
-            transfer_mol += amount_mol
-            if (
-                step_lower == step_upper
-                and abs(amount_mol) <= OXYGEN_RESERVOIR_NOOP_MOL
-            ):
-                break
-
+                extra_coefficient_s = remaining_s
+            unbacked_transfer_mol = f_at_cap * extra_coefficient_s
+        requested_transfer_mol = transfer_mol + unbacked_transfer_mol
         if abs(transfer_mol) <= OXYGEN_RESERVOIR_NOOP_MOL:
             direction = 'none:below_threshold'
         elif transfer_mol > 0.0:
             direction = 'melt_to_headspace'
         else:
             direction = 'headspace_to_melt'
+
+        feo_after = (
+            n_feo_mol - 2.0 * transfer_mol
+            if metal_law_active
+            else n_feo_mol + 4.0 * transfer_mol
+        )
+        ferric_after = (
+            n_fe2o3_mol
+            if metal_law_active
+            else n_fe2o3_mol - 2.0 * transfer_mol
+        )
+        metal_after = (
+            n_fe_metal_mol + 2.0 * transfer_mol
+            if metal_law_active
+            else n_fe_metal_mol
+        )
+        n_head_after = head_o2_mol + transfer_mol
         finite_values = (
             transfer_mol,
+            requested_transfer_mol,
+            unbacked_transfer_mol,
             tau_s,
+            initial_lambda,
             effective_conductance,
             float(last_root['interface_pO2_bar']),
             float(last_root['interface_flux_mol_m2_s']),
@@ -5882,38 +6689,41 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         return {
             'authority': 'diagnostic_only',
             'status': 'ok',
-            'solver': 'backward_euler_substeps',
-            'transfer_o2_mol': float(transfer_mol),
-            'transfer_o2_kg': float(
+            'solver': 'exponential_local_jacobian_refinement',
+            'transfer_o2_mol': transfer_mol,
+            'transfer_o2_kg': (
                 transfer_mol * OXYGEN_MOLAR_MASS_KG_PER_MOL
             ),
-            'requested_transfer_o2_mol': float(requested_transfer_mol),
-            'unbacked_transfer_o2_mol': float(unbacked_transfer_mol),
-            'availability_clamped': bool(availability_clamped),
+            'requested_transfer_o2_mol': requested_transfer_mol,
+            'unbacked_transfer_o2_mol': unbacked_transfer_mol,
+            'availability_clamped': availability_clamped,
             'direction': direction,
-            'substeps': int(substeps),
-            'requested_substeps': int(requested_substeps),
-            'bounded': bool(bounded),
+            'substeps': accepted_count,
+            'requested_substeps': accepted_count,
+            'refinement_levels': tuple(refinement_counts),
+            'amount_bisections': 0,
+            'interface_evaluations': interface_evaluations,
+            'bounded': (
+                lower_bound_mol <= transfer_mol <= upper_bound_mol
+                and min(feo_after, ferric_after, metal_after, n_head_after)
+                >= -1.0e-15
+            ),
             'finite': bool(all(math.isfinite(value) for value in finite_values)),
             'bounds_mol': {
                 'lower': float(lower_bound_mol),
                 'upper': float(upper_bound_mol),
             },
             'headspace_o2_mol_before': float(head_o2_mol),
-            'headspace_o2_mol_after': float(n_head_mol),
+            'headspace_o2_mol_after': float(n_head_after),
             'headspace_floor_o2_mol': float(n_floor_mol),
-            'fe_o_mol_before': float(
-                melt_mol.get('FeO', 0.0) or 0.0
-            ),
-            'fe2o3_mol_before': float(
-                melt_mol.get('Fe2O3', 0.0) or 0.0
-            ),
-            'fe_o_mol_after': float(n_feo_mol),
-            'fe2o3_mol_after': float(n_fe2o3_mol),
+            'fe_o_mol_before': float(melt_mol.get('FeO', 0.0) or 0.0),
+            'fe2o3_mol_before': float(melt_mol.get('Fe2O3', 0.0) or 0.0),
+            'fe_o_mol_after': float(max(0.0, feo_after)),
+            'fe2o3_mol_after': float(max(0.0, ferric_after)),
             'fe_metal_mol_before': float(
                 metal_mol.get('Fe', 0.0) or 0.0
             ),
-            'fe_metal_mol_after': float(n_fe_metal_mol),
+            'fe_metal_mol_after': float(max(0.0, metal_after)),
             'interface_pO2_bar': float(last_root['interface_pO2_bar']),
             'interface_flux_mol_m2_s': float(
                 last_root['interface_flux_mol_m2_s']
@@ -5924,14 +6734,19 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             'interface_root_residual_mol_m2_s': float(
                 last_root['interface_root_residual_mol_m2_s']
             ),
+            'interface_root_converged': bool(
+                last_root['interface_root_converged']
+            ),
             'finite_melt_driving_force_mol': float(
                 last_root['finite_melt_driving_force_mol']
             ),
             'conductances_mol_m2_s_per_ln': {
-                'gas': float(gas_conductance),
-                'melt': float(melt_conductance),
-                'effective': float(effective_conductance),
+                'gas': gas_conductance,
+                'melt': melt_conductance,
+                'effective': effective_conductance,
             },
+            'capacity_mol_per_ln_fO2': initial_capacity,
+            'initial_relaxation_rate_s': initial_lambda,
             'tau_s': float(tau_s),
             'tau_hr': float(tau_s / 3600.0),
             'melt_side_k_m_s': float(k_m),
@@ -10312,6 +11127,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         gate_authority = self._resolved_melt_redox_gate_authority(
             gate_authority
         )
+        published_reservoir = self.melt.oxygen_reservoir
         T_K = float(self.melt.temperature_C) + 273.15
         if not math.isfinite(T_K) or T_K <= 0.0:
             raise AccountingError(
@@ -10567,6 +11383,8 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 self._vacuum_floor_bar(),
                 transport_pO2,
             )
+            published_reservoir.__dict__.update(reservoir.__dict__)
+            reservoir = published_reservoir
             self.melt.oxygen_reservoir = reservoir
             self._sync_oxygen_reservoir_mirror()
             return reservoir
@@ -10902,6 +11720,8 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         )
         reservoir.exchange_unbacked_o2_mol = unbacked_transfer_mol
         reservoir.exchange_clamped = exchange_clamped
+        published_reservoir.__dict__.update(reservoir.__dict__)
+        reservoir = published_reservoir
         self.melt.oxygen_reservoir = reservoir
         self._sync_oxygen_reservoir_mirror()
         return reservoir

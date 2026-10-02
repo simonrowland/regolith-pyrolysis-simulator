@@ -7,6 +7,10 @@ import math
 import pytest
 
 from simulator.environment import DEFAULT_VACUUM_FLOOR_BAR
+from simulator.core import (
+    OxygenInterfaceConfigurationError,
+    PyrolysisSimulator,
+)
 from simulator.fe_redox import (
     KRESS91_LN_FO2_COEFFICIENT,
     _kress91_ln_ratio,
@@ -20,7 +24,32 @@ from simulator.run_executor import RunExecutor
 from simulator.runner import PyrolysisRun
 
 
-def test_lunar_c2a_170h_keeps_ledger_redox_bounded_and_consistent() -> None:
+def test_lunar_c2a_170h_refuses_unconverged_exchange_without_commit(
+    monkeypatch,
+) -> None:
+    original_shadow_transfer = PyrolysisSimulator._oxygen_shadow_transfer
+    rejected_hour = {}
+
+    def track_rejected_hour(self, *args, **kwargs):
+        ledger_before = self.atom_ledger.mol_by_account()
+        transition_count_before = len(self.atom_ledger.transitions)
+        try:
+            return original_shadow_transfer(self, *args, **kwargs)
+        except OxygenInterfaceConfigurationError as exc:
+            if exc.reason == "oxygen_exchange_refinement_nonconverged":
+                rejected_hour["ledger_before"] = ledger_before
+                rejected_hour["ledger_after"] = self.atom_ledger.mol_by_account()
+                rejected_hour["transitions_before"] = transition_count_before
+                rejected_hour["transitions_after"] = len(
+                    self.atom_ledger.transitions
+                )
+            raise
+
+    monkeypatch.setattr(
+        PyrolysisSimulator,
+        "_oxygen_shadow_transfer",
+        track_rejected_hour,
+    )
     run = PyrolysisRun(
         feedstock_id="lunar_mare_low_ti",
         campaign="C2A",
@@ -30,9 +59,21 @@ def test_lunar_c2a_170h_keeps_ledger_redox_bounded_and_consistent() -> None:
     )
     execution = RunExecutor().execute(run._session_config())
 
-    assert execution.status == "ok"
-    assert len(execution.snapshots) == 170
-    assert len(execution.per_hour) == 170
+    assert execution.status == "failed"
+    assert isinstance(
+        execution.failure_exception,
+        OxygenInterfaceConfigurationError,
+    )
+    assert (
+        execution.failure_exception.reason
+        == "oxygen_exchange_refinement_nonconverged"
+    )
+    assert len(execution.snapshots) < 170
+    assert len(execution.per_hour) == len(execution.snapshots)
+    assert rejected_hour["ledger_after"] == rejected_hour["ledger_before"]
+    assert rejected_hour["transitions_after"] == rejected_hour[
+        "transitions_before"
+    ]
 
     for snapshot, row in zip(execution.snapshots, execution.per_hour):
         assert abs(snapshot.mass_balance_error_pct) <= 5.0e-12
