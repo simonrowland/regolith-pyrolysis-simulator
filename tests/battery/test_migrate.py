@@ -73,6 +73,7 @@ from simulator.battery.migrate import (
     is_compilation_record_path,
     compilation_record_asset_id,
     compilation_column_series_from_record,
+    _provenance_from_extract,
     load_migrated_store,
     expand_queue_entries,
     group_queue_entries,
@@ -90,6 +91,129 @@ from simulator.battery.migrate import (
     write_outputs,
 
 )
+
+
+def test_ion_current_comparison_provenance_assumes_unreported_pairing() -> None:
+    from simulator.battery.validity import comparison_method_cell_constant_cancels
+    from simulator.battery.migrate import (
+        _comparison_method_cancellation_notice_reason,
+    )
+
+    values = {
+        "method": "ion current comparison with thermodynamic activity reduction",
+        "method_as_printed": "comparison against the individual pure-oxide standard",
+    }
+    provenance = _provenance_from_extract({}, values, None)
+    assert provenance is not None
+    assert provenance["comparison_method"]["kind"] == "comparison_ratio"
+    assert provenance["melt_reference_pairing"]["kind"] == (
+        "same_effective_setup_assumed"
+    )
+    assert comparison_method_cell_constant_cancels(provenance)
+    reason = _comparison_method_cancellation_notice_reason(provenance)
+    assert "assumes cancellation" in reason
+    assert "same instrument" in reason
+    assert "same-cell pairing not printed" in reason
+
+    integrated = _provenance_from_extract(
+        {}, {"method": "analytical integration of measured ion-current ratios"}, None
+    )
+    assert integrated is not None
+    assert integrated["comparison_method"]["kind"] == "comparison_ratio"
+    assert integrated["melt_reference_pairing"]["kind"] == (
+        "same_effective_setup_assumed"
+    )
+
+    different = _provenance_from_extract(
+        {},
+        {
+            **values,
+            "method_as_printed": (
+                "sample and standard measured in different cell geometries"
+            ),
+        },
+        None,
+    )
+    assert different is not None
+    assert different["melt_reference_pairing"]["kind"] == (
+        "different_cells_or_geometry"
+    )
+    assert not comparison_method_cell_constant_cancels(different)
+
+
+def test_persisted_kems_activity_recovers_comparison_method_from_calibration(
+    tmp_path: Path,
+) -> None:
+    from tests.battery import factories as F
+    from simulator.battery.records import State
+
+    work = F.work()
+    experiment = F.kems_experiment(
+        "persisted-comparison-activity", work.work_id, kn=Decimal("20")
+    )
+    assert experiment.apparatus is not None
+    experiment = replace(
+        experiment,
+        apparatus=replace(
+            experiment.apparatus,
+            calibration={
+                "method": F.located(
+                    "ion-current comparison using silver vapor pressure as standard"
+                ),
+                "reference_substance": F.located("silver vapor"),
+            },
+        ),
+    )
+    phase_text = "CaO-Al2O3-SiO2 liquid oxide melt"
+    activity_identity = F.activity_identity()
+    identity = replace(
+        activity_identity,
+        species=replace(
+            activity_identity.species,
+            phase=State.unknown(
+                f"phase string {phase_text!r} is not in the closed automatic map"
+            ),
+        ),
+    )
+    observation = F.observation(
+        "persisted-comparison-activity",
+        experiment.experiment_id,
+        identity,
+        Decimal("0.2"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="stolyarova-1996-cao-alumina-silica-kems",
+    )
+    works_dir = tmp_path / "data" / "literature" / "works"
+    extracts_dir = tmp_path / "data" / "literature" / "extracts-v2"
+    works_dir.mkdir(parents=True)
+    extracts_dir.mkdir(parents=True)
+    dump_yaml(
+        {
+            "work": to_plain(work),
+            "experiments": [to_plain(experiment)],
+        },
+        works_dir / "persisted-comparison.yaml",
+    )
+    dump_yaml(
+        {"observations": [to_plain(observation)]},
+        extracts_dir / "persisted-comparison.yaml",
+    )
+
+    _works, _experiments, observations = load_migrated_store(tmp_path)
+    migrated = observations[observation.observation_id]
+    assert migrated.identity.species.phase.is_value
+    assert migrated.identity.species.phase.value is Phase.L
+    assert migrated.provenance is not None
+    assert migrated.provenance["melt_reference_pairing"]["kind"] == (
+        "same_effective_setup_assumed"
+    )
+    notice = next(
+        notice
+        for notice in migrated.notices
+        if notice.kind is NoticeKind.COMPARISON_METHOD_CELL_CONSTANT_CANCELS
+    )
+    assert "assumes cancellation" in notice.reason
+    assert "same-cell pairing not printed" in notice.reason
 
 
 def test_reference_phase_convention_notice_round_trips_and_legacy_notice_stays_valid() -> None:

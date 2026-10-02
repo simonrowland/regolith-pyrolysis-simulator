@@ -1709,6 +1709,254 @@ def test_comparison_activity_cancels_cell_geometry_only_for_activity() -> None:
     assert partial_check.detail["flag"] == "calibration_not_grounded"
 
 
+def _comparison_activity_provenance(pairing: str) -> dict[str, object]:
+    return {
+        "comparison_method": {"kind": "comparison_ratio"},
+        "common_knudsen_cell_constant": {"cancels": True},
+        "melt_reference_pairing": {"kind": pairing},
+    }
+
+
+def test_assumed_comparison_activity_scores_with_cancellation_notice() -> None:
+    composition = Composition(
+        "published_mole_fraction",
+        (
+            ("CaO", Decimal("0.335")),
+            ("Al2O3", Decimal("0.335")),
+            ("SiO2", Decimal("0.33")),
+        ),
+        amount_basis=AmountBasis.MOLE_FRACTION,
+    )
+    identity = replace(
+        F.activity_identity(formula="NaO0.5"),
+        composition=State.unknown("composition is recorded on the source point"),
+        fO2_Pa=State.unknown("fO2 is not printed"),
+        total_pressure_Pa=State.unknown("total pressure is not printed"),
+    )
+    experiment = F.kems_experiment(
+        orifice_area=None, clausing=None, kn=Decimal("20"), calibrated=True
+    )
+    reference = F.observation(
+        "stolyarova-assumed-comparison-activity",
+        experiment.experiment_id,
+        identity,
+        Decimal("0.2"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="stolyarova-1996-cao-alumina-silica-kems",
+    )
+    reference = replace(
+        reference,
+        provenance=_comparison_activity_provenance("same_effective_setup_assumed"),
+        point_conditions={"composition": Located(State.of(composition))},
+        notices=(
+            Notice(
+                kind=NoticeKind.COMPARISON_METHOD_CELL_CONSTANT_CANCELS,
+                affected_quantities=(Quantity.ACTIVITY,),
+                reason=(
+                    "normalized comparison-method activity assumes cancellation "
+                    "of the common Knudsen-cell constant (same instrument; "
+                    "same-cell pairing not printed)"
+                ),
+                origin=reference.observation_id,
+            ),
+        ),
+    )
+    gates = run_validity_gates(experiment, reference)
+    assert gates.passed
+    geometry_check = next(
+        check for check in gates.checks if check.name == "comparison_method_cell_constant_cancels"
+    )
+    assert geometry_check.detail["pairing"] == "same_effective_setup_assumed"
+    assert geometry_check.detail["geometry"] == "not_required_for_normalized_activity"
+
+    residual, _ = _compile(
+        reference,
+        experiment,
+        _predict(Decimal("0.2"), identity),
+        review="reviewed",
+    )
+    assert residual.status is not ResidualStatus.REFUSED
+    assert residual.numeric is not None
+    assert any(
+        notice.kind is NoticeKind.COMPARISON_METHOD_CELL_CONSTANT_CANCELS
+        and "assumes cancellation" in notice.reason
+        and "same-cell pairing not printed" in notice.reason
+        for notice in residual.notices
+    )
+
+
+def test_different_cell_comparison_activity_still_refuses_geometry() -> None:
+    identity = F.activity_identity(formula="NaO0.5")
+    experiment = F.kems_experiment(
+        orifice_area=Decimal("3.14e-7"),
+        clausing=Decimal("0.9"),
+        kn=Decimal("20"),
+        calibrated=True,
+    )
+    reference = replace(
+        F.observation(
+            "different-cell-comparison-activity",
+            experiment.experiment_id,
+            identity,
+            Decimal("0.2"),
+            evidence=EvidenceClass.MEASURED_DIRECT,
+        ),
+        provenance=_comparison_activity_provenance("different_cells_or_geometry"),
+    )
+    gate = underdetermined_apparatus(
+        experiment, Quantity.ACTIVITY, observation=reference
+    )
+    assert gate.passed is False
+    assert gate.reason is RefusalReason.UNDERDETERMINED_APPARATUS
+    assert gate.primary_check == "geometry_determinants"
+    geometry_check = next(
+        check for check in gate.checks if check.name == "geometry_determinants"
+    )
+    assert "comparison_pairing_different_cells_or_geometry" in geometry_check.detail[
+        "missing"
+    ]
+
+    residual, _ = _compile(
+        reference,
+        experiment,
+        _predict(Decimal("0.2"), identity),
+        review="reviewed",
+    )
+    assert residual.status is ResidualStatus.REFUSED
+    assert residual.refusal is not None
+    assert residual.refusal.reason is RefusalReason.UNDERDETERMINED_APPARATUS
+
+
+@pytest.mark.parametrize(
+    "quantity", (Quantity.ACTIVITY, Quantity.ACTIVITY_COEFFICIENT)
+)
+def test_uncalibrated_kems_activity_uses_calibration_not_grounded_stratum(
+    quantity: Quantity,
+) -> None:
+    from simulator.battery.score import (
+        FLAGGED_STRATUM_CALIBRATION_NOT_GROUNDED,
+        flagged_strata,
+    )
+
+    identity = replace(
+        F.activity_identity(formula="NaO0.5"), quantity=quantity
+    )
+    experiment = F.kems_experiment(
+        orifice_area=None, clausing=None, kn=Decimal("20"), calibrated=False
+    )
+    reference = replace(
+        F.observation(
+            "uncalibrated-comparison-activity",
+            experiment.experiment_id,
+            identity,
+            Decimal("0.2"),
+            evidence=EvidenceClass.MEASURED_DIRECT,
+            source_id="stolyarova-1996-cao-alumina-silica-kems",
+        ),
+        provenance=_comparison_activity_provenance(
+            "same_effective_setup_assumed"
+        ),
+    )
+    gates = run_validity_gates(experiment, reference)
+    calibration_check = next(
+        check for check in gates.checks if check.name == "kems_calibration"
+    )
+    assert gates.passed
+    assert calibration_check.passed
+    assert calibration_check.detail["flag"] == "calibration_not_grounded"
+
+    residual, _ = _compile(
+        reference,
+        experiment,
+        _predict(Decimal("0.2"), identity),
+        review="reviewed",
+    )
+    assert residual.status is not ResidualStatus.REFUSED
+    assert residual.numeric is not None
+    assert residual.score_eligible is False
+    assert any(
+        notice.kind is NoticeKind.UNVERIFIED_APPARATUS
+        and notice.reason.startswith("calibration_not_grounded:")
+        for notice in residual.notices
+    )
+    assert flagged_strata(residual.notices) == (
+        FLAGGED_STRATUM_CALIBRATION_NOT_GROUNDED,
+    )
+
+
+def test_uncalibrated_kems_activity_pressure_sum_over_limit_still_refuses() -> None:
+    identity = F.activity_identity(formula="NaO0.5")
+    experiment = F.kems_experiment(
+        orifice_area=None, clausing=None, kn=None, calibrated=False
+    )
+    activity = F.observation(
+        "uncalibrated-over-limit-activity",
+        experiment.experiment_id,
+        identity,
+        Decimal("0.2"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="stolyarova-1996-cao-alumina-silica-kems",
+    )
+    activity = replace(
+        activity,
+        provenance=_comparison_activity_provenance(
+            "same_effective_setup_assumed"
+        ),
+    )
+    partial_identity = replace(
+        _partial_identity(),
+        temperature_K=identity.temperature_K,
+        fO2_Pa=identity.fO2_Pa,
+        total_pressure_Pa=identity.total_pressure_Pa,
+        composition=identity.composition,
+    )
+    sodium = F.observation(
+        "over-limit-Na-pressure",
+        experiment.experiment_id,
+        partial_identity,
+        Decimal("6"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="stolyarova-1996-cao-alumina-silica-kems",
+    )
+    silicon = F.observation(
+        "over-limit-Si-pressure",
+        experiment.experiment_id,
+        replace(partial_identity, species=Species("Si", Phase.G)),
+        Decimal("5"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="stolyarova-1996-cao-alumina-silica-kems",
+    )
+    gates = run_validity_gates(
+        experiment,
+        activity,
+        point_observations=(activity, sodium, silicon),
+    )
+    assert gates.passed is False
+    assert gates.reason is RefusalReason.EFFUSION_REGIME_UNVERIFIED
+    pressure_check = next(
+        check for check in gates.checks if check.name == "in_cell_partial_pressure_sum"
+    )
+    assert pressure_check.passed is False
+    assert pressure_check.detail["printed_partial_pressure_sum_Pa"] == "11"
+
+    context = _context(
+        F.work(), experiment, activity, sodium, silicon, review="reviewed"
+    )
+    residual, _ = compile_residual(
+        activity,
+        Engine.INTERNAL_ANALYTICAL,
+        context=context,
+        comparison_ids={activity.observation_id, sodium.observation_id, silicon.observation_id},
+        predict=lambda _engine, _reference, **_kwargs: _predict(
+            Decimal("0.2"), identity
+        ),
+        point_observations=(activity, sodium, silicon),
+    )
+    assert residual.status is ResidualStatus.REFUSED
+    assert residual.refusal is not None
+    assert residual.refusal.reason is RefusalReason.EFFUSION_REGIME_UNVERIFIED
+
+
 def test_unverified_kems_value_refuses_without_printed_in_cell_pressures() -> None:
     experiment = F.kems_experiment(calibrated=True, kn=None)
     experiment = replace(
