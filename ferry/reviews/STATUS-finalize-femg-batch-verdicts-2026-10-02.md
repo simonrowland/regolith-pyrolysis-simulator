@@ -34,7 +34,7 @@ VERDICT: LAND e644f212033d26c98d8f916d8e850d13fc3a7faf
 ## Ship fields
 
 - **Dropbox:** shipped to from-empirical/ 2026-10-02 ~00:31 ET
-- **Mailbox tip:** `MAILBOX_TIP_PENDING` on `empirical/reviews-batch-zv-2026-09-22`
-- **Artifacts tip:** `ARTIFACTS_TIP_PENDING`
+- **Mailbox tip:** `7ea60ebdd0a0e8e58f3a5b2d9a1e06feb235a624` on `empirical/reviews-batch-zv-2026-09-22`
+- **Artifacts tip:** `7ea60ebdd0a0e8e58f3a5b2d9a1e06feb235a624`
 
 — regolith-empirical
