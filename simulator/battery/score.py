@@ -1095,9 +1095,15 @@ def _fusion_comparison_reference(
         )
         return replace(reference, notices=union_notices(reference.notices, (notice,)))
 
+    # JANAF Mg-008 (MgO(cr), periclase) and Mg-009 (MgO(l)) give, by node
+    # interpolation at 1873 K, G_s°=-345.91812 and G_l°=-317.44751 kJ/mol.
+    # Thus ΔG_fus=+28.47061 kJ/mol and Δlog10(a)=ΔG_fus*1000/(R*T*ln(10))
+    # = +0.793984 dex (R=8.31441 J mol^-1 K^-1). Their branches cross at
+    # 3104.945598 K, where ΔG_fus and the reference shift go to zero.
     expected_polymorph = {
         "Ca-027": Polymorph.LIME,
         "Al-096": Polymorph.CORUNDUM,
+        "Mg-008": Polymorph.PERICLASE,
         "O-035": Polymorph.CRISTOBALITE_HIGH,
     }.get(fusion.crystal_table)
     observed_polymorph = polymorph_token(standard_state.endmember)
