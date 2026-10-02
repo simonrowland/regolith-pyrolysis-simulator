@@ -79,9 +79,14 @@ observations:
       reason: unmapped regime 'open_furnace_apparent'
     original_method_class: open_furnace_apparent
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - evaporation_coefficient_alpha
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: sossi-et-al-2019::sossi_2019_na_open_furnace_apparent
   source_id: sossi-et-al-2019
   locator:
     note: Sossi, P. A. et al. (2019), Geochim. Cosmochim. Acta 260:204-231, DOI 10.1016/j.gca.2019.06.021

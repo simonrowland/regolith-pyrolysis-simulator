@@ -75,9 +75,14 @@ observations:
       tag: unknown
       reason: source does not state method_class
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - p_partial
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: cao_raw_pCa:T=1812.0
   source_id: shornikov-2025-cao
   locator:
     record: raw_pCa:T=1812.0
@@ -174,9 +179,14 @@ observations:
       tag: unknown
       reason: source does not state method_class
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - p_partial
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: cao_raw_pCa:T=1913.0
   source_id: shornikov-2025-cao
   locator:
     record: raw_pCa:T=1913.0
@@ -273,9 +283,14 @@ observations:
       tag: unknown
       reason: source does not state method_class
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - p_partial
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: cao_raw_pCa:T=2000.0
   source_id: shornikov-2025-cao
   locator:
     record: raw_pCa:T=2000.0
@@ -372,9 +387,14 @@ observations:
       tag: unknown
       reason: source does not state method_class
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - p_partial
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: cao_raw_pCa:T=2100.0
   source_id: shornikov-2025-cao
   locator:
     record: raw_pCa:T=2100.0
@@ -471,9 +491,14 @@ observations:
       tag: unknown
       reason: source does not state method_class
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - log10_Kf
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: refractory:condensed_log10_kf:Al2O3
   source_id: janaf-4th
   locator:
     table: Al-096
@@ -560,9 +585,14 @@ observations:
       tag: unknown
       reason: source does not state method_class
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - log10_Kf
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: refractory:log10_kf:Al
   source_id: janaf-4th
   locator:
     table: Al-005
@@ -649,9 +679,14 @@ observations:
       tag: unknown
       reason: source does not state method_class
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - log10_Kf
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: refractory:log10_kf:Al2O
   source_id: janaf-4th
   locator:
     table: Al-092
@@ -738,9 +773,14 @@ observations:
       tag: unknown
       reason: source does not state method_class
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - log10_Kf
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: refractory:log10_kf:AlO
   source_id: janaf-4th
   locator:
     table: Al-074
@@ -827,9 +867,14 @@ observations:
       tag: unknown
       reason: source does not state method_class
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - log10_Kf
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: refractory:log10_kf:CaO
   source_id: janaf-4th
   locator:
     table: Ca-030
@@ -916,9 +961,14 @@ observations:
       tag: unknown
       reason: source does not state method_class
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - log10_Kf
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: refractory:log10_kf:MgO
   source_id: janaf-4th
   locator:
     table: Mg-011
@@ -1005,9 +1055,14 @@ observations:
       tag: unknown
       reason: source does not state method_class
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - log10_Kf
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: refractory:log10_kf:O
   source_id: janaf-4th
   locator:
     table: O-001
@@ -1094,9 +1149,14 @@ observations:
       tag: unknown
       reason: source does not state method_class
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - log10_Kf
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: refractory:log10_kf:SiO
   source_id: janaf-4th
   locator:
     table: O-012
@@ -1183,9 +1243,14 @@ observations:
       tag: unknown
       reason: source does not state method_class
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - log10_Kf
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: refractory:log10_kf:TiO2
   source_id: janaf-4th
   locator:
     table: O-046

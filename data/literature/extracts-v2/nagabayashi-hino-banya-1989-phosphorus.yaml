@@ -76,9 +76,14 @@ observations:
       value: measured_direct
     original_method_class: measured_direct
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - transition_temperature
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: nagabayashi-hino-banya-1989-phosphorus::nagabayashi_1989_experiment_1823K
   source_id: nagabayashi-hino-banya-1989-phosphorus
   locator:
     page: 140
@@ -172,9 +177,14 @@ observations:
       value: measured_direct
     original_method_class: measured_direct
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - transition_temperature
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: nagabayashi-hino-banya-1989-phosphorus::nagabayashi_1989_experiment_1873K
   source_id: nagabayashi-hino-banya-1989-phosphorus
   locator:
     page: 141
@@ -266,9 +276,14 @@ observations:
       value: measured_direct
     original_method_class: measured_direct
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - transition_temperature
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: nagabayashi-hino-banya-1989-phosphorus::nagabayashi_1989_experiment_1923K
   source_id: nagabayashi-hino-banya-1989-phosphorus
   locator:
     page: 141
@@ -361,9 +376,14 @@ observations:
     original_method_class: model_derived
     model: model_derived
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - interaction_parameter
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: nagabayashi-hino-banya-1989-phosphorus::nagabayashi_1989_interaction_ca_p5
   source_id: nagabayashi-hino-banya-1989-phosphorus
   locator:
     page: 143
@@ -447,9 +467,14 @@ observations:
     original_method_class: model_derived
     model: model_derived
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - interaction_parameter
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: nagabayashi-hino-banya-1989-phosphorus::nagabayashi_1989_interaction_mg_p5
   source_id: nagabayashi-hino-banya-1989-phosphorus
   locator:
     page: 143
@@ -533,9 +558,14 @@ observations:
     original_method_class: model_derived
     model: model_derived
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - interaction_parameter
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: nagabayashi-hino-banya-1989-phosphorus::nagabayashi_1989_interaction_si_p5
   source_id: nagabayashi-hino-banya-1989-phosphorus
   locator:
     page: 143

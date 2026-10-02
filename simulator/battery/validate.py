@@ -1151,9 +1151,20 @@ def validate_observation(
                 "author_estimate requires model",
             )
         )
+    admission_defaulted = any(
+        notice.kind is NoticeKind.ADMISSION_DEFAULTED
+        and notice.origin == observation.observation_id
+        and notice.reason == observation.admission.reason
+        and notice.reason.startswith("admission_defaulted:")
+        for notice in observation.notices
+    )
     if (
         observation.admission.status is not AdmissionStatus.PENDING
         and observation.admission.decided_by is None
+        and not (
+            observation.admission.status is AdmissionStatus.ADMITTED
+            and admission_defaulted
+        )
     ):
         issues.append(
             _issue(

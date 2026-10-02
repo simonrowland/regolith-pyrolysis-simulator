@@ -677,9 +677,14 @@ observations:
       value: quoted_unattributed
     original_method_class: quoted_unattributed
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - p_partial
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: kems-111-ichise-1982::ichise_1982_quoted_Mo_psat
   source_id: kems-111-ichise-1982
   locator:
     published_page: 552

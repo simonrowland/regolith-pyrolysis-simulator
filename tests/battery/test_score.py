@@ -729,6 +729,47 @@ def test_reference_phase_convention_notice_is_reported_without_blocking_score() 
     )
 
 
+def test_default_admission_notice_is_visible_without_changing_score() -> None:
+    notice = Notice(
+        kind=NoticeKind.ADMISSION_DEFAULTED,
+        affected_quantities=(Quantity.DELTA_FG,),
+        reason=(
+            "admission_defaulted: no observation admission_status mapped from source; "
+            "owner ruling d-056; not a reviewer decision"
+        ),
+        origin="janaf-defaulted-admission",
+    )
+    experiment = F.tabulation_experiment()
+    reference = F.observation(
+        "janaf-defaulted-admission",
+        experiment.experiment_id,
+        F.o2_identity(),
+        Decimal("0"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="nist-janaf-4th",
+        notices=(notice,),
+    )
+    residual, _ = _compile(
+        reference, experiment, _predict(Decimal("0"), reference.identity)
+    )
+    baseline = replace(
+        reference,
+        observation_id="janaf-defaulted-admission-baseline",
+        notices=(),
+    )
+    baseline_residual, _ = _compile(
+        baseline, experiment, _predict(Decimal("0"), baseline.identity)
+    )
+
+    assert residual.status is baseline_residual.status
+    assert residual.score_eligible is baseline_residual.score_eligible
+    assert notice in residual.notices
+    assert any(
+        row["kind"] == "admission_defaulted"
+        for row in residual_to_plain(residual)["notices"]
+    )
+
+
 def test_solved_effusion_lifts_only_derived_oxygen_provenance_blocker() -> None:
     experiment = replace(
         F.kems_experiment(),

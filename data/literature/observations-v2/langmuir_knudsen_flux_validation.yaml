@@ -78,9 +78,14 @@ observations:
       tag: unknown
       reason: source does not state method_class
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - evaporation_coefficient_alpha
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: chromium_solid_langmuir_knudsen
   source_id: REF-040
   locator:
     note: Pound, G. M. (1972), J. Phys. Chem. Ref. Data 1, 135-146, Table 1
@@ -164,9 +169,14 @@ observations:
       tag: unknown
       reason: source does not state method_class
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - evaporation_coefficient_alpha
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: iron_olivine_kems
   source_id: REF-016
   locator:
     note: Costa & Jacobson (2015), Vaporization Studies of Olivine via Knudsen Effusion Mass Spectrometry, NASA NTRS 20150002321
@@ -248,9 +258,14 @@ observations:
       tag: unknown
       reason: source does not state method_class
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - evaporation_coefficient_alpha
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: potassium_silicate_vacuum
   source_id: REF-014
   locator:
     note: Fedkin et al. (2006), Geochim. Cosmochim. Acta 70, 206-223; value tabulated with uncertainty by Richter et al. (2011),

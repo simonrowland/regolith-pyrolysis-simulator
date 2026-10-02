@@ -77,9 +77,14 @@ observations:
       tag: unknown
       reason: source does not state method_class
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - transition_temperature
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: janaf-4th::Cr_melting_point
   source_id: janaf-4th
   locator:
     note: '{''primary'': ''Chase (1998) NIST-JANAF Cr-001: CRYSTAL LIQUID 2130.000 K'', ''url'': ''https://janaf.nist.gov/tables/Cr-001.html''}'
@@ -160,9 +165,14 @@ observations:
       tag: unknown
       reason: source does not state method_class
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - transition_temperature
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: janaf-4th::Cr_normal_boiling_point
   source_id: janaf-4th
   locator:
     note: '{''primary'': ''Chase (1998) NIST-JANAF Cr-001: LIQUID IDEAL GAS 2952.078 K'', ''url'': ''https://janaf.nist.gov/tables/Cr-001.html''}'
@@ -243,9 +253,14 @@ observations:
       tag: unknown
       reason: source does not state method_class
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - transition_temperature
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: janaf-4th::Fe_melting_point
   source_id: janaf-4th
   locator:
     note: '{''primary'': ''Chase, M.W. Jr. (1998) NIST-JANAF Thermochemical Tables, 4th ed.; Fe condensed — liquid heat-capacity
@@ -328,9 +343,14 @@ observations:
       tag: unknown
       reason: source does not state method_class
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - transition_temperature
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: janaf-4th::Fe_normal_boiling_point
   source_id: janaf-4th
   locator:
     note: '{''primary'': ''Chase (1998) NIST-JANAF Fe; boiling point from adopted thermo + ΔsubH (see JANAF Fe text); liquid
@@ -423,9 +443,14 @@ observations:
       tag: unknown
       reason: source does not state method_class
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - delta_fG
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: janaf-4th::JANAF1998_P2_formation_tabulation
   source_id: janaf-4th
   locator:
     table: P-012
@@ -522,9 +547,14 @@ observations:
       tag: unknown
       reason: source does not state method_class
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - delta_fG
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: janaf-4th::JANAF1998_P4O10_gas_formation_tabulation
   source_id: janaf-4th
   locator:
     note: Chase (1998) NIST-JANAF 4th ed., tables O-094 (cr) and O-095 (g), Phosphorus Oxide (P2O5)2 = P4O10
@@ -657,9 +687,14 @@ observations:
       tag: unknown
       reason: source does not state method_class
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - delta_fG
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: janaf-4th::JANAF1998_P4O6_formation_tabulation_UNCERTAIN
   source_id: janaf-4th
   locator:
     table: O-087
@@ -756,9 +791,14 @@ observations:
       tag: unknown
       reason: source does not state method_class
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - delta_fG
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: janaf-4th::JANAF1998_P4_formation_tabulation
   source_id: janaf-4th
   locator:
     table: P-013
@@ -863,9 +903,14 @@ observations:
       tag: unknown
       reason: source does not state method_class
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - delta_fG
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: janaf-4th::JANAF1998_PO2_formation_tabulation
   source_id: janaf-4th
   locator:
     table: O-032
@@ -970,9 +1015,14 @@ observations:
       tag: unknown
       reason: source does not state method_class
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - delta_fG
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: janaf-4th::JANAF1998_PO_formation_tabulation
   source_id: janaf-4th
   locator:
     table: O-004
@@ -1056,9 +1106,14 @@ observations:
       tag: unknown
       reason: source does not state method_class
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - transition_temperature
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: janaf-4th::KCl_melting_point
   source_id: janaf-4th
   locator:
     note: '{''primary'': ''CRC / JANAF KCl(cr,l) conventional melt ~1045 K''}'
@@ -1139,9 +1194,14 @@ observations:
       tag: unknown
       reason: source does not state method_class
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - transition_temperature
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: janaf-4th::KCl_normal_boiling_point
   source_id: janaf-4th
   locator:
     note: '{''primary'': ''Stull (1947) via NIST-WB KCl Antoine (CAS 7447-40-7); CRC bp 1420 C as in vapor_pressures.yaml'',
@@ -1223,9 +1283,14 @@ observations:
       tag: unknown
       reason: source does not state method_class
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - transition_temperature
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: janaf-4th::MgCl2_melting_point
   source_id: janaf-4th
   locator:
     note: '{''primary'': ''Chase (1998) NIST-JANAF MgCl2 table Cl-083: CRYSTAL LIQUID 950.000 K'', ''url'': ''https://janaf.nist.gov/tables/Cl-083.html''}'
@@ -1306,9 +1371,14 @@ observations:
       tag: unknown
       reason: source does not state method_class
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - transition_temperature
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: janaf-4th::Mn_melting_point
   source_id: janaf-4th
   locator:
     note: '{''primary'': ''Chase (1998) NIST-JANAF Mn-001: DELTA LIQUID 1519.000 K'', ''url'': ''https://janaf.nist.gov/tables/Mn-001.html''}'
@@ -1389,9 +1459,14 @@ observations:
       tag: unknown
       reason: source does not state method_class
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - transition_temperature
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: janaf-4th::Mn_normal_boiling_point
   source_id: janaf-4th
   locator:
     note: '{''primary'': ''Chase (1998) NIST-JANAF Mn-001: LIQUID IDEAL GAS 2334.526 K'', ''url'': ''https://janaf.nist.gov/tables/Mn-001.html''}'
@@ -1472,9 +1547,14 @@ observations:
       tag: unknown
       reason: source does not state method_class
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - transition_temperature
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: janaf-4th::NaCl_melting_point
   source_id: janaf-4th
   locator:
     note: '{''primary'': ''Chase (1998) NIST-JANAF NaCl(cr,l) — melt commonly 1073.8 K in JANAF/CRC alkali-halide assessments'',
@@ -1558,9 +1638,14 @@ observations:
       tag: unknown
       reason: source does not state method_class
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - transition_temperature
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: janaf-4th::NaCl_normal_boiling_point
   source_id: janaf-4th
   locator:
     note: '{''primary'': ''Stull, D.R. (1947) Vapor Pressure of Pure Substances — Organic Compounds, Ind. Eng. Chem. 39, 517–540
@@ -1643,9 +1728,14 @@ observations:
       tag: unknown
       reason: source does not state method_class
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - transition_temperature
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: janaf-4th::NaF_melting_point
   source_id: janaf-4th
   locator:
     note: '{''primary'': ''Chase (1998) NIST-JANAF NaF(cr,l) table F-033: CRYSTAL LIQUID at 1269.000 K (row immediately before
@@ -1727,9 +1817,14 @@ observations:
       tag: unknown
       reason: source does not state method_class
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - transition_temperature
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: janaf-4th::NaF_normal_boiling_point
   source_id: janaf-4th
   locator:
     note: '{''primary'': ''CRC normal boiling point 1704 C as retained in vapor_pressures.yaml NaF notes (interval-only identity
@@ -1811,9 +1906,14 @@ observations:
       tag: unknown
       reason: source does not state method_class
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - transition_temperature
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: janaf-4th::Na_melting_point
   source_id: janaf-4th
   locator:
     note: '{''primary'': ''Marsh, K.N. (1987) Recommended Reference Materials for the Realization of Physicochemical Properties,
@@ -1896,9 +1996,14 @@ observations:
       tag: unknown
       reason: source does not state method_class
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - transition_temperature
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: janaf-4th::Na_normal_boiling_point
   source_id: janaf-4th
   locator:
     note: '{''primary'': ''Honig & Kramer (1969) RCA Rev. 30, 285'', ''webbook'': ''NIST-WB SRD 69 Sodium: Tboil=1156 K; TRC
@@ -1980,9 +2085,14 @@ observations:
       tag: unknown
       reason: source does not state method_class
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - transition_temperature
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: janaf-4th::Na_triple_point_temperature
   source_id: janaf-4th
   locator:
     note: '{''primary'': ''Honig, R.E. & Kramer, D.A. (1969) Vapor pressure data for the solid and liquid elements, RCA Rev.
@@ -2064,9 +2174,14 @@ observations:
       tag: unknown
       reason: source does not state method_class
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - transition_temperature
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: janaf-4th::Si_melting_point
   source_id: janaf-4th
   locator:
     note: '{''primary'': ''Chase (1998) NIST-JANAF Si(cr,l) table Si-001: CRYSTAL LIQUID transition at 1685.000 K'', ''url'':
@@ -2148,9 +2263,14 @@ observations:
       tag: unknown
       reason: source does not state method_class
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - transition_temperature
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: janaf-4th::Si_normal_boiling_point
   source_id: janaf-4th
   locator:
     note: '{''primary'': ''Chase (1998) NIST-JANAF Si-001: LIQUID IDEAL GAS 3504.616 K'', ''url'': ''https://janaf.nist.gov/tables/Si-001.html''}'
@@ -2231,9 +2351,14 @@ observations:
       tag: unknown
       reason: source does not state method_class
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - transition_temperature
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: janaf-4th::Ti_melting_point
   source_id: janaf-4th
   locator:
     note: '{''primary'': ''Chase (1998) NIST-JANAF Ti-001: BETA LIQUID 1939.000 K'', ''url'': ''https://janaf.nist.gov/tables/Ti-001.html''}'
@@ -2314,9 +2439,14 @@ observations:
       tag: unknown
       reason: source does not state method_class
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - transition_temperature
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: janaf-4th::Ti_normal_boiling_point
   source_id: janaf-4th
   locator:
     note: '{''primary'': ''Chase (1998) NIST-JANAF Ti-001: LIQUID IDEAL GAS 3630.956 K'', ''url'': ''https://janaf.nist.gov/tables/Ti-001.html''}'
@@ -2397,9 +2527,14 @@ observations:
       tag: unknown
       reason: source does not state method_class
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - transition_temperature
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: janaf-4th::Ti_solid_solid_transition
   source_id: janaf-4th
   locator:
     note: '{''primary'': ''Chase (1998) NIST-JANAF Ti-001: ALPHA BETA 1166.000 K'', ''url'': ''https://janaf.nist.gov/tables/Ti-001.html''}'
