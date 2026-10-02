@@ -1301,6 +1301,76 @@ def test_pins_never_widen() -> None:
     assert_never_widen(narrower, baseline)
 
 
+def _pin_test_record(channel: str) -> PinBandRecord:
+    return PinBandRecord(
+        key=f"pin-ref::delta_fG::thermochemistry::{channel}",
+        expected_outcome=ResidualStatus.MATCH.value,
+        evidence="test",
+        centre=Decimal("1"),
+        metric_operation=MetricOperation.ABSOLUTE.value,
+        metric_unit="kJ_per_declared_mol_basis",
+        pin_band_value=Decimal("0.05"),
+        pin_band_unit="kJ_per_declared_mol_basis",
+    )
+
+
+def _pin_test_residual(value: Decimal, *, rail: Rail = Rail.THERMOCHEMISTRY):
+    return F.residual(
+        key=f"pin-ref::delta_fG::{rail.value}::internal-analytical",
+        reference="pin-ref",
+        status=ResidualStatus.MATCH,
+        rail=rail,
+        numeric=ResidualNumeric(
+            operation=MetricOperation.ABSOLUTE,
+            unit="kJ_per_declared_mol_basis",
+            value=value,
+            decision_band=None,
+        ),
+    )
+
+
+def test_pin_failures_matches_legacy_channel_by_identity() -> None:
+    failures = pin_failures(
+        [_pin_test_residual(Decimal("1.05"))],
+        [_pin_test_record("ellingham")],
+    )
+
+    assert failures == []
+
+
+def test_pin_failures_reports_unmapped_channel() -> None:
+    failures = pin_failures(
+        [_pin_test_residual(Decimal("1"))],
+        [_pin_test_record("nasa_cea_vs_ellingham")],
+    )
+
+    assert failures[0]["reason"] == "unmapped_pin_channel"
+    assert failures[0]["channel"] == "nasa_cea_vs_ellingham"
+
+
+def test_pin_failures_reports_ambiguous_matches() -> None:
+    failures = pin_failures(
+        [
+            _pin_test_residual(Decimal("1")),
+            _pin_test_residual(Decimal("1.01"), rail=Rail.VAPOUR),
+        ],
+        [_pin_test_record("ellingham")],
+    )
+
+    assert failures[0]["reason"] == "ambiguous_live_residual"
+    assert len(failures[0]["candidate_keys"]) == 2
+
+
+def test_pin_failures_rejects_outside_band_live_value() -> None:
+    failures = pin_failures(
+        [_pin_test_residual(Decimal("1.051"))],
+        [_pin_test_record("ellingham")],
+    )
+
+    assert failures[0]["reason"] == "outside_pin_band"
+    assert failures[0]["source"] == "internal-analytical"
+
+
 def test_changed_identity_preserves_tombstone() -> None:
     old = PinBandRecord(
         key="old-key",
@@ -2881,7 +2951,7 @@ def test_missing_live_result_is_coverage_failure() -> None:
     )
     failures = pin_failures([], [record])
     assert failures
-    assert failures[0]["reason"] == "coverage_failure"
+    assert failures[0]["reason"] == "no_live_residual_for_reference"
 
 
 def _stamp(**overrides) -> dict:

@@ -9,10 +9,11 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from decimal import Decimal
+from enum import StrEnum
 from pathlib import Path
-from typing import Any, Mapping, Sequence
+from typing import Any, Iterable, Mapping, Sequence
 
-from simulator.battery.enums import MetricOperation, ResidualStatus
+from simulator.battery.enums import Engine, MetricOperation, Quantity, ResidualStatus
 from simulator.battery.migrate import REPO_ROOT, load_yaml
 from simulator.battery.records import Residual, as_decimal
 
@@ -26,6 +27,37 @@ VAPOUR_PINS = REPO_ROOT / "data" / "vapour_rail_validation_pins.yaml"
 
 class PinWidenError(ValueError):
     """Raised when a pin_band would widen relative to the committed baseline."""
+
+
+class PinChannel(StrEnum):
+    INTERNAL_ANALYTICAL = "internal-analytical"
+    NASA_CEA_9 = "nasa_cea_9"
+    VAPOUR_RAIL_PSAT = "vapour_rail_psat"
+    ELLINGHAM = "ellingham"
+    NASA_CEA_VS_ELLINGHAM = "nasa_cea_vs_ellingham"
+    VAPOROCK = "vaporock"
+    MASS_SPEC = "mass_spec"
+    MELTS = "melts"
+    ALPHAMELTS = "alphamelts"
+    THERMOENGINE = "thermoengine"
+    MAGEMIN = "magemin"
+    OPENIMCC = "openimcc"
+    TABLE_SELF_CHECK = "table_self_check"
+
+
+# The legacy Ellingham calculation now runs under internal-analytical; current
+# engine channels keep their names. The old CEA and vapour-rail producers,
+# pairwise diagnostics, measurement methods, unprobed MELTS channel, and table
+# self-checks have no one-to-one alias in the live engine table.
+PIN_CHANNEL_ENGINES: Mapping[PinChannel, Engine] = {
+    PinChannel.INTERNAL_ANALYTICAL: Engine.INTERNAL_ANALYTICAL,
+    PinChannel.ELLINGHAM: Engine.INTERNAL_ANALYTICAL,
+    PinChannel.VAPOROCK: Engine.VAPOROCK,
+    PinChannel.ALPHAMELTS: Engine.ALPHAMELTS,
+    PinChannel.THERMOENGINE: Engine.THERMOENGINE,
+    PinChannel.MAGEMIN: Engine.MAGEMIN,
+    PinChannel.OPENIMCC: Engine.OPENIMCC,
+}
 
 
 @dataclass(frozen=True)
@@ -167,70 +199,274 @@ def pin_failures(
     Missing live result for a non-tombstone pin is a coverage failure.
     """
 
-    by_key: dict[str, Residual] = {}
-    for residual in residuals:
-        by_key[residual.key] = residual
-    failures: list[dict[str, Any]] = []
+    return _pin_failures_from_live(records, residuals)
+
+
+@dataclass(frozen=True)
+class _PinLiveResidual:
+    key: str
+    reference: str
+    quantity: Quantity | None
+    engine: Engine | None
+    status: ResidualStatus
+    value: Decimal | None
+    source_relation: str | None
+    call_evidence: str | None
+
+
+def _pin_live_residual(row: Residual | Mapping[str, object]) -> _PinLiveResidual | None:
+    if isinstance(row, Residual):
+        key = row.key
+        reference = row.reference
+        status = row.status
+        value = live_numeric(row)
+        request = row.candidate_request
+        quantity_fallback = None if request is None else request.quantity
+        engine_fallback = None if request is None else request.engine
+        source_relation = row.source_relation.value
+        call_evidence = row.execution.call_evidence
+    else:
+        key = str(row.get("key") or "")
+        reference = str(row.get("reference") or "")
+        if not key or not reference:
+            return None
+        status = ResidualStatus(str(row.get("status") or ""))
+        numeric = row.get("numeric")
+        value = (
+            as_decimal(numeric["value"])
+            if isinstance(numeric, Mapping) and numeric.get("value") is not None
+            else None
+        )
+        request = row.get("candidate_request")
+        quantity_fallback = None
+        engine_fallback = None
+        if isinstance(request, Mapping):
+            try:
+                quantity_fallback = Quantity(str(request.get("quantity") or ""))
+            except ValueError:
+                pass
+            try:
+                engine_fallback = Engine(str(request.get("engine") or ""))
+            except ValueError:
+                pass
+        relation = row.get("source_relation")
+        source_relation = None if relation is None else str(relation)
+        execution = row.get("execution")
+        evidence = execution.get("call_evidence") if isinstance(execution, Mapping) else None
+        call_evidence = None if evidence is None else str(evidence)
+
+    parts = key.rsplit("::", 3)
+    quantity: Quantity | None = None
+    engine: Engine | None = None
+    if len(parts) == 4:
+        try:
+            quantity = Quantity(parts[1])
+        except ValueError:
+            pass
+        try:
+            engine = Engine(parts[3])
+        except ValueError:
+            pass
+    return _PinLiveResidual(
+        key=key,
+        reference=reference,
+        quantity=quantity or quantity_fallback,
+        engine=engine or engine_fallback,
+        status=status,
+        value=value,
+        source_relation=source_relation,
+        call_evidence=call_evidence,
+    )
+
+
+def _pin_channel_engine(token: str | None) -> Engine | None:
+    if token is None:
+        return None
+    try:
+        channel = PinChannel(token)
+    except ValueError:
+        return None
+    return PIN_CHANNEL_ENGINES.get(channel)
+
+
+def _pin_failures_from_payloads(
+    rows: Iterable[Mapping[str, object]],
+    records: Sequence[PinBandRecord],
+    *,
+    comparisons: list[dict[str, str]] | None = None,
+) -> list[dict[str, Any]]:
+    """Check streamed residual payloads without requiring a score rerun."""
+
+    return _pin_failures_from_live(records, rows, comparisons=comparisons)
+
+
+def _pin_failures_from_live(
+    records: Sequence[PinBandRecord],
+    rows: Iterable[Residual | Mapping[str, object]],
+    *,
+    comparisons: list[dict[str, str]] | None = None,
+) -> list[dict[str, Any]]:
+    """Join pins by reference, quantity, and an explicitly mapped engine."""
+
+    pins: list[
+        tuple[
+            PinBandRecord,
+            frozenset[str],
+            Quantity | None,
+            str | None,
+            Engine | None,
+            str | None,
+        ]
+    ] = []
+    wanted_references: set[str] = set()
     for record in records:
-        live = by_key.get(record.key)
-        if live is None:
-            for alias in record.aliases:
-                live = by_key.get(alias)
-                if live is not None:
-                    break
         if record.tombstone:
             continue
-        if live is None:
+        parts = record.key.rsplit("::", 3)
+        if len(parts) == 4:
+            reference, quantity_token, _rail, channel = parts
+            try:
+                quantity = Quantity(quantity_token)
+            except ValueError:
+                quantity = None
+        else:
+            reference = ""
+            quantity = None
+            channel = None
+        references = frozenset(
+            item
+            for item in (reference, *record.aliases, record.old_key)
+            if item
+        )
+        engine = _pin_channel_engine(channel)
+        pins.append((record, references, quantity, channel, engine, reference or None))
+        wanted_references.update(references)
+
+    by_reference: dict[str, int] = {}
+    by_identity: dict[tuple[str, Quantity, Engine], list[_PinLiveResidual]] = {}
+    for row in rows:
+        live = _pin_live_residual(row)
+        if live is None or live.reference not in wanted_references:
+            continue
+        by_reference[live.reference] = by_reference.get(live.reference, 0) + 1
+        if live.quantity is None or live.engine is None:
+            continue
+        by_identity.setdefault((live.reference, live.quantity, live.engine), []).append(live)
+
+    failures: list[dict[str, Any]] = []
+    for record, references, quantity, channel, engine, reference in pins:
+        base = {
+            "key": record.key,
+            "reference": reference,
+            "centre": None if record.centre is None else str(record.centre),
+            "pin_band": None
+            if record.pin_band_value is None
+            else str(record.pin_band_value),
+            "channel": channel,
+            "quantity": None if quantity is None else quantity.value,
+        }
+        reference_present = any(by_reference.get(reference, 0) for reference in references)
+        if not reference_present:
             failures.append(
                 {
-                    "key": record.key,
-                    "reason": "coverage_failure",
+                    **base,
+                    "reason": "no_live_residual_for_reference",
+                    "channel_status": "unmapped pin channel" if engine is None else "mapped",
+                    "reference_present": False,
                     "live": None,
-                    "centre": None if record.centre is None else str(record.centre),
-                    "pin_band": None
-                    if record.pin_band_value is None
-                    else str(record.pin_band_value),
                 }
             )
             continue
+        if engine is None:
+            failures.append(
+                {
+                    **base,
+                    "reason": "unmapped_pin_channel",
+                    "channel_status": "unmapped pin channel",
+                    "live": None,
+                }
+            )
+            continue
+        if quantity is None:
+            failures.append(
+                {
+                    **base,
+                    "reason": "no_live_residual_for_reference",
+                    "channel_status": "mapped",
+                    "match_detail": "unrecognized_pin_quantity",
+                    "live": None,
+                }
+            )
+            continue
+        matches: list[_PinLiveResidual] = []
+        for reference in references:
+            matches.extend(by_identity.get((reference, quantity, engine), ()))
+        if not matches:
+            failures.append(
+                {
+                    **base,
+                    "reason": "no_live_residual_for_reference",
+                    "channel_status": "mapped",
+                    "reference_present": True,
+                    "live": None,
+                }
+            )
+            continue
+        if len(matches) != 1:
+            failures.append(
+                {
+                    **base,
+                    "reason": "ambiguous_live_residual",
+                    "channel_status": "mapped",
+                    "live": None,
+                    "candidate_keys": [live.key for live in matches],
+                }
+            )
+            continue
+        live = matches[0]
         if live.status.value != record.expected_outcome:
             if record.expected_outcome == ResidualStatus.REFUSED.value:
                 if live.status is ResidualStatus.REFUSED:
                     continue
                 failures.append(
                     {
-                        "key": record.key,
+                        **base,
                         "reason": "expected_refusal_resurrected",
                         "live": live.status.value,
-                        "centre": None if record.centre is None else str(record.centre),
-                        "pin_band": None
-                        if record.pin_band_value is None
-                        else str(record.pin_band_value),
+                        "source": live.engine.value,
                     }
                 )
                 continue
         if record.centre is None or record.pin_band_value is None:
             continue
-        value = live_numeric(live)
-        if value is None:
+        if live.value is None:
             failures.append(
                 {
-                    "key": record.key,
+                    **base,
                     "reason": "coverage_failure",
+                    "coverage_reason": "live_numeric_missing",
                     "live": live.status.value,
-                    "centre": str(record.centre),
-                    "pin_band": str(record.pin_band_value),
+                    "source": live.engine.value,
                 }
             )
             continue
-        if abs(value - record.centre) > record.pin_band_value:
+        comparison = {
+            "key": record.key,
+            "centre": str(record.centre),
+            "pin_band": str(record.pin_band_value),
+            "live": str(live.value),
+            "source": live.engine.value,
+            "source_relation": live.source_relation or "unknown",
+            "call_evidence": live.call_evidence or "",
+        }
+        if comparisons is not None:
+            comparisons.append(comparison)
+        if abs(live.value - record.centre) > record.pin_band_value:
             failures.append(
                 {
-                    "key": record.key,
+                    **base,
                     "reason": "outside_pin_band",
-                    "live": str(value),
-                    "centre": str(record.centre),
-                    "pin_band": str(record.pin_band_value),
+                    **{key: value for key, value in comparison.items() if key != "key"},
                 }
             )
     return failures
