@@ -77,9 +77,14 @@ observations:
     original_method_class: model_derived
     model: model_derived
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - p_partial
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: jaggi-2021-mercury-atmosphere::jaggi_2021_table1_h2_partial_pressure::T=2000:row=lv:h=08abb7cbaf57
   source_id: jaggi-2021-mercury-atmosphere
   locator:
     published_page: 4
@@ -198,9 +203,14 @@ observations:
     original_method_class: model_derived
     model: model_derived
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - p_partial
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: jaggi-2021-mercury-atmosphere::jaggi_2021_table1_h2_partial_pressure::T=2000:row=sv:h=a9364a9943c4
   source_id: jaggi-2021-mercury-atmosphere
   locator:
     published_page: 4
@@ -319,9 +329,14 @@ observations:
     original_method_class: model_derived
     model: model_derived
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - p_partial
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: jaggi-2021-mercury-atmosphere::jaggi_2021_table1_sio_partial_pressure::T=2000:row=ln3:h=3f7010acaf9c
   source_id: jaggi-2021-mercury-atmosphere
   locator:
     published_page: 4
@@ -440,9 +455,14 @@ observations:
     original_method_class: model_derived
     model: model_derived
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - p_partial
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: jaggi-2021-mercury-atmosphere::jaggi_2021_table1_sio_partial_pressure::T=2000:row=ln5:h=621b1346e428
   source_id: jaggi-2021-mercury-atmosphere
   locator:
     published_page: 4
@@ -561,9 +581,14 @@ observations:
     original_method_class: model_derived
     model: model_derived
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - p_partial
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: jaggi-2021-mercury-atmosphere::jaggi_2021_table1_sio_partial_pressure::T=2000:row=sn3:h=87cb8d50abe0
   source_id: jaggi-2021-mercury-atmosphere
   locator:
     published_page: 4
@@ -682,9 +707,14 @@ observations:
     original_method_class: model_derived
     model: model_derived
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - p_partial
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: jaggi-2021-mercury-atmosphere::jaggi_2021_table1_sio_partial_pressure::T=2000:row=sn5:h=3d462b42da42
   source_id: jaggi-2021-mercury-atmosphere
   locator:
     published_page: 4

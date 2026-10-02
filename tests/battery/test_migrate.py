@@ -703,19 +703,99 @@ def test_series_row_point_conditions_preserve_pressure_interval(tmp_path: Path) 
     assert pressure.state.value.interval_high == as_decimal("20")
 
 
-def test_no_default_property_blanked_admission_is_unknown(tmp_path: Path) -> None:
+def test_missing_admission_status_defaults_with_notice_even_when_class_unknown(
+    tmp_path: Path,
+) -> None:
     extract = yaml.safe_load(yaml.safe_dump(FIXTURE_EXTRACT))
     extract["species"]["Na"]["observations"][0]["values"].pop("admission_status")
     extract["species"]["Na"]["observations"][0]["values"].pop("method_class")
     root = _write_min_tree(tmp_path, extract)
     result = migrate(root, write=False)
     obs = next(iter(result.observations.values()))
-    assert obs.admission.status is AdmissionStatus.PENDING
-    assert obs.admission.reason == "no observation admission_status mapped from source"
+    assert obs.admission.status is AdmissionStatus.ADMITTED
+    admission_notice = next(
+        notice
+        for notice in obs.notices
+        if notice.kind is NoticeKind.ADMISSION_DEFAULTED
+    )
+    assert "not a reviewer decision" in admission_notice.reason
+    assert admission_notice.origin == obs.observation_id
     assert obs.evidence.class_.tag is StateTag.UNKNOWN
     # Phase was stated as gas — that is a lift, not a default.
     assert obs.identity.species.phase.is_value
     assert obs.identity.species.phase.value is Phase.G
+
+
+def test_missing_admission_status_keeps_unmeasured_row_pending(tmp_path: Path) -> None:
+    extract = yaml.safe_load(yaml.safe_dump(FIXTURE_EXTRACT))
+    values = extract["species"]["Na"]["observations"][0]["values"]
+    values.pop("admission_status")
+    values.pop("series")
+    values["method_class"] = "figure_only"
+    root = _write_min_tree(tmp_path, extract)
+
+    observation = next(iter(migrate(root, write=False).observations.values()))
+
+    assert observation.value.kind is ValueKind.UNAVAILABLE
+    assert observation.admission.status is AdmissionStatus.PENDING
+    assert not any(
+        notice.kind is NoticeKind.ADMISSION_DEFAULTED
+        for notice in observation.notices
+    )
+
+
+@pytest.mark.parametrize(
+    ("source_status", "expected_status", "defaulted"),
+    [
+        ("pending", AdmissionStatus.ADMITTED, True),
+        ("pending_validation", AdmissionStatus.ADMITTED, True),
+        ("figure_only", AdmissionStatus.PENDING, False),
+        ("model_output_not_measurement", AdmissionStatus.PENDING, False),
+        (
+            "rejected_model_output_not_measurement",
+            AdmissionStatus.REJECTED,
+            False,
+        ),
+        ("admitted", AdmissionStatus.ADMITTED, False),
+    ],
+)
+def test_source_admission_default_scope(
+    tmp_path: Path,
+    source_status: str,
+    expected_status: AdmissionStatus,
+    defaulted: bool,
+) -> None:
+    extract = yaml.safe_load(yaml.safe_dump(FIXTURE_EXTRACT))
+    extract["species"]["Na"]["observations"][0]["values"][
+        "admission_status"
+    ] = source_status
+    root = _write_min_tree(tmp_path, extract)
+    result = migrate(root, write=False)
+    obs = next(iter(result.observations.values()))
+
+    assert obs.admission.status is expected_status
+    assert any(
+        notice.kind is NoticeKind.ADMISSION_DEFAULTED for notice in obs.notices
+    ) is defaulted
+
+
+def test_plain_pending_without_source_decision_defaults_and_adds_notice(
+    tmp_path: Path,
+) -> None:
+    from simulator.battery.migrate import observation_from_plain
+
+    result = migrate(_write_min_tree(tmp_path), write=False)
+    observation = next(iter(result.observations.values()))
+    payload = to_plain(observation)
+    payload["admission"] = {"reason": "no observation admission_status mapped from source"}
+    payload["notices"] = []
+
+    decoded = observation_from_plain(payload)
+
+    assert decoded.admission.status is AdmissionStatus.ADMITTED
+    assert any(
+        notice.kind is NoticeKind.ADMISSION_DEFAULTED for notice in decoded.notices
+    )
 
 
 def test_h07_write_outputs_prunes_stale_work_files(tmp_path: Path) -> None:
@@ -876,6 +956,14 @@ def test_validate_corpus_zero_hard_issues_on_migrated_store() -> None:
     works, experiments, observations = load_migrated_store(REPO_ROOT)
     assert works
     assert observations
+    figure_only = observations[
+        "1997jonesthermo::jones_1997_imcc_mgo_activity_comparison"
+    ]
+    assert figure_only.admission.status is AdmissionStatus.PENDING
+    assert not any(
+        notice.kind is NoticeKind.ADMISSION_DEFAULTED
+        for notice in figure_only.notices
+    )
     report = validate_corpus(works, experiments, observations, residuals=None)
     # J02 restored C(derived) derived_from+derivation. Unstated ancestry is a
     # hard conditional_field, not a silent pass. Other reasons must stay zero.
@@ -7032,8 +7120,8 @@ def test_store_pyrolysis_yield_census_is_honest() -> None:
     assert len(candidates) == 26
     admitted = [o for o in candidates if o.admission.status is AdmissionStatus.ADMITTED]
     pending = [o for o in candidates if o.admission.status is AdmissionStatus.PENDING]
-    assert len(admitted) == 18
-    assert len(pending) == 8
+    assert len(admitted) == 22
+    assert len(pending) == 4
     disagreed = [
         o
         for o in pending
@@ -7069,8 +7157,10 @@ def test_vacuum_pyrolysis_sidecar_loads_pomeroy_not_robinot_duplicates(
     assert pomeroy.value.kind is ValueKind.POINT
     assert pomeroy.value.point == as_decimal("0.0117")
     assert float(pomeroy.identity.temperature_K.value) == 1400.0 + 273.15
-    assert pomeroy.admission.status is AdmissionStatus.PENDING
-    assert "sample mass" in pomeroy.admission.reason or "not reported" in pomeroy.admission.reason or pomeroy.admission.reason.startswith("no observation admission_status")
+    assert pomeroy.admission.status is AdmissionStatus.ADMITTED
+    assert any(
+        notice.kind is NoticeKind.ADMISSION_DEFAULTED for notice in pomeroy.notices
+    )
     work = result.works[result.experiments[pomeroy.experiment_id].work_id]
     asset_ids = {f.asset_id for f in work.source_files.files}
     assert pomeroy.read_from in asset_ids

@@ -81,9 +81,14 @@ observations:
       reason: unmapped regime 'kems_effusion'
     original_method_class: kems_effusion
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - evaporation_coefficient_alpha
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: costa-jacobson-2015::costa_jacobson_2015_fe_olivine_kems
   source_id: costa-jacobson-2015
   locator:
     note: Costa, G. C. C. & Jacobson, N. S. (2015), Vaporization Studies of Olivine via Knudsen Effusion Mass Spectrometry,
@@ -170,9 +175,14 @@ observations:
       reason: unmapped regime 'kems_effusion'
     original_method_class: kems_effusion
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - evaporation_coefficient_alpha
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: costa-jacobson-2015::costa_jacobson_2015_sio_olivine_kems
   source_id: costa-jacobson-2015
   locator:
     note: Costa & Jacobson (2015) NASA NTRS 20150002321; D(SiO+) plot band ~0.01-0.04 class (prior runtime cross-check REF-016)

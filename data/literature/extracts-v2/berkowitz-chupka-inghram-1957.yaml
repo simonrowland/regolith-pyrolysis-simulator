@@ -75,9 +75,14 @@ observations:
       tag: unknown
       reason: source does not state method_class
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - p_sat
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: berkowitz-chupka-inghram-1957::BIC57_VO_absolute_points::T=1875:h=b846f134213c
   source_id: berkowitz-chupka-inghram-1957
   locator:
     note: BIC57_VO_absolute_points
@@ -170,9 +175,14 @@ observations:
       tag: unknown
       reason: source does not state method_class
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - p_sat
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: berkowitz-chupka-inghram-1957::BIC57_VO_absolute_points::T=1876:h=0ec759b19020
   source_id: berkowitz-chupka-inghram-1957
   locator:
     note: BIC57_VO_absolute_points

@@ -9,7 +9,13 @@ import yaml
 
 from simulator.battery import migrate as M
 from simulator.battery.consumer_inputs import collect_consumer_inputs
-from simulator.battery.enums import AdmissionStatus, EvidenceClass, Quantity, RefusalReason
+from simulator.battery.enums import (
+    AdmissionStatus,
+    EvidenceClass,
+    NoticeKind,
+    Quantity,
+    RefusalReason,
+)
 from simulator.battery.generators.bench import engine_point_requests
 from simulator.battery.waypoints import GapReason, charge_moles_by_species, normalized_composition
 from tests.battery import factories as F
@@ -146,8 +152,16 @@ def test_root_evidence_and_input_admission_remain_separate(tmp_path, method, sta
     child = _row("child", parents=["root"])
     result = _migrate(tmp_path, [child, root, parent])
     assert _child(result, "root").evidence.class_.value is EvidenceClass.MEASURED_REDUCED
-    assert _child(result, "root").admission.status.value == status
-    assert _child(result).evidence.class_.is_unknown
+    expected_admission = "admitted" if status == "pending" else status
+    assert _child(result, "root").admission.status.value == expected_admission
+    if status == "pending":
+        assert any(
+            notice.kind is NoticeKind.ADMISSION_DEFAULTED
+            for notice in _child(result, "root").notices
+        )
+        assert _child(result).evidence.class_.value is EvidenceClass.MEASURED_REDUCED
+    else:
+        assert _child(result).evidence.class_.is_unknown
     assert not result.validation.hard_issues
 
 
@@ -230,7 +244,7 @@ def test_every_reduced_ancestor_must_pass_admission(tmp_path, method, parent_sta
     child = _row("child", parents=[middle_id])
     result = _migrate(tmp_path / "run", [child, middle, parent])
     evidence = _child(result).evidence.class_
-    if parent_status == "admitted":
+    if parent_status in {"admitted", "pending"}:
         assert evidence.value is EvidenceClass.MEASURED_REDUCED
         assert not result.validation.hard_issues
     else:

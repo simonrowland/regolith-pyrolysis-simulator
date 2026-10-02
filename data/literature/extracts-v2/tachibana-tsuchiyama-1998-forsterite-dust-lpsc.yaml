@@ -198,9 +198,14 @@ observations:
       reason: unmapped method_class author_estimate
     original_method_class: author_estimate
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - evaporation_coefficient_alpha
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: tachibana-tsuchiyama-1998-forsterite-dust-lpsc::tachibana_1998_forsterite_hbd_alpha_assumption
   source_id: tachibana-tsuchiyama-1998-forsterite-dust-lpsc
   locator:
     page: 1
@@ -368,9 +373,14 @@ observations:
       reason: unmapped method_class quoted_attributed
     original_method_class: quoted_attributed
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - evaporation_coefficient_alpha
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: tachibana-tsuchiyama-1998-forsterite-dust-lpsc::tachibana_1998_forsterite_prior_experiment_alpha_constraint
   source_id: tachibana-tsuchiyama-1998-forsterite-dust-lpsc
   locator:
     page: 1

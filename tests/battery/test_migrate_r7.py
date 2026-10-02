@@ -331,9 +331,8 @@ def test_g1_unmapped_series_does_not_deny_numbers():
 def test_g2_plante_source_points_and_comparison_fence(tmp_path):
     """Plante fence is the admission split, not a single p_partial count.
 
-    162 superseded parents, 162 admitted homogeneous successors, and 59
-    superscript-a rows stay pending. Changing the total from 221 to 383
-    does not by itself keep the 59 pending.
+    162 superseded parents, 162 source-admitted homogeneous successors, and
+    59 superscript-a rows default to admitted while retaining their notice.
     """
 
     root = _write_min_tree(tmp_path)
@@ -344,10 +343,20 @@ def test_g2_plante_source_points_and_comparison_fence(tmp_path):
     buckets: dict[str, list] = {}
     for obs in measured:
         buckets.setdefault(obs.admission.status.value, []).append(obs)
-    assert set(buckets) == {"admitted", "pending", "superseded"}
+    assert set(buckets) == {"admitted", "superseded"}
     assert len(buckets["superseded"]) == 162
-    assert len(buckets["admitted"]) == 162
-    assert len(buckets["pending"]) == 59
+    assert len(buckets["admitted"]) == 221
+    defaulted = [
+        observation
+        for observation in buckets["admitted"]
+        if any(notice.kind is NoticeKind.ADMISSION_DEFAULTED for notice in observation.notices)
+    ]
+    assert len(defaulted) == 59
+    assert all(
+        not any(notice.kind is NoticeKind.ADMISSION_DEFAULTED for notice in observation.notices)
+        for observation in buckets["superseded"]
+    )
+    assert all(not observation.notices for observation in buckets["superseded"])
     assert len(measured) == 383
     assert all(
         observation.identity.species.phase.is_value
@@ -372,11 +381,11 @@ def test_g2_plante_source_points_and_comparison_fence(tmp_path):
     bulk_band = "two_phase_bulk_composition_not_liquid_composition"
     assert sum(
         any(notice.band == bulk_band for notice in observation.notices)
-        for observation in buckets["pending"]
+        for observation in defaulted
     ) == 59
     assert all(
         any(notice.band == bulk_band for notice in observation.notices)
-        for observation in buckets["pending"]
+        for observation in defaulted
         if "s1214_r" in observation.observation_id
     )
     assert all(o.value.kind is ValueKind.POINT and o.value.point is not None for o in measured)
@@ -384,6 +393,8 @@ def test_g2_plante_source_points_and_comparison_fence(tmp_path):
     factor = Decimal("0.226")
     tolerance = Decimal("1e-12")
     for obs in buckets["admitted"]:
+        if obs in defaulted:
+            continue
         composition = obs.identity.composition
         assert composition is not None and composition.is_value and composition.value is not None
         assert {oxide for oxide, _amount in composition.value.components} == {"K2O", "SiO2"}
@@ -407,9 +418,14 @@ def test_g2_plante_source_points_and_comparison_fence(tmp_path):
         assert obs.derivation is not None
         assert "P_K = k_K I_K+ T" in obs.derivation.relation
         assert "sqrt(T)" not in obs.derivation.relation
-    assert len([obs for obs in buckets["pending"] if "s1214" in obs.observation_id]) == 37
-    for obs in buckets["pending"]:
-        assert obs.admission.status.value == "pending"
+    assert len([obs for obs in defaulted if "s1214" in obs.observation_id]) == 37
+    for obs in defaulted:
+        assert obs.admission.status.value == "admitted"
+        assert any(notice.kind is NoticeKind.ADMISSION_DEFAULTED for notice in obs.notices)
+        assert any(
+            notice.kind is NoticeKind.PRESSURE_PROVENANCE_UNKNOWN
+            for notice in obs.notices
+        )
         composition = obs.identity.composition
         assert composition is None or not composition.is_value
         fo2 = obs.identity.fO2_Pa
@@ -445,7 +461,11 @@ def test_g2_plante_source_points_and_comparison_fence(tmp_path):
             if "s1123" in oid:
                 assert source["values"]["composition_K2O_wt_percent_as_published"] == 21.14
             assert any(source["values"]["reason"] in n.reason for n in obs.notices)
-            assert obs.admission.status.value == "pending"
+            assert obs.admission.status.value == "admitted"
+            assert any(
+                notice.kind is NoticeKind.ADMISSION_DEFAULTED
+                for notice in obs.notices
+            )
         else:
             assert obs.admission.status.value == "admitted"
             assert obs.identity.fO2_Pa.is_value
@@ -461,6 +481,10 @@ def test_g2_plante_partial_pressure_identity_axes_are_source_grounded(tmp_path):
         if observation.source_id == "kems-042-plante-1979"
         and quantity_token(observation.identity) is Quantity.P_PARTIAL
         and observation.admission.status.value == "admitted"
+        and not any(
+            notice.kind is NoticeKind.ADMISSION_DEFAULTED
+            for notice in observation.notices
+        )
     ]
     assert len(rows) == 162
     for observation in rows:
@@ -767,7 +791,7 @@ def test_g1_unmapped_composition_and_nested_admission_are_not_absent(tmp_path):
         "schaefer-and-fegley-2007-icarus-outgassing-of-oc::schaefer_2007_table2_h_solid_solutions"
     ):
         assert schaefer.admission.status.value == "pending"
-        assert schaefer.admission.reason == "no observation admission_status mapped from source"
+        assert not any(notice.kind is NoticeKind.ADMISSION_DEFAULTED for notice in schaefer.notices)
 
 
 def _leaves(value, prefix=""):

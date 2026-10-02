@@ -198,6 +198,8 @@ class NoticeKind(StrEnum):
     COMPOSITION_FROM_SAMPLE_CATALOG = "composition_from_sample_catalog"
     IMCC_COMPLEX_SATURATION = "imcc_complex_saturation"
     REFERENCE_PHASE_BY_CONVENTION = "reference_phase_by_convention"
+    # Extract omitted admission or said pending/pending_validation; d-056 admits by default, not a reviewer decision.
+    ADMISSION_DEFAULTED = "admission_defaulted"
 
 
 class ReferenceStateConvention(StrEnum):

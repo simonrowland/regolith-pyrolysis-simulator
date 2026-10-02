@@ -6507,9 +6507,14 @@ observations:
       value: measured_reduced
     original_method_class: directly_reduced_measurement
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - evaporation_coefficient_alpha
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: wimpenny-2019-zn-isotope-evaporation-extreme-t::wimpenny_2019_zn_fractionation_summary
   source_id: wimpenny-2019-zn-isotope-evaporation-extreme-t
   locator:
     published_page: 24
@@ -6593,9 +6598,14 @@ observations:
     original_method_class: model_derived
     model: model_derived
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - evaporation_coefficient_alpha
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: wimpenny-2019-zn-isotope-evaporation-extreme-t::wimpenny_2019_zn_kinetic_theory_and_pressure_model
   source_id: wimpenny-2019-zn-isotope-evaporation-extreme-t
   locator:
     published_page: 18

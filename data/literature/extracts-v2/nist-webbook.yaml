@@ -77,9 +77,14 @@ observations:
       tag: unknown
       reason: source does not state method_class
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - transition_temperature
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: nist-webbook::Al_melting_point
   source_id: nist-webbook
   locator:
     note: '{''primary'': ''Anonymous (1988) catalog fixed-point value via TRC; NIST-WB Aluminum Tfus'', ''webbook'': ''NIST-WB
@@ -161,9 +166,14 @@ observations:
       tag: unknown
       reason: source does not state method_class
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - transition_temperature
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: nist-webbook::Al_normal_boiling_point
   source_id: nist-webbook
   locator:
     note: '{''primary'': ''Honig & Kramer (1969) RCA Rev. 30, 285'', ''webbook'': ''NIST-WB Aluminum: Tboil=2793 K; TRC u=4
@@ -245,9 +255,14 @@ observations:
       tag: unknown
       reason: source does not state method_class
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - transition_temperature
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: nist-webbook::Al_triple_point_temperature
   source_id: nist-webbook
   locator:
     note: '{''primary'': ''Honig & Kramer (1969) RCA Rev. 30, 285'', ''webbook'': ''NIST-WB Aluminum: Ttriple=933.25 K; TRC
@@ -329,9 +344,14 @@ observations:
       tag: unknown
       reason: source does not state method_class
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - transition_temperature
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: nist-webbook::Br2_melting_point
   source_id: nist-webbook
   locator:
     note: '{''primary'': ''Weber (1912) via NIST-WB Bromine Tfus=266.0 K'', ''url'': ''https://webbook.nist.gov/cgi/cbook.cgi?ID=C7726956&Units=SI&Mask=4''}'
@@ -412,9 +432,14 @@ observations:
       tag: unknown
       reason: source does not state method_class
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - transition_temperature
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: nist-webbook::CH4_melting_point
   source_id: nist-webbook
   locator:
     note: '{''primary'': ''Streng (1971) via NIST-WB Methane Tfus=85.7 K; TRC u=0.3 K class'', ''url'': ''https://webbook.nist.gov/cgi/cbook.cgi?ID=C74828&Units=SI&Mask=4''}'
@@ -495,9 +520,14 @@ observations:
       tag: unknown
       reason: source does not state method_class
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - transition_temperature
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: nist-webbook::CO2_triple_point_temperature
   source_id: nist-webbook
   locator:
     note: '{''primary'': ''Marsh (1987) recommended fixed point; NIST-WB CO2 Ttriple=216.58 K; TRC u=0.008 K'', ''secondary'':
@@ -579,9 +609,14 @@ observations:
       tag: unknown
       reason: source does not state method_class
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - transition_temperature
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: nist-webbook::CO_normal_boiling_point
   source_id: nist-webbook
   locator:
     note: '{''primary'': ''Mullins, Kirk et al. (1963) via NIST-WB CO Tboil=81.63 K'', ''url'': ''https://webbook.nist.gov/cgi/cbook.cgi?ID=C630080&Units=SI&Mask=4''}'
@@ -662,9 +697,14 @@ observations:
       tag: unknown
       reason: source does not state method_class
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - transition_temperature
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: nist-webbook::CO_triple_point_temperature
   source_id: nist-webbook
   locator:
     note: '{''primary'': ''Gill & Morrison (1966) via NIST-WB CO Ttriple=67.95 K''}'
@@ -745,9 +785,14 @@ observations:
       tag: unknown
       reason: source does not state method_class
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - transition_temperature
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: nist-webbook::Ca_melting_point
   source_id: nist-webbook
   locator:
     note: '{''primary'': ''Honig & Kramer (1969) via NIST-WB Calcium''}'
@@ -828,9 +873,14 @@ observations:
       tag: unknown
       reason: source does not state method_class
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - transition_temperature
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: nist-webbook::Ca_normal_boiling_point
   source_id: nist-webbook
   locator:
     note: '{''primary'': ''Honig & Kramer (1969) RCA Rev. 30, 285'', ''webbook'': ''NIST-WB Calcium: Tboil=1757 K; TRC u=2
@@ -912,9 +962,14 @@ observations:
       tag: unknown
       reason: source does not state method_class
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - transition_temperature
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: nist-webbook::Ca_triple_point_temperature
   source_id: nist-webbook
   locator:
     note: '{''primary'': ''Honig & Kramer (1969) RCA Rev. 30, 285'', ''webbook'': ''NIST-WB SRD 69 Calcium (CAS 7440-70-2):
@@ -996,9 +1051,14 @@ observations:
       tag: unknown
       reason: source does not state method_class
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - transition_temperature
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: nist-webbook::Cl2_normal_boiling_point
   source_id: nist-webbook
   locator:
     note: '{''primary'': ''Thiele & Schulte (1920) via NIST-WB Cl2 Tboil=239.5 K; TRC u=0.6 K'', ''url'': ''https://webbook.nist.gov/cgi/cbook.cgi?ID=C7782505&Units=SI&Mask=4''}'
@@ -1079,9 +1139,14 @@ observations:
       tag: unknown
       reason: source does not state method_class
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - transition_temperature
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: nist-webbook::Cl2_triple_point_temperature
   source_id: nist-webbook
   locator:
     note: '{''primary'': ''Angus, Armstrong et al. (1984) IUPAC Cl2 tables via NIST-WB; u=0.05 K''}'
@@ -1162,9 +1227,14 @@ observations:
       tag: unknown
       reason: source does not state method_class
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - transition_temperature
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: nist-webbook::H2O_melting_point
   source_id: nist-webbook
   locator:
     note: '{''primary'': ''ITS-90 ice point definition at 101325 Pa''}'
@@ -1245,9 +1315,14 @@ observations:
       tag: unknown
       reason: source does not state method_class
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - transition_temperature
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: nist-webbook::H2O_normal_boiling_point
   source_id: nist-webbook
   locator:
     note: '{''primary'': ''IAPWS-95 / ITS-90 liquid–vapor saturation at 101325 Pa (modern value slightly below 100 C)'', ''note'':
@@ -1329,9 +1404,14 @@ observations:
       tag: unknown
       reason: source does not state method_class
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - transition_temperature
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: nist-webbook::H2O_triple_point_temperature
   source_id: nist-webbook
   locator:
     note: '{''primary'': ''ITS-90 definition of the triple point of water (fixed point)'', ''secondary'': ''Feistel & Wagner
@@ -1413,9 +1493,14 @@ observations:
       tag: unknown
       reason: source does not state method_class
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - transition_temperature
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: nist-webbook::H2S_melting_point
   source_id: nist-webbook
   locator:
     note: '{''primary'': ''Beckmann & Waentig (1910) via NIST-WB H2S Tfus=190.85 K'', ''url'': ''https://webbook.nist.gov/cgi/cbook.cgi?ID=C7783064&Units=SI&Mask=4''}'
@@ -1496,9 +1581,14 @@ observations:
       tag: unknown
       reason: source does not state method_class
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - transition_temperature
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: nist-webbook::H2S_normal_boiling_point
   source_id: nist-webbook
   locator:
     note: '{''primary'': ''Goodwin (1983) via NIST-WB H2S Tboil=212.87 K''}'
@@ -1579,9 +1669,14 @@ observations:
       tag: unknown
       reason: source does not state method_class
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - transition_temperature
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: nist-webbook::H2S_triple_point_temperature
   source_id: nist-webbook
   locator:
     note: '{''primary'': ''Goodwin (1983) via NIST-WB H2S Ttriple=187.66 K''}'
@@ -1662,9 +1757,14 @@ observations:
       tag: unknown
       reason: source does not state method_class
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - transition_temperature
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: nist-webbook::HCHO_melting_point
   source_id: nist-webbook
   locator:
     note: '{''primary'': ''Anonymous (1958) via NIST-WB Formaldehyde Tfus=181.0 K'', ''url'': ''https://webbook.nist.gov/cgi/cbook.cgi?ID=C50000&Units=SI&Mask=4''}'
@@ -1745,9 +1845,14 @@ observations:
       tag: unknown
       reason: source does not state method_class
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - transition_temperature
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: nist-webbook::HCHO_normal_boiling_point
   source_id: nist-webbook
   locator:
     note: '{''primary'': ''Spence & Wild (1935) via NIST-WB HCHO Tboil=253.85 K''}'
@@ -1828,9 +1933,14 @@ observations:
       tag: unknown
       reason: source does not state method_class
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - transition_temperature
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: nist-webbook::HCHO_triple_point_temperature
   source_id: nist-webbook
   locator:
     note: '{''primary'': ''Spence & Wild (1935) via NIST-WB HCHO Ttriple=155.1 K''}'
@@ -1911,9 +2021,14 @@ observations:
       tag: unknown
       reason: source does not state method_class
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - transition_temperature
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: nist-webbook::HCl_melting_point
   source_id: nist-webbook
   locator:
     note: '{''primary'': ''Beckmann & Waentig (1910) via NIST-WB HCl Tfus=161.15 K'', ''url'': ''https://webbook.nist.gov/cgi/cbook.cgi?ID=C7647010&Units=SI&Mask=4''}'
@@ -1994,9 +2109,14 @@ observations:
       tag: unknown
       reason: source does not state method_class
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - transition_temperature
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: nist-webbook::HF_melting_point
   source_id: nist-webbook
   locator:
     note: '{''primary'': ''Streng (1971) via NIST-WB HF Tfus=190.0 K'', ''url'': ''https://webbook.nist.gov/cgi/cbook.cgi?ID=C7664393&Units=SI&Mask=4''}'
@@ -2077,9 +2197,14 @@ observations:
       tag: unknown
       reason: source does not state method_class
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - transition_temperature
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: nist-webbook::HF_normal_boiling_point
   source_id: nist-webbook
   locator:
     note: '{''primary'': ''Streng (1971) via NIST-WB HF Tboil=292.7 K''}'
@@ -2160,9 +2285,14 @@ observations:
       tag: unknown
       reason: source does not state method_class
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - transition_temperature
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: nist-webbook::K_melting_point
   source_id: nist-webbook
   locator:
     note: '{''primary'': ''Honig & Kramer (1969) via NIST-WB SRD 69 Potassium'', ''url'': ''https://webbook.nist.gov/cgi/cbook.cgi?ID=C7440097&Units=SI&Mask=4''}'
@@ -2243,9 +2373,14 @@ observations:
       tag: unknown
       reason: source does not state method_class
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - transition_temperature
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: nist-webbook::K_normal_boiling_point
   source_id: nist-webbook
   locator:
     note: '{''primary'': ''Honig & Kramer (1969) RCA Rev. 30, 285'', ''webbook'': ''NIST-WB SRD 69 Potassium: Tboil=1037 K;
@@ -2327,9 +2462,14 @@ observations:
       tag: unknown
       reason: source does not state method_class
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - transition_temperature
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: nist-webbook::K_triple_point_temperature
   source_id: nist-webbook
   locator:
     note: '{''primary'': ''Honig & Kramer (1969) RCA Rev. 30, 285'', ''webbook'': ''NIST-WB SRD 69 Potassium (CAS 7440-09-7):
@@ -2411,9 +2551,14 @@ observations:
       tag: unknown
       reason: source does not state method_class
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - transition_temperature
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: nist-webbook::Mg_melting_point
   source_id: nist-webbook
   locator:
     note: '{''primary'': ''Honig & Kramer (1969) via NIST-WB SRD 69 Magnesium'', ''url'': ''https://webbook.nist.gov/cgi/cbook.cgi?ID=C7439954&Units=SI&Mask=4''}'
@@ -2494,9 +2639,14 @@ observations:
       tag: unknown
       reason: source does not state method_class
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - transition_temperature
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: nist-webbook::Mg_normal_boiling_point
   source_id: nist-webbook
   locator:
     note: '{''primary'': ''Honig & Kramer (1969) RCA Rev. 30, 285'', ''webbook'': ''NIST-WB SRD 69 Magnesium: Tboil=1363 K;
@@ -2578,9 +2728,14 @@ observations:
       tag: unknown
       reason: source does not state method_class
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - transition_temperature
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: nist-webbook::Mg_triple_point_temperature
   source_id: nist-webbook
   locator:
     note: '{''primary'': ''Honig & Kramer (1969) RCA Rev. 30, 285'', ''webbook'': ''NIST-WB SRD 69 Magnesium (CAS 7439-95-4):
@@ -2662,9 +2817,14 @@ observations:
       tag: unknown
       reason: source does not state method_class
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - transition_temperature
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: nist-webbook::N2_melting_point
   source_id: nist-webbook
   locator:
     note: '{''primary'': ''Streng (1971) via NIST-WB Nitrogen Tfus=63.3 K'', ''url'': ''https://webbook.nist.gov/cgi/cbook.cgi?ID=C7727379&Units=SI&Mask=4''}'
@@ -2745,9 +2905,14 @@ observations:
       tag: unknown
       reason: source does not state method_class
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - transition_temperature
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: nist-webbook::N2_normal_boiling_point
   source_id: nist-webbook
   locator:
     note: '{''primary'': ''Jacobsen, Stewart et al. (1986) via NIST-WB N2 Tboil=77.34 K''}'
@@ -2828,9 +2993,14 @@ observations:
       tag: unknown
       reason: source does not state method_class
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - transition_temperature
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: nist-webbook::N2_triple_point_temperature
   source_id: nist-webbook
   locator:
     note: '{''primary'': ''Jacobsen, Stewart et al. (1986) via NIST-WB N2 Ttriple=63.14 K''}'
@@ -2911,9 +3081,14 @@ observations:
       tag: unknown
       reason: source does not state method_class
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - transition_temperature
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: nist-webbook::NH3_melting_point
   source_id: nist-webbook
   locator:
     note: '{''primary'': ''Timmermans (1921) via NIST-WB Ammonia Tfus=194.95 K'', ''url'': ''https://webbook.nist.gov/cgi/cbook.cgi?ID=C7664417&Units=SI&Mask=4''}'
@@ -3128,9 +3303,14 @@ observations:
       tag: unknown
       reason: source does not state method_class
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - transition_temperature
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: nist-webbook::NO2_melting_point
   source_id: nist-webbook
   locator:
     note: '{''primary'': ''Giauque & Powell (1939) JACS 61, 1970 — melting of N2O4 (not pure undissociated NO2)''}'
@@ -3211,9 +3391,14 @@ observations:
       tag: unknown
       reason: source does not state method_class
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - transition_temperature
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: nist-webbook::NO2_normal_boiling_point
   source_id: nist-webbook
   locator:
     note: '{''primary'': ''Thorpe (1880) via NIST-WB NO2 Tboil=295.08 K — treat with dissociation caveat'', ''crosscheck'':
@@ -3296,9 +3481,14 @@ observations:
       tag: unknown
       reason: source does not state method_class
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - transition_temperature
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: nist-webbook::O2_melting_point
   source_id: nist-webbook
   locator:
     note: '{''primary'': ''Streng (1971) via NIST-WB Oxygen Tfus=54.8 K'', ''url'': ''https://webbook.nist.gov/cgi/cbook.cgi?ID=C7782447&Units=SI&Mask=4''}'
@@ -3379,9 +3569,14 @@ observations:
       tag: unknown
       reason: source does not state method_class
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - transition_temperature
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: nist-webbook::O2_normal_boiling_point
   source_id: nist-webbook
   locator:
     note: '{''primary'': ''Streng (1971) via NIST-WB O2 Tboil=90.2 K''}'
@@ -3462,9 +3657,14 @@ observations:
       tag: unknown
       reason: source does not state method_class
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - transition_temperature
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: nist-webbook::O2_triple_point_temperature
   source_id: nist-webbook
   locator:
     note: '{''primary'': ''Henning & Otto (1936) via NIST-WB O2 Ttriple=54.33 K''}'
@@ -3545,9 +3745,14 @@ observations:
       tag: unknown
       reason: source does not state method_class
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - transition_temperature
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: nist-webbook::Pb_melting_point
   source_id: nist-webbook
   locator:
     note: '{''primary'': ''Anonymous (1988) catalog via NIST-WB Lead Tfus=600.64 K'', ''url'': ''https://webbook.nist.gov/cgi/cbook.cgi?ID=C7439921&Units=SI&Mask=4''}'
@@ -3665,9 +3870,14 @@ observations:
       tag: unknown
       reason: source does not state method_class
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - transition_temperature
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: nist-webbook::SO2_melting_point
   source_id: nist-webbook
   locator:
     note: '{''primary'': ''Hoffman & Vanderwerf (1946) via NIST-WB SO2 Tfus=200.75 K'', ''url'': ''https://webbook.nist.gov/cgi/cbook.cgi?ID=C7446095&Units=SI&Mask=4''}'
@@ -3748,9 +3958,14 @@ observations:
       tag: unknown
       reason: source does not state method_class
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - transition_temperature
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: nist-webbook::SO2_triple_point_temperature
   source_id: nist-webbook
   locator:
     note: '{''primary'': ''Giauque & Stephenson (1938) J. Am. Chem. Soc. 60, 1389 — via NIST-WB Ttriple=197.64 K''}'
