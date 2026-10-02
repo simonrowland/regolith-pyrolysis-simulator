@@ -12,6 +12,7 @@ geometry/identity/kernel/acceptance). Appends **"Dropped or changed from r1"**.
 **Sol review:** `regolith-physics-residue-2026-10-02/sol-review-of-residue-r1.md`.
 **Mailbox:** empirical/reviews-batch-zv-2026-09-22 -> ferry/reviews/DESIGN-residue-predictor-r2-regolith-physics-2026-10-02.md + this STATUS.
 **Mailbox artifacts:** 4a2eeddc469f8df174edd4fa4c4a7d88108238d3
+**Mailbox tip:** e4796b2a87b996f8968ba85780a2fed66f14a9c2
 
 ## Covered (REQ-r2 + sol §§1–7)
 
