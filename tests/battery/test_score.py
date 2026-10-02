@@ -802,6 +802,10 @@ def test_uncalibrated_kems_residual_matches_between_oxygen_balance_engines() -> 
     assert openimcc.numeric == internal_analytical.numeric
     assert openimcc.status is internal_analytical.status is ResidualStatus.NO_BAND
     assert openimcc.score_eligible is internal_analytical.score_eligible is False
+    assert openimcc.numeric is not None
+    assert openimcc.numeric.decision_band is None
+    assert internal_analytical.numeric is not None
+    assert internal_analytical.numeric.decision_band is None
     assert flagged_strata(openimcc.notices) == (
         FLAGGED_STRATUM_CALIBRATION_NOT_GROUNDED,
     )
