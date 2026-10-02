@@ -16,6 +16,6 @@ VERDICT: LAND 8fe0c8e377ac0a982f2df494af781419a3231187
 - **Ack kept:** `STATUS-req-mgo-guo-acked-2026-10-02.md`
 - **Dropbox:** shipping REVIEW+STATUS (+ack already present) to from-empirical/
 - **Store regen / full W3:** skipped on 16GB VPS
-- **Mailbox tip:** `be40f456c987187193b65109cf73f83f8209004a` on `empirical/reviews-batch-zv-2026-09-22` (artifacts `00a2b8f98b98bb9012ce2c6118fb449f696b8d28`)
+- **Mailbox tip:** `ede5b19d4b380f088b3a98e65041d6275c73c19a` on `empirical/reviews-batch-zv-2026-09-22` (artifacts `00a2b8f98b98bb9012ce2c6118fb449f696b8d28`)
 
 — regolith-empirical
