@@ -25,6 +25,7 @@ from simulator.fe_redox import (
     feo_iw_log10_fO2_bar,
     floor_vacuum_pressure_bar,
     kress91_fe3_over_sigma_fe,
+    kress91_ferrous_feo_activity,
     kress91_log_fO2_from_fe3_over_sigma_fe,
     melt_mol_fractions_for_kress91,
 )
@@ -1018,7 +1019,7 @@ def _near_ferric_sim(n_feo_mol: float) -> PyrolysisSimulator:
     return sim
 
 
-def test_ferrous_free_bound_is_flagged_for_vapor_activity_only(
+def test_ferrous_free_vapor_activity_uses_committed_interface_pressure(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     from types import SimpleNamespace
@@ -1063,44 +1064,54 @@ def test_ferrous_free_bound_is_flagged_for_vapor_activity_only(
     sim._refresh_vapor_pressures_from_kernel(equilibrium)
     assert len(vapor_dispatches) == 1
     vapor_inputs = vapor_dispatches[0]
-    assert vapor_inputs["fO2_log"] == key_fO2_log
-    assert vapor_inputs["control_inputs"]["intrinsic_fO2_log"] == key_fO2_log
-    assert vapor_inputs["control_inputs"]["interface_pO2_bar"] == pytest.approx(
-        TRANSPORT_PO2_BAR
+    vapor_diagnostic = sim._last_vapor_pressure_diagnostic
+    interface_pO2_bar = vapor_diagnostic["interface_pO2_bar"]
+    fe_activity = vapor_diagnostic["activities"]["Fe"]
+    expected_interface_fe_activity = kress91_ferrous_feo_activity(
+        comp_wt=vapor_diagnostic["source_reaction_composition_wt_pct"],
+        fO2_log=math.log10(interface_pO2_bar),
+        T_K=sim.melt.temperature_C + 273.15,
+        pressure_bar=vapor_diagnostic["source_reaction_activity_pressure_bar"],
+        floor_bar=vapor_diagnostic["vacuum_floor_bar"],
     )
-    vapor_key = sim._last_vapor_pressure_diagnostic[
-        "melt_redox_speciation_key"
-    ]
+    assert interface_pO2_bar == pytest.approx(TRANSPORT_PO2_BAR)
+    assert fe_activity == pytest.approx(expected_interface_fe_activity)
+    vapor_key = vapor_diagnostic["melt_redox_speciation_key"]
     assert vapor_key == {
-        "fO2_log": key_fO2_log,
+        "fO2_log": None,
         "authority": "bound",
         "regime": "ferrous_free_lower_bound",
     }
-    assert sim._last_vapor_pressure_diagnostic[
-        "melt_redox_speciation_flag"
-    ] == _flag
-    vapor_activity = sim._last_vapor_pressure_diagnostic["a_FeO_calphad"]
-    assert vapor_activity["status"] == "ok"
-    assert vapor_activity["a_FeO_authoritative"] > 0.0
-
-    from simulator.vapour_rail.instrumentation import EffectivePressureSource
-
-    pressure_source = EffectivePressureSource(
-        "test-vapor-pressure",
-        dict(equilibrium.vapor_pressures_Pa),
+    assert vapor_diagnostic["melt_redox_speciation_flag"] == _flag
+    fe_provenance = vapor_diagnostic[
+        "vapor_pressure_numerator_provenance"
+    ]["Fe"]
+    assert fe_provenance["activity_basis"] == (
+        "kress91_interface_ferrous_free_melt"
     )
-    batch = sim._resolve_evaporation_vapour_batch(
-        equilibrium,
-        temperature_K=1673.15,
-        effective_pressure_source=pressure_source,
+    assert fe_provenance["activity_flag"]["code"] == (
+        "fe_activity_from_interface_in_ferrous_free_melt"
     )
-    assert batch is not None
-    si_o_answer = batch.channels_by_species["SiO"]
-    assert si_o_answer.source_reaction_activity is not None
-    assert si_o_answer.source_reaction_activity.value > 0.0
-    assert "source_fO2_log10=30" in (
-        si_o_answer.source_reaction_activity.state_fingerprint
+    assert fe_provenance["activity_flag"]["interface_pO2_bar"] == pytest.approx(
+        interface_pO2_bar
     )
+    assert expected_interface_fe_activity != pytest.approx(
+        kress91_ferrous_feo_activity(
+            comp_wt=vapor_diagnostic["source_reaction_composition_wt_pct"],
+            fO2_log=30.0,
+            T_K=sim.melt.temperature_C + 273.15,
+            pressure_bar=vapor_diagnostic[
+                "source_reaction_activity_pressure_bar"
+            ],
+            floor_bar=vapor_diagnostic["vacuum_floor_bar"],
+        )
+    )
+    assert vapor_inputs["fO2_log"] is None
+    assert vapor_inputs["control_inputs"]["intrinsic_fO2_log"] is None
+    assert vapor_inputs["control_inputs"]["interface_pO2_bar"] == pytest.approx(
+        TRANSPORT_PO2_BAR
+    )
+    assert vapor_diagnostic["source_reaction_fO2_log10"] is None
 
     sulfur_calls: list[dict[str, Any]] = []
 

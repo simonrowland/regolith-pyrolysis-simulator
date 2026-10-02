@@ -13864,9 +13864,12 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             speciation_authority = 'equality'
             speciation_regime = 'unclassified'
             speciation_flag = None
-        # A finite speciation key remains usable by vapor-activity consumers
-        # when it is a bound; the bound and its flag are recorded below. The
-        # committed interface pressure remains a separate control input.
+        if speciation_regime == 'ferrous_free_lower_bound':
+            # The M3 key is a clamped edge for liquidus/freeze-gate and PT-0
+            # consumers, not a melt equality. Vapor activities use the
+            # committed interface pO2 and derive the ferrous activity from
+            # the iron inventory when needed.
+            intrinsic_fO2_log = None
         if (
             intrinsic_fO2_log is None
             and self._melt_redox_equality_is_absent()

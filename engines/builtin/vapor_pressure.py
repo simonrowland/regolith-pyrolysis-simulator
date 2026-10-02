@@ -2005,6 +2005,15 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
         melt_account_mol = dict(
             request.account_view.accounts.get(self.DECLARED_ACCOUNT, {}) or {}
         )
+        from simulator.fe_redox import OXYGEN_RESERVOIR_NOOP_MOL
+
+        ferrous_free_ferric_inventory = (
+            float(melt_account_mol.get("FeO", 0.0) or 0.0)
+            <= OXYGEN_RESERVOIR_NOOP_MOL
+            and float(melt_account_mol.get("Fe2O3", 0.0) or 0.0)
+            > OXYGEN_RESERVOIR_NOOP_MOL
+        )
+        fe_activity_flag = None
         feo_activity_diagnostic = None
         feo_activity_pressure_bar = vacuum_floor_bar
         if intrinsic_fO2_log is not None:
@@ -2025,6 +2034,46 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                 floor_bar=vacuum_floor_bar,
             )
             below_cap_fe_activity_basis = "kress91_ferrous"
+        elif ferrous_free_ferric_inventory:
+            from simulator.fe_redox import (
+                kress91_ferrous_feo_activity,
+                kress91_furnace_activity_pressure_bar,
+            )
+
+            # With no stored FeO, Kress forward speciation at the committed
+            # interface pO2 predicts the coexisting ferrous fraction from the
+            # melt's actual total iron inventory. This is a flagged vapor
+            # activity estimate, never the clamped M3 speciation key.
+            interface_fO2_log = math.log10(interface_pO2_bar)
+            feo_activity_pressure_bar = kress91_furnace_activity_pressure_bar(
+                pressure_bar=float(request.pressure_bar),
+                floor_bar=vacuum_floor_bar,
+            )
+            below_cap_fe_activity = kress91_ferrous_feo_activity(
+                comp_wt=comp_wt,
+                fO2_log=interface_fO2_log,
+                T_K=T_K,
+                pressure_bar=feo_activity_pressure_bar,
+                floor_bar=vacuum_floor_bar,
+            )
+            below_cap_fe_activity_basis = (
+                "kress91_interface_ferrous_free_melt"
+            )
+            fe_activity_flag = {
+                "code": "fe_activity_from_interface_in_ferrous_free_melt",
+                "reason": (
+                    "FeO inventory is at or below NOOP with ferric iron present; "
+                    "Kress forward speciation predicts the coexisting FeO "
+                    "activity from total iron inventory at committed interface pO2"
+                ),
+                "interface_pO2_bar": interface_pO2_bar,
+                "fO2_log": interface_fO2_log,
+            }
+            warnings.append(
+                "fe_activity_from_interface_in_ferrous_free_melt: "
+                f"interface_pO2_bar={interface_pO2_bar:g} "
+                f"a_FeO={below_cap_fe_activity:g}; predicted and flagged"
+            )
         else:
             below_cap_fe_activity = comp_wt.get("FeO", 0.0) / 100.0
             below_cap_fe_activity_basis = "feo_weight_fraction"
@@ -2096,7 +2145,14 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                 continue
             # A fit range has no diagnostic meaning when its parent oxide is
             # absent; gate presence before selecting or warning about the fit.
-            if float(comp_wt.get(parent_oxide, 0.0) or 0.0) <= 0.0:
+            m3_fe_activity_available = (
+                species == "Fe"
+                and ferrous_free_ferric_inventory
+            )
+            if (
+                float(comp_wt.get(parent_oxide, 0.0) or 0.0) <= 0.0
+                and not m3_fe_activity_available
+            ):
                 continue
 
             fit_target = _fit_target(sp_data)
@@ -2651,7 +2707,13 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                     temperature_K=T_K,
                     authority=high_t_activity_authority,
                 )
-                if (
+                if fe_activity_flag is not None:
+                    # M3 uses the interface-derived Kress value as the live
+                    # Fe activity, including above the VapoRock temperature cap.
+                    oxide_activity = None
+                    a_oxide = below_cap_fe_activity
+                    fe_activity_basis = below_cap_fe_activity_basis
+                elif (
                     high_t_activity_authority
                     and high_t_activity_authority.get("provider") == "openimcc"
                     and candidate_activity is not None
@@ -2894,6 +2956,8 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                     else:
                         provenance["activity_basis"] = fe_activity_basis
                         provenance["degraded_activity_basis"] = None
+                    if fe_activity_flag is not None:
+                        provenance["activity_flag"] = dict(fe_activity_flag)
                 vapor_pressure_provenance[species] = provenance
                 if oxide_activity is not None:
                     vapor_pressure_provenance[species].update(
