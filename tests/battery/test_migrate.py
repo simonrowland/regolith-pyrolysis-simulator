@@ -4467,6 +4467,72 @@ def test_activity_standard_state_source_prose_lifts_typed_reference(tmp_path: Pa
     assert reference_state.value.reference_pressure_bar is None
 
 
+def test_guo_structured_standard_state_lifts_periclase_reference(tmp_path: Path) -> None:
+    source = REPO_ROOT / "data/literature/extracts/guo-2021-mgo-activity-cmas-slag.yaml"
+    extract = yaml.safe_load(source.read_text(encoding="utf-8"))
+    row = extract["species"]["MgO"]["observations"][0]
+    row["standard_state"] = {
+        "state": {
+            "tag": "value",
+            "value": {
+                "convention": "raoultian_pure_endmember",
+                "endmember": {
+                    "formula": "MgO",
+                    "phase": {"tag": "value", "value": "cr"},
+                    "polymorph": {"tag": "value", "value": "periclase"},
+                },
+                "component_basis": "MgO",
+            },
+        },
+        "inferred": False,
+        "note": "Typed crystal MgO as periclase; the extract states pure solid MgO.",
+        "locator": {
+            "published_page": 2728,
+            "pdf_page_index": 4,
+            "table": "5",
+            "note": "Table 5 activity standard state",
+        },
+    }
+    root = _write_min_tree(tmp_path, extract)
+    result = migrate(root, write=False)
+    observations = [
+        obs
+        for obs in result.observations.values()
+        if "guo_2021_table5_mgo_activities_1873k" in obs.observation_id
+    ]
+    assert len(observations) == 8
+    for obs in observations:
+        reference_state = obs.identity.reference_state
+        assert reference_state is not None and reference_state.is_value
+        assert reference_state.value.convention is ReferenceStateConvention.RAOULTIAN_PURE_ENDMEMBER
+        assert reference_state.value.endmember.formula == "MgO"
+        assert reference_state.value.endmember.phase.value is Phase.CR
+        assert reference_state.value.endmember.polymorph.value is Polymorph.PERICLASE
+
+
+def test_stolyarova_table3_137_row_ids_and_reference_states_unchanged(
+    tmp_path: Path,
+) -> None:
+    result = _migrate_real_extract(
+        tmp_path, "stolyarova-1996-cao-alumina-silica-kems.yaml"
+    )
+    rows = sorted(
+        (oid, obs)
+        for oid, obs in result.observations.items()
+        if "stolyarova_1996_table3_" in oid
+    )
+    assert len(rows) == 137
+    payload = [(oid, to_plain(obs.identity.reference_state)) for oid, obs in rows]
+    digest = hashlib.sha256(
+        json.dumps(
+            payload, sort_keys=True, separators=(",", ":"), ensure_ascii=False
+        ).encode()
+    ).hexdigest()
+    # Pinned to the digest on green c9b6e545d, whose Stolyarova 1996 locator notes carry the
+    # Table 1 caption and Eq. (13) quotes; this change must leave it unchanged.
+    assert digest == "a3f9988c9f64bb73c07eefa07b1d2edaac77abb0b2496799dba925c6bedaa968"
+
+
 def test_reference_prose_keeps_printed_endmember_and_does_not_stamp_one_bar() -> None:
     feo = reference_state_from_extract(
         "raoultian_pure_endmember; pure liquid FeO endmember=FeO. "

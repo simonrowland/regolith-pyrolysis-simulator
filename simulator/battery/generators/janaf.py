@@ -2527,6 +2527,9 @@ class JANAFFusionEnergy:
 _FUSION_TABLES = {
     "CaO": ("Ca-027", "Ca-028"),
     "Al2O3": ("Al-096", "Al-100"),
+    # Mg-009 is the MgO(l) Gibbs function; like Al-100 and Ca-028, its
+    # observation series is phase-unknown around JANAF's GLASS <--> LIQUID row.
+    "MgO": ("Mg-008", "Mg-009"),
     # High cristobalite is the high-temperature solid branch immediately
     # below the accepted SiO2 melting point; the quartz table is metastable.
     "SiO2": ("O-035", "O-038"),
@@ -2538,12 +2541,15 @@ _FUSION_NODE_SET_SHA256 = {
     "Al-100": "516fee6dda1c692a9b05507efce187256bec6f22b7928058f585834d2e28164d",
     "Ca-027": "376641f4fa64958a281184501eb5d3b621da105aee6bc625b26dd35e5d0ff061",
     "Ca-028": "045d9b4eca578094b9321cbdb0c1db10dcea80f2ca925fc59ae86f01c8069acd",
+    "Mg-008": "d90e9f5d25d9202d685f0690078ba27104b1446d12b46644a7d24a4a44c2505e",
+    "Mg-009": "1444ecc52a9e18a3cb76a953750798bc18b74661abfc721e41dc1a3aa8620a7e",
     "O-035": "86986e6bc3d75c0fec4c3a034a1deab91e966c42d5e0f1cb4080a33d10aa6bed",
     "O-038": "c0cbb21a4e8d7387b9a379c21edc29a61d124efb398711e402fe5c3ff9038791",
 }
 _ACCEPTED_MELTING_K = {
     "CaO": Decimal("2886"),
     "Al2O3": Decimal("2327"),
+    "MgO": Decimal("3100"),
     "SiO2": Decimal("1986"),
 }
 

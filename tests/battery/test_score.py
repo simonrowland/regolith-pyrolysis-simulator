@@ -4344,6 +4344,72 @@ def test_solid_activity_fusion_conversion_reports_positive_offset(
     assert converted.identity.reference_state.value.endmember.phase.value is Phase.L
 
 
+def test_periclase_solid_activity_fusion_conversion_uses_janaf_nodes() -> None:
+    """At 1873 K, Mg-008 and Mg-009 give the expected periclase-to-liquid shift.
+
+    Linear interpolation uses 73/100 of each table's 1800-to-1900 K span:
+    G_s° = -360.851 + 0.73*(-340.395 + 360.851) = -345.91812 kJ/mol;
+    G_l° = -330.816 + 0.73*(-312.503 + 330.816) = -317.44751 kJ/mol.
+    ΔG_fus = G_l° - G_s° = +28.47061 kJ/mol, so
+    Δlog10(a) = 28.47061*1000/(8.31441*1873*ln(10)) = +0.793984 dex.
+    """
+    from simulator.battery.generators.janaf import janaf_fusion_energy
+    from simulator.battery.score import _fusion_comparison_reference
+
+    temperature = Decimal("1873")
+    fusion = janaf_fusion_energy("MgO", temperature)
+    assert fusion.crystal_table == "Mg-008"
+    assert fusion.liquid_table == "Mg-009"
+    assert fusion.delta_g_fus_kJ_per_mol > 0
+    assert abs(
+        fusion.melting_temperature_K - Decimal("3104.945598")
+    ) < Decimal("0.00001")
+    at_melting = janaf_fusion_energy("MgO", fusion.melting_temperature_K)
+    assert abs(at_melting.delta_g_fus_kJ_per_mol) < Decimal("1e-20")
+
+    experiment = F.kems_experiment()
+    identity = _with_activity_reference_polymorph(
+        F.activity_identity(
+            formula="MgO",
+            T_K=temperature,
+            endmember_phase=Phase.CR,
+            component_basis="MgO",
+        ),
+        "periclase",
+    )
+    reference = F.observation(
+        "mgo-periclase-solid-activity-at-1873K",
+        experiment.experiment_id,
+        identity,
+        Decimal("0.2"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="synthetic-mgo-solid-reference-anchor",
+    )
+    converted = _fusion_comparison_reference(reference, engine=Engine.OPENIMCC)
+    notice = next(
+        item
+        for item in converted.notices
+        if item.reason.startswith("reference_converted_via_fusion;")
+    )
+    offset = Decimal(notice.reason.partition("offset_dex=+")[2].split(";")[0])
+    assert abs(offset - Decimal("0.793984")) <= Decimal("0.002")
+    assert converted.identity.reference_state.value.endmember.phase.value is Phase.L
+
+    wrong_polymorph = replace(
+        reference,
+        identity=_with_activity_reference_polymorph(identity, "spinel"),
+    )
+    refused = _fusion_comparison_reference(
+        wrong_polymorph, engine=Engine.OPENIMCC
+    )
+    assert refused.value.point == reference.value.point
+    assert refused.identity.reference_state.value.endmember.phase.value is Phase.CR
+    assert any(
+        "Mg-008 represents polymorph periclase" in notice.reason
+        for notice in refused.notices
+    )
+
+
 @pytest.mark.parametrize("polymorph", (None, "quartz"))
 def test_solid_activity_with_unmatched_polymorph_refuses_conversion(
     polymorph: str | None,
