@@ -36,6 +36,85 @@ work:
         tag: unknown
         reason: INDEX does not give an unmatched-layer asset
 experiments:
+- experiment_id: 0198c57b493a9754e97dd1c93d773e982d98037a4efcd65588c1ae0905c42aa5::experiment::markova-1983-kems-series
+  kind: literature
+  method:
+    tag: value
+    value: knudsen_effusion
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 460
+        pdf_page_index: 1
+        section: Technique
+        note: Chamber/background residual-gas pressure is not reported.
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 460
+        pdf_page_index: 1
+        section: Technique
+        note: No carrier-gas condition is reported.
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+    pumping:
+      base_pressure_Pa:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          published_page: 460
+          pdf_page_index: 1
+          section: Technique
+          note: A base-pressure value is not reported.
+  work_id: 0198c57b493a9754e97dd1c93d773e982d98037a4efcd65588c1ae0905c42aa5
+  locator:
+    published_page: 460
+    pdf_page_index: 1
+    section: Technique
+    note: Four sample series are shown; separate run identifiers are not printed.
+  apparatus:
+    geometry:
+      orifice_diameter_m:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          published_page: 460
+          pdf_page_index: 1
+          section: Technique
+      orifice_channel_length_m:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          published_page: 460
+          pdf_page_index: 1
+          section: Technique
+    calibration:
+      calibration:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          published_page: 460
+          pdf_page_index: 1
+          section: Technique
+          note: No pressure calibration method or silver/gold standard is stated in this paper.
+  bench_id: 0198c57b493a9754e97dd1c93d773e982d98037a4efcd65588c1ae0905c42aa5::bench::markova-1983-kems
 - experiment_id: 0198c57b493a9754e97dd1c93d773e982d98037a4efcd65588c1ae0905c42aa5::kems-025-markova-1983
   kind: literature
   method:
@@ -91,4 +170,30 @@ benches:
       pdf_page_index: 1
       section: Technique
       note: The two-page abstract does not print the cell material.
+  geometry:
+    cell_internal_dimensions:
+      diameter_m:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          published_page: 460
+          pdf_page_index: 1
+          section: Technique
+      height_m:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          published_page: 460
+          pdf_page_index: 1
+          section: Technique
+  detector:
+    state:
+      tag: value
+      value: MS-1301 mass spectrometer
+    locator:
+      published_page: 460
+      pdf_page_index: 1
+      section: Technique
   other_facts: []

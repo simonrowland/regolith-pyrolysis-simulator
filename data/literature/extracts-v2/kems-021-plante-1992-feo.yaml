@@ -1557,32 +1557,94 @@ observations:
     - unknown:kems-021-plante-1992-feo
     parameters: []
     output_unit: ion_intensity_ratio_dimensionless
-- observation_id: kems-021-plante-1992-feo::plante_1992_table2_feo_activity_coefficient_1973k::rows:h=0dc01e52b8c5
+- observation_id: kems-021-plante-1992-feo::plante_1992_table2_feo_activity_coefficient_1973k::T=1973:h=201bb6624432
   experiment_id: 10.2355/isijinternational.32.1276::experiment::feo-mgo-sio2-series
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'activity_and_raoultian_gamma'
+      tag: value
+      value: activity
     species:
       formula: FeO
       phase:
-        tag: unknown
-        reason: phase string 'FeO-MgO-SiO2_ternary_silicate_melt' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
     temperature_K:
       tag: value
       value: '1973'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
     reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: FeO
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: FeO
+        reference_pressure_bar: '1'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - FeO
+          - '0.1'
+        - - MgO
+          - '0.45'
+        - - SiO2
+          - '0.45'
+        amount_basis: mole_fraction
+    fO2_Pa:
       tag: unknown
-      reason: qualifier and_raoultian_gamma does not name a reference_state
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    kind: point
+    point: '0.404'
     approximate: false
   uncertainty:
     kind: printed
@@ -1591,19 +1653,27 @@ observations:
   evidence:
     class:
       tag: value
-      value: measured_direct
-    original_method_class: measured_direct
+      value: measured_reduced
+    original_method_class: directly_reduced_measurement
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: orphans-close
+      date: '2026-08-27'
+      evidence:
+        page: 1278
+        pdf_page_index: 3
+        table: '2'
   notices: []
   source_id: kems-021-plante-1992-feo
   locator:
     page: 1278
     pdf_page_index: 3
     table: '2'
-    source_path: docs-private/research/2026-08-27-ocr-repair/kems-021-plante-1992-feo/tables.md
-  read_from: unknown:kems-021-plante-1992-feo
+    note: Printed x(FeO)=0.1 and f(FeO)=4.04; x(MgO)=x(SiO2)=0.45 is inferred from the printed 1:1 join and ternary normalization.
+      Activity 0.404 is derived as f*x; no figure values used.
+  read_from: pdf:kems-021-plante-1992-feo
   point_conditions:
     temperature_K:
       state:
@@ -1613,33 +1683,121 @@ observations:
         page: 1278
         pdf_page_index: 3
         table: '2'
-        source_path: docs-private/research/2026-08-27-ocr-repair/kems-021-plante-1992-feo/tables.md
-- observation_id: kems-021-plante-1992-feo::plante_1992_table2_feo_activity_coefficient_1973k::rows:h=207c3002b37e
+        note: Printed x(FeO)=0.1 and f(FeO)=4.04; x(MgO)=x(SiO2)=0.45 is inferred from the printed 1:1 join and ternary normalization.
+          Activity 0.404 is derived as f*x; no figure values used.
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_mole_fraction
+          components:
+          - - FeO
+            - '0.1'
+          - - MgO
+            - '0.45'
+          - - SiO2
+            - '0.45'
+          amount_basis: mole_fraction
+      locator:
+        page: 1278
+        pdf_page_index: 3
+        table: '2'
+        note: Printed x(FeO)=0.1 and f(FeO)=4.04; x(MgO)=x(SiO2)=0.45 is inferred from the printed 1:1 join and ternary normalization.
+          Activity 0.404 is derived as f*x; no figure values used.
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:kems-021-plante-1992-feo
+    parameters: []
+    output_unit: dimensionless activity
+- observation_id: kems-021-plante-1992-feo::plante_1992_table2_feo_activity_coefficient_1973k::T=1973:h=328036886235
   experiment_id: 10.2355/isijinternational.32.1276::experiment::feo-mgo-sio2-series
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'activity_and_raoultian_gamma'
+      tag: value
+      value: activity
     species:
       formula: FeO
       phase:
-        tag: unknown
-        reason: phase string 'FeO-MgO-SiO2_ternary_silicate_melt' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
     temperature_K:
       tag: value
       value: '1973'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
     reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: FeO
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: FeO
+        reference_pressure_bar: '1'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - FeO
+          - '0.2'
+        - - MgO
+          - '0.4'
+        - - SiO2
+          - '0.4'
+        amount_basis: mole_fraction
+    fO2_Pa:
       tag: unknown
-      reason: qualifier and_raoultian_gamma does not name a reference_state
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    kind: point
+    point: '0.604'
     approximate: false
   uncertainty:
     kind: printed
@@ -1648,19 +1806,27 @@ observations:
   evidence:
     class:
       tag: value
-      value: measured_direct
-    original_method_class: measured_direct
+      value: measured_reduced
+    original_method_class: directly_reduced_measurement
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: orphans-close
+      date: '2026-08-27'
+      evidence:
+        page: 1278
+        pdf_page_index: 3
+        table: '2'
   notices: []
   source_id: kems-021-plante-1992-feo
   locator:
     page: 1278
     pdf_page_index: 3
     table: '2'
-    source_path: docs-private/research/2026-08-27-ocr-repair/kems-021-plante-1992-feo/tables.md
-  read_from: unknown:kems-021-plante-1992-feo
+    note: Printed x(FeO)=0.2 and f(FeO)=3.02; x(MgO)=x(SiO2)=0.4 is inferred from the printed 1:1 join and ternary normalization.
+      Activity 0.604 is derived as f*x; no figure values used.
+  read_from: pdf:kems-021-plante-1992-feo
   point_conditions:
     temperature_K:
       state:
@@ -1670,33 +1836,121 @@ observations:
         page: 1278
         pdf_page_index: 3
         table: '2'
-        source_path: docs-private/research/2026-08-27-ocr-repair/kems-021-plante-1992-feo/tables.md
-- observation_id: kems-021-plante-1992-feo::plante_1992_table2_feo_activity_coefficient_1973k::rows:h=26cb5881522b
+        note: Printed x(FeO)=0.2 and f(FeO)=3.02; x(MgO)=x(SiO2)=0.4 is inferred from the printed 1:1 join and ternary normalization.
+          Activity 0.604 is derived as f*x; no figure values used.
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_mole_fraction
+          components:
+          - - FeO
+            - '0.2'
+          - - MgO
+            - '0.4'
+          - - SiO2
+            - '0.4'
+          amount_basis: mole_fraction
+      locator:
+        page: 1278
+        pdf_page_index: 3
+        table: '2'
+        note: Printed x(FeO)=0.2 and f(FeO)=3.02; x(MgO)=x(SiO2)=0.4 is inferred from the printed 1:1 join and ternary normalization.
+          Activity 0.604 is derived as f*x; no figure values used.
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:kems-021-plante-1992-feo
+    parameters: []
+    output_unit: dimensionless activity
+- observation_id: kems-021-plante-1992-feo::plante_1992_table2_feo_activity_coefficient_1973k::T=1973:h=3ea1c1555ffc
   experiment_id: 10.2355/isijinternational.32.1276::experiment::feo-mgo-sio2-series
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'activity_and_raoultian_gamma'
+      tag: value
+      value: activity
     species:
       formula: FeO
       phase:
-        tag: unknown
-        reason: phase string 'FeO-MgO-SiO2_ternary_silicate_melt' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
     temperature_K:
       tag: value
       value: '1973'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
     reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: FeO
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: FeO
+        reference_pressure_bar: '1'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - FeO
+          - '0.9'
+        - - MgO
+          - '0.05'
+        - - SiO2
+          - '0.05'
+        amount_basis: mole_fraction
+    fO2_Pa:
       tag: unknown
-      reason: qualifier and_raoultian_gamma does not name a reference_state
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    kind: point
+    point: '0.918'
     approximate: false
   uncertainty:
     kind: printed
@@ -1705,19 +1959,27 @@ observations:
   evidence:
     class:
       tag: value
-      value: measured_direct
-    original_method_class: measured_direct
+      value: measured_reduced
+    original_method_class: directly_reduced_measurement
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: orphans-close
+      date: '2026-08-27'
+      evidence:
+        page: 1278
+        pdf_page_index: 3
+        table: '2'
   notices: []
   source_id: kems-021-plante-1992-feo
   locator:
     page: 1278
     pdf_page_index: 3
     table: '2'
-    source_path: docs-private/research/2026-08-27-ocr-repair/kems-021-plante-1992-feo/tables.md
-  read_from: unknown:kems-021-plante-1992-feo
+    note: Table 2 prints x(FeO)=0.9 and f(FeO)=1.02; Table 1 prints x(MgO)=0.05 for this composition. x(SiO2)=0.05 is inferred
+      from the printed 1:1 join. Activity 0.918 is derived as f*x.
+  read_from: pdf:kems-021-plante-1992-feo
   point_conditions:
     temperature_K:
       state:
@@ -1727,33 +1989,121 @@ observations:
         page: 1278
         pdf_page_index: 3
         table: '2'
-        source_path: docs-private/research/2026-08-27-ocr-repair/kems-021-plante-1992-feo/tables.md
-- observation_id: kems-021-plante-1992-feo::plante_1992_table2_feo_activity_coefficient_1973k::rows:h=57702a194746
+        note: Table 2 prints x(FeO)=0.9 and f(FeO)=1.02; Table 1 prints x(MgO)=0.05 for this composition. x(SiO2)=0.05 is
+          inferred from the printed 1:1 join. Activity 0.918 is derived as f*x.
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_mole_fraction
+          components:
+          - - FeO
+            - '0.9'
+          - - MgO
+            - '0.05'
+          - - SiO2
+            - '0.05'
+          amount_basis: mole_fraction
+      locator:
+        page: 1278
+        pdf_page_index: 3
+        table: '2'
+        note: Table 2 prints x(FeO)=0.9 and f(FeO)=1.02; Table 1 prints x(MgO)=0.05 for this composition. x(SiO2)=0.05 is
+          inferred from the printed 1:1 join. Activity 0.918 is derived as f*x.
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:kems-021-plante-1992-feo
+    parameters: []
+    output_unit: dimensionless activity
+- observation_id: kems-021-plante-1992-feo::plante_1992_table2_feo_activity_coefficient_1973k::T=1973:h=65f4615bc6f7
   experiment_id: 10.2355/isijinternational.32.1276::experiment::feo-mgo-sio2-series
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'activity_and_raoultian_gamma'
+      tag: value
+      value: activity
     species:
       formula: FeO
       phase:
-        tag: unknown
-        reason: phase string 'FeO-MgO-SiO2_ternary_silicate_melt' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
     temperature_K:
       tag: value
       value: '1973'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
     reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: FeO
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: FeO
+        reference_pressure_bar: '1'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - FeO
+          - '0.4'
+        - - MgO
+          - '0.3'
+        - - SiO2
+          - '0.3'
+        amount_basis: mole_fraction
+    fO2_Pa:
       tag: unknown
-      reason: qualifier and_raoultian_gamma does not name a reference_state
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    kind: point
+    point: '0.74'
     approximate: false
   uncertainty:
     kind: printed
@@ -1762,19 +2112,27 @@ observations:
   evidence:
     class:
       tag: value
-      value: measured_direct
-    original_method_class: measured_direct
+      value: measured_reduced
+    original_method_class: directly_reduced_measurement
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: orphans-close
+      date: '2026-08-27'
+      evidence:
+        page: 1278
+        pdf_page_index: 3
+        table: '2'
   notices: []
   source_id: kems-021-plante-1992-feo
   locator:
     page: 1278
     pdf_page_index: 3
     table: '2'
-    source_path: docs-private/research/2026-08-27-ocr-repair/kems-021-plante-1992-feo/tables.md
-  read_from: unknown:kems-021-plante-1992-feo
+    note: Table 2 prints x(FeO)=0.4 and f(FeO)=1.85; Table 1 prints x(MgO)=0.300 for this composition. x(SiO2)=0.300 is inferred
+      from the printed 1:1 join. Activity 0.74 is derived as f*x.
+  read_from: pdf:kems-021-plante-1992-feo
   point_conditions:
     temperature_K:
       state:
@@ -1784,33 +2142,121 @@ observations:
         page: 1278
         pdf_page_index: 3
         table: '2'
-        source_path: docs-private/research/2026-08-27-ocr-repair/kems-021-plante-1992-feo/tables.md
-- observation_id: kems-021-plante-1992-feo::plante_1992_table2_feo_activity_coefficient_1973k::rows:h=609ca37e350f
+        note: Table 2 prints x(FeO)=0.4 and f(FeO)=1.85; Table 1 prints x(MgO)=0.300 for this composition. x(SiO2)=0.300 is
+          inferred from the printed 1:1 join. Activity 0.74 is derived as f*x.
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_mole_fraction
+          components:
+          - - FeO
+            - '0.4'
+          - - MgO
+            - '0.3'
+          - - SiO2
+            - '0.3'
+          amount_basis: mole_fraction
+      locator:
+        page: 1278
+        pdf_page_index: 3
+        table: '2'
+        note: Table 2 prints x(FeO)=0.4 and f(FeO)=1.85; Table 1 prints x(MgO)=0.300 for this composition. x(SiO2)=0.300 is
+          inferred from the printed 1:1 join. Activity 0.74 is derived as f*x.
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:kems-021-plante-1992-feo
+    parameters: []
+    output_unit: dimensionless activity
+- observation_id: kems-021-plante-1992-feo::plante_1992_table2_feo_activity_coefficient_1973k::T=1973:h=7864b47a9b23
   experiment_id: 10.2355/isijinternational.32.1276::experiment::feo-mgo-sio2-series
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'activity_and_raoultian_gamma'
+      tag: value
+      value: activity
     species:
       formula: FeO
       phase:
-        tag: unknown
-        reason: phase string 'FeO-MgO-SiO2_ternary_silicate_melt' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
     temperature_K:
       tag: value
       value: '1973'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
     reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: FeO
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: FeO
+        reference_pressure_bar: '1'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - FeO
+          - '0.3'
+        - - MgO
+          - '0.35'
+        - - SiO2
+          - '0.35'
+        amount_basis: mole_fraction
+    fO2_Pa:
       tag: unknown
-      reason: qualifier and_raoultian_gamma does not name a reference_state
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    kind: point
+    point: '0.699'
     approximate: false
   uncertainty:
     kind: printed
@@ -1819,19 +2265,27 @@ observations:
   evidence:
     class:
       tag: value
-      value: measured_direct
-    original_method_class: measured_direct
+      value: measured_reduced
+    original_method_class: directly_reduced_measurement
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: orphans-close
+      date: '2026-08-27'
+      evidence:
+        page: 1278
+        pdf_page_index: 3
+        table: '2'
   notices: []
   source_id: kems-021-plante-1992-feo
   locator:
     page: 1278
     pdf_page_index: 3
     table: '2'
-    source_path: docs-private/research/2026-08-27-ocr-repair/kems-021-plante-1992-feo/tables.md
-  read_from: unknown:kems-021-plante-1992-feo
+    note: Printed x(FeO)=0.3 and f(FeO)=2.33; x(MgO)=x(SiO2)=0.35 is inferred from the printed 1:1 join and ternary normalization.
+      Activity 0.699 is derived as f*x; no figure values used.
+  read_from: pdf:kems-021-plante-1992-feo
   point_conditions:
     temperature_K:
       state:
@@ -1841,33 +2295,121 @@ observations:
         page: 1278
         pdf_page_index: 3
         table: '2'
-        source_path: docs-private/research/2026-08-27-ocr-repair/kems-021-plante-1992-feo/tables.md
-- observation_id: kems-021-plante-1992-feo::plante_1992_table2_feo_activity_coefficient_1973k::rows:h=a59118c01625
+        note: Printed x(FeO)=0.3 and f(FeO)=2.33; x(MgO)=x(SiO2)=0.35 is inferred from the printed 1:1 join and ternary normalization.
+          Activity 0.699 is derived as f*x; no figure values used.
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_mole_fraction
+          components:
+          - - FeO
+            - '0.3'
+          - - MgO
+            - '0.35'
+          - - SiO2
+            - '0.35'
+          amount_basis: mole_fraction
+      locator:
+        page: 1278
+        pdf_page_index: 3
+        table: '2'
+        note: Printed x(FeO)=0.3 and f(FeO)=2.33; x(MgO)=x(SiO2)=0.35 is inferred from the printed 1:1 join and ternary normalization.
+          Activity 0.699 is derived as f*x; no figure values used.
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:kems-021-plante-1992-feo
+    parameters: []
+    output_unit: dimensionless activity
+- observation_id: kems-021-plante-1992-feo::plante_1992_table2_feo_activity_coefficient_1973k::T=1973:h=7d1c9a46a5ce
   experiment_id: 10.2355/isijinternational.32.1276::experiment::feo-mgo-sio2-series
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'activity_and_raoultian_gamma'
+      tag: value
+      value: activity
     species:
       formula: FeO
       phase:
-        tag: unknown
-        reason: phase string 'FeO-MgO-SiO2_ternary_silicate_melt' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
     temperature_K:
       tag: value
       value: '1973'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
     reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: FeO
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: FeO
+        reference_pressure_bar: '1'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - FeO
+          - '0.7'
+        - - MgO
+          - '0.15'
+        - - SiO2
+          - '0.15'
+        amount_basis: mole_fraction
+    fO2_Pa:
       tag: unknown
-      reason: qualifier and_raoultian_gamma does not name a reference_state
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    kind: point
+    point: '0.819'
     approximate: false
   uncertainty:
     kind: printed
@@ -1876,19 +2418,27 @@ observations:
   evidence:
     class:
       tag: value
-      value: measured_direct
-    original_method_class: measured_direct
+      value: measured_reduced
+    original_method_class: directly_reduced_measurement
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: orphans-close
+      date: '2026-08-27'
+      evidence:
+        page: 1278
+        pdf_page_index: 3
+        table: '2'
   notices: []
   source_id: kems-021-plante-1992-feo
   locator:
     page: 1278
     pdf_page_index: 3
     table: '2'
-    source_path: docs-private/research/2026-08-27-ocr-repair/kems-021-plante-1992-feo/tables.md
-  read_from: unknown:kems-021-plante-1992-feo
+    note: Table 2 prints x(FeO)=0.7 and f(FeO)=1.17; Table 1 prints x(MgO)=0.15 for this composition. x(SiO2)=0.15 is inferred
+      from the printed 1:1 join. Activity 0.819 is derived as f*x.
+  read_from: pdf:kems-021-plante-1992-feo
   point_conditions:
     temperature_K:
       state:
@@ -1898,33 +2448,121 @@ observations:
         page: 1278
         pdf_page_index: 3
         table: '2'
-        source_path: docs-private/research/2026-08-27-ocr-repair/kems-021-plante-1992-feo/tables.md
-- observation_id: kems-021-plante-1992-feo::plante_1992_table2_feo_activity_coefficient_1973k::rows:h=dabdcb75787c
+        note: Table 2 prints x(FeO)=0.7 and f(FeO)=1.17; Table 1 prints x(MgO)=0.15 for this composition. x(SiO2)=0.15 is
+          inferred from the printed 1:1 join. Activity 0.819 is derived as f*x.
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_mole_fraction
+          components:
+          - - FeO
+            - '0.7'
+          - - MgO
+            - '0.15'
+          - - SiO2
+            - '0.15'
+          amount_basis: mole_fraction
+      locator:
+        page: 1278
+        pdf_page_index: 3
+        table: '2'
+        note: Table 2 prints x(FeO)=0.7 and f(FeO)=1.17; Table 1 prints x(MgO)=0.15 for this composition. x(SiO2)=0.15 is
+          inferred from the printed 1:1 join. Activity 0.819 is derived as f*x.
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:kems-021-plante-1992-feo
+    parameters: []
+    output_unit: dimensionless activity
+- observation_id: kems-021-plante-1992-feo::plante_1992_table2_feo_activity_coefficient_1973k::T=1973:h=e1fc9a7e622b
   experiment_id: 10.2355/isijinternational.32.1276::experiment::feo-mgo-sio2-series
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'activity_and_raoultian_gamma'
+      tag: value
+      value: activity
     species:
       formula: FeO
       phase:
-        tag: unknown
-        reason: phase string 'FeO-MgO-SiO2_ternary_silicate_melt' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
     temperature_K:
       tag: value
       value: '1973'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
     reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: FeO
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: FeO
+        reference_pressure_bar: '1'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - FeO
+          - '0.8'
+        - - MgO
+          - '0.1'
+        - - SiO2
+          - '0.1'
+        amount_basis: mole_fraction
+    fO2_Pa:
       tag: unknown
-      reason: qualifier and_raoultian_gamma does not name a reference_state
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    kind: point
+    point: '0.856'
     approximate: false
   uncertainty:
     kind: printed
@@ -1933,19 +2571,27 @@ observations:
   evidence:
     class:
       tag: value
-      value: measured_direct
-    original_method_class: measured_direct
+      value: measured_reduced
+    original_method_class: directly_reduced_measurement
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: orphans-close
+      date: '2026-08-27'
+      evidence:
+        page: 1278
+        pdf_page_index: 3
+        table: '2'
   notices: []
   source_id: kems-021-plante-1992-feo
   locator:
     page: 1278
     pdf_page_index: 3
     table: '2'
-    source_path: docs-private/research/2026-08-27-ocr-repair/kems-021-plante-1992-feo/tables.md
-  read_from: unknown:kems-021-plante-1992-feo
+    note: Table 2 prints x(FeO)=0.8 and f(FeO)=1.07; Table 1 prints x(MgO)=0.10 for this composition. x(SiO2)=0.10 is inferred
+      from the printed 1:1 join. Activity 0.856 is derived as f*x.
+  read_from: pdf:kems-021-plante-1992-feo
   point_conditions:
     temperature_K:
       state:
@@ -1955,33 +2601,121 @@ observations:
         page: 1278
         pdf_page_index: 3
         table: '2'
-        source_path: docs-private/research/2026-08-27-ocr-repair/kems-021-plante-1992-feo/tables.md
-- observation_id: kems-021-plante-1992-feo::plante_1992_table2_feo_activity_coefficient_1973k::rows:h=dcccbea0c28f
+        note: Table 2 prints x(FeO)=0.8 and f(FeO)=1.07; Table 1 prints x(MgO)=0.10 for this composition. x(SiO2)=0.10 is
+          inferred from the printed 1:1 join. Activity 0.856 is derived as f*x.
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_mole_fraction
+          components:
+          - - FeO
+            - '0.8'
+          - - MgO
+            - '0.1'
+          - - SiO2
+            - '0.1'
+          amount_basis: mole_fraction
+      locator:
+        page: 1278
+        pdf_page_index: 3
+        table: '2'
+        note: Table 2 prints x(FeO)=0.8 and f(FeO)=1.07; Table 1 prints x(MgO)=0.10 for this composition. x(SiO2)=0.10 is
+          inferred from the printed 1:1 join. Activity 0.856 is derived as f*x.
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:kems-021-plante-1992-feo
+    parameters: []
+    output_unit: dimensionless activity
+- observation_id: kems-021-plante-1992-feo::plante_1992_table2_feo_activity_coefficient_1973k::T=1973:h=e85068333c60
   experiment_id: 10.2355/isijinternational.32.1276::experiment::feo-mgo-sio2-series
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'activity_and_raoultian_gamma'
+      tag: value
+      value: activity
     species:
       formula: FeO
       phase:
-        tag: unknown
-        reason: phase string 'FeO-MgO-SiO2_ternary_silicate_melt' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
     temperature_K:
       tag: value
       value: '1973'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
     reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: FeO
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: FeO
+        reference_pressure_bar: '1'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - FeO
+          - '0.6'
+        - - MgO
+          - '0.2'
+        - - SiO2
+          - '0.2'
+        amount_basis: mole_fraction
+    fO2_Pa:
       tag: unknown
-      reason: qualifier and_raoultian_gamma does not name a reference_state
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    kind: point
+    point: '0.792'
     approximate: false
   uncertainty:
     kind: printed
@@ -1990,19 +2724,27 @@ observations:
   evidence:
     class:
       tag: value
-      value: measured_direct
-    original_method_class: measured_direct
+      value: measured_reduced
+    original_method_class: directly_reduced_measurement
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: orphans-close
+      date: '2026-08-27'
+      evidence:
+        page: 1278
+        pdf_page_index: 3
+        table: '2'
   notices: []
   source_id: kems-021-plante-1992-feo
   locator:
     page: 1278
     pdf_page_index: 3
     table: '2'
-    source_path: docs-private/research/2026-08-27-ocr-repair/kems-021-plante-1992-feo/tables.md
-  read_from: unknown:kems-021-plante-1992-feo
+    note: Printed x(FeO)=0.6 and f(FeO)=1.32; x(MgO)=x(SiO2)=0.2 is inferred from the printed 1:1 join and ternary normalization.
+      Activity 0.792 is derived as f*x; no figure values used.
+  read_from: pdf:kems-021-plante-1992-feo
   point_conditions:
     temperature_K:
       state:
@@ -2012,33 +2754,121 @@ observations:
         page: 1278
         pdf_page_index: 3
         table: '2'
-        source_path: docs-private/research/2026-08-27-ocr-repair/kems-021-plante-1992-feo/tables.md
-- observation_id: kems-021-plante-1992-feo::plante_1992_table2_feo_activity_coefficient_1973k::rows:h=feb46807f00a
+        note: Printed x(FeO)=0.6 and f(FeO)=1.32; x(MgO)=x(SiO2)=0.2 is inferred from the printed 1:1 join and ternary normalization.
+          Activity 0.792 is derived as f*x; no figure values used.
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_mole_fraction
+          components:
+          - - FeO
+            - '0.6'
+          - - MgO
+            - '0.2'
+          - - SiO2
+            - '0.2'
+          amount_basis: mole_fraction
+      locator:
+        page: 1278
+        pdf_page_index: 3
+        table: '2'
+        note: Printed x(FeO)=0.6 and f(FeO)=1.32; x(MgO)=x(SiO2)=0.2 is inferred from the printed 1:1 join and ternary normalization.
+          Activity 0.792 is derived as f*x; no figure values used.
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:kems-021-plante-1992-feo
+    parameters: []
+    output_unit: dimensionless activity
+- observation_id: kems-021-plante-1992-feo::plante_1992_table2_feo_activity_coefficient_1973k::T=1973:h=f14f45678245
   experiment_id: 10.2355/isijinternational.32.1276::experiment::feo-mgo-sio2-series
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'activity_and_raoultian_gamma'
+      tag: value
+      value: activity
     species:
       formula: FeO
       phase:
-        tag: unknown
-        reason: phase string 'FeO-MgO-SiO2_ternary_silicate_melt' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile activity does not use subtype
+    per:
+      tag: value
+      value: dimensionless
     temperature_K:
       tag: value
       value: '1973'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity does not use formation_elements
     reference_state:
+      tag: value
+      value:
+        convention: raoultian_pure_endmember
+        endmember:
+          formula: FeO
+          phase:
+            tag: value
+            value: l
+          polymorph:
+            tag: not_applicable
+            reason: not crystal
+          charge:
+            tag: value
+            value: 0
+        component_basis: FeO
+        reference_pressure_bar: '1'
+    reservoir:
+      tag: not_applicable
+      reason: profile activity does not use reservoir
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - FeO
+          - '0.5'
+        - - MgO
+          - '0.25'
+        - - SiO2
+          - '0.25'
+        amount_basis: mole_fraction
+    fO2_Pa:
       tag: unknown
-      reason: qualifier and_raoultian_gamma does not name a reference_state
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    kind: point
+    point: '0.77'
     approximate: false
   uncertainty:
     kind: printed
@@ -2047,19 +2877,27 @@ observations:
   evidence:
     class:
       tag: value
-      value: measured_direct
-    original_method_class: measured_direct
+      value: measured_reduced
+    original_method_class: directly_reduced_measurement
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
+    status: admitted
+    reason: source admission_status=admitted
+    decided_by:
+      worker: orphans-close
+      date: '2026-08-27'
+      evidence:
+        page: 1278
+        pdf_page_index: 3
+        table: '2'
   notices: []
   source_id: kems-021-plante-1992-feo
   locator:
     page: 1278
     pdf_page_index: 3
     table: '2'
-    source_path: docs-private/research/2026-08-27-ocr-repair/kems-021-plante-1992-feo/tables.md
-  read_from: unknown:kems-021-plante-1992-feo
+    note: Printed x(FeO)=0.5 and f(FeO)=1.54; x(MgO)=x(SiO2)=0.25 is inferred from the printed 1:1 join and ternary normalization.
+      Activity 0.77 is derived as f*x; no figure values used.
+  read_from: pdf:kems-021-plante-1992-feo
   point_conditions:
     temperature_K:
       state:
@@ -2069,4 +2907,30 @@ observations:
         page: 1278
         pdf_page_index: 3
         table: '2'
-        source_path: docs-private/research/2026-08-27-ocr-repair/kems-021-plante-1992-feo/tables.md
+        note: Printed x(FeO)=0.5 and f(FeO)=1.54; x(MgO)=x(SiO2)=0.25 is inferred from the printed 1:1 join and ternary normalization.
+          Activity 0.77 is derived as f*x; no figure values used.
+    composition:
+      state:
+        tag: value
+        value:
+          basis: printed_mole_fraction
+          components:
+          - - FeO
+            - '0.5'
+          - - MgO
+            - '0.25'
+          - - SiO2
+            - '0.25'
+          amount_basis: mole_fraction
+      locator:
+        page: 1278
+        pdf_page_index: 3
+        table: '2'
+        note: Printed x(FeO)=0.5 and f(FeO)=1.54; x(MgO)=x(SiO2)=0.25 is inferred from the printed 1:1 join and ternary normalization.
+          Activity 0.77 is derived as f*x; no figure values used.
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:kems-021-plante-1992-feo
+    parameters: []
+    output_unit: dimensionless activity

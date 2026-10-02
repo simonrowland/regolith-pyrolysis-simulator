@@ -100,6 +100,7 @@ experiments:
         value: powdered
       locator:
         page: 1277
+        pdf_page_index: 2
         section: 3. Experimental Procedure
   conditions:
     temperature_K:
@@ -110,18 +111,25 @@ experiments:
     total_pressure_Pa:
       state:
         tag: unknown
-        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
-          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
-          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
-          / P_test_Torr in this extract
+        reason: not_published
+      locator:
+        page: 1277
+        pdf_page_index: 2
+        section: 3. Experimental Procedure
+        note: No chamber or residual-gas background pressure near the cell is reported.
     sweep_gas:
       state:
         tag: unknown
-        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+        reason: not_published
+      locator:
+        page: 1277
+        pdf_page_index: 2
+        section: 3. Experimental Procedure
+        note: No sweep gas is reported.
     regime:
       regime_class:
         tag: unknown
-        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+        reason: not_published
   work_id: 10.2355/isijinternational.32.1276
   locator:
     page: 1277
@@ -187,6 +195,16 @@ experiments:
                 page: 1277
                 paragraph: The diameter of the effusion orifice was 0.5 mm
           output_unit: m
+    calibration:
+      ion_current_pressure_standards:
+        state:
+          tag: value
+          value: not printed
+        locator:
+          page: 1277
+          pdf_page_index: 2
+          section: 3. Experimental Procedure
+          note: The paper reports intensity ratios but names no absolute-pressure calibrant.
   bench_id: 10.2355/isijinternational.32.1276::bench::tungsten-iridium-kems
   thermal_schedule:
     setpoints_and_holds:
@@ -195,13 +213,15 @@ experiments:
           tag: value
           value:
             kind: interval
-            interval_low: '850'
-            interval_high: '980'
+            interval_low: '1850'
+            interval_high: '1980'
             approximate: false
         locator:
           page: 1277
+          pdf_page_index: 2
           section: 3. Experimental Procedure
-          note: Highest-FeO sample instead printed 790 to 910 K; per-charge compositions are on feo-mgo-sio2-xfeo-* experiments
+          note: Printed 1850 to 1980 K; the highest-FeO charge was 1790 to 1910 K. Per-charge compositions are on feo-mgo-sio2-xfeo-*
+            experiments.
     total_duration_s:
       state:
         tag: value
@@ -328,6 +348,7 @@ experiments:
         value: powdered
       locator:
         page: 1277
+        pdf_page_index: 2
         section: 3. Experimental Procedure
   conditions:
     temperature_K:
@@ -423,13 +444,14 @@ experiments:
           tag: value
           value:
             kind: interval
-            interval_low: '850'
-            interval_high: '980'
+            interval_low: '1850'
+            interval_high: '1980'
             approximate: false
         locator:
           page: 1277
+          pdf_page_index: 2
           section: 3. Experimental Procedure
-          note: Highest-FeO sample instead printed 790 to 910 K
+          note: Printed 1850 to 1980 K; highest-FeO composition x(FeO)=0.90 was measured at 1790 to 1910 K.
     total_duration_s:
       state:
         tag: value
@@ -556,6 +578,7 @@ experiments:
         value: powdered
       locator:
         page: 1277
+        pdf_page_index: 2
         section: 3. Experimental Procedure
   conditions:
     temperature_K:
@@ -651,13 +674,14 @@ experiments:
           tag: value
           value:
             kind: interval
-            interval_low: '850'
-            interval_high: '980'
+            interval_low: '1850'
+            interval_high: '1980'
             approximate: false
         locator:
           page: 1277
+          pdf_page_index: 2
           section: 3. Experimental Procedure
-          note: Highest-FeO sample instead printed 790 to 910 K
+          note: Printed 1850 to 1980 K; highest-FeO composition x(FeO)=0.90 was measured at 1790 to 1910 K.
     total_duration_s:
       state:
         tag: value
@@ -784,6 +808,7 @@ experiments:
         value: powdered
       locator:
         page: 1277
+        pdf_page_index: 2
         section: 3. Experimental Procedure
   conditions:
     temperature_K:
@@ -879,13 +904,14 @@ experiments:
           tag: value
           value:
             kind: interval
-            interval_low: '850'
-            interval_high: '980'
+            interval_low: '1850'
+            interval_high: '1980'
             approximate: false
         locator:
           page: 1277
+          pdf_page_index: 2
           section: 3. Experimental Procedure
-          note: Highest-FeO sample instead printed 790 to 910 K
+          note: Printed 1850 to 1980 K; highest-FeO composition x(FeO)=0.90 was measured at 1790 to 1910 K.
     total_duration_s:
       state:
         tag: value
@@ -1012,6 +1038,7 @@ experiments:
         value: powdered
       locator:
         page: 1277
+        pdf_page_index: 2
         section: 3. Experimental Procedure
   conditions:
     temperature_K:
@@ -1107,13 +1134,14 @@ experiments:
           tag: value
           value:
             kind: interval
-            interval_low: '850'
-            interval_high: '980'
+            interval_low: '1850'
+            interval_high: '1980'
             approximate: false
         locator:
           page: 1277
+          pdf_page_index: 2
           section: 3. Experimental Procedure
-          note: Highest-FeO sample instead printed 790 to 910 K
+          note: Printed 1850 to 1980 K; highest-FeO composition x(FeO)=0.90 was measured at 1790 to 1910 K.
     total_duration_s:
       state:
         tag: value
@@ -1240,6 +1268,7 @@ experiments:
         value: powdered
       locator:
         page: 1277
+        pdf_page_index: 2
         section: 3. Experimental Procedure
   conditions:
     temperature_K:
@@ -1335,13 +1364,14 @@ experiments:
           tag: value
           value:
             kind: interval
-            interval_low: '850'
-            interval_high: '980'
+            interval_low: '1850'
+            interval_high: '1980'
             approximate: false
         locator:
           page: 1277
+          pdf_page_index: 2
           section: 3. Experimental Procedure
-          note: Highest-FeO sample instead printed 790 to 910 K
+          note: Printed 1850 to 1980 K; highest-FeO composition x(FeO)=0.90 was measured at 1790 to 1910 K.
     total_duration_s:
       state:
         tag: value
@@ -1468,6 +1498,7 @@ experiments:
         value: powdered
       locator:
         page: 1277
+        pdf_page_index: 2
         section: 3. Experimental Procedure
   conditions:
     temperature_K:
@@ -1563,13 +1594,14 @@ experiments:
           tag: value
           value:
             kind: interval
-            interval_low: '850'
-            interval_high: '980'
+            interval_low: '1850'
+            interval_high: '1980'
             approximate: false
         locator:
           page: 1277
+          pdf_page_index: 2
           section: 3. Experimental Procedure
-          note: Highest-FeO sample instead printed 790 to 910 K
+          note: Printed 1850 to 1980 K; highest-FeO composition x(FeO)=0.90 was measured at 1790 to 1910 K.
     total_duration_s:
       state:
         tag: value
@@ -1696,6 +1728,7 @@ experiments:
         value: powdered
       locator:
         page: 1277
+        pdf_page_index: 2
         section: 3. Experimental Procedure
   conditions:
     temperature_K:
@@ -1791,13 +1824,14 @@ experiments:
           tag: value
           value:
             kind: interval
-            interval_low: '850'
-            interval_high: '980'
+            interval_low: '1790'
+            interval_high: '1910'
             approximate: false
         locator:
           page: 1277
+          pdf_page_index: 2
           section: 3. Experimental Procedure
-          note: Highest-FeO sample instead printed 790 to 910 K
+          note: Printed 1790 to 1910 K for the highest-FeO composition x(FeO)=0.90.
     total_duration_s:
       state:
         tag: value
@@ -1884,6 +1918,7 @@ benches:
       value: modulated-beam Knudsen effusion mass spectrometer
     locator:
       page: 1277
+      pdf_page_index: 2
       section: 3. Experimental Procedure
   cell_material_and_liner:
     state:
@@ -1891,6 +1926,7 @@ benches:
       value: tungsten cell with iridium inner cup
     locator:
       page: 1277
+      pdf_page_index: 2
       section: 3. Experimental Procedure
   cell_materials:
   - state:
@@ -1898,12 +1934,14 @@ benches:
       value: W
     locator:
       page: 1277
+      pdf_page_index: 2
       section: 3. Experimental Procedure
   - state:
       tag: value
       value: Ir
     locator:
       page: 1277
+      pdf_page_index: 2
       section: 3. Experimental Procedure
   geometry:
     orifice_diameter_m:
@@ -1915,6 +1953,7 @@ benches:
           approximate: false
       locator:
         page: 1277
+        pdf_page_index: 2
         section: 3. Experimental Procedure
         note: Printed 0.5 mm; unit conversion only
       inference:
@@ -1929,6 +1968,7 @@ benches:
               value: '0.5'
             locator:
               page: 1277
+              pdf_page_index: 2
               section: 3. Experimental Procedure
               note: Printed 0.5 mm; unit conversion only
         - - factor
@@ -1937,16 +1977,38 @@ benches:
               value: '1000'
             locator:
               page: 1277
+              pdf_page_index: 2
               section: 3. Experimental Procedure
               note: Printed 0.5 mm; unit conversion only
         output_unit: m
+    cell_internal_dimensions:
+      diameter_m:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          page: 1277
+          pdf_page_index: 2
+          section: 3. Experimental Procedure
+          note: No cell body dimensions are stated.
+      height_m:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          page: 1277
+          pdf_page_index: 2
+          section: 3. Experimental Procedure
+          note: No cell body dimensions are stated.
   detector:
     state:
       tag: value
       value: modulated-beam mass spectrometer with phase-sensitive detection
     locator:
       page: 1277
+      pdf_page_index: 2
       section: 3. Experimental Procedure
+      note: The instrument is referenced as described earlier in ref. 8; no model number is printed in this paper.
   ionization:
     method:
       state:
@@ -1954,6 +2016,7 @@ benches:
         value: electron impact
       locator:
         page: 1277
+        pdf_page_index: 2
         section: 3. Experimental Procedure
   temperature_measurement:
     sensor:
@@ -1962,5 +2025,6 @@ benches:
         value: optical pyrometer sighted into the effusion orifice
       locator:
         page: 1277
+        pdf_page_index: 2
         section: 3. Experimental Procedure
   other_facts: []

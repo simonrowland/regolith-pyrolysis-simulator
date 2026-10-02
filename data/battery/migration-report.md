@@ -1,14 +1,14 @@
 # Battery v2.1 migration report
 
 rows in: 47390
-records out (observations): 120847
+records out (observations): 120869
 works: 261
-experiments: 3508
-queue size: 76726
+experiments: 3509
+queue size: 76716
 identical-payload dedupe aliases: 342
 metadata files: 39
 index sources: 168
-hard issues: 3235
+hard issues: 3244
 
 ## Spec vs measured
 
@@ -17,7 +17,7 @@ hard issues: 3235
 | citations | 147 | 264 (mismatch) |
 | doi_works | 56 | 123 (mismatch) |
 | no_doi_works | 91 | 138 (mismatch) |
-| admission_statuses | 374 | 1025 (mismatch) |
+| admission_statuses | 374 | 1026 (mismatch) |
 | supersedes | 422 | 649 (mismatch) |
 | series | 60 | 592 (mismatch) |
 | gibbs_reference_pressures | 1617 | 1635 (mismatch) |
@@ -25,10 +25,10 @@ hard issues: 3235
 | gibbs_reference_101325 | 594 | 594 |
 | formulas | 1625 | 2030 (mismatch) |
 | equipment_payloads | 670 | 972 (mismatch) |
-| absent_admissions | 3511 | 4773 (mismatch) |
+| absent_admissions | 3511 | 4772 (mismatch) |
 | absent_classes | 2174 | 2205 (mismatch) |
 | range_only_T | 3125 | 2747 (mismatch) |
-| system_like_phases | 1065 | 2642 (mismatch) |
+| system_like_phases | 1065 | 2638 (mismatch) |
 | missing_phases | 237 | 367 (mismatch) |
 | tabulated_lists | — | 6 |
 
@@ -18009,11 +18009,11 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/extracts/kems-018-stolyarova-2012.yaml` | 1 | 1 | 5 |
 | `data/literature/extracts/kems-019-miller-armatys-2013.yaml` | 28 | 28 | 60 |
 | `data/literature/extracts/kems-020-hastie-1981-nbsir.yaml` | 38 | 112 | 289 |
-| `data/literature/extracts/kems-021-plante-1992-feo.yaml` | 10 | 25 | 44 |
+| `data/literature/extracts/kems-021-plante-1992-feo.yaml` | 10 | 25 | 40 |
 | `data/literature/extracts/kems-022-demaria-1971.yaml` | 31 | 89 | 227 |
 | `data/literature/extracts/kems-023-demaria-1973.yaml` | 30 | 75 | 58 |
 | `data/literature/extracts/kems-024-gibson-hubbard-1972.yaml` | 108 | 108 | 422 |
-| `data/literature/extracts/kems-025-markova-1983.yaml` | 22 | 22 | 69 |
+| `data/literature/extracts/kems-025-markova-1983.yaml` | 22 | 44 | 63 |
 | `data/literature/extracts/kems-026-markova-1984.yaml` | 15 | 37 | 61 |
 | `data/literature/extracts/kems-027-plante-hastie-1983.yaml` | 26 | 48 | 110 |
 | `data/literature/extracts/kems-028-yakovlev-1984.yaml` | 19 | 29 | 51 |
@@ -18211,13 +18211,13 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 
 ## Hard issue census
 
-hard issues: 3235
+hard issues: 3244
 
 MODEL_DERIVED / MEASURED_REDUCED keep their mapped evidence class. Parent pointers are not fabricated. Unstated derived_from / derivation is a hard conditional_field queued for page-grounding.
 
 | kind | count |
 |---|---:|
-| `conditional_field:derived_from` | 1679 |
+| `conditional_field:derived_from` | 1688 |
 | `conditional_field:derivation` | 1556 |
 
 ## Hard issues (first 50)
@@ -18275,8 +18275,8 @@ MODEL_DERIVED / MEASURED_REDUCED keep their mapped evidence class. Parent pointe
 
 ## Advisory issue census
 
-advisory issues: 218143
+advisory issues: 218252
 
 | kind | count |
 |---|---:|
-| `identity_incomplete` | 218143 |
+| `identity_incomplete` | 218252 |
