@@ -1,0 +1,611 @@
+schema_version: literature_extract.v1
+source_id: guo-2021-mgo-activity-cmas-slag
+source:
+  citation: >-
+    Guo, Y., Shen, F., Zheng, H., Wang, S., Jiang, X. and Gao, Q. (2021),
+    "Activity of MgO in CaO–SiO2–MgO–Al2O3 Melts for Blast Furnace Slag at
+    1873 K", ISIJ International 61(11), 2724–2730.
+  doi: 10.2355/isijinternational.ISIJINT-2021-224
+  year: 2021
+  sha256: 5150f1d2724f81c946acbcca6b1d131ae8256d52eeeec51b110865f3cb4d7d63
+extraction:
+  method: >-
+    Manual transcription of printed Tables 4, 5 and 6 from the supplied PDF
+    layout text. Table 5 activities are retained as measured-reduced values;
+    printed wt% slag compositions are retained alongside declared conversions
+    to mole fraction for typed identity. Activity-contour figures are not
+    digitized. The method is slag–metal equilibrium, not KEMS.
+  date: '2026-10-01'
+  worker: codex
+review_status: draft
+fidelity_samples:
+  - path: species.MgO.observations[guo_2021_table5_mgo_activities_1873k].values.reference_slag_x_Mg_average_as_printed
+    value: '0.00302'
+    note: Table 4 reference-slag x[Mg] average
+    locator:
+      published_page: 2728
+      pdf_page_index: 4
+      table: '4'
+      note: Reference slag CaF2–MgO average xref[Mg]
+  - path: species.MgO.observations[guo_2021_table5_mgo_activities_1873k].values.points[0].activity_as_printed
+    value: '0.4478'
+    note: Table 5 row 1 a(MgO)
+    locator:
+      published_page: 2728
+      pdf_page_index: 4
+      table: '5'
+      note: Row 1 activity cell
+  - path: species.MgO.observations[guo_2021_table5_mgo_activities_1873k].values.points[3].activity_as_printed
+    value: '0.6376'
+    note: Table 5 row 4 a(MgO)
+    locator:
+      published_page: 2728
+      pdf_page_index: 4
+      table: '5'
+      note: Row 4 activity cell
+  - path: species.MgO.observations[guo_2021_table5_mgo_activities_1873k].values.points[4].x_Mg_in_Sn_as_printed
+    value: '0.001282'
+    note: Table 5 row 5 x[Mg] in Sn
+    locator:
+      published_page: 2728
+      pdf_page_index: 4
+      table: '5'
+      note: Row 5 x[Mg] cell
+  - path: species.MgO.observations[guo_2021_table5_mgo_activities_1873k].values.points[7].activity_as_printed
+    value: '0.6472'
+    note: Table 5 row 8 a(MgO)
+    locator:
+      published_page: 2728
+      pdf_page_index: 4
+      table: '5'
+      note: Row 8 activity cell
+  - path: species.Mg.observations[guo_2021_table6_mg_activity_coefficients_1873k].values.points[0].gamma_as_printed
+    value: '3.1713'
+    note: Table 6 first activity-coefficient column
+    locator:
+      published_page: 2730
+      pdf_page_index: 6
+      table: '6'
+      note: First x[Mg] column gamma cell
+  - path: species.Mg.observations[guo_2021_table6_mg_activity_coefficients_1873k].values.points[3].gamma_as_printed
+    value: '3.1718'
+    note: Table 6 fourth activity-coefficient column
+    locator:
+      published_page: 2730
+      pdf_page_index: 6
+      table: '6'
+      note: Fourth x[Mg] column gamma cell
+  - path: species.Mg.observations[guo_2021_table6_mg_activity_coefficients_1873k].values.points[7].gamma_as_printed
+    value: '3.1703'
+    note: Table 6 eighth activity-coefficient column
+    locator:
+      published_page: 2730
+      pdf_page_index: 6
+      table: '6'
+      note: Eighth x[Mg] column gamma cell
+experiments:
+  - experiment_id: guo_slag_metal_equilibrium_1873k
+    method: quench_equilibration
+    method_as_printed: 'slag–metal equilibrium with an Sn solvent against a CaF2–MgO reference slag'
+    locator:
+      published_page: 2724
+      pdf_page_index: 0
+      section: Abstract
+      note: The abstract describes slag-metal equilibrium at 1 873 K using Sn as metal solvent and CaF2–MgO slag as reference slag.
+    conditions:
+      temperature_K:
+        state:
+          tag: value
+          value: '1873'
+        locator:
+          published_page: 2724
+          pdf_page_index: 0
+          section: Abstract
+          note: The abstract states T = 1 873 K.
+species:
+  MgO:
+    observations:
+      - observation_id: guo_2021_table5_mgo_activities_1873k
+        type: activity_coefficient
+        locator:
+          published_page: 2728
+          pdf_page_index: 4
+          table: '5'
+          note: Eight Table 5 activity rows; each point carries its row locator
+        experiment: guo_slag_metal_equilibrium_1873k
+        T_range_K:
+          - 1873.0
+          - 1873.0
+        phase: l
+        standard_state: pure solid MgO; the paper does not name a polymorph
+        units: dimensionless activity
+        uncertainty:
+          note: No numeric uncertainty is printed for the Table 5 activity cells.
+        values:
+          quantity: activity
+          method_class: directly_reduced_measurement
+          evidence_class: measured_reduced
+          admission_status: admitted
+          reference_state_as_printed: relative to pure solid
+          reference_slag_x_Mg_replicates_as_printed:
+            - '0.00301'
+            - '0.00302'
+            - '0.00303'
+          reference_slag_x_Mg_average_as_printed: '0.00302'
+          reference_slag_activity_MgO_as_printed: '1'
+          reference_slag_data_locator:
+            published_page: 2728
+            pdf_page_index: 4
+            table: '4'
+            note: Reference slag CaF2–MgO; three xref[Mg] groups, average and a_ref(MgO)
+          reference_slag_quantity_note: >-
+            Table 4 reports supporting x[Mg] mole fractions in Sn. The closed
+            Quantity enum has no standalone solution mole-fraction quantity;
+            these values are retained here as the printed reduction inputs,
+            not mislabeled as observations.
+          reduction_chain:
+            equation_1_and_3_as_printed: >-
+              MgO(measured or reference slag) + C(graphite) = Mg(in Sn) + CO(g)
+            equation_1_and_3_locator:
+              published_page: 2725
+              pdf_page_index: 1
+              equation: '1, 3'
+            equation_2_and_4_constant_as_printed: >-
+              p(CO) = p°CO = 101325 Pa; aC is relative to pure solid carbon.
+            equation_2_and_4_locator:
+              published_page: 2725
+              pdf_page_index: 1
+              equation: '2, 4'
+            equation_5_relation_as_printed: >-
+              a(MgO) = a_ref(MgO) × a[Mg] / a_ref[Mg]
+            equation_5_locator:
+              published_page: 2725
+              pdf_page_index: 1
+              equation: '5'
+            Henry_law_assumption_as_printed: >-
+              The authors state that Mg concentration in Sn is small enough for
+              Henry's law and set f[Mg] = 1.
+            Henry_law_locator:
+              published_page: 2725
+              pdf_page_index: 1
+              section: 2.1
+            equation_6_relation_as_printed: a(MgO) = x[Mg] / x_ref[Mg]
+            equation_6_locator:
+              published_page: 2725
+              pdf_page_index: 1
+              equation: '6'
+            reference_activity_input_locator:
+              published_page: 2725
+              pdf_page_index: 1
+              section: 2.1
+              note: The text states the CaF2–MgO reference slag has a(MgO) = 1.
+          composition_conversion: >-
+            For typed identity only, x_i=(w_i/M_i)/sum_j(w_j/M_j), using the
+            Table 5 printed oxide wt% values and oxide molar masses. The printed
+            wt% values remain in each point; no source value is overwritten.
+          points:
+            - row_as_printed: '1'
+              admission_status: admitted
+              method_class: directly_reduced_measurement
+              evidence_class: measured_reduced
+              T_K: '1873'
+              activity: '0.4478'
+              activity_as_printed: '0.4478'
+              x_Al_in_Sn_as_printed: '0.000264'
+              x_Si_in_Sn_as_printed: '0.000380'
+              x_Ca_in_Sn_as_printed: '0.001921'
+              x_Mg_in_Sn_as_printed: '0.001355'
+              composition_wt_pct:
+                CaO: '35.41'
+                SiO2: '33.35'
+                MgO: '9.26'
+                Al2O3: '19.39'
+              composition_mol:
+                CaO: '0.393074878891'
+                SiO2: '0.345524114992'
+                MgO: '0.143020064909'
+                Al2O3: '0.118380941208'
+              composition_conversion: x_i=(w_i/M_i)/sum_j(w_j/M_j) from printed mass%
+              locator:
+                published_page: 2728
+                pdf_page_index: 4
+                table: '5'
+                note: Row 1; slag composition and x[Al/Si/Ca/Mg] in Sn and a(MgO)
+            - row_as_printed: '2'
+              admission_status: admitted
+              method_class: directly_reduced_measurement
+              evidence_class: measured_reduced
+              T_K: '1873'
+              activity: '0.5121'
+              activity_as_printed: '0.5121'
+              x_Al_in_Sn_as_printed: '0.000220'
+              x_Si_in_Sn_as_printed: '0.000253'
+              x_Ca_in_Sn_as_printed: '0.002157'
+              x_Mg_in_Sn_as_printed: '0.001550'
+              composition_wt_pct:
+                CaO: '36.62'
+                SiO2: '32.02'
+                MgO: '9.46'
+                Al2O3: '19.75'
+              composition_mol:
+                CaO: '0.404508756338'
+                SiO2: '0.330114102073'
+                MgO: '0.145390940259'
+                Al2O3: '0.119986201331'
+              composition_conversion: x_i=(w_i/M_i)/sum_j(w_j/M_j) from printed mass%
+              locator:
+                published_page: 2728
+                pdf_page_index: 4
+                table: '5'
+                note: Row 2; slag composition and x[Al/Si/Ca/Mg] in Sn and a(MgO)
+            - row_as_printed: '3'
+              admission_status: admitted
+              method_class: directly_reduced_measurement
+              evidence_class: measured_reduced
+              T_K: '1873'
+              activity: '0.5379'
+              activity_as_printed: '0.5379'
+              x_Al_in_Sn_as_printed: '0.000176'
+              x_Si_in_Sn_as_printed: '0.000169'
+              x_Ca_in_Sn_as_printed: '0.002835'
+              x_Mg_in_Sn_as_printed: '0.001628'
+              composition_wt_pct:
+                CaO: '38.33'
+                SiO2: '30.84'
+                MgO: '9.51'
+                Al2O3: '19.63'
+              composition_mol:
+                CaO: '0.420553442921'
+                SiO2: '0.315812928871'
+                MgO: '0.145177566378'
+                Al2O3: '0.118456061829'
+              composition_conversion: x_i=(w_i/M_i)/sum_j(w_j/M_j) from printed mass%
+              locator:
+                published_page: 2728
+                pdf_page_index: 4
+                table: '5'
+                note: Row 3; slag composition and x[Al/Si/Ca/Mg] in Sn and a(MgO)
+            - row_as_printed: '4'
+              admission_status: admitted
+              method_class: directly_reduced_measurement
+              evidence_class: measured_reduced
+              T_K: '1873'
+              activity: '0.6376'
+              activity_as_printed: '0.6376'
+              x_Al_in_Sn_as_printed: '0.000176'
+              x_Si_in_Sn_as_printed: '0.000084'
+              x_Ca_in_Sn_as_printed: '0.003631'
+              x_Mg_in_Sn_as_printed: '0.001929'
+              composition_wt_pct:
+                CaO: '39.32'
+                SiO2: '29.27'
+                MgO: '9.77'
+                Al2O3: '19.72'
+              composition_mol:
+                CaO: '0.431719127168'
+                SiO2: '0.299946408475'
+                MgO: '0.149251590026'
+                Al2O3: '0.119082874332'
+              composition_conversion: x_i=(w_i/M_i)/sum_j(w_j/M_j) from printed mass%
+              locator:
+                published_page: 2728
+                pdf_page_index: 4
+                table: '5'
+                note: Row 4; slag composition and x[Al/Si/Ca/Mg] in Sn and a(MgO)
+            - row_as_printed: '5'
+              admission_status: admitted
+              method_class: directly_reduced_measurement
+              evidence_class: measured_reduced
+              T_K: '1873'
+              activity: '0.4236'
+              activity_as_printed: '0.4236'
+              x_Al_in_Sn_as_printed: '0.000220'
+              x_Si_in_Sn_as_printed: '0.000295'
+              x_Ca_in_Sn_as_printed: '0.004014'
+              x_Mg_in_Sn_as_printed: '0.001282'
+              composition_wt_pct:
+                CaO: '41.87'
+                SiO2: '31.85'
+                MgO: '4.63'
+                Al2O3: '19.35'
+              composition_mol:
+                CaO: '0.472143449804'
+                SiO2: '0.335207407507'
+                MgO: '0.0726421384761'
+                Al2O3: '0.120007004212'
+              composition_conversion: x_i=(w_i/M_i)/sum_j(w_j/M_j) from printed mass%
+              locator:
+                published_page: 2728
+                pdf_page_index: 4
+                table: '5'
+                note: Row 5; slag composition and x[Al/Si/Ca/Mg] in Sn and a(MgO)
+            - row_as_printed: '6'
+              admission_status: admitted
+              method_class: directly_reduced_measurement
+              evidence_class: measured_reduced
+              T_K: '1873'
+              activity: '0.4751'
+              activity_as_printed: '0.4751'
+              x_Al_in_Sn_as_printed: '0.000220'
+              x_Si_in_Sn_as_printed: '0.000211'
+              x_Ca_in_Sn_as_printed: '0.003572'
+              x_Mg_in_Sn_as_printed: '0.001438'
+              composition_wt_pct:
+                CaO: '40.64'
+                SiO2: '30.98'
+                MgO: '6.54'
+                Al2O3: '19.31'
+              composition_mol:
+                CaO: '0.455226897569'
+                SiO2: '0.323883475959'
+                MgO: '0.101926845960'
+                Al2O3: '0.118962780512'
+              composition_conversion: x_i=(w_i/M_i)/sum_j(w_j/M_j) from printed mass%
+              locator:
+                published_page: 2728
+                pdf_page_index: 4
+                table: '5'
+                note: Row 6; slag composition and x[Al/Si/Ca/Mg] in Sn and a(MgO)
+            - row_as_printed: '7'
+              admission_status: admitted
+              method_class: directly_reduced_measurement
+              evidence_class: measured_reduced
+              T_K: '1873'
+              activity: '0.5716'
+              activity_as_printed: '0.5716'
+              x_Al_in_Sn_as_printed: '0.000220'
+              x_Si_in_Sn_as_printed: '0.000127'
+              x_Ca_in_Sn_as_printed: '0.003484'
+              x_Mg_in_Sn_as_printed: '0.001730'
+              composition_wt_pct:
+                CaO: '39.22'
+                SiO2: '29.78'
+                MgO: '8.30'
+                Al2O3: '19.56'
+              composition_mol:
+                CaO: '0.439093192417'
+                SiO2: '0.311176628138'
+                MgO: '0.129289670492'
+                Al2O3: '0.120440508952'
+              composition_conversion: x_i=(w_i/M_i)/sum_j(w_j/M_j) from printed mass%
+              locator:
+                published_page: 2728
+                pdf_page_index: 4
+                table: '5'
+                note: Row 7; slag composition and x[Al/Si/Ca/Mg] in Sn and a(MgO)
+            - row_as_printed: '8'
+              admission_status: admitted
+              method_class: directly_reduced_measurement
+              evidence_class: measured_reduced
+              T_K: '1873'
+              activity: '0.6472'
+              activity_as_printed: '0.6472'
+              x_Al_in_Sn_as_printed: '0.000220'
+              x_Si_in_Sn_as_printed: '0.000084'
+              x_Ca_in_Sn_as_printed: '0.003690'
+              x_Mg_in_Sn_as_printed: '0.001959'
+              composition_wt_pct:
+                CaO: '38.58'
+                SiO2: '29.83'
+                MgO: '10.22'
+                Al2O3: '19.61'
+              composition_mol:
+                CaO: '0.421980592020'
+                SiO2: '0.304520594964'
+                MgO: '0.155531288949'
+                Al2O3: '0.117967524067'
+              composition_conversion: x_i=(w_i/M_i)/sum_j(w_j/M_j) from printed mass%
+              locator:
+                published_page: 2728
+                pdf_page_index: 4
+                table: '5'
+                note: Row 8; slag composition and x[Al/Si/Ca/Mg] in Sn and a(MgO)
+  Mg:
+    observations:
+      - observation_id: guo_2021_table6_mg_activity_coefficients_1873k
+        type: activity_coefficient
+        locator:
+          published_page: 2730
+          pdf_page_index: 6
+          table: '6'
+          note: Eight tabulated x[Mg], a[Mg](R) and gamma[Mg] columns
+        experiment: guo_slag_metal_equilibrium_1873k
+        T_range_K:
+          - 1873.0
+          - 1873.0
+        phase: l
+        standard_state: pure liquid Mg endmember; inferred phase for the printed standard
+        units: dimensionless activity coefficient
+        uncertainty:
+          note: No numeric uncertainty is printed for the Table 6 coefficients.
+        values:
+          quantity: activity_coefficient
+          method_class: model_derived
+          evidence_class: model_derived
+          admission_status: admitted
+          standard_state_as_printed: Raoultian standard state
+          standard_state_inference: >-
+            The authors state a Raoultian standard state but do not name the Mg
+            reference phase. The pure liquid Mg endmember is used for the
+            1873 K alloy row; this phase assignment is an inference.
+          standard_state_inference_locator:
+            published_page: 2730
+            pdf_page_index: 6
+            section: 3.4
+          calculation_as_printed: >-
+            The authors state that the activity coefficient of Mg in Sn at
+            Raoultian standard state is calculated and show the results in
+            Table 6.
+          calculation_locator:
+            published_page: 2730
+            pdf_page_index: 6
+            section: 3.4
+          equation_18_delta_G_as_printed: 'ΔG° = 615200 − 289.82 T J/mol'
+          equation_18_locator:
+            published_page: 2730
+            pdf_page_index: 6
+            equation: '18'
+          equation_20_log_K_as_printed: 'lg K° = −2.018 at T = 1873 K'
+          equation_20_locator:
+            published_page: 2730
+            pdf_page_index: 6
+            equation: '20'
+          equation_21_K_as_printed: 'K° = 0.009596'
+          equation_21_locator:
+            published_page: 2730
+            pdf_page_index: 6
+            equation: '21'
+          equation_22_relation_as_printed: 'a[Mg] = K° × a(MgO)'
+          equation_22_locator:
+            published_page: 2730
+            pdf_page_index: 6
+            equation: '22'
+          composition_conversion: >-
+            Table 6 prints x[Mg]. The Sn mole fraction in the binary Mg-Sn
+            solution is recorded as 1 − x[Mg] for typed identity; this
+            complement is calculated and is not a printed cell.
+          points:
+            - column_as_printed: '1'
+              admission_status: admitted
+              method_class: model_derived
+              evidence_class: model_derived
+              T_K: '1873'
+              x_Mg_as_printed: '0.001355'
+              x_Sn_from_binary_complement: '0.998645'
+              a_Mg_R_as_printed: '0.004297'
+              gamma: '3.1713'
+              gamma_as_printed: '3.1713'
+              composition_mol:
+                Mg: '0.001355'
+                Sn: '0.998645'
+              locator:
+                published_page: 2730
+                pdf_page_index: 6
+                table: '6'
+                note: First x[Mg] column; x[Mg], a[Mg](R) and gamma[Mg]
+            - column_as_printed: '2'
+              admission_status: admitted
+              method_class: model_derived
+              evidence_class: model_derived
+              T_K: '1873'
+              x_Mg_as_printed: '0.00155'
+              x_Sn_from_binary_complement: '0.99845'
+              a_Mg_R_as_printed: '0.004914'
+              gamma: '3.1704'
+              gamma_as_printed: '3.1704'
+              composition_mol:
+                Mg: '0.00155'
+                Sn: '0.99845'
+              locator:
+                published_page: 2730
+                pdf_page_index: 6
+                table: '6'
+                note: Second x[Mg] column; x[Mg], a[Mg](R) and gamma[Mg]
+            - column_as_printed: '3'
+              admission_status: admitted
+              method_class: model_derived
+              evidence_class: model_derived
+              T_K: '1873'
+              x_Mg_as_printed: '0.001628'
+              x_Sn_from_binary_complement: '0.998372'
+              a_Mg_R_as_printed: '0.005162'
+              gamma: '3.1706'
+              gamma_as_printed: '3.1706'
+              composition_mol:
+                Mg: '0.001628'
+                Sn: '0.998372'
+              locator:
+                published_page: 2730
+                pdf_page_index: 6
+                table: '6'
+                note: Third x[Mg] column; x[Mg], a[Mg](R) and gamma[Mg]
+            - column_as_printed: '4'
+              admission_status: admitted
+              method_class: model_derived
+              evidence_class: model_derived
+              T_K: '1873'
+              x_Mg_as_printed: '0.001929'
+              x_Sn_from_binary_complement: '0.998071'
+              a_Mg_R_as_printed: '0.006118'
+              gamma: '3.1718'
+              gamma_as_printed: '3.1718'
+              composition_mol:
+                Mg: '0.001929'
+                Sn: '0.998071'
+              locator:
+                published_page: 2730
+                pdf_page_index: 6
+                table: '6'
+                note: Fourth x[Mg] column; x[Mg], a[Mg](R) and gamma[Mg]
+            - column_as_printed: '5'
+              admission_status: admitted
+              method_class: model_derived
+              evidence_class: model_derived
+              T_K: '1873'
+              x_Mg_as_printed: '0.001282'
+              x_Sn_from_binary_complement: '0.998718'
+              a_Mg_R_as_printed: '0.004065'
+              gamma: '3.1707'
+              gamma_as_printed: '3.1707'
+              composition_mol:
+                Mg: '0.001282'
+                Sn: '0.998718'
+              locator:
+                published_page: 2730
+                pdf_page_index: 6
+                table: '6'
+                note: Fifth x[Mg] column; x[Mg], a[Mg](R) and gamma[Mg]
+            - column_as_printed: '6'
+              admission_status: admitted
+              method_class: model_derived
+              evidence_class: model_derived
+              T_K: '1873'
+              x_Mg_as_printed: '0.001438'
+              x_Sn_from_binary_complement: '0.998562'
+              a_Mg_R_as_printed: '0.004559'
+              gamma: '3.1704'
+              gamma_as_printed: '3.1704'
+              composition_mol:
+                Mg: '0.001438'
+                Sn: '0.998562'
+              locator:
+                published_page: 2730
+                pdf_page_index: 6
+                table: '6'
+                note: Sixth x[Mg] column; x[Mg], a[Mg](R) and gamma[Mg]
+            - column_as_printed: '7'
+              admission_status: admitted
+              method_class: model_derived
+              evidence_class: model_derived
+              T_K: '1873'
+              x_Mg_as_printed: '0.00173'
+              x_Sn_from_binary_complement: '0.99827'
+              a_Mg_R_as_printed: '0.005485'
+              gamma: '3.1706'
+              gamma_as_printed: '3.1706'
+              composition_mol:
+                Mg: '0.00173'
+                Sn: '0.99827'
+              locator:
+                published_page: 2730
+                pdf_page_index: 6
+                table: '6'
+                note: Seventh x[Mg] column; x[Mg], a[Mg](R) and gamma[Mg]
+            - column_as_printed: '8'
+              admission_status: admitted
+              method_class: model_derived
+              evidence_class: model_derived
+              T_K: '1873'
+              x_Mg_as_printed: '0.001959'
+              x_Sn_from_binary_complement: '0.998041'
+              a_Mg_R_as_printed: '0.006211'
+              gamma: '3.1703'
+              gamma_as_printed: '3.1703'
+              composition_mol:
+                Mg: '0.001959'
+                Sn: '0.998041'
+              locator:
+                published_page: 2730
+                pdf_page_index: 6
+                table: '6'
+                note: Eighth x[Mg] column; x[Mg], a[Mg](R) and gamma[Mg]
