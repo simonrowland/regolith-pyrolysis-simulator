@@ -52,7 +52,15 @@ from simulator.battery.pins import (
     pin_failures,
     tombstone_for_changed_identity,
 )
-from simulator.battery.identity import Exposure, Identity, SweepIdentity, identity_equal, quantity_token
+from simulator.battery.identity import (
+    Exposure,
+    Identity,
+    SweepIdentity,
+    identity_equal,
+    profile_for,
+    quantity_token,
+    validate_quantity_profile,
+)
 from simulator.battery.records import (
     Apparatus,
     ApparatusGeometry,
@@ -407,6 +415,148 @@ def test_condensed_activity_axes_follow_composition_and_pressure() -> None:
     vapour_outcome = identity_equal(vapour, vapour)
     assert vapour_outcome.kind is IdentityEqualKind.IDENTITY_UNKNOWN
     assert {"fO2_Pa", "total_pressure_Pa"}.issubset(vapour_outcome.fields)
+
+
+@pytest.mark.parametrize("axis", ("reaction", "reference_state", "reservoir"))
+def test_p_partial_optional_axes_do_not_block_identity_or_score(axis: str) -> None:
+    experiment = F.kems_experiment()
+    base = replace(
+        _partial_identity(),
+        fO2_Pa=State.of(Decimal("100000")),
+        total_pressure_Pa=State.of(Decimal("100000")),
+    )
+    profile = profile_for(base)
+    assert axis not in profile.required
+    assert axis not in profile.permitted_not_applicable
+    assert {
+        "temperature_K",
+        "composition",
+        "fO2_Pa",
+        "total_pressure_Pa",
+    }.issubset(profile.required)
+    assert len(base.composition.value.components) > 1
+
+    missing_metadata = replace(base, **{axis: State.unknown("not printed")})
+    assert validate_quantity_profile(missing_metadata).kind is IdentityEqualKind.EQUAL
+    assert identity_equal(base, missing_metadata).kind is IdentityEqualKind.EQUAL
+
+    reference = F.observation(
+        f"p-partial-optional-{axis}",
+        experiment.experiment_id,
+        missing_metadata,
+        Decimal("1"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="plante-1979",
+    )
+    residual, candidate = _compile(
+        reference,
+        experiment,
+        _partial_prediction(Engine.INTERNAL_ANALYTICAL, reference),
+    )
+    assert candidate is not None
+    assert residual.numeric is not None
+    assert residual.refusal is None
+
+
+def test_migrated_p_partial_optional_axes_are_retained_without_changing_score(
+    tmp_path: Path,
+) -> None:
+    """Source-printed optional axes survive migration and do not affect scoring."""
+
+    from simulator.battery.migrate import migrate
+    from tests.battery.test_migrate import _copy_extract, _write_min_tree
+
+    root = _write_min_tree(tmp_path)
+    _copy_extract(root, "kems-042-plante-1979.yaml")
+    _copy_extract(root, "stolyarova-1995-cao-alumina-kems.yaml")
+    migrated = migrate(root, write=False)
+    rows = tuple(migrated.observations.values())
+
+    def first_partial_pressure(source_id: str):
+        return next(
+            observation
+            for observation in rows
+            if observation.source_id == source_id
+            and quantity_token(observation.identity) is Quantity.P_PARTIAL
+        )
+
+    plante = first_partial_pressure("kems-042-plante-1979")
+    stolyarova = first_partial_pressure("stolyarova-1995-cao-alumina-kems")
+    assert all(
+        state is not None and state.is_value
+        for state in (
+            plante.identity.reaction,
+            plante.identity.reference_state,
+            plante.identity.reservoir,
+        )
+    )
+    assert all(
+        state is not None and state.is_unknown
+        for state in (
+            stolyarova.identity.reaction,
+            stolyarova.identity.reference_state,
+            stolyarova.identity.reservoir,
+        )
+    )
+
+    # Apply only the migrated metadata to a shared complete fixture so the
+    # identity difference is what each source did or did not print. The real
+    # Stolyarova observations remain model-derived and are not score-eligible.
+    experiment = F.kems_experiment()
+    base = replace(
+        _partial_identity(),
+        fO2_Pa=State.of(Decimal("100000")),
+        total_pressure_Pa=State.of(Decimal("100000")),
+    )
+    plante_identity = replace(
+        base,
+        reaction=plante.identity.reaction,
+        reference_state=plante.identity.reference_state,
+        reservoir=plante.identity.reservoir,
+    )
+    stolyarova_identity = replace(
+        base,
+        reaction=stolyarova.identity.reaction,
+        reference_state=stolyarova.identity.reference_state,
+        reservoir=stolyarova.identity.reservoir,
+    )
+    assert (
+        identity_equal(plante_identity, stolyarova_identity).kind
+        is IdentityEqualKind.EQUAL
+    )
+
+    for source, identity in (
+        ("plante", plante_identity),
+        ("stolyarova-1995", stolyarova_identity),
+    ):
+        reference = F.observation(
+            f"migrated-p-partial-{source}",
+            experiment.experiment_id,
+            identity,
+            Decimal("1"),
+            evidence=EvidenceClass.MEASURED_DIRECT,
+            source_id=f"p-partial-{source}",
+        )
+        residual, candidate = _compile(
+            reference,
+            experiment,
+            _partial_prediction(Engine.INTERNAL_ANALYTICAL, reference),
+        )
+        assert candidate is not None
+        assert residual.numeric is not None
+        assert residual.refusal is None
+
+
+def test_p_partial_without_composition_still_refuses_identity() -> None:
+    base = replace(
+        _partial_identity(),
+        fO2_Pa=State.of(Decimal("100000")),
+        total_pressure_Pa=State.of(Decimal("100000")),
+        composition=State.unknown("composition not printed"),
+    )
+    outcome = identity_equal(base, base)
+    assert outcome.kind is IdentityEqualKind.IDENTITY_UNKNOWN
+    assert "composition" in outcome.fields
 
 
 def test_pooled_log_pressure_sd_known_replicates() -> None:
