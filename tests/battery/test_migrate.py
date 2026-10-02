@@ -8374,11 +8374,8 @@ def test_residue_cells_keep_run_identity_and_printed_conditions(
             oxide: Decimal(str(amount))
             for oxide, amount in source_experiment["sample"]["printed_composition"]["state"]["value"].items()
         }
-        expected_start_composition[obs.identity.species.formula] = (
-            expected_starting / Decimal("10000")
-        )
         assert identity.composition.value.amount_basis.value == "mass_percent"
-        assert identity.composition.value.basis == "printed_oxides_plus_starting_element"
+        assert identity.composition.value.basis == "printed_oxides"
         assert dict(identity.composition.value.components) == expected_start_composition
         assert identity.temperature_K.value == run_key[1]
         assert identity.sample_mass_kg.value == Decimal(

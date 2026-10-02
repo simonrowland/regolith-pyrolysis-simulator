@@ -12578,16 +12578,10 @@ class Migrator:
                     )
                     if value_sel is not None and value_sel.field_name == "residue_ppm":
                         printed = run_experiment.sample.printed_composition
-                        start_ppm = (
-                            _as_dec_or_none(parent_values.get("starting_measured_ppm"))
-                            if isinstance(parent_values, Mapping)
-                            else None
-                        )
                         if (
                             printed is not None
                             and printed.state.is_value
                             and isinstance(printed.state.value, Mapping)
-                            and start_ppm is not None
                         ):
                             components = {
                                 str(formula): _as_dec_or_none(amount)
@@ -12598,10 +12592,9 @@ class Migrator:
                                 for formula, amount in components.items()
                                 if amount is not None
                             }
-                            components[species.formula] = start_ppm / Decimal("10000")
                             composition = State.of(
                                 Composition(
-                                    basis="printed_oxides_plus_starting_element",
+                                    basis="printed_oxides",
                                     components=tuple(components.items()),
                                     amount_basis=AmountBasis.MASS_PERCENT,
                                 )
