@@ -7,7 +7,7 @@
 - **VERDICT LAND 5e5b5ded58f43b644ce9b2d51ca8dd834811993f**
 - **Deliverable:** `REVIEW-ia-bounce-delta-5e5b5ded-2026-10-02.md`
 - **Date:** 2026-10-02 ~10:53 ET
-- **Mailbox tip:** _(pending pin)_ on `empirical/reviews-batch-zv-2026-09-22`
+- **Mailbox tip:** `272a2279d92e507ed8b1eb86b578238ad645d9ad` on `empirical/reviews-batch-zv-2026-09-22` (artifacts `272a2279d92e507ed8b1eb86b578238ad645d9ad`).
 
 R5: flattering guard 307 PASS; binary_pot 31 PASS + new unknown-authority test PASS (1 openimcc harness FAIL = VPS env, not tip); IA engine 4 PASS; test_score 122 PASS (1 openimcc ModuleNotFound = VPS env). Attacks (1)–(4) PASS. No P1 REVISE items.
 
