@@ -10,6 +10,8 @@
 
 Reviewed each tip as given (SHAs below). Parent/green tip not required for values guards.
 
+> **Store-count lean lifted (2026-10-02):** Main landing-train regen now confirms store counts. Values-side guards unchanged; leans that waited only on store regen are now final `VERDICT: LAND <sha>`. Guo held for amend/delta (not finalized here).
+
 ---
 
 ## 1) Hashimoto 1983 — `c04bff249ab1ee8107dab4c1776c0087c45f20af` (kems-015-hashimoto-1983)
@@ -42,7 +44,7 @@ Table 1 starting Ave. (wt%): SiO2 35.43, Al2O3 3.16, FeO 35.04, MgO 23.84, CaO 2
 - Cannot score residue composition yet — **ticket t-1078** (no engine predicts residue composition). Scorer/engine gap, not extract wrong-number.
 - Store regen: skipped on ~16GB box (values guards complete).
 
-**VERDICT lean:** LAND
+**VERDICT:** LAND c04bff249ab1ee8107dab4c1776c0087c45f20af
 
 ---
 
@@ -85,7 +87,7 @@ Table 6 — 8 γ(Mg in Sn) + a[Mg](R) + x[Mg]:
 - Mg-in-Sn γ correctly unsupported for OpenIMCC / melt-activity scoring (model_derived metal solvent γ).
 - Store regen skipped (16GB).
 
-**VERDICT lean:** LAND
+**VERDICT:** HOLD — awaiting amend/delta from main (a580172d6)
 
 ---
 
@@ -117,7 +119,7 @@ Table 6 — 8 γ(Mg in Sn) + a[Mg](R) + x[Mg]:
 - Scorer apparatus / effusion-regime paths may still refuse some KEMS rows — not wrong-number in the digitised Fe/Mg PP set.
 - Store regen skipped (16GB).
 
-**VERDICT lean:** LAND
+**VERDICT:** LAND 2883c54d02355d2365b3a98e26ca150d3b9d43eb
 
 ---
 
@@ -159,7 +161,7 @@ Torr→Pa ×133.322 consistent. Figs 1–2 figure_only.
 - Remaining scoring blockers are scorer/apparatus (calibration / effusion regime), not further wrong numbers in the admitted POINT set.
 - Store regen skipped (16GB).
 
-**VERDICT lean:** LAND
+**VERDICT:** LAND 60db4ba13acd1288b5eafc4acb5d38777a130605
 
 ---
 
@@ -199,12 +201,12 @@ FeO rows carry Table 4 EDS comps (wt% inferred; sum≈100) + printed X_FeO; wt%�
 - Worker OpenIMCC score (19 FeO residuals, median −0.085 dex) is a scorer result, not an extract wrong-number gate.
 - Store regen skipped (16GB).
 
-**VERDICT lean:** LAND
+**VERDICT:** LAND e644f212033d26c98d8f916d8e850d13fc3a7faf
 
 ---
 
 ## Store regen
 
-VPS ~16GB RAM: skipped `battery_migrate --dry-run` this seat (targeted values guards only). Counts above are extract-side. Ask Mac Studio if a green-gate migrate census is needed.
+Lean condition (store-count confirmation via `battery_migrate`) is **lifted**: main's landing train regen now supplies those counts. Values-side guards above unchanged. Guo not finalized (await delta). Finalized 2026-10-02 (2026-10-02 ~00:31 ET).
 
 — regolith-empirical

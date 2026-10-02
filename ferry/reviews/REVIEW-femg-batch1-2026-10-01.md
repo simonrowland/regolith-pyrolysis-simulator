@@ -10,6 +10,8 @@
 
 Green tip on origin may have moved (`c9b6e545d`); REQ merge-clean parent is `696299350`. Reviewed each tip as given.
 
+> **Store-count lean lifted (2026-10-02):** Main landing-train regen now confirms store counts (Plante 9 obs changed / hard +9; Markova 22→44). Values-side guards unchanged; leans that waited only on store regen are now final `VERDICT: LAND <sha>`.
+
 ---
 
 ## 1) Plante 1992 — `b843cd76be8762cf561267bd6fd5ef70be604422` (kems-021-plante-1992-feo)
@@ -42,7 +44,7 @@ Table 1 ion ratios (7 rows): I(Fe+)/I(Mg+) and I(Fe+)/I(SiO+) all match page (7.
 - Scorer: comparisons refuse `effusion_regime_unverified` (KEMS activities not yet on d-055 flag path) — **ticket t-1076**, scorer defect not extract wrong-number.
 - Store regen counts (worker): 9 observations changed; hard issues +9 lineage under d-053 — confirm on box when migrate re-run; values side OK.
 
-**VERDICT lean:** LAND
+**VERDICT:** LAND b843cd76be8762cf561267bd6fd5ef70be604422
 
 ---
 
@@ -82,7 +84,7 @@ Same sentence as the rejected Mg max: “Maximum P_SiO and P_Mg in the temperatu
 - After SiO/Ca range-max fix, remaining scoring blockers are scorer/apparatus (calibration / effusion regime), not further wrong numbers in the admitted POINT set.
 - Worker regen claim (15 obs changed; points 22→20; categoricals 4→6; hard issues unchanged) — re-confirm on box migrate after revise.
 
-**VERDICT lean:** REVISE — reject SiO (and Ca) range-maxima as `bound_not_point_ordering` like Mg/Fe.
+**VERDICT:** REVISE — reject SiO (and Ca) range-maxima as `bound_not_point_ordering` like Mg/Fe. (batch1 tip `617741fad7f35ed1d9884de57e3d4fed3a5832ca` — not LAND; revised tip is in batch2)
 
 ---
 
@@ -117,12 +119,13 @@ Tip also touches `simulator/battery/score.py` (+ in_cell_fallback→calibration 
 - All 25 points refuse `cell_material_unknown` until apparatus paper facts land or scorer path changes (t-1077).
 - Store regen 22→44 observations / hard issues unchanged — confirm on box migrate.
 
-**VERDICT lean:** LAND
+**VERDICT:** LAND 4b04c2290552fca19b7d9c48b68066115a6787da
+(landing as extract-only `2c92c4095`, blob-identical extract)
 
 ---
 
 ## Store regen
 
-Box VM `grok-bot-vm-309414527` went offline mid-seat before `battery_migrate --dry-run` could re-confirm store-side counts. Values-side guards above stand. Regen confirmation to be filled when box returns (or parent re-runs migrate on tip checkouts).
+Lean condition (store-count confirmation via `battery_migrate`) is **lifted**: main's landing train regen confirms Plante 9 obs changed / hard +9 and Markova 22→44. Values-side guards above unchanged. Finalized 2026-10-02 (2026-10-02 ~00:31 ET).
 
 — regolith-empirical
