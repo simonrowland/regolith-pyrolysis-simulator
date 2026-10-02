@@ -7438,27 +7438,33 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         """Solve ordinary finite-headspace evaporation and duct pressure together."""
 
         calculate = self._calculate_evaporation
+        same_tick_batch_cache: dict[str, Any] = {}
         try:
-            supports_override = (
-                'overhead_partials_override_Pa'
-                in inspect.signature(calculate).parameters
-            )
+            calculate_parameters = inspect.signature(calculate).parameters
+            supports_override = 'overhead_partials_override_Pa' in calculate_parameters
+            supports_batch_cache = '_same_tick_batch_cache' in calculate_parameters
         except (TypeError, ValueError):
             supports_override = False
+            supports_batch_cache = False
+
+        def calculate_for_headspace(partials: Mapping[str, float] | None = None):
+            kwargs: dict[str, Any] = {}
+            if supports_override:
+                kwargs['overhead_partials_override_Pa'] = partials
+            if supports_batch_cache:
+                kwargs['_same_tick_batch_cache'] = same_tick_batch_cache
+            return calculate(equilibrium, **kwargs)
 
         if supports_override:
             # Do not seed the solve from the previous tick.  The zero-pressure
             # call is a numerical starting point only; the returned state is
             # replaced by the same-tick duct fixed point below.
-            evap_flux = calculate(
-                equilibrium,
-                overhead_partials_override_Pa={},
-            )
+            evap_flux = calculate_for_headspace({})
         else:
             # Small test doubles and legacy diagnostic seams may not expose the
             # optional override.  Preserve their call contract while still
             # publishing the physical current-tick pressure for the caller.
-            evap_flux = calculate(equilibrium)
+            evap_flux = calculate_for_headspace()
         evap_flux = self._apply_analytic_evaporation_depletion(evap_flux)
         partials = self._same_tick_evaporation_headspace_partials_Pa(evap_flux)
         if not supports_override:
@@ -7512,10 +7518,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 # its toggles instead of the same-tick root.
                 partials = dict(initial_partials)
             for _ in range(iteration_limit):
-                next_flux = calculate(
-                    equilibrium,
-                    overhead_partials_override_Pa=bounded_override(partials),
-                )
+                next_flux = calculate_for_headspace(bounded_override(partials))
                 next_flux = self._apply_analytic_evaporation_depletion(next_flux)
                 next_partials = self._same_tick_evaporation_headspace_partials_Pa(
                     next_flux
@@ -7592,11 +7595,8 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
 
                 def evaluate_at(pressure_pa: float):
                     candidates[species] = pressure_pa
-                    trial_flux = calculate(
-                        equilibrium,
-                        overhead_partials_override_Pa=bounded_override(
-                            candidates
-                        ),
+                    trial_flux = calculate_for_headspace(
+                        bounded_override(candidates)
                     )
                     trial_flux = self._apply_analytic_evaporation_depletion(
                         trial_flux
@@ -7635,10 +7635,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                         break
                 partials[species] = 0.5 * (lo + hi)
 
-            final_flux = calculate(
-                equilibrium,
-                overhead_partials_override_Pa=bounded_override(partials),
-            )
+            final_flux = calculate_for_headspace(bounded_override(partials))
             final_flux = self._apply_analytic_evaporation_depletion(final_flux)
             final_partials = self._same_tick_evaporation_headspace_partials_Pa(
                 final_flux

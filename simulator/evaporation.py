@@ -692,6 +692,7 @@ class EvaporationMixin:
         equilibrium: Any,
         *,
         temperature_K: float,
+        same_tick_cache: dict[str, Any] | None = None,
     ) -> tuple[
         dict[str, float],
         dict[str, Any],
@@ -716,18 +717,86 @@ class EvaporationMixin:
             self.vapor_pressures,
             equilibrium,
         )
+        resolution_diagnostic = {
+            key: vapor_pressure_diagnostic.get(key)
+            for key in (
+                'pO2_bar',
+                'backend_vapor_pressures_Pa',
+                'activities',
+                'activities_provider',
+                'vapor_pressure_numerator_provenance',
+                'activity_provenance',
+                'a_FeO_calphad',
+                'activities_standard_state',
+                'source_reaction_fO2_bar',
+                'source_reaction_fO2_log10',
+                'source_reaction_activity_pressure_bar',
+                'source_reaction_redox_model_id',
+                'source_reaction_composition_wt_pct',
+            )
+        }
+        equilibrium_diagnostics = getattr(equilibrium, 'diagnostics', {}) or {}
+        resolution_equilibrium_diagnostics = {
+            key: equilibrium_diagnostics.get(key)
+            for key in (
+                'activities_provider',
+                'vapor_pressure_numerator_provenance',
+                'activity_provenance',
+                'a_FeO_calphad',
+                'activities_standard_state',
+            )
+        }
         live_vapor_pressures = _evaporation_legacy_shadow_pressure_map(
             self.vapor_pressures,
             vapor_pressure_diagnostic,
         )
-        vapour_batch = self._resolve_evaporation_vapour_batch(
-            equilibrium,
-            temperature_K=temperature_K,
-            effective_pressure_source=effective_pressure_source,
+        batch_inputs = (
+            id(equilibrium),
+            getattr(equilibrium, 'vapor_pressures_Pa', {}) or {},
+            getattr(equilibrium, 'activity_coefficients', {}) or {},
+            resolution_equilibrium_diagnostics,
+            getattr(equilibrium, 'temperature_C', None),
+            float(temperature_K),
+            resolution_diagnostic,
+            vapor_pressure_diagnostic.get(
+                'pO2_bar', getattr(equilibrium, 'pO2_bar', None)
+            ),
+            (
+                effective_pressure_source.source_id,
+                tuple(sorted(effective_pressure_source._pressures_pa.items())),
+                effective_pressure_source.physical_zero_reason,
+            ),
+            getattr(self.melt, 'p_total_mbar', None),
+            str(getattr(getattr(self.melt, 'campaign', None), 'name', '') or ''),
+            getattr(self, '_melt_activity_engine_inputs', {}),
+            bool(getattr(self, '_melt_activity_shadow_enabled', False)),
+            bool(getattr(self, '_imcc_activity_shadow_enabled', False)),
+            len(self.atom_ledger.transitions),
         )
-        resolve_error = dict(
-            getattr(self, '_last_vapour_batch_resolve_error', {}) or {}
+        cached_inputs = (
+            same_tick_cache.get('inputs')
+            if same_tick_cache is not None
+            else None
         )
+        reuse_cached_batch = (
+            cached_inputs is not None and cached_inputs == batch_inputs
+        )
+        if reuse_cached_batch:
+            return same_tick_cache['state']
+        else:
+            # The resolver reads equilibrium activities/pressures, temperature,
+            # source composition and ledger generation, melt pressure/campaign,
+            # activity inputs and committed interface pO2. Picard changes only
+            # the later pressure overlay; a hook may mutate a resolver input
+            # mid-solve, so a changed snapshot forces a fresh batch before use.
+            vapour_batch = self._resolve_evaporation_vapour_batch(
+                equilibrium,
+                temperature_K=temperature_K,
+                effective_pressure_source=effective_pressure_source,
+            )
+            resolve_error = dict(
+                getattr(self, '_last_vapour_batch_resolve_error', {}) or {}
+            )
         vapor_pressures, flux_overlay_report = flux_pressures_from_batch(
             vapour_batch,
             effective_pressure_source=effective_pressure_source,
@@ -741,7 +810,7 @@ class EvaporationMixin:
                 resolution_error=resolve_error or None,
             )
         )
-        return (
+        state = (
             vapor_pressures,
             flux_overlay_report,
             vapour_batch,
@@ -749,6 +818,10 @@ class EvaporationMixin:
             vapor_pressure_diagnostic,
             effective_pressure_source,
         )
+        if same_tick_cache is not None:
+            same_tick_cache['inputs'] = copy.deepcopy(batch_inputs)
+            same_tick_cache['state'] = state
+        return state
 
     def _calculate_evaporation(
         self,
@@ -756,6 +829,7 @@ class EvaporationMixin:
         *,
         gate_authority: Any = _RESOLVE_EVAPORATION_GATE_AUTHORITY,
         overhead_partials_override_Pa: Mapping[str, float] | None = None,
+        _same_tick_batch_cache: dict[str, Any] | None = None,
     ) -> EvaporationFlux:
         """
         Calculate evaporation flux using a series-resistance source.
@@ -858,6 +932,7 @@ class EvaporationMixin:
         ) = self._resolve_evaporation_batch_flux_state(
             equilibrium,
             temperature_K=T_K,
+            same_tick_cache=_same_tick_batch_cache,
         )
         batch_report = serialize_vapour_batch(vapour_batch)
         if isinstance(batch_report, Mapping):

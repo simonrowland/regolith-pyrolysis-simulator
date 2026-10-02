@@ -1931,6 +1931,38 @@ def test_c4_two_tick_species_parity_uses_current_duct_pressure_only():
     assert calls[0].get("Fe", 0.0) == pytest.approx(0.0)
 
 
+def test_same_tick_batch_cache_reuses_only_unchanged_resolution_inputs():
+    sim = _install_passthrough_vapour_batch(_gas_train_sim())
+    equilibrium = types.SimpleNamespace(
+        vapor_pressures_Pa={"Fe": 100.0},
+        activity_coefficients={},
+        diagnostics={},
+    )
+    resolutions = []
+    original_resolver = sim._resolve_evaporation_vapour_batch
+
+    def count_resolutions(*args, **kwargs):
+        resolutions.append(None)
+        return original_resolver(*args, **kwargs)
+
+    sim._resolve_evaporation_vapour_batch = count_resolutions
+    cache = {}
+    sim._resolve_evaporation_batch_flux_state(
+        equilibrium, temperature_K=1573.15, same_tick_cache=cache
+    )
+    sim._resolve_evaporation_batch_flux_state(
+        equilibrium, temperature_K=1573.15, same_tick_cache=cache
+    )
+    assert len(resolutions) == 1
+
+    # A changed equilibrium input during a solve invalidates the local reuse.
+    equilibrium.vapor_pressures_Pa["Fe"] = 90.0
+    sim._resolve_evaporation_batch_flux_state(
+        equilibrium, temperature_K=1573.15, same_tick_cache=cache
+    )
+    assert len(resolutions) == 2
+
+
 def test_same_tick_high_flux_throttles_smoothly_near_equilibrium_pressure():
     sim = _same_tick_solver_fixture()
     equilibrium = types.SimpleNamespace(vapor_pressures_Pa={"Fe": 100.0})
