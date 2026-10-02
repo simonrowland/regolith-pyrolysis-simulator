@@ -8,7 +8,7 @@
 - **Checks:** (1) consumption — OpenIMCC/bridge/equilibrate_cell/alphaMELTS/thermoengine do not read identity.reaction/reference_state/reservoir for p_partial; reservoir fallback only if composition absent, but composition still required — PASS. (2) comparison — residual_key/pins by observation_id; replicate groups by experiment/species/T/composition; identity_equal skips the three axes; no silent ID merge — PASS. (3) relaxation limited to p_partial; p_sat/activity/p_reference profiles unchanged — PASS. (4) NOT-FIXED — large dex residuals are physics, not wrong-reservoir artefact (composition drives pot; pack reactions ≠ identity.reaction) — PASS.
 - **Targeted tests:** `test_p_partial_optional_axes_*` ×3 + `test_p_partial_without_composition_still_refuses_identity` (+ condensed_activity) passed (`-o addopts=''`); no full W3 on VPS.
 - **Deliverable:** `REVIEW-pp-identity-632c41a5-2026-10-01.md`
-- **Mailbox tip:** PENDING_ON_COMMIT on `empirical/reviews-batch-zv-2026-09-22` (artifacts PENDING_ON_COMMIT)
+- **Mailbox tip:** `1f68f8f90abe20c3ba060a7cce781546e4abaf9e` on `empirical/reviews-batch-zv-2026-09-22` (artifacts `1f68f8f90abe20c3ba060a7cce781546e4abaf9e`)
 - **Date:** 2026-10-01 ~21:56 ET
 
 — regolith-empirical
