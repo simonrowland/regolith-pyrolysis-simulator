@@ -117,7 +117,25 @@ species:
           - 1873.0
           - 1873.0
         phase: l
-        standard_state: pure solid MgO; the paper does not name a polymorph
+        standard_state:
+          state:
+            tag: value
+            value:
+              convention: raoultian_pure_endmember
+              endmember:
+                formula: MgO
+                phase: {tag: value, value: cr}
+                polymorph: {tag: value, value: periclase}
+              component_basis: MgO
+          inferred: false
+          note: >-
+            At 1873 K, solid MgO has one polymorph, periclase (rock salt), so
+            the typed reference is a fact, not an inference.
+          locator:
+            published_page: 2728
+            pdf_page_index: 4
+            table: '5'
+            note: Table 5 reference state; the printed phrase is retained below.
         units: dimensionless activity
         uncertainty:
           note: No numeric uncertainty is printed for the Table 5 activity cells.
