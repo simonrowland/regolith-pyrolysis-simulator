@@ -6347,3 +6347,140 @@ def test_inferred_nonmodelled_cell_still_refuses_oxygen_balance() -> None:
         item.kind is NoticeKind.CELL_MATERIAL_INFERRED
         for item in residual.notices
     )
+
+
+def test_score_store_refuses_synthetic_unknown_reference_activity_point() -> None:
+    work = F.work("unknown-activity-reference-fixture")
+    experiment = F.tabulation_experiment(
+        "unknown-activity-reference-experiment", work.work_id
+    )
+    identity = replace(
+        F.activity_identity(formula="CaO"),
+        reference_state=State.unknown("source reference state not printed"),
+    )
+    observation = F.observation(
+        "unknown-activity-reference-fixture::activity",
+        experiment.experiment_id,
+        identity,
+        Decimal("0.42"),
+        source_id=work.work_id,
+    )
+    observation = replace(
+        observation,
+        evidence=replace(
+            observation.evidence,
+            class_=State.unknown("method class not established"),
+        ),
+    )
+    context = _context(work, experiment, observation)
+
+    def no_prediction(*args, **kwargs):
+        pytest.fail("unknown activity reference state must refuse before prediction")
+
+    residuals, _ = score_store(
+        context,
+        engines=(Engine.INTERNAL_ANALYTICAL,),
+        include_diagnostics=True,
+        predict=no_prediction,
+    )
+
+    assert len(residuals) == 1
+    residual = residuals[0]
+    assert residual.reference == observation.observation_id
+    assert residual.status is ResidualStatus.REFUSED
+    assert residual.refusal is not None
+    assert residual.refusal.reason is RefusalReason.IDENTITY_UNKNOWN
+    assert residual.refusal.detail["reason"] == "activity_reference_state_unknown"
+    assert residual.refusal.detail["fields"] == ["reference_state"]
+
+
+def test_score_store_refuses_categorical_stolyarova_figure_only_row() -> None:
+    source_id = "stolyarova-1996-cao-alumina-silica-kems"
+    context = load_score_context(sources=(source_id,))
+    figure_row = next(
+        obs
+        for obs in context.observations.values()
+        if obs.source_id == source_id and obs.value.kind is ValueKind.CATEGORICAL
+    )
+    figure_context = replace(
+        context,
+        observations={figure_row.observation_id: figure_row},
+        origins={
+            figure_row.observation_id: context.origins[figure_row.observation_id]
+        }
+        if figure_row.observation_id in context.origins
+        else {},
+    )
+    residuals, _ = score_store(
+        figure_context,
+        engines=(Engine.INTERNAL_ANALYTICAL,),
+        include_diagnostics=True,
+    )
+
+    assert len(residuals) == 1
+    refusal = residuals[0].refusal
+    assert refusal is not None
+    assert refusal.reason is RefusalReason.IDENTITY_UNKNOWN
+    assert "figure_only" in refusal.detail["quantity_reason"]
+    assert refusal.detail["value_kind"] == ValueKind.CATEGORICAL.value
+
+
+def test_score_store_records_each_in_scope_observation_in_small_fixture() -> None:
+    work = F.work("score-drop-fixture")
+    experiment = F.tabulation_experiment(
+        "score-drop-fixture-experiment", work.work_id
+    )
+    activity_identity = replace(
+        F.activity_identity(formula="CaO"),
+        reference_state=State.unknown("source reference state not printed"),
+    )
+    activity = F.observation(
+        "score-drop-fixture::activity",
+        experiment.experiment_id,
+        activity_identity,
+        Decimal("0.42"),
+        evidence=EvidenceClass.MEASURED_REDUCED,
+        source_id=work.work_id,
+    )
+    activity = replace(
+        activity,
+        evidence=replace(
+            activity.evidence,
+            class_=State.unknown("unmapped method_class measured_reduced"),
+        ),
+    )
+    figure_identity = replace(
+        activity_identity,
+        quantity=State.unknown("unsupported quantity 'CaO_activity_figure_only'"),
+    )
+    figure = F.observation(
+        "score-drop-fixture::figure-only",
+        experiment.experiment_id,
+        figure_identity,
+        Decimal("0"),
+        evidence=EvidenceClass.FIGURE_ONLY,
+        admission=AdmissionStatus.REJECTED,
+        source_id=work.work_id,
+    )
+    figure = replace(
+        figure,
+        value=Value(
+            kind=ValueKind.CATEGORICAL,
+            categorical="bound_not_point_ordering",
+        ),
+    )
+    context = _context(work, experiment, activity, figure)
+
+    def no_prediction(*args, **kwargs):
+        pytest.fail("fixture observations must refuse before prediction")
+
+    residuals, _ = score_store(
+        context,
+        engines=(Engine.INTERNAL_ANALYTICAL,),
+        include_diagnostics=True,
+        predict=no_prediction,
+    )
+
+    records_by_reference = Counter(row.reference for row in residuals)
+    assert records_by_reference.keys() == {activity.observation_id, figure.observation_id}
+    assert all(records_by_reference[obs.observation_id] >= 1 for obs in (activity, figure))
