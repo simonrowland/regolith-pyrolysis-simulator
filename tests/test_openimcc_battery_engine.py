@@ -880,15 +880,28 @@ def test_stolyarova_typed_w_cell_keeps_reservoir_notice_and_scores_uncalibrated_
     # Owner ruling d-055 (2026-10-01): rows refused only because no calibration
     # is grounded are scored, flagged, in their own stratum, out of band
     # derivation. These Stolyarova 1991 rows print no calibration, so they now
-    # produce residuals that all carry the calibration_not_grounded notice.
+    # produce residuals; every MEASURED one carries the calibration_not_grounded
+    # notice. Author-calculated (model_derived) rows, such as the p(O) the paper
+    # derives from WO3 = WO2 + O, are scored only as diagnostics: they run the
+    # validity gates but do not get the calibration notice, which is attached to
+    # measured evidence only, and they must never be score_eligible.
+    from simulator.battery.score import MEASURED_EVIDENCE
+
     assert all(row["n"] > 0 for row in report)
+    measured_seen = 0
     for _engine, residual in tagged:
         if residual.numeric is None or residual.rail is None or residual.rail.value != "vapour":
             continue
+        evidence = result.observations[residual.reference].evidence.class_
+        if not (evidence.is_value and evidence.value in MEASURED_EVIDENCE):
+            assert not residual.score_eligible, residual.reference
+            continue
+        measured_seen += 1
         assert any(
             notice.reason.startswith("calibration_not_grounded")
             for notice in residual.notices
         ), residual.reference
+    assert measured_seen > 0
 
 
 

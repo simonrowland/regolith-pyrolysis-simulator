@@ -87,7 +87,7 @@ from simulator.battery.identity import (
     atm_to_pa,
     bar_to_pa,
     celsius_to_kelvin,
-    _melt_activity_uncompared_axes,
+    _uncompared_axes_for,
     identity_equal,
     profile_for,
 )
@@ -6582,10 +6582,10 @@ def fill_identity(
     species: Species,
     **known: Any,
 ) -> Identity:
-    """Fill required/uncompared axes as unknown, permitted-not-applicable axes as N/A.
+    """Fill required/uncompared axes as unknown and permitted axes as N/A.
 
-    A VALUE on an axis the profile does not require is invalid (v2.1), except
-    for physically omitted melt-activity axes, whose known values are retained.
+    Keep source values on explicitly uncompared axes even when they are not
+    required, including p_partial reaction/reference/reservoir metadata.
     Transition temperatures store T as the observable, never as
     ``identity.temperature_K``.
     """
@@ -6601,7 +6601,7 @@ def fill_identity(
 
     for _ in range(4):
         profile = profile_for(identity)
-        uncompared_axes = _melt_activity_uncompared_axes((identity,))
+        uncompared_axes = _uncompared_axes_for(identity)
         payload = {item.name: getattr(identity, item.name) for item in fields(identity)}
         changed = False
         for name in profile.required:
@@ -11656,7 +11656,7 @@ class Migrator:
             else None
         )
         uncompared_identity_axes = (
-            _melt_activity_uncompared_axes((identity_for_profile,))
+            _uncompared_axes_for(identity_for_profile)
             if identity_for_profile is not None
             else frozenset()
         )
