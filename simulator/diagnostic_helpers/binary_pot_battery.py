@@ -2403,12 +2403,13 @@ def _internal_analytical_vapor_pressure_adapter(
                 }
             )
 
-    vapor_authority = core_diagnostic.get("vapor_pressure_authority") or {}
+    vapor_authority = core_diagnostic.get("vapor_pressure_authority")
     authority_status = (
-        str(vapor_authority.get("status") or "authoritative")
+        str(vapor_authority.get("status") or "unknown")
         if isinstance(vapor_authority, Mapping)
-        else "authoritative"
+        else "unknown"
     )
+    authority_is_authoritative = authority_status == "authoritative"
     provenance = {
         "code_path": _INTERNAL_ANALYTICAL_VAPOR_PRESSURE_PATH,
         "authority": authority_status,
@@ -2419,12 +2420,18 @@ def _internal_analytical_vapor_pressure_adapter(
     }
     diagnostics = {
         "internal_analytical_provenance": provenance,
-        "vapor_pressure_backend_status": "builtin_authoritative",
+        "vapor_pressure_backend_status": (
+            "builtin_authoritative" if authority_is_authoritative else authority_status
+        ),
         "vapor_pressure_backend_status_reason": json.dumps(
             provenance, sort_keys=True, default=str, separators=(",", ":")
         ),
-        "authoritative_for_requested_vapor_pressure": True,
-        "authority": AUTHORITY_EXTRAPOLATED if core_flags else "bridge",
+        "authoritative_for_requested_vapor_pressure": authority_is_authoritative,
+        "authority": (
+            AUTHORITY_EXTRAPOLATED
+            if core_flags
+            else "bridge" if authority_is_authoritative else authority_status
+        ),
         "vapor_pressure_diagnostic": core_diagnostic,
         "imcc_notices": oxygen_notices,
     }
@@ -2435,8 +2442,8 @@ def _internal_analytical_vapor_pressure_adapter(
         activity_coefficients=dict(core_diagnostic.get("activities") or {}),
         vapor_pressures_Pa=dict(equilibrium.vapor_pressures_Pa or {}),
         vapor_pressures_source=dict(equilibrium.vapor_pressures_source or {}),
-        vapor_pressure_backend_status="builtin_authoritative",
-        authoritative_for_requested_vapor_pressure=True,
+        vapor_pressure_backend_status=diagnostics["vapor_pressure_backend_status"],
+        authoritative_for_requested_vapor_pressure=authority_is_authoritative,
         liquid_fraction=None,
         phase_assemblage_available=False,
     )
