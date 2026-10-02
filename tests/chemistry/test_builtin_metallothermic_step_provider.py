@@ -1410,6 +1410,140 @@ def test_c3_na_draw_uses_true_ledger_availability_not_quantized_view(
     assert debited < quantized_feo_mol
 
 
+@pytest.mark.parametrize(
+    ("reaction_family", "reagent", "oxide"),
+    [
+        (REACTION_FAMILY_C3_NA, "Na", "Na2O"),
+        (REACTION_FAMILY_C3_K, "K", "K2O"),
+    ],
+)
+def test_c3_alkali_reduces_ferric_iron_before_feo(
+    vapor_pressure_data, feedstocks_data, setpoints_data,
+    reaction_family, reagent, oxide,
+):
+    """The ledger proposal applies Fe2O3 -> FeO before FeO -> Fe."""
+    sim = _build_sim(
+        "lunar_mare_low_ti", vapor_pressure_data, feedstocks_data,
+        setpoints_data,
+    )
+    provider = BuiltinMetallothermicStepProvider()
+    ferric_mol, ferrous_mol, dose_mol = 0.7, 1.5, 2.0
+    request = IntentRequest(
+        intent=ChemistryIntent.METALLOTHERMIC_STEP,
+        account_view=ProviderAccountView(
+            accounts={
+                "process.cleaned_melt": {
+                    "SiO2": 1000.0, "Fe2O3": ferric_mol, "FeO": ferrous_mol,
+                },
+                "process.metal_phase": {},
+                "process.reagent_inventory": {},
+            },
+            species_formula_registry=sim.species_formula_registry,
+        ),
+        temperature_C=(800.0 if reagent == "K" else 1150.0),
+        pressure_bar=1.0e-6,
+        control_inputs={
+            "reaction_family": reaction_family,
+            "na_target_stage": "feo_cleanup",
+            "reagent_available_kg": (
+                3.0 * dose_mol * MOLAR_MASS[reagent] / 1000.0
+            ),
+            "true_available_mol_by_species": {
+                "Fe2O3": ferric_mol, "FeO": ferrous_mol,
+            },
+            "liquid_fraction": 0.5,
+            "dt_hr": 1.0,
+        },
+    )
+
+    result = provider.dispatch(request)
+    assert result.status == "ok", result.diagnostic
+    proposal = result.transition
+    assert proposal is not None, result.diagnostic
+    ferric_reduced = min(dose_mol / 2.0, ferric_mol)
+    ferrous_reduced = min(
+        (dose_mol - 2.0 * ferric_reduced) / 2.0,
+        ferrous_mol + 2.0 * ferric_reduced,
+    )
+    assert proposal.debits["process.cleaned_melt"]["Fe2O3"] == pytest.approx(
+        ferric_reduced, abs=1e-12,
+    )
+    assert proposal.debits["process.cleaned_melt"]["FeO"] == pytest.approx(
+        ferrous_reduced, abs=1e-12,
+    )
+    melt_credits = proposal.credits.get("process.cleaned_melt", {})
+    assert melt_credits["FeO"] == pytest.approx(2.0 * ferric_reduced, abs=1e-12)
+    assert proposal.credits["process.metal_phase"]["Fe"] == pytest.approx(
+        ferrous_reduced, abs=1e-12,
+    )
+    coproduct_account = (
+        "process.cleaned_melt" if reagent == "K"
+        else SPENT_REDUCTANT_RESIDUE_ACCOUNT
+    )
+    assert proposal.credits[coproduct_account][oxide] == pytest.approx(
+        dose_mol / 2.0, abs=1e-12,
+    )
+    per_oxide = result.diagnostic.get("per_oxide_reduced_kg")
+    if per_oxide is not None:
+        assert per_oxide["Fe2O3"] == pytest.approx(
+            ferric_reduced * MOLAR_MASS["Fe2O3"] / 1000.0,
+        )
+        assert per_oxide["FeO"] == pytest.approx(
+            ferrous_reduced * MOLAR_MASS["FeO"] / 1000.0,
+        )
+    else:
+        assert result.diagnostic["oxide_reduced_kg"] == pytest.approx(
+            (ferric_reduced * MOLAR_MASS["Fe2O3"]
+             + ferrous_reduced * MOLAR_MASS["FeO"]) / 1000.0,
+        )
+    _atom_check(proposal, sim.species_formula_registry, tol=1e-12)
+
+
+def test_c3_na_feo_only_transition_keeps_legacy_shape(
+    vapor_pressure_data, feedstocks_data, setpoints_data,
+):
+    sim = _build_sim(
+        "lunar_mare_low_ti", vapor_pressure_data, feedstocks_data,
+        setpoints_data,
+    )
+    provider = BuiltinMetallothermicStepProvider()
+    feo_mol, na_mol = 2.0, 2.0
+    result = provider.dispatch(IntentRequest(
+        intent=ChemistryIntent.METALLOTHERMIC_STEP,
+        account_view=ProviderAccountView(
+            accounts={
+                "process.cleaned_melt": {"SiO2": 1000.0, "FeO": 10.0},
+                "process.metal_phase": {},
+                "process.reagent_inventory": {},
+            },
+            species_formula_registry=sim.species_formula_registry,
+        ),
+        temperature_C=1150.0,
+        pressure_bar=1.0e-6,
+        control_inputs={
+            "reaction_family": REACTION_FAMILY_C3_NA,
+            "na_target_stage": "feo_cleanup",
+            "reagent_available_kg": 3.0 * na_mol * MOLAR_MASS["Na"] / 1000.0,
+            "true_available_mol_by_species": {"FeO": feo_mol},
+            "liquid_fraction": 0.5,
+            "dt_hr": 1.0,
+        },
+    ))
+    proposal = result.transition
+    assert proposal is not None, result.diagnostic
+    assert proposal.debits.keys() == {
+        "process.reagent_inventory", "process.cleaned_melt",
+    }
+    assert proposal.debits["process.reagent_inventory"]["Na"] == pytest.approx(2.0)
+    assert proposal.debits["process.cleaned_melt"]["FeO"] == pytest.approx(1.0)
+    assert proposal.credits.keys() == {
+        SPENT_REDUCTANT_RESIDUE_ACCOUNT, "process.metal_phase",
+    }
+    assert proposal.credits[SPENT_REDUCTANT_RESIDUE_ACCOUNT]["Na2O"] == pytest.approx(1.0)
+    assert proposal.credits["process.metal_phase"]["Fe"] == pytest.approx(1.0)
+    _atom_check(proposal, sim.species_formula_registry, tol=1e-12)
+
+
 def test_c3_na_explicit_duplicate_targets_do_not_double_debit_feo(
     vapor_pressure_data, feedstocks_data, setpoints_data
 ):

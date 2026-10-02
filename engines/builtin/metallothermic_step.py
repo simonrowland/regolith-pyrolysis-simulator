@@ -10,14 +10,16 @@ refactor of where the :class:`LedgerTransitionProposal` is built, not a
 re-derivation of the metallothermic physics. The same solubility-limit /
 kinetic / accessibility constants flow through verbatim:
 
-* C3 K-shuttle: ``2 K + FeO -> K2O + Fe`` (K2O saturated at 10 wt% melt,
-  K injected up to 1/3 of inventory per hour).
+* C3 K-shuttle: ``2 K + Fe2O3 -> K2O + 2 FeO`` before
+  ``2 K + FeO -> K2O + Fe`` (K2O saturated at 10 wt% melt, K injected up
+  to 1/3 of inventory per hour).
 * C3 Na-shuttle: stage-aware targets.  The Cr stage preserves the legacy
   ``6 Na + Cr2O3 -> 3 Na2O + 2 Cr`` first, then
   ``4 Na + TiO2 -> 2 Na2O + Ti`` with 0.75 accessibility factor
   (highest-priority experimental question -- legacy comment
   ``[THERMO-10]``).  Cool Fe-cleanup may instead request
-  ``2 Na + FeO -> Na2O + Fe``. Na2O saturated at 10 wt%.
+  ``2 Na + Fe2O3 -> Na2O + 2 FeO`` before ``2 Na + FeO -> Na2O + Fe``.
+  Na2O saturated at 10 wt%.
 * C6 Mg thermite primary: ``3 Mg + Al2O3 -> 3 MgO + 2 Al``. Mg consumed
   per Arrhenius-style rate factor ``0.20 * exp(-0.05 * wt%MgO)`` (clamped
   to ``[0.01, 0.25]``).
@@ -107,7 +109,8 @@ ELECTROLYSIS_STEP) -- :meth:`ChemistryKernel.commit_batch` engages
 atom-balance validation at dispatch time AND again at commit time.
 
 Account declaration: ``process.cleaned_melt`` (debit oxides being
-reduced + credit K2O / MgO / regenerated Al2O3 coproducts),
+reduced + credit ferric-reduction FeO, K2O / MgO / regenerated Al2O3
+coproducts),
 ``process.spent_reductant_residue`` (credit melt-resident Na2O from the
 spent Na shuttle), ``process.metal_phase`` (credit Fe/Cr/Ti/Al/Si metals
 + debit Al on back-reduction), ``process.reagent_inventory`` (debit
@@ -164,6 +167,7 @@ from simulator.chemistry.kernel.dto import (
 )
 from simulator.chemistry.kernel.provider import ChemistryProvider
 from simulator.account_ids import SPENT_REDUCTANT_RESIDUE_ACCOUNT
+from simulator.fe_redox import OXYGEN_RESERVOIR_NOOP_MOL
 from simulator.melt_regime import MeltRegime, melt_regime
 from simulator.physical_constants import CELSIUS_TO_KELVIN_OFFSET
 
@@ -462,14 +466,25 @@ class BuiltinMetallothermicStepProvider(ChemistryProvider):
             true_available_mol,
             molar_mass,
         )
+        mol_Fe2O3_available = self._available_mol(
+            "Fe2O3", composition_kg, true_available_mol, molar_mass,
+        )
         FeO_available_kg = mol_FeO_available * molar_mass["FeO"] / 1000.0
         # 1 kg K reduces (M_FeO / (2 * M_K)) kg FeO -- inverse of the
         # 2K + FeO -> K2O + Fe stoichiometry.  Same expression as legacy.
-        K_for_FeO_kg = (
-            FeO_available_kg / (molar_mass["FeO"] / (2 * molar_mass["K"]))
-            if molar_mass["FeO"] > 0.0
-            else 0.0
-        )
+        if mol_Fe2O3_available > OXYGEN_RESERVOIR_NOOP_MOL:
+            # 2 K + Fe2O3 -> K2O + 2 FeO consumes 2 mol K/mol Fe2O3;
+            # the following FeO -> Fe step consumes the same 2:1 ratio.
+            K_for_FeO_kg = (
+                2.0 * (mol_Fe2O3_available + mol_FeO_available)
+                * molar_mass["K"] / 1000.0
+            )
+        else:
+            K_for_FeO_kg = (
+                FeO_available_kg / (molar_mass["FeO"] / (2 * molar_mass["K"]))
+                if molar_mass["FeO"] > 0.0
+                else 0.0
+            )
 
         K_available_this_hr = K_available_kg * _time_integrated_inventory_fraction(
             1.0 / 3.0,
@@ -519,31 +534,50 @@ class BuiltinMetallothermicStepProvider(ChemistryProvider):
         # IEEE-754 round-off on the same operand sequence the legacy
         # already pinned in the smoke run.
         mol_K = K_inject_kg / molar_mass["K"] * 1000.0
-        mol_FeO_reduced = min(mol_K / 2.0, mol_FeO_available)
-        mol_K_used = mol_FeO_reduced * 2.0
-        if mol_FeO_reduced <= 0.0:
+        mol_Fe2O3_reduced = min(mol_K / 2.0, mol_Fe2O3_available)
+        mol_K_after_ferric = mol_K - 2.0 * mol_Fe2O3_reduced
+        mol_FeO_reduced = min(
+            mol_K_after_ferric / 2.0,
+            mol_FeO_available + 2.0 * mol_Fe2O3_reduced,
+        )
+        mol_K_used = 2.0 * (mol_Fe2O3_reduced + mol_FeO_reduced)
+        if mol_Fe2O3_reduced <= 0.0 and mol_FeO_reduced <= 0.0:
             return self._empty_result(
                 "c3_k_shuttle skipped: no FeO reducible after stoich cap",
                 control_audit=control_audit,
             )
 
-        # Reaction 2 K + FeO -> K2O + Fe.  Per mol:
-        # debits: 2 mol K (reagent_inventory) + 1 mol FeO (cleaned_melt).
-        # credits: 1 mol K2O (cleaned_melt) + 1 mol Fe (metal_phase).
+        # Fe3+ is reduced first: 2 mol K + 1 mol Fe2O3 -> 1 mol K2O +
+        # 2 mol FeO (78.20 + 159.69 = 94.20 + 2*71.84 g); then
+        # 2 mol K + FeO -> K2O + Fe (78.20 + 71.84 = 94.20 + 55.85 g).
+        # K, Fe, and O atoms balance in each reaction. All extents below are
+        # mol; oxygen moves from Fe2O3 to K2O while FeO stays in the melt.
+        # If Fe2O3 is absent, the former FeO-only transition is bit-identical.
         debits: dict[str, dict[str, float]] = {
             "process.reagent_inventory": {"K": mol_K_used},
-            "process.cleaned_melt": {"FeO": mol_FeO_reduced},
+            "process.cleaned_melt": {},
         }
+        if mol_Fe2O3_reduced > 0.0:
+            debits["process.cleaned_melt"]["Fe2O3"] = mol_Fe2O3_reduced
+        if mol_FeO_reduced > 0.0:
+            debits["process.cleaned_melt"]["FeO"] = mol_FeO_reduced
         credits: dict[str, dict[str, float]] = {
-            "process.cleaned_melt": {"K2O": mol_FeO_reduced},
+            "process.cleaned_melt": {
+                "K2O": mol_Fe2O3_reduced + mol_FeO_reduced,
+            },
             "process.metal_phase": {"Fe": mol_FeO_reduced},
         }
+        if mol_Fe2O3_reduced > 0.0:
+            credits["process.cleaned_melt"]["FeO"] = 2.0 * mol_Fe2O3_reduced
 
         # Diagnostic dict in kg-native form for legacy parity.  Convert
         # mol back to kg via (mol * M_gmol / 1000.0) -- same shape as
         # the legacy ``_shuttle_*_this_hr`` counters.
         K_used_kg = mol_K_used * molar_mass["K"] / 1000.0
-        FeO_removed_kg = mol_FeO_reduced * molar_mass["FeO"] / 1000.0
+        iron_oxide_removed_kg = (
+            mol_Fe2O3_reduced * molar_mass["Fe2O3"]
+            + mol_FeO_reduced * molar_mass["FeO"]
+        ) / 1000.0
         Fe_produced_kg = mol_FeO_reduced * molar_mass["Fe"] / 1000.0
 
         atom_proof = build_atom_balance_proof(
@@ -558,7 +592,7 @@ class BuiltinMetallothermicStepProvider(ChemistryProvider):
         diagnostic = {
             "reaction_family": REACTION_FAMILY_C3_K,
             "reagent_consumed_kg": K_used_kg,
-            "oxide_reduced_kg": FeO_removed_kg,
+            "oxide_reduced_kg": iron_oxide_removed_kg,
             "metal_produced_kg": Fe_produced_kg,
             "metal_species": "Fe",
         }
@@ -665,6 +699,9 @@ class BuiltinMetallothermicStepProvider(ChemistryProvider):
             true_available_mol,
             molar_mass,
         )
+        mol_Fe2O3_available = self._available_mol(
+            "Fe2O3", composition_kg, true_available_mol, molar_mass,
+        )
         mol_TiO2_available = self._available_mol(
             "TiO2",
             composition_kg,
@@ -700,6 +737,8 @@ class BuiltinMetallothermicStepProvider(ChemistryProvider):
         total_Na_used_mol = 0.0
         total_Na2O_added_mol = 0.0
         total_FeO_removed_mol = 0.0
+        total_Fe2O3_removed_mol = 0.0
+        total_FeO_produced_mol = 0.0
         total_Cr2O3_removed_mol = 0.0
         total_TiO2_removed_mol = 0.0
         total_Fe_produced_mol = 0.0
@@ -726,7 +765,10 @@ class BuiltinMetallothermicStepProvider(ChemistryProvider):
 
         for target in target_priority:
             if target == "FeO":
-                if FeO_available_kg <= 0.01 or mol_Na <= 0.1:
+                if (
+                    FeO_available_kg <= 0.01
+                    and mol_Fe2O3_available <= OXYGEN_RESERVOIR_NOOP_MOL
+                ) or mol_Na <= 0.1:
                     continue
                 margin = float(thermo_audit["margin"].get(target, 0.0))
                 if margin <= 0.0:
@@ -739,6 +781,12 @@ class BuiltinMetallothermicStepProvider(ChemistryProvider):
                     }
                     continue
 
+                fe_reaction_melt_loss_per_na2o = (
+                    (molar_mass["Fe2O3"] - 2.0 * molar_mass["FeO"])
+                    / molar_mass["Na2O"]
+                    if mol_Fe2O3_available > OXYGEN_RESERVOIR_NOOP_MOL
+                    else molar_mass["FeO"] / molar_mass["Na2O"]
+                )
                 na2o_cap_mol = self._product_cap_kg_for_solubility(
                     total_kg=total_kg,
                     current_product_kg=Na2O_current_kg,
@@ -746,28 +794,58 @@ class BuiltinMetallothermicStepProvider(ChemistryProvider):
                     added_product_kg=(
                         total_Na2O_added_mol * molar_mass["Na2O"] / 1000.0
                     ),
+                    removed_kg_per_product_kg=fe_reaction_melt_loss_per_na2o,
+                    solubility_wt_pct=self.NA2O_SOLUBILITY_WT_PCT,
+                ) / (molar_mass["Na2O"] / 1000.0)
+                # Fe3+ is the strongest melt oxidant, so consume it first:
+                # 2 mol Na + Fe2O3 -> Na2O + 2 FeO (45.98 + 159.69 =
+                # 61.98 + 2*71.84 g); then 2 Na + FeO -> Na2O + Fe
+                # (45.98 + 71.84 = 61.98 + 55.85 g). Fe, O, and Na atoms
+                # balance per reaction; O moves from Fe2O3 to Na2O while the
+                # resulting FeO stays in the melt. Extents are mol. With no
+                # Fe2O3, retain the former FeO path and transition quantities.
+                mol_Fe2O3_reduced = min(
+                    mol_Na / 2.0, mol_Fe2O3_available, na2o_cap_mol,
+                )
+                ferric_net_melt_loss_kg = mol_Fe2O3_reduced * (
+                    molar_mass["Fe2O3"] - 2.0 * molar_mass["FeO"]
+                ) / 1000.0
+                mol_Na_after_ferric = mol_Na - 2.0 * mol_Fe2O3_reduced
+                na2o_cap_after_ferric_mol = self._product_cap_kg_for_solubility(
+                    total_kg=total_kg,
+                    current_product_kg=Na2O_current_kg,
+                    removed_kg=(
+                        total_melt_oxide_removed_kg + ferric_net_melt_loss_kg
+                    ),
+                    added_product_kg=(
+                        (total_Na2O_added_mol + mol_Fe2O3_reduced)
+                        * molar_mass["Na2O"] / 1000.0
+                    ),
                     removed_kg_per_product_kg=(
                         molar_mass["FeO"] / molar_mass["Na2O"]
                     ),
                     solubility_wt_pct=self.NA2O_SOLUBILITY_WT_PCT,
                 ) / (molar_mass["Na2O"] / 1000.0)
                 mol_FeO_reduced = min(
-                    mol_Na / 2.0,
-                    mol_FeO_available,
-                    na2o_cap_mol,
+                    mol_Na_after_ferric / 2.0,
+                    mol_FeO_available + 2.0 * mol_Fe2O3_reduced,
+                    na2o_cap_after_ferric_mol,
                 )
-                if mol_FeO_reduced <= 0.0:
+                if mol_FeO_reduced <= 0.0 and mol_Fe2O3_reduced <= 0.0:
                     continue
-                mol_Na_for_Fe = mol_FeO_reduced * 2.0
-                mol_Na2O_from_Fe = mol_FeO_reduced
+                mol_Na_for_Fe = 2.0 * (mol_Fe2O3_reduced + mol_FeO_reduced)
+                mol_Na2O_from_Fe = mol_Fe2O3_reduced + mol_FeO_reduced
                 mol_Fe_produced = mol_FeO_reduced
 
                 total_Na_used_mol += mol_Na_for_Fe
                 total_Na2O_added_mol += mol_Na2O_from_Fe
                 total_FeO_removed_mol += mol_FeO_reduced
+                total_Fe2O3_removed_mol += mol_Fe2O3_reduced
+                total_FeO_produced_mol += 2.0 * mol_Fe2O3_reduced
                 total_Fe_produced_mol += mol_Fe_produced
                 total_melt_oxide_removed_kg += (
-                    mol_FeO_reduced * molar_mass["FeO"] / 1000.0
+                    ferric_net_melt_loss_kg
+                    + mol_FeO_reduced * molar_mass["FeO"] / 1000.0
                 )
                 mol_Na -= mol_Na_for_Fe
                 accepted_targets.append(target)
@@ -906,6 +984,8 @@ class BuiltinMetallothermicStepProvider(ChemistryProvider):
         }
         if total_FeO_removed_mol > 0.0:
             debits["process.cleaned_melt"]["FeO"] = total_FeO_removed_mol
+        if total_Fe2O3_removed_mol > 0.0:
+            debits["process.cleaned_melt"]["Fe2O3"] = total_Fe2O3_removed_mol
         if total_Cr2O3_removed_mol > 0.0:
             debits["process.cleaned_melt"]["Cr2O3"] = total_Cr2O3_removed_mol
         if total_TiO2_removed_mol > 0.0:
@@ -917,10 +997,15 @@ class BuiltinMetallothermicStepProvider(ChemistryProvider):
             SPENT_REDUCTANT_RESIDUE_ACCOUNT: {
                 "Na2O": total_Na2O_added_mol
             },
+            "process.cleaned_melt": {},
             "process.metal_phase": {},
         }
         if total_Fe_produced_mol > 0.0:
             credits["process.metal_phase"]["Fe"] = total_Fe_produced_mol
+        if total_FeO_produced_mol > 0.0:
+            credits["process.cleaned_melt"]["FeO"] = total_FeO_produced_mol
+        if not credits["process.cleaned_melt"]:
+            del credits["process.cleaned_melt"]
         if total_Cr_produced_mol > 0.0:
             credits["process.metal_phase"]["Cr"] = total_Cr_produced_mol
         if total_Ti_produced_mol > 0.0:
@@ -932,8 +1017,9 @@ class BuiltinMetallothermicStepProvider(ChemistryProvider):
         # mol back to kg via (mol * M_gmol / 1000.0) -- same shape as
         # the legacy ``_shuttle_*_this_hr`` counters.
         Na_used_kg = total_Na_used_mol * molar_mass["Na"] / 1000.0
-        FeO_removed_kg = (
-            total_FeO_removed_mol * molar_mass["FeO"] / 1000.0
+        FeO_removed_kg = total_FeO_removed_mol * molar_mass["FeO"] / 1000.0
+        Fe2O3_removed_kg = (
+            total_Fe2O3_removed_mol * molar_mass["Fe2O3"] / 1000.0
         )
         Cr2O3_removed_kg = (
             total_Cr2O3_removed_mol * molar_mass["Cr2O3"] / 1000.0
@@ -966,13 +1052,15 @@ class BuiltinMetallothermicStepProvider(ChemistryProvider):
             "refused_targets": refused_targets,
             "reagent_consumed_kg": Na_used_kg,
             "oxide_reduced_kg": (
-                FeO_removed_kg + Cr2O3_removed_kg + TiO2_removed_kg
+                FeO_removed_kg + Fe2O3_removed_kg
+                + Cr2O3_removed_kg + TiO2_removed_kg
             ),
             "metal_produced_kg": (
                 Fe_produced_kg + Cr_produced_kg + Ti_produced_kg
             ),
             "per_oxide_reduced_kg": {
                 "FeO": FeO_removed_kg,
+                "Fe2O3": Fe2O3_removed_kg,
                 "Cr2O3": Cr2O3_removed_kg,
                 "TiO2": TiO2_removed_kg,
             },

@@ -1416,6 +1416,12 @@ def test_nonfinite_reservoir_fo2_raises_accounting_error_with_attribution() -> N
 
 def test_c3_na_source_term_comes_from_committed_transition() -> None:
     sim = _make_sim(additives_kg={"Na": 12.0})
+    sim.atom_ledger.load_external_mol(
+        "process.cleaned_melt",
+        {"Fe2O3": 0.7},
+        source="test ferric shuttle inventory",
+        material_origin="feedstock",
+    )
     sim._init_shuttle_inventory(CampaignPhase.C3_NA)
     sim.melt.campaign = CampaignPhase.C3_NA
     sim.melt.temperature_C = 1150.0
@@ -1431,12 +1437,24 @@ def test_c3_na_source_term_comes_from_committed_transition() -> None:
     assert len(sim.atom_ledger.transitions) == transitions_before + 1
     assert transition.name == "c3_na_shuttle_reduction"
     feo_mol = _cleaned_melt_debit_mol(sim, transition, "FeO")
-    expected_source = -0.5 * feo_mol
+    fe2o3_mol = _cleaned_melt_debit_mol(sim, transition, "Fe2O3")
+    feo_credited_mol = _transition_account_species_mol(
+        sim,
+        transition,
+        side="credits",
+        account="process.cleaned_melt",
+        species="FeO",
+    )
+    expected_source = -(
+        1.5 * fe2o3_mol + 0.5 * feo_mol - 0.5 * feo_credited_mol
+    )
     label = "redox_source:c3_na_shuttle_reduction"
     reservoir = sim.melt.oxygen_reservoir
     breakdown = sim._redox_source_breakdown_diagnostic()
 
     assert feo_mol > 0.0
+    assert fe2o3_mol == pytest.approx(0.7)
+    assert feo_credited_mol == pytest.approx(1.4)
     assert breakdown["terms_mol_o2_equiv_by_label"][label] == pytest.approx(
         expected_source
     )

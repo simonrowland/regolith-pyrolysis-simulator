@@ -2700,9 +2700,11 @@ class ExtractionMixin:
 
     def _shuttle_inject_K(self, *, liquid_fraction=None):
         """
-        K-shuttle injection: reduce FeO.  This dispatch has no SiO₂ reaction.
+        K-shuttle injection: reduce Fe2O3 to FeO, then FeO to Fe. This
+        dispatch has no SiO₂ reaction.
 
-        Reaction:  2K + FeO → K₂O + Fe(l)                      [THERMO-5]
+        Reactions: 2K + Fe2O3 → K2O + 2FeO; then
+                   2K + FeO → K2O + Fe(l)                      [THERMO-5]
         Stoichiometry:
             78.20 g K + 71.84 g FeO → 94.20 g K₂O + 55.85 g Fe
             1 kg K → 0.919 kg FeO reduced
@@ -2742,7 +2744,9 @@ class ExtractionMixin:
                 'reagent_available_kg': float(
                     self.shuttle_K_inventory_kg),
                 'true_available_mol_by_species':
-                    self._cleaned_melt_available_mol_by_species(('FeO',)),
+                    self._cleaned_melt_available_mol_by_species(
+                        ('Fe2O3', 'FeO'),
+                    ),
                 'liquid_fraction': liquid_fraction,
                 'dt_hr': 1.0,
             },
@@ -2781,7 +2785,7 @@ class ExtractionMixin:
         self._apply_transition_redox_source_terms(
             transition,
             label='redox_source:c3_k_shuttle_reduction',
-            target_oxides=('FeO',),
+            target_oxides=('Fe2O3', 'FeO'),
             exchange_direction='redox_source:c3_k_shuttle_reduction',
         )
 
@@ -2819,9 +2823,11 @@ class ExtractionMixin:
         liquid_fraction=None,
     ):
         """
-        Na-shuttle injection: reduce stage-selected oxides.
+        Na-shuttle injection: reduce Fe2O3 to FeO before FeO -> Fe, then
+        reduce the other stage-selected oxides.
 
         Reactions:                                               [THERMO-5]
+            2Na + Fe2O3 → Na₂O + 2FeO; then
             2Na + FeO → Na₂O + Fe(l)   [cool Fe-cleanup only]
             4Na + TiO₂ → 2Na₂O + Ti(l)  [accessibility uncertain]
             6Na + Cr₂O₃ → 3Na₂O + 2Cr(l)
@@ -2860,7 +2866,7 @@ class ExtractionMixin:
                     self.shuttle_Na_inventory_kg),
                 'true_available_mol_by_species':
                     self._cleaned_melt_available_mol_by_species(
-                        ('FeO', 'Cr2O3', 'TiO2'),
+                        ('Fe2O3', 'FeO', 'Cr2O3', 'TiO2'),
                     ),
                 'liquid_fraction': liquid_fraction,
                 'dt_hr': 1.0,
@@ -2900,7 +2906,7 @@ class ExtractionMixin:
         self._apply_transition_redox_source_terms(
             transition,
             label='redox_source:c3_na_shuttle_reduction',
-            target_oxides=('FeO', 'Cr2O3', 'TiO2'),
+            target_oxides=('Fe2O3', 'FeO', 'Cr2O3', 'TiO2'),
             exchange_direction='redox_source:c3_na_shuttle_reduction',
         )
 
