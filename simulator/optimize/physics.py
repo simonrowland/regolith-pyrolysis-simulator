@@ -2514,6 +2514,68 @@ def _coating_refused_flux_bounds(
     return bounds
 
 
+def _coating_source_flux_upper_bounds(
+    snapshots: Any,
+    refused_species: tuple[str, ...],
+    *,
+    campaigns_elapsed: float = 1.0,
+) -> dict[str, float]:
+    """Bound refused wall deposits by each species' observed vapour flux.
+
+    A wall deposit is downstream of its source vapour. Summing a refused
+    species' non-negative kg/hr flux over snapshot duration therefore gives an
+    upper bound for every segment, even when the wall saturation quantity was
+    refused. Missing species/rate evidence remains missing, never zero.
+    """
+
+    if not refused_species:
+        return {}
+    if not math.isfinite(campaigns_elapsed) or campaigns_elapsed <= 0.0:
+        raise CoatingFeasibilityReportError(
+            "campaigns_elapsed must be finite and positive for refused flux "
+            "bounds"
+        )
+    totals = {species: 0.0 for species in refused_species}
+    observed: set[str] = set()
+    for snapshot in tuple(snapshots or ()):
+        flux = getattr(snapshot, "evap_flux", None)
+        rates = getattr(flux, "species_kg_hr", None)
+        if not isinstance(rates, Mapping):
+            continue
+        raw_duration = getattr(snapshot, "duration_h", 1.0)
+        if isinstance(raw_duration, bool) or not isinstance(raw_duration, int | float):
+            raise CoatingFeasibilityReportError(
+                "snapshot duration_h must be numeric for refused flux bounds"
+            )
+        duration_h = float(raw_duration)
+        if not math.isfinite(duration_h) or duration_h < 0.0:
+            raise CoatingFeasibilityReportError(
+                "snapshot duration_h must be finite and non-negative for "
+                "refused flux bounds"
+            )
+        for species in refused_species:
+            if species not in rates:
+                continue
+            raw_rate = rates[species]
+            if isinstance(raw_rate, bool) or not isinstance(raw_rate, int | float):
+                raise CoatingFeasibilityReportError(
+                    f"vapour flux for refused species {species!r} must be numeric"
+                )
+            rate = float(raw_rate)
+            if not math.isfinite(rate) or rate < 0.0:
+                raise CoatingFeasibilityReportError(
+                    f"vapour flux for refused species {species!r} must be finite "
+                    "and non-negative"
+                )
+            totals[species] += rate * duration_h
+            observed.add(species)
+    return {
+        species: float(totals[species] / campaigns_elapsed)
+        for species in refused_species
+        if species in observed
+    }
+
+
 def _coating_fraction_wall_quantity_unavailable(
     report: Mapping[str, Any],
     authority: Mapping[str, Any],
