@@ -13864,11 +13864,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             speciation_authority = 'equality'
             speciation_regime = 'unclassified'
             speciation_flag = None
-        if speciation_regime == 'ferrous_free_lower_bound':
-            # M3's clamped key is for the freeze gate and PT-0 only. Vapor
-            # activities retain the absent-equality path instead of reading
-            # that edge as an intrinsic melt oxygen pressure.
-            intrinsic_fO2_log = None
+        # A finite speciation key remains usable by vapor-activity consumers
+        # when it is a bound; the bound and its flag are recorded below. The
+        # committed interface pressure remains a separate control input.
         if (
             intrinsic_fO2_log is None
             and self._melt_redox_equality_is_absent()
@@ -13961,15 +13959,6 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             )
             if isinstance(equilibrium_warnings, list) and notice not in equilibrium_warnings:
                 equilibrium_warnings.append(notice)
-        if speciation_regime == 'ferrous_free_lower_bound':
-            diagnostic['a_FeO_calphad'] = {
-                'status': 'unavailable',
-                'reason': (
-                    'ferrous_free_lower_bound_has_no_melt_equality'
-                ),
-                'a_FeO_authoritative': None,
-                'sources': {},
-            }
         high_t_activity = dict(diagnostic.get("high_t_melt_activity") or {})
         if (
             getattr(self, '_high_t_melt_activity', 'openimcc') == 'openimcc'

@@ -1018,7 +1018,7 @@ def _near_ferric_sim(n_feo_mol: float) -> PyrolysisSimulator:
     return sim
 
 
-def test_ferrous_free_bound_is_not_used_for_activity_or_sulfsat(
+def test_ferrous_free_bound_is_flagged_for_vapor_activity_only(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     from types import SimpleNamespace
@@ -1063,11 +1063,44 @@ def test_ferrous_free_bound_is_not_used_for_activity_or_sulfsat(
     sim._refresh_vapor_pressures_from_kernel(equilibrium)
     assert len(vapor_dispatches) == 1
     vapor_inputs = vapor_dispatches[0]
-    assert vapor_inputs["fO2_log"] is None
-    assert vapor_inputs["control_inputs"]["intrinsic_fO2_log"] is None
+    assert vapor_inputs["fO2_log"] == key_fO2_log
+    assert vapor_inputs["control_inputs"]["intrinsic_fO2_log"] == key_fO2_log
+    assert vapor_inputs["control_inputs"]["interface_pO2_bar"] == pytest.approx(
+        TRANSPORT_PO2_BAR
+    )
+    vapor_key = sim._last_vapor_pressure_diagnostic[
+        "melt_redox_speciation_key"
+    ]
+    assert vapor_key == {
+        "fO2_log": key_fO2_log,
+        "authority": "bound",
+        "regime": "ferrous_free_lower_bound",
+    }
+    assert sim._last_vapor_pressure_diagnostic[
+        "melt_redox_speciation_flag"
+    ] == _flag
     vapor_activity = sim._last_vapor_pressure_diagnostic["a_FeO_calphad"]
-    assert vapor_activity["status"] == "unavailable"
-    assert "ferrous_free_lower_bound" in vapor_activity["reason"]
+    assert vapor_activity["status"] == "ok"
+    assert vapor_activity["a_FeO_authoritative"] > 0.0
+
+    from simulator.vapour_rail.instrumentation import EffectivePressureSource
+
+    pressure_source = EffectivePressureSource(
+        "test-vapor-pressure",
+        dict(equilibrium.vapor_pressures_Pa),
+    )
+    batch = sim._resolve_evaporation_vapour_batch(
+        equilibrium,
+        temperature_K=1673.15,
+        effective_pressure_source=pressure_source,
+    )
+    assert batch is not None
+    si_o_answer = batch.channels_by_species["SiO"]
+    assert si_o_answer.source_reaction_activity is not None
+    assert si_o_answer.source_reaction_activity.value > 0.0
+    assert "source_fO2_log10=30" in (
+        si_o_answer.source_reaction_activity.state_fingerprint
+    )
 
     sulfur_calls: list[dict[str, Any]] = []
 
