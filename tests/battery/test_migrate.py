@@ -4434,7 +4434,9 @@ def test_stolyarova_table3_137_row_ids_and_reference_states_unchanged(
             payload, sort_keys=True, separators=(",", ":"), ensure_ascii=False
         ).encode()
     ).hexdigest()
-    assert digest == "5e605d6e940f020c15e0e931b7c9a706c2b0874ceeaf6ee285a370f5a3557961"
+    # Pinned to the digest on green c9b6e545d, whose Stolyarova 1996 locator notes carry the
+    # Table 1 caption and Eq. (13) quotes; this change must leave it unchanged.
+    assert digest == "a3f9988c9f64bb73c07eefa07b1d2edaac77abb0b2496799dba925c6bedaa968"
 
 
 def test_reference_prose_keeps_printed_endmember_and_does_not_stamp_one_bar() -> None:
