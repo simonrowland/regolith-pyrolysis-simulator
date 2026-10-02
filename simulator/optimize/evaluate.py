@@ -99,6 +99,7 @@ from simulator.optimize.physics import (
     ThresholdSpec,
     _coating_runtime_diagnostics,
     _coating_wall_refused_species,
+    _coating_source_flux_upper_bounds,
     physics_constraints_digest,
 )
 from simulator.optimize.profiles import (
@@ -1689,7 +1690,35 @@ def _evaluate_physics_constraints(
             },
         )
     feasibility = _with_knudsen_fallback_margin_detail(feasibility, prepared_trace)
-    return _with_extraction_not_attempted_verdicts(feasibility, prepared_trace)
+    feasibility = _with_extraction_not_attempted_verdicts(
+        feasibility,
+        prepared_trace,
+    )
+    coating = feasibility.margins.get("coating")
+    coating_authority = (
+        coating.status_payload.get("sticking_alpha_authority")
+        if coating is not None
+        else None
+    )
+    if (
+        coating is not None
+        and coating.status == "unavailable"
+        and not coating.authoritative
+        and isinstance(coating_authority, MappingABC)
+        and coating_authority.get("code") == "wall_deposit_coverage_unknown"
+    ):
+        margins = dict(feasibility.margins)
+        margins["coating"] = replace(coating, feasible=True)
+        feasibility = FeasibilityResult(
+            feasible=all(margin.feasible for margin in margins.values()),
+            margins={
+                gate: margins[gate]
+                for gate in GATE_ORDER
+                if gate in margins
+            },
+            version=feasibility.version,
+        )
+    return feasibility
 
 
 def _trace_with_optimizer_coating_report(
@@ -1748,7 +1777,7 @@ def _trace_with_optimizer_coating_report(
         if isinstance(nested_authority, MappingABC):
             refusal_sources.append(nested_authority)
     refused_species = _coating_wall_refused_species(*refusal_sources)
-    refused_flux_bounds = _optimizer_refused_flux_bounds(
+    refused_flux_bounds = _coating_source_flux_upper_bounds(
         getattr(run_execution, "snapshots", ()),
         refused_species,
         campaigns_elapsed=campaigns_elapsed,
@@ -1835,7 +1864,27 @@ def _trace_with_optimizer_coating_report(
                 refusal_payload[key] = wall_authority[key]
         if refusal_payload:
             report["sticking_alpha_authority"] = refusal_payload
-    if charge_mass_kg is not None:
+    if refused_species:
+        report[
+            "wall_saturation_pressure_refused_flux_upper_bounds_kg_per_campaign"
+        ] = refused_flux_bounds
+    has_priced_wall_quantity = any(
+        kg > COATING_POSITIVE_DEPOSIT_TOLERANCE_KG_PER_CAMPAIGN
+        for kg in normalized_deposit.values()
+    ) or bool(refused_flux_bounds)
+    if threshold_parametric:
+        report["unqualified_deposition_rate_kg_per_campaign"] = float(
+            runner_report.get("wall_deposit_kg_per_campaign", 0.0) or 0.0
+        )
+        report.update(
+            coating_constraint_mode="no_unqualified_deposition",
+            coating_constraint_authoritative=True,
+            coating_constraint_reason=(
+                "without a finite material damage capacity, no positive "
+                "continuous deposition rate has a qualified liner lifespan"
+            ),
+        )
+    elif charge_mass_kg is not None and has_priced_wall_quantity:
         report.update(
             feedstock_charge_mass_kg=charge_mass_kg,
             coating_constraint_mode="upstream_deposit_fraction",
@@ -1844,23 +1893,6 @@ def _trace_with_optimizer_coating_report(
                 "d-045 upstream wall deposit fraction per campaign"
             ),
         )
-    if refused_species:
-        report[
-            "wall_saturation_pressure_refused_flux_upper_bounds_kg_per_campaign"
-        ] = refused_flux_bounds
-    if threshold_parametric:
-        report["unqualified_deposition_rate_kg_per_campaign"] = float(
-            runner_report.get("wall_deposit_kg_per_campaign", 0.0) or 0.0
-        )
-        if charge_mass_kg is None:
-            report.update(
-                coating_constraint_mode="no_unqualified_deposition",
-                coating_constraint_authoritative=True,
-                coating_constraint_reason=(
-                    "without a finite material damage capacity, no positive "
-                    "continuous deposition rate has a qualified liner lifespan"
-                ),
-            )
     if not authoritative:
         report.update(
             authoritative=False,
@@ -1891,68 +1923,6 @@ def _optimizer_feedstock_charge_mass(
             "optimizer feedstock charge mass must be finite and positive"
         )
     return mass
-
-
-def _optimizer_refused_flux_bounds(
-    snapshots: Any,
-    refused_species: tuple[str, ...],
-    *,
-    campaigns_elapsed: float = 1.0,
-) -> dict[str, float]:
-    """Bound refused wall deposits by all observed vapour flux in the campaign.
-
-    A wall deposit is downstream of the source vapour. Summing each refused
-    species' non-negative kg/hr flux over snapshot duration therefore gives an
-    upper bound for every segment, even when the wall saturation quantity was
-    refused. Missing species/rate evidence remains missing, never zero.
-    """
-
-    if not refused_species:
-        return {}
-    if not math.isfinite(campaigns_elapsed) or campaigns_elapsed <= 0.0:
-        raise CoatingFeasibilityReportError(
-            "campaigns_elapsed must be finite and positive for refused flux "
-            "bounds"
-        )
-    totals = {species: 0.0 for species in refused_species}
-    observed: set[str] = set()
-    for snapshot in tuple(snapshots or ()):
-        flux = getattr(snapshot, "evap_flux", None)
-        rates = getattr(flux, "species_kg_hr", None)
-        if not isinstance(rates, MappingABC):
-            continue
-        raw_duration = getattr(snapshot, "duration_h", 1.0)
-        if isinstance(raw_duration, bool) or not isinstance(raw_duration, int | float):
-            raise CoatingFeasibilityReportError(
-                "snapshot duration_h must be numeric for refused flux bounds"
-            )
-        duration_h = float(raw_duration)
-        if not math.isfinite(duration_h) or duration_h < 0.0:
-            raise CoatingFeasibilityReportError(
-                "snapshot duration_h must be finite and non-negative for "
-                "refused flux bounds"
-            )
-        for species in refused_species:
-            if species not in rates:
-                continue
-            raw_rate = rates[species]
-            if isinstance(raw_rate, bool) or not isinstance(raw_rate, int | float):
-                raise CoatingFeasibilityReportError(
-                    f"vapour flux for refused species {species!r} must be numeric"
-                )
-            rate = float(raw_rate)
-            if not math.isfinite(rate) or rate < 0.0:
-                raise CoatingFeasibilityReportError(
-                    f"vapour flux for refused species {species!r} must be finite "
-                    "and non-negative"
-                )
-            totals[species] += rate * duration_h
-            observed.add(species)
-    return {
-        species: float(totals[species] / campaigns_elapsed)
-        for species in refused_species
-        if species in observed
-    }
 
 
 def _knudsen_summary_from_eval_inputs(

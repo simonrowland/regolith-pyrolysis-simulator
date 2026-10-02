@@ -26,6 +26,9 @@ from simulator.optimize.physics import (
     PhysicsConstraintSet,
     ThresholdSpec,
     _coating_wall_quantity_unavailable,
+    _coating_wall_refused_species,
+    _coating_refused_flux_bounds,
+    _coating_source_flux_upper_bounds,
     extraction_completeness_report,
     target_species_yield_report,
 )
@@ -3622,13 +3625,21 @@ def product_summary(
         margin_payload if isinstance(margin_payload, Mapping) else {},
         include_coverage_unknown=False,
     )
+    # A non-authoritative gate can coexist with a flagged numeric wall report.
+    wall_report_is_priced = (
+        summary.get("coating_status") == "warning"
+        and not summary.get("coating_unavailable_reason")
+    )
     if (
-        str(getattr(coating_margin, "status", "")) == "unavailable"
-        or (
-            isinstance(margin_payload, Mapping)
-            and margin_payload.get("coating_verdict") == "unavailable"
+        not wall_report_is_priced
+        and (
+            str(getattr(coating_margin, "status", "")) == "unavailable"
+            or (
+                isinstance(margin_payload, Mapping)
+                and margin_payload.get("coating_verdict") == "unavailable"
+            )
+            or margin_unavailable_reason
         )
-        or margin_unavailable_reason
     ):
         coating_unavailable_reason = (
             str(getattr(coating_margin, "status_reason", ""))
@@ -3647,6 +3658,45 @@ def product_summary(
     )
     summary["campaigns_to_resinter_worst_segment"] = lifetime
     summary["has_positive_qualified_fouling"] = has_positive_fouling
+    wall_authority = summary.get("wall_deposit_sticking_authority")
+    if isinstance(wall_authority, Mapping):
+        refused_species = _coating_wall_refused_species(wall_authority)
+        refused_bounds = _coating_refused_flux_bounds(
+            wall_authority,
+            refused_species,
+        )
+        if refused_species and all(
+            species in refused_bounds for species in refused_species
+        ):
+            refused_bound_kg = sum(
+                refused_bounds[species] for species in refused_species
+            )
+            if refused_bound_kg > 0.0:
+                raw_wall_loads: dict[str, float] = {}
+                raw_wall = getattr(
+                    getattr(run_execution, "trace", None),
+                    "wall_deposit_by_segment_species_kg",
+                    {},
+                )
+                elapsed = _campaigns_elapsed(run_execution)
+                if isinstance(raw_wall, Mapping):
+                    for key, raw_kg in raw_wall.items():
+                        if not isinstance(key, tuple) or len(key) != 2:
+                            continue
+                        segment, _species = key
+                        raw_wall_loads[str(segment)] = (
+                            raw_wall_loads.get(str(segment), 0.0)
+                            + _finite_float(raw_kg, "wall deposit kg") / elapsed
+                        )
+                worst_load = max(raw_wall_loads.values(), default=0.0)
+                threshold = _wall_resinter_threshold_kg()
+                lifetime = (
+                    math.inf
+                    if threshold is None
+                    else threshold / (worst_load + refused_bound_kg)
+                )
+                has_positive_fouling = True
+                summary["campaigns_to_resinter_worst_segment"] = lifetime
     if cost_parameters is not None:
         summary.update(
             _furnace_amortization_summary(
@@ -3882,6 +3932,16 @@ def _coating_product_summary(run_execution: Any) -> Mapping[str, Any]:
         cumulative_deposits_kg=raw_by_segment,
     )
     authority = _coating_authority_status(raw_by_segment, run_execution)
+    refused_species = _coating_wall_refused_species(authority)
+    if refused_species:
+        authority = dict(authority)
+        authority[
+            "wall_saturation_pressure_refused_flux_upper_bounds_kg_per_campaign"
+        ] = _coating_source_flux_upper_bounds(
+            getattr(run_execution, "snapshots", ()),
+            refused_species,
+            campaigns_elapsed=_campaigns_elapsed(run_execution),
+        )
     return MappingProxyType({
         "wall_deposit_kg_by_segment_species": by_segment,
         "wall_deposit_kg_by_zone_species": MappingProxyType({
@@ -3940,8 +4000,22 @@ def _has_positive_wall_deposit(
 
 
 def _coating_authority_summary(authority: Mapping[str, Any]) -> dict[str, Any]:
+    refused_species = _coating_wall_refused_species(authority)
+    refused_bounds = _coating_refused_flux_bounds(authority, refused_species)
+    bounded_refusals = bool(refused_species) and all(
+        species in refused_bounds for species in refused_species
+    )
+    quantity_authority = authority
+    if bounded_refusals:
+        quantity_authority = dict(authority)
+        quantity_authority.pop("wall_saturation_pressure_refused_species", None)
+        quantity_authority.pop("wall_saturation_pressure_refusals_by_species", None)
+        if "wall_saturation_pressure_refused" in str(
+            quantity_authority.get("code", "")
+        ):
+            quantity_authority.pop("code", None)
     unavailable_reason = _coating_wall_quantity_unavailable(
-        authority,
+        quantity_authority,
         include_coverage_unknown=False,
     )
     authoritative = (
@@ -3963,7 +4037,13 @@ def _coating_authority_summary(authority: Mapping[str, Any]) -> dict[str, Any]:
             else (
                 ""
                 if authoritative
-                else str(authority.get("message", "non-authoritative coating"))
+                else (
+                    "wall saturation refusal priced from vapour-flux upper "
+                    f"bounds {dict(refused_bounds)}; "
+                    if bounded_refusals
+                    else ""
+                )
+                + str(authority.get("message", "non-authoritative coating"))
             )
         ),
         "wall_deposit_sticking_authority": _plain_payload(authority),

@@ -1639,6 +1639,41 @@ def test_forged_precomputed_authority_without_grounding_fails_closed() -> None:
     assert readout["authoritative"] is False
 
 
+def test_refused_wall_saturation_flux_bound_keeps_coating_priced() -> None:
+    notice = _alpha_notice("Mg", cited=True)
+    notice.update(_wall_pressure_refusal_notice("Mg"))
+    sim = _fake_sim({}, notice)
+    trace = PhysicsTrace.from_simulator(sim)
+    snapshot = SimpleNamespace(
+        duration_h=2.0,
+        evap_flux=EvaporationFlux(
+            species_kg_hr={"Mg": 0.25},
+            total_kg_hr=0.25,
+        ),
+    )
+
+    summary = _coating_product_summary(
+        SimpleNamespace(
+            trace=trace,
+            simulator=sim,
+            snapshots=(snapshot,),
+        )
+    )
+
+    authority = summary["wall_deposit_sticking_authority"]
+    assert summary["coating_status"] == "warning"
+    assert summary["coating_authoritative"] is False
+    assert "priced from vapour-flux upper bounds" in summary[
+        "coating_status_reason"
+    ]
+    assert authority[
+        "wall_saturation_pressure_refused_species"
+    ] == ["Mg"]
+    assert authority[
+        "wall_saturation_pressure_refused_flux_upper_bounds_kg_per_campaign"
+    ] == {"Mg": pytest.approx(0.5)}
+
+
 def test_segment_deposit_without_matching_alpha_record_fails_closed() -> None:
     payload = wall_deposit_sticking_authority_status(
         {
