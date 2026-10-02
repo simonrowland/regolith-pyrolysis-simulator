@@ -9,7 +9,7 @@ Ack already on Dropbox / ferry: `STATUS-req-melt-redox-ferric-first-acked-2026-1
 **Seat:** `slot-z14` @ green `696299350e98b67f786c334b4b4ccc8856149379` (design-only; no stack2 product commits).
 **Sources folded:** REQ (7 sections); RULING d-058; alkali-couple DESIGN r1+r2; sol-review corrections; redox-design-r3 (+ owner-design-decisions / design-tail as needed); Q-A..Q-D / d-056 / d-057 / d-052.
 
-**Mailbox tip:** (filled after push) on `empirical/reviews-batch-zv-2026-09-22`.
+**Mailbox tip:** TIP_PLACEHOLDER on `empirical/reviews-batch-zv-2026-09-22` (artifacts `888f11d782b4f66d5155a767aa85e33abe41333d`).
 
 ## What landed
 
