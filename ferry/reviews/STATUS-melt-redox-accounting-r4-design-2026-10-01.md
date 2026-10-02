@@ -13,7 +13,7 @@ references, domain flags, competitor rule, chunk schedule, Mandate categories).
 sol-r3-confirm.md; grok-r3-confirm.md; optional ia-k-slope-diagnosis / NOTICE already in r3
 (ids d-057/058/059).
 
-**Mailbox tip:** fb020e9c384c74018401f1f134dfb31f94c02bd1 on `empirical/reviews-batch-zv-2026-09-22` (artifacts fb020e9c384c74018401f1f134dfb31f94c02bd1).
+**Mailbox tip:** b33315184867835646e2ba1374a842ad25b50aa0 on `empirical/reviews-batch-zv-2026-09-22` (artifacts fb020e9c384c74018401f1f134dfb31f94c02bd1).
 
 ## What changed from r3 (summary)
 
