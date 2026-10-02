@@ -12,10 +12,12 @@ extraction:
     Printed partial-pressure sentences and the Po2 table transcribed from a 400 dpi pdftoppm PNG. Figs
     1–2 listed figure-only and were not digitised. Authors'' measured KEMS partial pressures (torr as
     printed) are kept distinct from the Po2 table, which the authors calculate from AlO=Al+O and O2=2O.
-    The sentence ''Maximum P_FeO=10^-2 torr'' in the 1450–1725 C window is recorded as P(Fe): Fig. 1 labels
-    Fe (not FeO) at lg P ≈ -2 in that band, and the next sentence separately gives the top pressure of
-    iron oxide P_FeO=8.1×10^-5 torr at 1650 C. Typewriter I for 1 in the Po2 table (I.4×10^-6) is read
-    as 1.4.'
+    Temperatures converted from printed C to K use T_K = T_C + 273.15. The printed range sentence says
+    ''Maximum P_FeO=10^-2 tor'' over 1450–1725 C, while the adjacent sentence gives a top iron-oxide
+    pressure P_FeO=8.1×10^-5 tor at 1650 C; this conflict is preserved. The range row remains assigned
+    to Fe(g) under the existing correction based on Fig. 1 labels; Figs. 1–2 remain figure-only and are
+    not digitised. Authors'' measured KEMS pressures remain distinct from the model-derived Po2 table.
+    Typewriter I for 1 in that table (I.4×10^-6) is read as 1.4.'
   date: '2026-09-12'
   worker: extract-kems-026
   provenance_path: docs-private/reviews/2026-09-12-kems-extracts/
@@ -64,6 +66,48 @@ fidelity_samples:
     published_page: 945
     pdf_page_index: 1
     paragraph: At T=1225 C P_Na=2.7×10^-4 tor and P_K=4.2×10^-5 tor
+- species: Fe
+  observable: psat_series
+  observation_id: yakovlev_1984_murchison_Fe_troilite_1050C
+  field: p_torr
+  value: 1.8e-05
+  locator:
+    published_page: 945
+    pdf_page_index: 1
+    paragraph: Iron on the level of pressure 1.8×10^-5 tor have been already observed at T=1050 C and that is clearly connected with the decay of troilite
+- species: FeO
+  observable: psat_series
+  observation_id: yakovlev_1984_murchison_FeO_top_1650C
+  field: p_torr
+  value: 8.1e-05
+  locator:
+    published_page: 945
+    pdf_page_index: 1
+    paragraph: The top pressure of iron oxide (P_FeO=8.1×10^-5 tor) relates to T=1650 C
+- path: species.Mg.observations[yakovlev_1984_murchison_Mg_max_1750_1825C].values.semantics
+  value: bound_not_point_ordering
+  locator:
+    published_page: 945
+    pdf_page_index: 1
+    paragraph: Maximum P_SiO and P_Mg in the temperature range 1750-1825 C are accordingly 2×10^-2 tor and 8.3×10^-3 tor
+- species: Ca
+  observable: psat_series
+  observation_id: yakovlev_1984_murchison_Ca_1825C
+  field: p_torr
+  value: 7.5e-05
+  locator:
+    published_page: 945
+    pdf_page_index: 1
+    paragraph: Ca (P_Ca=7.5×10^-5 tor) are observed in vapor at this temperature
+- species: Al
+  observable: psat_series
+  observation_id: yakovlev_1984_murchison_Al_max_2100C
+  field: p_torr
+  value: 0.0017
+  locator:
+    published_page: 945
+    pdf_page_index: 1
+    paragraph: The pressure of aluminium increases accordingly to the temperature rises to 2100 C and reaches the maximum pressure P_Al=1.7×10^-3 tor
 benches:
 - id: yakovlev-1984-kems
   identity: {basis: described_in_this_work}
@@ -75,7 +119,44 @@ benches:
     locator:
       published_page: 945
       pdf_page_index: 1
-      note: The experiments are described as using a Knudsen effusion cell; the cell material is not stated.
+      paragraph: The experiments were carried out using the Knudsen effusion cell. The brief description of the technique was given in /I/.
+      note: Cell material and liner are not named in this abstract.
+  geometry:
+    orifice_diameter_m:
+      state: {tag: unknown, reason: not_published}
+      locator:
+        published_page: 945
+        pdf_page_index: 1
+        note: Effusion-orifice diameter is not stated in this abstract.
+  other_facts:
+    - name: cell_dimensions
+      value:
+        state: {tag: unknown, reason: not_published}
+        locator:
+          published_page: 945
+          pdf_page_index: 1
+          note: Cell dimensions are not stated in this abstract.
+    - name: background_residual_gas_pressure_near_cell
+      value:
+        state: {tag: unknown, reason: not_published}
+        locator:
+          published_page: 945
+          pdf_page_index: 1
+          note: Chamber or background pressure near the cell is not stated in this abstract.
+    - name: partial_pressure_calibration_standard
+      value:
+        state: {tag: unknown, reason: not_published}
+        locator:
+          published_page: 945
+          pdf_page_index: 1
+          note: No pressure-calibration standard is stated in this abstract.
+    - name: mass_spectrometer_instrument_model
+      value:
+        state: {tag: unknown, reason: not_published}
+        locator:
+          published_page: 945
+          pdf_page_index: 1
+          note: No instrument model is stated in this abstract.
 species:
   Na:
     observations:
@@ -261,6 +342,7 @@ species:
         pdf_page_index: 1
         paragraph: Iron on the level of pressure 1.8×10^-5 tor have been already observed at T=1050 C
           and that is clearly connected with the decay of troilite
+        note: Murchison chondrite is named as the sample; no numerical bulk composition is printed in this abstract.
       T_range_K:
       - 1323.15
       - 1323.15
@@ -278,9 +360,11 @@ species:
         gas_species: Fe(g)
         method_class: measured_direct
         T_C: 1050.0
+        admission_status: admitted
         p_torr: 1.8e-05
         p_Pa: 0.002399796
         p_Pa_conversion: p_Pa = p_torr × 133.322
+        T_K_conversion: T_K = T_C + 273.15
         source_as_printed: decay of troilite
       uncertainty:
         note: No numeric uncertainty printed.
@@ -289,7 +373,8 @@ species:
       locator:
         published_page: 945
         pdf_page_index: 1
-        paragraph: Maximum P=10^-2 tor is watched in the wide temperature range (T=1450-1725 C)
+        paragraph: Maximum P_FeO=10^-2 tor is watched in the wide temperature range (T=1450-1725 C).
+        note: The next sentence states “The top pressure of iron oxide (P_FeO=8.1×10^-5 tor) relates to T=1650 C.” This conflicts with the range maximum printed as P_FeO=10^-2 tor. The existing Fe(g) assignment follows Fig. 1's Fe label; no figure values are digitised. Murchison chondrite is named as the sample; no numerical bulk composition is printed in this abstract.
       T_range_K:
       - 1723.15
       - 1998.15
@@ -306,16 +391,17 @@ species:
         quantity: partial_pressure
         gas_species: Fe(g)
         method_class: measured_direct
+        admission_status: rejected
+        status: typed_refusal
+        reason: Maximum over a temperature range is not a single-temperature point pressure.
+        semantics: bound_not_point_ordering
         T_C_range:
         - 1450.0
         - 1725.0
-        p_torr: 0.01
-        p_Pa: 1.33322
-        p_Pa_conversion: p_Pa = p_torr × 133.322
-        as_printed_species_glyph: P_FeO in the typewriter line; recorded as Fe(g) — see corrections
-        fig1_support: Fig. 1 labels Fe at lg P (tor) ≈ -2 across this T band
+        as_printed_species_glyph: P_FeO in the printed range sentence; the row's Fe(g) assignment follows Fig. 1's label
+        T_K_conversion: T_K = T_C + 273.15
       uncertainty:
-        note: Order-of-magnitude maximum (10^-2 torr) as printed; not a single T point.
+        note: The prose gives a range maximum, not a point; it is retained categorically and rejected from point-pressure scoring.
   FeO:
     observations:
     - observation_id: yakovlev_1984_murchison_FeO_top_1650C
@@ -324,6 +410,7 @@ species:
         published_page: 945
         pdf_page_index: 1
         paragraph: The top pressure of iron oxide (P_FeO=8.1×10^-5 tor) relates to T=1650 C
+        note: This is the printed FeO point. The preceding sentence gives a conflicting P_FeO=10^-2 tor maximum over 1450–1725 C. Murchison chondrite is named as the sample; no numerical bulk composition is printed in this abstract.
       T_range_K:
       - 1923.15
       - 1923.15
@@ -340,12 +427,14 @@ species:
         quantity: partial_pressure
         gas_species: FeO(g)
         method_class: measured_direct
+        admission_status: admitted
         T_C: 1650.0
         p_torr: 8.1e-05
         p_Pa: 0.010799082000000002
         p_Pa_conversion: p_Pa = p_torr × 133.322
+        T_K_conversion: T_K = T_C + 273.15
       uncertainty:
-        note: No numeric uncertainty printed. Distinct from the 10^-2 torr Fe maximum in the same T window.
+        note: No numeric uncertainty printed. The preceding range sentence assigns the 10^-2 torr maximum to P_FeO and conflicts with this point.
   SiO:
     observations:
     - observation_id: yakovlev_1984_murchison_SiO_Mg_max_1750_1825C
@@ -355,6 +444,7 @@ species:
         pdf_page_index: 1
         paragraph: Maximum P_SiO and P_Mg in the temperature range 1750-1825 C are accordingly 2×10^-2
           tor and 8.3×10^-3 tor
+        note: 'Printed range maximum: “Maximum P_SiO and P_Mg in the temperature range 1750-1825 C are accordingly 2×10^-2 tor and 8.3×10^-3 tor.” The stated SiO maximum is not a point pressure.'
       T_range_K:
       - 2023.15
       - 2098.15
@@ -371,18 +461,20 @@ species:
         quantity: partial_pressure
         gas_species: SiO(g)
         method_class: measured_direct
+        admission_status: rejected
+        status: typed_refusal
+        reason: Maximum over a temperature range is not a single-temperature point pressure.
+        semantics: bound_not_point_ordering
         T_C_range:
         - 1750.0
         - 1825.0
-        p_torr: 0.02
-        p_Pa: 2.66644
-        p_Pa_conversion: p_Pa = p_torr × 133.322
         simultaneous_drop_T_C: 1825.0
+        T_K_conversion: T_K = T_C + 273.15
         simultaneous_drop_note: the decrease of SiO and Mg pressures takes place simultaneously at T=1825
           C owing to their exhausting in the condensate phase. The pressure in the system falls sharply
           (more than 10 times) after the vaporization of silica and magnesium.
       uncertainty:
-        note: Maximum in a T window as printed; not a single T point.
+        note: The prose gives a range maximum, not a point; it is retained categorically and rejected from point-pressure scoring.
     - observation_id: yakovlev_1984_CAI_SiO_max_1875C
       type: psat_series
       locator:
@@ -469,6 +561,7 @@ species:
         pdf_page_index: 1
         paragraph: Maximum P_SiO and P_Mg in the temperature range 1750-1825 C are accordingly 2×10^-2
           tor and 8.3×10^-3 tor
+        note: Murchison chondrite is named as the sample; no numerical bulk composition is printed in this abstract.
       T_range_K:
       - 2023.15
       - 2098.15
@@ -485,15 +578,17 @@ species:
         quantity: partial_pressure
         gas_species: Mg(g)
         method_class: measured_direct
+        admission_status: rejected
+        status: typed_refusal
+        reason: Maximum over a temperature range is not a single-temperature point pressure.
+        semantics: bound_not_point_ordering
         T_C_range:
         - 1750.0
         - 1825.0
-        p_torr: 0.0083
-        p_Pa: 1.1065726
-        p_Pa_conversion: p_Pa = p_torr × 133.322
         simultaneous_drop_T_C: 1825.0
+        T_K_conversion: T_K = T_C + 273.15
       uncertainty:
-        note: Maximum in a T window as printed.
+        note: The prose gives a range maximum, not a point; it is retained categorically and rejected from point-pressure scoring.
   Ca:
     observations:
     - observation_id: yakovlev_1984_murchison_Ca_1825C
@@ -534,6 +629,7 @@ species:
         pdf_page_index: 1
         paragraph: Calcium reaches the maximum pressure (P_Ca=4.4×10^-4 tor) at temperatures 1950-2025
           C
+        note: 'Printed wording: “Calcium reaches the maximum pressure (P_Ca=4.4×10^-4 tor) at temperatures 1950-2025 C.” This is a range maximum, not a point pressure.'
       T_range_K:
       - 2223.15
       - 2298.15
@@ -550,16 +646,17 @@ species:
         quantity: partial_pressure
         gas_species: Ca(g)
         method_class: measured_direct
+        admission_status: rejected
+        status: typed_refusal
+        reason: Maximum over a temperature range is not a single-temperature point pressure.
+        semantics: bound_not_point_ordering
         T_C_range:
         - 1950.0
         - 2025.0
-        p_torr: 0.00044
-        p_Pa: 0.05866168
-        p_Pa_conversion: p_Pa = p_torr × 133.322
         TiO_and_TiO2_same_T: true
         P_TiO_gt_P_TiO2: true
       uncertainty:
-        note: Maximum in a T window as printed.
+        note: The prose gives a range maximum, not a point; it is retained categorically and rejected from point-pressure scoring.
   Al:
     observations:
     - observation_id: yakovlev_1984_murchison_Al_max_2100C
@@ -733,7 +830,7 @@ species:
         published_page: 946
         pdf_page_index: 2
         note: Po2 pressure in the vapor during the vaporization of hightemperature residuals of chondrite
-          Murchison and CAI inclusions of Efremovka
+          Murchison and CAI inclusions of Efremovka. The abstract gives sample names but no numerical bulk compositions.
       quote: The calculation of Po2 has been done using the equilibriums AlO=Al+O, O2=2O. The Po2 calculation
         for the high temperature vaporization of Murchison and CAI inclusions of Efremovka shows that
         vaporization of latter takes place at the conditions with higher Po2 (table).
@@ -748,7 +845,8 @@ species:
         quantity: partial_pressure
         gas_species: O2(g)
         method_class: model_derived
-        admission_status: model_output_not_measurement
+        admission_status: admitted
+        T_K_conversion: T_K = T_C + 273.15
         equilibria_as_printed:
         - AlO = Al + O
         - O2 = 2 O
@@ -813,7 +911,7 @@ species:
         - Efremovka type B blank at 2180 and 2348 C
         - Efremovka type A and B blank at 2020 and 2072 C
       uncertainty:
-        note: Calculated p(O2); no numeric uncertainty printed. Typewriter I.4 read as 1.4.
+        note: No mass-spectrum or ion-current table is printed in this abstract. The table values are calculated p(O2), not observed O2+ ion pressures. The printed relation is AlO = Al + O followed by O2 = 2 O. No same-condition measured parent pressures are published in this abstract, so no parent observations are assigned. No numeric uncertainty printed. Typewriter I.4 read as 1.4.
 deepening:
   dispatch_id: extract-kems-026
   date: '2026-09-12'
@@ -846,5 +944,5 @@ deepening:
     - yakovlev_1984_fig2_CAI_psat_figure_only
     model:
     - yakovlev_1984_Po2_table_calculated
-  battery_limitation: Numeric P(T) points are the printed text maxima/anchors, not a digitised Clausius–Clapeyron
-    series. Figs 1–2 remain figure-only.
+  battery_limitation: Printed prose includes point anchors and range maxima; the range maxima are categorical
+    bound-not-point observations, not point pressures. Figs 1–2 remain figure-only.
