@@ -3625,13 +3625,21 @@ def product_summary(
         margin_payload if isinstance(margin_payload, Mapping) else {},
         include_coverage_unknown=False,
     )
+    # A non-authoritative gate can coexist with a flagged numeric wall report.
+    wall_report_is_priced = (
+        summary.get("coating_status") == "warning"
+        and not summary.get("coating_unavailable_reason")
+    )
     if (
-        str(getattr(coating_margin, "status", "")) == "unavailable"
-        or (
-            isinstance(margin_payload, Mapping)
-            and margin_payload.get("coating_verdict") == "unavailable"
+        not wall_report_is_priced
+        and (
+            str(getattr(coating_margin, "status", "")) == "unavailable"
+            or (
+                isinstance(margin_payload, Mapping)
+                and margin_payload.get("coating_verdict") == "unavailable"
+            )
+            or margin_unavailable_reason
         )
-        or margin_unavailable_reason
     ):
         coating_unavailable_reason = (
             str(getattr(coating_margin, "status_reason", ""))
