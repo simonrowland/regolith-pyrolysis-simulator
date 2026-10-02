@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import math
 import hashlib
+import time
 from collections import defaultdict
 from collections.abc import Callable, Mapping, Sequence
 from dataclasses import dataclass
@@ -30,6 +31,8 @@ _HASHIMOTO_GEOMETRIES = (
     "disk_4mm_constant",
 )
 _HASHIMOTO_DENSITY_KG_M3 = 2_700.0
+_HASHIMOTO_N_CAP = 256
+_HASHIMOTO_REFINEMENT_TOLERANCE_WT_PCT = 0.05
 _HASHIMOTO_DENSITY_SOURCE = (
     "labelled 2700 kg/m3 fallback from the r2 geometry sensitivity probe; "
     "not printed by Hashimoto"
@@ -841,11 +844,17 @@ def _predict_hashimoto_residue_cohort(
     *,
     preform_dimensions_mm: Mapping[str, float],
     code_revision: str,
+    _allow_partial_cohort_for_test: bool = False,
 ) -> tuple[_HashimotoResiduePrediction, ...]:
     """Produce R2's two alpha arms and geometry bands, without reading residues."""
-    if len(experiments) != 24 or len(
-        {str(experiment.get("experiment_id", "")) for experiment in experiments}
-    ) != 24:
+    experiment_ids = {
+        str(experiment.get("experiment_id", "")) for experiment in experiments
+    }
+    if (
+        not experiments
+        or len(experiment_ids) != len(experiments)
+        or (len(experiments) != 24 and not _allow_partial_cohort_for_test)
+    ):
         raise ResidueInventoryRefusal(
             "hashimoto_cohort_invalid", "R2 requires 24 distinct physical runs"
         )
@@ -941,7 +950,9 @@ def _predict_hashimoto_residue_cohort(
             / _formula_terms(str(oxide))[1]
             for oxide, wt_pct in run_wt_pct.items()
         }
-        steps = min(256, max(8, math.ceil(duration_s / 60.0)))
+        initial_steps = min(
+            _HASHIMOTO_N_CAP, max(8, math.ceil(duration_s / 60.0))
+        )
         geometry_areas = _hashimoto_geometry_areas(
             sample_mass_kg, preform_dimensions_mm
         )
@@ -1152,17 +1163,74 @@ def _predict_hashimoto_residue_cohort(
             geometry_exhaustions: dict[str, tuple[dict[str, float | int | str], ...]] = {}
             geometry_refusals: dict[str, dict[str, object] | None] = {}
             geometry_atom_closure: dict[str, dict[str, float]] = {}
+            refinement_steps_by_geometry: dict[str, tuple[int, ...]] = {}
+            refinement_differences_by_geometry: dict[str, tuple[dict[str, float | int], ...]] = {}
+            refinement_status_by_geometry: dict[str, str] = {}
+            refinement_cpu_seconds_by_geometry: dict[str, float] = {}
+            refinement_accepted_steps_by_geometry: dict[str, int] = {}
+            refinement_notices: list[dict[str, str]] = []
             for geometry in _HASHIMOTO_GEOMETRIES:
-                values, pO2_steps, exhaustions, refusal, atom_closure = _hashimoto_integrate_geometry(
-                    run_initial_mol,
-                    channels,
-                    pressure_model,
-                    temperature_K=temperature_K,
-                    duration_s=duration_s,
-                    steps=steps,
-                    geometry_policy_id=geometry,
-                    initial_area_m2=geometry_areas[geometry],
-                )
+                steps = initial_steps
+                tried_steps: list[int] = []
+                level_differences: list[dict[str, float | int]] = []
+                cpu_seconds = 0.0
+                previous_values: dict[str, float] | None = None
+                values: dict[str, float] = {}
+                pO2_steps: tuple[float, ...] = ()
+                exhaustions: tuple[dict[str, float | int | str], ...] = ()
+                refusal: ResidueEngineNonconvergence | None = None
+                atom_closure: dict[str, float] = {}
+                refinement_status = "unconverged_at_cap"
+                while True:
+                    started_cpu = time.process_time()
+                    values, pO2_steps, exhaustions, refusal, atom_closure = (
+                        _hashimoto_integrate_geometry(
+                            run_initial_mol,
+                            channels,
+                            pressure_model,
+                            temperature_K=temperature_K,
+                            duration_s=duration_s,
+                            steps=steps,
+                            geometry_policy_id=geometry,
+                            initial_area_m2=geometry_areas[geometry],
+                        )
+                    )
+                    cpu_seconds += time.process_time() - started_cpu
+                    tried_steps.append(steps)
+                    if refusal is not None:
+                        refinement_status = "engine_nonconvergence"
+                        break
+                    if previous_values is not None:
+                        max_difference = max(
+                            abs(values[oxide] - previous_values[oxide])
+                            for oxide in run_initial_mol
+                        )
+                        level_differences.append(
+                            {
+                                "coarse_steps": tried_steps[-2],
+                                "fine_steps": steps,
+                                "max_abs_difference_wt_pct": max_difference,
+                            }
+                        )
+                        if max_difference < _HASHIMOTO_REFINEMENT_TOLERANCE_WT_PCT:
+                            refinement_status = "converged"
+                            break
+                    if steps >= _HASHIMOTO_N_CAP:
+                        refinement_status = "unconverged_at_cap"
+                        refinement_notices.append(
+                            {
+                                "reason": "residue_time_refinement_unconverged",
+                                "geometry_policy_id": geometry,
+                            }
+                        )
+                        break
+                    previous_values = values
+                    steps = min(_HASHIMOTO_N_CAP, 2 * steps)
+                refinement_steps_by_geometry[geometry] = tuple(tried_steps)
+                refinement_differences_by_geometry[geometry] = tuple(level_differences)
+                refinement_status_by_geometry[geometry] = refinement_status
+                refinement_cpu_seconds_by_geometry[geometry] = cpu_seconds
+                refinement_accepted_steps_by_geometry[geometry] = tried_steps[-1]
                 geometry_predictions[geometry] = values
                 geometry_exhaustions[geometry] = exhaustions
                 geometry_refusals[geometry] = (
@@ -1287,9 +1355,17 @@ def _predict_hashimoto_residue_cohort(
                 "openimcc_pin": openimcc_bridge.OPENIMCC_RECORDED_PIN,
                 "code_revision": code_revision,
                 "integration": {
-                    "steps": steps,
-                    "refinement_status": "pending_r3",
-                    "substep_duration_s": duration_s / steps,
+                    "steps": refinement_accepted_steps_by_geometry[primary_geometry],
+                    "steps_tried_by_geometry": refinement_steps_by_geometry,
+                    "max_difference_wt_pct_by_geometry": refinement_differences_by_geometry,
+                    "accepted_steps_by_geometry": refinement_accepted_steps_by_geometry,
+                    "refinement_status_by_geometry": refinement_status_by_geometry,
+                    "refinement_status": refinement_status_by_geometry[primary_geometry],
+                    "process_cpu_seconds_by_geometry": refinement_cpu_seconds_by_geometry,
+                    "process_cpu_seconds": math.fsum(refinement_cpu_seconds_by_geometry.values()),
+                    "refinement_notices": tuple(refinement_notices),
+                    "substep_duration_s": duration_s
+                    / refinement_accepted_steps_by_geometry[primary_geometry],
                     "component_exhaustion_rule": (
                         "remaining component moles below sqrt(binary64 epsilon) "
                         "times initial sample oxide moles, floored at 16 ULPs; "
@@ -1303,6 +1379,7 @@ def _predict_hashimoto_residue_cohort(
                         "failure stops this geometry run with a partial diagnostic"
                     ),
                 },
+                "notices": tuple(refinement_notices),
                 "component_exhausted_by_geometry": geometry_exhaustions,
                 "atom_closure_mol_by_geometry": geometry_atom_closure,
                 "geometry_refusal_by_geometry": geometry_refusals,
