@@ -12567,6 +12567,130 @@ class Migrator:
                 experiment_id = run_experiment.experiment_id
                 pressure_environment = run_experiment.pressure_environment
                 total_pressure = pressure_environment.total_pressure_Pa
+                if q_token_point is Quantity.RESIDUE_COMPONENT_COMPOSITION:
+                    initial = run_experiment.sample.initial_composition
+                    composition = (
+                        initial.state
+                        if initial is not None and initial.state.is_value
+                        else State.unknown(
+                            "source has no located starting composition for this run"
+                        )
+                    )
+                    if value_sel is not None and value_sel.field_name == "residue_ppm":
+                        printed = run_experiment.sample.printed_composition
+                        start_ppm = (
+                            _as_dec_or_none(parent_values.get("starting_measured_ppm"))
+                            if isinstance(parent_values, Mapping)
+                            else None
+                        )
+                        if (
+                            printed is not None
+                            and printed.state.is_value
+                            and isinstance(printed.state.value, Mapping)
+                            and start_ppm is not None
+                        ):
+                            components = {
+                                str(formula): _as_dec_or_none(amount)
+                                for formula, amount in printed.state.value.items()
+                            }
+                            components = {
+                                formula: amount
+                                for formula, amount in components.items()
+                                if amount is not None
+                            }
+                            components[species.formula] = start_ppm / Decimal("10000")
+                            composition = State.of(
+                                Composition(
+                                    basis="printed_oxides_plus_starting_element",
+                                    components=tuple(components.items()),
+                                    amount_basis=AmountBasis.MASS_PERCENT,
+                                )
+                            )
+                    mass = run_experiment.sample.mass_kg
+                    mass_value = (
+                        mass.state.value
+                        if mass is not None and mass.state.is_value
+                        else None
+                    )
+                    sample_mass = (
+                        State.of(mass_value.point)
+                        if isinstance(mass_value, Value)
+                        and mass_value.kind is ValueKind.POINT
+                        and mass_value.point is not None
+                        else State.unknown(
+                            "source has no located point sample mass for this run"
+                        )
+                    )
+                    pressure_value = (
+                        total_pressure.state.value
+                        if total_pressure.state.is_value
+                        else None
+                    )
+                    pressure = (
+                        State.of(pressure_value.point)
+                        if isinstance(pressure_value, Value)
+                        and pressure_value.kind is ValueKind.POINT
+                        and pressure_value.point is not None
+                        else State.unknown(
+                            "source has no located total pressure for this run"
+                        )
+                    )
+                    area_located = None
+                    if (
+                        run_experiment.apparatus is not None
+                        and run_experiment.apparatus.geometry is not None
+                    ):
+                        area_located = run_experiment.apparatus.geometry.exposed_area_m2
+                    area_value = (
+                        area_located.state.value
+                        if area_located is not None and area_located.state.is_value
+                        else None
+                    )
+                    area = (
+                        State.of(area_value.point)
+                        if isinstance(area_value, Value)
+                        and area_value.kind is ValueKind.POINT
+                        and area_value.point is not None
+                        else State.unknown(
+                            "source has no located exposed area for this run"
+                        )
+                    )
+                    duration_min = _as_dec_or_none(raw_item.get("t_min"))
+                    duration = (
+                        State.of(duration_min * Decimal("60"))
+                        if duration_min is not None
+                        else State.unknown(
+                            "source has no located run duration for this point"
+                        )
+                    )
+                    log_fO2 = _as_dec_or_none(raw_item.get("log10_fO2"))
+                    if log_fO2 is not None:
+                        oxygen = State.of(
+                            Decimal("100000") * (Decimal(10) ** log_fO2)
+                        )
+                    elif (
+                        isinstance(parent_values, Mapping)
+                        and isinstance(parent_values.get("fO2_control"), Mapping)
+                        and str(
+                            parent_values["fO2_control"].get("during_run", "")
+                        ).strip().casefold()
+                        in {"none", "unbuffered"}
+                    ):
+                        oxygen = State.not_applicable("oxygen_unbuffered_vacuum")
+                    else:
+                        oxygen = State.unknown(
+                            "source has no located oxygen condition for this run"
+                        )
+                    identity = replace(
+                        identity,
+                        composition=composition,
+                        sample_mass_kg=sample_mass,
+                        total_pressure_Pa=pressure,
+                        exposure=State.of(
+                            Exposure(area_m2=area, duration_s=duration)
+                        ),
+                        fO2_Pa=oxygen,
+                    )
                 if not total_pressure.state.is_value:
                     source_pressure = next(
                         (
@@ -12654,10 +12778,19 @@ class Migrator:
                     str(key): _point_condition_from_plain(value, key=str(key))
                     for key, value in raw_point_conditions.items()
                 }
+                if q_token_point is Quantity.RESIDUE_COMPONENT_COMPOSITION:
+                    explicit_point_conditions.pop("VF_wt_pct", None)
                 point_conditions = {
                     **(point_conditions or {}),
                     **explicit_point_conditions,
                 }
+            if q_token_point is Quantity.RESIDUE_COMPONENT_COMPOSITION:
+                vf = _as_dec_or_none(raw_item.get("VF_wt_pct"))
+                if vf is not None:
+                    point_conditions = {
+                        **(point_conditions or {}),
+                        "VF_wt_pct": Located(State.of(vf), locator=point_locator),
+                    }
         partial_total_condition = _partial_pressure_point_condition(
             ident_kwargs, point_locator
         )

@@ -8296,6 +8296,8 @@ def test_residue_cells_keep_run_identity_and_printed_conditions(
     from decimal import Decimal
 
     from simulator.battery.enums import AdmissionStatus, Quantity
+    from simulator.battery.identity import profile_for
+    from simulator.battery.migrate import wt_pct_to_mole_fraction
 
     sossi_id = "kems-012-sossi-2019"
     sossi = _migrate_real_extract(tmp_path / "sossi", f"{sossi_id}.yaml")
@@ -8362,6 +8364,42 @@ def test_residue_cells_keep_run_identity_and_printed_conditions(
         assert conditions["starting_component_ppm"].state.value == expected_starting
         expected_pressure = sossi.experiments[obs.experiment_id].pressure_environment.total_pressure_Pa
         assert conditions["total_pressure_Pa"].state == expected_pressure.state
+        identity = obs.identity
+        source_experiment = next(
+            row
+            for row in sossi_source["experiments"]
+            if row["experiment_id"].endswith(run_key[3])
+        )
+        expected_start_composition = {
+            oxide: Decimal(str(amount))
+            for oxide, amount in source_experiment["sample"]["printed_composition"]["state"]["value"].items()
+        }
+        expected_start_composition[obs.identity.species.formula] = (
+            expected_starting / Decimal("10000")
+        )
+        assert identity.composition.value.amount_basis.value == "mass_percent"
+        assert identity.composition.value.basis == "printed_oxides_plus_starting_element"
+        assert dict(identity.composition.value.components) == expected_start_composition
+        assert identity.temperature_K.value == run_key[1]
+        assert identity.sample_mass_kg.value == Decimal(
+            source_experiment["sample"]["mass_kg"]["state"]["value"]["point"]
+        )
+        assert identity.exposure.value.duration_s.value == run_key[2] * Decimal("60")
+        assert identity.total_pressure_Pa.value == Decimal("101325")
+        assert identity.fO2_Pa.value == Decimal("100000") * (Decimal(10) ** expected_fO2)
+        assert "experiment_id" not in profile_for(identity).required
+        assert obs.experiment_id.endswith(f"::experiment::{run_key[3]}")
+        assert profile_for(identity).required == frozenset(
+            {
+                "temperature_K",
+                "subtype",
+                "composition",
+                "exposure",
+                "total_pressure_Pa",
+                "sample_mass_kg",
+                "fO2_Pa",
+            }
+        )
         for key in (
             "temperature_K",
             "time_min",
@@ -8448,6 +8486,29 @@ def test_residue_cells_keep_run_identity_and_printed_conditions(
         assert conditions["atmosphere"].state.value == fO2["note"]
         expected_pressure = hashimoto.experiments[obs.experiment_id].pressure_environment.total_pressure_Pa
         assert conditions["total_pressure_Pa"].state == expected_pressure.state
+        identity = obs.identity
+        experiment = hashimoto.experiments[obs.experiment_id]
+        expected_start = wt_pct_to_mole_fraction(
+            {
+                oxide: Decimal(str(amount))
+                for oxide, amount in starting.items()
+                if oxide != "locator"
+            }
+        )
+        assert identity.composition.value.components == expected_start.components
+        assert identity.temperature_K.value == conditions["temperature_K"].state.value
+        assert identity.sample_mass_kg.value == Decimal("0.0001")
+        assert identity.exposure.value.duration_s.value == conditions["time_min"].state.value * Decimal("60")
+        assert identity.total_pressure_Pa.value == experiment.pressure_environment.total_pressure_Pa.state.value.point
+        assert identity.fO2_Pa.is_not_applicable
+        assert identity.fO2_Pa.reason == "oxygen_unbuffered_vacuum"
+        assert run_id == obs.experiment_id.split("::experiment::")[-1]
+        source_vf = item.get("VF_wt_pct")
+        if source_vf is None:
+            assert "VF_wt_pct" not in conditions
+        else:
+            assert conditions["VF_wt_pct"].state.value == Decimal(str(source_vf))
+            assert conditions["VF_wt_pct"].locator == obs.locator
         pressure = values["pressure_on_throw_Torr"]
         temperature_c = item["T_C"]
         source_pressure = pressure["by_T_C"].get(temperature_c)

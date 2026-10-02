@@ -676,7 +676,19 @@ def profile_for(identity: Identity) -> QuantityProfile:
             na("composition")
         na("fO2_Pa")
     elif q is Quantity.RESIDUE_COMPONENT_COMPOSITION:
-        req("temperature_K", "subtype")
+        req(
+            "temperature_K",
+            "subtype",
+            "composition",
+            "exposure",
+            "total_pressure_Pa",
+            "sample_mass_kg",
+            "fO2_Pa",
+        )
+        # Buffered runs carry a printed oxygen value. Vacuum runs explicitly
+        # mark the chamber oxygen axis not applicable; the surface pO2 is a
+        # later model input, not a substitute identity value.
+        na("fO2_Pa")
     elif q in {
         Quantity.VISCOSITY,
         Quantity.DENSITY,
