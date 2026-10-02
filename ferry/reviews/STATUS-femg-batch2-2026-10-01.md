@@ -18,6 +18,6 @@ VERDICT: LAND e644f212033d26c98d8f916d8e850d13fc3a7faf
 - **Deliverable:** `REVIEW-femg-batch2-2026-10-01.md`
 - **Dropbox:** shipped to from-empirical/ 2026-10-01 ~23:33 ET
 - **Store regen:** skipped on 16GB VPS; values guards complete
-- **Mailbox tip:** `cf69244d3a4c42f6c1177304f5edb645a242adb8` on `empirical/reviews-batch-zv-2026-09-22` (artifacts `cf69244d3a4c42f6c1177304f5edb645a242adb8`)
+- **Mailbox tip:** `cc1ff92a3c77ac2021918ad3e8352cf2f2d7ab3e` on `empirical/reviews-batch-zv-2026-09-22` (artifacts `cf69244d3a4c42f6c1177304f5edb645a242adb8`)
 
 — regolith-empirical
