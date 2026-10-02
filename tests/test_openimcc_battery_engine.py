@@ -770,7 +770,7 @@ def test_stolyarova_1991_w_cell_pressure_and_residual_report() -> None:
         assert len(point_rows) == 1, x_sio2
 
 
-def test_stolyarova_typed_w_cell_keeps_reservoir_notice_but_refuses_unverified_regime(tmp_path: Path) -> None:
+def test_stolyarova_typed_w_cell_keeps_reservoir_notice_and_scores_uncalibrated_regime_flagged(tmp_path: Path) -> None:
     # Suppose my change is wrong in the way that matters most: restoring the
     # old reactive_cell_oxygen_reservoir refusal makes this red, because typed
     # [W] rows never request oxygen_balance_effusion with cell_material W.
@@ -877,7 +877,18 @@ def test_stolyarova_typed_w_cell_keeps_reservoir_notice_but_refuses_unverified_r
         "STOLYAROVA_FLAGGED="
         + json.dumps(flagged_stratum_rows(tuple(residuals), engines=engines), sort_keys=True)
     )
-    assert all(row["n"] == 0 and row["n_effusion_refused"] > 0 for row in report)
+    # Owner ruling d-055 (2026-10-01): rows refused only because no calibration
+    # is grounded are scored, flagged, in their own stratum, out of band
+    # derivation. These Stolyarova 1991 rows print no calibration, so they now
+    # produce residuals that all carry the calibration_not_grounded notice.
+    assert all(row["n"] > 0 for row in report)
+    for _engine, residual in tagged:
+        if residual.numeric is None or residual.rail is None or residual.rail.value != "vapour":
+            continue
+        assert any(
+            notice.reason.startswith("calibration_not_grounded")
+            for notice in residual.notices
+        ), residual.reference
 
 
 
