@@ -100,6 +100,7 @@ from simulator.battery.records import (
 )
 from simulator.battery.oxygen_balance import (
     IMCC_ENGINES,
+    OXYGEN_BALANCE_EFFUSION_ENGINES,
     OXYGEN_BALANCE_NOTICE_PREFIX,
     has_own_engine_solved_oxygen_balance,
 )
@@ -2963,7 +2964,7 @@ def predict_with_engine(
                 },
                 notices=tuple(input_notices),
             )
-        if engine not in IMCC_ENGINES:
+        if engine not in OXYGEN_BALANCE_EFFUSION_ENGINES:
             return _input_refusal(
                 engine=engine,
                 channel=channel,
@@ -3145,6 +3146,11 @@ def predict_with_engine(
         f"equilibrate_cell:{name}:host={getattr(cell, 'hostname', '')}"
         f":exit={getattr(cell, 'exit_code', None)}"
     )
+    if engine is Engine.INTERNAL_ANALYTICAL:
+        engine_version = (
+            getattr(cell, "vapor_pressure_backend_status_reason", None)
+            or "PyrolysisSimulator VAPOR_PRESSURE core route"
+        )
     if status != "ok":
         typed = str(refusal or status or "unavailable")
         engine_side_reason = str(getattr(cell, "engine_reason", None) or "")
@@ -3190,6 +3196,18 @@ def predict_with_engine(
         elif openimcc_outside_species:
             exec_state = ExecutionState.UNSUPPORTED
             reason = RefusalReason.OUTSIDE_SUPPORTED_SPECIES
+        elif engine is Engine.INTERNAL_ANALYTICAL and (
+            engine_side_reason.startswith("internal_analytical_missing_")
+            or engine_side_reason
+            == "internal_analytical_oxygen_balance_unavailable"
+        ):
+            exec_state = ExecutionState.NOT_PROBED
+            reason = RefusalReason.IDENTITY_INCOMPLETE
+        elif engine is Engine.INTERNAL_ANALYTICAL and engine_side_reason.startswith(
+            "internal_analytical_invalid_"
+        ):
+            exec_state = ExecutionState.NOT_PROBED
+            reason = RefusalReason.INVALID_IDENTITY
         else:
             exec_state = ExecutionState.UNSUPPORTED
             reason = RefusalReason.UNSUPPORTED

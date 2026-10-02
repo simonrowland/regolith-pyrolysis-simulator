@@ -8,6 +8,9 @@ from simulator.battery.enums import Engine, NoticeKind
 from simulator.battery.records import Notice
 
 IMCC_ENGINES: frozenset[Engine] = frozenset({Engine.OPENIMCC})
+OXYGEN_BALANCE_EFFUSION_ENGINES: frozenset[Engine] = frozenset(
+    {Engine.OPENIMCC, Engine.INTERNAL_ANALYTICAL}
+)
 OXYGEN_BALANCE_NOTICE_PREFIX = "fo2_oxygen_balance_effusion_solved:"
 
 
@@ -15,7 +18,7 @@ def has_own_engine_solved_oxygen_balance(
     engine: Engine | None,
     notices: Sequence[Notice],
 ) -> bool:
-    return engine in IMCC_ENGINES and any(
+    return engine in OXYGEN_BALANCE_EFFUSION_ENGINES and any(
         notice.kind is NoticeKind.SOURCE_DISAGREEMENT
         and notice.origin == f"engine:{engine.value}"
         and notice.reason.startswith(OXYGEN_BALANCE_NOTICE_PREFIX)
