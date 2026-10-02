@@ -605,3 +605,101 @@ def test_residue_missing_area_evolution_is_typed_absence() -> None:
             duration_s=1.0,
         )
     assert refusal.value.reason == "melt_surface_area_evolution_missing"
+
+
+@pytest.mark.parametrize("engine", ("IA", "openimcc"))
+def test_hashimoto_exhaustion_is_removed_before_either_engine_and_atom_closes(
+    engine: str,
+) -> None:
+    from simulator.battery.residue import _hashimoto_integrate_geometry
+
+    # This is the ~6.84e-10 mole-fraction FeO that previously reached IMCC-SF04.
+    starting = {"FeO": 6.84e-10, "MgO": 1.0}
+    observed_compositions: list[dict[str, float]] = []
+
+    def engine_pressure(inventory: dict[str, float], log10_pO2_bar: float):
+        observed_compositions.append(dict(inventory))
+        return _residue_pressure_model(inventory, log10_pO2_bar)
+
+    # IA and OpenIMCC both enter the same engine-neutral integration policy.
+    assert engine in {"IA", "openimcc"}
+    values, _pO2, exhausted, refusal, atom_closure = _hashimoto_integrate_geometry(
+        starting,
+        _residue_channels(),
+        engine_pressure,
+        temperature_K=2073.0,
+        duration_s=1.0,
+        steps=1,
+        geometry_policy_id="sphere_constant",
+        initial_area_m2=1.0e-4,
+    )
+
+    assert refusal is None
+    assert values["FeO"] == 0.0
+    assert observed_compositions
+    assert all("FeO" not in composition for composition in observed_compositions)
+    assert len(exhausted) == 1
+    assert exhausted[0]["reason"] == "component_exhausted"
+    assert exhausted[0]["component"] == "FeO"
+    assert exhausted[0]["remaining_moles"] == pytest.approx(6.84e-10)
+    assert exhausted[0]["step"] == 1
+    assert max(abs(value) for value in atom_closure.values()) < 1.0e-15
+
+
+@pytest.mark.parametrize("engine", ("IA", "openimcc"))
+def test_hashimoto_nonconvergence_is_partial_per_run_and_cohort_continues(
+    engine: str,
+) -> None:
+    from simulator.battery.residue import (
+        ResidueEngineNonconvergence,
+        _hashimoto_integrate_geometry,
+    )
+
+    starting = {"FeO": 1.0, "MgO": 1.0}
+    calls = 0
+
+    def failed_engine(_inventory: dict[str, float], _log10_pO2_bar: float):
+        nonlocal calls
+        calls += 1
+        raise ResidueEngineNonconvergence(engine, "injected nonconvergence")
+
+    per_run_results = []
+    per_run_results.append(
+        _hashimoto_integrate_geometry(
+            starting,
+            _residue_channels(),
+            failed_engine,
+            temperature_K=2073.0,
+            duration_s=2.0,
+            steps=1,
+            geometry_policy_id="sphere_constant",
+            initial_area_m2=1.0e-4,
+        )
+    )
+    assert calls == 2  # coarse interval, then the single half-step retry
+    refusal = per_run_results[0][3]
+    assert refusal is not None
+    assert isinstance(refusal, ResidueEngineNonconvergence)
+    assert refusal.reason == "engine_nonconvergence"
+    assert refusal.engine == engine
+    assert refusal.composition_mol == starting
+    assert refusal.step == 1
+    assert refusal.time_reached_s == 0.0
+    assert "halving" in str(refusal.retry)
+
+    # A refusal from one physical run is data for that run; it does not escape
+    # the shared geometry runner or prevent the next run from completing.
+    per_run_results.append(
+        _hashimoto_integrate_geometry(
+            starting,
+            _residue_channels(),
+            _residue_pressure_model,
+            temperature_K=2073.0,
+            duration_s=0.01,
+            steps=1,
+            geometry_policy_id="sphere_constant",
+            initial_area_m2=1.0e-6,
+        )
+    )
+    assert len(per_run_results) == 2
+    assert per_run_results[1][3] is None
