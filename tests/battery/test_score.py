@@ -52,7 +52,15 @@ from simulator.battery.pins import (
     pin_failures,
     tombstone_for_changed_identity,
 )
-from simulator.battery.identity import Exposure, Identity, SweepIdentity, identity_equal, quantity_token
+from simulator.battery.identity import (
+    Exposure,
+    Identity,
+    SweepIdentity,
+    identity_equal,
+    profile_for,
+    quantity_token,
+    validate_quantity_profile,
+)
 from simulator.battery.records import (
     Apparatus,
     ApparatusGeometry,
@@ -366,6 +374,59 @@ def test_condensed_activity_axes_follow_composition_and_pressure() -> None:
     vapour_outcome = identity_equal(vapour, vapour)
     assert vapour_outcome.kind is IdentityEqualKind.IDENTITY_UNKNOWN
     assert {"fO2_Pa", "total_pressure_Pa"}.issubset(vapour_outcome.fields)
+
+
+@pytest.mark.parametrize("axis", ("reaction", "reference_state", "reservoir"))
+def test_p_partial_optional_axes_do_not_block_identity_or_score(axis: str) -> None:
+    experiment = F.kems_experiment()
+    base = replace(
+        _partial_identity(),
+        fO2_Pa=State.of(Decimal("100000")),
+        total_pressure_Pa=State.of(Decimal("100000")),
+    )
+    profile = profile_for(base)
+    assert axis not in profile.required
+    assert axis not in profile.permitted_not_applicable
+    assert {
+        "temperature_K",
+        "composition",
+        "fO2_Pa",
+        "total_pressure_Pa",
+    }.issubset(profile.required)
+    assert len(base.composition.value.components) > 1
+
+    missing_metadata = replace(base, **{axis: State.unknown("not printed")})
+    assert validate_quantity_profile(missing_metadata).kind is IdentityEqualKind.EQUAL
+    assert identity_equal(base, missing_metadata).kind is IdentityEqualKind.EQUAL
+
+    reference = F.observation(
+        f"p-partial-optional-{axis}",
+        experiment.experiment_id,
+        missing_metadata,
+        Decimal("1"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="plante-1979",
+    )
+    residual, candidate = _compile(
+        reference,
+        experiment,
+        _partial_prediction(Engine.INTERNAL_ANALYTICAL, reference),
+    )
+    assert candidate is not None
+    assert residual.numeric is not None
+    assert residual.refusal is None
+
+
+def test_p_partial_without_composition_still_refuses_identity() -> None:
+    base = replace(
+        _partial_identity(),
+        fO2_Pa=State.of(Decimal("100000")),
+        total_pressure_Pa=State.of(Decimal("100000")),
+        composition=State.unknown("composition not printed"),
+    )
+    outcome = identity_equal(base, base)
+    assert outcome.kind is IdentityEqualKind.IDENTITY_UNKNOWN
+    assert "composition" in outcome.fields
 
 
 def test_pooled_log_pressure_sd_known_replicates() -> None:

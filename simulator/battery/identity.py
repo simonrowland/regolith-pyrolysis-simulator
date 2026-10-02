@@ -334,6 +334,12 @@ _AXIS_NAMES = (
     "wall",
 )
 
+# These printed axes can be retained on p_partial rows but do not describe the
+# measured mixture-pressure comparison. Keep them optional and un-compared.
+_P_PARTIAL_UNCOMPARED_AXES = frozenset(
+    {"reaction", "reference_state", "reservoir"}
+)
+
 
 @dataclass(frozen=True)
 class SweepIdentity:
@@ -572,11 +578,12 @@ def profile_for(identity: Identity) -> QuantityProfile:
             "total_pressure_Pa",
         )
     elif q is Quantity.P_PARTIAL:
+        # A measured gas partial pressure is predicted from T, oxygen, total
+        # pressure, and the printed melt. Its reaction, standard state, and
+        # pure-reservoir axes are not prediction inputs; do not require them or
+        # turn source omissions into stoichiometric assumptions.
         req(
             "temperature_K",
-            "reservoir",
-            "reaction",
-            "reference_state",
             "fO2_Pa",
             "total_pressure_Pa",
             "composition",
@@ -1187,7 +1194,7 @@ def _quantity_state(identity: Identity) -> State[Quantity]:
 
 
 def validate_quantity_profile(identity: Identity) -> IdentityEqualOutcome:
-    """Reject a supplied VALUE on an inapplicable axis; check reservoir rule."""
+    """Reject values on inapplicable axes; preserve optional p_partial metadata."""
 
     q_state = _quantity_state(identity)
     if q_state.is_not_applicable:
@@ -1200,14 +1207,19 @@ def validate_quantity_profile(identity: Identity) -> IdentityEqualOutcome:
         return IdentityEqualOutcome(IdentityEqualKind.EQUAL)
     profile = profile_for(identity)
     uncompared_axes = _melt_activity_uncompared_axes((identity,))
+    if quantity_token(identity) is Quantity.P_PARTIAL:
+        # Unlike N/A axes, these may still carry source-printed values (for
+        # example Plante's reaction and K2O reservoir). They remain valid
+        # metadata but are not equality keys or prediction inputs.
+        uncompared_axes |= _P_PARTIAL_UNCOMPARED_AXES
     bad: list[str] = []
     for name in _AXIS_NAMES:
         state = _axis_state(identity, name)
         if state is None:
             continue
         # permitted_not_applicable means N/A or absent — a VALUE is invalid,
-        # not an extra equality key. The two physically omitted axes for melt
-        # activities may still carry printed values; they remain un-compared.
+        # not an extra equality key. Explicitly uncompared axes may retain
+        # source values without becoming equality keys.
         if (
             state.is_value
             and name not in profile.required
