@@ -7,7 +7,7 @@
 - **VERDICT LAND 53d71755a4be677d22e50d10a3275981424cc7bd**
 - **Deliverable:** `REVIEW-residue-r0-53d71755a-2026-10-02.md`
 - **Date:** 2026-10-02 ~13:25 ET
-- **Mailbox tip:** `PLACEHOLDER_MAILBOX` on `empirical/reviews-batch-zv-2026-09-22` (artifacts `df3256d7ccf928a844f0e93275b3fb41e713fd7f`).
+- **Mailbox tip:** `0e4eeda12f0a014a2482649dc2c0c6e8f4217dc0` on `empirical/reviews-batch-zv-2026-09-22` (artifacts `df3256d7ccf928a844f0e93275b3fb41e713fd7f`).
 
 Attacks (1)–(5) PASS. Focused residue tests 6 PASS; test_migrate 272 PASS + 1 VPS timeout on full-corpus validate (not tip P1); mutations 3/3 detected; two-source store counts tip≡green (612/681); kems-activity merge-tree clean. No P1 REVISE items.
 
