@@ -1,116 +1,154 @@
-# REVIEW — d-056 admit pending literature rows by default, flagged
+# REVIEW — default pending literature admissions (owner ruling d-056)
 
 - **Reviewer:** regolith-empirical (frontier of record)
-- **Seat:** `/workspace/repos/wt/slot-b565` @ `review/admit-pending` (VPS shell OOM mid-review; checks completed on Mac Studio-1 detached worktree at the same SHA)
-- **Tip:** `9b3dd672723e02b976c07e38e4a8eb1f7afe4058` (parent / green `72cb7d960a71e7bb81430ed733a15f99edfa330b`)
+- **Seat:** `/workspace/repos/wt/slot-z20` @ tip
+- **Tip:** `9b3dd672723e02b976c07e38e4a8eb1f7afe4058` (parent / green-at-branch `72cb7d960a71e7bb81430ed733a15f99edfa330b`)
 - **Branch:** `review/admit-pending`
-- **Commit:** `Default pending literature admissions` — code in `simulator/battery/{enums,migrate,validate}.py` + targeted tests; 61 regenerated store files (effect reviewed via `load_migrated_store` / `observation_from_plain`, not byte diff)
-- **Date:** 2026-10-01 ~23:20 ET
-- **Mode:** review CODE + regeneration EFFECT at stated SHA; tip not rebased onto later green `c9b6e545d`
-- **REQ:** `REQ-review-admit-pending-9b3dd672-2026-10-01.md`
+- **Current green (context only; not merged):** `696299350e98b67f786c334b4b4ccc8856149379` — code paths for enums/migrate/validate do not conflict with tip; one extracts-v2 data file (`stolyarova-1996-…`) is “changed in both” and will be regenerated on land
+- **Commit:** `Default pending literature admissions` — code
+  `simulator/battery/enums.py` (+2), `migrate.py` (+167/−?), `validate.py` (+11);
+  tests `test_migrate.py`, `test_migrate_r7.py`, `test_schema_admission.py`, `test_score.py`;
+  plus 61 regenerated data files (review CODE + regeneration EFFECT, not YAML bytes)
+- **Date:** 2026-10-01 ~23:23 ET
+- **Mode:** read-only on tip; no extract edits; review tip not pushed to green
+- **REQ:** `REQ-review-admit-pending-9b3dd672-2026-10-01.md` — d-056: admit pending / no-decision literature rows by default, flagged
 
 ## Tip shape
 
 | check | result |
 | --- | --- |
 | HEAD | `9b3dd672723e02b976c07e38e4a8eb1f7afe4058` |
-| Parent | `72cb7d960a71e7bb81430ed733a15f99edfa330b` (exactly one commit; green is ancestor) |
-| Code | `NoticeKind.ADMISSION_DEFAULTED`; `_admission_from_plain` / `admission_for` / Migrator default numeric pending→admitted with notice; validate allows admitted-without-decided_by when defaulted notice present |
-| Green tip note | origin/work-v064-green may be at `c9b6e545d`; **not rebased** per REQ |
+| Parent | `72cb7d960a71e7bb81430ed733a15f99edfa330b` (exactly one commit; green-at-branch is ancestor) |
+| Code vs parent | **7** files (`+353 / −44` on enums/migrate/validate + four test modules) |
+| Store headline (regen effect) | admitted **27,913 → 69,054** (+41,141); pending **91,418 → 50,277** (−41,141); rejected **266**; superseded **1,250**; total **120,847**; hard issues **3,235** |
 
 **PASS.**
 
-## Check (1) — Scope (only no-decision / pending / pending_validation)
+## Attack (1) — scope: only no-decision / pending / pending_validation
 
-Store-wide via `load_migrated_store` (typed API; d-056 applied at deserialize):
+Store-wide census of `extracts-v2` + `observations-v2` on parent `72cb7d960` vs tip `9b3dd6727` (same 120,847 observation ids):
 
-| | parent `72cb7d960` | tip `9b3dd6727` |
-| --- | ---: | ---: |
-| total | 120847 | 120847 |
-| admitted | 27913 | 69275 |
-| pending | 91418 | 50056 |
-| rejected | **266** | **266** |
-| superseded | **1250** | **1250** |
-| `admission_defaulted:` reasons | 0 | 41362 |
+| cohort | parent | tip | Δ |
+| --- | ---: | ---: | ---: |
+| admitted | 27,913 | 69,054 | **+41,141** |
+| pending | 91,418 | 50,277 | **−41,141** |
+| rejected | 266 | 266 | **0** |
+| superseded | 1,250 | 1,250 | **0** |
+| `admission_defaulted:` reason | 0 | 41,141 | +41,141 |
+| `admission_defaulted` notice | 0 | 41,141 | +41,141 |
 
-Original non-measurement tokens (reason contains `source admission_status=<token>`), **before = after**, all still **pending**:
+**Four explicit non-measurement tokens (status breakdown unchanged):**
 
-| original token | parent | tip |
-| --- | ---: | ---: |
-| figure_only | 185 pending | 185 pending |
-| model_output_not_measurement | 252 pending | 252 pending |
-| qualitative_not_numeric | 4 pending | 4 pending |
-| measured_not_tabulated | 17 pending | 17 pending |
+| original token | parent | tip | statuses |
+| --- | ---: | ---: | --- |
+| `model_output_not_measurement` | 274 | 274 | pending 252 + rejected 22 |
+| `figure_only` | 189 | 189 | pending 189 |
+| `qualitative_not_numeric` | 4 | 4 | pending 4 |
+| `measured_not_tabulated` | 17 | 17 | pending 17 |
 
-**PASS.** Rejected/superseded and the four explicit non-measurement tokens are untouched.
+Token counts for `pending` (59) and `pending_validation` (108) as *source* tokens are preserved under the defaulted reason string (`admission_defaulted: source admission_status=…`). Rejected-ish tokens (`rejected_no_figure_reading` 14, `rejected_no_complete_figure_digitization` 15, `rejected_model_output_not_measurement` 9, …) unchanged.
 
-## Check (2) — Headline safety
-
-`comparison_candidates` still requires `evidence.class_ ∈ MEASURED_EVIDENCE` and status ∈ {admitted, pending}.
-
-| | parent | tip |
-| --- | ---: | ---: |
-| comparison_candidates (measured∩{adm,pend}) | **3306** | **3306** |
-| of which admitted | 483 | 1381 |
-| defaulted with measured evidence | 0 | 898 |
-| defaulted with compilation_assessed | 0 | 39754 |
-
-- **species-rail-differential / ledger / compilation rows:** 20589 species-rail + pankratz/kelley-king/atct/nasa-glenn/… defaulted under `compilation_assessed` (or non-MEASURED). They **cannot** enter the MEASURED headline candidate set. Confirmed: `defaulted_in_comparison_candidates` = 898 = measured-only.
-- **Compilation-tier scoring:** descriptive compilation residuals still come from the compilation/diagnostic path; `reference_measured_evidence` is forced false for compilation so they never become fully `score_eligible`. Effect beyond the new notice is the `admission_admitted` conjunct only (still blocked by measured-evidence conjunct). **Unchanged except notice** for compilation descriptive path.
-- **FLAG (band / score_eligible population):** `score_eligible` requires `admission_admitted`. Moving 898 previously-pending **measured** rows to admitted lifts that exclusion (candidate *set* unchanged at 3306; admitted_measured 483→1381). KEMS `derive_kems_partial_pressure_band` also requires ADMITTED — 125 defaulted Knudsen `p_partial` rows are newly eligible for band membership; **probe showed identical band width** before vs after (`0.146128…` dex, printed-envelope path). Pin files not rewritten by this tip.
-
-**PASS with FLAG** (intentional d-056 effect on measured score_eligible / band eligibility; compilation MEASURED-headline exclusion holds; live KEMS band value unchanged).
-
-## Check (3) — Notice visibility
-
-| population | tip count |
-| --- | ---: |
-| defaulted rows with `NoticeKind.ADMISSION_DEFAULTED` | **41362 / 41362** |
-| defaulted missing notice | **0** |
-| explicitly admitted (non-defaulted) with admission_defaulted notice | **0** |
-
-`score_store` residuals for newly defaulted scored rows carry the notice (sossi 344/344; bischof measured-defaulted 24/24).
+Code: `admission_for` defaults only `None`/empty, `pending`, `pending_validation`; closed non-pending tokens and `rejected*` keep mapped status; Migrator reverts defaulted → pending when `value.kind` ∉ `{point,series,bound,interval,relative_series}` (no-number rows stay pending). Parametrized unit test `test_source_admission_default_scope` covers figure_only / model_output_not_measurement / rejected_* / admitted.
 
 **PASS.**
 
-## Check (4) — `score_store(engines=(OPENIMCC,), include_diagnostics=True)`
+## Attack (2) — headline safety (ledgers vs MEASURED)
 
-### kems-012-sossi-2019
+**Are ledger/compilation rows measurements?** No for species-rail-differential:
 
-- loaded 612 obs; defaulted 344 (all `measured_direct` / `residue_component_composition`); all 344 ∈ comparison_candidates
-- residuals 348; candidates 0
-- **newly admitted outcomes:** 344× `refused:unsupported` (no numeric residuals)
-- admission_defaulted notice on 344/344 residuals
+| | n | evidence | admitted (defaulted) | measured |
+| --- | ---: | --- | ---: | ---: |
+| `species_rail_differential_ledger.yaml` | 23,673 | **all** `compilation_assessed` | 20,589 | **0** |
 
-### kems-137-bischof-2023
+Other large defaulted ledgers (pankratz-1984 7,061; kelley-king-1961 3,670; atct 3,422; …) are likewise `compilation_assessed` in the defaulted evidence rollup (**39,754** of 41,141 defaulted rows).
 
-- loaded 164 obs; defaulted 152 (24 measured: 22 `p_partial` + 2 reduced; 128 UNKNOWN evidence / mostly `activity_coefficient`)
-- only the 24 measured defaulted enter comparison_candidates; 128 neither CC nor diagnostic_references → **no residual produced** (admitted-but-unscored)
-- **newly admitted measured outcomes:** 24× `refused:effusion_regime_unverified` (gates still apply; no numeric residuals)
-- notice on 24/24 scored defaulted residuals
+**MEASURED headline filter:** `comparison_candidates` (`score.py`) requires `evidence.class_ ∈ MEASURED_EVIDENCE` (`measured_direct|tabulated|reduced`) **before** admission. Probe on mixed load: CC evidence was only measured_*; **0** defaulted non-measured rows entered CC. Defaulted MEASURED cohort that *can* enter CC: **820** store-wide (kems-012 **344**, kems-015 120, kems-042 59, kems-137 **24**, …).
+
+**Compilation-tier / diagnostic path:** `diagnostic_references` selects by origin/source (compilation / internal consistency / SF04 workbook), not by flipping MEASURED evidence. Unit test `test_default_admission_notice_is_visible_without_changing_score` asserts residual status / `score_eligible` unchanged vs notice-free baseline; notice is present on the residual.
+
+**Band / pin population (must say so):** KEMS vapour `p_partial` band candidates require `AdmissionStatus.ADMITTED` (`_derive_kems_partial_pressure_band` / `_kems_replicate_groups`). Tip vs parent-simulated (defaulted → pending):
+
+| | parent-sim | tip | Δ |
+| --- | ---: | ---: | ---: |
+| vapour KEMS band candidates (plante+bischof+sossi load) | **162** (all plante) | **243** | **+81** |
+| newly admitted into band set | — | 59 plante + 22 bischof | |
+| band **value** | 0.146128… | 0.146128… | **equal** |
+| band **rule** text | identical | identical | |
+
+The +81 all have `uncertainty.kind=none` and no composition value, so they do **not** move the printed-envelope RMS that sets the band width. Pins file has no `admission_defaulted` / plante `s1214` keys. **Admission does enlarge the admitted band-candidate set; the live Plante envelope value is unchanged on this tip.**
+
+**PASS** (headline MEASURED filter holds; band-candidate growth disclosed; value unchanged).
+
+## Attack (3) — notice visibility
+
+- Every defaulted row: reason starts with `admission_defaulted:` **and** carries `NoticeKind.ADMISSION_DEFAULTED` (41,141 / 41,141 store-wide).
+- Explicit admitted (no defaulted reason): **0** with that notice (27,913 plain admitted remain notice-free for this kind).
+- Residuals: OpenIMCC `score_store` on kems-012 + kems-137 — defaulted MEASURED residuals **344/344** and **24/24** carry the notice; explicit admitted residuals **0** with it.
+- `validate_observation` allows ADMITTED without `decided_by` only when the matching defaulted notice is present.
 
 **PASS.**
 
-## Check (5) — NOT-FIXED lens
+## Attack (4) — scorer product on kems-012 / kems-137 (not gate counts)
+
+`load_score_context(sources=['kems-012-sossi-2019','kems-137-bischof-2023'])` → 776 obs; `score_store(..., engines=(Engine.OPENIMCC,), include_diagnostics=True)`.
+
+Newly admitted **MEASURED** rows (defaulted notice + MEASURED_EVIDENCE):
+
+### kems-012-sossi-2019 — 344 rows
+
+| bucket | n | detail |
+| --- | ---: | --- |
+| quantity | 344 | all `residue_component_composition` |
+| status `refused` | **344** | |
+| numeric residual | **0** | |
+| notice on residual | 344 / 344 | |
+
+**Refusals by reason:** `unsupported` / `quantity_not_predicted` (`residue_component_composition`) × **344**.
+
+### kems-137-bischof-2023 — 24 rows
+
+| bucket | n | detail |
+| --- | ---: | --- |
+| quantity | 22 `p_partial` + 2 `activity_coefficient` | |
+| status `refused` | **24** | |
+| numeric residual | **0** | |
+| notice on residual | 24 / 24 | |
+
+**Refusals by reason:** `effusion_regime_unverified` / primary `in_cell_partial_pressure_sum` × **24** (tip is on `72cb7d960` **without** the later d-055 calibration-flag stratum; over-limit / unverified effusion still refuses here).
+
+Defaulted **non-measured** rows from these sources (e.g. kems-137’s extra defaulted beyond 24) do **not** enter `comparison_candidates` (0 non-measured defaulted in CC for this load).
+
+**PASS** (product recorded; no numeric residuals among newly admitted MEASURED on these two sources).
+
+## Attack (5) — NOT-FIXED lens
 
 This tip does **not**:
 
-- invent extract numbers, figure digitizations, or reviewer `decided_by` decisions (reason text states “not a reviewer decision”)
-- admit the four explicit non-measurement tokens, rejected, or superseded rows
-- put non-MEASURED / compilation_assessed rows into MEASURED `comparison_candidates`
-- clear scorer mechanical gates (`unsupported`, `effusion_regime_unverified`, identity gates, etc.)
-- rebase onto later green `c9b6e545d` or rewrite pin YAML
-- regenerate the store again onto current green (landing merge will)
+- Invent extract admission decisions, `decided_by`, or reviewer rationale (reason text says “not a reviewer decision”)
+- Admit the four explicit non-measurement tokens, or rejected / superseded rows
+- Promote `compilation_assessed` / ledger rows into the MEASURED headline (`comparison_candidates` still filters on `MEASURED_EVIDENCE`)
+- Implement OpenIMCC (or any engine) prediction for `residue_component_composition` (344 kems-012 refusals remain)
+- Clear Bischof `effusion_regime_unverified` / `in_cell_partial_pressure_sum` (needs apparatus / d-055 stratum on a later green, not this commit)
+- Freeze regenerated YAML bytes (landing merge re-migrates onto current green)
+- Change mechanical score gates beyond admission default + notice plumbing
 
 **PASS.**
 
-## Targeted tests (Studio-1, scoped; not full W3)
+## Targeted tests (VPS, scoped)
 
-→ **56 passed**, 3014 deselected (`test_score` / `test_migrate` / `test_schema_admission` / `test_migrate_r7` admission-default filters).
+```
+.venv/bin/python -m pytest tests/battery/test_schema_admission.py \
+  tests/battery/test_score.py tests/battery/test_migrate.py \
+  tests/battery/test_migrate_r7.py \
+  -k 'admission_default or default_admission or source_admission_default or missing_admission or plain_pending_without or figure_only or g2_plante_source or defaulted' \
+  -o addopts='' -q
+```
+
+→ **14 passed** (no full W3). OpenIMCC installed only into a throwaway `/tmp` venv for the two-source score probe.
 
 ## Verdict
 
-All five REQ checks answered with evidence. One intentional FLAG on measured score_eligible / KEMS band *eligibility* (band *value* unchanged in probe). No P0/P1 defect against d-056.
+All five REQ checks PASS. Band-candidate set growth (+81) disclosed; band value unchanged; no P0/P1 defect against d-056.
 
 **VERDICT: LAND 9b3dd672723e02b976c07e38e4a8eb1f7afe4058**
 
