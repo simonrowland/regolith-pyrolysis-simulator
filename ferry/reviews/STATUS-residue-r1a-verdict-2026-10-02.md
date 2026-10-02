@@ -8,7 +8,7 @@
 - **VERDICT LAND 802b69ad7b6197046b27286e98e42bed91322fbc**
 - **Deliverable:** `REVIEW-residue-r1a-802b69ad7-2026-10-02.md`
 - **Date:** 2026-10-02 ~13:50 ET
-- **Mailbox tip:** PENDING_MAILBOX_TIP on `empirical/reviews-batch-zv-2026-09-22`
+- **Mailbox tip:** 90a13fca9dd9011e1435d21e168bf3d3322bebce on `empirical/reviews-batch-zv-2026-09-22`
 
 Attacks (1)–(6) PASS. Focused residue oxygen test 1 PASS; mutations 2/2 detected; score/silent_fills/openimcc oxygen_balance referencing tests 17 PASS; Hashimoto pins matched; IA shared O/O2 ≡ openimcc evaluate_gas (rel 0); KEMS effusion path 0-diff. No P1 REVISE items.
 
