@@ -3701,9 +3701,14 @@ def compile_residual(
         )
 
     if quantity is None:
+        detail: dict[str, object] = {"reason": "quantity_unknown"}
+        if reference.value.kind is ValueKind.CATEGORICAL:
+            detail["value_kind"] = ValueKind.CATEGORICAL.value
+            if isinstance(identity, Identity) and identity.quantity.is_unknown:
+                detail["quantity_reason"] = identity.quantity.reason
         return _refused(
             RefusalReason.IDENTITY_UNKNOWN,
-            {"reason": "quantity_unknown"},
+            detail,
             execution=Execution(state=ExecutionState.NOT_PROBED),
             exclusions=("status_match_or_mismatch", "finite_numeric_point_endpoints"),
         )
@@ -3727,6 +3732,23 @@ def compile_residual(
                 "engine": engine.value,
             },
             execution=Execution(state=ExecutionState.NOT_PROBED),
+        )
+    if (
+        quantity is Quantity.ACTIVITY
+        and reference.evidence.class_.is_unknown
+        and isinstance(identity, Identity)
+        and identity.reference_state is not None
+        and identity.reference_state.is_unknown
+    ):
+        return _refused(
+            RefusalReason.IDENTITY_UNKNOWN,
+            {
+                "fields": ["reference_state"],
+                "reason": "activity_reference_state_unknown",
+                "detail": identity.reference_state.reason,
+            },
+            execution=Execution(state=ExecutionState.NOT_PROBED),
+            exclusions=("identity_equal", "status_match_or_mismatch"),
         )
     if point_magnitude(reference.value) is None:
         reason_token = "value_unknown"
@@ -4209,6 +4231,32 @@ def diagnostic_references(context: ScoreContext) -> tuple[Observation, ...]:
     return tuple(sorted(out, key=lambda o: o.observation_id))
 
 
+def _refusal_diagnostic_references(context: ScoreContext) -> tuple[Observation, ...]:
+    """Rows excluded from comparisons but retained so scoring can explain why."""
+
+    out: list[Observation] = []
+    for obs in context.observations.values():
+        if not isinstance(obs.identity, Identity):
+            continue
+        evidence_class = obs.evidence.class_
+        status = obs.admission.status
+        activity_reference_unknown = (
+            status in {AdmissionStatus.ADMITTED, AdmissionStatus.PENDING}
+            and evidence_class.is_unknown
+            and quantity_token(obs.identity) is Quantity.ACTIVITY
+            and obs.identity.reference_state is not None
+            and obs.identity.reference_state.is_unknown
+        )
+        categorical_quantity_unknown = (
+            status is AdmissionStatus.REJECTED
+            and obs.value.kind is ValueKind.CATEGORICAL
+            and obs.identity.quantity.is_unknown
+        )
+        if activity_reference_unknown or categorical_quantity_unknown:
+            out.append(obs)
+    return tuple(sorted(out, key=lambda o: o.observation_id))
+
+
 def _score_store_with_decisions(
     context: ScoreContext,
     *,
@@ -4258,6 +4306,10 @@ def _score_store_with_decisions(
             refs.append(obs)
             seen.add(obs.observation_id)
             admitted_model_derived_ids.add(obs.observation_id)
+        for obs in _refusal_diagnostic_references(context):
+            if obs.observation_id not in seen:
+                refs.append(obs)
+                seen.add(obs.observation_id)
     if work_id:
         filtered: list[Observation] = []
         for obs in refs:
