@@ -5578,18 +5578,26 @@ def reference_state_from_extract(
     species_formula: str,
     values: Mapping[str, Any],
 ) -> State[StandardState] | None:
-    """Lift an explicit extract ``standard_state`` into the typed identity.
+    """Lift a typed or prose extract ``standard_state`` into the identity.
 
-    The extract field is source prose, so an unrecognised or explicitly
-    unprinted statement remains an unknown rather than becoming a convention
-    by inference. A printed Raoultian activity standard is not overridden by
-    an infinite-dilution coefficient in the same sentence. The phase is the
-    phase printed for that endmember. Reference pressure is a printed bar
-    number, never a default of 1 bar.
+    Structured payloads use the same StandardState shape as stored identities.
+    Unrecognised prose remains unknown rather than becoming a convention by
+    inference. A printed Raoultian activity standard is not overridden by an
+    infinite-dilution coefficient in the same sentence. Reference pressure is
+    a printed bar number, never a default of 1 bar.
     """
 
     if raw in (None, ""):
         return None
+    if isinstance(raw, Mapping):
+        try:
+            if raw.get("state") is not None:
+                return _located_from_plain(raw, _standard_state_from_plain).state
+            if raw.get("convention") is not None:
+                return State.of(_standard_state_from_plain(raw))
+        except (KeyError, TypeError, ValueError):
+            return State.unknown("source typed standard_state is not decodable")
+        return State.unknown("source typed standard_state is not decodable")
     text = " ".join(str(raw).split())
     lowered = text.casefold()
     if not text:
@@ -11331,7 +11339,10 @@ class Migrator:
                 source=source_key,
                 observation_id=obs_id,
             )
-        if q_token in {Quantity.ACTIVITY, Quantity.ACTIVITY_COEFFICIENT}:
+        if (
+            q_token in {Quantity.ACTIVITY, Quantity.ACTIVITY_COEFFICIENT}
+            and not isinstance(obs.get("standard_state"), Mapping)
+        ):
             reference_state = _standard_state_from_extract_text(
                 obs.get("standard_state"),
                 species.formula,
