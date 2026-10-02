@@ -4,7 +4,7 @@ rows in: 47390
 records out (observations): 120847
 works: 261
 experiments: 3508
-queue size: 76736
+queue size: 76731
 identical-payload dedupe aliases: 342
 metadata files: 39
 index sources: 168
@@ -24,11 +24,11 @@ hard issues: 3235
 | gibbs_reference_100000 | 1023 | 1029 (mismatch) |
 | gibbs_reference_101325 | 594 | 594 |
 | formulas | 1625 | 2030 (mismatch) |
-| equipment_payloads | 670 | 975 (mismatch) |
+| equipment_payloads | 670 | 972 (mismatch) |
 | absent_admissions | 3511 | 4773 (mismatch) |
 | absent_classes | 2174 | 2205 (mismatch) |
 | range_only_T | 3125 | 2747 (mismatch) |
-| system_like_phases | 1065 | 2647 (mismatch) |
+| system_like_phases | 1065 | 2642 (mismatch) |
 | missing_phases | 237 | 367 (mismatch) |
 | tabulated_lists | — | 6 |
 
@@ -18174,7 +18174,7 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/extracts/steurer-1985-vapor-phase-pyrolysis.yaml` | 8 | 43 | 151 |
 | `data/literature/extracts/steurer-1992-vapor-phase-pyrolysis.yaml` | 2 | 11 | 39 |
 | `data/literature/extracts/stolyarova-1995-cao-alumina-kems.yaml` | 12 | 56 | 28 |
-| `data/literature/extracts/stolyarova-1996-cao-alumina-silica-kems.yaml` | 25 | 312 | 99 |
+| `data/literature/extracts/stolyarova-1996-cao-alumina-silica-kems.yaml` | 25 | 312 | 94 |
 | `data/literature/extracts/street-2010-thermal-properties-simulants.yaml` | 7 | 13 | 35 |
 | `data/literature/extracts/sublimation-kinetics-2023-minerals.yaml` | 19 | 57 | 84 |
 | `data/literature/extracts/ta-badro-2021.yaml` | 28 | 28 | 64 |
@@ -18275,8 +18275,8 @@ MODEL_DERIVED / MEASURED_REDUCED keep their mapped evidence class. Parent pointe
 
 ## Advisory issue census
 
-advisory issues: 218329
+advisory issues: 218280
 
 | kind | count |
 |---|---:|
-| `identity_incomplete` | 218329 |
+| `identity_incomplete` | 218280 |
