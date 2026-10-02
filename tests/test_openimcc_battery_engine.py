@@ -882,8 +882,9 @@ def test_stolyarova_typed_w_cell_keeps_reservoir_notice_and_scores_uncalibrated_
     # derivation. These Stolyarova 1991 rows print no calibration, so they now
     # produce residuals; every MEASURED one carries the calibration_not_grounded
     # notice. Author-calculated (model_derived) rows, such as the p(O) the paper
-    # derives from WO3 = WO2 + O, reach the scorer only as diagnostics: they never
-    # pass the effusion/calibration gate and must never be score_eligible.
+    # derives from WO3 = WO2 + O, are scored only as diagnostics: they run the
+    # validity gates but do not get the calibration notice, which is attached to
+    # measured evidence only, and they must never be score_eligible.
     from simulator.battery.score import MEASURED_EVIDENCE
 
     assert all(row["n"] > 0 for row in report)
