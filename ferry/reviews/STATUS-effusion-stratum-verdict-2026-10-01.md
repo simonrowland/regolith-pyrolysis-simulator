@@ -8,6 +8,7 @@
 - **Checks:** (1) grounded P_PARTIAL gate outcomes store-wide tip vs green: 645 rows, 0 mismatches — PASS. (2) flagged excluded from KEMS band + 2×MAD/family pools + headlines; `calibration-not-grounded` stratum in report (23 SiO_evolution / 44 vapour) — PASS. (3) score_store OpenIMCC on five sources: 199 gate transitions; 67 numeric no_band (Stolyarova, median −2.226 dex) with cal notice; 82 refuse identity_*; Stolyarova mostly scores not identity_unknown — PASS. (4) 199 exact for five sources; ~261 not a five-source hole; ichise/allibert/ms2000 = 0 P_PARTIAL; store-wide transitions 370 — PASS. (5) NOT-FIXED: no calibration invent, no identity fix, over-limit still refuses — PASS.
 - **Targeted tests:** uncalibrated / band-exclusion / over-limit mutation tests passed (`-o addopts=''`); no full W3 on VPS.
 - **Deliverable:** `REVIEW-effusion-stratum-874ea78e-2026-10-01.md`
-- **Date:** 2026-10-01 ~21:05 ET
+- **Mailbox tip:** `e520e3e8b3c466289217f1069736f8c62a4b3899` on `empirical/reviews-batch-zv-2026-09-22` (artifacts `e520e3e8b3c466289217f1069736f8c62a4b3899`)
+- **Date:** 2026-10-01 ~21:06 ET
 
 — regolith-empirical
