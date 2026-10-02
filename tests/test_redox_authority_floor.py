@@ -2547,6 +2547,76 @@ def test_exponential_m2_activity_failure_is_predicted_and_flagged(
     )
 
 
+def test_m2_unavailable_surface_activity_completes_full_hour_flagged(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    sim = _m2_ideal_fixture(monkeypatch)
+    _finite_gas_film(sim)
+    sim._overhead_headspace_config["enabled"] = True
+    sim.melt.melt_surface_area_m2 = 1.0
+    sim.overhead.headspace_temperature_K = 2000.0
+    sim.atom_ledger.load_external_mol(
+        "process.overhead_gas",
+        {"O2": 1.0},
+        source="M2 full-hour unavailable-activity fixture",
+        material_origin="feedstock",
+    )
+    gas_pressure_bar = 0.02 / 1.0e5
+    sim._headspace_ledger_pO2_bar_from_o2_mol = lambda _n: gas_pressure_bar
+    sim._headspace_transport_pO2_bar_from_ledger = (
+        lambda *_args, **_kwargs: gas_pressure_bar
+    )
+    sim._headspace_floor_o2_mol = lambda: 0.0
+    monkeypatch.setattr(
+        sim,
+        "_fe_saturation_bound_fO2_log",
+        lambda **_kwargs: None,
+    )
+    exchange_ledger: dict[str, Any] = {}
+    apply_exchange = sim._apply_oxygen_reservoir_exchange
+
+    def observe_exchange(**kwargs: Any) -> Any:
+        exchange_ledger["before"] = sim.atom_ledger.mol_by_account()
+        result = apply_exchange(**kwargs)
+        exchange_ledger["after"] = sim.atom_ledger.mol_by_account()
+        return result
+
+    monkeypatch.setattr(sim, "_apply_oxygen_reservoir_exchange", observe_exchange)
+    drift_before = sim.atom_ledger.element_atom_drift_report()
+
+    snapshot = sim._step_one_hour()
+
+    assert snapshot is not None
+    reservoir = sim.melt.oxygen_reservoir
+    shadow = reservoir.shadow_oxygen_transfer
+    assert shadow["status"] == "ok"
+    assert shadow["transfer_o2_mol"] == 0.0
+    assert reservoir.exchange_o2_mol == 0.0
+    assert reservoir.interface_pO2_bar == pytest.approx(gas_pressure_bar)
+    assert (
+        reservoir.interface_pO2_limiting_regime
+        == "surface_activity_unavailable"
+    )
+    assert any(
+        flag["flag"] == "oxygen_exchange_activity_fixed_point_nonconverged"
+        for flag in shadow["prediction_flags"]
+    )
+    assert any(
+        flag["flag"] == "surface_activity_unavailable"
+        for flag in shadow["prediction_flags"]
+    )
+    assert exchange_ledger["after"] == exchange_ledger["before"]
+    drift_after = sim.atom_ledger.element_atom_drift_report()
+    for report_key in (
+        "accepted_transition_residual_mol_atoms",
+        "whole_run_boundary_residual_mol_atoms",
+    ):
+        for element, value in drift_after[report_key].items():
+            assert value == pytest.approx(
+                drift_before[report_key][element], abs=5.0e-12
+            )
+
+
 def test_exponential_refinement_exhaustion_is_predicted_and_flagged(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:

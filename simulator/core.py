@@ -6687,6 +6687,13 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 'flag': 'oxygen_exchange_activity_fixed_point_nonconverged',
                 'detail': str(solver_failure),
             })
+            if 'M2 surface FeO activity fixed point returned no root' in str(
+                solver_failure
+            ):
+                prediction_flags.append({
+                    'flag': 'surface_activity_unavailable',
+                    'detail': str(solver_failure),
+                })
         if selected is not None:
             preceding = next(
                 (
@@ -11594,12 +11601,34 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             self._sync_oxygen_reservoir_mirror()
             return reservoir
 
-        interface_diagnostic = self._oxygen_interface_state(
-            float(transport_pO2),
-            intrinsic_fO2_log=base_fO2_log,
-        )
         transfer_status = str(finite_transfer.get('status', '') or '')
         transfer_mol = float(finite_transfer.get('transfer_o2_mol', 0.0) or 0.0)
+        prediction_flags = finite_transfer.get('prediction_flags', ())
+        activity_unavailable = any(
+            isinstance(flag, Mapping)
+            and flag.get('flag')
+            == 'oxygen_exchange_activity_fixed_point_nonconverged'
+            for flag in prediction_flags
+        )
+        if activity_unavailable:
+            # The shadow already failed closed on M2 surface activity and
+            # published its predict-and-flag zero-transfer result. Do not
+            # repeat the same unresolvable root for diagnostics: keep the
+            # interface at the gas pressure and leave the ledger untouched.
+            transfer_mol = 0.0
+            finite_transfer['transfer_o2_mol'] = 0.0
+            interface_diagnostic = None
+            self._last_oxygen_interface_diagnostic = {
+                'interface_pO2_bar': float(transport_pO2),
+                'interface_flux_mol_m2_s': 0.0,
+                'surface_activity_available': False,
+                'limiting_regime': 'surface_activity_unavailable',
+            }
+        else:
+            interface_diagnostic = self._oxygen_interface_state(
+                float(transport_pO2),
+                intrinsic_fO2_log=base_fO2_log,
+            )
         self._redox_handover_transfer_override = transfer_mol
         unbacked_transfer_mol = float(
             finite_transfer.get('unbacked_transfer_o2_mol', 0.0) or 0.0
@@ -11900,24 +11929,29 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         # Publish the diagnostic beside the accepted trajectory endpoint.
         # Do not re-solve from the mutated ledger; a zero commit holds the
         # interface at the gas pressure.
-        committed_interface_diagnostic = dict(interface_diagnostic)
-        committed_interface_diagnostic['interface_pO2_bar'] = (
-            committed_interface_pO2_bar
-        )
-        if abs(transfer_mol) > OXYGEN_RESERVOIR_NOOP_MOL:
-            committed_interface_diagnostic['interface_flux_mol_m2_s'] = float(
-                finite_transfer['interface_flux_mol_m2_s']
+        if interface_diagnostic is not None:
+            committed_interface_diagnostic = dict(interface_diagnostic)
+            committed_interface_diagnostic['interface_pO2_bar'] = (
+                committed_interface_pO2_bar
             )
-            committed_interface_diagnostic['interface_root_clamped'] = bool(
-                finite_transfer['interface_root_clamped']
+            if abs(transfer_mol) > OXYGEN_RESERVOIR_NOOP_MOL:
+                committed_interface_diagnostic['interface_flux_mol_m2_s'] = float(
+                    finite_transfer['interface_flux_mol_m2_s']
+                )
+                committed_interface_diagnostic['interface_root_clamped'] = bool(
+                    finite_transfer['interface_root_clamped']
+                )
+                committed_interface_diagnostic[
+                    'interface_root_residual_mol_m2_s'
+                ] = float(finite_transfer['interface_root_residual_mol_m2_s'])
+            self._apply_oxygen_interface_diagnostic(
+                reservoir,
+                state=committed_interface_diagnostic,
             )
-            committed_interface_diagnostic[
-                'interface_root_residual_mol_m2_s'
-            ] = float(finite_transfer['interface_root_residual_mol_m2_s'])
-        self._apply_oxygen_interface_diagnostic(
-            reservoir,
-            state=committed_interface_diagnostic,
-        )
+        else:
+            reservoir.interface_pO2_limiting_regime = (
+                'surface_activity_unavailable'
+            )
         reservoir.interface_pO2_bar = committed_interface_pO2_bar
         reservoir.exchange_o2_mol = transfer_mol
         reservoir.exchange_o2_kg = (
