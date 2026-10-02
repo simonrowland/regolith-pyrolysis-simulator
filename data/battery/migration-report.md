@@ -1,31 +1,31 @@
 # Battery v2.1 migration report
 
-rows in: 47390
-records out (observations): 120869
-works: 261
-experiments: 3509
-queue size: 76716
+rows in: 47410
+records out (observations): 121085
+works: 263
+experiments: 3518
+queue size: 76833
 identical-payload dedupe aliases: 342
 metadata files: 39
 index sources: 168
-hard issues: 3244
+hard issues: 3351
 
 ## Spec vs measured
 
 | count | spec | measured |
 |---|---:|---:|
-| citations | 147 | 264 (mismatch) |
-| doi_works | 56 | 123 (mismatch) |
+| citations | 147 | 266 (mismatch) |
+| doi_works | 56 | 125 (mismatch) |
 | no_doi_works | 91 | 138 (mismatch) |
-| admission_statuses | 374 | 1026 (mismatch) |
+| admission_statuses | 374 | 1076 (mismatch) |
 | supersedes | 422 | 649 (mismatch) |
-| series | 60 | 592 (mismatch) |
+| series | 60 | 597 (mismatch) |
 | gibbs_reference_pressures | 1617 | 1635 (mismatch) |
 | gibbs_reference_100000 | 1023 | 1029 (mismatch) |
 | gibbs_reference_101325 | 594 | 594 |
-| formulas | 1625 | 2030 (mismatch) |
+| formulas | 1625 | 2037 (mismatch) |
 | equipment_payloads | 670 | 972 (mismatch) |
-| absent_admissions | 3511 | 4772 (mismatch) |
+| absent_admissions | 3511 | 4742 (mismatch) |
 | absent_classes | 2174 | 2205 (mismatch) |
 | range_only_T | 3125 | 2747 (mismatch) |
 | system_like_phases | 1065 | 2638 (mismatch) |
@@ -40,7 +40,7 @@ hard issues: 3244
 | `compilation_assessed` | 95 |
 | `method_only` | 38 |
 | `measured_reduced` | 34 |
-| `quoted_attributed` | 22 |
+| `quoted_attributed` | 24 |
 | `measured_tabulated` | 16 |
 | `author_estimate` | 11 |
 | `derived_from_kems_equilibrium_constants` | 8 |
@@ -17976,6 +17976,7 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/extracts/fray-schmitt-2009-nh3.yaml` | 1 | 1 | 5 |
 | `data/literature/extracts/giauque-powell-1939-cl2.yaml` | 1 | 1 | 4 |
 | `data/literature/extracts/giauque-ruehrwein-1939-hcn-psat.yaml` | 1 | 1 | 4 |
+| `data/literature/extracts/guo-2021-mgo-activity-cmas-slag.yaml` | 2 | 16 | 18 |
 | `data/literature/extracts/habermann-daane-1964.yaml` | 2 | 2 | 9 |
 | `data/literature/extracts/hashimoto-nakano-2021-bubbles-to-chondrites-ii.yaml` | 7 | 7 | 40 |
 | `data/literature/extracts/hendrix-2024-reactivity-reduced-simulants.yaml` | 8 | 8 | 36 |
@@ -17996,7 +17997,7 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/extracts/kems-003-pound-1972.yaml` | 18 | 18 | 65 |
 | `data/literature/extracts/kems-005-fedkin-2006.yaml` | 14 | 27 | 79 |
 | `data/literature/extracts/kems-006-zhang-2021.yaml` | 13 | 15 | 50 |
-| `data/literature/extracts/kems-007-costa-2015.yaml` | 4 | 4 | 22 |
+| `data/literature/extracts/kems-007-costa-2015.yaml` | 17 | 113 | 26 |
 | `data/literature/extracts/kems-008-schaefer-fegley-2004.yaml` | 78 | 78 | 338 |
 | `data/literature/extracts/kems-009-safarian-2013.yaml` | 2 | 2 | 10 |
 | `data/literature/extracts/kems-010-richter-2007.yaml` | 156 | 156 | 365 |
@@ -18016,7 +18017,7 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/extracts/kems-025-markova-1983.yaml` | 22 | 44 | 63 |
 | `data/literature/extracts/kems-026-markova-1984.yaml` | 15 | 37 | 61 |
 | `data/literature/extracts/kems-027-plante-hastie-1983.yaml` | 26 | 48 | 110 |
-| `data/literature/extracts/kems-028-yakovlev-1984.yaml` | 19 | 29 | 51 |
+| `data/literature/extracts/kems-028-yakovlev-1984.yaml` | 19 | 29 | 55 |
 | `data/literature/extracts/kems-029-yakovlev-shornikov-2011.yaml` | 5 | 15 | 26 |
 | `data/literature/extracts/kems-031-halwax-2024.yaml` | 22 | 24 | 109 |
 | `data/literature/extracts/kems-032-copland-jacobson-2010.yaml` | 5 | 13 | 33 |
@@ -18118,6 +18119,7 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/extracts/ntrs-19730008085.yaml` | 2 | 30 | 37 |
 | `data/literature/extracts/ntrs-20250004626.yaml` | 5 | 15 | 31 |
 | `data/literature/extracts/okazaki-2022-ryugu-gas-treasure-box.yaml` | 13 | 13 | 57 |
+| `data/literature/extracts/oneill-2002-feo-activity-coefficients-cmas.yaml` | 5 | 91 | 91 |
 | `data/literature/extracts/pahlevan-2026-protolunar-volatile-outflows.yaml` | 8 | 51 | 24 |
 | `data/literature/extracts/pending-as2o3-second-primary.yaml` | 1 | 1 | 4 |
 | `data/literature/extracts/pending-bi2o3-kems.yaml` | 1 | 1 | 5 |
@@ -18211,13 +18213,13 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 
 ## Hard issue census
 
-hard issues: 3244
+hard issues: 3351
 
 MODEL_DERIVED / MEASURED_REDUCED keep their mapped evidence class. Parent pointers are not fabricated. Unstated derived_from / derivation is a hard conditional_field queued for page-grounding.
 
 | kind | count |
 |---|---:|
-| `conditional_field:derived_from` | 1688 |
+| `conditional_field:derived_from` | 1795 |
 | `conditional_field:derivation` | 1556 |
 
 ## Hard issues (first 50)
@@ -18275,8 +18277,8 @@ MODEL_DERIVED / MEASURED_REDUCED keep their mapped evidence class. Parent pointe
 
 ## Advisory issue census
 
-advisory issues: 218252
+advisory issues: 216465
 
 | kind | count |
 |---|---:|
-| `identity_incomplete` | 218252 |
+| `identity_incomplete` | 216465 |
