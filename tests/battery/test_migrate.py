@@ -103,7 +103,9 @@ def test_ion_current_comparison_provenance_assumes_unreported_pairing() -> None:
         "method": "ion current comparison with thermodynamic activity reduction",
         "method_as_printed": "comparison against the individual pure-oxide standard",
     }
-    provenance = _provenance_from_extract({}, values, None)
+    provenance = _provenance_from_extract(
+        {}, values, None, quantity=Quantity.ACTIVITY
+    )
     assert provenance is not None
     assert provenance["comparison_method"]["kind"] == "comparison_ratio"
     assert provenance["melt_reference_pairing"]["kind"] == (
@@ -115,8 +117,20 @@ def test_ion_current_comparison_provenance_assumes_unreported_pairing() -> None:
     assert "same instrument" in reason
     assert "same-cell pairing not printed" in reason
 
+    coefficient = _provenance_from_extract(
+        {}, values, None, quantity=Quantity.ACTIVITY_COEFFICIENT
+    )
+    assert coefficient is not None
+    assert coefficient["comparison_method"]["kind"] == "comparison_ratio"
+    assert _provenance_from_extract(
+        {}, values, None, quantity=Quantity.P_PARTIAL
+    ) is None
+
     integrated = _provenance_from_extract(
-        {}, {"method": "analytical integration of measured ion-current ratios"}, None
+        {},
+        {"method": "analytical integration of measured ion-current ratios"},
+        None,
+        quantity=Quantity.ACTIVITY,
     )
     assert integrated is not None
     assert integrated["comparison_method"]["kind"] == "comparison_ratio"
@@ -133,6 +147,7 @@ def test_ion_current_comparison_provenance_assumes_unreported_pairing() -> None:
             ),
         },
         None,
+        quantity=Quantity.ACTIVITY,
     )
     assert different is not None
     assert different["melt_reference_pairing"]["kind"] == (
@@ -4655,6 +4670,70 @@ def test_stolyarova_table3_137_row_ids_and_reference_states_unchanged(
     # Pinned to the digest on green c9b6e545d, whose Stolyarova 1996 locator notes carry the
     # Table 1 caption and Eq. (13) quotes; this change must leave it unchanged.
     assert digest == "a3f9988c9f64bb73c07eefa07b1d2edaac77abb0b2496799dba925c6bedaa968"
+
+
+def test_stolyarova_1996_comparison_provenance_is_activity_only(
+    tmp_path: Path,
+) -> None:
+    from simulator.battery.identity import Identity
+
+    result = _migrate_real_extract(
+        tmp_path, "stolyarova-1996-cao-alumina-silica-kems.yaml"
+    )
+    activities = [
+        obs
+        for obs in result.observations.values()
+        if "stolyarova_1996_table3_" in obs.observation_id
+        and isinstance(obs.identity, Identity)
+        and quantity_token(obs.identity) is Quantity.ACTIVITY
+    ]
+    pressures = [
+        obs
+        for obs in result.observations.values()
+        if obs.source_id == "stolyarova-1996-cao-alumina-silica-kems"
+        and isinstance(obs.identity, Identity)
+        and quantity_token(obs.identity) is Quantity.P_PARTIAL
+        and obs.evidence.class_.is_value
+        and obs.evidence.class_.value is EvidenceClass.MEASURED_DIRECT
+    ]
+
+    assert len(activities) == 137
+    assert all(
+        obs.provenance is not None
+        and obs.provenance.get("comparison_method", {}).get("kind")
+        == "comparison_ratio"
+        for obs in activities
+    )
+    assert len(pressures) == 108
+    assert all(
+        not obs.provenance
+        or not {
+            "comparison_method",
+            "common_knudsen_cell_constant",
+            "melt_reference_pairing",
+        }.intersection(obs.provenance)
+        for obs in pressures
+    )
+
+
+def test_comparison_provenance_is_not_inherited_by_unknown_quantity_points(
+    tmp_path: Path,
+) -> None:
+    from simulator.battery.identity import Identity
+
+    result = _migrate_real_extract(tmp_path, "kems-ms2000-044.yaml")
+    comparison_rows = [
+        obs
+        for obs in result.observations.values()
+        if obs.provenance and "comparison_method" in obs.provenance
+    ]
+    assert comparison_rows
+    assert all(
+        isinstance(obs.identity, Identity)
+        and quantity_token(obs.identity)
+        in {Quantity.ACTIVITY, Quantity.ACTIVITY_COEFFICIENT}
+        for obs in comparison_rows
+    )
 
 
 def test_reference_prose_keeps_printed_endmember_and_does_not_stamp_one_bar() -> None:

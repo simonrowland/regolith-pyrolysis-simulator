@@ -638,6 +638,8 @@ def _provenance_from_extract(
     obs: Mapping[str, Any],
     values: Mapping[str, Any],
     inherited: Mapping[str, Any] | None,
+    *,
+    quantity: Quantity | None,
 ) -> Mapping[str, Any] | None:
     selected: dict[str, Any] | None = None
     for candidate in (obs.get("provenance"), values.get("provenance"), inherited):
@@ -652,7 +654,7 @@ def _provenance_from_extract(
     method_token = " ".join(
         method_text.casefold().replace("_", " ").replace("-", " ").split()
     )
-    if any(
+    if quantity in {Quantity.ACTIVITY, Quantity.ACTIVITY_COEFFICIENT} and any(
         token in method_token
         for token in (
             "ion current comparison",
@@ -2231,7 +2233,9 @@ def load_migrated_store(
             note = method_record.locator.note
             if note:
                 method_values["method_as_printed"] = note
-        provenance = _provenance_from_extract({}, method_values, observation.provenance)
+        provenance = _provenance_from_extract(
+            {}, method_values, observation.provenance, quantity=quantity
+        )
         if not comparison_method_cell_constant_cancels(provenance):
             continue
         identity = observation.identity
@@ -11117,7 +11121,6 @@ class Migrator:
             values = dict(raw_values)
         else:
             values = {}
-        observation_provenance = _provenance_from_extract(obs, values, provenance)
         t_for_rekey = None
         if isinstance(values, Mapping):
             t_sel_rekey = select_declared_source(AXIS_TEMPERATURE_K, None, values)
@@ -11162,7 +11165,12 @@ class Migrator:
                     local_ids=local_ids,
                     declared_experiment_id=declared_experiment_id,
                     source_context=source_context,
-                    provenance=observation_provenance,
+                    provenance=_provenance_from_extract(
+                        child_obs,
+                        child_values,
+                        provenance,
+                        quantity=child_quantity,
+                    ),
                 )
             return
         locator = locator_from_mapping(
@@ -11183,6 +11191,9 @@ class Migrator:
                 observation_id=obs_id,
             )
         q_token = quantity.value if quantity.is_value else None
+        observation_provenance = _provenance_from_extract(
+            obs, values, provenance, quantity=q_token
+        )
         phase_raw = compilation_phase_text(values) or compilation_phase_text(obs)
         phase_provenance: str | None = None
         transition_reason = transition_phase_reason(obs_type, values)
@@ -11264,9 +11275,6 @@ class Migrator:
                 species = make_species(
                     suffix_formula, phase, polymorph=polymorph_from_extract(obs)
                 )
-        q_token = quantity.value if isinstance(quantity, State) and quantity.is_value else (
-            quantity if isinstance(quantity, Quantity) else None
-        )
         initial_oxide_map = _initial_oxide_map_from_values(values)
         composition_located = _composition_located_from_values(values, locator)
         catalogue_composition = _catalogue_composition_located_from_values(values, locator)
@@ -12511,6 +12519,20 @@ class Migrator:
             if isinstance(quantity, State) and quantity.is_value
             else (quantity if isinstance(quantity, Quantity) else None)
         )
+        if (
+            q_token_point not in {Quantity.ACTIVITY, Quantity.ACTIVITY_COEFFICIENT}
+            and provenance is not None
+        ):
+            provenance = {
+                key: value
+                for key, value in provenance.items()
+                if key
+                not in {
+                    "comparison_method",
+                    "common_knudsen_cell_constant",
+                    "melt_reference_pairing",
+                }
+            } or None
         if ident_kwargs.get("composition") is None:
             initial_map = _initial_oxide_map_from_values(parent_values)
             if initial_map:
