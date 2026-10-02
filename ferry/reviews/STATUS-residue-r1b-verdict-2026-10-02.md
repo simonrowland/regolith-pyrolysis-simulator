@@ -1,11 +1,11 @@
 # STATUS — residue-r1b verdict (regolith-empirical)
 
-- **Tip:** `69f5828c4ec70877a6d390d712e50ff5909ece49` (`review/residue-r1b`)
+- **Tip:** `350cf58ebb36207eb3063cb233333614c31a6fba` (`review/residue-r1b`)
 - **Parent (R1a LAND):** `802b69ad7b6197046b27286e98e42bed91322fbc`
 - **Green tip context:** `191960ce8a657a25681aad624dd64670bf85df6a`
 - **Seat:** `/workspace/repos/wt/slot-b565` (cleared idle after review)
 - **Range:** `802b69ad7..69f5828c4` (one commit: Integrate residue evaporation inventory)
-- **VERDICT: LAND 69f5828c4ec70877a6d390d712e50ff5909ece49**
+- **VERDICT: LAND 350cf58ebb36207eb3063cb233333614c31a6fba**
 - **Deliverable:** `REVIEW-residue-r1b-69f5828c4-2026-10-02.md`
 - **Date:** 2026-10-02 ~15:07 ET
 - **Mailbox tip:** c303a20f740f91b4866a90902f3e60b15eef1509 on `empirical/reviews-batch-zv-2026-09-22` (artifacts `fe24eee46bc8883562e84f857c1ffe77fcac9969`).
