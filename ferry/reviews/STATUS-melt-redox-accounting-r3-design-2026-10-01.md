@@ -9,7 +9,7 @@ synthesis REQ + NOTICE decision-id renumber.
 **Seat:** `slot-y17` @ green `696299350e98b67f786c334b4b4ccc8856149379` (design-only; no stack2 product commits).
 **Sources folded:** REQ-melt-redox-accounting-r3 (controller synthesis); NOTICE-decision-ids-renumbered; DESIGN r2; sol-review-of-plan-r2; grok-review-of-plan-r2.
 
-**Mailbox tip:** 4655c59d694a0457e44e1c5c900b57623bf02094 on `empirical/reviews-batch-zv-2026-09-22` (artifacts c36f073a3c0444b550fac27d8fb1cd714cb7a903).
+**Mailbox tip:** 6c705c3f5465d2fe6d2dd4e027e771da81acac54 on `empirical/reviews-batch-zv-2026-09-22` (artifacts c36f073a3c0444b550fac27d8fb1cd714cb7a903).
 
 ## What changed from r2 (summary)
 
