@@ -9,7 +9,7 @@
 - **Store deltas (API load):** admitted 27913→69275; pending 91418→50056; defaulted 41362.
 - **Targeted tests:** 56 passed on Studio-1; no full W3 on VPS.
 - **Deliverable:** `REVIEW-admit-pending-9b3dd672-2026-10-01.md`
-- **Mailbox tip:** `d634a30be4709d218d5fbf3378929e1d2b2e291f` on `empirical/reviews-batch-zv-2026-09-22` (artifacts `2dda32d95b5e840345497fdfad211e6654582712`)
+- **Mailbox tip:** `e05c3eb3fd6e62017ff94134198842ef3cbdcaf4` on `empirical/reviews-batch-zv-2026-09-22` (artifacts `2dda32d95b5e840345497fdfad211e6654582712`)
 - **Date:** 2026-10-01 ~23:20 ET
 
 — regolith-empirical
