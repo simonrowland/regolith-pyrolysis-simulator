@@ -1,16 +1,15 @@
 # STATUS — residue-batch verdict (regolith-empirical)
 
-- **Tip:** `9e434da92623a4c4c6c887bd1659e3a876906d91` (`review/residue-batch`)
-- **Parents:** R1b LAND `69f5828c4` + fix `138be92af` (merge-tree clean)
-- **R1a LAND ancestor:** `802b69ad7`
-- **Green tip context:** `191960ce8a657a25681aad624dd64670bf85df6a`
+- **Tip:** `d1179bbf9da452d13334502210a1d4b3dbfd2fca` (`review/residue-batch`)
+- **Parents:** `9e434da92623a4c4c6c887bd1659e3a876906d91` + t1075 `a8cefc8ba67d82c3aa12a27f5f4cb513f8ccb891`
+- **Ancestors:** R1b `69f5828c4`, R1a `802b69ad7`, R0-fix `138be92af`
+- **Prior OF RECORD:** LAND `9e434da9` (superseded by NOTICE tip update)
 - **Seat:** `/workspace/repos/wt/slot-b565` (cleared idle after review)
-- **Range:** fix under LANDed R1a/R1b (migrate.py + test_migrate.py only vs R1b)
-- **VERDICT: LAND 9e434da92623a4c4c6c887bd1659e3a876906d91**
-- **Deliverable:** `REVIEW-residue-batch-9e434da9-2026-10-02.md`
-- **Date:** 2026-10-02 ~16:50 ET
-- **Mailbox tip:** `a5dbdfd55d57c170d4dfeb43207f5849f4ef6b0b` on `empirical/reviews-batch-zv-2026-09-22` (artifacts `a5dbdfd55d57c170d4dfeb43207f5849f4ef6b0b`).
+- **VERDICT: LAND d1179bbf9da452d13334502210a1d4b3dbfd2fca**
+- **Deliverable:** `REVIEW-residue-batch-d1179bbf9-2026-10-02.md`
+- **Date:** 2026-10-02 ~17:00 ET
+- **Mailbox tip:**  on  (artifacts ).
 
-Attacks (1)–(2) PASS (fix: no schema change in fix; refusal intact; trace start via run join; merge-tree clean). (3) whole-store regen+load **not** completed on ~16GB VPS — Sossi-targeted migrate+mutation PASS; **Mac Studio ASK** for regen + `test_validate_corpus_zero_hard_issues_on_migrated_store`. (4) score admitted-model PASS; validity[6] PASS; validate_corpus TIMEOUT on VPS load (not hard-issue fail). Targeted: residue identity migrate 1 PASS; seat Sossi script PASS. No P1 REVISE. Mailbox note: REVIEW+STATUS under ferry/reviews; no extract edits; Mac listen pools not armed.
+Attacks (1)–(2) PASS (R0 fix: no schema change; refusal intact; trace start via run join; both merges write-tree clean; tip tree = merge-tree). (3) on-disk validate_corpus PASS serial ~418s; tip full regen still Mac Studio ASK. (4) bounced trio 3 PASS. (5) `test_score.py` **159 passed** on tip (t1075 parity + R1b typed-absence both exercised). No P1 REVISE. Mailbox note: REVIEW+STATUS under ferry/reviews; no extract edits; Mac listen pools not armed; review branch not pushed.
 
 — regolith-empirical
