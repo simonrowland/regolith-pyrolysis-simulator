@@ -7,7 +7,7 @@
 - **VERDICT: LAND 5a1f5486e71229aedd724401d34a63fe78dba82d**
 - **Deliverable:** `REVIEW-shuttle-ferric-first-regolith-physics-2026-10-01.md`
 - **Date:** 2026-10-01 ~20:55 ET
-- **Mailbox tip:** `7b982d9e8595251546fe42ce70260b5838feab43`
+- **Mailbox tip:** `437d066271822366098dd164d53e671ac59829e3`
 
 C3 Na/K ferric-first (`2A + Fe2O3 → A2O + 2FeO` before FeO→Fe): stoich/atom balance, 10 wt% + accessibility unchanged, Fe2O3=0 legacy shape, dose/cap no double-count, redox source terms see Fe2O3/FeO. Ledger amendment (debit Fe2O3 / credit FeO) accepted in code; docs follow-up non-blocking. Two provider failures (C6 empty-window refusal assert; mars mixed-origin `cleaned_melt.K` withdrawal) reproduce at base — not tip regressions.
 
