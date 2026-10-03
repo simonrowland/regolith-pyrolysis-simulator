@@ -11458,7 +11458,10 @@ class Migrator:
             if not derived_prose:
                 self._author_derivations[obs_id] = source_derivation
         conditional_method = str(method_class) if method_class else str(regime or "").strip()
-        if conditional_method not in _CONDITIONAL_REDUCED_METHODS:
+        if (
+            conditional_method not in _CONDITIONAL_REDUCED_METHODS
+            and conditional_method != EvidenceClass.MEASURED_REDUCED.value
+        ):
             source_derivation = None
         for payload in (values, obs):
             if not isinstance(payload.get("inference"), Mapping):
