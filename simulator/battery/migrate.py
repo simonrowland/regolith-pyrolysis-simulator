@@ -5366,9 +5366,11 @@ def lineage_parents_from_source(
         local = item[len(prefix):] if item.startswith(prefix) else item
         if local in local_ids:
             parents.append(f"{prefix}{local}")
+        elif item == f"tables:{source_id}":
+            # The source's root table asset is a stable lineage link. More
+            # specific table filenames resolve only when registered.
+            parents.append(item)
         elif item.startswith("tables:") and item in asset_ids:
-            # A reduced literature value may cite the registered table asset
-            # that carries the source's calibration/measurement lineage.
             parents.append(item)
         elif "::" in item:
             # Source-stated qualified pointer; kept as written. If it
@@ -11441,7 +11443,11 @@ class Migrator:
         source_asset_ids = {asset.asset_id for asset in work.source_files.files}
         try:
             derived_parents, derived_prose = lineage_parents_from_source(
-                obs, values, source_id, local_ids, source_asset_ids
+                obs,
+                values,
+                source_id,
+                local_ids,
+                source_asset_ids,
             )
         except ValueError as exc:
             derived_parents, derived_prose = (), (str(exc),)
