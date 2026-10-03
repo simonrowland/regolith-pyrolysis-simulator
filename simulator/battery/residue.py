@@ -844,9 +844,12 @@ def _predict_hashimoto_residue_cohort(
     *,
     preform_dimensions_mm: Mapping[str, float],
     code_revision: str,
+    engine: str = "openimcc",
     _allow_partial_cohort_for_test: bool = False,
 ) -> tuple[_HashimotoResiduePrediction, ...]:
-    """Produce R2's two alpha arms and geometry bands, without reading residues."""
+    """Produce both alpha arms and geometry bands, without reading residues."""
+    if engine not in {"openimcc", "internal-analytical"}:
+        raise ResidueInventoryRefusal("hashimoto_engine_unsupported", engine)
     experiment_ids = {
         str(experiment.get("experiment_id", "")) for experiment in experiments
     }
@@ -1104,54 +1107,95 @@ def _predict_hashimoto_residue_cohort(
             tuple[tuple[str, float], ...], Mapping[str, float]
         ] = {}
 
-        def pressure_model(
-            inventory: Mapping[str, float], log10_pO2_bar: float
-        ) -> Mapping[str, float]:
-            key = tuple(
-                sorted((str(oxide), float(amount)) for oxide, amount in inventory.items())
-            )
-            base_pressure_bar = pressure_state_cache.get(key)
-            if base_pressure_bar is None:
-                current_composition = {
-                    oxide: amount for oxide, amount in key if amount > 0.0
-                }
-                try:
-                    state = openimcc_bridge.evaluate(
-                        composition_mol=current_composition,
-                        temperature_K=temperature_K,
-                        allow_extrapolation=True,
-                        allow_out_of_envelope=True,
-                    )
-                except ImccNonconvergenceError as exc:
-                    raise ResidueEngineNonconvergence(
-                        "openimcc", str(exc)
-                    ) from exc
-                base_pressure_bar = evaluate_gas(
-                    state.parent_oxide_activities,
-                    temperature_K,
-                    1.0,
-                    gas_pack,
-                    parent_oxides=state.parent_oxides,
-                    allow_extrapolation=True,
+        if engine == "openimcc":
+            def pressure_model(
+                inventory: Mapping[str, float], log10_pO2_bar: float
+            ) -> Mapping[str, float]:
+                key = tuple(
+                    sorted((str(oxide), float(amount)) for oxide, amount in inventory.items())
                 )
-                pressure_state_cache[key] = base_pressure_bar
-                melt_pack_identity.update(
-                    {
-                        "model_id": state.pack_model_id,
-                        "datapack_version": state.pack_version,
-                        "pack_digest": state.pack_digest,
-                        "openimcc_version": state.openimcc_version,
+                base_pressure_bar = pressure_state_cache.get(key)
+                if base_pressure_bar is None:
+                    current_composition = {
+                        oxide: amount for oxide, amount in key if amount > 0.0
                     }
+                    try:
+                        state = openimcc_bridge.evaluate(
+                            composition_mol=current_composition,
+                            temperature_K=temperature_K,
+                            allow_extrapolation=True,
+                            allow_out_of_envelope=True,
+                        )
+                    except ImccNonconvergenceError as exc:
+                        raise ResidueEngineNonconvergence(
+                            "openimcc", str(exc)
+                        ) from exc
+                    base_pressure_bar = evaluate_gas(
+                        state.parent_oxide_activities,
+                        temperature_K,
+                        1.0,
+                        gas_pack,
+                        parent_oxides=state.parent_oxides,
+                        allow_extrapolation=True,
+                    )
+                    pressure_state_cache[key] = base_pressure_bar
+                    melt_pack_identity.update(
+                        {
+                            "model_id": state.pack_model_id,
+                            "datapack_version": state.pack_version,
+                            "pack_digest": state.pack_digest,
+                            "openimcc_version": state.openimcc_version,
+                        }
+                    )
+                pO2_bar = 10.0**float(log10_pO2_bar)
+                return {
+                    str(species): (
+                        float(base_pressure_bar.get(species, 0.0))
+                        * pO2_bar ** gas_pressure_exponents[str(species)]
+                        * 100_000.0
+                    )
+                    for species, _reaction in gas_channels
+                }
+        else:
+            from simulator.diagnostic_helpers.binary_pot_battery import (
+                PO2_COMMANDED,
+                Po2Request,
+                _internal_analytical_vapor_pressure_adapter,
+                _new_internal_analytical_core,
+            )
+
+            analytical_core = _new_internal_analytical_core()
+
+            def pressure_model(
+                inventory: Mapping[str, float], log10_pO2_bar: float
+            ) -> Mapping[str, float]:
+                response = _internal_analytical_vapor_pressure_adapter(
+                    core=analytical_core,
+                    temperature_C=temperature_K - 273.15,
+                    pressure_bar=total_pressure_Pa / 100_000.0,
+                    composition_kg=None,
+                    composition_mol=inventory,
+                    fO2_log=log10_pO2_bar,
+                    po2_request=Po2Request(
+                        mode=PO2_COMMANDED,
+                        po2_bar=10.0**float(log10_pO2_bar),
+                    ),
                 )
-            pO2_bar = 10.0**float(log10_pO2_bar)
-            return {
-                str(species): (
-                    float(base_pressure_bar.get(species, 0.0))
-                    * pO2_bar ** gas_pressure_exponents[str(species)]
-                    * 100_000.0
-                )
-                for species, _reaction in gas_channels
-            }
+                pressures = response.vapor_pressures_Pa
+                missing = [
+                    str(species)
+                    for species, _reaction in gas_channels
+                    if species not in pressures
+                ]
+                if missing:
+                    raise ResidueInventoryRefusal(
+                        "hashimoto_internal_analytical_channels_missing",
+                        ", ".join(missing),
+                    )
+                return {
+                    str(species): float(pressures[str(species)])
+                    for species, _reaction in gas_channels
+                }
 
         arm_channels = (
             ("alpha_common_unity_sensitivity", common_channels, common_alpha_records, "common"),
@@ -1337,8 +1381,9 @@ def _predict_hashimoto_residue_cohort(
                 if alpha_arm == "alpha_runtime_catalog"
                 else (),
                 "oxygen_model": (
-                    "R1a engine-consistent alpha-weighted congruent vacuum oxygen balance"
+                    f"R1a engine-consistent alpha-weighted congruent vacuum oxygen balance ({engine})"
                 ),
+                "engine": engine,
                 "oxygen_boundary": "unbuffered vacuum; fO2 control none",
                 "total_pressure_Pa": total_pressure_Pa,
                 "surface_pO2_bar_range_by_geometry": pO2_ranges,

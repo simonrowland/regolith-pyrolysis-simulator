@@ -2736,6 +2736,98 @@ def test_residue_composition_has_its_own_rail_and_typed_engine_refusal() -> None
         assert prediction.refusal_detail["quantity"] == "residue_component_composition"
 
 
+def test_hashimoto_scoring_projects_by_experiment_and_carries_residue_flags(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from types import SimpleNamespace
+
+    from simulator.battery import residue, score
+
+    context = load_score_context(sources=("kems-015-hashimoto-1983",))
+    references = sorted(
+        (
+            observation
+            for observation in context.observations.values()
+            if observation.source_id == "kems-015-hashimoto-1983"
+            and "::hashimoto_1983_table3_residue_composition_series::"
+            in observation.observation_id
+            and quantity_token(observation.identity)
+            is Quantity.RESIDUE_COMPONENT_COMPOSITION
+            and observation.identity.species.formula == "FeO"
+        ),
+        key=lambda observation: observation.experiment_id,
+    )
+    assert len(references) == 24
+    refused_experiment: str | None = None
+
+    def fake_cohort(experiments, _catalog, *, engine, **_kwargs):
+        rows = []
+        for index, experiment in enumerate(experiments):
+            experiment_id = experiment["experiment_id"]
+            provenance = {
+                "experiment_id": experiment_id,
+                "engine": engine,
+                "oxygen_model": f"own oxygen balance: {engine}",
+                "integration": {
+                    "steps": 256,
+                    "refinement_status": "unconverged_at_cap",
+                    "refinement_notices": ({"reason": "residue_time_refinement_unconverged"},),
+                },
+                "geometry_refusal_by_geometry": (
+                    {"sphere_shrinking": {"reason": "injected_refusal"}}
+                    if experiment_id == refused_experiment
+                    else {"sphere_shrinking": None}
+                ),
+            }
+            values = {"FeO": float(index + 10), "MgO": 20.0, "SiO2": 30.0, "CaO": 4.0, "Al2O3": 5.0}
+            rows.extend(
+                (
+                    SimpleNamespace(
+                        experiment_id=experiment_id,
+                        alpha_arm="alpha_common_unity_sensitivity",
+                        primary_geometry_policy_id="sphere_shrinking",
+                        primary_oxide_wt_pct=values,
+                        sensitivity_band_wt_pct={name: (value - 1.0, value + 1.0) for name, value in values.items()},
+                        provenance=provenance,
+                    ),
+                    SimpleNamespace(
+                        experiment_id=experiment_id,
+                        alpha_arm="alpha_runtime_catalog",
+                        primary_geometry_policy_id="sphere_shrinking",
+                        primary_oxide_wt_pct={**values, "FeO": values["FeO"] + 100.0},
+                        geometry_oxide_wt_pct={"sphere_shrinking": values},
+                        sensitivity_band_wt_pct={name: (value - 2.0, value + 2.0) for name, value in values.items()},
+                        provenance={"engine": engine, "alpha_arm": "alpha_runtime_catalog"},
+                    ),
+                )
+            )
+        return tuple(rows)
+
+    monkeypatch.setattr(residue, "_predict_hashimoto_residue_cohort", fake_cohort)
+    for engine in (Engine.OPENIMCC, Engine.INTERNAL_ANALYTICAL):
+        refused_experiment = None
+        cache = {}
+        first, second = references[0], references[-1]
+        first_prediction = score._hashimoto_residue_prediction(context, first, engine, cache)
+        second_prediction = score._hashimoto_residue_prediction(context, second, engine, cache)
+        assert first_prediction.execution.state is ExecutionState.PRODUCED, first_prediction.refusal_detail
+        assert second_prediction.execution.state is ExecutionState.PRODUCED
+        assert first_prediction.value != second_prediction.value
+        assert first_prediction.refusal_detail["experiment_id"] == first.experiment_id
+        assert first_prediction.refusal_detail["consumed_row"]["observation_id"] == first.observation_id
+        assert first_prediction.refusal_detail["production_alpha_arm"]["alpha_arm"] == "alpha_runtime_catalog"
+        assert any("feo_melt_redox_stack2_pending" in notice.reason for notice in first_prediction.notices)
+        assert any("residue_time_refinement_unconverged" in notice.reason for notice in first_prediction.notices)
+        candidate = score.candidate_observation(first, first_prediction)
+        assert candidate.provenance["oxygen_model"] == f"own oxygen balance: {engine.value}"
+
+        refused_experiment = first.experiment_id
+        refusal = score._hashimoto_residue_prediction(context, first, engine, {})
+        assert refusal.value is None
+        assert refusal.refusal_reason is RefusalReason.UNSUPPORTED
+        assert "injected_refusal" in refusal.refusal_detail["reason"]
+
+
 def test_non_alkali_alpha_is_refused_with_no_rail() -> None:
     ident = replace(
         F.psat_identity("Zn"), quantity=Quantity.EVAPORATION_COEFFICIENT_ALPHA

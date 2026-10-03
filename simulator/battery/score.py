@@ -3668,7 +3668,209 @@ def candidate_observation(
         ),
         authority=prediction.authority,
         certified_band=prediction.certified_band,
+        provenance=(
+            dict(prediction.refusal_detail)
+            if quantity_token(identity) is Quantity.RESIDUE_COMPONENT_COMPOSITION
+            and prediction.value is not None
+            else None
+        ),
     )
+
+
+_HASHIMOTO_SOURCE_ID = "kems-015-hashimoto-1983"
+
+
+def _hashimoto_residue_prediction(
+    context: ScoreContext,
+    reference: Observation,
+    engine: Engine,
+    cache: dict[Engine, Mapping[str, object]],
+) -> EnginePrediction:
+    """Predict a Hashimoto vector once per engine, then project by physical run."""
+    channel = ENGINE_CHANNELS[engine]
+    sources = ENGINE_COEFFICIENT_SOURCES[engine]
+    try:
+        if engine not in {Engine.INTERNAL_ANALYTICAL, Engine.OPENIMCC}:
+            raise ValueError("engine_not_supported_for_hashimoto_residue")
+        if engine not in cache:
+            from simulator.battery.residue import (
+                ResidueInventoryRefusal,
+                _predict_hashimoto_residue_cohort,
+            )
+
+            observations = [
+                row
+                for row in context.observations.values()
+                if row.source_id == _HASHIMOTO_SOURCE_ID
+                and row.observation_id.startswith(_HASHIMOTO_SOURCE_ID + "::")
+                and isinstance(row.identity, Identity)
+                and quantity_token(row.identity)
+                is Quantity.RESIDUE_COMPONENT_COMPOSITION
+            ]
+            experiments_by_id = {
+                row.experiment_id: context.experiments[row.experiment_id]
+                for row in observations
+                if row.experiment_id in context.experiments
+            }
+            if len(experiments_by_id) != 24:
+                raise ResidueInventoryRefusal(
+                    "hashimoto_cohort_invalid",
+                    f"scorer found {len(experiments_by_id)} Hashimoto runs, expected 24",
+                )
+            source_path = (
+                REPO_ROOT
+                / "data/literature/extracts/kems-015-hashimoto-1983.yaml"
+            )
+            source = load_yaml(source_path)
+            geometry = next(
+                item
+                for item in source.get("metadata", ())
+                if item.get("observation_id")
+                == "hashimoto_1983_fe_fcmas_free_evap_geometry_quoted"
+            )["values"]["starting_preform_mm"]
+            experiments = [
+                to_plain(experiments_by_id[experiment_id])
+                for experiment_id in sorted(experiments_by_id)
+            ]
+            revision = subprocess.run(
+                ["git", "rev-parse", "HEAD"],
+                cwd=REPO_ROOT,
+                check=True,
+                capture_output=True,
+                text=True,
+            ).stdout.strip()
+            rows = _predict_hashimoto_residue_cohort(
+                experiments,
+                load_yaml(REPO_ROOT / "data/vapor_pressures.yaml"),
+                preform_dimensions_mm=geometry,
+                code_revision=revision,
+                engine=engine.value,
+            )
+            cache[engine] = {
+                row.experiment_id + "::" + row.alpha_arm: row for row in rows
+            }
+        rows_by_key = cache[engine]
+        if "__cohort_error__" in rows_by_key:
+            raise ValueError(str(rows_by_key["__cohort_error__"]))
+        primary_key = (
+            reference.experiment_id + "::alpha_common_unity_sensitivity"
+        )
+        production_key = reference.experiment_id + "::alpha_runtime_catalog"
+        primary = rows_by_key.get(primary_key)
+        production = rows_by_key.get(production_key)
+        if primary is None or production is None:
+            raise ValueError("hashimoto_prediction_row_missing")
+        primary_provenance = dict(primary.provenance)
+        consumed_provenance = {
+            "observation_id": reference.observation_id,
+            "source_id": reference.source_id,
+            "experiment_id": reference.experiment_id,
+            "locator": to_plain(reference.locator),
+            "read_from": reference.read_from,
+        }
+        primary_provenance.update(
+            {
+                "consumed_row": consumed_provenance,
+                "production_alpha_arm": {
+                    "alpha_arm": production.alpha_arm,
+                    "primary_geometry_policy_id": production.primary_geometry_policy_id,
+                    "primary_oxide_wt_pct": dict(production.primary_oxide_wt_pct),
+                    "geometry_oxide_wt_pct": {
+                        name: dict(values)
+                        for name, values in production.geometry_oxide_wt_pct.items()
+                    },
+                    "sensitivity_band_wt_pct": dict(production.sensitivity_band_wt_pct),
+                    "provenance": dict(production.provenance),
+                },
+            }
+        )
+        primary_geometry = primary.primary_geometry_policy_id
+        run_refusal = (primary.provenance.get("geometry_refusal_by_geometry") or {}).get(
+            primary_geometry
+        )
+        if run_refusal:
+            from simulator.battery.residue import ResidueInventoryRefusal
+
+            raise ResidueInventoryRefusal(
+                str(run_refusal.get("reason") or "hashimoto_run_refused"),
+                json.dumps(run_refusal, sort_keys=True, default=str),
+            )
+        formula = reference.identity.species.formula
+        value = primary.primary_oxide_wt_pct.get(formula)
+        band = primary.sensitivity_band_wt_pct.get(formula)
+        if value is None or band is None:
+            raise ValueError("hashimoto_oxide_prediction_missing:" + formula)
+        notices = [
+            Notice(
+                kind=NoticeKind.OUT_OF_CERTIFIED_BAND,
+                affected_quantities=(Quantity.RESIDUE_COMPONENT_COMPOSITION,),
+                reason="feo_melt_redox_stack2_pending; regimes=M5,M2,M4",
+                origin="hashimoto-residue-r4",
+                band="1973-2273 K; engine tip 191960ce8",
+            )
+        ]
+        integration = primary.provenance.get("integration") or {}
+        if integration.get("refinement_status") == "unconverged_at_cap":
+            notices.append(
+                Notice(
+                    kind=NoticeKind.OUT_OF_CERTIFIED_BAND,
+                    affected_quantities=(Quantity.RESIDUE_COMPONENT_COMPOSITION,),
+                    reason="residue_time_refinement_unconverged; finest prediction retained",
+                    origin="hashimoto-residue-r3",
+                    band=f"N={integration.get('steps')}; N_cap=256",
+                )
+            )
+        if primary.provenance.get("openimcc_liquid_row_extrapolated"):
+            notices.append(
+                Notice(
+                    kind=NoticeKind.OUT_OF_CERTIFIED_BAND,
+                    affected_quantities=(Quantity.RESIDUE_COMPONENT_COMPOSITION,),
+                    reason="OpenIMCC liquid-row extrapolation below fitted temperature floor",
+                    origin="hashimoto-residue-addendum-a",
+                    band="liquid-row floors are recorded in provenance",
+                )
+            )
+        return EnginePrediction(
+            engine=engine,
+            channel=channel,
+            execution=Execution(
+                state=ExecutionState.PRODUCED,
+                call_evidence=f"{engine.value}:hashimoto:{reference.experiment_id}:alpha_common_unity_sensitivity",
+            ),
+            value=Decimal(str(value)),
+            unit=QUANTITY_UNITS[Quantity.RESIDUE_COMPONENT_COMPOSITION],
+            coefficient_sources=sources,
+            lineage_complete=False,
+            notices=tuple(notices),
+            identity=reference.identity,
+            version=str(primary.provenance.get("code_revision") or "unknown"),
+            refusal_detail=primary_provenance,
+        )
+    except Exception as exc:  # the scorer records typed per-cell refusal and continues
+        reason = getattr(exc, "reason", None) or str(exc) or type(exc).__name__
+        if engine not in cache:
+            cache[engine] = {"__cohort_error__": str(reason)}
+        detail: dict[str, object] = {
+            "reason": str(reason),
+            "engine": engine.value,
+            "source_id": reference.source_id,
+            "experiment_id": reference.experiment_id,
+        }
+        if getattr(exc, "detail", None):
+            detail["detail"] = str(exc.detail)
+        return EnginePrediction(
+            engine=engine,
+            channel=channel,
+            execution=Execution(state=ExecutionState.NOT_PROBED),
+            coefficient_sources=sources,
+            refusal_reason=(
+                RefusalReason.OPENIMCC_NOT_IMPORTABLE
+                if str(reason) == "openimcc_not_importable"
+                else RefusalReason.UNSUPPORTED
+            ),
+            refusal_detail=detail,
+            identity=reference.identity,
+        )
 
 
 def _is_bulk_not_liquid_composition(observation: Observation) -> bool:
@@ -4463,6 +4665,7 @@ def _score_store_with_decisions(
     kems_band = _derive_kems_partial_pressure_band(
         observations, context.experiments, context.benches
     )
+    residue_prediction_cache: dict[Engine, Mapping[str, object]] = {}
     try:
         with bound_work_inputs(context.works, observations, context.experiments):
             for obs in refs:
@@ -4517,6 +4720,19 @@ def _score_store_with_decisions(
                                 refusal_reason=RefusalReason.UNSUPPORTED,
                                 refusal_detail={"reason": "diagnostic_population"},
                                 identity=point.identity if isinstance(point.identity, Identity) else None,
+                            )
+                        if (
+                            predict is None
+                            and isinstance(point.identity, Identity)
+                            and quantity is Quantity.RESIDUE_COMPONENT_COMPOSITION
+                            and point.source_id == _HASHIMOTO_SOURCE_ID
+                            and engine in {Engine.OPENIMCC, Engine.INTERNAL_ANALYTICAL}
+                        ):
+                            prediction = _hashimoto_residue_prediction(
+                                context,
+                                point,
+                                engine,
+                                residue_prediction_cache,
                             )
                         residual, candidate = compile_residual(
                             point,
