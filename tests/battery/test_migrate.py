@@ -5238,6 +5238,45 @@ def test_kume_measured_reduced_activity_preserves_structured_derivation(
     )
 
 
+def test_measured_reduced_derivation_prose_input_is_queued_not_pointed(
+    tmp_path: Path,
+) -> None:
+    name = "kume-2000-cao-activities.yaml"
+    source = REPO_ROOT / "data" / "literature" / "extracts" / name
+    extract = yaml.safe_load(source.read_text(encoding="utf-8"))
+    extract["source_id"] = "fixture-source"
+    raw = next(
+        row
+        for row in extract["species"]["CaO"]["observations"]
+        if row.get("observation_id") == "kume_2000_table2_sample_101"
+    )
+    raw["derivation"]["inputs"] = ["Table 2 DSC Cp points"]
+
+    result = migrate(_write_min_tree(tmp_path, extract), write=True)
+    observation = next(
+        obs
+        for obs in result.observations.values()
+        if obs.observation_id.endswith("::kume_2000_table2_sample_101")
+    )
+    queued = [
+        entry
+        for entry in result.queue
+        if entry.observation_id == observation.observation_id
+        and "Table 2 DSC Cp points" in (entry.why or "")
+    ]
+    assert len(queued) == 1
+    assert queued[0].axes == ["derived_from"]
+    assert queued[0].locator
+    report = validate_corpus(
+        result.works, result.experiments, result.observations, residuals=None
+    )
+    assert not any(
+        issue.observation_id == observation.observation_id
+        and issue.reason is RefusalReason.REFERENTIAL_INTEGRITY
+        for issue in report.hard_issues
+    )
+
+
 def test_kume_measured_reduced_activity_without_derivation_stays_queued(
     tmp_path: Path,
 ) -> None:
