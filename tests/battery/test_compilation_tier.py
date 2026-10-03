@@ -292,6 +292,106 @@ def test_compilation_comparison_sidecar_is_additive_and_streamed(tmp_path) -> No
     assert after == before
 
 
+def test_real_janaf_rows_join_real_compilation_pins(tmp_path) -> None:
+    from pathlib import Path
+
+    from simulator.battery.compilation_tier import (
+        iter_compilation_comparisons_jsonl,
+        write_compilation_comparisons_jsonl,
+    )
+    from simulator.battery.migrate import load_yaml, observation_from_plain
+    from simulator.battery.pins import load_pins, pin_failures
+
+    root = Path(__file__).resolve().parents[2]
+    requested = {"Mg-008": {"1100", "1200"}, "Al-096": {"1100", "1200"}}
+    observations = []
+    origins = {}
+    for element, table in (("Mg", "Mg-008"), ("Al", "Al-096")):
+        relative = f"compilations-janaf/janaf-{element}.yaml"
+        document = load_yaml(root / "data" / "literature" / "observations-v2" / relative)
+        raw = next(
+            row
+            for row in document["observations"]
+            if row.get("locator", {}).get("record") == table
+            and row.get("identity", {}).get("quantity", {}).get("value") == "delta_fG"
+            and requested[table]
+            <= {temperature for temperature, _ in row.get("value", {}).get("series", ())}
+        )
+        observation = observation_from_plain(raw)
+        observations.append(observation)
+        origins[observation.observation_id] = relative
+
+    context = _context(*observations, origins=origins)
+    loaded = load_pins(root / "data" / "battery" / "pins.yaml")
+    aliases = (
+        f"janaf::{table}:T={temperature}::{channel}::{quantity}"
+        for table in requested
+        for temperature in sorted(requested[table])
+        for channel, quantity in (
+            ("nasa_cea_9", "delta_fG_kJ_mol"),
+            ("ellingham", "delta_fG_kJ_per_mol_O2"),
+        )
+    )
+    pins = []
+    for alias in aliases:
+        pin = next(
+            record
+            for record in loaded["pin_band_records"]
+            if alias in record.aliases or record.old_key == alias
+        )
+        assert pin.aliases == (alias,)
+        assert pin.old_key == alias
+        pins.append(pin)
+
+    sidecar = tmp_path / "compilation-comparisons.jsonl"
+    assert write_compilation_comparisons_jsonl(context, sidecar) > 0
+    comparisons: list[dict[str, str]] = []
+    failures = pin_failures(
+        [],
+        pins,
+        compilation_comparisons=iter_compilation_comparisons_jsonl(sidecar),
+        comparisons=comparisons,
+    )
+
+    assert {row["key"] for row in comparisons} == {pin.key for pin in pins}
+    assert len(comparisons) == len(pins)
+    assert not any(
+        failure["reason"]
+        in {
+            "no_compilation_comparison_for_reference",
+            "ambiguous_compilation_comparison",
+        }
+        for failure in failures
+    )
+
+
+def test_real_compilation_pin_score_report_reason_before_sidecar() -> None:
+    from pathlib import Path
+
+    from simulator.battery.pins import load_pins, pin_failures
+
+    root = Path(__file__).resolve().parents[2]
+    target_alias = "janaf::Al-096:T=1100::nasa_cea_9::delta_fG_kJ_mol"
+    pin = next(
+        record
+        for record in load_pins(root / "data" / "battery" / "pins.yaml")[
+            "pin_band_records"
+        ]
+        if target_alias in record.aliases
+    )
+    failures = pin_failures([], (pin,))
+    report = render_score_report(
+        [],
+        context=_context(),
+        engines=(Engine.INTERNAL_ANALYTICAL,),
+        pin_failures=failures,
+        root=root,
+    )
+
+    row = next(line for line in report.splitlines() if line.startswith(f"| `{pin.key}` |"))
+    assert row.split("|")[2].strip() == "no_live_residual_for_reference"
+
+
 def test_compilation_comparison_sidecar_failure_preserves_target(tmp_path, monkeypatch) -> None:
     import pytest
 
