@@ -20,6 +20,7 @@ from simulator.chemistry.kernel.capabilities import CapabilityProfile
 from simulator.chemistry.kernel.dto import IntentRequest, IntentResult
 from simulator.chemistry.kernel.provider import ChemistryProvider
 from simulator.corpus_version import current_corpus_version
+from simulator.config import DEFAULT_ALPHAMELTS_MODEL
 from simulator.grind_preflight import GrindSourceGateError
 from simulator.melt_backend.base import (
     EquilibriumResult,
@@ -625,6 +626,42 @@ def _thermoengine_pt0_identity(model: str) -> tuple[dict, dict]:
     )
 
     return key, authority
+
+
+def _alphamelts_pt0_identity(model: str) -> tuple[dict, dict]:
+    from simulator.melt_backend.alphamelts import AlphaMELTSBackend
+
+    store = PT0DeterminismStore("capture")
+    sim = _build_pt0_sim(store)
+    backend = AlphaMELTSBackend(model_name=model)
+    backend._mode = "subprocess"
+    provider = AlphaMELTSProvider(backend=backend)
+    sim.backend = backend
+    sim._chem_registry.register(
+        provider,
+        [ChemistryIntent.SILICATE_EQUILIBRIUM],
+    )
+
+    key = store._equilibrium_key(sim)
+    authority = rrd._equilibrium_record_authority(
+        sim,
+        ChemistryIntent.SILICATE_EQUILIBRIUM,
+    )
+    return key, authority
+
+
+def test_blank_alphamelts_subprocess_model_currently_uses_provider_name():
+    key, authority = _alphamelts_pt0_identity("")
+
+    assert key["model"]["model"] == "alphamelts-diagnostic"
+    assert authority["provider"]["model"] == "alphamelts-diagnostic"
+
+
+def test_explicit_default_alphamelts_subprocess_model_is_in_pt0_identity():
+    key, authority = _alphamelts_pt0_identity(DEFAULT_ALPHAMELTS_MODEL)
+
+    assert key["model"]["model"] == DEFAULT_ALPHAMELTS_MODEL
+    assert authority["provider"]["model"] == DEFAULT_ALPHAMELTS_MODEL
 
 
 def test_blank_thermoengine_model_resolves_to_default_in_pt0_identity() -> None:

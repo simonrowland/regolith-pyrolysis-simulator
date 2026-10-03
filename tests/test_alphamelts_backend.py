@@ -354,6 +354,63 @@ def _melts_domain_composition() -> dict[str, float]:
     }
 
 
+def _captured_subprocess_calc_mode(
+    monkeypatch,
+    *,
+    model_name: str,
+    ambient_calc_mode: str | None = None,
+) -> str:
+    backend = AlphaMELTSBackend(model_name=model_name)
+    backend._mode = 'subprocess'
+    backend._binary_path = Path('/tmp/fake-alphamelts')
+    backend._engine_version = 'captured-test'
+    captured = {}
+
+    if ambient_calc_mode is None:
+        monkeypatch.delenv('ALPHAMELTS_CALC_MODE', raising=False)
+    else:
+        monkeypatch.setenv('ALPHAMELTS_CALC_MODE', ambient_calc_mode)
+
+    def fake_run(_args, **kwargs):
+        captured.update(kwargs['env'])
+        return types.SimpleNamespace(returncode=-signal.SIGABRT, stdout='', stderr='')
+
+    monkeypatch.setattr(
+        'simulator.melt_backend.alphamelts._run_alphamelts_subprocess',
+        fake_run,
+    )
+    backend._equilibrate_subprocess(
+        1400.0,
+        _melts_domain_composition(),
+        -9.0,
+        1.0,
+        total_input_kg=100.0,
+        run_mode=AlphaMELTSSubprocessRunMode.ISOTHERMAL,
+    )
+    return captured['ALPHAMELTS_CALC_MODE']
+
+
+@pytest.mark.parametrize(
+    ('model_name', 'ambient_calc_mode', 'expected_calc_mode'),
+    [
+        ('', None, 'MELTS'),
+        ('pMELTS', None, 'MELTS'),
+        ('', 'pMELTS', 'pMELTS'),
+    ],
+)
+def test_alphamelts_subprocess_currently_passes_model_and_ambient_mode(
+    monkeypatch,
+    model_name,
+    ambient_calc_mode,
+    expected_calc_mode,
+):
+    assert _captured_subprocess_calc_mode(
+        monkeypatch,
+        model_name=model_name,
+        ambient_calc_mode=ambient_calc_mode,
+    ) == expected_calc_mode
+
+
 def _system_main_fixture(
     *,
     temperature_C: float,
