@@ -23,6 +23,7 @@ from engines.alphamelts.thermoengine import (
     thermoengine_timeout_cause_from_exception,
 )
 from simulator.engine_pool import EngineWorkerTimeout
+from simulator.config import DEFAULT_ALPHAMELTS_MODEL
 from simulator.melt_backend.alphamelts import (
     VaporPressureActivityRefusal,
     _MELTSBackendSupport,
@@ -112,7 +113,7 @@ class ThermoEngineBackend(_MELTSBackendSupport, RealBackendAuthority):
 
         try:
             transport = ThermoEngineTransport(
-                model_name=(self._model or 'MELTSv1.0.2'),
+                model_name=(self._model or DEFAULT_ALPHAMELTS_MODEL),
                 activity_converter=activity_from_chem_potential,
                 equilibrate_timeout_s=float(raw_equilibrate_timeout_s),
                 health_timeout_s=self._health_timeout_s,

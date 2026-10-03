@@ -16,6 +16,7 @@ from simulator.yaml_cache import load_cached_safe_yaml
 
 
 DEFAULT_DATA_DIR = Path(__file__).resolve().parent.parent / "data"
+DEFAULT_ALPHAMELTS_MODEL = "MELTSv1.0.2"
 _FUNCTIONAL_DATA_DIGEST_CONFIGS = frozenset({"setpoints", "vapor_pressures"})
 _FUNCTIONAL_DATA_DIGEST_PREFIX = b"functional-data-yaml-v1\0"
 

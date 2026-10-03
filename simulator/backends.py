@@ -27,6 +27,7 @@ from simulator.backend_names import (  # noqa: F401 - re-exported for callers
 )
 from simulator.accounting.exceptions import AccountingError
 from simulator.accounting.formulas import resolve_species_formula
+from simulator.config import DEFAULT_ALPHAMELTS_MODEL
 from simulator.core import PyrolysisSimulator
 from simulator.grind_preflight import STAGE0_INPROCESS_SAFE_FEEDSTOCK_IDS
 from simulator.melt_backend.alphamelts import (
@@ -122,7 +123,6 @@ CACHE_TIER_CEILINGS = (
     "cached_exact",
 )
 DEFAULT_CACHE_TIER_CEILING = "cached_interpolated"
-DEFAULT_ALPHAMELTS_MODEL = "MELTSv1.0.2"
 DEFAULT_ALPHAMELTS_MODE = "subprocess"
 BACKEND_STATUS_OK = "ok"
 BACKEND_STATUS_UNAVAILABLE = "unavailable"
