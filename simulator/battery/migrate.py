@@ -11449,15 +11449,18 @@ class Migrator:
         derived_from = derived_parents or None
         source_derivation = source_derivation_from_source(obs, values)
         if source_derivation is not None:
-            source_derivation = replace(
-                source_derivation,
-                inputs=tuple(
-                    f"{source_id}::{item}" if item in local_ids else item
-                    for item in source_derivation.inputs
-                ),
+            derivation_parents, derivation_prose = lineage_parents_from_source(
+                {"derived_from": source_derivation.inputs}, {}, source_id, local_ids
+            )
+            derived_prose = tuple(dict.fromkeys((*derived_prose, *derivation_prose)))
+            source_derivation = (
+                replace(source_derivation, inputs=derivation_parents)
+                if derivation_parents
+                else None
             )
             if not derived_prose:
-                self._author_derivations[obs_id] = source_derivation
+                if source_derivation is not None:
+                    self._author_derivations[obs_id] = source_derivation
         conditional_method = str(method_class) if method_class else str(regime or "").strip()
         if (
             conditional_method not in _CONDITIONAL_REDUCED_METHODS
