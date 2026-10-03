@@ -788,11 +788,18 @@ def _missing_apparatus_fact(
     check: object,
     *,
     allow_calibration: bool,
+    allow_unknown_method: bool,
 ) -> str | None:
     name = str(getattr(check, "name", ""))
     detail = getattr(check, "detail", {})
     if not isinstance(detail, Mapping):
         detail = {}
+    if (
+        name == "method"
+        and not getattr(check, "passed", True)
+        and allow_unknown_method
+    ):
+        return "method_unknown"
     if name == "kems_calibration" and allow_calibration:
         return "calibration"
     if name == "background_pressure_stated" and not getattr(check, "passed", True):
@@ -839,11 +846,6 @@ def _unverified_apparatus_notices(
     quantity = quantity_token(identity)
     if quantity is None or point_magnitude(reference.value) is None:
         return ()
-    if (
-        not experiment.method.is_value
-        or experiment.method.value is not MethodToken.KNUDSEN_EFFUSION
-    ):
-        return ()
     if reference.admission.status is not AdmissionStatus.ADMITTED:
         return ()
     source_is_kems = bool(reference.source_id and reference.source_id.startswith("kems-"))
@@ -866,6 +868,25 @@ def _unverified_apparatus_notices(
             "derived",
         }
     )
+    reference_state = identity.reference_state
+    typed_condensed_reference = (
+        reference_state is not None
+        and reference_state.is_value
+        and isinstance(reference_state.value, StandardState)
+        and phase_token(reference_state.value.endmember) in CONDENSED_PHASES
+    )
+    unknown_method_activity = (
+        experiment.method.is_unknown
+        and gates.reason is RefusalReason.METHOD_UNKNOWN
+        and quantity is Quantity.ACTIVITY
+        and author_reported_activity
+        and typed_condensed_reference
+    )
+    if not unknown_method_activity and (
+        not experiment.method.is_value
+        or experiment.method.value is not MethodToken.KNUDSEN_EFFUSION
+    ):
+        return ()
     comparison_activity = (
         quantity in {Quantity.ACTIVITY, Quantity.ACTIVITY_COEFFICIENT}
         and author_reported_activity
@@ -891,6 +912,7 @@ def _unverified_apparatus_notices(
     if not (
         measured_pressure
         or comparison_activity
+        or unknown_method_activity
         or calibration_flagged_partial_pressure
         or calibration_flagged_activity
     ):
@@ -921,6 +943,7 @@ def _unverified_apparatus_notices(
         fact = _missing_apparatus_fact(
             check,
             allow_calibration=allow_calibration,
+            allow_unknown_method=unknown_method_activity,
         )
         if fact is None:
             return ()
@@ -940,7 +963,12 @@ def _unverified_apparatus_notices(
                     else ""
                 )
                 if fact == "calibration_not_grounded"
-                else f"apparatus_unverified:{fact}"
+                else (
+                    "method_unknown: published activity has a typed condensed "
+                    "reference but its experiment method is not stated"
+                    if fact == "method_unknown"
+                    else f"apparatus_unverified:{fact}"
+                )
             ),
             origin=reference.observation_id,
         )
