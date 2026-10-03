@@ -363,6 +363,33 @@ def test_real_janaf_rows_join_real_compilation_pins(tmp_path) -> None:
         }
         for failure in failures
     )
+    target_alias = "janaf::Al-096:T=1100::nasa_cea_9::delta_fG_kJ_mol"
+    target_pin = next(pin for pin in pins if target_alias in pin.aliases)
+    legacy_failure = pin_failures([], (target_pin,))
+    legacy_report = render_score_report(
+        [],
+        context=context,
+        engines=(Engine.INTERNAL_ANALYTICAL,),
+        pin_failures=legacy_failure,
+        root=root,
+    )
+    legacy_row = next(
+        line
+        for line in legacy_report.splitlines()
+        if line.startswith(f"| `{target_pin.key}` |")
+    )
+    assert legacy_row.split("|")[2].strip() == "no_live_residual_for_reference"
+    comparison_report = render_score_report(
+        [],
+        context=context,
+        engines=(Engine.INTERNAL_ANALYTICAL,),
+        pin_failures=failures,
+        root=root,
+    )
+    assert not any(
+        line.startswith(f"| `{target_pin.key}` |")
+        for line in comparison_report.splitlines()
+    )
 
 
 def test_real_compilation_pin_score_report_reason_before_sidecar() -> None:
