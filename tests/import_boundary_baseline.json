@@ -1,7 +1,5 @@
-[
-  {"source": "engines.alphamelts.provider", "target": "simulator.alphamelts_reference_pressure"},
-  {"source": "engines.alphamelts.thermoengine", "target": "simulator.engine_local_config"},
-  {"source": "engines.alphamelts.thermoengine", "target": "simulator.engine_pool"},
+{
+  "edges": [
   {"source": "engines.builtin._common", "target": "simulator.state"},
   {"source": "engines.builtin.condensation_route", "target": "simulator.accounting.lots"},
   {"source": "engines.builtin.condensation_route", "target": "simulator.condensation"},
@@ -14,7 +12,6 @@
   {"source": "engines.builtin.evaporation_flux", "target": "simulator.state"},
   {"source": "engines.builtin.melt_effect_adjustment", "target": "simulator.chemistry.kernel"},
   {"source": "engines.builtin.melt_effect_adjustment", "target": "simulator.state"},
-  {"source": "engines.builtin.metal_phase_stratification", "target": "simulator.material_densities"},
   {"source": "engines.builtin.metal_phase_stratification", "target": "simulator.metal_stratification"},
   {"source": "engines.builtin.metallothermic_step", "target": "simulator.state"},
   {"source": "engines.builtin.overhead_bleed", "target": "simulator.capacity_coupling"},
@@ -22,7 +19,6 @@
   {"source": "engines.builtin.overhead_gas_equilibrium", "target": "simulator.state"},
   {"source": "engines.builtin.vapor_pressure", "target": "simulator.state"},
   {"source": "engines.magemin.domain", "target": "simulator.state"},
-  {"source": "engines.vaporock.provider", "target": "simulator.chemistry.kernel.errors"},
   {"source": "simulator.accounting.ledger_api", "target": "simulator.three_product_report"},
   {"source": "simulator.battery.generators.janaf", "target": "tools.harvest_janaf_compilation"},
   {"source": "simulator.chemistry.langmuir_knudsen", "target": "simulator.condensation"},
@@ -33,17 +29,9 @@
   {"source": "simulator.config", "target": "simulator.vapour_rail.catalog"},
   {"source": "simulator.diagnostic_helpers.binary_pot_scoring", "target": "scripts.calibration_battery"},
   {"source": "simulator.fe_redox", "target": "simulator.state"},
-  {"source": "simulator.melt_backend.alphamelts", "target": "simulator.engine_local_config"},
-  {"source": "simulator.melt_backend.alphamelts", "target": "simulator.engine_pool"},
-  {"source": "simulator.melt_backend.engine_worker", "target": "simulator.engine_pool"},
-  {"source": "simulator.melt_backend.magemin", "target": "simulator.engine_local_config"},
-  {"source": "simulator.melt_backend.magemin", "target": "simulator.engine_pool"},
   {"source": "simulator.melt_backend.magemin", "target": "simulator.state"},
-  {"source": "simulator.melt_backend.openimcc_bridge", "target": "simulator.composition_projection"},
   {"source": "simulator.melt_backend.openimcc_bridge", "target": "simulator.state"},
   {"source": "simulator.melt_backend.pure_phase_janaf_score", "target": "simulator.battery.polymorph_dictionary"},
-  {"source": "simulator.melt_backend.thermoengine", "target": "simulator.engine_pool"},
-  {"source": "simulator.melt_backend.vaporock", "target": "simulator.engine_pool"},
   {"source": "simulator.melt_backend.vaporock", "target": "simulator.state"},
   {"source": "simulator.mre_reproduction", "target": "simulator.diagnostic_helpers.reproduction_compare"},
   {"source": "simulator.optimize.evaluate", "target": "simulator.run_executor"},
@@ -65,4 +53,15 @@
   {"source": "simulator.vapour_rail.request", "target": "simulator.vapour_rail.calibration"},
   {"source": "simulator.vapour_rail.request", "target": "simulator.vapour_rail.melt_activity_resolver"},
   {"source": "simulator.vapour_rail.u0_manifest", "target": "simulator.state"}
-]
+  ],
+  "dynamic_import_sites": [
+    "scripts/vaporock_antoine_shadow_matrix.py:package_or_module_version",
+    "simulator/core.py:PyrolysisSimulator._build_chemistry_kernel",
+    "simulator/melt_backend/installer.py:EngineInstaller._check_chemapp",
+    "simulator/melt_backend/vaporock.py:_bootstrap_vaporock_worker",
+    "simulator/melt_backend/vaporock.py:VapoRockBackend._import_vaporock",
+    "simulator/optimize/__init__.py:__getattr__",
+    "simulator/optimize/evaluate.py:_vapor_pressure_provider_code_fingerprint",
+    "simulator/optimize/strategy/__init__.py:__getattr__"
+  ]
+}
