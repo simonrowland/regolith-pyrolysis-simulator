@@ -928,10 +928,16 @@ def test_antoine_fallback_mbar_is_not_scaled_as_bar() -> None:
         return float(points[0]["P_Pa"])
 
     # log10(P) = 5. Substring "bar" inside "mbar" used to multiply by 1e5.
-    assert pressure_pa("log10(P_mbar) = A - B/(T+C)") == pytest.approx(1.0e7)
-    assert pressure_pa("mbar") == pytest.approx(1.0e7)
-    assert pressure_pa("log10(P/bar) = A - B/(T+C)") == pytest.approx(1.0e10)
-    assert pressure_pa("log10(P_bar) = A - B/(T+C)") == pytest.approx(1.0e10)
+    assert pressure_pa("log10(P_mbar) = A - B/(T+C)").hex() == (
+        "0x1.312d000000000p+23"
+    )
+    assert pressure_pa("mbar").hex() == "0x1.312d000000000p+23"
+    assert pressure_pa("log10(P/bar) = A - B/(T+C)").hex() == (
+        "0x1.2a05f20000000p+33"
+    )
+    assert pressure_pa("log10(P_bar) = A - B/(T+C)").hex() == (
+        "0x1.2a05f20000000p+33"
+    )
 
 
 def test_point_level_drops_emit_gap_records_not_silent() -> None:

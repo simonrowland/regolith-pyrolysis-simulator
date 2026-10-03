@@ -6,6 +6,7 @@ import math
 import warnings
 from typing import Any, Dict, Mapping
 
+from engines.antoine import _antoine_log10_pressure
 import simulator.mre_ladder as mre_ladder
 from simulator.account_ids import (
     C7_AL_CREDIT_ACCOUNT,
@@ -3585,10 +3586,11 @@ class ExtractionMixin:
                 )
         if antoine:
             try:
-                p_sat_pa = 10.0 ** (
-                    float(antoine.get('A', 0.0))
-                    - float(antoine.get('B', 0.0))
-                    / (hold_temp_K + float(antoine.get('C', 0.0)))
+                p_sat_pa = 10.0 ** _antoine_log10_pressure(
+                    float(antoine.get('A', 0.0)),
+                    float(antoine.get('B', 0.0)),
+                    float(antoine.get('C', 0.0)),
+                    hold_temp_K,
                 )
             except (OverflowError, TypeError, ValueError, ZeroDivisionError):
                 p_sat_pa = 0.0

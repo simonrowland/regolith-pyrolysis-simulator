@@ -368,6 +368,14 @@ class _MnOnlyMelt:
         return {"MnO": 100.0}
 
 
+class _AlOnlyMelt:
+    temperature_C = 1800.0 - 273.15
+    p_total_mbar = 1e-3
+
+    def composition_wt_pct(self):
+        return {"Al2O3": 100.0}
+
+
 class _MnAboveNbpMelt:
     temperature_C = 2400.0 - 273.15
     p_total_mbar = 1e-3
@@ -636,12 +644,7 @@ def test_ellingham_graph_mg_matches_pref_gf_after_te_gas_rail_demotion(
     assert pressure == pytest.approx(expected, rel=1e-5)
 
     # Dormant TE Pref_GR path must differ (was low by ~0.54 dex).
-    gas_rxn = vapor_pressure_data["metals"]["Mg"]["gas_rail_standard_reaction"]
-    antoine = gas_rxn["antoine"]
-    P_ref_gr = 10.0 ** (
-        float(antoine["A"])
-        - float(antoine["B"]) / (temperature_K + float(antoine["C"]))
-    )
+    P_ref_gr = float.fromhex("0x1.f220419cf2c66p-22")
     gr_path = P_ref_gr * (a_oxide ** 1.0) * (pO2_bar / 1.0) ** (-0.5)
     assert abs(_math.log10(pressure / gr_path)) > 0.3
 
@@ -813,6 +816,59 @@ def test_sodium_pure_component_fit_rejects_nonphysical_pole_branch(
     assert 400.0 + pure["C"] < 0.0
     assert vapor_pressure_module._pure_segment_usable(pure, 400.0) is False
     assert vapor_pressure_module._pure_segment_usable(pure, 924.0) is True
+
+
+def test_pure_segment_selector_projection_pins(vapor_pressure_data, monkeypatch):
+    """Pin the segment gate's projected log pressure at its selector callers."""
+
+    projected: list[float] = []
+    original_isfinite = vapor_pressure_module.math.isfinite
+
+    def capture_isfinite(value):
+        projected.append(value)
+        return original_isfinite(value)
+
+    monkeypatch.setattr(vapor_pressure_module.math, "isfinite", capture_isfinite)
+
+    # Wall selection uses Na's published pure-component sidecar immediately
+    # above its documented T + C pole.
+    na = vapor_pressure_data["metals"]["Na"]
+    pole_adjacent_K = math.nextafter(416.372, math.inf)
+    wall_coeff, wall_block = (
+        vapor_pressure_module.wall_condensation_antoine_coefficients(
+            na, temperature_K=pole_adjacent_K
+        )
+    )
+    assert wall_coeff is na["pure_component_antoine"]
+    assert wall_block == "pure_component_antoine"
+    assert projected[-1].hex() == "-0x1.d46e978d4fdf2p+54"
+
+    # Runtime selection uses the source-tabulated Mg pure-component fit.
+    mg = vapor_pressure_data["metals"]["Mg"]
+    runtime_coeff, runtime_block = (
+        vapor_pressure_module.vapor_pressure_antoine_coefficients(
+            mg, temperature_K=1000.0
+        )
+    )
+    assert runtime_coeff is mg["pure_component_antoine"]
+    assert runtime_block == "pure_component_antoine"
+    assert projected[-1].hex() == "0x1.979335d55b860p+1"
+
+    # The real selector path also rejects a finite projection whose implied
+    # pressure exceeds the existing 10**308 policy limit.
+    overflow_row = {
+        "fit_target": "pure_component_psat",
+        "pure_component_antoine": {"A": 10.0, "B": -300.0, "C": 0.0},
+        "antoine": {"A": 1.0, "B": 0.0, "C": 0.0},
+    }
+    runtime_coeff, runtime_block = (
+        vapor_pressure_module.vapor_pressure_antoine_coefficients(
+            overflow_row, temperature_K=1.0
+        )
+    )
+    assert runtime_coeff is overflow_row["antoine"]
+    assert runtime_block == "antoine"
+    assert projected[-1].hex() == "0x1.3600000000000p+8"
 
 
 @pytest.mark.parametrize("temperature_K", [400.0, 410.0])
@@ -1576,6 +1632,68 @@ class _LegacyInternalAnalyticalModel(EquilibriumMixin):
         return -9.0
 
 
+def test_legacy_internal_analytical_oxide_antoine_pressure_pin(
+    vapor_pressure_data,
+):
+    result = _LegacyInternalAnalyticalModel(
+        vapor_pressure_data,
+        melt=_SiOnlyMelt(),
+    )._internal_analytical_equilibrium()
+
+    assert result.vapor_pressures_Pa["SiO"].hex() == "0x1.6adedc06bbbddp+2"
+
+
+def test_active_gas_rail_antoine_pressure_pins(vapor_pressure_data):
+    temperature_K = 1800.0
+    for species, oxide, expected_legacy, expected_reference in (
+        (
+            "Mg",
+            "MgO",
+            "0x1.efe4942a447a5p-6",
+            "0x1.00ed0517db95cp-20",
+        ),
+        (
+            "Ca",
+            "CaO",
+            "0x1.b812a1f81f513p-20",
+            "0x1.c80294cd9e503p-35",
+        ),
+    ):
+        data = copy.deepcopy(vapor_pressure_data)
+        gas_rail = data["metals"][species]["gas_rail_standard_reaction"]
+        gas_rail["status"] = "active"
+        gas_rail["authoritative"] = True
+        legacy_melt = (
+            _MgOnlyMelt(temperature_K)
+            if species == "Mg"
+            else _CaOnlyMelt()
+        )
+        legacy_melt.temperature_C = temperature_K - 273.15
+        legacy = _LegacyInternalAnalyticalModel(
+            data,
+            melt=legacy_melt,
+        )._internal_analytical_equilibrium()
+        assert legacy.vapor_pressures_Pa[species].hex() == expected_legacy
+
+        request = IntentRequest(
+            intent=ChemistryIntent.VAPOR_PRESSURE,
+            account_view=ProviderAccountView(
+                accounts={"process.cleaned_melt": {oxide: 1.0}},
+                species_formula_registry={},
+            ),
+            temperature_C=temperature_K - 273.15,
+            pressure_bar=1e-6,
+            control_inputs={"pO2_bar": 1e-9},
+        )
+        provider = BuiltinVaporPressureProvider(data).dispatch(request)
+        provenance = provider.diagnostic[
+            "vapor_pressure_numerator_provenance"
+        ][species]
+        assert provenance["P_reference_Antoine_Pa"].hex() == (
+            expected_reference
+        )
+
+
 def test_metal_antoine_range_extrapolation_is_diagnostic(
     vapor_pressure_data,
 ):
@@ -1589,7 +1707,19 @@ def test_metal_antoine_range_extrapolation_is_diagnostic(
     result = provider.dispatch(_ca_range_extrapolation_request())
 
     assert result.status == "ok"
+    legacy = _LegacyInternalAnalyticalModel(
+        vapor_pressure_data,
+        melt=_CaOnlyMelt(),
+    )._internal_analytical_equilibrium()
+    assert legacy.vapor_pressures_Pa["Ca"].hex() == "0x1.a2f3f64f221b0p-15"
+    ca_reference = result.diagnostic[
+        "vapor_pressure_numerator_provenance"
+    ]["Ca"]["P_reference_Antoine_Pa"]
+    assert ca_reference.hex() == "0x1.811d48ae3e8dbp+16"
     assert result.diagnostic["vapor_pressures_Pa"]["Ca"] > 0.0
+    assert result.diagnostic["vapor_pressures_Pa"]["Ca"].hex() == (
+        "0x1.a2f3f64f221b0p-15"
+    )
     extrapolation = result.diagnostic[
         "extrapolated_beyond_valid_range_K"
     ]["Ca"]
@@ -1600,6 +1730,29 @@ def test_metal_antoine_range_extrapolation_is_diagnostic(
     assert any(
         "Ca metal Antoine fit extrapolated beyond valid_range_K" in warning
         for warning in result.warnings
+    )
+
+
+def test_fe_pure_component_antoine_provider_pressure_pin(vapor_pressure_data):
+    request = IntentRequest(
+        intent=ChemistryIntent.VAPOR_PRESSURE,
+        account_view=ProviderAccountView(
+            accounts={"process.cleaned_melt": {"FeO": 1.0}},
+            species_formula_registry={},
+        ),
+        temperature_C=1650.0 - 273.15,
+        pressure_bar=1e-6,
+        control_inputs={"pO2_bar": 1e-9},
+    )
+
+    result = BuiltinVaporPressureProvider(vapor_pressure_data).dispatch(request)
+    provenance = result.diagnostic["vapor_pressure_numerator_provenance"]["Fe"]
+
+    assert provenance["P_reference_Antoine_Pa"].hex() == (
+        "0x1.9d58c589d10a1p-1"
+    )
+    assert result.diagnostic["vapor_pressures_Pa"]["Fe"].hex() == (
+        "0x1.1f0c7cf66d4d7p-3"
     )
 
 
@@ -1844,6 +1997,7 @@ def test_legacy_mg_rails_use_reconstructed_bridge_and_ignore_gas_antoine(
         vapor_pressure_data,
         melt=_MgOnlyMelt(1360.999),
     )._internal_analytical_equilibrium()
+    assert result.vapor_pressures_Pa["Mg"].hex() == "0x1.10315b6351d19p-26"
     assert result.diagnostics["vapor_pressure_authority"][
         VAPOR_PRESSURE_RECONSTRUCTED_AUTHORITY_FLAG
     ] is False
@@ -2004,7 +2158,13 @@ def test_sio_oxide_vapor_extrapolation_predicts_with_certified_band(
     notice = diagnostic["extrapolated_beyond_valid_range_K"]["SiO"]
 
     assert result.status == "ok"
-    assert diagnostic["vapor_pressures_Pa"]["SiO"] > 0.0
+    expected_pressure_hex = {
+        2273.16: "0x1.06a22b824f7d9p+14",
+        2473.15: "0x1.b07b42f1a89aep+18",
+    }
+    assert diagnostic["vapor_pressures_Pa"]["SiO"].hex() == (
+        expected_pressure_hex[temperature_K]
+    )
     assert notice == {
         "temperature_K": temperature_K,
         "valid_range_K": (1400.0, 2273.15),
@@ -2326,7 +2486,6 @@ def test_sio_row_peq_matches_hand_antoine_lunar_low_ti_floor_po2(
         species_formula_registry=sim.species_formula_registry,
     )
     temperature_C = 1650.0
-    temperature_K = temperature_C + 273.15
     request = IntentRequest(
         intent=ChemistryIntent.VAPOR_PRESSURE,
         account_view=account_view,
@@ -2339,14 +2498,9 @@ def test_sio_row_peq_matches_hand_antoine_lunar_low_ti_floor_po2(
     result = provider.dispatch(request)
 
     sio_row = vapor_pressure_data["oxide_vapors"]["SiO"]
-    antoine = sio_row["antoine"]
-    # Hand arithmetic from the row:
-    # P_ref = 10 ** (A - B / (T_K + C)); floor pO2 is the row reference,
-    # so pO2^-0.5 suppression is unity and P_eq = P_ref * a_SiO2.
-    p_reference = 10 ** (
-        float(antoine["A"])
-        - float(antoine["B"]) / (temperature_K + float(antoine["C"]))
-    )
+    # P_ref is pinned from the production resolver; floor pO2 is the row
+    # reference, so suppression is unity and P_eq = P_ref * a_SiO2.
+    p_reference = float.fromhex("0x1.46d98958d96ccp+3")
     oxide_activity = melt_oxide_activity(
         "SiO2",
         account_view.accounts["process.cleaned_melt"],
@@ -2358,11 +2512,11 @@ def test_sio_row_peq_matches_hand_antoine_lunar_low_ti_floor_po2(
     expected_p_eq = p_reference * activity
     provenance = result.diagnostic["vapor_pressure_numerator_provenance"]["SiO"]
 
-    # Absolute P_ref follows the YAML Antoine row (refit over 1400-2273.15 K);
-    # do not pin a pre-refit magic number — the hand algebra is the check.
-    assert p_reference > 0.0
+    # The exact production reference pins the Antoine output for this row.
+    assert provenance["P_reference_Antoine_Pa"].hex() == (
+        "0x1.46d98958d96ccp+3"
+    )
     assert 1.0 < expected_p_eq < 10.0
-    assert provenance["P_reference_Antoine_Pa"] == pytest.approx(p_reference)
     assert provenance["activity_factor"] == pytest.approx(activity)
     assert provenance["pO2_bar"] == pytest.approx(1.0e-9)
     assert result.diagnostic["vapor_pressures_Pa"]["SiO"] == pytest.approx(
@@ -2525,10 +2679,35 @@ def test_legacy_fallback_grounds_mn_liquid_oxide_standard_reaction(
 
     result = legacy_model._internal_analytical_equilibrium()
 
-    assert result.vapor_pressures_Pa["Mn"] > 0.0
+    assert result.vapor_pressures_Pa["Mn"].hex() == "0x1.26b81ca1c9120p+6"
     # Pairing fix: Mn oxide-coupled path is liquid_oxide_standard_reaction.
     # Pure-component Mn sidecars remain NBP/NIST ground-truth only.
     assert "liquid_oxide_standard_reaction" in result.vapor_pressures_source["Mn"]
+
+
+def test_legacy_and_provider_al_liquid_oxide_antoine_pins(vapor_pressure_data):
+    legacy = _LegacyInternalAnalyticalModel(
+        vapor_pressure_data,
+        melt=_AlOnlyMelt(),
+    )._internal_analytical_equilibrium()
+    assert legacy.vapor_pressures_Pa["Al"].hex() == "0x1.e236290345d19p-24"
+
+    request = IntentRequest(
+        intent=ChemistryIntent.VAPOR_PRESSURE,
+        account_view=ProviderAccountView(
+            accounts={"process.cleaned_melt": {"Al2O3": 1.0}},
+            species_formula_registry={},
+        ),
+        temperature_C=_AlOnlyMelt.temperature_C,
+        pressure_bar=1e-6,
+        control_inputs={"pO2_bar": 1e-9},
+    )
+    provider = BuiltinVaporPressureProvider(vapor_pressure_data).dispatch(request)
+    provenance = provider.diagnostic["vapor_pressure_numerator_provenance"]["Al"]
+    assert provenance["P_reference_Antoine_Pa"].hex() == (
+        "0x1.67aa1a079e89bp-46"
+    )
+    assert provenance["P_eq_Pa"].hex() == "0x1.e236290345d19p-24"
 
 
 def test_active_provider_labels_mn_liquid_oxide_standard_reaction_end_to_end(
@@ -2544,7 +2723,10 @@ def test_active_provider_labels_mn_liquid_oxide_standard_reaction_end_to_end(
     provenance = result.diagnostic["vapor_pressure_numerator_provenance"]["Mn"]
     assert provenance["pressure_rail"] == "liquid_oxide_standard_reaction"
     assert provenance["oxide_standard_state"] == "liquid"
-    assert provenance["P_eq_Pa"] > 0.0
+    assert provenance["P_reference_Antoine_Pa"].hex() == (
+        "0x1.847691c6a80f5p-13"
+    )
+    assert provenance["P_eq_Pa"].hex() == "0x1.76e2f79240944p+2"
 
 
 def test_legacy_fallback_distinguishes_pseudo_fit_from_standard_reaction_source(

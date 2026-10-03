@@ -56,6 +56,7 @@ if TYPE_CHECKING:
         GasChannelPotential,
     )
 
+from engines.antoine import _antoine_log10_pressure
 from engines.builtin._common import (
     composition_wt_pct_from_account_view,
     diagnostic_control_audit,
@@ -1000,8 +1001,11 @@ def _reconstructed_anchor_pressure_Pa(
         antoine = (gas_rail or {}).get("antoine", {}) or {}
         temperature_K = float(anchor["temperature_K"])
         try:
-            log10_pressure_Pa = float(antoine["A"]) - float(antoine["B"]) / (
-                temperature_K + float(antoine.get("C", 0.0) or 0.0)
+            log10_pressure_Pa = _antoine_log10_pressure(
+                float(antoine["A"]),
+                float(antoine["B"]),
+                float(antoine.get("C", 0.0) or 0.0),
+                temperature_K,
             )
         except (KeyError, TypeError, ValueError, ZeroDivisionError) as exc:
             raise VaporPressureComputationError(
@@ -1266,8 +1270,11 @@ def _pure_segment_usable(
         # T + C > 0 branch; crossing its pole is not a physical continuation.
         if denominator <= 0.0:
             return False
-        projected_log_pressure = float(selected.get("A", 0.0)) - (
-            float(selected.get("B", 0.0)) / denominator
+        projected_log_pressure = _antoine_log10_pressure(
+            float(selected.get("A", 0.0)),
+            float(selected.get("B", 0.0)),
+            float(selected.get("C", 0.0)),
+            float(temperature_K),
         )
     except (TypeError, ValueError, ZeroDivisionError):
         return False
@@ -2087,7 +2094,7 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                     if compiled_reference_Pa is not None:
                         P_reference_Pa = compiled_reference_Pa
                     else:
-                        log_P = A - B / (T_K + C)
+                        log_P = _antoine_log10_pressure(A, B, C, T_K)
                         P_reference_Pa = _pow10_pressure_or_raise(
                             log_P,
                             species=species,
@@ -2243,7 +2250,7 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                             f"extrapolated beyond valid_range_K "
                             f"[{vlo:g}, {vhi:g}] at {T_K:.3f} K"
                         )
-                log_P_liq = A_l - B_l / (T_K + C_l)
+                log_P_liq = _antoine_log10_pressure(A_l, B_l, C_l, T_K)
                 P_reference_Pa = _pow10_pressure_or_raise(
                     log_P_liq,
                     species=species,
@@ -2371,7 +2378,7 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                                 f"extrapolated beyond valid_range_K "
                                 f"[{vlo:g}, {vhi:g}] at {T_K:.3f} K"
                             )
-                    log_P_gas = A_g - B_g / (T_K + C_g)
+                    log_P_gas = _antoine_log10_pressure(A_g, B_g, C_g, T_K)
                     P_reference_Pa = _pow10_pressure_or_raise(
                         log_P_gas,
                         species=species,
@@ -2979,7 +2986,7 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                 # B and T_K+C carry K, so the exponent is dimensionless.
                 # At the certified edge the same expression is continuous.
                 # This preserves the trend, not a certified error bound.
-                log_P = A - B / (T_K + C)
+                log_P = _antoine_log10_pressure(A, B, C, T_K)
                 P_reference_Pa = _pow10_pressure_or_raise(
                     log_P,
                     species=name,

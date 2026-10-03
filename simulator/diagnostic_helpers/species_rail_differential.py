@@ -24,6 +24,7 @@ from typing import Any, Iterator, Mapping, Sequence
 
 import yaml
 
+from engines.antoine import _antoine_log10_pressure
 from simulator.chemistry.ellingham_thermo import (
     ELLINGHAM_FIT_RANGE_K,
     ELLINGHAM_FIT_SEGMENTS,
@@ -1096,7 +1097,7 @@ def _pure_component_antoine_pa(row: Mapping[str, Any], T_K: float) -> float | No
     denom = float(T_K) + C
     if denom <= 0.0:
         return None
-    log10_pa = A - B / denom
+    log10_pa = _antoine_log10_pressure(A, B, C, T_K)
     if not math.isfinite(log10_pa) or log10_pa > 308.0:
         return None
     pressure = 10.0 ** log10_pa

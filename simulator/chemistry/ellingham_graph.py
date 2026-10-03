@@ -2,9 +2,10 @@
 
 Diagnostic module for reading the Ellingham diagram at a temperature and pO2
 operating point. Reuses the canonical JANAF linear ΔG(T) fits from
-:mod:`simulator.chemistry.ellingham_thermo` and the Antoine + pO2 dissociation
-lever from :mod:`engines.builtin.vapor_pressure` without mutating ledger,
-vapor authority, or equilibrium paths.
+:mod:`simulator.chemistry.ellingham_thermo`, Antoine arithmetic from
+:mod:`engines.antoine`, and the pO2 dissociation lever from
+:mod:`engines.builtin.vapor_pressure` without mutating ledger, vapor authority,
+or equilibrium paths.
 """
 
 from __future__ import annotations
@@ -15,6 +16,7 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
+from engines.antoine import _antoine_log10_pressure
 from simulator.chemistry.ellingham_thermo import (
     ELLINGHAM_METAL_PHASE_GAS,
     ELLINGHAM_THERMO,
@@ -211,7 +213,7 @@ def _antoine_reference_pressure_Pa(
     if not (A > 0) or not math.isfinite(T_K):
         return None
     # Category (2): T may be outside the historical comfort band; still evaluate.
-    log_P = A - B / (T_K + C)
+    log_P = _antoine_log10_pressure(A, B, C, T_K)
     if not math.isfinite(log_P) or log_P > 308.0:
         return None
     return 10.0 ** log_P

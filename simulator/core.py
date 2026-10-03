@@ -56,6 +56,7 @@ from pathlib import Path
 from types import MappingProxyType
 from typing import Any, Dict, Literal, Mapping, Optional, Tuple
 
+from engines.antoine import _antoine_log10_pressure
 
 class RefusalStateSnapshotError(TypeError):
     """Typed refusal when rollback state contains an unsupported proxy graph."""
@@ -7344,7 +7345,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 'pure_component_antoine coefficients'
             )
         P_reference_Pa = _pow10_pressure_or_raise(
-            A - B / (T_K + C),
+            _antoine_log10_pressure(A, B, C, T_K),
             species='Fe',
             field='P_reference_Pa',
         )
