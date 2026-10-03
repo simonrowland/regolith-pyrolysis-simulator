@@ -206,8 +206,8 @@ observations:
       reported_status: not_reported
   evidence:
     class:
-      tag: unknown
-      reason: unmapped method_class measured_tabulated
+      tag: value
+      value: measured_tabulated
     original_method_class: measured_tabulated
   admission:
     status: pending
@@ -246,9 +246,10 @@ observations:
       reported_status: not_reported
   evidence:
     class:
-      tag: unknown
-      reason: unmapped method_class author_estimate
+      tag: value
+      value: author_estimate
     original_method_class: author_estimate
+    model: author_estimate
   admission:
     status: pending
     reason: no observation admission_status mapped from source

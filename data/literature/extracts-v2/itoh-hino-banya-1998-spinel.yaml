@@ -33,9 +33,10 @@ observations:
       note: Explicit zero assumption; not a measured zero and no uncertainty printed.
   evidence:
     class:
-      tag: unknown
-      reason: unmapped method_class author_estimate
+      tag: value
+      value: author_estimate
     original_method_class: author_estimate
+    model: author_estimate
   admission:
     status: pending
     reason: no observation admission_status mapped from source
@@ -285,8 +286,8 @@ observations:
       note: No numerical uncertainty printed for the attributed values.
   evidence:
     class:
-      tag: unknown
-      reason: unmapped method_class quoted_attributed
+      tag: value
+      value: quoted_attributed
     original_method_class: quoted_attributed
   admission:
     status: pending
@@ -340,9 +341,10 @@ observations:
       note: These are explicit assumptions for calculated phase boundaries, not measurements; no uncertainty printed.
   evidence:
     class:
-      tag: unknown
-      reason: unmapped method_class author_estimate
+      tag: value
+      value: author_estimate
     original_method_class: author_estimate
+    model: author_estimate
   admission:
     status: pending
     reason: no observation admission_status mapped from source

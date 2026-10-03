@@ -194,9 +194,11 @@ observations:
     kind: none
   evidence:
     class:
-      tag: unknown
-      reason: unmapped method_class author_estimate
+      tag: value
+      value: author_estimate
     original_method_class: author_estimate
+    attribution: We assumed here that alpha is approximately 0.1 in the HBD regimes too.
+    model: author_estimate
   admission:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
@@ -369,9 +371,11 @@ observations:
     kind: none
   evidence:
     class:
-      tag: unknown
-      reason: unmapped method_class quoted_attributed
+      tag: value
+      value: quoted_attributed
     original_method_class: quoted_attributed
+    attribution: alpha approximately 0.1 irrespective of T; alpha = 0.03-0.2 at T = 1200-1800 degrees C and pH2 <= 8.6 x 10^-5
+      bar.
   admission:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'

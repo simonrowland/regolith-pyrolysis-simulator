@@ -980,9 +980,10 @@ observations:
       note: 'Authors: considered to be about 1e-9 atm; no calibration envelope.'
   evidence:
     class:
-      tag: unknown
-      reason: unmapped method_class author_estimate
+      tag: value
+      value: author_estimate
     original_method_class: author_estimate
+    model: author_estimate
   admission:
     status: pending
     reason: no observation admission_status mapped from source
