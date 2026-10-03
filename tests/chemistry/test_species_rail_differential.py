@@ -315,6 +315,27 @@ def test_inconsistent_table_logk_does_not_admit_cea_comparison(monkeypatch) -> N
     )
 
 
+@pytest.mark.parametrize(
+    ("residual", "expected_status"),
+    (
+        (-0.1, "match"),
+        (0.1, "match"),
+        (-0.10000000000000002, "mismatch"),
+        (0.10000000000000002, "mismatch"),
+    ),
+)
+def test_table_self_check_floor_boundary_golden_pin(
+    residual: float, expected_status: str
+) -> None:
+    score = score_table_self_check(
+        _o2_identity_point(log10_Kf=residual, as_published="0.000")
+    )
+
+    assert score is not None
+    assert score.residual_log10K == residual
+    assert score.status == expected_status
+
+
 def test_consistent_o2_identity_still_cea_matches_through_score_rail(
     monkeypatch,
 ) -> None:

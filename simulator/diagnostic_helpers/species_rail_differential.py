@@ -34,6 +34,7 @@ from simulator.chemistry.ellingham_thermo import (
     ellingham_segment_for_temperature,
     ellingham_stoichiometry,
 )
+from simulator.physical_constants import TABLE_SELF_CHECK_FINDING_DEX
 from simulator.diagnostic_helpers.gibbs_battery import (
     INDEPENDENT_AGREEMENT_BAND_KJ_MOL,
     LEDGER_PATH as GIBBS_PILOT_LEDGER_PATH,
@@ -479,12 +480,6 @@ def table_self_check_residual(
         return None
     recomputed = log10K_from_delta_fG_kJ_mol(point.delta_fG_kJ_mol, point.T_K)
     return float(point.log10_Kf) - recomputed
-
-
-# Printed-precision self-check floor. JANAF low-T rows disagree with CODATA-R
-# recomputation at ~0.02–0.08 dex (R-convention / rounding, not OCR). A
-# finding is reserved for residuals well above that grain.
-TABLE_SELF_CHECK_FINDING_DEX = 0.1
 
 
 # ---------------------------------------------------------------------------
@@ -1634,7 +1629,7 @@ def score_table_self_check(point: KeyedTablePoint) -> GibbsPointScore | None:
         return None
     tol = max(
         printed_logk_tolerance(point.log10_Kf_as_published),
-        TABLE_SELF_CHECK_FINDING_DEX,
+        float(TABLE_SELF_CHECK_FINDING_DEX),
     )
     status = "match" if abs(residual_log10) <= tol else "mismatch"
     return GibbsPointScore(
