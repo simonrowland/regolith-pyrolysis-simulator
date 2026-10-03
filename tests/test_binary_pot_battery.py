@@ -1411,6 +1411,18 @@ from pathlib import Path
 
 from simulator.diagnostic_helpers.binary_pot_battery import EquilibrateCell, Po2Request
 
+# Give the worker its own tight descriptor ceiling. It inherits the parent's
+# soft limit, which the fd test raises above 256 when the parent is busy, so
+# without this a one-fd-per-cell leak inside the worker could go unnoticed.
+import resource
+_fd_now = len(os.listdir("/dev/fd"))
+_soft, _hard = resource.getrlimit(resource.RLIMIT_NOFILE)
+_cap = _fd_now + 64
+if _hard != resource.RLIM_INFINITY:
+    _cap = min(_cap, _hard)
+if _soft == resource.RLIM_INFINITY or _cap < _soft:
+    resource.setrlimit(resource.RLIMIT_NOFILE, (_cap, _hard))
+
 for line in sys.stdin:
     request = json.loads(line)
     mode = request.get("simulate_crash")
@@ -1508,10 +1520,17 @@ def test_isolated_cell_worker_reuses_one_process_and_keeps_fds_bounded(
 ) -> None:
     battery = _install_fake_isolated_cell_worker(monkeypatch)
     soft, hard = resource.getrlimit(resource.RLIMIT_NOFILE)
-    capped_soft = 256 if hard == resource.RLIM_INFINITY else min(256, hard)
-    resource.setrlimit(resource.RLIMIT_NOFILE, (capped_soft, hard))
+    # Measure before tightening, and cap relative to what this process already
+    # holds: under xdist a worker can legitimately sit above 256 fds when it gets
+    # here, and lowering the cap below its current count used to raise EMFILE
+    # outside the try, leaving the whole worker capped at 256 (b-651). 300 cells
+    # against +64 headroom still catches a one-fd-per-cell leak.
     fd_before = len(os.listdir("/dev/fd"))
+    capped_soft = max(256, fd_before + 64)
+    if hard != resource.RLIM_INFINITY:
+        capped_soft = min(capped_soft, hard)
     try:
+        resource.setrlimit(resource.RLIMIT_NOFILE, (capped_soft, hard))
         for index in range(300):
             cell = _run_fake_isolated_cell(battery, pot_id=f"worker-{index}")
             assert cell.status == "ok"
