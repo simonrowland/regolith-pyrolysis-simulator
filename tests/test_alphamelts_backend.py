@@ -3003,11 +3003,58 @@ def test_alphamelts_initialize_explicit_thermoengine_when_available(monkeypatch)
     assert backend.initialize({}) is True
     assert backend._mode == 'thermoengine'
     assert backend.get_engine_version() == 'thermoengine fake'
+    assert backend._model == 'MELTSv1.0.2'
+    assert backend._thermoengine_transport.model_name == 'MELTSv1.0.2'
     assert backend._thermoengine_transport.equilibrate_timeout_s == 3.0
     assert (
         backend._thermoengine_transport.health_timeout_s
         == THERMOENGINE_HEALTH_TIMEOUT_S
     )
+
+
+@pytest.mark.parametrize(
+    ("config", "adapter_model", "forwarded_model", "transport_model"),
+    [
+        ({"model": ""}, "", "MELTSv1.0.2", "MELTSv1.0.2"),
+        ({}, "MELTSv1.0.2", "MELTSv1.0.2", "MELTSv1.0.2"),
+    ],
+)
+def test_thermoengine_backend_pins_blank_model_resolution_before_transport(
+    monkeypatch, config, adapter_model, forwarded_model, transport_model
+):
+    class FakeThermoEngineTransport:
+        engine_version = "thermoengine fake"
+
+        def __init__(
+            self,
+            *,
+            model_name,
+            activity_converter,
+            equilibrate_timeout_s,
+            health_timeout_s=None,
+        ):
+            self.forwarded_model_name = model_name
+            self.model_name = str(model_name or "MELTSv1.0.2")
+            self.activity_converter = activity_converter
+            self.equilibrate_timeout_s = equilibrate_timeout_s
+            self.health_timeout_s = health_timeout_s
+
+        def initialize(self):
+            return True
+
+    backend = ThermoEngineBackend()
+    monkeypatch.setattr(
+        "simulator.melt_backend.thermoengine.ThermoEngineTransport",
+        FakeThermoEngineTransport,
+    )
+
+    assert backend.initialize(config) is True
+    assert backend._model == adapter_model
+    assert (
+        backend._thermoengine_transport.forwarded_model_name
+        == forwarded_model
+    )
+    assert backend._thermoengine_transport.model_name == transport_model
 
 
 def test_thermoengine_backend_surfaces_typed_hang_and_keeps_respawn_transport():
@@ -3239,6 +3286,7 @@ def test_melt_backend_interface_documents_intrinsic_default_opt_in():
 
 def test_alphamelts_results_carry_backend_and_engine_provenance():
     backend = AlphaMELTSBackend()
+    assert backend._model == 'MELTSv1.0.2'
     backend._engine_version = 'alphamelts fake-v1'
 
     result = backend._emit_equilibrium_result(
@@ -3310,6 +3358,7 @@ def test_smoke_timeout_reason_is_derived_from_token_not_absence(monkeypatch):
         fake_run,
     )
     transport = ThermoEngineTransport(
+        model_name='MELTSv1.0.2',
         activity_converter=activity_from_chem_potential,
     )
     ok, reason = transport.health_check(timeout_s=1.0)
@@ -3386,6 +3435,7 @@ def test_health_timeout_default_is_contention_robust_and_overridable(
     assert math.isfinite(THERMOENGINE_HEALTH_TIMEOUT_S)
     assert THERMOENGINE_HEALTH_TIMEOUT_S > 8.0
     transport = ThermoEngineTransport(
+        model_name='MELTSv1.0.2',
         activity_converter=activity_from_chem_potential,
     )
     assert transport.health_timeout_s == THERMOENGINE_HEALTH_TIMEOUT_S
@@ -3402,6 +3452,7 @@ def test_health_timeout_default_is_contention_robust_and_overridable(
     transport.health_check()
     assert seen == [THERMOENGINE_HEALTH_TIMEOUT_S]
     overridden = ThermoEngineTransport(
+        model_name='MELTSv1.0.2',
         activity_converter=activity_from_chem_potential,
         health_timeout_s=12.5,
     )
@@ -3409,6 +3460,7 @@ def test_health_timeout_default_is_contention_robust_and_overridable(
     assert seen[-1] == 12.5
     with pytest.raises(ValueError, match='finite bound'):
         ThermoEngineTransport(
+            model_name='MELTSv1.0.2',
             activity_converter=activity_from_chem_potential,
             health_timeout_s=float('inf'),
         )
@@ -3455,8 +3507,22 @@ def test_thermoengine_transport_rejects_unknown_model_name():
         )
 
 
+def test_thermoengine_transport_requires_explicit_nonblank_model_name():
+    with pytest.raises(TypeError, match='model_name'):
+        ThermoEngineTransport(
+            activity_converter=activity_from_chem_potential,
+        )
+
+    with pytest.raises(ValueError, match='unknown ThermoEngine MELTS model'):
+        ThermoEngineTransport(
+            model_name='',
+            activity_converter=activity_from_chem_potential,
+        )
+
+
 def test_thermoengine_transport_rejects_unpickleable_worker_converter():
     transport = ThermoEngineTransport(
+        model_name='MELTSv1.0.2',
         activity_converter=lambda _mu, _mu0, _temperature_K: 1.0,
     )
 
@@ -3549,6 +3615,7 @@ def test_thermoengine_timeout_dumps_then_kills_worker(monkeypatch):
         lambda seconds: events.append(('grace', seconds)),
     )
     transport = ThermoEngineTransport(
+        model_name='MELTSv1.0.2',
         activity_converter=activity_from_chem_potential,
         equilibrate_timeout_s=2.0,
         watchdog_grace_s=0.125,
@@ -3605,6 +3672,7 @@ def test_thermoengine_transport_close_is_idempotent(monkeypatch):
     )
 
     transport = ThermoEngineTransport(
+        model_name='MELTSv1.0.2',
         activity_converter=activity_from_chem_potential,
     )
     transport._worker_process = FakeProcess()
@@ -3765,6 +3833,7 @@ def test_thermoengine_transport_broken_pipe_closes_worker(monkeypatch):
     )
 
     transport = ThermoEngineTransport(
+        model_name='MELTSv1.0.2',
         activity_converter=activity_from_chem_potential,
     )
     transport._worker_process = FakeProcess()
@@ -3822,6 +3891,7 @@ def test_thermoengine_transport_pipe_close_failure_still_joins_worker(monkeypatc
     )
 
     transport = ThermoEngineTransport(
+        model_name='MELTSv1.0.2',
         activity_converter=activity_from_chem_potential,
     )
     transport._worker_process = FakeProcess()
@@ -3885,6 +3955,7 @@ def test_thermoengine_health_smoke_requires_solved_absolute_fo2(
         fake_run,
     )
     transport = ThermoEngineTransport(
+        model_name='MELTSv1.0.2',
         activity_converter=activity_from_chem_potential,
     )
 
@@ -4582,6 +4653,7 @@ def test_thermoengine_activity_extractor_uses_mu_minus_mu0():
             return [-1000.0]
 
     transport = ThermoEngineTransport(
+        model_name='MELTSv1.0.2',
         activity_converter=activity_from_chem_potential,
     )
     transport._liq_phase = FakeLiquidPhase()
@@ -4600,6 +4672,7 @@ def test_thermoengine_activity_extractor_uses_mu_minus_mu0():
 
 def test_thermoengine_equilibrate_refuses_in_process_fallback(monkeypatch):
     transport = ThermoEngineTransport(
+        model_name='MELTSv1.0.2',
         activity_converter=activity_from_chem_potential,
     )
     monkeypatch.setattr(
@@ -4696,6 +4769,7 @@ def test_thermoengine_private_in_process_equilibrate_parses_payload(monkeypatch)
             return self.melts
 
     transport = ThermoEngineTransport(
+        model_name='MELTSv1.0.2',
         activity_converter=activity_from_chem_potential,
     )
     fake_equilibrate = FakeEquilibrate()
@@ -4790,6 +4864,7 @@ def test_thermoengine_private_in_process_equilibrate_parses_payload(monkeypatch)
 
 def test_thermoengine_extras_fail_loud_on_malformed_present_value():
     transport = ThermoEngineTransport(
+        model_name='MELTSv1.0.2',
         activity_converter=activity_from_chem_potential,
     )
 
@@ -4806,6 +4881,7 @@ def test_thermoengine_transport_remaps_nonfinite_field_remote_error():
     from simulator.engine_pool import EngineWorkerRemoteError
 
     transport = ThermoEngineTransport(
+        model_name='MELTSv1.0.2',
         activity_converter=activity_from_chem_potential,
     )
     transport._worker.start_count = 1
@@ -4836,6 +4912,7 @@ def test_thermoengine_transport_remaps_fo2_undefined_remote_error():
     from simulator.engine_pool import EngineWorkerRemoteError
 
     transport = ThermoEngineTransport(
+        model_name='MELTSv1.0.2',
         activity_converter=activity_from_chem_potential,
     )
     transport._worker.start_count = 1
@@ -4866,6 +4943,7 @@ def test_thermoengine_transport_remaps_fo2_omitted_remote_error():
     from simulator.engine_pool import EngineWorkerRemoteError
 
     transport = ThermoEngineTransport(
+        model_name='MELTSv1.0.2',
         activity_converter=activity_from_chem_potential,
     )
     transport._worker.start_count = 1
@@ -4892,6 +4970,7 @@ def test_thermoengine_transport_unrecognised_remote_name_is_runtime_error():
     from simulator.engine_pool import EngineWorkerRemoteError
 
     transport = ThermoEngineTransport(
+        model_name='MELTSv1.0.2',
         activity_converter=activity_from_chem_potential,
     )
     transport._worker.start_count = 1
@@ -4918,6 +4997,7 @@ def test_thermoengine_backend_closes_on_unrecognised_remote_error():
     from simulator.engine_pool import EngineWorkerRemoteError
 
     transport = ThermoEngineTransport(
+        model_name='MELTSv1.0.2',
         activity_converter=activity_from_chem_potential,
     )
     transport._worker.start_count = 1
@@ -5000,6 +5080,7 @@ def test_thermoengine_backend_respawns_worker_after_nonfinite_field():
             return payload
 
     transport = ThermoEngineTransport(
+        model_name='MELTSv1.0.2',
         activity_converter=activity_from_chem_potential,
     )
     worker = RespawnWorker()
@@ -5046,6 +5127,7 @@ def test_thermoengine_fo2_bracket_valueerror_is_retyped_and_keeps_handle():
     )
 
     transport = ThermoEngineTransport(
+        model_name='MELTSv1.0.2',
         activity_converter=activity_from_chem_potential,
     )
     transport._worker.start_count = 1
@@ -5083,6 +5165,7 @@ def test_thermoengine_typed_fo2_ood_does_not_close_transport():
     )
 
     transport = ThermoEngineTransport(
+        model_name='MELTSv1.0.2',
         activity_converter=activity_from_chem_potential,
     )
     transport._worker.start_count = 1
@@ -5291,6 +5374,7 @@ def test_midrun_ood_keeps_handle_and_never_emits_absence_token():
     from benchmarks.melt_activity_benchmark import classify_engine_exception
 
     transport = ThermoEngineTransport(
+        model_name='MELTSv1.0.2',
         activity_converter=activity_from_chem_potential,
     )
     transport._worker.start_count = 1
@@ -5382,6 +5466,7 @@ def test_thermoengine_transport_remaps_ood_remote_by_name():
     from simulator.engine_pool import EngineWorkerRemoteError
 
     transport = ThermoEngineTransport(
+        model_name='MELTSv1.0.2',
         activity_converter=activity_from_chem_potential,
     )
     transport._worker.start_count = 1
@@ -5419,6 +5504,7 @@ def test_thermoengine_fo2_requires_iron_is_retyped_and_keeps_handle():
     )
 
     transport = ThermoEngineTransport(
+        model_name='MELTSv1.0.2',
         activity_converter=activity_from_chem_potential,
     )
     transport._worker.start_count = 1
@@ -5531,6 +5617,7 @@ def test_fo2_impose_sibling_causes_are_closed_and_keep_handle():
     for message, cause, status in expected:
         assert classify_thermoengine_refusal_message(message) is cause
         transport = ThermoEngineTransport(
+            model_name='MELTSv1.0.2',
             activity_converter=activity_from_chem_potential,
         )
         transport.equilibrate = _raise_message(message)
@@ -5614,6 +5701,7 @@ def test_untyped_close_then_next_probe_is_not_attempted():
 
 def test_thermoengine_solution_mu_recovers_before_finite_validation(monkeypatch):
     transport = ThermoEngineTransport(
+        model_name='MELTSv1.0.2',
         activity_converter=activity_from_chem_potential,
     )
     melts = types.SimpleNamespace(
@@ -5669,6 +5757,7 @@ def test_thermoengine_native_model_gets_call_namespace_and_balanced_cleanup():
         get_list_of_phases_in_assemblage=lambda root: ('Augite',),
     )
     transport = ThermoEngineTransport(
+        model_name='MELTSv1.0.2',
         activity_converter=activity_from_chem_potential,
     )
     transport._equilibrate = types.SimpleNamespace(
@@ -5690,6 +5779,7 @@ def test_thermoengine_operation_cleanup_runs_when_payload_build_raises(
     monkeypatch,
 ):
     transport = ThermoEngineTransport(
+        model_name='MELTSv1.0.2',
         activity_converter=activity_from_chem_potential,
     )
     cleaned = []
@@ -5718,6 +5808,7 @@ def test_thermoengine_operation_cleanup_runs_when_payload_build_raises(
 
 def test_thermoengine_operation_cleanup_failure_is_fail_closed(monkeypatch):
     transport = ThermoEngineTransport(
+        model_name='MELTSv1.0.2',
         activity_converter=activity_from_chem_potential,
     )
     monkeypatch.setattr(
@@ -5789,6 +5880,7 @@ def test_thermoengine_retained_solution_mu_reads_owned_native_vectors():
         ),
     )
     transport = ThermoEngineTransport(
+        model_name='MELTSv1.0.2',
         activity_converter=activity_from_chem_potential,
     )
 
@@ -6068,6 +6160,7 @@ def test_thermoengine_private_solver_imposes_absolute_fo2_with_python_fake(
 
     fake_equilibrate = FakeEquilibrate()
     transport = ThermoEngineTransport(
+        model_name='MELTSv1.0.2',
         activity_converter=activity_from_chem_potential,
     )
     transport._equilibrate = fake_equilibrate
@@ -6139,6 +6232,7 @@ def test_thermoengine_imposed_fo2_seeds_feo_only_bulk_with_positive_kress91(
             return FakeModel()
 
     transport = ThermoEngineTransport(
+        model_name='MELTSv1.0.2',
         activity_converter=activity_from_chem_potential,
     )
     transport._equilibrate = FakeEquilibrate()
@@ -6221,6 +6315,7 @@ def test_thermoengine_fe_free_intrinsic_solve_keeps_activities_with_typed_none(
 
     melts = FakeMelts()
     transport = ThermoEngineTransport(
+        model_name='MELTSv1.0.2',
         activity_converter=activity_from_chem_potential,
     )
     transport._equilibrate = object()
@@ -6343,6 +6438,7 @@ def test_thermoengine_backend_rejects_untyped_missing_intrinsic_fo2():
 
 def test_thermoengine_pinned_fo2_request_on_fe_free_composition_still_refuses():
     transport = ThermoEngineTransport(
+        model_name='MELTSv1.0.2',
         activity_converter=activity_from_chem_potential,
     )
 
@@ -6368,6 +6464,7 @@ def test_thermoengine_echo_clamps_roundoff_negative_fe2o3_to_zero_limit():
             return {'SiO2': 83.0, 'FeO': 17.0, 'Fe2O3': -3.1e-14}
 
     transport = ThermoEngineTransport(
+        model_name='MELTSv1.0.2',
         activity_converter=activity_from_chem_potential,
     )
     transport._database = object()
@@ -6390,6 +6487,7 @@ def test_thermoengine_echo_rejects_negative_fe2o3_beyond_roundoff_tolerance():
             return {'SiO2': 83.0, 'FeO': 17.0, 'Fe2O3': -2.0e-12}
 
     transport = ThermoEngineTransport(
+        model_name='MELTSv1.0.2',
         activity_converter=activity_from_chem_potential,
     )
     transport._database = object()
@@ -6405,6 +6503,7 @@ def test_thermoengine_echo_rejects_negative_fe2o3_beyond_roundoff_tolerance():
 
 def test_thermoengine_imposed_fo2_fails_loud_on_buffered_region(monkeypatch):
     transport = ThermoEngineTransport(
+        model_name='MELTSv1.0.2',
         activity_converter=activity_from_chem_potential,
     )
     transport._equilibrate = object()
@@ -6469,6 +6568,7 @@ def test_thermoengine_imposed_fo2_rejects_narrow_target_plateau(monkeypatch):
             return FakeModel()
 
     transport = ThermoEngineTransport(
+        model_name='MELTSv1.0.2',
         activity_converter=activity_from_chem_potential,
     )
     transport._equilibrate = FakeEquilibrate()
@@ -6746,7 +6846,6 @@ def test_activities_times_antoine_computes_activity_times_ppure_from_yaml():
     from simulator.vapour_rail.catalog import vapor_pressure_legacy_view
 
     table = vapor_pressure_legacy_view(_load_data('vapor_pressures.yaml'))['metals']
-    T_K = 1600.0 + 273.15
     # 2026-08-08 t-383: Na's runtime Antoine is the L&H liquid-NaO0.5
     # standard-reaction reference (fit_target=standard_reaction_term), so the
     # legacy bridge evaluates activity^1 x P_ref(T) x (pO2/pO2_ref)^-0.25 —
@@ -6755,15 +6854,17 @@ def test_activities_times_antoine_computes_activity_times_ppure_from_yaml():
     # pseudo/backsolve row). SIGN/unit check: P_ref(1873.15 K)=1.739e4 Pa,
     # x2 activity, x(1e-9)^-0.25=10^2.25 => ~6.19e6 Pa.
     na_row = table['Na']
-    na_ref = na_row['antoine']
+    p_reference_na = float.fromhex("0x1.0fc0c6cbb52d4p+14")
     expected_na = (
         2.0
-        * 10.0 ** (na_ref['A'] - na_ref['B'] / (T_K + na_ref['C']))
+        * p_reference_na
         * (1e-9 / float(na_row.get('pO2_reference_bar', 1.0) or 1.0))
         ** float(na_row['pO2_exponent'])
     )
 
     assert set(pressures) == {'Na', 'K'}
+    assert pressures['Na'].hex() == '0x1.798a909525fabp+22'
+    assert pressures['K'].hex() == '0x1.e0a0e8f4fbaebp+23'
     assert pressures['Na'] == pytest.approx(expected_na)
     assert pressures['K'] > 0.0
 
@@ -6814,6 +6915,10 @@ def test_activities_times_antoine_maps_thermoengine_liquid_activity_keys():
     # legacy AlphaMELTS bridge covers only its original Antoine/activity surface.
     assert required == set(pressures)
     assert all(pressures[species] > 0.0 for species in required)
+    assert pressures['Na'].hex() == '0x1.27fb918b2b0aep+8'
+    assert pressures['K'].hex() == '0x1.19c380c94a644p+14'
+    assert pressures['Mg'].hex() == '0x1.0e7fbeab5e7f0p+18'
+    assert pressures['SiO'].hex() == '0x1.3edd07a85de8dp+0'
     assert backend._activity_for_vapor_species('Na', activities) == pytest.approx(
         9.57e-5
     )

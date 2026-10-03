@@ -14,8 +14,38 @@ from simulator.battery.migrate import (
     observation_from_plain,
 )
 from simulator.battery.records import Experiment, Observation
-from simulator.battery.validity import run_validity_gates
+from simulator.battery.validity import (
+    comparison_method_cell_constant_cancels,
+    run_validity_gates,
+)
 from tests.battery import factories as F
+
+
+@pytest.mark.parametrize(
+    "pairing_kind",
+    (None, "not_printed", "not_reported", "unknown", "same_cell"),
+)
+def test_comparison_pairing_cancellation_golden_pin(pairing_kind: str | None) -> None:
+    provenance = {
+        "comparison_method": {"kind": "comparison_ratio"},
+        "common_knudsen_cell_constant": {"cancels": True},
+        "melt_reference_pairing": {"kind": pairing_kind},
+    }
+
+    assert comparison_method_cell_constant_cancels(provenance) is True
+
+
+@pytest.mark.parametrize("comparison_kind", ("ratio", "comparison_ratio"))
+def test_comparison_ratio_kind_cancellation_golden_pin(
+    comparison_kind: str,
+) -> None:
+    provenance = {
+        "comparison_method": {"kind": comparison_kind},
+        "common_knudsen_cell_constant": {"cancels": True},
+        "melt_reference_pairing": {"kind": "same_cell"},
+    }
+
+    assert comparison_method_cell_constant_cancels(provenance) is True
 
 
 _VALIDITY_BUCKET_COUNT = 8

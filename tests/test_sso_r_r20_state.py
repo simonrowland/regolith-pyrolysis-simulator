@@ -2617,6 +2617,9 @@ def test_native_fe_partition_vacuum_exceeds_pn2_and_small_pool_vaporizes() -> No
 
     vacuum_small = sim._native_fe_partition_diagnostic(0.5)
     vacuum_pool = sim._native_fe_partition_diagnostic(100.0)
+    assert vacuum_small["P_reference_Antoine_Pa"].hex() == (
+        "0x1.76017513f6704p+5"
+    )
 
     sim.melt.p_total_mbar = 10.0
     sim.overhead.pressure_mbar = 10.0

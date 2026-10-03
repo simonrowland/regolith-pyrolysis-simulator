@@ -6,6 +6,7 @@ import math
 from collections.abc import Mapping
 from typing import Any
 
+from engines.antoine import _antoine_log10_pressure
 from simulator.chemistry.ellingham_thermo import (
     ELLINGHAM_METAL_PHASE_GAS,
     ELLINGHAM_THERMO as _CANONICAL_ELLINGHAM_THERMO,
@@ -699,7 +700,7 @@ class EquilibriumMixin:
                                 f"valid_range_K [{valid_low:g}, {valid_high:g}] at "
                                 f"{T_K:.3f} K"
                             )
-                    log_P = A - B / (T_K + C)
+                    log_P = _antoine_log10_pressure(A, B, C, T_K)
                     P_reference_Pa = _pow10_pressure_or_raise(
                         log_P,
                         species=species,
@@ -795,7 +796,7 @@ class EquilibriumMixin:
                             f"extrapolated beyond valid_range_K "
                             f"[{vlo:g}, {vhi:g}] at {T_K:.3f} K"
                         )
-                log_P_liq = A_l - B_l / (T_K + C_l)
+                log_P_liq = _antoine_log10_pressure(A_l, B_l, C_l, T_K)
                 P_reference_Pa = _pow10_pressure_or_raise(
                     log_P_liq,
                     species=species,
@@ -913,7 +914,7 @@ class EquilibriumMixin:
                                 f"extrapolated beyond valid_range_K "
                                 f"[{vlo:g}, {vhi:g}] at {T_K:.3f} K"
                             )
-                    log_P_gas = A_g - B_g / (T_K + C_g)
+                    log_P_gas = _antoine_log10_pressure(A_g, B_g, C_g, T_K)
                     P_reference_Pa = _pow10_pressure_or_raise(
                         log_P_gas,
                         species=species,
@@ -1216,7 +1217,7 @@ class EquilibriumMixin:
             valid = data.get('valid_range_K', [0, 9999])
 
             if A > 0 and valid[0] <= T_K <= valid[1]:
-                log_P = A - B / (T_K + C)
+                log_P = _antoine_log10_pressure(A, B, C, T_K)
                 P_sat = _pow10_pressure_or_raise(
                     log_P,
                     species=name,

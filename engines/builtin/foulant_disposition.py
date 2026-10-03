@@ -15,6 +15,7 @@ from typing import Any
 
 import yaml
 
+from engines.antoine import _antoine_log10_pressure
 from engines.yaml_loader import YAML12SafeLoader
 
 GAS_CONSTANT_J_PER_MOL_K = 8.314462618
@@ -94,8 +95,11 @@ def _pure_component_antoine_pa(entry: Mapping[str, Any], temperature_K: float) -
     coeff = entry.get("pure_component_antoine") or entry.get("antoine")
     if not coeff:
         raise KeyError("pure_component_antoine")
-    log_p = float(coeff["A"]) - float(coeff["B"]) / (
-        temperature_K + float(coeff.get("C", 0.0))
+    log_p = _antoine_log10_pressure(
+        float(coeff["A"]),
+        float(coeff["B"]),
+        float(coeff.get("C", 0.0)),
+        temperature_K,
     )
     return 10.0**log_p
 

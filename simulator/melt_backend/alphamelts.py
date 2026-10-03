@@ -47,6 +47,7 @@ from itertools import product
 from pathlib import Path
 from typing import Any, Dict, List, Mapping, Optional
 
+from engines.antoine import _antoine_log10_pressure
 from engines.alphamelts.domain import (
     canonical_melt_oxide_activity_name,
     canonical_oxide_activity_map,
@@ -61,6 +62,7 @@ from simulator.accounting.formulas import (
     resolve_species_formula,
 )
 from simulator.accounting.exceptions import UnknownSpeciesError
+from simulator.config import DEFAULT_ALPHAMELTS_MODEL
 from simulator.melt_backend.base import (
     EquilibriumResult,
     LiquidFractionInvalidError,
@@ -899,7 +901,7 @@ class _MELTSBackendSupport(MeltBackend):
 
     backend_name = 'alphamelts'
 
-    def __init__(self):
+    def __init__(self, *, model_name: str = DEFAULT_ALPHAMELTS_MODEL):
         self._mode: Optional[str] = None  # 'python_api' or 'subprocess'
         self._engine_path: Optional[Path] = None
         self._binary_path: Optional[Path] = None
@@ -918,7 +920,7 @@ class _MELTSBackendSupport(MeltBackend):
         self._redox_buffer: Optional[str] = None
         self._fo2_offset: Optional[float] = None
         self._fe3fet_ratio: Optional[float] = None
-        self._model = 'MELTSv1.0.2'
+        self._model = str(model_name)
         self._timeout_s = ALPHAMELTS_DEFAULT_TIMEOUT_S
         self._last_normalization_warnings: List[str] = []
         self._vapor_pressure_table: Optional[dict] = None
@@ -5346,8 +5348,11 @@ class _MELTSBackendSupport(MeltBackend):
             if not all(key in coeffs for key in ('A', 'B', 'C')):
                 continue
             activity_i = float(raw_activity)
-            p_reference_i = 10.0 ** (
-                float(coeffs['A']) - float(coeffs['B']) / (T_K + float(coeffs['C']))
+            p_reference_i = 10.0 ** _antoine_log10_pressure(
+                float(coeffs['A']),
+                float(coeffs['B']),
+                float(coeffs['C']),
+                T_K,
             )
             p_i = activity_i * p_reference_i
             if str(spec.get('fit_target', '') or '') == FIT_TARGET_STANDARD_REACTION:

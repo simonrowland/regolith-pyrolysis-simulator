@@ -30,8 +30,8 @@ observations:
       note: Water is an upper bound as printed; no uncertainty is printed.
   evidence:
     class:
-      tag: unknown
-      reason: unmapped method_class quoted_attributed
+      tag: value
+      value: quoted_attributed
     original_method_class: quoted_attributed
   admission:
     status: pending
@@ -241,8 +241,8 @@ observations:
       note: Threshold is a bound, not a point estimate.
   evidence:
     class:
-      tag: unknown
-      reason: unmapped method_class quoted_attributed
+      tag: value
+      value: quoted_attributed
     original_method_class: quoted_attributed
   admission:
     status: pending
@@ -338,8 +338,8 @@ observations:
       note: The prose says "about"; no uncertainty is printed.
   evidence:
     class:
-      tag: unknown
-      reason: unmapped method_class quoted_attributed
+      tag: value
+      value: quoted_attributed
     original_method_class: quoted_attributed
   admission:
     status: pending
@@ -380,9 +380,10 @@ observations:
       note: Range and approximation retained; no statistical uncertainty is printed.
   evidence:
     class:
-      tag: unknown
-      reason: unmapped method_class author_estimate
+      tag: value
+      value: author_estimate
     original_method_class: author_estimate
+    model: author_estimate
   admission:
     status: pending
     reason: no observation admission_status mapped from source

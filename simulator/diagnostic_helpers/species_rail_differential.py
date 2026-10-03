@@ -24,6 +24,7 @@ from typing import Any, Iterator, Mapping, Sequence
 
 import yaml
 
+from engines.antoine import _antoine_log10_pressure
 from simulator.chemistry.ellingham_thermo import (
     ELLINGHAM_FIT_RANGE_K,
     ELLINGHAM_FIT_SEGMENTS,
@@ -34,6 +35,7 @@ from simulator.chemistry.ellingham_thermo import (
     ellingham_segment_for_temperature,
     ellingham_stoichiometry,
 )
+from simulator.physical_constants import TABLE_SELF_CHECK_FINDING_DEX
 from simulator.diagnostic_helpers.gibbs_battery import (
     INDEPENDENT_AGREEMENT_BAND_KJ_MOL,
     LEDGER_PATH as GIBBS_PILOT_LEDGER_PATH,
@@ -479,12 +481,6 @@ def table_self_check_residual(
         return None
     recomputed = log10K_from_delta_fG_kJ_mol(point.delta_fG_kJ_mol, point.T_K)
     return float(point.log10_Kf) - recomputed
-
-
-# Printed-precision self-check floor. JANAF low-T rows disagree with CODATA-R
-# recomputation at ~0.02–0.08 dex (R-convention / rounding, not OCR). A
-# finding is reserved for residuals well above that grain.
-TABLE_SELF_CHECK_FINDING_DEX = 0.1
 
 
 # ---------------------------------------------------------------------------
@@ -1101,7 +1097,7 @@ def _pure_component_antoine_pa(row: Mapping[str, Any], T_K: float) -> float | No
     denom = float(T_K) + C
     if denom <= 0.0:
         return None
-    log10_pa = A - B / denom
+    log10_pa = _antoine_log10_pressure(A, B, C, T_K)
     if not math.isfinite(log10_pa) or log10_pa > 308.0:
         return None
     pressure = 10.0 ** log10_pa
@@ -1234,7 +1230,7 @@ def _finding_class(provenance_class: str, status: str) -> str | None:
     return "compilation_agreement"
 
 
-def _point_key(
+def _compilation_comparison_key(
     compilation_id: str,
     record_id: str,
     T_K: float,
@@ -1242,6 +1238,7 @@ def _point_key(
     quantity: str = "delta_fG_kJ_mol",
 ) -> str:
     t_label = f"{T_K:.2f}".rstrip("0").rstrip(".")
+    record_id = record_id.removesuffix(f":T={t_label}")
     return f"{compilation_id}::{record_id}:T={t_label}::{channel}::{quantity}"
 
 
@@ -1270,7 +1267,7 @@ def _refusal_score(
         )
     t_for_key = float(T_K) if T_K is not None else 0.0
     return GibbsPointScore(
-        key=_point_key(
+        key=_compilation_comparison_key(
             compilation_id, record_id, t_for_key, channel, comparison_quantity
         ),
         source_id=compilation_id,
@@ -1352,7 +1349,7 @@ def score_cea_point(point: KeyedTablePoint) -> GibbsPointScore:
             f"ΔG_vap scaled to formula = {shift_s} kJ/mol"
         ).strip("; ")
     return GibbsPointScore(
-        key=_point_key(
+        key=_compilation_comparison_key(
             point.compilation_id, point.record_id, point.T_K, CHANNEL_NASA_CEA
         ),
         source_id=point.compilation_id,
@@ -1414,6 +1411,31 @@ def score_ellingham_point(point: KeyedTablePoint) -> GibbsPointScore | None:
                 f"{point.note}; via OXIDE_TO_METAL[{point.formula!r}] → {metal} "
                 "(no Ellingham segment)"
             ).strip("; "),
+        )
+    try:
+        ellingham_segment_for_temperature(metal, point.T_K)
+    except ValueError as exc:
+        # The chemistry owner rejects nonpositive absolute temperatures before
+        # the comparison can reach its certified-band refusal below. Preserve
+        # that domain boundary as a per-point comparison status for JANAF rows.
+        if str(exc) != "Ellingham temperature_K must be > 0 K":
+            raise
+        low, high = ellingham_fit_range_K(metal)
+        band_note = f"certified_band_flag fit_range_K=({low:g},{high:g})"
+        return _refusal_score(
+            compilation_id=point.compilation_id,
+            record_id=point.record_id,
+            formula=point.formula,
+            T_K=point.T_K,
+            channel=CHANNEL_ELLINGHAM,
+            reason="engine_channel_out_of_range",
+            provenance_class=ellingham_provenance(metal, point.compilation_id),
+            table_kJ_mol=oxide_dG_per_mol_O2_kJ(
+                point.delta_fG_kJ_mol, point.formula
+            ),
+            band=(low, high),
+            comparison_quantity="delta_fG_kJ_per_mol_O2",
+            note=f"{point.note}; {band_note}".strip("; "),
         )
     # Each metal key is one oxide reaction. Fe is 2 Fe + O2 → 2 FeO, not
     # hematite (b-489). Map only when the line's own oxide IS this formula.
@@ -1496,7 +1518,7 @@ def score_ellingham_point(point: KeyedTablePoint) -> GibbsPointScore | None:
         f"via OXIDE_TO_METAL[{point.formula!r}] → {metal}"
     )
     return GibbsPointScore(
-        key=_point_key(
+        key=_compilation_comparison_key(
             point.compilation_id, point.record_id, point.T_K, CHANNEL_ELLINGHAM,
             "delta_fG_kJ_per_mol_O2",
         ),
@@ -1575,7 +1597,7 @@ def score_channel_vs_channel(
             f"{leftover_s} kJ/mol O2."
         )
     return GibbsPointScore(
-        key=_point_key(
+        key=_compilation_comparison_key(
             point.compilation_id,
             point.record_id,
             point.T_K,
@@ -1608,11 +1630,11 @@ def score_table_self_check(point: KeyedTablePoint) -> GibbsPointScore | None:
         return None
     tol = max(
         printed_logk_tolerance(point.log10_Kf_as_published),
-        TABLE_SELF_CHECK_FINDING_DEX,
+        float(TABLE_SELF_CHECK_FINDING_DEX),
     )
     status = "match" if abs(residual_log10) <= tol else "mismatch"
     return GibbsPointScore(
-        key=_point_key(
+        key=_compilation_comparison_key(
             point.compilation_id,
             point.record_id,
             point.T_K,
@@ -1719,7 +1741,7 @@ def score_psat_pair(
         provenance_class=provenance,
     )
     return GibbsPointScore(
-        key=_point_key(
+        key=_compilation_comparison_key(
             gas.compilation_id,
             gas.record_id,
             T,
@@ -1815,7 +1837,7 @@ def score_psat_nbp_sanity(
         provenance = PROVENANCE_INDEPENDENT
         status = _status_for_residual(engine_dvap, provenance)
         score = GibbsPointScore(
-            key=_point_key(
+            key=_compilation_comparison_key(
                 COMPILATION_JANAF,
                 point.record_id,
                 T_K,

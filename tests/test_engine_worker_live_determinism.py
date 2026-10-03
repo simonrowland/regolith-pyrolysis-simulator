@@ -218,6 +218,7 @@ def test_thermoengine_24_point_warm_cold_byte_identity():
     cold_bytes = []
     for point in points:
         cold = ThermoEngineTransport(
+            model_name='MELTSv1.0.2',
             activity_converter=activity_from_chem_potential,
         )
         try:
@@ -227,6 +228,7 @@ def test_thermoengine_24_point_warm_cold_byte_identity():
             cold.close()
 
     warm = ThermoEngineTransport(
+        model_name='MELTSv1.0.2',
         activity_converter=activity_from_chem_potential,
     )
     warm_times = []
@@ -278,6 +280,7 @@ def test_thermoengine_two_slot_pool_matches_cold_byte_for_byte(tmp_path):
     cold_bytes = []
     for point in points:
         cold = ThermoEngineTransport(
+            model_name='MELTSv1.0.2',
             activity_converter=activity_from_chem_potential,
         )
         try:
@@ -319,6 +322,7 @@ def test_thermoengine_pool_matches_cold_under_load(tmp_path):
     cold_bytes = []
     for point in points:
         cold = ThermoEngineTransport(
+            model_name='MELTSv1.0.2',
             activity_converter=activity_from_chem_potential,
         )
         try:

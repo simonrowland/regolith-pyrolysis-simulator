@@ -680,15 +680,23 @@ def test_kems_band_prefers_printed_envelope_over_replicate_scatter() -> None:
 
 
 @pytest.mark.parametrize(
-    ("typed_not_printed", "expected_notice"),
+    ("typed_not_printed", "expected_reason"),
     (
-        (False, "No calibration entry has been recorded yet."),
-        (True, "The source record says the calibration was not printed."),
+        (
+            False,
+            "calibration_not_grounded: No calibration entry has been recorded yet. "
+            "(KEMS pressure requires a recorded calibration)",
+        ),
+        (
+            True,
+            "calibration_not_grounded: The source record says the calibration was "
+            "not printed. (KEMS pressure requires a recorded calibration)",
+        ),
     ),
 )
 def test_uncalibrated_kems_partial_pressure_scores_with_calibration_notice(
     typed_not_printed: bool,
-    expected_notice: str,
+    expected_reason: str,
 ) -> None:
     from simulator.battery.validity import run_validity_gates
     from simulator.battery.score import (
@@ -744,8 +752,7 @@ def test_uncalibrated_kems_partial_pressure_scores_with_calibration_notice(
         item for item in residual.notices
         if item.kind is NoticeKind.UNVERIFIED_APPARATUS
     )
-    assert notice.reason.startswith("calibration_not_grounded:")
-    assert expected_notice in notice.reason
+    assert notice.reason == expected_reason
     assert flagged_strata(residual.notices) == (
         FLAGGED_STRATUM_CALIBRATION_NOT_GROUNDED,
     )
@@ -1899,6 +1906,258 @@ def test_comparison_activity_cancels_cell_geometry_only_for_activity() -> None:
         check for check in partial_gate.checks if check.name == "kems_calibration"
     )
     assert partial_check.detail["flag"] == "calibration_not_grounded"
+
+
+def _comparison_activity_provenance(pairing: str) -> dict[str, object]:
+    return {
+        "comparison_method": {"kind": "comparison_ratio"},
+        "common_knudsen_cell_constant": {"cancels": True},
+        "melt_reference_pairing": {"kind": pairing},
+    }
+
+
+def test_assumed_comparison_activity_scores_with_cancellation_notice() -> None:
+    composition = Composition(
+        "published_mole_fraction",
+        (
+            ("CaO", Decimal("0.335")),
+            ("Al2O3", Decimal("0.335")),
+            ("SiO2", Decimal("0.33")),
+        ),
+        amount_basis=AmountBasis.MOLE_FRACTION,
+    )
+    identity = replace(
+        F.activity_identity(formula="NaO0.5"),
+        composition=State.unknown("composition is recorded on the source point"),
+        fO2_Pa=State.unknown("fO2 is not printed"),
+        total_pressure_Pa=State.unknown("total pressure is not printed"),
+    )
+    experiment = F.kems_experiment(
+        orifice_area=None, clausing=None, kn=Decimal("20"), calibrated=True
+    )
+    reference = F.observation(
+        "stolyarova-assumed-comparison-activity",
+        experiment.experiment_id,
+        identity,
+        Decimal("0.2"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="stolyarova-1996-cao-alumina-silica-kems",
+    )
+    reference = replace(
+        reference,
+        provenance=_comparison_activity_provenance("same_effective_setup_assumed"),
+        point_conditions={"composition": Located(State.of(composition))},
+        notices=(
+            Notice(
+                kind=NoticeKind.COMPARISON_METHOD_CELL_CONSTANT_CANCELS,
+                affected_quantities=(Quantity.ACTIVITY,),
+                reason=(
+                    "normalized comparison-method activity assumes cancellation "
+                    "of the common Knudsen-cell constant (same instrument; "
+                    "same-cell pairing not printed)"
+                ),
+                origin=reference.observation_id,
+            ),
+        ),
+    )
+    gates = run_validity_gates(experiment, reference)
+    assert gates.passed
+    geometry_check = next(
+        check for check in gates.checks if check.name == "comparison_method_cell_constant_cancels"
+    )
+    assert geometry_check.detail["pairing"] == "same_effective_setup_assumed"
+    assert geometry_check.detail["geometry"] == "not_required_for_normalized_activity"
+
+    residual, _ = _compile(
+        reference,
+        experiment,
+        _predict(Decimal("0.2"), identity),
+        review="reviewed",
+    )
+    assert residual.status is not ResidualStatus.REFUSED
+    assert residual.numeric is not None
+    assert any(
+        notice.kind is NoticeKind.COMPARISON_METHOD_CELL_CONSTANT_CANCELS
+        and "assumes cancellation" in notice.reason
+        and "same-cell pairing not printed" in notice.reason
+        for notice in residual.notices
+    )
+
+
+def test_different_cell_comparison_activity_still_refuses_geometry() -> None:
+    identity = F.activity_identity(formula="NaO0.5")
+    experiment = F.kems_experiment(
+        orifice_area=Decimal("3.14e-7"),
+        clausing=Decimal("0.9"),
+        kn=Decimal("20"),
+        calibrated=True,
+    )
+    reference = replace(
+        F.observation(
+            "different-cell-comparison-activity",
+            experiment.experiment_id,
+            identity,
+            Decimal("0.2"),
+            evidence=EvidenceClass.MEASURED_DIRECT,
+        ),
+        provenance=_comparison_activity_provenance("different_cells_or_geometry"),
+    )
+    gate = underdetermined_apparatus(
+        experiment, Quantity.ACTIVITY, observation=reference
+    )
+    assert gate.passed is False
+    assert gate.reason is RefusalReason.UNDERDETERMINED_APPARATUS
+    assert gate.primary_check == "geometry_determinants"
+    geometry_check = next(
+        check for check in gate.checks if check.name == "geometry_determinants"
+    )
+    assert "comparison_pairing_different_cells_or_geometry" in geometry_check.detail[
+        "missing"
+    ]
+
+    residual, _ = _compile(
+        reference,
+        experiment,
+        _predict(Decimal("0.2"), identity),
+        review="reviewed",
+    )
+    assert residual.status is ResidualStatus.REFUSED
+    assert residual.refusal is not None
+    assert residual.refusal.reason is RefusalReason.UNDERDETERMINED_APPARATUS
+
+
+@pytest.mark.parametrize(
+    "quantity", (Quantity.ACTIVITY, Quantity.ACTIVITY_COEFFICIENT)
+)
+def test_uncalibrated_kems_activity_uses_calibration_not_grounded_stratum(
+    quantity: Quantity,
+) -> None:
+    from simulator.battery.score import (
+        FLAGGED_STRATUM_CALIBRATION_NOT_GROUNDED,
+        flagged_strata,
+    )
+
+    identity = replace(
+        F.activity_identity(formula="NaO0.5"), quantity=quantity
+    )
+    experiment = F.kems_experiment(
+        orifice_area=None, clausing=None, kn=Decimal("20"), calibrated=False
+    )
+    reference = replace(
+        F.observation(
+            "uncalibrated-comparison-activity",
+            experiment.experiment_id,
+            identity,
+            Decimal("0.2"),
+            evidence=EvidenceClass.MEASURED_DIRECT,
+            source_id="stolyarova-1996-cao-alumina-silica-kems",
+        ),
+        provenance=_comparison_activity_provenance(
+            "same_effective_setup_assumed"
+        ),
+    )
+    gates = run_validity_gates(experiment, reference)
+    calibration_check = next(
+        check for check in gates.checks if check.name == "kems_calibration"
+    )
+    assert gates.passed
+    assert calibration_check.passed
+    assert calibration_check.detail["flag"] == "calibration_not_grounded"
+
+    residual, _ = _compile(
+        reference,
+        experiment,
+        _predict(Decimal("0.2"), identity),
+        review="reviewed",
+    )
+    assert residual.status is not ResidualStatus.REFUSED
+    assert residual.numeric is not None
+    assert residual.score_eligible is False
+    notice = next(
+        notice
+        for notice in residual.notices
+        if notice.kind is NoticeKind.UNVERIFIED_APPARATUS
+    )
+    assert notice.reason == (
+        "calibration_not_grounded: No calibration entry has been recorded yet. "
+        "(KEMS activity requires a recorded calibration)"
+    )
+    assert flagged_strata(residual.notices) == (
+        FLAGGED_STRATUM_CALIBRATION_NOT_GROUNDED,
+    )
+
+
+def test_uncalibrated_kems_activity_pressure_sum_over_limit_still_refuses() -> None:
+    identity = F.activity_identity(formula="NaO0.5")
+    experiment = F.kems_experiment(
+        orifice_area=None, clausing=None, kn=None, calibrated=False
+    )
+    activity = F.observation(
+        "uncalibrated-over-limit-activity",
+        experiment.experiment_id,
+        identity,
+        Decimal("0.2"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="stolyarova-1996-cao-alumina-silica-kems",
+    )
+    activity = replace(
+        activity,
+        provenance=_comparison_activity_provenance(
+            "same_effective_setup_assumed"
+        ),
+    )
+    partial_identity = replace(
+        _partial_identity(),
+        temperature_K=identity.temperature_K,
+        fO2_Pa=identity.fO2_Pa,
+        total_pressure_Pa=identity.total_pressure_Pa,
+        composition=identity.composition,
+    )
+    sodium = F.observation(
+        "over-limit-Na-pressure",
+        experiment.experiment_id,
+        partial_identity,
+        Decimal("6"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="stolyarova-1996-cao-alumina-silica-kems",
+    )
+    silicon = F.observation(
+        "over-limit-Si-pressure",
+        experiment.experiment_id,
+        replace(partial_identity, species=Species("Si", Phase.G)),
+        Decimal("5"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="stolyarova-1996-cao-alumina-silica-kems",
+    )
+    gates = run_validity_gates(
+        experiment,
+        activity,
+        point_observations=(activity, sodium, silicon),
+    )
+    assert gates.passed is False
+    assert gates.reason is RefusalReason.EFFUSION_REGIME_UNVERIFIED
+    pressure_check = next(
+        check for check in gates.checks if check.name == "in_cell_partial_pressure_sum"
+    )
+    assert pressure_check.passed is False
+    assert pressure_check.detail["printed_partial_pressure_sum_Pa"] == "11"
+
+    context = _context(
+        F.work(), experiment, activity, sodium, silicon, review="reviewed"
+    )
+    residual, _ = compile_residual(
+        activity,
+        Engine.INTERNAL_ANALYTICAL,
+        context=context,
+        comparison_ids={activity.observation_id, sodium.observation_id, silicon.observation_id},
+        predict=lambda _engine, _reference, **_kwargs: _predict(
+            Decimal("0.2"), identity
+        ),
+        point_observations=(activity, sodium, silicon),
+    )
+    assert residual.status is ResidualStatus.REFUSED
+    assert residual.refusal is not None
+    assert residual.refusal.reason is RefusalReason.EFFUSION_REGIME_UNVERIFIED
 
 
 def test_unverified_kems_value_refuses_without_printed_in_cell_pressures() -> None:
@@ -3456,7 +3715,204 @@ def test_missing_live_result_is_coverage_failure() -> None:
     )
     failures = pin_failures([], [record])
     assert failures
-    assert failures[0]["reason"] == "coverage_failure"
+    assert failures[0]["reason"] == "no_live_residual_for_reference"
+
+
+def _pin_test_record(channel: str) -> PinBandRecord:
+    return PinBandRecord(
+        key=f"pin-ref::delta_fG::thermochemistry::{channel}",
+        expected_outcome=ResidualStatus.MATCH.value,
+        evidence="test",
+        centre=Decimal("1"),
+        metric_operation=MetricOperation.ABSOLUTE.value,
+        metric_unit="kJ_per_declared_mol_basis",
+        pin_band_value=Decimal("0.05"),
+        pin_band_unit="kJ_per_declared_mol_basis",
+    )
+
+
+def _pin_test_residual(value: Decimal, *, rail: Rail = Rail.THERMOCHEMISTRY):
+    return F.residual(
+        key=f"pin-ref::delta_fG::{rail.value}::internal-analytical",
+        reference="pin-ref",
+        status=ResidualStatus.MATCH,
+        rail=rail,
+        numeric=ResidualNumeric(
+            operation=MetricOperation.ABSOLUTE,
+            unit="kJ_per_declared_mol_basis",
+            value=value,
+            decision_band=None,
+        ),
+    )
+
+
+def test_pin_failures_matches_legacy_channel_by_identity() -> None:
+    failures = pin_failures(
+        [_pin_test_residual(Decimal("1.05"))],
+        [_pin_test_record("ellingham")],
+    )
+
+    assert failures == []
+
+
+def test_pin_and_legacy_bucket_share_residual_status_tokens() -> None:
+    from simulator.battery.enums import residual_status_token
+    from simulator.battery.pins import _pin_live_comparison
+    from simulator.battery.score import _legacy_bucket
+
+    assert residual_status_token("typed-refusal") is ResidualStatus.REFUSED
+    assert residual_status_token("typed_refusal") is ResidualStatus.REFUSED
+    assert residual_status_token("unknown") is None
+    assert _legacy_bucket({"status": "typed-refusal"}) == "refused"
+    assert _legacy_bucket({"status": "failed-to-run"}) == "refused"
+    assert _legacy_bucket({"status": "unknown"}) == "excluded"
+    live = _pin_live_comparison(
+        {
+            "reference_id": "reference",
+            "comparison_key": "janaf::record:T=1100::nasa_cea_9::delta_fG_kJ_mol",
+            "quantity": "delta_fG",
+            "comparison_channel": "nasa_cea_9",
+            "status": "typed_refusal",
+        }
+    )
+    assert live is not None and live.status is ResidualStatus.REFUSED
+
+
+def test_pin_payloads_match_legacy_channel_by_identity() -> None:
+    from simulator.battery.pins import _pin_failures_from_payloads
+
+    comparisons: list[dict[str, str]] = []
+    failures = _pin_failures_from_payloads(
+        [
+            {
+                "key": "pin-ref::delta_fG::thermochemistry::internal-analytical",
+                "reference": "pin-ref",
+                "status": ResidualStatus.MATCH.value,
+                "numeric": {"value": "1.01"},
+                "source_relation": "derived",
+                "execution": {"call_evidence": "fixture-call"},
+            }
+        ],
+        [_pin_test_record("ellingham")],
+        comparisons=comparisons,
+    )
+
+    assert failures == []
+    assert comparisons == [
+        {
+            "key": "pin-ref::delta_fG::thermochemistry::ellingham",
+            "centre": "1",
+            "pin_band": "0.05",
+            "live": "1.01",
+            "source": "internal-analytical",
+            "source_relation": "derived",
+            "call_evidence": "fixture-call",
+        }
+    ]
+
+
+def test_pin_failures_deduplicate_identical_pin_keys() -> None:
+    pin = _pin_test_record("internal-analytical")
+    pin = replace(pin, aliases=(pin.key,), old_key=pin.key)
+
+    failures = pin_failures([_pin_test_residual(Decimal("1.01"))], [pin])
+
+    assert failures == []
+
+
+def test_compilation_pin_join_uses_sidecar_not_engine_residuals() -> None:
+    comparisons: list[dict[str, str]] = []
+    failures = pin_failures(
+        [
+            {
+                "key": "pin-ref::delta_fG::thermochemistry::internal-analytical",
+                "reference": "pin-ref",
+                "status": ResidualStatus.MATCH.value,
+                "numeric": {"value": "100"},
+            }
+        ],
+        [_pin_test_record("nasa_cea_9")],
+        compilation_comparisons=[
+            {
+                "reference_id": "pin-ref",
+                "quantity": "delta_fG",
+                "comparison_channel": "nasa_cea_9",
+                "comparison_key": "janaf::record:T=1100::nasa_cea_9::delta_fG_kJ_mol",
+                "status": ResidualStatus.MATCH.value,
+                "value": "1.03",
+                "band": "0.05",
+            }
+        ],
+        comparisons=comparisons,
+    )
+
+    assert failures == []
+    assert comparisons[0]["live"] == "1.03"
+    assert comparisons[0]["source"] == "nasa_cea_9"
+    assert comparisons[0]["within_pin_band"] == "true"
+
+
+def test_pin_failures_reports_unmapped_channel() -> None:
+    from simulator.battery.pins import _pin_failures_from_payloads
+
+    failures = pin_failures(
+        [_pin_test_residual(Decimal("1"))],
+        [_pin_test_record("nasa_cea_vs_ellingham")],
+    )
+
+    assert failures[0]["reason"] == "unmapped_pin_channel"
+    assert failures[0]["channel"] == "nasa_cea_vs_ellingham"
+
+    absent_unmapped_failures = pin_failures(
+        [], [_pin_test_record("nasa_cea_vs_ellingham")]
+    )
+    assert absent_unmapped_failures[0]["reason"] == "unmapped_pin_channel"
+
+    exact_key_failures = _pin_failures_from_payloads(
+        [
+            {
+                "key": "pin-ref::delta_fG::thermochemistry::nasa_cea_vs_ellingham",
+                "reference": "pin-ref",
+                "status": ResidualStatus.MATCH.value,
+                "numeric": {"value": "1"},
+            }
+        ],
+        [_pin_test_record("nasa_cea_vs_ellingham")],
+    )
+    assert exact_key_failures[0]["reason"] == "unmapped_pin_channel"
+
+
+def test_pin_failures_reports_ambiguous_matches() -> None:
+    sidecar_rows = [
+        {
+            "reference_id": "pin-ref",
+            "quantity": "delta_fG",
+            "comparison_channel": "ellingham",
+            "comparison_key": f"janaf::record-{index}:T=1100::ellingham::delta_fG_kJ_per_mol_O2",
+            "status": ResidualStatus.MATCH.value,
+            "value": "1",
+            "band": "0.05",
+        }
+        for index in (1, 2)
+    ]
+    failures = pin_failures(
+        [],
+        [_pin_test_record("ellingham")],
+        compilation_comparisons=sidecar_rows,
+    )
+
+    assert failures[0]["reason"] == "ambiguous_compilation_comparison"
+    assert len(failures[0]["candidate_keys"]) == 2
+
+
+def test_pin_failures_rejects_outside_band_live_value() -> None:
+    failures = pin_failures(
+        [_pin_test_residual(Decimal("1.051"))],
+        [_pin_test_record("ellingham")],
+    )
+
+    assert failures[0]["reason"] == "outside_pin_band"
+    assert failures[0]["source"] == "internal-analytical"
 
 
 def _stamp(**overrides) -> dict:
@@ -4603,10 +5059,6 @@ def test_imcc_complex_saturation_routes_only_own_prediction() -> None:
 
 
 def test_non_allibert_typed_solid_activity_uses_fusion_conversion() -> None:
-    from simulator.battery.generators.janaf import (
-        JANAF_R_J_PER_MOL_K,
-        janaf_fusion_energy,
-    )
     from simulator.battery.score import _fusion_comparison_reference
 
     temperature = Decimal("2000")
@@ -4636,9 +5088,16 @@ def test_non_allibert_typed_solid_activity_uses_fusion_conversion() -> None:
     )
 
     converted = _fusion_comparison_reference(reference)
-    delta_g = janaf_fusion_energy("CaO", temperature).delta_g_fus_kJ_per_mol
-    expected = (-delta_g * Decimal(1000) / (JANAF_R_J_PER_MOL_K * temperature)).exp()
-    assert converted.value.point == expected
+    # Premise: JANAF electronic records Ca-027 (CaO(cr)) and Ca-028 (CaO(l)),
+    # 2000 K formation-Gibbs rows, give -401.713 and -372.176 kJ/mol; neither
+    # record has a printed page number. Algebra: ΔG_fus=G_l°-G_s°=+29.537
+    # kJ/mol, so Δlog10(a)=-29.537*1000 J/kJ / (8.31441 J/(mol K)*2000 K*ln10)
+    # = -0.7714171006707842 dex. Units cancel to a dimensionless shift; hence
+    # a_l/a_s=10**shift=0.1692711323009035502632434871 (float.hex:
+    # 0x1.5aaad2cb1d399p-3), below one because G_l°>G_s°.
+    expected = Decimal("0.1692711323009035502632434871")
+    assert float(converted.value.point).hex() == "0x1.5aaad2cb1d399p-3"
+    assert abs(converted.value.point - expected) < Decimal("1e-27")
     assert converted.identity.reference_state.value.endmember.phase.value is Phase.L
     assert converted.source_id == "another-source"
 
@@ -5332,7 +5791,6 @@ def test_allibert_solid_activity_fusion_conversion_is_diagnostic_only(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     from simulator.battery.generators.janaf import (
-        JANAF_R_J_PER_MOL_K,
         janaf_fusion_energy,
     )
     from simulator.battery.score import (
@@ -5423,13 +5881,27 @@ def test_allibert_solid_activity_fusion_conversion_is_diagnostic_only(
     assert silica_fusion.delta_g_fus_kJ_per_mol == Decimal("0.27784")
     assert Decimal("1994.4") < silica_fusion.melting_temperature_K < Decimal("1994.5")
     assert silica_fusion.accepted_melting_temperature_K == Decimal("1986")
+
+    allibert_1933 = replace(
+        reference,
+        observation_id="allibert-cao-solid-activity-at-1933K",
+        identity=replace(identity, temperature_K=State.of(Decimal("1933"))),
+    )
+    converted_1933 = _fusion_comparison_reference(allibert_1933)
+    # Premise: JANAF records Ca-027 (CaO(cr)) and Ca-028 (CaO(l)), each with
+    # T=1900/2000 K formation-Gibbs rows and no printed page number. Linear
+    # interpolation to 1933 K gives G_s°=-420.996+0.33*(-401.713+420.996)
+    # =-414.63261 and G_l°=-389.048+0.33*(-372.176+389.048)=-383.48024
+    # kJ/mol; ΔG_fus=+31.15237 kJ/mol. Therefore Δlog10(a)=-31.15237*1000
+    # J/kJ/(8.31441 J/(mol K)*1933 K*ln10)=-0.8418061863721363 dex.
+    # Units cancel to a dimensionless shift; a_l/a_s=10**shift is below one
+    # because G_l°>G_s°: 0.1439440817603981956094785450, float.hex
+    # 0x1.26cc279ce8c6cp-3.
+    expected = Decimal("0.1439440817603981956094785450")
+    assert float(converted_1933.value.point).hex() == "0x1.26cc279ce8c6cp-3"
+    assert abs(converted_1933.value.point - expected) < Decimal("1e-27")
+
     converted = _fusion_comparison_reference(reference)
-    expected = (
-        -fusion.delta_g_fus_kJ_per_mol
-        * Decimal(1000)
-        / (JANAF_R_J_PER_MOL_K * temperature)
-    ).exp()
-    assert abs(converted.value.point - expected) < Decimal("1e-26")
     assert converted.identity.reference_state.value.endmember.phase.value is Phase.L
     assert converted.evidence.class_.is_unknown
     assert reference.value.point == Decimal("1")

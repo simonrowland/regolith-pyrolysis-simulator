@@ -67,6 +67,7 @@ def test_thermoengine_liquidus_preserves_policy_refusal() -> None:
 
 def test_thermoengine_liquidus_preserves_isolation_policy_refusal() -> None:
     transport = ThermoEngineTransport(
+        model_name='MELTSv1.0.2',
         activity_converter=lambda _mu, _mu0, _temperature_K: 1.0,
     )
     backend = ThermoEngineBackend()

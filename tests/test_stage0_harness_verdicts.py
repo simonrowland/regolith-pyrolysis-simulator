@@ -506,10 +506,14 @@ def test_t139_sulfide_model_exposes_fes_matte_fits_and_mass_balance():
     assert liquid["B"] == pytest.approx(20615.4)
     assert liquid["valid_range_K"] == pytest.approx((1500.0, 2600.0))
     assert "10.18434/T42S31" in liquid["citation"]
-    assert model["evaluated_at_T_K"]["FeS_liquid_vapor"]["log10_P_FeS_bar"] == pytest.approx(
-        -4.41407,
-        abs=1e-5,
+    assert model["evaluated_at_T_K"]["FeS_solid_vapor"]["log10_P_FeS_bar"].hex() == (
+        "-0x1.f4504816f0068p+1"
     )
+    assert model["evaluated_at_T_K"]["FeS_solid_vapor"]["inside_valid_range"] is False
+    assert model["evaluated_at_T_K"]["FeS_liquid_vapor"]["log10_P_FeS_bar"].hex() == (
+        "-0x1.1a801f75104d6p+2"
+    )
+    assert model["evaluated_at_T_K"]["FeS_liquid_vapor"]["inside_valid_range"] is True
     assert model["evaluated_at_T_K"]["FeS_decomposition"]["log10_K_bar_1p5"] == pytest.approx(
         -4.74022,
         abs=1e-5,

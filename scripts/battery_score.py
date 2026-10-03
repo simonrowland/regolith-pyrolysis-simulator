@@ -22,6 +22,10 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 from simulator.battery.migrate import canonicalize_rail  # noqa: E402
+from simulator.battery.compilation_tier import (  # noqa: E402
+    iter_compilation_comparisons_jsonl,
+    write_compilation_comparisons_jsonl,
+)
 from simulator.battery.pins import (  # noqa: E402
     load_pins,
     migrate_pin_records,
@@ -180,6 +184,9 @@ def main(argv: list[str] | None = None) -> int:
 
     residuals_path = args.root / "data" / "battery" / "residuals.jsonl"
     report_path = args.root / "data" / "battery" / "score-report.md"
+    compilation_comparisons_path = (
+        args.root / "data" / "battery" / "compilation-comparisons.jsonl"
+    )
     if args.report_only:
         payloads = _ResidualJsonlRows(residuals_path)
         context = load_score_context(args.root)
@@ -194,32 +201,16 @@ def main(argv: list[str] | None = None) -> int:
         if pins_file.is_file():
             loaded = load_pins(pins_file)
             key_map = loaded["key_map"]
-            wanted_keys = {
-                key
-                for record in loaded["pin_band_records"]
-                if not record.tombstone
-                for key in (record.key, *record.aliases)
-            }
-            live_keys = {
-                str(row.get("key") or "")
-                for row in payloads
-                if str(row.get("key") or "") in wanted_keys
-            }
-            for record in loaded["pin_band_records"]:
-                if record.tombstone:
-                    continue
-                if record.key not in live_keys and not any(a in live_keys for a in record.aliases):
-                    failures.append(
-                        {
-                            "key": record.key,
-                            "reason": "coverage_failure",
-                            "live": None,
-                            "centre": None if record.centre is None else str(record.centre),
-                            "pin_band": None
-                            if record.pin_band_value is None
-                            else str(record.pin_band_value),
-                        }
-                    )
+            comparisons = (
+                iter_compilation_comparisons_jsonl(compilation_comparisons_path)
+                if compilation_comparisons_path.is_file()
+                else None
+            )
+            failures = _pin_failures_from_payloads(
+                payloads,
+                loaded["pin_band_records"],
+                compilation_comparisons=comparisons,
+            )
         diffs, unmapped = status_diff_rows(
             old_rows=load_legacy_score_rows(args.root),
             new_rows=payloads,
@@ -293,48 +284,61 @@ def main(argv: list[str] | None = None) -> int:
     live = derive_store_stamp(args.root)
     mismatch = emit_store_stamp_mismatch_warning(recorded, live)
 
+    summary_path = args.root / "data" / "battery" / "score-summary.json"
+    summary_partial_path = summary_path.with_name(summary_path.name + ".partial")
+    report_partial_path = report_path.with_name(report_path.name + ".partial")
+    compilation_comparisons_partial_path = compilation_comparisons_path.with_name(
+        compilation_comparisons_path.name + ".partial"
+    )
     failures: list[dict] = []
     unmapped: list[str] = []
     diffs: list[dict] = []
     pins_file = args.root / "data" / "battery" / "pins.yaml"
     key_map: dict[str, str] = {}
-    if pins_file.is_file():
-        loaded = load_pins(pins_file)
-        key_map = loaded["key_map"]
-        failures = _pin_failures_from_payloads(
-            payloads,
-            loaded["pin_band_records"],
-        )
-    diffs, unmapped = status_diff_rows(
-        old_rows=load_legacy_score_rows(args.root),
-        new_rows=payloads,
-        key_map=key_map,
-    )
-
-    report = _render_score_report_from_payloads_legacy(
-        payloads,
-        context=context,
-        engines=engines if not args.studio else engines_from_names(args.engines.split(",")),
-        pin_failures=failures,
-        status_diff=diffs,
-        unmapped_legacy_keys=unmapped,
-        studio_hostname=studio_hostname,
-        store_stamp=recorded,
-        _aggregate=report_aggregate,
-    )
-    summary_path = args.root / "data" / "battery" / "score-summary.json"
-    summary_partial_path = summary_path.with_name(summary_path.name + ".partial")
-    report_partial_path = report_path.with_name(report_path.name + ".partial")
-    _write_headline_summary_from_accumulator_json(
-        report_aggregate,
-        summary_partial_path,
-        store_stamp=recorded,
-    )
-    report_partial_path.write_text(report, encoding="utf-8")
     scored = report_aggregate.scored_count
-    os.replace(summary_partial_path, summary_path)
-    os.replace(report_partial_path, report_path)
-    os.replace(partial_path, residuals_path)
+    try:
+        write_compilation_comparisons_jsonl(
+            context,
+            compilation_comparisons_partial_path,
+        )
+        if pins_file.is_file():
+            loaded = load_pins(pins_file)
+            key_map = loaded["key_map"]
+            failures = _pin_failures_from_payloads(
+                payloads,
+                loaded["pin_band_records"],
+                compilation_comparisons=iter_compilation_comparisons_jsonl(
+                    compilation_comparisons_partial_path
+                ),
+            )
+        diffs, unmapped = status_diff_rows(
+            old_rows=load_legacy_score_rows(args.root),
+            new_rows=payloads,
+            key_map=key_map,
+        )
+        report = _render_score_report_from_payloads_legacy(
+            payloads,
+            context=context,
+            engines=engines if not args.studio else engines_from_names(args.engines.split(",")),
+            pin_failures=failures,
+            status_diff=diffs,
+            unmapped_legacy_keys=unmapped,
+            studio_hostname=studio_hostname,
+            store_stamp=recorded,
+            _aggregate=report_aggregate,
+        )
+        _write_headline_summary_from_accumulator_json(
+            report_aggregate,
+            summary_partial_path,
+            store_stamp=recorded,
+        )
+        report_partial_path.write_text(report, encoding="utf-8")
+        os.replace(summary_partial_path, summary_path)
+        os.replace(report_partial_path, report_path)
+        os.replace(partial_path, residuals_path)
+        os.replace(compilation_comparisons_partial_path, compilation_comparisons_path)
+    finally:
+        compilation_comparisons_partial_path.unlink(missing_ok=True)
     print(
         f"residuals={written} scored={scored} "
         f"pin_failures={len(failures)} host={context.hostname}"

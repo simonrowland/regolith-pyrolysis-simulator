@@ -548,7 +548,10 @@ def test_thermoengine_isolation_guard_without_worker():
         ThermoEngineTransport,
     )
 
-    transport = ThermoEngineTransport(activity_converter=_activity_passthrough)
+    transport = ThermoEngineTransport(
+        model_name='MELTSv1.0.2',
+        activity_converter=_activity_passthrough,
+    )
     with pytest.raises(ThermoEngineIsolationError):
         transport.pure_phase_properties(
             "Fo", temperature_K=298.15, pressure_bar=1.0

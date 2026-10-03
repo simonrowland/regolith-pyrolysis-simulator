@@ -13,6 +13,7 @@ from types import SimpleNamespace
 import pytest
 import yaml
 
+from engines.alphamelts import AlphaMELTSProvider
 import simulator.reduced_real_determinism as rrd
 from simulator.chemistry.kernel import ChemistryIntent
 from simulator.chemistry.kernel.capabilities import CapabilityProfile
@@ -586,12 +587,67 @@ def test_alphamelts_provider_key_partitions_model_mode_not_engine_version() -> N
         "mode": "subprocess",
         "magemin_database": None,
     }
+    assert _key_hash(base) == (
+        "3914dfa4cca7d7503c290122f70e67ab003fbcdaca1d5c230e49120236a8b048"
+    )
     assert pmelts["model"]["model"] == "pMELTS"
     assert thermoengine["model"]["mode"] == "thermoengine"
     assert "engine_version" not in next_engine["model"]
     assert _key_hash(base) != _key_hash(pmelts)
     assert _key_hash(base) != _key_hash(thermoengine)
     assert _key_hash(base) == _key_hash(next_engine)
+
+
+def _thermoengine_pt0_identity(model: str) -> tuple[dict, dict]:
+    store = PT0DeterminismStore("capture")
+    sim = _build_pt0_sim(store)
+
+    class ThermoEngineBackend(RealBackendAuthority):
+        real_backend_family = RealBackendFamily.THERMOENGINE
+        _model = model
+        _mode = None
+
+        def is_available(self) -> bool:
+            return True
+
+    backend = ThermoEngineBackend()
+    provider = AlphaMELTSProvider(backend=backend)
+    sim.backend = backend
+    sim._chem_registry.register(
+        provider,
+        [ChemistryIntent.SILICATE_EQUILIBRIUM],
+    )
+
+    key = store._equilibrium_key(sim)
+    authority = rrd._equilibrium_record_authority(
+        sim,
+        ChemistryIntent.SILICATE_EQUILIBRIUM,
+    )
+
+    return key, authority
+
+
+def test_blank_thermoengine_model_resolves_to_default_in_pt0_identity() -> None:
+    key, authority = _thermoengine_pt0_identity("")
+
+    assert key["model"]["model"] == "MELTSv1.0.2"
+    assert authority["provider"]["model"] == "MELTSv1.0.2"
+
+
+@pytest.mark.parametrize("model", ["MELTSv1.0.2", "pMELTS"])
+def test_nonblank_thermoengine_model_passes_through_pt0_identity(model: str) -> None:
+    key, authority = _thermoengine_pt0_identity(model)
+
+    assert key["model"]["model"] == model
+    assert authority["provider"]["model"] == model
+
+
+def test_blank_and_explicit_default_thermoengine_identity_are_equal() -> None:
+    blank_key, blank_authority = _thermoengine_pt0_identity("")
+    explicit_key, explicit_authority = _thermoengine_pt0_identity("MELTSv1.0.2")
+
+    assert blank_key == explicit_key
+    assert blank_authority == explicit_authority
 
 
 def test_non_alphamelts_magemin_shadow_key_identity_stays_byte_identical() -> None:

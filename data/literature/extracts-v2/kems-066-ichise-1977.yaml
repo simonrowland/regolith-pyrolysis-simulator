@@ -3630,9 +3630,10 @@ observations:
       note: 'Authors: calculated under a simple assumption; not a tabulated calibration.'
   evidence:
     class:
-      tag: unknown
-      reason: unmapped method_class author_estimate
+      tag: value
+      value: author_estimate
     original_method_class: author_estimate
+    model: author_estimate
   admission:
     status: pending
     reason: no observation admission_status mapped from source

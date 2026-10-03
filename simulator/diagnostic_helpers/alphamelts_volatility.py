@@ -16,6 +16,7 @@ from typing import Any
 import yaml
 from simulator.yaml_cache import load_cached_safe_yaml
 
+from engines.antoine import _antoine_log10_pressure
 from engines.alphamelts.domain import (
     AlphaMELTSDomainGate,
     canonical_melt_oxide_activity_name,
@@ -333,7 +334,10 @@ def _analytical_vapor_pressures_from_activities(
                     "valid_range_K": (valid_low, valid_high),
                         "authority_status": "extrapolation_limited",
                 }
-        P_reference_Pa = _pow10(A - B / (T_K + C), species=species)
+        P_reference_Pa = _pow10(
+            _antoine_log10_pressure(A, B, C, T_K),
+            species=species,
+        )
         if str(sp_data.get("fit_target", "") or "") == FIT_TARGET_STANDARD_REACTION:
             activity_exponent = float(
                 sp_data.get("oxide_activity_exponent", 1.0) or 1.0
@@ -472,7 +476,10 @@ def _analytical_vapor_pressures_from_activities(
                     "authority_status": "extrapolation_limited",
                 }
         exponent = float(data.get("oxide_activity_exponent", 1.0) or 1.0)
-        P_reference_Pa = _pow10(A - B / (T_K + C), species=str(species))
+        P_reference_Pa = _pow10(
+            _antoine_log10_pressure(A, B, C, T_K),
+            species=str(species),
+        )
         P_eq_Pa, activity_factor = _oxide_vapor_pressure_Pa(
             species=str(species),
             data=data,

@@ -53,6 +53,7 @@ from simulator.vapour_rail.channels import (
     compile_o2_channel_term,
     o2_potential_from_pO2_bar,
 )
+from engines.antoine import _antoine_log10_pressure
 from simulator.vapour_rail.nasa_cea import (
     Nasa7Segment,
     Nasa9Segment,
@@ -901,7 +902,7 @@ class _ReferencePressureModel:
                 raise CatalogCompileError(
                     "Antoine reference model has non-positive denominator"
                 )
-            return A - B / (temperature_K + C)
+            return _antoine_log10_pressure(A, B, C, temperature_K)
 
         if self.evaluator_family == "tabulated_equilibrium":
             return _interpolate_log_pressure(self.points, temperature_K)
@@ -1494,7 +1495,7 @@ class CompiledPressureEvaluator:
                     f"{self.species_id}: Antoine 1/T continuation has "
                     "non-positive denominator at boundary"
                 )
-            boundary_log = A - B / denom
+            boundary_log = _antoine_log10_pressure(A, B, C, boundary)
             # s = dL/d(1/T) = −B · Tb² / (Tb+C)²
             s = -B * (boundary * boundary) / (denom * denom)
             return boundary_log + s * (1.0 / temperature_K - 1.0 / boundary)

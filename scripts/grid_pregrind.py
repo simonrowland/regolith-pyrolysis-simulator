@@ -40,6 +40,7 @@ from engines.alphamelts.thermoengine import (  # noqa: E402
 )
 from engines.domain_reason import OutOfDomainReason  # noqa: E402
 from simulator.environment import DEFAULT_VACUUM_FLOOR_BAR  # noqa: E402
+from simulator.config import DEFAULT_ALPHAMELTS_MODEL  # noqa: E402
 from simulator.engine_pool import (  # noqa: E402
     EngineWorkerPool,
     INHERIT_PROCESS_GROUP_ENV,
@@ -1894,7 +1895,7 @@ def parser() -> argparse.ArgumentParser:
             "ThermoEngine solves intrinsically on the fixed-ferric composition"
         ),
     )
-    result.add_argument("--model", default="MELTSv1.0.2")
+    result.add_argument("--model", default=DEFAULT_ALPHAMELTS_MODEL)
     result.add_argument("--timeout-s", type=float, default=20.0)
     result.add_argument(
         "--thermoengine-equilibrate-timeout-s", type=float, default=60.0

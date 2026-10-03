@@ -931,7 +931,7 @@ class ThermoEngineTransport:
     def __init__(
         self,
         *,
-        model_name: str = 'MELTSv1.0.2',
+        model_name: str,
         activity_converter: ActivityConverter,
         equilibrate_timeout_s: float = _DEFAULT_EQUILIBRATE_TIMEOUT_S,
         health_timeout_s: float = _DEFAULT_HEALTH_TIMEOUT_S,
@@ -939,7 +939,7 @@ class ThermoEngineTransport:
         watchdog_grace_s: float = _DEFAULT_WATCHDOG_GRACE_S,
         diagnostic_signal: int = signal.SIGUSR1,
     ) -> None:
-        self._model_name = str(model_name or 'MELTSv1.0.2')
+        self._model_name = str(model_name)
         if self._model_name not in _MODEL_TO_THERMOENGINE:
             known = ', '.join(sorted(_MODEL_TO_THERMOENGINE))
             raise ValueError(

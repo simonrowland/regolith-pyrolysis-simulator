@@ -138,6 +138,377 @@ def _context(*observations, works=None, experiments=None, origins=None):
     )
 
 
+def _mgo_janaf_observation():
+    experiment = F.tabulation_experiment()
+    identity = F.oxide_identity(
+        "MgO",
+        Phase.CR,
+        T_K=Decimal("1100"),
+        per=PerBasis.MOL_SPECIES,
+        polymorph=Polymorph.PERICLASE.value,
+        metal_formula="Mg",
+        nu_metal=Fraction(1),
+        nu_o2=Fraction(1, 2),
+    )
+    return F.observation(
+        "janaf-4th::Mg-008:T=1100",
+        experiment.experiment_id,
+        identity,
+        Decimal("-481.399"),
+        evidence=EvidenceClass.COMPILATION_ASSESSED,
+        source_id="janaf-4th",
+    )
+
+
+def test_compilation_comparison_sidecar_is_additive_and_streamed(tmp_path) -> None:
+    import hashlib
+    from pathlib import Path
+
+    from simulator.battery.compilation_tier import (
+        iter_compilation_comparisons_jsonl,
+        write_compilation_comparisons_jsonl,
+    )
+    from simulator.battery.score import (
+        render_score_report,
+        score_store,
+        write_headline_summary_json,
+        write_residuals_jsonl,
+    )
+    from simulator.battery.pins import PinBandRecord, pin_failures
+    from simulator.diagnostic_helpers.species_rail_differential import (
+        KeyedTablePoint,
+        PHASE_SOLID,
+        score_cea_point,
+        score_ellingham_point,
+    )
+
+    observation = _mgo_janaf_observation()
+    context = _context(observation)
+    engines = (Engine.INTERNAL_ANALYTICAL,)
+    residuals, candidates = score_store(context, engines=engines)
+    residuals_path = tmp_path / "residuals.jsonl"
+    summary_path = tmp_path / "score-summary.json"
+    report_path = tmp_path / "score-report.md"
+    comparison_path = tmp_path / "compilation-comparisons.jsonl"
+    root = Path(__file__).resolve().parents[2]
+    write_residuals_jsonl(residuals, candidates, residuals_path, root=root)
+    write_headline_summary_json(
+        residuals,
+        summary_path,
+        context=context,
+        engines=engines,
+        root=root,
+    )
+    legacy_pin = PinBandRecord(
+        key=(
+            f"{observation.observation_id}::delta_fG::thermochemistry::"
+            "nasa_cea_9"
+        ),
+        expected_outcome="match",
+        evidence="fixture",
+        centre=Decimal("-481.399"),
+        pin_band_value=Decimal("0.05"),
+    )
+    legacy_pin_failures = pin_failures(residuals, (legacy_pin,))
+    report_path.write_text(
+        render_score_report(
+            residuals,
+            context=context,
+            engines=engines,
+            root=root,
+            pin_failures=legacy_pin_failures,
+        ),
+        encoding="utf-8",
+    )
+    outputs = (residuals_path, summary_path, report_path)
+    before = {
+        path.name: hashlib.sha256(path.read_bytes()).hexdigest() for path in outputs
+    }
+
+    assert write_compilation_comparisons_jsonl(context, comparison_path) == 2
+
+    rows = tuple(iter_compilation_comparisons_jsonl(comparison_path))
+    point = KeyedTablePoint(
+        compilation_id="janaf",
+        record_id="Mg-008:T=1100",
+        formula="MgO",
+        phase="cr",
+        phase_kind=PHASE_SOLID,
+        T_K=1100.0,
+        delta_fG_kJ_mol=-481.399,
+        log10_Kf=None,
+        log10_Kf_as_published=None,
+        printed_page=None,
+        note="JANAF compilation point",
+    )
+    expected_scores = (score_cea_point(point), score_ellingham_point(point))
+    assert [row["reference_id"] for row in rows] == [observation.observation_id] * 2
+    assert [row["comparison_channel"] for row in rows] == [
+        score.engine_channel for score in expected_scores if score is not None
+    ]
+    assert [row["value"] for row in rows] == [
+        str(score.residual_kJ_mol) for score in expected_scores if score is not None
+    ]
+    assert [row["status"] for row in rows] == [
+        score.status for score in expected_scores if score is not None
+    ]
+    assert [row["band"] for row in rows] == [
+        str(score.band_kJ_mol) for score in expected_scores if score is not None
+    ]
+    nasa, ellingham = rows
+    pins = (
+        PinBandRecord(
+            key=(
+                f"{observation.observation_id}::delta_fG::thermochemistry::"
+                "nasa_cea_9"
+            ),
+            expected_outcome="match",
+            evidence="fixture",
+            centre=Decimal(str(nasa["value"])),
+            pin_band_value=Decimal("0.05"),
+        ),
+        PinBandRecord(
+            key=(
+                f"{observation.observation_id}::delta_fG::thermochemistry::"
+                "ellingham"
+            ),
+            expected_outcome="match",
+            evidence="fixture",
+            centre=Decimal(str(ellingham["value"])) + Decimal("1"),
+            pin_band_value=Decimal("0.05"),
+        ),
+    )
+    compared: list[dict[str, str]] = []
+    failures = pin_failures(
+        [], pins, compilation_comparisons=rows, comparisons=compared
+    )
+    assert len(compared) == 2
+    assert [row["within_pin_band"] for row in compared] == ["true", "false"]
+    assert [failure["reason"] for failure in failures] == ["outside_pin_band"]
+    assert failures[0]["source"] == "ellingham"
+    after = {
+        path.name: hashlib.sha256(path.read_bytes()).hexdigest() for path in outputs
+    }
+    assert after == before
+
+
+def test_real_janaf_rows_join_real_compilation_pins(tmp_path) -> None:
+    from pathlib import Path
+
+    from simulator.battery.compilation_tier import (
+        iter_compilation_comparisons_jsonl,
+        write_compilation_comparisons_jsonl,
+    )
+    from simulator.battery.migrate import load_yaml, observation_from_plain
+    from simulator.battery.pins import load_pins, pin_failures
+
+    root = Path(__file__).resolve().parents[2]
+    requested = {"Mg-008": {"1100", "1200"}, "Al-096": {"1100", "1200"}}
+    observations = []
+    origins = {}
+    for element, table in (("Mg", "Mg-008"), ("Al", "Al-096")):
+        relative = f"compilations-janaf/janaf-{element}.yaml"
+        document = load_yaml(root / "data" / "literature" / "observations-v2" / relative)
+        raw = next(
+            row
+            for row in document["observations"]
+            if row.get("locator", {}).get("record") == table
+            and row.get("identity", {}).get("quantity", {}).get("value") == "delta_fG"
+            and requested[table]
+            <= {temperature for temperature, _ in row.get("value", {}).get("series", ())}
+        )
+        observation = observation_from_plain(raw)
+        observations.append(observation)
+        origins[observation.observation_id] = relative
+
+    context = _context(*observations, origins=origins)
+    loaded = load_pins(root / "data" / "battery" / "pins.yaml")
+    aliases = (
+        f"janaf::{table}:T={temperature}::{channel}::{quantity}"
+        for table in requested
+        for temperature in sorted(requested[table])
+        for channel, quantity in (
+            ("nasa_cea_9", "delta_fG_kJ_mol"),
+            ("ellingham", "delta_fG_kJ_per_mol_O2"),
+        )
+    )
+    pins = []
+    for alias in aliases:
+        pin = next(
+            record
+            for record in loaded["pin_band_records"]
+            if alias in record.aliases or record.old_key == alias
+        )
+        assert pin.aliases == (alias,)
+        assert pin.old_key == alias
+        pins.append(pin)
+
+    sidecar = tmp_path / "compilation-comparisons.jsonl"
+    assert write_compilation_comparisons_jsonl(context, sidecar) > 0
+    comparisons: list[dict[str, str]] = []
+    failures = pin_failures(
+        [],
+        pins,
+        compilation_comparisons=iter_compilation_comparisons_jsonl(sidecar),
+        comparisons=comparisons,
+    )
+
+    assert {row["key"] for row in comparisons} == {pin.key for pin in pins}
+    assert len(comparisons) == len(pins)
+    assert not any(
+        failure["reason"]
+        in {
+            "no_compilation_comparison_for_reference",
+            "ambiguous_compilation_comparison",
+        }
+        for failure in failures
+    )
+    target_alias = "janaf::Al-096:T=1100::nasa_cea_9::delta_fG_kJ_mol"
+    target_pin = next(pin for pin in pins if target_alias in pin.aliases)
+    legacy_failure = pin_failures([], (target_pin,))
+    legacy_report = render_score_report(
+        [],
+        context=context,
+        engines=(Engine.INTERNAL_ANALYTICAL,),
+        pin_failures=legacy_failure,
+        root=root,
+    )
+    legacy_row = next(
+        line
+        for line in legacy_report.splitlines()
+        if line.startswith(f"| `{target_pin.key}` |")
+    )
+    assert legacy_row.split("|")[2].strip() == "no_live_residual_for_reference"
+    comparison_report = render_score_report(
+        [],
+        context=context,
+        engines=(Engine.INTERNAL_ANALYTICAL,),
+        pin_failures=failures,
+        root=root,
+    )
+    assert not any(
+        line.startswith(f"| `{target_pin.key}` |")
+        for line in comparison_report.splitlines()
+    )
+
+
+def test_real_compilation_pin_score_report_reason_before_sidecar() -> None:
+    from pathlib import Path
+
+    from simulator.battery.pins import load_pins, pin_failures
+
+    root = Path(__file__).resolve().parents[2]
+    target_alias = "janaf::Al-096:T=1100::nasa_cea_9::delta_fG_kJ_mol"
+    pin = next(
+        record
+        for record in load_pins(root / "data" / "battery" / "pins.yaml")[
+            "pin_band_records"
+        ]
+        if target_alias in record.aliases
+    )
+    failures = pin_failures([], (pin,))
+    report = render_score_report(
+        [],
+        context=_context(),
+        engines=(Engine.INTERNAL_ANALYTICAL,),
+        pin_failures=failures,
+        root=root,
+    )
+
+    row = next(line for line in report.splitlines() if line.startswith(f"| `{pin.key}` |"))
+    assert row.split("|")[2].strip() == "no_live_residual_for_reference"
+
+
+def test_compilation_pin_checker_exit_and_counts(tmp_path, monkeypatch, capsys) -> None:
+    import json
+
+    from scripts import check_compilation_pin_sidecar as checker
+    from simulator.battery.pins import PinBandRecord
+
+    key = "janaf::Al-096:T=1100::nasa_cea_9::delta_fG_kJ_mol"
+    pin = PinBandRecord(
+        key=f"{key}::delta_fG::thermochemistry::nasa_cea_9",
+        expected_outcome="match",
+        evidence="fixture",
+        aliases=(key,),
+        centre=Decimal("1"),
+        pin_band_value=Decimal("0.05"),
+    )
+    monkeypatch.setattr(
+        checker,
+        "load_pins",
+        lambda _path: {"pin_band_records": (pin,)},
+    )
+    residuals = tmp_path / "residuals.jsonl"
+    residuals.write_text("", encoding="utf-8")
+    sidecar = tmp_path / "compilation-comparisons.jsonl"
+    args = [
+        "--residuals",
+        str(residuals),
+        "--sidecar",
+        str(sidecar),
+        "--pins",
+        str(tmp_path / "pins.yaml"),
+    ]
+
+    def write_comparison(value: str) -> None:
+        sidecar.write_text(
+            json.dumps(
+                {
+                    "reference_id": "nist-janaf-4th:Al-096:delta_fG:T=1100",
+                    "quantity": "delta_fG",
+                    "comparison_channel": "nasa_cea_9",
+                    "comparison_key": key,
+                    "status": "match",
+                    "value": value,
+                    "band": "0.05",
+                }
+            )
+            + "\n",
+            encoding="utf-8",
+        )
+
+    write_comparison("1")
+    assert checker.main(args) == 0
+    output = capsys.readouterr().out
+    assert "pins_total=1 matched=1 in_band=1 outside_band=0 unmatched=0" in output
+
+    write_comparison("1.1")
+    assert checker.main(args) == 1
+    output = capsys.readouterr().out
+    assert "pins_total=1 matched=1 in_band=0 outside_band=1 unmatched=0" in output
+
+    sidecar.write_text("", encoding="utf-8")
+    assert checker.main(args) == 1
+    output = capsys.readouterr().out
+    assert "pins_total=1 matched=0 in_band=0 outside_band=0 unmatched=1" in output
+    assert '"no_compilation_comparison_for_reference": 1' in output
+
+
+def test_compilation_comparison_sidecar_failure_preserves_target(tmp_path, monkeypatch) -> None:
+    import pytest
+
+    from simulator.battery import compilation_tier
+    from simulator.diagnostic_helpers import species_rail_differential
+
+    observation = _mgo_janaf_observation()
+    target = tmp_path / "compilation-comparisons.jsonl"
+    target.write_bytes(b"previous sidecar\n")
+
+    def fail(_point):
+        raise RuntimeError("comparison failed")
+
+    monkeypatch.setattr(species_rail_differential, "score_cea_point", fail)
+
+    with pytest.raises(RuntimeError, match="comparison failed"):
+        compilation_tier.write_compilation_comparisons_jsonl(
+            _context(observation), target
+        )
+
+    assert target.read_bytes() == b"previous sidecar\n"
+    assert list(tmp_path.iterdir()) == [target]
+
+
 def test_every_ellingham_segment_names_one_product() -> None:
     for metal, segments in ELLINGHAM_FIT_SEGMENTS.items():
         for segment in segments:

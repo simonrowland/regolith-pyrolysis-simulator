@@ -7,8 +7,8 @@ Observation. All failed checks are recorded; the first is the primary reason.
 Ambiguity resolutions:
 - Table self-consistency uses ``log10K_from_delta_fG_kJ_mol``
   (−ΔfG/(R T ln 10)) at matching reaction/per/p°. The finding floor is
-  0.1 dex, matching ``TABLE_SELF_CHECK_FINDING_DEX`` in
-  species_rail_differential (JANAF printed-precision grain). A consistent
+  0.1 dex, from ``physical_constants.TABLE_SELF_CHECK_FINDING_DEX``
+  (JANAF printed-precision grain). A consistent
   O2 identity (ΔfG=0, log10 Kf=0) passes. The gate does not score engines.
 - Effusion Kn threshold is ``FREE_MOLECULAR_KNUDSEN_MIN`` (10) from
   transport_constants. Kn is the *orifice* (cell-local) number, not chamber
@@ -40,7 +40,7 @@ from typing import Any, Iterable, Mapping, Sequence
 
 from simulator.battery.enums import (
     AdmissionStatus,
-    EvidenceClass,
+    MEASURED_EVIDENCE,
     MethodToken,
     Quantity,
     RefusalReason,
@@ -62,13 +62,8 @@ from simulator.battery.records import (
     as_decimal,
 )
 from simulator.reference_data.janaf import formula_composition
+from simulator.physical_constants import TABLE_SELF_CHECK_FINDING_DEX
 from simulator.transport_constants import FREE_MOLECULAR_KNUDSEN_MIN
-
-# Printed-precision self-check floor. Same constant as
-# simulator.diagnostic_helpers.species_rail_differential.TABLE_SELF_CHECK_FINDING_DEX.
-# JANAF low-T rows disagree with CODATA-R recomputation at ~0.02–0.08 dex;
-# a finding is reserved for residuals well above that grain.
-TABLE_SELF_CHECK_FINDING_DEX = Decimal("0.1")
 
 # KEMS equilibrium background ceiling (Pa). This remains a separate signal
 # quality check; it does not determine the in-cell effusion regime.
@@ -292,23 +287,36 @@ def _is_kinetic_or_yield(quantity: Quantity) -> bool:
     }
 
 
+COMPARISON_RATIO_KINDS = frozenset({"ratio", "comparison_ratio"})
+
+
+def effective_melt_reference_pairing_kind(
+    pairing_kind: Any, *, explicitly_same: bool = False
+) -> Any:
+    if pairing_kind in {None, "not_printed", "not_reported", "unknown"}:
+        return "same_cell" if explicitly_same else "same_effective_setup_assumed"
+    return pairing_kind
+
+
 def comparison_method_cell_constant_cancels(
     provenance: Mapping[str, Any] | None,
 ) -> bool:
-    """Return true only for grounded same-setup comparison activity evidence."""
+    """Return true for comparison ratios unless separate cells are recorded."""
 
     if not isinstance(provenance, Mapping):
         return False
     method = provenance.get("comparison_method")
     cell_constant = provenance.get("common_knudsen_cell_constant")
     pairing = provenance.get("melt_reference_pairing")
+    pairing_kind = pairing.get("kind") if isinstance(pairing, Mapping) else None
+    pairing_kind = effective_melt_reference_pairing_kind(pairing_kind)
     return (
         isinstance(method, Mapping)
-        and method.get("kind") in {"ratio", "comparison_ratio"}
+        and method.get("kind") in COMPARISON_RATIO_KINDS
         and isinstance(cell_constant, Mapping)
         and cell_constant.get("cancels") is True
-        and isinstance(pairing, Mapping)
-        and pairing.get("kind") in {"same_cell", "same_effective_setup"}
+        and pairing_kind
+        in {"same_cell", "same_effective_setup", "same_effective_setup_assumed"}
     )
 
 
@@ -434,19 +442,59 @@ def underdetermined_apparatus(
             ):
                 missing.append("clausing_factor")
     elif _is_effusion_pressure(method, quantity):
+        provenance = observation.provenance if observation is not None else None
+        method_provenance = (
+            provenance.get("comparison_method")
+            if isinstance(provenance, Mapping)
+            else None
+        )
+        pairing = (
+            provenance.get("melt_reference_pairing")
+            if isinstance(provenance, Mapping)
+            else None
+        )
+        different_comparison_setup = (
+            quantity in {Quantity.ACTIVITY, Quantity.ACTIVITY_COEFFICIENT}
+            and isinstance(method_provenance, Mapping)
+            and method_provenance.get("kind") in COMPARISON_RATIO_KINDS
+            and isinstance(pairing, Mapping)
+            and pairing.get("kind") == "different_cells_or_geometry"
+        )
         comparison_activity = (
             quantity in {Quantity.ACTIVITY, Quantity.ACTIVITY_COEFFICIENT}
             and observation is not None
             and comparison_method_cell_constant_cancels(observation.provenance)
         )
-        if comparison_activity:
+        if different_comparison_setup:
+            checks.append(
+                GateCheck(
+                    "comparison_method_cell_constant_cancels",
+                    False,
+                    {
+                        "method": "comparison_ratio",
+                        "pairing": "different_cells_or_geometry",
+                        "reason": "sample and standard use different cells or geometries",
+                    },
+                )
+            )
+            missing.append("comparison_pairing_different_cells_or_geometry")
+        elif comparison_activity:
+            # For same-instrument sample/pure-oxide current ratios, a_i ~ I_i/I_i°:
+            # area, Clausing factor, and sensitivity cancel to first order. Effusion
+            # still applies; explicit different-cell/geometry pairing disables this.
+            pairing = observation.provenance.get("melt_reference_pairing")
+            pairing_kind = (
+                pairing.get("kind")
+                if isinstance(pairing, Mapping)
+                else effective_melt_reference_pairing_kind(None)
+            )
             checks.append(
                 GateCheck(
                     "comparison_method_cell_constant_cancels",
                     True,
                     {
                         "method": "comparison_ratio",
-                        "pairing": "same_cell_or_same_effective_setup",
+                        "pairing": pairing_kind,
                         "geometry": "not_required_for_normalized_activity",
                     },
                 )
@@ -462,7 +510,32 @@ def underdetermined_apparatus(
             if not _clausing_ok(geometry.clausing_factor):
                 missing.append("clausing_factor")
         calibration = None if experiment.apparatus is None else experiment.apparatus.calibration
-        if not _calibration_grounded(calibration):
+        calibrated = _calibration_grounded(calibration)
+        activity_quantity = quantity in {
+            Quantity.ACTIVITY,
+            Quantity.ACTIVITY_COEFFICIENT,
+        }
+        ungrounded_detail = (
+            None if calibrated else _calibration_not_grounded_detail(calibration)
+        )
+        calibration_flagged = activity_quantity and ungrounded_detail is not None
+        if activity_quantity:
+            checks.append(
+                GateCheck(
+                    "kems_calibration",
+                    calibrated or calibration_flagged,
+                    {
+                        "missing": [] if calibrated else ["calibration"],
+                        "method": method.value,
+                        "quantity": quantity.value,
+                        "reason": None
+                        if calibrated
+                        else "KEMS activity requires a recorded calibration",
+                        **(ungrounded_detail if calibration_flagged else {}),
+                    },
+                )
+            )
+        if not calibrated and not calibration_flagged:
             missing.append("calibration")
     if _is_langmuir_pressure_or_alpha(method, quantity):
         if geometry is None or _finite_positive(geometry.exposed_area_m2) is None:
@@ -618,7 +691,12 @@ def effusion_regime_unverified(
     if not _calibration_grounded(calibration):
         ungrounded_detail = (
             _calibration_not_grounded_detail(calibration)
-            if quantity is Quantity.P_PARTIAL
+            if quantity
+            in {
+                Quantity.P_PARTIAL,
+                Quantity.ACTIVITY,
+                Quantity.ACTIVITY_COEFFICIENT,
+            }
             else None
         )
         if ungrounded_detail is None:
@@ -660,6 +738,22 @@ def effusion_regime_unverified(
                 "route": "in_cell_fallback",
             }
         )
+        if pressure_sum is None and quantity in {
+            Quantity.ACTIVITY,
+            Quantity.ACTIVITY_COEFFICIENT,
+        }:
+            checks.append(
+                GateCheck(
+                    "in_cell_partial_pressure_sum",
+                    False,
+                    pressure_detail,
+                )
+            )
+            return _fail(
+                RefusalReason.EFFUSION_REGIME_UNVERIFIED,
+                checks,
+                "in_cell_partial_pressure_sum",
+            )
         if pressure_sum is not None and pressure_sum > pressure_limit:
             checks.append(
                 GateCheck("in_cell_partial_pressure_sum", False, pressure_detail)
@@ -912,12 +1006,7 @@ def _printed_in_cell_pressure_sum(
             or quantity_token(identity) is not Quantity.P_PARTIAL
             or candidate.admission.status is not AdmissionStatus.ADMITTED
             or not candidate.evidence.class_.is_value
-            or candidate.evidence.class_.value
-            not in {
-                EvidenceClass.MEASURED_DIRECT,
-                EvidenceClass.MEASURED_TABULATED,
-                EvidenceClass.MEASURED_REDUCED,
-            }
+            or candidate.evidence.class_.value not in MEASURED_EVIDENCE
             or candidate.locator is None
             or not candidate.locator.has_location()
             or _point_temperature(candidate) != temperature

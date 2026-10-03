@@ -8574,7 +8574,8 @@ observations:
   - kind: comparison_method_cell_constant_cancels
     affected_quantities:
     - activity
-    reason: normalized melt/reference comparison records cancellation of the common Knudsen-cell constant
+    reason: normalized comparison-method activity assumes cancellation of the common Knudsen-cell constant (same instrument;
+      same-cell pairing not printed)
     origin: kems-051-allibert-1981::allibert_1981_table2_alumina_activity_kems::points:h=0ecd876f0b9c
   - kind: out_of_certified_band
     affected_quantities:
@@ -8636,9 +8637,10 @@ observations:
       basis: source-declared ion-comparison method
     common_knudsen_cell_constant:
       cancels: true
-      basis: same-condition reference-cell ratio
+      basis: same-instrument comparison ratio; common setup assumed
     melt_reference_pairing:
-      kind: same_effective_setup
+      kind: same_effective_setup_assumed
+      basis: same instrument; same-cell pairing is not printed
 - observation_id: kems-051-allibert-1981::allibert_1981_table2_alumina_activity_kems::points:h=324802d3baa1
   experiment_id: 10.1111/j.1151-2916.1981.tb09608.x::experiment::allibert-1981-mo-kems
   identity:
@@ -8750,7 +8752,8 @@ observations:
   - kind: comparison_method_cell_constant_cancels
     affected_quantities:
     - activity
-    reason: normalized melt/reference comparison records cancellation of the common Knudsen-cell constant
+    reason: normalized comparison-method activity assumes cancellation of the common Knudsen-cell constant (same instrument;
+      same-cell pairing not printed)
     origin: kems-051-allibert-1981::allibert_1981_table2_alumina_activity_kems::points:h=324802d3baa1
   source_id: kems-051-allibert-1981
   locator:
@@ -8806,9 +8809,10 @@ observations:
       basis: source-declared ion-comparison method
     common_knudsen_cell_constant:
       cancels: true
-      basis: same-condition reference-cell ratio
+      basis: same-instrument comparison ratio; common setup assumed
     melt_reference_pairing:
-      kind: same_effective_setup
+      kind: same_effective_setup_assumed
+      basis: same instrument; same-cell pairing is not printed
 - observation_id: kems-051-allibert-1981::allibert_1981_table2_alumina_activity_kems::points:h=4e576f5389d8
   experiment_id: 10.1111/j.1151-2916.1981.tb09608.x::experiment::allibert-1981-mo-kems
   identity:
@@ -8920,7 +8924,8 @@ observations:
   - kind: comparison_method_cell_constant_cancels
     affected_quantities:
     - activity
-    reason: normalized melt/reference comparison records cancellation of the common Knudsen-cell constant
+    reason: normalized comparison-method activity assumes cancellation of the common Knudsen-cell constant (same instrument;
+      same-cell pairing not printed)
     origin: kems-051-allibert-1981::allibert_1981_table2_alumina_activity_kems::points:h=4e576f5389d8
   source_id: kems-051-allibert-1981
   locator:
@@ -8976,9 +8981,10 @@ observations:
       basis: source-declared ion-comparison method
     common_knudsen_cell_constant:
       cancels: true
-      basis: same-condition reference-cell ratio
+      basis: same-instrument comparison ratio; common setup assumed
     melt_reference_pairing:
-      kind: same_effective_setup
+      kind: same_effective_setup_assumed
+      basis: same instrument; same-cell pairing is not printed
 - observation_id: kems-051-allibert-1981::allibert_1981_table2_alumina_activity_kems::points:h=6873b336f527
   experiment_id: 10.1111/j.1151-2916.1981.tb09608.x::experiment::allibert-1981-mo-kems
   identity:
@@ -9090,7 +9096,8 @@ observations:
   - kind: comparison_method_cell_constant_cancels
     affected_quantities:
     - activity
-    reason: normalized melt/reference comparison records cancellation of the common Knudsen-cell constant
+    reason: normalized comparison-method activity assumes cancellation of the common Knudsen-cell constant (same instrument;
+      same-cell pairing not printed)
     origin: kems-051-allibert-1981::allibert_1981_table2_alumina_activity_kems::points:h=6873b336f527
   source_id: kems-051-allibert-1981
   locator:
@@ -9146,9 +9153,10 @@ observations:
       basis: source-declared ion-comparison method
     common_knudsen_cell_constant:
       cancels: true
-      basis: same-condition reference-cell ratio
+      basis: same-instrument comparison ratio; common setup assumed
     melt_reference_pairing:
-      kind: same_effective_setup
+      kind: same_effective_setup_assumed
+      basis: same instrument; same-cell pairing is not printed
 - observation_id: kems-051-allibert-1981::allibert_1981_table2_alumina_activity_kems::points:h=93c8de819127
   experiment_id: 10.1111/j.1151-2916.1981.tb09608.x::experiment::allibert-1981-mo-kems
   identity:
@@ -9260,7 +9268,8 @@ observations:
   - kind: comparison_method_cell_constant_cancels
     affected_quantities:
     - activity
-    reason: normalized melt/reference comparison records cancellation of the common Knudsen-cell constant
+    reason: normalized comparison-method activity assumes cancellation of the common Knudsen-cell constant (same instrument;
+      same-cell pairing not printed)
     origin: kems-051-allibert-1981::allibert_1981_table2_alumina_activity_kems::points:h=93c8de819127
   source_id: kems-051-allibert-1981
   locator:
@@ -9316,9 +9325,10 @@ observations:
       basis: source-declared ion-comparison method
     common_knudsen_cell_constant:
       cancels: true
-      basis: same-condition reference-cell ratio
+      basis: same-instrument comparison ratio; common setup assumed
     melt_reference_pairing:
-      kind: same_effective_setup
+      kind: same_effective_setup_assumed
+      basis: same instrument; same-cell pairing is not printed
 - observation_id: kems-051-allibert-1981::allibert_1981_table2_alumina_activity_kems::points:h=958f9785390e
   experiment_id: 10.1111/j.1151-2916.1981.tb09608.x::experiment::allibert-1981-mo-kems
   identity:
@@ -9430,7 +9440,8 @@ observations:
   - kind: comparison_method_cell_constant_cancels
     affected_quantities:
     - activity
-    reason: normalized melt/reference comparison records cancellation of the common Knudsen-cell constant
+    reason: normalized comparison-method activity assumes cancellation of the common Knudsen-cell constant (same instrument;
+      same-cell pairing not printed)
     origin: kems-051-allibert-1981::allibert_1981_table2_alumina_activity_kems::points:h=958f9785390e
   source_id: kems-051-allibert-1981
   locator:
@@ -9486,9 +9497,10 @@ observations:
       basis: source-declared ion-comparison method
     common_knudsen_cell_constant:
       cancels: true
-      basis: same-condition reference-cell ratio
+      basis: same-instrument comparison ratio; common setup assumed
     melt_reference_pairing:
-      kind: same_effective_setup
+      kind: same_effective_setup_assumed
+      basis: same instrument; same-cell pairing is not printed
 - observation_id: kems-051-allibert-1981::allibert_1981_table2_alumina_activity_kems::points:h=9f2ea9a43918
   experiment_id: 10.1111/j.1151-2916.1981.tb09608.x::experiment::allibert-1981-mo-kems
   identity:
@@ -9600,7 +9612,8 @@ observations:
   - kind: comparison_method_cell_constant_cancels
     affected_quantities:
     - activity
-    reason: normalized melt/reference comparison records cancellation of the common Knudsen-cell constant
+    reason: normalized comparison-method activity assumes cancellation of the common Knudsen-cell constant (same instrument;
+      same-cell pairing not printed)
     origin: kems-051-allibert-1981::allibert_1981_table2_alumina_activity_kems::points:h=9f2ea9a43918
   source_id: kems-051-allibert-1981
   locator:
@@ -9656,9 +9669,10 @@ observations:
       basis: source-declared ion-comparison method
     common_knudsen_cell_constant:
       cancels: true
-      basis: same-condition reference-cell ratio
+      basis: same-instrument comparison ratio; common setup assumed
     melt_reference_pairing:
-      kind: same_effective_setup
+      kind: same_effective_setup_assumed
+      basis: same instrument; same-cell pairing is not printed
 - observation_id: kems-051-allibert-1981::allibert_1981_table2_alumina_activity_kems::points:h=bac23d93f466
   experiment_id: 10.1111/j.1151-2916.1981.tb09608.x::experiment::allibert-1981-mo-kems
   identity:
@@ -9770,7 +9784,8 @@ observations:
   - kind: comparison_method_cell_constant_cancels
     affected_quantities:
     - activity
-    reason: normalized melt/reference comparison records cancellation of the common Knudsen-cell constant
+    reason: normalized comparison-method activity assumes cancellation of the common Knudsen-cell constant (same instrument;
+      same-cell pairing not printed)
     origin: kems-051-allibert-1981::allibert_1981_table2_alumina_activity_kems::points:h=bac23d93f466
   source_id: kems-051-allibert-1981
   locator:
@@ -9826,9 +9841,10 @@ observations:
       basis: source-declared ion-comparison method
     common_knudsen_cell_constant:
       cancels: true
-      basis: same-condition reference-cell ratio
+      basis: same-instrument comparison ratio; common setup assumed
     melt_reference_pairing:
-      kind: same_effective_setup
+      kind: same_effective_setup_assumed
+      basis: same instrument; same-cell pairing is not printed
 - observation_id: kems-051-allibert-1981::allibert_1981_table2_cao_activity_kems::points:h=089e4f903141
   experiment_id: 10.1111/j.1151-2916.1981.tb09608.x::experiment::allibert-1981-mo-kems
   identity:
@@ -9941,7 +9957,8 @@ observations:
   - kind: comparison_method_cell_constant_cancels
     affected_quantities:
     - activity
-    reason: normalized melt/reference comparison records cancellation of the common Knudsen-cell constant
+    reason: normalized comparison-method activity assumes cancellation of the common Knudsen-cell constant (same instrument;
+      same-cell pairing not printed)
     origin: kems-051-allibert-1981::allibert_1981_table2_cao_activity_kems::points:h=089e4f903141
   source_id: kems-051-allibert-1981
   locator:
@@ -9997,9 +10014,10 @@ observations:
       basis: source-declared ion-comparison method
     common_knudsen_cell_constant:
       cancels: true
-      basis: same-condition reference-cell ratio
+      basis: same-instrument comparison ratio; common setup assumed
     melt_reference_pairing:
-      kind: same_effective_setup
+      kind: same_effective_setup_assumed
+      basis: same instrument; same-cell pairing is not printed
 - observation_id: kems-051-allibert-1981::allibert_1981_table2_cao_activity_kems::points:h=0a68381c8d07
   experiment_id: 10.1111/j.1151-2916.1981.tb09608.x::experiment::allibert-1981-mo-kems
   identity:
@@ -10112,7 +10130,8 @@ observations:
   - kind: comparison_method_cell_constant_cancels
     affected_quantities:
     - activity
-    reason: normalized melt/reference comparison records cancellation of the common Knudsen-cell constant
+    reason: normalized comparison-method activity assumes cancellation of the common Knudsen-cell constant (same instrument;
+      same-cell pairing not printed)
     origin: kems-051-allibert-1981::allibert_1981_table2_cao_activity_kems::points:h=0a68381c8d07
   source_id: kems-051-allibert-1981
   locator:
@@ -10168,9 +10187,10 @@ observations:
       basis: source-declared ion-comparison method
     common_knudsen_cell_constant:
       cancels: true
-      basis: same-condition reference-cell ratio
+      basis: same-instrument comparison ratio; common setup assumed
     melt_reference_pairing:
-      kind: same_effective_setup
+      kind: same_effective_setup_assumed
+      basis: same instrument; same-cell pairing is not printed
 - observation_id: kems-051-allibert-1981::allibert_1981_table2_cao_activity_kems::points:h=3816d169fbf5
   experiment_id: 10.1111/j.1151-2916.1981.tb09608.x::experiment::allibert-1981-mo-kems
   identity:
@@ -10283,7 +10303,8 @@ observations:
   - kind: comparison_method_cell_constant_cancels
     affected_quantities:
     - activity
-    reason: normalized melt/reference comparison records cancellation of the common Knudsen-cell constant
+    reason: normalized comparison-method activity assumes cancellation of the common Knudsen-cell constant (same instrument;
+      same-cell pairing not printed)
     origin: kems-051-allibert-1981::allibert_1981_table2_cao_activity_kems::points:h=3816d169fbf5
   source_id: kems-051-allibert-1981
   locator:
@@ -10339,9 +10360,10 @@ observations:
       basis: source-declared ion-comparison method
     common_knudsen_cell_constant:
       cancels: true
-      basis: same-condition reference-cell ratio
+      basis: same-instrument comparison ratio; common setup assumed
     melt_reference_pairing:
-      kind: same_effective_setup
+      kind: same_effective_setup_assumed
+      basis: same instrument; same-cell pairing is not printed
 - observation_id: kems-051-allibert-1981::allibert_1981_table2_cao_activity_kems::points:h=803c6b10f6a7
   experiment_id: 10.1111/j.1151-2916.1981.tb09608.x::experiment::allibert-1981-mo-kems
   identity:
@@ -10454,7 +10476,8 @@ observations:
   - kind: comparison_method_cell_constant_cancels
     affected_quantities:
     - activity
-    reason: normalized melt/reference comparison records cancellation of the common Knudsen-cell constant
+    reason: normalized comparison-method activity assumes cancellation of the common Knudsen-cell constant (same instrument;
+      same-cell pairing not printed)
     origin: kems-051-allibert-1981::allibert_1981_table2_cao_activity_kems::points:h=803c6b10f6a7
   source_id: kems-051-allibert-1981
   locator:
@@ -10510,9 +10533,10 @@ observations:
       basis: source-declared ion-comparison method
     common_knudsen_cell_constant:
       cancels: true
-      basis: same-condition reference-cell ratio
+      basis: same-instrument comparison ratio; common setup assumed
     melt_reference_pairing:
-      kind: same_effective_setup
+      kind: same_effective_setup_assumed
+      basis: same instrument; same-cell pairing is not printed
 - observation_id: kems-051-allibert-1981::allibert_1981_table2_cao_activity_kems::points:h=98d5192921f6
   experiment_id: 10.1111/j.1151-2916.1981.tb09608.x::experiment::allibert-1981-mo-kems
   identity:
@@ -10625,7 +10649,8 @@ observations:
   - kind: comparison_method_cell_constant_cancels
     affected_quantities:
     - activity
-    reason: normalized melt/reference comparison records cancellation of the common Knudsen-cell constant
+    reason: normalized comparison-method activity assumes cancellation of the common Knudsen-cell constant (same instrument;
+      same-cell pairing not printed)
     origin: kems-051-allibert-1981::allibert_1981_table2_cao_activity_kems::points:h=98d5192921f6
   source_id: kems-051-allibert-1981
   locator:
@@ -10681,9 +10706,10 @@ observations:
       basis: source-declared ion-comparison method
     common_knudsen_cell_constant:
       cancels: true
-      basis: same-condition reference-cell ratio
+      basis: same-instrument comparison ratio; common setup assumed
     melt_reference_pairing:
-      kind: same_effective_setup
+      kind: same_effective_setup_assumed
+      basis: same instrument; same-cell pairing is not printed
 - observation_id: kems-051-allibert-1981::allibert_1981_table2_cao_activity_kems::points:h=a5963b5fa0df
   experiment_id: 10.1111/j.1151-2916.1981.tb09608.x::experiment::allibert-1981-mo-kems
   identity:
@@ -10796,7 +10822,8 @@ observations:
   - kind: comparison_method_cell_constant_cancels
     affected_quantities:
     - activity
-    reason: normalized melt/reference comparison records cancellation of the common Knudsen-cell constant
+    reason: normalized comparison-method activity assumes cancellation of the common Knudsen-cell constant (same instrument;
+      same-cell pairing not printed)
     origin: kems-051-allibert-1981::allibert_1981_table2_cao_activity_kems::points:h=a5963b5fa0df
   - kind: out_of_certified_band
     affected_quantities:
@@ -10858,9 +10885,10 @@ observations:
       basis: source-declared ion-comparison method
     common_knudsen_cell_constant:
       cancels: true
-      basis: same-condition reference-cell ratio
+      basis: same-instrument comparison ratio; common setup assumed
     melt_reference_pairing:
-      kind: same_effective_setup
+      kind: same_effective_setup_assumed
+      basis: same instrument; same-cell pairing is not printed
 - observation_id: kems-051-allibert-1981::allibert_1981_table2_cao_activity_kems::points:h=b3b06405be2e
   experiment_id: 10.1111/j.1151-2916.1981.tb09608.x::experiment::allibert-1981-mo-kems
   identity:
@@ -10973,7 +11001,8 @@ observations:
   - kind: comparison_method_cell_constant_cancels
     affected_quantities:
     - activity
-    reason: normalized melt/reference comparison records cancellation of the common Knudsen-cell constant
+    reason: normalized comparison-method activity assumes cancellation of the common Knudsen-cell constant (same instrument;
+      same-cell pairing not printed)
     origin: kems-051-allibert-1981::allibert_1981_table2_cao_activity_kems::points:h=b3b06405be2e
   source_id: kems-051-allibert-1981
   locator:
@@ -11029,9 +11058,10 @@ observations:
       basis: source-declared ion-comparison method
     common_knudsen_cell_constant:
       cancels: true
-      basis: same-condition reference-cell ratio
+      basis: same-instrument comparison ratio; common setup assumed
     melt_reference_pairing:
-      kind: same_effective_setup
+      kind: same_effective_setup_assumed
+      basis: same instrument; same-cell pairing is not printed
 - observation_id: kems-051-allibert-1981::allibert_1981_table2_cao_activity_kems::points:h=d5945aa87c1c
   experiment_id: 10.1111/j.1151-2916.1981.tb09608.x::experiment::allibert-1981-mo-kems
   identity:
@@ -11144,7 +11174,8 @@ observations:
   - kind: comparison_method_cell_constant_cancels
     affected_quantities:
     - activity
-    reason: normalized melt/reference comparison records cancellation of the common Knudsen-cell constant
+    reason: normalized comparison-method activity assumes cancellation of the common Knudsen-cell constant (same instrument;
+      same-cell pairing not printed)
     origin: kems-051-allibert-1981::allibert_1981_table2_cao_activity_kems::points:h=d5945aa87c1c
   source_id: kems-051-allibert-1981
   locator:
@@ -11200,9 +11231,10 @@ observations:
       basis: source-declared ion-comparison method
     common_knudsen_cell_constant:
       cancels: true
-      basis: same-condition reference-cell ratio
+      basis: same-instrument comparison ratio; common setup assumed
     melt_reference_pairing:
-      kind: same_effective_setup
+      kind: same_effective_setup_assumed
+      basis: same instrument; same-cell pairing is not printed
 - observation_id: kems-051-allibert-1981::allibert_1981_table3_delta_mu_cao_from_emf::rows:h=2a8a53e6fe02
   experiment_id: 10.1111/j.1151-2916.1981.tb09608.x::kems-051-allibert-1981
   identity:

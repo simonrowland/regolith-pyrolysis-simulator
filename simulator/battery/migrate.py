@@ -255,6 +255,8 @@ class DuplicateContextIdError(ValueError):
 
 # Automatic method_class → evidence.class. PAGE tokens are absent here.
 METHOD_CLASS_MAP: dict[str, EvidenceClass] = {
+    member.value: member for member in EvidenceClass
+} | {
     "authors_estimate": EvidenceClass.AUTHOR_ESTIMATE,
     "authors_hypothesis": EvidenceClass.AUTHOR_ESTIMATE,
     "calculated": EvidenceClass.MEASURED_REDUCED,
@@ -346,6 +348,7 @@ PHASE_MAP: dict[str, Phase] = {
     "solid_arsenolite": Phase.CR,
     "basaltic_silicate_melt": Phase.L,
     "silicate_melt_ferrobasalt_FCMAS": Phase.L,
+    "cao-al2o3-sio2 liquid oxide melt": Phase.L,
     # Published parenthetical spellings (Kelley / Pankratz tables).
     "(g)": Phase.G,
     "(c)": Phase.CR,
@@ -637,15 +640,31 @@ def _provenance_from_extract(
     obs: Mapping[str, Any],
     values: Mapping[str, Any],
     inherited: Mapping[str, Any] | None,
+    *,
+    quantity: Quantity | None,
 ) -> Mapping[str, Any] | None:
     selected: dict[str, Any] | None = None
     for candidate in (obs.get("provenance"), values.get("provenance"), inherited):
         if isinstance(candidate, Mapping):
             selected = dict(candidate)
             break
-    method = values.get("method") or values.get("experimental_method")
-    method_token = str(method or "").strip().casefold().replace("_", "-")
-    if "ion-comparison" in method_token or "comparison-ratio" in method_token:
+    method_text = " ".join(
+        str(values[key])
+        for key in ("method", "experimental_method", "method_as_printed")
+        if values.get(key)
+    )
+    method_token = " ".join(
+        method_text.casefold().replace("_", " ").replace("-", " ").split()
+    )
+    if quantity in {Quantity.ACTIVITY, Quantity.ACTIVITY_COEFFICIENT} and any(
+        token in method_token
+        for token in (
+            "ion current comparison",
+            "ion comparison",
+            "ion current ratio",
+            "comparison ratio",
+        )
+    ):
         selected = dict(selected or {})
         selected.setdefault(
             "comparison_method",
@@ -658,14 +677,81 @@ def _provenance_from_extract(
             "common_knudsen_cell_constant",
             {
                 "cancels": True,
-                "basis": "same-condition reference-cell ratio",
+                "basis": "same-instrument comparison ratio; common setup assumed",
             },
         )
-        selected.setdefault(
-            "melt_reference_pairing",
-            {"kind": "same_effective_setup"},
+        explicitly_different = any(
+            phrase in method_token
+            for phrase in (
+                "different cell",
+                "separate cell",
+                "two cells",
+                "different geometr",
+                "separate geometr",
+                "not same cell",
+                "not the same cell",
+                "not same geometry",
+                "not the same geometry",
+            )
         )
+        pairing_not_reported = any(
+            phrase in method_token
+            for phrase in (
+                "does not state same cell",
+                "does not report same cell",
+                "not printed",
+                "not stated",
+                "not reported",
+                "not specified",
+            )
+        )
+        explicitly_same = any(
+            phrase in method_token
+            for phrase in ("same cell", "same geometry", "same effective setup")
+        ) and not pairing_not_reported
+        pairing = selected.get("melt_reference_pairing")
+        pairing_kind = pairing.get("kind") if isinstance(pairing, Mapping) else None
+        from simulator.battery.validity import effective_melt_reference_pairing_kind
+
+        effective_pairing_kind = effective_melt_reference_pairing_kind(
+            pairing_kind, explicitly_same=explicitly_same
+        )
+        if explicitly_different:
+            selected["melt_reference_pairing"] = {
+                "kind": "different_cells_or_geometry",
+                "basis": "extract states that sample and reference use different setups",
+            }
+        elif effective_pairing_kind != pairing_kind:
+            selected["melt_reference_pairing"] = {
+                "kind": effective_pairing_kind,
+                "basis": (
+                    "source states a common cell"
+                    if explicitly_same
+                    else "same instrument; same-cell pairing is not printed"
+                ),
+            }
     return selected
+
+
+def _comparison_method_cancellation_notice_reason(
+    provenance: Mapping[str, Any] | None,
+) -> str:
+    pairing = (
+        provenance.get("melt_reference_pairing")
+        if isinstance(provenance, Mapping)
+        else None
+    )
+    pairing_kind = pairing.get("kind") if isinstance(pairing, Mapping) else None
+    if pairing_kind == "same_effective_setup_assumed" or pairing_kind is None:
+        return (
+            "normalized comparison-method activity assumes cancellation of the "
+            "common Knudsen-cell constant (same instrument; same-cell pairing "
+            "not printed)"
+        )
+    return (
+        "normalized melt/reference comparison records cancellation of the common "
+        "Knudsen-cell constant"
+    )
 
 def _temperature_number(value: object) -> Decimal | None:
     if isinstance(value, Value) and value.kind is ValueKind.POINT:
@@ -2107,6 +2193,92 @@ def load_migrated_store(
                 ):
                     continue
                 observations[obs.observation_id] = obs
+    from simulator.battery.validity import comparison_method_cell_constant_cancels
+
+    # Persisted v2 activity rows omit the method prose; recover it from their
+    # located KEMS calibration record before the apparatus gate scores them.
+    for observation_id, observation in tuple(observations.items()):
+        identity = observation.identity
+        quantity = (
+            identity.quantity.value
+            if isinstance(identity, Identity) and identity.quantity.is_value
+            else None
+        )
+        if (
+            not isinstance(identity, Identity)
+            or quantity not in {Quantity.ACTIVITY, Quantity.ACTIVITY_COEFFICIENT}
+        ):
+            continue
+        experiment = experiments.get(observation.experiment_id)
+        if (
+            experiment is None
+            or not experiment.method.is_value
+            or experiment.method.value is not MethodToken.KNUDSEN_EFFUSION
+            or not experiment.apparatus
+            or not isinstance(experiment.apparatus.calibration, Mapping)
+        ):
+            continue
+        calibration = experiment.apparatus.calibration
+        method_record = calibration.get("method")
+        method_text = (
+            method_record.state.value
+            if isinstance(method_record, Located) and method_record.state.is_value
+            else method_record
+        )
+        standard_record = calibration.get("reference_substance")
+        standard = (
+            standard_record.state.value
+            if isinstance(standard_record, Located) and standard_record.state.is_value
+            else standard_record
+        )
+        if not isinstance(method_text, str) or not method_text.strip():
+            continue
+        if not standard and "standard" not in method_text.casefold():
+            continue
+        method_values = {"method": method_text}
+        if isinstance(method_record, Located) and method_record.locator is not None:
+            note = method_record.locator.note
+            if note:
+                method_values["method_as_printed"] = note
+        provenance = _provenance_from_extract(
+            {}, method_values, observation.provenance, quantity=quantity
+        )
+        if not comparison_method_cell_constant_cancels(provenance):
+            continue
+        identity = observation.identity
+        phase_text = "CaO-Al2O3-SiO2 liquid oxide melt"
+        phase_reason = (
+            f"phase string {phase_text!r} is not in the closed automatic map"
+        )
+        if (
+            identity.species.phase.is_unknown
+            and identity.species.phase.reason == phase_reason
+        ):
+            phase, _ = map_phase(phase_text)
+            identity = replace(
+                identity,
+                species=replace(identity.species, phase=phase),
+            )
+        notices = observation.notices
+        if not any(
+            notice.kind is NoticeKind.COMPARISON_METHOD_CELL_CONSTANT_CANCELS
+            for notice in notices
+        ):
+            notices = (
+                *notices,
+                Notice(
+                    kind=NoticeKind.COMPARISON_METHOD_CELL_CONSTANT_CANCELS,
+                    affected_quantities=(quantity,),
+                    reason=_comparison_method_cancellation_notice_reason(provenance),
+                    origin=observation_id,
+                ),
+            )
+        observations[observation_id] = replace(
+            observation,
+            identity=identity,
+            provenance=provenance,
+            notices=notices,
+        )
     return works, experiments, observations
 
 
@@ -5268,6 +5440,9 @@ def evidence_for(
     if mapped in {
         EvidenceClass.QUOTED_UNATTRIBUTED,
         EvidenceClass.QUOTED_ATTRIBUTED,
+    } and original not in {
+        EvidenceClass.QUOTED_UNATTRIBUTED.value,
+        EvidenceClass.QUOTED_ATTRIBUTED.value,
     }:
         mapped = (
             EvidenceClass.QUOTED_ATTRIBUTED
@@ -10956,7 +11131,6 @@ class Migrator:
             values = dict(raw_values)
         else:
             values = {}
-        observation_provenance = _provenance_from_extract(obs, values, provenance)
         t_for_rekey = None
         if isinstance(values, Mapping):
             t_sel_rekey = select_declared_source(AXIS_TEMPERATURE_K, None, values)
@@ -11001,7 +11175,12 @@ class Migrator:
                     local_ids=local_ids,
                     declared_experiment_id=declared_experiment_id,
                     source_context=source_context,
-                    provenance=observation_provenance,
+                    provenance=_provenance_from_extract(
+                        child_obs,
+                        child_values,
+                        provenance,
+                        quantity=child_quantity,
+                    ),
                 )
             return
         locator = locator_from_mapping(
@@ -11022,6 +11201,9 @@ class Migrator:
                 observation_id=obs_id,
             )
         q_token = quantity.value if quantity.is_value else None
+        observation_provenance = _provenance_from_extract(
+            obs, values, provenance, quantity=q_token
+        )
         phase_raw = compilation_phase_text(values) or compilation_phase_text(obs)
         phase_provenance: str | None = None
         transition_reason = transition_phase_reason(obs_type, values)
@@ -11103,9 +11285,6 @@ class Migrator:
                 species = make_species(
                     suffix_formula, phase, polymorph=polymorph_from_extract(obs)
                 )
-        q_token = quantity.value if isinstance(quantity, State) and quantity.is_value else (
-            quantity if isinstance(quantity, Quantity) else None
-        )
         initial_oxide_map = _initial_oxide_map_from_values(values)
         composition_located = _composition_located_from_values(values, locator)
         catalogue_composition = _catalogue_composition_located_from_values(values, locator)
@@ -12023,9 +12202,8 @@ class Migrator:
                 Notice(
                     kind=NoticeKind.COMPARISON_METHOD_CELL_CONSTANT_CANCELS,
                     affected_quantities=(q_token,),
-                    reason=(
-                        "normalized melt/reference comparison records cancellation "
-                        "of the common Knudsen-cell constant"
+                    reason=_comparison_method_cancellation_notice_reason(
+                        observation_provenance
                     ),
                     origin=obs_id,
                 )
@@ -12351,6 +12529,20 @@ class Migrator:
             if isinstance(quantity, State) and quantity.is_value
             else (quantity if isinstance(quantity, Quantity) else None)
         )
+        if (
+            q_token_point not in {Quantity.ACTIVITY, Quantity.ACTIVITY_COEFFICIENT}
+            and provenance is not None
+        ):
+            provenance = {
+                key: value
+                for key, value in provenance.items()
+                if key
+                not in {
+                    "comparison_method",
+                    "common_knudsen_cell_constant",
+                    "melt_reference_pairing",
+                }
+            } or None
         if ident_kwargs.get("composition") is None:
             initial_map = _initial_oxide_map_from_values(parent_values)
             if initial_map:
@@ -12850,10 +13042,7 @@ class Migrator:
                 Notice(
                     kind=NoticeKind.COMPARISON_METHOD_CELL_CONSTANT_CANCELS,
                     affected_quantities=(q_token_point,),
-                    reason=(
-                        "normalized melt/reference comparison records cancellation "
-                        "of the common Knudsen-cell constant"
-                    ),
+                    reason=_comparison_method_cancellation_notice_reason(provenance),
                     origin=point_id,
                 )
             )

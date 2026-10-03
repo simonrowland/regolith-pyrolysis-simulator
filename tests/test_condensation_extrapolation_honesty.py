@@ -672,6 +672,9 @@ def test_wall_deposit_query_reports_out_of_domain_antoine_prediction():
     assert wall_temperature_K <= float(
         magnesium_vapor["total_source_certified_range_K"][1]
     )
+    assert condensation._antoine_psat_pa("Mg", wall_temperature_K).hex() == (
+        "0x1.8910042a323f1p+20"
+    )
 
     model = condensation.CondensationModel(
         CondensationTrain.create_default(),
