@@ -1781,7 +1781,11 @@ def test_unknown_method_on_vapour_is_typed_method_unknown() -> None:
     assert residual.refusal.reason is not RefusalReason.UNDERDETERMINED_APPARATUS
 
 
+@pytest.mark.parametrize(
+    "quantity", (Quantity.ACTIVITY, Quantity.ACTIVITY_COEFFICIENT)
+)
 def test_published_typed_activity_unknown_method_scores_flagged_and_pressure_unknown_method_still_refuses(
+    quantity: Quantity,
 ) -> None:
     from simulator.battery.score import (
         FLAGGED_STRATUM_UNVERIFIED_APPARATUS,
@@ -1789,11 +1793,14 @@ def test_published_typed_activity_unknown_method_scores_flagged_and_pressure_unk
     )
 
     experiment = _unknown_method_experiment()
-    identity = F.activity_identity(
-        formula="CaO",
-        T_K=Decimal("1823"),
-        endmember_phase=Phase.L,
-        component_basis="CaO",
+    identity = replace(
+        F.activity_identity(
+            formula="CaO",
+            T_K=Decimal("1823"),
+            endmember_phase=Phase.L,
+            component_basis="CaO",
+        ),
+        quantity=quantity,
     )
     activity = F.observation(
         "published-cao-activity-unknown-method",
