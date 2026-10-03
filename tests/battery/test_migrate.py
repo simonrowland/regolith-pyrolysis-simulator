@@ -2011,18 +2011,18 @@ def test_h08_fourteen_token_table_destinations_are_stored(tmp_path: Path) -> Non
     ("method_class", "expected_evidence"),
     (
         ("measured_direct", "measured_direct"),
-        ("measured_tabulated", "unknown: unmapped method_class measured_tabulated"),
-        ("measured_reduced", "unknown: unmapped method_class measured_reduced"),
-        ("quoted_attributed", "unknown: unmapped method_class quoted_attributed"),
+        ("measured_tabulated", "measured_tabulated"),
+        ("measured_reduced", "measured_reduced"),
+        ("quoted_attributed", "quoted_attributed"),
         ("quoted_unattributed", "quoted_unattributed"),
         ("model_derived", "model_derived"),
-        ("author_estimate", "unknown: unmapped method_class author_estimate"),
+        ("author_estimate", "author_estimate"),
         ("figure_only", "figure_only"),
-        ("compilation_assessed", "unknown: unmapped method_class compilation_assessed"),
-        ("engine_prediction", "unknown: unmapped method_class engine_prediction"),
+        ("compilation_assessed", "compilation_assessed"),
+        ("engine_prediction", "engine_prediction"),
     ),
 )
-def test_canonical_evidence_method_class_current_mapping(
+def test_canonical_evidence_method_class_mapping(
     method_class: str, expected_evidence: str
 ) -> None:
     from simulator.battery.migrate import evidence_for
