@@ -2163,6 +2163,7 @@ def _internal_analytical_vapor_pressure_adapter(
     fO2_log: float | None,
     po2_request: Po2Request | None,
     oxygen_balance_backend: Any | None = None,
+    include_diagnostic_shadows: bool = True,
 ) -> Any:
     """Evaluate a battery observation through the simulator VAPOR_PRESSURE intent.
 
@@ -2357,7 +2358,13 @@ def _internal_analytical_vapor_pressure_adapter(
         vapor_pressures_source={},
         liquid_fraction=None,
     )
-    core._refresh_vapor_pressures_from_kernel(equilibrium)
+    if include_diagnostic_shadows:
+        core._refresh_vapor_pressures_from_kernel(equilibrium)
+    else:
+        core._refresh_vapor_pressures_from_kernel(
+            equilibrium,
+            include_diagnostic_shadows=False,
+        )
     core_diagnostic = dict(core._last_vapor_pressure_diagnostic)
     core_flags: list[dict[str, Any]] = []
     for field_name in (

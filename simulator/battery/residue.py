@@ -1231,6 +1231,7 @@ def _predict_hashimoto_residue_cohort(
                         mode=PO2_COMMANDED,
                         po2_bar=10.0**float(log10_pO2_bar),
                     ),
+                    include_diagnostic_shadows=False,
                 )
                 pressures = response.vapor_pressures_Pa
                 missing = [
@@ -1814,6 +1815,7 @@ def _predict_sossi_residue_cohort(
                         mode=PO2_COMMANDED,
                         po2_bar=10.0**log10_pO2_bar,
                     ),
+                    include_diagnostic_shadows=False,
                 )
                 return response.vapor_pressures_Pa
 

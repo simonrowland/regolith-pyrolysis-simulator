@@ -2035,27 +2035,37 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         )
         from engines.vaporock import VapoRockProvider
 
-        builtin_provider = BuiltinVaporPressureProvider(
-            self.vapor_pressure_catalog_data
+        builtin_provider = self._chem_registry.authoritative_for(
+            ChemistryIntent.VAPOR_PRESSURE
         )
-        self._chem_registry.register_idempotent(
-            builtin_provider,
-            [ChemistryIntent.VAPOR_PRESSURE],
-        )
+        if not isinstance(builtin_provider, BuiltinVaporPressureProvider):
+            builtin_provider = BuiltinVaporPressureProvider(
+                self.vapor_pressure_catalog_data
+            )
+            self._chem_registry.register_idempotent(
+                builtin_provider,
+                [ChemistryIntent.VAPOR_PRESSURE],
+            )
 
         # VapoRockProvider receives the same vapor_pressures.yaml payload
         # so its diagnostic output is filtered onto the simulator species
         # universe. It is shadow-only: the builtin result remains the
         # authoritative pressure dict even when VapoRock reports
         # non_authoritative or empty diagnostics.
-        vaporock_provider = VapoRockProvider(
-            vapor_pressure_data=self.vapor_pressures,
-        )
-        self._chem_registry.register_idempotent(
-            vaporock_provider,
-            [ChemistryIntent.VAPOR_PRESSURE],
-            shadow=True,
-        )
+        if not any(
+            isinstance(provider, VapoRockProvider)
+            for provider in self._chem_registry.shadows_for(
+                ChemistryIntent.VAPOR_PRESSURE
+            )
+        ):
+            vaporock_provider = VapoRockProvider(
+                vapor_pressure_data=self.vapor_pressures,
+            )
+            self._chem_registry.register_idempotent(
+                vaporock_provider,
+                [ChemistryIntent.VAPOR_PRESSURE],
+                shadow=True,
+            )
 
     def build_vapour_batch(
         self,
@@ -2348,6 +2358,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         fO2_log: Optional[float] = None,
         fe_redox_policy: str = 'intrinsic',
         temperature_C_override: float | None = None,
+        include_diagnostic_shadows: bool = True,
     ) -> IntentResult:
         """Dispatch one intent through the kernel with melt-derived controls.
 
@@ -2435,7 +2446,12 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                         'liquid_fraction'),
                 )
             )
-        return kernel.dispatch(
+        dispatch = (
+            kernel.dispatch
+            if include_diagnostic_shadows
+            else kernel._dispatch_authoritative_without_shadows
+        )
+        return dispatch(
             intent,
             temperature_C=temperature_C,
             pressure_bar=pressure_bar,
@@ -9291,7 +9307,12 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             ),
         }
 
-    def _refresh_vapor_pressures_from_kernel(self, result) -> None:
+    def _refresh_vapor_pressures_from_kernel(
+        self,
+        result,
+        *,
+        include_diagnostic_shadows: bool = True,
+    ) -> None:
         """Refresh ``result.vapor_pressures_Pa`` from the kernel dispatch.
 
         Belongs to the VAPOR_PRESSURE flip in
@@ -9460,6 +9481,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 **high_t_control_inputs,
             },
             fO2_log=intrinsic_fO2_log,
+            include_diagnostic_shadows=include_diagnostic_shadows,
         )
         self._last_high_t_melt_activity_temperature_K = T_C + 273.15
         diagnostic = dict(kernel_result.diagnostic or {})
