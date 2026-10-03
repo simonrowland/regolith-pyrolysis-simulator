@@ -7,6 +7,7 @@ exercise the schema-level contracts those rows require.
 
 from __future__ import annotations
 
+from dataclasses import replace
 from decimal import Decimal
 from fractions import Fraction
 from pathlib import Path
@@ -55,6 +56,7 @@ from simulator.battery.records import (
     CandidateRequest,
     Composition,
     Derivation,
+    Evidence,
     Execution,
     Located,
     Notice,
@@ -163,6 +165,29 @@ def test_m01_inconsistent_o2_table_is_invalid_source() -> None:
         score_eligible=True,
     )
     assert validate_corpus([w], [exp], [dg, lk_good, cand], [consistent]).ok
+
+
+@pytest.mark.parametrize(
+    ("residual", "passed"),
+    (
+        (Decimal("-0.1"), True),
+        (Decimal("0.1"), True),
+        (Decimal("-0.1000000000000000000000000001"), False),
+        (Decimal("0.1000000000000000000000000001"), False),
+    ),
+)
+def test_m01_table_floor_boundary_golden_pin(
+    residual: Decimal, passed: bool
+) -> None:
+    outcome = table_self_consistency(
+        delta_fG_kJ_mol=Decimal("0"),
+        log10_Kf=residual,
+        T_K=Decimal("298.15"),
+    )
+
+    assert outcome.passed is passed
+    assert outcome.checks[0].detail["residual_dex"] == str(residual)
+    assert outcome.checks[0].detail["finding_floor_dex"] == "0.1"
 
 
 def test_r01_engine_sibling_cannot_mask_printed_table_inconsistency() -> None:
@@ -3197,6 +3222,60 @@ def _kems_without_background(experiment):
             ),
         ),
     )
+
+
+@pytest.mark.parametrize(
+    ("evidence_class", "expected_pass"),
+    (
+        (EvidenceClass.MEASURED_DIRECT, True),
+        (EvidenceClass.MEASURED_TABULATED, True),
+        (EvidenceClass.MEASURED_REDUCED, True),
+        (EvidenceClass.QUOTED_ATTRIBUTED, False),
+        (EvidenceClass.QUOTED_UNATTRIBUTED, False),
+        (EvidenceClass.MODEL_DERIVED, False),
+        (EvidenceClass.AUTHOR_ESTIMATE, False),
+        (EvidenceClass.FIGURE_ONLY, False),
+        (EvidenceClass.COMPILATION_ASSESSED, False),
+        (EvidenceClass.ENGINE_PREDICTION, False),
+    ),
+)
+def test_mf_f04_pressure_sum_evidence_class_golden_pin(
+    evidence_class: EvidenceClass, expected_pass: bool
+) -> None:
+    composition = Composition(
+        basis="printed_mole_fraction",
+        components=(("CaO", Decimal("0.25")), ("SiO2", Decimal("0.75"))),
+        amount_basis=AmountBasis.MOLE_FRACTION,
+    )
+    experiment = _kems_without_background(F.kems_experiment(kn=None))
+    pressures = tuple(
+        replace(
+            _printed_kems_partial_pressure(
+                f"evidence-{species.lower()}",
+                experiment.experiment_id,
+                species,
+                pressure,
+                composition,
+            ),
+            evidence=Evidence(State.of(evidence_class)),
+        )
+        for species, pressure in (("O2", "0.2"), ("Ca", "0.1"), ("SiO", "0.4"))
+    )
+
+    result = run_validity_gates(
+        experiment,
+        pressures[0],
+        point_observations=pressures,
+    )
+
+    assert result.passed is expected_pass
+    if expected_pass:
+        pressure_check = next(
+            check for check in result.checks if check.name == "in_cell_partial_pressure_sum"
+        )
+        assert pressure_check.detail["printed_partial_pressure_sum_Pa"] == "0.7"
+    else:
+        assert result.reason is RefusalReason.EFFUSION_REGIME_UNVERIFIED
 
 
 def test_mf_f04_in_cell_pressure_sum_passes_with_unstated_background_flagged() -> None:

@@ -8,6 +8,8 @@ constants are parked here for future consolidation.
 
 from __future__ import annotations
 
+from decimal import Decimal
+
 # Fundamental constants (SI 2019 / CODATA exact-derived).
 GAS_CONSTANT = 8.31446261815324  # J/(mol K); R = N_A k_B.
 FARADAY = 96485.33212  # C/mol; F = N_A e.
@@ -27,6 +29,10 @@ J_PER_KJ = 1000.0
 ANGSTROM_PER_M = 1e10
 M2_PER_CM2 = 1e4
 STANDARD_ATMOSPHERE_PA = 101325.0
+
+# Printed-precision table self-check floor shared by battery validity and
+# compilation diagnostics. This is a policy scalar, not a physical constant.
+TABLE_SELF_CHECK_FINDING_DEX = Decimal("0.1")
 
 # Melt-dissociation pO2 envelope for vapor-pressure mass action (b-148).
 #
@@ -68,4 +74,5 @@ __all__ = (
     "STANDARD_ATMOSPHERE_PA",
     "STANDARD_GRAVITY",
     "STEFAN_BOLTZMANN",
+    "TABLE_SELF_CHECK_FINDING_DEX",
 )

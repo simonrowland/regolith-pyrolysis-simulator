@@ -7,8 +7,8 @@ Observation. All failed checks are recorded; the first is the primary reason.
 Ambiguity resolutions:
 - Table self-consistency uses ``log10K_from_delta_fG_kJ_mol``
   (−ΔfG/(R T ln 10)) at matching reaction/per/p°. The finding floor is
-  0.1 dex, matching ``TABLE_SELF_CHECK_FINDING_DEX`` in
-  species_rail_differential (JANAF printed-precision grain). A consistent
+  0.1 dex, from ``physical_constants.TABLE_SELF_CHECK_FINDING_DEX``
+  (JANAF printed-precision grain). A consistent
   O2 identity (ΔfG=0, log10 Kf=0) passes. The gate does not score engines.
 - Effusion Kn threshold is ``FREE_MOLECULAR_KNUDSEN_MIN`` (10) from
   transport_constants. Kn is the *orifice* (cell-local) number, not chamber
@@ -40,7 +40,7 @@ from typing import Any, Iterable, Mapping, Sequence
 
 from simulator.battery.enums import (
     AdmissionStatus,
-    EvidenceClass,
+    MEASURED_EVIDENCE,
     MethodToken,
     Quantity,
     RefusalReason,
@@ -62,13 +62,8 @@ from simulator.battery.records import (
     as_decimal,
 )
 from simulator.reference_data.janaf import formula_composition
+from simulator.physical_constants import TABLE_SELF_CHECK_FINDING_DEX
 from simulator.transport_constants import FREE_MOLECULAR_KNUDSEN_MIN
-
-# Printed-precision self-check floor. Same constant as
-# simulator.diagnostic_helpers.species_rail_differential.TABLE_SELF_CHECK_FINDING_DEX.
-# JANAF low-T rows disagree with CODATA-R recomputation at ~0.02–0.08 dex;
-# a finding is reserved for residuals well above that grain.
-TABLE_SELF_CHECK_FINDING_DEX = Decimal("0.1")
 
 # KEMS equilibrium background ceiling (Pa). This remains a separate signal
 # quality check; it does not determine the in-cell effusion regime.
@@ -1011,12 +1006,7 @@ def _printed_in_cell_pressure_sum(
             or quantity_token(identity) is not Quantity.P_PARTIAL
             or candidate.admission.status is not AdmissionStatus.ADMITTED
             or not candidate.evidence.class_.is_value
-            or candidate.evidence.class_.value
-            not in {
-                EvidenceClass.MEASURED_DIRECT,
-                EvidenceClass.MEASURED_TABULATED,
-                EvidenceClass.MEASURED_REDUCED,
-            }
+            or candidate.evidence.class_.value not in MEASURED_EVIDENCE
             or candidate.locator is None
             or not candidate.locator.has_location()
             or _point_temperature(candidate) != temperature
