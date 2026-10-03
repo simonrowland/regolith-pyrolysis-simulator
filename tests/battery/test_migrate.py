@@ -1088,6 +1088,16 @@ def test_lineage_parents_from_source_never_invents_pointer() -> None:
     assert parents == ("src::local_a", "other::obs", "src::local_b")
     assert prose == ("prose note",)
 
+    parents, prose = lineage_parents_from_source(
+        {"derived_from": ["tables:src", "tables:src/t2.csv"]},
+        {},
+        "src",
+        set(),
+        asset_ids={"tables:src"},
+    )
+    assert parents == ("tables:src",)
+    assert prose == ("tables:src/t2.csv",)
+
     assert lineage_parents_from_source({}, {}, "src", {"local_a"}) == ((), ())
 
 
@@ -4495,6 +4505,8 @@ _TYPE_CONTRADICTIONS = [
     ("kems-184-behrens-1979.yaml", "behrens_1979_sic2_equilibrium_enthalpy_and_barrier"),
     ("kems-184-behrens-1979.yaml", "behrens_1979_sic2_formation_enthalpies"),
     ("nist-webbook.yaml", "Rau74_critical_constants"),
+    # The reviewed extract replaced the former bundled heat-capacity rows
+    # with table-specific observations; keep the same contradiction pinned.
     ("stebbins-carmichael-weill-1983.yaml", "stebbins_1983_diopside_calorimetry_measured_tables_1_3"),
     ("stebbins-carmichael-weill-1983.yaml", "stebbins_1983_albite_analbite_calorimetry_measured_tables_1_5"),
     ("stebbins-carmichael-weill-1983.yaml", "stebbins_1983_sanidine_calorimetry_measured_table_3"),
@@ -5241,22 +5253,26 @@ def test_kume_measured_reduced_activity_preserves_structured_derivation(
 def test_measured_reduced_derivation_prose_input_is_queued_not_pointed(
     tmp_path: Path,
 ) -> None:
-    name = "kume-2000-cao-activities.yaml"
+    name = "stebbins-carmichael-weill-1983.yaml"
     source = REPO_ROOT / "data" / "literature" / "extracts" / name
     extract = yaml.safe_load(source.read_text(encoding="utf-8"))
     extract["source_id"] = "fixture-source"
     raw = next(
         row
-        for row in extract["species"]["CaO"]["observations"]
-        if row.get("observation_id") == "kume_2000_table2_sample_101"
+        for block in extract["species"].values()
+        for row in block["observations"]
+        if row.get("observation_id") == "stebbins_1983_diopside_table_4_fit"
     )
-    raw["derivation"]["inputs"] = "Table 2 DSC Cp points"
+    assert raw["values"]["derivation"]["inputs"] == [
+        "Table 2 DSC Cp points",
+        "Table 3 drop-calorimetric heat contents",
+    ]
 
     result = migrate(_write_min_tree(tmp_path, extract), write=True)
     observation = next(
         obs
         for obs in result.observations.values()
-        if obs.observation_id.endswith("::kume_2000_table2_sample_101")
+        if obs.observation_id.endswith("::stebbins_1983_diopside_table_4_fit")
     )
     queued = [
         entry
@@ -5271,7 +5287,7 @@ def test_measured_reduced_derivation_prose_input_is_queued_not_pointed(
         result.works, result.experiments, result.observations, residuals=None
     )
     assert not any(
-        issue.path.startswith(f"observations.{observation.observation_id}.")
+        issue.path.startswith(f"observation[{observation.observation_id}].")
         and issue.reason is RefusalReason.REFERENTIAL_INTEGRITY
         for issue in report.hard_issues
     )
