@@ -4,7 +4,7 @@ rows in: 47410
 records out (observations): 121085
 works: 263
 experiments: 3518
-queue size: 76833
+queue size: 76822
 identical-payload dedupe aliases: 342
 metadata files: 39
 index sources: 168
@@ -28,7 +28,7 @@ hard issues: 3351
 | absent_admissions | 3511 | 4742 (mismatch) |
 | absent_classes | 2174 | 2205 (mismatch) |
 | range_only_T | 3125 | 2747 (mismatch) |
-| system_like_phases | 1065 | 2638 (mismatch) |
+| system_like_phases | 1065 | 2627 (mismatch) |
 | missing_phases | 237 | 367 (mismatch) |
 | tabulated_lists | — | 6 |
 
@@ -18176,7 +18176,7 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/extracts/steurer-1985-vapor-phase-pyrolysis.yaml` | 8 | 43 | 151 |
 | `data/literature/extracts/steurer-1992-vapor-phase-pyrolysis.yaml` | 2 | 11 | 39 |
 | `data/literature/extracts/stolyarova-1995-cao-alumina-kems.yaml` | 12 | 56 | 28 |
-| `data/literature/extracts/stolyarova-1996-cao-alumina-silica-kems.yaml` | 25 | 312 | 89 |
+| `data/literature/extracts/stolyarova-1996-cao-alumina-silica-kems.yaml` | 25 | 312 | 78 |
 | `data/literature/extracts/street-2010-thermal-properties-simulants.yaml` | 7 | 13 | 35 |
 | `data/literature/extracts/sublimation-kinetics-2023-minerals.yaml` | 19 | 57 | 84 |
 | `data/literature/extracts/ta-badro-2021.yaml` | 28 | 28 | 64 |

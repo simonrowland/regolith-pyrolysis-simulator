@@ -1665,7 +1665,13 @@ observations:
         page: 1278
         pdf_page_index: 3
         table: '2'
-  notices: []
+  notices:
+  - kind: comparison_method_cell_constant_cancels
+    affected_quantities:
+    - activity
+    reason: normalized comparison-method activity assumes cancellation of the common Knudsen-cell constant (same instrument;
+      same-cell pairing not printed)
+    origin: kems-021-plante-1992-feo::plante_1992_table2_feo_activity_coefficient_1973k::T=1973:h=201bb6624432
   source_id: kems-021-plante-1992-feo
   locator:
     page: 1278
@@ -1710,6 +1716,16 @@ observations:
     - pdf:kems-021-plante-1992-feo
     parameters: []
     output_unit: dimensionless activity
+  provenance:
+    comparison_method:
+      kind: comparison_ratio
+      basis: source-declared ion-comparison method
+    common_knudsen_cell_constant:
+      cancels: true
+      basis: same-instrument comparison ratio; common setup assumed
+    melt_reference_pairing:
+      kind: same_effective_setup_assumed
+      basis: same instrument; same-cell pairing is not printed
 - observation_id: kems-021-plante-1992-feo::plante_1992_table2_feo_activity_coefficient_1973k::T=1973:h=328036886235
   experiment_id: 10.2355/isijinternational.32.1276::experiment::feo-mgo-sio2-series
   identity:
@@ -1818,7 +1834,13 @@ observations:
         page: 1278
         pdf_page_index: 3
         table: '2'
-  notices: []
+  notices:
+  - kind: comparison_method_cell_constant_cancels
+    affected_quantities:
+    - activity
+    reason: normalized comparison-method activity assumes cancellation of the common Knudsen-cell constant (same instrument;
+      same-cell pairing not printed)
+    origin: kems-021-plante-1992-feo::plante_1992_table2_feo_activity_coefficient_1973k::T=1973:h=328036886235
   source_id: kems-021-plante-1992-feo
   locator:
     page: 1278
@@ -1863,6 +1885,16 @@ observations:
     - pdf:kems-021-plante-1992-feo
     parameters: []
     output_unit: dimensionless activity
+  provenance:
+    comparison_method:
+      kind: comparison_ratio
+      basis: source-declared ion-comparison method
+    common_knudsen_cell_constant:
+      cancels: true
+      basis: same-instrument comparison ratio; common setup assumed
+    melt_reference_pairing:
+      kind: same_effective_setup_assumed
+      basis: same instrument; same-cell pairing is not printed
 - observation_id: kems-021-plante-1992-feo::plante_1992_table2_feo_activity_coefficient_1973k::T=1973:h=3ea1c1555ffc
   experiment_id: 10.2355/isijinternational.32.1276::experiment::feo-mgo-sio2-series
   identity:
@@ -1971,7 +2003,13 @@ observations:
         page: 1278
         pdf_page_index: 3
         table: '2'
-  notices: []
+  notices:
+  - kind: comparison_method_cell_constant_cancels
+    affected_quantities:
+    - activity
+    reason: normalized comparison-method activity assumes cancellation of the common Knudsen-cell constant (same instrument;
+      same-cell pairing not printed)
+    origin: kems-021-plante-1992-feo::plante_1992_table2_feo_activity_coefficient_1973k::T=1973:h=3ea1c1555ffc
   source_id: kems-021-plante-1992-feo
   locator:
     page: 1278
@@ -2016,6 +2054,16 @@ observations:
     - pdf:kems-021-plante-1992-feo
     parameters: []
     output_unit: dimensionless activity
+  provenance:
+    comparison_method:
+      kind: comparison_ratio
+      basis: source-declared ion-comparison method
+    common_knudsen_cell_constant:
+      cancels: true
+      basis: same-instrument comparison ratio; common setup assumed
+    melt_reference_pairing:
+      kind: same_effective_setup_assumed
+      basis: same instrument; same-cell pairing is not printed
 - observation_id: kems-021-plante-1992-feo::plante_1992_table2_feo_activity_coefficient_1973k::T=1973:h=65f4615bc6f7
   experiment_id: 10.2355/isijinternational.32.1276::experiment::feo-mgo-sio2-series
   identity:
@@ -2124,7 +2172,13 @@ observations:
         page: 1278
         pdf_page_index: 3
         table: '2'
-  notices: []
+  notices:
+  - kind: comparison_method_cell_constant_cancels
+    affected_quantities:
+    - activity
+    reason: normalized comparison-method activity assumes cancellation of the common Knudsen-cell constant (same instrument;
+      same-cell pairing not printed)
+    origin: kems-021-plante-1992-feo::plante_1992_table2_feo_activity_coefficient_1973k::T=1973:h=65f4615bc6f7
   source_id: kems-021-plante-1992-feo
   locator:
     page: 1278
@@ -2169,6 +2223,16 @@ observations:
     - pdf:kems-021-plante-1992-feo
     parameters: []
     output_unit: dimensionless activity
+  provenance:
+    comparison_method:
+      kind: comparison_ratio
+      basis: source-declared ion-comparison method
+    common_knudsen_cell_constant:
+      cancels: true
+      basis: same-instrument comparison ratio; common setup assumed
+    melt_reference_pairing:
+      kind: same_effective_setup_assumed
+      basis: same instrument; same-cell pairing is not printed
 - observation_id: kems-021-plante-1992-feo::plante_1992_table2_feo_activity_coefficient_1973k::T=1973:h=7864b47a9b23
   experiment_id: 10.2355/isijinternational.32.1276::experiment::feo-mgo-sio2-series
   identity:
@@ -2277,7 +2341,13 @@ observations:
         page: 1278
         pdf_page_index: 3
         table: '2'
-  notices: []
+  notices:
+  - kind: comparison_method_cell_constant_cancels
+    affected_quantities:
+    - activity
+    reason: normalized comparison-method activity assumes cancellation of the common Knudsen-cell constant (same instrument;
+      same-cell pairing not printed)
+    origin: kems-021-plante-1992-feo::plante_1992_table2_feo_activity_coefficient_1973k::T=1973:h=7864b47a9b23
   source_id: kems-021-plante-1992-feo
   locator:
     page: 1278
@@ -2322,6 +2392,16 @@ observations:
     - pdf:kems-021-plante-1992-feo
     parameters: []
     output_unit: dimensionless activity
+  provenance:
+    comparison_method:
+      kind: comparison_ratio
+      basis: source-declared ion-comparison method
+    common_knudsen_cell_constant:
+      cancels: true
+      basis: same-instrument comparison ratio; common setup assumed
+    melt_reference_pairing:
+      kind: same_effective_setup_assumed
+      basis: same instrument; same-cell pairing is not printed
 - observation_id: kems-021-plante-1992-feo::plante_1992_table2_feo_activity_coefficient_1973k::T=1973:h=7d1c9a46a5ce
   experiment_id: 10.2355/isijinternational.32.1276::experiment::feo-mgo-sio2-series
   identity:
@@ -2430,7 +2510,13 @@ observations:
         page: 1278
         pdf_page_index: 3
         table: '2'
-  notices: []
+  notices:
+  - kind: comparison_method_cell_constant_cancels
+    affected_quantities:
+    - activity
+    reason: normalized comparison-method activity assumes cancellation of the common Knudsen-cell constant (same instrument;
+      same-cell pairing not printed)
+    origin: kems-021-plante-1992-feo::plante_1992_table2_feo_activity_coefficient_1973k::T=1973:h=7d1c9a46a5ce
   source_id: kems-021-plante-1992-feo
   locator:
     page: 1278
@@ -2475,6 +2561,16 @@ observations:
     - pdf:kems-021-plante-1992-feo
     parameters: []
     output_unit: dimensionless activity
+  provenance:
+    comparison_method:
+      kind: comparison_ratio
+      basis: source-declared ion-comparison method
+    common_knudsen_cell_constant:
+      cancels: true
+      basis: same-instrument comparison ratio; common setup assumed
+    melt_reference_pairing:
+      kind: same_effective_setup_assumed
+      basis: same instrument; same-cell pairing is not printed
 - observation_id: kems-021-plante-1992-feo::plante_1992_table2_feo_activity_coefficient_1973k::T=1973:h=e1fc9a7e622b
   experiment_id: 10.2355/isijinternational.32.1276::experiment::feo-mgo-sio2-series
   identity:
@@ -2583,7 +2679,13 @@ observations:
         page: 1278
         pdf_page_index: 3
         table: '2'
-  notices: []
+  notices:
+  - kind: comparison_method_cell_constant_cancels
+    affected_quantities:
+    - activity
+    reason: normalized comparison-method activity assumes cancellation of the common Knudsen-cell constant (same instrument;
+      same-cell pairing not printed)
+    origin: kems-021-plante-1992-feo::plante_1992_table2_feo_activity_coefficient_1973k::T=1973:h=e1fc9a7e622b
   source_id: kems-021-plante-1992-feo
   locator:
     page: 1278
@@ -2628,6 +2730,16 @@ observations:
     - pdf:kems-021-plante-1992-feo
     parameters: []
     output_unit: dimensionless activity
+  provenance:
+    comparison_method:
+      kind: comparison_ratio
+      basis: source-declared ion-comparison method
+    common_knudsen_cell_constant:
+      cancels: true
+      basis: same-instrument comparison ratio; common setup assumed
+    melt_reference_pairing:
+      kind: same_effective_setup_assumed
+      basis: same instrument; same-cell pairing is not printed
 - observation_id: kems-021-plante-1992-feo::plante_1992_table2_feo_activity_coefficient_1973k::T=1973:h=e85068333c60
   experiment_id: 10.2355/isijinternational.32.1276::experiment::feo-mgo-sio2-series
   identity:
@@ -2736,7 +2848,13 @@ observations:
         page: 1278
         pdf_page_index: 3
         table: '2'
-  notices: []
+  notices:
+  - kind: comparison_method_cell_constant_cancels
+    affected_quantities:
+    - activity
+    reason: normalized comparison-method activity assumes cancellation of the common Knudsen-cell constant (same instrument;
+      same-cell pairing not printed)
+    origin: kems-021-plante-1992-feo::plante_1992_table2_feo_activity_coefficient_1973k::T=1973:h=e85068333c60
   source_id: kems-021-plante-1992-feo
   locator:
     page: 1278
@@ -2781,6 +2899,16 @@ observations:
     - pdf:kems-021-plante-1992-feo
     parameters: []
     output_unit: dimensionless activity
+  provenance:
+    comparison_method:
+      kind: comparison_ratio
+      basis: source-declared ion-comparison method
+    common_knudsen_cell_constant:
+      cancels: true
+      basis: same-instrument comparison ratio; common setup assumed
+    melt_reference_pairing:
+      kind: same_effective_setup_assumed
+      basis: same instrument; same-cell pairing is not printed
 - observation_id: kems-021-plante-1992-feo::plante_1992_table2_feo_activity_coefficient_1973k::T=1973:h=f14f45678245
   experiment_id: 10.2355/isijinternational.32.1276::experiment::feo-mgo-sio2-series
   identity:
@@ -2889,7 +3017,13 @@ observations:
         page: 1278
         pdf_page_index: 3
         table: '2'
-  notices: []
+  notices:
+  - kind: comparison_method_cell_constant_cancels
+    affected_quantities:
+    - activity
+    reason: normalized comparison-method activity assumes cancellation of the common Knudsen-cell constant (same instrument;
+      same-cell pairing not printed)
+    origin: kems-021-plante-1992-feo::plante_1992_table2_feo_activity_coefficient_1973k::T=1973:h=f14f45678245
   source_id: kems-021-plante-1992-feo
   locator:
     page: 1278
@@ -2934,3 +3068,13 @@ observations:
     - pdf:kems-021-plante-1992-feo
     parameters: []
     output_unit: dimensionless activity
+  provenance:
+    comparison_method:
+      kind: comparison_ratio
+      basis: source-declared ion-comparison method
+    common_knudsen_cell_constant:
+      cancels: true
+      basis: same-instrument comparison ratio; common setup assumed
+    melt_reference_pairing:
+      kind: same_effective_setup_assumed
+      basis: same instrument; same-cell pairing is not printed
