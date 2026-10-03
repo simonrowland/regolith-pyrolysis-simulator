@@ -452,6 +452,8 @@ def normalize_cached_real_config(
                     unavailable_error_cls(str(exc)),
                     "invalid_run_input",
                 ) from exc
+        else:
+            authorized_model = authorized_model or DEFAULT_ALPHAMELTS_MODEL
     elif _is_thermoengine_authorized_name(authorized_backend_name):
         authorized_model = authorized_model or DEFAULT_ALPHAMELTS_MODEL
         authorized_mode = authorized_mode or 'thermoengine'

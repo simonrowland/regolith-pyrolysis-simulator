@@ -722,6 +722,7 @@ def test_cached_real_model_identity_pins_current_family_and_transport_behavior(
         BackendSelectionPolicy.RUNNER_STRICT,
         cached_real_config=config,
     )
+    assert backend.config.authorized_model == expected_model
     sim = _build_cached_real_sim(backend=backend, cache_config=config)
 
     key = canonical_replay_key(
