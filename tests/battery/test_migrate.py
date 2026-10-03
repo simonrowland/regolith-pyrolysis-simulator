@@ -4495,11 +4495,11 @@ _TYPE_CONTRADICTIONS = [
     ("kems-184-behrens-1979.yaml", "behrens_1979_sic2_equilibrium_enthalpy_and_barrier"),
     ("kems-184-behrens-1979.yaml", "behrens_1979_sic2_formation_enthalpies"),
     ("nist-webbook.yaml", "Rau74_critical_constants"),
-    ("stebbins-carmichael-weill-1983.yaml", "stebbins_1983_diopside_calorimetry_tables_1_7"),
-    ("stebbins-carmichael-weill-1983.yaml", "stebbins_1983_albite_analbite_calorimetry_tables_1_7"),
-    ("stebbins-carmichael-weill-1983.yaml", "stebbins_1983_sanidine_calorimetry_tables_3_7"),
-    ("stebbins-carmichael-weill-1983.yaml", "stebbins_1983_nepheline_calorimetry_tables_3_7"),
-    ("stebbins-carmichael-weill-1983.yaml", "stebbins_1983_anorthite_calorimetry_tables_1_7"),
+    ("stebbins-carmichael-weill-1983.yaml", "stebbins_1983_diopside_calorimetry_measured_tables_1_3"),
+    ("stebbins-carmichael-weill-1983.yaml", "stebbins_1983_albite_analbite_calorimetry_measured_tables_1_5"),
+    ("stebbins-carmichael-weill-1983.yaml", "stebbins_1983_sanidine_calorimetry_measured_table_3"),
+    ("stebbins-carmichael-weill-1983.yaml", "stebbins_1983_nepheline_calorimetry_measured_table_3"),
+    ("stebbins-carmichael-weill-1983.yaml", "stebbins_1983_anorthite_calorimetry_measured_table_1"),
     ("wetzel-gail-2013-sio-arrhenius.yaml", "wetzel_gail_2013_sio_arrhenius"),
 ]
 _FIELD_ALPHA_CONTRADICTIONS = [
@@ -5054,6 +5054,63 @@ def test_dacko_minor_constituents_are_omitted_from_activity_composition() -> Non
         composition, omitted = _mole_fraction_composition_from_values(row["values"])
         assert composition is None
         assert "minor constituents" in omitted
+
+
+def test_kume_activity_extract_rows_use_activity_quantity_type() -> None:
+    extract = yaml.safe_load(
+        (REPO_ROOT / "data/literature/extracts/kume-2000-cao-activities.yaml")
+        .read_text(encoding="utf-8")
+    )
+    rows = []
+    for species in ("CaO", "SiO2"):
+        block = extract["species"][species]
+        rows.extend(
+            row
+            for row in block["observations"]
+            if "activity" in (row.get("values") or {})
+        )
+
+    assert len(rows) == 208
+    for row in rows:
+        assert row["type"] == "activity", row["observation_id"]
+        quantity, reason = map_quantity(
+            row.get("type"), row.get("values"), units=row.get("units"), row=row
+        )
+        assert quantity.is_value and quantity.value is Quantity.ACTIVITY
+        assert reason is None
+
+    assert all(
+        sample["observable"] == "activity"
+        for sample in extract["fidelity_samples"]
+    )
+
+
+def test_kume_experiment_temperatures_have_table_locators(tmp_path: Path) -> None:
+    result = _migrate_real_extract(
+        tmp_path, "kume-2000-cao-activities.yaml", write=False
+    )
+    expected = {
+        "kume-2000-table1-1823k": (Decimal("1823"), "1", 562),
+        "kume-2000-table1-1873k": (Decimal("1873"), "1", 562),
+        "kume-2000-table2-1823k": (Decimal("1823"), "2", 563),
+        "kume-2000-table3-1873k": (Decimal("1873"), "3", 564),
+        "kume-2000-table4-1873k": (Decimal("1873"), "4", 565),
+    }
+    seen = set()
+    for experiment in result.experiments.values():
+        local_id = experiment.experiment_id.rsplit("::", 1)[-1]
+        if local_id not in expected:
+            continue
+        temperature, table, page = expected[local_id]
+        condition = experiment.conditions["temperature_K"]
+        assert condition.state.is_value
+        assert condition.state.value == temperature
+        assert condition.locator is not None
+        assert str(condition.locator.table) == table
+        assert condition.locator.page == page
+        seen.add(local_id)
+
+    assert seen == set(expected)
 
 
 def test_kume_activity_compositions_map_to_parent_oxide_basis(tmp_path: Path) -> None:
