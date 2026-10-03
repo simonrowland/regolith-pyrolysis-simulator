@@ -129,3 +129,98 @@ def test_sossi_scorer_projects_mn_and_types_unsupported_elements(monkeypatch) ->
     assert metric_operation_for_identity(manganese.identity) is MetricOperation.DEX
     assert refusal.refusal_reason is RefusalReason.OUTSIDE_SUPPORTED_SPECIES
     assert refusal.refusal_detail["reason"] == "channel_missing"
+
+
+def test_mixed_hashimoto_and_sossi_score_keep_separate_engine_cohorts(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from types import SimpleNamespace
+
+    from simulator.battery.enums import Engine, Quantity, Rail
+    from simulator.battery.score import (
+        load_score_context,
+        point_magnitude,
+        quantity_token,
+        score_store,
+    )
+    import simulator.battery.residue as residue
+
+    hashimoto_source = "kems-015-hashimoto-1983"
+    sossi_source = "kems-012-sossi-2019"
+    context = load_score_context(sources=(hashimoto_source, sossi_source))
+
+    def hashimoto_cohort(experiments, *_args, **_kwargs):
+        rows = []
+        for experiment in experiments:
+            for alpha_arm in (
+                residue._HASHIMOTO_PRIMARY_ALPHA_ARM,
+                "alpha_runtime_catalog",
+            ):
+                rows.append(
+                    SimpleNamespace(
+                        experiment_id=experiment["experiment_id"],
+                        alpha_arm=alpha_arm,
+                        primary_geometry_policy_id=residue._HASHIMOTO_PRIMARY_GEOMETRY,
+                        primary_oxide_wt_pct={
+                            oxide: 1.0 for oxide in ("FeO", "MgO", "SiO2", "CaO", "Al2O3")
+                        },
+                        sensitivity_band_wt_pct={
+                            oxide: (0.9, 1.1)
+                            for oxide in ("FeO", "MgO", "SiO2", "CaO", "Al2O3")
+                        },
+                        provenance={
+                            "geometry_refusal_by_geometry": {},
+                            "integration": {"refinement_status": "converged"},
+                            "code_revision": "fixture-revision",
+                        },
+                    )
+                )
+        return tuple(rows)
+
+    def sossi_cohort(experiments, *_args, **_kwargs):
+        return tuple(
+            SimpleNamespace(
+                experiment_id=experiment["experiment_id"],
+                primary_element_ppm={"Mn": 900.0, "Ti": 450.0},
+                sensitivity_band_ppm={"Mn": (800.0, 1000.0), "Ti": (400.0, 500.0)},
+                channel_missing_elements=(),
+                provenance={
+                    "integration": {"primary": {"status": "converged"}},
+                    "code_revision": "fixture-revision",
+                },
+            )
+            for experiment in experiments
+        )
+
+    monkeypatch.setattr(residue, "_predict_hashimoto_residue_cohort", hashimoto_cohort)
+    monkeypatch.setattr(residue, "_predict_sossi_residue_cohort", sossi_cohort)
+
+    residuals, _ = score_store(
+        context,
+        engines=(Engine.OPENIMCC,),
+        rail=Rail.RESIDUE_COMPOSITION,
+    )
+    hashimoto_ids = {
+        row.observation_id
+        for row in context.observations.values()
+        if row.source_id == hashimoto_source
+        and "::hashimoto_1983_table3_residue_composition_series::" in row.observation_id
+        and point_magnitude(row.value) is not None
+    }
+    sossi_ti_ids = {
+        row.observation_id
+        for row in context.observations.values()
+        if row.source_id == sossi_source
+        and row.identity.species.formula == "Ti"
+        and quantity_token(row.identity) is Quantity.RESIDUE_COMPONENT_COMPOSITION
+        and row.admission.status.value == "admitted"
+        and point_magnitude(row.value) is not None
+    }
+    numeric_references = {
+        residual.reference for residual in residuals if residual.numeric is not None
+    }
+
+    assert len(hashimoto_ids) == 120
+    assert len(sossi_ti_ids) == 43
+    assert hashimoto_ids <= numeric_references
+    assert sossi_ti_ids <= numeric_references
