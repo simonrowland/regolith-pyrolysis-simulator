@@ -5077,7 +5077,7 @@ def test_dacko_minor_constituents_are_omitted_from_activity_composition() -> Non
         assert "minor constituents" in omitted
 
 
-def test_kume_activity_extract_rows_use_activity_quantity_type() -> None:
+def test_kume_activity_values_use_schema_type_and_map_to_activity() -> None:
     extract = yaml.safe_load(
         (REPO_ROOT / "data/literature/extracts/kume-2000-cao-activities.yaml")
         .read_text(encoding="utf-8")
@@ -5093,7 +5093,7 @@ def test_kume_activity_extract_rows_use_activity_quantity_type() -> None:
 
     assert len(rows) == 208
     for row in rows:
-        assert row["type"] == "activity", row["observation_id"]
+        assert row["type"] == "activity_coefficient", row["observation_id"]
         quantity, reason = map_quantity(
             row.get("type"), row.get("values"), units=row.get("units"), row=row
         )
@@ -5101,7 +5101,7 @@ def test_kume_activity_extract_rows_use_activity_quantity_type() -> None:
         assert reason is None
 
     assert all(
-        sample["observable"] == "activity"
+        sample["observable"] == "activity_coefficient"
         for sample in extract["fidelity_samples"]
     )
 
