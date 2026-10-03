@@ -4478,6 +4478,8 @@ def test_l02_reviewed_prefix_collisions_keep_the_unaliased_parse() -> None:
 
 
 _TYPE_CONTRADICTIONS = [
+    # The expectation changed because the reviewed extract replaced the old
+    # bundled Stebbins row; these current rows preserve the same pin.
     ("ames-walsh-white-1967.yaml", "Ames67_EuO_dissociation"),
     ("ames-walsh-white-1967.yaml", "Ames67_YbO_dissociation"),
     ("banchor-matsui-naito-1986.yaml", "Ban86_equations"),
