@@ -5173,6 +5173,40 @@ def test_kume_activity_compositions_map_to_parent_oxide_basis(tmp_path: Path) ->
     assert unknown_observation.identity.composition.is_unknown
 
 
+@pytest.mark.parametrize(
+    ("composition_key", "observation_id"),
+    [
+        ("composition_mole_fraction", "kume_2000_table2_sample_101"),
+        ("composition_mass_percent", "kume_2000_table4_sample_301"),
+    ],
+)
+def test_kume_malformed_declared_composition_amount_makes_whole_composition_unknown(
+    tmp_path: Path, composition_key: str, observation_id: str
+) -> None:
+    name = "kume-2000-cao-activities.yaml"
+    source = REPO_ROOT / "data" / "literature" / "extracts" / name
+    extract = yaml.safe_load(source.read_text(encoding="utf-8"))
+    extract["source_id"] = "fixture-source"
+    row = next(
+        row
+        for row in extract["species"]["CaO"]["observations"]
+        if row.get("observation_id") == observation_id
+    )
+    composition = row["values"][composition_key]
+    component = "CaO"
+    assert component in composition and len(composition) > 2
+    composition[component] = "not-a-number"
+
+    result = migrate(_write_min_tree(tmp_path, extract), write=False)
+    observation = next(
+        item
+        for item in result.observations.values()
+        if item.observation_id.endswith(f"::{observation_id}")
+    )
+    assert observation.identity.composition is not None
+    assert observation.identity.composition.is_unknown
+
+
 def test_kume_measured_reduced_activity_preserves_structured_derivation(
     tmp_path: Path,
 ) -> None:
