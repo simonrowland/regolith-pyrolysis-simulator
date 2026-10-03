@@ -2944,6 +2944,7 @@ def _kume_mole_amounts_from_mapping(
             continue
         parsed = _as_dec_or_none(amount)
         if parsed is None:
+            omitted.append(token)
             continue
         oxide, factor = equivalent
         amounts[oxide] = amounts.get(oxide, Decimal("0")) + parsed * factor
@@ -3217,7 +3218,7 @@ def composition_unknown_reason() -> str:
 
 def partial_composition_unknown_reason(omitted_components: Sequence[str]) -> str:
     return (
-        "partial_composition: omitted non-formula component(s): "
+        "partial_composition: unusable component(s): "
         + ", ".join(omitted_components)
     )
 
@@ -11384,7 +11385,7 @@ class Migrator:
                 work.work_id,
                 locator,
                 ["composition"],
-                "omitted non-formula composition component(s): "
+                "unusable composition component(s): "
                 + ", ".join(omitted_components),
                 source=source_key,
                 observation_id=obs_id,
