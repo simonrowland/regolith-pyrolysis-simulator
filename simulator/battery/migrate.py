@@ -2839,6 +2839,7 @@ _PRINTED_COMPOSITION_MAP_KEYS = (
     "oxides_wt_pct",
     "major_oxide_wt_pct",
     "composition_wt_pct",
+    "composition_mass_percent",
     "sample_oxide_composition_wt_pct",
     "starting_glass_wt_pct",
     "printed_composition",
@@ -2863,6 +2864,7 @@ _BULK_PROPERTY_QUANTITIES = frozenset(
 )
 _COMPOSITION_LOOKED_FOR = (
     "oxides_wt_pct / major_oxide_wt_pct / composition_wt_pct / "
+    "composition_mole_fraction / composition_mass_percent / "
     "sample_oxide_composition_wt_pct / starting_glass_wt_pct / "
     "SiO2 Al2O3 FeO Fe2O3 MgO CaO Na2O K2O TiO2 MnO P2O5"
 )
@@ -2905,6 +2907,49 @@ def wt_pct_to_mole_fraction(wt: Mapping[str, Decimal]) -> Composition:
     )
 
 
+def _kume_formula_unit_oxide(name: str) -> tuple[str, Decimal] | None:
+    if name in _OXIDE_COMPONENT_KEYS:
+        return name, Decimal("1")
+    if name != "AlO1.5":
+        return None
+
+    # AlO1.5 is half an Al2O3 formula unit and M(AlO1.5) = M(Al2O3)/2.
+    # Mole conversion uses n(Al2O3) = n(AlO1.5)/2 before renormalising all
+    # components; mass percent is invariant, so rename AlO1.5 only. For the
+    # mole-to-mass path, x [mol/mol] * M [g/mol] = relative mass [g/mol].
+    # Sanity check: 50:50 CaO:AlO1.5 becomes 2/3 CaO, 1/3 Al2O3.
+    from simulator.chemistry.structural_activity import normalize_formula_unit_moles
+
+    mapped, unsupported = normalize_formula_unit_moles({name: 1.0})
+    if unsupported or len(mapped) != 1:
+        return None
+    oxide, factor = next(iter(mapped.items()))
+    if oxide not in _OXIDE_COMPONENT_KEYS:
+        return None
+    return oxide, Decimal(str(factor))
+
+
+def _kume_mole_amounts_from_mapping(
+    raw: object,
+) -> tuple[dict[str, Decimal], tuple[str, ...]]:
+    if not isinstance(raw, Mapping):
+        return {}, ()
+    amounts: dict[str, Decimal] = {}
+    omitted: list[str] = []
+    for name, amount in raw.items():
+        token = str(name).strip()
+        equivalent = _kume_formula_unit_oxide(token)
+        if equivalent is None:
+            omitted.append(token)
+            continue
+        parsed = _as_dec_or_none(amount)
+        if parsed is None:
+            continue
+        oxide, factor = equivalent
+        amounts[oxide] = amounts.get(oxide, Decimal("0")) + parsed * factor
+    return amounts, tuple(omitted)
+
+
 def is_sample_code_formula(text: str) -> bool:
     return bool(_SAMPLE_CODE_FORMULA_RE.match(str(text).strip()))
 
@@ -2915,6 +2960,18 @@ def _oxide_map_from_mapping(obj: object) -> dict[str, Decimal] | None:
     for key in _PRINTED_COMPOSITION_MAP_KEYS:
         nested = obj.get(key)
         if isinstance(nested, Mapping):
+            if key == "composition_mass_percent":
+                comps: dict[str, Decimal] = {}
+                for name, value in nested.items():
+                    equivalent = _kume_formula_unit_oxide(str(name).strip())
+                    amount = _as_dec_or_none(value)
+                    if equivalent is None or amount is None:
+                        return None
+                    oxide, _factor = equivalent
+                    comps[oxide] = comps.get(oxide, Decimal("0")) + amount
+                if len(comps) >= 2:
+                    return comps
+                continue
             got = _oxide_map_from_mapping(nested)
             if got:
                 return got
@@ -2962,7 +3019,26 @@ def _initial_oxide_map_from_values(
             got = _oxide_map_from_mapping(item)
             if got:
                 return got
-    return _oxide_map_from_mapping(values)
+    got = _oxide_map_from_mapping(values)
+    if got:
+        return got
+    raw_moles = values.get("composition_mole_fraction")
+    if isinstance(raw_moles, Mapping):
+        formula_moles, omitted = _kume_mole_amounts_from_mapping(raw_moles)
+        if omitted or len(formula_moles) < 2:
+            return None
+        masses = {
+            oxide: amount * oxide_molar_mass(oxide)
+            for oxide, amount in formula_moles.items()
+        }
+        total_mass = sum(masses.values(), Decimal("0"))
+        if total_mass <= 0:
+            return None
+        return {
+            oxide: mass * Decimal("100") / total_mass
+            for oxide, mass in masses.items()
+        }
+    return None
 
 
 def _catalogue_composition_located_from_values(
@@ -3031,18 +3107,30 @@ def _mole_fraction_composition_from_values(
     from simulator.battery.score import parse_species_formula
 
     raw = values.get("composition_mol")
+    kume_mole_fraction = False
+    if not isinstance(raw, Mapping):
+        raw = values.get("composition_mole_fraction")
+        kume_mole_fraction = isinstance(raw, Mapping)
     components: list[tuple[str, Decimal]] = []
     omitted: list[str] = []
     if isinstance(raw, Mapping):
-        for name, amount in raw.items():
-            parsed = _as_dec_or_none(amount)
-            if parsed is None:
-                continue
-            token = str(name).strip()
-            if parse_species_formula(token) is None:
-                omitted.append(token)
-                continue
-            components.append((token, parsed))
+        if kume_mole_fraction:
+            mapped, omitted_names = _kume_mole_amounts_from_mapping(raw)
+            omitted.extend(omitted_names)
+            total = sum(mapped.values(), Decimal("0"))
+            if len(mapped) < 2 or total <= 0:
+                return None, tuple(omitted)
+            components = [(name, amount / total) for name, amount in mapped.items()]
+        else:
+            for name, amount in raw.items():
+                parsed = _as_dec_or_none(amount)
+                if parsed is None:
+                    continue
+                token = str(name).strip()
+                if parse_species_formula(token) is None:
+                    omitted.append(token)
+                    continue
+                components.append((token, parsed))
     if len(components) < 2:
         for key in ("X_Na2O_as_published", "X_Na2O"):
             fraction = _as_dec_or_none(values.get(key))
