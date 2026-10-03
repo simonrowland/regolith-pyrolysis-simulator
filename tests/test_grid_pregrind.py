@@ -2907,3 +2907,8 @@ def test_observe_hook_binds_to_real_adapter_signature():
         "adapter grew parameters the grinder hook does not know: "
         f"{adapter_params}"
     )
+
+
+def test_grid_pregrind_cli_model_default_is_pinned():
+    """Pin the offline grid CLI's --model default before it is sourced from simulator.config."""
+    assert grid_pregrind.parser().parse_args([]).model == "MELTSv1.0.2"
