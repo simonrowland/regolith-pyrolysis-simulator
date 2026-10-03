@@ -4890,10 +4890,6 @@ def test_imcc_complex_saturation_routes_only_own_prediction() -> None:
 
 
 def test_non_allibert_typed_solid_activity_uses_fusion_conversion() -> None:
-    from simulator.battery.generators.janaf import (
-        JANAF_R_J_PER_MOL_K,
-        janaf_fusion_energy,
-    )
     from simulator.battery.score import _fusion_comparison_reference
 
     temperature = Decimal("2000")
@@ -4923,9 +4919,16 @@ def test_non_allibert_typed_solid_activity_uses_fusion_conversion() -> None:
     )
 
     converted = _fusion_comparison_reference(reference)
-    delta_g = janaf_fusion_energy("CaO", temperature).delta_g_fus_kJ_per_mol
-    expected = (-delta_g * Decimal(1000) / (JANAF_R_J_PER_MOL_K * temperature)).exp()
-    assert converted.value.point == expected
+    # Premise: JANAF electronic records Ca-027 (CaO(cr)) and Ca-028 (CaO(l)),
+    # 2000 K formation-Gibbs rows, give -401.713 and -372.176 kJ/mol; neither
+    # record has a printed page number. Algebra: ΔG_fus=G_l°-G_s°=+29.537
+    # kJ/mol, so Δlog10(a)=-29.537*1000 J/kJ / (8.31441 J/(mol K)*2000 K*ln10)
+    # = -0.7714171006707842 dex. Units cancel to a dimensionless shift; hence
+    # a_l/a_s=10**shift=0.1692711323009035502632434871 (float.hex:
+    # 0x1.5aaad2cb1d399p-3), below one because G_l°>G_s°.
+    expected = Decimal("0.1692711323009035502632434871")
+    assert float(converted.value.point).hex() == "0x1.5aaad2cb1d399p-3"
+    assert abs(converted.value.point - expected) < Decimal("1e-27")
     assert converted.identity.reference_state.value.endmember.phase.value is Phase.L
     assert converted.source_id == "another-source"
 
@@ -5619,7 +5622,6 @@ def test_allibert_solid_activity_fusion_conversion_is_diagnostic_only(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     from simulator.battery.generators.janaf import (
-        JANAF_R_J_PER_MOL_K,
         janaf_fusion_energy,
     )
     from simulator.battery.score import (
@@ -5710,13 +5712,27 @@ def test_allibert_solid_activity_fusion_conversion_is_diagnostic_only(
     assert silica_fusion.delta_g_fus_kJ_per_mol == Decimal("0.27784")
     assert Decimal("1994.4") < silica_fusion.melting_temperature_K < Decimal("1994.5")
     assert silica_fusion.accepted_melting_temperature_K == Decimal("1986")
+
+    allibert_1933 = replace(
+        reference,
+        observation_id="allibert-cao-solid-activity-at-1933K",
+        identity=replace(identity, temperature_K=State.of(Decimal("1933"))),
+    )
+    converted_1933 = _fusion_comparison_reference(allibert_1933)
+    # Premise: JANAF records Ca-027 (CaO(cr)) and Ca-028 (CaO(l)), each with
+    # T=1900/2000 K formation-Gibbs rows and no printed page number. Linear
+    # interpolation to 1933 K gives G_s°=-420.996+0.33*(-401.713+420.996)
+    # =-414.63261 and G_l°=-389.048+0.33*(-372.176+389.048)=-383.48024
+    # kJ/mol; ΔG_fus=+31.15237 kJ/mol. Therefore Δlog10(a)=-31.15237*1000
+    # J/kJ/(8.31441 J/(mol K)*1933 K*ln10)=-0.8418061863721363 dex.
+    # Units cancel to a dimensionless shift; a_l/a_s=10**shift is below one
+    # because G_l°>G_s°: 0.1439440817603981956094785450, float.hex
+    # 0x1.26cc279ce8c6cp-3.
+    expected = Decimal("0.1439440817603981956094785450")
+    assert float(converted_1933.value.point).hex() == "0x1.26cc279ce8c6cp-3"
+    assert abs(converted_1933.value.point - expected) < Decimal("1e-27")
+
     converted = _fusion_comparison_reference(reference)
-    expected = (
-        -fusion.delta_g_fus_kJ_per_mol
-        * Decimal(1000)
-        / (JANAF_R_J_PER_MOL_K * temperature)
-    ).exp()
-    assert abs(converted.value.point - expected) < Decimal("1e-26")
     assert converted.identity.reference_state.value.endmember.phase.value is Phase.L
     assert converted.evidence.class_.is_unknown
     assert reference.value.point == Decimal("1")
