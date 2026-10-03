@@ -468,6 +468,34 @@ def test_openimcc_producer_emits_activity_and_vapour_rails() -> None:
     assert cell.model_id == "IMCC-SF04"
 
 
+def test_missing_binding_digest_refuses_without_residual_identity_or_cache_key(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from types import SimpleNamespace
+
+    from simulator.melt_backend import openimcc_bridge
+
+    monkeypatch.setattr(openimcc_bridge, "_load_pack", lambda _name: SimpleNamespace())
+    handle = open_battery_engine("openimcc")
+
+    assert not handle.available
+    assert "openimcc_binding_digest_unavailable" in (handle.unavailable_reason or "")
+    assert "pack_digest" not in handle.identity
+
+    context, reference = _zhang_k_case(tmp_path, "1473.15")
+    residual, candidate = compile_residual(
+        reference,
+        Engine.OPENIMCC,
+        context=context,
+        handles={"openimcc": handle},
+    )
+    assert residual.status is ResidualStatus.REFUSED
+    assert residual.refusal is not None
+    assert residual.numeric is None
+    assert candidate is None
+
+
 def test_openimcc_battery_solves_plante_oxygen_balance_anchor() -> None:
     _require_oxygen_balance()
     _require_openimcc()
