@@ -5271,7 +5271,7 @@ def test_measured_reduced_derivation_prose_input_is_queued_not_pointed(
         result.works, result.experiments, result.observations, residuals=None
     )
     assert not any(
-        issue.observation_id == observation.observation_id
+        issue.path.startswith(f"observations.{observation.observation_id}.")
         and issue.reason is RefusalReason.REFERENTIAL_INTEGRITY
         for issue in report.hard_issues
     )
