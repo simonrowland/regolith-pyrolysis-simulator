@@ -61,7 +61,10 @@ from simulator.accounting.formulas import (
     resolve_species_formula,
 )
 from simulator.accounting.exceptions import UnknownSpeciesError
-from simulator.config import DEFAULT_ALPHAMELTS_MODEL
+from simulator.config import (
+    DEFAULT_ALPHAMELTS_MODEL,
+    resolve_alphamelts_subprocess_model,
+)
 from simulator.melt_backend.base import (
     EquilibriumResult,
     LiquidFractionInvalidError,
@@ -156,6 +159,8 @@ ALPHAMELTS_REASON_PARSE_EMPTY_OUTPUT = 'parse_empty_output'
 ALPHAMELTS_REASON_MISSING_BINARY = 'missing_binary'
 ALPHAMELTS_REASON_RUN_MODE_REQUIRED = 'subprocess_run_mode_required'
 ALPHAMELTS_REASON_RUN_MODE_INVALID = 'subprocess_run_mode_invalid'
+ALPHAMELTS_REASON_MODEL_UNVERIFIED = 'subprocess_model_unverified'
+ALPHAMELTS_REASON_CALC_MODE_MISMATCH = 'subprocess_calc_mode_mismatch'
 ALPHAMELTS_REASON_EXECUTED_T_MISSING = 'executed_temperature_missing'
 ALPHAMELTS_REASON_EXECUTED_T_MISMATCH = 'executed_temperature_mismatch'
 ALPHAMELTS_REASON_PRESSURE_UNSUPPORTED = 'subprocess_pressure_below_minimum'
@@ -257,6 +262,8 @@ ALPHAMELTS_BACKEND_FAILURE_CATEGORY_BY_REASON = {
     ALPHAMELTS_REASON_MISSING_BINARY: OutOfDomainReason.BACKEND_UNAVAILABLE.value,
     ALPHAMELTS_REASON_RUN_MODE_REQUIRED: 'contract_error',
     ALPHAMELTS_REASON_RUN_MODE_INVALID: 'contract_error',
+    ALPHAMELTS_REASON_MODEL_UNVERIFIED: 'contract_error',
+    ALPHAMELTS_REASON_CALC_MODE_MISMATCH: 'contract_error',
     ALPHAMELTS_REASON_EXECUTED_T_MISSING: 'parse_error',
     ALPHAMELTS_REASON_EXECUTED_T_MISMATCH: 'contract_error',
     ALPHAMELTS_REASON_PRESSURE_UNSUPPORTED: 'out_of_domain',
@@ -291,6 +298,12 @@ ALPHAMELTS_BACKEND_FAILURE_MESSAGES = {
     ),
     ALPHAMELTS_REASON_RUN_MODE_INVALID: (
         'AlphaMELTS subprocess run mode was invalid'
+    ),
+    ALPHAMELTS_REASON_MODEL_UNVERIFIED: (
+        'AlphaMELTS subprocess model has no verified calc-mode mapping'
+    ),
+    ALPHAMELTS_REASON_CALC_MODE_MISMATCH: (
+        'Ambient ALPHAMELTS_CALC_MODE conflicts with the resolved model'
     ),
     ALPHAMELTS_REASON_EXECUTED_T_MISSING: (
         'AlphaMELTS did not report its executed temperature'
@@ -2942,6 +2955,22 @@ class _MELTSBackendSupport(MeltBackend):
 
         Slower (~1-3s per call) but reliable.
         """
+        try:
+            _, calc_mode = resolve_alphamelts_subprocess_model(
+                self._model
+            )
+        except ValueError as exc:
+            raise _alphamelts_backend_failure_error(
+                ALPHAMELTS_REASON_MODEL_UNVERIFIED,
+                str(exc),
+            ) from exc
+        ambient_calc_mode = os.environ.get('ALPHAMELTS_CALC_MODE')
+        if ambient_calc_mode is not None and ambient_calc_mode != calc_mode:
+            raise _alphamelts_backend_failure_error(
+                ALPHAMELTS_REASON_CALC_MODE_MISMATCH,
+                f'ambient={ambient_calc_mode!r}; resolved={calc_mode!r}',
+            )
+
         requested_temperature_C = float(temperature_C)
         requested_pressure_bar = float(pressure_bar)
         if requested_pressure_bar < ALPHAMELTS_SUBPROCESS_MIN_PRESSURE_BAR:
@@ -3018,7 +3047,7 @@ class _MELTSBackendSupport(MeltBackend):
             # source for fO2, liquid density, and liquid viscosity.
             menu_input = f'1\ninput.melts\n4\n{starting_guess}\n1\nx\n'
             env = os.environ.copy()
-            env.setdefault('ALPHAMELTS_CALC_MODE', 'MELTS')
+            env['ALPHAMELTS_CALC_MODE'] = calc_mode
             env['ALPHAMELTS_RUN_MODE'] = 'isobaric'
             env['ALPHAMELTS_DELTAT'] = '0'
             # Same contract value as the .melts file (not a second quantization).
