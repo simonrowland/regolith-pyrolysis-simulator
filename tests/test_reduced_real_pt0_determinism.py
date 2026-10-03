@@ -627,11 +627,11 @@ def _thermoengine_pt0_identity(model: str) -> tuple[dict, dict]:
     return key, authority
 
 
-def test_blank_thermoengine_model_keeps_provider_name_in_pt0_identity() -> None:
+def test_blank_thermoengine_model_resolves_to_default_in_pt0_identity() -> None:
     key, authority = _thermoengine_pt0_identity("")
 
-    assert key["model"]["model"] == "alphamelts-diagnostic"
-    assert authority["provider"]["model"] == "alphamelts-diagnostic"
+    assert key["model"]["model"] == "MELTSv1.0.2"
+    assert authority["provider"]["model"] == "MELTSv1.0.2"
 
 
 @pytest.mark.parametrize("model", ["MELTSv1.0.2", "pMELTS"])
@@ -640,6 +640,14 @@ def test_nonblank_thermoengine_model_passes_through_pt0_identity(model: str) -> 
 
     assert key["model"]["model"] == model
     assert authority["provider"]["model"] == model
+
+
+def test_blank_and_explicit_default_thermoengine_identity_are_equal() -> None:
+    blank_key, blank_authority = _thermoengine_pt0_identity("")
+    explicit_key, explicit_authority = _thermoengine_pt0_identity("MELTSv1.0.2")
+
+    assert blank_key == explicit_key
+    assert blank_authority == explicit_authority
 
 
 def test_non_alphamelts_magemin_shadow_key_identity_stays_byte_identical() -> None:

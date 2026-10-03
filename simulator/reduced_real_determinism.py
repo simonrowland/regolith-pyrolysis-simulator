@@ -3174,6 +3174,11 @@ def _provider_model(provider: Any) -> str | None:
         model_text = str(model).strip()
         if model_text:
             return model_text
+    if (
+        getattr(backend, "real_backend_family", None)
+        == RealBackendFamily.THERMOENGINE
+    ):
+        return DEFAULT_ALPHAMELTS_MODEL
     return str(getattr(provider, "name", type(provider).__name__))
 
 
