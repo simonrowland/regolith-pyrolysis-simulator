@@ -156,6 +156,56 @@ def test_ion_current_comparison_provenance_assumes_unreported_pairing() -> None:
     assert not comparison_method_cell_constant_cancels(different)
 
 
+@pytest.mark.parametrize(
+    ("pairing_kind", "expected_pairing"),
+    (
+        (None, "same_effective_setup_assumed"),
+        ("not_printed", "same_effective_setup_assumed"),
+        ("not_reported", "same_effective_setup_assumed"),
+        ("unknown", "same_effective_setup_assumed"),
+        ("same_cell", "same_cell"),
+    ),
+)
+def test_comparison_pairing_migration_golden_pin(
+    pairing_kind: str | None, expected_pairing: str
+) -> None:
+    provenance = _provenance_from_extract(
+        {},
+        {
+            "method": "ion current comparison",
+            "provenance": {
+                "melt_reference_pairing": {"kind": pairing_kind},
+            },
+        },
+        None,
+        quantity=Quantity.ACTIVITY,
+    )
+
+    assert provenance is not None
+    assert provenance["melt_reference_pairing"]["kind"] == expected_pairing
+
+
+@pytest.mark.parametrize(
+    ("comparison_kind", "expected_kind"),
+    (("ratio", "ratio"), ("comparison_ratio", "comparison_ratio")),
+)
+def test_comparison_ratio_kind_migration_golden_pin(
+    comparison_kind: str, expected_kind: str
+) -> None:
+    provenance = _provenance_from_extract(
+        {},
+        {
+            "method": "ion current comparison",
+            "provenance": {"comparison_method": {"kind": comparison_kind}},
+        },
+        None,
+        quantity=Quantity.ACTIVITY,
+    )
+
+    assert provenance is not None
+    assert provenance["comparison_method"]["kind"] == expected_kind
+
+
 def test_persisted_kems_activity_recovers_comparison_method_from_calibration(
     tmp_path: Path,
 ) -> None:

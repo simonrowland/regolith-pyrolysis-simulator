@@ -680,15 +680,23 @@ def test_kems_band_prefers_printed_envelope_over_replicate_scatter() -> None:
 
 
 @pytest.mark.parametrize(
-    ("typed_not_printed", "expected_notice"),
+    ("typed_not_printed", "expected_reason"),
     (
-        (False, "No calibration entry has been recorded yet."),
-        (True, "The source record says the calibration was not printed."),
+        (
+            False,
+            "calibration_not_grounded: No calibration entry has been recorded yet. "
+            "(KEMS pressure requires a recorded calibration)",
+        ),
+        (
+            True,
+            "calibration_not_grounded: The source record says the calibration was "
+            "not printed. (KEMS pressure requires a recorded calibration)",
+        ),
     ),
 )
 def test_uncalibrated_kems_partial_pressure_scores_with_calibration_notice(
     typed_not_printed: bool,
-    expected_notice: str,
+    expected_reason: str,
 ) -> None:
     from simulator.battery.validity import run_validity_gates
     from simulator.battery.score import (
@@ -744,8 +752,7 @@ def test_uncalibrated_kems_partial_pressure_scores_with_calibration_notice(
         item for item in residual.notices
         if item.kind is NoticeKind.UNVERIFIED_APPARATUS
     )
-    assert notice.reason.startswith("calibration_not_grounded:")
-    assert expected_notice in notice.reason
+    assert notice.reason == expected_reason
     assert flagged_strata(residual.notices) == (
         FLAGGED_STRATUM_CALIBRATION_NOT_GROUNDED,
     )
@@ -2066,10 +2073,14 @@ def test_uncalibrated_kems_activity_uses_calibration_not_grounded_stratum(
     assert residual.status is not ResidualStatus.REFUSED
     assert residual.numeric is not None
     assert residual.score_eligible is False
-    assert any(
-        notice.kind is NoticeKind.UNVERIFIED_APPARATUS
-        and notice.reason.startswith("calibration_not_grounded:")
+    notice = next(
+        notice
         for notice in residual.notices
+        if notice.kind is NoticeKind.UNVERIFIED_APPARATUS
+    )
+    assert notice.reason == (
+        "calibration_not_grounded: No calibration entry has been recorded yet. "
+        "(KEMS activity requires a recorded calibration)"
     )
     assert flagged_strata(residual.notices) == (
         FLAGGED_STRATUM_CALIBRATION_NOT_GROUNDED,
