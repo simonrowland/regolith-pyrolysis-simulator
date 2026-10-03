@@ -74,6 +74,7 @@ from simulator.battery.migrate import (
     compilation_record_asset_id,
     compilation_column_series_from_record,
     _provenance_from_extract,
+    _initial_oxide_map_from_values,
     load_migrated_store,
     expand_queue_entries,
     group_queue_entries,
@@ -5053,6 +5054,66 @@ def test_dacko_minor_constituents_are_omitted_from_activity_composition() -> Non
         composition, omitted = _mole_fraction_composition_from_values(row["values"])
         assert composition is None
         assert "minor constituents" in omitted
+
+
+def test_kume_activity_compositions_map_to_parent_oxide_basis(tmp_path: Path) -> None:
+    name = "kume-2000-cao-activities.yaml"
+    result = _migrate_real_extract(tmp_path / "real", name)
+    observations = {
+        obs.observation_id.rsplit("::", 1)[-1]: obs
+        for obs in result.observations.values()
+    }
+
+    table2 = observations["kume_2000_table2_sample_101"]
+    assert table2.identity.composition is not None
+    assert table2.identity.composition.is_value
+    # Hand conversion: 0.085 mol AlO1.5 is 0.0425 mol Al2O3;
+    # the renormalised total is 0.876 + 0.039 + 0.0425 = 0.9575.
+    assert table2.identity.composition.value.as_map() == {
+        "SiO2": Decimal("0.876") / Decimal("0.9575"),
+        "CaO": Decimal("0.039") / Decimal("0.9575"),
+        "Al2O3": Decimal("0.0425") / Decimal("0.9575"),
+    }
+
+    table4 = observations["kume_2000_table4_sample_301"]
+    assert table4.identity.composition is not None
+    assert table4.identity.composition.is_value
+    raw_table4 = next(
+        row
+        for row in _extract_observations(name)
+        if row.get("observation_id") == "kume_2000_table4_sample_301"
+    )
+    table4_mass = _initial_oxide_map_from_values(raw_table4["values"])
+    assert table4_mass is not None
+    assert table4_mass["Al2O3"] == Decimal("27.8")
+    assert "AlO1.5" not in table4_mass
+
+    # A chemically parseable but unsupported oxide must invalidate the whole
+    # composition; mapping only the components we happen to recognise is lossy.
+    source = REPO_ROOT / "data" / "literature" / "extracts" / name
+    extract = yaml.safe_load(source.read_text(encoding="utf-8"))
+    extract["source_id"] = "fixture-source"
+    raw_table2 = next(
+        row
+        for row in _extract_observations(name)
+        if row.get("observation_id") == "kume_2000_table2_sample_101"
+    )
+    raw_table2["values"]["composition_mole_fraction"]["ZnO"] = 0.001
+    for block in extract["species"].values():
+        block["observations"] = [
+            raw_table2
+            if row.get("observation_id") == "kume_2000_table2_sample_101"
+            else row
+            for row in block.get("observations", [])
+        ]
+    unknown_result = migrate(_write_min_tree(tmp_path / "unknown", extract), write=False)
+    unknown_observation = next(
+        obs
+        for obs in unknown_result.observations.values()
+        if obs.observation_id.endswith("::kume_2000_table2_sample_101")
+    )
+    assert unknown_observation.identity.composition is not None
+    assert unknown_observation.identity.composition.is_unknown
 
 
 def test_l05g1a_table_qualifier_leaves_reference_state_unknown(tmp_path: Path) -> None:
