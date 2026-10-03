@@ -811,6 +811,17 @@ def _missing_apparatus_fact(
     return None
 
 
+def _has_calibration_not_grounded(checks: Iterable[object]) -> bool:
+    return any(
+        getattr(check, "passed", True)
+        and str(getattr(check, "name", ""))
+        in {"kems_calibration", "in_cell_partial_pressure_sum"}
+        and isinstance(getattr(check, "detail", {}), Mapping)
+        and check.detail.get("flag") == "calibration_not_grounded"
+        for check in checks
+    )
+
+
 def _unverified_apparatus_notices(
     reference: Observation,
     experiment: Experiment | None,
@@ -840,9 +851,18 @@ def _unverified_apparatus_notices(
         in {"measured", "measured_direct", "measured_tabulated"}
     )
     author_reported_activity = (
-        source_is_kems
-        and reference.evidence.original_method_class
-        in {"measured", "measured_direct", "measured_tabulated", "derived"}
+        (
+            reference.evidence.class_.is_value
+            and reference.evidence.class_.value in MEASURED_EVIDENCE
+        )
+        or reference.evidence.original_method_class
+        in {
+            "measured",
+            "measured_direct",
+            "measured_reduced",
+            "measured_tabulated",
+            "derived",
+        }
     )
     comparison_activity = (
         quantity in {Quantity.ACTIVITY, Quantity.ACTIVITY_COEFFICIENT}
@@ -859,18 +879,23 @@ def _unverified_apparatus_notices(
         quantity is Quantity.P_PARTIAL
         and reference.evidence.class_.is_value
         and reference.evidence.class_.value in MEASURED_EVIDENCE
-        and any(
-            getattr(check, "passed", True)
-            and str(getattr(check, "name", ""))
-            in {"kems_calibration", "in_cell_partial_pressure_sum"}
-            and isinstance(getattr(check, "detail", {}), Mapping)
-            and check.detail.get("flag") == "calibration_not_grounded"
-            for check in gates.checks
-        )
+        and _has_calibration_not_grounded(gates.checks)
     )
-    if not (measured_pressure or comparison_activity or calibration_flagged_partial_pressure):
+    calibration_flagged_activity = (
+        quantity in {Quantity.ACTIVITY, Quantity.ACTIVITY_COEFFICIENT}
+        and author_reported_activity
+        and _has_calibration_not_grounded(gates.checks)
+    )
+    if not (
+        measured_pressure
+        or comparison_activity
+        or calibration_flagged_partial_pressure
+        or calibration_flagged_activity
+    ):
         return ()
-    allow_calibration = author_reported_pressure or comparison_activity
+    allow_calibration = (
+        author_reported_pressure or comparison_activity or calibration_flagged_activity
+    )
     missing: set[str] = set()
     calibration_notice = None
     calibration_reason = None
@@ -881,9 +906,7 @@ def _unverified_apparatus_notices(
         if getattr(check, "passed", True):
             if (
                 (allow_calibration or calibration_flagged_partial_pressure)
-                and str(getattr(check, "name", ""))
-                in {"kems_calibration", "in_cell_partial_pressure_sum"}
-                and detail.get("flag") == "calibration_not_grounded"
+                and _has_calibration_not_grounded((check,))
             ):
                 missing.add("calibration_not_grounded")
                 notice_text = detail.get("calibration_notice")
@@ -2589,31 +2612,43 @@ def _solved_effusion_po2_bar(prediction: EnginePrediction) -> float | None:
     return None
 
 
-def _effusion_comparison_identity(
+def _comparison_identity(
     identity: Identity,
     reference: Observation,
     prediction: EnginePrediction,
 ) -> Identity:
-    """Comparison view for a solved oxygen-balance row.
+    """Comparison identity with conditions used by the numeric prediction.
 
-    The source leaves composition on the point and leaves fO2 and in-cell
-    total pressure unknown. The solve used the printed point composition,
-    its own pO2, and the scorer pressure assumption. Both sides of the
-    equality check see those same inputs. The stored identity is unchanged.
+    KEMS activity series can store printed composition on the point while
+    leaving it unknown on the identity. Their comparison uses that same
+    printed composition. Oxygen-balance effusion predictions also supply
+    their solved pO2 and scorer pressure assumption. Stored identities remain
+    unchanged.
     """
 
-    if not has_own_engine_solved_oxygen_balance(prediction.engine, prediction.notices):
+    solved_oxygen_balance = has_own_engine_solved_oxygen_balance(
+        prediction.engine, prediction.notices
+    )
+    comparison_activity = (
+        quantity_token(identity) in MELT_ACTIVITY_QUANTITIES
+        and comparison_method_cell_constant_cancels(reference.provenance)
+    )
+    if not solved_oxygen_balance and not comparison_activity:
         return identity
     updates: dict[str, State] = {}
     if identity.composition is None or not identity.composition.is_value:
         point = _printed_point_composition(reference)
         if point is not None:
             updates["composition"] = point
-    if identity.fO2_Pa is None or not identity.fO2_Pa.is_value:
+    if solved_oxygen_balance and (
+        identity.fO2_Pa is None or not identity.fO2_Pa.is_value
+    ):
         po2_bar = _solved_effusion_po2_bar(prediction)
         if po2_bar is not None:
             updates["fO2_Pa"] = State.of(Decimal(str(po2_bar)) * Decimal("1e5"))
-    if identity.total_pressure_Pa is None or not identity.total_pressure_Pa.is_value:
+    if solved_oxygen_balance and (
+        identity.total_pressure_Pa is None or not identity.total_pressure_Pa.is_value
+    ):
         quantity = quantity_token(identity)
         if quantity is not None:
             bar, _notice, invalid = total_pressure_bar_for_score(identity, quantity)
@@ -4071,10 +4106,10 @@ def compile_residual(
     compared_reference = reference.identity
     compared_candidate = candidate.identity
     if isinstance(compared_reference, Identity) and isinstance(compared_candidate, Identity):
-        compared_reference = _effusion_comparison_identity(
+        compared_reference = _comparison_identity(
             compared_reference, reference, prediction
         )
-        compared_candidate = _effusion_comparison_identity(
+        compared_candidate = _comparison_identity(
             compared_candidate, reference, prediction
         )
     equal = identity_equal(compared_reference, compared_candidate)
