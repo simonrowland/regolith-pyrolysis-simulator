@@ -2820,39 +2820,21 @@ def test_hashimoto_scoring_projects_by_experiment_and_carries_residue_flags(
         assert any("residue_time_refinement_unconverged" in notice.reason for notice in first_prediction.notices)
         candidate = score.candidate_observation(first, first_prediction)
         assert candidate.identity.species.phase == first.identity.species.phase
-        # Isolate the phase comparator from Hashimoto's separately unresolved
-        # exposed-area identity field; the synthetic area is only for this check.
-        comparable_reference = replace(
-            first.identity,
-            exposure=State.of(
-                replace(
-                    first.identity.exposure.value,
-                    area_m2=State.of(Decimal("1")),
-                )
-            ),
-        )
-        comparable_candidate = replace(
-            candidate.identity,
-            exposure=State.of(
-                replace(
-                    candidate.identity.exposure.value,
-                    area_m2=State.of(Decimal("1")),
-                )
-            ),
-        )
-        assert identity_equal(comparable_candidate, comparable_reference).kind is IdentityEqualKind.EQUAL
+        assert candidate.identity.exposure.value.area_m2 == first.identity.exposure.value.area_m2
+        assert candidate.identity.exposure.value.area_m2.is_unknown
+        assert identity_equal(candidate.identity, first.identity).kind is IdentityEqualKind.EQUAL
         wrong_phase_prediction = replace(
             first_prediction,
             identity=replace(
-                comparable_reference,
-                species=replace(comparable_reference.species, phase=State.of(Phase.GLASS)),
+                first.identity,
+                species=replace(first.identity.species, phase=State.of(Phase.GLASS)),
             ),
         )
         wrong_phase_candidate = score.candidate_observation(
             first, wrong_phase_prediction
         )
         assert (
-            identity_equal(comparable_reference, wrong_phase_candidate.identity).kind
+            identity_equal(first.identity, wrong_phase_candidate.identity).kind
             is IdentityEqualKind.IDENTITY_MISMATCH
         )
         assert candidate.provenance["oxygen_model"] == f"own oxygen balance: {engine.value}"
@@ -2862,6 +2844,40 @@ def test_hashimoto_scoring_projects_by_experiment_and_carries_residue_flags(
         assert refusal.value is None
         assert refusal.refusal_reason is RefusalReason.UNSUPPORTED
         assert "injected_refusal" in refusal.refusal_detail["reason"]
+
+
+def test_residue_area_is_not_identity_but_per_area_rate_still_requires_it() -> None:
+    context = load_score_context(sources=("kems-015-hashimoto-1983",))
+    residue_identity = next(
+        observation.identity
+        for observation in context.observations.values()
+        if observation.source_id == "kems-015-hashimoto-1983"
+        and "::hashimoto_1983_table3_residue_composition_series::"
+        in observation.observation_id
+        and quantity_token(observation.identity)
+        is Quantity.RESIDUE_COMPONENT_COMPOSITION
+    )
+    assert identity_equal(residue_identity, residue_identity).kind is IdentityEqualKind.EQUAL
+
+    rate_identity = replace(
+        F.psat_identity("FeO"),
+        quantity=Quantity.EVAPORATION_RATE,
+        exposure=State.of(
+            Exposure(
+                area_m2=State.unknown("area required by rate"),
+                duration_s=State.of(Decimal("1")),
+            )
+        ),
+        per=State.unknown("test rate basis"),
+        composition=State.unknown("test starting composition"),
+        fO2_Pa=State.unknown("test oxygen condition"),
+        total_pressure_Pa=State.unknown("test total pressure"),
+        sweep_gas=State.unknown("test sweep gas"),
+        sample_mass_kg=State.unknown("test sample mass"),
+    )
+    rate_outcome = identity_equal(rate_identity, rate_identity)
+    assert rate_outcome.kind is IdentityEqualKind.IDENTITY_UNKNOWN
+    assert "exposure.area_m2" in rate_outcome.fields
 
 
 def test_non_alkali_alpha_is_refused_with_no_rail() -> None:
