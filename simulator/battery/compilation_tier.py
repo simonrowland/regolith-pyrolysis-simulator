@@ -1802,11 +1802,7 @@ def write_compilation_comparisons_jsonl(context, path: Path) -> int:
                     ):
                         continue
                     phase = phase_token(identity.species)
-                    phase_text = {
-                        Phase.G: "g",
-                        Phase.L: "l",
-                        Phase.CR: "cr",
-                    }.get(phase)
+                    phase_text = phase.value if isinstance(phase, Phase) else None
                     if phase_text is None:
                         continue
                     phase_kind = classify_phase_token(phase_text)

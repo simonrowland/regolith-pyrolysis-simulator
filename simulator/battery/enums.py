@@ -375,6 +375,18 @@ class ResidualStatus(StrEnum):
     REFUSED = "refused"
 
 
+def residual_status_token(status: object) -> ResidualStatus | None:
+    """Resolve stored and legacy status spellings without inventing a default."""
+
+    token = str(status or "")
+    if token in {"typed-refusal", "typed_refusal"}:
+        return ResidualStatus.REFUSED
+    try:
+        return ResidualStatus(token)
+    except ValueError:
+        return None
+
+
 class ExecutionState(StrEnum):
     PRODUCED = "produced"
     ATTEMPTED_UNAVAILABLE = "attempted_unavailable"

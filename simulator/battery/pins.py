@@ -13,7 +13,13 @@ from enum import StrEnum
 from pathlib import Path
 from typing import Any, Iterable, Mapping, Sequence
 
-from simulator.battery.enums import Engine, MetricOperation, Quantity, ResidualStatus
+from simulator.battery.enums import (
+    Engine,
+    MetricOperation,
+    Quantity,
+    ResidualStatus,
+    residual_status_token,
+)
 from simulator.battery.migrate import REPO_ROOT, load_yaml
 from simulator.battery.records import Residual, as_decimal
 
@@ -310,9 +316,9 @@ def _pin_live_comparison(row: Mapping[str, object]) -> _PinLiveComparison | None
     try:
         quantity = Quantity(str(row.get("quantity") or ""))
         engine = Engine(str(row.get("comparison_channel") or ""))
-        status = ResidualStatus(_status_token(row.get("status")))
     except ValueError:
         return None
+    status = residual_status_token(row.get("status")) or ResidualStatus.REFUSED
     if not reference or not key or engine not in {
         Engine.NASA_CEA_9,
         Engine.ELLINGHAM,
@@ -712,19 +718,6 @@ def tombstone_for_changed_identity(old: PinBandRecord, *, new_key: str) -> PinBa
     )
 
 
-def _status_token(status: object) -> str:
-    text = str(status or "")
-    if text in {s.value for s in ResidualStatus}:
-        return text
-    if text in {"typed-refusal", "typed_refusal", "refused"}:
-        return ResidualStatus.REFUSED.value
-    if text == "match":
-        return ResidualStatus.MATCH.value
-    if text == "mismatch":
-        return ResidualStatus.MISMATCH.value
-    return ResidualStatus.REFUSED.value
-
-
 def migrate_pin_records(root: Path | None = None) -> dict[str, Any]:
     """Lift existing pin sets into pin_band_records + exhaustive key_map."""
 
@@ -747,7 +740,10 @@ def migrate_pin_records(root: Path | None = None) -> dict[str, Any]:
             records.append(
                 PinBandRecord(
                     key=new_key,
-                    expected_outcome=_status_token(point.get("status")),
+                    expected_outcome=(
+                        residual_status_token(point.get("status"))
+                        or ResidualStatus.REFUSED
+                    ).value,
                     evidence="data/literature/gibbs_battery_residual_ledger.yaml",
                     aliases=(old_key,),
                     centre=residual,
@@ -777,7 +773,10 @@ def migrate_pin_records(root: Path | None = None) -> dict[str, Any]:
             records.append(
                 PinBandRecord(
                     key=new_key,
-                    expected_outcome=_status_token(point.get("status")),
+                    expected_outcome=(
+                        residual_status_token(point.get("status"))
+                        or ResidualStatus.REFUSED
+                    ).value,
                     evidence="data/literature/species_rail_differential_ledger.yaml",
                     aliases=(old_key,),
                     centre=residual,

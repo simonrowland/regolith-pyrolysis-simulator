@@ -3319,6 +3319,29 @@ def test_pin_failures_matches_legacy_channel_by_identity() -> None:
     assert failures == []
 
 
+def test_pin_and_legacy_bucket_share_residual_status_tokens() -> None:
+    from simulator.battery.enums import residual_status_token
+    from simulator.battery.pins import _pin_live_comparison
+    from simulator.battery.score import _legacy_bucket
+
+    assert residual_status_token("typed-refusal") is ResidualStatus.REFUSED
+    assert residual_status_token("typed_refusal") is ResidualStatus.REFUSED
+    assert residual_status_token("unknown") is None
+    assert _legacy_bucket({"status": "typed-refusal"}) == "refused"
+    assert _legacy_bucket({"status": "failed-to-run"}) == "refused"
+    assert _legacy_bucket({"status": "unknown"}) == "excluded"
+    live = _pin_live_comparison(
+        {
+            "reference_id": "reference",
+            "comparison_key": "janaf::record:T=1100::nasa_cea_9::delta_fG_kJ_mol",
+            "quantity": "delta_fG",
+            "comparison_channel": "nasa_cea_9",
+            "status": "typed_refusal",
+        }
+    )
+    assert live is not None and live.status is ResidualStatus.REFUSED
+
+
 def test_pin_payloads_match_legacy_channel_by_identity() -> None:
     from simulator.battery.pins import _pin_failures_from_payloads
 

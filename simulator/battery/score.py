@@ -56,6 +56,7 @@ from simulator.battery.enums import (
     UncertaintyKind,
     VAPORIZATION_ENTHALPIES,
     ValueKind,
+    residual_status_token,
 )
 from simulator.battery.identity import (
     Identity,
@@ -7680,10 +7681,15 @@ def render_score_report_from_payloads(
 def _legacy_bucket(row: Mapping[str, object]) -> str:
     if row.get("score_eligible"):
         return "scored"
-    status = str(row.get("status") or row.get("terminal_bucket") or "")
-    if status in {"refused", "typed-refusal", "failed-to-run"} or row.get("authority") == "refused":
+    raw_status = str(row.get("status") or row.get("terminal_bucket") or "")
+    status = residual_status_token(raw_status)
+    if (
+        status is ResidualStatus.REFUSED
+        or raw_status == "failed-to-run"
+        or row.get("authority") == "refused"
+    ):
         return "refused"
-    if status in {"match", "mismatch"}:
+    if status in {ResidualStatus.MATCH, ResidualStatus.MISMATCH}:
         return "scored"
     return "excluded"
 
