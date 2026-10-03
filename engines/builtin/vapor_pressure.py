@@ -1270,8 +1270,11 @@ def _pure_segment_usable(
         # T + C > 0 branch; crossing its pole is not a physical continuation.
         if denominator <= 0.0:
             return False
-        projected_log_pressure = float(selected.get("A", 0.0)) - (
-            float(selected.get("B", 0.0)) / denominator
+        projected_log_pressure = _antoine_log10_pressure(
+            float(selected.get("A", 0.0)),
+            float(selected.get("B", 0.0)),
+            float(selected.get("C", 0.0)),
+            float(temperature_K),
         )
     except (TypeError, ValueError, ZeroDivisionError):
         return False
