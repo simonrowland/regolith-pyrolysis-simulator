@@ -3507,6 +3507,19 @@ def test_thermoengine_transport_rejects_unknown_model_name():
         )
 
 
+def test_thermoengine_transport_requires_explicit_nonblank_model_name():
+    with pytest.raises(TypeError, match='model_name'):
+        ThermoEngineTransport(
+            activity_converter=activity_from_chem_potential,
+        )
+
+    with pytest.raises(ValueError, match='unknown ThermoEngine MELTS model'):
+        ThermoEngineTransport(
+            model_name='',
+            activity_converter=activity_from_chem_potential,
+        )
+
+
 def test_thermoengine_transport_rejects_unpickleable_worker_converter():
     transport = ThermoEngineTransport(
         model_name='MELTSv1.0.2',
