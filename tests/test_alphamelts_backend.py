@@ -3013,14 +3013,14 @@ def test_alphamelts_initialize_explicit_thermoengine_when_available(monkeypatch)
 
 
 @pytest.mark.parametrize(
-    ("config", "adapter_model", "transport_model"),
+    ("config", "adapter_model", "forwarded_model", "transport_model"),
     [
-        ({"model": ""}, "", "MELTSv1.0.2"),
-        ({}, "MELTSv1.0.2", "MELTSv1.0.2"),
+        ({"model": ""}, "", "MELTSv1.0.2", "MELTSv1.0.2"),
+        ({}, "MELTSv1.0.2", "MELTSv1.0.2", "MELTSv1.0.2"),
     ],
 )
 def test_thermoengine_backend_pins_blank_model_resolution_before_transport(
-    monkeypatch, config, adapter_model, transport_model
+    monkeypatch, config, adapter_model, forwarded_model, transport_model
 ):
     class FakeThermoEngineTransport:
         engine_version = "thermoengine fake"
@@ -3050,7 +3050,10 @@ def test_thermoengine_backend_pins_blank_model_resolution_before_transport(
 
     assert backend.initialize(config) is True
     assert backend._model == adapter_model
-    assert backend._thermoengine_transport.forwarded_model_name == adapter_model
+    assert (
+        backend._thermoengine_transport.forwarded_model_name
+        == forwarded_model
+    )
     assert backend._thermoengine_transport.model_name == transport_model
 
 

@@ -112,7 +112,7 @@ class ThermoEngineBackend(_MELTSBackendSupport, RealBackendAuthority):
 
         try:
             transport = ThermoEngineTransport(
-                model_name=self._model,
+                model_name=(self._model or 'MELTSv1.0.2'),
                 activity_converter=activity_from_chem_potential,
                 equilibrate_timeout_s=float(raw_equilibrate_timeout_s),
                 health_timeout_s=self._health_timeout_s,
