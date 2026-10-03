@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from importlib.resources import files
 from typing import Any
 
 import pytest
@@ -157,14 +158,6 @@ _GOLDEN = {
     },
 }
 
-_GAS_TABLE = "/Users/simonrowland/Repos/regolith-pyrolysis-simulator/.venv/lib/python3.12/site-packages/openimcc/data/gas/gas-shomate.csv"
-_GAS_PROVENANCE = {
-    "gas_condensate_source": "/Users/simonrowland/Repos/regolith-pyrolysis-simulator/.venv/lib/python3.12/site-packages/openimcc/data/gas/condensate.csv",
-    "gas_table_source": _GAS_TABLE,
-    "pack": "1.0.2",
-    "pack_digest": "f2b479cd54e3c82704a5863fcc06836f72045375d9a8c7f8d2fad19e98f75d05",
-    "package_version": "0.1.0.dev0",
-}
 _GAS_SOURCE_CLASSES = {
     "Ca": "janaf_fitted", "CaO": "janaf_fitted", "O": "janaf_fitted",
     "O2": "janaf_fitted", "Si": "janaf_fitted", "Si2": "janaf_fitted",
@@ -257,6 +250,20 @@ def _gas_result(backend: Any, pot: Any, temperature_K: float, cell: str | None) 
 
 
 def test_binary_pot_gas_paths_match_base_revision_hex_pins() -> None:
+    openimcc = pytest.importorskip("openimcc", reason="openimcc is not importable")
+    if not hasattr(openimcc, "oxygen_balance_from_pressure_model"):
+        pytest.skip("installed openimcc lacks oxygen_balance_from_pressure_model")
+
+    gas_data = files("openimcc") / "data" / "gas"
+    gas_table = str((gas_data / "gas-shomate.csv").resolve())
+    gas_provenance = {
+        "gas_condensate_source": str((gas_data / "condensate.csv").resolve()),
+        "gas_table_source": gas_table,
+        "pack": "1.0.2",
+        "pack_digest": "f2b479cd54e3c82704a5863fcc06836f72045375d9a8c7f8d2fad19e98f75d05",
+        "package_version": "0.1.0.dev0",
+    }
+
     pots = {pot.pot_id: pot for pot in load_binary_pots(DEFAULT_POTS_PATH)[0]}
     backend = _OpenImccBatteryBackend("openimcc")
 
@@ -282,7 +289,7 @@ def test_binary_pot_gas_paths_match_base_revision_hex_pins() -> None:
         assert _hx_tree(balance["dominant_metal_carriers"]) == expected["metal"]
         assert float(solved["pO2_bar"]).hex() == expected["pO2"]
         assert diagnostics["authority"] == "extrapolated"
-        assert diagnostics["openimcc_provenance"] == _GAS_PROVENANCE
+        assert diagnostics["openimcc_provenance"] == gas_provenance
         assert gas["domain_flags"] == _DOMAIN_FLAGS[temperature_K]
         assert gas["provenance_class"] == _PROVENANCE_CLASSES
         expected_gas_notices = {
@@ -308,7 +315,7 @@ def test_binary_pot_gas_paths_match_base_revision_hex_pins() -> None:
         assert (None if buffer is None else float(buffer).hex()) == expected["buffer"]
         assert set(result.vapor_pressures_source) == set(expected["pressures"])
         expected_sources = {
-            species: f"openimcc:{_GAS_TABLE}:{_GAS_SOURCE_CLASSES[species]}"
+            species: f"openimcc:{gas_table}:{_GAS_SOURCE_CLASSES[species]}"
             for species in expected["pressures"]
             if species not in _CELL_SOURCE_LABELS
         }
