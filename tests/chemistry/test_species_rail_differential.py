@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import hashlib
+import json
 import math
 from pathlib import Path
 
@@ -92,6 +93,46 @@ from simulator.reference_data.janaf import FEEDSTOCKS_PATH
 
 def _pilot_ledger_digest() -> bytes:
     return hashlib.sha256(GIBBS_PILOT_LEDGER_PATH.read_bytes()).digest()
+
+
+def test_compilation_comparison_numeric_output_digest() -> None:
+    point = KeyedTablePoint(
+        compilation_id="janaf",
+        record_id="Mg-008",
+        formula="MgO",
+        phase="cr",
+        phase_kind=PHASE_SOLID,
+        T_K=1100.0,
+        delta_fG_kJ_mol=-481.399,
+        log10_Kf=None,
+        log10_Kf_as_published=None,
+        printed_page=None,
+        note="golden compilation point",
+    )
+    scores = (score_cea_point(point), score_ellingham_point(point))
+    payload = [
+        {
+            "channel": score.engine_channel,
+            "key": score.key,
+            "status": score.status,
+            "value_hex": (
+                None
+                if score.residual_kJ_mol is None
+                else float(score.residual_kJ_mol).hex()
+            ),
+            "engine_hex": (
+                None if score.engine_kJ_mol is None else float(score.engine_kJ_mol).hex()
+            ),
+            "band_hex": float(score.band_kJ_mol).hex(),
+        }
+        for score in scores
+        if score is not None
+    ]
+    digest = hashlib.sha256(
+        json.dumps(payload, sort_keys=True, separators=(",", ":")).encode()
+    ).hexdigest()
+
+    assert digest == "1abf930cf423f44ba5e1e35c198302b10cc7fe29ecada60fac0de125963423c4"
 
 
 def test_rail_is_content_derived(tmp_path: Path) -> None:
@@ -784,6 +825,33 @@ def test_ellingham_outside_species_fit_range_is_typed_refusal() -> None:
     assert inside_score is not None
     assert inside_score.status == "match"
     assert inside_score.residual_kJ_mol == pytest.approx(0.0, abs=0.05)
+
+
+def test_ellingham_zero_kelvin_row_is_a_typed_out_of_range_refusal() -> None:
+    point = KeyedTablePoint(
+        compilation_id="janaf",
+        record_id="Mg-008",
+        formula="MgO",
+        phase="cr",
+        phase_kind=PHASE_SOLID,
+        T_K=0.0,
+        delta_fG_kJ_mol=-600.0,
+        log10_Kf=None,
+        log10_Kf_as_published=None,
+        printed_page=None,
+    )
+
+    score = score_ellingham_point(point)
+
+    assert score is not None
+    assert score.key == (
+        "janaf::Mg-008:T=0::ellingham::delta_fG_kJ_per_mol_O2"
+    )
+    assert score.status == "typed-refusal"
+    assert score.residual_kJ_mol is None
+    assert score.skip_reason == (
+        f"{TYPED_REFUSAL_PREFIX}engine_channel_out_of_range:1100-2600K"
+    )
 
 
 def test_ellingham_primary_refit_to_2600k_stays_scored() -> None:
