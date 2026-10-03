@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import hashlib
 import math
 from pathlib import Path
 from types import SimpleNamespace
@@ -69,6 +70,46 @@ def test_sossi_geometry_is_declared_from_bead_mass_without_residue_inputs() -> N
     assert areas["pt_loop_bead_disk_equivalent_volume"] != areas[
         "pt_loop_bead_sphere_constant"
     ]
+
+
+def test_sossi_prediction_provenance_pins_pack_byte_digests(monkeypatch) -> None:
+    pytest.importorskip("openimcc")
+    from openimcc import load_gas_datapack
+
+    import simulator.battery.residue as residue
+
+    def no_evaporation(inventory, *_args, **_kwargs):
+        return SimpleNamespace(
+            residue_mol=dict(inventory), buffer_oxygen_exchange_mol=0.0
+        )
+
+    monkeypatch.setattr(residue, "integrate_residue_inventory", no_evaporation)
+    source = yaml.safe_load(SOURCE.read_text())
+    experiment = source["experiments"][0]
+    experiment_id = experiment["experiment_id"]
+    starting_trace = {
+        element: source["species"][element]["observations"][0]["values"][
+            "starting_measured_ppm"
+        ]
+        for element in ("Mn", "Ti")
+    }
+    catalog = yaml.safe_load((ROOT / "data/vapor_pressures.yaml").read_text())
+    prediction = residue._predict_sossi_residue_cohort(
+        [experiment],
+        catalog,
+        starting_trace_ppm_by_experiment={experiment_id: starting_trace},
+        buffered_fO2_log_by_experiment={experiment_id: -10.0},
+        code_revision="pack-digest-pin-test",
+        engine="openimcc",
+    )[0]
+
+    gas_pack = load_gas_datapack()
+    assert prediction.provenance["gas_pack_digest"] == hashlib.sha256(
+        Path(gas_pack.gas_path).read_bytes()
+    ).hexdigest()
+    assert prediction.provenance["liquid_pack_digest"] == hashlib.sha256(
+        Path(gas_pack.oxide_path).read_bytes()
+    ).hexdigest()
 
 
 def test_sossi_scorer_projects_mn_and_types_unsupported_elements(monkeypatch) -> None:
