@@ -54,14 +54,14 @@
   {"source": "simulator.vapour_rail.request", "target": "simulator.vapour_rail.melt_activity_resolver"},
   {"source": "simulator.vapour_rail.u0_manifest", "target": "simulator.state"}
   ],
-  "dynamic_import_sites": [
-    "scripts/vaporock_antoine_shadow_matrix.py:package_or_module_version",
-    "simulator/core.py:PyrolysisSimulator._build_chemistry_kernel",
-    "simulator/melt_backend/installer.py:EngineInstaller._check_chemapp",
-    "simulator/melt_backend/vaporock.py:_bootstrap_vaporock_worker",
-    "simulator/melt_backend/vaporock.py:VapoRockBackend._import_vaporock",
-    "simulator/optimize/__init__.py:__getattr__",
-    "simulator/optimize/evaluate.py:_vapor_pressure_provider_code_fingerprint",
-    "simulator/optimize/strategy/__init__.py:__getattr__"
-  ]
+  "dynamic_import_sites": {
+    "scripts/vaporock_antoine_shadow_matrix.py:package_or_module_version": 1,
+    "simulator/core.py:PyrolysisSimulator._build_chemistry_kernel": 1,
+    "simulator/melt_backend/installer.py:EngineInstaller._check_chemapp": 1,
+    "simulator/melt_backend/vaporock.py:_bootstrap_vaporock_worker": 1,
+    "simulator/melt_backend/vaporock.py:VapoRockBackend._import_vaporock": 1,
+    "simulator/optimize/__init__.py:__getattr__": 1,
+    "simulator/optimize/evaluate.py:_vapor_pressure_provider_code_fingerprint": 1,
+    "simulator/optimize/strategy/__init__.py:__getattr__": 1
+  }
 }

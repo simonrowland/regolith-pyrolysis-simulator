@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import ast
+from collections import Counter
 import json
 from pathlib import Path
 import subprocess
@@ -34,7 +35,7 @@ def _is_type_checking(test: ast.expr) -> bool:
 
 def _imports(tree: ast.AST, source: str, path: str, package: str, modules: set[str]):
     found: list[tuple[str, int]] = []
-    dynamic_sites: set[str] = set()
+    dynamic_sites: Counter[str] = Counter()
 
     def add(node: ast.AST, base: str, names: list[ast.alias] | None = None) -> None:
         if base in modules:
@@ -44,9 +45,10 @@ def _imports(tree: ast.AST, source: str, path: str, package: str, modules: set[s
             if child in modules:
                 found.append((child, node.lineno))
 
-    class Visitor(ast.NodeVisitor):
+    class AliasCollector(ast.NodeVisitor):
+        """Collect dynamic-import spellings before resolving references in source order."""
+
         def __init__(self) -> None:
-            self.scope_stack: list[str] = []
             self.importlib_names = {"importlib"}
             self.import_module_names = {"import_module"}
 
@@ -54,17 +56,34 @@ def _imports(tree: ast.AST, source: str, path: str, package: str, modules: set[s
             for alias in node.names:
                 if alias.name == "importlib":
                     self.importlib_names.add(alias.asname or "importlib")
-            for alias in node.names:
-                add(node, alias.name)
 
         def visit_ImportFrom(self, node: ast.ImportFrom) -> None:
             if node.module == "importlib":
                 for alias in node.names:
                     if alias.name == "import_module":
                         self.import_module_names.add(alias.asname or alias.name)
-            self._visit_import_from(node)
 
-        def _visit_import_from(self, node: ast.ImportFrom) -> None:
+        def visit_If(self, node: ast.If) -> None:
+            if _is_type_checking(node.test):
+                for statement in node.orelse:
+                    self.visit(statement)
+                return
+            self.generic_visit(node)
+
+    aliases = AliasCollector()
+    aliases.visit(tree)
+
+    class Visitor(ast.NodeVisitor):
+        def __init__(self) -> None:
+            self.scope_stack: list[str] = []
+            self.importlib_names = aliases.importlib_names
+            self.import_module_names = aliases.import_module_names
+
+        def visit_Import(self, node: ast.Import) -> None:
+            for alias in node.names:
+                add(node, alias.name)
+
+        def visit_ImportFrom(self, node: ast.ImportFrom) -> None:
             if node.level:
                 parts = package.split(".") if package else []
                 trim = node.level - 1
@@ -77,6 +96,28 @@ def _imports(tree: ast.AST, source: str, path: str, package: str, modules: set[s
                 base = node.module or ""
             if base:
                 add(node, base, node.names)
+
+        def _is_dynamic_reference(self, node: ast.AST) -> bool:
+            return (
+                isinstance(node, ast.Name)
+                and (node.id == "__import__" or node.id in self.import_module_names)
+            ) or (
+                isinstance(node, ast.Attribute)
+                and node.attr == "import_module"
+                and isinstance(node.value, ast.Name)
+                and node.value.id in self.importlib_names
+            )
+
+        def _record_computed(self) -> None:
+            function = ".".join(self.scope_stack) or "<module>"
+            dynamic_sites[f"{path}:{function}"] += 1
+
+        @staticmethod
+        def _literal_value(node: ast.AST) -> tuple[bool, object]:
+            try:
+                return True, ast.literal_eval(node)
+            except (ValueError, TypeError):
+                return False, None
 
         def visit_FunctionDef(self, node: ast.FunctionDef) -> None:
             self.scope_stack.append(node.name)
@@ -91,31 +132,32 @@ def _imports(tree: ast.AST, source: str, path: str, package: str, modules: set[s
             self.scope_stack.pop()
 
         def visit_Call(self, node: ast.Call) -> None:
-            dynamic = False
-            if isinstance(node.func, ast.Name) and node.func.id in self.import_module_names:
-                dynamic = True
-            elif (
-                isinstance(node.func, ast.Attribute)
-                and node.func.attr == "import_module"
-                and isinstance(node.func.value, ast.Name)
-                and node.func.value.id in self.importlib_names
-            ):
-                dynamic = True
-            elif isinstance(node.func, ast.Name) and node.func.id == "__import__":
-                dynamic = True
-            if dynamic:
-                name = node.args[0] if node.args else None
-                literal_name = name.value if isinstance(name, ast.Constant) and isinstance(name.value, str) else None
-                package_arg = next((kw.value for kw in node.keywords if kw.arg == "package"), None)
-                literal_package = (
-                    package_arg.value
-                    if isinstance(package_arg, ast.Constant) and isinstance(package_arg.value, str)
-                    else None
+            if self._is_dynamic_reference(node.func):
+                name = node.args[0] if node.args else next(
+                    (kw.value for kw in node.keywords if kw.arg == "name"), None
                 )
+                name_is_literal, literal_name = self._literal_value(name) if name is not None else (False, None)
+                is_importlib = not (isinstance(node.func, ast.Name) and node.func.id == "__import__")
+                package_arg = next((kw.value for kw in node.keywords if kw.arg == "package"), None)
+                if is_importlib and package_arg is None and len(node.args) > 1:
+                    package_arg = node.args[1]
+                package_is_literal, literal_package = (
+                    self._literal_value(package_arg) if package_arg is not None else (True, None)
+                )
+                arguments_are_literal = all(
+                    self._literal_value(argument)[0] for argument in node.args
+                ) and all(
+                    keyword.arg is not None and self._literal_value(keyword.value)[0]
+                    for keyword in node.keywords
+                )
+                literal_name = literal_name if name_is_literal and isinstance(literal_name, str) else None
+                literal_package = literal_package if package_is_literal and (
+                    literal_package is None or isinstance(literal_package, str)
+                ) else None
                 target = None
-                if literal_name is not None and not literal_name.startswith("."):
+                if literal_name is not None and not literal_name.startswith(".") and arguments_are_literal:
                     target = literal_name
-                elif literal_name is not None and literal_package is not None:
+                elif literal_name is not None and literal_package is not None and arguments_are_literal:
                     dots = len(literal_name) - len(literal_name.lstrip("."))
                     parts = literal_package.split(".")
                     if dots > len(parts):
@@ -123,9 +165,35 @@ def _imports(tree: ast.AST, source: str, path: str, package: str, modules: set[s
                     target = ".".join((*parts[:len(parts) - dots + 1], literal_name[dots:])).rstrip(".")
                 if target:
                     add(node, target)
+                    is_dunder_import = isinstance(node.func, ast.Name) and node.func.id == "__import__"
+                    if is_dunder_import:
+                        fromlist = next((kw.value for kw in node.keywords if kw.arg == "fromlist"), None)
+                        if fromlist is None and len(node.args) > 3:
+                            fromlist = node.args[3]
+                        fromlist_is_literal, imported_names = (
+                            self._literal_value(fromlist) if fromlist is not None else (True, ())
+                        )
+                        if fromlist_is_literal and isinstance(imported_names, (tuple, list)):
+                            if imported_names and all(isinstance(name, str) for name in imported_names):
+                                add(node, target, [ast.alias(name=name, asname=None) for name in imported_names])
                 else:
-                    function = ".".join(self.scope_stack) or "<module>"
-                    dynamic_sites.add(f"{path}:{function}")
+                    self._record_computed()
+                # A recognized call accounts for its function reference once.
+                for argument in node.args:
+                    self.visit(argument)
+                for keyword in node.keywords:
+                    self.visit(keyword.value)
+                return
+            self.generic_visit(node)
+
+        def visit_Name(self, node: ast.Name) -> None:
+            if self._is_dynamic_reference(node):
+                self._record_computed()
+
+        def visit_Attribute(self, node: ast.Attribute) -> None:
+            if self._is_dynamic_reference(node):
+                self._record_computed()
+                return
             self.generic_visit(node)
 
         def visit_If(self, node: ast.If) -> None:
@@ -161,7 +229,7 @@ def _layer_prefixes() -> dict[str, int]:
     return prefixes
 
 
-def _scan(files: dict[str, tuple[str, str]]) -> tuple[dict[tuple[str, str], list[int]], set[str], set[str]]:
+def _scan(files: dict[str, tuple[str, str]]) -> tuple[dict[tuple[str, str], list[int]], set[str], dict[str, int]]:
     """Return module edges, undefined-layer modules, and computed dynamic-import sites."""
     modules = set(files)
     layers = _layer_prefixes()
@@ -173,7 +241,7 @@ def _scan(files: dict[str, tuple[str, str]]) -> tuple[dict[tuple[str, str], list
         return layers[max(matches, key=len)]
 
     edges: dict[tuple[str, str], set[int]] = {}
-    dynamic_sites: set[str] = set()
+    dynamic_sites: Counter[str] = Counter()
     for source, (path, text) in files.items():
         try:
             tree = ast.parse(text, filename=path)
@@ -218,9 +286,19 @@ def _check_baseline(
     return errors
 
 
-def _check_dynamic_sites(sites: set[str], baseline: set[str]) -> list[str]:
-    errors = [f"NEW computed dynamic import at {site}: {DYNAMIC_REMEDIATION}" for site in sorted(sites - baseline)]
-    errors.extend(f"STALE dynamic import site {site}: delete it" for site in sorted(baseline - sites))
+def _check_dynamic_sites(sites: dict[str, int], baseline: dict[str, int]) -> list[str]:
+    errors = []
+    for site in sorted(sites.keys() | baseline.keys()):
+        current = sites.get(site, 0)
+        allowed = baseline.get(site, 0)
+        if current > allowed:
+            errors.append(
+                f"NEW computed dynamic import at {site}: {current} exceeds baseline {allowed}: {DYNAMIC_REMEDIATION}"
+            )
+        elif current < allowed:
+            errors.append(
+                f"STALE dynamic import site {site}: count dropped from {allowed} to {current}; lower the count / delete the entry in the same commit that removes the call"
+            )
     return errors
 
 
@@ -229,7 +307,7 @@ def test_import_boundary_baseline_is_shrink_only() -> None:
     upward, unmatched, dynamic_sites = _scan(files)
     baseline_data = json.loads(BASELINE_PATH.read_text(encoding="utf-8"))
     baseline = {(row["source"], row["target"]) for row in baseline_data["edges"]}
-    baseline_sites = set(baseline_data["dynamic_import_sites"])
+    baseline_sites = baseline_data["dynamic_import_sites"]
     errors = _check_baseline(upward, baseline, {module: path for module, (path, _) in files.items()})
     errors.extend(_check_dynamic_sites(dynamic_sites, baseline_sites))
     errors.extend(f"module matches no layer: {module}" for module in sorted(unmatched))
@@ -279,6 +357,59 @@ def test_literal_dunder_import_is_an_edge(tmp_path: Path) -> None:
     _assert_literal_dynamic_edge(tmp_path, 'def load():\n    return __import__("simulator.high")\n')
 
 
+def test_keyword_literal_importlib_import_is_an_edge(tmp_path: Path) -> None:
+    _assert_literal_dynamic_edge(
+        tmp_path,
+        'def load():\n    return il.import_module(name="simulator.high")\nimport importlib as il\n',
+    )
+
+
+def test_dunder_import_fromlist_adds_tracked_child_edge(tmp_path: Path) -> None:
+    path = tmp_path / "simulator" / "low.py"
+    path.parent.mkdir()
+    path.write_text('def load():\n    return __import__("simulator", fromlist=["high"])\n')
+    high = path.parent / "high.py"
+    high.write_text("VALUE = 1\n")
+    edges, unmatched, sites = _scan({
+        "simulator.chemistry.low": (str(path), path.read_text()),
+        "simulator": (str(path.parent / "__init__.py"), ""),
+        "simulator.high": (str(high), high.read_text()),
+    })
+    assert not unmatched and not sites
+    errors = _check_baseline(edges, set(), {"simulator.chemistry.low": str(path)})
+    assert any("simulator.chemistry.low -> simulator.high" in error for error in errors)
+
+
+def test_dynamic_import_alias_reference_is_counted(tmp_path: Path) -> None:
+    path = tmp_path / "simulator" / "low.py"
+    path.parent.mkdir()
+    path.write_text("import importlib as il\nf = il.import_module\n")
+    _, _, sites = _scan({"simulator.chemistry.low": (str(path), path.read_text())})
+    assert sites == {f"{path}:<module>": 1}
+    assert _check_dynamic_sites(sites, {})
+
+
+def test_second_computed_dynamic_reference_in_function_fails(tmp_path: Path) -> None:
+    path = tmp_path / "simulator" / "low.py"
+    path.parent.mkdir()
+    path.write_text(
+        "def load(name):\n    __import__(name)\n    __import__(name)\n"
+    )
+    _, _, sites = _scan({"simulator.chemistry.low": (str(path), path.read_text())})
+    assert sites == {f"{path}:load": 2}
+    assert _check_dynamic_sites(sites, {f"{path}:load": 1})
+
+
+def test_partial_dynamic_import_removal_fails_as_stale(tmp_path: Path) -> None:
+    path = tmp_path / "simulator" / "low.py"
+    path.parent.mkdir()
+    path.write_text("def load(name):\n    __import__(name)\n")
+    _, _, sites = _scan({"simulator.chemistry.low": (str(path), path.read_text())})
+    assert _check_dynamic_sites(sites, {f"{path}:load": 2}) == [
+        f"STALE dynamic import site {path}:load: count dropped from 2 to 1; lower the count / delete the entry in the same commit that removes the call"
+    ]
+
+
 def _assert_literal_dynamic_edge(tmp_path: Path, source: str) -> None:
     path = tmp_path / "simulator" / "low.py"
     path.parent.mkdir(exist_ok=True)
@@ -301,8 +432,8 @@ def test_new_computed_dynamic_import_site_fails(tmp_path: Path) -> None:
     path.parent.mkdir()
     path.write_text("def load(name):\n    return __import__(name)\n")
     _, _, sites = _scan({"simulator.chemistry.low": (str(path), path.read_text())})
-    assert _check_dynamic_sites(sites, set()) == [
-        f"NEW computed dynamic import at {path}:load: {DYNAMIC_REMEDIATION}"
+    assert _check_dynamic_sites(sites, {}) == [
+        f"NEW computed dynamic import at {path}:load: 1 exceeds baseline 0: {DYNAMIC_REMEDIATION}"
     ]
 
 
@@ -311,6 +442,6 @@ def test_stale_dynamic_import_site_fails(tmp_path: Path) -> None:
     path.parent.mkdir()
     path.write_text("VALUE = 1\n")
     _, _, sites = _scan({"simulator.chemistry.low": (str(path), path.read_text())})
-    assert _check_dynamic_sites(sites, {f"{path}:load"}) == [
-        f"STALE dynamic import site {path}:load: delete it"
+    assert _check_dynamic_sites(sites, {f"{path}:load": 1}) == [
+        f"STALE dynamic import site {path}:load: count dropped from 1 to 0; lower the count / delete the entry in the same commit that removes the call"
     ]
