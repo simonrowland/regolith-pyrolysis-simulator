@@ -372,8 +372,8 @@ def test_hashimoto_vacuum_oxygen_balance_is_engine_specific_and_alpha_weighted()
         )
 
     # OpenIMCC be41a6d's JANAF major-oxide liquid rows move the Hashimoto-start
-    # probe pO2 consumed by the oxygen-balance solver to 0.828632754 bar at
-    # alpha=1 (afcb5d8: 0.799303) and 0.300351240 bar at alpha=0.25
+    # probe pO2 consumed by the oxygen-balance solver to 0.828632754 Pa at
+    # alpha=1 (afcb5d8: 0.799303) and 0.300351240 Pa at alpha=0.25
     # (afcb5d8: 0.289332). The two engines still use their own melt channel
     # pressures for both alpha arms.
     assert solved["openimcc"][1.0].pO2_bar * PA_PER_BAR == pytest.approx(
