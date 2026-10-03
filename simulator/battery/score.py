@@ -3842,6 +3842,8 @@ def _hashimoto_residue_prediction(
             coefficient_sources=sources,
             lineage_complete=False,
             notices=tuple(notices),
+            # The source-resolved Phase.L identity denotes the modeled run-end
+            # liquid's bulk oxide inventory; quenching preserves that inventory.
             identity=reference.identity,
             version=str(primary.provenance.get("code_revision") or "unknown"),
             refusal_detail=primary_provenance,

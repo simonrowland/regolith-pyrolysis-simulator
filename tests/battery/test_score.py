@@ -2819,6 +2819,42 @@ def test_hashimoto_scoring_projects_by_experiment_and_carries_residue_flags(
         assert any("feo_melt_redox_stack2_pending" in notice.reason for notice in first_prediction.notices)
         assert any("residue_time_refinement_unconverged" in notice.reason for notice in first_prediction.notices)
         candidate = score.candidate_observation(first, first_prediction)
+        assert candidate.identity.species.phase == first.identity.species.phase
+        # Isolate the phase comparator from Hashimoto's separately unresolved
+        # exposed-area identity field; the synthetic area is only for this check.
+        comparable_reference = replace(
+            first.identity,
+            exposure=State.of(
+                replace(
+                    first.identity.exposure.value,
+                    area_m2=State.of(Decimal("1")),
+                )
+            ),
+        )
+        comparable_candidate = replace(
+            candidate.identity,
+            exposure=State.of(
+                replace(
+                    candidate.identity.exposure.value,
+                    area_m2=State.of(Decimal("1")),
+                )
+            ),
+        )
+        assert identity_equal(comparable_candidate, comparable_reference).kind is IdentityEqualKind.EQUAL
+        wrong_phase_prediction = replace(
+            first_prediction,
+            identity=replace(
+                comparable_reference,
+                species=replace(comparable_reference.species, phase=State.of(Phase.GLASS)),
+            ),
+        )
+        wrong_phase_candidate = score.candidate_observation(
+            first, wrong_phase_prediction
+        )
+        assert (
+            identity_equal(comparable_reference, wrong_phase_candidate.identity).kind
+            is IdentityEqualKind.IDENTITY_MISMATCH
+        )
         assert candidate.provenance["oxygen_model"] == f"own oxygen balance: {engine.value}"
 
         refused_experiment = first.experiment_id

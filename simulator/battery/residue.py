@@ -678,6 +678,9 @@ def _hashimoto_project_oxide_wt_pct(inventory_mol: Mapping[str, float]) -> dict[
     total_mass_kg = math.fsum(oxide_mass_kg.values())
     if not math.isfinite(total_mass_kg) or total_mass_kg <= 0.0:
         raise ResidueInventoryRefusal("hashimoto_residue_mass_invalid")
+    # This is the run-end liquid's bulk oxide inventory; the Hashimoto source
+    # reports the same whole-spherule inventory after quenching, so score.py
+    # carries the source-resolved Phase.L identity onto this prediction.
     return {
         oxide: mass_kg / total_mass_kg * 100.0
         for oxide, mass_kg in oxide_mass_kg.items()
