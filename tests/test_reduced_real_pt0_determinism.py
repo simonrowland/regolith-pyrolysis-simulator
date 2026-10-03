@@ -598,19 +598,19 @@ def test_alphamelts_provider_key_partitions_model_mode_not_engine_version() -> N
     assert _key_hash(base) == _key_hash(next_engine)
 
 
-def test_blank_thermoengine_model_keeps_provider_name_in_pt0_identity() -> None:
+def _thermoengine_pt0_identity(model: str) -> tuple[dict, dict]:
     store = PT0DeterminismStore("capture")
     sim = _build_pt0_sim(store)
 
-    class BlankThermoEngineBackend(RealBackendAuthority):
+    class ThermoEngineBackend(RealBackendAuthority):
         real_backend_family = RealBackendFamily.THERMOENGINE
-        _model = ""
+        _model = model
         _mode = None
 
         def is_available(self) -> bool:
             return True
 
-    backend = BlankThermoEngineBackend()
+    backend = ThermoEngineBackend()
     provider = AlphaMELTSProvider(backend=backend)
     sim.backend = backend
     sim._chem_registry.register(
@@ -624,8 +624,22 @@ def test_blank_thermoengine_model_keeps_provider_name_in_pt0_identity() -> None:
         ChemistryIntent.SILICATE_EQUILIBRIUM,
     )
 
+    return key, authority
+
+
+def test_blank_thermoengine_model_keeps_provider_name_in_pt0_identity() -> None:
+    key, authority = _thermoengine_pt0_identity("")
+
     assert key["model"]["model"] == "alphamelts-diagnostic"
     assert authority["provider"]["model"] == "alphamelts-diagnostic"
+
+
+@pytest.mark.parametrize("model", ["MELTSv1.0.2", "pMELTS"])
+def test_nonblank_thermoengine_model_passes_through_pt0_identity(model: str) -> None:
+    key, authority = _thermoengine_pt0_identity(model)
+
+    assert key["model"]["model"] == model
+    assert authority["provider"]["model"] == model
 
 
 def test_non_alphamelts_magemin_shadow_key_identity_stays_byte_identical() -> None:
