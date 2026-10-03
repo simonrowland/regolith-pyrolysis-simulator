@@ -1416,6 +1416,31 @@ def score_ellingham_point(point: KeyedTablePoint) -> GibbsPointScore | None:
                 "(no Ellingham segment)"
             ).strip("; "),
         )
+    try:
+        ellingham_segment_for_temperature(metal, point.T_K)
+    except ValueError as exc:
+        # The chemistry owner rejects nonpositive absolute temperatures before
+        # the comparison can reach its certified-band refusal below. Preserve
+        # that domain boundary as a per-point comparison status for JANAF rows.
+        if str(exc) != "Ellingham temperature_K must be > 0 K":
+            raise
+        low, high = ellingham_fit_range_K(metal)
+        band_note = f"certified_band_flag fit_range_K=({low:g},{high:g})"
+        return _refusal_score(
+            compilation_id=point.compilation_id,
+            record_id=point.record_id,
+            formula=point.formula,
+            T_K=point.T_K,
+            channel=CHANNEL_ELLINGHAM,
+            reason="engine_channel_out_of_range",
+            provenance_class=ellingham_provenance(metal, point.compilation_id),
+            table_kJ_mol=oxide_dG_per_mol_O2_kJ(
+                point.delta_fG_kJ_mol, point.formula
+            ),
+            band=(low, high),
+            comparison_quantity="delta_fG_kJ_per_mol_O2",
+            note=f"{point.note}; {band_note}".strip("; "),
+        )
     # Each metal key is one oxide reaction. Fe is 2 Fe + O2 → 2 FeO, not
     # hematite (b-489). Map only when the line's own oxide IS this formula.
     if oxide_identity_mismatch_applies(point.formula):

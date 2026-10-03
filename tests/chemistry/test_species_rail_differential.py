@@ -827,6 +827,33 @@ def test_ellingham_outside_species_fit_range_is_typed_refusal() -> None:
     assert inside_score.residual_kJ_mol == pytest.approx(0.0, abs=0.05)
 
 
+def test_ellingham_zero_kelvin_row_is_a_typed_out_of_range_refusal() -> None:
+    point = KeyedTablePoint(
+        compilation_id="janaf",
+        record_id="Mg-008",
+        formula="MgO",
+        phase="cr",
+        phase_kind=PHASE_SOLID,
+        T_K=0.0,
+        delta_fG_kJ_mol=-600.0,
+        log10_Kf=None,
+        log10_Kf_as_published=None,
+        printed_page=None,
+    )
+
+    score = score_ellingham_point(point)
+
+    assert score is not None
+    assert score.key == (
+        "janaf::Mg-008:T=0::ellingham::delta_fG_kJ_per_mol_O2"
+    )
+    assert score.status == "typed-refusal"
+    assert score.residual_kJ_mol is None
+    assert score.skip_reason == (
+        f"{TYPED_REFUSAL_PREFIX}engine_channel_out_of_range:1100-2600K"
+    )
+
+
 def test_ellingham_primary_refit_to_2600k_stays_scored() -> None:
     """Na ellingham_fit_range_K is (1100, 2600); 2500 K is in-range."""
 
