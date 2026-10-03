@@ -889,6 +889,16 @@ def _hashimoto_integrate_geometry(
     )
 
 
+def _gas_pack_byte_digests(gas_pack) -> tuple[str, str]:
+    """Return raw-byte digests of both pack files; b-690 replaces this with the
+    bridge's parsed-content binding digest.
+    """
+    return (
+        hashlib.sha256(Path(gas_pack.gas_path).read_bytes()).hexdigest(),
+        hashlib.sha256(Path(gas_pack.oxide_path).read_bytes()).hexdigest(),
+    )
+
+
 def _predict_hashimoto_residue_cohort(
     experiments: Sequence[Mapping[str, Any]],
     runtime_catalog: Mapping[str, Any],
@@ -974,8 +984,7 @@ def _predict_hashimoto_residue_cohort(
         for species, reaction in gas_channels
     }
 
-    gas_digest = hashlib.sha256(Path(gas_pack.gas_path).read_bytes()).hexdigest()
-    liquid_digest = hashlib.sha256(Path(gas_pack.oxide_path).read_bytes()).hexdigest()
+    gas_digest, liquid_digest = _gas_pack_byte_digests(gas_pack)
     melt_pack_identity: dict[str, str] = {}
     primary_alpha_arm, primary_geometry = _hashimoto_primary_policy()
     prediction_rows: list[_HashimotoResiduePrediction] = []
@@ -1650,8 +1659,7 @@ def _predict_sossi_residue_cohort(
             for species, reaction in raw_gas_channels
             if str(reaction[0]) in set(_SOSSI_TRACE_PARENTS.values())
         ]
-        gas_pack_digest = hashlib.sha256(Path(gas_pack.gas_path).read_bytes()).hexdigest()
-        liquid_pack_digest = hashlib.sha256(Path(gas_pack.oxide_path).read_bytes()).hexdigest()
+        gas_pack_digest, liquid_pack_digest = _gas_pack_byte_digests(gas_pack)
     else:
         gas_pack = None
         omissions = ()
