@@ -392,6 +392,72 @@ def test_real_compilation_pin_score_report_reason_before_sidecar() -> None:
     assert row.split("|")[2].strip() == "no_live_residual_for_reference"
 
 
+def test_compilation_pin_checker_exit_and_counts(tmp_path, monkeypatch, capsys) -> None:
+    import json
+
+    from scripts import check_compilation_pin_sidecar as checker
+    from simulator.battery.pins import PinBandRecord
+
+    key = "janaf::Al-096:T=1100::nasa_cea_9::delta_fG_kJ_mol"
+    pin = PinBandRecord(
+        key=f"{key}::delta_fG::thermochemistry::nasa_cea_9",
+        expected_outcome="match",
+        evidence="fixture",
+        aliases=(key,),
+        centre=Decimal("1"),
+        pin_band_value=Decimal("0.05"),
+    )
+    monkeypatch.setattr(
+        checker,
+        "load_pins",
+        lambda _path: {"pin_band_records": (pin,)},
+    )
+    residuals = tmp_path / "residuals.jsonl"
+    residuals.write_text("", encoding="utf-8")
+    sidecar = tmp_path / "compilation-comparisons.jsonl"
+    args = [
+        "--residuals",
+        str(residuals),
+        "--sidecar",
+        str(sidecar),
+        "--pins",
+        str(tmp_path / "pins.yaml"),
+    ]
+
+    def write_comparison(value: str) -> None:
+        sidecar.write_text(
+            json.dumps(
+                {
+                    "reference_id": "nist-janaf-4th:Al-096:delta_fG:T=1100",
+                    "quantity": "delta_fG",
+                    "comparison_channel": "nasa_cea_9",
+                    "comparison_key": key,
+                    "status": "match",
+                    "value": value,
+                    "band": "0.05",
+                }
+            )
+            + "\n",
+            encoding="utf-8",
+        )
+
+    write_comparison("1")
+    assert checker.main(args) == 0
+    output = capsys.readouterr().out
+    assert "pins_total=1 matched=1 in_band=1 outside_band=0 unmatched=0" in output
+
+    write_comparison("1.1")
+    assert checker.main(args) == 1
+    output = capsys.readouterr().out
+    assert "pins_total=1 matched=1 in_band=0 outside_band=1 unmatched=0" in output
+
+    sidecar.write_text("", encoding="utf-8")
+    assert checker.main(args) == 1
+    output = capsys.readouterr().out
+    assert "pins_total=1 matched=0 in_band=0 outside_band=0 unmatched=1" in output
+    assert '"no_compilation_comparison_for_reference": 1' in output
+
+
 def test_compilation_comparison_sidecar_failure_preserves_target(tmp_path, monkeypatch) -> None:
     import pytest
 
