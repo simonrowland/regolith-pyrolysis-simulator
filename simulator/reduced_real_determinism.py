@@ -34,6 +34,7 @@ from simulator.chemistry.kernel import ChemistryIntent
 from simulator.config import (
     DEFAULT_ALPHAMELTS_MODEL,
     functional_data_yaml_digest,
+    resolve_alphamelts_subprocess_model,
 )
 from simulator.grind_preflight import (
     assert_strict_vapor_pt1_row,
@@ -3169,6 +3170,15 @@ def _provider_model(provider: Any) -> str | None:
     if provider is None:
         return None
     backend = getattr(provider, "_backend", None)
+    if (
+        getattr(backend, "real_backend_family", None)
+        == RealBackendFamily.ALPHAMELTS
+        and str(getattr(backend, "_mode", "")).strip() == "subprocess"
+    ):
+        model, _ = resolve_alphamelts_subprocess_model(
+            getattr(backend, "_model", None)
+        )
+        return model
     model = getattr(backend, "_model", None)
     if model is not None:
         model_text = str(model).strip()
