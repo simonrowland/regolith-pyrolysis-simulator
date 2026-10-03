@@ -5250,7 +5250,7 @@ def test_measured_reduced_derivation_prose_input_is_queued_not_pointed(
         for row in extract["species"]["CaO"]["observations"]
         if row.get("observation_id") == "kume_2000_table2_sample_101"
     )
-    raw["derivation"]["inputs"] = ["Table 2 DSC Cp points"]
+    raw["derivation"]["inputs"] = "Table 2 DSC Cp points"
 
     result = migrate(_write_min_tree(tmp_path, extract), write=True)
     observation = next(
