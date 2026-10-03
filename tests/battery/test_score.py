@@ -6443,13 +6443,34 @@ def test_admitted_model_derived_rows_emit_residuals_per_imcc_engine() -> None:
             == 14
         )
         assert all(not row.score_eligible for row in allibert_rows)
+        allibert_cao_rows = [
+            row
+            for row in allibert_rows
+            if observations[row.reference].identity.species.formula == "CaO"
+        ]
+        allibert_alumina_rows = [
+            row
+            for row in allibert_rows
+            if observations[row.reference].identity.species.formula == "Al2O3"
+        ]
+        assert len(allibert_cao_rows) == 8
+        assert all(
+            any(
+                notice.kind is NoticeKind.DERIVATION_USES_COMPILATION
+                and notice.reason.startswith("reference_converted_via_fusion;")
+                and "source polymorph is unknown" in notice.reason
+                for notice in row.notices
+            )
+            for row in allibert_cao_rows
+        )
+        assert len(allibert_alumina_rows) == 8
         assert all(
             any(
                 "fusion conversion missing input" in notice.reason
                 and "measured reference polymorph is unknown" in notice.reason
                 for notice in row.notices
             )
-            for row in allibert_rows
+            for row in allibert_alumina_rows
         )
         assert not any(row.reference in allibert_rejected for row in residuals)
 

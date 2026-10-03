@@ -23,6 +23,7 @@ import warnings
 from collections import defaultdict
 from dataclasses import dataclass, field, replace
 from decimal import Decimal, InvalidOperation
+from functools import lru_cache
 from pathlib import Path
 from typing import Any, Callable, Iterable, Mapping, Sequence
 
@@ -1082,6 +1083,55 @@ def _is_flagged_stratum_notice(notice: Notice) -> bool:
     )
 
 
+@lru_cache(maxsize=1)
+def _janaf_pure_solid_table_index() -> tuple[tuple[str, str], ...]:
+    """Return the JANAF neutral crystal-table index by normalized formula."""
+
+    from simulator.reference_data.janaf import load_manifest
+
+    entries = load_manifest().get("entries")
+    if not isinstance(entries, list):
+        return ()
+    return tuple(
+        (str(entry["formula_normalised"]), str(entry["table_id"]))
+        for entry in entries
+        if isinstance(entry, Mapping)
+        and entry.get("phase") == "cr"
+        and entry.get("charge") == 0
+        and isinstance(entry.get("formula_normalised"), str)
+        and isinstance(entry.get("table_id"), str)
+    )
+
+
+@lru_cache(maxsize=None)
+def _janaf_pure_solid_table_temperature_range(
+    table_id: str,
+) -> tuple[Decimal, Decimal] | None:
+    from simulator.reference_data.janaf import TABLES_DIR, load_table_document
+
+    document = load_table_document(TABLES_DIR / f"{table_id}.yaml")
+    table = document.get("table")
+    values = table.get("values") if isinstance(table, Mapping) else None
+    if not isinstance(values, list):
+        return None
+    temperatures: list[Decimal] = []
+    for row in values:
+        if not isinstance(row, Mapping):
+            continue
+        temperature = row.get("temperature")
+        gibbs = row.get("formation_gibbs_energy")
+        if not isinstance(temperature, Mapping) or not isinstance(gibbs, Mapping):
+            continue
+        temperature_value = temperature.get("value")
+        gibbs_value = gibbs.get("value")
+        if temperature_value is None or gibbs_value is None:
+            continue
+        temperatures.append(Decimal(str(temperature_value)))
+    if len(set(temperatures)) < 2:
+        return None
+    return min(temperatures), max(temperatures)
+
+
 def _fusion_comparison_reference(
     reference: Observation, *, engine: Engine | None = None
 ) -> Observation:
@@ -1192,9 +1242,34 @@ def _fusion_comparison_reference(
         "O-035": Polymorph.CRISTOBALITE_HIGH,
     }.get(fusion.crystal_table)
     observed_polymorph = polymorph_token(standard_state.endmember)
+    source_polymorph = standard_state.endmember.polymorph
+    source_polymorph_is_unknown = (
+        source_polymorph is not None
+        and source_polymorph.is_unknown
+        and not (source_polymorph.reason or "").startswith("unrecognised polymorph ")
+    )
+    unique_unknown_polymorph_table = False
     if (
         expected_polymorph is not None
         and observed_polymorph is not expected_polymorph
+        and source_polymorph_is_unknown
+    ):
+        eligible_solid_tables = tuple(
+            table_id
+            for candidate_formula, table_id in _janaf_pure_solid_table_index()
+            if candidate_formula == formula
+            and (
+                table_range := _janaf_pure_solid_table_temperature_range(table_id)
+            ) is not None
+            and table_range[0] <= temperature_K <= table_range[1]
+        )
+        unique_unknown_polymorph_table = eligible_solid_tables == (
+            fusion.crystal_table,
+        )
+    if (
+        expected_polymorph is not None
+        and observed_polymorph is not expected_polymorph
+        and not unique_unknown_polymorph_table
     ):
         observed = "unknown" if observed_polymorph is None else observed_polymorph.value
         notice = Notice(
@@ -1281,14 +1356,13 @@ def _fusion_comparison_reference(
             notices=union_notices(reference.notices, notices),
         )
 
-    # Activity is a_i=exp[(mu_i-mu_i°)/(R*T)]. For the same mu_i,
-    # log10(a_solid)=log10(a_liquid)+[G_l°(T)-G_s°(T)]/(R*T*ln(10));
-    # the element terms cancel because both JANAF formation energies use the
-    # same elements. A liquid engine prediction gains this positive offset
-    # before comparison with a solid measurement. This helper makes the
-    # algebraically equivalent comparison by translating that measurement to
-    # a liquid-reference view and subtracting the same offset. JANAF G is
-    # kJ/mol, so multiply by 1000 to obtain J/mol; R=8.314462618 J/(mol*K).
+    # For the same chemical potential, mu = G° + RT ln(a) gives
+    # log10(a_l/a_s) = -DeltaG_fus/(RT ln(10)); JANAF reports DeltaG_fus in
+    # kJ/mol, so multiply by 1000 and use R=8.314462618 J/(mol*K). For CaO,
+    # JANAF interpolation gives DeltaG_fus=33.80370 and 32.59870 kJ/mol at
+    # 1823 and 1873 K, hence shifts -0.96857 and -0.90911 dex. Sanity check:
+    # DeltaH_fus(1-T/Tm), with the JANAF crossing Tm=3200 K, gives 34.208 and
+    # 32.966 kJ/mol at those temperatures.
     converted_activity = reference.value.point * (
         -delta_g_fus_J_per_mol / (JANAF_R_J_PER_MOL_K * temperature_K)
     ).exp()
@@ -1299,6 +1373,7 @@ def _fusion_comparison_reference(
         affected_quantities=(Quantity.ACTIVITY,),
         reason=(
             f"{FLAGGED_STRATUM_REFERENCE_CONVERTED_VIA_FUSION}; "
+            f"{'source polymorph is unknown; ' if source_polymorph_is_unknown else ''}"
             "reference-state conversion (not model error); "
             f"oxide={formula}; source_activity_solid={reference.value.point}; "
             f"converted_activity_liquid={converted_activity}; "
