@@ -33,6 +33,14 @@ def _is_type_checking(test: ast.expr) -> bool:
     )
 
 
+def _visit_runtime_if(visitor: ast.NodeVisitor, node: ast.If) -> bool:
+    if not _is_type_checking(node.test):
+        return False
+    for statement in node.orelse:
+        visitor.visit(statement)
+    return True
+
+
 def _imports(tree: ast.AST, source: str, path: str, package: str, modules: set[str]):
     found: list[tuple[str, int]] = []
     dynamic_sites: Counter[str] = Counter()
@@ -64,11 +72,8 @@ def _imports(tree: ast.AST, source: str, path: str, package: str, modules: set[s
                         self.import_module_names.add(alias.asname or alias.name)
 
         def visit_If(self, node: ast.If) -> None:
-            if _is_type_checking(node.test):
-                for statement in node.orelse:
-                    self.visit(statement)
-                return
-            self.generic_visit(node)
+            if not _visit_runtime_if(self, node):
+                self.generic_visit(node)
 
     aliases = AliasCollector()
     aliases.visit(tree)
@@ -119,6 +124,78 @@ def _imports(tree: ast.AST, source: str, path: str, package: str, modules: set[s
             except (ValueError, TypeError):
                 return False, None
 
+        def _resolved_dynamic_arguments(
+            self, node: ast.Call,
+        ) -> tuple[str, str, str | None, tuple[str, ...]] | None:
+            """Resolve only direct calls matching the supported literal shapes.
+
+            ``import_module`` accepts a literal name (positional or ``name=``),
+            optionally with ``package=<str literal>``. ``__import__`` accepts a
+            literal name, absent or zero literal level, and an absent, ``None``,
+            or all-string literal list/tuple fromlist; globals and locals may be
+            arbitrary. Starred args, ``**kwargs``, duplicate or unknown keywords,
+            extra arguments, and every other argument shape are computed.
+            """
+            if any(isinstance(argument, ast.Starred) for argument in node.args):
+                return None
+            is_dunder = isinstance(node.func, ast.Name) and node.func.id == "__import__"
+            if not is_dunder:
+                parameters = ("name", "package")
+                if len(node.args) > 1:
+                    return None
+                arguments = {"name": node.args[0]} if node.args else {}
+                for keyword in node.keywords:
+                    if keyword.arg not in parameters or keyword.arg in arguments:
+                        return None
+                    arguments[keyword.arg] = keyword.value
+                name_node = arguments.get("name")
+                name_is_literal, name = self._literal_value(name_node) if name_node is not None else (False, None)
+                package_node = arguments.get("package")
+                package_is_literal, package = (
+                    self._literal_value(package_node) if package_node is not None else (True, None)
+                )
+                if not name_is_literal or not isinstance(name, str):
+                    return None
+                if not package_is_literal or (
+                    package_node is not None and not isinstance(package, str)
+                ):
+                    return None
+                return "import_module", name, package, ()
+
+            parameters = ("name", "globals", "locals", "fromlist", "level")
+            if len(node.args) > len(parameters):
+                return None
+            arguments = dict(zip(parameters, node.args))
+            for keyword in node.keywords:
+                if keyword.arg not in parameters or keyword.arg in arguments:
+                    return None
+                arguments[keyword.arg] = keyword.value
+            name_node = arguments.get("name")
+            name_is_literal, name = self._literal_value(name_node) if name_node is not None else (False, None)
+            if not name_is_literal or not isinstance(name, str):
+                return None
+            level_node = arguments.get("level")
+            if level_node is not None:
+                level_is_literal, level = self._literal_value(level_node)
+                if not level_is_literal or type(level) is not int or level != 0:
+                    return None
+            fromlist_node = arguments.get("fromlist")
+            if fromlist_node is None:
+                fromlist: tuple[str, ...] = ()
+            else:
+                fromlist_is_literal, value = self._literal_value(fromlist_node)
+                if value is None and fromlist_is_literal:
+                    fromlist = ()
+                elif (
+                    fromlist_is_literal
+                    and isinstance(value, (list, tuple))
+                    and all(isinstance(item, str) for item in value)
+                ):
+                    fromlist = tuple(value)
+                else:
+                    return None
+            return "__import__", name, None, fromlist
+
         def visit_FunctionDef(self, node: ast.FunctionDef) -> None:
             self.scope_stack.append(node.name)
             self.generic_visit(node)
@@ -133,49 +210,22 @@ def _imports(tree: ast.AST, source: str, path: str, package: str, modules: set[s
 
         def visit_Call(self, node: ast.Call) -> None:
             if self._is_dynamic_reference(node.func):
-                name = node.args[0] if node.args else next(
-                    (kw.value for kw in node.keywords if kw.arg == "name"), None
-                )
-                name_is_literal, literal_name = self._literal_value(name) if name is not None else (False, None)
-                is_importlib = not (isinstance(node.func, ast.Name) and node.func.id == "__import__")
-                package_arg = next((kw.value for kw in node.keywords if kw.arg == "package"), None)
-                if is_importlib and package_arg is None and len(node.args) > 1:
-                    package_arg = node.args[1]
-                package_is_literal, literal_package = (
-                    self._literal_value(package_arg) if package_arg is not None else (True, None)
-                )
-                arguments_are_literal = all(
-                    self._literal_value(argument)[0] for argument in node.args
-                ) and all(
-                    keyword.arg is not None and self._literal_value(keyword.value)[0]
-                    for keyword in node.keywords
-                )
-                literal_name = literal_name if name_is_literal and isinstance(literal_name, str) else None
-                literal_package = literal_package if package_is_literal and (
-                    literal_package is None or isinstance(literal_package, str)
-                ) else None
+                resolved = self._resolved_dynamic_arguments(node)
                 target = None
-                if literal_name is not None and not literal_name.startswith(".") and arguments_are_literal:
-                    target = literal_name
-                elif literal_name is not None and literal_package is not None and arguments_are_literal:
-                    dots = len(literal_name) - len(literal_name.lstrip("."))
-                    parts = literal_package.split(".")
-                    if dots > len(parts):
-                        raise AssertionError(f"invalid relative dynamic import in {path}:{node.lineno}")
-                    target = ".".join((*parts[:len(parts) - dots + 1], literal_name[dots:])).rstrip(".")
-                if target:
+                if resolved is not None:
+                    kind, literal_name, literal_package, fromlist = resolved
+                    if not literal_name.startswith("."):
+                        target = literal_name
+                    elif kind == "import_module" and literal_package is not None:
+                        dots = len(literal_name) - len(literal_name.lstrip("."))
+                        parts = literal_package.split(".")
+                        if dots > len(parts):
+                            raise AssertionError(f"invalid relative dynamic import in {path}:{node.lineno}")
+                        target = ".".join((*parts[:len(parts) - dots + 1], literal_name[dots:])).rstrip(".")
+                if target is not None:
                     add(node, target)
-                    is_dunder_import = isinstance(node.func, ast.Name) and node.func.id == "__import__"
-                    if is_dunder_import:
-                        fromlist = next((kw.value for kw in node.keywords if kw.arg == "fromlist"), None)
-                        if fromlist is None and len(node.args) > 3:
-                            fromlist = node.args[3]
-                        fromlist_is_literal, imported_names = (
-                            self._literal_value(fromlist) if fromlist is not None else (True, ())
-                        )
-                        if fromlist_is_literal and isinstance(imported_names, (tuple, list)):
-                            if imported_names and all(isinstance(name, str) for name in imported_names):
-                                add(node, target, [ast.alias(name=name, asname=None) for name in imported_names])
+                    if kind == "__import__" and fromlist:
+                        add(node, target, [ast.alias(name=name, asname=None) for name in fromlist])
                 else:
                     self._record_computed()
                 # A recognized call accounts for its function reference once.
@@ -197,11 +247,8 @@ def _imports(tree: ast.AST, source: str, path: str, package: str, modules: set[s
             self.generic_visit(node)
 
         def visit_If(self, node: ast.If) -> None:
-            if _is_type_checking(node.test):
-                for statement in node.orelse:
-                    self.visit(statement)
-                return
-            self.generic_visit(node)
+            if not _visit_runtime_if(self, node):
+                self.generic_visit(node)
 
     Visitor().visit(tree)
     return found, dynamic_sites
@@ -378,6 +425,22 @@ def test_dunder_import_fromlist_adds_tracked_child_edge(tmp_path: Path) -> None:
     assert not unmatched and not sites
     errors = _check_baseline(edges, set(), {"simulator.chemistry.low": str(path)})
     assert any("simulator.chemistry.low -> simulator.high" in error for error in errors)
+
+
+def test_unsupported_dynamic_import_shapes_are_counted(tmp_path: Path) -> None:
+    path = tmp_path / "simulator" / "low.py"
+    path.parent.mkdir()
+    cases = {
+        "relative_import": '__import__("high", level=1)',
+        "set_fromlist": '__import__("simulator", fromlist={"high"})',
+        "dict_fromlist": '__import__("simulator", fromlist={"high": None})',
+        "kwargs_call": "__import__(**options)",
+    }
+    path.write_text("\n".join(
+        f"def {name}():\n    return {call}" for name, call in cases.items()
+    ) + "\n")
+    _, _, sites = _scan({"simulator.chemistry.low": (str(path), path.read_text())})
+    assert sites == {f"{path}:{name}": 1 for name in cases}
 
 
 def test_dynamic_import_alias_reference_is_counted(tmp_path: Path) -> None:
