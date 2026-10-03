@@ -5116,6 +5116,69 @@ def test_kume_activity_compositions_map_to_parent_oxide_basis(tmp_path: Path) ->
     assert unknown_observation.identity.composition.is_unknown
 
 
+def test_kume_measured_reduced_activity_preserves_structured_derivation(
+    tmp_path: Path,
+) -> None:
+    name = "kume-2000-cao-activities.yaml"
+    result = _migrate_real_extract(tmp_path, name)
+    observation_id = "kume_2000_table2_sample_101"
+    observation = next(
+        obs
+        for obs in result.observations.values()
+        if obs.observation_id.endswith(f"::{observation_id}")
+    )
+    raw = next(
+        row
+        for row in _extract_observations(name)
+        if row.get("observation_id") == observation_id
+    )
+    raw_derivation = raw["derivation"]
+
+    assert observation.derivation is not None
+    assert observation.derivation.relation == raw_derivation["relation"]
+    assert observation.derivation.inputs == tuple(
+        f"kume-2000-cao-activities::{item}"
+        for item in raw_derivation["inputs"]
+    )
+    assert not any(
+        entry.observation_id == observation.observation_id
+        and entry.axes in (["derivation"], ["derived_from"])
+        for entry in result.queue
+    )
+
+
+def test_kume_measured_reduced_activity_without_derivation_stays_queued(
+    tmp_path: Path,
+) -> None:
+    name = "kume-2000-cao-activities.yaml"
+    source = REPO_ROOT / "data" / "literature" / "extracts" / name
+    extract = yaml.safe_load(source.read_text(encoding="utf-8"))
+    extract["source_id"] = "fixture-source"
+    observation_id = "kume_2000_table2_sample_101"
+    for block in extract["species"].values():
+        for row in block.get("observations", []):
+            if row.get("observation_id") == observation_id:
+                row.pop("derivation")
+
+    result = migrate(_write_min_tree(tmp_path, extract), write=False)
+    observation = next(
+        obs
+        for obs in result.observations.values()
+        if obs.observation_id.endswith(f"::{observation_id}")
+    )
+    assert observation.derivation is None
+    derivation_queue = [
+        entry
+        for entry in result.queue
+        if entry.observation_id == observation.observation_id
+        and entry.axes == ["derivation"]
+    ]
+    assert len(derivation_queue) == 1
+    assert derivation_queue[0].why == (
+        "derived evidence class with unstated derivation; queued for page-grounding"
+    )
+
+
 def test_l05g1a_table_qualifier_leaves_reference_state_unknown(tmp_path: Path) -> None:
     extract = _scalar_extract(
         quantity="activity_vapor_reference_eq7",
