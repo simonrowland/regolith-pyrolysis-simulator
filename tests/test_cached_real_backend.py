@@ -34,6 +34,7 @@ from simulator.melt_backend.melt_envelope import (
     consume_melt_extrapolation_envelope,
     melt_extrapolation_diagnostic,
 )
+import simulator.reduced_real_determinism as rrd
 from simulator.reduced_real_determinism import (
     ControlQuantization,
     PT0CacheCollision,
@@ -45,7 +46,6 @@ from simulator.reduced_real_determinism import (
     canonical_replay_key,
     equilibrium_payload,
 )
-import simulator.reduced_real_determinism as rrd
 from simulator.state import CampaignPhase
 
 _DEFAULT_MELTS_REPLAY_KEY_HASH = (
@@ -512,62 +512,125 @@ def _build_direct_real_sim(backend, *, db_path: Path | None = None):
     return sim
 
 
-def test_cached_real_replay_key_matches_live_alphamelts_identity(
+def test_cached_real_identity_matches_live_alphamelts_identity(
     tmp_path: Path,
 ) -> None:
-    db_path = tmp_path / "cached-real.db"
-    live_backend = AlphaMELTSBackend()
-    live_backend._model = live_backend.model
-    live_backend._mode = live_backend.mode
-    live_sim = _build_direct_real_sim(live_backend, db_path=db_path)
-    live_key = canonical_replay_key(
-        live_sim,
-        artifact="equilibrium_post_record",
-        intent=ChemistryIntent.SILICATE_EQUILIBRIUM,
-        fO2_log=None,
-        fe_redox_policy="intrinsic",
-    )
+    identities = {}
+    for index, model in enumerate(("", "MELTSv1.0.2")):
+        db_path = tmp_path / f"cached-real-{index}.db"
+        live_backend = AlphaMELTSBackend()
+        live_backend._model = model
+        live_backend._mode = live_backend.mode
+        live_sim = _build_direct_real_sim(live_backend, db_path=db_path)
+        live_key = canonical_replay_key(
+            live_sim,
+            artifact="equilibrium_post_record",
+            intent=ChemistryIntent.SILICATE_EQUILIBRIUM,
+            fO2_log=None,
+            fe_redox_policy="intrinsic",
+        )
+        replay_config = _cache_config(
+            db_path,
+            "fail-loud",
+            name="alphamelts",
+            version=live_backend.engine_version,
+            model=model,
+            mode=live_backend._mode,
+        )
+        replay_backend = resolve_backend(
+            "cached-real",
+            BackendSelectionPolicy.RUNNER_STRICT,
+            cached_real_config=replay_config,
+        )
+        replay_sim = _build_cached_real_sim(
+            backend=replay_backend,
+            cache_config=replay_config,
+        )
+        replay_key = canonical_replay_key(
+            replay_sim,
+            artifact="equilibrium_post_record",
+            intent=ChemistryIntent.SILICATE_EQUILIBRIUM,
+            fO2_log=None,
+            fe_redox_policy="intrinsic",
+        )
+        live_authority = rrd._equilibrium_record_authority(
+            live_sim,
+            ChemistryIntent.SILICATE_EQUILIBRIUM,
+        )
+        replay_authority = rrd._equilibrium_record_authority(
+            replay_sim,
+            ChemistryIntent.SILICATE_EQUILIBRIUM,
+        )
 
-    replay_config = _cache_config(
-        db_path,
-        "fail-loud",
-        name="alphamelts",
-        version=live_backend.engine_version,
-        mode=live_backend._mode,
-    )
-    replay_backend = resolve_backend(
-        "cached-real",
-        BackendSelectionPolicy.RUNNER_STRICT,
-        cached_real_config=replay_config,
-    )
-    replay_sim = _build_cached_real_sim(
-        backend=replay_backend,
-        cache_config=replay_config,
-    )
-    assert replay_backend.config.authorized_model == "MELTSv1.0.2"
-    replay_key = canonical_replay_key(
-        replay_sim,
-        artifact="equilibrium_post_record",
-        intent=ChemistryIntent.SILICATE_EQUILIBRIUM,
-        fO2_log=None,
-        fe_redox_policy="intrinsic",
-    )
+        assert replay_backend.config.authorized_model == "MELTSv1.0.2"
+        assert "provider_selection" not in live_key
+        assert "provider_selection" not in replay_key
+        assert live_key == replay_key
+        assert live_authority == replay_authority
+        identities[model] = (replay_key, replay_authority)
 
-    assert "provider_selection" not in live_key
-    assert "provider_selection" not in replay_key
-    assert live_key["model"] == replay_key["model"]
-    assert _key_hash(live_key) == _key_hash(replay_key)
-    assert live_key["model"] == {
+    blank_key, blank_authority = identities[""]
+    explicit_key, explicit_authority = identities["MELTSv1.0.2"]
+    assert blank_key == explicit_key
+    assert blank_authority == explicit_authority
+    assert blank_key["model"] == {
         "model": "MELTSv1.0.2",
         "mode": "subprocess",
         "magemin_database": None,
     }
-    assert _key_hash(live_key) == (
+    assert _key_hash(blank_key) == (
         "0e50712f6fafc213d62c8c496d135dd8d801800c373cbe934a919b093d821b5e"
     )
-    assert _key_hash(replay_key) == (
-        "0e50712f6fafc213d62c8c496d135dd8d801800c373cbe934a919b093d821b5e"
+
+
+def test_cached_real_subprocess_unverified_model_refuses_before_identity(
+    tmp_path: Path,
+) -> None:
+    config = _cache_config(
+        tmp_path / "cached-real.db",
+        "fail-loud",
+        name="alphamelts",
+        family=RealBackendFamily.ALPHAMELTS,
+        mode="subprocess",
+        model="pMELTS",
     )
+    with pytest.raises(BackendUnavailableError, match="no verified") as exc_info:
+        resolve_backend(
+            "cached-real",
+            BackendSelectionPolicy.RUNNER_STRICT,
+            cached_real_config=config,
+        )
+    assert exc_info.value.reason_code == "invalid_run_input"
+
+    valid_config = {**config, "authorized_model": "MELTSv1.0.2"}
+    backend = resolve_backend(
+        "cached-real",
+        BackendSelectionPolicy.RUNNER_STRICT,
+        cached_real_config=valid_config,
+    )
+    sim = _build_cached_real_sim(
+        backend=backend,
+        cache_config=valid_config,
+    )
+    backend.config = SimpleNamespace(
+        authorized_backend_name="alphamelts",
+        authorized_backend_family=RealBackendFamily.ALPHAMELTS,
+        authorized_model="pMELTS",
+        authorized_mode="subprocess",
+    )
+    with pytest.raises(ValueError, match="no verified ALPHAMELTS_CALC_MODE"):
+        canonical_replay_key(
+            sim,
+            artifact="equilibrium_post_record",
+            intent=ChemistryIntent.SILICATE_EQUILIBRIUM,
+            fO2_log=None,
+            fe_redox_policy="intrinsic",
+        )
+    with pytest.raises(ValueError, match="no verified ALPHAMELTS_CALC_MODE"):
+        rrd._equilibrium_record_authority(
+            sim,
+            ChemistryIntent.SILICATE_EQUILIBRIUM,
+        )
 
 
 @pytest.mark.parametrize("model", [None, ""])
@@ -619,7 +682,11 @@ def test_cached_real_blank_model_normalization_keeps_replay_identity(
 )
 @pytest.mark.parametrize(
     ("model", "expected_model"),
-    [("", "MELTSv1.0.2"), ("MELTSv1.0.2", "MELTSv1.0.2"), ("pMELTS", "pMELTS")],
+    [
+        ("", "MELTSv1.0.2"),
+        ("MELTSv1.0.2", "MELTSv1.0.2"),
+        ("pMELTS", "pMELTS"),
+    ],
     ids=("blank-model", "explicit-default", "pmelts"),
 )
 def test_cached_real_model_identity_pins_current_family_and_transport_behavior(
@@ -638,6 +705,18 @@ def test_cached_real_model_identity_pins_current_family_and_transport_behavior(
         mode=mode,
         model=model,
     )
+    if (
+        backend_name == "alphamelts"
+        and mode == "subprocess"
+        and model == "pMELTS"
+    ):
+        with pytest.raises(BackendUnavailableError, match="no verified"):
+            resolve_backend(
+                "cached-real",
+                BackendSelectionPolicy.RUNNER_STRICT,
+                cached_real_config=config,
+            )
+        return
     backend = resolve_backend(
         "cached-real",
         BackendSelectionPolicy.RUNNER_STRICT,

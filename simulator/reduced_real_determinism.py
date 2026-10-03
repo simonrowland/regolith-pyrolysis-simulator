@@ -3138,24 +3138,30 @@ def _cached_real_provider_identity(
         if intent == ChemistryIntent.GATE_LIQUID_FRACTION
         else None
     )
+    authorized_model = str(
+        getattr(config, "authorized_model", "")
+    ).strip()
+    authorized_mode = str(
+        getattr(config, "authorized_mode", "")
+    ).strip() or (
+        _THERMOENGINE_DEFAULT_MODE
+        if is_thermoengine
+        else _ALPHAMELTS_DEFAULT_MODE
+    )
+    if is_alphamelts and authorized_mode == _ALPHAMELTS_DEFAULT_MODE:
+        authorized_model, _ = resolve_alphamelts_subprocess_model(
+            authorized_model
+        )
+    else:
+        authorized_model = authorized_model or DEFAULT_ALPHAMELTS_MODEL
     return {
         "resolved_provider_id": _ALPHAMELTS_PROVIDER_ID,
         "resolved_role": "authoritative",
         "authoritative_provider_id": _ALPHAMELTS_PROVIDER_ID,
         "fallback_provider_id": fallback_provider_id,
         "fallback_allowed": bool(fallback_allowed),
-        "model": (
-            str(getattr(config, "authorized_model", "")).strip()
-            or DEFAULT_ALPHAMELTS_MODEL
-        ),
-        "mode": (
-            str(getattr(config, "authorized_mode", "")).strip()
-            or (
-                _THERMOENGINE_DEFAULT_MODE
-                if is_thermoengine
-                else _ALPHAMELTS_DEFAULT_MODE
-            )
-        ),
+        "model": authorized_model,
+        "mode": authorized_mode,
     }
 
 
