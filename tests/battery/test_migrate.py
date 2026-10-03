@@ -1093,7 +1093,6 @@ def test_lineage_parents_from_source_never_invents_pointer() -> None:
         {},
         "src",
         set(),
-        asset_ids={"tables:src"},
     )
     assert parents == ("tables:src",)
     assert prose == ("tables:src/t2.csv",)
