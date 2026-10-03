@@ -818,6 +818,59 @@ def test_sodium_pure_component_fit_rejects_nonphysical_pole_branch(
     assert vapor_pressure_module._pure_segment_usable(pure, 924.0) is True
 
 
+def test_pure_segment_selector_projection_pins(vapor_pressure_data, monkeypatch):
+    """Pin the segment gate's projected log pressure at its selector callers."""
+
+    projected: list[float] = []
+    original_isfinite = vapor_pressure_module.math.isfinite
+
+    def capture_isfinite(value):
+        projected.append(value)
+        return original_isfinite(value)
+
+    monkeypatch.setattr(vapor_pressure_module.math, "isfinite", capture_isfinite)
+
+    # Wall selection uses Na's published pure-component sidecar immediately
+    # above its documented T + C pole.
+    na = vapor_pressure_data["metals"]["Na"]
+    pole_adjacent_K = math.nextafter(416.372, math.inf)
+    wall_coeff, wall_block = (
+        vapor_pressure_module.wall_condensation_antoine_coefficients(
+            na, temperature_K=pole_adjacent_K
+        )
+    )
+    assert wall_coeff is na["pure_component_antoine"]
+    assert wall_block == "pure_component_antoine"
+    assert projected[-1].hex() == "-0x1.d46e978d4fdf2p+54"
+
+    # Runtime selection uses the source-tabulated Mg pure-component fit.
+    mg = vapor_pressure_data["metals"]["Mg"]
+    runtime_coeff, runtime_block = (
+        vapor_pressure_module.vapor_pressure_antoine_coefficients(
+            mg, temperature_K=1000.0
+        )
+    )
+    assert runtime_coeff is mg["pure_component_antoine"]
+    assert runtime_block == "pure_component_antoine"
+    assert projected[-1].hex() == "0x1.979335d55b860p+1"
+
+    # The real selector path also rejects a finite projection whose implied
+    # pressure exceeds the existing 10**308 policy limit.
+    overflow_row = {
+        "fit_target": "pure_component_psat",
+        "pure_component_antoine": {"A": 10.0, "B": -300.0, "C": 0.0},
+        "antoine": {"A": 1.0, "B": 0.0, "C": 0.0},
+    }
+    runtime_coeff, runtime_block = (
+        vapor_pressure_module.vapor_pressure_antoine_coefficients(
+            overflow_row, temperature_K=1.0
+        )
+    )
+    assert runtime_coeff is overflow_row["antoine"]
+    assert runtime_block == "antoine"
+    assert projected[-1].hex() == "0x1.3600000000000p+8"
+
+
 @pytest.mark.parametrize("temperature_K", [400.0, 410.0])
 def test_sodium_provider_omits_nonphysical_pole_branch(
     vapor_pressure_data,
