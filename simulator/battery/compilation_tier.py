@@ -1749,6 +1749,7 @@ def write_compilation_comparisons_jsonl(context, path: Path) -> int:
     from simulator.diagnostic_helpers.species_rail_differential import (
         COMPILATION_JANAF,
         KeyedTablePoint,
+        _compilation_comparison_key,
         classify_phase_token,
         score_cea_point,
         score_ellingham_point,
@@ -1811,16 +1812,23 @@ def write_compilation_comparisons_jsonl(context, path: Path) -> int:
                     phase_kind = classify_phase_token(phase_text)
                     if phase_kind in {"prose", "mixed"}:
                         continue
-                    _source, separator, record_id = point.observation_id.partition("::")
-                    if not separator:
-                        continue
+                    record_id = (
+                        None
+                        if point.locator is None
+                        else point.locator.record
+                    )
+                    if not record_id:
+                        _source, separator, record_id = point.observation_id.partition("::")
+                        if not separator:
+                            continue
+                    temperature_K = float(as_decimal(temperature.value))
                     comparison_point = KeyedTablePoint(
                         compilation_id=COMPILATION_JANAF,
                         record_id=record_id,
                         formula=identity.species.formula,
                         phase=phase_text,
                         phase_kind=phase_kind,
-                        T_K=float(as_decimal(temperature.value)),
+                        T_K=temperature_K,
                         delta_fG_kJ_mol=float(as_decimal(point.value.point)),
                         log10_Kf=None,
                         log10_Kf_as_published=None,
@@ -1838,7 +1846,13 @@ def write_compilation_comparisons_jsonl(context, path: Path) -> int:
                             "reference_id": point.observation_id,
                             "quantity": quantity.value,
                             "comparison_channel": score.engine_channel,
-                            "comparison_key": score.key,
+                            "comparison_key": _compilation_comparison_key(
+                                COMPILATION_JANAF,
+                                record_id,
+                                temperature_K,
+                                score.engine_channel,
+                                score.comparison_quantity,
+                            ),
                             "comparison_quantity": score.comparison_quantity,
                             "status": score.status,
                             "value": (

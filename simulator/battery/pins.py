@@ -330,6 +330,31 @@ def _pin_live_comparison(row: Mapping[str, object]) -> _PinLiveComparison | None
     )
 
 
+def _pin_comparison_key(key: str) -> str | None:
+    parts = key.split("::")
+    if len(parts) != 4:
+        return None
+    compilation_id, point, channel, quantity = parts
+    record_id, separator, temperature = point.rpartition(":T=")
+    if not separator or not record_id:
+        return None
+    try:
+        temperature_K = float(temperature)
+    except ValueError:
+        return None
+    from simulator.diagnostic_helpers.species_rail_differential import (
+        _compilation_comparison_key,
+    )
+
+    return _compilation_comparison_key(
+        compilation_id,
+        record_id,
+        temperature_K,
+        channel,
+        quantity,
+    )
+
+
 def _pin_channel_engine(token: str | None) -> Engine | None:
     if token is None:
         return None
@@ -482,7 +507,14 @@ def _pin_failures_from_live(
         )
         if is_compilation_comparison:
             comparison_matches: list[_PinLiveComparison] = []
-            for key in dict.fromkeys((record.key, *record.aliases, record.old_key)):
+            comparison_keys = list(
+                dict.fromkeys((record.key, *record.aliases, record.old_key))
+            )
+            for key in tuple(comparison_keys):
+                canonical = _pin_comparison_key(key) if key else None
+                if canonical and canonical not in comparison_keys:
+                    comparison_keys.append(canonical)
+            for key in comparison_keys:
                 if key:
                     comparison_matches.extend(
                         live
