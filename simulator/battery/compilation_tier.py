@@ -16,9 +16,11 @@ are not collapsed. ``transition_temperature`` series are not expanded.
 from __future__ import annotations
 
 import hashlib
+import json
 import os
 import re
 import subprocess
+import tempfile
 from collections import defaultdict
 from dataclasses import dataclass, field, replace
 from decimal import Decimal
@@ -1729,6 +1731,164 @@ def compilation_tier_lines_from_payloads(
         cells(),
         typed_band_values=getattr(rows, "_typed_tier_band_values", None),
     )
+
+
+def write_compilation_comparisons_jsonl(context, path: Path) -> int:
+    """Write per-point NASA-9 and Ellingham comparisons from their tier scores.
+
+    The legacy channel scorers own the comparison arithmetic, status, and
+    band. This writer streams those score objects to an additive JSONL file;
+    it does not derive a second residual or decision.
+    """
+
+    from simulator.battery.score import (
+        is_compilation_source,
+        is_internal_consistency,
+        is_sf04_workbook,
+    )
+    from simulator.diagnostic_helpers.species_rail_differential import (
+        COMPILATION_JANAF,
+        KeyedTablePoint,
+        _compilation_comparison_key,
+        classify_phase_token,
+        score_cea_point,
+        score_ellingham_point,
+    )
+
+    path.parent.mkdir(parents=True, exist_ok=True)
+    temporary_path: Path | None = None
+    written = 0
+    try:
+        with tempfile.NamedTemporaryFile(
+            mode="w",
+            encoding="utf-8",
+            prefix=f".{path.name}-",
+            dir=path.parent,
+            delete=False,
+        ) as stream:
+            temporary_path = Path(stream.name)
+            for observation in context.observations.values():
+                origin = context.origins.get(observation.observation_id)
+                source_id = observation.source_id or ""
+                if not (
+                    is_compilation_evidence(observation)
+                    or is_compilation_source(source_id, origin)
+                ):
+                    continue
+                if not (
+                    source_id in {"janaf", "janaf-4th", "nist-janaf-4th"}
+                    or (origin or "").replace("\\", "/").startswith(
+                        "compilations-janaf/"
+                    )
+                ):
+                    continue
+                if is_internal_consistency(origin) or is_sf04_workbook(observation):
+                    continue
+
+                for point in _iter_compilation_series_points(observation, origin):
+                    identity = point.identity
+                    if not isinstance(identity, Identity):
+                        continue
+                    quantity = quantity_token(identity)
+                    if quantity is not Quantity.DELTA_FG:
+                        continue
+                    temperature = identity.temperature_K
+                    if (
+                        not isinstance(temperature, State)
+                        or not temperature.is_value
+                        or temperature.value is None
+                        or point.value.kind is not ValueKind.POINT
+                        or point.value.point is None
+                    ):
+                        continue
+                    phase = phase_token(identity.species)
+                    phase_text = phase.value if isinstance(phase, Phase) else None
+                    if phase_text is None:
+                        continue
+                    phase_kind = classify_phase_token(phase_text)
+                    if phase_kind in {"prose", "mixed"}:
+                        continue
+                    record_id = (
+                        None
+                        if point.locator is None
+                        else point.locator.record
+                    )
+                    if not record_id:
+                        _source, separator, record_id = point.observation_id.partition("::")
+                        if not separator:
+                            continue
+                    temperature_K = float(as_decimal(temperature.value))
+                    comparison_point = KeyedTablePoint(
+                        compilation_id=COMPILATION_JANAF,
+                        record_id=record_id,
+                        formula=identity.species.formula,
+                        phase=phase_text,
+                        phase_kind=phase_kind,
+                        T_K=temperature_K,
+                        delta_fG_kJ_mol=float(as_decimal(point.value.point)),
+                        log10_Kf=None,
+                        log10_Kf_as_published=None,
+                        printed_page=None,
+                        note="JANAF compilation point",
+                    )
+                    scores = (
+                        score_cea_point(comparison_point),
+                        score_ellingham_point(comparison_point),
+                    )
+                    for score in scores:
+                        if score is None:
+                            continue
+                        payload = {
+                            "reference_id": point.observation_id,
+                            "quantity": quantity.value,
+                            "comparison_channel": score.engine_channel,
+                            "comparison_key": _compilation_comparison_key(
+                                COMPILATION_JANAF,
+                                record_id,
+                                temperature_K,
+                                score.engine_channel,
+                                score.comparison_quantity,
+                            ),
+                            "comparison_quantity": score.comparison_quantity,
+                            "status": score.status,
+                            "value": (
+                                None
+                                if score.residual_kJ_mol is None
+                                else str(score.residual_kJ_mol)
+                            ),
+                            "band": str(score.band_kJ_mol),
+                        }
+                        stream.write(
+                            json.dumps(
+                                payload,
+                                sort_keys=True,
+                                ensure_ascii=False,
+                                separators=(",", ":"),
+                            )
+                            + "\n"
+                        )
+                        written += 1
+            stream.flush()
+        os.replace(temporary_path, path)
+        temporary_path = None
+    finally:
+        if temporary_path is not None:
+            temporary_path.unlink(missing_ok=True)
+    return written
+
+
+def iter_compilation_comparisons_jsonl(path: Path) -> Iterable[dict[str, object]]:
+    """Read a compilation comparison sidecar one record at a time."""
+
+    if not path.is_file():
+        return
+    with path.open(encoding="utf-8") as stream:
+        for line in stream:
+            if not line.strip():
+                continue
+            payload = json.loads(line)
+            if isinstance(payload, dict):
+                yield payload
 
 
 def _prediction_from_attempt(engine: Engine, observation: Observation, attempt: ThermoAttempt):

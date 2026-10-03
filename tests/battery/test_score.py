@@ -3546,7 +3546,204 @@ def test_missing_live_result_is_coverage_failure() -> None:
     )
     failures = pin_failures([], [record])
     assert failures
-    assert failures[0]["reason"] == "coverage_failure"
+    assert failures[0]["reason"] == "no_live_residual_for_reference"
+
+
+def _pin_test_record(channel: str) -> PinBandRecord:
+    return PinBandRecord(
+        key=f"pin-ref::delta_fG::thermochemistry::{channel}",
+        expected_outcome=ResidualStatus.MATCH.value,
+        evidence="test",
+        centre=Decimal("1"),
+        metric_operation=MetricOperation.ABSOLUTE.value,
+        metric_unit="kJ_per_declared_mol_basis",
+        pin_band_value=Decimal("0.05"),
+        pin_band_unit="kJ_per_declared_mol_basis",
+    )
+
+
+def _pin_test_residual(value: Decimal, *, rail: Rail = Rail.THERMOCHEMISTRY):
+    return F.residual(
+        key=f"pin-ref::delta_fG::{rail.value}::internal-analytical",
+        reference="pin-ref",
+        status=ResidualStatus.MATCH,
+        rail=rail,
+        numeric=ResidualNumeric(
+            operation=MetricOperation.ABSOLUTE,
+            unit="kJ_per_declared_mol_basis",
+            value=value,
+            decision_band=None,
+        ),
+    )
+
+
+def test_pin_failures_matches_legacy_channel_by_identity() -> None:
+    failures = pin_failures(
+        [_pin_test_residual(Decimal("1.05"))],
+        [_pin_test_record("ellingham")],
+    )
+
+    assert failures == []
+
+
+def test_pin_and_legacy_bucket_share_residual_status_tokens() -> None:
+    from simulator.battery.enums import residual_status_token
+    from simulator.battery.pins import _pin_live_comparison
+    from simulator.battery.score import _legacy_bucket
+
+    assert residual_status_token("typed-refusal") is ResidualStatus.REFUSED
+    assert residual_status_token("typed_refusal") is ResidualStatus.REFUSED
+    assert residual_status_token("unknown") is None
+    assert _legacy_bucket({"status": "typed-refusal"}) == "refused"
+    assert _legacy_bucket({"status": "failed-to-run"}) == "refused"
+    assert _legacy_bucket({"status": "unknown"}) == "excluded"
+    live = _pin_live_comparison(
+        {
+            "reference_id": "reference",
+            "comparison_key": "janaf::record:T=1100::nasa_cea_9::delta_fG_kJ_mol",
+            "quantity": "delta_fG",
+            "comparison_channel": "nasa_cea_9",
+            "status": "typed_refusal",
+        }
+    )
+    assert live is not None and live.status is ResidualStatus.REFUSED
+
+
+def test_pin_payloads_match_legacy_channel_by_identity() -> None:
+    from simulator.battery.pins import _pin_failures_from_payloads
+
+    comparisons: list[dict[str, str]] = []
+    failures = _pin_failures_from_payloads(
+        [
+            {
+                "key": "pin-ref::delta_fG::thermochemistry::internal-analytical",
+                "reference": "pin-ref",
+                "status": ResidualStatus.MATCH.value,
+                "numeric": {"value": "1.01"},
+                "source_relation": "derived",
+                "execution": {"call_evidence": "fixture-call"},
+            }
+        ],
+        [_pin_test_record("ellingham")],
+        comparisons=comparisons,
+    )
+
+    assert failures == []
+    assert comparisons == [
+        {
+            "key": "pin-ref::delta_fG::thermochemistry::ellingham",
+            "centre": "1",
+            "pin_band": "0.05",
+            "live": "1.01",
+            "source": "internal-analytical",
+            "source_relation": "derived",
+            "call_evidence": "fixture-call",
+        }
+    ]
+
+
+def test_pin_failures_deduplicate_identical_pin_keys() -> None:
+    pin = _pin_test_record("internal-analytical")
+    pin = replace(pin, aliases=(pin.key,), old_key=pin.key)
+
+    failures = pin_failures([_pin_test_residual(Decimal("1.01"))], [pin])
+
+    assert failures == []
+
+
+def test_compilation_pin_join_uses_sidecar_not_engine_residuals() -> None:
+    comparisons: list[dict[str, str]] = []
+    failures = pin_failures(
+        [
+            {
+                "key": "pin-ref::delta_fG::thermochemistry::internal-analytical",
+                "reference": "pin-ref",
+                "status": ResidualStatus.MATCH.value,
+                "numeric": {"value": "100"},
+            }
+        ],
+        [_pin_test_record("nasa_cea_9")],
+        compilation_comparisons=[
+            {
+                "reference_id": "pin-ref",
+                "quantity": "delta_fG",
+                "comparison_channel": "nasa_cea_9",
+                "comparison_key": "janaf::record:T=1100::nasa_cea_9::delta_fG_kJ_mol",
+                "status": ResidualStatus.MATCH.value,
+                "value": "1.03",
+                "band": "0.05",
+            }
+        ],
+        comparisons=comparisons,
+    )
+
+    assert failures == []
+    assert comparisons[0]["live"] == "1.03"
+    assert comparisons[0]["source"] == "nasa_cea_9"
+    assert comparisons[0]["within_pin_band"] == "true"
+
+
+def test_pin_failures_reports_unmapped_channel() -> None:
+    from simulator.battery.pins import _pin_failures_from_payloads
+
+    failures = pin_failures(
+        [_pin_test_residual(Decimal("1"))],
+        [_pin_test_record("nasa_cea_vs_ellingham")],
+    )
+
+    assert failures[0]["reason"] == "unmapped_pin_channel"
+    assert failures[0]["channel"] == "nasa_cea_vs_ellingham"
+
+    absent_unmapped_failures = pin_failures(
+        [], [_pin_test_record("nasa_cea_vs_ellingham")]
+    )
+    assert absent_unmapped_failures[0]["reason"] == "unmapped_pin_channel"
+
+    exact_key_failures = _pin_failures_from_payloads(
+        [
+            {
+                "key": "pin-ref::delta_fG::thermochemistry::nasa_cea_vs_ellingham",
+                "reference": "pin-ref",
+                "status": ResidualStatus.MATCH.value,
+                "numeric": {"value": "1"},
+            }
+        ],
+        [_pin_test_record("nasa_cea_vs_ellingham")],
+    )
+    assert exact_key_failures[0]["reason"] == "unmapped_pin_channel"
+
+
+def test_pin_failures_reports_ambiguous_matches() -> None:
+    sidecar_rows = [
+        {
+            "reference_id": "pin-ref",
+            "quantity": "delta_fG",
+            "comparison_channel": "ellingham",
+            "comparison_key": f"janaf::record-{index}:T=1100::ellingham::delta_fG_kJ_per_mol_O2",
+            "status": ResidualStatus.MATCH.value,
+            "value": "1",
+            "band": "0.05",
+        }
+        for index in (1, 2)
+    ]
+    failures = pin_failures(
+        [],
+        [_pin_test_record("ellingham")],
+        compilation_comparisons=sidecar_rows,
+    )
+
+    assert failures[0]["reason"] == "ambiguous_compilation_comparison"
+    assert len(failures[0]["candidate_keys"]) == 2
+
+
+def test_pin_failures_rejects_outside_band_live_value() -> None:
+    failures = pin_failures(
+        [_pin_test_residual(Decimal("1.051"))],
+        [_pin_test_record("ellingham")],
+    )
+
+    assert failures[0]["reason"] == "outside_pin_band"
+    assert failures[0]["source"] == "internal-analytical"
 
 
 def _stamp(**overrides) -> dict:
