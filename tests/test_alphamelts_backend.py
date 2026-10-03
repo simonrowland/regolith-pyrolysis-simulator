@@ -3003,6 +3003,8 @@ def test_alphamelts_initialize_explicit_thermoengine_when_available(monkeypatch)
     assert backend.initialize({}) is True
     assert backend._mode == 'thermoengine'
     assert backend.get_engine_version() == 'thermoengine fake'
+    assert backend._model == 'MELTSv1.0.2'
+    assert backend._thermoengine_transport.model_name == 'MELTSv1.0.2'
     assert backend._thermoengine_transport.equilibrate_timeout_s == 3.0
     assert (
         backend._thermoengine_transport.health_timeout_s
@@ -3239,6 +3241,7 @@ def test_melt_backend_interface_documents_intrinsic_default_opt_in():
 
 def test_alphamelts_results_carry_backend_and_engine_provenance():
     backend = AlphaMELTSBackend()
+    assert backend._model == 'MELTSv1.0.2'
     backend._engine_version = 'alphamelts fake-v1'
 
     result = backend._emit_equilibrium_result(

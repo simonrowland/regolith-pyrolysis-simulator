@@ -6,6 +6,7 @@ import hashlib
 import json
 import sqlite3
 from pathlib import Path
+from types import SimpleNamespace
 from typing import Any, Mapping
 
 import pytest
@@ -39,11 +40,19 @@ from simulator.reduced_real_determinism import (
     PT0CacheMiss,
     PT0DeterminismStore,
     PT1_EQUILIBRIUM_TABLE,
+    canonical_physics_bucket_key_from_replay_key,
     canonical_json_bytes,
     canonical_replay_key,
     equilibrium_payload,
 )
 from simulator.state import CampaignPhase
+
+_DEFAULT_MELTS_REPLAY_KEY_HASH = (
+    "0e50712f6fafc213d62c8c496d135dd8d801800c373cbe934a919b093d821b5e"
+)
+_DEFAULT_MELTS_PROVIDER_KEY_HASH = (
+    "0435dada46c55b064f6593edae3fbbac9c556e00ea56807944400dccbc3bc30a"
+)
 
 
 class _FakeLiveRealBackend(RealBackendAuthority):
@@ -523,9 +532,55 @@ def test_cached_real_replay_key_matches_live_alphamelts_identity(
         "fail-loud",
         name="alphamelts",
         version=live_backend.engine_version,
-        model=live_backend._model,
         mode=live_backend._mode,
     )
+    replay_backend = resolve_backend(
+        "cached-real",
+        BackendSelectionPolicy.RUNNER_STRICT,
+        cached_real_config=replay_config,
+    )
+    replay_sim = _build_cached_real_sim(
+        backend=replay_backend,
+        cache_config=replay_config,
+    )
+    assert replay_backend.config.authorized_model == "MELTSv1.0.2"
+    replay_key = canonical_replay_key(
+        replay_sim,
+        artifact="equilibrium_post_record",
+        intent=ChemistryIntent.SILICATE_EQUILIBRIUM,
+        fO2_log=None,
+        fe_redox_policy="intrinsic",
+    )
+
+    assert "provider_selection" not in live_key
+    assert "provider_selection" not in replay_key
+    assert live_key["model"] == replay_key["model"]
+    assert _key_hash(live_key) == _key_hash(replay_key)
+    assert live_key["model"] == {
+        "model": "MELTSv1.0.2",
+        "mode": "subprocess",
+        "magemin_database": None,
+    }
+    assert _key_hash(live_key) == (
+        "0e50712f6fafc213d62c8c496d135dd8d801800c373cbe934a919b093d821b5e"
+    )
+    assert _key_hash(replay_key) == (
+        "0e50712f6fafc213d62c8c496d135dd8d801800c373cbe934a919b093d821b5e"
+    )
+
+
+@pytest.mark.parametrize("model", [None, ""])
+def test_cached_real_blank_model_normalization_keeps_replay_identity(
+    tmp_path: Path,
+    model: str | None,
+) -> None:
+    replay_config = _cache_config(
+        tmp_path / "cached-real.db",
+        "fail-loud",
+        name="alphamelts",
+        model=model,
+    )
+    normalized = normalize_cached_real_config(replay_config)
     replay_backend = resolve_backend(
         "cached-real",
         BackendSelectionPolicy.RUNNER_STRICT,
@@ -543,10 +598,56 @@ def test_cached_real_replay_key_matches_live_alphamelts_identity(
         fe_redox_policy="intrinsic",
     )
 
-    assert "provider_selection" not in live_key
-    assert "provider_selection" not in replay_key
-    assert live_key["model"] == replay_key["model"]
-    assert _key_hash(live_key) == _key_hash(replay_key)
+    assert normalized.authorized_model == "MELTSv1.0.2"
+    assert replay_backend.config.authorized_model == "MELTSv1.0.2"
+    assert replay_key["model"]["model"] == "MELTSv1.0.2"
+    assert _key_hash(replay_key) == _DEFAULT_MELTS_REPLAY_KEY_HASH
+    assert _key_hash(
+        canonical_physics_bucket_key_from_replay_key(replay_key)
+    ) == _DEFAULT_MELTS_PROVIDER_KEY_HASH
+
+
+@pytest.mark.parametrize("model", [None, ""])
+def test_cached_real_provider_fallback_resolves_absent_or_blank_model(
+    tmp_path: Path,
+    model: str | None,
+) -> None:
+    replay_config = _cache_config(
+        tmp_path / "cached-real.db",
+        "fail-loud",
+        model="MELTSv1.0.2",
+    )
+    replay_backend = resolve_backend(
+        "cached-real",
+        BackendSelectionPolicy.RUNNER_STRICT,
+        cached_real_config=replay_config,
+    )
+    replay_sim = _build_cached_real_sim(
+        backend=replay_backend,
+        cache_config=replay_config,
+    )
+    config_fields = {
+        "authorized_backend_name": "alphamelts",
+        "authorized_backend_family": RealBackendFamily.ALPHAMELTS,
+        "authorized_backend_version": "alphamelts-test 1.0.0",
+        "authorized_mode": "subprocess",
+    }
+    if model is not None:
+        config_fields["authorized_model"] = model
+    replay_backend.config = SimpleNamespace(**config_fields)
+    replay_key = canonical_replay_key(
+        replay_sim,
+        artifact="equilibrium_post_record",
+        intent=ChemistryIntent.SILICATE_EQUILIBRIUM,
+        fO2_log=None,
+        fe_redox_policy="intrinsic",
+    )
+
+    assert replay_key["model"]["model"] == "MELTSv1.0.2"
+    assert _key_hash(replay_key) == _DEFAULT_MELTS_REPLAY_KEY_HASH
+    assert _key_hash(
+        canonical_physics_bucket_key_from_replay_key(replay_key)
+    ) == _DEFAULT_MELTS_PROVIDER_KEY_HASH
 
 
 def test_cached_real_resolver_requires_cache_config() -> None:

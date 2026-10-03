@@ -586,6 +586,9 @@ def test_alphamelts_provider_key_partitions_model_mode_not_engine_version() -> N
         "mode": "subprocess",
         "magemin_database": None,
     }
+    assert _key_hash(base) == (
+        "3914dfa4cca7d7503c290122f70e67ab003fbcdaca1d5c230e49120236a8b048"
+    )
     assert pmelts["model"]["model"] == "pMELTS"
     assert thermoengine["model"]["mode"] == "thermoengine"
     assert "engine_version" not in next_engine["model"]
