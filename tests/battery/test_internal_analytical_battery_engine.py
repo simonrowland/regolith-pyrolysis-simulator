@@ -156,6 +156,19 @@ def test_internal_analytical_residue_adapter_skips_diagnostic_shadow(
 
     monkeypatch.setattr(VapoRockProvider, "dispatch", count_shadow_calls)
     core = _new_internal_analytical_core()
+    from simulator.vapour_rail import catalog as vapour_catalog
+
+    original_compile_catalog = vapour_catalog.compile_vapour_rail_catalog
+    catalog_compiles = 0
+
+    def count_catalog_compiles(payload, **kwargs):
+        nonlocal catalog_compiles
+        catalog_compiles += 1
+        return original_compile_catalog(payload, **kwargs)
+
+    monkeypatch.setattr(
+        vapour_catalog, "compile_vapour_rail_catalog", count_catalog_compiles
+    )
     inputs = {
         "temperature_C": 1500.0 - 273.15,
         "pressure_bar": 1.0,
@@ -170,7 +183,9 @@ def test_internal_analytical_residue_adapter_skips_diagnostic_shadow(
         **inputs,
     )
     shadow_call_count = shadow_calls
+    catalog_compile_count = catalog_compiles
     assert shadow_call_count == 1
+    assert catalog_compile_count > 0
 
     residue_prediction = _internal_analytical_vapor_pressure_adapter(
         core=core,
@@ -179,4 +194,5 @@ def test_internal_analytical_residue_adapter_skips_diagnostic_shadow(
     )
 
     assert shadow_calls == shadow_call_count
+    assert catalog_compiles == catalog_compile_count
     assert residue_prediction.vapor_pressures_Pa == with_shadow.vapor_pressures_Pa
