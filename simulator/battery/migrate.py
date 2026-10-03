@@ -5333,6 +5333,7 @@ def lineage_parents_from_source(
     values: Mapping[str, Any],
     source_id: str,
     local_ids: set[str],
+    asset_ids: set[str] | frozenset[str] = frozenset(),
 ) -> tuple[tuple[str, ...], tuple[str, ...]]:
     """Source-stated lineage as (parents, prose). Never invents a pointer.
 
@@ -5365,7 +5366,7 @@ def lineage_parents_from_source(
         local = item[len(prefix):] if item.startswith(prefix) else item
         if local in local_ids:
             parents.append(f"{prefix}{local}")
-        elif item.startswith("tables:"):
+        elif item.startswith("tables:") and item in asset_ids:
             # A reduced literature value may cite the registered table asset
             # that carries the source's calibration/measurement lineage.
             parents.append(item)
@@ -11437,9 +11438,10 @@ class Migrator:
         regime = obs.get("regime") or values.get("regime")
         if method_class is None:
             measured.absent_classes += 1
+        source_asset_ids = {asset.asset_id for asset in work.source_files.files}
         try:
             derived_parents, derived_prose = lineage_parents_from_source(
-                obs, values, source_id, local_ids
+                obs, values, source_id, local_ids, source_asset_ids
             )
         except ValueError as exc:
             derived_parents, derived_prose = (), (str(exc),)
@@ -11452,7 +11454,11 @@ class Migrator:
         source_derivation = source_derivation_from_source(obs, values)
         if source_derivation is not None:
             derivation_parents, derivation_prose = lineage_parents_from_source(
-                {"derived_from": source_derivation.inputs}, {}, source_id, local_ids
+                {"derived_from": source_derivation.inputs},
+                {},
+                source_id,
+                local_ids,
+                source_asset_ids,
             )
             derived_prose = tuple(dict.fromkeys((*derived_prose, *derivation_prose)))
             source_derivation = (
