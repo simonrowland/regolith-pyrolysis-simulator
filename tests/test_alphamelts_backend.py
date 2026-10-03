@@ -3012,6 +3012,48 @@ def test_alphamelts_initialize_explicit_thermoengine_when_available(monkeypatch)
     )
 
 
+@pytest.mark.parametrize(
+    ("config", "adapter_model", "transport_model"),
+    [
+        ({"model": ""}, "", "MELTSv1.0.2"),
+        ({}, "MELTSv1.0.2", "MELTSv1.0.2"),
+    ],
+)
+def test_thermoengine_backend_pins_blank_model_resolution_before_transport(
+    monkeypatch, config, adapter_model, transport_model
+):
+    class FakeThermoEngineTransport:
+        engine_version = "thermoengine fake"
+
+        def __init__(
+            self,
+            *,
+            model_name,
+            activity_converter,
+            equilibrate_timeout_s,
+            health_timeout_s=None,
+        ):
+            self.forwarded_model_name = model_name
+            self.model_name = str(model_name or "MELTSv1.0.2")
+            self.activity_converter = activity_converter
+            self.equilibrate_timeout_s = equilibrate_timeout_s
+            self.health_timeout_s = health_timeout_s
+
+        def initialize(self):
+            return True
+
+    backend = ThermoEngineBackend()
+    monkeypatch.setattr(
+        "simulator.melt_backend.thermoengine.ThermoEngineTransport",
+        FakeThermoEngineTransport,
+    )
+
+    assert backend.initialize(config) is True
+    assert backend._model == adapter_model
+    assert backend._thermoengine_transport.forwarded_model_name == adapter_model
+    assert backend._thermoengine_transport.model_name == transport_model
+
+
 def test_thermoengine_backend_surfaces_typed_hang_and_keeps_respawn_transport():
     class TimedOutTransport:
         def equilibrate(self, **_kwargs):
