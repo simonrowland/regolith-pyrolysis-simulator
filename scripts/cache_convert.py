@@ -125,6 +125,9 @@ VAPOROCK_FULL_SPECIES = (
     "TiO2_gas",
 )
 
+# Frozen legacy-conversion defaults: converting a historical cache must keep the
+# model those entries were produced with, independent of any later change to
+# simulator.config.DEFAULT_ALPHAMELTS_MODEL. Deliberately NOT sourced from the owner.
 ALPHA_ENGINE_DEFAULTS = {
     "model": "MELTSv1.0.2",
     "mode": None,

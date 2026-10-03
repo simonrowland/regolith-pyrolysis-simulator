@@ -62,6 +62,7 @@ from simulator.accounting.formulas import (
     resolve_species_formula,
 )
 from simulator.accounting.exceptions import UnknownSpeciesError
+from simulator.config import DEFAULT_ALPHAMELTS_MODEL
 from simulator.melt_backend.base import (
     EquilibriumResult,
     LiquidFractionInvalidError,
@@ -900,7 +901,7 @@ class _MELTSBackendSupport(MeltBackend):
 
     backend_name = 'alphamelts'
 
-    def __init__(self):
+    def __init__(self, *, model_name: str = DEFAULT_ALPHAMELTS_MODEL):
         self._mode: Optional[str] = None  # 'python_api' or 'subprocess'
         self._engine_path: Optional[Path] = None
         self._binary_path: Optional[Path] = None
@@ -919,7 +920,7 @@ class _MELTSBackendSupport(MeltBackend):
         self._redox_buffer: Optional[str] = None
         self._fo2_offset: Optional[float] = None
         self._fe3fet_ratio: Optional[float] = None
-        self._model = 'MELTSv1.0.2'
+        self._model = str(model_name)
         self._timeout_s = ALPHAMELTS_DEFAULT_TIMEOUT_S
         self._last_normalization_warnings: List[str] = []
         self._vapor_pressure_table: Optional[dict] = None

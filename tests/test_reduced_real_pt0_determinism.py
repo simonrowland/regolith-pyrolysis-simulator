@@ -13,6 +13,7 @@ from types import SimpleNamespace
 import pytest
 import yaml
 
+from engines.alphamelts import AlphaMELTSProvider
 import simulator.reduced_real_determinism as rrd
 from simulator.chemistry.kernel import ChemistryIntent
 from simulator.chemistry.kernel.capabilities import CapabilityProfile
@@ -586,12 +587,45 @@ def test_alphamelts_provider_key_partitions_model_mode_not_engine_version() -> N
         "mode": "subprocess",
         "magemin_database": None,
     }
+    assert _key_hash(base) == (
+        "3914dfa4cca7d7503c290122f70e67ab003fbcdaca1d5c230e49120236a8b048"
+    )
     assert pmelts["model"]["model"] == "pMELTS"
     assert thermoengine["model"]["mode"] == "thermoengine"
     assert "engine_version" not in next_engine["model"]
     assert _key_hash(base) != _key_hash(pmelts)
     assert _key_hash(base) != _key_hash(thermoengine)
     assert _key_hash(base) == _key_hash(next_engine)
+
+
+def test_blank_thermoengine_model_keeps_provider_name_in_pt0_identity() -> None:
+    store = PT0DeterminismStore("capture")
+    sim = _build_pt0_sim(store)
+
+    class BlankThermoEngineBackend(RealBackendAuthority):
+        real_backend_family = RealBackendFamily.THERMOENGINE
+        _model = ""
+        _mode = None
+
+        def is_available(self) -> bool:
+            return True
+
+    backend = BlankThermoEngineBackend()
+    provider = AlphaMELTSProvider(backend=backend)
+    sim.backend = backend
+    sim._chem_registry.register(
+        provider,
+        [ChemistryIntent.SILICATE_EQUILIBRIUM],
+    )
+
+    key = store._equilibrium_key(sim)
+    authority = rrd._equilibrium_record_authority(
+        sim,
+        ChemistryIntent.SILICATE_EQUILIBRIUM,
+    )
+
+    assert key["model"]["model"] == "alphamelts-diagnostic"
+    assert authority["provider"]["model"] == "alphamelts-diagnostic"
 
 
 def test_non_alphamelts_magemin_shadow_key_identity_stays_byte_identical() -> None:

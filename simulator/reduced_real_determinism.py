@@ -31,7 +31,10 @@ from simulator.backend_names import (
     canonical_backend_class_name,
 )
 from simulator.chemistry.kernel import ChemistryIntent
-from simulator.config import functional_data_yaml_digest
+from simulator.config import (
+    DEFAULT_ALPHAMELTS_MODEL,
+    functional_data_yaml_digest,
+)
 from simulator.grind_preflight import (
     assert_strict_vapor_pt1_row,
 )
@@ -134,7 +137,6 @@ _ALPHAMELTS_BACKEND_CLASS = (
     "simulator.melt_backend.alphamelts.AlphaMELTSBackend"
 )
 _ALPHAMELTS_PROVIDER_ID = "alphamelts-diagnostic"
-_ALPHAMELTS_DEFAULT_MODEL = "MELTSv1.0.2"
 _ALPHAMELTS_DEFAULT_MODE = "subprocess"
 _THERMOENGINE_AUTHORIZED_NAME = 'thermoengine'
 _THERMOENGINE_BACKEND_NAME = 'ThermoEngineBackend'
@@ -3143,7 +3145,7 @@ def _cached_real_provider_identity(
         "fallback_allowed": bool(fallback_allowed),
         "model": (
             str(getattr(config, "authorized_model", "")).strip()
-            or _ALPHAMELTS_DEFAULT_MODEL
+            or DEFAULT_ALPHAMELTS_MODEL
         ),
         "mode": (
             str(getattr(config, "authorized_mode", "")).strip()
