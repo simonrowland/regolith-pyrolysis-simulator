@@ -45,6 +45,7 @@ from simulator.reduced_real_determinism import (
     canonical_replay_key,
     equilibrium_payload,
 )
+import simulator.reduced_real_determinism as rrd
 from simulator.state import CampaignPhase
 
 _DEFAULT_MELTS_REPLAY_KEY_HASH = (
@@ -605,6 +606,64 @@ def test_cached_real_blank_model_normalization_keeps_replay_identity(
     assert _key_hash(
         canonical_physics_bucket_key_from_replay_key(replay_key)
     ) == _DEFAULT_MELTS_PROVIDER_KEY_HASH
+
+
+@pytest.mark.parametrize(
+    ("backend_name", "family", "mode"),
+    [
+        ("alphamelts", RealBackendFamily.ALPHAMELTS, "subprocess"),
+        ("thermoengine", RealBackendFamily.THERMOENGINE, "thermoengine"),
+        ("alphamelts", RealBackendFamily.ALPHAMELTS, "python_api"),
+    ],
+    ids=("alphamelts-subprocess", "thermoengine", "alphamelts-python-api"),
+)
+@pytest.mark.parametrize(
+    ("model", "expected_model"),
+    [("", "MELTSv1.0.2"), ("MELTSv1.0.2", "MELTSv1.0.2"), ("pMELTS", "pMELTS")],
+    ids=("blank-model", "explicit-default", "pmelts"),
+)
+def test_cached_real_model_identity_pins_current_family_and_transport_behavior(
+    tmp_path: Path,
+    backend_name: str,
+    family: RealBackendFamily,
+    mode: str,
+    model: str,
+    expected_model: str,
+) -> None:
+    config = _cache_config(
+        tmp_path / "cached-real.db",
+        "fail-loud",
+        name=backend_name,
+        family=family,
+        mode=mode,
+        model=model,
+    )
+    backend = resolve_backend(
+        "cached-real",
+        BackendSelectionPolicy.RUNNER_STRICT,
+        cached_real_config=config,
+    )
+    sim = _build_cached_real_sim(backend=backend, cache_config=config)
+
+    key = canonical_replay_key(
+        sim,
+        artifact="equilibrium_post_record",
+        intent=ChemistryIntent.SILICATE_EQUILIBRIUM,
+        fO2_log=None,
+        fe_redox_policy="intrinsic",
+    )
+    authority = rrd._equilibrium_record_authority(
+        sim,
+        ChemistryIntent.SILICATE_EQUILIBRIUM,
+    )
+
+    assert key["model"] == {
+        "model": expected_model,
+        "mode": mode,
+        "magemin_database": None,
+    }
+    assert authority["provider"]["model"] == expected_model
+    assert authority["provider"]["mode"] == mode
 
 
 @pytest.mark.parametrize("model", [None, ""])
