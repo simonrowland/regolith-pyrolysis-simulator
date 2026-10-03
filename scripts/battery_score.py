@@ -22,6 +22,9 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 from simulator.battery.migrate import canonicalize_rail  # noqa: E402
+from simulator.battery.compilation_tier import (  # noqa: E402
+    write_compilation_comparisons_jsonl,
+)
 from simulator.battery.pins import (  # noqa: E402
     load_pins,
     migrate_pin_records,
@@ -325,6 +328,12 @@ def main(argv: list[str] | None = None) -> int:
     summary_path = args.root / "data" / "battery" / "score-summary.json"
     summary_partial_path = summary_path.with_name(summary_path.name + ".partial")
     report_partial_path = report_path.with_name(report_path.name + ".partial")
+    compilation_comparisons_path = (
+        args.root / "data" / "battery" / "compilation-comparisons.jsonl"
+    )
+    compilation_comparisons_partial_path = compilation_comparisons_path.with_name(
+        compilation_comparisons_path.name + ".partial"
+    )
     _write_headline_summary_from_accumulator_json(
         report_aggregate,
         summary_partial_path,
@@ -332,9 +341,17 @@ def main(argv: list[str] | None = None) -> int:
     )
     report_partial_path.write_text(report, encoding="utf-8")
     scored = report_aggregate.scored_count
-    os.replace(summary_partial_path, summary_path)
-    os.replace(report_partial_path, report_path)
-    os.replace(partial_path, residuals_path)
+    try:
+        write_compilation_comparisons_jsonl(
+            context,
+            compilation_comparisons_partial_path,
+        )
+        os.replace(summary_partial_path, summary_path)
+        os.replace(report_partial_path, report_path)
+        os.replace(partial_path, residuals_path)
+        os.replace(compilation_comparisons_partial_path, compilation_comparisons_path)
+    finally:
+        compilation_comparisons_partial_path.unlink(missing_ok=True)
     print(
         f"residuals={written} scored={scored} "
         f"pin_failures={len(failures)} host={context.hostname}"

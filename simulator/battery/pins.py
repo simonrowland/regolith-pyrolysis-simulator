@@ -45,9 +45,8 @@ class PinChannel(StrEnum):
     TABLE_SELF_CHECK = "table_self_check"
 
 
-# Legacy labels map only when the current scorer computes the same quantity
-# against the same reference identity. NASA-CEA rows are now assessed by the
-# compilation tier against the live internal-analytical engine.
+# Legacy residual channel map used by battery score reporting. Compilation pin
+# checks use the explicit per-reference sidecar channel map below.
 PIN_CHANNEL_ENGINES: Mapping[PinChannel, Engine] = {
     PinChannel.INTERNAL_ANALYTICAL: Engine.INTERNAL_ANALYTICAL,
     PinChannel.NASA_CEA_9: Engine.INTERNAL_ANALYTICAL,
@@ -57,6 +56,10 @@ PIN_CHANNEL_ENGINES: Mapping[PinChannel, Engine] = {
     PinChannel.THERMOENGINE: Engine.THERMOENGINE,
     PinChannel.MAGEMIN: Engine.MAGEMIN,
     PinChannel.OPENIMCC: Engine.OPENIMCC,
+}
+PIN_COMPILATION_CHANNEL_ENGINES: Mapping[PinChannel, Engine] = {
+    PinChannel.NASA_CEA_9: Engine.NASA_CEA_9,
+    PinChannel.ELLINGHAM: Engine.ELLINGHAM,
 }
 
 
@@ -193,13 +196,21 @@ def live_numeric(residual: Residual) -> Decimal | None:
 def pin_failures(
     residuals: Sequence[Residual],
     records: Sequence[PinBandRecord],
+    *,
+    compilation_comparisons: Iterable[Mapping[str, object]] | None = None,
+    comparisons: list[dict[str, str]] | None = None,
 ) -> list[dict[str, Any]]:
-    """A live residual outside its pin_band is a FAILURE, never a re-centre.
+    """Check residual pins and optional compilation-comparison sidecar pins.
 
-    Missing live result for a non-tombstone pin is a coverage failure.
+    A live value outside its pin_band is a FAILURE, never a re-centre.
     """
 
-    return _pin_failures_from_live(records, residuals)
+    return _pin_failures_from_live(
+        records,
+        residuals,
+        compilation_comparisons=compilation_comparisons,
+        comparisons=comparisons,
+    )
 
 
 @dataclass(frozen=True)
@@ -212,6 +223,19 @@ class _PinLiveResidual:
     value: Decimal | None
     source_relation: str | None
     call_evidence: str | None
+
+
+@dataclass(frozen=True)
+class _PinLiveComparison:
+    key: str
+    reference: str
+    quantity: Quantity
+    engine: Engine
+    status: ResidualStatus
+    value: Decimal | None
+    band: Decimal | None
+    source_relation: str = "compilation_comparison"
+    call_evidence: str | None = None
 
 
 def _pin_live_residual(row: Residual | Mapping[str, object]) -> _PinLiveResidual | None:
@@ -280,6 +304,32 @@ def _pin_live_residual(row: Residual | Mapping[str, object]) -> _PinLiveResidual
     )
 
 
+def _pin_live_comparison(row: Mapping[str, object]) -> _PinLiveComparison | None:
+    reference = str(row.get("reference_id") or "")
+    key = str(row.get("comparison_key") or "")
+    try:
+        quantity = Quantity(str(row.get("quantity") or ""))
+        engine = Engine(str(row.get("comparison_channel") or ""))
+        status = ResidualStatus(_status_token(row.get("status")))
+    except ValueError:
+        return None
+    if not reference or not key or engine not in {
+        Engine.NASA_CEA_9,
+        Engine.ELLINGHAM,
+    }:
+        return None
+    value = _dec(row.get("value"))
+    return _PinLiveComparison(
+        key=key,
+        reference=reference,
+        quantity=quantity,
+        engine=engine,
+        status=status,
+        value=value,
+        band=_dec(row.get("band")),
+    )
+
+
 def _pin_channel_engine(token: str | None) -> Engine | None:
     if token is None:
         return None
@@ -290,24 +340,41 @@ def _pin_channel_engine(token: str | None) -> Engine | None:
     return PIN_CHANNEL_ENGINES.get(channel)
 
 
+def _pin_compilation_engine(token: str | None) -> Engine | None:
+    if token is None:
+        return None
+    try:
+        channel = PinChannel(token)
+    except ValueError:
+        return None
+    return PIN_COMPILATION_CHANNEL_ENGINES.get(channel)
+
+
 def _pin_failures_from_payloads(
     rows: Iterable[Mapping[str, object]],
     records: Sequence[PinBandRecord],
     *,
+    compilation_comparisons: Iterable[Mapping[str, object]] | None = None,
     comparisons: list[dict[str, str]] | None = None,
 ) -> list[dict[str, Any]]:
     """Check streamed residual payloads without requiring a score rerun."""
 
-    return _pin_failures_from_live(records, rows, comparisons=comparisons)
+    return _pin_failures_from_live(
+        records,
+        rows,
+        compilation_comparisons=compilation_comparisons,
+        comparisons=comparisons,
+    )
 
 
 def _pin_failures_from_live(
     records: Sequence[PinBandRecord],
     rows: Iterable[Residual | Mapping[str, object]],
     *,
+    compilation_comparisons: Iterable[Mapping[str, object]] | None = None,
     comparisons: list[dict[str, str]] | None = None,
 ) -> list[dict[str, Any]]:
-    """Join pins by reference, quantity, and an explicitly mapped engine."""
+    """Join pins by reference, quantity, and their typed comparison channel."""
 
     pins: list[
         tuple[
@@ -321,6 +388,7 @@ def _pin_failures_from_live(
     ] = []
     wanted_references: set[str] = set()
     wanted_keys: set[str] = set()
+    wanted_comparison_identities: set[tuple[str, Quantity, Engine]] = set()
     for record in records:
         if record.tombstone:
             continue
@@ -344,10 +412,20 @@ def _pin_failures_from_live(
         pins.append((record, references, quantity, channel, engine, reference or None))
         wanted_references.update(references)
         wanted_keys.update(item for item in (record.key, *record.aliases, record.old_key) if item)
+        comparison_engine = _pin_compilation_engine(channel)
+        if quantity is not None and comparison_engine is not None:
+            wanted_comparison_identities.update(
+                (item, quantity, comparison_engine) for item in references
+            )
 
     by_reference: dict[str, int] = {}
     by_identity: dict[tuple[str, Quantity, Engine], list[_PinLiveResidual]] = {}
     by_key: dict[str, list[_PinLiveResidual]] = {}
+    by_comparison_identity: dict[
+        tuple[str, Quantity, Engine], list[_PinLiveComparison]
+    ] = {}
+    by_comparison_key: dict[str, list[_PinLiveComparison]] = {}
+    by_comparison_reference: dict[str, int] = {}
     for row in rows:
         live = _pin_live_residual(row)
         if live is None:
@@ -360,6 +438,21 @@ def _pin_failures_from_live(
         if live.quantity is None or live.engine is None:
             continue
         by_identity.setdefault((live.reference, live.quantity, live.engine), []).append(live)
+
+    if compilation_comparisons is not None:
+        for row in compilation_comparisons:
+            live = _pin_live_comparison(row)
+            if live is None:
+                continue
+            if live.reference in wanted_references:
+                by_comparison_reference[live.reference] = (
+                    by_comparison_reference.get(live.reference, 0) + 1
+                )
+            identity = (live.reference, live.quantity, live.engine)
+            if identity in wanted_comparison_identities:
+                by_comparison_identity.setdefault(identity, []).append(live)
+            if live.key in wanted_keys:
+                by_comparison_key.setdefault(live.key, []).append(live)
 
     failures: list[dict[str, Any]] = []
     for record, references, quantity, channel, engine, reference in pins:
@@ -383,72 +476,121 @@ def _pin_failures_from_live(
                 }
             )
             continue
-        matches = []
-        for key in dict.fromkeys((record.key, *record.aliases, record.old_key)):
-            if key:
-                matches.extend(by_key.get(key, ()))
-        if not matches:
-            reference_present = any(by_reference.get(item, 0) for item in references)
+        comparison_engine = _pin_compilation_engine(channel)
+        is_compilation_comparison = (
+            compilation_comparisons is not None and comparison_engine is not None
+        )
+        if is_compilation_comparison:
+            comparison_matches: list[_PinLiveComparison] = []
+            for key in dict.fromkeys((record.key, *record.aliases, record.old_key)):
+                if key:
+                    comparison_matches.extend(
+                        live
+                        for live in by_comparison_key.get(key, ())
+                        if live.quantity is quantity
+                        and live.engine is comparison_engine
+                    )
+            if not comparison_matches and quantity is not None:
+                for item in references:
+                    comparison_matches.extend(
+                        by_comparison_identity.get(
+                            (item, quantity, comparison_engine), ()
+                        )
+                    )
+            if not comparison_matches:
+                failures.append(
+                    {
+                        **base,
+                        "reason": "no_compilation_comparison_for_reference",
+                        "channel_status": "mapped",
+                        "reference_present": any(
+                            by_comparison_reference.get(item, 0)
+                            for item in references
+                        ),
+                        "live": None,
+                    }
+                )
+                continue
+            if len(comparison_matches) != 1:
+                failures.append(
+                    {
+                        **base,
+                        "reason": "ambiguous_compilation_comparison",
+                        "channel_status": "mapped",
+                        "live": None,
+                        "candidate_keys": [live.key for live in comparison_matches],
+                    }
+                )
+                continue
+            live: _PinLiveResidual | _PinLiveComparison = comparison_matches[0]
         else:
-            reference_present = True
-        if not reference_present:
-            failures.append(
-                {
-                    **base,
-                    "reason": "no_live_residual_for_reference",
-                    "channel_status": "unmapped pin channel" if engine is None else "mapped",
-                    "reference_present": False,
-                    "live": None,
-                }
+            matches: list[_PinLiveResidual] = []
+            for key in dict.fromkeys((record.key, *record.aliases, record.old_key)):
+                if key:
+                    matches.extend(by_key.get(key, ()))
+            reference_present = bool(matches) or any(
+                by_reference.get(item, 0) for item in references
             )
-            continue
-        if engine is None:
-            failures.append(
-                {
-                    **base,
-                    "reason": "unmapped_pin_channel",
-                    "channel_status": "unmapped pin channel",
-                    "live": None,
-                }
-            )
-            continue
-        if not matches and quantity is None:
-            failures.append(
-                {
-                    **base,
-                    "reason": "no_live_residual_for_reference",
-                    "channel_status": "mapped",
-                    "match_detail": "unrecognized_pin_quantity",
-                    "live": None,
-                }
-            )
-            continue
-        if not matches:
-            for item in references:
-                matches.extend(by_identity.get((item, quantity, engine), ()))
-        if not matches:
-            failures.append(
-                {
-                    **base,
-                    "reason": "no_live_residual_for_reference",
-                    "channel_status": "mapped",
-                    "reference_present": True,
-                    "live": None,
-                }
-            )
-            continue
-        if len(matches) != 1:
-            failures.append(
-                {
-                    **base,
-                    "reason": "ambiguous_live_residual",
-                    "channel_status": "mapped",
-                    "live": None,
-                    "candidate_keys": [live.key for live in matches],
-                }
-            )
-            continue
-        live = matches[0]
+            if not reference_present:
+                failures.append(
+                    {
+                        **base,
+                        "reason": "no_live_residual_for_reference",
+                        "channel_status": (
+                            "unmapped pin channel" if engine is None else "mapped"
+                        ),
+                        "reference_present": False,
+                        "live": None,
+                    }
+                )
+                continue
+            if engine is None:
+                failures.append(
+                    {
+                        **base,
+                        "reason": "unmapped_pin_channel",
+                        "channel_status": "unmapped pin channel",
+                        "live": None,
+                    }
+                )
+                continue
+            if not matches and quantity is None:
+                failures.append(
+                    {
+                        **base,
+                        "reason": "no_live_residual_for_reference",
+                        "channel_status": "mapped",
+                        "match_detail": "unrecognized_pin_quantity",
+                        "live": None,
+                    }
+                )
+                continue
+            if not matches:
+                for item in references:
+                    matches.extend(by_identity.get((item, quantity, engine), ()))
+            if not matches:
+                failures.append(
+                    {
+                        **base,
+                        "reason": "no_live_residual_for_reference",
+                        "channel_status": "mapped",
+                        "reference_present": True,
+                        "live": None,
+                    }
+                )
+                continue
+            if len(matches) != 1:
+                failures.append(
+                    {
+                        **base,
+                        "reason": "ambiguous_live_residual",
+                        "channel_status": "mapped",
+                        "live": None,
+                        "candidate_keys": [live.key for live in matches],
+                    }
+                )
+                continue
+            live = matches[0]
         source_engine = live.engine or engine
         source = "unknown" if source_engine is None else source_engine.value
         if live.status.value != record.expected_outcome:
@@ -483,12 +625,31 @@ def _pin_failures_from_live(
             "pin_band": str(record.pin_band_value),
             "live": str(live.value),
             "source": source,
-            "source_relation": live.source_relation or "unknown",
+            "source_relation": (
+                live.source_relation
+                if is_compilation_comparison
+                else live.source_relation or "unknown"
+            ),
             "call_evidence": live.call_evidence or "",
         }
+        delta = abs(live.value - record.centre)
+        if is_compilation_comparison:
+            comparison.update(
+                {
+                    "delta": str(delta),
+                    "within_pin_band": str(
+                        delta <= record.pin_band_value
+                    ).lower(),
+                    "comparison_band": (
+                        ""
+                        if live.band is None
+                        else str(live.band)
+                    ),
+                }
+            )
         if comparisons is not None:
             comparisons.append(comparison)
-        if abs(live.value - record.centre) > record.pin_band_value:
+        if delta > record.pin_band_value:
             failures.append(
                 {
                     **base,

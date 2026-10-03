@@ -3361,13 +3361,36 @@ def test_pin_failures_deduplicate_identical_pin_keys() -> None:
     assert failures == []
 
 
-def test_pin_failures_maps_nasa_cea_to_compilation_engine() -> None:
+def test_compilation_pin_join_uses_sidecar_not_engine_residuals() -> None:
+    comparisons: list[dict[str, str]] = []
     failures = pin_failures(
-        [_pin_test_residual(Decimal("1.05"))],
+        [
+            {
+                "key": "pin-ref::delta_fG::thermochemistry::internal-analytical",
+                "reference": "pin-ref",
+                "status": ResidualStatus.MATCH.value,
+                "numeric": {"value": "100"},
+            }
+        ],
         [_pin_test_record("nasa_cea_9")],
+        compilation_comparisons=[
+            {
+                "reference_id": "pin-ref",
+                "quantity": "delta_fG",
+                "comparison_channel": "nasa_cea_9",
+                "comparison_key": "janaf::record:T=1100::nasa_cea_9::delta_fG_kJ_mol",
+                "status": ResidualStatus.MATCH.value,
+                "value": "1.03",
+                "band": "0.05",
+            }
+        ],
+        comparisons=comparisons,
     )
 
     assert failures == []
+    assert comparisons[0]["live"] == "1.03"
+    assert comparisons[0]["source"] == "nasa_cea_9"
+    assert comparisons[0]["within_pin_band"] == "true"
 
 
 def test_pin_failures_reports_unmapped_channel() -> None:
@@ -3401,15 +3424,25 @@ def test_pin_failures_reports_unmapped_channel() -> None:
 
 
 def test_pin_failures_reports_ambiguous_matches() -> None:
+    sidecar_rows = [
+        {
+            "reference_id": "pin-ref",
+            "quantity": "delta_fG",
+            "comparison_channel": "ellingham",
+            "comparison_key": f"janaf::record-{index}:T=1100::ellingham::delta_fG_kJ_per_mol_O2",
+            "status": ResidualStatus.MATCH.value,
+            "value": "1",
+            "band": "0.05",
+        }
+        for index in (1, 2)
+    ]
     failures = pin_failures(
-        [
-            _pin_test_residual(Decimal("1")),
-            _pin_test_residual(Decimal("1.01"), rail=Rail.VAPOUR),
-        ],
+        [],
         [_pin_test_record("ellingham")],
+        compilation_comparisons=sidecar_rows,
     )
 
-    assert failures[0]["reason"] == "ambiguous_live_residual"
+    assert failures[0]["reason"] == "ambiguous_compilation_comparison"
     assert len(failures[0]["candidate_keys"]) == 2
 
 
