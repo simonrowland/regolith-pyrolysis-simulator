@@ -6633,6 +6633,45 @@ def test_admitted_model_derived_rows_emit_residuals_per_imcc_engine() -> None:
         assert all(row.status is ResidualStatus.REFUSED for row in stolyarova_1995_rows)
 
 
+def test_kume_real_migrated_activity_scores_numeric_with_openimcc(
+    tmp_path: Path,
+) -> None:
+    pytest.importorskip("openimcc", reason="openimcc is not importable")
+    from tests.battery.test_migrate import _migrate_real_extract
+
+    result = _migrate_real_extract(
+        tmp_path, "kume-2000-cao-activities.yaml", write=True
+    )
+    work_id = next(iter(result.works))
+    observation_id = next(
+        observation_id
+        for observation_id in result.observations
+        if observation_id.endswith("::kume_2000_table2_sample_101")
+    )
+    context = load_score_context(
+        tmp_path / "tree", sources=("kume-2000-cao-activities",)
+    )
+    reference = context.observations[observation_id]
+
+    assert reference.identity.species.phase.is_value
+    assert reference.identity.species.phase.value is Phase.L
+
+    residuals, _candidates = score_store(
+        context,
+        engines=(Engine.OPENIMCC,),
+        work_id=work_id,
+    )
+    residual = next(row for row in residuals if row.reference == observation_id)
+
+    assert residual.numeric is not None
+    assert residual.status is not ResidualStatus.REFUSED
+    assert residual.score_eligible is False
+    assert any(
+        notice.kind is NoticeKind.UNVERIFIED_APPARATUS
+        for notice in residual.notices
+    )
+
+
 def test_allibert_xcao_0_80_rows_refuse_bulk_not_liquid_composition(tmp_path: Path) -> None:
     """Printed 'CaO + melt' is the two-phase marker. The scorer does not stamp it liquid."""
 
