@@ -878,7 +878,7 @@ def _unverified_apparatus_notices(
     unknown_method_activity = (
         experiment.method.is_unknown
         and gates.reason is RefusalReason.METHOD_UNKNOWN
-        and quantity is Quantity.ACTIVITY
+        and quantity in {Quantity.ACTIVITY, Quantity.ACTIVITY_COEFFICIENT}
         and author_reported_activity
         and typed_condensed_reference
     )
