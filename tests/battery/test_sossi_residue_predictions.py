@@ -118,7 +118,7 @@ def test_sossi_scorer_projects_mn_and_types_unsupported_elements(monkeypatch) ->
         context, gadolinium, Engine.OPENIMCC, cache
     )
 
-    assert expected_run in cache[Engine.OPENIMCC]
+    assert expected_run in cache[("kems-012-sossi-2019", Engine.OPENIMCC)]
     assert prediction.execution.state.value == "produced"
     assert prediction.value == 900.0
     assert prediction.identity == manganese.identity
@@ -168,6 +168,12 @@ def test_mixed_hashimoto_and_sossi_score_keep_separate_engine_cohorts(
                             oxide: (0.9, 1.1)
                             for oxide in ("FeO", "MgO", "SiO2", "CaO", "Al2O3")
                         },
+                        geometry_oxide_wt_pct={
+                            residue._HASHIMOTO_PRIMARY_GEOMETRY: {
+                                oxide: 1.0
+                                for oxide in ("FeO", "MgO", "SiO2", "CaO", "Al2O3")
+                            }
+                        },
                         provenance={
                             "geometry_refusal_by_geometry": {},
                             "integration": {"refinement_status": "converged"},
@@ -204,7 +210,9 @@ def test_mixed_hashimoto_and_sossi_score_keep_separate_engine_cohorts(
         row.observation_id
         for row in context.observations.values()
         if row.source_id == hashimoto_source
-        and "::hashimoto_1983_table3_residue_composition_series::" in row.observation_id
+        and "hashimoto_1983_table3_residue_composition_series" in row.observation_id
+        and row.admission.status.value == "admitted"
+        and quantity_token(row.identity) is Quantity.RESIDUE_COMPONENT_COMPOSITION
         and point_magnitude(row.value) is not None
     }
     sossi_ti_ids = {

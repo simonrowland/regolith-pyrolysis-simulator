@@ -3716,15 +3716,16 @@ def _hashimoto_residue_prediction(
     context: ScoreContext,
     reference: Observation,
     engine: Engine,
-    cache: dict[Engine, Mapping[str, object]],
+    cache: dict[tuple[str, Engine], Mapping[str, object]],
 ) -> EnginePrediction:
     """Predict a Hashimoto vector once per engine, then project by physical run."""
     channel = ENGINE_CHANNELS[engine]
     sources = ENGINE_COEFFICIENT_SOURCES[engine]
+    cache_key = (_HASHIMOTO_SOURCE_ID, engine)
     try:
         if engine not in {Engine.INTERNAL_ANALYTICAL, Engine.OPENIMCC}:
             raise ValueError("engine_not_supported_for_hashimoto_residue")
-        if engine not in cache:
+        if cache_key not in cache:
             from simulator.battery.residue import (
                 ResidueInventoryRefusal,
                 _predict_hashimoto_residue_cohort,
@@ -3778,10 +3779,10 @@ def _hashimoto_residue_prediction(
                 code_revision=revision,
                 engine=engine.value,
             )
-            cache[engine] = {
+            cache[cache_key] = {
                 row.experiment_id + "::" + row.alpha_arm: row for row in rows
             }
-        rows_by_key = cache[engine]
+        rows_by_key = cache[cache_key]
         if "__cohort_error__" in rows_by_key:
             raise ValueError(str(rows_by_key["__cohort_error__"]))
         primary_key = (
@@ -3882,8 +3883,8 @@ def _hashimoto_residue_prediction(
         )
     except Exception as exc:  # the scorer records typed per-cell refusal and continues
         reason = getattr(exc, "reason", None) or str(exc) or type(exc).__name__
-        if engine not in cache:
-            cache[engine] = {"__cohort_error__": str(reason)}
+        if cache_key not in cache:
+            cache[cache_key] = {"__cohort_error__": str(reason)}
         detail: dict[str, object] = {
             "reason": str(reason),
             "engine": engine.value,
@@ -3914,7 +3915,7 @@ def _sossi_residue_prediction(
     context: ScoreContext,
     reference: Observation,
     engine: Engine,
-    cache: dict[Engine, Mapping[str, object]],
+    cache: dict[tuple[str, Engine], Mapping[str, object]],
 ) -> EnginePrediction:
     """Predict one Sossi Mn/Ti cell from the shared per-run inventory result."""
     channel = ENGINE_CHANNELS[engine]
@@ -3935,6 +3936,7 @@ def _sossi_residue_prediction(
             },
             identity=reference.identity,
         )
+    cache_key = (_SOSSI_SOURCE_ID, engine)
     try:
         from simulator.battery.residue import (
             ResidueInventoryRefusal,
@@ -3943,7 +3945,7 @@ def _sossi_residue_prediction(
 
         if engine not in {Engine.INTERNAL_ANALYTICAL, Engine.OPENIMCC}:
             raise ValueError("sossi_engine_unsupported")
-        if engine not in cache:
+        if cache_key not in cache:
             live_rows = [
                 row
                 for row in context.observations.values()
@@ -4004,13 +4006,13 @@ def _sossi_residue_prediction(
                 code_revision=revision,
                 engine=engine.value,
             )
-            cache[engine] = {
+            cache[cache_key] = {
                 row.experiment_id: row for row in rows
             }
-        if "__cohort_error__" in cache[engine]:
-            raise ValueError(str(cache[engine]["__cohort_error__"]))
+        if "__cohort_error__" in cache[cache_key]:
+            raise ValueError(str(cache[cache_key]["__cohort_error__"]))
         short_id = reference.experiment_id.rsplit("::", 1)[-1]
-        prediction = cache[engine].get(short_id)
+        prediction = cache[cache_key].get(short_id)
         if prediction is None:
             raise ValueError("sossi_prediction_row_missing")
         if formula in prediction.channel_missing_elements:
@@ -4080,8 +4082,8 @@ def _sossi_residue_prediction(
         )
     except Exception as exc:  # preserve a typed per-cell absence and keep scoring
         reason = getattr(exc, "reason", None) or str(exc) or type(exc).__name__
-        if engine not in cache:
-            cache[engine] = {"__cohort_error__": str(reason)}
+        if cache_key not in cache:
+            cache[cache_key] = {"__cohort_error__": str(reason)}
         if reason == "oxygen_condition_missing":
             refusal = RefusalReason.IDENTITY_INCOMPLETE
         elif reason == "channel_missing":
@@ -4900,7 +4902,7 @@ def _score_store_with_decisions(
     kems_band = _derive_kems_partial_pressure_band(
         observations, context.experiments, context.benches
     )
-    residue_prediction_cache: dict[Engine, Mapping[str, object]] = {}
+    residue_prediction_cache: dict[tuple[str, Engine], Mapping[str, object]] = {}
     try:
         with bound_work_inputs(context.works, observations, context.experiments):
             for obs in refs:
