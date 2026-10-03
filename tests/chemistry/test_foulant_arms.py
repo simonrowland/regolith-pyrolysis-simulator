@@ -113,6 +113,7 @@ def test_nacl_escape_fraction_anchored_to_stull_source_row(foulant_registry):
     p_overhead_bar = 0.2
     T_K = T_C + 273.15
     p_sat_pa = 10.0 ** (coeff["A"] - coeff["B"] / (T_K + coeff["C"]))
+    assert p_sat_pa.hex() == "0x1.55ff3657cd95ep+13"
     expected_escaped = p_sat_pa / (p_sat_pa + p_overhead_bar * PA_PER_BAR)
     assert expected_escaped == pytest.approx(0.35366909122306056)
 

@@ -126,6 +126,7 @@ def test_k_standard_reaction_graph_uses_activity_and_po2_scaling(
     pO2_bar = 10.0**-7.853
     a_KO0_5 = 3.5e-5
     reference = 10.0 ** (coeff["A"] - coeff["B"] / (T_K + coeff["C"]))
+    assert reference.hex() == "0x1.004c838a0bdb7p+10"
     expected = reference * a_KO0_5 * (pO2_bar ** -0.25)
 
     assert row["fit_target"] == "standard_reaction_term"

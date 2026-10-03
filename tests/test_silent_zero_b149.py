@@ -595,6 +595,7 @@ def test_c7_ca_valid_inputs_emit_no_notes() -> None:
     assert diagnostic["c7_ca_alpha_intrinsic"] == 0.5
     hold_temp_K = 1200.0 + 273.15
     expected_p_sat = 10.0 ** (10.0 - 15000.0 / (hold_temp_K + 0.0))
+    assert diagnostic["c7_ca_p_sat_pa"].hex() == "0x1.508471263deffp-1"
     assert diagnostic["c7_ca_p_sat_pa"] == pytest.approx(expected_p_sat)
     assert extent_mol >= 0.0
 
