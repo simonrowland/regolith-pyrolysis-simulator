@@ -1155,10 +1155,14 @@ def test_validate_corpus_zero_hard_issues_on_migrated_store() -> None:
     )
     report = validate_corpus(works, experiments, observations, residuals=None)
     # J02 restored C(derived) derived_from+derivation. Unstated ancestry is a
-    # hard conditional_field, not a silent pass. Other reasons must stay zero.
+    # hard conditional_field, not a silent pass. The same holds for a row that
+    # declares quoted_attributed but states no attribution: the canonical
+    # token now maps to its class, so the missing field is reported instead of
+    # the row falling to unknown. Other reasons must stay zero.
+    lineage_fields = (".derived_from", ".derivation", ".attribution")
     for issue in report.hard_issues:
         assert issue.reason.value == "conditional_field", issue
-        assert issue.path.endswith(".derived_from") or issue.path.endswith(".derivation"), issue
+        assert issue.path.endswith(lineage_fields), issue
     assert extracts_v2.is_dir() or obs_dir.is_dir()
 
 
@@ -2005,6 +2009,36 @@ def test_h08_fourteen_token_table_destinations_are_stored(tmp_path: Path) -> Non
         assert matches, token
         assert matches[0].evidence.class_.is_value, token
         assert matches[0].evidence.class_.value is dest, token
+
+
+@pytest.mark.parametrize(
+    ("method_class", "expected_evidence"),
+    (
+        ("measured_direct", "measured_direct"),
+        ("measured_tabulated", "measured_tabulated"),
+        ("measured_reduced", "measured_reduced"),
+        ("quoted_attributed", "quoted_attributed"),
+        ("quoted_unattributed", "quoted_unattributed"),
+        ("model_derived", "model_derived"),
+        ("author_estimate", "author_estimate"),
+        ("figure_only", "figure_only"),
+        ("compilation_assessed", "compilation_assessed"),
+        ("engine_prediction", "engine_prediction"),
+    ),
+)
+def test_canonical_evidence_method_class_mapping(
+    method_class: str, expected_evidence: str
+) -> None:
+    from simulator.battery.migrate import evidence_for
+
+    evidence, _reason = evidence_for(method_class)
+
+    actual = (
+        evidence.class_.value.value
+        if evidence.class_.is_value
+        else f"unknown: {evidence.class_.reason}"
+    )
+    assert actual == expected_evidence
 
 
 def test_g07_unsupported_quantity_is_unknown_not_relabeled(tmp_path: Path) -> None:
