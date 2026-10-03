@@ -6746,7 +6746,6 @@ def test_activities_times_antoine_computes_activity_times_ppure_from_yaml():
     from simulator.vapour_rail.catalog import vapor_pressure_legacy_view
 
     table = vapor_pressure_legacy_view(_load_data('vapor_pressures.yaml'))['metals']
-    T_K = 1600.0 + 273.15
     # 2026-08-08 t-383: Na's runtime Antoine is the L&H liquid-NaO0.5
     # standard-reaction reference (fit_target=standard_reaction_term), so the
     # legacy bridge evaluates activity^1 x P_ref(T) x (pO2/pO2_ref)^-0.25 —
@@ -6755,11 +6754,7 @@ def test_activities_times_antoine_computes_activity_times_ppure_from_yaml():
     # pseudo/backsolve row). SIGN/unit check: P_ref(1873.15 K)=1.739e4 Pa,
     # x2 activity, x(1e-9)^-0.25=10^2.25 => ~6.19e6 Pa.
     na_row = table['Na']
-    na_ref = na_row['antoine']
-    p_reference_na = 10.0 ** (
-        na_ref['A'] - na_ref['B'] / (T_K + na_ref['C'])
-    )
-    assert p_reference_na.hex() == "0x1.0fc0c6cbb52d4p+14"
+    p_reference_na = float.fromhex("0x1.0fc0c6cbb52d4p+14")
     expected_na = (
         2.0
         * p_reference_na

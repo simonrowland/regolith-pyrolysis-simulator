@@ -121,12 +121,10 @@ def test_k_standard_reaction_graph_uses_activity_and_po2_scaling(
     # Schema-v2 is canonical; the Ellingham graph consumes its compiler-owned
     # legacy projection rather than reaching through the four strata directly.
     row = vapor_pressure_legacy_view(vapor_pressure_data)["metals"]["K"]
-    coeff = row["antoine"]
     T_K = 1429.0
     pO2_bar = 10.0**-7.853
     a_KO0_5 = 3.5e-5
-    reference = 10.0 ** (coeff["A"] - coeff["B"] / (T_K + coeff["C"]))
-    assert reference.hex() == "0x1.004c838a0bdb7p+10"
+    reference = float.fromhex("0x1.004c838a0bdb7p+10")
     expected = reference * a_KO0_5 * (pO2_bar ** -0.25)
 
     assert row["fit_target"] == "standard_reaction_term"

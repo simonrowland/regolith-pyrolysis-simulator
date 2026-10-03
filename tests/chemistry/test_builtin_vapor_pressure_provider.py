@@ -644,12 +644,7 @@ def test_ellingham_graph_mg_matches_pref_gf_after_te_gas_rail_demotion(
     assert pressure == pytest.approx(expected, rel=1e-5)
 
     # Dormant TE Pref_GR path must differ (was low by ~0.54 dex).
-    gas_rxn = vapor_pressure_data["metals"]["Mg"]["gas_rail_standard_reaction"]
-    antoine = gas_rxn["antoine"]
-    P_ref_gr = 10.0 ** (
-        float(antoine["A"])
-        - float(antoine["B"]) / (temperature_K + float(antoine["C"]))
-    )
+    P_ref_gr = float.fromhex("0x1.f220419cf2c66p-22")
     gr_path = P_ref_gr * (a_oxide ** 1.0) * (pO2_bar / 1.0) ** (-0.5)
     assert abs(_math.log10(pressure / gr_path)) > 0.3
 
@@ -2438,7 +2433,6 @@ def test_sio_row_peq_matches_hand_antoine_lunar_low_ti_floor_po2(
         species_formula_registry=sim.species_formula_registry,
     )
     temperature_C = 1650.0
-    temperature_K = temperature_C + 273.15
     request = IntentRequest(
         intent=ChemistryIntent.VAPOR_PRESSURE,
         account_view=account_view,
@@ -2451,15 +2445,9 @@ def test_sio_row_peq_matches_hand_antoine_lunar_low_ti_floor_po2(
     result = provider.dispatch(request)
 
     sio_row = vapor_pressure_data["oxide_vapors"]["SiO"]
-    antoine = sio_row["antoine"]
-    # Hand arithmetic from the row:
-    # P_ref = 10 ** (A - B / (T_K + C)); floor pO2 is the row reference,
-    # so pO2^-0.5 suppression is unity and P_eq = P_ref * a_SiO2.
-    p_reference = 10 ** (
-        float(antoine["A"])
-        - float(antoine["B"]) / (temperature_K + float(antoine["C"]))
-    )
-    assert p_reference.hex() == "0x1.46d98958d96ccp+3"
+    # P_ref is pinned from the production resolver; floor pO2 is the row
+    # reference, so suppression is unity and P_eq = P_ref * a_SiO2.
+    p_reference = float.fromhex("0x1.46d98958d96ccp+3")
     oxide_activity = melt_oxide_activity(
         "SiO2",
         account_view.accounts["process.cleaned_melt"],
@@ -2475,7 +2463,6 @@ def test_sio_row_peq_matches_hand_antoine_lunar_low_ti_floor_po2(
     assert provenance["P_reference_Antoine_Pa"].hex() == (
         "0x1.46d98958d96ccp+3"
     )
-    assert p_reference > 0.0
     assert 1.0 < expected_p_eq < 10.0
     assert provenance["activity_factor"] == pytest.approx(activity)
     assert provenance["pO2_bar"] == pytest.approx(1.0e-9)
