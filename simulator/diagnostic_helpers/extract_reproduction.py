@@ -30,6 +30,7 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any, Mapping, Sequence
 
+from engines.antoine import _antoine_log10_pressure
 from engines.builtin.vapor_pressure import BuiltinVaporPressureProvider
 from simulator.alpha_kinetics import ALPHA_AUTHORITY_STATUS_FIELD
 from simulator.chemistry.kernel.capabilities import ChemistryIntent
@@ -1016,7 +1017,7 @@ def _literature_pressure_points(
                     }
                 )
                 continue
-            log10_p = A - B / (T + C)
+            log10_p = _antoine_log10_pressure(A, B, C, T)
             if use_pa or "A_Pa" in coef:
                 P = 10.0**log10_p
             elif use_bar:

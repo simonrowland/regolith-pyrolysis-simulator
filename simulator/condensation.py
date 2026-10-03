@@ -90,6 +90,7 @@ from typing import Any, Dict
 
 import yaml
 
+from engines.antoine import _antoine_log10_pressure
 from simulator.alpha_kinetics import (
     ALPHA_AUTHORITY_STATUS_FIELD,
     ANALYTICAL_UPPER_BOUND_ALPHA_STATUS,
@@ -6015,7 +6016,7 @@ def _antoine_psat_pa(
             }
     # Same Antoine form used by equilibrium.py and builtin vapor pressure.
     try:
-        pressure_pa = 10.0 ** (A - B / (T_K + C))
+        pressure_pa = 10.0 ** _antoine_log10_pressure(A, B, C, T_K)
     except OverflowError:
         pressure_pa = math.inf
     if not math.isfinite(pressure_pa) or pressure_pa <= 0.0:

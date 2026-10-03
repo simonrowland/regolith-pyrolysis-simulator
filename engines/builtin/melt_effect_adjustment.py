@@ -12,6 +12,7 @@ import re
 from dataclasses import dataclass, field, replace
 from typing import Any, Mapping
 
+from engines.antoine import _antoine_log10_pressure
 from engines.domain_reason import OutOfDomainReason, reason_value
 from engines.alphamelts.domain import (
     AlphaMELTSDomainGate,
@@ -794,7 +795,7 @@ def _evaluate_analytical_forms(
             A = float(form["A"])
             B = float(form["B"])
             C = float(form["C"])
-            log10_P = A - B / (temperature + C)
+            log10_P = _antoine_log10_pressure(A, B, C, temperature)
             vapor_eval[str(species)] = {
                 "T_K": temperature,
                 "log10_P_Pa": log10_P,
@@ -813,7 +814,13 @@ def _evaluate_analytical_forms(
             continue
         if "A" not in form or "B" not in form:
             continue
-        value = float(form["A"]) - float(form["B"]) / temperature
+        A = float(form["A"])
+        B = float(form["B"])
+        value = (
+            A - B / temperature
+            if key == "FeS_decomposition"
+            else _antoine_log10_pressure(A, B, 0.0, temperature)
+        )
         output_key = (
             "log10_K_bar_1p5"
             if key == "FeS_decomposition"

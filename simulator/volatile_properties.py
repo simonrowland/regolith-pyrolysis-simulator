@@ -22,6 +22,7 @@ from pathlib import Path
 from types import MappingProxyType
 from typing import Any, Literal, TypeAlias
 
+from engines.antoine import _antoine_log10_pressure
 from simulator.accounting.formulas import (
     ATOMIC_WEIGHTS_G_PER_MOL,
     SpeciesFormula,
@@ -626,9 +627,11 @@ def _evaluate_correlation(row: _CorrelationRow, T_K: float) -> float:
         if row.correlation_family == "antoine":
             # Source-normalized Antoine form:
             # log10(P/Pa) = A - B / (T/K + C), so P_Pa = 10**exponent.
-            exponent = (
-                float(coefficients["A"])
-                - float(coefficients["B"]) / (T_K + float(coefficients["C"]))
+            exponent = _antoine_log10_pressure(
+                float(coefficients["A"]),
+                float(coefficients["B"]),
+                float(coefficients["C"]),
+                T_K,
             )
             pressure = 10.0**exponent
         elif row.correlation_family == "feistel_wagner_ice":

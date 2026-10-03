@@ -47,6 +47,7 @@ from itertools import product
 from pathlib import Path
 from typing import Any, Dict, List, Mapping, Optional
 
+from engines.antoine import _antoine_log10_pressure
 from engines.alphamelts.domain import (
     canonical_melt_oxide_activity_name,
     canonical_oxide_activity_map,
@@ -5346,8 +5347,11 @@ class _MELTSBackendSupport(MeltBackend):
             if not all(key in coeffs for key in ('A', 'B', 'C')):
                 continue
             activity_i = float(raw_activity)
-            p_reference_i = 10.0 ** (
-                float(coeffs['A']) - float(coeffs['B']) / (T_K + float(coeffs['C']))
+            p_reference_i = 10.0 ** _antoine_log10_pressure(
+                float(coeffs['A']),
+                float(coeffs['B']),
+                float(coeffs['C']),
+                T_K,
             )
             p_i = activity_i * p_reference_i
             if str(spec.get('fit_target', '') or '') == FIT_TARGET_STANDARD_REACTION:

@@ -28,6 +28,7 @@ from functools import lru_cache
 from pathlib import Path
 from typing import Any
 
+from engines.antoine import _antoine_log10_pressure
 from engines.builtin.evaporation_flux import (
     SeriesEvaporationFlux,
     _series_resistance_evaporation_flux_kg_m2_s,
@@ -327,7 +328,7 @@ def pseudo_antoine_p_eq_pa(species: str, T_K: float) -> float:
     C = float(antoine.get("C", 0.0))
     if A <= 0.0 or T_K <= 0.0:
         return 0.0
-    log10_p = A - B / (T_K + C)
+    log10_p = _antoine_log10_pressure(A, B, C, T_K)
     return 10.0 ** log10_p
 
 
