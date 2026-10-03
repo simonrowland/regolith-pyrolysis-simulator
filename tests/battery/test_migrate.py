@@ -2007,6 +2007,36 @@ def test_h08_fourteen_token_table_destinations_are_stored(tmp_path: Path) -> Non
         assert matches[0].evidence.class_.value is dest, token
 
 
+@pytest.mark.parametrize(
+    ("method_class", "expected_evidence"),
+    (
+        ("measured_direct", "measured_direct"),
+        ("measured_tabulated", "measured_tabulated"),
+        ("measured_reduced", "measured_reduced"),
+        ("quoted_attributed", "quoted_attributed"),
+        ("quoted_unattributed", "quoted_unattributed"),
+        ("model_derived", "model_derived"),
+        ("author_estimate", "author_estimate"),
+        ("figure_only", "figure_only"),
+        ("compilation_assessed", "compilation_assessed"),
+        ("engine_prediction", "engine_prediction"),
+    ),
+)
+def test_canonical_evidence_method_class_mapping(
+    method_class: str, expected_evidence: str
+) -> None:
+    from simulator.battery.migrate import evidence_for
+
+    evidence, _reason = evidence_for(method_class)
+
+    actual = (
+        evidence.class_.value.value
+        if evidence.class_.is_value
+        else f"unknown: {evidence.class_.reason}"
+    )
+    assert actual == expected_evidence
+
+
 def test_g07_unsupported_quantity_is_unknown_not_relabeled(tmp_path: Path) -> None:
     root = _write_min_tree(tmp_path)
     (root / "data" / "literature" / "mre_measurements.yaml").write_text(

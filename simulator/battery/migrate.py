@@ -255,6 +255,8 @@ class DuplicateContextIdError(ValueError):
 
 # Automatic method_class → evidence.class. PAGE tokens are absent here.
 METHOD_CLASS_MAP: dict[str, EvidenceClass] = {
+    member.value: member for member in EvidenceClass
+} | {
     "authors_estimate": EvidenceClass.AUTHOR_ESTIMATE,
     "authors_hypothesis": EvidenceClass.AUTHOR_ESTIMATE,
     "calculated": EvidenceClass.MEASURED_REDUCED,
@@ -5438,6 +5440,9 @@ def evidence_for(
     if mapped in {
         EvidenceClass.QUOTED_UNATTRIBUTED,
         EvidenceClass.QUOTED_ATTRIBUTED,
+    } and original not in {
+        EvidenceClass.QUOTED_UNATTRIBUTED.value,
+        EvidenceClass.QUOTED_ATTRIBUTED.value,
     }:
         mapped = (
             EvidenceClass.QUOTED_ATTRIBUTED
