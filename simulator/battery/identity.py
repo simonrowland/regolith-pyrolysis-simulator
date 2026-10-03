@@ -367,6 +367,7 @@ class WallIdentity:
 class QuantityProfile:
     required: frozenset[str]
     permitted_not_applicable: frozenset[str]
+    exposure_area_required: bool = False
 
 
 @dataclass(frozen=True)
@@ -688,6 +689,8 @@ def profile_for(identity: Identity) -> QuantityProfile:
         # Buffered runs carry a printed oxygen value. Vacuum runs explicitly
         # mark the chamber oxygen axis not applicable; the surface pO2 is a
         # later model input, not a substitute identity value.
+        # Here area only scales the integrator: experiment_id pins the run, so
+        # assumed geometry remains prediction provenance rather than identity.
         na("fO2_Pa")
     elif q in {
         Quantity.VISCOSITY,
@@ -738,6 +741,7 @@ def profile_for(identity: Identity) -> QuantityProfile:
     return QuantityProfile(
         required=frozenset(required),
         permitted_not_applicable=frozenset(permitted_na),
+        exposure_area_required=q in KINETIC_YIELD_QUANTITIES,
     )
 
 
@@ -833,6 +837,9 @@ def _comparison_profile(left: Identity, right: Identity) -> QuantityProfile:
     return QuantityProfile(
         required=frozenset(required),
         permitted_not_applicable=frozenset(permitted_na),
+        exposure_area_required=(
+            left_profile.exposure_area_required or right_profile.exposure_area_required
+        ),
     )
 
 
@@ -1177,17 +1184,10 @@ def _values_compare(name: str, left: Any, right: Any) -> IdentityEqualOutcome:
         )
         return pp
     if isinstance(left, Exposure) and isinstance(right, Exposure):
-        for field_name in ("area_m2", "duration_s", "schedule"):
-            outcome = _state_compare(
-                f"exposure.{field_name}",
-                getattr(left, field_name),
-                getattr(right, field_name),
-                required=field_name != "schedule",
-                permitted_na=field_name == "schedule",
-            )
-            if outcome.kind is not IdentityEqualKind.EQUAL:
-                return outcome
-        return IdentityEqualOutcome(IdentityEqualKind.EQUAL)
+        # Exposure subaxes are compared by identity_equal using the closed
+        # quantity profile, because area is required for flux/rate quantities
+        # but not for the residue composition measured at the run's end.
+        return _mismatch(name)
     if isinstance(left, WallIdentity) and isinstance(right, WallIdentity):
         for field_name in ("temperature_K", "material", "area_m2", "location"):
             required = field_name in {"temperature_K", "material"}
@@ -1340,13 +1340,44 @@ def identity_equal(left: Identity, right: Identity) -> IdentityEqualOutcome:
             # Forbidden as value; validate_quantity_profile already refused
             # filled values. Absent/n/a on both sides is ignored.
             continue
-        outcome = _state_compare(
-            name,
-            _axis_state(left, name),
-            _axis_state(right, name),
-            required=required,
-            permitted_na=permitted_na,
-        )
+        left_axis = _axis_state(left, name)
+        right_axis = _axis_state(right, name)
+        if (
+            name == "exposure"
+            and left_axis is not None
+            and right_axis is not None
+            and left_axis.is_value
+            and right_axis.is_value
+            and left_axis.value is not None
+            and right_axis.value is not None
+            and isinstance(left_axis.value, Exposure)
+            and isinstance(right_axis.value, Exposure)
+        ):
+            outcome = IdentityEqualOutcome(IdentityEqualKind.EQUAL)
+            for field_name in ("area_m2", "duration_s", "schedule"):
+                if field_name == "area_m2" and not profile.exposure_area_required:
+                    continue
+                outcome = _state_compare(
+                    f"exposure.{field_name}",
+                    getattr(left_axis.value, field_name),
+                    getattr(right_axis.value, field_name),
+                    required=(
+                        profile.exposure_area_required
+                        if field_name == "area_m2"
+                        else field_name == "duration_s"
+                    ),
+                    permitted_na=field_name == "schedule",
+                )
+                if outcome.kind is not IdentityEqualKind.EQUAL:
+                    break
+        else:
+            outcome = _state_compare(
+                name,
+                left_axis,
+                right_axis,
+                required=required,
+                permitted_na=permitted_na,
+            )
         if outcome.kind is IdentityEqualKind.IDENTITY_MISMATCH:
             mismatch.extend(outcome.fields)
         elif outcome.kind is IdentityEqualKind.IDENTITY_UNKNOWN:

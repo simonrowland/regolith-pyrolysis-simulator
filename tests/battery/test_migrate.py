@@ -8491,7 +8491,7 @@ def test_residue_battery_ready_counts_one_cell_per_printed_component(
 ) -> None:
     from collections import Counter
 
-    from simulator.battery.enums import AdmissionStatus, Quantity
+    from simulator.battery.enums import AdmissionStatus, Phase, Quantity
     from simulator.battery.score import ScoreContext, comparison_candidates
 
     expected = {
@@ -8548,7 +8548,7 @@ def test_residue_cells_keep_run_identity_and_printed_conditions(
     from collections import Counter
     from decimal import Decimal
 
-    from simulator.battery.enums import AdmissionStatus, Quantity
+    from simulator.battery.enums import AdmissionStatus, Phase, Quantity
     from simulator.battery.identity import profile_for
     from simulator.battery.migrate import wt_pct_to_mole_fraction
 
@@ -8597,6 +8597,8 @@ def test_residue_cells_keep_run_identity_and_printed_conditions(
     ]
     actual_sossi = Counter()
     for obs in sossi_rows:
+        assert obs.identity.species.phase.is_value
+        assert obs.identity.species.phase.value is Phase.GLASS
         conditions = obs.point_conditions or {}
         actual_sossi[
             (
@@ -8704,6 +8706,8 @@ def test_residue_cells_keep_run_identity_and_printed_conditions(
                 ] += 1
     actual_hashimoto = Counter()
     for obs in hashimoto_rows:
+        assert obs.identity.species.phase.is_value
+        assert obs.identity.species.phase.value is Phase.L
         conditions = obs.point_conditions or {}
         run_id = obs.experiment_id.split("::experiment::")[-1]
         actual_hashimoto[

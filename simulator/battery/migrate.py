@@ -12567,6 +12567,19 @@ class Migrator:
                 ident_kwargs["subtype"] = State.of("element_ppm_by_mass")
             elif value_sel.field_name.endswith("_wt_pct"):
                 ident_kwargs["subtype"] = State.of("oxide_wt_percent")
+        if q_token_point is Quantity.RESIDUE_COMPONENT_COMPOSITION:
+            if source_id == "kems-015-hashimoto-1983":
+                # Hashimoto Table 3 (p. 116) is the recovered spherule's bulk composition;
+                # the source describes a silicate melt and says the single spherule appears
+                # after quenching (p. 113, Experimental device). Preserve the run-end liquid
+                # phase: the modeled and measured objects are the same bulk oxide inventory.
+                species = make_species(species.formula, Phase.L, charge=species.charge)
+            elif source_id == "kems-012-sossi-2019":
+                # Sossi Table 2 (OCR §4.0, lines 202-203) measures residue ppm in quenched
+                # glass; its extract locator likewise identifies LA-ICP-MS on quenched glass.
+                species = make_species(
+                    species.formula, Phase.GLASS, charge=species.charge
+                )
         if printed_phase_kind == "liquid":
             species = make_species(species.formula, Phase.L, charge=species.charge)
         elif printed_phase_kind == "two_phase":
