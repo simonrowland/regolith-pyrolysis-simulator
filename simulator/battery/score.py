@@ -811,6 +811,17 @@ def _missing_apparatus_fact(
     return None
 
 
+def _has_calibration_not_grounded(checks: Iterable[object]) -> bool:
+    return any(
+        getattr(check, "passed", True)
+        and str(getattr(check, "name", ""))
+        in {"kems_calibration", "in_cell_partial_pressure_sum"}
+        and isinstance(getattr(check, "detail", {}), Mapping)
+        and check.detail.get("flag") == "calibration_not_grounded"
+        for check in checks
+    )
+
+
 def _unverified_apparatus_notices(
     reference: Observation,
     experiment: Experiment | None,
@@ -868,26 +879,12 @@ def _unverified_apparatus_notices(
         quantity is Quantity.P_PARTIAL
         and reference.evidence.class_.is_value
         and reference.evidence.class_.value in MEASURED_EVIDENCE
-        and any(
-            getattr(check, "passed", True)
-            and str(getattr(check, "name", ""))
-            in {"kems_calibration", "in_cell_partial_pressure_sum"}
-            and isinstance(getattr(check, "detail", {}), Mapping)
-            and check.detail.get("flag") == "calibration_not_grounded"
-            for check in gates.checks
-        )
+        and _has_calibration_not_grounded(gates.checks)
     )
     calibration_flagged_activity = (
         quantity in {Quantity.ACTIVITY, Quantity.ACTIVITY_COEFFICIENT}
         and author_reported_activity
-        and any(
-            getattr(check, "passed", True)
-            and str(getattr(check, "name", ""))
-            in {"kems_calibration", "in_cell_partial_pressure_sum"}
-            and isinstance(getattr(check, "detail", {}), Mapping)
-            and check.detail.get("flag") == "calibration_not_grounded"
-            for check in gates.checks
-        )
+        and _has_calibration_not_grounded(gates.checks)
     )
     if not (
         measured_pressure
@@ -909,9 +906,7 @@ def _unverified_apparatus_notices(
         if getattr(check, "passed", True):
             if (
                 (allow_calibration or calibration_flagged_partial_pressure)
-                and str(getattr(check, "name", ""))
-                in {"kems_calibration", "in_cell_partial_pressure_sum"}
-                and detail.get("flag") == "calibration_not_grounded"
+                and _has_calibration_not_grounded((check,))
             ):
                 missing.add("calibration_not_grounded")
                 notice_text = detail.get("calibration_notice")

@@ -292,6 +292,17 @@ def _is_kinetic_or_yield(quantity: Quantity) -> bool:
     }
 
 
+COMPARISON_RATIO_KINDS = frozenset({"ratio", "comparison_ratio"})
+
+
+def effective_melt_reference_pairing_kind(
+    pairing_kind: Any, *, explicitly_same: bool = False
+) -> Any:
+    if pairing_kind in {None, "not_printed", "not_reported", "unknown"}:
+        return "same_cell" if explicitly_same else "same_effective_setup_assumed"
+    return pairing_kind
+
+
 def comparison_method_cell_constant_cancels(
     provenance: Mapping[str, Any] | None,
 ) -> bool:
@@ -303,11 +314,10 @@ def comparison_method_cell_constant_cancels(
     cell_constant = provenance.get("common_knudsen_cell_constant")
     pairing = provenance.get("melt_reference_pairing")
     pairing_kind = pairing.get("kind") if isinstance(pairing, Mapping) else None
-    if pairing_kind in {None, "not_printed", "not_reported", "unknown"}:
-        pairing_kind = "same_effective_setup_assumed"
+    pairing_kind = effective_melt_reference_pairing_kind(pairing_kind)
     return (
         isinstance(method, Mapping)
-        and method.get("kind") in {"ratio", "comparison_ratio"}
+        and method.get("kind") in COMPARISON_RATIO_KINDS
         and isinstance(cell_constant, Mapping)
         and cell_constant.get("cancels") is True
         and pairing_kind
@@ -451,7 +461,7 @@ def underdetermined_apparatus(
         different_comparison_setup = (
             quantity in {Quantity.ACTIVITY, Quantity.ACTIVITY_COEFFICIENT}
             and isinstance(method_provenance, Mapping)
-            and method_provenance.get("kind") in {"ratio", "comparison_ratio"}
+            and method_provenance.get("kind") in COMPARISON_RATIO_KINDS
             and isinstance(pairing, Mapping)
             and pairing.get("kind") == "different_cells_or_geometry"
         )
@@ -481,7 +491,7 @@ def underdetermined_apparatus(
             pairing_kind = (
                 pairing.get("kind")
                 if isinstance(pairing, Mapping)
-                else "same_effective_setup_assumed"
+                else effective_melt_reference_pairing_kind(None)
             )
             checks.append(
                 GateCheck(

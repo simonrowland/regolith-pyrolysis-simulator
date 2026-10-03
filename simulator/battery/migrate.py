@@ -709,20 +709,25 @@ def _provenance_from_extract(
         ) and not pairing_not_reported
         pairing = selected.get("melt_reference_pairing")
         pairing_kind = pairing.get("kind") if isinstance(pairing, Mapping) else None
+        from simulator.battery.validity import effective_melt_reference_pairing_kind
+
+        effective_pairing_kind = effective_melt_reference_pairing_kind(
+            pairing_kind, explicitly_same=explicitly_same
+        )
         if explicitly_different:
             selected["melt_reference_pairing"] = {
                 "kind": "different_cells_or_geometry",
                 "basis": "extract states that sample and reference use different setups",
             }
-        elif pairing_kind in {None, "not_printed", "not_reported", "unknown"}:
-            selected["melt_reference_pairing"] = (
-                {"kind": "same_cell", "basis": "source states a common cell"}
-                if explicitly_same
-                else {
-                    "kind": "same_effective_setup_assumed",
-                    "basis": "same instrument; same-cell pairing is not printed",
-                }
-            )
+        elif effective_pairing_kind != pairing_kind:
+            selected["melt_reference_pairing"] = {
+                "kind": effective_pairing_kind,
+                "basis": (
+                    "source states a common cell"
+                    if explicitly_same
+                    else "same instrument; same-cell pairing is not printed"
+                ),
+            }
     return selected
 
 
