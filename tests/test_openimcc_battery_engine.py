@@ -450,6 +450,9 @@ def test_openimcc_producer_emits_activity_and_vapour_rails() -> None:
     _require_openimcc()
     handle = open_battery_engine("openimcc")
     assert handle.available, handle.unavailable_reason
+    assert handle.identity["pack_digest"] == (
+        "f2b479cd54e3c82704a5863fcc06836f72045375d9a8c7f8d2fad19e98f75d05"
+    )
     cell = equilibrate_cell(
         handle,
         _binary_probe(),
@@ -1090,6 +1093,12 @@ assert {
     for residual, candidate in engine_rows
     if candidate.engine is not None
 } == {(True, "independent")}
+assert any(
+    "openimcc-pack-digest:f2b479cd54e3c82704a5863fcc06836f72045375d9a8c7f8d2fad19e98f75d05"
+    in candidate.engine.coefficient_sources
+    for _, candidate in engine_rows
+    if candidate.engine is not None
+)
 summary = next(
     row for row in headline_rows(residuals, context=context, engines=engines)
     if row["rail"] == "vapour" and row["engine"] == Engine.OPENIMCC.value

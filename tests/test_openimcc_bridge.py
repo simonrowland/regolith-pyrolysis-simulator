@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import os
 import json
+from dataclasses import replace
 from pathlib import Path
 import subprocess
 import sys
@@ -16,6 +17,8 @@ from simulator.melt_backend.openimcc_bridge import (
     OpenImccBridgeResult,
     OpenImccUnavailableError,
     OPENIMCC_PARENT_OXIDES,
+    _load_pack,
+    _pack_digest,
     _cleaned_melt_projection,
     evaluate as bridge_evaluate,
     evaluate_cleaned_melt,
@@ -455,6 +458,37 @@ def test_green_fixture_detects_an_in_memory_coefficient_mutation() -> None:
         for name, value in zip(mutated.parent_oxides, mutated.parent_activity, strict=True)
     }
     assert mutated_hex != row["activities_hex"]
+
+
+def test_pack_digest_pins_the_current_v1_integrity_fallback() -> None:
+    _openimcc_or_skip()
+    expected = "f2b479cd54e3c82704a5863fcc06836f72045375d9a8c7f8d2fad19e98f75d05"
+    assert _pack_digest(_load_pack("v1.0.2")) == expected
+
+
+def test_pack_digest_pins_the_current_ext_integrity_fallback_defect() -> None:
+    _openimcc_or_skip()
+    expected = "f2b479cd54e3c82704a5863fcc06836f72045375d9a8c7f8d2fad19e98f75d05"
+    assert _pack_digest(_load_pack("ext-v4")) == expected
+
+
+def test_pack_digest_pins_the_current_research_integrity_fallback() -> None:
+    _openimcc_or_skip()
+    from openimcc import label_research_datapack
+
+    expected = "f2b479cd54e3c82704a5863fcc06836f72045375d9a8c7f8d2fad19e98f75d05"
+    loaded_pack = _load_pack("v1.0.2")
+    kernel = replace(
+        loaded_pack.kernel_datapack,
+        A=loaded_pack.kernel_datapack.A.copy(),
+    )
+    kernel.A[0] += 0.01
+    research_pack = label_research_datapack(
+        kernel,
+        model_id="IMCC-SF04-mutation",
+        coverage="mutation-probe",
+    )
+    assert _pack_digest(research_pack) == expected
 
 
 def test_bridge_envelope_matches_green_edge_decisions() -> None:
