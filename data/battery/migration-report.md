@@ -8,7 +8,7 @@ queue size: 76917
 identical-payload dedupe aliases: 342
 metadata files: 39
 index sources: 168
-hard issues: 3655
+hard issues: 3653
 
 ## Spec vs measured
 
@@ -18208,7 +18208,7 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 
 ## Hard issue census
 
-hard issues: 3655
+hard issues: 3653
 
 MODEL_DERIVED / MEASURED_REDUCED keep their mapped evidence class. Parent pointers are not fabricated. Unstated derived_from / derivation is a hard conditional_field queued for page-grounding.
 
@@ -18216,7 +18216,7 @@ MODEL_DERIVED / MEASURED_REDUCED keep their mapped evidence class. Parent pointe
 |---|---:|
 | `conditional_field:derived_from` | 2004 |
 | `conditional_field:derivation` | 1626 |
-| `conditional_field:attribution` | 25 |
+| `conditional_field:attribution` | 23 |
 
 ## Hard issues (first 50)
 
