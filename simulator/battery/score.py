@@ -6709,6 +6709,9 @@ def _empty_headline_payload_stats() -> dict[str, object]:
         "n_no_band": 0,
         "dex_values": [],
         "band_widths": set(),
+        # all_numeric only (b-691); ignored for measured/compilation records.
+        "flag_class_counts": defaultdict(int),
+        "source_groups": {},
     }
 
 
@@ -6765,6 +6768,25 @@ def _headline_payload_record(
         "decision_strata": [],
         "data_scatter_ratio": None if rms_over_band is None else str(rms_over_band),
     }
+    if tier == "all_numeric":
+        iqr = _iqr(dex_values)
+        flag_counts = stats.get("flag_class_counts") or {}
+        record["iqr_dex"] = None if iqr is None else str(iqr)
+        record["flag_class_counts"] = dict(sorted(flag_counts.items()))
+        source_groups = stats.get("source_groups") or {}
+        assert isinstance(source_groups, dict)
+        record["sources"] = [
+            {
+                "source_id": source_id,
+                "n_numeric": entry["n_numeric"],
+                "n_certified": entry["n_certified"],
+                "n_flagged": entry["n_flagged"],
+                "flag_class_counts": dict(
+                    sorted(entry["flag_class_counts"].items())
+                ),
+            }
+            for source_id, entry in sorted(source_groups.items())
+        ]
     if not include_eligible_references:
         record.pop("n_eligible_references")
     return record
@@ -7676,6 +7698,7 @@ class _ScorePayloadAccumulator:
         rail: str,
         engine: str,
         numeric_value: Decimal | None,
+        row_metadata: _ScorePayloadRowMetadata | None = None,
     ) -> None:
         groups = self.headline_groups[tier]
         stats = groups.setdefault((rail, engine), _empty_headline_payload_stats())
@@ -7713,6 +7736,50 @@ class _ScorePayloadAccumulator:
                 stats["band_widths"].add(as_decimal(band.get("value")))
             except (TypeError, ValueError, ArithmeticError):
                 pass
+        if tier != "all_numeric":
+            return
+        # b-691 all_numeric extras: IQR / flag-class / per-source counts.
+        strata = _flagged_payload_strata(row)
+        flag_counts = stats["flag_class_counts"]
+        assert isinstance(flag_counts, defaultdict)
+        if not strata:
+            flag_counts["unflagged"] += 1
+        else:
+            for stratum in strata:
+                flag_counts[stratum] += 1
+        observation = None if row_metadata is None else row_metadata.observation
+        source_id = (
+            observation.source_id
+            if observation is not None and observation.source_id
+            else str(row.get("reference") or "")
+        )
+        source_groups = stats["source_groups"]
+        assert isinstance(source_groups, dict)
+        entry = source_groups.setdefault(
+            source_id,
+            {
+                "source_id": source_id,
+                "n_numeric": 0,
+                "n_certified": 0,
+                "n_flagged": 0,
+                "flag_class_counts": defaultdict(int),
+            },
+        )
+        entry["n_numeric"] = int(entry["n_numeric"]) + 1
+        measured = _reference_has_measured_evidence(
+            observation, exclusions=row.get("exclusions")
+        )
+        is_compilation = bool(
+            row_metadata is not None and row_metadata.is_compilation
+        )
+        if measured and not strata and not is_compilation:
+            entry["n_certified"] = int(entry["n_certified"]) + 1
+        if strata:
+            entry["n_flagged"] = int(entry["n_flagged"]) + 1
+            entry_flags = entry["flag_class_counts"]
+            assert isinstance(entry_flags, defaultdict)
+            for stratum in strata:
+                entry_flags[stratum] += 1
 
     def _add_compilation_decision(
         self,
@@ -7914,13 +7981,16 @@ class _ScorePayloadAccumulator:
         rail = str(row.get("rail") or "")
         if numeric_value is not None and rail:
             # all_numeric co-equal headline (b-691): every priced residual.
-            self.report_engine_names.add(engine)
+            # Do not add to report_engine_names here — that set drives the
+            # measured-tier zero-grid expansion (SCORE_ENGINE_SET fallback when
+            # empty). Compilation/all_numeric rows must not shrink that grid.
             self._add_headline(
                 row,
                 tier="all_numeric",
                 rail=rail,
                 engine=engine,
                 numeric_value=numeric_value,
+                row_metadata=metadata,
             )
         if measured:
             if _reference_has_measured_evidence(None, exclusions=exclusions):
@@ -7932,6 +8002,7 @@ class _ScorePayloadAccumulator:
                         rail=rail,
                         engine=engine,
                         numeric_value=numeric_value,
+                        row_metadata=metadata,
                     )
             if row.get("status") == ResidualStatus.REFUSED.value:
                 refusal = row.get("refusal") or {}
@@ -7966,6 +8037,7 @@ class _ScorePayloadAccumulator:
                         rail=rail,
                         engine=engine,
                         numeric_value=numeric_value,
+                        row_metadata=metadata,
                     )
             self._add_compilation_decision(
                 row,

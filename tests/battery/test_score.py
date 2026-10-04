@@ -6239,7 +6239,9 @@ def test_admitted_model_derived_rows_emit_residuals_per_imcc_engine() -> None:
         obs.observation_id for obs in score_module.comparison_candidates(filtered)
     }
 
-    def typed_test_refusal(engine, point, *, handles, experiment):
+    def typed_test_refusal(engine, point, *, handles, experiment, bench=None, **_kwargs):
+        # compile_residual always forwards bench= when a recorded bench exists
+        # (b-693 reactive-cell path). Accept and forward it.
         if (
             point.source_id == "kems-053-stolyarova-1991"
             and isinstance(point.identity, Identity)
@@ -6250,6 +6252,7 @@ def test_admitted_model_derived_rows_emit_residuals_per_imcc_engine() -> None:
                 point,
                 handles=handles,
                 experiment=experiment,
+                bench=bench,
             )
         reason = (
             RefusalReason.IDENTITY_UNKNOWN
