@@ -609,15 +609,36 @@ def test_unrepaired_janaf_tail_coordinates_match_the_named_exception_list() -> N
         ("O-083", 500),
     ),
 )
-def test_large_logk_rounding_miss_still_restores_signs(
+def test_large_logk_rounding_miss_refuses_transition_crossing_enthalpy(
     table_id: str, temperature: int
 ) -> None:
     table = load_table_document(TABLES_DIR / f"{table_id}.yaml")["table"]
-    row = next(
-        row for row in table["values"] if row["temperature"]["value"] == temperature
+    assert not any(
+        row["temperature"]["value"] == temperature for row in table["values"]
     )
-    assert row["formation_gibbs_energy"]["locator"]["parse_repair"] == NIST_TAIL_PARSE_REPAIR
-    assert row["log10_formation_equilibrium_constant"]["locator"]["parse_repair"] == NIST_TAIL_PARSE_REPAIR
+    ambiguity = next(
+        item
+        for item in table["parse_ambiguities"]
+        if item.get("raw_line", "").startswith(f"{temperature}\t")
+    )
+    assert "formation enthalpy neighbors span a transition marker" in ambiguity["reason"]
+
+
+def test_scale_aware_identity_tolerance_accepts_more_than_two_printed_units() -> None:
+    source = (
+        "Synthetic scale-aware identity tail\n"
+        "T(K)\tCp\tS\t-[G-H(Tr)]/T\tH-H(Tr)\tΔfH\tΔfG\tlog Kf\n"
+        "900\t10\t10\t10\t0\t-100.000\t1000.000\t-58.038\n"
+        "1000\t10\t10\t10\t0\t100.000 1000.000 52.236\n"
+        "1100\t10\t10\t10\t0\t-100.000\t1000.000\t-47.485\n"
+    )
+    parsed = parse_janaf_txt(
+        source, table_id="synthetic-scale-aware-tail", url="u", download_url="d"
+    )
+    row = next(row for row in parsed.values if row["temperature"]["value"] == 1000)
+    assert row["formation_enthalpy"]["value"] == -100.0
+    assert row["formation_gibbs_energy"]["value"] == 1000.0
+    assert row["log10_formation_equilibrium_constant"]["value"] == -52.236
 
 
 def test_malformed_tail_refuses_enthalpy_bracket_crossing_transition() -> None:
