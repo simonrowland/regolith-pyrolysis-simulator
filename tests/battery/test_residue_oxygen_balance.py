@@ -372,8 +372,8 @@ def test_hashimoto_vacuum_oxygen_balance_is_engine_specific_and_alpha_weighted()
         )
 
     # OpenIMCC be41a6d's JANAF major-oxide liquid rows move the Hashimoto-start
-    # probe pO2 consumed by the oxygen-balance solver to 0.828632754 bar at
-    # alpha=1 (afcb5d8: 0.799303) and 0.300351240 bar at alpha=0.25
+    # probe pO2 consumed by the oxygen-balance solver to 0.828632754 Pa at
+    # alpha=1 (afcb5d8: 0.799303) and 0.300351240 Pa at alpha=0.25
     # (afcb5d8: 0.289332). The two engines still use their own melt channel
     # pressures for both alpha arms.
     assert solved["openimcc"][1.0].pO2_bar * PA_PER_BAR == pytest.approx(
@@ -498,6 +498,31 @@ def test_residue_two_channel_hkl_and_parent_stoichiometric_anchors() -> None:
     _assert_residue_atoms_close(
         starting, dict(result.residue_mol), dict(result.evaporated_mol)
     )
+
+
+def test_buffered_residue_keeps_printed_fo2_and_accounts_reservoir_exchange() -> None:
+    from simulator.battery.residue import ResidueChannel, integrate_residue_inventory
+
+    requested_logp = -3.25
+    seen_logp: list[float] = []
+    starting = {"FeO": 1.0e-3}
+    fe_alpha, alpha_source = _residue_catalog_alpha("Fe")
+    result = integrate_residue_inventory(
+        starting,
+        (ResidueChannel("Fe", "Fe", "FeO", fe_alpha, alpha_source),),
+        lambda _inventory, logp: seen_logp.append(logp) or {"Fe": 1.0e-3},
+        temperature_K=1773.15,
+        duration_s=60.0,
+        area_evolution_m2=(1.0e-4, 1.0e-4),
+        buffered_fO2_log=requested_logp,
+    )
+
+    assert seen_logp == [requested_logp, requested_logp]
+    assert result.pO2_bar_by_step == (10.0**requested_logp,) * 2
+    assert result.residue_mol["FeO"] < starting["FeO"]
+    assert result.buffer_oxygen_exchange_mol < 0.0
+    assert result.atom_closure_mol["O"] == pytest.approx(0.0, abs=1.0e-15)
+    assert result.atom_closure_mol["Fe"] == pytest.approx(0.0, abs=1.0e-15)
 
 
 @pytest.mark.parametrize(

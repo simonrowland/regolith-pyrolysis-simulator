@@ -21,6 +21,7 @@ from simulator.diagnostic_helpers.binary_pot_battery import (
     PO2_COMMANDED,
     Po2Request,
     _InternalAnalyticalInputRefusal,
+    _new_internal_analytical_core,
     _internal_analytical_vapor_pressure_adapter,
 )
 from tests.battery import factories as F
@@ -138,3 +139,60 @@ def test_internal_analytical_refuses_nonfinite_temperature() -> None:
         )
     assert raised.value.category == 2
     assert raised.value.code == "internal_analytical_invalid_temperature"
+
+
+def test_internal_analytical_residue_adapter_skips_diagnostic_shadow(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from engines.vaporock import VapoRockProvider
+
+    original_dispatch = VapoRockProvider.dispatch
+    shadow_calls = 0
+
+    def count_shadow_calls(self, request):
+        nonlocal shadow_calls
+        shadow_calls += 1
+        return original_dispatch(self, request)
+
+    monkeypatch.setattr(VapoRockProvider, "dispatch", count_shadow_calls)
+    core = _new_internal_analytical_core()
+    from simulator.vapour_rail import catalog as vapour_catalog
+
+    original_compile_catalog = vapour_catalog.compile_vapour_rail_catalog
+    catalog_compiles = 0
+
+    def count_catalog_compiles(payload, **kwargs):
+        nonlocal catalog_compiles
+        catalog_compiles += 1
+        return original_compile_catalog(payload, **kwargs)
+
+    monkeypatch.setattr(
+        vapour_catalog, "compile_vapour_rail_catalog", count_catalog_compiles
+    )
+    inputs = {
+        "temperature_C": 1500.0 - 273.15,
+        "pressure_bar": 1.0,
+        "composition_kg": None,
+        "composition_mol": {"SiO2": 0.5, "FeO": 0.3, "MgO": 0.2},
+        "fO2_log": -9.0,
+        "po2_request": Po2Request(mode=PO2_COMMANDED, po2_bar=1e-9),
+    }
+
+    with_shadow = _internal_analytical_vapor_pressure_adapter(
+        core=core,
+        **inputs,
+    )
+    shadow_call_count = shadow_calls
+    catalog_compile_count = catalog_compiles
+    assert shadow_call_count == 1
+    assert catalog_compile_count > 0
+
+    residue_prediction = _internal_analytical_vapor_pressure_adapter(
+        core=core,
+        **inputs,
+        include_diagnostic_shadows=False,
+    )
+
+    assert shadow_calls == shadow_call_count
+    assert catalog_compiles == catalog_compile_count
+    assert residue_prediction.vapor_pressures_Pa == with_shadow.vapor_pressures_Pa
