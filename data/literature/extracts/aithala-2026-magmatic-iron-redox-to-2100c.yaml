@@ -47,8 +47,9 @@ benches:
       state: {tag: unknown, reason: not_published}
       locator: {page: 7, published_page: 'SI-1', section: Methods, note: Both types are named without run-specific assignment}
   temperature_calibration:
-    state: {tag: value, value: Calibration details referred to Aithala et al. (2026)}
-    locator: {page: 7, published_page: 'SI-1', section: Methods}
+    checks:
+      state: {tag: value, value: Calibration details referred to Aithala et al. (2026)}
+      locator: {page: 7, published_page: 'SI-1', section: Methods}
   other_facts:
   - name: oxygen_fugacity_sensor
     unit: as_printed
