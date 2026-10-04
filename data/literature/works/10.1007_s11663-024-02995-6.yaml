@@ -280,48 +280,33 @@ experiments:
   pressure_environment:
     total_pressure_Pa:
       state:
-        tag: value
-        value:
-          kind: point
-          point: '0.001'
-          approximate: false
+        tag: unknown
+        reason: not_published
       locator:
         page: 825
         section: III. Experimental
-        note: Starting chamber pressure as printed; unit conversion only
-      inference:
-        relation: mbar_to_Pa
-        inputs:
-        - P_Pa = P_mbar × 100
-        - original_unit=mbar
-        - as_published=1e-05 mbar
-        - printed=chamber_pressure
-        parameters:
-        - - original
-          - state:
-              tag: value
-              value: '0.00001'
-            locator:
-              page: 825
-              section: III. Experimental
-              note: Starting chamber pressure as printed; unit conversion only
-        - - factor
-          - state:
-              tag: value
-              value: '100'
-            locator:
-              page: 825
-              section: III. Experimental
-              note: Starting chamber pressure as printed; unit conversion only
-        output_unit: Pa
+        note: Measurement-time chamber background not printed; page-825 below-10^-5-mbar threshold is pre-heating pump-down
+          only (see observation equipment residual_pressure_Pa_as_printed)
     sweep_gas:
       state:
-        tag: unknown
-        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        page: 825
+        section: III. Experimental
     regime:
       regime_class:
         tag: unknown
-        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+        reason: not_published
+    cell_internal_pressure_note:
+      state:
+        tag: value
+        value: Starting chamber pressure below 1e-5 mbar (<0.001 Pa) reached BEFORE heating; pump-down/startup context only
+          — not a bound on background during hot measurements
+      locator:
+        page: 825
+        section: III. Experimental
+        note: Pre-heating pump-down threshold as printed; timing before heating; unit conversion only
   work_id: 10.1007/s11663-024-02995-6
   locator:
     page: 825
