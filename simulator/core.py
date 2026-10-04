@@ -9468,9 +9468,8 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                     <= VAPOROCK_T_MAX_K
                 ),
             }
-        kernel_result = self._dispatch_only(
-            ChemistryIntent.VAPOR_PRESSURE,
-            control_inputs={
+        dispatch_kwargs = {
+            'control_inputs': {
                 'pO2_bar': pO2_bar,
                 'intrinsic_fO2_log': intrinsic_fO2_log,
                 'vacuum_floor_bar': vacuum_floor,
@@ -9481,8 +9480,15 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 ),
                 **high_t_control_inputs,
             },
-            fO2_log=intrinsic_fO2_log,
-            include_diagnostic_shadows=include_diagnostic_shadows,
+            'fO2_log': intrinsic_fO2_log,
+        }
+        if not include_diagnostic_shadows:
+            # Keep the default dispatch signature for substituted dispatchers;
+            # only shadow-suppressing callers need a dispatcher that accepts it.
+            dispatch_kwargs['include_diagnostic_shadows'] = False
+        kernel_result = self._dispatch_only(
+            ChemistryIntent.VAPOR_PRESSURE,
+            **dispatch_kwargs,
         )
         self._last_high_t_melt_activity_temperature_K = T_C + 273.15
         diagnostic = dict(kernel_result.diagnostic or {})
