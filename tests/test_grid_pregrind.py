@@ -1755,6 +1755,37 @@ def test_write_result_refuses_model_mismatch(tmp_path):
         ).fetchone()[0] == 0
 
 
+def test_write_result_refuses_backend_failure_model_mismatch(tmp_path):
+    database = tmp_path / "write-backend-failure-model-mismatch.db"
+    with GridCacheWriter(database) as writer:
+        batch_id = writer.ensure_batch(
+            label="fixed", kind="fixed", seed=178, params={"test": True}
+        )
+        writer.materialize_key(
+            _inputs(1200.0),
+            batch_id=batch_id,
+            shuffle_rank=0,
+            shard=0,
+            intended_fO2_log=-9.0,
+        )
+        grid_key_id = writer.pending_rows(batch_id=batch_id)[0]["grid_key_id"]
+        output = _output("error")
+        output["status_kind"] = "failure"
+        output["engine_model"] = "pMELTS"
+        raw_payload = json.loads(output["raw_payload"])
+        raw_payload["engine_invoked"] = True
+        output["raw_payload"] = json.dumps(raw_payload)
+
+        with pytest.raises(
+            ValueError, match="grid result model differs from queued key"
+        ):
+            writer.write_result(grid_key_id, output)
+
+        assert writer.connection.execute(
+            "SELECT COUNT(*) FROM alphamelts_outputs"
+        ).fetchone()[0] == 0
+
+
 def test_write_result_refuses_ok_without_backend_model(tmp_path):
     database = tmp_path / "write-ok-without-model.db"
     with GridCacheWriter(database) as writer:
