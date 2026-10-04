@@ -14,7 +14,7 @@ review_status: draft
 source_locators:
   sample_overview: &sample_overview
     source_path: /Users/simonrowland/Repos/regolith-corpus/raw/lpi-compendium-65701/lpi-compendium-65701.pdf
-    pdf_page_index: 0
+    pdf_page_index: 1
     section: Introduction and Petrography
   chemistry: &chemistry
     source_path: /Users/simonrowland/Repos/regolith-corpus/raw/lpi-compendium-65701/lpi-compendium-65701.pdf
@@ -53,6 +53,28 @@ laboratory_parameters:
       run_duration: not stated
     locator: *sample_overview
     note: Storage, collection, and analytical methods are not converted into vaporization-run conditions.
+benches:
+- id: handbook-entry-no-thermal-run
+  identity: {basis: described_in_this_work}
+  apparatus_family:
+    state: {tag: unknown, reason: not_published}
+    locator: {<<: *sample_overview, note: 'furnace_or_heated_cell: not stated'}
+  cell_material_and_liner:
+    state: {tag: unknown, reason: not_published}
+    locator: {<<: *sample_overview, note: 'crucible_or_container_for_thermal_experiment: not stated'}
+  temperature_measurement:
+    sensor:
+      state: {tag: unknown, reason: not_published}
+      locator: {<<: *sample_overview, note: 'temperature_measurement_or_calibration: not stated'}
+experiments:
+- experiment_id: handbook-characterization
+  bench_id: handbook-entry-no-thermal-run
+  method: {tag: unknown, reason: not_published}
+  locator: *sample_overview
+  sample:
+    mass_kg:
+      state: {tag: value, value: {kind: point, point: '0.171'}}
+      locator: {<<: *sample_overview, note: 'Printed 171 g characterization mass (not a thermal-run charge); unit conversion only.'}
 sample_characterization:
   apollo_16_sample_65701:
     locator: *sample_overview
@@ -71,6 +93,7 @@ species:
   regolith:
     observations:
     - observation_id: lpi_compendium_65701_sample_characterization
+      experiment: handbook-characterization
       type: rate_series
       locator: *sample_overview
       phase: lunar_soil
@@ -90,6 +113,7 @@ species:
         agglutinate_content: not reported
         collection_note: Figures 1-3 locate the sample at Station 5; the entry states that 65701 was taken from a small crater.
     - observation_id: lpi_compendium_65701_chemical_composition_table
+      experiment: handbook-characterization
       type: rate_series
       locator: *chemistry
       phase: lunar_soil
@@ -247,6 +271,7 @@ species:
         omitted_table_rows: [Mo, Ru, Rh, Pd, Ag, In, Sn, Sb, Te, W, Re, Os, Pt]
         omission_policy: blank cells omitted; no zero inferred
     - observation_id: lpi_compendium_65701_attributed_trace_and_exposure_values
+      experiment: handbook-characterization
       type: rate_series
       locator: *chemistry_narrative
       phase: lunar_soil
@@ -271,10 +296,11 @@ species:
         grain_size_distribution_source: Graf (1993), from data by Butler et al. (1973)
       note: Values are reproduced from named prior studies; they are not new measurements by Meyer (2010).
     - observation_id: lpi_compendium_65701_figure_only_characterization
+      experiment: handbook-characterization
       type: rate_series
       locator:
         source_path: /Users/simonrowland/Repos/regolith-corpus/raw/lpi-compendium-65701/lpi-compendium-65701.pdf
-        pdf_page_index: 0
+        pdf_page_index: 1
         figure: '4'
       phase: lunar_soil
       regime: figure_only_comparison
