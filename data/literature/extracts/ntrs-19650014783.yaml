@@ -746,14 +746,14 @@ species:
             published_page: 2
             pdf_page_index: 4
             section: Experiment - Apparatus
-        chamber_pressure:
-          value: 10^-4
-          units: Torr
-          semantics: upper_bound_or_setpoint_as_printed
+        residual_pressure_Pa_as_printed:
+          value: "evacuated to 10^-4 Torr before sodium injection (preparation; not measurement pressure)"
+          quote: "evacuated to 10^-4 Torr before sodium injection"
           locator:
-            published_page: 3
-            pdf_page_index: 5
+            published_page: 4
+            pdf_page_index: 6
             section: Procedure
+            note: printed p. 4 / PDF 6; preparation evacuation before Na injection
     - observation_id: bowles_rosenblum_1965_na_fit_this_work
       experiment: sodium-vapor-pressure-series
       type: psat_series

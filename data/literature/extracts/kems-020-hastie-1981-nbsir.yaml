@@ -303,6 +303,23 @@ benches:
       figure: '20'
       pdf_page_index: 59
       note: 'Figure 20 caption: “KMS data with Pt-cell orifice diameter of 0.34 mm.”'
+- id: hastie-1981-tms
+  identity: {basis: described_in_this_work}
+  apparatus_family:
+    state: {tag: value, value: Transpiration mass spectrometry}
+    locator: {page: 9, paragraph: primary experimental methods KMS and TMS}
+  cell_materials:
+    - state:
+        tag: value
+        value: Pt
+      locator:
+        page: 9
+        paragraph: all of these components were fabricated from platinum metal
+  cell_material_and_liner:
+    state: {tag: value, value: "platinum TMS reactor (boat, carrier, probe)"}
+    locator:
+      page: 9
+      paragraph: all of these components were fabricated from platinum metal
 
 experiments:
 - experiment_id: hastie-1981-pt-kms
@@ -313,10 +330,18 @@ experiments:
     figure: '20'
     pdf_page_index: 59
     note: 'Figure 20 caption: "KMS data with Pt-cell orifice diameter of 0.34 mm."'
+- experiment_id: hastie-1981-pt-tms
+  bench_id: hastie-1981-tms
+  method: transpiration
+  locator:
+    page: 9
+    paragraph: usually operated at total pressures of 0.2 to 1.0 atm
+    note: TMS usual operating range; NaCl and Table 2 K are TMS (printed p. 11 / p. 22)
 species:
   K:
     observations:
     - observation_id: hastie_1981_table2_k_logP_coefficients
+      experiment: hastie-1981-pt-tms
       type: psat_series
       locator:
         source_path: docs-private/research/2026-08-27-ocr-repair/kems-020-hastie-1981-nbsir/tables.md
@@ -516,12 +541,14 @@ species:
           as printed. ZrO2 row may be low by a factor of two (footnote g).
           No per-coefficient sigma except those statements.
       equipment:
-        chamber_pressure:
-          value: KMS upper limit ~1e-4 atm as stated for the method (section 6); Table 2 rows are KMS
-          units: atm
+        residual_pressure_Pa_as_printed:
+          value: "Table 2 potassium pressures are TMS measurements under neutral conditions (printed p. 22 / PDF 28); TMS usual operating range 0.2-1.0 atm binds via TMS experiment. KMS method limit ~1e-4 atm (section 6 / p. 9) stays with KMS runs."
+          quote: "Table 2 potassium pressures are TMS measurements under neutral conditions (printed p. 22 / PDF 28); TMS usual operating range 0.2-1.0 atm binds via TMS experiment. KMS method limit ~1e-4 atm (section 6 / p. 9) stays with KMS runs."
           locator:
-            page: 9
-            paragraph: upper pressure limits of 10^-4 and one atm
+            page: 22
+            published_page: 22
+            pdf_page_index: 28
+            paragraph: Table 2 potassium pressures as TMS under neutral conditions
     - observation_id: hastie_1981_table2_17k2o_A_as_printed_note
       type: psat_series
       locator:
@@ -586,6 +613,12 @@ species:
           locator:
             page: 28
             paragraph: relatively small effusion orifice (0.34 mm diameter)
+        residual_pressure_Pa_as_printed:
+          value: "KMS upper limit ~1e-4 atm as stated for the method (section 6 / printed p. 9)"
+          quote: "KMS upper limit ~1e-4 atm as stated for the method (section 6 / printed p. 9)"
+          locator:
+            page: 9
+            paragraph: upper pressure limits of 10^-4 and one atm
     - observation_id: hastie_1981_fig4_9_illite_slag_PO2_figure_only_blocked
       type: psat_series
       locator:
@@ -1081,6 +1114,7 @@ species:
   Na:
     observations:
     - observation_id: hastie_1981_nacl_liquid_logP_prose
+      experiment: hastie-1981-pt-tms
       type: psat_series
       locator:
         source_path: docs-private/research/2026-08-27-ocr-repair/kems-020-hastie-1981-nbsir/tables.md
@@ -1131,12 +1165,15 @@ species:
           locator:
             page: 9
             paragraph: all of these components were fabricated from platinum metal
-        chamber_pressure:
+        total_pressure_atm:
           value:
-            min_atm: 0.2
-            max_atm: 1.0
-            carrier: N2 or Ar
+            kind: interval
+            interval_low: 0.2
+            interval_high: 1
           units: atm
+          as_printed: "usually operated at total pressures of 0.2 to 1.0 atm"
+          quote: "usually operated at total pressures of 0.2 to 1.0 atm"
+          note: "carrier: N2 or Ar"
           locator:
             page: 9
             paragraph: usually operated at total pressures of 0.2 to 1.0 atm
