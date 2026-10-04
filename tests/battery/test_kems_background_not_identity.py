@@ -15,15 +15,26 @@ from __future__ import annotations
 
 from decimal import Decimal
 from pathlib import Path
+from types import SimpleNamespace
 
 import yaml
 
 from simulator.battery.consumer_inputs import collect_consumer_inputs
 from simulator.battery.enums import MethodToken, Quantity, ValueKind
-from simulator.battery.generators.bench import engine_point_requests, kems_case
+from simulator.battery.generators.bench import (
+    _prediction_pressure_waypoint,
+    engine_point_requests,
+    kems_case,
+)
 from simulator.battery.migrate import migrate
 from simulator.battery.records import State, Value
-from simulator.battery.waypoints import pressure_boundary
+from simulator.battery.waypoints import (
+    Waypoint,
+    WaypointAuthority,
+    WaypointResult,
+    _pressure_for_oxygen_derivation,
+    pressure_boundary,
+)
 from tests.battery.test_bench_generators import case, complete_kems
 from tests.battery.test_migrate import _migrate_real_extract
 from tests.battery import factories as f
@@ -206,6 +217,31 @@ def _assert_identity_not_chamber(observation, chamber: Decimal = _CHAMBER_PA) ->
                 f"{observation.observation_id} inherited chamber background "
                 f"{chamber} Pa as identity.total_pressure_Pa"
             )
+
+
+def test_pressure_selection_prefers_first_non_chamber_route(monkeypatch) -> None:
+    """Both current selectors preserve the order of eligible alternatives."""
+
+    experiment, bench, observation = case(pressure=str(_CHAMBER_PA))
+    chamber = Waypoint(
+        "pressure_boundary", Value.point_of(_CHAMBER_PA), "printed_run_pressure",
+        WaypointAuthority.PRINTED, ("experiment.pressure_environment.total_pressure_Pa",),
+    )
+    first = Waypoint(
+        "pressure_boundary", Value.point_of(1), "first_eligible", WaypointAuthority.DERIVED, (),
+    )
+    second = Waypoint(
+        "pressure_boundary", Value.point_of(2), "second_eligible", WaypointAuthority.DERIVED, (),
+    )
+    result = WaypointResult("pressure_boundary", chamber, (chamber, first, second))
+    monkeypatch.setattr("simulator.battery.waypoints.pressure_boundary", lambda *args: result)
+
+    oxygen = _pressure_for_oxygen_derivation(experiment, bench, observation)
+    engine_point = _prediction_pressure_waypoint(
+        SimpleNamespace(waypoints={"pressure_boundary": result}, method=experiment.method)
+    )
+    assert oxygen == first
+    assert engine_point == first
 
 
 def test_knudsen_effusion_numeric_fixture_not_inherited_at_both_sites(
