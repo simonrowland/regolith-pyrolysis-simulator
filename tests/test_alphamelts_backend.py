@@ -145,12 +145,15 @@ def test_petthermotools_model_code_pins_current_selection(
 
 
 def test_petthermotools_blank_and_default_launch_arguments_match() -> None:
-    _blank_backend, blank_call = _petthermotools_call_arguments('')
+    blank_backend, blank_call = _petthermotools_call_arguments('')
+    none_backend, none_call = _petthermotools_call_arguments(None)
     _default_backend, default_call = _petthermotools_call_arguments(
         DEFAULT_ALPHAMELTS_MODEL
     )
 
     assert blank_call == default_call
+    assert none_call == default_call
+    assert blank_backend._melts_model_code() == none_backend._melts_model_code()
 
 
 @pytest.mark.parametrize('model_name', ['not-a-model', 'MELTSv1.O.2'])
@@ -220,6 +223,9 @@ def test_petthermotools_resolver_is_the_model_code_owner() -> None:
         ('MELTSv1.2.0', 4),
         (' pMELTS ', 2),
     )
+    assert resolver("") == (DEFAULT_ALPHAMELTS_MODEL, 1)
+    assert resolver(None) == resolver("")
+    assert resolver(" pMELTS ") == ("pMELTS", 2)
     for model_name, expected_code in cases:
         resolved_model, code = resolver(model_name)
         backend = AlphaMELTSBackend(model_name=model_name)

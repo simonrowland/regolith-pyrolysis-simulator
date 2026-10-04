@@ -33,6 +33,27 @@ def resolve_alphamelts_subprocess_model(
     return model, "MELTS"
 
 
+def resolve_alphamelts_python_api_model(
+    model_name: str | None,
+) -> tuple[str, int]:
+    """Resolve the verified PetThermoTools MELTS model and payload code."""
+    model = str(model_name if model_name is not None else "").strip()
+    model = model or DEFAULT_ALPHAMELTS_MODEL
+    model_codes = {
+        DEFAULT_ALPHAMELTS_MODEL: 1,
+        "pMELTS": 2,
+        "MELTSv1.1.0": 3,
+        "MELTSv1.2.0": 4,
+    }
+    try:
+        model_code = model_codes[model]
+    except KeyError as exc:
+        raise ValueError(
+            f"AlphaMELTS Python API model {model!r} is not verified"
+        ) from exc
+    return model, model_code
+
+
 def resolve_grid_engine_model(model_name: str | None, backend_name: str) -> str:
     """Resolve the model identity used by the grid producer and writer."""
     if backend_name == "subprocess":
