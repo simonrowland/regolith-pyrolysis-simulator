@@ -5342,7 +5342,7 @@ def test_absent_janaf_fusion_grid_node_refuses_interpolation(
         janaf.janaf_fusion_energy("SiO2", Decimal("1673"))
 
 
-def test_fusion_comparison_reports_absent_janaf_grid_node_as_refusal(
+def test_fusion_comparison_skips_missing_node_outside_interpolation_bracket(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     from simulator.battery.generators import janaf
@@ -5377,10 +5377,10 @@ def test_fusion_comparison_reports_absent_janaf_grid_node_as_refusal(
     )
 
     comparison = _fusion_comparison_reference(reference, engine=Engine.OPENIMCC)
-    assert comparison.value.point == reference.value.point
+    assert comparison.value.point != reference.value.point
+    assert comparison.identity.reference_state.value.endmember.phase.value is Phase.L
     assert any(
-        "fusion conversion missing input" in notice.reason
-        and "spans missing grid node 1700 K" in notice.reason
+        notice.reason.startswith("reference_converted_via_fusion;")
         for notice in comparison.notices
     )
 
