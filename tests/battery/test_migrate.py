@@ -5261,6 +5261,44 @@ def test_kume_measured_reduced_activity_preserves_structured_derivation(
     )
 
 
+def test_unregistered_table_derivation_input_is_not_retained(
+    tmp_path: Path,
+) -> None:
+    name = "kume-2000-cao-activities.yaml"
+    extract = yaml.safe_load(
+        (REPO_ROOT / "data" / "literature" / "extracts" / name).read_text(
+            encoding="utf-8"
+        )
+    )
+    extract["source_id"] = "fixture-source"
+    observation_id = "kume_2000_table2_sample_101"
+    unregistered = "tables:fixture-source/not-registered.csv"
+    row = next(
+        row
+        for block in extract["species"].values()
+        for row in block["observations"]
+        if row.get("observation_id") == observation_id
+    )
+    row["derivation"]["inputs"] = [unregistered]
+
+    result = migrate(_write_min_tree(tmp_path, extract), write=False)
+    observation = next(
+        obs
+        for obs in result.observations.values()
+        if obs.observation_id.endswith(f"::{observation_id}")
+    )
+    assert unregistered not in (observation.derived_from or ())
+    assert observation.derivation is None or unregistered not in observation.derivation.inputs
+
+    report = validate_corpus(
+        result.works, result.experiments, result.observations, residuals=None
+    )
+    assert not any(
+        issue.reason is RefusalReason.REFERENTIAL_INTEGRITY
+        for issue in report.hard_issues
+    )
+
+
 def test_measured_reduced_derivation_prose_input_is_queued_not_pointed(
     tmp_path: Path,
 ) -> None:
