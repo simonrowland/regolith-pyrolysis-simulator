@@ -3185,6 +3185,14 @@ def _provider_model(provider: Any) -> str | None:
             getattr(backend, "_model", None)
         )
         return model
+    if (
+        getattr(backend, "real_backend_family", None)
+        == RealBackendFamily.ALPHAMELTS
+        and str(getattr(backend, "_mode", "")).strip() == "python_api"
+    ):
+        # Validate before canonical key construction, so rejected model names
+        # cannot reach replay lookup or store write paths.
+        backend._melts_model_code()
     model = getattr(backend, "_model", None)
     if model is not None:
         model_text = str(model).strip()

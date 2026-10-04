@@ -2505,10 +2505,11 @@ class _MELTSBackendSupport(MeltBackend):
                     warnings=warnings,
                 )
             )
+            self._melts_model_code()
             results = self._run_petthermotools_isolated(
                 'equilibrate_MELTS',
                 kwargs={
-                    'Model': self._resolved_python_api_model()[0],
+                    'Model': self._model,
                     'P_bar': solved_pressure_bar,
                     'T_C': temperature_C,
                     'comp': ptt_comp,
@@ -2869,12 +2870,13 @@ class _MELTSBackendSupport(MeltBackend):
         find_liq_melts = getattr(ptt, 'findLiq_MELTS', None)
         find_liq = getattr(ptt, 'findLiq', None)
         try:
+            self._melts_model_code()
             if callable(find_liq_melts):
                 raw = self._run_petthermotools_isolated(
                     'findLiq_MELTS',
                     kwargs={
                         'P_bar': max(pressure_bar, 1e-6),
-                        'Model': self._resolved_python_api_model()[0],
+                        'Model': self._model,
                         'T_C_init': float(seed_T_C),
                         'comp': ptt_comp,
                         'fO2_buffer': self._redox_buffer,
@@ -2887,7 +2889,7 @@ class _MELTSBackendSupport(MeltBackend):
                     'findLiq',
                     args=(None, 0),
                     kwargs={
-                        'Model': self._resolved_python_api_model()[0],
+                        'Model': self._model,
                         'P_bar': max(pressure_bar, 1e-6),
                         'T_initial_C': float(seed_T_C),
                         'comp': ptt_comp,
@@ -4847,6 +4849,7 @@ class _MELTSBackendSupport(MeltBackend):
         comp_wt = self._normalize_composition_to_melts_basis(raw_comp_wt)
         ptt = self._require_petthermotools_runtime()
         ptt_comp = self._to_petthermotools_liq_comp(comp_wt)
+        self._melts_model_code()
         if not hasattr(ptt, 'isothermal_decompression'):
             raise AttributeError(
                 'PetThermoTools isothermal_decompression API not found'
@@ -4855,7 +4858,7 @@ class _MELTSBackendSupport(MeltBackend):
             results = self._run_petthermotools_isolated(
                 'isothermal_decompression',
                 kwargs={
-                    'Model': self._resolved_python_api_model()[0],
+                    'Model': self._model,
                     'bulk': ptt_comp,
                     'T_C': T_C,
                     'P_start_bar': P_start_bar,

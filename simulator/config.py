@@ -36,9 +36,16 @@ def resolve_alphamelts_subprocess_model(
 def resolve_alphamelts_python_api_model(
     model_name: str | None,
 ) -> tuple[str, int]:
-    """Resolve the verified PetThermoTools MELTS model and payload code."""
-    model = str(model_name if model_name is not None else "").strip()
-    model = model or DEFAULT_ALPHAMELTS_MODEL
+    """Resolve exact PetThermoTools model names to their payload codes."""
+    # The subprocess resolver accepts only the default, so stripping there
+    # cannot change the computation. This transport accepts several models;
+    # stripping here would turn a name that previously fell through to code 1
+    # into code 2/3/4 under the unchanged replay identity.
+    model = (
+        DEFAULT_ALPHAMELTS_MODEL
+        if model_name is None or model_name == ""
+        else model_name
+    )
     model_codes = {
         DEFAULT_ALPHAMELTS_MODEL: 1,
         "pMELTS": 2,
@@ -47,7 +54,7 @@ def resolve_alphamelts_python_api_model(
     }
     try:
         model_code = model_codes[model]
-    except KeyError as exc:
+    except (KeyError, TypeError) as exc:
         raise ValueError(
             f"AlphaMELTS Python API model {model!r} is not verified"
         ) from exc
