@@ -26,6 +26,7 @@ Fail-loud rules (non-exhaustive; see data/literature/extracts/SCHEMA.md):
   observation-shaped contract, but a scored observation ``type`` parked
   there is refused
 * absolute machine-local provenance_path refused
+* absolute provenance/locator path count ratchet (may only fall)
 
 Usage::
 
@@ -130,6 +131,98 @@ _ISO_DATE_RE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
 _ABS_PATH_RE = re.compile(r"^(/|[A-Za-z]:\\|\\\\)")
 # path segments: bare key or key[index_or_id]
 _PATH_SEGMENT_RE = re.compile(r"^([^.\[]+)(?:\[([^\]]*)\])?$")
+
+# Provenance / locator path value keys that must stay corpus- or
+# repository-relative (never machine-local absolute).
+PATH_VALUE_KEYS = frozenset(
+    {
+        "provenance_path",
+        "source_path",
+        "source_pdf",
+        "source_pdf_path",
+    }
+)
+
+# Ratchet on absolute PATH_VALUE_KEYS hits across data/literature/extracts.
+# The count may only fall. b-713 pin captures the live total; the fix lowers
+# the ceiling after rewriting every hit to corpus-relative.
+ABSOLUTE_PATH_COUNT_CEILING = 471
+
+
+def _walk_absolute_path_values(
+    node: Any, *, path: str = ""
+) -> list[tuple[str, str]]:
+    """Return (dotted-path, value) for absolute PATH_VALUE_KEYS hits."""
+    hits: list[tuple[str, str]] = []
+    if isinstance(node, Mapping):
+        for key, value in node.items():
+            key_s = str(key)
+            child = f"{path}.{key_s}" if path else key_s
+            if (
+                key_s in PATH_VALUE_KEYS
+                and isinstance(value, str)
+                and _ABS_PATH_RE.match(value)
+            ):
+                hits.append((child, value))
+            else:
+                hits.extend(_walk_absolute_path_values(value, path=child))
+    elif isinstance(node, (list, tuple)):
+        for i, item in enumerate(node):
+            hits.extend(_walk_absolute_path_values(item, path=f"{path}[{i}]"))
+    return hits
+
+
+# Line-oriented matcher for absolute PATH_VALUE_KEYS (block or flow style).
+# Counts extract *lines*, matching the b-713 "absolute-path lines" ledger —
+# not YAML-alias expansions (those inflate the parsed walk).
+_ABS_PATH_FIELD_LINE_RE = re.compile(
+    r"(?:provenance_path|source_path|source_pdf_path|source_pdf)\s*:\s*"
+    r"(?:/|[A-Za-z]:\\|\\\\)"
+)
+
+
+def count_absolute_paths_in_extracts(
+    paths: Iterable[Path] | None = None,
+) -> tuple[int, dict[str, int]]:
+    """Count absolute provenance/locator path *lines* under extracts/.
+
+    Returns ``(total, {filename: count})`` for files with at least one hit.
+    Counting is line-oriented so YAML anchors/aliases are not double-counted.
+    """
+    files = list(paths) if paths is not None else discover_extracts()
+    per_file: dict[str, int] = {}
+    total = 0
+    for path in files:
+        try:
+            text = path.read_text(encoding="utf-8")
+        except OSError:
+            continue
+        n = sum(1 for line in text.splitlines() if _ABS_PATH_FIELD_LINE_RE.search(line))
+        if n:
+            per_file[path.name] = n
+            total += n
+    return total, per_file
+
+
+def check_absolute_path_count_ceiling(
+    paths: Iterable[Path] | None = None,
+    *,
+    ceiling: int | None = None,
+) -> list[str]:
+    """Fail when absolute provenance/locator path count rises above the ceiling."""
+    limit = ABSOLUTE_PATH_COUNT_CEILING if ceiling is None else ceiling
+    total, per_file = count_absolute_paths_in_extracts(paths)
+    if total <= limit:
+        return []
+    top = ", ".join(
+        f"{name}:{count}"
+        for name, count in sorted(per_file.items(), key=lambda kv: (-kv[1], kv[0]))[:8]
+    )
+    return [
+        f"absolute provenance/locator path count {total} exceeds ceiling "
+        f"{limit} (count may only fall; top files: {top})"
+    ]
+
 
 
 class ExtractValidationError(Exception):
@@ -1673,6 +1766,7 @@ def validate_all(
                 check_fidelity_match=check_fidelity_match,
             )
         )
+    errors.extend(check_absolute_path_count_ceiling(files))
     return errors
 
 
