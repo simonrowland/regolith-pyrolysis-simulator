@@ -14,7 +14,7 @@ review_status: draft
 source_locators:
   sample_overview: &sample_overview
     source_path: /Users/simonrowland/Repos/regolith-corpus/raw/lpi-compendium-65701/lpi-compendium-65701.pdf
-    pdf_page_index: 0
+    pdf_page_index: 1
     section: Introduction and Petrography
   chemistry: &chemistry
     source_path: /Users/simonrowland/Repos/regolith-corpus/raw/lpi-compendium-65701/lpi-compendium-65701.pdf
@@ -89,6 +89,7 @@ species:
   regolith:
     observations:
     - observation_id: lpi_compendium_65701_sample_characterization
+      experiment: handbook-characterization
       type: rate_series
       locator: *sample_overview
       phase: lunar_soil
@@ -108,6 +109,7 @@ species:
         agglutinate_content: not reported
         collection_note: Figures 1-3 locate the sample at Station 5; the entry states that 65701 was taken from a small crater.
     - observation_id: lpi_compendium_65701_chemical_composition_table
+      experiment: handbook-characterization
       type: rate_series
       locator: *chemistry
       phase: lunar_soil
@@ -265,6 +267,7 @@ species:
         omitted_table_rows: [Mo, Ru, Rh, Pd, Ag, In, Sn, Sb, Te, W, Re, Os, Pt]
         omission_policy: blank cells omitted; no zero inferred
     - observation_id: lpi_compendium_65701_attributed_trace_and_exposure_values
+      experiment: handbook-characterization
       type: rate_series
       locator: *chemistry_narrative
       phase: lunar_soil
@@ -289,10 +292,11 @@ species:
         grain_size_distribution_source: Graf (1993), from data by Butler et al. (1973)
       note: Values are reproduced from named prior studies; they are not new measurements by Meyer (2010).
     - observation_id: lpi_compendium_65701_figure_only_characterization
+      experiment: handbook-characterization
       type: rate_series
       locator:
         source_path: /Users/simonrowland/Repos/regolith-corpus/raw/lpi-compendium-65701/lpi-compendium-65701.pdf
-        pdf_page_index: 0
+        pdf_page_index: 1
         figure: '4'
       phase: lunar_soil
       regime: figure_only_comparison

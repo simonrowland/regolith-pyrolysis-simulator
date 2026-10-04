@@ -28,7 +28,7 @@ source_locators:
     section: Initial Sample Processing
   format: &format
     source_path: /Users/simonrowland/Repos/regolith-corpus/raw/lpi-lunar-soils/lpi-lunar-soils.pdf
-    pdf_page_index: 9
+    pdf_page_index: 8
     section: Format
   soil_10002: &soil_10002
     source_path: /Users/simonrowland/Repos/regolith-corpus/raw/lpi-lunar-soils/lpi-lunar-soils.pdf
@@ -149,6 +149,7 @@ species:
   lunar_soil_samples:
     observations:
     - observation_id: lpi_1983_soil_10002_provenance_and_characterization
+      experiment: handbook-sample-characterization
       type: rate_series
       locator: *soil_10002
       phase: Apollo_11_lunar_soil_10002
@@ -170,6 +171,7 @@ species:
         trace_elements_ppm: {Sc: 60.2, V: 70, Co: 28.0, Ni: 200, Ba: 170, Sr: 160, Hf: 9.00, Ta: 1.25, Th: 1.90, U: 0.5, La: 15.8, Ce: 43, Nd: 37, Sm: 11.4, Eu: 1.60, Tb: 2.9, Dy: 17, Ho: 4.1, Tm: 1.6, Yb: 10.0, Lu: 1.39}
         note: 'Ni values are suspect of contamination from Rh-plated sieves.'
     - observation_id: lpi_1983_soil_12032_provenance_and_characterization
+      experiment: handbook-sample-characterization
       type: rate_series
       locator: *soil_12032
       phase: Apollo_12_lunar_soil_12032
@@ -188,6 +190,7 @@ species:
         major_oxide_wt_pct: {SiO2: 46.5, TiO2: 2.9, Al2O3: 15.2, Cr2O3: 0.26, FeO: 14.1, MnO: 0.2, MgO: 9.4, CaO: 10.7, Na2O: 0.59, K2O: 0.36}
         trace_elements_ppm: {Ba: 529, Ce: 117, Nd: 73.0, Sm: 20.7, Eu: 2.12, Dy: 28.0, Yb: 15.2, Lu: 2.24}
     - observation_id: lpi_1983_soil_14148_provenance_and_characterization
+      experiment: handbook-sample-characterization
       type: rate_series
       locator: *soil_14148
       phase: Apollo_14_lunar_soil_14148
@@ -209,6 +212,7 @@ species:
         major_oxide_wt_pct: {SiO2: 48.5, TiO2: 1.71, Al2O3: 17.38, FeO: 10.55, MnO: 0.13, MgO: 9.66, CaO: 10.40, Na2O: 0.71, K2O: 0.53, P2O5: 0.50, S: 0.19}
         trace_elements_ppm: {Sc: 21.0, V: 44, Co: 34.4, La: 64.3, Ce: 176, Nd: 98, Sm: 31.5, Eu: 2.68, Tb: 6.6, Hf: 25.7, Ta: 4.7, Th: 13.8, Yb: 21.7, Lu: 3.18}
     - observation_id: lpi_1983_soil_15020_provenance_and_characterization
+      experiment: handbook-sample-characterization
       type: rate_series
       locator: *soil_15020
       phase: Apollo_15_lunar_soil_15020
@@ -229,6 +233,7 @@ species:
         major_oxide_wt_pct: {SiO2: 46.56, TiO2: 1.75, Al2O3: 13.73, FeO: 15.21, MnO: 0.20, MgO: 10.37, CaO: 10.54, Na2O: 0.41, K2O: 0.20, P2O5: 0.18, S: 0.06}
         trace_elements_ppm: {Sc: 28, V: 114, Co: 40, Ba: 320, Sm: 12.9, Eu: 1.4, Tb: 2.3, Hf: 9.9, Ta: 1.2, Th: 4.9, U: 1.5, Zr: 350, La: 26, Ce: 73, Yb: 9.5, Lu: 1.3}
     - observation_id: lpi_1983_soil_60050_provenance_and_characterization
+      experiment: handbook-sample-characterization
       type: rate_series
       locator: *soil_60050
       phase: Apollo_16_lunar_soil_60050
@@ -248,6 +253,7 @@ species:
         major_oxide_wt_pct: {SiO2: 44.8, TiO2: 0.44, Al2O3: 28.5, FeO: 4.5, MnO: 0.04, MgO: 5.05, CaO: 16.2, Na2O: 0.46, K2O: 0.14}
         trace_elements_ppm: {Sc: 7.83, V: 19, Co: 21.3, Ni: 250, Ba: 108, Sr: 165, Hf: 3.89, Ta: 0.526, Th: 1.76, U: 0.46, La: 10.06, Ce: 21.0, Sm: 4.88, Eu: 1.119, Tb: 1.04, Yb: 3.42, Lu: 0.501}
     - observation_id: lpi_1983_soil_74220_provenance_and_characterization
+      experiment: handbook-sample-characterization
       type: rate_series
       locator: *soil_74220
       phase: Apollo_17_lunar_soil_74220

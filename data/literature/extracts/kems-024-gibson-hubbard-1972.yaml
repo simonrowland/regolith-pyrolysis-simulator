@@ -197,6 +197,46 @@ experiments:
     method: {state: {tag: value, value: 'Heated at 4 or 6 C/min to 950, 1050, 1200, or 1400 C; run assignments are not printed'}, locator: *procedures}
     total_duration_s: {state: {tag: unknown, reason: not_published}, locator: {<<: *procedures, note: Most runs held 2 h; one 950/1050 C set held 1-72 h; no universal duration}}
     cooling_or_quench: {state: {tag: value, value: normal cooling curve; 1400 C to room temperature required 4 h}, locator: *procedures}
+- experiment_id: '10017_1400°C 2 hr'
+  bench_id: mettler-vta
+  method: vacuum_chamber_pyrolysis
+  locator: *procedures
+- experiment_id: '10073_1400°C 2 hr'
+  bench_id: mettler-vta
+  method: vacuum_chamber_pyrolysis
+  locator: *procedures
+- experiment_id: '12022_950°C 2 hr'
+  bench_id: mettler-vta
+  method: vacuum_chamber_pyrolysis
+  locator: *procedures
+- experiment_id: '12022_1050°C 2 hr'
+  bench_id: mettler-vta
+  method: vacuum_chamber_pyrolysis
+  locator: *procedures
+- experiment_id: '12022_1200°C 2 hr'
+  bench_id: mettler-vta
+  method: vacuum_chamber_pyrolysis
+  locator: *procedures
+- experiment_id: '12022_1400°C 2 hr'
+  bench_id: mettler-vta
+  method: vacuum_chamber_pyrolysis
+  locator: *procedures
+- experiment_id: '14163_1050°C instantaneous'
+  bench_id: mettler-vta
+  method: vacuum_chamber_pyrolysis
+  locator: *procedures
+- experiment_id: '14163_1050°C 1 hr'
+  bench_id: mettler-vta
+  method: vacuum_chamber_pyrolysis
+  locator: *procedures
+- experiment_id: '14163_1050°C 6 hr'
+  bench_id: mettler-vta
+  method: vacuum_chamber_pyrolysis
+  locator: *procedures
+- experiment_id: '14163_1050°C 72 hr'
+  bench_id: mettler-vta
+  method: vacuum_chamber_pyrolysis
+  locator: *procedures
 species:
   K:
     observations:
@@ -218,6 +258,7 @@ species:
         abundance_ppm: "2610"
         condition_as_printed: "Initial"
     - observation_id: gibson_hubbard_1972_k_10017_1
+      experiment: '10017_1400°C 2 hr'
       type: rate_series
       class_tag: measured
       locator: {<<: *table2, paragraph: "K row; 10017 1400°C 2 hr column"}
@@ -255,6 +296,7 @@ species:
         abundance_ppm: "1200"
         condition_as_printed: "Initial"
     - observation_id: gibson_hubbard_1972_k_10073_3
+      experiment: '10073_1400°C 2 hr'
       type: rate_series
       class_tag: measured
       locator: {<<: *table2, paragraph: "K row; 10073 1400°C 2 hr column"}
@@ -292,6 +334,7 @@ species:
         abundance_ppm: "536"
         condition_as_printed: "Initial"
     - observation_id: gibson_hubbard_1972_k_12022_5
+      experiment: '12022_950°C 2 hr'
       type: rate_series
       class_tag: measured
       locator: {<<: *table2, paragraph: "K row; 12022 950°C 2 hr column"}
@@ -312,6 +355,7 @@ species:
         T_C: 950
         hold_time_hr: 2
     - observation_id: gibson_hubbard_1972_k_12022_6
+      experiment: '12022_1050°C 2 hr'
       type: rate_series
       class_tag: measured
       locator: {<<: *table2, paragraph: "K row; 12022 1050°C 2 hr column"}
@@ -332,6 +376,7 @@ species:
         T_C: 1050
         hold_time_hr: 2
     - observation_id: gibson_hubbard_1972_k_12022_7
+      experiment: '12022_1200°C 2 hr'
       type: rate_series
       class_tag: measured
       locator: {<<: *table2, paragraph: "K row; 12022 1200°C 2 hr column"}
@@ -352,6 +397,7 @@ species:
         T_C: 1200
         hold_time_hr: 2
     - observation_id: gibson_hubbard_1972_k_12022_8
+      experiment: '12022_1400°C 2 hr'
       type: rate_series
       class_tag: measured
       locator: {<<: *table2, paragraph: "K row; 12022 1400°C 2 hr column"}
@@ -390,6 +436,7 @@ species:
         condition_as_printed: "Initial†"
         attribution: "Hubbard et al. (1972), separate aliquot, Table 2 dagger footnote"
     - observation_id: gibson_hubbard_1972_k_14163_10
+      experiment: '14163_1050°C instantaneous'
       type: rate_series
       class_tag: measured
       locator: {<<: *table2, paragraph: "K row; 14163 1050°C instantaneous column"}
@@ -409,6 +456,7 @@ species:
         condition_as_printed: "1050°C instantaneous"
         T_C: 1050
     - observation_id: gibson_hubbard_1972_k_14163_11
+      experiment: '14163_1050°C 1 hr'
       type: rate_series
       class_tag: measured
       locator: {<<: *table2, paragraph: "K row; 14163 1050°C 1 hr column"}
@@ -429,6 +477,7 @@ species:
         T_C: 1050
         hold_time_hr: 1
     - observation_id: gibson_hubbard_1972_k_14163_12
+      experiment: '14163_1050°C 6 hr'
       type: rate_series
       class_tag: measured
       locator: {<<: *table2, paragraph: "K row; 14163 1050°C 6 hr column"}
@@ -449,6 +498,7 @@ species:
         T_C: 1050
         hold_time_hr: 6
     - observation_id: gibson_hubbard_1972_k_14163_13
+      experiment: '14163_1050°C 72 hr'
       type: rate_series
       class_tag: measured
       locator: {<<: *table2, paragraph: "K row; 14163 1050°C 72 hr column"}
@@ -487,6 +537,7 @@ species:
         condition_as_printed: "Initial"
         evidence_note: Printed ratio of measured abundances; not recalculated here, not an ion intensity ratio.
     - observation_id: gibson_hubbard_1972_k_rb_10017_1
+      experiment: '10017_1400°C 2 hr'
       type: rate_series
       class_tag: measured
       locator: {<<: *table2, paragraph: "K/Rb row; 10017 1400°C 2 hr column"}
@@ -526,6 +577,7 @@ species:
         condition_as_printed: "Initial"
         evidence_note: Printed ratio of measured abundances; not recalculated here, not an ion intensity ratio.
     - observation_id: gibson_hubbard_1972_k_rb_10073_3
+      experiment: '10073_1400°C 2 hr'
       type: rate_series
       class_tag: measured
       locator: {<<: *table2, paragraph: "K/Rb row; 10073 1400°C 2 hr column"}
@@ -565,6 +617,7 @@ species:
         condition_as_printed: "Initial"
         evidence_note: Printed ratio of measured abundances; not recalculated here, not an ion intensity ratio.
     - observation_id: gibson_hubbard_1972_k_rb_12022_5
+      experiment: '12022_950°C 2 hr'
       type: rate_series
       class_tag: measured
       locator: {<<: *table2, paragraph: "K/Rb row; 12022 950°C 2 hr column"}
@@ -586,6 +639,7 @@ species:
         hold_time_hr: 2
         evidence_note: Printed ratio of measured abundances; not recalculated here, not an ion intensity ratio.
     - observation_id: gibson_hubbard_1972_k_rb_12022_6
+      experiment: '12022_1050°C 2 hr'
       type: rate_series
       class_tag: measured
       locator: {<<: *table2, paragraph: "K/Rb row; 12022 1050°C 2 hr column"}
@@ -607,6 +661,7 @@ species:
         hold_time_hr: 2
         evidence_note: Printed ratio of measured abundances; not recalculated here, not an ion intensity ratio.
     - observation_id: gibson_hubbard_1972_k_rb_12022_7
+      experiment: '12022_1200°C 2 hr'
       type: rate_series
       class_tag: measured
       locator: {<<: *table2, paragraph: "K/Rb row; 12022 1200°C 2 hr column"}
@@ -628,6 +683,7 @@ species:
         hold_time_hr: 2
         evidence_note: Printed ratio of measured abundances; not recalculated here, not an ion intensity ratio.
     - observation_id: gibson_hubbard_1972_k_rb_12022_8
+      experiment: '12022_1400°C 2 hr'
       type: rate_series
       class_tag: measured
       locator: {<<: *table2, paragraph: "K/Rb row; 12022 1400°C 2 hr column"}
@@ -668,6 +724,7 @@ species:
         attribution: "Hubbard et al. (1972), separate aliquot, Table 2 dagger footnote"
         evidence_note: Printed ratio of measured abundances; not recalculated here, not an ion intensity ratio.
     - observation_id: gibson_hubbard_1972_k_rb_14163_10
+      experiment: '14163_1050°C instantaneous'
       type: rate_series
       class_tag: measured
       locator: {<<: *table2, paragraph: "K/Rb row; 14163 1050°C instantaneous column"}
@@ -688,6 +745,7 @@ species:
         T_C: 1050
         evidence_note: Printed ratio of measured abundances; not recalculated here, not an ion intensity ratio.
     - observation_id: gibson_hubbard_1972_k_rb_14163_11
+      experiment: '14163_1050°C 1 hr'
       type: rate_series
       class_tag: measured
       locator: {<<: *table2, paragraph: "K/Rb row; 14163 1050°C 1 hr column"}
@@ -709,6 +767,7 @@ species:
         hold_time_hr: 1
         evidence_note: Printed ratio of measured abundances; not recalculated here, not an ion intensity ratio.
     - observation_id: gibson_hubbard_1972_k_rb_14163_12
+      experiment: '14163_1050°C 6 hr'
       type: rate_series
       class_tag: measured
       locator: {<<: *table2, paragraph: "K/Rb row; 14163 1050°C 6 hr column"}
@@ -730,6 +789,7 @@ species:
         hold_time_hr: 6
         evidence_note: Printed ratio of measured abundances; not recalculated here, not an ion intensity ratio.
     - observation_id: gibson_hubbard_1972_k_rb_14163_13
+      experiment: '14163_1050°C 72 hr'
       type: rate_series
       class_tag: measured
       locator: {<<: *table2, paragraph: "K/Rb row; 14163 1050°C 72 hr column"}
@@ -769,6 +829,7 @@ species:
         condition_as_printed: "Initial"
         evidence_note: Printed ratio of measured abundances; not recalculated here, not an ion intensity ratio.
     - observation_id: gibson_hubbard_1972_k_ba_12022_5
+      experiment: '12022_950°C 2 hr'
       type: rate_series
       class_tag: measured
       locator: {<<: *table2, paragraph: "K/Ba row; 12022 950°C 2 hr column"}
@@ -790,6 +851,7 @@ species:
         hold_time_hr: 2
         evidence_note: Printed ratio of measured abundances; not recalculated here, not an ion intensity ratio.
     - observation_id: gibson_hubbard_1972_k_ba_12022_6
+      experiment: '12022_1050°C 2 hr'
       type: rate_series
       class_tag: measured
       locator: {<<: *table2, paragraph: "K/Ba row; 12022 1050°C 2 hr column"}
@@ -811,6 +873,7 @@ species:
         hold_time_hr: 2
         evidence_note: Printed ratio of measured abundances; not recalculated here, not an ion intensity ratio.
     - observation_id: gibson_hubbard_1972_k_ba_12022_7
+      experiment: '12022_1200°C 2 hr'
       type: rate_series
       class_tag: measured
       locator: {<<: *table2, paragraph: "K/Ba row; 12022 1200°C 2 hr column"}
@@ -832,6 +895,7 @@ species:
         hold_time_hr: 2
         evidence_note: Printed ratio of measured abundances; not recalculated here, not an ion intensity ratio.
     - observation_id: gibson_hubbard_1972_k_ba_12022_8
+      experiment: '12022_1400°C 2 hr'
       type: rate_series
       class_tag: measured
       locator: {<<: *table2, paragraph: "K/Ba row; 12022 1400°C 2 hr column"}
@@ -872,6 +936,7 @@ species:
         attribution: "Hubbard et al. (1972), separate aliquot, Table 2 dagger footnote"
         evidence_note: Printed ratio of measured abundances; not recalculated here, not an ion intensity ratio.
     - observation_id: gibson_hubbard_1972_k_ba_14163_10
+      experiment: '14163_1050°C instantaneous'
       type: rate_series
       class_tag: measured
       locator: {<<: *table2, paragraph: "K/Ba row; 14163 1050°C instantaneous column"}
@@ -893,6 +958,7 @@ species:
         semantics: approximate_as_printed_not_exact_point
         evidence_note: Printed ratio of measured abundances; not recalculated here, not an ion intensity ratio.
     - observation_id: gibson_hubbard_1972_k_ba_14163_11
+      experiment: '14163_1050°C 1 hr'
       type: rate_series
       class_tag: measured
       locator: {<<: *table2, paragraph: "K/Ba row; 14163 1050°C 1 hr column"}
@@ -914,6 +980,7 @@ species:
         hold_time_hr: 1
         evidence_note: Printed ratio of measured abundances; not recalculated here, not an ion intensity ratio.
     - observation_id: gibson_hubbard_1972_k_ba_14163_12
+      experiment: '14163_1050°C 6 hr'
       type: rate_series
       class_tag: measured
       locator: {<<: *table2, paragraph: "K/Ba row; 14163 1050°C 6 hr column"}
@@ -935,6 +1002,7 @@ species:
         hold_time_hr: 6
         evidence_note: Printed ratio of measured abundances; not recalculated here, not an ion intensity ratio.
     - observation_id: gibson_hubbard_1972_k_ba_14163_13
+      experiment: '14163_1050°C 72 hr'
       type: rate_series
       class_tag: measured
       locator: {<<: *table2, paragraph: "K/Ba row; 14163 1050°C 72 hr column"}
@@ -956,6 +1024,7 @@ species:
         hold_time_hr: 72
         evidence_note: Printed ratio of measured abundances; not recalculated here, not an ion intensity ratio.
     - observation_id: gibson_hubbard_1972_k_volatilization_statement
+      experiment: lunar-volatilization-series
       type: rate_series
       class_tag: measured
       locator: *results
@@ -990,6 +1059,7 @@ species:
         abundance_ppm: "5.63"
         condition_as_printed: "Initial"
     - observation_id: gibson_hubbard_1972_rb_10017_1
+      experiment: '10017_1400°C 2 hr'
       type: rate_series
       class_tag: measured
       locator: {<<: *table2, paragraph: "Rb row; 10017 1400°C 2 hr column"}
@@ -1027,6 +1097,7 @@ species:
         abundance_ppm: "2.84"
         condition_as_printed: "Initial"
     - observation_id: gibson_hubbard_1972_rb_10073_3
+      experiment: '10073_1400°C 2 hr'
       type: rate_series
       class_tag: measured
       locator: {<<: *table2, paragraph: "Rb row; 10073 1400°C 2 hr column"}
@@ -1064,6 +1135,7 @@ species:
         abundance_ppm: "0.738"
         condition_as_printed: "Initial"
     - observation_id: gibson_hubbard_1972_rb_12022_5
+      experiment: '12022_950°C 2 hr'
       type: rate_series
       class_tag: measured
       locator: {<<: *table2, paragraph: "Rb row; 12022 950°C 2 hr column"}
@@ -1084,6 +1156,7 @@ species:
         T_C: 950
         hold_time_hr: 2
     - observation_id: gibson_hubbard_1972_rb_12022_6
+      experiment: '12022_1050°C 2 hr'
       type: rate_series
       class_tag: measured
       locator: {<<: *table2, paragraph: "Rb row; 12022 1050°C 2 hr column"}
@@ -1104,6 +1177,7 @@ species:
         T_C: 1050
         hold_time_hr: 2
     - observation_id: gibson_hubbard_1972_rb_12022_7
+      experiment: '12022_1200°C 2 hr'
       type: rate_series
       class_tag: measured
       locator: {<<: *table2, paragraph: "Rb row; 12022 1200°C 2 hr column"}
@@ -1124,6 +1198,7 @@ species:
         T_C: 1200
         hold_time_hr: 2
     - observation_id: gibson_hubbard_1972_rb_12022_8
+      experiment: '12022_1400°C 2 hr'
       type: rate_series
       class_tag: measured
       locator: {<<: *table2, paragraph: "Rb row; 12022 1400°C 2 hr column"}
@@ -1162,6 +1237,7 @@ species:
         condition_as_printed: "Initial†"
         attribution: "Hubbard et al. (1972), separate aliquot, Table 2 dagger footnote"
     - observation_id: gibson_hubbard_1972_rb_14163_10
+      experiment: '14163_1050°C instantaneous'
       type: rate_series
       class_tag: measured
       locator: {<<: *table2, paragraph: "Rb row; 14163 1050°C instantaneous column"}
@@ -1181,6 +1257,7 @@ species:
         condition_as_printed: "1050°C instantaneous"
         T_C: 1050
     - observation_id: gibson_hubbard_1972_rb_14163_11
+      experiment: '14163_1050°C 1 hr'
       type: rate_series
       class_tag: measured
       locator: {<<: *table2, paragraph: "Rb row; 14163 1050°C 1 hr column"}
@@ -1201,6 +1278,7 @@ species:
         T_C: 1050
         hold_time_hr: 1
     - observation_id: gibson_hubbard_1972_rb_14163_12
+      experiment: '14163_1050°C 6 hr'
       type: rate_series
       class_tag: measured
       locator: {<<: *table2, paragraph: "Rb row; 14163 1050°C 6 hr column"}
@@ -1221,6 +1299,7 @@ species:
         T_C: 1050
         hold_time_hr: 6
     - observation_id: gibson_hubbard_1972_rb_14163_13
+      experiment: '14163_1050°C 72 hr'
       type: rate_series
       class_tag: measured
       locator: {<<: *table2, paragraph: "Rb row; 14163 1050°C 72 hr column"}
@@ -1241,6 +1320,7 @@ species:
         T_C: 1050
         hold_time_hr: 72
     - observation_id: gibson_hubbard_1972_rb_volatilization_statement
+      experiment: lunar-volatilization-series
       type: rate_series
       class_tag: measured
       locator: *results
@@ -1277,6 +1357,7 @@ species:
         abundance_ppm: "3800"
         condition_as_printed: "Initial"
     - observation_id: gibson_hubbard_1972_na_10017_1
+      experiment: '10017_1400°C 2 hr'
       type: rate_series
       class_tag: measured
       locator: {<<: *table2, paragraph: "Na row; 10017 1400°C 2 hr column"}
@@ -1331,6 +1412,7 @@ species:
         abundance_ppm: "1824"
         condition_as_printed: "Initial"
     - observation_id: gibson_hubbard_1972_na_12022_5
+      experiment: '12022_950°C 2 hr'
       type: rate_series
       class_tag: measured
       locator: {<<: *table2, paragraph: "Na row; 12022 950°C 2 hr column"}
@@ -1351,6 +1433,7 @@ species:
         T_C: 950
         hold_time_hr: 2
     - observation_id: gibson_hubbard_1972_na_12022_6
+      experiment: '12022_1050°C 2 hr'
       type: rate_series
       class_tag: measured
       locator: {<<: *table2, paragraph: "Na row; 12022 1050°C 2 hr column"}
@@ -1371,6 +1454,7 @@ species:
         T_C: 1050
         hold_time_hr: 2
     - observation_id: gibson_hubbard_1972_na_12022_7
+      experiment: '12022_1200°C 2 hr'
       type: rate_series
       class_tag: measured
       locator: {<<: *table2, paragraph: "Na row; 12022 1200°C 2 hr column"}
@@ -1391,6 +1475,7 @@ species:
         T_C: 1200
         hold_time_hr: 2
     - observation_id: gibson_hubbard_1972_na_12022_8
+      experiment: '12022_1400°C 2 hr'
       type: rate_series
       class_tag: measured
       locator: {<<: *table2, paragraph: "Na row; 12022 1400°C 2 hr column"}
@@ -1429,6 +1514,7 @@ species:
         condition_as_printed: "Initial†"
         attribution: "Hubbard et al. (1972), separate aliquot, Table 2 dagger footnote"
     - observation_id: gibson_hubbard_1972_na_14163_10
+      experiment: '14163_1050°C instantaneous'
       type: rate_series
       class_tag: measured
       locator: {<<: *table2, paragraph: "Na row; 14163 1050°C instantaneous column"}
@@ -1448,6 +1534,7 @@ species:
         condition_as_printed: "1050°C instantaneous"
         T_C: 1050
     - observation_id: gibson_hubbard_1972_na_14163_11
+      experiment: '14163_1050°C 1 hr'
       type: rate_series
       class_tag: measured
       locator: {<<: *table2, paragraph: "Na row; 14163 1050°C 1 hr column"}
@@ -1468,6 +1555,7 @@ species:
         T_C: 1050
         hold_time_hr: 1
     - observation_id: gibson_hubbard_1972_na_14163_12
+      experiment: '14163_1050°C 6 hr'
       type: rate_series
       class_tag: measured
       locator: {<<: *table2, paragraph: "Na row; 14163 1050°C 6 hr column"}
@@ -1488,6 +1576,7 @@ species:
         T_C: 1050
         hold_time_hr: 6
     - observation_id: gibson_hubbard_1972_na_14163_13
+      experiment: '14163_1050°C 72 hr'
       type: rate_series
       class_tag: measured
       locator: {<<: *table2, paragraph: "Na row; 14163 1050°C 72 hr column"}
@@ -1508,6 +1597,7 @@ species:
         T_C: 1050
         hold_time_hr: 72
     - observation_id: gibson_hubbard_1972_na_volatilization_statement
+      experiment: lunar-volatilization-series
       type: rate_series
       class_tag: measured
       locator: *abstract
@@ -1542,6 +1632,7 @@ species:
         abundance_ppm: "59.5"
         condition_as_printed: "Initial"
     - observation_id: gibson_hubbard_1972_ba_12022_8
+      experiment: '12022_1400°C 2 hr'
       type: rate_series
       class_tag: measured
       locator: {<<: *table2, paragraph: "Ba row; 12022 1400°C 2 hr column"}
@@ -1580,6 +1671,7 @@ species:
         condition_as_printed: "Initial†"
         attribution: "Hubbard et al. (1972), separate aliquot, Table 2 dagger footnote"
     - observation_id: gibson_hubbard_1972_ba_14163_11
+      experiment: '14163_1050°C 1 hr'
       type: rate_series
       class_tag: measured
       locator: {<<: *table2, paragraph: "Ba row; 14163 1050°C 1 hr column"}
@@ -1600,6 +1692,7 @@ species:
         T_C: 1050
         hold_time_hr: 1
     - observation_id: gibson_hubbard_1972_ba_14163_12
+      experiment: '14163_1050°C 6 hr'
       type: rate_series
       class_tag: measured
       locator: {<<: *table2, paragraph: "Ba row; 14163 1050°C 6 hr column"}
@@ -1620,6 +1713,7 @@ species:
         T_C: 1050
         hold_time_hr: 6
     - observation_id: gibson_hubbard_1972_ba_14163_13
+      experiment: '14163_1050°C 72 hr'
       type: rate_series
       class_tag: measured
       locator: {<<: *table2, paragraph: "Ba row; 14163 1050°C 72 hr column"}
@@ -1640,6 +1734,7 @@ species:
         T_C: 1050
         hold_time_hr: 72
     - observation_id: gibson_hubbard_1972_ba_volatilization_statement
+      experiment: lunar-volatilization-series
       type: rate_series
       class_tag: measured
       locator: *abstract
@@ -1675,6 +1770,7 @@ species:
         condition_as_printed: "Initial"
         attribution: "Tera et al. (1970), Table 2 asterisk footnote"
     - observation_id: gibson_hubbard_1972_li_10017_1
+      experiment: '10017_1400°C 2 hr'
       type: rate_series
       class_tag: measured
       locator: {<<: *table2, paragraph: "Li row; 10017 1400°C 2 hr column"}
@@ -1712,6 +1808,7 @@ species:
         abundance_ppm: "9.5"
         condition_as_printed: "Initial"
     - observation_id: gibson_hubbard_1972_li_12022_6
+      experiment: '12022_1050°C 2 hr'
       type: rate_series
       class_tag: measured
       locator: {<<: *table2, paragraph: "Li row; 12022 1050°C 2 hr column"}
@@ -1732,6 +1829,7 @@ species:
         T_C: 1050
         hold_time_hr: 2
     - observation_id: gibson_hubbard_1972_li_12022_7
+      experiment: '12022_1200°C 2 hr'
       type: rate_series
       class_tag: measured
       locator: {<<: *table2, paragraph: "Li row; 12022 1200°C 2 hr column"}
@@ -1752,6 +1850,7 @@ species:
         T_C: 1200
         hold_time_hr: 2
     - observation_id: gibson_hubbard_1972_li_12022_8
+      experiment: '12022_1400°C 2 hr'
       type: rate_series
       class_tag: measured
       locator: {<<: *table2, paragraph: "Li row; 12022 1400°C 2 hr column"}
@@ -1772,6 +1871,7 @@ species:
         T_C: 1400
         hold_time_hr: 2
     - observation_id: gibson_hubbard_1972_li_volatilization_statement
+      experiment: lunar-volatilization-series
       type: rate_series
       class_tag: measured
       locator: *abstract
@@ -1840,6 +1940,7 @@ species:
         abundance_ppm: "17.4"
         condition_as_printed: "Initial"
     - observation_id: gibson_hubbard_1972_ce_12022_8
+      experiment: '12022_1400°C 2 hr'
       type: rate_series
       class_tag: measured
       locator: {<<: *table2, paragraph: "Ce row; 12022 1400°C 2 hr column"}
@@ -1860,6 +1961,7 @@ species:
         T_C: 1400
         hold_time_hr: 2
     - observation_id: gibson_hubbard_1972_ce_volatilization_statement
+      experiment: lunar-volatilization-series
       type: rate_series
       class_tag: measured
       locator: *abstract
@@ -1929,6 +2031,7 @@ species:
         abundance_ppm: "14.8"
         condition_as_printed: "Initial"
     - observation_id: gibson_hubbard_1972_nd_12022_8
+      experiment: '12022_1400°C 2 hr'
       type: rate_series
       class_tag: measured
       locator: {<<: *table2, paragraph: "Nd row; 12022 1400°C 2 hr column"}
@@ -1949,6 +2052,7 @@ species:
         T_C: 1400
         hold_time_hr: 2
     - observation_id: gibson_hubbard_1972_nd_volatilization_statement
+      experiment: lunar-volatilization-series
       type: rate_series
       class_tag: measured
       locator: *abstract
@@ -2018,6 +2122,7 @@ species:
         abundance_ppm: "5.58"
         condition_as_printed: "Initial"
     - observation_id: gibson_hubbard_1972_sm_12022_8
+      experiment: '12022_1400°C 2 hr'
       type: rate_series
       class_tag: measured
       locator: {<<: *table2, paragraph: "Sm row; 12022 1400°C 2 hr column"}
@@ -2038,6 +2143,7 @@ species:
         T_C: 1400
         hold_time_hr: 2
     - observation_id: gibson_hubbard_1972_sm_volatilization_statement
+      experiment: lunar-volatilization-series
       type: rate_series
       class_tag: measured
       locator: *abstract
@@ -2107,6 +2213,7 @@ species:
         abundance_ppm: "1.28"
         condition_as_printed: "Initial"
     - observation_id: gibson_hubbard_1972_eu_12022_8
+      experiment: '12022_1400°C 2 hr'
       type: rate_series
       class_tag: measured
       locator: {<<: *table2, paragraph: "Eu row; 12022 1400°C 2 hr column"}
@@ -2127,6 +2234,7 @@ species:
         T_C: 1400
         hold_time_hr: 2
     - observation_id: gibson_hubbard_1972_eu_volatilization_statement
+      experiment: lunar-volatilization-series
       type: rate_series
       class_tag: measured
       locator: *abstract
@@ -2196,6 +2304,7 @@ species:
         abundance_ppm: "7.90"
         condition_as_printed: "Initial"
     - observation_id: gibson_hubbard_1972_gd_12022_8
+      experiment: '12022_1400°C 2 hr'
       type: rate_series
       class_tag: measured
       locator: {<<: *table2, paragraph: "Gd row; 12022 1400°C 2 hr column"}
@@ -2216,6 +2325,7 @@ species:
         T_C: 1400
         hold_time_hr: 2
     - observation_id: gibson_hubbard_1972_gd_volatilization_statement
+      experiment: lunar-volatilization-series
       type: rate_series
       class_tag: measured
       locator: *abstract
@@ -2234,6 +2344,7 @@ species:
   Sr:
     observations:
     - observation_id: gibson_hubbard_1972_sr_volatilization_statement
+      experiment: lunar-volatilization-series
       type: rate_series
       class_tag: measured
       locator: *abstract
