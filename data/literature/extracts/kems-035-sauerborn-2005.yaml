@@ -295,8 +295,10 @@ experiments:
   locator: {page: 105, table: '5.3', note: 'JSC-1 MS1/MS2/MS4/MS5 series; table preserves run-specific mass, peak temperature, and high-temperature duration'}
   sample:
     printed_composition:
-      state: {tag: value, value: NASA JSC-1 basaltic lunar soil simulant}
-      locator: {page: 17, section: '2.1.2 Mondstaub-Simulat JSC-1'}
+      state:
+        tag: value
+        value: {SiO2: 47.7, Al2O3: 15.0, CaO: 10.4, MgO: 9.0, FeO: 7.4, Fe2O3: 3.4, K2O: 0.8, TiO2: 1.6, Na2O: 2.7}
+      locator: {page: 17, figure: '2.2', section: '2.1.2 Mondstaub-Simulat JSC-1', note: 'JSC-1 oxide pie labels after McKay et al. 1994 [MKCa 94]; NASA JSC-1 basaltic lunar soil simulant'}
     initial_composition:
       state:
         tag: value
@@ -462,6 +464,7 @@ species:
       uncertainty:
         note: not applicable
     - observation_id: sauerborn_2005_fig22_jsc1_oxide_pie
+      experiment: jsc1-solar-series
       type: gibbs_table
       locator:
         figure: '2.2'
@@ -1783,6 +1786,7 @@ species:
         T_K = T_C + 273.15 and pressure_Pa = pressure_mbar * 100. T_range_K endpoints refer to the quoted run-temperature
         cells, not independent measurements.
     - observation_id: sauerborn_2005_fig22_jsc1_oxide_pie_deep2
+      experiment: jsc1-solar-series
       type: gibbs_table
       locator:
         figure: '2.2'
@@ -3765,6 +3769,26 @@ species:
           \ nicht verändert hat.\n\n                                                                          \
           \                        89"
         method: pdftotext -layout; whitespace retained; superscripts follow PDF text order
+    context:
+    - observation_id: sauerborn_2005_fig22_apollo14_nr_14163_oxide_pie
+      type: analytical_composition
+      locator: {figure: '2.2', page: 17, paragraph: 'Kapitel 2.1.2', note: 'Apollo 14 Nr. 14163 comparison pie; not experimental JSC-1 feedstock'}
+      phase: Apollo_14_Nr_14163_lunar_soil
+      regime: secondary_compilation_comparison
+      units: wt_percent
+      values:
+        quantity: apollo14_nr_14163_oxide_pie_labels
+        method_class: secondary_compilation
+        semantics: verbatim_comparison_context_not_engine_input
+        citation_as_published: MKCa 94
+        identity_as_published: Apollo 14 Nr. 14163
+        basis: wt_percent
+        printed_total: '99.5'
+        oxides_wt_pct_as_published: {SiO2: '47.3', Al2O3: '17.8', CaO: '11.4', MgO: '9.6', FeO: '10.5', Fe2O3: '0.0', K2O: '0.6', TiO2: '1.6', Na2O: '0.7'}
+        printed_quote: 'Mondstaub | Mare-Regolith | (Apollo14: Nr. 14163) | Analyse der Oxide: SiO₂ 47.3; Al₂O₃ 17.8; CaO 11.4; MgO 9.6; FeO 10.5; Fe₂O₃ 0; K₂O 0.6; TiO₂ 1.6; Na₂O 0.7'
+      uncertainty:
+        note: no uncertainty printed on the pie labels; sum of printed pie components is 99.5
+
   Fe:
     observations:
     - observation_id: sauerborn_2005_table56_ms5c_epma

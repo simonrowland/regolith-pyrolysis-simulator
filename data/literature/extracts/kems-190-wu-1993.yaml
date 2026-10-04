@@ -405,11 +405,79 @@ species:
           fidelity_temperature_C: 1310
           temperature_C_as_published: 1310
           composition_wt_pct: {MgO: 10.5, FeO: 45, SiO2: 44.5}
-          olivine_Fe2SiO4_wt_pct_as_published: 61
+          olivine_Fe2SiO4_wt_pct_as_published: '61'
           pyroxene_FeSiO3_wt_pct_as_published: 50
           printed_quote: 'The ternary peritectic point was calculated at 1310°C at a liquid composition of 10.5 wt% MgO, 45 wt% FeO and 44.5 wt% SiO2 ... calculated olivine composition ... 61 wt% Fe2SiO4 ... calculated pyroxene composition ... 50 wt% FeSiO3.'
         uncertainty:
           note: No numeric uncertainty is printed for the calculated invariant or compositions.
+    context:
+    - observation_id: wu_1993_reported_peritectic_olivine_endmembers
+      type: analytical_composition
+      locator: {published_page: 33, paragraph: 'The MgO-FeO-SiO2 System', note: 'Reported olivine endmember wt% at the ternary peritectic from reference 16; not the liquid composition'}
+      phase: olivine_in_equilibrium_with_peritectic_liquid
+      regime: reported_quench_experiment_from_Bowen_and_Schairer_1935
+      units: wt_percent
+      values:
+        quantity: olivine_endmember_wt_pct
+        method_class: measured_direct
+        semantics: verbatim_phase_context_not_engine_input
+        associated_observation_id: wu_1993_reported_ternary_peritectic
+        role: reported_peritectic_olivine
+        oxides_wt_pct_as_published: {Fe2SiO4: '68', Mg2SiO4: '32'}
+        printed_quote: 'olivine containing 68 wt% Fe2SiO4 and 32 wt% Mg2SiO4'
+      uncertainty:
+        note: No numeric uncertainty is printed for the reported olivine endmember amounts.
+    - observation_id: wu_1993_reported_peritectic_pyroxene_endmembers
+      type: analytical_composition
+      locator: {published_page: 33, paragraph: 'The MgO-FeO-SiO2 System', note: 'Reported pyroxene endmember wt% at the ternary peritectic from reference 16; not the liquid composition'}
+      phase: pyroxene_in_equilibrium_with_peritectic_liquid
+      regime: reported_quench_experiment_from_Bowen_and_Schairer_1935
+      units: wt_percent
+      values:
+        quantity: pyroxene_endmember_wt_pct
+        method_class: measured_direct
+        semantics: verbatim_phase_context_not_engine_input
+        associated_observation_id: wu_1993_reported_ternary_peritectic
+        role: reported_peritectic_pyroxene
+        oxides_wt_pct_as_published: {FeSiO3: '62', MgSiO3: '38'}
+        printed_quote: 'pyroxene containing 62 wt% FeSiO3 and 38 wt% MgSiO3'
+      uncertainty:
+        note: No numeric uncertainty is printed for the reported pyroxene endmember amounts.
+    - observation_id: wu_1993_calculated_peritectic_olivine_endmembers
+      type: analytical_composition
+      locator: {published_page: 34, paragraph: 'For the liquid phase', note: 'Calculated olivine endmember statement at the model ternary peritectic; not the liquid composition'}
+      phase: olivine_in_equilibrium_with_peritectic_liquid
+      regime: modified_quasichemical_model_asymmetric_combining_rule
+      units: wt_percent
+      values:
+        quantity: olivine_endmember_wt_pct
+        method_class: model_derived
+        admission_status: model_output_not_measurement
+        semantics: verbatim_phase_context_not_engine_input
+        associated_observation_id: wu_1993_calculated_ternary_peritectic
+        role: calculated_peritectic_olivine
+        Fe2SiO4_wt_pct_as_published: '61'
+        printed_quote: 'calculated olivine composition ... 61 wt% Fe2SiO4'
+      uncertainty:
+        note: No numeric uncertainty is printed for the calculated olivine endmember amount.
+    - observation_id: wu_1993_calculated_peritectic_pyroxene_endmembers
+      type: analytical_composition
+      locator: {published_page: 34, paragraph: 'For the liquid phase', note: 'Calculated pyroxene endmember statement at the model ternary peritectic; not the liquid composition'}
+      phase: pyroxene_in_equilibrium_with_peritectic_liquid
+      regime: modified_quasichemical_model_asymmetric_combining_rule
+      units: wt_percent
+      values:
+        quantity: pyroxene_endmember_wt_pct
+        method_class: model_derived
+        admission_status: model_output_not_measurement
+        semantics: verbatim_phase_context_not_engine_input
+        associated_observation_id: wu_1993_calculated_ternary_peritectic
+        role: calculated_peritectic_pyroxene
+        FeSiO3_wt_pct_as_published: '50'
+        printed_quote: 'calculated pyroxene composition ... 50 wt% FeSiO3'
+      uncertainty:
+        note: No numeric uncertainty is printed for the calculated pyroxene endmember amount.
+
   SiO2:
     observations:
       - observation_id: wu_1993_table1_sio2_compiled_thermochemistry
