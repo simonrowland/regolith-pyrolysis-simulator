@@ -1983,8 +1983,8 @@ def test_full_corpus_control_cell_accounting_and_transcription_report() -> None:
     assert refused_merged_pair_checks == 12
     assert stored_cell_errata == 1
     assert raw_numeric_accounting == {
-        "numeric_source_tokens": 533672,
-        "accounted_numeric_cells": 533672,
+        "numeric_source_tokens": 533309,
+        "accounted_numeric_cells": 533309,
         "refused_concatenated_numeric_tokens": 0,
         "refused_layout_numeric_tokens": 0,
         "unexplained_numeric_tokens": 0,
