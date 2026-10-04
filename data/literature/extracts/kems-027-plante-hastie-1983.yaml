@@ -428,6 +428,22 @@ experiments:
     total_duration_s:
       state: {tag: unknown, reason: not_published}
       locator: {published_page: 29, section: '3.5', note: 'Higher temperatures than KMS stated, but no single duration printed'}
+- experiment_id: plante-1983-model-assay
+  method:
+    tag: unknown
+    reason: >-
+      Table 1 composition assay and thermodynamic/off-gas model records are
+      not measurements in the Pt KMS/TMS apparatus (b-717; REVIEW-b714-r2).
+      Apparatus-free bench-free registry scope.
+  locator:
+    published_page: 3
+    pdf_page_index: 9
+    table: '1'
+    note: >-
+      Model/assay registry; no shared physical bench or apparatus. Own-row
+      evidence stays on each observation; apparatus remains on kms/tms series.
+
+
 species:
   Na:
     observations:
@@ -480,6 +496,7 @@ species:
             paragraph: Knudsen cell was made of 0.025 cm Pt sheet
             line_range: '163'
     - observation_id: plante_hastie_1983_table1_snw_glass_composition
+      experiment: plante-1983-model-assay
       type: rate_series
       locator:
         table: '1'
@@ -698,21 +715,6 @@ species:
           Printed ±0.2 on A and ±0.02×10^4 on B. TMS metaborate reproducibility
           ca. 20% (section 3.6). No per-point sigma tabulated. Digitisation of
           the scatter is not required for the coefficients (they are printed).
-      equipment:
-        cell_material:
-          value: Pt Knudsen cell (KMS) and Pt transpiration boat/capillary (TMS)
-          locator:
-            published_page: 7
-            pdf_page_index: 13
-            figure: '2'
-            paragraph: Knudsen cell was made of 0.025 cm Pt sheet
-        chamber_pressure:
-          value: 0.3
-          units: atm
-          note: TMS N2 carrier ~0.3 atm (Fig. 17 caption). KMS is vacuum effusion.
-          locator:
-            published_page: 45
-            figure: '17'
     - observation_id: plante_hastie_1983_nabo2_activity_approx
       experiment: kms-vacuum-glass-series
       type: activity_coefficient
@@ -1176,6 +1178,7 @@ species:
       uncertainty:
         note: about; no numeric uncertainty printed
     - observation_id: plante_hastie_1983_csbo2_ideal_model_quoted
+      experiment: plante-1983-model-assay
       type: activity_coefficient
       class_tag: model
       locator:
@@ -1221,6 +1224,7 @@ species:
       uncertainty:
         note: not applicable to unpublished LS; scatter not digitised this hunt
     - observation_id: plante_hastie_1983_table4_offgas_cec_model
+      experiment: plante-1983-model-assay
       type: rate_series
       locator:
         table: '4'
@@ -1259,6 +1263,7 @@ species:
       uncertainty:
         note: compilation/model; no experimental sigma
     - observation_id: plante_hastie_1983_fig20_21_model_proxy
+      experiment: plante-1983-model-assay
       type: psat_series
       locator:
         figure: '20'
@@ -1301,6 +1306,7 @@ species:
         status: typed_refusal
         reason: Scatter not digitised; comparison JANAF curve is not measured. No invented temperature grid.
     - observation_id: plante_hastie_1983_offgas_model_quoted
+      experiment: plante-1983-model-assay
       supersedes: plante_hastie_1983_table4_offgas_cec_model
       type: psat_series
       class_tag: model
@@ -1318,6 +1324,7 @@ species:
         quotes_path: tables/kems-027-plante-hastie-1983/t4.provenance.yaml
         semantics: Equilibrium composition table retained cell-for-cell in corpus, not a rate time series.
     - observation_id: plante_hastie_1983_thermodynamic_figures_quoted
+      experiment: plante-1983-model-assay
       supersedes: plante_hastie_1983_fig20_21_model_proxy
       type: psat_series
       class_tag: model
@@ -1354,6 +1361,28 @@ deepening:
   quote_convention: Quotes transcribe printed text with normalized whitespace, subscripts and superscript
     exponents; no evaluated pressure grids added.
 metadata:
+  fig19_nabo2_apparatus_as_printed:
+    class_tag: metadata
+    note: >-
+      Demoted from plante_hastie_1983_fig19_nabo2_logP_ls.equipment so the
+      composite Pt KMS/TMS cell does not promote onto the shared default
+      experiment (b-717). Registry kms/tms series retain own apparatus;
+      model/assay rows use plante-1983-model-assay.
+    equipment:
+      cell_material:
+        value: Pt Knudsen cell (KMS) and Pt transpiration boat/capillary (TMS)
+        locator:
+          published_page: 7
+          pdf_page_index: 13
+          figure: '2'
+          paragraph: Knudsen cell was made of 0.025 cm Pt sheet
+      chamber_pressure:
+        value: 0.3
+        units: atm
+        note: TMS N2 carrier ~0.3 atm (Fig. 17 caption). KMS is vacuum effusion.
+        locator:
+          published_page: 45
+          figure: '17'
   apparatus:
     supersedes: plante_hastie_1983_kms_pt_cell_geometry
     class_tag: derived
