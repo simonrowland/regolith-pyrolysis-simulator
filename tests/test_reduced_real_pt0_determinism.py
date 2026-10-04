@@ -715,6 +715,59 @@ def test_python_api_identity_pins_current_model_and_provider_fields(
     assert authority["provider"]["model"] == expected_identity
 
 
+@pytest.mark.parametrize(
+    ("model", "expected_hash"),
+    [
+        ("", "b43e6955cdee10f871c8aaceaa9b45eea9524da6d6fc9449f252c9f463281dd9"),
+        (DEFAULT_ALPHAMELTS_MODEL, "7797a4c8de6ca270d6dd2118c5f22fe309175b95e991a70fb108a2a7f66d1645"),
+        ("pMELTS", "632a85c2c53b207343c5b33ff54275f4d610bedfdad9a9d4e2774dee4140f2c5"),
+    ],
+)
+def test_python_api_accepted_replay_key_hashes_remain_base_bytes(
+    model: str,
+    expected_hash: str,
+) -> None:
+    # Hashes captured by the review probe at base 05b6309d3.
+    key, _authority = _alphamelts_pt0_identity(model, mode="python_api")
+
+    assert hashlib.sha256(rrd.canonical_json_bytes(key)).hexdigest() == expected_hash
+
+
+def test_padded_python_api_name_refuses_during_key_build_before_replay_access(
+    monkeypatch,
+) -> None:
+    from simulator.melt_backend.alphamelts import AlphaMELTSConfigurationError
+
+    store = PT0DeterminismStore("capture")
+    sim = _build_pt0_sim(store)
+    from simulator.melt_backend.alphamelts import AlphaMELTSBackend
+
+    backend = AlphaMELTSBackend(model_name=" pMELTS ")
+    backend._mode = "python_api"
+    provider = AlphaMELTSProvider(backend=backend)
+    sim.backend = backend
+    sim._chem_registry.register(
+        provider,
+        [ChemistryIntent.SILICATE_EQUILIBRIUM],
+    )
+    replay_events = []
+    monkeypatch.setattr(
+        store,
+        "_lookup_optional",
+        lambda *args, **kwargs: replay_events.append("lookup"),
+    )
+    monkeypatch.setattr(
+        store,
+        "_store",
+        lambda *args, **kwargs: replay_events.append("store"),
+    )
+
+    with pytest.raises(AlphaMELTSConfigurationError):
+        store._equilibrium_key(sim)
+
+    assert replay_events == []
+
+
 def test_blank_thermoengine_model_resolves_to_default_in_pt0_identity() -> None:
     key, authority = _thermoengine_pt0_identity("")
 
