@@ -406,7 +406,13 @@ def _write_min_tree(root: Path, extract: dict | None = None) -> Path:
     return root
 
 
-def _migrate_real_extract(tmp_path: Path, name: str, *, write: bool = False):
+def _migrate_real_extract(
+    tmp_path: Path,
+    name: str,
+    *,
+    write: bool = False,
+    use_repository_index_row: bool = False,
+):
     src = REPO_ROOT / "data" / "literature" / "extracts" / name
     doc = yaml.safe_load(src.read_text(encoding="utf-8"))
     assert isinstance(doc, dict)
@@ -415,16 +421,23 @@ def _migrate_real_extract(tmp_path: Path, name: str, *, write: bool = False):
     extracts.mkdir(parents=True)
     (root / "data" / "literature" / "compilations").mkdir(parents=True)
     source = doc.get("source") if isinstance(doc.get("source"), dict) else {}
-    index = {
-        "schema_version": "literature_index.v1",
-        "sources": [
-            {
-                "source_id": doc.get("source_id") or src.stem,
-                "citation": source.get("citation") or src.stem,
-                "doi": source.get("doi"),
-            }
-        ],
-    }
+    source_id = doc.get("source_id") or src.stem
+    if use_repository_index_row:
+        repository_index = yaml.safe_load(
+            (REPO_ROOT / "data" / "literature" / "INDEX.yaml").read_text(
+                encoding="utf-8"
+            )
+        )
+        index_row = next(
+            row for row in repository_index["sources"] if row["source_id"] == source_id
+        )
+    else:
+        index_row = {
+            "source_id": source_id,
+            "citation": source.get("citation") or src.stem,
+            "doi": source.get("doi"),
+        }
+    index = {"schema_version": "literature_index.v1", "sources": [index_row]}
     (root / "data" / "literature" / "INDEX.yaml").write_text(
         yaml.safe_dump(index, sort_keys=False),
         encoding="utf-8",
@@ -2439,6 +2452,31 @@ def test_t998_admitted_source_rows_survive_migration(tmp_path: Path) -> None:
     assert {row.derivation.relation for row in target if row.derivation} == {
         "nonlinear_least_squares_K_star_fit",
         "K_star_over_alpha_e_and_pure_system_equilibrium_constant",
+    }
+
+
+def test_t998_plante_reduced_derivation_keeps_registered_table_input(
+    tmp_path: Path,
+) -> None:
+    plante = _migrate_real_extract(
+        tmp_path / "plante",
+        "kems-042-plante-1979.yaml",
+        use_repository_index_row=True,
+    )
+    row = plante.observations[
+        "kems-042-plante-1979::plante1979_table2_k2o_s1104_000_1302K"
+    ]
+
+    assert row.evidence.original_method_class == "directly_reduced_measurement"
+    assert row.derivation is not None
+    assert row.derivation.relation.startswith("Plante eq. (2)")
+    assert "eq. (3)" in row.derivation.relation
+    assert "eq. (5)" in row.derivation.relation
+    assert row.derivation.inputs == ("tables:kems-042-plante-1979",)
+
+    work = plante.works[plante.experiments[row.experiment_id].work_id]
+    assert row.derivation.inputs[0] in {
+        asset.asset_id for asset in work.source_files.files
     }
 
 
