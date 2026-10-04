@@ -10159,6 +10159,7 @@ class Migrator:
         # Only an initial composition declared as a registry value may take
         # precedence over later legacy lab-parameter rows.
         self._registry_value_initial_experiments: set[str] = set()
+        self._registry_printed_composition_experiments: set[str] = set()
         # Compilation record JSON paths registered as Work assets (not INDEX).
         self._work_extra_assets: dict[str, dict[str, SourceFile]] = defaultdict(dict)
 
@@ -10326,13 +10327,28 @@ class Migrator:
             values=values,
             locator=locator,
         )
+        # b-718: observation-row printed maps stay on the observation
+        # (attached by the caller). Promote to experiment.sample only from an
+        # explicit registry declaration, or later when every row shares one map.
+        row_printed = sample.printed_composition
+        if experiment_id in self._registry_printed_composition_experiments:
+            sample = replace(sample, printed_composition=None)
+            if row_printed is not None:
+                sample = replace(sample, initial_composition=None)
+        elif row_printed is not None:
+            sample = replace(
+                sample,
+                printed_composition=None,
+                initial_composition=None,
+            )
         if existing is not None:
             merged = _merge_experiment_lab_params(
                 existing,
                 sample,
                 apparatus,
                 pressure_env,
-                prefer_existing_initial=prefer_existing_initial,
+                prefer_existing_initial=prefer_existing_initial
+                or experiment_id in self._registry_printed_composition_experiments,
             )
             self.result.experiments[experiment_id] = merged
             return merged
@@ -10875,6 +10891,13 @@ class Migrator:
                 and experiment.sample.initial_composition.state.is_value
             ):
                 self._registry_value_initial_experiments.add(experiment.experiment_id)
+            if (
+                experiment.sample.printed_composition is not None
+                and experiment.sample.printed_composition.state.is_value
+            ):
+                self._registry_printed_composition_experiments.add(
+                    experiment.experiment_id
+                )
             self.result.experiments[experiment.experiment_id] = experiment
             if experiment.experiment_id not in self.result.experiments_by_work[work.work_id]:
                 self.result.experiments_by_work[work.work_id].append(
@@ -10994,6 +11017,83 @@ class Migrator:
             experiment, equipment_context_id=record["context_id"]
         )
 
+    def _promote_universal_observation_printed_compositions(
+        self, work_id: str
+    ) -> None:
+        """b-718 rule (2): same map on every observation → experiment.sample.
+
+        Registry declarations already own experiment.sample.printed_composition
+        and are left untouched. Experiments whose observations all carry one
+        identical printed fingerprint receive that map at sample level so
+        normalized_composition can fall back without subset leakage.
+        """
+
+        by_experiment: dict[str, list[Observation]] = defaultdict(list)
+        for observation in self.result.observations.values():
+            experiment = self.result.experiments.get(observation.experiment_id)
+            if experiment is None or experiment.work_id != work_id:
+                continue
+            by_experiment[observation.experiment_id].append(observation)
+
+        for experiment_id, rows in by_experiment.items():
+            if experiment_id in self._registry_printed_composition_experiments:
+                continue
+            if not rows:
+                continue
+            fingerprints: list[tuple[tuple[tuple[str, str], ...], Located[Any]]] = []
+            all_present = True
+            for observation in rows:
+                located = (observation.point_conditions or {}).get("printed_composition")
+                if located is None or not located.state.is_value:
+                    all_present = False
+                    break
+                raw = located.state.value
+                if isinstance(raw, Mapping) and isinstance(raw.get("components"), Mapping):
+                    raw = raw["components"]
+                if not isinstance(raw, Mapping):
+                    all_present = False
+                    break
+                pairs = []
+                for key, value in raw.items():
+                    if key in _WALK_SKIP_KEYS or key == "locator":
+                        continue
+                    number = _as_dec_or_none(value)
+                    if number is None:
+                        continue
+                    pairs.append((str(key), _dec_str(number)))
+                if not pairs:
+                    all_present = False
+                    break
+                fingerprints.append((tuple(sorted(pairs)), located))
+            if not all_present or not fingerprints:
+                continue
+            unique = {item[0] for item in fingerprints}
+            if len(unique) != 1:
+                continue
+            located = fingerprints[0][1]
+            experiment = self.result.experiments[experiment_id]
+            printed = located
+            initial = None
+            raw = located.state.value
+            if isinstance(raw, Mapping):
+                wt = {
+                    str(k): as_decimal(v)
+                    for k, v in raw.items()
+                    if str(k) in _OXIDE_COMPONENT_KEYS and _as_dec_or_none(v) is not None
+                }
+                if len(wt) >= 2:
+                    _, initial = _located_printed_and_initial(wt, located.locator)
+            sample = replace(
+                experiment.sample,
+                printed_composition=printed,
+                initial_composition=initial
+                if experiment.sample.initial_composition is None
+                else experiment.sample.initial_composition,
+            )
+            self.result.experiments[experiment_id] = replace(
+                experiment, sample=sample
+            )
+
     def _migrate_extract(self, path: Path) -> None:
         rel = path.relative_to(self.root).as_posix() if path.is_relative_to(self.root) else str(path)
         count = self._count(rel)
@@ -11071,6 +11171,7 @@ class Migrator:
                 source_context=pressure_identity_context,
                 provenance=extract_provenance,
             )
+        self._promote_universal_observation_printed_compositions(work.work_id)
         # b-555: do not leave a silent extract — absence is fine, silence is not.
         self._record_silent_extract_if_needed(
             doc=doc, work=work, source_key=rel, path_stem=path.stem
@@ -11746,6 +11847,29 @@ class Migrator:
                 **(point_conditions or {}),
                 "composition": catalogue_composition,
             }
+        # b-718: keep observation-row printed maps on point_conditions so
+        # subset promotions no longer live only on experiment.sample.
+        row_sample = sample_from_equipment(
+            obs.get("equipment"),
+            vocabulary=self._vocab,
+            values=values if isinstance(values, Mapping) else None,
+            locator=locator,
+        )
+        if (
+            row_sample.printed_composition is not None
+            and row_sample.printed_composition.state.is_value
+            and "printed_composition" not in (point_conditions or {})
+        ):
+            point_conditions = {
+                **(point_conditions or {}),
+                "printed_composition": row_sample.printed_composition,
+            }
+            if (
+                row_sample.initial_composition is not None
+                and row_sample.initial_composition.state.is_value
+                and "composition" not in point_conditions
+            ):
+                point_conditions["composition"] = row_sample.initial_composition
         if declared_experiment_id is None or (
             declared_experiment_id in self.result.experiments
             and bool(obs.get("equipment"))
