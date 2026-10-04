@@ -22,7 +22,7 @@ from simulator.battery.consumer_inputs import collect_consumer_inputs
 from simulator.battery.enums import MethodToken, Quantity, ValueKind
 from simulator.battery.generators.bench import engine_point_requests, kems_case
 from simulator.battery.migrate import migrate
-from simulator.battery.records import Value
+from simulator.battery.records import State, Value
 from simulator.battery.waypoints import pressure_boundary
 from tests.battery.test_bench_generators import case, complete_kems
 from tests.battery.test_migrate import _migrate_real_extract
@@ -421,3 +421,144 @@ def test_transpiration_still_inherits_experiment_total(tmp_path: Path) -> None:
                 inherited.append(observation.observation_id)
                 break
     assert inherited, "expected at least one transpiration observation to inherit experiment total"
+
+
+def test_knudsen_chamber_vacuum_not_commanded_oxygen_for_melt_activity() -> None:
+    """P1 pin (r2): Knudsen chamber background must not become commanded sample oxygen.
+
+    Film: FeO–SiO2 liquid activity, no stated sample oxygen, chamber total
+    0.0001 Pa with a during-run vacuum locator. Pre-fix tip supplies
+    fO2_log=-9 via vacuum_total_pressure_upper_bound → melt-activity payload →
+    Po2Request(mode='commanded'). That route must close for closed-token
+    knudsen_effusion; chamber evidence stays on the pressure_boundary waypoint.
+    """
+
+    from simulator.battery.generators.bench import (
+        activity_request_for_engine,
+        melt_activity_requests,
+    )
+    from simulator.battery.waypoints import oxygen_condition
+    from tests.battery.test_melt_activity_requirements import _case, _composition
+
+    chamber = _CHAMBER_PA
+    experiment, bench, observation = _case(
+        composition=_composition(("FeO", "0.2"), ("SiO2", "0.8")),
+        formula="SiO2",
+    )
+    experiment = replace(
+        experiment,
+        pressure_environment=replace(
+            experiment.pressure_environment,
+            total_pressure_Pa=f.located(
+                Value.point_of(chamber),
+                note="chamber pressure during evaporation / printed vacuum during run",
+            ),
+        ),
+    )
+    observation = replace(
+        observation,
+        point_conditions={
+            key: value
+            for key, value in observation.point_conditions.items()
+            if key != "fO2_log"
+        },
+    )
+    assert experiment.method.is_value
+    assert experiment.method.value is MethodToken.KNUDSEN_EFFUSION
+    assert "fO2_log" not in (observation.point_conditions or {})
+    assert "total_pressure_Pa" not in (observation.point_conditions or {})
+
+    # Chamber remains exposed for exterior / validity consumers.
+    boundary = pressure_boundary(experiment, bench, observation)
+    assert boundary.selected is not None
+    assert boundary.selected.route == "printed_run_pressure"
+    assert boundary.selected.value.point == chamber
+
+    oxygen = oxygen_condition(experiment, bench, observation)
+    vacuum_hits = [
+        route
+        for route in oxygen.routes
+        if route.route == "vacuum_total_pressure_upper_bound"
+        and "experiment.pressure_environment.total_pressure_Pa" in route.inputs
+    ]
+    assert not vacuum_hits, (
+        "knudsen chamber background reached vacuum_total_pressure_upper_bound "
+        f"(routes={[route.route for route in oxygen.routes]!r})"
+    )
+    assert oxygen.selected is None or oxygen.selected.route != "vacuum_total_pressure_upper_bound"
+
+    inputs = collect_consumer_inputs(experiment, bench, observation)
+    melt = list(melt_activity_requests(inputs))
+    commanded = [
+        item.payload
+        for item in melt
+        if item.payload is not None and "fO2_log" in item.payload
+    ]
+    assert not commanded, (
+        "melt-activity payload carried commanded fO2_log from knudsen chamber "
+        f"vacuum bound: {[item.get('fO2_log') for item in commanded]!r}"
+    )
+    openimcc = activity_request_for_engine(experiment, observation, "openimcc")
+    assert openimcc is not None
+    assert openimcc.payload is None or "fO2_log" not in openimcc.payload
+
+
+def test_non_knudsen_vacuum_bound_and_knudsen_row_oxygen_controls() -> None:
+    """Controls: non-Knudsen vacuum bound still works; Knudsen row oxygen preserved."""
+
+    from simulator.battery.generators.bench import melt_activity_requests
+    from simulator.battery.waypoints import oxygen_condition
+    from tests.battery.test_melt_activity_requirements import _case, _composition
+
+    # Non-Knudsen (langmuir): chamber vacuum upper bound remains a usable oxygen route.
+    experiment, bench, observation = _case(
+        composition=_composition(("FeO", "0.2"), ("SiO2", "0.8")),
+        formula="SiO2",
+    )
+    experiment = replace(
+        experiment,
+        method=State.of(MethodToken.LANGMUIR_FREE_EVAPORATION),
+        pressure_environment=replace(
+            experiment.pressure_environment,
+            total_pressure_Pa=f.located(
+                Value.point_of(_CHAMBER_PA),
+                note="printed vacuum during run",
+            ),
+        ),
+    )
+    observation = replace(
+        observation,
+        point_conditions={
+            key: value
+            for key, value in observation.point_conditions.items()
+            if key != "fO2_log"
+        },
+    )
+    selected = oxygen_condition(experiment, bench, observation).selected
+    assert selected is not None
+    assert selected.route == "vacuum_total_pressure_upper_bound"
+    assert selected.value.point == Decimal("-9")
+    melt = melt_activity_requests(collect_consumer_inputs(experiment, bench, observation))
+    assert all(item.payload is not None and item.payload.get("fO2_log") == -9.0 for item in melt)
+
+    # Knudsen with source-grounded printed sample oxygen still commands fO2_log.
+    knudsen, bench_k, obs_k = _case(
+        composition=_composition(("FeO", "0.2"), ("SiO2", "0.8")),
+        oxygen=Decimal("-7"),
+        formula="SiO2",
+    )
+    knudsen = replace(
+        knudsen,
+        pressure_environment=replace(
+            knudsen.pressure_environment,
+            total_pressure_Pa=f.located(
+                Value.point_of(_CHAMBER_PA),
+                note="printed vacuum during run",
+            ),
+        ),
+    )
+    selected_k = oxygen_condition(knudsen, bench_k, obs_k).selected
+    assert selected_k is not None
+    assert selected_k.route == "observation_fO2_log"
+    melt_k = melt_activity_requests(collect_consumer_inputs(knudsen, bench_k, obs_k))
+    assert all(item.payload is not None and item.payload.get("fO2_log") == -7.0 for item in melt_k)
