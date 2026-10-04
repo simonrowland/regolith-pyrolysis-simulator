@@ -1,10 +1,10 @@
 # Battery v2.1 migration report
 
-rows in: 47411
+rows in: 47416
 records out (observations): 121113
 works: 263
-experiments: 3524
-queue size: 76891
+experiments: 3535
+queue size: 76899
 identical-payload dedupe aliases: 342
 metadata files: 39
 index sources: 168
@@ -18,17 +18,17 @@ hard issues: 3638
 | doi_works | 56 | 125 (mismatch) |
 | no_doi_works | 91 | 138 (mismatch) |
 | admission_statuses | 374 | 1074 (mismatch) |
-| supersedes | 422 | 649 (mismatch) |
+| supersedes | 422 | 650 (mismatch) |
 | series | 60 | 597 (mismatch) |
 | gibbs_reference_pressures | 1617 | 1635 (mismatch) |
 | gibbs_reference_100000 | 1023 | 1029 (mismatch) |
 | gibbs_reference_101325 | 594 | 594 |
 | formulas | 1625 | 2037 (mismatch) |
-| equipment_payloads | 670 | 974 (mismatch) |
-| absent_admissions | 3511 | 4745 (mismatch) |
-| absent_classes | 2174 | 2203 (mismatch) |
+| equipment_payloads | 670 | 973 (mismatch) |
+| absent_admissions | 3511 | 4750 (mismatch) |
+| absent_classes | 2174 | 2205 (mismatch) |
 | range_only_T | 3125 | 2748 (mismatch) |
-| system_like_phases | 1065 | 2628 (mismatch) |
+| system_like_phases | 1065 | 2633 (mismatch) |
 | missing_phases | 237 | 367 (mismatch) |
 | tabulated_lists | — | 6 |
 
@@ -18004,7 +18004,7 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/extracts/kems-017-stolyarova-2013.yaml` | 11 | 11 | 50 |
 | `data/literature/extracts/kems-018-stolyarova-2012.yaml` | 1 | 1 | 5 |
 | `data/literature/extracts/kems-019-miller-armatys-2013.yaml` | 28 | 28 | 60 |
-| `data/literature/extracts/kems-020-hastie-1981-nbsir.yaml` | 38 | 112 | 288 |
+| `data/literature/extracts/kems-020-hastie-1981-nbsir.yaml` | 41 | 112 | 294 |
 | `data/literature/extracts/kems-021-plante-1992-feo.yaml` | 10 | 25 | 40 |
 | `data/literature/extracts/kems-022-demaria-1971.yaml` | 32 | 117 | 223 |
 | `data/literature/extracts/kems-023-demaria-1973.yaml` | 30 | 75 | 58 |
@@ -18017,7 +18017,7 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/extracts/kems-031-halwax-2024.yaml` | 22 | 24 | 109 |
 | `data/literature/extracts/kems-032-copland-jacobson-2010.yaml` | 5 | 13 | 33 |
 | `data/literature/extracts/kems-033-shornikov-2010.yaml` | 5 | 5 | 25 |
-| `data/literature/extracts/kems-035-sauerborn-2005.yaml` | 60 | 74 | 283 |
+| `data/literature/extracts/kems-035-sauerborn-2005.yaml` | 62 | 74 | 285 |
 | `data/literature/extracts/kems-036-sesko-2024.yaml` | 8 | 8 | 41 |
 | `data/literature/extracts/kems-037-richter-2002.yaml` | 4 | 4 | 18 |
 | `data/literature/extracts/kems-038-matchett-2006.yaml` | 3 | 16 | 23 |
