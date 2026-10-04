@@ -10,6 +10,7 @@ from __future__ import annotations
 
 from pathlib import Path
 from copy import deepcopy
+from decimal import Decimal
 import hashlib
 import json
 import os
@@ -120,8 +121,9 @@ EXPECTED_TRANSITION_REFUSALS = {
     "C-074": (1200,),
     "C-076": (1000,),
     "C-077": (1000,),
-    "C-083": (900,),
+    "C-083": (Decimal("298.15"), 900),
     "C-084": (900,),
+    "C-085": (Decimal("298.15"),),
     "C-090": (1200,),
     "C-091": (1200,),
     "C-104": (4300,),
@@ -174,6 +176,8 @@ EXPECTED_TRANSITION_REFUSALS = {
     "Cl-152": (600,),
     "Cl-155": (500,),
     "Cl-156": (500,),
+    "Cl-161": (Decimal("298.15"),),
+    "Cl-162": (Decimal("298.15"),),
     "Cl-169": (500,),
     "Cl-170": (500,),
     "Cl-173": (500,),
@@ -191,6 +195,7 @@ EXPECTED_TRANSITION_REFUSALS = {
     "Cr-002": (2200,),
     "Cr-014": (2700,),
     "Cr-015": (2700,),
+    "Cs-002": (350,),
     "Cs-008": (1000,),
     "Cs-009": (1000,),
     "Cs-012": (600,),
@@ -232,6 +237,7 @@ EXPECTED_TRANSITION_REFUSALS = {
     "Fe-019": (1700,),
     "Fe-023": (1500,),
     "Fe-024": (1500,),
+    "Ga-002": (350,),
     "H-009": (700,),
     "H-010": (700,),
     "H-014": (1000,),
@@ -240,6 +246,7 @@ EXPECTED_TRANSITION_REFUSALS = {
     "H-019": (800,),
     "H-033": (600,),
     "H-034": (600,),
+    "H-063": (380,),
     "H-071": (800,),
     "H-072": (800,),
     "H-085": (400,),
@@ -264,6 +271,7 @@ EXPECTED_TRANSITION_REFUSALS = {
     "I-062": (400,),
     "I-065": (500,),
     "I-066": (500,),
+    "K-002": (350,),
     "K-014": (1300,),
     "K-015": (1300,),
     "K-017": (900,),
@@ -312,6 +320,8 @@ EXPECTED_TRANSITION_REFUSALS = {
     "N-015": (3300,),
     "N-019": (3300,),
     "N-020": (3300,),
+    "N-029": (Decimal("298.15"),),
+    "N-030": (Decimal("298.15"),),
     "Na-002": (400,),
     "Na-012": (1500,),
     "Na-013": (1500,),
@@ -373,10 +383,12 @@ EXPECTED_TRANSITION_REFUSALS = {
     "O-085": (1000,),
     "O-089": (2000,),
     "O-090": (2000,),
+    "P-002": (350,),
     "P-014": (500,),
     "P-015": (500,),
     "Pb-002": (700,),
     "Pb-009": (1400,),
+    "Rb-002": (350,),
     "S-002": (400,),
     "S-013": (1400,),
     "S-014": (1400,),
@@ -479,26 +491,6 @@ def test_every_stored_number_reparses_from_table_text() -> None:
     ("table_id", "temperature", "expected"),
     (
         (
-            "O-038",
-            1700,
-            {
-                "formation_enthalpy": -941.610,
-                "formation_gibbs_energy": -609.059,
-                "log10_formation_equilibrium_constant": 18.714,
-            },
-        ),
-        (
-            "O-037",
-            1700,
-            {
-                "formation_enthalpy": -949.326,
-                "formation_gibbs_energy": -609.041,
-                "log10_formation_equilibrium_constant": 18.714,
-            },
-        ),
-        ("Fe-018", 1700, {"formation_gibbs_energy": -163.094}),
-        ("Na-012", 1500, {"formation_gibbs_energy": -164.364}),
-        (
             "K-003",
             1100,
             {
@@ -533,25 +525,37 @@ def test_transition_following_rows_restore_signed_janaf_tail(
         assert row[key]["value"] == value
 
 
-def test_repaired_janaf_row_keeps_unsigned_tokens_and_raw_line() -> None:
-    table = load_table_document(TABLES_DIR / "O-038.yaml")["table"]
-    row = next(
-        row for row in table["values"] if row["temperature"]["value"] == 1700
+@pytest.mark.parametrize(
+    ("table_id", "temperature"),
+    (("O-038", 1700), ("O-037", 1700), ("Fe-018", 1700), ("Na-012", 1500)),
+)
+def test_transition_following_enthalpy_bracket_is_named_refusal(
+    table_id: str, temperature: int
+) -> None:
+    table = load_table_document(TABLES_DIR / f"{table_id}.yaml")["table"]
+    assert not any(
+        row["temperature"]["value"] == temperature for row in table["values"]
     )
+    ambiguity = next(
+        item
+        for item in table["parse_ambiguities"]
+        if item.get("raw_line", "").startswith(f"{temperature}\t")
+    )
+    assert ambiguity["kind"] == "nist_tail_whitespace_signs_unresolved"
+    assert "formation enthalpy neighbors span a transition marker" in ambiguity["reason"]
+
+
+def test_refused_janaf_row_keeps_unsigned_source_line() -> None:
+    table = load_table_document(TABLES_DIR / "O-038.yaml")["table"]
     raw_line = (
         "1700\t85.772\t158.857\t102.619\t95.604\t"
         "941.610  609.059 18.714"
     )
-    for key, token in (
-        ("formation_enthalpy", "941.610"),
-        ("formation_gibbs_energy", "609.059"),
-        ("log10_formation_equilibrium_constant", "18.714"),
-    ):
-        cell = row[key]
-        assert cell["as_published"] == token
-        assert cell["locator"]["parse_repair"] == NIST_TAIL_PARSE_REPAIR
-        assert cell["locator"]["raw_line"] == raw_line
-    assert round_trip_failures({"table": table}) == []
+    ambiguity = next(
+        item for item in table["parse_ambiguities"] if item.get("raw_line", "").startswith("1700\t")
+    )
+    assert ambiguity["raw_line"] == raw_line
+    assert "formation enthalpy neighbors span a transition marker" in ambiguity["reason"]
 
 
 def test_unresolved_janaf_tail_identity_stays_in_parse_ambiguities() -> None:
@@ -576,7 +580,7 @@ def test_unrepaired_janaf_tail_coordinates_match_the_named_exception_list() -> N
             if ambiguity.get("kind") != "nist_tail_whitespace_signs_unresolved":
                 continue
             raw_line = ambiguity.get("raw_line", "")
-            temperature = int(Decimal(raw_line.split("\t", 1)[0]))
+            temperature = Decimal(raw_line.split("\t", 1)[0])
             reason = (
                 "printed Gibbs/log Kf pair misses allowed tolerance"
                 if "identity misses by" in ambiguity.get("reason", "")
@@ -717,7 +721,7 @@ def test_every_absent_100k_node_is_explained_by_the_printed_grid() -> None:
     expected_grid_gaps = [
         row for row in EXPECTED_UNREPAIRED_TAILS if row[1] % 100 == 0
     ]
-    assert unexplained == expected_grid_gaps
+    assert sorted(unexplained) == sorted(expected_grid_gaps)
 
 
 def _assert_source_round_trip(document, source_path):
