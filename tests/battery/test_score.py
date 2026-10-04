@@ -5110,7 +5110,7 @@ def test_non_allibert_typed_solid_activity_uses_fusion_conversion() -> None:
         (
             "SiO2",
             "cristobalite_high",
-            None,
+            Decimal("0.008"),
             ("O-035", "O-038"),
         ),
     ),
@@ -5498,12 +5498,20 @@ def test_melts_fusion_shift_refuses_missing_janaf_rows(
     )
 
     converted = _fusion_comparison_reference(reference, engine=engine)
-    assert converted.value.point == reference.value.point
-    assert any(
-        "fusion conversion missing input" in item.reason
-        and ("missing at" in item.reason or "spans missing grid node" in item.reason)
-        for item in converted.notices
-    )
+    if formula == "SiO2":
+        assert converted.value.point != reference.value.point
+        assert any(
+            item.kind is NoticeKind.DERIVATION_USES_COMPILATION
+            and "applied shift is approximate" in item.reason
+            for item in converted.notices
+        )
+    else:
+        assert converted.value.point == reference.value.point
+        assert any(
+            "fusion conversion missing input" in item.reason
+            and "needed JANAF formation Gibbs row missing" in item.reason
+            for item in converted.notices
+        )
 
 
 def test_unestablished_engine_reference_keeps_solid_value_and_notices_residual() -> None:
@@ -5929,8 +5937,9 @@ def test_allibert_solid_activity_fusion_conversion_is_diagnostic_only(
         and "needed JANAF formation Gibbs row missing" in notice.reason
         for notice in converted_alumina.notices
     )
-    with pytest.raises(ValueError, match="1700"):
-        janaf_fusion_energy("SiO2", Decimal("1933"))
+    silica_fusion = janaf_fusion_energy("SiO2", Decimal("1933"))
+    assert silica_fusion.delta_g_fus_kJ_per_mol == Decimal("0.27784")
+    assert Decimal("1994.4") < silica_fusion.melting_temperature_K < Decimal("1994.5")
 
     allibert_1933 = replace(
         reference,
