@@ -29,8 +29,8 @@ formula_normalised_rule: formula_normalised is formula_as_published with trailin
   flattened to n, and integer subscript-1 dropped. Decimal coefficients are kept exactly; they are never rounded to integers.
 summary:
   table_count: 1655
-  thermodynamic_row_count: 77042
-  parse_ambiguity_count: 1765
+  thermodynamic_row_count: 77039
+  parse_ambiguity_count: 1768
   formula_count: 985
 non_stoichiometric_formulas:
 - table_id: C-001
@@ -2410,8 +2410,8 @@ entries:
   title_as_published: Lithium Hexafluoroaluminate (Li3AlF6)  |  Al1F6Li3(l)
   url: https://janaf.nist.gov/tables/Al-050.html
   download_url: https://janaf.nist.gov/tables/Al-050.txt
-  row_count: 31
-  ambiguity_count: 4
+  row_count: 32
+  ambiguity_count: 3
   parse_ambiguities:
   - line_number: 12
     raw_line: "700.000\t274.052\t450.736\t310.087\t98.454\tGLASS <--> LIQUID"
@@ -2431,14 +2431,6 @@ entries:
     locator:
       table_id: Al-050
       url: https://janaf.nist.gov/tables/Al-050.html
-  - line_number: 18
-    raw_line: "1100\t359.824\t613.371\t393.022\t242.383\t3272.388  2803.892 133.146"
-    reason: 'refused JANAF tail sign restoration: formation Gibbs/log Kf identity misses by 2.040 printed log Kf units with
-      R=8.31441'
-    locator:
-      table_id: Al-050
-      url: https://janaf.nist.gov/tables/Al-050.html
-    kind: nist_tail_whitespace_signs_unresolved
   harvest_era: txt
   path: data/literature/compilations/janaf/tables/Al-050.yaml
   source_sha256: 3a2e1a438aaf30a0e58962a1c70fcf58b16ee7f04d664b7ecf5e9a320a067dfd
@@ -2514,8 +2506,8 @@ entries:
   title_as_published: Cryolite, Alpha (Na3AlF6)  |  Al1F6Na3(cr)
   url: https://janaf.nist.gov/tables/Al-052.html
   download_url: https://janaf.nist.gov/tables/Al-052.txt
-  row_count: 13
-  ambiguity_count: 2
+  row_count: 14
+  ambiguity_count: 1
   parse_ambiguities:
   - line_number: 13
     raw_line: "836.000\t295.809\t497.868\t331.843\t138.797\tALPHA <--> BETA"
@@ -2523,14 +2515,6 @@ entries:
     locator:
       table_id: Al-052
       url: https://janaf.nist.gov/tables/Al-052.html
-  - line_number: 14
-    raw_line: "900\t304.691\t520.012\t344.443\t158.013\t3300.200  2818.502 163.582"
-    reason: 'refused JANAF tail sign restoration: formation Gibbs/log Kf identity misses by 2.562 printed log Kf units with
-      R=8.31441'
-    locator:
-      table_id: Al-052
-      url: https://janaf.nist.gov/tables/Al-052.html
-    kind: nist_tail_whitespace_signs_unresolved
   harvest_era: txt
   path: data/literature/compilations/janaf/tables/Al-052.yaml
   source_sha256: 17d7c7fa2852b4225775243905baf9f29b3b01afa0c4cc7326f2705120f1a92b
@@ -2543,8 +2527,8 @@ entries:
   title_as_published: Cryolite, Beta (Na3AlF6)  |  Al1F6Na3(cr)
   url: https://janaf.nist.gov/tables/Al-053.html
   download_url: https://janaf.nist.gov/tables/Al-053.txt
-  row_count: 16
-  ambiguity_count: 3
+  row_count: 17
+  ambiguity_count: 2
   parse_ambiguities:
   - line_number: 13
     raw_line: "836.000\t261.500\t509.179\t363.999\t121.370\tALPHA <--> BETA"
@@ -2552,14 +2536,6 @@ entries:
     locator:
       table_id: Al-053
       url: https://janaf.nist.gov/tables/Al-053.html
-  - line_number: 14
-    raw_line: "900\t271.458\t528.831\t376.408\t137.181\t3292.905  2819.145 163.619"
-    reason: 'refused JANAF tail sign restoration: formation Gibbs/log Kf identity misses by 2.243 printed log Kf units with
-      R=8.31441'
-    locator:
-      table_id: Al-053
-      url: https://janaf.nist.gov/tables/Al-053.html
-    kind: nist_tail_whitespace_signs_unresolved
   - line_number: 18
     raw_line: "1285.000\t332.461\t635.677\t438.489\t253.387\tBETA <--> LIQUID"
     reason: expected 8 tab-separated values; found 6
@@ -3505,8 +3481,8 @@ entries:
   title_as_published: Chiolite (Na5Al3F14)  |  Al3F14Na5(cr)
   url: https://janaf.nist.gov/tables/Al-106.html
   download_url: https://janaf.nist.gov/tables/Al-106.txt
-  row_count: 16
-  ambiguity_count: 2
+  row_count: 17
+  ambiguity_count: 1
   parse_ambiguities:
   - line_number: 15
     raw_line: "1010.000\t590.781\t1130.465\t747.792\t386.500\tCRYSTAL <--> LIQUID"
@@ -3514,14 +3490,6 @@ entries:
     locator:
       table_id: Al-106
       url: https://janaf.nist.gov/tables/Al-106.html
-  - line_number: 16
-    raw_line: "1100\t600.319\t1181.296\t781.205\t440.100\t7573.318  6174.615 293.208"
-    reason: 'refused JANAF tail sign restoration: formation Gibbs/log Kf identity misses by 3.877 printed log Kf units with
-      R=8.31441'
-    locator:
-      table_id: Al-106
-      url: https://janaf.nist.gov/tables/Al-106.html
-    kind: nist_tail_whitespace_signs_unresolved
   harvest_era: txt
   path: data/literature/compilations/janaf/tables/Al-106.yaml
   source_sha256: 4e9d939dc8d12fe8134ebb3f0b844f0f17076f08151294a4b2d8a41109089854
@@ -3534,8 +3502,8 @@ entries:
   title_as_published: Chiolite (Na5Al3F14)  |  Al3F14Na5(l)
   url: https://janaf.nist.gov/tables/Al-107.html
   download_url: https://janaf.nist.gov/tables/Al-107.txt
-  row_count: 31
-  ambiguity_count: 4
+  row_count: 32
+  ambiguity_count: 3
   parse_ambiguities:
   - line_number: 11
     raw_line: "650.000\t549.778\t927.848\t649.737\t180.772\tGLASS <--> LIQUID"
@@ -3555,14 +3523,6 @@ entries:
     locator:
       table_id: Al-107
       url: https://janaf.nist.gov/tables/Al-107.html
-  - line_number: 18
-    raw_line: "1100\t973.868\t1440.193\t877.455\t619.013\t7310.405  6196.490 294.247"
-    reason: 'refused JANAF tail sign restoration: formation Gibbs/log Kf identity misses by 4.134 printed log Kf units with
-      R=8.31441'
-    locator:
-      table_id: Al-107
-      url: https://janaf.nist.gov/tables/Al-107.html
-    kind: nist_tail_whitespace_signs_unresolved
   harvest_era: txt
   path: data/literature/compilations/janaf/tables/Al-107.yaml
   source_sha256: 51b5da7f97b2233c0da5bdae8a5e70e742c3573d8ab0c95f6b2e607edace3dbf
@@ -5663,8 +5623,8 @@ entries:
   title_as_published: Potassium Borate (K2B4O7)  |  B4K2O7(l)
   url: https://janaf.nist.gov/tables/B-116.html
   download_url: https://janaf.nist.gov/tables/B-116.txt
-  row_count: 32
-  ambiguity_count: 4
+  row_count: 33
+  ambiguity_count: 3
   parse_ambiguities:
   - line_number: 12
     raw_line: "676.000\t259.821\t416.068\t290.428\t84.933\tGLASS <--> LIQUID"
@@ -5684,14 +5644,6 @@ entries:
     locator:
       table_id: B-116
       url: https://janaf.nist.gov/tables/B-116.html
-  - line_number: 19
-    raw_line: "1100\t459.361\t618.988\t379.664\t263.257\t3396.492  2576.011 122.325"
-    reason: 'refused JANAF tail sign restoration: formation Gibbs/log Kf identity misses by 2.062 printed log Kf units with
-      R=8.31441'
-    locator:
-      table_id: B-116
-      url: https://janaf.nist.gov/tables/B-116.html
-    kind: nist_tail_whitespace_signs_unresolved
   harvest_era: txt
   path: data/literature/compilations/janaf/tables/B-116.yaml
   source_sha256: 2edb4df4c8a348527c0531f05ee94876f1fbb9a2f30b4026c20443781ea8e9ad
@@ -6021,8 +5973,8 @@ entries:
   title_as_published: Potassium Borate (K2B8O13)  |  B8K2O13(cr)
   url: https://janaf.nist.gov/tables/B-132.html
   download_url: https://janaf.nist.gov/tables/B-132.txt
-  row_count: 22
-  ambiguity_count: 2
+  row_count: 23
+  ambiguity_count: 1
   parse_ambiguities:
   - line_number: 17
     raw_line: "1130.000\t563.825\t873.400\t532.303\t385.440\tCRYSTAL <--> LIQUID"
@@ -6030,14 +5982,6 @@ entries:
     locator:
       table_id: B-132
       url: https://janaf.nist.gov/tables/B-132.html
-  - line_number: 18
-    raw_line: "1200\t574.045\t907.597\t553.205\t425.270\t6084.767  4446.220 193.539"
-    reason: 'refused JANAF tail sign restoration: formation Gibbs/log Kf identity misses by 2.636 printed log Kf units with
-      R=8.31441'
-    locator:
-      table_id: B-132
-      url: https://janaf.nist.gov/tables/B-132.html
-    kind: nist_tail_whitespace_signs_unresolved
   harvest_era: txt
   path: data/literature/compilations/janaf/tables/B-132.yaml
   source_sha256: 58c56ccd27e2b2f534792bb4b5e6f0284bfeadcc78cf01ea9f502f564e36da7a
@@ -6050,8 +5994,8 @@ entries:
   title_as_published: Potassium Borate (K2B8O13)  |  B8K2O13(l)
   url: https://janaf.nist.gov/tables/B-133.html
   download_url: https://janaf.nist.gov/tables/B-133.txt
-  row_count: 32
-  ambiguity_count: 4
+  row_count: 33
+  ambiguity_count: 3
   parse_ambiguities:
   - line_number: 12
     raw_line: "673.000\t473.866\t663.180\t424.897\t160.364\tGLASS <--> LIQUID"
@@ -6071,14 +6015,6 @@ entries:
     locator:
       table_id: B-133
       url: https://janaf.nist.gov/tables/B-133.html
-  - line_number: 20
-    raw_line: "1200\t661.490\t1045.741\t621.599\t508.970\t5928.475  4455.701 193.952"
-    reason: 'refused JANAF tail sign restoration: formation Gibbs/log Kf identity misses by 2.945 printed log Kf units with
-      R=8.31441'
-    locator:
-      table_id: B-133
-      url: https://janaf.nist.gov/tables/B-133.html
-    kind: nist_tail_whitespace_signs_unresolved
   harvest_era: txt
   path: data/literature/compilations/janaf/tables/B-133.yaml
   source_sha256: fb9481122f8677302d44ee1df4d422c5df7fc5aa1708f2af6790064b8b61b7ef
@@ -12062,8 +11998,8 @@ entries:
   title_as_published: Calcium, Alpha (Ca)  |  Ca1(cr)
   url: https://janaf.nist.gov/tables/Ca-002.html
   download_url: https://janaf.nist.gov/tables/Ca-002.txt
-  row_count: 16
-  ambiguity_count: 1
+  row_count: 15
+  ambiguity_count: 2
   parse_ambiguities:
   - line_number: 15
     raw_line: "716.000\t32.737\t66.416\t49.586\t12.051\tALPHA <--> BETA"
@@ -12071,6 +12007,14 @@ entries:
     locator:
       table_id: Ca-002
       url: https://janaf.nist.gov/tables/Ca-002.html
+  - line_number: 16
+    raw_line: "800\t34.613\t70.150\t51.551\t14.879\t0.844 0.104  0.007"
+    reason: 'refused JANAF tail sign restoration: formation Gibbs/log Kf identity misses by 0.210 printed log Kf units with
+      R=8.31441 (allowed 2.000; alternate relation 13.790)'
+    locator:
+      table_id: Ca-002
+      url: https://janaf.nist.gov/tables/Ca-002.html
+    kind: nist_tail_whitespace_signs_unresolved
   harvest_era: txt
   path: data/literature/compilations/janaf/tables/Ca-002.yaml
   source_sha256: 4bb1f9cf20427e6e7b7dceaefcb1eee1cd707eb28598a14a965ec3bc823e0529
@@ -16515,8 +16459,8 @@ entries:
   title_as_published: Cobalt (Co)  |  Co1(cr)
   url: https://janaf.nist.gov/tables/Co-002.html
   download_url: https://janaf.nist.gov/tables/Co-002.txt
-  row_count: 30
-  ambiguity_count: 5
+  row_count: 29
+  ambiguity_count: 6
   parse_ambiguities:
   - line_number: 15
     raw_line: "700.100\t31.047\t53.655\t37.535\t11.285\tALPHA <--> BETA"
@@ -16548,6 +16492,14 @@ entries:
     locator:
       table_id: Co-002
       url: https://janaf.nist.gov/tables/Co-002.html
+  - line_number: 30
+    raw_line: "1800\t37.656\t90.776\t60.142\t55.141\t16.269 0.293  0.009"
+    reason: 'refused JANAF tail sign restoration: formation Gibbs/log Kf identity misses by 0.497 printed log Kf units with
+      R=8.31441 (allowed 2.000; alternate relation 17.503)'
+    locator:
+      table_id: Co-002
+      url: https://janaf.nist.gov/tables/Co-002.html
+    kind: nist_tail_whitespace_signs_unresolved
   harvest_era: txt
   path: data/literature/compilations/janaf/tables/Co-002.yaml
   source_sha256: ec37e6154fac726df72706139c3eed03438ff525835db61f0056bab9fcbae79e
@@ -16914,8 +16866,8 @@ entries:
   title_as_published: Chromium (Cr)  |  Cr1(cr)
   url: https://janaf.nist.gov/tables/Cr-002.html
   download_url: https://janaf.nist.gov/tables/Cr-002.txt
-  row_count: 33
-  ambiguity_count: 3
+  row_count: 32
+  ambiguity_count: 4
   parse_ambiguities:
   - line_number: 9
     raw_line: "311.500\t23.681\t24.651\t23.641\t0.315\tCp LAMBDA MAXIMUM"
@@ -16935,6 +16887,14 @@ entries:
     locator:
       table_id: Cr-002
       url: https://janaf.nist.gov/tables/Cr-002.html
+  - line_number: 32
+    raw_line: "2200\t56.785\t89.634\t56.918\t71.975\t19.336 0.655  0.016"
+    reason: 'refused JANAF tail sign restoration: formation Gibbs/log Kf identity misses by 0.449 printed log Kf units with
+      R=8.31441 (allowed 2.000; alternate relation 31.551)'
+    locator:
+      table_id: Cr-002
+      url: https://janaf.nist.gov/tables/Cr-002.html
+    kind: nist_tail_whitespace_signs_unresolved
   harvest_era: txt
   path: data/literature/compilations/janaf/tables/Cr-002.yaml
   source_sha256: 2c49a20db54e7b84e15ce35364a3bde9d1f4cf460677ec14bdb68210ffe85abc
@@ -20711,8 +20671,8 @@ entries:
   title_as_published: Tungsten Fluoride Oxide (WF4O)  |  F4O1W1(cr)
   url: https://janaf.nist.gov/tables/F-133.html
   download_url: https://janaf.nist.gov/tables/F-133.txt
-  row_count: 11
-  ambiguity_count: 2
+  row_count: 12
+  ambiguity_count: 1
   parse_ambiguities:
   - line_number: 8
     raw_line: "379.000\t147.109\t209.337\t179.398\t11.347\tCRYSTAL <--> LIQUID"
@@ -20720,14 +20680,6 @@ entries:
     locator:
       table_id: F-133
       url: https://janaf.nist.gov/tables/F-133.html
-  - line_number: 9
-    raw_line: "400\t150.624\t217.357\t181.182\t14.470\t1403.013  1261.438 164.727"
-    reason: 'refused JANAF tail sign restoration: formation Gibbs/log Kf identity misses by 2.274 printed log Kf units with
-      R=8.31441'
-    locator:
-      table_id: F-133
-      url: https://janaf.nist.gov/tables/F-133.html
-    kind: nist_tail_whitespace_signs_unresolved
   harvest_era: txt
   path: data/literature/compilations/janaf/tables/F-133.yaml
   source_sha256: 668a997fdff6bd704f92254af29220f1dc2a81cecf62f62a5926650e799db465
@@ -20740,8 +20692,8 @@ entries:
   title_as_published: Tungsten Fluoride Oxide (WF4O)  |  F4O1W1(l)
   url: https://janaf.nist.gov/tables/F-134.html
   download_url: https://janaf.nist.gov/tables/F-134.txt
-  row_count: 11
-  ambiguity_count: 2
+  row_count: 12
+  ambiguity_count: 1
   parse_ambiguities:
   - line_number: 8
     raw_line: "379.000\t182.004\t222.585\t183.759\t14.715\tCRYSTAL <--> LIQUID"
@@ -20749,14 +20701,6 @@ entries:
     locator:
       table_id: F-134
       url: https://janaf.nist.gov/tables/F-134.html
-  - line_number: 9
-    raw_line: "400\t182.004\t232.400\t186.057\t18.537\t1397.294  1261.736 164.766"
-    reason: 'refused JANAF tail sign restoration: formation Gibbs/log Kf identity misses by 2.360 printed log Kf units with
-      R=8.31441'
-    locator:
-      table_id: F-134
-      url: https://janaf.nist.gov/tables/F-134.html
-    kind: nist_tail_whitespace_signs_unresolved
   harvest_era: txt
   path: data/literature/compilations/janaf/tables/F-134.yaml
   source_sha256: 553290e7c6f8d627618634c8434d108a3fc55798865eb1638520e0ef5013d13b
@@ -21327,8 +21271,8 @@ entries:
   title_as_published: Iron, Alpha-Delta (Fe)  |  Fe1(cr)
   url: https://janaf.nist.gov/tables/Fe-004.html
   download_url: https://janaf.nist.gov/tables/Fe-004.txt
-  row_count: 27
-  ambiguity_count: 5
+  row_count: 26
+  ambiguity_count: 6
   parse_ambiguities:
   - line_number: 18
     raw_line: "1042.000\t83.680\t69.245\t43.372\t26.960\tCp LAMBDA MAXIMUM"
@@ -21348,6 +21292,14 @@ entries:
     locator:
       table_id: Fe-004
       url: https://janaf.nist.gov/tables/Fe-004.html
+  - line_number: 22
+    raw_line: "1200\t40.794\t75.830\t47.249\t34.298\t0.764 0.010 0.001"
+    reason: 'refused JANAF tail sign restoration: formation Gibbs/log Kf identity misses by 0.565 printed log Kf units with
+      R=8.31441 (allowed 2.000; alternate relation 1.435)'
+    locator:
+      table_id: Fe-004
+      url: https://janaf.nist.gov/tables/Fe-004.html
+    kind: nist_tail_whitespace_signs_unresolved
   - line_number: 27
     raw_line: "1665.000\t41.112\t88.721\t57.117\t52.620\tGAMMA <--> DELTA"
     reason: expected 8 tab-separated values; found 6
@@ -21372,8 +21324,8 @@ entries:
   title_as_published: Iron, Gamma (Fe)  |  Fe1(cr)
   url: https://janaf.nist.gov/tables/Fe-005.html
   download_url: https://janaf.nist.gov/tables/Fe-005.txt
-  row_count: 27
-  ambiguity_count: 2
+  row_count: 26
+  ambiguity_count: 3
   parse_ambiguities:
   - line_number: 19
     raw_line: "1184.000\t33.882\t76.020\t53.443\t26.731\tALPHA <--> GAMMA"
@@ -21387,6 +21339,14 @@ entries:
     locator:
       table_id: Fe-005
       url: https://janaf.nist.gov/tables/Fe-005.html
+  - line_number: 26
+    raw_line: "1700\t38.200\t89.010\t62.346\t45.328\t0.950 0.019  0.001"
+    reason: 'refused JANAF tail sign restoration: formation Gibbs/log Kf identity misses by 0.416 printed log Kf units with
+      R=8.31441 (allowed 2.000; alternate relation 1.584)'
+    locator:
+      table_id: Fe-005
+      url: https://janaf.nist.gov/tables/Fe-005.html
+    kind: nist_tail_whitespace_signs_unresolved
   harvest_era: txt
   path: data/literature/compilations/janaf/tables/Fe-005.yaml
   source_sha256: 5b989dccee50a73fdb19d07b9adbd08482e63e695ddb554f7d07717d3c74bd52
@@ -23778,8 +23738,8 @@ entries:
   title_as_published: Phosphoric Acid (H3PO4)  |  H3O4P1(cr)
   url: https://janaf.nist.gov/tables/H-085.html
   download_url: https://janaf.nist.gov/tables/H-085.txt
-  row_count: 11
-  ambiguity_count: 2
+  row_count: 12
+  ambiguity_count: 1
   parse_ambiguities:
   - line_number: 8
     raw_line: "315.500\t111.303\t116.688\t110.713\t1.885\tCRYSTAL <--> LIQUID"
@@ -23787,14 +23747,6 @@ entries:
     locator:
       table_id: H-085
       url: https://janaf.nist.gov/tables/H-085.html
-  - line_number: 9
-    raw_line: "400\t136.900\t146.019\t115.089\t12.372\t1285.789  1069.271 139.633"
-    reason: 'refused JANAF tail sign restoration: formation Gibbs/log Kf identity misses by 2.378 printed log Kf units with
-      R=8.31441'
-    locator:
-      table_id: H-085
-      url: https://janaf.nist.gov/tables/H-085.html
-    kind: nist_tail_whitespace_signs_unresolved
   harvest_era: txt
   path: data/literature/compilations/janaf/tables/H-085.yaml
   source_sha256: 6217354c1e290a3010ee345179efafbc706d0a513f3de7c103852a6a7aed3244
@@ -23807,8 +23759,8 @@ entries:
   title_as_published: Phosphoric Acid (H3PO4)  |  H3O4P1(l)
   url: https://janaf.nist.gov/tables/H-086.html
   download_url: https://janaf.nist.gov/tables/H-086.txt
-  row_count: 11
-  ambiguity_count: 2
+  row_count: 12
+  ambiguity_count: 1
   parse_ambiguities:
   - line_number: 8
     raw_line: "315.500\t150.273\t159.125\t151.005\t2.562\tCRYSTAL <--> LIQUID"
@@ -23816,14 +23768,6 @@ entries:
     locator:
       table_id: H-086
       url: https://janaf.nist.gov/tables/H-086.html
-  - line_number: 9
-    raw_line: "400\t175.728\t197.687\t156.848\t16.335\t1269.114  1073.263 140.154"
-    reason: 'refused JANAF tail sign restoration: formation Gibbs/log Kf identity misses by 2.083 printed log Kf units with
-      R=8.31441'
-    locator:
-      table_id: H-086
-      url: https://janaf.nist.gov/tables/H-086.html
-    kind: nist_tail_whitespace_signs_unresolved
   harvest_era: txt
   path: data/literature/compilations/janaf/tables/H-086.yaml
   source_sha256: 19a42d514488ac8e439916ab6cecc6abe347d7ed5e2f3ae45f149f0103305189
@@ -24160,8 +24104,8 @@ entries:
   title_as_published: Hafnium, Alpha (Hf)  |  Hf1(cr)
   url: https://janaf.nist.gov/tables/Hf-002.html
   download_url: https://janaf.nist.gov/tables/Hf-002.txt
-  row_count: 30
-  ambiguity_count: 1
+  row_count: 29
+  ambiguity_count: 2
   parse_ambiguities:
   - line_number: 28
     raw_line: "2054.000\t39.648\t103.378\t75.057\t58.172\tALPHA <--> BETA"
@@ -24169,6 +24113,14 @@ entries:
     locator:
       table_id: Hf-002
       url: https://janaf.nist.gov/tables/Hf-002.html
+  - line_number: 29
+    raw_line: "2100\t39.970\t104.260\t75.687\t60.003\t5.648 0.129  0.003"
+    reason: 'refused JANAF tail sign restoration: formation Gibbs/log Kf identity misses by 0.209 printed log Kf units with
+      R=8.31441 (allowed 2.000; alternate relation 6.209)'
+    locator:
+      table_id: Hf-002
+      url: https://janaf.nist.gov/tables/Hf-002.html
+    kind: nist_tail_whitespace_signs_unresolved
   harvest_era: txt
   path: data/literature/compilations/janaf/tables/Hf-002.yaml
   source_sha256: c6e30a3da1dc83bb251e246a79c41d40a20a1711e5117ae70e4e0325f3a29b13
@@ -24181,8 +24133,8 @@ entries:
   title_as_published: Hafnium, Beta (Hf)  |  Hf1(cr)
   url: https://janaf.nist.gov/tables/Hf-003.html
   download_url: https://janaf.nist.gov/tables/Hf-003.txt
-  row_count: 35
-  ambiguity_count: 2
+  row_count: 34
+  ambiguity_count: 3
   parse_ambiguities:
   - line_number: 28
     raw_line: "2054.000\t33.959\t106.255\t84.154\t45.394\tALPHA <--> BETA"
@@ -24196,6 +24148,14 @@ entries:
     locator:
       table_id: Hf-003
       url: https://janaf.nist.gov/tables/Hf-003.html
+  - line_number: 35
+    raw_line: "2600\t39.001\t114.865\t89.712\t65.396\t29.200 1.170  0.024"
+    reason: 'refused JANAF tail sign restoration: formation Gibbs/log Kf identity misses by 0.495 printed log Kf units with
+      R=8.31441 (allowed 2.001; alternate relation 47.505)'
+    locator:
+      table_id: Hf-003
+      url: https://janaf.nist.gov/tables/Hf-003.html
+    kind: nist_tail_whitespace_signs_unresolved
   harvest_era: txt
   path: data/literature/compilations/janaf/tables/Hf-003.yaml
   source_sha256: f380dcd3db1a6d6bdffa02c98a05d6c38e3fe8c09ff0f3a6909b29e2c1d048bf
@@ -28552,8 +28512,8 @@ entries:
   title_as_published: Molybdenum (Mo)  |  Mo1(cr)
   url: https://janaf.nist.gov/tables/Mo-002.html
   download_url: https://janaf.nist.gov/tables/Mo-002.txt
-  row_count: 38
-  ambiguity_count: 1
+  row_count: 37
+  ambiguity_count: 2
   parse_ambiguities:
   - line_number: 36
     raw_line: "2896.000\t54.835\t98.098\t67.060\t89.885\tCRYSTAL <--> LIQUID"
@@ -28561,6 +28521,14 @@ entries:
     locator:
       table_id: Mo-002
       url: https://janaf.nist.gov/tables/Mo-002.html
+  - line_number: 37
+    raw_line: "2900\t54.970\t98.173\t67.103\t90.104\t35.913 0.050  0.001"
+    reason: 'refused JANAF tail sign restoration: formation Gibbs/log Kf identity misses by 0.099 printed log Kf units with
+      R=8.31441 (allowed 2.000; alternate relation 1.901)'
+    locator:
+      table_id: Mo-002
+      url: https://janaf.nist.gov/tables/Mo-002.html
+    kind: nist_tail_whitespace_signs_unresolved
   harvest_era: txt
   path: data/literature/compilations/janaf/tables/Mo-002.yaml
   source_sha256: 142f48657af5268032628a6e14c36768f5e868f37be56e0ee29c80d120a34276
@@ -30187,8 +30155,8 @@ entries:
   title_as_published: Sodium Sulfate, IV (Na2SO4)  |  Na2O4S1(cr)
   url: https://janaf.nist.gov/tables/Na-022.html
   download_url: https://janaf.nist.gov/tables/Na-022.txt
-  row_count: 11
-  ambiguity_count: 3
+  row_count: 12
+  ambiguity_count: 2
   parse_ambiguities:
   - line_number: 9
     raw_line: "458.000\t153.331\t210.462\t161.117\t22.600\tV <--> IV"
@@ -30196,14 +30164,6 @@ entries:
     locator:
       table_id: Na-022
       url: https://janaf.nist.gov/tables/Na-022.html
-  - line_number: 10
-    raw_line: "500\t158.908\t224.159\t165.842\t29.158\t1396.687  1187.082 124.014"
-    reason: 'refused JANAF tail sign restoration: formation Gibbs/log Kf identity misses by 2.035 printed log Kf units with
-      R=8.31441'
-    locator:
-      table_id: Na-022
-      url: https://janaf.nist.gov/tables/Na-022.html
-    kind: nist_tail_whitespace_signs_unresolved
   - line_number: 11
     raw_line: "514.000\t160.712\t228.572\t167.491\t31.396\tIV <--> I"
     reason: expected 8 tab-separated values; found 6
@@ -33672,8 +33632,8 @@ entries:
   title_as_published: Titanium Oxide (Ti3O5)  |  O5Ti3(cr,l)
   url: https://janaf.nist.gov/tables/O-083.html
   download_url: https://janaf.nist.gov/tables/O-083.txt
-  row_count: 42
-  ambiguity_count: 4
+  row_count: 43
+  ambiguity_count: 3
   parse_ambiguities:
   - line_number: 10
     raw_line: "450.000\t181.586\t230.691\t141.909\t39.952\tALPHA <--> BETA"
@@ -33681,14 +33641,6 @@ entries:
     locator:
       table_id: O-083
       url: https://janaf.nist.gov/tables/O-083.html
-  - line_number: 11
-    raw_line: "500\t184.096\t249.952\t151.765\t49.094\t2441.465  2223.774 232.316"
-    reason: 'refused JANAF tail sign restoration: formation Gibbs/log Kf identity misses by 2.997 printed log Kf units with
-      R=8.31441'
-    locator:
-      table_id: O-083
-      url: https://janaf.nist.gov/tables/O-083.html
-    kind: nist_tail_whitespace_signs_unresolved
   - line_number: 27
     raw_line: "2050.000\t261.918\t552.111\t359.547\t394.755\tBETA <--> LIQUID"
     reason: expected 8 tab-separated values; found 6
@@ -34031,8 +33983,8 @@ entries:
   title_as_published: Phosphorus, White (P)  |  P1(cr)
   url: https://janaf.nist.gov/tables/P-002.html
   download_url: https://janaf.nist.gov/tables/P-002.txt
-  row_count: 15
-  ambiguity_count: 3
+  row_count: 14
+  ambiguity_count: 4
   parse_ambiguities:
   - line_number: 5
     raw_line: "195.400\t21.117\t28.969\t43.439\t-2.827\tALPHA <--> BETA"
@@ -34052,6 +34004,14 @@ entries:
     locator:
       table_id: P-002
       url: https://janaf.nist.gov/tables/P-002.html
+  - line_number: 12
+    raw_line: "350\t24.731\t44.981\t41.372\t1.263\t0.717 0.071  0.011"
+    reason: 'refused JANAF tail sign restoration: formation Gibbs/log Kf identity misses by 0.404 printed log Kf units with
+      R=8.31441 (allowed 2.000; alternate relation 21.596)'
+    locator:
+      table_id: P-002
+      url: https://janaf.nist.gov/tables/P-002.html
+    kind: nist_tail_whitespace_signs_unresolved
   harvest_era: txt
   path: data/literature/compilations/janaf/tables/P-002.yaml
   source_sha256: bfe643af76d2d4c1ff8ef220a9c226cc1668263e035e3e3794c3daafdc0786f7
@@ -34898,8 +34858,8 @@ entries:
   title_as_published: Sulfur, Orthorhombic (S)  |  S1(cr)
   url: https://janaf.nist.gov/tables/S-002.html
   download_url: https://janaf.nist.gov/tables/S-002.txt
-  row_count: 13
-  ambiguity_count: 1
+  row_count: 12
+  ambiguity_count: 2
   parse_ambiguities:
   - line_number: 10
     raw_line: "368.300\t24.246\t37.015\t32.540\t1.648\tALPHA <--> BETA"
@@ -34907,6 +34867,14 @@ entries:
     locator:
       table_id: S-002
       url: https://janaf.nist.gov/tables/S-002.html
+  - line_number: 11
+    raw_line: "400\t24.895\t39.044\t32.975\t2.427\t2.212 0.088  0.011"
+    reason: 'refused JANAF tail sign restoration: formation Gibbs/log Kf identity misses by 0.491 printed log Kf units with
+      R=8.31441 (allowed 2.000; alternate relation 22.491)'
+    locator:
+      table_id: S-002
+      url: https://janaf.nist.gov/tables/S-002.html
+    kind: nist_tail_whitespace_signs_unresolved
   harvest_era: txt
   path: data/literature/compilations/janaf/tables/S-002.yaml
   source_sha256: f389771a316b5e382166ec4111b6b8bb0e16f648f27686336af59437563a249e
@@ -35595,8 +35563,8 @@ entries:
   title_as_published: Strontium, Alpha (Sr)  |  Sr1(cr)
   url: https://janaf.nist.gov/tables/Sr-002.html
   download_url: https://janaf.nist.gov/tables/Sr-002.txt
-  row_count: 19
-  ambiguity_count: 1
+  row_count: 18
+  ambiguity_count: 2
   parse_ambiguities:
   - line_number: 15
     raw_line: "820.000\t32.151\t85.005\t66.285\t15.351\tALPHA <--> BETA"
@@ -35604,6 +35572,14 @@ entries:
     locator:
       table_id: Sr-002
       url: https://janaf.nist.gov/tables/Sr-002.html
+  - line_number: 16
+    raw_line: "900\t33.027\t88.038\t68.085\t17.958\t0.626 0.072  0.004"
+    reason: 'refused JANAF tail sign restoration: formation Gibbs/log Kf identity misses by 0.179 printed log Kf units with
+      R=8.31441 (allowed 2.000; alternate relation 8.179)'
+    locator:
+      table_id: Sr-002
+      url: https://janaf.nist.gov/tables/Sr-002.html
+    kind: nist_tail_whitespace_signs_unresolved
   harvest_era: txt
   path: data/literature/compilations/janaf/tables/Sr-002.yaml
   source_sha256: 17567b7cfa80fc73fb67a7b08997a6a06da3c7d17d44b7d197bc7680727b5c12
@@ -35790,8 +35766,8 @@ entries:
   title_as_published: Tantalum (Ta)  |  Ta1(cr)
   url: https://janaf.nist.gov/tables/Ta-002.html
   download_url: https://janaf.nist.gov/tables/Ta-002.txt
-  row_count: 43
-  ambiguity_count: 1
+  row_count: 42
+  ambiguity_count: 2
   parse_ambiguities:
   - line_number: 40
     raw_line: "3258.000\t44.080\t111.256\t82.538\t93.564\tCRYSTAL <--> LIQUID"
@@ -35799,6 +35775,14 @@ entries:
     locator:
       table_id: Ta-002
       url: https://janaf.nist.gov/tables/Ta-002.html
+  - line_number: 41
+    raw_line: "3300\t44.965\t111.826\t82.907\t95.433\t36.456 0.471  0.007"
+    reason: 'refused JANAF tail sign restoration: formation Gibbs/log Kf identity misses by 0.455 printed log Kf units with
+      R=8.31441 (allowed 2.000; alternate relation 14.455)'
+    locator:
+      table_id: Ta-002
+      url: https://janaf.nist.gov/tables/Ta-002.html
+    kind: nist_tail_whitespace_signs_unresolved
   harvest_era: txt
   path: data/literature/compilations/janaf/tables/Ta-002.yaml
   source_sha256: 2f898ed3535c5d05aadef238690d48335aede91f3baa0243b42c39df9febe106
@@ -35985,8 +35969,8 @@ entries:
   title_as_published: Titanium, Alpha (Ti)  |  Ti1(cr)
   url: https://janaf.nist.gov/tables/Ti-002.html
   download_url: https://janaf.nist.gov/tables/Ti-002.txt
-  row_count: 22
-  ambiguity_count: 1
+  row_count: 21
+  ambiguity_count: 2
   parse_ambiguities:
   - line_number: 19
     raw_line: "1166.000\t36.175\t70.058\t47.938\t25.791\tALPHA <--> BETA"
@@ -35994,6 +35978,14 @@ entries:
     locator:
       table_id: Ti-002
       url: https://janaf.nist.gov/tables/Ti-002.html
+  - line_number: 20
+    raw_line: "1200\t37.233\t71.113\t48.580\t27.039\t3.922 0.118  0.005"
+    reason: 'refused JANAF tail sign restoration: formation Gibbs/log Kf identity misses by 0.136 printed log Kf units with
+      R=8.31441 (allowed 2.000; alternate relation 10.136)'
+    locator:
+      table_id: Ti-002
+      url: https://janaf.nist.gov/tables/Ti-002.html
+    kind: nist_tail_whitespace_signs_unresolved
   harvest_era: txt
   path: data/literature/compilations/janaf/tables/Ti-002.yaml
   source_sha256: 10598076980e174ea28cbe4bb80c67375634977c35fd44922d61db9a856c28f4
@@ -36207,8 +36199,8 @@ entries:
   title_as_published: Vanadium (V)  |  V1(cr)
   url: https://janaf.nist.gov/tables/V-002.html
   download_url: https://janaf.nist.gov/tables/V-002.txt
-  row_count: 32
-  ambiguity_count: 1
+  row_count: 31
+  ambiguity_count: 2
   parse_ambiguities:
   - line_number: 29
     raw_line: "2190.000\t44.141\t89.653\t61.093\t62.547\tCRYSTAL <--> LIQUID"
@@ -36216,6 +36208,14 @@ entries:
     locator:
       table_id: V-002
       url: https://janaf.nist.gov/tables/V-002.html
+  - line_number: 30
+    raw_line: "2200\t44.329\t89.856\t61.223\t62.991\t22.863 0.104  0.002"
+    reason: 'refused JANAF tail sign restoration: formation Gibbs/log Kf identity misses by 0.469 printed log Kf units with
+      R=8.31441 (allowed 2.000; alternate relation 4.469)'
+    locator:
+      table_id: V-002
+      url: https://janaf.nist.gov/tables/V-002.html
+    kind: nist_tail_whitespace_signs_unresolved
   harvest_era: txt
   path: data/literature/compilations/janaf/tables/V-002.yaml
   source_sha256: b1a246a69113121a54458baa89c5af5d8c596c5fe6b9d33a6d437832f4c60463
@@ -36378,8 +36378,8 @@ entries:
   title_as_published: Tungsten (W)  |  W1(cr)
   url: https://janaf.nist.gov/tables/W-002.html
   download_url: https://janaf.nist.gov/tables/W-002.txt
-  row_count: 53
-  ambiguity_count: 1
+  row_count: 52
+  ambiguity_count: 2
   parse_ambiguities:
   - line_number: 44
     raw_line: "3680.000\t66.149\t108.904\t76.734\t118.383\tCRYSTAL <--> LIQUID"
@@ -36387,6 +36387,14 @@ entries:
     locator:
       table_id: W-002
       url: https://janaf.nist.gov/tables/W-002.html
+  - line_number: 45
+    raw_line: "3700\t67.205\t109.265\t76.909\t119.716\t34.775 0.191  0.003"
+    reason: 'refused JANAF tail sign restoration: formation Gibbs/log Kf identity misses by 0.304 printed log Kf units with
+      R=8.31441 (allowed 2.000; alternate relation 5.696)'
+    locator:
+      table_id: W-002
+      url: https://janaf.nist.gov/tables/W-002.html
+    kind: nist_tail_whitespace_signs_unresolved
   harvest_era: txt
   path: data/literature/compilations/janaf/tables/W-002.yaml
   source_sha256: 734c1ab4a714a94905aae6ebec967947db0be14c18cf2fe65f7b859c97d23a3c
@@ -36543,8 +36551,8 @@ entries:
   title_as_published: Zinc (Zn)  |  Zn1(cr)
   url: https://janaf.nist.gov/tables/Zn-002.html
   download_url: https://janaf.nist.gov/tables/Zn-002.txt
-  row_count: 15
-  ambiguity_count: 1
+  row_count: 14
+  ambiguity_count: 2
   parse_ambiguities:
   - line_number: 14
     raw_line: "692.730\t29.802\t64.591\t48.965\t10.825\tCRYSTAL <--> LIQUID"
@@ -36552,6 +36560,14 @@ entries:
     locator:
       table_id: Zn-002
       url: https://janaf.nist.gov/tables/Zn-002.html
+  - line_number: 15
+    raw_line: "700\t29.900\t64.903\t49.129\t11.042\t7.333 0.077  0.006"
+    reason: 'refused JANAF tail sign restoration: formation Gibbs/log Kf identity misses by 0.254 printed log Kf units with
+      R=8.31441 (allowed 2.000; alternate relation 11.746)'
+    locator:
+      table_id: Zn-002
+      url: https://janaf.nist.gov/tables/Zn-002.html
+    kind: nist_tail_whitespace_signs_unresolved
   harvest_era: txt
   path: data/literature/compilations/janaf/tables/Zn-002.yaml
   source_sha256: a10aaa36ec09d1b31621c81701b66a52fb27fb9a61e1dc9fd095995460b820dc
@@ -36738,8 +36754,8 @@ entries:
   title_as_published: Zirconium, Alpha (Zr)  |  Zr1(cr)
   url: https://janaf.nist.gov/tables/Zr-002.html
   download_url: https://janaf.nist.gov/tables/Zr-002.txt
-  row_count: 22
-  ambiguity_count: 1
+  row_count: 21
+  ambiguity_count: 2
   parse_ambiguities:
   - line_number: 19
     raw_line: "1135.000\t32.724\t75.939\t54.925\t23.851\tALPHA <--> BETA"
@@ -36747,6 +36763,14 @@ entries:
     locator:
       table_id: Zr-002
       url: https://janaf.nist.gov/tables/Zr-002.html
+  - line_number: 20
+    raw_line: "1200\t33.502\t77.783\t56.113\t26.004\t3.711 0.222  0.010"
+    reason: 'refused JANAF tail sign restoration: formation Gibbs/log Kf identity misses by 0.337 printed log Kf units with
+      R=8.31441 (allowed 2.000; alternate relation 19.663)'
+    locator:
+      table_id: Zr-002
+      url: https://janaf.nist.gov/tables/Zr-002.html
+    kind: nist_tail_whitespace_signs_unresolved
   harvest_era: txt
   path: data/literature/compilations/janaf/tables/Zr-002.yaml
   source_sha256: ae1ca602fcba18ebfe61993ec8137a99f91f0b85928893f66c3651ac3529850f

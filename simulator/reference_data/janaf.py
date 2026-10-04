@@ -412,38 +412,43 @@ def _restore_whitespace_tail_signs(
     if gibbs_magnitude == 0 and log_magnitude != 0:
         return None, "zero formation Gibbs with nonzero log Kf has no sign assignment"
 
-    # JANAF's printed identity is log10(Kf) = -ΔfG/(R T ln 10). ΔfG is
-    # stored in kJ/mol, so multiply it by 1000 J/kJ before dividing by
-    # R=8.31441 J/(mol K), T in K, and dimensionless ln(10). The two
-    # possible absolute sign assignments are (+G, -log Kf) and
-    # (-G, +log Kf); the identity checks their opposite-sign relation, and
-    # neighboring ΔfG values then select the absolute signs. We also compute
-    # the modern R=8.314462618 check as a rounding sanity check. A printed
-    # 0.001 log Kf has a 0.001 last-digit unit; an error above two such units
-    # under both assignments means the unsigned source magnitudes do not
-    # corroborate a repair. Sanity: O-038 at 1700 K gives approximately
-    # log Kf=18.714 for ΔfG=-609.059 kJ/mol.
+    # Premise -> algebra -> units: JANAF prints log10(Kf)=-ΔfG/(R T ln 10);
+    # ΔfG is printed to 0.001 kJ/mol and log Kf to 0.001. Convert ΔfG to
+    # J/mol with 1000 J/kJ, then compare dimensionless log values using
+    # R=8.31441 J/(mol K), T in K, and ln(10). JANAF tables span decades and
+    # use several R values (8.3143, 8.31441, 8.314510 J/(mol K), with older
+    # tables computed in calories), so a relative R difference up to 2.5e-5
+    # contributes |log Kf|*2.5e-5. In printed 0.001 units this is
+    # 0.025*|log Kf| units; rounding adds at most 0.5 log unit plus
+    # 0.0005 kJ/mol*1000/(R T ln(10))/0.001 units from ΔfG. Thus accept a
+    # best relation miss no larger than 2 + 3e-5*|log Kf|/log_quantum units,
+    # only when the other sign relation misses by at least 100 times more.
+    # The other relation has the signs aligned, so its miss is about
+    # 2*|log Kf|; continuity with neighboring ΔfG rows chooses the absolute
+    # signs after the opposite-sign relation is established. We also check
+    # modern R=8.314462618. Sanity: O-038 at 1700 K gives log Kf=18.714 for
+    # ΔfG=-609.059 kJ/mol; the 14 large-log rows have >100x separation and
+    # neighboring accepted rows show the same few-unit rounding residuals.
     log_quantum = abs(
         Decimal(1).scaleb(Decimal(candidate.whitespace_tail[2]).as_tuple().exponent)
     )
     ln10 = Decimal(10).ln()
-    errors_by_r: dict[Decimal, list[Decimal]] = {}
-    for gas_constant in (JANAF_R_J_MOL_K, STANDARD_R_J_MOL_K):
-        errors: list[Decimal] = []
-        for candidate_gibbs_sign in (-1, 1):
-            signed_gibbs = candidate_gibbs_sign * gibbs_magnitude
-            predicted_log = -signed_gibbs * Decimal(1000) / (
-                gas_constant * temperature * ln10
-            )
-            signed_log = -candidate_gibbs_sign * log_magnitude
-            errors.append(abs(predicted_log - signed_log) / log_quantum)
-        errors_by_r[gas_constant] = errors
-    janaf_errors = errors_by_r[JANAF_R_J_MOL_K]
-    if all(error > 2 for error in janaf_errors):
+    predicted_log_magnitude = gibbs_magnitude * Decimal(1000) / (
+        JANAF_R_J_MOL_K * temperature * ln10
+    )
+    relation_miss = abs(predicted_log_magnitude - log_magnitude) / log_quantum
+    other_relation_miss = (predicted_log_magnitude + log_magnitude) / log_quantum
+    allowed_miss = Decimal(2) + Decimal("3e-5") * log_magnitude / log_quantum
+    if (
+        relation_miss > allowed_miss
+        or other_relation_miss < relation_miss * 100
+    ):
         return (
             None,
             "formation Gibbs/log Kf identity misses by "
-            f"{min(janaf_errors):.3f} printed log Kf units with R=8.31441",
+            f"{relation_miss:.3f} printed log Kf units with R=8.31441 "
+            f"(allowed {allowed_miss:.3f}; alternate relation "
+            f"{other_relation_miss:.3f})",
         )
 
     signed_enthalpy = enthalpy_magnitude * enthalpy_sign

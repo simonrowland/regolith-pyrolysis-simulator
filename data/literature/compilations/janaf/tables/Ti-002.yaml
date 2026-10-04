@@ -16,6 +16,7 @@ compilation_role:
   scoring_eligible: false
   battery_refusal: gibbs_table_not_runtime_observable
   circularity_warning: Do not validate an engine against a compilation it consumes.
+  pure_substance_reference: true
 extraction:
   method: machine parse of NIST tab-delimited table download; source bytes cached unchanged
   user_agent: RegolithPyrolysisSimulator-corpus-harvester/1.0 (public thermochemical reference-data research; polite cached
@@ -1206,87 +1207,6 @@ table:
         row_temperature_as_published: '1100'
         column: log Kf
   - temperature:
-      value: 1200.0
-      as_published: '1200'
-      locator:
-        table_id: Ti-002
-        url: https://janaf.nist.gov/tables/Ti-002.html
-        download_url: https://janaf.nist.gov/tables/Ti-002.txt
-        row_temperature_as_published: '1200'
-        column: T(K)
-    heat_capacity:
-      value: 37.233
-      as_published: '37.233'
-      locator:
-        table_id: Ti-002
-        url: https://janaf.nist.gov/tables/Ti-002.html
-        download_url: https://janaf.nist.gov/tables/Ti-002.txt
-        row_temperature_as_published: '1200'
-        column: Cp
-    entropy:
-      value: 71.113
-      as_published: '71.113'
-      locator:
-        table_id: Ti-002
-        url: https://janaf.nist.gov/tables/Ti-002.html
-        download_url: https://janaf.nist.gov/tables/Ti-002.txt
-        row_temperature_as_published: '1200'
-        column: S
-    negative_gibbs_enthalpy_function:
-      value: 48.58
-      as_published: '48.580'
-      locator:
-        table_id: Ti-002
-        url: https://janaf.nist.gov/tables/Ti-002.html
-        download_url: https://janaf.nist.gov/tables/Ti-002.txt
-        row_temperature_as_published: '1200'
-        column: -[G-H(Tr)]/T
-    enthalpy_increment:
-      value: 27.039
-      as_published: '27.039'
-      locator:
-        table_id: Ti-002
-        url: https://janaf.nist.gov/tables/Ti-002.html
-        download_url: https://janaf.nist.gov/tables/Ti-002.txt
-        row_temperature_as_published: '1200'
-        column: H-H(Tr)
-    formation_enthalpy:
-      value: -3.922
-      as_published: '3.922'
-      locator:
-        table_id: Ti-002
-        url: https://janaf.nist.gov/tables/Ti-002.html
-        download_url: https://janaf.nist.gov/tables/Ti-002.txt
-        row_temperature_as_published: '1200'
-        column: delta-f H
-        parse_repair: nist_tail_whitespace_signs_restored
-        line_number: 20
-        raw_line: "1200\t37.233\t71.113\t48.580\t27.039\t3.922 0.118  0.005"
-    formation_gibbs_energy:
-      value: 0.118
-      as_published: '0.118'
-      locator:
-        table_id: Ti-002
-        url: https://janaf.nist.gov/tables/Ti-002.html
-        download_url: https://janaf.nist.gov/tables/Ti-002.txt
-        row_temperature_as_published: '1200'
-        column: delta-f G
-        parse_repair: nist_tail_whitespace_signs_restored
-        line_number: 20
-        raw_line: "1200\t37.233\t71.113\t48.580\t27.039\t3.922 0.118  0.005"
-    log10_formation_equilibrium_constant:
-      value: -0.005
-      as_published: '0.005'
-      locator:
-        table_id: Ti-002
-        url: https://janaf.nist.gov/tables/Ti-002.html
-        download_url: https://janaf.nist.gov/tables/Ti-002.txt
-        row_temperature_as_published: '1200'
-        column: log Kf
-        parse_repair: nist_tail_whitespace_signs_restored
-        line_number: 20
-        raw_line: "1200\t37.233\t71.113\t48.580\t27.039\t3.922 0.118  0.005"
-  - temperature:
       value: 1300.0
       as_published: '1300'
       locator:
@@ -1653,3 +1573,11 @@ table:
     locator:
       table_id: Ti-002
       url: https://janaf.nist.gov/tables/Ti-002.html
+  - line_number: 20
+    raw_line: "1200\t37.233\t71.113\t48.580\t27.039\t3.922 0.118  0.005"
+    reason: 'refused JANAF tail sign restoration: formation Gibbs/log Kf identity misses by 0.136 printed log Kf units with
+      R=8.31441 (allowed 2.000; alternate relation 10.136)'
+    locator:
+      table_id: Ti-002
+      url: https://janaf.nist.gov/tables/Ti-002.html
+    kind: nist_tail_whitespace_signs_unresolved

@@ -16,6 +16,7 @@ compilation_role:
   scoring_eligible: false
   battery_refusal: gibbs_table_not_runtime_observable
   circularity_warning: Do not validate an engine against a compilation it consumes.
+  pure_substance_reference: true
 extraction:
   method: machine parse of NIST tab-delimited table download; source bytes cached unchanged
   user_agent: RegolithPyrolysisSimulator-corpus-harvester/1.0 (public thermochemical reference-data research; polite cached
@@ -768,6 +769,87 @@ table:
         row_temperature_as_published: '800'
         column: log Kf
   - temperature:
+      value: 900.0
+      as_published: '900'
+      locator:
+        table_id: Al-052
+        url: https://janaf.nist.gov/tables/Al-052.html
+        download_url: https://janaf.nist.gov/tables/Al-052.txt
+        row_temperature_as_published: '900'
+        column: T(K)
+    heat_capacity:
+      value: 304.691
+      as_published: '304.691'
+      locator:
+        table_id: Al-052
+        url: https://janaf.nist.gov/tables/Al-052.html
+        download_url: https://janaf.nist.gov/tables/Al-052.txt
+        row_temperature_as_published: '900'
+        column: Cp
+    entropy:
+      value: 520.012
+      as_published: '520.012'
+      locator:
+        table_id: Al-052
+        url: https://janaf.nist.gov/tables/Al-052.html
+        download_url: https://janaf.nist.gov/tables/Al-052.txt
+        row_temperature_as_published: '900'
+        column: S
+    negative_gibbs_enthalpy_function:
+      value: 344.443
+      as_published: '344.443'
+      locator:
+        table_id: Al-052
+        url: https://janaf.nist.gov/tables/Al-052.html
+        download_url: https://janaf.nist.gov/tables/Al-052.txt
+        row_temperature_as_published: '900'
+        column: -[G-H(Tr)]/T
+    enthalpy_increment:
+      value: 158.013
+      as_published: '158.013'
+      locator:
+        table_id: Al-052
+        url: https://janaf.nist.gov/tables/Al-052.html
+        download_url: https://janaf.nist.gov/tables/Al-052.txt
+        row_temperature_as_published: '900'
+        column: H-H(Tr)
+    formation_enthalpy:
+      value: -3300.2
+      as_published: '3300.200'
+      locator:
+        table_id: Al-052
+        url: https://janaf.nist.gov/tables/Al-052.html
+        download_url: https://janaf.nist.gov/tables/Al-052.txt
+        row_temperature_as_published: '900'
+        column: delta-f H
+        parse_repair: nist_tail_whitespace_signs_restored
+        line_number: 14
+        raw_line: "900\t304.691\t520.012\t344.443\t158.013\t3300.200  2818.502 163.582"
+    formation_gibbs_energy:
+      value: -2818.502
+      as_published: '2818.502'
+      locator:
+        table_id: Al-052
+        url: https://janaf.nist.gov/tables/Al-052.html
+        download_url: https://janaf.nist.gov/tables/Al-052.txt
+        row_temperature_as_published: '900'
+        column: delta-f G
+        parse_repair: nist_tail_whitespace_signs_restored
+        line_number: 14
+        raw_line: "900\t304.691\t520.012\t344.443\t158.013\t3300.200  2818.502 163.582"
+    log10_formation_equilibrium_constant:
+      value: 163.582
+      as_published: '163.582'
+      locator:
+        table_id: Al-052
+        url: https://janaf.nist.gov/tables/Al-052.html
+        download_url: https://janaf.nist.gov/tables/Al-052.txt
+        row_temperature_as_published: '900'
+        column: log Kf
+        parse_repair: nist_tail_whitespace_signs_restored
+        line_number: 14
+        raw_line: "900\t304.691\t520.012\t344.443\t158.013\t3300.200  2818.502 163.582"
+  - temperature:
       value: 1000.0
       as_published: '1000'
       locator:
@@ -990,11 +1072,3 @@ table:
     locator:
       table_id: Al-052
       url: https://janaf.nist.gov/tables/Al-052.html
-  - line_number: 14
-    raw_line: "900\t304.691\t520.012\t344.443\t158.013\t3300.200  2818.502 163.582"
-    reason: 'refused JANAF tail sign restoration: formation Gibbs/log Kf identity misses by 2.562 printed log Kf units with
-      R=8.31441'
-    locator:
-      table_id: Al-052
-      url: https://janaf.nist.gov/tables/Al-052.html
-    kind: nist_tail_whitespace_signs_unresolved

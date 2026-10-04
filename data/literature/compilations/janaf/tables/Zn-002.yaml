@@ -16,6 +16,7 @@ compilation_role:
   scoring_eligible: false
   battery_refusal: gibbs_table_not_runtime_observable
   circularity_warning: Do not validate an engine against a compilation it consumes.
+  pure_substance_reference: true
 extraction:
   method: machine parse of NIST tab-delimited table download; source bytes cached unchanged
   user_agent: RegolithPyrolysisSimulator-corpus-harvester/1.0 (public thermochemical reference-data research; polite cached
@@ -846,87 +847,6 @@ table:
         row_temperature_as_published: '600'
         column: log Kf
   - temperature:
-      value: 700.0
-      as_published: '700'
-      locator:
-        table_id: Zn-002
-        url: https://janaf.nist.gov/tables/Zn-002.html
-        download_url: https://janaf.nist.gov/tables/Zn-002.txt
-        row_temperature_as_published: '700'
-        column: T(K)
-    heat_capacity:
-      value: 29.9
-      as_published: '29.900'
-      locator:
-        table_id: Zn-002
-        url: https://janaf.nist.gov/tables/Zn-002.html
-        download_url: https://janaf.nist.gov/tables/Zn-002.txt
-        row_temperature_as_published: '700'
-        column: Cp
-    entropy:
-      value: 64.903
-      as_published: '64.903'
-      locator:
-        table_id: Zn-002
-        url: https://janaf.nist.gov/tables/Zn-002.html
-        download_url: https://janaf.nist.gov/tables/Zn-002.txt
-        row_temperature_as_published: '700'
-        column: S
-    negative_gibbs_enthalpy_function:
-      value: 49.129
-      as_published: '49.129'
-      locator:
-        table_id: Zn-002
-        url: https://janaf.nist.gov/tables/Zn-002.html
-        download_url: https://janaf.nist.gov/tables/Zn-002.txt
-        row_temperature_as_published: '700'
-        column: -[G-H(Tr)]/T
-    enthalpy_increment:
-      value: 11.042
-      as_published: '11.042'
-      locator:
-        table_id: Zn-002
-        url: https://janaf.nist.gov/tables/Zn-002.html
-        download_url: https://janaf.nist.gov/tables/Zn-002.txt
-        row_temperature_as_published: '700'
-        column: H-H(Tr)
-    formation_enthalpy:
-      value: -7.333
-      as_published: '7.333'
-      locator:
-        table_id: Zn-002
-        url: https://janaf.nist.gov/tables/Zn-002.html
-        download_url: https://janaf.nist.gov/tables/Zn-002.txt
-        row_temperature_as_published: '700'
-        column: delta-f H
-        parse_repair: nist_tail_whitespace_signs_restored
-        line_number: 15
-        raw_line: "700\t29.900\t64.903\t49.129\t11.042\t7.333 0.077  0.006"
-    formation_gibbs_energy:
-      value: 0.077
-      as_published: '0.077'
-      locator:
-        table_id: Zn-002
-        url: https://janaf.nist.gov/tables/Zn-002.html
-        download_url: https://janaf.nist.gov/tables/Zn-002.txt
-        row_temperature_as_published: '700'
-        column: delta-f G
-        parse_repair: nist_tail_whitespace_signs_restored
-        line_number: 15
-        raw_line: "700\t29.900\t64.903\t49.129\t11.042\t7.333 0.077  0.006"
-    log10_formation_equilibrium_constant:
-      value: -0.006
-      as_published: '0.006'
-      locator:
-        table_id: Zn-002
-        url: https://janaf.nist.gov/tables/Zn-002.html
-        download_url: https://janaf.nist.gov/tables/Zn-002.txt
-        row_temperature_as_published: '700'
-        column: log Kf
-        parse_repair: nist_tail_whitespace_signs_restored
-        line_number: 15
-        raw_line: "700\t29.900\t64.903\t49.129\t11.042\t7.333 0.077  0.006"
-  - temperature:
       value: 800.0
       as_published: '800'
       locator:
@@ -1149,3 +1069,11 @@ table:
     locator:
       table_id: Zn-002
       url: https://janaf.nist.gov/tables/Zn-002.html
+  - line_number: 15
+    raw_line: "700\t29.900\t64.903\t49.129\t11.042\t7.333 0.077  0.006"
+    reason: 'refused JANAF tail sign restoration: formation Gibbs/log Kf identity misses by 0.254 printed log Kf units with
+      R=8.31441 (allowed 2.000; alternate relation 11.746)'
+    locator:
+      table_id: Zn-002
+      url: https://janaf.nist.gov/tables/Zn-002.html
+    kind: nist_tail_whitespace_signs_unresolved
