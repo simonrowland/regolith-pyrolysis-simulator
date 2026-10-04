@@ -338,7 +338,6 @@ experiments:
     paragraph: usually operated at total pressures of 0.2 to 1.0 atm
     note: TMS usual operating range; NaCl and Table 2 K are TMS (printed p. 11 / p. 22)
 - experiment_id: hastie-1981-solgasmix-model-glass
-  bench_id: hastie-1981-kms
   method: thermochemical_equilibrium_model
   locator:
     table: '3'
@@ -362,6 +361,36 @@ experiments:
         note: 'Glass: Na2O (17 wt.%), CaO (12 wt.%), SiO2 (71 wt.%); model recipe only'
 
 - experiment_id: hastie-1981-measured-soda-lime-glass
+  method:
+    tag: unknown
+    reason: >-
+      Fig.5 ledger compares KMS and TMS; no single-method physical bench
+      (R2-1). Composition-only scope for mixed ledgers.
+  locator:
+    figure: '5'
+    page: 51
+    published_page: 51
+    pdf_page_index: 57
+    note: >-
+      Figure 5/6 measured soda-lime-silica glass mixed KMS/TMS ledger scope;
+      caption p.51/PDF57; initial 17/12/71 recipe printed p.18/PDF24. No
+      physical bench — KMS/TMS points use method-specific experiments.
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value:
+          Na2O: 17
+          CaO: 12
+          SiO2: 71
+      locator:
+        page: 18
+        published_page: 18
+        pdf_page_index: 24
+        note: >-
+          Measured starting glass Na2O 17 / CaO 12 / SiO2 71 wt%; Fig. 6 is
+          0.45 wt% Na2CO3 impurity in this glass (caption p.51/PDF57)
+- experiment_id: hastie-1981-measured-soda-lime-glass-kms
   bench_id: hastie-1981-kms
   method: knudsen_effusion
   locator:
@@ -370,9 +399,35 @@ experiments:
     published_page: 51
     pdf_page_index: 57
     note: >-
-      Figure 5/6 measured soda-lime-silica glass (KMS/TMS); caption p.51/PDF57
-      cross-refers Fig. 6 carbonate impurity to this glass; initial 17/12/71
-      recipe printed p.18/PDF24. Measured experiment, not SOLGASMIX model.
+      Fig.5 KMS digitized points on measured soda-lime glass; initial
+      17/12/71 wt% printed p.18/PDF24. KMS bench only (R2-1).
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value:
+          Na2O: 17
+          CaO: 12
+          SiO2: 71
+      locator:
+        page: 18
+        published_page: 18
+        pdf_page_index: 24
+        note: >-
+          Measured starting glass Na2O 17 / CaO 12 / SiO2 71 wt%; Fig. 6 is
+          0.45 wt% Na2CO3 impurity in this glass (caption p.51/PDF57)
+- experiment_id: hastie-1981-measured-soda-lime-glass-tms
+  bench_id: hastie-1981-tms
+  method: transpiration
+  locator:
+    figure: '5'
+    page: 51
+    published_page: 51
+    pdf_page_index: 57
+    note: >-
+      Fig.5 TMS digitized points and Fig.6 TMS Na2CO3 gamma on measured
+      soda-lime glass; initial 17/12/71 wt% printed p.18/PDF24. Accepted
+      method token transpiration (existing hastie-1981-tms bench). R2-1.
   sample:
     printed_composition:
       state:
@@ -1387,8 +1442,93 @@ species:
         semantics: bound_not_point_ordering
       uncertainty:
         note: not applicable
+    - observation_id: hastie_1981_fig5_glass_Na_this_work_digitized::T=1493.7:h=31e60450532f
+      experiment: hastie-1981-measured-soda-lime-glass-tms
+      type: psat_series
+      locator:
+        figure: '5'
+        page: 59
+        published_page: 59
+        pdf_page_index: 65
+      T_K: 1493.7
+      phase: soda_lime_silica_glass
+      regime: transpiration_mass_spectrometry
+      units: atm as published
+      values:
+        quantity: P_Na_over_soda_lime_glass
+        method_class: measured_direct
+        figure_digitized: true
+        digitization_error_dex: 0.10
+        series: TMS_1
+        p_atm: 9.49e-05
+        log10_p_atm: -4.023
+        invT_times_1e4_K_inv: 6.695
+        pixel_pass1: [1013, 1039]
+        residual_dex_vs_pass2: -0.002
+        Na2O_wt_pct: 17.0
+        note: TMS(1) error-bar midpoint (bar log10 P -3.73 to -4.32)
+        glass_initial_wt_pct: {Na2O: 17, CaO: 12, SiO2: 71}
+        Na2CO3_impurity_wt_pct: 0.45
+      uncertainty:
+        note: digitisation ±0.10 dex (tick-calibrated; pass-2 residual ≤0.004 dex). KMS(1) vertical bar is the authors' maximum conceivable error.
+    - observation_id: hastie_1981_fig5_glass_Na_this_work_digitized::T=1333.3:h=0364389ce814
+      experiment: hastie-1981-measured-soda-lime-glass-tms
+      type: psat_series
+      locator:
+        figure: '5'
+        page: 59
+        published_page: 59
+        pdf_page_index: 65
+      T_K: 1333.3
+      phase: soda_lime_silica_glass
+      regime: transpiration_mass_spectrometry
+      units: atm as published
+      values:
+        quantity: P_Na_over_soda_lime_glass
+        method_class: measured_direct
+        figure_digitized: true
+        digitization_error_dex: 0.10
+        series: TMS_1
+        p_atm: 1.72e-05
+        log10_p_atm: -4.765
+        invT_times_1e4_K_inv: 7.5
+        pixel_pass1: [1493, 1477]
+        residual_dex_vs_pass2: -0.003
+        Na2O_wt_pct: 17.0
+        glass_initial_wt_pct: {Na2O: 17, CaO: 12, SiO2: 71}
+        Na2CO3_impurity_wt_pct: 0.45
+      uncertainty:
+        note: digitisation ±0.10 dex (tick-calibrated; pass-2 residual ≤0.004 dex). KMS(1) vertical bar is the authors' maximum conceivable error.
+    - observation_id: hastie_1981_fig5_glass_Na_this_work_digitized::T=1333.3:h=2db4bdbaa4a6
+      experiment: hastie-1981-measured-soda-lime-glass-tms
+      type: psat_series
+      locator:
+        figure: '5'
+        page: 59
+        published_page: 59
+        pdf_page_index: 65
+      T_K: 1333.3
+      phase: soda_lime_silica_glass
+      regime: transpiration_mass_spectrometry
+      units: atm as published
+      values:
+        quantity: P_Na_over_soda_lime_glass
+        method_class: measured_direct
+        figure_digitized: true
+        digitization_error_dex: 0.10
+        series: TMS_2
+        p_atm: 1.41e-05
+        log10_p_atm: -4.850
+        invT_times_1e4_K_inv: 7.5
+        pixel_pass1: [1493, 1527]
+        residual_dex_vs_pass2: -0.003
+        Na2O_wt_pct: 16.9
+        glass_initial_wt_pct: {Na2O: 17, CaO: 12, SiO2: 71}
+        Na2CO3_impurity_wt_pct: 0.45
+      uncertainty:
+        note: digitisation ±0.10 dex (tick-calibrated; pass-2 residual ≤0.004 dex). KMS(1) vertical bar is the authors' maximum conceivable error.
     - observation_id: hastie_1981_fig5_glass_Na_this_work_digitized
-      experiment: hastie-1981-measured-soda-lime-glass
+      experiment: hastie-1981-measured-soda-lime-glass-kms
       type: psat_series
       locator:
         figure: '5'
@@ -1397,9 +1537,9 @@ species:
         pdf_page_index: 65
       T_range_K:
       - 1333.3
-      - 1493.7
+      - 1488.8
       phase: soda_lime_silica_glass
-      regime: mixed_kms_tms
+      regime: knudsen_mass_spectrometry
       units: atm as published
       values:
         quantity: P_Na_over_soda_lime_glass
@@ -1455,15 +1595,6 @@ species:
           impurity Na2CO3 (p. 20). Caption: KMS(1) 17.0 to 16.7; KMS(3) 15.6
           to 13.3; TMS(1) 17.0; TMS(2) 16.9 wt.%.
         points:
-        - series: TMS_1
-          T_K: 1493.7
-          invT_times_1e4_K_inv: 6.695
-          p_atm: 9.49e-05
-          log10_p_atm: -4.023
-          pixel_pass1: [1013, 1039]
-          residual_dex_vs_pass2: -0.002
-          Na2O_wt_pct: 17.0
-          note: TMS(1) error-bar midpoint (bar log10 P -3.73 to -4.32)
         - series: KMS_1
           T_K: 1488.8
           invT_times_1e4_K_inv: 6.717
@@ -1482,22 +1613,6 @@ species:
           residual_dex_vs_pass2: -0.004
           Na2O_wt_pct: 17.0-16.7
           note: KMS(1) curve at 10^4/T=7.5 (tick-calibrated; prior frame map was -6.05)
-        - series: TMS_1
-          T_K: 1333.3
-          invT_times_1e4_K_inv: 7.5
-          p_atm: 1.72e-05
-          log10_p_atm: -4.765
-          pixel_pass1: [1493, 1477]
-          residual_dex_vs_pass2: -0.003
-          Na2O_wt_pct: 17.0
-        - series: TMS_2
-          T_K: 1333.3
-          invT_times_1e4_K_inv: 7.5
-          p_atm: 1.41e-05
-          log10_p_atm: -4.850
-          pixel_pass1: [1493, 1527]
-          residual_dex_vs_pass2: -0.003
-          Na2O_wt_pct: 16.9
         - series: KMS_3
           T_K: 1428.6
           invT_times_1e4_K_inv: 7.0
@@ -1513,7 +1628,7 @@ species:
       uncertainty:
         note: digitisation ±0.10 dex (tick-calibrated; pass-2 residual ≤0.004 dex). KMS(1) vertical bar is the authors' maximum conceivable error.
     - observation_id: hastie_1981_fig6_na2co3_gamma_figure_only
-      experiment: hastie-1981-measured-soda-lime-glass
+      experiment: hastie-1981-measured-soda-lime-glass-tms
       type: activity_coefficient
       locator:
         figure: '6'
@@ -1883,7 +1998,7 @@ species:
         reason: Parent digitization retained unchanged as archival derived evidence; plotted point coordinates
           are not printed numeric cells. No re-digitization or invented cell quote in this deepening.
     - observation_id: hastie_1981_fig6_na2co3_gamma_figure_only_quoted_20260906
-      experiment: hastie-1981-measured-soda-lime-glass
+      experiment: hastie-1981-measured-soda-lime-glass-tms
       supersedes: hastie_1981_fig6_na2co3_gamma_figure_only
       type: activity_coefficient
       class_tag: figure_only
