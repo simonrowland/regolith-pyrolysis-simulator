@@ -3,7 +3,7 @@ sources:
 - data/literature/extracts/kems-035-sauerborn-2005.yaml
 observations:
 - observation_id: kems-035-sauerborn-2005::sauerborn_2005_completeness_ledger
-  experiment_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356::experiment::jsc1-solar-series
+  experiment_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356::kems-035-sauerborn-2005
   identity:
     quantity:
       tag: unknown
@@ -49,7 +49,7 @@ observations:
     paragraph: Inhaltsverzeichnis
   read_from: pdf:kems-035-sauerborn-2005
 - observation_id: kems-035-sauerborn-2005::sauerborn_2005_completeness_ledger_deep2
-  experiment_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356::experiment::jsc1-solar-series
+  experiment_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356::kems-035-sauerborn-2005
   identity:
     quantity:
       tag: unknown
@@ -825,167 +825,6 @@ observations:
     figure: '2.2'
     paragraph: Kapitel 2.1.2
   read_from: pdf:kems-035-sauerborn-2005
-- observation_id: kems-035-sauerborn-2005::sauerborn_2005_mass_loss_series::T=1673.15:h=92ce255f810f
-  experiment_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356::experiment::jsc1-solar-series
-  identity:
-    quantity:
-      tag: value
-      value: mass_loss_fraction
-    species:
-      formula: SiO2
-      phase:
-        tag: unknown
-        reason: phase string 'JSC-1_and_SiO2_residues' is not in the closed automatic map
-      polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-      charge:
-        tag: value
-        value: 0
-    subtype:
-      tag: not_applicable
-      reason: profile mass_loss_fraction does not use subtype
-    per:
-      tag: unknown
-      reason: no per mapped from source
-    temperature_K:
-      tag: value
-      value: '1673.15'
-    standard_pressure_Pa:
-      tag: not_applicable
-      reason: profile mass_loss_fraction does not use standard_pressure_Pa
-    reaction:
-      tag: not_applicable
-      reason: profile mass_loss_fraction does not use reaction
-    formation_elements:
-      tag: not_applicable
-      reason: profile mass_loss_fraction does not use formation_elements
-    reference_state:
-      tag: not_applicable
-      reason: profile mass_loss_fraction does not use reference_state
-    reservoir:
-      tag: unknown
-      reason: no reservoir mapped from source
-    composition:
-      tag: unknown
-      reason: no composition field under keys oxides_wt_pct / major_oxide_wt_pct / composition_wt_pct / sample_oxide_composition_wt_pct
-        / starting_glass_wt_pct / SiO2 Al2O3 FeO Fe2O3 MgO CaO Na2O K2O TiO2 MnO P2O5 in this extract
-    fO2_Pa:
-      tag: unknown
-      reason: no fO2_Pa mapped from source
-    total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
-    sweep_gas:
-      tag: unknown
-      reason: no sweep_gas mapped from source
-    exposure:
-      tag: unknown
-      reason: no exposure mapped from source
-    sample_mass_kg:
-      tag: unknown
-      reason: no sample_mass_kg mapped from source
-    wall:
-      tag: not_applicable
-      reason: profile mass_loss_fraction does not use wall
-  value:
-    kind: point
-    point: '0.011'
-    approximate: false
-  uncertainty:
-    kind: printed
-    verbatim:
-      note: none printed; MS5 melted-fraction 43 vs 54 residual is a source inconsistency
-  evidence:
-    class:
-      tag: value
-      value: measured_direct
-    original_method_class: solar_vacuum_pyrolysis
-  admission:
-    status: superseded
-    reason: superseded by a later observation in the same extract
-    superseded_by: kems-035-sauerborn-2005::sauerborn_2005_mass_loss_series_deep2::T=1673.15:h=92ce255f810f
-    decided_by:
-      worker: hunt-RH-49-r2
-      date: '2026-09-06'
-      evidence:
-        page: 76
-  notices: []
-  source_id: kems-035-sauerborn-2005
-  locator:
-    page: 76
-  read_from: pdf:kems-035-sauerborn-2005
-  point_conditions:
-    temperature_K:
-      state:
-        tag: value
-        value: '1673.15'
-      locator:
-        page: 76
-      inference:
-        relation: celsius_to_kelvin
-        inputs:
-        - T_K = T_C + 273.15
-        - original_unit=C
-        parameters:
-        - - original
-          - state:
-              tag: value
-              value: '1400'
-            locator:
-              page: 76
-        - - factor
-          - state:
-              tag: value
-              value: '273.15'
-            locator:
-              page: 76
-        output_unit: K
-    mass_kg:
-      state:
-        tag: value
-        value: '0.0006719'
-      locator:
-        page: 76
-      inference:
-        relation: g_to_kg
-        inputs:
-        - m_kg = m_g / 1000
-        - original_unit=g
-        - as_published=0.6719 g
-        - printed=mass_g
-        parameters:
-        - - original
-          - state:
-              tag: value
-              value: '0.6719'
-            locator:
-              page: 76
-        - - factor
-          - state:
-              tag: value
-              value: '1000'
-            locator:
-              page: 76
-        output_unit: kg
-  derivation:
-    relation: percent_to_fraction
-    inputs:
-    - pdf:kems-035-sauerborn-2005
-    parameters:
-    - - original
-      - state:
-          tag: value
-          value: '1.1'
-        locator:
-          page: 76
-    - - factor
-      - state:
-          tag: value
-          value: '100'
-        locator:
-          page: 76
-    output_unit: dimensionless
 - observation_id: kems-035-sauerborn-2005::sauerborn_2005_mass_loss_series::T=1815.15:h=43dee28e38e2
   experiment_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356::experiment::jsc1-solar-series
   identity:
@@ -1065,7 +904,7 @@ observations:
   admission:
     status: superseded
     reason: superseded by a later observation in the same extract
-    superseded_by: kems-035-sauerborn-2005::sauerborn_2005_mass_loss_series_deep2::T=1673.15:h=92ce255f810f
+    superseded_by: kems-035-sauerborn-2005::sauerborn_2005_mass_loss_series_deep2::T=1815.15:h=43dee28e38e2
     decided_by:
       worker: hunt-RH-49-r2
       date: '2026-09-06'
@@ -1226,7 +1065,7 @@ observations:
   admission:
     status: superseded
     reason: superseded by a later observation in the same extract
-    superseded_by: kems-035-sauerborn-2005::sauerborn_2005_mass_loss_series_deep2::T=1673.15:h=92ce255f810f
+    superseded_by: kems-035-sauerborn-2005::sauerborn_2005_mass_loss_series_deep2::T=1815.15:h=43dee28e38e2
     decided_by:
       worker: hunt-RH-49-r2
       date: '2026-09-06'
@@ -1387,7 +1226,7 @@ observations:
   admission:
     status: superseded
     reason: superseded by a later observation in the same extract
-    superseded_by: kems-035-sauerborn-2005::sauerborn_2005_mass_loss_series_deep2::T=1673.15:h=92ce255f810f
+    superseded_by: kems-035-sauerborn-2005::sauerborn_2005_mass_loss_series_deep2::T=1815.15:h=43dee28e38e2
     decided_by:
       worker: hunt-RH-49-r2
       date: '2026-09-06'
@@ -1468,166 +1307,6 @@ observations:
           value: '100'
         locator:
           page: 98
-    output_unit: dimensionless
-- observation_id: kems-035-sauerborn-2005::sauerborn_2005_mass_loss_series_deep2::T=1673.15:h=92ce255f810f
-  experiment_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356::experiment::jsc1-solar-series
-  identity:
-    quantity:
-      tag: value
-      value: mass_loss_fraction
-    species:
-      formula: SiO2
-      phase:
-        tag: unknown
-        reason: phase string 'JSC-1_and_SiO2_residues' is not in the closed automatic map
-      polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-      charge:
-        tag: value
-        value: 0
-    subtype:
-      tag: not_applicable
-      reason: profile mass_loss_fraction does not use subtype
-    per:
-      tag: unknown
-      reason: no per mapped from source
-    temperature_K:
-      tag: value
-      value: '1673.15'
-    standard_pressure_Pa:
-      tag: not_applicable
-      reason: profile mass_loss_fraction does not use standard_pressure_Pa
-    reaction:
-      tag: not_applicable
-      reason: profile mass_loss_fraction does not use reaction
-    formation_elements:
-      tag: not_applicable
-      reason: profile mass_loss_fraction does not use formation_elements
-    reference_state:
-      tag: not_applicable
-      reason: profile mass_loss_fraction does not use reference_state
-    reservoir:
-      tag: unknown
-      reason: no reservoir mapped from source
-    composition:
-      tag: unknown
-      reason: no composition field under keys oxides_wt_pct / major_oxide_wt_pct / composition_wt_pct / sample_oxide_composition_wt_pct
-        / starting_glass_wt_pct / SiO2 Al2O3 FeO Fe2O3 MgO CaO Na2O K2O TiO2 MnO P2O5 in this extract
-    fO2_Pa:
-      tag: unknown
-      reason: no fO2_Pa mapped from source
-    total_pressure_Pa:
-      tag: unknown
-      reason: no total_pressure_Pa mapped from source
-    sweep_gas:
-      tag: unknown
-      reason: no sweep_gas mapped from source
-    exposure:
-      tag: unknown
-      reason: no exposure mapped from source
-    sample_mass_kg:
-      tag: unknown
-      reason: no sample_mass_kg mapped from source
-    wall:
-      tag: not_applicable
-      reason: profile mass_loss_fraction does not use wall
-  value:
-    kind: point
-    point: '0.011'
-    approximate: false
-  uncertainty:
-    kind: printed
-    verbatim:
-      note: none printed; MS5 melted-fraction 43 vs 54 residual is a source inconsistency
-  evidence:
-    class:
-      tag: value
-      value: measured_direct
-    original_method_class: solar_vacuum_pyrolysis
-  admission:
-    status: admitted
-    reason: printed numeric mass-loss cell with page locator
-    decided_by:
-      worker: hunt-RH-49-r2
-      date: '2026-09-06'
-      evidence:
-        page: 76
-  notices: []
-  source_id: kems-035-sauerborn-2005
-  locator:
-    page: 76
-  read_from: pdf:kems-035-sauerborn-2005
-  point_conditions:
-    temperature_K:
-      state:
-        tag: value
-        value: '1673.15'
-      locator:
-        page: 76
-      inference:
-        relation: celsius_to_kelvin
-        inputs:
-        - T_K = T_C + 273.15
-        - original_unit=C
-        parameters:
-        - - original
-          - state:
-              tag: value
-              value: '1400'
-            locator:
-              page: 76
-        - - factor
-          - state:
-              tag: value
-              value: '273.15'
-            locator:
-              page: 76
-        output_unit: K
-    mass_kg:
-      state:
-        tag: value
-        value: '0.0006719'
-      locator:
-        page: 76
-      inference:
-        relation: g_to_kg
-        inputs:
-        - m_kg = m_g / 1000
-        - original_unit=g
-        - as_published=0.6719 g
-        - printed=mass_g
-        parameters:
-        - - original
-          - state:
-              tag: value
-              value: '0.6719'
-            locator:
-              page: 76
-        - - factor
-          - state:
-              tag: value
-              value: '1000'
-            locator:
-              page: 76
-        output_unit: kg
-  derivation:
-    relation: percent_to_fraction
-    inputs:
-    - pdf:kems-035-sauerborn-2005
-    parameters:
-    - - original
-      - state:
-          tag: value
-          value: '1.1'
-        locator:
-          page: 76
-    - - factor
-      - state:
-          tag: value
-          value: '100'
-        locator:
-          page: 76
     output_unit: dimensionless
 - observation_id: kems-035-sauerborn-2005::sauerborn_2005_mass_loss_series_deep2::T=1815.15:h=43dee28e38e2
   experiment_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356::experiment::jsc1-solar-series
@@ -2276,6 +1955,323 @@ observations:
     figure: '5.1'
     note: Abb. 5.1–5.3 and MS QMS/IR time series
   read_from: pdf:kems-035-sauerborn-2005
+- observation_id: kems-035-sauerborn-2005::sauerborn_2005_sio2_control_mass_loss_series::T=1673.15:h=92ce255f810f
+  experiment_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356::experiment::oxide-reference-series
+  identity:
+    quantity:
+      tag: value
+      value: mass_loss_fraction
+    species:
+      formula: SiO2
+      phase:
+        tag: unknown
+        reason: phase string 'pure_SiO2_control' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '1673.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition field under keys oxides_wt_pct / major_oxide_wt_pct / composition_wt_pct / sample_oxide_composition_wt_pct
+        / starting_glass_wt_pct / SiO2 Al2O3 FeO Fe2O3 MgO CaO Na2O K2O TiO2 MnO P2O5 in this extract
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: unknown
+      reason: no sample_mass_kg mapped from source
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use wall
+  value:
+    kind: point
+    point: '0.011'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: solar_vacuum_pyrolysis
+  admission:
+    status: superseded
+    reason: superseded by a later observation in the same extract
+    superseded_by: kems-035-sauerborn-2005::sauerborn_2005_sio2_control_mass_loss_series_deep2::T=1673.15:h=92ce255f810f
+    decided_by:
+      worker: hunt-RH-49-r2
+      date: '2026-09-06'
+      evidence:
+        page: 76
+  notices: []
+  source_id: kems-035-sauerborn-2005
+  locator:
+    page: 76
+  read_from: pdf:kems-035-sauerborn-2005
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1673.15'
+      locator:
+        page: 76
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1400'
+            locator:
+              page: 76
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 76
+        output_unit: K
+    mass_kg:
+      state:
+        tag: value
+        value: '0.0006719'
+      locator:
+        page: 76
+      inference:
+        relation: g_to_kg
+        inputs:
+        - m_kg = m_g / 1000
+        - original_unit=g
+        - as_published=0.6719 g
+        - printed=mass_g
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.6719'
+            locator:
+              page: 76
+        - - factor
+          - state:
+              tag: value
+              value: '1000'
+            locator:
+              page: 76
+        output_unit: kg
+  derivation:
+    relation: percent_to_fraction
+    inputs:
+    - pdf:kems-035-sauerborn-2005
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '1.1'
+        locator:
+          page: 76
+    - - factor
+      - state:
+          tag: value
+          value: '100'
+        locator:
+          page: 76
+    output_unit: dimensionless
+- observation_id: kems-035-sauerborn-2005::sauerborn_2005_sio2_control_mass_loss_series_deep2::T=1673.15:h=92ce255f810f
+  experiment_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356::experiment::oxide-reference-series
+  identity:
+    quantity:
+      tag: value
+      value: mass_loss_fraction
+    species:
+      formula: SiO2
+      phase:
+        tag: unknown
+        reason: phase string 'pure_SiO2_control' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use subtype
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '1673.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition field under keys oxides_wt_pct / major_oxide_wt_pct / composition_wt_pct / sample_oxide_composition_wt_pct
+        / starting_glass_wt_pct / SiO2 Al2O3 FeO Fe2O3 MgO CaO Na2O K2O TiO2 MnO P2O5 in this extract
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: unknown
+      reason: no sample_mass_kg mapped from source
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use wall
+  value:
+    kind: point
+    point: '0.011'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: solar_vacuum_pyrolysis
+  admission:
+    status: admitted
+    reason: printed numeric mass-loss cell with page locator
+    decided_by:
+      worker: hunt-RH-49-r2
+      date: '2026-09-06'
+      evidence:
+        page: 76
+  notices: []
+  source_id: kems-035-sauerborn-2005
+  locator:
+    page: 76
+  read_from: pdf:kems-035-sauerborn-2005
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1673.15'
+      locator:
+        page: 76
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1400'
+            locator:
+              page: 76
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 76
+        output_unit: K
+    mass_kg:
+      state:
+        tag: value
+        value: '0.0006719'
+      locator:
+        page: 76
+      inference:
+        relation: g_to_kg
+        inputs:
+        - m_kg = m_g / 1000
+        - original_unit=g
+        - as_published=0.6719 g
+        - printed=mass_g
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.6719'
+            locator:
+              page: 76
+        - - factor
+          - state:
+              tag: value
+              value: '1000'
+            locator:
+              page: 76
+        output_unit: kg
+  derivation:
+    relation: percent_to_fraction
+    inputs:
+    - pdf:kems-035-sauerborn-2005
+    parameters:
+    - - original
+      - state:
+          tag: value
+          value: '1.1'
+        locator:
+          page: 76
+    - - factor
+      - state:
+          tag: value
+          value: '100'
+        locator:
+          page: 76
+    output_unit: dimensionless
 - observation_id: kems-035-sauerborn-2005::sauerborn_2005_table21_lunar_soil_element_wt::rows:row=apollo-12:h=02d32d76f862
   experiment_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356::kems-035-sauerborn-2005
   identity:
@@ -2795,7 +2791,7 @@ observations:
     table: '2.2'
   read_from: pdf:kems-035-sauerborn-2005
 - observation_id: kems-035-sauerborn-2005::sauerborn_2005_table32_qms_masses
-  experiment_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356::experiment::jsc1-solar-series
+  experiment_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356::kems-035-sauerborn-2005
   identity:
     quantity:
       tag: unknown
@@ -2842,7 +2838,7 @@ observations:
     table: '3.2'
   read_from: pdf:kems-035-sauerborn-2005
 - observation_id: kems-035-sauerborn-2005::sauerborn_2005_table32_qms_masses_deep2
-  experiment_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356::experiment::jsc1-solar-series
+  experiment_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356::kems-035-sauerborn-2005
   identity:
     quantity:
       tag: unknown
@@ -2882,7 +2878,7 @@ observations:
     table: '3.2'
   read_from: pdf:kems-035-sauerborn-2005
 - observation_id: kems-035-sauerborn-2005::sauerborn_2005_table41_sample_inventory
-  experiment_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356::experiment::jsc1-solar-series
+  experiment_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356::kems-035-sauerborn-2005
   identity:
     quantity:
       tag: unknown
@@ -2929,7 +2925,7 @@ observations:
     table: '4.1'
   read_from: pdf:kems-035-sauerborn-2005
 - observation_id: kems-035-sauerborn-2005::sauerborn_2005_table41_sample_inventory_deep2
-  experiment_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356::experiment::jsc1-solar-series
+  experiment_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356::kems-035-sauerborn-2005
   identity:
     quantity:
       tag: unknown
@@ -3155,7 +3151,7 @@ observations:
     table: '5.1'
   read_from: pdf:kems-035-sauerborn-2005
 - observation_id: kems-035-sauerborn-2005::sauerborn_2005_table52_cao_cold_trap_edx
-  experiment_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356::experiment::jsc1-solar-series
+  experiment_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356::experiment::oxide-reference-series
   identity:
     quantity:
       tag: unknown
@@ -3238,7 +3234,7 @@ observations:
               source_path: docs-private/research/2026-08-27-ocr-repair/kems-035-sauerborn-2005/tables.md
         output_unit: K
 - observation_id: kems-035-sauerborn-2005::sauerborn_2005_table52_cao_cold_trap_edx_deep2
-  experiment_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356::experiment::jsc1-solar-series
+  experiment_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356::experiment::oxide-reference-series
   identity:
     quantity:
       tag: unknown
@@ -3309,7 +3305,7 @@ observations:
               table: '5.2'
         output_unit: K
 - observation_id: kems-035-sauerborn-2005::sauerborn_2005_table52_untreated_foil_sd
-  experiment_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356::experiment::jsc1-solar-series
+  experiment_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356::experiment::oxide-reference-series
   identity:
     quantity:
       tag: unknown
@@ -3370,7 +3366,7 @@ observations:
         table: '5.2'
         note: unbehandelte Folie Standardabweichung
 - observation_id: kems-035-sauerborn-2005::sauerborn_2005_table52_untreated_foil_sd_deep2
-  experiment_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356::experiment::jsc1-solar-series
+  experiment_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356::experiment::oxide-reference-series
   identity:
     quantity:
       tag: unknown
@@ -3602,7 +3598,7 @@ observations:
     table: '5.3'
   read_from: pdf:kems-035-sauerborn-2005
 - observation_id: kems-035-sauerborn-2005::sauerborn_2005_table54_blank_foil_edx
-  experiment_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356::experiment::jsc1-solar-series
+  experiment_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356::experiment::oxide-reference-series
   identity:
     quantity:
       tag: unknown
@@ -3662,7 +3658,7 @@ observations:
         table: '5.4'
         note: unbehandelte Folie / blank foil block
 - observation_id: kems-035-sauerborn-2005::sauerborn_2005_table54_blank_foil_edx_deep2
-  experiment_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356::experiment::jsc1-solar-series
+  experiment_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356::experiment::oxide-reference-series
   identity:
     quantity:
       tag: unknown
@@ -4292,7 +4288,7 @@ observations:
     table: '5.7'
   read_from: pdf:kems-035-sauerborn-2005
 - observation_id: kems-035-sauerborn-2005::sauerborn_2005_table58_outgassing_peaks
-  experiment_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356::experiment::jsc1-solar-series
+  experiment_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356::experiment::oxide-reference-series
   identity:
     quantity:
       tag: unknown
@@ -4344,7 +4340,7 @@ observations:
     source_path: docs-private/research/2026-08-27-ocr-repair/kems-035-sauerborn-2005/tables.md
   read_from: unknown:kems-035-sauerborn-2005
 - observation_id: kems-035-sauerborn-2005::sauerborn_2005_table58_outgassing_peaks_deep2
-  experiment_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356::experiment::jsc1-solar-series
+  experiment_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356::experiment::oxide-reference-series
   identity:
     quantity:
       tag: unknown
