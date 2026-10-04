@@ -533,7 +533,11 @@ species:
         measurement_status: measured_figure_only
         sodium_disilicate_1416C: [{p_H2O_sqrt_bar_sqrt: 0.0, p_NaOH_Pa_approx: 12.0}, {p_H2O_sqrt_bar_sqrt: 0.3, p_NaOH_Pa_approx: 40.0}, {p_H2O_sqrt_bar_sqrt: 0.5, p_NaOH_Pa_approx: 70.0}, {p_H2O_sqrt_bar_sqrt: 0.8, p_NaOH_Pa_approx: 90.0}]
         soda_lime_silica_1463C: [{p_H2O_sqrt_bar_sqrt: 0.0, p_NaOH_Pa_approx: 0.0}, {p_H2O_sqrt_bar_sqrt: 0.43, p_NaOH_Pa_approx: 20.0}, {p_H2O_sqrt_bar_sqrt: 0.58, p_NaOH_Pa_approx: 24.0}, {p_H2O_sqrt_bar_sqrt: 0.68, p_NaOH_Pa_approx: 26.0}]
-        composition_mol: {SiO2: 74, Na2O: 16, CaO: 10}
+        # Printed mol% for soda-lime-silica series at 1463 C only (not sodium-disilicate 1416 C).
+        # Correct encoding needs composition_mol fractions 0.74/0.16/0.10 with mol%-to-fraction
+        # conversion documented, on a soda-lime-silicate experiment distinct from sodium-disilicate.
+        # Do not use composition_mol with amounts summing to ~100 (reader treats as mole_fraction).
+        glass_composition_mol_pct: {SiO2: 74, Na2O: 16, CaO: 10}
     - observation_id: van_limpt_2007_table44_sodium_mass_balance
       experiment: sodium-disilicate-transpiration
       type: rate_series

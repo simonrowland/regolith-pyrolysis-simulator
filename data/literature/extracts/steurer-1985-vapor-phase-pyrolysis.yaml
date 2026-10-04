@@ -283,6 +283,7 @@ species:
         o2_fraction_table_note: Unnumbered comparison table on published p. 127; 2000–3000 K range. SiO2
           O2 yield (% of oxide) printed as 25 (no trailing decimal).
     - observation_id: steurer_1985_sio2_induction_experiment
+      experiment: steurer-1985-sio2-induction
       type: rate_series
       locator:
         published_page: 128
@@ -383,6 +384,7 @@ species:
   O2:
     observations:
     - observation_id: steurer_1985_table2_mixture_psat
+      experiment: steurer-1985-model-mixture
       type: psat_series
       locator:
         table: '2'
