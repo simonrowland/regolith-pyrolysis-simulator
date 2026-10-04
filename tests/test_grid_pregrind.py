@@ -1467,7 +1467,7 @@ def test_legacy_cache_v2_descriptive_manifest_remains_readable(tmp_path):
         ).hexdigest()
 
 
-def _prepared_drain_database(database, temperatures=(1200.0,)):
+def _prepared_drain_database(database, temperatures=(1200.0,), *, model="MELTSv1.0.2"):
     with GridCacheWriter(database) as writer:
         writer.seed_id_block(0)
         batch_id = writer.ensure_batch(
@@ -1484,8 +1484,9 @@ def _prepared_drain_database(database, temperatures=(1200.0,)):
             },
         )
         for shuffle_rank, temperature_C in enumerate(temperatures):
+            inputs = {**_inputs(temperature_C), "model": model}
             assert writer.materialize_key(
-                _inputs(temperature_C),
+                inputs,
                 batch_id=batch_id,
                 shuffle_rank=shuffle_rank,
                 shard=0,
@@ -1526,6 +1527,151 @@ class _ImmediateContext:
     def EngineWorkerPool(self, _worker_factory, *, size):
         self.pool = _ImmediatePool(size, _worker_factory)
         return self.pool
+
+
+def _drain_once_with_fake_native(database, *, model, monkeypatch):
+    context = _ImmediateContext()
+    calls = []
+
+    class FakeNativeBackend:
+        def equilibrate(self, queued_inputs):
+            calls.append(dict(queued_inputs))
+            output = _output()
+            output["engine_model"] = model
+            return output
+
+    fake_native = FakeNativeBackend()
+
+    def fake_run_point(job):
+        return job.grid_key_id, fake_native.equilibrate(job.inputs)
+
+    monkeypatch.setattr(grid_pregrind, "_STOP_REQUESTED", False)
+    monkeypatch.setattr(grid_pregrind, "EngineWorkerPool", context.EngineWorkerPool)
+    monkeypatch.setattr(grid_pregrind, "_run_point", fake_run_point)
+    args = SimpleNamespace(
+        backend="subprocess",
+        workers=1,
+        heartbeat_s=60.0,
+        limit=None,
+        status_json=database.with_suffix(".status.json"),
+        seed=178,
+        db=database,
+        commit_every=10,
+        assume_queued_run_mode=None,
+        model="MELTSv1.0.2",
+        timeout_s=20.0,
+        thermoengine_health_timeout_s=8.0,
+        thermoengine_equilibrate_timeout_s=60.0,
+        allow_zero_component_boundary=False,
+    )
+    with GridCacheWriter(
+        database, existing_only=True, backend_name="subprocess"
+    ) as writer:
+        batch_id = writer.connection.execute(
+            "SELECT batch_id FROM batches WHERE label = 'fixed-v2'"
+        ).fetchone()[0]
+        result = grid_pregrind.run_cycle(
+            args,
+            writer,
+            batch_id=batch_id,
+            grid_total=1,
+            shard=0,
+        )
+        row = writer.connection.execute(
+            "SELECT g.model, g.expedited_key, o.engine_model, o.status "
+            "FROM grid_keys g JOIN alphamelts_outputs o "
+            "ON o.expedited_key = g.expedited_key"
+        ).fetchone()
+    return result, row, calls
+
+
+def test_drain_with_different_model_persists_result_under_queued_key(
+    tmp_path, monkeypatch
+):
+    database = tmp_path / "queued-pmelts-drained-default.db"
+    _prepared_drain_database(database, model="pMELTS")
+
+    result, row, calls = _drain_once_with_fake_native(
+        database, model="MELTSv1.0.2", monkeypatch=monkeypatch
+    )
+
+    assert result["success"] == 1
+    assert calls[0]["model"] == "pMELTS"
+    assert (row["model"], row["engine_model"], row["status"]) == (
+        "pMELTS",
+        "MELTSv1.0.2",
+        "ok",
+    )
+
+
+def test_drain_with_same_model_persists_result_normally(tmp_path, monkeypatch):
+    database = tmp_path / "queued-default-drained-default.db"
+    _prepared_drain_database(database)
+
+    result, row, calls = _drain_once_with_fake_native(
+        database, model="MELTSv1.0.2", monkeypatch=monkeypatch
+    )
+
+    assert result["success"] == 1
+    assert calls[0]["model"] == "MELTSv1.0.2"
+    assert (row["model"], row["engine_model"], row["status"]) == (
+        "MELTSv1.0.2",
+        "MELTSv1.0.2",
+        "ok",
+    )
+
+
+def test_pmelts_drain_refuses_at_adapter_resolver_before_native_call(
+    tmp_path, monkeypatch
+):
+    from simulator import backends
+    from simulator.config import resolve_alphamelts_subprocess_model
+
+    database = tmp_path / "queued-pmelts-drained-pmelts.db"
+    _prepared_drain_database(database, model="pMELTS")
+    resolver_calls = []
+    native_calls = []
+
+    class FakeNativeBackend:
+        _mode = "subprocess"
+        _model = "pMELTS"
+
+        def is_available(self):
+            return True
+
+        def get_engine_version(self):
+            return "fixture-engine"
+
+        def equilibrate(self, **_kwargs):
+            native_calls.append(True)
+            pytest.fail("unverified model reached native backend")
+
+    def fake_resolve_backend(_name, _policy, *, backend_config):
+        resolver_calls.append(backend_config["model"])
+        resolve_alphamelts_subprocess_model(backend_config["model"])
+        return FakeNativeBackend()
+
+    monkeypatch.setattr(backends, "resolve_backend", fake_resolve_backend)
+    monkeypatch.setattr(grid_pregrind.signal, "signal", lambda *_args: None)
+    context = _ImmediateContext()
+    monkeypatch.setattr(grid_pregrind, "EngineWorkerPool", context.EngineWorkerPool)
+
+    def fake_run_point(job):
+        output = _output()
+        output["engine_model"] = "pMELTS"
+        native_calls.append(True)
+        return job.grid_key_id, output
+
+    monkeypatch.setattr(grid_pregrind, "_run_point", fake_run_point)
+
+    assert grid_pregrind.main(
+        ["--drain-only", "--db", str(database), "--model", "pMELTS"]
+    ) == 2
+
+    assert resolver_calls == ["pMELTS"]
+    assert native_calls == []
+    with sqlite3.connect(database) as connection:
+        assert connection.execute("SELECT COUNT(*) FROM alphamelts_outputs").fetchone()[0] == 0
 
 
 def test_unknown_phase_is_per_point_failure_and_pool_continues(
