@@ -628,13 +628,17 @@ def _thermoengine_pt0_identity(model: str) -> tuple[dict, dict]:
     return key, authority
 
 
-def _alphamelts_pt0_identity(model: str) -> tuple[dict, dict]:
+def _alphamelts_pt0_identity(
+    model: str,
+    *,
+    mode: str = "subprocess",
+) -> tuple[dict, dict]:
     from simulator.melt_backend.alphamelts import AlphaMELTSBackend
 
     store = PT0DeterminismStore("capture")
     sim = _build_pt0_sim(store)
     backend = AlphaMELTSBackend(model_name=model)
-    backend._mode = "subprocess"
+    backend._mode = mode
     provider = AlphaMELTSProvider(backend=backend)
     sim.backend = backend
     sim._chem_registry.register(
@@ -684,6 +688,31 @@ def test_blank_and_explicit_default_alphamelts_identity_match_field_by_field():
     del blank_non_model_provider["model"]
     del explicit_non_model_provider["model"]
     assert blank_non_model_provider == explicit_non_model_provider
+
+
+@pytest.mark.parametrize(
+    ("model", "expected_identity"),
+    [
+        ("", "alphamelts-diagnostic"),
+        (DEFAULT_ALPHAMELTS_MODEL, DEFAULT_ALPHAMELTS_MODEL),
+        ("pMELTS", "pMELTS"),
+    ],
+)
+def test_python_api_identity_pins_current_model_and_provider_fields(
+    model: str,
+    expected_identity: str,
+) -> None:
+    key, authority = _alphamelts_pt0_identity(model, mode="python_api")
+
+    assert key["model"] == {
+        "model": expected_identity,
+        "mode": "python_api",
+        "magemin_database": None,
+    }
+    assert authority["provider"]["resolved_provider_id"] == (
+        "alphamelts-diagnostic"
+    )
+    assert authority["provider"]["model"] == expected_identity
 
 
 def test_blank_thermoengine_model_resolves_to_default_in_pt0_identity() -> None:

@@ -24,6 +24,7 @@ from engines.alphamelts import AlphaMELTSProvider
 from engines.alphamelts.domain import AlphaMELTSDomainGate
 import engines.alphamelts.provider as alphamelts_provider_module
 import engines.alphamelts.thermoengine as thermoengine_module
+import simulator.config as simulator_config
 import simulator.engine_pool as engine_worker_module
 from engines.alphamelts.parser import diagnostics_to_equilibrium
 from engines.alphamelts.result import LiquidusDiagnostics
@@ -98,6 +99,133 @@ DATA_DIR = Path(__file__).resolve().parents[1] / "data"
 def _load_data(filename):
     with open(DATA_DIR / filename) as f:
         return yaml.safe_load(f) or {}
+
+
+def _petthermotools_call_arguments(model_name: str | None):
+    backend = AlphaMELTSBackend(model_name=model_name)
+    backend._mode = 'python_api'
+    calls = []
+    backend._require_petthermotools_runtime = lambda: object()
+    backend._run_petthermotools_isolated = (
+        lambda operation, **kwargs: calls.append((operation, kwargs)) or {}
+    )
+    backend._parse_petthermotools_result = lambda _raw, **kwargs: EquilibriumResult(
+        status='ok',
+        temperature_C=kwargs['temperature_C'],
+        pressure_bar=kwargs['pressure_bar'],
+        fO2_log=kwargs['fO2_log'],
+        liquid_fraction=1.0,
+    )
+    backend._equilibrate_python(
+        1400.0,
+        {'SiO2': 100.0},
+        -9.0,
+        1.0,
+    )
+    return backend, calls[0]
+
+
+@pytest.mark.parametrize(
+    ('model_name', 'expected_code'),
+    [
+        ('', 1),
+        ('MELTSv1.0.2', 1),
+        ('pMELTS', 2),
+        ('MELTSv1.1.0', 3),
+        ('MELTSv1.2.0', 4),
+    ],
+)
+def test_petthermotools_model_code_pins_current_selection(
+    model_name: str,
+    expected_code: int,
+) -> None:
+    backend = AlphaMELTSBackend(model_name=model_name)
+
+    assert backend._melts_model_code() == expected_code
+
+
+def test_petthermotools_blank_and_default_launch_arguments_match() -> None:
+    _blank_backend, blank_call = _petthermotools_call_arguments('')
+    _default_backend, default_call = _petthermotools_call_arguments(
+        DEFAULT_ALPHAMELTS_MODEL
+    )
+
+    assert blank_call == default_call
+
+
+@pytest.mark.parametrize('model_name', ['not-a-model', 'MELTSv1.O.2'])
+def test_petthermotools_unknown_model_refuses_before_worker_start(
+    monkeypatch,
+    tmp_path: Path,
+    model_name: str,
+) -> None:
+    backend = AlphaMELTSBackend(model_name=model_name)
+
+    class Context:
+        def Pipe(self, *, duplex: bool):
+            assert duplex
+            return Endpoint(), Endpoint()
+
+        def Process(self, **_kwargs):
+            return Process()
+
+    class Endpoint:
+        def close(self):
+            pass
+
+        def poll(self, _timeout):
+            return True
+
+        def recv(self):
+            return ('ok', {})
+
+    starts = []
+
+    class Process:
+        def start(self):
+            starts.append(True)
+
+        def join(self, timeout=None):
+            assert timeout == 0.25
+            pass
+
+        def is_alive(self):
+            return False
+
+    monkeypatch.setattr(
+        'simulator.melt_backend.alphamelts.multiprocessing.get_context',
+        lambda _name: Context(),
+    )
+    with pytest.raises(AlphaMELTSConfigurationError):
+        backend._run_petthermotools_cold(
+            'equilibrate_MELTS',
+            args=(),
+            kwargs={},
+            timeout_s=1.0,
+        )
+    assert starts == []
+    assert list(tmp_path.iterdir()) == []
+
+
+def test_petthermotools_resolver_is_the_model_code_owner() -> None:
+    resolver = getattr(simulator_config, 'resolve_alphamelts_python_api_model', None)
+    assert callable(resolver), 'Python API model resolver is not implemented yet'
+
+    cases = (
+        ('', 1),
+        (None, 1),
+        ('MELTSv1.0.2', 1),
+        ('pMELTS', 2),
+        ('MELTSv1.1.0', 3),
+        ('MELTSv1.2.0', 4),
+        (' pMELTS ', 2),
+    )
+    for model_name, expected_code in cases:
+        resolved_model, code = resolver(model_name)
+        backend = AlphaMELTSBackend(model_name=model_name)
+        assert code == expected_code
+        assert backend._melts_model_code() == code
+        assert resolved_model.strip() == resolved_model
 
 
 def test_alphamelts_python_failures_mark_backend_unavailable():
