@@ -71,6 +71,10 @@ experiments:
   bench_id: handbook-entry-no-thermal-run
   method: {tag: unknown, reason: not_published}
   locator: *sample_overview
+  sample:
+    mass_kg:
+      state: {tag: value, value: {kind: point, point: '0.171'}}
+      locator: {<<: *sample_overview, note: 'Printed 171 g characterization mass (not a thermal-run charge); unit conversion only.'}
 sample_characterization:
   apollo_16_sample_65701:
     locator: *sample_overview
