@@ -753,7 +753,7 @@ def test_padded_python_api_name_refuses_during_key_build_before_replay_access(
     replay_events = []
     monkeypatch.setattr(
         store,
-        "_lookup_optional",
+        "_lookup",
         lambda *args, **kwargs: replay_events.append("lookup"),
     )
     monkeypatch.setattr(
@@ -763,7 +763,18 @@ def test_padded_python_api_name_refuses_during_key_build_before_replay_access(
     )
 
     with pytest.raises(AlphaMELTSConfigurationError):
-        store._equilibrium_key(sim)
+        store.replay_equilibrium(sim)
+    with pytest.raises(AlphaMELTSConfigurationError):
+        store.capture_equilibrium(
+            sim,
+            EquilibriumResult(
+                status="ok",
+                temperature_C=1400.0,
+                pressure_bar=1.0,
+                fO2_log=-9.0,
+                liquid_fraction=1.0,
+            ),
+        )
 
     assert replay_events == []
 
