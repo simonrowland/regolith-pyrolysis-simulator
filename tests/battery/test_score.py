@@ -5105,7 +5105,7 @@ def test_non_allibert_typed_solid_activity_uses_fusion_conversion() -> None:
 @pytest.mark.parametrize(
     ("formula", "polymorph", "expected_offset", "tables"),
     (
-        ("Al2O3", "corundum", None, ("Al-096", "Al-100")),
+        ("Al2O3", "corundum", Decimal("0.455"), ("Al-096", "Al-100")),
         ("CaO", "lime", Decimal("0.842"), ("Ca-027", "Ca-028")),
         (
             "SiO2",
@@ -5181,7 +5181,7 @@ def test_solid_activity_fusion_conversion_reports_positive_offset(
     assert converted.identity.reference_state.value.endmember.phase.value is Phase.L
 
 
-def test_periclase_fusion_conversion_refuses_missing_janaf_rows() -> None:
+def test_periclase_fusion_conversion_uses_restored_janaf_rows() -> None:
     from simulator.battery.score import _fusion_comparison_reference
 
     temperature = Decimal("1873")
@@ -5205,11 +5205,10 @@ def test_periclase_fusion_conversion_refuses_missing_janaf_rows() -> None:
         source_id="synthetic-mgo-solid-reference-anchor",
     )
     converted = _fusion_comparison_reference(reference, engine=Engine.OPENIMCC)
-    assert converted.value.point == reference.value.point
-    assert converted.identity.reference_state.value.endmember.phase.value is Phase.CR
+    assert converted.value.point != reference.value.point
+    assert converted.identity.reference_state.value.endmember.phase.value is Phase.L
     assert any(
-        "fusion conversion missing input" in notice.reason
-        and "needed JANAF formation Gibbs row missing" in notice.reason
+        notice.reason.startswith("reference_converted_via_fusion;")
         for notice in converted.notices
     )
 
@@ -5404,11 +5403,11 @@ def test_absent_janaf_grid_node_refuses_binary_cell_interpolation(
         binary._cell_oxide_thermodynamics("W", 325.0)
 
 
-def test_silica_fusion_refuses_interpolation_across_unresolved_1700_row() -> None:
+def test_silica_fusion_interpolates_from_restored_1700_row() -> None:
     from simulator.battery.generators.janaf import janaf_fusion_energy
 
-    with pytest.raises(ValueError, match="1700"):
-        janaf_fusion_energy("SiO2", Decimal("1673"))
+    fusion = janaf_fusion_energy("SiO2", Decimal("1673"))
+    assert fusion.delta_g_fus_kJ_per_mol == Decimal("1.21185")
 
 
 def test_liquid_activity_reference_is_not_shifted() -> None:
@@ -5457,10 +5456,10 @@ def test_solid_activity_at_missing_fusion_node_is_refused() -> None:
 
     comparison = _fusion_comparison_reference(reference, engine=Engine.OPENIMCC)
     assert comparison.value.point == reference.value.point
-    assert comparison.identity.reference_state.value.endmember.phase.value is Phase.CR
+    assert comparison.identity.reference_state.value.endmember.phase.value is Phase.L
     assert any(
-        "fusion conversion missing input" in item.reason
-        and "needed JANAF formation Gibbs row missing" in item.reason
+        item.kind is NoticeKind.OUT_OF_GAMMA_DOMAIN
+        and "liquid is natural" in item.reason
         for item in comparison.notices
     )
 
@@ -5474,7 +5473,7 @@ def test_solid_activity_at_missing_fusion_node_is_refused() -> None:
         (Engine.THERMOENGINE, "Al2O3"),
     ),
 )
-def test_melts_fusion_shift_refuses_missing_janaf_rows(
+def test_melts_fusion_shift_uses_restored_alumina_rows(
     engine: Engine, formula: str
 ) -> None:
     from simulator.battery.score import _fusion_comparison_reference
@@ -5506,10 +5505,11 @@ def test_melts_fusion_shift_refuses_missing_janaf_rows(
             for item in converted.notices
         )
     else:
-        assert converted.value.point == reference.value.point
+        assert converted.value.point != reference.value.point
+        assert converted.identity.reference_state.value.endmember.phase.value is Phase.L
         assert any(
-            "fusion conversion missing input" in item.reason
-            and "needed JANAF formation Gibbs row missing" in item.reason
+            item.kind is NoticeKind.DERIVATION_USES_COMPILATION
+            and item.reason.startswith("reference_converted_via_fusion;")
             for item in converted.notices
         )
 
@@ -5931,10 +5931,11 @@ def test_allibert_solid_activity_fusion_conversion_is_diagnostic_only(
         ),
     )
     converted_alumina = _fusion_comparison_reference(alumina_reference)
-    assert converted_alumina.value.point == alumina_reference.value.point
+    assert converted_alumina.value.point != alumina_reference.value.point
+    assert converted_alumina.identity.reference_state.value.endmember.phase.value is Phase.L
     assert any(
-        "fusion conversion missing input" in notice.reason
-        and "needed JANAF formation Gibbs row missing" in notice.reason
+        notice.kind is NoticeKind.DERIVATION_USES_COMPILATION
+        and notice.reason.startswith("reference_converted_via_fusion;")
         for notice in converted_alumina.notices
     )
     silica_fusion = janaf_fusion_energy("SiO2", Decimal("1933"))
@@ -6102,7 +6103,10 @@ def test_allibert_solid_activity_fusion_conversion_is_diagnostic_only(
         experiment, converted_alumina, Engine.ALPHAMELTS.value
     )
     assert activity_request is not None
-    assert activity_request.payload is None
+    assert activity_request.payload is not None
+    assert activity_request.payload["reference_state"] == (
+        "raoultian_pure_liquid_endmember"
+    )
 
     model_derived_reference = replace(
         reference,

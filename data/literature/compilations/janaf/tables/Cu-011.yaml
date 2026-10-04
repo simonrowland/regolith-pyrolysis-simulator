@@ -984,6 +984,92 @@ table:
         row_temperature_as_published: '1100'
         column: log Kf
   - temperature:
+      value: 1200.0
+      as_published: '1200'
+      locator:
+        table_id: Cu-011
+        url: https://janaf.nist.gov/tables/Cu-011.html
+        download_url: https://janaf.nist.gov/tables/Cu-011.txt
+        row_temperature_as_published: '1200'
+        column: T(K)
+    heat_capacity:
+      value: 100.416
+      as_published: '100.416'
+      locator:
+        table_id: Cu-011
+        url: https://janaf.nist.gov/tables/Cu-011.html
+        download_url: https://janaf.nist.gov/tables/Cu-011.txt
+        row_temperature_as_published: '1200'
+        column: Cp
+    entropy:
+      value: 240.273
+      as_published: '240.273'
+      locator:
+        table_id: Cu-011
+        url: https://janaf.nist.gov/tables/Cu-011.html
+        download_url: https://janaf.nist.gov/tables/Cu-011.txt
+        row_temperature_as_published: '1200'
+        column: S
+    negative_gibbs_enthalpy_function:
+      value: 173.202
+      as_published: '173.202'
+      locator:
+        table_id: Cu-011
+        url: https://janaf.nist.gov/tables/Cu-011.html
+        download_url: https://janaf.nist.gov/tables/Cu-011.txt
+        row_temperature_as_published: '1200'
+        column: -[G-H(Tr)]/T
+    enthalpy_increment:
+      value: 80.486
+      as_published: '80.486'
+      locator:
+        table_id: Cu-011
+        url: https://janaf.nist.gov/tables/Cu-011.html
+        download_url: https://janaf.nist.gov/tables/Cu-011.txt
+        row_temperature_as_published: '1200'
+        column: H-H(Tr)
+    formation_enthalpy:
+      value: null
+      as_published: '464.089'
+      locator:
+        table_id: Cu-011
+        url: https://janaf.nist.gov/tables/Cu-011.html
+        download_url: https://janaf.nist.gov/tables/Cu-011.txt
+        row_temperature_as_published: '1200'
+        column: delta-f H
+        parse_repair: nist_tail_dfh_sign_undetermined
+        parse_repair_reason: formation enthalpy neighbors span a transition marker
+        raw_tail_tokens:
+        - '464.089'
+        - '366.348'
+        - '15.947'
+        line_number: 20
+        raw_line: "1200\t100.416\t240.273\t173.202\t80.486\t464.089  366.348 15.947"
+    formation_gibbs_energy:
+      value: -366.348
+      as_published: '366.348'
+      locator:
+        table_id: Cu-011
+        url: https://janaf.nist.gov/tables/Cu-011.html
+        download_url: https://janaf.nist.gov/tables/Cu-011.txt
+        row_temperature_as_published: '1200'
+        column: delta-f G
+        parse_repair: nist_tail_whitespace_signs_restored
+        line_number: 20
+        raw_line: "1200\t100.416\t240.273\t173.202\t80.486\t464.089  366.348 15.947"
+    log10_formation_equilibrium_constant:
+      value: 15.947
+      as_published: '15.947'
+      locator:
+        table_id: Cu-011
+        url: https://janaf.nist.gov/tables/Cu-011.html
+        download_url: https://janaf.nist.gov/tables/Cu-011.txt
+        row_temperature_as_published: '1200'
+        column: log Kf
+        parse_repair: nist_tail_whitespace_signs_restored
+        line_number: 20
+        raw_line: "1200\t100.416\t240.273\t173.202\t80.486\t464.089  366.348 15.947"
+  - temperature:
       value: 1300.0
       as_published: '1300'
       locator:
@@ -1945,10 +2031,3 @@ table:
     locator:
       table_id: Cu-011
       url: https://janaf.nist.gov/tables/Cu-011.html
-  - line_number: 20
-    raw_line: "1200\t100.416\t240.273\t173.202\t80.486\t464.089  366.348 15.947"
-    reason: 'refused JANAF tail sign restoration: formation enthalpy neighbors span a transition marker'
-    locator:
-      table_id: Cu-011
-      url: https://janaf.nist.gov/tables/Cu-011.html
-    kind: nist_tail_whitespace_signs_unresolved

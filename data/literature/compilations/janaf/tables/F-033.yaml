@@ -1062,6 +1062,92 @@ table:
         row_temperature_as_published: '1200'
         column: log Kf
   - temperature:
+      value: 1300.0
+      as_published: '1300'
+      locator:
+        table_id: F-033
+        url: https://janaf.nist.gov/tables/F-033.html
+        download_url: https://janaf.nist.gov/tables/F-033.txt
+        row_temperature_as_published: '1300'
+        column: T(K)
+    heat_capacity:
+      value: 66.944
+      as_published: '66.944'
+      locator:
+        table_id: F-033
+        url: https://janaf.nist.gov/tables/F-033.html
+        download_url: https://janaf.nist.gov/tables/F-033.txt
+        row_temperature_as_published: '1300'
+        column: Cp
+    entropy:
+      value: 131.018
+      as_published: '131.018'
+      locator:
+        table_id: F-033
+        url: https://janaf.nist.gov/tables/F-033.html
+        download_url: https://janaf.nist.gov/tables/F-033.txt
+        row_temperature_as_published: '1300'
+        column: S
+    negative_gibbs_enthalpy_function:
+      value: 87.612
+      as_published: '87.612'
+      locator:
+        table_id: F-033
+        url: https://janaf.nist.gov/tables/F-033.html
+        download_url: https://janaf.nist.gov/tables/F-033.txt
+        row_temperature_as_published: '1300'
+        column: -[G-H(Tr)]/T
+    enthalpy_increment:
+      value: 56.427
+      as_published: '56.427'
+      locator:
+        table_id: F-033
+        url: https://janaf.nist.gov/tables/F-033.html
+        download_url: https://janaf.nist.gov/tables/F-033.txt
+        row_temperature_as_published: '1300'
+        column: H-H(Tr)
+    formation_enthalpy:
+      value: null
+      as_published: '665.009'
+      locator:
+        table_id: F-033
+        url: https://janaf.nist.gov/tables/F-033.html
+        download_url: https://janaf.nist.gov/tables/F-033.txt
+        row_temperature_as_published: '1300'
+        column: delta-f H
+        parse_repair: nist_tail_dfh_sign_undetermined
+        parse_repair_reason: formation enthalpy neighbors span a transition marker
+        raw_tail_tokens:
+        - '665.009'
+        - '430.433'
+        - '17.295'
+        line_number: 18
+        raw_line: "1300\t66.944\t131.018\t87.612\t56.427\t665.009  430.433 17.295"
+    formation_gibbs_energy:
+      value: -430.433
+      as_published: '430.433'
+      locator:
+        table_id: F-033
+        url: https://janaf.nist.gov/tables/F-033.html
+        download_url: https://janaf.nist.gov/tables/F-033.txt
+        row_temperature_as_published: '1300'
+        column: delta-f G
+        parse_repair: nist_tail_whitespace_signs_restored
+        line_number: 18
+        raw_line: "1300\t66.944\t131.018\t87.612\t56.427\t665.009  430.433 17.295"
+    log10_formation_equilibrium_constant:
+      value: 17.295
+      as_published: '17.295'
+      locator:
+        table_id: F-033
+        url: https://janaf.nist.gov/tables/F-033.html
+        download_url: https://janaf.nist.gov/tables/F-033.txt
+        row_temperature_as_published: '1300'
+        column: log Kf
+        parse_repair: nist_tail_whitespace_signs_restored
+        line_number: 18
+        raw_line: "1300\t66.944\t131.018\t87.612\t56.427\t665.009  430.433 17.295"
+  - temperature:
       value: 1400.0
       as_published: '1400'
       locator:
@@ -2292,10 +2378,3 @@ table:
     locator:
       table_id: F-033
       url: https://janaf.nist.gov/tables/F-033.html
-  - line_number: 18
-    raw_line: "1300\t66.944\t131.018\t87.612\t56.427\t665.009  430.433 17.295"
-    reason: 'refused JANAF tail sign restoration: formation enthalpy neighbors span a transition marker'
-    locator:
-      table_id: F-033
-      url: https://janaf.nist.gov/tables/F-033.html
-    kind: nist_tail_whitespace_signs_unresolved

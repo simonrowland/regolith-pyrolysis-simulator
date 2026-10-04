@@ -768,6 +768,92 @@ table:
         row_temperature_as_published: '800'
         column: log Kf
   - temperature:
+      value: 900.0
+      as_published: '900'
+      locator:
+        table_id: C-070
+        url: https://janaf.nist.gov/tables/C-070.html
+        download_url: https://janaf.nist.gov/tables/C-070.txt
+        row_temperature_as_published: '900'
+        column: T(K)
+    heat_capacity:
+      value: 75.312
+      as_published: '75.312'
+      locator:
+        table_id: C-070
+        url: https://janaf.nist.gov/tables/C-070.html
+        download_url: https://janaf.nist.gov/tables/C-070.txt
+        row_temperature_as_published: '900'
+        column: Cp
+    entropy:
+      value: 217.526
+      as_published: '217.526'
+      locator:
+        table_id: C-070
+        url: https://janaf.nist.gov/tables/C-070.html
+        download_url: https://janaf.nist.gov/tables/C-070.txt
+        row_temperature_as_published: '900'
+        column: S
+    negative_gibbs_enthalpy_function:
+      value: 167.163
+      as_published: '167.163'
+      locator:
+        table_id: C-070
+        url: https://janaf.nist.gov/tables/C-070.html
+        download_url: https://janaf.nist.gov/tables/C-070.txt
+        row_temperature_as_published: '900'
+        column: -[G-H(Tr)]/T
+    enthalpy_increment:
+      value: 45.327
+      as_published: '45.327'
+      locator:
+        table_id: C-070
+        url: https://janaf.nist.gov/tables/C-070.html
+        download_url: https://janaf.nist.gov/tables/C-070.txt
+        row_temperature_as_published: '900'
+        column: H-H(Tr)
+    formation_enthalpy:
+      value: null
+      as_published: '98.240'
+      locator:
+        table_id: C-070
+        url: https://janaf.nist.gov/tables/C-070.html
+        download_url: https://janaf.nist.gov/tables/C-070.txt
+        row_temperature_as_published: '900'
+        column: delta-f H
+        parse_repair: nist_tail_dfh_sign_undetermined
+        parse_repair_reason: formation enthalpy neighbors span a transition marker
+        raw_tail_tokens:
+        - '98.240'
+        - '78.001'
+        - '4.527'
+        line_number: 14
+        raw_line: "900\t75.312\t217.526\t167.163\t45.327\t98.240  78.001 4.527"
+    formation_gibbs_energy:
+      value: -78.001
+      as_published: '78.001'
+      locator:
+        table_id: C-070
+        url: https://janaf.nist.gov/tables/C-070.html
+        download_url: https://janaf.nist.gov/tables/C-070.txt
+        row_temperature_as_published: '900'
+        column: delta-f G
+        parse_repair: nist_tail_whitespace_signs_restored
+        line_number: 14
+        raw_line: "900\t75.312\t217.526\t167.163\t45.327\t98.240  78.001 4.527"
+    log10_formation_equilibrium_constant:
+      value: 4.527
+      as_published: '4.527'
+      locator:
+        table_id: C-070
+        url: https://janaf.nist.gov/tables/C-070.html
+        download_url: https://janaf.nist.gov/tables/C-070.txt
+        row_temperature_as_published: '900'
+        column: log Kf
+        parse_repair: nist_tail_whitespace_signs_restored
+        line_number: 14
+        raw_line: "900\t75.312\t217.526\t167.163\t45.327\t98.240  78.001 4.527"
+  - temperature:
       value: 1000.0
       as_published: '1000'
       locator:
@@ -2286,10 +2372,3 @@ table:
     locator:
       table_id: C-070
       url: https://janaf.nist.gov/tables/C-070.html
-  - line_number: 14
-    raw_line: "900\t75.312\t217.526\t167.163\t45.327\t98.240  78.001 4.527"
-    reason: 'refused JANAF tail sign restoration: formation enthalpy neighbors span a transition marker'
-    locator:
-      table_id: C-070
-      url: https://janaf.nist.gov/tables/C-070.html
-    kind: nist_tail_whitespace_signs_unresolved

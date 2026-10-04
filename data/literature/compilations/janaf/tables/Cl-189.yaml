@@ -552,6 +552,178 @@ table:
         row_temperature_as_published: '450'
         column: log Kf
   - temperature:
+      value: 500.0
+      as_published: '500'
+      locator:
+        table_id: Cl-189
+        url: https://janaf.nist.gov/tables/Cl-189.html
+        download_url: https://janaf.nist.gov/tables/Cl-189.txt
+        row_temperature_as_published: '500'
+        column: T(K)
+    heat_capacity:
+      value: 209.2
+      as_published: '209.200'
+      locator:
+        table_id: Cl-189
+        url: https://janaf.nist.gov/tables/Cl-189.html
+        download_url: https://janaf.nist.gov/tables/Cl-189.txt
+        row_temperature_as_published: '500'
+        column: Cp
+    entropy:
+      value: 346.463
+      as_published: '346.463'
+      locator:
+        table_id: Cl-189
+        url: https://janaf.nist.gov/tables/Cl-189.html
+        download_url: https://janaf.nist.gov/tables/Cl-189.txt
+        row_temperature_as_published: '500'
+        column: S
+    negative_gibbs_enthalpy_function:
+      value: 260.459
+      as_published: '260.459'
+      locator:
+        table_id: Cl-189
+        url: https://janaf.nist.gov/tables/Cl-189.html
+        download_url: https://janaf.nist.gov/tables/Cl-189.txt
+        row_temperature_as_published: '500'
+        column: -[G-H(Tr)]/T
+    enthalpy_increment:
+      value: 43.002
+      as_published: '43.002'
+      locator:
+        table_id: Cl-189
+        url: https://janaf.nist.gov/tables/Cl-189.html
+        download_url: https://janaf.nist.gov/tables/Cl-189.txt
+        row_temperature_as_published: '500'
+        column: H-H(Tr)
+    formation_enthalpy:
+      value: null
+      as_published: '577.043'
+      locator:
+        table_id: Cl-189
+        url: https://janaf.nist.gov/tables/Cl-189.html
+        download_url: https://janaf.nist.gov/tables/Cl-189.txt
+        row_temperature_as_published: '500'
+        column: delta-f H
+        parse_repair: nist_tail_dfh_sign_undetermined
+        parse_repair_reason: formation enthalpy neighbors span a transition marker
+        raw_tail_tokens:
+        - '577.043'
+        - '365.681'
+        - '38.202'
+        line_number: 11
+        raw_line: "500\t209.200\t346.463\t260.459\t43.002\t577.043  365.681 38.202"
+    formation_gibbs_energy:
+      value: -365.681
+      as_published: '365.681'
+      locator:
+        table_id: Cl-189
+        url: https://janaf.nist.gov/tables/Cl-189.html
+        download_url: https://janaf.nist.gov/tables/Cl-189.txt
+        row_temperature_as_published: '500'
+        column: delta-f G
+        parse_repair: nist_tail_whitespace_signs_restored
+        line_number: 11
+        raw_line: "500\t209.200\t346.463\t260.459\t43.002\t577.043  365.681 38.202"
+    log10_formation_equilibrium_constant:
+      value: 38.202
+      as_published: '38.202'
+      locator:
+        table_id: Cl-189
+        url: https://janaf.nist.gov/tables/Cl-189.html
+        download_url: https://janaf.nist.gov/tables/Cl-189.txt
+        row_temperature_as_published: '500'
+        column: log Kf
+        parse_repair: nist_tail_whitespace_signs_restored
+        line_number: 11
+        raw_line: "500\t209.200\t346.463\t260.459\t43.002\t577.043  365.681 38.202"
+  - temperature:
+      value: 600.0
+      as_published: '600'
+      locator:
+        table_id: Cl-189
+        url: https://janaf.nist.gov/tables/Cl-189.html
+        download_url: https://janaf.nist.gov/tables/Cl-189.txt
+        row_temperature_as_published: '600'
+        column: T(K)
+    heat_capacity:
+      value: 222.17
+      as_published: '222.170'
+      locator:
+        table_id: Cl-189
+        url: https://janaf.nist.gov/tables/Cl-189.html
+        download_url: https://janaf.nist.gov/tables/Cl-189.txt
+        row_temperature_as_published: '600'
+        column: Cp
+    entropy:
+      value: 385.865
+      as_published: '385.865'
+      locator:
+        table_id: Cl-189
+        url: https://janaf.nist.gov/tables/Cl-189.html
+        download_url: https://janaf.nist.gov/tables/Cl-189.txt
+        row_temperature_as_published: '600'
+        column: S
+    negative_gibbs_enthalpy_function:
+      value: 278.144
+      as_published: '278.144'
+      locator:
+        table_id: Cl-189
+        url: https://janaf.nist.gov/tables/Cl-189.html
+        download_url: https://janaf.nist.gov/tables/Cl-189.txt
+        row_temperature_as_published: '600'
+        column: -[G-H(Tr)]/T
+    enthalpy_increment:
+      value: 64.633
+      as_published: '64.633'
+      locator:
+        table_id: Cl-189
+        url: https://janaf.nist.gov/tables/Cl-189.html
+        download_url: https://janaf.nist.gov/tables/Cl-189.txt
+        row_temperature_as_published: '600'
+        column: H-H(Tr)
+    formation_enthalpy:
+      value: null
+      as_published: '568.866'
+      locator:
+        table_id: Cl-189
+        url: https://janaf.nist.gov/tables/Cl-189.html
+        download_url: https://janaf.nist.gov/tables/Cl-189.txt
+        row_temperature_as_published: '600'
+        column: delta-f H
+        parse_repair: nist_tail_dfh_sign_undetermined
+        parse_repair_reason: formation enthalpy neighbors span a transition marker
+        raw_tail_tokens:
+        - '568.866'
+        - '324.158'
+        - '28.220'
+        line_number: 13
+        raw_line: "600\t222.170\t385.865\t278.144\t64.633\t568.866  324.158 28.220"
+    formation_gibbs_energy:
+      value: -324.158
+      as_published: '324.158'
+      locator:
+        table_id: Cl-189
+        url: https://janaf.nist.gov/tables/Cl-189.html
+        download_url: https://janaf.nist.gov/tables/Cl-189.txt
+        row_temperature_as_published: '600'
+        column: delta-f G
+        parse_repair: nist_tail_whitespace_signs_restored
+        line_number: 13
+        raw_line: "600\t222.170\t385.865\t278.144\t64.633\t568.866  324.158 28.220"
+    log10_formation_equilibrium_constant:
+      value: 28.22
+      as_published: '28.220'
+      locator:
+        table_id: Cl-189
+        url: https://janaf.nist.gov/tables/Cl-189.html
+        download_url: https://janaf.nist.gov/tables/Cl-189.txt
+        row_temperature_as_published: '600'
+        column: log Kf
+        parse_repair: nist_tail_whitespace_signs_restored
+        line_number: 13
+        raw_line: "600\t222.170\t385.865\t278.144\t64.633\t568.866  324.158 28.220"
+  - temperature:
       value: 700.0
       as_published: '700'
       locator:
@@ -846,23 +1018,9 @@ table:
     locator:
       table_id: Cl-189
       url: https://janaf.nist.gov/tables/Cl-189.html
-  - line_number: 11
-    raw_line: "500\t209.200\t346.463\t260.459\t43.002\t577.043  365.681 38.202"
-    reason: 'refused JANAF tail sign restoration: formation enthalpy neighbors span a transition marker'
-    locator:
-      table_id: Cl-189
-      url: https://janaf.nist.gov/tables/Cl-189.html
-    kind: nist_tail_whitespace_signs_unresolved
   - line_number: 12
     raw_line: "503.000\t209.702\t347.716\t260.976\t43.630\tII <--> III"
     reason: expected 8 tab-separated values; found 6
     locator:
       table_id: Cl-189
       url: https://janaf.nist.gov/tables/Cl-189.html
-  - line_number: 13
-    raw_line: "600\t222.170\t385.865\t278.144\t64.633\t568.866  324.158 28.220"
-    reason: 'refused JANAF tail sign restoration: formation enthalpy neighbors span a transition marker'
-    locator:
-      table_id: Cl-189
-      url: https://janaf.nist.gov/tables/Cl-189.html
-    kind: nist_tail_whitespace_signs_unresolved

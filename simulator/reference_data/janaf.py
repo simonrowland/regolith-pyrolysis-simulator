@@ -92,6 +92,7 @@ GRID_ORDER_REASON = (
     "temperature is not ordered within the printed table grid"
 )
 NIST_TAIL_PARSE_REPAIR = "nist_tail_whitespace_signs_restored"
+NIST_TAIL_DFH_ABSENCE_REPAIR = "nist_tail_dfh_sign_undetermined"
 NIST_TAIL_UNRESOLVED_KIND = "nist_tail_whitespace_signs_unresolved"
 JANAF_R_J_MOL_K = Decimal("8.31441")
 STANDARD_R_J_MOL_K = Decimal("8.314462618")
@@ -400,11 +401,88 @@ def _continuity_sign(
     return sign, None if sign is not None else "neighbor interpolation is zero"
 
 
+def _gibbs_sign_from_neighbors(left: Decimal, right: Decimal) -> int | None:
+    """Return a formation-Gibbs sign only when both neighbors pin it."""
+
+    if left == 0 or right == 0 or (left > 0) != (right > 0):
+        return None
+    if min(abs(left), abs(right)) <= abs(right - left):
+        return None
+    return 1 if left > 0 else -1
+
+
+def _element_reference_gibbs_sign(
+    formula: str, state: str, *, has_zero_reference_interval: bool
+) -> int | None:
+    composition = formula_composition(formula)
+    if (
+        composition is None
+        or len(composition) != 1
+        or state not in {"cr", "l", "cr,l", "fl"}
+        or not has_zero_reference_interval
+    ):
+        return None
+    # Premise: an element's reference phase is the stable phase at each T.
+    # Algebra: G_ref is the minimum Gibbs energy among its phases, so for any
+    # other phase ΔfG = G_phase - G_ref >= 0 (equality at a reference-state
+    # interval or transition). Values are kJ/mol. Sanity: parsed rows after
+    # transitions in the 17 audited element tables all have ΔfG > 0.
+    return 1
+
+
+def _title_formula_and_state(title_lines: list[str]) -> tuple[str, str, str]:
+    """Return (name, printed formula, state) from a NIST JANAF title line."""
+
+    if not title_lines:
+        return "", "", ""
+    line = title_lines[0]
+    left, _separator, right = line.partition("\t")
+    name = left.strip()
+    state = ""
+    published = ""
+    paren = re.search(r"\(([^()]*)\)\s*$", name)
+    if paren:
+        published = paren.group(1).strip()
+        name = name[: paren.start()].strip()
+    if right:
+        right = right.strip()
+        state_match = re.search(r"\((ref|cr|l|cr,l|g|l,g|fl)\)$", right)
+        if state_match:
+            state = state_match.group(1)
+            hill = right[: state_match.start()]
+            if not published or formula_composition(published) != formula_composition(hill):
+                published = hill
+    return name, published, state
+
+
+def _is_nist_typed_absent_enthalpy_cell(cell: object) -> bool:
+    if not isinstance(cell, Mapping) or cell.get("value") is not None:
+        return False
+    token = str(cell.get("as_published") or "")
+    locator = cell.get("locator")
+    if not isinstance(locator, Mapping):
+        return False
+    tokens = locator.get("raw_tail_tokens")
+    return bool(
+        locator.get("parse_repair") == NIST_TAIL_DFH_ABSENCE_REPAIR
+        and isinstance(locator.get("parse_repair_reason"), str)
+        and locator.get("parse_repair_reason", "").strip()
+        and isinstance(tokens, list)
+        and len(tokens) == 3
+        and all(isinstance(item, str) and NUMBER_RE.fullmatch(item) for item in tokens)
+        and token == tokens[0]
+    )
+
+
 def _restore_whitespace_tail_signs(
     candidate: _LineCandidate,
     parsed_neighbors: list[_LineCandidate],
     transition_marker_lines: list[int],
-) -> tuple[tuple[float, float, float] | None, str | None]:
+    *,
+    formula: str,
+    state: str,
+    has_zero_reference_interval: bool,
+) -> tuple[tuple[float | None, float, float] | None, str | None, str | None]:
     """Restore signs only when magnitudes and structurally valid neighbors agree."""
 
     assert candidate.whitespace_tail is not None
@@ -414,7 +492,7 @@ def _restore_whitespace_tail_signs(
         abs(Decimal(token)) for token in candidate.whitespace_tail
     )
     if enthalpy_magnitude == gibbs_magnitude == log_magnitude == 0:
-        return (0.0, 0.0, 0.0), None
+        return (0.0, 0.0, 0.0), None, None
 
     # Premise -> algebra -> units: JANAF prints log10(Kf)=-ΔfG/(R T ln 10),
     # so the identity fixes only the relative signs (always opposite) and
@@ -424,11 +502,19 @@ def _restore_whitespace_tail_signs(
     # and ln(10). JANAF used several gas constants (8.3143, 8.31441,
     # 8.314510 J/(mol K); older tables used calories), so the allowed miss is
     # scale-aware in printed 0.001 log units: 2 + 3e-5*|log Kf|/log_quantum.
-    # Absolute signs come from neighboring parsed rows. ΔfH can jump at a
-    # phase transition, so its neighbor bracket must stay on the candidate's
-    # side of every transition marker; if it crosses one, refuse ΔfH rather
-    # than infer its sign across phases. Sanity: O-038 at 1700 K has
-    # ΔfG=-609.059 kJ/mol and log Kf=18.714.
+    # ΔfG is continuous through a first-order transition because the two
+    # phases have equal G at equilibrium. Its sign is assigned from the
+    # nearest parsed rows on both sides only when both are nonzero, agree in
+    # sign, and min(|G_left|, |G_right|) > |G_right-G_left|; otherwise a zero
+    # crossing remains possible and the sign is refused. For a condensed
+    # single-element table with a parsed all-zero reference-state interval,
+    # ΔfG = G_phase-G_ref >= 0 because G_ref is the stable (minimum-G) phase.
+    # This exception does not cover gases. log Kf has the opposite sign by
+    # the identity above. ΔfH has no such continuity across transitions, so
+    # its sign uses same-phase neighbors only; when those are unavailable,
+    # keep the raw numeric token and locator evidence but represent its value
+    # as a typed absence. Units for ΔfG/ΔfH are kJ/mol; log Kf is dimensionless.
+    # Sanity: O-038 at 1700 K has ΔfG=-609.059 kJ/mol and log Kf=18.714.
     log_quantum = abs(
         Decimal(1).scaleb(Decimal(candidate.whitespace_tail[2]).as_tuple().exponent)
     )
@@ -439,12 +525,11 @@ def _restore_whitespace_tail_signs(
     relation_miss = abs(predicted_log_magnitude - log_magnitude) / log_quantum
     allowed_miss = Decimal(2) + Decimal("3e-5") * log_magnitude / log_quantum
     if relation_miss > allowed_miss:
-        return (
-            None,
+        return None, (
             "formation Gibbs/log Kf identity misses by "
             f"{relation_miss:.3f} printed log Kf units with R=8.31441 "
-            f"(allowed {allowed_miss:.3f})",
-        )
+            f"(allowed {allowed_miss:.3f})"
+        ), None
 
     enthalpy_sign, enthalpy_reason = (
         _continuity_sign(
@@ -458,30 +543,58 @@ def _restore_whitespace_tail_signs(
         if enthalpy_magnitude
         else (0, None)
     )
-    gibbs_sign, gibbs_reason = (
-        _continuity_sign(
-            parsed_neighbors,
-            6,
-            temperature,
-            line_number=candidate.line_number,
-            transition_marker_lines=transition_marker_lines,
+    gibbs_sign: int | None = 0
+    gibbs_reason: str | None = None
+    if gibbs_magnitude:
+        ordered_gibbs = sorted(
+            (
+                (
+                    _candidate_temperature_decimal(row),
+                    parse_published_number(row.content[6]),
+                )
+                for row in parsed_neighbors
+                if len(row.content) > 6
+            ),
+            key=lambda item: item[0] or Decimal("-Infinity"),
         )
-        if gibbs_magnitude
-        else (0, None)
-    )
-    if enthalpy_sign is None:
-        return None, enthalpy_reason
+        before = [
+            item
+            for item in ordered_gibbs
+            if item[0] is not None and item[0] < temperature and item[1] is not None
+        ]
+        after = [
+            item
+            for item in ordered_gibbs
+            if item[0] is not None and item[0] > temperature and item[1] is not None
+        ]
+        if before and after:
+            left = max(before, key=lambda item: item[0])
+            right = min(after, key=lambda item: item[0])
+            gibbs_sign = _gibbs_sign_from_neighbors(Decimal(str(left[1])), Decimal(str(right[1])))
+        if gibbs_sign is None:
+            gibbs_sign = _element_reference_gibbs_sign(
+                formula, state, has_zero_reference_interval=has_zero_reference_interval
+            )
+        if gibbs_sign is None:
+            gibbs_reason = "formation Gibbs neighbors do not structurally pin a sign"
     if gibbs_sign is None:
-        return None, gibbs_reason
+        return None, gibbs_reason, None
     if gibbs_magnitude == 0 and log_magnitude != 0:
-        return None, "zero formation Gibbs with nonzero log Kf has no sign assignment"
+        return None, "zero formation Gibbs with nonzero log Kf has no sign assignment", None
 
-    signed_enthalpy = enthalpy_magnitude * enthalpy_sign
+    signed_enthalpy = (
+        enthalpy_magnitude * enthalpy_sign if enthalpy_sign is not None else None
+    )
     signed_gibbs = gibbs_magnitude * gibbs_sign
     signed_log = -gibbs_sign * log_magnitude if log_magnitude else Decimal(0)
     return (
-        (float(signed_enthalpy), float(signed_gibbs), float(signed_log)),
+        (
+            None if signed_enthalpy is None else float(signed_enthalpy),
+            float(signed_gibbs),
+            float(signed_log),
+        ),
         None,
+        enthalpy_reason if enthalpy_sign is None else None,
     )
 
 
@@ -689,6 +802,8 @@ def parse_janaf_txt(
     structured_candidates: list[_LineCandidate] = []
     whitespace_tail_candidates: list[_LineCandidate] = []
     transition_marker_lines: list[int] = []
+    title_lines = [line.strip() for line in lines[:header_index] if line.strip()]
+    _title_name, title_formula, title_state = _title_formula_and_state(title_lines)
     for line_number, line in enumerate(lines[header_index + 1 :], start=header_index + 2):
         if not line.strip():
             continue
@@ -812,13 +927,24 @@ def parse_janaf_txt(
         for candidate in corroborated
         if candidate.whitespace_tail is None
     ]
-    repaired_values: dict[int, tuple[float, float, float]] = {}
+    has_zero_reference_interval = any(
+        len(candidate.content) >= 8
+        and all(parse_published_number(candidate.content[index]) == 0 for index in (5, 6, 7))
+        for candidate in parsed_neighbors
+    )
+    repaired_values: dict[int, tuple[float | None, float, float]] = {}
+    enthalpy_absence_reasons: dict[int, str] = {}
     corroborated_lines = {candidate.line_number for candidate in corroborated}
     for candidate in whitespace_tail_candidates:
         if candidate.line_number not in corroborated_lines:
             continue
-        restored, reason = _restore_whitespace_tail_signs(
-            candidate, parsed_neighbors, transition_marker_lines
+        restored, reason, enthalpy_absence_reason = _restore_whitespace_tail_signs(
+            candidate,
+            parsed_neighbors,
+            transition_marker_lines,
+            formula=title_formula,
+            state=title_state,
+            has_zero_reference_interval=has_zero_reference_interval,
         )
         if restored is None:
             ambiguities.append(
@@ -833,6 +959,8 @@ def parse_janaf_txt(
             )
         else:
             repaired_values[candidate.line_number] = restored
+            if enthalpy_absence_reason:
+                enthalpy_absence_reasons[candidate.line_number] = enthalpy_absence_reason
     ambiguities.sort(key=lambda item: (item.get("line_number") is None, item.get("line_number") or 0))
     for candidate in corroborated:
         repaired_tail = repaired_values.get(candidate.line_number)
@@ -855,13 +983,26 @@ def parse_janaf_txt(
             value = parse_published_number(token)
             if repaired_tail is not None and index >= 5:
                 value = repaired_tail[index - 5]
-                locator.update(
-                    {
-                        "parse_repair": NIST_TAIL_PARSE_REPAIR,
-                        "line_number": candidate.line_number,
-                        "raw_line": candidate.line,
-                    }
-                )
+                if index == 5 and value is None:
+                    locator.update(
+                        {
+                            "parse_repair": NIST_TAIL_DFH_ABSENCE_REPAIR,
+                            "parse_repair_reason": enthalpy_absence_reasons[
+                                candidate.line_number
+                            ],
+                            "raw_tail_tokens": list(candidate.whitespace_tail or ()),
+                            "line_number": candidate.line_number,
+                            "raw_line": candidate.line,
+                        }
+                    )
+                else:
+                    locator.update(
+                        {
+                            "parse_repair": NIST_TAIL_PARSE_REPAIR,
+                            "line_number": candidate.line_number,
+                            "raw_line": candidate.line,
+                        }
+                    )
             row[key] = {
                 "value": value,
                 "as_published": token,
@@ -870,7 +1011,6 @@ def parse_janaf_txt(
         values.append(row)
     if not values:
         raise JanafParseError(f"{table_id}: no unambiguous thermodynamic rows parsed")
-    title_lines = [line.strip() for line in lines[:header_index] if line.strip()]
     return ParsedTxtTable(
         title_lines=title_lines,
         header_as_published=header_as_published,
@@ -944,6 +1084,12 @@ def round_trip_failures(document: Mapping[str, Any]) -> list[str]:
             parsed = parse_published_number("" if token is None else str(token))
             if parsed != stored:
                 locator = cell.get("locator")
+                if (
+                    key == "formation_enthalpy"
+                    and stored is None
+                    and _is_nist_typed_absent_enthalpy_cell(cell)
+                ):
+                    continue
                 if (
                     isinstance(locator, Mapping)
                     and locator.get("parse_repair") == NIST_TAIL_PARSE_REPAIR

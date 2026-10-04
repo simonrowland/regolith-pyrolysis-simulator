@@ -846,6 +846,92 @@ table:
         row_temperature_as_published: '900'
         column: log Kf
   - temperature:
+      value: 1000.0
+      as_published: '1000'
+      locator:
+        table_id: Cl-094
+        url: https://janaf.nist.gov/tables/Cl-094.html
+        download_url: https://janaf.nist.gov/tables/Cl-094.txt
+        row_temperature_as_published: '1000'
+        column: T(K)
+    heat_capacity:
+      value: 92.048
+      as_published: '92.048'
+      locator:
+        table_id: Cl-094
+        url: https://janaf.nist.gov/tables/Cl-094.html
+        download_url: https://janaf.nist.gov/tables/Cl-094.txt
+        row_temperature_as_published: '1000'
+        column: Cp
+    entropy:
+      value: 228.662
+      as_published: '228.662'
+      locator:
+        table_id: Cl-094
+        url: https://janaf.nist.gov/tables/Cl-094.html
+        download_url: https://janaf.nist.gov/tables/Cl-094.txt
+        row_temperature_as_published: '1000'
+        column: S
+    negative_gibbs_enthalpy_function:
+      value: 169.381
+      as_published: '169.381'
+      locator:
+        table_id: Cl-094
+        url: https://janaf.nist.gov/tables/Cl-094.html
+        download_url: https://janaf.nist.gov/tables/Cl-094.txt
+        row_temperature_as_published: '1000'
+        column: -[G-H(Tr)]/T
+    enthalpy_increment:
+      value: 59.282
+      as_published: '59.282'
+      locator:
+        table_id: Cl-094
+        url: https://janaf.nist.gov/tables/Cl-094.html
+        download_url: https://janaf.nist.gov/tables/Cl-094.txt
+        row_temperature_as_published: '1000'
+        column: H-H(Tr)
+    formation_enthalpy:
+      value: null
+      as_published: '596.730'
+      locator:
+        table_id: Cl-094
+        url: https://janaf.nist.gov/tables/Cl-094.html
+        download_url: https://janaf.nist.gov/tables/Cl-094.txt
+        row_temperature_as_published: '1000'
+        column: delta-f H
+        parse_repair: nist_tail_dfh_sign_undetermined
+        parse_repair_reason: formation enthalpy neighbors span a transition marker
+        raw_tail_tokens:
+        - '596.730'
+        - '482.642'
+        - '25.211'
+        line_number: 17
+        raw_line: "1000\t92.048\t228.662\t169.381\t59.282\t596.730  482.642 25.211"
+    formation_gibbs_energy:
+      value: -482.642
+      as_published: '482.642'
+      locator:
+        table_id: Cl-094
+        url: https://janaf.nist.gov/tables/Cl-094.html
+        download_url: https://janaf.nist.gov/tables/Cl-094.txt
+        row_temperature_as_published: '1000'
+        column: delta-f G
+        parse_repair: nist_tail_whitespace_signs_restored
+        line_number: 17
+        raw_line: "1000\t92.048\t228.662\t169.381\t59.282\t596.730  482.642 25.211"
+    log10_formation_equilibrium_constant:
+      value: 25.211
+      as_published: '25.211'
+      locator:
+        table_id: Cl-094
+        url: https://janaf.nist.gov/tables/Cl-094.html
+        download_url: https://janaf.nist.gov/tables/Cl-094.txt
+        row_temperature_as_published: '1000'
+        column: log Kf
+        parse_repair: nist_tail_whitespace_signs_restored
+        line_number: 17
+        raw_line: "1000\t92.048\t228.662\t169.381\t59.282\t596.730  482.642 25.211"
+  - temperature:
       value: 1100.0
       as_published: '1100'
       locator:
@@ -1944,10 +2030,3 @@ table:
     locator:
       table_id: Cl-094
       url: https://janaf.nist.gov/tables/Cl-094.html
-  - line_number: 17
-    raw_line: "1000\t92.048\t228.662\t169.381\t59.282\t596.730  482.642 25.211"
-    reason: 'refused JANAF tail sign restoration: formation enthalpy neighbors span a transition marker'
-    locator:
-      table_id: Cl-094
-      url: https://janaf.nist.gov/tables/Cl-094.html
-    kind: nist_tail_whitespace_signs_unresolved

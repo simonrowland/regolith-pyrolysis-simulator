@@ -912,6 +912,92 @@ table:
         row_temperature_as_published: '1000'
         column: log Kf
   - temperature:
+      value: 1100.0
+      as_published: '1100'
+      locator:
+        table_id: Br-015
+        url: https://janaf.nist.gov/tables/Br-015.html
+        download_url: https://janaf.nist.gov/tables/Br-015.txt
+        row_temperature_as_published: '1100'
+        column: T(K)
+    heat_capacity:
+      value: 73.053
+      as_published: '73.053'
+      locator:
+        table_id: Br-015
+        url: https://janaf.nist.gov/tables/Br-015.html
+        download_url: https://janaf.nist.gov/tables/Br-015.txt
+        row_temperature_as_published: '1100'
+        column: Cp
+    entropy:
+      value: 171.491
+      as_published: '171.491'
+      locator:
+        table_id: Br-015
+        url: https://janaf.nist.gov/tables/Br-015.html
+        download_url: https://janaf.nist.gov/tables/Br-015.txt
+        row_temperature_as_published: '1100'
+        column: S
+    negative_gibbs_enthalpy_function:
+      value: 127.948
+      as_published: '127.948'
+      locator:
+        table_id: Br-015
+        url: https://janaf.nist.gov/tables/Br-015.html
+        download_url: https://janaf.nist.gov/tables/Br-015.txt
+        row_temperature_as_published: '1100'
+        column: -[G-H(Tr)]/T
+    enthalpy_increment:
+      value: 47.897
+      as_published: '47.897'
+      locator:
+        table_id: Br-015
+        url: https://janaf.nist.gov/tables/Br-015.html
+        download_url: https://janaf.nist.gov/tables/Br-015.txt
+        row_temperature_as_published: '1100'
+        column: H-H(Tr)
+    formation_enthalpy:
+      value: null
+      as_published: '481.989'
+      locator:
+        table_id: Br-015
+        url: https://janaf.nist.gov/tables/Br-015.html
+        download_url: https://janaf.nist.gov/tables/Br-015.txt
+        row_temperature_as_published: '1100'
+        column: delta-f H
+        parse_repair: nist_tail_dfh_sign_undetermined
+        parse_repair_reason: formation enthalpy neighbors span a transition marker
+        raw_tail_tokens:
+        - '481.989'
+        - '302.762'
+        - '14.377'
+        line_number: 16
+        raw_line: "1100\t73.053\t171.491\t127.948\t47.897\t481.989  302.762 14.377"
+    formation_gibbs_energy:
+      value: -302.762
+      as_published: '302.762'
+      locator:
+        table_id: Br-015
+        url: https://janaf.nist.gov/tables/Br-015.html
+        download_url: https://janaf.nist.gov/tables/Br-015.txt
+        row_temperature_as_published: '1100'
+        column: delta-f G
+        parse_repair: nist_tail_whitespace_signs_restored
+        line_number: 16
+        raw_line: "1100\t73.053\t171.491\t127.948\t47.897\t481.989  302.762 14.377"
+    log10_formation_equilibrium_constant:
+      value: 14.377
+      as_published: '14.377'
+      locator:
+        table_id: Br-015
+        url: https://janaf.nist.gov/tables/Br-015.html
+        download_url: https://janaf.nist.gov/tables/Br-015.txt
+        row_temperature_as_published: '1100'
+        column: log Kf
+        parse_repair: nist_tail_whitespace_signs_restored
+        line_number: 16
+        raw_line: "1100\t73.053\t171.491\t127.948\t47.897\t481.989  302.762 14.377"
+  - temperature:
       value: 1200.0
       as_published: '1200'
       locator:
@@ -1206,10 +1292,3 @@ table:
     locator:
       table_id: Br-015
       url: https://janaf.nist.gov/tables/Br-015.html
-  - line_number: 16
-    raw_line: "1100\t73.053\t171.491\t127.948\t47.897\t481.989  302.762 14.377"
-    reason: 'refused JANAF tail sign restoration: formation enthalpy neighbors span a transition marker'
-    locator:
-      table_id: Br-015
-      url: https://janaf.nist.gov/tables/Br-015.html
-    kind: nist_tail_whitespace_signs_unresolved

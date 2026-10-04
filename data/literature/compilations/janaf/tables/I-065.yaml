@@ -480,6 +480,92 @@ table:
         row_temperature_as_published: '400'
         column: log Kf
   - temperature:
+      value: 500.0
+      as_published: '500'
+      locator:
+        table_id: I-065
+        url: https://janaf.nist.gov/tables/I-065.html
+        download_url: https://janaf.nist.gov/tables/I-065.txt
+        row_temperature_as_published: '500'
+        column: T(K)
+    heat_capacity:
+      value: 148.114
+      as_published: '148.114'
+      locator:
+        table_id: I-065
+        url: https://janaf.nist.gov/tables/I-065.html
+        download_url: https://janaf.nist.gov/tables/I-065.txt
+        row_temperature_as_published: '500'
+        column: Cp
+    entropy:
+      value: 345.106
+      as_published: '345.106'
+      locator:
+        table_id: I-065
+        url: https://janaf.nist.gov/tables/I-065.html
+        download_url: https://janaf.nist.gov/tables/I-065.txt
+        row_temperature_as_published: '500'
+        column: S
+    negative_gibbs_enthalpy_function:
+      value: 267.986
+      as_published: '267.986'
+      locator:
+        table_id: I-065
+        url: https://janaf.nist.gov/tables/I-065.html
+        download_url: https://janaf.nist.gov/tables/I-065.txt
+        row_temperature_as_published: '500'
+        column: -[G-H(Tr)]/T
+    enthalpy_increment:
+      value: 38.56
+      as_published: '38.560'
+      locator:
+        table_id: I-065
+        url: https://janaf.nist.gov/tables/I-065.html
+        download_url: https://janaf.nist.gov/tables/I-065.txt
+        row_temperature_as_published: '500'
+        column: H-H(Tr)
+    formation_enthalpy:
+      value: null
+      as_published: '482.434'
+      locator:
+        table_id: I-065
+        url: https://janaf.nist.gov/tables/I-065.html
+        download_url: https://janaf.nist.gov/tables/I-065.txt
+        row_temperature_as_published: '500'
+        column: delta-f H
+        parse_repair: nist_tail_dfh_sign_undetermined
+        parse_repair_reason: formation enthalpy neighbors span a transition marker
+        raw_tail_tokens:
+        - '482.434'
+        - '352.801'
+        - '36.857'
+        line_number: 12
+        raw_line: "500\t148.114\t345.106\t267.986\t38.560\t482.434  352.801 36.857"
+    formation_gibbs_energy:
+      value: -352.801
+      as_published: '352.801'
+      locator:
+        table_id: I-065
+        url: https://janaf.nist.gov/tables/I-065.html
+        download_url: https://janaf.nist.gov/tables/I-065.txt
+        row_temperature_as_published: '500'
+        column: delta-f G
+        parse_repair: nist_tail_whitespace_signs_restored
+        line_number: 12
+        raw_line: "500\t148.114\t345.106\t267.986\t38.560\t482.434  352.801 36.857"
+    log10_formation_equilibrium_constant:
+      value: 36.857
+      as_published: '36.857'
+      locator:
+        table_id: I-065
+        url: https://janaf.nist.gov/tables/I-065.html
+        download_url: https://janaf.nist.gov/tables/I-065.txt
+        row_temperature_as_published: '500'
+        column: log Kf
+        parse_repair: nist_tail_whitespace_signs_restored
+        line_number: 12
+        raw_line: "500\t148.114\t345.106\t267.986\t38.560\t482.434  352.801 36.857"
+  - temperature:
       value: 600.0
       as_published: '600'
       locator:
@@ -1218,10 +1304,3 @@ table:
     locator:
       table_id: I-065
       url: https://janaf.nist.gov/tables/I-065.html
-  - line_number: 12
-    raw_line: "500\t148.114\t345.106\t267.986\t38.560\t482.434  352.801 36.857"
-    reason: 'refused JANAF tail sign restoration: formation enthalpy neighbors span a transition marker'
-    locator:
-      table_id: I-065
-      url: https://janaf.nist.gov/tables/I-065.html
-    kind: nist_tail_whitespace_signs_unresolved

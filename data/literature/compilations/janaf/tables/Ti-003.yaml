@@ -1791,6 +1791,92 @@ table:
         row_temperature_as_published: '1900'
         column: log Kf
   - temperature:
+      value: 2000.0
+      as_published: '2000'
+      locator:
+        table_id: Ti-003
+        url: https://janaf.nist.gov/tables/Ti-003.html
+        download_url: https://janaf.nist.gov/tables/Ti-003.txt
+        row_temperature_as_published: '2000'
+        column: T(K)
+    heat_capacity:
+      value: 38.885
+      as_published: '38.885'
+      locator:
+        table_id: Ti-003
+        url: https://janaf.nist.gov/tables/Ti-003.html
+        download_url: https://janaf.nist.gov/tables/Ti-003.txt
+        row_temperature_as_published: '2000'
+        column: Cp
+    entropy:
+      value: 91.374
+      as_published: '91.374'
+      locator:
+        table_id: Ti-003
+        url: https://janaf.nist.gov/tables/Ti-003.html
+        download_url: https://janaf.nist.gov/tables/Ti-003.txt
+        row_temperature_as_published: '2000'
+        column: S
+    negative_gibbs_enthalpy_function:
+      value: 65.937
+      as_published: '65.937'
+      locator:
+        table_id: Ti-003
+        url: https://janaf.nist.gov/tables/Ti-003.html
+        download_url: https://janaf.nist.gov/tables/Ti-003.txt
+        row_temperature_as_published: '2000'
+        column: -[G-H(Tr)]/T
+    enthalpy_increment:
+      value: 50.874
+      as_published: '50.874'
+      locator:
+        table_id: Ti-003
+        url: https://janaf.nist.gov/tables/Ti-003.html
+        download_url: https://janaf.nist.gov/tables/Ti-003.txt
+        row_temperature_as_published: '2000'
+        column: H-H(Tr)
+    formation_enthalpy:
+      value: null
+      as_published: '14.687'
+      locator:
+        table_id: Ti-003
+        url: https://janaf.nist.gov/tables/Ti-003.html
+        download_url: https://janaf.nist.gov/tables/Ti-003.txt
+        row_temperature_as_published: '2000'
+        column: delta-f H
+        parse_repair: nist_tail_dfh_sign_undetermined
+        parse_repair_reason: formation enthalpy neighbors span a transition marker
+        raw_tail_tokens:
+        - '14.687'
+        - '0.454'
+        - '0.012'
+        line_number: 29
+        raw_line: "2000\t38.885\t91.374\t65.937\t50.874\t14.687 0.454  0.012"
+    formation_gibbs_energy:
+      value: 0.454
+      as_published: '0.454'
+      locator:
+        table_id: Ti-003
+        url: https://janaf.nist.gov/tables/Ti-003.html
+        download_url: https://janaf.nist.gov/tables/Ti-003.txt
+        row_temperature_as_published: '2000'
+        column: delta-f G
+        parse_repair: nist_tail_whitespace_signs_restored
+        line_number: 29
+        raw_line: "2000\t38.885\t91.374\t65.937\t50.874\t14.687 0.454  0.012"
+    log10_formation_equilibrium_constant:
+      value: -0.012
+      as_published: '0.012'
+      locator:
+        table_id: Ti-003
+        url: https://janaf.nist.gov/tables/Ti-003.html
+        download_url: https://janaf.nist.gov/tables/Ti-003.txt
+        row_temperature_as_published: '2000'
+        column: log Kf
+        parse_repair: nist_tail_whitespace_signs_restored
+        line_number: 29
+        raw_line: "2000\t38.885\t91.374\t65.937\t50.874\t14.687 0.454  0.012"
+  - temperature:
       value: 2100.0
       as_published: '2100'
       locator:
@@ -2163,10 +2249,3 @@ table:
     locator:
       table_id: Ti-003
       url: https://janaf.nist.gov/tables/Ti-003.html
-  - line_number: 29
-    raw_line: "2000\t38.885\t91.374\t65.937\t50.874\t14.687 0.454  0.012"
-    reason: 'refused JANAF tail sign restoration: formation enthalpy neighbors span a transition marker'
-    locator:
-      table_id: Ti-003
-      url: https://janaf.nist.gov/tables/Ti-003.html
-    kind: nist_tail_whitespace_signs_unresolved

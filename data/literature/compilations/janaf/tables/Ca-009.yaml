@@ -918,6 +918,92 @@ table:
         row_temperature_as_published: '1000'
         column: log Kf
   - temperature:
+      value: 1100.0
+      as_published: '1100'
+      locator:
+        table_id: Ca-009
+        url: https://janaf.nist.gov/tables/Ca-009.html
+        download_url: https://janaf.nist.gov/tables/Ca-009.txt
+        row_temperature_as_published: '1100'
+        column: T(K)
+    heat_capacity:
+      value: 88.701
+      as_published: '88.701'
+      locator:
+        table_id: Ca-009
+        url: https://janaf.nist.gov/tables/Ca-009.html
+        download_url: https://janaf.nist.gov/tables/Ca-009.txt
+        row_temperature_as_published: '1100'
+        column: Cp
+    entropy:
+      value: 207.345
+      as_published: '207.345'
+      locator:
+        table_id: Ca-009
+        url: https://janaf.nist.gov/tables/Ca-009.html
+        download_url: https://janaf.nist.gov/tables/Ca-009.txt
+        row_temperature_as_published: '1100'
+        column: S
+    negative_gibbs_enthalpy_function:
+      value: 148.95
+      as_published: '148.950'
+      locator:
+        table_id: Ca-009
+        url: https://janaf.nist.gov/tables/Ca-009.html
+        download_url: https://janaf.nist.gov/tables/Ca-009.txt
+        row_temperature_as_published: '1100'
+        column: -[G-H(Tr)]/T
+    enthalpy_increment:
+      value: 64.236
+      as_published: '64.236'
+      locator:
+        table_id: Ca-009
+        url: https://janaf.nist.gov/tables/Ca-009.html
+        download_url: https://janaf.nist.gov/tables/Ca-009.txt
+        row_temperature_as_published: '1100'
+        column: H-H(Tr)
+    formation_enthalpy:
+      value: null
+      as_published: '788.069'
+      locator:
+        table_id: Ca-009
+        url: https://janaf.nist.gov/tables/Ca-009.html
+        download_url: https://janaf.nist.gov/tables/Ca-009.txt
+        row_temperature_as_published: '1100'
+        column: delta-f H
+        parse_repair: nist_tail_dfh_sign_undetermined
+        parse_repair_reason: formation enthalpy neighbors span a transition marker
+        raw_tail_tokens:
+        - '788.069'
+        - '626.995'
+        - '29.774'
+        line_number: 16
+        raw_line: "1100\t88.701\t207.345\t148.950\t64.236\t788.069  626.995 29.774"
+    formation_gibbs_energy:
+      value: -626.995
+      as_published: '626.995'
+      locator:
+        table_id: Ca-009
+        url: https://janaf.nist.gov/tables/Ca-009.html
+        download_url: https://janaf.nist.gov/tables/Ca-009.txt
+        row_temperature_as_published: '1100'
+        column: delta-f G
+        parse_repair: nist_tail_whitespace_signs_restored
+        line_number: 16
+        raw_line: "1100\t88.701\t207.345\t148.950\t64.236\t788.069  626.995 29.774"
+    log10_formation_equilibrium_constant:
+      value: 29.774
+      as_published: '29.774'
+      locator:
+        table_id: Ca-009
+        url: https://janaf.nist.gov/tables/Ca-009.html
+        download_url: https://janaf.nist.gov/tables/Ca-009.txt
+        row_temperature_as_published: '1100'
+        column: log Kf
+        parse_repair: nist_tail_whitespace_signs_restored
+        line_number: 16
+        raw_line: "1100\t88.701\t207.345\t148.950\t64.236\t788.069  626.995 29.774"
+  - temperature:
       value: 1200.0
       as_published: '1200'
       locator:
@@ -1572,10 +1658,3 @@ table:
     locator:
       table_id: Ca-009
       url: https://janaf.nist.gov/tables/Ca-009.html
-  - line_number: 16
-    raw_line: "1100\t88.701\t207.345\t148.950\t64.236\t788.069  626.995 29.774"
-    reason: 'refused JANAF tail sign restoration: formation enthalpy neighbors span a transition marker'
-    locator:
-      table_id: Ca-009
-      url: https://janaf.nist.gov/tables/Ca-009.html
-    kind: nist_tail_whitespace_signs_unresolved

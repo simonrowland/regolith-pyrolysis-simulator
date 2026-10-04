@@ -59,13 +59,13 @@ FIXTURE_IDS = (
     "O-029",
 )
 STRUCTURED_NUMERIC_COUNTS = {
-    "heat_capacity": 75814,
-    "entropy": 75812,
-    "negative_gibbs_enthalpy_function": 74566,
-    "enthalpy_increment": 75812,
-    "formation_enthalpy": 75334,
-    "formation_gibbs_energy": 75174,
-    "log10_formation_equilibrium_constant": 74194,
+    "heat_capacity": 75820,
+    "entropy": 75818,
+    "negative_gibbs_enthalpy_function": 74572,
+    "enthalpy_increment": 75818,
+    "formation_enthalpy": 74977,
+    "formation_gibbs_energy": 75180,
+    "log10_formation_equilibrium_constant": 74200,
 }
 _COMBINED_STATES = {"cr,l", "ref", "l,g"}
 _FORMATION_COLUMNS = {
@@ -450,6 +450,48 @@ def test_null_published_cells_require_blank_or_infinite_tokens() -> None:
             table_id="T-001",
             column="formation_enthalpy",
         )
+
+
+def test_marked_typed_absent_enthalpy_is_skipped_by_generation() -> None:
+    document = load_table_document(TABLES_DIR / "O-038.yaml")
+    row = next(
+        row
+        for row in document["table"]["values"]
+        if row["temperature"]["as_published"] == "1700"
+    )
+    enthalpy = row["formation_enthalpy"]
+    assert enthalpy["value"] is None
+    assert enthalpy["locator"]["parse_repair"] == generator.NIST_TAIL_DFH_ABSENCE_REPAIR
+    assert generator._cell(
+        enthalpy, table_id="O-038", column="formation_enthalpy"
+    ).value is None
+
+    generated = generator.generate_table(document)
+    assert not _series_has_temperature(generated, Quantity.DELTA_FH, "1700")
+    assert _series_has_temperature(generated, Quantity.DELTA_FG, "1700")
+    assert _series_has_temperature(generated, Quantity.LOG10_KF, "1700")
+
+
+def test_typed_absent_marker_with_a_numeric_value_is_rejected() -> None:
+    document = load_table_document(TABLES_DIR / "O-038.yaml")
+    row = next(
+        row
+        for row in document["table"]["values"]
+        if row["temperature"]["as_published"] == "1700"
+    )
+    cell = deepcopy(row["formation_enthalpy"])
+    cell["value"] = 941.610
+    with pytest.raises(ValueError, match="inconsistent typed JANAF absence"):
+        generator._cell(cell, table_id="O-038", column="formation_enthalpy")
+
+
+def test_binary_pot_gibbs_reader_keeps_marked_row() -> None:
+    from simulator.diagnostic_helpers.binary_pot_battery import (
+        _cell_janaf_gibbs_points,
+    )
+
+    points, _digest = _cell_janaf_gibbs_points("O-038")
+    assert (Decimal("1700"), Decimal("-609.059")) in points
 
 
 def test_segmentation_witnesses_and_transition_row_assignment() -> None:
@@ -969,18 +1011,26 @@ def test_janaf_identity_uses_the_source_gas_constant() -> None:
     )
 
 
-def test_al002_tail_is_refused_when_enthalpy_bracket_crosses_transition() -> None:
+def test_al002_tail_keeps_gibbs_when_enthalpy_bracket_crosses_transition() -> None:
     generated = _generation("Al-002")
     document = load_table_document(TABLES_DIR / "Al-002.yaml")
-    ambiguity = next(
-        item
-        for item in document["table"]["parse_ambiguities"]
-        if item.get("raw_line", "").startswith("1000\t")
+    row = next(
+        row for row in document["table"]["values"]
+        if row["temperature"]["value"] == 1000
     )
-    assert "formation enthalpy neighbors span a transition marker" in ambiguity["reason"]
-    assert all(
-        not any(temperature == Decimal("1000") for temperature, _ in _series(generated, quantity))
-        for quantity in (Quantity.DELTA_FH, Quantity.DELTA_FG, Quantity.LOG10_KF)
+    assert row["formation_enthalpy"]["value"] is None
+    assert row["formation_enthalpy"]["locator"]["parse_repair"] == (
+        generator.NIST_TAIL_DFH_ABSENCE_REPAIR
+    )
+    assert not any(
+        temperature == Decimal("1000")
+        for temperature, _ in _series(generated, Quantity.DELTA_FH)
+    )
+    assert (Decimal("1000"), Decimal("0.76")) in _series(
+        generated, Quantity.DELTA_FG
+    )
+    assert (Decimal("1000"), Decimal("-0.040")) in _series(
+        generated, Quantity.LOG10_KF
     )
 
 
@@ -1010,15 +1060,17 @@ def test_al003_restored_formation_zeros_keep_the_source_line() -> None:
         for row in zeros.report["merged_formation_rows"]
     )
 
-def test_fe004_tail_is_refused_when_enthalpy_bracket_crosses_transition() -> None:
+def test_fe004_tail_keeps_gibbs_when_enthalpy_bracket_crosses_transition() -> None:
     mixed = _generation("Fe-004")
     document = load_table_document(TABLES_DIR / "Fe-004.yaml")
-    ambiguity = next(
-        item
-        for item in document["table"]["parse_ambiguities"]
-        if item.get("raw_line", "").startswith("1700\t")
+    row = next(
+        row for row in document["table"]["values"]
+        if row["temperature"]["value"] == 1700
     )
-    assert "formation enthalpy neighbors span a transition marker" in ambiguity["reason"]
+    assert row["formation_enthalpy"]["value"] is None
+    assert row["formation_enthalpy"]["locator"]["parse_repair"] == (
+        generator.NIST_TAIL_DFH_ABSENCE_REPAIR
+    )
     assert not any(
         temperature == Decimal("1700")
         for temperature, _ in _series(mixed, Quantity.DELTA_FH)
@@ -1403,10 +1455,10 @@ def test_stored_pair_identity_reports_its_denominator() -> None:
     }
     b133 = _generation("B-133")
     assert b133.report["stored_pair_identity_denominator"] == {
-        "eligible_delta_fG_T_gt_0": 28,
-        "eligible_log10_Kf_T_gt_0": 28,
-        "checked_intersection": 28,
-        "passed": 27,
+        "eligible_delta_fG_T_gt_0": 29,
+        "eligible_log10_Kf_T_gt_0": 29,
+        "checked_intersection": 29,
+        "passed": 28,
         "failed": 1,
     }
 
@@ -1820,8 +1872,8 @@ def test_full_corpus_control_cell_accounting_and_transcription_report() -> None:
                 flush=True,
             )
 
-    assert restored_whitespace_tails == 126
-    assert unresolved_whitespace_tails == 363
+    assert restored_whitespace_tails == 496
+    assert unresolved_whitespace_tails == 12
     assert stored_nonzero_merged_cells == 0, (
         f"stored {stored_nonzero_merged_cells} sign-ambiguous merged cells"
     )
@@ -1831,7 +1883,7 @@ def test_full_corpus_control_cell_accounting_and_transcription_report() -> None:
         f"({len(stored_pair_violations) - 1} excess)"
     )
     assert reported_stored_pair_violations == stored_pair_violations
-    assert len(refused_merged_pair_violations) == 18
+    assert len(refused_merged_pair_violations) == 12
     assert reported_refused_pair_violations == refused_merged_pair_violations
     assert merged_disposition_mismatches == 0
     assert segment_control_mismatches == 0
@@ -1840,11 +1892,11 @@ def test_full_corpus_control_cell_accounting_and_transcription_report() -> None:
     assert points[Quantity.CP.value] == 77542
     assert points[Quantity.S.value] == 77540
     assert points[Quantity.H_MINUS_H298.value] == 77539
-    assert points[Quantity.DELTA_FH.value] == 75334
-    assert points[Quantity.DELTA_FG.value] == 75174
-    assert points[Quantity.LOG10_KF.value] == 74194
+    assert points[Quantity.DELTA_FH.value] == 74977
+    assert points[Quantity.DELTA_FG.value] == 75180
+    assert points[Quantity.LOG10_KF.value] == 74200
     assert points[Quantity.TRANSITION_TEMPERATURE.value] == 979
-    assert merged_rows == 18
+    assert merged_rows == 12
     assert merged_extras == {"delta_fG": 0, "log10_Kf": 0}
     assert {
         column: row["structured_numeric"] for column, row in cells.items()
@@ -1853,29 +1905,29 @@ def test_full_corpus_control_cell_accounting_and_transcription_report() -> None:
     assert cells["heat_capacity"]["stored_points"] == 77542
     assert cells["entropy"]["stored_points"] == 77540
     assert cells["enthalpy_increment"]["stored_points"] == 77539
-    assert cells["formation_enthalpy"]["stored_points"] == 75334
-    assert cells["formation_gibbs_energy"]["stored_points"] == 75174
-    assert cells["log10_formation_equilibrium_constant"]["stored_points"] == 74194
-    assert cells["formation_enthalpy"]["excluded_numeric_total"] == 18
-    assert cells["formation_gibbs_energy"]["excluded_numeric_total"] == 18
-    assert cells["log10_formation_equilibrium_constant"]["excluded_numeric_total"] == 18
-    # Eighteen unresolved sign rows remain as merged ambiguities: all 54
+    assert cells["formation_enthalpy"]["stored_points"] == 74977
+    assert cells["formation_gibbs_energy"]["stored_points"] == 75180
+    assert cells["log10_formation_equilibrium_constant"]["stored_points"] == 74200
+    assert cells["formation_enthalpy"]["excluded_numeric_total"] == 12
+    assert cells["formation_gibbs_energy"]["excluded_numeric_total"] == 12
+    assert cells["log10_formation_equilibrium_constant"]["excluded_numeric_total"] == 12
+    # Twelve unresolved sign rows remain as merged ambiguities: all 36
     # tail cells stay excluded because none is an exact reference-state zero.
     assert (
         cells["formation_enthalpy"]["excluded_numeric_total"]
         + cells["formation_gibbs_energy"]["excluded_numeric_total"]
         + cells["log10_formation_equilibrium_constant"]["excluded_numeric_total"]
-    ) == 54
+    ) == 36
     assert stored_zero_merged_cells == 0
-    assert refused_merged_cells == 54
+    assert refused_merged_cells == 36
     # Formation parents split where a printed elemental reference schedule changes.
     assert observations == {
         "cp": 2117,
         "S": 2117,
         "H_minus_H298": 2117,
-        "delta_fH": 5522,
-        "delta_fG": 5513,
-        "log10_Kf": 5513,
+        "delta_fH": 5511,
+        "delta_fG": 5511,
+        "log10_Kf": 5511,
         "transition_temperature": 979,
     }
     # 128 liquid tables store a printed GLASS <--> LIQUID/LIQ row. Those series
@@ -1919,16 +1971,16 @@ def test_full_corpus_control_cell_accounting_and_transcription_report() -> None:
     }
     assert transcription_checks == {
         "negative_gibbs_enthalpy_function": 76293,
-        "log10_Kf_from_delta_fG": 74087,
+        "log10_Kf_from_delta_fG": 74093,
     }
     assert dict(stored_pair_denominator) == {
-        "eligible_delta_fG_T_gt_0": 74087,
-        "eligible_log10_Kf_T_gt_0": 74087,
-        "checked_intersection": 74087,
-        "passed": 74086,
+        "eligible_delta_fG_T_gt_0": 74093,
+        "eligible_log10_Kf_T_gt_0": 74093,
+        "checked_intersection": 74093,
+        "passed": 74092,
         "failed": 1,
     }
-    assert refused_merged_pair_checks == 18
+    assert refused_merged_pair_checks == 12
     assert stored_cell_errata == 1
     assert raw_numeric_accounting == {
         "numeric_source_tokens": 533672,

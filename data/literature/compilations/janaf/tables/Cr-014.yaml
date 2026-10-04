@@ -2070,6 +2070,92 @@ table:
         row_temperature_as_published: '2600'
         column: log Kf
   - temperature:
+      value: 2700.0
+      as_published: '2700'
+      locator:
+        table_id: Cr-014
+        url: https://janaf.nist.gov/tables/Cr-014.html
+        download_url: https://janaf.nist.gov/tables/Cr-014.txt
+        row_temperature_as_published: '2700'
+        column: T(K)
+    heat_capacity:
+      value: 144.428
+      as_published: '144.428'
+      locator:
+        table_id: Cr-014
+        url: https://janaf.nist.gov/tables/Cr-014.html
+        download_url: https://janaf.nist.gov/tables/Cr-014.txt
+        row_temperature_as_published: '2700'
+        column: Cp
+    entropy:
+      value: 358.257
+      as_published: '358.257'
+      locator:
+        table_id: Cr-014
+        url: https://janaf.nist.gov/tables/Cr-014.html
+        download_url: https://janaf.nist.gov/tables/Cr-014.txt
+        row_temperature_as_published: '2700'
+        column: S
+    negative_gibbs_enthalpy_function:
+      value: 241.298
+      as_published: '241.298'
+      locator:
+        table_id: Cr-014
+        url: https://janaf.nist.gov/tables/Cr-014.html
+        download_url: https://janaf.nist.gov/tables/Cr-014.txt
+        row_temperature_as_published: '2700'
+        column: -[G-H(Tr)]/T
+    enthalpy_increment:
+      value: 315.791
+      as_published: '315.791'
+      locator:
+        table_id: Cr-014
+        url: https://janaf.nist.gov/tables/Cr-014.html
+        download_url: https://janaf.nist.gov/tables/Cr-014.txt
+        row_temperature_as_published: '2700'
+        column: H-H(Tr)
+    formation_enthalpy:
+      value: null
+      as_published: '1170.281'
+      locator:
+        table_id: Cr-014
+        url: https://janaf.nist.gov/tables/Cr-014.html
+        download_url: https://janaf.nist.gov/tables/Cr-014.txt
+        row_temperature_as_published: '2700'
+        column: delta-f H
+        parse_repair: nist_tail_dfh_sign_undetermined
+        parse_repair_reason: formation enthalpy neighbors span a transition marker
+        raw_tail_tokens:
+        - '1170.281'
+        - '423.987'
+        - '8.203'
+        line_number: 35
+        raw_line: "2700\t144.428\t358.257\t241.298\t315.791\t1170.281  423.987 8.203"
+    formation_gibbs_energy:
+      value: -423.987
+      as_published: '423.987'
+      locator:
+        table_id: Cr-014
+        url: https://janaf.nist.gov/tables/Cr-014.html
+        download_url: https://janaf.nist.gov/tables/Cr-014.txt
+        row_temperature_as_published: '2700'
+        column: delta-f G
+        parse_repair: nist_tail_whitespace_signs_restored
+        line_number: 35
+        raw_line: "2700\t144.428\t358.257\t241.298\t315.791\t1170.281  423.987 8.203"
+    log10_formation_equilibrium_constant:
+      value: 8.203
+      as_published: '8.203'
+      locator:
+        table_id: Cr-014
+        url: https://janaf.nist.gov/tables/Cr-014.html
+        download_url: https://janaf.nist.gov/tables/Cr-014.txt
+        row_temperature_as_published: '2700'
+        column: log Kf
+        parse_repair: nist_tail_whitespace_signs_restored
+        line_number: 35
+        raw_line: "2700\t144.428\t358.257\t241.298\t315.791\t1170.281  423.987 8.203"
+  - temperature:
       value: 2800.0
       as_published: '2800'
       locator:
@@ -2311,10 +2397,3 @@ table:
     locator:
       table_id: Cr-014
       url: https://janaf.nist.gov/tables/Cr-014.html
-  - line_number: 35
-    raw_line: "2700\t144.428\t358.257\t241.298\t315.791\t1170.281  423.987 8.203"
-    reason: 'refused JANAF tail sign restoration: formation enthalpy neighbors span a transition marker'
-    locator:
-      table_id: Cr-014
-      url: https://janaf.nist.gov/tables/Cr-014.html
-    kind: nist_tail_whitespace_signs_unresolved
