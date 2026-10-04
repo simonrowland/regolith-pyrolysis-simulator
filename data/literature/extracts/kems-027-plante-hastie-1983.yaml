@@ -502,6 +502,7 @@ species:
         analytical_Na2O_mol_pct: 9.20
         nominal_Na2O_wt_pct: 10.13
         nominal_Na2O_mol_pct: 10.76
+        # analytical = measured sample (ICP/NAA); nominal = thermodynamic estimates (p.2/PDF p.8)
         composition_nominal_wt_pct:
           SiO2: 52.00
           Fe2O3: 12.96
@@ -535,7 +536,14 @@ species:
           RuO2: 0.11
           Re2O7: 0.03
         footnote_a: Soper 1982
-        footnote_b: see text for selection; nominal used for thermodynamic estimates
+        footnote_b: see text for selection; nominal used for thermodynamic estimates; analytical is the measured sample composition
+        composition_role_note: >-
+          Published page 2 (PDF page 8): analytical composition is the measured
+          sample; nominal composition is for thermodynamic estimates. Full 15-compound
+          maps retained under composition_nominal_wt_pct / composition_analytical_wt_pct
+          (not allow-list keys) because eight printed compounds (B2O3, Li2O, MnO2,
+          ZrO2, SrO, Cs2O, RuO2, Re2O7) are outside _OXIDE_COMPONENT_KEYS and would
+          be dropped+renormalised. Registry KMS/TMS samples already carry both complete maps.
       uncertainty:
         note: unreported for the ICP/NAA analyses
     - observation_id: plante_hastie_1983_table3_mass_loss
