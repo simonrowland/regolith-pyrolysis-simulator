@@ -2782,33 +2782,29 @@ class GridCacheWriter:
                 f"queued={queued_mode!r}, result={output_mode!r}"
             )
         queued_model = str(queued_inputs.get("model") or "")
-        result_model = str(output.get("engine_model") or "")
+        reported_model = output.get("engine_model")
         is_failure = str(output.get("status_kind")) == "failure"
         if is_failure and str(output.get("status")) == "ok":
             raise ValueError("grid failure result cannot have status='ok'")
-        if not is_failure and result_model == ENGINE_MODEL_UNAVAILABLE:
-            raise ValueError(
-                "grid result model differs from queued key: "
-                f"queued={queued_model!r}, result={result_model!r}"
-            )
-        if not (is_failure and result_model == ENGINE_MODEL_UNAVAILABLE):
+        if not (
+            is_failure and reported_model == ENGINE_MODEL_UNAVAILABLE
+        ):
+            # The queued spelling is an input alias and is resolved. The reported
+            # model states what ran, so never default, strip, or resolve it.
             try:
                 resolved_queued_model = resolve_grid_engine_model(
                     queued_model, output_mode
                 )
-                resolved_result_model = resolve_grid_engine_model(
-                    result_model, output_mode
-                )
             except ValueError as exc:
                 raise ValueError(
                     "grid result model differs from queued key: "
-                    f"queued={queued_model!r}, result={result_model!r}"
+                    f"queued={queued_model!r}, result={reported_model!r}"
                 ) from exc
-            if resolved_queued_model != resolved_result_model:
+            if resolved_queued_model != reported_model:
                 raise ValueError(
                     "grid result model differs from queued key: "
                     f"queued={resolved_queued_model!r}, "
-                    f"result={resolved_result_model!r}"
+                    f"result={reported_model!r}"
                 )
 
         output_values = self._output_values(output)
