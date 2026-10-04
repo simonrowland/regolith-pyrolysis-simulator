@@ -1,0 +1,112 @@
+schema_version: literature_extract.v1
+source_id: ohta-1996-cao-mgo-al2o3-activities
+source:
+  citation: 'H. Ohta and H. Suito, "Activities in CaO-MgO-Al2O3 Slags and Deoxidation Equilibria of Al, Mg, and Ca", ISIJ International 36(8) (1996) 983–990.'
+  doi: 10.2355/isijinternational.36.983
+  url: https://doi.org/10.2355/isijinternational.36.983
+  year: 1996
+  corpus_source_id: ohta-1996-cao-mgo-al2o3-activities
+extraction:
+  method: Manual transcription from 200 dpi pdftoppm renders of the ISIJ PDF plus pdftotext -layout cross-check.
+    Tables transcribed from page images. Iso-activity figures recorded figure_only (not digitised). No invented binary
+    a(CaO) values — authors state CaO iso-activities in the ternary were assessed from reported sulfide capacities coupled
+    with γ(CaS) estimated from CaO-Al2O3 slags (i.e. binary edge partly derived, not an independent binary measurement).
+  date: '2026-10-04'
+  worker: empirical-cao-al2o3-slot-04
+  provenance_path: ferry-inbox/cao-al2o3-sources/ohta-1996-cao-mgo-al2o3-activities/
+review_status: draft
+fidelity_samples:
+- path: species.CaO.context[ohta_1996_method_scope].values.temperatures_K[0]
+  value: 1823
+  note: experimental temperatures
+  locator: {published_page: 983, pdf_page_index: 1, section: Synopsis}
+- path: species.Al2O3.observations[ohta_1996_table1_spinel_sat_compositions].values.rows[0].slag_mass_pct_Al2O3
+  value: 57.5
+  note: Table 1 first 1873 K slag Al2O3 mass%
+  locator: {published_page: 984, pdf_page_index: 2, table: '1'}
+species:
+  CaO:
+    context:
+    - observation_id: ohta_1996_method_scope
+      type: method
+      locator:
+        published_page: 983
+        pdf_page_index: 1
+        section: Synopsis / Introduction
+      units: K; mass%
+      values:
+        quantity: slag_metal_equilibration_method_and_activity_assessment_scope
+        method_class: method_only
+        experimental_method: equilibrium between CaO-Al2O3-MgO slag (with minor MnO, FetO, S) and liquid iron in Al2O3 or MgO
+          crucibles at 1823 and 1873 K under deoxidized Ar; ~2 h to equilibrium
+        temperatures_K: [1823, 1873]
+        a_CaO_assessment_as_printed: activities of CaO in entire liquid region first determined at 1823 and 1873 K from reported
+          sulfide capacities coupled with activity coefficients of CaS estimated from those in CaO-Al2O3 slags
+        a_Al2O3_MgO_as_printed: on basis of CaO iso-activity lines, activities of Al2O3 and MgO calculated by Schuhmann method
+          using spinel-saturation a(Al2O3) and a(MgO) as starting points
+        binary_edge_note: for the CaO-Al2O3 binary join this paper is partly derived from prior Cs / γ(CaS) data (refs cited),
+          not an independent gas-slag binary activity table; iso-activity figures (Fig. 6) are figure_only here
+        standard_states_as_printed: solid standard states for oxide activities as used in deoxidation equilibria discussion
+        how_equilibrium_shown_as_printed: time trials found equilibrium in ~2 h; unstirred >=1 h before quench; metal/slag
+          analyses as in prior articles
+    - observation_id: ohta_1996_fig6_iso_activity_cao_figure_only
+      type: method
+      locator:
+        published_page: 987
+        pdf_page_index: 5
+        figure: '6'
+      units: none
+      values:
+        quantity: iso_activity_lines_of_CaO
+        method_class: method_only
+        admission_status: figure_only
+        note: Fig. 6 iso-activity lines of CaO at 1873 and 1823 K in CaO-MgO-Al2O3; points not digitised; binary-edge values
+          not re-invented from the figure
+  Al2O3:
+    observations:
+    - observation_id: ohta_1996_table1_spinel_sat_compositions
+      type: composition
+      locator:
+        published_page: 984
+        pdf_page_index: 2
+        table: '1'
+      T_range_K: [1823.0, 1873.0]
+      phase: liquid CaO-MgO-Al2O3 slag along spinel saturation (plus metal)
+      units: mass ppm (metal); mass% (slag oxides); mass ppm (S in slag)
+      values:
+        quantity: chemical_compositions_metal_and_slag
+        method_class: measured
+        admission_status: admitted
+        table_title_as_printed: Table 1. Chemical compositions of metal and slag phases.
+        note: Full row transcription in progress; first rows verified from page image. Slags are spinel-saturated ternary,
+          not binary CaO-Al2O3.
+        rows:
+        - T_K: 1873
+          metal_Al_sol_ppm: 43.5
+          metal_O_ppm: 13.3
+          slag_mass_pct_CaO: 27.4
+          slag_mass_pct_MgO: 12.3
+          slag_mass_pct_Al2O3: 57.5
+          slag_mass_pct_MnO: 0.274
+          slag_mass_pct_FetO: 0.959
+          slag_S_ppm: 2420
+        - T_K: 1873
+          metal_Al_sol_ppm: 21.6
+          metal_O_ppm: 10.2
+          slag_mass_pct_CaO: 30.1
+          slag_mass_pct_MgO: 15.4
+          slag_mass_pct_Al2O3: 52.3
+          slag_mass_pct_MnO: 0.208
+          slag_mass_pct_FetO: 2.13
+          slag_S_ppm: 3210
+        - T_K: 1823
+          metal_Al_sol_ppm: 29.6
+          metal_O_ppm: 15.0
+          slag_mass_pct_CaO: 31.9
+          slag_mass_pct_MgO: 9.0
+          slag_mass_pct_Al2O3: 56.5
+          slag_mass_pct_MnO: 0.060
+          slag_mass_pct_FetO: 0.726
+          slag_S_ppm: 1570
+      quote: 'Table 1 (excerpt): 1873 K slag (CaO 27.4, MgO 12.3, Al2O3 57.5 mass%); 1823 K slag (CaO 31.9, MgO 9.0, Al2O3 56.5
+        mass%).'
