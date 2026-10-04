@@ -8,7 +8,7 @@ extraction:
   method: MinerU text transcription checked against rendered original PDF pages, not MinerU image crops
   date: '2026-10-03'
   worker: extract-gibson-hubbard-1972
-  original_scan: &scan /Users/simonrowland/Repos/regolith-corpus/raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+  original_scan: &scan raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
 review_status: draft
 fidelity_samples:
 - species: Na
@@ -44,6 +44,8 @@ laboratory_parameters:
       value: powdered samples were placed in a platinum crucible
       locator: *procedures
       quote: "Powdered samples were placed in a platinum crucible in a Mettler recording vacuum thermal analyzer as described by Gibson and Johnson (1972)."
+      form: {value: powdered samples, locator: *procedures}
+      container: {value: platinum crucible, locator: *procedures}
     heating_schedule:
       value:
         heating_rates_C_per_min: [4, 6]
