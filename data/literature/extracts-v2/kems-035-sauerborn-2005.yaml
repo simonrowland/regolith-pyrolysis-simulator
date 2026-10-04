@@ -89,7 +89,7 @@ observations:
     paragraph: Inhaltsverzeichnis
   read_from: pdf:kems-035-sauerborn-2005
 - observation_id: kems-035-sauerborn-2005::sauerborn_2005_fig22_jsc1_oxide_pie
-  experiment_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356::kems-035-sauerborn-2005
+  experiment_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356::experiment::jsc1-solar-series
   identity:
     quantity:
       tag: unknown
@@ -105,6 +105,30 @@ observations:
       charge:
         tag: value
         value: 0
+    composition:
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - SiO2
+          - '0.513465703173792996060452264'
+        - - Al2O3
+          - '0.09514933882544856591610812716'
+        - - CaO
+          - '0.1199480627193263721234413181'
+        - - MgO
+          - '0.1444238871547512704497711421'
+        - - FeO
+          - '0.0666171250276056525421376922'
+        - - Fe2O3
+          - '0.01377063685195923114475036148'
+        - - K2O
+          - '0.005492929698424314421110093002'
+        - - TiO2
+          - '0.01295711034122324801815858953'
+        - - Na2O
+          - '0.02817520620746834932407041259'
+        amount_basis: mole_fraction
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'jsc1_and_apollo14163_oxide_pie_labels'; refusing
@@ -138,7 +162,7 @@ observations:
     paragraph: Kapitel 2.1.2
   read_from: pdf:kems-035-sauerborn-2005
 - observation_id: kems-035-sauerborn-2005::sauerborn_2005_fig22_jsc1_oxide_pie_deep2
-  experiment_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356::kems-035-sauerborn-2005
+  experiment_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356::experiment::jsc1-solar-series
   identity:
     quantity:
       tag: unknown
@@ -154,6 +178,30 @@ observations:
       charge:
         tag: value
         value: 0
+    composition:
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - SiO2
+          - '0.513465703173792996060452264'
+        - - Al2O3
+          - '0.09514933882544856591610812716'
+        - - CaO
+          - '0.1199480627193263721234413181'
+        - - MgO
+          - '0.1444238871547512704497711421'
+        - - FeO
+          - '0.0666171250276056525421376922'
+        - - Fe2O3
+          - '0.01377063685195923114475036148'
+        - - K2O
+          - '0.005492929698424314421110093002'
+        - - TiO2
+          - '0.01295711034122324801815858953'
+        - - Na2O
+          - '0.02817520620746834932407041259'
+        amount_basis: mole_fraction
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'jsc1_and_apollo14163_oxide_pie_labels'; refusing
@@ -438,7 +486,7 @@ observations:
     figure: '5.32'
   read_from: pdf:kems-035-sauerborn-2005
 - observation_id: kems-035-sauerborn-2005::sauerborn_2005_fig555_o2_reference_normalized
-  experiment_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356::experiment::jsc1-solar-series
+  experiment_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356::experiment::oxide-reference-series
   identity:
     quantity:
       tag: unknown
@@ -488,7 +536,7 @@ observations:
     figure: '5.55'
   read_from: pdf:kems-035-sauerborn-2005
 - observation_id: kems-035-sauerborn-2005::sauerborn_2005_fig555_o2_reference_normalized_deep2
-  experiment_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356::experiment::jsc1-solar-series
+  experiment_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356::experiment::oxide-reference-series
   identity:
     quantity:
       tag: unknown
@@ -525,7 +573,7 @@ observations:
     figure: '5.55'
   read_from: pdf:kems-035-sauerborn-2005
 - observation_id: kems-035-sauerborn-2005::sauerborn_2005_fig555_printed_zno_increase_deep2
-  experiment_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356::experiment::jsc1-solar-series
+  experiment_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356::experiment::oxide-reference-series
   identity:
     quantity:
       tag: unknown
@@ -2921,7 +2969,7 @@ observations:
     table: '4.1'
   read_from: pdf:kems-035-sauerborn-2005
 - observation_id: kems-035-sauerborn-2005::sauerborn_2005_table51_oxide_reference_full_grid
-  experiment_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356::experiment::jsc1-solar-series
+  experiment_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356::experiment::oxide-reference-series
   identity:
     quantity:
       tag: unknown
@@ -2971,7 +3019,7 @@ observations:
     table: '5.1'
   read_from: pdf:kems-035-sauerborn-2005
 - observation_id: kems-035-sauerborn-2005::sauerborn_2005_table51_oxide_reference_full_grid_deep2
-  experiment_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356::experiment::jsc1-solar-series
+  experiment_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356::experiment::oxide-reference-series
   identity:
     quantity:
       tag: unknown
@@ -3014,7 +3062,7 @@ observations:
     table: '5.1'
   read_from: pdf:kems-035-sauerborn-2005
 - observation_id: kems-035-sauerborn-2005::sauerborn_2005_table51_oxide_reference_runs
-  experiment_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356::experiment::jsc1-solar-series
+  experiment_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356::experiment::oxide-reference-series
   identity:
     quantity:
       tag: unknown
@@ -3065,7 +3113,7 @@ observations:
     source_path: docs-private/research/2026-08-27-ocr-repair/kems-035-sauerborn-2005/tables.md
   read_from: unknown:kems-035-sauerborn-2005
 - observation_id: kems-035-sauerborn-2005::sauerborn_2005_table51_oxide_reference_runs_deep2
-  experiment_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356::experiment::jsc1-solar-series
+  experiment_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356::experiment::oxide-reference-series
   identity:
     quantity:
       tag: unknown

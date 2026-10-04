@@ -64,6 +64,15 @@ experiments:
       regime_class:
         tag: unknown
         reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+    cell_internal_pressure_note:
+      state:
+        tag: value
+        value: about 10^{-6} to 10^{-7} torr (ion-source and Knudsen-cell chambers; surrounding pumped chambers, not in-cell
+          total)
+      locator:
+        published_page: 297
+        pdf_page_index: 3
+        paragraph: both chambers were differentially pumped to about 10^{-6} to 10^{-7} torr
   work_id: 10.5702/massspec.37.295
   locator:
     published_page: 297
