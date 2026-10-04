@@ -11475,30 +11475,6 @@ class Migrator:
             if not derived_prose:
                 if source_derivation is not None:
                     self._author_derivations[obs_id] = source_derivation
-        conditional_method = str(method_class) if method_class else str(regime or "").strip()
-        if (
-            conditional_method not in _CONDITIONAL_REDUCED_METHODS
-            and conditional_method != EvidenceClass.MEASURED_REDUCED.value
-        ):
-            source_derivation = None
-        for payload in (values, obs):
-            if not isinstance(payload.get("inference"), Mapping):
-                continue
-            try:
-                extractor_derivation = _derivation_from_plain(payload["inference"])
-            except (TypeError, ValueError):
-                continue
-            source_derivation = _merge_source_conversion_derivation(
-                source_derivation or Derivation(
-                    relation="as_published",
-                    inputs=(choose_read_from(work, locator),),
-                    parameters=(),
-                    output_unit="as_published",
-                ),
-                extractor_derivation,
-                choose_read_from(work, locator),
-            )
-            break
         evidence, ev_reason = self._evidence_for(
             method_class,
             evaluator_family=values.get("evaluator_family"),
@@ -11517,6 +11493,30 @@ class Migrator:
                 model=suffix_derivation,
                 attribution=evidence.attribution,
             )
+        if evidence.class_.is_value and evidence.class_.value not in {
+            EvidenceClass.MEASURED_REDUCED,
+            EvidenceClass.MODEL_DERIVED,
+        }:
+            source_derivation = None
+        for payload in (values, obs):
+            if not isinstance(payload.get("inference"), Mapping):
+                continue
+            try:
+                extractor_derivation = _derivation_from_plain(payload["inference"])
+            except (TypeError, ValueError):
+                continue
+            if source_derivation is None:
+                source_derivation = _merge_source_conversion_derivation(
+                    Derivation(
+                        relation="as_published",
+                        inputs=(choose_read_from(work, locator),),
+                        parameters=(),
+                        output_unit="as_published",
+                    ),
+                    extractor_derivation,
+                    choose_read_from(work, locator),
+                )
+            break
         if ev_reason:
             self.result.add_queue(
                 work.work_id,
