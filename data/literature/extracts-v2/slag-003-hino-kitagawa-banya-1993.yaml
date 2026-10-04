@@ -22,6 +22,9 @@ observations:
     temperature_K:
       tag: value
       value: '1873'
+    total_pressure_Pa:
+      tag: value
+      value: '101325'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'sulphur_distribution_ratio_logLs'; refusing to
@@ -64,6 +67,12 @@ observations:
         figure: '10'
         equation: '10'
         note: estimated sulphur distribution ratio Ls = (mass%S)/[mass%S]
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - pdf:slag-003-hino-kitagawa-banya-1993
+    parameters: []
+    output_unit: Pa
 - observation_id: slag-003-hino-kitagawa-banya-1993::hino_kitagawa_banya_1993_eq4_logK3
   experiment_id: 10.2355/isijinternational.33.36::slag-003-hino-kitagawa-banya-1993
   identity:
@@ -81,6 +90,9 @@ observations:
       charge:
         tag: value
         value: 0
+    total_pressure_Pa:
+      tag: value
+      value: '101325'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'oxygen_dissolution_in_liquid_iron_logK'; refusing
@@ -109,6 +121,12 @@ observations:
     equation: '4'
     note: log K3 for 1/2 O2(g) = O in liquid iron, cited Steelmaking Data Sourcebook 17)
   read_from: pdf:slag-003-hino-kitagawa-banya-1993
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - pdf:slag-003-hino-kitagawa-banya-1993
+    parameters: []
+    output_unit: Pa
 - observation_id: slag-003-hino-kitagawa-banya-1993::hino_kitagawa_banya_1993_eq6_logK5
   experiment_id: 10.2355/isijinternational.33.36::slag-003-hino-kitagawa-banya-1993
   identity:
@@ -126,6 +144,9 @@ observations:
       charge:
         tag: value
         value: 0
+    total_pressure_Pa:
+      tag: value
+      value: '101325'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'sulphur_dissolution_in_liquid_iron_logK'; refusing
@@ -154,6 +175,12 @@ observations:
     equation: '6'
     note: log K5 for 1/2 S2(g) = S in liquid iron, cited Steelmaking Data Sourcebook 17)
   read_from: pdf:slag-003-hino-kitagawa-banya-1993
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - pdf:slag-003-hino-kitagawa-banya-1993
+    parameters: []
+    output_unit: Pa
 - observation_id: slag-003-hino-kitagawa-banya-1993::hino_kitagawa_banya_1993_eq7_log_S_over_aS
   experiment_id: 10.2355/isijinternational.33.36::slag-003-hino-kitagawa-banya-1993
   identity:
@@ -171,6 +198,9 @@ observations:
       charge:
         tag: value
         value: 0
+    total_pressure_Pa:
+      tag: value
+      value: '101325'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'slag_metal_sulphur_ratio_from_Cs'; refusing to
@@ -200,6 +230,12 @@ observations:
     equation: '7'
     note: obtained from Eqs. (2), (4) and (6)
   read_from: pdf:slag-003-hino-kitagawa-banya-1993
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - pdf:slag-003-hino-kitagawa-banya-1993
+    parameters: []
+    output_unit: Pa
 - observation_id: slag-003-hino-kitagawa-banya-1993::hino_kitagawa_banya_1993_eq9_logK8
   experiment_id: 10.2355/isijinternational.33.36::slag-003-hino-kitagawa-banya-1993
   identity:
@@ -217,6 +253,9 @@ observations:
       charge:
         tag: value
         value: 0
+    total_pressure_Pa:
+      tag: value
+      value: '101325'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'aluminium_deoxidation_logK'; refusing to pick
@@ -246,6 +285,12 @@ observations:
     equation: '9'
     note: log K8 for 2Al + 3O = (Al2O3), cited Steelmaking Data Sourcebook 17)
   read_from: pdf:slag-003-hino-kitagawa-banya-1993
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - pdf:slag-003-hino-kitagawa-banya-1993
+    parameters: []
+    output_unit: Pa
 - observation_id: slag-003-hino-kitagawa-banya-1993::hino_kitagawa_banya_1993_fig10_figure_only
   experiment_id: 10.2355/isijinternational.33.36::slag-003-hino-kitagawa-banya-1993
   identity:
@@ -266,6 +311,9 @@ observations:
     temperature_K:
       tag: value
       value: '1873'
+    total_pressure_Pa:
+      tag: value
+      value: '101325'
   value:
     kind: categorical
     categorical: bound_not_point_ordering
@@ -317,6 +365,12 @@ observations:
         figure: '10'
         note: Fig. 10. Comparison of the change of sulphur distribution ratio between CaO–Al2O3 slag and liquid iron by addition
           of MgO or SiO2 to the slag at 1873 K.
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - pdf:slag-003-hino-kitagawa-banya-1993
+    parameters: []
+    output_unit: Pa
 - observation_id: slag-003-hino-kitagawa-banya-1993::hino_kitagawa_banya_1993_fig1_figure_only
   experiment_id: 10.2355/isijinternational.33.36::slag-003-hino-kitagawa-banya-1993
   identity:
@@ -334,6 +388,9 @@ observations:
       charge:
         tag: value
         value: 0
+    total_pressure_Pa:
+      tag: value
+      value: '101325'
   value:
     kind: categorical
     categorical: bound_not_point_ordering
@@ -370,6 +427,12 @@ observations:
     figure: '1'
     note: Fig. 1. Schematic diagram of experimental apparatus.
   read_from: pdf:slag-003-hino-kitagawa-banya-1993
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - pdf:slag-003-hino-kitagawa-banya-1993
+    parameters: []
+    output_unit: Pa
 - observation_id: slag-003-hino-kitagawa-banya-1993::hino_kitagawa_banya_1993_fig2_figure_only
   experiment_id: 10.2355/isijinternational.33.36::slag-003-hino-kitagawa-banya-1993
   identity:
@@ -387,6 +450,9 @@ observations:
       charge:
         tag: value
         value: 0
+    total_pressure_Pa:
+      tag: value
+      value: '101325'
   value:
     kind: categorical
     categorical: bound_not_point_ordering
@@ -423,6 +489,12 @@ observations:
     figure: '2'
     note: Fig. 2. Sulphide capacities of CaO–Al2O3 slag.
   read_from: pdf:slag-003-hino-kitagawa-banya-1993
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - pdf:slag-003-hino-kitagawa-banya-1993
+    parameters: []
+    output_unit: Pa
 - observation_id: slag-003-hino-kitagawa-banya-1993::hino_kitagawa_banya_1993_fig3_figure_only
   experiment_id: 10.2355/isijinternational.33.36::slag-003-hino-kitagawa-banya-1993
   identity:
@@ -440,6 +512,9 @@ observations:
       charge:
         tag: value
         value: 0
+    total_pressure_Pa:
+      tag: value
+      value: '101325'
   value:
     kind: categorical
     categorical: bound_not_point_ordering
@@ -476,6 +551,12 @@ observations:
     figure: '3'
     note: Fig. 3. Sulphide capacities of CaO–Al2O3–MgO slag.
   read_from: pdf:slag-003-hino-kitagawa-banya-1993
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - pdf:slag-003-hino-kitagawa-banya-1993
+    parameters: []
+    output_unit: Pa
 - observation_id: slag-003-hino-kitagawa-banya-1993::hino_kitagawa_banya_1993_fig4_figure_only
   experiment_id: 10.2355/isijinternational.33.36::slag-003-hino-kitagawa-banya-1993
   identity:
@@ -496,6 +577,9 @@ observations:
     temperature_K:
       tag: value
       value: '1823'
+    total_pressure_Pa:
+      tag: value
+      value: '101325'
   value:
     kind: categorical
     categorical: bound_not_point_ordering
@@ -547,6 +631,12 @@ observations:
         figure: '4'
         note: 'Fig. 4. Iso-sulphide capacity curves in CaO–Al2O3–MgO slag at 1823 K. ●: experimental composition. Numerical
           values show −log Cs.'
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - pdf:slag-003-hino-kitagawa-banya-1993
+    parameters: []
+    output_unit: Pa
 - observation_id: slag-003-hino-kitagawa-banya-1993::hino_kitagawa_banya_1993_fig5_figure_only
   experiment_id: 10.2355/isijinternational.33.36::slag-003-hino-kitagawa-banya-1993
   identity:
@@ -567,6 +657,9 @@ observations:
     temperature_K:
       tag: value
       value: '1873'
+    total_pressure_Pa:
+      tag: value
+      value: '101325'
   value:
     kind: categorical
     categorical: bound_not_point_ordering
@@ -618,6 +711,12 @@ observations:
         figure: '5'
         note: 'Fig. 5. Iso-sulphide capacity curves in CaO–Al2O3–MgO slag at 1873 K. ●: experimental composition. Numerical
           values show −log Cs.'
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - pdf:slag-003-hino-kitagawa-banya-1993
+    parameters: []
+    output_unit: Pa
 - observation_id: slag-003-hino-kitagawa-banya-1993::hino_kitagawa_banya_1993_fig6_figure_only
   experiment_id: 10.2355/isijinternational.33.36::slag-003-hino-kitagawa-banya-1993
   identity:
@@ -638,6 +737,9 @@ observations:
     temperature_K:
       tag: value
       value: '1923'
+    total_pressure_Pa:
+      tag: value
+      value: '101325'
   value:
     kind: categorical
     categorical: bound_not_point_ordering
@@ -689,6 +791,12 @@ observations:
         figure: '6'
         note: 'Fig. 6. Iso-sulphide capacity curves in CaO–Al2O3–MgO slag at 1923 K. ●: experimental composition. Numerical
           values show −log Cs.'
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - pdf:slag-003-hino-kitagawa-banya-1993
+    parameters: []
+    output_unit: Pa
 - observation_id: slag-003-hino-kitagawa-banya-1993::hino_kitagawa_banya_1993_fig7_figure_only
   experiment_id: 10.2355/isijinternational.33.36::slag-003-hino-kitagawa-banya-1993
   identity:
@@ -709,6 +817,9 @@ observations:
     temperature_K:
       tag: value
       value: '1873'
+    total_pressure_Pa:
+      tag: value
+      value: '101325'
   value:
     kind: categorical
     categorical: bound_not_point_ordering
@@ -756,6 +867,12 @@ observations:
         pdf_page_index: 4
         figure: '7'
         note: Fig. 7. Sulphide capacity of CaO–Al2O3–SiO2 slag at 1873 K.
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - pdf:slag-003-hino-kitagawa-banya-1993
+    parameters: []
+    output_unit: Pa
 - observation_id: slag-003-hino-kitagawa-banya-1993::hino_kitagawa_banya_1993_fig8_figure_only
   experiment_id: 10.2355/isijinternational.33.36::slag-003-hino-kitagawa-banya-1993
   identity:
@@ -776,6 +893,9 @@ observations:
     temperature_K:
       tag: value
       value: '1873'
+    total_pressure_Pa:
+      tag: value
+      value: '101325'
   value:
     kind: categorical
     categorical: bound_not_point_ordering
@@ -827,6 +947,12 @@ observations:
         figure: '8'
         note: 'Fig. 8. Iso-sulphide capacity curves in CaO–Al2O3–SiO2 slag at 1873 K. ●: experimental composition. Numerical
           values show −log Cs.'
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - pdf:slag-003-hino-kitagawa-banya-1993
+    parameters: []
+    output_unit: Pa
 - observation_id: slag-003-hino-kitagawa-banya-1993::hino_kitagawa_banya_1993_fig9_figure_only
   experiment_id: 10.2355/isijinternational.33.36::slag-003-hino-kitagawa-banya-1993
   identity:
@@ -847,6 +973,9 @@ observations:
     temperature_K:
       tag: value
       value: '1873'
+    total_pressure_Pa:
+      tag: value
+      value: '101325'
   value:
     kind: categorical
     categorical: bound_not_point_ordering
@@ -895,6 +1024,12 @@ observations:
         pdf_page_index: 5
         figure: '9'
         note: Fig. 9. Comparison of the change of sulphide capacity in CaO–Al2O3 slag by addition of MgO or SiO2 at 1873 K.
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - pdf:slag-003-hino-kitagawa-banya-1993
+    parameters: []
+    output_unit: Pa
 - observation_id: slag-003-hino-kitagawa-banya-1993::hino_kitagawa_banya_1993_table1_cao_al2o3_cs
   experiment_id: 10.2355/isijinternational.33.36::slag-003-hino-kitagawa-banya-1993
   identity:
@@ -915,6 +1050,9 @@ observations:
     temperature_K:
       tag: unknown
       reason: source T_range_K [1822.0, 1928.0]; no midpoint invented
+    total_pressure_Pa:
+      tag: value
+      value: '101325'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'sulphide_capacity_minus_log_Cs'; refusing to pick
@@ -951,6 +1089,12 @@ observations:
     table: '1'
     note: Experimental result in CaO–Al2O3 system
   read_from: pdf:slag-003-hino-kitagawa-banya-1993
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - pdf:slag-003-hino-kitagawa-banya-1993
+    parameters: []
+    output_unit: Pa
 - observation_id: slag-003-hino-kitagawa-banya-1993::hino_kitagawa_banya_1993_table2_cao_al2o3_mgo_cs
   experiment_id: 10.2355/isijinternational.33.36::slag-003-hino-kitagawa-banya-1993
   identity:
@@ -971,6 +1115,9 @@ observations:
     temperature_K:
       tag: unknown
       reason: source T_range_K [1822.0, 1928.0]; no midpoint invented
+    total_pressure_Pa:
+      tag: value
+      value: '101325'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'sulphide_capacity_minus_log_Cs'; refusing to pick
@@ -1013,6 +1160,12 @@ observations:
     table: '2'
     note: Experimental result in CaO–Al2O3–MgO system
   read_from: pdf:slag-003-hino-kitagawa-banya-1993
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - pdf:slag-003-hino-kitagawa-banya-1993
+    parameters: []
+    output_unit: Pa
 - observation_id: slag-003-hino-kitagawa-banya-1993::hino_kitagawa_banya_1993_table3_cao_al2o3_sio2_cs
   experiment_id: 10.2355/isijinternational.33.36::slag-003-hino-kitagawa-banya-1993
   identity:
@@ -1034,6 +1187,9 @@ observations:
     temperature_K:
       tag: unknown
       reason: source T_range_K [1872.0, 1873.0]; no midpoint invented
+    total_pressure_Pa:
+      tag: value
+      value: '101325'
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; unsupported quantity 'sulphide_capacity_minus_log_Cs'; refusing to pick
@@ -1068,3 +1224,9 @@ observations:
     table: '3'
     note: Experimental result in CaO–Al2O3–SiO2 system at 1873 K
   read_from: pdf:slag-003-hino-kitagawa-banya-1993
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - pdf:slag-003-hino-kitagawa-banya-1993
+    parameters: []
+    output_unit: Pa

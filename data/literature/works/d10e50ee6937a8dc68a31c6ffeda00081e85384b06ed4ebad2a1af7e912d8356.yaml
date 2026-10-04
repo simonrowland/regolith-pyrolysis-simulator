@@ -170,6 +170,13 @@ experiments:
       regime_class:
         tag: unknown
         reason: not_published
+    cell_internal_pressure_note:
+      state:
+        tag: value
+        value: Ausheiz-Peaks tabulated in Tabelle 5.1/5.8; not a commanded pO2
+      locator:
+        page: 68
+        table: '5.1'
   work_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356
   locator:
     page: 105
@@ -322,6 +329,13 @@ experiments:
       regime_class:
         tag: unknown
         reason: not_published
+    cell_internal_pressure_note:
+      state:
+        tag: value
+        value: Ausheiz-Peaks tabulated in Tabelle 5.1/5.8; not a commanded pO2
+      locator:
+        page: 68
+        table: '5.1'
   work_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356
   locator:
     page: 105
@@ -474,6 +488,13 @@ experiments:
       regime_class:
         tag: unknown
         reason: not_published
+    cell_internal_pressure_note:
+      state:
+        tag: value
+        value: Ausheiz-Peaks tabulated in Tabelle 5.1/5.8; not a commanded pO2
+      locator:
+        page: 68
+        table: '5.1'
   work_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356
   locator:
     page: 105
@@ -626,6 +647,13 @@ experiments:
       regime_class:
         tag: unknown
         reason: not_published
+    cell_internal_pressure_note:
+      state:
+        tag: value
+        value: Ausheiz-Peaks tabulated in Tabelle 5.1/5.8; not a commanded pO2
+      locator:
+        page: 68
+        table: '5.1'
   work_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356
   locator:
     page: 105
@@ -730,11 +758,82 @@ experiments:
       regime_class:
         tag: unknown
         reason: not_published
+    cell_internal_pressure_note:
+      state:
+        tag: value
+        value: QMS Messkreuz baseline forced to 1e-7 mbar on this figure; chamber high-T peaks are in Tabelle 5.8 (MS1 peak/base
+          17.1)
+      locator:
+        page: 107
+        figure: '5.56'
   work_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356
   locator:
     page: 105
     table: '5.3'
     note: JSC-1 MS1/MS2/MS4/MS5 series; table preserves run-specific mass, peak temperature, and high-temperature duration
+  bench_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356::bench::dlr-solar-vacuum-system
+- experiment_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356::experiment::oxide-reference-series
+  kind: literature
+  method:
+    tag: value
+    value: solar_furnace_pyrolysis
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value: Simple oxide and empty sample holder reference runs
+      locator:
+        page: 68
+        table: '5.1'
+    form:
+      state:
+        tag: value
+        value: Powder or empty holder
+      locator:
+        page: 54
+        section: 4.1.2 Pulverproben
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 68
+        table: '5.1'
+        note: Reference runs have distinct Tmax
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 68
+        table: '5.1'
+        note: Chamber Druckwerte tabulated per phase; no single commanded total assigned
+    sweep_gas:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        page: 36
+        section: 3.2.1 Vakuumkammer und Pumpstände
+        note: High-vacuum operation
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+    cell_internal_pressure_note:
+      state:
+        tag: value
+        value: QMS Messkreuz; valve-set ~10x below chamber. Baseline of this figure forced to 1e-7 mbar.
+      locator:
+        page: 105
+        figure: '5.55'
+  work_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356
+  locator:
+    page: 68
+    table: '5.1'
+    note: Oxide and empty-holder reference runs (ohne Probe, CaO, SiO2, ZnO); Fig. 5.55 O2 traces
   bench_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356::bench::dlr-solar-vacuum-system
 - experiment_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356::kems-035-sauerborn-2005
   kind: literature
