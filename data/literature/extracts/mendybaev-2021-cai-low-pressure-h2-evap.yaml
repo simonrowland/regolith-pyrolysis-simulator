@@ -7,7 +7,7 @@ extraction:
   method: pdftotext -layout with visual verification of Tables 1-2 and Figures 2, 6, 8
   date: '2026-09-19'
   worker: extract-mendybaev-2021
-  source_path: /Users/simonrowland/Repos/regolith-corpus/raw/mendybaev-2021-cai-low-pressure-h2-evap/mendybaev-2021-cai-low-pressure-h2-evap.pdf
+  source_path: corpus/raw/mendybaev-2021-cai-low-pressure-h2-evap/mendybaev-2021-cai-low-pressure-h2-evap.pdf
   note: 'The supplied manuscript PDF clips the right-hand continuation of Tables 1-2. Only readable cells are transcribed; clipped residue oxide compositions, final weights, and clipped rate columns are absent.'
 review_status: draft
 benches:
@@ -118,23 +118,23 @@ system_conditions:
     Al2O3: 27
     CaO: 21
   starting_composition_locator:
-    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/mendybaev-2021-cai-low-pressure-h2-evap/mendybaev-2021-cai-low-pressure-h2-evap.pdf
+    source_path: corpus/raw/mendybaev-2021-cai-low-pressure-h2-evap/mendybaev-2021-cai-low-pressure-h2-evap.pdf
     published_page: 5
     paragraph: 'Starting materials; CAI4B2 composition'
   temperature_C: 1600
   temperature_locator:
-    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/mendybaev-2021-cai-low-pressure-h2-evap/mendybaev-2021-cai-low-pressure-h2-evap.pdf
+    source_path: corpus/raw/mendybaev-2021-cai-low-pressure-h2-evap/mendybaev-2021-cai-low-pressure-h2-evap.pdf
     published_page: 7
     paragraph: 'experiments conducted at 1600°C'
   sample_form: molten CAI4B2 droplets on 1.5- or 2.5-mm diameter Ir-wire loops
   container: Alfa Aesar Ir wire, 99.8%; no crucible during evaporation
   sample_form_locator:
-    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/mendybaev-2021-cai-low-pressure-h2-evap/mendybaev-2021-cai-low-pressure-h2-evap.pdf
+    source_path: corpus/raw/mendybaev-2021-cai-low-pressure-h2-evap/mendybaev-2021-cai-low-pressure-h2-evap.pdf
     published_page: 5
     paragraph: 'samples loaded onto iridium wire loops'
   area_method: 'surface area calculated from measured sample geometry, Ir thermal expansion, and density-composition-temperature relationships; initial areas printed in Table 1'
   area_locator:
-    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/mendybaev-2021-cai-low-pressure-h2-evap/mendybaev-2021-cai-low-pressure-h2-evap.pdf
+    source_path: corpus/raw/mendybaev-2021-cai-low-pressure-h2-evap/mendybaev-2021-cai-low-pressure-h2-evap.pdf
     published_page: 7
     table: '1'
   temperature_measurement:
@@ -144,7 +144,7 @@ system_conditions:
     hydrogen: 'calibrated against melting Fe 1535°C, Ni 1455°C, and Rh-C eutectic 1657°C at the sample location'
   temperature_control: 'vacuum Eurotherm controller within ±1°C; H2 heating rate ~20°C/min and 5 min hold for complete melting'
   temperature_locator:
-    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/mendybaev-2021-cai-low-pressure-h2-evap/mendybaev-2021-cai-low-pressure-h2-evap.pdf
+    source_path: corpus/raw/mendybaev-2021-cai-low-pressure-h2-evap/mendybaev-2021-cai-low-pressure-h2-evap.pdf
     published_pages: '7-8'
     paragraph: 'Experimental protocols'
   arms:
@@ -154,7 +154,7 @@ system_conditions:
       pumping: 'turbo pump evacuation to 10−9–10−10 bar at room temperature; H2 introduced after the furnace was below 5×10−9 bar and flow-controlled to constant pressure'
       furnace: 'Hokkaido University low-pressure high-temperature hydrogen furnace; stainless-steel vacuum furnace with tungsten mesh heater, 25 mm diameter × 100 mm'
       locator:
-        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/mendybaev-2021-cai-low-pressure-h2-evap/mendybaev-2021-cai-low-pressure-h2-evap.pdf
+        source_path: corpus/raw/mendybaev-2021-cai-low-pressure-h2-evap/mendybaev-2021-cai-low-pressure-h2-evap.pdf
         published_page: 8
         paragraph: '3.1.2 Low-pressure H2 experiments'
     h2_2e-5_bar:
@@ -163,7 +163,7 @@ system_conditions:
       pumping: 'same H2-furnace evacuation and flow-control protocol as the 2×10−4 bar arm'
       furnace: 'same Hokkaido University low-pressure hydrogen furnace'
       locator:
-        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/mendybaev-2021-cai-low-pressure-h2-evap/mendybaev-2021-cai-low-pressure-h2-evap.pdf
+        source_path: corpus/raw/mendybaev-2021-cai-low-pressure-h2-evap/mendybaev-2021-cai-low-pressure-h2-evap.pdf
         published_page: 8
         paragraph: '3.1.2 Low-pressure H2 experiments'
     vacuum:
@@ -172,7 +172,7 @@ system_conditions:
       pumping: 'turbomolecular pump; chamber pumped to ~10−7 bar before heating and vented after cooling'
       furnace: 'University of Chicago high-temperature high-vacuum Hashimoto furnace with tungsten mesh heater and heat shield'
       locator:
-        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/mendybaev-2021-cai-low-pressure-h2-evap/mendybaev-2021-cai-low-pressure-h2-evap.pdf
+        source_path: corpus/raw/mendybaev-2021-cai-low-pressure-h2-evap/mendybaev-2021-cai-low-pressure-h2-evap.pdf
         published_page: 7
         paragraph: '3.1.1 Vacuum evaporation experiments'
 species:
@@ -181,7 +181,7 @@ species:
     - observation_id: mendybaev_2021_mg_evaporation_rates_by_arm
       type: rate_series
       locator:
-        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/mendybaev-2021-cai-low-pressure-h2-evap/mendybaev-2021-cai-low-pressure-h2-evap.pdf
+        source_path: corpus/raw/mendybaev-2021-cai-low-pressure-h2-evap/mendybaev-2021-cai-low-pressure-h2-evap.pdf
         published_page: 11
         paragraph: 'average evaporation rates JMg'
       T_C: 1600
@@ -208,7 +208,7 @@ species:
     - observation_id: mendybaev_2021_mg_alpha_by_arm
       type: alpha
       locator:
-        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/mendybaev-2021-cai-low-pressure-h2-evap/mendybaev-2021-cai-low-pressure-h2-evap.pdf
+        source_path: corpus/raw/mendybaev-2021-cai-low-pressure-h2-evap/mendybaev-2021-cai-low-pressure-h2-evap.pdf
         published_page: 15
         figure: '6'
         paragraph: 'kinetic isotopic fractionation factor α25,24'
@@ -229,7 +229,7 @@ species:
     - observation_id: mendybaev_2021_si_evaporation_rates_by_arm
       type: rate_series
       locator:
-        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/mendybaev-2021-cai-low-pressure-h2-evap/mendybaev-2021-cai-low-pressure-h2-evap.pdf
+        source_path: corpus/raw/mendybaev-2021-cai-low-pressure-h2-evap/mendybaev-2021-cai-low-pressure-h2-evap.pdf
         published_page: 11
         paragraph: 'average evaporation rates JSi'
       T_C: 1600
@@ -256,7 +256,7 @@ species:
     - observation_id: mendybaev_2021_si_alpha_by_arm
       type: alpha
       locator:
-        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/mendybaev-2021-cai-low-pressure-h2-evap/mendybaev-2021-cai-low-pressure-h2-evap.pdf
+        source_path: corpus/raw/mendybaev-2021-cai-low-pressure-h2-evap/mendybaev-2021-cai-low-pressure-h2-evap.pdf
         published_page: 16
         figure: '8'
         paragraph: 'kinetic isotopic fractionation factor α29,28'
@@ -272,7 +272,7 @@ species:
     - observation_id: mendybaev_2021_isotope_table2_readable_rows
       type: concentration_series
       locator:
-        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/mendybaev-2021-cai-low-pressure-h2-evap/mendybaev-2021-cai-low-pressure-h2-evap.pdf
+        source_path: corpus/raw/mendybaev-2021-cai-low-pressure-h2-evap/mendybaev-2021-cai-low-pressure-h2-evap.pdf
         published_page: 29
         table: '2'
       T_C: 1600
@@ -306,7 +306,7 @@ species:
     - observation_id: mendybaev_2021_weight_loss_rates_by_arm
       type: rate_series
       locator:
-        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/mendybaev-2021-cai-low-pressure-h2-evap/mendybaev-2021-cai-low-pressure-h2-evap.pdf
+        source_path: corpus/raw/mendybaev-2021-cai-low-pressure-h2-evap/mendybaev-2021-cai-low-pressure-h2-evap.pdf
         published_page: 11
         figure: '2'
         paragraph: 'surface-area-normalized total weight loss'
@@ -326,7 +326,7 @@ species:
     - observation_id: mendybaev_2021_table1_sample_geometry_readable_columns
       type: experiment_series
       locator:
-        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/mendybaev-2021-cai-low-pressure-h2-evap/mendybaev-2021-cai-low-pressure-h2-evap.pdf
+        source_path: corpus/raw/mendybaev-2021-cai-low-pressure-h2-evap/mendybaev-2021-cai-low-pressure-h2-evap.pdf
         published_page: 28
         table: '1'
       phase: CAI4B2_melt

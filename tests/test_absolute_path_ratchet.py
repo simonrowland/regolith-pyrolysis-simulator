@@ -1,8 +1,7 @@
-"""Pin + ratchet for absolute provenance/locator paths in literature extracts (b-713).
+"""Ratchet for absolute provenance/locator paths in literature extracts (b-713).
 
-PIN behaviour (this file on the pin commit): the live extract tree carries a
-known absolute-path count, and the validator ceiling refuses any rise.
-The fix commit rewrites every hit to corpus-relative and lowers the ceiling.
+After the fix, the extract tree must carry zero absolute provenance/locator
+path lines, and the validator ceiling refuses any rise above zero.
 """
 
 from __future__ import annotations
@@ -17,10 +16,9 @@ from tools import validate_literature_extracts as vle
 REPO_ROOT = Path(__file__).resolve().parents[1]
 EXTRACTS = REPO_ROOT / "data" / "literature" / "extracts"
 
-# Live absolute-path total on work-v064-green @ 8089eadbf (b-713 pin).
-# The fix commit lowers ABSOLUTE_PATH_COUNT_CEILING and this expectation together.
-PINNED_ABSOLUTE_PATH_TOTAL = 471
-PINNED_EXTRACT_FILES_WITH_ABS = 46
+# Post-fix absolute-path total (b-713): every hit rewritten to corpus-relative.
+PINNED_ABSOLUTE_PATH_TOTAL = 0
+PINNED_EXTRACT_FILES_WITH_ABS = 0
 
 
 def test_absolute_path_count_matches_pin() -> None:

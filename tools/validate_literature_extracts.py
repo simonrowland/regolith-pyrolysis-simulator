@@ -144,9 +144,9 @@ PATH_VALUE_KEYS = frozenset(
 )
 
 # Ratchet on absolute PATH_VALUE_KEYS hits across data/literature/extracts.
-# The count may only fall. b-713 pin captures the live total; the fix lowers
-# the ceiling after rewriting every hit to corpus-relative.
-ABSOLUTE_PATH_COUNT_CEILING = 471
+# The count may only fall. b-713 rewrote every hit to corpus-relative and
+# lowered the ceiling to zero; new absolute paths are refused.
+ABSOLUTE_PATH_COUNT_CEILING = 0
 
 
 def _walk_absolute_path_values(

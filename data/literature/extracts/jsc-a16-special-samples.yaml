@@ -11,31 +11,31 @@ extraction:
 review_status: draft
 source_locators:
   introduction: &introduction
-    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/jsc-a16-special-samples/jsc-a16-special-samples.pdf
+    source_path: corpus/raw/jsc-a16-special-samples/jsc-a16-special-samples.pdf
     pdf_page_index: 2
     section: Introduction
   surface_sampling: &surface_sampling
-    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/jsc-a16-special-samples/jsc-a16-special-samples.pdf
+    source_path: corpus/raw/jsc-a16-special-samples/jsc-a16-special-samples.pdf
     pdf_page_index: 3
     section: 'A.1 Regolith Materials'
   cs_vc: &cs_vc
-    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/jsc-a16-special-samples/jsc-a16-special-samples.pdf
+    source_path: corpus/raw/jsc-a16-special-samples/jsc-a16-special-samples.pdf
     pdf_page_index: 10
     section: 'A.3 Core Sample Vacuum Container (CSVC)'
   core_method: &core_method
-    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/jsc-a16-special-samples/jsc-a16-special-samples.pdf
+    source_path: corpus/raw/jsc-a16-special-samples/jsc-a16-special-samples.pdf
     pdf_page_index: 11
     section: 'B. Double Drive Tubes and Deep Drill Core'
   table1: &table1
-    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/jsc-a16-special-samples/jsc-a16-special-samples.pdf
+    source_path: corpus/raw/jsc-a16-special-samples/jsc-a16-special-samples.pdf
     pdf_page_index: 45
     table: 'I'
   core_log_60009_10: &core_log_60009_10
-    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/jsc-a16-special-samples/jsc-a16-special-samples.pdf
+    source_path: corpus/raw/jsc-a16-special-samples/jsc-a16-special-samples.pdf
     pdf_page_index: 15
     section: 'Detailed Core Log, drive tube 60009/60010'
   core_log_60013_14: &core_log_60013_14
-    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/jsc-a16-special-samples/jsc-a16-special-samples.pdf
+    source_path: corpus/raw/jsc-a16-special-samples/jsc-a16-special-samples.pdf
     pdf_page_index: 19
     section: 'Detailed Core Log, drive tube 60013/60014'
 laboratory_parameters:
@@ -57,7 +57,7 @@ laboratory_parameters:
       collected_layer_thickness_as_printed: about 100 microns
       sealing: containers carefully sealed before and after deployment
     locator:
-      source_path: /Users/simonrowland/Repos/regolith-corpus/raw/jsc-a16-special-samples/jsc-a16-special-samples.pdf
+      source_path: corpus/raw/jsc-a16-special-samples/jsc-a16-special-samples.pdf
       pdf_page_index: 46
       figure: '1'
   core_sample_vacuum_container:
@@ -70,7 +70,7 @@ laboratory_parameters:
       receiving_atmosphere: sterile nitrogen atmosphere on LRL opening
       additional_containment: two vacuum seals
     locator:
-      source_path: /Users/simonrowland/Repos/regolith-corpus/raw/jsc-a16-special-samples/jsc-a16-special-samples.pdf
+      source_path: corpus/raw/jsc-a16-special-samples/jsc-a16-special-samples.pdf
       pdf_page_index: 53
       section: 'Figure 38 caption and A.3 Core Sample Vacuum Container'
     note: This is a storage/contamination-control condition, not a vaporization-run pressure.
