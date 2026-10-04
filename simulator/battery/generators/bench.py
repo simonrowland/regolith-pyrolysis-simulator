@@ -7,7 +7,10 @@ from collections.abc import Mapping
 from simulator.battery.consumer_inputs import ConsumerInputs, REQUIREMENTS
 from simulator.battery.enums import Phase, ReferenceStateConvention, ValueKind
 from simulator.battery.records import StandardState, Value, phase_token
-from simulator.battery.migrate import to_plain
+from simulator.battery.migrate import (
+    _knudsen_effusion_chamber_background_not_for_identity,
+    to_plain,
+)
 from simulator.battery.waypoints import (
     ConsumerReadiness, ReadinessStatus, ReadinessGap, GapReason,
     ENGINE_POINT_CONSUMERS, MELT_ACTIVITY_ENGINES, Waypoint, WaypointFlag,
@@ -71,10 +74,21 @@ def _requirements(inputs, consumer, engine=None):
             missing = charges.absence.missing if charges.absence else ()
         else:
             waypoint = inputs.waypoints[name]
-            absent = waypoint.selected is None
-            missing = waypoint.absence.missing if waypoint.absence else ()
+            if consumer == "engine_point" and name == "pressure_boundary":
+                prediction = _prediction_pressure_waypoint(inputs)
+                absent = prediction is None
+                missing = (
+                    waypoint.absence.missing
+                    if waypoint.absence
+                    else ("experiment.pressure_environment.total_pressure_Pa",)
+                )
+                selected_value = prediction.value if prediction is not None else None
+            else:
+                absent = waypoint.selected is None
+                missing = waypoint.absence.missing if waypoint.absence else ()
+                selected_value = waypoint.selected.value if waypoint.selected is not None else None
             if not absent and consumer == "engine_point" and name != "normalized_composition":
-                selected = waypoint.selected.value
+                selected = selected_value
                 if (name == "pressure_boundary"
                         and isinstance(selected, Value)
                         and selected.kind is ValueKind.BOUND
@@ -97,6 +111,29 @@ def _requirements(inputs, consumer, engine=None):
 
 class UnsupportedValue(ValueError):
     pass
+
+
+def _prediction_pressure_waypoint(inputs: ConsumerInputs):
+    """Waypoint selected for engine-point system pressure.
+
+    Knudsen chamber background (``printed_run_pressure``) stays on the
+    pressure_boundary waypoint for exterior/kems consumers, but must not
+    become prediction ``pressure_bar``. Prefer any non-chamber route
+    (source-grounded observation point_conditions); otherwise absent.
+    """
+
+    result = inputs.waypoints["pressure_boundary"]
+    selected = result.selected
+    if (
+        selected is not None
+        and selected.route == "printed_run_pressure"
+        and _knudsen_effusion_chamber_background_not_for_identity(inputs.method)
+    ):
+        for route in result.routes:
+            if route.route != "printed_run_pressure":
+                return route
+        return None
+    return selected
 
 
 # Each element has more than one oxidation state in silicate melts over the
@@ -350,12 +387,18 @@ def _point(inputs, name):
 
 
 def _engine_pressure_point(inputs):
-    value = inputs.waypoints["pressure_boundary"].selected.value
+    selected = _prediction_pressure_waypoint(inputs)
+    if selected is None:
+        raise UnsupportedValue("pressure_boundary")
+    value = selected.value
     if (value.kind is ValueKind.BOUND
             and value.bound_operator in {"<", "<=", "≤"}
+            and inputs.waypoints["oxygen_condition"].selected is not None
             and inputs.waypoints["oxygen_condition"].selected.route == "vacuum_total_pressure_upper_bound"):
         return value.bound_value
-    return _point(inputs, "pressure_boundary")
+    if not isinstance(value, Value) or value.kind is not ValueKind.POINT:
+        raise UnsupportedValue("pressure_boundary")
+    return value.point
 
 
 def _document(inputs, name):

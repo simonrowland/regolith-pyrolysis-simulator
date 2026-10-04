@@ -12936,9 +12936,17 @@ class Migrator:
                     )
                     if source_pressure is not None:
                         total_pressure = source_pressure
-                condition_updates = {
-                    "total_pressure_Pa": total_pressure
-                }
+                # Same predicate as identity fills: knudsen chamber background
+                # must not become observation point_conditions (feeds
+                # pressure_boundary → engine-point system pressure).
+                if _knudsen_effusion_chamber_background_not_for_identity(
+                    run_experiment.method
+                ):
+                    condition_updates: dict[str, Located[Any]] = {}
+                else:
+                    condition_updates = {
+                        "total_pressure_Pa": total_pressure
+                    }
                 parent_atmosphere = (parent_point_conditions or {}).get(
                     "atmosphere"
                 )

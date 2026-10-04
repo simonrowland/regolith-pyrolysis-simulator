@@ -55,6 +55,9 @@ class ConsumerInputs:
     activity_quantity: str | None = None
     # Measured species formula. A multivalent solute can sit outside the bulk map.
     measured_species: str | None = None
+    # Experiment method token (State[MethodToken]); engine-point uses it with the
+    # shared knudsen chamber-background predicate.
+    method: object | None = None
 
 
 def _activity_quantity(observation) -> str | None:
@@ -193,4 +196,6 @@ def collect_consumer_inputs(experiment, bench, observation=None) -> ConsumerInpu
         activity_quantity=_activity_quantity(observation),
         measured_species=(
             observation.identity.species.formula if observation is not None else None
-        ))
+        ),
+        method=experiment.method,
+    )
