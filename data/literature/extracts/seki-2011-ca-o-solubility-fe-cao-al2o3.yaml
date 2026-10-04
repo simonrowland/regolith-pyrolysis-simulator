@@ -1,0 +1,156 @@
+schema_version: literature_extract.v1
+source_id: seki-2011-ca-o-solubility-fe-cao-al2o3
+source:
+  citation: 'I. Seki et al., solubility of Ca and O in molten iron with CaO-Al2O3-ZrO2 slag in CaO, Al2O3 or CaO-stabilized ZrO2 crucible at 1873 K, ISIJ International 51(9) (2011) 1369–1374.'
+  doi: 10.2355/isijinternational.51.1369
+  url: https://doi.org/10.2355/isijinternational.51.1369
+  year: 2011
+  corpus_source_id: seki-2011-ca-o-solubility-fe-cao-al2o3
+extraction:
+  method: Manual transcription from 200 dpi pdftoppm page renders of the ISIJ PDF plus pdftotext -layout. Table 3 a(CaO)
+    cells from page image (p. 1373). Abstract slag compositions transcribed. a(CaO) values are calculated (derived) from
+    measured Ca and O with interaction parameters — recorded as author-reported calculated activities, not invented.
+  date: '2026-10-04'
+  worker: empirical-cao-al2o3-slot-07
+  provenance_path: ferry-inbox/cao-al2o3-sources/seki-2011-ca-o-solubility-fe-cao-al2o3/
+review_status: draft
+fidelity_samples:
+- path: species.CaO.observations[seki_2011_table3_calculated_a_CaO].values.rows[5].a_CaO
+  value: 0.81
+  note: Table 3 CaO-crucible run 6 aCaO
+  locator: {published_page: 1373, pdf_page_index: 5, table: '3', row: '6'}
+- path: species.CaO.observations[seki_2011_abstract_slag_compositions].values.CaO_crucible_slag_mass_pct_CaO
+  value: 57.36
+  note: abstract CaO-crucible slag CaO mass%
+  locator: {published_page: 1369, pdf_page_index: 1, section: Synopsis}
+species:
+  CaO:
+    context:
+    - observation_id: seki_2011_method
+      type: method
+      locator:
+        published_page: 1369
+        pdf_page_index: 1
+        section: Synopsis / Experiments
+      units: K; mass%
+      values:
+        quantity: slag_metal_equilibration_ca_o_solubility
+        method_class: method_only
+        experimental_method: slag-metal equilibration of molten iron with CaO-Al2O3-ZrO2 slag in CaO, Al2O3, or 5.5 mass% CaO-stabilized
+          ZrO2 crucible at 1873 K
+        temperature_K: 1873
+        logK_CaO_eq_Ca_O_as_printed: -4.38
+        e_Ca_O_as_printed: 31.8
+        how_equilibrium_shown_as_printed: hold at 1873 K; quench; Ca and O analyses; aCaO calculated via interaction parameters
+        note: Derived a(CaO) depends on Ca-O interaction parameters (authors' log K differs from Hino recommendation -9.08)
+    observations:
+    - observation_id: seki_2011_abstract_slag_compositions
+      type: composition
+      locator:
+        published_page: 1369
+        pdf_page_index: 1
+        section: Synopsis
+      T_range_K: [1873.0, 1873.0]
+      phase: CaO-Al2O3-ZrO2 molten slag at compound saturation
+      units: mass%
+      values:
+        quantity: slag_composition_at_saturation
+        method_class: measured
+        admission_status: admitted
+        CaO_crucible_as_printed: '57.36 mass% CaO - 34.86% Al2O3 - 7.78% ZrO2; equilibrium with CaO.ZrO2 and CaO'
+        Al2O3_crucible_as_printed: '27.08 mass% CaO - 53.42% Al2O3 - 19.50% ZrO2; equilibrium with CaO.2Al2O3 and ZrO2-CaO ss'
+        CSZ_crucible_as_printed: '30.38 mass% CaO - 51.56% Al2O3 - (ZrO2 balance); equilibrium with Css and CaO.ZrO2'
+        CaO_crucible_slag_mass_pct_CaO: 57.36
+        CaO_crucible_slag_mass_pct_Al2O3: 34.86
+        CaO_crucible_slag_mass_pct_ZrO2: 7.78
+        Al2O3_crucible_slag_mass_pct_CaO: 27.08
+        Al2O3_crucible_slag_mass_pct_Al2O3: 53.42
+        Al2O3_crucible_slag_mass_pct_ZrO2: 19.50
+      quote: 'the slag in a CaO crucible was in equilibrium with CaO.ZrO2 and CaO and the slag composition was 57.36 mass% CaO-34.86%
+        Al2O3-7.78% ZrO2.'
+    - observation_id: seki_2011_table3_calculated_a_CaO
+      type: activity_coefficient
+      locator:
+        published_page: 1373
+        pdf_page_index: 5
+        table: '3'
+      T_range_K: [1873.0, 1873.0]
+      phase: CaO-Al2O3-ZrO2 slag / molten iron
+      standard_state: solid CaO (reaction CaO(s)=Ca+O)
+      units: dimensionless activity
+      values:
+        quantity: activity
+        method_class: derived
+        admission_status: admitted
+        measurement_status: author_reported_calculated_from_Ca_O_and_interaction_parameters
+        table_title_as_printed: 'Table 3. Calculated activity of calcium and oxygen in molten iron and CaO in slag at 1873 K.'
+        rows:
+        - run: 1
+          crucible: Al2O3
+          a_Ca: 5.36e-4
+          a_O: 3.96e-3
+          a_CaO: 0.037
+          a_CaO_as_printed: '0.037'
+        - run: 2
+          crucible: Al2O3
+          a_Ca: 4.82e-4
+          a_O: 1.97e-3
+          a_CaO: 0.023
+          a_CaO_as_printed: '0.023'
+        - run: Av_Al2O3
+          crucible: Al2O3
+          a_CaO: 0.030
+          a_CaO_as_printed: '0.030'
+          note: table average row
+        - run: 3
+          crucible: CaO-stabilized ZrO2
+          a_Ca: 8.31e-4
+          a_O: 1.41e-3
+          a_CaO: 0.028
+          a_CaO_as_printed: '0.028'
+        - run: 4
+          crucible: CaO-stabilized ZrO2
+          a_Ca: 5.79e-4
+          a_O: 2.01e-3
+          a_CaO: 0.028
+          a_CaO_as_printed: '0.028'
+        - run: 5
+          crucible: CaO-stabilized ZrO2
+          a_Ca: 3.70e-4
+          a_O: 2.27e-3
+          a_CaO: 0.020
+          a_CaO_as_printed: '0.020'
+        - run: Av_CSZ
+          crucible: CaO-stabilized ZrO2
+          a_CaO: 0.025
+          a_CaO_as_printed: '0.025'
+        - run: 6
+          crucible: CaO
+          a_Ca: 1.33e-3
+          a_O: 2.54e-2
+          a_CaO: 0.81
+          a_CaO_as_printed: '0.81'
+        - run: 7
+          crucible: CaO
+          a_Ca: 2.08e-3
+          a_O: 2.40e-2
+          a_CaO: 1.20
+          a_CaO_as_printed: '1.20'
+        - run: Av_CaO
+          crucible: CaO
+          a_CaO: 1.00
+          a_CaO_as_printed: '1.00'
+          note: lime-saturated average forced to unity in discussion
+        formula: CaO
+      quote: 'Table 3: Al2O3 crucible aCaO 0.037, 0.023 (Av 0.030); CaO crucible aCaO 0.81, 1.20 (Av 1.00).'
+    - observation_id: seki_2011_fig5_figure_only
+      type: method
+      locator:
+        published_page: 1373
+        pdf_page_index: 5
+        figure: '5'
+      units: none
+      values:
+        quantity: ca_o_solubility_plot
+        method_class: method_only
+        admission_status: figure_only
