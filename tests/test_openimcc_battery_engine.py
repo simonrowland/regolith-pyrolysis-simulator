@@ -450,6 +450,9 @@ def test_openimcc_producer_emits_activity_and_vapour_rails() -> None:
     _require_openimcc()
     handle = open_battery_engine("openimcc")
     assert handle.available, handle.unavailable_reason
+    assert handle.identity["pack_digest"] == (
+        "f2b479cd54e3c82704a5863fcc06836f72045375d9a8c7f8d2fad19e98f75d05"
+    )
     cell = equilibrate_cell(
         handle,
         _binary_probe(),
@@ -463,6 +466,34 @@ def test_openimcc_producer_emits_activity_and_vapour_rails() -> None:
     assert "openimcc" in cell.vapor_pressures_source["K"]
     assert "gas-shomate.csv" in cell.vapor_pressures_source["K"]
     assert cell.model_id == "IMCC-SF04"
+
+
+def test_missing_binding_digest_refuses_without_residual_identity_or_cache_key(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from types import SimpleNamespace
+
+    from simulator.melt_backend import openimcc_bridge
+
+    monkeypatch.setattr(openimcc_bridge, "_load_pack", lambda _name: SimpleNamespace())
+    handle = open_battery_engine("openimcc")
+
+    assert not handle.available
+    assert "openimcc_binding_digest_unavailable" in (handle.unavailable_reason or "")
+    assert "pack_digest" not in handle.identity
+
+    context, reference = _zhang_k_case(tmp_path, "1473.15")
+    residual, candidate = compile_residual(
+        reference,
+        Engine.OPENIMCC,
+        context=context,
+        handles={"openimcc": handle},
+    )
+    assert residual.status is ResidualStatus.REFUSED
+    assert residual.refusal is not None
+    assert residual.numeric is None
+    assert candidate is None
 
 
 def test_openimcc_battery_solves_plante_oxygen_balance_anchor() -> None:
@@ -1090,6 +1121,12 @@ assert {
     for residual, candidate in engine_rows
     if candidate.engine is not None
 } == {(True, "independent")}
+assert any(
+    "openimcc-pack-digest:f2b479cd54e3c82704a5863fcc06836f72045375d9a8c7f8d2fad19e98f75d05"
+    in candidate.engine.coefficient_sources
+    for _, candidate in engine_rows
+    if candidate.engine is not None
+)
 summary = next(
     row for row in headline_rows(residuals, context=context, engines=engines)
     if row["rail"] == "vapour" and row["engine"] == Engine.OPENIMCC.value
