@@ -1,10 +1,10 @@
 # Battery v2.1 migration report
 
-rows in: 47410
-records out (observations): 121085
+rows in: 47411
+records out (observations): 121113
 works: 263
-experiments: 3518
-queue size: 76921
+experiments: 3520
+queue size: 76917
 identical-payload dedupe aliases: 342
 metadata files: 39
 index sources: 168
@@ -17,7 +17,7 @@ hard issues: 3655
 | citations | 147 | 266 (mismatch) |
 | doi_works | 56 | 125 (mismatch) |
 | no_doi_works | 91 | 138 (mismatch) |
-| admission_statuses | 374 | 1076 (mismatch) |
+| admission_statuses | 374 | 1074 (mismatch) |
 | supersedes | 422 | 649 (mismatch) |
 | series | 60 | 597 (mismatch) |
 | gibbs_reference_pressures | 1617 | 1635 (mismatch) |
@@ -25,10 +25,10 @@ hard issues: 3655
 | gibbs_reference_101325 | 594 | 594 |
 | formulas | 1625 | 2037 (mismatch) |
 | equipment_payloads | 670 | 972 (mismatch) |
-| absent_admissions | 3511 | 4742 (mismatch) |
-| absent_classes | 2174 | 2205 (mismatch) |
-| range_only_T | 3125 | 2747 (mismatch) |
-| system_like_phases | 1065 | 2627 (mismatch) |
+| absent_admissions | 3511 | 4745 (mismatch) |
+| absent_classes | 2174 | 2203 (mismatch) |
+| range_only_T | 3125 | 2748 (mismatch) |
+| system_like_phases | 1065 | 2628 (mismatch) |
 | missing_phases | 237 | 367 (mismatch) |
 | tabulated_lists | — | 6 |
 
@@ -36,7 +36,7 @@ hard issues: 3655
 
 | source method_class | count |
 |---|---:|
-| `absent` | 579 |
+| `absent` | 577 |
 | `method_only` | 38 |
 | `derived_from_kems_equilibrium_constants` | 8 |
 | `third_law_kems` | 8 |
@@ -18006,7 +18006,7 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/extracts/kems-019-miller-armatys-2013.yaml` | 28 | 28 | 60 |
 | `data/literature/extracts/kems-020-hastie-1981-nbsir.yaml` | 38 | 112 | 289 |
 | `data/literature/extracts/kems-021-plante-1992-feo.yaml` | 10 | 25 | 40 |
-| `data/literature/extracts/kems-022-demaria-1971.yaml` | 31 | 89 | 227 |
+| `data/literature/extracts/kems-022-demaria-1971.yaml` | 32 | 117 | 223 |
 | `data/literature/extracts/kems-023-demaria-1973.yaml` | 30 | 75 | 58 |
 | `data/literature/extracts/kems-024-gibson-hubbard-1972.yaml` | 108 | 108 | 422 |
 | `data/literature/extracts/kems-025-markova-1983.yaml` | 22 | 44 | 63 |
@@ -18273,8 +18273,8 @@ MODEL_DERIVED / MEASURED_REDUCED keep their mapped evidence class. Parent pointe
 
 ## Advisory issue census
 
-advisory issues: 216801
+advisory issues: 216861
 
 | kind | count |
 |---|---:|
-| `identity_incomplete` | 216801 |
+| `identity_incomplete` | 216861 |

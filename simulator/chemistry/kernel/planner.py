@@ -254,6 +254,22 @@ class Planner:
 
         return authoritative_result
 
+    def _dispatch_authoritative_only(self, request: IntentRequest) -> IntentResult:
+        """Dispatch and validate the authoritative provider without shadows.
+
+        High-frequency read-only evaluations may consume only the
+        authoritative result. Their caller opts into this internal path when
+        diagnostic shadows would repeat expensive work without affecting the
+        consumed value.
+        """
+
+        authoritative = self._registry.authoritative_for(request.intent)
+        if authoritative is None:
+            raise ProviderUnavailableError(
+                f"no authoritative provider registered for intent {request.intent.value!r}"
+            )
+        return authoritative.dispatch(request)
+
     def _append_shadow_trace(self, record: dict[str, Any]) -> None:
         if self._shadow_trace_cap == 0:
             return
@@ -597,6 +613,38 @@ class ChemistryKernel:
                 role="fallback",
             )
 
+    def _dispatch_authoritative_without_shadows(
+        self,
+        intent: ChemistryIntent,
+        *,
+        temperature_C: float,
+        pressure_bar: float,
+        fO2_log: Optional[float] = None,
+        fe_redox_policy: str = "intrinsic",
+        control_inputs: Optional[Mapping[str, Any]] = None,
+        declared_accounts: Optional[frozenset[str]] = None,
+        account_mol_overrides: Optional[Mapping[str, Mapping[str, float]]] = None,
+    ) -> IntentResult:
+        """Run an authoritative read-only dispatch without diagnostic shadows."""
+
+        provider = self._registry.authoritative_for(intent)
+        if provider is None:
+            raise ProviderUnavailableError(
+                f"no authoritative provider registered for intent {intent.value!r}"
+            )
+        return self._dispatch_through_provider(
+            intent,
+            provider,
+            temperature_C=temperature_C,
+            pressure_bar=pressure_bar,
+            fO2_log=fO2_log,
+            fe_redox_policy=fe_redox_policy,
+            control_inputs=control_inputs,
+            declared_accounts=declared_accounts,
+            account_mol_overrides=account_mol_overrides,
+            role="authoritative_without_shadows",
+        )
+
     def _dispatch_through_provider(
         self,
         intent: ChemistryIntent,
@@ -654,6 +702,8 @@ class ChemistryKernel:
         )
         if role == "authoritative":
             result = self._planner.dispatch(request)
+        elif role == "authoritative_without_shadows":
+            result = self._planner._dispatch_authoritative_only(request)
         else:
             # Fallback path -- bypass the planner's authoritative dispatch
             # (which would re-raise ``ProviderUnavailableError``) and call
