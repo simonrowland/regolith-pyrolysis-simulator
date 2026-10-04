@@ -41,25 +41,365 @@ from tools import harvest_janaf_compilation as harvester
 from tools import build_janaf_compilation_manifest as manifest_builder
 from tools.harvest_janaf_compilation import parse_table, parse_element_index
 
+EXPECTED_TRANSITION_REFUSALS = {
+    "Al-002": (1000,),
+    "Al-010": (400,),
+    "Al-011": (400,),
+    "Al-025": (500,),
+    "Al-026": (500,),
+    "Al-041": (2600,),
+    "Al-042": (2600,),
+    "Al-049": (1100,),
+    "Al-050": (1100,),
+    "Al-052": (900,),
+    "Al-053": (900, 1300),
+    "Al-054": (900, 1300),
+    "Al-064": (500,),
+    "Al-065": (500,),
+    "Al-068": (2000,),
+    "Al-069": (2000,),
+    "Al-089": (2500,),
+    "Al-090": (2500,),
+    "Al-096": (2400,),
+    "Al-100": (2400,),
+    "Al-106": (1100,),
+    "Al-107": (1100,),
+    "B-002": (2400,),
+    "B-041": (900,),
+    "B-042": (900,),
+    "B-064": (1300,),
+    "B-065": (1300,),
+    "B-068": (1200,),
+    "B-069": (1200,),
+    "B-074": (1300,),
+    "B-075": (1300,),
+    "B-095": (800,),
+    "B-096": (800,),
+    "B-100": (3200,),
+    "B-101": (3200,),
+    "B-103": (3400,),
+    "B-104": (3400,),
+    "B-115": (1100,),
+    "B-116": (1100,),
+    "B-118": (1200,),
+    "B-119": (1200,),
+    "B-122": (1100,),
+    "B-132": (1200,),
+    "B-133": (1200,),
+    "B-136": (400,),
+    "B-137": (400,),
+    "Ba-002": (1100,),
+    "Ba-008": (1200,),
+    "Ba-009": (1200,),
+    "Ba-013": (1300,),
+    "Ba-014": (1300,),
+    "Ba-019": (1700,),
+    "Ba-020": (1700,),
+    "Ba-025": (700,),
+    "Ba-026": (700,),
+    "Ba-030": (1000,),
+    "Ba-031": (1000,),
+    "Ba-034": (2300,),
+    "Ba-035": (2300,),
+    "Br-015": (1100,),
+    "Br-019": (900,),
+    "Br-027": (1100,),
+    "Br-041": (1100,),
+    "Br-045": (1000,),
+    "Br-070": (1000,),
+    "Br-076": (1000,),
+    "Br-098": (400,),
+    "Br-104": (600,),
+    "Br-105": (600,),
+    "Br-108": (600,),
+    "C-008": (2800,),
+    "C-009": (2800,),
+    "C-069": (900,),
+    "C-070": (900,),
+    "C-073": (1200,),
+    "C-074": (1200,),
+    "C-076": (1000,),
+    "C-077": (1000,),
+    "C-083": (900,),
+    "C-084": (900,),
+    "C-090": (1200,),
+    "C-091": (1200,),
+    "C-104": (4300,),
+    "C-105": (4300,),
+    "C-107": (3300,),
+    "C-108": (3300,),
+    "C-110": (3900,),
+    "C-111": (3900,),
+    "Ca-002": (800,),
+    "Ca-003": (1200,),
+    "Ca-009": (1100,),
+    "Ca-010": (1100,),
+    "Ca-014": (1700,),
+    "Ca-015": (1700,),
+    "Ca-023": (1100,),
+    "Ca-024": (1100,),
+    "Ca-027": (3300,),
+    "Ca-028": (3300,),
+    "Cl-005": (1000,),
+    "Cl-006": (1000,),
+    "Cl-009": (800,),
+    "Cl-010": (800,),
+    "Cl-032": (400,),
+    "Cl-033": (400,),
+    "Cl-036": (1100,),
+    "Cl-037": (1100,),
+    "Cl-041": (900,),
+    "Cl-042": (900,),
+    "Cl-046": (600,),
+    "Cl-047": (600,),
+    "Cl-053": (1100,),
+    "Cl-054": (1100,),
+    "Cl-074": (1100,),
+    "Cl-075": (1100,),
+    "Cl-081": (1000,),
+    "Cl-082": (1000,),
+    "Cl-093": (1000,),
+    "Cl-094": (1000,),
+    "Cl-099": (1400,),
+    "Cl-100": (1400,),
+    "Cl-108": (800,),
+    "Cl-109": (800,),
+    "Cl-119": (1200,),
+    "Cl-120": (1200,),
+    "Cl-127": (1100,),
+    "Cl-128": (1100,),
+    "Cl-134": (600,),
+    "Cl-135": (600,),
+    "Cl-151": (600,),
+    "Cl-152": (600,),
+    "Cl-155": (500,),
+    "Cl-156": (500,),
+    "Cl-169": (500,),
+    "Cl-170": (500,),
+    "Cl-173": (500,),
+    "Cl-174": (500,),
+    "Cl-178": (500,),
+    "Cl-179": (500,),
+    "Cl-182": (600,),
+    "Cl-183": (600,),
+    "Cl-189": (500, 600),
+    "Cl-191": (600,),
+    "Cl-192": (500,),
+    "Co-002": (1800,),
+    "Co-008": (1500,),
+    "Co-009": (1500,),
+    "Cr-002": (2200,),
+    "Cr-014": (2700,),
+    "Cr-015": (2700,),
+    "Cs-008": (1000,),
+    "Cs-009": (1000,),
+    "Cs-012": (600,),
+    "Cs-013": (600,),
+    "Cs-022": (1000, 1300),
+    "Cs-023": (1000,),
+    "Cs-024": (1300,),
+    "Cu-002": (1400,),
+    "Cu-010": (1200,),
+    "Cu-011": (1200,),
+    "Cu-019": (1600,),
+    "Cu-020": (1600,),
+    "F-017": (1200,),
+    "F-018": (1200,),
+    "F-021": (1200,),
+    "F-022": (1200,),
+    "F-033": (1300,),
+    "F-034": (1300,),
+    "F-055": (1400,),
+    "F-056": (1400,),
+    "F-059": (600,),
+    "F-060": (600,),
+    "F-072": (1600,),
+    "F-073": (1600,),
+    "F-091": (600,),
+    "F-092": (600, 1200),
+    "F-093": (1200,),
+    "F-102": (1800,),
+    "F-103": (1800,),
+    "F-107": (1200,),
+    "F-108": (1200,),
+    "F-133": (400,),
+    "F-134": (400,),
+    "Fe-004": (1200, 1700, 1900),
+    "Fe-005": (1700,),
+    "Fe-014": (900,),
+    "Fe-015": (900,),
+    "Fe-018": (1700,),
+    "Fe-019": (1700,),
+    "Fe-023": (1500,),
+    "Fe-024": (1500,),
+    "H-009": (700,),
+    "H-010": (700,),
+    "H-014": (1000,),
+    "H-015": (1000,),
+    "H-018": (800,),
+    "H-019": (800,),
+    "H-033": (600,),
+    "H-034": (600,),
+    "H-071": (800,),
+    "H-072": (800,),
+    "H-085": (400,),
+    "H-086": (400,),
+    "Hf-002": (2100,),
+    "Hf-003": (2600,),
+    "I-004": (1000,),
+    "I-005": (1000,),
+    "I-009": (800,),
+    "I-015": (1000,),
+    "I-016": (1000,),
+    "I-024": (400,),
+    "I-030": (1000,),
+    "I-031": (1000,),
+    "I-036": (700,),
+    "I-037": (700,),
+    "I-041": (900,),
+    "I-042": (900,),
+    "I-047": (800,),
+    "I-048": (800,),
+    "I-061": (400,),
+    "I-062": (400,),
+    "I-065": (500,),
+    "I-066": (500,),
+    "K-014": (1300,),
+    "K-015": (1300,),
+    "K-017": (900,),
+    "K-018": (900, 1400),
+    "K-019": (1400,),
+    "K-022": (1300,),
+    "K-023": (1300,),
+    "Li-002": (500,),
+    "Li-014": (1900,),
+    "Li-015": (1900,),
+    "Li-020": (1500,),
+    "Li-021": (1500,),
+    "Li-023": (1900,),
+    "Li-024": (1900,),
+    "Li-026": (900,),
+    "Li-027": (900, 1200),
+    "Li-028": (1200,),
+    "Li-031": (1400,),
+    "Li-032": (1400,),
+    "Mg-002": (1000,),
+    "Mg-008": (3200,),
+    "Mg-009": (3200,),
+    "Mg-012": (1900,),
+    "Mg-013": (1900,),
+    "Mg-015": (2000,),
+    "Mg-016": (2000,),
+    "Mg-018": (1500,),
+    "Mg-019": (1500,),
+    "Mg-022": (2000,),
+    "Mg-023": (2000,),
+    "Mg-028": (2200,),
+    "Mg-029": (2200,),
+    "Mg-031": (2100,),
+    "Mg-032": (2100,),
+    "Mg-034": (1400,),
+    "Mg-035": (1400,),
+    "Mg-038": (1700,),
+    "Mg-039": (1700,),
+    "Mn-002": (1600,),
+    "Mo-002": (2900,),
+    "Mo-014": (1100,),
+    "Mo-015": (1100,),
+    "Mo-019": (2100,),
+    "Mo-020": (2100,),
+    "N-014": (3300,),
+    "N-015": (3300,),
+    "N-019": (3300,),
+    "N-020": (3300,),
+    "Na-002": (400,),
+    "Na-012": (1500,),
+    "Na-013": (1500,),
+    "Na-016": (1400,),
+    "Na-017": (1400,),
+    "Na-020": (600, 1200),
+    "Na-022": (500, 600),
+    "Na-023": (500,),
+    "Na-024": (1200,),
+    "Na-028": (1200,),
+    "Na-029": (1200,),
+    "Na-031": (1500,),
+    "Na-032": (1500,),
+    "Na-034": (800,),
+    "Na-035": (800,),
+    "Nb-002": (2800,),
+    "Nb-008": (2300,),
+    "Nb-009": (2300,),
+    "Nb-012": (2200,),
+    "Nb-013": (2200,),
+    "Nb-016": (1800,),
+    "Nb-017": (1800,),
+    "Ni-002": (1800,),
+    "Ni-008": (1300,),
+    "Ni-009": (1300,),
+    "Ni-012": (1300,),
+    "Ni-013": (1300,),
+    "Ni-015": (1100,),
+    "Ni-016": (1100,),
+    "O-005": (800,),
+    "O-006": (800, 1200),
+    "O-007": (1200,),
+    "O-013": (3000,),
+    "O-014": (3000,),
+    "O-018": (1300,),
+    "O-019": (1300, 2100),
+    "O-020": (2100,),
+    "O-023": (2100,),
+    "O-024": (2100,),
+    "O-037": (1700,),
+    "O-038": (1700,),
+    "O-043": (2200,),
+    "O-044": (2200,),
+    "O-052": (3000,),
+    "O-053": (3000,),
+    "O-059": (2200,),
+    "O-060": (2200,),
+    "O-062": (2400,),
+    "O-063": (2400,),
+    "O-065": (1800,),
+    "O-066": (1800,),
+    "O-073": (1900,),
+    "O-074": (1900,),
+    "O-077": (2100,),
+    "O-078": (2100,),
+    "O-082": (2100,),
+    "O-083": (500,),
+    "O-084": (1000,),
+    "O-085": (1000,),
+    "O-089": (2000,),
+    "O-090": (2000,),
+    "P-014": (500,),
+    "P-015": (500,),
+    "Pb-002": (700,),
+    "Pb-009": (1400,),
+    "S-002": (400,),
+    "S-013": (1400,),
+    "S-014": (1400,),
+    "Si-002": (1700,),
+    "Sr-002": (900,),
+    "Sr-003": (1100,),
+    "Ta-002": (3300,),
+    "Ti-002": (1200,),
+    "Ti-003": (2000,),
+    "V-002": (2200,),
+    "W-002": (3700,),
+    "Zn-002": (700,),
+    "Zr-002": (1200,),
+    "Zr-003": (2200,),
+}
+
 EXPECTED_UNREPAIRED_TAILS = (
     ("B-123", 1100, "printed Gibbs/log Kf pair misses allowed tolerance"),
-    ("Ca-002", 800, "alternate sign relation is not 100x separated"),
-    ("Co-002", 1800, "alternate sign relation is not 100x separated"),
-    ("Cr-002", 2200, "alternate sign relation is not 100x separated"),
-    ("Fe-004", 1200, "alternate sign relation is not 100x separated"),
-    ("Fe-005", 1700, "alternate sign relation is not 100x separated"),
-    ("Hf-002", 2100, "alternate sign relation is not 100x separated"),
-    ("Hf-003", 2600, "alternate sign relation is not 100x separated"),
-    ("Mo-002", 2900, "alternate sign relation is not 100x separated"),
-    ("P-002", 350, "alternate sign relation is not 100x separated"),
-    ("S-002", 400, "alternate sign relation is not 100x separated"),
-    ("Sr-002", 900, "alternate sign relation is not 100x separated"),
-    ("Ta-002", 3300, "alternate sign relation is not 100x separated"),
-    ("Ti-002", 1200, "alternate sign relation is not 100x separated"),
-    ("V-002", 2200, "alternate sign relation is not 100x separated"),
-    ("W-002", 3700, "alternate sign relation is not 100x separated"),
-    ("Zn-002", 700, "alternate sign relation is not 100x separated"),
-    ("Zr-002", 1200, "alternate sign relation is not 100x separated"),
+    *(
+        (table_id, temperature, "formation enthalpy neighbors span a transition marker")
+        for table_id, temperatures in EXPECTED_TRANSITION_REFUSALS.items()
+        for temperature in temperatures
+    ),
 )
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -239,11 +579,11 @@ def test_unrepaired_janaf_tail_coordinates_match_the_named_exception_list() -> N
             temperature = int(Decimal(raw_line.split("\t", 1)[0]))
             reason = (
                 "printed Gibbs/log Kf pair misses allowed tolerance"
-                if "alternate relation" not in ambiguity.get("reason", "")
-                else "alternate sign relation is not 100x separated"
+                if "identity misses by" in ambiguity.get("reason", "")
+                else "formation enthalpy neighbors span a transition marker"
             )
             actual.append((table["table_id"], temperature, reason))
-    assert actual == list(EXPECTED_UNREPAIRED_TAILS)
+    assert sorted(actual) == sorted(EXPECTED_UNREPAIRED_TAILS)
 
 
 @pytest.mark.parametrize(
@@ -276,26 +616,6 @@ def test_large_logk_rounding_miss_still_restores_signs(
     assert row["log10_formation_equilibrium_constant"]["locator"]["parse_repair"] == NIST_TAIL_PARSE_REPAIR
 
 
-def test_near_zero_logk_without_100x_sign_separation_stays_unresolved() -> None:
-    source = (
-        "Synthetic near-zero formation tail\n"
-        "T(K)\tCp\tS\t-[G-H(Tr)]/T\tH-H(Tr)\tΔfH\tΔfG\tlog Kf\n"
-        "900\t10\t10\t10\t0\t-1.000\t-0.001\t0.001\n"
-        "1000\t10\t10\t10\t0\t-1.000\t-0.001\t0.001\n"
-        "1100\t10\t10\t10\t0\tCRYSTAL <--> LIQUID\n"
-        "1200\t10\t10\t10\t0\t1.000 0.001 0.001\n"
-        "1300\t10\t10\t10\t0\t-1.000\t-0.001\t0.001\n"
-    )
-    parsed = parse_janaf_txt(
-        source, table_id="synthetic-near-zero", url="u", download_url="d"
-    )
-    assert not any(row["temperature"]["value"] == 1200 for row in parsed.values)
-    ambiguity = next(
-        item for item in parsed.parse_ambiguities if item.get("raw_line", "").startswith("1200\t")
-    )
-    assert ambiguity["kind"] == "nist_tail_whitespace_signs_unresolved"
-
-
 def test_malformed_tail_refuses_enthalpy_bracket_crossing_transition() -> None:
     source = (
         "Synthetic transition-adjacent formation tail\n"
@@ -316,6 +636,23 @@ def test_malformed_tail_refuses_enthalpy_bracket_crossing_transition() -> None:
     )
     assert ambiguity["kind"] == "nist_tail_whitespace_signs_unresolved"
     assert "formation enthalpy neighbors span a transition" in ambiguity["reason"]
+
+
+def test_identity_consistent_tail_needs_no_same_sign_orientation() -> None:
+    source = (
+        "Synthetic identity-consistent formation tail\n"
+        "T(K)\tCp\tS\t-[G-H(Tr)]/T\tH-H(Tr)\tΔfH\tΔfG\tlog Kf\n"
+        "900\t10\t10\t10\t0\t-1.000\t0.038\t-0.002\n"
+        "1000\t10\t10\t10\t0\t1.100 0.038 0.001\n"
+        "1100\t10\t10\t10\t0\t-1.000\t0.038\t-0.002\n"
+    )
+    parsed = parse_janaf_txt(
+        source, table_id="synthetic-identity-tail", url="u", download_url="d"
+    )
+    row = next(row for row in parsed.values if row["temperature"]["value"] == 1000)
+    assert row["formation_enthalpy"]["value"] == -1.1
+    assert row["formation_gibbs_energy"]["value"] == 0.038
+    assert row["log10_formation_equilibrium_constant"]["value"] == -0.001
 
 
 def test_every_absent_100k_node_is_explained_by_the_printed_grid() -> None:
@@ -373,8 +710,8 @@ def test_every_absent_100k_node_is_explained_by_the_printed_grid() -> None:
                 )
                 reason = (
                     "printed Gibbs/log Kf pair misses allowed tolerance"
-                    if "alternate relation" not in ambiguity.get("reason", "")
-                    else "alternate sign relation is not 100x separated"
+                    if "identity misses by" in ambiguity.get("reason", "")
+                    else "formation enthalpy neighbors span a transition marker"
                 )
                 unexplained.append((table["table_id"], candidate, reason))
     expected_grid_gaps = [
