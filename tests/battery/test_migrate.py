@@ -4478,8 +4478,8 @@ def test_l02_reviewed_prefix_collisions_keep_the_unaliased_parse() -> None:
 
 
 _TYPE_CONTRADICTIONS = [
-    # The expectation changed because the reviewed extract replaced the old
-    # bundled Stebbins row; these current rows preserve the same pin.
+    # These current rows pin quantity refusals. Four Stebbins replacements
+    # now exercise missing-quantity handling, not the former calorimetry guard.
     ("ames-walsh-white-1967.yaml", "Ames67_EuO_dissociation"),
     ("ames-walsh-white-1967.yaml", "Ames67_YbO_dissociation"),
     ("banchor-matsui-naito-1986.yaml", "Ban86_equations"),
@@ -4516,14 +4516,90 @@ _TYPE_CONTRADICTIONS = [
     ("kems-184-behrens-1979.yaml", "behrens_1979_sic2_equilibrium_enthalpy_and_barrier"),
     ("kems-184-behrens-1979.yaml", "behrens_1979_sic2_formation_enthalpies"),
     ("nist-webbook.yaml", "Rau74_critical_constants"),
-    # The reviewed extract replaced the former bundled heat-capacity rows
-    # with table-specific observations; keep the same contradiction pinned.
+    # The four current series rows return missing quantity; inline fixtures
+    # below retain the former calorimetric gibbs_table guard probes. Anorthite
+    # still exercises that guard from the current extract.
     ("stebbins-carmichael-weill-1983.yaml", "stebbins_1983_diopside_calorimetry_measured_tables_1_3"),
     ("stebbins-carmichael-weill-1983.yaml", "stebbins_1983_albite_analbite_calorimetry_measured_tables_1_5"),
     ("stebbins-carmichael-weill-1983.yaml", "stebbins_1983_sanidine_calorimetry_measured_table_3"),
     ("stebbins-carmichael-weill-1983.yaml", "stebbins_1983_nepheline_calorimetry_measured_table_3"),
     ("stebbins-carmichael-weill-1983.yaml", "stebbins_1983_anorthite_calorimetry_measured_table_1"),
     ("wetzel-gail-2013-sio-arrhenius.yaml", "wetzel_gail_2013_sio_arrhenius"),
+]
+_L05_CALORIMETRIC_GIBBS_GUARD_REASON = (
+    "source is calorimetric enthalpy/heat content, not delta_fG"
+)
+_L05_CALORIMETRIC_GIBBS_FIXTURES = [
+    (
+        "fixture:stebbins_1983_diopside_calorimetry_tables_1_7",
+        {
+            "observation_id": "fixture:stebbins_1983_diopside_calorimetry_tables_1_7",
+            "type": "gibbs_table",
+            "units": "as published",
+            "standard_state": "heat content referred to 300 K; heat of fusion at 1 bar",
+            "regime": "drop calorimetry",
+            "values": {
+                "composition": "CaMgSi2O6",
+                "system": "diopside calorimetric heat content",
+            },
+        },
+        _L05_CALORIMETRIC_GIBBS_GUARD_REASON,
+    ),
+    (
+        "fixture:stebbins_1983_albite_analbite_calorimetry_tables_1_7",
+        {
+            "observation_id": "fixture:stebbins_1983_albite_analbite_calorimetry_tables_1_7",
+            "type": "gibbs_table",
+            "units": "as published",
+            "standard_state": "heat content referred to 300 K; heat of fusion at 1 bar",
+            "regime": "drop calorimetry",
+            "values": {
+                "composition": "NaAlSi3O8",
+                "system": "albite and analbite calorimetric heat content",
+            },
+        },
+        _L05_CALORIMETRIC_GIBBS_GUARD_REASON,
+    ),
+    (
+        "fixture:stebbins_1983_sanidine_calorimetry_tables_3_7",
+        {
+            "observation_id": "fixture:stebbins_1983_sanidine_calorimetry_tables_3_7",
+            "type": "gibbs_table",
+            "units": "as published",
+            "standard_state": "heat content referred to 300 K; heat of fusion at 1 bar",
+            "regime": "drop calorimetry",
+            "values": {
+                "composition": "KAlSi3O8",
+                "system": "sanidine calorimetric heat content",
+            },
+        },
+        _L05_CALORIMETRIC_GIBBS_GUARD_REASON,
+    ),
+    (
+        "fixture:stebbins_1983_nepheline_calorimetry_tables_3_7",
+        {
+            "observation_id": "fixture:stebbins_1983_nepheline_calorimetry_tables_3_7",
+            "type": "gibbs_table",
+            "units": "as published",
+            "standard_state": "heat content referred to 300 K; heat of fusion at 1 bar",
+            "regime": "drop calorimetry",
+            "values": {
+                "composition": "NaAlSiO4",
+                "system": "nepheline calorimetric heat content",
+            },
+        },
+        _L05_CALORIMETRIC_GIBBS_GUARD_REASON,
+    ),
+]
+_L05_CALORIMETRIC_REPLACEMENT_REASONS = [
+    ("stebbins_1983_diopside_calorimetry_measured_tables_1_3", "missing quantity"),
+    ("stebbins_1983_albite_analbite_calorimetry_measured_tables_1_5", "missing quantity"),
+    ("stebbins_1983_sanidine_calorimetry_measured_table_3", "missing quantity"),
+    ("stebbins_1983_nepheline_calorimetry_measured_table_3", "missing quantity"),
+    (
+        "stebbins_1983_anorthite_calorimetry_measured_table_1",
+        _L05_CALORIMETRIC_GIBBS_GUARD_REASON,
+    ),
 ]
 _FIELD_ALPHA_CONTRADICTIONS = [
     ("kems-001-homma-1966.yaml", "homma_1966_mn_olette_alpha_exp_table1"),
@@ -4568,6 +4644,26 @@ def test_l05c1_type_contradictions_are_quantity_unknown() -> None:
         )
         assert not state.is_value, (oid, state, reason)
         assert reason
+
+
+def test_l05c1_calorimetric_gibbs_guard_reasons_are_pinned() -> None:
+    for fixture_id, row, expected_reason in _L05_CALORIMETRIC_GIBBS_FIXTURES:
+        assert fixture_id.startswith("fixture:")
+        state, reason = map_quantity(
+            row["type"], row["values"], units=row["units"], row=row
+        )
+        assert not state.is_value
+        assert reason == expected_reason, (fixture_id, state, reason)
+
+    for observation_id, expected_reason in _L05_CALORIMETRIC_REPLACEMENT_REASONS:
+        row = _extract_observation(
+            "stebbins-carmichael-weill-1983.yaml", observation_id
+        )
+        state, reason = map_quantity(
+            row.get("type"), row.get("values"), units=row.get("units"), row=row
+        )
+        assert not state.is_value
+        assert reason == expected_reason, (observation_id, state, reason)
 
 
 def test_l05c1_olette_alpha_fields_are_quantity_unknown() -> None:
