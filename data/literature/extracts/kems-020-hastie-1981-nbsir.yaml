@@ -516,9 +516,9 @@ species:
           as printed. ZrO2 row may be low by a factor of two (footnote g).
           No per-coefficient sigma except those statements.
       equipment:
-        chamber_pressure:
-          value: KMS upper limit ~1e-4 atm as stated for the method (section 6); Table 2 rows are KMS
-          units: atm
+        residual_pressure_Pa_as_printed:
+          value: "KMS upper limit ~1e-4 atm as stated for the method (section 6); Table 2 rows are KMS"
+          quote: "KMS upper limit ~1e-4 atm as stated for the method (section 6); Table 2 rows are KMS"
           locator:
             page: 9
             paragraph: upper pressure limits of 10^-4 and one atm
@@ -1131,12 +1131,15 @@ species:
           locator:
             page: 9
             paragraph: all of these components were fabricated from platinum metal
-        chamber_pressure:
+        total_pressure_atm:
           value:
-            min_atm: 0.2
-            max_atm: 1.0
-            carrier: N2 or Ar
+            kind: interval
+            interval_low: 0.2
+            interval_high: 1
           units: atm
+          as_printed: "usually operated at total pressures of 0.2 to 1.0 atm"
+          quote: "usually operated at total pressures of 0.2 to 1.0 atm"
+          note: "carrier: N2 or Ar"
           locator:
             page: 9
             paragraph: usually operated at total pressures of 0.2 to 1.0 atm

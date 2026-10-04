@@ -630,9 +630,9 @@ species:
           locator:
             page: 51
             table: '4.1'
-        chamber_pressure:
-          value: Ausheiz-Peaks tabulated in Tabelle 5.1/5.8; not a commanded pO2
-          units: mbar
+        residual_pressure_Pa_as_printed:
+          value: "Ausheiz-Peaks tabulated in Tabelle 5.1/5.8; not a commanded pO2"
+          quote: "Ausheiz-Peaks tabulated in Tabelle 5.1/5.8; not a commanded pO2"
           locator:
             page: 68
             table: '5.1'
@@ -2068,9 +2068,9 @@ species:
           locator:
             page: 51
             table: '4.1'
-        chamber_pressure:
-          value: Ausheiz-Peaks tabulated in Tabelle 5.1/5.8; not a commanded pO2
-          units: mbar
+        residual_pressure_Pa_as_printed:
+          value: "Ausheiz-Peaks tabulated in Tabelle 5.1/5.8; not a commanded pO2"
+          quote: "Ausheiz-Peaks tabulated in Tabelle 5.1/5.8; not a commanded pO2"
           locator:
             page: 68
             table: '5.1'
@@ -5386,9 +5386,9 @@ species:
       uncertainty:
         note: digitization_error_dex 0.15; no printed sigma; QMS absolute calibration not tabulated
       equipment:
-        chamber_pressure:
-          value: QMS Messkreuz; valve-set ~10x below chamber. Baseline of this figure forced to 1e-7 mbar.
-          units: mbar
+        residual_pressure_Pa_as_printed:
+          value: "QMS Messkreuz; valve-set ~10x below chamber. Baseline of this figure forced to 1e-7 mbar."
+          quote: "QMS Messkreuz; valve-set ~10x below chamber. Baseline of this figure forced to 1e-7 mbar."
           locator:
             page: 105
             figure: '5.55'
@@ -5530,10 +5530,9 @@ species:
       uncertainty:
         note: digitization_error_dex 0.15; no printed sigma; baseline normalisation removes absolute p_O2
       equipment:
-        chamber_pressure:
-          value: QMS Messkreuz baseline forced to 1e-7 mbar on this figure; chamber high-T peaks are in
-            Tabelle 5.8 (MS1 peak/base 17.1)
-          units: mbar
+        residual_pressure_Pa_as_printed:
+          value: "QMS Messkreuz baseline forced to 1e-7 mbar on this figure; chamber high-T peaks are in Tabelle 5.8 (MS1 peak/base 17.1)"
+          quote: "QMS Messkreuz baseline forced to 1e-7 mbar on this figure; chamber high-T peaks are in Tabelle 5.8 (MS1 peak/base 17.1)"
           locator:
             page: 107
             figure: '5.56'

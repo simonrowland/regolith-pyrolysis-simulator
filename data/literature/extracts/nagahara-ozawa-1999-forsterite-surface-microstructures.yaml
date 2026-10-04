@@ -78,9 +78,14 @@ species:
             published_page: 29
             pdf_page_index: 1
             section: Experiments
-        chamber_pressure:
-          value: about 1 x 10^-9 Pa at 1400 C to 1 x 10^-7 Pa at 1800 C
+        pressure_Pa:
+          value:
+            kind: interval
+            interval_low: 1e-09
+            interval_high: 1e-07
           units: Pa
+          as_printed: "about 1 x 10^-9 Pa at 1400 C to 1 x 10^-7 Pa at 1800 C"
+          quote: "about 1 x 10^-9 Pa at 1400 C to 1 x 10^-7 Pa at 1800 C"
           locator:
             published_page: 30
             pdf_page_index: 2

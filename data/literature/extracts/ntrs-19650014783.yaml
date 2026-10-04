@@ -746,9 +746,12 @@ species:
             published_page: 2
             pdf_page_index: 4
             section: Experiment - Apparatus
-        chamber_pressure:
-          value: 10^-4
+        P_test_Torr:
+          value: 0.0001
           units: Torr
+          as_printed: "10^-4 Torr"
+          quote: "10^-4 Torr"
+          upper_bound: true
           semantics: upper_bound_or_setpoint_as_printed
           locator:
             published_page: 3
