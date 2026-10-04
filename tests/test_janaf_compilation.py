@@ -377,6 +377,53 @@ def test_transition_enthalpy_refusal_prevents_the_fe004_wrong_sign(
     assert row["formation_gibbs_energy"]["value"] == 0.052
 
 
+@pytest.mark.parametrize(
+    ("table_id", "temperature"),
+    (
+        ("F-045", "800"),
+        ("Fe-029", "350"),
+        ("Cl-070", "3600"),
+        ("I-018", "2000"),
+        ("S-011", "1600"),
+        ("Co-007", "3200"),
+        ("Na-007", "1100"),
+        ("S-020", "800"),
+        ("O-009", "2000"),
+        ("B-091", "2300"),
+    ),
+)
+def test_opposite_sign_enthalpy_neighbors_do_not_restore_tail(
+    table_id: str, temperature: str
+) -> None:
+    """Opposite-sign DfH brackets cannot establish a repaired sign."""
+
+    source_path = JANAF_SOURCE_DIR / f"{table_id}.txt"
+    lines = source_path.read_text(encoding="utf-8").splitlines()
+    target_index = next(
+        index
+        for index, line in enumerate(lines)
+        if line.split("\t", 1)[0] == temperature
+    )
+    fields = lines[target_index].split("\t")
+    assert len(fields) >= 8
+    # Hide the original signs and reproduce the malformed whitespace tail.
+    lines[target_index] = "\t".join(
+        [*fields[:5], " ".join(token.lstrip("+-") for token in fields[5:8])]
+    )
+
+    parsed = parse_janaf_txt(
+        "\n".join(lines), table_id=table_id, url="u", download_url="d"
+    )
+    row = next(
+        row for row in parsed.values
+        if row["temperature"]["as_published"] == temperature
+    )
+    assert row["formation_enthalpy"]["value"] is None
+    assert row["formation_enthalpy"]["locator"]["parse_repair"] == (
+        "nist_tail_dfh_sign_undetermined"
+    )
+
+
 def test_identity_consistent_tail_needs_no_same_sign_orientation() -> None:
     source = (
         "Synthetic identity-consistent formation tail\n"
