@@ -58,13 +58,13 @@ FIXTURE_IDS = (
     "O-029",
 )
 STRUCTURED_NUMERIC_COUNTS = {
-    "heat_capacity": 75817,
-    "entropy": 75815,
-    "negative_gibbs_enthalpy_function": 74569,
-    "enthalpy_increment": 75815,
-    "formation_enthalpy": 75337,
-    "formation_gibbs_energy": 75177,
-    "log10_formation_equilibrium_constant": 74197,
+    "heat_capacity": 75814,
+    "entropy": 75812,
+    "negative_gibbs_enthalpy_function": 74566,
+    "enthalpy_increment": 75812,
+    "formation_enthalpy": 75334,
+    "formation_gibbs_energy": 75174,
+    "log10_formation_equilibrium_constant": 74194,
 }
 _COMBINED_STATES = {"cr,l", "ref", "l,g"}
 _FORMATION_COLUMNS = {
@@ -1380,10 +1380,10 @@ def test_stored_pair_identity_reports_its_denominator() -> None:
     }
     b133 = _generation("B-133")
     assert b133.report["stored_pair_identity_denominator"] == {
-        "eligible_delta_fG_T_gt_0": 28,
-        "eligible_log10_Kf_T_gt_0": 28,
-        "checked_intersection": 28,
-        "passed": 27,
+        "eligible_delta_fG_T_gt_0": 29,
+        "eligible_log10_Kf_T_gt_0": 29,
+        "checked_intersection": 29,
+        "passed": 28,
         "failed": 1,
     }
 
@@ -1791,7 +1791,7 @@ def test_full_corpus_control_cell_accounting_and_transcription_report() -> None:
         f"({len(stored_pair_violations) - 1} excess)"
     )
     assert reported_stored_pair_violations == stored_pair_violations
-    assert len(refused_merged_pair_violations) == 15
+    assert len(refused_merged_pair_violations) == 18
     assert reported_refused_pair_violations == refused_merged_pair_violations
     assert merged_disposition_mismatches == 0
     assert segment_control_mismatches == 0
@@ -1800,11 +1800,11 @@ def test_full_corpus_control_cell_accounting_and_transcription_report() -> None:
     assert points[Quantity.CP.value] == 77542
     assert points[Quantity.S.value] == 77540
     assert points[Quantity.H_MINUS_H298.value] == 77539
-    assert points[Quantity.DELTA_FH.value] == 75337
-    assert points[Quantity.DELTA_FG.value] == 75177
-    assert points[Quantity.LOG10_KF.value] == 74197
+    assert points[Quantity.DELTA_FH.value] == 75334
+    assert points[Quantity.DELTA_FG.value] == 75174
+    assert points[Quantity.LOG10_KF.value] == 74194
     assert points[Quantity.TRANSITION_TEMPERATURE.value] == 979
-    assert merged_rows == 15
+    assert merged_rows == 18
     assert merged_extras == {"delta_fG": 0, "log10_Kf": 0}
     assert {
         column: row["structured_numeric"] for column, row in cells.items()
@@ -1813,29 +1813,29 @@ def test_full_corpus_control_cell_accounting_and_transcription_report() -> None:
     assert cells["heat_capacity"]["stored_points"] == 77542
     assert cells["entropy"]["stored_points"] == 77540
     assert cells["enthalpy_increment"]["stored_points"] == 77539
-    assert cells["formation_enthalpy"]["stored_points"] == 75337
-    assert cells["formation_gibbs_energy"]["stored_points"] == 75177
-    assert cells["log10_formation_equilibrium_constant"]["stored_points"] == 74197
-    assert cells["formation_enthalpy"]["excluded_numeric_total"] == 15
-    assert cells["formation_gibbs_energy"]["excluded_numeric_total"] == 15
-    assert cells["log10_formation_equilibrium_constant"]["excluded_numeric_total"] == 15
-    # Fifteen identity-refused rows remain as merged ambiguities: all 45
+    assert cells["formation_enthalpy"]["stored_points"] == 75334
+    assert cells["formation_gibbs_energy"]["stored_points"] == 75174
+    assert cells["log10_formation_equilibrium_constant"]["stored_points"] == 74194
+    assert cells["formation_enthalpy"]["excluded_numeric_total"] == 18
+    assert cells["formation_gibbs_energy"]["excluded_numeric_total"] == 18
+    assert cells["log10_formation_equilibrium_constant"]["excluded_numeric_total"] == 18
+    # Eighteen unresolved sign rows remain as merged ambiguities: all 54
     # tail cells stay excluded because none is an exact reference-state zero.
     assert (
         cells["formation_enthalpy"]["excluded_numeric_total"]
         + cells["formation_gibbs_energy"]["excluded_numeric_total"]
         + cells["log10_formation_equilibrium_constant"]["excluded_numeric_total"]
-    ) == 45
+    ) == 54
     assert stored_zero_merged_cells == 0
-    assert refused_merged_cells == 45
+    assert refused_merged_cells == 54
     # Formation parents split where a printed elemental reference schedule changes.
     assert observations == {
         "cp": 2117,
         "S": 2117,
         "H_minus_H298": 2117,
-        "delta_fH": 5520,
-        "delta_fG": 5511,
-        "log10_Kf": 5511,
+        "delta_fH": 5522,
+        "delta_fG": 5513,
+        "log10_Kf": 5513,
         "transition_temperature": 979,
     }
     # 128 liquid tables store a printed GLASS <--> LIQUID/LIQ row. Those series
@@ -1879,16 +1879,16 @@ def test_full_corpus_control_cell_accounting_and_transcription_report() -> None:
     }
     assert transcription_checks == {
         "negative_gibbs_enthalpy_function": 76293,
-        "log10_Kf_from_delta_fG": 74090,
+        "log10_Kf_from_delta_fG": 74087,
     }
     assert dict(stored_pair_denominator) == {
-        "eligible_delta_fG_T_gt_0": 74090,
-        "eligible_log10_Kf_T_gt_0": 74090,
-        "checked_intersection": 74090,
-        "passed": 74089,
+        "eligible_delta_fG_T_gt_0": 74087,
+        "eligible_log10_Kf_T_gt_0": 74087,
+        "checked_intersection": 74087,
+        "passed": 74086,
         "failed": 1,
     }
-    assert refused_merged_pair_checks == 15
+    assert refused_merged_pair_checks == 18
     assert stored_cell_errata == 1
     assert raw_numeric_accounting == {
         "numeric_source_tokens": 533672,

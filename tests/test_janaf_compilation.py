@@ -41,6 +41,27 @@ from tools import harvest_janaf_compilation as harvester
 from tools import build_janaf_compilation_manifest as manifest_builder
 from tools.harvest_janaf_compilation import parse_table, parse_element_index
 
+EXPECTED_UNREPAIRED_TAILS = (
+    ("B-123", 1100, "printed Gibbs/log Kf pair misses allowed tolerance"),
+    ("Ca-002", 800, "alternate sign relation is not 100x separated"),
+    ("Co-002", 1800, "alternate sign relation is not 100x separated"),
+    ("Cr-002", 2200, "alternate sign relation is not 100x separated"),
+    ("Fe-004", 1200, "alternate sign relation is not 100x separated"),
+    ("Fe-005", 1700, "alternate sign relation is not 100x separated"),
+    ("Hf-002", 2100, "alternate sign relation is not 100x separated"),
+    ("Hf-003", 2600, "alternate sign relation is not 100x separated"),
+    ("Mo-002", 2900, "alternate sign relation is not 100x separated"),
+    ("P-002", 350, "alternate sign relation is not 100x separated"),
+    ("S-002", 400, "alternate sign relation is not 100x separated"),
+    ("Sr-002", 900, "alternate sign relation is not 100x separated"),
+    ("Ta-002", 3300, "alternate sign relation is not 100x separated"),
+    ("Ti-002", 1200, "alternate sign relation is not 100x separated"),
+    ("V-002", 2200, "alternate sign relation is not 100x separated"),
+    ("W-002", 3700, "alternate sign relation is not 100x separated"),
+    ("Zn-002", 700, "alternate sign relation is not 100x separated"),
+    ("Zr-002", 1200, "alternate sign relation is not 100x separated"),
+)
+
 ROOT = Path(__file__).resolve().parents[1]
 EXTRACT = ROOT / "data" / "literature" / "extracts" / "janaf-4th.yaml"
 CORPUS_ROOT = Path(
@@ -205,6 +226,26 @@ def test_unresolved_janaf_tail_identity_stays_in_parse_ambiguities() -> None:
     assert "identity misses by 1001.634 printed log Kf units" in ambiguity["reason"]
 
 
+def test_unrepaired_janaf_tail_coordinates_match_the_named_exception_list() -> None:
+    from decimal import Decimal
+
+    actual = []
+    for path in iter_table_paths():
+        table = load_table_document(path)["table"]
+        for ambiguity in table.get("parse_ambiguities", []):
+            if ambiguity.get("kind") != "nist_tail_whitespace_signs_unresolved":
+                continue
+            raw_line = ambiguity.get("raw_line", "")
+            temperature = int(Decimal(raw_line.split("\t", 1)[0]))
+            reason = (
+                "printed Gibbs/log Kf pair misses allowed tolerance"
+                if "alternate relation" not in ambiguity.get("reason", "")
+                else "alternate sign relation is not 100x separated"
+            )
+            actual.append((table["table_id"], temperature, reason))
+    assert actual == list(EXPECTED_UNREPAIRED_TAILS)
+
+
 @pytest.mark.parametrize(
     ("table_id", "temperature"),
     (
@@ -256,11 +297,11 @@ def test_near_zero_logk_without_100x_sign_separation_stays_unresolved() -> None:
 
 
 def test_every_absent_100k_node_is_explained_by_the_printed_grid() -> None:
-    """Only derived sparse ladders and the one explicit unresolved JANAF row may skip nodes."""
+    """Derived sparse ladders plus named unresolved rows are the only skipped nodes."""
 
     from decimal import Decimal
 
-    unexplained: list[str] = []
+    unexplained: list[tuple[str, int, str]] = []
     for path in iter_table_paths():
         table = load_table_document(path)["table"]
         temperatures = sorted(
@@ -302,8 +343,22 @@ def test_every_absent_100k_node_is_explained_by_the_printed_grid() -> None:
                 left == Decimal("298.15") and right == Decimal("500")
             )
             if not sparse_ladder and not reference_interval:
-                unexplained.append(f"{table['table_id']}@{candidate} K")
-    assert unexplained == ["B-123@1100 K"]
+                ambiguity = next(
+                    item
+                    for item in table.get("parse_ambiguities", [])
+                    if item.get("kind") == "nist_tail_whitespace_signs_unresolved"
+                    and item.get("raw_line", "").startswith(f"{candidate}\t")
+                )
+                reason = (
+                    "printed Gibbs/log Kf pair misses allowed tolerance"
+                    if "alternate relation" not in ambiguity.get("reason", "")
+                    else "alternate sign relation is not 100x separated"
+                )
+                unexplained.append((table["table_id"], candidate, reason))
+    expected_grid_gaps = [
+        row for row in EXPECTED_UNREPAIRED_TAILS if row[1] % 100 == 0
+    ]
+    assert unexplained == expected_grid_gaps
 
 
 def _assert_source_round_trip(document, source_path):
