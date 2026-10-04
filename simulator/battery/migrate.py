@@ -3098,14 +3098,49 @@ def _catalogue_composition_located_from_values(
     )
 
 
+_COMPOSITION_MOL_META_KEYS = frozenset(
+    {
+        "basis",
+        "amount_basis",
+        "components",
+        "proxy_flag",
+        "proxy_source",
+        "analysis_selection_rule",
+    }
+)
+_DEFAULT_COMPOSITION_MOL_BASIS = "printed_mole_fraction"
+
+
+def _declared_composition_mol_basis(values: Mapping[str, object], raw: object) -> str | None:
+    """Return an extract-declared Composition.basis for a composition_mol map.
+
+    Nested ``composition_mol.basis`` wins over sibling ``composition_mol_basis``.
+    Descriptive ``composition_basis`` notes are not engine-basis tokens and are
+    ignored here.
+    """
+
+    if isinstance(raw, Mapping):
+        nested = raw.get("basis")
+        if isinstance(nested, str) and nested.strip():
+            return nested.strip()
+    sibling = values.get("composition_mol_basis")
+    if isinstance(sibling, str) and sibling.strip():
+        return sibling.strip()
+    return None
+
+
 def _mole_fraction_composition_from_values(
     values: object,
 ) -> tuple[Composition | None, tuple[str, ...]]:
-    """Map a printed mole-fraction composition.
+    """Map a mole-fraction composition from values.composition_mol.
 
     A key that is not a species formula is the unnamed remainder (for example
     ``minor constituents``). It is omitted and returned so the caller can flag
     it. The named oxides still map.
+
+    When the extract declares a basis (``composition_mol.basis`` or sibling
+    ``composition_mol_basis``), that token is kept. Otherwise the label defaults
+    to ``printed_mole_fraction``.
     """
 
     if not isinstance(values, Mapping):
@@ -3129,10 +3164,12 @@ def _mole_fraction_composition_from_values(
             components = [(name, amount / total) for name, amount in mapped.items()]
         else:
             for name, amount in raw.items():
+                token = str(name).strip()
+                if token in _COMPOSITION_MOL_META_KEYS:
+                    continue
                 parsed = _as_dec_or_none(amount)
                 if parsed is None:
                     continue
-                token = str(name).strip()
                 if parse_species_formula(token) is None:
                     omitted.append(token)
                     continue
@@ -3148,9 +3185,12 @@ def _mole_fraction_composition_from_values(
         return None, tuple(omitted)
     if omitted:
         return None, tuple(omitted)
+    basis = (
+        _declared_composition_mol_basis(values, raw) or _DEFAULT_COMPOSITION_MOL_BASIS
+    )
     return (
         Composition(
-            basis="printed_mole_fraction",
+            basis=basis,
             components=tuple(components),
             amount_basis=AmountBasis.MOLE_FRACTION,
         ),
