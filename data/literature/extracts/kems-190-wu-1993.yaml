@@ -382,9 +382,9 @@ species:
           method_class: measured_direct
           original_experimental_citation: 'N. L. Bowen and J. F. Schairer, Am. J. Sci. 29 (1935) 157 [reference 16]'
           temperature_C_as_published: 1306
-          liquid_wt_pct_as_published: {MgO: 9, FeO: 46, SiO2: 45}
-          olivine_wt_pct_as_published: {Fe2SiO4: 68, Mg2SiO4: 32}
-          pyroxene_wt_pct_as_published: {FeSiO3: 62, MgSiO3: 38}
+          composition_wt_pct: {MgO: 9, FeO: 46, SiO2: 45}
+          oxides_wt_pct: {Fe2SiO4: 68, Mg2SiO4: 32}
+          major_oxide_wt_pct: {FeSiO3: 62, MgSiO3: 38}
           printed_quote: 'A ternary peritectic invariant was observed at 1306°C with a liquid of 9 wt% MgO, 46 wt% FeO and 45 wt% SiO2 ... olivine containing 68 wt% Fe2SiO4 and 32 wt% Mg2SiO4 ... pyroxene containing 62 wt% FeSiO3 and 38 wt% MgSiO3.'
         uncertainty:
           note: No numeric uncertainty is printed for the reported invariant or compositions.
@@ -404,7 +404,7 @@ species:
           admission_status: model_output_not_measurement
           fidelity_temperature_C: 1310
           temperature_C_as_published: 1310
-          liquid_wt_pct_as_published: {MgO: 10.5, FeO: 45, SiO2: 44.5}
+          composition_wt_pct: {MgO: 10.5, FeO: 45, SiO2: 44.5}
           olivine_Fe2SiO4_wt_pct_as_published: 61
           pyroxene_FeSiO3_wt_pct_as_published: 50
           printed_quote: 'The ternary peritectic point was calculated at 1310°C at a liquid composition of 10.5 wt% MgO, 45 wt% FeO and 44.5 wt% SiO2 ... calculated olivine composition ... 61 wt% Fe2SiO4 ... calculated pyroxene composition ... 50 wt% FeSiO3.'
