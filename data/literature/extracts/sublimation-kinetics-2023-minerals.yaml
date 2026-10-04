@@ -111,6 +111,54 @@ experiments:
       orifice_channel_length_m:
         state: {tag: not_applicable, reason: not_applicable}
         locator: *bet_locator
+- experiment_id: apollo-12022-factsage
+  method: factsage_equilibrium_calculation
+  locator:
+    published_page: 4
+    pdf_page_index: 4
+    table: '1'
+    note: Apollo 12022 composition (Snyder) used for FactSage full-silicate p_sat / Demaria comparison; scoped off LMS-1 default
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value:
+          SiO2: 43.22
+          FeO: 21.45
+          MgO: 10.44
+          Al2O3: 9.04
+          CaO: 9.56
+          TiO2: 5.16
+          Cr2O3: 0.33
+          MnO: 0.25
+          Na2O: 0.47
+          K2O: 0.07
+      locator:
+        published_page: 4
+        pdf_page_index: 4
+        table: '1'
+        note: "Table 1 Apollo #12022 composition from Snyder et al.; adjusted to 100% omitting trace elements"
+
+- experiment_id: factsage-feo-proxy
+  method: factsage_equilibrium_calculation
+  locator:
+    published_page: 7
+    pdf_page_index: 7
+    section: '2.3.1'
+    note: >-
+      FactSage Fe p_sat / HKL flux from pure FeO system (pp.7,9); not the
+      Table 1 Apollo 12022 bulk map. Caption names 12022 as the feedstock
+      being approximated.
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value:
+          FeO: 100
+      locator:
+        published_page: 7
+        pdf_page_index: 7
+        note: Pure FeO proxy system for Fe vapor-pressure / flux calculations
 fidelity_samples:
 - species: LMS-1
   observable: rate_series
@@ -529,6 +577,7 @@ species:
   '12022':
     observations:
     - observation_id: shaw_2023_table1_apollo_12022_composition_snyder
+      experiment: apollo-12022-factsage
       type: rate_series
       class_tag: quoted
       locator:
@@ -573,6 +622,7 @@ species:
           status: absent
           reason: LMS-1 oxide composition is not printed in this paper
     - observation_id: shaw_2023_fig3_factsage_full_silicate_vs_demaria_figure_only
+      experiment: apollo-12022-factsage
       type: psat_series
       class_tag: model
       locator:
@@ -678,6 +728,7 @@ species:
   Fe:
     observations:
     - observation_id: shaw_2023_table2_fe_psat_factsage_feo
+      experiment: factsage-feo-proxy
       type: psat_series
       class_tag: model
       locator:
@@ -750,6 +801,7 @@ species:
             pdf_page_index: 7
             table: '2'
     - observation_id: shaw_2023_table2_fe_hkl_flux
+      experiment: factsage-feo-proxy
       type: rate_series
       class_tag: model
       locator:
