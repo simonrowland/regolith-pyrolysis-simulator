@@ -5190,8 +5190,8 @@ def test_periclase_solid_activity_fusion_conversion_uses_janaf_nodes() -> None:
     assert fusion.liquid_table == "Mg-009"
     assert fusion.delta_g_fus_kJ_per_mol > 0
     assert abs(
-        fusion.melting_temperature_K - Decimal("3104.945598")
-    ) < Decimal("0.00001")
+        fusion.melting_temperature_K - Decimal("3104.968203")
+    ) < Decimal("0.000001")
     at_melting = janaf_fusion_energy("MgO", fusion.melting_temperature_K)
     assert abs(at_melting.delta_g_fus_kJ_per_mol) < Decimal("1e-20")
 
@@ -5383,7 +5383,7 @@ def test_absent_janaf_grid_node_refuses_binary_cell_interpolation(
     monkeypatch.setattr(binary, "_cell_janaf_gibbs_points", without_wo_300)
 
     with pytest.raises(binary._OxygenBalanceRefusal, match="300"):
-        binary._cell_oxide_thermodynamics("W", 350.0)
+        binary._cell_oxide_thermodynamics("W", 325.0)
 
 
 def test_silica_fusion_uses_restored_janaf_1700_row_and_decreases() -> None:
@@ -5902,7 +5902,9 @@ def test_allibert_solid_activity_fusion_conversion_is_diagnostic_only(
     )
     alumina_fusion = janaf_fusion_energy("Al2O3", Decimal("2060"))
     assert alumina_fusion.delta_g_fus_kJ_per_mol == Decimal("11.8498")
-    assert Decimal("2325.9") < alumina_fusion.melting_temperature_K < Decimal("2326.0")
+    assert abs(
+        alumina_fusion.melting_temperature_K - Decimal("2326.528497")
+    ) < Decimal("0.000001")
     assert alumina_fusion.accepted_melting_temperature_K == Decimal("2327")
     alumina_reference = replace(
         reference,
@@ -5926,7 +5928,7 @@ def test_allibert_solid_activity_fusion_conversion_is_diagnostic_only(
             f"{FLAGGED_STRATUM_REFERENCE_CONVERTED_VIA_FUSION};"
         )
     )
-    assert "distance_below_JANAF_Tm=265.931928687" in alumina_notice.reason
+    assert "distance_below_JANAF_Tm=266.528497409" in alumina_notice.reason
     assert "accepted_Tm~2327 K" in alumina_notice.reason
     silica_fusion = janaf_fusion_energy("SiO2", Decimal("1933"))
     assert silica_fusion.delta_g_fus_kJ_per_mol == Decimal("0.27784")

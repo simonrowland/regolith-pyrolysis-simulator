@@ -2661,6 +2661,12 @@ def _interpolate_formation_gibbs(
 ) -> Decimal:
     if temperature_K < points[0][0] or temperature_K > points[-1][0]:
         raise ValueError(f"{temperature_K} K is outside the JANAF table range")
+    missing_node = _missing_node_for_interpolation(points, (), temperature_K)
+    if missing_node is not None:
+        raise ValueError(
+            f"JANAF formation Gibbs interpolation spans missing grid node "
+            f"{missing_node} K at {temperature_K} K"
+        )
     for (t0, g0), (t1, g1) in zip(points, points[1:]):
         if t0 <= temperature_K <= t1:
             if temperature_K == t0:
@@ -2678,12 +2684,46 @@ def _missing_node_for_interpolation(
 ) -> Decimal | None:
     if any(node_temperature == temperature_K for node_temperature, _ in points):
         return None
-    for (left, _), (right, _) in zip(points, points[1:]):
+    temperatures = tuple(temperature for temperature, _ in points)
+    gaps = tuple(right - left for left, right in zip(temperatures, temperatures[1:]))
+    for gap_index, ((left, _), (right, _)) in enumerate(zip(points, points[1:])):
         if left < temperature_K < right:
-            return next(
-                (node for node in missing_nodes if left < node < right),
-                None,
+            absent_grid_nodes = tuple(
+                Decimal(candidate)
+                for candidate in range(
+                    int(left // 100) * 100 + 100,
+                    int(right // 100) * 100 + 1,
+                    100,
+                )
+                if left < Decimal(candidate) < right
             )
+            for node in sorted(
+                {node for node in missing_nodes if left < node < right}
+                | set(absent_grid_nodes)
+            ):
+                run_start = gap_index
+                run_end = gap_index + 1
+                while run_start > 0 and gaps[run_start - 1] in (
+                    Decimal("200"),
+                    Decimal("400"),
+                ):
+                    run_start -= 1
+                while run_end < len(gaps) and gaps[run_end] in (
+                    Decimal("200"),
+                    Decimal("400"),
+                ):
+                    run_end += 1
+                sparse_ladder = (
+                    left >= Decimal("3000")
+                    and right - left in (Decimal("200"), Decimal("400"))
+                    and run_end - run_start >= 2
+                )
+                reference_interval = (
+                    left == Decimal("298.15") and right == Decimal("500")
+                )
+                if not sparse_ladder and not reference_interval:
+                    return node
+            return None
     return None
 
 
