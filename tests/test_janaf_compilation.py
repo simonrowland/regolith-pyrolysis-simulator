@@ -113,6 +113,115 @@ def test_every_stored_number_reparses_from_table_text() -> None:
     assert failures == []
 
 
+@pytest.mark.parametrize(
+    ("table_id", "temperature", "expected"),
+    (
+        (
+            "O-038",
+            1700,
+            {
+                "formation_enthalpy": -941.610,
+                "formation_gibbs_energy": -609.059,
+                "log10_formation_equilibrium_constant": 18.714,
+            },
+        ),
+        (
+            "O-037",
+            1700,
+            {
+                "formation_enthalpy": -949.326,
+                "formation_gibbs_energy": -609.041,
+                "log10_formation_equilibrium_constant": 18.714,
+            },
+        ),
+        ("Fe-018", 1700, {"formation_gibbs_energy": -163.094}),
+        ("Na-012", 1500, {"formation_gibbs_energy": -164.364}),
+        (
+            "K-003",
+            1100,
+            {
+                "formation_enthalpy": -78.951,
+                "formation_gibbs_energy": 4.610,
+                "log10_formation_equilibrium_constant": -0.219,
+            },
+        ),
+        (
+            "Al-003",
+            1000,
+            {
+                "formation_enthalpy": 0.0,
+                "formation_gibbs_energy": 0.0,
+                "log10_formation_equilibrium_constant": 0.0,
+            },
+        ),
+    ),
+)
+def test_transition_following_rows_restore_signed_janaf_tail(
+    table_id: str, temperature: int, expected: dict[str, float]
+) -> None:
+    table = load_table_document(TABLES_DIR / f"{table_id}.yaml")["table"]
+    rows = [
+        row
+        for row in table["values"]
+        if row["temperature"]["value"] == temperature
+    ]
+    assert len(rows) == 1, f"{table_id}: missing {temperature} K row"
+    row = rows[0]
+    for key, value in expected.items():
+        assert row[key]["value"] == value
+
+
+def test_every_absent_100k_node_is_explained_by_the_printed_grid() -> None:
+    """Only sustained 200/400 K ladders and the 298.15-to-500 K interval may skip nodes."""
+
+    from decimal import Decimal
+
+    unexplained: list[str] = []
+    for path in iter_table_paths():
+        table = load_table_document(path)["table"]
+        temperatures = sorted(
+            Decimal(str(row["temperature"]["value"]))
+            for row in table["values"]
+            if row["temperature"]["value"] is not None
+        )
+        present = set(temperatures)
+        if not temperatures:
+            continue
+        first = int(temperatures[0] // 100) * 100
+        last = int(temperatures[-1] // 100) * 100
+        for candidate in range(first, last + 1, 100):
+            node = Decimal(candidate)
+            if node in present or node < temperatures[0] or node > temperatures[-1]:
+                continue
+            left = max(value for value in temperatures if value < node)
+            right = min(value for value in temperatures if value > node)
+            gaps = [b - a for a, b in zip(temperatures, temperatures[1:])]
+            left_index = temperatures.index(left)
+            run_start = left_index
+            run_end = left_index + 1
+            while run_start > 0 and gaps[run_start - 1] in (
+                Decimal("200"),
+                Decimal("400"),
+            ):
+                run_start -= 1
+            while run_end < len(gaps) and gaps[run_end] in (
+                Decimal("200"),
+                Decimal("400"),
+            ):
+                run_end += 1
+            sparse_ladder = (
+                left >= Decimal("3000")
+                and right - left in (Decimal("200"), Decimal("400"))
+                and run_end - run_start >= 2
+            )
+            reference_interval = (
+                left == Decimal("298.15") and right == Decimal("500")
+            )
+            if not sparse_ladder and not reference_interval:
+                unexplained.append(f"{table['table_id']}@{candidate} K")
+    assert unexplained == []
+
+
 def _assert_source_round_trip(document, source_path):
     table = document["table"]
     fresh = parse_table(source_path.read_bytes(), table, source_path)["table"]

@@ -5347,6 +5347,57 @@ def test_missing_janaf_fusion_node_refuses_activity_residual(
     )
 
 
+def test_absent_janaf_fusion_grid_node_refuses_interpolation(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from simulator.battery.generators import janaf
+
+    original_points = janaf._fusion_table_points
+
+    def without_silica_1700(table_id: str):
+        points, digest = original_points(table_id)
+        if table_id == "O-038":
+            points = tuple((t, g) for t, g in points if t != Decimal("1700"))
+        return points, digest
+
+    monkeypatch.setattr(janaf, "_fusion_table_points", without_silica_1700)
+    monkeypatch.setattr(janaf, "_fusion_missing_gibbs_temperatures", lambda _table_id: ())
+
+    with pytest.raises(ValueError, match="1700"):
+        janaf.janaf_fusion_energy("SiO2", Decimal("1673"))
+
+
+def test_absent_janaf_grid_node_refuses_binary_cell_interpolation(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from simulator.diagnostic_helpers import binary_pot_battery as binary
+
+    original_points = binary._cell_janaf_gibbs_points
+
+    def without_wo_300(table_id: str):
+        points, digest = original_points(table_id)
+        if table_id == "O-027":
+            points = tuple((t, g) for t, g in points if t != Decimal("300"))
+        return points, digest
+
+    monkeypatch.setattr(binary, "_cell_janaf_gibbs_points", without_wo_300)
+
+    with pytest.raises(binary._OxygenBalanceRefusal, match="300"):
+        binary._cell_oxide_thermodynamics("W", 350.0)
+
+
+def test_silica_fusion_uses_restored_janaf_1700_row_and_decreases() -> None:
+    from simulator.battery.generators.janaf import janaf_fusion_energy
+
+    temperatures = (1600, 1650, 1700, 1750, 1800)
+    values = [
+        janaf_fusion_energy("SiO2", Decimal(temperature)).delta_g_fus_kJ_per_mol
+        for temperature in temperatures
+    ]
+    assert values[2] == Decimal("1.143")
+    assert all(left > right for left, right in zip(values, values[1:]))
+
+
 def test_liquid_activity_reference_is_not_shifted() -> None:
     from simulator.battery.score import _fusion_comparison_reference
 
