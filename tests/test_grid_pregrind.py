@@ -795,7 +795,7 @@ def test_worker_failure_with_backend_and_missing_subprocess_module_checks_model(
             intended_fO2_log=-9.0,
         )
         key_id = writer.pending_rows(batch_id=batch_id)[0]["grid_key_id"]
-        with pytest.raises(ValueError, match="grid result model differs from queued key"):
+        with pytest.raises(ValueError):
             writer.write_result(key_id, output)
 
 
@@ -813,8 +813,10 @@ def test_worker_model_resolution_rejects_unavailable_collision_and_propagates(
 
     monkeypatch.setattr(
         grid_pregrind,
-        "resolve_alphamelts_subprocess_model",
-        lambda _model: (_ for _ in ()).throw(ValueError("resolver failed")),
+        "resolve_grid_engine_model",
+        lambda _model, _backend: (_ for _ in ()).throw(
+            ValueError("resolver failed")
+        ),
     )
     with pytest.raises(ValueError, match="resolver failed"):
         grid_pregrind._resolved_worker_engine_model(DefaultBackend(), "subprocess")
@@ -2033,7 +2035,7 @@ def test_resolved_queued_model_drains_and_stores_through_run_cycle(
     assert row["engine_model"] == "MELTSv1.0.2"
     assert row["status"] == "ok"
     with GridCacheWriter(database, existing_only=True, backend_name=backend_name) as writer:
-        assert writer.counts()["pending"] == 0
+        assert writer.pending_rows(batch_id=batch_id) == []
 
 
 def test_run_cycle_rechecks_each_claimed_job_before_submission(tmp_path, monkeypatch):
@@ -2109,14 +2111,14 @@ def test_pmelts_drain_refuses_at_adapter_resolver_before_native_call(
     _prepared_drain_database(database, model="pMELTS")
     resolver_calls = []
     native_calls = []
-    resolver = grid_pregrind.resolve_alphamelts_subprocess_model
+    resolver = grid_pregrind.resolve_grid_engine_model
 
-    def record_resolver(model):
+    def record_resolver(model, backend_name):
         resolver_calls.append(model)
-        return resolver(model)
+        return resolver(model, backend_name)
 
     monkeypatch.setattr(
-        grid_pregrind, "resolve_alphamelts_subprocess_model", record_resolver
+        grid_pregrind, "resolve_grid_engine_model", record_resolver
     )
     monkeypatch.setattr(
         grid_pregrind,

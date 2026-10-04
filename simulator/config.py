@@ -33,6 +33,18 @@ def resolve_alphamelts_subprocess_model(
     return model, "MELTS"
 
 
+def resolve_grid_engine_model(model_name: str | None, backend_name: str) -> str:
+    """Resolve the model identity used by the grid producer and writer."""
+    if backend_name == "subprocess":
+        return resolve_alphamelts_subprocess_model(model_name)[0]
+    if backend_name == "thermoengine":
+        model = str(model_name or "") or DEFAULT_ALPHAMELTS_MODEL
+        if model == ENGINE_MODEL_UNAVAILABLE:
+            raise ValueError("ThermoEngine model identity cannot be unavailable")
+        return model
+    raise ValueError(f"unsupported grid backend: {backend_name!r}")
+
+
 _FUNCTIONAL_DATA_DIGEST_CONFIGS = frozenset({"setpoints", "vapor_pressures"})
 _FUNCTIONAL_DATA_DIGEST_PREFIX = b"functional-data-yaml-v1\0"
 

@@ -43,7 +43,7 @@ from simulator.environment import DEFAULT_VACUUM_FLOOR_BAR  # noqa: E402
 from simulator.config import (  # noqa: E402
     DEFAULT_ALPHAMELTS_MODEL,
     ENGINE_MODEL_UNAVAILABLE,
-    resolve_alphamelts_subprocess_model,
+    resolve_grid_engine_model,
 )
 from simulator.engine_pool import (  # noqa: E402
     EngineWorkerPool,
@@ -1180,9 +1180,7 @@ def _resolved_worker_engine_model(backend: Any, backend_name: str) -> str:
     if backend is None:
         return ENGINE_MODEL_UNAVAILABLE
     model = getattr(backend, "_model", None)
-    if backend_name == "subprocess":
-        return resolve_alphamelts_subprocess_model(model)[0]
-    return str(model or DEFAULT_ALPHAMELTS_MODEL)
+    return resolve_grid_engine_model(model, backend_name)
 
 
 def _worker_refusal_output(
@@ -1364,6 +1362,7 @@ def _run_point(job: WorkerJob) -> tuple[int, dict[str, Any]]:
             native_input=native_input,
             run_mode=run_mode,
             applied_timeout_s=applied_timeout_s,
+            backend=_WORKER_BACKEND,
         )
 
     backend = _WORKER_BACKEND
@@ -1723,8 +1722,9 @@ def run_cycle(
 
     config = backend_config(args)
     expected_model = str(config["model"])
-    if config["grid_backend_name"] == "subprocess":
-        expected_model, _ = resolve_alphamelts_subprocess_model(expected_model)
+    expected_model = resolve_grid_engine_model(
+        expected_model, str(config["grid_backend_name"])
+    )
 
     next_heartbeat = time.monotonic() + args.heartbeat_s
     def pending_jobs() -> Iterable[WorkerJob]:
@@ -2152,9 +2152,7 @@ def run_drain_only(args: argparse.Namespace) -> int:
         )
 
         try:
-            drain_model = args.model
-            if args.backend == "subprocess":
-                drain_model, _ = resolve_alphamelts_subprocess_model(args.model)
+            drain_model = resolve_grid_engine_model(args.model, args.backend)
             writer._validate_drain_configuration(
                 backend_name=args.backend,
                 model=drain_model,
