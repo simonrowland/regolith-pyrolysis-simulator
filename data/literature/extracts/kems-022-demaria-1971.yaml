@@ -1975,22 +1975,22 @@ species:
           reading_uncertainty:
             x: {calibration_residual: 0.000131, marker_half_width: 0.011062, repeatability: 0.000620, total: 0.011813}
             y: {calibration_residual: 0.003188, marker_half_width: 0.034618, repeatability: 0.001950, total: 0.039755}
-        - T_K: 1296.18
-          invT_times_1e4_K_inv: 7.715
-          log10_p_atm: -8.015
-          p_atm: 9.6605088e-09
-          p_Pa: 0.00097885105
+        - T_K: 1297.35
+          invT_times_1e4_K_inv: 7.708
+          log10_p_atm: -8.037
+          p_atm: 9.1833260e-09
+          p_Pa: 0.00093050050
           marker_id: C6
           shape: circle
           fill: open
           instrument: BC
           figure_digitized: true
           bar_state: not_visible
-          pixel_center_300: [1569.50, 2234.58]
-          pixel_center_600: [3139.25, 4468.73]
+          pixel_center_300: [1565.41, 2239.75]
+          pixel_center_600: [3130.90, 4478.72]
           reading_uncertainty:
-            x: {calibration_residual: 0.000131, marker_half_width: 0.005737, repeatability: 0.001070, total: 0.006938}
-            y: {calibration_residual: 0.003188, marker_half_width: 0.012920, repeatability: 0.001499, total: 0.017607}
+            x: {calibration_residual: 0.000131, marker_half_width: 0.015604, repeatability: 0.000899, total: 0.016634}
+            y: {calibration_residual: 0.003188, marker_half_width: 0.033245, repeatability: 0.000780, total: 0.037213}
       equipment:
         orifice_area:
           value: 4.154756e-06
@@ -2093,6 +2093,16 @@ species:
             note: >-
               Markers overlap within this dark full-square cluster; distinct centres cannot be separated.
               This single entry represents an unresolved overlap region, not an asserted marker count.
+          - marker_id: S4
+            flag: overlap_unresolved
+            sample: '12065'
+            shape: square
+            fill: full
+            instrument: NAA
+            bar_state: visible
+            note: >-
+              The elongated dark body may contain more than one overlapping square; multiplicity is
+              unresolved, so S4 is not treated as a uniquely resolved single marker.
         companion_O2_table: demaria_1971_o2_psat_table1_alkali_range
         co_measured_context: same alkali window as K Fig. 2 and Table 1 O2
         fO2_pairing:
@@ -2218,7 +2228,7 @@ species:
           pixel_center_300: [1029.86, 2031.94]
           pixel_center_600: [2060.02, 4063.95]
           reading_uncertainty:
-            x: {calibration_residual: 0.000131, marker_half_width: 0.012177, repeatability: 0.000727, total: 0.013035}
+            x: {calibration_residual: 0.000131, marker_half_width: 0.025690, repeatability: 0.000727, total: 0.026548}
             y: {calibration_residual: 0.003188, marker_half_width: 0.029040, repeatability: 0.002015, total: 0.034243}
         - T_K: 1464.99
           invT_times_1e4_K_inv: 6.826
@@ -2454,7 +2464,7 @@ species:
           higher-temperature ones; the order is not stated; in an upward progressive run depletion flattens it.
         thermodynamic_context_flags:
           liquidus: All transcribed Fig. 1 Na points are below the lunar-sample liquidus.
-          effusion_saturation: Not demonstrated; the orifice area is 4.15 mm² and sample surface area is not stated.
+          effusion_saturation: Not demonstrated; the area calculated from the reported diameter is 4.15 mm², and sample surface area is not stated.
           absolute_pressure_uncertainty: At least a factor of two according to the authors (p. 1375).
     - observation_id: demaria_1971_figure1_symbol_key
       type: experiment_series
@@ -2548,7 +2558,7 @@ species:
         temperature_calibration_reference: not stated; pyrometers are described as calibrated (p. 1368)
         heating_methods_and_range: Samples were heated by radiation or electron bombardment, to temperatures up to 2500 K (p. 1368).
         liquidus_context: All re-read Fig. 1 Na points are below the lunar-sample liquidus.
-        effusion_context: Effusion saturation is not demonstrated; the 4.15 mm² orifice is reported but sample area is not stated.
+        effusion_context: Effusion saturation is not demonstrated; area calculated from the reported diameter is 4.15 mm², and sample area is not stated.
         absolute_pressure_uncertainty: At least a factor of two (authors, p. 1375).
   K:
     observations:
