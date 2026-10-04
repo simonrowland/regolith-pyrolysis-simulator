@@ -6,9 +6,10 @@ source:
   year: 1963
   corpus_source_id: gibbons-1963-thesis-cas-slags-cas
 extraction:
-  method: Page-image first (poor OmniPage OCR). 200 dpi pdftoppm of thesis PDF; vision read of discussion page
-    (PDF p. 66 / thesis p. 48) for method. Numeric Table II / lime-activity table transcription still OPEN — must continue
-    from page images; do not trust OCR digits alone. Figs 4–6, 7 recorded figure_only until table cells are pinned.
+  method: Page-image first (poor OmniPage OCR). 200–400 dpi pdftoppm of thesis PDF; vision read of Table I
+    (PDF p. 55), Table II (PDF p. 56), method/K discussion (PDF p. 66 / thesis p. 48 and PDF p. 70 / thesis p. 49). Digits
+    taken from page images; OmniPage cross-check only. a(CaO) at CaS saturation is plotted in fig. 7 only — figure_only,
+    not digitised. No invented a(CaO) from K·A.
   date: '2026-10-04'
   worker: empirical-cao-al2o3-slot-05
   provenance_path: ferry-inbox/cao-al2o3-sources/gibbons-1963-thesis-cas-slags-cas/
@@ -18,6 +19,14 @@ fidelity_samples:
   value: 1550
   note: lime-alumina system temperature from thesis p. 48 page image
   locator: {published_page: 48, pdf_page_index: 66, section: The Lime-Alumina System}
+- path: species.CaO.observations[gibbons_1963_table_i_cas_sat_compositions].values.rows[0].wt_pct_CaO
+  value: 50.5
+  note: Table I CA1 %CaO (CaS-free)
+  locator: {published_page: null, pdf_page_index: 55, table: I, row: CA1}
+- path: species.CaO.observations[gibbons_1963_table_ii_lime_alumina_runs].values.rows[1].A_value
+  value: 1700
+  note: Table II CA1 run 113 A value at Sat. final S
+  locator: {published_page: null, pdf_page_index: 56, table: II, row: CA1-113}
 species:
   CaO:
     context:
@@ -31,22 +40,25 @@ species:
       values:
         quantity: gas_slag_sulphurising_equilibration_method
         method_class: method_only
-        experimental_method: gas-slag equilibration; sulphurising potential ("A value"); CaS saturation when sulphur content
+        experimental_method: gas-slag equilibration; sulphurising potential (A value); CaS saturation when sulphur content
           rises markedly for slight increase in sulphurising capacity (figs 4–5)
         temperature_C: 1550
         temperature_K: 1823
         a_CaS_at_saturation_as_printed: 1
-        data_table_as_printed_on_p48: Table II (page-image reading; OCR sometimes misreads as Table IX)
-        plots_as_printed: figs. 4, 5 and 6; lime activities at CaS saturation discussed with fig. 7
+        data_tables_as_printed: Table I (compositions at CaS saturation, CaS-free basis, PDF p. 55); Table II (lime-alumina
+          run results, PDF p. 56). Thesis p. 48 text says "table II" (OmniPage sometimes misreads as Table IX).
+        plots_as_printed: figs. 4, 5 and 6; lime activities at CaS saturation plotted in fig. 7
         how_equilibrium_shown_as_printed: CaS free phase at saturation so aCaS=1; correction for change in CaS-free lime % from
           S gain/loss is approximate and within experimental error except one point
+        a_CaO_formula_at_sat_as_printed: 'aCaO = 1/(K · A) at CaS saturation (thesis p. 49)'
         equilibrium_constants_as_printed:
-        K_1500_C: 2.75e-3
-        K_1550_C: 3.52e-3
+          K_1500_C: 2.75e-3
+          K_1550_C: 3.32e-3
+          K_1550_C_as_printed: '3.32 x 10^-3'
+          K_1550_digit_note: 'page-image (400 dpi) reads middle digit as 3 (3.32); OmniPage/bbox OCR word is 3.52 — image reading preferred'
+          K_locator: {published_page: 49, pdf_page_index: 70}
         reaction_as_printed: 'CaO + 1/2 S2 = CaS + 1/2 O2'
-        a_CaO_at_sat_note: 'at CaS saturation aCaS=1 so aCaO from K and gas A-value; plotted in fig. 7 (figure_only until table pin)'
-        status: OPEN — numeric a(CaO) / composition rows from Table II (and any printed activity table) not yet transcribed
-          from page images; continue before REPORT
+        a_CaO_at_sat_note: 'at CaS saturation aCaS=1 so aCaO from K and gas A-value; plotted in fig. 7 only (figure_only — no printed aCaO table)'
     - observation_id: gibbons_1963_figs_figure_only
       type: method
       locator:
@@ -58,5 +70,357 @@ species:
         quantity: sulphur_uptake_and_lime_activity_plots
         method_class: method_only
         admission_status: figure_only
-        note: figs 4–6 sulphur vs sulphurising potential; fig 7 lime activities at CaS saturation — not digitised; await Table
-          II cell pin
+        note: figs 4–6 sulphur vs sulphurising potential (PDF p. 67–69); fig 7 lime activities at CaS saturation (PDF p. 71) —
+          not digitised; no printed numeric a(CaO) table in thesis
+    observations:
+    - observation_id: gibbons_1963_table_i_cas_sat_compositions
+      type: composition
+      locator:
+        pdf_page_index: 55
+        table: I
+      T_range_K:
+      - 1823.0
+      units: wt% and mole fraction as printed
+      values:
+        quantity: slag_composition_at_CaS_saturation_CaS_free_basis
+        method_class: measured
+        admission_status: admitted
+        temperature_C: 1550
+        table_title_as_printed: 'TABLE I. Slag Compositions at Calcium Sulphide Saturation. (Calculated on a CaS free basis.)'
+        sulphur_columns_note_as_printed: Slag sulphur content at CaS saturation
+        footnote_as_printed: 'For slags CA2 and M, saturation was not achieved and the compositions of these slags have been calculated on a calcium sulphide free basis at 4.0% sulphur.'
+        rows:
+        - slag_no: CA1
+          wt_pct_CaO: 50.5
+          wt_pct_Al2O3: 49.5
+          wt_pct_SiO2: null
+          N_CaO: 0.650
+          N_Al2O3: 0.350
+          N_SiO2: null
+          wt_pct_S_at_sat: 1.8
+          N_CaS: 0.040
+        - slag_no: CA2
+          asterisk: true
+          wt_pct_CaO: 43.0
+          wt_pct_Al2O3: 57.0
+          wt_pct_SiO2: null
+          N_CaO: 0.564
+          N_Al2O3: 0.436
+          N_SiO2: null
+          wt_pct_S_at_sat: null
+          N_CaS: null
+          note: saturation not achieved; CaS-free basis at 4.0% S per footnote
+        - slag_no: CA3
+          wt_pct_CaO: 53.5
+          wt_pct_Al2O3: 46.5
+          wt_pct_SiO2: null
+          N_CaO: 0.676
+          N_CaO_digit_note: 'third decimal faint on page image; N_Al2O3 0.324 implies 0.676 if mole fractions sum to 1'
+          N_Al2O3: 0.324
+          N_SiO2: null
+          wt_pct_S_at_sat: 1.8
+          N_CaS: 0.040
+        - slag_no: CA4
+          wt_pct_CaO: 58.35
+          wt_pct_Al2O3: 41.65
+          wt_pct_SiO2: null
+          N_CaO: 0.723
+          N_Al2O3: 0.277
+          N_SiO2: null
+          wt_pct_S_at_sat: 1.8
+          N_CaS: 0.039
+        - slag_no: CA6
+          wt_pct_CaO: 45.0
+          wt_pct_Al2O3: 55.0
+          wt_pct_SiO2: null
+          N_CaO: 0.600
+          N_Al2O3: 0.400
+          N_SiO2: null
+          wt_pct_S_at_sat: 4.0
+          N_CaS: 0.100
+        ternary_rows_status: OPEN — CAS ternary rows C–N on same Table I page not required for binary CaO-Al2O3 seating; left for later if needed
+        formula: CaO
+      quote: 'Table I binary CA rows: CA1 50.5/49.5 %CaO/%Al2O3, NCaO 0.650; CA4 58.35/41.65, NCaO 0.723; CA6 45.0/55.0, NCaO 0.600.'
+    - observation_id: gibbons_1963_table_ii_lime_alumina_runs
+      type: equilibration
+      locator:
+        pdf_page_index: 56
+        table: II
+      T_range_K:
+      - 1823.0
+      units: hrs; CO/CO2 ratio; %SO2; A value; wt% S
+      values:
+        quantity: gas_slag_equilibration_runs_lime_alumina
+        method_class: measured
+        admission_status: admitted
+        temperature_C: 1550
+        table_title_as_printed: 'TABLE II. Results for Lime-Alumina Slags.'
+        columns_as_printed: Slag No.; Run No.; Time of Run (hrs); Gas Analysis CO/CO2; %SO2; A value; Slag sulphur analysis (%) Initial; Final
+        row_count: 32
+        rows:
+        - slag_no: CA1
+          run_no: 99
+          time_hrs: 5
+          CO_over_CO2: 4.8
+          pct_SO2: 1.5
+          A_value: 950
+          S_initial_pct: 1.0
+          S_final_pct: 1.40
+        - slag_no: CA1
+          run_no: 113
+          time_hrs: 2
+          CO_over_CO2: 10.0
+          pct_SO2: 1.2
+          A_value: 1700
+          S_initial_pct: 2.0
+          S_final: Sat.
+        - slag_no: CA1
+          run_no: 119
+          time_hrs: 2
+          CO_over_CO2: 7.0
+          pct_SO2: 1.5
+          A_value: 1400
+          S_initial_pct: 2.0
+          S_final_pct: 1.5
+        - slag_no: CA1
+          run_no: 121
+          time_hrs: 2
+          CO_over_CO2: 6.0
+          pct_SO2: 1.6
+          A_value: 1200
+          S_initial_pct: 2.0
+          S_final_pct: 1.4
+        - slag_no: CA1
+          run_no: 122
+          time_hrs: 2
+          CO_over_CO2: 5.0
+          pct_SO2: 1.35
+          A_value: 1000
+          S_initial_pct: 2.0
+          S_final_pct: 1.3
+        - slag_no: CA1
+          run_no: 141
+          time_hrs: 2
+          CO_over_CO2: 6.0
+          pct_SO2: 1.3
+          A_value: 1100
+          S_initial_pct: 1.0
+          S_final_pct: 1.2
+        - slag_no: CA1
+          run_no: 142
+          time_hrs: 2
+          CO_over_CO2: 3.5
+          pct_SO2: 1.3
+          A_value: 700
+          S_initial_pct: 1.0
+          S_final_pct: 1.05
+        - slag_no: CA2
+          run_no: 81
+          time_hrs: 2
+          CO_over_CO2: 7.5
+          pct_SO2: 1.35
+          A_value: 1400
+          S_initial_pct: 2.0
+          S_final_pct: 0.96
+        - slag_no: CA2
+          run_no: 82
+          time_hrs: 2
+          CO_over_CO2: 13.0
+          pct_SO2: 1.60
+          A_value: 2500
+          S_initial_pct: 2.0
+          S_final_pct: 1.32
+        - slag_no: CA2
+          run_no: 83
+          time_hrs: 2
+          CO_over_CO2: 16.5
+          pct_SO2: 1.7
+          A_value: 3100
+          S_initial_pct: 1.0
+          S_final_pct: 1.40
+        - slag_no: CA2
+          run_no: 84
+          time_hrs: 2
+          CO_over_CO2: 22.0
+          pct_SO2: 1.5
+          A_value: 3500
+          S_initial_pct: 3.0
+          S_final_pct: 2.35
+        - slag_no: CA2
+          run_no: 89
+          time_hrs: 2
+          CO_over_CO2: 47.0
+          pct_SO2: 0.9
+          A_value: 5600
+          S_initial_pct: 4.0
+          S_final_pct: 3.20
+        - slag_no: CA2
+          run_no: 115
+          time_hrs: 2
+          CO_over_CO2: 13.0
+          pct_SO2: 0.9
+          A_value: 2100
+          S_initial_pct: 1.0
+          S_final_pct: 1.40
+        - slag_no: CA2
+          run_no: 127
+          time_hrs: 2
+          CO_over_CO2: 73.0
+          pct_SO2: 1.3
+          A_value: 6500
+          S_initial_pct: 4.0
+          S_final_pct: 3.70
+        - slag_no: CA3
+          run_no: 107
+          time_hrs: 2
+          CO_over_CO2: 1.8
+          pct_SO2: 1.6
+          A_value: 400
+          S_initial_pct: 0.0
+          S_final_pct: 0.85
+        - slag_no: CA3
+          run_no: 108
+          time_hrs: 2
+          CO_over_CO2: 3.5
+          pct_SO2: 1.5
+          A_value: 800
+          S_initial_pct: 1.0
+          S_final_pct: 1.60
+        - slag_no: CA3
+          run_no: 109
+          time_hrs: 2
+          CO_over_CO2: 2.6
+          pct_SO2: 1.3
+          A_value: 500
+          S_initial_pct: 2.0
+          S_final_pct: 1.55
+        - slag_no: CA3
+          run_no: 117
+          time_hrs: 2
+          CO_over_CO2: 4.6
+          pct_SO2: 1.3
+          A_value: 900
+          S_initial_pct: 2.0
+          S_final_pct: 1.60
+        - slag_no: CA3
+          run_no: 122
+          time_hrs: 2
+          CO_over_CO2: 5.3
+          pct_SO2: 1.35
+          A_value: 1000
+          S_initial_pct: 2.0
+          S_final: Sat.
+        - slag_no: CA4
+          run_no: 109
+          time_hrs: 2
+          CO_over_CO2: 2.6
+          pct_SO2: 1.3
+          A_value: 500
+          S_initial_pct: 2.0
+          S_final: Sat.
+        - slag_no: CA4
+          run_no: 161
+          time_hrs: 2
+          CO_over_CO2: 2.3
+          pct_SO2: 1.6
+          A_value: 400
+          S_initial_pct: 2.0
+          S_final_pct: 1.80
+        - slag_no: CA4
+          run_no: 161R
+          time_hrs: 2
+          CO_over_CO2: 0.45
+          pct_SO2: 1.6
+          A_value: 100
+          S_initial_pct: 0.0
+          S_final_pct: 0.43
+        - slag_no: CA4
+          run_no: 164
+          time_hrs: 2
+          CO_over_CO2: 2.0
+          pct_SO2: 0.9
+          A_value: 300
+          S_initial_pct: 2.0
+          S_final_pct: 1.60
+        - slag_no: CA6
+          run_no: 125
+          time_hrs: 1.5
+          time_hrs_as_printed: '1 1/2'
+          CO_over_CO2: 49
+          pct_SO2: 1.3
+          A_value: 5500
+          S_initial_pct: 2.0
+          S_final_pct: 2.90
+        - slag_no: CA6
+          run_no: 126
+          time_hrs: 2
+          CO_over_CO2: 63
+          pct_SO2: 1.3
+          A_value: 6100
+          S_initial_pct: 2.0
+          S_final_pct: 3.80
+        - slag_no: CA6
+          run_no: 127
+          time_hrs: 2
+          CO_over_CO2: 73
+          pct_SO2: 1.3
+          A_value: 6500
+          S_initial_pct: 4.0
+          S_final: Sat.
+        - slag_no: CA6
+          run_no: 135
+          time_hrs: 2
+          CO_over_CO2: 33
+          pct_SO2: 1.2
+          A_value: 4600
+          S_initial_pct: 2.0
+          S_final_pct: 2.7
+        - slag_no: CA6
+          run_no: 139
+          time_hrs: 1.5
+          time_hrs_as_printed: '1 1/2'
+          CO_over_CO2: 12
+          pct_SO2: 1.1
+          A_value: 2100
+          S_initial_pct: 0.0
+          S_final_pct: 1.05
+        - slag_no: CA6
+          run_no: 140
+          time_hrs: 2
+          CO_over_CO2: 7.5
+          pct_SO2: 1.3
+          A_value: 1400
+          S_initial_pct: 0.0
+          S_final_pct: 0.90
+        - slag_no: CA6
+          run_no: 141
+          time_hrs: 2
+          CO_over_CO2: 6.0
+          pct_SO2: 1.3
+          A_value: 1100
+          S_initial_pct: 1.0
+          S_final_pct: 0.90
+        - slag_no: CA6
+          run_no: 146
+          time_hrs: 2
+          CO_over_CO2: 47.0
+          pct_SO2: 1.6
+          A_value: 5300
+          S_initial_pct: 4.0
+          S_final_pct: 3.50
+        - slag_no: CA6
+          run_no: 150
+          time_hrs: 2
+          CO_over_CO2: 22.0
+          pct_SO2: 0.9
+          A_value: 3300
+          S_initial_pct: 3.0
+          S_final_pct: 2.6
+        sat_A_values_for_fig7_context:
+          CA1_run_113_A: 1700
+          CA3_run_122_A: 1000
+          CA4_run_109_A: 500
+          CA6_run_127_A: 6500
+          CA2_note: no Sat. row in Table II (saturation not achieved)
+        formula: CaO
+      quote: 'Table II: 32 lime-alumina runs (CA1×7, CA2×7, CA3×5, CA4×4, CA6×9); Sat. finals at CA1-113 A=1700, CA3-122 A=1000, CA4-109 A=500, CA6-127 A=6500.'
