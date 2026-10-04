@@ -205,8 +205,58 @@ def test_unresolved_janaf_tail_identity_stays_in_parse_ambiguities() -> None:
     assert "identity misses by 1001.634 printed log Kf units" in ambiguity["reason"]
 
 
+@pytest.mark.parametrize(
+    ("table_id", "temperature"),
+    (
+        ("Al-050", 1100),
+        ("Al-052", 900),
+        ("Al-053", 900),
+        ("Al-106", 1100),
+        ("Al-107", 1100),
+        ("B-116", 1100),
+        ("B-132", 1200),
+        ("B-133", 1200),
+        ("F-133", 400),
+        ("F-134", 400),
+        ("H-085", 400),
+        ("H-086", 400),
+        ("Na-022", 500),
+        ("O-083", 500),
+    ),
+)
+def test_large_logk_rounding_miss_still_restores_signs(
+    table_id: str, temperature: int
+) -> None:
+    table = load_table_document(TABLES_DIR / f"{table_id}.yaml")["table"]
+    row = next(
+        row for row in table["values"] if row["temperature"]["value"] == temperature
+    )
+    assert row["formation_gibbs_energy"]["locator"]["parse_repair"] == NIST_TAIL_PARSE_REPAIR
+    assert row["log10_formation_equilibrium_constant"]["locator"]["parse_repair"] == NIST_TAIL_PARSE_REPAIR
+
+
+def test_near_zero_logk_without_100x_sign_separation_stays_unresolved() -> None:
+    source = (
+        "Synthetic near-zero formation tail\n"
+        "T(K)\tCp\tS\t-[G-H(Tr)]/T\tH-H(Tr)\tΔfH\tΔfG\tlog Kf\n"
+        "900\t10\t10\t10\t0\t-1.000\t-0.001\t0.001\n"
+        "1000\t10\t10\t10\t0\t-1.000\t-0.001\t0.001\n"
+        "1100\t10\t10\t10\t0\tCRYSTAL <--> LIQUID\n"
+        "1200\t10\t10\t10\t0\t1.000 0.001 0.001\n"
+        "1300\t10\t10\t10\t0\t-1.000\t-0.001\t0.001\n"
+    )
+    parsed = parse_janaf_txt(
+        source, table_id="synthetic-near-zero", url="u", download_url="d"
+    )
+    assert not any(row["temperature"]["value"] == 1200 for row in parsed.values)
+    ambiguity = next(
+        item for item in parsed.parse_ambiguities if item.get("raw_line", "").startswith("1200\t")
+    )
+    assert ambiguity["kind"] == "nist_tail_whitespace_signs_unresolved"
+
+
 def test_every_absent_100k_node_is_explained_by_the_printed_grid() -> None:
-    """Only sustained 200/400 K ladders and the 298.15-to-500 K interval may skip nodes."""
+    """Only derived sparse ladders and the one explicit unresolved JANAF row may skip nodes."""
 
     from decimal import Decimal
 
@@ -253,7 +303,7 @@ def test_every_absent_100k_node_is_explained_by_the_printed_grid() -> None:
             )
             if not sparse_ladder and not reference_interval:
                 unexplained.append(f"{table['table_id']}@{candidate} K")
-    assert unexplained == []
+    assert unexplained == ["B-123@1100 K"]
 
 
 def _assert_source_round_trip(document, source_path):
