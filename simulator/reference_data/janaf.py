@@ -425,8 +425,8 @@ def _restore_whitespace_tail_signs(
     # only when the other sign relation misses by at least 100 times more.
     # The other relation has the signs aligned, so its miss is about
     # 2*|log Kf|; continuity with neighboring ΔfG rows chooses the absolute
-    # signs after the opposite-sign relation is established. We also check
-    # modern R=8.314462618. Sanity: O-038 at 1700 K gives log Kf=18.714 for
+    # signs after the opposite-sign relation is established. Sanity: O-038 at
+    # 1700 K gives log Kf=18.714 for
     # ΔfG=-609.059 kJ/mol; the 14 large-log rows have >100x separation and
     # neighboring accepted rows show the same few-unit rounding residuals.
     log_quantum = abs(
