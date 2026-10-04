@@ -170,6 +170,9 @@ experiments:
     total_pressure_Pa: {state: {tag: unknown, reason: not_published}, locator: {page: 37, section: '3.2.1 Vakuumkammer und Pumpstände'}}
     sweep_gas: {state: {tag: not_applicable, reason: not_applicable}, locator: {page: 36, section: '3.2.1 Vakuumkammer und Pumpstände'}}
     regime: {regime_class: {tag: unknown, reason: not_published}}
+    cell_internal_pressure_note:
+      state: {tag: value, value: "Ausheiz-Peaks tabulated in Tabelle 5.1/5.8; not a commanded pO2"}
+      locator: {page: 68, table: '5.1'}
   thermal_schedule:
     total_duration_s: {state: {tag: value, value: {kind: point, point: '77'}}, locator: {page: 105, table: '5.3', note: 'High-temperature phase, shutter >10%'}}
 - experiment_id: jsc1-ms2
@@ -209,6 +212,9 @@ experiments:
     total_pressure_Pa: {state: {tag: unknown, reason: not_published}, locator: {page: 37, section: '3.2.1 Vakuumkammer und Pumpstände'}}
     sweep_gas: {state: {tag: not_applicable, reason: not_applicable}, locator: {page: 36, section: '3.2.1 Vakuumkammer und Pumpstände'}}
     regime: {regime_class: {tag: unknown, reason: not_published}}
+    cell_internal_pressure_note:
+      state: {tag: value, value: "Ausheiz-Peaks tabulated in Tabelle 5.1/5.8; not a commanded pO2"}
+      locator: {page: 68, table: '5.1'}
   thermal_schedule:
     total_duration_s: {state: {tag: value, value: {kind: point, point: '55'}}, locator: {page: 105, table: '5.3', note: 'High-temperature phase, shutter >10%'}}
 - experiment_id: jsc1-ms4
@@ -248,6 +254,9 @@ experiments:
     total_pressure_Pa: {state: {tag: unknown, reason: not_published}, locator: {page: 37, section: '3.2.1 Vakuumkammer und Pumpstände'}}
     sweep_gas: {state: {tag: not_applicable, reason: not_applicable}, locator: {page: 36, section: '3.2.1 Vakuumkammer und Pumpstände'}}
     regime: {regime_class: {tag: unknown, reason: not_published}}
+    cell_internal_pressure_note:
+      state: {tag: value, value: "Ausheiz-Peaks tabulated in Tabelle 5.1/5.8; not a commanded pO2"}
+      locator: {page: 68, table: '5.1'}
   thermal_schedule:
     total_duration_s: {state: {tag: value, value: {kind: point, point: '38'}}, locator: {page: 105, table: '5.3', note: 'High-temperature phase, shutter >10%'}}
 - experiment_id: jsc1-ms5
@@ -287,6 +296,9 @@ experiments:
     total_pressure_Pa: {state: {tag: unknown, reason: not_published}, locator: {page: 37, section: '3.2.1 Vakuumkammer und Pumpstände'}}
     sweep_gas: {state: {tag: not_applicable, reason: not_applicable}, locator: {page: 36, section: '3.2.1 Vakuumkammer und Pumpstände'}}
     regime: {regime_class: {tag: unknown, reason: not_published}}
+    cell_internal_pressure_note:
+      state: {tag: value, value: "Ausheiz-Peaks tabulated in Tabelle 5.1/5.8; not a commanded pO2"}
+      locator: {page: 68, table: '5.1'}
   thermal_schedule:
     total_duration_s: {state: {tag: value, value: {kind: point, point: '174'}}, locator: {page: 105, table: '5.3', note: 'High-temperature phase, shutter >10%'}}
 - experiment_id: jsc1-solar-series
@@ -336,6 +348,30 @@ experiments:
     temperature_K:
       state: {tag: unknown, reason: not_published}
       locator: {page: 105, table: '5.3', note: MS1/MS2/MS4/MS5 have distinct maxima; retained in existing run-log observation}
+- experiment_id: oxide-reference-series
+  bench_id: dlr-solar-vacuum-system
+  method: solar_furnace_pyrolysis
+  locator: {page: 68, table: '5.1', note: 'Oxide and empty-holder reference runs (ohne Probe, CaO, SiO2, ZnO); Fig. 5.55 O2 traces'}
+  sample:
+    printed_composition:
+      state: {tag: value, value: Simple oxide and empty sample holder reference runs}
+      locator: {page: 68, table: '5.1'}
+    form:
+      state: {tag: value, value: Powder or empty holder}
+      locator: {page: 54, section: '4.1.2 Pulverproben'}
+  pressure_environment:
+    total_pressure_Pa:
+      state: {tag: unknown, reason: not_published}
+      locator: {page: 68, table: '5.1', note: 'Chamber Druckwerte tabulated per phase; no single commanded total assigned'}
+    sweep_gas:
+      state: {tag: not_applicable, reason: not_applicable}
+      locator: {page: 36, section: '3.2.1 Vakuumkammer und Pumpstände', note: High-vacuum operation}
+    regime: {regime_class: {tag: unknown, reason: not_published}}
+  conditions:
+    temperature_K:
+      state: {tag: unknown, reason: not_published}
+      locator: {page: 68, table: '5.1', note: 'Reference runs have distinct Tmax'}
+
 species:
   Na:
     observations:
@@ -630,12 +666,6 @@ species:
           locator:
             page: 51
             table: '4.1'
-        residual_pressure_Pa_as_printed:
-          value: "Ausheiz-Peaks tabulated in Tabelle 5.1/5.8; not a commanded pO2"
-          quote: "Ausheiz-Peaks tabulated in Tabelle 5.1/5.8; not a commanded pO2"
-          locator:
-            page: 68
-            table: '5.1'
     - observation_id: sauerborn_2005_table53_heating_cooling_grid
       experiment: jsc1-solar-series
       type: rate_series
@@ -2068,12 +2098,6 @@ species:
           locator:
             page: 51
             table: '4.1'
-        residual_pressure_Pa_as_printed:
-          value: "Ausheiz-Peaks tabulated in Tabelle 5.1/5.8; not a commanded pO2"
-          quote: "Ausheiz-Peaks tabulated in Tabelle 5.1/5.8; not a commanded pO2"
-          locator:
-            page: 68
-            table: '5.1'
       supersedes: sauerborn_2005_table53_jsc1_run_log
       source_quotes:
       - locator:
@@ -5072,7 +5096,7 @@ species:
   O2:
     observations:
     - observation_id: sauerborn_2005_table51_oxide_reference_runs
-      experiment: jsc1-solar-series
+      experiment: oxide-reference-series
       type: rate_series
       locator:
         source_path: docs-private/research/2026-08-27-ocr-repair/kems-035-sauerborn-2005/tables.md
@@ -5110,7 +5134,7 @@ species:
       uncertainty:
         note: ILLEGIBLE cell not guessed
     - observation_id: sauerborn_2005_table51_oxide_reference_full_grid
-      experiment: jsc1-solar-series
+      experiment: oxide-reference-series
       type: rate_series
       locator:
         table: '5.1'
@@ -5322,7 +5346,7 @@ species:
       uncertainty:
         note: none printed; MS5 melted-fraction 43 vs 54 residual is a source inconsistency
     - observation_id: sauerborn_2005_fig555_o2_reference_normalized
-      experiment: jsc1-solar-series
+      experiment: oxide-reference-series
       type: rate_series
       locator:
         figure: '5.55'
@@ -5542,7 +5566,7 @@ species:
             page: 51
             table: '4.1'
     - observation_id: sauerborn_2005_table51_oxide_reference_runs_deep2
-      experiment: jsc1-solar-series
+      experiment: oxide-reference-series
       type: rate_series
       locator:
         table: '5.1'
@@ -5679,7 +5703,7 @@ species:
         T_K = T_C + 273.15 and pressure_Pa = pressure_mbar * 100. T_range_K endpoints refer to the quoted run-temperature
         cells, not independent measurements.
     - observation_id: sauerborn_2005_table51_oxide_reference_full_grid_deep2
-      experiment: jsc1-solar-series
+      experiment: oxide-reference-series
       type: rate_series
       locator:
         table: '5.1'
@@ -6408,7 +6432,7 @@ species:
         T_K = T_C + 273.15 and pressure_Pa = pressure_mbar * 100. T_range_K endpoints refer to the quoted run-temperature
         cells, not independent measurements.
     - observation_id: sauerborn_2005_fig555_o2_reference_normalized_deep2
-      experiment: jsc1-solar-series
+      experiment: oxide-reference-series
       type: rate_series
       locator:
         figure: '5.55'
@@ -6425,6 +6449,13 @@ species:
           are not printed cells and are not relabelled as quoted measurements. This superseder retains the figure
           provenance; no new digitization performed.
       supersedes: sauerborn_2005_fig555_o2_reference_normalized
+      equipment:
+        residual_pressure_Pa_as_printed:
+          value: "QMS Messkreuz; valve-set ~10x below chamber. Baseline of this figure forced to 1e-7 mbar."
+          quote: "QMS Messkreuz; valve-set ~10x below chamber. Baseline of this figure forced to 1e-7 mbar."
+          locator:
+            page: 105
+            figure: '5.55'
       source_quotes:
       - locator:
           page: 105
@@ -6500,6 +6531,13 @@ species:
           are not printed cells and are not relabelled as quoted measurements. This superseder retains the figure
           provenance; no new digitization performed.
       supersedes: sauerborn_2005_fig556_o2_vs_T_normalized
+      equipment:
+        residual_pressure_Pa_as_printed:
+          value: "QMS Messkreuz baseline forced to 1e-7 mbar on this figure; chamber high-T peaks are in Tabelle 5.8 (MS1 peak/base 17.1)"
+          quote: "QMS Messkreuz baseline forced to 1e-7 mbar on this figure; chamber high-T peaks are in Tabelle 5.8 (MS1 peak/base 17.1)"
+          locator:
+            page: 107
+            figure: '5.56'
       source_quotes:
       - locator:
           page: 107
@@ -6600,7 +6638,7 @@ species:
         T_K = T_C + 273.15 and pressure_Pa = pressure_mbar * 100. T_range_K endpoints refer to the quoted run-temperature
         cells, not independent measurements.
     - observation_id: sauerborn_2005_fig555_printed_zno_increase_deep2
-      experiment: jsc1-solar-series
+      experiment: oxide-reference-series
       type: rate_series
       locator:
         page: 105
