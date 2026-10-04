@@ -5362,6 +5362,12 @@ def test_kume_malformed_declared_composition_amount_makes_whole_composition_unkn
     )
     assert observation.identity.composition is not None
     assert observation.identity.composition.is_unknown
+    hard = result.validation.hard_issues if result.validation is not None else ()
+    assert not any(
+        issue.reason is RefusalReason.INVALID_SOURCE
+        and "composition_mole_fraction" in (issue.path or "")
+        for issue in hard
+    )
 
 
 def test_kume_measured_reduced_activity_preserves_structured_derivation(
