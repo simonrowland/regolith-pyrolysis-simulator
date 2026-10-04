@@ -7203,10 +7203,12 @@ def test_derived_effusion_knudsen_number_does_not_raise_apparatus_notice() -> No
     )
 
 
-def test_inferred_nonmodelled_cell_still_refuses_oxygen_balance() -> None:
+def test_inferred_nonmodelled_cell_predicts_with_reactive_notice() -> None:
     from simulator.battery.enums import CellMaterial
+    from simulator.battery.records import union_notices
+    from simulator.battery.score import _reactive_cell_not_modelled_notice
 
-    reference, context, _bench, _prediction = _cell_material_score_case(
+    reference, context, bench, prediction = _cell_material_score_case(
         CellMaterial.TA,
         Derivation(
             relation="inferred tantalum cell",
@@ -7215,18 +7217,38 @@ def test_inferred_nonmodelled_cell_still_refuses_oxygen_balance() -> None:
             output_unit="cell material",
         ),
     )
+    # Injected prediction carries the production reactive-cell notice.
+    def predict(engine, obs, **kwargs):
+        base = prediction(engine, obs, **kwargs)
+        return replace(
+            base,
+            notices=union_notices(
+                base.notices,
+                (
+                    _reactive_cell_not_modelled_notice(
+                        Quantity.P_PARTIAL, bench.cell_materials
+                    ),
+                ),
+            ),
+        )
 
     residual, _candidate = compile_residual(
         reference,
         Engine.OPENIMCC,
         context=context,
+        predict=predict,
     )
 
-    assert residual.status is ResidualStatus.REFUSED
-    assert residual.refusal is not None
-    assert residual.refusal.detail.get("reason") == "reactive_cell_oxygen_reservoir"
+    assert residual.refusal is None or residual.refusal.detail.get("reason") != (
+        "reactive_cell_oxygen_reservoir"
+    )
     assert any(
         item.kind is NoticeKind.CELL_MATERIAL_INFERRED
+        for item in residual.notices
+    )
+    assert any(
+        item.kind is NoticeKind.REACTIVE_CELL_NOT_MODELLED
+        or "reactive cell: oxygen balance of the cell not modelled" in item.reason
         for item in residual.notices
     )
 

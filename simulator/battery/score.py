@@ -367,12 +367,16 @@ FLAGGED_STRATUM_CATALOGUE_COMPOSITION = "catalogue-composition"
 FLAGGED_STRATUM_SOURCE_INTERNALLY_INCONSISTENT = "source-internally-inconsistent"
 FLAGGED_STRATUM_IMCC_COMPLEX_SATURATION = "imcc_complex_saturation"
 FLAGGED_STRATUM_REFERENCE_CONVERTED_VIA_FUSION = "reference_converted_via_fusion"
+FLAGGED_STRATUM_FIGURE_ONLY = "figure_only"
+FLAGGED_STRATUM_REACTIVE_CELL_NOT_MODELLED = "reactive-cell-not-modelled"
 _FLAGGED_STRATUM_NOTICE_KINDS: frozenset[NoticeKind] = frozenset(
     {
         NoticeKind.UNVERIFIED_APPARATUS,
         NoticeKind.CELL_MATERIAL_INFERRED,
         NoticeKind.COMPOSITION_FROM_SAMPLE_CATALOG,
         NoticeKind.IMCC_COMPLEX_SATURATION,
+        NoticeKind.FIGURE_ONLY,
+        NoticeKind.REACTIVE_CELL_NOT_MODELLED,
     }
 )
 
@@ -1057,6 +1061,10 @@ def flagged_strata(notices: Sequence[Notice]) -> tuple[str, ...]:
         strata.append(FLAGGED_STRATUM_IMCC_COMPLEX_SATURATION)
     if any(_is_fusion_conversion_notice(notice) for notice in notices):
         strata.append(FLAGGED_STRATUM_REFERENCE_CONVERTED_VIA_FUSION)
+    if NoticeKind.FIGURE_ONLY in kinds:
+        strata.append(FLAGGED_STRATUM_FIGURE_ONLY)
+    if NoticeKind.REACTIVE_CELL_NOT_MODELLED in kinds:
+        strata.append(FLAGGED_STRATUM_REACTIVE_CELL_NOT_MODELLED)
     return tuple(strata)
 
 
@@ -2515,6 +2523,44 @@ def _omission_notice(quantity: Quantity, reason: str) -> Notice:
     )
 
 
+def _reactive_cell_not_modelled_notice(
+    quantity: Quantity,
+    materials: Sequence[Located[CellMaterial]] | None,
+) -> Notice:
+    cell_material = [
+        {
+            "field": "bench.cell_materials",
+            "value": item.state.value.value,
+        }
+        for item in materials or ()
+        if item.state.is_value and isinstance(item.state.value, CellMaterial)
+    ]
+    payload = json.dumps(
+        {"cell_material": cell_material},
+        ensure_ascii=False,
+        sort_keys=True,
+        separators=(",", ":"),
+    )
+    return Notice(
+        kind=NoticeKind.REACTIVE_CELL_NOT_MODELLED,
+        affected_quantities=(quantity,),
+        reason=(
+            "reactive cell: oxygen balance of the cell not modelled "
+            f"{payload}"
+        ),
+        origin="score:predict_with_engine",
+    )
+
+
+def _figure_only_notice(quantity: Quantity, observation: Observation) -> Notice:
+    return Notice(
+        kind=NoticeKind.FIGURE_ONLY,
+        affected_quantities=(quantity,),
+        reason="figure_only",
+        origin=observation.observation_id,
+    )
+
+
 def _cell_material_class(
     materials: Sequence[Located[CellMaterial]] | None,
 ) -> str:
@@ -3180,9 +3226,40 @@ def predict_with_engine(
             if material_class == "reactive"
             else None
         )
-        if material_class != "inert" and modelled is None:
+        if material_class == "reactive" and modelled is None:
+            # Out-of-domain physics: predict and flag. Keep refusal only when
+            # a required input is genuinely missing (handled below).
+            input_notices.append(
+                _reactive_cell_not_modelled_notice(quantity, cell_materials)
+            )
+            oxygen_required, oxygen_why, redox = oxygen_is_scorer_input(
+                identity, composition_value
+            )
+            if fo2_state is not None and fo2_state.is_value and fo2_state.value is not None:
+                po2 = Po2Request(
+                    mode=PO2_COMMANDED, po2_bar=float(fo2_state.value) / 1.0e5
+                )
+            elif oxygen_required:
+                return _input_refusal(
+                    engine=engine,
+                    channel=channel,
+                    sources=sources,
+                    identity=identity,
+                    requested=requested,
+                    reason=RefusalReason.IDENTITY_INCOMPLETE,
+                    detail={
+                        "reason": "missing_fO2",
+                        "quantity": quantity.value,
+                        "why": oxygen_why,
+                        "multivalent": list(redox),
+                    },
+                    notices=tuple(input_notices),
+                )
+            else:
+                po2 = Po2Request(mode=PO2_NOT_AN_INPUT, po2_bar=None)
+                input_notices.append(_omission_notice(quantity, oxygen_why))
+        elif material_class != "inert" and modelled is None:
             refusal_token = {
-                "reactive": "reactive_cell_oxygen_reservoir",
                 "not_inert": "cell_material_not_inert",
                 "unknown": "cell_material_unknown",
             }[material_class]
@@ -3210,27 +3287,28 @@ def predict_with_engine(
                 },
                 notices=tuple(input_notices),
             )
-        if engine not in OXYGEN_BALANCE_EFFUSION_ENGINES:
-            return _input_refusal(
-                engine=engine,
-                channel=channel,
-                sources=sources,
-                identity=identity,
-                requested=requested,
-                reason=RefusalReason.UNSUPPORTED,
-                detail={
-                    "reason": "oxygen_balance_effusion_unsupported_engine",
-                    "engine": engine.value,
-                },
-                notices=tuple(input_notices),
+        else:
+            if engine not in OXYGEN_BALANCE_EFFUSION_ENGINES:
+                return _input_refusal(
+                    engine=engine,
+                    channel=channel,
+                    sources=sources,
+                    identity=identity,
+                    requested=requested,
+                    reason=RefusalReason.UNSUPPORTED,
+                    detail={
+                        "reason": "oxygen_balance_effusion_unsupported_engine",
+                        "engine": engine.value,
+                    },
+                    notices=tuple(input_notices),
+                )
+            # The openimcc bridge discards pressure_bar; its balance solve uses
+            # printed composition-derived activities and T, never measured p_K.
+            po2 = Po2Request(
+                mode=PO2_OXYGEN_BALANCE_EFFUSION,
+                po2_bar=None,
+                cell_material=modelled,
             )
-        # The openimcc bridge discards pressure_bar; its balance solve uses
-        # printed composition-derived activities and T, never measured p_K.
-        po2 = Po2Request(
-            mode=PO2_OXYGEN_BALANCE_EFFUSION,
-            po2_bar=None,
-            cell_material=modelled,
-        )
     else:
         oxygen_required, oxygen_why, redox = oxygen_is_scorer_input(identity, composition_value)
         if fo2_state is not None and fo2_state.is_value and fo2_state.value is not None:
@@ -3256,6 +3334,30 @@ def predict_with_engine(
         else:
             po2 = Po2Request(mode=PO2_NOT_AN_INPUT, po2_bar=None)
             input_notices.append(_omission_notice(quantity, oxygen_why))
+        # Printed-O2 (or oxygen-not-required) Knudsen path: still flag an
+        # unmodelled reactive cell so the label travels with the prediction.
+        if (
+            quantity in _VAPOUR_EQUILIBRIUM
+            and experiment is not None
+            and experiment.method.is_value
+            and experiment.method.value is MethodToken.KNUDSEN_EFFUSION
+            and bench is not None
+        ):
+            cell_materials = bench.cell_materials
+            material_class = _cell_material_class(cell_materials)
+            modelled = (
+                _uniform_modelled_reactive_cell(cell_materials)
+                if material_class == "reactive"
+                else None
+            )
+            if material_class == "reactive" and modelled is None:
+                if not any(
+                    notice.kind is NoticeKind.REACTIVE_CELL_NOT_MODELLED
+                    for notice in input_notices
+                ):
+                    input_notices.append(
+                        _reactive_cell_not_modelled_notice(quantity, cell_materials)
+                    )
 
     if composition_value is not None:
         wt = composition_wt_pct(composition_value)
@@ -3992,7 +4094,15 @@ def compile_residual(
         else _bench_for_score(experiment, context.benches)
     )
     flagged_notices = _flagged_stratum_notices(reference, experiment, gates, bench)
-    notices = union_notices(reference.notices, flagged_notices)
+    figure_only_notices: tuple[Notice, ...] = ()
+    evidence_class = reference.evidence.class_
+    if (
+        evidence_class.is_value
+        and evidence_class.value is EvidenceClass.FIGURE_ONLY
+        and quantity is not None
+    ):
+        figure_only_notices = (_figure_only_notice(quantity, reference),)
+    notices = union_notices(reference.notices, flagged_notices, figure_only_notices)
     comparison_ids = comparison_ids or {reference.observation_id}
 
     def _refused(
@@ -4154,7 +4264,7 @@ def compile_residual(
             "handles": handles,
             "experiment": experiment,
         }
-        if predict is None and experiment is not None:
+        if experiment is not None:
             recorded = _bench_for_score(experiment, context.benches)
             if recorded is not None:
                 predictor_kwargs["bench"] = recorded
@@ -4360,6 +4470,17 @@ def compile_residual(
                 ref_point,
                 source_observation=reference,
             ) or cell_band
+        figure_only = (
+            reference.evidence.class_.is_value
+            and reference.evidence.class_.value is EvidenceClass.FIGURE_ONLY
+        )
+        if figure_only:
+            cell_band = _printed_uncertainty_band(
+                quantity,
+                reference.uncertainty,
+                ref_point,
+                source_observation=reference,
+            ) or cell_band
         numeric, metric_reason, metric_detail = populate_numeric(
             quantity=quantity,
             candidate=prediction.value,
@@ -4390,8 +4511,15 @@ def compile_residual(
             source_relation=source_relation,
             exclusions=("valid_metric_domain",),
         )
+    # figure_only and reactive-cell-not-modelled keep their numeric band: they
+    # are labels on a predicted quantity, not reasons the reading band is void.
     has_no_band_flag = any(
-        notice.kind is not NoticeKind.CELL_MATERIAL_INFERRED
+        notice.kind
+        not in {
+            NoticeKind.CELL_MATERIAL_INFERRED,
+            NoticeKind.FIGURE_ONLY,
+            NoticeKind.REACTIVE_CELL_NOT_MODELLED,
+        }
         for notice in flagged_notices
     ) or any(
         _is_fusion_conversion_notice(notice) for notice in notices
@@ -4542,12 +4670,23 @@ def load_score_context(
 
 
 def comparison_candidates(context: ScoreContext) -> tuple[Observation, ...]:
-    """Measured evidence, admitted or pending (pending is diagnostic)."""
+    """Measured or figure_only evidence, admitted or pending (pending is diagnostic).
+
+    FIGURE_ONLY rows are candidates (owner mandate: score everything; evidence
+    class is a label). They stay out of the certified/measured headline via
+    the figure_only notice and by not being in MEASURED_EVIDENCE.
+    """
 
     out: list[Observation] = []
     for obs in context.observations.values():
         ev = obs.evidence.class_
-        if not (ev.is_value and ev.value in MEASURED_EVIDENCE):
+        if not (
+            ev.is_value
+            and (
+                ev.value in MEASURED_EVIDENCE
+                or ev.value is EvidenceClass.FIGURE_ONLY
+            )
+        ):
             continue
         if obs.admission.status not in {AdmissionStatus.ADMITTED, AdmissionStatus.PENDING}:
             continue
@@ -5260,6 +5399,25 @@ def _rms(values: Sequence[Decimal]) -> Decimal | None:
     return (sum((value * value for value in values), Decimal(0)) / Decimal(len(values))).sqrt()
 
 
+def _iqr(values: Sequence[Decimal]) -> Decimal | None:
+    """Interquartile range of ``values``; None when fewer than two samples."""
+
+    if len(values) < 2:
+        return None
+    ordered = sorted(values)
+    n = len(ordered)
+
+    def _quartile(p: float) -> Decimal:
+        # Inclusive rank; matches the descriptive IQR used in the report.
+        pos = p * (n - 1)
+        lo = int(pos)
+        hi = min(lo + 1, n - 1)
+        frac = Decimal(str(pos - lo))
+        return ordered[lo] + (ordered[hi] - ordered[lo]) * frac
+
+    return _quartile(0.75) - _quartile(0.25)
+
+
 def _measured_residuals(
     residuals: Sequence[Residual],
     context: ScoreContext | None,
@@ -5309,6 +5467,15 @@ def _compilation_residuals(
         )
         is not None
     ]
+
+
+def _all_numeric_residuals(
+    residuals: Sequence[Residual],
+    context: ScoreContext | None,
+) -> list[Residual]:
+    """Every residual that carries a numeric value, certified and flagged alike."""
+
+    return [residual for residual in residuals if residual.numeric is not None]
 
 
 def _compilation_decision_strata(
@@ -5434,13 +5601,13 @@ def _headline_metric_row(
     bucket: Sequence[Residual],
     *,
     tier: str,
+    context: ScoreContext | None = None,
 ) -> dict[str, object]:
-    if tier == "measured":
+    if tier in {"measured", "compilation", "all_numeric"}:
         # Numeric measured rows remain in the report even when a gate keeps
         # them out of score_eligible. ``n_inside_band`` separates the
         # measured agreement result from those other eligibility gates.
-        scored = [r for r in bucket if r.numeric is not None]
-    elif tier == "compilation":
+        # all_numeric includes certified and flagged alike (b-691).
         scored = [r for r in bucket if r.numeric is not None]
     else:
         raise ValueError(f"unknown headline tier {tier!r}")
@@ -5474,7 +5641,7 @@ def _headline_metric_row(
         match_rate = None
     else:
         match_rate = len(matches) / len(banded)
-    return {
+    row: dict[str, object] = {
         "tier": tier,
         "rail": rail,
         "engine": engine,
@@ -5499,6 +5666,82 @@ def _headline_metric_row(
         "n_no_band": sum(1 for r in scored if r.status is ResidualStatus.NO_BAND),
         "data_scatter_ratio": None if rms_over_band is None else str(rms_over_band),
     }
+    if tier == "all_numeric":
+        iqr = _iqr(dex_values)
+        flag_counts: dict[str, int] = defaultdict(int)
+        for residual in scored:
+            strata = flagged_strata(residual.notices)
+            if not strata:
+                flag_counts["unflagged"] += 1
+            else:
+                for stratum in strata:
+                    flag_counts[stratum] += 1
+        row["iqr_dex"] = None if iqr is None else str(iqr)
+        row["flag_class_counts"] = dict(sorted(flag_counts.items()))
+        row["sources"] = _all_numeric_source_rows(scored, context)
+    return row
+
+
+def _all_numeric_source_rows(
+    scored: Sequence[Residual],
+    context: ScoreContext | None,
+) -> list[dict[str, object]]:
+    """Per-source counts for the all-numeric headline, including zero-certified."""
+
+    if context is None:
+        return []
+    groups: dict[str, dict[str, object]] = {}
+    for residual in scored:
+        observation = context.observations.get(residual.reference)
+        source_id = (
+            observation.source_id
+            if observation is not None and observation.source_id
+            else residual.reference
+        )
+        entry = groups.setdefault(
+            source_id,
+            {
+                "source_id": source_id,
+                "n_numeric": 0,
+                "n_certified": 0,
+                "n_flagged": 0,
+                "flag_class_counts": defaultdict(int),
+            },
+        )
+        entry["n_numeric"] = int(entry["n_numeric"]) + 1
+        strata = flagged_strata(residual.notices)
+        measured = _reference_has_measured_evidence(
+            observation, exclusions=residual.exclusions
+        )
+        from simulator.battery.compilation_tier import compilation_row_observation
+
+        is_compilation = (
+            compilation_row_observation(
+                residual.reference, context.observations, context.origins
+            )
+            is not None
+        )
+        if measured and not strata and not is_compilation:
+            entry["n_certified"] = int(entry["n_certified"]) + 1
+        if strata:
+            entry["n_flagged"] = int(entry["n_flagged"]) + 1
+            counts = entry["flag_class_counts"]
+            assert isinstance(counts, defaultdict)
+            for stratum in strata:
+                counts[stratum] += 1
+    out: list[dict[str, object]] = []
+    for source_id, entry in sorted(groups.items()):
+        counts = entry["flag_class_counts"]
+        out.append(
+            {
+                "source_id": source_id,
+                "n_numeric": entry["n_numeric"],
+                "n_certified": entry["n_certified"],
+                "n_flagged": entry["n_flagged"],
+                "flag_class_counts": dict(sorted(counts.items())),
+            }
+        )
+    return out
 
 
 def headline_rows(
@@ -5510,9 +5753,10 @@ def headline_rows(
 ) -> list[dict[str, object]]:
     """Per rail × engine headline for one tier.
 
-    Measured and compilation rows use numeric residuals for descriptive
-    accuracy. ``score_eligible`` remains a separately reported gate result;
-    compilation rows remain a separate diagnostic tier.
+    Measured (certified) and compilation rows use numeric residuals for
+    descriptive accuracy. ``all_numeric`` is the co-equal headline that keeps
+    flagged rows (b-691). ``score_eligible`` remains a separately reported
+    gate result; compilation rows remain a separate diagnostic tier.
     """
 
     groups: dict[tuple[str, str], list[Residual]] = {}
@@ -5521,6 +5765,8 @@ def headline_rows(
         tier_residuals = _measured_residuals(residuals, context)
     elif tier == "compilation":
         tier_residuals = _compilation_residuals(residuals, context)
+    elif tier == "all_numeric":
+        tier_residuals = _all_numeric_residuals(residuals, context)
     else:
         raise ValueError(f"unknown headline tier {tier!r}")
     for residual in tier_residuals:
@@ -5536,7 +5782,9 @@ def headline_rows(
             groups.setdefault((rail.value, engine), [])
     rows: list[dict[str, object]] = []
     for (rail, engine), bucket in sorted(groups.items()):
-        row = _headline_metric_row(rail, engine, bucket, tier=tier)
+        row = _headline_metric_row(
+            rail, engine, bucket, tier=tier, context=context
+        )
         row["decision_strata"] = (
             _compilation_decision_strata(
                 [
@@ -5603,9 +5851,10 @@ def headline_records(
     context: ScoreContext | None = None,
     engines: Sequence[Engine] | None = None,
 ) -> list[dict[str, object]]:
-    """Machine-readable measured and compilation band-membership records."""
+    """Machine-readable all-numeric, certified, and compilation records."""
 
     return [
+        *headline_rows(residuals, context=context, tier="all_numeric", engines=engines),
         *headline_rows(residuals, context=context, tier="measured", engines=engines),
         *headline_rows(residuals, context=context, tier="compilation", engines=engines),
     ]
@@ -6395,6 +6644,10 @@ def _flagged_payload_strata(row: Mapping[str, object]) -> tuple[str, ...]:
         out.append(FLAGGED_STRATUM_IMCC_COMPLEX_SATURATION)
     if any(_is_fusion_conversion_reason(notice.get("reason")) for notice in notices):
         out.append(FLAGGED_STRATUM_REFERENCE_CONVERTED_VIA_FUSION)
+    if NoticeKind.FIGURE_ONLY.value in kinds:
+        out.append(FLAGGED_STRATUM_FIGURE_ONLY)
+    if NoticeKind.REACTIVE_CELL_NOT_MODELLED.value in kinds:
+        out.append(FLAGGED_STRATUM_REACTIVE_CELL_NOT_MODELLED)
     return tuple(out)
 
 
@@ -7113,7 +7366,7 @@ class _ScorePayloadAccumulator:
         )
         self.headline_groups: dict[
             str, dict[tuple[str, str], dict[str, object]]
-        ] = {"measured": {}, "compilation": {}}
+        ] = {"all_numeric": {}, "measured": {}, "compilation": {}}
         self.report_engine_names: set[str] = set()
         self.count = 0
         self.scored_count = 0
@@ -7410,9 +7663,19 @@ class _ScorePayloadAccumulator:
         exclusions = row.get("exclusions")
         compilation_observation = metadata.observation if metadata.is_compilation else None
         measured = metadata.is_measured
+        rail = str(row.get("rail") or "")
+        if numeric_value is not None and rail:
+            # all_numeric co-equal headline (b-691): every priced residual.
+            self.report_engine_names.add(engine)
+            self._add_headline(
+                row,
+                tier="all_numeric",
+                rail=rail,
+                engine=engine,
+                numeric_value=numeric_value,
+            )
         if measured:
             if _reference_has_measured_evidence(None, exclusions=exclusions):
-                rail = str(row.get("rail") or "")
                 if rail:
                     self.report_engine_names.add(engine)
                     self._add_headline(
@@ -7511,7 +7774,7 @@ class _ScorePayloadAccumulator:
             self.engine_names if engines is None else {engine.value for engine in engines}
         )
         records: list[dict[str, object]] = []
-        for tier in ("measured", "compilation"):
+        for tier in ("all_numeric", "measured", "compilation"):
             groups = self.headline_groups[tier]
             keys = {
                 key for key in groups
