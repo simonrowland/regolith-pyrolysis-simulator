@@ -11,9 +11,12 @@ from pathlib import Path
 
 import pytest
 
-from simulator.battery.enums import NoticeKind
+from simulator.battery.enums import MethodToken, NoticeKind
+from simulator.battery.records import SOURCE_INTERNALLY_INCONSISTENT_REASON_PREFIX
+from simulator.yaml_cache import load_cached_safe_yaml
 from tests.battery.test_migrate import _migrate_real_extract
 
+EXTRACTS = Path(__file__).resolve().parents[2] / "data/literature/extracts"
 EXTRACT = "kems-020-hastie-1981-nbsir.yaml"
 LIVE = "hastie_1981_table2_k_logP_coefficients_quoted_20260906"
 PARENT = "hastie_1981_table2_k_logP_coefficients"
@@ -72,3 +75,39 @@ def test_live_table2_rows_emit_no_source_disagreement_notice(hastie) -> None:
         for notice in obs.notices
         if notice.kind is NoticeKind.SOURCE_DISAGREEMENT
     ]
+
+
+def test_quoted_fits_experiment_carries_transpiration_from_printed_p22(hastie) -> None:
+    experiment = _experiment(hastie, QUOTED_FITS)
+    assert experiment.method.is_value
+    assert experiment.method.value is MethodToken.TRANSPIRATION
+    assert experiment.locator is not None
+    assert experiment.locator.page == 22
+    assert experiment.locator.pdf_page_index == 27
+    assert "TMS technique" in (experiment.locator.paragraph or "")
+
+
+def test_live_table2_row_flags_technique_assignment_ambiguous() -> None:
+    doc = load_cached_safe_yaml((EXTRACTS / EXTRACT).read_text(encoding="utf-8"))
+    row = next(
+        obs
+        for obs in doc["species"]["K"]["observations"]
+        if obs["observation_id"] == LIVE
+    )
+    reason = " ".join(row["reason"].split())
+    assert reason.startswith(
+        SOURCE_INTERNALLY_INCONSISTENT_REASON_PREFIX
+        + " technique_assignment_ambiguous."
+    )
+    assert (
+        'Text p. 22 (PDF p. 28): "The potassium vapor pressure data were '
+        'obtained under neutral conditions using the TMS technique."'
+    ) in reason
+    assert (
+        'Table 2 footnote d, p. 25 (PDF p. 31): "Results obtained by KMS. '
+        'See comments for applicable compositions."'
+    ) in reason
+    # Footnote d text already carried verbatim on the row agrees with the flag.
+    assert row["values"]["footnotes"]["d"].startswith(
+        "Results obtained by KMS. See comments for applicable compositions."
+    )
