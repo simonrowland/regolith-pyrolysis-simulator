@@ -377,7 +377,7 @@ experiments:
 species:
   SiO2:
     observations:
-    - observation_id: sauerborn_2005_mass_loss_series
+    - observation_id: sauerborn_2005_sio2_control_mass_loss_series
       experiment: oxide-reference-series
       type: rate_series
       locator:
@@ -397,7 +397,7 @@ species:
           mass_g: 0.6719
           locator:
             page: 76
-    - observation_id: sauerborn_2005_mass_loss_series_deep2
+    - observation_id: sauerborn_2005_sio2_control_mass_loss_series_deep2
       experiment: oxide-reference-series
       type: rate_series
       locator:
@@ -417,7 +417,7 @@ species:
           mass_g: 0.6719
           locator:
             page: 76
-      supersedes: sauerborn_2005_mass_loss_series::T=1673.15:h=92ce255f810f
+      supersedes: sauerborn_2005_sio2_control_mass_loss_series
   Na:
     observations:
     - observation_id: sauerborn_2005_table21_lunar_soil_element_wt
@@ -615,7 +615,6 @@ species:
         note: no uncertainty printed on the pie; prose K2O 0.82 vs pie 0.8 is source rounding, not transcription
           error
     - observation_id: sauerborn_2005_table41_sample_inventory
-      experiment: jsc1-solar-series
       type: rate_series
       locator:
         table: '4.1'
@@ -1442,7 +1441,6 @@ species:
       uncertainty:
         note: not applicable
     - observation_id: sauerborn_2005_table32_qms_masses
-      experiment: jsc1-solar-series
       type: rate_series
       locator:
         table: '3.2'
@@ -1501,7 +1499,6 @@ species:
       uncertainty:
         note: not applicable
     - observation_id: sauerborn_2005_completeness_ledger
-      experiment: jsc1-solar-series
       type: rate_series
       locator:
         page: 4
@@ -2005,7 +2002,6 @@ species:
         T_K = T_C + 273.15 and pressure_Pa = pressure_mbar * 100. T_range_K endpoints refer to the quoted run-temperature
         cells, not independent measurements.
     - observation_id: sauerborn_2005_table41_sample_inventory_deep2
-      experiment: jsc1-solar-series
       type: rate_series
       locator:
         table: '4.1'
@@ -3380,7 +3376,6 @@ species:
         T_K = T_C + 273.15 and pressure_Pa = pressure_mbar * 100. T_range_K endpoints refer to the quoted run-temperature
         cells, not independent measurements.
     - observation_id: sauerborn_2005_table32_qms_masses_deep2
-      experiment: jsc1-solar-series
       type: rate_series
       locator:
         table: '3.2'
@@ -3523,7 +3518,6 @@ species:
         T_K = T_C + 273.15 and pressure_Pa = pressure_mbar * 100. T_range_K endpoints refer to the quoted run-temperature
         cells, not independent measurements.
     - observation_id: sauerborn_2005_completeness_ledger_deep2
-      experiment: jsc1-solar-series
       type: rate_series
       locator:
         page: 4
@@ -6905,6 +6899,9 @@ deepening:
     effective_class: measured
   - observation_id: sauerborn_2005_mass_loss_series
     superseded_by: sauerborn_2005_mass_loss_series_deep2
+    effective_class: measured
+  - observation_id: sauerborn_2005_sio2_control_mass_loss_series
+    superseded_by: sauerborn_2005_sio2_control_mass_loss_series_deep2
     effective_class: measured
   - observation_id: sauerborn_2005_fig555_o2_reference_normalized
     superseded_by: sauerborn_2005_fig555_o2_reference_normalized_deep2
