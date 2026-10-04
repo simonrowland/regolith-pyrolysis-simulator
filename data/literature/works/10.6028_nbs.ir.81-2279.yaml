@@ -468,44 +468,6 @@ experiments:
     pdf_page_index: 29
     table: '2'
     note: rotated Table 2 ~17[K2O] row; report p. 23
-  apparatus:
-    geometry:
-      orifice_diameter_m:
-        state:
-          tag: value
-          value:
-            kind: point
-            point: '0.00034'
-            approximate: false
-        locator:
-          page: 51
-          section: '15'
-          note: figure captions report pp. 51-53; figures PDF 61-81
-        inference:
-          relation: mm_to_m
-          inputs:
-          - L_m = L_mm / 1000
-          - original_unit=mm
-          - as_published=0.34 mm
-          - printed=orifice_mm
-          parameters:
-          - - original
-            - state:
-                tag: value
-                value: '0.34'
-              locator:
-                page: 51
-                section: '15'
-                note: figure captions report pp. 51-53; figures PDF 61-81
-          - - factor
-            - state:
-                tag: value
-                value: '1000'
-              locator:
-                page: 51
-                section: '15'
-                note: figure captions report pp. 51-53; figures PDF 61-81
-          output_unit: m
 benches:
 - id: 10.6028/nbs.ir.81-2279::bench::hastie-1981-kms
   work_id: 10.6028/nbs.ir.81-2279

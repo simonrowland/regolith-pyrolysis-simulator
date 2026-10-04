@@ -3,7 +3,7 @@
 rows in: 47416
 records out (observations): 121113
 works: 263
-experiments: 3535
+experiments: 3537
 queue size: 76899
 identical-payload dedupe aliases: 342
 metadata files: 39
@@ -24,7 +24,7 @@ hard issues: 3638
 | gibbs_reference_100000 | 1023 | 1029 (mismatch) |
 | gibbs_reference_101325 | 594 | 594 |
 | formulas | 1625 | 2037 (mismatch) |
-| equipment_payloads | 670 | 973 (mismatch) |
+| equipment_payloads | 670 | 972 (mismatch) |
 | absent_admissions | 3511 | 4750 (mismatch) |
 | absent_classes | 2174 | 2205 (mismatch) |
 | range_only_T | 3125 | 2748 (mismatch) |
