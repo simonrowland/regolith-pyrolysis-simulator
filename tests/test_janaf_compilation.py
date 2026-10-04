@@ -30,6 +30,8 @@ from simulator.reference_data.janaf import (
     feedstock_element_symbols,
     formula_composition,
     formula_normalised,
+    _element_reference_gibbs_sign,
+    _gibbs_sign_from_neighbors,
     harvest_era,
     iter_table_paths,
     load_manifest,
@@ -556,6 +558,30 @@ def test_refused_janaf_row_keeps_unsigned_source_line() -> None:
     )
     assert ambiguity["raw_line"] == raw_line
     assert "formation enthalpy neighbors span a transition marker" in ambiguity["reason"]
+
+
+def test_gibbs_sign_continuity_refuses_zero_crossings_and_small_values() -> None:
+    assert _gibbs_sign_from_neighbors(Decimal("10"), Decimal("9")) == 1
+    assert _gibbs_sign_from_neighbors(Decimal("-10"), Decimal("-9")) == -1
+    assert _gibbs_sign_from_neighbors(Decimal("-1"), Decimal("1")) is None
+    # I-013@5000: the closest neighbour is only 0.625 kJ/mol from zero,
+    # while the neighbours differ by 2.075 kJ/mol.
+    assert _gibbs_sign_from_neighbors(Decimal("-0.625"), Decimal("-2.700")) is None
+
+
+def test_element_reference_sign_requires_condensed_single_element_table() -> None:
+    assert _element_reference_gibbs_sign(
+        "O2", "cr", has_zero_reference_interval=True
+    ) == 1
+    assert _element_reference_gibbs_sign(
+        "O2", "g", has_zero_reference_interval=True
+    ) is None
+    assert _element_reference_gibbs_sign(
+        "MgO", "cr", has_zero_reference_interval=True
+    ) is None
+    assert _element_reference_gibbs_sign(
+        "O2", "cr", has_zero_reference_interval=False
+    ) is None
 
 
 def test_unresolved_janaf_tail_identity_stays_in_parse_ambiguities() -> None:
