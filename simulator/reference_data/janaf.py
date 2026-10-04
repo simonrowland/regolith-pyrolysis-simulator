@@ -95,7 +95,6 @@ NIST_TAIL_PARSE_REPAIR = "nist_tail_whitespace_signs_restored"
 NIST_TAIL_DFH_ABSENCE_REPAIR = "nist_tail_dfh_sign_undetermined"
 NIST_TAIL_UNRESOLVED_KIND = "nist_tail_whitespace_signs_unresolved"
 JANAF_R_J_MOL_K = Decimal("8.31441")
-STANDARD_R_J_MOL_K = Decimal("8.314462618")
 # Decimal subscripts are retained. Charge is optional.
 FORMULA_TOKEN_RE = re.compile(r"([A-Z][a-z]?)(\d+(?:\.\d+)?)?")
 CHARGE_RE = re.compile(r"[+-]$")
@@ -361,19 +360,17 @@ def _whitespace_tail_candidate(line_number: int, line: str) -> _LineCandidate | 
 
 def _continuity_sign(
     candidates: list[_LineCandidate],
-    field_index: int,
     temperature: Decimal,
     *,
     line_number: int,
     transition_marker_lines: list[int],
-    require_same_phase: bool = False,
 ) -> tuple[int | None, str | None]:
     neighbors: list[tuple[Decimal, Decimal, int]] = []
     for candidate in candidates:
         candidate_temperature = _candidate_temperature_decimal(candidate)
-        if candidate_temperature is None or field_index >= len(candidate.content):
+        if candidate_temperature is None or len(candidate.content) <= 5:
             continue
-        value = parse_published_number(candidate.content[field_index])
+        value = parse_published_number(candidate.content[5])
         if value is not None:
             neighbors.append(
                 (candidate_temperature, Decimal(str(value)), candidate.line_number)
@@ -386,14 +383,14 @@ def _continuity_sign(
     right = min((item[0], item[1]) for item in after)
     left_line = next(item[2] for item in before if item[:2] == left)
     right_line = next(item[2] for item in after if item[:2] == right)
-    if require_same_phase and any(
+    if any(
         min(line_number, neighbor_line) < marker_line < max(line_number, neighbor_line)
         for neighbor_line in (left_line, right_line)
         for marker_line in transition_marker_lines
     ):
         return None, "formation enthalpy neighbors span a transition marker"
-    left_t, left_value = left
-    right_t, right_value = right
+    _left_t, left_value = left
+    _right_t, right_value = right
     if left_value == 0 or right_value == 0:
         return None, "formation enthalpy neighbor is zero"
     if (left_value > 0) != (right_value > 0):
@@ -558,11 +555,9 @@ def _restore_whitespace_tail_signs(
     enthalpy_sign, enthalpy_reason = (
         _continuity_sign(
             parsed_neighbors,
-            5,
             temperature,
             line_number=candidate.line_number,
             transition_marker_lines=transition_marker_lines,
-            require_same_phase=True,
         )
         if enthalpy_magnitude
         else (0, None)
