@@ -5,6 +5,8 @@ from __future__ import annotations
 import ast
 import importlib.util
 import re
+import subprocess
+import sys
 from pathlib import Path
 
 import pytest
@@ -326,6 +328,46 @@ def test_migrate_pilot_extracts_refuses_when_janaf_unlinked_and_not_rewritten(
         migrate.main()
 
     assert "janaf-4th.yaml" in str(excinfo.value)
+
+
+def test_migrate_pilot_extracts_help_does_not_rewrite_extracts():
+    """b-720: ``python tools/migrate_pilot_extracts.py --help`` must not write.
+
+    Pre-fix the script ignored argv and ran ``main()`` even for ``--help``,
+    which cleared/rewrote pilot extracts in a worker seat. The script roots
+    EXTRACTS at the repo, so we fingerprint that tree around the CLI call.
+    """
+    extracts = REPO_ROOT / "data" / "literature" / "extracts"
+    assert extracts.is_dir()
+    before = {
+        p.name: (p.stat().st_mtime_ns, p.stat().st_size)
+        for p in extracts.glob("*.yaml")
+    }
+
+    migrate = _load_migrate_pilot_extracts()
+    with pytest.raises(SystemExit) as help_exit:
+        migrate._parse_args(["--help"])
+    assert help_exit.value.code == 0
+
+    proc = subprocess.run(
+        [sys.executable, str(REPO_ROOT / "tools" / "migrate_pilot_extracts.py"), "--help"],
+        cwd=REPO_ROOT,
+        capture_output=True,
+        text=True,
+        check=False,
+        timeout=30,
+    )
+    assert proc.returncode == 0, proc.stderr
+    out = proc.stdout.lower()
+    assert "usage:" in out or "pilot migration" in out
+    assert "wrote " not in out
+    assert "cleared " not in out
+
+    after = {
+        p.name: (p.stat().st_mtime_ns, p.stat().st_size)
+        for p in extracts.glob("*.yaml")
+    }
+    assert after == before
 
 
 # The two halves of the guard, when called by hand rather than through the
