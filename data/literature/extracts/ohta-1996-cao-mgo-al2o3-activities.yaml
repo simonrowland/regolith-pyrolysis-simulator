@@ -7,10 +7,11 @@ source:
   year: 1996
   corpus_source_id: ohta-1996-cao-mgo-al2o3-activities
 extraction:
-  method: Manual transcription from 200 dpi pdftoppm renders of the ISIJ PDF plus pdftotext -layout cross-check.
-    Tables transcribed from page images. Iso-activity figures recorded figure_only (not digitised). No invented binary
-    a(CaO) values — authors state CaO iso-activities in the ternary were assessed from reported sulfide capacities coupled
-    with γ(CaS) estimated from CaO-Al2O3 slags (i.e. binary edge partly derived, not an independent binary measurement).
+  method: Manual transcription from 200–300 dpi pdftoppm renders of the ISIJ PDF plus pdftotext -layout/-raw
+    cross-check. Table 1 fully transcribed from page images. Iso-activity figures recorded figure_only (not digitised).
+    No invented binary a(CaO) values — authors state CaO iso-activities in the ternary were assessed from reported
+    sulfide capacities coupled with γ(CaS) estimated from CaO-Al2O3 slags (i.e. binary edge partly derived, not an
+    independent binary measurement).
   date: '2026-10-04'
   worker: empirical-cao-al2o3-slot-04
   provenance_path: ferry-inbox/cao-al2o3-sources/ohta-1996-cao-mgo-al2o3-activities/
@@ -23,6 +24,10 @@ fidelity_samples:
 - path: species.Al2O3.observations[ohta_1996_table1_spinel_sat_compositions].values.rows[0].slag_mass_pct_Al2O3
   value: 57.5
   note: Table 1 first 1873 K slag Al2O3 mass%
+  locator: {published_page: 984, pdf_page_index: 2, table: '1'}
+- path: species.Al2O3.observations[ohta_1996_table1_spinel_sat_compositions].values.row_count
+  value: 10
+  note: full Table 1 row count (6 at 1873 K + 4 at 1823 K)
   locator: {published_page: 984, pdf_page_index: 2, table: '1'}
 species:
   CaO:
@@ -78,35 +83,152 @@ species:
         method_class: measured
         admission_status: admitted
         table_title_as_printed: Table 1. Chemical compositions of metal and slag phases.
-        note: Full row transcription in progress; first rows verified from page image. Slags are spinel-saturated ternary,
-          not binary CaO-Al2O3.
+        columns_as_printed: 'Metal mass ppm: [Al] Sol., [Al] Insol., [Mg], [Ca], [Mn], [O], [S]; Slag: (S) mass ppm; (CaO)(MgO)(Al2O3)(MnO)(FetO) mass pct'
+        row_count: 10
+        note: >-
+          Full Table 1 transcription (10 rows: 6 at 1873 K + 4 at 1823 K) from page image + pdftotext -raw cross-check.
+          Metal [Ca] printed as <0.01 stored as string. Slags are spinel-saturated ternary, not binary CaO-Al2O3. No a(CaO)
+          numbers invented; Fig. 6 remains figure_only.
         rows:
         - T_K: 1873
           metal_Al_sol_ppm: 43.5
+          metal_Al_insol_ppm: 0.0
+          metal_Mg_ppm: 0.3
+          metal_Ca_ppm: '<0.01'
+          metal_Mn_ppm: 982
           metal_O_ppm: 13.3
+          metal_S_ppm: 538
+          slag_S_ppm: 2420
           slag_mass_pct_CaO: 27.4
           slag_mass_pct_MgO: 12.3
           slag_mass_pct_Al2O3: 57.5
           slag_mass_pct_MnO: 0.274
           slag_mass_pct_FetO: 0.959
-          slag_S_ppm: 2420
         - T_K: 1873
           metal_Al_sol_ppm: 21.6
+          metal_Al_insol_ppm: 0.1
+          metal_Mg_ppm: 0.29
+          metal_Ca_ppm: '<0.01'
+          metal_Mn_ppm: 1070
           metal_O_ppm: 10.2
+          metal_S_ppm: 618
+          slag_S_ppm: 3210
           slag_mass_pct_CaO: 30.1
           slag_mass_pct_MgO: 15.4
           slag_mass_pct_Al2O3: 52.3
           slag_mass_pct_MnO: 0.208
           slag_mass_pct_FetO: 2.13
-          slag_S_ppm: 3210
+        - T_K: 1873
+          metal_Al_sol_ppm: 15.0
+          metal_Al_insol_ppm: 2.5
+          metal_Mg_ppm: 0.31
+          metal_Ca_ppm: 0.8
+          metal_Mn_ppm: 274
+          metal_O_ppm: 15.3
+          metal_S_ppm: 802
+          slag_S_ppm: 1370
+          slag_mass_pct_CaO: 26.5
+          slag_mass_pct_MgO: 8.8
+          slag_mass_pct_Al2O3: 62.0
+          slag_mass_pct_MnO: 0.099
+          slag_mass_pct_FetO: 0.855
+        - T_K: 1873
+          metal_Al_sol_ppm: 31.3
+          metal_Al_insol_ppm: 0.0
+          metal_Mg_ppm: 0.31
+          metal_Ca_ppm: '<0.01'
+          metal_Mn_ppm: 1890
+          metal_O_ppm: 21.1
+          metal_S_ppm: 868
+          slag_S_ppm: 2690
+          slag_mass_pct_CaO: 26.8
+          slag_mass_pct_MgO: 9.0
+          slag_mass_pct_Al2O3: 61.4
+          slag_mass_pct_MnO: 0.478
+          slag_mass_pct_FetO: 0.683
+        - T_K: 1873
+          metal_Al_sol_ppm: 93.1
+          metal_Al_insol_ppm: 1.6
+          metal_Mg_ppm: 1.02
+          metal_Ca_ppm: 0.61
+          metal_Mn_ppm: 2990
+          metal_O_ppm: 14.9
+          metal_S_ppm: 845
+          slag_S_ppm: 955
+          slag_mass_pct_CaO: 27.7
+          slag_mass_pct_MgO: 4.1
+          slag_mass_pct_Al2O3: 67.3
+          slag_mass_pct_MnO: 0.485
+          slag_mass_pct_FetO: 0.512
+        - T_K: 1873
+          metal_Al_sol_ppm: 24.1
+          metal_Al_insol_ppm: 2.2
+          metal_Mg_ppm: 0.32
+          metal_Ca_ppm: 0.12
+          metal_Mn_ppm: 908
+          metal_O_ppm: 14.8
+          metal_S_ppm: 435
+          slag_S_ppm: 674
+          slag_mass_pct_CaO: 27.5
+          slag_mass_pct_MgO: 6.6
+          slag_mass_pct_Al2O3: 63.7
+          slag_mass_pct_MnO: 0.781
+          slag_mass_pct_FetO: 1.54
         - T_K: 1823
           metal_Al_sol_ppm: 29.6
+          metal_Al_insol_ppm: 0.0
+          metal_Mg_ppm: 0.37
+          metal_Ca_ppm: 0.52
+          metal_Mn_ppm: 212
           metal_O_ppm: 15.0
+          metal_S_ppm: 556
+          slag_S_ppm: 1570
           slag_mass_pct_CaO: 31.9
           slag_mass_pct_MgO: 9.0
           slag_mass_pct_Al2O3: 56.5
-          slag_mass_pct_MnO: 0.060
+          slag_mass_pct_MnO: 0.06
           slag_mass_pct_FetO: 0.726
-          slag_S_ppm: 1570
-      quote: 'Table 1 (excerpt): 1873 K slag (CaO 27.4, MgO 12.3, Al2O3 57.5 mass%); 1823 K slag (CaO 31.9, MgO 9.0, Al2O3 56.5
-        mass%).'
+        - T_K: 1823
+          metal_Al_sol_ppm: 27.7
+          metal_Al_insol_ppm: 0.3
+          metal_Mg_ppm: 1.01
+          metal_Ca_ppm: '<0.01'
+          metal_Mn_ppm: 817
+          metal_O_ppm: 10.4
+          metal_S_ppm: 649
+          slag_S_ppm: 1960
+          slag_mass_pct_CaO: 31.6
+          slag_mass_pct_MgO: 10.5
+          slag_mass_pct_Al2O3: 55.6
+          slag_mass_pct_MnO: 0.385
+          slag_mass_pct_FetO: 1.72
+        - T_K: 1823
+          metal_Al_sol_ppm: 27.7
+          metal_Al_insol_ppm: 0.2
+          metal_Mg_ppm: 0.12
+          metal_Ca_ppm: '<0.01'
+          metal_Mn_ppm: 3710
+          metal_O_ppm: 3.5
+          metal_S_ppm: 483
+          slag_S_ppm: 1330
+          slag_mass_pct_CaO: 30.6
+          slag_mass_pct_MgO: 7.0
+          slag_mass_pct_Al2O3: 60.0
+          slag_mass_pct_MnO: 0.853
+          slag_mass_pct_FetO: 0.774
+        - T_K: 1823
+          metal_Al_sol_ppm: 8.0
+          metal_Al_insol_ppm: 0.2
+          metal_Mg_ppm: 0.29
+          metal_Ca_ppm: 0.54
+          metal_Mn_ppm: 181
+          metal_O_ppm: 34.1
+          metal_S_ppm: 1110
+          slag_S_ppm: 1180
+          slag_mass_pct_CaO: 32.3
+          slag_mass_pct_MgO: 8.4
+          slag_mass_pct_Al2O3: 56.9
+          slag_mass_pct_MnO: 0.086
+          slag_mass_pct_FetO: 1.86
+      quote: 'Table 1 (full): 1873 K n=6 spinel-sat slag rows (e.g. CaO 27.4 / MgO 12.3 / Al2O3 57.5 mass%); 1823 K n=4
+        (e.g. CaO 31.9 / MgO 9.0 / Al2O3 56.5 mass%).'
