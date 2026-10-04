@@ -18,12 +18,12 @@ compilation_role:
   circularity_warning: Do not validate an engine against a compilation it consumes.
 extraction:
   method: machine parse of NIST tab-delimited table download; source bytes cached unchanged
-  date: '2026-09-06'
   user_agent: RegolithPyrolysisSimulator-corpus-harvester/1.0 (public thermochemical reference-data research; polite cached
     client)
   source_cache_path: /Users/simonrowland/Library/CloudStorage/Dropbox/Starship Mission Design/Regolith Processing/regolith-pyrolysis-simulator/docs-private/research/2026-08-09-upstream-mission/IMCC-impl/janaf-mirror/Cl/Cl-047.txt
   source_sha256: fc6508837c43b374a2c8262bc2166a98ebd5095ad120130a10a475b4e326b3a8
   review_status: machine_transcribed_unreviewed
+  date: '2026-09-06'
 table:
   table_id: Cl-047
   url: https://janaf.nist.gov/tables/Cl-047.html
@@ -551,6 +551,87 @@ table:
         download_url: https://janaf.nist.gov/tables/Cl-047.txt
         row_temperature_as_published: '500'
         column: log Kf
+  - temperature:
+      value: 600.0
+      as_published: '600'
+      locator:
+        table_id: Cl-047
+        url: https://janaf.nist.gov/tables/Cl-047.html
+        download_url: https://janaf.nist.gov/tables/Cl-047.txt
+        row_temperature_as_published: '600'
+        column: T(K)
+    heat_capacity:
+      value: 161.084
+      as_published: '161.084'
+      locator:
+        table_id: Cl-047
+        url: https://janaf.nist.gov/tables/Cl-047.html
+        download_url: https://janaf.nist.gov/tables/Cl-047.txt
+        row_temperature_as_published: '600'
+        column: Cp
+    entropy:
+      value: 277.263
+      as_published: '277.263'
+      locator:
+        table_id: Cl-047
+        url: https://janaf.nist.gov/tables/Cl-047.html
+        download_url: https://janaf.nist.gov/tables/Cl-047.txt
+        row_temperature_as_published: '600'
+        column: S
+    negative_gibbs_enthalpy_function:
+      value: 196.224
+      as_published: '196.224'
+      locator:
+        table_id: Cl-047
+        url: https://janaf.nist.gov/tables/Cl-047.html
+        download_url: https://janaf.nist.gov/tables/Cl-047.txt
+        row_temperature_as_published: '600'
+        column: -[G-H(Tr)]/T
+    enthalpy_increment:
+      value: 48.623
+      as_published: '48.623'
+      locator:
+        table_id: Cl-047
+        url: https://janaf.nist.gov/tables/Cl-047.html
+        download_url: https://janaf.nist.gov/tables/Cl-047.txt
+        row_temperature_as_published: '600'
+        column: H-H(Tr)
+    formation_enthalpy:
+      value: -345.15
+      as_published: '345.150'
+      locator:
+        table_id: Cl-047
+        url: https://janaf.nist.gov/tables/Cl-047.html
+        download_url: https://janaf.nist.gov/tables/Cl-047.txt
+        row_temperature_as_published: '600'
+        column: delta-f H
+        parse_repair: nist_tail_whitespace_signs_restored
+        line_number: 11
+        raw_line: "600\t161.084\t277.263\t196.224\t48.623\t345.150  132.242 11.513"
+    formation_gibbs_energy:
+      value: -132.242
+      as_published: '132.242'
+      locator:
+        table_id: Cl-047
+        url: https://janaf.nist.gov/tables/Cl-047.html
+        download_url: https://janaf.nist.gov/tables/Cl-047.txt
+        row_temperature_as_published: '600'
+        column: delta-f G
+        parse_repair: nist_tail_whitespace_signs_restored
+        line_number: 11
+        raw_line: "600\t161.084\t277.263\t196.224\t48.623\t345.150  132.242 11.513"
+    log10_formation_equilibrium_constant:
+      value: 11.513
+      as_published: '11.513'
+      locator:
+        table_id: Cl-047
+        url: https://janaf.nist.gov/tables/Cl-047.html
+        download_url: https://janaf.nist.gov/tables/Cl-047.txt
+        row_temperature_as_published: '600'
+        column: log Kf
+        parse_repair: nist_tail_whitespace_signs_restored
+        line_number: 11
+        raw_line: "600\t161.084\t277.263\t196.224\t48.623\t345.150  132.242 11.513"
   - temperature:
       value: 700.0
       as_published: '700'
@@ -1202,12 +1283,6 @@ table:
   parse_ambiguities:
   - line_number: 10
     raw_line: "509.000\t161.084\t250.767\t184.039\t33.965\tCRYSTAL <--> LIQUID"
-    reason: expected 8 tab-separated values; found 6
-    locator:
-      table_id: Cl-047
-      url: https://janaf.nist.gov/tables/Cl-047.html
-  - line_number: 11
-    raw_line: "600\t161.084\t277.263\t196.224\t48.623\t345.150  132.242 11.513"
     reason: expected 8 tab-separated values; found 6
     locator:
       table_id: Cl-047

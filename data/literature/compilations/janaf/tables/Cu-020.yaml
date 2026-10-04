@@ -18,12 +18,12 @@ compilation_role:
   circularity_warning: Do not validate an engine against a compilation it consumes.
 extraction:
   method: machine parse of NIST tab-delimited table download; source bytes cached unchanged
-  date: '2026-09-06'
   user_agent: RegolithPyrolysisSimulator-corpus-harvester/1.0 (public thermochemical reference-data research; polite cached
     client)
   source_cache_path: /Users/simonrowland/Library/CloudStorage/Dropbox/Starship Mission Design/Regolith Processing/regolith-pyrolysis-simulator/docs-private/research/2026-08-09-upstream-mission/IMCC-impl/janaf-mirror/Cu/Cu-020.txt
   source_sha256: 973b32867fe099ee38615c87298ae0231e65097c5e7614cc7f2e9adb3a8d4e92
   review_status: machine_transcribed_unreviewed
+  date: '2026-09-06'
 table:
   table_id: Cu-020
   url: https://janaf.nist.gov/tables/Cu-020.html
@@ -1272,6 +1272,87 @@ table:
         row_temperature_as_published: '1500'
         column: log Kf
   - temperature:
+      value: 1600.0
+      as_published: '1600'
+      locator:
+        table_id: Cu-020
+        url: https://janaf.nist.gov/tables/Cu-020.html
+        download_url: https://janaf.nist.gov/tables/Cu-020.txt
+        row_temperature_as_published: '1600'
+        column: T(K)
+    heat_capacity:
+      value: 99.914
+      as_published: '99.914'
+      locator:
+        table_id: Cu-020
+        url: https://janaf.nist.gov/tables/Cu-020.html
+        download_url: https://janaf.nist.gov/tables/Cu-020.txt
+        row_temperature_as_published: '1600'
+        column: Cp
+    entropy:
+      value: 264.163
+      as_published: '264.163'
+      locator:
+        table_id: Cu-020
+        url: https://janaf.nist.gov/tables/Cu-020.html
+        download_url: https://janaf.nist.gov/tables/Cu-020.txt
+        row_temperature_as_published: '1600'
+        column: S
+    negative_gibbs_enthalpy_function:
+      value: 194.298
+      as_published: '194.298'
+      locator:
+        table_id: Cu-020
+        url: https://janaf.nist.gov/tables/Cu-020.html
+        download_url: https://janaf.nist.gov/tables/Cu-020.txt
+        row_temperature_as_published: '1600'
+        column: -[G-H(Tr)]/T
+    enthalpy_increment:
+      value: 111.785
+      as_published: '111.785'
+      locator:
+        table_id: Cu-020
+        url: https://janaf.nist.gov/tables/Cu-020.html
+        download_url: https://janaf.nist.gov/tables/Cu-020.txt
+        row_temperature_as_published: '1600'
+        column: H-H(Tr)
+    formation_enthalpy:
+      value: -123.836
+      as_published: '123.836'
+      locator:
+        table_id: Cu-020
+        url: https://janaf.nist.gov/tables/Cu-020.html
+        download_url: https://janaf.nist.gov/tables/Cu-020.txt
+        row_temperature_as_published: '1600'
+        column: delta-f H
+        parse_repair: nist_tail_whitespace_signs_restored
+        line_number: 24
+        raw_line: "1600\t99.914\t264.163\t194.298\t111.785\t123.836  52.197 1.704"
+    formation_gibbs_energy:
+      value: -52.197
+      as_published: '52.197'
+      locator:
+        table_id: Cu-020
+        url: https://janaf.nist.gov/tables/Cu-020.html
+        download_url: https://janaf.nist.gov/tables/Cu-020.txt
+        row_temperature_as_published: '1600'
+        column: delta-f G
+        parse_repair: nist_tail_whitespace_signs_restored
+        line_number: 24
+        raw_line: "1600\t99.914\t264.163\t194.298\t111.785\t123.836  52.197 1.704"
+    log10_formation_equilibrium_constant:
+      value: 1.704
+      as_published: '1.704'
+      locator:
+        table_id: Cu-020
+        url: https://janaf.nist.gov/tables/Cu-020.html
+        download_url: https://janaf.nist.gov/tables/Cu-020.txt
+        row_temperature_as_published: '1600'
+        column: log Kf
+        parse_repair: nist_tail_whitespace_signs_restored
+        line_number: 24
+        raw_line: "1600\t99.914\t264.163\t194.298\t111.785\t123.836  52.197 1.704"
+  - temperature:
       value: 1700.0
       as_published: '1700'
       locator:
@@ -1569,10 +1650,10 @@ table:
   - line_number: 16
     raw_line: "+\t"
     reason: non-data marker line; no numeric thermochemical token
-    kind: non_data_marker
     locator:
       table_id: Cu-020
       url: https://janaf.nist.gov/tables/Cu-020.html
+    kind: non_data_marker
   - line_number: 17
     raw_line: "1000.000\t99.914\t217.203\t165.367\t51.837\tTRANSITION"
     reason: expected 8 tab-separated values; found 6
@@ -1581,12 +1662,6 @@ table:
       url: https://janaf.nist.gov/tables/Cu-020.html
   - line_number: 23
     raw_line: "1516.700\t99.914\t258.821\t190.606\t103.462\tCRYSTAL <--> LIQUID"
-    reason: expected 8 tab-separated values; found 6
-    locator:
-      table_id: Cu-020
-      url: https://janaf.nist.gov/tables/Cu-020.html
-  - line_number: 24
-    raw_line: "1600\t99.914\t264.163\t194.298\t111.785\t123.836  52.197 1.704"
     reason: expected 8 tab-separated values; found 6
     locator:
       table_id: Cu-020

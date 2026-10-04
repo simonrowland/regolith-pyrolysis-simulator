@@ -18,12 +18,12 @@ compilation_role:
   circularity_warning: Do not validate an engine against a compilation it consumes.
 extraction:
   method: machine parse of NIST tab-delimited table download; source bytes cached unchanged
-  date: '2026-09-06'
   user_agent: RegolithPyrolysisSimulator-corpus-harvester/1.0 (public thermochemical reference-data research; polite cached
     client)
   source_cache_path: /Users/simonrowland/Library/CloudStorage/Dropbox/Starship Mission Design/Regolith Processing/regolith-pyrolysis-simulator/docs-private/research/2026-08-09-upstream-mission/IMCC-impl/janaf-mirror/Ba/Ba-003.txt
   source_sha256: e458778048c0cd4c6dd96dbb97d8f68da03f7f986a554b6c3b3465769fba16b9
   review_status: machine_transcribed_unreviewed
+  date: '2026-09-06'
 table:
   table_id: Ba-003
   url: https://janaf.nist.gov/tables/Ba-003.html
@@ -1128,6 +1128,87 @@ table:
         row_temperature_as_published: '1000'
         column: log Kf
   - temperature:
+      value: 1100.0
+      as_published: '1100'
+      locator:
+        table_id: Ba-003
+        url: https://janaf.nist.gov/tables/Ba-003.html
+        download_url: https://janaf.nist.gov/tables/Ba-003.txt
+        row_temperature_as_published: '1100'
+        column: T(K)
+    heat_capacity:
+      value: 42.007
+      as_published: '42.007'
+      locator:
+        table_id: Ba-003
+        url: https://janaf.nist.gov/tables/Ba-003.html
+        download_url: https://janaf.nist.gov/tables/Ba-003.txt
+        row_temperature_as_published: '1100'
+        column: Cp
+    entropy:
+      value: 120.657
+      as_published: '120.657'
+      locator:
+        table_id: Ba-003
+        url: https://janaf.nist.gov/tables/Ba-003.html
+        download_url: https://janaf.nist.gov/tables/Ba-003.txt
+        row_temperature_as_published: '1100'
+        column: S
+    negative_gibbs_enthalpy_function:
+      value: 89.062
+      as_published: '89.062'
+      locator:
+        table_id: Ba-003
+        url: https://janaf.nist.gov/tables/Ba-003.html
+        download_url: https://janaf.nist.gov/tables/Ba-003.txt
+        row_temperature_as_published: '1100'
+        column: -[G-H(Tr)]/T
+    enthalpy_increment:
+      value: 34.755
+      as_published: '34.755'
+      locator:
+        table_id: Ba-003
+        url: https://janaf.nist.gov/tables/Ba-003.html
+        download_url: https://janaf.nist.gov/tables/Ba-003.txt
+        row_temperature_as_published: '1100'
+        column: H-H(Tr)
+    formation_enthalpy:
+      value: 0.0
+      as_published: '0.'
+      locator:
+        table_id: Ba-003
+        url: https://janaf.nist.gov/tables/Ba-003.html
+        download_url: https://janaf.nist.gov/tables/Ba-003.txt
+        row_temperature_as_published: '1100'
+        column: delta-f H
+        parse_repair: nist_tail_whitespace_signs_restored
+        line_number: 22
+        raw_line: "1100\t42.007\t120.657\t89.062\t34.755\t0. 0. 0."
+    formation_gibbs_energy:
+      value: 0.0
+      as_published: '0.'
+      locator:
+        table_id: Ba-003
+        url: https://janaf.nist.gov/tables/Ba-003.html
+        download_url: https://janaf.nist.gov/tables/Ba-003.txt
+        row_temperature_as_published: '1100'
+        column: delta-f G
+        parse_repair: nist_tail_whitespace_signs_restored
+        line_number: 22
+        raw_line: "1100\t42.007\t120.657\t89.062\t34.755\t0. 0. 0."
+    log10_formation_equilibrium_constant:
+      value: 0.0
+      as_published: '0.'
+      locator:
+        table_id: Ba-003
+        url: https://janaf.nist.gov/tables/Ba-003.html
+        download_url: https://janaf.nist.gov/tables/Ba-003.txt
+        row_temperature_as_published: '1100'
+        column: log Kf
+        parse_repair: nist_tail_whitespace_signs_restored
+        line_number: 22
+        raw_line: "1100\t42.007\t120.657\t89.062\t34.755\t0. 0. 0."
+  - temperature:
       value: 1200.0
       as_published: '1200'
       locator:
@@ -1847,6 +1928,87 @@ table:
         download_url: https://janaf.nist.gov/tables/Ba-003.txt
         row_temperature_as_published: '2100'
         column: log Kf
+  - temperature:
+      value: 2200.0
+      as_published: '2200'
+      locator:
+        table_id: Ba-003
+        url: https://janaf.nist.gov/tables/Ba-003.html
+        download_url: https://janaf.nist.gov/tables/Ba-003.txt
+        row_temperature_as_published: '2200'
+        column: T(K)
+    heat_capacity:
+      value: 41.539
+      as_published: '41.539'
+      locator:
+        table_id: Ba-003
+        url: https://janaf.nist.gov/tables/Ba-003.html
+        download_url: https://janaf.nist.gov/tables/Ba-003.txt
+        row_temperature_as_published: '2200'
+        column: Cp
+    entropy:
+      value: 148.168
+      as_published: '148.168'
+      locator:
+        table_id: Ba-003
+        url: https://janaf.nist.gov/tables/Ba-003.html
+        download_url: https://janaf.nist.gov/tables/Ba-003.txt
+        row_temperature_as_published: '2200'
+        column: S
+    negative_gibbs_enthalpy_function:
+      value: 112.555
+      as_published: '112.555'
+      locator:
+        table_id: Ba-003
+        url: https://janaf.nist.gov/tables/Ba-003.html
+        download_url: https://janaf.nist.gov/tables/Ba-003.txt
+        row_temperature_as_published: '2200'
+        column: -[G-H(Tr)]/T
+    enthalpy_increment:
+      value: 78.348
+      as_published: '78.348'
+      locator:
+        table_id: Ba-003
+        url: https://janaf.nist.gov/tables/Ba-003.html
+        download_url: https://janaf.nist.gov/tables/Ba-003.txt
+        row_temperature_as_published: '2200'
+        column: H-H(Tr)
+    formation_enthalpy:
+      value: -139.52
+      as_published: '139.520'
+      locator:
+        table_id: Ba-003
+        url: https://janaf.nist.gov/tables/Ba-003.html
+        download_url: https://janaf.nist.gov/tables/Ba-003.txt
+        row_temperature_as_published: '2200'
+        column: delta-f H
+        parse_repair: nist_tail_whitespace_signs_restored
+        line_number: 34
+        raw_line: "2200\t41.539\t148.168\t112.555\t78.348\t139.520 5.375  0.128"
+    formation_gibbs_energy:
+      value: 5.375
+      as_published: '5.375'
+      locator:
+        table_id: Ba-003
+        url: https://janaf.nist.gov/tables/Ba-003.html
+        download_url: https://janaf.nist.gov/tables/Ba-003.txt
+        row_temperature_as_published: '2200'
+        column: delta-f G
+        parse_repair: nist_tail_whitespace_signs_restored
+        line_number: 34
+        raw_line: "2200\t41.539\t148.168\t112.555\t78.348\t139.520 5.375  0.128"
+    log10_formation_equilibrium_constant:
+      value: -0.128
+      as_published: '0.128'
+      locator:
+        table_id: Ba-003
+        url: https://janaf.nist.gov/tables/Ba-003.html
+        download_url: https://janaf.nist.gov/tables/Ba-003.txt
+        row_temperature_as_published: '2200'
+        column: log Kf
+        parse_repair: nist_tail_whitespace_signs_restored
+        line_number: 34
+        raw_line: "2200\t41.539\t148.168\t112.555\t78.348\t139.520 5.375  0.128"
   - temperature:
       value: 2300.0
       as_published: '2300'
@@ -2793,10 +2955,10 @@ table:
   - line_number: 14
     raw_line: "+\t"
     reason: non-data marker line; no numeric thermochemical token
-    kind: non_data_marker
     locator:
       table_id: Ba-003
       url: https://janaf.nist.gov/tables/Ba-003.html
+    kind: non_data_marker
   - line_number: 15
     raw_line: "580.000\t51.120\t90.849\t72.242\t10.792\tTRANSITION"
     reason: expected 8 tab-separated values; found 6
@@ -2809,20 +2971,8 @@ table:
     locator:
       table_id: Ba-003
       url: https://janaf.nist.gov/tables/Ba-003.html
-  - line_number: 22
-    raw_line: "1100\t42.007\t120.657\t89.062\t34.755\t0. 0. 0."
-    reason: expected 8 tab-separated values; found 6
-    locator:
-      table_id: Ba-003
-      url: https://janaf.nist.gov/tables/Ba-003.html
   - line_number: 33
     raw_line: "2118.599\t40.692\t146.618\t111.217\t75.002\tFUGACITY = 1 bar"
-    reason: expected 8 tab-separated values; found 6
-    locator:
-      table_id: Ba-003
-      url: https://janaf.nist.gov/tables/Ba-003.html
-  - line_number: 34
-    raw_line: "2200\t41.539\t148.168\t112.555\t78.348\t139.520 5.375  0.128"
     reason: expected 8 tab-separated values; found 6
     locator:
       table_id: Ba-003

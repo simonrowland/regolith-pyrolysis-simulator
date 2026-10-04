@@ -18,12 +18,12 @@ compilation_role:
   circularity_warning: Do not validate an engine against a compilation it consumes.
 extraction:
   method: machine parse of NIST tab-delimited table download; source bytes cached unchanged
-  date: '2026-09-06'
   user_agent: RegolithPyrolysisSimulator-corpus-harvester/1.0 (public thermochemical reference-data research; polite cached
     client)
   source_cache_path: /Users/simonrowland/Library/CloudStorage/Dropbox/Starship Mission Design/Regolith Processing/regolith-pyrolysis-simulator/docs-private/research/2026-08-09-upstream-mission/IMCC-impl/janaf-mirror/Mo/Mo-019.txt
   source_sha256: 24f62597eb48d60822b19fa0eb86063d8cec01ae5542b147e082979d066e4d25
   review_status: machine_transcribed_unreviewed
+  date: '2026-09-06'
 table:
   table_id: Mo-019
   url: https://janaf.nist.gov/tables/Mo-019.html
@@ -1632,6 +1632,87 @@ table:
         row_temperature_as_published: '2000'
         column: log Kf
   - temperature:
+      value: 2100.0
+      as_published: '2100'
+      locator:
+        table_id: Mo-019
+        url: https://janaf.nist.gov/tables/Mo-019.html
+        download_url: https://janaf.nist.gov/tables/Mo-019.txt
+        row_temperature_as_published: '2100'
+        column: T(K)
+    heat_capacity:
+      value: 179.309
+      as_published: '179.309'
+      locator:
+        table_id: Mo-019
+        url: https://janaf.nist.gov/tables/Mo-019.html
+        download_url: https://janaf.nist.gov/tables/Mo-019.txt
+        row_temperature_as_published: '2100'
+        column: Cp
+    entropy:
+      value: 384.376
+      as_published: '384.376'
+      locator:
+        table_id: Mo-019
+        url: https://janaf.nist.gov/tables/Mo-019.html
+        download_url: https://janaf.nist.gov/tables/Mo-019.txt
+        row_temperature_as_published: '2100'
+        column: S
+    negative_gibbs_enthalpy_function:
+      value: 257.142
+      as_published: '257.142'
+      locator:
+        table_id: Mo-019
+        url: https://janaf.nist.gov/tables/Mo-019.html
+        download_url: https://janaf.nist.gov/tables/Mo-019.txt
+        row_temperature_as_published: '2100'
+        column: -[G-H(Tr)]/T
+    enthalpy_increment:
+      value: 267.19
+      as_published: '267.190'
+      locator:
+        table_id: Mo-019
+        url: https://janaf.nist.gov/tables/Mo-019.html
+        download_url: https://janaf.nist.gov/tables/Mo-019.txt
+        row_temperature_as_published: '2100'
+        column: H-H(Tr)
+    formation_enthalpy:
+      value: -543.184
+      as_published: '543.184'
+      locator:
+        table_id: Mo-019
+        url: https://janaf.nist.gov/tables/Mo-019.html
+        download_url: https://janaf.nist.gov/tables/Mo-019.txt
+        row_temperature_as_published: '2100'
+        column: delta-f H
+        parse_repair: nist_tail_whitespace_signs_restored
+        line_number: 26
+        raw_line: "2100\t179.309\t384.376\t257.142\t267.190\t543.184  54.601 1.358"
+    formation_gibbs_energy:
+      value: -54.601
+      as_published: '54.601'
+      locator:
+        table_id: Mo-019
+        url: https://janaf.nist.gov/tables/Mo-019.html
+        download_url: https://janaf.nist.gov/tables/Mo-019.txt
+        row_temperature_as_published: '2100'
+        column: delta-f G
+        parse_repair: nist_tail_whitespace_signs_restored
+        line_number: 26
+        raw_line: "2100\t179.309\t384.376\t257.142\t267.190\t543.184  54.601 1.358"
+    log10_formation_equilibrium_constant:
+      value: 1.358
+      as_published: '1.358'
+      locator:
+        table_id: Mo-019
+        url: https://janaf.nist.gov/tables/Mo-019.html
+        download_url: https://janaf.nist.gov/tables/Mo-019.txt
+        row_temperature_as_published: '2100'
+        column: log Kf
+        parse_repair: nist_tail_whitespace_signs_restored
+        line_number: 26
+        raw_line: "2100\t179.309\t384.376\t257.142\t267.190\t543.184  54.601 1.358"
+  - temperature:
       value: 2200.0
       as_published: '2200'
       locator:
@@ -1850,12 +1931,6 @@ table:
   parse_ambiguities:
   - line_number: 25
     raw_line: "2080.000\t178.645\t382.663\t255.927\t263.610\tCRYSTAL <--> LIQUID"
-    reason: expected 8 tab-separated values; found 6
-    locator:
-      table_id: Mo-019
-      url: https://janaf.nist.gov/tables/Mo-019.html
-  - line_number: 26
-    raw_line: "2100\t179.309\t384.376\t257.142\t267.190\t543.184  54.601 1.358"
     reason: expected 8 tab-separated values; found 6
     locator:
       table_id: Mo-019

@@ -18,12 +18,12 @@ compilation_role:
   circularity_warning: Do not validate an engine against a compilation it consumes.
 extraction:
   method: machine parse of NIST tab-delimited table download; source bytes cached unchanged
-  date: '2026-09-06'
   user_agent: RegolithPyrolysisSimulator-corpus-harvester/1.0 (public thermochemical reference-data research; polite cached
     client)
   source_cache_path: /Users/simonrowland/Library/CloudStorage/Dropbox/Starship Mission Design/Regolith Processing/regolith-pyrolysis-simulator/docs-private/research/2026-08-09-upstream-mission/IMCC-impl/janaf-mirror/H/H-014.txt
   source_sha256: eef7408adb358360535bd2a0f7f92e7eddd4e38547eb9683bddddf75853164a6
   review_status: machine_transcribed_unreviewed
+  date: '2026-09-06'
 table:
   table_id: H-014
   url: https://janaf.nist.gov/tables/H-014.html
@@ -840,6 +840,87 @@ table:
         row_temperature_as_published: '900'
         column: log Kf
   - temperature:
+      value: 1000.0
+      as_published: '1000'
+      locator:
+        table_id: H-014
+        url: https://janaf.nist.gov/tables/H-014.html
+        download_url: https://janaf.nist.gov/tables/H-014.txt
+        row_temperature_as_published: '1000'
+        column: T(K)
+    heat_capacity:
+      value: 68.028
+      as_published: '68.028'
+      locator:
+        table_id: H-014
+        url: https://janaf.nist.gov/tables/H-014.html
+        download_url: https://janaf.nist.gov/tables/H-014.txt
+        row_temperature_as_published: '1000'
+        column: Cp
+    entropy:
+      value: 74.361
+      as_published: '74.361'
+      locator:
+        table_id: H-014
+        url: https://janaf.nist.gov/tables/H-014.html
+        download_url: https://janaf.nist.gov/tables/H-014.txt
+        row_temperature_as_published: '1000'
+        column: S
+    negative_gibbs_enthalpy_function:
+      value: 40.111
+      as_published: '40.111'
+      locator:
+        table_id: H-014
+        url: https://janaf.nist.gov/tables/H-014.html
+        download_url: https://janaf.nist.gov/tables/H-014.txt
+        row_temperature_as_published: '1000'
+        column: -[G-H(Tr)]/T
+    enthalpy_increment:
+      value: 34.25
+      as_published: '34.250'
+      locator:
+        table_id: H-014
+        url: https://janaf.nist.gov/tables/H-014.html
+        download_url: https://janaf.nist.gov/tables/H-014.txt
+        row_temperature_as_published: '1000'
+        column: H-H(Tr)
+    formation_enthalpy:
+      value: -89.876
+      as_published: '89.876'
+      locator:
+        table_id: H-014
+        url: https://janaf.nist.gov/tables/H-014.html
+        download_url: https://janaf.nist.gov/tables/H-014.txt
+        row_temperature_as_published: '1000'
+        column: delta-f H
+        parse_repair: nist_tail_whitespace_signs_restored
+        line_number: 15
+        raw_line: "1000\t68.028\t74.361\t40.111\t34.250\t89.876  11.022 0.576"
+    formation_gibbs_energy:
+      value: -11.022
+      as_published: '11.022'
+      locator:
+        table_id: H-014
+        url: https://janaf.nist.gov/tables/H-014.html
+        download_url: https://janaf.nist.gov/tables/H-014.txt
+        row_temperature_as_published: '1000'
+        column: delta-f G
+        parse_repair: nist_tail_whitespace_signs_restored
+        line_number: 15
+        raw_line: "1000\t68.028\t74.361\t40.111\t34.250\t89.876  11.022 0.576"
+    log10_formation_equilibrium_constant:
+      value: 0.576
+      as_published: '0.576'
+      locator:
+        table_id: H-014
+        url: https://janaf.nist.gov/tables/H-014.html
+        download_url: https://janaf.nist.gov/tables/H-014.txt
+        row_temperature_as_published: '1000'
+        column: log Kf
+        parse_repair: nist_tail_whitespace_signs_restored
+        line_number: 15
+        raw_line: "1000\t68.028\t74.361\t40.111\t34.250\t89.876  11.022 0.576"
+  - temperature:
       value: 1100.0
       as_published: '1100'
       locator:
@@ -1202,12 +1283,6 @@ table:
   parse_ambiguities:
   - line_number: 14
     raw_line: "961.800\t65.985\t71.751\t38.802\t31.690\tCRYSTAL <--> LIQUID"
-    reason: expected 8 tab-separated values; found 6
-    locator:
-      table_id: H-014
-      url: https://janaf.nist.gov/tables/H-014.html
-  - line_number: 15
-    raw_line: "1000\t68.028\t74.361\t40.111\t34.250\t89.876  11.022 0.576"
     reason: expected 8 tab-separated values; found 6
     locator:
       table_id: H-014

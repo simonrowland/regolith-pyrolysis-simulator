@@ -18,12 +18,12 @@ compilation_role:
   circularity_warning: Do not validate an engine against a compilation it consumes.
 extraction:
   method: machine parse of NIST tab-delimited table download; source bytes cached unchanged
-  date: '2026-09-06'
   user_agent: RegolithPyrolysisSimulator-corpus-harvester/1.0 (public thermochemical reference-data research; polite cached
     client)
   source_cache_path: /Users/simonrowland/Library/CloudStorage/Dropbox/Starship Mission Design/Regolith Processing/regolith-pyrolysis-simulator/docs-private/research/2026-08-09-upstream-mission/IMCC-impl/janaf-mirror/Nb/Nb-017.txt
   source_sha256: fdd67d8fab54161150445c8f9dd787f0c4237d10833d39301f6436e668156bf9
   review_status: machine_transcribed_unreviewed
+  date: '2026-09-06'
 table:
   table_id: Nb-017
   url: https://janaf.nist.gov/tables/Nb-017.html
@@ -1415,6 +1415,87 @@ table:
         download_url: https://janaf.nist.gov/tables/Nb-017.txt
         row_temperature_as_published: '1700'
         column: log Kf
+  - temperature:
+      value: 1800.0
+      as_published: '1800'
+      locator:
+        table_id: Nb-017
+        url: https://janaf.nist.gov/tables/Nb-017.html
+        download_url: https://janaf.nist.gov/tables/Nb-017.txt
+        row_temperature_as_published: '1800'
+        column: T(K)
+    heat_capacity:
+      value: 242.254
+      as_published: '242.254'
+      locator:
+        table_id: Nb-017
+        url: https://janaf.nist.gov/tables/Nb-017.html
+        download_url: https://janaf.nist.gov/tables/Nb-017.txt
+        row_temperature_as_published: '1800'
+        column: Cp
+    entropy:
+      value: 491.07
+      as_published: '491.070'
+      locator:
+        table_id: Nb-017
+        url: https://janaf.nist.gov/tables/Nb-017.html
+        download_url: https://janaf.nist.gov/tables/Nb-017.txt
+        row_temperature_as_published: '1800'
+        column: S
+    negative_gibbs_enthalpy_function:
+      value: 328.045
+      as_published: '328.045'
+      locator:
+        table_id: Nb-017
+        url: https://janaf.nist.gov/tables/Nb-017.html
+        download_url: https://janaf.nist.gov/tables/Nb-017.txt
+        row_temperature_as_published: '1800'
+        column: -[G-H(Tr)]/T
+    enthalpy_increment:
+      value: 293.445
+      as_published: '293.445'
+      locator:
+        table_id: Nb-017
+        url: https://janaf.nist.gov/tables/Nb-017.html
+        download_url: https://janaf.nist.gov/tables/Nb-017.txt
+        row_temperature_as_published: '1800'
+        column: H-H(Tr)
+    formation_enthalpy:
+      value: -1751.374
+      as_published: '1751.374'
+      locator:
+        table_id: Nb-017
+        url: https://janaf.nist.gov/tables/Nb-017.html
+        download_url: https://janaf.nist.gov/tables/Nb-017.txt
+        row_temperature_as_published: '1800'
+        column: delta-f H
+        parse_repair: nist_tail_whitespace_signs_restored
+        line_number: 25
+        raw_line: "1800\t242.254\t491.070\t328.045\t293.445\t1751.374  1135.837 32.961"
+    formation_gibbs_energy:
+      value: -1135.837
+      as_published: '1135.837'
+      locator:
+        table_id: Nb-017
+        url: https://janaf.nist.gov/tables/Nb-017.html
+        download_url: https://janaf.nist.gov/tables/Nb-017.txt
+        row_temperature_as_published: '1800'
+        column: delta-f G
+        parse_repair: nist_tail_whitespace_signs_restored
+        line_number: 25
+        raw_line: "1800\t242.254\t491.070\t328.045\t293.445\t1751.374  1135.837 32.961"
+    log10_formation_equilibrium_constant:
+      value: 32.961
+      as_published: '32.961'
+      locator:
+        table_id: Nb-017
+        url: https://janaf.nist.gov/tables/Nb-017.html
+        download_url: https://janaf.nist.gov/tables/Nb-017.txt
+        row_temperature_as_published: '1800'
+        column: log Kf
+        parse_repair: nist_tail_whitespace_signs_restored
+        line_number: 25
+        raw_line: "1800\t242.254\t491.070\t328.045\t293.445\t1751.374  1135.837 32.961"
   - temperature:
       value: 1900.0
       as_published: '1900'
@@ -3734,12 +3815,6 @@ table:
       url: https://janaf.nist.gov/tables/Nb-017.html
   - line_number: 24
     raw_line: "1785.000\t242.254\t489.043\t326.684\t289.811\tCRYSTAL <--> LIQUID"
-    reason: expected 8 tab-separated values; found 6
-    locator:
-      table_id: Nb-017
-      url: https://janaf.nist.gov/tables/Nb-017.html
-  - line_number: 25
-    raw_line: "1800\t242.254\t491.070\t328.045\t293.445\t1751.374  1135.837 32.961"
     reason: expected 8 tab-separated values; found 6
     locator:
       table_id: Nb-017

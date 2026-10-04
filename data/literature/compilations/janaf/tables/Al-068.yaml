@@ -18,12 +18,12 @@ compilation_role:
   circularity_warning: Do not validate an engine against a compilation it consumes.
 extraction:
   method: machine parse of NIST tab-delimited table download; source bytes cached unchanged
-  date: '2026-09-06'
   user_agent: RegolithPyrolysisSimulator-corpus-harvester/1.0 (public thermochemical reference-data research; polite cached
     client)
   source_cache_path: /Users/simonrowland/Library/CloudStorage/Dropbox/Starship Mission Design/Regolith Processing/regolith-pyrolysis-simulator/docs-private/research/2026-08-09-upstream-mission/IMCC-impl/janaf-mirror/Al/Al-068.txt
   source_sha256: fa2af531a32d6bcd18332f4f76316577cdec72932f33131abadb95d38848e775
   review_status: machine_transcribed_unreviewed
+  date: '2026-09-06'
 table:
   table_id: Al-068
   url: https://janaf.nist.gov/tables/Al-068.html
@@ -1560,6 +1560,87 @@ table:
         row_temperature_as_published: '1900'
         column: log Kf
   - temperature:
+      value: 2000.0
+      as_published: '2000'
+      locator:
+        table_id: Al-068
+        url: https://janaf.nist.gov/tables/Al-068.html
+        download_url: https://janaf.nist.gov/tables/Al-068.txt
+        row_temperature_as_published: '2000'
+        column: T(K)
+    heat_capacity:
+      value: 116.022
+      as_published: '116.022'
+      locator:
+        table_id: Al-068
+        url: https://janaf.nist.gov/tables/Al-068.html
+        download_url: https://janaf.nist.gov/tables/Al-068.txt
+        row_temperature_as_published: '2000'
+        column: Cp
+    entropy:
+      value: 235.986
+      as_published: '235.986'
+      locator:
+        table_id: Al-068
+        url: https://janaf.nist.gov/tables/Al-068.html
+        download_url: https://janaf.nist.gov/tables/Al-068.txt
+        row_temperature_as_published: '2000'
+        column: S
+    negative_gibbs_enthalpy_function:
+      value: 149.094
+      as_published: '149.094'
+      locator:
+        table_id: Al-068
+        url: https://janaf.nist.gov/tables/Al-068.html
+        download_url: https://janaf.nist.gov/tables/Al-068.txt
+        row_temperature_as_published: '2000'
+        column: -[G-H(Tr)]/T
+    enthalpy_increment:
+      value: 173.784
+      as_published: '173.784'
+      locator:
+        table_id: Al-068
+        url: https://janaf.nist.gov/tables/Al-068.html
+        download_url: https://janaf.nist.gov/tables/Al-068.txt
+        row_temperature_as_published: '2000'
+        column: H-H(Tr)
+    formation_enthalpy:
+      value: -1331.309
+      as_published: '1331.309'
+      locator:
+        table_id: Al-068
+        url: https://janaf.nist.gov/tables/Al-068.html
+        download_url: https://janaf.nist.gov/tables/Al-068.txt
+        row_temperature_as_published: '2000'
+        column: delta-f H
+        parse_repair: nist_tail_whitespace_signs_restored
+        line_number: 25
+        raw_line: "2000\t116.022\t235.986\t149.094\t173.784\t1331.309  718.272 18.759"
+    formation_gibbs_energy:
+      value: -718.272
+      as_published: '718.272'
+      locator:
+        table_id: Al-068
+        url: https://janaf.nist.gov/tables/Al-068.html
+        download_url: https://janaf.nist.gov/tables/Al-068.txt
+        row_temperature_as_published: '2000'
+        column: delta-f G
+        parse_repair: nist_tail_whitespace_signs_restored
+        line_number: 25
+        raw_line: "2000\t116.022\t235.986\t149.094\t173.784\t1331.309  718.272 18.759"
+    log10_formation_equilibrium_constant:
+      value: 18.759
+      as_published: '18.759'
+      locator:
+        table_id: Al-068
+        url: https://janaf.nist.gov/tables/Al-068.html
+        download_url: https://janaf.nist.gov/tables/Al-068.txt
+        row_temperature_as_published: '2000'
+        column: log Kf
+        parse_repair: nist_tail_whitespace_signs_restored
+        line_number: 25
+        raw_line: "2000\t116.022\t235.986\t149.094\t173.784\t1331.309  718.272 18.759"
+  - temperature:
       value: 2100.0
       as_published: '2100'
       locator:
@@ -1706,12 +1787,6 @@ table:
   parse_ambiguities:
   - line_number: 24
     raw_line: "1973.000\t115.679\t234.411\t147.916\t170.656\tCRYSTAL <--> LIQUID"
-    reason: expected 8 tab-separated values; found 6
-    locator:
-      table_id: Al-068
-      url: https://janaf.nist.gov/tables/Al-068.html
-  - line_number: 25
-    raw_line: "2000\t116.022\t235.986\t149.094\t173.784\t1331.309  718.272 18.759"
     reason: expected 8 tab-separated values; found 6
     locator:
       table_id: Al-068

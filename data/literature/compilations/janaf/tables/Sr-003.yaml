@@ -18,12 +18,12 @@ compilation_role:
   circularity_warning: Do not validate an engine against a compilation it consumes.
 extraction:
   method: machine parse of NIST tab-delimited table download; source bytes cached unchanged
-  date: '2026-09-06'
   user_agent: RegolithPyrolysisSimulator-corpus-harvester/1.0 (public thermochemical reference-data research; polite cached
     client)
   source_cache_path: /Users/simonrowland/Library/CloudStorage/Dropbox/Starship Mission Design/Regolith Processing/regolith-pyrolysis-simulator/docs-private/research/2026-08-09-upstream-mission/IMCC-impl/janaf-mirror/Sr/Sr-003.txt
   source_sha256: 35b787a037f42002ccb8a93ea826e56599193bd9415dfe85807f7db3caaf984e
   review_status: machine_transcribed_unreviewed
+  date: '2026-09-06'
 table:
   table_id: Sr-003
   url: https://janaf.nist.gov/tables/Sr-003.html
@@ -840,6 +840,87 @@ table:
         row_temperature_as_published: '800'
         column: log Kf
   - temperature:
+      value: 900.0
+      as_published: '900'
+      locator:
+        table_id: Sr-003
+        url: https://janaf.nist.gov/tables/Sr-003.html
+        download_url: https://janaf.nist.gov/tables/Sr-003.txt
+        row_temperature_as_published: '900'
+        column: T(K)
+    heat_capacity:
+      value: 30.125
+      as_published: '30.125'
+      locator:
+        table_id: Sr-003
+        url: https://janaf.nist.gov/tables/Sr-003.html
+        download_url: https://janaf.nist.gov/tables/Sr-003.txt
+        row_temperature_as_published: '900'
+        column: Cp
+    entropy:
+      value: 88.814
+      as_published: '88.814'
+      locator:
+        table_id: Sr-003
+        url: https://janaf.nist.gov/tables/Sr-003.html
+        download_url: https://janaf.nist.gov/tables/Sr-003.txt
+        row_temperature_as_published: '900'
+        column: S
+    negative_gibbs_enthalpy_function:
+      value: 69.511
+      as_published: '69.511'
+      locator:
+        table_id: Sr-003
+        url: https://janaf.nist.gov/tables/Sr-003.html
+        download_url: https://janaf.nist.gov/tables/Sr-003.txt
+        row_temperature_as_published: '900'
+        column: -[G-H(Tr)]/T
+    enthalpy_increment:
+      value: 17.373
+      as_published: '17.373'
+      locator:
+        table_id: Sr-003
+        url: https://janaf.nist.gov/tables/Sr-003.html
+        download_url: https://janaf.nist.gov/tables/Sr-003.txt
+        row_temperature_as_published: '900'
+        column: H-H(Tr)
+    formation_enthalpy:
+      value: 0.0
+      as_published: '0.'
+      locator:
+        table_id: Sr-003
+        url: https://janaf.nist.gov/tables/Sr-003.html
+        download_url: https://janaf.nist.gov/tables/Sr-003.txt
+        row_temperature_as_published: '900'
+        column: delta-f H
+        parse_repair: nist_tail_whitespace_signs_restored
+        line_number: 15
+        raw_line: "900\t30.125\t88.814\t69.511\t17.373\t0. 0. 0."
+    formation_gibbs_energy:
+      value: 0.0
+      as_published: '0.'
+      locator:
+        table_id: Sr-003
+        url: https://janaf.nist.gov/tables/Sr-003.html
+        download_url: https://janaf.nist.gov/tables/Sr-003.txt
+        row_temperature_as_published: '900'
+        column: delta-f G
+        parse_repair: nist_tail_whitespace_signs_restored
+        line_number: 15
+        raw_line: "900\t30.125\t88.814\t69.511\t17.373\t0. 0. 0."
+    log10_formation_equilibrium_constant:
+      value: 0.0
+      as_published: '0.'
+      locator:
+        table_id: Sr-003
+        url: https://janaf.nist.gov/tables/Sr-003.html
+        download_url: https://janaf.nist.gov/tables/Sr-003.txt
+        row_temperature_as_published: '900'
+        column: log Kf
+        parse_repair: nist_tail_whitespace_signs_restored
+        line_number: 15
+        raw_line: "900\t30.125\t88.814\t69.511\t17.373\t0. 0. 0."
+  - temperature:
       value: 1000.0
       as_published: '1000'
       locator:
@@ -911,6 +992,87 @@ table:
         download_url: https://janaf.nist.gov/tables/Sr-003.txt
         row_temperature_as_published: '1000'
         column: log Kf
+  - temperature:
+      value: 1100.0
+      as_published: '1100'
+      locator:
+        table_id: Sr-003
+        url: https://janaf.nist.gov/tables/Sr-003.html
+        download_url: https://janaf.nist.gov/tables/Sr-003.txt
+        row_temperature_as_published: '1100'
+        column: T(K)
+    heat_capacity:
+      value: 30.962
+      as_published: '30.962'
+      locator:
+        table_id: Sr-003
+        url: https://janaf.nist.gov/tables/Sr-003.html
+        download_url: https://janaf.nist.gov/tables/Sr-003.txt
+        row_temperature_as_published: '1100'
+        column: Cp
+    entropy:
+      value: 94.941
+      as_published: '94.941'
+      locator:
+        table_id: Sr-003
+        url: https://janaf.nist.gov/tables/Sr-003.html
+        download_url: https://janaf.nist.gov/tables/Sr-003.txt
+        row_temperature_as_published: '1100'
+        column: S
+    negative_gibbs_enthalpy_function:
+      value: 73.594
+      as_published: '73.594'
+      locator:
+        table_id: Sr-003
+        url: https://janaf.nist.gov/tables/Sr-003.html
+        download_url: https://janaf.nist.gov/tables/Sr-003.txt
+        row_temperature_as_published: '1100'
+        column: -[G-H(Tr)]/T
+    enthalpy_increment:
+      value: 23.481
+      as_published: '23.481'
+      locator:
+        table_id: Sr-003
+        url: https://janaf.nist.gov/tables/Sr-003.html
+        download_url: https://janaf.nist.gov/tables/Sr-003.txt
+        row_temperature_as_published: '1100'
+        column: H-H(Tr)
+    formation_enthalpy:
+      value: -7.861
+      as_published: '7.861'
+      locator:
+        table_id: Sr-003
+        url: https://janaf.nist.gov/tables/Sr-003.html
+        download_url: https://janaf.nist.gov/tables/Sr-003.txt
+        row_temperature_as_published: '1100'
+        column: delta-f H
+        parse_repair: nist_tail_whitespace_signs_restored
+        line_number: 18
+        raw_line: "1100\t30.962\t94.941\t73.594\t23.481\t7.861 0.364  0.017"
+    formation_gibbs_energy:
+      value: 0.364
+      as_published: '0.364'
+      locator:
+        table_id: Sr-003
+        url: https://janaf.nist.gov/tables/Sr-003.html
+        download_url: https://janaf.nist.gov/tables/Sr-003.txt
+        row_temperature_as_published: '1100'
+        column: delta-f G
+        parse_repair: nist_tail_whitespace_signs_restored
+        line_number: 18
+        raw_line: "1100\t30.962\t94.941\t73.594\t23.481\t7.861 0.364  0.017"
+    log10_formation_equilibrium_constant:
+      value: -0.017
+      as_published: '0.017'
+      locator:
+        table_id: Sr-003
+        url: https://janaf.nist.gov/tables/Sr-003.html
+        download_url: https://janaf.nist.gov/tables/Sr-003.txt
+        row_temperature_as_published: '1100'
+        column: log Kf
+        parse_repair: nist_tail_whitespace_signs_restored
+        line_number: 18
+        raw_line: "1100\t30.962\t94.941\t73.594\t23.481\t7.861 0.364  0.017"
   - temperature:
       value: 1200.0
       as_published: '1200'
@@ -1206,20 +1368,8 @@ table:
     locator:
       table_id: Sr-003
       url: https://janaf.nist.gov/tables/Sr-003.html
-  - line_number: 15
-    raw_line: "900\t30.125\t88.814\t69.511\t17.373\t0. 0. 0."
-    reason: expected 8 tab-separated values; found 6
-    locator:
-      table_id: Sr-003
-      url: https://janaf.nist.gov/tables/Sr-003.html
   - line_number: 17
     raw_line: "1050.000\t30.752\t93.505\t72.611\t21.939\tBETA <--> LIQUID"
-    reason: expected 8 tab-separated values; found 6
-    locator:
-      table_id: Sr-003
-      url: https://janaf.nist.gov/tables/Sr-003.html
-  - line_number: 18
-    raw_line: "1100\t30.962\t94.941\t73.594\t23.481\t7.861 0.364  0.017"
     reason: expected 8 tab-separated values; found 6
     locator:
       table_id: Sr-003

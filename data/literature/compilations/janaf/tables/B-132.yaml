@@ -18,12 +18,12 @@ compilation_role:
   circularity_warning: Do not validate an engine against a compilation it consumes.
 extraction:
   method: machine parse of NIST tab-delimited table download; source bytes cached unchanged
-  date: '2026-09-06'
   user_agent: RegolithPyrolysisSimulator-corpus-harvester/1.0 (public thermochemical reference-data research; polite cached
     client)
   source_cache_path: /Users/simonrowland/Library/CloudStorage/Dropbox/Starship Mission Design/Regolith Processing/regolith-pyrolysis-simulator/docs-private/research/2026-08-09-upstream-mission/IMCC-impl/janaf-mirror/B/B-132.txt
   source_sha256: 58c56ccd27e2b2f534792bb4b5e6f0284bfeadcc78cf01ea9f502f564e36da7a
   review_status: machine_transcribed_unreviewed
+  date: '2026-09-06'
 table:
   table_id: B-132
   url: https://janaf.nist.gov/tables/B-132.html
@@ -1640,7 +1640,9 @@ table:
       url: https://janaf.nist.gov/tables/B-132.html
   - line_number: 18
     raw_line: "1200\t574.045\t907.597\t553.205\t425.270\t6084.767  4446.220 193.539"
-    reason: expected 8 tab-separated values; found 6
+    reason: 'refused JANAF tail sign restoration: formation Gibbs/log Kf identity misses by 2.636 printed log Kf units with
+      R=8.31441'
     locator:
       table_id: B-132
       url: https://janaf.nist.gov/tables/B-132.html
+    kind: nist_tail_whitespace_signs_unresolved

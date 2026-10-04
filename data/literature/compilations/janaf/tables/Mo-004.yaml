@@ -18,12 +18,12 @@ compilation_role:
   circularity_warning: Do not validate an engine against a compilation it consumes.
 extraction:
   method: machine parse of NIST tab-delimited table download; source bytes cached unchanged
-  date: '2026-09-06'
   user_agent: RegolithPyrolysisSimulator-corpus-harvester/1.0 (public thermochemical reference-data research; polite cached
     client)
   source_cache_path: /Users/simonrowland/Library/CloudStorage/Dropbox/Starship Mission Design/Regolith Processing/regolith-pyrolysis-simulator/docs-private/research/2026-08-09-upstream-mission/IMCC-impl/janaf-mirror/Mo/Mo-004.txt
   source_sha256: 6ad9070f08bb6ff1a9eac4d72718a65663c51208d9e8b4fa58988921315d89bd
   review_status: machine_transcribed_unreviewed
+  date: '2026-09-06'
 table:
   table_id: Mo-004
   url: https://janaf.nist.gov/tables/Mo-004.html
@@ -3936,6 +3936,87 @@ table:
         row_temperature_as_published: '4900'
         column: log Kf
   - temperature:
+      value: 5000.0
+      as_published: '5000'
+      locator:
+        table_id: Mo-004
+        url: https://janaf.nist.gov/tables/Mo-004.html
+        download_url: https://janaf.nist.gov/tables/Mo-004.txt
+        row_temperature_as_published: '5000'
+        column: T(K)
+    heat_capacity:
+      value: 37.656
+      as_published: '37.656'
+      locator:
+        table_id: Mo-004
+        url: https://janaf.nist.gov/tables/Mo-004.html
+        download_url: https://janaf.nist.gov/tables/Mo-004.txt
+        row_temperature_as_published: '5000'
+        column: Cp
+    entropy:
+      value: 131.087
+      as_published: '131.087'
+      locator:
+        table_id: Mo-004
+        url: https://janaf.nist.gov/tables/Mo-004.html
+        download_url: https://janaf.nist.gov/tables/Mo-004.txt
+        row_temperature_as_published: '5000'
+        column: S
+    negative_gibbs_enthalpy_function:
+      value: 90.068
+      as_published: '90.068'
+      locator:
+        table_id: Mo-004
+        url: https://janaf.nist.gov/tables/Mo-004.html
+        download_url: https://janaf.nist.gov/tables/Mo-004.txt
+        row_temperature_as_published: '5000'
+        column: -[G-H(Tr)]/T
+    enthalpy_increment:
+      value: 205.096
+      as_published: '205.096'
+      locator:
+        table_id: Mo-004
+        url: https://janaf.nist.gov/tables/Mo-004.html
+        download_url: https://janaf.nist.gov/tables/Mo-004.txt
+        row_temperature_as_published: '5000'
+        column: H-H(Tr)
+    formation_enthalpy:
+      value: -591.385
+      as_published: '591.385'
+      locator:
+        table_id: Mo-004
+        url: https://janaf.nist.gov/tables/Mo-004.html
+        download_url: https://janaf.nist.gov/tables/Mo-004.txt
+        row_temperature_as_published: '5000'
+        column: delta-f H
+        parse_repair: nist_tail_whitespace_signs_restored
+        line_number: 60
+        raw_line: "5000\t37.656\t131.087\t90.068\t205.096\t591.385 5.731  0.060"
+    formation_gibbs_energy:
+      value: 5.731
+      as_published: '5.731'
+      locator:
+        table_id: Mo-004
+        url: https://janaf.nist.gov/tables/Mo-004.html
+        download_url: https://janaf.nist.gov/tables/Mo-004.txt
+        row_temperature_as_published: '5000'
+        column: delta-f G
+        parse_repair: nist_tail_whitespace_signs_restored
+        line_number: 60
+        raw_line: "5000\t37.656\t131.087\t90.068\t205.096\t591.385 5.731  0.060"
+    log10_formation_equilibrium_constant:
+      value: -0.06
+      as_published: '0.060'
+      locator:
+        table_id: Mo-004
+        url: https://janaf.nist.gov/tables/Mo-004.html
+        download_url: https://janaf.nist.gov/tables/Mo-004.txt
+        row_temperature_as_published: '5000'
+        column: log Kf
+        parse_repair: nist_tail_whitespace_signs_restored
+        line_number: 60
+        raw_line: "5000\t37.656\t131.087\t90.068\t205.096\t591.385 5.731  0.060"
+  - temperature:
       value: 5100.0
       as_published: '5100'
       locator:
@@ -4526,12 +4607,6 @@ table:
       url: https://janaf.nist.gov/tables/Mo-004.html
   - line_number: 59
     raw_line: "4951.969\t37.656\t130.723\t89.671\t203.287\tFUGACITY = 1 bar"
-    reason: expected 8 tab-separated values; found 6
-    locator:
-      table_id: Mo-004
-      url: https://janaf.nist.gov/tables/Mo-004.html
-  - line_number: 60
-    raw_line: "5000\t37.656\t131.087\t90.068\t205.096\t591.385 5.731  0.060"
     reason: expected 8 tab-separated values; found 6
     locator:
       table_id: Mo-004

@@ -18,12 +18,12 @@ compilation_role:
   circularity_warning: Do not validate an engine against a compilation it consumes.
 extraction:
   method: machine parse of NIST tab-delimited table download; source bytes cached unchanged
-  date: '2026-09-06'
   user_agent: RegolithPyrolysisSimulator-corpus-harvester/1.0 (public thermochemical reference-data research; polite cached
     client)
   source_cache_path: /Users/simonrowland/Library/CloudStorage/Dropbox/Starship Mission Design/Regolith Processing/regolith-pyrolysis-simulator/docs-private/research/2026-08-09-upstream-mission/IMCC-impl/janaf-mirror/B/B-100.txt
   source_sha256: 89ff39da492e820c30e8c176497e498d835f0ce9f186269a3b23e4c66cbd1f32
   review_status: machine_transcribed_unreviewed
+  date: '2026-09-06'
 table:
   table_id: B-100
   url: https://janaf.nist.gov/tables/B-100.html
@@ -2424,6 +2424,87 @@ table:
         row_temperature_as_published: '3100'
         column: log Kf
   - temperature:
+      value: 3200.0
+      as_published: '3200'
+      locator:
+        table_id: B-100
+        url: https://janaf.nist.gov/tables/B-100.html
+        download_url: https://janaf.nist.gov/tables/B-100.txt
+        row_temperature_as_published: '3200'
+        column: T(K)
+    heat_capacity:
+      value: 105.249
+      as_published: '105.249'
+      locator:
+        table_id: B-100
+        url: https://janaf.nist.gov/tables/B-100.html
+        download_url: https://janaf.nist.gov/tables/B-100.txt
+        row_temperature_as_published: '3200'
+        column: Cp
+    entropy:
+      value: 210.544
+      as_published: '210.544'
+      locator:
+        table_id: B-100
+        url: https://janaf.nist.gov/tables/B-100.html
+        download_url: https://janaf.nist.gov/tables/B-100.txt
+        row_temperature_as_published: '3200'
+        column: S
+    negative_gibbs_enthalpy_function:
+      value: 131.501
+      as_published: '131.501'
+      locator:
+        table_id: B-100
+        url: https://janaf.nist.gov/tables/B-100.html
+        download_url: https://janaf.nist.gov/tables/B-100.txt
+        row_temperature_as_published: '3200'
+        column: -[G-H(Tr)]/T
+    enthalpy_increment:
+      value: 252.937
+      as_published: '252.937'
+      locator:
+        table_id: B-100
+        url: https://janaf.nist.gov/tables/B-100.html
+        download_url: https://janaf.nist.gov/tables/B-100.txt
+        row_temperature_as_published: '3200'
+        column: H-H(Tr)
+    formation_enthalpy:
+      value: -414.744
+      as_published: '414.744'
+      locator:
+        table_id: B-100
+        url: https://janaf.nist.gov/tables/B-100.html
+        download_url: https://janaf.nist.gov/tables/B-100.txt
+        row_temperature_as_published: '3200'
+        column: delta-f H
+        parse_repair: nist_tail_whitespace_signs_restored
+        line_number: 37
+        raw_line: "3200\t105.249\t210.544\t131.501\t252.937\t414.744  164.000 2.677"
+    formation_gibbs_energy:
+      value: -164.0
+      as_published: '164.000'
+      locator:
+        table_id: B-100
+        url: https://janaf.nist.gov/tables/B-100.html
+        download_url: https://janaf.nist.gov/tables/B-100.txt
+        row_temperature_as_published: '3200'
+        column: delta-f G
+        parse_repair: nist_tail_whitespace_signs_restored
+        line_number: 37
+        raw_line: "3200\t105.249\t210.544\t131.501\t252.937\t414.744  164.000 2.677"
+    log10_formation_equilibrium_constant:
+      value: 2.677
+      as_published: '2.677'
+      locator:
+        table_id: B-100
+        url: https://janaf.nist.gov/tables/B-100.html
+        download_url: https://janaf.nist.gov/tables/B-100.txt
+        row_temperature_as_published: '3200'
+        column: log Kf
+        parse_repair: nist_tail_whitespace_signs_restored
+        line_number: 37
+        raw_line: "3200\t105.249\t210.544\t131.501\t252.937\t414.744  164.000 2.677"
+  - temperature:
       value: 3300.0
       as_published: '3300'
       locator:
@@ -3002,12 +3083,6 @@ table:
   parse_ambiguities:
   - line_number: 36
     raw_line: "3193.000\t105.190\t210.313\t131.328\t252.201\tCRYSTAL <--> LIQUID"
-    reason: expected 8 tab-separated values; found 6
-    locator:
-      table_id: B-100
-      url: https://janaf.nist.gov/tables/B-100.html
-  - line_number: 37
-    raw_line: "3200\t105.249\t210.544\t131.501\t252.937\t414.744  164.000 2.677"
     reason: expected 8 tab-separated values; found 6
     locator:
       table_id: B-100

@@ -18,12 +18,12 @@ compilation_role:
   circularity_warning: Do not validate an engine against a compilation it consumes.
 extraction:
   method: machine parse of NIST tab-delimited table download; source bytes cached unchanged
-  date: '2026-09-06'
   user_agent: RegolithPyrolysisSimulator-corpus-harvester/1.0 (public thermochemical reference-data research; polite cached
     client)
   source_cache_path: /Users/simonrowland/Library/CloudStorage/Dropbox/Starship Mission Design/Regolith Processing/regolith-pyrolysis-simulator/docs-private/research/2026-08-09-upstream-mission/IMCC-impl/janaf-mirror/Al/Al-050.txt
   source_sha256: 3a2e1a438aaf30a0e58962a1c70fcf58b16ee7f04d664b7ecf5e9a320a067dfd
   review_status: machine_transcribed_unreviewed
+  date: '2026-09-06'
 table:
   table_id: Al-050
   url: https://janaf.nist.gov/tables/Al-050.html
@@ -2300,7 +2300,9 @@ table:
       url: https://janaf.nist.gov/tables/Al-050.html
   - line_number: 18
     raw_line: "1100\t359.824\t613.371\t393.022\t242.383\t3272.388  2803.892 133.146"
-    reason: expected 8 tab-separated values; found 6
+    reason: 'refused JANAF tail sign restoration: formation Gibbs/log Kf identity misses by 2.040 printed log Kf units with
+      R=8.31441'
     locator:
       table_id: Al-050
       url: https://janaf.nist.gov/tables/Al-050.html
+    kind: nist_tail_whitespace_signs_unresolved

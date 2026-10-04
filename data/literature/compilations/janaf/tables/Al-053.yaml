@@ -18,12 +18,12 @@ compilation_role:
   circularity_warning: Do not validate an engine against a compilation it consumes.
 extraction:
   method: machine parse of NIST tab-delimited table download; source bytes cached unchanged
-  date: '2026-09-06'
   user_agent: RegolithPyrolysisSimulator-corpus-harvester/1.0 (public thermochemical reference-data research; polite cached
     client)
   source_cache_path: /Users/simonrowland/Library/CloudStorage/Dropbox/Starship Mission Design/Regolith Processing/regolith-pyrolysis-simulator/docs-private/research/2026-08-09-upstream-mission/IMCC-impl/janaf-mirror/Al/Al-053.txt
   source_sha256: 2426106b4dccc50df592ee56f2f7b4330148fbce2eda337e6cceab14a7615572
   review_status: machine_transcribed_unreviewed
+  date: '2026-09-06'
 table:
   table_id: Al-053
   url: https://janaf.nist.gov/tables/Al-053.html
@@ -984,6 +984,87 @@ table:
         row_temperature_as_published: '1200'
         column: log Kf
   - temperature:
+      value: 1300.0
+      as_published: '1300'
+      locator:
+        table_id: Al-053
+        url: https://janaf.nist.gov/tables/Al-053.html
+        download_url: https://janaf.nist.gov/tables/Al-053.txt
+        row_temperature_as_published: '1300'
+        column: T(K)
+    heat_capacity:
+      value: 334.846
+      as_published: '334.846'
+      locator:
+        table_id: Al-053
+        url: https://janaf.nist.gov/tables/Al-053.html
+        download_url: https://janaf.nist.gov/tables/Al-053.txt
+        row_temperature_as_published: '1300'
+        column: Cp
+    entropy:
+      value: 639.549
+      as_published: '639.549'
+      locator:
+        table_id: Al-053
+        url: https://janaf.nist.gov/tables/Al-053.html
+        download_url: https://janaf.nist.gov/tables/Al-053.txt
+        row_temperature_as_published: '1300'
+        column: S
+    negative_gibbs_enthalpy_function:
+      value: 440.786
+      as_published: '440.786'
+      locator:
+        table_id: Al-053
+        url: https://janaf.nist.gov/tables/Al-053.html
+        download_url: https://janaf.nist.gov/tables/Al-053.txt
+        row_temperature_as_published: '1300'
+        column: -[G-H(Tr)]/T
+    enthalpy_increment:
+      value: 258.392
+      as_published: '258.392'
+      locator:
+        table_id: Al-053
+        url: https://janaf.nist.gov/tables/Al-053.html
+        download_url: https://janaf.nist.gov/tables/Al-053.txt
+        row_temperature_as_published: '1300'
+        column: H-H(Tr)
+    formation_enthalpy:
+      value: -3562.664
+      as_published: '3562.664'
+      locator:
+        table_id: Al-053
+        url: https://janaf.nist.gov/tables/Al-053.html
+        download_url: https://janaf.nist.gov/tables/Al-053.txt
+        row_temperature_as_published: '1300'
+        column: delta-f H
+        parse_repair: nist_tail_whitespace_signs_restored
+        line_number: 19
+        raw_line: "1300\t334.846\t639.549\t440.786\t258.392\t3562.664  2577.103 103.549"
+    formation_gibbs_energy:
+      value: -2577.103
+      as_published: '2577.103'
+      locator:
+        table_id: Al-053
+        url: https://janaf.nist.gov/tables/Al-053.html
+        download_url: https://janaf.nist.gov/tables/Al-053.txt
+        row_temperature_as_published: '1300'
+        column: delta-f G
+        parse_repair: nist_tail_whitespace_signs_restored
+        line_number: 19
+        raw_line: "1300\t334.846\t639.549\t440.786\t258.392\t3562.664  2577.103 103.549"
+    log10_formation_equilibrium_constant:
+      value: 103.549
+      as_published: '103.549'
+      locator:
+        table_id: Al-053
+        url: https://janaf.nist.gov/tables/Al-053.html
+        download_url: https://janaf.nist.gov/tables/Al-053.txt
+        row_temperature_as_published: '1300'
+        column: log Kf
+        parse_repair: nist_tail_whitespace_signs_restored
+        line_number: 19
+        raw_line: "1300\t334.846\t639.549\t440.786\t258.392\t3562.664  2577.103 103.549"
+  - temperature:
       value: 1400.0
       as_published: '1400'
       locator:
@@ -1136,18 +1217,14 @@ table:
       url: https://janaf.nist.gov/tables/Al-053.html
   - line_number: 14
     raw_line: "900\t271.458\t528.831\t376.408\t137.181\t3292.905  2819.145 163.619"
-    reason: expected 8 tab-separated values; found 6
+    reason: 'refused JANAF tail sign restoration: formation Gibbs/log Kf identity misses by 2.243 printed log Kf units with
+      R=8.31441'
     locator:
       table_id: Al-053
       url: https://janaf.nist.gov/tables/Al-053.html
+    kind: nist_tail_whitespace_signs_unresolved
   - line_number: 18
     raw_line: "1285.000\t332.461\t635.677\t438.489\t253.387\tBETA <--> LIQUID"
-    reason: expected 8 tab-separated values; found 6
-    locator:
-      table_id: Al-053
-      url: https://janaf.nist.gov/tables/Al-053.html
-  - line_number: 19
-    raw_line: "1300\t334.846\t639.549\t440.786\t258.392\t3562.664  2577.103 103.549"
     reason: expected 8 tab-separated values; found 6
     locator:
       table_id: Al-053

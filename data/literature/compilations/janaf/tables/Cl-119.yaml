@@ -18,12 +18,12 @@ compilation_role:
   circularity_warning: Do not validate an engine against a compilation it consumes.
 extraction:
   method: machine parse of NIST tab-delimited table download; source bytes cached unchanged
-  date: '2026-09-06'
   user_agent: RegolithPyrolysisSimulator-corpus-harvester/1.0 (public thermochemical reference-data research; polite cached
     client)
   source_cache_path: /Users/simonrowland/Library/CloudStorage/Dropbox/Starship Mission Design/Regolith Processing/regolith-pyrolysis-simulator/docs-private/research/2026-08-09-upstream-mission/IMCC-impl/janaf-mirror/Cl/Cl-119.txt
   source_sha256: b7b323e98128ea3a77e4f5a589cb32eb507a461cf772bdd22cb0a2bfd5cd1ccb
   review_status: machine_transcribed_unreviewed
+  date: '2026-09-06'
 table:
   table_id: Cl-119
   url: https://janaf.nist.gov/tables/Cl-119.html
@@ -984,6 +984,87 @@ table:
         row_temperature_as_published: '1100'
         column: log Kf
   - temperature:
+      value: 1200.0
+      as_published: '1200'
+      locator:
+        table_id: Cl-119
+        url: https://janaf.nist.gov/tables/Cl-119.html
+        download_url: https://janaf.nist.gov/tables/Cl-119.txt
+        row_temperature_as_published: '1200'
+        column: T(K)
+    heat_capacity:
+      value: 123.01
+      as_published: '123.010'
+      locator:
+        table_id: Cl-119
+        url: https://janaf.nist.gov/tables/Cl-119.html
+        download_url: https://janaf.nist.gov/tables/Cl-119.txt
+        row_temperature_as_published: '1200'
+        column: Cp
+    entropy:
+      value: 245.448
+      as_published: '245.448'
+      locator:
+        table_id: Cl-119
+        url: https://janaf.nist.gov/tables/Cl-119.html
+        download_url: https://janaf.nist.gov/tables/Cl-119.txt
+        row_temperature_as_published: '1200'
+        column: S
+    negative_gibbs_enthalpy_function:
+      value: 169.123
+      as_published: '169.123'
+      locator:
+        table_id: Cl-119
+        url: https://janaf.nist.gov/tables/Cl-119.html
+        download_url: https://janaf.nist.gov/tables/Cl-119.txt
+        row_temperature_as_published: '1200'
+        column: -[G-H(Tr)]/T
+    enthalpy_increment:
+      value: 91.591
+      as_published: '91.591'
+      locator:
+        table_id: Cl-119
+        url: https://janaf.nist.gov/tables/Cl-119.html
+        download_url: https://janaf.nist.gov/tables/Cl-119.txt
+        row_temperature_as_published: '1200'
+        column: H-H(Tr)
+    formation_enthalpy:
+      value: -806.836
+      as_published: '806.836'
+      locator:
+        table_id: Cl-119
+        url: https://janaf.nist.gov/tables/Cl-119.html
+        download_url: https://janaf.nist.gov/tables/Cl-119.txt
+        row_temperature_as_published: '1200'
+        column: delta-f H
+        parse_repair: nist_tail_whitespace_signs_restored
+        line_number: 19
+        raw_line: "1200\t123.010\t245.448\t169.123\t91.591\t806.836  646.014 28.120"
+    formation_gibbs_energy:
+      value: -646.014
+      as_published: '646.014'
+      locator:
+        table_id: Cl-119
+        url: https://janaf.nist.gov/tables/Cl-119.html
+        download_url: https://janaf.nist.gov/tables/Cl-119.txt
+        row_temperature_as_published: '1200'
+        column: delta-f G
+        parse_repair: nist_tail_whitespace_signs_restored
+        line_number: 19
+        raw_line: "1200\t123.010\t245.448\t169.123\t91.591\t806.836  646.014 28.120"
+    log10_formation_equilibrium_constant:
+      value: 28.12
+      as_published: '28.120'
+      locator:
+        table_id: Cl-119
+        url: https://janaf.nist.gov/tables/Cl-119.html
+        download_url: https://janaf.nist.gov/tables/Cl-119.txt
+        row_temperature_as_published: '1200'
+        column: log Kf
+        parse_repair: nist_tail_whitespace_signs_restored
+        line_number: 19
+        raw_line: "1200\t123.010\t245.448\t169.123\t91.591\t806.836  646.014 28.120"
+  - temperature:
       value: 1300.0
       as_published: '1300'
       locator:
@@ -1574,12 +1655,6 @@ table:
       url: https://janaf.nist.gov/tables/Cl-119.html
   - line_number: 18
     raw_line: "1147.000\t123.010\t239.892\t165.723\t85.071\tBETA <--> LIQUID"
-    reason: expected 8 tab-separated values; found 6
-    locator:
-      table_id: Cl-119
-      url: https://janaf.nist.gov/tables/Cl-119.html
-  - line_number: 19
-    raw_line: "1200\t123.010\t245.448\t169.123\t91.591\t806.836  646.014 28.120"
     reason: expected 8 tab-separated values; found 6
     locator:
       table_id: Cl-119

@@ -91,6 +91,10 @@ GRID_RANGE_REASON = (
 GRID_ORDER_REASON = (
     "temperature is not ordered within the printed table grid"
 )
+NIST_TAIL_PARSE_REPAIR = "nist_tail_whitespace_signs_restored"
+NIST_TAIL_UNRESOLVED_KIND = "nist_tail_whitespace_signs_unresolved"
+JANAF_R_J_MOL_K = Decimal("8.31441")
+STANDARD_R_J_MOL_K = Decimal("8.314462618")
 # Decimal subscripts are retained. Charge is optional.
 FORMULA_TOKEN_RE = re.compile(r"([A-Z][a-z]?)(\d+(?:\.\d+)?)?")
 CHARGE_RE = re.compile(r"[+-]$")
@@ -304,6 +308,7 @@ class _LineCandidate:
     concatenated: bool
     all_thermo_tokens: bool
     temperature: float | None
+    whitespace_tail: tuple[str, str, str] | None = None
 
 
 def _line_candidate(line_number: int, line: str) -> _LineCandidate:
@@ -324,6 +329,129 @@ def _line_candidate(line_number: int, line: str) -> _LineCandidate:
         concatenated=concatenated,
         all_thermo_tokens=bool(content) and all(_is_thermo_token(token) for token in content),
         temperature=temperature,
+    )
+
+
+def _whitespace_tail_candidate(line_number: int, line: str) -> _LineCandidate | None:
+    """Recognize five tab-separated columns followed by three space-separated numbers."""
+
+    fields = [field.strip() for field in line.split("\t")]
+    if len(fields) != 6 or not all(_is_thermo_token(token) for token in fields[:5]):
+        return None
+    tail = fields[5].split()
+    if len(tail) != 3 or not all(NUMBER_RE.fullmatch(token) for token in tail):
+        return None
+    content = fields[:5] + tail
+    temperature = parse_published_number(content[0])
+    if temperature is None:
+        return None
+    return _LineCandidate(
+        line_number=line_number,
+        line=line,
+        raw_n=len(fields),
+        content=content,
+        first_is_number=True,
+        concatenated=False,
+        all_thermo_tokens=True,
+        temperature=temperature,
+        whitespace_tail=tuple(tail),
+    )
+
+
+def _continuity_sign(
+    candidates: list[_LineCandidate], field_index: int, temperature: Decimal
+) -> int | None:
+    neighbors: list[tuple[Decimal, Decimal]] = []
+    for candidate in candidates:
+        candidate_temperature = _candidate_temperature_decimal(candidate)
+        if candidate_temperature is None or field_index >= len(candidate.content):
+            continue
+        value = parse_published_number(candidate.content[field_index])
+        if value is not None:
+            neighbors.append((candidate_temperature, Decimal(str(value))))
+    before = [item for item in neighbors if item[0] < temperature]
+    after = [item for item in neighbors if item[0] > temperature]
+    if not before or not after:
+        return None
+    left_t, left_value = max(before)
+    right_t, right_value = min(after)
+    estimate = left_value + (right_value - left_value) * (
+        temperature - left_t
+    ) / (right_t - left_t)
+    return 1 if estimate > 0 else -1 if estimate < 0 else None
+
+
+def _restore_whitespace_tail_signs(
+    candidate: _LineCandidate, parsed_neighbors: list[_LineCandidate]
+) -> tuple[tuple[float, float, float] | None, str | None]:
+    """Restore signs only when neighboring rows and the JANAF identity agree."""
+
+    assert candidate.whitespace_tail is not None
+    temperature = _decimal_temperature_token(candidate.content[0])
+    assert temperature is not None
+    enthalpy_magnitude, gibbs_magnitude, log_magnitude = (
+        abs(Decimal(token)) for token in candidate.whitespace_tail
+    )
+    if enthalpy_magnitude == gibbs_magnitude == log_magnitude == 0:
+        return (0.0, 0.0, 0.0), None
+
+    enthalpy_sign = (
+        _continuity_sign(parsed_neighbors, 5, temperature)
+        if enthalpy_magnitude
+        else 0
+    )
+    gibbs_sign = (
+        _continuity_sign(parsed_neighbors, 6, temperature)
+        if gibbs_magnitude
+        else 0
+    )
+    if enthalpy_sign is None:
+        return None, "formation enthalpy sign is not resolved by neighboring rows"
+    if gibbs_sign is None:
+        return None, "formation Gibbs sign is not resolved by neighboring rows"
+    if gibbs_magnitude == 0 and log_magnitude != 0:
+        return None, "zero formation Gibbs with nonzero log Kf has no sign assignment"
+
+    # JANAF's printed identity is log10(Kf) = -ΔfG/(R T ln 10). ΔfG is
+    # stored in kJ/mol, so multiply it by 1000 J/kJ before dividing by
+    # R=8.31441 J/(mol K), T in K, and dimensionless ln(10). The two
+    # possible absolute sign assignments are (+G, -log Kf) and
+    # (-G, +log Kf); the identity checks their opposite-sign relation, and
+    # neighboring ΔfG values then select the absolute signs. We also compute
+    # the modern R=8.314462618 check as a rounding sanity check. A printed
+    # 0.001 log Kf has a 0.001 last-digit unit; an error above two such units
+    # under both assignments means the unsigned source magnitudes do not
+    # corroborate a repair. Sanity: O-038 at 1700 K gives approximately
+    # log Kf=18.714 for ΔfG=-609.059 kJ/mol.
+    log_quantum = abs(
+        Decimal(1).scaleb(Decimal(candidate.whitespace_tail[2]).as_tuple().exponent)
+    )
+    ln10 = Decimal(10).ln()
+    errors_by_r: dict[Decimal, list[Decimal]] = {}
+    for gas_constant in (JANAF_R_J_MOL_K, STANDARD_R_J_MOL_K):
+        errors: list[Decimal] = []
+        for candidate_gibbs_sign in (-1, 1):
+            signed_gibbs = candidate_gibbs_sign * gibbs_magnitude
+            predicted_log = -signed_gibbs * Decimal(1000) / (
+                gas_constant * temperature * ln10
+            )
+            signed_log = -candidate_gibbs_sign * log_magnitude
+            errors.append(abs(predicted_log - signed_log) / log_quantum)
+        errors_by_r[gas_constant] = errors
+    janaf_errors = errors_by_r[JANAF_R_J_MOL_K]
+    if all(error > 2 for error in janaf_errors):
+        return (
+            None,
+            "formation Gibbs/log Kf identity misses by "
+            f"{min(janaf_errors):.3f} printed log Kf units with R=8.31441",
+        )
+
+    signed_enthalpy = enthalpy_magnitude * enthalpy_sign
+    signed_gibbs = gibbs_magnitude * gibbs_sign
+    signed_log = -gibbs_sign * log_magnitude if log_magnitude else Decimal(0)
+    return (
+        (float(signed_enthalpy), float(signed_gibbs), float(signed_log)),
+        None,
     )
 
 
@@ -529,8 +657,13 @@ def parse_janaf_txt(
     values: list[dict[str, Any]] = []
     ambiguities: list[dict[str, Any]] = []
     structured_candidates: list[_LineCandidate] = []
+    whitespace_tail_candidates: list[_LineCandidate] = []
     for line_number, line in enumerate(lines[header_index + 1 :], start=header_index + 2):
         if not line.strip():
+            continue
+        whitespace_candidate = _whitespace_tail_candidate(line_number, line)
+        if whitespace_candidate is not None:
+            whitespace_tail_candidates.append(whitespace_candidate)
             continue
         candidate = _line_candidate(line_number, line)
         if not candidate.content:
@@ -618,8 +751,12 @@ def parse_janaf_txt(
             else:
                 layout_consistent.append(candidate)
     layout_consistent.sort(key=lambda item: item.line_number)
+    candidates_on_grid = sorted(
+        [*layout_consistent, *whitespace_tail_candidates],
+        key=lambda item: item.line_number,
+    )
     corroborated, uncorroborated, grid_reasons = _refuse_uncorroborated_temperatures(
-        layout_consistent
+        candidates_on_grid
     )
     for candidate, reason in zip(uncorroborated, grid_reasons, strict=True):
         ambiguities.append(
@@ -629,12 +766,45 @@ def parse_janaf_txt(
                 reason=reason,
                 table_id=table_id,
                 url=url,
-                kind=REFUSED_LAYOUT_KIND,
+                kind=(
+                    NIST_TAIL_UNRESOLVED_KIND
+                    if candidate.whitespace_tail is not None
+                    else REFUSED_LAYOUT_KIND
+                ),
             )
         )
     corroborated.sort(key=lambda item: item.line_number)
+    parsed_neighbors = [
+        candidate
+        for candidate in corroborated
+        if candidate.whitespace_tail is None
+    ]
+    repaired_values: dict[int, tuple[float, float, float]] = {}
+    corroborated_lines = {candidate.line_number for candidate in corroborated}
+    for candidate in whitespace_tail_candidates:
+        if candidate.line_number not in corroborated_lines:
+            continue
+        restored, reason = _restore_whitespace_tail_signs(
+            candidate, parsed_neighbors
+        )
+        if restored is None:
+            ambiguities.append(
+                _ambiguity_record(
+                    line_number=candidate.line_number,
+                    line=candidate.line,
+                    reason=f"refused JANAF tail sign restoration: {reason}",
+                    table_id=table_id,
+                    url=url,
+                    kind=NIST_TAIL_UNRESOLVED_KIND,
+                )
+            )
+        else:
+            repaired_values[candidate.line_number] = restored
     ambiguities.sort(key=lambda item: (item.get("line_number") is None, item.get("line_number") or 0))
     for candidate in corroborated:
+        repaired_tail = repaired_values.get(candidate.line_number)
+        if candidate.whitespace_tail is not None and repaired_tail is None:
+            continue
         fields = candidate.content + [""] * (len(VALUE_COLUMNS) - len(candidate.content))
         temperature_token = fields[0]
         row: dict[str, Any] = {}
@@ -642,16 +812,27 @@ def parse_janaf_txt(
             zip(VALUE_COLUMNS, fields, strict=True)
         ):
             column = header_fields[index] if index < len(header_fields) else default_column
+            locator = {
+                "table_id": table_id,
+                "url": url,
+                "download_url": download_url,
+                "row_temperature_as_published": temperature_token,
+                "column": column,
+            }
+            value = parse_published_number(token)
+            if repaired_tail is not None and index >= 5:
+                value = repaired_tail[index - 5]
+                locator.update(
+                    {
+                        "parse_repair": NIST_TAIL_PARSE_REPAIR,
+                        "line_number": candidate.line_number,
+                        "raw_line": candidate.line,
+                    }
+                )
             row[key] = {
-                "value": parse_published_number(token),
+                "value": value,
                 "as_published": token,
-                "locator": {
-                    "table_id": table_id,
-                    "url": url,
-                    "download_url": download_url,
-                    "row_temperature_as_published": temperature_token,
-                    "column": column,
-                },
+                "locator": locator,
             }
         values.append(row)
     if not values:
@@ -729,6 +910,16 @@ def round_trip_failures(document: Mapping[str, Any]) -> list[str]:
             stored = cell.get("value")
             parsed = parse_published_number("" if token is None else str(token))
             if parsed != stored:
+                locator = cell.get("locator")
+                if (
+                    isinstance(locator, Mapping)
+                    and locator.get("parse_repair") == NIST_TAIL_PARSE_REPAIR
+                    and locator.get("raw_line")
+                    and parsed is not None
+                    and stored is not None
+                    and abs(parsed) == abs(stored)
+                ):
+                    continue
                 failures.append(
                     f"{table_id} row {row_number} {key}: "
                     f"as_published={token!r} stored={stored!r} parsed={parsed!r}"

@@ -22,6 +22,7 @@ from simulator.yaml_cache import load_cached_safe_yaml
 from simulator.reference_data.janaf import (
     COMPILATION_ROOT,
     NON_STOICHIOMETRIC_TABLES,
+    NIST_TAIL_PARSE_REPAIR,
     PINNED_JANAF_ABSENT_ELEMENTS,
     TABLES_DIR,
     coverage_by_element,
@@ -169,6 +170,39 @@ def test_transition_following_rows_restore_signed_janaf_tail(
     row = rows[0]
     for key, value in expected.items():
         assert row[key]["value"] == value
+
+
+def test_repaired_janaf_row_keeps_unsigned_tokens_and_raw_line() -> None:
+    table = load_table_document(TABLES_DIR / "O-038.yaml")["table"]
+    row = next(
+        row for row in table["values"] if row["temperature"]["value"] == 1700
+    )
+    raw_line = (
+        "1700\t85.772\t158.857\t102.619\t95.604\t"
+        "941.610  609.059 18.714"
+    )
+    for key, token in (
+        ("formation_enthalpy", "941.610"),
+        ("formation_gibbs_energy", "609.059"),
+        ("log10_formation_equilibrium_constant", "18.714"),
+    ):
+        cell = row[key]
+        assert cell["as_published"] == token
+        assert cell["locator"]["parse_repair"] == NIST_TAIL_PARSE_REPAIR
+        assert cell["locator"]["raw_line"] == raw_line
+    assert round_trip_failures({"table": table}) == []
+
+
+def test_unresolved_janaf_tail_identity_stays_in_parse_ambiguities() -> None:
+    table = load_table_document(TABLES_DIR / "B-123.yaml")["table"]
+    assert not any(row["temperature"]["value"] == 1100 for row in table["values"])
+    ambiguity = next(
+        item
+        for item in table["parse_ambiguities"]
+        if item.get("raw_line", "").startswith("1100\t")
+    )
+    assert ambiguity["kind"] == "nist_tail_whitespace_signs_unresolved"
+    assert "identity misses by 1001.634 printed log Kf units" in ambiguity["reason"]
 
 
 def test_every_absent_100k_node_is_explained_by_the_printed_grid() -> None:

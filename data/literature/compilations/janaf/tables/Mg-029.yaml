@@ -18,12 +18,12 @@ compilation_role:
   circularity_warning: Do not validate an engine against a compilation it consumes.
 extraction:
   method: machine parse of NIST tab-delimited table download; source bytes cached unchanged
-  date: '2026-09-06'
   user_agent: RegolithPyrolysisSimulator-corpus-harvester/1.0 (public thermochemical reference-data research; polite cached
     client)
   source_cache_path: /Users/simonrowland/Library/CloudStorage/Dropbox/Starship Mission Design/Regolith Processing/regolith-pyrolysis-simulator/docs-private/research/2026-08-09-upstream-mission/IMCC-impl/janaf-mirror/Mg/Mg-029.txt
   source_sha256: b432307111c764a5937967d9123333c6b8004519ee25a0c9f5a6572131297ee8
   review_status: machine_transcribed_unreviewed
+  date: '2026-09-06'
 table:
   table_id: Mg-029
   url: https://janaf.nist.gov/tables/Mg-029.html
@@ -1704,6 +1704,87 @@ table:
         row_temperature_as_published: '2100'
         column: log Kf
   - temperature:
+      value: 2200.0
+      as_published: '2200'
+      locator:
+        table_id: Mg-029
+        url: https://janaf.nist.gov/tables/Mg-029.html
+        download_url: https://janaf.nist.gov/tables/Mg-029.txt
+        row_temperature_as_published: '2200'
+        column: T(K)
+    heat_capacity:
+      value: 205.016
+      as_published: '205.016'
+      locator:
+        table_id: Mg-029
+        url: https://janaf.nist.gov/tables/Mg-029.html
+        download_url: https://janaf.nist.gov/tables/Mg-029.txt
+        row_temperature_as_published: '2200'
+        column: Cp
+    entropy:
+      value: 458.623
+      as_published: '458.623'
+      locator:
+        table_id: Mg-029
+        url: https://janaf.nist.gov/tables/Mg-029.html
+        download_url: https://janaf.nist.gov/tables/Mg-029.txt
+        row_temperature_as_published: '2200'
+        column: S
+    negative_gibbs_enthalpy_function:
+      value: 301.525
+      as_published: '301.525'
+      locator:
+        table_id: Mg-029
+        url: https://janaf.nist.gov/tables/Mg-029.html
+        download_url: https://janaf.nist.gov/tables/Mg-029.txt
+        row_temperature_as_published: '2200'
+        column: -[G-H(Tr)]/T
+    enthalpy_increment:
+      value: 345.616
+      as_published: '345.616'
+      locator:
+        table_id: Mg-029
+        url: https://janaf.nist.gov/tables/Mg-029.html
+        download_url: https://janaf.nist.gov/tables/Mg-029.txt
+        row_temperature_as_published: '2200'
+        column: H-H(Tr)
+    formation_enthalpy:
+      value: -2375.259
+      as_published: '2375.259'
+      locator:
+        table_id: Mg-029
+        url: https://janaf.nist.gov/tables/Mg-029.html
+        download_url: https://janaf.nist.gov/tables/Mg-029.txt
+        row_temperature_as_published: '2200'
+        column: delta-f H
+        parse_repair: nist_tail_whitespace_signs_restored
+        line_number: 29
+        raw_line: "2200\t205.016\t458.623\t301.525\t345.616\t2375.259  1131.582 26.867"
+    formation_gibbs_energy:
+      value: -1131.582
+      as_published: '1131.582'
+      locator:
+        table_id: Mg-029
+        url: https://janaf.nist.gov/tables/Mg-029.html
+        download_url: https://janaf.nist.gov/tables/Mg-029.txt
+        row_temperature_as_published: '2200'
+        column: delta-f G
+        parse_repair: nist_tail_whitespace_signs_restored
+        line_number: 29
+        raw_line: "2200\t205.016\t458.623\t301.525\t345.616\t2375.259  1131.582 26.867"
+    log10_formation_equilibrium_constant:
+      value: 26.867
+      as_published: '26.867'
+      locator:
+        table_id: Mg-029
+        url: https://janaf.nist.gov/tables/Mg-029.html
+        download_url: https://janaf.nist.gov/tables/Mg-029.txt
+        row_temperature_as_published: '2200'
+        column: log Kf
+        parse_repair: nist_tail_whitespace_signs_restored
+        line_number: 29
+        raw_line: "2200\t205.016\t458.623\t301.525\t345.616\t2375.259  1131.582 26.867"
+  - temperature:
       value: 2300.0
       as_published: '2300'
       locator:
@@ -3014,12 +3095,6 @@ table:
       url: https://janaf.nist.gov/tables/Mg-029.html
   - line_number: 28
     raw_line: "2171.000\t205.016\t455.902\t299.444\t339.670\tCRYSTAL <--> LIQUID"
-    reason: expected 8 tab-separated values; found 6
-    locator:
-      table_id: Mg-029
-      url: https://janaf.nist.gov/tables/Mg-029.html
-  - line_number: 29
-    raw_line: "2200\t205.016\t458.623\t301.525\t345.616\t2375.259  1131.582 26.867"
     reason: expected 8 tab-separated values; found 6
     locator:
       table_id: Mg-029

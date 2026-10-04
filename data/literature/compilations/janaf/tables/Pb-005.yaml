@@ -18,12 +18,12 @@ compilation_role:
   circularity_warning: Do not validate an engine against a compilation it consumes.
 extraction:
   method: machine parse of NIST tab-delimited table download; source bytes cached unchanged
-  date: '2026-09-06'
   user_agent: RegolithPyrolysisSimulator-corpus-harvester/1.0 (public thermochemical reference-data research; polite cached
     client)
   source_cache_path: /private/tmp/janaf-review-evidence/nist-cache/txt/Pb-005.txt
   source_sha256: 6364c46e83457718ebb0290f862e2e829e5bbd8851e508af9f94c85781c4f2b7
   review_status: machine_transcribed_unreviewed
+  date: '2026-09-06'
 table:
   table_id: Pb-005
   url: https://janaf.nist.gov/tables/Pb-005.html
@@ -1847,6 +1847,87 @@ table:
         download_url: https://janaf.nist.gov/tables/Pb-005.txt
         row_temperature_as_published: '2000'
         column: log Kf
+  - temperature:
+      value: 2100.0
+      as_published: '2100'
+      locator:
+        table_id: Pb-005
+        url: https://janaf.nist.gov/tables/Pb-005.html
+        download_url: https://janaf.nist.gov/tables/Pb-005.txt
+        row_temperature_as_published: '2100'
+        column: T(K)
+    heat_capacity:
+      value: 25.499
+      as_published: '25.499'
+      locator:
+        table_id: Pb-005
+        url: https://janaf.nist.gov/tables/Pb-005.html
+        download_url: https://janaf.nist.gov/tables/Pb-005.txt
+        row_temperature_as_published: '2100'
+        column: Cp
+    entropy:
+      value: 216.916
+      as_published: '216.916'
+      locator:
+        table_id: Pb-005
+        url: https://janaf.nist.gov/tables/Pb-005.html
+        download_url: https://janaf.nist.gov/tables/Pb-005.txt
+        row_temperature_as_published: '2100'
+        column: S
+    negative_gibbs_enthalpy_function:
+      value: 198.26
+      as_published: '198.260'
+      locator:
+        table_id: Pb-005
+        url: https://janaf.nist.gov/tables/Pb-005.html
+        download_url: https://janaf.nist.gov/tables/Pb-005.txt
+        row_temperature_as_published: '2100'
+        column: -[G-H(Tr)]/T
+    enthalpy_increment:
+      value: 39.178
+      as_published: '39.178'
+      locator:
+        table_id: Pb-005
+        url: https://janaf.nist.gov/tables/Pb-005.html
+        download_url: https://janaf.nist.gov/tables/Pb-005.txt
+        row_temperature_as_published: '2100'
+        column: H-H(Tr)
+    formation_enthalpy:
+      value: 0.0
+      as_published: '0.'
+      locator:
+        table_id: Pb-005
+        url: https://janaf.nist.gov/tables/Pb-005.html
+        download_url: https://janaf.nist.gov/tables/Pb-005.txt
+        row_temperature_as_published: '2100'
+        column: delta-f H
+        parse_repair: nist_tail_whitespace_signs_restored
+        line_number: 29
+        raw_line: "2100\t25.499\t216.916\t198.260\t39.178\t0. 0. 0."
+    formation_gibbs_energy:
+      value: 0.0
+      as_published: '0.'
+      locator:
+        table_id: Pb-005
+        url: https://janaf.nist.gov/tables/Pb-005.html
+        download_url: https://janaf.nist.gov/tables/Pb-005.txt
+        row_temperature_as_published: '2100'
+        column: delta-f G
+        parse_repair: nist_tail_whitespace_signs_restored
+        line_number: 29
+        raw_line: "2100\t25.499\t216.916\t198.260\t39.178\t0. 0. 0."
+    log10_formation_equilibrium_constant:
+      value: 0.0
+      as_published: '0.'
+      locator:
+        table_id: Pb-005
+        url: https://janaf.nist.gov/tables/Pb-005.html
+        download_url: https://janaf.nist.gov/tables/Pb-005.txt
+        row_temperature_as_published: '2100'
+        column: log Kf
+        parse_repair: nist_tail_whitespace_signs_restored
+        line_number: 29
+        raw_line: "2100\t25.499\t216.916\t198.260\t39.178\t0. 0. 0."
   - temperature:
       value: 2200.0
       as_published: '2200'
@@ -4658,12 +4739,6 @@ table:
   parse_ambiguities:
   - line_number: 28
     raw_line: "2019.022\t24.831\t215.927\t197.532\t37.140\tFUGACITY = 1 bar"
-    reason: expected 8 tab-separated values; found 6
-    locator:
-      table_id: Pb-005
-      url: https://janaf.nist.gov/tables/Pb-005.html
-  - line_number: 29
-    raw_line: "2100\t25.499\t216.916\t198.260\t39.178\t0. 0. 0."
     reason: expected 8 tab-separated values; found 6
     locator:
       table_id: Pb-005

@@ -18,12 +18,12 @@ compilation_role:
   circularity_warning: Do not validate an engine against a compilation it consumes.
 extraction:
   method: machine parse of NIST tab-delimited table download; source bytes cached unchanged
-  date: '2026-09-06'
   user_agent: RegolithPyrolysisSimulator-corpus-harvester/1.0 (public thermochemical reference-data research; polite cached
     client)
   source_cache_path: /Users/simonrowland/Library/CloudStorage/Dropbox/Starship Mission Design/Regolith Processing/regolith-pyrolysis-simulator/docs-private/research/2026-08-09-upstream-mission/IMCC-impl/janaf-mirror/C/C-077.txt
   source_sha256: 424527654976ae2cd3b781192dd18011fb44b262de4c070a74c7f4da7ec8ce68
   review_status: machine_transcribed_unreviewed
+  date: '2026-09-06'
 table:
   table_id: C-077
   url: https://janaf.nist.gov/tables/C-077.html
@@ -840,6 +840,87 @@ table:
         row_temperature_as_published: '900'
         column: log Kf
   - temperature:
+      value: 1000.0
+      as_published: '1000'
+      locator:
+        table_id: C-077
+        url: https://janaf.nist.gov/tables/C-077.html
+        download_url: https://janaf.nist.gov/tables/C-077.txt
+        row_temperature_as_published: '1000'
+        column: T(K)
+    heat_capacity:
+      value: 185.435
+      as_published: '185.435'
+      locator:
+        table_id: C-077
+        url: https://janaf.nist.gov/tables/C-077.html
+        download_url: https://janaf.nist.gov/tables/C-077.txt
+        row_temperature_as_published: '1000'
+        column: Cp
+    entropy:
+      value: 305.341
+      as_published: '305.341'
+      locator:
+        table_id: C-077
+        url: https://janaf.nist.gov/tables/C-077.html
+        download_url: https://janaf.nist.gov/tables/C-077.txt
+        row_temperature_as_published: '1000'
+        column: S
+    negative_gibbs_enthalpy_function:
+      value: 196.255
+      as_published: '196.255'
+      locator:
+        table_id: C-077
+        url: https://janaf.nist.gov/tables/C-077.html
+        download_url: https://janaf.nist.gov/tables/C-077.txt
+        row_temperature_as_published: '1000'
+        column: -[G-H(Tr)]/T
+    enthalpy_increment:
+      value: 109.086
+      as_published: '109.086'
+      locator:
+        table_id: C-077
+        url: https://janaf.nist.gov/tables/C-077.html
+        download_url: https://janaf.nist.gov/tables/C-077.txt
+        row_temperature_as_published: '1000'
+        column: H-H(Tr)
+    formation_enthalpy:
+      value: -1158.169
+      as_published: '1158.169'
+      locator:
+        table_id: C-077
+        url: https://janaf.nist.gov/tables/C-077.html
+        download_url: https://janaf.nist.gov/tables/C-077.txt
+        row_temperature_as_published: '1000'
+        column: delta-f H
+        parse_repair: nist_tail_whitespace_signs_restored
+        line_number: 19
+        raw_line: "1000\t185.435\t305.341\t196.255\t109.086\t1158.169  933.471 48.760"
+    formation_gibbs_energy:
+      value: -933.471
+      as_published: '933.471'
+      locator:
+        table_id: C-077
+        url: https://janaf.nist.gov/tables/C-077.html
+        download_url: https://janaf.nist.gov/tables/C-077.txt
+        row_temperature_as_published: '1000'
+        column: delta-f G
+        parse_repair: nist_tail_whitespace_signs_restored
+        line_number: 19
+        raw_line: "1000\t185.435\t305.341\t196.255\t109.086\t1158.169  933.471 48.760"
+    log10_formation_equilibrium_constant:
+      value: 48.76
+      as_published: '48.760'
+      locator:
+        table_id: C-077
+        url: https://janaf.nist.gov/tables/C-077.html
+        download_url: https://janaf.nist.gov/tables/C-077.txt
+        row_temperature_as_published: '1000'
+        column: log Kf
+        parse_repair: nist_tail_whitespace_signs_restored
+        line_number: 19
+        raw_line: "1000\t185.435\t305.341\t196.255\t109.086\t1158.169  933.471 48.760"
+  - temperature:
       value: 1100.0
       as_published: '1100'
       locator:
@@ -1586,12 +1667,6 @@ table:
       url: https://janaf.nist.gov/tables/C-077.html
   - line_number: 18
     raw_line: "993.150\t185.435\t304.066\t195.507\t107.816\tIII <--> LIQUID"
-    reason: expected 8 tab-separated values; found 6
-    locator:
-      table_id: C-077
-      url: https://janaf.nist.gov/tables/C-077.html
-  - line_number: 19
-    raw_line: "1000\t185.435\t305.341\t196.255\t109.086\t1158.169  933.471 48.760"
     reason: expected 8 tab-separated values; found 6
     locator:
       table_id: C-077
