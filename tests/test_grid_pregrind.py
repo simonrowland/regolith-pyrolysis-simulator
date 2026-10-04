@@ -2168,6 +2168,55 @@ def test_write_result_refuses_model_mismatch(tmp_path):
         ).fetchone()[0] == 0
 
 
+@pytest.mark.parametrize("backend_name", ["subprocess", "thermoengine"])
+@pytest.mark.parametrize("queued_model", ["MELTSv1.0.2", ""])
+@pytest.mark.parametrize("reported_model", [None, "", " \t "])
+@pytest.mark.parametrize("status_kind", ["success", "refusal", "failure"])
+def test_write_result_refuses_blank_reported_model_for_every_status(
+    tmp_path, backend_name, queued_model, reported_model, status_kind
+):
+    database = tmp_path / (
+        f"blank-reported-{backend_name}-{queued_model!r}-"
+        f"{reported_model!r}-{status_kind}.db"
+    )
+    with GridCacheWriter(database, backend_name=backend_name) as writer:
+        batch_id = writer.ensure_batch(
+            label="fixed", kind="fixed", seed=178, params={"test": True}
+        )
+        inputs = {
+            **_inputs(1200.0),
+            "mode": backend_name,
+            "model": queued_model,
+        }
+        writer.materialize_key(
+            inputs,
+            batch_id=batch_id,
+            shuffle_rank=0,
+            shard=0,
+            intended_fO2_log=-9.0,
+        )
+        key_id = writer.pending_rows(batch_id=batch_id)[0]["grid_key_id"]
+        output = _output()
+        output["engine_mode"] = backend_name
+        output["engine_model"] = reported_model
+        output["status_kind"] = status_kind
+        output["status"] = {
+            "success": "ok",
+            "refusal": "out_of_domain",
+            "failure": "failed",
+        }[status_kind]
+
+        with pytest.raises(
+            ValueError, match="grid result model differs from queued key"
+        ):
+            writer.write_result(key_id, output)
+
+        assert writer.connection.execute(
+            "SELECT COUNT(*) FROM alphamelts_outputs"
+        ).fetchone()[0] == 0
+        assert len(writer.pending_rows(batch_id=batch_id)) == 1
+
+
 @pytest.mark.parametrize("status_kind", ["success", "refusal"])
 def test_write_result_refuses_unavailable_model_for_nonfailure_even_if_queued(
     tmp_path, status_kind
