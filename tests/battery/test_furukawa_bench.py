@@ -32,7 +32,8 @@ def test_furukawa_registry_preserves_unassigned_geometry_and_observations(tmp_pa
         assert mass.kind is ValueKind.INTERVAL
         assert str(mass.interval_low) == "0.001"
         assert str(mass.interval_high) == "0.003"
-        assert experiment.pressure_environment.total_pressure_Pa.state.value.kind is ValueKind.INTERVAL
+        # Chamber / cell-side vacuum demoted: in-cell total unknown (not an interval over the sample).
+        assert experiment.pressure_environment.total_pressure_Pa.state.is_unknown
         duration = experiment.thermal_schedule.total_duration_s.state
         if experiment.experiment_id.endswith('fe-v-solid-scan-series'):
             assert duration.value.kind is ValueKind.POINT
@@ -40,6 +41,15 @@ def test_furukawa_registry_preserves_unassigned_geometry_and_observations(tmp_pa
             assert str(duration.value.point) == '14400'
         else:
             assert duration.is_unknown
+    notes = [
+        e.pressure_environment.cell_internal_pressure_note
+        for e in declared
+        if e.pressure_environment.cell_internal_pressure_note is not None
+        and e.pressure_environment.cell_internal_pressure_note.state.is_value
+    ]
+    assert notes, 'expected residual chamber-vacuum note on at least one Furukawa experiment'
+    assert any('3x10^-7' in str(n.state.value) or '1.5x10^-6' in str(n.state.value) for n in notes)
+
     stability = next(f for f in bench.other_facts if f.name.startswith('temperature_fluctuation'))
     assert stability.value.state.value.kind is ValueKind.BOUND
     assert stability.value.state.value.bound_operator == '<='

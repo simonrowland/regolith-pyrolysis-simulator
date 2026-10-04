@@ -174,8 +174,8 @@ experiments:
         locator: {published_page: 271, section: '3. Procedure', table: '1', note: 'Printed calibration procedure preceding Table 1'}
   pressure_environment:
     total_pressure_Pa:
-      state: {tag: value, value: {kind: interval, interval_low: '0.000001333223684210526315789474', interval_high: '0.00001333223684210526315789474'}}
-      locator: {page: 267, section: '2. Description of Mass Spectrometric System', note: 10^-8 to 10^-7 Torr; converted to Pa}
+      state: {tag: unknown, reason: in_cell_total_pressure_not_derivable}
+      locator: {page: 267, section: '2. Description of Mass Spectrometric System', note: 10^-8 to 10^-7 Torr; converted to Pa; demoted to residual chamber-vacuum note (not in-cell total)}
     sweep_gas:
       state: {tag: not_applicable, reason: not_applicable}
       locator: {page: 267, section: '2. Description of Mass Spectrometric System', note: Vacuum system}
@@ -278,6 +278,10 @@ species:
           equation_locator: {published_page: 270, equation: '2'}
           calibration_locator: {published_page: 271, table: '1'}
       equipment:
+        residual_pressure_Pa_as_printed:
+          value: "Knudsen chamber and MS region ionization-gauge pressures in the 10^-8 to 10^-7 Torr range (~1.33e-6 to 1.33e-5 Pa) during experiments — surrounding vacua, not in-cell total"
+          quote: "were in the 10^-7–10^-8 Torr range"
+          locator: {page: 267, section: '2. Description of Mass Spectrometric System', note: '10^-8 to 10^-7 Torr chamber vacua; demoted (not in-cell total)'}
         cell_material:
           value: platinum Knudsen cell
           locator:

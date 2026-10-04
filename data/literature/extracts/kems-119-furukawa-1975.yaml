@@ -191,8 +191,8 @@ experiments:
       locator: {published_page: 3054, table: '2', note: Multiple measurement temperatures; 1600 C tabulated intercepts are not a single run setpoint}
   pressure_environment:
     total_pressure_Pa:
-      state: {tag: value, value: {kind: interval, interval_low: '0.00003999671052631578947368421053', interval_high: '0.0001999835526315789473684210526'}}
-      locator: {page: 15, published_page: 3053, section: '3.2', note: 'Cell-side vacuum during ion measurement: 3e-7 to 1.5e-6 Torr; unit conversion only, 1 Torr = 101325/760 Pa'}
+      state: {tag: unknown, reason: in_cell_total_pressure_not_derivable}
+      locator: {page: 15, published_page: 3053, section: '3.2', note: 'Cell-side vacuum during ion measurement: 3e-7 to 1.5e-6 Torr; unit conversion only, 1 Torr = 101325/760 Pa; demoted to residual chamber-vacuum note (not in-cell total)'}
     sweep_gas:
       state: {tag: not_applicable, reason: not_applicable}
       locator: {page: 15, published_page: 3053, section: '3.2', note: Vacuum measurement; preparation H2 is not measurement gas}
@@ -335,9 +335,9 @@ species:
             section: '3.1'
             figure: '1'
             note: Hitachi RM-6K; alumina SSA-S cell; Ta susceptor Fig. 2
-        chamber_pressure:
-          value: 3e-7 to 1.5e-6 Torr as printed during ion-intensity measurement
-          units: Torr as published
+        residual_pressure_Pa_as_printed:
+          value: "Cell-side vacuum during ion-intensity measurement 3x10^-7 to 1.5x10^-6 Torr (~4.00e-5 to 2.00e-4 Pa) — chamber vacuum, not in-cell total"
+          quote: "イオン強度測定中のセル側真空度は 3×10^-7 ～ 1.5×10^-6 Torr であった。"
           locator:
             published_page: 3053
             pdf_page_index: 4
@@ -406,9 +406,9 @@ species:
             section: '3.1'
             figure: '1'
             note: Hitachi RM-6K; alumina SSA-S cell; Ta susceptor Fig. 2
-        chamber_pressure:
-          value: 3e-7 to 1.5e-6 Torr as printed during ion-intensity measurement
-          units: Torr as published
+        residual_pressure_Pa_as_printed:
+          value: "Cell-side vacuum during ion-intensity measurement 3x10^-7 to 1.5x10^-6 Torr (~4.00e-5 to 2.00e-4 Pa) — chamber vacuum, not in-cell total"
+          quote: "イオン強度測定中のセル側真空度は 3×10^-7 ～ 1.5×10^-6 Torr であった。"
           locator:
             published_page: 3053
             pdf_page_index: 4
@@ -681,9 +681,9 @@ species:
             section: '3.1'
             figure: '1'
             note: Hitachi RM-6K; alumina SSA-S cell; Ta susceptor Fig. 2
-        chamber_pressure:
-          value: 3e-7 to 1.5e-6 Torr as printed during ion-intensity measurement
-          units: Torr as published
+        residual_pressure_Pa_as_printed:
+          value: "Cell-side vacuum during ion-intensity measurement 3x10^-7 to 1.5x10^-6 Torr (~4.00e-5 to 2.00e-4 Pa) — chamber vacuum, not in-cell total"
+          quote: "イオン強度測定中のセル側真空度は 3×10^-7 ～ 1.5×10^-6 Torr であった。"
           locator:
             published_page: 3053
             pdf_page_index: 4
@@ -1016,9 +1016,9 @@ species:
             section: '3.1'
             figure: '1'
             note: Hitachi RM-6K; alumina SSA-S cell; Ta susceptor Fig. 2
-        chamber_pressure:
-          value: 3e-7 to 1.5e-6 Torr as printed during ion-intensity measurement
-          units: Torr as published
+        residual_pressure_Pa_as_printed:
+          value: "Cell-side vacuum during ion-intensity measurement 3x10^-7 to 1.5x10^-6 Torr (~4.00e-5 to 2.00e-4 Pa) — chamber vacuum, not in-cell total"
+          quote: "イオン強度測定中のセル側真空度は 3×10^-7 ～ 1.5×10^-6 Torr であった。"
           locator:
             published_page: 3053
             pdf_page_index: 4

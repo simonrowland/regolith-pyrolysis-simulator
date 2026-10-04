@@ -189,8 +189,8 @@ experiments:
         locator: {page: 3, published_page: 3, note: 'Thickness-to-radius ratio 1 and Clausing factor 0.67 are printed, not a channel length'}
   pressure_environment:
     total_pressure_Pa:
-      state: {tag: value, value: {kind: point, point: '0.0001', approximate: true}}
-      locator: {page: 2, published_page: 2, note: KC chamber about 10^-6 mbar; unit conversion only}
+      state: {tag: unknown, reason: in_cell_total_pressure_not_derivable}
+      locator: {page: 2, published_page: 2, note: KC chamber about 10^-6 mbar; unit conversion only; demoted to residual chamber-vacuum note (not in-cell total)}
     sweep_gas:
       state: {tag: not_applicable, reason: not_applicable}
       locator: *b138_apparatus
@@ -231,8 +231,8 @@ experiments:
         locator: {page: 3, published_page: 3, note: No channel length printed}
   pressure_environment:
     total_pressure_Pa:
-      state: {tag: value, value: {kind: point, point: '0.0001', approximate: true}}
-      locator: {page: 2, published_page: 2, note: KC chamber about 10^-6 mbar; unit conversion only}
+      state: {tag: unknown, reason: in_cell_total_pressure_not_derivable}
+      locator: {page: 2, published_page: 2, note: KC chamber about 10^-6 mbar; unit conversion only; demoted to residual chamber-vacuum note (not in-cell total)}
     sweep_gas:
       state: {tag: not_applicable, reason: not_applicable}
       locator: *b138_apparatus
@@ -323,10 +323,9 @@ species:
             published_page: 2
             paragraph: experimental
             quote: "The iridium KC contains the sample to be analysed"
-        chamber_pressure:
-          value: 1.0e-06
-          units: mbar
-          note: KC chamber (~10^-6 mbar) as printed; other compartments ~10^-9 mbar
+        residual_pressure_Pa_as_printed:
+          value: "Assembly evacuated through turbo molecular pump to ~10^-6 mbar (~0.0001 Pa); heating when vacuum reached ~10^-6 mbar or better — chamber/pump-down vacuum, not in-cell total"
+          quote: "evacuated through a turbo molecular pump to ~10-6 mbar"
           locator:
             pdf_page_index: 3
             published_page: 2

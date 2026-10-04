@@ -145,35 +145,11 @@ experiments:
   pressure_environment:
     total_pressure_Pa:
       state:
-        tag: value
-        value:
-          kind: point
-          point: '0.0001'
-          approximate: true
+        tag: unknown
+        reason: in_cell_total_pressure_not_derivable
       locator:
         page: 4
-        note: KC chamber about 10^-6 mbar; unit conversion only
-      inference:
-        relation: mbar_to_Pa
-        inputs:
-        - P_Pa = P_mbar × 100
-        - original_unit=mbar
-        parameters:
-        - - original
-          - state:
-              tag: value
-              value: '0.000001'
-            locator:
-              page: 4
-              note: KC chamber about 10^-6 mbar; unit conversion only
-        - - factor
-          - state:
-              tag: value
-              value: '100'
-            locator:
-              page: 4
-              note: KC chamber about 10^-6 mbar; unit conversion only
-        output_unit: Pa
+        note: KC chamber about 10^-6 mbar; unit conversion only; demoted to residual chamber-vacuum note (not in-cell total)
     sweep_gas:
       state:
         tag: not_applicable
@@ -185,6 +161,15 @@ experiments:
       regime_class:
         tag: value
         value: molecular
+    cell_internal_pressure_note:
+      state:
+        tag: value
+        value: KC chamber about 10^-6 mbar (~0.0001 Pa); other compartments about 10^-9 mbar — surrounding chamber vacuum,
+          not in-cell total
+      locator:
+        pdf_page_index: 5
+        paragraph: The KC chamber (~10-6 mbar)
+        section: 2.2.1. Knudsen Effusion Mass Spectrometry (KEMS)
   work_id: 10.1016/j.gca.2023.08.027
   locator:
     page: 5
@@ -354,35 +339,11 @@ experiments:
   pressure_environment:
     total_pressure_Pa:
       state:
-        tag: value
-        value:
-          kind: point
-          point: '0.0001'
-          approximate: true
+        tag: unknown
+        reason: in_cell_total_pressure_not_derivable
       locator:
         page: 4
-        note: KC chamber about 10^-6 mbar; unit conversion only
-      inference:
-        relation: mbar_to_Pa
-        inputs:
-        - P_Pa = P_mbar × 100
-        - original_unit=mbar
-        parameters:
-        - - original
-          - state:
-              tag: value
-              value: '0.000001'
-            locator:
-              page: 4
-              note: KC chamber about 10^-6 mbar; unit conversion only
-        - - factor
-          - state:
-              tag: value
-              value: '100'
-            locator:
-              page: 4
-              note: KC chamber about 10^-6 mbar; unit conversion only
-        output_unit: Pa
+        note: KC chamber about 10^-6 mbar; unit conversion only; demoted to residual chamber-vacuum note (not in-cell total)
     sweep_gas:
       state:
         tag: not_applicable
@@ -394,6 +355,15 @@ experiments:
       regime_class:
         tag: value
         value: molecular
+    cell_internal_pressure_note:
+      state:
+        tag: value
+        value: KC chamber about 10^-6 mbar (~0.0001 Pa); other compartments about 10^-9 mbar — surrounding chamber vacuum,
+          not in-cell total
+      locator:
+        pdf_page_index: 5
+        paragraph: The KC chamber (~10-6 mbar)
+        section: 2.2.1. Knudsen Effusion Mass Spectrometry (KEMS)
   work_id: 10.1016/j.gca.2023.08.027
   locator:
     page: 5
@@ -563,35 +533,11 @@ experiments:
   pressure_environment:
     total_pressure_Pa:
       state:
-        tag: value
-        value:
-          kind: point
-          point: '0.0001'
-          approximate: true
+        tag: unknown
+        reason: in_cell_total_pressure_not_derivable
       locator:
         page: 4
-        note: KC chamber about 10^-6 mbar; unit conversion only
-      inference:
-        relation: mbar_to_Pa
-        inputs:
-        - P_Pa = P_mbar × 100
-        - original_unit=mbar
-        parameters:
-        - - original
-          - state:
-              tag: value
-              value: '0.000001'
-            locator:
-              page: 4
-              note: KC chamber about 10^-6 mbar; unit conversion only
-        - - factor
-          - state:
-              tag: value
-              value: '100'
-            locator:
-              page: 4
-              note: KC chamber about 10^-6 mbar; unit conversion only
-        output_unit: Pa
+        note: KC chamber about 10^-6 mbar; unit conversion only; demoted to residual chamber-vacuum note (not in-cell total)
     sweep_gas:
       state:
         tag: not_applicable
@@ -603,6 +549,15 @@ experiments:
       regime_class:
         tag: value
         value: molecular
+    cell_internal_pressure_note:
+      state:
+        tag: value
+        value: KC chamber about 10^-6 mbar (~0.0001 Pa); other compartments about 10^-9 mbar — surrounding chamber vacuum,
+          not in-cell total
+      locator:
+        pdf_page_index: 5
+        paragraph: The KC chamber (~10-6 mbar)
+        section: 2.2.1. Knudsen Effusion Mass Spectrometry (KEMS)
   work_id: 10.1016/j.gca.2023.08.027
   locator:
     page: 5
@@ -862,35 +817,11 @@ experiments:
   pressure_environment:
     total_pressure_Pa:
       state:
-        tag: value
-        value:
-          kind: point
-          point: '0.0001'
-          approximate: true
+        tag: unknown
+        reason: in_cell_total_pressure_not_derivable
       locator:
         page: 4
-        note: KC chamber about 10^-6 mbar; unit conversion only
-      inference:
-        relation: mbar_to_Pa
-        inputs:
-        - P_Pa = P_mbar × 100
-        - original_unit=mbar
-        parameters:
-        - - original
-          - state:
-              tag: value
-              value: '0.000001'
-            locator:
-              page: 4
-              note: KC chamber about 10^-6 mbar; unit conversion only
-        - - factor
-          - state:
-              tag: value
-              value: '100'
-            locator:
-              page: 4
-              note: KC chamber about 10^-6 mbar; unit conversion only
-        output_unit: Pa
+        note: KC chamber about 10^-6 mbar; unit conversion only; demoted to residual chamber-vacuum note (not in-cell total)
     sweep_gas:
       state:
         tag: not_applicable
@@ -902,6 +833,15 @@ experiments:
       regime_class:
         tag: value
         value: molecular
+    cell_internal_pressure_note:
+      state:
+        tag: value
+        value: KC chamber about 10^-6 mbar (~0.0001 Pa); other compartments about 10^-9 mbar — surrounding chamber vacuum,
+          not in-cell total
+      locator:
+        pdf_page_index: 5
+        paragraph: The KC chamber (~10-6 mbar)
+        section: 2.2.1. Knudsen Effusion Mass Spectrometry (KEMS)
   work_id: 10.1016/j.gca.2023.08.027
   locator:
     page: 5

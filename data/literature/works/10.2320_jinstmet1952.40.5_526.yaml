@@ -99,15 +99,13 @@ experiments:
   pressure_environment:
     total_pressure_Pa:
       state:
-        tag: value
-        value:
-          kind: point
-          point: '0.00001'
-          approximate: true
+        tag: unknown
+        reason: in_cell_total_pressure_not_derivable
       locator:
         page: 528
         published_page: 528
-        note: Residual gas pressure during cell heating in the 10^-5 Pa range
+        note: Residual gas pressure during cell heating in the 10^-5 Pa range; demoted to residual chamber-vacuum note (not
+          in-cell total)
     sweep_gas:
       state:
         tag: not_applicable
@@ -135,12 +133,13 @@ experiments:
     cell_internal_pressure_note:
       state:
         tag: value
-        value: 10^-5 Pa range; Fig. 5 ~= 3e-5 Pa
+        value: Residual gas pressure during cell heating in the 10^-5 Pa range (Fig. 5 example ~3e-5 Pa); pump-down to about
+          10^-4 Pa before heater — residual/chamber vacuum, not in-cell total
       locator:
-        published_page: 527
-        pdf_page_index: 2
-        figure: '1'
-        note: NEVA NAG-530 quadrupole mass filter; Mo Knudsen cell; alumina inner crucible
+        published_page: 529
+        pdf_page_index: 4
+        figure: '5'
+        note: Fig. 5 residual gas pressure ~= 3 x 10^-5 Pa; text 10^-5 Pa range from ion-pump gauges
   work_id: 10.2320/jinstmet1952.40.5_526
   locator:
     page: 527

@@ -273,8 +273,8 @@ experiments:
         output_unit: mole_fraction
   pressure_environment:
     total_pressure_Pa:
-      state: {tag: value, value: {kind: point, point: '0.0001', approximate: true}}
-      locator: {page: 4, note: 'KC chamber about 10^-6 mbar; unit conversion only'}
+      state: {tag: unknown, reason: in_cell_total_pressure_not_derivable}
+      locator: {page: 4, note: 'KC chamber about 10^-6 mbar; unit conversion only; demoted to residual chamber-vacuum note (not in-cell total)'}
     sweep_gas: {state: {tag: not_applicable, reason: not_applicable}, locator: {page: 4, section: '2.2.1 Knudsen Effusion Mass Spectrometry'}}
     regime: {regime_class: {tag: value, value: molecular}}
   fO2_control:
@@ -312,7 +312,9 @@ experiments:
         - sample.printed_composition
         output_unit: mole_fraction
   pressure_environment:
-    total_pressure_Pa: {state: {tag: value, value: {kind: point, point: '0.0001', approximate: true}}, locator: {page: 4, note: 'KC chamber about 10^-6 mbar; unit conversion only'}}
+    total_pressure_Pa:
+      state: {tag: unknown, reason: in_cell_total_pressure_not_derivable}
+      locator: {page: 4, note: 'KC chamber about 10^-6 mbar; unit conversion only; demoted to residual chamber-vacuum note (not in-cell total)'}
     sweep_gas: {state: {tag: not_applicable, reason: not_applicable}, locator: {page: 4, section: '2.2.1 Knudsen Effusion Mass Spectrometry'}}
     regime: {regime_class: {tag: value, value: molecular}}
   fO2_control:
@@ -350,7 +352,9 @@ experiments:
         - sample.printed_composition
         output_unit: mole_fraction
   pressure_environment:
-    total_pressure_Pa: {state: {tag: value, value: {kind: point, point: '0.0001', approximate: true}}, locator: {page: 4, note: 'KC chamber about 10^-6 mbar; unit conversion only'}}
+    total_pressure_Pa:
+      state: {tag: unknown, reason: in_cell_total_pressure_not_derivable}
+      locator: {page: 4, note: 'KC chamber about 10^-6 mbar; unit conversion only; demoted to residual chamber-vacuum note (not in-cell total)'}
     sweep_gas: {state: {tag: not_applicable, reason: not_applicable}, locator: {page: 4, section: '2.2.1 Knudsen Effusion Mass Spectrometry'}}
     regime: {regime_class: {tag: value, value: molecular}}
   fO2_control:
@@ -388,8 +392,8 @@ experiments:
         locator: {page: 4, note: No channel length printed}
   pressure_environment:
     total_pressure_Pa:
-      state: {tag: value, value: {kind: point, point: '0.0001', approximate: true}}
-      locator: {page: 4, note: KC chamber about 10^-6 mbar; unit conversion only}
+      state: {tag: unknown, reason: in_cell_total_pressure_not_derivable}
+      locator: {page: 4, note: KC chamber about 10^-6 mbar; unit conversion only; demoted to residual chamber-vacuum note (not in-cell total)}
     sweep_gas:
       state: {tag: not_applicable, reason: not_applicable}
       locator: *b137_apparatus
@@ -453,11 +457,9 @@ species:
             pdf_page_index: 5
             section: 2.2.1. Knudsen Effusion Mass Spectrometry (KEMS)
             paragraph: a lid with a 0.4 mm orifice at its centre
-        chamber_pressure:
-          value: "~10^-6"
-          units: mbar
-          kind: nominal
-          note: printed as KC chamber (~10^-6 mbar); other compartments (~10^-9 mbar); not collapsed to a point
+        residual_pressure_Pa_as_printed:
+          value: "KC chamber about 10^-6 mbar (~0.0001 Pa); other compartments about 10^-9 mbar — surrounding chamber vacuum, not in-cell total"
+          quote: "The KC chamber (~10^-6 mbar) can be isolated through a shutter from all other compartments (~10^-9 mbar)"
           locator:
             pdf_page_index: 5
             section: 2.2.1. Knudsen Effusion Mass Spectrometry (KEMS)

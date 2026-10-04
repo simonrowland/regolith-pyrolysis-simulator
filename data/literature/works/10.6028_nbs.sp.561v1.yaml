@@ -139,47 +139,12 @@ experiments:
   pressure_environment:
     total_pressure_Pa:
       state:
-        tag: value
-        value:
-          kind: interval
-          interval_low: '0.000001333223684210526315789474'
-          interval_high: '0.00001333223684210526315789474'
-          approximate: false
+        tag: unknown
+        reason: in_cell_total_pressure_not_derivable
       locator:
         page: 267
         section: 2. Description of Mass Spectrometric System
-        note: 10^-8 to 10^-7 Torr; converted to Pa
-      inference:
-        relation: Torr_to_Pa
-        inputs:
-        - P_Pa = P_Torr × 101325 / 760
-        - original_unit=Torr
-        parameters:
-        - - original_low
-          - state:
-              tag: value
-              value: '0.00000001'
-            locator:
-              page: 267
-              section: 2. Description of Mass Spectrometric System
-              note: 10^-8 to 10^-7 Torr; converted to Pa
-        - - original_high
-          - state:
-              tag: value
-              value: '0.0000001'
-            locator:
-              page: 267
-              section: 2. Description of Mass Spectrometric System
-              note: 10^-8 to 10^-7 Torr; converted to Pa
-        - - factor
-          - state:
-              tag: value
-              value: '133.3223684210526315789473684'
-            locator:
-              page: 267
-              section: 2. Description of Mass Spectrometric System
-              note: 10^-8 to 10^-7 Torr; converted to Pa
-        output_unit: Pa
+        note: 10^-8 to 10^-7 Torr; converted to Pa; demoted to residual chamber-vacuum note (not in-cell total)
     sweep_gas:
       state:
         tag: not_applicable
@@ -192,6 +157,15 @@ experiments:
       regime_class:
         tag: unknown
         reason: not_published
+    cell_internal_pressure_note:
+      state:
+        tag: value
+        value: Knudsen chamber and MS region ionization-gauge pressures in the 10^-8 to 10^-7 Torr range (~1.33e-6 to 1.33e-5
+          Pa) during experiments — surrounding vacua, not in-cell total
+      locator:
+        page: 267
+        section: 2. Description of Mass Spectrometric System
+        note: 10^-8 to 10^-7 Torr chamber vacua; demoted (not in-cell total)
   work_id: 10.6028/nbs.sp.561v1
   locator:
     page: 270

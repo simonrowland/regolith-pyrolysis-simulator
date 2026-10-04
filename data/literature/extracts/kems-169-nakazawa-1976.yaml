@@ -120,8 +120,8 @@ experiments:
         locator: {page: 528, published_page: 528, note: Printed 0.051 mm orifice-plate thickness}
   pressure_environment:
     total_pressure_Pa:
-      state: {tag: value, value: {kind: point, point: '0.00001', approximate: true}}
-      locator: {page: 528, published_page: 528, note: Residual gas pressure during cell heating in the 10^-5 Pa range}
+      state: {tag: unknown, reason: in_cell_total_pressure_not_derivable}
+      locator: {page: 528, published_page: 528, note: Residual gas pressure during cell heating in the 10^-5 Pa range; demoted to residual chamber-vacuum note (not in-cell total)}
     sweep_gas:
       state: {tag: not_applicable, reason: not_applicable}
       locator: {page: 528, published_page: 528, note: 'Ar was used for alloy preparation, not as measurement sweep gas'}
@@ -199,9 +199,9 @@ species:
             ratio about 1e4:1. NEVA (Nippon Electric Varian) NAG-530 quadrupole mass filter. Alumel-chromel
             thermocouple in the lid well. Ionization 70 eV, 0.1 mA for all samples.'
           locator: *id001
-        chamber_pressure:
-          value: residual with cell hot about 1e-5 Pa; Fig. 5 example ~= 3e-5 Pa
-          units: Pa as published
+        residual_pressure_Pa_as_printed:
+          value: "Residual gas pressure during cell heating in the 10^-5 Pa range (Fig. 5 example ~3e-5 Pa); pump-down to about 10^-4 Pa before heater — residual/chamber vacuum, not in-cell total"
+          quote: "10^-4 Pa程度の真空に達してからヒータに通電"
           locator:
             published_page: 529
             pdf_page_index: 4

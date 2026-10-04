@@ -104,54 +104,14 @@ experiments:
   pressure_environment:
     total_pressure_Pa:
       state:
-        tag: value
-        value:
-          kind: interval
-          interval_low: '0.00003999671052631578947368421053'
-          interval_high: '0.0001999835526315789473684210526'
-          approximate: false
+        tag: unknown
+        reason: in_cell_total_pressure_not_derivable
       locator:
         page: 15
         published_page: 3053
         section: '3.2'
-        note: 'Cell-side vacuum during ion measurement: 3e-7 to 1.5e-6 Torr; unit conversion only, 1 Torr = 101325/760 Pa'
-      inference:
-        relation: Torr_to_Pa
-        inputs:
-        - P_Pa = P_Torr × 101325 / 760
-        - original_unit=Torr
-        parameters:
-        - - original_low
-          - state:
-              tag: value
-              value: '0.0000003'
-            locator:
-              page: 15
-              published_page: 3053
-              section: '3.2'
-              note: 'Cell-side vacuum during ion measurement: 3e-7 to 1.5e-6 Torr; unit conversion only, 1 Torr = 101325/760
-                Pa'
-        - - original_high
-          - state:
-              tag: value
-              value: '0.0000015'
-            locator:
-              page: 15
-              published_page: 3053
-              section: '3.2'
-              note: 'Cell-side vacuum during ion measurement: 3e-7 to 1.5e-6 Torr; unit conversion only, 1 Torr = 101325/760
-                Pa'
-        - - factor
-          - state:
-              tag: value
-              value: '133.3223684210526315789473684'
-            locator:
-              page: 15
-              published_page: 3053
-              section: '3.2'
-              note: 'Cell-side vacuum during ion measurement: 3e-7 to 1.5e-6 Torr; unit conversion only, 1 Torr = 101325/760
-                Pa'
-        output_unit: Pa
+        note: 'Cell-side vacuum during ion measurement: 3e-7 to 1.5e-6 Torr; unit conversion only, 1 Torr = 101325/760 Pa;
+          demoted to residual chamber-vacuum note (not in-cell total)'
     sweep_gas:
       state:
         tag: not_applicable
@@ -174,6 +134,16 @@ experiments:
           page: 13
           published_page: 3051
           note: The introductory approximately 1e-4 is a V/Fe vapour-pressure ratio, not base pressure
+    cell_internal_pressure_note:
+      state:
+        tag: value
+        value: Cell-side vacuum during ion-intensity measurement 3x10^-7 to 1.5x10^-6 Torr (~4.00e-5 to 2.00e-4 Pa) — chamber
+          vacuum, not in-cell total
+      locator:
+        published_page: 3053
+        pdf_page_index: 4
+        section: '3.2'
+        note: sample mass, chamber pressure, ionizing voltage, ion species
   work_id: 10.2355/tetsutohagane1955.61.15_3050
   locator:
     published_page: 3057
@@ -313,54 +283,14 @@ experiments:
   pressure_environment:
     total_pressure_Pa:
       state:
-        tag: value
-        value:
-          kind: interval
-          interval_low: '0.00003999671052631578947368421053'
-          interval_high: '0.0001999835526315789473684210526'
-          approximate: false
+        tag: unknown
+        reason: in_cell_total_pressure_not_derivable
       locator:
         page: 15
         published_page: 3053
         section: '3.2'
-        note: 'Cell-side vacuum during ion measurement: 3e-7 to 1.5e-6 Torr; unit conversion only, 1 Torr = 101325/760 Pa'
-      inference:
-        relation: Torr_to_Pa
-        inputs:
-        - P_Pa = P_Torr × 101325 / 760
-        - original_unit=Torr
-        parameters:
-        - - original_low
-          - state:
-              tag: value
-              value: '0.0000003'
-            locator:
-              page: 15
-              published_page: 3053
-              section: '3.2'
-              note: 'Cell-side vacuum during ion measurement: 3e-7 to 1.5e-6 Torr; unit conversion only, 1 Torr = 101325/760
-                Pa'
-        - - original_high
-          - state:
-              tag: value
-              value: '0.0000015'
-            locator:
-              page: 15
-              published_page: 3053
-              section: '3.2'
-              note: 'Cell-side vacuum during ion measurement: 3e-7 to 1.5e-6 Torr; unit conversion only, 1 Torr = 101325/760
-                Pa'
-        - - factor
-          - state:
-              tag: value
-              value: '133.3223684210526315789473684'
-            locator:
-              page: 15
-              published_page: 3053
-              section: '3.2'
-              note: 'Cell-side vacuum during ion measurement: 3e-7 to 1.5e-6 Torr; unit conversion only, 1 Torr = 101325/760
-                Pa'
-        output_unit: Pa
+        note: 'Cell-side vacuum during ion measurement: 3e-7 to 1.5e-6 Torr; unit conversion only, 1 Torr = 101325/760 Pa;
+          demoted to residual chamber-vacuum note (not in-cell total)'
     sweep_gas:
       state:
         tag: not_applicable
@@ -383,6 +313,16 @@ experiments:
           page: 13
           published_page: 3051
           note: The introductory approximately 1e-4 is a V/Fe vapour-pressure ratio, not base pressure
+    cell_internal_pressure_note:
+      state:
+        tag: value
+        value: Cell-side vacuum during ion-intensity measurement 3x10^-7 to 1.5x10^-6 Torr (~4.00e-5 to 2.00e-4 Pa) — chamber
+          vacuum, not in-cell total
+      locator:
+        published_page: 3053
+        pdf_page_index: 4
+        section: '3.2'
+        note: sample mass, chamber pressure, ionizing voltage, ion species
   work_id: 10.2355/tetsutohagane1955.61.15_3050
   locator:
     page: 15
@@ -523,54 +463,14 @@ experiments:
   pressure_environment:
     total_pressure_Pa:
       state:
-        tag: value
-        value:
-          kind: interval
-          interval_low: '0.00003999671052631578947368421053'
-          interval_high: '0.0001999835526315789473684210526'
-          approximate: false
+        tag: unknown
+        reason: in_cell_total_pressure_not_derivable
       locator:
         page: 15
         published_page: 3053
         section: '3.2'
-        note: 'Cell-side vacuum during ion measurement: 3e-7 to 1.5e-6 Torr; unit conversion only, 1 Torr = 101325/760 Pa'
-      inference:
-        relation: Torr_to_Pa
-        inputs:
-        - P_Pa = P_Torr × 101325 / 760
-        - original_unit=Torr
-        parameters:
-        - - original_low
-          - state:
-              tag: value
-              value: '0.0000003'
-            locator:
-              page: 15
-              published_page: 3053
-              section: '3.2'
-              note: 'Cell-side vacuum during ion measurement: 3e-7 to 1.5e-6 Torr; unit conversion only, 1 Torr = 101325/760
-                Pa'
-        - - original_high
-          - state:
-              tag: value
-              value: '0.0000015'
-            locator:
-              page: 15
-              published_page: 3053
-              section: '3.2'
-              note: 'Cell-side vacuum during ion measurement: 3e-7 to 1.5e-6 Torr; unit conversion only, 1 Torr = 101325/760
-                Pa'
-        - - factor
-          - state:
-              tag: value
-              value: '133.3223684210526315789473684'
-            locator:
-              page: 15
-              published_page: 3053
-              section: '3.2'
-              note: 'Cell-side vacuum during ion measurement: 3e-7 to 1.5e-6 Torr; unit conversion only, 1 Torr = 101325/760
-                Pa'
-        output_unit: Pa
+        note: 'Cell-side vacuum during ion measurement: 3e-7 to 1.5e-6 Torr; unit conversion only, 1 Torr = 101325/760 Pa;
+          demoted to residual chamber-vacuum note (not in-cell total)'
     sweep_gas:
       state:
         tag: not_applicable
@@ -708,6 +608,16 @@ experiments:
       regime_class:
         tag: unknown
         reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+    cell_internal_pressure_note:
+      state:
+        tag: value
+        value: Cell-side vacuum during ion-intensity measurement 3x10^-7 to 1.5x10^-6 Torr (~4.00e-5 to 2.00e-4 Pa) — chamber
+          vacuum, not in-cell total
+      locator:
+        published_page: 3053
+        pdf_page_index: 4
+        section: '3.2'
+        note: sample mass, chamber pressure, ionizing voltage, ion species
   work_id: 10.2355/tetsutohagane1955.61.15_3050
   locator:
     published_page: 3051

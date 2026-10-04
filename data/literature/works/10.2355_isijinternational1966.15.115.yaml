@@ -107,47 +107,12 @@ experiments:
   pressure_environment:
     total_pressure_Pa:
       state:
-        tag: value
-        value:
-          kind: interval
-          interval_low: '0.0005332894736842105263157894737'
-          interval_high: '0.0007999342105263157894736842105'
-          approximate: false
+        tag: unknown
+        reason: in_cell_total_pressure_not_derivable
       locator:
         published_page: 116
         pdf_page_index: 2
-        note: Cell chamber 4-6 x 10^-6 Torr; unit conversion only
-      inference:
-        relation: Torr_to_Pa
-        inputs:
-        - P_Pa = P_Torr × 101325 / 760
-        - original_unit=Torr
-        parameters:
-        - - original_low
-          - state:
-              tag: value
-              value: '0.000004'
-            locator:
-              published_page: 116
-              pdf_page_index: 2
-              note: Cell chamber 4-6 x 10^-6 Torr; unit conversion only
-        - - original_high
-          - state:
-              tag: value
-              value: '0.000006'
-            locator:
-              published_page: 116
-              pdf_page_index: 2
-              note: Cell chamber 4-6 x 10^-6 Torr; unit conversion only
-        - - factor
-          - state:
-              tag: value
-              value: '133.3223684210526315789473684'
-            locator:
-              published_page: 116
-              pdf_page_index: 2
-              note: Cell chamber 4-6 x 10^-6 Torr; unit conversion only
-        output_unit: Pa
+        note: Cell chamber 4-6 x 10^-6 Torr; unit conversion only; demoted to residual chamber-vacuum note (not in-cell total)
     sweep_gas:
       state:
         tag: not_applicable
@@ -279,47 +244,12 @@ experiments:
   pressure_environment:
     total_pressure_Pa:
       state:
-        tag: value
-        value:
-          kind: interval
-          interval_low: '0.0005332894736842105263157894737'
-          interval_high: '0.0007999342105263157894736842105'
-          approximate: false
+        tag: unknown
+        reason: in_cell_total_pressure_not_derivable
       locator:
         published_page: 116
         pdf_page_index: 2
-        note: Cell chamber 4-6 x 10^-6 Torr; unit conversion only
-      inference:
-        relation: Torr_to_Pa
-        inputs:
-        - P_Pa = P_Torr × 101325 / 760
-        - original_unit=Torr
-        parameters:
-        - - original_low
-          - state:
-              tag: value
-              value: '0.000004'
-            locator:
-              published_page: 116
-              pdf_page_index: 2
-              note: Cell chamber 4-6 x 10^-6 Torr; unit conversion only
-        - - original_high
-          - state:
-              tag: value
-              value: '0.000006'
-            locator:
-              published_page: 116
-              pdf_page_index: 2
-              note: Cell chamber 4-6 x 10^-6 Torr; unit conversion only
-        - - factor
-          - state:
-              tag: value
-              value: '133.3223684210526315789473684'
-            locator:
-              published_page: 116
-              pdf_page_index: 2
-              note: Cell chamber 4-6 x 10^-6 Torr; unit conversion only
-        output_unit: Pa
+        note: Cell chamber 4-6 x 10^-6 Torr; unit conversion only; demoted to residual chamber-vacuum note (not in-cell total)
     sweep_gas:
       state:
         tag: not_applicable
@@ -451,47 +381,12 @@ experiments:
   pressure_environment:
     total_pressure_Pa:
       state:
-        tag: value
-        value:
-          kind: interval
-          interval_low: '0.0005332894736842105263157894737'
-          interval_high: '0.0007999342105263157894736842105'
-          approximate: false
+        tag: unknown
+        reason: in_cell_total_pressure_not_derivable
       locator:
         published_page: 116
         pdf_page_index: 2
-        note: Cell chamber 4-6 x 10^-6 Torr; unit conversion only
-      inference:
-        relation: Torr_to_Pa
-        inputs:
-        - P_Pa = P_Torr × 101325 / 760
-        - original_unit=Torr
-        parameters:
-        - - original_low
-          - state:
-              tag: value
-              value: '0.000004'
-            locator:
-              published_page: 116
-              pdf_page_index: 2
-              note: Cell chamber 4-6 x 10^-6 Torr; unit conversion only
-        - - original_high
-          - state:
-              tag: value
-              value: '0.000006'
-            locator:
-              published_page: 116
-              pdf_page_index: 2
-              note: Cell chamber 4-6 x 10^-6 Torr; unit conversion only
-        - - factor
-          - state:
-              tag: value
-              value: '133.3223684210526315789473684'
-            locator:
-              published_page: 116
-              pdf_page_index: 2
-              note: Cell chamber 4-6 x 10^-6 Torr; unit conversion only
-        output_unit: Pa
+        note: Cell chamber 4-6 x 10^-6 Torr; unit conversion only; demoted to residual chamber-vacuum note (not in-cell total)
     sweep_gas:
       state:
         tag: not_applicable
@@ -623,47 +518,12 @@ experiments:
   pressure_environment:
     total_pressure_Pa:
       state:
-        tag: value
-        value:
-          kind: interval
-          interval_low: '0.0005332894736842105263157894737'
-          interval_high: '0.0007999342105263157894736842105'
-          approximate: false
+        tag: unknown
+        reason: in_cell_total_pressure_not_derivable
       locator:
         published_page: 116
         pdf_page_index: 2
-        note: Cell chamber 4-6 x 10^-6 Torr; unit conversion only
-      inference:
-        relation: Torr_to_Pa
-        inputs:
-        - P_Pa = P_Torr × 101325 / 760
-        - original_unit=Torr
-        parameters:
-        - - original_low
-          - state:
-              tag: value
-              value: '0.000004'
-            locator:
-              published_page: 116
-              pdf_page_index: 2
-              note: Cell chamber 4-6 x 10^-6 Torr; unit conversion only
-        - - original_high
-          - state:
-              tag: value
-              value: '0.000006'
-            locator:
-              published_page: 116
-              pdf_page_index: 2
-              note: Cell chamber 4-6 x 10^-6 Torr; unit conversion only
-        - - factor
-          - state:
-              tag: value
-              value: '133.3223684210526315789473684'
-            locator:
-              published_page: 116
-              pdf_page_index: 2
-              note: Cell chamber 4-6 x 10^-6 Torr; unit conversion only
-        output_unit: Pa
+        note: Cell chamber 4-6 x 10^-6 Torr; unit conversion only; demoted to residual chamber-vacuum note (not in-cell total)
     sweep_gas:
       state:
         tag: not_applicable
@@ -795,47 +655,12 @@ experiments:
   pressure_environment:
     total_pressure_Pa:
       state:
-        tag: value
-        value:
-          kind: interval
-          interval_low: '0.0005332894736842105263157894737'
-          interval_high: '0.0007999342105263157894736842105'
-          approximate: false
+        tag: unknown
+        reason: in_cell_total_pressure_not_derivable
       locator:
         published_page: 116
         pdf_page_index: 2
-        note: Cell chamber 4-6 x 10^-6 Torr; unit conversion only
-      inference:
-        relation: Torr_to_Pa
-        inputs:
-        - P_Pa = P_Torr × 101325 / 760
-        - original_unit=Torr
-        parameters:
-        - - original_low
-          - state:
-              tag: value
-              value: '0.000004'
-            locator:
-              published_page: 116
-              pdf_page_index: 2
-              note: Cell chamber 4-6 x 10^-6 Torr; unit conversion only
-        - - original_high
-          - state:
-              tag: value
-              value: '0.000006'
-            locator:
-              published_page: 116
-              pdf_page_index: 2
-              note: Cell chamber 4-6 x 10^-6 Torr; unit conversion only
-        - - factor
-          - state:
-              tag: value
-              value: '133.3223684210526315789473684'
-            locator:
-              published_page: 116
-              pdf_page_index: 2
-              note: Cell chamber 4-6 x 10^-6 Torr; unit conversion only
-        output_unit: Pa
+        note: Cell chamber 4-6 x 10^-6 Torr; unit conversion only; demoted to residual chamber-vacuum note (not in-cell total)
     sweep_gas:
       state:
         tag: not_applicable
@@ -967,47 +792,12 @@ experiments:
   pressure_environment:
     total_pressure_Pa:
       state:
-        tag: value
-        value:
-          kind: interval
-          interval_low: '0.0005332894736842105263157894737'
-          interval_high: '0.0007999342105263157894736842105'
-          approximate: false
+        tag: unknown
+        reason: in_cell_total_pressure_not_derivable
       locator:
         published_page: 116
         pdf_page_index: 2
-        note: Cell chamber 4-6 x 10^-6 Torr; unit conversion only
-      inference:
-        relation: Torr_to_Pa
-        inputs:
-        - P_Pa = P_Torr × 101325 / 760
-        - original_unit=Torr
-        parameters:
-        - - original_low
-          - state:
-              tag: value
-              value: '0.000004'
-            locator:
-              published_page: 116
-              pdf_page_index: 2
-              note: Cell chamber 4-6 x 10^-6 Torr; unit conversion only
-        - - original_high
-          - state:
-              tag: value
-              value: '0.000006'
-            locator:
-              published_page: 116
-              pdf_page_index: 2
-              note: Cell chamber 4-6 x 10^-6 Torr; unit conversion only
-        - - factor
-          - state:
-              tag: value
-              value: '133.3223684210526315789473684'
-            locator:
-              published_page: 116
-              pdf_page_index: 2
-              note: Cell chamber 4-6 x 10^-6 Torr; unit conversion only
-        output_unit: Pa
+        note: Cell chamber 4-6 x 10^-6 Torr; unit conversion only; demoted to residual chamber-vacuum note (not in-cell total)
     sweep_gas:
       state:
         tag: not_applicable
@@ -1139,47 +929,12 @@ experiments:
   pressure_environment:
     total_pressure_Pa:
       state:
-        tag: value
-        value:
-          kind: interval
-          interval_low: '0.0005332894736842105263157894737'
-          interval_high: '0.0007999342105263157894736842105'
-          approximate: false
+        tag: unknown
+        reason: in_cell_total_pressure_not_derivable
       locator:
         published_page: 116
         pdf_page_index: 2
-        note: Cell chamber 4-6 x 10^-6 Torr; unit conversion only
-      inference:
-        relation: Torr_to_Pa
-        inputs:
-        - P_Pa = P_Torr × 101325 / 760
-        - original_unit=Torr
-        parameters:
-        - - original_low
-          - state:
-              tag: value
-              value: '0.000004'
-            locator:
-              published_page: 116
-              pdf_page_index: 2
-              note: Cell chamber 4-6 x 10^-6 Torr; unit conversion only
-        - - original_high
-          - state:
-              tag: value
-              value: '0.000006'
-            locator:
-              published_page: 116
-              pdf_page_index: 2
-              note: Cell chamber 4-6 x 10^-6 Torr; unit conversion only
-        - - factor
-          - state:
-              tag: value
-              value: '133.3223684210526315789473684'
-            locator:
-              published_page: 116
-              pdf_page_index: 2
-              note: Cell chamber 4-6 x 10^-6 Torr; unit conversion only
-        output_unit: Pa
+        note: Cell chamber 4-6 x 10^-6 Torr; unit conversion only; demoted to residual chamber-vacuum note (not in-cell total)
     sweep_gas:
       state:
         tag: not_applicable
@@ -1311,47 +1066,12 @@ experiments:
   pressure_environment:
     total_pressure_Pa:
       state:
-        tag: value
-        value:
-          kind: interval
-          interval_low: '0.0005332894736842105263157894737'
-          interval_high: '0.0007999342105263157894736842105'
-          approximate: false
+        tag: unknown
+        reason: in_cell_total_pressure_not_derivable
       locator:
         published_page: 116
         pdf_page_index: 2
-        note: Cell chamber 4-6 x 10^-6 Torr; unit conversion only
-      inference:
-        relation: Torr_to_Pa
-        inputs:
-        - P_Pa = P_Torr × 101325 / 760
-        - original_unit=Torr
-        parameters:
-        - - original_low
-          - state:
-              tag: value
-              value: '0.000004'
-            locator:
-              published_page: 116
-              pdf_page_index: 2
-              note: Cell chamber 4-6 x 10^-6 Torr; unit conversion only
-        - - original_high
-          - state:
-              tag: value
-              value: '0.000006'
-            locator:
-              published_page: 116
-              pdf_page_index: 2
-              note: Cell chamber 4-6 x 10^-6 Torr; unit conversion only
-        - - factor
-          - state:
-              tag: value
-              value: '133.3223684210526315789473684'
-            locator:
-              published_page: 116
-              pdf_page_index: 2
-              note: Cell chamber 4-6 x 10^-6 Torr; unit conversion only
-        output_unit: Pa
+        note: Cell chamber 4-6 x 10^-6 Torr; unit conversion only; demoted to residual chamber-vacuum note (not in-cell total)
     sweep_gas:
       state:
         tag: not_applicable
@@ -1440,6 +1160,15 @@ experiments:
       regime_class:
         tag: unknown
         reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+    cell_internal_pressure_note:
+      state:
+        tag: value
+        value: Cell chamber operating pressure (4 to 6)x10^-6 Torr (~5.33e-4 to 8.00e-4 Pa); ion source (5 to 7)x10^-7 Torr
+          — surrounding chambers, not in-cell total
+      locator:
+        published_page: 116
+        pdf_page_index: 2
+        section: '4'
   work_id: 10.2355/isijinternational1966.15.115
   locator:
     published_page: 116

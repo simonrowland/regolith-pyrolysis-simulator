@@ -4,7 +4,7 @@ rows in: 47411
 records out (observations): 121113
 works: 263
 experiments: 3520
-queue size: 76917
+queue size: 76914
 identical-payload dedupe aliases: 342
 metadata files: 39
 index sources: 168
@@ -18040,18 +18040,18 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/extracts/kems-067-yamada-1980.yaml` | 18 | 48 | 87 |
 | `data/literature/extracts/kems-069-furukawa-1976.yaml` | 18 | 52 | 157 |
 | `data/literature/extracts/kems-087-yamada-kato-1980.yaml` | 16 | 19 | 53 |
-| `data/literature/extracts/kems-088-ichise-1975.yaml` | 16 | 25 | 86 |
+| `data/literature/extracts/kems-088-ichise-1975.yaml` | 16 | 25 | 85 |
 | `data/literature/extracts/kems-093-piacente-1975.yaml` | 34 | 40 | 155 |
 | `data/literature/extracts/kems-095-ueda-1986.yaml` | 38 | 46 | 193 |
 | `data/literature/extracts/kems-097-ikeda-1978.yaml` | 16 | 24 | 92 |
 | `data/literature/extracts/kems-103-fraser-1983.yaml` | 4 | 142 | 248 |
 | `data/literature/extracts/kems-105-yamada-1983.yaml` | 13 | 35 | 52 |
 | `data/literature/extracts/kems-111-ichise-1982.yaml` | 16 | 64 | 124 |
-| `data/literature/extracts/kems-112-ichise-1989.yaml` | 49 | 87 | 121 |
+| `data/literature/extracts/kems-112-ichise-1989.yaml` | 49 | 87 | 120 |
 | `data/literature/extracts/kems-114-nichols-1995.yaml` | 28 | 28 | 116 |
 | `data/literature/extracts/kems-116-nunoue-1987.yaml` | 12 | 40 | 45 |
 | `data/literature/extracts/kems-118-yamamoto-1983.yaml` | 11 | 50 | 108 |
-| `data/literature/extracts/kems-119-furukawa-1975.yaml` | 21 | 38 | 99 |
+| `data/literature/extracts/kems-119-furukawa-1975.yaml` | 21 | 38 | 98 |
 | `data/literature/extracts/kems-120-ueshima-1984.yaml` | 8 | 30 | 103 |
 | `data/literature/extracts/kems-127-qi-1989.yaml` | 11 | 26 | 72 |
 | `data/literature/extracts/kems-132-nakajima-2016.yaml` | 11 | 23 | 87 |
