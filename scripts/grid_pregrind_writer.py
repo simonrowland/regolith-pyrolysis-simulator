@@ -2772,7 +2772,10 @@ class GridCacheWriter:
             )
         queued_model = str(queued_inputs.get("model") or "")
         result_model = str(output.get("engine_model") or "")
-        if queued_model != result_model:
+        is_failure = str(output.get("status_kind")) == "failure"
+        if is_failure and str(output.get("status")) == "ok":
+            raise ValueError("grid failure result cannot have status='ok'")
+        if not is_failure and queued_model != result_model:
             raise ValueError(
                 "grid result model differs from queued key: "
                 f"queued={queued_model!r}, result={result_model!r}"

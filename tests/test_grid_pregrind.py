@@ -1755,6 +1755,73 @@ def test_write_result_refuses_model_mismatch(tmp_path):
         ).fetchone()[0] == 0
 
 
+def test_write_result_refuses_ok_without_backend_model(tmp_path):
+    database = tmp_path / "write-ok-without-model.db"
+    with GridCacheWriter(database) as writer:
+        batch_id = writer.ensure_batch(
+            label="fixed", kind="fixed", seed=178, params={"test": True}
+        )
+        writer.materialize_key(
+            _inputs(1200.0),
+            batch_id=batch_id,
+            shuffle_rank=0,
+            shard=0,
+            intended_fO2_log=-9.0,
+        )
+        grid_key_id = writer.pending_rows(batch_id=batch_id)[0]["grid_key_id"]
+        failure = grid_pregrind._worker_failure_output(
+            RuntimeError("worker died before producing a model result"),
+            started=grid_pregrind.time.monotonic(),
+            captures=[],
+            native_input=None,
+            backend_name="subprocess",
+        )
+        failure["status"] = "ok"
+        failure["status_kind"] = "success"
+
+        with pytest.raises(
+            ValueError, match="grid result model differs from queued key"
+        ):
+            writer.write_result(grid_key_id, failure)
+
+        assert writer.connection.execute(
+            "SELECT COUNT(*) FROM alphamelts_outputs"
+        ).fetchone()[0] == 0
+
+
+def test_write_result_refuses_failure_record_with_ok_status(tmp_path):
+    database = tmp_path / "write-failure-with-ok-status.db"
+    with GridCacheWriter(database) as writer:
+        batch_id = writer.ensure_batch(
+            label="fixed", kind="fixed", seed=178, params={"test": True}
+        )
+        writer.materialize_key(
+            _inputs(1200.0),
+            batch_id=batch_id,
+            shuffle_rank=0,
+            shard=0,
+            intended_fO2_log=-9.0,
+        )
+        grid_key_id = writer.pending_rows(batch_id=batch_id)[0]["grid_key_id"]
+        failure = grid_pregrind._worker_failure_output(
+            RuntimeError("worker died before producing a model result"),
+            started=grid_pregrind.time.monotonic(),
+            captures=[],
+            native_input=None,
+            backend_name="subprocess",
+        )
+        failure["status"] = "ok"
+
+        with pytest.raises(
+            ValueError, match="grid failure result cannot have status='ok'"
+        ):
+            writer.write_result(grid_key_id, failure)
+
+        assert writer.connection.execute(
+            "SELECT COUNT(*) FROM alphamelts_outputs"
+        ).fetchone()[0] == 0
+
+
 def test_write_result_refuses_transport_mismatch(tmp_path):
     database = tmp_path / "write-transport-mismatch.db"
     with GridCacheWriter(database) as writer:
@@ -2406,7 +2473,7 @@ def test_writer_surfaces_bounded_failure_diagnostics(tmp_path):
             EngineWorkerTimeout(
                 "grid engine slot 0", 25.0, phase="request"
             ),
-            "timeout",
+            "error",
         ),
     ],
     ids=("dead-worker", "worker-timeout"),
