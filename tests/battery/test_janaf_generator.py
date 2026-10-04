@@ -33,6 +33,7 @@ from simulator.reference_data.janaf import (
     GRID_RANGE_REASON,
     INCONSISTENT_LAYOUT_REASON,
     NON_DATA_MARKER_KIND,
+    NIST_TAIL_UNRESOLVED_KIND,
     STRUCTURED_LAYOUT_REASON,
     TABLES_DIR,
     TRAILING_EMPTY_LAYOUT_REASON,
@@ -432,6 +433,23 @@ def test_units_formula_and_token_mismatches_stop_loudly() -> None:
     bad_token["table"]["values"][1]["entropy"]["value"] = 999.0
     with pytest.raises(ValueError, match="token/value mismatch"):
         generator.generate_table(bad_token)
+
+
+def test_null_published_cells_require_blank_or_infinite_tokens() -> None:
+    assert generator._cell(
+        {"as_published": "", "value": None}, table_id="T-001", column="formation_enthalpy"
+    ).value is None
+    assert generator._cell(
+        {"as_published": "INFINITE", "value": None},
+        table_id="T-001",
+        column="formation_enthalpy",
+    ).value is None
+    with pytest.raises(ValueError, match="token/value mismatch"):
+        generator._cell(
+            {"as_published": "12.345", "value": None},
+            table_id="T-001",
+            column="formation_enthalpy",
+        )
 
 
 def test_segmentation_witnesses_and_transition_row_assignment() -> None:
@@ -1551,10 +1569,25 @@ def test_full_corpus_control_cell_accounting_and_transcription_report() -> None:
     store_series_mismatches = 0
     seen_control: set[tuple[str, Quantity]] = set()
     started = time.monotonic()
+    restored_whitespace_tails = 0
+    unresolved_whitespace_tails = 0
     paths = list(iter_table_paths())
     assert len(paths) == 1655
     for index, path in enumerate(paths, start=1):
         document = load_table_document(path)
+        restored_whitespace_tails += sum(
+            (row.get("formation_gibbs_energy", {}).get("locator") or {}).get(
+                "parse_repair"
+            )
+            == generator.NIST_TAIL_PARSE_REPAIR
+            for row in document["table"]["values"]
+        )
+        unresolved_whitespace_tails += sum(
+            item.get("kind") == NIST_TAIL_UNRESOLVED_KIND
+            and len(str(item.get("raw_line") or "").split("\t")) == 6
+            and len(str(item.get("raw_line") or "").split("\t")[-1].split()) == 3
+            for item in document["table"].get("parse_ambiguities", [])
+        )
         for row in document["table"]["values"]:
             temperature = Decimal(str(row["temperature"]["value"]))
             for quantity, column in _FORMATION_COLUMNS.items():
@@ -1787,6 +1820,8 @@ def test_full_corpus_control_cell_accounting_and_transcription_report() -> None:
                 flush=True,
             )
 
+    assert restored_whitespace_tails == 126
+    assert unresolved_whitespace_tails == 363
     assert stored_nonzero_merged_cells == 0, (
         f"stored {stored_nonzero_merged_cells} sign-ambiguous merged cells"
     )
