@@ -7,14 +7,11 @@ from collections.abc import Mapping
 from simulator.battery.consumer_inputs import ConsumerInputs, REQUIREMENTS
 from simulator.battery.enums import Phase, ReferenceStateConvention, ValueKind
 from simulator.battery.records import StandardState, Value, phase_token
-from simulator.battery.migrate import (
-    _knudsen_effusion_chamber_background_not_for_identity,
-    to_plain,
-)
+from simulator.battery.migrate import to_plain
 from simulator.battery.waypoints import (
     ConsumerReadiness, ReadinessStatus, ReadinessGap, GapReason,
     ENGINE_POINT_CONSUMERS, MELT_ACTIVITY_ENGINES, Waypoint, WaypointFlag,
-    WaypointResult, pure_substance_engine_point_gap,
+    WaypointResult, _prediction_pressure_waypoint, pure_substance_engine_point_gap,
 )
 
 
@@ -75,7 +72,7 @@ def _requirements(inputs, consumer, engine=None):
         else:
             waypoint = inputs.waypoints[name]
             if consumer == "engine_point" and name == "pressure_boundary":
-                prediction = _prediction_pressure_waypoint(inputs)
+                prediction = _prediction_pressure_waypoint(waypoint, inputs.method)
                 absent = prediction is None
                 missing = (
                     waypoint.absence.missing
@@ -111,29 +108,6 @@ def _requirements(inputs, consumer, engine=None):
 
 class UnsupportedValue(ValueError):
     pass
-
-
-def _prediction_pressure_waypoint(inputs: ConsumerInputs):
-    """Waypoint selected for engine-point system pressure.
-
-    Knudsen chamber background (``printed_run_pressure``) stays on the
-    pressure_boundary waypoint for exterior/kems consumers, but must not
-    become prediction ``pressure_bar``. Prefer any non-chamber route
-    (source-grounded observation point_conditions); otherwise absent.
-    """
-
-    result = inputs.waypoints["pressure_boundary"]
-    selected = result.selected
-    if (
-        selected is not None
-        and selected.route == "printed_run_pressure"
-        and _knudsen_effusion_chamber_background_not_for_identity(inputs.method)
-    ):
-        for route in result.routes:
-            if route.route != "printed_run_pressure":
-                return route
-        return None
-    return selected
 
 
 # Each element has more than one oxidation state in silicate melts over the
@@ -387,7 +361,9 @@ def _point(inputs, name):
 
 
 def _engine_pressure_point(inputs):
-    selected = _prediction_pressure_waypoint(inputs)
+    selected = _prediction_pressure_waypoint(
+        inputs.waypoints["pressure_boundary"], inputs.method
+    )
     if selected is None:
         raise UnsupportedValue("pressure_boundary")
     value = selected.value

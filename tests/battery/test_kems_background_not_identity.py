@@ -15,14 +15,12 @@ from __future__ import annotations
 
 from decimal import Decimal
 from pathlib import Path
-from types import SimpleNamespace
 
 import yaml
 
 from simulator.battery.consumer_inputs import collect_consumer_inputs
 from simulator.battery.enums import MethodToken, Quantity, ValueKind
 from simulator.battery.generators.bench import (
-    _prediction_pressure_waypoint,
     engine_point_requests,
     kems_case,
 )
@@ -32,7 +30,7 @@ from simulator.battery.waypoints import (
     Waypoint,
     WaypointAuthority,
     WaypointResult,
-    _pressure_for_oxygen_derivation,
+    _prediction_pressure_waypoint,
     pressure_boundary,
 )
 from tests.battery.test_bench_generators import case, complete_kems
@@ -219,8 +217,8 @@ def _assert_identity_not_chamber(observation, chamber: Decimal = _CHAMBER_PA) ->
             )
 
 
-def test_pressure_selection_prefers_first_non_chamber_route(monkeypatch) -> None:
-    """Both current selectors preserve the order of eligible alternatives."""
+def test_prediction_pressure_selection_prefers_first_non_chamber_route() -> None:
+    """Prediction pressure preserves the order of eligible alternatives."""
 
     experiment, bench, observation = case(pressure=str(_CHAMBER_PA))
     chamber = Waypoint(
@@ -234,14 +232,7 @@ def test_pressure_selection_prefers_first_non_chamber_route(monkeypatch) -> None
         "pressure_boundary", Value.point_of(2), "second_eligible", WaypointAuthority.DERIVED, (),
     )
     result = WaypointResult("pressure_boundary", chamber, (chamber, first, second))
-    monkeypatch.setattr("simulator.battery.waypoints.pressure_boundary", lambda *args: result)
-
-    oxygen = _pressure_for_oxygen_derivation(experiment, bench, observation)
-    engine_point = _prediction_pressure_waypoint(
-        SimpleNamespace(waypoints={"pressure_boundary": result}, method=experiment.method)
-    )
-    assert oxygen == first
-    assert engine_point == first
+    assert _prediction_pressure_waypoint(result, experiment.method) == first
 
 
 def test_knudsen_effusion_numeric_fixture_not_inherited_at_both_sites(
