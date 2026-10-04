@@ -495,6 +495,18 @@ observations:
     reference_state:
       tag: unknown
       reason: qualifier and_raoultian_gamma does not name a reference_state
+    composition:
+      tag: value
+      value:
+        basis: printed_mole_fraction
+        components:
+        - - Na2O
+          - '0.395'
+        - - SiO2
+          - '0.526'
+        - - Fe2O3
+          - '0.079'
+        amount_basis: mole_fraction
   value:
     kind: unavailable
     unavailable_reason: declared quantity is unknown; refusing to pick a number

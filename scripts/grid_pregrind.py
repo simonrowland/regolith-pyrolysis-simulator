@@ -40,7 +40,11 @@ from engines.alphamelts.thermoengine import (  # noqa: E402
 )
 from engines.domain_reason import OutOfDomainReason  # noqa: E402
 from simulator.environment import DEFAULT_VACUUM_FLOOR_BAR  # noqa: E402
-from simulator.config import DEFAULT_ALPHAMELTS_MODEL  # noqa: E402
+from simulator.config import (  # noqa: E402
+    DEFAULT_ALPHAMELTS_MODEL,
+    ENGINE_MODEL_UNAVAILABLE,
+    resolve_grid_engine_model,
+)
 from simulator.engine_pool import (  # noqa: E402
     EngineWorkerPool,
     INHERIT_PROCESS_GROUP_ENV,
@@ -1082,6 +1086,7 @@ def _worker_failure_output(
     run_mode: str | None = None,
     applied_timeout_s: float | None = None,
     backend_name: str | None = None,
+    backend: Any = None,
 ) -> dict[str, Any]:
     effective_backend_name = backend_name or _WORKER_BACKEND_NAME
     raw_payload_format = (
@@ -1127,7 +1132,9 @@ def _worker_failure_output(
         "timing_s": time.monotonic() - started,
         "engine_version": _WORKER_ENGINE_VERSION,
         "engine_mode": effective_backend_name,
-        "engine_model": str(getattr(_WORKER_BACKEND, "_model", "unknown")),
+        "engine_model": _resolved_worker_engine_model(
+            backend, effective_backend_name
+        ),
         "run_mode": run_mode,
         "applied_timeout_s": applied_timeout_s,
         "native_input": native_input,
@@ -1169,6 +1176,13 @@ def _stable_failure_reason_code(
     return (stable or "exception_unknown")[:FAILURE_REASON_CODE_MAX_LENGTH]
 
 
+def _resolved_worker_engine_model(backend: Any, backend_name: str) -> str:
+    if backend is None:
+        return ENGINE_MODEL_UNAVAILABLE
+    model = getattr(backend, "_model", None)
+    return resolve_grid_engine_model(model, backend_name)
+
+
 def _worker_refusal_output(
     reason: str,
     *,
@@ -1201,7 +1215,9 @@ def _worker_refusal_output(
         "timing_s": time.monotonic() - started,
         "engine_version": _WORKER_ENGINE_VERSION,
         "engine_mode": _WORKER_BACKEND_NAME,
-        "engine_model": str(getattr(_WORKER_BACKEND, "_model", "unknown")),
+        "engine_model": _resolved_worker_engine_model(
+            _WORKER_BACKEND, _WORKER_BACKEND_NAME
+        ),
         "run_mode": run_mode,
         "applied_timeout_s": applied_timeout_s,
         "native_input": None,
@@ -1291,6 +1307,7 @@ def _run_point(job: WorkerJob) -> tuple[int, dict[str, Any]]:
             started=started,
             captures=captures,
             native_input=native_input,
+            backend=_WORKER_BACKEND,
         )
     persisted_fO2_log = job.inputs.get("fO2_log")
     intended_fO2_log = job.inputs.get("intended_fO2_log")
@@ -1345,6 +1362,7 @@ def _run_point(job: WorkerJob) -> tuple[int, dict[str, Any]]:
             native_input=native_input,
             run_mode=run_mode,
             applied_timeout_s=applied_timeout_s,
+            backend=_WORKER_BACKEND,
         )
 
     backend = _WORKER_BACKEND
@@ -1421,7 +1439,9 @@ def _run_point(job: WorkerJob) -> tuple[int, dict[str, Any]]:
                 "timing_s": time.monotonic() - started,
                 "engine_version": _WORKER_ENGINE_VERSION,
                 "engine_mode": "thermoengine",
-                "engine_model": str(getattr(backend, "_model", "unknown")),
+                "engine_model": _resolved_worker_engine_model(
+                    backend, _WORKER_BACKEND_NAME
+                ),
                 "run_mode": None,
                 "applied_timeout_s": None,
                 "native_input": None,
@@ -1438,6 +1458,7 @@ def _run_point(job: WorkerJob) -> tuple[int, dict[str, Any]]:
                 started=started,
                 captures=captures,
                 native_input=native_input,
+                backend=backend,
             )
             close_backend = getattr(backend, "close", None)
             if callable(close_backend):
@@ -1577,7 +1598,9 @@ def _run_point(job: WorkerJob) -> tuple[int, dict[str, Any]]:
             "timing_s": time.monotonic() - started,
             "engine_version": _WORKER_ENGINE_VERSION,
             "engine_mode": str(getattr(backend, "_mode", "subprocess")),
-            "engine_model": str(getattr(backend, "_model", "unknown")),
+            "engine_model": _resolved_worker_engine_model(
+                backend, _WORKER_BACKEND_NAME
+            ),
             "run_mode": run_mode,
             "applied_timeout_s": applied_timeout_s,
             "native_input": native_input,
@@ -1596,6 +1619,7 @@ def _run_point(job: WorkerJob) -> tuple[int, dict[str, Any]]:
             native_input=native_input,
             run_mode=run_mode,
             applied_timeout_s=applied_timeout_s,
+            backend=backend,
         )
 
 
@@ -1696,12 +1720,20 @@ def run_cycle(
             **kinds,
         }
 
+    config = backend_config(args)
+    expected_model = str(config["model"])
+    expected_model = resolve_grid_engine_model(
+        expected_model, str(config["grid_backend_name"])
+    )
+
     next_heartbeat = time.monotonic() + args.heartbeat_s
     def pending_jobs() -> Iterable[WorkerJob]:
         after_rank = -1
         while True:
-            rows = writer.pending_rows(
+            rows = writer._pending_drain_rows(
                 batch_id=batch_id,
+                backend_name=str(config["grid_backend_name"]),
+                model=expected_model,
                 shard=shard,
                 rank_limit=args.limit,
                 after_shuffle_rank=after_rank,
@@ -1712,8 +1744,9 @@ def run_cycle(
                 return
             for row in rows:
                 after_rank = int(row["shuffle_rank"])
+                grid_key_id = int(row["grid_key_id"])
                 yield WorkerJob(
-                    grid_key_id=int(row["grid_key_id"]),
+                    grid_key_id=grid_key_id,
                     shuffle_rank=after_rank,
                     inputs=dict(row["inputs"]),
                     engine_epoch=writer.engine_epoch,
@@ -1721,39 +1754,41 @@ def run_cycle(
 
     iterator = iter(pending_jobs())
     active: list[tuple[Any, WorkerJob, float]] = []
-    config = backend_config(args)
     outer_timeout_s = max(
         float(args.timeout_s),
         float(config.get("thermoengine_equilibrate_timeout_s", 60.0)),
     ) + 5.0
-    pool = EngineWorkerPool(
-        lambda index: WarmEngineWorker(
-            name=f"grid engine slot {index}",
-            bootstrap=_bootstrap_grid_worker,
-            handler=_handle_grid_worker_request,
-            bootstrap_args=(config, args.assume_queued_run_mode),
-            startup_timeout_s=max(
-                30.0,
-                float(
-                    config.get(
-                        "thermoengine_health_timeout_s",
-                        THERMOENGINE_HEALTH_TIMEOUT_S,
-                    )
-                )
-                + 30.0,
-            ),
-            call_timeout_s=outer_timeout_s,
-            daemon=False,
-        ),
-        size=args.workers,
-    )
+    pool = None
     try:
         def fill() -> None:
+            nonlocal pool
             while not _STOP_REQUESTED and len(active) < args.workers:
                 try:
                     job = next(iterator)
                 except StopIteration:
                     return
+                if pool is None:
+                    pool = EngineWorkerPool(
+                        lambda index: WarmEngineWorker(
+                            name=f"grid engine slot {index}",
+                            bootstrap=_bootstrap_grid_worker,
+                            handler=_handle_grid_worker_request,
+                            bootstrap_args=(config, args.assume_queued_run_mode),
+                            startup_timeout_s=max(
+                                30.0,
+                                float(
+                                    config.get(
+                                        "thermoengine_health_timeout_s",
+                                        THERMOENGINE_HEALTH_TIMEOUT_S,
+                                    )
+                                )
+                                + 30.0,
+                            ),
+                            call_timeout_s=outer_timeout_s,
+                            daemon=False,
+                        ),
+                        size=args.workers,
+                    )
                 active.append((
                     pool.submit(job, timeout_s=outer_timeout_s),
                     job,
@@ -1811,7 +1846,8 @@ def run_cycle(
                 )
                 next_heartbeat = time.monotonic() + args.heartbeat_s
     finally:
-        pool.close()
+        if pool is not None:
+            pool.close()
     writer.commit()
     final_state = "stopped" if _STOP_REQUESTED else "complete"
     _heartbeat(
@@ -2114,6 +2150,17 @@ def run_drain_only(args: argparse.Namespace) -> int:
             ),
             flush=True,
         )
+
+        try:
+            drain_model = resolve_grid_engine_model(args.model, args.backend)
+            writer._validate_drain_configuration(
+                backend_name=args.backend,
+                model=drain_model,
+                shard=shard,
+                rank_limit=args.limit,
+            )
+        except ValueError as exc:
+            raise SystemExit(f"DRAIN-ONLY REFUSED: {exc}") from exc
 
         probe = probe_engine(backend_config(args))
         print(f"engine_probe={json.dumps(probe, sort_keys=True)}", flush=True)

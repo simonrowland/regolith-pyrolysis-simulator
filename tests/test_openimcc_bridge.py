@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import os
 import json
+from dataclasses import replace
 from pathlib import Path
 import subprocess
 import sys
@@ -12,10 +13,13 @@ from types import SimpleNamespace
 import pytest
 
 from simulator.melt_backend.openimcc_bridge import (
+    OpenImccBindingDigestUnavailableError,
     OpenImccCompositionPolicyRefusal,
     OpenImccBridgeResult,
     OpenImccUnavailableError,
     OPENIMCC_PARENT_OXIDES,
+    _load_pack,
+    _pack_digest,
     _cleaned_melt_projection,
     evaluate as bridge_evaluate,
     evaluate_cleaned_melt,
@@ -455,6 +459,51 @@ def test_green_fixture_detects_an_in_memory_coefficient_mutation() -> None:
         for name, value in zip(mutated.parent_oxides, mutated.parent_activity, strict=True)
     }
     assert mutated_hex != row["activities_hex"]
+
+
+def test_pack_digest_preserves_the_v1_binding_value() -> None:
+    _openimcc_or_skip()
+    expected = "f2b479cd54e3c82704a5863fcc06836f72045375d9a8c7f8d2fad19e98f75d05"
+    assert _pack_digest(_load_pack("v1.0.2")) == expected
+
+
+def test_pack_digest_uses_ext_binding_digest() -> None:
+    _openimcc_or_skip()
+    expected = "4cbec2ee85cd95314a5f62f5ce4e00cbe660935bde12df3a7e5daa425612ad03"
+    assert _pack_digest(_load_pack("ext-v4")) == expected
+
+
+def test_pack_digest_uses_research_binding_digest() -> None:
+    _openimcc_or_skip()
+    from openimcc import label_research_datapack
+
+    loaded_pack = _load_pack("v1.0.2")
+    kernel = replace(
+        loaded_pack.kernel_datapack,
+        A=loaded_pack.kernel_datapack.A.copy(),
+    )
+    kernel.A[0] += 0.01
+    research_pack = label_research_datapack(
+        kernel,
+        model_id="IMCC-SF04-mutation",
+        coverage="mutation-probe",
+    )
+    research_digest = _pack_digest(research_pack)
+    assert research_digest != _pack_digest(_load_pack("v1.0.2"))
+    assert research_digest != _pack_digest(_load_pack("ext-v4"))
+
+
+@pytest.mark.parametrize(
+    "pack",
+    (SimpleNamespace(binding_digest=None), SimpleNamespace()),
+    ids=("none", "unsupported-attribute"),
+)
+def test_pack_digest_refuses_missing_binding_digest(pack) -> None:
+    with pytest.raises(OpenImccBindingDigestUnavailableError) as exc_info:
+        _pack_digest(pack)
+
+    assert exc_info.value.reason_code == "openimcc_binding_digest_unavailable"
+    assert "install the recorded pin" in str(exc_info.value)
 
 
 def test_bridge_envelope_matches_green_edge_decisions() -> None:

@@ -50,7 +50,7 @@ OPENIMCC_INSTALL_HINT = (
 )
 OPENIMCC_RECORDED_PIN = (
     "openimcc @ git+https://github.com/simonrowland/openimcc"
-    "@be41a6db66a9597685e2bf685013bfdfff737009"
+    "@bc3ac65e4c1da6949b9bece20f36668bd2f68fc2"
 )
 
 _PACK_RESOURCE_NAMES = {
@@ -128,6 +128,21 @@ class OpenImccOxygenBalanceUnavailableError(RuntimeError):
         self.backend_status_reason = (
             f"{self.code}: installed openimcc does not expose "
             "evaluate_gas_oxygen_balance; remedy: install the recorded pin "
+            f"{OPENIMCC_RECORDED_PIN}"
+        )
+        super().__init__(self.backend_status_reason)
+
+
+class OpenImccBindingDigestUnavailableError(RuntimeError):
+    """Typed refusal when openimcc cannot identify a datapack binding."""
+
+    code = "openimcc_binding_digest_unavailable"
+    reason_code = code
+
+    def __init__(self) -> None:
+        self.backend_status_reason = (
+            f"{self.code}: installed openimcc does not expose a non-empty "
+            "datapack binding_digest; remedy: install the recorded pin "
             f"{OPENIMCC_RECORDED_PIN}"
         )
         super().__init__(self.backend_status_reason)
@@ -578,19 +593,10 @@ def _load_pack(pack_name: str) -> Any:
 
 
 def _pack_digest(pack: Any) -> str:
-    for owner in (pack, getattr(pack, "kernel_datapack", None)):
-        for name in ("published_manifest_sha256", "digest"):
-            value = getattr(owner, name, None)
-            if value:
-                return str(value)
-
-    package = _require_openimcc()
-    try:
-        from openimcc.kernel import _PUBLISHED_DATAPACK_SHA256
-    except (ImportError, AttributeError):  # pragma: no cover - future package API
-        return ""
-    _ = package
-    return str(_PUBLISHED_DATAPACK_SHA256)
+    value = getattr(pack, "binding_digest", None)
+    if not isinstance(value, str) or not value:
+        raise OpenImccBindingDigestUnavailableError()
+    return value
 
 
 def evaluate(

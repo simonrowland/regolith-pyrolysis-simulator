@@ -911,6 +911,15 @@ experiments:
       regime_class:
         tag: unknown
         reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+    cell_internal_pressure_note:
+      state:
+        tag: value
+        value: unstated
+      locator:
+        published_page: 419
+        pdf_page_index: 3
+        section: '2.6'
+        note: vacuum quality / chamber pressure not printed; Fig. 3 is chamber voltage vs ion ratio
   work_id: 10.2355/tetsutohagane1955.63.3_417
   locator:
     published_page: 421
@@ -2054,8 +2063,9 @@ context:
         pdf_page_index: 2
         section: '2.2'
         note: Clausing factor not printed
-    chamber_pressure:
+    residual_pressure_Pa_as_printed:
       value: unstated
+      quote: unstated
       locator:
         published_page: 419
         pdf_page_index: 3

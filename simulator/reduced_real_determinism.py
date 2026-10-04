@@ -34,6 +34,7 @@ from simulator.chemistry.kernel import ChemistryIntent
 from simulator.config import (
     DEFAULT_ALPHAMELTS_MODEL,
     functional_data_yaml_digest,
+    resolve_alphamelts_subprocess_model,
 )
 from simulator.grind_preflight import (
     assert_strict_vapor_pt1_row,
@@ -3137,24 +3138,30 @@ def _cached_real_provider_identity(
         if intent == ChemistryIntent.GATE_LIQUID_FRACTION
         else None
     )
+    authorized_model = str(
+        getattr(config, "authorized_model", "")
+    ).strip()
+    authorized_mode = str(
+        getattr(config, "authorized_mode", "")
+    ).strip() or (
+        _THERMOENGINE_DEFAULT_MODE
+        if is_thermoengine
+        else _ALPHAMELTS_DEFAULT_MODE
+    )
+    if is_alphamelts and authorized_mode == _ALPHAMELTS_DEFAULT_MODE:
+        authorized_model, _ = resolve_alphamelts_subprocess_model(
+            authorized_model
+        )
+    else:
+        authorized_model = authorized_model or DEFAULT_ALPHAMELTS_MODEL
     return {
         "resolved_provider_id": _ALPHAMELTS_PROVIDER_ID,
         "resolved_role": "authoritative",
         "authoritative_provider_id": _ALPHAMELTS_PROVIDER_ID,
         "fallback_provider_id": fallback_provider_id,
         "fallback_allowed": bool(fallback_allowed),
-        "model": (
-            str(getattr(config, "authorized_model", "")).strip()
-            or DEFAULT_ALPHAMELTS_MODEL
-        ),
-        "mode": (
-            str(getattr(config, "authorized_mode", "")).strip()
-            or (
-                _THERMOENGINE_DEFAULT_MODE
-                if is_thermoengine
-                else _ALPHAMELTS_DEFAULT_MODE
-            )
-        ),
+        "model": authorized_model,
+        "mode": authorized_mode,
     }
 
 
@@ -3169,6 +3176,15 @@ def _provider_model(provider: Any) -> str | None:
     if provider is None:
         return None
     backend = getattr(provider, "_backend", None)
+    if (
+        getattr(backend, "real_backend_family", None)
+        == RealBackendFamily.ALPHAMELTS
+        and str(getattr(backend, "_mode", "")).strip() == "subprocess"
+    ):
+        model, _ = resolve_alphamelts_subprocess_model(
+            getattr(backend, "_model", None)
+        )
+        return model
     model = getattr(backend, "_model", None)
     if model is not None:
         model_text = str(model).strip()

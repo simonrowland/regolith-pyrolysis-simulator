@@ -11478,7 +11478,14 @@ class Migrator:
         evidence, ev_reason = self._evidence_for(
             method_class,
             evaluator_family=values.get("evaluator_family"),
-            attribution=obs.get("quote") if isinstance(obs.get("quote"), str) else None,
+            attribution=(
+                values.get("attribution")
+                if isinstance(values.get("attribution"), str)
+                and values.get("attribution").strip()
+                else (
+                    obs.get("quote") if isinstance(obs.get("quote"), str) else None
+                )
+            ),
             model=suffix_derivation,
             regime=regime,
         )

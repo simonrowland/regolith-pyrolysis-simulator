@@ -202,7 +202,7 @@ observations:
       tag: value
       value: quoted_attributed
     original_method_class: quoted_measurement
-    attribution: De Maria et al. 1971 KEMS measurements summarized by Wolf et al.
+    attribution: De Maria et al. 1971
   admission:
     status: pending
     reason: no observation admission_status mapped from source
@@ -374,7 +374,7 @@ observations:
       tag: value
       value: quoted_attributed
     original_method_class: quoted_measurement
-    attribution: Hastie et al. 1981 and Hastie & Bonnell 1985, 1986 KEMS measurements summarized by Wolf et al.
+    attribution: Hastie et al. 1981; Hastie & Bonnell 1985, 1986
   admission:
     status: pending
     reason: no observation admission_status mapped from source
@@ -472,7 +472,7 @@ observations:
     section: '3.2'
   read_from: unknown:kems-039-wolf-2023-vaporock
 - observation_id: kems-039-wolf-2023-vaporock::wolf_2023_lunar_basalt_12065_composition_compiled
-  experiment_id: f2e0decaf080185d6335e155731e9509598bd0aa2ce01d20c15398500c091e6d::kems-039-wolf-2023-vaporock
+  experiment_id: f2e0decaf080185d6335e155731e9509598bd0aa2ce01d20c15398500c091e6d::experiment::lunar-basalt-12065
   identity:
     quantity:
       tag: unknown
@@ -535,7 +535,7 @@ observations:
     table: '2'
   read_from: unknown:kems-039-wolf-2023-vaporock
 - observation_id: kems-039-wolf-2023-vaporock::wolf_2023_lunar_vaporock_activity_fits
-  experiment_id: f2e0decaf080185d6335e155731e9509598bd0aa2ce01d20c15398500c091e6d::kems-039-wolf-2023-vaporock
+  experiment_id: f2e0decaf080185d6335e155731e9509598bd0aa2ce01d20c15398500c091e6d::experiment::lunar-basalt-12065
   identity:
     quantity:
       tag: value

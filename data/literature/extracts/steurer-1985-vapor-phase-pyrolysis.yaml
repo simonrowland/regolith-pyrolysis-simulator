@@ -50,6 +50,58 @@ fidelity_samples:
     pdf_page_index: 6
     section: Experiments
     note: each experiment run at a temperature of 2650 K
+experiments:
+- experiment_id: steurer-1985-model-mixture
+  method: janaf_equilibrium_calculation
+  locator:
+    table: '2'
+    published_page: 127
+    pdf_page_index: 5
+    note: Table 2 modeled vapor-pressure mixture; distinct from SiO2 induction feasibility runs
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value:
+          Al2O3: '15.0'
+          SiO2: '50.0'
+          TiO2: '10.0'
+          FeO: '25.0'
+      locator:
+        published_page: 127
+        pdf_page_index: 5
+        note: Oxides % (Weight) table above Table 2; model mixture only
+- experiment_id: steurer-1985-sio2-induction
+  method: induction_vacuum_pyrolysis_cold_finger
+  locator:
+    published_page: 128
+    pdf_page_index: 6
+    section: Experiments
+    note: SiO2 induction-heating feasibility; single-oxide feedstock; not the Table 2 model mixture
+  sample:
+    form:
+      state: {tag: value, value: Silica}
+      locator:
+        published_page: 128
+        pdf_page_index: 6
+        note: 'authors: single oxide considered permissible for feasibility; predominant in lunar soil'
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: >-
+          no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about / P_test_Torr in this extract
+    sweep_gas:
+      state: {tag: unknown, reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract}
+    regime:
+      regime_class: {tag: unknown, reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract}
+    cell_internal_pressure_note:
+      state: {tag: value, value: "not printed for the experiment; Fig. 3 labels VACUUM and ARGON"}
+      locator:
+        figure: '3'
+        note: no numeric chamber pressure printed for the SiO2 runs
+        pdf_page_index: 7
+        published_page: 129
 species:
   SiO2:
     observations:
@@ -283,6 +335,7 @@ species:
         o2_fraction_table_note: Unnumbered comparison table on published p. 127; 2000–3000 K range. SiO2
           O2 yield (% of oxide) printed as 25 (no trailing decimal).
     - observation_id: steurer_1985_sio2_induction_experiment
+      experiment: steurer-1985-sio2-induction
       type: rate_series
       locator:
         published_page: 128
@@ -340,9 +393,9 @@ species:
             published_page: 129
             pdf_page_index: 7
             paragraph: Figure 3 Experimental Apparatus
-        chamber_pressure:
-          value: not printed for the experiment; Fig. 3 labels VACUUM and ARGON
-          units: as published
+        residual_pressure_Pa_as_printed:
+          value: "not printed for the experiment; Fig. 3 labels VACUUM and ARGON"
+          quote: "not printed for the experiment; Fig. 3 labels VACUUM and ARGON"
           locator:
             figure: '3'
             published_page: 129
@@ -383,6 +436,7 @@ species:
   O2:
     observations:
     - observation_id: steurer_1985_table2_mixture_psat
+      experiment: steurer-1985-model-mixture
       type: psat_series
       locator:
         table: '2'
@@ -407,7 +461,7 @@ species:
         - 2000.0
         - 2500.0
         - 3000.0
-        feedstock_model_mixture_wt_pct:
+        composition_wt_pct:
           Al2O3: 15.0
           SiO2: 50.0
           TiO2: 10.0

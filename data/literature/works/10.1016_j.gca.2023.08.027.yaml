@@ -711,112 +711,42 @@ experiments:
         value:
           basis: printed_oxides
           components:
-          - - Al2O3
-            - '0.09016222059047146822155136996'
-          - - CaO
-            - '0.2497337676677724287741937335'
-          - - MgO
-            - '0.159959352914716545092785499'
           - - SiO2
             - '0.5001446588270395579114693973'
+          - - Al2O3
+            - '0.09016222059047146822155136996'
+          - - MgO
+            - '0.159959352914716545092785499'
+          - - CaO
+            - '0.2497337676677724287741937335'
           amount_basis: mole_fraction
       locator:
-        pdf_page_index: 23
-        paragraph: yielding γ(GaO1.5) = 0.036(6) at an average T of 1700 K
-        note: authors preferred average of Fig. 5a red points plus the isotherm value; AM page 23 lines 593-596, not Table
-          8 on page 22
+        page: 4
+        pdf_page_index: 4
+        section: 2.1 Sample preparation
+        note: lines 110-111; derived from nominal recipe wt%; n_i=(wt_i/M_i)/sum(wt_j/M_j)
       inference:
         relation: wt_pct_to_mole_fraction
         inputs:
+        - sample.printed_composition
         - x_i = (w_i / M_i) / Σ_j (w_j / M_j)
         - original_unit=wt_pct
-        parameters:
-        - - original_Al2O3_wt_pct
-          - state:
-              tag: value
-              value: '15.4'
-            locator:
-              pdf_page_index: 23
-              paragraph: yielding γ(GaO1.5) = 0.036(6) at an average T of 1700 K
-              note: authors preferred average of Fig. 5a red points plus the isotherm value; AM page 23 lines 593-596, not
-                Table 8 on page 22
-        - - M_Al2O3_g_mol
-          - state:
-              tag: value
-              value: '101.960077'
-            locator:
-              pdf_page_index: 23
-              paragraph: yielding γ(GaO1.5) = 0.036(6) at an average T of 1700 K
-              note: authors preferred average of Fig. 5a red points plus the isotherm value; AM page 23 lines 593-596, not
-                Table 8 on page 22
-        - - original_CaO_wt_pct
-          - state:
-              tag: value
-              value: '23.46'
-            locator:
-              pdf_page_index: 23
-              paragraph: yielding γ(GaO1.5) = 0.036(6) at an average T of 1700 K
-              note: authors preferred average of Fig. 5a red points plus the isotherm value; AM page 23 lines 593-596, not
-                Table 8 on page 22
-        - - M_CaO_g_mol
-          - state:
-              tag: value
-              value: '56.077000000000005'
-            locator:
-              pdf_page_index: 23
-              paragraph: yielding γ(GaO1.5) = 0.036(6) at an average T of 1700 K
-              note: authors preferred average of Fig. 5a red points plus the isotherm value; AM page 23 lines 593-596, not
-                Table 8 on page 22
-        - - original_MgO_wt_pct
-          - state:
-              tag: value
-              value: '10.8'
-            locator:
-              pdf_page_index: 23
-              paragraph: yielding γ(GaO1.5) = 0.036(6) at an average T of 1700 K
-              note: authors preferred average of Fig. 5a red points plus the isotherm value; AM page 23 lines 593-596, not
-                Table 8 on page 22
-        - - M_MgO_g_mol
-          - state:
-              tag: value
-              value: '40.304'
-            locator:
-              pdf_page_index: 23
-              paragraph: yielding γ(GaO1.5) = 0.036(6) at an average T of 1700 K
-              note: authors preferred average of Fig. 5a red points plus the isotherm value; AM page 23 lines 593-596, not
-                Table 8 on page 22
-        - - original_SiO2_wt_pct
-          - state:
-              tag: value
-              value: '50.34'
-            locator:
-              pdf_page_index: 23
-              paragraph: yielding γ(GaO1.5) = 0.036(6) at an average T of 1700 K
-              note: authors preferred average of Fig. 5a red points plus the isotherm value; AM page 23 lines 593-596, not
-                Table 8 on page 22
-        - - M_SiO2_g_mol
-          - state:
-              tag: value
-              value: '60.083'
-            locator:
-              pdf_page_index: 23
-              paragraph: yielding γ(GaO1.5) = 0.036(6) at an average T of 1700 K
-              note: authors preferred average of Fig. 5a red points plus the isotherm value; AM page 23 lines 593-596, not
-                Table 8 on page 22
+        parameters: []
         output_unit: mole_fraction
     printed_composition:
       state:
         tag: value
         value:
-          Al2O3: '15.4'
-          CaO: '23.46'
-          MgO: '10.8'
           SiO2: '50.34'
+          Al2O3: '15.40'
+          MgO: '10.80'
+          CaO: '23.46'
       locator:
-        pdf_page_index: 6
-        table: '2'
-        section: 2.2.1. Knudsen Effusion Mass Spectrometry (KEMS)
-        note: apparatus §2.2.1 AM pp. 4-5; Table 2 weights AM p. 6; calibration eqs. 2-3 AM p. 8
+        page: 4
+        pdf_page_index: 4
+        section: 2.1 Sample preparation
+        note: lines 110-111; nominal composition SiO2=50.34, Al2O3=15.40, MgO=10.80, CaO=23.46 wt%; An-Di eutectic 42 wt%
+          anorthite / 58 wt% diopside with run-varying Ga/In/Tl traces
     form:
       state:
         tag: value
@@ -1059,3 +989,225 @@ benches:
       page: 4
       section: 2.2.1 Knudsen Effusion Mass Spectrometry
   other_facts: []
+context:
+- observation_id: bischof_2023_epma_table6_end_1_low
+  type: analytical_composition
+  experiment: an-di-series
+  locator:
+    table: '6'
+    pdf_page_index: 15
+    section: 4.1. EPMA
+    note: Table 6 1_low End; post-KEMS; not an initial/sample engine selector
+  phase: anorthite_diopside_eutectic_silicate_melt
+  regime: epma_post_kems
+  units: wt_percent
+  values:
+    quantity: epma_table6_run_state_oxide_analysis
+    method_class: measured_direct
+    semantics: verbatim_table6_context_not_engine_input
+    run: 1_low
+    state: End
+    printed_total: '99.94'
+    oxides_wt_pct_as_published:
+      SiO2: '50.60'
+      Al2O3: '15.31'
+      MgO: '10.38'
+      CaO: '23.65'
+    uncertainties_as_published:
+      SiO2: '0.18'
+      Al2O3: '0.09'
+      MgO: '0.1'
+      CaO: '0.27'
+      Total: '0.35'
+    printed_quote: Table 6 1_low End SiO2 50.60 ± 0.18, Al2O3 15.31 ± 0.09, MgO 10.38 ± 0.10, CaO 23.65 ± 0.27, Total 99.94
+      ± 0.35
+  uncertainty:
+    note: printed ± on each oxide and Total as listed under uncertainties_as_published
+  context_id: kems-137-bischof-2023::context::bischof_2023_epma_table6_end_1_low
+  work_id: 10.1016/j.gca.2023.08.027
+  source_id: kems-137-bischof-2023
+  species: Ga
+- observation_id: bischof_2023_epma_table6_end_2_low
+  type: analytical_composition
+  experiment: an-di-series
+  locator:
+    table: '6'
+    pdf_page_index: 15
+    section: 4.1. EPMA
+    note: Table 6 2_low End; post-KEMS; not an initial/sample engine selector
+  phase: anorthite_diopside_eutectic_silicate_melt
+  regime: epma_post_kems
+  units: wt_percent
+  values:
+    quantity: epma_table6_run_state_oxide_analysis
+    method_class: measured_direct
+    semantics: verbatim_table6_context_not_engine_input
+    run: 2_low
+    state: End
+    printed_total: '99.91'
+    oxides_wt_pct_as_published:
+      SiO2: '50.46'
+      Al2O3: '15.48'
+      MgO: '10.72'
+      CaO: '23.25'
+    uncertainties_as_published:
+      SiO2: '0.17'
+      Al2O3: '0.07'
+      MgO: '0.08'
+      CaO: '0.05'
+      Total: '0.21'
+    printed_quote: Table 6 2_low End SiO2 50.46 ± 0.17, Al2O3 15.48 ± 0.07, MgO 10.72 ± 0.08, CaO 23.25 ± 0.05, Total 99.91
+      ± 0.21
+  uncertainty:
+    note: printed ± on each oxide and Total as listed under uncertainties_as_published
+  context_id: kems-137-bischof-2023::context::bischof_2023_epma_table6_end_2_low
+  work_id: 10.1016/j.gca.2023.08.027
+  source_id: kems-137-bischof-2023
+  species: Ga
+- observation_id: bischof_2023_epma_table6_end_3_high
+  type: analytical_composition
+  experiment: an-di-series
+  locator:
+    table: '6'
+    pdf_page_index: 15
+    section: 4.1. EPMA
+    note: Table 6 3_high End; post-KEMS; not an initial/sample engine selector
+  phase: anorthite_diopside_eutectic_silicate_melt
+  regime: epma_post_kems
+  units: wt_percent
+  values:
+    quantity: epma_table6_run_state_oxide_analysis
+    method_class: measured_direct
+    semantics: verbatim_table6_context_not_engine_input
+    run: 3_high
+    state: End
+    printed_total: '98.82'
+    oxides_wt_pct_as_published:
+      SiO2: '49.92'
+      Al2O3: '15.22'
+      MgO: '10.70'
+      CaO: '22.98'
+    uncertainties_as_published:
+      SiO2: '0.39'
+      Al2O3: '0.12'
+      MgO: '0.07'
+      CaO: '0.08'
+      Total: '0.42'
+    printed_quote: Table 6 3_high End SiO2 49.92 ± 0.39, Al2O3 15.22 ± 0.12, MgO 10.70 ± 0.07, CaO 22.98 ± 0.08, Total 98.82
+      ± 0.42
+  uncertainty:
+    note: printed ± on each oxide and Total as listed under uncertainties_as_published
+  context_id: kems-137-bischof-2023::context::bischof_2023_epma_table6_end_3_high
+  work_id: 10.1016/j.gca.2023.08.027
+  source_id: kems-137-bischof-2023
+  species: Ga
+- observation_id: bischof_2023_epma_table6_start_1_low
+  type: analytical_composition
+  experiment: an-di-series
+  locator:
+    table: '6'
+    pdf_page_index: 15
+    section: 4.1. EPMA
+    note: Table 6 1_low Start; pre-KEMS starting glass
+  phase: anorthite_diopside_eutectic_silicate_melt
+  regime: epma_pre_kems
+  units: wt_percent
+  values:
+    quantity: epma_table6_run_state_oxide_analysis
+    method_class: measured_direct
+    semantics: verbatim_table6_context_not_engine_input
+    run: 1_low
+    state: Start
+    printed_total: '99.90'
+    oxides_wt_pct_as_published:
+      SiO2: '50.47'
+      Al2O3: '15.38'
+      MgO: '10.42'
+      CaO: '23.63'
+    uncertainties_as_published:
+      SiO2: '0.09'
+      Al2O3: '0.08'
+      MgO: '0.04'
+      CaO: '0.09'
+      Total: '0.16'
+    printed_quote: Table 6 1_low Start SiO2 50.47 ± 0.09, Al2O3 15.38 ± 0.08, MgO 10.42 ± 0.04, CaO 23.63 ± 0.09, Total 99.90
+      ± 0.16
+  uncertainty:
+    note: printed ± on each oxide and Total as listed under uncertainties_as_published
+  context_id: kems-137-bischof-2023::context::bischof_2023_epma_table6_start_1_low
+  work_id: 10.1016/j.gca.2023.08.027
+  source_id: kems-137-bischof-2023
+  species: Ga
+- observation_id: bischof_2023_epma_table6_start_2_low
+  type: analytical_composition
+  experiment: an-di-series
+  locator:
+    table: '6'
+    pdf_page_index: 15
+    section: 4.1. EPMA
+    note: Table 6 2_low Start; identical starting glass to 1_low Start
+  phase: anorthite_diopside_eutectic_silicate_melt
+  regime: epma_pre_kems
+  units: wt_percent
+  values:
+    quantity: epma_table6_run_state_oxide_analysis
+    method_class: measured_direct
+    semantics: verbatim_table6_context_not_engine_input
+    run: 2_low
+    state: Start
+    printed_total: '99.90'
+    oxides_wt_pct_as_published:
+      SiO2: '50.47'
+      Al2O3: '15.38'
+      MgO: '10.42'
+      CaO: '23.63'
+    uncertainties_as_published:
+      SiO2: '0.09'
+      Al2O3: '0.08'
+      MgO: '0.04'
+      CaO: '0.09'
+      Total: '0.16'
+    printed_quote: Table 6 2_low Start identical to 1_low Start (same starting glass)
+  uncertainty:
+    note: printed ± on each oxide and Total as listed under uncertainties_as_published
+  context_id: kems-137-bischof-2023::context::bischof_2023_epma_table6_start_2_low
+  work_id: 10.1016/j.gca.2023.08.027
+  source_id: kems-137-bischof-2023
+  species: Ga
+- observation_id: bischof_2023_epma_table6_start_3_high
+  type: analytical_composition
+  experiment: an-di-series
+  locator:
+    table: '6'
+    pdf_page_index: 15
+    section: 4.1. EPMA
+    note: Table 6 3_high Start; pre-KEMS starting glass
+  phase: anorthite_diopside_eutectic_silicate_melt
+  regime: epma_pre_kems
+  units: wt_percent
+  values:
+    quantity: epma_table6_run_state_oxide_analysis
+    method_class: measured_direct
+    semantics: verbatim_table6_context_not_engine_input
+    run: 3_high
+    state: Start
+    printed_total: '98.42'
+    oxides_wt_pct_as_published:
+      SiO2: '49.72'
+      Al2O3: '15.15'
+      MgO: '10.27'
+      CaO: '23.28'
+    uncertainties_as_published:
+      SiO2: '0.09'
+      Al2O3: '0.08'
+      MgO: '0.04'
+      CaO: '0.09'
+      Total: '0.16'
+    printed_quote: Table 6 3_high Start SiO2 49.72 ± 0.09, Al2O3 15.15 ± 0.08, MgO 10.27 ± 0.04, CaO 23.28 ± 0.09, Total 98.42
+      ± 0.16
+  uncertainty:
+    note: printed ± on each oxide and Total as listed under uncertainties_as_published
+  context_id: kems-137-bischof-2023::context::bischof_2023_epma_table6_start_3_high
+  work_id: 10.1016/j.gca.2023.08.027
+  source_id: kems-137-bischof-2023
+  species: Ga

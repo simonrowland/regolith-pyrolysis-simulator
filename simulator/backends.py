@@ -27,7 +27,10 @@ from simulator.backend_names import (  # noqa: F401 - re-exported for callers
 )
 from simulator.accounting.exceptions import AccountingError
 from simulator.accounting.formulas import resolve_species_formula
-from simulator.config import DEFAULT_ALPHAMELTS_MODEL
+from simulator.config import (
+    DEFAULT_ALPHAMELTS_MODEL,
+    resolve_alphamelts_subprocess_model,
+)
 from simulator.core import PyrolysisSimulator
 from simulator.grind_preflight import STAGE0_INPROCESS_SAFE_FEEDSTOCK_IDS
 from simulator.melt_backend.alphamelts import (
@@ -438,8 +441,19 @@ def normalize_cached_real_config(
     authorized_model = str(value.get("authorized_model", "")).strip()
     authorized_mode = str(value.get("authorized_mode", "")).strip()
     if _is_alphamelts_authorized_name(authorized_backend_name):
-        authorized_model = authorized_model or DEFAULT_ALPHAMELTS_MODEL
         authorized_mode = authorized_mode or DEFAULT_ALPHAMELTS_MODE
+        if authorized_mode == DEFAULT_ALPHAMELTS_MODE:
+            try:
+                authorized_model, _ = resolve_alphamelts_subprocess_model(
+                    authorized_model
+                )
+            except ValueError as exc:
+                raise stamp_config_reason(
+                    unavailable_error_cls(str(exc)),
+                    "invalid_run_input",
+                ) from exc
+        else:
+            authorized_model = authorized_model or DEFAULT_ALPHAMELTS_MODEL
     elif _is_thermoengine_authorized_name(authorized_backend_name):
         authorized_model = authorized_model or DEFAULT_ALPHAMELTS_MODEL
         authorized_mode = authorized_mode or 'thermoengine'

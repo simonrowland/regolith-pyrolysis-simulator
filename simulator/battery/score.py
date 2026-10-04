@@ -650,6 +650,19 @@ def metric_operation(quantity: Quantity | None) -> MetricOperation | None:
     return QUANTITY_METRIC.get(quantity)
 
 
+def metric_operation_for_identity(identity: Identity) -> MetricOperation | None:
+    """Select the stored residue metric from its measured subtype."""
+    quantity = quantity_token(identity)
+    if quantity is not Quantity.RESIDUE_COMPONENT_COMPOSITION:
+        return metric_operation(quantity)
+    subtype = identity.subtype.value if identity.subtype.is_value else None
+    if subtype == "element_ppm_by_mass":
+        return MetricOperation.DEX
+    if subtype == "oxide_wt_percent":
+        return MetricOperation.ABSOLUTE
+    return metric_operation(quantity)
+
+
 def compute_metric(
     operation: MetricOperation,
     candidate: Decimal,
@@ -2114,8 +2127,9 @@ def populate_numeric(
     observations: Mapping[str, Observation] | None = None,
     experiments: Mapping[str, Experiment] | None = None,
     derived_band: DecisionBand | None = None,
+    operation_override: MetricOperation | None = None,
 ) -> tuple[ResidualNumeric | None, RefusalReason | None, dict[str, object]]:
-    operation = metric_operation(quantity)
+    operation = operation_override or metric_operation(quantity)
     if operation is None:
         return None, RefusalReason.METRIC_DOMAIN, {"quantity": quantity.value}
     unit = QUANTITY_UNITS[quantity]
@@ -2992,6 +3006,24 @@ def predict_with_engine(
             refusal_detail={"reason": "quantity_unknown"},
         )
     if quantity is Quantity.RESIDUE_COMPONENT_COMPOSITION:
+        if (
+            observation.source_id == "kems-012-sossi-2019"
+            and identity.species.formula not in {"Mn", "Ti"}
+        ):
+            return EnginePrediction(
+                engine=engine,
+                channel=channel,
+                execution=Execution(state=ExecutionState.UNSUPPORTED),
+                coefficient_sources=sources,
+                lineage_complete=False,
+                refusal_reason=RefusalReason.OUTSIDE_SUPPORTED_SPECIES,
+                refusal_detail={
+                    "reason": "channel_missing",
+                    "element": identity.species.formula,
+                    "quantity": quantity.value,
+                },
+                identity=identity,
+            )
         if engine in OXYGEN_BALANCE_EFFUSION_ENGINES:
             return EnginePrediction(
                 engine=engine,
@@ -3823,15 +3855,16 @@ def _hashimoto_residue_prediction(
     context: ScoreContext,
     reference: Observation,
     engine: Engine,
-    cache: dict[Engine, Mapping[str, object]],
+    cache: dict[tuple[str, Engine], Mapping[str, object]],
 ) -> EnginePrediction:
     """Predict a Hashimoto vector once per engine, then project by physical run."""
     channel = ENGINE_CHANNELS[engine]
     sources = ENGINE_COEFFICIENT_SOURCES[engine]
+    cache_key = (_HASHIMOTO_SOURCE_ID, engine)
     try:
         if engine not in {Engine.INTERNAL_ANALYTICAL, Engine.OPENIMCC}:
             raise ValueError("engine_not_supported_for_hashimoto_residue")
-        if engine not in cache:
+        if cache_key not in cache:
             from simulator.battery.residue import (
                 ResidueInventoryRefusal,
                 _predict_hashimoto_residue_cohort,
@@ -3885,10 +3918,10 @@ def _hashimoto_residue_prediction(
                 code_revision=revision,
                 engine=engine.value,
             )
-            cache[engine] = {
+            cache[cache_key] = {
                 row.experiment_id + "::" + row.alpha_arm: row for row in rows
             }
-        rows_by_key = cache[engine]
+        rows_by_key = cache[cache_key]
         if "__cohort_error__" in rows_by_key:
             raise ValueError(str(rows_by_key["__cohort_error__"]))
         primary_key = (
@@ -3989,8 +4022,8 @@ def _hashimoto_residue_prediction(
         )
     except Exception as exc:  # the scorer records typed per-cell refusal and continues
         reason = getattr(exc, "reason", None) or str(exc) or type(exc).__name__
-        if engine not in cache:
-            cache[engine] = {"__cohort_error__": str(reason)}
+        if cache_key not in cache:
+            cache[cache_key] = {"__cohort_error__": str(reason)}
         detail: dict[str, object] = {
             "reason": str(reason),
             "engine": engine.value,
@@ -4010,6 +4043,207 @@ def _hashimoto_residue_prediction(
                 else RefusalReason.UNSUPPORTED
             ),
             refusal_detail=detail,
+            identity=reference.identity,
+        )
+
+
+_SOSSI_SOURCE_ID = "kems-012-sossi-2019"
+
+
+def _sossi_residue_prediction(
+    context: ScoreContext,
+    reference: Observation,
+    engine: Engine,
+    cache: dict[tuple[str, Engine], Mapping[str, object]],
+) -> EnginePrediction:
+    """Predict one Sossi Mn/Ti cell from the shared per-run inventory result."""
+    channel = ENGINE_CHANNELS[engine]
+    sources = ENGINE_COEFFICIENT_SOURCES[engine]
+    formula = reference.identity.species.formula
+    if formula not in {"Mn", "Ti"}:
+        return EnginePrediction(
+            engine=engine,
+            channel=channel,
+            execution=Execution(state=ExecutionState.UNSUPPORTED),
+            coefficient_sources=sources,
+            lineage_complete=False,
+            refusal_reason=RefusalReason.OUTSIDE_SUPPORTED_SPECIES,
+            refusal_detail={
+                "reason": "channel_missing",
+                "element": formula,
+                "quantity": Quantity.RESIDUE_COMPONENT_COMPOSITION.value,
+            },
+            identity=reference.identity,
+        )
+    cache_key = (_SOSSI_SOURCE_ID, engine)
+    try:
+        from simulator.battery.residue import (
+            ResidueInventoryRefusal,
+            _predict_sossi_residue_cohort,
+        )
+
+        if engine not in {Engine.INTERNAL_ANALYTICAL, Engine.OPENIMCC}:
+            raise ValueError("sossi_engine_unsupported")
+        if cache_key not in cache:
+            live_rows = [
+                row
+                for row in context.observations.values()
+                if row.source_id == _SOSSI_SOURCE_ID
+                and isinstance(row.identity, Identity)
+                and quantity_token(row.identity)
+                is Quantity.RESIDUE_COMPONENT_COMPOSITION
+                and row.admission.status.value == "admitted"
+            ]
+            experiments_by_run: dict[str, Mapping[str, object]] = {}
+            trace_ppm_by_experiment: dict[str, dict[str, float]] = {}
+            buffered_fO2_by_experiment: dict[str, float] = {}
+            for row in live_rows:
+                short_id = row.experiment_id.rsplit("::", 1)[-1]
+                experiments_by_run[short_id] = {}
+                point = row.point_conditions or {}
+                oxygen = point.get("fO2_log")
+                if oxygen is not None and oxygen.state.is_value:
+                    buffered_fO2_by_experiment[short_id] = float(oxygen.state.value)
+                element = row.identity.species.formula
+                if element in {"Mn", "Ti"}:
+                    trace = point.get("starting_component_ppm")
+                    if trace is not None and trace.state.is_value:
+                        trace_ppm_by_experiment.setdefault(short_id, {})[
+                            element
+                        ] = float(trace.state.value)
+            if len(experiments_by_run) != 43:
+                raise ResidueInventoryRefusal(
+                    "sossi_cohort_invalid",
+                    f"scorer found {len(experiments_by_run)} Sossi runs, expected 43",
+                )
+            source = load_yaml(
+                REPO_ROOT / "data/literature/extracts/kems-012-sossi-2019.yaml"
+            )
+            source_experiments = {
+                str(item.get("experiment_id")): item
+                for item in source.get("experiments", ())
+                if isinstance(item, Mapping)
+            }
+            missing_runs = set(experiments_by_run) - set(source_experiments)
+            if missing_runs:
+                raise ResidueInventoryRefusal(
+                    "sossi_experiment_missing_from_extract", ",".join(sorted(missing_runs))
+                )
+            experiments = [source_experiments[key] for key in sorted(experiments_by_run)]
+            revision = subprocess.run(
+                ["git", "rev-parse", "HEAD"],
+                cwd=REPO_ROOT,
+                check=True,
+                capture_output=True,
+                text=True,
+            ).stdout.strip()
+            rows = _predict_sossi_residue_cohort(
+                experiments,
+                load_yaml(REPO_ROOT / "data/vapor_pressures.yaml"),
+                starting_trace_ppm_by_experiment=trace_ppm_by_experiment,
+                buffered_fO2_log_by_experiment=buffered_fO2_by_experiment,
+                code_revision=revision,
+                engine=engine.value,
+            )
+            cache[cache_key] = {
+                row.experiment_id: row for row in rows
+            }
+        if "__cohort_error__" in cache[cache_key]:
+            raise ValueError(str(cache[cache_key]["__cohort_error__"]))
+        short_id = reference.experiment_id.rsplit("::", 1)[-1]
+        prediction = cache[cache_key].get(short_id)
+        if prediction is None:
+            raise ValueError("sossi_prediction_row_missing")
+        if formula in prediction.channel_missing_elements:
+            raise ResidueInventoryRefusal(
+                "channel_missing", f"no {formula} evaporation channel for {engine.value}"
+            )
+        value = prediction.primary_element_ppm.get(formula)
+        band = prediction.sensitivity_band_ppm.get(formula)
+        if value is None or band is None or value <= 0.0:
+            raise ResidueInventoryRefusal(
+                "residue_metric_domain", f"no positive Sossi {formula} prediction"
+            )
+        provenance = dict(prediction.provenance)
+        provenance["consumed_row"] = {
+            "observation_id": reference.observation_id,
+            "source_id": reference.source_id,
+            "experiment_id": reference.experiment_id,
+            "locator": to_plain(reference.locator),
+            "read_from": reference.read_from,
+        }
+        provenance["predicted_element_ppm"] = value
+        provenance["sensitivity_band_ppm_for_cell"] = band
+        notices = [
+            Notice(
+                kind=NoticeKind.OUT_OF_CERTIFIED_BAND,
+                affected_quantities=(Quantity.RESIDUE_COMPONENT_COMPOSITION,),
+                reason="bc_open_furnace_langmuir_limit_diagnostic",
+                origin="sossi-residue-r5",
+                band="open furnace at 101325 Pa; no gas-film resistance",
+            ),
+            Notice(
+                kind=NoticeKind.OUT_OF_CERTIFIED_BAND,
+                affected_quantities=(Quantity.RESIDUE_COMPONENT_COMPOSITION,),
+                reason="pt_wire_loop_bead_geometry_assumed",
+                origin="sossi-residue-r5",
+                band=str(band),
+            ),
+        ]
+        if any(
+            details.get("status") == "unconverged_at_cap"
+            for details in (provenance.get("integration") or {}).values()
+        ):
+            notices.append(
+                Notice(
+                    kind=NoticeKind.OUT_OF_CERTIFIED_BAND,
+                    affected_quantities=(Quantity.RESIDUE_COMPONENT_COMPOSITION,),
+                    reason="residue_time_refinement_unconverged; finest prediction retained",
+                    origin="sossi-residue-r5",
+                    band=f"N_cap=256; experiment={short_id}",
+                )
+            )
+        return EnginePrediction(
+            engine=engine,
+            channel=channel,
+            execution=Execution(
+                state=ExecutionState.PRODUCED,
+                call_evidence=f"{engine.value}:sossi:{short_id}:alpha_runtime_catalog",
+            ),
+            value=Decimal(str(value)),
+            unit=QUANTITY_UNITS[Quantity.RESIDUE_COMPONENT_COMPOSITION],
+            coefficient_sources=sources,
+            lineage_complete=False,
+            notices=tuple(notices),
+            identity=reference.identity,
+            version=str(provenance.get("code_revision") or "unknown"),
+            refusal_detail=provenance,
+        )
+    except Exception as exc:  # preserve a typed per-cell absence and keep scoring
+        reason = getattr(exc, "reason", None) or str(exc) or type(exc).__name__
+        if cache_key not in cache:
+            cache[cache_key] = {"__cohort_error__": str(reason)}
+        if reason == "oxygen_condition_missing":
+            refusal = RefusalReason.IDENTITY_INCOMPLETE
+        elif reason == "channel_missing":
+            refusal = RefusalReason.OUTSIDE_SUPPORTED_SPECIES
+        elif reason == "openimcc_not_importable":
+            refusal = RefusalReason.OPENIMCC_NOT_IMPORTABLE
+        else:
+            refusal = RefusalReason.UNSUPPORTED
+        return EnginePrediction(
+            engine=engine,
+            channel=channel,
+            execution=Execution(state=ExecutionState.NOT_PROBED),
+            coefficient_sources=sources,
+            refusal_reason=refusal,
+            refusal_detail={
+                "reason": str(reason),
+                "engine": engine.value,
+                "source_id": reference.source_id,
+                "experiment_id": reference.experiment_id,
+                "detail": str(getattr(exc, "detail", "")),
+            },
             identity=reference.identity,
         )
 
@@ -4482,6 +4716,7 @@ def compile_residual(
             observations=context.observations,
             experiments=context.experiments,
             derived_band=cell_band,
+            operation_override=metric_operation_for_identity(reference.identity),
         )
     if numeric is None:
         return _refused(
@@ -4806,7 +5041,7 @@ def _score_store_with_decisions(
     kems_band = _derive_kems_partial_pressure_band(
         observations, context.experiments, context.benches
     )
-    residue_prediction_cache: dict[Engine, Mapping[str, object]] = {}
+    residue_prediction_cache: dict[tuple[str, Engine], Mapping[str, object]] = {}
     try:
         with bound_work_inputs(context.works, observations, context.experiments):
             for obs in refs:
@@ -4870,6 +5105,19 @@ def _score_store_with_decisions(
                             and engine in {Engine.OPENIMCC, Engine.INTERNAL_ANALYTICAL}
                         ):
                             prediction = _hashimoto_residue_prediction(
+                                context,
+                                point,
+                                engine,
+                                residue_prediction_cache,
+                            )
+                        if (
+                            predict is None
+                            and isinstance(point.identity, Identity)
+                            and quantity is Quantity.RESIDUE_COMPONENT_COMPOSITION
+                            and point.source_id == _SOSSI_SOURCE_ID
+                            and engine in {Engine.OPENIMCC, Engine.INTERNAL_ANALYTICAL}
+                        ):
+                            prediction = _sossi_residue_prediction(
                                 context,
                                 point,
                                 engine,
