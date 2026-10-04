@@ -1,0 +1,3 @@
+Read-only production `headline_rows(..., tier='all_numeric', engines=[Engine.INTERNAL_ANALYTICAL])` probe at 9be2c17266eec54bd7b23c1768a73d2192911f05: two `Rail.RESIDUE_COMPOSITION` residuals with `MetricOperation.RELATIVE`, values 0.1 and 0.3, produced `n=2`, `median_dex=None`, `iqr_dex=None`, and `flag_class_counts={'unflagged': 2}`.
+
+The new all-numeric median/IQR therefore summarize DEX residuals only. `score.py:5623-5627` filters every non-DEX numeric before the statistics, and `:5669-5670` computes IQR from that filtered list. Non-DEX rails require a statistic in their actual residual metric to satisfy the request for n/median/IQR on every rail; preserve the existing measured schema/values separately.
