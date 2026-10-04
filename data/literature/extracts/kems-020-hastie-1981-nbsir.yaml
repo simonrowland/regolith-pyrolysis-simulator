@@ -360,6 +360,34 @@ experiments:
         published_page: 43
         pdf_page_index: 49
         note: 'Glass: Na2O (17 wt.%), CaO (12 wt.%), SiO2 (71 wt.%); model recipe only'
+
+- experiment_id: hastie-1981-measured-soda-lime-glass
+  bench_id: hastie-1981-kms
+  method: knudsen_effusion
+  locator:
+    figure: '5'
+    page: 51
+    published_page: 51
+    pdf_page_index: 57
+    note: >-
+      Figure 5/6 measured soda-lime-silica glass (KMS/TMS); caption p.51/PDF57
+      cross-refers Fig. 6 carbonate impurity to this glass; initial 17/12/71
+      recipe printed p.18/PDF24. Measured experiment, not SOLGASMIX model.
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value:
+          Na2O: 17
+          CaO: 12
+          SiO2: 71
+      locator:
+        page: 18
+        published_page: 18
+        pdf_page_index: 24
+        note: >-
+          Measured starting glass Na2O 17 / CaO 12 / SiO2 71 wt%; Fig. 6 is
+          0.45 wt% Na2CO3 impurity in this glass (caption p.51/PDF57)
 species:
   K:
     observations:
@@ -1340,7 +1368,7 @@ species:
       uncertainty:
         note: model table; no experimental sigma
     - observation_id: hastie_1981_fig5_glass_Na_figure_only_blocked
-      experiment: hastie-1981-solgasmix-model-glass
+      experiment: hastie-1981-measured-soda-lime-glass
       type: psat_series
       locator:
         figure: '5'
@@ -1362,7 +1390,7 @@ species:
       uncertainty:
         note: not applicable
     - observation_id: hastie_1981_fig5_glass_Na_this_work_digitized
-      experiment: hastie-1981-solgasmix-model-glass
+      experiment: hastie-1981-measured-soda-lime-glass
       type: psat_series
       locator:
         figure: '5'
@@ -1487,6 +1515,7 @@ species:
       uncertainty:
         note: digitisation ±0.10 dex (tick-calibrated; pass-2 residual ≤0.004 dex). KMS(1) vertical bar is the authors' maximum conceivable error.
     - observation_id: hastie_1981_fig6_na2co3_gamma_figure_only
+      experiment: hastie-1981-measured-soda-lime-glass
       type: activity_coefficient
       locator:
         figure: '6'
@@ -1809,7 +1838,7 @@ species:
         note: All cells retained as printed computer notation. Dashes are absent, not zero; activity row dimensionless,
           other rows atm. No model value admitted as a measurement.
     - observation_id: hastie_1981_fig5_glass_Na_figure_only_blocked_quoted_20260906
-      experiment: hastie-1981-solgasmix-model-glass
+      experiment: hastie-1981-measured-soda-lime-glass
       supersedes: hastie_1981_fig5_glass_Na_figure_only_blocked
       type: psat_series
       class_tag: figure_only
@@ -1832,7 +1861,7 @@ species:
         semantics: bound_not_point_ordering
         reason: Plotted evidence, not a printed numeric table. See completeness ledger for individual figures.
     - observation_id: hastie_1981_fig5_glass_Na_this_work_digitized_quoted_20260906
-      experiment: hastie-1981-solgasmix-model-glass
+      experiment: hastie-1981-measured-soda-lime-glass
       supersedes: hastie_1981_fig5_glass_Na_this_work_digitized
       type: psat_series
       class_tag: figure_only
@@ -1856,6 +1885,7 @@ species:
         reason: Parent digitization retained unchanged as archival derived evidence; plotted point coordinates
           are not printed numeric cells. No re-digitization or invented cell quote in this deepening.
     - observation_id: hastie_1981_fig6_na2co3_gamma_figure_only_quoted_20260906
+      experiment: hastie-1981-measured-soda-lime-glass
       supersedes: hastie_1981_fig6_na2co3_gamma_figure_only
       type: activity_coefficient
       class_tag: figure_only

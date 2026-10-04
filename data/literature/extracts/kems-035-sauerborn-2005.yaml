@@ -377,7 +377,7 @@ experiments:
 species:
   SiO2:
     observations:
-    - observation_id: sauerborn_2005_mass_loss_series::T=1673.15:h=92ce255f810f
+    - observation_id: sauerborn_2005_mass_loss_series
       experiment: oxide-reference-series
       type: rate_series
       locator:
@@ -389,16 +389,15 @@ species:
       units: wt_percent
       values:
         quantity: bulk_mass_loss_wt_pct
-        method_class: measured_direct
-        evidence_class: authors_own_measurement
-        id: SiO2
-        mass_loss_wt_pct: 1.1
-        Tmax_C: 1400
-        Tmax_K: 1673.15
-        mass_g: 0.6719
-        T_K: 1673.15
-        note: pure SiO2 control from mass-loss series; not JSC-1
-    - observation_id: sauerborn_2005_mass_loss_series_deep2::T=1673.15:h=92ce255f810f
+        points:
+        - id: SiO2
+          mass_loss_wt_pct: 1.1
+          Tmax_C: 1400
+          Tmax_K: 1673.15
+          mass_g: 0.6719
+          locator:
+            page: 76
+    - observation_id: sauerborn_2005_mass_loss_series_deep2
       experiment: oxide-reference-series
       type: rate_series
       locator:
@@ -410,15 +409,14 @@ species:
       units: wt_percent
       values:
         quantity: bulk_mass_loss_wt_pct
-        method_class: measured_direct
-        evidence_class: authors_own_measurement
-        id: SiO2
-        mass_loss_wt_pct: 1.1
-        Tmax_C: 1400
-        Tmax_K: 1673.15
-        mass_g: 0.6719
-        T_K: 1673.15
-        note: pure SiO2 control from mass-loss series; not JSC-1
+        points:
+        - id: SiO2
+          mass_loss_wt_pct: 1.1
+          Tmax_C: 1400
+          Tmax_K: 1673.15
+          mass_g: 0.6719
+          locator:
+            page: 76
       supersedes: sauerborn_2005_mass_loss_series::T=1673.15:h=92ce255f810f
   Na:
     observations:
