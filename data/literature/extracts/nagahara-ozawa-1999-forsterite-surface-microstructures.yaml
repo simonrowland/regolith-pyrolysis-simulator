@@ -29,10 +29,53 @@ fidelity_samples:
     figure: '2'
     published_page: 31
     note: Fo-11 (001) printed figure label
+benches:
+- id: free-evaporation-chamber
+  identity: {basis: described_in_this_work}
+  apparatus_family:
+    state: {tag: value, value: continuous-evacuation free-evaporation chamber}
+    locator: {published_page: 29, pdf_page_index: 1, section: Experiments}
+  cell_material_and_liner:
+    state: {tag: value, value: tungsten-mesh heater with tungsten and molybdenum insulation; no crucible or container stated}
+    locator: {published_page: 29, pdf_page_index: 1, section: Experiments}
+
+experiments:
+- experiment_id: free-evaporation-series
+  bench_id: free-evaporation-chamber
+  method: langmuir_free_evaporation
+  locator:
+    published_page: 29
+    pdf_page_index: 1
+    section: Experiments
+  conditions:
+    temperature_K:
+      state: {tag: unknown, reason: not_published}
+      locator: {published_page: 29, pdf_page_index: 1, section: Experiments, note: 'Fe-bearing 1400-1500 C; pure forsterite 1500-1800 C; no single series setpoint'}
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '0.000000001'
+          interval_high: '0.0000001'
+          approximate: true
+      locator:
+        published_page: 30
+        pdf_page_index: 2
+        section: Experiments
+        note: 'nominal chamber pressure under continuous evacuation: about 1e-9 Pa at 1400 C to 1e-7 Pa at 1800 C'
+    sweep_gas:
+      state: {tag: not_applicable, reason: not_applicable}
+      locator: {published_page: 30, pdf_page_index: 2, section: Experiments, note: continuous evacuation; free evaporation}
+    regime:
+      regime_class: {tag: value, value: molecular}
+
 species:
   forsterite:
     observations:
     - observation_id: nagahara_ozawa_1999_experimental_apparatus
+      experiment: free-evaporation-series
       type: rate_series
       locator:
         published_page: 29
@@ -78,19 +121,8 @@ species:
             published_page: 29
             pdf_page_index: 1
             section: Experiments
-        pressure_Pa:
-          value:
-            kind: interval
-            interval_low: 1e-09
-            interval_high: 1e-07
-          units: Pa
-          as_printed: "about 1 x 10^-9 Pa at 1400 C to 1 x 10^-7 Pa at 1800 C"
-          quote: "about 1 x 10^-9 Pa at 1400 C to 1 x 10^-7 Pa at 1800 C"
-          locator:
-            published_page: 30
-            pdf_page_index: 2
-            section: Experiments
     - observation_id: nagahara_ozawa_1999_table1_rates_and_surface_densities
+      experiment: free-evaporation-series
       type: rate_series
       locator:
         table: '1'
@@ -147,6 +179,7 @@ species:
       uncertainty:
         note: Table I prints 7.5 x 10^-11 +/- 0.8 x 10^-11 m/sec and 617 +/- 15 kJ/mole for forsterite; SC olivine activation energy is printed as about 250 kJ/mole and described as considerably uncertain.
     - observation_id: nagahara_ozawa_1999_figure1_1700C_runs
+      experiment: free-evaporation-series
       type: rate_series
       locator:
         figure: '1'
@@ -179,6 +212,7 @@ species:
           mass_loss_fraction: 24.0
           duration_h: 9.2
     - observation_id: nagahara_ozawa_1999_figure2_1500C_runs
+      experiment: free-evaporation-series
       type: rate_series
       locator:
         figure: '2'
@@ -225,6 +259,7 @@ species:
           mass_loss_fraction: 3.2
           duration_h: 12
     - observation_id: nagahara_ozawa_1999_olivine_composition_change
+      experiment: free-evaporation-series
       type: rate_series
       locator:
         figure: '3'

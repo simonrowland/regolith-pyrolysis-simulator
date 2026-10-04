@@ -129,13 +129,8 @@ species:
             section: 2.1 Apparatus
             figure: '1'
             note: Combined ion source and Knudsen cell furnace; English experimental section
-        P_test_Torr:
-          value:
-            kind: interval
-            interval_low: 1e-07
-            interval_high: 1e-06
-          units: Torr
-          as_printed: "about 10^{-6} to 10^{-7} torr"
+        residual_pressure_Pa_as_printed:
+          value: "about 10^{-6} to 10^{-7} torr (ion-source and Knudsen-cell chambers; surrounding pumped chambers, not in-cell total)"
           quote: "about 10^{-6} to 10^{-7} torr"
           locator:
             published_page: 297
