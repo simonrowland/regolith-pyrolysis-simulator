@@ -3001,6 +3001,87 @@ def _implied_alpha_numeric(
     )
 
 
+def _knudsen_vapour_equilibrium(
+    quantity: Quantity, experiment: Experiment | None
+) -> bool:
+    """Vapour-equilibrium quantity measured by Knudsen effusion."""
+
+    return bool(
+        quantity in _VAPOUR_EQUILIBRIUM
+        and experiment is not None
+        and experiment.method.is_value
+        and experiment.method.value is MethodToken.KNUDSEN_EFFUSION
+    )
+
+
+def _cell_oxygen_class(
+    materials: Sequence[Located[CellMaterial]] | None,
+) -> tuple[str, str | None]:
+    """(material class, modelled reactive reservoir metal or None)."""
+
+    material_class = _cell_material_class(materials)
+    modelled = (
+        _uniform_modelled_reactive_cell(materials)
+        if material_class == "reactive"
+        else None
+    )
+    return material_class, modelled
+
+
+def _oxygen_input_request(
+    *,
+    engine: Engine,
+    channel: str,
+    sources: tuple[str, ...],
+    identity: Identity,
+    requested: State[Composition] | None,
+    quantity: Quantity,
+    composition_value: Composition | None,
+    input_notices: list[Notice],
+) -> "Po2Request | EnginePrediction":
+    """The scorer's one oxygen-input decision (b-693/b-691 r2 finding 5).
+
+    A printed fO2 is the commanded point (fO2_Pa is fugacity; pO2_bar =
+    fO2_Pa / 1e5 under the stated ideal-gas assumption, 1 bar = 100000 Pa
+    exactly). Otherwise a quantity that needs oxygen refuses
+    ``missing_fO2``; one that does not records the omission notice on
+    ``input_notices`` and runs with oxygen not an input. Every cell branch of
+    ``predict_with_engine`` consumes this; none re-derives it.
+    """
+
+    # Same lazy import predict_with_engine already uses (no new layer edge).
+    from simulator.diagnostic_helpers.binary_pot_battery import (
+        PO2_COMMANDED,
+        PO2_NOT_AN_INPUT,
+        Po2Request,
+    )
+
+    oxygen_required, oxygen_why, redox = oxygen_is_scorer_input(
+        identity, composition_value
+    )
+    fo2_state = identity.fO2_Pa
+    if fo2_state is not None and fo2_state.is_value and fo2_state.value is not None:
+        return Po2Request(mode=PO2_COMMANDED, po2_bar=float(fo2_state.value) / 1.0e5)
+    if oxygen_required:
+        return _input_refusal(
+            engine=engine,
+            channel=channel,
+            sources=sources,
+            identity=identity,
+            requested=requested,
+            reason=RefusalReason.IDENTITY_INCOMPLETE,
+            detail={
+                "reason": "missing_fO2",
+                "quantity": quantity.value,
+                "why": oxygen_why,
+                "multivalent": list(redox),
+            },
+            notices=tuple(input_notices),
+        )
+    input_notices.append(_omission_notice(quantity, oxygen_why))
+    return Po2Request(mode=PO2_NOT_AN_INPUT, po2_bar=None)
+
+
 def predict_with_engine(
     engine: Engine,
     observation: Observation,
@@ -3329,13 +3410,9 @@ def predict_with_engine(
         if pressure_notice is not None:
             input_notices.append(pressure_notice)
 
-    fo2_state = identity.fO2_Pa
-    oxygen_balance_effusion = (
-        quantity in _VAPOUR_EQUILIBRIUM
-        and experiment is not None
-        and experiment.method.is_value
-        and experiment.method.value is MethodToken.KNUDSEN_EFFUSION
-        and not _has_printed_fo2(observation, identity)
+    knudsen_vapour = _knudsen_vapour_equilibrium(quantity, experiment)
+    oxygen_balance_effusion = knudsen_vapour and not _has_printed_fo2(
+        observation, identity
     )
     if activity_payload is not None:
         # The contract's oxygen point, or none. Never an engine default.
@@ -3348,44 +3425,26 @@ def predict_with_engine(
             po2 = Po2Request(mode=PO2_NOT_AN_INPUT, po2_bar=None)
     elif oxygen_balance_effusion:
         cell_materials = bench.cell_materials if bench is not None else None
-        material_class = _cell_material_class(cell_materials)
-        modelled = (
-            _uniform_modelled_reactive_cell(cell_materials)
-            if material_class == "reactive"
-            else None
-        )
+        material_class, modelled = _cell_oxygen_class(cell_materials)
         if material_class == "reactive" and modelled is None:
             # Out-of-domain physics: predict and flag. Keep refusal only when
-            # a required input is genuinely missing (handled below).
+            # a required input is genuinely missing (the shared decision).
             input_notices.append(
                 _reactive_cell_not_modelled_notice(quantity, cell_materials)
             )
-            oxygen_required, oxygen_why, redox = oxygen_is_scorer_input(
-                identity, composition_value
+            decision = _oxygen_input_request(
+                engine=engine,
+                channel=channel,
+                sources=sources,
+                identity=identity,
+                requested=requested,
+                quantity=quantity,
+                composition_value=composition_value,
+                input_notices=input_notices,
             )
-            if fo2_state is not None and fo2_state.is_value and fo2_state.value is not None:
-                po2 = Po2Request(
-                    mode=PO2_COMMANDED, po2_bar=float(fo2_state.value) / 1.0e5
-                )
-            elif oxygen_required:
-                return _input_refusal(
-                    engine=engine,
-                    channel=channel,
-                    sources=sources,
-                    identity=identity,
-                    requested=requested,
-                    reason=RefusalReason.IDENTITY_INCOMPLETE,
-                    detail={
-                        "reason": "missing_fO2",
-                        "quantity": quantity.value,
-                        "why": oxygen_why,
-                        "multivalent": list(redox),
-                    },
-                    notices=tuple(input_notices),
-                )
-            else:
-                po2 = Po2Request(mode=PO2_NOT_AN_INPUT, po2_bar=None)
-                input_notices.append(_omission_notice(quantity, oxygen_why))
+            if isinstance(decision, EnginePrediction):
+                return decision
+            po2 = decision
         elif material_class != "inert" and modelled is None:
             refusal_token = {
                 "not_inert": "cell_material_not_inert",
@@ -3438,53 +3497,32 @@ def predict_with_engine(
                 cell_material=modelled,
             )
     else:
-        oxygen_required, oxygen_why, redox = oxygen_is_scorer_input(identity, composition_value)
-        if fo2_state is not None and fo2_state.is_value and fo2_state.value is not None:
-            # fO2_Pa is fugacity. Commanded pO2_bar = fO2_Pa / 1e5 under the
-            # stated ideal-gas assumption (1 bar = 100000 Pa exactly).
-            po2 = Po2Request(mode=PO2_COMMANDED, po2_bar=float(fo2_state.value) / 1.0e5)
-        elif oxygen_required:
-            return _input_refusal(
-                engine=engine,
-                channel=channel,
-                sources=sources,
-                identity=identity,
-                requested=requested,
-                reason=RefusalReason.IDENTITY_INCOMPLETE,
-                detail={
-                    "reason": "missing_fO2",
-                    "quantity": quantity.value,
-                    "why": oxygen_why,
-                    "multivalent": list(redox),
-                },
-                notices=tuple(input_notices),
-            )
-        else:
-            po2 = Po2Request(mode=PO2_NOT_AN_INPUT, po2_bar=None)
-            input_notices.append(_omission_notice(quantity, oxygen_why))
+        decision = _oxygen_input_request(
+            engine=engine,
+            channel=channel,
+            sources=sources,
+            identity=identity,
+            requested=requested,
+            quantity=quantity,
+            composition_value=composition_value,
+            input_notices=input_notices,
+        )
+        if isinstance(decision, EnginePrediction):
+            return decision
+        po2 = decision
         # Printed-O2 (or oxygen-not-required) Knudsen path: still flag an
         # unmodelled reactive cell so the label travels with the prediction.
-        if (
-            quantity in _VAPOUR_EQUILIBRIUM
-            and experiment is not None
-            and experiment.method.is_value
-            and experiment.method.value is MethodToken.KNUDSEN_EFFUSION
-            and bench is not None
-        ):
-            cell_materials = bench.cell_materials
-            material_class = _cell_material_class(cell_materials)
-            modelled = (
-                _uniform_modelled_reactive_cell(cell_materials)
-                if material_class == "reactive"
-                else None
-            )
+        if knudsen_vapour and bench is not None:
+            material_class, modelled = _cell_oxygen_class(bench.cell_materials)
             if material_class == "reactive" and modelled is None:
                 if not any(
                     notice.kind is NoticeKind.REACTIVE_CELL_NOT_MODELLED
                     for notice in input_notices
                 ):
                     input_notices.append(
-                        _reactive_cell_not_modelled_notice(quantity, cell_materials)
+                        _reactive_cell_not_modelled_notice(
+                            quantity, bench.cell_materials
+                        )
                     )
 
     if composition_value is not None:
