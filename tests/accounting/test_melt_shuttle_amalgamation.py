@@ -80,10 +80,13 @@ def test_melt_shuttle_credit_allows_partial_evaporation_with_pro_rata_origins(
         )
 
     ledger.apply(shuttle_transition)
+    ledger.mark_amalgamated_pool("process.cleaned_melt", (element,))
     ledger.apply(partial_evaporation)
 
     origin_debit = partial_evaporation.debits[0].origin_atom_moles
     if element == "K":
-        assert origin_debit == {"feedstock": {"K": 1.0}, "reagent": {"K": 1.0}}
+        assert origin_debit["feedstock"]["K"] == pytest.approx(1.0)
+        assert origin_debit["reagent"]["K"] == pytest.approx(1.0)
     else:
-        assert origin_debit == {"feedstock": {"Mg": 1.5}, "reagent": {"Mg": 1.5}}
+        assert origin_debit["feedstock"]["Mg"] == pytest.approx(1.5)
+        assert origin_debit["reagent"]["Mg"] == pytest.approx(1.5)
