@@ -8,17 +8,16 @@ source:
   url: https://ui.adsabs.harvard.edu/abs/1971LPSC....2.1367D
 extraction:
   method: >-
-    WA-3 (2026-09-06): pdftotext -layout of the held ADS JBIG2 scan is empty (one
-    bibcode token per page). Tables 1–8 transcribed from 200 dpi pdftoppm renders
-    (not MinerU "~" figure grids). Parent observation objects left unchanged;
-    Table 6 rows, silver/O–O2 calibration, and sample masses added as new
-    observation_ids. Prior method: OCR-artifact transcription (MinerU vlm) of
-    Tables 1–8 + prior phase-2 geometry; multicarrier ladder 2026-08-04
-    (mine-multicarrier-gk). Absolute P only from published tables — figure-only
-    series (Na, K, Fe, Ca, SiO, TiO, TiO2, Al monatomic; Fig. 8 composite) not
-    digitised in this round.
-  date: '2026-09-06'
-  worker: wave-WA-3
+    WA-3 (2026-09-06): Tables 1–8 transcribed from 200 dpi pdftoppm renders;
+    the earlier round did not digitize figure-only series. Repair t1120-demaria
+    (2026-10-03): Fig. 1's 16 stored Na readings re-read at 300 dpi and tagged
+    with the caption's sample, instrument and bar-series symbols; Fig. 2 K
+    points added as figure_only from a 300 dpi render. Procedure, depletion,
+    temperature-measurement and figure-legend context checked against page images.
+    Prior method: OCR-artifact transcription (MinerU vlm) of Tables 1–8 + prior
+    phase-2 geometry; multicarrier ladder 2026-08-04 (mine-multicarrier-gk).
+  date: '2026-10-03'
+  worker: t1120-demaria
   provenance_path: docs-private/research/2026-09-06-wave-A/WA-3/kems-022-demaria-1971/
 review_status: draft
 species:
@@ -105,7 +104,10 @@ species:
       locator:
         published_page: 1368
         pdf_page_index: 2
-        paragraph: On the whole 680.2 mg of sample 12022,57 and 928.6 mg of 12065,36
+        paragraph: Total masses on p. 1368; 12022 splits on p. 1369; 12065 splits on p. 1375
+        note: >-
+          p. 1368 gives the whole-sample totals; p. 1369 gives the 12022 BC and NAA split masses;
+          p. 1375 gives the 12065 BC and NAA split masses.
       T_range_K:
       - 1250.0
       - 2500.0
@@ -159,6 +161,24 @@ species:
             published_page: 1368
             pdf_page_index: 2
             paragraph: rhenium containers having a knife-edge effusion hole 2.3 mm in diameter
+        temperature_measurement:
+          value: >-
+            Calibrated Leeds and Northrup optical pyrometers sighted a bottom black-body hole
+            for NAA and the effusion hole for BC, through bottom and top viewing windows,
+            respectively. A tungsten/tungsten-rhenium thermocouple in the central crucible
+            support leg was used with the BC optical pyrometer; the readings agreed generally
+            satisfactorily.
+          units: as described
+          locator:
+            published_page: 1368
+            pdf_page_index: 2
+            paragraph: calibrated Leeds and Northrup optical pyrometers; bottom black body hole; BC effusion hole; thermocouple in central crucible support leg
+        temperature_calibration:
+          value: Optical pyrometers described as calibrated; calibration reference not specified.
+          locator:
+            published_page: 1368
+            pdf_page_index: 2
+            paragraph: calibrated Leeds and Northrup optical pyrometers
   Mn:
     observations:
     - observation_id: demaria_1971_mn_psat_table2_sample_12022
@@ -428,6 +448,7 @@ species:
       - 1300.0
       - 1800.0
       phase: lunar_basalt_melt_12022_12065
+      standard_state: pure Fe metal (Hultgren 1967 reference vapor-pressure line on Fig. 3)
       regime: kems_effusion
       units: dimensionless
       values:
@@ -474,6 +495,7 @@ species:
         line_range: 340-356
         figure: '3'
       phase: lunar_basalt_melt_12065
+      standard_state: pure Fe chips in Fe crucible (multi-rotating cell reference)
       regime: kems_effusion
       units: dimensionless
       values:
@@ -1725,18 +1747,22 @@ species:
       regime: kems_effusion
       units: atm as published on Fig. 1 (p_Pa = p_atm × 101325)
       uncertainty:
-        sigma_log10P_dex_per_point: 0.3
-        dex: 0.3
-        fully_correlated_cell_calibration_offset_note: 'Framework §4.3.A error model: one fully-correlated
-          cell-calibration offset across all points of a series (in addition to 0.30 dex/pt independent).
-          Authors also state ≥factor 2 absolute-P uncertainty from calibration.'
-        note: pre-registered digitization σ; do not retune Pref/γ to close residuals. dex=0.3 is the
-          already-stated σ (log10 of the authors' ≥factor-2 absolute-P bound), not a retune.
+        figure_reading_estimate:
+          log10_p_atm_absolute_uncertainty_dex: 0.10
+          invT_times_1e4_K_inv_absolute_uncertainty: 0.02
+          note: >-
+            Estimated from the 300 dpi Fig. 1 axis and point widths; applies to each
+            listed point. The pressure coordinate is log10(atm), and the temperature
+            coordinate is 1/T × 10^4 K^-1.
+        calibration_context: >-
+          The authors state on p. 1375 that pressure values carry an uncertainty of
+          at least a factor 2, mainly from calibration; they discuss this as reducing
+          apparent differences except for Na and K. This is distinct from the plotted
+          point-reading estimate above.
       values:
         gas_species: Na(g)
-        quantity: partial_pressure_figure_digitization_rejected
-        status: typed_refusal
-        reason: Figure-only values are inadmissible for this extraction; no source-tabulated Na pressure points exist.
+        quantity: partial_pressure
+        method_class: figure_only
         material: Apollo_12_12022
         condensed_phase: lunar_basalt_melt
         sample: '12022'
@@ -1768,7 +1794,6 @@ species:
           published_pages: 1254–1255
           quote: Apollo 12 rock 12022 analytical composition
         prior_figure_digitization_present: true
-        admission_status: rejected_no_figure_reading
         series: upper_line_circles
         pre_depletion_only: true
         first_observed_T_K: 1250.0
@@ -1779,9 +1804,9 @@ species:
           measured_at_same_T: false
           oxygen_observation_id: demaria_1971_o2_psat_table1_alkali_range
           reason: >-
-            Table 1 O2 points are at 1396 and 1475 K for sample 12022; none is at the
-            temperature of an admissible Na row. The nearest 1396 K point is context only,
-            not an in-cell fO2 pairing.
+            Table 1 reports O2 at 1396 and 1475 K for sample 12022; neither printed T
+            exactly matches a Fig. 1 Na point. These Table 1 measurements are contextual;
+            the paper does not pair them with a particular Na run.
           derivation_status: not_applied
         pO2_atm_as_published: 5.54e-09
         oxygen_partial_pressure:
@@ -1831,7 +1856,7 @@ species:
           p_Pa: 0.0793
           note: Fitted-line evaluation at investigation T (July Na report); consistent with upper-line
             visual digitization. Held-out only.
-        inadmissible_figure_digitized_points:
+        points:
         - T_K: 1428.57
           invT_times_1e4_K_inv: 7.0
           log10_p_atm: -6.05
@@ -1840,7 +1865,8 @@ species:
           symbol: open_circle
           instrument: BC
           figure_digitized: true
-          sigma_log10P_dex: 0.3
+          series: sample_12022_circle_line
+          barred_marker: false
           pre_depletion_initial_point: true
         - T_K: 1412.43
           invT_times_1e4_K_inv: 7.08
@@ -1850,7 +1876,8 @@ species:
           symbol: open_circle
           instrument: BC
           figure_digitized: true
-          sigma_log10P_dex: 0.3
+          series: sample_12022_circle_line
+          barred_marker: false
           pre_depletion_initial_point: true
         - T_K: 1379.31
           invT_times_1e4_K_inv: 7.25
@@ -1860,7 +1887,8 @@ species:
           symbol: filled_circle
           instrument: NAA
           figure_digitized: true
-          sigma_log10P_dex: 0.3
+          series: sample_12022_circle_line
+          barred_marker: false
           pre_depletion_initial_point: true
         - T_K: 1360.54
           invT_times_1e4_K_inv: 7.35
@@ -1870,7 +1898,8 @@ species:
           symbol: open_circle
           instrument: BC
           figure_digitized: true
-          sigma_log10P_dex: 0.3
+          series: sample_12022_circle_line
+          barred_marker: false
           pre_depletion_initial_point: true
         - T_K: 1342.28
           invT_times_1e4_K_inv: 7.45
@@ -1880,7 +1909,8 @@ species:
           symbol: filled_circle
           instrument: NAA
           figure_digitized: true
-          sigma_log10P_dex: 0.3
+          series: sample_12022_circle_line
+          barred_marker: false
           pre_depletion_initial_point: true
         - T_K: 1298.7
           invT_times_1e4_K_inv: 7.7
@@ -1890,7 +1920,8 @@ species:
           symbol: open_circle
           instrument: BC
           figure_digitized: true
-          sigma_log10P_dex: 0.3
+          series: sample_12022_circle_line
+          barred_marker: false
           pre_depletion_initial_point: true
       equipment:
         orifice_area:
@@ -1928,18 +1959,22 @@ species:
       regime: kems_effusion
       units: atm as published on Fig. 1 (p_Pa = p_atm × 101325)
       uncertainty:
-        sigma_log10P_dex_per_point: 0.3
-        dex: 0.3
-        fully_correlated_cell_calibration_offset_note: 'Framework §4.3.A error model: one fully-correlated
-          cell-calibration offset across all points of a series (in addition to 0.30 dex/pt independent).
-          Authors state ≥factor 2 absolute-P uncertainty from calibration (12065 section).'
-        note: pre-registered digitization σ; do not retune Pref/γ to close residuals. dex=0.3 is the
-          already-stated σ (log10 of the authors' ≥factor-2 absolute-P bound), not a retune.
+        figure_reading_estimate:
+          log10_p_atm_absolute_uncertainty_dex: 0.10
+          invT_times_1e4_K_inv_absolute_uncertainty: 0.02
+          note: >-
+            Estimated from the 300 dpi Fig. 1 axis and point widths; applies to each
+            listed point. The pressure coordinate is log10(atm), and the temperature
+            coordinate is 1/T × 10^4 K^-1.
+        calibration_context: >-
+          The authors state on p. 1375 that pressure values carry an uncertainty of
+          at least a factor 2, mainly from calibration; they discuss this as reducing
+          apparent differences except for Na and K. This is distinct from the plotted
+          point-reading estimate above.
       values:
         gas_species: Na(g)
-        quantity: partial_pressure_figure_digitization_rejected
-        status: typed_refusal
-        reason: Figure-only values are inadmissible for this extraction; no source-tabulated Na pressure points exist.
+        quantity: partial_pressure
+        method_class: figure_only
         material: Apollo_12_12065
         condensed_phase: lunar_basalt_melt
         sample: '12065'
@@ -1967,13 +2002,14 @@ species:
           published_pages: 1254–1255
           quote: Apollo 12 rock 12065 analytical composition
         prior_figure_digitization_present: true
-        admission_status: rejected_no_figure_reading
         series: lower_line_squares
         pre_depletion_only: true
         first_observed_T_K: 1250.0
-        excluded_points_note: 'Three high-T open squares (~6.55–6.72 ×10^4 K^-1) sit well above the author''s
-          fitted lower line and are treated as other-series / non-initial (paper: barred points = different
-          series; progressive depletion lowers later points). Not included in this pre-depletion set.'
+        excluded_points_note: >-
+          Three additional high-temperature open squares are visible at approximately
+          1/T × 10^4 = 6.55–6.72 K^-1 × 10^4 above the lower line. They are not part of
+          the ten lower-line figure readings listed here; their mass/run assignment is
+          not stated in the paper.
         companion_O2_table: demaria_1971_o2_psat_table1_alkali_range
         co_measured_context: same alkali window as K Fig. 2 and Table 1 O2
         fO2_pairing:
@@ -1981,9 +2017,10 @@ species:
           measured_at_same_T: false
           oxygen_observation_id: demaria_1971_o2_psat_table1_alkali_range
           reason: >-
-            Table 1 O2 points are at 1433, 1459, 1471, 1482 and 1499 K for sample 12065;
-            none is at the temperature of an admissible Na row. The nearest 1433 K point is
-            context only, not an in-cell fO2 pairing.
+            Table 1 reports O2 at 1433, 1459, 1471, 1482 and 1499 K for sample 12065.
+            Its 1459 K entry is close to a filled-square Fig. 1 Na point read at about
+            1459.85 K, but the paper does not identify them as the same run or pair the
+            table entry with that point. Keep the O2 value as context, not a per-run fO2 pairing.
           derivation_status: not_applied
         pO2_atm_as_published: 3.78e-09
         oxygen_partial_pressure:
@@ -2035,7 +2072,7 @@ species:
           p_Pa: 0.00183
           note: Fitted-line evaluation at investigation T (July Na report); consistent with lower-line
             visual digitization. Held-out only.
-        inadmissible_figure_digitized_points:
+        points:
         - T_K: 1474.93
           invT_times_1e4_K_inv: 6.78
           log10_p_atm: -7.05
@@ -2044,7 +2081,8 @@ species:
           symbol: open_square
           instrument: BC
           figure_digitized: true
-          sigma_log10P_dex: 0.3
+          series: sample_12065_square_line
+          barred_marker: false
           pre_depletion_initial_point: true
         - T_K: 1459.85
           invT_times_1e4_K_inv: 6.85
@@ -2054,7 +2092,8 @@ species:
           symbol: filled_square
           instrument: NAA
           figure_digitized: true
-          sigma_log10P_dex: 0.3
+          series: sample_12065_square_line
+          barred_marker: unclear_due_to_overlap
           pre_depletion_initial_point: true
         - T_K: 1449.28
           invT_times_1e4_K_inv: 6.9
@@ -2064,7 +2103,8 @@ species:
           symbol: open_square
           instrument: BC
           figure_digitized: true
-          sigma_log10P_dex: 0.3
+          series: sample_12065_square_line
+          barred_marker: false
           pre_depletion_initial_point: true
         - T_K: 1438.85
           invT_times_1e4_K_inv: 6.95
@@ -2074,7 +2114,8 @@ species:
           symbol: filled_square
           instrument: NAA
           figure_digitized: true
-          sigma_log10P_dex: 0.3
+          series: sample_12065_square_line
+          barred_marker: true
           pre_depletion_initial_point: true
         - T_K: 1428.57
           invT_times_1e4_K_inv: 7.0
@@ -2084,7 +2125,8 @@ species:
           symbol: open_square
           instrument: BC
           figure_digitized: true
-          sigma_log10P_dex: 0.3
+          series: sample_12065_square_line
+          barred_marker: false
           pre_depletion_initial_point: true
         - T_K: 1418.44
           invT_times_1e4_K_inv: 7.05
@@ -2094,7 +2136,8 @@ species:
           symbol: filled_square
           instrument: NAA
           figure_digitized: true
-          sigma_log10P_dex: 0.3
+          series: sample_12065_square_line
+          barred_marker: true
           pre_depletion_initial_point: true
         - T_K: 1398.6
           invT_times_1e4_K_inv: 7.15
@@ -2104,7 +2147,8 @@ species:
           symbol: filled_square
           instrument: NAA
           figure_digitized: true
-          sigma_log10P_dex: 0.3
+          series: sample_12065_square_line
+          barred_marker: unclear_due_to_overlap
           pre_depletion_initial_point: true
         - T_K: 1379.31
           invT_times_1e4_K_inv: 7.25
@@ -2114,7 +2158,8 @@ species:
           symbol: filled_square
           instrument: NAA
           figure_digitized: true
-          sigma_log10P_dex: 0.3
+          series: sample_12065_square_line
+          barred_marker: unclear_due_to_overlap
           pre_depletion_initial_point: true
         - T_K: 1351.35
           invT_times_1e4_K_inv: 7.4
@@ -2124,7 +2169,8 @@ species:
           symbol: filled_square
           instrument: NAA
           figure_digitized: true
-          sigma_log10P_dex: 0.3
+          series: sample_12065_square_line
+          barred_marker: false
           pre_depletion_initial_point: true
         - T_K: 1324.5
           invT_times_1e4_K_inv: 7.55
@@ -2134,7 +2180,8 @@ species:
           symbol: filled_square
           instrument: NAA
           figure_digitized: true
-          sigma_log10P_dex: 0.3
+          series: sample_12065_square_line
+          barred_marker: false
           pre_depletion_initial_point: true
       equipment:
         orifice_area:
@@ -2156,6 +2203,108 @@ species:
             source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
             paragraph: passivated rhenium cells for 12065
             line_range: 56-60
+    context:
+    - observation_id: demaria_1971_alkali_run_procedure_and_missing_order
+      type: method
+      locator:
+        published_page: 1368
+        pdf_page_index: 2
+        paragraph: experiments performed utilizing alternate procedures; progressive and fixed temperature procedures
+      units: as printed
+      values:
+        quantity: alkali_run_temperature_procedure
+        method_class: quoted_attributed
+        procedure_quote: >-
+          The experiments were performed utilizing alternate procedures which consisted either of studying the
+          vaporization of the sample progressively, namely by changing the temperature step by step
+          (“progressive depletion” procedure) or of heating the sample to a predetermined temperature
+          (“fixed temperature” procedure). The latter mode was controlled by the limits imposed by the validity
+          of the Knudsen effusion conditions. This procedure was mainly used in the initial part of the BC
+          experiments.
+        temperature_visit_order: not stated; ascending, descending, or cyclic order is not specified (pp. 1367–1380 searched)
+        fresh_sample_per_temperature: not stated (pp. 1367–1380 searched)
+        time_at_temperature: not stated (pp. 1367–1380 searched)
+        sample_depletion_procedure_note: The paper calls the stepwise procedure “progressive depletion,” but does not give a point-by-point run sequence.
+    - observation_id: demaria_1971_alkali_depletion_statements
+      type: method
+      locator:
+        published_page: 1368
+        pdf_page_index: 2
+        paragraph: As the sample vaporized a depletion in the volatile components occurred
+        note: Additional Na and K depletion statement at p. 1369, Alkaline components paragraph.
+      units: as printed
+      values:
+        quantity: alkali_depletion_with_vaporization
+        method_class: quoted_attributed
+        depletion_quote_p1368: >-
+          As the sample vaporized a depletion in the volatile components occurred. This process caused a change
+          in the intensities of species at constant temperature to values which, in some cases, dropped below
+          the sensitivity-detection limits of the instruments. We therefore considered only the “initial points,”
+          namely the values measured in a temperature range corresponding to the conditions under which
+          presumably no appreciable variation of the concentration of the relative components in the condensed
+          phase occurred.
+        alkali_depletion_quote_p1369: >-
+          Owing to the low content in the sample (0.36 and 0.068 wt. % of Na2O and K2O, respectively) depletion
+          of these components occurred very soon, so that only a few initial points could be measured.
+        time_or_successive_heating_detail: not stated beyond the quoted depletion statements; pp. 1367–1380 searched
+    - observation_id: demaria_1971_figure1_symbol_key
+      type: experiment_series
+      locator:
+        published_page: 1369
+        pdf_page_index: 3
+        figure: '1'
+        paragraph: Figure 1 caption symbol definitions
+      units: as printed
+      values:
+        quantity: figure_symbol_and_instrument_key
+        method_class: quoted_attributed
+        caption_quote: >-
+          The circles are referred to the sample 12022 while the squares are relative to the sample 12065.
+          Open points are referred to experiments carried out with BC instrument; full points are relative to
+          NAA experiments. Barred points are relative to different series of data. This notation is followed
+          through the text.
+        BC_instrument: Bendix Co. time-of-flight mass spectrometer, model 3015 (p. 1367)
+        NAA_instrument: Nuclide Analysis Associates high-temperature mass spectrometer, model HT (p. 1367)
+        series_interpretation: The caption does not name or number the different series; a bar marks a point from a different data series.
+    - observation_id: demaria_1971_o2_temperature_and_run_pairing_context
+      type: experiment_series
+      locator:
+        published_page: 1370
+        pdf_page_index: 4
+        table: '1'
+        figure: '1'
+        paragraph: Table 1 footnote states measurements carried out with NAA instrument
+      units: K and atm as printed; figure comparison is figure-only
+      values:
+        quantity: oxygen_and_sodium_temperature_pairing_context
+        method_class: quoted_attributed
+        table_1_instrument: NAA
+        sample_12022_O2_temperatures_K: [1396, 1475]
+        sample_12065_O2_temperatures_K: [1433, 1482, 1499, 1471, 1459]
+        sample_12065_nearby_Na_point_note: >-
+          Fig. 1 includes a filled-square NAA Na point read at about 1459.85 K, close to the 1459 K Table 1 O2
+          entry. The paper does not explicitly pair this table entry with a Fig. 1 point or identify a shared run.
+        pairing_statement: The paper reports O2 during alkali evaporation and gives Table 1 temperatures, but does not state per-run Na/O2 pairings.
+    - observation_id: demaria_1971_main_cell_unreported_dimensions_and_temperature_uncertainty
+      type: apparatus
+      locator:
+        published_page: 1368
+        pdf_page_index: 2
+        paragraph: rhenium containers having a knife-edge effusion hole 2.3 mm in diameter
+        note: Search of apparatus and results pages 1367–1380.
+      units: as reported or not stated
+      values:
+        quantity: main_knudsen_cell_geometry_and_temperature_uncertainty
+        method_class: quoted_unattributed
+        stated_cell_material: rhenium
+        stated_orifice_diameter_mm: 2.3
+        cell_internal_dimensions: not stated (pp. 1367–1380 searched)
+        clausing_factor: not stated (pp. 1367–1380 searched)
+        liner_material: not stated separately from the rhenium container (pp. 1367–1380 searched)
+        sample_surface_area: not stated (pp. 1367–1380 searched)
+        orifice_to_sample_area_ratio: not stated; sample surface area is not given (pp. 1367–1380 searched)
+        temperature_measurement_uncertainty: not stated (pp. 1367–1380 searched)
+        temperature_calibration_reference: not stated; pyrometers are described as calibrated (p. 1368)
   K:
     observations:
     - observation_id: demaria_1971_k_first_observed_figure2
@@ -2179,7 +2328,9 @@ species:
         sample_K2O_wt_pct: 0.068
         first_observed_T_K: 1250.0
         semantics: bound_not_point_ordering
-        note: Absolute P on Fig. 2 only. Not figure-digitized.
+        note: >-
+          This first-observed context record is not the digitized point series; see
+          demaria_1971_k_psat_figure2_digitized.
         companion_O2_table: demaria_1971_o2_psat_table1_alkali_range
       equipment:
         orifice_area:
@@ -2201,6 +2352,83 @@ species:
             source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
             paragraph: rhenium containers; passivated Re for 12065
             line_range: 32-56
+    - observation_id: demaria_1971_k_psat_figure2_digitized
+      type: psat_series
+      locator:
+        published_page: 1370
+        pdf_page_index: 4
+        figure: '2'
+        paragraph: Temperature dependence of K partial pressures over samples 12022 and 12065
+        note: Figure-only readings from the 300 dpi page image; axes are log10(P/atm) and 1/T × 10^4 K^-1.
+      T_range_K:
+      - 1308.90
+      - 1497.01
+      phase: Apollo_12_lunar_basalt_melt_12022_12065
+      regime: kems_effusion
+      units: atm as published on Fig. 2 (p_Pa = p_atm × 101325)
+      uncertainty:
+        figure_reading_estimate:
+          log10_p_atm_absolute_uncertainty_dex: 0.10
+          invT_times_1e4_K_inv_absolute_uncertainty: 0.02
+          note: >-
+            Estimated from the 300 dpi Fig. 2 axes and point widths; applies to each listed point.
+            The pressure coordinate is log10(atm), and the temperature coordinate is 1/T × 10^4 K^-1.
+      values:
+        gas_species: K(g)
+        quantity: partial_pressure
+        method_class: figure_only
+        sample_pair: Apollo_12_12022_and_12065
+        points:
+        - T_K: 1366.12
+          invT_times_1e4_K_inv: 7.32
+          log10_p_atm: -7.35
+          p_atm: 4.466836e-08
+          series: sample_12022_circle_line
+        - T_K: 1314.06
+          invT_times_1e4_K_inv: 7.61
+          log10_p_atm: -7.60
+          p_atm: 2.511886e-08
+          series: sample_12022_circle_line
+        - T_K: 1497.01
+          invT_times_1e4_K_inv: 6.68
+          log10_p_atm: -8.25
+          p_atm: 5.623413e-09
+          series: sample_12065_square_line
+        - T_K: 1479.29
+          invT_times_1e4_K_inv: 6.76
+          log10_p_atm: -8.40
+          p_atm: 3.981072e-09
+          series: sample_12065_square_line
+        - T_K: 1468.43
+          invT_times_1e4_K_inv: 6.81
+          log10_p_atm: -8.40
+          p_atm: 3.981072e-09
+          series: sample_12065_square_line
+        - T_K: 1457.73
+          invT_times_1e4_K_inv: 6.86
+          log10_p_atm: -8.50
+          p_atm: 3.162278e-09
+          series: sample_12065_square_line
+        - T_K: 1428.57
+          invT_times_1e4_K_inv: 7.00
+          log10_p_atm: -8.68
+          p_atm: 2.089296e-09
+          series: sample_12065_square_line
+        - T_K: 1392.76
+          invT_times_1e4_K_inv: 7.18
+          log10_p_atm: -8.80
+          p_atm: 1.584893e-09
+          series: sample_12065_square_line
+        - T_K: 1351.35
+          invT_times_1e4_K_inv: 7.40
+          log10_p_atm: -8.85
+          p_atm: 1.412538e-09
+          series: sample_12065_square_line
+        - T_K: 1308.90
+          invT_times_1e4_K_inv: 7.64
+          log10_p_atm: -9.22
+          p_atm: 6.025596e-10
+          series: sample_12065_square_line
   Si:
     observations:
     - observation_id: demaria_1971_si_monatomic_not_reported
