@@ -578,7 +578,7 @@ observations:
         pdf_page_index: 6
         note: unnumbered metal-yield table; Si from 2 SiO(g) -> SiO2(s) + Si(s) eq. (18)
 - observation_id: steurer-1985-vapor-phase-pyrolysis::steurer_1985_sio2_induction_experiment
-  experiment_id: df0238505301ce8823909c46c2187b3a6ba0fbd2420d9d5fecce946e681c3098::steurer-1985-vapor-phase-pyrolysis
+  experiment_id: df0238505301ce8823909c46c2187b3a6ba0fbd2420d9d5fecce946e681c3098::experiment::steurer-1985-sio2-induction
   identity:
     quantity:
       tag: unknown
@@ -1846,7 +1846,7 @@ observations:
     note: Table 1 vapor pressure of oxide dissociation species vs temperature
   read_from: pdf:steurer-1985-vapor-phase-pyrolysis
 - observation_id: steurer-1985-vapor-phase-pyrolysis::steurer_1985_table2_mixture_psat::rows:h=0709eb58b2d3
-  experiment_id: df0238505301ce8823909c46c2187b3a6ba0fbd2420d9d5fecce946e681c3098::steurer-1985-vapor-phase-pyrolysis
+  experiment_id: df0238505301ce8823909c46c2187b3a6ba0fbd2420d9d5fecce946e681c3098::experiment::steurer-1985-model-mixture
   identity:
     quantity:
       tag: value
@@ -1901,8 +1901,19 @@ observations:
       tag: unknown
       reason: source condensed reservoir not grounded
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - Al2O3
+          - '0.1012859355409274971736609261'
+        - - SiO2
+          - '0.5729364260977871867940321665'
+        - - TiO2
+          - '0.0862048188549010143220330174'
+        - - FeO
+          - '0.2395728195063843017102738897'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -1947,7 +1958,7 @@ observations:
     note: Table 2 compositional vapor pressure (atm) of Al2O3+SiO2+TiO2+FeO mixture
   read_from: pdf:steurer-1985-vapor-phase-pyrolysis
 - observation_id: steurer-1985-vapor-phase-pyrolysis::steurer_1985_table2_mixture_psat::rows:h=0b9faee1ca99
-  experiment_id: df0238505301ce8823909c46c2187b3a6ba0fbd2420d9d5fecce946e681c3098::steurer-1985-vapor-phase-pyrolysis
+  experiment_id: df0238505301ce8823909c46c2187b3a6ba0fbd2420d9d5fecce946e681c3098::experiment::steurer-1985-model-mixture
   identity:
     quantity:
       tag: value
@@ -2002,8 +2013,19 @@ observations:
       tag: unknown
       reason: source condensed reservoir not grounded
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - Al2O3
+          - '0.1012859355409274971736609261'
+        - - SiO2
+          - '0.5729364260977871867940321665'
+        - - TiO2
+          - '0.0862048188549010143220330174'
+        - - FeO
+          - '0.2395728195063843017102738897'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -2048,7 +2070,7 @@ observations:
     note: Table 2 compositional vapor pressure (atm) of Al2O3+SiO2+TiO2+FeO mixture
   read_from: pdf:steurer-1985-vapor-phase-pyrolysis
 - observation_id: steurer-1985-vapor-phase-pyrolysis::steurer_1985_table2_mixture_psat::rows:h=14794d7246a9
-  experiment_id: df0238505301ce8823909c46c2187b3a6ba0fbd2420d9d5fecce946e681c3098::steurer-1985-vapor-phase-pyrolysis
+  experiment_id: df0238505301ce8823909c46c2187b3a6ba0fbd2420d9d5fecce946e681c3098::experiment::steurer-1985-model-mixture
   identity:
     quantity:
       tag: value
@@ -2103,8 +2125,19 @@ observations:
       tag: unknown
       reason: source condensed reservoir not grounded
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - Al2O3
+          - '0.1012859355409274971736609261'
+        - - SiO2
+          - '0.5729364260977871867940321665'
+        - - TiO2
+          - '0.0862048188549010143220330174'
+        - - FeO
+          - '0.2395728195063843017102738897'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -2149,7 +2182,7 @@ observations:
     note: Table 2 compositional vapor pressure (atm) of Al2O3+SiO2+TiO2+FeO mixture
   read_from: pdf:steurer-1985-vapor-phase-pyrolysis
 - observation_id: steurer-1985-vapor-phase-pyrolysis::steurer_1985_table2_mixture_psat::rows:h=8b76e5891654
-  experiment_id: df0238505301ce8823909c46c2187b3a6ba0fbd2420d9d5fecce946e681c3098::steurer-1985-vapor-phase-pyrolysis
+  experiment_id: df0238505301ce8823909c46c2187b3a6ba0fbd2420d9d5fecce946e681c3098::experiment::steurer-1985-model-mixture
   identity:
     quantity:
       tag: value
@@ -2204,8 +2237,19 @@ observations:
       tag: unknown
       reason: source condensed reservoir not grounded
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - Al2O3
+          - '0.1012859355409274971736609261'
+        - - SiO2
+          - '0.5729364260977871867940321665'
+        - - TiO2
+          - '0.0862048188549010143220330174'
+        - - FeO
+          - '0.2395728195063843017102738897'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -2250,7 +2294,7 @@ observations:
     note: Table 2 compositional vapor pressure (atm) of Al2O3+SiO2+TiO2+FeO mixture
   read_from: pdf:steurer-1985-vapor-phase-pyrolysis
 - observation_id: steurer-1985-vapor-phase-pyrolysis::steurer_1985_table2_mixture_psat::rows:h=8f72350044a9
-  experiment_id: df0238505301ce8823909c46c2187b3a6ba0fbd2420d9d5fecce946e681c3098::steurer-1985-vapor-phase-pyrolysis
+  experiment_id: df0238505301ce8823909c46c2187b3a6ba0fbd2420d9d5fecce946e681c3098::experiment::steurer-1985-model-mixture
   identity:
     quantity:
       tag: value
@@ -2305,8 +2349,19 @@ observations:
       tag: unknown
       reason: source condensed reservoir not grounded
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - Al2O3
+          - '0.1012859355409274971736609261'
+        - - SiO2
+          - '0.5729364260977871867940321665'
+        - - TiO2
+          - '0.0862048188549010143220330174'
+        - - FeO
+          - '0.2395728195063843017102738897'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -2351,7 +2406,7 @@ observations:
     note: Table 2 compositional vapor pressure (atm) of Al2O3+SiO2+TiO2+FeO mixture
   read_from: pdf:steurer-1985-vapor-phase-pyrolysis
 - observation_id: steurer-1985-vapor-phase-pyrolysis::steurer_1985_table2_mixture_psat::rows:h=a1e4de1aafb1
-  experiment_id: df0238505301ce8823909c46c2187b3a6ba0fbd2420d9d5fecce946e681c3098::steurer-1985-vapor-phase-pyrolysis
+  experiment_id: df0238505301ce8823909c46c2187b3a6ba0fbd2420d9d5fecce946e681c3098::experiment::steurer-1985-model-mixture
   identity:
     quantity:
       tag: value
@@ -2406,8 +2461,19 @@ observations:
       tag: unknown
       reason: source condensed reservoir not grounded
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - Al2O3
+          - '0.1012859355409274971736609261'
+        - - SiO2
+          - '0.5729364260977871867940321665'
+        - - TiO2
+          - '0.0862048188549010143220330174'
+        - - FeO
+          - '0.2395728195063843017102738897'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -2452,7 +2518,7 @@ observations:
     note: Table 2 compositional vapor pressure (atm) of Al2O3+SiO2+TiO2+FeO mixture
   read_from: pdf:steurer-1985-vapor-phase-pyrolysis
 - observation_id: steurer-1985-vapor-phase-pyrolysis::steurer_1985_table2_mixture_psat::rows:h=b038d7511379
-  experiment_id: df0238505301ce8823909c46c2187b3a6ba0fbd2420d9d5fecce946e681c3098::steurer-1985-vapor-phase-pyrolysis
+  experiment_id: df0238505301ce8823909c46c2187b3a6ba0fbd2420d9d5fecce946e681c3098::experiment::steurer-1985-model-mixture
   identity:
     quantity:
       tag: value
@@ -2507,8 +2573,19 @@ observations:
       tag: unknown
       reason: source condensed reservoir not grounded
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - Al2O3
+          - '0.1012859355409274971736609261'
+        - - SiO2
+          - '0.5729364260977871867940321665'
+        - - TiO2
+          - '0.0862048188549010143220330174'
+        - - FeO
+          - '0.2395728195063843017102738897'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -2553,7 +2630,7 @@ observations:
     note: Table 2 compositional vapor pressure (atm) of Al2O3+SiO2+TiO2+FeO mixture
   read_from: pdf:steurer-1985-vapor-phase-pyrolysis
 - observation_id: steurer-1985-vapor-phase-pyrolysis::steurer_1985_table2_mixture_psat::rows:h=bd9124886c6c
-  experiment_id: df0238505301ce8823909c46c2187b3a6ba0fbd2420d9d5fecce946e681c3098::steurer-1985-vapor-phase-pyrolysis
+  experiment_id: df0238505301ce8823909c46c2187b3a6ba0fbd2420d9d5fecce946e681c3098::experiment::steurer-1985-model-mixture
   identity:
     quantity:
       tag: value
@@ -2608,8 +2685,19 @@ observations:
       tag: unknown
       reason: source condensed reservoir not grounded
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - Al2O3
+          - '0.1012859355409274971736609261'
+        - - SiO2
+          - '0.5729364260977871867940321665'
+        - - TiO2
+          - '0.0862048188549010143220330174'
+        - - FeO
+          - '0.2395728195063843017102738897'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -2654,7 +2742,7 @@ observations:
     note: Table 2 compositional vapor pressure (atm) of Al2O3+SiO2+TiO2+FeO mixture
   read_from: pdf:steurer-1985-vapor-phase-pyrolysis
 - observation_id: steurer-1985-vapor-phase-pyrolysis::steurer_1985_table2_mixture_psat::rows:h=d4f34c7c14de
-  experiment_id: df0238505301ce8823909c46c2187b3a6ba0fbd2420d9d5fecce946e681c3098::steurer-1985-vapor-phase-pyrolysis
+  experiment_id: df0238505301ce8823909c46c2187b3a6ba0fbd2420d9d5fecce946e681c3098::experiment::steurer-1985-model-mixture
   identity:
     quantity:
       tag: value
@@ -2709,8 +2797,19 @@ observations:
       tag: unknown
       reason: source condensed reservoir not grounded
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - Al2O3
+          - '0.1012859355409274971736609261'
+        - - SiO2
+          - '0.5729364260977871867940321665'
+        - - TiO2
+          - '0.0862048188549010143220330174'
+        - - FeO
+          - '0.2395728195063843017102738897'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -2755,7 +2854,7 @@ observations:
     note: Table 2 compositional vapor pressure (atm) of Al2O3+SiO2+TiO2+FeO mixture
   read_from: pdf:steurer-1985-vapor-phase-pyrolysis
 - observation_id: steurer-1985-vapor-phase-pyrolysis::steurer_1985_table2_mixture_psat::rows:h=ec7f61012f6e
-  experiment_id: df0238505301ce8823909c46c2187b3a6ba0fbd2420d9d5fecce946e681c3098::steurer-1985-vapor-phase-pyrolysis
+  experiment_id: df0238505301ce8823909c46c2187b3a6ba0fbd2420d9d5fecce946e681c3098::experiment::steurer-1985-model-mixture
   identity:
     quantity:
       tag: value
@@ -2810,8 +2909,19 @@ observations:
       tag: unknown
       reason: source condensed reservoir not grounded
     composition:
-      tag: unknown
-      reason: no composition mapped from source
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - Al2O3
+          - '0.1012859355409274971736609261'
+        - - SiO2
+          - '0.5729364260977871867940321665'
+        - - TiO2
+          - '0.0862048188549010143220330174'
+        - - FeO
+          - '0.2395728195063843017102738897'
+        amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source

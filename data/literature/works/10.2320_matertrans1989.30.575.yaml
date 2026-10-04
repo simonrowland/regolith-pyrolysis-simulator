@@ -103,6 +103,14 @@ experiments:
       regime_class:
         tag: unknown
         reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+    cell_internal_pressure_note:
+      state:
+        tag: value
+        value: 7e-5 Pa furnace vacuum (not in-cell total)
+      locator:
+        published_page: 577
+        pdf_page_index: 3
+        note: The vacuum in the furnace could be maintained at 7 x 10^-5 Pa
   work_id: 10.2320/matertrans1989.30.575
   locator:
     published_page: 576

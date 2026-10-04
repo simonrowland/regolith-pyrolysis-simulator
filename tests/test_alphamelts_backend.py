@@ -35,8 +35,10 @@ from simulator.melt_backend.alphamelts import (
     ALPHAMELTS_DESCENDANT_CONTAINMENT,
     ALPHAMELTS_EXECUTED_T_TOLERANCE_C,
     ALPHAMELTS_MELTS_FILE_TEMPERATURE_DECIMALS,
+    ALPHAMELTS_REASON_CALC_MODE_MISMATCH,
     ALPHAMELTS_REASON_EXECUTED_T_MISMATCH,
     ALPHAMELTS_REASON_MISSING_BINARY,
+    ALPHAMELTS_REASON_MODEL_UNVERIFIED,
     ALPHAMELTS_REASON_NONZERO_EXIT,
     ALPHAMELTS_REASON_NO_CONVERGENCE,
     ALPHAMELTS_REASON_PARSE_EMPTY_OUTPUT,
@@ -84,6 +86,10 @@ from engines.alphamelts.thermoengine import (
     thermoengine_timeout_cause_from_text,
 )
 from engines.magemin.parity import MAGEMinParityComparator
+from simulator.config import (
+    DEFAULT_ALPHAMELTS_MODEL,
+    resolve_alphamelts_subprocess_model,
+)
 
 
 DATA_DIR = Path(__file__).resolve().parents[1] / "data"
@@ -352,6 +358,119 @@ def _melts_domain_composition() -> dict[str, float]:
         'CaO': 10.0,
         'Na2O': 5.0,
     }
+
+
+def _prepare_subprocess_launch_probe(
+    monkeypatch,
+    *,
+    model_name: str,
+    ambient_calc_mode: str | None = None,
+):
+    backend = AlphaMELTSBackend(model_name=model_name)
+    backend._mode = 'subprocess'
+    backend._binary_path = Path('/tmp/fake-alphamelts')
+    backend._engine_version = 'captured-test'
+    captured = {}
+    launches = []
+
+    if ambient_calc_mode is None:
+        monkeypatch.delenv('ALPHAMELTS_CALC_MODE', raising=False)
+    else:
+        monkeypatch.setenv('ALPHAMELTS_CALC_MODE', ambient_calc_mode)
+
+    def fake_run(_args, **kwargs):
+        launches.append(kwargs)
+        captured.update(kwargs['env'])
+        return types.SimpleNamespace(returncode=-signal.SIGABRT, stdout='', stderr='')
+
+    monkeypatch.setattr(
+        'simulator.melt_backend.alphamelts._run_alphamelts_subprocess',
+        fake_run,
+    )
+    return backend, captured, launches
+
+
+def _invoke_subprocess_probe(backend):
+    return backend._equilibrate_subprocess(
+        1400.0,
+        _melts_domain_composition(),
+        -9.0,
+        1.0,
+        total_input_kg=100.0,
+        run_mode=AlphaMELTSSubprocessRunMode.ISOTHERMAL,
+    )
+
+
+def test_subprocess_model_resolver_maps_default_model_to_verified_mode():
+    model, mode = resolve_alphamelts_subprocess_model("")
+
+    assert model == DEFAULT_ALPHAMELTS_MODEL
+    assert mode == "MELTS"
+
+
+def test_blank_and_explicit_default_launch_the_same_resolved_mode(monkeypatch):
+    blank_backend, blank_env, _ = _prepare_subprocess_launch_probe(
+        monkeypatch,
+        model_name="",
+    )
+    _invoke_subprocess_probe(blank_backend)
+    explicit_backend, explicit_env, _ = _prepare_subprocess_launch_probe(
+        monkeypatch,
+        model_name=DEFAULT_ALPHAMELTS_MODEL,
+    )
+    _invoke_subprocess_probe(explicit_backend)
+
+    _resolved_model, expected_mode = resolve_alphamelts_subprocess_model("")
+    assert blank_env["ALPHAMELTS_CALC_MODE"] == expected_mode
+    assert explicit_env["ALPHAMELTS_CALC_MODE"] == expected_mode
+    assert blank_env["ALPHAMELTS_CALC_MODE"] == explicit_env[
+        "ALPHAMELTS_CALC_MODE"
+    ]
+
+
+def test_unverified_subprocess_model_refuses_before_launch(monkeypatch):
+    backend, _captured, launches = _prepare_subprocess_launch_probe(
+        monkeypatch,
+        model_name="pMELTS",
+    )
+
+    with pytest.raises(AlphaMELTSSubprocessContractError) as excinfo:
+        _invoke_subprocess_probe(backend)
+
+    assert excinfo.value.backend_failure_reason_code == (
+        ALPHAMELTS_REASON_MODEL_UNVERIFIED
+    )
+    assert launches == []
+
+
+def test_conflicting_ambient_calc_mode_refuses_before_launch(monkeypatch):
+    backend, _captured, launches = _prepare_subprocess_launch_probe(
+        monkeypatch,
+        model_name="",
+        ambient_calc_mode="pMELTS",
+    )
+
+    with pytest.raises(AlphaMELTSSubprocessContractError) as excinfo:
+        _invoke_subprocess_probe(backend)
+
+    assert excinfo.value.backend_failure_reason_code == (
+        ALPHAMELTS_REASON_CALC_MODE_MISMATCH
+    )
+    assert launches == []
+
+
+def test_agreeing_ambient_calc_mode_passes_to_subprocess(monkeypatch):
+    backend, captured, launches = _prepare_subprocess_launch_probe(
+        monkeypatch,
+        model_name="",
+        ambient_calc_mode="MELTS",
+    )
+
+    _invoke_subprocess_probe(backend)
+
+    _resolved_model, expected_mode = resolve_alphamelts_subprocess_model("")
+    assert len(launches) == 1
+    assert captured["ALPHAMELTS_CALC_MODE"] == expected_mode
 
 
 def _system_main_fixture(

@@ -3121,7 +3121,19 @@ def test_printed_experiment_bench_links_carry_locator(tmp_path: Path):
     hastie = _migrate_real_extract(tmp_path / "hastie-unlinked", "kems-020-hastie-1981-nbsir.yaml")
     table2 = observations_named(hastie, "hastie_1981_table2_k_logP_coefficients")
     table2_experiment = hastie.experiments[table2[0].experiment_id]
-    assert table2_experiment.bench_id is None
+    assert table2_experiment.bench_id is not None
+    assert table2_experiment.bench_id.endswith("::bench::hastie-1981-tms")
+    assert table2_experiment.experiment_id.endswith("::experiment::hastie-1981-pt-tms")
+    tms_bench = hastie.benches[table2_experiment.bench_id]
+    assert tms_bench.cell_material_and_liner is not None
+    assert tms_bench.cell_material_and_liner.state.is_value
+    assert (
+        tms_bench.cell_material_and_liner.state.value
+        == "platinum TMS reactor (boat, carrier, probe)"
+    )
+    nacl = observations_named(hastie, "hastie_1981_nacl_liquid_logP_prose")
+    assert nacl
+    assert nacl[0].experiment_id == table2_experiment.experiment_id
 
     allibert = _migrate_real_extract(tmp_path, "kems-051-allibert-1981.yaml")
     emf = observations_named(allibert, "allibert_1981_table3_emf_solid_cells")
