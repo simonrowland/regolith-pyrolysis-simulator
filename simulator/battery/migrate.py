@@ -6705,6 +6705,24 @@ def _partial_pressure_point_condition(
     return located_value(total.value, locator)
 
 
+
+def _knudsen_effusion_chamber_background_not_for_identity(
+    method: State[MethodToken] | None,
+) -> bool:
+    """True when experiment-level total pressure is Knudsen chamber background.
+
+    Closed token only: ``knudsen_effusion``. Unknown-regime KEMS variants
+    (for example ``kems_ion_intensity_thermal_analysis``) are out of scope —
+    propose a rule in the landing REPORT; do not guess here.
+    """
+
+    return (
+        method is not None
+        and method.is_value
+        and method.value is MethodToken.KNUDSEN_EFFUSION
+    )
+
+
 def _printed_experiment_pressure(
     located: Located[Any] | None,
 ) -> Decimal | None:
@@ -10531,11 +10549,12 @@ class Migrator:
                 if method is not None and method.is_value
                 else experiment.method
             )
-            is_knudsen = (
-                effective_method.is_value
-                and effective_method.value is MethodToken.KNUDSEN_EFFUSION
+            # Knudsen effusion: experiment total is chamber background for the
+            # KEMS validity gates — never the pressure a prediction is made at.
+            skip_identity_fill = _knudsen_effusion_chamber_background_not_for_identity(
+                effective_method
             )
-            if pressure is None and not is_knudsen:
+            if pressure is None and not skip_identity_fill:
                 sweep = experiment.pressure_environment.sweep_gas
                 if sweep.state.is_value and isinstance(sweep.state.value, SweepGas):
                     gas = sweep.state.value
@@ -10548,7 +10567,7 @@ class Migrator:
                         pressure_source = (
                             "experiment.pressure_environment.sweep_gas"
                         )
-            if pressure is not None:
+            if pressure is not None and not skip_identity_fill:
                 known["total_pressure_Pa"] = State.of(pressure)
                 provenance.append(
                     "identity.total_pressure_Pa="
@@ -12824,15 +12843,24 @@ class Migrator:
                         if total_pressure.state.is_value
                         else None
                     )
-                    pressure = (
-                        State.of(pressure_value.point)
-                        if isinstance(pressure_value, Value)
-                        and pressure_value.kind is ValueKind.POINT
-                        and pressure_value.point is not None
-                        else State.unknown(
-                            "source has no located total pressure for this run"
+                    if _knudsen_effusion_chamber_background_not_for_identity(
+                        run_experiment.method
+                    ):
+                        # Same rule as _experiment_identity_fields: chamber
+                        # background must not become the prediction pressure.
+                        pressure = State.unknown(
+                            _PRESSURE_IDENTITY_UNKNOWN["total_pressure_Pa"]
                         )
-                    )
+                    else:
+                        pressure = (
+                            State.of(pressure_value.point)
+                            if isinstance(pressure_value, Value)
+                            and pressure_value.kind is ValueKind.POINT
+                            and pressure_value.point is not None
+                            else State.unknown(
+                                "source has no located total pressure for this run"
+                            )
+                        )
                     area_located = None
                     if (
                         run_experiment.apparatus is not None
