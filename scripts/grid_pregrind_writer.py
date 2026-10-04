@@ -2104,6 +2104,50 @@ class GridCacheWriter:
         fetch_limit: int | None = None,
         grid_key_ids: Sequence[int] | None = None,
     ) -> list[dict[str, Any]]:
+        return self._pending_rows(
+            batch_id=batch_id,
+            shard=shard,
+            rank_limit=rank_limit,
+            after_shuffle_rank=after_shuffle_rank,
+            fetch_limit=fetch_limit,
+            grid_key_ids=grid_key_ids,
+        )
+
+    def _pending_drain_rows(
+        self,
+        *,
+        batch_id: int,
+        backend_name: str,
+        model: str,
+        shard: int | None = None,
+        rank_limit: int | None = None,
+        after_shuffle_rank: int = -1,
+        fetch_limit: int | None = None,
+        grid_key_ids: Sequence[int] | None = None,
+    ) -> list[dict[str, Any]]:
+        return self._pending_rows(
+            batch_id=batch_id,
+            shard=shard,
+            rank_limit=rank_limit,
+            after_shuffle_rank=after_shuffle_rank,
+            fetch_limit=fetch_limit,
+            grid_key_ids=grid_key_ids,
+            expected_backend_name=backend_name,
+            expected_model=model,
+        )
+
+    def _pending_rows(
+        self,
+        *,
+        batch_id: int,
+        shard: int | None = None,
+        rank_limit: int | None = None,
+        after_shuffle_rank: int = -1,
+        fetch_limit: int | None = None,
+        grid_key_ids: Sequence[int] | None = None,
+        expected_backend_name: str | None = None,
+        expected_model: str | None = None,
+    ) -> list[dict[str, Any]]:
         now = time.time()
         if grid_key_ids is not None and not grid_key_ids:
             return []
@@ -2155,6 +2199,14 @@ class GridCacheWriter:
             if not rows:
                 self._finish_write_section(write_section)
                 return []
+            if expected_backend_name is not None and expected_model is not None:
+                for row in rows:
+                    self._validate_queued_drain_identity(
+                        json.loads(row["input_payload_json"]),
+                        backend_name=expected_backend_name,
+                        model=expected_model,
+                        grid_key_id=int(row["id"]),
+                    )
             for row in rows:
                 lease_s = max(3600.0, float(row["timeout_s"]) * 2.0 + 300.0)
                 self.connection.execute(
@@ -2197,6 +2249,61 @@ class GridCacheWriter:
             }
             for row in rows
         ]
+
+    def _validate_drain_configuration(
+        self,
+        *,
+        backend_name: str,
+        model: str,
+        shard: int | None,
+        rank_limit: int | None,
+    ) -> None:
+        clauses = ["o.id IS NULL"]
+        parameters: list[Any] = []
+        if shard is not None:
+            clauses.append("g.shard = ?")
+            parameters.append(int(shard))
+        if rank_limit is not None:
+            clauses.append("g.shuffle_rank < ?")
+            parameters.append(int(rank_limit))
+        rows = self.connection.execute(
+            "SELECT g.id, g.input_payload_json FROM grid_keys g "
+            "LEFT JOIN alphamelts_outputs o "
+            "ON o.expedited_key = g.expedited_key WHERE "
+            + " AND ".join(clauses),
+            tuple(parameters),
+        )
+        for row in rows:
+            inputs = json.loads(row["input_payload_json"])
+            self._validate_queued_drain_identity(
+                inputs,
+                backend_name=backend_name,
+                model=model,
+                grid_key_id=int(row["id"]),
+            )
+
+    @staticmethod
+    def _validate_queued_drain_identity(
+        inputs: Mapping[str, Any],
+        *,
+        backend_name: str,
+        model: str,
+        grid_key_id: int,
+    ) -> None:
+        queued_mode = str(inputs.get("mode") or "")
+        if queued_mode != backend_name:
+            raise ValueError(
+                "queued grid transport differs from drain configuration: "
+                f"grid_key_id={grid_key_id}, queued={queued_mode!r}, "
+                f"drain={backend_name!r}"
+            )
+        queued_model = str(inputs.get("model") or "")
+        if queued_model != model:
+            raise ValueError(
+                "queued grid model differs from drain configuration: "
+                f"grid_key_id={grid_key_id}, queued={queued_model!r}, "
+                f"drain={model!r}"
+            )
 
     def queue_counts(
         self,
@@ -2649,11 +2756,27 @@ class GridCacheWriter:
         )
 
         row = self.connection.execute(
-            "SELECT id, expedited_key FROM grid_keys WHERE id = ?",
+            "SELECT id, expedited_key, input_payload_json FROM grid_keys "
+            "WHERE id = ?",
             (int(grid_key_id),),
         ).fetchone()
         if row is None:
             raise RuntimeError(f"grid key is not materialized: {grid_key_id}")
+
+        queued_inputs = json.loads(row["input_payload_json"])
+        queued_mode = str(queued_inputs.get("mode") or "")
+        if queued_mode != output_mode:
+            raise ValueError(
+                "grid result transport differs from queued key: "
+                f"queued={queued_mode!r}, result={output_mode!r}"
+            )
+        queued_model = str(queued_inputs.get("model") or "")
+        result_model = str(output.get("engine_model") or "")
+        if queued_model != result_model:
+            raise ValueError(
+                "grid result model differs from queued key: "
+                f"queued={queued_model!r}, result={result_model!r}"
+            )
 
         output_values = self._output_values(output)
         output_values.update(

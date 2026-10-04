@@ -1467,8 +1467,15 @@ def test_legacy_cache_v2_descriptive_manifest_remains_readable(tmp_path):
         ).hexdigest()
 
 
-def _prepared_drain_database(database, temperatures=(1200.0,), *, model="MELTSv1.0.2"):
-    with GridCacheWriter(database) as writer:
+def _prepared_drain_database(
+    database,
+    temperatures=(1200.0,),
+    *,
+    model="MELTSv1.0.2",
+    mode="subprocess",
+    backend_name=None,
+):
+    with GridCacheWriter(database, backend_name=backend_name) as writer:
         writer.seed_id_block(0)
         batch_id = writer.ensure_batch(
             label="fixed-v2",
@@ -1484,7 +1491,7 @@ def _prepared_drain_database(database, temperatures=(1200.0,), *, model="MELTSv1
             },
         )
         for shuffle_rank, temperature_C in enumerate(temperatures):
-            inputs = {**_inputs(temperature_C), "model": model}
+            inputs = {**_inputs(temperature_C), "model": model, "mode": mode}
             assert writer.materialize_key(
                 inputs,
                 batch_id=batch_id,
@@ -1585,23 +1592,84 @@ def _drain_once_with_fake_native(database, *, model, monkeypatch):
     return result, row, calls
 
 
-def test_drain_with_different_model_persists_result_under_queued_key(
+def test_drain_refuses_when_queued_model_differs_from_drain_model(
     tmp_path, monkeypatch
 ):
     database = tmp_path / "queued-pmelts-drained-default.db"
     _prepared_drain_database(database, model="pMELTS")
-
-    result, row, calls = _drain_once_with_fake_native(
-        database, model="MELTSv1.0.2", monkeypatch=monkeypatch
+    native_calls = []
+    monkeypatch.setattr(
+        grid_pregrind,
+        "probe_engine",
+        lambda _config: pytest.fail("mismatched queue reached engine probe"),
+    )
+    monkeypatch.setattr(
+        grid_pregrind,
+        "EngineWorkerPool",
+        lambda *_args, **_kwargs: pytest.fail("mismatched queue started workers"),
+    )
+    monkeypatch.setattr(grid_pregrind.signal, "signal", lambda *_args: None)
+    monkeypatch.setattr(
+        grid_pregrind,
+        "_run_point",
+        lambda job: (native_calls.append(job.inputs) or (job.grid_key_id, _output())),
     )
 
-    assert result["success"] == 1
-    assert calls[0]["model"] == "pMELTS"
-    assert (row["model"], row["engine_model"], row["status"]) == (
-        "pMELTS",
-        "MELTSv1.0.2",
-        "ok",
+    with pytest.raises(SystemExit, match="queued grid model differs"):
+        grid_pregrind.main(["--drain-only", "--db", str(database)])
+
+    assert native_calls == []
+    with sqlite3.connect(database) as connection:
+        assert connection.execute("SELECT COUNT(*) FROM alphamelts_outputs").fetchone()[0] == 0
+
+
+def test_run_cycle_rechecks_each_claimed_job_before_submission(tmp_path, monkeypatch):
+    database = tmp_path / "late-mismatched-queue-row.db"
+    _prepared_drain_database(database, model="pMELTS")
+    context = _ImmediateContext()
+    monkeypatch.setattr(grid_pregrind, "EngineWorkerPool", context.EngineWorkerPool)
+    monkeypatch.setattr(
+        grid_pregrind,
+        "_run_point",
+        lambda _job: pytest.fail("mismatched queued job reached the backend"),
     )
+    args = SimpleNamespace(
+        backend="subprocess",
+        workers=1,
+        heartbeat_s=60.0,
+        limit=None,
+        status_json=database.with_suffix(".status.json"),
+        seed=178,
+        db=database,
+        commit_every=10,
+        assume_queued_run_mode=None,
+        model="MELTSv1.0.2",
+        timeout_s=20.0,
+        thermoengine_health_timeout_s=8.0,
+        thermoengine_equilibrate_timeout_s=60.0,
+        allow_zero_component_boundary=False,
+    )
+    with GridCacheWriter(
+        database, existing_only=True, backend_name="subprocess"
+    ) as writer:
+        batch_id = writer.connection.execute(
+            "SELECT batch_id FROM batches WHERE label = 'fixed-v2'"
+        ).fetchone()[0]
+        with pytest.raises(ValueError, match="queued grid model differs"):
+            grid_pregrind.run_cycle(
+                args,
+                writer,
+                batch_id=batch_id,
+                grid_total=1,
+                shard=0,
+            )
+        assert context.pool is None
+        assert writer.connection.execute(
+            "SELECT COUNT(*) FROM grid_key_claims"
+        ).fetchone()[0] == 0
+        assert writer.connection.execute(
+            "SELECT COUNT(*) FROM alphamelts_outputs"
+        ).fetchone()[0] == 0
 
 
 def test_drain_with_same_model_persists_result_normally(tmp_path, monkeypatch):
@@ -1624,54 +1692,151 @@ def test_drain_with_same_model_persists_result_normally(tmp_path, monkeypatch):
 def test_pmelts_drain_refuses_at_adapter_resolver_before_native_call(
     tmp_path, monkeypatch
 ):
-    from simulator import backends
-    from simulator.config import resolve_alphamelts_subprocess_model
-
     database = tmp_path / "queued-pmelts-drained-pmelts.db"
     _prepared_drain_database(database, model="pMELTS")
     resolver_calls = []
     native_calls = []
+    resolver = grid_pregrind.resolve_alphamelts_subprocess_model
 
-    class FakeNativeBackend:
-        _mode = "subprocess"
-        _model = "pMELTS"
+    def record_resolver(model):
+        resolver_calls.append(model)
+        return resolver(model)
 
-        def is_available(self):
-            return True
-
-        def get_engine_version(self):
-            return "fixture-engine"
-
-        def equilibrate(self, **_kwargs):
-            native_calls.append(True)
-            pytest.fail("unverified model reached native backend")
-
-    def fake_resolve_backend(_name, _policy, *, backend_config):
-        resolver_calls.append(backend_config["model"])
-        resolve_alphamelts_subprocess_model(backend_config["model"])
-        return FakeNativeBackend()
-
-    monkeypatch.setattr(backends, "resolve_backend", fake_resolve_backend)
+    monkeypatch.setattr(
+        grid_pregrind, "resolve_alphamelts_subprocess_model", record_resolver
+    )
+    monkeypatch.setattr(
+        grid_pregrind,
+        "probe_engine",
+        lambda _config: pytest.fail("unverified model reached engine probe"),
+    )
     monkeypatch.setattr(grid_pregrind.signal, "signal", lambda *_args: None)
-    context = _ImmediateContext()
-    monkeypatch.setattr(grid_pregrind, "EngineWorkerPool", context.EngineWorkerPool)
+    monkeypatch.setattr(
+        grid_pregrind,
+        "_run_point",
+        lambda *_args: native_calls.append(True),
+    )
 
-    def fake_run_point(job):
-        output = _output()
-        output["engine_model"] = "pMELTS"
-        native_calls.append(True)
-        return job.grid_key_id, output
-
-    monkeypatch.setattr(grid_pregrind, "_run_point", fake_run_point)
-
-    assert grid_pregrind.main(
-        ["--drain-only", "--db", str(database), "--model", "pMELTS"]
-    ) == 2
+    with pytest.raises(SystemExit, match="has no verified ALPHAMELTS_CALC_MODE mapping"):
+        grid_pregrind.main(
+            ["--drain-only", "--db", str(database), "--model", "pMELTS"]
+        )
 
     assert resolver_calls == ["pMELTS"]
     assert native_calls == []
     with sqlite3.connect(database) as connection:
         assert connection.execute("SELECT COUNT(*) FROM alphamelts_outputs").fetchone()[0] == 0
+
+
+def test_write_result_refuses_model_mismatch(tmp_path):
+    database = tmp_path / "write-model-mismatch.db"
+    with GridCacheWriter(database) as writer:
+        batch_id = writer.ensure_batch(
+            label="fixed", kind="fixed", seed=178, params={"test": True}
+        )
+        writer.materialize_key(
+            _inputs(1200.0),
+            batch_id=batch_id,
+            shuffle_rank=0,
+            shard=0,
+            intended_fO2_log=-9.0,
+        )
+        grid_key_id = writer.pending_rows(batch_id=batch_id)[0]["grid_key_id"]
+        output = _output()
+        output["engine_model"] = "pMELTS"
+
+        with pytest.raises(ValueError, match="grid result model differs from queued key"):
+            writer.write_result(grid_key_id, output)
+
+        assert writer.connection.execute(
+            "SELECT COUNT(*) FROM alphamelts_outputs"
+        ).fetchone()[0] == 0
+
+
+def test_write_result_refuses_transport_mismatch(tmp_path):
+    database = tmp_path / "write-transport-mismatch.db"
+    with GridCacheWriter(database) as writer:
+        batch_id = writer.ensure_batch(
+            label="fixed", kind="fixed", seed=178, params={"test": True}
+        )
+        writer.materialize_key(
+            _inputs(1200.0),
+            batch_id=batch_id,
+            shuffle_rank=0,
+            shard=0,
+            intended_fO2_log=-9.0,
+        )
+        with pytest.raises(
+            ValueError, match="queued grid transport differs from drain configuration"
+        ):
+            writer._validate_drain_configuration(
+                backend_name="thermoengine",
+                model="MELTSv1.0.2",
+                shard=0,
+                rank_limit=None,
+            )
+        grid_key_id = writer.pending_rows(batch_id=batch_id)[0]["grid_key_id"]
+        output = _output()
+        output["engine_mode"] = "thermoengine"
+
+        with pytest.raises(
+            ValueError, match="grid result transport differs from queued key"
+        ):
+            writer.write_result(grid_key_id, output)
+
+        assert writer.connection.execute(
+            "SELECT COUNT(*) FROM alphamelts_outputs"
+        ).fetchone()[0] == 0
+
+
+def test_thermoengine_drain_accepts_queued_nondefault_model(tmp_path, monkeypatch):
+    database = tmp_path / "queued-pmelts-thermoengine.db"
+    _prepared_drain_database(
+        database,
+        model="pMELTS",
+        mode="thermoengine",
+        backend_name="thermoengine",
+    )
+    context = _ImmediateContext()
+    monkeypatch.setattr(grid_pregrind.signal, "signal", lambda *_args: None)
+    monkeypatch.setattr(
+        grid_pregrind,
+        "probe_engine",
+        lambda _config: {
+            "available": True,
+            "engine_version": "fixture-engine",
+            "mode": "thermoengine",
+        },
+    )
+    monkeypatch.setattr(grid_pregrind, "EngineWorkerPool", context.EngineWorkerPool)
+
+    def fake_run_point(job):
+        output = _output()
+        output["engine_mode"] = "thermoengine"
+        output["engine_model"] = "pMELTS"
+        output["raw_payload_format"] = grid_pregrind.THERMOENGINE_RAW_PAYLOAD_FORMAT
+        return job.grid_key_id, output
+
+    monkeypatch.setattr(grid_pregrind, "_run_point", fake_run_point)
+    monkeypatch.setattr(grid_pregrind, "_STOP_REQUESTED", False)
+
+    assert grid_pregrind.main(
+        [
+            "--drain-only",
+            "--db",
+            str(database),
+            "--backend",
+            "thermoengine",
+            "--model",
+            "pMELTS",
+        ]
+    ) == 0
+
+    with sqlite3.connect(database) as connection:
+        row = connection.execute(
+            "SELECT engine_mode, engine_model, status FROM alphamelts_outputs"
+        ).fetchone()
+    assert row == ("thermoengine", "pMELTS", "ok")
 
 
 def test_unknown_phase_is_per_point_failure_and_pool_continues(
@@ -2122,7 +2287,7 @@ def test_writer_populates_thermoengine_only_json_without_scalar_padding(tmp_path
         batch_id = writer.ensure_batch(
             label="thermoengine", kind="fixed", seed=178, params={"test": True}
         )
-        inputs = _inputs(1400.0)
+        inputs = {**_inputs(1400.0), "mode": "thermoengine"}
         assert writer.materialize_key(
             inputs,
             batch_id=batch_id,
@@ -2201,6 +2366,7 @@ def test_writer_surfaces_bounded_failure_diagnostics(tmp_path):
         native_input=None,
         backend_name="thermoengine",
     )
+    output["engine_model"] = "MELTSv1.0.2"
 
     with GridCacheWriter(database, backend_name="thermoengine") as writer:
         batch_id = writer.ensure_batch(
@@ -2210,7 +2376,7 @@ def test_writer_surfaces_bounded_failure_diagnostics(tmp_path):
             params={"test": True},
         )
         assert writer.materialize_key(
-            _inputs(1400.0),
+            {**_inputs(1400.0), "mode": "thermoengine"},
             batch_id=batch_id,
             shuffle_rank=0,
             shard=0,
@@ -2242,7 +2408,7 @@ def test_writer_refuses_engine_blending_on_open_and_write(tmp_path):
             label="thermoengine", kind="fixed", seed=178, params={"test": True}
         )
         assert writer.materialize_key(
-            _inputs(1400.0),
+            {**_inputs(1400.0), "mode": "thermoengine"},
             batch_id=batch_id,
             shuffle_rank=0,
             shard=0,
