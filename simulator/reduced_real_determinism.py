@@ -3186,13 +3186,6 @@ def _provider_model(provider: Any) -> str | None:
         )
         return model
     model = getattr(backend, "_model", None)
-    if (
-        model is None
-        and getattr(backend, "real_backend_family", None)
-        == RealBackendFamily.ALPHAMELTS
-        and str(getattr(backend, "_mode", "")).strip() == "python_api"
-    ):
-        return "None"
     if model is not None:
         model_text = str(model).strip()
         if model_text:

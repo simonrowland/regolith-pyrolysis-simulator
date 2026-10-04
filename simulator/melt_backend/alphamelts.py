@@ -934,9 +934,8 @@ class _MELTSBackendSupport(MeltBackend):
         self._redox_buffer: Optional[str] = None
         self._fo2_offset: Optional[float] = None
         self._fe3fet_ratio: Optional[float] = None
-        self._model: str | None = (
-            None if model_name is None else str(model_name)
-        )
+        self._model_was_none = model_name is None
+        self._model = str(model_name)
         self._timeout_s = ALPHAMELTS_DEFAULT_TIMEOUT_S
         self._last_normalization_warnings: List[str] = []
         self._vapor_pressure_table: Optional[dict] = None
@@ -979,8 +978,12 @@ class _MELTSBackendSupport(MeltBackend):
         self._fo2_offset = self._optional_float(config.get('fO2_offset'))
         self._fe3fet_ratio = self._normalize_fe3fet_ratio(
             config.get('Fe3Fet_Liq', config.get('fe3fet_ratio')))
-        model_name = config.get('model', self._model)
-        self._model = None if model_name is None else str(model_name)
+        model_name = config.get(
+            'model',
+            None if self._model_was_none else self._model,
+        )
+        self._model_was_none = model_name is None
+        self._model = str(model_name)
         self._timeout_s = _validated_timeout_s(
             config.get('timeout_s', ALPHAMELTS_DEFAULT_TIMEOUT_S)
         )
@@ -1224,7 +1227,9 @@ class _MELTSBackendSupport(MeltBackend):
 
     def _resolved_python_api_model(self) -> tuple[str, int]:
         try:
-            return resolve_alphamelts_python_api_model(self._model)
+            return resolve_alphamelts_python_api_model(
+                None if self._model_was_none else self._model
+            )
         except ValueError as exc:
             raise AlphaMELTSConfigurationError(str(exc)) from exc
 

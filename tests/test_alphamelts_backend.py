@@ -577,6 +577,21 @@ def test_unverified_subprocess_model_refuses_before_launch(monkeypatch):
     assert launches == []
 
 
+def test_none_subprocess_model_keeps_its_existing_refusal(monkeypatch):
+    backend, _captured, launches = _prepare_subprocess_launch_probe(
+        monkeypatch,
+        model_name=None,
+    )
+
+    with pytest.raises(AlphaMELTSSubprocessContractError) as excinfo:
+        _invoke_subprocess_probe(backend)
+
+    assert excinfo.value.backend_failure_reason_code == (
+        ALPHAMELTS_REASON_MODEL_UNVERIFIED
+    )
+    assert launches == []
+
+
 def test_conflicting_ambient_calc_mode_refuses_before_launch(monkeypatch):
     backend, _captured, launches = _prepare_subprocess_launch_probe(
         monkeypatch,
