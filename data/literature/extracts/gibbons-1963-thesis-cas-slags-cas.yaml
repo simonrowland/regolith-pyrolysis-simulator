@@ -1,0 +1,62 @@
+schema_version: literature_extract.v1
+source_id: gibbons-1963-thesis-cas-slags-cas
+source:
+  citation: 'T. B. Gibbons, PhD thesis on CaS in lime-alumina and related slags (primary source behind Cameron, Gibbons & Taylor 1966), University of [Glasgow/Strathclyde era]; corpus id gibbons-1963-thesis-cas-slags-cas.'
+  doi: null
+  year: 1963
+  corpus_source_id: gibbons-1963-thesis-cas-slags-cas
+extraction:
+  method: Page-image first (poor OmniPage OCR). 200 dpi pdftoppm of thesis PDF; vision read of discussion page
+    (PDF p. 66 / thesis p. 48) for method. Numeric Table II / lime-activity table transcription still OPEN — must continue
+    from page images; do not trust OCR digits alone. Figs 4–6, 7 recorded figure_only until table cells are pinned.
+  date: '2026-10-04'
+  worker: empirical-cao-al2o3-slot-05
+  provenance_path: ferry-inbox/cao-al2o3-sources/gibbons-1963-thesis-cas-slags-cas/
+review_status: draft
+fidelity_samples:
+- path: species.CaO.context[gibbons_1963_lime_alumina_method].values.temperature_C
+  value: 1550
+  note: lime-alumina system temperature from thesis p. 48 page image
+  locator: {published_page: 48, pdf_page_index: 66, section: The Lime-Alumina System}
+species:
+  CaO:
+    context:
+    - observation_id: gibbons_1963_lime_alumina_method
+      type: method
+      locator:
+        published_page: 48
+        pdf_page_index: 66
+        section: The Lime-Alumina System
+      units: C
+      values:
+        quantity: gas_slag_sulphurising_equilibration_method
+        method_class: method_only
+        experimental_method: gas-slag equilibration; sulphurising potential ("A value"); CaS saturation when sulphur content
+          rises markedly for slight increase in sulphurising capacity (figs 4–5)
+        temperature_C: 1550
+        temperature_K: 1823
+        a_CaS_at_saturation_as_printed: 1
+        data_table_as_printed_on_p48: Table II (page-image reading; OCR sometimes misreads as Table IX)
+        plots_as_printed: figs. 4, 5 and 6; lime activities at CaS saturation discussed with fig. 7
+        how_equilibrium_shown_as_printed: CaS free phase at saturation so aCaS=1; correction for change in CaS-free lime % from
+          S gain/loss is approximate and within experimental error except one point
+        equilibrium_constants_as_printed:
+        K_1500_C: 2.75e-3
+        K_1550_C: 3.52e-3
+        reaction_as_printed: 'CaO + 1/2 S2 = CaS + 1/2 O2'
+        a_CaO_at_sat_note: 'at CaS saturation aCaS=1 so aCaO from K and gas A-value; plotted in fig. 7 (figure_only until table pin)'
+        status: OPEN — numeric a(CaO) / composition rows from Table II (and any printed activity table) not yet transcribed
+          from page images; continue before REPORT
+    - observation_id: gibbons_1963_figs_figure_only
+      type: method
+      locator:
+        published_page: 48
+        pdf_page_index: 66
+        figure: '4-7'
+      units: none
+      values:
+        quantity: sulphur_uptake_and_lime_activity_plots
+        method_class: method_only
+        admission_status: figure_only
+        note: figs 4–6 sulphur vs sulphurising potential; fig 7 lime activities at CaS saturation — not digitised; await Table
+          II cell pin
