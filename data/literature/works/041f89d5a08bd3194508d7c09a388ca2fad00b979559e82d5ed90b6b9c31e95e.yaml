@@ -18,6 +18,786 @@ work:
         tag: unknown
         reason: INDEX does not give an unmatched-layer asset
 experiments:
+- experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::experiment::10017_1400°C 2 hr
+  kind: literature
+  method:
+    tag: value
+    value: vacuum_chamber_pyrolysis
+  sample:
+    form:
+      state:
+        tag: value
+        value: powdered samples
+      locator:
+        published_page: 2004
+        section: Experimental procedures
+        source_path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+    container:
+      state:
+        tag: value
+        value: platinum crucible
+      locator:
+        published_page: 2004
+        section: Experimental procedures
+        source_path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.0002666447368421052631578947368'
+          approximate: false
+      locator:
+        published_page: 2004
+        section: Experimental procedures
+        source_path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+      inference:
+        relation: Torr_to_Pa
+        inputs:
+        - P_Pa = P_Torr × 101325 / 760
+        - original_unit=Torr
+        - as_published=2e-06 Torr
+        - printed=chamber_pressure
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.000002'
+            locator:
+              published_page: 2004
+              section: Experimental procedures
+              source_path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '133.3223684210526315789473684'
+            locator:
+              published_page: 2004
+              section: Experimental procedures
+              source_path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+        output_unit: Pa
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e
+  locator:
+    published_page: 2004
+    section: Experimental procedures
+    source_path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+  bench_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::bench::mettler-vta
+- experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::experiment::10073_1400°C 2 hr
+  kind: literature
+  method:
+    tag: value
+    value: vacuum_chamber_pyrolysis
+  sample:
+    form:
+      state:
+        tag: value
+        value: powdered samples
+      locator:
+        published_page: 2004
+        section: Experimental procedures
+        source_path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+    container:
+      state:
+        tag: value
+        value: platinum crucible
+      locator:
+        published_page: 2004
+        section: Experimental procedures
+        source_path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.0002666447368421052631578947368'
+          approximate: false
+      locator:
+        published_page: 2004
+        section: Experimental procedures
+        source_path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+      inference:
+        relation: Torr_to_Pa
+        inputs:
+        - P_Pa = P_Torr × 101325 / 760
+        - original_unit=Torr
+        - as_published=2e-06 Torr
+        - printed=chamber_pressure
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.000002'
+            locator:
+              published_page: 2004
+              section: Experimental procedures
+              source_path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '133.3223684210526315789473684'
+            locator:
+              published_page: 2004
+              section: Experimental procedures
+              source_path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+        output_unit: Pa
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e
+  locator:
+    published_page: 2004
+    section: Experimental procedures
+    source_path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+  bench_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::bench::mettler-vta
+- experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::experiment::12022_1050°C 2 hr
+  kind: literature
+  method:
+    tag: value
+    value: vacuum_chamber_pyrolysis
+  sample:
+    form:
+      state:
+        tag: value
+        value: powdered samples
+      locator:
+        published_page: 2004
+        section: Experimental procedures
+        source_path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+    container:
+      state:
+        tag: value
+        value: platinum crucible
+      locator:
+        published_page: 2004
+        section: Experimental procedures
+        source_path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.0002666447368421052631578947368'
+          approximate: false
+      locator:
+        published_page: 2004
+        section: Experimental procedures
+        source_path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+      inference:
+        relation: Torr_to_Pa
+        inputs:
+        - P_Pa = P_Torr × 101325 / 760
+        - original_unit=Torr
+        - as_published=2e-06 Torr
+        - printed=chamber_pressure
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.000002'
+            locator:
+              published_page: 2004
+              section: Experimental procedures
+              source_path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '133.3223684210526315789473684'
+            locator:
+              published_page: 2004
+              section: Experimental procedures
+              source_path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+        output_unit: Pa
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e
+  locator:
+    published_page: 2004
+    section: Experimental procedures
+    source_path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+  bench_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::bench::mettler-vta
+- experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::experiment::12022_1200°C 2 hr
+  kind: literature
+  method:
+    tag: value
+    value: vacuum_chamber_pyrolysis
+  sample:
+    form:
+      state:
+        tag: value
+        value: powdered samples
+      locator:
+        published_page: 2004
+        section: Experimental procedures
+        source_path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+    container:
+      state:
+        tag: value
+        value: platinum crucible
+      locator:
+        published_page: 2004
+        section: Experimental procedures
+        source_path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.0002666447368421052631578947368'
+          approximate: false
+      locator:
+        published_page: 2004
+        section: Experimental procedures
+        source_path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+      inference:
+        relation: Torr_to_Pa
+        inputs:
+        - P_Pa = P_Torr × 101325 / 760
+        - original_unit=Torr
+        - as_published=2e-06 Torr
+        - printed=chamber_pressure
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.000002'
+            locator:
+              published_page: 2004
+              section: Experimental procedures
+              source_path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '133.3223684210526315789473684'
+            locator:
+              published_page: 2004
+              section: Experimental procedures
+              source_path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+        output_unit: Pa
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e
+  locator:
+    published_page: 2004
+    section: Experimental procedures
+    source_path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+  bench_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::bench::mettler-vta
+- experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::experiment::12022_1400°C 2 hr
+  kind: literature
+  method:
+    tag: value
+    value: vacuum_chamber_pyrolysis
+  sample:
+    form:
+      state:
+        tag: value
+        value: powdered samples
+      locator:
+        published_page: 2004
+        section: Experimental procedures
+        source_path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+    container:
+      state:
+        tag: value
+        value: platinum crucible
+      locator:
+        published_page: 2004
+        section: Experimental procedures
+        source_path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.0002666447368421052631578947368'
+          approximate: false
+      locator:
+        published_page: 2004
+        section: Experimental procedures
+        source_path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+      inference:
+        relation: Torr_to_Pa
+        inputs:
+        - P_Pa = P_Torr × 101325 / 760
+        - original_unit=Torr
+        - as_published=2e-06 Torr
+        - printed=chamber_pressure
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.000002'
+            locator:
+              published_page: 2004
+              section: Experimental procedures
+              source_path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '133.3223684210526315789473684'
+            locator:
+              published_page: 2004
+              section: Experimental procedures
+              source_path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+        output_unit: Pa
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e
+  locator:
+    published_page: 2004
+    section: Experimental procedures
+    source_path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+  bench_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::bench::mettler-vta
+- experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::experiment::12022_950°C 2 hr
+  kind: literature
+  method:
+    tag: value
+    value: vacuum_chamber_pyrolysis
+  sample:
+    form:
+      state:
+        tag: value
+        value: powdered samples
+      locator:
+        published_page: 2004
+        section: Experimental procedures
+        source_path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+    container:
+      state:
+        tag: value
+        value: platinum crucible
+      locator:
+        published_page: 2004
+        section: Experimental procedures
+        source_path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.0002666447368421052631578947368'
+          approximate: false
+      locator:
+        published_page: 2004
+        section: Experimental procedures
+        source_path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+      inference:
+        relation: Torr_to_Pa
+        inputs:
+        - P_Pa = P_Torr × 101325 / 760
+        - original_unit=Torr
+        - as_published=2e-06 Torr
+        - printed=chamber_pressure
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.000002'
+            locator:
+              published_page: 2004
+              section: Experimental procedures
+              source_path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '133.3223684210526315789473684'
+            locator:
+              published_page: 2004
+              section: Experimental procedures
+              source_path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+        output_unit: Pa
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e
+  locator:
+    published_page: 2004
+    section: Experimental procedures
+    source_path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+  bench_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::bench::mettler-vta
+- experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::experiment::14163_1050°C 1 hr
+  kind: literature
+  method:
+    tag: value
+    value: vacuum_chamber_pyrolysis
+  sample:
+    form:
+      state:
+        tag: value
+        value: powdered samples
+      locator:
+        published_page: 2004
+        section: Experimental procedures
+        source_path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+    container:
+      state:
+        tag: value
+        value: platinum crucible
+      locator:
+        published_page: 2004
+        section: Experimental procedures
+        source_path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.0002666447368421052631578947368'
+          approximate: false
+      locator:
+        published_page: 2004
+        section: Experimental procedures
+        source_path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+      inference:
+        relation: Torr_to_Pa
+        inputs:
+        - P_Pa = P_Torr × 101325 / 760
+        - original_unit=Torr
+        - as_published=2e-06 Torr
+        - printed=chamber_pressure
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.000002'
+            locator:
+              published_page: 2004
+              section: Experimental procedures
+              source_path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '133.3223684210526315789473684'
+            locator:
+              published_page: 2004
+              section: Experimental procedures
+              source_path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+        output_unit: Pa
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e
+  locator:
+    published_page: 2004
+    section: Experimental procedures
+    source_path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+  bench_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::bench::mettler-vta
+- experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::experiment::14163_1050°C 6 hr
+  kind: literature
+  method:
+    tag: value
+    value: vacuum_chamber_pyrolysis
+  sample:
+    form:
+      state:
+        tag: value
+        value: powdered samples
+      locator:
+        published_page: 2004
+        section: Experimental procedures
+        source_path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+    container:
+      state:
+        tag: value
+        value: platinum crucible
+      locator:
+        published_page: 2004
+        section: Experimental procedures
+        source_path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.0002666447368421052631578947368'
+          approximate: false
+      locator:
+        published_page: 2004
+        section: Experimental procedures
+        source_path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+      inference:
+        relation: Torr_to_Pa
+        inputs:
+        - P_Pa = P_Torr × 101325 / 760
+        - original_unit=Torr
+        - as_published=2e-06 Torr
+        - printed=chamber_pressure
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.000002'
+            locator:
+              published_page: 2004
+              section: Experimental procedures
+              source_path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '133.3223684210526315789473684'
+            locator:
+              published_page: 2004
+              section: Experimental procedures
+              source_path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+        output_unit: Pa
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e
+  locator:
+    published_page: 2004
+    section: Experimental procedures
+    source_path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+  bench_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::bench::mettler-vta
+- experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::experiment::14163_1050°C 72 hr
+  kind: literature
+  method:
+    tag: value
+    value: vacuum_chamber_pyrolysis
+  sample:
+    form:
+      state:
+        tag: value
+        value: powdered samples
+      locator:
+        published_page: 2004
+        section: Experimental procedures
+        source_path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+    container:
+      state:
+        tag: value
+        value: platinum crucible
+      locator:
+        published_page: 2004
+        section: Experimental procedures
+        source_path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.0002666447368421052631578947368'
+          approximate: false
+      locator:
+        published_page: 2004
+        section: Experimental procedures
+        source_path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+      inference:
+        relation: Torr_to_Pa
+        inputs:
+        - P_Pa = P_Torr × 101325 / 760
+        - original_unit=Torr
+        - as_published=2e-06 Torr
+        - printed=chamber_pressure
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.000002'
+            locator:
+              published_page: 2004
+              section: Experimental procedures
+              source_path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '133.3223684210526315789473684'
+            locator:
+              published_page: 2004
+              section: Experimental procedures
+              source_path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+        output_unit: Pa
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e
+  locator:
+    published_page: 2004
+    section: Experimental procedures
+    source_path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+  bench_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::bench::mettler-vta
+- experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::experiment::14163_1050°C instantaneous
+  kind: literature
+  method:
+    tag: value
+    value: vacuum_chamber_pyrolysis
+  sample:
+    form:
+      state:
+        tag: value
+        value: powdered samples
+      locator:
+        published_page: 2004
+        section: Experimental procedures
+        source_path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+    container:
+      state:
+        tag: value
+        value: platinum crucible
+      locator:
+        published_page: 2004
+        section: Experimental procedures
+        source_path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.0002666447368421052631578947368'
+          approximate: false
+      locator:
+        published_page: 2004
+        section: Experimental procedures
+        source_path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+      inference:
+        relation: Torr_to_Pa
+        inputs:
+        - P_Pa = P_Torr × 101325 / 760
+        - original_unit=Torr
+        - as_published=2e-06 Torr
+        - printed=chamber_pressure
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.000002'
+            locator:
+              published_page: 2004
+              section: Experimental procedures
+              source_path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '133.3223684210526315789473684'
+            locator:
+              published_page: 2004
+              section: Experimental procedures
+              source_path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+        output_unit: Pa
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e
+  locator:
+    published_page: 2004
+    section: Experimental procedures
+    source_path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+  bench_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::bench::mettler-vta
 - experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::experiment::lunar-volatilization-series
   kind: literature
   method:
@@ -45,7 +825,15 @@ experiments:
     form:
       state:
         tag: value
-        value: powdered lunar samples
+        value: powdered samples
+      locator:
+        published_page: 2004
+        section: Experimental procedures
+        source_path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+    container:
+      state:
+        tag: value
+        value: platinum crucible
       locator:
         published_page: 2004
         section: Experimental procedures
@@ -159,163 +947,6 @@ experiments:
         published_page: 2004
         section: Experimental procedures
         source_path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
-- experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::kems-024-gibson-hubbard-1972
-  kind: literature
-  method:
-    tag: value
-    value: vacuum_chamber_pyrolysis
-  sample:
-    form:
-      state:
-        tag: value
-        value: powdered samples
-      locator:
-        published_page: 2004
-        section: Experimental procedures
-        source_path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
-    container:
-      state:
-        tag: value
-        value: platinum crucible
-      locator:
-        published_page: 2004
-        section: Experimental procedures
-        source_path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
-  conditions:
-    temperature_K:
-      state:
-        tag: unknown
-        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
-  pressure_environment:
-    total_pressure_Pa:
-      state:
-        tag: value
-        value:
-          kind: point
-          point: '0.0002666447368421052631578947368'
-          approximate: false
-      locator:
-        published_page: 2004
-        section: Experimental procedures
-        source_path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
-      inference:
-        relation: Torr_to_Pa
-        inputs:
-        - P_Pa = P_Torr × 101325 / 760
-        - original_unit=Torr
-        - as_published=2e-06 Torr
-        - printed=chamber_pressure
-        parameters:
-        - - original
-          - state:
-              tag: value
-              value: '0.000002'
-            locator:
-              published_page: 2004
-              section: Experimental procedures
-              source_path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
-        - - factor
-          - state:
-              tag: value
-              value: '133.3223684210526315789473684'
-            locator:
-              published_page: 2004
-              section: Experimental procedures
-              source_path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
-        output_unit: Pa
-    sweep_gas:
-      state:
-        tag: unknown
-        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
-    regime:
-      regime_class:
-        tag: unknown
-        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
-  work_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e
-  locator:
-    published_page: 2006
-    figure: '1'
-    section: Results
-    source_path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
-- experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::kems-024-gibson-hubbard-1972::10017_1400°C
-    2 hr
-  kind: literature
-  method:
-    tag: value
-    value: vacuum_chamber_pyrolysis
-  sample:
-    form:
-      state:
-        tag: value
-        value: powdered samples
-      locator:
-        published_page: 2004
-        section: Experimental procedures
-        source_path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
-    container:
-      state:
-        tag: value
-        value: platinum crucible
-      locator:
-        published_page: 2004
-        section: Experimental procedures
-        source_path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
-  conditions:
-    temperature_K:
-      state:
-        tag: unknown
-        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
-  pressure_environment:
-    total_pressure_Pa:
-      state:
-        tag: value
-        value:
-          kind: point
-          point: '0.0002666447368421052631578947368'
-          approximate: false
-      locator:
-        published_page: 2004
-        section: Experimental procedures
-        source_path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
-      inference:
-        relation: Torr_to_Pa
-        inputs:
-        - P_Pa = P_Torr × 101325 / 760
-        - original_unit=Torr
-        - as_published=2e-06 Torr
-        - printed=chamber_pressure
-        parameters:
-        - - original
-          - state:
-              tag: value
-              value: '0.000002'
-            locator:
-              published_page: 2004
-              section: Experimental procedures
-              source_path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
-        - - factor
-          - state:
-              tag: value
-              value: '133.3223684210526315789473684'
-            locator:
-              published_page: 2004
-              section: Experimental procedures
-              source_path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
-        output_unit: Pa
-    sweep_gas:
-      state:
-        tag: unknown
-        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
-    regime:
-      regime_class:
-        tag: unknown
-        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
-  work_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e
-  locator:
-    published_page: 2005
-    table: '2'
-    paragraph: K row; 10017 1400°C 2 hr column
-    source_path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
 - experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::kems-024-gibson-hubbard-1972::10017_Initial
   kind: literature
   method:
@@ -357,85 +988,6 @@ experiments:
     published_page: 2005
     table: '2'
     paragraph: K row; 10017 Initial column
-    source_path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
-- experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::kems-024-gibson-hubbard-1972::10073_1400°C
-    2 hr
-  kind: literature
-  method:
-    tag: value
-    value: vacuum_chamber_pyrolysis
-  sample:
-    form:
-      state:
-        tag: value
-        value: powdered samples
-      locator:
-        published_page: 2004
-        section: Experimental procedures
-        source_path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
-    container:
-      state:
-        tag: value
-        value: platinum crucible
-      locator:
-        published_page: 2004
-        section: Experimental procedures
-        source_path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
-  conditions:
-    temperature_K:
-      state:
-        tag: unknown
-        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
-  pressure_environment:
-    total_pressure_Pa:
-      state:
-        tag: value
-        value:
-          kind: point
-          point: '0.0002666447368421052631578947368'
-          approximate: false
-      locator:
-        published_page: 2004
-        section: Experimental procedures
-        source_path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
-      inference:
-        relation: Torr_to_Pa
-        inputs:
-        - P_Pa = P_Torr × 101325 / 760
-        - original_unit=Torr
-        - as_published=2e-06 Torr
-        - printed=chamber_pressure
-        parameters:
-        - - original
-          - state:
-              tag: value
-              value: '0.000002'
-            locator:
-              published_page: 2004
-              section: Experimental procedures
-              source_path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
-        - - factor
-          - state:
-              tag: value
-              value: '133.3223684210526315789473684'
-            locator:
-              published_page: 2004
-              section: Experimental procedures
-              source_path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
-        output_unit: Pa
-    sweep_gas:
-      state:
-        tag: unknown
-        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
-    regime:
-      regime_class:
-        tag: unknown
-        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
-  work_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e
-  locator:
-    published_page: 2005
-    table: '2'
-    paragraph: K row; 10073 1400°C 2 hr column
     source_path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
 - experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::kems-024-gibson-hubbard-1972::10073_Initial
   kind: literature
@@ -479,322 +1031,6 @@ experiments:
     table: '2'
     paragraph: K row; 10073 Initial column
     source_path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
-- experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::kems-024-gibson-hubbard-1972::12022_1050°C
-    2 hr
-  kind: literature
-  method:
-    tag: value
-    value: vacuum_chamber_pyrolysis
-  sample:
-    form:
-      state:
-        tag: value
-        value: powdered samples
-      locator:
-        published_page: 2004
-        section: Experimental procedures
-        source_path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
-    container:
-      state:
-        tag: value
-        value: platinum crucible
-      locator:
-        published_page: 2004
-        section: Experimental procedures
-        source_path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
-  conditions:
-    temperature_K:
-      state:
-        tag: unknown
-        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
-  pressure_environment:
-    total_pressure_Pa:
-      state:
-        tag: value
-        value:
-          kind: point
-          point: '0.0002666447368421052631578947368'
-          approximate: false
-      locator:
-        published_page: 2004
-        section: Experimental procedures
-        source_path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
-      inference:
-        relation: Torr_to_Pa
-        inputs:
-        - P_Pa = P_Torr × 101325 / 760
-        - original_unit=Torr
-        - as_published=2e-06 Torr
-        - printed=chamber_pressure
-        parameters:
-        - - original
-          - state:
-              tag: value
-              value: '0.000002'
-            locator:
-              published_page: 2004
-              section: Experimental procedures
-              source_path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
-        - - factor
-          - state:
-              tag: value
-              value: '133.3223684210526315789473684'
-            locator:
-              published_page: 2004
-              section: Experimental procedures
-              source_path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
-        output_unit: Pa
-    sweep_gas:
-      state:
-        tag: unknown
-        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
-    regime:
-      regime_class:
-        tag: unknown
-        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
-  work_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e
-  locator:
-    published_page: 2005
-    table: '2'
-    paragraph: K row; 12022 1050°C 2 hr column
-    source_path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
-- experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::kems-024-gibson-hubbard-1972::12022_1200°C
-    2 hr
-  kind: literature
-  method:
-    tag: value
-    value: vacuum_chamber_pyrolysis
-  sample:
-    form:
-      state:
-        tag: value
-        value: powdered samples
-      locator:
-        published_page: 2004
-        section: Experimental procedures
-        source_path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
-    container:
-      state:
-        tag: value
-        value: platinum crucible
-      locator:
-        published_page: 2004
-        section: Experimental procedures
-        source_path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
-  conditions:
-    temperature_K:
-      state:
-        tag: unknown
-        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
-  pressure_environment:
-    total_pressure_Pa:
-      state:
-        tag: value
-        value:
-          kind: point
-          point: '0.0002666447368421052631578947368'
-          approximate: false
-      locator:
-        published_page: 2004
-        section: Experimental procedures
-        source_path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
-      inference:
-        relation: Torr_to_Pa
-        inputs:
-        - P_Pa = P_Torr × 101325 / 760
-        - original_unit=Torr
-        - as_published=2e-06 Torr
-        - printed=chamber_pressure
-        parameters:
-        - - original
-          - state:
-              tag: value
-              value: '0.000002'
-            locator:
-              published_page: 2004
-              section: Experimental procedures
-              source_path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
-        - - factor
-          - state:
-              tag: value
-              value: '133.3223684210526315789473684'
-            locator:
-              published_page: 2004
-              section: Experimental procedures
-              source_path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
-        output_unit: Pa
-    sweep_gas:
-      state:
-        tag: unknown
-        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
-    regime:
-      regime_class:
-        tag: unknown
-        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
-  work_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e
-  locator:
-    published_page: 2005
-    table: '2'
-    paragraph: K row; 12022 1200°C 2 hr column
-    source_path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
-- experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::kems-024-gibson-hubbard-1972::12022_1400°C
-    2 hr
-  kind: literature
-  method:
-    tag: value
-    value: vacuum_chamber_pyrolysis
-  sample:
-    form:
-      state:
-        tag: value
-        value: powdered samples
-      locator:
-        published_page: 2004
-        section: Experimental procedures
-        source_path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
-    container:
-      state:
-        tag: value
-        value: platinum crucible
-      locator:
-        published_page: 2004
-        section: Experimental procedures
-        source_path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
-  conditions:
-    temperature_K:
-      state:
-        tag: unknown
-        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
-  pressure_environment:
-    total_pressure_Pa:
-      state:
-        tag: value
-        value:
-          kind: point
-          point: '0.0002666447368421052631578947368'
-          approximate: false
-      locator:
-        published_page: 2004
-        section: Experimental procedures
-        source_path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
-      inference:
-        relation: Torr_to_Pa
-        inputs:
-        - P_Pa = P_Torr × 101325 / 760
-        - original_unit=Torr
-        - as_published=2e-06 Torr
-        - printed=chamber_pressure
-        parameters:
-        - - original
-          - state:
-              tag: value
-              value: '0.000002'
-            locator:
-              published_page: 2004
-              section: Experimental procedures
-              source_path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
-        - - factor
-          - state:
-              tag: value
-              value: '133.3223684210526315789473684'
-            locator:
-              published_page: 2004
-              section: Experimental procedures
-              source_path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
-        output_unit: Pa
-    sweep_gas:
-      state:
-        tag: unknown
-        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
-    regime:
-      regime_class:
-        tag: unknown
-        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
-  work_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e
-  locator:
-    published_page: 2005
-    table: '2'
-    paragraph: K row; 12022 1400°C 2 hr column
-    source_path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
-- experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::kems-024-gibson-hubbard-1972::12022_950°C
-    2 hr
-  kind: literature
-  method:
-    tag: value
-    value: vacuum_chamber_pyrolysis
-  sample:
-    form:
-      state:
-        tag: value
-        value: powdered samples
-      locator:
-        published_page: 2004
-        section: Experimental procedures
-        source_path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
-    container:
-      state:
-        tag: value
-        value: platinum crucible
-      locator:
-        published_page: 2004
-        section: Experimental procedures
-        source_path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
-  conditions:
-    temperature_K:
-      state:
-        tag: unknown
-        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
-  pressure_environment:
-    total_pressure_Pa:
-      state:
-        tag: value
-        value:
-          kind: point
-          point: '0.0002666447368421052631578947368'
-          approximate: false
-      locator:
-        published_page: 2004
-        section: Experimental procedures
-        source_path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
-      inference:
-        relation: Torr_to_Pa
-        inputs:
-        - P_Pa = P_Torr × 101325 / 760
-        - original_unit=Torr
-        - as_published=2e-06 Torr
-        - printed=chamber_pressure
-        parameters:
-        - - original
-          - state:
-              tag: value
-              value: '0.000002'
-            locator:
-              published_page: 2004
-              section: Experimental procedures
-              source_path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
-        - - factor
-          - state:
-              tag: value
-              value: '133.3223684210526315789473684'
-            locator:
-              published_page: 2004
-              section: Experimental procedures
-              source_path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
-        output_unit: Pa
-    sweep_gas:
-      state:
-        tag: unknown
-        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
-    regime:
-      regime_class:
-        tag: unknown
-        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
-  work_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e
-  locator:
-    published_page: 2005
-    table: '2'
-    paragraph: K row; 12022 950°C 2 hr column
-    source_path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
 - experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::kems-024-gibson-hubbard-1972::12022_Initial
   kind: literature
   method:
@@ -836,322 +1072,6 @@ experiments:
     published_page: 2005
     table: '2'
     paragraph: K row; 12022 Initial column
-    source_path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
-- experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::kems-024-gibson-hubbard-1972::14163_1050°C
-    1 hr
-  kind: literature
-  method:
-    tag: value
-    value: vacuum_chamber_pyrolysis
-  sample:
-    form:
-      state:
-        tag: value
-        value: powdered samples
-      locator:
-        published_page: 2004
-        section: Experimental procedures
-        source_path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
-    container:
-      state:
-        tag: value
-        value: platinum crucible
-      locator:
-        published_page: 2004
-        section: Experimental procedures
-        source_path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
-  conditions:
-    temperature_K:
-      state:
-        tag: unknown
-        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
-  pressure_environment:
-    total_pressure_Pa:
-      state:
-        tag: value
-        value:
-          kind: point
-          point: '0.0002666447368421052631578947368'
-          approximate: false
-      locator:
-        published_page: 2004
-        section: Experimental procedures
-        source_path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
-      inference:
-        relation: Torr_to_Pa
-        inputs:
-        - P_Pa = P_Torr × 101325 / 760
-        - original_unit=Torr
-        - as_published=2e-06 Torr
-        - printed=chamber_pressure
-        parameters:
-        - - original
-          - state:
-              tag: value
-              value: '0.000002'
-            locator:
-              published_page: 2004
-              section: Experimental procedures
-              source_path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
-        - - factor
-          - state:
-              tag: value
-              value: '133.3223684210526315789473684'
-            locator:
-              published_page: 2004
-              section: Experimental procedures
-              source_path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
-        output_unit: Pa
-    sweep_gas:
-      state:
-        tag: unknown
-        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
-    regime:
-      regime_class:
-        tag: unknown
-        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
-  work_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e
-  locator:
-    published_page: 2005
-    table: '2'
-    paragraph: K row; 14163 1050°C 1 hr column
-    source_path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
-- experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::kems-024-gibson-hubbard-1972::14163_1050°C
-    6 hr
-  kind: literature
-  method:
-    tag: value
-    value: vacuum_chamber_pyrolysis
-  sample:
-    form:
-      state:
-        tag: value
-        value: powdered samples
-      locator:
-        published_page: 2004
-        section: Experimental procedures
-        source_path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
-    container:
-      state:
-        tag: value
-        value: platinum crucible
-      locator:
-        published_page: 2004
-        section: Experimental procedures
-        source_path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
-  conditions:
-    temperature_K:
-      state:
-        tag: unknown
-        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
-  pressure_environment:
-    total_pressure_Pa:
-      state:
-        tag: value
-        value:
-          kind: point
-          point: '0.0002666447368421052631578947368'
-          approximate: false
-      locator:
-        published_page: 2004
-        section: Experimental procedures
-        source_path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
-      inference:
-        relation: Torr_to_Pa
-        inputs:
-        - P_Pa = P_Torr × 101325 / 760
-        - original_unit=Torr
-        - as_published=2e-06 Torr
-        - printed=chamber_pressure
-        parameters:
-        - - original
-          - state:
-              tag: value
-              value: '0.000002'
-            locator:
-              published_page: 2004
-              section: Experimental procedures
-              source_path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
-        - - factor
-          - state:
-              tag: value
-              value: '133.3223684210526315789473684'
-            locator:
-              published_page: 2004
-              section: Experimental procedures
-              source_path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
-        output_unit: Pa
-    sweep_gas:
-      state:
-        tag: unknown
-        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
-    regime:
-      regime_class:
-        tag: unknown
-        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
-  work_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e
-  locator:
-    published_page: 2005
-    table: '2'
-    paragraph: K row; 14163 1050°C 6 hr column
-    source_path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
-- experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::kems-024-gibson-hubbard-1972::14163_1050°C
-    72 hr
-  kind: literature
-  method:
-    tag: value
-    value: vacuum_chamber_pyrolysis
-  sample:
-    form:
-      state:
-        tag: value
-        value: powdered samples
-      locator:
-        published_page: 2004
-        section: Experimental procedures
-        source_path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
-    container:
-      state:
-        tag: value
-        value: platinum crucible
-      locator:
-        published_page: 2004
-        section: Experimental procedures
-        source_path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
-  conditions:
-    temperature_K:
-      state:
-        tag: unknown
-        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
-  pressure_environment:
-    total_pressure_Pa:
-      state:
-        tag: value
-        value:
-          kind: point
-          point: '0.0002666447368421052631578947368'
-          approximate: false
-      locator:
-        published_page: 2004
-        section: Experimental procedures
-        source_path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
-      inference:
-        relation: Torr_to_Pa
-        inputs:
-        - P_Pa = P_Torr × 101325 / 760
-        - original_unit=Torr
-        - as_published=2e-06 Torr
-        - printed=chamber_pressure
-        parameters:
-        - - original
-          - state:
-              tag: value
-              value: '0.000002'
-            locator:
-              published_page: 2004
-              section: Experimental procedures
-              source_path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
-        - - factor
-          - state:
-              tag: value
-              value: '133.3223684210526315789473684'
-            locator:
-              published_page: 2004
-              section: Experimental procedures
-              source_path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
-        output_unit: Pa
-    sweep_gas:
-      state:
-        tag: unknown
-        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
-    regime:
-      regime_class:
-        tag: unknown
-        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
-  work_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e
-  locator:
-    published_page: 2005
-    table: '2'
-    paragraph: K row; 14163 1050°C 72 hr column
-    source_path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
-- experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::kems-024-gibson-hubbard-1972::14163_1050°C
-    instantaneous
-  kind: literature
-  method:
-    tag: value
-    value: vacuum_chamber_pyrolysis
-  sample:
-    form:
-      state:
-        tag: value
-        value: powdered samples
-      locator:
-        published_page: 2004
-        section: Experimental procedures
-        source_path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
-    container:
-      state:
-        tag: value
-        value: platinum crucible
-      locator:
-        published_page: 2004
-        section: Experimental procedures
-        source_path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
-  conditions:
-    temperature_K:
-      state:
-        tag: unknown
-        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
-  pressure_environment:
-    total_pressure_Pa:
-      state:
-        tag: value
-        value:
-          kind: point
-          point: '0.0002666447368421052631578947368'
-          approximate: false
-      locator:
-        published_page: 2004
-        section: Experimental procedures
-        source_path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
-      inference:
-        relation: Torr_to_Pa
-        inputs:
-        - P_Pa = P_Torr × 101325 / 760
-        - original_unit=Torr
-        - as_published=2e-06 Torr
-        - printed=chamber_pressure
-        parameters:
-        - - original
-          - state:
-              tag: value
-              value: '0.000002'
-            locator:
-              published_page: 2004
-              section: Experimental procedures
-              source_path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
-        - - factor
-          - state:
-              tag: value
-              value: '133.3223684210526315789473684'
-            locator:
-              published_page: 2004
-              section: Experimental procedures
-              source_path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
-        output_unit: Pa
-    sweep_gas:
-      state:
-        tag: unknown
-        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
-    regime:
-      regime_class:
-        tag: unknown
-        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
-  work_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e
-  locator:
-    published_page: 2005
-    table: '2'
-    paragraph: K row; 14163 1050°C instantaneous column
     source_path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
 - experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::kems-024-gibson-hubbard-1972::14163_Initial†
   kind: literature
@@ -1224,4 +1144,13 @@ benches:
       published_page: 2004
       section: Experimental procedures
       source_path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+  temperature_measurement:
+    recording:
+      state:
+        tag: value
+        value: sample temperature continuously recorded
+      locator:
+        published_page: 2004
+        section: Experimental procedures
+        source_path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
   other_facts: []

@@ -379,6 +379,12 @@ benches:
     sensor:
       state: {tag: value, value: Pyrometer}
       locator: {published_page: 103, pdf_page_index: 3, figure: '2'}
+    recording:
+      state: {tag: value, value: 'Pyrometer measures above 900 degC and returns a baseline of 900 degC below.'}
+      locator: {published_page: 104, pdf_page_index: 4, figure: '2', paragraph: Caption}
+  cell_material_and_liner:
+    state: {tag: not_applicable, reason: not_applicable}
+    locator: {published_page: 102, pdf_page_index: 2, section: '2. Experimental setup', note: 'Contactless sample supported by upward gas in a conical nozzle; no crucible or Knudsen cell.'}
   other_facts:
   - name: nozzle_gas_inlet_diameter
     unit: mm
