@@ -246,6 +246,65 @@ def test_corpus_pointers_compare_bytes_counts_and_ledger(tmp_path):
     assert pointers["extract"]["matches_simulator"] is False
 
 
+@pytest.mark.parametrize("path_kind", ["raw", "corpus_raw", "absolute"])
+def test_corpus_pointers_use_stated_provenance_path(tmp_path, path_kind):
+    corpus = tmp_path / "corpus"
+    raw_rel = "raw/ammin-73-470/ammin-73-470.pdf"
+    raw = corpus / raw_rel
+    raw.parent.mkdir(parents=True)
+    raw.write_bytes(b"pdf")
+    mirror = tmp_path / "paper.yaml"
+    mirror.write_text("extract: true\n")
+    if path_kind == "raw":
+        provenance_path = raw_rel
+    elif path_kind == "corpus_raw":
+        provenance_path = f"corpus/{raw_rel}"
+    else:
+        provenance_path = str(raw)
+
+    pointers = builder.corpus_pointers(
+        corpus,
+        "paper",
+        hashlib.sha256(b"pdf").hexdigest(),
+        mirror,
+        "abc",
+        extract_doc={"extraction": {"provenance_path": provenance_path}},
+    )
+    assert pointers["raw"]["path"] == raw_rel
+    assert pointers["raw"]["present"] is True
+    assert pointers["raw"]["matches_simulator"] is True
+
+
+def test_corpus_pointers_use_unique_raw_locator_when_provenance_is_private(tmp_path):
+    corpus = tmp_path / "corpus"
+    raw_rel = "raw/ammin-75-781/ammin-75-781.pdf"
+    raw = corpus / raw_rel
+    raw.parent.mkdir(parents=True)
+    raw.write_bytes(b"pdf")
+    mirror = tmp_path / "paper.yaml"
+    mirror.write_text("extract: true\n")
+
+    pointers = builder.corpus_pointers(
+        corpus,
+        "paper",
+        hashlib.sha256(b"pdf").hexdigest(),
+        mirror,
+        "abc",
+        extract_doc={
+            "extraction": {"provenance_path": "docs-private/paper.pdf"},
+            "species": {
+                "NiO": {
+                    "observations": [
+                        {"locator": {"source_path": str(raw)}}
+                    ]
+                }
+            },
+        },
+    )
+    assert pointers["raw"]["path"] == raw_rel
+    assert pointers["raw"]["present"] is True
+
+
 @pytest.mark.parametrize("layout", ["empty", "unrelated", "raw", "extracts", "ledger", "git"])
 def test_corpus_availability_cli(tmp_path, monkeypatch, layout):
     corpus = tmp_path / "corpus"
