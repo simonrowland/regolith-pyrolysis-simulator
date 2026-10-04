@@ -2214,7 +2214,11 @@ def test_write_result_refuses_blank_reported_model_for_every_status(
         assert writer.connection.execute(
             "SELECT COUNT(*) FROM alphamelts_outputs"
         ).fetchone()[0] == 0
-        assert len(writer.pending_rows(batch_id=batch_id)) == 1
+        assert writer.queue_counts(batch_id=batch_id) == {
+            "total": 1,
+            "done": 0,
+            "remaining": 1,
+        }
 
 
 @pytest.mark.parametrize("status_kind", ["success", "refusal"])
