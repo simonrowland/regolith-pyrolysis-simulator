@@ -296,6 +296,28 @@ def test_near_zero_logk_without_100x_sign_separation_stays_unresolved() -> None:
     assert ambiguity["kind"] == "nist_tail_whitespace_signs_unresolved"
 
 
+def test_malformed_tail_refuses_enthalpy_bracket_crossing_transition() -> None:
+    source = (
+        "Synthetic transition-adjacent formation tail\n"
+        "T(K)\tCp\tS\t-[G-H(Tr)]/T\tH-H(Tr)\tΔfH\tΔfG\tlog Kf\n"
+        "900\t10\t10\t10\t0\t0.\t0.\t0.\n"
+        "950\t10\t10\t10\t0\tALPHA <--> BETA\n"
+        "1000\t10\t10\t10\t0\t1.000 0.500 0.026\n"
+        "1100\t10\t10\t10\t0\t-1.200\t0.600\t-0.031\n"
+    )
+    parsed = parse_janaf_txt(
+        source, table_id="synthetic-transition-tail", url="u", download_url="d"
+    )
+    assert not any(row["temperature"]["value"] == 1000 for row in parsed.values)
+    ambiguity = next(
+        item
+        for item in parsed.parse_ambiguities
+        if item.get("raw_line", "").startswith("1000\t")
+    )
+    assert ambiguity["kind"] == "nist_tail_whitespace_signs_unresolved"
+    assert "formation enthalpy neighbors span a transition" in ambiguity["reason"]
+
+
 def test_every_absent_100k_node_is_explained_by_the_printed_grid() -> None:
     """Derived sparse ladders plus named unresolved rows are the only skipped nodes."""
 
