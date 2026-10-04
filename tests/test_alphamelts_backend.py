@@ -145,16 +145,19 @@ def test_petthermotools_model_code_pins_current_selection(
     assert backend._melts_model_code() == expected_code
 
 
-def test_petthermotools_blank_and_default_launch_arguments_match() -> None:
+def test_petthermotools_blank_and_none_preserve_base_model_keywords() -> None:
     blank_backend, blank_call = _petthermotools_call_arguments('')
     none_backend, none_call = _petthermotools_call_arguments(None)
     _default_backend, default_call = _petthermotools_call_arguments(
         DEFAULT_ALPHAMELTS_MODEL
     )
 
-    assert blank_call == default_call
-    assert none_call == default_call
+    # Base 05b6309d3 passed _model unchanged in the worker payload.
+    assert blank_call[1]['kwargs']['Model'] == ''
+    assert none_call[1]['kwargs']['Model'] == 'None'
+    assert default_call[1]['kwargs']['Model'] == DEFAULT_ALPHAMELTS_MODEL
     assert blank_backend._melts_model_code() == none_backend._melts_model_code()
+    assert blank_backend._melts_model_code() == 1
 
 
 @pytest.mark.parametrize('model_name', ['not-a-model', 'MELTSv1.O.2'])
