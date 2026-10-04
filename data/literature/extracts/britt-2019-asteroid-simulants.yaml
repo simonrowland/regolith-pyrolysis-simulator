@@ -389,6 +389,7 @@ species:
   CI_Asteroid_Simulant:
     observations:
     - observation_id: britt_2019_ci_table3_xrf_major_oxide_composition
+      experiment: tga-ega-ci
       type: gibbs_table
       locator:
         pdf_page_index: 9
@@ -450,6 +451,7 @@ species:
   CM_Asteroid_Simulant:
     observations:
     - observation_id: britt_2019_cm_table3_xrf_major_oxide_composition
+      experiment: tga-ega-cm
       type: gibbs_table
       locator:
         pdf_page_index: 9
@@ -484,6 +486,7 @@ species:
   CR_Asteroid_Simulant:
     observations:
     - observation_id: britt_2019_cr_table3_xrf_major_oxide_composition
+      experiment: tga-ega-cr
       type: gibbs_table
       locator: {pdf_page_index: 9, table: '3', note: Simulant prototype major element chemistry measured by XRF; CR Simulant column.}
       phase: CR_asteroid_simulant_prototype_crushed_powder

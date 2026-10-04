@@ -337,6 +337,29 @@ experiments:
     page: 9
     paragraph: usually operated at total pressures of 0.2 to 1.0 atm
     note: TMS usual operating range; NaCl and Table 2 K are TMS (printed p. 11 / p. 22)
+- experiment_id: hastie-1981-solgasmix-model-glass
+  bench_id: hastie-1981-kms
+  method: thermochemical_equilibrium_model
+  locator:
+    table: '3'
+    page: 43
+    published_page: 43
+    pdf_page_index: 49
+    note: Table 3 SOLGASMIX soda-lime-silica model glass; scoped so recipe does not lift into shared default sample
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value:
+          Na2O: 17
+          CaO: 12
+          SiO2: 71
+      locator:
+        table: '3'
+        page: 43
+        published_page: 43
+        pdf_page_index: 49
+        note: 'Glass: Na2O (17 wt.%), CaO (12 wt.%), SiO2 (71 wt.%); model recipe only'
 species:
   K:
     observations:
@@ -1213,6 +1236,7 @@ species:
       uncertainty:
         note: +- as printed on -ΔHd and -ΔSd; JANAF 1971 in parentheses
     - observation_id: hastie_1981_table3_solgasmix_model_not_measurement
+      experiment: hastie-1981-solgasmix-model-glass
       type: activity_coefficient
       locator:
         source_path: docs-private/research/2026-08-27-ocr-repair/kems-020-hastie-1981-nbsir/tables.md
@@ -1257,6 +1281,7 @@ species:
       uncertainty:
         note: model table; no experimental sigma
     - observation_id: hastie_1981_table3_solgasmix_species_grid
+      experiment: hastie-1981-solgasmix-model-glass
       type: activity_coefficient
       locator:
         table: '3'
@@ -1315,6 +1340,7 @@ species:
       uncertainty:
         note: model table; no experimental sigma
     - observation_id: hastie_1981_fig5_glass_Na_figure_only_blocked
+      experiment: hastie-1981-solgasmix-model-glass
       type: psat_series
       locator:
         figure: '5'
@@ -1336,6 +1362,7 @@ species:
       uncertainty:
         note: not applicable
     - observation_id: hastie_1981_fig5_glass_Na_this_work_digitized
+      experiment: hastie-1981-solgasmix-model-glass
       type: psat_series
       locator:
         figure: '5'
@@ -1562,6 +1589,7 @@ species:
           section: '7.1'
         quote: 46.4 ± 0.7 (47.1 ± 3.5); 30.2 ± 0.6 (29.7 ± 1.0)
     - observation_id: hastie_1981_table3_solgasmix_model_not_measurement_quoted_20260906
+      experiment: hastie-1981-solgasmix-model-glass
       supersedes: hastie_1981_table3_solgasmix_model_not_measurement
       type: activity_coefficient
       class_tag: model
@@ -1671,6 +1699,7 @@ species:
         note: All cells retained as printed computer notation. Dashes are absent, not zero; activity row dimensionless,
           other rows atm. No model value admitted as a measurement.
     - observation_id: hastie_1981_table3_solgasmix_species_grid_quoted_20260906
+      experiment: hastie-1981-solgasmix-model-glass
       supersedes: hastie_1981_table3_solgasmix_species_grid
       type: activity_coefficient
       class_tag: model
@@ -1780,6 +1809,7 @@ species:
         note: All cells retained as printed computer notation. Dashes are absent, not zero; activity row dimensionless,
           other rows atm. No model value admitted as a measurement.
     - observation_id: hastie_1981_fig5_glass_Na_figure_only_blocked_quoted_20260906
+      experiment: hastie-1981-solgasmix-model-glass
       supersedes: hastie_1981_fig5_glass_Na_figure_only_blocked
       type: psat_series
       class_tag: figure_only
@@ -1802,6 +1832,7 @@ species:
         semantics: bound_not_point_ordering
         reason: Plotted evidence, not a printed numeric table. See completeness ledger for individual figures.
     - observation_id: hastie_1981_fig5_glass_Na_this_work_digitized_quoted_20260906
+      experiment: hastie-1981-solgasmix-model-glass
       supersedes: hastie_1981_fig5_glass_Na_this_work_digitized
       type: psat_series
       class_tag: figure_only

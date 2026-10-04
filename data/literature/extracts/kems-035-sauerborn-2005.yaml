@@ -375,6 +375,51 @@ experiments:
       locator: {page: 68, table: '5.1', note: 'Reference runs have distinct Tmax'}
 
 species:
+  SiO2:
+    observations:
+    - observation_id: sauerborn_2005_mass_loss_series::T=1673.15:h=92ce255f810f
+      experiment: oxide-reference-series
+      type: rate_series
+      locator:
+        page: 76
+        note: SiO2 pure-oxide mass-loss control; split from shared jsc1-solar-series parent so JSC-1 sample does not bind
+      phase: pure_SiO2_control
+      standard_state: mass loss of pure SiO2 reference run as printed
+      regime: solar_vacuum_pyrolysis
+      units: wt_percent
+      values:
+        quantity: bulk_mass_loss_wt_pct
+        method_class: measured_direct
+        evidence_class: authors_own_measurement
+        id: SiO2
+        mass_loss_wt_pct: 1.1
+        Tmax_C: 1400
+        Tmax_K: 1673.15
+        mass_g: 0.6719
+        T_K: 1673.15
+        note: pure SiO2 control from mass-loss series; not JSC-1
+    - observation_id: sauerborn_2005_mass_loss_series_deep2::T=1673.15:h=92ce255f810f
+      experiment: oxide-reference-series
+      type: rate_series
+      locator:
+        page: 76
+        note: SiO2 pure-oxide mass-loss control; split from shared jsc1-solar-series parent so JSC-1 sample does not bind
+      phase: pure_SiO2_control
+      standard_state: mass loss of pure SiO2 reference run as printed
+      regime: solar_vacuum_pyrolysis
+      units: wt_percent
+      values:
+        quantity: bulk_mass_loss_wt_pct
+        method_class: measured_direct
+        evidence_class: authors_own_measurement
+        id: SiO2
+        mass_loss_wt_pct: 1.1
+        Tmax_C: 1400
+        Tmax_K: 1673.15
+        mass_g: 0.6719
+        T_K: 1673.15
+        note: pure SiO2 control from mass-loss series; not JSC-1
+      supersedes: sauerborn_2005_mass_loss_series::T=1673.15:h=92ce255f810f
   Na:
     observations:
     - observation_id: sauerborn_2005_table21_lunar_soil_element_wt
@@ -830,7 +875,7 @@ species:
       uncertainty:
         note: printed Standardabweichung on foil means; splash is a single Wert
     - observation_id: sauerborn_2005_table54_blank_foil_edx
-      experiment: jsc1-solar-series
+      experiment: oxide-reference-series
       type: rate_series
       locator:
         table: '5.4'
@@ -955,7 +1000,7 @@ species:
       uncertainty:
         note: printed Standardabweichung; Si is a dash (true absence), not 0
     - observation_id: sauerborn_2005_table58_outgassing_peaks
-      experiment: jsc1-solar-series
+      experiment: oxide-reference-series
       type: rate_series
       locator:
         source_path: docs-private/research/2026-08-27-ocr-repair/kems-035-sauerborn-2005/tables.md
@@ -2667,7 +2712,7 @@ species:
         T_K = T_C + 273.15 and pressure_Pa = pressure_mbar * 100. T_range_K endpoints refer to the quoted run-temperature
         cells, not independent measurements.
     - observation_id: sauerborn_2005_table54_blank_foil_edx_deep2
-      experiment: jsc1-solar-series
+      experiment: oxide-reference-series
       type: rate_series
       locator:
         table: '5.4'
@@ -2939,7 +2984,7 @@ species:
         T_K = T_C + 273.15 and pressure_Pa = pressure_mbar * 100. T_range_K endpoints refer to the quoted run-temperature
         cells, not independent measurements.
     - observation_id: sauerborn_2005_table58_outgassing_peaks_deep2
-      experiment: jsc1-solar-series
+      experiment: oxide-reference-series
       type: rate_series
       locator:
         table: '5.8'
@@ -5240,7 +5285,7 @@ species:
       uncertainty:
         note: ILLEGIBLE cell not guessed; no printed sigma
     - observation_id: sauerborn_2005_table52_cao_cold_trap_edx
-      experiment: jsc1-solar-series
+      experiment: oxide-reference-series
       type: rate_series
       locator:
         source_path: docs-private/research/2026-08-27-ocr-repair/kems-035-sauerborn-2005/tables.md
@@ -5286,7 +5331,7 @@ species:
       uncertainty:
         note: untreated-foil Standardabweichung printed in tables.md
     - observation_id: sauerborn_2005_table52_untreated_foil_sd
-      experiment: jsc1-solar-series
+      experiment: oxide-reference-series
       type: rate_series
       locator:
         table: '5.2'
@@ -5332,13 +5377,6 @@ species:
         quantity: bulk_mass_loss_wt_pct
         MS2_mass_loss_wt_pct: 3.2
         points:
-        - id: SiO2
-          mass_loss_wt_pct: 1.1
-          Tmax_C: 1400
-          Tmax_K: 1673.15
-          mass_g: 0.6719
-          locator:
-            page: 76
         - id: MS1
           mass_loss_wt_pct: 2.6
           Tmax_C: 1542
@@ -5909,7 +5947,7 @@ species:
         T_K = T_C + 273.15 and pressure_Pa = pressure_mbar * 100. T_range_K endpoints refer to the quoted run-temperature
         cells, not independent measurements.
     - observation_id: sauerborn_2005_table52_cao_cold_trap_edx_deep2
-      experiment: jsc1-solar-series
+      experiment: oxide-reference-series
       type: rate_series
       locator:
         table: '5.2'
@@ -6044,7 +6082,7 @@ species:
         T_K = T_C + 273.15 and pressure_Pa = pressure_mbar * 100. T_range_K endpoints refer to the quoted run-temperature
         cells, not independent measurements.
     - observation_id: sauerborn_2005_table52_untreated_foil_sd_deep2
-      experiment: jsc1-solar-series
+      experiment: oxide-reference-series
       type: rate_series
       locator:
         table: '5.2'
@@ -6131,13 +6169,6 @@ species:
         quantity: bulk_mass_loss_wt_pct
         MS2_mass_loss_wt_pct: 3.2
         points:
-        - id: SiO2
-          mass_loss_wt_pct: 1.1
-          Tmax_C: 1400
-          Tmax_K: 1673.15
-          mass_g: 0.6719
-          locator:
-            page: 76
         - id: MS1
           mass_loss_wt_pct: 2.6
           Tmax_C: 1542

@@ -111,6 +111,33 @@ experiments:
       orifice_channel_length_m:
         state: {tag: not_applicable, reason: not_applicable}
         locator: *bet_locator
+- experiment_id: apollo-12022-factsage
+  method: factsage_equilibrium_calculation
+  locator:
+    published_page: 4
+    pdf_page_index: 4
+    table: '1'
+    note: Apollo 12022 composition (Snyder) used for FactSage full-silicate p_sat / Demaria comparison; scoped off LMS-1 default
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value:
+          SiO2: 43.22
+          FeO: 21.45
+          MgO: 10.44
+          Al2O3: 9.04
+          CaO: 9.56
+          TiO2: 5.16
+          Cr2O3: 0.33
+          MnO: 0.25
+          Na2O: 0.47
+          K2O: 0.07
+      locator:
+        published_page: 4
+        pdf_page_index: 4
+        table: '1'
+        note: Table 1 Apollo #12022 composition from Snyder et al.; adjusted to 100% omitting trace elements
 fidelity_samples:
 - species: LMS-1
   observable: rate_series
@@ -529,6 +556,7 @@ species:
   '12022':
     observations:
     - observation_id: shaw_2023_table1_apollo_12022_composition_snyder
+      experiment: apollo-12022-factsage
       type: rate_series
       class_tag: quoted
       locator:
@@ -573,6 +601,7 @@ species:
           status: absent
           reason: LMS-1 oxide composition is not printed in this paper
     - observation_id: shaw_2023_fig3_factsage_full_silicate_vs_demaria_figure_only
+      experiment: apollo-12022-factsage
       type: psat_series
       class_tag: model
       locator:
@@ -618,6 +647,7 @@ species:
         demaria_overlay: cited KEMS from De Maria et al. 1971 on 12022; not re-tabulated (see kems-022-demaria-1971)
         T_axis_as_printed: figure axis; not digitised. Modelling window in the text is 800-1200 C.
     - observation_id: shaw_2023_fig4_proxy_oxide_vs_demaria_figure_only
+      experiment: apollo-12022-factsage
       type: psat_series
       class_tag: model
       locator:
@@ -648,6 +678,7 @@ species:
         legend_as_printed: Blue = DeMaria KEMS data; Green = Pure Oxide (FactSage); Yellow = Closest Oxide
           System (FactSage)
     - observation_id: shaw_2023_fig5_predicted_sublimation_rate_figure_only
+      experiment: apollo-12022-factsage
       type: rate_series
       class_tag: model
       locator:
@@ -678,6 +709,7 @@ species:
   Fe:
     observations:
     - observation_id: shaw_2023_table2_fe_psat_factsage_feo
+      experiment: apollo-12022-factsage
       type: psat_series
       class_tag: model
       locator:
@@ -750,6 +782,7 @@ species:
             pdf_page_index: 7
             table: '2'
     - observation_id: shaw_2023_table2_fe_hkl_flux
+      experiment: apollo-12022-factsage
       type: rate_series
       class_tag: model
       locator:
@@ -813,6 +846,7 @@ species:
             section: 2.3.2
             paragraph: For the purposes of the current work, the area (A) will be included later.
     - observation_id: shaw_2023_fe_max_sublimation_rate_1200C
+      experiment: apollo-12022-factsage
       type: rate_series
       class_tag: model
       locator:
@@ -844,6 +878,7 @@ species:
         construction: Table 2 Fe flux x BET area from Figure 1; authors report no local maximum below
           the melting point
     - observation_id: shaw_2023_hkl_ae_unity_assumption
+      experiment: apollo-12022-factsage
       type: alpha
       class_tag: model
       locator:
@@ -873,6 +908,7 @@ species:
   Na:
     observations:
     - observation_id: shaw_2023_table2_na_psat_factsage_al2o3_cao_na2o
+      experiment: apollo-12022-factsage
       type: psat_series
       class_tag: model
       locator:
@@ -927,6 +963,7 @@ species:
           T_K: 1473.15
           p_atm: 2.4e-06
     - observation_id: shaw_2023_table2_na_hkl_flux
+      experiment: apollo-12022-factsage
       type: rate_series
       class_tag: model
       locator:
@@ -981,6 +1018,7 @@ species:
             pdf_page_index: 7
             table: '2'
     - observation_id: shaw_2023_na_max_sublimation_rate_1200C
+      experiment: apollo-12022-factsage
       type: rate_series
       class_tag: model
       locator:
@@ -1009,6 +1047,7 @@ species:
   K:
     observations:
     - observation_id: shaw_2023_table2_k_psat_factsage_al2o3_k2o
+      experiment: apollo-12022-factsage
       type: psat_series
       class_tag: model
       locator:
@@ -1062,6 +1101,7 @@ species:
           T_K: 1473.15
           p_atm: 1.4e-06
     - observation_id: shaw_2023_table2_k_hkl_flux
+      experiment: apollo-12022-factsage
       type: rate_series
       class_tag: model
       locator:
@@ -1116,6 +1156,7 @@ species:
             pdf_page_index: 7
             table: '2'
     - observation_id: shaw_2023_k_max_sublimation_rate_1200C
+      experiment: apollo-12022-factsage
       type: rate_series
       class_tag: model
       locator:
