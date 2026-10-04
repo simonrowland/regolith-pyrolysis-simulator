@@ -471,6 +471,11 @@ def test_marked_typed_absent_enthalpy_is_skipped_by_generation() -> None:
     assert _series_has_temperature(generated, Quantity.DELTA_FG, "1700")
     assert _series_has_temperature(generated, Quantity.LOG10_KF, "1700")
 
+    gibbs = row["formation_gibbs_energy"]
+    assert generator._cell(
+        gibbs, table_id="O-038", column="formation_gibbs_energy"
+    ).value == Decimal("-609.059")
+
 
 def test_typed_absent_marker_with_a_numeric_value_is_rejected() -> None:
     document = load_table_document(TABLES_DIR / "O-038.yaml")

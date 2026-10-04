@@ -474,6 +474,30 @@ def _is_nist_typed_absent_enthalpy_cell(cell: object) -> bool:
     )
 
 
+def is_nist_tail_signed_repair_cell(cell: object) -> bool:
+    """Whether a published numeric cell stores the sign-restored magnitude."""
+
+    if not isinstance(cell, Mapping):
+        return False
+    token = cell.get("as_published")
+    stored = cell.get("value")
+    locator = cell.get("locator")
+    if (
+        not isinstance(token, str)
+        or not NUMBER_RE.fullmatch(token.strip())
+        or stored is None
+        or not isinstance(locator, Mapping)
+        or locator.get("parse_repair") != NIST_TAIL_PARSE_REPAIR
+        or not isinstance(locator.get("raw_line"), str)
+        or not locator.get("raw_line", "").strip()
+    ):
+        return False
+    try:
+        return abs(Decimal(token.strip())) == abs(Decimal(str(stored)))
+    except InvalidOperation:
+        return False
+
+
 def _restore_whitespace_tail_signs(
     candidate: _LineCandidate,
     parsed_neighbors: list[_LineCandidate],
@@ -1090,14 +1114,7 @@ def round_trip_failures(document: Mapping[str, Any]) -> list[str]:
                     and _is_nist_typed_absent_enthalpy_cell(cell)
                 ):
                     continue
-                if (
-                    isinstance(locator, Mapping)
-                    and locator.get("parse_repair") == NIST_TAIL_PARSE_REPAIR
-                    and locator.get("raw_line")
-                    and parsed is not None
-                    and stored is not None
-                    and abs(parsed) == abs(stored)
-                ):
+                if is_nist_tail_signed_repair_cell(cell):
                     continue
                 failures.append(
                     f"{table_id} row {row_number} {key}: "

@@ -68,6 +68,7 @@ from simulator.reference_data.janaf import (
     SIDECAR_PATH,
     TABLES_DIR,
     formula_composition,
+    is_nist_tail_signed_repair_cell,
     _is_nist_typed_absent_enthalpy_cell,
     load_table_document,
     table_printed_temperatures,
@@ -353,10 +354,9 @@ def _cell(cell: object, *, table_id: str, column: str) -> _Cell:
         isinstance(locator, Mapping)
         and locator.get("parse_repair") == NIST_TAIL_DFH_ABSENCE_REPAIR
     )
-    repaired = (
+    repair_marker = (
         isinstance(locator, Mapping)
         and locator.get("parse_repair") == NIST_TAIL_PARSE_REPAIR
-        and bool(locator.get("raw_line"))
     )
     if typed_absence:
         if column != "formation_enthalpy" or not _is_nist_typed_absent_enthalpy_cell(cell):
@@ -367,9 +367,9 @@ def _cell(cell: object, *, table_id: str, column: str) -> _Cell:
             raise ValueError(
                 f"{table_id}: {column} token {token!r} is null but value is {parsed!r}"
             )
-    elif repaired:
+    elif repair_marker:
         restored = Decimal(str(parsed)) if parsed is not None else None
-        if restored is None or abs(restored) != abs(value):
+        if not is_nist_tail_signed_repair_cell(cell):
             raise ValueError(
                 f"{table_id}: {column} repaired token/value mismatch: "
                 f"{token!r} != {parsed!r}"

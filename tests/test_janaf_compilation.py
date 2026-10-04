@@ -33,6 +33,7 @@ from simulator.reference_data.janaf import (
     _element_reference_gibbs_sign,
     _gibbs_sign_from_neighbors,
     harvest_era,
+    is_nist_tail_signed_repair_cell,
     iter_table_paths,
     load_manifest,
     load_table_document,
@@ -207,6 +208,27 @@ def test_refused_janaf_row_keeps_unsigned_source_line() -> None:
     ]
     assert row["formation_gibbs_energy"]["value"] == -609.059
     assert row["log10_formation_equilibrium_constant"]["value"] == 18.714
+
+
+def test_signed_tail_cell_validation_requires_marker_raw_line_and_magnitude() -> None:
+    cell = {
+        "as_published": "609.059",
+        "value": -609.059,
+        "locator": {
+            "parse_repair": NIST_TAIL_PARSE_REPAIR,
+            "raw_line": "1700\t...\t941.610  609.059 18.714",
+        },
+    }
+    assert is_nist_tail_signed_repair_cell(cell)
+    without_marker = deepcopy(cell)
+    without_marker["locator"].pop("parse_repair")
+    assert not is_nist_tail_signed_repair_cell(without_marker)
+    without_raw_line = deepcopy(cell)
+    without_raw_line["locator"].pop("raw_line")
+    assert not is_nist_tail_signed_repair_cell(without_raw_line)
+    wrong_magnitude = deepcopy(cell)
+    wrong_magnitude["value"] = -609.060
+    assert not is_nist_tail_signed_repair_cell(wrong_magnitude)
 
 
 def test_gibbs_sign_continuity_refuses_zero_crossings_and_small_values() -> None:
