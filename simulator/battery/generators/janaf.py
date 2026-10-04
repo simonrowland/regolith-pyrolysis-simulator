@@ -2744,6 +2744,18 @@ def janaf_fusion_energy(oxide: str, temperature_K: Decimal) -> JANAFFusionEnergy
     )
     if len(overlap) < 2:
         raise ValueError(f"{oxide}: JANAF crystal/liquid tables do not overlap")
+    crystal_missing = _fusion_missing_gibbs_temperatures(crystal_table)
+    liquid_missing = _fusion_missing_gibbs_temperatures(liquid_table)
+    overlap = [
+        temperature
+        for temperature in overlap
+        if _missing_node_for_interpolation(
+            crystal, crystal_missing, temperature
+        ) is None
+        and _missing_node_for_interpolation(liquid, liquid_missing, temperature) is None
+    ]
+    if len(overlap) < 2:
+        raise ValueError(f"{oxide}: JANAF tables have fewer than two complete overlap nodes")
 
     def difference(t: Decimal) -> Decimal:
         return _interpolate_formation_gibbs(
@@ -2762,11 +2774,10 @@ def janaf_fusion_energy(oxide: str, temperature_K: Decimal) -> JANAFFusionEnergy
     if len(crossings) != 1:
         raise ValueError(f"{oxide}: expected one JANAF cr/l crossing, got {crossings}")
     tm = crossings[0]
-    for table_id, points in (
-        (crystal_table, crystal),
-        (liquid_table, liquid),
+    for table_id, points, missing_nodes in (
+        (crystal_table, crystal, crystal_missing),
+        (liquid_table, liquid, liquid_missing),
     ):
-        missing_nodes = _fusion_missing_gibbs_temperatures(table_id)
         for interpolation_temperature in (temperature_K, tm):
             missing_node = _missing_node_for_interpolation(
                 points, missing_nodes, interpolation_temperature
