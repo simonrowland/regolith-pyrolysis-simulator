@@ -394,11 +394,11 @@ def _continuity_sign(
         return None, "formation enthalpy neighbors span a transition marker"
     left_t, left_value = left
     right_t, right_value = right
-    estimate = left_value + (right_value - left_value) * (
-        temperature - left_t
-    ) / (right_t - left_t)
-    sign = 1 if estimate > 0 else -1 if estimate < 0 else None
-    return sign, None if sign is not None else "neighbor interpolation is zero"
+    if left_value == 0 or right_value == 0:
+        return None, "formation enthalpy neighbor is zero"
+    if (left_value > 0) != (right_value > 0):
+        return None, "formation enthalpy neighbors have opposite signs"
+    return (1 if left_value > 0 else -1), None
 
 
 def _gibbs_sign_from_neighbors(left: Decimal, right: Decimal) -> int | None:

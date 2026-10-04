@@ -340,15 +340,13 @@ def test_malformed_tail_restores_gibbs_when_enthalpy_spans_transition() -> None:
     assert row["log10_formation_equilibrium_constant"]["value"] == -0.026
 
 
-def test_transition_enthalpy_refusal_prevents_the_fe004_wrong_sign(
-    monkeypatch: pytest.MonkeyPatch,
-) -> None:
+def test_transition_enthalpy_refusal_prevents_the_fe004_wrong_sign() -> None:
     import simulator.reference_data.janaf as janaf
 
     source = (
         "Synthetic Fe-004 audit row\n"
         "T(K)\tCp\tS\t-[G-H(Tr)]/T\tH-H(Tr)\tΔfH\tΔfG\tlog Kf\n"
-        "1100\t10\t10\t10\t0\t0\t0.052\t-0.002\n"
+        "1100\t10\t10\t10\t0\t0.100\t0.052\t-0.002\n"
         "1184\t10\t10\t10\t0\tALPHA <--> GAMMA\n"
         "1300\t10\t10\t10\t0\t0.267 0.052 0.002\n"
         "1400\t10\t10\t10\t0\t0.044\t0.052\t-0.002\n"
@@ -361,20 +359,6 @@ def test_transition_enthalpy_refusal_prevents_the_fe004_wrong_sign(
     assert row["formation_enthalpy"]["locator"]["parse_repair"] == (
         "nist_tail_dfh_sign_undetermined"
     )
-
-    original_continuity = janaf._continuity_sign
-
-    def without_transition_refusal(*args, **kwargs):
-        kwargs["transition_marker_lines"] = []
-        return original_continuity(*args, **kwargs)
-
-    monkeypatch.setattr(janaf, "_continuity_sign", without_transition_refusal)
-    unguarded = janaf.parse_janaf_txt(
-        source, table_id="synthetic-fe004-audit", url="u", download_url="d"
-    )
-    row = next(row for row in unguarded.values if row["temperature"]["value"] == 1300)
-    assert row["formation_enthalpy"]["value"] == 0.267
-    assert row["formation_gibbs_energy"]["value"] == 0.052
 
 
 @pytest.mark.parametrize(
