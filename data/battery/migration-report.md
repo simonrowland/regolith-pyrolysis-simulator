@@ -3,7 +3,7 @@
 rows in: 47411
 records out (observations): 121113
 works: 263
-experiments: 3522
+experiments: 3524
 queue size: 76891
 identical-payload dedupe aliases: 342
 metadata files: 39
@@ -18273,8 +18273,8 @@ MODEL_DERIVED / MEASURED_REDUCED keep their mapped evidence class. Parent pointe
 
 ## Advisory issue census
 
-advisory issues: 216861
+advisory issues: 216851
 
 | kind | count |
 |---|---:|
-| `identity_incomplete` | 216861 |
+| `identity_incomplete` | 216851 |
