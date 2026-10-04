@@ -443,6 +443,22 @@ experiments:
         note: >-
           Measured starting glass Na2O 17 / CaO 12 / SiO2 71 wt%; Fig. 6 is
           0.45 wt% Na2CO3 impurity in this glass (caption p.51/PDF57)
+- experiment_id: hastie-1981-table2-quoted-fits
+  method:
+    tag: unknown
+    reason: >-
+      Quoted Table 2 empirical K logP fit collection spans heterogeneous
+      systems (R3-1). Bench-free sample-free registry scope so a sole
+      row-local composition map does not promote onto the shared default
+      Hastie experiment.
+  locator:
+    table: '2'
+    page: 23
+    published_page: 23
+    pdf_page_index: 28
+    note: >-
+      Quoted Table 2 empirical fit collection; no shared sample, bench, or
+      apparatus. Illite map stays row-local on body row 16.
 species:
   K:
     observations:
@@ -789,6 +805,7 @@ species:
         note: not applicable
     - observation_id: hastie_1981_table2_k_logP_coefficients_quoted_20260906
       supersedes: hastie_1981_table2_k_logP_coefficients
+      experiment: hastie-1981-table2-quoted-fits
       type: psat_series
       class_tag: model
       locator:
@@ -1019,6 +1036,8 @@ species:
           - 1800
           A: 5.564
           B: 16650
+          additional_coefficients_as_printed: ''
+          comments_as_printed: Illinois no. 6 coal, UTSI test sample. Initially high pressure of K due to
             presence of K2SO4 and K2CO3 (0.2 percent S). Equation corresponds to [K2O] ~ 14. Hastie et al.
             (1980).
         - locator:
@@ -1037,6 +1056,8 @@ species:
           - 1700
           A: 6.818
           B: 18472
+          additional_coefficients_as_printed: ''
+          comments_as_printed: '[K2O] 18.9-17.6. Plante and Cook (1978).'
         - locator:
             page: 24
             table: '2'
@@ -1053,6 +1074,8 @@ species:
           - 1750
           A: 6.831
           B: 19056
+          additional_coefficients_as_printed: ''
+          comments_as_printed: 23.3-22.1 [K2O]. Linear portion of AB, BC curves in figure 9. Plante and Cook
             (1978).
         - locator:
             page: 24
@@ -1092,6 +1115,8 @@ species:
           - 1820
           A: 6.231
           B: 17863
+          additional_coefficients_as_printed: ''
+          comments_as_printed: 6[K2O]. Initial PO2 ≥ PK, but later fell to the level of K2O (see text). Hastie
             et al. (1980).
         footnotes:
           a: Initial compositions given in weight percent (wt %). Note, actual analyses given not normalized

@@ -646,13 +646,6 @@ species:
         note: JSC-1 chemism points to Kapitel 2.1.2 / Abb. 2.2 rather than reprinting numbers.
       uncertainty:
         note: none printed
-      equipment:
-        cell_material:
-          value: plasmagespritzte Aluminiumoxidkeramik (Schale or Tiegel) for powder JSC-1; Tantal Drahttraeger
-            for pellets
-          locator:
-            page: 51
-            table: '4.1'
     - observation_id: sauerborn_2005_table53_jsc1_run_log
       experiment: jsc1-solar-series
       type: rate_series
@@ -6915,6 +6908,13 @@ metadata:
       table: '4.1'
       page: 51
     classification: equipment_metadata
+    equipment:
+      cell_material:
+        value: plasmagespritzte Aluminiumoxidkeramik (Schale or Tiegel) for powder JSC-1; Tantal Drahttraeger
+          for pellets
+        locator:
+          page: 51
+          table: '4.1'
     values:
       quantity: sample_and_holder_inventory
       jsc1_powder_mass_g_range:
