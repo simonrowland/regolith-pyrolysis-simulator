@@ -11995,29 +11995,6 @@ class Migrator:
                 source=source_key,
                 observation_id=obs_id,
             )
-        raw_derivation = values.get("derivation")
-        if raw_derivation is None:
-            raw_derivation = obs.get("derivation")
-        # Legacy extracts also use ``derivation`` for page/quote prose. Only
-        # promote the structured table-asset form; it has resolvable lineage.
-        derivation = (
-            _derivation_from_plain(raw_derivation)
-            if (
-                isinstance(raw_derivation, Mapping)
-                and isinstance(raw_derivation.get("inputs"), (list, tuple))
-                and any(
-                    str(item).startswith("tables:")
-                    for item in raw_derivation["inputs"]
-                )
-            )
-            else None
-        )
-        if derivation is not None:
-            value_derivation = _merge_source_conversion_derivation(
-                derivation,
-                value_conversion,
-                read_from,
-            )
         if phase_provenance is not None and value.kind is not ValueKind.UNAVAILABLE:
             if value_derivation is None:
                 value_derivation = Derivation(
