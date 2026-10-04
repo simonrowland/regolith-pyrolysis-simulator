@@ -961,9 +961,8 @@ def test_al002_tail_is_refused_when_enthalpy_bracket_crosses_transition() -> Non
     )
     assert "formation enthalpy neighbors span a transition marker" in ambiguity["reason"]
     assert all(
-        (Decimal("1000"), _) not in _series(generated, quantity)
+        not any(temperature == Decimal("1000") for temperature, _ in _series(generated, quantity))
         for quantity in (Quantity.DELTA_FH, Quantity.DELTA_FG, Quantity.LOG10_KF)
-        for _ in (Decimal("-10.585"), Decimal("0.760"), Decimal("-0.040"))
     )
 
 
@@ -1386,10 +1385,10 @@ def test_stored_pair_identity_reports_its_denominator() -> None:
     }
     b133 = _generation("B-133")
     assert b133.report["stored_pair_identity_denominator"] == {
-        "eligible_delta_fG_T_gt_0": 29,
-        "eligible_log10_Kf_T_gt_0": 29,
-        "checked_intersection": 29,
-        "passed": 28,
+        "eligible_delta_fG_T_gt_0": 28,
+        "eligible_log10_Kf_T_gt_0": 28,
+        "checked_intersection": 28,
+        "passed": 27,
         "failed": 1,
     }
 

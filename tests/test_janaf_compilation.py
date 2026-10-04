@@ -663,6 +663,42 @@ def test_malformed_tail_refuses_enthalpy_bracket_crossing_transition() -> None:
     assert "formation enthalpy neighbors span a transition" in ambiguity["reason"]
 
 
+def test_transition_enthalpy_refusal_prevents_the_fe004_wrong_sign(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    import simulator.reference_data.janaf as janaf
+
+    source = (
+        "Synthetic Fe-004 audit row\n"
+        "T(K)\tCp\tS\t-[G-H(Tr)]/T\tH-H(Tr)\tΔfH\tΔfG\tlog Kf\n"
+        "1100\t10\t10\t10\t0\t0\t0.052\t-0.002\n"
+        "1184\t10\t10\t10\t0\tALPHA <--> GAMMA\n"
+        "1300\t10\t10\t10\t0\t0.267 0.052 0.002\n"
+        "1400\t10\t10\t10\t0\t0.044\t0.052\t-0.002\n"
+    )
+    guarded = janaf.parse_janaf_txt(
+        source, table_id="synthetic-fe004-audit", url="u", download_url="d"
+    )
+    assert not any(row["temperature"]["value"] == 1300 for row in guarded.values)
+    ambiguity = next(
+        item for item in guarded.parse_ambiguities if item["raw_line"].startswith("1300\t")
+    )
+    assert "formation enthalpy neighbors span a transition marker" in ambiguity["reason"]
+
+    original_continuity = janaf._continuity_sign
+
+    def without_transition_refusal(*args, **kwargs):
+        kwargs["transition_marker_lines"] = []
+        return original_continuity(*args, **kwargs)
+
+    monkeypatch.setattr(janaf, "_continuity_sign", without_transition_refusal)
+    unguarded = janaf.parse_janaf_txt(
+        source, table_id="synthetic-fe004-audit", url="u", download_url="d"
+    )
+    row = next(row for row in unguarded.values if row["temperature"]["value"] == 1300)
+    assert row["formation_enthalpy"]["value"] == 0.267
+
+
 def test_identity_consistent_tail_needs_no_same_sign_orientation() -> None:
     source = (
         "Synthetic identity-consistent formation tail\n"
