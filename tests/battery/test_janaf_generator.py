@@ -951,17 +951,19 @@ def test_janaf_identity_uses_the_source_gas_constant() -> None:
     )
 
 
-def test_al002_restored_formation_cells_keep_published_magnitudes() -> None:
+def test_al002_tail_is_refused_when_enthalpy_bracket_crosses_transition() -> None:
     generated = _generation("Al-002")
-    for quantity, value in {
-        Quantity.DELTA_FH: Decimal("-10.585"),
-        Quantity.DELTA_FG: Decimal("0.760"),
-        Quantity.LOG10_KF: Decimal("-0.040"),
-    }.items():
-        assert (Decimal("1000"), value) in _series(generated, quantity)
-    assert not any(
-        row["temperature_as_published"] == "1000"
-        for row in generated.report["merged_formation_rows"]
+    document = load_table_document(TABLES_DIR / "Al-002.yaml")
+    ambiguity = next(
+        item
+        for item in document["table"]["parse_ambiguities"]
+        if item.get("raw_line", "").startswith("1000\t")
+    )
+    assert "formation enthalpy neighbors span a transition marker" in ambiguity["reason"]
+    assert all(
+        (Decimal("1000"), _) not in _series(generated, quantity)
+        for quantity in (Quantity.DELTA_FH, Quantity.DELTA_FG, Quantity.LOG10_KF)
+        for _ in (Decimal("-10.585"), Decimal("0.760"), Decimal("-0.040"))
     )
 
 
@@ -991,17 +993,21 @@ def test_al003_restored_formation_zeros_keep_the_source_line() -> None:
         for row in zeros.report["merged_formation_rows"]
     )
 
-def test_fe004_restored_mixed_formation_cells_keep_their_signs() -> None:
+def test_fe004_tail_is_refused_when_enthalpy_bracket_crosses_transition() -> None:
     mixed = _generation("Fe-004")
-    assert (Decimal("1700"), Decimal("0.001")) in _series(
-        mixed, Quantity.DELTA_FH
+    document = load_table_document(TABLES_DIR / "Fe-004.yaml")
+    ambiguity = next(
+        item
+        for item in document["table"]["parse_ambiguities"]
+        if item.get("raw_line", "").startswith("1700\t")
+    )
+    assert "formation enthalpy neighbors span a transition marker" in ambiguity["reason"]
+    assert not any(
+        temperature == Decimal("1700")
+        for temperature, _ in _series(mixed, Quantity.DELTA_FH)
     )
     assert (Decimal("1700"), Decimal("0")) in _series(mixed, Quantity.DELTA_FG)
     assert (Decimal("1700"), Decimal("0")) in _series(mixed, Quantity.LOG10_KF)
-    assert not any(
-        row["temperature_as_published"] == "1700"
-        for row in mixed.report["merged_formation_rows"]
-    )
 
 
 def test_raw_and_tables_paths_are_byte_identical_and_hash_guarded(

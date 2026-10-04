@@ -5367,6 +5367,49 @@ def test_absent_janaf_fusion_grid_node_refuses_interpolation(
         janaf.janaf_fusion_energy("SiO2", Decimal("1673"))
 
 
+def test_fusion_comparison_reports_absent_janaf_grid_node_as_refusal(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from simulator.battery.generators import janaf
+    from simulator.battery.score import _fusion_comparison_reference
+
+    original_points = janaf._fusion_table_points
+
+    def without_silica_1700(table_id: str):
+        points, digest = original_points(table_id)
+        if table_id == "O-038":
+            points = tuple((t, g) for t, g in points if t != Decimal("1700"))
+        return points, digest
+
+    monkeypatch.setattr(janaf, "_fusion_table_points", without_silica_1700)
+    monkeypatch.setattr(janaf, "_fusion_missing_gibbs_temperatures", lambda _table_id: ())
+    experiment = F.kems_experiment()
+    reference = F.observation(
+        "silica-activity-across-missing-janaf-node",
+        experiment.experiment_id,
+        _with_activity_reference_polymorph(
+            F.activity_identity(
+                formula="SiO2",
+                T_K=Decimal("1933"),
+                endmember_phase=Phase.CR,
+                component_basis="SiO2",
+            ),
+            "cristobalite_high",
+        ),
+        Decimal("0.3"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="synthetic-missing-janaf-grid-node",
+    )
+
+    comparison = _fusion_comparison_reference(reference, engine=Engine.OPENIMCC)
+    assert comparison.value.point == reference.value.point
+    assert any(
+        "fusion conversion missing input" in notice.reason
+        and "spans missing grid node 1700 K" in notice.reason
+        for notice in comparison.notices
+    )
+
+
 def test_absent_janaf_grid_node_refuses_binary_cell_interpolation(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
