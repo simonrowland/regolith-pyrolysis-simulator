@@ -104,6 +104,24 @@ laboratory_parameters:
       fO2_control: not_reported
       vaporization_run_duration: not_reported
     locator: *format
+benches:
+- id: handbook-no-vaporization-run
+  identity: {basis: described_in_this_work}
+  apparatus_family:
+    state: {tag: unknown, reason: not_published}
+    locator: {<<: *format, note: 'heated_cell_or_furnace: not_reported'}
+  cell_material_and_liner:
+    state: {tag: unknown, reason: not_published}
+    locator: {<<: *format, note: 'vaporization_run: not_reported; no heated cell or crucible printed'}
+  temperature_measurement:
+    sensor:
+      state: {tag: unknown, reason: not_published}
+      locator: {<<: *format, note: 'run_temperature_and_calibration: not_reported'}
+experiments:
+- experiment_id: handbook-sample-characterization
+  bench_id: handbook-no-vaporization-run
+  method: {tag: unknown, reason: not_published}
+  locator: *format
 sample_characterization:
   selected_data_sheet_coverage:
     locator: *format

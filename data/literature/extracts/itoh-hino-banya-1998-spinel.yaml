@@ -76,6 +76,23 @@ laboratory_parameters:
     - exposed melt area
     - crucible mass and charge mass by run
     - individual run durations except the stated deoxidation and equilibrium-time tests
+benches:
+- id: induction-furnace-spinel
+  identity: {basis: described_in_this_work}
+  apparatus_family:
+    state: {tag: value, value: high-frequency induction furnace}
+    locator: *methods
+  cell_material_and_liner:
+    state: {tag: value, value: 'MgO, Al2O3, MgO·Al2O3 spinel, and dolomite with MgO/CaO = 40/60 mass ratio'}
+    locator: *methods
+  detector:
+    state: {tag: value, value: 'ICP emission spectrometry for Al, Mg and Ca after acid dissolution and solvent extraction; inert-gas impulse-fusion infrared absorption for O; X-ray diffraction for interfacial equilibrium phases'}
+    locator: *methods
+experiments:
+- experiment_id: spinel-deoxidation-series
+  bench_id: induction-furnace-spinel
+  method: {tag: unknown, reason: not_published}
+  locator: *methods
 fidelity_samples:
   - path: species.Mg.observations[itoh_1998_spinel_interaction_parameters].values.r_o_Mg_Al
     value: -150

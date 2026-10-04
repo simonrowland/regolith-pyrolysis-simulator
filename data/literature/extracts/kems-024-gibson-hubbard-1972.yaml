@@ -163,6 +163,10 @@ benches:
   detector:
     state: {tag: value, value: 'continuously recorded sample weight, temperature, and in some experiments evolved-gas composition'}
     locator: *procedures
+  temperature_measurement:
+    recording:
+      state: {tag: value, value: sample temperature continuously recorded}
+      locator: *procedures
 experiments:
 - experiment_id: lunar-volatilization-series
   bench_id: mettler-vta

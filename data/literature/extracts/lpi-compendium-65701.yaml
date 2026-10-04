@@ -53,6 +53,24 @@ laboratory_parameters:
       run_duration: not stated
     locator: *sample_overview
     note: Storage, collection, and analytical methods are not converted into vaporization-run conditions.
+benches:
+- id: handbook-entry-no-thermal-run
+  identity: {basis: described_in_this_work}
+  apparatus_family:
+    state: {tag: unknown, reason: not_published}
+    locator: {<<: *sample_overview, note: 'furnace_or_heated_cell: not stated'}
+  cell_material_and_liner:
+    state: {tag: unknown, reason: not_published}
+    locator: {<<: *sample_overview, note: 'crucible_or_container_for_thermal_experiment: not stated'}
+  temperature_measurement:
+    sensor:
+      state: {tag: unknown, reason: not_published}
+      locator: {<<: *sample_overview, note: 'temperature_measurement_or_calibration: not stated'}
+experiments:
+- experiment_id: handbook-characterization
+  bench_id: handbook-entry-no-thermal-run
+  method: {tag: unknown, reason: not_published}
+  locator: *sample_overview
 sample_characterization:
   apollo_16_sample_65701:
     locator: *sample_overview
