@@ -5386,16 +5386,11 @@ def test_absent_janaf_grid_node_refuses_binary_cell_interpolation(
         binary._cell_oxide_thermodynamics("W", 325.0)
 
 
-def test_silica_fusion_uses_restored_janaf_1700_row_and_decreases() -> None:
+def test_silica_fusion_refuses_interpolation_across_unresolved_1700_row() -> None:
     from simulator.battery.generators.janaf import janaf_fusion_energy
 
-    temperatures = (1600, 1650, 1700, 1750, 1800)
-    values = [
-        janaf_fusion_energy("SiO2", Decimal(temperature)).delta_g_fus_kJ_per_mol
-        for temperature in temperatures
-    ]
-    assert values[2] == Decimal("1.143")
-    assert all(left > right for left, right in zip(values, values[1:]))
+    with pytest.raises(ValueError, match="1700"):
+        janaf_fusion_energy("SiO2", Decimal("1673"))
 
 
 def test_liquid_activity_reference_is_not_shifted() -> None:
