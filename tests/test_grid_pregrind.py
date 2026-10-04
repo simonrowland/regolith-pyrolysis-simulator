@@ -758,6 +758,68 @@ def test_worker_failure_output_records_positive_wall_time(monkeypatch):
     assert json.loads(bounded["raw_payload"])["exception"]["message"] == long_message
 
 
+def test_worker_failure_with_backend_and_missing_subprocess_module_checks_model(
+    tmp_path, monkeypatch
+):
+    class Backend:
+        _model = "MELTSv1.0.2"
+
+    monkeypatch.setattr(grid_pregrind, "_WORKER_BACKEND_NAME", "subprocess")
+    monkeypatch.setattr(grid_pregrind, "_WORKER_BACKEND", Backend())
+    monkeypatch.setattr(grid_pregrind, "_WORKER_MODULE", None)
+    monkeypatch.setattr(grid_pregrind, "_WORKER_INIT_ERROR", "module unavailable")
+    monkeypatch.setattr(grid_pregrind, "_WORKER_ALLOW_ZERO_COMPONENT_BOUNDARY", True)
+    monkeypatch.setattr(grid_pregrind, "_worker_initialize", lambda *_args: None)
+
+    inputs = {
+        **_inputs(1200.0),
+        "model": "pMELTS",
+        "intended_fO2_log": -9.0,
+    }
+    _key_id, output = grid_pregrind._run_point(
+        grid_pregrind.WorkerJob(7, 0, inputs)
+    )
+
+    assert output["status_kind"] == "failure"
+    assert output["engine_model"] == "MELTSv1.0.2"
+    database = tmp_path / "backend-module-missing.db"
+    with GridCacheWriter(database) as writer:
+        batch_id = writer.ensure_batch(
+            label="fixed", kind="fixed", seed=178, params={"test": True}
+        )
+        writer.materialize_key(
+            {key: value for key, value in inputs.items() if key != "intended_fO2_log"},
+            batch_id=batch_id,
+            shuffle_rank=0,
+            shard=0,
+            intended_fO2_log=-9.0,
+        )
+        key_id = writer.pending_rows(batch_id=batch_id)[0]["grid_key_id"]
+        with pytest.raises(ValueError, match="grid result model differs from queued key"):
+            writer.write_result(key_id, output)
+
+
+def test_worker_model_resolution_rejects_unavailable_collision_and_propagates(
+    monkeypatch,
+):
+    class Backend:
+        _model = grid_pregrind.ENGINE_MODEL_UNAVAILABLE
+
+    with pytest.raises(ValueError):
+        grid_pregrind._resolved_worker_engine_model(Backend(), "thermoengine")
+
+    class DefaultBackend:
+        _model = "MELTSv1.0.2"
+
+    monkeypatch.setattr(
+        grid_pregrind,
+        "resolve_alphamelts_subprocess_model",
+        lambda _model: (_ for _ in ()).throw(ValueError("resolver failed")),
+    )
+    with pytest.raises(ValueError, match="resolver failed"):
+        grid_pregrind._resolved_worker_engine_model(DefaultBackend(), "subprocess")
+
+
 def test_thermoengine_grind_uses_fixed_ferric_intrinsic_open_loop(monkeypatch):
     calls = []
     result = SimpleNamespace(**dict(_output()["generic"]))
@@ -1854,6 +1916,126 @@ def test_drain_refuses_when_queued_model_differs_from_drain_model(
         assert connection.execute("SELECT COUNT(*) FROM alphamelts_outputs").fetchone()[0] == 0
 
 
+@pytest.mark.parametrize(
+    ("backend_name", "queued_model"),
+    [
+        ("subprocess", ""),
+        ("subprocess", " MELTSv1.0.2 "),
+        ("thermoengine", ""),
+    ],
+    ids=("subprocess-blank", "subprocess-padded", "thermoengine-blank"),
+)
+def test_resolved_queued_model_drains_and_stores_through_run_cycle(
+    tmp_path, monkeypatch, backend_name, queued_model
+):
+    database = tmp_path / f"resolved-{backend_name}-{repr(queued_model)}.db"
+    _prepared_drain_database(
+        database,
+        model=queued_model,
+        mode=backend_name,
+        backend_name=backend_name,
+    )
+    context = _ImmediateContext()
+    result = SimpleNamespace(
+        **{
+            **_output()["generic"],
+            "status": "ok",
+            "diagnostics": {},
+            "warnings": [],
+            "ledger_transition": None,
+            "fO2_log": -9.0,
+        }
+    )
+
+    class ControlledBackend:
+        _mode = backend_name
+        _model = ""
+        _timeout_s = 5.0
+
+        def _equilibrate_subprocess(self, *args, **kwargs):
+            del args, kwargs
+            module._run_alphamelts_subprocess(
+                ["fake-alphamelts"], cwd=str(native_dir), timeout=self._timeout_s
+            )
+            return result
+
+        def equilibrate(self, **kwargs):
+            if backend_name == "thermoengine":
+                return result
+            return self._equilibrate_subprocess(
+                kwargs["temperature_C"],
+                kwargs["composition_mol"],
+                kwargs["fO2_log"],
+                kwargs["pressure_bar"],
+                total_input_kg=100.0,
+                diagnostics={},
+                run_mode=kwargs["subprocess_run_mode"],
+            )
+
+    native_dir = tmp_path / "native"
+    native_dir.mkdir()
+
+    def complete_native(*_args, **kwargs):
+        (Path(kwargs["cwd"]) / "Phase_main_tbl.txt").write_text("completed\n")
+        return SimpleNamespace(returncode=0, stdout="", stderr="")
+
+    module = SimpleNamespace(_run_alphamelts_subprocess=complete_native)
+    monkeypatch.setattr(grid_pregrind, "_STOP_REQUESTED", False)
+    monkeypatch.setattr(grid_pregrind, "EngineWorkerPool", context.EngineWorkerPool)
+    monkeypatch.setattr(grid_pregrind, "_WORKER_BACKEND_NAME", backend_name)
+    monkeypatch.setattr(grid_pregrind, "_WORKER_BACKEND", ControlledBackend())
+    monkeypatch.setattr(
+        grid_pregrind, "_WORKER_MODULE", module if backend_name == "subprocess" else None
+    )
+    monkeypatch.setattr(grid_pregrind, "_WORKER_ENGINE_VERSION", "fixture-engine")
+    monkeypatch.setattr(grid_pregrind, "_WORKER_ALLOW_ZERO_COMPONENT_BOUNDARY", True)
+    monkeypatch.setattr(grid_pregrind, "_worker_initialize", lambda *_args: None)
+    monkeypatch.setattr(
+        grid_pregrind, "_generic_result", lambda *_args: _output()["generic"]
+    )
+    monkeypatch.setattr(grid_pregrind, "_alpha_result", lambda *_args: {})
+    monkeypatch.setattr(grid_pregrind, "_thermoengine_generic_result", lambda _result: _output()["generic"])
+    monkeypatch.setattr(grid_pregrind, "_thermoengine_result", lambda _result: {})
+    args = SimpleNamespace(
+        backend=backend_name,
+        workers=1,
+        heartbeat_s=60.0,
+        limit=None,
+        status_json=database.with_suffix(".status.json"),
+        seed=178,
+        db=database,
+        commit_every=10,
+        assume_queued_run_mode=None,
+        model="MELTSv1.0.2",
+        timeout_s=20.0,
+        thermoengine_health_timeout_s=8.0,
+        thermoengine_equilibrate_timeout_s=60.0,
+        allow_zero_component_boundary=True,
+    )
+
+    with GridCacheWriter(
+        database, existing_only=True, backend_name=backend_name
+    ) as writer:
+        batch_id = writer.connection.execute(
+            "SELECT batch_id FROM batches WHERE label = 'fixed-v2'"
+        ).fetchone()[0]
+        outcome = grid_pregrind.run_cycle(
+            args, writer, batch_id=batch_id, grid_total=1, shard=0
+        )
+        row = writer.connection.execute(
+            "SELECT g.model, g.expedited_key, o.engine_model, o.status "
+            "FROM grid_keys g JOIN alphamelts_outputs o "
+            "ON o.expedited_key = g.expedited_key"
+        ).fetchone()
+
+    assert outcome["inserted"] == 1
+    assert row["model"] == queued_model
+    assert row["engine_model"] == "MELTSv1.0.2"
+    assert row["status"] == "ok"
+    with GridCacheWriter(database, existing_only=True, backend_name=backend_name) as writer:
+        assert writer.counts()["pending"] == 0
+
+
 def test_run_cycle_rechecks_each_claimed_job_before_submission(tmp_path, monkeypatch):
     database = tmp_path / "late-mismatched-queue-row.db"
     _prepared_drain_database(database, model="pMELTS")
@@ -1979,6 +2161,64 @@ def test_write_result_refuses_model_mismatch(tmp_path):
         with pytest.raises(ValueError, match="grid result model differs from queued key"):
             writer.write_result(grid_key_id, output)
 
+        assert writer.connection.execute(
+            "SELECT COUNT(*) FROM alphamelts_outputs"
+        ).fetchone()[0] == 0
+
+
+@pytest.mark.parametrize("status_kind", ["success", "refusal"])
+def test_write_result_refuses_unavailable_model_for_nonfailure_even_if_queued(
+    tmp_path, status_kind
+):
+    database = tmp_path / f"write-unavailable-{status_kind}.db"
+    queued = {**_inputs(1200.0), "model": grid_pregrind.ENGINE_MODEL_UNAVAILABLE}
+    with GridCacheWriter(database) as writer:
+        batch_id = writer.ensure_batch(
+            label="fixed", kind="fixed", seed=178, params={"test": True}
+        )
+        writer.materialize_key(
+            queued,
+            batch_id=batch_id,
+            shuffle_rank=0,
+            shard=0,
+            intended_fO2_log=-9.0,
+        )
+        key_id = writer.pending_rows(batch_id=batch_id)[0]["grid_key_id"]
+        output = _output()
+        output["status_kind"] = status_kind
+        output["status"] = "out_of_domain" if status_kind == "refusal" else "ok"
+        output["engine_model"] = grid_pregrind.ENGINE_MODEL_UNAVAILABLE
+
+        with pytest.raises(ValueError, match="grid result model differs from queued key"):
+            writer.write_result(key_id, output)
+        assert writer.connection.execute(
+            "SELECT COUNT(*) FROM alphamelts_outputs"
+        ).fetchone()[0] == 0
+
+
+def test_write_result_refuses_refusal_with_unavailable_model_under_default_key(
+    tmp_path,
+):
+    database = tmp_path / "write-refusal-unavailable-default.db"
+    with GridCacheWriter(database) as writer:
+        batch_id = writer.ensure_batch(
+            label="fixed", kind="fixed", seed=178, params={"test": True}
+        )
+        writer.materialize_key(
+            _inputs(1200.0),
+            batch_id=batch_id,
+            shuffle_rank=0,
+            shard=0,
+            intended_fO2_log=-9.0,
+        )
+        key_id = writer.pending_rows(batch_id=batch_id)[0]["grid_key_id"]
+        output = _output()
+        output["status_kind"] = "refusal"
+        output["status"] = "out_of_domain"
+        output["engine_model"] = grid_pregrind.ENGINE_MODEL_UNAVAILABLE
+
+        with pytest.raises(ValueError, match="grid result model differs from queued key"):
+            writer.write_result(key_id, output)
         assert writer.connection.execute(
             "SELECT COUNT(*) FROM alphamelts_outputs"
         ).fetchone()[0] == 0
