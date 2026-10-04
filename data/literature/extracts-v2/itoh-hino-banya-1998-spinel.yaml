@@ -59,7 +59,7 @@ observations:
         note: The paper explicitly states that e_Ca^Mg is taken as zero as in prior work.
         source_path: /Users/simonrowland/Repos/regolith-corpus/raw/itoh-hino-banya-1998-spinel/itoh-hino-banya-1998-spinel.pdf
 - observation_id: itoh-hino-banya-1998-spinel::itoh_1998_dolomite_MgO_CaO_phase_observations
-  experiment_id: 10.2355/tetsutohagane1955.84.2_85::itoh-hino-banya-1998-spinel
+  experiment_id: 10.2355/tetsutohagane1955.84.2_85::experiment::spinel-deoxidation-series
   identity:
     quantity:
       tag: unknown
@@ -114,7 +114,7 @@ observations:
         note: Phase-presence statements are in sections 4.2-4.3 prose; Figure 1 is the separate dissolved Mg/O plot
         source_path: /Users/simonrowland/Repos/regolith-corpus/raw/itoh-hino-banya-1998-spinel/itoh-hino-banya-1998-spinel.pdf
 - observation_id: itoh-hino-banya-1998-spinel::itoh_1998_equilibrium_time
-  experiment_id: 10.2355/tetsutohagane1955.84.2_85::itoh-hino-banya-1998-spinel
+  experiment_id: 10.2355/tetsutohagane1955.84.2_85::experiment::spinel-deoxidation-series
   identity:
     quantity:
       tag: unknown
@@ -213,7 +213,7 @@ observations:
     source_path: /Users/simonrowland/Repos/regolith-corpus/raw/itoh-hino-banya-1998-spinel/itoh-hino-banya-1998-spinel.pdf
   read_from: unknown:itoh-hino-banya-1998-spinel
 - observation_id: itoh-hino-banya-1998-spinel::itoh_1998_fig2_measured_concentration_time_plots
-  experiment_id: 10.2355/tetsutohagane1955.84.2_85::itoh-hino-banya-1998-spinel
+  experiment_id: 10.2355/tetsutohagane1955.84.2_85::experiment::spinel-deoxidation-series
   identity:
     quantity:
       tag: unknown
@@ -492,13 +492,15 @@ observations:
   uncertainty:
     kind: printed
     verbatim:
-      note: No numerical uncertainty printed; phase regions were established by X-ray diffraction and the text's phase-presence
-        summary.
+      note: Author-derived phase-diagram thresholds (author_estimate, not model_derived). §4.3 constructs pseudo-binary sections
+        from a cited ternary diagram and Fig. 3/text read 52 and 15 mass% Al2O3 from those sections — not the directly observed
+        XRD phase-presence statements in §4.2. No numerical uncertainty printed.
   evidence:
     class:
       tag: value
-      value: measured_direct
-    original_method_class: measured_direct
+      value: author_estimate
+    original_method_class: author_estimate
+    model: author_estimate
   admission:
     status: pending
     reason: no observation admission_status mapped from source
@@ -508,7 +510,8 @@ observations:
     published_page: 87
     figure: '3'
     section: 4.3 Relationship between dolomite composition and deoxidation-product phases
-    note: Thresholds are printed in text; phase diagrams were not digitised.
+    note: Thresholds printed in text from author-constructed pseudo-binary sections of a cited CaO–Al2O3–MgO ternary diagram
+      (ref. 9); phase diagrams were not digitised.
     source_path: /Users/simonrowland/Repos/regolith-corpus/raw/itoh-hino-banya-1998-spinel/itoh-hino-banya-1998-spinel.pdf
   read_from: unknown:itoh-hino-banya-1998-spinel
   point_conditions:
@@ -520,5 +523,6 @@ observations:
         published_page: 87
         figure: '3'
         section: 4.3 Relationship between dolomite composition and deoxidation-product phases
-        note: Thresholds are printed in text; phase diagrams were not digitised.
+        note: Thresholds printed in text from author-constructed pseudo-binary sections of a cited CaO–Al2O3–MgO ternary diagram
+          (ref. 9); phase diagrams were not digitised.
         source_path: /Users/simonrowland/Repos/regolith-corpus/raw/itoh-hino-banya-1998-spinel/itoh-hino-banya-1998-spinel.pdf
