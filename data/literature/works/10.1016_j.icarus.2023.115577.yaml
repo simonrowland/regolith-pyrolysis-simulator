@@ -99,11 +99,38 @@ experiments:
     total_pressure_Pa:
       state:
         tag: unknown
-        reason: not_published
+        reason: extract pressure_mbar is a bound or approximate value, not a point; extract_value=<1x10^-4 mbar (continuous
+          turbo; vacuum TGA runs); upper_bound=true    <1x10^-4 mbar (continuous turbo; vacuum TGA runs)
       locator:
         pdf_page_index: 6
         section: 2.1 Thermal Analysis and Mass Spectroscopy
         note: Icarus journal pre-proof; no printed pagination.
+      inference:
+        relation: extract_limit
+        inputs:
+        - P_Pa = P_mbar × 100
+        - original_unit=mbar
+        - as_published=<1x10^-4 mbar (continuous turbo; vacuum TGA runs)
+        - printed=pressure_mbar
+        - as_printed=<1x10^-4 mbar (continuous turbo; vacuum TGA runs)
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.0001'
+            locator:
+              pdf_page_index: 6
+              section: 2.1 Thermal Analysis and Mass Spectroscopy
+              note: Icarus journal pre-proof; no printed pagination.
+        - - factor
+          - state:
+              tag: value
+              value: '100'
+            locator:
+              pdf_page_index: 6
+              section: 2.1 Thermal Analysis and Mass Spectroscopy
+              note: Icarus journal pre-proof; no printed pagination.
+        output_unit: Pa
     sweep_gas:
       state:
         tag: unknown
@@ -503,6 +530,14 @@ experiments:
           pdf_page_index: 7
           section: 2.1-2.2 vacuum MS and chemical analysis
           note: Icarus journal pre-proof; no printed pagination.
+    cell_internal_pressure_note:
+      state:
+        tag: value
+        value: ~1x10^-6 mbar base; low-10^-4 mbar with MS aperture; 0.01-0.1 mbar peak outgassing (as printed)
+      locator:
+        pdf_page_index: 7
+        section: 2.1-2.2 vacuum MS and chemical analysis
+        note: Icarus journal pre-proof; no printed pagination.
   work_id: 10.1016/j.icarus.2023.115577
   locator:
     pdf_page_index: 7

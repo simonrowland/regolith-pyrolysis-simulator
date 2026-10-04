@@ -64,6 +64,13 @@ experiments:
       regime_class:
         tag: unknown
         reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+    cell_internal_pressure_note:
+      state:
+        tag: value
+        value: KMS upper limit ~1e-4 atm as stated for the method (section 6 / printed p. 9)
+      locator:
+        page: 9
+        paragraph: upper pressure limits of 10^-4 and one atm
   work_id: 10.6028/nbs.ir.81-2279
   locator:
     page: 53
@@ -124,6 +131,80 @@ experiments:
                 paragraph: relatively small effusion orifice (0.34 mm diameter)
           output_unit: m
   bench_id: 10.6028/nbs.ir.81-2279::bench::hastie-1981-kms
+- experiment_id: 10.6028/nbs.ir.81-2279::experiment::hastie-1981-pt-tms
+  kind: literature
+  method:
+    tag: value
+    value: transpiration
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: experiment temperature not published
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '20265'
+          interval_high: '101325'
+          approximate: false
+      locator:
+        page: 9
+        paragraph: usually operated at total pressures of 0.2 to 1.0 atm
+      inference:
+        relation: atm_to_Pa
+        inputs:
+        - P_Pa = P_atm × 101325
+        - original_unit=atm
+        - as_published=usually operated at total pressures of 0.2 to 1.0 atm
+        - printed=total_pressure_atm
+        - as_printed=usually operated at total pressures of 0.2 to 1.0 atm
+        - original_interval=0.2..1 atm
+        parameters:
+        - - factor
+          - state:
+              tag: value
+              value: '101325'
+            locator:
+              page: 9
+              paragraph: usually operated at total pressures of 0.2 to 1.0 atm
+        output_unit: Pa
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+    cell_internal_pressure_note:
+      state:
+        tag: value
+        value: Table 2 potassium pressures are TMS measurements under neutral conditions (printed p. 22 / PDF 28); TMS usual
+          operating range 0.2-1.0 atm binds via TMS experiment. KMS method limit ~1e-4 atm (section 6 / p. 9) stays with KMS
+          runs.
+      locator:
+        page: 22
+        published_page: 22
+        pdf_page_index: 28
+        paragraph: Table 2 potassium pressures as TMS under neutral conditions
+  work_id: 10.6028/nbs.ir.81-2279
+  locator:
+    page: 9
+    paragraph: usually operated at total pressures of 0.2 to 1.0 atm
+    note: TMS usual operating range; NaCl and Table 2 K are TMS (printed p. 11 / p. 22)
+  apparatus:
+    cell_material_and_liner:
+      state:
+        tag: value
+        value: platinum TMS reactor (boat, carrier, probe)
+      locator:
+        page: 9
+        paragraph: all of these components were fabricated from platinum metal
+  bench_id: 10.6028/nbs.ir.81-2279::bench::hastie-1981-tms
 - experiment_id: 10.6028/nbs.ir.81-2279::kems-020-hastie-1981-nbsir
   kind: literature
   method:
@@ -256,16 +337,8 @@ experiments:
     published_page: 23
     pdf_page_index: 29
     table: '2'
-    note: Table 2 continues report pp. 23-25 / PDF pp. 29-31
-    source_path: docs-private/research/2026-08-27-ocr-repair/kems-020-hastie-1981-nbsir/tables.md
+    note: rotated Table 2 ~17[K2O] row; report p. 23
   apparatus:
-    cell_material_and_liner:
-      state:
-        tag: value
-        value: platinum TMS reactor (boat, carrier, probe)
-      locator:
-        page: 9
-        paragraph: all of these components were fabricated from platinum metal
     geometry:
       orifice_diameter_m:
         state:
@@ -333,4 +406,30 @@ benches:
       pdf_page_index: 59
       figure: '20'
       note: 'Figure 20 caption: “KMS data with Pt-cell orifice diameter of 0.34 mm.”'
+  other_facts: []
+- id: 10.6028/nbs.ir.81-2279::bench::hastie-1981-tms
+  work_id: 10.6028/nbs.ir.81-2279
+  identity:
+    basis: described_in_this_work
+  apparatus_family:
+    state:
+      tag: value
+      value: Transpiration mass spectrometry
+    locator:
+      page: 9
+      paragraph: primary experimental methods KMS and TMS
+  cell_material_and_liner:
+    state:
+      tag: value
+      value: platinum TMS reactor (boat, carrier, probe)
+    locator:
+      page: 9
+      paragraph: all of these components were fabricated from platinum metal
+  cell_materials:
+  - state:
+      tag: value
+      value: Pt
+    locator:
+      page: 9
+      paragraph: all of these components were fabricated from platinum metal
   other_facts: []

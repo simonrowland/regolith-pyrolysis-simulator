@@ -170,6 +170,13 @@ experiments:
       regime_class:
         tag: unknown
         reason: not_published
+    cell_internal_pressure_note:
+      state:
+        tag: value
+        value: Ausheiz-Peaks tabulated in Tabelle 5.1/5.8; not a commanded pO2
+      locator:
+        page: 68
+        table: '5.1'
   work_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356
   locator:
     page: 105
@@ -322,6 +329,13 @@ experiments:
       regime_class:
         tag: unknown
         reason: not_published
+    cell_internal_pressure_note:
+      state:
+        tag: value
+        value: Ausheiz-Peaks tabulated in Tabelle 5.1/5.8; not a commanded pO2
+      locator:
+        page: 68
+        table: '5.1'
   work_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356
   locator:
     page: 105
@@ -474,6 +488,13 @@ experiments:
       regime_class:
         tag: unknown
         reason: not_published
+    cell_internal_pressure_note:
+      state:
+        tag: value
+        value: Ausheiz-Peaks tabulated in Tabelle 5.1/5.8; not a commanded pO2
+      locator:
+        page: 68
+        table: '5.1'
   work_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356
   locator:
     page: 105
@@ -626,6 +647,13 @@ experiments:
       regime_class:
         tag: unknown
         reason: not_published
+    cell_internal_pressure_note:
+      state:
+        tag: value
+        value: Ausheiz-Peaks tabulated in Tabelle 5.1/5.8; not a commanded pO2
+      locator:
+        page: 68
+        table: '5.1'
   work_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356
   locator:
     page: 105
@@ -689,10 +717,21 @@ experiments:
     printed_composition:
       state:
         tag: value
-        value: NASA JSC-1 basaltic lunar soil simulant
+        value:
+          SiO2: '47.7'
+          Al2O3: '15'
+          CaO: '10.4'
+          MgO: '9'
+          FeO: '7.4'
+          Fe2O3: '3.4'
+          K2O: '0.8'
+          TiO2: '1.6'
+          Na2O: '2.7'
       locator:
         page: 17
+        figure: '2.2'
         section: 2.1.2 Mondstaub-Simulat JSC-1
+        note: JSC-1 oxide pie labels after McKay et al. 1994 [MKCa 94]; NASA JSC-1 basaltic lunar soil simulant
     form:
       state:
         tag: value
@@ -730,11 +769,82 @@ experiments:
       regime_class:
         tag: unknown
         reason: not_published
+    cell_internal_pressure_note:
+      state:
+        tag: value
+        value: QMS Messkreuz baseline forced to 1e-7 mbar on this figure; chamber high-T peaks are in Tabelle 5.8 (MS1 peak/base
+          17.1)
+      locator:
+        page: 107
+        figure: '5.56'
   work_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356
   locator:
     page: 105
     table: '5.3'
     note: JSC-1 MS1/MS2/MS4/MS5 series; table preserves run-specific mass, peak temperature, and high-temperature duration
+  bench_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356::bench::dlr-solar-vacuum-system
+- experiment_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356::experiment::oxide-reference-series
+  kind: literature
+  method:
+    tag: value
+    value: solar_furnace_pyrolysis
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value: Simple oxide and empty sample holder reference runs
+      locator:
+        page: 68
+        table: '5.1'
+    form:
+      state:
+        tag: value
+        value: Powder or empty holder
+      locator:
+        page: 54
+        section: 4.1.2 Pulverproben
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 68
+        table: '5.1'
+        note: Reference runs have distinct Tmax
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 68
+        table: '5.1'
+        note: Chamber Druckwerte tabulated per phase; no single commanded total assigned
+    sweep_gas:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        page: 36
+        section: 3.2.1 Vakuumkammer und Pumpstände
+        note: High-vacuum operation
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+    cell_internal_pressure_note:
+      state:
+        tag: value
+        value: QMS Messkreuz; valve-set ~10x below chamber. Baseline of this figure forced to 1e-7 mbar.
+      locator:
+        page: 105
+        figure: '5.55'
+  work_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356
+  locator:
+    page: 68
+    table: '5.1'
+    note: Oxide and empty-holder reference runs (ohne Probe, CaO, SiO2, ZnO); Fig. 5.55 O2 traces
   bench_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356::bench::dlr-solar-vacuum-system
 - experiment_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356::kems-035-sauerborn-2005
   kind: literature
@@ -817,3 +927,40 @@ benches:
       page: 34
       section: 3 Experimenteller Aufbau
   other_facts: []
+context:
+- observation_id: sauerborn_2005_fig22_apollo14_nr_14163_oxide_pie
+  type: analytical_composition
+  locator:
+    figure: '2.2'
+    page: 17
+    paragraph: Kapitel 2.1.2
+    note: Apollo 14 Nr. 14163 comparison pie; not experimental JSC-1 feedstock
+  phase: Apollo_14_Nr_14163_lunar_soil
+  regime: secondary_compilation_comparison
+  units: wt_percent
+  values:
+    quantity: apollo14_nr_14163_oxide_pie_labels
+    method_class: secondary_compilation
+    semantics: verbatim_comparison_context_not_engine_input
+    citation_as_published: MKCa 94
+    identity_as_published: Apollo 14 Nr. 14163
+    basis: wt_percent
+    printed_total: '99.5'
+    oxides_wt_pct_as_published:
+      SiO2: '47.3'
+      Al2O3: '17.8'
+      CaO: '11.4'
+      MgO: '9.6'
+      FeO: '10.5'
+      Fe2O3: '0.0'
+      K2O: '0.6'
+      TiO2: '1.6'
+      Na2O: '0.7'
+    printed_quote: 'Mondstaub | Mare-Regolith | (Apollo14: Nr. 14163) | Analyse der Oxide: SiO₂ 47.3; Al₂O₃ 17.8; CaO 11.4;
+      MgO 9.6; FeO 10.5; Fe₂O₃ 0; K₂O 0.6; TiO₂ 1.6; Na₂O 0.7'
+  uncertainty:
+    note: no uncertainty printed on the pie labels; sum of printed pie components is 99.5
+  context_id: kems-035-sauerborn-2005::context::sauerborn_2005_fig22_apollo14_nr_14163_oxide_pie
+  work_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356
+  source_id: kems-035-sauerborn-2005
+  species: Na
