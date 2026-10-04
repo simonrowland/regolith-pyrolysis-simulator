@@ -2564,14 +2564,14 @@ _FUSION_TABLES = {
 # The source hashes identify the JANAF text; pin the extracted temperature-node
 # sets too so a dropped compiled row cannot silently widen interpolation.
 _FUSION_NODE_SET_SHA256 = {
-    "Al-096": "86986e6bc3d75c0fec4c3a034a1deab91e966c42d5e0f1cb4080a33d10aa6bed",
-    "Al-100": "b61dfea8f1da3f3a90ba7c7ceedc7b1cd04048c46fb4cf20bf5e5c3c4f0c0b18",
-    "Ca-027": "0b4adb5cf7b86a053c456688e9e635947ca38276f7b703cb00062ca5f00dbb5c",
-    "Ca-028": "4a9048a895bd8b3e499110d27edbbbe984c8c130881687ee8654a2f750afb765",
-    "Mg-008": "b61dfea8f1da3f3a90ba7c7ceedc7b1cd04048c46fb4cf20bf5e5c3c4f0c0b18",
-    "Mg-009": "e7c4becbfe7033b2b739a3b12f1404808d4fa05c33c4ee04d15cc1e5c114d8d4",
+    "Al-096": "4fdff7891379ea07bbc7c0ca5254fdec29a4c5d3a6d35e1b8098004da618f6dc",
+    "Al-100": "516fee6dda1c692a9b05507efce187256bec6f22b7928058f585834d2e28164d",
+    "Ca-027": "376641f4fa64958a281184501eb5d3b621da105aee6bc625b26dd35e5d0ff061",
+    "Ca-028": "045d9b4eca578094b9321cbdb0c1db10dcea80f2ca925fc59ae86f01c8069acd",
+    "Mg-008": "d90e9f5d25d9202d685f0690078ba27104b1446d12b46644a7d24a4a44c2505e",
+    "Mg-009": "1444ecc52a9e18a3cb76a953750798bc18b74661abfc721e41dc1a3aa8620a7e",
     "O-035": "86986e6bc3d75c0fec4c3a034a1deab91e966c42d5e0f1cb4080a33d10aa6bed",
-    "O-038": "4a9048a895bd8b3e499110d27edbbbe984c8c130881687ee8654a2f750afb765",
+    "O-038": "c0cbb21a4e8d7387b9a379c21edc29a61d124efb398711e402fe5c3ff9038791",
 }
 _ACCEPTED_MELTING_K = {
     "CaO": Decimal("2886"),

@@ -16,7 +16,6 @@ compilation_role:
   scoring_eligible: false
   battery_refusal: gibbs_table_not_runtime_observable
   circularity_warning: Do not validate an engine against a compilation it consumes.
-  pure_substance_reference: true
 extraction:
   method: machine parse of NIST tab-delimited table download; source bytes cached unchanged
   user_agent: RegolithPyrolysisSimulator-corpus-harvester/1.0 (public thermochemical reference-data research; polite cached
@@ -912,87 +911,6 @@ table:
         download_url: https://janaf.nist.gov/tables/Al-050.txt
         row_temperature_as_published: '1000'
         column: log Kf
-  - temperature:
-      value: 1100.0
-      as_published: '1100'
-      locator:
-        table_id: Al-050
-        url: https://janaf.nist.gov/tables/Al-050.html
-        download_url: https://janaf.nist.gov/tables/Al-050.txt
-        row_temperature_as_published: '1100'
-        column: T(K)
-    heat_capacity:
-      value: 359.824
-      as_published: '359.824'
-      locator:
-        table_id: Al-050
-        url: https://janaf.nist.gov/tables/Al-050.html
-        download_url: https://janaf.nist.gov/tables/Al-050.txt
-        row_temperature_as_published: '1100'
-        column: Cp
-    entropy:
-      value: 613.371
-      as_published: '613.371'
-      locator:
-        table_id: Al-050
-        url: https://janaf.nist.gov/tables/Al-050.html
-        download_url: https://janaf.nist.gov/tables/Al-050.txt
-        row_temperature_as_published: '1100'
-        column: S
-    negative_gibbs_enthalpy_function:
-      value: 393.022
-      as_published: '393.022'
-      locator:
-        table_id: Al-050
-        url: https://janaf.nist.gov/tables/Al-050.html
-        download_url: https://janaf.nist.gov/tables/Al-050.txt
-        row_temperature_as_published: '1100'
-        column: -[G-H(Tr)]/T
-    enthalpy_increment:
-      value: 242.383
-      as_published: '242.383'
-      locator:
-        table_id: Al-050
-        url: https://janaf.nist.gov/tables/Al-050.html
-        download_url: https://janaf.nist.gov/tables/Al-050.txt
-        row_temperature_as_published: '1100'
-        column: H-H(Tr)
-    formation_enthalpy:
-      value: -3272.388
-      as_published: '3272.388'
-      locator:
-        table_id: Al-050
-        url: https://janaf.nist.gov/tables/Al-050.html
-        download_url: https://janaf.nist.gov/tables/Al-050.txt
-        row_temperature_as_published: '1100'
-        column: delta-f H
-        parse_repair: nist_tail_whitespace_signs_restored
-        line_number: 18
-        raw_line: "1100\t359.824\t613.371\t393.022\t242.383\t3272.388  2803.892 133.146"
-    formation_gibbs_energy:
-      value: -2803.892
-      as_published: '2803.892'
-      locator:
-        table_id: Al-050
-        url: https://janaf.nist.gov/tables/Al-050.html
-        download_url: https://janaf.nist.gov/tables/Al-050.txt
-        row_temperature_as_published: '1100'
-        column: delta-f G
-        parse_repair: nist_tail_whitespace_signs_restored
-        line_number: 18
-        raw_line: "1100\t359.824\t613.371\t393.022\t242.383\t3272.388  2803.892 133.146"
-    log10_formation_equilibrium_constant:
-      value: 133.146
-      as_published: '133.146'
-      locator:
-        table_id: Al-050
-        url: https://janaf.nist.gov/tables/Al-050.html
-        download_url: https://janaf.nist.gov/tables/Al-050.txt
-        row_temperature_as_published: '1100'
-        column: log Kf
-        parse_repair: nist_tail_whitespace_signs_restored
-        line_number: 18
-        raw_line: "1100\t359.824\t613.371\t393.022\t242.383\t3272.388  2803.892 133.146"
   - temperature:
       value: 1200.0
       as_published: '1200'
@@ -2380,3 +2298,10 @@ table:
     locator:
       table_id: Al-050
       url: https://janaf.nist.gov/tables/Al-050.html
+  - line_number: 18
+    raw_line: "1100\t359.824\t613.371\t393.022\t242.383\t3272.388  2803.892 133.146"
+    reason: 'refused JANAF tail sign restoration: formation enthalpy neighbors span a transition marker'
+    locator:
+      table_id: Al-050
+      url: https://janaf.nist.gov/tables/Al-050.html
+    kind: nist_tail_whitespace_signs_unresolved

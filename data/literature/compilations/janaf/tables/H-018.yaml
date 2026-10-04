@@ -696,87 +696,6 @@ table:
         row_temperature_as_published: '700'
         column: log Kf
   - temperature:
-      value: 800.0
-      as_published: '800'
-      locator:
-        table_id: H-018
-        url: https://janaf.nist.gov/tables/H-018.html
-        download_url: https://janaf.nist.gov/tables/H-018.txt
-        row_temperature_as_published: '800'
-        column: T(K)
-    heat_capacity:
-      value: 76.086
-      as_published: '76.086'
-      locator:
-        table_id: H-018
-        url: https://janaf.nist.gov/tables/H-018.html
-        download_url: https://janaf.nist.gov/tables/H-018.txt
-        row_temperature_as_published: '800'
-        column: Cp
-    entropy:
-      value: 105.002
-      as_published: '105.002'
-      locator:
-        table_id: H-018
-        url: https://janaf.nist.gov/tables/H-018.html
-        download_url: https://janaf.nist.gov/tables/H-018.txt
-        row_temperature_as_published: '800'
-        column: S
-    negative_gibbs_enthalpy_function:
-      value: 64.18
-      as_published: '64.180'
-      locator:
-        table_id: H-018
-        url: https://janaf.nist.gov/tables/H-018.html
-        download_url: https://janaf.nist.gov/tables/H-018.txt
-        row_temperature_as_published: '800'
-        column: -[G-H(Tr)]/T
-    enthalpy_increment:
-      value: 32.658
-      as_published: '32.658'
-      locator:
-        table_id: H-018
-        url: https://janaf.nist.gov/tables/H-018.html
-        download_url: https://janaf.nist.gov/tables/H-018.txt
-        row_temperature_as_published: '800'
-        column: H-H(Tr)
-    formation_enthalpy:
-      value: -484.92
-      as_published: '484.920'
-      locator:
-        table_id: H-018
-        url: https://janaf.nist.gov/tables/H-018.html
-        download_url: https://janaf.nist.gov/tables/H-018.txt
-        row_temperature_as_published: '800'
-        column: delta-f H
-        parse_repair: nist_tail_whitespace_signs_restored
-        line_number: 13
-        raw_line: "800\t76.086\t105.002\t64.180\t32.658\t484.920  359.805 23.493"
-    formation_gibbs_energy:
-      value: -359.805
-      as_published: '359.805'
-      locator:
-        table_id: H-018
-        url: https://janaf.nist.gov/tables/H-018.html
-        download_url: https://janaf.nist.gov/tables/H-018.txt
-        row_temperature_as_published: '800'
-        column: delta-f G
-        parse_repair: nist_tail_whitespace_signs_restored
-        line_number: 13
-        raw_line: "800\t76.086\t105.002\t64.180\t32.658\t484.920  359.805 23.493"
-    log10_formation_equilibrium_constant:
-      value: 23.493
-      as_published: '23.493'
-      locator:
-        table_id: H-018
-        url: https://janaf.nist.gov/tables/H-018.html
-        download_url: https://janaf.nist.gov/tables/H-018.txt
-        row_temperature_as_published: '800'
-        column: log Kf
-        parse_repair: nist_tail_whitespace_signs_restored
-        line_number: 13
-        raw_line: "800\t76.086\t105.002\t64.180\t32.658\t484.920  359.805 23.493"
-  - temperature:
       value: 900.0
       as_published: '900'
       locator:
@@ -1287,3 +1206,10 @@ table:
     locator:
       table_id: H-018
       url: https://janaf.nist.gov/tables/H-018.html
+  - line_number: 13
+    raw_line: "800\t76.086\t105.002\t64.180\t32.658\t484.920  359.805 23.493"
+    reason: 'refused JANAF tail sign restoration: formation enthalpy neighbors span a transition marker'
+    locator:
+      table_id: H-018
+      url: https://janaf.nist.gov/tables/H-018.html
+    kind: nist_tail_whitespace_signs_unresolved

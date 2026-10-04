@@ -1062,87 +1062,6 @@ table:
         row_temperature_as_published: '1200'
         column: log Kf
   - temperature:
-      value: 1300.0
-      as_published: '1300'
-      locator:
-        table_id: O-019
-        url: https://janaf.nist.gov/tables/O-019.html
-        download_url: https://janaf.nist.gov/tables/O-019.txt
-        row_temperature_as_published: '1300'
-        column: T(K)
-    heat_capacity:
-      value: 64.643
-      as_published: '64.643'
-      locator:
-        table_id: O-019
-        url: https://janaf.nist.gov/tables/O-019.html
-        download_url: https://janaf.nist.gov/tables/O-019.txt
-        row_temperature_as_published: '1300'
-        column: Cp
-    entropy:
-      value: 114.192
-      as_published: '114.192'
-      locator:
-        table_id: O-019
-        url: https://janaf.nist.gov/tables/O-019.html
-        download_url: https://janaf.nist.gov/tables/O-019.txt
-        row_temperature_as_published: '1300'
-        column: S
-    negative_gibbs_enthalpy_function:
-      value: 72.209
-      as_published: '72.209'
-      locator:
-        table_id: O-019
-        url: https://janaf.nist.gov/tables/O-019.html
-        download_url: https://janaf.nist.gov/tables/O-019.txt
-        row_temperature_as_published: '1300'
-        column: -[G-H(Tr)]/T
-    enthalpy_increment:
-      value: 54.578
-      as_published: '54.578'
-      locator:
-        table_id: O-019
-        url: https://janaf.nist.gov/tables/O-019.html
-        download_url: https://janaf.nist.gov/tables/O-019.txt
-        row_temperature_as_published: '1300'
-        column: H-H(Tr)
-    formation_enthalpy:
-      value: -534.515
-      as_published: '534.515'
-      locator:
-        table_id: O-019
-        url: https://janaf.nist.gov/tables/O-019.html
-        download_url: https://janaf.nist.gov/tables/O-019.txt
-        row_temperature_as_published: '1300'
-        column: delta-f H
-        parse_repair: nist_tail_whitespace_signs_restored
-        line_number: 18
-        raw_line: "1300\t64.643\t114.192\t72.209\t54.578\t534.515  418.671 16.822"
-    formation_gibbs_energy:
-      value: -418.671
-      as_published: '418.671'
-      locator:
-        table_id: O-019
-        url: https://janaf.nist.gov/tables/O-019.html
-        download_url: https://janaf.nist.gov/tables/O-019.txt
-        row_temperature_as_published: '1300'
-        column: delta-f G
-        parse_repair: nist_tail_whitespace_signs_restored
-        line_number: 18
-        raw_line: "1300\t64.643\t114.192\t72.209\t54.578\t534.515  418.671 16.822"
-    log10_formation_equilibrium_constant:
-      value: 16.822
-      as_published: '16.822'
-      locator:
-        table_id: O-019
-        url: https://janaf.nist.gov/tables/O-019.html
-        download_url: https://janaf.nist.gov/tables/O-019.txt
-        row_temperature_as_published: '1300'
-        column: log Kf
-        parse_repair: nist_tail_whitespace_signs_restored
-        line_number: 18
-        raw_line: "1300\t64.643\t114.192\t72.209\t54.578\t534.515  418.671 16.822"
-  - temperature:
       value: 1400.0
       as_published: '1400'
       locator:
@@ -1647,87 +1566,6 @@ table:
         row_temperature_as_published: '2000'
         column: log Kf
   - temperature:
-      value: 2100.0
-      as_published: '2100'
-      locator:
-        table_id: O-019
-        url: https://janaf.nist.gov/tables/O-019.html
-        download_url: https://janaf.nist.gov/tables/O-019.txt
-        row_temperature_as_published: '2100'
-        column: T(K)
-    heat_capacity:
-      value: 78.91
-      as_published: '78.910'
-      locator:
-        table_id: O-019
-        url: https://janaf.nist.gov/tables/O-019.html
-        download_url: https://janaf.nist.gov/tables/O-019.txt
-        row_temperature_as_published: '2100'
-        column: Cp
-    entropy:
-      value: 148.358
-      as_published: '148.358'
-      locator:
-        table_id: O-019
-        url: https://janaf.nist.gov/tables/O-019.html
-        download_url: https://janaf.nist.gov/tables/O-019.txt
-        row_temperature_as_published: '2100'
-        column: S
-    negative_gibbs_enthalpy_function:
-      value: 95.012
-      as_published: '95.012'
-      locator:
-        table_id: O-019
-        url: https://janaf.nist.gov/tables/O-019.html
-        download_url: https://janaf.nist.gov/tables/O-019.txt
-        row_temperature_as_published: '2100'
-        column: -[G-H(Tr)]/T
-    enthalpy_increment:
-      value: 112.027
-      as_published: '112.027'
-      locator:
-        table_id: O-019
-        url: https://janaf.nist.gov/tables/O-019.html
-        download_url: https://janaf.nist.gov/tables/O-019.txt
-        row_temperature_as_published: '2100'
-        column: H-H(Tr)
-    formation_enthalpy:
-      value: -535.079
-      as_published: '535.079'
-      locator:
-        table_id: O-019
-        url: https://janaf.nist.gov/tables/O-019.html
-        download_url: https://janaf.nist.gov/tables/O-019.txt
-        row_temperature_as_published: '2100'
-        column: delta-f H
-        parse_repair: nist_tail_whitespace_signs_restored
-        line_number: 27
-        raw_line: "2100\t78.910\t148.358\t95.012\t112.027\t535.079  349.883 8.703"
-    formation_gibbs_energy:
-      value: -349.883
-      as_published: '349.883'
-      locator:
-        table_id: O-019
-        url: https://janaf.nist.gov/tables/O-019.html
-        download_url: https://janaf.nist.gov/tables/O-019.txt
-        row_temperature_as_published: '2100'
-        column: delta-f G
-        parse_repair: nist_tail_whitespace_signs_restored
-        line_number: 27
-        raw_line: "2100\t78.910\t148.358\t95.012\t112.027\t535.079  349.883 8.703"
-    log10_formation_equilibrium_constant:
-      value: 8.703
-      as_published: '8.703'
-      locator:
-        table_id: O-019
-        url: https://janaf.nist.gov/tables/O-019.html
-        download_url: https://janaf.nist.gov/tables/O-019.txt
-        row_temperature_as_published: '2100'
-        column: log Kf
-        parse_repair: nist_tail_whitespace_signs_restored
-        line_number: 27
-        raw_line: "2100\t78.910\t148.358\t95.012\t112.027\t535.079  349.883 8.703"
-  - temperature:
       value: 2200.0
       as_published: '2200'
       locator:
@@ -2022,9 +1860,23 @@ table:
     locator:
       table_id: O-019
       url: https://janaf.nist.gov/tables/O-019.html
+  - line_number: 18
+    raw_line: "1300\t64.643\t114.192\t72.209\t54.578\t534.515  418.671 16.822"
+    reason: 'refused JANAF tail sign restoration: formation enthalpy neighbors span a transition marker'
+    locator:
+      table_id: O-019
+      url: https://janaf.nist.gov/tables/O-019.html
+    kind: nist_tail_whitespace_signs_unresolved
   - line_number: 26
     raw_line: "2023.000\t77.551\t145.436\t93.037\t106.003\tBETA <--> LIQUID"
     reason: expected 8 tab-separated values; found 6
     locator:
       table_id: O-019
       url: https://janaf.nist.gov/tables/O-019.html
+  - line_number: 27
+    raw_line: "2100\t78.910\t148.358\t95.012\t112.027\t535.079  349.883 8.703"
+    reason: 'refused JANAF tail sign restoration: formation enthalpy neighbors span a transition marker'
+    locator:
+      table_id: O-019
+      url: https://janaf.nist.gov/tables/O-019.html
+    kind: nist_tail_whitespace_signs_unresolved

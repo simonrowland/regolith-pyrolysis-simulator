@@ -1200,87 +1200,6 @@ table:
         row_temperature_as_published: '1400'
         column: log Kf
   - temperature:
-      value: 1500.0
-      as_published: '1500'
-      locator:
-        table_id: Co-009
-        url: https://janaf.nist.gov/tables/Co-009.html
-        download_url: https://janaf.nist.gov/tables/Co-009.txt
-        row_temperature_as_published: '1500'
-        column: T(K)
-    heat_capacity:
-      value: 104.6
-      as_published: '104.600'
-      locator:
-        table_id: Co-009
-        url: https://janaf.nist.gov/tables/Co-009.html
-        download_url: https://janaf.nist.gov/tables/Co-009.txt
-        row_temperature_as_published: '1500'
-        column: Cp
-    entropy:
-      value: 255.232
-      as_published: '255.232'
-      locator:
-        table_id: Co-009
-        url: https://janaf.nist.gov/tables/Co-009.html
-        download_url: https://janaf.nist.gov/tables/Co-009.txt
-        row_temperature_as_published: '1500'
-        column: S
-    negative_gibbs_enthalpy_function:
-      value: 171.423
-      as_published: '171.423'
-      locator:
-        table_id: Co-009
-        url: https://janaf.nist.gov/tables/Co-009.html
-        download_url: https://janaf.nist.gov/tables/Co-009.txt
-        row_temperature_as_published: '1500'
-        column: -[G-H(Tr)]/T
-    enthalpy_increment:
-      value: 125.714
-      as_published: '125.714'
-      locator:
-        table_id: Co-009
-        url: https://janaf.nist.gov/tables/Co-009.html
-        download_url: https://janaf.nist.gov/tables/Co-009.txt
-        row_temperature_as_published: '1500'
-        column: H-H(Tr)
-    formation_enthalpy:
-      value: -599.094
-      as_published: '599.094'
-      locator:
-        table_id: Co-009
-        url: https://janaf.nist.gov/tables/Co-009.html
-        download_url: https://janaf.nist.gov/tables/Co-009.txt
-        row_temperature_as_published: '1500'
-        column: delta-f H
-        parse_repair: nist_tail_whitespace_signs_restored
-        line_number: 20
-        raw_line: "1500\t104.600\t255.232\t171.423\t125.714\t599.094  466.535 16.246"
-    formation_gibbs_energy:
-      value: -466.535
-      as_published: '466.535'
-      locator:
-        table_id: Co-009
-        url: https://janaf.nist.gov/tables/Co-009.html
-        download_url: https://janaf.nist.gov/tables/Co-009.txt
-        row_temperature_as_published: '1500'
-        column: delta-f G
-        parse_repair: nist_tail_whitespace_signs_restored
-        line_number: 20
-        raw_line: "1500\t104.600\t255.232\t171.423\t125.714\t599.094  466.535 16.246"
-    log10_formation_equilibrium_constant:
-      value: 16.246
-      as_published: '16.246'
-      locator:
-        table_id: Co-009
-        url: https://janaf.nist.gov/tables/Co-009.html
-        download_url: https://janaf.nist.gov/tables/Co-009.txt
-        row_temperature_as_published: '1500'
-        column: log Kf
-        parse_repair: nist_tail_whitespace_signs_restored
-        line_number: 20
-        raw_line: "1500\t104.600\t255.232\t171.423\t125.714\t599.094  466.535 16.246"
-  - temperature:
       value: 1600.0
       as_published: '1600'
       locator:
@@ -2367,3 +2286,10 @@ table:
     locator:
       table_id: Co-009
       url: https://janaf.nist.gov/tables/Co-009.html
+  - line_number: 20
+    raw_line: "1500\t104.600\t255.232\t171.423\t125.714\t599.094  466.535 16.246"
+    reason: 'refused JANAF tail sign restoration: formation enthalpy neighbors span a transition marker'
+    locator:
+      table_id: Co-009
+      url: https://janaf.nist.gov/tables/Co-009.html
+    kind: nist_tail_whitespace_signs_unresolved

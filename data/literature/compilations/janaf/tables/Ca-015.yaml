@@ -1350,87 +1350,6 @@ table:
         row_temperature_as_published: '1600'
         column: log Kf
   - temperature:
-      value: 1700.0
-      as_published: '1700'
-      locator:
-        table_id: Ca-015
-        url: https://janaf.nist.gov/tables/Ca-015.html
-        download_url: https://janaf.nist.gov/tables/Ca-015.txt
-        row_temperature_as_published: '1700'
-        column: T(K)
-    heat_capacity:
-      value: 99.914
-      as_published: '99.914'
-      locator:
-        table_id: Ca-015
-        url: https://janaf.nist.gov/tables/Ca-015.html
-        download_url: https://janaf.nist.gov/tables/Ca-015.txt
-        row_temperature_as_published: '1700'
-        column: Cp
-    entropy:
-      value: 240.174
-      as_published: '240.174'
-      locator:
-        table_id: Ca-015
-        url: https://janaf.nist.gov/tables/Ca-015.html
-        download_url: https://janaf.nist.gov/tables/Ca-015.txt
-        row_temperature_as_published: '1700'
-        column: S
-    negative_gibbs_enthalpy_function:
-      value: 165.988
-      as_published: '165.988'
-      locator:
-        table_id: Ca-015
-        url: https://janaf.nist.gov/tables/Ca-015.html
-        download_url: https://janaf.nist.gov/tables/Ca-015.txt
-        row_temperature_as_published: '1700'
-        column: -[G-H(Tr)]/T
-    enthalpy_increment:
-      value: 126.116
-      as_published: '126.116'
-      locator:
-        table_id: Ca-015
-        url: https://janaf.nist.gov/tables/Ca-015.html
-        download_url: https://janaf.nist.gov/tables/Ca-015.txt
-        row_temperature_as_published: '1700'
-        column: H-H(Tr)
-    formation_enthalpy:
-      value: -1167.935
-      as_published: '1167.935'
-      locator:
-        table_id: Ca-015
-        url: https://janaf.nist.gov/tables/Ca-015.html
-        download_url: https://janaf.nist.gov/tables/Ca-015.txt
-        row_temperature_as_published: '1700'
-        column: delta-f H
-        parse_repair: nist_tail_whitespace_signs_restored
-        line_number: 25
-        raw_line: "1700\t99.914\t240.174\t165.988\t126.116\t1167.935  945.444 29.050"
-    formation_gibbs_energy:
-      value: -945.444
-      as_published: '945.444'
-      locator:
-        table_id: Ca-015
-        url: https://janaf.nist.gov/tables/Ca-015.html
-        download_url: https://janaf.nist.gov/tables/Ca-015.txt
-        row_temperature_as_published: '1700'
-        column: delta-f G
-        parse_repair: nist_tail_whitespace_signs_restored
-        line_number: 25
-        raw_line: "1700\t99.914\t240.174\t165.988\t126.116\t1167.935  945.444 29.050"
-    log10_formation_equilibrium_constant:
-      value: 29.05
-      as_published: '29.050'
-      locator:
-        table_id: Ca-015
-        url: https://janaf.nist.gov/tables/Ca-015.html
-        download_url: https://janaf.nist.gov/tables/Ca-015.txt
-        row_temperature_as_published: '1700'
-        column: log Kf
-        parse_repair: nist_tail_whitespace_signs_restored
-        line_number: 25
-        raw_line: "1700\t99.914\t240.174\t165.988\t126.116\t1167.935  945.444 29.050"
-  - temperature:
       value: 1800.0
       as_published: '1800'
       locator:
@@ -3112,3 +3031,10 @@ table:
     locator:
       table_id: Ca-015
       url: https://janaf.nist.gov/tables/Ca-015.html
+  - line_number: 25
+    raw_line: "1700\t99.914\t240.174\t165.988\t126.116\t1167.935  945.444 29.050"
+    reason: 'refused JANAF tail sign restoration: formation enthalpy neighbors span a transition marker'
+    locator:
+      table_id: Ca-015
+      url: https://janaf.nist.gov/tables/Ca-015.html
+    kind: nist_tail_whitespace_signs_unresolved

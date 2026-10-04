@@ -486,87 +486,6 @@ table:
         row_temperature_as_published: '400'
         column: log Kf
   - temperature:
-      value: 500.0
-      as_published: '500'
-      locator:
-        table_id: Al-025
-        url: https://janaf.nist.gov/tables/Al-025.html
-        download_url: https://janaf.nist.gov/tables/Al-025.txt
-        row_temperature_as_published: '500'
-        column: T(K)
-    heat_capacity:
-      value: 108.868
-      as_published: '108.868'
-      locator:
-        table_id: Al-025
-        url: https://janaf.nist.gov/tables/Al-025.html
-        download_url: https://janaf.nist.gov/tables/Al-025.txt
-        row_temperature_as_published: '500'
-        column: Cp
-    entropy:
-      value: 160.594
-      as_published: '160.594'
-      locator:
-        table_id: Al-025
-        url: https://janaf.nist.gov/tables/Al-025.html
-        download_url: https://janaf.nist.gov/tables/Al-025.txt
-        row_temperature_as_published: '500'
-        column: S
-    negative_gibbs_enthalpy_function:
-      value: 120.224
-      as_published: '120.224'
-      locator:
-        table_id: Al-025
-        url: https://janaf.nist.gov/tables/Al-025.html
-        download_url: https://janaf.nist.gov/tables/Al-025.txt
-        row_temperature_as_published: '500'
-        column: -[G-H(Tr)]/T
-    enthalpy_increment:
-      value: 20.185
-      as_published: '20.185'
-      locator:
-        table_id: Al-025
-        url: https://janaf.nist.gov/tables/Al-025.html
-        download_url: https://janaf.nist.gov/tables/Al-025.txt
-        row_temperature_as_published: '500'
-        column: H-H(Tr)
-    formation_enthalpy:
-      value: -701.288
-      as_published: '701.288'
-      locator:
-        table_id: Al-025
-        url: https://janaf.nist.gov/tables/Al-025.html
-        download_url: https://janaf.nist.gov/tables/Al-025.txt
-        row_temperature_as_published: '500'
-        column: delta-f H
-        parse_repair: nist_tail_whitespace_signs_restored
-        line_number: 10
-        raw_line: "500\t108.868\t160.594\t120.224\t20.185\t701.288  579.914 60.583"
-    formation_gibbs_energy:
-      value: -579.914
-      as_published: '579.914'
-      locator:
-        table_id: Al-025
-        url: https://janaf.nist.gov/tables/Al-025.html
-        download_url: https://janaf.nist.gov/tables/Al-025.txt
-        row_temperature_as_published: '500'
-        column: delta-f G
-        parse_repair: nist_tail_whitespace_signs_restored
-        line_number: 10
-        raw_line: "500\t108.868\t160.594\t120.224\t20.185\t701.288  579.914 60.583"
-    log10_formation_equilibrium_constant:
-      value: 60.583
-      as_published: '60.583'
-      locator:
-        table_id: Al-025
-        url: https://janaf.nist.gov/tables/Al-025.html
-        download_url: https://janaf.nist.gov/tables/Al-025.txt
-        row_temperature_as_published: '500'
-        column: log Kf
-        parse_repair: nist_tail_whitespace_signs_restored
-        line_number: 10
-        raw_line: "500\t108.868\t160.594\t120.224\t20.185\t701.288  579.914 60.583"
-  - temperature:
       value: 600.0
       as_published: '600'
       locator:
@@ -1293,3 +1212,10 @@ table:
     locator:
       table_id: Al-025
       url: https://janaf.nist.gov/tables/Al-025.html
+  - line_number: 10
+    raw_line: "500\t108.868\t160.594\t120.224\t20.185\t701.288  579.914 60.583"
+    reason: 'refused JANAF tail sign restoration: formation enthalpy neighbors span a transition marker'
+    locator:
+      table_id: Al-025
+      url: https://janaf.nist.gov/tables/Al-025.html
+    kind: nist_tail_whitespace_signs_unresolved

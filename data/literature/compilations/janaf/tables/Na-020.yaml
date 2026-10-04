@@ -558,87 +558,6 @@ table:
         row_temperature_as_published: '500'
         column: log Kf
   - temperature:
-      value: 600.0
-      as_published: '600'
-      locator:
-        table_id: Na-020
-        url: https://janaf.nist.gov/tables/Na-020.html
-        download_url: https://janaf.nist.gov/tables/Na-020.txt
-        row_temperature_as_published: '600'
-        column: T(K)
-    heat_capacity:
-      value: 175.331
-      as_published: '175.331'
-      locator:
-        table_id: Na-020
-        url: https://janaf.nist.gov/tables/Na-020.html
-        download_url: https://janaf.nist.gov/tables/Na-020.txt
-        row_temperature_as_published: '600'
-        column: Cp
-    entropy:
-      value: 276.549
-      as_published: '276.549'
-      locator:
-        table_id: Na-020
-        url: https://janaf.nist.gov/tables/Na-020.html
-        download_url: https://janaf.nist.gov/tables/Na-020.txt
-        row_temperature_as_published: '600'
-        column: S
-    negative_gibbs_enthalpy_function:
-      value: 192.345
-      as_published: '192.345'
-      locator:
-        table_id: Na-020
-        url: https://janaf.nist.gov/tables/Na-020.html
-        download_url: https://janaf.nist.gov/tables/Na-020.txt
-        row_temperature_as_published: '600'
-        column: -[G-H(Tr)]/T
-    enthalpy_increment:
-      value: 50.522
-      as_published: '50.522'
-      locator:
-        table_id: Na-020
-        url: https://janaf.nist.gov/tables/Na-020.html
-        download_url: https://janaf.nist.gov/tables/Na-020.txt
-        row_temperature_as_published: '600'
-        column: H-H(Tr)
-    formation_enthalpy:
-      value: -1384.599
-      as_published: '1384.599'
-      locator:
-        table_id: Na-020
-        url: https://janaf.nist.gov/tables/Na-020.html
-        download_url: https://janaf.nist.gov/tables/Na-020.txt
-        row_temperature_as_published: '600'
-        column: delta-f H
-        parse_repair: nist_tail_whitespace_signs_restored
-        line_number: 11
-        raw_line: "600\t175.331\t276.549\t192.345\t50.522\t1384.599  1147.069 99.861"
-    formation_gibbs_energy:
-      value: -1147.069
-      as_published: '1147.069'
-      locator:
-        table_id: Na-020
-        url: https://janaf.nist.gov/tables/Na-020.html
-        download_url: https://janaf.nist.gov/tables/Na-020.txt
-        row_temperature_as_published: '600'
-        column: delta-f G
-        parse_repair: nist_tail_whitespace_signs_restored
-        line_number: 11
-        raw_line: "600\t175.331\t276.549\t192.345\t50.522\t1384.599  1147.069 99.861"
-    log10_formation_equilibrium_constant:
-      value: 99.861
-      as_published: '99.861'
-      locator:
-        table_id: Na-020
-        url: https://janaf.nist.gov/tables/Na-020.html
-        download_url: https://janaf.nist.gov/tables/Na-020.txt
-        row_temperature_as_published: '600'
-        column: log Kf
-        parse_repair: nist_tail_whitespace_signs_restored
-        line_number: 11
-        raw_line: "600\t175.331\t276.549\t192.345\t50.522\t1384.599  1147.069 99.861"
-  - temperature:
       value: 700.0
       as_published: '700'
       locator:
@@ -999,87 +918,6 @@ table:
         row_temperature_as_published: '1100'
         column: log Kf
   - temperature:
-      value: 1200.0
-      as_published: '1200'
-      locator:
-        table_id: Na-020
-        url: https://janaf.nist.gov/tables/Na-020.html
-        download_url: https://janaf.nist.gov/tables/Na-020.txt
-        row_temperature_as_published: '1200'
-        column: T(K)
-    heat_capacity:
-      value: 213.133
-      as_published: '213.133'
-      locator:
-        table_id: Na-020
-        url: https://janaf.nist.gov/tables/Na-020.html
-        download_url: https://janaf.nist.gov/tables/Na-020.txt
-        row_temperature_as_published: '1200'
-        column: Cp
-    entropy:
-      value: 409.428
-      as_published: '409.428'
-      locator:
-        table_id: Na-020
-        url: https://janaf.nist.gov/tables/Na-020.html
-        download_url: https://janaf.nist.gov/tables/Na-020.txt
-        row_temperature_as_published: '1200'
-        column: S
-    negative_gibbs_enthalpy_function:
-      value: 270.379
-      as_published: '270.379'
-      locator:
-        table_id: Na-020
-        url: https://janaf.nist.gov/tables/Na-020.html
-        download_url: https://janaf.nist.gov/tables/Na-020.txt
-        row_temperature_as_published: '1200'
-        column: -[G-H(Tr)]/T
-    enthalpy_increment:
-      value: 166.86
-      as_published: '166.860'
-      locator:
-        table_id: Na-020
-        url: https://janaf.nist.gov/tables/Na-020.html
-        download_url: https://janaf.nist.gov/tables/Na-020.txt
-        row_temperature_as_published: '1200'
-        column: H-H(Tr)
-    formation_enthalpy:
-      value: -1606.234
-      as_published: '1606.234'
-      locator:
-        table_id: Na-020
-        url: https://janaf.nist.gov/tables/Na-020.html
-        download_url: https://janaf.nist.gov/tables/Na-020.txt
-        row_temperature_as_published: '1200'
-        column: delta-f H
-        parse_repair: nist_tail_whitespace_signs_restored
-        line_number: 18
-        raw_line: "1200\t213.133\t409.428\t270.379\t166.860\t1606.234  892.663 38.857"
-    formation_gibbs_energy:
-      value: -892.663
-      as_published: '892.663'
-      locator:
-        table_id: Na-020
-        url: https://janaf.nist.gov/tables/Na-020.html
-        download_url: https://janaf.nist.gov/tables/Na-020.txt
-        row_temperature_as_published: '1200'
-        column: delta-f G
-        parse_repair: nist_tail_whitespace_signs_restored
-        line_number: 18
-        raw_line: "1200\t213.133\t409.428\t270.379\t166.860\t1606.234  892.663 38.857"
-    log10_formation_equilibrium_constant:
-      value: 38.857
-      as_published: '38.857'
-      locator:
-        table_id: Na-020
-        url: https://janaf.nist.gov/tables/Na-020.html
-        download_url: https://janaf.nist.gov/tables/Na-020.txt
-        row_temperature_as_published: '1200'
-        column: log Kf
-        parse_repair: nist_tail_whitespace_signs_restored
-        line_number: 18
-        raw_line: "1200\t213.133\t409.428\t270.379\t166.860\t1606.234  892.663 38.857"
-  - temperature:
       value: 1300.0
       as_published: '1300'
       locator:
@@ -1302,9 +1140,23 @@ table:
     locator:
       table_id: Na-020
       url: https://janaf.nist.gov/tables/Na-020.html
+  - line_number: 11
+    raw_line: "600\t175.331\t276.549\t192.345\t50.522\t1384.599  1147.069 99.861"
+    reason: 'refused JANAF tail sign restoration: formation enthalpy neighbors span a transition marker'
+    locator:
+      table_id: Na-020
+      url: https://janaf.nist.gov/tables/Na-020.html
+    kind: nist_tail_whitespace_signs_unresolved
   - line_number: 17
     raw_line: "1157.000\t210.367\t401.702\t265.354\t157.755\tI <--> LIQUID"
     reason: expected 8 tab-separated values; found 6
     locator:
       table_id: Na-020
       url: https://janaf.nist.gov/tables/Na-020.html
+  - line_number: 18
+    raw_line: "1200\t213.133\t409.428\t270.379\t166.860\t1606.234  892.663 38.857"
+    reason: 'refused JANAF tail sign restoration: formation enthalpy neighbors span a transition marker'
+    locator:
+      table_id: Na-020
+      url: https://janaf.nist.gov/tables/Na-020.html
+    kind: nist_tail_whitespace_signs_unresolved

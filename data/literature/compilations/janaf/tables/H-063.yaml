@@ -702,87 +702,6 @@ table:
         row_temperature_as_published: '360'
         column: log Kf
   - temperature:
-      value: 380.0
-      as_published: '380'
-      locator:
-        table_id: H-063
-        url: https://janaf.nist.gov/tables/H-063.html
-        download_url: https://janaf.nist.gov/tables/H-063.txt
-        row_temperature_as_published: '380'
-        column: T(K)
-    heat_capacity:
-      value: 76.154
-      as_published: '76.154'
-      locator:
-        table_id: H-063
-        url: https://janaf.nist.gov/tables/H-063.html
-        download_url: https://janaf.nist.gov/tables/H-063.txt
-        row_temperature_as_published: '380'
-        column: Cp
-    entropy:
-      value: 88.267
-      as_published: '88.267'
-      locator:
-        table_id: H-063
-        url: https://janaf.nist.gov/tables/H-063.html
-        download_url: https://janaf.nist.gov/tables/H-063.txt
-        row_temperature_as_published: '380'
-        column: S
-    negative_gibbs_enthalpy_function:
-      value: 72.0
-      as_published: '72.000'
-      locator:
-        table_id: H-063
-        url: https://janaf.nist.gov/tables/H-063.html
-        download_url: https://janaf.nist.gov/tables/H-063.txt
-        row_temperature_as_published: '380'
-        column: -[G-H(Tr)]/T
-    enthalpy_increment:
-      value: 6.182
-      as_published: '6.182'
-      locator:
-        table_id: H-063
-        url: https://janaf.nist.gov/tables/H-063.html
-        download_url: https://janaf.nist.gov/tables/H-063.txt
-        row_temperature_as_published: '380'
-        column: H-H(Tr)
-    formation_enthalpy:
-      value: -283.237
-      as_published: '283.237'
-      locator:
-        table_id: H-063
-        url: https://janaf.nist.gov/tables/H-063.html
-        download_url: https://janaf.nist.gov/tables/H-063.txt
-        row_temperature_as_published: '380'
-        column: delta-f H
-        parse_repair: nist_tail_whitespace_signs_restored
-        line_number: 13
-        raw_line: "380\t76.154\t88.267\t72.000\t6.182\t283.237  224.102 30.805"
-    formation_gibbs_energy:
-      value: -224.102
-      as_published: '224.102'
-      locator:
-        table_id: H-063
-        url: https://janaf.nist.gov/tables/H-063.html
-        download_url: https://janaf.nist.gov/tables/H-063.txt
-        row_temperature_as_published: '380'
-        column: delta-f G
-        parse_repair: nist_tail_whitespace_signs_restored
-        line_number: 13
-        raw_line: "380\t76.154\t88.267\t72.000\t6.182\t283.237  224.102 30.805"
-    log10_formation_equilibrium_constant:
-      value: 30.805
-      as_published: '30.805'
-      locator:
-        table_id: H-063
-        url: https://janaf.nist.gov/tables/H-063.html
-        download_url: https://janaf.nist.gov/tables/H-063.txt
-        row_temperature_as_published: '380'
-        column: log Kf
-        parse_repair: nist_tail_whitespace_signs_restored
-        line_number: 13
-        raw_line: "380\t76.154\t88.267\t72.000\t6.182\t283.237  224.102 30.805"
-  - temperature:
       value: 400.0
       as_published: '400'
       locator:
@@ -1221,3 +1140,10 @@ table:
     locator:
       table_id: H-063
       url: https://janaf.nist.gov/tables/H-063.html
+  - line_number: 13
+    raw_line: "380\t76.154\t88.267\t72.000\t6.182\t283.237  224.102 30.805"
+    reason: 'refused JANAF tail sign restoration: formation enthalpy neighbors span a transition marker'
+    locator:
+      table_id: H-063
+      url: https://janaf.nist.gov/tables/H-063.html
+    kind: nist_tail_whitespace_signs_unresolved

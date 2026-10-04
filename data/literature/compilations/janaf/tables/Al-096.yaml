@@ -1854,87 +1854,6 @@ table:
         row_temperature_as_published: '2300'
         column: log Kf
   - temperature:
-      value: 2400.0
-      as_published: '2400'
-      locator:
-        table_id: Al-096
-        url: https://janaf.nist.gov/tables/Al-096.html
-        download_url: https://janaf.nist.gov/tables/Al-096.txt
-        row_temperature_as_published: '2400'
-        column: T(K)
-    heat_capacity:
-      value: 139.453
-      as_published: '139.453'
-      locator:
-        table_id: Al-096
-        url: https://janaf.nist.gov/tables/Al-096.html
-        download_url: https://janaf.nist.gov/tables/Al-096.txt
-        row_temperature_as_published: '2400'
-        column: Cp
-    entropy:
-      value: 296.214
-      as_published: '296.214'
-      locator:
-        table_id: Al-096
-        url: https://janaf.nist.gov/tables/Al-096.html
-        download_url: https://janaf.nist.gov/tables/Al-096.txt
-        row_temperature_as_published: '2400'
-        column: S
-    negative_gibbs_enthalpy_function:
-      value: 185.829
-      as_published: '185.829'
-      locator:
-        table_id: Al-096
-        url: https://janaf.nist.gov/tables/Al-096.html
-        download_url: https://janaf.nist.gov/tables/Al-096.txt
-        row_temperature_as_published: '2400'
-        column: -[G-H(Tr)]/T
-    enthalpy_increment:
-      value: 264.922
-      as_published: '264.922'
-      locator:
-        table_id: Al-096
-        url: https://janaf.nist.gov/tables/Al-096.html
-        download_url: https://janaf.nist.gov/tables/Al-096.txt
-        row_temperature_as_published: '2400'
-        column: H-H(Tr)
-    formation_enthalpy:
-      value: -1672.963
-      as_published: '1672.963'
-      locator:
-        table_id: Al-096
-        url: https://janaf.nist.gov/tables/Al-096.html
-        download_url: https://janaf.nist.gov/tables/Al-096.txt
-        row_temperature_as_published: '2400'
-        column: delta-f H
-        parse_repair: nist_tail_whitespace_signs_restored
-        line_number: 29
-        raw_line: "2400\t139.453\t296.214\t185.829\t264.922\t1672.963  905.582 19.709"
-    formation_gibbs_energy:
-      value: -905.582
-      as_published: '905.582'
-      locator:
-        table_id: Al-096
-        url: https://janaf.nist.gov/tables/Al-096.html
-        download_url: https://janaf.nist.gov/tables/Al-096.txt
-        row_temperature_as_published: '2400'
-        column: delta-f G
-        parse_repair: nist_tail_whitespace_signs_restored
-        line_number: 29
-        raw_line: "2400\t139.453\t296.214\t185.829\t264.922\t1672.963  905.582 19.709"
-    log10_formation_equilibrium_constant:
-      value: 19.709
-      as_published: '19.709'
-      locator:
-        table_id: Al-096
-        url: https://janaf.nist.gov/tables/Al-096.html
-        download_url: https://janaf.nist.gov/tables/Al-096.txt
-        row_temperature_as_published: '2400'
-        column: log Kf
-        parse_repair: nist_tail_whitespace_signs_restored
-        line_number: 29
-        raw_line: "2400\t139.453\t296.214\t185.829\t264.922\t1672.963  905.582 19.709"
-  - temperature:
       value: 2500.0
       as_published: '2500'
       locator:
@@ -2373,3 +2292,10 @@ table:
     locator:
       table_id: Al-096
       url: https://janaf.nist.gov/tables/Al-096.html
+  - line_number: 29
+    raw_line: "2400\t139.453\t296.214\t185.829\t264.922\t1672.963  905.582 19.709"
+    reason: 'refused JANAF tail sign restoration: formation enthalpy neighbors span a transition marker'
+    locator:
+      table_id: Al-096
+      url: https://janaf.nist.gov/tables/Al-096.html
+    kind: nist_tail_whitespace_signs_unresolved

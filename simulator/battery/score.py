@@ -1181,6 +1181,7 @@ def _fusion_comparison_reference(
                 "JANAF cached table is incomplete",
                 "JANAF table values are missing",
                 "JANAF table has fewer than two Gibbs points",
+                "spans missing grid node",
             )
         ):
             raise

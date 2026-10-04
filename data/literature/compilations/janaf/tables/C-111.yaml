@@ -2928,87 +2928,6 @@ table:
         row_temperature_as_published: '3800'
         column: log Kf
   - temperature:
-      value: 3900.0
-      as_published: '3900'
-      locator:
-        table_id: C-111
-        url: https://janaf.nist.gov/tables/C-111.html
-        download_url: https://janaf.nist.gov/tables/C-111.txt
-        row_temperature_as_published: '3900'
-        column: T(K)
-    heat_capacity:
-      value: 62.76
-      as_published: '62.760'
-      locator:
-        table_id: C-111
-        url: https://janaf.nist.gov/tables/C-111.html
-        download_url: https://janaf.nist.gov/tables/C-111.txt
-        row_temperature_as_published: '3900'
-        column: Cp
-    entropy:
-      value: 190.242
-      as_published: '190.242'
-      locator:
-        table_id: C-111
-        url: https://janaf.nist.gov/tables/C-111.html
-        download_url: https://janaf.nist.gov/tables/C-111.txt
-        row_temperature_as_published: '3900'
-        column: S
-    negative_gibbs_enthalpy_function:
-      value: 137.187
-      as_published: '137.187'
-      locator:
-        table_id: C-111
-        url: https://janaf.nist.gov/tables/C-111.html
-        download_url: https://janaf.nist.gov/tables/C-111.txt
-        row_temperature_as_published: '3900'
-        column: -[G-H(Tr)]/T
-    enthalpy_increment:
-      value: 206.915
-      as_published: '206.915'
-      locator:
-        table_id: C-111
-        url: https://janaf.nist.gov/tables/C-111.html
-        download_url: https://janaf.nist.gov/tables/C-111.txt
-        row_temperature_as_published: '3900'
-        column: H-H(Tr)
-    formation_enthalpy:
-      value: -151.857
-      as_published: '151.857'
-      locator:
-        table_id: C-111
-        url: https://janaf.nist.gov/tables/C-111.html
-        download_url: https://janaf.nist.gov/tables/C-111.txt
-        row_temperature_as_published: '3900'
-        column: delta-f H
-        parse_repair: nist_tail_whitespace_signs_restored
-        line_number: 46
-        raw_line: "3900\t62.760\t190.242\t137.187\t206.915\t151.857  143.140 1.917"
-    formation_gibbs_energy:
-      value: -143.14
-      as_published: '143.140'
-      locator:
-        table_id: C-111
-        url: https://janaf.nist.gov/tables/C-111.html
-        download_url: https://janaf.nist.gov/tables/C-111.txt
-        row_temperature_as_published: '3900'
-        column: delta-f G
-        parse_repair: nist_tail_whitespace_signs_restored
-        line_number: 46
-        raw_line: "3900\t62.760\t190.242\t137.187\t206.915\t151.857  143.140 1.917"
-    log10_formation_equilibrium_constant:
-      value: 1.917
-      as_published: '1.917'
-      locator:
-        table_id: C-111
-        url: https://janaf.nist.gov/tables/C-111.html
-        download_url: https://janaf.nist.gov/tables/C-111.txt
-        row_temperature_as_published: '3900'
-        column: log Kf
-        parse_repair: nist_tail_whitespace_signs_restored
-        line_number: 46
-        raw_line: "3900\t62.760\t190.242\t137.187\t206.915\t151.857  143.140 1.917"
-  - temperature:
       value: 4000.0
       as_published: '4000'
       locator:
@@ -4539,3 +4458,10 @@ table:
     locator:
       table_id: C-111
       url: https://janaf.nist.gov/tables/C-111.html
+  - line_number: 46
+    raw_line: "3900\t62.760\t190.242\t137.187\t206.915\t151.857  143.140 1.917"
+    reason: 'refused JANAF tail sign restoration: formation enthalpy neighbors span a transition marker'
+    locator:
+      table_id: C-111
+      url: https://janaf.nist.gov/tables/C-111.html
+    kind: nist_tail_whitespace_signs_unresolved

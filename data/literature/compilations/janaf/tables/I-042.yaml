@@ -768,87 +768,6 @@ table:
         row_temperature_as_published: '800'
         column: log Kf
   - temperature:
-      value: 900.0
-      as_published: '900'
-      locator:
-        table_id: I-042
-        url: https://janaf.nist.gov/tables/I-042.html
-        download_url: https://janaf.nist.gov/tables/I-042.txt
-        row_temperature_as_published: '900'
-        column: T(K)
-    heat_capacity:
-      value: 110.039
-      as_published: '110.039'
-      locator:
-        table_id: I-042
-        url: https://janaf.nist.gov/tables/I-042.html
-        download_url: https://janaf.nist.gov/tables/I-042.txt
-        row_temperature_as_published: '900'
-        column: Cp
-    entropy:
-      value: 278.737
-      as_published: '278.737'
-      locator:
-        table_id: I-042
-        url: https://janaf.nist.gov/tables/I-042.html
-        download_url: https://janaf.nist.gov/tables/I-042.txt
-        row_temperature_as_published: '900'
-        column: S
-    negative_gibbs_enthalpy_function:
-      value: 211.724
-      as_published: '211.724'
-      locator:
-        table_id: I-042
-        url: https://janaf.nist.gov/tables/I-042.html
-        download_url: https://janaf.nist.gov/tables/I-042.txt
-        row_temperature_as_published: '900'
-        column: -[G-H(Tr)]/T
-    enthalpy_increment:
-      value: 60.312
-      as_published: '60.312'
-      locator:
-        table_id: I-042
-        url: https://janaf.nist.gov/tables/I-042.html
-        download_url: https://janaf.nist.gov/tables/I-042.txt
-        row_temperature_as_published: '900'
-        column: H-H(Tr)
-    formation_enthalpy:
-      value: -592.047
-      as_published: '592.047'
-      locator:
-        table_id: I-042
-        url: https://janaf.nist.gov/tables/I-042.html
-        download_url: https://janaf.nist.gov/tables/I-042.txt
-        row_temperature_as_published: '900'
-        column: delta-f H
-        parse_repair: nist_tail_whitespace_signs_restored
-        line_number: 16
-        raw_line: "900\t110.039\t278.737\t211.724\t60.312\t592.047  491.103 28.503"
-    formation_gibbs_energy:
-      value: -491.103
-      as_published: '491.103'
-      locator:
-        table_id: I-042
-        url: https://janaf.nist.gov/tables/I-042.html
-        download_url: https://janaf.nist.gov/tables/I-042.txt
-        row_temperature_as_published: '900'
-        column: delta-f G
-        parse_repair: nist_tail_whitespace_signs_restored
-        line_number: 16
-        raw_line: "900\t110.039\t278.737\t211.724\t60.312\t592.047  491.103 28.503"
-    log10_formation_equilibrium_constant:
-      value: 28.503
-      as_published: '28.503'
-      locator:
-        table_id: I-042
-        url: https://janaf.nist.gov/tables/I-042.html
-        download_url: https://janaf.nist.gov/tables/I-042.txt
-        row_temperature_as_published: '900'
-        column: log Kf
-        parse_repair: nist_tail_whitespace_signs_restored
-        line_number: 16
-        raw_line: "900\t110.039\t278.737\t211.724\t60.312\t592.047  491.103 28.503"
-  - temperature:
       value: 1000.0
       as_published: '1000'
       locator:
@@ -2091,3 +2010,10 @@ table:
     locator:
       table_id: I-042
       url: https://janaf.nist.gov/tables/I-042.html
+  - line_number: 16
+    raw_line: "900\t110.039\t278.737\t211.724\t60.312\t592.047  491.103 28.503"
+    reason: 'refused JANAF tail sign restoration: formation enthalpy neighbors span a transition marker'
+    locator:
+      table_id: I-042
+      url: https://janaf.nist.gov/tables/I-042.html
+    kind: nist_tail_whitespace_signs_unresolved

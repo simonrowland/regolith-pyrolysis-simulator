@@ -359,32 +359,53 @@ def _whitespace_tail_candidate(line_number: int, line: str) -> _LineCandidate | 
 
 
 def _continuity_sign(
-    candidates: list[_LineCandidate], field_index: int, temperature: Decimal
-) -> int | None:
-    neighbors: list[tuple[Decimal, Decimal]] = []
+    candidates: list[_LineCandidate],
+    field_index: int,
+    temperature: Decimal,
+    *,
+    line_number: int,
+    transition_marker_lines: list[int],
+    require_same_phase: bool = False,
+) -> tuple[int | None, str | None]:
+    neighbors: list[tuple[Decimal, Decimal, int]] = []
     for candidate in candidates:
         candidate_temperature = _candidate_temperature_decimal(candidate)
         if candidate_temperature is None or field_index >= len(candidate.content):
             continue
         value = parse_published_number(candidate.content[field_index])
         if value is not None:
-            neighbors.append((candidate_temperature, Decimal(str(value))))
+            neighbors.append(
+                (candidate_temperature, Decimal(str(value)), candidate.line_number)
+            )
     before = [item for item in neighbors if item[0] < temperature]
     after = [item for item in neighbors if item[0] > temperature]
     if not before or not after:
-        return None
-    left_t, left_value = max(before)
-    right_t, right_value = min(after)
+        return None, "formation sign is not resolved by neighboring rows"
+    left = max((item[0], item[1]) for item in before)
+    right = min((item[0], item[1]) for item in after)
+    left_line = next(item[2] for item in before if item[:2] == left)
+    right_line = next(item[2] for item in after if item[:2] == right)
+    if require_same_phase and any(
+        min(line_number, neighbor_line) < marker_line < max(line_number, neighbor_line)
+        for neighbor_line in (left_line, right_line)
+        for marker_line in transition_marker_lines
+    ):
+        return None, "formation enthalpy neighbors span a transition marker"
+    left_t, left_value = left
+    right_t, right_value = right
     estimate = left_value + (right_value - left_value) * (
         temperature - left_t
     ) / (right_t - left_t)
-    return 1 if estimate > 0 else -1 if estimate < 0 else None
+    sign = 1 if estimate > 0 else -1 if estimate < 0 else None
+    return sign, None if sign is not None else "neighbor interpolation is zero"
 
 
 def _restore_whitespace_tail_signs(
-    candidate: _LineCandidate, parsed_neighbors: list[_LineCandidate]
+    candidate: _LineCandidate,
+    parsed_neighbors: list[_LineCandidate],
+    transition_marker_lines: list[int],
 ) -> tuple[tuple[float, float, float] | None, str | None]:
-    """Restore signs only when neighboring rows and the JANAF identity agree."""
+    """Restore signs only when magnitudes and structurally valid neighbors agree."""
 
     assert candidate.whitespace_tail is not None
     temperature = _decimal_temperature_token(candidate.content[0])
@@ -395,40 +416,19 @@ def _restore_whitespace_tail_signs(
     if enthalpy_magnitude == gibbs_magnitude == log_magnitude == 0:
         return (0.0, 0.0, 0.0), None
 
-    enthalpy_sign = (
-        _continuity_sign(parsed_neighbors, 5, temperature)
-        if enthalpy_magnitude
-        else 0
-    )
-    gibbs_sign = (
-        _continuity_sign(parsed_neighbors, 6, temperature)
-        if gibbs_magnitude
-        else 0
-    )
-    if enthalpy_sign is None:
-        return None, "formation enthalpy sign is not resolved by neighboring rows"
-    if gibbs_sign is None:
-        return None, "formation Gibbs sign is not resolved by neighboring rows"
-    if gibbs_magnitude == 0 and log_magnitude != 0:
-        return None, "zero formation Gibbs with nonzero log Kf has no sign assignment"
-
-    # Premise -> algebra -> units: JANAF prints log10(Kf)=-ΔfG/(R T ln 10);
-    # ΔfG is printed to 0.001 kJ/mol and log Kf to 0.001. Convert ΔfG to
-    # J/mol with 1000 J/kJ, then compare dimensionless log values using
-    # R=8.31441 J/(mol K), T in K, and ln(10). JANAF tables span decades and
-    # use several R values (8.3143, 8.31441, 8.314510 J/(mol K), with older
-    # tables computed in calories), so a relative R difference up to 2.5e-5
-    # contributes |log Kf|*2.5e-5. In printed 0.001 units this is
-    # 0.025*|log Kf| units; rounding adds at most 0.5 log unit plus
-    # 0.0005 kJ/mol*1000/(R T ln(10))/0.001 units from ΔfG. Thus accept a
-    # best relation miss no larger than 2 + 3e-5*|log Kf|/log_quantum units,
-    # only when the other sign relation misses by at least 100 times more.
-    # The other relation has the signs aligned, so its miss is about
-    # 2*|log Kf|; continuity with neighboring ΔfG rows chooses the absolute
-    # signs after the opposite-sign relation is established. Sanity: O-038 at
-    # 1700 K gives log Kf=18.714 for
-    # ΔfG=-609.059 kJ/mol; the 14 large-log rows have >100x separation and
-    # neighboring accepted rows show the same few-unit rounding residuals.
+    # Premise -> algebra -> units: JANAF prints log10(Kf)=-ΔfG/(R T ln 10),
+    # so the identity fixes only the relative signs (always opposite) and
+    # checks the printed ΔfG/log Kf magnitudes; it says nothing about ΔfH or
+    # their absolute signs. Convert ΔfG from kJ/mol to J/mol with 1000 J/kJ,
+    # then compare dimensionless log values using R=8.31441 J/(mol K), T in K,
+    # and ln(10). JANAF used several gas constants (8.3143, 8.31441,
+    # 8.314510 J/(mol K); older tables used calories), so the allowed miss is
+    # scale-aware in printed 0.001 log units: 2 + 3e-5*|log Kf|/log_quantum.
+    # Absolute signs come from neighboring parsed rows. ΔfH can jump at a
+    # phase transition, so its neighbor bracket must stay on the candidate's
+    # side of every transition marker; if it crosses one, refuse ΔfH rather
+    # than infer its sign across phases. Sanity: O-038 at 1700 K has
+    # ΔfG=-609.059 kJ/mol and log Kf=18.714.
     log_quantum = abs(
         Decimal(1).scaleb(Decimal(candidate.whitespace_tail[2]).as_tuple().exponent)
     )
@@ -437,19 +437,44 @@ def _restore_whitespace_tail_signs(
         JANAF_R_J_MOL_K * temperature * ln10
     )
     relation_miss = abs(predicted_log_magnitude - log_magnitude) / log_quantum
-    other_relation_miss = (predicted_log_magnitude + log_magnitude) / log_quantum
     allowed_miss = Decimal(2) + Decimal("3e-5") * log_magnitude / log_quantum
-    if (
-        relation_miss > allowed_miss
-        or other_relation_miss < relation_miss * 100
-    ):
+    if relation_miss > allowed_miss:
         return (
             None,
             "formation Gibbs/log Kf identity misses by "
             f"{relation_miss:.3f} printed log Kf units with R=8.31441 "
-            f"(allowed {allowed_miss:.3f}; alternate relation "
-            f"{other_relation_miss:.3f})",
+            f"(allowed {allowed_miss:.3f})",
         )
+
+    enthalpy_sign, enthalpy_reason = (
+        _continuity_sign(
+            parsed_neighbors,
+            5,
+            temperature,
+            line_number=candidate.line_number,
+            transition_marker_lines=transition_marker_lines,
+            require_same_phase=True,
+        )
+        if enthalpy_magnitude
+        else (0, None)
+    )
+    gibbs_sign, gibbs_reason = (
+        _continuity_sign(
+            parsed_neighbors,
+            6,
+            temperature,
+            line_number=candidate.line_number,
+            transition_marker_lines=transition_marker_lines,
+        )
+        if gibbs_magnitude
+        else (0, None)
+    )
+    if enthalpy_sign is None:
+        return None, enthalpy_reason
+    if gibbs_sign is None:
+        return None, gibbs_reason
+    if gibbs_magnitude == 0 and log_magnitude != 0:
+        return None, "zero formation Gibbs with nonzero log Kf has no sign assignment"
 
     signed_enthalpy = enthalpy_magnitude * enthalpy_sign
     signed_gibbs = gibbs_magnitude * gibbs_sign
@@ -663,9 +688,12 @@ def parse_janaf_txt(
     ambiguities: list[dict[str, Any]] = []
     structured_candidates: list[_LineCandidate] = []
     whitespace_tail_candidates: list[_LineCandidate] = []
+    transition_marker_lines: list[int] = []
     for line_number, line in enumerate(lines[header_index + 1 :], start=header_index + 2):
         if not line.strip():
             continue
+        if "<-->" in line:
+            transition_marker_lines.append(line_number)
         whitespace_candidate = _whitespace_tail_candidate(line_number, line)
         if whitespace_candidate is not None:
             whitespace_tail_candidates.append(whitespace_candidate)
@@ -790,7 +818,7 @@ def parse_janaf_txt(
         if candidate.line_number not in corroborated_lines:
             continue
         restored, reason = _restore_whitespace_tail_signs(
-            candidate, parsed_neighbors
+            candidate, parsed_neighbors, transition_marker_lines
         )
         if restored is None:
             ambiguities.append(

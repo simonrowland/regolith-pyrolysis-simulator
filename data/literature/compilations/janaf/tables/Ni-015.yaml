@@ -918,87 +918,6 @@ table:
         row_temperature_as_published: '1000'
         column: log Kf
   - temperature:
-      value: 1100.0
-      as_published: '1100'
-      locator:
-        table_id: Ni-015
-        url: https://janaf.nist.gov/tables/Ni-015.html
-        download_url: https://janaf.nist.gov/tables/Ni-015.txt
-        row_temperature_as_published: '1100'
-        column: T(K)
-    heat_capacity:
-      value: 188.615
-      as_published: '188.615'
-      locator:
-        table_id: Ni-015
-        url: https://janaf.nist.gov/tables/Ni-015.html
-        download_url: https://janaf.nist.gov/tables/Ni-015.txt
-        row_temperature_as_published: '1100'
-        column: Cp
-    entropy:
-      value: 392.259
-      as_published: '392.259'
-      locator:
-        table_id: Ni-015
-        url: https://janaf.nist.gov/tables/Ni-015.html
-        download_url: https://janaf.nist.gov/tables/Ni-015.txt
-        row_temperature_as_published: '1100'
-        column: S
-    negative_gibbs_enthalpy_function:
-      value: 228.561
-      as_published: '228.561'
-      locator:
-        table_id: Ni-015
-        url: https://janaf.nist.gov/tables/Ni-015.html
-        download_url: https://janaf.nist.gov/tables/Ni-015.txt
-        row_temperature_as_published: '1100'
-        column: -[G-H(Tr)]/T
-    enthalpy_increment:
-      value: 180.068
-      as_published: '180.068'
-      locator:
-        table_id: Ni-015
-        url: https://janaf.nist.gov/tables/Ni-015.html
-        download_url: https://janaf.nist.gov/tables/Ni-015.txt
-        row_temperature_as_published: '1100'
-        column: H-H(Tr)
-    formation_enthalpy:
-      value: -268.653
-      as_published: '268.653'
-      locator:
-        table_id: Ni-015
-        url: https://janaf.nist.gov/tables/Ni-015.html
-        download_url: https://janaf.nist.gov/tables/Ni-015.txt
-        row_temperature_as_published: '1100'
-        column: delta-f H
-        parse_repair: nist_tail_whitespace_signs_restored
-        line_number: 18
-        raw_line: "1100\t188.615\t392.259\t228.561\t180.068\t268.653  167.837 7.970"
-    formation_gibbs_energy:
-      value: -167.837
-      as_published: '167.837'
-      locator:
-        table_id: Ni-015
-        url: https://janaf.nist.gov/tables/Ni-015.html
-        download_url: https://janaf.nist.gov/tables/Ni-015.txt
-        row_temperature_as_published: '1100'
-        column: delta-f G
-        parse_repair: nist_tail_whitespace_signs_restored
-        line_number: 18
-        raw_line: "1100\t188.615\t392.259\t228.561\t180.068\t268.653  167.837 7.970"
-    log10_formation_equilibrium_constant:
-      value: 7.97
-      as_published: '7.970'
-      locator:
-        table_id: Ni-015
-        url: https://janaf.nist.gov/tables/Ni-015.html
-        download_url: https://janaf.nist.gov/tables/Ni-015.txt
-        row_temperature_as_published: '1100'
-        column: log Kf
-        parse_repair: nist_tail_whitespace_signs_restored
-        line_number: 18
-        raw_line: "1100\t188.615\t392.259\t228.561\t180.068\t268.653  167.837 7.970"
-  - temperature:
       value: 1200.0
       as_published: '1200'
       locator:
@@ -1377,3 +1296,10 @@ table:
     locator:
       table_id: Ni-015
       url: https://janaf.nist.gov/tables/Ni-015.html
+  - line_number: 18
+    raw_line: "1100\t188.615\t392.259\t228.561\t180.068\t268.653  167.837 7.970"
+    reason: 'refused JANAF tail sign restoration: formation enthalpy neighbors span a transition marker'
+    locator:
+      table_id: Ni-015
+      url: https://janaf.nist.gov/tables/Ni-015.html
+    kind: nist_tail_whitespace_signs_unresolved

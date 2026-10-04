@@ -840,87 +840,6 @@ table:
         row_temperature_as_published: '900'
         column: log Kf
   - temperature:
-      value: 1000.0
-      as_published: '1000'
-      locator:
-        table_id: I-031
-        url: https://janaf.nist.gov/tables/I-031.html
-        download_url: https://janaf.nist.gov/tables/I-031.txt
-        row_temperature_as_published: '1000'
-        column: T(K)
-    heat_capacity:
-      value: 100.416
-      as_published: '100.416'
-      locator:
-        table_id: I-031
-        url: https://janaf.nist.gov/tables/I-031.html
-        download_url: https://janaf.nist.gov/tables/I-031.txt
-        row_temperature_as_published: '1000'
-        column: Cp
-    entropy:
-      value: 262.275
-      as_published: '262.275'
-      locator:
-        table_id: I-031
-        url: https://janaf.nist.gov/tables/I-031.html
-        download_url: https://janaf.nist.gov/tables/I-031.txt
-        row_temperature_as_published: '1000'
-        column: S
-    negative_gibbs_enthalpy_function:
-      value: 198.123
-      as_published: '198.123'
-      locator:
-        table_id: I-031
-        url: https://janaf.nist.gov/tables/I-031.html
-        download_url: https://janaf.nist.gov/tables/I-031.txt
-        row_temperature_as_published: '1000'
-        column: -[G-H(Tr)]/T
-    enthalpy_increment:
-      value: 64.152
-      as_published: '64.152'
-      locator:
-        table_id: I-031
-        url: https://janaf.nist.gov/tables/I-031.html
-        download_url: https://janaf.nist.gov/tables/I-031.txt
-        row_temperature_as_published: '1000'
-        column: H-H(Tr)
-    formation_enthalpy:
-      value: -395.798
-      as_published: '395.798'
-      locator:
-        table_id: I-031
-        url: https://janaf.nist.gov/tables/I-031.html
-        download_url: https://janaf.nist.gov/tables/I-031.txt
-        row_temperature_as_published: '1000'
-        column: delta-f H
-        parse_repair: nist_tail_whitespace_signs_restored
-        line_number: 17
-        raw_line: "1000\t100.416\t262.275\t198.123\t64.152\t395.798  276.003 14.417"
-    formation_gibbs_energy:
-      value: -276.003
-      as_published: '276.003'
-      locator:
-        table_id: I-031
-        url: https://janaf.nist.gov/tables/I-031.html
-        download_url: https://janaf.nist.gov/tables/I-031.txt
-        row_temperature_as_published: '1000'
-        column: delta-f G
-        parse_repair: nist_tail_whitespace_signs_restored
-        line_number: 17
-        raw_line: "1000\t100.416\t262.275\t198.123\t64.152\t395.798  276.003 14.417"
-    log10_formation_equilibrium_constant:
-      value: 14.417
-      as_published: '14.417'
-      locator:
-        table_id: I-031
-        url: https://janaf.nist.gov/tables/I-031.html
-        download_url: https://janaf.nist.gov/tables/I-031.txt
-        row_temperature_as_published: '1000'
-        column: log Kf
-        parse_repair: nist_tail_whitespace_signs_restored
-        line_number: 17
-        raw_line: "1000\t100.416\t262.275\t198.123\t64.152\t395.798  276.003 14.417"
-  - temperature:
       value: 1100.0
       as_published: '1100'
       locator:
@@ -1659,3 +1578,10 @@ table:
     locator:
       table_id: I-031
       url: https://janaf.nist.gov/tables/I-031.html
+  - line_number: 17
+    raw_line: "1000\t100.416\t262.275\t198.123\t64.152\t395.798  276.003 14.417"
+    reason: 'refused JANAF tail sign restoration: formation enthalpy neighbors span a transition marker'
+    locator:
+      table_id: I-031
+      url: https://janaf.nist.gov/tables/I-031.html
+    kind: nist_tail_whitespace_signs_unresolved

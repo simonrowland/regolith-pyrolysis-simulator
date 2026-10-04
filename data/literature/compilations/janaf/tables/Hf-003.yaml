@@ -16,7 +16,6 @@ compilation_role:
   scoring_eligible: false
   battery_refusal: gibbs_table_not_runtime_observable
   circularity_warning: Do not validate an engine against a compilation it consumes.
-  pure_substance_reference: true
 extraction:
   method: machine parse of NIST tab-delimited table download; source bytes cached unchanged
   user_agent: RegolithPyrolysisSimulator-corpus-harvester/1.0 (public thermochemical reference-data research; polite cached
@@ -2520,8 +2519,7 @@ table:
       url: https://janaf.nist.gov/tables/Hf-003.html
   - line_number: 35
     raw_line: "2600\t39.001\t114.865\t89.712\t65.396\t29.200 1.170  0.024"
-    reason: 'refused JANAF tail sign restoration: formation Gibbs/log Kf identity misses by 0.495 printed log Kf units with
-      R=8.31441 (allowed 2.001; alternate relation 47.505)'
+    reason: 'refused JANAF tail sign restoration: formation enthalpy neighbors span a transition marker'
     locator:
       table_id: Hf-003
       url: https://janaf.nist.gov/tables/Hf-003.html

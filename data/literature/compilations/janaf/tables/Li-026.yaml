@@ -768,87 +768,6 @@ table:
         row_temperature_as_published: '800'
         column: log Kf
   - temperature:
-      value: 900.0
-      as_published: '900'
-      locator:
-        table_id: Li-026
-        url: https://janaf.nist.gov/tables/Li-026.html
-        download_url: https://janaf.nist.gov/tables/Li-026.txt
-        row_temperature_as_published: '900'
-        column: T(K)
-    heat_capacity:
-      value: 209.702
-      as_published: '209.702'
-      locator:
-        table_id: Li-026
-        url: https://janaf.nist.gov/tables/Li-026.html
-        download_url: https://janaf.nist.gov/tables/Li-026.txt
-        row_temperature_as_published: '900'
-        column: Cp
-    entropy:
-      value: 289.957
-      as_published: '289.957'
-      locator:
-        table_id: Li-026
-        url: https://janaf.nist.gov/tables/Li-026.html
-        download_url: https://janaf.nist.gov/tables/Li-026.txt
-        row_temperature_as_published: '900'
-        column: S
-    negative_gibbs_enthalpy_function:
-      value: 178.033
-      as_published: '178.033'
-      locator:
-        table_id: Li-026
-        url: https://janaf.nist.gov/tables/Li-026.html
-        download_url: https://janaf.nist.gov/tables/Li-026.txt
-        row_temperature_as_published: '900'
-        column: -[G-H(Tr)]/T
-    enthalpy_increment:
-      value: 100.732
-      as_published: '100.732'
-      locator:
-        table_id: Li-026
-        url: https://janaf.nist.gov/tables/Li-026.html
-        download_url: https://janaf.nist.gov/tables/Li-026.txt
-        row_temperature_as_published: '900'
-        column: H-H(Tr)
-    formation_enthalpy:
-      value: -1489.633
-      as_published: '1489.633'
-      locator:
-        table_id: Li-026
-        url: https://janaf.nist.gov/tables/Li-026.html
-        download_url: https://janaf.nist.gov/tables/Li-026.txt
-        row_temperature_as_published: '900'
-        column: delta-f H
-        parse_repair: nist_tail_whitespace_signs_restored
-        line_number: 14
-        raw_line: "900\t209.702\t289.957\t178.033\t100.732\t1489.633  1077.896 62.559"
-    formation_gibbs_energy:
-      value: -1077.896
-      as_published: '1077.896'
-      locator:
-        table_id: Li-026
-        url: https://janaf.nist.gov/tables/Li-026.html
-        download_url: https://janaf.nist.gov/tables/Li-026.txt
-        row_temperature_as_published: '900'
-        column: delta-f G
-        parse_repair: nist_tail_whitespace_signs_restored
-        line_number: 14
-        raw_line: "900\t209.702\t289.957\t178.033\t100.732\t1489.633  1077.896 62.559"
-    log10_formation_equilibrium_constant:
-      value: 62.559
-      as_published: '62.559'
-      locator:
-        table_id: Li-026
-        url: https://janaf.nist.gov/tables/Li-026.html
-        download_url: https://janaf.nist.gov/tables/Li-026.txt
-        row_temperature_as_published: '900'
-        column: log Kf
-        parse_repair: nist_tail_whitespace_signs_restored
-        line_number: 14
-        raw_line: "900\t209.702\t289.957\t178.033\t100.732\t1489.633  1077.896 62.559"
-  - temperature:
       value: 1000.0
       as_published: '1000'
       locator:
@@ -1071,3 +990,10 @@ table:
     locator:
       table_id: Li-026
       url: https://janaf.nist.gov/tables/Li-026.html
+  - line_number: 14
+    raw_line: "900\t209.702\t289.957\t178.033\t100.732\t1489.633  1077.896 62.559"
+    reason: 'refused JANAF tail sign restoration: formation enthalpy neighbors span a transition marker'
+    locator:
+      table_id: Li-026
+      url: https://janaf.nist.gov/tables/Li-026.html
+    kind: nist_tail_whitespace_signs_unresolved

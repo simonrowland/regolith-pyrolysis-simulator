@@ -16,7 +16,6 @@ compilation_role:
   scoring_eligible: false
   battery_refusal: gibbs_table_not_runtime_observable
   circularity_warning: Do not validate an engine against a compilation it consumes.
-  pure_substance_reference: true
 extraction:
   method: machine parse of NIST tab-delimited table download; source bytes cached unchanged
   user_agent: RegolithPyrolysisSimulator-corpus-harvester/1.0 (public thermochemical reference-data research; polite cached
@@ -1143,8 +1142,7 @@ table:
       url: https://janaf.nist.gov/tables/Ca-002.html
   - line_number: 16
     raw_line: "800\t34.613\t70.150\t51.551\t14.879\t0.844 0.104  0.007"
-    reason: 'refused JANAF tail sign restoration: formation Gibbs/log Kf identity misses by 0.210 printed log Kf units with
-      R=8.31441 (allowed 2.000; alternate relation 13.790)'
+    reason: 'refused JANAF tail sign restoration: formation enthalpy neighbors span a transition marker'
     locator:
       table_id: Ca-002
       url: https://janaf.nist.gov/tables/Ca-002.html

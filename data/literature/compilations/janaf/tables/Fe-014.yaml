@@ -768,87 +768,6 @@ table:
         row_temperature_as_published: '800'
         column: log Kf
   - temperature:
-      value: 900.0
-      as_published: '900'
-      locator:
-        table_id: Fe-014
-        url: https://janaf.nist.gov/tables/Fe-014.html
-        download_url: https://janaf.nist.gov/tables/Fe-014.txt
-        row_temperature_as_published: '900'
-        column: T(K)
-    heat_capacity:
-      value: 126.224
-      as_published: '126.224'
-      locator:
-        table_id: Fe-014
-        url: https://janaf.nist.gov/tables/Fe-014.html
-        download_url: https://janaf.nist.gov/tables/Fe-014.txt
-        row_temperature_as_published: '900'
-        column: Cp
-    entropy:
-      value: 268.644
-      as_published: '268.644'
-      locator:
-        table_id: Fe-014
-        url: https://janaf.nist.gov/tables/Fe-014.html
-        download_url: https://janaf.nist.gov/tables/Fe-014.txt
-        row_temperature_as_published: '900'
-        column: S
-    negative_gibbs_enthalpy_function:
-      value: 205.106
-      as_published: '205.106'
-      locator:
-        table_id: Fe-014
-        url: https://janaf.nist.gov/tables/Fe-014.html
-        download_url: https://janaf.nist.gov/tables/Fe-014.txt
-        row_temperature_as_published: '900'
-        column: -[G-H(Tr)]/T
-    enthalpy_increment:
-      value: 57.184
-      as_published: '57.184'
-      locator:
-        table_id: Fe-014
-        url: https://janaf.nist.gov/tables/Fe-014.html
-        download_url: https://janaf.nist.gov/tables/Fe-014.txt
-        row_temperature_as_published: '900'
-        column: H-H(Tr)
-    formation_enthalpy:
-      value: -152.024
-      as_published: '152.024'
-      locator:
-        table_id: Fe-014
-        url: https://janaf.nist.gov/tables/Fe-014.html
-        download_url: https://janaf.nist.gov/tables/Fe-014.txt
-        row_temperature_as_published: '900'
-        column: delta-f H
-        parse_repair: nist_tail_whitespace_signs_restored
-        line_number: 16
-        raw_line: "900\t126.224\t268.644\t205.106\t57.184\t152.024  66.419 3.855"
-    formation_gibbs_energy:
-      value: -66.419
-      as_published: '66.419'
-      locator:
-        table_id: Fe-014
-        url: https://janaf.nist.gov/tables/Fe-014.html
-        download_url: https://janaf.nist.gov/tables/Fe-014.txt
-        row_temperature_as_published: '900'
-        column: delta-f G
-        parse_repair: nist_tail_whitespace_signs_restored
-        line_number: 16
-        raw_line: "900\t126.224\t268.644\t205.106\t57.184\t152.024  66.419 3.855"
-    log10_formation_equilibrium_constant:
-      value: 3.855
-      as_published: '3.855'
-      locator:
-        table_id: Fe-014
-        url: https://janaf.nist.gov/tables/Fe-014.html
-        download_url: https://janaf.nist.gov/tables/Fe-014.txt
-        row_temperature_as_published: '900'
-        column: log Kf
-        parse_repair: nist_tail_whitespace_signs_restored
-        line_number: 16
-        raw_line: "900\t126.224\t268.644\t205.106\t57.184\t152.024  66.419 3.855"
-  - temperature:
       value: 1000.0
       as_published: '1000'
       locator:
@@ -1299,3 +1218,10 @@ table:
     locator:
       table_id: Fe-014
       url: https://janaf.nist.gov/tables/Fe-014.html
+  - line_number: 16
+    raw_line: "900\t126.224\t268.644\t205.106\t57.184\t152.024  66.419 3.855"
+    reason: 'refused JANAF tail sign restoration: formation enthalpy neighbors span a transition marker'
+    locator:
+      table_id: Fe-014
+      url: https://janaf.nist.gov/tables/Fe-014.html
+    kind: nist_tail_whitespace_signs_unresolved
