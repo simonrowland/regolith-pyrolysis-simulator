@@ -279,7 +279,10 @@ def test_knudsen_engine_point_does_not_use_chamber_as_pressure_bar() -> None:
     Exterior-chamber / kems consumers must still see the chamber pressure.
     """
 
+    from tests.battery.test_bench_generators import _clear_sample_pressure
+
     experiment, bench, observation = case(pressure=str(_CHAMBER_PA))
+    observation = _clear_sample_pressure(observation)
     assert experiment.method.is_value
     assert experiment.method.value is MethodToken.KNUDSEN_EFFUSION
     assert "total_pressure_Pa" not in (observation.point_conditions or {})

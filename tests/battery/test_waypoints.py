@@ -419,7 +419,12 @@ def test_printed_mixture_component_outranks_observation_gas_derivation() -> None
     gas = Composition("mix", (("O2", Decimal("0.21")), ("N2", Decimal("0.79"))), AmountBasis.MOLE_FRACTION)
     observation = replace(
         factories.observation("obs", experiment.experiment_id, factories.o2_identity(), 1),
-        point_conditions={"gas_composition": factories.located(gas)},
+        point_conditions={
+            "gas_composition": factories.located(gas),
+            # Explicit sample total so the x_O2*P alternate route can fire;
+            # Knudsen chamber background is not a sample oxygen frame (P1).
+            "total_pressure_Pa": factories.located(Decimal("100000")),
+        },
     )
     result = oxygen_condition(experiment, _bench(), observation)
     assert result.selected is not None
@@ -431,8 +436,13 @@ def test_printed_mixture_component_outranks_observation_gas_derivation() -> None
 def test_printed_sweep_partial_pressure_outranks_buffer_derivation() -> None:
     """A printed sweep pO2 outranks the buffer relation, which needs a
     published table plus thermal and pressure waypoints."""
+    from simulator.battery.enums import MethodToken
+
+    # Non-Knudsen: buffer_relation may use experiment total as the P frame.
+    # Knudsen chamber background is excluded from oxygen derivations (P1).
     experiment = replace(
         factories.kems_experiment(),
+        method=factories.State.of(MethodToken.LANGMUIR_FREE_EVAPORATION),
         conditions={"temperature_K": factories.located(Decimal("1200"))},
         fO2_control=FO2Control(
             channel=factories.State.of(FO2Channel.BUFFER),
@@ -673,6 +683,8 @@ def test_rps_pressure_floor_rejects_only_wholly_excluded_values(pressure, status
 def test_multicomponent_engine_charge_is_not_structural_failure() -> None:
     from simulator.battery.records import FO2Control
 
+    # Explicit sample pressure: this scenario tests multicomponent charge
+    # readiness, not Knudsen chamber→prediction inheritance.
     experiment = replace(
         factories.kems_experiment(total_P=Decimal("0.1")),
         sample=_charge(single=False),
@@ -680,10 +692,16 @@ def test_multicomponent_engine_charge_is_not_structural_failure() -> None:
         fO2_control=FO2Control(factories.State.unknown("channel not printed"), oxygen_partial_pressure_Pa=factories.located(Value.point_of("0.0001"))),
     )
     bench = _bench(geometry=experiment.apparatus.geometry)
-    readiness = {item.consumer: item for item in consumer_readiness(experiment, bench)}
+    observation = replace(
+        factories.observation("obs", experiment.experiment_id, factories.o2_identity(), 1),
+        point_conditions={
+            "total_pressure_Pa": factories.located(Decimal("0.1")),
+        },
+    )
+    readiness = {item.consumer: item for item in consumer_readiness(experiment, bench, observation)}
     assert readiness["engine_point"].status is ReadinessStatus.READY
     engines = [
-        item for item in consumer_readiness(experiment, bench)
+        item for item in consumer_readiness(experiment, bench, observation)
         if item.consumer == "engine_point" and item.engine
     ]
     assert [item.engine for item in engines] == [
@@ -1123,12 +1141,16 @@ def test_readiness_report_passes_modelling_inputs_to_consumer_path(
     experiment, bench, observation, modelling_inputs = complete_rps()
     printed_experiment = replace(experiment, bench_id=bench.id)
     printed_observation = observation
+    # Vacuum-oxygen scenario: clear sample pressure and use non-Knudsen so
+    # experiment total remains a legitimate oxygen upper-bound input. Knudsen
+    # chamber background must not command sample oxygen (P1).
+    from simulator.battery.enums import MethodToken
     observation = replace(
         observation,
         point_conditions={
             key: value
             for key, value in observation.point_conditions.items()
-            if key != "fO2_log"
+            if key not in {"fO2_log", "total_pressure_Pa"}
         },
     )
     pressure = factories.located(
@@ -1138,6 +1160,7 @@ def test_readiness_report_passes_modelling_inputs_to_consumer_path(
     experiment = replace(
         experiment,
         bench_id=bench.id,
+        method=factories.State.of(MethodToken.LANGMUIR_FREE_EVAPORATION),
         conditions={
             **experiment.conditions,
             "surfaces": observation.point_conditions["surfaces"],
@@ -1511,8 +1534,13 @@ def test_oxygen_condition_c_co_prose_buffer_without_token_stays_refusal() -> Non
 
 def test_oxygen_condition_c_co_uses_total_p_when_co_is_the_stated_gas() -> None:
     """When sweep CO PP is absent, printed total P is P_CO for a C–CO token."""
+    from simulator.battery.enums import MethodToken
+
+    # Non-Knudsen: experiment total is the stated CO gas pressure. Knudsen
+    # chamber background must not supply P_CO for oxygen prediction (P1).
     experiment = replace(
         factories.kems_experiment(total_P=Decimal("101325")),
+        method=factories.State.of(MethodToken.LANGMUIR_FREE_EVAPORATION),
         conditions={"temperature_K": factories.located(Value.point_of("1373.15"))},
         fO2_control=FO2Control(
             channel=factories.State.of(FO2Channel.BUFFER),
