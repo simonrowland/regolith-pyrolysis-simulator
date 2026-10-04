@@ -7,6 +7,7 @@ import sqlite3
 import sys
 import threading
 import time
+from concurrent.futures import Future
 from pathlib import Path
 from types import SimpleNamespace
 
@@ -37,6 +38,7 @@ from scripts.grid_pregrind_writer import (
     canonical_input_vector,
     expedited_key,
 )
+from simulator.engine_pool import EngineWorkerTimeout
 from scripts.grind_harvest import harvest_snapshot
 from simulator.melt_backend.thermoengine import ThermoEngineBackend
 
@@ -2366,8 +2368,6 @@ def test_writer_surfaces_bounded_failure_diagnostics(tmp_path):
         native_input=None,
         backend_name="thermoengine",
     )
-    output["engine_model"] = "MELTSv1.0.2"
-
     with GridCacheWriter(database, backend_name="thermoengine") as writer:
         batch_id = writer.ensure_batch(
             label="thermoengine-failure",
@@ -2396,6 +2396,87 @@ def test_writer_surfaces_bounded_failure_diagnostics(tmp_path):
     assert histogram["failure_reason_code"] == {
         "thermoengine_nonfinite_fo2_echo": 1
     }
+
+
+@pytest.mark.parametrize(
+    ("exc", "expected_status"),
+    [
+        (RuntimeError("worker process died"), "error"),
+        (
+            EngineWorkerTimeout(
+                "grid engine slot 0", 25.0, phase="request"
+            ),
+            "timeout",
+        ),
+    ],
+    ids=("dead-worker", "worker-timeout"),
+)
+def test_parent_worker_failure_future_is_persisted(
+    tmp_path, monkeypatch, exc, expected_status
+):
+    database = tmp_path / f"{expected_status}-worker-failure.db"
+    _prepared_drain_database(database)
+    monkeypatch.setattr(grid_pregrind, "_STOP_REQUESTED", False)
+
+    class FailedFuturePool:
+        def __init__(self, size, _worker_factory):
+            self.processes = size
+
+        def submit(self, _job, *, timeout_s):
+            del timeout_s
+            future = Future()
+            future.set_exception(exc)
+            return future
+
+        def close(self, **_kwargs):
+            pass
+
+    monkeypatch.setattr(
+        grid_pregrind,
+        "EngineWorkerPool",
+        lambda worker_factory, *, size: FailedFuturePool(size, worker_factory),
+    )
+    args = SimpleNamespace(
+        backend="subprocess",
+        workers=1,
+        heartbeat_s=60.0,
+        limit=None,
+        status_json=database.with_suffix(".status.json"),
+        seed=178,
+        db=database,
+        commit_every=10,
+        assume_queued_run_mode=None,
+        model="MELTSv1.0.2",
+        timeout_s=20.0,
+        thermoengine_health_timeout_s=8.0,
+        thermoengine_equilibrate_timeout_s=60.0,
+        allow_zero_component_boundary=False,
+    )
+
+    with GridCacheWriter(
+        database, existing_only=True, backend_name="subprocess"
+    ) as writer:
+        batch_id = writer.connection.execute(
+            "SELECT batch_id FROM batches WHERE label = 'fixed-v2'"
+        ).fetchone()[0]
+        result = grid_pregrind.run_cycle(
+            args, writer, batch_id=batch_id, grid_total=1, shard=0
+        )
+        row = writer.connection.execute(
+            "SELECT status, status_kind, engine_model, failure_message, raw_payload "
+            "FROM alphamelts_outputs"
+        ).fetchone()
+        remaining = writer.queue_counts(batch_id=batch_id, shard=0)["remaining"]
+
+    assert result["completed"] == 1
+    assert result["inserted"] == 1
+    assert result["failure"] == 1
+    assert row["status"] == expected_status
+    assert row["status_kind"] == "failure"
+    assert row["engine_model"] == "unknown"
+    assert row["failure_message"] == str(exc)
+    assert json.loads(row["raw_payload"])["exception"]["message"] == str(exc)
+    assert remaining == 0
 
 
 def test_writer_refuses_engine_blending_on_open_and_write(tmp_path):
