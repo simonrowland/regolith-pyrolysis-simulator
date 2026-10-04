@@ -666,6 +666,17 @@ def metric_operation_for_identity(identity: Identity) -> MetricOperation | None:
     return metric_operation(quantity)
 
 
+def _residual_metric_operation(
+    quantity: Quantity | None, observation: object | None
+) -> MetricOperation | None:
+    """Metric of a residual on ``observation``: identity-aware when typed."""
+
+    identity = getattr(observation, "identity", None)
+    if isinstance(identity, Identity) and quantity_token(identity) is quantity:
+        return metric_operation_for_identity(identity)
+    return metric_operation(quantity)
+
+
 def compute_metric(
     operation: MetricOperation,
     candidate: Decimal,
@@ -1589,18 +1600,24 @@ def unit_dimension(unit: str) -> str | None:
     return _UNIT_DIMENSION.get(unit)
 
 
-def band_dimension_matches(quantity: Quantity, band: DecisionBand) -> bool:
+def band_dimension_matches(
+    quantity: Quantity,
+    band: DecisionBand,
+    *,
+    operation: MetricOperation | None = None,
+) -> bool:
     """True only when the band and the quantity share one dimension.
 
     Residual metrics (relative and dex) are dimensionless even when their
     source quantity has a physical unit. kJ/mol does not match J/mol/K.
     Scale aliases that are not in ``_UNIT_DIMENSION`` fail closed.
+    ``operation`` is the residual's own (identity-aware) metric when the
+    caller knows it; default is the quantity's metric.
     """
 
-    if (
-        band.unit == "dimensionless"
-        and metric_operation(quantity) in {MetricOperation.RELATIVE, MetricOperation.DEX}
-    ):
+    if band.unit == "dimensionless" and (
+        operation or metric_operation(quantity)
+    ) in {MetricOperation.RELATIVE, MetricOperation.DEX}:
         return True
     quantity_dim = unit_dimension(QUANTITY_UNITS[quantity])
     band_dim = unit_dimension(band.unit)
@@ -1872,6 +1889,7 @@ def decision_band_for(
     observations: Mapping[str, Observation] | None = None,
     experiments: Mapping[str, Experiment] | None = None,
     derived_band: DecisionBand | None = None,
+    operation: MetricOperation | None = None,
 ) -> DecisionBand | None:
     if (
         quantity is Quantity.P_PARTIAL
@@ -1884,10 +1902,12 @@ def decision_band_for(
         # no unflagged candidates.  Do not refill it with the public helper,
         # whose inputs cannot include the bench map.
         band = derived_band
-        if band is not None and band_dimension_matches(quantity, band):
+        if band is not None and band_dimension_matches(
+            quantity, band, operation=operation
+        ):
             return band
     if derived_band is not None:
-        if band_dimension_matches(quantity, derived_band):
+        if band_dimension_matches(quantity, derived_band, operation=operation):
             return derived_band
         return None
     if quantity not in GIBBS_BAND_QUANTITIES:
@@ -1970,9 +1990,12 @@ def _printed_uncertainty_band(
 
     if uncertainty is None or uncertainty.kind is not UncertaintyKind.PRINTED:
         return None
+    # The band must be in the residual's own metric: the same identity-aware
+    # selector populate_numeric uses (residue element ppm is DEX, oxide wt%
+    # ABSOLUTE), not the quantity default (b-693/b-691 r2 finding 4).
+    operation = _residual_metric_operation(quantity, source_observation)
     mapped = _mapped_reading_uncertainty_dex(uncertainty)
     if mapped is not None:
-        operation = metric_operation(quantity)
         if operation is MetricOperation.DEX:
             return DecisionBand(
                 mapped, "dimensionless", "source-printed per-cell uncertainty"
@@ -1994,7 +2017,6 @@ def _printed_uncertainty_band(
     if not width.is_finite():
         return None
 
-    operation = metric_operation(quantity)
     if operation is None:
         return None
     percent = match.group(2) is not None
@@ -2131,10 +2153,13 @@ def populate_numeric(
             observations=observations,
             experiments=experiments,
             derived_band=derived_band,
+            operation=operation,
         )
     # Dimension guard. decision_band_for normally filters mismatched bands;
     # keep this check for callers that replace it in a focused test.
-    if band is not None and not band_dimension_matches(quantity, band):
+    if band is not None and not band_dimension_matches(
+        quantity, band, operation=operation
+    ):
         return None, RefusalReason.DECISION_RULE_MISSING, {
             "reason": f"band_dimension_mismatch:{quantity.value}",
             "quantity": quantity.value,
@@ -4569,12 +4594,12 @@ def compile_residual(
             "handles": handles,
             "experiment": experiment,
         }
-        # Restore injection contract: only the production default predictor
-        # receives bench=. Caller-supplied predictors historically took only
-        # handles/experiment; forwarding bench= raised TypeError (b-693 review
-        # finding 5). Production predict_with_engine still gets bench via the
-        # predict-is-None path.
-        if predict is None and experiment is not None:
+        # The recorded bench goes to the built-in predictor whether it is
+        # selected implicitly (predict=None) or explicitly
+        # (predict=predict_with_engine): the reactive-cell label follows the
+        # bench, not the call style (b-693/b-691 r2 finding 6). Caller-supplied
+        # predictors keep the handles/experiment keyword contract.
+        if predictor is predict_with_engine and experiment is not None:
             recorded = _bench_for_score(experiment, context.benches)
             if recorded is not None:
                 predictor_kwargs["bench"] = recorded
@@ -4809,7 +4834,7 @@ def compile_residual(
             observations=context.observations,
             experiments=context.experiments,
             derived_band=cell_band,
-            operation_override=metric_operation_for_identity(reference.identity),
+            operation_override=_residual_metric_operation(quantity, reference),
         )
     if numeric is None:
         return _refused(
@@ -5793,15 +5818,6 @@ def _compilation_residuals(
     ]
 
 
-def _all_numeric_residuals(
-    residuals: Sequence[Residual],
-    context: ScoreContext | None,
-) -> list[Residual]:
-    """Every residual that carries a numeric value, certified and flagged alike."""
-
-    return [residual for residual in residuals if residual.numeric is not None]
-
-
 def _compilation_decision_strata(
     residuals: Sequence[Residual], context: ScoreContext | None
 ) -> list[dict[str, object]]:
@@ -5925,13 +5941,13 @@ def _headline_metric_row(
     bucket: Sequence[Residual],
     *,
     tier: str,
-    context: ScoreContext | None = None,
 ) -> dict[str, object]:
-    if tier in {"measured", "compilation", "all_numeric"}:
+    if tier == "measured":
         # Numeric measured rows remain in the report even when a gate keeps
         # them out of score_eligible. ``n_inside_band`` separates the
         # measured agreement result from those other eligibility gates.
-        # all_numeric includes certified and flagged alike (b-691).
+        scored = [r for r in bucket if r.numeric is not None]
+    elif tier == "compilation":
         scored = [r for r in bucket if r.numeric is not None]
     else:
         raise ValueError(f"unknown headline tier {tier!r}")
@@ -5945,22 +5961,15 @@ def _headline_metric_row(
         for r in scored
         if r.status in {ResidualStatus.MATCH, ResidualStatus.MISMATCH}
     ]
-    # Measured/compilation keep DEX-only descriptive stats (existing schema).
-    # all_numeric median/IQR summarize every numeric residual in its own metric.
-    if tier == "all_numeric":
-        metric_values = [
-            r.numeric.value for r in scored if r.numeric is not None
-        ]
-    else:
-        metric_values = [
-            r.numeric.value
-            for r in scored
-            if r.numeric is not None and r.numeric.operation is MetricOperation.DEX
-        ]
+    dex_values = [
+        r.numeric.value
+        for r in scored
+        if r.numeric is not None and r.numeric.operation is MetricOperation.DEX
+    ]
     band_width = _headline_band_width(scored)
-    median = _median_abs(metric_values)
-    signed_median = _median(metric_values)
-    rms = _rms(metric_values)
+    median = _median_abs(dex_values)
+    signed_median = _median(dex_values)
+    rms = _rms(dex_values)
     n_scored = len(scored)
     rms_over_band = (
         None
@@ -5972,7 +5981,7 @@ def _headline_metric_row(
         match_rate = None
     else:
         match_rate = len(matches) / len(banded)
-    row: dict[str, object] = {
+    return {
         "tier": tier,
         "rail": rail,
         "engine": engine,
@@ -5997,82 +6006,6 @@ def _headline_metric_row(
         "n_no_band": sum(1 for r in scored if r.status is ResidualStatus.NO_BAND),
         "data_scatter_ratio": None if rms_over_band is None else str(rms_over_band),
     }
-    if tier == "all_numeric":
-        iqr = _iqr(metric_values)
-        flag_counts: dict[str, int] = defaultdict(int)
-        for residual in scored:
-            strata = flagged_strata(residual.notices)
-            if not strata:
-                flag_counts["unflagged"] += 1
-            else:
-                for stratum in strata:
-                    flag_counts[stratum] += 1
-        row["iqr_dex"] = None if iqr is None else str(iqr)
-        row["flag_class_counts"] = dict(sorted(flag_counts.items()))
-        row["sources"] = _all_numeric_source_rows(scored, context)
-    return row
-
-
-def _all_numeric_source_rows(
-    scored: Sequence[Residual],
-    context: ScoreContext | None,
-) -> list[dict[str, object]]:
-    """Per-source counts for the all-numeric headline, including zero-certified."""
-
-    if context is None:
-        return []
-    groups: dict[str, dict[str, object]] = {}
-    for residual in scored:
-        observation = context.observations.get(residual.reference)
-        source_id = (
-            observation.source_id
-            if observation is not None and observation.source_id
-            else residual.reference
-        )
-        entry = groups.setdefault(
-            source_id,
-            {
-                "source_id": source_id,
-                "n_numeric": 0,
-                "n_certified": 0,
-                "n_flagged": 0,
-                "flag_class_counts": defaultdict(int),
-            },
-        )
-        entry["n_numeric"] = int(entry["n_numeric"]) + 1
-        strata = flagged_strata(residual.notices)
-        measured = _reference_has_measured_evidence(
-            observation, exclusions=residual.exclusions
-        )
-        from simulator.battery.compilation_tier import compilation_row_observation
-
-        is_compilation = (
-            compilation_row_observation(
-                residual.reference, context.observations, context.origins
-            )
-            is not None
-        )
-        if measured and not strata and not is_compilation:
-            entry["n_certified"] = int(entry["n_certified"]) + 1
-        if strata:
-            entry["n_flagged"] = int(entry["n_flagged"]) + 1
-            counts = entry["flag_class_counts"]
-            assert isinstance(counts, defaultdict)
-            for stratum in strata:
-                counts[stratum] += 1
-    out: list[dict[str, object]] = []
-    for source_id, entry in sorted(groups.items()):
-        counts = entry["flag_class_counts"]
-        out.append(
-            {
-                "source_id": source_id,
-                "n_numeric": entry["n_numeric"],
-                "n_certified": entry["n_certified"],
-                "n_flagged": entry["n_flagged"],
-                "flag_class_counts": dict(sorted(counts.items())),
-            }
-        )
-    return out
 
 
 def headline_rows(
@@ -6084,20 +6017,21 @@ def headline_rows(
 ) -> list[dict[str, object]]:
     """Per rail × engine headline for one tier.
 
-    Measured (certified) and compilation rows use numeric residuals for
-    descriptive accuracy. ``all_numeric`` is the co-equal headline that keeps
-    flagged rows (b-691). ``score_eligible`` remains a separately reported
-    gate result; compilation rows remain a separate diagnostic tier.
+    Measured and compilation rows use numeric residuals for descriptive
+    accuracy. ``score_eligible`` remains a separately reported gate result;
+    compilation rows remain a separate diagnostic tier.
     """
 
+    if tier == ALL_NUMERIC_TIER:
+        return _all_numeric_rows_from_residuals(
+            residuals, context=context, engines=engines
+        )
     groups: dict[tuple[str, str], list[Residual]] = {}
     engines_seen: set[str] = set()
     if tier == "measured":
         tier_residuals = _measured_residuals(residuals, context)
     elif tier == "compilation":
         tier_residuals = _compilation_residuals(residuals, context)
-    elif tier == "all_numeric":
-        tier_residuals = _all_numeric_residuals(residuals, context)
     else:
         raise ValueError(f"unknown headline tier {tier!r}")
     for residual in tier_residuals:
@@ -6113,9 +6047,7 @@ def headline_rows(
             groups.setdefault((rail.value, engine), [])
     rows: list[dict[str, object]] = []
     for (rail, engine), bucket in sorted(groups.items()):
-        row = _headline_metric_row(
-            rail, engine, bucket, tier=tier, context=context
-        )
+        row = _headline_metric_row(rail, engine, bucket, tier=tier)
         row["decision_strata"] = (
             _compilation_decision_strata(
                 [
@@ -6182,13 +6114,386 @@ def headline_records(
     context: ScoreContext | None = None,
     engines: Sequence[Engine] | None = None,
 ) -> list[dict[str, object]]:
-    """Machine-readable all-numeric, certified, and compilation records."""
+    """Machine-readable all-numeric (A), certified (B), and compilation records."""
 
     return [
-        *headline_rows(residuals, context=context, tier="all_numeric", engines=engines),
+        *headline_rows(residuals, context=context, tier=ALL_NUMERIC_TIER, engines=engines),
         *headline_rows(residuals, context=context, tier="measured", engines=engines),
         *headline_rows(residuals, context=context, tier="compilation", engines=engines),
     ]
+
+
+# ---------------------------------------------------------------------------
+# b-691 all-numeric (A) headline: ONE owner (b-693/b-691 round-2 finding 5).
+#
+# Every writer (typed JSON, streamed JSON + Markdown, report-only payload JSON
+# + Markdown) feeds the same facts to ``_AllNumericHeadline`` and prints its
+# records. A never re-derives admission: ``certified`` on each fact is the
+# caller's own measured/certified (B) membership decision for that row.
+# Statistics are stratified by quantity / metric operation / unit; only DEX
+# residuals contribute to a ``*_dex`` statistic (round-2 finding 3).
+# ---------------------------------------------------------------------------
+
+ALL_NUMERIC_TIER = "all_numeric"
+
+
+@dataclass(frozen=True)
+class _AllNumericFact:
+    rail: str
+    engine: str
+    quantity: str
+    operation: str
+    unit: str
+    value: Decimal
+    status: str
+    score_eligible: bool
+    strata: tuple[str, ...]
+    source_id: str
+    certified: bool
+
+
+def _residual_key_quantity(key: object) -> str:
+    """Quantity token of a ``residual_key`` (``…::q::rail::engine``)."""
+
+    parts = str(key or "").rsplit("::", 3)
+    return parts[1] if len(parts) == 4 and parts[1] else "quantity_unknown"
+
+
+def _all_numeric_source_id(reference: str, observation: Observation | None) -> str:
+    return (
+        observation.source_id
+        if observation is not None and observation.source_id
+        else reference
+    )
+
+
+def _all_numeric_fact(
+    row: Mapping[str, object],
+    *,
+    engine: str,
+    observation: Observation | None,
+    certified: bool,
+    value: Decimal | None = None,
+) -> _AllNumericFact | None:
+    """One numeric residual payload as the A headline sees it, or None."""
+
+    numeric = row.get("numeric")
+    rail = str(row.get("rail") or "")
+    if not rail or not isinstance(numeric, Mapping):
+        return None
+    if value is None:
+        raw = numeric.get("value")
+        if raw is None:
+            return None
+        try:
+            value = as_decimal(raw)
+        except (TypeError, ValueError, ArithmeticError):
+            return None
+    return _AllNumericFact(
+        rail=rail,
+        engine=engine,
+        quantity=_residual_key_quantity(row.get("key")),
+        operation=str(numeric.get("operation") or ""),
+        unit=str(numeric.get("unit") or ""),
+        value=value,
+        status=str(row.get("status") or ""),
+        score_eligible=bool(row.get("score_eligible")),
+        strata=_flagged_payload_strata(row),
+        source_id=_all_numeric_source_id(str(row.get("reference") or ""), observation),
+        certified=certified,
+    )
+
+
+def _all_numeric_metric_label(operation: str, unit: str) -> str:
+    """Label of one metric stratum. Only a DEX metric is ever called dex."""
+
+    if operation == MetricOperation.DEX.value:
+        return "dex"
+    if operation == MetricOperation.RELATIVE.value:
+        return f"relative ({unit})"
+    return f"absolute ({unit})"
+
+
+def _all_numeric_stats(values: Sequence[Decimal]) -> dict[str, str | None]:
+    median = _median(values)
+    median_abs = _median_abs(values)
+    iqr = _iqr(values)
+    rms = _rms(values)
+    return {
+        "median": None if median is None else str(median),
+        "median_abs": None if median_abs is None else str(median_abs),
+        "iqr": None if iqr is None else str(iqr),
+        "rms": None if rms is None else str(rms),
+    }
+
+
+class _AllNumericHeadline:
+    """Single owner of the A headline: grid, strata, flag classes, sources."""
+
+    def __init__(self) -> None:
+        self._facts: dict[tuple[str, str], list[_AllNumericFact]] = defaultdict(list)
+
+    def add(self, fact: _AllNumericFact | None) -> None:
+        if fact is not None:
+            self._facts[(fact.rail, fact.engine)].append(fact)
+
+    @property
+    def engines_seen(self) -> set[str]:
+        return {engine for _rail, engine in self._facts}
+
+    def records(
+        self,
+        engine_names: Iterable[str],
+        *,
+        include_seen: bool = True,
+    ) -> list[dict[str, object]]:
+        """Complete rail × engine grid; empty cells are n = 0 records."""
+
+        names = set(engine_names)
+        if include_seen:
+            names |= self.engines_seen
+        return [
+            self._record(rail, engine, self._facts.get((rail, engine), ()))
+            for rail, engine in sorted(
+                (rail.value, engine) for rail in Rail for engine in names
+            )
+        ]
+
+    @staticmethod
+    def _record(
+        rail: str, engine: str, facts: Sequence[_AllNumericFact]
+    ) -> dict[str, object]:
+        dex_values = [
+            fact.value for fact in facts if fact.operation == MetricOperation.DEX.value
+        ]
+        dex = _all_numeric_stats(dex_values)
+        strata: dict[tuple[str, str, str], list[Decimal]] = defaultdict(list)
+        flag_counts: dict[str, int] = defaultdict(int)
+        sources: dict[str, dict[str, object]] = {}
+        for fact in facts:
+            strata[(fact.quantity, fact.operation, fact.unit)].append(fact.value)
+            for stratum in fact.strata or ("unflagged",):
+                flag_counts[stratum] += 1
+            entry = sources.setdefault(
+                fact.source_id,
+                {
+                    "source_id": fact.source_id,
+                    "n_numeric": 0,
+                    "n_certified": 0,
+                    "n_flagged": 0,
+                    "flag_class_counts": defaultdict(int),
+                },
+            )
+            entry["n_numeric"] = int(entry["n_numeric"]) + 1
+            entry["n_certified"] = int(entry["n_certified"]) + int(fact.certified)
+            if fact.strata:
+                entry["n_flagged"] = int(entry["n_flagged"]) + 1
+                source_flags = entry["flag_class_counts"]
+                assert isinstance(source_flags, defaultdict)
+                for stratum in fact.strata:
+                    source_flags[stratum] += 1
+        return {
+            "tier": ALL_NUMERIC_TIER,
+            "rail": rail,
+            "engine": engine,
+            "n": len(facts),
+            "n_certified": sum(1 for fact in facts if fact.certified),
+            "n_flagged": sum(1 for fact in facts if fact.strata),
+            "n_score_eligible": sum(1 for fact in facts if fact.score_eligible),
+            "n_inside_band": sum(
+                1 for fact in facts if fact.status == ResidualStatus.MATCH.value
+            ),
+            "n_no_band": sum(
+                1 for fact in facts if fact.status == ResidualStatus.NO_BAND.value
+            ),
+            "n_dex": len(dex_values),
+            "median_dex": dex["median"],
+            "median_abs_dex": dex["median_abs"],
+            "iqr_dex": dex["iqr"],
+            "rms_dex": dex["rms"],
+            "metric_strata": [
+                {
+                    "quantity": quantity,
+                    "operation": operation,
+                    "unit": unit,
+                    "label": _all_numeric_metric_label(operation, unit),
+                    "n": len(values),
+                    **_all_numeric_stats(values),
+                }
+                for (quantity, operation, unit), values in sorted(strata.items())
+            ],
+            "flag_class_counts": dict(sorted(flag_counts.items())),
+            "sources": [
+                {
+                    **{key: value for key, value in entry.items() if key != "flag_class_counts"},
+                    "flag_class_counts": dict(
+                        sorted(entry["flag_class_counts"].items())  # type: ignore[union-attr]
+                    ),
+                }
+                for _source_id, entry in sorted(sources.items())
+            ],
+        }
+
+
+def _all_numeric_rows_from_residuals(
+    residuals: Sequence[Residual],
+    *,
+    context: ScoreContext | None,
+    engines: Sequence[Engine] | None,
+) -> list[dict[str, object]]:
+    """Typed adapter: certified membership is ``_measured_residuals`` (B)."""
+
+    from simulator.battery.compilation_tier import reference_observation
+
+    certified_ids = {id(residual) for residual in _measured_residuals(residuals, context)}
+    owner = _AllNumericHeadline()
+    for residual in residuals:
+        if residual.numeric is None or residual.rail is None:
+            continue
+        owner.add(
+            _all_numeric_fact(
+                residual_to_plain(residual),
+                engine=_engine_of(residual),
+                observation=(
+                    None
+                    if context is None
+                    else reference_observation(context.observations, residual.reference)
+                ),
+                certified=id(residual) in certified_ids,
+                value=residual.numeric.value,
+            )
+        )
+    engine_names = [engine.value for engine in engines or ()]
+    if not engine_names and not owner.engines_seen:
+        engine_names = [engine.value for engine in SCORE_ENGINE_SET]
+    return owner.records(engine_names)
+
+
+def _payload_measured_reference(
+    observations: Mapping[str, Observation] | None,
+    origins: Mapping[str, str] | None,
+) -> Callable[[Mapping[str, object]], bool]:
+    """Measured-tier reference membership for residual payloads (one owner)."""
+
+    if observations is None:
+        return lambda row: _reference_has_measured_evidence(
+            None, exclusions=row.get("exclusions")
+        )
+    from simulator.battery.compilation_tier import compilation_row_observation
+
+    def member(row: Mapping[str, object]) -> bool:
+        reference = str(row.get("reference") or "")
+        return compilation_row_observation(
+            reference, observations, origins
+        ) is None and _reference_has_measured_evidence(
+            observations.get(reference), exclusions=row.get("exclusions")
+        )
+
+    return member
+
+
+def all_numeric_payload_records(
+    rows: Iterable[Mapping[str, object]],
+    *,
+    engines: Sequence[Engine],
+    observations: Mapping[str, Observation] | None = None,
+    origins: Mapping[str, str] | None = None,
+) -> list[dict[str, object]]:
+    """Report-only adapter shared by the payload JSON and Markdown writers.
+
+    ``certified`` is the payload B decision: measured-tier reference
+    membership plus the measured headline row filter.
+    """
+
+    from simulator.battery.compilation_tier import reference_observation
+
+    measured_reference = _payload_measured_reference(observations, origins)
+    owner = _AllNumericHeadline()
+    for row in rows:
+        reference = str(row.get("reference") or "")
+        owner.add(
+            _all_numeric_fact(
+                row,
+                engine=_ScorePayloadAccumulator._engine(row),
+                observation=(
+                    None
+                    if observations is None
+                    else reference_observation(observations, reference)
+                ),
+                certified=measured_reference(row)
+                and _headline_payload_admits(row, tier="measured"),
+            )
+        )
+    return owner.records(engine.value for engine in engines)
+
+
+def _all_numeric_markdown_lines(
+    records: Sequence[Mapping[str, object]],
+    *,
+    regenerated: bool = True,
+) -> list[str]:
+    """The A section for both Markdown writers; every grid row is printed."""
+
+    lines = [
+        "## All-numeric tier",
+        "",
+        "Co-equal descriptive headline (A) over every priced residual, certified and "
+        "flagged. Every rail × engine cell is printed, n = 0 included. Dex statistics "
+        "use DEX residuals only; every other metric stays in its own quantity / "
+        "operation / unit stratum below and is never labelled dex. n certified is the "
+        "measured (B) membership decision, consumed rather than recomputed. Does not "
+        "change the measured/certified table.",
+        "",
+    ]
+    if not regenerated:
+        lines.append("Not regenerated.")
+        return lines
+    lines.extend(
+        [
+            "| rail | engine | n | n certified | n flagged | n dex | median dex | "
+            "IQR dex | flag classes | sources |",
+            "|---|---|---:|---:|---:|---:|---:|---:|---|---|",
+        ]
+    )
+    strata_lines: list[str] = []
+    for row in records:
+        flags = row.get("flag_class_counts") or {}
+        assert isinstance(flags, Mapping)
+        flag_s = ", ".join(f"{k}={v}" for k, v in flags.items()) if flags else "—"
+        sources = row.get("sources") or []
+        assert isinstance(sources, Sequence)
+        source_s = (
+            ", ".join(
+                f"{s.get('source_id')}(n={s.get('n_numeric')},"
+                f"cert={s.get('n_certified')},flag={s.get('n_flagged')})"
+                for s in sources
+                if isinstance(s, Mapping)
+            )
+            or "—"
+        )
+        lines.append(
+            f"| {row['rail']} | {row['engine']} | {row['n']} | {row['n_certified']} | "
+            f"{row['n_flagged']} | {row['n_dex']} | {row.get('median_dex') or '—'} | "
+            f"{row.get('iqr_dex') or '—'} | {flag_s} | {source_s} |"
+        )
+        for stratum in row.get("metric_strata") or ():
+            assert isinstance(stratum, Mapping)
+            strata_lines.append(
+                f"| {row['rail']} | {row['engine']} | {stratum['quantity']} | "
+                f"{stratum['label']} | {stratum['n']} | {stratum.get('median') or '—'} | "
+                f"{stratum.get('iqr') or '—'} |"
+            )
+    lines.extend(
+        [
+            "",
+            "### All-numeric metric strata",
+            "",
+            "| rail | engine | quantity | metric | n | median | IQR |",
+            "|---|---|---|---|---:|---:|---:|",
+            *(strata_lines or ["| (none) | — | — | — | 0 | — | — |"]),
+        ]
+    )
+    return lines
 
 
 HEADLINE_SUMMARY_KIND = "battery_headline_summary"
@@ -6574,50 +6879,17 @@ def _render_score_report_from_payloads_legacy(
     if not report_engine_names:
         report_engine_names = {engine.value for engine in SCORE_ENGINE_SET}
     report_engines = tuple(Engine(name) for name in sorted(report_engine_names))
+    # A has its own complete engine × rail grid (the run's engines plus any
+    # engine with an A row); B keeps its measured-only membership below.
     lines.extend(
         [
             "",
-            "## All-numeric tier",
-            "",
-            "Co-equal descriptive headline over every priced residual (certified and "
-            "flagged). Reports n, signed median, IQR, and per-source counts. Does not "
-            "change the measured/certified table below.",
-            "",
+            *_all_numeric_markdown_lines(
+                aggregate.all_numeric.records(engine.value for engine in engines),
+                regenerated=has_residuals,
+            ),
         ]
     )
-    if not has_residuals:
-        lines.append("Not regenerated.")
-    else:
-        lines.extend(
-            [
-                "| rail | engine | n | median | IQR | flag classes | sources |",
-                "|---|---|---:|---:|---:|---|---|",
-            ]
-        )
-        for row in aggregate.headline_records(engines=report_engines):
-            if row.get("tier") != "all_numeric":
-                continue
-            if int(row.get("n") or 0) == 0 and not row.get("sources"):
-                continue
-            flags = row.get("flag_class_counts") or {}
-            flag_s = (
-                ", ".join(f"{k}={v}" for k, v in flags.items()) if flags else "—"
-            )
-            sources = row.get("sources") or []
-            source_s = (
-                ", ".join(
-                    f"{s.get('source_id')}(n={s.get('n_numeric')},"
-                    f"cert={s.get('n_certified')},flag={s.get('n_flagged')})"
-                    for s in sources
-                )
-                if sources
-                else "—"
-            )
-            lines.append(
-                f"| {row['rail']} | {row['engine']} | {row['n']} | "
-                f"{row.get('median_dex') or '—'} | {row.get('iqr_dex') or '—'} | "
-                f"{flag_s} | {source_s} |"
-            )
     lines.extend(
         [
             "",
@@ -6836,9 +7108,6 @@ def _empty_headline_payload_stats() -> dict[str, object]:
         "n_no_band": 0,
         "dex_values": [],
         "band_widths": set(),
-        # all_numeric only (b-691); ignored for measured/compilation records.
-        "flag_class_counts": defaultdict(int),
-        "source_groups": {},
     }
 
 
@@ -6895,25 +7164,6 @@ def _headline_payload_record(
         "decision_strata": [],
         "data_scatter_ratio": None if rms_over_band is None else str(rms_over_band),
     }
-    if tier == "all_numeric":
-        iqr = _iqr(dex_values)
-        flag_counts = stats.get("flag_class_counts") or {}
-        record["iqr_dex"] = None if iqr is None else str(iqr)
-        record["flag_class_counts"] = dict(sorted(flag_counts.items()))
-        source_groups = stats.get("source_groups") or {}
-        assert isinstance(source_groups, dict)
-        record["sources"] = [
-            {
-                "source_id": source_id,
-                "n_numeric": entry["n_numeric"],
-                "n_certified": entry["n_certified"],
-                "n_flagged": entry["n_flagged"],
-                "flag_class_counts": dict(
-                    sorted(entry["flag_class_counts"].items())
-                ),
-            }
-            for source_id, entry in sorted(source_groups.items())
-        ]
     if not include_eligible_references:
         record.pop("n_eligible_references")
     return record
@@ -6925,7 +7175,7 @@ def headline_payloads(
     *,
     tier: str = "measured",
 ) -> list[dict[str, object]]:
-    if tier not in {"measured", "compilation", "all_numeric"}:
+    if tier not in {"measured", "compilation"}:
         raise ValueError(f"unknown headline tier {tier!r}")
     groups: dict[tuple[str, str], dict[str, object]] = {}
     engine_names = [e.value for e in engines]
@@ -6933,18 +7183,9 @@ def headline_payloads(
         for engine in engine_names:
             groups[(rail.value, engine)] = _empty_headline_payload_stats()
     for row in rows:
-        strata = _flagged_payload_strata(row)
-        # all_numeric keeps flagged rows; measured/compilation still exclude them.
-        if tier != "all_numeric" and strata:
+        if not _headline_payload_admits(row, tier=tier):
             continue
-        if tier == "measured" and not _reference_has_measured_evidence(
-            None, exclusions=row.get("exclusions")
-        ):
-            continue
-        raw_rail = row.get("rail")
-        if not raw_rail:
-            continue
-        rail = str(raw_rail)
+        rail = str(row.get("rail"))
         engine = str(
             ((row.get("candidate_request") or {}) if isinstance(row.get("candidate_request"), Mapping) else {}).get("engine")
             or str(row.get("key") or "").rsplit("::", 1)[-1]
@@ -6972,19 +7213,11 @@ def headline_payloads(
             stats["n_banded"] = int(stats["n_banded"]) + 1
         if status == ResidualStatus.NO_BAND.value:
             stats["n_no_band"] = int(stats["n_no_band"]) + 1
-        if tier == "all_numeric" or numeric.get("operation") == MetricOperation.DEX.value:
+        if numeric.get("operation") == MetricOperation.DEX.value:
             try:
                 stats["dex_values"].append(as_decimal(numeric.get("value")))  # type: ignore[union-attr]
             except (TypeError, ValueError, ArithmeticError):
                 pass
-        if tier == "all_numeric":
-            flag_counts = stats["flag_class_counts"]
-            assert isinstance(flag_counts, defaultdict)
-            if not strata:
-                flag_counts["unflagged"] += 1
-            else:
-                for stratum in strata:
-                    flag_counts[stratum] += 1
         band = numeric.get("decision_band")
         if (
             numeric.get("operation") == MetricOperation.DEX.value
@@ -7011,6 +7244,22 @@ def headline_payloads(
             )
         )
     return out
+
+
+def _headline_payload_admits(row: Mapping[str, object], *, tier: str) -> bool:
+    """Row filter of the measured/compilation payload headline (one owner).
+
+    Flagged rows never enter; the measured tier also needs measured evidence.
+    The all-numeric headline consumes this as the payload B decision.
+    """
+
+    if _flagged_payload_strata(row):
+        return False
+    if tier == "measured" and not _reference_has_measured_evidence(
+        None, exclusions=row.get("exclusions")
+    ):
+        return False
+    return bool(row.get("rail"))
 
 
 def _flagged_payload_strata(row: Mapping[str, object]) -> tuple[str, ...]:
@@ -7542,8 +7791,11 @@ def headline_payload_records(
 ) -> list[dict[str, object]]:
     """Machine-readable headline records from residual payloads."""
 
-    measured_rows: Iterable[Mapping[str, object]]
     compilation_rows: Iterable[Mapping[str, object]] = ()
+    is_measured = _payload_measured_reference(observations, origins)
+    measured_rows: Iterable[Mapping[str, object]] = (
+        row for row in rows if is_measured(row)
+    )
     if observations is not None:
         from simulator.battery.compilation_tier import compilation_row_observation
 
@@ -7555,24 +7807,11 @@ def headline_payload_records(
                 is not None
             )
 
-        def is_measured(row: Mapping[str, object]) -> bool:
-            reference = observations.get(str(row.get("reference") or ""))
-            return not is_compilation(row) and _reference_has_measured_evidence(
-                reference, exclusions=row.get("exclusions")
-            )
-
-        measured_rows = (row for row in rows if is_measured(row))
         compilation_rows = (row for row in rows if is_compilation(row))
-    else:
-        measured_rows = (
-            row
-            for row in rows
-            if _reference_has_measured_evidence(
-                None, exclusions=row.get("exclusions")
-            )
-        )
     records = [
-        *headline_payloads(rows, engines, tier="all_numeric"),
+        *all_numeric_payload_records(
+            rows, engines=engines, observations=observations, origins=origins
+        ),
         *headline_payloads(measured_rows, engines, tier="measured"),
         *headline_payloads(compilation_rows, engines, tier="compilation"),
     ]
@@ -7774,7 +8013,8 @@ class _ScorePayloadAccumulator:
         )
         self.headline_groups: dict[
             str, dict[tuple[str, str], dict[str, object]]
-        ] = {"all_numeric": {}, "measured": {}, "compilation": {}}
+        ] = {"measured": {}, "compilation": {}}
+        self.all_numeric = _AllNumericHeadline()
         self.report_engine_names: set[str] = set()
         self.count = 0
         self.scored_count = 0
@@ -7836,7 +8076,6 @@ class _ScorePayloadAccumulator:
         rail: str,
         engine: str,
         numeric_value: Decimal | None,
-        row_metadata: _ScorePayloadRowMetadata | None = None,
     ) -> None:
         groups = self.headline_groups[tier]
         stats = groups.setdefault((rail, engine), _empty_headline_payload_stats())
@@ -7859,9 +8098,9 @@ class _ScorePayloadAccumulator:
             stats["n_banded"] = int(stats["n_banded"]) + 1
         if status == ResidualStatus.NO_BAND.value:
             stats["n_no_band"] = int(stats["n_no_band"]) + 1
-        if numeric_value is not None and (
-            tier == "all_numeric"
-            or numeric.get("operation") == MetricOperation.DEX.value
+        if (
+            numeric.get("operation") == MetricOperation.DEX.value
+            and numeric_value is not None
         ):
             stats["dex_values"].append(numeric_value)
         band = numeric.get("decision_band")
@@ -7874,50 +8113,6 @@ class _ScorePayloadAccumulator:
                 stats["band_widths"].add(as_decimal(band.get("value")))
             except (TypeError, ValueError, ArithmeticError):
                 pass
-        if tier != "all_numeric":
-            return
-        # b-691 all_numeric extras: IQR / flag-class / per-source counts.
-        strata = _flagged_payload_strata(row)
-        flag_counts = stats["flag_class_counts"]
-        assert isinstance(flag_counts, defaultdict)
-        if not strata:
-            flag_counts["unflagged"] += 1
-        else:
-            for stratum in strata:
-                flag_counts[stratum] += 1
-        observation = None if row_metadata is None else row_metadata.observation
-        source_id = (
-            observation.source_id
-            if observation is not None and observation.source_id
-            else str(row.get("reference") or "")
-        )
-        source_groups = stats["source_groups"]
-        assert isinstance(source_groups, dict)
-        entry = source_groups.setdefault(
-            source_id,
-            {
-                "source_id": source_id,
-                "n_numeric": 0,
-                "n_certified": 0,
-                "n_flagged": 0,
-                "flag_class_counts": defaultdict(int),
-            },
-        )
-        entry["n_numeric"] = int(entry["n_numeric"]) + 1
-        measured = _reference_has_measured_evidence(
-            observation, exclusions=row.get("exclusions")
-        )
-        is_compilation = bool(
-            row_metadata is not None and row_metadata.is_compilation
-        )
-        if measured and not strata and not is_compilation:
-            entry["n_certified"] = int(entry["n_certified"]) + 1
-        if strata:
-            entry["n_flagged"] = int(entry["n_flagged"]) + 1
-            entry_flags = entry["flag_class_counts"]
-            assert isinstance(entry_flags, defaultdict)
-            for stratum in strata:
-                entry_flags[stratum] += 1
 
     def _add_compilation_decision(
         self,
@@ -8117,31 +8312,34 @@ class _ScorePayloadAccumulator:
         compilation_observation = metadata.observation if metadata.is_compilation else None
         measured = metadata.is_measured
         rail = str(row.get("rail") or "")
-        if numeric_value is not None and rail:
-            # all_numeric co-equal headline (b-691): every priced residual.
-            # Do not add to report_engine_names here — that set drives the
-            # measured-tier zero-grid expansion (SCORE_ENGINE_SET fallback when
-            # empty). Compilation/all_numeric rows must not shrink that grid.
-            self._add_headline(
-                row,
-                tier="all_numeric",
-                rail=rail,
-                engine=engine,
-                numeric_value=numeric_value,
-                row_metadata=metadata,
+        # The certified (B) membership decision for this row, made once and
+        # consumed by the all-numeric (A) owner rather than re-derived there.
+        in_measured_headline = bool(
+            measured
+            and _reference_has_measured_evidence(None, exclusions=exclusions)
+            and rail
+        )
+        if numeric_value is not None:
+            # A never adds to report_engine_names: that set is B's grid.
+            self.all_numeric.add(
+                _all_numeric_fact(
+                    row,
+                    engine=engine,
+                    observation=metadata.observation,
+                    certified=in_measured_headline,
+                    value=numeric_value,
+                )
             )
         if measured:
-            if _reference_has_measured_evidence(None, exclusions=exclusions):
-                if rail:
-                    self.report_engine_names.add(engine)
-                    self._add_headline(
-                        row,
-                        tier="measured",
-                        rail=rail,
-                        engine=engine,
-                        numeric_value=numeric_value,
-                        row_metadata=metadata,
-                    )
+            if in_measured_headline:
+                self.report_engine_names.add(engine)
+                self._add_headline(
+                    row,
+                    tier="measured",
+                    rail=rail,
+                    engine=engine,
+                    numeric_value=numeric_value,
+                )
             if row.get("status") == ResidualStatus.REFUSED.value:
                 refusal = row.get("refusal") or {}
                 if isinstance(refusal, Mapping):
@@ -8175,7 +8373,6 @@ class _ScorePayloadAccumulator:
                         rail=rail,
                         engine=engine,
                         numeric_value=numeric_value,
-                        row_metadata=metadata,
                     )
             self._add_compilation_decision(
                 row,
@@ -8231,8 +8428,10 @@ class _ScorePayloadAccumulator:
         selected_names = (
             self.engine_names if engines is None else {engine.value for engine in engines}
         )
-        records: list[dict[str, object]] = []
-        for tier in ("all_numeric", "measured", "compilation"):
+        records: list[dict[str, object]] = self.all_numeric.records(
+            selected_names, include_seen=engines is None
+        )
+        for tier in ("measured", "compilation"):
             groups = self.headline_groups[tier]
             keys = {
                 key for key in groups
@@ -8454,20 +8653,11 @@ def render_score_report_from_payloads(
     compilation_lines: list[str] = []
     if observations is not None:
         from simulator.battery.compilation_tier import (
-            compilation_row_observation,
             compilation_tier_lines_from_payloads,
         )
 
         measured_rows = _FilteredPayloadRows(
-            unflagged_rows,
-            lambda row: _reference_has_measured_evidence(
-                observations.get(str(row.get("reference") or "")),
-                exclusions=row.get("exclusions"),
-            )
-            and compilation_row_observation(
-                str(row.get("reference") or ""), observations, origins
-            )
-            is None,
+            unflagged_rows, _payload_measured_reference(observations, origins)
         )
         compilation_lines = compilation_tier_lines_from_payloads(
             unflagged_rows, observations, origins
@@ -8491,27 +8681,15 @@ def render_score_report_from_payloads(
     lines.extend(
         [
             "",
-            "## All-numeric tier",
+            f"Engines: {', '.join(e.value for e in engines)}.",
             "",
-            "Co-equal descriptive headline over every priced residual (certified and "
-            "flagged). Reports n, signed median, and IQR.",
-            "",
-            "| rail | engine | n | median | IQR | flag classes |",
-            "|---|---|---:|---:|---:|---|",
+            *_all_numeric_markdown_lines(
+                all_numeric_payload_records(
+                    rows, engines=engines, observations=observations, origins=origins
+                )
+            ),
         ]
     )
-    for row in headline_payloads(rows, engines, tier="all_numeric"):
-        if int(row.get("n") or 0) == 0:
-            continue
-        flags = row.get("flag_class_counts") or {}
-        flag_s = (
-            ", ".join(f"{k}={v}" for k, v in flags.items()) if flags else "—"
-        )
-        lines.append(
-            f"| {row['rail']} | {row['engine']} | {row['n']} | "
-            f"{row.get('median_dex') or '—'} | {row.get('iqr_dex') or '—'} | "
-            f"{flag_s} |"
-        )
     lines.extend(
         [
             "",

@@ -846,8 +846,16 @@ def test_pin_all_numeric_non_dex_median_iqr_in_own_metric() -> None:
     )
     row = next(r for r in all_numeric if r["rail"] == Rail.RESIDUE_COMPOSITION.value)
     assert row["n"] == 2
-    assert row["median_dex"] == str(Decimal("0.2"))
-    assert row["iqr_dex"] is not None
+    # r2 finding 3: non-DEX values are never published under a *_dex key;
+    # they are reported in their own (quantity, operation, unit) stratum.
+    assert row["median_dex"] is None
+    assert row["iqr_dex"] is None
+    strata = [s for s in row["metric_strata"] if s["operation"] == "relative"]
+    assert len(strata) == 1
+    assert strata[0]["n"] == 2
+    assert strata[0]["unit"] == "dimensionless"
+    assert strata[0]["median"] == str(Decimal("0.2"))
+    assert "dex" not in strata[0]["label"]
     # Measured tier must remain DEX-filtered (schema unchanged): n counts
     # numeric rows but median_dex stays None when no DEX values exist.
     measured = headline_rows(
