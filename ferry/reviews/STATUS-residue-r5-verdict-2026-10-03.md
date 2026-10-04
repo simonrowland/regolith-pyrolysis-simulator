@@ -7,7 +7,7 @@
 - **VERDICT: LAND c35db99ffa4633a9e65786912da6ac8ede36b299**
 - **Deliverable:** `REVIEW-residue-r5-c35db99ff-2026-10-03.md`
 - **Date:** 2026-10-03 ~20:45 ET
-- **Mailbox:** `empirical/reviews-batch-zv-2026-09-22` (local only, not pushed; sha filled after commit).
+- **Mailbox:** `empirical/reviews-batch-zv-2026-09-22` @ `a449e8707d025feb5a90c73e9e86a5e59550135a` (local only, not pushed).
 
 Attacks (1)–(6) PASS. Sossi element_ppm_by_mass vs Table 2 like-with-like (DEX); buffered fO2 per run. Cache `(source_id, engine)` + cohort maps; mutation RED on engine-only keys. Shadow skip residue-only; vapour path still one shadow; provider reuse conflict-raises; mutation RED. Refusal buckets `outside_supported_species`/`unsupported` keep specific `refusal_detail.reason` (`channel_missing` / `hashimoto_internal_analytical_channels_missing`). NOT-FIXED: store ordering cannot wipe Hashimoto under current keys. Counts spot: data/ empty, admitted residue 464; 653,150 not re-run on 16GB VPS. d-062: single digest owner (named leftovers); pins before moves; import boundary 14 PASS. Focused tests 14 PASS; both mutations detected. VPS openimcc oxygen-anchor pin skew (afcb5d8 vs be41a6d) noted as environment, not product REVISE.
 
