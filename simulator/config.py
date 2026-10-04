@@ -17,6 +17,7 @@ from simulator.yaml_cache import load_cached_safe_yaml
 
 DEFAULT_DATA_DIR = Path(__file__).resolve().parent.parent / "data"
 DEFAULT_ALPHAMELTS_MODEL = "MELTSv1.0.2"
+ENGINE_MODEL_UNAVAILABLE = "unknown"
 
 
 def resolve_alphamelts_subprocess_model(

@@ -42,6 +42,7 @@ from engines.domain_reason import OutOfDomainReason  # noqa: E402
 from simulator.environment import DEFAULT_VACUUM_FLOOR_BAR  # noqa: E402
 from simulator.config import (  # noqa: E402
     DEFAULT_ALPHAMELTS_MODEL,
+    ENGINE_MODEL_UNAVAILABLE,
     resolve_alphamelts_subprocess_model,
 )
 from simulator.engine_pool import (  # noqa: E402
@@ -1085,6 +1086,7 @@ def _worker_failure_output(
     run_mode: str | None = None,
     applied_timeout_s: float | None = None,
     backend_name: str | None = None,
+    backend: Any = None,
 ) -> dict[str, Any]:
     effective_backend_name = backend_name or _WORKER_BACKEND_NAME
     raw_payload_format = (
@@ -1130,7 +1132,9 @@ def _worker_failure_output(
         "timing_s": time.monotonic() - started,
         "engine_version": _WORKER_ENGINE_VERSION,
         "engine_mode": effective_backend_name,
-        "engine_model": str(getattr(_WORKER_BACKEND, "_model", "unknown")),
+        "engine_model": _resolved_worker_engine_model(
+            backend, effective_backend_name
+        ),
         "run_mode": run_mode,
         "applied_timeout_s": applied_timeout_s,
         "native_input": native_input,
@@ -1172,6 +1176,15 @@ def _stable_failure_reason_code(
     return (stable or "exception_unknown")[:FAILURE_REASON_CODE_MAX_LENGTH]
 
 
+def _resolved_worker_engine_model(backend: Any, backend_name: str) -> str:
+    if backend is None:
+        return ENGINE_MODEL_UNAVAILABLE
+    model = getattr(backend, "_model", None)
+    if backend_name == "subprocess":
+        return resolve_alphamelts_subprocess_model(model)[0]
+    return str(model or DEFAULT_ALPHAMELTS_MODEL)
+
+
 def _worker_refusal_output(
     reason: str,
     *,
@@ -1204,7 +1217,9 @@ def _worker_refusal_output(
         "timing_s": time.monotonic() - started,
         "engine_version": _WORKER_ENGINE_VERSION,
         "engine_mode": _WORKER_BACKEND_NAME,
-        "engine_model": str(getattr(_WORKER_BACKEND, "_model", "unknown")),
+        "engine_model": _resolved_worker_engine_model(
+            _WORKER_BACKEND, _WORKER_BACKEND_NAME
+        ),
         "run_mode": run_mode,
         "applied_timeout_s": applied_timeout_s,
         "native_input": None,
@@ -1294,6 +1309,7 @@ def _run_point(job: WorkerJob) -> tuple[int, dict[str, Any]]:
             started=started,
             captures=captures,
             native_input=native_input,
+            backend=_WORKER_BACKEND,
         )
     persisted_fO2_log = job.inputs.get("fO2_log")
     intended_fO2_log = job.inputs.get("intended_fO2_log")
@@ -1424,7 +1440,9 @@ def _run_point(job: WorkerJob) -> tuple[int, dict[str, Any]]:
                 "timing_s": time.monotonic() - started,
                 "engine_version": _WORKER_ENGINE_VERSION,
                 "engine_mode": "thermoengine",
-                "engine_model": str(getattr(backend, "_model", "unknown")),
+                "engine_model": _resolved_worker_engine_model(
+                    backend, _WORKER_BACKEND_NAME
+                ),
                 "run_mode": None,
                 "applied_timeout_s": None,
                 "native_input": None,
@@ -1441,6 +1459,7 @@ def _run_point(job: WorkerJob) -> tuple[int, dict[str, Any]]:
                 started=started,
                 captures=captures,
                 native_input=native_input,
+                backend=backend,
             )
             close_backend = getattr(backend, "close", None)
             if callable(close_backend):
@@ -1580,7 +1599,9 @@ def _run_point(job: WorkerJob) -> tuple[int, dict[str, Any]]:
             "timing_s": time.monotonic() - started,
             "engine_version": _WORKER_ENGINE_VERSION,
             "engine_mode": str(getattr(backend, "_mode", "subprocess")),
-            "engine_model": str(getattr(backend, "_model", "unknown")),
+            "engine_model": _resolved_worker_engine_model(
+                backend, _WORKER_BACKEND_NAME
+            ),
             "run_mode": run_mode,
             "applied_timeout_s": applied_timeout_s,
             "native_input": native_input,
@@ -1599,6 +1620,7 @@ def _run_point(job: WorkerJob) -> tuple[int, dict[str, Any]]:
             native_input=native_input,
             run_mode=run_mode,
             applied_timeout_s=applied_timeout_s,
+            backend=backend,
         )
 
 

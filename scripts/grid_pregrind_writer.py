@@ -23,6 +23,7 @@ from typing import Any, Iterable, Mapping, Sequence
 import yaml
 
 from simulator.accounting.formulas import load_species_formulas
+from simulator.config import ENGINE_MODEL_UNAVAILABLE
 from simulator.fidelity_vocabulary import EvidenceClass
 from simulator.melt_regime import MeltRegime
 from simulator.yaml_cache import load_cached_safe_yaml
@@ -2773,12 +2774,11 @@ class GridCacheWriter:
         queued_model = str(queued_inputs.get("model") or "")
         result_model = str(output.get("engine_model") or "")
         is_failure = str(output.get("status_kind")) == "failure"
-        backend_invoked = bool(
-            json.loads(str(output["raw_payload"])).get("engine_invoked")
-        )
         if is_failure and str(output.get("status")) == "ok":
             raise ValueError("grid failure result cannot have status='ok'")
-        if not (is_failure and not backend_invoked) and queued_model != result_model:
+        if not (
+            is_failure and result_model == ENGINE_MODEL_UNAVAILABLE
+        ) and queued_model != result_model:
             raise ValueError(
                 "grid result model differs from queued key: "
                 f"queued={queued_model!r}, result={result_model!r}"

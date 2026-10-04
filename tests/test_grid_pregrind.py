@@ -39,6 +39,7 @@ from scripts.grid_pregrind_writer import (
     expedited_key,
 )
 from simulator.engine_pool import EngineWorkerTimeout
+from simulator.config import ENGINE_MODEL_UNAVAILABLE
 from scripts.grind_harvest import harvest_snapshot
 from simulator.melt_backend.thermoengine import ThermoEngineBackend
 
@@ -945,7 +946,6 @@ def test_thermoengine_post_run_failure_reports_model_and_is_refused(
         **_inputs(1400.0),
         "model": "pMELTS",
         "mode": "thermoengine",
-        "subprocess_run_mode": None,
         "intended_fO2_log": -9.0,
     }
     monkeypatch.setattr(grid_pregrind, "_WORKER_BACKEND_NAME", "thermoengine")
@@ -1122,9 +1122,7 @@ def test_blank_config_model_is_resolved_for_success_and_worker_failure(
     inputs = {
         **_inputs(1200.0),
         "mode": backend_name,
-        "subprocess_run_mode": (
-            "isothermal" if backend_name == "subprocess" else None
-        ),
+        "subprocess_run_mode": "isothermal",
         "intended_fO2_log": -9.0,
     }
 
@@ -2899,7 +2897,7 @@ def test_parent_worker_failure_future_is_persisted(
     assert result["failure"] == 1
     assert row["status"] == expected_status
     assert row["status_kind"] == "failure"
-    assert row["engine_model"] == "unknown"
+    assert row["engine_model"] == ENGINE_MODEL_UNAVAILABLE
     assert row["failure_message"] == str(exc)
     assert json.loads(row["raw_payload"])["exception"]["message"] == str(exc)
     assert remaining == 0
@@ -2952,7 +2950,7 @@ def test_child_no_backend_initialization_failure_is_persisted(tmp_path, monkeypa
     assert result["inserted"] == 1
     assert result["failure"] == 1
     assert row["status_kind"] == "failure"
-    assert row["engine_model"] == "unknown"
+    assert row["engine_model"] == ENGINE_MODEL_UNAVAILABLE
     assert remaining == 0
 
 
