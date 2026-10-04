@@ -1900,6 +1900,60 @@ def decision_band_for(
     return band
 
 
+def _mapped_reading_uncertainty_dex(
+    uncertainty: Uncertainty,
+) -> Decimal | None:
+    """Dex width from mapped PRINTED verbatim or typed value/basis=dex.
+
+    Extracts store reading uncertainty as a verbatim mapping with keys such as
+    ``dex``, ``sigma_log10P_dex_per_point``, or nested
+    ``figure_reading_estimate.log10_p_atm_absolute_uncertainty_dex``. A typed
+    ``value`` with a dex ``basis`` is accepted the same way. Scalar PRINTED
+    strings remain handled by ``_printed_uncertainty_band``.
+    """
+
+    if uncertainty.value is not None and uncertainty.basis:
+        basis = uncertainty.basis.casefold()
+        if "dex" in basis:
+            raw = uncertainty.value
+            if isinstance(raw, tuple):
+                raw = abs(raw[1] - raw[0])
+            try:
+                width = abs(as_decimal(raw))
+            except (TypeError, ValueError, ArithmeticError, InvalidOperation):
+                width = None
+            if width is not None and width.is_finite() and width > 0:
+                return width
+
+    verbatim = uncertainty.verbatim
+    if isinstance(verbatim, Mapping):
+        return _dex_width_from_mapping(verbatim)
+    return None
+
+
+def _dex_width_from_mapping(mapping: Mapping[str, object]) -> Decimal | None:
+    keys = (
+        "dex",
+        "sigma_log10P_dex_per_point",
+        "sigma_log10p_dex_per_point",
+        "log10_p_atm_absolute_uncertainty_dex",
+    )
+    lower = {str(key).casefold(): value for key, value in mapping.items()}
+    for key in keys:
+        if key.casefold() not in lower:
+            continue
+        try:
+            width = abs(as_decimal(lower[key.casefold()]))
+        except (TypeError, ValueError, ArithmeticError, InvalidOperation):
+            continue
+        if width.is_finite() and width > 0:
+            return width
+    nested = mapping.get("figure_reading_estimate")
+    if isinstance(nested, Mapping):
+        return _dex_width_from_mapping(nested)
+    return None
+
+
 def _printed_uncertainty_band(
     quantity: Quantity,
     uncertainty: Uncertainty | None,
@@ -1907,13 +1961,25 @@ def _printed_uncertainty_band(
     *,
     source_observation: Observation | None = None,
 ) -> DecisionBand | None:
-    """Convert a scalar printed cell uncertainty to the scorer's metric unit."""
+    """Convert a printed cell uncertainty to the scorer's metric unit.
 
-    if (
-        uncertainty is None
-        or uncertainty.kind is not UncertaintyKind.PRINTED
-        or not isinstance(uncertainty.verbatim, str)
-    ):
+    Accepts scalar PRINTED strings (``±30%``) and the mapped reading forms
+    extracts actually store (``dex`` / ``sigma_log10P_dex_per_point`` / nested
+    figure-reading dex), plus typed dex value+basis.
+    """
+
+    if uncertainty is None or uncertainty.kind is not UncertaintyKind.PRINTED:
+        return None
+    mapped = _mapped_reading_uncertainty_dex(uncertainty)
+    if mapped is not None:
+        operation = metric_operation(quantity)
+        if operation is MetricOperation.DEX:
+            return DecisionBand(
+                mapped, "dimensionless", "source-printed per-cell uncertainty"
+            )
+        # Mapped dex widths are already in log10 space; only attach on DEX rails.
+        return None
+    if not isinstance(uncertainty.verbatim, str):
         return None
     match = re.fullmatch(
         r"\s*(?:(?:±|\+/-)\s*)?\(?([+-]?(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][+-]?\d+)?)\)?\s*(%)?\s*",
@@ -2566,10 +2632,15 @@ def _reactive_cell_not_modelled_notice(
     )
 
 
-def _figure_only_notice(quantity: Quantity, observation: Observation) -> Notice:
+def _figure_only_notice(
+    quantity: Quantity | None, observation: Observation
+) -> Notice:
+    # Quantity may be unknown (typed refusal quantity_unknown); the evidence
+    # class label must still attach. Empty affected_quantities is allowed only
+    # for FIGURE_ONLY (see Notice.__post_init__).
     return Notice(
         kind=NoticeKind.FIGURE_ONLY,
-        affected_quantities=(quantity,),
+        affected_quantities=() if quantity is None else (quantity,),
         reason="figure_only",
         origin=observation.observation_id,
     )
@@ -4330,11 +4401,11 @@ def compile_residual(
     flagged_notices = _flagged_stratum_notices(reference, experiment, gates, bench)
     figure_only_notices: tuple[Notice, ...] = ()
     evidence_class = reference.evidence.class_
-    if (
+    figure_only = (
         evidence_class.is_value
         and evidence_class.value is EvidenceClass.FIGURE_ONLY
-        and quantity is not None
-    ):
+    )
+    if figure_only:
         figure_only_notices = (_figure_only_notice(quantity, reference),)
     notices = union_notices(reference.notices, flagged_notices, figure_only_notices)
     comparison_ids = comparison_ids or {reference.observation_id}
@@ -4498,7 +4569,12 @@ def compile_residual(
             "handles": handles,
             "experiment": experiment,
         }
-        if experiment is not None:
+        # Restore injection contract: only the production default predictor
+        # receives bench=. Caller-supplied predictors historically took only
+        # handles/experiment; forwarding bench= raised TypeError (b-693 review
+        # finding 5). Production predict_with_engine still gets bench via the
+        # predict-is-None path.
+        if predict is None and experiment is not None:
             recorded = _bench_for_score(experiment, context.benches)
             if recorded is not None:
                 predictor_kwargs["bench"] = recorded
@@ -4704,17 +4780,16 @@ def compile_residual(
                 ref_point,
                 source_observation=reference,
             ) or cell_band
-        figure_only = (
-            reference.evidence.class_.is_value
-            and reference.evidence.class_.value is EvidenceClass.FIGURE_ONLY
-        )
         if figure_only:
+            # Figure reading band comes only from this row's stored uncertainty.
+            # Never fall back to the global measured KEMS cell band (that
+            # borrows another source's envelope).
             cell_band = _printed_uncertainty_band(
                 quantity,
                 reference.uncertainty,
                 ref_point,
                 source_observation=reference,
-            ) or cell_band
+            )
         numeric, metric_reason, metric_detail = populate_numeric(
             quantity=quantity,
             candidate=prediction.value,
@@ -4748,17 +4823,18 @@ def compile_residual(
         )
     # figure_only and reactive-cell-not-modelled keep their numeric band: they
     # are labels on a predicted quantity, not reasons the reading band is void.
+    # Catalogue-composition on a figure row is the same kind of label: preserve
+    # the stored reading band while keeping the row out of the certified subset.
+    band_preserving_kinds = {
+        NoticeKind.CELL_MATERIAL_INFERRED,
+        NoticeKind.FIGURE_ONLY,
+        NoticeKind.REACTIVE_CELL_NOT_MODELLED,
+    }
+    if figure_only:
+        band_preserving_kinds.add(NoticeKind.COMPOSITION_FROM_SAMPLE_CATALOG)
     has_no_band_flag = any(
-        notice.kind
-        not in {
-            NoticeKind.CELL_MATERIAL_INFERRED,
-            NoticeKind.FIGURE_ONLY,
-            NoticeKind.REACTIVE_CELL_NOT_MODELLED,
-        }
-        for notice in flagged_notices
-    ) or any(
-        _is_fusion_conversion_notice(notice) for notice in notices
-    )
+        notice.kind not in band_preserving_kinds for notice in flagged_notices
+    ) or any(_is_fusion_conversion_notice(notice) for notice in notices)
     if has_no_band_flag:
         numeric = replace(numeric, decision_band=None)
     if implied_alpha:
@@ -5869,15 +5945,22 @@ def _headline_metric_row(
         for r in scored
         if r.status in {ResidualStatus.MATCH, ResidualStatus.MISMATCH}
     ]
-    dex_values = [
-        r.numeric.value
-        for r in scored
-        if r.numeric is not None and r.numeric.operation is MetricOperation.DEX
-    ]
+    # Measured/compilation keep DEX-only descriptive stats (existing schema).
+    # all_numeric median/IQR summarize every numeric residual in its own metric.
+    if tier == "all_numeric":
+        metric_values = [
+            r.numeric.value for r in scored if r.numeric is not None
+        ]
+    else:
+        metric_values = [
+            r.numeric.value
+            for r in scored
+            if r.numeric is not None and r.numeric.operation is MetricOperation.DEX
+        ]
     band_width = _headline_band_width(scored)
-    median = _median_abs(dex_values)
-    signed_median = _median(dex_values)
-    rms = _rms(dex_values)
+    median = _median_abs(metric_values)
+    signed_median = _median(metric_values)
+    rms = _rms(metric_values)
     n_scored = len(scored)
     rms_over_band = (
         None
@@ -5915,7 +5998,7 @@ def _headline_metric_row(
         "data_scatter_ratio": None if rms_over_band is None else str(rms_over_band),
     }
     if tier == "all_numeric":
-        iqr = _iqr(dex_values)
+        iqr = _iqr(metric_values)
         flag_counts: dict[str, int] = defaultdict(int)
         for residual in scored:
             strata = flagged_strata(residual.notices)
@@ -6487,6 +6570,54 @@ def _render_score_report_from_payloads_legacy(
     else:
         for row in unassigned_census:
             lines.append(_census_count_line(row, f"`{row['reason']}`"))
+    report_engine_names = set(aggregate.report_engine_names)
+    if not report_engine_names:
+        report_engine_names = {engine.value for engine in SCORE_ENGINE_SET}
+    report_engines = tuple(Engine(name) for name in sorted(report_engine_names))
+    lines.extend(
+        [
+            "",
+            "## All-numeric tier",
+            "",
+            "Co-equal descriptive headline over every priced residual (certified and "
+            "flagged). Reports n, signed median, IQR, and per-source counts. Does not "
+            "change the measured/certified table below.",
+            "",
+        ]
+    )
+    if not has_residuals:
+        lines.append("Not regenerated.")
+    else:
+        lines.extend(
+            [
+                "| rail | engine | n | median | IQR | flag classes | sources |",
+                "|---|---|---:|---:|---:|---|---|",
+            ]
+        )
+        for row in aggregate.headline_records(engines=report_engines):
+            if row.get("tier") != "all_numeric":
+                continue
+            if int(row.get("n") or 0) == 0 and not row.get("sources"):
+                continue
+            flags = row.get("flag_class_counts") or {}
+            flag_s = (
+                ", ".join(f"{k}={v}" for k, v in flags.items()) if flags else "—"
+            )
+            sources = row.get("sources") or []
+            source_s = (
+                ", ".join(
+                    f"{s.get('source_id')}(n={s.get('n_numeric')},"
+                    f"cert={s.get('n_certified')},flag={s.get('n_flagged')})"
+                    for s in sources
+                )
+                if sources
+                else "—"
+            )
+            lines.append(
+                f"| {row['rail']} | {row['engine']} | {row['n']} | "
+                f"{row.get('median_dex') or '—'} | {row.get('iqr_dex') or '—'} | "
+                f"{flag_s} | {source_s} |"
+            )
     lines.extend(
         [
             "",
@@ -6508,10 +6639,6 @@ def _render_score_report_from_payloads_legacy(
                 "|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|",
             ]
         )
-        report_engine_names = set(aggregate.report_engine_names)
-        if not report_engine_names:
-            report_engine_names = {engine.value for engine in SCORE_ENGINE_SET}
-        report_engines = tuple(Engine(name) for name in sorted(report_engine_names))
         for row in aggregate.headline_records(engines=report_engines):
             if row.get("tier") != "measured":
                 continue
@@ -6798,7 +6925,7 @@ def headline_payloads(
     *,
     tier: str = "measured",
 ) -> list[dict[str, object]]:
-    if tier not in {"measured", "compilation"}:
+    if tier not in {"measured", "compilation", "all_numeric"}:
         raise ValueError(f"unknown headline tier {tier!r}")
     groups: dict[tuple[str, str], dict[str, object]] = {}
     engine_names = [e.value for e in engines]
@@ -6806,7 +6933,9 @@ def headline_payloads(
         for engine in engine_names:
             groups[(rail.value, engine)] = _empty_headline_payload_stats()
     for row in rows:
-        if _flagged_payload_strata(row):
+        strata = _flagged_payload_strata(row)
+        # all_numeric keeps flagged rows; measured/compilation still exclude them.
+        if tier != "all_numeric" and strata:
             continue
         if tier == "measured" and not _reference_has_measured_evidence(
             None, exclusions=row.get("exclusions")
@@ -6843,11 +6972,19 @@ def headline_payloads(
             stats["n_banded"] = int(stats["n_banded"]) + 1
         if status == ResidualStatus.NO_BAND.value:
             stats["n_no_band"] = int(stats["n_no_band"]) + 1
-        if numeric.get("operation") == MetricOperation.DEX.value:
+        if tier == "all_numeric" or numeric.get("operation") == MetricOperation.DEX.value:
             try:
                 stats["dex_values"].append(as_decimal(numeric.get("value")))  # type: ignore[union-attr]
             except (TypeError, ValueError, ArithmeticError):
                 pass
+        if tier == "all_numeric":
+            flag_counts = stats["flag_class_counts"]
+            assert isinstance(flag_counts, defaultdict)
+            if not strata:
+                flag_counts["unflagged"] += 1
+            else:
+                for stratum in strata:
+                    flag_counts[stratum] += 1
         band = numeric.get("decision_band")
         if (
             numeric.get("operation") == MetricOperation.DEX.value
@@ -7435,6 +7572,7 @@ def headline_payload_records(
             )
         )
     records = [
+        *headline_payloads(rows, engines, tier="all_numeric"),
         *headline_payloads(measured_rows, engines, tier="measured"),
         *headline_payloads(compilation_rows, engines, tier="compilation"),
     ]
@@ -7721,9 +7859,9 @@ class _ScorePayloadAccumulator:
             stats["n_banded"] = int(stats["n_banded"]) + 1
         if status == ResidualStatus.NO_BAND.value:
             stats["n_no_band"] = int(stats["n_no_band"]) + 1
-        if (
-            numeric.get("operation") == MetricOperation.DEX.value
-            and numeric_value is not None
+        if numeric_value is not None and (
+            tier == "all_numeric"
+            or numeric.get("operation") == MetricOperation.DEX.value
         ):
             stats["dex_values"].append(numeric_value)
         band = numeric.get("decision_band")
@@ -8353,7 +8491,29 @@ def render_score_report_from_payloads(
     lines.extend(
         [
             "",
-            f"Engines: {', '.join(e.value for e in engines)}.",
+            "## All-numeric tier",
+            "",
+            "Co-equal descriptive headline over every priced residual (certified and "
+            "flagged). Reports n, signed median, and IQR.",
+            "",
+            "| rail | engine | n | median | IQR | flag classes |",
+            "|---|---|---:|---:|---:|---|",
+        ]
+    )
+    for row in headline_payloads(rows, engines, tier="all_numeric"):
+        if int(row.get("n") or 0) == 0:
+            continue
+        flags = row.get("flag_class_counts") or {}
+        flag_s = (
+            ", ".join(f"{k}={v}" for k, v in flags.items()) if flags else "—"
+        )
+        lines.append(
+            f"| {row['rail']} | {row['engine']} | {row['n']} | "
+            f"{row.get('median_dex') or '—'} | {row.get('iqr_dex') or '—'} | "
+            f"{flag_s} |"
+        )
+    lines.extend(
+        [
             "",
             "## Measured tier" if observations is not None else "## Per rail × engine headline",
             "",

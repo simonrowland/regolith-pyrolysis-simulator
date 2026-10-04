@@ -6301,7 +6301,12 @@ def test_admitted_model_derived_rows_emit_residuals_per_imcc_engine() -> None:
     from simulator.battery.score import headline_payload_records, headline_rows
 
     def assert_empty_measured_headlines(rows):
-        assert rows
+        # Dual-headline owners also emit all_numeric records; this assertion
+        # is about the measured/certified grid staying empty for diagnostics.
+        measured = [
+            row for row in rows if row.get("tier", "measured") == "measured"
+        ]
+        assert measured
         assert all(
             row["n"] == 0
             and row["n_refused"] == 0
@@ -6310,7 +6315,7 @@ def test_admitted_model_derived_rows_emit_residuals_per_imcc_engine() -> None:
             and row["rms_dex"] is None
             and row["band_width_dex"] is None
             and row["n_inside_band"] == 0
-            for row in rows
+            for row in measured
         )
 
     object_headlines = headline_rows(
