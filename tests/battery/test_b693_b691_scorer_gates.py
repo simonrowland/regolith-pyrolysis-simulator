@@ -404,6 +404,42 @@ def test_pin_figure_only_counts_in_all_numeric_never_certified() -> None:
 
 
 def test_pin_reactive_re_cell_predicts_with_notice_not_refusal(monkeypatch) -> None:
+    """compile_residual on a typed Re Knudsen row must predict+flag, not refuse reservoir."""
+    from simulator.battery.score import predict_with_engine
+    from tests.battery import test_silent_fills as sf
+
+    sf._capture_cell(monkeypatch)
+    observation, experiment = sf._kems_partial(cell_material=None)
+    bench = sf._cell_material_bench((CellMaterial.RE,))
+    experiment = replace(experiment, bench_id=bench.id)
+    context = _context(
+        F.work(),
+        experiment,
+        observation,
+        benches={bench.id: bench},
+        review="reviewed",
+    )
+    residual, _ = compile_residual(
+        observation,
+        Engine.OPENIMCC,
+        context=context,
+        # Production predictor; monkeypatched engine open from silent_fills.
+        predict=predict_with_engine,
+    )
+    assert residual.status is not ResidualStatus.REFUSED or (
+        residual.refusal is not None
+        and residual.refusal.detail.get("reason") != "reactive_cell_oxygen_reservoir"
+    )
+    assert residual.refusal is None or residual.refusal.detail.get("reason") != (
+        "reactive_cell_oxygen_reservoir"
+    )
+    assert any(
+        "reactive cell: oxygen balance of the cell not modelled" in notice.reason
+        for notice in residual.notices
+    )
+
+
+def test_pin_reactive_re_cell_implicit_predictor_keeps_notice(monkeypatch) -> None:
     """Re cell: prediction+flag, or typed refusal naming the missing input — not old reservoir."""
     from tests.battery import test_silent_fills as sf
 
