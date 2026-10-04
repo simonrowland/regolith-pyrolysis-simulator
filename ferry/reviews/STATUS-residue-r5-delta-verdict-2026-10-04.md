@@ -8,7 +8,7 @@
 - **VERDICT: LAND c5c49f53e985383b8a74e4764272d5de7bcabeca**
 - **Deliverable:** `REVIEW-residue-r5-delta-c5c49f53e-2026-10-04.md`
 - **Date:** 2026-10-04 ~00:15 ET
-- **Mailbox:** `empirical/reviews-batch-zv-2026-09-22` (local commit pending in this STATUS's companion commit; empirical branch not pushed).
+- **Mailbox:** `empirical/reviews-batch-zv-2026-09-22` @ `bb9399c4e1d726f7253f794df75ff262e2a596df` (local only, not pushed).
 
 Attacks: (1) conditional keyword complete for all current callers; suppress+old-stub still TypeErrors but no such caller — typed refusal optional hardening only. (2) residue `_gas_pack_byte_digests` vs bridge `binding_digest` remain distinct provenance fields; merge did not create a cross-read disagreement NOW (b-690 out of scope). (3) NOT-FIXED class = suppress path + old-signature stub. (4) merges do not change residue numbers; `data/` tip↔green empty; merge-trees match both merge commits. d-062: two call-site convention, not duplicated rule; pins OK; import boundary 14 PASS. Focused: vaporock bounce regression PASS; shadow-skip PASS; VPS openimcc lacks binding_digest → 2 residue tests refuse (env; tip requires bc3ac65). Pre-offer CLEAR / NEW 0 / hard_issues 3655=green relied on from receipt (not re-swept here).
 
