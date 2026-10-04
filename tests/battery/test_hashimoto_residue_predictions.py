@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import hashlib
 import math
 from pathlib import Path
 
@@ -100,6 +101,15 @@ def test_hashimoto_cohort_has_complete_vectors_bands_and_value_provenance(
     primary = [row for row in predictions if row.alpha_arm == _HASHIMOTO_PRIMARY_ALPHA_ARM]
     runtime = [row for row in predictions if row.alpha_arm == "alpha_runtime_catalog"]
     assert len(primary) == len(runtime) == 24
+    pytest.importorskip("openimcc")
+    from openimcc import load_gas_datapack
+
+    gas_pack = load_gas_datapack()
+    expected_gas_digest = hashlib.sha256(Path(gas_pack.gas_path).read_bytes()).hexdigest()
+    expected_liquid_digest = hashlib.sha256(Path(gas_pack.oxide_path).read_bytes()).hexdigest()
+    pack_digests = primary[0].provenance["pack_digest"]
+    assert pack_digests["gas_table_sha256"] == expected_gas_digest
+    assert pack_digests["condensate_table_sha256"] == expected_liquid_digest
     assert sum(len(row.primary_oxide_wt_pct) for row in primary) == 120
     assert all(tuple(row.geometry_oxide_wt_pct) == _HASHIMOTO_GEOMETRIES for row in predictions)
 

@@ -8,19 +8,51 @@ source:
   url: https://ui.adsabs.harvard.edu/abs/1971LPSC....2.1367D
 extraction:
   method: >-
-    WA-3 (2026-09-06): pdftotext -layout of the held ADS JBIG2 scan is empty (one
-    bibcode token per page). Tables 1–8 transcribed from 200 dpi pdftoppm renders
-    (not MinerU "~" figure grids). Parent observation objects left unchanged;
-    Table 6 rows, silver/O–O2 calibration, and sample masses added as new
-    observation_ids. Prior method: OCR-artifact transcription (MinerU vlm) of
-    Tables 1–8 + prior phase-2 geometry; multicarrier ladder 2026-08-04
-    (mine-multicarrier-gk). Absolute P only from published tables — figure-only
-    series (Na, K, Fe, Ca, SiO, TiO, TiO2, Al monatomic; Fig. 8 composite) not
-    digitised in this round.
-  date: '2026-09-06'
-  worker: wave-WA-3
+    WA-3 (2026-09-06): Tables 1–8 transcribed from 200 dpi pdftoppm renders;
+    the earlier round did not digitize figure-only series. Repair t1120-demaria
+    (2026-10-03): Fig. 1's Na readings re-read at 300 and 600 dpi from marker
+    centres, with pointwise reading uncertainty and the caption's sample,
+    instrument and bar symbols; Fig. 2 K
+    points added as figure_only from a 300 dpi render. Procedure, depletion,
+    temperature-measurement and figure-legend context checked against page images.
+    Prior method: OCR-artifact transcription (MinerU vlm) of Tables 1–8 + prior
+    phase-2 geometry; multicarrier ladder 2026-08-04 (mine-multicarrier-gk).
+  date: '2026-10-03'
+  worker: t1120-demaria
   provenance_path: docs-private/research/2026-09-06-wave-A/WA-3/kems-022-demaria-1971/
 review_status: draft
+benches:
+- id: demaria-1971-re-kems
+  identity: {basis: described_in_this_work}
+  apparatus_family:
+    state: {tag: value, value: Knudsen-cell mass spectrometry}
+    locator:
+      published_page: 1368
+      pdf_page_index: 2
+      paragraph: rhenium containers having a knife-edge effusion hole 2.3 mm in diameter
+  cell_materials:
+  - state: {tag: value, value: Re}
+    locator:
+      published_page: 1368
+      pdf_page_index: 2
+      paragraph: rhenium containers having a knife-edge effusion hole 2.3 mm in diameter
+experiments:
+- experiment_id: demaria-1971-na-figure1
+  bench_id: demaria-1971-re-kems
+  method: knudsen_effusion
+  locator:
+    published_page: 1369
+    pdf_page_index: 3
+    figure: '1'
+    note: Figure-only Na pressure readings over samples 12022 and 12065.
+- experiment_id: demaria-1971-k-figure2
+  bench_id: demaria-1971-re-kems
+  method: knudsen_effusion
+  locator:
+    published_page: 1370
+    pdf_page_index: 4
+    figure: '2'
+    note: Figure-only K pressure readings over samples 12022 and 12065.
 species:
   O2:
     observations:
@@ -105,7 +137,10 @@ species:
       locator:
         published_page: 1368
         pdf_page_index: 2
-        paragraph: On the whole 680.2 mg of sample 12022,57 and 928.6 mg of 12065,36
+        paragraph: Total masses on p. 1368; 12022 splits on p. 1369; 12065 splits on p. 1375
+        note: >-
+          p. 1368 gives the whole-sample totals; p. 1369 gives the 12022 BC and NAA split masses;
+          p. 1375 gives the 12065 BC and NAA split masses.
       T_range_K:
       - 1250.0
       - 2500.0
@@ -138,9 +173,11 @@ species:
           pdf_page_index: 11
           paragraph: The rhenium crucible was loaded with 106 mgrs. of 12065 lunar sample
       uncertainty:
-        note: masses as printed; 12022 BC+NAA (167.6+162.6+350=680.2) matches the total; 12065
-          series masses plus the 106 mg activity load are recorded separately from the 928.6 mg
-          whole-sample total (arithmetic not forced)
+        note: >-
+          Masses as printed. For 12022, BC+NAA (167.6+162.6+350=680.2 mg) matches the total. For
+          12065, the listed BC+NAA splits total 759 mg, leaving 169.6 mg unexplained relative to
+          the 928.6 mg whole-sample total; the separate 106 mg multi-rotating-cell activity load
+          is not added to those splits.
       equipment:
         orifice_area:
           value: 4.154756e-06
@@ -159,6 +196,24 @@ species:
             published_page: 1368
             pdf_page_index: 2
             paragraph: rhenium containers having a knife-edge effusion hole 2.3 mm in diameter
+        temperature_measurement:
+          value: >-
+            Calibrated Leeds and Northrup optical pyrometers sighted a bottom black-body hole
+            for NAA and the effusion hole for BC, through bottom and top viewing windows,
+            respectively. A tungsten/tungsten-rhenium thermocouple in the central crucible
+            support leg was used with the BC optical pyrometer; the readings agreed generally
+            satisfactorily.
+          units: as described
+          locator:
+            published_page: 1368
+            pdf_page_index: 2
+            paragraph: calibrated Leeds and Northrup optical pyrometers; bottom black body hole; BC effusion hole; thermocouple in central crucible support leg
+        temperature_calibration:
+          value: Optical pyrometers described as calibrated; calibration reference not specified.
+          locator:
+            published_page: 1368
+            pdf_page_index: 2
+            paragraph: calibrated Leeds and Northrup optical pyrometers
   Mn:
     observations:
     - observation_id: demaria_1971_mn_psat_table2_sample_12022
@@ -428,6 +483,7 @@ species:
       - 1300.0
       - 1800.0
       phase: lunar_basalt_melt_12022_12065
+      standard_state: pure Fe metal (Hultgren 1967 reference vapor-pressure line on Fig. 3)
       regime: kems_effusion
       units: dimensionless
       values:
@@ -474,6 +530,7 @@ species:
         line_range: 340-356
         figure: '3'
       phase: lunar_basalt_melt_12065
+      standard_state: pure Fe chips in Fe crucible (multi-rotating cell reference)
       regime: kems_effusion
       units: dimensionless
       values:
@@ -1709,69 +1766,75 @@ species:
             paragraph: rhenium containers; passivated Re for 12065
             line_range: 32-56
     - observation_id: demaria_1971_na_psat_figure1_sample_12022_digitized
+      experiment: demaria-1971-na-figure1
       type: psat_series
       locator:
         source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
         figure: '1'
         page: 1369
-        paragraph: Fig. 1 circles = sample 12022 (upper line); open=BC, full=NAA; pre-depletion / first-observed
-          points only (Na first ~1250 K; rapid depletion)
+        paragraph: Fig. 1 circles = sample 12022; open=BC, full=NAA; bars mark different data series.
         note: figure-digitized absolute P series; not tabulated in source
       T_range_K:
-      - 1299.0
-      - 1429.0
+      - 1296.18
+      - 1439.68
       phase: Apollo_12_lunar_basalt_melt_12022
       standard_state: partial pressure over multicomponent lunar basalt melt (not pure oxide)
       regime: kems_effusion
       units: atm as published on Fig. 1 (p_Pa = p_atm × 101325)
       uncertainty:
-        sigma_log10P_dex_per_point: 0.3
-        dex: 0.3
-        fully_correlated_cell_calibration_offset_note: 'Framework §4.3.A error model: one fully-correlated
-          cell-calibration offset across all points of a series (in addition to 0.30 dex/pt independent).
-          Authors also state ≥factor 2 absolute-P uncertainty from calibration.'
-        note: pre-registered digitization σ; do not retune Pref/γ to close residuals. dex=0.3 is the
-          already-stated σ (log10 of the authors' ≥factor-2 absolute-P bound), not a retune.
+        figure_reading_method: >-
+          Each point has separate x and y reading uncertainty. For each axis, the reported bound
+          is the sum of the maximum absolute printed-tick fit residual, the marker half-width in
+          coordinate units, and the absolute difference between the independent 300 and 600 dpi
+          readings. Component values are stored on each point.
+        calibration_context: >-
+          The authors state on p. 1375 that pressure values carry an uncertainty of
+          at least a factor 2, mainly from calibration; they discuss this as reducing
+          apparent differences except for Na and K. This is distinct from the plotted
+          point-reading estimate above.
       values:
         gas_species: Na(g)
-        quantity: partial_pressure_figure_digitization_rejected
-        status: typed_refusal
-        reason: Figure-only values are inadmissible for this extraction; no source-tabulated Na pressure points exist.
+        quantity: partial_pressure
+        method_class: figure_only
         material: Apollo_12_12022
         condensed_phase: lunar_basalt_melt
         sample: '12022'
-        sample_Na2O_wt_pct: 0.36
-        sample_K2O_wt_pct: 0.068
-        composition_source: 'DeMaria 1971 text (Sample 12022,57 alkaline components paragraph): "0.36
-          and 0.068 wt. % of Na2O and K2O, respectively"; full oxide suite reported elsewhere (Smales
-          1971). Test fixture matches Na2O=0.36.'
-        printed_composition:
-          Na2O: 0.36
-          K2O: 0.068
-        printed_composition_source: DeMaria 1971, p. 1369, alkaline-components paragraph; printed alkalis take precedence for those named fields, while Smales supplies the unprinted bulk oxides.
-        composition_basis: printed_alkali_fields_plus_same_sample_catalog_major_oxides
-        composition_from_sample_catalog: true
-        composition_source_kind: published_same_sample_bulk_analysis
-        sample_oxide_composition_wt_pct:
-          SiO2: 42.3
-          Al2O3: 8.2
-          FeO: 21.6
-          MgO: 11.9
-          CaO: 9.0
-          Na2O: 0.23
-          K2O: 0.061
-          TiO2: 4.9
-          MnO: 0.31
-        composition_source_locator:
-          source_id: smales-1971-lpsc-12022
-          observation_id: smales_1971_apollo_12022_bulk_composition_tables1_2_3
-          published_pages: 1254–1255
-          quote: Apollo 12 rock 12022 analytical composition
+        <<: &composition_12022
+          sample_Na2O_wt_pct: 0.36
+          sample_K2O_wt_pct: 0.068
+          composition_source: 'DeMaria 1971 text (Sample 12022,57 alkaline components paragraph): "0.36
+            and 0.068 wt. % of Na2O and K2O, respectively"; full oxide suite reported elsewhere (Smales
+            1971). Test fixture matches Na2O=0.36.'
+          printed_composition:
+            Na2O: 0.36
+            K2O: 0.068
+          printed_composition_source: DeMaria 1971, p. 1369, alkaline-components paragraph; printed alkalis take precedence for those named fields, while Smales supplies the unprinted bulk oxides.
+          composition_basis: printed_alkali_fields_plus_same_sample_catalog_major_oxides
+          composition_from_sample_catalog: true
+          composition_source_kind: published_same_sample_bulk_analysis
+          sample_oxide_composition_wt_pct:
+            SiO2: 42.3
+            Al2O3: 8.2
+            FeO: 21.6
+            MgO: 11.9
+            CaO: 9.0
+            Na2O: 0.23
+            K2O: 0.061
+            TiO2: 4.9
+            MnO: 0.31
+          composition_source_locator:
+            source_id: smales-1971-lpsc-12022
+            observation_id: smales_1971_apollo_12022_bulk_composition_tables1_2_3
+            published_pages: 1254–1255
+            quote: Apollo 12 rock 12022 analytical composition
         prior_figure_digitization_present: true
-        admission_status: rejected_no_figure_reading
-        series: upper_line_circles
-        pre_depletion_only: true
         first_observed_T_K: 1250.0
+        selection_context_note: >-
+          Authors' general selection statement (p. 1368): “We therefore considered only the ‘initial
+          points,’ namely the values measured in a temperature range corresponding to the conditions
+          under which presumably no appreciable variation of the concentration of the relative components
+          in the condensed phase occurred.” “The treatment of the experimental results given in this paper,
+          is mainly restricted to such data.” This is not a verified per-point fact.
         companion_O2_table: demaria_1971_o2_psat_table1_alkali_range
         co_measured_context: same alkali window as K Fig. 2 and Table 1 O2
         fO2_pairing:
@@ -1779,9 +1842,9 @@ species:
           measured_at_same_T: false
           oxygen_observation_id: demaria_1971_o2_psat_table1_alkali_range
           reason: >-
-            Table 1 O2 points are at 1396 and 1475 K for sample 12022; none is at the
-            temperature of an admissible Na row. The nearest 1396 K point is context only,
-            not an in-cell fO2 pairing.
+            Table 1 reports O2 at 1396 and 1475 K for sample 12022; neither printed T
+            exactly matches a Fig. 1 Na point. These Table 1 measurements are contextual;
+            the paper does not pair them with a particular Na run.
           derivation_status: not_applied
         pO2_atm_as_published: 5.54e-09
         oxygen_partial_pressure:
@@ -1802,7 +1865,7 @@ species:
           source_T_K: 1396.0
           source_instrument: NAA
           basis: Direct Table 1 NAA p(O2) for sample 12022 at 1396 K — the only Table 1 12022 row
-            inside this series' T window [1299, 1429] K. The 1475 K 12022 row (4.96e-8 atm) is outside
+              inside this series' T window [1296.18, 1439.68] K. The 1475 K 12022 row (4.96e-8 atm) is outside
             the digitized Na window and is not used. Not interpolated. Not DEFAULT_PO2_BAR. Not a
             vacuum-floor. Re-cell gettering is already inside the measured p(O2).
           locator:
@@ -1822,8 +1885,8 @@ species:
             sanity_check: 5.6e-9 bar is the same order as the alkali-window O2 table (5.54e-9–4.96e-8
               atm). Distinct from DEFAULT_PO2_BAR=1e-8. Harness is observation-level, so this single
               measured pO2 is attached to the whole series; no Clausius–Clapeyron interpolation or
-              extrapolation is applied. Residual includes any T-mismatch (lowest Na point is 97 K
-              below 1396 K).
+              extrapolation is applied. Residual includes any T-mismatch (lowest Na marker is about
+              100 K below 1396 K); this is context, not a run pairing.
         line_anchor_1429K:
           T_K: 1429.0
           invT_times_1e4_K_inv: 6.9979
@@ -1831,67 +1894,103 @@ species:
           p_Pa: 0.0793
           note: Fitted-line evaluation at investigation T (July Na report); consistent with upper-line
             visual digitization. Held-out only.
-        inadmissible_figure_digitized_points:
-        - T_K: 1428.57
-          invT_times_1e4_K_inv: 7.0
-          log10_p_atm: -6.05
-          p_atm: 8.912509e-07
-          p_Pa: 0.090306
-          symbol: open_circle
+        points:
+        - T_K: 1439.68
+          invT_times_1e4_K_inv: 6.946
+          log10_p_atm: -6.039
+          p_atm: 9.1411324e-07
+          p_Pa: 0.092622524
+          marker_id: C1
+          shape: circle
+          fill: open
           instrument: BC
           figure_digitized: true
-          sigma_log10P_dex: 0.3
-          pre_depletion_initial_point: true
-        - T_K: 1412.43
-          invT_times_1e4_K_inv: 7.08
-          log10_p_atm: -6.15
-          p_atm: 7.079458e-07
-          p_Pa: 0.07173261
-          symbol: open_circle
+          bar_state: not_visible
+          pixel_center_300: [1153.54, 1786.52]
+          pixel_center_600: [2295.19, 3580.94]
+          reading_uncertainty:
+            x: {calibration_residual: 0.000131, marker_half_width: 0.018427, repeatability: 0.010374, total: 0.028932}
+            y: {calibration_residual: 0.003188, marker_half_width: 0.039869, repeatability: 0.018717, total: 0.061774}
+        - T_K: 1421.06
+          invT_times_1e4_K_inv: 7.037
+          log10_p_atm: -6.145
+          p_atm: 7.1614341e-07
+          p_Pa: 0.072563231
+          marker_id: C2
+          shape: circle
+          fill: open
           instrument: BC
           figure_digitized: true
-          sigma_log10P_dex: 0.3
-          pre_depletion_initial_point: true
-        - T_K: 1379.31
-          invT_times_1e4_K_inv: 7.25
-          log10_p_atm: -6.7
-          p_atm: 1.995262e-07
-          p_Pa: 0.020217
-          symbol: filled_circle
+          bar_state: not_visible
+          pixel_center_300: [1200.13, 1812.63]
+          pixel_center_600: [2400.32, 3624.76]
+          reading_uncertainty:
+            x: {calibration_residual: 0.000131, marker_half_width: 0.018351, repeatability: 0.000641, total: 0.019123}
+            y: {calibration_residual: 0.003188, marker_half_width: 0.039869, repeatability: 0.000135, total: 0.043192}
+        - T_K: 1377.03
+          invT_times_1e4_K_inv: 7.262
+          log10_p_atm: -6.716
+          p_atm: 1.9230917e-07
+          p_Pa: 0.019485727
+          marker_id: C3
+          shape: circle
+          fill: full
           instrument: NAA
           figure_digitized: true
-          sigma_log10P_dex: 0.3
-          pre_depletion_initial_point: true
-        - T_K: 1360.54
-          invT_times_1e4_K_inv: 7.35
-          log10_p_atm: -7.15
-          p_atm: 7.079458e-08
-          p_Pa: 0.007173261
-          symbol: open_circle
+          bar_state: not_visible
+          pixel_center_300: [1322.94, 1941.31]
+          pixel_center_600: [2644.67, 3882.47]
+          reading_uncertainty:
+            x: {calibration_residual: 0.000131, marker_half_width: 0.018351, repeatability: 0.000438, total: 0.018920}
+            y: {calibration_residual: 0.003188, marker_half_width: 0.039869, repeatability: 0.001314, total: 0.044371}
+        - T_K: 1358.33
+          invT_times_1e4_K_inv: 7.362
+          log10_p_atm: -7.148
+          p_atm: 7.1121351e-08
+          p_Pa: 0.0072063709
+          marker_id: C4
+          shape: circle
+          fill: open
           instrument: BC
           figure_digitized: true
-          sigma_log10P_dex: 0.3
-          pre_depletion_initial_point: true
-        - T_K: 1342.28
-          invT_times_1e4_K_inv: 7.45
-          log10_p_atm: -7.45
-          p_atm: 3.548134e-08
-          p_Pa: 0.003595147
-          symbol: filled_circle
+          bar_state: not_visible
+          pixel_center_300: [1377.25, 2038.83]
+          pixel_center_600: [2754.45, 4077.69]
+          reading_uncertainty:
+            x: {calibration_residual: 0.000131, marker_half_width: 0.018351, repeatability: 0.000665, total: 0.019147}
+            y: {calibration_residual: 0.003188, marker_half_width: 0.039869, repeatability: 0.001943, total: 0.045000}
+        - T_K: 1334.94
+          invT_times_1e4_K_inv: 7.491
+          log10_p_atm: -7.460
+          p_atm: 3.4673685e-08
+          p_Pa: 0.0035133111
+          marker_id: C5
+          shape: circle
+          fill: full
           instrument: NAA
           figure_digitized: true
-          sigma_log10P_dex: 0.3
-          pre_depletion_initial_point: true
-        - T_K: 1298.7
-          invT_times_1e4_K_inv: 7.7
-          log10_p_atm: -8.05
-          p_atm: 8.912509e-09
-          p_Pa: 0.00090306
-          symbol: open_circle
+          bar_state: not_visible
+          pixel_center_300: [1447.47, 2109.31]
+          pixel_center_600: [2894.80, 4218.56]
+          reading_uncertainty:
+            x: {calibration_residual: 0.000131, marker_half_width: 0.018351, repeatability: 0.000620, total: 0.019102}
+            y: {calibration_residual: 0.003188, marker_half_width: 0.039869, repeatability: 0.001950, total: 0.045007}
+        - T_K: 1297.35
+          invT_times_1e4_K_inv: 7.708
+          log10_p_atm: -8.037
+          p_atm: 9.1833260e-09
+          p_Pa: 0.00093050050
+          marker_id: C6
+          shape: circle
+          fill: open
           instrument: BC
           figure_digitized: true
-          sigma_log10P_dex: 0.3
-          pre_depletion_initial_point: true
+          bar_state: not_visible
+          pixel_center_300: [1565.41, 2239.75]
+          pixel_center_600: [3130.90, 4478.72]
+          reading_uncertainty:
+            x: {calibration_residual: 0.000131, marker_half_width: 0.018351, repeatability: 0.000899, total: 0.019381}
+            y: {calibration_residual: 0.003188, marker_half_width: 0.039869, repeatability: 0.000780, total: 0.043837}
       equipment:
         orifice_area:
           value: 4.154756e-06
@@ -1912,68 +2011,98 @@ species:
             paragraph: rhenium containers
             line_range: '32'
     - observation_id: demaria_1971_na_psat_figure1_sample_12065_digitized
+      experiment: demaria-1971-na-figure1
       type: psat_series
       locator:
         source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
         figure: '1'
         page: 1369
-        paragraph: Fig. 1 squares = sample 12065 (lower line); open=BC, full=NAA; pre-depletion / first-observed
-          points only
+        paragraph: Fig. 1 squares = sample 12065; open=BC, full=NAA; bars mark different data series.
         note: figure-digitized absolute P series; not tabulated in source
       T_range_K:
-      - 1325.0
-      - 1475.0
+      - 1328.20
+      - 1522.77
       phase: Apollo_12_lunar_basalt_melt_12065
       standard_state: partial pressure over multicomponent lunar basalt melt (not pure oxide)
       regime: kems_effusion
       units: atm as published on Fig. 1 (p_Pa = p_atm × 101325)
       uncertainty:
-        sigma_log10P_dex_per_point: 0.3
-        dex: 0.3
-        fully_correlated_cell_calibration_offset_note: 'Framework §4.3.A error model: one fully-correlated
-          cell-calibration offset across all points of a series (in addition to 0.30 dex/pt independent).
-          Authors state ≥factor 2 absolute-P uncertainty from calibration (12065 section).'
-        note: pre-registered digitization σ; do not retune Pref/γ to close residuals. dex=0.3 is the
-          already-stated σ (log10 of the authors' ≥factor-2 absolute-P bound), not a retune.
+        figure_reading_method: >-
+          Each point has separate x and y reading uncertainty. For each axis, the reported bound
+          is the sum of the maximum absolute printed-tick fit residual, the marker half-width in
+          coordinate units, and the absolute difference between the independent 300 and 600 dpi
+          readings. Component values are stored on each point.
+        calibration_context: >-
+          The authors state on p. 1375 that pressure values carry an uncertainty of
+          at least a factor 2, mainly from calibration; they discuss this as reducing
+          apparent differences except for Na and K. This is distinct from the plotted
+          point-reading estimate above.
       values:
         gas_species: Na(g)
-        quantity: partial_pressure_figure_digitization_rejected
-        status: typed_refusal
-        reason: Figure-only values are inadmissible for this extraction; no source-tabulated Na pressure points exist.
+        quantity: partial_pressure
+        method_class: figure_only
         material: Apollo_12_12065
         condensed_phase: lunar_basalt_melt
         sample: '12065'
-        sample_Na2O_wt_pct: 0.27
-        sample_oxide_composition_wt_pct:
-          SiO2: 47.1
-          Al2O3: 9.8
-          FeO: 20.0
-          MgO: 9.2
-          CaO: 10.1
-          Na2O: 0.24
-          K2O: 0.063
-          TiO2: 3.1
-          MnO: 0.26
-        composition_source: Smales et al. 1971, Proc. Second Lunar Science Conf. 2, Tables 1–3, pp. 1254–1255;
-          same Apollo 12065 number, not a generic lunar-basalt composition. DeMaria 1971 does not tabulate
-          the full 12065 bulk oxides.
-        composition_basis: same_sample_catalog_bulk_analysis
-        sample_alkali_context_source: Wolf et al. 2022/2023 VapoRock Table 2; retained sample_Na2O_wt_pct=0.27 is legacy figure context, not the Smales bulk-map Na2O value.
-        composition_from_sample_catalog: true
-        composition_source_kind: published_same_sample_bulk_analysis
-        composition_source_locator:
-          source_id: smales-1971-lpsc-12022
-          observation_id: smales_1971_apollo_12065_bulk_composition_tables1_2_3
-          published_pages: 1254–1255
-          quote: Apollo 12 rock 12065 analytical composition
+        <<: &composition_12065
+          sample_Na2O_wt_pct: 0.27
+          sample_oxide_composition_wt_pct:
+            SiO2: 47.1
+            Al2O3: 9.8
+            FeO: 20.0
+            MgO: 9.2
+            CaO: 10.1
+            Na2O: 0.24
+            K2O: 0.063
+            TiO2: 3.1
+            MnO: 0.26
+          composition_source: Smales et al. 1971, Proc. Second Lunar Science Conf. 2, Tables 1–3, pp. 1254–1255;
+            same Apollo 12065 number, not a generic lunar-basalt composition. DeMaria 1971 does not tabulate
+            the full 12065 bulk oxides.
+          composition_basis: same_sample_catalog_bulk_analysis
+          sample_alkali_context_source: Wolf et al. 2022/2023 VapoRock Table 2; retained sample_Na2O_wt_pct=0.27 is legacy figure context, not the Smales bulk-map Na2O value.
+          composition_from_sample_catalog: true
+          composition_source_kind: published_same_sample_bulk_analysis
+          composition_source_locator:
+            source_id: smales-1971-lpsc-12022
+            observation_id: smales_1971_apollo_12065_bulk_composition_tables1_2_3
+            published_pages: 1254–1255
+            quote: Apollo 12 rock 12065 analytical composition
         prior_figure_digitization_present: true
-        admission_status: rejected_no_figure_reading
-        series: lower_line_squares
-        pre_depletion_only: true
         first_observed_T_K: 1250.0
-        excluded_points_note: 'Three high-T open squares (~6.55–6.72 ×10^4 K^-1) sit well above the author''s
-          fitted lower line and are treated as other-series / non-initial (paper: barred points = different
-          series; progressive depletion lowers later points). Not included in this pre-depletion set.'
+        selection_context_note: >-
+          Authors' general selection statement (p. 1368): “We therefore considered only the ‘initial
+          points,’ namely the values measured in a temperature range corresponding to the conditions
+          under which presumably no appreciable variation of the concentration of the relative components
+          in the condensed phase occurred.” “The treatment of the experimental results given in this paper,
+          is mainly restricted to such data.” This is not a verified per-point fact.
+        marker_reading_notes:
+          included_off_trend_markers: >-
+            All three upper-left open squares are included regardless of fitted-line membership. Their
+            run or mass assignments are not stated in the paper.
+          overlap_unresolved:
+          - marker_id: S11
+            flag: overlap_unresolved
+            sample: '12065'
+            shape: square
+            fill: full
+            instrument: NAA
+            bar_state: unresolved
+            pixel_extent_600: {x: [2324, 2370], y: [4288, 4325]}
+            coordinate_extent_approx: {x: [6.967, 7.009], y: [-7.70, -7.61]}
+            note: >-
+              Markers overlap within this dark full-square cluster; distinct centres cannot be separated.
+              This single entry represents an unresolved overlap region, not an asserted marker count.
+          - marker_id: S4
+            flag: overlap_unresolved
+            sample: '12065'
+            shape: square
+            fill: full
+            instrument: NAA
+            bar_state: visible
+            note: >-
+              The elongated dark body may contain more than one overlapping square; multiplicity is
+              unresolved, so S4 is not treated as a uniquely resolved single marker.
         companion_O2_table: demaria_1971_o2_psat_table1_alkali_range
         co_measured_context: same alkali window as K Fig. 2 and Table 1 O2
         fO2_pairing:
@@ -1981,9 +2110,10 @@ species:
           measured_at_same_T: false
           oxygen_observation_id: demaria_1971_o2_psat_table1_alkali_range
           reason: >-
-            Table 1 O2 points are at 1433, 1459, 1471, 1482 and 1499 K for sample 12065;
-            none is at the temperature of an admissible Na row. The nearest 1433 K point is
-            context only, not an in-cell fO2 pairing.
+            Table 1 reports O2 at 1433, 1459, 1471, 1482 and 1499 K for sample 12065.
+            The nearest re-read Na marker to 1459 K is an open BC square at about 1455.18 K;
+            the nearest marker is not an NAA point. The paper does not identify the table row
+            and figure marker as the same run. Keep O2 as context, not a per-run fO2 pairing.
           derivation_status: not_applied
         pO2_atm_as_published: 3.78e-09
         oxygen_partial_pressure:
@@ -2003,12 +2133,12 @@ species:
           source_sample: '12065'
           source_T_K: 1433.0
           source_instrument: NAA
-          basis: 'Direct Table 1 NAA p(O2) for sample 12065 at 1433 K — the lowest-T overlapping Table 1
-            12065 row inside this series T window [1325, 1475] K, and the nearest Table 1 row to the
-            series median T (~1423.5 K). Other overlapping 12065 Table 1 rows (1459 K 8.78e-9 atm;
-            1471 K 1.27e-8 atm) are recorded on the companion O2 observation and are not averaged.
-            Not interpolated. Not DEFAULT_PO2_BAR. Not a vacuum-floor. Passivated-Re gettering is
-            already inside the measured p(O2) (authors, higher O2+/Me+ than unpassivated 12022).'
+          basis: 'Direct Table 1 NAA p(O2) for sample 12065 at 1433 K, the lowest-temperature Table 1
+            measurement in the alkali window. It is retained as measured context only. Other 12065
+            Table 1 rows (including 1459 K at 8.78e-9 atm and 1471 K at 1.27e-8 atm) remain recorded
+            on the companion O2 observation and are not averaged or assigned to a Fig. 1 run. Not
+            interpolated. Not DEFAULT_PO2_BAR. Not a vacuum-floor. Passivated-Re gettering is already
+            inside the measured p(O2) (authors, higher O2+/Me+ than unpassivated 12022).'
           locator:
             source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
             table: '1'
@@ -2022,10 +2152,10 @@ species:
             algebra: pO2_bar = p_atm × (1.01325 bar / 1 atm) = 3.78e-9 × 1.01325 = 3.830085e-9 bar
             unit_check: 3.78e-9 atm × 101325 Pa/atm = 3.830085e-4 Pa; 3.830085e-4 Pa / 1e5 Pa/bar =
               3.830085e-9 bar. Matches the already-stored Table 1 point p_Pa=0.0003830085.
-            sanity_check: 3.8e-9 bar sits inside the 12065 alkali-window O2 table (3.78e-9–2.11e-8 atm).
+          sanity_check: 3.8e-9 bar sits inside the 12065 alkali-window O2 table (3.78e-9–2.11e-8 atm).
               Distinct from DEFAULT_PO2_BAR=1e-8. Harness is observation-level, so this single measured
-              pO2 is attached to the whole series; no interpolation. Residual includes T-mismatch
-              (lowest Na point is 108 K below 1433 K). A factor ~5.6 span across Table 1 12065 pO2
+              pO2 is attached as context to the whole series; no interpolation or same-run pairing is
+              asserted. The lowest Na marker is about 105 K below 1433 K. A factor ~5.6 span across Table 1 12065 pO2
               moves p_Na by only ~0.19 dex (p_Na ∝ pO2^{-1/4}); it cannot manufacture or hide a ~2 dex
               residual.
         line_anchor_1429K:
@@ -2035,107 +2165,231 @@ species:
           p_Pa: 0.00183
           note: Fitted-line evaluation at investigation T (July Na report); consistent with lower-line
             visual digitization. Held-out only.
-        inadmissible_figure_digitized_points:
-        - T_K: 1474.93
-          invT_times_1e4_K_inv: 6.78
-          log10_p_atm: -7.05
-          p_atm: 8.912509e-08
-          p_Pa: 0.0090306
-          symbol: open_square
+        points:
+        - T_K: 1522.77
+          invT_times_1e4_K_inv: 6.567
+          log10_p_atm: -6.463
+          p_atm: 3.4434993e-07
+          p_Pa: 0.034891257
+          marker_id: S1
+          shape: square
+          fill: open
           instrument: BC
           figure_digitized: true
-          sigma_log10P_dex: 0.3
-          pre_depletion_initial_point: true
-        - T_K: 1459.85
-          invT_times_1e4_K_inv: 6.85
-          log10_p_atm: -7.2
-          p_atm: 6.309573e-08
-          p_Pa: 0.006393175
-          symbol: filled_square
-          instrument: NAA
-          figure_digitized: true
-          sigma_log10P_dex: 0.3
-          pre_depletion_initial_point: true
-        - T_K: 1449.28
-          invT_times_1e4_K_inv: 6.9
-          log10_p_atm: -7.3
-          p_atm: 5.011872e-08
-          p_Pa: 0.00507828
-          symbol: open_square
+          bar_state: not_visible
+          pixel_center_300: [944.11, 1884.02]
+          pixel_center_600: [1888.51, 3768.97]
+          reading_uncertainty:
+            x: {calibration_residual: 0.000131, marker_half_width: 0.018351, repeatability: 0.000660, total: 0.019142}
+            y: {calibration_residual: 0.003188, marker_half_width: 0.039869, repeatability: 0.003505, total: 0.046562}
+        - T_K: 1497.23
+          invT_times_1e4_K_inv: 6.679
+          log10_p_atm: -6.739
+          p_atm: 1.8238957e-07
+          p_Pa: 0.018480623
+          marker_id: S2
+          shape: square
+          fill: open
           instrument: BC
           figure_digitized: true
-          sigma_log10P_dex: 0.3
-          pre_depletion_initial_point: true
-        - T_K: 1438.85
-          invT_times_1e4_K_inv: 6.95
-          log10_p_atm: -7.4
-          p_atm: 3.981072e-08
-          p_Pa: 0.004033821
-          symbol: filled_square
-          instrument: NAA
-          figure_digitized: true
-          sigma_log10P_dex: 0.3
-          pre_depletion_initial_point: true
-        - T_K: 1428.57
-          invT_times_1e4_K_inv: 7.0
-          log10_p_atm: -7.55
-          p_atm: 2.818383e-08
-          p_Pa: 0.002855727
-          symbol: open_square
+          bar_state: not_visible
+          pixel_center_300: [1005.00, 1946.89]
+          pixel_center_600: [2009.66, 3892.93]
+          reading_uncertainty:
+            x: {calibration_residual: 0.000131, marker_half_width: 0.018351, repeatability: 0.000128, total: 0.018610}
+            y: {calibration_residual: 0.003188, marker_half_width: 0.039869, repeatability: 0.000238, total: 0.043295}
+        - T_K: 1477.98
+          invT_times_1e4_K_inv: 6.766
+          log10_p_atm: -6.945
+          p_atm: 1.1350108e-07
+          p_Pa: 0.011500497
+          marker_id: S3
+          shape: square
+          fill: open
           instrument: BC
           figure_digitized: true
-          sigma_log10P_dex: 0.3
-          pre_depletion_initial_point: true
-        - T_K: 1418.44
-          invT_times_1e4_K_inv: 7.05
-          log10_p_atm: -7.7
-          p_atm: 1.995262e-08
-          p_Pa: 0.0020217
-          symbol: filled_square
+          bar_state: not_visible
+          pixel_center_300: [1052.12, 1993.25]
+          pixel_center_600: [2105.12, 3986.14]
+          reading_uncertainty:
+            x: {calibration_residual: 0.000131, marker_half_width: 0.018351, repeatability: 0.001287, total: 0.019769}
+            y: {calibration_residual: 0.003188, marker_half_width: 0.039869, repeatability: 0.000999, total: 0.044056}
+        - T_K: 1486.99
+          invT_times_1e4_K_inv: 6.725
+          log10_p_atm: -7.117
+          p_atm: 7.6383578e-08
+          p_Pa: 0.0077395661
+          marker_id: S4
+          shape: square
+          fill: full
           instrument: NAA
           figure_digitized: true
-          sigma_log10P_dex: 0.3
-          pre_depletion_initial_point: true
-        - T_K: 1398.6
-          invT_times_1e4_K_inv: 7.15
-          log10_p_atm: -8.0
-          p_atm: 1.0e-08
-          p_Pa: 0.00101325
-          symbol: filled_square
+          bar_state: visible
+          pixel_center_300: [1029.86, 2031.94]
+          pixel_center_600: [2060.02, 4063.95]
+          reading_uncertainty:
+            x: {calibration_residual: 0.000131, marker_half_width: 0.025690, repeatability: 0.000727, total: 0.026548}
+            y: {calibration_residual: 0.003188, marker_half_width: 0.039869, repeatability: 0.002015, total: 0.045072}
+        - T_K: 1464.99
+          invT_times_1e4_K_inv: 6.826
+          log10_p_atm: -7.170
+          p_atm: 6.7608298e-08
+          p_Pa: 0.0068504107
+          marker_id: S5
+          shape: square
+          fill: open
+          instrument: BC
+          figure_digitized: true
+          bar_state: not_visible
+          pixel_center_300: [1084.24, 2044.12]
+          pixel_center_600: [2171.28, 4086.89]
+          reading_uncertainty:
+            x: {calibration_residual: 0.000131, marker_half_width: 0.018351, repeatability: 0.003059, total: 0.021541}
+            y: {calibration_residual: 0.003188, marker_half_width: 0.039869, repeatability: 0.001083, total: 0.044140}
+        - T_K: 1455.18
+          invT_times_1e4_K_inv: 6.872
+          log10_p_atm: -7.186
+          p_atm: 6.5162839e-08
+          p_Pa: 0.0066026247
+          marker_id: S6
+          shape: square
+          fill: open
+          instrument: BC
+          figure_digitized: true
+          bar_state: not_visible
+          pixel_center_300: [1109.77, 2047.88]
+          pixel_center_600: [2220.13, 4094.25]
+          reading_uncertainty:
+            x: {calibration_residual: 0.000131, marker_half_width: 0.018351, repeatability: 0.001061, total: 0.019543}
+            y: {calibration_residual: 0.003188, marker_half_width: 0.039869, repeatability: 0.001434, total: 0.044491}
+        - T_K: 1472.10
+          invT_times_1e4_K_inv: 6.793
+          log10_p_atm: -7.248
+          p_atm: 5.6493697e-08
+          p_Pa: 0.0057242239
+          marker_id: S7
+          shape: square
+          fill: full
           instrument: NAA
           figure_digitized: true
-          sigma_log10P_dex: 0.3
-          pre_depletion_initial_point: true
-        - T_K: 1379.31
-          invT_times_1e4_K_inv: 7.25
-          log10_p_atm: -8.15
-          p_atm: 7.079458e-09
-          p_Pa: 0.0007173261
-          symbol: filled_square
+          bar_state: not_visible
+          pixel_center_300: [1066.91, 2061.51]
+          pixel_center_600: [2133.95, 4122.37]
+          reading_uncertainty:
+            x: {calibration_residual: 0.000131, marker_half_width: 0.018351, repeatability: 0.000599, total: 0.019081}
+            y: {calibration_residual: 0.003188, marker_half_width: 0.039869, repeatability: 0.000546, total: 0.043603}
+        - T_K: 1464.34
+          invT_times_1e4_K_inv: 6.829
+          log10_p_atm: -7.313
+          p_atm: 4.8640721e-08
+          p_Pa: 0.004928521
+          marker_id: S8
+          shape: square
+          fill: full
           instrument: NAA
           figure_digitized: true
-          sigma_log10P_dex: 0.3
-          pre_depletion_initial_point: true
-        - T_K: 1351.35
-          invT_times_1e4_K_inv: 7.4
-          log10_p_atm: -8.7
-          p_atm: 1.995262e-09
-          p_Pa: 0.00020217
-          symbol: filled_square
+          bar_state: visible
+          pixel_center_300: [1086.98, 2076.00]
+          pixel_center_600: [2173.75, 4152.06]
+          reading_uncertainty:
+            x: {calibration_residual: 0.000131, marker_half_width: 0.018351, repeatability: 0.000317, total: 0.018799}
+            y: {calibration_residual: 0.003188, marker_half_width: 0.039869, repeatability: 0.002153, total: 0.045210}
+        - T_K: 1451.59
+          invT_times_1e4_K_inv: 6.889
+          log10_p_atm: -7.409
+          p_atm: 3.8994199e-08
+          p_Pa: 0.0039510872
+          marker_id: S9
+          shape: square
+          fill: full
           instrument: NAA
           figure_digitized: true
-          sigma_log10P_dex: 0.3
-          pre_depletion_initial_point: true
-        - T_K: 1324.5
-          invT_times_1e4_K_inv: 7.55
-          log10_p_atm: -9.35
-          p_atm: 4.466836e-10
-          p_Pa: 4.526021e-05
-          symbol: filled_square
+          bar_state: visible
+          pixel_center_300: [1119.21, 2097.75]
+          pixel_center_600: [2238.48, 4195.15]
+          reading_uncertainty:
+            x: {calibration_residual: 0.000131, marker_half_width: 0.018351, repeatability: 0.000583, total: 0.019065}
+            y: {calibration_residual: 0.003188, marker_half_width: 0.039869, repeatability: 0.001300, total: 0.044357}
+        - T_K: 1442.38
+          invT_times_1e4_K_inv: 6.933
+          log10_p_atm: -7.467
+          p_atm: 3.4119291e-08
+          p_Pa: 0.0034571372
+          marker_id: S10
+          shape: square
+          fill: open
+          instrument: BC
+          figure_digitized: true
+          bar_state: not_visible
+          pixel_center_300: [1143.22, 2111.16]
+          pixel_center_600: [2286.36, 4221.15]
+          reading_uncertainty:
+            x: {calibration_residual: 0.000131, marker_half_width: 0.018351, repeatability: 0.000472, total: 0.018954}
+            y: {calibration_residual: 0.003188, marker_half_width: 0.039869, repeatability: 0.000505, total: 0.043562}
+        - T_K: 1408.25
+          invT_times_1e4_K_inv: 7.101
+          log10_p_atm: -8.025
+          p_atm: 9.4406088e-09
+          p_Pa: 0.00095656968
+          marker_id: S12
+          shape: square
+          fill: full
           instrument: NAA
           figure_digitized: true
-          sigma_log10P_dex: 0.3
-          pre_depletion_initial_point: true
+          bar_state: visible
+          pixel_center_300: [1234.84, 2236.87]
+          pixel_center_600: [2469.80, 4473.60]
+          reading_uncertainty:
+            x: {calibration_residual: 0.000131, marker_half_width: 0.018351, repeatability: 0.000715, total: 0.019197}
+            y: {calibration_residual: 0.003188, marker_half_width: 0.039869, repeatability: 0.002175, total: 0.045232}
+        - T_K: 1399.19
+          invT_times_1e4_K_inv: 7.147
+          log10_p_atm: -8.136
+          p_atm: 7.3113908e-09
+          p_Pa: 0.00074082668
+          marker_id: S13
+          shape: square
+          fill: full
+          instrument: NAA
+          figure_digitized: true
+          bar_state: not_visible
+          pixel_center_300: [1260.08, 2262.04]
+          pixel_center_600: [2520.34, 4522.83]
+          reading_uncertainty:
+            x: {calibration_residual: 0.000131, marker_half_width: 0.018351, repeatability: 0.000787, total: 0.019269}
+            y: {calibration_residual: 0.003188, marker_half_width: 0.039869, repeatability: 0.000211, total: 0.043268}
+        - T_K: 1364.44
+          invT_times_1e4_K_inv: 7.329
+          log10_p_atm: -8.706
+          p_atm: 1.9678863e-09
+          p_Pa: 0.00019939608
+          marker_id: S14
+          shape: square
+          fill: full
+          instrument: NAA
+          figure_digitized: true
+          bar_state: not_visible
+          pixel_center_300: [1359.32, 2390.60]
+          pixel_center_600: [2718.48, 4780.27]
+          reading_uncertainty:
+            x: {calibration_residual: 0.000131, marker_half_width: 0.018351, repeatability: 0.000544, total: 0.019026}
+            y: {calibration_residual: 0.003188, marker_half_width: 0.039869, repeatability: 0.000885, total: 0.043942}
+        - T_K: 1328.20
+          invT_times_1e4_K_inv: 7.529
+          log10_p_atm: -9.413
+          p_atm: 3.8636698e-10
+          p_Pa: 3.9148634e-05
+          marker_id: S15
+          shape: square
+          fill: full
+          instrument: NAA
+          figure_digitized: true
+          bar_state: not_visible
+          pixel_center_300: [1468.42, 2549.95]
+          pixel_center_600: [2936.58, 5099.82]
+          reading_uncertainty:
+            x: {calibration_residual: 0.000131, marker_half_width: 0.018351, repeatability: 0.000525, total: 0.019007}
+            y: {calibration_residual: 0.003188, marker_half_width: 0.039869, repeatability: 0.003171, total: 0.046228}
       equipment:
         orifice_area:
           value: 4.154756e-06
@@ -2156,6 +2410,163 @@ species:
             source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
             paragraph: passivated rhenium cells for 12065
             line_range: 56-60
+    context:
+    - observation_id: demaria_1971_alkali_run_procedure_and_missing_order
+      type: method
+      locator:
+        published_page: 1368
+        pdf_page_index: 2
+        paragraph: experiments performed utilizing alternate procedures; progressive and fixed temperature procedures
+      units: as printed
+      values:
+        quantity: alkali_run_temperature_procedure
+        method_class: quoted_attributed
+        procedure_quote: >-
+          The experiments were performed utilizing alternate procedures which consisted either of studying the
+          vaporization of the sample progressively, namely by changing the temperature step by step
+          (“progressive depletion” procedure) or of heating the sample to a predetermined temperature
+          (“fixed temperature” procedure). The latter mode was controlled by the limits imposed by the validity
+          of the Knudsen effusion conditions. This procedure was mainly used in the initial part of the BC
+          experiments.
+        temperature_visit_order: not stated; ascending, descending, or cyclic order is not specified (pp. 1367–1380 searched)
+        fresh_sample_per_temperature: not stated (pp. 1367–1380 searched)
+        time_at_temperature: not stated (pp. 1367–1380 searched)
+        sample_depletion_procedure_note: The paper calls the stepwise procedure “progressive depletion,” but does not give a point-by-point run sequence.
+        sample_12065_procedure_relation: >-
+          The authors say that the procedure for sample 12065 was similar to that for 12022 (p. 1375).
+          They do not specify point-by-point run order, fresh sample use, or hold times.
+    - observation_id: demaria_1971_alkali_depletion_statements
+      type: method
+      locator:
+        published_page: 1368
+        pdf_page_index: 2
+        paragraph: As the sample vaporized a depletion in the volatile components occurred
+        note: Additional Na and K depletion statement at p. 1369, Alkaline components paragraph.
+      units: as printed
+      values:
+        quantity: alkali_depletion_with_vaporization
+        method_class: quoted_attributed
+        depletion_quote_p1368: >-
+          As the sample vaporized a depletion in the volatile components occurred. This process caused a change
+          in the intensities of species at constant temperature to values which, in some cases, dropped below
+          the sensitivity-detection limits of the instruments. We therefore considered only the “initial points,”
+          namely the values measured in a temperature range corresponding to the conditions under which
+          presumably no appreciable variation of the concentration of the relative components in the condensed
+          phase occurred.
+        results_treatment_quote_p1368: >-
+          The treatment of the experimental results given in this paper, is mainly restricted to such data.
+        alkali_depletion_quote_p1369: >-
+          Owing to the low content in the sample (0.36 and 0.068 wt. % of Na2O and K2O, respectively) depletion
+          of these components occurred very soon, so that only a few initial points could be measured.
+        time_or_successive_heating_detail: not stated beyond the quoted depletion statements; pp. 1367–1380 searched
+        depletion_interpretation_note: >-
+          depletion steepens the apparent slope only if the lower-temperature points were measured after the
+          higher-temperature ones; the order is not stated; in an upward progressive run depletion flattens it.
+        thermodynamic_context_flags:
+          liquidus: All transcribed Fig. 1 Na points are below the lunar-sample liquidus.
+          effusion_saturation: Not demonstrated; the area calculated from the reported diameter is 4.15 mm², and sample surface area is not stated.
+          absolute_pressure_uncertainty: At least a factor of two according to the authors (p. 1375).
+    - observation_id: demaria_1971_figure1_symbol_key
+      type: experiment_series
+      locator:
+        published_page: 1369
+        pdf_page_index: 3
+        figure: '1'
+        paragraph: Figure 1 caption symbol definitions
+      units: as printed
+      values:
+        quantity: figure_symbol_and_instrument_key
+        method_class: quoted_attributed
+        caption_quote: >-
+          The circles are referred to the sample 12022 while the squares are relative to the sample 12065.
+          Open points are referred to experiments carried out with BC instrument; full points are relative to
+          NAA experiments. Barred points are relative to different series of data. This notation is followed
+          through the text.
+        BC_instrument: Bendix Co. time-of-flight mass spectrometer, model 3015 (p. 1367)
+        NAA_instrument: Inghram-type Nuclide Analysis HT model (NAA), 60° magnetic-sector, 12″ radius of curvature, vertically mounted (p. 1367)
+        differential_pumping_and_background_note: Differential pumping and background discrimination used a movable slit (p. 1367).
+        series_interpretation: The caption does not name or number the different series; a bar marks a point from a different data series.
+        figure_reading_note: |-
+          # Fig. 1 digitization derivation (p. 1369; image pixels are full-page render coordinates)
+          # Locate the printed tick centres, fit value = slope × pixel + intercept separately for each axis,
+          # then map the centroid of each isolated marker's dark body pixels. Crops were enlarged for manual
+          # seed placement; grayscale pixels <150 within the marker body supplied the centroid. The 300 and
+          # 600 dpi readings were made independently. The crowded lower cluster is recorded by extent only.
+          # 300 dpi: x = 0.00183503073162 px + 4.834633153; y = -0.00442985392815 py + 1.884830493.
+          # Printed Fig. 1 symbols are uniform in size.
+          # Reviewer measurement: isolated 8-connected components at grayscale < 150, inclusive pixel coverage, 300 dpi;
+          # maximum half-extent 9.5 × 8.5 px at S1 (S3: 9 × 8.5 px).
+          # Round that maximum up to a 10 × 9 px half-width floor; larger stored widths remain.
+          # Using the stored 300 dpi calibration (x slope 0.00183503073162 in 10^4/T per px; y slope 0.00442985392815 dex per px),
+          # the floor is x=10×0.00183503073162=0.018350307 in 10^4/T and y=9×0.00442985392815=0.039868685 dex;
+          # S1: half-widths 0.016516/0.035439 → 0.018351/0.039869 axis units; totals 0.017307/0.042132 → 0.019142/0.046562.
+          # 600 dpi: x = 0.000917868016649 px + 4.834366353; y = -0.00221636267629 py + 1.888778039.
+          # From the mapped centre (x,y), T = 10^4/x K and p = 10^y atm. Each point stores the 300/600 dpi
+          # pixel centres and uncertainty components: maximum absolute tick-fit residual + marker half-width
+          # + absolute difference between the independent coordinate readings.
+          # Worked point C1: the two mapped centres average to x=6.946, y=-6.039; T=10^4/6.946=1439.68 K,
+          # p=10^-6.039=9.1411324e-7 atm. Sanity check: 300 dpi x tick at px=1180 maps to 6.9999694 (~7.0);
+          # 600 dpi y tick at py=4912.686 maps to -8.9995159 (~-9.0).
+          # Calibration residual tables (tick | pixel | fitted value | residual):
+          # 300 x: 6.5|907.5500|6.5000153|+0.0000153; 7.0|1180.0000|6.9999694|-0.0000306;
+          # 7.5|1452.5000|7.5000153|+0.0000153.
+          # 300 y: -6|1780.2154|-6.0012637|-0.0012637; -7|2004.9516|-6.9968122|+0.0031878;
+          # -8|2232.0000|-8.0026035|-0.0026035; -9|2457.0000|-8.9993206|+0.0006794.
+          # 600 x: 6.5|1814.6051|6.4999343|-0.0000657; 7.0|2359.5604|7.0001314|+0.0001314;
+          # 7.5|2904.0863|7.4999343|-0.0000657.
+          # 600 y: -6|3559.7625|-6.0009467|-0.0009467; -7|4009.4570|-6.9976328|+0.0023672;
+          # -8|4462.5741|-8.0019046|-0.0019046; -9|4912.6860|-8.9995159|+0.0004841.
+    - observation_id: demaria_1971_o2_temperature_and_run_pairing_context
+      type: experiment_series
+      locator:
+        published_page: 1370
+        pdf_page_index: 4
+        table: '1'
+        figure: '1'
+        paragraph: Table 1 footnote states measurements carried out with NAA instrument
+      units: K and atm as printed; figure comparison is figure-only
+      values:
+        quantity: oxygen_and_sodium_temperature_pairing_context
+        method_class: quoted_attributed
+        table_1_instrument: NAA
+        sample_12022_O2_temperatures_K: [1396, 1475]
+        sample_12065_O2_temperatures_K: [1433, 1482, 1499, 1471, 1459]
+        nearest_Na_marker_to_each_O2_temperature:
+          sample_12022:
+            - {O2_T_K: 1396, marker_id: C3, Na_T_K: 1377.03, marker: full circle, instrument: NAA, delta_T_K: 18.97}
+            - {O2_T_K: 1475, marker_id: C1, Na_T_K: 1439.68, marker: open circle, instrument: BC, delta_T_K: 35.32}
+          sample_12065:
+            - {O2_T_K: 1433, marker_id: S10, Na_T_K: 1442.38, marker: open square, instrument: BC, delta_T_K: 9.38}
+            - {O2_T_K: 1459, marker_id: S6, Na_T_K: 1455.18, marker: open square, instrument: BC, delta_T_K: 3.82}
+            - {O2_T_K: 1471, marker_id: S7, Na_T_K: 1472.10, marker: full square, instrument: NAA, delta_T_K: 1.10}
+            - {O2_T_K: 1482, marker_id: S3, Na_T_K: 1477.98, marker: open square, instrument: BC, delta_T_K: 4.02}
+            - {O2_T_K: 1499, marker_id: S2, Na_T_K: 1497.23, marker: open square, instrument: BC, delta_T_K: 1.77}
+        nearest_marker_note: These are temperature-nearest plotted markers only; none is asserted as a same-run O2/Na pairing.
+        pairing_statement: The paper reports O2 during alkali evaporation and gives Table 1 temperatures, but does not state per-run Na/O2 pairings.
+    - observation_id: demaria_1971_main_cell_unreported_dimensions_and_temperature_uncertainty
+      type: apparatus
+      locator:
+        published_page: 1368
+        pdf_page_index: 2
+        paragraph: rhenium containers having a knife-edge effusion hole 2.3 mm in diameter
+        note: Search of apparatus and results pages 1367–1380.
+      units: as reported or not stated
+      values:
+        quantity: main_knudsen_cell_geometry_and_temperature_uncertainty
+        method_class: quoted_unattributed
+        stated_cell_material: rhenium
+        stated_orifice_diameter_mm: 2.3
+        cell_internal_dimensions: not stated (pp. 1367–1380 searched)
+        clausing_factor: not stated (pp. 1367–1380 searched)
+        liner_material: not stated separately from the rhenium container (pp. 1367–1380 searched)
+        sample_surface_area: not stated (pp. 1367–1380 searched)
+        orifice_to_sample_area_ratio: not stated; sample surface area is not given (pp. 1367–1380 searched)
+        temperature_measurement_uncertainty: not stated (pp. 1367–1380 searched)
+        temperature_calibration_reference: not stated; pyrometers are described as calibrated (p. 1368)
+        heating_methods_and_range: Samples were heated by radiation or electron bombardment, to temperatures up to 2500 K (p. 1368).
+        liquidus_context: All re-read Fig. 1 Na points are below the lunar-sample liquidus.
+        effusion_context: Effusion saturation is not demonstrated; area calculated from the reported diameter is 4.15 mm², and sample area is not stated.
+        absolute_pressure_uncertainty: At least a factor of two (authors, p. 1375).
   K:
     observations:
     - observation_id: demaria_1971_k_first_observed_figure2
@@ -2179,7 +2590,9 @@ species:
         sample_K2O_wt_pct: 0.068
         first_observed_T_K: 1250.0
         semantics: bound_not_point_ordering
-        note: Absolute P on Fig. 2 only. Not figure-digitized.
+        note: >-
+          This first-observed context record is not the digitized point series; see
+          demaria_1971_k_psat_figure2_digitized.
         companion_O2_table: demaria_1971_o2_psat_table1_alkali_range
       equipment:
         orifice_area:
@@ -2201,6 +2614,94 @@ species:
             source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
             paragraph: rhenium containers; passivated Re for 12065
             line_range: 32-56
+    - observation_id: demaria_1971_k_psat_figure2_digitized
+      experiment: demaria-1971-k-figure2
+      type: psat_series
+      locator:
+        published_page: 1370
+        pdf_page_index: 4
+        figure: '2'
+        paragraph: Temperature dependence of K partial pressures over samples 12022 and 12065
+        note: Figure-only readings from the 300 dpi page image; axes are log10(P/atm) and 1/T × 10^4 K^-1.
+      T_range_K:
+      - 1308.90
+      - 1497.01
+      phase: Apollo_12_lunar_basalt_melt_12022_12065
+      regime: kems_effusion
+      units: atm as published on Fig. 2 (p_Pa = p_atm × 101325)
+      uncertainty:
+        figure_reading_estimate:
+          log10_p_atm_absolute_uncertainty_dex: 0.10
+          invT_times_1e4_K_inv_absolute_uncertainty: 0.02
+          note: >-
+            Estimated from the 300 dpi Fig. 2 axes and point widths; applies to each listed point.
+            The pressure coordinate is log10(atm), and the temperature coordinate is 1/T × 10^4 K^-1.
+      values:
+        gas_species: K(g)
+        quantity: partial_pressure
+        method_class: figure_only
+        sample_pair: Apollo_12_12022_and_12065
+        points:
+        - T_K: 1366.12
+          <<: *composition_12022
+          invT_times_1e4_K_inv: 7.32
+          log10_p_atm: -7.35
+          p_atm: 4.466836e-08
+          series: sample_12022_circle_line
+        - T_K: 1314.06
+          <<: *composition_12022
+          invT_times_1e4_K_inv: 7.61
+          log10_p_atm: -7.60
+          p_atm: 2.511886e-08
+          series: sample_12022_circle_line
+        - T_K: 1497.01
+          <<: *composition_12065
+          invT_times_1e4_K_inv: 6.68
+          log10_p_atm: -8.25
+          p_atm: 5.623413e-09
+          series: sample_12065_square_line
+        - T_K: 1479.29
+          <<: *composition_12065
+          invT_times_1e4_K_inv: 6.76
+          log10_p_atm: -8.40
+          p_atm: 3.981072e-09
+          series: sample_12065_square_line
+        - T_K: 1468.43
+          <<: *composition_12065
+          invT_times_1e4_K_inv: 6.81
+          log10_p_atm: -8.40
+          p_atm: 3.981072e-09
+          series: sample_12065_square_line
+        - T_K: 1457.73
+          <<: *composition_12065
+          invT_times_1e4_K_inv: 6.86
+          log10_p_atm: -8.50
+          p_atm: 3.162278e-09
+          series: sample_12065_square_line
+        - T_K: 1428.57
+          <<: *composition_12065
+          invT_times_1e4_K_inv: 7.00
+          log10_p_atm: -8.68
+          p_atm: 2.089296e-09
+          series: sample_12065_square_line
+        - T_K: 1392.76
+          <<: *composition_12065
+          invT_times_1e4_K_inv: 7.18
+          log10_p_atm: -8.80
+          p_atm: 1.584893e-09
+          series: sample_12065_square_line
+        - T_K: 1351.35
+          <<: *composition_12065
+          invT_times_1e4_K_inv: 7.40
+          log10_p_atm: -8.85
+          p_atm: 1.412538e-09
+          series: sample_12065_square_line
+        - T_K: 1308.90
+          <<: *composition_12065
+          invT_times_1e4_K_inv: 7.64
+          log10_p_atm: -9.22
+          p_atm: 6.025596e-10
+          series: sample_12065_square_line
   Si:
     observations:
     - observation_id: demaria_1971_si_monatomic_not_reported
