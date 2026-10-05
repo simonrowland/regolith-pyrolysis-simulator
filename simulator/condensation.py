@@ -2981,6 +2981,7 @@ class CondensationModel:
             temps=self.condensation_temperatures_C,
             vapor_pressure_data=self.vapor_pressure_data,
             species_partial_pressures_pa=self.wall_species_partial_pressures_pa or None,
+            stages=self.train.stages,
         )
         self.last_cold_spot_diagnostic = copy.deepcopy(diagnostic)
         self.cold_spot_history.append(copy.deepcopy(diagnostic))
@@ -4984,6 +4985,11 @@ def _assert_condensation_applicable(
     Applicability must bind before either legacy or compiled coefficient-source
     lookup. Condensation deliberately has no Stage-0 context, so ``stage0_only``
     rows refuse here; Stage-0 callers can supply context at the catalog seam.
+
+    Trace vapours have no catalog row. Their applicability is
+    ``TraceVapourCondensationOnset.hot_train_applicability``, read by
+    ``cold_spot_diagnostic`` and ``route``. This gate does not grow a
+    second list, and a declared row such as Pb still refuses here.
     """
 
     catalog_payload = _authoritative_vapour_catalog_payload(vapor_pressure_data)
@@ -8337,6 +8343,7 @@ def cold_spot_diagnostic(
     temps: Mapping[str, float] | None = None,
     vapor_pressure_data: Mapping[str, Any] | None = None,
     species_partial_pressures_pa: Mapping[str, float] | None = None,
+    stages: Sequence[CondensationStage] | None = None,
 ) -> dict[str, Any]:
     """Flag pipe segments that would condense flowing vapor too early.
 
@@ -8362,14 +8369,38 @@ def cold_spot_diagnostic(
         if kg_hr <= 1e-15:
             continue
         target_stage_number = designated_stage_number(species)
+        trace_applicability: str | None = None
         if target_stage_number is None:
-            continue
-        condensation_T_C = _species_condensation_temperature_C(
-            species,
-            temps=temps,
-            vapor_pressure_data=vapor_pressure_data,
-        )
+            if species in CONDENSATION_TEMPS_C:
+                continue
+            onset = _trace_onset_for_flow(
+                str(species),
+                species_partial_pressures_pa,
+                vapor_pressure_data=vapor_pressure_data,
+                stages=stages,
+            )
+            if (
+                onset is None
+                or onset.temperature_C is None
+                or onset.wall_landing_stage_number is None
+            ):
+                continue
+            target_stage_number = onset.wall_landing_stage_number
+            condensation_T_C = float(onset.temperature_C)
+            trace_applicability = onset.hot_train_applicability
+        else:
+            condensation_T_C = _species_condensation_temperature_C(
+                species,
+                temps=temps,
+                vapor_pressure_data=vapor_pressure_data,
+            )
         threshold_C = condensation_T_C - margin_C
+
+        def _stamp_applicability(finding: dict[str, Any]) -> dict[str, Any]:
+            if trace_applicability is not None:
+                finding["hot_train_applicability"] = trace_applicability
+            return finding
+
         p_local_pa = None
         if species_partial_pressures_pa is not None:
             raw_partial = species_partial_pressures_pa.get(species)
@@ -8392,7 +8423,7 @@ def cold_spot_diagnostic(
                 and math.isfinite(hot_wall_threshold_C)
                 and wall_T_C < hot_wall_threshold_C
             ):
-                upstream_hot_wall_findings.append({
+                upstream_hot_wall_findings.append(_stamp_applicability({
                     'segment': segment.name,
                     'account': segment.wall_deposit_account,
                     'species': str(species),
@@ -8405,7 +8436,7 @@ def cold_spot_diagnostic(
                         f'{wall_T_C:.1f} C below {hot_wall_threshold_C:.1f} C '
                         f'before stage {target_stage_number}'
                     ),
-                })
+                }))
             if p_local_pa is not None:
                 # Premise: fouling requires p_i > P_sat(T_wall) (mandate
                 # hot-wall invariant). Algebra: supersaturation iff
@@ -8427,7 +8458,7 @@ def cold_spot_diagnostic(
                     and math.isfinite(P_sat_pa)
                     and p_local_pa > P_sat_pa
                 ):
-                    upstream_hot_wall_findings.append({
+                    upstream_hot_wall_findings.append(_stamp_applicability({
                         'segment': segment.name,
                         'account': segment.wall_deposit_account,
                         'species': str(species),
@@ -8441,10 +8472,10 @@ def cold_spot_diagnostic(
                             f'saturation at {wall_T_C:.1f} C before stage '
                             f'{target_stage_number}'
                         ),
-                    })
+                    }))
             if wall_T_C >= threshold_C:
                 continue
-            findings.append({
+            findings.append(_stamp_applicability({
                 'segment': segment.name,
                 'account': segment.wall_deposit_account,
                 'species': str(species),
@@ -8458,7 +8489,7 @@ def cold_spot_diagnostic(
                     f'{wall_T_C:.1f} C before stage {target_stage_number}; '
                     f'threshold {threshold_C:.1f} C'
                 ),
-            })
+            }))
 
     warnings = [str(finding['warning']) for finding in findings]
     upstream_hot_wall_warnings = [
