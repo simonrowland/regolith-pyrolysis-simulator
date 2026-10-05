@@ -250,12 +250,15 @@ def test_sossi_fegley_2018_table_2_migrates_numeric_activity_rows() -> None:
         }.intersection(printed_row)
         assert observation.identity.species.formula == printed_row["oxide"]
         assert observation.evidence.class_.is_value
-        if printed_row.get("evidence_model") == "MELTS":
+        if printed_row["references_as_published"] == "Ghiorso & Sack 1995":
+            assert printed_row["evidence_model"] == "MELTS"
             assert observation.evidence.model == "MELTS"
             assert observation.evidence.class_.value is EvidenceClass.COMPILATION_ASSESSED
         elif printed_row.get("relation_parameters"):
+            assert "evidence_model" not in printed_row
             assert observation.evidence.class_.value is EvidenceClass.QUOTED_ATTRIBUTED
         else:
+            assert "evidence_model" not in printed_row
             assert observation.evidence.class_.value is EvidenceClass.MEASURED_TABULATED
     phosphate = next(
         observation
