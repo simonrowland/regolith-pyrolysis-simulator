@@ -9,13 +9,13 @@ scan:
   - hunt_ids column empty; --hunt-json not provided
   corpus_root: /Users/simonrowland/Repos/regolith-corpus
 counts:
-  sources: 273
-  extracts: 271
+  sources: 274
+  extracts: 272
   pdfs_present_in_worktree: 0
   extracts_with_private_locators: 60
   pdfs_tracked_99_kems_langmuir: 0
   pdfs_without_extract: 0
-  extracts_without_pdf: 271
+  extracts_without_pdf: 272
   alias_groups_needing_resolution: 41
 gaps:
   pdfs_without_extract: []
@@ -188,6 +188,7 @@ gaps:
   - metsoc-2019-6005
   - metsoc-2024-6131
   - metsoc-2024-6224
+  - miki-1999-si-alloy-thermodynamics
   - mogul-2023-pioneer-venus-co2-icarus
   - murchison-degassing-2023-springer
   - murchison-hydropyrolysis-1990s-gca
@@ -10461,6 +10462,64 @@ sources:
       last_stage: decoded
       date: '2026-09-06'
     commit: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
+- source_id: miki-1999-si-alloy-thermodynamics
+  aliases: []
+  citation: T. Miki, K. Morita and N. Sano, “Thermodynamic Properties of Si–Al, –Ca, –Mg Binary and Si–Ca–Al,
+    –Ti, –Fe Ternary Alloys,” Materials Transactions, JIM 40(10) (1999), 1108–1116.
+  doi: null
+  report_number: null
+  identifier: null
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: OA
+  extracts:
+  - path: data/literature/extracts/miki-1999-si-alloy-thermodynamics.yaml
+    review_status: draft
+    rows: 111
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/miki-1999-si-alloy-thermodynamics/miki-1999-si-alloy-thermodynamics.pdf
+      present: true
+      sha256: 2bdfe16d459560e0e7dcb4e87db9ffe445ee41d58775ff31c1fd98f72b814b7a
+      matches_simulator: null
+    sidecar:
+      path: raw/miki-1999-si-alloy-thermodynamics/sidecar.yaml
+      present: true
+    text:
+      path: text/miki-1999-si-alloy-thermodynamics
+      exists: true
+      file_count: 12
+    tables:
+      path: tables/miki-1999-si-alloy-thermodynamics
+      exists: true
+      file_count: 20
+    extract:
+      path: extracts/miki-1999-si-alloy-thermodynamics.yaml
+      present: true
+      matches_simulator: true
+    ledger:
+      path: ledger/miki-1999-si-alloy-thermodynamics.yaml
+      present: true
+      error: null
+      last_stage: extracted
+      date: '2026-10-04'
+    commit: 1ce8e2fc3db83962928fccf9b9d4c72fdb8b699e
 - source_id: mogul-2023-pioneer-venus-co2-icarus
   aliases: []
   citation: 'Mogul, R., Limaye, S. S., Way, M. J. & Cordova, J. A. (2023), "Venus (atmosphere): analytical
