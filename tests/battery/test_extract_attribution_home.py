@@ -24,11 +24,10 @@ import yaml
 
 from simulator.battery.enums import EvidenceClass
 from simulator.battery.migrate import REPO_ROOT
-from tests.battery.test_migrate import _migrate_real_extract
+from tests.battery.test_migrate import _extract_observations, _migrate_real_extract
 
 EXTRACTS = REPO_ROOT / "data" / "literature" / "extracts"
 ALIASES = ("source_attribution", "quoted_from")
-_LOADER = getattr(yaml, "CSafeLoader", yaml.SafeLoader)
 
 # Renamed by tools/rename_values_attribution.py: one flip per shape, one fill, one list join.
 RENAMED = {
@@ -75,21 +74,10 @@ TOUCHED = sorted(
 )
 
 
-def _load(name: str) -> dict:
-    return yaml.load((EXTRACTS / name).read_text(encoding="utf-8"), Loader=_LOADER)
-
-
-def _species_values(doc: dict):
-    for body in (doc.get("species") or {}).values():
-        for obs in (body or {}).get("observations") or []:
-            if isinstance(obs, dict) and isinstance(obs.get("values"), dict):
-                yield obs, obs["values"]
-
-
 def _extract_values(name: str, raw_id: str) -> dict:
-    for obs, values in _species_values(_load(name)):
+    for obs in _extract_observations(name):
         if obs.get("observation_id") == raw_id:
-            return values
+            return obs["values"]
     raise AssertionError(f"{raw_id} not found in {name}")
 
 
@@ -104,15 +92,16 @@ def test_no_values_level_alias_attribution_keys_in_extracts() -> None:
         (path.name, obs.get("observation_id"), key)
         for path in sorted(EXTRACTS.glob("*.yaml"))
         if any(alias in path.read_text(encoding="utf-8") for alias in ALIASES)
-        for obs, values in _species_values(_load(path.name))
+        for obs in _extract_observations(path.name)
+        if isinstance(obs.get("values"), dict)
         for key in ALIASES
-        if key in values
+        if key in obs["values"]
     ]
     assert offenders == []
 
 
 def test_row_level_attribution_keys_are_left_alone() -> None:
-    doc = _load("schaefer-fegley-2011-vaporization-earth.yaml")
+    doc = yaml.safe_load((EXTRACTS / "schaefer-fegley-2011-vaporization-earth.yaml").read_text(encoding="utf-8"))
     table1 = next(
         row
         for row in doc["species"]["planetary_context"]["context"]
