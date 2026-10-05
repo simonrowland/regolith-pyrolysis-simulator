@@ -144,7 +144,8 @@ def _record_from_audit(audit, items, fixture):
         "name_as_published": audit["name_as_published"], "phase": audit["phase"],
         "metadata_ocr_token": candidates, "metadata_ocr_suspect": metadata_unverified,
         "printed_page": audit["printed_page"], "pdf_page": pg,
-        "source_ref": {"path": "source/mineru-pages.jsonl", "line": pg, "item_index": table_index},
+        "source_ref": {"path": "source/mineru-pages.jsonl", "line": audit.get("source_line", pg),
+                       "item_index": table_index},
         "source_heading_raw": table.get("table_caption", []),
         "table_kind": table_kind,
         "header_rows_raw": raw_rows[:2], "columns": list(COLUMNS), "units": dict(zip(COLUMNS, UNITS)),
@@ -159,6 +160,19 @@ def _record_from_audit(audit, items, fixture):
 def _records_from_audits(audits, pages_by_pdf, fixture):
     return [_record_from_audit(audit, pages_by_pdf[audit["pdf_page"]]["items"], fixture)
             for audit in audits]
+
+
+def _manifest_entries(records, source, source_sha256):
+    return [{**{k: record[k] for k in ("record_id", "record_kind", "formula", "formula_as_published",
+                                        "name_as_published", "phase", "row_count", "metadata_ocr_suspect")},
+             "source": source,
+             "source_locator": {"printed_page": record["printed_page"], "pdf_page": record["pdf_page"]},
+             "original_record_text_location": record["source_ref"], "sha256": source_sha256,
+             "path": f"records/{record['record_id']}.json",
+             "ambiguity_count": len(record["ambiguities"]), "ambiguities": record["ambiguities"],
+             "ocr_suspect_count": int(record["metadata_ocr_suspect"]) + int(record["notes"]["ocr_suspect"])
+             + sum(c["ocr_suspect"] for row in record["rows"] for c in row["cells"].values())}
+            for record in records]
 
 
 def build(corpus):
@@ -194,16 +208,7 @@ def build(corpus):
               "retrieved_url": sidecar["retrieved_url"], "licence": sidecar["licence"], "access_date": "2026-09-12"}
     pages_by_pdf = {page["pdf_page"]: page for page in pages}
     records = _records_from_audits(audits, pages_by_pdf, fixture)
-    entries = []
-    for record in records:
-        entries.append({**{k: record[k] for k in ("record_id", "record_kind", "formula", "formula_as_published",
-                                                  "name_as_published", "phase", "row_count", "metadata_ocr_suspect")},
-                        "source": source, "source_locator": {"printed_page": record["printed_page"], "pdf_page": record["pdf_page"]},
-                        "original_record_text_location": record["source_ref"], "sha256": sidecar["sha256"],
-                        "path": f"records/{record['record_id']}.json",
-                        "ambiguity_count": len(record["ambiguities"]), "ambiguities": record["ambiguities"],
-                        "ocr_suspect_count": int(record["metadata_ocr_suspect"]) + int(record["notes"]["ocr_suspect"])
-                        + sum(c["ocr_suspect"] for row in record["rows"] for c in row["cells"].values())})
+    entries = _manifest_entries(records, source, sidecar["sha256"])
     coverage = {"status": "partial", "pdf_page_count": 432, "decoded_pdf_pages": [1, 432],
                 "ingested_printed_pages": [3, last_page - 4], "ingested_pdf_pages": [7, last_page],
                 "remaining_pdf_pages": [last_page + 1, 432], "remaining_printed_pages": [last_page - 3, 427],
