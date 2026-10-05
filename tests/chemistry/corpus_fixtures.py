@@ -61,6 +61,9 @@ from typing import Any, Mapping
 
 import yaml
 
+from simulator.feedstock_composition import (
+    FE_REPORTING_CONVENTION_TOTAL_AS_FEO,
+)
 from simulator.vapour_rail.catalog import vapor_pressure_legacy_view
 
 
@@ -147,6 +150,9 @@ class CorpusAnchor:
     composition_wt_pct: Mapping[str, float] = field(
         default_factory=dict
     )
+    composition_source: str = ""
+    composition_basis: Mapping[str, Any] = field(default_factory=dict)
+    fe_redox_split_unknown: bool = False
 
     @property
     def anchor_id(self) -> str:
@@ -188,6 +194,9 @@ class AtomicRatioAnchor:
     composition_wt_pct: Mapping[str, float] = field(
         default_factory=dict
     )
+    composition_source: str = ""
+    composition_basis: Mapping[str, Any] = field(default_factory=dict)
+    fe_redox_split_unknown: bool = False
 
     @property
     def anchor_id(self) -> str:
@@ -220,6 +229,9 @@ class CJOlivineKEMSAnchor:
     composition_wt_pct: Mapping[str, float] = field(
         default_factory=dict
     )
+    composition_source: str = ""
+    composition_basis: Mapping[str, Any] = field(default_factory=dict)
+    fe_redox_split_unknown: bool = False
 
     @property
     def anchor_id(self) -> str:
@@ -521,8 +533,17 @@ def _multi_melt_compositions(
             continue
         comp: dict[str, float] = {}
         for k, v in payload.items():
-            if k in ("notes", "source", "total_wt_pct", "Mg_mol_pct",
-                      "tolerance_decades", "Mg_number"):
+            if k in (
+                "notes",
+                "source",
+                "total_wt_pct",
+                "Mg_mol_pct",
+                "tolerance_decades",
+                "Mg_number",
+                "composition_source",
+                "composition_basis",
+                "fe_redox_split_unknown",
+            ):
                 continue
             f = _coerce_float(v)
             if f is not None and f > 0.0:
@@ -683,6 +704,15 @@ def load_all_corpus_anchors(
             feedstock = {}
         default_comp = _composition_wt_pct(feedstock)
         default_melt_label = str(feedstock.get("key") or paper_id)
+        default_composition_source = str(
+            feedstock.get("composition_source") or feedstock.get("source") or ""
+        )
+        default_composition_basis = feedstock.get("composition_basis") or {}
+        if not isinstance(default_composition_basis, Mapping):
+            default_composition_basis = {}
+        default_split_unknown = (
+            feedstock.get("fe_redox_split_unknown") is True
+        )
 
         for block_name in (
             "vapor_partial_pressures_Pa",
@@ -710,6 +740,26 @@ def load_all_corpus_anchors(
                     if isinstance(body, str) and body in body_compositions:
                         composition = body_compositions[body]
                         melt_id = f"{paper_id}:{body}"
+                        body_composition = (
+                            (expected.get("bulk_silicate_compositions") or {})
+                            .get(body, {})
+                        )
+                        if not isinstance(body_composition, Mapping):
+                            body_composition = {}
+                        composition_source = str(
+                            body_composition.get("composition_source")
+                            or body_composition.get("source")
+                            or default_composition_source
+                        )
+                        composition_basis = (
+                            body_composition.get("composition_basis") or {}
+                        )
+                        if not isinstance(composition_basis, Mapping):
+                            composition_basis = {}
+                        split_unknown = (
+                            body_composition.get("fe_redox_split_unknown")
+                            is True
+                        )
                         fO2_log = (
                             _multi_melt_fO2_log(expected, body, T_K)
                             if expected.get(
@@ -721,6 +771,9 @@ def load_all_corpus_anchors(
                     else:
                         composition = default_comp
                         melt_id = f"{paper_id}:{default_melt_label}"
+                        composition_source = default_composition_source
+                        composition_basis = default_composition_basis
+                        split_unknown = default_split_unknown
                         fO2_log = _kress91_iw_log_fO2(T_K)
 
                     if not composition:
@@ -739,6 +792,9 @@ def load_all_corpus_anchors(
                             tolerance_decades=tol,
                             source=str(entry.get("source") or ""),
                             composition_wt_pct=composition,
+                            composition_source=composition_source,
+                            composition_basis=dict(composition_basis),
+                            fe_redox_split_unknown=split_unknown,
                         )
                     )
 
@@ -789,6 +845,13 @@ def load_all_atomic_ratio_anchors(
             feedstock = {}
         default_comp = _composition_wt_pct(feedstock)
         default_label = str(feedstock.get("key") or paper_id)
+        composition_source = str(
+            feedstock.get("composition_source") or feedstock.get("source") or ""
+        )
+        # The Table 8 cohort replaces the collapsed top-level feedstock
+        # composition with the separately reported Table 5 oxide rows.
+        composition_basis: Mapping[str, Any] = {}
+        split_unknown = False
         compositions = _atomic_ratio_compositions(
             paper_id,
             expected,
@@ -842,6 +905,9 @@ def load_all_atomic_ratio_anchors(
                         tolerance_decades=tol,
                         source=source,
                         composition_wt_pct=dict(composition),
+                        composition_source=composition_source,
+                        composition_basis=dict(composition_basis),
+                        fe_redox_split_unknown=split_unknown,
                     )
                 )
     return anchors
@@ -908,6 +974,9 @@ def _emit_cj_olivine_pressure_grid(
     melt_id: str,
     expected: Mapping[str, Any],
     composition: Mapping[str, float],
+    composition_source: str,
+    composition_basis: Mapping[str, Any],
+    fe_redox_split_unknown: bool,
 ) -> list[CJOlivineKEMSAnchor]:
     cc = expected.get("clausius_clapeyron_equations") or {}
     if not isinstance(cc, Mapping):
@@ -954,6 +1023,9 @@ def _emit_cj_olivine_pressure_grid(
                         coefficient_A=A,
                         coefficient_B_1e3K=B,
                         composition_wt_pct=dict(composition),
+                        composition_source=composition_source,
+                        composition_basis=dict(composition_basis),
+                        fe_redox_split_unknown=fe_redox_split_unknown,
                     )
                 )
     return anchors
@@ -965,6 +1037,9 @@ def _emit_cj_olivine_alpha_grid(
     melt_id: str,
     expected: Mapping[str, Any],
     composition: Mapping[str, float],
+    composition_source: str,
+    composition_basis: Mapping[str, Any],
+    fe_redox_split_unknown: bool,
 ) -> list[CJOlivineKEMSAnchor]:
     cc = expected.get("clausius_clapeyron_equations") or {}
     coeffs = expected.get("vaporization_coefficients") or {}
@@ -1024,6 +1099,9 @@ def _emit_cj_olivine_alpha_grid(
                             coefficients.get("B_1e3K")
                         ),
                         composition_wt_pct=dict(composition),
+                        composition_source=composition_source,
+                        composition_basis=dict(composition_basis),
+                        fe_redox_split_unknown=fe_redox_split_unknown,
                     )
                 )
     return anchors
@@ -1035,6 +1113,9 @@ def _emit_cj_olivine_kems_grid(
     melt_id: str,
     expected: Mapping[str, Any],
     composition: Mapping[str, float],
+    composition_source: str,
+    composition_basis: Mapping[str, Any],
+    fe_redox_split_unknown: bool,
 ) -> list[CJOlivineKEMSAnchor]:
     intents = _fixture_intents(expected)
     anchors: list[CJOlivineKEMSAnchor] = []
@@ -1045,6 +1126,9 @@ def _emit_cj_olivine_kems_grid(
                 melt_id=melt_id,
                 expected=expected,
                 composition=composition,
+                composition_source=composition_source,
+                composition_basis=composition_basis,
+                fe_redox_split_unknown=fe_redox_split_unknown,
             )
         )
     if "EVAPORATION_FLUX" in intents:
@@ -1054,6 +1138,9 @@ def _emit_cj_olivine_kems_grid(
                 melt_id=melt_id,
                 expected=expected,
                 composition=composition,
+                composition_source=composition_source,
+                composition_basis=composition_basis,
+                fe_redox_split_unknown=fe_redox_split_unknown,
             )
         )
     return anchors
@@ -1088,6 +1175,12 @@ def load_all_cj_olivine_kems_anchors(
         composition = _composition_wt_pct(feedstock)
         if not composition:
             continue
+        composition_source = str(
+            feedstock.get("composition_source") or feedstock.get("source") or ""
+        )
+        composition_basis = feedstock.get("composition_basis") or {}
+        if not isinstance(composition_basis, Mapping):
+            composition_basis = {}
         paper_id = str(data.get("paper_id") or path.parent.name)
         melt_label = str(feedstock.get("key") or paper_id)
         anchors.extend(
@@ -1096,6 +1189,11 @@ def load_all_cj_olivine_kems_anchors(
                 melt_id=f"{paper_id}:{melt_label}",
                 expected=expected,
                 composition=composition,
+                composition_source=composition_source,
+                composition_basis=composition_basis,
+                fe_redox_split_unknown=(
+                    feedstock.get("fe_redox_split_unknown") is True
+                ),
             )
         )
     return anchors
@@ -1322,6 +1420,9 @@ def _grid_25_v3_cj_substitute(
             tolerance_decades=1.0,
             source=_grid_25_v3_source(old_cell_id, source),
             composition_wt_pct=dict(anchor.composition_wt_pct),
+            composition_source=anchor.composition_source,
+            composition_basis=dict(anchor.composition_basis),
+            fe_redox_split_unknown=anchor.fe_redox_split_unknown,
         )
     return None
 
@@ -1356,6 +1457,9 @@ def _grid_25_v3_corpus_substitute(
             tolerance_decades=1.0,
             source=_grid_25_v3_source(old_cell_id, anchor.source),
             composition_wt_pct=dict(anchor.composition_wt_pct),
+            composition_source=anchor.composition_source,
+            composition_basis=dict(anchor.composition_basis),
+            fe_redox_split_unknown=anchor.fe_redox_split_unknown,
         )
     return None
 
@@ -1381,6 +1485,12 @@ def _grid_25_v3_substitute_anchor(
 GRID_25_FEEDSTOCKS: dict[str, dict[str, Any]] = {
     "tholeiite": {
         "label": "SF2004 tholeiite",
+        "fe_redox_split_unknown": True,
+        "composition_basis": {
+            "fe_reporting_convention": (
+                FE_REPORTING_CONVENTION_TOTAL_AS_FEO
+            ),
+        },
         "composition_wt_pct": {
             "SiO2": 51.55,
             "TiO2": 1.73,
@@ -1484,6 +1594,15 @@ def grid_25_anchors(
                         tolerance_decades=1.0,
                         source=source,
                         composition_wt_pct=composition,
+                        composition_source=str(
+                            melt_data.get("composition_source") or ""
+                        ),
+                        composition_basis=dict(
+                            melt_data.get("composition_basis") or {}
+                        ),
+                        fe_redox_split_unknown=(
+                            melt_data.get("fe_redox_split_unknown") is True
+                        ),
                     )
                 )
     return anchors
@@ -1540,13 +1659,13 @@ def _grid_25_sio_paper_tag(anchor: CorpusAnchor) -> str | None:
     return None
 
 
-def _grid_25_sio_vf_composition(
+def _grid_25_sio_vf_feedstock(
     paper_tag: str,
     repo_root: Path | None,
-) -> dict[str, float]:
+) -> tuple[dict[str, float], str, dict[str, Any], bool]:
     composition_key = _GRID_25_SIO_VF_COMPOSITION_KEYS.get(paper_tag)
     if composition_key is None:
-        return {}
+        return {}, "", {}, False
     path = _resolve_paper_fixture(
         "visscher-fegley-2013-debris-disks", repo_root
     )
@@ -1565,11 +1684,20 @@ def _grid_25_sio_vf_composition(
         raise RuntimeError(
             f"§25-bis-SiO VF2013 fixture lacks mapping expected block: {path}"
         )
-    composition = dict(
-        _multi_melt_compositions(expected).get(composition_key) or {}
-    )
+    composition = dict(_multi_melt_compositions(expected).get(composition_key) or {})
     composition.pop("ZnO", None)
-    return composition
+    body = (expected.get("bulk_silicate_compositions") or {}).get(
+        composition_key, {}
+    )
+    if not isinstance(body, Mapping):
+        body = {}
+    basis = body.get("composition_basis") or {}
+    return (
+        composition,
+        str(body.get("composition_source") or body.get("source") or ""),
+        dict(basis) if isinstance(basis, Mapping) else {},
+        body.get("fe_redox_split_unknown") is True,
+    )
 
 
 def grid_25_sio_anchors(
@@ -1584,8 +1712,16 @@ def grid_25_sio_anchors(
         if paper_tag is None:
             continue
         composition = dict(anchor.composition_wt_pct)
+        composition_source = anchor.composition_source
+        composition_basis = dict(anchor.composition_basis)
+        split_unknown = anchor.fe_redox_split_unknown
         if anchor.paper_id == "visscher-fegley-2013-debris-disks":
-            composition = _grid_25_sio_vf_composition(paper_tag, repo_root)
+            (
+                composition,
+                composition_source,
+                composition_basis,
+                split_unknown,
+            ) = _grid_25_sio_vf_feedstock(paper_tag, repo_root)
             if not composition:
                 continue
         anchors.append(
@@ -1602,6 +1738,9 @@ def grid_25_sio_anchors(
                     f"({anchor.melt_id}); {anchor.source}"
                 ),
                 composition_wt_pct=composition,
+                composition_source=composition_source,
+                composition_basis=composition_basis,
+                fe_redox_split_unknown=split_unknown,
             )
         )
     return sorted(
