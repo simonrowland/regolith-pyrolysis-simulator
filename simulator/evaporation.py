@@ -39,6 +39,11 @@ from simulator.state import (
     EvaporationFlux,
     clamp_stir_factor,
 )
+from simulator.vapour_rail.stoich import (
+    oxygen_coproduct_account,
+    reactant_masses_and_o2_per_vapor_kg,
+    strip_phase,
+)
 from simulator.vapour_rail.batch import (
     FLUX_ACTIVATION_EPOCH_PRE_RG,
     FluxActivationContext,
@@ -3259,11 +3264,12 @@ class EvaporationMixin:
             vapor_oxygen_atoms = float(
                 formula.elements.get('O', 0.0) or 0.0
             )
-            if (
-                o2_kg_hr < 0.0
-                or vapor_oxygen_atoms > 0.0
-                or oxygen_destination == 'process.overhead_gas'
-            ):
+            # Negative O2 is an overhead debit. A positive coproduct uses
+            # the same account as the transition credit.
+            if o2_kg_hr < 0.0 or oxygen_coproduct_account(
+                oxygen_destination or None,
+                vapor_oxygen_atoms=vapor_oxygen_atoms,
+            ) == 'process.overhead_gas':
                 source_mol_hr['O2'] = (
                     source_mol_hr.get('O2', 0.0)
                     + o2_kg_hr / o2_molar_mass
@@ -3329,6 +3335,7 @@ class EvaporationMixin:
         metals_data = self.vapor_pressures.get('metals', {}) or {}
         oxide_vapors_data = self.vapor_pressures.get('oxide_vapors', {}) or {}
         parent_groups: dict[str, list[dict]] = defaultdict(list)
+        multi_entries: list[dict] = []
 
         for species in sorted(raw_rates_kg_hr):
             raw_rate_kg_hr = (
@@ -3341,6 +3348,18 @@ class EvaporationMixin:
             if not sp_data:
                 sp_data = oxide_vapors_data.get(species, {})
             stoich = self._evaporation_stoich(species, sp_data)
+            vector = stoich.get('reactants_kg_per_vapor')
+            if isinstance(vector, Mapping) and len(vector) > 1:
+                multi_entries.append({
+                    'species': species,
+                    'stoich': stoich,
+                    'raw_rate_kg_hr': raw_rate_kg_hr,
+                    'reactants_kg_per_vapor': {
+                        str(reactant): float(kg_per)
+                        for reactant, kg_per in vector.items()
+                    },
+                })
+                continue
             parent_oxide = stoich['parent_oxide']
             oxide_per_product_kg = float(stoich['oxide_per_product_kg'])
             parent_draw_kg_hr = raw_rate_kg_hr * oxide_per_product_kg
@@ -3378,6 +3397,32 @@ class EvaporationMixin:
                 if product_kg > 1e-12:
                     effective_rates[entry['species']] = product_kg / dt_hr
 
+        if multi_entries:
+            # Recompute every draw, including single-parent species, so a
+            # shared reactant is one pool. Live calls have no multi entry,
+            # so they keep the loop above.
+            combined = []
+            for parent_oxide, group in parent_groups.items():
+                for entry in group:
+                    combined.append({
+                        'species': entry['species'],
+                        'raw_rate_kg_hr': entry['raw_rate_kg_hr'],
+                        'reactants_kg_per_vapor': {
+                            parent_oxide: float(
+                                entry['stoich']['oxide_per_product_kg']
+                            ),
+                        },
+                        'stoich': entry['stoich'],
+                    })
+            combined.extend(multi_entries)
+            effective_rates.clear()
+            self._limit_multi_reactant_rates(
+                combined,
+                effective_rates,
+                dt_hr=dt_hr,
+                cleaned_melt_kg=cleaned_melt_kg,
+            )
+
         o2_draws: list[tuple[str, float]] = []
         for parent_oxide in sorted(parent_groups):
             for entry in parent_groups[parent_oxide]:
@@ -3388,6 +3433,14 @@ class EvaporationMixin:
                 if rate_kg_hr > 1e-12 and O2_per_product_kg < -1e-12:
                     o2_draws.append(
                         (species, rate_kg_hr * abs(O2_per_product_kg)))
+        for entry in multi_entries:
+            species = entry['species']
+            rate_kg_hr = float(effective_rates.get(species, 0.0))
+            O2_per_product_kg = float(
+                entry['stoich'].get('O2_per_product_kg', 0.0))
+            if rate_kg_hr > 1e-12 and O2_per_product_kg < -1e-12:
+                o2_draws.append(
+                    (species, rate_kg_hr * abs(O2_per_product_kg)))
         total_o2_draw_kg_hr = sum(draw for _species, draw in o2_draws)
         if total_o2_draw_kg_hr <= 1e-12:
             return effective_rates
@@ -3695,8 +3748,7 @@ class EvaporationMixin:
         stoich = self._evaporation_stoich(species, sp_data)
         if stoich is None:
             return {}
-        available_kg = self.atom_ledger.kg_by_account(
-            'process.cleaned_melt').get(stoich['parent_oxide'], 0.0)
+        available_kg = self._evaporation_reactant_stock_kg(stoich)
         if available_kg <= 1e-12:
             return {}
         remaining_kg_hr = route_result.remaining_by_species.get(
@@ -4136,8 +4188,7 @@ class EvaporationMixin:
         if oxide_removed <= 1e-12:
             return (0.0, None) if return_transition else 0.0
 
-        available_kg = self.atom_ledger.kg_by_account(
-            'process.cleaned_melt').get(parent_oxide, 0.0)
+        available_kg = self._evaporation_reactant_stock_kg(stoich)
         if available_kg <= 1e-12:
             return (0.0, None) if return_transition else 0.0
 
@@ -4297,6 +4348,162 @@ class EvaporationMixin:
                 converted[species] = kg
         return converted
 
+    def _limit_multi_reactant_rates(
+        self,
+        entries: list[dict],
+        effective_rates: dict[str, float],
+        *,
+        dt_hr: float,
+        cleaned_melt_kg: Mapping[str, float],
+    ) -> None:
+        """First-order limit shared across every condensed reactant.
+
+        A species rate is the minimum of its per-reactant limits. Each
+        reactant pool includes every entry that draws it. Called only when
+        a reaction has more than one condensed reactant.
+        """
+
+        by_reactant: dict[str, list[tuple[str, float, float]]] = defaultdict(list)
+        for entry in entries:
+            raw_rate = float(entry['raw_rate_kg_hr'])
+            for reactant, kg_per in entry['reactants_kg_per_vapor'].items():
+                by_reactant[str(reactant)].append(
+                    (str(entry['species']), float(kg_per), raw_rate)
+                )
+        limits: dict[str, list[float]] = defaultdict(list)
+        max_fraction = math.nextafter(1.0, 0.0)
+        for reactant, items in by_reactant.items():
+            available = float(cleaned_melt_kg.get(reactant, 0.0))
+            total_draw = sum(raw * kg_per for _species, kg_per, raw in items)
+            if available <= 1e-12 or total_draw <= 1e-12:
+                for species, _kg_per, _raw in items:
+                    limits[species].append(0.0)
+                continue
+            depletion_fraction = -math.expm1(-(total_draw / available) * dt_hr)
+            depletion_fraction = max(0.0, min(max_fraction, depletion_fraction))
+            reactant_draw_kg = available * depletion_fraction
+            for species, kg_per, raw in items:
+                share = (raw * kg_per) / total_draw
+                product_kg = reactant_draw_kg * share / kg_per
+                rate = product_kg / dt_hr if product_kg > 1e-12 else 0.0
+                limits[species].append(rate)
+        seen = {str(entry['species']) for entry in entries}
+        for species in seen:
+            rate = min(limits.get(species, [0.0]))
+            if rate > 1e-12:
+                effective_rates[species] = rate
+            else:
+                effective_rates.pop(species, None)
+
+    def _multi_reactant_stoich(self, species: str, sp_data: dict) -> dict | None:
+        """Vector stoich when the selected reaction has two condensed reactants.
+
+        A single condensed reactant returns None so the scalar stoich dict
+        stays unchanged.
+        """
+
+        reactions = sp_data.get('source_reactions') or []
+        if not isinstance(reactions, list):
+            return None
+        candidates = [item for item in reactions if isinstance(item, Mapping)]
+        if not candidates:
+            return None
+        chosen = None
+        wanted = sp_data.get('source_reaction_id')
+        if isinstance(wanted, str):
+            for reaction in candidates:
+                if reaction.get('id') == wanted:
+                    chosen = reaction
+                    break
+        elif len(candidates) == 1:
+            chosen = candidates[0]
+        if chosen is None:
+            return None
+        formula = str(sp_data.get('formula') or species)
+        vapor_key = strip_phase(formula)
+        condensed: list[str] = []
+        for item in chosen.get('reactants') or []:
+            if not isinstance(item, Mapping):
+                continue
+            key = strip_phase(str(item.get('formula') or ''))
+            if key and key != 'O2' and key != vapor_key:
+                condensed.append(key)
+        if len(set(condensed)) <= 1:
+            return None
+        masses, o2 = reactant_masses_and_o2_per_vapor_kg(
+            formula=formula, reaction=chosen
+        )
+        oxide = sum(masses.values())
+        declared_oxide = sp_data.get('stoich_oxide_per_vapor')
+        declared_o2 = sp_data.get('stoich_O2_per_vapor')
+        if declared_oxide is not None or declared_o2 is not None:
+            if declared_oxide is None or declared_o2 is None:
+                raise AccountingError(
+                    f"vapor species {species!r} multi-reactant stoich "
+                    "requires both stoich_oxide_per_vapor and "
+                    "stoich_O2_per_vapor when either is set"
+                )
+            if not math.isclose(
+                float(declared_oxide), oxide, rel_tol=1e-6, abs_tol=1e-9
+            ) or not math.isclose(
+                float(declared_o2), o2, rel_tol=1e-6, abs_tol=1e-9
+            ):
+                raise AccountingError(
+                    f"vapor species {species!r} declared stoich does not "
+                    "match the compiled reactant vector"
+                )
+        self._validate_multi_reactant_atoms(masses, formula, o2)
+        return {
+            'parent_oxide': sp_data.get('parent_oxide', ''),
+            'oxide_per_product_kg': oxide,
+            'O2_per_product_kg': o2,
+            'oxygen_destination': sp_data.get('oxygen_destination'),
+            'reactants_kg_per_vapor': masses,
+        }
+
+    def _validate_multi_reactant_atoms(
+        self,
+        reactant_kg: Mapping[str, float],
+        product_species: str,
+        O2_per_product_kg: float,
+    ) -> None:
+        debit_atoms: dict[str, float] = defaultdict(float)
+        for reactant, kg in reactant_kg.items():
+            for element, moles in self._atom_moles_for_kg(reactant, kg).items():
+                debit_atoms[element] += moles
+        credit_atoms: dict[str, float] = defaultdict(float)
+        for element, moles in self._atom_moles_for_kg(product_species, 1.0).items():
+            credit_atoms[element] += moles
+        if O2_per_product_kg >= 0.0:
+            for element, moles in self._atom_moles_for_kg(
+                'O2', O2_per_product_kg
+            ).items():
+                credit_atoms[element] += moles
+        else:
+            for element, moles in self._atom_moles_for_kg(
+                'O2', abs(O2_per_product_kg)
+            ).items():
+                debit_atoms[element] += moles
+        for element in set(debit_atoms) | set(credit_atoms):
+            debit = debit_atoms.get(element, 0.0)
+            credit = credit_atoms.get(element, 0.0)
+            if not math.isclose(debit, credit, rel_tol=1e-6, abs_tol=1e-9):
+                raise AccountingError(
+                    f"vapor species {product_species!r} multi-reactant "
+                    f"stoich does not conserve {element} atoms"
+                )
+
+    def _evaporation_reactant_stock_kg(self, stoich: Mapping[str, Any]) -> float:
+        """Parent stock, or the scarcest condensed reactant when there are two."""
+
+        cleaned = self.atom_ledger.kg_by_account('process.cleaned_melt')
+        vector = stoich.get('reactants_kg_per_vapor')
+        if isinstance(vector, Mapping) and len(vector) > 1:
+            return min(
+                float(cleaned.get(str(reactant), 0.0)) for reactant in vector
+            )
+        return float(cleaned.get(str(stoich.get('parent_oxide') or ''), 0.0))
+
     def _evaporation_stoich(self, species: str, sp_data: dict):
         parent_oxide = sp_data.get('parent_oxide', '')
         if not parent_oxide:
@@ -4304,6 +4511,9 @@ class EvaporationMixin:
                 f"vapor species {species!r} requires parent_oxide "
                 "metadata before ledger routing"
             )
+        multi = self._multi_reactant_stoich(species, sp_data)
+        if multi is not None:
+            return multi
 
         has_oxide = sp_data.get('stoich_oxide_per_vapor') is not None
         has_o2 = sp_data.get('stoich_O2_per_vapor') is not None

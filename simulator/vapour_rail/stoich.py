@@ -113,6 +113,76 @@ def _molar_mass_g(formula: str) -> float:
     return parse_formula(strip_phase(formula)).molar_mass_g_per_mol()
 
 
+def oxygen_coproduct_account(
+    oxygen_destination: str | None,
+    *,
+    vapor_oxygen_atoms: float,
+) -> str:
+    """Account that receives a positive O2 coproduct.
+
+    A declared destination wins. With none declared, metal vapour (no oxygen
+    atoms in the vapor) credits ``reservoir.fo2_buffer`` and oxide vapour
+    credits ``process.overhead_gas``. Negative O2 remains an overhead debit;
+    this function is only the positive-coproduct choice.
+    """
+
+    destination = str(oxygen_destination or "")
+    if destination == "reservoir.fo2_buffer" or (
+        not destination and float(vapor_oxygen_atoms) <= 0.0
+    ):
+        return "reservoir.fo2_buffer"
+    return "process.overhead_gas"
+
+
+def reactant_masses_and_o2_per_vapor_kg(
+    *,
+    formula: str,
+    reaction: Mapping[str, Any],
+) -> tuple[dict[str, float], float]:
+    """Condensed-reactant kg and signed O2 kg per kg of vapor.
+
+    O2 is not a key in the reactant map. The reactant masses sum to
+    ``1 + O2``. Keys are ledger component keys, with phase tags removed.
+    """
+
+    vapor_key = ledger_component_key(formula)
+    reactants = reaction.get("reactants") or []
+    products = reaction.get("products") or []
+    if not isinstance(reactants, list) or not isinstance(products, list):
+        raise ValueError("reaction requires reactants and products lists")
+
+    condensed_g: dict[str, float] = {}
+    vapor_nu = 0.0
+    o2_nu = 0.0
+    for sign, participants in ((-1.0, reactants), (1.0, products)):
+        for item in participants:
+            if not isinstance(item, Mapping):
+                continue
+            part = ledger_component_key(str(item.get("formula") or ""))
+            amount = float(item.get("stoichiometry"))
+            if part == "O2":
+                o2_nu += sign * amount
+                continue
+            if sign < 0.0 and part != vapor_key:
+                condensed_g[part] = condensed_g.get(part, 0.0) + (
+                    amount * _molar_mass_g(part)
+                )
+            if sign > 0.0 and part == vapor_key:
+                vapor_nu += amount
+    if not condensed_g or vapor_nu <= 0.0:
+        raise ValueError(f"cannot derive reactant masses for {formula!r}")
+    denom = vapor_nu * _molar_mass_g(vapor_key)
+    masses = {key: grams / denom for key, grams in condensed_g.items()}
+    o2 = (o2_nu * _molar_mass_g("O2")) / denom
+    oxide = sum(masses.values())
+    if not math.isclose(oxide, 1.0 + o2, rel_tol=1e-6, abs_tol=1e-9):
+        raise ValueError(
+            f"{formula}: reactant masses do not conserve mass: "
+            f"oxide={oxide} O2={o2}"
+        )
+    return masses, o2
+
+
 def derive_stoich_oxide_per_vapor(
     *,
     formula: str,
