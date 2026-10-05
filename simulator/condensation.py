@@ -4268,6 +4268,15 @@ class CondensationModel:
         if self.lab_geometry is not None:
             return list(self.pipe_segments)
         target_stage_number = designated_stage_number(species)
+        if target_stage_number is None and species not in CONDENSATION_TEMPS_C:
+            onset = _trace_onset_for_flow(
+                species,
+                self.wall_species_partial_pressures_pa,
+                vapor_pressure_data=self.vapor_pressure_data,
+                stages=self.train.stages,
+            )
+            if onset is not None:
+                target_stage_number = onset.wall_landing_stage_number
         if target_stage_number is None:
             return []
         segments: list[PipeSegment] = []
@@ -5600,6 +5609,37 @@ def _onset_from_temperature(
         source_id=source_id,
         status="ok",
         detail=detail,
+    )
+
+
+def _trace_onset_for_flow(
+    species: str,
+    partial_pressures_pa: Mapping[str, float] | None,
+    *,
+    vapor_pressure_data: Mapping[str, Any] | None = None,
+    stages: Sequence[CondensationStage] | None = None,
+) -> TraceVapourCondensationOnset | None:
+    """Onset for an undesignated trace carrier at its flowing pressure.
+
+    Designated species and the declared Ca/Al/Ti temperatures do not
+    reach the rail. A missing partial pressure does not invent a stage.
+    """
+
+    if (
+        designated_stage_number(species) is not None
+        or species in CONDENSATION_TEMPS_C
+    ):
+        return None
+    if (
+        not isinstance(partial_pressures_pa, Mapping)
+        or species not in partial_pressures_pa
+    ):
+        return None
+    return trace_vapour_condensation_onset(
+        species,
+        partial_pressures_pa[species],
+        vapor_pressure_data=vapor_pressure_data,
+        stages=stages,
     )
 
 
