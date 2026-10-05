@@ -102,7 +102,7 @@ def test_cached_real_python_api_model_session_reaches_build_simulator(
             )
         )
 
-    assert reached == [str(model)]
+    assert reached == [model]
 
 
 def test_session_rejects_metallic_real_backend_before_resolver(monkeypatch):

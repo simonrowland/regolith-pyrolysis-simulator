@@ -807,7 +807,7 @@ def test_cached_real_python_api_literal_none_model_is_refused(tmp_path: Path) ->
     [
         (
             None,
-            "None",
+            None,
             "None",
         ),
         (
@@ -820,7 +820,7 @@ def test_cached_real_python_api_literal_none_model_is_refused(tmp_path: Path) ->
 def test_cached_real_blank_model_normalization_keeps_replay_identity(
     tmp_path: Path,
     model: str | None,
-    expected_identity: str,
+    expected_identity: str | None,
     expected_key_model: str,
 ) -> None:
     replay_config = _cache_config(

@@ -249,7 +249,7 @@ class CachedRealConfig:
     corpus_version: str = ""
     interoperable_corpus_versions: tuple[str, ...] = ()
     authorized_backend_version: str = ""
-    authorized_model: str = ""
+    authorized_model: str | None = ""
     authorized_mode: str = ""
     miss_policy: str = "fail-loud"
     cache_tier_ceiling: str = DEFAULT_CACHE_TIER_CEILING
@@ -453,7 +453,7 @@ def normalize_cached_real_config(
                     unavailable_error_cls(str(exc)),
                     "invalid_run_input",
                 ) from exc
-            authorized_model = str(raw_authorized_model)
+            authorized_model = raw_authorized_model
         elif authorized_mode == DEFAULT_ALPHAMELTS_MODE:
             authorized_model = str(raw_authorized_model).strip()
             try:
