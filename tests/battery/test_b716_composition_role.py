@@ -26,11 +26,12 @@ from simulator.battery.migrate import (
     sample_from_equipment,
 )
 from simulator.battery.records import Composition, Located, State
+from simulator.battery.records import (
+    INITIAL_CHARGE_ONLY_PROXY_FLAG as INITIAL_CHARGE_ONLY,
+)
 from simulator.battery.score import _catalogue_composition_notice
 from tests.battery import factories as F
 from tests.battery.test_migrate import _migrate_real_extract, _write_min_tree
-
-INITIAL_CHARGE_ONLY = "initial_charge_only"
 
 
 def _series_extract(values_extra: dict | None = None) -> dict:
@@ -105,31 +106,59 @@ def test_undeclared_point_oxide_map_dual_promotes_without_proxy_flag(tmp_path) -
     assert composition.proxy_flag is None
 
 
-def test_declared_initial_charge_point_map_dual_promotes(tmp_path) -> None:
+def test_declared_initial_charge_point_map_is_stamped_and_kept(tmp_path) -> None:
     conditions = _fixture_points(
         tmp_path, {"composition_role": INITIAL_CHARGE_ONLY}
     )
+    # Option (a): still on both melt channels, now carrying the role.
     composition = _assert_dual_promotion(conditions)
-    # Pin of the current reader: the role is not read yet.
-    assert composition.proxy_flag is None
+    assert composition.proxy_flag == INITIAL_CHARGE_ONLY
 
 
-def test_markova_1983_initial_sample_points_dual_promote(tmp_path) -> None:
+def test_located_composition_role_declaration_is_read(tmp_path) -> None:
+    conditions = _fixture_points(
+        tmp_path,
+        {
+            "composition_role": {
+                "value": INITIAL_CHARGE_ONLY,
+                "locator": {"page": 2, "table": "1"},
+                "quote": "The compositions of initial samples",
+            }
+        },
+    )
+    assert _assert_dual_promotion(conditions).proxy_flag == INITIAL_CHARGE_ONLY
+
+
+def test_unknown_composition_role_is_queued_not_stamped(tmp_path) -> None:
+    root = _write_min_tree(
+        tmp_path, _series_extract({"composition_role": "initial_charge"})
+    )
+    result = migrate(root, write=False)
+    points = _point_compositions(result, "fixture-source::fixture_series")
+    assert len(points) == 1
+    assert _assert_dual_promotion(points[0][1]).proxy_flag is None
+    assert any(
+        "composition_role 'initial_charge' is not one of" in entry.why
+        for entry in result.queue
+    )
+
+
+def test_markova_1983_initial_sample_points_are_stamped(tmp_path) -> None:
     result = _migrate_real_extract(tmp_path, "kems-025-markova-1983.yaml")
     points = _point_compositions(result, "kems-025-markova-1983::")
     assert len(points) == 25
     flags = {_assert_dual_promotion(conditions).proxy_flag for _, conditions in points}
-    assert flags == {None}
+    assert flags == {INITIAL_CHARGE_ONLY}
 
 
-def test_hastie_1981_table2_initial_maps_dual_promote(tmp_path) -> None:
+def test_hastie_1981_table2_initial_maps_are_stamped(tmp_path) -> None:
     result = _migrate_real_extract(tmp_path, "kems-020-hastie-1981-nbsir.yaml")
     points = _point_compositions(
         result, "kems-020-hastie-1981-nbsir::hastie_1981_table2_k_logP_coefficients"
     )
     assert len(points) == 6
     flags = {_assert_dual_promotion(conditions).proxy_flag for _, conditions in points}
-    assert flags == {None}
+    assert flags == {INITIAL_CHARGE_ONLY}
 
 
 # --- the four ``rg proxy_flag tests`` hits: catalogue token paths ---------
@@ -231,11 +260,24 @@ def _stamped_point_residual():
     return residual
 
 
-def test_stamped_point_composition_residual_stratum() -> None:
+def test_stamped_point_composition_is_predicted_and_flagged() -> None:
+    from simulator.battery.score import (
+        FLAGGED_STRATUM_SOURCE_INTERNALLY_INCONSISTENT,
+        flagged_strata,
+    )
+
     residual = _stamped_point_residual()
+    # Predict-and-flag: the number is kept, the row leaves the headline.
     assert residual.numeric is not None
-    # Pin of the current scorer: no composition-role notice yet.
-    assert "not_flagged_stratum" not in residual.exclusions
-    assert not any(
-        "initial_charge_only" in notice.reason for notice in residual.notices
+    assert residual.score_eligible is False
+    assert "not_flagged_stratum" in residual.exclusions
+    role_notices = [
+        notice
+        for notice in residual.notices
+        if "composition_role=initial_charge_only" in notice.reason
+    ]
+    assert len(role_notices) == 1
+    assert role_notices[0].kind is NoticeKind.SOURCE_DISAGREEMENT
+    assert flagged_strata(residual.notices) == (
+        FLAGGED_STRATUM_SOURCE_INTERNALLY_INCONSISTENT,
     )
