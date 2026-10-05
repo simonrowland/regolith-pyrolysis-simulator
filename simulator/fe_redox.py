@@ -4,6 +4,10 @@ import math
 from collections.abc import Mapping
 
 from simulator.environment import DEFAULT_VACUUM_FLOOR_BAR
+from simulator.feedstock_composition import (
+    feot_equivalent_wt_pct,
+    iron_oxide_values,
+)
 
 
 class Kress91InvalidControls(ValueError):
@@ -387,12 +391,6 @@ def kress91_furnace_activity_pressure_bar(
     return floor_vacuum_pressure_bar(0.0, floor_bar=floor_bar)
 
 
-def feot_equivalent_wt_pct(comp_wt: Mapping[str, float]) -> float:
-    feo = max(0.0, float(comp_wt.get('FeO', 0.0) or 0.0))
-    fe2o3 = max(0.0, float(comp_wt.get('Fe2O3', 0.0) or 0.0))
-    return feo + fe2o3 * (2.0 * 71.844 / 159.687)
-
-
 def _linear_interpolate_or_clamp(
     points: tuple[tuple[float, float], ...],
     x: float,
@@ -600,7 +598,14 @@ def melt_mol_fractions_for_kress91(comp_wt: Mapping[str, float]) -> dict[str, fl
     # GAS_CONSTANT. Keeping fe_redox.py a true leaf avoids that cycle.
     from simulator.state import MOLAR_MASS
 
-    for oxide in (*KRESS91_MOL_FRACTION_OXIDES, 'FeO', 'Fe2O3'):
+    try:
+        feo_wt, fe2o3_wt = iron_oxide_values(comp_wt)
+    except ValueError as exc:
+        raise Kress91InvalidControls(
+            'Kress91 composition FeO/Fe2O3 must be finite and non-negative'
+        ) from exc
+    iron_oxides = {'FeO': feo_wt, 'Fe2O3': fe2o3_wt}
+    for oxide in KRESS91_MOL_FRACTION_OXIDES:
         raw = comp_wt.get(oxide, 0.0)
         try:
             value = float(raw)
@@ -608,6 +613,11 @@ def melt_mol_fractions_for_kress91(comp_wt: Mapping[str, float]) -> dict[str, fl
             raise Kress91InvalidControls(
                 f'Kress91 composition {oxide} must be finite and non-negative'
             ) from exc
+        if not math.isfinite(value) or value < 0.0:
+            raise Kress91InvalidControls(
+                f'Kress91 composition {oxide} must be finite and non-negative'
+            )
+    for oxide, value in iron_oxides.items():
         if not math.isfinite(value) or value < 0.0:
             raise Kress91InvalidControls(
                 f'Kress91 composition {oxide} must be finite and non-negative'
