@@ -99,7 +99,7 @@ def _host(vapor_pressures: dict | None = None) -> SimpleNamespace:
     )
     for name in (
         "_analytic_evaporation_depletion_rates",
-        "_limit_multi_reactant_rates",
+        "_limit_reactant_pools",
         "_evaporation_stoich",
         "_multi_reactant_stoich",
         "_validate_multi_reactant_atoms",
@@ -332,14 +332,24 @@ def _dispatch(species: str, stoich: dict, sp_data: dict | None = None, *, rate: 
     ))
 
 
-def _first_order_rate(raw_kg_hr: float, total_draw_kg_hr: float, available_kg: float, dt_hr: float = 1.0) -> float:
-    """Product kg/hr when one reactant pool is shared first-order."""
+def _integrated_pool_rate(
+    raw_kg_hr: float,
+    total_draw_kg_hr: float,
+    available_kg: float,
+    dt_hr: float = 1.0,
+) -> float:
+    """Closed form of dM/dt = -(total_draw/available) M, split by raw/total.
+
+    Consumed mass is M(0) * (1 - exp(-kt)). This is the integral, not the
+    production ``expm1`` evaluation.
+    """
 
     if available_kg <= 1e-12 or total_draw_kg_hr <= 1e-12:
         return 0.0
-    fraction = -math.expm1(-(total_draw_kg_hr / available_kg) * dt_hr)
-    fraction = max(0.0, min(math.nextafter(1.0, 0.0), fraction))
-    return raw_kg_hr * (available_kg * fraction) / total_draw_kg_hr
+    consumed_kg = available_kg * (
+        1.0 - math.exp(-(total_draw_kg_hr / available_kg) * dt_hr)
+    )
+    return raw_kg_hr * consumed_kg / total_draw_kg_hr
 
 
 def test_half_sodium_oxide_half_boria_is_one_kilogram_per_kilogram() -> None:
@@ -583,10 +593,10 @@ def test_depletion_uses_every_reactant_and_one_shared_pool() -> None:
         available_o2_kg=1.0e6,
     )
     sodium_draw = nabo["reactants_kg_per_vapor"]["Na2O"] + nak["reactants_kg_per_vapor"]["Na2O"]
-    expected = _first_order_rate(1.0, sodium_draw, sodium)
+    expected = _integrated_pool_rate(1.0, sodium_draw, sodium)
     assert shared["NaBO"] == pytest.approx(expected, rel=1e-12)
     assert shared["NaK"] == pytest.approx(expected, rel=1e-12)
-    own = _first_order_rate(1.0, nabo["reactants_kg_per_vapor"]["Na2O"], sodium)
+    own = _integrated_pool_rate(1.0, nabo["reactants_kg_per_vapor"]["Na2O"], sodium)
     assert expected < own
     no_o2 = host._analytic_evaporation_depletion_rates(
         {"NaBO3": 1.0},

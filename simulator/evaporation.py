@@ -3346,13 +3346,18 @@ class EvaporationMixin:
             stoich = self._evaporation_stoich(species, sp_data)
             vector = stoich.get('reactants_kg_per_vapor')
             if isinstance(vector, Mapping) and len(vector) > 1:
+                masses = {
+                    str(reactant): float(kg_per)
+                    for reactant, kg_per in vector.items()
+                }
                 multi_entries.append({
                     'species': species,
                     'stoich': stoich,
                     'raw_rate_kg_hr': raw_rate_kg_hr,
-                    'reactants_kg_per_vapor': {
-                        str(reactant): float(kg_per)
-                        for reactant, kg_per in vector.items()
+                    'reactants_kg_per_vapor': masses,
+                    'draws_kg_hr': {
+                        reactant: raw_rate_kg_hr * kg_per
+                        for reactant, kg_per in masses.items()
                     },
                 })
                 continue
@@ -3367,57 +3372,21 @@ class EvaporationMixin:
                 'stoich': stoich,
                 'raw_rate_kg_hr': raw_rate_kg_hr,
                 'parent_draw_kg_hr': parent_draw_kg_hr,
+                'reactants_kg_per_vapor': {
+                    parent_oxide: oxide_per_product_kg,
+                },
+                'draws_kg_hr': {parent_oxide: parent_draw_kg_hr},
             })
 
-        effective_rates: dict[str, float] = {}
-        max_fraction = math.nextafter(1.0, 0.0)
+        ordered_entries: list[dict] = []
         for parent_oxide in sorted(parent_groups):
-            entries = parent_groups[parent_oxide]
-            available_parent_kg = float(cleaned_melt_kg.get(parent_oxide, 0.0))
-            total_parent_draw_kg_hr = sum(
-                entry['parent_draw_kg_hr'] for entry in entries)
-            if available_parent_kg <= 1e-12 or total_parent_draw_kg_hr <= 1e-12:
-                continue
-            k_hr = total_parent_draw_kg_hr / available_parent_kg
-            depletion_fraction = -math.expm1(-k_hr * dt_hr)
-            depletion_fraction = max(
-                0.0, min(max_fraction, depletion_fraction))
-            parent_draw_kg = available_parent_kg * depletion_fraction
-            for entry in entries:
-                share = entry['parent_draw_kg_hr'] / total_parent_draw_kg_hr
-                product_kg = (
-                    parent_draw_kg
-                    * share
-                    / float(entry['stoich']['oxide_per_product_kg'])
-                )
-                if product_kg > 1e-12:
-                    effective_rates[entry['species']] = product_kg / dt_hr
-
-        if multi_entries:
-            # Recompute every draw, including single-parent species, so a
-            # shared reactant is one pool. Live calls have no multi entry,
-            # so they keep the loop above.
-            combined = []
-            for parent_oxide, group in parent_groups.items():
-                for entry in group:
-                    combined.append({
-                        'species': entry['species'],
-                        'raw_rate_kg_hr': entry['raw_rate_kg_hr'],
-                        'reactants_kg_per_vapor': {
-                            parent_oxide: float(
-                                entry['stoich']['oxide_per_product_kg']
-                            ),
-                        },
-                        'stoich': entry['stoich'],
-                    })
-            combined.extend(multi_entries)
-            effective_rates.clear()
-            self._limit_multi_reactant_rates(
-                combined,
-                effective_rates,
-                dt_hr=dt_hr,
-                cleaned_melt_kg=cleaned_melt_kg,
-            )
+            ordered_entries.extend(parent_groups[parent_oxide])
+        ordered_entries.extend(multi_entries)
+        effective_rates = self._limit_reactant_pools(
+            ordered_entries,
+            dt_hr=dt_hr,
+            cleaned_melt_kg=cleaned_melt_kg,
+        )
 
         o2_draws: list[tuple[str, float]] = []
         for parent_oxide in sorted(parent_groups):
@@ -4344,52 +4313,55 @@ class EvaporationMixin:
                 converted[species] = kg
         return converted
 
-    def _limit_multi_reactant_rates(
+    def _limit_reactant_pools(
         self,
         entries: list[dict],
-        effective_rates: dict[str, float],
         *,
         dt_hr: float,
         cleaned_melt_kg: Mapping[str, float],
-    ) -> None:
-        """First-order limit shared across every condensed reactant.
+    ) -> dict[str, float]:
+        """First-order limit over every condensed-reactant pool.
 
-        A species rate is the minimum of its per-reactant limits. Each
-        reactant pool includes every entry that draws it. Called only when
-        a reaction has more than one condensed reactant.
+        One entry draws one reactant or several. Pools that share a reactant
+        share one inventory. A species rate is the minimum of its pool limits.
+        The consumed fraction is ``-expm1(-k dt)`` with ``k = draw / stock``.
+        Overhead O2 is a later pass: it scales these rates from a different
+        account, so it is not a second copy of this pool rule.
         """
 
-        by_reactant: dict[str, list[tuple[str, float, float]]] = defaultdict(list)
+        by_reactant: dict[str, list[tuple[dict, float, float]]] = defaultdict(list)
         for entry in entries:
-            raw_rate = float(entry['raw_rate_kg_hr'])
+            draws = entry['draws_kg_hr']
             for reactant, kg_per in entry['reactants_kg_per_vapor'].items():
                 by_reactant[str(reactant)].append(
-                    (str(entry['species']), float(kg_per), raw_rate)
+                    (entry, float(kg_per), float(draws[reactant]))
                 )
         limits: dict[str, list[float]] = defaultdict(list)
         max_fraction = math.nextafter(1.0, 0.0)
-        for reactant, items in by_reactant.items():
+        for reactant in sorted(by_reactant):
+            items = by_reactant[reactant]
             available = float(cleaned_melt_kg.get(reactant, 0.0))
-            total_draw = sum(raw * kg_per for _species, kg_per, raw in items)
+            total_draw = sum(draw for _entry, _kg_per, draw in items)
             if available <= 1e-12 or total_draw <= 1e-12:
-                for species, _kg_per, _raw in items:
-                    limits[species].append(0.0)
+                for entry, _kg_per, _draw in items:
+                    limits[str(entry['species'])].append(0.0)
                 continue
-            depletion_fraction = -math.expm1(-(total_draw / available) * dt_hr)
+            k_hr = total_draw / available
+            depletion_fraction = -math.expm1(-k_hr * dt_hr)
             depletion_fraction = max(0.0, min(max_fraction, depletion_fraction))
-            reactant_draw_kg = available * depletion_fraction
-            for species, kg_per, raw in items:
-                share = (raw * kg_per) / total_draw
-                product_kg = reactant_draw_kg * share / kg_per
+            pool_draw_kg = available * depletion_fraction
+            for entry, kg_per, draw in items:
+                share = draw / total_draw
+                product_kg = pool_draw_kg * share / kg_per
                 rate = product_kg / dt_hr if product_kg > 1e-12 else 0.0
-                limits[species].append(rate)
-        seen = {str(entry['species']) for entry in entries}
-        for species in seen:
+                limits[str(entry['species'])].append(rate)
+        effective_rates: dict[str, float] = {}
+        for entry in entries:
+            species = str(entry['species'])
             rate = min(limits.get(species, [0.0]))
-            if rate > 1e-12:
+            if rate > 0.0:
                 effective_rates[species] = rate
-            else:
-                effective_rates.pop(species, None)
+        return effective_rates
 
     def _multi_reactant_stoich(self, species: str, sp_data: dict) -> dict | None:
         """Vector stoich carried on the legacy projection.
