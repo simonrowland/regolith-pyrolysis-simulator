@@ -387,10 +387,9 @@ species:
             published_page: 308
             note: No numeric KEMS oxygen fugacity is printed.
       derived_from: &id001
-      - allibert_1981_table1_spectrometer_ion_conditions
-      - allibert_1981_kems_ion_comparison_method
+      - unknown:kems-051-allibert-1981
       derivation:
-        relation: 'CaO activity is reduced from the Ca+ and O+ ion-intensity ratios over the melt and CaO reference cell (Eqs. 1–2, 4, and 6–7, pp. 308–309); the paper states the activities were independently deduced from O+, Ca+, and Al+ intensities.'
+        relation: 'Printed-reduction-only derivation: CaO activity is reduced from Ca+ and O+ ion-intensity ratios over the melt and CaO reference cell (Eqs. 1–2, 4, and 6–7, pp. 308–309). The paper states both activities were independently deduced from O+, Ca+, and Al+ intensities. Composition-resolved ion-intensity observations are not tabulated in this extract; reduced activity rows follow the landed KEMS pattern in stolyarova-1996-cao-alumina-silica-kems.yaml.'
         inputs: *id001
         output_unit: dimensionless activity
       inference:
@@ -1087,10 +1086,10 @@ species:
             published_page: 308
             note: No numeric KEMS oxygen fugacity is printed.
       derived_from: &id006
-      - allibert_1981_table1_spectrometer_ion_conditions
-      - allibert_1981_kems_ion_comparison_method
+      - unknown:kems-051-allibert-1981
       derivation:
-        relation: 'Al2O3 activity is reduced from the Al+ and O+ ion-intensity ratios over the melt and pure alpha-Al2O3 reference cell (Eqs. 1–2, 3, 5, and 8, pp. 308–309); the paper states the activities were independently deduced from O+, Ca+, and Al+ intensities.'
+        relation: 'Printed-reduction-only derivation: Al2O3 activity is reduced from Al+ and O+ ion-intensity ratios over the melt and pure alpha-Al2O3 reference cell (Eqs. 1–2, 3, 5, and 8, pp. 308–309). The paper states both activities were independently deduced from O+, Ca+, and Al+ intensities. Composition-resolved ion-intensity observations are not tabulated in this extract; reduced activity rows follow the landed KEMS pattern in stolyarova-1996-cao-alumina-silica-kems.yaml.'
+        inputs: *id006
         inputs: *id006
         output_unit: dimensionless activity
       inference:
