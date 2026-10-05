@@ -53,6 +53,23 @@ experiments:
     pdf_page_index: 4
     figure: '2'
     note: Figure-only K pressure readings over samples 12022 and 12065.
+source_caveats:
+- locator:
+    source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+    published_page: 1369
+    pdf_page_index: 3
+    line_range: '56'
+    paragraph: Alkaline components; molecular oxygen in Table 1 range
+  quote: '“far below the stoichiometric amount”; “interaction of oxygen with the rhenium container”'
+  note: Authors attribute the low O2 pressure partly to oxygen interaction with Re; passivated Re cells used for 12065 produced a higher O2+/Me+ ratio.
+- locator:
+    source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+    published_page: 1375
+    pdf_page_index: 9
+    line_range: '304'
+    paragraph: SAMPLE 12065; absolute pressure calibration uncertainty
+  quote: '“an uncertainty of at least a factor 2”'
+  note: The authors attribute this absolute-pressure uncertainty mainly to calibration errors.
 species:
   O2:
     observations:
@@ -66,16 +83,18 @@ species:
       T_range_K:
       - 1396.0
       - 1499.0
-      phase: Apollo_12_lunar_basalt_melt_12022_12065
+      phase: gas
       standard_state: partial pressure over multicomponent lunar basalt melt (not pure oxide)
       regime: kems_effusion
       units: atm as published (p_Pa = p_atm × 101325)
       values:
         gas_species: O2(g)
-        quantity: partial_pressure_over_lunar_basalt
+        quantity: partial_pressure
+        method_class: measured_direct
+        admission_status: admitted
         material: Apollo_12_12022_and_12065
-        condensed_phase: lunar_basalt_melt
-        vaporization_regime_note: alkali vaporization window; O2 far below stoichiometric Me2O→2Me+1/2O2
+        condensed_phase: basaltic_silicate_melt
+        vaporization_regime_note: alkali vaporization window
         points:
         - T_K: 1396.0
           p_atm: 5.54e-09
@@ -105,13 +124,10 @@ species:
           p_atm: 8.78e-09
           p_Pa: 0.0008896335
           sample: '12065'
-        negative_stoichiometry_note: Molecular oxygen partial pressure far below stoichiometric amount
-          for Me2O(s)→2Me(g)+1/2O2(g). Authors attribute partially to O interaction with Re container;
-          passivated Re cells on 12065 showed higher O2+/Me+.
         co_measured_context: same alkali T window as Na/K figure series (Figs 1–2); tabulated co-species
           O2 only
       uncertainty:
-        note: authors state ≥factor 2 uncertainty in absolute P from calibration
+        note: See the located author uncertainty caveat for absolute pressures (p. 1375).
       equipment:
         orifice_area:
           value: 4.154756e-06
@@ -1614,15 +1630,17 @@ species:
       T_range_K:
       - 2015.0
       - 2500.0
-      phase: Apollo_12_lunar_basalt_melt_12022_12065
+      phase: gas
       standard_state: partial pressure over multicomponent lunar basalt melt (not pure oxide)
       regime: kems_effusion
       units: atm as published (p_Pa = p_atm × 101325)
       values:
         gas_species: O(g)
-        quantity: partial_pressure_atomic_oxygen
+        quantity: partial_pressure
+        method_class: measured_direct
+        admission_status: admitted
         material: Apollo_12_12022_and_12065
-        condensed_phase: lunar_basalt_melt
+        condensed_phase: basaltic_silicate_melt
         points:
         - T_K: 2015.0
           p_atm: 9.2e-08
@@ -1697,8 +1715,7 @@ species:
           and with AlO/Al2O (12065 BC: 2320–2500). Enables p(Al2O)/p(O), p(AlO)/p(O) ratios and Table
           8 Kp.'
       uncertainty:
-        note: ≥factor 2 absolute; Re cell O interaction caveat applies more to O2 than atomic O at high
-          T
+        note: See the located author uncertainty caveat for absolute pressures (p. 1375).
       equipment:
         orifice_area:
           value: 4.154756e-06

@@ -1,10 +1,10 @@
 # Battery v2.1 migration report
 
 rows in: 47794
-records out (observations): 121506
+records out (observations): 121524
 works: 267
 experiments: 3555
-queue size: 77684
+queue size: 77654
 identical-payload dedupe aliases: 342
 metadata files: 39
 index sources: 271
@@ -17,7 +17,7 @@ hard issues: 3664
 | citations | 147 | 270 (mismatch) |
 | doi_works | 56 | 128 (mismatch) |
 | no_doi_works | 91 | 139 (mismatch) |
-| admission_statuses | 374 | 1178 (mismatch) |
+| admission_statuses | 374 | 1180 (mismatch) |
 | supersedes | 422 | 650 (mismatch) |
 | series | 60 | 597 (mismatch) |
 | gibbs_reference_pressures | 1617 | 1635 (mismatch) |
@@ -25,10 +25,10 @@ hard issues: 3664
 | gibbs_reference_101325 | 594 | 594 |
 | formulas | 1625 | 2044 (mismatch) |
 | equipment_payloads | 670 | 973 (mismatch) |
-| absent_admissions | 3511 | 5024 (mismatch) |
-| absent_classes | 2174 | 2205 (mismatch) |
+| absent_admissions | 3511 | 5022 (mismatch) |
+| absent_classes | 2174 | 2203 (mismatch) |
 | range_only_T | 3125 | 2751 (mismatch) |
-| system_like_phases | 1065 | 2687 (mismatch) |
+| system_like_phases | 1065 | 2685 (mismatch) |
 | missing_phases | 237 | 587 (mismatch) |
 | tabulated_lists | — | 6 |
 
@@ -36,7 +36,7 @@ hard issues: 3664
 
 | source method_class | count |
 |---|---:|
-| `absent` | 577 |
+| `absent` | 575 |
 | `method_only` | 38 |
 | `derived_from_kems_equilibrium_constants` | 8 |
 | `third_law_kems` | 8 |
@@ -7053,8 +7053,8 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/compilations/janaf/tables/Al-049.yaml` | 1 | 28 | 2 |
 | `data/literature/compilations/janaf/tables/Al-050.yaml` | 1 | 20 | 20 |
 | `data/literature/compilations/janaf/tables/Al-051.yaml` | 1 | 43 | 8 |
-| `data/literature/compilations/janaf/tables/Al-052.yaml` | 1 | 19 | 0 |
-| `data/literature/compilations/janaf/tables/Al-053.yaml` | 1 | 20 | 1 |
+| `data/literature/compilations/janaf/tables/Al-052.yaml` | 1 | 21 | 0 |
+| `data/literature/compilations/janaf/tables/Al-053.yaml` | 1 | 22 | 1 |
 | `data/literature/compilations/janaf/tables/Al-054.yaml` | 1 | 21 | 20 |
 | `data/literature/compilations/janaf/tables/Al-055.yaml` | 1 | 32 | 1 |
 | `data/literature/compilations/janaf/tables/Al-056.yaml` | 1 | 12 | 0 |
@@ -7276,8 +7276,8 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/compilations/janaf/tables/Ba-027.yaml` | 1 | 25 | 1 |
 | `data/literature/compilations/janaf/tables/Ba-028.yaml` | 1 | 21 | 0 |
 | `data/literature/compilations/janaf/tables/Ba-029.yaml` | 1 | 27 | 0 |
-| `data/literature/compilations/janaf/tables/Ba-030.yaml` | 1 | 22 | 1 |
-| `data/literature/compilations/janaf/tables/Ba-031.yaml` | 1 | 26 | 26 |
+| `data/literature/compilations/janaf/tables/Ba-030.yaml` | 1 | 24 | 1 |
+| `data/literature/compilations/janaf/tables/Ba-031.yaml` | 1 | 28 | 28 |
 | `data/literature/compilations/janaf/tables/Ba-032.yaml` | 1 | 31 | 1 |
 | `data/literature/compilations/janaf/tables/Ba-033.yaml` | 1 | 27 | 0 |
 | `data/literature/compilations/janaf/tables/Ba-034.yaml` | 1 | 22 | 1 |
@@ -7349,7 +7349,7 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/compilations/janaf/tables/Br-067.yaml` | 1 | 19 | 1 |
 | `data/literature/compilations/janaf/tables/Br-068.yaml` | 1 | 18 | 0 |
 | `data/literature/compilations/janaf/tables/Br-069.yaml` | 1 | 18 | 0 |
-| `data/literature/compilations/janaf/tables/Br-070.yaml` | 1 | 23 | 1 |
+| `data/literature/compilations/janaf/tables/Br-070.yaml` | 1 | 25 | 1 |
 | `data/literature/compilations/janaf/tables/Br-071.yaml` | 1 | 19 | 19 |
 | `data/literature/compilations/janaf/tables/Br-072.yaml` | 1 | 35 | 4 |
 | `data/literature/compilations/janaf/tables/Br-073.yaml` | 1 | 21 | 0 |
@@ -7753,10 +7753,10 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/compilations/janaf/tables/Cl-186.yaml` | 1 | 18 | 0 |
 | `data/literature/compilations/janaf/tables/Cl-187.yaml` | 1 | 6 | 0 |
 | `data/literature/compilations/janaf/tables/Cl-188.yaml` | 1 | 12 | 0 |
-| `data/literature/compilations/janaf/tables/Cl-189.yaml` | 1 | 20 | 3 |
+| `data/literature/compilations/janaf/tables/Cl-189.yaml` | 1 | 20 | 1 |
 | `data/literature/compilations/janaf/tables/Cl-190.yaml` | 1 | 14 | 1 |
 | `data/literature/compilations/janaf/tables/Cl-191.yaml` | 1 | 7 | 1 |
-| `data/literature/compilations/janaf/tables/Cl-192.yaml` | 1 | 27 | 7 |
+| `data/literature/compilations/janaf/tables/Cl-192.yaml` | 1 | 27 | 5 |
 | `data/literature/compilations/janaf/tables/Cl-193.yaml` | 1 | 9 | 0 |
 | `data/literature/compilations/janaf/tables/Cl-194.yaml` | 1 | 9 | 0 |
 | `data/literature/compilations/janaf/tables/Co-001.yaml` | 1 | 27 | 2 |
@@ -7922,8 +7922,8 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/compilations/janaf/tables/F-088.yaml` | 1 | 15 | 0 |
 | `data/literature/compilations/janaf/tables/F-089.yaml` | 1 | 13 | 0 |
 | `data/literature/compilations/janaf/tables/F-090.yaml` | 1 | 13 | 0 |
-| `data/literature/compilations/janaf/tables/F-091.yaml` | 1 | 13 | 0 |
-| `data/literature/compilations/janaf/tables/F-092.yaml` | 1 | 14 | 1 |
+| `data/literature/compilations/janaf/tables/F-091.yaml` | 1 | 15 | 0 |
+| `data/literature/compilations/janaf/tables/F-092.yaml` | 1 | 16 | 1 |
 | `data/literature/compilations/janaf/tables/F-093.yaml` | 1 | 11 | 11 |
 | `data/literature/compilations/janaf/tables/F-094.yaml` | 1 | 23 | 1 |
 | `data/literature/compilations/janaf/tables/F-095.yaml` | 1 | 12 | 0 |
@@ -8198,8 +8198,8 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/compilations/janaf/tables/I-058.yaml` | 1 | 12 | 0 |
 | `data/literature/compilations/janaf/tables/I-059.yaml` | 1 | 18 | 0 |
 | `data/literature/compilations/janaf/tables/I-060.yaml` | 1 | 18 | 0 |
-| `data/literature/compilations/janaf/tables/I-061.yaml` | 1 | 10 | 1 |
-| `data/literature/compilations/janaf/tables/I-062.yaml` | 1 | 10 | 1 |
+| `data/literature/compilations/janaf/tables/I-061.yaml` | 1 | 12 | 1 |
+| `data/literature/compilations/janaf/tables/I-062.yaml` | 1 | 12 | 1 |
 | `data/literature/compilations/janaf/tables/I-063.yaml` | 1 | 16 | 1 |
 | `data/literature/compilations/janaf/tables/I-064.yaml` | 1 | 18 | 0 |
 | `data/literature/compilations/janaf/tables/I-065.yaml` | 1 | 20 | 1 |
@@ -18008,7 +18008,7 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/extracts/kems-019-miller-armatys-2013.yaml` | 28 | 28 | 60 |
 | `data/literature/extracts/kems-020-hastie-1981-nbsir.yaml` | 41 | 112 | 294 |
 | `data/literature/extracts/kems-021-plante-1992-feo.yaml` | 10 | 25 | 40 |
-| `data/literature/extracts/kems-022-demaria-1971.yaml` | 32 | 117 | 223 |
+| `data/literature/extracts/kems-022-demaria-1971.yaml` | 32 | 117 | 195 |
 | `data/literature/extracts/kems-023-demaria-1973.yaml` | 30 | 75 | 58 |
 | `data/literature/extracts/kems-024-gibson-hubbard-1972.yaml` | 108 | 108 | 314 |
 | `data/literature/extracts/kems-025-markova-1983.yaml` | 22 | 44 | 63 |
@@ -18278,8 +18278,8 @@ MODEL_DERIVED / MEASURED_REDUCED keep their mapped evidence class. Parent pointe
 
 ## Advisory issue census
 
-advisory issues: 217059
+advisory issues: 217137
 
 | kind | count |
 |---|---:|
-| `identity_incomplete` | 217059 |
+| `identity_incomplete` | 217137 |

@@ -18,12 +18,12 @@ compilation_role:
   circularity_warning: Do not validate an engine against a compilation it consumes.
 extraction:
   method: machine parse of NIST tab-delimited table download; source bytes cached unchanged
-  date: '2026-09-06'
   user_agent: RegolithPyrolysisSimulator-corpus-harvester/1.0 (public thermochemical reference-data research; polite cached
     client)
   source_cache_path: /Users/simonrowland/Library/CloudStorage/Dropbox/Starship Mission Design/Regolith Processing/regolith-pyrolysis-simulator/docs-private/research/2026-08-09-upstream-mission/IMCC-impl/janaf-mirror/Na/Na-028.txt
   source_sha256: a49089601a0a33134ff3df92f0cfedd9dfd7c517875d24fe68a2c8a11a0c709f
   review_status: machine_transcribed_unreviewed
+  date: '2026-09-06'
 table:
   table_id: Na-028
   url: https://janaf.nist.gov/tables/Na-028.html
@@ -984,6 +984,92 @@ table:
         row_temperature_as_published: '1100'
         column: log Kf
   - temperature:
+      value: 1200.0
+      as_published: '1200'
+      locator:
+        table_id: Na-028
+        url: https://janaf.nist.gov/tables/Na-028.html
+        download_url: https://janaf.nist.gov/tables/Na-028.txt
+        row_temperature_as_published: '1200'
+        column: T(K)
+    heat_capacity:
+      value: 292.88
+      as_published: '292.880'
+      locator:
+        table_id: Na-028
+        url: https://janaf.nist.gov/tables/Na-028.html
+        download_url: https://janaf.nist.gov/tables/Na-028.txt
+        row_temperature_as_published: '1200'
+        column: Cp
+    entropy:
+      value: 469.859
+      as_published: '469.859'
+      locator:
+        table_id: Na-028
+        url: https://janaf.nist.gov/tables/Na-028.html
+        download_url: https://janaf.nist.gov/tables/Na-028.txt
+        row_temperature_as_published: '1200'
+        column: S
+    negative_gibbs_enthalpy_function:
+      value: 293.251
+      as_published: '293.251'
+      locator:
+        table_id: Na-028
+        url: https://janaf.nist.gov/tables/Na-028.html
+        download_url: https://janaf.nist.gov/tables/Na-028.txt
+        row_temperature_as_published: '1200'
+        column: -[G-H(Tr)]/T
+    enthalpy_increment:
+      value: 211.93
+      as_published: '211.930'
+      locator:
+        table_id: Na-028
+        url: https://janaf.nist.gov/tables/Na-028.html
+        download_url: https://janaf.nist.gov/tables/Na-028.txt
+        row_temperature_as_published: '1200'
+        column: H-H(Tr)
+    formation_enthalpy:
+      value: null
+      as_published: '2629.223'
+      locator:
+        table_id: Na-028
+        url: https://janaf.nist.gov/tables/Na-028.html
+        download_url: https://janaf.nist.gov/tables/Na-028.txt
+        row_temperature_as_published: '1200'
+        column: delta-f H
+        parse_repair: nist_tail_dfh_sign_undetermined
+        parse_repair_reason: formation enthalpy neighbors span a transition marker
+        raw_tail_tokens:
+        - '2629.223'
+        - '1879.459'
+        - '81.811'
+        line_number: 21
+        raw_line: "1200\t292.880\t469.859\t293.251\t211.930\t2629.223  1879.459 81.811"
+    formation_gibbs_energy:
+      value: -1879.459
+      as_published: '1879.459'
+      locator:
+        table_id: Na-028
+        url: https://janaf.nist.gov/tables/Na-028.html
+        download_url: https://janaf.nist.gov/tables/Na-028.txt
+        row_temperature_as_published: '1200'
+        column: delta-f G
+        parse_repair: nist_tail_whitespace_signs_restored
+        line_number: 21
+        raw_line: "1200\t292.880\t469.859\t293.251\t211.930\t2629.223  1879.459 81.811"
+    log10_formation_equilibrium_constant:
+      value: 81.811
+      as_published: '81.811'
+      locator:
+        table_id: Na-028
+        url: https://janaf.nist.gov/tables/Na-028.html
+        download_url: https://janaf.nist.gov/tables/Na-028.txt
+        row_temperature_as_published: '1200'
+        column: log Kf
+        parse_repair: nist_tail_whitespace_signs_restored
+        line_number: 21
+        raw_line: "1200\t292.880\t469.859\t293.251\t211.930\t2629.223  1879.459 81.811"
+  - temperature:
       value: 1300.0
       as_published: '1300'
       locator:
@@ -1586,12 +1672,6 @@ table:
       url: https://janaf.nist.gov/tables/Na-028.html
   - line_number: 20
     raw_line: "1147.000\t292.880\t456.629\t285.393\t196.408\tIII <--> LIQUID"
-    reason: expected 8 tab-separated values; found 6
-    locator:
-      table_id: Na-028
-      url: https://janaf.nist.gov/tables/Na-028.html
-  - line_number: 21
-    raw_line: "1200\t292.880\t469.859\t293.251\t211.930\t2629.223  1879.459 81.811"
     reason: expected 8 tab-separated values; found 6
     locator:
       table_id: Na-028

@@ -4756,6 +4756,8 @@ observations:
   value:
     kind: series
     series:
+    - - '350'
+      - '0.071'
     - - '400'
       - '0.188'
     - - '450'
@@ -5252,7 +5254,7 @@ observations:
     record: P-002
   read_from: tables:nist-janaf-4th
   derivation:
-    relation: 'Direct JANAF tabulation; 0 printed cells blank or INFINITE; compilation_role engine_reference_input=true, scoring_eligible=false;
+    relation: 'Direct JANAF tabulation; 1 printed cells blank or INFINITE; compilation_role engine_reference_input=true, scoring_eligible=false;
       circularity_warning=Do not validate an engine against a compilation it consumes.; formation_reference_state_schedule=printed
       JANAF (ref) schedules: P-001 (ref), transition rows 10 and 20 bracket series T; phase_basis=''BETA'' in "ALPHA <-->
       BETA"'
@@ -5401,7 +5403,7 @@ observations:
     record: P-002
   read_from: tables:nist-janaf-4th
   derivation:
-    relation: 'Direct JANAF tabulation; 0 printed cells blank or INFINITE; compilation_role engine_reference_input=true, scoring_eligible=false;
+    relation: 'Direct JANAF tabulation; 1 printed cells blank or INFINITE; compilation_role engine_reference_input=true, scoring_eligible=false;
       circularity_warning=Do not validate an engine against a compilation it consumes.; formation_reference_state_schedule=printed
       JANAF (ref) schedules: P-001 (ref), transition rows 5 and 10 bracket series T; phase_basis=''BETA'' in "ALPHA <--> BETA"'
     inputs:
@@ -5654,6 +5656,8 @@ observations:
   value:
     kind: series
     series:
+    - - '350'
+      - '-0.011'
     - - '400'
       - '-0.025'
     - - '450'
@@ -7042,6 +7046,8 @@ observations:
   value:
     kind: series
     series:
+    - - '1200'
+      - '1.078'
     - - '1300'
       - '6.434'
     - - '1400'
@@ -7250,7 +7256,7 @@ observations:
     record: P-003
   read_from: tables:nist-janaf-4th
   derivation:
-    relation: 'Direct JANAF tabulation; 4 printed cells blank or INFINITE; compilation_role engine_reference_input=true, scoring_eligible=false;
+    relation: 'Direct JANAF tabulation; 5 printed cells blank or INFINITE; compilation_role engine_reference_input=true, scoring_eligible=false;
       circularity_warning=Do not validate an engine against a compilation it consumes.; formation_reference_state_schedule=printed
       JANAF (ref) schedules: P-001 (ref), transition rows 10 and 20 bracket series T; phase_basis=phase declared by JANAF
       index state ''l'''
@@ -7395,7 +7401,7 @@ observations:
     record: P-003
   read_from: tables:nist-janaf-4th
   derivation:
-    relation: 'Direct JANAF tabulation; 4 printed cells blank or INFINITE; compilation_role engine_reference_input=true, scoring_eligible=false;
+    relation: 'Direct JANAF tabulation; 5 printed cells blank or INFINITE; compilation_role engine_reference_input=true, scoring_eligible=false;
       circularity_warning=Do not validate an engine against a compilation it consumes.; formation_reference_state_schedule=printed
       JANAF (ref) schedules: P-001 (ref), transition rows 5 and 10 bracket series T; phase_basis=phase declared by JANAF index
       state ''l'''
@@ -7552,7 +7558,7 @@ observations:
     record: P-003
   read_from: tables:nist-janaf-4th
   derivation:
-    relation: 'Direct JANAF tabulation; 4 printed cells blank or INFINITE; compilation_role engine_reference_input=true, scoring_eligible=false;
+    relation: 'Direct JANAF tabulation; 5 printed cells blank or INFINITE; compilation_role engine_reference_input=true, scoring_eligible=false;
       circularity_warning=Do not validate an engine against a compilation it consumes.; formation_reference_state_schedule=printed
       JANAF (ref) schedules: P-001 (ref), transition row 20 brackets lower series T; phase_basis=phase declared by JANAF index
       state ''l'''
@@ -7968,6 +7974,8 @@ observations:
   value:
     kind: series
     series:
+    - - '1200'
+      - '-0.047'
     - - '1300'
       - '-0.259'
     - - '1400'
@@ -9628,6 +9636,8 @@ observations:
   value:
     kind: series
     series:
+    - - '1200'
+      - '1.078'
     - - '1300'
       - '6.434'
     - - '1400'
@@ -10129,7 +10139,7 @@ observations:
     record: P-004
   read_from: tables:nist-janaf-4th
   derivation:
-    relation: 'Direct JANAF tabulation; 0 printed cells blank or INFINITE; compilation_role engine_reference_input=true, scoring_eligible=false;
+    relation: 'Direct JANAF tabulation; 1 printed cells blank or INFINITE; compilation_role engine_reference_input=true, scoring_eligible=false;
       circularity_warning=Do not validate an engine against a compilation it consumes.; formation_reference_state_schedule=printed
       JANAF (ref) schedules: P-001 (ref), transition rows 10 and 20 bracket series T; phase_basis=''LIQUID'' in "BETA <-->
       LIQUID"'
@@ -10286,7 +10296,7 @@ observations:
     record: P-004
   read_from: tables:nist-janaf-4th
   derivation:
-    relation: 'Direct JANAF tabulation; 0 printed cells blank or INFINITE; compilation_role engine_reference_input=true, scoring_eligible=false;
+    relation: 'Direct JANAF tabulation; 1 printed cells blank or INFINITE; compilation_role engine_reference_input=true, scoring_eligible=false;
       circularity_warning=Do not validate an engine against a compilation it consumes.; formation_reference_state_schedule=printed
       JANAF (ref) schedules: P-001 (ref), transition row 20 brackets lower series T; phase_basis=''LIQUID'' in "BETA <-->
       LIQUID"'
@@ -10850,6 +10860,8 @@ observations:
   value:
     kind: series
     series:
+    - - '1200'
+      - '-0.047'
     - - '1300'
       - '-0.259'
     - - '1400'
@@ -34349,6 +34361,8 @@ observations:
     series:
     - - '400'
       - '-199.434'
+    - - '500'
+      - '-189.235'
     - - '600'
       - '-177.539'
     - - '700'
@@ -35041,7 +35055,7 @@ observations:
     record: P-014
   read_from: tables:nist-janaf-4th
   derivation:
-    relation: 'Direct JANAF tabulation; 4 printed cells blank or INFINITE; compilation_role engine_reference_input=true, scoring_eligible=false;
+    relation: 'Direct JANAF tabulation; 5 printed cells blank or INFINITE; compilation_role engine_reference_input=true, scoring_eligible=false;
       circularity_warning=Do not validate an engine against a compilation it consumes.; formation_reference_state_schedule=printed
       JANAF (ref) schedules: P-001 (ref), transition rows 10 and 20 bracket series T; S-001 (ref), transition rows 10 and
       19 bracket series T; phase_basis=phase declared by JANAF index state ''cr'''
@@ -35204,7 +35218,7 @@ observations:
     record: P-014
   read_from: tables:nist-janaf-4th
   derivation:
-    relation: 'Direct JANAF tabulation; 4 printed cells blank or INFINITE; compilation_role engine_reference_input=true, scoring_eligible=false;
+    relation: 'Direct JANAF tabulation; 5 printed cells blank or INFINITE; compilation_role engine_reference_input=true, scoring_eligible=false;
       circularity_warning=Do not validate an engine against a compilation it consumes.; formation_reference_state_schedule=printed
       JANAF (ref) schedules: P-001 (ref), transition rows 10 and 20 bracket series T; S-001 (ref), transition row 19 brackets
       lower series T; phase_basis=phase declared by JANAF index state ''cr'''
@@ -35365,7 +35379,7 @@ observations:
     record: P-014
   read_from: tables:nist-janaf-4th
   derivation:
-    relation: 'Direct JANAF tabulation; 4 printed cells blank or INFINITE; compilation_role engine_reference_input=true, scoring_eligible=false;
+    relation: 'Direct JANAF tabulation; 5 printed cells blank or INFINITE; compilation_role engine_reference_input=true, scoring_eligible=false;
       circularity_warning=Do not validate an engine against a compilation it consumes.; formation_reference_state_schedule=printed
       JANAF (ref) schedules: P-001 (ref), transition rows 5 and 10 bracket series T; S-001 (ref), transition row 8 brackets
       upper series T; phase_basis=phase declared by JANAF index state ''cr'''
@@ -35540,7 +35554,7 @@ observations:
     record: P-014
   read_from: tables:nist-janaf-4th
   derivation:
-    relation: 'Direct JANAF tabulation; 4 printed cells blank or INFINITE; compilation_role engine_reference_input=true, scoring_eligible=false;
+    relation: 'Direct JANAF tabulation; 5 printed cells blank or INFINITE; compilation_role engine_reference_input=true, scoring_eligible=false;
       circularity_warning=Do not validate an engine against a compilation it consumes.; formation_reference_state_schedule=printed
       JANAF (ref) schedules: P-001 (ref), transition row 20 brackets lower series T; S-001 (ref), transition row 19 brackets
       lower series T; phase_basis=phase declared by JANAF index state ''cr'''
@@ -35677,6 +35691,8 @@ observations:
     series:
     - - '400'
       - '26.043'
+    - - '500'
+      - '19.769'
     - - '600'
       - '15.456'
     - - '700'
@@ -36920,6 +36936,8 @@ observations:
     series:
     - - '400'
       - '-198.668'
+    - - '500'
+      - '-190.638'
     - - '600'
       - '-181.869'
     - - '700'
@@ -37669,7 +37687,7 @@ observations:
     record: P-015
   read_from: tables:nist-janaf-4th
   derivation:
-    relation: 'Direct JANAF tabulation; 4 printed cells blank or INFINITE; compilation_role engine_reference_input=true, scoring_eligible=false;
+    relation: 'Direct JANAF tabulation; 5 printed cells blank or INFINITE; compilation_role engine_reference_input=true, scoring_eligible=false;
       circularity_warning=Do not validate an engine against a compilation it consumes.; formation_reference_state_schedule=printed
       JANAF (ref) schedules: P-001 (ref), transition rows 10 and 20 bracket series T; S-001 (ref), transition rows 10 and
       19 bracket series T; phase_basis=phase declared by JANAF index state ''l'''
@@ -37839,7 +37857,7 @@ observations:
     record: P-015
   read_from: tables:nist-janaf-4th
   derivation:
-    relation: 'Direct JANAF tabulation; 4 printed cells blank or INFINITE; compilation_role engine_reference_input=true, scoring_eligible=false;
+    relation: 'Direct JANAF tabulation; 5 printed cells blank or INFINITE; compilation_role engine_reference_input=true, scoring_eligible=false;
       circularity_warning=Do not validate an engine against a compilation it consumes.; formation_reference_state_schedule=printed
       JANAF (ref) schedules: P-001 (ref), transition rows 10 and 20 bracket series T; S-001 (ref), transition row 19 brackets
       lower series T; phase_basis=phase declared by JANAF index state ''l'''
@@ -38007,7 +38025,7 @@ observations:
     record: P-015
   read_from: tables:nist-janaf-4th
   derivation:
-    relation: 'Direct JANAF tabulation; 4 printed cells blank or INFINITE; compilation_role engine_reference_input=true, scoring_eligible=false;
+    relation: 'Direct JANAF tabulation; 5 printed cells blank or INFINITE; compilation_role engine_reference_input=true, scoring_eligible=false;
       circularity_warning=Do not validate an engine against a compilation it consumes.; formation_reference_state_schedule=printed
       JANAF (ref) schedules: P-001 (ref), transition rows 5 and 10 bracket series T; S-001 (ref), transition row 8 brackets
       upper series T; phase_basis=phase declared by JANAF index state ''l'''
@@ -38209,7 +38227,7 @@ observations:
     record: P-015
   read_from: tables:nist-janaf-4th
   derivation:
-    relation: 'Direct JANAF tabulation; 4 printed cells blank or INFINITE; compilation_role engine_reference_input=true, scoring_eligible=false;
+    relation: 'Direct JANAF tabulation; 5 printed cells blank or INFINITE; compilation_role engine_reference_input=true, scoring_eligible=false;
       circularity_warning=Do not validate an engine against a compilation it consumes.; formation_reference_state_schedule=printed
       JANAF (ref) schedules: P-001 (ref), transition row 20 brackets lower series T; S-001 (ref), transition row 19 brackets
       lower series T; phase_basis=phase declared by JANAF index state ''l'''
@@ -38344,6 +38362,8 @@ observations:
     series:
     - - '400'
       - '25.943'
+    - - '500'
+      - '19.916'
     - - '600'
       - '15.833'
     - - '700'

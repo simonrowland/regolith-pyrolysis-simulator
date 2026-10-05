@@ -5213,7 +5213,7 @@ def test_non_allibert_typed_solid_activity_uses_fusion_conversion() -> None:
 def test_solid_activity_fusion_conversion_reports_positive_offset(
     formula: str,
     polymorph: str,
-    expected_offset: Decimal,
+    expected_offset: Decimal | None,
     tables: tuple[str, str],
 ) -> None:
     from simulator.battery.enums import Polymorph
@@ -5251,6 +5251,15 @@ def test_solid_activity_fusion_conversion_reports_positive_offset(
     )
 
     converted = _fusion_comparison_reference(reference, engine=Engine.OPENIMCC)
+    if expected_offset is None:
+        assert converted.value.point == reference.value.point
+        assert converted.identity.reference_state.value.endmember.phase.value is Phase.CR
+        assert any(
+            "fusion conversion missing input" in item.reason
+            and ("missing at" in item.reason or "spans missing grid node" in item.reason)
+            for item in converted.notices
+        )
+        return
     notice = next(
         item
         for item in converted.notices
@@ -5265,6 +5274,38 @@ def test_solid_activity_fusion_conversion_reports_positive_offset(
     assert f"T={temperature} K" in notice.reason
     assert "reference-state conversion (not model error)" in notice.reason
     assert converted.identity.reference_state.value.endmember.phase.value is Phase.L
+
+
+def test_periclase_fusion_conversion_uses_restored_janaf_rows() -> None:
+    from simulator.battery.score import _fusion_comparison_reference
+
+    temperature = Decimal("1873")
+
+    experiment = F.kems_experiment()
+    identity = _with_activity_reference_polymorph(
+        F.activity_identity(
+            formula="MgO",
+            T_K=temperature,
+            endmember_phase=Phase.CR,
+            component_basis="MgO",
+        ),
+        "periclase",
+    )
+    reference = F.observation(
+        "mgo-periclase-solid-activity-at-1873K",
+        experiment.experiment_id,
+        identity,
+        Decimal("0.2"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="synthetic-mgo-solid-reference-anchor",
+    )
+    converted = _fusion_comparison_reference(reference, engine=Engine.OPENIMCC)
+    assert converted.value.point != reference.value.point
+    assert converted.identity.reference_state.value.endmember.phase.value is Phase.L
+    assert any(
+        notice.reason.startswith("reference_converted_via_fusion;")
+        for notice in converted.notices
+    )
 
 
 def test_periclase_solid_activity_fusion_conversion_uses_janaf_nodes() -> None:
@@ -5284,8 +5325,9 @@ def test_periclase_solid_activity_fusion_conversion_uses_janaf_nodes() -> None:
     assert fusion.crystal_table == "Mg-008"
     assert fusion.liquid_table == "Mg-009"
     assert fusion.delta_g_fus_kJ_per_mol > 0
+    # Round 9 restored the 3200 K node in both tables, moving the crossing.
     assert abs(
-        fusion.melting_temperature_K - Decimal("3104.945598")
+        fusion.melting_temperature_K - Decimal("3104.968203")
     ) < Decimal("0.00001")
     at_melting = janaf_fusion_energy("MgO", fusion.melting_temperature_K)
     assert abs(at_melting.delta_g_fus_kJ_per_mol) < Decimal("1e-20")
@@ -5331,7 +5373,6 @@ def test_periclase_solid_activity_fusion_conversion_uses_janaf_nodes() -> None:
         "Mg-008 represents polymorph periclase" in notice.reason
         for notice in refused.notices
     )
-
 
 @pytest.mark.parametrize(
     ("temperature", "expected_shift_dex"),
@@ -5439,6 +5480,63 @@ def test_solid_activity_with_unmatched_polymorph_refuses_conversion(
     experiment = F.kems_experiment()
     identity = _with_activity_reference_polymorph(
         F.activity_identity(
+            formula="CaO",
+            T_K=Decimal("1933"),
+            endmember_phase=Phase.CR,
+            component_basis="CaO",
+        ),
+        polymorph,
+    )
+    reference = F.observation(
+        f"cao-solid-activity-{polymorph or 'unknown'}-polymorph",
+        experiment.experiment_id,
+        identity,
+        Decimal("0.3"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="synthetic-unmatched-solid-polymorph",
+    )
+
+    comparison = _fusion_comparison_reference(reference, engine=Engine.OPENIMCC)
+    if polymorph is None:
+        assert comparison.value.point != reference.value.point
+        assert comparison.identity.reference_state.value.endmember.phase.value is Phase.L
+        assert any(
+            notice.reason.startswith("reference_converted_via_fusion;")
+            and "source polymorph is unknown" in notice.reason
+            for notice in comparison.notices
+        )
+        return
+
+    assert comparison.value.point == reference.value.point
+    assert comparison.identity.reference_state.value.endmember.phase.value is Phase.CR
+    assert any(
+        "fusion conversion missing input" in notice.reason
+        and "Ca-027 represents polymorph lime" in notice.reason
+        for notice in comparison.notices
+    )
+
+    residual, _candidate = compile_residual(
+        reference,
+        Engine.OPENIMCC,
+        context=_context(F.work(), experiment, reference, review="reviewed"),
+    )
+    assert residual.status is ResidualStatus.REFUSED
+    assert residual.refusal is not None
+    assert residual.refusal.reason is RefusalReason.IDENTITY_INCOMPLETE
+    assert residual.refusal.detail["missing_input"] == (
+        "JANAF solid polymorph matching the selected table"
+    )
+
+
+@pytest.mark.parametrize("polymorph", (None, "quartz"))
+def test_silica_solid_activity_with_unmatched_polymorph_refuses_conversion(
+    polymorph: str | None,
+) -> None:
+    from simulator.battery.score import _fusion_comparison_reference
+
+    experiment = F.kems_experiment()
+    identity = _with_activity_reference_polymorph(
+        F.activity_identity(
             formula="SiO2",
             T_K=Decimal("1933"),
             endmember_phase=Phase.CR,
@@ -5539,6 +5637,95 @@ def test_missing_janaf_fusion_node_refuses_activity_residual(
     )
 
 
+def test_absent_janaf_fusion_grid_node_refuses_interpolation(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from simulator.battery.generators import janaf
+
+    original_points = janaf._fusion_table_points
+
+    def without_silica_1700(table_id: str):
+        points, digest = original_points(table_id)
+        if table_id == "O-038":
+            points = tuple((t, g) for t, g in points if t != Decimal("1700"))
+        return points, digest
+
+    monkeypatch.setattr(janaf, "_fusion_table_points", without_silica_1700)
+    monkeypatch.setattr(janaf, "_fusion_missing_gibbs_temperatures", lambda _table_id: ())
+
+    with pytest.raises(ValueError, match="1700"):
+        janaf.janaf_fusion_energy("SiO2", Decimal("1673"))
+
+
+def test_fusion_comparison_skips_missing_node_outside_interpolation_bracket(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from simulator.battery.generators import janaf
+    from simulator.battery.score import _fusion_comparison_reference
+
+    original_points = janaf._fusion_table_points
+
+    def without_silica_1700(table_id: str):
+        points, digest = original_points(table_id)
+        if table_id == "O-038":
+            points = tuple((t, g) for t, g in points if t != Decimal("1700"))
+        return points, digest
+
+    monkeypatch.setattr(janaf, "_fusion_table_points", without_silica_1700)
+    monkeypatch.setattr(janaf, "_fusion_missing_gibbs_temperatures", lambda _table_id: ())
+    experiment = F.kems_experiment()
+    reference = F.observation(
+        "silica-activity-across-missing-janaf-node",
+        experiment.experiment_id,
+        _with_activity_reference_polymorph(
+            F.activity_identity(
+                formula="SiO2",
+                T_K=Decimal("1933"),
+                endmember_phase=Phase.CR,
+                component_basis="SiO2",
+            ),
+            "cristobalite_high",
+        ),
+        Decimal("0.3"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="synthetic-missing-janaf-grid-node",
+    )
+
+    comparison = _fusion_comparison_reference(reference, engine=Engine.OPENIMCC)
+    assert comparison.value.point != reference.value.point
+    assert comparison.identity.reference_state.value.endmember.phase.value is Phase.L
+    assert any(
+        notice.reason.startswith("reference_converted_via_fusion;")
+        for notice in comparison.notices
+    )
+
+
+def test_absent_janaf_grid_node_refuses_binary_cell_interpolation(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from simulator.diagnostic_helpers import binary_pot_battery as binary
+
+    original_points = binary._cell_janaf_gibbs_points
+
+    def without_wo_300(table_id: str):
+        points, digest = original_points(table_id)
+        if table_id == "O-027":
+            points = tuple((t, g) for t, g in points if t != Decimal("300"))
+        return points, digest
+
+    monkeypatch.setattr(binary, "_cell_janaf_gibbs_points", without_wo_300)
+
+    with pytest.raises(binary._OxygenBalanceRefusal, match="300"):
+        binary._cell_oxide_thermodynamics("W", 325.0)
+
+
+def test_silica_fusion_interpolates_from_restored_1700_row() -> None:
+    from simulator.battery.generators.janaf import janaf_fusion_energy
+
+    fusion = janaf_fusion_energy("SiO2", Decimal("1673"))
+    assert fusion.delta_g_fus_kJ_per_mol == Decimal("1.21185")
+
+
 def test_liquid_activity_reference_is_not_shifted() -> None:
     from simulator.battery.score import _fusion_comparison_reference
 
@@ -5595,6 +5782,87 @@ def test_solid_activity_at_or_above_fusion_is_unshifted() -> None:
         for item in comparison.notices
     )
 
+def test_solid_activity_at_missing_fusion_node_is_refused() -> None:
+    from simulator.battery.score import _fusion_comparison_reference
+
+    temperature = Decimal("3300")
+    experiment = F.kems_experiment()
+    reference = F.observation(
+        "cao-solid-activity-above-fusion",
+        experiment.experiment_id,
+        _with_activity_reference_polymorph(
+            F.activity_identity(
+                formula="CaO",
+                T_K=temperature,
+                endmember_phase=Phase.CR,
+                component_basis="CaO",
+            ),
+            "lime",
+        ),
+        Decimal("0.4"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="synthetic-above-fusion",
+    )
+
+    comparison = _fusion_comparison_reference(reference, engine=Engine.OPENIMCC)
+    assert comparison.value.point == reference.value.point
+    assert comparison.identity.reference_state.value.endmember.phase.value is Phase.L
+    assert any(
+        item.kind is NoticeKind.OUT_OF_GAMMA_DOMAIN
+        and "liquid is natural" in item.reason
+        for item in comparison.notices
+    )
+
+
+@pytest.mark.parametrize(
+    ("engine", "formula"),
+    (
+        (Engine.ALPHAMELTS, "SiO2"),
+        (Engine.THERMOENGINE, "SiO2"),
+        (Engine.ALPHAMELTS, "Al2O3"),
+        (Engine.THERMOENGINE, "Al2O3"),
+    ),
+)
+def test_melts_fusion_shift_uses_restored_alumina_rows(
+    engine: Engine, formula: str
+) -> None:
+    from simulator.battery.score import _fusion_comparison_reference
+
+    experiment = F.kems_experiment()
+    reference = F.observation(
+        f"{engine.value}-{formula}-solid-activity",
+        experiment.experiment_id,
+        _with_activity_reference_polymorph(
+            F.activity_identity(
+                formula=formula,
+                T_K=Decimal("1933"),
+                endmember_phase=Phase.CR,
+                component_basis=formula,
+            ),
+            "corundum" if formula == "Al2O3" else "cristobalite_high",
+        ),
+        Decimal("0.3"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="synthetic-melts-reference-gap",
+    )
+
+    converted = _fusion_comparison_reference(reference, engine=engine)
+    if formula == "SiO2":
+        assert converted.value.point != reference.value.point
+        assert any(
+            item.kind is NoticeKind.DERIVATION_USES_COMPILATION
+            and "applied shift is approximate" in item.reason
+            for item in converted.notices
+        )
+    else:
+        assert converted.value.point != reference.value.point
+        assert converted.identity.reference_state.value.endmember.phase.value is Phase.L
+        assert any(
+            item.kind is NoticeKind.DERIVATION_USES_COMPILATION
+            and item.reason.startswith("reference_converted_via_fusion;")
+            for item in converted.notices
+        )
+
 
 @pytest.mark.parametrize(
     ("engine", "formula", "bound"),
@@ -5637,7 +5905,6 @@ def test_melts_liquid_reference_gap_is_attached_to_fusion_shift(
         and "2026-10-02-melts-vs-janaf-liquid/findings.md" in item.reason
         for item in converted.notices
     )
-
 
 def test_unestablished_engine_reference_keeps_solid_value_and_notices_residual() -> None:
     from simulator.battery.score import _fusion_comparison_reference
@@ -6043,7 +6310,9 @@ def test_allibert_solid_activity_fusion_conversion_is_diagnostic_only(
     )
     alumina_fusion = janaf_fusion_energy("Al2O3", Decimal("2060"))
     assert alumina_fusion.delta_g_fus_kJ_per_mol == Decimal("11.8498")
-    assert Decimal("2325.9") < alumina_fusion.melting_temperature_K < Decimal("2326.0")
+    assert alumina_fusion.melting_temperature_K == Decimal(
+        "2326.528497409326424870466321"
+    )
     assert alumina_fusion.accepted_melting_temperature_K == Decimal("2327")
     alumina_reference = replace(
         reference,
@@ -6060,6 +6329,11 @@ def test_allibert_solid_activity_fusion_conversion_is_diagnostic_only(
         ),
     )
     converted_alumina = _fusion_comparison_reference(alumina_reference)
+    assert converted_alumina.value.point != alumina_reference.value.point
+    assert converted_alumina.identity.reference_state.value.endmember.phase.value is Phase.L
+    assert (
+        converted_alumina.identity.reference_state.value.component_basis == "Al2O3"
+    )
     alumina_notice = next(
         notice
         for notice in converted_alumina.notices
@@ -6067,8 +6341,16 @@ def test_allibert_solid_activity_fusion_conversion_is_diagnostic_only(
             f"{FLAGGED_STRATUM_REFERENCE_CONVERTED_VIA_FUSION};"
         )
     )
-    assert "distance_below_JANAF_Tm=265.931928687" in alumina_notice.reason
+    assert (
+        "distance_below_JANAF_Tm=266.528497409326424870466321"
+        in alumina_notice.reason
+    )
     assert "accepted_Tm~2327 K" in alumina_notice.reason
+    assert any(
+        notice.kind is NoticeKind.DERIVATION_USES_COMPILATION
+        and notice.reason.startswith("reference_converted_via_fusion;")
+        for notice in converted_alumina.notices
+    )
     silica_fusion = janaf_fusion_energy("SiO2", Decimal("1933"))
     assert silica_fusion.delta_g_fus_kJ_per_mol == Decimal("0.27784")
     assert Decimal("1994.4") < silica_fusion.melting_temperature_K < Decimal("1994.5")
@@ -6234,9 +6516,10 @@ def test_allibert_solid_activity_fusion_conversion_is_diagnostic_only(
     activity_request = activity_request_for_engine(
         experiment, converted_alumina, Engine.ALPHAMELTS.value
     )
-    assert activity_request is not None and activity_request.payload is not None
-    assert (
-        converted_alumina.identity.reference_state.value.component_basis == "Al2O3"
+    assert activity_request is not None
+    assert activity_request.payload is not None
+    assert activity_request.payload["reference_state"] == (
+        "raoultian_pure_liquid_endmember"
     )
 
     model_derived_reference = replace(

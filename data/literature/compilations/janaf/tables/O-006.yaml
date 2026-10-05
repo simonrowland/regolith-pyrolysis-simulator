@@ -18,12 +18,12 @@ compilation_role:
   circularity_warning: Do not validate an engine against a compilation it consumes.
 extraction:
   method: machine parse of NIST tab-delimited table download; source bytes cached unchanged
-  date: '2026-09-06'
   user_agent: RegolithPyrolysisSimulator-corpus-harvester/1.0 (public thermochemical reference-data research; polite cached
     client)
   source_cache_path: /Users/simonrowland/Library/CloudStorage/Dropbox/Starship Mission Design/Regolith Processing/regolith-pyrolysis-simulator/docs-private/research/2026-08-09-upstream-mission/IMCC-impl/janaf-mirror/O/O-006.txt
   source_sha256: d09ae23df708057e5f2fff926037fd8a3d55b712198db1ec677159df9891eaa5
   review_status: machine_transcribed_unreviewed
+  date: '2026-09-06'
 table:
   table_id: O-006
   url: https://janaf.nist.gov/tables/O-006.html
@@ -696,6 +696,92 @@ table:
         row_temperature_as_published: '700'
         column: log Kf
   - temperature:
+      value: 800.0
+      as_published: '800'
+      locator:
+        table_id: O-006
+        url: https://janaf.nist.gov/tables/O-006.html
+        download_url: https://janaf.nist.gov/tables/O-006.txt
+        row_temperature_as_published: '800'
+        column: T(K)
+    heat_capacity:
+      value: 55.028
+      as_published: '55.028'
+      locator:
+        table_id: O-006
+        url: https://janaf.nist.gov/tables/O-006.html
+        download_url: https://janaf.nist.gov/tables/O-006.txt
+        row_temperature_as_published: '800'
+        column: Cp
+    entropy:
+      value: 118.355
+      as_published: '118.355'
+      locator:
+        table_id: O-006
+        url: https://janaf.nist.gov/tables/O-006.html
+        download_url: https://janaf.nist.gov/tables/O-006.txt
+        row_temperature_as_published: '800'
+        column: S
+    negative_gibbs_enthalpy_function:
+      value: 86.339
+      as_published: '86.339'
+      locator:
+        table_id: O-006
+        url: https://janaf.nist.gov/tables/O-006.html
+        download_url: https://janaf.nist.gov/tables/O-006.txt
+        row_temperature_as_published: '800'
+        column: -[G-H(Tr)]/T
+    enthalpy_increment:
+      value: 25.613
+      as_published: '25.613'
+      locator:
+        table_id: O-006
+        url: https://janaf.nist.gov/tables/O-006.html
+        download_url: https://janaf.nist.gov/tables/O-006.txt
+        row_temperature_as_published: '800'
+        column: H-H(Tr)
+    formation_enthalpy:
+      value: null
+      as_published: '219.687'
+      locator:
+        table_id: O-006
+        url: https://janaf.nist.gov/tables/O-006.html
+        download_url: https://janaf.nist.gov/tables/O-006.txt
+        row_temperature_as_published: '800'
+        column: delta-f H
+        parse_repair: nist_tail_dfh_sign_undetermined
+        parse_repair_reason: formation enthalpy neighbors span a transition marker
+        raw_tail_tokens:
+        - '219.687'
+        - '139.192'
+        - '9.088'
+        line_number: 13
+        raw_line: "800\t55.028\t118.355\t86.339\t25.613\t219.687  139.192 9.088"
+    formation_gibbs_energy:
+      value: -139.192
+      as_published: '139.192'
+      locator:
+        table_id: O-006
+        url: https://janaf.nist.gov/tables/O-006.html
+        download_url: https://janaf.nist.gov/tables/O-006.txt
+        row_temperature_as_published: '800'
+        column: delta-f G
+        parse_repair: nist_tail_whitespace_signs_restored
+        line_number: 13
+        raw_line: "800\t55.028\t118.355\t86.339\t25.613\t219.687  139.192 9.088"
+    log10_formation_equilibrium_constant:
+      value: 9.088
+      as_published: '9.088'
+      locator:
+        table_id: O-006
+        url: https://janaf.nist.gov/tables/O-006.html
+        download_url: https://janaf.nist.gov/tables/O-006.txt
+        row_temperature_as_published: '800'
+        column: log Kf
+        parse_repair: nist_tail_whitespace_signs_restored
+        line_number: 13
+        raw_line: "800\t55.028\t118.355\t86.339\t25.613\t219.687  139.192 9.088"
+  - temperature:
       value: 900.0
       as_published: '900'
       locator:
@@ -911,6 +997,92 @@ table:
         download_url: https://janaf.nist.gov/tables/O-006.txt
         row_temperature_as_published: '1100'
         column: log Kf
+  - temperature:
+      value: 1200.0
+      as_published: '1200'
+      locator:
+        table_id: O-006
+        url: https://janaf.nist.gov/tables/O-006.html
+        download_url: https://janaf.nist.gov/tables/O-006.txt
+        row_temperature_as_published: '1200'
+        column: T(K)
+    heat_capacity:
+      value: 60.421
+      as_published: '60.421'
+      locator:
+        table_id: O-006
+        url: https://janaf.nist.gov/tables/O-006.html
+        download_url: https://janaf.nist.gov/tables/O-006.txt
+        row_temperature_as_published: '1200'
+        column: Cp
+    entropy:
+      value: 141.698
+      as_published: '141.698'
+      locator:
+        table_id: O-006
+        url: https://janaf.nist.gov/tables/O-006.html
+        download_url: https://janaf.nist.gov/tables/O-006.txt
+        row_temperature_as_published: '1200'
+        column: S
+    negative_gibbs_enthalpy_function:
+      value: 101.103
+      as_published: '101.103'
+      locator:
+        table_id: O-006
+        url: https://janaf.nist.gov/tables/O-006.html
+        download_url: https://janaf.nist.gov/tables/O-006.txt
+        row_temperature_as_published: '1200'
+        column: -[G-H(Tr)]/T
+    enthalpy_increment:
+      value: 48.714
+      as_published: '48.714'
+      locator:
+        table_id: O-006
+        url: https://janaf.nist.gov/tables/O-006.html
+        download_url: https://janaf.nist.gov/tables/O-006.txt
+        row_temperature_as_published: '1200'
+        column: H-H(Tr)
+    formation_enthalpy:
+      value: null
+      as_published: '215.307'
+      locator:
+        table_id: O-006
+        url: https://janaf.nist.gov/tables/O-006.html
+        download_url: https://janaf.nist.gov/tables/O-006.txt
+        row_temperature_as_published: '1200'
+        column: delta-f H
+        parse_repair: nist_tail_dfh_sign_undetermined
+        parse_repair_reason: formation enthalpy neighbors span a transition marker
+        raw_tail_tokens:
+        - '215.307'
+        - '99.800'
+        - '4.344'
+        line_number: 18
+        raw_line: "1200\t60.421\t141.698\t101.103\t48.714\t215.307  99.800 4.344"
+    formation_gibbs_energy:
+      value: -99.8
+      as_published: '99.800'
+      locator:
+        table_id: O-006
+        url: https://janaf.nist.gov/tables/O-006.html
+        download_url: https://janaf.nist.gov/tables/O-006.txt
+        row_temperature_as_published: '1200'
+        column: delta-f G
+        parse_repair: nist_tail_whitespace_signs_restored
+        line_number: 18
+        raw_line: "1200\t60.421\t141.698\t101.103\t48.714\t215.307  99.800 4.344"
+    log10_formation_equilibrium_constant:
+      value: 4.344
+      as_published: '4.344'
+      locator:
+        table_id: O-006
+        url: https://janaf.nist.gov/tables/O-006.html
+        download_url: https://janaf.nist.gov/tables/O-006.txt
+        row_temperature_as_published: '1200'
+        column: log Kf
+        parse_repair: nist_tail_whitespace_signs_restored
+        line_number: 18
+        raw_line: "1200\t60.421\t141.698\t101.103\t48.714\t215.307  99.800 4.344"
   - temperature:
       value: 1300.0
       as_published: '1300'
@@ -1134,20 +1306,8 @@ table:
     locator:
       table_id: O-006
       url: https://janaf.nist.gov/tables/O-006.html
-  - line_number: 13
-    raw_line: "800\t55.028\t118.355\t86.339\t25.613\t219.687  139.192 9.088"
-    reason: expected 8 tab-separated values; found 6
-    locator:
-      table_id: O-006
-      url: https://janaf.nist.gov/tables/O-006.html
   - line_number: 17
     raw_line: "1159.000\t59.884\t139.607\t99.704\t46.248\tII <--> LIQUID"
-    reason: expected 8 tab-separated values; found 6
-    locator:
-      table_id: O-006
-      url: https://janaf.nist.gov/tables/O-006.html
-  - line_number: 18
-    raw_line: "1200\t60.421\t141.698\t101.103\t48.714\t215.307  99.800 4.344"
     reason: expected 8 tab-separated values; found 6
     locator:
       table_id: O-006

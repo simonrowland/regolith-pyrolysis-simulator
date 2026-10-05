@@ -18,12 +18,12 @@ compilation_role:
   circularity_warning: Do not validate an engine against a compilation it consumes.
 extraction:
   method: machine parse of NIST tab-delimited table download; source bytes cached unchanged
-  date: '2026-09-06'
   user_agent: RegolithPyrolysisSimulator-corpus-harvester/1.0 (public thermochemical reference-data research; polite cached
     client)
   source_cache_path: /Users/simonrowland/Library/CloudStorage/Dropbox/Starship Mission Design/Regolith Processing/regolith-pyrolysis-simulator/docs-private/research/2026-08-09-upstream-mission/IMCC-impl/janaf-mirror/B/B-122.txt
   source_sha256: 26a89710e0cc38363756936832ff88dc870c24b33e0c66a7e7740c7b09b4310f
   review_status: machine_transcribed_unreviewed
+  date: '2026-09-06'
 table:
   table_id: B-122
   url: https://janaf.nist.gov/tables/B-122.html
@@ -912,6 +912,92 @@ table:
         row_temperature_as_published: '1000'
         column: log Kf
   - temperature:
+      value: 1100.0
+      as_published: '1100'
+      locator:
+        table_id: B-122
+        url: https://janaf.nist.gov/tables/B-122.html
+        download_url: https://janaf.nist.gov/tables/B-122.txt
+        row_temperature_as_published: '1100'
+        column: T(K)
+    heat_capacity:
+      value: 287.583
+      as_published: '287.583'
+      locator:
+        table_id: B-122
+        url: https://janaf.nist.gov/tables/B-122.html
+        download_url: https://janaf.nist.gov/tables/B-122.txt
+        row_temperature_as_published: '1100'
+        column: Cp
+    entropy:
+      value: 500.534
+      as_published: '500.534'
+      locator:
+        table_id: B-122
+        url: https://janaf.nist.gov/tables/B-122.html
+        download_url: https://janaf.nist.gov/tables/B-122.txt
+        row_temperature_as_published: '1100'
+        column: S
+    negative_gibbs_enthalpy_function:
+      value: 319.431
+      as_published: '319.431'
+      locator:
+        table_id: B-122
+        url: https://janaf.nist.gov/tables/B-122.html
+        download_url: https://janaf.nist.gov/tables/B-122.txt
+        row_temperature_as_published: '1100'
+        column: -[G-H(Tr)]/T
+    enthalpy_increment:
+      value: 199.214
+      as_published: '199.214'
+      locator:
+        table_id: B-122
+        url: https://janaf.nist.gov/tables/B-122.html
+        download_url: https://janaf.nist.gov/tables/B-122.txt
+        row_temperature_as_published: '1100'
+        column: H-H(Tr)
+    formation_enthalpy:
+      value: null
+      as_published: '3289.570'
+      locator:
+        table_id: B-122
+        url: https://janaf.nist.gov/tables/B-122.html
+        download_url: https://janaf.nist.gov/tables/B-122.txt
+        row_temperature_as_published: '1100'
+        column: delta-f H
+        parse_repair: nist_tail_dfh_sign_undetermined
+        parse_repair_reason: formation enthalpy neighbors span a transition marker
+        raw_tail_tokens:
+        - '3289.570'
+        - '2537.005'
+        - '120.472'
+        line_number: 16
+        raw_line: "1100\t287.583\t500.534\t319.431\t199.214\t3289.570  2537.005 120.472"
+    formation_gibbs_energy:
+      value: -2537.005
+      as_published: '2537.005'
+      locator:
+        table_id: B-122
+        url: https://janaf.nist.gov/tables/B-122.html
+        download_url: https://janaf.nist.gov/tables/B-122.txt
+        row_temperature_as_published: '1100'
+        column: delta-f G
+        parse_repair: nist_tail_whitespace_signs_restored
+        line_number: 16
+        raw_line: "1100\t287.583\t500.534\t319.431\t199.214\t3289.570  2537.005 120.472"
+    log10_formation_equilibrium_constant:
+      value: 120.472
+      as_published: '120.472'
+      locator:
+        table_id: B-122
+        url: https://janaf.nist.gov/tables/B-122.html
+        download_url: https://janaf.nist.gov/tables/B-122.txt
+        row_temperature_as_published: '1100'
+        column: log Kf
+        parse_repair: nist_tail_whitespace_signs_restored
+        line_number: 16
+        raw_line: "1100\t287.583\t500.534\t319.431\t199.214\t3289.570  2537.005 120.472"
+  - temperature:
       value: 1200.0
       as_published: '1200'
       locator:
@@ -1562,12 +1648,6 @@ table:
   parse_ambiguities:
   - line_number: 15
     raw_line: "1015.600\t280.970\t477.841\t305.314\t175.218\tCRYSTAL <--> LIQUID"
-    reason: expected 8 tab-separated values; found 6
-    locator:
-      table_id: B-122
-      url: https://janaf.nist.gov/tables/B-122.html
-  - line_number: 16
-    raw_line: "1100\t287.583\t500.534\t319.431\t199.214\t3289.570  2537.005 120.472"
     reason: expected 8 tab-separated values; found 6
     locator:
       table_id: B-122

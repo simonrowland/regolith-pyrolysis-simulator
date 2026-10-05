@@ -3024,6 +3024,8 @@ observations:
   value:
     kind: series
     series:
+    - - '3700'
+      - '0.191'
     - - '3800'
       - '1.091'
     - - '3900'
@@ -3438,7 +3440,7 @@ observations:
     record: W-002
   read_from: tables:nist-janaf-4th
   derivation:
-    relation: 'Direct JANAF tabulation; 0 printed cells blank or INFINITE; compilation_role engine_reference_input=true, scoring_eligible=false;
+    relation: 'Direct JANAF tabulation; 1 printed cells blank or INFINITE; compilation_role engine_reference_input=true, scoring_eligible=false;
       circularity_warning=Do not validate an engine against a compilation it consumes.; formation_reference_state_schedule=printed
       JANAF (ref) schedules: W-001 (ref), transition row 44 brackets lower series T; phase_basis=phase declared by JANAF index
       state ''cr'''
@@ -3654,7 +3656,7 @@ observations:
     record: W-002
   read_from: tables:nist-janaf-4th
   derivation:
-    relation: 'Direct JANAF tabulation; 0 printed cells blank or INFINITE; compilation_role engine_reference_input=true, scoring_eligible=false;
+    relation: 'Direct JANAF tabulation; 1 printed cells blank or INFINITE; compilation_role engine_reference_input=true, scoring_eligible=false;
       circularity_warning=Do not validate an engine against a compilation it consumes.; formation_reference_state_schedule=printed
       JANAF (ref) schedules: W-001 (ref), transition row 44 brackets upper series T; phase_basis=phase declared by JANAF index
       state ''cr'''
@@ -3764,6 +3766,8 @@ observations:
   value:
     kind: series
     series:
+    - - '3700'
+      - '-0.003'
     - - '3800'
       - '-0.015'
     - - '3900'

@@ -18,12 +18,12 @@ compilation_role:
   circularity_warning: Do not validate an engine against a compilation it consumes.
 extraction:
   method: machine parse of NIST tab-delimited table download; source bytes cached unchanged
-  date: '2026-09-06'
   user_agent: RegolithPyrolysisSimulator-corpus-harvester/1.0 (public thermochemical reference-data research; polite cached
     client)
   source_cache_path: /Users/simonrowland/Library/CloudStorage/Dropbox/Starship Mission Design/Regolith Processing/regolith-pyrolysis-simulator/docs-private/research/2026-08-09-upstream-mission/IMCC-impl/janaf-mirror/Al/Al-090.txt
   source_sha256: c3d7565c1cda400ffafac58ad0adbc58b51559a7c390f50b4bb03a281342ae4e
   review_status: machine_transcribed_unreviewed
+  date: '2026-09-06'
 table:
   table_id: Al-090
   url: https://janaf.nist.gov/tables/Al-090.html
@@ -1920,6 +1920,92 @@ table:
         row_temperature_as_published: '2400'
         column: log Kf
   - temperature:
+      value: 2500.0
+      as_published: '2500'
+      locator:
+        table_id: Al-090
+        url: https://janaf.nist.gov/tables/Al-090.html
+        download_url: https://janaf.nist.gov/tables/Al-090.txt
+        row_temperature_as_published: '2500'
+        column: T(K)
+    heat_capacity:
+      value: 219.66
+      as_published: '219.660'
+      locator:
+        table_id: Al-090
+        url: https://janaf.nist.gov/tables/Al-090.html
+        download_url: https://janaf.nist.gov/tables/Al-090.txt
+        row_temperature_as_published: '2500'
+        column: Cp
+    entropy:
+      value: 538.101
+      as_published: '538.101'
+      locator:
+        table_id: Al-090
+        url: https://janaf.nist.gov/tables/Al-090.html
+        download_url: https://janaf.nist.gov/tables/Al-090.txt
+        row_temperature_as_published: '2500'
+        column: S
+    negative_gibbs_enthalpy_function:
+      value: 369.913
+      as_published: '369.913'
+      locator:
+        table_id: Al-090
+        url: https://janaf.nist.gov/tables/Al-090.html
+        download_url: https://janaf.nist.gov/tables/Al-090.txt
+        row_temperature_as_published: '2500'
+        column: -[G-H(Tr)]/T
+    enthalpy_increment:
+      value: 420.47
+      as_published: '420.470'
+      locator:
+        table_id: Al-090
+        url: https://janaf.nist.gov/tables/Al-090.html
+        download_url: https://janaf.nist.gov/tables/Al-090.txt
+        row_temperature_as_published: '2500'
+        column: H-H(Tr)
+    formation_enthalpy:
+      value: null
+      as_published: '2192.452'
+      locator:
+        table_id: Al-090
+        url: https://janaf.nist.gov/tables/Al-090.html
+        download_url: https://janaf.nist.gov/tables/Al-090.txt
+        row_temperature_as_published: '2500'
+        column: delta-f H
+        parse_repair: nist_tail_dfh_sign_undetermined
+        parse_repair_reason: formation enthalpy neighbors span a transition marker
+        raw_tail_tokens:
+        - '2192.452'
+        - '1156.661'
+        - '24.167'
+        line_number: 32
+        raw_line: "2500\t219.660\t538.101\t369.913\t420.470\t2192.452  1156.661 24.167"
+    formation_gibbs_energy:
+      value: -1156.661
+      as_published: '1156.661'
+      locator:
+        table_id: Al-090
+        url: https://janaf.nist.gov/tables/Al-090.html
+        download_url: https://janaf.nist.gov/tables/Al-090.txt
+        row_temperature_as_published: '2500'
+        column: delta-f G
+        parse_repair: nist_tail_whitespace_signs_restored
+        line_number: 32
+        raw_line: "2500\t219.660\t538.101\t369.913\t420.470\t2192.452  1156.661 24.167"
+    log10_formation_equilibrium_constant:
+      value: 24.167
+      as_published: '24.167'
+      locator:
+        table_id: Al-090
+        url: https://janaf.nist.gov/tables/Al-090.html
+        download_url: https://janaf.nist.gov/tables/Al-090.txt
+        row_temperature_as_published: '2500'
+        column: log Kf
+        parse_repair: nist_tail_whitespace_signs_restored
+        line_number: 32
+        raw_line: "2500\t219.660\t538.101\t369.913\t420.470\t2192.452  1156.661 24.167"
+  - temperature:
       value: 2600.0
       as_published: '2600'
       locator:
@@ -3014,12 +3100,6 @@ table:
       url: https://janaf.nist.gov/tables/Al-090.html
   - line_number: 31
     raw_line: "2408.000\t219.660\t529.865\t363.644\t400.261\tCRYSTAL <--> LIQUID"
-    reason: expected 8 tab-separated values; found 6
-    locator:
-      table_id: Al-090
-      url: https://janaf.nist.gov/tables/Al-090.html
-  - line_number: 32
-    raw_line: "2500\t219.660\t538.101\t369.913\t420.470\t2192.452  1156.661 24.167"
     reason: expected 8 tab-separated values; found 6
     locator:
       table_id: Al-090

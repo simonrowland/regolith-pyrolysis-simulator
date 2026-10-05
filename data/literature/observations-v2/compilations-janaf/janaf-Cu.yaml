@@ -3671,6 +3671,8 @@ observations:
   value:
     kind: series
     series:
+    - - '1400'
+      - '0.406'
     - - '1500'
       - '1.363'
     - - '1600'
@@ -4019,7 +4021,7 @@ observations:
     record: Cu-002
   read_from: tables:nist-janaf-4th
   derivation:
-    relation: 'Direct JANAF tabulation; 0 printed cells blank or INFINITE; compilation_role engine_reference_input=true, scoring_eligible=false;
+    relation: 'Direct JANAF tabulation; 1 printed cells blank or INFINITE; compilation_role engine_reference_input=true, scoring_eligible=false;
       circularity_warning=Do not validate an engine against a compilation it consumes.; formation_reference_state_schedule=printed
       JANAF (ref) schedules: Cu-001 (ref), transition rows 18 and 35 bracket series T; phase_basis=phase declared by JANAF
       index state ''cr'''
@@ -4189,7 +4191,7 @@ observations:
     record: Cu-002
   read_from: tables:nist-janaf-4th
   derivation:
-    relation: 'Direct JANAF tabulation; 0 printed cells blank or INFINITE; compilation_role engine_reference_input=true, scoring_eligible=false;
+    relation: 'Direct JANAF tabulation; 1 printed cells blank or INFINITE; compilation_role engine_reference_input=true, scoring_eligible=false;
       circularity_warning=Do not validate an engine against a compilation it consumes.; formation_reference_state_schedule=printed
       JANAF (ref) schedules: Cu-001 (ref), transition row 18 brackets upper series T; phase_basis=phase declared by JANAF
       index state ''cr'''
@@ -4299,6 +4301,8 @@ observations:
   value:
     kind: series
     series:
+    - - '1400'
+      - '-0.015'
     - - '1500'
       - '-0.047'
     - - '1600'
@@ -5440,6 +5444,8 @@ observations:
   value:
     kind: series
     series:
+    - - '2900'
+      - '5.996'
     - - '3000'
       - '16.541'
     - - '3100'
@@ -5818,7 +5824,7 @@ observations:
     record: Cu-003
   read_from: tables:nist-janaf-4th
   derivation:
-    relation: 'Direct JANAF tabulation; 3 printed cells blank or INFINITE; compilation_role engine_reference_input=true, scoring_eligible=false;
+    relation: 'Direct JANAF tabulation; 4 printed cells blank or INFINITE; compilation_role engine_reference_input=true, scoring_eligible=false;
       circularity_warning=Do not validate an engine against a compilation it consumes.; formation_reference_state_schedule=printed
       JANAF (ref) schedules: Cu-001 (ref), transition rows 18 and 35 bracket series T; phase_basis=printed "GLASS <--> LIQUID"
       at 900.000 K; rows through that labelled transition are the supercooled liquid / glass-transition region and following
@@ -5977,7 +5983,7 @@ observations:
     record: Cu-003
   read_from: tables:nist-janaf-4th
   derivation:
-    relation: 'Direct JANAF tabulation; 3 printed cells blank or INFINITE; compilation_role engine_reference_input=true, scoring_eligible=false;
+    relation: 'Direct JANAF tabulation; 4 printed cells blank or INFINITE; compilation_role engine_reference_input=true, scoring_eligible=false;
       circularity_warning=Do not validate an engine against a compilation it consumes.; formation_reference_state_schedule=printed
       JANAF (ref) schedules: Cu-001 (ref), transition row 35 brackets lower series T; phase_basis=printed "GLASS <--> LIQUID"
       at 900.000 K; rows through that labelled transition are the supercooled liquid / glass-transition region and following
@@ -6144,7 +6150,7 @@ observations:
     record: Cu-003
   read_from: tables:nist-janaf-4th
   derivation:
-    relation: 'Direct JANAF tabulation; 3 printed cells blank or INFINITE; compilation_role engine_reference_input=true, scoring_eligible=false;
+    relation: 'Direct JANAF tabulation; 4 printed cells blank or INFINITE; compilation_role engine_reference_input=true, scoring_eligible=false;
       circularity_warning=Do not validate an engine against a compilation it consumes.; formation_reference_state_schedule=printed
       JANAF (ref) schedules: Cu-001 (ref), transition row 18 brackets upper series T; phase_basis=printed "GLASS <--> LIQUID"
       at 900.000 K; rows through that labelled transition are the supercooled liquid / glass-transition region and following
@@ -6426,6 +6432,8 @@ observations:
   value:
     kind: series
     series:
+    - - '2900'
+      - '-0.108'
     - - '3000'
       - '-0.288'
     - - '3100'
@@ -7988,6 +7996,8 @@ observations:
   value:
     kind: series
     series:
+    - - '2900'
+      - '5.996'
     - - '3000'
       - '16.541'
     - - '3100'
@@ -8384,7 +8394,7 @@ observations:
     record: Cu-004
   read_from: tables:nist-janaf-4th
   derivation:
-    relation: 'Direct JANAF tabulation; 0 printed cells blank or INFINITE; compilation_role engine_reference_input=true, scoring_eligible=false;
+    relation: 'Direct JANAF tabulation; 1 printed cells blank or INFINITE; compilation_role engine_reference_input=true, scoring_eligible=false;
       circularity_warning=Do not validate an engine against a compilation it consumes.; formation_reference_state_schedule=printed
       JANAF (ref) schedules: Cu-001 (ref), transition rows 18 and 35 bracket series T; phase_basis=''LIQUID'' in "CRYSTAL
       <--> LIQUID"'
@@ -8547,7 +8557,7 @@ observations:
     record: Cu-004
   read_from: tables:nist-janaf-4th
   derivation:
-    relation: 'Direct JANAF tabulation; 0 printed cells blank or INFINITE; compilation_role engine_reference_input=true, scoring_eligible=false;
+    relation: 'Direct JANAF tabulation; 1 printed cells blank or INFINITE; compilation_role engine_reference_input=true, scoring_eligible=false;
       circularity_warning=Do not validate an engine against a compilation it consumes.; formation_reference_state_schedule=printed
       JANAF (ref) schedules: Cu-001 (ref), transition row 35 brackets lower series T; phase_basis=''LIQUID'' in "CRYSTAL <-->
       LIQUID"'
@@ -9000,6 +9010,8 @@ observations:
   value:
     kind: series
     series:
+    - - '2900'
+      - '-0.108'
     - - '3000'
       - '-0.288'
     - - '3100'
@@ -21151,6 +21163,8 @@ observations:
       - '-388.603'
     - - '1100'
       - '-375.081'
+    - - '1200'
+      - '-361.785'
     - - '1300'
       - '-348.693'
     approximate: false
@@ -21360,7 +21374,7 @@ observations:
     record: Cu-010
   read_from: tables:nist-janaf-4th
   derivation:
-    relation: 'Direct JANAF tabulation; 0 printed cells blank or INFINITE; compilation_role engine_reference_input=true, scoring_eligible=false;
+    relation: 'Direct JANAF tabulation; 1 printed cells blank or INFINITE; compilation_role engine_reference_input=true, scoring_eligible=false;
       circularity_warning=Do not validate an engine against a compilation it consumes.; formation_reference_state_schedule=printed
       JANAF (ref) schedules: Cu-001 (ref), transition rows 18 and 35 bracket series T; F-054 (ref), ideal gas by monograph
       convention over printed T range; phase_basis=phase declared by JANAF index state ''cr'''
@@ -21554,7 +21568,7 @@ observations:
     record: Cu-010
   read_from: tables:nist-janaf-4th
   derivation:
-    relation: 'Direct JANAF tabulation; 0 printed cells blank or INFINITE; compilation_role engine_reference_input=true, scoring_eligible=false;
+    relation: 'Direct JANAF tabulation; 1 printed cells blank or INFINITE; compilation_role engine_reference_input=true, scoring_eligible=false;
       circularity_warning=Do not validate an engine against a compilation it consumes.; formation_reference_state_schedule=printed
       JANAF (ref) schedules: Cu-001 (ref), transition row 18 brackets upper series T; F-054 (ref), ideal gas by monograph
       convention over printed T range; phase_basis=phase declared by JANAF index state ''cr'''
@@ -21893,6 +21907,8 @@ observations:
       - '20.299'
     - - '1100'
       - '17.811'
+    - - '1200'
+      - '15.748'
     - - '1300'
       - '14.011'
     approximate: false
@@ -22823,6 +22839,8 @@ observations:
       - '-383.226'
     - - '1100'
       - '-374.634'
+    - - '1200'
+      - '-366.348'
     - - '1300'
       - '-358.332'
     approximate: false
@@ -23046,7 +23064,7 @@ observations:
     record: Cu-011
   read_from: tables:nist-janaf-4th
   derivation:
-    relation: 'Direct JANAF tabulation; 3 printed cells blank or INFINITE; compilation_role engine_reference_input=true, scoring_eligible=false;
+    relation: 'Direct JANAF tabulation; 4 printed cells blank or INFINITE; compilation_role engine_reference_input=true, scoring_eligible=false;
       circularity_warning=Do not validate an engine against a compilation it consumes.; formation_reference_state_schedule=printed
       JANAF (ref) schedules: Cu-001 (ref), transition rows 18 and 35 bracket series T; F-054 (ref), ideal gas by monograph
       convention over printed T range; phase_basis=printed "GLASS <--> LIQUID" at 740.000 K; rows through that labelled transition
@@ -23238,7 +23256,7 @@ observations:
     record: Cu-011
   read_from: tables:nist-janaf-4th
   derivation:
-    relation: 'Direct JANAF tabulation; 3 printed cells blank or INFINITE; compilation_role engine_reference_input=true, scoring_eligible=false;
+    relation: 'Direct JANAF tabulation; 4 printed cells blank or INFINITE; compilation_role engine_reference_input=true, scoring_eligible=false;
       circularity_warning=Do not validate an engine against a compilation it consumes.; formation_reference_state_schedule=printed
       JANAF (ref) schedules: Cu-001 (ref), transition row 18 brackets upper series T; F-054 (ref), ideal gas by monograph
       convention over printed T range; phase_basis=printed "GLASS <--> LIQUID" at 740.000 K; rows through that labelled transition
@@ -23591,6 +23609,8 @@ observations:
       - '20.018'
     - - '1100'
       - '17.79'
+    - - '1200'
+      - '15.947'
     - - '1300'
       - '14.398'
     approximate: false
@@ -40440,6 +40460,8 @@ observations:
       - '-66.321'
     - - '1500'
       - '-57.438'
+    - - '1600'
+      - '-48.635'
     - - '1700'
       - '-39.928'
     - - '1800'
@@ -40849,7 +40871,7 @@ observations:
     record: Cu-019
   read_from: tables:nist-janaf-4th
   derivation:
-    relation: 'Direct JANAF tabulation; 0 printed cells blank or INFINITE; compilation_role engine_reference_input=true, scoring_eligible=false;
+    relation: 'Direct JANAF tabulation; 1 printed cells blank or INFINITE; compilation_role engine_reference_input=true, scoring_eligible=false;
       circularity_warning=Do not validate an engine against a compilation it consumes.; formation_reference_state_schedule=printed
       JANAF (ref) schedules: Cu-001 (ref), transition rows 18 and 35 bracket series T; O-029 (ref), ideal gas by monograph
       convention over printed T range; phase_basis=phase declared by JANAF index state ''cr'''
@@ -41045,7 +41067,7 @@ observations:
     record: Cu-019
   read_from: tables:nist-janaf-4th
   derivation:
-    relation: 'Direct JANAF tabulation; 0 printed cells blank or INFINITE; compilation_role engine_reference_input=true, scoring_eligible=false;
+    relation: 'Direct JANAF tabulation; 1 printed cells blank or INFINITE; compilation_role engine_reference_input=true, scoring_eligible=false;
       circularity_warning=Do not validate an engine against a compilation it consumes.; formation_reference_state_schedule=printed
       JANAF (ref) schedules: Cu-001 (ref), transition row 18 brackets upper series T; O-029 (ref), ideal gas by monograph
       convention over printed T range; phase_basis=phase declared by JANAF index state ''cr'''
@@ -41184,6 +41206,8 @@ observations:
       - '2.474'
     - - '1500'
       - '2'
+    - - '1600'
+      - '1.588'
     - - '1700'
       - '1.227'
     - - '1800'
@@ -42074,6 +42098,8 @@ observations:
       - '-61.36'
     - - '1500'
       - '-56.725'
+    - - '1600'
+      - '-52.197'
     - - '1700'
       - '-47.768'
     - - '1800'
@@ -42485,7 +42511,7 @@ observations:
     record: Cu-020
   read_from: tables:nist-janaf-4th
   derivation:
-    relation: 'Direct JANAF tabulation; 3 printed cells blank or INFINITE; compilation_role engine_reference_input=true, scoring_eligible=false;
+    relation: 'Direct JANAF tabulation; 4 printed cells blank or INFINITE; compilation_role engine_reference_input=true, scoring_eligible=false;
       circularity_warning=Do not validate an engine against a compilation it consumes.; formation_reference_state_schedule=printed
       JANAF (ref) schedules: Cu-001 (ref), transition rows 18 and 35 bracket series T; O-029 (ref), ideal gas by monograph
       convention over printed T range; phase_basis=printed "GLASS <--> LIQUID" at 1000.000 K; rows through that labelled transition
@@ -42679,7 +42705,7 @@ observations:
     record: Cu-020
   read_from: tables:nist-janaf-4th
   derivation:
-    relation: 'Direct JANAF tabulation; 3 printed cells blank or INFINITE; compilation_role engine_reference_input=true, scoring_eligible=false;
+    relation: 'Direct JANAF tabulation; 4 printed cells blank or INFINITE; compilation_role engine_reference_input=true, scoring_eligible=false;
       circularity_warning=Do not validate an engine against a compilation it consumes.; formation_reference_state_schedule=printed
       JANAF (ref) schedules: Cu-001 (ref), transition row 18 brackets upper series T; O-029 (ref), ideal gas by monograph
       convention over printed T range; phase_basis=printed "GLASS <--> LIQUID" at 1000.000 K; rows through that labelled transition
@@ -42822,6 +42848,8 @@ observations:
       - '2.289'
     - - '1500'
       - '1.975'
+    - - '1600'
+      - '1.704'
     - - '1700'
       - '1.468'
     - - '1800'

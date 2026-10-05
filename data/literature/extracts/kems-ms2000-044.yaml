@@ -2124,8 +2124,7 @@ species:
           composition_mol: {SiO2: 0.811, K2O: 0.189}
           composition_derivation: "x(SiO2) printed; x(K2O)=1-x(SiO2) in binary K2O-SiO2 system"
           method_class: measured_direct
-          admission_status: typed_refusal
-          reason: probable source misprint
+          admission_status: admitted
           system_class: silicate_melt
         uncertainty:
           note: Experimental and model entries differ by two decades as printed; neither is altered.
@@ -2136,6 +2135,11 @@ species:
           table: '1'
           field: values.model_activity
           class: model
+          reason: >-
+            source_internally_inconsistent: At x(SiO2)=0.811 and T=1173 K,
+            Table 1 prints measured a(K2O)=2.50e-15 and MODEL
+            a(K2O)=2.47e-13; the model cell is 100 times the measured value
+            and is the likely source misprint.
           quote: activities calculated by means of the associated-solution model
       - observation_id: ms2000_044_k2o_activity_xsio2_0770_t1073_class_quote_r2
         experiment: k2o-sio2-xsio2-0p770

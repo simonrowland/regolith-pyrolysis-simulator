@@ -18,12 +18,12 @@ compilation_role:
   circularity_warning: Do not validate an engine against a compilation it consumes.
 extraction:
   method: machine parse of NIST tab-delimited table download; source bytes cached unchanged
-  date: '2026-09-06'
   user_agent: RegolithPyrolysisSimulator-corpus-harvester/1.0 (public thermochemical reference-data research; polite cached
     client)
   source_cache_path: /Users/simonrowland/Library/CloudStorage/Dropbox/Starship Mission Design/Regolith Processing/regolith-pyrolysis-simulator/docs-private/research/2026-08-09-upstream-mission/IMCC-impl/janaf-mirror/O/O-074.txt
   source_sha256: bf10e9e639a70f9c31c50d179856ab3539cc38c158ba2d9cb52b25e29b809dff
   review_status: machine_transcribed_unreviewed
+  date: '2026-09-06'
 table:
   table_id: O-074
   url: https://janaf.nist.gov/tables/O-074.html
@@ -1488,6 +1488,92 @@ table:
         row_temperature_as_published: '1800'
         column: log Kf
   - temperature:
+      value: 1900.0
+      as_published: '1900'
+      locator:
+        table_id: O-074
+        url: https://janaf.nist.gov/tables/O-074.html
+        download_url: https://janaf.nist.gov/tables/O-074.txt
+        row_temperature_as_published: '1900'
+        column: T(K)
+    heat_capacity:
+      value: 213.384
+      as_published: '213.384'
+      locator:
+        table_id: O-074
+        url: https://janaf.nist.gov/tables/O-074.html
+        download_url: https://janaf.nist.gov/tables/O-074.txt
+        row_temperature_as_published: '1900'
+        column: Cp
+    entropy:
+      value: 475.57
+      as_published: '475.570'
+      locator:
+        table_id: O-074
+        url: https://janaf.nist.gov/tables/O-074.html
+        download_url: https://janaf.nist.gov/tables/O-074.txt
+        row_temperature_as_published: '1900'
+        column: S
+    negative_gibbs_enthalpy_function:
+      value: 325.226
+      as_published: '325.226'
+      locator:
+        table_id: O-074
+        url: https://janaf.nist.gov/tables/O-074.html
+        download_url: https://janaf.nist.gov/tables/O-074.txt
+        row_temperature_as_published: '1900'
+        column: -[G-H(Tr)]/T
+    enthalpy_increment:
+      value: 285.655
+      as_published: '285.655'
+      locator:
+        table_id: O-074
+        url: https://janaf.nist.gov/tables/O-074.html
+        download_url: https://janaf.nist.gov/tables/O-074.txt
+        row_temperature_as_published: '1900'
+        column: H-H(Tr)
+    formation_enthalpy:
+      value: null
+      as_published: '1258.250'
+      locator:
+        table_id: O-074
+        url: https://janaf.nist.gov/tables/O-074.html
+        download_url: https://janaf.nist.gov/tables/O-074.txt
+        row_temperature_as_published: '1900'
+        column: delta-f H
+        parse_repair: nist_tail_dfh_sign_undetermined
+        parse_repair_reason: formation enthalpy neighbors span a transition marker
+        raw_tail_tokens:
+        - '1258.250'
+        - '829.705'
+        - '22.810'
+        line_number: 26
+        raw_line: "1900\t213.384\t475.570\t325.226\t285.655\t1258.250  829.705 22.810"
+    formation_gibbs_energy:
+      value: -829.705
+      as_published: '829.705'
+      locator:
+        table_id: O-074
+        url: https://janaf.nist.gov/tables/O-074.html
+        download_url: https://janaf.nist.gov/tables/O-074.txt
+        row_temperature_as_published: '1900'
+        column: delta-f G
+        parse_repair: nist_tail_whitespace_signs_restored
+        line_number: 26
+        raw_line: "1900\t213.384\t475.570\t325.226\t285.655\t1258.250  829.705 22.810"
+    log10_formation_equilibrium_constant:
+      value: 22.81
+      as_published: '22.810'
+      locator:
+        table_id: O-074
+        url: https://janaf.nist.gov/tables/O-074.html
+        download_url: https://janaf.nist.gov/tables/O-074.txt
+        row_temperature_as_published: '1900'
+        column: log Kf
+        parse_repair: nist_tail_whitespace_signs_restored
+        line_number: 26
+        raw_line: "1900\t213.384\t475.570\t325.226\t285.655\t1258.250  829.705 22.810"
+  - temperature:
       value: 2000.0
       as_published: '2000'
       locator:
@@ -2294,12 +2380,6 @@ table:
       url: https://janaf.nist.gov/tables/O-074.html
   - line_number: 25
     raw_line: "1818.000\t213.384\t466.156\t318.655\t268.157\tII <--> LIQUID"
-    reason: expected 8 tab-separated values; found 6
-    locator:
-      table_id: O-074
-      url: https://janaf.nist.gov/tables/O-074.html
-  - line_number: 26
-    raw_line: "1900\t213.384\t475.570\t325.226\t285.655\t1258.250  829.705 22.810"
     reason: expected 8 tab-separated values; found 6
     locator:
       table_id: O-074

@@ -6,6 +6,7 @@ import hashlib
 import json
 import math
 from pathlib import Path
+from types import SimpleNamespace
 
 import pytest
 import yaml
@@ -89,6 +90,31 @@ from simulator.diagnostic_helpers.species_rail_differential import (
     _count_matrix,
 )
 from simulator.reference_data.janaf import FEEDSTOCKS_PATH
+
+
+def test_species_rail_reads_gibbs_when_formation_enthalpy_is_typed_absent(monkeypatch):
+    import simulator.diagnostic_helpers.species_rail_differential as differential
+    from simulator.reference_data.janaf import load_table_document
+
+    document = load_table_document(
+        Path(__file__).resolve().parents[2]
+        / "data/literature/compilations/janaf/tables/O-038.yaml"
+    )
+    monkeypatch.setattr(differential, "iter_table_paths", lambda: [Path("O-038.yaml")])
+    monkeypatch.setattr(differential, "load_table_document", lambda _path: document)
+    points = list(
+        differential.iter_janaf_keyed_points(
+            SimpleNamespace(in_rail=lambda _formula: True)
+        )
+    )
+    row = next(
+        point
+        for point in points
+        if isinstance(point, KeyedTablePoint)
+        and point.record_id == "O-038"
+        and point.T_K == 1700.0
+    )
+    assert row.delta_fG_kJ_mol == -609.059
 
 
 def _pilot_ledger_digest() -> bytes:

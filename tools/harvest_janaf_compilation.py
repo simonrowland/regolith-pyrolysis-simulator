@@ -33,6 +33,7 @@ from simulator.reference_data.janaf import (  # noqa: E402
     formula_composition,
     formula_elements,
     formula_normalised,
+    _title_formula_and_state,
     parse_janaf_txt,
 )
 
@@ -285,31 +286,6 @@ def collect_live_entries(
     _ = skipped_404
     _ = formula_rows
     return entries, index_payload, index_cache.as_posix()
-
-
-def _title_formula_and_state(title_lines: list[str]) -> tuple[str, str, str]:
-    """Return (name, formula_as_published, state) from the NIST .txt title line."""
-
-    if not title_lines:
-        return "", "", ""
-    line = title_lines[0]
-    left, sep, right = line.partition("\t")
-    name = left.strip()
-    state = ""
-    published = ""
-    paren = re.search(r"\(([^()]*)\)\s*$", name)
-    if paren:
-        published = paren.group(1).strip()
-        name = name[: paren.start()].strip()
-    if right:
-        right = right.strip()
-        state_match = re.search(r"\((ref|cr|l|cr,l|g|l,g|fl)\)$", right)
-        if state_match:
-            state = state_match.group(1)
-            hill = right[: state_match.start()]
-            if not published or formula_composition(published) != formula_composition(hill):
-                published = hill
-    return name, published, state
 
 
 def parse_table(payload: bytes, entry: dict[str, Any], cache_path: Path) -> dict[str, Any]:
