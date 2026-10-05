@@ -445,7 +445,7 @@ def normalize_cached_real_config(
         authorized_mode = authorized_mode or DEFAULT_ALPHAMELTS_MODE
         if authorized_mode == "python_api":
             try:
-                authorized_model, _ = resolve_alphamelts_python_api_model(
+                resolve_alphamelts_python_api_model(
                     raw_authorized_model
                 )
             except ValueError as exc:
@@ -453,6 +453,7 @@ def normalize_cached_real_config(
                     unavailable_error_cls(str(exc)),
                     "invalid_run_input",
                 ) from exc
+            authorized_model = str(raw_authorized_model)
         elif authorized_mode == DEFAULT_ALPHAMELTS_MODE:
             authorized_model = str(raw_authorized_model).strip()
             try:
