@@ -180,6 +180,28 @@ def test_every_returned_record_names_formation_gibbs_convention(source_rail) -> 
                 assert record.native_gibbs_convention == GIBBS_CONVENTION_FORMATION
 
 
+def test_janaf_o2_reference_is_zero_by_definition(source_rail) -> None:
+    oxygen = source_rail.require("O2", "gas")
+    assert oxygen.source_id == "nist-janaf-4th"
+    assert oxygen.record_id == "O-029"
+    assert oxygen.native_phase == "ref"
+    assert oxygen.standard_state == "gas"
+    assert oxygen.species_thermo["gibbs_defined_zero"] is True
+    for temperature_K in (298.15, 1400.0, 1600.0, 1800.0):
+        assert oxygen.thermo.evaluate(temperature_K).g_J_per_mol == pytest.approx(
+            0.0, abs=1e-9
+        )
+    bromine = source_rail.records_for("Br2", "gas")
+    assert all(record.native_phase != "ref" for record in bromine)
+    aluminium = [
+        record
+        for record in source_rail.records_for("Al", "condensed_solid")
+        if record.source_id == "nist-janaf-4th"
+    ]
+    assert aluminium
+    assert all(record.native_phase != "ref" for record in aluminium)
+
+
 def test_nasa_o2_formation_gibbs_is_the_zero_of_the_reference(source_rail) -> None:
     oxygen = _record_by_source(source_rail.records_for("O2", "gas"), "nasa-glenn")
     for temperature_K in (1400.0, 1600.0, 1800.0):

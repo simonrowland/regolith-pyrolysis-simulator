@@ -79,6 +79,11 @@ _DIATOMIC_CONDENSED_REFERENCE: Mapping[str, str] = {
 _NOBLE_GAS_ELEMENTS: frozenset[str] = frozenset(
     {"He", "Ne", "Ar", "Kr", "Xe", "Rn"}
 )
+# JANAF `ref` tables whose standard state is the gas itself. ΔfG is 0 by
+# definition. Condensed element refs and Br2/I2 stay skipped.
+_GAS_ONLY_REFERENCE_FORMULAS: frozenset[str] = frozenset(
+    {"H2", "N2", "O2", "F2", "Cl2", "He", "Ne", "Ar", "Kr", "Xe", "Rn"}
+)
 # CEA solid allotropes that are not "cr".
 _SOLID_ALLOTROPE_PHASES: frozenset[str] = frozenset(
     {"a", "b", "d", "gr", "I", "II", "III", "IV", "s", "S"}
@@ -479,8 +484,33 @@ class SourceRail:
         return tuple(selected)
 
 
+def _janaf_formula(index_entry: Mapping[str, Any]) -> str:
+    return str(
+        index_entry.get("formula_normalised") or index_entry.get("formula") or ""
+    )
+
+
+def _janaf_state(index_entry: Mapping[str, Any]) -> str:
+    return str(index_entry.get("state") or index_entry.get("phase") or "")
+
+
+def _janaf_gas_only_reference(index_entry: Mapping[str, Any]) -> bool:
+    return (
+        _janaf_state(index_entry) == "ref"
+        and _janaf_formula(index_entry) in _GAS_ONLY_REFERENCE_FORMULAS
+    )
+
+
+def _janaf_standard_state(index_entry: Mapping[str, Any]) -> str | None:
+    if _janaf_gas_only_reference(index_entry):
+        return "gas"
+    return canonical_standard_state(_janaf_state(index_entry))
+
+
 def _janaf_points(
     document: Mapping[str, Any],
+    *,
+    defined_zero: bool = False,
 ) -> tuple[tuple[tuple[float, float], ...], tuple[float, ...]]:
     table = document.get("table") or {}
     rows = table.get("values") or []
@@ -492,9 +522,12 @@ def _janaf_points(
         temperature = row.get("temperature") or {}
         gibbs = row.get("formation_gibbs_energy") or {}
         t_k = _published_value(temperature)
-        g_kj = _published_value(gibbs)
         if t_k is None or t_k <= 0.0:
             continue
+        if defined_zero:
+            points.append((t_k, 0.0))
+            continue
+        g_kj = _published_value(gibbs)
         if g_kj is None:
             missing.append(t_k)
             continue
@@ -512,8 +545,12 @@ def _janaf_points(
 
 
 def _janaf_skip_reason(index_entry: Mapping[str, Any]) -> str | None:
-    state = str(index_entry.get("state") or index_entry.get("phase") or "")
-    if state in {"ref", "cr,l", "l,g"}:
+    state = _janaf_state(index_entry)
+    if state == "ref":
+        if _janaf_formula(index_entry) in _GAS_ONLY_REFERENCE_FORMULAS:
+            return None
+        return "combined-or-reference table"
+    if state in {"cr,l", "l,g"}:
         return "combined-or-reference table"
     charge = index_entry.get("charge")
     if charge not in (None, 0, 0.0, "0"):
@@ -530,16 +567,13 @@ def _janaf_record_from_path(path: Path) -> SourceRailRecord | None:
     index_entry = table.get("index_entry") or {}
     if _janaf_skip_reason(index_entry):
         return None
-    formula = str(
-        index_entry.get("formula_normalised")
-        or index_entry.get("formula")
-        or ""
-    )
+    formula = _janaf_formula(index_entry)
     native_phase = str(index_entry.get("state") or "")
-    standard_state = canonical_standard_state(native_phase)
+    standard_state = _janaf_standard_state(index_entry)
+    defined_zero = _janaf_gas_only_reference(index_entry)
     if not formula or standard_state is None:
         return None
-    points, missing_nodes = _janaf_points(document)
+    points, missing_nodes = _janaf_points(document, defined_zero=defined_zero)
     if len(points) < 2:
         return None
     table_id = str(table.get("table_id") or path.stem)
@@ -568,6 +602,8 @@ def _janaf_record_from_path(path: Path) -> SourceRailRecord | None:
         "native_phase": native_phase,
         "citation": thermo.citation,
     }
+    if defined_zero:
+        species_thermo["gibbs_defined_zero"] = True
     return SourceRailRecord(
         source_id="nist-janaf-4th",
         record_id=table_id,
@@ -591,8 +627,8 @@ def _janaf_index() -> _CompilationIndex:
             continue
         if _janaf_skip_reason(entry):
             continue
-        formula = str(entry.get("formula_normalised") or entry.get("formula") or "")
-        standard_state = canonical_standard_state(str(entry.get("phase") or ""))
+        formula = _janaf_formula(entry)
+        standard_state = _janaf_standard_state(entry)
         table_id = str(entry.get("table_id") or "")
         if not formula or standard_state is None or not table_id:
             continue
