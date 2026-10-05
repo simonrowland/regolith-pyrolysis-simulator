@@ -7120,6 +7120,7 @@ def _render_score_report_from_payloads_legacy(
                 f"{row['band_width_dex'] or '—'} | {row['rms_over_band'] or '—'} | "
                 f"{row['n_no_band']} | {rate_s} |"
             )
+    lines.extend(["", *aggregate.condition_hull_lines()])
     lines.extend(
         [
             "",
@@ -7292,6 +7293,122 @@ def refusal_census_payloads(rows: Iterable[Mapping[str, object]]) -> dict[str, i
     return dict(sorted(counts.items()))
 
 
+class _ConditionHull:
+    """Min/max (T, P, composition) of the rows behind one headline statistic.
+
+    Presentation only (t-1110). It reads the conditions a reference row
+    already carries and keeps their extremes; it fills nothing in. T is
+    ``temperature_of(identity)``, else a compilation cell's printed T from
+    its point id. P is the stored ``identity.total_pressure_Pa`` (never the
+    scorer's pressure assumption). Composition is ``identity.composition``,
+    else the printed point composition, kept per amount basis and component.
+    A row without a value is counted as missing, not imputed.
+    """
+
+    __slots__ = ("n", "n_t", "t", "n_p", "p", "n_composition", "composition")
+
+    def __init__(self) -> None:
+        self.n = 0
+        self.n_t = 0
+        self.t: tuple[Decimal, Decimal] | None = None
+        self.n_p = 0
+        self.p: tuple[Decimal, Decimal] | None = None
+        self.n_composition = 0
+        self.composition: dict[tuple[str, str], tuple[Decimal, Decimal]] = {}
+
+    @staticmethod
+    def _widen(
+        bounds: tuple[Decimal, Decimal] | None, value: Decimal
+    ) -> tuple[Decimal, Decimal]:
+        if bounds is None:
+            return (value, value)
+        return (min(bounds[0], value), max(bounds[1], value))
+
+    def add(self, reference: str, observation: Observation | None) -> None:
+        self.n += 1
+        identity = None if observation is None else observation.identity
+        if not isinstance(identity, Identity):
+            return
+        temperature = temperature_of(identity)
+        if temperature is None:
+            from simulator.battery.compilation_tier import (
+                compilation_point_temperature,
+            )
+
+            temperature = compilation_point_temperature(reference)
+        if temperature is not None:
+            self.n_t += 1
+            self.t = self._widen(self.t, temperature)
+        pressure = identity.total_pressure_Pa
+        if pressure is not None and pressure.is_value and pressure.value is not None:
+            self.n_p += 1
+            self.p = self._widen(self.p, as_decimal(pressure.value))
+        state = identity.composition
+        if state is None or not state.is_value or state.value is None:
+            state = _printed_point_composition(observation)
+        if state is None or not isinstance(state.value, Composition):
+            return
+        self.n_composition += 1
+        basis = state.value.amount_basis.value
+        for component, amount in state.value.components:
+            key = (basis, component)
+            self.composition[key] = self._widen(self.composition.get(key), amount)
+
+    @staticmethod
+    def _span(bounds: tuple[Decimal, Decimal] | None, n: int) -> str:
+        if bounds is None:
+            return "— (0)"
+        low, high = (_dec_token(value) for value in bounds)
+        text = low if low == high else f"{low}–{high}"
+        return f"{text} ({n})"
+
+    def cells(self) -> tuple[str, str, str]:
+        by_basis: dict[str, list[str]] = {}
+        for (basis, component), bounds in sorted(self.composition.items()):
+            low, high = (_dec_token(value) for value in bounds)
+            span = low if low == high else f"{low}–{high}"
+            by_basis.setdefault(basis, []).append(f"{component} {span}")
+        composition = (
+            "; ".join(f"{basis}: {', '.join(parts)}" for basis, parts in by_basis.items())
+            or "—"
+        )
+        return (
+            self._span(self.t, self.n_t),
+            self._span(self.p, self.n_p),
+            f"{composition} ({self.n_composition})",
+        )
+
+
+def _condition_hull_lines(
+    hulls: Mapping[tuple[str, str, str], _ConditionHull],
+) -> list[str]:
+    """Markdown table of the per (tier, rail, engine) condition hulls."""
+
+    lines = [
+        "## Condition hull per rail × engine",
+        "",
+        "Min–max of the stored (T, P, composition) of the numeric rows behind "
+        "each headline statistic (the n scored column). T and total pressure "
+        "are the reference row's own (a compilation cell's printed T); "
+        "composition is the row's stated composition per amount basis. "
+        "Nothing is filled in: bracketed counts are rows carrying a value. "
+        "Presentation only; no residual or statistic reads this table.",
+        "",
+        "| tier | rail | engine | n scored | T K (n) | total P Pa (n) | composition (n) |",
+        "|---|---|---|---:|---|---|---|",
+    ]
+    rows = [(key, hull) for key, hull in sorted(hulls.items()) if hull.n]
+    if not rows:
+        lines.append("| (none) | — | — | 0 | — | — | — |")
+    for (tier, rail, engine), hull in rows:
+        t_cell, p_cell, composition_cell = hull.cells()
+        lines.append(
+            f"| {tier} | {rail} | {engine} | {hull.n} | {t_cell} | {p_cell} | "
+            f"{composition_cell} |"
+        )
+    return lines
+
+
 def _empty_headline_payload_stats() -> dict[str, object]:
     return {
         "n_candidates": 0,
@@ -7370,6 +7487,8 @@ def headline_payloads(
     engines: Sequence[Engine],
     *,
     tier: str = "measured",
+    hulls: dict[tuple[str, str, str], _ConditionHull] | None = None,
+    observations: Mapping[str, Observation] | None = None,
 ) -> list[dict[str, object]]:
     if tier not in {"measured", "compilation"}:
         raise ValueError(f"unknown headline tier {tier!r}")
@@ -7401,6 +7520,13 @@ def headline_payloads(
         if not isinstance(numeric, Mapping):
             continue
         stats["n_scored"] = int(stats["n_scored"]) + 1
+        if hulls is not None:
+            from simulator.battery.compilation_tier import reference_observation
+
+            reference = str(row.get("reference") or "")
+            hulls.setdefault((tier, rail, engine), _ConditionHull()).add(
+                reference, reference_observation(observations or {}, reference)
+            )
         if row.get("score_eligible"):
             stats["n_score_eligible"] = int(stats["n_score_eligible"]) + 1
         if status == ResidualStatus.MATCH.value:
@@ -8211,6 +8337,7 @@ class _ScorePayloadAccumulator:
             str, dict[tuple[str, str], dict[str, object]]
         ] = {"measured": {}, "compilation": {}}
         self.all_numeric = _AllNumericHeadline()
+        self.headline_hulls: dict[tuple[str, str, str], _ConditionHull] = {}
         self.report_engine_names: set[str] = set()
         self.count = 0
         self.scored_count = 0
@@ -8272,6 +8399,7 @@ class _ScorePayloadAccumulator:
         rail: str,
         engine: str,
         numeric_value: Decimal | None,
+        observation: Observation | None = None,
     ) -> None:
         groups = self.headline_groups[tier]
         stats = groups.setdefault((rail, engine), _empty_headline_payload_stats())
@@ -8286,6 +8414,9 @@ class _ScorePayloadAccumulator:
         if not isinstance(numeric, Mapping):
             return
         stats["n_scored"] = int(stats["n_scored"]) + 1
+        self.headline_hulls.setdefault((tier, rail, engine), _ConditionHull()).add(
+            str(row.get("reference") or ""), observation
+        )
         if row.get("score_eligible"):
             stats["n_score_eligible"] = int(stats["n_score_eligible"]) + 1
         if status == ResidualStatus.MATCH.value:
@@ -8535,6 +8666,7 @@ class _ScorePayloadAccumulator:
                     rail=rail,
                     engine=engine,
                     numeric_value=numeric_value,
+                    observation=metadata.observation,
                 )
             if row.get("status") == ResidualStatus.REFUSED.value:
                 refusal = row.get("refusal") or {}
@@ -8569,6 +8701,7 @@ class _ScorePayloadAccumulator:
                         rail=rail,
                         engine=engine,
                         numeric_value=numeric_value,
+                        observation=metadata.observation,
                     )
             self._add_compilation_decision(
                 row,
@@ -8744,6 +8877,15 @@ class _ScorePayloadAccumulator:
             for stratum, rail, engine in sorted(self.flagged_counts)
         ]
 
+    def condition_hull_lines(self) -> list[str]:
+        return _condition_hull_lines(
+            {
+                key: hull
+                for key, hull in self.headline_hulls.items()
+                if not self.engine_names or key[2] in self.engine_names
+            }
+        )
+
     def compilation_lines(self) -> list[str]:
         from simulator.battery.compilation_tier import _tier_markdown
 
@@ -8906,7 +9048,12 @@ def render_score_report_from_payloads(
             "|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|",
         ]
     )
-    for row in headline_payloads(measured_rows, engines):
+    hulls: dict[tuple[str, str, str], _ConditionHull] | None = (
+        None if observations is None else {}
+    )
+    for row in headline_payloads(
+        measured_rows, engines, hulls=hulls, observations=observations
+    ):
         rate = row["match_rate"]
         rate_s = "—" if rate is None else f"{rate:.3f}"
         rms = row["rms_dex"] or "—"
@@ -8920,6 +9067,8 @@ def render_score_report_from_payloads(
             f"{row['n_inside_band']} | {rms} | {med} | {med_abs} | {band} | {ratio} | "
             f"{row['n_no_band']} | {rate_s} |"
         )
+    if hulls is not None:
+        lines.extend(["", *_condition_hull_lines(hulls)])
     lines.extend(
         [
             "",
