@@ -15,12 +15,12 @@ Canonical `source_id` is the extract filename stem. Preset ids are aliases, neve
 
 ## Counts
 
-- Sources: 277
-- Extracts (`literature_extract.v1`): 275
+- Sources: 278
+- Extracts (`literature_extract.v1`): 276
 - PDFs present in this worktree: 0
 - Tracked PDFs in `docs/references/pdfs/99-kems-langmuir/`: 0
 - PDFs with no extract: 0
-- Extracts with no PDF: 275
+- Extracts with no PDF: 276
 - Alias groups needing owner/controller resolution: 41
 - Extracts with private/non-public row locators: 60
 
@@ -200,6 +200,7 @@ Canonical `source_id` is the extract filename stem. Preset ids are aliases, neve
 | `metsoc-2024-6224` | Prince, B. S., Zega, T. J., Connolly Jr., H. C. & Lauretta, D. S. (2024), "Nanometer-sized Fluid Inclusions in OSIRIS-REx Samples of Bennu", 86th Annual Meeting of the Meteoritical Society, LPI Contribution No. 3036, abstract 6224. |  | ABSENT, `` | `raw/metsoc-2024-6224/metsoc-2024-6224.pdf` (present, e456326c); `text/metsoc-2024-6224/` (10 files, exists); `tables/metsoc-2024-6224/` (0 files, ABSENT) | `data/literature/extracts/metsoc-2024-6224.yaml` (5 rows, draft) | `ledger/metsoc-2024-6224.yaml`: decoded (2026-09-06) |
 | `miki-1999-si-alloy-thermodynamics` | T. Miki, K. Morita and N. Sano, “Thermodynamic Properties of Si–Al, –Ca, –Mg Binary and Si–Ca–Al, –Ti, –Fe Ternary Alloys,” Materials Transactions, JIM 40(10) (1999), 1108–1116. |  | ABSENT, `` | `raw/miki-1999-si-alloy-thermodynamics/miki-1999-si-alloy-thermodynamics.pdf` (present, 2bdfe16d); `text/miki-1999-si-alloy-thermodynamics/` (12 files, exists); `tables/miki-1999-si-alloy-thermodynamics/` (20 files, exists) | `data/literature/extracts/miki-1999-si-alloy-thermodynamics.yaml` (111 rows, draft) | `ledger/miki-1999-si-alloy-thermodynamics.yaml`: extracted (2026-10-04) |
 | `mogul-2023-pioneer-venus-co2-icarus` | Mogul, R., Limaye, S. S., Way, M. J. & Cordova, J. A. (2023), "Venus (atmosphere): analytical model for mass spectra obtained by the Pioneer Venus Large Probe Neutral Mass Spectrometer", Icarus 392:115374. | 10.1016/j.icarus.2022.115374 | ABSENT, `` | `raw/mogul-2023-pioneer-venus-co2-icarus/mogul-2023-pioneer-venus-co2-icarus.pdf` (present, 2e0f7062); `text/mogul-2023-pioneer-venus-co2-icarus/` (55 files, exists); `tables/mogul-2023-pioneer-venus-co2-icarus/` (0 files, ABSENT) | `data/literature/extracts/mogul-2023-pioneer-venus-co2-icarus.yaml` (3 rows, draft) | `ledger/mogul-2023-pioneer-venus-co2-icarus.yaml`: decoded (2026-09-06) |
+| `morey-1964-usgs-pp440l-phase-equilibria` | G. W. Morey, Phase-Equilibrium Relations of the Common Rock-Forming Oxides Except Water, Data of Geochemistry (6th ed.), Chapter L, U.S. Geological Survey Professional Paper 440-L, 1964. |  | ABSENT, `` | `raw/morey-1964-usgs-pp440l-phase-equilibria/morey-1964-usgs-pp440l-phase-equilibria.pdf` (present, 6e996717); `text/morey-1964-usgs-pp440l-phase-equilibria/` (34 files, exists); `tables/morey-1964-usgs-pp440l-phase-equilibria/` (29 files, exists) | `data/literature/extracts/morey-1964-usgs-pp440l-phase-equilibria.yaml` (0 rows, draft) | `ledger/morey-1964-usgs-pp440l-phase-equilibria.yaml`: extracted (2026-10-04) |
 | `morita-2000-sio2-activity-si-alloys` | Morita, K., Kume, K. & Sano, N. (2000), "A Newly Developed Method for Determining SiO2 Activity of the Silicate Slags Equilibrated with Molten Silicon Alloys," ISIJ International 40(6): 554–560. | 10.2355/isijinternational.40.554 | ABSENT, `` | `raw/morita-2000-sio2-activity-si-alloys/morita-2000-sio2-activity-si-alloys.pdf` (present, f4d38726); `text/morita-2000-sio2-activity-si-alloys/` (10 files, exists); `tables/morita-2000-sio2-activity-si-alloys/` (8 files, exists) | `data/literature/extracts/morita-2000-sio2-activity-si-alloys.yaml` (172 rows, draft) | `ledger/morita-2000-sio2-activity-si-alloys.yaml`: extracted (2026-10-03) |
 | `murchison-degassing-2023-springer` | Voropaev, S. A., Dushenko, N. V., Fedulov, V. S. and Korochantsev, A. V. (2023), Osobennosti degazatsii uglistogo khondrita Murchison (CM2) v intervale temperatur 200-800 C, Astronomicheskii Vestnik 57(6) 571-582. English translation: Features of Degassing of the Murchison (CM2) Carbonaceous Chondrite in the Temperature Interval of 200-800 C, Solar System Research. Russian original DOI 10.31857/S0320930X23050067; English DOI 10.1134/S0038094623050064. | 10.1134/S0038094623050064 | ABSENT, `` | `raw/murchison-degassing-2023-springer/murchison-degassing-2023-springer.pdf` (present, 906d6c21); `text/murchison-degassing-2023-springer/` (20 files, exists); `tables/murchison-degassing-2023-springer/` (0 files, ABSENT) | `data/literature/extracts/murchison-degassing-2023-springer.yaml` (27 rows, draft) | `ledger/murchison-degassing-2023-springer.yaml`: extracted (2026-09-12) |
 | `murchison-hydropyrolysis-1990s-gca` | Sephton, M. A., Love, G. D., Watson, J. S., Verchovsky, A. B., Wright, I. P., Snape, C. E. and Gilmour, I. (2004), Hydropyrolysis of insoluble carbonaceous matter in the Murchison meteorite: new insights into its macromolecular structure, Geochimica et Cosmochimica Acta 68(6) 1385-1393, DOI 10.1016/j.gca.2003.08.019 | 10.1016/j.gca.2003.08.019 | ABSENT, `` | `raw/murchison-hydropyrolysis-1990s-gca/murchison-hydropyrolysis-1990s-gca.pdf` (present, b799d6c8); `text/murchison-hydropyrolysis-1990s-gca/` (24 files, exists); `tables/murchison-hydropyrolysis-1990s-gca/` (0 files, ABSENT) | `data/literature/extracts/murchison-hydropyrolysis-1990s-gca.yaml` (10 rows, draft) | `ledger/murchison-hydropyrolysis-1990s-gca.yaml`: extracted (2026-09-12) |
@@ -484,6 +485,7 @@ Canonical `source_id` is the extract filename stem. Preset ids are aliases, neve
 - `metsoc-2024-6224`
 - `miki-1999-si-alloy-thermodynamics`
 - `mogul-2023-pioneer-venus-co2-icarus`
+- `morey-1964-usgs-pp440l-phase-equilibria`
 - `morita-2000-sio2-activity-si-alloys`
 - `murchison-degassing-2023-springer`
 - `murchison-hydropyrolysis-1990s-gca`
