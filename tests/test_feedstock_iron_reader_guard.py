@@ -22,23 +22,44 @@ def _literal_string(node: ast.AST, constants: dict[str, str]) -> str | None:
     return None
 
 
-def _module_level_nodes(tree: ast.AST):
-    stack = [tree]
+def _scope_nodes(scope: ast.AST):
+    stack = list(getattr(scope, "body", ()))
     while stack:
         node = stack.pop()
-        if node is not tree and isinstance(
-            node, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)
-        ):
-            continue
         yield node
+        if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)):
+            continue
         stack.extend(ast.iter_child_nodes(node))
 
 
-def _string_constants(tree: ast.AST) -> dict[str, str]:
-    constants: dict[str, str] = {}
+def _string_constants(
+    scope: ast.AST, inherited: dict[str, str] | None = None
+) -> dict[str, str]:
+    nodes = list(_scope_nodes(scope))
+    bound_names = {
+        node.id
+        for node in nodes
+        if isinstance(node, ast.Name) and isinstance(node.ctx, ast.Store)
+    }
+    for node in nodes:
+        if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)):
+            bound_names.add(node.name)
+    if isinstance(scope, (ast.FunctionDef, ast.AsyncFunctionDef)):
+        bound_names.update(
+            argument.arg
+            for argument in (
+                *scope.args.posonlyargs,
+                *scope.args.args,
+                *scope.args.kwonlyargs,
+            )
+        )
+
+    constants = dict(inherited or {})
+    for name in bound_names:
+        constants.pop(name, None)
     assignments = [
         node
-        for node in _module_level_nodes(tree)
+        for node in nodes
         if isinstance(node, (ast.Assign, ast.AnnAssign))
     ]
     for _ in range(len(assignments) + 1):
@@ -61,6 +82,37 @@ def _string_constants(tree: ast.AST) -> dict[str, str]:
         if not changed:
             break
     return constants
+
+
+def _string_constants_by_node(tree: ast.AST) -> dict[ast.AST, dict[str, str]]:
+    scope_types = (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)
+    parents = {
+        child: node
+        for node in ast.walk(tree)
+        for child in ast.iter_child_nodes(node)
+    }
+    scopes = [
+        node
+        for node in ast.walk(tree)
+        if isinstance(node, scope_types)
+    ]
+    constants_by_scope = {tree: _string_constants(tree)}
+
+    for scope in scopes:
+        parent = parents[scope]
+        while parent not in constants_by_scope:
+            parent = parents[parent]
+        constants_by_scope[scope] = _string_constants(
+            scope, constants_by_scope[parent]
+        )
+
+    constants_by_node = {}
+    for node in ast.walk(tree):
+        scope = node
+        while scope not in constants_by_scope:
+            scope = parents[scope]
+        constants_by_node[node] = constants_by_scope[scope]
+    return constants_by_node
 
 
 def _composition_map_expression(
@@ -132,7 +184,7 @@ def _function_parameters(tree: ast.AST) -> dict[str, list[tuple[str, ...]]]:
 def _composition_aliases(
     tree: ast.AST,
     map_field: str,
-    constants: dict[str, str],
+    constants_by_node: dict[ast.AST, dict[str, str]],
     functions: dict[str, list[tuple[str, ...]]],
 ) -> set[str]:
     aliases = {map_field}
@@ -150,7 +202,7 @@ def _composition_aliases(
                 targets = []
                 value = None
             if value is not None and _composition_map_expression(
-                value, map_field, aliases, constants
+                value, map_field, aliases, constants_by_node[node]
             ):
                 for target in targets:
                     if isinstance(target, ast.Name) and target.id not in aliases:
@@ -166,14 +218,20 @@ def _composition_aliases(
                 passed = set()
                 for index, argument in enumerate(node.args):
                     if index < len(parameters) and _composition_map_expression(
-                        argument, map_field, aliases, constants
+                        argument,
+                        map_field,
+                        aliases,
+                        constants_by_node[node],
                     ):
                         passed.add(parameters[index])
                 for keyword in node.keywords:
                     if (
                         keyword.arg in parameters
                         and _composition_map_expression(
-                            keyword.value, map_field, aliases, constants
+                            keyword.value,
+                            map_field,
+                            aliases,
+                            constants_by_node[node],
                         )
                     ):
                         passed.add(keyword.arg)
@@ -185,17 +243,18 @@ def _composition_aliases(
 
 def _iron_composition_reads(source: str) -> tuple[int, ...]:
     tree = ast.parse(source)
-    constants = _string_constants(tree)
+    constants_by_node = _string_constants_by_node(tree)
     functions = _function_parameters(tree)
     aliases = {
         map_field: _composition_aliases(
-            tree, map_field, constants, functions
+            tree, map_field, constants_by_node, functions
         )
         for map_field in _IRON_MAP_KEYS
     }
 
     lines: list[int] = []
     for node in ast.walk(tree):
+        constants = constants_by_node[node]
         if isinstance(node, ast.Subscript):
             base = node.value
             key = _literal_string(node.slice, constants)
@@ -245,6 +304,8 @@ def test_raw_feedstock_iron_values_are_read_only_by_the_owner() -> None:
         "def project(fs):\n    c = fs.get(\"composition_wt_pct\", {}) or {}\n    return c.get(\"FeO\")\n",
         "FEO = \"FeO\"\ndef project(fs):\n    c = fs[\"composition_wt_pct\"]\n    return c.get(FEO)\n",
         "COMP = \"composition_wt_pct\"\ndef project(fs):\n    return fs[COMP][\"FeO\"]\n",
+        "def project(fs):\n    FEO = \"FeO\"\n    return fs[\"composition_wt_pct\"].get(FEO)\n",
+        "def project(fs):\n    COMP = \"composition_wt_pct\"\n    return fs[COMP][\"FeO\"]\n",
         "def project(feedstocks, feedstock_id):\n    return feedstocks[feedstock_id][\"composition_wt_pct\"].get(\"Fe2O3\")\n",
         "def consume(comp):\n    return comp.get(\"Fe2O3\")\n\nconsume(fs[\"composition_wt_pct\"])\n",
         "def project(fs):\n    return fs[\"elemental_composition_wt_pct\"].get(\"Fe\")\n",
