@@ -275,7 +275,12 @@ def test_petthermotools_backend_uses_the_owner_resolved_code(monkeypatch) -> Non
         lambda model: (model, 73),
     )
 
+    worker_args = []
+
     class Worker:
+        def __init__(self, **kwargs):
+            worker_args.append(kwargs)
+
         def start(self):
             pass
 
@@ -284,10 +289,11 @@ def test_petthermotools_backend_uses_the_owner_resolved_code(monkeypatch) -> Non
 
     monkeypatch.setattr(
         'simulator.melt_backend.alphamelts.WarmEngineWorker',
-        lambda **_kwargs: Worker(),
+        lambda **kwargs: Worker(**kwargs),
     )
 
     assert backend.initialize({'mode': 'python_api', 'warm_worker': True})
+    assert worker_args[0]['bootstrap_args'] == (73,)
     assert backend._melts_model_code() == 73
 
 
