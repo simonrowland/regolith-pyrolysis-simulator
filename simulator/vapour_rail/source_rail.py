@@ -320,7 +320,9 @@ def _with_formation_convention(
 ) -> SourceRailRecord:
     species_thermo = dict(native.species_thermo)
     species_thermo["native_gibbs_convention"] = index.native_gibbs_convention
-    species_thermo["gibbs_convention"] = GIBBS_CONVENTION_FORMATION
+    # Coefficients stay in the compilation's native convention. evaluate()
+    # on the record is formation; the payload label must match the coefficients.
+    species_thermo["gibbs_convention"] = index.native_gibbs_convention
     thermo: Any = native.thermo
     if index.native_gibbs_convention != GIBBS_CONVENTION_FORMATION:
         thermo = FormationGibbsThermo(

@@ -67,6 +67,11 @@ from simulator.vapour_rail.shomate import (
     ShomateSegment,
     coefficients_from_mapping,
 )
+from simulator.vapour_rail.source_rail import (
+    ATM_PRESSURE_PA,
+    GIBBS_CONVENTION_ABSOLUTE,
+    GIBBS_CONVENTION_FORMATION,
+)
 from simulator.vapour_rail.stoich import (
     CATALOG_DERIVED_STOICH_SPECIES,
     derive_stoich_oxide_per_vapor,
@@ -102,6 +107,7 @@ _THERMO_FAMILY_ALIASES: Mapping[str, str] = MappingProxyType(
 RUNTIME_THERMO_EVALUATOR_FAMILIES = frozenset(
     {"nasa_cea_7", "nasa_cea_9", "shomate", "tabulated_janaf"}
 )
+_ABSOLUTE_GIBBS_FAMILIES = frozenset({"nasa_cea_7", "nasa_cea_9", "shomate"})
 # CEA / JANAF standard-state pressure P° (Pa).
 _THERMO_REFERENCE_PRESSURE_PA = 100_000.0
 _THERMO_EXTRACT_DIR = (
@@ -2912,6 +2918,27 @@ def _compile_reference_model(
     )
 
 
+def _coefficient_gibbs_basis(
+    family: str, record: Mapping[str, Any], field: str
+) -> str:
+    """Basis the coefficients actually evaluate, checked against any label."""
+    if family == "tabulated_janaf":
+        expected = GIBBS_CONVENTION_FORMATION
+    elif family in _ABSOLUTE_GIBBS_FAMILIES:
+        expected = GIBBS_CONVENTION_ABSOLUTE
+    else:
+        raise CatalogCompileError(
+            f"{field}: no Gibbs basis for evaluator family {family!r}"
+        )
+    label = record.get("gibbs_convention")
+    if label is not None and str(label) != expected:
+        raise CatalogCompileError(
+            f"{field}: gibbs_convention {label!r} does not match "
+            f"what the coefficients evaluate ({expected})"
+        )
+    return expected
+
+
 def _compile_thermo_reference_model(
     *,
     species_id: str,
@@ -3012,18 +3039,46 @@ def _compile_thermo_reference_model(
                 f"{species_id}: species_thermo must be a mapping of formula → record"
             )
         polys: dict[str, Any] = {}
+        prepared: list[tuple[str, str, Mapping[str, Any]]] = []
+        bases: set[str] = set()
         for formula, rec in species_thermo_raw.items():
-            rec_map = _mapping(rec, f"{species_id}.species_thermo[{formula}]")
-            rec_map = _resolve_thermo_record(
-                rec_map, field=f"{species_id}.species_thermo[{formula}]"
-            )
+            field = f"{species_id}.species_thermo[{formula}]"
+            rec_map = _mapping(rec, field)
+            rec_map = _resolve_thermo_record(rec_map, field=field)
             fam = evaluator_family
             if rec_map.get("evaluator_family") or rec_map.get("evaluator"):
                 fam = _normalize_thermo_family(
                     str(rec_map.get("evaluator_family") or rec_map.get("evaluator")),
-                    field=f"{species_id}.species_thermo[{formula}].evaluator",
+                    field=f"{field}.evaluator",
                 )
-            polys[str(formula)] = _polynomial_from_thermo_record(
+            bases.add(_coefficient_gibbs_basis(fam, rec_map, field))
+            pressure = _finite_positive(
+                rec_map.get("reference_pressure_Pa", _THERMO_REFERENCE_PRESSURE_PA),
+                f"{field}.reference_pressure_Pa",
+            )
+            state = str(rec_map.get("standard_state") or "")
+            # CEA condensed rows are labelled 1 atm. That label does not enter
+            # G (condensed VΔP is neglected; the ratio evaluator ignores it).
+            # A gas at any other pressure is a second reaction P°.
+            condensed_atm_label = state.startswith("condensed") and math.isclose(
+                pressure, ATM_PRESSURE_PA, rel_tol=0.0, abs_tol=1e-6
+            )
+            if (
+                not math.isclose(pressure, Pstd, rel_tol=0.0, abs_tol=1e-6)
+                and not condensed_atm_label
+            ):
+                raise CatalogCompileError(
+                    f"{field}: reference_pressure_Pa {pressure} does not match "
+                    f"the reaction standard {Pstd}"
+                )
+            prepared.append((str(formula), fam, rec_map))
+        if len(bases) > 1:
+            raise CatalogCompileError(
+                f"{species_id}: reaction participants must share one Gibbs basis, "
+                f"got {sorted(bases)}"
+            )
+        for formula, fam, rec_map in prepared:
+            polys[formula] = _polynomial_from_thermo_record(
                 name=f"{species_id}:{formula}",
                 family=fam,
                 record=rec_map,

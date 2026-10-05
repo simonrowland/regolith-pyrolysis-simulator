@@ -174,7 +174,10 @@ def test_every_returned_record_names_formation_gibbs_convention(source_rail) -> 
     for formula, state in samples:
         for record in source_rail.records_for(formula, state):
             assert record.gibbs_convention == GIBBS_CONVENTION_FORMATION
-            assert record.species_thermo["gibbs_convention"] == GIBBS_CONVENTION_FORMATION
+            assert (
+                record.species_thermo["gibbs_convention"]
+                == record.native_gibbs_convention
+            )
             if record.source_id in {"nasa-glenn", "burcat"}:
                 assert record.native_gibbs_convention == GIBBS_CONVENTION_ABSOLUTE
             else:

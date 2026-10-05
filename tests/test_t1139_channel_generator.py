@@ -4,7 +4,12 @@ from __future__ import annotations
 
 import pytest
 
-from simulator.vapour_rail.catalog import compile_vapour_rail_catalog
+from copy import deepcopy
+
+from simulator.vapour_rail.catalog import (
+    CatalogCompileError,
+    compile_vapour_rail_catalog,
+)
 from simulator.vapour_rail.channel_generator import (
     ACTIVITY_BASIS,
     FIRST_BATCH_ELEMENTS,
@@ -132,6 +137,45 @@ def test_generated_domains_contain_the_furnace_window(generated_batch) -> None:
     ] is True
     assert _channel_domain(by_key[("In", "In")])[0] < 2186.0
     assert _channel_domain(by_key[("V", "V")])[0] < 2230.0
+
+
+def _ga_payload(generated_batch):
+    ga = next(
+        channel
+        for channel in generated_batch.channels
+        if channel.element == "Ga" and channel.carrier == "Ga"
+    )
+    return catalog_payload_from_channels((ga,))
+
+
+def _ga_thermo(payload):
+    return payload["families"]["t1139_Ga_Ga_family"]["physical_properties"][
+        "species"
+    ]["t1139_Ga_Ga"]["pressure_models"][0]["species_thermo"]
+
+
+def test_compiler_rejects_mixed_gibbs_basis_and_pressure(generated_batch) -> None:
+    pressure_payload = deepcopy(_ga_payload(generated_batch))
+    thermo = _ga_thermo(pressure_payload)
+    thermo["O2(g)"]["reference_pressure_Pa"] = 101325.0
+    with pytest.raises(CatalogCompileError, match="reference_pressure"):
+        compile_vapour_rail_catalog(pressure_payload, emit_u0_request_rules=False)
+
+    basis_payload = deepcopy(_ga_payload(generated_batch))
+    thermo = _ga_thermo(basis_payload)
+    key = next(iter(thermo))
+    thermo[key]["evaluator_family"] = "tabulated_janaf"
+    thermo[key]["gibbs_convention"] = "formation_gibbs"
+    thermo[key].pop("segments", None)
+    with pytest.raises(CatalogCompileError, match="one Gibbs basis"):
+        compile_vapour_rail_catalog(basis_payload, emit_u0_request_rules=False)
+
+    label_payload = deepcopy(_ga_payload(generated_batch))
+    thermo = _ga_thermo(label_payload)
+    key = next(iter(thermo))
+    thermo[key]["gibbs_convention"] = "formation_gibbs"
+    with pytest.raises(CatalogCompileError, match="gibbs_convention"):
+        compile_vapour_rail_catalog(label_payload, emit_u0_request_rules=False)
 
 
 def test_generated_channels_use_one_source_per_reaction(generated_batch) -> None:
