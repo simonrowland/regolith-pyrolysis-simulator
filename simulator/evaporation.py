@@ -5,7 +5,7 @@ from __future__ import annotations
 import copy
 import math
 from collections import defaultdict
-from collections.abc import Mapping
+from collections.abc import Mapping, Sequence
 from numbers import Real
 from typing import Any
 
@@ -678,6 +678,49 @@ def _load_evaporation_alpha_envelope_by_species(
                 float(envelope[1]),
             )
     return envelope_by_species
+
+
+def split_frozen_inventory(
+    available: float,
+    draws: Sequence[float],
+    coefficients: Sequence[float],
+    *,
+    dt: float,
+    total_draw: float,
+    available_floor: float,
+    draw_floor: float,
+    fraction_cap: float,
+    clamp_consumed_to_stock: bool,
+    divide_draw_by_stock_first: bool,
+) -> tuple[float, tuple[float, ...]] | None:
+    """Debit one frozen stock and split that debit across concurrent draws.
+
+    Consumed stock is ``available * (1 - exp(-draw * dt / available))``,
+    evaluated with ``-expm1``. The caller passes its own units, floors, cap,
+    and the summation behind ``total_draw``. Each product amount is
+    ``consumed * (draw / total_draw) / coefficient``.
+    ``divide_draw_by_stock_first`` keeps the caller's existing multiply
+    order for that exposure. Returns None when the stock or the total draw
+    is at or below the caller's floor. Oxygen remainders and rate
+    conversions stay with the caller.
+    """
+
+    if available <= available_floor or total_draw <= draw_floor:
+        return None
+    if divide_draw_by_stock_first:
+        rate_over_stock = total_draw / available
+        raw_fraction = -math.expm1(-rate_over_stock * dt)
+    else:
+        raw_fraction = -math.expm1(-total_draw * dt / available)
+    fraction = max(0.0, min(fraction_cap, raw_fraction))
+    consumed = available * fraction
+    if clamp_consumed_to_stock:
+        consumed = min(available, max(0.0, consumed))
+    products: list[float] = []
+    for draw, coefficient in zip(draws, coefficients, strict=True):
+        share = draw / total_draw
+        products.append(consumed * share / coefficient)
+    return consumed, tuple(products)
 
 
 class EvaporationMixin:
@@ -3415,6 +3458,7 @@ class EvaporationMixin:
                 effective_rates.pop(species, None)
             return effective_rates
 
+        # Rate rescale on process.overhead_gas, not a reactant product split.
         max_fraction = math.nextafter(1.0, 0.0)
         k_hr = total_o2_draw_kg_hr / float(available_o2_kg)
         depletion_fraction = -math.expm1(-k_hr * dt_hr)
@@ -4324,9 +4368,9 @@ class EvaporationMixin:
 
         One entry draws one reactant or several. Pools that share a reactant
         share one inventory. A species rate is the minimum of its pool limits.
-        The consumed fraction is ``-expm1(-k dt)`` with ``k = draw / stock``.
-        Overhead O2 is a later pass: it scales these rates from a different
-        account, so it is not a second copy of this pool rule.
+        ``split_frozen_inventory`` owns the debit and the proportional split.
+        Overhead O2 is a later pass: it rescales these rates from
+        ``process.overhead_gas`` and is not a second reactant-pool split.
         """
 
         by_reactant: dict[str, list[tuple[dict, float, float]]] = defaultdict(list)
@@ -4337,22 +4381,33 @@ class EvaporationMixin:
                     (entry, float(kg_per), float(draws[reactant]))
                 )
         limits: dict[str, list[float]] = defaultdict(list)
-        max_fraction = math.nextafter(1.0, 0.0)
+        fraction_cap = math.nextafter(1.0, 0.0)
         for reactant in sorted(by_reactant):
             items = by_reactant[reactant]
             available = float(cleaned_melt_kg.get(reactant, 0.0))
-            total_draw = sum(draw for _entry, _kg_per, draw in items)
-            if available <= 1e-12 or total_draw <= 1e-12:
+            channel_draws = tuple(draw for _entry, _kg_per, draw in items)
+            coefficients = tuple(kg_per for _entry, kg_per, _draw in items)
+            total_draw = sum(channel_draws)
+            split = split_frozen_inventory(
+                available,
+                channel_draws,
+                coefficients,
+                dt=dt_hr,
+                total_draw=total_draw,
+                available_floor=1e-12,
+                draw_floor=1e-12,
+                fraction_cap=fraction_cap,
+                clamp_consumed_to_stock=False,
+                divide_draw_by_stock_first=True,
+            )
+            if split is None:
                 for entry, _kg_per, _draw in items:
                     limits[str(entry['species'])].append(0.0)
                 continue
-            k_hr = total_draw / available
-            depletion_fraction = -math.expm1(-k_hr * dt_hr)
-            depletion_fraction = max(0.0, min(max_fraction, depletion_fraction))
-            pool_draw_kg = available * depletion_fraction
-            for entry, kg_per, draw in items:
-                share = draw / total_draw
-                product_kg = pool_draw_kg * share / kg_per
+            _consumed, products = split
+            for (entry, _kg_per, _draw), product_kg in zip(
+                items, products, strict=True
+            ):
                 rate = product_kg / dt_hr if product_kg > 1e-12 else 0.0
                 limits[str(entry['species'])].append(rate)
         effective_rates: dict[str, float] = {}
