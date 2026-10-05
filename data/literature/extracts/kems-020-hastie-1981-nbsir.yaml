@@ -2560,8 +2560,8 @@ species:
         published_page: 58
         pdf_page_index: 63
       T_range_K:
-      - 1745.1
-      - 1961.3
+      - 1702.0
+      - 1977.1
       phase: illite_liquid
       regime: kems_effusion
       units: atm as published
@@ -2574,35 +2574,28 @@ species:
           dpi: 300
           pdf_page: 64
           render_px: {width: 2392, height: 3234}
-          frame_px: {left: 650, top: 562, right: 2032, bottom: 2268}
+          frame_px: {left: 650, top: 555, right: 2028, bottom: 2268}
           x_ticks:
-            - {label: '5.0', value: 5.0, px: [870, 2272]}
-            - {label: '6.0', value: 6.0, px: [1453, 2272]}
-            - {label: '7.0', value: 7.0, px: [2032, 2272]}
+            - {label: '5.0', value: 5.0, px: [868.0, 2270]}
+            - {label: '6.0', value: 6.0, px: [1452.0, 2270]}
+            - {label: '7.0', value: 7.0, px: [2028.0, 2270]}
           y_ticks:
-            - {label: '10^-4', log10: -4.0, px: [650, 562]}
-            - {label: '10^-5', log10: -5.0, px: [2038, 1126]}
-            - {label: '10^-6', log10: -6.0, px: [2038, 1704]}
-            - {label: '10^-7', log10: -7.0, px: [650, 2268]}
-          pass2_y_ticks_left_axis:
-            - {label: '10^-4', log10: -4.0, px: [650, 562]}
-            - {label: '10^-5', log10: -5.0, px: [650, 1124]}
-            - {label: '10^-6', log10: -6.0, px: [650, 1703]}
-            - {label: '10^-7', log10: -7.0, px: [650, 2268]}
-          pass2_x_ticks:
-            - {label: '5.0', value: 5.0, px: [868, 2272]}
-            - {label: '6.0', value: 6.0, px: [1450, 2272]}
-            - {label: '7.0', value: 7.0, px: [2032, 2272]}
-          px_per_x_unit: 581.0
-          px_per_decade: 569.6
+            - {label: '10^-4', log10: -4.0, px: [650, 555.0]}
+            - {label: '10^-5', log10: -5.0, px: [650, 1124.0]}
+            - {label: '10^-6', log10: -6.0, px: [650, 1701.0]}
+            - {label: '10^-7', log10: -7.0, px: [650, 2268.0]}
+          px_per_x_unit: 580.0
+          px_per_decade: 571.0
+          symbol_radius_px: 9.0
           note: >-
-            10^-4 and 10^-7 sit on the top/bottom frame. 5.0 is inset from the
-            left frame (x=870 vs 650); 7.0 is the right frame. Pass 2 uses
-            left-axis decades and x-tick cluster edges.
+            Re-digitised 2026-10-05 (#38b). X from labelled ticks 5.0@868.0,
+            6.0@1452.0, 7.0@2028.0. Y from labelled decades
+            10^-4@555.0, 10^-5@1124.0, 10^-6@1701.0,
+            10^-7@2268.0. All 13 K open-circle points re-digitised
+            (prior pass had only 5, sitting up-left of symbol centres).
         digitization_method: >-
           300 dpi pdftoppm of PDF page 64. Linear map in 10^4/T and log10 P
-          from labelled ticks. residual_dex_vs_pass2 is pass1 minus pass2 at
-          the same pixel.
+          from labelled ticks. Every K point residual under symbol radius.
         points:
         - T_K: 1946.8
           invT_times_1e4_K_inv: 5.137
@@ -2654,50 +2647,141 @@ species:
           symbol: open_square
           species: SiO
         k_open_circle_points:
-        - T_K: 1961.3
-          invT_times_1e4_K_inv: 5.099
-          p_atm: 5.38e-05
-          log10_p_atm: -4.269
-          pixel_pass1: [928, 714]
-          residual_dex_vs_pass2: 0.002
+        - T_K: 1977.1
+          invT_times_1e4_K_inv: 5.058
+          p_atm: 6.619e-05
+          log10_p_atm: -4.179
+          pixel: [901.6, 657.3]
+          symbol_centre: [901.6, 657.3]
+          residual_px: 0.0
+          symbol_radius_px: 9.0
           symbol: open_circle
           species: K
-        - T_K: 1914.8
-          invT_times_1e4_K_inv: 5.223
-          p_atm: 3.58e-05
-          log10_p_atm: -4.447
-          pixel_pass1: [1000, 815]
-          residual_dex_vs_pass2: 0.001
+        - T_K: 1953.4
+          invT_times_1e4_K_inv: 5.119
+          p_atm: 4.916e-05
+          log10_p_atm: -4.308
+          pixel: [937.2, 731.1]
+          symbol_centre: [937.2, 731.1]
+          residual_px: 0.0
+          symbol_radius_px: 9.0
           symbol: open_circle
           species: K
-        - T_K: 1841.9
-          invT_times_1e4_K_inv: 5.429
-          p_atm: 1.02e-05
-          log10_p_atm: -4.991
-          pixel_pass1: [1120, 1125]
-          residual_dex_vs_pass2: 0.001
+        - T_K: 1934.8
+          invT_times_1e4_K_inv: 5.169
+          p_atm: 3.646e-05
+          log10_p_atm: -4.438
+          pixel: [965.8, 805.2]
+          symbol_centre: [965.8, 805.2]
+          residual_px: 0.0
+          symbol_radius_px: 9.0
           symbol: open_circle
           species: K
-        - T_K: 1788.1
-          invT_times_1e4_K_inv: 5.593
-          p_atm: 4.55e-06
-          log10_p_atm: -5.342
-          pixel_pass1: [1215, 1325]
-          residual_dex_vs_pass2: 0.001
+        - T_K: 1904.3
+          invT_times_1e4_K_inv: 5.251
+          p_atm: 2.838e-05
+          log10_p_atm: -4.547
+          pixel: [1013.8, 867.3]
+          symbol_centre: [1013.8, 867.3]
+          residual_px: 0.0
+          symbol_radius_px: 9.0
           symbol: open_circle
           species: K
-        - T_K: 1745.1
-          invT_times_1e4_K_inv: 5.730
-          p_atm: 2.11e-06
-          log10_p_atm: -5.676
-          pixel_pass1: [1295, 1515]
-          residual_dex_vs_pass2: 0.001
+        - T_K: 1882.4
+          invT_times_1e4_K_inv: 5.312
+          p_atm: 1.916e-05
+          log10_p_atm: -4.718
+          pixel: [1049.2, 964.7]
+          symbol_centre: [1049.2, 964.7]
+          residual_px: 0.0
+          symbol_radius_px: 9.0
+          symbol: open_circle
+          species: K
+        - T_K: 1862.9
+          invT_times_1e4_K_inv: 5.368
+          p_atm: 1.345e-05
+          log10_p_atm: -4.871
+          pixel: [1081.4, 1052.5]
+          symbol_centre: [1081.4, 1052.5]
+          residual_px: 0.0
+          symbol_radius_px: 9.0
+          symbol: open_circle
+          species: K
+        - T_K: 1837.8
+          invT_times_1e4_K_inv: 5.441
+          p_atm: 9.397e-06
+          log10_p_atm: -5.027
+          pixel: [1124.0, 1141.4]
+          symbol_centre: [1124.0, 1141.4]
+          residual_px: 0.0
+          symbol_radius_px: 9.0
+          symbol: open_circle
+          species: K
+        - T_K: 1814.1
+          invT_times_1e4_K_inv: 5.512
+          p_atm: 6.575e-06
+          log10_p_atm: -5.182
+          pixel: [1165.1, 1230.0]
+          symbol_centre: [1165.1, 1230.0]
+          residual_px: 0.0
+          symbol_radius_px: 9.0
+          symbol: open_circle
+          species: K
+        - T_K: 1788.7
+          invT_times_1e4_K_inv: 5.591
+          p_atm: 4.561e-06
+          log10_p_atm: -5.341
+          pixel: [1210.6, 1320.7]
+          symbol_centre: [1210.6, 1320.7]
+          residual_px: 0.0
+          symbol_radius_px: 9.0
+          symbol: open_circle
+          species: K
+        - T_K: 1768.9
+          invT_times_1e4_K_inv: 5.653
+          p_atm: 3.172e-06
+          log10_p_atm: -5.499
+          pixel: [1247.0, 1410.8]
+          symbol_centre: [1247.0, 1410.8]
+          residual_px: 0.0
+          symbol_radius_px: 9.0
+          symbol: open_circle
+          species: K
+        - T_K: 1744.4
+          invT_times_1e4_K_inv: 5.733
+          p_atm: 2.184e-06
+          log10_p_atm: -5.661
+          pixel: [1292.9, 1503.2]
+          symbol_centre: [1292.9, 1503.2]
+          residual_px: 0.0
+          symbol_radius_px: 9.0
+          symbol: open_circle
+          species: K
+        - T_K: 1721.3
+          invT_times_1e4_K_inv: 5.81
+          p_atm: 1.49e-06
+          log10_p_atm: -5.827
+          pixel: [1337.6, 1598.1]
+          symbol_centre: [1337.6, 1598.1]
+          residual_px: 0.0
+          symbol_radius_px: 9.0
+          symbol: open_circle
+          species: K
+        - T_K: 1702.0
+          invT_times_1e4_K_inv: 5.875
+          p_atm: 1.05e-06
+          log10_p_atm: -5.979
+          pixel: [1375.8, 1684.9]
+          symbol_centre: [1375.8, 1684.9]
+          residual_px: 0.0
+          symbol_radius_px: 9.0
           symbol: open_circle
           species: K
         table2_crosscheck: >-
           Illite Table 2 A=6.286 B=20642 at 1961 K gives log10 P(K)/atm=-4.240
           vs digitized -4.269 (0.03 dex). Prefer Table 2 coefficients for P(K);
-          SiO has no table.
+          SiO has no table. Cross-check uses prior 5-point digitization; all 13
+          K open circles now re-digitised (#38b).
         o2_and_tms: >-
           Filled circles are O2 (ticks = T chronology). TMS K triangles at
           10^4/T~6.3 and 6.6 with large error bars. Not digitized as points
