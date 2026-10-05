@@ -9,13 +9,13 @@ scan:
   - hunt_ids column empty; --hunt-json not provided
   corpus_root: /Users/simonrowland/Repos/regolith-corpus
 counts:
-  sources: 285
-  extracts: 283
+  sources: 286
+  extracts: 284
   pdfs_present_in_worktree: 0
   extracts_with_private_locators: 60
   pdfs_tracked_99_kems_langmuir: 0
   pdfs_without_extract: 0
-  extracts_without_pdf: 283
+  extracts_without_pdf: 284
   alias_groups_needing_resolution: 41
 gaps:
   pdfs_without_extract: []
@@ -260,6 +260,7 @@ gaps:
   - sf04-magma-companion-workbook
   - shornikov-1994-mullite-kems
   - shornikov-1997-cao-alumina-vapor
+  - shornikov-1998-silica-vaporization
   - shornikov-2000-cao-silica-vaporization
   - shornikov-2007-cao-aluminosilicate-melts
   - shornikov-2021-mgo-feo-silicate
@@ -14759,6 +14760,66 @@ sources:
       last_stage: null
       date: null
     commit: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
+- source_id: shornikov-1998-silica-vaporization
+  aliases: []
+  citation: Shornikov, S. I., Archakov, I. Yu., and Shul’ts, M. M. (1998). Mass Spectrometric Study of
+    Vaporization and Thermodynamic Properties of Silicon Dioxide. I. Composition of the Gas Phase and
+    Partial Vapor Pressures of the Molecular Forms over Silicon Dioxide. Russian Journal of General Chemistry,
+    68(8), 1171–1177.
+  doi: null
+  report_number: null
+  identifier: null
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
+  extracts:
+  - path: data/literature/extracts/shornikov-1998-silica-vaporization.yaml
+    review_status: draft
+    rows: 0
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/shornikov-1998-silica-vaporization/shornikov-1998-silica-vaporization.pdf
+      present: true
+      sha256: 3a38a303b366dc121cf09f6dd8a5425990fd781854382f66cec924e70b9c58bd
+      matches_simulator: null
+    sidecar:
+      path: raw/shornikov-1998-silica-vaporization/sidecar.yaml
+      present: true
+    text:
+      path: text/shornikov-1998-silica-vaporization
+      exists: true
+      file_count: 3
+    tables:
+      path: tables/shornikov-1998-silica-vaporization
+      exists: true
+      file_count: 6
+    extract:
+      path: extracts/shornikov-1998-silica-vaporization.yaml
+      present: true
+      matches_simulator: true
+    ledger:
+      path: ledger/shornikov-1998-silica-vaporization.yaml
+      present: true
+      error: null
+      last_stage: extracted
+      date: '2026-10-04'
+    commit: d937549d195ad330cdedbe4fa2b55d8b028a2ea7
 - source_id: shornikov-2000-cao-silica-vaporization
   aliases: []
   citation: Shornikov, S. I., and Archakov, I. Yu. (2000). Mass Spectrometric Study of Phase Relations
