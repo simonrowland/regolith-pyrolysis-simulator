@@ -39,11 +39,7 @@ from simulator.state import (
     EvaporationFlux,
     clamp_stir_factor,
 )
-from simulator.vapour_rail.stoich import (
-    derive_stoich_oxide_per_vapor,
-    oxygen_coproduct_account,
-    strip_phase,
-)
+from simulator.vapour_rail.stoich import oxygen_coproduct_account
 from simulator.vapour_rail.batch import (
     FLUX_ACTIVATION_EPOCH_PRE_RG,
     FluxActivationContext,
@@ -4396,64 +4392,43 @@ class EvaporationMixin:
                 effective_rates.pop(species, None)
 
     def _multi_reactant_stoich(self, species: str, sp_data: dict) -> dict | None:
-        """Vector stoich when the selected reaction has two condensed reactants.
+        """Vector stoich carried on the legacy projection.
 
-        A single condensed reactant returns None so the scalar stoich dict
-        stays unchanged.
+        ``legacy_view`` pops ``source_reactions`` after the catalog derivation
+        writes ``reactants_kg_per_vapor``. A row with one or no condensed
+        reactant returns None so the scalar path stays unchanged.
         """
 
-        reactions = sp_data.get('source_reactions') or []
-        if not isinstance(reactions, list):
+        vector = sp_data.get('reactants_kg_per_vapor')
+        if not isinstance(vector, Mapping) or len(vector) <= 1:
             return None
-        candidates = [item for item in reactions if isinstance(item, Mapping)]
-        if not candidates:
-            return None
-        chosen = None
-        wanted = sp_data.get('source_reaction_id')
-        if isinstance(wanted, str):
-            for reaction in candidates:
-                if reaction.get('id') == wanted:
-                    chosen = reaction
-                    break
-        elif len(candidates) == 1:
-            chosen = candidates[0]
-        if chosen is None:
-            return None
-        formula = str(sp_data.get('formula') or species)
-        vapor_key = strip_phase(formula)
-        condensed: list[str] = []
-        for item in chosen.get('reactants') or []:
-            if not isinstance(item, Mapping):
-                continue
-            key = strip_phase(str(item.get('formula') or ''))
-            if key and key != 'O2' and key != vapor_key:
-                condensed.append(key)
-        if len(set(condensed)) <= 1:
-            return None
-        masses, oxide, o2 = derive_stoich_oxide_per_vapor(
-            formula=formula,
-            parent_oxide=str(sp_data.get('parent_oxide') or ''),
-            reaction=chosen,
-        )
+        masses = {
+            str(reactant): float(kg_per) for reactant, kg_per in vector.items()
+        }
+        oxide = sum(masses.values())
         declared_oxide = sp_data.get('stoich_oxide_per_vapor')
         declared_o2 = sp_data.get('stoich_O2_per_vapor')
-        if declared_oxide is not None or declared_o2 is not None:
-            if declared_oxide is None or declared_o2 is None:
-                raise AccountingError(
-                    f"vapor species {species!r} multi-reactant stoich "
-                    "requires both stoich_oxide_per_vapor and "
-                    "stoich_O2_per_vapor when either is set"
-                )
-            if not math.isclose(
-                float(declared_oxide), oxide, rel_tol=1e-6, abs_tol=1e-9
-            ) or not math.isclose(
-                float(declared_o2), o2, rel_tol=1e-6, abs_tol=1e-9
-            ):
-                raise AccountingError(
-                    f"vapor species {species!r} declared stoich does not "
-                    "match the compiled reactant vector"
-                )
-        self._validate_multi_reactant_atoms(masses, formula, o2)
+        if declared_oxide is None or declared_o2 is None:
+            raise AccountingError(
+                f"vapor species {species!r} multi-reactant projection "
+                "requires stoich_oxide_per_vapor and stoich_O2_per_vapor"
+            )
+        if not math.isclose(
+            float(declared_oxide), oxide, rel_tol=1e-6, abs_tol=1e-9
+        ) or not math.isclose(
+            float(declared_oxide),
+            1.0 + float(declared_o2),
+            rel_tol=1e-6,
+            abs_tol=1e-9,
+        ):
+            raise AccountingError(
+                f"vapor species {species!r} declared stoich does not "
+                "match the compiled reactant vector"
+            )
+        o2 = float(declared_o2)
+        self._validate_multi_reactant_atoms(
+            masses, str(sp_data.get('formula') or species), o2
+        )
         return {
             'parent_oxide': sp_data.get('parent_oxide', ''),
             'oxide_per_product_kg': oxide,

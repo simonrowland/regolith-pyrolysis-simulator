@@ -3965,12 +3965,11 @@ def _legacy_species_row(
             matched = [item for item in reactions if isinstance(item, Mapping)]
         if matched:
             try:
-                derived = derive_stoich_oxide_per_vapor(
+                reactant_kg, oxide, o2 = derive_stoich_oxide_per_vapor(
                     formula=str(row.get("formula") or species_id),
                     parent_oxide=str(parent_oxide),
                     reaction=matched[0],
                 )
-                oxide, o2 = derived[1], derived[2]
             except CatalogCompileError:
                 raise
             except ValueError as exc:
@@ -3978,7 +3977,7 @@ def _legacy_species_row(
                     raise CatalogCompileError(
                         f"{species_id}: cannot derive stoichiometry: {exc}"
                     ) from exc
-                oxide, o2 = None, None
+                reactant_kg, oxide, o2 = {}, None, None
             if oxide is not None and o2 is not None:
                 declared_oxide = result.get("stoich_oxide_per_vapor")
                 declared_o2 = result.get("stoich_O2_per_vapor")
@@ -3996,10 +3995,18 @@ def _legacy_species_row(
                         f"{species_id}: derived stoich_O2_per_vapor {o2} "
                         f"disagrees with declared {declared_o2}"
                     )
+                # source_reactions is popped above. A multi-reactant vector
+                # has to travel on this row or the runtime falls through to
+                # the single-parent atom check.
+                if len(reactant_kg) > 1:
+                    result["reactants_kg_per_vapor"] = {
+                        str(key): float(value) for key, value in reactant_kg.items()
+                    }
                 if (
                     species_id in CATALOG_DERIVED_STOICH_SPECIES
                     or declared_oxide is not None
                     or declared_o2 is not None
+                    or len(reactant_kg) > 1
                 ):
                     result["stoich_oxide_per_vapor"] = oxide
                     result["stoich_O2_per_vapor"] = o2

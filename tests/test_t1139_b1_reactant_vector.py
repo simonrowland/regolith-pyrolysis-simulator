@@ -4,6 +4,8 @@ from __future__ import annotations
 
 import math
 from collections import defaultdict
+from functools import lru_cache
+from pathlib import Path
 from types import SimpleNamespace
 
 import pytest
@@ -16,10 +18,17 @@ from simulator.accounting.formulas import parse_formula
 from simulator.chemistry.kernel import ChemistryIntent, IntentRequest
 from simulator.chemistry.kernel.dto import ProviderAccountView
 from simulator.evaporation import EvaporationMixin
+from simulator.vapour_rail.catalog import (
+    OUT_OF_RANGE_STATUS,
+    compile_vapour_rail_catalog,
+)
 from simulator.vapour_rail.stoich import (
     derive_stoich_oxide_per_vapor,
     oxygen_coproduct_account,
 )
+from simulator.yaml_cache import load_cached_safe_yaml
+
+ROOT = Path(__file__).resolve().parents[1]
 
 
 def _kg_per_kg_vapor(formula: str, nu: float, vapor: str, vapor_nu: float = 1.0) -> float:
@@ -103,16 +112,130 @@ def _host(vapor_pressures: dict | None = None) -> SimpleNamespace:
     return host
 
 
-def _catalog() -> dict:
+def _activity(component: str) -> dict:
     return {
-        "metals": {
-            "NaK": _species_data("NaK", "Na2O", NAK),
+        "component_id": component,
+        "standard_state": {
+            "convention": "raoultian_pure_endmember",
+            "phase": "liquid",
+            "reference_pressure_bar": 1.0,
+            "component_basis": "raoultian_pure_endmember",
         },
-        "oxide_vapors": {
-            "NaBO": _species_data("NaBO", "Na2O", NABO),
-            "NaBO2": _species_data("NaBO2", "Na2O", NABO2),
-            "NaBO3": _species_data("NaBO3", "Na2O", NABO3),
+        "activity_model": "provider_reported_thermodynamic_activity",
+        "allow_henrian_upper_bound": False,
+        "compound_bearing": False,
+        "require_assemblage_match": False,
+    }
+
+
+def _family(
+    species: str,
+    parent: str,
+    reaction: dict,
+    projection: str,
+    *,
+    activity_exponent: float,
+    po2_exponent: float,
+) -> dict:
+    reaction_row = dict(reaction)
+    reaction_row["activity_input"] = _activity(parent)
+    return {
+        "physical_properties": {
+            "species": {
+                species: {
+                    "formula": species,
+                    "parent_oxide": parent,
+                    "molar_mass_g_mol": parse_formula(species).molar_mass_g_per_mol(),
+                    "source_reactions": [reaction_row],
+                    "pressure_models": [
+                        {
+                            "evaluator_family": "standard_reaction_term",
+                            "fit_target": "standard_reaction_term",
+                            "pressure_kind": "equilibrium_partial_pressure",
+                            "species_basis": "monomer",
+                            "valid_domain": {"temperature_K": [1000.0, 1200.0]},
+                            "source_reaction_id": reaction["id"],
+                            "activity_semantics": "source_reaction_activity",
+                            "reference_pressure_model": {
+                                "evaluator_family": "tabulated_equilibrium",
+                                "points": [
+                                    {"temperature_K": 1000.0, "pressure_Pa": 1.0},
+                                    {"temperature_K": 1200.0, "pressure_Pa": 100.0},
+                                ],
+                            },
+                            "activity_exponent": activity_exponent,
+                            "pO2_exponent": po2_exponent,
+                            "pO2_reference_bar": 1.0,
+                            "oxygen_fugacity_channel": "intrinsic_melt",
+                        }
+                    ],
+                    "validation": {
+                        "status": "pending_validation",
+                        "anchor_refs": [],
+                    },
+                    "oxide_activity_exponent": activity_exponent,
+                    "pO2_exponent": po2_exponent,
+                    "pO2_reference_bar": 1.0,
+                }
+            }
         },
+        "fiat_routing": {
+            "plant_bin": None,
+            "engineering_capture_policy": "temperature_threshold",
+            "products_and_coproducts": [],
+            "process_or_terminal_destination": "process.condensation_train",
+            "condensation_reference_at_1mbar_C": 420.0,
+        },
+        "vaporisation_coefficients": {
+            "evaporation_alpha": {"value": 1.0},
+            "alpha_domain_and_uncertainty": {},
+            "extrapolation_policy": "conservative_slope_continuation",
+            "out_of_range_status": OUT_OF_RANGE_STATUS,
+            "acquisition_flag": f"acquire:test:{species}",
+        },
+        "code_metadata": {
+            "formula_id": species,
+            "source_account": "process.cleaned_melt",
+            "request_rule": "source_inventory_present",
+            "solve_group_id": f"{species}_family",
+            "compatibility_projection": projection,
+            "canonical_aliases": [],
+            "hot_train_applicability": "applicable",
+        },
+    }
+
+
+@lru_cache(maxsize=1)
+def _catalog() -> dict:
+    """Runtime rows: compiled, then ``legacy_view``, which pops source_reactions."""
+
+    payload = {
+        "schema_version": 2,
+        "families": {
+            "nak_family": _family(
+                "NaK", "Na2O", NAK, "metals",
+                activity_exponent=0.5, po2_exponent=-0.5,
+            ),
+            "nabo_family": _family(
+                "NaBO", "Na2O", NABO, "oxide_vapors",
+                activity_exponent=0.5, po2_exponent=-0.5,
+            ),
+            "nabo2_family": _family(
+                "NaBO2", "Na2O", NABO2, "oxide_vapors",
+                activity_exponent=0.5, po2_exponent=0.0,
+            ),
+            "nabo3_family": _family(
+                "NaBO3", "Na2O", NABO3, "oxide_vapors",
+                activity_exponent=0.5, po2_exponent=0.5,
+            ),
+        },
+    }
+    view = compile_vapour_rail_catalog(
+        payload, emit_u0_request_rules=False
+    ).legacy_view()
+    return {
+        "metals": view["metals"],
+        "oxide_vapors": view["oxide_vapors"],
     }
 
 
@@ -269,6 +392,44 @@ def test_single_condensed_reactant_scalar_is_its_own_mass() -> None:
     assert oxide == pytest.approx(parent / vapor)
     assert o2 == pytest.approx(oxygen / vapor)
     assert oxide == pytest.approx(1.0 + o2)
+
+
+def test_legacy_view_projects_the_metaborate_reactant_vector() -> None:
+    row = _catalog()["oxide_vapors"]["NaBO2"]
+    assert "source_reactions" not in row
+    assert set(row["reactants_kg_per_vapor"]) == {"Na2O", "B2O3"}
+    assert row["stoich_oxide_per_vapor"] == pytest.approx(1.0, abs=1e-12)
+    assert row["stoich_O2_per_vapor"] == pytest.approx(0.0, abs=1e-15)
+    host = _host(_catalog())
+    stoich = host._evaporation_stoich("NaBO2", row)
+    _assert_vector_matches_coefficients(
+        stoich, "NaBO2", [("Na2O", 0.5), ("B2O3", 0.5)], 0.0
+    )
+
+
+def test_unprojected_source_reactions_do_not_build_a_vector() -> None:
+    host = _host()
+    raw = _species_data("NaBO2", "Na2O", NABO2)
+    assert "reactants_kg_per_vapor" not in raw
+    with pytest.raises(AccountingError, match="explicit stoich"):
+        host._evaporation_stoich("NaBO2", raw)
+
+
+def test_production_legacy_rows_carry_no_extra_reactant_vector() -> None:
+    payload = load_cached_safe_yaml(
+        (ROOT / "data" / "vapor_pressures.yaml").read_text(encoding="utf-8")
+    )
+    view = compile_vapour_rail_catalog(
+        payload, emit_u0_request_rules=False
+    ).legacy_view()
+    projected = [
+        species_id
+        for group in view.values()
+        if isinstance(group, dict)
+        for species_id, row in group.items()
+        if isinstance(row, dict) and "reactants_kg_per_vapor" in row
+    ]
+    assert projected == []
 
 
 def test_oxide_vapour_vector_closes_and_credits_overhead_oxygen() -> None:
