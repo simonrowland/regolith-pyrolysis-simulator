@@ -17,6 +17,8 @@ from simulator.battery.enums import (
 )
 from simulator.battery.identity import profile_for
 from simulator.battery.migrate import Migrator
+from simulator.battery.records import Value
+from simulator.battery.validate import _validate_activity_coefficient_temperature_fit
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -137,6 +139,56 @@ def test_fegley_2023_table_2_migrates_all_numeric_fit_rows() -> None:
     anchor_domain = json.loads(ag2o.value.expression_domain)
     assert anchor_domain["validity_range_K"] is None
     assert anchor_domain["notes_as_printed"] == "Regular solution 1673 K point, Sossi et al. (2019)"
+
+
+def test_fit_validator_rejects_non_numeric_and_non_finite_coefficients() -> None:
+    domain = json.dumps(
+        {
+            "input_unit": "K",
+            "validity_range_K": None,
+            "standard_state_as_printed": "not stated in Table 2 row",
+            "notes_as_printed": "",
+        }
+    )
+    invalid_parameters = (
+        (("A", Decimal("NaN")), ("B", Decimal("Infinity"))),
+        (("A", "bogus"), ("B", "also bogus")),
+    )
+
+    for parameters in invalid_parameters:
+        value = Value(
+            ValueKind.EXPRESSION,
+            expression_text="log10 γ = A + B/T",
+            expression_parameters=parameters,
+            expression_domain=domain,
+        )
+        issues = _validate_activity_coefficient_temperature_fit(value, "value")
+        assert {issue.path for issue in issues} >= {
+            "value.expression_parameters.A",
+            "value.expression_parameters.B",
+        }
+
+
+def test_fit_validator_reports_malformed_temperature_range() -> None:
+    value = Value(
+        ValueKind.EXPRESSION,
+        expression_text="log10 γ = A + B/T",
+        expression_parameters=(("A", Decimal("0")), ("B", Decimal("-582"))),
+        expression_domain=json.dumps(
+            {
+                "input_unit": "K",
+                "validity_range_K": ["bad", "range"],
+                "standard_state_as_printed": "not stated in Table 2 row",
+                "notes_as_printed": "",
+            }
+        ),
+    )
+
+    issues = _validate_activity_coefficient_temperature_fit(value, "value")
+
+    assert [issue.path for issue in issues] == [
+        "value.expression_domain.validity_range_K"
+    ]
 
 
 def test_sossi_fegley_2018_table_2_migrates_numeric_activity_rows() -> None:

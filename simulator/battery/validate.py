@@ -40,7 +40,7 @@ import json
 import re
 from contextlib import contextmanager
 from dataclasses import dataclass, fields, is_dataclass
-from decimal import Decimal
+from decimal import Decimal, InvalidOperation
 from typing import Any, Iterable, Iterator, Mapping, Sequence
 
 from simulator.battery.enums import (
@@ -1227,9 +1227,27 @@ def _validate_activity_coefficient_temperature_fit(
             _issue(
                 f"{path}.expression_parameters",
                 RefusalReason.INVALID_SOURCE,
-                "activity-coefficient temperature fit requires numeric A and B",
+                "activity-coefficient temperature fit requires exactly one A and B parameter",
             )
         )
+    else:
+        for name, coefficient in parameters:
+            finite_numeric = False
+            if not isinstance(coefficient, bool) and isinstance(
+                coefficient, (Decimal, int, float)
+            ):
+                try:
+                    finite_numeric = Decimal(str(coefficient)).is_finite()
+                except (InvalidOperation, TypeError, ValueError):
+                    pass
+            if not finite_numeric:
+                issues.append(
+                    _issue(
+                        f"{path}.expression_parameters.{name}",
+                        RefusalReason.INVALID_SOURCE,
+                        f"activity-coefficient temperature fit parameter {name} must be numeric and finite",
+                    )
+                )
     if QUANTITY_UNITS[Quantity.ACTIVITY_COEFFICIENT_TEMPERATURE_FIT] != "dimensionless":
         issues.append(
             _issue(
@@ -1256,7 +1274,7 @@ def _validate_activity_coefficient_temperature_fit(
             try:
                 low, high = (Decimal(str(endpoint)) for endpoint in temperature_range)
                 valid_range = len(temperature_range) == 2 and low.is_finite() and high.is_finite() and low <= high
-            except (TypeError, ValueError):
+            except (InvalidOperation, TypeError, ValueError):
                 valid_range = False
             if not valid_range:
                 issues.append(
