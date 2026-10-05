@@ -9,13 +9,13 @@ scan:
   - hunt_ids column empty; --hunt-json not provided
   corpus_root: /Users/simonrowland/Repos/regolith-corpus
 counts:
-  sources: 279
-  extracts: 277
+  sources: 280
+  extracts: 278
   pdfs_present_in_worktree: 0
   extracts_with_private_locators: 60
   pdfs_tracked_99_kems_langmuir: 0
   pdfs_without_extract: 0
-  extracts_without_pdf: 277
+  extracts_without_pdf: 278
   alias_groups_needing_resolution: 41
 gaps:
   pdfs_without_extract: []
@@ -49,6 +49,7 @@ gaps:
   - datz-1961-na2cl2
   - datz-and-smith-1961
   - datz-smith-taylor-1961-nacl-vapor
+  - deffrennes-2020-ca-o-calphad
   - deguzman-2026-simulant-physicochemical
   - engelschion-2020-eac1a-simulant
   - fdm879
@@ -2426,6 +2427,65 @@ sources:
       last_stage: extracted
       date: '2026-09-06'
     commit: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
+- source_id: deffrennes-2020-ca-o-calphad
+  aliases: []
+  citation: G. Deffrennes, N. Jakse, C. M. S. S. Alvares, I. Nuta, A. Pasturel, A. Khvan, A. Pisch, "Thermodynamic
+    modelling of the Ca-O system including 3rd generation description of CaO and CaO2", Calphad, 69 (2020),
+    101764.
+  doi: 10.1016/j.calphad.2020.101764
+  report_number: null
+  identifier: 10.1016/j.calphad.2020.101764
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
+  extracts:
+  - path: data/literature/extracts/deffrennes-2020-ca-o-calphad.yaml
+    review_status: draft
+    rows: 3
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/deffrennes-2020-ca-o-calphad/deffrennes-2020-ca-o-calphad.pdf
+      present: true
+      sha256: 8b5c40c419d3bdcc1c7966613bb8a8adf6a6379231ff24a82d2435889ea24be7
+      matches_simulator: null
+    sidecar:
+      path: raw/deffrennes-2020-ca-o-calphad/sidecar.yaml
+      present: true
+    text:
+      path: text/deffrennes-2020-ca-o-calphad
+      exists: true
+      file_count: 3
+    tables:
+      path: tables/deffrennes-2020-ca-o-calphad
+      exists: true
+      file_count: 8
+    extract:
+      path: extracts/deffrennes-2020-ca-o-calphad.yaml
+      present: true
+      matches_simulator: true
+    ledger:
+      path: ledger/deffrennes-2020-ca-o-calphad.yaml
+      present: true
+      error: null
+      last_stage: extracted
+      date: '2026-10-04'
+    commit: 1ce8e2fc3db83962928fccf9b9d4c72fdb8b699e
 - source_id: deguzman-2026-simulant-physicochemical
   aliases: []
   citation: De Guzman, Alyssa Ang, Varghese, Anish Mathai, Alshalloudi, Saif, Kosca, Lance, Polychronopoulou,
