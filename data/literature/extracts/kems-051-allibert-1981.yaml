@@ -217,7 +217,8 @@ species:
       units: dimensionless activity
       values:
         quantity: activity
-        method_class: derived
+        method_class: measured_reduced
+        evidence_class: measured_reduced
         admission_status: admitted
         measurement_status: author_reported_activity_calculated_from_directly_measured_ion_intensity_ratios
         experimental_method: ion-comparison
@@ -328,7 +329,7 @@ species:
       - allibert_1981_table1_spectrometer_ion_conditions
       - allibert_1981_kems_ion_comparison_method
       derivation:
-        relation: author-published derived result
+        relation: 'CaO activity is reduced from the Ca+ and O+ ion-intensity ratios over the melt and CaO reference cell (Eqs. 1–2, 4, and 6–7, pp. 308–309); the paper states the activities were independently deduced from O+, Ca+, and Al+ intensities.'
         inputs: *id001
         output_unit: dimensionless activity
       inference:
@@ -917,7 +918,8 @@ species:
       units: dimensionless activity
       values:
         quantity: activity
-        method_class: derived
+        method_class: measured_reduced
+        evidence_class: measured_reduced
         admission_status: admitted
         measurement_status: author_reported_activity_calculated_from_directly_measured_ion_intensity_ratios
         experimental_method: ion-comparison
@@ -1027,7 +1029,7 @@ species:
       - allibert_1981_table1_spectrometer_ion_conditions
       - allibert_1981_kems_ion_comparison_method
       derivation:
-        relation: author-published derived result
+        relation: 'Al2O3 activity is reduced from the Al+ and O+ ion-intensity ratios over the melt and pure alpha-Al2O3 reference cell (Eqs. 1–2, 3, 5, and 8, pp. 308–309); the paper states the activities were independently deduced from O+, Ca+, and Al+ intensities.'
         inputs: *id006
         output_unit: dimensionless activity
       inference:
