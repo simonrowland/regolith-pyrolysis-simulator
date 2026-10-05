@@ -12950,24 +12950,7 @@ class Migrator:
                     coord, t_trail, t_original, point_locator
                 )
             }
-            if (
-                isinstance(raw_item, Mapping)
-                and len(t_sel.condition_ranges) > 0
-                and t_sel.condition_ranges[0][1] != t_sel.condition_ranges[0][2]
-                and q_token_point
-                in {
-                    Quantity.ACTIVITY_COEFFICIENT,
-                    Quantity.ACTIVITY_COEFFICIENT_TEMPERATURE_FIT,
-                }
-            ):
-                _range_name, lo, hi = t_sel.condition_ranges[0]
-                point_conditions["temperature_K"] = Located(
-                    State.of(
-                        _interval_selection(lo, hi, _range_name, {}, ()).value
-                    ),
-                    locator=point_locator,
-                )
-        elif (
+        if (
             isinstance(raw_item, Mapping)
             and t_sel.condition_ranges
             and q_token_point
@@ -12977,14 +12960,16 @@ class Migrator:
             }
         ):
             _range_name, lo, hi = t_sel.condition_ranges[0]
-            point_conditions = {
-                "temperature_K": Located(
-                    State.of(
-                        _interval_selection(lo, hi, _range_name, {}, ()).value
+            if coord is None or lo != hi:
+                point_conditions = {
+                    **(point_conditions or {}),
+                    "temperature_K": Located(
+                        State.of(
+                            _interval_selection(lo, hi, _range_name, {}, ()).value
+                        ),
+                        locator=point_locator,
                     ),
-                    locator=point_locator,
-                )
-            }
+                }
         lab_pc = point_lab_conditions(
             series_item=raw_item if isinstance(raw_item, Mapping) else None,
             equipment=equipment,
