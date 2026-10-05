@@ -7,7 +7,7 @@ from pathlib import Path
 import pytest
 import yaml
 
-from simulator.accounting.formulas import parse_formula
+from simulator.accounting.formulas import load_species_formulas, parse_formula
 from simulator.feedstock_composition import (
     bridge_trace_element_keys,
     feedstock_trace_oxide_bridge,
@@ -141,3 +141,12 @@ def test_every_manifest_parent_exists_after_load(feedstock_id: str) -> None:
         assert coverage[element] == "siderophile_in_metal_scope_gap"
         assert element in masses
         assert masses[element] > 0.0
+
+
+def test_bridged_parent_oxides_are_formula_registry_keys() -> None:
+    """Ledger load refuses a component that is not in the formula registry."""
+
+    registry = load_species_formulas(ROOT / "data" / "species_catalog.yaml")
+    for parent in LIQUID_PARENT_OXIDE.values():
+        assert parent in registry
+        assert dict(registry[parent].elements) == dict(parse_formula(parent).elements)
