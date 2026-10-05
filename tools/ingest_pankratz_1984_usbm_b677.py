@@ -899,7 +899,7 @@ def update_access_status(pdf_sha: str, record_count: int) -> None:
         "harvested_path": f"data/literature/compilations/{SOURCE_ID}/",
         "harvested_record_count": record_count,
         "source_pdf_sha256": pdf_sha,
-        "note": "Assessed thermodynamic reference tables; not measurements and never battery-scored.",
+        "note": "Assessed thermodynamic reference tables; not measurements; never in the measured tier (emitted as refused compilation-tier records).",
     }
     write_yaml(path, data)
 
