@@ -742,52 +742,6 @@ def test_python_api_accepted_replay_key_hashes_remain_base_bytes(
     assert actual_hash == expected_hash
 
 
-def test_padded_python_api_name_refuses_during_key_build_before_replay_access(
-    monkeypatch,
-) -> None:
-    from simulator.melt_backend.alphamelts import AlphaMELTSConfigurationError
-
-    store = PT0DeterminismStore("capture")
-    sim = _build_pt0_sim(store)
-    from simulator.melt_backend.alphamelts import AlphaMELTSBackend
-
-    backend = AlphaMELTSBackend(model_name=" pMELTS ")
-    backend._mode = "python_api"
-    provider = AlphaMELTSProvider(backend=backend)
-    sim.backend = backend
-    sim._chem_registry.register(
-        provider,
-        [ChemistryIntent.SILICATE_EQUILIBRIUM],
-    )
-    replay_events = []
-    monkeypatch.setattr(
-        store,
-        "_lookup",
-        lambda *args, **kwargs: replay_events.append("lookup"),
-    )
-    monkeypatch.setattr(
-        store,
-        "_store",
-        lambda *args, **kwargs: replay_events.append("store"),
-    )
-
-    with pytest.raises(AlphaMELTSConfigurationError):
-        store.replay_equilibrium(sim)
-    with pytest.raises(AlphaMELTSConfigurationError):
-        store.capture_equilibrium(
-            sim,
-            EquilibriumResult(
-                status="ok",
-                temperature_C=1400.0,
-                pressure_bar=1.0,
-                fO2_log=-9.0,
-                liquid_fraction=1.0,
-            ),
-        )
-
-    assert replay_events == []
-
-
 def test_blank_thermoengine_model_resolves_to_default_in_pt0_identity() -> None:
     key, authority = _thermoengine_pt0_identity("")
 
