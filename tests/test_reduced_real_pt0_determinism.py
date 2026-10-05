@@ -743,6 +743,48 @@ def test_python_api_accepted_replay_key_hashes_remain_base_bytes(
     assert actual_hash == expected_hash
 
 
+@pytest.mark.parametrize(
+    ("model", "expected_hash"),
+    [
+        (None, "1754e315cc016d162243334396a464d6caed842b252638f80cb532b0ffd7a088"),
+        ("", "b43e6955cdee10f871c8aaceaa9b45eea9524da6d6fc9449f252c9f463281dd9"),
+        (DEFAULT_ALPHAMELTS_MODEL, "7797a4c8de6ca270d6dd2118c5f22fe309175b95e991a70fb108a2a7f66d1645"),
+        ("pMELTS", "632a85c2c53b207343c5b33ff54275f4d610bedfdad9a9d4e2774dee4140f2c5"),
+        ("MELTSv1.1.0", "da91bc89b90ad478d80e727462027fcffa9fd12435c60126dbcb9ffb315249c6"),
+        ("MELTSv1.2.0", "faecc7fca96b82b0121c50de8a431908cfaaccfe79bbe154fee91d5b7135d982"),
+    ],
+)
+def test_cached_real_python_api_replay_key_hashes_remain_base_bytes(
+    tmp_path: Path,
+    model: str | None,
+    expected_hash: str,
+) -> None:
+    from simulator.backends import CachedRealBackend, normalize_cached_real_config
+
+    config = normalize_cached_real_config(
+        {
+            "db_path": str(tmp_path / "identity.db"),
+            "miss_policy": "fail-loud",
+            "authorized_backend_name": "alphamelts",
+            "authorized_mode": "python_api",
+            "authorized_model": model,
+        }
+    )
+    store = PT0DeterminismStore("capture")
+    sim = _build_pt0_sim(store)
+    sim.backend = CachedRealBackend(config=config)
+    sim._chem_registry.replace_for_test(
+        ChemistryIntent.SILICATE_EQUILIBRIUM,
+        None,
+    )
+
+    key = store._equilibrium_key(sim)
+    actual_hash = hashlib.sha256(rrd.canonical_json_bytes(key)).hexdigest()
+
+    # Base 05b6309d30cfed84d5e2ecd0467106d5702ce628 reviewer probe.
+    assert actual_hash == expected_hash
+
+
 def test_blank_thermoengine_model_resolves_to_default_in_pt0_identity() -> None:
     key, authority = _thermoengine_pt0_identity("")
 

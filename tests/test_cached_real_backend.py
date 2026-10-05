@@ -754,25 +754,16 @@ def test_cached_real_python_api_model_refuses_before_backend_or_store_access(
 
 
 @pytest.mark.parametrize(
-    ("model", "expected_identity", "expected_hash"),
+    ("model", "expected_identity"),
     [
-        (
-            None,
-            "None",
-            "1754e315cc016d162243334396a464d6caed842b252638f80cb532b0ffd7a088",
-        ),
-        (
-            "",
-            "",
-            "b43e6955cdee10f871c8aaceaa9b45eea9524da6d6fc9449f252c9f463281dd9",
-        ),
+        (None, "None"),
+        ("", ""),
     ],
 )
 def test_cached_real_blank_model_normalization_keeps_replay_identity(
     tmp_path: Path,
     model: str | None,
     expected_identity: str,
-    expected_hash: str,
 ) -> None:
     replay_config = _cache_config(
         tmp_path / "cached-real.db",
@@ -803,7 +794,6 @@ def test_cached_real_blank_model_normalization_keeps_replay_identity(
     assert normalized.authorized_model == expected_identity
     assert replay_backend.config.authorized_model == expected_identity
     assert replay_key["model"]["model"] == expected_identity
-    assert _key_hash(replay_key) == expected_hash
 
 
 @pytest.mark.parametrize(
