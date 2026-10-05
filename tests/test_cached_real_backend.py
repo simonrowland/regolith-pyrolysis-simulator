@@ -633,6 +633,84 @@ def test_cached_real_subprocess_unverified_model_refuses_before_identity(
         )
 
 
+@pytest.mark.parametrize(
+    "model",
+    [
+        " pMELTS ",
+        " \t ",
+        "not-a-model",
+        Path("pMELTS"),
+        pytest.param(
+            type("StringifiableModel", (), {"__str__": lambda self: "pMELTS"})(),
+            id="stringifiable",
+        ),
+    ],
+)
+def test_cached_real_python_api_model_refuses_before_backend_or_store_access(
+    tmp_path: Path,
+    monkeypatch,
+    model,
+) -> None:
+    constructed = []
+    events = []
+    original_init = CachedRealBackend.__init__
+
+    def track_init(self, **kwargs):
+        constructed.append(True)
+        original_init(self, **kwargs)
+
+    monkeypatch.setattr(CachedRealBackend, "__init__", track_init)
+    monkeypatch.setattr(
+        PT0DeterminismStore,
+        "_lookup",
+        lambda self, *args, **kwargs: (
+            events.append("lookup") or (_ for _ in ()).throw(PT0CacheMiss())
+        ),
+    )
+    monkeypatch.setattr(
+        PT0DeterminismStore,
+        "_store",
+        lambda self, *args, **kwargs: events.append("store"),
+    )
+    config = _cache_config(
+        tmp_path / "cached-real.db",
+        "fail-loud",
+        name="alphamelts",
+        family=RealBackendFamily.ALPHAMELTS,
+        mode="python_api",
+        model=model,
+    )
+
+    try:
+        backend = resolve_backend(
+            "cached-real",
+            BackendSelectionPolicy.RUNNER_STRICT,
+            cached_real_config=config,
+        )
+    except BackendUnavailableError as exc:
+        assert exc.reason_code == "invalid_run_input"
+    else:
+        # This is the reviewer's cached-real probe shape: use the real facade,
+        # public normalization, and public replay/capture entry points.
+        sim = _build_cached_real_sim(backend=backend, cache_config=config)
+        store = sim._pt0_store()
+        with pytest.raises(PT0CacheMiss):
+            store.replay_equilibrium(sim)
+        store.capture_equilibrium(
+            sim,
+            EquilibriumResult(
+                status="ok",
+                temperature_C=1400.0,
+                pressure_bar=1.0,
+                fO2_log=-9.0,
+                liquid_fraction=0.25,
+            ),
+        )
+
+    assert constructed == []
+    assert events == []
+
+
 @pytest.mark.parametrize("model", [None, ""])
 def test_cached_real_blank_model_normalization_keeps_replay_identity(
     tmp_path: Path,

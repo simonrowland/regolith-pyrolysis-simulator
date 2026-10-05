@@ -238,6 +238,95 @@ def test_petthermotools_resolver_is_the_model_code_owner() -> None:
 
 
 @pytest.mark.parametrize(
+    'model_name',
+    [Path('pMELTS'), pytest.param(object(), id='object')],
+)
+def test_petthermotools_resolver_rejects_non_string_models(model_name) -> None:
+    resolver = simulator_config.resolve_alphamelts_python_api_model
+
+    with pytest.raises(ValueError, match='not verified'):
+        resolver(model_name)
+
+
+def test_petthermotools_backend_uses_the_owner_resolved_code(monkeypatch) -> None:
+    backend = AlphaMELTSBackend(model_name='pMELTS')
+    backend._import_petthermotools = lambda: object()
+    backend._preload_petthermotools_payload = lambda _module: None
+
+    class VaporHelper:
+        def initialize(self, _config):
+            pass
+
+        def is_available(self):
+            return True
+
+    backend._vaporock_helper = VaporHelper()
+    monkeypatch.setattr(
+        'simulator.melt_backend.alphamelts.resolve_alphamelts_python_api_model',
+        lambda model: (model, 73),
+    )
+
+    class Worker:
+        def start(self):
+            pass
+
+        def close(self):
+            pass
+
+    monkeypatch.setattr(
+        'simulator.melt_backend.alphamelts.WarmEngineWorker',
+        lambda **_kwargs: Worker(),
+    )
+
+    assert backend.initialize({'mode': 'python_api', 'warm_worker': True})
+    assert backend._melts_model_code() == 73
+
+
+@pytest.mark.parametrize(
+    'model_name',
+    [
+        ' pMELTS ',
+        ' \t ',
+        'not-a-model',
+        Path('pMELTS'),
+        pytest.param(
+            type('StringifiableModel', (), {'__str__': lambda self: 'pMELTS'})(),
+            id='stringifiable',
+        ),
+    ],
+)
+def test_python_api_initialization_refuses_raw_model_before_worker_creation(
+    monkeypatch,
+    model_name,
+) -> None:
+    backend = AlphaMELTSBackend(model_name=model_name)
+    imports = []
+    workers = []
+    backend._import_petthermotools = lambda: imports.append(True) or object()
+    backend._preload_petthermotools_payload = lambda _module: None
+
+    class VaporHelper:
+        def initialize(self, _config):
+            pass
+
+        def is_available(self):
+            return True
+
+    backend._vaporock_helper = VaporHelper()
+    monkeypatch.setattr(
+        'simulator.melt_backend.alphamelts.WarmEngineWorker',
+        lambda **kwargs: workers.append(kwargs),
+    )
+
+    with pytest.raises(AlphaMELTSConfigurationError):
+        backend.initialize({'mode': 'python_api', 'warm_worker': True})
+
+    assert workers == []
+    assert backend._mode is None
+    assert backend._pet_worker is None
+
+
+@pytest.mark.parametrize(
     'model_name', [' MELTSv1.0.2 ', ' pMELTS ', 'MELTSv1.1.0 ', ' \t ']
 )
 @pytest.mark.parametrize(
