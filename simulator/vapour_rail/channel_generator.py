@@ -7,6 +7,7 @@ into the production catalog.
 
 from __future__ import annotations
 
+import math
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any, Mapping
@@ -19,6 +20,7 @@ from simulator.vapour_rail.source_rail import (
     SourceRail,
     SourceRailRecord,
     load_source_rail,
+    supercooled_liquid_from_crystal,
 )
 from simulator.vapour_rail.stoich import (
     balance_oxide_evaporation,
@@ -136,6 +138,24 @@ def _foreign_atoms(element: str, formula: str) -> frozenset[str]:
     return frozenset(symbol for symbol in atoms if symbol not in {element, "O"})
 
 
+def _extend_parent_liquid(
+    rail: SourceRail, parent_oxide: str, liquid: SourceRailRecord
+) -> SourceRailRecord:
+    """Use the same-source crystal that ends at Tm to extend the liquid."""
+    if liquid.evaluator_family not in {"nasa_cea_7", "nasa_cea_9"}:
+        return liquid
+    solids = [
+        record
+        for record in rail.records_for(parent_oxide, "condensed_solid")
+        if record.source_id == liquid.source_id
+        and math.isclose(record.T_max_K, liquid.T_min_K, abs_tol=1e-4)
+    ]
+    if len(solids) != 1:
+        return liquid
+    extended = supercooled_liquid_from_crystal(liquid, solids[0])
+    return extended if extended is not None else liquid
+
+
 def _intersection_band(
     records: Mapping[str, SourceRailRecord]
 ) -> tuple[float, float] | None:
@@ -183,6 +203,11 @@ def _four_strata_family(
                     "source_bands_K": {
                         key: [low, high] for key, (low, high) in bands_K.items()
                     },
+                    "liquid_parent_extension": bool(
+                        species_thermo.get(f"{parent_oxide}(l)", {}).get(
+                            "supercooled_liquid_extension"
+                        )
+                    ),
                     "validation": {
                         "status": "pending_validation",
                         "certification_ceiling": "never",
@@ -345,7 +370,11 @@ def generate_element_channels(
             continue
         _source_id, chosen = selected
         records = {
-            f"{parent_oxide}(l)": chosen[(parent_oxide, "condensed_liquid")],
+            f"{parent_oxide}(l)": _extend_parent_liquid(
+                source_rail,
+                parent_oxide,
+                chosen[(parent_oxide, "condensed_liquid")],
+            ),
             f"{strip_phase(formula)}(g)": chosen[(strip_phase(formula), "gas")],
         }
         if uses_o2:

@@ -23,6 +23,7 @@ from simulator.vapour_rail.source_rail import (
     compare_g_over_overlap,
     convert_gas_g_j_per_mol,
     load_source_rail,
+    supercooled_liquid_from_crystal,
 )
 from simulator.vapour_rail.stoich import CATALOG_DERIVED_STOICH_SPECIES
 from simulator.vapour_rail.tabulated_gibbs import (
@@ -244,6 +245,48 @@ def test_two_source_formation_gibbs_residuals_on_common_basis(source_rail) -> No
             assert abs(residual_kJ) < 5.0, line
     print("\n".join(reported))
     assert len(reported) == 30
+
+
+def test_supercooled_ga2o3_meets_the_liquid_and_reaches_below_tm(source_rail) -> None:
+    liquid = _record_by_source(
+        source_rail.records_for("Ga2O3", "condensed_liquid"), "nasa-glenn"
+    )
+    crystal = _record_by_source(
+        source_rail.records_for("Ga2O3", "condensed_solid"), "nasa-glenn"
+    )
+    extended = supercooled_liquid_from_crystal(liquid, crystal)
+    assert extended is not None
+    assert extended.species_thermo["supercooled_liquid_extension"] is True
+    assert extended.species_thermo["supercooled_crystal_record_id"] == crystal.record_id
+    assert extended.T_min_K == pytest.approx(crystal.T_min_K)
+    assert extended.T_min_K < 2080.0
+    tm = liquid.T_min_K
+    liquid_native = liquid.thermo.native
+    crystal_native = crystal.thermo.native
+    extended_native = extended.thermo.native
+    assert extended_native.evaluate(tm).g_J_per_mol == pytest.approx(
+        liquid_native.evaluate(tm).g_J_per_mol, rel=0.0, abs=1e-6
+    )
+    crystal_side = next(
+        seg for seg in extended_native.segments if math.isclose(seg.T_max_K, tm)
+    )
+    _cp, _h, _s, g_over_rt = crystal_side.evaluate_ratios(tm)
+    assert g_over_rt * R_J_PER_MOL_K * tm == pytest.approx(
+        liquid_native.evaluate(tm).g_J_per_mol, rel=0.0, abs=1e-4
+    )
+
+    def extension_offset(temperature_K: float) -> float:
+        return (
+            extended_native.evaluate(temperature_K).g_J_per_mol
+            - crystal_native.evaluate(temperature_K).g_J_per_mol
+        )
+
+    step = 50.0
+    offsets = [extension_offset(tm - step * i) for i in (1, 2, 3)]
+    assert offsets[0] - offsets[1] == pytest.approx(
+        offsets[1] - offsets[2], rel=0.0, abs=1e-4
+    )
+    assert math.isfinite(extended.thermo.evaluate(1000.0).g_J_per_mol)
 
 
 def test_nasa_si_reference_is_crystal_inside_condensed_coverage(source_rail) -> None:

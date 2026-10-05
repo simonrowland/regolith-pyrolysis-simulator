@@ -111,6 +111,29 @@ def test_preferred_carrier_table_matches_steer() -> None:
     assert PREFERRED_CARRIERS["V"] == ("VO2", "VO")
 
 
+def _channel_domain(channel) -> list[float]:
+    species = channel.family["physical_properties"]["species"][channel.species_id]
+    return species["pressure_models"][0]["valid_domain"]["temperature_K"]
+
+
+def test_generated_domains_contain_the_furnace_window(generated_batch) -> None:
+    assert len(generated_batch.channels) == 45
+    for channel in generated_batch.channels:
+        low, high = _channel_domain(channel)
+        assert low < 1600.0 < high, (channel.species_id, low, high)
+    by_key = {
+        (channel.element, channel.carrier): channel
+        for channel in generated_batch.channels
+    }
+    ga = by_key[("Ga", "Ga")]
+    assert _channel_domain(ga)[0] < 2080.0
+    assert ga.family["physical_properties"]["species"][ga.species_id][
+        "liquid_parent_extension"
+    ] is True
+    assert _channel_domain(by_key[("In", "In")])[0] < 2186.0
+    assert _channel_domain(by_key[("V", "V")])[0] < 2230.0
+
+
 def test_generated_channels_use_one_source_per_reaction(generated_batch) -> None:
     for channel in generated_batch.channels:
         sources = set(channel.selected_sources.values())

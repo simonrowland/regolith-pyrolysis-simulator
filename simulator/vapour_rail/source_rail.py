@@ -704,6 +704,138 @@ def _nasa9_from_document(document: Mapping[str, Any]) -> NasaCeaPolynomial | Non
         return None
 
 
+def _unwrap_native(record: SourceRailRecord) -> Any:
+    thermo = record.thermo
+    if isinstance(thermo, FormationGibbsThermo):
+        return thermo.native
+    return thermo
+
+
+def supercooled_liquid_from_crystal(
+    liquid: SourceRailRecord, crystal: SourceRailRecord
+) -> SourceRailRecord | None:
+    """Extend a liquid polynomial below Tm with the joining crystal.
+
+    G_ext(T) = G_cr(T) + ΔH − T ΔS, with ΔH chosen so G_ext meets G_liquid
+    at Tm and ΔS = (H_liquid − H_crystal) / Tm. The liquid segments are
+    copied unchanged. The result is flagged ``supercooled_liquid_extension``.
+    """
+    liquid_native = _unwrap_native(liquid)
+    crystal_native = _unwrap_native(crystal)
+    if not isinstance(liquid_native, NasaCeaPolynomial):
+        return None
+    if not isinstance(crystal_native, NasaCeaPolynomial):
+        return None
+    if liquid_native.family != crystal_native.family:
+        return None
+    if liquid.source_id != crystal.source_id:
+        return None
+    t_liquid = float(liquid_native.T_min_K)
+    t_crystal = float(crystal_native.T_max_K)
+    if not math.isclose(t_crystal, t_liquid, abs_tol=1e-4):
+        return None
+    try:
+        state_l = liquid_native.evaluate(t_liquid)
+        state_c = crystal_native.evaluate(t_crystal)
+    except NasaCeaError:
+        return None
+    enthalpy_shift = (float(state_l.h_J_per_mol) - float(state_c.h_J_per_mol)) + (
+        float(state_l.g_J_per_mol) - float(state_c.g_J_per_mol)
+    )
+    entropy_shift = (
+        float(state_l.h_J_per_mol) - float(state_c.h_J_per_mol)
+    ) / t_liquid
+    b1_shift = enthalpy_shift / R_J_PER_MOL_K
+    b2_shift = entropy_shift / R_J_PER_MOL_K
+    shifted: list[Any] = []
+    crystal_segments = list(crystal_native.segments)
+    try:
+        for index, seg in enumerate(crystal_segments):
+            t_max = t_liquid if index == len(crystal_segments) - 1 else seg.T_max_K
+            if isinstance(seg, Nasa9Segment):
+                shifted.append(
+                    Nasa9Segment(
+                        seg.T_min_K,
+                        t_max,
+                        seg.coefficients,
+                        seg.b1 + b1_shift,
+                        seg.b2 + b2_shift,
+                        seg.exponents,
+                    )
+                )
+            elif isinstance(seg, Nasa7Segment):
+                coeffs = list(seg.coefficients)
+                coeffs[5] = float(coeffs[5]) + b1_shift
+                coeffs[6] = float(coeffs[6]) + b2_shift
+                shifted.append(
+                    Nasa7Segment(
+                        seg.T_min_K,
+                        t_max,
+                        tuple(float(c) for c in coeffs),  # type: ignore[arg-type]
+                    )
+                )
+            else:
+                return None
+        poly = NasaCeaPolynomial(
+            name=liquid_native.name,
+            family=liquid_native.family,
+            standard_state=liquid_native.standard_state,
+            segments=tuple(shifted) + tuple(liquid_native.segments),
+            formula=liquid_native.formula,
+            delta_f_H_298_15_J_per_mol=liquid_native.delta_f_H_298_15_J_per_mol,
+            citation=liquid_native.citation,
+            reference_pressure_Pa=liquid_native.reference_pressure_Pa,
+        )
+    except NasaCeaError:
+        return None
+    species_thermo = dict(liquid.species_thermo)
+    if poly.family == "nasa_cea_9":
+        species_thermo["segments"] = [
+            {
+                "T_min_K": seg.T_min_K,
+                "T_max_K": seg.T_max_K,
+                "a_coefficients": list(seg.coefficients),
+                "b1": seg.b1,
+                "b2": seg.b2,
+            }
+            for seg in poly.segments
+            if isinstance(seg, Nasa9Segment)
+        ]
+    else:
+        species_thermo["segments"] = [
+            {
+                "T_min_K": seg.T_min_K,
+                "T_max_K": seg.T_max_K,
+                "coefficients": list(seg.coefficients),
+            }
+            for seg in poly.segments
+        ]
+    species_thermo["supercooled_liquid_extension"] = True
+    species_thermo["melting_temperature_K"] = t_liquid
+    species_thermo["supercooled_crystal_record_id"] = crystal.record_id
+    thermo: Any = poly
+    if isinstance(liquid.thermo, FormationGibbsThermo):
+        thermo = FormationGibbsThermo(
+            native=poly, formula=liquid.formula, index=liquid.thermo.index
+        )
+    return SourceRailRecord(
+        source_id=liquid.source_id,
+        record_id=liquid.record_id,
+        formula=liquid.formula,
+        native_phase=liquid.native_phase,
+        standard_state=liquid.standard_state,
+        T_min_K=float(poly.T_min_K),
+        T_max_K=float(poly.T_max_K),
+        native_reference_pressure_Pa=liquid.native_reference_pressure_Pa,
+        reference_pressure_Pa=liquid.reference_pressure_Pa,
+        evaluator_family=liquid.evaluator_family,
+        thermo=thermo,
+        species_thermo=species_thermo,
+        gibbs_convention=liquid.gibbs_convention,
+        native_gibbs_convention=liquid.native_gibbs_convention,
+    )
+
+
 def _species_thermo_from_nasa9(
     poly: NasaCeaPolynomial, document: Mapping[str, Any]
 ) -> dict[str, Any]:
