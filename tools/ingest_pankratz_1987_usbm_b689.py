@@ -93,6 +93,74 @@ def _note_blocks(items, table_index):
     return blocks
 
 
+def _record_from_audit(audit, items, fixture):
+    pg = audit["pdf_page"]
+    table_index = audit.get("table_index")
+    if table_index is None:
+        table_index = next(i for i, x in enumerate(items) if x["type"] == "table")
+    table = items[table_index]
+    raw_rows = _rows(table["table_body"])
+    verified_rows = fixture["complete_numeric_pages"].get(str(pg))
+    if verified_rows is not None and raw_rows[2:] != verified_rows:
+        raise ValueError(f"PDF{pg}: numeric transcription differs from independent image fixture")
+    if any(len(row) != 8 for row in raw_rows[2:]):
+        raise ValueError(f"PDF{pg}: row needs image adjudication")
+    candidates = _identity_candidates(items, table_index)
+    corrections = []
+    if audit["status"] == "corrected":
+        corrections.append({"record_id": audit["record_id"], "printed_page": audit["printed_page"],
+                            "pdf_page": pg, "kind": audit["correction_kind"],
+                            "field": "substance_identity", "ocr_token": candidates,
+                            "printed_token": audit["formula_as_published"] + " / " + audit["name_as_published"],
+                            "image_quote": audit["printed_quote"], "image_evidence": audit["image_evidence"]})
+    rows = [{"source_row_index": i, "raw": row,
+             "cells": {column: _cell(token, verified_rows is not None) for column, token in zip(COLUMNS, row)}}
+            for i, row in enumerate(raw_rows[2:], 2)]
+    flags = _structure_detectors(items, table_index) + _numeric_detectors(rows)
+    for correction in fixture["numeric_corrections"]:
+        if correction["record_id"] != audit["record_id"]:
+            continue
+        row = next(r for r in rows if r["source_row_index"] == correction["source_row_index"])
+        cell = row["cells"][correction["column"]]
+        if cell["raw"] != correction["ocr_token"]:
+            raise ValueError(f"stale numeric correction: {correction}")
+        row["cells"][correction["column"]] = {
+            **_cell(correction["printed_token"], True), "raw_ocr_token": cell["raw"]}
+        corrections.append({**correction, "image_evidence": audit["image_evidence"]})
+    note_blocks = _note_blocks(items, table_index)
+    notes = parse_note_block("\n".join(note_blocks))
+    notes["blocks_raw"] = note_blocks
+    notes["equation_transcription_status"] = "raw_ocr_only"
+    metadata_unverified = audit["status"] == "unverified"
+    ambiguities = flags + notes["ambiguities"]
+    if verified_rows is None:
+        ambiguities.append({"kind": "numeric_cells_not_image_verified"})
+    if metadata_unverified:
+        ambiguities.append({"kind": "unverified_printed_identity", "raw": audit["printed_quote"]})
+    table_kind = audit.get("table_kind") or ("formation" if "Log Kf" in table["table_body"] else "reaction")
+    return {
+        "record_id": audit["record_id"], "record_kind": audit["record_kind"],
+        "formula": audit["formula"], "formula_as_published": audit["formula_as_published"],
+        "name_as_published": audit["name_as_published"], "phase": audit["phase"],
+        "metadata_ocr_token": candidates, "metadata_ocr_suspect": metadata_unverified,
+        "printed_page": audit["printed_page"], "pdf_page": pg,
+        "source_ref": {"path": "source/mineru-pages.jsonl", "line": pg, "item_index": table_index},
+        "source_heading_raw": table.get("table_caption", []),
+        "table_kind": table_kind,
+        "header_rows_raw": raw_rows[:2], "columns": list(COLUMNS), "units": dict(zip(COLUMNS, UNITS)),
+        "rows": rows, "row_count": len(rows), "notes": notes,
+        "structural_records": [{"record_kind": x["type"], "printed_form_ocr": x.get("text", "")}
+                               for x in items if x["type"] in {"header", "page_number", "footer"}],
+        "corrections": corrections, "ambiguities": ambiguities,
+        "transcription_status": "native_table_transcribed_with_explicit_ocr_coverage",
+    }
+
+
+def _records_from_audits(audits, pages_by_pdf, fixture):
+    return [_record_from_audit(audit, pages_by_pdf[audit["pdf_page"]]["items"], fixture)
+            for audit in audits]
+
+
 def build(corpus):
     pdf = corpus / "raw" / SOURCE_ID / f"{SOURCE_ID}.pdf"
     sidecar = yaml.safe_load((pdf.parent / "sidecar.yaml").read_text())
@@ -124,67 +192,8 @@ def build(corpus):
     source = {"database": "U.S. Bureau of Mines Bulletin 689", "version": "1987",
               "citation": sidecar["citation"], "official_url": "https://digital.library.unt.edu/ark:/67531/metadc38801/",
               "retrieved_url": sidecar["retrieved_url"], "licence": sidecar["licence"], "access_date": "2026-09-12"}
-    records = []
-    for audit in audits:
-        pg = audit["pdf_page"]
-        items = pages[pg - 1]["items"]
-        table_index = next(i for i, x in enumerate(items) if x["type"] == "table")
-        table = items[table_index]
-        raw_rows = _rows(table["table_body"])
-        verified_rows = fixture["complete_numeric_pages"].get(str(pg))
-        if verified_rows is not None and raw_rows[2:] != verified_rows:
-            raise ValueError(f"PDF{pg}: numeric transcription differs from independent image fixture")
-        if any(len(row) != 8 for row in raw_rows[2:]):
-            raise ValueError(f"PDF{pg}: row needs image adjudication")
-        candidates = _identity_candidates(items, table_index)
-        corrections = []
-        if audit["status"] == "corrected":
-            corrections.append({"record_id": audit["record_id"], "printed_page": audit["printed_page"],
-                                "pdf_page": pg, "kind": audit["correction_kind"],
-                                "field": "substance_identity", "ocr_token": candidates,
-                                "printed_token": audit["formula_as_published"] + " / " + audit["name_as_published"],
-                                "image_quote": audit["printed_quote"], "image_evidence": audit["image_evidence"]})
-        rows = [{"source_row_index": i, "raw": row,
-                 "cells": {column: _cell(token, verified_rows is not None) for column, token in zip(COLUMNS, row)}}
-                for i, row in enumerate(raw_rows[2:], 2)]
-        flags = _structure_detectors(items, table_index) + _numeric_detectors(rows)
-        for correction in fixture["numeric_corrections"]:
-            if correction["record_id"] != audit["record_id"]:
-                continue
-            row = next(r for r in rows if r["source_row_index"] == correction["source_row_index"])
-            cell = row["cells"][correction["column"]]
-            if cell["raw"] != correction["ocr_token"]:
-                raise ValueError(f"stale numeric correction: {correction}")
-            row["cells"][correction["column"]] = {
-                **_cell(correction["printed_token"], True), "raw_ocr_token": cell["raw"]}
-            corrections.append({**correction, "image_evidence": audit["image_evidence"]})
-        note_blocks = _note_blocks(items, table_index)
-        notes = parse_note_block("\n".join(note_blocks))
-        notes["blocks_raw"] = note_blocks
-        # Equations remain in their native OCR representation, never executable coefficients.
-        notes["equation_transcription_status"] = "raw_ocr_only"
-        metadata_unverified = audit["status"] == "unverified"
-        ambiguities = flags + notes["ambiguities"]
-        if verified_rows is None:
-            ambiguities.append({"kind": "numeric_cells_not_image_verified"})
-        if metadata_unverified:
-            ambiguities.append({"kind": "unverified_printed_identity", "raw": audit["printed_quote"]})
-        records.append({
-            "record_id": audit["record_id"], "record_kind": audit["record_kind"],
-            "formula": audit["formula"], "formula_as_published": audit["formula_as_published"],
-            "name_as_published": audit["name_as_published"], "phase": audit["phase"],
-            "metadata_ocr_token": candidates, "metadata_ocr_suspect": metadata_unverified,
-            "printed_page": audit["printed_page"], "pdf_page": pg,
-            "source_ref": {"path": "source/mineru-pages.jsonl", "line": pg, "item_index": table_index},
-            "source_heading_raw": table.get("table_caption", []),
-            "table_kind": "formation" if "Log Kf" in table["table_body"] else "reaction",
-            "header_rows_raw": raw_rows[:2], "columns": list(COLUMNS), "units": dict(zip(COLUMNS, UNITS)),
-            "rows": rows, "row_count": len(rows), "notes": notes,
-            "structural_records": [{"record_kind": x["type"], "printed_form_ocr": x.get("text", "")}
-                                   for x in items if x["type"] in {"header", "page_number", "footer"}],
-            "corrections": corrections, "ambiguities": ambiguities,
-            "transcription_status": "native_table_transcribed_with_explicit_ocr_coverage",
-        })
+    pages_by_pdf = {page["pdf_page"]: page for page in pages}
+    records = _records_from_audits(audits, pages_by_pdf, fixture)
     entries = []
     for record in records:
         entries.append({**{k: record[k] for k in ("record_id", "record_kind", "formula", "formula_as_published",
