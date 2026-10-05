@@ -754,6 +754,55 @@ def test_cached_real_python_api_model_refuses_before_backend_or_store_access(
 
 
 @pytest.mark.parametrize(
+    "model",
+    [None, "", "MELTSv1.0.2", "pMELTS", "MELTSv1.1.0", "MELTSv1.2.0"],
+)
+def test_cached_real_python_api_model_normalization_round_trip_is_idempotent(
+    tmp_path: Path,
+    model: str | None,
+) -> None:
+    raw_config = _cache_config(
+        tmp_path / "cached-real.db",
+        "fail-loud",
+        name="alphamelts",
+        mode="python_api",
+        model=model,
+    )
+    raw_config["authorized_model"] = model
+
+    normalized = normalize_cached_real_config(raw_config)
+    normalized_again = normalize_cached_real_config(normalized)
+    backend = resolve_backend(
+        "cached-real",
+        BackendSelectionPolicy.RUNNER_STRICT,
+        cached_real_config=normalized_again,
+    )
+
+    assert normalized_again == normalized
+    assert backend.config.authorized_model == normalized.authorized_model
+
+
+def test_cached_real_python_api_literal_none_model_is_refused(tmp_path: Path) -> None:
+    config = _cache_config(
+        tmp_path / "cached-real.db",
+        "fail-loud",
+        name="alphamelts",
+        mode="python_api",
+        model="None",
+    )
+    config["authorized_model"] = "None"
+
+    with pytest.raises(BackendUnavailableError) as exc_info:
+        resolve_backend(
+            "cached-real",
+            BackendSelectionPolicy.RUNNER_STRICT,
+            cached_real_config=config,
+        )
+
+    assert exc_info.value.reason_code == "invalid_run_input"
+
+
+@pytest.mark.parametrize(
     ("model", "expected_identity", "expected_key_model"),
     [
         (
