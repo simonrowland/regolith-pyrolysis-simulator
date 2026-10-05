@@ -9,13 +9,13 @@ scan:
   - hunt_ids column empty; --hunt-json not provided
   corpus_root: /Users/simonrowland/Repos/regolith-corpus
 counts:
-  sources: 281
-  extracts: 279
+  sources: 285
+  extracts: 283
   pdfs_present_in_worktree: 0
   extracts_with_private_locators: 60
   pdfs_tracked_99_kems_langmuir: 0
   pdfs_without_extract: 0
-  extracts_without_pdf: 279
+  extracts_without_pdf: 283
   alias_groups_needing_resolution: 41
 gaps:
   pdfs_without_extract: []
@@ -260,6 +260,10 @@ gaps:
   - sf04-magma-companion-workbook
   - shornikov-1994-mullite-kems
   - shornikov-1997-cao-alumina-vapor
+  - shornikov-2000-cao-silica-vaporization
+  - shornikov-2007-cao-aluminosilicate-melts
+  - shornikov-2021-mgo-feo-silicate
+  - shornikov-2025-saratov-alkali-evaporation
   - slag-001-banya-1993
   - slag-002-banya-hino-nagasaka-1993
   - slag-003-hino-kitagawa-banya-1993
@@ -14755,6 +14759,239 @@ sources:
       last_stage: null
       date: null
     commit: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
+- source_id: shornikov-2000-cao-silica-vaporization
+  aliases: []
+  citation: Shornikov, S. I., and Archakov, I. Yu. (2000). Mass Spectrometric Study of Phase Relations
+    and Vaporization Processes in the CaO–SiO2 System. Glastech. Ber. Glass Sci. Technol., 73 C2, 51–57.
+  doi: null
+  report_number: null
+  identifier: null
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
+  extracts:
+  - path: data/literature/extracts/shornikov-2000-cao-silica-vaporization.yaml
+    review_status: draft
+    rows: 0
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/shornikov-2000-cao-silica-vaporization/shornikov-2000-cao-silica-vaporization.pdf
+      present: true
+      sha256: 3a1ed0b83c7b6b4be8dbe8b249128e4b446acc6d0f9b8cf4da9db3eb7091e04e
+      matches_simulator: null
+    sidecar:
+      path: raw/shornikov-2000-cao-silica-vaporization/sidecar.yaml
+      present: true
+    text:
+      path: text/shornikov-2000-cao-silica-vaporization
+      exists: true
+      file_count: 3
+    tables:
+      path: tables/shornikov-2000-cao-silica-vaporization
+      exists: false
+      file_count: 0
+    extract:
+      path: extracts/shornikov-2000-cao-silica-vaporization.yaml
+      present: true
+      matches_simulator: true
+    ledger:
+      path: ledger/shornikov-2000-cao-silica-vaporization.yaml
+      present: true
+      error: null
+      last_stage: extracted
+      date: '2026-10-04'
+    commit: 1ce8e2fc3db83962928fccf9b9d4c72fdb8b699e
+- source_id: shornikov-2007-cao-aluminosilicate-melts
+  aliases: []
+  citation: Shornikov, S. I. (2007), Thermodynamic properties of CaO-Al2O3-SiO2 melts, Experiment in Geosciences
+    14(1):35-37.
+  doi: null
+  report_number: null
+  identifier: null
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
+  extracts:
+  - path: data/literature/extracts/shornikov-2007-cao-aluminosilicate-melts.yaml
+    review_status: draft
+    rows: 6
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/shornikov-2007-cao-aluminosilicate-melts/shornikov-2007-cao-aluminosilicate-melts.pdf
+      present: true
+      sha256: 9822bdf342023a55d81701b7f9977271126e900897b7e46e3e1be27545d142a0
+      matches_simulator: null
+    sidecar:
+      path: raw/shornikov-2007-cao-aluminosilicate-melts/sidecar.yaml
+      present: true
+    text:
+      path: text/shornikov-2007-cao-aluminosilicate-melts
+      exists: true
+      file_count: 3
+    tables:
+      path: tables/shornikov-2007-cao-aluminosilicate-melts
+      exists: true
+      file_count: 2
+    extract:
+      path: extracts/shornikov-2007-cao-aluminosilicate-melts.yaml
+      present: true
+      matches_simulator: true
+    ledger:
+      path: ledger/shornikov-2007-cao-aluminosilicate-melts.yaml
+      present: true
+      error: null
+      last_stage: extracted
+      date: '2026-10-04'
+    commit: 1ce8e2fc3db83962928fccf9b9d4c72fdb8b699e
+- source_id: shornikov-2021-mgo-feo-silicate
+  aliases: []
+  citation: Shornikov, S. I., Ivanova, M. A., and Minaeva, M. S. (2021), Thermodynamic Properties of the
+    MgO–FeO–SiO2 Melts, Experiment in Geosciences 27(1):67–69.
+  doi: null
+  report_number: null
+  identifier: null
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
+  extracts:
+  - path: data/literature/extracts/shornikov-2021-mgo-feo-silicate.yaml
+    review_status: draft
+    rows: 0
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/shornikov-2021-mgo-feo-silicate/shornikov-2021-mgo-feo-silicate.pdf
+      present: true
+      sha256: 6e3e55953c0c8138920aaa81cded6552ea58f8bbea41a4a874310a2aa9a7afa4
+      matches_simulator: null
+    sidecar:
+      path: raw/shornikov-2021-mgo-feo-silicate/sidecar.yaml
+      present: true
+    text:
+      path: text/shornikov-2021-mgo-feo-silicate
+      exists: true
+      file_count: 3
+    tables:
+      path: tables/shornikov-2021-mgo-feo-silicate
+      exists: false
+      file_count: 0
+    extract:
+      path: extracts/shornikov-2021-mgo-feo-silicate.yaml
+      present: true
+      matches_simulator: true
+    ledger:
+      path: ledger/shornikov-2021-mgo-feo-silicate.yaml
+      present: true
+      error: null
+      last_stage: extracted
+      date: '2026-10-04'
+    commit: 1ce8e2fc3db83962928fccf9b9d4c72fdb8b699e
+- source_id: shornikov-2025-saratov-alkali-evaporation
+  aliases: []
+  citation: Shornikov, S., and Yakovlev, O. (2025). Evaporation of Alkaline Components (Na2O and K2O)
+    from the Chondrule Melts of the Saratov Chondrite (L4). In Advances in Ceramic Materials and Processing,
+    chapter 23, pp. 113–118.
+  doi: 10.1007/978-3-031-87558-8_23
+  report_number: null
+  identifier: 10.1007/978-3-031-87558-8_23
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
+  extracts:
+  - path: data/literature/extracts/shornikov-2025-saratov-alkali-evaporation.yaml
+    review_status: draft
+    rows: 2
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/shornikov-2025-saratov-alkali-evaporation/shornikov-2025-saratov-alkali-evaporation.pdf
+      present: true
+      sha256: 60790b61f867e2fbee22478d375c2f754c54cead52210bac84ec1152cc62b768
+      matches_simulator: null
+    sidecar:
+      path: raw/shornikov-2025-saratov-alkali-evaporation/sidecar.yaml
+      present: true
+    text:
+      path: text/shornikov-2025-saratov-alkali-evaporation
+      exists: true
+      file_count: 9
+    tables:
+      path: tables/shornikov-2025-saratov-alkali-evaporation
+      exists: false
+      file_count: 0
+    extract:
+      path: extracts/shornikov-2025-saratov-alkali-evaporation.yaml
+      present: true
+      matches_simulator: true
+    ledger:
+      path: ledger/shornikov-2025-saratov-alkali-evaporation.yaml
+      present: true
+      error: null
+      last_stage: extracted
+      date: '2026-10-04'
+    commit: 1ce8e2fc3db83962928fccf9b9d4c72fdb8b699e
 - source_id: slag-001-banya-1993
   aliases: []
   citation: Ban-Ya, Shiro (1993), "Mathematical Expression of Slag-Metal Reactions in Steelmaking Process
