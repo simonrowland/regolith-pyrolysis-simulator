@@ -3025,8 +3025,8 @@ observations:
     original_method_class: measured_direct
     attribution: 0.811 1173 0.745 0.737 2.50×10-15 2.47×10-13
   admission:
-    status: rejected
-    reason: probable source misprint
+    status: admitted
+    reason: source admission_status=admitted
     decided_by:
       worker: fix-deep-ms2000
       date: '2026-09-06'
@@ -3040,11 +3040,6 @@ observations:
     affected_quantities:
     - activity
     reason: normalized melt/reference comparison records cancellation of the common Knudsen-cell constant
-    origin: kems-ms2000-044::ms2000_044_k2o_activity_xsio2_0811_t1173_class_quote_r2
-  - kind: probable_source_misprint
-    affected_quantities:
-    - activity
-    reason: probable source misprint
     origin: kems-ms2000-044::ms2000_044_k2o_activity_xsio2_0811_t1173_class_quote_r2
   source_id: kems-ms2000-044
   locator:

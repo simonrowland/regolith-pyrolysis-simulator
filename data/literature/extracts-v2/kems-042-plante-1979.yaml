@@ -81193,6 +81193,15 @@ observations:
         table: '2'
         note: Series 1123, row 4; columns T,K | Wt % K2O | P_K(atm).
   notices:
+  - kind: source_disagreement
+    affected_quantities:
+    - p_partial
+    reason: 'source_internally_inconsistent: Series 1123 Table 2 prints 24.46 wt% K2O with P_K=2.64E-6 atm at 1469 K. Table
+      3 eq. (6) is log10(P_K/atm)=4.721-15624/T+9.32N^2, where N=x(K2O). Using the printed 24.46 wt% gives N=(24.46/94.196)/((24.46/94.196)+
+      (75.54/60.0843))=0.171185, so T=1469 K predicts log10(P_K/atm)= -5.64169 and P_K=2.282E-6 atm versus the printed 2.64E-6
+      atm. Inverting the printed pressure gives N=0.18999 or 26.89 wt% K2O, but this fit is not a corrected cell; the neighboring
+      printed 26.48 and 26.40 wt% suggest the isolated 24.46 is likely about 26.4-26.5 wt%.'
+    origin: kems-042-plante-1979::plante1979_table2_s1123_r004_quoted
   - kind: pressure_provenance_unknown
     affected_quantities:
     - p_partial
@@ -84493,6 +84502,13 @@ observations:
         table: '2'
         note: Series 1123, row 14; columns T,K | Wt % K2O | P_K(atm).
   notices:
+  - kind: source_disagreement
+    affected_quantities:
+    - p_partial
+    reason: 'source_internally_inconsistent: Series 1123 Table 2 prints P_K=1.67E-7 atm at 1451 K and 24.18 wt% K2O. Table
+      3 eq. (6) is log10(P_K/atm)=4.721-15624/T+9.32N^2, where N=x(K2O). Using N=(24.18/94.196)/((24.18/94.196)+(75.82/60.0843))=0.169037
+      and T=1451 K gives log10(P_K/atm)=-5.78044 and P_K=1.6579E-6 atm, about ten times the printed value.'
+    origin: kems-042-plante-1979::plante1979_table2_s1123_r014_quoted
   - kind: pressure_provenance_unknown
     affected_quantities:
     - p_partial
