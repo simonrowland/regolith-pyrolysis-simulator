@@ -789,7 +789,7 @@ def test_cached_real_python_api_replay_key_hashes_remain_base_bytes(
             mode="python_api",
         )
         assert key == live_key
-        payload = {"review_sentinel": "accepted-None-base"}
+        payload = {"authority": _alphamelts_record_authority()}
         store._store("equilibrium_post_record", live_key, payload)
         assert store._lookup("equilibrium_post_record", key) == payload
 
