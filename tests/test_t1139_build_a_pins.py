@@ -9,12 +9,18 @@ from __future__ import annotations
 
 import math
 from collections import defaultdict
+from dataclasses import fields, is_dataclass
 from pathlib import Path
+from typing import Any, Mapping
 
 import pytest
 
 from simulator.accounting.formulas import parse_formula
-from simulator.vapour_rail.catalog import compile_vapour_rail_catalog
+from simulator.config import load_config_bundle
+from simulator.vapour_rail.catalog import (
+    compile_vapour_rail_catalog,
+    vapor_pressure_legacy_view,
+)
 from simulator.yaml_cache import load_cached_safe_yaml
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -351,3 +357,72 @@ def test_hand_stoich_atom_and_mass_closure(
             f"credit={credit[element]}"
         )
     assert math.isclose(oxide_kg, 1.0 + o2_kg, rel_tol=1e-6, abs_tol=1e-9)
+
+
+def _t1139_ids(value: Any) -> list[str]:
+    found: list[str] = []
+    seen: set[int] = set()
+
+    def walk(node: Any) -> None:
+        if isinstance(node, str):
+            if "t1139_" in node:
+                found.append(node)
+            return
+        if node is None or isinstance(node, (int, float, bool, bytes)):
+            return
+        ident = id(node)
+        if ident in seen:
+            return
+        seen.add(ident)
+        if isinstance(node, Mapping):
+            for key, item in node.items():
+                walk(key)
+                walk(item)
+            return
+        if isinstance(node, (list, tuple, set, frozenset)):
+            for item in node:
+                walk(item)
+            return
+        if is_dataclass(node) and not isinstance(node, type):
+            for item in fields(node):
+                walk(getattr(node, item.name))
+
+    walk(value)
+    return found
+
+
+def _compiled_t1139_ids(catalog) -> list[str]:
+    found: list[str] = []
+    for species_id, compiled in catalog.species.items():
+        found.extend(
+            _t1139_ids(
+                (
+                    species_id,
+                    compiled.species_id,
+                    compiled.family_id,
+                    compiled.source_reaction_id,
+                    compiled.code_metadata,
+                )
+            )
+        )
+    found.extend(_t1139_ids(catalog.request_rules))
+    return found
+
+
+def test_live_catalog_legacy_view_and_config_bundle_have_zero_t1139_ids() -> None:
+    payload = load_cached_safe_yaml(CATALOG_PATH.read_text(encoding="utf-8"))
+    catalog = compile_vapour_rail_catalog(payload, emit_u0_request_rules=True)
+    bundle = load_config_bundle()
+    surfaces = {
+        "catalog": _compiled_t1139_ids(catalog),
+        "legacy_view": _t1139_ids(catalog.legacy_view()),
+        "vapor_pressure_legacy_view": _t1139_ids(
+            vapor_pressure_legacy_view(payload)
+        ),
+        "config_bundle": _t1139_ids(bundle.vapor_pressures),
+        "config_bundle_payload": _t1139_ids(
+            getattr(bundle.vapor_pressures, "catalog_payload", {})
+        ),
+    }
+    leaked = {name: ids for name, ids in surfaces.items() if ids}
+    assert not leaked
