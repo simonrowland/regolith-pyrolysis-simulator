@@ -82,9 +82,10 @@ from __future__ import annotations
 import copy
 import math
 import warnings
-from collections.abc import Mapping, MutableMapping
+from collections.abc import Mapping, MutableMapping, Sequence
 from contextvars import ContextVar
 from dataclasses import dataclass, field, replace
+from functools import lru_cache
 from pathlib import Path
 from typing import Any, Dict
 
@@ -5356,6 +5357,567 @@ def antoine_dew_temperature_diagnostic(
         "provenance": "existing_condensation_antoine_surface",
         "routing_authority": False,
     }
+
+
+# Stages that collect a condensate. Later stages can still wet a wall.
+_CAPTURE_STAGE_NUMBERS = frozenset({1, 2, 3, 4})
+_CONDENSED_STANDARD_STATES = (
+    "condensed_liquid",
+    "condensed_solid",
+    "condensed",
+)
+_ONSET_BISECTION_STEPS = 80
+
+
+@dataclass(frozen=True)
+class TraceVapourCondensationOnset:
+    """One species' condensation onset. Every consumer reads this object.
+
+    ``hot_train_applicability`` is derived here. It is not a catalog token
+    and it is not a second table.
+    """
+
+    species: str
+    partial_pressure_Pa: float | None
+    temperature_K: float | None
+    temperature_C: float | None
+    method: str
+    landing_stage_number: int | None
+    wall_landing_stage_number: int | None
+    hot_train_applicability: str
+    disposition: str
+    receiving_phase: str | None
+    source_id: str | None
+    status: str
+    detail: str
+
+
+def trace_vapour_condensation_onset(
+    species: str,
+    partial_pressure_pa: float,
+    *,
+    vapor_pressure_data: Mapping[str, Any] | None = None,
+    stages: Sequence[CondensationStage] | None = None,
+) -> TraceVapourCondensationOnset:
+    """Derive one condensation onset at the flowing partial pressure.
+
+    Derivation
+    ----------
+    Premise: a trace vapour condenses as itself. The receiving phase is
+    the condensed form of that vapour formula (the stable liquid or
+    solid), not the parent-oxide evaporation reaction. Equilibrium is
+    ``M(cond) <=> M(g)``. Species already named by ``DESIGNATED_STAGE``
+    or ``CONDENSATION_TEMPS_C`` keep that declared routing temperature;
+    this function does not replace it with a dewpoint. Where the vapour
+    has a certified Antoine wall curve,
+    ``antoine_dew_temperature_diagnostic`` supplies the temperature.
+    Otherwise both Gibbs functions are the Build A source-rail records
+    for one compilation: the gas record the channel selected, and the
+    condensed phase of that same compilation. Compilations are never
+    mixed. There is no second "first stage below dewpoint" rule; the
+    landing stage below is read from this onset.
+
+    Algebra::
+
+        K(T) = P_sat / P° = exp(-(G_gas(T) - G_cond(T)) / (R T))
+        P_sat(T) = P° * K(T)
+
+    ``K`` is ``reaction_equilibrium_constant`` on the two rail states.
+    ``P°`` is ``STANDARD_PRESSURE_PA`` (1 bar = 100000 Pa). Invert
+    ``P_sat(T) = p_local`` by bisection on the temperature overlap of
+    the gas band and a condensed band. A partial pressure outside that
+    image is unavailable; the ends are not clamped. At each temperature
+    the receiving phase is the lower-G record among the first liquid
+    and the first solid of that compilation whose band covers T.
+
+    The landing stage is the first train stage in flow order, after the
+    hot duct, whose lower temperature edge is at or below the onset.
+    Stages 1-4 can capture. A later stage is wall-only, so the coating
+    model still sees the vapour. An onset colder than every stage floor
+    lands on the last stage rather than disappearing.
+
+    Units: ``G/(R T)`` is dimensionless, so ``K`` is ``P_sat/P°``.
+    ``P_sat`` and the flowing partial pressure are both pascals.
+    Celsius is kelvin minus ``CELSIUS_TO_KELVIN_OFFSET``.
+
+    Sanity: JANAF Pb liquid (Pb-003) marks the liquid/ideal-gas
+    transition at fugacity 1 bar and 2019.022 K. The nist-janaf-4th Pb
+    gas and liquid, evaluated at ``P° = 100000 Pa``, invert to that
+    temperature.
+    """
+
+    declared = _declared_routing_onset(
+        species,
+        partial_pressure_pa,
+        vapor_pressure_data=vapor_pressure_data,
+        stages=stages,
+    )
+    if declared is not None:
+        return declared
+    pressure_pa = _finite_positive_partial_pressure(partial_pressure_pa)
+    if pressure_pa is None:
+        return _onset_unavailable(
+            species,
+            partial_pressure_pa=None,
+            status="inputs_required",
+            detail="partial pressure must be finite and positive",
+        )
+    if species not in _trace_vapour_carrier_sources():
+        return _onset_unavailable(
+            species,
+            partial_pressure_pa=pressure_pa,
+            status="not_a_trace_vapour",
+            detail="species is not a first-batch trace vapour carrier",
+        )
+    antoine = _antoine_trace_onset(
+        species,
+        pressure_pa,
+        vapor_pressure_data=vapor_pressure_data,
+        stages=stages,
+    )
+    if antoine is not None:
+        return antoine
+    return _thermo_saturation_onset(
+        species,
+        pressure_pa,
+        stages=stages,
+    )
+
+
+def _declared_routing_onset(
+    species: str,
+    partial_pressure_pa: float,
+    *,
+    vapor_pressure_data: Mapping[str, Any] | None,
+    stages: Sequence[CondensationStage] | None,
+) -> TraceVapourCondensationOnset | None:
+    del stages
+    """Majors keep the declared table. Do not recompute a dewpoint."""
+
+    stage_number = designated_stage_number(species)
+    if stage_number is None and species not in CONDENSATION_TEMPS_C:
+        return None
+    try:
+        pressure_pa = float(partial_pressure_pa)
+    except (TypeError, ValueError):
+        pressure_pa = math.nan
+    if not math.isfinite(pressure_pa):
+        pressure_pa = None
+    temperature_C = _species_condensation_temperature_C(
+        species,
+        vapor_pressure_data=vapor_pressure_data,
+    )
+    temperature_K = temperature_C + CELSIUS_TO_KELVIN_OFFSET
+    if stage_number is None:
+        applicability = "declared_no_wall_stage"
+        disposition = "declared_temperature"
+    else:
+        applicability = "declared_routing"
+        disposition = "designated"
+    return TraceVapourCondensationOnset(
+        species=str(species),
+        partial_pressure_Pa=pressure_pa,
+        temperature_K=temperature_K,
+        temperature_C=temperature_C,
+        method="declared_routing_temperature",
+        landing_stage_number=stage_number,
+        wall_landing_stage_number=stage_number,
+        hot_train_applicability=applicability,
+        disposition=disposition,
+        receiving_phase=None,
+        source_id=None,
+        status="declared",
+        detail="CONDENSATION_TEMPS_C / DESIGNATED_STAGE",
+    )
+
+
+def _finite_positive_partial_pressure(partial_pressure_pa: float) -> float | None:
+    try:
+        pressure_pa = float(partial_pressure_pa)
+    except (TypeError, ValueError):
+        return None
+    if not math.isfinite(pressure_pa) or pressure_pa <= 0.0:
+        return None
+    return pressure_pa
+
+
+def _onset_unavailable(
+    species: str,
+    *,
+    partial_pressure_pa: float | None,
+    status: str,
+    detail: str,
+    method: str = "unavailable",
+    source_id: str | None = None,
+) -> TraceVapourCondensationOnset:
+    return TraceVapourCondensationOnset(
+        species=str(species),
+        partial_pressure_Pa=partial_pressure_pa,
+        temperature_K=None,
+        temperature_C=None,
+        method=method,
+        landing_stage_number=None,
+        wall_landing_stage_number=None,
+        hot_train_applicability="unavailable",
+        disposition="unavailable",
+        receiving_phase=None,
+        source_id=source_id,
+        status=status,
+        detail=detail,
+    )
+
+
+def _onset_from_temperature(
+    species: str,
+    pressure_pa: float,
+    temperature_K: float,
+    *,
+    method: str,
+    stages: Sequence[CondensationStage] | None,
+    receiving_phase: str | None,
+    source_id: str | None,
+    detail: str,
+) -> TraceVapourCondensationOnset:
+    temperature_C = float(temperature_K) - CELSIUS_TO_KELVIN_OFFSET
+    capture_stage, wall_stage = _landing_stages_for_onset(temperature_C, stages)
+    if capture_stage is None:
+        applicability = "uncaptured_condensable"
+        disposition = "flagged_uncaptured_condensable"
+    else:
+        applicability = "applicable"
+        disposition = "impurity_capture"
+    return TraceVapourCondensationOnset(
+        species=str(species),
+        partial_pressure_Pa=pressure_pa,
+        temperature_K=float(temperature_K),
+        temperature_C=temperature_C,
+        method=method,
+        landing_stage_number=capture_stage,
+        wall_landing_stage_number=wall_stage,
+        hot_train_applicability=applicability,
+        disposition=disposition,
+        receiving_phase=receiving_phase,
+        source_id=source_id,
+        status="ok",
+        detail=detail,
+    )
+
+
+def _landing_stages_for_onset(
+    temperature_C: float,
+    stages: Sequence[CondensationStage] | None,
+) -> tuple[int | None, int | None]:
+    """First stage whose lower edge is at or below the onset.
+
+    Called only from ``trace_vapour_condensation_onset``. Designated
+    species never reach it.
+    """
+
+    ordered = sorted(
+        stages if stages is not None else CondensationTrain.create_default().stages,
+        key=lambda stage: int(stage.stage_number),
+    )
+    capture_stage: int | None = None
+    wall_stage: int | None = None
+    for stage in ordered:
+        number = int(stage.stage_number)
+        if number <= 0:
+            continue
+        lower_C, _upper_C = stage.temp_range_C
+        if float(lower_C) <= float(temperature_C):
+            wall_stage = number
+            if number in _CAPTURE_STAGE_NUMBERS:
+                capture_stage = number
+            break
+    if wall_stage is None and ordered:
+        last = int(ordered[-1].stage_number)
+        if last > 0:
+            wall_stage = last
+    return capture_stage, wall_stage
+
+
+def _antoine_trace_onset(
+    species: str,
+    pressure_pa: float,
+    *,
+    vapor_pressure_data: Mapping[str, Any] | None,
+    stages: Sequence[CondensationStage] | None,
+) -> TraceVapourCondensationOnset | None:
+    """Reuse the Antoine inverter when it actually returns a dewpoint.
+
+    A missing curve falls through to the rail. A certified curve that
+    refuses the pressure stays refused: thermo must not override it.
+    """
+
+    diagnostic = antoine_dew_temperature_diagnostic(
+        species,
+        pressure_pa,
+        vapor_pressure_data=vapor_pressure_data,
+    )
+    status = str(diagnostic.get("status") or "")
+    if status == "diagnostic_only" and diagnostic.get("temperature_K") is not None:
+        return _onset_from_temperature(
+            species,
+            pressure_pa,
+            float(diagnostic["temperature_K"]),
+            method="antoine_dewpoint",
+            stages=stages,
+            receiving_phase=None,
+            source_id=str(diagnostic.get("provenance") or ""),
+            detail="antoine_dew_temperature_diagnostic",
+        )
+    if status == "refused_pressure_outside_certified_range":
+        return _onset_unavailable(
+            species,
+            partial_pressure_pa=pressure_pa,
+            status=status,
+            method="antoine_dewpoint",
+            source_id=str(diagnostic.get("provenance") or ""),
+            detail="Antoine pressure is outside the certified range",
+        )
+    return None
+
+
+@lru_cache(maxsize=1)
+def _trace_vapour_carrier_sources() -> dict[str, str | None]:
+    """Carrier formula → gas compilation the Build A channel selected.
+
+    The first channel wins when two elements share a formula. The cache
+    is the channel index; callers do not reload the rail per species.
+    """
+
+    from simulator.vapour_rail.channel_generator import generate_first_batch
+    from simulator.vapour_rail.source_rail import load_source_rail
+    from simulator.vapour_rail.stoich import strip_phase
+
+    batch = generate_first_batch(rail=load_source_rail())
+    sources: dict[str, str | None] = {}
+    for channel in batch.channels:
+        formula = strip_phase(channel.carrier)
+        gas_key = f"{formula}(g)"
+        sources.setdefault(formula, channel.selected_sources.get(gas_key))
+    return sources
+
+
+def _thermo_saturation_onset(
+    species: str,
+    pressure_pa: float,
+    *,
+    stages: Sequence[CondensationStage] | None,
+) -> TraceVapourCondensationOnset:
+    from simulator.vapour_rail.nasa_cea import (
+        NasaCeaError,
+        reaction_equilibrium_constant,
+    )
+    from simulator.vapour_rail.source_rail import (
+        SOURCE_ORDER,
+        STANDARD_PRESSURE_PA,
+        SourceCoverageGap,
+        load_source_rail,
+    )
+    from simulator.vapour_rail.tabulated_gibbs import (
+        TabulatedDomainError,
+        TabulatedGibbsConventionError,
+    )
+
+    preferred = _trace_vapour_carrier_sources().get(species)
+    rail = load_source_rail()
+    source_order: list[str] = []
+    if preferred:
+        source_order.append(preferred)
+    for source_id in SOURCE_ORDER:
+        if source_id not in source_order:
+            source_order.append(source_id)
+    gas = None
+    condensed: list[Any] = []
+    source_id: str | None = None
+    for candidate_source in source_order:
+        gases = [
+            record
+            for record in rail.records_for(species, "gas")
+            if record.source_id == candidate_source
+        ]
+        phases: list[Any] = []
+        for state in _CONDENSED_STANDARD_STATES:
+            phases.extend(
+                record
+                for record in rail.records_for(species, state)
+                if record.source_id == candidate_source
+            )
+        if gases and phases:
+            gas = gases[0]
+            condensed = phases
+            source_id = candidate_source
+            break
+    if gas is None or source_id is None:
+        return _onset_unavailable(
+            species,
+            partial_pressure_pa=pressure_pa,
+            status="no_receiving_condensed_phase",
+            method="thermo_saturation",
+            source_id=preferred,
+            detail=(
+                "no single compilation tabulates the gas and a condensed "
+                "phase of the same formula"
+            ),
+        )
+    covering = [
+        record
+        for record in condensed
+        if record.T_max_K >= gas.T_min_K and record.T_min_K <= gas.T_max_K
+    ]
+    if not covering:
+        return _onset_unavailable(
+            species,
+            partial_pressure_pa=pressure_pa,
+            status="no_overlapping_band",
+            method="thermo_saturation",
+            source_id=source_id,
+            detail="gas and condensed bands do not overlap",
+        )
+    low = max(gas.T_min_K, min(record.T_min_K for record in covering))
+    high = min(gas.T_max_K, max(record.T_max_K for record in covering))
+    if not high > low:
+        return _onset_unavailable(
+            species,
+            partial_pressure_pa=pressure_pa,
+            status="no_overlapping_band",
+            method="thermo_saturation",
+            source_id=source_id,
+            detail="gas and condensed bands do not overlap",
+        )
+
+    def saturation(temperature_K: float) -> tuple[float, Any] | None:
+        phase = _stable_receiving_phase(condensed, temperature_K)
+        if phase is None:
+            return None
+        gas_state = gas.thermo.evaluate(temperature_K)
+        condensed_state = phase.thermo.evaluate(temperature_K)
+        k_eq = reaction_equilibrium_constant(
+            ((1.0, gas_state), (-1.0, condensed_state)),
+            T_K=temperature_K,
+        )
+        return STANDARD_PRESSURE_PA * k_eq, phase
+
+    try:
+        low_point = saturation(low)
+        high_point = saturation(high)
+    except (
+        NasaCeaError,
+        TabulatedDomainError,
+        TabulatedGibbsConventionError,
+        SourceCoverageGap,
+        ValueError,
+    ) as exc:
+        return _onset_unavailable(
+            species,
+            partial_pressure_pa=pressure_pa,
+            status="saturation_unavailable",
+            method="thermo_saturation",
+            source_id=source_id,
+            detail=str(exc),
+        )
+    if (
+        low_point is None
+        or high_point is None
+        or not math.isfinite(low_point[0])
+        or not math.isfinite(high_point[0])
+        or high_point[0] < low_point[0]
+        or not low_point[0] <= pressure_pa <= high_point[0]
+    ):
+        return _onset_unavailable(
+            species,
+            partial_pressure_pa=pressure_pa,
+            status="pressure_outside_saturation_domain",
+            method="thermo_saturation",
+            source_id=source_id,
+            detail=(
+                "flowing partial pressure is outside the saturation "
+                "curve on the overlapping band"
+            ),
+        )
+    for _ in range(_ONSET_BISECTION_STEPS):
+        midpoint = (low + high) / 2.0
+        try:
+            point = saturation(midpoint)
+        except (
+            NasaCeaError,
+            TabulatedDomainError,
+            TabulatedGibbsConventionError,
+            SourceCoverageGap,
+            ValueError,
+        ) as exc:
+            return _onset_unavailable(
+                species,
+                partial_pressure_pa=pressure_pa,
+                status="saturation_unavailable",
+                method="thermo_saturation",
+                source_id=source_id,
+                detail=str(exc),
+            )
+        if point is None:
+            return _onset_unavailable(
+                species,
+                partial_pressure_pa=pressure_pa,
+                status="saturation_domain_gap",
+                method="thermo_saturation",
+                source_id=source_id,
+                detail=f"no receiving phase covers {midpoint} K",
+            )
+        if point[0] < pressure_pa:
+            low = midpoint
+        else:
+            high = midpoint
+    solved = (low + high) / 2.0
+    try:
+        solved_point = saturation(solved)
+    except (
+        NasaCeaError,
+        TabulatedDomainError,
+        TabulatedGibbsConventionError,
+        SourceCoverageGap,
+        ValueError,
+    ) as exc:
+        return _onset_unavailable(
+            species,
+            partial_pressure_pa=pressure_pa,
+            status="saturation_unavailable",
+            method="thermo_saturation",
+            source_id=source_id,
+            detail=str(exc),
+        )
+    phase = None if solved_point is None else solved_point[1]
+    return _onset_from_temperature(
+        species,
+        pressure_pa,
+        solved,
+        method="thermo_saturation",
+        stages=stages,
+        receiving_phase=None if phase is None else str(phase.native_phase),
+        source_id=source_id,
+        detail="source-rail G(T) saturation at the flowing partial pressure",
+    )
+
+
+def _stable_receiving_phase(condensed: Sequence[Any], temperature_K: float) -> Any | None:
+    """Lower-G phase among the first liquid and first solid that cover T."""
+
+    chosen: list[Any] = []
+    for state in _CONDENSED_STANDARD_STATES:
+        for record in condensed:
+            if record.standard_state != state:
+                continue
+            if record.T_min_K <= temperature_K <= record.T_max_K:
+                chosen.append(record)
+                break
+    best = None
+    best_g: float | None = None
+    for record in chosen:
+        g_over_rt = float(record.thermo.evaluate(temperature_K).g_over_RT)
+        if best is None or best_g is None or g_over_rt < best_g:
+            best = record
+            best_g = g_over_rt
+    return best
 
 
 def _materials_source(materials: Mapping[str, Any] | None = None) -> Mapping[str, Any]:
