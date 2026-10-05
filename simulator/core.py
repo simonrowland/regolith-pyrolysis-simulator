@@ -376,6 +376,7 @@ from simulator.condensation_routing import (
 )
 from simulator.cost_ledger import CostImportContext, CostLedger
 from simulator.feedstock_guard import assert_feedstock_loadable
+from simulator.feedstock_composition import normalize_component_masses_kg
 from simulator.environment import DEFAULT_VACUUM_FLOOR_BAR, feedstock_body
 from simulator.fe_redox import (
     calphad_ferrous_feo_activity_diagnostic,
@@ -10129,7 +10130,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         structural = self._component_masses_from_named_section(
             feedstock.get('structural_water', {}) or {}, mass_kg)
         self._merge_masses(raw, structural)
-        self._normalize_component_masses(raw, mass_kg)
+        normalize_component_masses_kg(raw, mass_kg)
         inert_melt = self._inert_trace_component_masses(feedstock, raw)
         self._validate_stage0_unmodeled_nitrate_components(
             raw,
@@ -11228,7 +11229,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             else cleaned_mass_kg
         )
         melt = cls._component_masses_from_wt_pct(comp, cleaned_mass)
-        cls._normalize_component_masses(melt, cleaned_mass)
+        normalize_component_masses_kg(melt, cleaned_mass)
         return {
             oxide: float(melt.get(oxide, 0.0))
             for oxide in OXIDE_SPECIES
@@ -11579,17 +11580,6 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             if kg is not None and kg > 0.0:
                 masses[name] = masses.get(name, 0.0) + kg
         return masses
-
-    @staticmethod
-    def _normalize_component_masses(
-        masses: Dict[str, float], target_mass_kg: float
-    ) -> None:
-        total = sum(kg for kg in masses.values() if kg > 0.0)
-        if total <= 0.0 or target_mass_kg <= 0.0:
-            return
-        scale = target_mass_kg / total
-        for component, kg in list(masses.items()):
-            masses[component] = kg * scale
 
     @staticmethod
     def _merge_masses(target: Dict[str, float],

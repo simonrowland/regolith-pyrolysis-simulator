@@ -86,12 +86,21 @@ def normalized_feedstock_component_masses_kg(
                 if kg is not None and kg > 0.0:
                     raw_masses[name] = raw_masses.get(name, 0.0) + kg
 
-    total = sum(kg for kg in raw_masses.values() if kg > 0.0)
-    if total <= 0.0 or batch_mass_kg <= 0.0:
-        return raw_masses
+    return normalize_component_masses_kg(raw_masses, batch_mass_kg)
 
-    scale = batch_mass_kg / total
-    return {component: kg * scale for component, kg in raw_masses.items()}
+
+def normalize_component_masses_kg(
+    masses: dict[str, float],
+    target_mass_kg: float,
+) -> dict[str, float]:
+    """Scale positive component masses to a ledger target, in place."""
+    total = sum(kg for kg in masses.values() if kg > 0.0)
+    if total <= 0.0 or target_mass_kg <= 0.0:
+        return masses
+    scale = target_mass_kg / total
+    for component, kg in list(masses.items()):
+        masses[component] = kg * scale
+    return masses
 
 
 def _mass_from_wt_pct(value: Any, mass_kg: float, *, field: str) -> float | None:
