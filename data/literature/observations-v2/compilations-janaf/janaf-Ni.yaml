@@ -3661,6 +3661,8 @@ observations:
   value:
     kind: series
     series:
+    - - '1800'
+      - '0.715'
     - - '1900'
       - '1.704'
     - - '2000'
@@ -4021,7 +4023,7 @@ observations:
     record: Ni-002
   read_from: tables:nist-janaf-4th
   derivation:
-    relation: 'Direct JANAF tabulation; 0 printed cells blank or INFINITE; compilation_role engine_reference_input=true, scoring_eligible=false;
+    relation: 'Direct JANAF tabulation; 1 printed cells blank or INFINITE; compilation_role engine_reference_input=true, scoring_eligible=false;
       circularity_warning=Do not validate an engine against a compilation it consumes.; formation_reference_state_schedule=printed
       JANAF (ref) schedules: Ni-001 (ref), transition rows 24 and 40 bracket series T; phase_basis=phase declared by JANAF
       index state ''cr'''
@@ -4199,7 +4201,7 @@ observations:
     record: Ni-002
   read_from: tables:nist-janaf-4th
   derivation:
-    relation: 'Direct JANAF tabulation; 0 printed cells blank or INFINITE; compilation_role engine_reference_input=true, scoring_eligible=false;
+    relation: 'Direct JANAF tabulation; 1 printed cells blank or INFINITE; compilation_role engine_reference_input=true, scoring_eligible=false;
       circularity_warning=Do not validate an engine against a compilation it consumes.; formation_reference_state_schedule=printed
       JANAF (ref) schedules: Ni-001 (ref), transition row 24 brackets upper series T; phase_basis=phase declared by JANAF
       index state ''cr'''
@@ -4309,6 +4311,8 @@ observations:
   value:
     kind: series
     series:
+    - - '1800'
+      - '-0.021'
     - - '1900'
       - '-0.047'
     - - '2000'
@@ -5434,6 +5438,8 @@ observations:
   value:
     kind: series
     series:
+    - - '3200'
+      - '5.189'
     - - '3300'
       - '17.101'
     - - '3400'
@@ -5804,7 +5810,7 @@ observations:
     record: Ni-003
   read_from: tables:nist-janaf-4th
   derivation:
-    relation: 'Direct JANAF tabulation; 4 printed cells blank or INFINITE; compilation_role engine_reference_input=true, scoring_eligible=false;
+    relation: 'Direct JANAF tabulation; 5 printed cells blank or INFINITE; compilation_role engine_reference_input=true, scoring_eligible=false;
       circularity_warning=Do not validate an engine against a compilation it consumes.; formation_reference_state_schedule=printed
       JANAF (ref) schedules: Ni-001 (ref), transition rows 24 and 40 bracket series T; phase_basis=printed "GLASS <--> LIQUID"
       at 1300.000 K; rows through that labelled transition are the supercooled liquid / glass-transition region and following
@@ -5949,7 +5955,7 @@ observations:
     record: Ni-003
   read_from: tables:nist-janaf-4th
   derivation:
-    relation: 'Direct JANAF tabulation; 4 printed cells blank or INFINITE; compilation_role engine_reference_input=true, scoring_eligible=false;
+    relation: 'Direct JANAF tabulation; 5 printed cells blank or INFINITE; compilation_role engine_reference_input=true, scoring_eligible=false;
       circularity_warning=Do not validate an engine against a compilation it consumes.; formation_reference_state_schedule=printed
       JANAF (ref) schedules: Ni-001 (ref), transition row 40 brackets lower series T; phase_basis=printed "GLASS <--> LIQUID"
       at 1300.000 K; rows through that labelled transition are the supercooled liquid / glass-transition region and following
@@ -6124,7 +6130,7 @@ observations:
     record: Ni-003
   read_from: tables:nist-janaf-4th
   derivation:
-    relation: 'Direct JANAF tabulation; 4 printed cells blank or INFINITE; compilation_role engine_reference_input=true, scoring_eligible=false;
+    relation: 'Direct JANAF tabulation; 5 printed cells blank or INFINITE; compilation_role engine_reference_input=true, scoring_eligible=false;
       circularity_warning=Do not validate an engine against a compilation it consumes.; formation_reference_state_schedule=printed
       JANAF (ref) schedules: Ni-001 (ref), transition row 24 brackets upper series T; phase_basis=printed "GLASS <--> LIQUID"
       at 1300.000 K; rows through that labelled transition are the supercooled liquid / glass-transition region and following
@@ -6404,6 +6410,8 @@ observations:
   value:
     kind: series
     series:
+    - - '3200'
+      - '-0.085'
     - - '3300'
       - '-0.271'
     - - '3400'
@@ -7946,6 +7954,8 @@ observations:
   value:
     kind: series
     series:
+    - - '3200'
+      - '5.189'
     - - '3300'
       - '17.101'
     - - '3400'
@@ -8334,7 +8344,7 @@ observations:
     record: Ni-004
   read_from: tables:nist-janaf-4th
   derivation:
-    relation: 'Direct JANAF tabulation; 0 printed cells blank or INFINITE; compilation_role engine_reference_input=true, scoring_eligible=false;
+    relation: 'Direct JANAF tabulation; 1 printed cells blank or INFINITE; compilation_role engine_reference_input=true, scoring_eligible=false;
       circularity_warning=Do not validate an engine against a compilation it consumes.; formation_reference_state_schedule=printed
       JANAF (ref) schedules: Ni-001 (ref), transition rows 24 and 40 bracket series T; phase_basis=''LIQUID'' in "CRYSTAL
       <--> LIQUID"'
@@ -8483,7 +8493,7 @@ observations:
     record: Ni-004
   read_from: tables:nist-janaf-4th
   derivation:
-    relation: 'Direct JANAF tabulation; 0 printed cells blank or INFINITE; compilation_role engine_reference_input=true, scoring_eligible=false;
+    relation: 'Direct JANAF tabulation; 1 printed cells blank or INFINITE; compilation_role engine_reference_input=true, scoring_eligible=false;
       circularity_warning=Do not validate an engine against a compilation it consumes.; formation_reference_state_schedule=printed
       JANAF (ref) schedules: Ni-001 (ref), transition row 40 brackets lower series T; phase_basis=''LIQUID'' in "CRYSTAL <-->
       LIQUID"'
@@ -8942,6 +8952,8 @@ observations:
   value:
     kind: series
     series:
+    - - '3200'
+      - '-0.085'
     - - '3300'
       - '-0.271'
     - - '3400'
@@ -17263,6 +17275,8 @@ observations:
       - '-59.773'
     - - '1200'
       - '-52.547'
+    - - '1300'
+      - '-45.456'
     - - '1400'
       - '-38.503'
     - - '1500'
@@ -17784,7 +17798,7 @@ observations:
     record: Ni-008
   read_from: tables:nist-janaf-4th
   derivation:
-    relation: 'Direct JANAF tabulation; 0 printed cells blank or INFINITE; compilation_role engine_reference_input=true, scoring_eligible=false;
+    relation: 'Direct JANAF tabulation; 1 printed cells blank or INFINITE; compilation_role engine_reference_input=true, scoring_eligible=false;
       circularity_warning=Do not validate an engine against a compilation it consumes.; formation_reference_state_schedule=printed
       JANAF (ref) schedules: Ni-001 (ref), transition row 24 brackets upper series T; S-001 (ref), transition rows 10 and
       19 bracket series T; phase_basis=''ALPHA'' in "BETA <--> ALPHA"'
@@ -17957,7 +17971,7 @@ observations:
     record: Ni-008
   read_from: tables:nist-janaf-4th
   derivation:
-    relation: 'Direct JANAF tabulation; 0 printed cells blank or INFINITE; compilation_role engine_reference_input=true, scoring_eligible=false;
+    relation: 'Direct JANAF tabulation; 1 printed cells blank or INFINITE; compilation_role engine_reference_input=true, scoring_eligible=false;
       circularity_warning=Do not validate an engine against a compilation it consumes.; formation_reference_state_schedule=printed
       JANAF (ref) schedules: Ni-001 (ref), transition row 24 brackets upper series T; S-001 (ref), transition row 19 brackets
       lower series T; phase_basis=''ALPHA'' in "BETA <--> ALPHA"'
@@ -18591,6 +18605,8 @@ observations:
       - '2.838'
     - - '1200'
       - '2.287'
+    - - '1300'
+      - '1.826'
     - - '1400'
       - '1.437'
     - - '1500'
@@ -20333,6 +20349,8 @@ observations:
       - '-56.254'
     - - '1200'
       - '-51.372'
+    - - '1300'
+      - '-46.692'
     - - '1400'
       - '-42.191'
     - - '1500'
@@ -20719,7 +20737,7 @@ observations:
     record: Ni-009
   read_from: tables:nist-janaf-4th
   derivation:
-    relation: 'Direct JANAF tabulation; 3 printed cells blank or INFINITE; compilation_role engine_reference_input=true, scoring_eligible=false;
+    relation: 'Direct JANAF tabulation; 4 printed cells blank or INFINITE; compilation_role engine_reference_input=true, scoring_eligible=false;
       circularity_warning=Do not validate an engine against a compilation it consumes.; formation_reference_state_schedule=printed
       JANAF (ref) schedules: Ni-001 (ref), transition rows 24 and 40 bracket series T; S-001 (ref), transition row 19 brackets
       lower series T; phase_basis=printed "GLASS <--> LIQUID" at 860.000 K; rows through that labelled transition are the
@@ -20886,7 +20904,7 @@ observations:
     record: Ni-009
   read_from: tables:nist-janaf-4th
   derivation:
-    relation: 'Direct JANAF tabulation; 3 printed cells blank or INFINITE; compilation_role engine_reference_input=true, scoring_eligible=false;
+    relation: 'Direct JANAF tabulation; 4 printed cells blank or INFINITE; compilation_role engine_reference_input=true, scoring_eligible=false;
       circularity_warning=Do not validate an engine against a compilation it consumes.; formation_reference_state_schedule=printed
       JANAF (ref) schedules: Ni-001 (ref), transition row 40 brackets lower series T; S-001 (ref), transition row 19 brackets
       lower series T; phase_basis=printed "GLASS <--> LIQUID" at 860.000 K; rows through that labelled transition are the
@@ -21059,7 +21077,7 @@ observations:
     record: Ni-009
   read_from: tables:nist-janaf-4th
   derivation:
-    relation: 'Direct JANAF tabulation; 3 printed cells blank or INFINITE; compilation_role engine_reference_input=true, scoring_eligible=false;
+    relation: 'Direct JANAF tabulation; 4 printed cells blank or INFINITE; compilation_role engine_reference_input=true, scoring_eligible=false;
       circularity_warning=Do not validate an engine against a compilation it consumes.; formation_reference_state_schedule=printed
       JANAF (ref) schedules: Ni-001 (ref), transition row 24 brackets upper series T; S-001 (ref), transition rows 10 and
       19 bracket series T; phase_basis=printed "GLASS <--> LIQUID" at 860.000 K; rows through that labelled transition are
@@ -21238,7 +21256,7 @@ observations:
     record: Ni-009
   read_from: tables:nist-janaf-4th
   derivation:
-    relation: 'Direct JANAF tabulation; 3 printed cells blank or INFINITE; compilation_role engine_reference_input=true, scoring_eligible=false;
+    relation: 'Direct JANAF tabulation; 4 printed cells blank or INFINITE; compilation_role engine_reference_input=true, scoring_eligible=false;
       circularity_warning=Do not validate an engine against a compilation it consumes.; formation_reference_state_schedule=printed
       JANAF (ref) schedules: Ni-001 (ref), transition row 24 brackets upper series T; S-001 (ref), transition row 19 brackets
       lower series T; phase_basis=printed "GLASS <--> LIQUID" at 860.000 K; rows through that labelled transition are the
@@ -21405,7 +21423,7 @@ observations:
     record: Ni-009
   read_from: tables:nist-janaf-4th
   derivation:
-    relation: 'Direct JANAF tabulation; 3 printed cells blank or INFINITE; compilation_role engine_reference_input=true, scoring_eligible=false;
+    relation: 'Direct JANAF tabulation; 4 printed cells blank or INFINITE; compilation_role engine_reference_input=true, scoring_eligible=false;
       circularity_warning=Do not validate an engine against a compilation it consumes.; formation_reference_state_schedule=printed
       JANAF (ref) schedules: Ni-001 (ref), transition row 24 brackets upper series T; S-001 (ref), transition row 8 brackets
       upper series T; phase_basis=printed "GLASS <--> LIQUID" at 860.000 K; rows through that labelled transition are the
@@ -22083,6 +22101,8 @@ observations:
       - '2.671'
     - - '1200'
       - '2.236'
+    - - '1300'
+      - '1.876'
     - - '1400'
       - '1.574'
     - - '1500'
@@ -40244,6 +40264,8 @@ observations:
       - '-187.213'
     - - '1000'
       - '-177.251'
+    - - '1100'
+      - '-167.837'
     - - '1200'
       - '-158.899'
     - - '1300'
@@ -40781,7 +40803,7 @@ observations:
     record: Ni-015
   read_from: tables:nist-janaf-4th
   derivation:
-    relation: 'Direct JANAF tabulation; 0 printed cells blank or INFINITE; compilation_role engine_reference_input=true, scoring_eligible=false;
+    relation: 'Direct JANAF tabulation; 1 printed cells blank or INFINITE; compilation_role engine_reference_input=true, scoring_eligible=false;
       circularity_warning=Do not validate an engine against a compilation it consumes.; formation_reference_state_schedule=printed
       JANAF (ref) schedules: Ni-001 (ref), transition row 24 brackets upper series T; S-001 (ref), transition row 19 brackets
       lower series T; phase_basis=''II'' in "I <--> II"'
@@ -41254,6 +41276,8 @@ observations:
       - '10.866'
     - - '1000'
       - '9.259'
+    - - '1100'
+      - '7.97'
     - - '1200'
       - '6.917'
     - - '1300'
@@ -43018,6 +43042,8 @@ observations:
       - '-184.242'
     - - '1000'
       - '-176.104'
+    - - '1100'
+      - '-168.546'
     - - '1200'
       - '-161.493'
     - - '1300'
@@ -43408,7 +43434,7 @@ observations:
     record: Ni-016
   read_from: tables:nist-janaf-4th
   derivation:
-    relation: 'Direct JANAF tabulation; 3 printed cells blank or INFINITE; compilation_role engine_reference_input=true, scoring_eligible=false;
+    relation: 'Direct JANAF tabulation; 4 printed cells blank or INFINITE; compilation_role engine_reference_input=true, scoring_eligible=false;
       circularity_warning=Do not validate an engine against a compilation it consumes.; formation_reference_state_schedule=printed
       JANAF (ref) schedules: Ni-001 (ref), transition rows 24 and 40 bracket series T; S-001 (ref), transition row 19 brackets
       lower series T; phase_basis=printed "GLASS <--> LIQUID" at 760.000 K; rows through that labelled transition are the
@@ -43583,7 +43609,7 @@ observations:
     record: Ni-016
   read_from: tables:nist-janaf-4th
   derivation:
-    relation: 'Direct JANAF tabulation; 3 printed cells blank or INFINITE; compilation_role engine_reference_input=true, scoring_eligible=false;
+    relation: 'Direct JANAF tabulation; 4 printed cells blank or INFINITE; compilation_role engine_reference_input=true, scoring_eligible=false;
       circularity_warning=Do not validate an engine against a compilation it consumes.; formation_reference_state_schedule=printed
       JANAF (ref) schedules: Ni-001 (ref), transition row 40 brackets lower series T; S-001 (ref), transition row 19 brackets
       lower series T; phase_basis=printed "GLASS <--> LIQUID" at 760.000 K; rows through that labelled transition are the
@@ -43756,7 +43782,7 @@ observations:
     record: Ni-016
   read_from: tables:nist-janaf-4th
   derivation:
-    relation: 'Direct JANAF tabulation; 3 printed cells blank or INFINITE; compilation_role engine_reference_input=true, scoring_eligible=false;
+    relation: 'Direct JANAF tabulation; 4 printed cells blank or INFINITE; compilation_role engine_reference_input=true, scoring_eligible=false;
       circularity_warning=Do not validate an engine against a compilation it consumes.; formation_reference_state_schedule=printed
       JANAF (ref) schedules: Ni-001 (ref), transition row 24 brackets upper series T; S-001 (ref), transition rows 10 and
       19 bracket series T; phase_basis=printed "GLASS <--> LIQUID" at 760.000 K; rows through that labelled transition are
@@ -43935,7 +43961,7 @@ observations:
     record: Ni-016
   read_from: tables:nist-janaf-4th
   derivation:
-    relation: 'Direct JANAF tabulation; 3 printed cells blank or INFINITE; compilation_role engine_reference_input=true, scoring_eligible=false;
+    relation: 'Direct JANAF tabulation; 4 printed cells blank or INFINITE; compilation_role engine_reference_input=true, scoring_eligible=false;
       circularity_warning=Do not validate an engine against a compilation it consumes.; formation_reference_state_schedule=printed
       JANAF (ref) schedules: Ni-001 (ref), transition row 24 brackets upper series T; S-001 (ref), transition row 19 brackets
       lower series T; phase_basis=printed "GLASS <--> LIQUID" at 760.000 K; rows through that labelled transition are the
@@ -44102,7 +44128,7 @@ observations:
     record: Ni-016
   read_from: tables:nist-janaf-4th
   derivation:
-    relation: 'Direct JANAF tabulation; 3 printed cells blank or INFINITE; compilation_role engine_reference_input=true, scoring_eligible=false;
+    relation: 'Direct JANAF tabulation; 4 printed cells blank or INFINITE; compilation_role engine_reference_input=true, scoring_eligible=false;
       circularity_warning=Do not validate an engine against a compilation it consumes.; formation_reference_state_schedule=printed
       JANAF (ref) schedules: Ni-001 (ref), transition row 24 brackets upper series T; S-001 (ref), transition row 8 brackets
       upper series T; phase_basis=printed "GLASS <--> LIQUID" at 760.000 K; rows through that labelled transition are the
@@ -44784,6 +44810,8 @@ observations:
       - '10.693'
     - - '1000'
       - '9.199'
+    - - '1100'
+      - '8.004'
     - - '1200'
       - '7.03'
     - - '1300'
