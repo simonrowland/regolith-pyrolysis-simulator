@@ -1422,18 +1422,29 @@ def test_allibert_printed_binary_compositions_survive_migration(tmp_path: Path):
         for observation, row in rows
         if "composition" in (row.get("point_conditions") or {})
     ]
-    assert len(typed_source) == 76
+    # Seven Fig. 2 points now carry their axis-mapped composition (b-726).
+    assert len(typed_source) == 83
+    fig2_source = [
+        (observation, row)
+        for observation, row in typed_source
+        if row["point_conditions"]["composition"]["locator"].get("figure") == "2"
+    ]
+    assert len(fig2_source) == 7
     for observation, row in typed_source:
         composition = row["point_conditions"]["composition"]
         value = composition["state"]["value"]
         assert value["basis"] == "printed_mole_fraction"
         assert value["amount_basis"] == "mole_fraction"
         assert len(value["components"]) == 2
-        assert "documented complement" in composition["locator"]["note"]
-        assert "not printed" in composition["locator"]["note"]
-        assert composition["locator"].get("table") in {"II", "V"} or composition[
-            "locator"
-        ].get("figure") in {6, "6"}
+        if composition["locator"].get("figure") == "2":
+            assert "horizontal axis" in composition["locator"]["note"]
+            assert "binary complement x(CaO)" in composition["locator"]["note"]
+        else:
+            assert "documented complement" in composition["locator"]["note"]
+            assert "not printed" in composition["locator"]["note"]
+            assert composition["locator"].get("table") in {"II", "V"} or composition[
+                "locator"
+            ].get("figure") in {6, "6"}
 
     table2 = next(
         row
@@ -1451,7 +1462,18 @@ def test_allibert_printed_binary_compositions_survive_migration(tmp_path: Path):
         == "allibert_1981_fig2_alumina_activity_gibbs_duhem"
     ]
     assert figure2_rows
-    assert all("composition" not in (row.get("point_conditions") or {}) for row in figure2_rows)
+    assert [
+        row["point_conditions"]["composition"]["state"]["value"]["components"]
+        for row in figure2_rows
+    ] == [
+        [["CaO", "0.8"], ["Al2O3", "0.2"]],
+        [["CaO", "0.7"], ["Al2O3", "0.3"]],
+        [["CaO", "0.6"], ["Al2O3", "0.4"]],
+        [["CaO", "0.5"], ["Al2O3", "0.5"]],
+        [["CaO", "0.4"], ["Al2O3", "0.6"]],
+        [["CaO", "0.3"], ["Al2O3", "0.7"]],
+        [["CaO", "0.2"], ["Al2O3", "0.8"]],
+    ]
 
     result = _migrate_real_extract(tmp_path / "allibert-unlinked", "kems-051-allibert-1981.yaml")
     typed_migrated = [
@@ -1461,7 +1483,7 @@ def test_allibert_printed_binary_compositions_survive_migration(tmp_path: Path):
         and (observation.point_conditions or {}).get("composition") is not None
         and observation.point_conditions["composition"].state.is_value
     ]
-    assert len(typed_migrated) == 76
+    assert len(typed_migrated) == 83
     assert all(
         observation.point_conditions["composition"].state.value.amount_basis.value
         == "mole_fraction"
