@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import copy
+import hashlib
 import inspect
 import json
 import os
@@ -152,6 +153,19 @@ def test_complete_page_three_numeric_image_fixture():
     for row, expected in zip(record["rows"], fixture["complete_numeric_pages"]["7"], strict=True):
         assert [row["cells"][c]["raw"] for c in harvest.COLUMNS] == expected
         assert all(not c["ocr_suspect"] for c in row["cells"].values())
+
+
+def test_numeric_records_match_pre_extension_golden_pin():
+    payload = [
+        [record["record_id"], [row["raw"] for row in record["rows"]]]
+        for record in _records()
+    ]
+    digest = hashlib.sha256(
+        json.dumps(payload, ensure_ascii=False, separators=(",", ":")).encode()
+    ).hexdigest()
+    assert len(payload) == 421
+    assert sum(len(record[1]) for record in payload) == 6804
+    assert digest == "7364ebad96703bb1fa8b09c6c5b5a439a814077c5c2b75e66fd6b2badd790d86"
 
 
 def test_native_tokens_notes_and_html_census():

@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import os
 import re
@@ -17,6 +18,9 @@ from tools.ingest_pankratz_1984_usbm_b677 import TableParser, parse_note_block, 
 SOURCE_ID = "pankratz-1987-usbm-b689"
 ROOT = Path(__file__).resolve().parents[1]
 DEST = ROOT / "data/literature/compilations" / SOURCE_ID
+B696_SOURCE_ID = "pankratz-1994-usbm-b696"
+B696_DEST = ROOT / "data/literature/compilations" / B696_SOURCE_ID
+B696_PROOF_PAGES = (3, 46, 47, 48, 49, 50, 332)
 COLUMNS = ("temperature", "cp", "entropy", "gibbs_function", "enthalpy_increment",
            "delta_h", "delta_g", "log_k")
 UNITS = ("K", "cal/mol·K", "cal/mol·K", "cal/mol·K", "kcal/mol", "kcal/mol", "kcal/mol", None)
@@ -93,6 +97,92 @@ def _note_blocks(items, table_index):
     return blocks
 
 
+def _record_from_audit(audit, items, fixture):
+    pg = audit["pdf_page"]
+    table_index = audit.get("table_index")
+    if table_index is None:
+        table_index = next(i for i, x in enumerate(items) if x["type"] == "table")
+    table = items[table_index]
+    raw_rows = _rows(table["table_body"])
+    verified_rows = fixture["complete_numeric_pages"].get(str(pg))
+    if verified_rows is not None and raw_rows[2:] != verified_rows:
+        raise ValueError(f"PDF{pg}: numeric transcription differs from independent image fixture")
+    if any(len(row) != 8 for row in raw_rows[2:]):
+        raise ValueError(f"PDF{pg}: row needs image adjudication")
+    candidates = _identity_candidates(items, table_index)
+    corrections = []
+    if audit["status"] == "corrected":
+        corrections.append({"record_id": audit["record_id"], "printed_page": audit["printed_page"],
+                            "pdf_page": pg, "kind": audit["correction_kind"],
+                            "field": "substance_identity", "ocr_token": candidates,
+                            "printed_token": audit["formula_as_published"] + " / " + audit["name_as_published"],
+                            "image_quote": audit["printed_quote"], "image_evidence": audit["image_evidence"]})
+    rows = [{"source_row_index": i, "raw": row,
+             "cells": {column: _cell(token, verified_rows is not None) for column, token in zip(COLUMNS, row)}}
+            for i, row in enumerate(raw_rows[2:], 2)]
+    flags = _structure_detectors(items, table_index) + _numeric_detectors(rows)
+    for correction in fixture["numeric_corrections"]:
+        if correction["record_id"] != audit["record_id"]:
+            continue
+        row = next(r for r in rows if r["source_row_index"] == correction["source_row_index"])
+        cell = row["cells"][correction["column"]]
+        if cell["raw"] != correction["ocr_token"]:
+            raise ValueError(f"stale numeric correction: {correction}")
+        row["cells"][correction["column"]] = {
+            **_cell(correction["printed_token"], True), "raw_ocr_token": cell["raw"]}
+        corrections.append({**correction, "image_evidence": audit["image_evidence"]})
+    note_blocks = _note_blocks(items, table_index)
+    notes = parse_note_block("\n".join(note_blocks))
+    notes["blocks_raw"] = note_blocks
+    notes["equation_transcription_status"] = "raw_ocr_only"
+    metadata_unverified = audit["status"] == "unverified"
+    ambiguities = flags + notes["ambiguities"]
+    if verified_rows is None:
+        ambiguities.append({"kind": "numeric_cells_not_image_verified"})
+    if metadata_unverified:
+        ambiguities.append({"kind": "unverified_printed_identity", "raw": audit["printed_quote"]})
+    table_kind = audit.get("table_kind") or ("formation" if "Log Kf" in table["table_body"] else "reaction")
+    return {
+        "record_id": audit["record_id"], "record_kind": audit["record_kind"],
+        "formula": audit["formula"], "formula_as_published": audit["formula_as_published"],
+        "name_as_published": audit["name_as_published"], "phase": audit["phase"],
+        "metadata_ocr_token": candidates, "metadata_ocr_suspect": metadata_unverified,
+        "printed_page": audit["printed_page"], "pdf_page": pg,
+        "source_ref": {"path": "source/mineru-pages.jsonl", "line": audit.get("source_line", pg),
+                       "item_index": table_index},
+        "source_heading_raw": table.get("table_caption", []),
+        "table_kind": table_kind,
+        "header_rows_raw": raw_rows[:2], "columns": list(COLUMNS), "units": dict(zip(COLUMNS, UNITS)),
+        "rows": rows, "row_count": len(rows), "notes": notes,
+        "structural_records": [{"record_kind": x["type"], "printed_form_ocr": x.get("text", "")}
+                               for x in items if x["type"] in {"header", "page_number", "footer"}],
+        "corrections": corrections, "ambiguities": ambiguities,
+        "transcription_status": "native_table_transcribed_with_explicit_ocr_coverage",
+    }
+
+
+def _records_from_audits(audits, pages_by_pdf, fixture):
+    return [_record_from_audit(audit, pages_by_pdf[audit["pdf_page"]]["items"], fixture)
+            for audit in audits]
+
+
+def _manifest_entries(records, source, source_sha256):
+    return [{**{k: record[k] for k in ("record_id", "record_kind", "formula", "formula_as_published",
+                                        "name_as_published", "phase", "row_count", "metadata_ocr_suspect")},
+             "source": source,
+             "source_locator": {"printed_page": record["printed_page"], "pdf_page": record["pdf_page"]},
+             "original_record_text_location": record["source_ref"], "sha256": source_sha256,
+             "path": f"records/{record['record_id']}.json",
+             "ambiguity_count": len(record["ambiguities"]), "ambiguities": record["ambiguities"],
+             "ocr_suspect_count": int(record["metadata_ocr_suspect"]) + int(record["notes"]["ocr_suspect"])
+             + sum(c["ocr_suspect"] for row in record["rows"] for c in row["cells"].values())}
+            for record in records]
+
+
+def _advance_access_status_date(access, date):
+    access["updated"] = max(access.get("updated", ""), date)
+
+
 def build(corpus):
     pdf = corpus / "raw" / SOURCE_ID / f"{SOURCE_ID}.pdf"
     sidecar = yaml.safe_load((pdf.parent / "sidecar.yaml").read_text())
@@ -124,77 +214,9 @@ def build(corpus):
     source = {"database": "U.S. Bureau of Mines Bulletin 689", "version": "1987",
               "citation": sidecar["citation"], "official_url": "https://digital.library.unt.edu/ark:/67531/metadc38801/",
               "retrieved_url": sidecar["retrieved_url"], "licence": sidecar["licence"], "access_date": "2026-09-12"}
-    records = []
-    for audit in audits:
-        pg = audit["pdf_page"]
-        items = pages[pg - 1]["items"]
-        table_index = next(i for i, x in enumerate(items) if x["type"] == "table")
-        table = items[table_index]
-        raw_rows = _rows(table["table_body"])
-        verified_rows = fixture["complete_numeric_pages"].get(str(pg))
-        if verified_rows is not None and raw_rows[2:] != verified_rows:
-            raise ValueError(f"PDF{pg}: numeric transcription differs from independent image fixture")
-        if any(len(row) != 8 for row in raw_rows[2:]):
-            raise ValueError(f"PDF{pg}: row needs image adjudication")
-        candidates = _identity_candidates(items, table_index)
-        corrections = []
-        if audit["status"] == "corrected":
-            corrections.append({"record_id": audit["record_id"], "printed_page": audit["printed_page"],
-                                "pdf_page": pg, "kind": audit["correction_kind"],
-                                "field": "substance_identity", "ocr_token": candidates,
-                                "printed_token": audit["formula_as_published"] + " / " + audit["name_as_published"],
-                                "image_quote": audit["printed_quote"], "image_evidence": audit["image_evidence"]})
-        rows = [{"source_row_index": i, "raw": row,
-                 "cells": {column: _cell(token, verified_rows is not None) for column, token in zip(COLUMNS, row)}}
-                for i, row in enumerate(raw_rows[2:], 2)]
-        flags = _structure_detectors(items, table_index) + _numeric_detectors(rows)
-        for correction in fixture["numeric_corrections"]:
-            if correction["record_id"] != audit["record_id"]:
-                continue
-            row = next(r for r in rows if r["source_row_index"] == correction["source_row_index"])
-            cell = row["cells"][correction["column"]]
-            if cell["raw"] != correction["ocr_token"]:
-                raise ValueError(f"stale numeric correction: {correction}")
-            row["cells"][correction["column"]] = {
-                **_cell(correction["printed_token"], True), "raw_ocr_token": cell["raw"]}
-            corrections.append({**correction, "image_evidence": audit["image_evidence"]})
-        note_blocks = _note_blocks(items, table_index)
-        notes = parse_note_block("\n".join(note_blocks))
-        notes["blocks_raw"] = note_blocks
-        # Equations remain in their native OCR representation, never executable coefficients.
-        notes["equation_transcription_status"] = "raw_ocr_only"
-        metadata_unverified = audit["status"] == "unverified"
-        ambiguities = flags + notes["ambiguities"]
-        if verified_rows is None:
-            ambiguities.append({"kind": "numeric_cells_not_image_verified"})
-        if metadata_unverified:
-            ambiguities.append({"kind": "unverified_printed_identity", "raw": audit["printed_quote"]})
-        records.append({
-            "record_id": audit["record_id"], "record_kind": audit["record_kind"],
-            "formula": audit["formula"], "formula_as_published": audit["formula_as_published"],
-            "name_as_published": audit["name_as_published"], "phase": audit["phase"],
-            "metadata_ocr_token": candidates, "metadata_ocr_suspect": metadata_unverified,
-            "printed_page": audit["printed_page"], "pdf_page": pg,
-            "source_ref": {"path": "source/mineru-pages.jsonl", "line": pg, "item_index": table_index},
-            "source_heading_raw": table.get("table_caption", []),
-            "table_kind": "formation" if "Log Kf" in table["table_body"] else "reaction",
-            "header_rows_raw": raw_rows[:2], "columns": list(COLUMNS), "units": dict(zip(COLUMNS, UNITS)),
-            "rows": rows, "row_count": len(rows), "notes": notes,
-            "structural_records": [{"record_kind": x["type"], "printed_form_ocr": x.get("text", "")}
-                                   for x in items if x["type"] in {"header", "page_number", "footer"}],
-            "corrections": corrections, "ambiguities": ambiguities,
-            "transcription_status": "native_table_transcribed_with_explicit_ocr_coverage",
-        })
-    entries = []
-    for record in records:
-        entries.append({**{k: record[k] for k in ("record_id", "record_kind", "formula", "formula_as_published",
-                                                  "name_as_published", "phase", "row_count", "metadata_ocr_suspect")},
-                        "source": source, "source_locator": {"printed_page": record["printed_page"], "pdf_page": record["pdf_page"]},
-                        "original_record_text_location": record["source_ref"], "sha256": sidecar["sha256"],
-                        "path": f"records/{record['record_id']}.json",
-                        "ambiguity_count": len(record["ambiguities"]), "ambiguities": record["ambiguities"],
-                        "ocr_suspect_count": int(record["metadata_ocr_suspect"]) + int(record["notes"]["ocr_suspect"])
-                        + sum(c["ocr_suspect"] for row in record["rows"] for c in row["cells"].values())})
+    pages_by_pdf = {page["pdf_page"]: page for page in pages}
+    records = _records_from_audits(audits, pages_by_pdf, fixture)
+    entries = _manifest_entries(records, source, sidecar["sha256"])
     coverage = {"status": "partial", "pdf_page_count": 432, "decoded_pdf_pages": [1, 432],
                 "ingested_printed_pages": [3, last_page - 4], "ingested_pdf_pages": [7, last_page],
                 "remaining_pdf_pages": [last_page + 1, 432], "remaining_printed_pages": [last_page - 3, 427],
@@ -220,7 +242,7 @@ def build(corpus):
                 "corrections": [c for r in records for c in r["corrections"]], "entries": entries}
     access_path = ROOT / "data/literature/compilations/access-status.yaml"
     access = yaml.safe_load(access_path.read_text())
-    access["updated"] = "2026-09-12"
+    _advance_access_status_date(access, "2026-09-12")
     access["sources"]["pankratz_1987_usbm_b689"] = {
         **source, "access": "public_domain_us_government_work", "local_status": "partial_ingest",
         "harvested_path": str(DEST.relative_to(ROOT)), "source_pdf_sha256": sidecar["sha256"],
@@ -235,8 +257,152 @@ def build(corpus):
     return {str(path.relative_to(ROOT)): content for path, content in artifacts.items()}
 
 
+def _b696_decoded_pages(corpus, pdf_pages):
+    source_root = corpus / "text" / B696_SOURCE_ID / "mineru"
+    pages = []
+    for pdf_page in sorted(pdf_pages):
+        first_page = ((pdf_page - 1) // 40) * 40 + 1
+        last_page = min(first_page + 39, 962)
+        chunk = f"p{first_page:03d}-p{last_page:03d}"
+        source_path = (source_root / f"chunk-{chunk}"
+                       / f"{B696_SOURCE_ID}-{chunk}_content_list.json")
+        content = json.loads(source_path.read_text())
+        items = [item for item in content if item["page_idx"] == pdf_page - first_page]
+        if not items:
+            raise ValueError(f"PDF{pdf_page}: expected selected page decode")
+        pages.append({"pdf_page": pdf_page, "items": items})
+    return pages
+
+
+def _page_complement(first_page, last_page, included_pages):
+    included = set(included_pages)
+    ranges = []
+    range_start = None
+    for page in range(first_page, last_page + 2):
+        if page <= last_page and page not in included:
+            if range_start is None:
+                range_start = page
+        elif range_start is not None:
+            ranges.append([range_start, page - 1])
+            range_start = None
+    return ranges
+
+
+def build_b696(corpus):
+    """Build the image-audited, species-bounded B696 ingest using B689 record assembly."""
+    pdf = corpus / "raw" / B696_SOURCE_ID / f"{B696_SOURCE_ID}.pdf"
+    sidecar = yaml.safe_load((pdf.parent / "sidecar.yaml").read_text())
+    if sha256(pdf) != sidecar["sha256"]:
+        raise ValueError("source PDF differs from acquisition checksum")
+    audits = [json.loads(line) for line in
+              (B696_DEST / "source/formula-audit.jsonl").read_text().splitlines() if line.strip()]
+    fixture_path = B696_DEST / "source/image-verified-fixture.json"
+    fixture = json.loads(fixture_path.read_text())
+    table_pages = [audit["pdf_page"] for audit in audits]
+    if table_pages != sorted(set(table_pages)):
+        raise ValueError("B696 formula audit must list each table page once in PDF order")
+    if any(audit["printed_page"] != audit["pdf_page"] - 4
+           or audit["record_id"] != f"page-{audit['printed_page']:04d}"
+           for audit in audits):
+        raise ValueError("identity audit page and record locators disagree")
+    decode_pages = _b696_decoded_pages(corpus, {*B696_PROOF_PAGES, *table_pages})
+    pages_by_pdf = {page["pdf_page"]: page for page in decode_pages}
+    source_line_by_pdf = {page["pdf_page"]: line for line, page in enumerate(decode_pages, 1)}
+    if any(audit.get("source_line") != source_line_by_pdf.get(audit["pdf_page"])
+           for audit in audits):
+        raise ValueError("formula audit source lines disagree with selected page decodes")
+    records = _records_from_audits(audits, pages_by_pdf, fixture)
+    source = {
+        "database": "U.S. Bureau of Mines Bulletin 696", "version": "1994",
+        "citation": sidecar["citation"].removesuffix(".") + ", 962 pp.",
+        "official_url": "https://digital.library.unt.edu/ark:/67531/metadc12836/",
+        "retrieved_url": sidecar["retrieved_url"], "licence": sidecar["licence"],
+        "access_date": "2026-10-05",
+    }
+    sidecar_text = yaml.safe_dump(sidecar, sort_keys=False, allow_unicode=True)
+    entries = _manifest_entries(records, source, sidecar["sha256"])
+    numeric_cell_count = sum(len(record["rows"]) * len(COLUMNS) for record in records)
+    non_numeric_cell_count = sum(cell["value"] is None for record in records
+                                 for row in record["rows"] for cell in row["cells"].values())
+    coverage = {
+        "status": "partial", "pdf_page_count": 962,
+        "decoded_pdf_pages": [page["pdf_page"] for page in decode_pages],
+        "ingested_printed_pages": [record["printed_page"] for record in records],
+        "ingested_pdf_pages": table_pages,
+        "remaining_pdf_pages": _page_complement(1, 962, table_pages),
+        "remaining_note": ("Species-scope partial ingest: all requested tables found in the bulletin are complete; "
+                           "all other substance tables remain untranscribed. Extra decoded pages support the "
+                           "contents and absence checks."),
+        "records_examined": len(audits),
+        **{status: sum(audit["status"] == status for audit in audits)
+           for status in ("matched", "corrected", "unverified")},
+        "complete_numeric_image_audit_pdf_pages": table_pages,
+        "numeric_cell_count": numeric_cell_count,
+        "numeric_cells_image_verified": numeric_cell_count - non_numeric_cell_count,
+        "non_numeric_cell_count": non_numeric_cell_count,
+        "absent_species": [
+            {"formula": "PmO", "pages_checked": [3]},
+            {"formula": "Se2", "pages_checked": [3]},
+            {"formula": "As4", "pages_checked": [3, 46, 47, 48, 49, 50]},
+        ],
+        "per_page": [{"pdf_page": audit["pdf_page"], "printed_page": audit["printed_page"],
+                      "record_id": audit["record_id"], "identity_status": audit["status"],
+                      "numeric_status": "image_verified"} for audit in audits],
+    }
+    manifest = {
+        "schema_version": "literature_compilation_manifest.v1", "source_id": B696_SOURCE_ID,
+        "source": source,
+        "compilation_role": {
+            "engine_reference_input": True, "validation_measurement": False,
+            "scoring_eligible": False, "oxide_rail_default": False,
+            "non_oxide_policy": "warn_not_fail_closed",
+            "intended_use": "Thermodynamic reference input only",
+        },
+        "coverage": coverage, "record_count": len(records),
+        "substance_count": sum(record["record_kind"] == "substance" for record in records),
+        "feedstock_element_coverage": feedstock_coverage(
+            [{"formula": record["formula"] or ""} for record in records
+             if record["record_kind"] == "substance"]),
+        "source_files": [
+            {"path": "source/mineru-pages.jsonl",
+             "sha256": hashlib.sha256("".join(json.dumps(page, ensure_ascii=False) + "\n"
+                                                    for page in decode_pages).encode()).hexdigest()},
+            {"path": "source/formula-audit.jsonl", "sha256": sha256(B696_DEST / "source/formula-audit.jsonl")},
+            {"path": "source/image-verified-fixture.json", "sha256": sha256(fixture_path)},
+            {"path": "source/sidecar.yaml",
+             "sha256": hashlib.sha256(sidecar_text.encode()).hexdigest()},
+            {"path": str(pdf.relative_to(corpus)), "sha256": sidecar["sha256"]},
+        ],
+        "corrections": [correction for record in records for correction in record["corrections"]],
+        "entries": entries,
+    }
+    access_path = ROOT / "data/literature/compilations/access-status.yaml"
+    access = yaml.safe_load(access_path.read_text())
+    _advance_access_status_date(access, "2026-10-05")
+    access["sources"]["pankratz_1994_usbm_b696"] = {
+        **source, "access": "public_domain_us_government_work", "local_status": "partial_ingest",
+        "harvested_path": str(B696_DEST.relative_to(ROOT)), "source_pdf_sha256": sidecar["sha256"],
+        "harvested_record_count": len(records), "coverage": coverage,
+        "note": ("Selected gas-table reference data only; assessed engine reference input, "
+                 "never validation measurement evidence or battery-scored."),
+    }
+    pages_text = "".join(json.dumps(page, ensure_ascii=False) + "\n" for page in decode_pages)
+    artifacts = {
+        B696_DEST / "manifest.yaml": yaml.safe_dump(manifest, sort_keys=False, allow_unicode=True),
+        B696_DEST / "source/sidecar.yaml": sidecar_text,
+        B696_DEST / "source/mineru-pages.jsonl": pages_text,
+        access_path: yaml.safe_dump(access, sort_keys=False, allow_unicode=True, width=120),
+        B696_DEST / "census.json": json.dumps(coverage, indent=2) + "\n",
+    }
+    artifacts.update({B696_DEST / f"records/{record['record_id']}.json":
+                      json.dumps(record, ensure_ascii=False, indent=2) + "\n" for record in records})
+    return {str(path.relative_to(ROOT)): content for path, content in artifacts.items()}
+
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--corpus", type=Path, default=Path(os.environ.get("REGOLITH_CORPUS_ROOT", Path.home() / "Repos/regolith-corpus")))
+    parser.add_argument("--edition", choices=("b689", "b696"), default="b689")
     args = parser.parse_args()
-    print(json.dumps(build(args.corpus), ensure_ascii=False))
+    build_function = build if args.edition == "b689" else build_b696
+    print(json.dumps(build_function(args.corpus), ensure_ascii=False))
