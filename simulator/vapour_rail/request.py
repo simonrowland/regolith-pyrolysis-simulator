@@ -1377,6 +1377,7 @@ def refusal_closure(
                         activity_exponent=evaluator_activity_exponent,
                         solve_group_id=rule.solve_group_id,
                         state_fingerprint=state_identity,
+                        temperature_K=state.temperature_K,
                         mole_fraction=reported_mole_fraction,
                         reported_activity=reported_activity,
                         reported_activity_provider=(

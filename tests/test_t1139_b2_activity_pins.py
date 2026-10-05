@@ -1,8 +1,8 @@
-"""t-1139 Build B2 pins of the trace-parent activity verdict before the ladder.
+"""t-1139 Build B2 pins of the trace-parent activity verdict after the ladder.
 
-Taken against the production resolver at the B1 checkout. Temperature is
-recorded at both anchors even though this path does not read it. Live
-channel pin tables stay the Build A digest.
+The pre-ladder pin (ideal activity equal to the mole fraction, no rung) is
+the parent commit. These literals are the production resolver's verdict at
+mole fraction 1e-6. Live channel pin tables stay the Build A digest.
 """
 
 from __future__ import annotations
@@ -26,25 +26,398 @@ from tests.test_t1139_build_a_pins import (
 
 PIN_TEMPERATURES_K = (1500.0, 1673.0)
 PIN_MOLE_FRACTION = 1e-6
-PIN_MOLE_FRACTION_HEX = PIN_MOLE_FRACTION.hex()
 
-# Pre-ladder verdict. No coefficient row, so the Henrian policy asserts an
-# ideal solution. gamma is 1 and the activity value is the supplied mole
-# fraction. There is no rung and no bound.
-_PRE_LADDER_VERDICT = {
-    "verdict": "StatusBearingValue",
-    "value_hex": PIN_MOLE_FRACTION_HEX,
-    "reason": "declared_ideal_solution_activity",
-    "provider": "declared_ideal_solution_policy",
-    "bound_direction": None,
+# Recorded from CondensedPhaseActivityProvider after the ladder. Gamma hex is
+# the fit coefficient; value hex is the activity a = gamma * X when one gamma
+# is selected. Unranked parents carry no collapsed number.
+_AFTER_LADDER = json.loads(
+    r"""
+{
+  "B2O3": {
+    "authority": false,
+    "bound": null,
+    "coefficient_formula": null,
+    "extrapolation_notice": {
+      "authority_level": "extrapolated",
+      "certified_band": {
+        "temperature_K": [
+          1800.0,
+          2200.0
+        ]
+      },
+      "reason": "temperature outside the fit validity range"
+    },
+    "flag": "extrapolated",
+    "gamma_hex": {
+      "1500": "0x1.4a5ef73f587cep-23",
+      "1673": "0x1.30c4cd9b7e70ap-23"
+    },
+    "homologue": null,
+    "may_certify": false,
+    "origin": "published",
+    "provider": "trace_parent_activity_ladder",
+    "reason": "published_gamma_extrapolated",
     "report_label": "status-bearing-not-point",
-    "authority": False,
-    "evidence_tier": "ASSUMED_IDEAL_SOLUTION",
-    "may_certify": False,
-    "missing_inputs": ("coefficient_table_row",),
-    "rung": None,
-    "flag": "declared_ideal_solution_activity",
+    "rung": 2,
+    "source_row_count": 1,
+    "source_row_id": "fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_02_model::rows_as_printed:h=cfa04d163c6b",
+    "tier": "B",
+    "value_hex": {
+      "1500": "0x1.5a6b478373699p-43",
+      "1673": "0x1.3f92bddf42251p-43"
+    },
+    "verdict": "StatusBearingValue"
+  },
+  "Cs2O": {
+    "authority": false,
+    "bound": null,
+    "coefficient_formula": null,
+    "extrapolation_notice": null,
+    "flag": "published",
+    "gamma_hex": {
+      "1500": "0x1.137459234191cp-27",
+      "1673": "0x1.d957152e02175p-25"
+    },
+    "homologue": null,
+    "may_certify": false,
+    "origin": "published",
+    "provider": "trace_parent_activity_ladder",
+    "reason": "published_gamma",
+    "report_label": null,
+    "rung": 2,
+    "source_row_count": 1,
+    "source_row_id": "fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_02_model::rows_as_printed:h=88048d19eeb1",
+    "tier": "B",
+    "value_hex": {
+      "1500": "0x1.20d5c0153d76ap-47",
+      "1673": "0x1.f0554896df580p-45"
+    },
+    "verdict": "Point"
+  },
+  "Cu2O": {
+    "authority": false,
+    "bound": null,
+    "coefficient_formula": null,
+    "extrapolation_notice": null,
+    "flag": "published_gamma_rows_unranked",
+    "gamma_hex": {
+      "1500": null,
+      "1673": null
+    },
+    "homologue": null,
+    "may_certify": false,
+    "origin": null,
+    "provider": "trace_parent_activity_ladder",
+    "reason": "published_gamma_rows_unranked",
+    "report_label": "status-bearing-not-point",
+    "rung": 2,
+    "source_row_count": 4,
+    "source_row_id": null,
+    "tier": "B",
+    "value_hex": {
+      "1500": null,
+      "1673": null
+    },
+    "verdict": "StatusBearingValue"
+  },
+  "CuO0.5": {
+    "authority": false,
+    "bound": null,
+    "coefficient_formula": "Cu2O",
+    "extrapolation_notice": null,
+    "flag": "published_gamma_rows_unranked",
+    "gamma_hex": {
+      "1500": null,
+      "1673": null
+    },
+    "homologue": null,
+    "may_certify": false,
+    "origin": null,
+    "provider": "trace_parent_activity_ladder",
+    "reason": "published_gamma_rows_unranked",
+    "report_label": "status-bearing-not-point",
+    "rung": 2,
+    "source_row_count": 4,
+    "source_row_id": null,
+    "tier": "B",
+    "value_hex": {
+      "1500": null,
+      "1673": null
+    },
+    "verdict": "StatusBearingValue"
+  },
+  "Ga2O3": {
+    "authority": false,
+    "bound": null,
+    "coefficient_formula": null,
+    "extrapolation_notice": null,
+    "flag": "proxy_estimate",
+    "gamma_hex": {
+      "1500": "0x1.030417c184bc4p-14",
+      "1673": "0x1.60d5b11eab48bp-13"
+    },
+    "homologue": null,
+    "may_certify": false,
+    "origin": "proxy_estimate",
+    "provider": "trace_parent_activity_ladder",
+    "reason": "proxy_gamma_estimate",
+    "report_label": "status-bearing-not-point",
+    "rung": 2,
+    "source_row_count": 1,
+    "source_row_id": "fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_02_model::rows_as_printed:h=d8fd97ad84fe",
+    "tier": "B",
+    "value_hex": {
+      "1500": "0x1.0f9913205853cp-34",
+      "1673": "0x1.71f95a4969ecep-33"
+    },
+    "verdict": "StatusBearingValue"
+  },
+  "GaO1.5": {
+    "authority": false,
+    "bound": null,
+    "coefficient_formula": "Ga2O3",
+    "extrapolation_notice": null,
+    "flag": "proxy_estimate",
+    "gamma_hex": {
+      "1500": "0x1.030417c184bc4p-14",
+      "1673": "0x1.60d5b11eab48bp-13"
+    },
+    "homologue": null,
+    "may_certify": false,
+    "origin": "proxy_estimate",
+    "provider": "trace_parent_activity_ladder",
+    "reason": "proxy_gamma_estimate",
+    "report_label": "status-bearing-not-point",
+    "rung": 2,
+    "source_row_count": 1,
+    "source_row_id": "fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_02_model::rows_as_printed:h=d8fd97ad84fe",
+    "tier": "B",
+    "value_hex": {
+      "1500": "0x1.0f9913205853cp-34",
+      "1673": "0x1.71f95a4969ecep-33"
+    },
+    "verdict": "StatusBearingValue"
+  },
+  "GeO2": {
+    "authority": false,
+    "bound": null,
+    "coefficient_formula": null,
+    "extrapolation_notice": null,
+    "flag": "published_gamma_rows_unranked",
+    "gamma_hex": {
+      "1500": null,
+      "1673": null
+    },
+    "homologue": null,
+    "may_certify": false,
+    "origin": null,
+    "provider": "trace_parent_activity_ladder",
+    "reason": "published_gamma_rows_unranked",
+    "report_label": "status-bearing-not-point",
+    "rung": 2,
+    "source_row_count": 4,
+    "source_row_id": null,
+    "tier": "B",
+    "value_hex": {
+      "1500": null,
+      "1673": null
+    },
+    "verdict": "StatusBearingValue"
+  },
+  "In2O3": {
+    "authority": false,
+    "bound": null,
+    "coefficient_formula": null,
+    "extrapolation_notice": null,
+    "flag": "published",
+    "gamma_hex": {
+      "1500": "0x1.71736527bbfbdp-15",
+      "1673": "0x1.0496141e2f5f6p-13"
+    },
+    "homologue": null,
+    "may_certify": false,
+    "origin": "published",
+    "provider": "trace_parent_activity_ladder",
+    "reason": "published_gamma",
+    "report_label": null,
+    "rung": 2,
+    "source_row_count": 1,
+    "source_row_id": "fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_02_model::rows_as_printed:h=aaa9829cdabd",
+    "tier": "B",
+    "value_hex": {
+      "1500": "0x1.8365af0fdc11bp-35",
+      "1673": "0x1.113e965d6b437p-33"
+    },
+    "verdict": "Point"
+  },
+  "InO1.5": {
+    "authority": false,
+    "bound": null,
+    "coefficient_formula": "In2O3",
+    "extrapolation_notice": null,
+    "flag": "published",
+    "gamma_hex": {
+      "1500": "0x1.71736527bbfbdp-15",
+      "1673": "0x1.0496141e2f5f6p-13"
+    },
+    "homologue": null,
+    "may_certify": false,
+    "origin": "published",
+    "provider": "trace_parent_activity_ladder",
+    "reason": "published_gamma",
+    "report_label": null,
+    "rung": 2,
+    "source_row_count": 1,
+    "source_row_id": "fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_02_model::rows_as_printed:h=aaa9829cdabd",
+    "tier": "B",
+    "value_hex": {
+      "1500": "0x1.8365af0fdc11bp-35",
+      "1673": "0x1.113e965d6b437p-33"
+    },
+    "verdict": "Point"
+  },
+  "Li2O": {
+    "authority": false,
+    "bound": null,
+    "coefficient_formula": null,
+    "extrapolation_notice": null,
+    "flag": "published_gamma_rows_unranked",
+    "gamma_hex": {
+      "1500": null,
+      "1673": null
+    },
+    "homologue": null,
+    "may_certify": false,
+    "origin": null,
+    "provider": "trace_parent_activity_ladder",
+    "reason": "published_gamma_rows_unranked",
+    "report_label": "status-bearing-not-point",
+    "rung": 2,
+    "source_row_count": 4,
+    "source_row_id": null,
+    "tier": "B",
+    "value_hex": {
+      "1500": null,
+      "1673": null
+    },
+    "verdict": "StatusBearingValue"
+  },
+  "PbO": {
+    "authority": false,
+    "bound": null,
+    "coefficient_formula": null,
+    "extrapolation_notice": null,
+    "flag": "published_gamma_rows_unranked",
+    "gamma_hex": {
+      "1500": null,
+      "1673": null
+    },
+    "homologue": null,
+    "may_certify": false,
+    "origin": null,
+    "provider": "trace_parent_activity_ladder",
+    "reason": "published_gamma_rows_unranked",
+    "report_label": "status-bearing-not-point",
+    "rung": 2,
+    "source_row_count": 4,
+    "source_row_id": null,
+    "tier": "B",
+    "value_hex": {
+      "1500": null,
+      "1673": null
+    },
+    "verdict": "StatusBearingValue"
+  },
+  "Rb2O": {
+    "authority": false,
+    "bound": null,
+    "coefficient_formula": null,
+    "extrapolation_notice": null,
+    "flag": "published",
+    "gamma_hex": {
+      "1500": "0x1.407beea69aaacp-30",
+      "1673": "0x1.501d1a32d102cp-27"
+    },
+    "homologue": null,
+    "may_certify": false,
+    "origin": "published",
+    "provider": "trace_parent_activity_ladder",
+    "reason": "published_gamma",
+    "report_label": null,
+    "rung": 2,
+    "source_row_count": 1,
+    "source_row_id": "fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_02_model::rows_as_printed:h=13d25d543cb0",
+    "tier": "B",
+    "value_hex": {
+      "1500": "0x1.500d4c5c2ff36p-50",
+      "1673": "0x1.6070d4485b1b3p-47"
+    },
+    "verdict": "Point"
+  },
+  "SnO": {
+    "authority": false,
+    "bound": null,
+    "coefficient_formula": null,
+    "extrapolation_notice": {
+      "authority_level": "extrapolated",
+      "certified_band": {
+        "temperature_K": [
+          1800.0,
+          2200.0
+        ]
+      },
+      "reason": "temperature outside the fit validity range"
+    },
+    "flag": "extrapolated",
+    "gamma_hex": {
+      "1500": "0x1.48cf071b5f6a2p+1",
+      "1673": "0x1.4d8f9f6b3607ap+1"
+    },
+    "homologue": null,
+    "may_certify": false,
+    "origin": "published",
+    "provider": "trace_parent_activity_ladder",
+    "reason": "published_gamma_extrapolated",
+    "report_label": "status-bearing-not-point",
+    "rung": 2,
+    "source_row_count": 1,
+    "source_row_id": "fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_02_model::rows_as_printed:h=d9adb021bd8a",
+    "tier": "B",
+    "value_hex": {
+      "1500": "0x1.58c7e9f600dc5p-19",
+      "1673": "0x1.5dc39b2f9ec69p-19"
+    },
+    "verdict": "StatusBearingValue"
+  },
+  "V2O3": {
+    "authority": false,
+    "bound": null,
+    "coefficient_formula": null,
+    "extrapolation_notice": null,
+    "flag": "proxy_estimate",
+    "gamma_hex": {
+      "1500": "0x1.fd72aa196d134p-42",
+      "1673": "0x1.cba7842db7682p-38"
+    },
+    "homologue": null,
+    "may_certify": false,
+    "origin": "proxy_estimate",
+    "provider": "trace_parent_activity_ladder",
+    "reason": "proxy_gamma_estimate",
+    "report_label": "status-bearing-not-point",
+    "rung": 2,
+    "source_row_count": 1,
+    "source_row_id": "fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_02_model::rows_as_printed:h=ec257950b80d",
+    "tier": "B",
+    "value_hex": {
+      "1500": "0x1.0b18f0d4d279cp-61",
+      "1673": "0x1.e1fb87246b50dp-58"
+    },
+    "verdict": "StatusBearingValue"
+  }
 }
+"""
+)
 
 
 def _trace_parent_formulas() -> tuple[str, ...]:
@@ -65,53 +438,46 @@ def _resolve(formula: str, temperature_K: float):
         activity_model="source_reaction_activity",
         allow_henrian_upper_bound=True,
     )
-    # temperature_K is part of the pin contract. The pre-ladder resolver
-    # does not take it; the call still records both anchors.
-    del temperature_K
     return provider.resolve_source_reaction_activity(
         declaration,
         magemin=None,
         thermoengine=None,
         activity_exponent=1.0,
         mole_fraction=PIN_MOLE_FRACTION,
+        temperature_K=temperature_K,
     )
 
 
-def test_trace_parent_activity_verdicts_match_the_pre_ladder_pin() -> None:
+def test_trace_parent_activity_verdicts_match_the_ladder_pin() -> None:
     formulas = _trace_parent_formulas()
-    assert formulas == (
-        "B2O3",
-        "Cs2O",
-        "Cu2O",
-        "CuO0.5",
-        "Ga2O3",
-        "GaO1.5",
-        "GeO2",
-        "In2O3",
-        "InO1.5",
-        "Li2O",
-        "PbO",
-        "Rb2O",
-        "SnO",
-        "V2O3",
-    )
+    assert formulas == tuple(_AFTER_LADDER)
     for formula in formulas:
+        expected = _AFTER_LADDER[formula]
         for temperature_K in PIN_TEMPERATURES_K:
             answer = _resolve(formula, temperature_K)
-            assert answer.verdict.value == _PRE_LADDER_VERDICT["verdict"], formula
-            assert answer.value is not None
-            assert answer.value.hex() == _PRE_LADDER_VERDICT["value_hex"], formula
-            assert answer.reason == _PRE_LADDER_VERDICT["reason"], formula
-            assert answer.provider == _PRE_LADDER_VERDICT["provider"], formula
-            assert answer.bound_direction is None, formula
-            assert answer.report_label == _PRE_LADDER_VERDICT["report_label"]
-            assert answer.authority is False
-            assert answer.evidence_tier == _PRE_LADDER_VERDICT["evidence_tier"]
-            assert answer.may_certify() is False
-            assert answer.derivation["missing_inputs"] == (
-                _PRE_LADDER_VERDICT["missing_inputs"]
-            )
-            assert answer.derivation.get("rung") is None
+            label = f"{formula} @ {temperature_K}"
+            key = str(int(temperature_K))
+            assert answer.verdict.value == expected["verdict"], label
+            assert (None if answer.tier is None else answer.tier.value) == expected["tier"], label
+            assert answer.reason == expected["reason"], label
+            assert answer.provider == expected["provider"], label
+            assert answer.report_label == expected["report_label"], label
+            assert answer.authority is expected["authority"], label
+            assert answer.may_certify() is expected["may_certify"], label
+            bound = None if answer.bound_direction is None else answer.bound_direction.value
+            assert bound == expected["bound"], label
+            derivation = answer.derivation
+            assert derivation["flag"] == expected["flag"], label
+            assert derivation["rung"] == expected["rung"], label
+            assert derivation["origin"] == expected["origin"], label
+            assert derivation["homologue"] == expected["homologue"], label
+            assert derivation["coefficient_formula"] == expected["coefficient_formula"], label
+            assert derivation["source_row_id"] == expected["source_row_id"], label
+            assert len(derivation["source_row_ids"]) == expected["source_row_count"], label
+            assert derivation["extrapolation_notice"] == expected["extrapolation_notice"], label
+            gamma = derivation["gamma"]
+            assert (None if gamma is None else float(gamma).hex()) == expected["gamma_hex"][key], label
+            assert (None if answer.value is None else float(answer.value).hex()) == expected["value_hex"][key], label
 
 
 def test_live_channel_pin_tables_stay_at_the_build_a_digest() -> None:
@@ -120,7 +486,5 @@ def test_live_channel_pin_tables_stay_at_the_build_a_digest() -> None:
         "stoich": {key: list(value) for key, value in sorted(STOICH_PINS.items())},
         "dormant": list(FIRST_BATCH_EXISTING),
     }
-    encoded = json.dumps(payload, sort_keys=True, separators=(",", ":")).encode(
-        "utf-8"
-    )
+    encoded = json.dumps(payload, sort_keys=True, separators=(",", ":")).encode("utf-8")
     assert hashlib.sha256(encoded).hexdigest() == _LIVE_CHANNEL_PIN_DIGEST
