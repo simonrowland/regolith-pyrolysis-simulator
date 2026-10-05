@@ -50,7 +50,7 @@ def test_sossi_fegley_2018_table_2_printed_rows_are_pinned() -> None:
             {
                 key: value
                 for key, value in (obs.get("values") or {}).items()
-                if key not in {"quantity", "rows", "range", "approximate", "compilation_note"}
+                if key != "rows"
             },
         ]
         for formula, species in doc["species"].items()
@@ -59,7 +59,22 @@ def test_sossi_fegley_2018_table_2_printed_rows_are_pinned() -> None:
     ]
 
     assert len(rows) == 31
-    assert _sha256(rows) == "ff2408b65c69ae0aa84224fc88692e26de1d0a40fb847bfcb8f4b4f05e547cf6"
+    assert _sha256(rows) == "49112e165ef0da3f7c2aa8b0287550db0dfc3ca3b441ea36aeb6dcb5cef99df3"
+
+
+def test_sossi_fegley_2018_added_numeric_rows_are_pinned() -> None:
+    path = ROOT / "data/literature/extracts/kems-041-sossi-fegley-2018.yaml"
+    doc = yaml.safe_load(path.read_text())
+    rows = [
+        row
+        for species in doc["species"].values()
+        for obs in species.get("observations", [])
+        if str((obs.get("locator") or {}).get("table")) == "2"
+        for row in (obs.get("values") or {}).get("rows", [])
+    ]
+
+    assert len(rows) == 44
+    assert _sha256(rows) == "8207990870ce8a4a98ea8baa80820f002c63f93c742fe621b893b72d0c87bc64"
 
 
 def _migrate_extract(name: str):
