@@ -18,12 +18,12 @@ compilation_role:
   circularity_warning: Do not validate an engine against a compilation it consumes.
 extraction:
   method: machine parse of NIST tab-delimited table download; source bytes cached unchanged
-  date: '2026-09-06'
   user_agent: RegolithPyrolysisSimulator-corpus-harvester/1.0 (public thermochemical reference-data research; polite cached
     client)
   source_cache_path: /Users/simonrowland/Library/CloudStorage/Dropbox/Starship Mission Design/Regolith Processing/regolith-pyrolysis-simulator/docs-private/research/2026-08-09-upstream-mission/IMCC-impl/janaf-mirror/Ta/Ta-005.txt
   source_sha256: 6936c4ac94b6a82440048f7c811f29be01caa698ba71b2ae39626facd0750a0f
   review_status: machine_transcribed_unreviewed
+  date: '2026-09-06'
 table:
   table_id: Ta-005
   url: https://janaf.nist.gov/tables/Ta-005.html
@@ -4512,6 +4512,87 @@ table:
         row_temperature_as_published: '5700'
         column: log Kf
   - temperature:
+      value: 5800.0
+      as_published: '5800'
+      locator:
+        table_id: Ta-005
+        url: https://janaf.nist.gov/tables/Ta-005.html
+        download_url: https://janaf.nist.gov/tables/Ta-005.txt
+        row_temperature_as_published: '5800'
+        column: T(K)
+    heat_capacity:
+      value: 43.762
+      as_published: '43.762'
+      locator:
+        table_id: Ta-005
+        url: https://janaf.nist.gov/tables/Ta-005.html
+        download_url: https://janaf.nist.gov/tables/Ta-005.txt
+        row_temperature_as_published: '5800'
+        column: Cp
+    entropy:
+      value: 274.465
+      as_published: '274.465'
+      locator:
+        table_id: Ta-005
+        url: https://janaf.nist.gov/tables/Ta-005.html
+        download_url: https://janaf.nist.gov/tables/Ta-005.txt
+        row_temperature_as_published: '5800'
+        column: S
+    negative_gibbs_enthalpy_function:
+      value: 241.146
+      as_published: '241.146'
+      locator:
+        table_id: Ta-005
+        url: https://janaf.nist.gov/tables/Ta-005.html
+        download_url: https://janaf.nist.gov/tables/Ta-005.txt
+        row_temperature_as_published: '5800'
+        column: -[G-H(Tr)]/T
+    enthalpy_increment:
+      value: 193.254
+      as_published: '193.254'
+      locator:
+        table_id: Ta-005
+        url: https://janaf.nist.gov/tables/Ta-005.html
+        download_url: https://janaf.nist.gov/tables/Ta-005.txt
+        row_temperature_as_published: '5800'
+        column: H-H(Tr)
+    formation_enthalpy:
+      value: 0.0
+      as_published: '0.'
+      locator:
+        table_id: Ta-005
+        url: https://janaf.nist.gov/tables/Ta-005.html
+        download_url: https://janaf.nist.gov/tables/Ta-005.txt
+        row_temperature_as_published: '5800'
+        column: delta-f H
+        parse_repair: nist_tail_whitespace_signs_restored
+        line_number: 66
+        raw_line: "5800\t43.762\t274.465\t241.146\t193.254\t0. 0. 0."
+    formation_gibbs_energy:
+      value: 0.0
+      as_published: '0.'
+      locator:
+        table_id: Ta-005
+        url: https://janaf.nist.gov/tables/Ta-005.html
+        download_url: https://janaf.nist.gov/tables/Ta-005.txt
+        row_temperature_as_published: '5800'
+        column: delta-f G
+        parse_repair: nist_tail_whitespace_signs_restored
+        line_number: 66
+        raw_line: "5800\t43.762\t274.465\t241.146\t193.254\t0. 0. 0."
+    log10_formation_equilibrium_constant:
+      value: 0.0
+      as_published: '0.'
+      locator:
+        table_id: Ta-005
+        url: https://janaf.nist.gov/tables/Ta-005.html
+        download_url: https://janaf.nist.gov/tables/Ta-005.txt
+        row_temperature_as_published: '5800'
+        column: log Kf
+        parse_repair: nist_tail_whitespace_signs_restored
+        line_number: 66
+        raw_line: "5800\t43.762\t274.465\t241.146\t193.254\t0. 0. 0."
+  - temperature:
       value: 5900.0
       as_published: '5900'
       locator:
@@ -4658,12 +4739,6 @@ table:
   parse_ambiguities:
   - line_number: 65
     raw_line: "5778.070\t43.671\t274.300\t241.020\t192.296\tFUGACITY = 1 bar"
-    reason: expected 8 tab-separated values; found 6
-    locator:
-      table_id: Ta-005
-      url: https://janaf.nist.gov/tables/Ta-005.html
-  - line_number: 66
-    raw_line: "5800\t43.762\t274.465\t241.146\t193.254\t0. 0. 0."
     reason: expected 8 tab-separated values; found 6
     locator:
       table_id: Ta-005
