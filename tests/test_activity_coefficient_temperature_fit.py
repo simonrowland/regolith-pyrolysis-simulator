@@ -206,11 +206,20 @@ def test_sossi_fegley_2018_table_2_migrates_numeric_activity_rows() -> None:
     assert sum(observation.value.kind is ValueKind.INTERVAL for observation in observations) == 37
     assert sum(observation.value.kind is ValueKind.POINT for observation in observations) == 4
     assert sum(observation.value.kind is ValueKind.EXPRESSION for observation in observations) == 3
+    for observation in observations:
+        printed_row = observation.provenance[
+            "activity_coefficient_table_row_as_printed"
+        ]
+        assert observation.identity.species.formula == printed_row["oxide"]
     phosphate = next(
         observation
         for observation in observations
-        if observation.identity.species.formula == "P"
+        if observation.provenance[
+            "activity_coefficient_table_row_as_printed"
+        ]["oxide"]
+        == "PO2.5"
     )
+    assert phosphate.identity.species.formula == "PO2.5"
     assert phosphate.value.kind is ValueKind.INTERVAL
     assert (phosphate.value.interval_low, phosphate.value.interval_high) == (
         Decimal("1e-10"),

@@ -12624,8 +12624,14 @@ class Migrator:
                     charge=species.charge,
                 )
             elif (
-                q_for_species is Quantity.ACTIVITY_COEFFICIENT_TEMPERATURE_FIT
-                and raw_item.get("oxide")
+                raw_item.get("oxide")
+                and (
+                    q_for_species is Quantity.ACTIVITY_COEFFICIENT_TEMPERATURE_FIT
+                    or (
+                        source_id == "kems-041-sossi-fegley-2018"
+                        and q_for_species is Quantity.ACTIVITY_COEFFICIENT
+                    )
+                )
             ):
                 species = make_species(
                     str(raw_item["oxide"]).replace(" ", ""),
