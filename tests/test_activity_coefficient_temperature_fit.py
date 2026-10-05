@@ -129,6 +129,15 @@ def test_fegley_2023_table_2_migrates_all_numeric_fit_rows() -> None:
     assert domain["validity_range_K"] == [1800, 2200]
     assert domain["notes_as_printed"] == "FactSage 1800−2200 K, CMAS+FeO"
 
+    ag2o = next(
+        observation
+        for observation in observations
+        if observation.identity.species.formula == "Ag2O"
+    )
+    anchor_domain = json.loads(ag2o.value.expression_domain)
+    assert anchor_domain["validity_range_K"] is None
+    assert anchor_domain["notes_as_printed"] == "Regular solution 1673 K point, Sossi et al. (2019)"
+
 
 def test_sossi_fegley_2018_table_2_migrates_numeric_activity_rows() -> None:
     result = _migrate_extract("kems-041-sossi-fegley-2018")

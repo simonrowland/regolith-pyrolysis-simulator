@@ -7899,14 +7899,14 @@ def select_declared_source(
             note = str(payload.get("notes_printed") or "")
             numeric_temperature = r"([0-9][0-9,]*(?:\.[0-9]+)?)"
             match = re.search(
-                rf"{numeric_temperature}\s*(?:[–−-]\s*{numeric_temperature})?\s*K\b",
+                rf"{numeric_temperature}\s*[–−-]\s*{numeric_temperature}\s*K\b",
                 note,
                 re.IGNORECASE,
             )
             validity_range: list[int | float] | None = None
             if match is not None:
                 lo = Decimal(match.group(1).replace(",", ""))
-                hi = Decimal((match.group(2) or match.group(1)).replace(",", ""))
+                hi = Decimal(match.group(2).replace(",", ""))
                 validity_range = [
                     int(lo) if lo == lo.to_integral_value() else float(lo),
                     int(hi) if hi == hi.to_integral_value() else float(hi),
