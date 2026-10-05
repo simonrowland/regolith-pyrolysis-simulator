@@ -783,6 +783,15 @@ def test_cached_real_python_api_replay_key_hashes_remain_base_bytes(
 
     # Base 05b6309d30cfed84d5e2ecd0467106d5702ce628 reviewer probe.
     assert actual_hash == expected_hash
+    if model is None:
+        live_key, _authority = _alphamelts_pt0_identity(
+            model,
+            mode="python_api",
+        )
+        assert key == live_key
+        payload = {"review_sentinel": "accepted-None-base"}
+        store._store("equilibrium_post_record", live_key, payload)
+        assert store._lookup("equilibrium_post_record", key) == payload
 
 
 def test_blank_thermoengine_model_resolves_to_default_in_pt0_identity() -> None:
