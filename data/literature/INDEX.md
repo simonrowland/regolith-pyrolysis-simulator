@@ -15,12 +15,12 @@ Canonical `source_id` is the extract filename stem. Preset ids are aliases, neve
 
 ## Counts
 
-- Sources: 273
-- Extracts (`literature_extract.v1`): 271
+- Sources: 274
+- Extracts (`literature_extract.v1`): 272
 - PDFs present in this worktree: 0
 - Tracked PDFs in `docs/references/pdfs/99-kems-langmuir/`: 0
 - PDFs with no extract: 0
-- Extracts with no PDF: 271
+- Extracts with no PDF: 272
 - Alias groups needing owner/controller resolution: 41
 - Extracts with private/non-public row locators: 60
 
@@ -196,6 +196,7 @@ Canonical `source_id` is the extract filename stem. Preset ids are aliases, neve
 | `metsoc-2019-6005` | Shornikov, S. I. & Yakovlev, O. I. (2019), "Mass spectrometric study of perovskite evaporation from Knudsen cell", 82nd Annual Meeting of The Meteoritical Society, LPI Contrib. No. 2157, abstract 6005. |  | ABSENT, `` | `raw/metsoc-2019-6005/metsoc-2019-6005.pdf` (ABSENT, ); `text/metsoc-2019-6005/` (0 files, ABSENT); `tables/metsoc-2019-6005/` (0 files, ABSENT) | `data/literature/extracts/metsoc-2019-6005.yaml` (3 rows, draft) | `ledger/metsoc-2019-6005.yaml`: — (—) |
 | `metsoc-2024-6131` | Singerling, S. A., Brenker, F. E., Tkalcec, H., Connolly Jr., H. C. & Lauretta, D. S. (2024), "Nanoscale studies of sulfides and carbonates in OSIRIS-REx samples: What can they tell us about alteration on Bennu?", 86th Annual Meeting of the Meteoritical Society, LPI Contribution No. 3036, abstract 6131. |  | ABSENT, `` | `raw/metsoc-2024-6131/metsoc-2024-6131.pdf` (present, 59f1e8a4); `text/metsoc-2024-6131/` (10 files, exists); `tables/metsoc-2024-6131/` (0 files, ABSENT) | `data/literature/extracts/metsoc-2024-6131.yaml` (3 rows, draft) | `ledger/metsoc-2024-6131.yaml`: decoded (2026-09-06) |
 | `metsoc-2024-6224` | Prince, B. S., Zega, T. J., Connolly Jr., H. C. & Lauretta, D. S. (2024), "Nanometer-sized Fluid Inclusions in OSIRIS-REx Samples of Bennu", 86th Annual Meeting of the Meteoritical Society, LPI Contribution No. 3036, abstract 6224. |  | ABSENT, `` | `raw/metsoc-2024-6224/metsoc-2024-6224.pdf` (present, e456326c); `text/metsoc-2024-6224/` (10 files, exists); `tables/metsoc-2024-6224/` (0 files, ABSENT) | `data/literature/extracts/metsoc-2024-6224.yaml` (5 rows, draft) | `ledger/metsoc-2024-6224.yaml`: decoded (2026-09-06) |
+| `miki-1999-si-alloy-thermodynamics` | T. Miki, K. Morita and N. Sano, “Thermodynamic Properties of Si–Al, –Ca, –Mg Binary and Si–Ca–Al, –Ti, –Fe Ternary Alloys,” Materials Transactions, JIM 40(10) (1999), 1108–1116. |  | ABSENT, `` | `raw/miki-1999-si-alloy-thermodynamics/miki-1999-si-alloy-thermodynamics.pdf` (present, 2bdfe16d); `text/miki-1999-si-alloy-thermodynamics/` (12 files, exists); `tables/miki-1999-si-alloy-thermodynamics/` (20 files, exists) | `data/literature/extracts/miki-1999-si-alloy-thermodynamics.yaml` (111 rows, draft) | `ledger/miki-1999-si-alloy-thermodynamics.yaml`: extracted (2026-10-04) |
 | `mogul-2023-pioneer-venus-co2-icarus` | Mogul, R., Limaye, S. S., Way, M. J. & Cordova, J. A. (2023), "Venus (atmosphere): analytical model for mass spectra obtained by the Pioneer Venus Large Probe Neutral Mass Spectrometer", Icarus 392:115374. | 10.1016/j.icarus.2022.115374 | ABSENT, `` | `raw/mogul-2023-pioneer-venus-co2-icarus/mogul-2023-pioneer-venus-co2-icarus.pdf` (present, 2e0f7062); `text/mogul-2023-pioneer-venus-co2-icarus/` (55 files, exists); `tables/mogul-2023-pioneer-venus-co2-icarus/` (0 files, ABSENT) | `data/literature/extracts/mogul-2023-pioneer-venus-co2-icarus.yaml` (3 rows, draft) | `ledger/mogul-2023-pioneer-venus-co2-icarus.yaml`: decoded (2026-09-06) |
 | `murchison-degassing-2023-springer` | Voropaev, S. A., Dushenko, N. V., Fedulov, V. S. and Korochantsev, A. V. (2023), Osobennosti degazatsii uglistogo khondrita Murchison (CM2) v intervale temperatur 200-800 C, Astronomicheskii Vestnik 57(6) 571-582. English translation: Features of Degassing of the Murchison (CM2) Carbonaceous Chondrite in the Temperature Interval of 200-800 C, Solar System Research. Russian original DOI 10.31857/S0320930X23050067; English DOI 10.1134/S0038094623050064. | 10.1134/S0038094623050064 | ABSENT, `` | `raw/murchison-degassing-2023-springer/murchison-degassing-2023-springer.pdf` (present, 906d6c21); `text/murchison-degassing-2023-springer/` (20 files, exists); `tables/murchison-degassing-2023-springer/` (0 files, ABSENT) | `data/literature/extracts/murchison-degassing-2023-springer.yaml` (27 rows, draft) | `ledger/murchison-degassing-2023-springer.yaml`: extracted (2026-09-12) |
 | `murchison-hydropyrolysis-1990s-gca` | Sephton, M. A., Love, G. D., Watson, J. S., Verchovsky, A. B., Wright, I. P., Snape, C. E. and Gilmour, I. (2004), Hydropyrolysis of insoluble carbonaceous matter in the Murchison meteorite: new insights into its macromolecular structure, Geochimica et Cosmochimica Acta 68(6) 1385-1393, DOI 10.1016/j.gca.2003.08.019 | 10.1016/j.gca.2003.08.019 | ABSENT, `` | `raw/murchison-hydropyrolysis-1990s-gca/murchison-hydropyrolysis-1990s-gca.pdf` (present, b799d6c8); `text/murchison-hydropyrolysis-1990s-gca/` (24 files, exists); `tables/murchison-hydropyrolysis-1990s-gca/` (0 files, ABSENT) | `data/literature/extracts/murchison-hydropyrolysis-1990s-gca.yaml` (10 rows, draft) | `ledger/murchison-hydropyrolysis-1990s-gca.yaml`: extracted (2026-09-12) |
@@ -476,6 +477,7 @@ Canonical `source_id` is the extract filename stem. Preset ids are aliases, neve
 - `metsoc-2019-6005`
 - `metsoc-2024-6131`
 - `metsoc-2024-6224`
+- `miki-1999-si-alloy-thermodynamics`
 - `mogul-2023-pioneer-venus-co2-icarus`
 - `murchison-degassing-2023-springer`
 - `murchison-hydropyrolysis-1990s-gca`
