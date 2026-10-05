@@ -133,7 +133,7 @@ def test_liquid_parents_are_on_the_rail(source_rail) -> None:
         "In2O3",
         "PbO",
         "GeO2",
-        "SnO2",
+        "SnO",
         "Rb2O",
         "Cs2O",
         "B2O3",
@@ -144,6 +144,22 @@ def test_liquid_parents_are_on_the_rail(source_rail) -> None:
         record = source_rail.require(formula, "condensed_liquid")
         assert record.standard_state == "condensed_liquid"
         assert record.T_max_K > record.T_min_K
+
+
+def test_sn_oxide_liquids_support_both_valences(source_rail) -> None:
+    """SnO is Sn2+ and SnO2 is Sn4+. Both NASA liquids load; JANAF has neither."""
+    sno = source_rail.records_for("SnO", "condensed_liquid")
+    sno2 = source_rail.records_for("SnO2", "condensed_liquid")
+    assert [(record.source_id, record.record_id) for record in sno] == [
+        ("nasa-glenn", "NG-1888")
+    ]
+    assert [(record.source_id, record.record_id) for record in sno2] == [
+        ("nasa-glenn", "NG-1890")
+    ]
+    assert sno[0].T_min_K == 1250.0
+    assert sno2[0].T_min_K == 1903.0
+    assert source_rail.records_for("SnO", "condensed_solid")[0].record_id == "NG-1887"
+    assert source_rail.records_for("SnO2", "condensed_solid")[0].record_id == "NG-1889"
 
 
 def test_feedstock_element_enumerator_is_the_janaf_owner() -> None:

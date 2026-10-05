@@ -52,7 +52,7 @@ LIQUID_PARENT_OXIDE: Mapping[str, str] = {
     "In": "In2O3",
     "Pb": "PbO",
     "Ge": "GeO2",
-    "Sn": "SnO2",
+    "Sn": "SnO",
     "Rb": "Rb2O",
     "Cs": "Cs2O",
     "B": "B2O3",

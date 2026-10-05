@@ -90,6 +90,23 @@ def test_preferred_oxide_carriers_compile_dormant(generated_batch) -> None:
             assert record_id in channel.native_phases
 
 
+def test_sn_parent_is_sno(generated_batch) -> None:
+    assert LIQUID_PARENT_OXIDE["Sn"] == "SnO"
+    tin = [
+        channel
+        for channel in generated_batch.channels
+        if channel.element == "Sn"
+    ]
+    assert tin
+    for channel in tin:
+        assert channel.parent_oxide == "SnO"
+        species = channel.family["physical_properties"]["species"][
+            channel.species_id
+        ]
+        assert species["liquid_parent_extension"] is True
+        assert _channel_domain(channel)[0] < 1250.0
+
+
 def test_cu_parent_is_cu2o_with_cuo05_basis(generated_batch) -> None:
     copper = [
         channel
