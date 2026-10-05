@@ -20,6 +20,11 @@ import yaml
 from werkzeug.exceptions import BadRequest, RequestEntityTooLarge
 
 from simulator.backends import BackendResolutionStatus, backend_resolution_status
+from simulator.additive_calculations import (
+    ADDITIVE_MASS_MARGIN,
+    SHUTTLE_LOSS_FRACTION,
+    k_shuttle_potassium_additive_kg,
+)
 from simulator.backend_names import (
     ANALYTICAL_BACKEND_CLASS_DISPLAY_NAME,
     ANALYTICAL_BACKEND_SERIALIZATION_TOKEN,
@@ -52,7 +57,10 @@ from simulator.fidelity_vocabulary import (
     UnknownFidelityVocabularyTokenError,
     canonicalize_fidelity_emission,
 )
-from simulator.feedstock_composition import normalized_feedstock_component_masses_kg
+from simulator.feedstock_composition import (
+    iron_oxide_values,
+    normalized_feedstock_component_masses_kg,
+)
 from simulator.furnace_materials import (
     PROXY_FURNACE_GROUNDING_TIERS,
     load_furnace_materials,
@@ -5392,26 +5400,23 @@ def additive_calc(key):
     comp = normalized_feedstock_component_masses_kg(fs, mass_kg)
 
     # Absolute kg of each oxide in the batch
-    FeO_kg = comp.get('FeO', 0.0)
+    FeO_kg, Fe2O3_kg = iron_oxide_values(comp)
     TiO2_kg = comp.get('TiO2', 0.0)
     Cr2O3_kg = comp.get('Cr2O3', 0.0)
     Al2O3_kg = comp.get('Al2O3', 0.0)
     P2O5_kg = comp.get('P2O5', 0.0)
     SO3_kg = comp.get('SO3', 0.0)
 
-    MARGIN = 1.2
-    SHUTTLE_LOSS = 0.25  # ~25% loss per cycle
-
-    # K for C3-K shuttle
-    K_kg = FeO_kg * (2 * 39.10 / 71.84) * SHUTTLE_LOSS * MARGIN
+    # K for C3-K shuttle; physical stoichiometry is owned by the simulator.
+    K_kg = k_shuttle_potassium_additive_kg(FeO_kg, Fe2O3_kg)
 
     # Na for C3-Na shuttle
     Na_kg = ((TiO2_kg * (4 * 22.99 / 79.87)
               + Cr2O3_kg * (6 * 22.99 / 151.99))
-             * SHUTTLE_LOSS * MARGIN)
+             * SHUTTLE_LOSS_FRACTION * ADDITIVE_MASS_MARGIN)
 
     # Mg for C6 thermite
-    Mg_kg = Al2O3_kg * (3 * 24.31 / 101.96) * MARGIN
+    Mg_kg = Al2O3_kg * (3 * 24.31 / 101.96) * ADDITIVE_MASS_MARGIN
 
     # C for P₂O₅/SO₃ feedstocks
     C_kg = P2O5_kg * 0.5 + SO3_kg * 0.3

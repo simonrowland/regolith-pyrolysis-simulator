@@ -84,6 +84,9 @@ expected:
       Vdovykin 1970, Wiik 1972, Jarosewich 1990, Klöck+1998).
     BSE_bulk_silicate_earth:
       source: "Tab 1 col BSE; Palme & O'Neill 2003"
+      fe_redox_split_unknown: true
+      composition_basis:
+        fe_reporting_convention: total Fe as FeO
       SiO2: 45.40
       MgO: 36.76
       Al2O3: 4.48
@@ -110,6 +113,9 @@ expected:
       Mg_mol_pct: 83.3
     Mars_bulk_silicate_mars:
       source: "Tab 1 col Mars; Lodders 2000 + Lodders-Fegley 2011"
+      fe_redox_split_unknown: true
+      composition_basis:
+        fe_reporting_convention: total Fe as FeO
       SiO2: 45.39
       MgO: 29.71
       Al2O3: 2.89
@@ -123,6 +129,9 @@ expected:
       Mg_mol_pct: 75.5
     EPB_eucrite_parent_body:
       source: "Tab 1 col EPB (presumed 4 Vesta); Lodders 2000"
+      fe_redox_split_unknown: true
+      composition_basis:
+        fe_reporting_convention: total Fe as FeO
       SiO2: 46.26
       MgO: 31.55
       Al2O3: 3.27
@@ -136,6 +145,9 @@ expected:
       Mg_mol_pct: 79.1
     Angrite:
       source: "Tab 1 col Angrite; unweighted mean of 5 angrites (D'Orbigny, Sahara 99555, Angra dos Reis, LEW 86010, LEW 87051)"
+      fe_redox_split_unknown: true
+      composition_basis:
+        fe_reporting_convention: total Fe as FeO
       SiO2: 40.32
       MgO: 11.10
       Al2O3: 11.45
@@ -149,6 +161,9 @@ expected:
       Mg_mol_pct: 49.6
     Ureilite:
       source: "Tab 1 col Ureilite; unweighted median of 9 ureilites"
+      fe_redox_split_unknown: true
+      composition_basis:
+        fe_reporting_convention: total Fe as FeO
       SiO2: 43.65
       MgO: 39.98
       Al2O3: 0.37

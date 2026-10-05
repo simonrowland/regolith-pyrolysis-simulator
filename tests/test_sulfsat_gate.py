@@ -461,12 +461,16 @@ def _sim_with_sulfur_feedstock() -> PyrolysisSimulator:
                     'SO3': 4.0,
                     'Cl': 1.0,
                     'ClO4': 0.5,
-                    'Fe': 6.0,
                     'Ni': 1.0,
                     'NiO': 1.2,
                     'ZrO2': 0.3,
                     'REE_oxides': 0.2,
                 },
+                'composition_basis': {
+                    'FeO': {'method': 'synthetic assay', 'source': 'test'},
+                    'Fe2O3': {'method': 'synthetic assay', 'source': 'test'},
+                },
+                'elemental_composition_wt_pct': {'Fe': 6.0},
                 'non_oxide_components': {'S_wt_pct': [1.0, 3.0]},
                 'bulk_additions': {
                     'metallic_FeNi_wt_pct': [10.0, 20.0],

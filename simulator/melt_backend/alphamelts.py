@@ -85,6 +85,7 @@ from simulator.melt_backend.alphamelts_contract import (
 )
 from simulator.melt_backend.vaporock import VapoRockBackend
 from simulator.environment import DEFAULT_VACUUM_FLOOR_BAR
+from simulator.feedstock_composition import iron_oxide_values, total_fe
 from simulator.melt_backend.liquidus import (
     LiquidusSampleError,
     LiquidusSolidusResult,
@@ -2421,20 +2422,29 @@ class _MELTSBackendSupport(MeltBackend):
         self._last_normalization_warnings = []
         normalized_basis = {oxide: 0.0 for oxide in MELTS_OXIDE_BASIS}
         feo_total = 0.0
+        feo, fe2o3 = iron_oxide_values(comp_wt)
 
         for raw_name, raw_wt in comp_wt.items():
-            wt = float(raw_wt)
-            if wt <= 0.0:
-                continue
             oxide = self._canonical_oxide_name(raw_name)
             if oxide is None:
+                wt = float(raw_wt)
+                if wt <= 0.0:
+                    continue
                 self._last_normalization_warnings.append(
                     f'Dropped non-MELTS component {raw_name}')
+                continue
+            if oxide in ('FeO', 'Fe2O3'):
+                continue
+            wt = float(raw_wt)
+            if wt <= 0.0:
                 continue
             if oxide == 'FeO_total':
                 feo_total += wt
             else:
                 normalized_basis[oxide] += wt
+
+        normalized_basis['FeO'] += feo
+        normalized_basis['Fe2O3'] += fe2o3
 
         if feo_total > 0.0:
             if self._fe3fet_ratio is not None:
@@ -2718,13 +2728,10 @@ class _MELTSBackendSupport(MeltBackend):
         )
 
     def _to_petthermotools_liq_comp(self, comp_wt: Mapping[str, float]) -> dict:
-        feot = float(comp_wt.get('FeO', 0.0)) + (
-            FE3_TO_FEOT_FACTOR * float(comp_wt.get('Fe2O3', 0.0))
-        )
+        feo, _ = iron_oxide_values(comp_wt)
+        feot = total_fe(comp_wt)
         if feot > 0.0:
-            fe3fet = (
-                FE3_TO_FEOT_FACTOR * float(comp_wt.get('Fe2O3', 0.0)) / feot
-            )
+            fe3fet = (feot - feo) / feot
         else:
             fe3fet = self._fe3fet_ratio or 0.0
         return {

@@ -55,6 +55,7 @@ from simulator.backends import (
 )
 from simulator.config import ConfigBundle, load_config_bundle
 from simulator.fidelity_vocabulary import canonicalize_fidelity_emission
+from simulator.feedstock_composition import iron_oxide_values
 from simulator.campaigns import CampaignManager, CampaignPressureSetpointRefusal
 from simulator.accounting import AccountingQueries
 from simulator.accounting.ledger_api import LedgerAPI
@@ -2950,9 +2951,10 @@ def _c0_char_diagnostic(
     o2_injected_mol = o2_injected_kg / o2_molar_mass_kg_per_mol
     o2_absorbed_mol = o2_absorbed_kg / o2_molar_mass_kg_per_mol
 
-    # Premise: residual char can reduce molten FeO once the C/CO Ellingham
-    # line is below Fe/FeO. Algebra: C + O2 -> CO2 needs 1 mol O2/mol C;
-    # C + 1/2 O2 -> CO needs 0.5 mol O2/mol C; FeO + C -> Fe + CO is 1:1.
+    # Premise: residual char can reduce molten iron oxides once the C/CO
+    # Ellingham line is below Fe/FeO. Algebra: FeO + C -> Fe + CO consumes
+    # one carbon per FeO; Fe2O3 + 3C -> 2Fe + 3CO consumes three per Fe2O3.
+    # C + O2 -> CO2 needs 1 mol O2/mol C; C + 1/2 O2 -> CO needs 0.5.
     # Unit check: kg O2 / (kg/mol) -> mol; mol C * kg/mol -> kg C/Fe.
     # Sanity: 1 tonne at 3.5 wt% C and the Sephton floor 0.39 gives
     # 1.136 kmol (13.65 kg) char, 36.3/18.2 kg O2 (CO2/CO), and at most
@@ -2972,21 +2974,35 @@ def _c0_char_diagnostic(
     absorbed_residual_co_mol = refractory_char_mol
 
     c0_end = c0_snapshots[-1]
-    melt_feo_kg = max(
-        0.0,
-        float(c0_end.inventory.melt_oxide_kg.get("FeO", 0.0) or 0.0),
+    melt_feo_kg, melt_fe2o3_kg = iron_oxide_values(
+        c0_end.inventory.melt_oxide_kg
     )
+    melt_feo_kg = max(0.0, melt_feo_kg)
+    melt_fe2o3_kg = max(0.0, melt_fe2o3_kg)
     melt_feo_mol = melt_feo_kg / feo_molar_mass_kg_per_mol
+    fe2o3_molar_mass_kg_per_mol = MOLAR_MASS["Fe2O3"] / 1000.0
+    melt_fe2o3_mol = melt_fe2o3_kg / fe2o3_molar_mass_kg_per_mol
+    melt_iron_oxide_oxygen_mol = melt_feo_mol + 3.0 * melt_fe2o3_mol
     feo_reducible_mol = min(absorbed_residual_co2_mol, melt_feo_mol)
+    iron_oxide_oxygen_reducible_mol = min(
+        absorbed_residual_co2_mol, melt_iron_oxide_oxygen_mol
+    )
     feo_fraction_at_risk = (
         feo_reducible_mol / melt_feo_mol if melt_feo_mol > 0.0 else 0.0
+    )
+    iron_oxide_oxygen_fraction_at_risk = (
+        iron_oxide_oxygen_reducible_mol / melt_iron_oxide_oxygen_mol
+        if melt_iron_oxide_oxygen_mol > 0.0
+        else 0.0
     )
     # No source establishes a safe non-zero residual-char allowance. The
     # owner-flagged 2026-07-15 Ellingham premise, grounded to REF-020
     # NIST-JANAF/Chase 1998 C/CO and Fe/FeO thermochemistry, makes onset the
     # warning boundary: any positive FeO fraction at risk warns, but never
     # refuses or changes process behavior.
-    warning_fired = feo_fraction_at_risk > C0_CHAR_WARNING_FEO_FRACTION
+    warning_fired = (
+        iron_oxide_oxygen_fraction_at_risk > C0_CHAR_WARNING_FEO_FRACTION
+    )
 
     def coverage_pct(o2_mol: float, required_mol: float) -> float:
         if required_mol <= 0.0:
@@ -2995,9 +3011,14 @@ def _c0_char_diagnostic(
 
     warning = None
     if warning_fired:
+        susceptible_label = (
+            "melt iron oxides"
+            if melt_fe2o3_mol > 0.0
+            else "melt FeO"
+        )
         warning = (
             "WARNING: un-lanced refractory char can stoichiometrically reduce "
-            "a positive fraction of C0-end melt FeO; diagnostic only, "
+            f"a positive fraction of C0-end {susceptible_label}; diagnostic only, "
             "no process gate applied."
         )
     susceptible_melt_mol = {}
@@ -3089,6 +3110,23 @@ def _c0_char_diagnostic(
             "Fe_equivalent_kg": feo_reducible_mol * fe_molar_mass_kg_per_mol,
             "CO_equivalent_mol": feo_reducible_mol,
             "melt_FeO_fraction_at_risk": feo_fraction_at_risk,
+            **(
+                {
+                    "melt_Fe2O3_available_mol": melt_fe2o3_mol,
+                    "melt_Fe2O3_available_kg": melt_fe2o3_kg,
+                    "melt_iron_oxide_oxygen_available_mol": (
+                        melt_iron_oxide_oxygen_mol
+                    ),
+                    "iron_oxide_oxygen_reducible_mol": (
+                        iron_oxide_oxygen_reducible_mol
+                    ),
+                    "melt_iron_oxide_oxygen_fraction_at_risk": (
+                        iron_oxide_oxygen_fraction_at_risk
+                    ),
+                }
+                if melt_fe2o3_mol > 0.0
+                else {}
+            ),
             "warning_threshold_melt_FeO_fraction": (
                 C0_CHAR_WARNING_FEO_FRACTION
             ),

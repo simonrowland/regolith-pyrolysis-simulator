@@ -85,6 +85,7 @@ from simulator.chemistry.ellingham_thermo import (
     ELLINGHAM_METAL_PHASE_GAS,
 )
 from simulator.chemistry.melt_activity import melt_oxide_activity
+from simulator.feedstock_composition import iron_oxide_values
 from simulator.core import (
     MOLAR_MASS, OXIDE_TO_METAL, FARADAY, GAS_CONSTANT, MeltState,
 )
@@ -615,9 +616,9 @@ class ElectrolysisModel:
         than one oxide_to_metal target is in that set, the method
         returns reason_refused=uncertified_multi_oxide_current_partition,
         omits product and energy quantities, and applies no Faraday reduction.
-        A single oxide_to_metal target (optionally plus a ferric_to_ferrous row,
-        which the detector does not count) is weighted by SEL-1 and
-        reduced by Faraday's law.
+        A single oxide_to_metal target is weighted by SEL-1 and reduced by
+        Faraday's law. A ferric-to-ferrous row may also be reduced without
+        consuming the oxide-to-metal current partition.
 
         Args:
             melt_state: Current melt composition
@@ -642,7 +643,7 @@ class ElectrolysisModel:
             gas_product_fugacity_bar
         )
         melt_account_mol = melt_account_mol_from_kg(melt_state.composition_kg)
-        feo_fraction = max(0.0, comp.get('FeO', 0.0)) / 100.0
+        feo_fraction = max(0.0, iron_oxide_values(comp)[0]) / 100.0
         result = {
             'oxides_reduced_kg': {},
             'oxides_reduced_mol': {},

@@ -1,0 +1,328 @@
+from __future__ import annotations
+
+from pathlib import Path
+
+import pytest
+import yaml
+
+from simulator.accounting.formulas import (
+    ATOMIC_WEIGHTS_G_PER_MOL,
+    resolve_species_formula,
+)
+from simulator.core import PyrolysisSimulator
+from simulator.feedstock_composition import (
+    UNKNOWN_FERRIC_UPPER_BOUND_REASON,
+    fe2o3_equivalent_wt_pct,
+    fe_metal,
+    feot_equivalent_moles,
+    measured_fe2o3,
+    measured_feo,
+    resolve_feedstock_composition,
+    split_known,
+    total_fe,
+    total_oxygen_bounds,
+)
+from simulator.fe_redox import (
+    feot_equivalent_wt_pct,
+    intrinsic_melt_fO2,
+    melt_mol_fractions_for_kress91,
+)
+from simulator.melt_backend.base import EquilibriumResult
+from simulator.melt_backend.base import InternalAnalyticalBackend
+
+
+_DATA = Path(__file__).resolve().parents[1] / "data"
+
+
+def _load_yaml(name: str) -> dict:
+    return yaml.safe_load((_DATA / name).read_text())
+
+
+def _measured_split() -> dict:
+    return {
+        "composition_wt_pct": {"SiO2": 70.0, "FeO": 2.0, "Fe2O3": 1.0},
+        "composition_basis": {
+            "FeO": {"method": "wet chemistry", "source": "synthetic assay"},
+            "Fe2O3": {"method": "Mössbauer", "source": "synthetic assay"},
+        },
+        "elemental_composition_wt_pct": {"Fe": 0.25},
+    }
+
+
+def _unknown_split() -> dict:
+    return {
+        "composition_wt_pct": {"SiO2": 70.0, "FeO": 3.0},
+        "fe_redox_split_unknown": True,
+        "composition_basis": {
+            "fe_reporting_convention": "total Fe as FeO",
+        },
+        "elemental_composition_wt_pct": {"Fe": 0.25},
+    }
+
+
+def _oxygen_mass_fraction(species: str) -> float:
+    formula = resolve_species_formula(species)
+    oxygen_g_per_mol = (
+        formula.elements["O"] * ATOMIC_WEIGHTS_G_PER_MOL["O"]
+    )
+    return oxygen_g_per_mol / formula.molar_mass_g_per_mol()
+
+
+def test_unknown_split_metadata_covers_every_non_lunar_unmeasured_iron_entry() -> None:
+    expected = {
+        "s_type_asteroid_silicate",
+        "m_type_silicate_phase",
+        "v_type_vesta_hed",
+        "e_type_enstatite_aubrite",
+        "ci_carbonaceous_chondrite",
+        "cm_carbonaceous_chondrite",
+        "ceres_regolith",
+        "comet_nucleus",
+        "mars_global_mgs1",
+        "mars_basalt",
+        "mars_sulfate_rich",
+        "mars_phyllosilicate_clay",
+        "mars_perchlorate_rich",
+    }
+    feedstocks = _load_yaml("feedstocks.yaml")
+    flagged = {
+        key
+        for key, entry in feedstocks.items()
+        if entry.get("fe_redox_split_unknown") is True
+    }
+
+    assert flagged == expected
+    for key in expected:
+        assert feedstocks[key]["composition_basis"][
+            "fe_reporting_convention"
+        ] == "total Fe as FeO"
+
+
+def test_resolver_exposes_canonical_map_provenance_and_explicit_iron_accessors() -> None:
+    entry = _measured_split()
+    resolved = resolve_feedstock_composition(entry)
+
+    assert resolved.canonical_wt_pct == entry["composition_wt_pct"]
+    assert resolved.provenance == entry["composition_basis"]
+    assert resolved.fe_redox_split_unknown is False
+    assert resolved.split_known is True
+    assert resolved.total_fe_basis == (
+        "FeO-equivalent wt% on the declared composition basis"
+    )
+    assert resolved.total_fe == feot_equivalent_wt_pct(entry["composition_wt_pct"])
+    assert total_fe(entry["composition_wt_pct"]) == resolved.total_fe
+    assert measured_feo(entry) == 2.0
+    assert measured_fe2o3(entry) == 1.0
+    assert fe_metal(entry) == 0.25
+    assert split_known(entry) is True
+
+
+def test_fe2o3_equivalent_preserves_the_declared_mass_model_factor() -> None:
+    composition = _measured_split()["composition_wt_pct"]
+
+    assert fe2o3_equivalent_wt_pct(composition) == pytest.approx(3.2226)
+    assert fe2o3_equivalent_wt_pct(
+        composition, feo_to_fe2o3_factor=2.0
+    ) == pytest.approx(5.0)
+
+
+def test_feot_equivalent_moles_counts_two_iron_atoms_per_ferric_formula_unit() -> None:
+    # Two FeO formula units and three Fe2O3 formula units contain eight Fe atoms.
+    assert feot_equivalent_moles({"FeO": 2.0, "Fe2O3": 3.0}) == pytest.approx(
+        8.0
+    )
+
+
+def test_redox_helpers_consume_both_measured_oxides() -> None:
+    composition = _measured_split()["composition_wt_pct"]
+
+    fractions = melt_mol_fractions_for_kress91(composition)
+    split_fO2 = intrinsic_melt_fO2(composition, 2000.0)
+    ferrous_only_fO2 = intrinsic_melt_fO2(
+        {"SiO2": 70.0, "FeO": 2.0}, 2000.0
+    )
+
+    assert fractions["FeOt"] > 0.0
+    assert fractions["FeOt"] > melt_mol_fractions_for_kress91(
+        {"SiO2": 70.0, "FeO": 2.0}
+    )["FeOt"]
+    assert split_fO2 != ferrous_only_fO2
+
+
+def test_unknown_split_is_all_ferrous_with_typed_oxygen_upper_absence() -> None:
+    entry = _unknown_split()
+    resolved = resolve_feedstock_composition(entry)
+    bounds = total_oxygen_bounds(entry)
+    expected_lower = 70.0 * _oxygen_mass_fraction("SiO2") + 3.0 * _oxygen_mass_fraction("FeO")
+
+    assert resolved.fe_redox_split_unknown is True
+    assert resolved.total_fe == 3.0
+    assert resolved.measured_feo is None
+    assert resolved.measured_fe2o3 is None
+    assert measured_feo(entry) is None
+    assert measured_fe2o3(entry) is None
+    assert fe_metal(entry) == 0.25
+    assert split_known(entry) is False
+    assert bounds.lower.value_wt_pct == pytest.approx(expected_lower)
+    assert bounds.upper.value_wt_pct is None
+    assert bounds.upper.refused_reason == UNKNOWN_FERRIC_UPPER_BOUND_REASON
+
+
+def test_known_total_oxygen_bounds_include_non_iron_oxides() -> None:
+    entry = _measured_split()
+    bounds = total_oxygen_bounds(entry)
+    expected = (
+        70.0 * _oxygen_mass_fraction("SiO2")
+        + 2.0 * _oxygen_mass_fraction("FeO")
+        + 1.0 * _oxygen_mass_fraction("Fe2O3")
+    )
+
+    assert bounds.lower.value_wt_pct == pytest.approx(expected)
+    assert bounds.upper.value_wt_pct == pytest.approx(expected)
+
+
+def test_feedstock_json_round_trip_keeps_unknown_split_provenance(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from flask import Flask
+    from web import routes
+
+    entry = _unknown_split()
+    monkeypatch.setattr(
+        routes,
+        "get_visible_feedstock",
+        lambda _key, **_kwargs: entry,
+    )
+    app = Flask(__name__)
+    app.register_blueprint(routes.bp)
+    response = app.test_client().get("/api/feedstock/synthetic")
+
+    assert response.status_code == 200
+    assert response.get_json() == entry
+
+
+def test_metallic_feedstock_fe_stays_outside_oxide_map_and_crosschecks_are_ignored():
+    feedstocks = _load_yaml("feedstocks.yaml")
+    metallic = resolve_feedstock_composition(feedstocks["m_type_metallic_phase"])
+    eac = resolve_feedstock_composition(feedstocks["lunar_eac_1a"])
+
+    assert "Fe" not in metallic.canonical_wt_pct
+    assert metallic.fe_metal == 90.0
+    assert eac.fe_metal is None
+
+
+def test_engine_result_attaches_unknown_split_notice(monkeypatch) -> None:
+    backend = InternalAnalyticalBackend()
+    backend.initialize({})
+    feedstocks = _load_yaml("feedstocks.yaml")
+    feedstock = feedstocks["lunar_mare_low_ti"]
+    feedstock["fe_redox_split_unknown"] = True
+    feedstock["composition_basis"] = {
+        "fe_reporting_convention": "total Fe as FeO",
+    }
+    sim = PyrolysisSimulator(
+        backend,
+        _load_yaml("setpoints.yaml"),
+        feedstocks,
+        _load_yaml("vapor_pressures.yaml"),
+    )
+    sim.load_batch("lunar_mare_low_ti", mass_kg=1000.0)
+    assert sim._feedstock_fe_redox_split_unknown is True
+    monkeypatch.setattr(
+        PyrolysisSimulator,
+        "_refresh_vapor_pressures_from_kernel",
+        lambda _self, _result: None,
+    )
+    monkeypatch.setattr(
+        PyrolysisSimulator,
+        "_attach_post_equilibrium_sulfsat",
+        lambda _self, _result: None,
+    )
+    monkeypatch.setattr(
+        PyrolysisSimulator,
+        "_note_engine_commissioning_from_last_diagnostics",
+        lambda _self: None,
+    )
+    result = EquilibriumResult(status="unavailable")
+
+    returned = PyrolysisSimulator._record_equilibrium_status(sim, result)
+
+    assert returned is result
+    assert result.diagnostics["feedstock_iron_notice"]["code"] == (
+        "fe_redox_split_unknown"
+    )
+    assert "all-ferrous" in result.diagnostics["feedstock_iron_notice"]["message"]
+
+
+@pytest.mark.parametrize(
+    "entry, message",
+    [
+        (
+            {
+                **_unknown_split(),
+                "composition_wt_pct": {"FeO": 2.0, "Fe2O3": 1.0},
+            },
+            "cannot be combined with Fe2O3",
+        ),
+        (
+            {
+                "composition_wt_pct": {"SiO2": 70.0},
+                "fe_redox_split_unknown": True,
+                "composition_basis": {
+                    "fe_reporting_convention": "total Fe as FeO",
+                },
+            },
+            "requires FeO",
+        ),
+        (
+            {
+                "composition_wt_pct": {"FeO": 3.0},
+                "fe_redox_split_unknown": True,
+                "composition_basis": {},
+            },
+            "fe_reporting_convention",
+        ),
+        (
+            {
+                **_measured_split(),
+                "composition_basis": {
+                    "FeO": {"method": "wet chemistry"},
+                    "Fe2O3": {"method": "Mössbauer", "source": "synthetic assay"},
+                },
+            },
+            "FeO.method and source",
+        ),
+        (
+            {
+                **_measured_split(),
+                "composition_wt_pct": {"Fe2O3": 1.0},
+            },
+            "requires both FeO and Fe2O3",
+        ),
+        (
+            {
+                "composition_wt_pct": {"Fe": 1.0},
+            },
+            "metallic iron must be outside",
+        ),
+        (
+            {"composition_wt_pct": {"FeO_total": 3.0}},
+            "FeO_total is not a canonical feedstock oxide",
+        ),
+        (
+            {
+                "composition_wt_pct": {"FeO": 3.0},
+                "fe_redox_split_unknown": "true",
+                "composition_basis": {
+                    "fe_reporting_convention": "total Fe as FeO",
+                },
+            },
+            "must be a boolean",
+        ),
+    ],
+)
+def test_resolver_rejects_invalid_iron_representations(
+    entry: dict, message: str
+) -> None:
+    with pytest.raises(ValueError, match=message):
+        resolve_feedstock_composition(entry)

@@ -1745,6 +1745,9 @@ s_type_asteroid_silicate:
     reflect different subtypes that don't co-occur at their midpoints.
     Use H-type (FeO~9, MgO~36) or LL-type (FeO~16, MgO~32) for
     specific simulations. Normalise for generic runs.
+  fe_redox_split_unknown: true
+  composition_basis:
+    fe_reporting_convention: total Fe as FeO
   composition_wt_pct:
     SiO2:  51.5
     TiO2:   0.15
@@ -1795,11 +1798,12 @@ m_type_metallic_phase:
     simulation means 1000 kg of separated metal phase, not one tonne of
     unsorted bulk M-type regolith. Elemental composition (not oxides).
   composition_wt_pct:
-    Fe:  90.0
     Ni:   7.5
     Co:   0.40
     S:    1.25
     P:    0.20
+  elemental_composition_wt_pct:
+    Fe:  90.0
   composition_ranges:
     Fe: [88, 92]
     Ni: [5, 10]
@@ -1822,6 +1826,9 @@ m_type_silicate_phase:
     1000 kg simulation means 1000 kg of separated silicate phase, not one
     tonne of unsorted bulk M-type regolith. Very high uncertainty
     (+-30-50%) on Na2O. Sum ~99.8 wt%.
+  fe_redox_split_unknown: true
+  composition_basis:
+    fe_reporting_convention: total Fe as FeO
   composition_wt_pct:
     SiO2:  57.5
     MgO:   35.0
@@ -1852,6 +1859,9 @@ v_type_vesta_hed:
   note: >
     Source data omits Cr2O3, MnO, P2O5; not added (insufficient constraint).
     Sum ~99.7 wt%.
+  fe_redox_split_unknown: true
+  composition_basis:
+    fe_reporting_convention: total Fe as FeO
   composition_wt_pct:
     SiO2:  49.5
     TiO2:   0.65
@@ -1886,6 +1896,9 @@ e_type_enstatite_aubrite:
     Extremely reduced, nearly pure enstatite pyroxenite. Sulfur present
     as oldhamite/troilite (1-3 wt% S elemental, not an oxide)  --  listed
     separately. Sum of oxide components ~99.85 wt%.
+  fe_redox_split_unknown: true
+  composition_basis:
+    fe_reporting_convention: total Fe as FeO
   composition_wt_pct:
     SiO2:  57.5
     MgO:   37.5
@@ -1922,6 +1935,9 @@ ci_carbonaceous_chondrite:
   label: "CI Carbonaceous Chondrite"
   source: "FAMILY-REPRESENTATIVE MODELED COMPOSITION (not a cited table); context basis: CI meteorites; Hayabusa2 Ryugu return; OSIRIS-REx Bennu return"
   confidence: "High"
+  fe_redox_split_unknown: true
+  composition_basis:
+    fe_reporting_convention: "total Fe as FeO"
   note: >
     Bulk composition includes ~20-35% volatile mass (H2O, C, S) lost during
     extended C0. Main composition_wt_pct gives the BULK including volatiles-
@@ -2039,6 +2055,9 @@ cm_carbonaceous_chondrite:
     silicate is slightly higher SiO2, lower FeO than CI. Full oxide
     breakdown not provided in source; anhydrous silicate estimated as
     CI-like with noted adjustments.
+  fe_redox_split_unknown: true
+  composition_basis:
+    fe_reporting_convention: total Fe as FeO
   composition_wt_pct:
     SiO2:  28.0     # slightly higher than CI
     FeO:   23.0     # slightly lower than CI
@@ -2121,6 +2140,9 @@ ceres_regolith:
     (C1-C6) identical to CI baseline but slightly Mg-richer.
     Bulk oxide values estimated from CI baseline + Dawn observational
     constraints (enhanced carbonates, NH4-clays).
+  fe_redox_split_unknown: true
+  composition_basis:
+    fe_reporting_convention: total Fe as FeO
   composition_wt_pct:
     SiO2:  24.0
     FeO:   24.0
@@ -2271,6 +2293,9 @@ comet_nucleus:
     Volatile-extreme CI with massive supervolatiles. Dust-to-ice ratio
     4-10:1 (porous nucleus ~75% void). Post-C0 silicate identical to CI.
     Bulk composition is dominated by volatiles.
+  fe_redox_split_unknown: true
+  composition_basis:
+    fe_reporting_convention: total Fe as FeO
   composition_wt_pct:
     SiO2:  12.60    # scaled refractory mineral dust; see carbon_speciation_provenance
     FeO:   12.60
@@ -2428,6 +2453,8 @@ mars_global_mgs1:
     normalized_sum_check_wt_pct: 100.0
     excluded_classes: [sulfur, halides, perchlorates, salts, sulfides]
     citation: "Long-Fox J.M. et al. 2023, Frontiers in Space Technologies, Table 2 XRF for MGS-1."
+    fe_reporting_convention: "total Fe as FeO"
+  fe_redox_split_unknown: true
   glass_fraction:
     value: "not_reported"
     note: "MGS-1 captured sources do not report glass fraction."
@@ -2495,6 +2522,9 @@ mars_basalt:
       - perchlorate_to_chloride_o2
   source: "FAMILY-REPRESENTATIVE MODELED COMPOSITION (not a cited table); context basis: Curiosity/Spirit/Opportunity APXS; Phoenix lander"
   confidence: "High"
+  fe_redox_split_unknown: true
+  composition_basis:
+    fe_reporting_convention: "total Fe as FeO"
   note: >
     Thousands of APXS analyses across 4 sites; +-1-2 wt% major oxides.
     Includes SO3 and Cl as components (sulfate-bearing soil). FeO_total
@@ -2592,6 +2622,9 @@ mars_sulfate_rich:
       - co2_boudouard_to_co
   source: "FAMILY-REPRESENTATIVE MODELED COMPOSITION (not a cited table); context basis: Meridiani Planum soils, Vera Rubin Ridge margins, polar/sedimentary deposits"
   confidence: "High"
+  fe_redox_split_unknown: true
+  composition_basis:
+    fe_reporting_convention: "total Fe as FeO"
   note: >
     Elevated Ca/Mg/Fe sulfates (SO3 8-15 wt% vs 5-7% baseline).
     Midpoint sum ~105.5 wt%  --  wide SO3 range causes overshoot.
@@ -2668,6 +2701,9 @@ mars_phyllosilicate_clay:
     reactions: []
   source: "FAMILY-REPRESENTATIVE MODELED COMPOSITION (not a cited table); context basis: Gale Glen Torridon clays, Jezero clay units, Mawrth Vallis analogs"
   confidence: "High"
+  fe_redox_split_unknown: true
+  composition_basis:
+    fe_reporting_convention: "total Fe as FeO"
   note: >
     Smectite-rich deposits. Higher Al2O3 (12-18%) and bound water than
     baseline Mars basalt. Sum ~103.8 wt%  --  broad range midpoints overshoot.
@@ -2735,6 +2771,9 @@ mars_perchlorate_rich:
       - perchlorate_to_chloride_o2
   source: "FAMILY-REPRESENTATIVE MODELED COMPOSITION (not a cited table); context basis: Phoenix landing site, high-latitude/polar soils, scattered Gale/Jezero samples"
   confidence: "Medium-High"
+  fe_redox_split_unknown: true
+  composition_basis:
+    fe_reporting_convention: "total Fe as FeO"
   note: >
     Source data omits TiO2; estimated from mars_basalt range. Elevated
     oxychlorine salts (ClO4 0.4-1.5 wt%). Sum ~101.5 wt%.

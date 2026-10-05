@@ -32,6 +32,7 @@ from simulator.config import (
     resolve_alphamelts_subprocess_model,
 )
 from simulator.core import PyrolysisSimulator
+from simulator.feedstock_composition import iron_oxide_values, total_fe
 from simulator.grind_preflight import STAGE0_INPROCESS_SAFE_FEEDSTOCK_IDS
 from simulator.melt_backend.alphamelts import (
     AlphaMELTSBackend,
@@ -659,6 +660,18 @@ def is_spinel_rich_stage0_subprocess_feedstock(feedstock: Mapping[str, Any]) -> 
 
 
 def _oxide_wt_pct(composition: Mapping[str, Any], oxide: str) -> float:
+    if oxide == "FeO":
+        try:
+            return total_fe(composition)
+        except ValueError:
+            return 0.0
+    if oxide == "Fe2O3":
+        try:
+            return iron_oxide_values(composition)[1]
+        except ValueError:
+            return 0.0
+    if oxide in {"Fe", "Fe0", "Fe_metal"}:
+        return 0.0
     value = composition.get(oxide, 0.0)
     try:
         number = float(value)
@@ -806,8 +819,10 @@ def assert_real_backend_feedstock_supported(
 
 
 def _melts_major_oxide_sum(composition: Mapping[str, Any]) -> float:
-    total = 0.0
+    total = _oxide_wt_pct(composition, "FeO")
     for raw_name, raw_value in composition.items():
+        if raw_name in {"FeO", "Fe2O3"}:
+            continue
         oxide = MELTS_OXIDE_ALIASES.get(str(raw_name).strip().lower())
         if oxide == "FeO_total":
             oxide = "FeO"

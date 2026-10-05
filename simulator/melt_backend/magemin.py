@@ -144,6 +144,7 @@ from simulator.melt_backend.pure_phase import (
 )
 from simulator.state import OXIDE_SPECIES
 from simulator.scalar_boundary import is_declared_real_scalar
+from simulator.feedstock_composition import iron_oxide_values, total_fe
 
 
 # 2026-07-23 B1 gate-2 warm-gateway residue: per-call hard wall raised
@@ -1890,11 +1891,6 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
     _FE2O3_MOLAR_MASS_G_PER_MOL = (
         2 * _FE_MOLAR_MASS_G_PER_MOL + 3 * _O_MOLAR_MASS_G_PER_MOL
     )
-    _FEOT_FROM_FE2O3_MOLAR_MASS_G_PER_MOL = 2 * _FEO_MOLAR_MASS_G_PER_MOL
-    _FEOT_FROM_FE2O3_FACTOR = (
-        _FEOT_FROM_FE2O3_MOLAR_MASS_G_PER_MOL
-        / _FE2O3_MOLAR_MASS_G_PER_MOL
-    )
     _EXCESS_O_FROM_FE2O3_FACTOR = (
         _O_MOLAR_MASS_G_PER_MOL / _FE2O3_MOLAR_MASS_G_PER_MOL
     )
@@ -2331,11 +2327,14 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
         allowed = set(self._MAGEMIN_INPUT_BASIS)
         source: Dict[str, float] = {}
         unknown: List[str] = []
+        feo, fe2o3 = iron_oxide_values(composition_wt_pct)
         for component, raw_value in composition_wt_pct.items():
+            name = str(component)
+            if name in ('FeO', 'Fe2O3'):
+                continue
             value = float(raw_value or 0.0)
             if value <= 0.0:
                 continue
-            name = str(component)
             if name not in allowed:
                 unknown.append(name)
                 continue
@@ -2346,9 +2345,7 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                 + ', '.join(sorted(unknown))
             )
 
-        feo = source.pop('FeO', 0.0)
-        fe2o3 = source.pop('Fe2O3', 0.0)
-        feot = source.pop('FeOt', 0.0)
+        feot = source.pop('FeOt', 0.0) + total_fe(composition_wt_pct)
         excess_o = source.pop('O', 0.0)
         merged: List[str] = []
         if feo > 0.0:
@@ -2358,7 +2355,6 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
 
         # Fe2O3 -> FeO-equivalent mass: each Fe2O3 carries 2 Fe;
         # total-iron-as-FeOt reports that iron as 2 FeO formula masses.
-        feot += feo + fe2o3 * self._FEOT_FROM_FE2O3_FACTOR
         excess_o += fe2o3 * self._EXCESS_O_FROM_FE2O3_FACTOR
         if fe2o3 <= 0.0 and feo > 0.0:
             # FeO key is total-iron inventory (FeO_T), not literal FeO only.

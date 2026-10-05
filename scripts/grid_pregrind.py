@@ -40,6 +40,12 @@ from engines.alphamelts.thermoengine import (  # noqa: E402
 )
 from engines.domain_reason import OutOfDomainReason  # noqa: E402
 from simulator.environment import DEFAULT_VACUUM_FLOOR_BAR  # noqa: E402
+from simulator.feedstock_composition import (  # noqa: E402
+    feot_equivalent_moles,
+    feot_equivalent_wt_pct,
+    iron_oxide_values,
+    resolve_feedstock_composition,
+)
 from simulator.config import (  # noqa: E402
     DEFAULT_ALPHAMELTS_MODEL,
     ENGINE_MODEL_UNAVAILABLE,
@@ -263,11 +269,16 @@ def melts_composition_wt_pct(point: GridPoint) -> dict[str, float]:
         raise ValueError(
             "MELTS trace exclusions require basis=feedstock.trace_elements"
         )
-    return {
+    composition = {
         str(species): float(value)
         for species, value in point.composition_wt_pct.items()
         if str(species) in MELTS_OXIDE_BASIS
+        and str(species) not in {"FeO", "Fe2O3"}
     }
+    composition["FeO"] = feot_equivalent_wt_pct(point.composition_wt_pct)
+    if "Fe2O3" in point.composition_wt_pct:
+        composition["Fe2O3"] = 0.0
+    return composition
 
 
 def load_feedstock_box(
@@ -283,12 +294,15 @@ def load_feedstock_box(
     for anchor in anchors:
         if anchor not in data:
             raise KeyError(f"feedstock anchor missing: {anchor}")
-        entry = data[anchor]
+        entry = resolve_feedstock_composition(data[anchor])
         nominal = {
-            oxide: float((entry.get("composition_wt_pct") or {}).get(oxide, 0.0))
+            oxide: float(entry.canonical_wt_pct.get(oxide, 0.0))
             for oxide in MAJOR_OXIDES
+            if oxide != "FeO"
         }
-        ranges = entry.get("composition_ranges") or {}
+        nominal["FeO"] = entry.total_fe
+        nominal["Fe2O3"] = 0.0
+        ranges = data[anchor].get("composition_ranges") or {}
         low = {
             oxide: float(ranges.get(oxide, (nominal[oxide], nominal[oxide]))[0])
             for oxide in MAJOR_OXIDES
@@ -394,14 +408,17 @@ def expand_composition_axes(
     nominal_vectors: list[dict[str, float]] = []
     cr_candidates: list[float] = []
     for anchor in anchors:
-        entry = data[anchor]
+        entry = resolve_feedstock_composition(data[anchor])
         nominal = {
-            oxide: float((entry.get("composition_wt_pct") or {}).get(oxide, 0.0))
+            oxide: float(entry.canonical_wt_pct.get(oxide, 0.0))
             for oxide in MELTS_OXIDE_BASIS
+            if oxide not in {"FeO", "Fe2O3"}
         }
+        nominal["FeO"] = entry.total_fe
+        nominal["Fe2O3"] = 0.0
         nominal_normalized = normalize_composition(nominal)
         nominal_vectors.append(nominal_normalized)
-        ranges = entry.get("composition_ranges") or {}
+        ranges = data[anchor].get("composition_ranges") or {}
         for vector in (
             nominal,
             {
@@ -586,10 +603,19 @@ def composition_wt_pct_to_mol(
     from simulator.accounting.formulas import resolve_species_formula
 
     result: dict[str, float] = {}
+    feo_wt_pct, fe2o3_wt_pct = iron_oxide_values(composition_wt_pct)
     for species, wt_pct in composition_wt_pct.items():
+        if species in {"FeO", "Fe2O3"}:
+            continue
         mass_kg = batch_mass_kg * float(wt_pct) / 100.0
         molar_mass = resolve_species_formula(species).molar_mass_kg_per_mol()
         result[str(species)] = mass_kg / molar_mass
+    for oxide, wt_pct in (("FeO", feo_wt_pct), ("Fe2O3", fe2o3_wt_pct)):
+        if wt_pct <= 0.0 and oxide not in composition_wt_pct:
+            continue
+        mass_kg = batch_mass_kg * wt_pct / 100.0
+        molar_mass = resolve_species_formula(oxide).molar_mass_kg_per_mol()
+        result[oxide] = mass_kg / molar_mass
     return dict(sorted(result.items()))
 
 
@@ -605,9 +631,7 @@ def kress91_partitioned_composition_mol(
     baseline_mol = composition_wt_pct_to_mol(
         composition_wt_pct, batch_mass_kg=batch_mass_kg
     )
-    total_fe_mol = baseline_mol.get("FeO", 0.0) + (
-        2.0 * baseline_mol.get("Fe2O3", 0.0)
-    )
+    total_fe_mol = feot_equivalent_moles(baseline_mol)
     if total_fe_mol <= 0.0:
         return baseline_mol
 
@@ -791,13 +815,12 @@ def point_inputs(point: GridPoint, args: argparse.Namespace) -> dict[str, Any]:
         intended_fO2_log=point.intended_fO2_log,
         pressure_bar=point.pressure_bar,
     )
-    total_fe_mol = composition_mol.get("FeO", 0.0) + (
-        2.0 * composition_mol.get("Fe2O3", 0.0)
-    )
+    total_fe_mol = feot_equivalent_moles(composition_mol)
+    _feo_mol, fe2o3_mol = iron_oxide_values(composition_mol)
     fixed_ferric_fraction = (
         None
         if total_fe_mol <= 0.0
-        else 2.0 * composition_mol.get("Fe2O3", 0.0) / total_fe_mol
+        else 2.0 * fe2o3_mol / total_fe_mol
     )
     values: dict[str, Any] = {
         "temperature_C": temperature_C,
@@ -1387,11 +1410,10 @@ def _run_point(job: WorkerJob) -> tuple[int, dict[str, Any]]:
         )
     if _WORKER_BACKEND_NAME == "thermoengine":
         try:
-            total_fe_mol = float(composition_mol.get("FeO", 0.0)) + (
-                2.0 * float(composition_mol.get("Fe2O3", 0.0))
-            )
+            total_fe_mol = feot_equivalent_moles(composition_mol)
+            _feo_mol, fe2o3_mol = iron_oxide_values(composition_mol)
             fixed_ferric_fraction = (
-                2.0 * float(composition_mol.get("Fe2O3", 0.0)) / total_fe_mol
+                2.0 * fe2o3_mol / total_fe_mol
                 if total_fe_mol > 0.0
                 else 0.0
             )
@@ -2313,11 +2335,7 @@ def main(argv: Sequence[str] | None = None) -> int:
     iron_bearing_compositions = sum(
         1
         for composition in compositions
-        if (
-            float(composition.get("FeO", 0.0))
-            + float(composition.get("Fe2O3", 0.0))
-        )
-        > 0.0
+        if feot_equivalent_moles(composition) > 0.0
     )
     iron_free_compositions = len(compositions) - iron_bearing_compositions
     cartesian_grid_points = (

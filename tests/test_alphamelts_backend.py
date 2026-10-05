@@ -4137,6 +4137,32 @@ def test_normalize_composition_to_melts_basis_drops_and_renormalizes():
     ]
 
 
+def test_normalize_measured_split_reads_both_iron_oxides_through_owner():
+    from simulator.feedstock_composition import resolve_feedstock_composition
+
+    feedstock = resolve_feedstock_composition({
+        "composition_wt_pct": {
+            "SiO2": 50.0,
+            "Al2O3": 20.0,
+            "FeO": 10.0,
+            "Fe2O3": 5.0,
+            "MgO": 15.0,
+        },
+        "composition_basis": {
+            "FeO": {"method": "wet chemistry", "source": "synthetic assay"},
+            "Fe2O3": {"method": "Mössbauer", "source": "synthetic assay"},
+        },
+    })
+    backend = AlphaMELTSBackend()
+
+    normalized = backend._normalize_composition_to_melts_basis(
+        dict(feedstock.canonical_wt_pct)
+    )
+
+    assert normalized["FeO"] == pytest.approx(10.0)
+    assert normalized["Fe2O3"] == pytest.approx(5.0)
+
+
 def test_normalize_composition_refuses_feo_total_without_policy():
     backend = AlphaMELTSBackend()
 

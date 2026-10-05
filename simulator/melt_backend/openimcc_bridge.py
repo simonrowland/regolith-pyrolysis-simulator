@@ -17,6 +17,11 @@ from types import MappingProxyType
 from typing import Any
 
 from simulator.accounting.formulas import resolve_species_formula
+from simulator.feedstock_composition import (
+    FEOT_FROM_FE2O3,
+    feot_equivalent_moles,
+    iron_oxide_values,
+)
 from simulator.chemistry.melt_activity import (
     single_cation_activity_and_fraction,
     single_cation_component_formula,
@@ -73,9 +78,7 @@ _OPENIMCC_CRMN_RELAXED_RULING = "owner 2026-09-27"
 
 # Fe2O3 contributes two FeO-equivalent moles. Keep this mass ratio for the
 # policy diagnostic only; the actual projection folds moles directly.
-FE2O3_TO_FEO_TOTAL_WT_FACTOR = (
-    2.0 * MOLAR_MASS["FeO"] / MOLAR_MASS["Fe2O3"]
-)
+FE2O3_TO_FEO_TOTAL_WT_FACTOR = FEOT_FROM_FE2O3
 
 
 class OpenImccUnavailableError(RuntimeError):
@@ -330,18 +333,13 @@ def _cleaned_melt_projection(
                     f"value={raw_mol!r}; inventory must be finite"
                 ),
             )
+        canonical[name] = mol
+        if name in ("FeO", "Fe2O3"):
+            continue
         if mol == 0.0:
             continue
-        if name in OPENIMCC_PARENT_OXIDES and name != "FeO":
+        if name in OPENIMCC_PARENT_OXIDES:
             cleaned_composition_mol[name] = mol
-        elif name == "FeO":
-            # Accumulate: an Fe2O3 entry earlier in the mapping (or an FeO_total
-            # alias canonicalised to FeO) may already have folded Fe into FeO.
-            cleaned_composition_mol["FeO"] = cleaned_composition_mol.get("FeO", 0.0) + mol
-        elif name == "Fe2O3":
-            cleaned_composition_mol["FeO"] = (
-                cleaned_composition_mol.get("FeO", 0.0) + 2.0 * mol
-            )
         try:
             mass_kg = mol * resolve_species_formula(name).molar_mass_kg_per_mol()
         except Exception as exc:  # noqa: BLE001 - policy turns this into a typed refusal
@@ -350,6 +348,18 @@ def _cleaned_melt_projection(
                 f"cannot resolve cleaned-melt formula for {name!r}: {exc}",
             ) from exc
         source_mass_kg[name] = source_mass_kg.get(name, 0.0) + mass_kg
+
+    feo_moles, fe2o3_moles = iron_oxide_values(canonical)
+    for oxide, mol in (("FeO", feo_moles), ("Fe2O3", fe2o3_moles)):
+        if mol <= 0.0:
+            continue
+        source_mass_kg[oxide] = (
+            mol * resolve_species_formula(oxide).molar_mass_kg_per_mol()
+        )
+
+    feo_equivalent_moles = feot_equivalent_moles(canonical)
+    if feo_equivalent_moles > 0.0:
+        cleaned_composition_mol["FeO"] = feo_equivalent_moles
 
     total_mass_kg = sum(source_mass_kg.values())
     if total_mass_kg <= 0.0:
@@ -496,7 +506,7 @@ def _cleaned_melt_policy(
         }
     if relaxed_notice is not None:
         policy["openimcc_projection_crmn_relaxed"] = relaxed_notice
-    fe2o3_wt_pct = source_wt_pct.get("Fe2O3", 0.0)
+    _feo_wt_pct, fe2o3_wt_pct = iron_oxide_values(source_wt_pct)
     if fe2o3_wt_pct > 0.0:
         policy["fe2o3_fold"] = {
             "code": "openimcc_fe2o3_fold",
@@ -506,6 +516,10 @@ def _cleaned_melt_policy(
             ).get("FeO", 0.0),
             "factor": FE2O3_TO_FEO_TOTAL_WT_FACTOR,
             "basis": "Fe_atoms",
+        }
+        policy["fe_redox_notice"] = {
+            "code": "openimcc_ferric_component_collapsed",
+            "message": "ferric component collapsed until d-072",
         }
     return cleaned_composition_mol, policy
 
