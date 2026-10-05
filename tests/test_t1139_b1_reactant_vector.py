@@ -16,7 +16,10 @@ from simulator.accounting.formulas import parse_formula
 from simulator.chemistry.kernel import ChemistryIntent, IntentRequest
 from simulator.chemistry.kernel.dto import ProviderAccountView
 from simulator.evaporation import EvaporationMixin
-from simulator.vapour_rail.stoich import oxygen_coproduct_account
+from simulator.vapour_rail.stoich import (
+    oxygen_coproduct_account,
+    oxygen_fugacity_plane,
+)
 
 
 def _kg_per_kg_vapor(formula: str, nu: float, vapor: str, vapor_nu: float = 1.0) -> float:
@@ -234,6 +237,7 @@ def test_oxide_vapour_vector_closes_and_credits_overhead_oxygen() -> None:
     assert oxygen_coproduct_account(None, vapor_oxygen_atoms=1.0) == (
         "process.overhead_gas"
     )
+    assert oxygen_fugacity_plane(vapor_oxygen_atoms=1.0) == "transport_headspace"
 
 
 def test_metal_vapour_vector_credits_fo2_buffer() -> None:
@@ -253,6 +257,7 @@ def test_metal_vapour_vector_credits_fo2_buffer() -> None:
     assert oxygen_coproduct_account(None, vapor_oxygen_atoms=0.0) == (
         "reservoir.fo2_buffer"
     )
+    assert oxygen_fugacity_plane(vapor_oxygen_atoms=0.0) == "intrinsic_melt"
 
 
 def test_zero_oxygen_metaborate_debits_both_parents() -> None:

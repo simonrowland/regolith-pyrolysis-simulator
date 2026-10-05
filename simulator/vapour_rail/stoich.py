@@ -134,6 +134,23 @@ def oxygen_coproduct_account(
     return "process.overhead_gas"
 
 
+def oxygen_fugacity_plane(*, vapor_oxygen_atoms: float) -> str:
+    """fO2 plane for one binding, from the metal-versus-oxide coproduct rule.
+
+    Metal vapour credits ``reservoir.fo2_buffer`` and is evaluated on
+    ``intrinsic_melt``. Oxide vapour credits ``process.overhead_gas`` and is
+    evaluated on ``transport_headspace``. A declared oxygen destination is an
+    accounting override and does not retarget the plane.
+    """
+
+    account = oxygen_coproduct_account(
+        None, vapor_oxygen_atoms=vapor_oxygen_atoms
+    )
+    if account == "reservoir.fo2_buffer":
+        return "intrinsic_melt"
+    return "transport_headspace"
+
+
 def reactant_masses_and_o2_per_vapor_kg(
     *,
     formula: str,
