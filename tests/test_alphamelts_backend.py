@@ -96,6 +96,17 @@ from simulator.config import (
 DATA_DIR = Path(__file__).resolve().parents[1] / "data"
 
 
+class _StringifiableModel:
+    def __str__(self):
+        return 'pMELTS'
+
+    def __hash__(self):
+        return hash('pMELTS')
+
+    def __eq__(self, other):
+        return other == 'pMELTS'
+
+
 def _load_data(filename):
     with open(DATA_DIR / filename) as f:
         return yaml.safe_load(f) or {}
@@ -248,7 +259,11 @@ def test_petthermotools_resolver_is_the_model_code_owner() -> None:
 
 @pytest.mark.parametrize(
     'model_name',
-    [Path('pMELTS'), pytest.param(object(), id='object')],
+    [
+        Path('pMELTS'),
+        pytest.param(object(), id='object'),
+        pytest.param(_StringifiableModel(), id='stringifiable'),
+    ],
 )
 def test_petthermotools_resolver_rejects_non_string_models(model_name) -> None:
     resolver = simulator_config.resolve_alphamelts_python_api_model
@@ -304,19 +319,18 @@ def test_petthermotools_backend_uses_the_owner_resolved_code(monkeypatch) -> Non
         ' \t ',
         'not-a-model',
         Path('pMELTS'),
-        pytest.param(
-            type('StringifiableModel', (), {'__str__': lambda self: 'pMELTS'})(),
-            id='stringifiable',
-        ),
+        pytest.param(_StringifiableModel(), id='stringifiable'),
     ],
 )
 @pytest.mark.parametrize(
     'mode', ['python_api', None], ids=['requested-api', 'discovered-api']
 )
+@pytest.mark.parametrize('warm_worker', [False, True], ids=['cold', 'warm'])
 def test_python_api_initialization_refuses_raw_model_before_worker_creation(
     monkeypatch,
     model_name,
     mode,
+    warm_worker,
 ) -> None:
     backend = AlphaMELTSBackend(model_name=model_name)
     imports = []
@@ -347,7 +361,7 @@ def test_python_api_initialization_refuses_raw_model_before_worker_creation(
     )
 
     with pytest.raises(AlphaMELTSConfigurationError):
-        backend.initialize({'mode': mode, 'warm_worker': True})
+        backend.initialize({'mode': mode, 'warm_worker': warm_worker})
 
     assert imports == []
     assert workers == []
