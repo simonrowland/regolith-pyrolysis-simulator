@@ -9,13 +9,13 @@ scan:
   - hunt_ids column empty; --hunt-json not provided
   corpus_root: /Users/simonrowland/Repos/regolith-corpus
 counts:
-  sources: 287
-  extracts: 285
+  sources: 288
+  extracts: 286
   pdfs_present_in_worktree: 0
   extracts_with_private_locators: 60
   pdfs_tracked_99_kems_langmuir: 0
   pdfs_without_extract: 0
-  extracts_without_pdf: 285
+  extracts_without_pdf: 286
   alias_groups_needing_resolution: 41
 gaps:
   pdfs_without_extract: []
@@ -265,6 +265,7 @@ gaps:
   - shornikov-2007-cao-aluminosilicate-melts
   - shornikov-2008-redox-oxide-evaporation
   - shornikov-2021-mgo-feo-silicate
+  - shornikov-2024-wollastonite-evaporation
   - shornikov-2025-saratov-alkali-evaporation
   - slag-001-banya-1993
   - slag-002-banya-hino-nagasaka-1993
@@ -15053,6 +15054,65 @@ sources:
       last_stage: extracted
       date: '2026-10-04'
     commit: 1ce8e2fc3db83962928fccf9b9d4c72fdb8b699e
+- source_id: shornikov-2024-wollastonite-evaporation
+  aliases: []
+  citation: Shornikov, S. I. (2024), ‘Mass Spectrometric Investigation of Thermodynamic Properties of
+    CaSiO3 Wollastonite’, TMS 2024 153rd Annual Meeting & Exhibition Supplemental Proceedings, The Minerals,
+    Metals & Materials Series, pp. 568–576.
+  doi: 10.1007/978-3-031-50349-8_48
+  report_number: null
+  identifier: 10.1007/978-3-031-50349-8_48
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
+  extracts:
+  - path: data/literature/extracts/shornikov-2024-wollastonite-evaporation.yaml
+    review_status: draft
+    rows: 19
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/shornikov-2024-wollastonite-evaporation/shornikov-2024-wollastonite-evaporation.pdf
+      present: true
+      sha256: 145eeaee821e66da05007e5efadd265fb577e707add57466a4d79ccc5fc5a34e
+      matches_simulator: null
+    sidecar:
+      path: raw/shornikov-2024-wollastonite-evaporation/sidecar.yaml
+      present: true
+    text:
+      path: text/shornikov-2024-wollastonite-evaporation
+      exists: true
+      file_count: 3
+    tables:
+      path: tables/shornikov-2024-wollastonite-evaporation
+      exists: true
+      file_count: 2
+    extract:
+      path: extracts/shornikov-2024-wollastonite-evaporation.yaml
+      present: true
+      matches_simulator: true
+    ledger:
+      path: ledger/shornikov-2024-wollastonite-evaporation.yaml
+      present: true
+      error: null
+      last_stage: extracted
+      date: '2026-10-04'
+    commit: d937549d195ad330cdedbe4fa2b55d8b028a2ea7
 - source_id: shornikov-2025-saratov-alkali-evaporation
   aliases: []
   citation: Shornikov, S., and Yakovlev, O. (2025). Evaporation of Alkaline Components (Na2O and K2O)

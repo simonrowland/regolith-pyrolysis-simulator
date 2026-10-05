@@ -15,12 +15,12 @@ Canonical `source_id` is the extract filename stem. Preset ids are aliases, neve
 
 ## Counts
 
-- Sources: 287
-- Extracts (`literature_extract.v1`): 285
+- Sources: 288
+- Extracts (`literature_extract.v1`): 286
 - PDFs present in this worktree: 0
 - Tracked PDFs in `docs/references/pdfs/99-kems-langmuir/`: 0
 - PDFs with no extract: 0
-- Extracts with no PDF: 285
+- Extracts with no PDF: 286
 - Alias groups needing owner/controller resolution: 41
 - Extracts with private/non-public row locators: 60
 
@@ -274,6 +274,7 @@ Canonical `source_id` is the extract filename stem. Preset ids are aliases, neve
 | `shornikov-2007-cao-aluminosilicate-melts` | Shornikov, S. I. (2007), Thermodynamic properties of CaO-Al2O3-SiO2 melts, Experiment in Geosciences 14(1):35-37. |  | ABSENT, `` | `raw/shornikov-2007-cao-aluminosilicate-melts/shornikov-2007-cao-aluminosilicate-melts.pdf` (present, 9822bdf3); `text/shornikov-2007-cao-aluminosilicate-melts/` (3 files, exists); `tables/shornikov-2007-cao-aluminosilicate-melts/` (2 files, exists) | `data/literature/extracts/shornikov-2007-cao-aluminosilicate-melts.yaml` (6 rows, draft) | `ledger/shornikov-2007-cao-aluminosilicate-melts.yaml`: extracted (2026-10-04) |
 | `shornikov-2008-redox-oxide-evaporation` | Shornikov, S. I. (2008). Effect of Redox Conditions on the Evaporation of Oxide Melts in the CaO–MgO–FeO–Al2O3–SiO2 System. Geochemistry International, 46(7), 724–729. | 10.1134/S0016702908070069 | ABSENT, `` | `raw/shornikov-2008-redox-oxide-evaporation/shornikov-2008-redox-oxide-evaporation.pdf` (present, 8c2cc9af); `text/shornikov-2008-redox-oxide-evaporation/` (0 files, ABSENT); `tables/shornikov-2008-redox-oxide-evaporation/` (4 files, exists) | `data/literature/extracts/shornikov-2008-redox-oxide-evaporation.yaml` (29 rows, draft) | `ledger/shornikov-2008-redox-oxide-evaporation.yaml`: extracted (2026-10-04) |
 | `shornikov-2021-mgo-feo-silicate` | Shornikov, S. I., Ivanova, M. A., and Minaeva, M. S. (2021), Thermodynamic Properties of the MgO–FeO–SiO2 Melts, Experiment in Geosciences 27(1):67–69. |  | ABSENT, `` | `raw/shornikov-2021-mgo-feo-silicate/shornikov-2021-mgo-feo-silicate.pdf` (present, 6e3e5595); `text/shornikov-2021-mgo-feo-silicate/` (3 files, exists); `tables/shornikov-2021-mgo-feo-silicate/` (0 files, ABSENT) | `data/literature/extracts/shornikov-2021-mgo-feo-silicate.yaml` (0 rows, draft) | `ledger/shornikov-2021-mgo-feo-silicate.yaml`: extracted (2026-10-04) |
+| `shornikov-2024-wollastonite-evaporation` | Shornikov, S. I. (2024), ‘Mass Spectrometric Investigation of Thermodynamic Properties of CaSiO3 Wollastonite’, TMS 2024 153rd Annual Meeting & Exhibition Supplemental Proceedings, The Minerals, Metals & Materials Series, pp. 568–576. | 10.1007/978-3-031-50349-8_48 | ABSENT, `` | `raw/shornikov-2024-wollastonite-evaporation/shornikov-2024-wollastonite-evaporation.pdf` (present, 145eeaee); `text/shornikov-2024-wollastonite-evaporation/` (3 files, exists); `tables/shornikov-2024-wollastonite-evaporation/` (2 files, exists) | `data/literature/extracts/shornikov-2024-wollastonite-evaporation.yaml` (19 rows, draft) | `ledger/shornikov-2024-wollastonite-evaporation.yaml`: extracted (2026-10-04) |
 | `shornikov-2025-saratov-alkali-evaporation` | Shornikov, S., and Yakovlev, O. (2025). Evaporation of Alkaline Components (Na2O and K2O) from the Chondrule Melts of the Saratov Chondrite (L4). In Advances in Ceramic Materials and Processing, chapter 23, pp. 113–118. | 10.1007/978-3-031-87558-8_23 | ABSENT, `` | `raw/shornikov-2025-saratov-alkali-evaporation/shornikov-2025-saratov-alkali-evaporation.pdf` (present, 60790b61); `text/shornikov-2025-saratov-alkali-evaporation/` (9 files, exists); `tables/shornikov-2025-saratov-alkali-evaporation/` (0 files, ABSENT) | `data/literature/extracts/shornikov-2025-saratov-alkali-evaporation.yaml` (2 rows, draft) | `ledger/shornikov-2025-saratov-alkali-evaporation.yaml`: extracted (2026-10-04) |
 | `slag-001-banya-1993` | Ban-Ya, Shiro (1993), "Mathematical Expression of Slag-Metal Reactions in Steelmaking Process by Quadratic Formalism Based on the Regular Solution Model", ISIJ International 33(1), 2–11, DOI 10.2355/isijinternational.33.2 | 10.2355/isijinternational.33.2 | ABSENT, `` | `raw/slag-001-banya-1993/slag-001-banya-1993.pdf` (ABSENT, ); `text/slag-001-banya-1993/` (0 files, ABSENT); `tables/slag-001-banya-1993/` (0 files, ABSENT) | `data/literature/extracts/slag-001-banya-1993.yaml` (48 rows, draft) | `ledger/slag-001-banya-1993.yaml`: extracted (2026-09-07) |
 | `slag-002-banya-hino-nagasaka-1993` | Ban-Ya, S., Hino, M. and Nagasaka, T. (1993), "Estimation of Water Vapor Solubility in Molten Silicates by Quadratic Formalism Based on the Regular Solution Model", ISIJ International 33(1), 12–19, DOI 10.2355/isijinternational.33.12 | 10.2355/isijinternational.33.12 | ABSENT, `` | `raw/slag-002-banya-hino-nagasaka-1993/slag-002-banya-hino-nagasaka-1993.pdf` (ABSENT, ); `text/slag-002-banya-hino-nagasaka-1993/` (0 files, ABSENT); `tables/slag-002-banya-hino-nagasaka-1993/` (0 files, ABSENT) | `data/literature/extracts/slag-002-banya-hino-nagasaka-1993.yaml` (27 rows, draft) | `ledger/slag-002-banya-hino-nagasaka-1993.yaml`: extracted (2026-09-07) |
@@ -567,6 +568,7 @@ Canonical `source_id` is the extract filename stem. Preset ids are aliases, neve
 - `shornikov-2007-cao-aluminosilicate-melts`
 - `shornikov-2008-redox-oxide-evaporation`
 - `shornikov-2021-mgo-feo-silicate`
+- `shornikov-2024-wollastonite-evaporation`
 - `shornikov-2025-saratov-alkali-evaporation`
 - `slag-001-banya-1993`
 - `slag-002-banya-hino-nagasaka-1993`
