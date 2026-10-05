@@ -172,6 +172,26 @@ def test_generated_fo2_plane_follows_vapor_oxygen(generated_batch) -> None:
     assert (False, "transport_headspace") in seen
 
 
+def test_generated_alpha_is_the_shared_upper_bound(generated_batch) -> None:
+    from simulator.alpha_kinetics import ANALYTICAL_UPPER_BOUND_ALPHA_STATUS
+
+    assert generated_batch.channels
+    for channel in generated_batch.channels:
+        alpha = channel.family["vaporisation_coefficients"]["evaporation_alpha"]
+        assert alpha == {
+            "value": 1.0,
+            "status": ANALYTICAL_UPPER_BOUND_ALPHA_STATUS,
+        }
+        species = channel.family["physical_properties"]["species"][
+            channel.species_id
+        ]
+        assert species["flux_dormant"] is True
+        assert (
+            channel.family["code_metadata"]["request_rule"]
+            == "dormant_pending_validation"
+        )
+
+
 def test_preferred_carrier_table_matches_steer() -> None:
     assert PREFERRED_CARRIERS["Ge"] == ("GeO",)
     assert PREFERRED_CARRIERS["Sn"] == ("SnO",)

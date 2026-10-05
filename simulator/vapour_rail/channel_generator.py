@@ -13,6 +13,7 @@ from pathlib import Path
 from typing import Any, Mapping
 
 from simulator.accounting.formulas import parse_formula
+from simulator.alpha_kinetics import ANALYTICAL_UPPER_BOUND_ALPHA_STATUS
 from simulator.reference_data.janaf import feedstock_element_symbols
 from simulator.trace_oxide_parents import (
     ACTIVITY_BASIS,
@@ -243,9 +244,8 @@ def _four_strata_family(
         },
         "vaporisation_coefficients": {
             "evaporation_alpha": {
-                "status": "no_data",
-                "policy": "refuse_nonzero_flux",
-                "compatibility_policy_field": "refuse_nonzero_flux",
+                "value": 1.0,
+                "status": ANALYTICAL_UPPER_BOUND_ALPHA_STATUS,
             },
             "alpha_domain_and_uncertainty": {},
             "extrapolation_policy": "conservative_slope_continuation",
