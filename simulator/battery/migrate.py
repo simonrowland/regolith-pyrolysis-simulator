@@ -11155,7 +11155,28 @@ class Migrator:
         count.rows_in += len(rows)
         self.result.measured.citations += 1
         local_ids = {str(obs.get("observation_id")) for _, obs in rows if obs.get("observation_id")}
+        row_ordinals: dict[str, int] = defaultdict(int)
         for formula, obs in rows:
+            row_ordinal = row_ordinals[formula]
+            row_ordinals[formula] += 1
+            if not obs.get("observation_id"):
+                # b-674: an id-less row has no identity. A shared fallback id
+                # would silently merge identical id-less rows, so refuse the
+                # row with a typed hard issue instead of migrating it.
+                self.result.registry_issues.append(
+                    ValidationIssue(
+                        path=(
+                            f"extract[{rel}].species[{formula}]"
+                            f".observations[{row_ordinal}].observation_id"
+                        ),
+                        reason=RefusalReason.INVALID_IDENTITY,
+                        detail=(
+                            "extract observation has no observation_id; refused at "
+                            "identity resolution (b-674), not migrated"
+                        ),
+                    )
+                )
+                continue
             raw_experiment = obs.get("experiment")
             declared_experiment_id = None
             if raw_experiment is not None:
@@ -11163,9 +11184,7 @@ class Migrator:
                 if key in experiment_refs:
                     declared_experiment_id = experiment_refs[key]
                 else:
-                    raw_obs_id = str(
-                        obs.get("observation_id") or f"{source_id}:missing"
-                    )
+                    raw_obs_id = str(obs["observation_id"])
                     declared_experiment_id = self._registry_id(
                         work.work_id,
                         "experiment",
@@ -11231,7 +11250,13 @@ class Migrator:
         provenance: Mapping[str, Any] | None = None,
     ) -> None:
         measured = self.result.measured
-        raw_obs_id = str(obs.get("observation_id") or f"{source_id}:missing")
+        raw_obs_id = str(obs.get("observation_id") or "")
+        if not raw_obs_id:
+            # b-674: _migrate_extract refuses id-less rows before this point.
+            raise ValueError(
+                f"{source_id}: extract observation without observation_id reached "
+                "_migrate_extract_observation"
+            )
         obs_id = f"{source_id}::{raw_obs_id}"
         raw_values = obs.get("values")
         if isinstance(raw_values, list):
