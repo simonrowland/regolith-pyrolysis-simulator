@@ -10,6 +10,7 @@ from __future__ import annotations
 
 from pathlib import Path
 from copy import deepcopy
+from decimal import Decimal
 import hashlib
 import json
 import os
@@ -22,13 +23,17 @@ from simulator.yaml_cache import load_cached_safe_yaml
 from simulator.reference_data.janaf import (
     COMPILATION_ROOT,
     NON_STOICHIOMETRIC_TABLES,
+    NIST_TAIL_PARSE_REPAIR,
     PINNED_JANAF_ABSENT_ELEMENTS,
     TABLES_DIR,
     coverage_by_element,
     feedstock_element_symbols,
     formula_composition,
     formula_normalised,
+    _element_reference_gibbs_sign,
+    _gibbs_sign_from_neighbors,
     harvest_era,
+    is_nist_tail_signed_repair_cell,
     iter_table_paths,
     load_manifest,
     load_table_document,
@@ -39,6 +44,21 @@ from simulator.reference_data.janaf import (
 from tools import harvest_janaf_compilation as harvester
 from tools import build_janaf_compilation_manifest as manifest_builder
 from tools.harvest_janaf_compilation import parse_table, parse_element_index
+
+EXPECTED_UNREPAIRED_TAILS = (
+    ("B-123", 1100, "printed Gibbs/log Kf pair misses allowed tolerance"),
+    ("C-008", 2800, "formation Gibbs neighbors do not structurally pin a sign"),
+    ("C-009", 2800, "formation Gibbs neighbors do not structurally pin a sign"),
+    ("Cl-032", 400, "formation Gibbs neighbors do not structurally pin a sign"),
+    ("Cl-033", 400, "formation Gibbs neighbors do not structurally pin a sign"),
+    ("H-014", 1000, "formation Gibbs neighbors do not structurally pin a sign"),
+    ("H-015", 1000, "formation Gibbs neighbors do not structurally pin a sign"),
+    ("Mo-019", 2100, "formation Gibbs neighbors do not structurally pin a sign"),
+    ("N-014", 3300, "formation Gibbs neighbors do not structurally pin a sign"),
+    ("N-015", 3300, "formation Gibbs neighbors do not structurally pin a sign"),
+    ("Ni-012", 1300, "formation Gibbs neighbors do not structurally pin a sign"),
+    ("Ni-013", 1300, "formation Gibbs neighbors do not structurally pin a sign"),
+)
 
 ROOT = Path(__file__).resolve().parents[1]
 EXTRACT = ROOT / "data" / "literature" / "extracts" / "janaf-4th.yaml"
@@ -111,6 +131,389 @@ def test_every_stored_number_reparses_from_table_text() -> None:
             break
     assert html_era + txt_era == 1655
     assert failures == []
+
+
+@pytest.mark.parametrize(
+    ("table_id", "temperature", "expected"),
+    (
+        (
+            "K-003",
+            1100,
+            {
+                "formation_enthalpy": None,
+                "formation_gibbs_energy": 4.610,
+                "log10_formation_equilibrium_constant": -0.219,
+            },
+        ),
+        (
+            "Al-003",
+            1000,
+            {
+                "formation_enthalpy": 0.0,
+                "formation_gibbs_energy": 0.0,
+                "log10_formation_equilibrium_constant": 0.0,
+            },
+        ),
+    ),
+)
+def test_transition_following_rows_restore_signed_janaf_tail(
+    table_id: str, temperature: int, expected: dict[str, float]
+) -> None:
+    table = load_table_document(TABLES_DIR / f"{table_id}.yaml")["table"]
+    rows = [
+        row
+        for row in table["values"]
+        if row["temperature"]["value"] == temperature
+    ]
+    assert len(rows) == 1, f"{table_id}: missing {temperature} K row"
+    row = rows[0]
+    for key, value in expected.items():
+        assert row[key]["value"] == value
+    if table_id == "K-003":
+        assert row["formation_enthalpy"]["locator"]["parse_repair"] == (
+            "nist_tail_dfh_sign_undetermined"
+        )
+
+
+@pytest.mark.parametrize(
+    ("table_id", "temperature"),
+    (("O-038", 1700), ("O-037", 1700), ("Fe-018", 1700), ("Na-012", 1500)),
+)
+def test_transition_following_enthalpy_bracket_is_named_refusal(
+    table_id: str, temperature: int
+) -> None:
+    table = load_table_document(TABLES_DIR / f"{table_id}.yaml")["table"]
+    row = next(
+        row for row in table["values"] if row["temperature"]["value"] == temperature
+    )
+    enthalpy = row["formation_enthalpy"]
+    assert enthalpy["value"] is None
+    assert enthalpy["locator"]["parse_repair"] == "nist_tail_dfh_sign_undetermined"
+    assert "formation enthalpy neighbors span a transition marker" in enthalpy[
+        "locator"
+    ]["parse_repair_reason"]
+    assert row["formation_gibbs_energy"]["value"] is not None
+    assert row["log10_formation_equilibrium_constant"]["value"] is not None
+
+
+def test_refused_janaf_row_keeps_unsigned_source_line() -> None:
+    table = load_table_document(TABLES_DIR / "O-038.yaml")["table"]
+    raw_line = (
+        "1700\t85.772\t158.857\t102.619\t95.604\t"
+        "941.610  609.059 18.714"
+    )
+    row = next(row for row in table["values"] if row["temperature"]["value"] == 1700)
+    assert row["formation_enthalpy"]["as_published"] == "941.610"
+    assert row["formation_enthalpy"]["locator"]["raw_line"] == raw_line
+    assert row["formation_enthalpy"]["locator"]["raw_tail_tokens"] == [
+        "941.610",
+        "609.059",
+        "18.714",
+    ]
+    assert row["formation_gibbs_energy"]["value"] == -609.059
+    assert row["log10_formation_equilibrium_constant"]["value"] == 18.714
+
+
+def test_signed_tail_cell_validation_requires_marker_raw_line_and_magnitude() -> None:
+    cell = {
+        "as_published": "609.059",
+        "value": -609.059,
+        "locator": {
+            "parse_repair": NIST_TAIL_PARSE_REPAIR,
+            "raw_line": "1700\t...\t941.610  609.059 18.714",
+        },
+    }
+    assert is_nist_tail_signed_repair_cell(cell)
+    without_marker = deepcopy(cell)
+    without_marker["locator"].pop("parse_repair")
+    assert not is_nist_tail_signed_repair_cell(without_marker)
+    without_raw_line = deepcopy(cell)
+    without_raw_line["locator"].pop("raw_line")
+    assert not is_nist_tail_signed_repair_cell(without_raw_line)
+    wrong_magnitude = deepcopy(cell)
+    wrong_magnitude["value"] = -609.060
+    assert not is_nist_tail_signed_repair_cell(wrong_magnitude)
+
+
+def test_gibbs_sign_continuity_refuses_zero_crossings_and_small_values() -> None:
+    assert _gibbs_sign_from_neighbors(Decimal("10"), Decimal("9")) == 1
+    assert _gibbs_sign_from_neighbors(Decimal("-10"), Decimal("-9")) == -1
+    assert _gibbs_sign_from_neighbors(Decimal("-1"), Decimal("1")) is None
+    # I-013@5000: the closest neighbour is only 0.625 kJ/mol from zero,
+    # while the neighbours differ by 2.075 kJ/mol.
+    assert _gibbs_sign_from_neighbors(Decimal("-0.625"), Decimal("-2.700")) is None
+
+
+def test_element_reference_sign_requires_condensed_single_element_table() -> None:
+    assert _element_reference_gibbs_sign(
+        "O2", "cr", has_zero_reference_interval=True
+    ) == 1
+    assert _element_reference_gibbs_sign(
+        "O2", "g", has_zero_reference_interval=True
+    ) is None
+    assert _element_reference_gibbs_sign(
+        "MgO", "cr", has_zero_reference_interval=True
+    ) is None
+    assert _element_reference_gibbs_sign(
+        "O2", "cr", has_zero_reference_interval=False
+    ) is None
+
+
+def test_unresolved_janaf_tail_identity_stays_in_parse_ambiguities() -> None:
+    table = load_table_document(TABLES_DIR / "B-123.yaml")["table"]
+    assert not any(row["temperature"]["value"] == 1100 for row in table["values"])
+    ambiguity = next(
+        item
+        for item in table["parse_ambiguities"]
+        if item.get("raw_line", "").startswith("1100\t")
+    )
+    assert ambiguity["kind"] == "nist_tail_whitespace_signs_unresolved"
+    assert "identity misses by 1001.634 printed log Kf units" in ambiguity["reason"]
+
+
+def test_unrepaired_janaf_tail_coordinates_match_the_named_exception_list() -> None:
+    from decimal import Decimal
+
+    actual = []
+    for path in iter_table_paths():
+        table = load_table_document(path)["table"]
+        for ambiguity in table.get("parse_ambiguities", []):
+            if ambiguity.get("kind") != "nist_tail_whitespace_signs_unresolved":
+                continue
+            raw_line = ambiguity.get("raw_line", "")
+            temperature = Decimal(raw_line.split("\t", 1)[0])
+            reason = (
+                "printed Gibbs/log Kf pair misses allowed tolerance"
+                if "identity misses by" in ambiguity.get("reason", "")
+                else "formation Gibbs neighbors do not structurally pin a sign"
+            )
+            actual.append((table["table_id"], temperature, reason))
+    assert sorted(actual) == sorted(EXPECTED_UNREPAIRED_TAILS)
+
+
+@pytest.mark.parametrize(
+    ("table_id", "temperature"),
+    (
+        ("Al-050", 1100),
+        ("Al-052", 900),
+        ("Al-053", 900),
+        ("Al-106", 1100),
+        ("Al-107", 1100),
+        ("B-116", 1100),
+        ("B-132", 1200),
+        ("B-133", 1200),
+        ("F-133", 400),
+        ("F-134", 400),
+        ("H-085", 400),
+        ("H-086", 400),
+        ("Na-022", 500),
+        ("O-083", 500),
+    ),
+)
+def test_large_logk_rows_restore_gibbs_and_mark_undecided_enthalpy(
+    table_id: str, temperature: int
+) -> None:
+    table = load_table_document(TABLES_DIR / f"{table_id}.yaml")["table"]
+    row = next(
+        row for row in table["values"] if row["temperature"]["value"] == temperature
+    )
+    enthalpy = row["formation_enthalpy"]
+    assert enthalpy["value"] is None
+    assert enthalpy["locator"]["parse_repair"] == "nist_tail_dfh_sign_undetermined"
+    assert row["formation_gibbs_energy"]["value"] is not None
+    assert row["log10_formation_equilibrium_constant"]["value"] is not None
+    assert not any(
+        item.get("raw_line", "").startswith(f"{temperature}\t")
+        for item in table.get("parse_ambiguities", [])
+    )
+
+
+def test_scale_aware_identity_tolerance_accepts_more_than_two_printed_units() -> None:
+    source = (
+        "Synthetic scale-aware identity tail\n"
+        "T(K)\tCp\tS\t-[G-H(Tr)]/T\tH-H(Tr)\tΔfH\tΔfG\tlog Kf\n"
+        "900\t10\t10\t10\t0\t-100.000\t1000.000\t-58.038\n"
+        "1000\t10\t10\t10\t0\t100.000 1000.000 52.236\n"
+        "1100\t10\t10\t10\t0\t-100.000\t1000.000\t-47.485\n"
+    )
+    parsed = parse_janaf_txt(
+        source, table_id="synthetic-scale-aware-tail", url="u", download_url="d"
+    )
+    row = next(row for row in parsed.values if row["temperature"]["value"] == 1000)
+    assert row["formation_enthalpy"]["value"] == -100.0
+    assert row["formation_gibbs_energy"]["value"] == 1000.0
+    assert row["log10_formation_equilibrium_constant"]["value"] == -52.236
+
+
+def test_malformed_tail_restores_gibbs_when_enthalpy_spans_transition() -> None:
+    source = (
+        "Synthetic transition-adjacent formation tail\n"
+        "T(K)\tCp\tS\t-[G-H(Tr)]/T\tH-H(Tr)\tΔfH\tΔfG\tlog Kf\n"
+        "900\t10\t10\t10\t0\t-1.000\t1.000\t-0.052\n"
+        "950\t10\t10\t10\t0\tALPHA <--> BETA\n"
+        "1000\t10\t10\t10\t0\t1.000 0.500 0.026\n"
+        "1100\t10\t10\t10\t0\t-1.200\t0.600\t-0.031\n"
+    )
+    parsed = parse_janaf_txt(
+        source, table_id="synthetic-transition-tail", url="u", download_url="d"
+    )
+    row = next(row for row in parsed.values if row["temperature"]["value"] == 1000)
+    assert row["formation_enthalpy"]["value"] is None
+    assert row["formation_enthalpy"]["locator"]["parse_repair"] == (
+        "nist_tail_dfh_sign_undetermined"
+    )
+    assert row["formation_gibbs_energy"]["value"] == 0.5
+    assert row["log10_formation_equilibrium_constant"]["value"] == -0.026
+
+
+def test_transition_enthalpy_refusal_prevents_the_fe004_wrong_sign() -> None:
+    import simulator.reference_data.janaf as janaf
+
+    source = (
+        "Synthetic Fe-004 audit row\n"
+        "T(K)\tCp\tS\t-[G-H(Tr)]/T\tH-H(Tr)\tΔfH\tΔfG\tlog Kf\n"
+        "1100\t10\t10\t10\t0\t0.100\t0.052\t-0.002\n"
+        "1184\t10\t10\t10\t0\tALPHA <--> GAMMA\n"
+        "1300\t10\t10\t10\t0\t0.267 0.052 0.002\n"
+        "1400\t10\t10\t10\t0\t0.044\t0.052\t-0.002\n"
+    )
+    guarded = janaf.parse_janaf_txt(
+        source, table_id="synthetic-fe004-audit", url="u", download_url="d"
+    )
+    row = next(row for row in guarded.values if row["temperature"]["value"] == 1300)
+    assert row["formation_enthalpy"]["value"] is None
+    assert row["formation_enthalpy"]["locator"]["parse_repair"] == (
+        "nist_tail_dfh_sign_undetermined"
+    )
+
+
+@pytest.mark.parametrize(
+    ("table_id", "temperature"),
+    (
+        ("F-045", "800"),
+        ("Fe-029", "350"),
+        ("Cl-070", "3600"),
+        ("I-018", "2000"),
+        ("S-011", "1600"),
+        ("Co-007", "3200"),
+        ("Na-007", "1100"),
+        ("S-020", "800"),
+        ("O-009", "2000"),
+        ("B-091", "2300"),
+    ),
+)
+def test_opposite_sign_enthalpy_neighbors_do_not_restore_tail(
+    table_id: str, temperature: str, janaf_source_dir: Path
+) -> None:
+    """Opposite-sign DfH brackets cannot establish a repaired sign."""
+
+    source_path = janaf_source_dir / f"{table_id}.txt"
+    lines = source_path.read_text(encoding="utf-8").splitlines()
+    target_index = next(
+        index
+        for index, line in enumerate(lines)
+        if line.split("\t", 1)[0] == temperature
+    )
+    fields = lines[target_index].split("\t")
+    assert len(fields) >= 8
+    # Hide the original signs and reproduce the malformed whitespace tail.
+    lines[target_index] = "\t".join(
+        [*fields[:5], " ".join(token.lstrip("+-") for token in fields[5:8])]
+    )
+
+    parsed = parse_janaf_txt(
+        "\n".join(lines), table_id=table_id, url="u", download_url="d"
+    )
+    row = next(
+        row for row in parsed.values
+        if row["temperature"]["as_published"] == temperature
+    )
+    assert row["formation_enthalpy"]["value"] is None
+    assert row["formation_enthalpy"]["locator"]["parse_repair"] == (
+        "nist_tail_dfh_sign_undetermined"
+    )
+
+
+def test_identity_consistent_tail_needs_no_same_sign_orientation() -> None:
+    source = (
+        "Synthetic identity-consistent formation tail\n"
+        "T(K)\tCp\tS\t-[G-H(Tr)]/T\tH-H(Tr)\tΔfH\tΔfG\tlog Kf\n"
+        "900\t10\t10\t10\t0\t-1.000\t0.038\t-0.002\n"
+        "1000\t10\t10\t10\t0\t1.100 0.038 0.001\n"
+        "1100\t10\t10\t10\t0\t-1.000\t0.038\t-0.002\n"
+    )
+    parsed = parse_janaf_txt(
+        source, table_id="synthetic-identity-tail", url="u", download_url="d"
+    )
+    row = next(row for row in parsed.values if row["temperature"]["value"] == 1000)
+    assert row["formation_enthalpy"]["value"] == -1.1
+    assert row["formation_gibbs_energy"]["value"] == 0.038
+    assert row["log10_formation_equilibrium_constant"]["value"] == -0.001
+
+
+def test_every_absent_100k_node_is_explained_by_the_printed_grid() -> None:
+    """Derived sparse ladders plus named unresolved rows are the only skipped nodes."""
+
+    from decimal import Decimal
+
+    unexplained: list[tuple[str, int, str]] = []
+    for path in iter_table_paths():
+        table = load_table_document(path)["table"]
+        temperatures = sorted(
+            Decimal(str(row["temperature"]["value"]))
+            for row in table["values"]
+            if row["temperature"]["value"] is not None
+        )
+        present = set(temperatures)
+        if not temperatures:
+            continue
+        first = int(temperatures[0] // 100) * 100
+        last = int(temperatures[-1] // 100) * 100
+        for candidate in range(first, last + 1, 100):
+            node = Decimal(candidate)
+            if node in present or node < temperatures[0] or node > temperatures[-1]:
+                continue
+            left = max(value for value in temperatures if value < node)
+            right = min(value for value in temperatures if value > node)
+            gaps = [b - a for a, b in zip(temperatures, temperatures[1:])]
+            left_index = temperatures.index(left)
+            run_start = left_index
+            run_end = left_index + 1
+            while run_start > 0 and gaps[run_start - 1] in (
+                Decimal("200"),
+                Decimal("400"),
+            ):
+                run_start -= 1
+            while run_end < len(gaps) and gaps[run_end] in (
+                Decimal("200"),
+                Decimal("400"),
+            ):
+                run_end += 1
+            sparse_ladder = (
+                left >= Decimal("3000")
+                and right - left in (Decimal("200"), Decimal("400"))
+                and run_end - run_start >= 2
+            )
+            reference_interval = (
+                left == Decimal("298.15") and right == Decimal("500")
+            )
+            if not sparse_ladder and not reference_interval:
+                ambiguity = next(
+                    item
+                    for item in table.get("parse_ambiguities", [])
+                    if item.get("kind") == "nist_tail_whitespace_signs_unresolved"
+                    and item.get("raw_line", "").startswith(f"{candidate}\t")
+                )
+                reason = (
+                    "printed Gibbs/log Kf pair misses allowed tolerance"
+                    if "identity misses by" in ambiguity.get("reason", "")
+                    else "formation Gibbs neighbors do not structurally pin a sign"
+                )
+                unexplained.append((table["table_id"], candidate, reason))
+    expected_grid_gaps = [
+        row for row in EXPECTED_UNREPAIRED_TAILS if row[1] % 100 == 0
+    ]
+    assert sorted(unexplained) == sorted(expected_grid_gaps)
 
 
 def _assert_source_round_trip(document, source_path):

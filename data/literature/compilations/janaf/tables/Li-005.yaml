@@ -18,12 +18,12 @@ compilation_role:
   circularity_warning: Do not validate an engine against a compilation it consumes.
 extraction:
   method: machine parse of NIST tab-delimited table download; source bytes cached unchanged
-  date: '2026-09-06'
   user_agent: RegolithPyrolysisSimulator-corpus-harvester/1.0 (public thermochemical reference-data research; polite cached
     client)
   source_cache_path: /Users/simonrowland/Library/CloudStorage/Dropbox/Starship Mission Design/Regolith Processing/regolith-pyrolysis-simulator/docs-private/research/2026-08-09-upstream-mission/IMCC-impl/janaf-mirror/Li/Li-005.txt
   source_sha256: c928a217f760a03228ec581af269caa14068ae53b077d12fccc19964558350e4
   review_status: machine_transcribed_unreviewed
+  date: '2026-09-06'
 table:
   table_id: Li-005
   url: https://janaf.nist.gov/tables/Li-005.html
@@ -1559,6 +1559,87 @@ table:
         download_url: https://janaf.nist.gov/tables/Li-005.txt
         row_temperature_as_published: '1600'
         column: log Kf
+  - temperature:
+      value: 1700.0
+      as_published: '1700'
+      locator:
+        table_id: Li-005
+        url: https://janaf.nist.gov/tables/Li-005.html
+        download_url: https://janaf.nist.gov/tables/Li-005.txt
+        row_temperature_as_published: '1700'
+        column: T(K)
+    heat_capacity:
+      value: 20.799
+      as_published: '20.799'
+      locator:
+        table_id: Li-005
+        url: https://janaf.nist.gov/tables/Li-005.html
+        download_url: https://janaf.nist.gov/tables/Li-005.txt
+        row_temperature_as_published: '1700'
+        column: Cp
+    entropy:
+      value: 174.966
+      as_published: '174.966'
+      locator:
+        table_id: Li-005
+        url: https://janaf.nist.gov/tables/Li-005.html
+        download_url: https://janaf.nist.gov/tables/Li-005.txt
+        row_temperature_as_published: '1700'
+        column: S
+    negative_gibbs_enthalpy_function:
+      value: 157.824
+      as_published: '157.824'
+      locator:
+        table_id: Li-005
+        url: https://janaf.nist.gov/tables/Li-005.html
+        download_url: https://janaf.nist.gov/tables/Li-005.txt
+        row_temperature_as_published: '1700'
+        column: -[G-H(Tr)]/T
+    enthalpy_increment:
+      value: 29.141
+      as_published: '29.141'
+      locator:
+        table_id: Li-005
+        url: https://janaf.nist.gov/tables/Li-005.html
+        download_url: https://janaf.nist.gov/tables/Li-005.txt
+        row_temperature_as_published: '1700'
+        column: H-H(Tr)
+    formation_enthalpy:
+      value: 0.0
+      as_published: '0.'
+      locator:
+        table_id: Li-005
+        url: https://janaf.nist.gov/tables/Li-005.html
+        download_url: https://janaf.nist.gov/tables/Li-005.txt
+        row_temperature_as_published: '1700'
+        column: delta-f H
+        parse_repair: nist_tail_whitespace_signs_restored
+        line_number: 25
+        raw_line: "1700\t20.799\t174.966\t157.824\t29.141\t0. 0. 0."
+    formation_gibbs_energy:
+      value: 0.0
+      as_published: '0.'
+      locator:
+        table_id: Li-005
+        url: https://janaf.nist.gov/tables/Li-005.html
+        download_url: https://janaf.nist.gov/tables/Li-005.txt
+        row_temperature_as_published: '1700'
+        column: delta-f G
+        parse_repair: nist_tail_whitespace_signs_restored
+        line_number: 25
+        raw_line: "1700\t20.799\t174.966\t157.824\t29.141\t0. 0. 0."
+    log10_formation_equilibrium_constant:
+      value: 0.0
+      as_published: '0.'
+      locator:
+        table_id: Li-005
+        url: https://janaf.nist.gov/tables/Li-005.html
+        download_url: https://janaf.nist.gov/tables/Li-005.txt
+        row_temperature_as_published: '1700'
+        column: log Kf
+        parse_repair: nist_tail_whitespace_signs_restored
+        line_number: 25
+        raw_line: "1700\t20.799\t174.966\t157.824\t29.141\t0. 0. 0."
   - temperature:
       value: 1800.0
       as_published: '1800'
@@ -4658,12 +4739,6 @@ table:
   parse_ambiguities:
   - line_number: 24
     raw_line: "1620.120\t20.794\t173.965\t157.004\t27.479\tFUGACITY = 1 bar"
-    reason: expected 8 tab-separated values; found 6
-    locator:
-      table_id: Li-005
-      url: https://janaf.nist.gov/tables/Li-005.html
-  - line_number: 25
-    raw_line: "1700\t20.799\t174.966\t157.824\t29.141\t0. 0. 0."
     reason: expected 8 tab-separated values; found 6
     locator:
       table_id: Li-005

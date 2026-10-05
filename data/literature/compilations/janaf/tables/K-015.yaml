@@ -18,12 +18,12 @@ compilation_role:
   circularity_warning: Do not validate an engine against a compilation it consumes.
 extraction:
   method: machine parse of NIST tab-delimited table download; source bytes cached unchanged
-  date: '2026-09-06'
   user_agent: RegolithPyrolysisSimulator-corpus-harvester/1.0 (public thermochemical reference-data research; polite cached
     client)
   source_cache_path: /Users/simonrowland/Library/CloudStorage/Dropbox/Starship Mission Design/Regolith Processing/regolith-pyrolysis-simulator/docs-private/research/2026-08-09-upstream-mission/IMCC-impl/janaf-mirror/K/K-015.txt
   source_sha256: 64151bf11bc2ba6462dfbe3dbe6d5b4777132d6a49bd90b8d7e626c4df52d159
   review_status: machine_transcribed_unreviewed
+  date: '2026-09-06'
 table:
   table_id: K-015
   url: https://janaf.nist.gov/tables/K-015.html
@@ -1055,6 +1055,92 @@ table:
         download_url: https://janaf.nist.gov/tables/K-015.txt
         row_temperature_as_published: '1200'
         column: log Kf
+  - temperature:
+      value: 1300.0
+      as_published: '1300'
+      locator:
+        table_id: K-015
+        url: https://janaf.nist.gov/tables/K-015.html
+        download_url: https://janaf.nist.gov/tables/K-015.txt
+        row_temperature_as_published: '1300'
+        column: T(K)
+    heat_capacity:
+      value: 179.912
+      as_published: '179.912'
+      locator:
+        table_id: K-015
+        url: https://janaf.nist.gov/tables/K-015.html
+        download_url: https://janaf.nist.gov/tables/K-015.txt
+        row_temperature_as_published: '1300'
+        column: Cp
+    entropy:
+      value: 417.357
+      as_published: '417.357'
+      locator:
+        table_id: K-015
+        url: https://janaf.nist.gov/tables/K-015.html
+        download_url: https://janaf.nist.gov/tables/K-015.txt
+        row_temperature_as_published: '1300'
+        column: S
+    negative_gibbs_enthalpy_function:
+      value: 289.211
+      as_published: '289.211'
+      locator:
+        table_id: K-015
+        url: https://janaf.nist.gov/tables/K-015.html
+        download_url: https://janaf.nist.gov/tables/K-015.txt
+        row_temperature_as_published: '1300'
+        column: -[G-H(Tr)]/T
+    enthalpy_increment:
+      value: 166.59
+      as_published: '166.590'
+      locator:
+        table_id: K-015
+        url: https://janaf.nist.gov/tables/K-015.html
+        download_url: https://janaf.nist.gov/tables/K-015.txt
+        row_temperature_as_published: '1300'
+        column: H-H(Tr)
+    formation_enthalpy:
+      value: null
+      as_published: '1627.403'
+      locator:
+        table_id: K-015
+        url: https://janaf.nist.gov/tables/K-015.html
+        download_url: https://janaf.nist.gov/tables/K-015.txt
+        row_temperature_as_published: '1300'
+        column: delta-f H
+        parse_repair: nist_tail_dfh_sign_undetermined
+        parse_repair_reason: formation enthalpy neighbors span a transition marker
+        raw_tail_tokens:
+        - '1627.403'
+        - '1109.670'
+        - '44.587'
+        line_number: 20
+        raw_line: "1300\t179.912\t417.357\t289.211\t166.590\t1627.403  1109.670 44.587"
+    formation_gibbs_energy:
+      value: -1109.67
+      as_published: '1109.670'
+      locator:
+        table_id: K-015
+        url: https://janaf.nist.gov/tables/K-015.html
+        download_url: https://janaf.nist.gov/tables/K-015.txt
+        row_temperature_as_published: '1300'
+        column: delta-f G
+        parse_repair: nist_tail_whitespace_signs_restored
+        line_number: 20
+        raw_line: "1300\t179.912\t417.357\t289.211\t166.590\t1627.403  1109.670 44.587"
+    log10_formation_equilibrium_constant:
+      value: 44.587
+      as_published: '44.587'
+      locator:
+        table_id: K-015
+        url: https://janaf.nist.gov/tables/K-015.html
+        download_url: https://janaf.nist.gov/tables/K-015.txt
+        row_temperature_as_published: '1300'
+        column: log Kf
+        parse_repair: nist_tail_whitespace_signs_restored
+        line_number: 20
+        raw_line: "1300\t179.912\t417.357\t289.211\t166.590\t1627.403  1109.670 44.587"
   - temperature:
       value: 1400.0
       as_published: '1400'
@@ -2294,12 +2380,6 @@ table:
       url: https://janaf.nist.gov/tables/K-015.html
   - line_number: 19
     raw_line: "1249.000\t179.912\t410.154\t284.121\t157.414\tCRYSTAL <--> LIQUID"
-    reason: expected 8 tab-separated values; found 6
-    locator:
-      table_id: K-015
-      url: https://janaf.nist.gov/tables/K-015.html
-  - line_number: 20
-    raw_line: "1300\t179.912\t417.357\t289.211\t166.590\t1627.403  1109.670 44.587"
     reason: expected 8 tab-separated values; found 6
     locator:
       table_id: K-015

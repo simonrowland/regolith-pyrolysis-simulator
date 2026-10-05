@@ -18,12 +18,12 @@ compilation_role:
   circularity_warning: Do not validate an engine against a compilation it consumes.
 extraction:
   method: machine parse of NIST tab-delimited table download; source bytes cached unchanged
-  date: '2026-09-06'
   user_agent: RegolithPyrolysisSimulator-corpus-harvester/1.0 (public thermochemical reference-data research; polite cached
     client)
   source_cache_path: /Users/simonrowland/Library/CloudStorage/Dropbox/Starship Mission Design/Regolith Processing/regolith-pyrolysis-simulator/docs-private/research/2026-08-09-upstream-mission/IMCC-impl/janaf-mirror/Cl/Cl-074.txt
   source_sha256: fb9261b3ad7e9b506cf7641c7a5f12abc4ff67c2e3acf0074944d0b6ad60935a
   review_status: machine_transcribed_unreviewed
+  date: '2026-09-06'
 table:
   table_id: Cl-074
   url: https://janaf.nist.gov/tables/Cl-074.html
@@ -912,6 +912,92 @@ table:
         row_temperature_as_published: '1000'
         column: log Kf
   - temperature:
+      value: 1100.0
+      as_published: '1100'
+      locator:
+        table_id: Cl-074
+        url: https://janaf.nist.gov/tables/Cl-074.html
+        download_url: https://janaf.nist.gov/tables/Cl-074.txt
+        row_temperature_as_published: '1100'
+        column: T(K)
+    heat_capacity:
+      value: 88.826
+      as_published: '88.826'
+      locator:
+        table_id: Cl-074
+        url: https://janaf.nist.gov/tables/Cl-074.html
+        download_url: https://janaf.nist.gov/tables/Cl-074.txt
+        row_temperature_as_published: '1100'
+        column: Cp
+    entropy:
+      value: 219.2
+      as_published: '219.200'
+      locator:
+        table_id: Cl-074
+        url: https://janaf.nist.gov/tables/Cl-074.html
+        download_url: https://janaf.nist.gov/tables/Cl-074.txt
+        row_temperature_as_published: '1100'
+        column: S
+    negative_gibbs_enthalpy_function:
+      value: 157.054
+      as_published: '157.054'
+      locator:
+        table_id: Cl-074
+        url: https://janaf.nist.gov/tables/Cl-074.html
+        download_url: https://janaf.nist.gov/tables/Cl-074.txt
+        row_temperature_as_published: '1100'
+        column: -[G-H(Tr)]/T
+    enthalpy_increment:
+      value: 68.361
+      as_published: '68.361'
+      locator:
+        table_id: Cl-074
+        url: https://janaf.nist.gov/tables/Cl-074.html
+        download_url: https://janaf.nist.gov/tables/Cl-074.txt
+        row_temperature_as_published: '1100'
+        column: H-H(Tr)
+    formation_enthalpy:
+      value: null
+      as_published: '299.134'
+      locator:
+        table_id: Cl-074
+        url: https://janaf.nist.gov/tables/Cl-074.html
+        download_url: https://janaf.nist.gov/tables/Cl-074.txt
+        row_temperature_as_published: '1100'
+        column: delta-f H
+        parse_repair: nist_tail_dfh_sign_undetermined
+        parse_repair_reason: formation enthalpy neighbors span a transition marker
+        raw_tail_tokens:
+        - '299.134'
+        - '166.045'
+        - '7.885'
+        line_number: 16
+        raw_line: "1100\t88.826\t219.200\t157.054\t68.361\t299.134  166.045 7.885"
+    formation_gibbs_energy:
+      value: -166.045
+      as_published: '166.045'
+      locator:
+        table_id: Cl-074
+        url: https://janaf.nist.gov/tables/Cl-074.html
+        download_url: https://janaf.nist.gov/tables/Cl-074.txt
+        row_temperature_as_published: '1100'
+        column: delta-f G
+        parse_repair: nist_tail_whitespace_signs_restored
+        line_number: 16
+        raw_line: "1100\t88.826\t219.200\t157.054\t68.361\t299.134  166.045 7.885"
+    log10_formation_equilibrium_constant:
+      value: 7.885
+      as_published: '7.885'
+      locator:
+        table_id: Cl-074
+        url: https://janaf.nist.gov/tables/Cl-074.html
+        download_url: https://janaf.nist.gov/tables/Cl-074.txt
+        row_temperature_as_published: '1100'
+        column: log Kf
+        parse_repair: nist_tail_whitespace_signs_restored
+        line_number: 16
+        raw_line: "1100\t88.826\t219.200\t157.054\t68.361\t299.134  166.045 7.885"
+  - temperature:
       value: 1200.0
       as_published: '1200'
       locator:
@@ -1202,12 +1288,6 @@ table:
   parse_ambiguities:
   - line_number: 15
     raw_line: "1013.000\t88.316\t211.902\t152.026\t60.655\tCRYSTAL <--> LIQUID"
-    reason: expected 8 tab-separated values; found 6
-    locator:
-      table_id: Cl-074
-      url: https://janaf.nist.gov/tables/Cl-074.html
-  - line_number: 16
-    raw_line: "1100\t88.826\t219.200\t157.054\t68.361\t299.134  166.045 7.885"
     reason: expected 8 tab-separated values; found 6
     locator:
       table_id: Cl-074

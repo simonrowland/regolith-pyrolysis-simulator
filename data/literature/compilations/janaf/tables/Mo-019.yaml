@@ -18,12 +18,12 @@ compilation_role:
   circularity_warning: Do not validate an engine against a compilation it consumes.
 extraction:
   method: machine parse of NIST tab-delimited table download; source bytes cached unchanged
-  date: '2026-09-06'
   user_agent: RegolithPyrolysisSimulator-corpus-harvester/1.0 (public thermochemical reference-data research; polite cached
     client)
   source_cache_path: /Users/simonrowland/Library/CloudStorage/Dropbox/Starship Mission Design/Regolith Processing/regolith-pyrolysis-simulator/docs-private/research/2026-08-09-upstream-mission/IMCC-impl/janaf-mirror/Mo/Mo-019.txt
   source_sha256: 24f62597eb48d60822b19fa0eb86063d8cec01ae5542b147e082979d066e4d25
   review_status: machine_transcribed_unreviewed
+  date: '2026-09-06'
 table:
   table_id: Mo-019
   url: https://janaf.nist.gov/tables/Mo-019.html
@@ -1856,7 +1856,8 @@ table:
       url: https://janaf.nist.gov/tables/Mo-019.html
   - line_number: 26
     raw_line: "2100\t179.309\t384.376\t257.142\t267.190\t543.184  54.601 1.358"
-    reason: expected 8 tab-separated values; found 6
+    reason: 'refused JANAF tail sign restoration: formation Gibbs neighbors do not structurally pin a sign'
     locator:
       table_id: Mo-019
       url: https://janaf.nist.gov/tables/Mo-019.html
+    kind: nist_tail_whitespace_signs_unresolved

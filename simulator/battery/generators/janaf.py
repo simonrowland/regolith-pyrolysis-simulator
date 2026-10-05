@@ -60,12 +60,16 @@ from simulator.reference_data.janaf import (
     ELEMENT_SYMBOLS,
     GRID_ORDER_REASON,
     GRID_RANGE_REASON,
+    NIST_TAIL_DFH_ABSENCE_REPAIR,
+    NIST_TAIL_PARSE_REPAIR,
     NON_DATA_MARKER_KIND,
     NON_DATA_MARKER_REASON,
     REFUSED_LAYOUT_KIND,
     SIDECAR_PATH,
     TABLES_DIR,
     formula_composition,
+    is_nist_tail_signed_repair_cell,
+    _is_nist_typed_absent_enthalpy_cell,
     load_table_document,
     table_printed_temperatures,
 )
@@ -345,11 +349,32 @@ def _cell(cell: object, *, table_id: str, column: str) -> _Cell:
     token = "" if cell.get("as_published") is None else str(cell["as_published"])
     value = _published_decimal(token)
     parsed = cell.get("value")
+    locator = cell.get("locator")
+    typed_absence = (
+        isinstance(locator, Mapping)
+        and locator.get("parse_repair") == NIST_TAIL_DFH_ABSENCE_REPAIR
+    )
+    repair_marker = (
+        isinstance(locator, Mapping)
+        and locator.get("parse_repair") == NIST_TAIL_PARSE_REPAIR
+    )
+    if typed_absence:
+        if column != "formation_enthalpy" or not _is_nist_typed_absent_enthalpy_cell(cell):
+            raise ValueError(f"{table_id}: {column} has an inconsistent typed JANAF absence")
+        return _Cell(token=token, value=None)
     if value is None:
         if parsed is not None:
             raise ValueError(
                 f"{table_id}: {column} token {token!r} is null but value is {parsed!r}"
             )
+    elif repair_marker:
+        restored = Decimal(str(parsed)) if parsed is not None else None
+        if not is_nist_tail_signed_repair_cell(cell):
+            raise ValueError(
+                f"{table_id}: {column} repaired token/value mismatch: "
+                f"{token!r} != {parsed!r}"
+            )
+        value = restored
     elif parsed is None or Decimal(str(parsed)) != value:
         raise ValueError(
             f"{table_id}: {column} token/value mismatch: {token!r} != {parsed!r}"
@@ -414,6 +439,18 @@ def _structured_rows(table: Mapping[str, Any], table_id: str) -> list[_Row]:
             line_number += 1
         if not isinstance(raw, Mapping):
             raise ValueError(f"{table_id}: values[{index}] is not a mapping")
+        gibbs_cell = raw.get("formation_gibbs_energy")
+        gibbs_locator = (
+            gibbs_cell.get("locator") if isinstance(gibbs_cell, Mapping) else None
+        )
+        repaired_line = (
+            gibbs_locator.get("line_number")
+            if isinstance(gibbs_locator, Mapping)
+            and gibbs_locator.get("parse_repair") == NIST_TAIL_PARSE_REPAIR
+            else None
+        )
+        if isinstance(repaired_line, int):
+            line_number = repaired_line
         cells = {
             column: _cell(raw.get(column), table_id=table_id, column=column)
             for column in _UNITS
@@ -2537,14 +2574,14 @@ _FUSION_TABLES = {
 # The source hashes identify the JANAF text; pin the extracted temperature-node
 # sets too so a dropped compiled row cannot silently widen interpolation.
 _FUSION_NODE_SET_SHA256 = {
-    "Al-096": "4fdff7891379ea07bbc7c0ca5254fdec29a4c5d3a6d35e1b8098004da618f6dc",
-    "Al-100": "516fee6dda1c692a9b05507efce187256bec6f22b7928058f585834d2e28164d",
-    "Ca-027": "376641f4fa64958a281184501eb5d3b621da105aee6bc625b26dd35e5d0ff061",
-    "Ca-028": "045d9b4eca578094b9321cbdb0c1db10dcea80f2ca925fc59ae86f01c8069acd",
-    "Mg-008": "d90e9f5d25d9202d685f0690078ba27104b1446d12b46644a7d24a4a44c2505e",
-    "Mg-009": "1444ecc52a9e18a3cb76a953750798bc18b74661abfc721e41dc1a3aa8620a7e",
+    "Al-096": "86986e6bc3d75c0fec4c3a034a1deab91e966c42d5e0f1cb4080a33d10aa6bed",
+    "Al-100": "b61dfea8f1da3f3a90ba7c7ceedc7b1cd04048c46fb4cf20bf5e5c3c4f0c0b18",
+    "Ca-027": "0b4adb5cf7b86a053c456688e9e635947ca38276f7b703cb00062ca5f00dbb5c",
+    "Ca-028": "4a9048a895bd8b3e499110d27edbbbe984c8c130881687ee8654a2f750afb765",
+    "Mg-008": "b61dfea8f1da3f3a90ba7c7ceedc7b1cd04048c46fb4cf20bf5e5c3c4f0c0b18",
+    "Mg-009": "e7c4becbfe7033b2b739a3b12f1404808d4fa05c33c4ee04d15cc1e5c114d8d4",
     "O-035": "86986e6bc3d75c0fec4c3a034a1deab91e966c42d5e0f1cb4080a33d10aa6bed",
-    "O-038": "c0cbb21a4e8d7387b9a379c21edc29a61d124efb398711e402fe5c3ff9038791",
+    "O-038": "4a9048a895bd8b3e499110d27edbbbe984c8c130881687ee8654a2f750afb765",
 }
 _ACCEPTED_MELTING_K = {
     "CaO": Decimal("2886"),
@@ -2634,6 +2671,12 @@ def _interpolate_formation_gibbs(
 ) -> Decimal:
     if temperature_K < points[0][0] or temperature_K > points[-1][0]:
         raise ValueError(f"{temperature_K} K is outside the JANAF table range")
+    missing_node = _missing_node_for_interpolation(points, (), temperature_K)
+    if missing_node is not None:
+        raise ValueError(
+            f"JANAF formation Gibbs interpolation spans missing grid node "
+            f"{missing_node} K at {temperature_K} K"
+        )
     for (t0, g0), (t1, g1) in zip(points, points[1:]):
         if t0 <= temperature_K <= t1:
             if temperature_K == t0:
@@ -2651,12 +2694,46 @@ def _missing_node_for_interpolation(
 ) -> Decimal | None:
     if any(node_temperature == temperature_K for node_temperature, _ in points):
         return None
-    for (left, _), (right, _) in zip(points, points[1:]):
+    temperatures = tuple(temperature for temperature, _ in points)
+    gaps = tuple(right - left for left, right in zip(temperatures, temperatures[1:]))
+    for gap_index, ((left, _), (right, _)) in enumerate(zip(points, points[1:])):
         if left < temperature_K < right:
-            return next(
-                (node for node in missing_nodes if left < node < right),
-                None,
+            absent_grid_nodes = tuple(
+                Decimal(candidate)
+                for candidate in range(
+                    int(left // 100) * 100 + 100,
+                    int(right // 100) * 100 + 1,
+                    100,
+                )
+                if left < Decimal(candidate) < right
             )
+            for node in sorted(
+                {node for node in missing_nodes if left < node < right}
+                | set(absent_grid_nodes)
+            ):
+                run_start = gap_index
+                run_end = gap_index + 1
+                while run_start > 0 and gaps[run_start - 1] in (
+                    Decimal("200"),
+                    Decimal("400"),
+                ):
+                    run_start -= 1
+                while run_end < len(gaps) and gaps[run_end] in (
+                    Decimal("200"),
+                    Decimal("400"),
+                ):
+                    run_end += 1
+                sparse_ladder = (
+                    left >= Decimal("3000")
+                    and right - left in (Decimal("200"), Decimal("400"))
+                    and run_end - run_start >= 2
+                )
+                reference_interval = (
+                    left == Decimal("298.15") and right == Decimal("500")
+                )
+                if not sparse_ladder and not reference_interval:
+                    return node
+            return None
     return None
 
 
@@ -2677,6 +2754,18 @@ def janaf_fusion_energy(oxide: str, temperature_K: Decimal) -> JANAFFusionEnergy
     )
     if len(overlap) < 2:
         raise ValueError(f"{oxide}: JANAF crystal/liquid tables do not overlap")
+    crystal_missing = _fusion_missing_gibbs_temperatures(crystal_table)
+    liquid_missing = _fusion_missing_gibbs_temperatures(liquid_table)
+    overlap = [
+        temperature
+        for temperature in overlap
+        if _missing_node_for_interpolation(
+            crystal, crystal_missing, temperature
+        ) is None
+        and _missing_node_for_interpolation(liquid, liquid_missing, temperature) is None
+    ]
+    if len(overlap) < 2:
+        raise ValueError(f"{oxide}: JANAF tables have fewer than two complete overlap nodes")
 
     def difference(t: Decimal) -> Decimal:
         return _interpolate_formation_gibbs(
@@ -2695,11 +2784,10 @@ def janaf_fusion_energy(oxide: str, temperature_K: Decimal) -> JANAFFusionEnergy
     if len(crossings) != 1:
         raise ValueError(f"{oxide}: expected one JANAF cr/l crossing, got {crossings}")
     tm = crossings[0]
-    for table_id, points in (
-        (crystal_table, crystal),
-        (liquid_table, liquid),
+    for table_id, points, missing_nodes in (
+        (crystal_table, crystal, crystal_missing),
+        (liquid_table, liquid, liquid_missing),
     ):
-        missing_nodes = _fusion_missing_gibbs_temperatures(table_id)
         for interpolation_temperature in (temperature_K, tm):
             missing_node = _missing_node_for_interpolation(
                 points, missing_nodes, interpolation_temperature

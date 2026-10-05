@@ -470,6 +470,13 @@ def test_janaf_values_at_missing_temperature_returns_none():
     assert janaf_values_at(document, 999.0) is None
 
 
+def test_janaf_values_at_typed_absent_enthalpy_keeps_gibbs_value():
+    values = janaf_values_at(load_janaf_table("O-038"), 1700.0)
+    assert values is not None
+    assert values.formation_enthalpy_kJ_mol is None
+    assert values.formation_gibbs_kJ_mol == -609.059
+
+
 def _printed_solid_solid_temperatures(table_id: str) -> list[float]:
     document = load_janaf_table(table_id)
     found = []
