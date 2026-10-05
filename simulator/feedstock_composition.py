@@ -7,12 +7,18 @@ from dataclasses import dataclass
 import math
 from typing import Any
 
-from simulator.accounting.exceptions import UnknownSpeciesError
+from simulator.accounting.exceptions import AccountingError, UnknownSpeciesError
 from simulator.accounting.formulas import (
     ATOMIC_WEIGHTS_G_PER_MOL,
+    parse_formula,
     resolve_species_formula,
 )
 from simulator.scalar_boundary import is_declared_real_scalar
+from simulator.trace_oxide_parents import (
+    LIQUID_PARENT_OXIDE,
+    SIDEROPHILE_IN_METAL_SCOPE_GAP,
+    ledger_component_key,
+)
 
 
 FEOT_FROM_FE2O3 = 2.0 * 71.844 / 159.687
@@ -280,11 +286,170 @@ def _valid_declared_number(number: float, field: str) -> float:
     return number
 
 
-def normalized_feedstock_component_masses_kg(
+@dataclass(frozen=True)
+class TraceOxideConversion:
+    """One element row rewritten as its parent-oxide ledger key."""
+
+    element: str
+    parent: str
+    added_o_kg: float
+    element_mass_kg: float
+    parent_mass_kg: float
+
+
+@dataclass(frozen=True)
+class TraceElementCoverage:
+    """An element key the bridge kept. Never dropped and never zeroed."""
+
+    element: str
+    disposition: str
+    mass_kg: float
+
+
+@dataclass(frozen=True)
+class TraceOxideBridgeResult:
+    """Pre-normalize masses plus the conversion notes and coverage list."""
+
+    masses_kg: Mapping[str, float]
+    notes: tuple[TraceOxideConversion, ...]
+    coverage: tuple[TraceElementCoverage, ...]
+
+
+def trace_element_disposition(element: str) -> str:
+    """Classify one element key. Siderophiles win over a parent oxide."""
+
+    if element in SIDEROPHILE_IN_METAL_SCOPE_GAP:
+        return "siderophile_in_metal_scope_gap"
+    if element in LIQUID_PARENT_OXIDE:
+        return "oxide_parent"
+    return "no_oxide_parent"
+
+
+def _element_symbol(component: str) -> str | None:
+    try:
+        formula = parse_formula(component)
+    except AccountingError:
+        return None
+    if len(formula.elements) != 1:
+        return None
+    symbol, count = next(iter(formula.elements.items()))
+    if component != symbol or abs(float(count) - 1.0) > 1.0e-12:
+        return None
+    return str(symbol)
+
+
+def _stoichiometric_parent_mass_kg(
+    element: str,
+    parent: str,
+    element_mass_kg: float,
+) -> tuple[float, float]:
+    """Return ``(added oxygen kg, parent-oxide kg)`` for one element row.
+
+    Premise. A ``composition_wt_pct`` row whose key is an element symbol is
+    elemental mass. The oxygen of the generator parent was never in that
+    row. The ledger key is the parent oxide, so that oxygen is real mass
+    inserted before the shared rescale. The scale factor does not create it.
+
+    Algebra. ``m_E`` is the elemental mass in kg (``batch_kg * wt_pct / 100``).
+    ``n_E`` [mol] = ``m_E`` [kg] * 1000 [g/kg] / ``A_E`` [g/mol]. Parent
+    ``M_a O_b`` contributes ``b/a`` mol O per mol M.
+    ``m_O`` [kg] = ``n_E * (b/a) * A_O`` [g/mol] / 1000 [g/kg].
+    ``m_parent = m_E + m_O``.
+
+    ``normalize_component_masses_kg`` then scales every positive component,
+    including ``m_parent``, by ``s = target / sum(components)``. The oxygen
+    that remains in the batch is ``m_O * s``. The batch total stays
+    ``target``, the same contract as every other component. Inserting
+    ``m_O`` after the rescale would push the total off target.
+
+    Unit check. kg * (g/kg) / (g/mol) * (g/mol) / (g/kg) = kg.
+
+    Worked example. 5 ppm Ga is wt% 0.0005 (element ppm / 10_000). On a
+    1000 kg batch, ``m_Ga = 0.005`` kg. ``A_Ga = 69.723`` g/mol,
+    ``A_O = 15.999`` g/mol, and Ga2O3 has ``b/a = 1.5``.
+    ``n_Ga = 0.071712347432`` mol. ``m_O = 0.00172098876985`` kg
+    = 1.72098876985 g/t before the rescale.
+    ``m_Ga2O3 = 0.00672098876985`` kg.
+    """
+
+    parent_formula = parse_formula(parent)
+    counts = parent_formula.elements
+    extra = [symbol for symbol in counts if symbol not in {element, "O"}]
+    metal_count = float(counts.get(element, 0.0))
+    oxygen_count = float(counts.get("O", 0.0))
+    if extra or metal_count <= 0.0 or oxygen_count <= 0.0:
+        raise ValueError(
+            f"parent {parent!r} is not an oxide of {element!r}"
+        )
+    atomic = ATOMIC_WEIGHTS_G_PER_MOL
+    element_mol = element_mass_kg * 1000.0 / float(atomic[element])
+    added_o_kg = (
+        element_mol * (oxygen_count / metal_count) * float(atomic["O"]) / 1000.0
+    )
+    return added_o_kg, element_mass_kg + added_o_kg
+
+
+def bridge_trace_element_keys(
+    masses_kg: Mapping[str, float],
+) -> TraceOxideBridgeResult:
+    """Rewrite oxide-parent element keys onto the generator's ledger keys.
+
+    The parent is ``LIQUID_PARENT_OXIDE`` via ``ledger_component_key``.
+    Elements with no oxide parent stay element keys and are listed in
+    ``coverage``. Siderophiles (Ni, Co, Ir, Os, Pt, Au) stay element keys
+    and are flagged ``siderophile_in_metal_scope_gap``; metal is not
+    oxidised on paper. Returned masses are pre-normalize.
+    """
+
+    masses = {
+        str(component): float(kg)
+        for component, kg in masses_kg.items()
+        if float(kg) > 0.0
+    }
+    notes: list[TraceOxideConversion] = []
+    coverage: list[TraceElementCoverage] = []
+    converted: list[str] = []
+    for component in sorted(masses):
+        symbol = _element_symbol(component)
+        if symbol is None:
+            continue
+        disposition = trace_element_disposition(symbol)
+        element_mass_kg = masses[component]
+        if disposition != "oxide_parent":
+            coverage.append(
+                TraceElementCoverage(symbol, disposition, element_mass_kg)
+            )
+            continue
+        parent = ledger_component_key(LIQUID_PARENT_OXIDE[symbol])
+        added_o_kg, parent_mass_kg = _stoichiometric_parent_mass_kg(
+            symbol, parent, element_mass_kg
+        )
+        notes.append(
+            TraceOxideConversion(
+                element=symbol,
+                parent=parent,
+                added_o_kg=added_o_kg,
+                element_mass_kg=element_mass_kg,
+                parent_mass_kg=parent_mass_kg,
+            )
+        )
+        masses[parent] = masses.get(parent, 0.0) + parent_mass_kg
+        converted.append(component)
+    for component in converted:
+        del masses[component]
+    return TraceOxideBridgeResult(
+        masses_kg=masses,
+        notes=tuple(notes),
+        coverage=tuple(coverage),
+    )
+
+
+def _raw_feedstock_component_masses_kg(
     feedstock: Mapping[str, Any],
     mass_kg: float,
 ) -> dict[str, float]:
-    """Return ledger-normalized raw feedstock component masses."""
+    """Component masses before the trace-oxide bridge and the rescale."""
+
     batch_mass_kg = float(mass_kg)
     raw_masses: dict[str, float] = {}
     composition = feedstock.get("composition_wt_pct", {}) or {}
@@ -331,7 +496,34 @@ def normalized_feedstock_component_masses_kg(
                 if kg is not None and kg > 0.0:
                     raw_masses[name] = raw_masses.get(name, 0.0) + kg
 
-    return normalize_component_masses_kg(raw_masses, batch_mass_kg)
+    return raw_masses
+
+
+def feedstock_trace_oxide_bridge(
+    feedstock: Mapping[str, Any],
+    mass_kg: float,
+) -> TraceOxideBridgeResult:
+    """Bridge one feedstock. Notes and coverage are this return value."""
+
+    return bridge_trace_element_keys(
+        _raw_feedstock_component_masses_kg(feedstock, mass_kg)
+    )
+
+
+def normalized_feedstock_component_masses_kg(
+    feedstock: Mapping[str, Any],
+    mass_kg: float,
+) -> dict[str, float]:
+    """Return ledger-normalized raw feedstock component masses.
+
+    Trace element keys with an oxide parent are rewritten first. The added
+    oxygen sits inside the parent mass before ``normalize_component_masses_kg``
+    rescales the batch onto ``mass_kg``.
+    """
+
+    batch_mass_kg = float(mass_kg)
+    bridged = feedstock_trace_oxide_bridge(feedstock, batch_mass_kg)
+    return normalize_component_masses_kg(dict(bridged.masses_kg), batch_mass_kg)
 
 
 def normalize_component_masses_kg(
