@@ -248,9 +248,18 @@ def _element_reference_species_g(
                 if record.standard_state == "condensed_liquid"
             ]
             chosen = liquids[0] if liquids else covering[0]
-        elif condensed:
-            # JANAF ref: the gas is the standard only above condensed coverage.
-            # A hole or a T below the condensed tables is a gap, not a gas fallback.
+        else:
+            # Gas is the elemental reference only above this compilation's
+            # condensed coverage. `gas_only` (JANAF `ref` diatomics, noble
+            # gases) is the other case and never enters this branch. No
+            # condensed records at all is a gap, not a gas fallback.
+            if not condensed:
+                raise SourceCoverageGap(
+                    formula,
+                    "reference",
+                    f"no condensed {element} records; "
+                    "gas is not the elemental reference",
+                )
             coverage_high = max(record.T_max_K for record in condensed)
             if temperature_K <= coverage_high:
                 raise SourceCoverageGap(
@@ -604,6 +613,8 @@ def _janaf_record_from_path(path: Path) -> SourceRailRecord | None:
         "native_phase": native_phase,
         "citation": thermo.citation,
     }
+    if missing_nodes:
+        species_thermo["missing_nodes"] = [float(node) for node in missing_nodes]
     if defined_zero:
         species_thermo["gibbs_defined_zero"] = True
     return SourceRailRecord(

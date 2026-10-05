@@ -3756,6 +3756,17 @@ def _polynomial_from_thermo_record(
                     float(g_j),
                 )
             )
+        missing_raw = record.get("missing_nodes") or ()
+        if isinstance(missing_raw, (str, bytes)) or not isinstance(
+            missing_raw, Sequence
+        ):
+            raise CatalogCompileError(
+                f"{name}: missing_nodes must be a list of temperatures"
+            )
+        missing_nodes = tuple(
+            _finite_positive(node, f"{name}.missing_nodes[{index}]")
+            for index, node in enumerate(missing_raw)
+        )
         try:
             return TabulatedThermo(
                 name=name,
@@ -3775,6 +3786,7 @@ def _polynomial_from_thermo_record(
                     if record.get("native_phase")
                     else None
                 ),
+                missing_nodes=missing_nodes,
             )
         except Exception as exc:
             raise CatalogCompileError(

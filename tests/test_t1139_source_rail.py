@@ -7,11 +7,13 @@ import math
 import pytest
 
 from simulator.accounting.formulas import parse_formula
+from simulator.reference_data import janaf
 from simulator.reference_data.janaf import feedstock_element_symbols
 from simulator.vapour_rail.catalog import (
     RUNTIME_THERMO_EVALUATOR_FAMILIES,
     CatalogCompileError,
     _legacy_species_row,
+    _polynomial_from_thermo_record,
     compile_vapour_rail_catalog,
 )
 from simulator.vapour_rail.nasa_cea import R_J_PER_MOL_K
@@ -30,11 +32,13 @@ from simulator.vapour_rail.source_rail import (
 from simulator.vapour_rail.stoich import CATALOG_DERIVED_STOICH_SPECIES
 from simulator.vapour_rail.tabulated_gibbs import (
     TabulatedDomainError,
+    TabulatedMissingNodeError,
     TabulatedThermo,
     interpolate_tabulated,
 )
 from simulator.yaml_cache import load_cached_safe_yaml
 from tests.test_t1139_build_a_pins import CATALOG_PATH, STOICH_PINS, _legacy_row
+from tests.test_vr4b_runtime_thermo_families import _strata
 
 
 def test_decimal_subscript_formulas_parse_for_activity_basis() -> None:
@@ -365,6 +369,140 @@ def test_supercooled_ga2o3_meets_the_liquid_and_reaches_below_tm(source_rail) ->
         offsets[1] - offsets[2], rel=0.0, abs=1e-4
     )
     assert math.isfinite(extended.thermo.evaluate(1000.0).g_J_per_mol)
+
+
+def _blank_positive_gibbs_temperatures(table_id: str) -> tuple[float, ...]:
+    """Positive-T JANAF rows whose formation-Gibbs cell is blank."""
+    document = janaf.load_table_document(janaf.TABLES_DIR / f"{table_id}.yaml")
+    rows = (document.get("table") or {}).get("values") or []
+    printed: set[float] = set()
+    missing: list[float] = []
+    for row in rows:
+        if not isinstance(row, dict):
+            continue
+        temperature = row.get("temperature") or {}
+        gibbs = row.get("formation_gibbs_energy") or {}
+        t_k = temperature.get("value") if isinstance(temperature, dict) else None
+        if t_k is None or float(t_k) <= 0.0:
+            continue
+        if not isinstance(gibbs, dict) or gibbs.get("value") is None:
+            missing.append(float(t_k))
+        else:
+            printed.add(float(t_k))
+    return tuple(t_k for t_k in missing if t_k not in printed)
+
+
+@pytest.mark.parametrize(
+    ("element", "record_id"),
+    (("Sn", "BU-3341"), ("V", "BU-3366")),
+)
+def test_burcat_gas_only_element_is_not_the_elemental_reference(
+    source_rail, element: str, record_id: str
+) -> None:
+    """Burcat has no condensed Sn or V. The gas record must not become the ref."""
+    index = source_rail._indexes["burcat"]
+    condensed = []
+    for state in ("condensed_liquid", "condensed_solid", "condensed"):
+        condensed.extend(index.native_records_for(element, state))
+    assert condensed == []
+    gas = [
+        record
+        for record in index.native_records_for(element, "gas")
+        if record.record_id == record_id
+    ]
+    assert len(gas) == 1
+    assert gas[0].T_min_K == pytest.approx(200.0)
+    assert gas[0].T_max_K == pytest.approx(6000.0)
+    for temperature_K in (200.0, 1400.0, 6000.0):
+        assert gas[0].T_min_K <= temperature_K <= gas[0].T_max_K
+        with pytest.raises(SourceCoverageGap, match="gas is not the elemental reference"):
+            _element_reference_species_g(index, element, temperature_K)
+    converted = next(
+        record
+        for record in index.records_for(element, "gas")
+        if record.record_id == record_id
+    )
+    with pytest.raises(SourceCoverageGap, match="gas is not the elemental reference"):
+        converted.thermo.evaluate(1400.0)
+
+
+def test_burcat_o2_stays_the_gas_elemental_reference(source_rail) -> None:
+    """O2 is a JANAF `ref` gas standard, so Burcat's gas record is the reference."""
+    index = source_rail._indexes["burcat"]
+    g_ref, atoms = _element_reference_species_g(index, "O", 1400.0)
+    assert atoms == 2.0
+    covering = [
+        record
+        for record in index.native_records_for("O2", "gas")
+        if record.T_min_K <= 1400.0 <= record.T_max_K
+    ]
+    assert covering
+    assert g_ref == pytest.approx(covering[0].thermo.evaluate(1400.0).g_J_per_mol)
+
+
+def test_compiled_tabulated_janaf_refuses_at_a_missing_printed_node(
+    source_rail,
+) -> None:
+    record = next(
+        item
+        for item in source_rail.records_for("Al2O3", "condensed_liquid")
+        if item.record_id == "Al-100"
+    )
+    blanks = _blank_positive_gibbs_temperatures("Al-100")
+    assert blanks
+    assert record.thermo.missing_nodes == blanks
+    assert record.species_thermo["missing_nodes"] == [float(node) for node in blanks]
+    rebuilt = _polynomial_from_thermo_record(
+        name="Al-100",
+        family="tabulated_janaf",
+        record=record.species_thermo,
+    )
+    assert rebuilt.missing_nodes == blanks
+
+    points = record.species_thermo["formation_gibbs_points"]
+    left, middle, right = points[0], points[1], points[2]
+    query = (float(left["T_K"]) + float(middle["T_K"])) / 2.0
+    gas = dict(record.species_thermo)
+    gas["standard_state"] = "gas"
+    gas["formation_gibbs_points"] = [left, right]
+    gas["missing_nodes"] = list(record.species_thermo["missing_nodes"]) + [
+        middle["T_K"]
+    ]
+    condensed = dict(record.species_thermo)
+    condensed["formation_gibbs_points"] = [left, right]
+    condensed.pop("missing_nodes", None)
+    domain = [float(left["T_K"]), float(right["T_K"])]
+
+    def payload(gas_record: dict) -> dict:
+        return _strata(
+            species_id="BlankNode",
+            formula="Al2O3",
+            pressure_models=[
+                {
+                    "evaluator_family": "tabulated_janaf",
+                    "pressure_kind": "pure_component_saturation_pressure",
+                    "species_basis": "monomer",
+                    "valid_domain": {"temperature_K": domain},
+                    "reference_pressure_Pa": STANDARD_PRESSURE_PA,
+                    "gas_thermo_record": gas_record,
+                    "condensed_thermo_record": condensed,
+                }
+            ],
+        )
+
+    refused = compile_vapour_rail_catalog(payload(gas), emit_u0_request_rules=False)
+    with pytest.raises(TabulatedMissingNodeError) as caught:
+        refused.evaluator_for("BlankNode").evaluate(query)
+    assert caught.value.missing_node == pytest.approx(float(middle["T_K"]))
+
+    open_bracket = dict(gas)
+    open_bracket.pop("missing_nodes")
+    admitted = compile_vapour_rail_catalog(
+        payload(open_bracket), emit_u0_request_rules=False
+    )
+    pressure = admitted.evaluator_for("BlankNode").evaluate(query).pressure_pa
+    assert math.isfinite(pressure)
+    assert pressure > 0.0
 
 
 def test_nasa_si_reference_is_crystal_inside_condensed_coverage(source_rail) -> None:
