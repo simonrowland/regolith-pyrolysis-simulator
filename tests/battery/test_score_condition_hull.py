@@ -244,3 +244,87 @@ PIN_HEADLINE_LINES = (
     "0.1118033988749894848204586834 | -0.05 | 0.10 | 0.3 | "
     "0.3726779962499649494015289447 | 0 | 1.000 |",
 )
+
+
+# --- t-1110 hull (added after the pin) ---------------------------------------
+
+HULL_MELT = (
+    "| measured | melt_activity | internal-analytical | 3 | 1773–1923 (3) | "
+    "50000–100000 (3) | mole_fraction: CaO 0.3–0.55, SiO2 0.45–0.7 (3) |"
+)
+HULL_VAPOUR = (
+    "| measured | vapour | internal-analytical | 2 | 1100–1250 (2) | — (0) | — (0) |"
+)
+HULL_COMPILATION = (
+    "| compilation | thermochemistry | internal-analytical | 2 | 1500–2000 (2) | "
+    "— (0) | — (0) |"
+)
+
+
+def _hull_section(report: str) -> list[str]:
+    lines = report.splitlines()
+    start = lines.index("## Condition hull per rail × engine")
+    end = next(i for i in range(start + 1, len(lines)) if lines[i].startswith("## "))
+    return [line for line in lines[start:end] if line.startswith("| ") and "---" not in line]
+
+
+def test_streamed_report_prints_condition_hull_per_rail_and_engine() -> None:
+    context, residuals = hull_fixture()
+    rows = _hull_section(_report(context, residuals))
+    assert rows[0].startswith("| tier | rail | engine | n scored |")
+    # Refused act-refused (T 2500 K, P 1 Pa, CaO 0.99) is not behind a statistic.
+    assert rows[1:] == [HULL_COMPILATION, HULL_MELT, HULL_VAPOUR]
+
+
+def test_report_only_render_prints_the_same_measured_hull() -> None:
+    from simulator.battery.score import render_score_report_from_payloads, residual_to_plain
+
+    context, residuals = hull_fixture()
+    payloads = []
+    for residual in residuals:
+        payload = residual_to_plain(residual)
+        if residual.numeric is not None:
+            payload["numeric"]["value"] = str(residual.numeric.value)
+        payloads.append(payload)
+    report = render_score_report_from_payloads(
+        payloads,
+        engines=(ENGINE,),
+        hostname="test",
+        store_stamp=STAMP,
+        observations=context.observations,
+        origins=context.origins,
+    )
+    assert _hull_section(report)[1:] == [HULL_MELT, HULL_VAPOUR]
+
+
+def test_hull_counts_missing_conditions_and_never_imputes() -> None:
+    from simulator.battery.score import _ConditionHull
+
+    hull = _ConditionHull()
+    hull.add("missing-row", None)
+    context, _ = hull_fixture()
+    hull.add("na-1", context.observations["na-1"])
+    assert (hull.n, hull.n_t, hull.n_p, hull.n_composition) == (2, 1, 0, 0)
+    assert hull.cells() == ("1100 (1)", "— (0)", "— (0)")
+
+
+def test_compilation_point_temperature_reads_only_printed_cell_ids() -> None:
+    from simulator.battery.compilation_tier import (
+        compilation_point_id,
+        compilation_point_temperature,
+    )
+
+    cell = compilation_point_id("janaf-o2", Decimal("1500.50"), Decimal("-3.2"), 1)
+    assert compilation_point_temperature(cell) == Decimal("1500.5")
+    assert compilation_point_temperature("janaf-o2") is None
+    assert compilation_point_temperature("series-row#3") is None
+
+
+def test_hull_is_presentation_only_no_residual_reads_it() -> None:
+    """The hull is written to the report only; the summary JSON is unchanged."""
+
+    context, residuals = hull_fixture()
+    aggregate = _aggregate(context, residuals)
+    assert aggregate.headline_hulls  # collected
+    blob = json.dumps(aggregate.summary_payload(STAMP), sort_keys=True)
+    assert "hull" not in blob
