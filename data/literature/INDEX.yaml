@@ -9,19 +9,20 @@ scan:
   - hunt_ids column empty; --hunt-json not provided
   corpus_root: /Users/simonrowland/Repos/regolith-corpus
 counts:
-  sources: 278
-  extracts: 276
+  sources: 279
+  extracts: 277
   pdfs_present_in_worktree: 0
   extracts_with_private_locators: 60
   pdfs_tracked_99_kems_langmuir: 0
   pdfs_without_extract: 0
-  extracts_without_pdf: 276
+  extracts_without_pdf: 277
   alias_groups_needing_resolution: 41
 gaps:
   pdfs_without_extract: []
   extracts_without_pdf:
   - 1997jonesthermo-jones-1997
   - 2010zahnle-schaefer-fegley-cshperspect-ori-a004895-2019
+  - abdul-2023-cao-sio2-calphad
   - aithala-2026-magmatic-iron-redox-to-2100c
   - ames-walsh-white-1967
   - ammin-73-470-oneill-1988
@@ -843,6 +844,64 @@ sources:
       last_stage: decoded
       date: '2026-09-06'
     commit: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
+- source_id: abdul-2023-cao-sio2-calphad
+  aliases: []
+  citation: Abdul, W., Mawalala, C., Pisch, A. & Bannerman, M. N. (2023). CaO-SiO2 assessment using 3rd
+    generation CALPHAD models. Cement and Concrete Research, 173, 107309. doi:10.1016/j.cemconres.2023.107309.
+  doi: 10.1016/j.cemconres.2023.107309
+  report_number: null
+  identifier: 10.1016/j.cemconres.2023.107309
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
+  extracts:
+  - path: data/literature/extracts/abdul-2023-cao-sio2-calphad.yaml
+    review_status: draft
+    rows: 2
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/abdul-2023-cao-sio2-calphad/abdul-2023-cao-sio2-calphad.pdf
+      present: true
+      sha256: f103ff37067d968c2c84005ebf2f7a000548792b2f44c47849ac3c92da0d9eb7
+      matches_simulator: null
+    sidecar:
+      path: raw/abdul-2023-cao-sio2-calphad/sidecar.yaml
+      present: true
+    text:
+      path: text/abdul-2023-cao-sio2-calphad
+      exists: true
+      file_count: 3
+    tables:
+      path: tables/abdul-2023-cao-sio2-calphad
+      exists: true
+      file_count: 22
+    extract:
+      path: extracts/abdul-2023-cao-sio2-calphad.yaml
+      present: true
+      matches_simulator: true
+    ledger:
+      path: ledger/abdul-2023-cao-sio2-calphad.yaml
+      present: true
+      error: null
+      last_stage: extracted
+      date: '2026-10-04'
+    commit: 1ce8e2fc3db83962928fccf9b9d4c72fdb8b699e
 - source_id: aithala-2026-magmatic-iron-redox-to-2100c
   aliases: []
   citation: Aithala, S. P., Macris, C. A., and Hirschmann, M. M. (2026). Temperature dependence of magmatic

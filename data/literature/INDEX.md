@@ -15,12 +15,12 @@ Canonical `source_id` is the extract filename stem. Preset ids are aliases, neve
 
 ## Counts
 
-- Sources: 278
-- Extracts (`literature_extract.v1`): 276
+- Sources: 279
+- Extracts (`literature_extract.v1`): 277
 - PDFs present in this worktree: 0
 - Tracked PDFs in `docs/references/pdfs/99-kems-langmuir/`: 0
 - PDFs with no extract: 0
-- Extracts with no PDF: 276
+- Extracts with no PDF: 277
 - Alias groups needing owner/controller resolution: 41
 - Extracts with private/non-public row locators: 60
 
@@ -30,6 +30,7 @@ Canonical `source_id` is the extract filename stem. Preset ids are aliases, neve
 |---|---|---|---|---|---|---|
 | `1997jonesthermo-jones-1997` | Jones, R. T. (1997), "Thermodynamics and its applications – an overview", SAIMM Pyrometallurgy School, Mintek, Randburg, 20–21 May 1997. |  | ABSENT, `` | `raw/1997jonesthermo/1997jonesthermo.pdf` (present, d8ac7ea5); `text/1997jonesthermo-jones-1997/` (0 files, ABSENT); `tables/1997jonesthermo-jones-1997/` (0 files, ABSENT) | `data/literature/extracts/1997jonesthermo-jones-1997.yaml` (2 rows, draft, private_path) | `ledger/1997jonesthermo-jones-1997.yaml`: — (—) |
 | `2010zahnle-schaefer-fegley-cshperspect-ori-a004895-2019` | Zahnle, K., Schaefer, L. & Fegley, B. (2010), "Earth's Earliest Atmospheres", Cold Spring Harb Perspect Biol, doi: 10.1101/cshperspect.a004895. | 10.1101/cshperspect.a004895 | ABSENT, `` | `raw/2010zahnle-schaefer-fegley-cshperspect-ori-a004895-2019/2010zahnle-schaefer-fegley-cshperspect-ori-a004895-2019.pdf` (present, 251bafd1); `text/2010zahnle-schaefer-fegley-cshperspect-ori-a004895-2019/` (15 files, exists); `tables/2010zahnle-schaefer-fegley-cshperspect-ori-a004895-2019/` (0 files, ABSENT) | `data/literature/extracts/2010zahnle-schaefer-fegley-cshperspect-ori-a004895-2019.yaml` (8 rows, draft) | `ledger/2010zahnle-schaefer-fegley-cshperspect-ori-a004895-2019.yaml`: decoded (2026-09-06) |
+| `abdul-2023-cao-sio2-calphad` | Abdul, W., Mawalala, C., Pisch, A. & Bannerman, M. N. (2023). CaO-SiO2 assessment using 3rd generation CALPHAD models. Cement and Concrete Research, 173, 107309. doi:10.1016/j.cemconres.2023.107309. | 10.1016/j.cemconres.2023.107309 | ABSENT, `` | `raw/abdul-2023-cao-sio2-calphad/abdul-2023-cao-sio2-calphad.pdf` (present, f103ff37); `text/abdul-2023-cao-sio2-calphad/` (3 files, exists); `tables/abdul-2023-cao-sio2-calphad/` (22 files, exists) | `data/literature/extracts/abdul-2023-cao-sio2-calphad.yaml` (2 rows, draft) | `ledger/abdul-2023-cao-sio2-calphad.yaml`: extracted (2026-10-04) |
 | `aithala-2026-magmatic-iron-redox-to-2100c` | Aithala, S. P., Macris, C. A., and Hirschmann, M. M. (2026). Temperature dependence of magmatic iron redox speciation to 2100 °C. Geochemical Perspectives Letters 40, 18–23. | 10.7185/geochemlet.2617 | ABSENT, `` | `raw/aithala-2026-magmatic-iron-redox-to-2100c/aithala-2026-magmatic-iron-redox-to-2100c.pdf` (ABSENT, ); `text/aithala-2026-magmatic-iron-redox-to-2100c/` (0 files, ABSENT); `tables/aithala-2026-magmatic-iron-redox-to-2100c/` (0 files, ABSENT) | `data/literature/extracts/aithala-2026-magmatic-iron-redox-to-2100c.yaml` (28 rows, draft) | `ledger/aithala-2026-magmatic-iron-redox-to-2100c.yaml`: — (—) |
 | `ames-walsh-white-1967` | Ames, Walsh & White, J. Phys. Chem. 71 (1967) 2707–2718 |  | ABSENT, `` | `raw/ames-walsh-white-1967/ames-walsh-white-1967.pdf` (ABSENT, ); `text/ames-walsh-white-1967/` (0 files, ABSENT); `tables/ames-walsh-white-1967/` (0 files, ABSENT) | `data/literature/extracts/ames-walsh-white-1967.yaml` (2 rows, draft) | `ledger/ames-walsh-white-1967.yaml`: extracted (2026-09-06) |
 | `ammin-73-470-oneill-1988` | O'Neill, H. St. C. (1988), "Thermodynamic data for the equilibria Fe-\"FeO,\" Fe-Fe3O4, \"FeO\"-Fe3O4, Fe3O4-Fe2O3, Cu-Cu2O, and Cu2O-CuO from emf measurements", American Mineralogist 73:470-486. |  | ABSENT, `` | `raw/ammin-73-470/ammin-73-470.pdf` (present, ce068ba4); `text/ammin-73-470-oneill-1988/` (0 files, ABSENT); `tables/ammin-73-470-oneill-1988/` (0 files, ABSENT) | `data/literature/extracts/ammin-73-470-oneill-1988.yaml` (9 rows, draft, private_path) | `ledger/ammin-73-470-oneill-1988.yaml`: — (—) |
@@ -315,6 +316,7 @@ Canonical `source_id` is the extract filename stem. Preset ids are aliases, neve
 
 - `1997jonesthermo-jones-1997`
 - `2010zahnle-schaefer-fegley-cshperspect-ori-a004895-2019`
+- `abdul-2023-cao-sio2-calphad`
 - `aithala-2026-magmatic-iron-redox-to-2100c`
 - `ames-walsh-white-1967`
 - `ammin-73-470-oneill-1988`
