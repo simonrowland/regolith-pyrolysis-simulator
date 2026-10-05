@@ -131,6 +131,14 @@ def _build_sim_for_anchor(
             f"corpus anchor melt ({anchor.melt_id})"
         ),
         "composition_wt_pct": dict(anchor.composition_wt_pct),
+        "composition_basis": {
+            oxide: {
+                "method": "literature-reported oxide split",
+                "source": anchor.source,
+            }
+            for oxide in ("FeO", "Fe2O3")
+            if {"FeO", "Fe2O3"} <= set(anchor.composition_wt_pct)
+        },
     }
 
     # Shallow copy keeps the module-scoped fixture immutable.
@@ -431,6 +439,14 @@ def _build_sim_for_atomic_ratio_anchor(
     feedstocks[feedstock_key] = {
         "label": f"SF2004 Table 8 melt ({anchor.composition_key})",
         "composition_wt_pct": dict(anchor.composition_wt_pct),
+        "composition_basis": {
+            oxide: {
+                "method": "literature-reported oxide split",
+                "source": anchor.source,
+            }
+            for oxide in ("FeO", "Fe2O3")
+            if {"FeO", "Fe2O3"} <= set(anchor.composition_wt_pct)
+        },
     }
 
     backend = InternalAnalyticalBackend()

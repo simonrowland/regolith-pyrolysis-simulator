@@ -1410,6 +1410,16 @@ GRID_25_FEEDSTOCKS: dict[str, dict[str, Any]] = {
     },
     "EAC-1A": {
         "label": "Sesko 2022 EAC-1A simulant",
+        "composition_basis": {
+            "FeO": {
+                "method": "literature-reported oxide split",
+                "source": "Sesko 2022 EAC-1A simulant composition",
+            },
+            "Fe2O3": {
+                "method": "literature-reported oxide split",
+                "source": "Sesko 2022 EAC-1A simulant composition",
+            },
+        },
         "composition_wt_pct": {
             "SiO2": 44.41,
             "Fe2O3": 12.20,
