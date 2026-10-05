@@ -9,13 +9,13 @@ scan:
   - hunt_ids column empty; --hunt-json not provided
   corpus_root: /Users/simonrowland/Repos/regolith-corpus
 counts:
-  sources: 277
-  extracts: 275
+  sources: 278
+  extracts: 276
   pdfs_present_in_worktree: 0
   extracts_with_private_locators: 60
   pdfs_tracked_99_kems_langmuir: 0
   pdfs_without_extract: 0
-  extracts_without_pdf: 275
+  extracts_without_pdf: 276
   alias_groups_needing_resolution: 41
 gaps:
   pdfs_without_extract: []
@@ -192,6 +192,7 @@ gaps:
   - metsoc-2024-6224
   - miki-1999-si-alloy-thermodynamics
   - mogul-2023-pioneer-venus-co2-icarus
+  - morey-1964-usgs-pp440l-phase-equilibria
   - morita-2000-sio2-activity-si-alloys
   - murchison-degassing-2023-springer
   - murchison-hydropyrolysis-1990s-gca
@@ -10698,6 +10699,64 @@ sources:
       last_stage: decoded
       date: '2026-09-06'
     commit: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
+- source_id: morey-1964-usgs-pp440l-phase-equilibria
+  aliases: []
+  citation: G. W. Morey, Phase-Equilibrium Relations of the Common Rock-Forming Oxides Except Water, Data
+    of Geochemistry (6th ed.), Chapter L, U.S. Geological Survey Professional Paper 440-L, 1964.
+  doi: null
+  report_number: null
+  identifier: null
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
+  extracts:
+  - path: data/literature/extracts/morey-1964-usgs-pp440l-phase-equilibria.yaml
+    review_status: draft
+    rows: 0
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/morey-1964-usgs-pp440l-phase-equilibria/morey-1964-usgs-pp440l-phase-equilibria.pdf
+      present: true
+      sha256: 6e9967175b2e75bd24d6d0c1031da87b8634c38a2d530db6006a74b840dff728
+      matches_simulator: null
+    sidecar:
+      path: raw/morey-1964-usgs-pp440l-phase-equilibria/sidecar.yaml
+      present: true
+    text:
+      path: text/morey-1964-usgs-pp440l-phase-equilibria
+      exists: true
+      file_count: 34
+    tables:
+      path: tables/morey-1964-usgs-pp440l-phase-equilibria
+      exists: true
+      file_count: 29
+    extract:
+      path: extracts/morey-1964-usgs-pp440l-phase-equilibria.yaml
+      present: true
+      matches_simulator: true
+    ledger:
+      path: ledger/morey-1964-usgs-pp440l-phase-equilibria.yaml
+      present: true
+      error: null
+      last_stage: extracted
+      date: '2026-10-04'
+    commit: 1ce8e2fc3db83962928fccf9b9d4c72fdb8b699e
 - source_id: morita-2000-sio2-activity-si-alloys
   aliases: []
   citation: 'Morita, K., Kume, K. & Sano, N. (2000), "A Newly Developed Method for Determining SiO2 Activity
