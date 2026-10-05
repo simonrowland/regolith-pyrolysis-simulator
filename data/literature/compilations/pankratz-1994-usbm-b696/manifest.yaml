@@ -1,0 +1,1144 @@
+schema_version: literature_compilation_manifest.v1
+source_id: pankratz-1994-usbm-b696
+source: &id002
+  database: U.S. Bureau of Mines Bulletin 696
+  version: '1994'
+  citation: Pankratz, L. B., 1994, Thermodynamic Properties of Carbides, Nitrides,
+    and Other Selected Substances, U.S. Bureau of Mines Bulletin 696, 962 pp.
+  official_url: https://digital.library.unt.edu/ark:/67531/metadc12836/
+  retrieved_url: https://web.archive.org/web/20220620073322id_/https://digital.library.unt.edu/ark:/67531/metadc12836/m2/1/high_res_d/BULLETIN0696.pdf
+  licence: United States government work (USBM bulletin). Public domain in the United
+    States.
+  access_date: '2026-10-05'
+compilation_role:
+  engine_reference_input: true
+  validation_measurement: false
+  scoring_eligible: false
+  oxide_rail_default: false
+  non_oxide_policy: warn_not_fail_closed
+  intended_use: Thermodynamic reference input only
+coverage:
+  status: partial
+  pdf_page_count: 962
+  decoded_pdf_pages:
+  - 3
+  - 10
+  - 46
+  - 47
+  - 48
+  - 49
+  - 50
+  - 119
+  - 195
+  - 208
+  - 277
+  - 279
+  - 282
+  - 323
+  - 331
+  - 332
+  - 334
+  - 356
+  - 360
+  - 364
+  - 414
+  - 459
+  - 633
+  - 709
+  - 737
+  - 773
+  - 776
+  - 807
+  - 808
+  - 841
+  - 862
+  - 914
+  - 924
+  - 928
+  ingested_printed_pages:
+  - 6
+  - 115
+  - 191
+  - 204
+  - 273
+  - 275
+  - 278
+  - 319
+  - 327
+  - 330
+  - 352
+  - 356
+  - 360
+  - 410
+  - 455
+  - 629
+  - 705
+  - 733
+  - 769
+  - 772
+  - 803
+  - 804
+  - 837
+  - 858
+  - 910
+  - 920
+  - 924
+  ingested_pdf_pages: &id001
+  - 10
+  - 119
+  - 195
+  - 208
+  - 277
+  - 279
+  - 282
+  - 323
+  - 331
+  - 334
+  - 356
+  - 360
+  - 364
+  - 414
+  - 459
+  - 633
+  - 709
+  - 737
+  - 773
+  - 776
+  - 807
+  - 808
+  - 841
+  - 862
+  - 914
+  - 924
+  - 928
+  remaining_pdf_pages:
+  - - 1
+    - 9
+  - - 11
+    - 118
+  - - 120
+    - 194
+  - - 196
+    - 207
+  - - 209
+    - 276
+  - - 278
+    - 278
+  - - 280
+    - 281
+  - - 283
+    - 322
+  - - 324
+    - 330
+  - - 332
+    - 333
+  - - 335
+    - 355
+  - - 357
+    - 359
+  - - 361
+    - 363
+  - - 365
+    - 413
+  - - 415
+    - 458
+  - - 460
+    - 632
+  - - 634
+    - 708
+  - - 710
+    - 736
+  - - 738
+    - 772
+  - - 774
+    - 775
+  - - 777
+    - 806
+  - - 809
+    - 840
+  - - 842
+    - 861
+  - - 863
+    - 913
+  - - 915
+    - 923
+  - - 925
+    - 927
+  - - 929
+    - 962
+  remaining_note: 'Species-scope partial ingest: all requested tables found in the
+    bulletin are complete; all other substance tables remain untranscribed. Extra
+    decoded pages support the contents and absence checks.'
+  records_examined: 27
+  matched: 25
+  corrected: 2
+  unverified: 0
+  complete_numeric_image_audit_pdf_pages: *id001
+  numeric_cell_count: 4816
+  numeric_cells_image_verified: 4816
+  non_numeric_cell_count: 0
+  absent_species:
+  - formula: PmO
+    pages_checked:
+    - 3
+  - formula: Se2
+    pages_checked:
+    - 3
+  - formula: As4
+    pages_checked:
+    - 3
+    - 46
+    - 47
+    - 48
+    - 49
+    - 50
+  per_page:
+  - pdf_page: 10
+    printed_page: 6
+    record_id: page-0006
+    identity_status: matched
+    numeric_status: image_verified
+  - pdf_page: 119
+    printed_page: 115
+    record_id: page-0115
+    identity_status: matched
+    numeric_status: image_verified
+  - pdf_page: 195
+    printed_page: 191
+    record_id: page-0191
+    identity_status: matched
+    numeric_status: image_verified
+  - pdf_page: 208
+    printed_page: 204
+    record_id: page-0204
+    identity_status: matched
+    numeric_status: image_verified
+  - pdf_page: 277
+    printed_page: 273
+    record_id: page-0273
+    identity_status: matched
+    numeric_status: image_verified
+  - pdf_page: 279
+    printed_page: 275
+    record_id: page-0275
+    identity_status: matched
+    numeric_status: image_verified
+  - pdf_page: 282
+    printed_page: 278
+    record_id: page-0278
+    identity_status: matched
+    numeric_status: image_verified
+  - pdf_page: 323
+    printed_page: 319
+    record_id: page-0319
+    identity_status: matched
+    numeric_status: image_verified
+  - pdf_page: 331
+    printed_page: 327
+    record_id: page-0327
+    identity_status: matched
+    numeric_status: image_verified
+  - pdf_page: 334
+    printed_page: 330
+    record_id: page-0330
+    identity_status: matched
+    numeric_status: image_verified
+  - pdf_page: 356
+    printed_page: 352
+    record_id: page-0352
+    identity_status: matched
+    numeric_status: image_verified
+  - pdf_page: 360
+    printed_page: 356
+    record_id: page-0356
+    identity_status: matched
+    numeric_status: image_verified
+  - pdf_page: 364
+    printed_page: 360
+    record_id: page-0360
+    identity_status: matched
+    numeric_status: image_verified
+  - pdf_page: 414
+    printed_page: 410
+    record_id: page-0410
+    identity_status: corrected
+    numeric_status: image_verified
+  - pdf_page: 459
+    printed_page: 455
+    record_id: page-0455
+    identity_status: matched
+    numeric_status: image_verified
+  - pdf_page: 633
+    printed_page: 629
+    record_id: page-0629
+    identity_status: matched
+    numeric_status: image_verified
+  - pdf_page: 709
+    printed_page: 705
+    record_id: page-0705
+    identity_status: matched
+    numeric_status: image_verified
+  - pdf_page: 737
+    printed_page: 733
+    record_id: page-0733
+    identity_status: corrected
+    numeric_status: image_verified
+  - pdf_page: 773
+    printed_page: 769
+    record_id: page-0769
+    identity_status: matched
+    numeric_status: image_verified
+  - pdf_page: 776
+    printed_page: 772
+    record_id: page-0772
+    identity_status: matched
+    numeric_status: image_verified
+  - pdf_page: 807
+    printed_page: 803
+    record_id: page-0803
+    identity_status: matched
+    numeric_status: image_verified
+  - pdf_page: 808
+    printed_page: 804
+    record_id: page-0804
+    identity_status: matched
+    numeric_status: image_verified
+  - pdf_page: 841
+    printed_page: 837
+    record_id: page-0837
+    identity_status: matched
+    numeric_status: image_verified
+  - pdf_page: 862
+    printed_page: 858
+    record_id: page-0858
+    identity_status: matched
+    numeric_status: image_verified
+  - pdf_page: 914
+    printed_page: 910
+    record_id: page-0910
+    identity_status: matched
+    numeric_status: image_verified
+  - pdf_page: 924
+    printed_page: 920
+    record_id: page-0920
+    identity_status: matched
+    numeric_status: image_verified
+  - pdf_page: 928
+    printed_page: 924
+    record_id: page-0924
+    identity_status: matched
+    numeric_status: image_verified
+record_count: 27
+substance_count: 27
+feedstock_element_coverage:
+  Ag: 1
+  Al: 0
+  As: 0
+  Au: 0
+  B: 0
+  Ba: 0
+  Bi: 1
+  Br: 0
+  C: 0
+  Ca: 0
+  Cd: 1
+  Ce: 1
+  Cl: 0
+  Co: 0
+  Cr: 0
+  Cs: 0
+  Cu: 0
+  Dy: 1
+  Er: 1
+  Eu: 1
+  F: 0
+  Fe: 0
+  Ga: 1
+  Gd: 1
+  Ge: 1
+  H: 0
+  Hf: 1
+  Ho: 1
+  I: 0
+  In: 1
+  Ir: 0
+  K: 0
+  La: 1
+  Li: 0
+  Lu: 1
+  Mg: 0
+  Mn: 0
+  Mo: 0
+  N: 0
+  Na: 0
+  Nb: 0
+  Nd: 1
+  Ni: 0
+  O: 27
+  Os: 0
+  P: 0
+  Pb: 0
+  Pr: 1
+  Pt: 0
+  Rb: 0
+  S: 0
+  Sb: 0
+  Sc: 1
+  Se: 0
+  Si: 0
+  Sm: 1
+  Sn: 1
+  Sr: 0
+  Tb: 1
+  Te: 1
+  Th: 0
+  Ti: 0
+  Tm: 1
+  U: 1
+  V: 0
+  W: 0
+  Y: 1
+  Yb: 1
+  Zn: 1
+  Zr: 0
+source_files:
+- path: source/mineru-pages.jsonl
+  sha256: d389aa1976ffd2a87f540e5bcf447ef6c84951bde51829be776f29a5e20091d2
+- path: source/formula-audit.jsonl
+  sha256: 82f77fb0ef963516b1222cc268cc37ef1f57d7e7cee71a96052cd806307f9193
+- path: source/image-verified-fixture.json
+  sha256: 0ff301d6377fc0118b34165bb4d2735485b5ef1280180049fa65c4c12e777225
+- path: source/sidecar.yaml
+  sha256: 358c58c74c0aeb26a5333f2e7519164a98a6c83908d18caa7b8da5d85f255eca
+- path: raw/pankratz-1994-usbm-b696/pankratz-1994-usbm-b696.pdf
+  sha256: a745e7971979553bf11fe2233c756efdca1ebbb57f3afaba4e8df3f841e893e3
+corrections:
+- record_id: page-0410
+  printed_page: 410
+  pdf_page: 414
+  kind: repair
+  field: substance_identity
+  ocr_token:
+  - 'La0(g) '
+  - 'Lanthanum Monoxide (ideal gas) '
+  printed_token: LaO(g) / Lanthanum Monoxide (ideal gas)
+  image_quote: LaO(g) / Lanthanum Monoxide (ideal gas)
+  image_evidence:
+    source_pdf_sha256: a745e7971979553bf11fe2233c756efdca1ebbb57f3afaba4e8df3f841e893e3
+    pdf_page: 414
+    render_dpi: 300
+- record_id: page-0733
+  printed_page: 733
+  pdf_page: 737
+  kind: repair
+  field: substance_identity
+  ocr_token:
+  - 'Sc0(g) '
+  - 'Scandium Monoxide (ideal gas) '
+  printed_token: ScO(g) / Scandium Monoxide (ideal gas)
+  image_quote: ScO(g) / Scandium Monoxide (ideal gas)
+  image_evidence:
+    source_pdf_sha256: a745e7971979553bf11fe2233c756efdca1ebbb57f3afaba4e8df3f841e893e3
+    pdf_page: 737
+    render_dpi: 300
+entries:
+- record_id: page-0006
+  record_kind: substance
+  formula: AgO
+  formula_as_published: AgO(g)
+  name_as_published: Silver Monoxide (ideal gas)
+  phase: g
+  row_count: 21
+  metadata_ocr_suspect: false
+  source: *id002
+  source_locator:
+    printed_page: 6
+    pdf_page: 10
+  original_record_text_location:
+    path: source/mineru-pages.jsonl
+    line: 2
+    item_index: 0
+  sha256: a745e7971979553bf11fe2233c756efdca1ebbb57f3afaba4e8df3f841e893e3
+  path: records/page-0006.json
+  ambiguity_count: 1
+  ambiguities:
+  - kind: post_table_note_ocr_unverified
+    reason: Raw MinerU note text is retained verbatim; no image correction is asserted.
+  ocr_suspect_count: 1
+- record_id: page-0115
+  record_kind: substance
+  formula: BiO
+  formula_as_published: BiO(g)
+  name_as_published: Bismuth Monoxide (ideal gas)
+  phase: g
+  row_count: 13
+  metadata_ocr_suspect: false
+  source: *id002
+  source_locator:
+    printed_page: 115
+    pdf_page: 119
+  original_record_text_location:
+    path: source/mineru-pages.jsonl
+    line: 8
+    item_index: 0
+  sha256: a745e7971979553bf11fe2233c756efdca1ebbb57f3afaba4e8df3f841e893e3
+  path: records/page-0115.json
+  ambiguity_count: 1
+  ambiguities:
+  - kind: post_table_note_ocr_unverified
+    reason: Raw MinerU note text is retained verbatim; no image correction is asserted.
+  ocr_suspect_count: 1
+- record_id: page-0191
+  record_kind: substance
+  formula: CdO
+  formula_as_published: CdO(g)
+  name_as_published: Cadmium Monoxide (ideal gas)
+  phase: g
+  row_count: 23
+  metadata_ocr_suspect: false
+  source: *id002
+  source_locator:
+    printed_page: 191
+    pdf_page: 195
+  original_record_text_location:
+    path: source/mineru-pages.jsonl
+    line: 9
+    item_index: 0
+  sha256: a745e7971979553bf11fe2233c756efdca1ebbb57f3afaba4e8df3f841e893e3
+  path: records/page-0191.json
+  ambiguity_count: 1
+  ambiguities:
+  - kind: post_table_note_ocr_unverified
+    reason: Raw MinerU note text is retained verbatim; no image correction is asserted.
+  ocr_suspect_count: 1
+- record_id: page-0204
+  record_kind: substance
+  formula: CeO
+  formula_as_published: CeO(g)
+  name_as_published: Cerium Monoxide (ideal gas)
+  phase: g
+  row_count: 23
+  metadata_ocr_suspect: false
+  source: *id002
+  source_locator:
+    printed_page: 204
+    pdf_page: 208
+  original_record_text_location:
+    path: source/mineru-pages.jsonl
+    line: 10
+    item_index: 0
+  sha256: a745e7971979553bf11fe2233c756efdca1ebbb57f3afaba4e8df3f841e893e3
+  path: records/page-0204.json
+  ambiguity_count: 2
+  ambiguities:
+  - kind: post_table_note_ocr_unverified
+    reason: Raw MinerU note text is retained verbatim; no image correction is asserted.
+  - kind: unparsed_transition_form
+    raw: 999 K, Y - δ transition point of Ce
+    reason: Event-like source prose did not match a supported structured transition
+      form.
+  ocr_suspect_count: 1
+- record_id: page-0273
+  record_kind: substance
+  formula: DyO
+  formula_as_published: DyO(g)
+  name_as_published: Dysprosium Monoxide (ideal gas)
+  phase: g
+  row_count: 23
+  metadata_ocr_suspect: false
+  source: *id002
+  source_locator:
+    printed_page: 273
+    pdf_page: 277
+  original_record_text_location:
+    path: source/mineru-pages.jsonl
+    line: 11
+    item_index: 0
+  sha256: a745e7971979553bf11fe2233c756efdca1ebbb57f3afaba4e8df3f841e893e3
+  path: records/page-0273.json
+  ambiguity_count: 2
+  ambiguities:
+  - kind: post_table_note_ocr_unverified
+    reason: Raw MinerU note text is retained verbatim; no image correction is asserted.
+  - kind: unparsed_transition_form
+    raw: 1657 K, α - β transition point of Dy
+    reason: Event-like source prose did not match a supported structured transition
+      form.
+  ocr_suspect_count: 1
+- record_id: page-0275
+  record_kind: substance
+  formula: ErO
+  formula_as_published: ErO(g)
+  name_as_published: Erbium Monoxide (ideal gas)
+  phase: g
+  row_count: 21
+  metadata_ocr_suspect: false
+  source: *id002
+  source_locator:
+    printed_page: 275
+    pdf_page: 279
+  original_record_text_location:
+    path: source/mineru-pages.jsonl
+    line: 12
+    item_index: 0
+  sha256: a745e7971979553bf11fe2233c756efdca1ebbb57f3afaba4e8df3f841e893e3
+  path: records/page-0275.json
+  ambiguity_count: 2
+  ambiguities:
+  - kind: identity_line_wrap_or_merge
+    raw:
+    - 'ErO(g)
+
+      Erbium Monoxide (ideal gas) '
+  - kind: post_table_note_ocr_unverified
+    reason: Raw MinerU note text is retained verbatim; no image correction is asserted.
+  ocr_suspect_count: 1
+- record_id: page-0278
+  record_kind: substance
+  formula: EuO
+  formula_as_published: EuO(g)
+  name_as_published: Europium Monoxide (ideal gas)
+  phase: g
+  row_count: 22
+  metadata_ocr_suspect: false
+  source: *id002
+  source_locator:
+    printed_page: 278
+    pdf_page: 282
+  original_record_text_location:
+    path: source/mineru-pages.jsonl
+    line: 13
+    item_index: 0
+  sha256: a745e7971979553bf11fe2233c756efdca1ebbb57f3afaba4e8df3f841e893e3
+  path: records/page-0278.json
+  ambiguity_count: 1
+  ambiguities:
+  - kind: post_table_note_ocr_unverified
+    reason: Raw MinerU note text is retained verbatim; no image correction is asserted.
+  ocr_suspect_count: 1
+- record_id: page-0319
+  record_kind: substance
+  formula: GaO
+  formula_as_published: GaO(g)
+  name_as_published: Gallium Monoxide (ideal gas)
+  phase: g
+  row_count: 21
+  metadata_ocr_suspect: false
+  source: *id002
+  source_locator:
+    printed_page: 319
+    pdf_page: 323
+  original_record_text_location:
+    path: source/mineru-pages.jsonl
+    line: 14
+    item_index: 0
+  sha256: a745e7971979553bf11fe2233c756efdca1ebbb57f3afaba4e8df3f841e893e3
+  path: records/page-0319.json
+  ambiguity_count: 2
+  ambiguities:
+  - kind: identity_line_wrap_or_merge
+    raw:
+    - 'GaO(g)
+
+      Gallium Monoxide (ideal gas) '
+  - kind: post_table_note_ocr_unverified
+    reason: Raw MinerU note text is retained verbatim; no image correction is asserted.
+  ocr_suspect_count: 1
+- record_id: page-0327
+  record_kind: substance
+  formula: GdO
+  formula_as_published: GdO(g)
+  name_as_published: Gadolinium Monoxide (ideal gas)
+  phase: g
+  row_count: 23
+  metadata_ocr_suspect: false
+  source: *id002
+  source_locator:
+    printed_page: 327
+    pdf_page: 331
+  original_record_text_location:
+    path: source/mineru-pages.jsonl
+    line: 15
+    item_index: 3
+  sha256: a745e7971979553bf11fe2233c756efdca1ebbb57f3afaba4e8df3f841e893e3
+  path: records/page-0327.json
+  ambiguity_count: 2
+  ambiguities:
+  - kind: post_table_note_ocr_unverified
+    reason: Raw MinerU note text is retained verbatim; no image correction is asserted.
+  - kind: unparsed_transition_form
+    raw: 1533 K, α - β transition point of Gd
+    reason: Event-like source prose did not match a supported structured transition
+      form.
+  ocr_suspect_count: 1
+- record_id: page-0330
+  record_kind: substance
+  formula: GeO
+  formula_as_published: GeO(g)
+  name_as_published: Germanium Monoxide (ideal gas)
+  phase: g
+  row_count: 21
+  metadata_ocr_suspect: false
+  source: *id002
+  source_locator:
+    printed_page: 330
+    pdf_page: 334
+  original_record_text_location:
+    path: source/mineru-pages.jsonl
+    line: 17
+    item_index: 0
+  sha256: a745e7971979553bf11fe2233c756efdca1ebbb57f3afaba4e8df3f841e893e3
+  path: records/page-0330.json
+  ambiguity_count: 1
+  ambiguities:
+  - kind: post_table_note_ocr_unverified
+    reason: Raw MinerU note text is retained verbatim; no image correction is asserted.
+  ocr_suspect_count: 1
+- record_id: page-0352
+  record_kind: substance
+  formula: HfO
+  formula_as_published: HfO(g)
+  name_as_published: Hafnium Monoxide (ideal gas)
+  phase: g
+  row_count: 28
+  metadata_ocr_suspect: false
+  source: *id002
+  source_locator:
+    printed_page: 352
+    pdf_page: 356
+  original_record_text_location:
+    path: source/mineru-pages.jsonl
+    line: 18
+    item_index: 0
+  sha256: a745e7971979553bf11fe2233c756efdca1ebbb57f3afaba4e8df3f841e893e3
+  path: records/page-0352.json
+  ambiguity_count: 2
+  ambiguities:
+  - kind: post_table_note_ocr_unverified
+    reason: Raw MinerU note text is retained verbatim; no image correction is asserted.
+  - kind: unparsed_transition_form
+    raw: 2013 K, \alpha-\beta transition point of Hf
+    reason: Event-like source prose did not match a supported structured transition
+      form.
+  ocr_suspect_count: 1
+- record_id: page-0356
+  record_kind: substance
+  formula: HoO
+  formula_as_published: HoO(g)
+  name_as_published: Holmium Monoxide (ideal gas)
+  phase: g
+  row_count: 23
+  metadata_ocr_suspect: false
+  source: *id002
+  source_locator:
+    printed_page: 356
+    pdf_page: 360
+  original_record_text_location:
+    path: source/mineru-pages.jsonl
+    line: 19
+    item_index: 0
+  sha256: a745e7971979553bf11fe2233c756efdca1ebbb57f3afaba4e8df3f841e893e3
+  path: records/page-0356.json
+  ambiguity_count: 2
+  ambiguities:
+  - kind: post_table_note_ocr_unverified
+    reason: Raw MinerU note text is retained verbatim; no image correction is asserted.
+  - kind: unparsed_transition_form
+    raw: 1701 K, \alpha-\beta transition point of Ho
+    reason: Event-like source prose did not match a supported structured transition
+      form.
+  ocr_suspect_count: 1
+- record_id: page-0360
+  record_kind: substance
+  formula: InO
+  formula_as_published: InO(g)
+  name_as_published: Indium Monoxide (ideal gas)
+  phase: g
+  row_count: 21
+  metadata_ocr_suspect: false
+  source: *id002
+  source_locator:
+    printed_page: 360
+    pdf_page: 364
+  original_record_text_location:
+    path: source/mineru-pages.jsonl
+    line: 20
+    item_index: 0
+  sha256: a745e7971979553bf11fe2233c756efdca1ebbb57f3afaba4e8df3f841e893e3
+  path: records/page-0360.json
+  ambiguity_count: 1
+  ambiguities:
+  - kind: post_table_note_ocr_unverified
+    reason: Raw MinerU note text is retained verbatim; no image correction is asserted.
+  ocr_suspect_count: 1
+- record_id: page-0410
+  record_kind: substance
+  formula: LaO
+  formula_as_published: LaO(g)
+  name_as_published: Lanthanum Monoxide (ideal gas)
+  phase: g
+  row_count: 25
+  metadata_ocr_suspect: false
+  source: *id002
+  source_locator:
+    printed_page: 410
+    pdf_page: 414
+  original_record_text_location:
+    path: source/mineru-pages.jsonl
+    line: 21
+    item_index: 0
+  sha256: a745e7971979553bf11fe2233c756efdca1ebbb57f3afaba4e8df3f841e893e3
+  path: records/page-0410.json
+  ambiguity_count: 3
+  ambiguities:
+  - kind: post_table_note_ocr_unverified
+    reason: Raw MinerU note text is retained verbatim; no image correction is asserted.
+  - kind: unparsed_transition_form
+    raw: 550 K, \alpha-\beta transition point of La
+    reason: Event-like source prose did not match a supported structured transition
+      form.
+  - kind: unparsed_transition_form
+    raw: 1134 K, \beta-Y transition point of La
+    reason: Event-like source prose did not match a supported structured transition
+      form.
+  ocr_suspect_count: 1
+- record_id: page-0455
+  record_kind: substance
+  formula: LuO
+  formula_as_published: LuO(g)
+  name_as_published: Lutetium Monoxide (ideal gas)
+  phase: g
+  row_count: 21
+  metadata_ocr_suspect: false
+  source: *id002
+  source_locator:
+    printed_page: 455
+    pdf_page: 459
+  original_record_text_location:
+    path: source/mineru-pages.jsonl
+    line: 22
+    item_index: 0
+  sha256: a745e7971979553bf11fe2233c756efdca1ebbb57f3afaba4e8df3f841e893e3
+  path: records/page-0455.json
+  ambiguity_count: 1
+  ambiguities:
+  - kind: post_table_note_ocr_unverified
+    reason: Raw MinerU note text is retained verbatim; no image correction is asserted.
+  ocr_suspect_count: 1
+- record_id: page-0629
+  record_kind: substance
+  formula: NdO
+  formula_as_published: NdO(g)
+  name_as_published: Neodymium Monoxide (ideal gas)
+  phase: g
+  row_count: 23
+  metadata_ocr_suspect: false
+  source: *id002
+  source_locator:
+    printed_page: 629
+    pdf_page: 633
+  original_record_text_location:
+    path: source/mineru-pages.jsonl
+    line: 23
+    item_index: 0
+  sha256: a745e7971979553bf11fe2233c756efdca1ebbb57f3afaba4e8df3f841e893e3
+  path: records/page-0629.json
+  ambiguity_count: 2
+  ambiguities:
+  - kind: post_table_note_ocr_unverified
+    reason: Raw MinerU note text is retained verbatim; no image correction is asserted.
+  - kind: unparsed_transition_form
+    raw: 1128 K, α - β transition point of Nd
+    reason: Event-like source prose did not match a supported structured transition
+      form.
+  ocr_suspect_count: 1
+- record_id: page-0705
+  record_kind: substance
+  formula: PrO
+  formula_as_published: PrO(g)
+  name_as_published: Praseodymium Monoxide (ideal gas)
+  phase: g
+  row_count: 23
+  metadata_ocr_suspect: false
+  source: *id002
+  source_locator:
+    printed_page: 705
+    pdf_page: 709
+  original_record_text_location:
+    path: source/mineru-pages.jsonl
+    line: 24
+    item_index: 0
+  sha256: a745e7971979553bf11fe2233c756efdca1ebbb57f3afaba4e8df3f841e893e3
+  path: records/page-0705.json
+  ambiguity_count: 2
+  ambiguities:
+  - kind: post_table_note_ocr_unverified
+    reason: Raw MinerU note text is retained verbatim; no image correction is asserted.
+  - kind: unparsed_transition_form
+    raw: 1068 K, α - β transition point of Pr
+    reason: Event-like source prose did not match a supported structured transition
+      form.
+  ocr_suspect_count: 1
+- record_id: page-0733
+  record_kind: substance
+  formula: ScO
+  formula_as_published: ScO(g)
+  name_as_published: Scandium Monoxide (ideal gas)
+  phase: g
+  row_count: 23
+  metadata_ocr_suspect: false
+  source: *id002
+  source_locator:
+    printed_page: 733
+    pdf_page: 737
+  original_record_text_location:
+    path: source/mineru-pages.jsonl
+    line: 25
+    item_index: 0
+  sha256: a745e7971979553bf11fe2233c756efdca1ebbb57f3afaba4e8df3f841e893e3
+  path: records/page-0733.json
+  ambiguity_count: 2
+  ambiguities:
+  - kind: post_table_note_ocr_unverified
+    reason: Raw MinerU note text is retained verbatim; no image correction is asserted.
+  - kind: unparsed_transition_form
+    raw: 1608 K, \alpha-\beta transition point of Sc
+    reason: Event-like source prose did not match a supported structured transition
+      form.
+  ocr_suspect_count: 1
+- record_id: page-0769
+  record_kind: substance
+  formula: SmO
+  formula_as_published: SmO(g)
+  name_as_published: Samarium Monoxide (ideal gas)
+  phase: g
+  row_count: 23
+  metadata_ocr_suspect: false
+  source: *id002
+  source_locator:
+    printed_page: 769
+    pdf_page: 773
+  original_record_text_location:
+    path: source/mineru-pages.jsonl
+    line: 26
+    item_index: 0
+  sha256: a745e7971979553bf11fe2233c756efdca1ebbb57f3afaba4e8df3f841e893e3
+  path: records/page-0769.json
+  ambiguity_count: 2
+  ambiguities:
+  - kind: post_table_note_ocr_unverified
+    reason: Raw MinerU note text is retained verbatim; no image correction is asserted.
+  - kind: unparsed_transition_form
+    raw: 1190 K, \alpha-\beta transition point of Sm
+    reason: Event-like source prose did not match a supported structured transition
+      form.
+  ocr_suspect_count: 1
+- record_id: page-0772
+  record_kind: substance
+  formula: SnO
+  formula_as_published: SnO(g)
+  name_as_published: Tin Monoxide (ideal gas)
+  phase: g
+  row_count: 21
+  metadata_ocr_suspect: false
+  source: *id002
+  source_locator:
+    printed_page: 772
+    pdf_page: 776
+  original_record_text_location:
+    path: source/mineru-pages.jsonl
+    line: 27
+    item_index: 0
+  sha256: a745e7971979553bf11fe2233c756efdca1ebbb57f3afaba4e8df3f841e893e3
+  path: records/page-0772.json
+  ambiguity_count: 1
+  ambiguities:
+  - kind: post_table_note_ocr_unverified
+    reason: Raw MinerU note text is retained verbatim; no image correction is asserted.
+  ocr_suspect_count: 1
+- record_id: page-0803
+  record_kind: substance
+  formula: TbO
+  formula_as_published: TbO(g)
+  name_as_published: Terbium Monoxide (ideal gas)
+  phase: g
+  row_count: 23
+  metadata_ocr_suspect: false
+  source: *id002
+  source_locator:
+    printed_page: 803
+    pdf_page: 807
+  original_record_text_location:
+    path: source/mineru-pages.jsonl
+    line: 28
+    item_index: 0
+  sha256: a745e7971979553bf11fe2233c756efdca1ebbb57f3afaba4e8df3f841e893e3
+  path: records/page-0803.json
+  ambiguity_count: 3
+  ambiguities:
+  - kind: identity_line_wrap_or_merge
+    raw:
+    - 'TbO(g)
+
+      Terbium Monoxide (ideal gas) '
+  - kind: post_table_note_ocr_unverified
+    reason: Raw MinerU note text is retained verbatim; no image correction is asserted.
+  - kind: unparsed_transition_form
+    raw: 1560 K, α - β transition point of Tb
+    reason: Event-like source prose did not match a supported structured transition
+      form.
+  ocr_suspect_count: 1
+- record_id: page-0804
+  record_kind: substance
+  formula: TeO
+  formula_as_published: TeO(g)
+  name_as_published: Tellurium Monoxide (ideal gas)
+  phase: g
+  row_count: 19
+  metadata_ocr_suspect: false
+  source: *id002
+  source_locator:
+    printed_page: 804
+    pdf_page: 808
+  original_record_text_location:
+    path: source/mineru-pages.jsonl
+    line: 29
+    item_index: 0
+  sha256: a745e7971979553bf11fe2233c756efdca1ebbb57f3afaba4e8df3f841e893e3
+  path: records/page-0804.json
+  ambiguity_count: 1
+  ambiguities:
+  - kind: post_table_note_ocr_unverified
+    reason: Raw MinerU note text is retained verbatim; no image correction is asserted.
+  ocr_suspect_count: 1
+- record_id: page-0837
+  record_kind: substance
+  formula: TmO
+  formula_as_published: TmO(g)
+  name_as_published: Thulium Monoxide (ideal gas)
+  phase: g
+  row_count: 21
+  metadata_ocr_suspect: false
+  source: *id002
+  source_locator:
+    printed_page: 837
+    pdf_page: 841
+  original_record_text_location:
+    path: source/mineru-pages.jsonl
+    line: 30
+    item_index: 0
+  sha256: a745e7971979553bf11fe2233c756efdca1ebbb57f3afaba4e8df3f841e893e3
+  path: records/page-0837.json
+  ambiguity_count: 1
+  ambiguities:
+  - kind: post_table_note_ocr_unverified
+    reason: Raw MinerU note text is retained verbatim; no image correction is asserted.
+  ocr_suspect_count: 1
+- record_id: page-0858
+  record_kind: substance
+  formula: UO
+  formula_as_published: UO(g)
+  name_as_published: Uranium Monoxide (ideal gas)
+  phase: g
+  row_count: 25
+  metadata_ocr_suspect: false
+  source: *id002
+  source_locator:
+    printed_page: 858
+    pdf_page: 862
+  original_record_text_location:
+    path: source/mineru-pages.jsonl
+    line: 31
+    item_index: 0
+  sha256: a745e7971979553bf11fe2233c756efdca1ebbb57f3afaba4e8df3f841e893e3
+  path: records/page-0858.json
+  ambiguity_count: 2
+  ambiguities:
+  - kind: identity_line_wrap_or_merge
+    raw:
+    - 'UO(g) '
+    - 'Uranium Monoxide (ideal gas) '
+    - 'Phase changes: '
+    - '942 K, α - β transition point of U: ΔH° = 0.667 kcal/mol. '
+    - '1049 K, $\beta - \gamma$ transition point of U; $\Delta H^{\circ} = 1.137 \mathrm{kcal}
+      / \mathrm{mol}$ . '
+  - kind: post_table_note_ocr_unverified
+    reason: Raw MinerU note text is retained verbatim; no image correction is asserted.
+  ocr_suspect_count: 1
+- record_id: page-0910
+  record_kind: substance
+  formula: YO
+  formula_as_published: YO(g)
+  name_as_published: Yttrium Monoxide (ideal gas)
+  phase: g
+  row_count: 23
+  metadata_ocr_suspect: false
+  source: *id002
+  source_locator:
+    printed_page: 910
+    pdf_page: 914
+  original_record_text_location:
+    path: source/mineru-pages.jsonl
+    line: 32
+    item_index: 0
+  sha256: a745e7971979553bf11fe2233c756efdca1ebbb57f3afaba4e8df3f841e893e3
+  path: records/page-0910.json
+  ambiguity_count: 2
+  ambiguities:
+  - kind: post_table_note_ocr_unverified
+    reason: Raw MinerU note text is retained verbatim; no image correction is asserted.
+  - kind: unparsed_transition_form
+    raw: 1752 K, α - β transition point of Y
+    reason: Event-like source prose did not match a supported structured transition
+      form.
+  ocr_suspect_count: 1
+- record_id: page-0920
+  record_kind: substance
+  formula: YbO
+  formula_as_published: YbO(g)
+  name_as_published: Ytterbium Monoxide (ideal gas)
+  phase: g
+  row_count: 26
+  metadata_ocr_suspect: false
+  source: *id002
+  source_locator:
+    printed_page: 920
+    pdf_page: 924
+  original_record_text_location:
+    path: source/mineru-pages.jsonl
+    line: 33
+    item_index: 0
+  sha256: a745e7971979553bf11fe2233c756efdca1ebbb57f3afaba4e8df3f841e893e3
+  path: records/page-0920.json
+  ambiguity_count: 2
+  ambiguities:
+  - kind: post_table_note_ocr_unverified
+    reason: Raw MinerU note text is retained verbatim; no image correction is asserted.
+  - kind: unparsed_transition_form
+    raw: 1033 K, α - β transition point of Yb
+    reason: Event-like source prose did not match a supported structured transition
+      form.
+  ocr_suspect_count: 1
+- record_id: page-0924
+  record_kind: substance
+  formula: ZnO
+  formula_as_published: ZnO(g)
+  name_as_published: Zinc Monoxide (ideal gas)
+  phase: g
+  row_count: 23
+  metadata_ocr_suspect: false
+  source: *id002
+  source_locator:
+    printed_page: 924
+    pdf_page: 928
+  original_record_text_location:
+    path: source/mineru-pages.jsonl
+    line: 34
+    item_index: 0
+  sha256: a745e7971979553bf11fe2233c756efdca1ebbb57f3afaba4e8df3f841e893e3
+  path: records/page-0924.json
+  ambiguity_count: 1
+  ambiguities:
+  - kind: post_table_note_ocr_unverified
+    reason: Raw MinerU note text is retained verbatim; no image correction is asserted.
+  ocr_suspect_count: 1
