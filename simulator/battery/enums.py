@@ -61,6 +61,7 @@ class Quantity(StrEnum):
     LOG10_K_STAR = "log10_K_star"
     ACTIVITY = "activity"
     ACTIVITY_COEFFICIENT = "activity_coefficient"
+    ACTIVITY_COEFFICIENT_TEMPERATURE_FIT = "activity_coefficient_temperature_fit"
     EVAPORATION_COEFFICIENT_ALPHA = "evaporation_coefficient_alpha"
     MASS_LOSS_FRACTION = "mass_loss_fraction"
     MASS_LOSS_FRACTION_VS_T = "mass_loss_fraction_vs_T"
@@ -460,6 +461,7 @@ QUANTITY_UNITS: dict[Quantity, str] = {
     Quantity.LOG10_K_STAR: "dimensionless",
     Quantity.ACTIVITY: "dimensionless",
     Quantity.ACTIVITY_COEFFICIENT: "dimensionless",
+    Quantity.ACTIVITY_COEFFICIENT_TEMPERATURE_FIT: "dimensionless",
     Quantity.EVAPORATION_COEFFICIENT_ALPHA: "dimensionless",
     Quantity.MASS_LOSS_FRACTION: "dimensionless",
     Quantity.MASS_LOSS_FRACTION_VS_T: "dimensionless",

@@ -25,6 +25,8 @@ extraction:
   date: '2026-08-04'
   worker: mine-multicarrier-gk
   provenance_path: docs-private/research/ocr-artifacts/kems-041-sossi-fegley-2018/
+  table_2_footnote_as_printed: "Notes: A = Al₂O₃; An = Anorthite; C = CaO; Di = Diopside; F = FeO; K = K₂O; M = MgO; P = P₂O₅; S = SiO₂"
+  table_2_qualification_as_printed: "These should only be used as guide and the interested reader is referred to the relevant paper for further information as to how the activity coefficients were calculated and how they vary with melt composition, temperature, and oxygen fugacity."
 review_status: draft
 species:
   Al:
@@ -44,6 +46,21 @@ species:
       units: dimensionless γ as published range
       values:
         quantity: activity_coefficient_range
+        rows:
+          - oxide: AlO1.5
+            method_class: compilation_calculated_table
+            evidence_model: MELTS
+            oxide_formula_as_published: $AlO_{1.5}$
+            temperature_as_published: 1573–1773
+            T_range_K:
+            - '1573'
+            - '1773'
+            gamma_as_published: 0.28–0.37
+            melt_composition_as_published: CMAS (An–Di)
+            references_as_published: Ghiorso & Sack 1995
+            range:
+            - '.28'
+            - '.37'
         oxide_formula_as_published: $AlO_{1.5}$
         melt_composition_as_published: CMAS (An–Di)
         gamma_range_as_published: 0.28–0.37
@@ -72,6 +89,20 @@ species:
       units: dimensionless γ as published range
       values:
         quantity: activity_coefficient_range
+        rows:
+          - oxide: AsO1.5
+            method_class: measured_tabulated
+            oxide_formula_as_published: $AsO_{1.5}$
+            temperature_as_published: '1573'
+            T_range_K:
+            - '1573'
+            - '1573'
+            gamma_as_published: 0.03–0.56
+            melt_composition_as_published: FCS
+            references_as_published: Chen & Jahanshahi 2010
+            range:
+            - '.03'
+            - '.56'
         oxide_formula_as_published: $AsO_{1.5}$
         melt_composition_as_published: FCS
         gamma_range_as_published: 0.03–0.56
@@ -120,6 +151,20 @@ species:
       units: dimensionless γ as published range
       values:
         quantity: activity_coefficient_range
+        rows:
+          - oxide: BiO1.5
+            method_class: measured_tabulated
+            oxide_formula_as_published: $BiO_{1.5}$
+            temperature_as_published: '1573'
+            T_range_K:
+            - '1573'
+            - '1573'
+            gamma_as_published: 0.3–0.5
+            melt_composition_as_published: FCS
+            references_as_published: Paulina et al. 2013
+            range:
+            - '.3'
+            - '.5'
         oxide_formula_as_published: $BiO_{1.5}$
         melt_composition_as_published: FCS
         gamma_range_as_published: 0.3–0.5
@@ -168,6 +213,21 @@ species:
       units: dimensionless γ as published range
       values:
         quantity: activity_coefficient_range
+        rows:
+          - oxide: CaO
+            method_class: measured_tabulated
+            oxide_formula_as_published: CaO
+            temperature_as_published: '1873'
+            T_range_K:
+            - '1873'
+            - '1873'
+            gamma_as_published: ≈0.001–0.15
+            melt_composition_as_published: CMAS(0.55 < Basicity < 0.65)
+            references_as_published: Beckett 2002
+            range:
+            - '.001'
+            - '.15'
+            approximate: true
         oxide_formula_as_published: CaO
         melt_composition_as_published: CMAS(0.55 < Basicity < 0.65)
         gamma_range_as_published: ≈0.001–0.15
@@ -197,6 +257,33 @@ species:
       units: dimensionless γ as published range
       values:
         quantity: activity_coefficient_range
+        rows:
+          - oxide: CoO
+            method_class: measured_tabulated
+            oxide_formula_as_published: CoO
+            temperature_as_published: 1573–1873ᵃ
+            T_range_K:
+            - '1573'
+            - '1873'
+            gamma_as_published: 0.5–2.2ᵃ
+            melt_composition_as_published: (F)CMAS $^{a}$ CMAS $^{b}$
+            references_as_published: $^{a}$ Holzheid et al. 1997 $^{b}$ O’Neill & Eggins 2002;O’Neill & Berry 2006
+            range:
+            - '.5'
+            - '2.2'
+          - oxide: CoO
+            method_class: measured_tabulated
+            oxide_formula_as_published: CoO
+            temperature_as_published: 1673ᵇ
+            T_range_K:
+            - '1673'
+            - '1673'
+            gamma_as_published: 0.8–1.8ᵇ
+            melt_composition_as_published: (F)CMAS $^{a}$ CMAS $^{b}$
+            references_as_published: $^{a}$ Holzheid et al. 1997 $^{b}$ O’Neill & Eggins 2002;O’Neill & Berry 2006
+            range:
+            - '.8'
+            - '1.8'
         oxide_formula_as_published: CoO
         melt_composition_as_published: (F)CMAS $^{a}$ CMAS $^{b}$
         gamma_range_as_published: 0.5–2.2 $^{a}$ 0.8–1.8 $^{b}$
@@ -226,6 +313,20 @@ species:
       units: dimensionless γ as published range
       values:
         quantity: activity_coefficient_range
+        rows:
+          - oxide: CrO
+            method_class: measured_tabulated
+            oxide_formula_as_published: CrO
+            temperature_as_published: '1773'
+            T_range_K:
+            - '1773'
+            - '1773'
+            gamma_as_published: 1.9–7.2
+            melt_composition_as_published: CAS
+            references_as_published: Pretorius & Muan 1992
+            range:
+            - '1.9'
+            - '7.2'
         oxide_formula_as_published: CrO
         melt_composition_as_published: CAS
         gamma_range_as_published: 1.9–7.2
@@ -253,6 +354,20 @@ species:
       units: dimensionless γ as published range
       values:
         quantity: activity_coefficient_range
+        rows:
+          - oxide: CrO1.5
+            method_class: measured_tabulated
+            oxide_formula_as_published: $CrO_{1.5}$
+            temperature_as_published: '1773'
+            T_range_K:
+            - '1773'
+            - '1773'
+            gamma_as_published: 23–42
+            melt_composition_as_published: CAS
+            references_as_published: Pretorius & Muan 1992
+            range:
+            - '23'
+            - '42'
         oxide_formula_as_published: $CrO_{1.5}$
         melt_composition_as_published: CAS
         gamma_range_as_published: 23–42
@@ -301,6 +416,31 @@ species:
       units: dimensionless γ as published range
       values:
         quantity: activity_coefficient_range
+        rows:
+          - oxide: CuO0.5
+            method_class: measured_tabulated
+            oxide_formula_as_published: $CuO_{0.5}$
+            temperature_as_published: 1573ᵃ
+            T_range_K:
+            - '1573'
+            - '1573'
+            gamma_as_published: 9–11ᵃ
+            melt_composition_as_published: (F)CMAS $^{a}$ CMAS $^{b}$
+            references_as_published: $^{a}$ Holzheid & Lodders 2001 $^{b}$ Wood & Wade 2013
+            range:
+            - '9'
+            - '11'
+          - oxide: CuO0.5
+            method_class: measured_tabulated
+            oxide_formula_as_published: $CuO_{0.5}$
+            temperature_as_published: 1923ᵇ
+            T_range_K:
+            - '1923'
+            - '1923'
+            gamma_as_published: 3.5ᵇ
+            melt_composition_as_published: (F)CMAS $^{a}$ CMAS $^{b}$
+            references_as_published: $^{a}$ Holzheid & Lodders 2001 $^{b}$ Wood & Wade 2013
+            gamma: '3.5'
         oxide_formula_as_published: $CuO_{0.5}$
         melt_composition_as_published: (F)CMAS $^{a}$ CMAS $^{b}$
         gamma_range_as_published: 9–11 $^{a}$ 3.5 $^{b}$
@@ -348,6 +488,60 @@ species:
       units: dimensionless γ as published range
       values:
         quantity: activity_coefficient_range
+        rows:
+          - oxide: FeO
+            method_class: measured_tabulated
+            oxide_formula_as_published: FeO
+            temperature_as_published: 1600ᵃ
+            T_range_K:
+            - '1600'
+            - '1600'
+            gamma_as_published: 0.6–2.3ᵃ
+            melt_composition_as_published: SKAnFa(F)CMAS $^{b}$ CMAS $^{c,d}$
+            references_as_published: $^{a}$ Doyle 1988 $^{b}$ Holzheid et al. 1997 $^{c}$ O’Neill & Eggins 2002 $^{d}$ Wood & Wade 2013
+            range:
+            - '0.6'
+            - '2.3'
+          - oxide: FeO
+            method_class: measured_tabulated
+            oxide_formula_as_published: FeO
+            temperature_as_published: 1573–1873ᵇ
+            T_range_K:
+            - '1573'
+            - '1873'
+            gamma_as_published: 1.2–2.1ᵇ
+            melt_composition_as_published: SKAnFa(F)CMAS $^{b}$ CMAS $^{c,d}$
+            references_as_published: $^{a}$ Doyle 1988 $^{b}$ Holzheid et al. 1997 $^{c}$ O’Neill & Eggins 2002 $^{d}$ Wood & Wade 2013
+            range:
+            - '1.2'
+            - '2.1'
+          - oxide: FeO
+            method_class: measured_tabulated
+            oxide_formula_as_published: FeO
+            temperature_as_published: 1673ᶜ
+            T_range_K:
+            - '1673'
+            - '1673'
+            gamma_as_published: 0.9–1.8ᶜ
+            melt_composition_as_published: SKAnFa(F)CMAS $^{b}$ CMAS $^{c,d}$
+            references_as_published: $^{a}$ Doyle 1988 $^{b}$ Holzheid et al. 1997 $^{c}$ O’Neill & Eggins 2002 $^{d}$ Wood & Wade 2013
+            range:
+            - '0.9'
+            - '1.8'
+          - oxide: FeO
+            method_class: measured_tabulated
+            oxide_formula_as_published: FeO
+            temperature_as_published: 1923ᶜ
+            T_range_K:
+            - '1923'
+            - '1923'
+            gamma_as_published: ≈0.5–2.5ᵈ
+            melt_composition_as_published: SKAnFa(F)CMAS $^{b}$ CMAS $^{c,d}$
+            references_as_published: $^{a}$ Doyle 1988 $^{b}$ Holzheid et al. 1997 $^{c}$ O’Neill & Eggins 2002 $^{d}$ Wood & Wade 2013
+            range:
+            - '0.5'
+            - '2.5'
+            approximate: true
         oxide_formula_as_published: FeO
         melt_composition_as_published: SKAnFa(F)CMAS $^{b}$ CMAS $^{c,d}$
         gamma_range_as_published: 0.6–2.3 $^{a}$ 1.2–2.1 $^{b}$ 0.9–1.8 $^{c}$ ≈0.5–2.5 $^{d}$
@@ -396,6 +590,20 @@ species:
       units: dimensionless γ as published range
       values:
         quantity: activity_coefficient_range
+        rows:
+          - oxide: GeO
+            method_class: measured_tabulated
+            oxide_formula_as_published: GeO
+            temperature_as_published: 1423–1523
+            T_range_K:
+            - '1423'
+            - '1523'
+            gamma_as_published: 1.44–2.55
+            melt_composition_as_published: FCAS
+            references_as_published: Yan & Swinbourne 2013
+            range:
+            - '1.44'
+            - '2.55'
         oxide_formula_as_published: GeO
         melt_composition_as_published: FCAS
         gamma_range_as_published: 1.44–2.55
@@ -443,6 +651,20 @@ species:
       units: dimensionless γ as published range
       values:
         quantity: activity_coefficient_range
+        rows:
+          - oxide: GeO2
+            method_class: measured_tabulated
+            oxide_formula_as_published: $GeO_{2}$
+            temperature_as_published: '1573'
+            T_range_K:
+            - '1573'
+            - '1573'
+            gamma_as_published: 0.24–1.50
+            melt_composition_as_published: FCMS
+            references_as_published: Shuva et al. 2016
+            range:
+            - '0.24'
+            - '1.50'
         oxide_formula_as_published: $GeO_{2}$
         melt_composition_as_published: FCMS
         gamma_range_as_published: 0.24–1.50
@@ -501,6 +723,18 @@ species:
       units: dimensionless γ as published range
       values:
         quantity: activity_coefficient_range
+        rows:
+          - oxide: InO1.5
+            method_class: measured_tabulated
+            oxide_formula_as_published: $InO_{1.5}$
+            temperature_as_published: '1923'
+            T_range_K:
+            - '1923'
+            - '1923'
+            gamma_as_published: '0.02'
+            melt_composition_as_published: CMAS
+            references_as_published: Wood & Wade 2013
+            gamma: '0.02'
         oxide_formula_as_published: $InO_{1.5}$
         melt_composition_as_published: CMAS
         gamma_range_as_published: '0.02'
@@ -549,6 +783,20 @@ species:
       units: dimensionless γ as published range
       values:
         quantity: activity_coefficient_range
+        rows:
+          - oxide: KO0.5
+            method_class: measured_tabulated
+            oxide_formula_as_published: $KO_{0.5}$
+            temperature_as_published: '1573'
+            T_range_K:
+            - '1573'
+            - '1573'
+            gamma_as_published: 6.3 × 10⁻⁵–7.1 × 10⁻⁴
+            melt_composition_as_published: KFCAS** with KAlSiO $_{4(s)}$
+            references_as_published: Hastie et al. 1981
+            range:
+            - '6.3e-5'
+            - '7.1e-4'
         oxide_formula_as_published: $KO_{0.5}$
         melt_composition_as_published: KFCAS** with KAlSiO $_{4(s)}$
         gamma_range_as_published: $6.3 \times 10^{-5}$ – $7.1 \times 10^{-4}$
@@ -597,6 +845,21 @@ species:
       units: dimensionless γ as published range
       values:
         quantity: activity_coefficient_range
+        rows:
+          - oxide: MgO
+            method_class: measured_tabulated
+            oxide_formula_as_published: MgO
+            temperature_as_published: '1873'
+            T_range_K:
+            - '1873'
+            - '1873'
+            gamma_as_published: ≈0.25–4
+            melt_composition_as_published: CMAS(0.55 < Basicity < 0.65)
+            references_as_published: Beckett 2002
+            range:
+            - '0.25'
+            - '4'
+            approximate: true
         oxide_formula_as_published: MgO
         melt_composition_as_published: CMAS(0.55 < Basicity < 0.65)
         gamma_range_as_published: ≈0.25–4
@@ -626,6 +889,33 @@ species:
       units: dimensionless γ as published range
       values:
         quantity: activity_coefficient_range
+        rows:
+          - oxide: MnO
+            method_class: measured_tabulated
+            oxide_formula_as_published: MnO
+            temperature_as_published: 1823–1923ᵃ
+            T_range_K:
+            - '1823'
+            - '1923'
+            gamma_as_published: 0.7–3.5ᵃ
+            melt_composition_as_published: FCMS(P) $^{a}$ CAS $^{b}$
+            references_as_published: $^{a}$ Suito & Inoue 1984 $^{b}$ Ohta & Suito 1995
+            range:
+            - '0.7'
+            - '3.5'
+          - oxide: MnO
+            method_class: measured_tabulated
+            oxide_formula_as_published: MnO
+            temperature_as_published: 1873ᵇ
+            T_range_K:
+            - '1873'
+            - '1873'
+            gamma_as_published: 0.5–7.2ᵇ
+            melt_composition_as_published: FCMS(P) $^{a}$ CAS $^{b}$
+            references_as_published: $^{a}$ Suito & Inoue 1984 $^{b}$ Ohta & Suito 1995
+            range:
+            - '0.5'
+            - '7.2'
         oxide_formula_as_published: MnO
         melt_composition_as_published: FCMS(P) $^{a}$ CAS $^{b}$
         gamma_range_as_published: 0.7–3.5 $^{a}$ 0.5–7.2 $^{b}$
@@ -673,6 +963,34 @@ species:
       units: dimensionless γ as published range
       values:
         quantity: activity_coefficient_range
+        rows:
+          - oxide: MoO2
+            method_class: measured_tabulated
+            oxide_formula_as_published: $MoO_{2}$
+            temperature_as_published: 1673ᵃ
+            T_range_K:
+            - '1673'
+            - '1673'
+            gamma_as_published: 67–227ᵃ
+            melt_composition_as_published: CMAS $^{a,b}$
+            references_as_published: $^{a}$ O’Neill & Eggins 2002 $^{b}$ Wood & Wade 2013
+            range:
+            - '67'
+            - '227'
+          - oxide: MoO2
+            method_class: measured_tabulated
+            oxide_formula_as_published: $MoO_{2}$
+            temperature_as_published: 1923ᵇ
+            T_range_K:
+            - '1923'
+            - '1923'
+            gamma_as_published: ≈5–100ᵇ
+            melt_composition_as_published: CMAS $^{a,b}$
+            references_as_published: $^{a}$ O’Neill & Eggins 2002 $^{b}$ Wood & Wade 2013
+            range:
+            - '5'
+            - '100'
+            approximate: true
         oxide_formula_as_published: $MoO_{2}$
         melt_composition_as_published: CMAS $^{a,b}$
         gamma_range_as_published: 67–227 $^{a}$ ≈5–100 $^{b}$
@@ -731,6 +1049,34 @@ species:
       units: dimensionless γ as published range
       values:
         quantity: activity_coefficient_range
+        rows:
+          - oxide: MoO3
+            method_class: measured_tabulated
+            oxide_formula_as_published: $MoO_3$
+            temperature_as_published: '1673'
+            T_range_K:
+            - '1673'
+            - '1673'
+            gamma_as_published: 0.1–0.8*
+            melt_composition_as_published: CMAS
+            references_as_published: O’Neill & Eggins 2002
+            range:
+            - '0.1'
+            - '0.8'
+          - oxide: MoO3
+            method_class: quoted_attributed
+            oxide_formula_as_published: $MoO_3$
+            temperature_as_published: '1673'
+            T_range_K:
+            - '1673'
+            - '1673'
+            gamma_as_published: '* logγMoO₃ = 1.49(logγMoO₂) − 3.59'
+            melt_composition_as_published: CMAS
+            references_as_published: O’Neill & Eggins 2002
+            activity_relation_as_published: '* logγMoO₃ = 1.49(logγMoO₂) − 3.59'
+            relation_parameters:
+              slope: '1.49'
+              intercept: '-3.59'
         oxide_formula_as_published: $MoO_3$
         melt_composition_as_published: CMAS
         gamma_range_as_published: 0.1–0.8* * $\log\gamma MoO_3$ = 1.49( $\log\gamma MoO_2$ )-3.59
@@ -789,6 +1135,31 @@ species:
       units: dimensionless γ as published range
       values:
         quantity: activity_coefficient_range
+        rows:
+          - oxide: NaO0.5
+            method_class: measured_tabulated
+            oxide_formula_as_published: $NaO_{0.5}$
+            temperature_as_published: 1623ᵃ
+            T_range_K:
+            - '1623'
+            - '1623'
+            gamma_as_published: 10⁻³ᵃ
+            melt_composition_as_published: CMASa $CMS^b$
+            references_as_published: aMathieu et al. 2008bMathieu et al. 2011
+            gamma: 1e-3
+          - oxide: NaO0.5
+            method_class: measured_tabulated
+            oxide_formula_as_published: $NaO_{0.5}$
+            temperature_as_published: 1673ᵇ
+            T_range_K:
+            - '1673'
+            - '1673'
+            gamma_as_published: 8.4 × 10⁻⁴–2.2 × 10⁻³ᵇ
+            melt_composition_as_published: CMASa $CMS^b$
+            references_as_published: aMathieu et al. 2008bMathieu et al. 2011
+            range:
+            - '8.4e-4'
+            - '2.2e-3'
         oxide_formula_as_published: $NaO_{0.5}$
         melt_composition_as_published: CMASa $CMS^b$
         gamma_range_as_published: a $10^{-3}$ b $8.4 \times 10^{-4}$ –2.2 × $10^{-3}$
@@ -836,6 +1207,47 @@ species:
       units: dimensionless γ as published range
       values:
         quantity: activity_coefficient_range
+        rows:
+          - oxide: NiO
+            method_class: measured_tabulated
+            oxide_formula_as_published: NiO
+            temperature_as_published: 1573–1873ᵃ
+            T_range_K:
+            - '1573'
+            - '1873'
+            gamma_as_published: 1.3–3.5ᵃ
+            melt_composition_as_published: (F)CMASa $CMAS^{b,c}$
+            references_as_published: aHolzheid et al. 1997bO’Neill & Eggins 2002;O’Neill & Berry, 2006cWood & Wade 2013
+            range:
+            - '1.3'
+            - '3.5'
+          - oxide: NiO
+            method_class: measured_tabulated
+            oxide_formula_as_published: NiO
+            temperature_as_published: 1673ᵇ
+            T_range_K:
+            - '1673'
+            - '1673'
+            gamma_as_published: 2.0–4.3ᵇ
+            melt_composition_as_published: (F)CMASa $CMAS^{b,c}$
+            references_as_published: aHolzheid et al. 1997bO’Neill & Eggins 2002;O’Neill & Berry, 2006cWood & Wade 2013
+            range:
+            - '2.0'
+            - '4.3'
+          - oxide: NiO
+            method_class: measured_tabulated
+            oxide_formula_as_published: NiO
+            temperature_as_published: 1923ᶜ
+            T_range_K:
+            - '1923'
+            - '1923'
+            gamma_as_published: ≈1.5–3.0ᶜ
+            melt_composition_as_published: (F)CMASa $CMAS^{b,c}$
+            references_as_published: aHolzheid et al. 1997bO’Neill & Eggins 2002;O’Neill & Berry, 2006cWood & Wade 2013
+            range:
+            - '1.5'
+            - '3.0'
+            approximate: true
         oxide_formula_as_published: NiO
         melt_composition_as_published: (F)CMASa $CMAS^{b,c}$
         gamma_range_as_published: 1.3–3.5a2.0–4.3b≈1.5–3.0c
@@ -865,6 +1277,20 @@ species:
       units: dimensionless γ as published range
       values:
         quantity: activity_coefficient_range
+        rows:
+          - oxide: PO2.5
+            method_class: measured_tabulated
+            oxide_formula_as_published: $PO_{2.5}$
+            temperature_as_published: 1823–1923
+            T_range_K:
+            - '1823'
+            - '1923'
+            gamma_as_published: 10⁻⁶–10⁻¹⁰
+            melt_composition_as_published: CMFS
+            references_as_published: Turkdogan (2000)
+            range:
+            - 1e-10
+            - 1e-6
         oxide_formula_as_published: $PO_{2.5}$
         melt_composition_as_published: CMFS
         gamma_range_as_published: $10^{-6}$ – $10^{-10}$
@@ -912,6 +1338,18 @@ species:
       units: dimensionless γ as published range
       values:
         quantity: activity_coefficient_range
+        rows:
+          - oxide: PbO
+            method_class: measured_tabulated
+            oxide_formula_as_published: PbO
+            temperature_as_published: '1923'
+            T_range_K:
+            - '1923'
+            - '1923'
+            gamma_as_published: '0.22'
+            melt_composition_as_published: CMAS
+            references_as_published: Wood & Wade 2013
+            gamma: '0.22'
         oxide_formula_as_published: PbO
         melt_composition_as_published: CMAS
         gamma_range_as_published: '0.22'
@@ -960,6 +1398,21 @@ species:
       units: dimensionless γ as published range
       values:
         quantity: activity_coefficient_range
+        rows:
+          - oxide: SiO2
+            method_class: compilation_calculated_table
+            evidence_model: MELTS
+            oxide_formula_as_published: $SiO_2$
+            temperature_as_published: 1573–1773
+            T_range_K:
+            - '1573'
+            - '1773'
+            gamma_as_published: 0.9–1.1
+            melt_composition_as_published: CMAS (An-Di)
+            references_as_published: Ghiorso & Sack 1995
+            range:
+            - '0.9'
+            - '1.1'
         oxide_formula_as_published: $SiO_2$
         melt_composition_as_published: CMAS (An-Di)
         gamma_range_as_published: 0.9–1.1
@@ -1017,6 +1470,20 @@ species:
       units: dimensionless γ as published range
       values:
         quantity: activity_coefficient_range
+        rows:
+          - oxide: SnO
+            method_class: measured_tabulated
+            oxide_formula_as_published: SnO
+            temperature_as_published: '1573'
+            T_range_K:
+            - '1573'
+            - '1573'
+            gamma_as_published: 5–6.2
+            melt_composition_as_published: FCS
+            references_as_published: Takeda & Yazawa 1989
+            range:
+            - '5'
+            - '6.2'
         oxide_formula_as_published: SnO
         melt_composition_as_published: FCS
         gamma_range_as_published: 5–6.2
@@ -1065,6 +1532,21 @@ species:
       units: dimensionless γ as published range
       values:
         quantity: activity_coefficient_range
+        rows:
+          - oxide: TiO2
+            method_class: compilation_calculated_table
+            evidence_model: MELTS
+            oxide_formula_as_published: $TiO_2$
+            temperature_as_published: 1573–1773
+            T_range_K:
+            - '1573'
+            - '1773'
+            gamma_as_published: 1.5–1.7
+            melt_composition_as_published: CMAS
+            references_as_published: Ghiorso & Sack 1995
+            range:
+            - '1.5'
+            - '1.7'
         oxide_formula_as_published: $TiO_2$
         melt_composition_as_published: CMAS
         gamma_range_as_published: 1.5–1.7
@@ -1123,6 +1605,20 @@ species:
       units: dimensionless γ as published range
       values:
         quantity: activity_coefficient_range
+        rows:
+          - oxide: V2O3
+            method_class: measured_tabulated
+            oxide_formula_as_published: $V_2O_3$
+            temperature_as_published: '1900'
+            T_range_K:
+            - '1900'
+            - '1900'
+            gamma_as_published: 1.2–20.8
+            melt_composition_as_published: CMAS
+            references_as_published: Wang et al. 2010
+            range:
+            - '1.2'
+            - '20.8'
         oxide_formula_as_published: $V_2O_3$
         melt_composition_as_published: CMAS
         gamma_range_as_published: 1.2–20.8
@@ -1151,6 +1647,20 @@ species:
       units: dimensionless γ as published range
       values:
         quantity: activity_coefficient_range
+        rows:
+          - oxide: V2O3
+            method_class: measured_tabulated
+            oxide_formula_as_published: $V_2O_3$
+            temperature_as_published: '2000'
+            T_range_K:
+            - '2000'
+            - '2000'
+            gamma_as_published: 0.3–5.2
+            melt_composition_as_published: CMAS
+            references_as_published: Wang et al. 2010
+            range:
+            - '0.3'
+            - '5.2'
         oxide_formula_as_published: $V_2O_3$
         melt_composition_as_published: CMAS
         gamma_range_as_published: null
@@ -1179,6 +1689,20 @@ species:
       units: dimensionless γ as published range
       values:
         quantity: activity_coefficient_range
+        rows:
+          - oxide: V2O3
+            method_class: measured_tabulated
+            oxide_formula_as_published: $V_2O_3$
+            temperature_as_published: '2100'
+            T_range_K:
+            - '2100'
+            - '2100'
+            gamma_as_published: 0.05–1.65
+            melt_composition_as_published: CMAS
+            references_as_published: Wang et al. 2010
+            range:
+            - '0.05'
+            - '1.65'
         oxide_formula_as_published: $V_2O_3$
         melt_composition_as_published: CMAS
         gamma_range_as_published: 0.05–1.65
@@ -1209,6 +1733,34 @@ species:
       units: dimensionless γ as published range
       values:
         quantity: activity_coefficient_range
+        rows:
+          - oxide: WO2
+            method_class: measured_tabulated
+            oxide_formula_as_published: $WO_2$
+            temperature_as_published: '1673'
+            T_range_K:
+            - '1673'
+            - '1673'
+            gamma_as_published: 7.4–45*
+            melt_composition_as_published: CMAS
+            references_as_published: O’Neill et al. 2008
+            range:
+            - '7.4'
+            - '45'
+          - oxide: WO2
+            method_class: quoted_attributed
+            oxide_formula_as_published: $WO_2$
+            temperature_as_published: '1673'
+            T_range_K:
+            - '1673'
+            - '1673'
+            gamma_as_published: '* logγWO₂ = logγMoO₂ − 2.20'
+            melt_composition_as_published: CMAS
+            references_as_published: O’Neill et al. 2008
+            activity_relation_as_published: '* logγWO₂ = logγMoO₂ − 2.20'
+            relation_parameters:
+              slope: '1'
+              intercept: '-2.20'
         oxide_formula_as_published: $WO_2$
         melt_composition_as_published: CMAS
         gamma_range_as_published: 7.4–45
@@ -1240,6 +1792,34 @@ species:
       units: dimensionless γ as published range
       values:
         quantity: activity_coefficient_relation
+        rows:
+          - oxide: WO3
+            method_class: measured_tabulated
+            oxide_formula_as_published: $WO_3$
+            temperature_as_published: 1673ᵃ
+            T_range_K:
+            - '1673'
+            - '1673'
+            gamma_as_published: 0.02–0.3ᵃ*
+            melt_composition_as_published: CMAS
+            references_as_published: O’Neill et al. 2008
+            range:
+            - '0.02'
+            - '0.3'
+          - oxide: WO3
+            method_class: quoted_attributed
+            oxide_formula_as_published: $WO_3$
+            temperature_as_published: 1673ᵃ
+            T_range_K:
+            - '1673'
+            - '1673'
+            gamma_as_published: '* logγWO₃ = logγMoO₃ − 1.42'
+            melt_composition_as_published: CMAS
+            references_as_published: O’Neill et al. 2008
+            activity_relation_as_published: '* logγWO₃ = logγMoO₃ − 1.42'
+            relation_parameters:
+              slope: '1'
+              intercept: '-1.42'
         oxide_formula_as_published: $WO_3$
         melt_composition_as_published: CMAS
         gamma_range_as_published: null
@@ -1271,6 +1851,21 @@ species:
       units: dimensionless γ as published range
       values:
         quantity: activity_coefficient_range
+        rows:
+          - oxide: WO3
+            method_class: measured_tabulated
+            oxide_formula_as_published: $WO_3$
+            temperature_as_published: 1923ᵇ
+            T_range_K:
+            - '1923'
+            - '1923'
+            gamma_as_published: ≈0.001–0.05ᵇ
+            melt_composition_as_published: CMAS
+            references_as_published: Wood & Wade 2013
+            range:
+            - '0.001'
+            - '0.05'
+            approximate: true
         oxide_formula_as_published: $WO_3$
         melt_composition_as_published: CMAS
         gamma_range_as_published: ≈0.001–0.05
@@ -1329,6 +1924,20 @@ species:
       units: dimensionless γ as published range
       values:
         quantity: activity_coefficient_range
+        rows:
+          - oxide: ZnO
+            method_class: measured_tabulated
+            oxide_formula_as_published: ZnO
+            temperature_as_published: 1673–1823
+            T_range_K:
+            - '1673'
+            - '1823'
+            gamma_as_published: 0.25–0.58
+            melt_composition_as_published: CAS
+            references_as_published: Reyes & Gaskell 1983
+            range:
+            - '0.25'
+            - '0.58'
         oxide_formula_as_published: ZnO
         melt_composition_as_published: CAS
         gamma_range_as_published: 0.25–0.58
