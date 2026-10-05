@@ -509,13 +509,13 @@ species:
           C_multiplier: x_K2O_squared
           original_source: Plante et al. (1975) compared; this summary higher because of orifice effect
         - system: K2O-Al2O3
-          phases: KAlO2 + K2O.5Al2O3
+          phases: KAlO2 → K2O.5Al2O3
           T_K_range: [1300, 1800]
           A: 5.489
           B: 15036.0
           original_source: Plante et al. (1975)
         - system: K2O-Al2O3
-          phases: K2O.9Al2O3 + Al2O3
+          phases: K2O.9Al2O3 → Al2O3
           T_K_range: [1500, 1800]
           A: 7.487
           B: 21453.0
@@ -848,15 +848,21 @@ species:
           additional_coefficients_as_printed: C = 9.32
           comments_as_printed: Pressures higher than earlier data of Plante et al. (1975) because of orifice
             effect.
+          method_class: quoted_literature
+          quoted_from: >-
+            kems-042-plante-1979 Table 3 series 1104-1129 master fit
+            (B0=4.721, B1=-15624, B2=9.32). Coefficients identical to Plante's
+            printed master fit; not an independent Hastie measurement. Hastie
+            Table 2 comments cite Plante et al. (1975) orifice-effect comparison.
         - locator:
             page: 23
             table: '2'
             note: body row 2
           class_tag: model
-          quote: K2O-Al2O3 | KAlO2 + K2O·5Al2O3[f] | 1300-1800 | 5.489 | 15036 | PK independent of bulk composition.
+          quote: K2O-Al2O3 | KAlO2 → K2O·5Al2O3[f] | 1300-1800 | 5.489 | 15036 | PK independent of bulk composition.
             Plante et al. (1975).
           system_as_printed: K2O-Al2O3
-          phases_as_printed: KAlO2 + K2O·5Al2O3[f]
+          phases_as_printed: KAlO2 → K2O·5Al2O3[f]
           T_range_K:
           - 1300
           - 1800
@@ -894,6 +900,11 @@ species:
           B: 12873
           additional_coefficients_as_printed: ''
           comments_as_printed: Plante (1977).[g]
+          reason: >-
+            source_internally_inconsistent: identical_coefficients_distinct_systems.
+            Printed Table 2 K2O-ZrO2 row: A=4.524 B=12873 (Plante 1977).[g].
+            Printed Table 2 K2O-Fe2O3 row: A=4.524 B=12873 (Plante 1979b).
+            Identical printed coefficients for distinct systems; kept as printed.
         - locator:
             page: 23
             table: '2'
@@ -911,6 +922,11 @@ species:
           additional_coefficients_as_printed: ''
           comments_as_printed: Phase boundary composition slightly dependent on T. Data adjusted for constant
             K/O2. Plante (1979b).
+          reason: >-
+            source_internally_inconsistent: identical_coefficients_distinct_systems.
+            Printed Table 2 K2O-ZrO2 row: A=4.524 B=12873 (Plante 1977).[g].
+            Printed Table 2 K2O-Fe2O3 row: A=4.524 B=12873 (Plante 1979b).
+            Identical printed coefficients for distinct systems; kept as printed.
         - locator:
             page: 23
             table: '2'
