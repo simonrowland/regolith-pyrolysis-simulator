@@ -8,9 +8,27 @@ work:
   source_files:
     corpus_repo: regolith-corpus
     corpus_commit:
-      tag: unknown
-      reason: INDEX does not give corpus commit
+      tag: value
+      value: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
     files:
+    - asset_id: pdf:ta-shirai-2000-lpsc
+      role: pdf
+      path: raw/ta-shirai-2000-lpsc/ta-shirai-2000-lpsc.pdf
+      sha256:
+        tag: value
+        value: c156af42719bbc71a58893448664ae84fe65cbb2943d33a48b8e02efe54f84e8
+    - asset_id: pdftotext:ta-shirai-2000-lpsc
+      role: pdftotext
+      path: text/ta-shirai-2000-lpsc
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: tables:ta-shirai-2000-lpsc
+      role: table_csv
+      path: tables/ta-shirai-2000-lpsc
+      sha256:
+        tag: unknown
+        reason: INDEX does not give table sha256
     - asset_id: unknown:ta-shirai-2000-lpsc
       role: pdftotext
       path: unknown

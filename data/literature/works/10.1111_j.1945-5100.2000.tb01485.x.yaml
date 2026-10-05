@@ -8,9 +8,27 @@ work:
   source_files:
     corpus_repo: regolith-corpus
     corpus_commit:
-      tag: unknown
-      reason: INDEX does not give corpus commit
+      tag: value
+      value: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
     files:
+    - asset_id: pdf:busemann-2000-phase-q-noble-gases
+      role: pdf
+      path: raw/busemann-2000-phase-q-noble-gases/busemann-2000-phase-q-noble-gases.pdf
+      sha256:
+        tag: value
+        value: a39d24cb1febb73ef264532439d0e4d21ef15480be734b6a705a6214d122a854
+    - asset_id: pdftotext:busemann-2000-phase-q-noble-gases
+      role: pdftotext
+      path: text/busemann-2000-phase-q-noble-gases
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: tables:busemann-2000-phase-q-noble-gases
+      role: table_csv
+      path: tables/busemann-2000-phase-q-noble-gases
+      sha256:
+        tag: unknown
+        reason: INDEX does not give table sha256
     - asset_id: unknown:busemann-2000-phase-q-noble-gases
       role: pdftotext
       path: unknown

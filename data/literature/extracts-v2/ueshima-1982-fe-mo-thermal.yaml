@@ -90,7 +90,7 @@ observations:
     pdf_page_index: 3
     table: '2'
     note: row=A4 point of Fe; column=reference transition and ΔT
-  read_from: unknown:ueshima-1982-fe-mo-thermal
+  read_from: pdf:ueshima-1982-fe-mo-thermal
   point_conditions:
     temperature_K:
       state:
@@ -214,7 +214,7 @@ observations:
     pdf_page_index: 3
     table: '2'
     note: row=melting point of Fe; column=reference transition and ΔT
-  read_from: unknown:ueshima-1982-fe-mo-thermal
+  read_from: pdf:ueshima-1982-fe-mo-thermal
   point_conditions:
     temperature_K:
       state:
@@ -338,7 +338,7 @@ observations:
     pdf_page_index: 3
     table: '2'
     note: row=melting point of Pd; column=reference transition and ΔT
-  read_from: unknown:ueshima-1982-fe-mo-thermal
+  read_from: pdf:ueshima-1982-fe-mo-thermal
   point_conditions:
     temperature_K:
       state:
@@ -463,7 +463,7 @@ observations:
     pdf_page_index: 5
     table: '4'
     note: row=x1; heat 158; x_Mo=0.250; column=Tr (°C), reading 1
-  read_from: unknown:ueshima-1982-fe-mo-thermal
+  read_from: pdf:ueshima-1982-fe-mo-thermal
   point_conditions:
     temperature_K:
       state:
@@ -502,9 +502,9 @@ observations:
   derived_from:
   - ueshima-1982-fe-mo-thermal::ueshima_1982_table2_pd_melting_standard
   derivation:
-    relation: celsius_to_kelvin
+    relation: author Eq. (4)-(8) temperature reduction from 56Fe ion-intensity transition and adopted Pd ΔT correction
     inputs:
-    - unknown:ueshima-1982-fe-mo-thermal
+    - ueshima-1982-fe-mo-thermal::ueshima_1982_table2_pd_melting_standard
     parameters:
     - - original
       - state:
@@ -515,6 +515,31 @@ observations:
           pdf_page_index: 5
           table: '4'
           note: row=x1; heat 158; x_Mo=0.250; column=Tr (°C), reading 1
+        inference:
+          relation: celsius_to_kelvin
+          inputs:
+          - T_K = T_C + 273.15
+          - original_unit=C
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '1323.1'
+              locator:
+                published_page: 2573
+                pdf_page_index: 5
+                table: '4'
+                note: row=x1; heat 158; x_Mo=0.250; column=Tr (°C), reading 1
+          - - factor
+            - state:
+                tag: value
+                value: '273.15'
+              locator:
+                published_page: 2573
+                pdf_page_index: 5
+                table: '4'
+                note: row=x1; heat 158; x_Mo=0.250; column=Tr (°C), reading 1
+          output_unit: K
     - - factor
       - state:
           tag: value
@@ -614,7 +639,7 @@ observations:
     pdf_page_index: 5
     table: '4'
     note: row=x1; heat 156; x_Mo=0.340; column=Tr (°C), reading 1
-  read_from: unknown:ueshima-1982-fe-mo-thermal
+  read_from: pdf:ueshima-1982-fe-mo-thermal
   point_conditions:
     temperature_K:
       state:
@@ -653,9 +678,9 @@ observations:
   derived_from:
   - ueshima-1982-fe-mo-thermal::ueshima_1982_table2_pd_melting_standard
   derivation:
-    relation: celsius_to_kelvin
+    relation: author Eq. (4)-(8) temperature reduction from 56Fe ion-intensity transition and adopted Pd ΔT correction
     inputs:
-    - unknown:ueshima-1982-fe-mo-thermal
+    - ueshima-1982-fe-mo-thermal::ueshima_1982_table2_pd_melting_standard
     parameters:
     - - original
       - state:
@@ -666,6 +691,31 @@ observations:
           pdf_page_index: 5
           table: '4'
           note: row=x1; heat 156; x_Mo=0.340; column=Tr (°C), reading 1
+        inference:
+          relation: celsius_to_kelvin
+          inputs:
+          - T_K = T_C + 273.15
+          - original_unit=C
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '1329.6'
+              locator:
+                published_page: 2573
+                pdf_page_index: 5
+                table: '4'
+                note: row=x1; heat 156; x_Mo=0.340; column=Tr (°C), reading 1
+          - - factor
+            - state:
+                tag: value
+                value: '273.15'
+              locator:
+                published_page: 2573
+                pdf_page_index: 5
+                table: '4'
+                note: row=x1; heat 156; x_Mo=0.340; column=Tr (°C), reading 1
+          output_unit: K
     - - factor
       - state:
           tag: value
@@ -765,7 +815,7 @@ observations:
     pdf_page_index: 5
     table: '4'
     note: row=x1; heat 13; x_Mo=0.430; column=Tr (°C), reading 1
-  read_from: unknown:ueshima-1982-fe-mo-thermal
+  read_from: pdf:ueshima-1982-fe-mo-thermal
   point_conditions:
     temperature_K:
       state:
@@ -804,9 +854,9 @@ observations:
   derived_from:
   - ueshima-1982-fe-mo-thermal::ueshima_1982_table2_pd_melting_standard
   derivation:
-    relation: celsius_to_kelvin
+    relation: author Eq. (4)-(8) temperature reduction from 56Fe ion-intensity transition and adopted Pd ΔT correction
     inputs:
-    - unknown:ueshima-1982-fe-mo-thermal
+    - ueshima-1982-fe-mo-thermal::ueshima_1982_table2_pd_melting_standard
     parameters:
     - - original
       - state:
@@ -817,6 +867,31 @@ observations:
           pdf_page_index: 5
           table: '4'
           note: row=x1; heat 13; x_Mo=0.430; column=Tr (°C), reading 1
+        inference:
+          relation: celsius_to_kelvin
+          inputs:
+          - T_K = T_C + 273.15
+          - original_unit=C
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '1332.4'
+              locator:
+                published_page: 2573
+                pdf_page_index: 5
+                table: '4'
+                note: row=x1; heat 13; x_Mo=0.430; column=Tr (°C), reading 1
+          - - factor
+            - state:
+                tag: value
+                value: '273.15'
+              locator:
+                published_page: 2573
+                pdf_page_index: 5
+                table: '4'
+                note: row=x1; heat 13; x_Mo=0.430; column=Tr (°C), reading 1
+          output_unit: K
     - - factor
       - state:
           tag: value
@@ -916,7 +991,7 @@ observations:
     pdf_page_index: 5
     table: '4'
     note: row=x2; heat 151; x_Mo=0.339; column=Tr (°C), reading 1
-  read_from: unknown:ueshima-1982-fe-mo-thermal
+  read_from: pdf:ueshima-1982-fe-mo-thermal
   point_conditions:
     temperature_K:
       state:
@@ -955,9 +1030,9 @@ observations:
   derived_from:
   - ueshima-1982-fe-mo-thermal::ueshima_1982_table2_pd_melting_standard
   derivation:
-    relation: celsius_to_kelvin
+    relation: author Eq. (4)-(8) temperature reduction from 56Fe ion-intensity transition and adopted Pd ΔT correction
     inputs:
-    - unknown:ueshima-1982-fe-mo-thermal
+    - ueshima-1982-fe-mo-thermal::ueshima_1982_table2_pd_melting_standard
     parameters:
     - - original
       - state:
@@ -968,6 +1043,31 @@ observations:
           pdf_page_index: 5
           table: '4'
           note: row=x2; heat 151; x_Mo=0.339; column=Tr (°C), reading 1
+        inference:
+          relation: celsius_to_kelvin
+          inputs:
+          - T_K = T_C + 273.15
+          - original_unit=C
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '1335.8'
+              locator:
+                published_page: 2573
+                pdf_page_index: 5
+                table: '4'
+                note: row=x2; heat 151; x_Mo=0.339; column=Tr (°C), reading 1
+          - - factor
+            - state:
+                tag: value
+                value: '273.15'
+              locator:
+                published_page: 2573
+                pdf_page_index: 5
+                table: '4'
+                note: row=x2; heat 151; x_Mo=0.339; column=Tr (°C), reading 1
+          output_unit: K
     - - factor
       - state:
           tag: value
@@ -1067,7 +1167,7 @@ observations:
     pdf_page_index: 5
     table: '4'
     note: row=x1; heat 13; x_Mo=0.430; column=Tr (°C), reading 2
-  read_from: unknown:ueshima-1982-fe-mo-thermal
+  read_from: pdf:ueshima-1982-fe-mo-thermal
   point_conditions:
     temperature_K:
       state:
@@ -1106,9 +1206,9 @@ observations:
   derived_from:
   - ueshima-1982-fe-mo-thermal::ueshima_1982_table2_pd_melting_standard
   derivation:
-    relation: celsius_to_kelvin
+    relation: author Eq. (4)-(8) temperature reduction from 56Fe ion-intensity transition and adopted Pd ΔT correction
     inputs:
-    - unknown:ueshima-1982-fe-mo-thermal
+    - ueshima-1982-fe-mo-thermal::ueshima_1982_table2_pd_melting_standard
     parameters:
     - - original
       - state:
@@ -1119,6 +1219,31 @@ observations:
           pdf_page_index: 5
           table: '4'
           note: row=x1; heat 13; x_Mo=0.430; column=Tr (°C), reading 2
+        inference:
+          relation: celsius_to_kelvin
+          inputs:
+          - T_K = T_C + 273.15
+          - original_unit=C
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '1336.8'
+              locator:
+                published_page: 2573
+                pdf_page_index: 5
+                table: '4'
+                note: row=x1; heat 13; x_Mo=0.430; column=Tr (°C), reading 2
+          - - factor
+            - state:
+                tag: value
+                value: '273.15'
+              locator:
+                published_page: 2573
+                pdf_page_index: 5
+                table: '4'
+                note: row=x1; heat 13; x_Mo=0.430; column=Tr (°C), reading 2
+          output_unit: K
     - - factor
       - state:
           tag: value
@@ -1218,7 +1343,7 @@ observations:
     pdf_page_index: 5
     table: '4'
     note: row=x1; heat 151; x_Mo=0.339; column=Tr (°C), reading 3
-  read_from: unknown:ueshima-1982-fe-mo-thermal
+  read_from: pdf:ueshima-1982-fe-mo-thermal
   point_conditions:
     temperature_K:
       state:
@@ -1257,9 +1382,9 @@ observations:
   derived_from:
   - ueshima-1982-fe-mo-thermal::ueshima_1982_table2_pd_melting_standard
   derivation:
-    relation: celsius_to_kelvin
+    relation: author Eq. (4)-(8) temperature reduction from 56Fe ion-intensity transition and adopted Pd ΔT correction
     inputs:
-    - unknown:ueshima-1982-fe-mo-thermal
+    - ueshima-1982-fe-mo-thermal::ueshima_1982_table2_pd_melting_standard
     parameters:
     - - original
       - state:
@@ -1270,6 +1395,31 @@ observations:
           pdf_page_index: 5
           table: '4'
           note: row=x1; heat 151; x_Mo=0.339; column=Tr (°C), reading 3
+        inference:
+          relation: celsius_to_kelvin
+          inputs:
+          - T_K = T_C + 273.15
+          - original_unit=C
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '1341.1'
+              locator:
+                published_page: 2573
+                pdf_page_index: 5
+                table: '4'
+                note: row=x1; heat 151; x_Mo=0.339; column=Tr (°C), reading 3
+          - - factor
+            - state:
+                tag: value
+                value: '273.15'
+              locator:
+                published_page: 2573
+                pdf_page_index: 5
+                table: '4'
+                note: row=x1; heat 151; x_Mo=0.339; column=Tr (°C), reading 3
+          output_unit: K
     - - factor
       - state:
           tag: value
@@ -1369,7 +1519,7 @@ observations:
     pdf_page_index: 5
     table: '4'
     note: row=x1; heat 151; x_Mo=0.339; column=Tr (°C), reading 2
-  read_from: unknown:ueshima-1982-fe-mo-thermal
+  read_from: pdf:ueshima-1982-fe-mo-thermal
   point_conditions:
     temperature_K:
       state:
@@ -1408,9 +1558,9 @@ observations:
   derived_from:
   - ueshima-1982-fe-mo-thermal::ueshima_1982_table2_pd_melting_standard
   derivation:
-    relation: celsius_to_kelvin
+    relation: author Eq. (4)-(8) temperature reduction from 56Fe ion-intensity transition and adopted Pd ΔT correction
     inputs:
-    - unknown:ueshima-1982-fe-mo-thermal
+    - ueshima-1982-fe-mo-thermal::ueshima_1982_table2_pd_melting_standard
     parameters:
     - - original
       - state:
@@ -1421,6 +1571,31 @@ observations:
           pdf_page_index: 5
           table: '4'
           note: row=x1; heat 151; x_Mo=0.339; column=Tr (°C), reading 2
+        inference:
+          relation: celsius_to_kelvin
+          inputs:
+          - T_K = T_C + 273.15
+          - original_unit=C
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '1341.3'
+              locator:
+                published_page: 2573
+                pdf_page_index: 5
+                table: '4'
+                note: row=x1; heat 151; x_Mo=0.339; column=Tr (°C), reading 2
+          - - factor
+            - state:
+                tag: value
+                value: '273.15'
+              locator:
+                published_page: 2573
+                pdf_page_index: 5
+                table: '4'
+                note: row=x1; heat 151; x_Mo=0.339; column=Tr (°C), reading 2
+          output_unit: K
     - - factor
       - state:
           tag: value
@@ -1520,7 +1695,7 @@ observations:
     pdf_page_index: 5
     table: '4'
     note: row=x1; heat 158; x_Mo=0.250; column=Tc (°C), reading 2
-  read_from: unknown:ueshima-1982-fe-mo-thermal
+  read_from: pdf:ueshima-1982-fe-mo-thermal
   point_conditions:
     temperature_K:
       state:
@@ -1559,9 +1734,9 @@ observations:
   derived_from:
   - ueshima-1982-fe-mo-thermal::ueshima_1982_table2_pd_melting_standard
   derivation:
-    relation: celsius_to_kelvin
+    relation: author Eq. (4)-(8) temperature reduction from 56Fe ion-intensity transition and adopted Pd ΔT correction
     inputs:
-    - unknown:ueshima-1982-fe-mo-thermal
+    - ueshima-1982-fe-mo-thermal::ueshima_1982_table2_pd_melting_standard
     parameters:
     - - original
       - state:
@@ -1572,6 +1747,31 @@ observations:
           pdf_page_index: 5
           table: '4'
           note: row=x1; heat 158; x_Mo=0.250; column=Tc (°C), reading 2
+        inference:
+          relation: celsius_to_kelvin
+          inputs:
+          - T_K = T_C + 273.15
+          - original_unit=C
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '1343.6'
+              locator:
+                published_page: 2573
+                pdf_page_index: 5
+                table: '4'
+                note: row=x1; heat 158; x_Mo=0.250; column=Tc (°C), reading 2
+          - - factor
+            - state:
+                tag: value
+                value: '273.15'
+              locator:
+                published_page: 2573
+                pdf_page_index: 5
+                table: '4'
+                note: row=x1; heat 158; x_Mo=0.250; column=Tc (°C), reading 2
+          output_unit: K
     - - factor
       - state:
           tag: value
@@ -1671,7 +1871,7 @@ observations:
     pdf_page_index: 5
     table: '4'
     note: row=x1; heat 158; x_Mo=0.250; column=Tc (°C), reading 1
-  read_from: unknown:ueshima-1982-fe-mo-thermal
+  read_from: pdf:ueshima-1982-fe-mo-thermal
   point_conditions:
     temperature_K:
       state:
@@ -1710,9 +1910,9 @@ observations:
   derived_from:
   - ueshima-1982-fe-mo-thermal::ueshima_1982_table2_pd_melting_standard
   derivation:
-    relation: celsius_to_kelvin
+    relation: author Eq. (4)-(8) temperature reduction from 56Fe ion-intensity transition and adopted Pd ΔT correction
     inputs:
-    - unknown:ueshima-1982-fe-mo-thermal
+    - ueshima-1982-fe-mo-thermal::ueshima_1982_table2_pd_melting_standard
     parameters:
     - - original
       - state:
@@ -1723,6 +1923,31 @@ observations:
           pdf_page_index: 5
           table: '4'
           note: row=x1; heat 158; x_Mo=0.250; column=Tc (°C), reading 1
+        inference:
+          relation: celsius_to_kelvin
+          inputs:
+          - T_K = T_C + 273.15
+          - original_unit=C
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '1346.3'
+              locator:
+                published_page: 2573
+                pdf_page_index: 5
+                table: '4'
+                note: row=x1; heat 158; x_Mo=0.250; column=Tc (°C), reading 1
+          - - factor
+            - state:
+                tag: value
+                value: '273.15'
+              locator:
+                published_page: 2573
+                pdf_page_index: 5
+                table: '4'
+                note: row=x1; heat 158; x_Mo=0.250; column=Tc (°C), reading 1
+          output_unit: K
     - - factor
       - state:
           tag: value
@@ -1822,7 +2047,7 @@ observations:
     pdf_page_index: 5
     table: '4'
     note: row=x2; heat 158; x_Mo=0.250; column=Tr (°C), reading 2
-  read_from: unknown:ueshima-1982-fe-mo-thermal
+  read_from: pdf:ueshima-1982-fe-mo-thermal
   point_conditions:
     temperature_K:
       state:
@@ -1861,9 +2086,9 @@ observations:
   derived_from:
   - ueshima-1982-fe-mo-thermal::ueshima_1982_table2_pd_melting_standard
   derivation:
-    relation: celsius_to_kelvin
+    relation: author Eq. (4)-(8) temperature reduction from 56Fe ion-intensity transition and adopted Pd ΔT correction
     inputs:
-    - unknown:ueshima-1982-fe-mo-thermal
+    - ueshima-1982-fe-mo-thermal::ueshima_1982_table2_pd_melting_standard
     parameters:
     - - original
       - state:
@@ -1874,6 +2099,31 @@ observations:
           pdf_page_index: 5
           table: '4'
           note: row=x2; heat 158; x_Mo=0.250; column=Tr (°C), reading 2
+        inference:
+          relation: celsius_to_kelvin
+          inputs:
+          - T_K = T_C + 273.15
+          - original_unit=C
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '1350.6'
+              locator:
+                published_page: 2573
+                pdf_page_index: 5
+                table: '4'
+                note: row=x2; heat 158; x_Mo=0.250; column=Tr (°C), reading 2
+          - - factor
+            - state:
+                tag: value
+                value: '273.15'
+              locator:
+                published_page: 2573
+                pdf_page_index: 5
+                table: '4'
+                note: row=x2; heat 158; x_Mo=0.250; column=Tr (°C), reading 2
+          output_unit: K
     - - factor
       - state:
           tag: value
@@ -1973,7 +2223,7 @@ observations:
     pdf_page_index: 5
     table: '4'
     note: row=x2; heat 158; x_Mo=0.250; column=Tr (°C), reading 1
-  read_from: unknown:ueshima-1982-fe-mo-thermal
+  read_from: pdf:ueshima-1982-fe-mo-thermal
   point_conditions:
     temperature_K:
       state:
@@ -2012,9 +2262,9 @@ observations:
   derived_from:
   - ueshima-1982-fe-mo-thermal::ueshima_1982_table2_pd_melting_standard
   derivation:
-    relation: celsius_to_kelvin
+    relation: author Eq. (4)-(8) temperature reduction from 56Fe ion-intensity transition and adopted Pd ΔT correction
     inputs:
-    - unknown:ueshima-1982-fe-mo-thermal
+    - ueshima-1982-fe-mo-thermal::ueshima_1982_table2_pd_melting_standard
     parameters:
     - - original
       - state:
@@ -2025,6 +2275,31 @@ observations:
           pdf_page_index: 5
           table: '4'
           note: row=x2; heat 158; x_Mo=0.250; column=Tr (°C), reading 1
+        inference:
+          relation: celsius_to_kelvin
+          inputs:
+          - T_K = T_C + 273.15
+          - original_unit=C
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '1355.1'
+              locator:
+                published_page: 2573
+                pdf_page_index: 5
+                table: '4'
+                note: row=x2; heat 158; x_Mo=0.250; column=Tr (°C), reading 1
+          - - factor
+            - state:
+                tag: value
+                value: '273.15'
+              locator:
+                published_page: 2573
+                pdf_page_index: 5
+                table: '4'
+                note: row=x2; heat 158; x_Mo=0.250; column=Tr (°C), reading 1
+          output_unit: K
     - - factor
       - state:
           tag: value
@@ -2124,7 +2399,7 @@ observations:
     pdf_page_index: 5
     table: '4'
     note: row=x1; heat 151; x_Mo=0.339; column=Tr (°C), reading 1
-  read_from: unknown:ueshima-1982-fe-mo-thermal
+  read_from: pdf:ueshima-1982-fe-mo-thermal
   point_conditions:
     temperature_K:
       state:
@@ -2163,9 +2438,9 @@ observations:
   derived_from:
   - ueshima-1982-fe-mo-thermal::ueshima_1982_table2_pd_melting_standard
   derivation:
-    relation: celsius_to_kelvin
+    relation: author Eq. (4)-(8) temperature reduction from 56Fe ion-intensity transition and adopted Pd ΔT correction
     inputs:
-    - unknown:ueshima-1982-fe-mo-thermal
+    - ueshima-1982-fe-mo-thermal::ueshima_1982_table2_pd_melting_standard
     parameters:
     - - original
       - state:
@@ -2176,6 +2451,31 @@ observations:
           pdf_page_index: 5
           table: '4'
           note: row=x1; heat 151; x_Mo=0.339; column=Tr (°C), reading 1
+        inference:
+          relation: celsius_to_kelvin
+          inputs:
+          - T_K = T_C + 273.15
+          - original_unit=C
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '1358.8'
+              locator:
+                published_page: 2573
+                pdf_page_index: 5
+                table: '4'
+                note: row=x1; heat 151; x_Mo=0.339; column=Tr (°C), reading 1
+          - - factor
+            - state:
+                tag: value
+                value: '273.15'
+              locator:
+                published_page: 2573
+                pdf_page_index: 5
+                table: '4'
+                note: row=x1; heat 151; x_Mo=0.339; column=Tr (°C), reading 1
+          output_unit: K
     - - factor
       - state:
           tag: value
@@ -2275,7 +2575,7 @@ observations:
     pdf_page_index: 5
     table: '4'
     note: row=x1; heat 13; x_Mo=0.430; column=Tc (°C), reading 2
-  read_from: unknown:ueshima-1982-fe-mo-thermal
+  read_from: pdf:ueshima-1982-fe-mo-thermal
   point_conditions:
     temperature_K:
       state:
@@ -2314,9 +2614,9 @@ observations:
   derived_from:
   - ueshima-1982-fe-mo-thermal::ueshima_1982_table2_pd_melting_standard
   derivation:
-    relation: celsius_to_kelvin
+    relation: author Eq. (4)-(8) temperature reduction from 56Fe ion-intensity transition and adopted Pd ΔT correction
     inputs:
-    - unknown:ueshima-1982-fe-mo-thermal
+    - ueshima-1982-fe-mo-thermal::ueshima_1982_table2_pd_melting_standard
     parameters:
     - - original
       - state:
@@ -2327,6 +2627,31 @@ observations:
           pdf_page_index: 5
           table: '4'
           note: row=x1; heat 13; x_Mo=0.430; column=Tc (°C), reading 2
+        inference:
+          relation: celsius_to_kelvin
+          inputs:
+          - T_K = T_C + 273.15
+          - original_unit=C
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '1361'
+              locator:
+                published_page: 2573
+                pdf_page_index: 5
+                table: '4'
+                note: row=x1; heat 13; x_Mo=0.430; column=Tc (°C), reading 2
+          - - factor
+            - state:
+                tag: value
+                value: '273.15'
+              locator:
+                published_page: 2573
+                pdf_page_index: 5
+                table: '4'
+                note: row=x1; heat 13; x_Mo=0.430; column=Tc (°C), reading 2
+          output_unit: K
     - - factor
       - state:
           tag: value
@@ -2426,7 +2751,7 @@ observations:
     pdf_page_index: 5
     table: '4'
     note: row=x1; heat 13; x_Mo=0.430; column=Tc (°C), reading 1
-  read_from: unknown:ueshima-1982-fe-mo-thermal
+  read_from: pdf:ueshima-1982-fe-mo-thermal
   point_conditions:
     temperature_K:
       state:
@@ -2465,9 +2790,9 @@ observations:
   derived_from:
   - ueshima-1982-fe-mo-thermal::ueshima_1982_table2_pd_melting_standard
   derivation:
-    relation: celsius_to_kelvin
+    relation: author Eq. (4)-(8) temperature reduction from 56Fe ion-intensity transition and adopted Pd ΔT correction
     inputs:
-    - unknown:ueshima-1982-fe-mo-thermal
+    - ueshima-1982-fe-mo-thermal::ueshima_1982_table2_pd_melting_standard
     parameters:
     - - original
       - state:
@@ -2478,6 +2803,31 @@ observations:
           pdf_page_index: 5
           table: '4'
           note: row=x1; heat 13; x_Mo=0.430; column=Tc (°C), reading 1
+        inference:
+          relation: celsius_to_kelvin
+          inputs:
+          - T_K = T_C + 273.15
+          - original_unit=C
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '1362.4'
+              locator:
+                published_page: 2573
+                pdf_page_index: 5
+                table: '4'
+                note: row=x1; heat 13; x_Mo=0.430; column=Tc (°C), reading 1
+          - - factor
+            - state:
+                tag: value
+                value: '273.15'
+              locator:
+                published_page: 2573
+                pdf_page_index: 5
+                table: '4'
+                note: row=x1; heat 13; x_Mo=0.430; column=Tc (°C), reading 1
+          output_unit: K
     - - factor
       - state:
           tag: value
@@ -2577,7 +2927,7 @@ observations:
     pdf_page_index: 5
     table: '4'
     note: row=x2; heat 156; x_Mo=0.340; column=Tr (°C), reading 1
-  read_from: unknown:ueshima-1982-fe-mo-thermal
+  read_from: pdf:ueshima-1982-fe-mo-thermal
   point_conditions:
     temperature_K:
       state:
@@ -2616,9 +2966,9 @@ observations:
   derived_from:
   - ueshima-1982-fe-mo-thermal::ueshima_1982_table2_pd_melting_standard
   derivation:
-    relation: celsius_to_kelvin
+    relation: author Eq. (4)-(8) temperature reduction from 56Fe ion-intensity transition and adopted Pd ΔT correction
     inputs:
-    - unknown:ueshima-1982-fe-mo-thermal
+    - ueshima-1982-fe-mo-thermal::ueshima_1982_table2_pd_melting_standard
     parameters:
     - - original
       - state:
@@ -2629,6 +2979,31 @@ observations:
           pdf_page_index: 5
           table: '4'
           note: row=x2; heat 156; x_Mo=0.340; column=Tr (°C), reading 1
+        inference:
+          relation: celsius_to_kelvin
+          inputs:
+          - T_K = T_C + 273.15
+          - original_unit=C
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '1365'
+              locator:
+                published_page: 2573
+                pdf_page_index: 5
+                table: '4'
+                note: row=x2; heat 156; x_Mo=0.340; column=Tr (°C), reading 1
+          - - factor
+            - state:
+                tag: value
+                value: '273.15'
+              locator:
+                published_page: 2573
+                pdf_page_index: 5
+                table: '4'
+                note: row=x2; heat 156; x_Mo=0.340; column=Tr (°C), reading 1
+          output_unit: K
     - - factor
       - state:
           tag: value
@@ -2728,7 +3103,7 @@ observations:
     pdf_page_index: 5
     table: '4'
     note: row=x2; heat 13; x_Mo=0.430; column=Tr (°C), reading 1
-  read_from: unknown:ueshima-1982-fe-mo-thermal
+  read_from: pdf:ueshima-1982-fe-mo-thermal
   point_conditions:
     temperature_K:
       state:
@@ -2767,9 +3142,9 @@ observations:
   derived_from:
   - ueshima-1982-fe-mo-thermal::ueshima_1982_table2_pd_melting_standard
   derivation:
-    relation: celsius_to_kelvin
+    relation: author Eq. (4)-(8) temperature reduction from 56Fe ion-intensity transition and adopted Pd ΔT correction
     inputs:
-    - unknown:ueshima-1982-fe-mo-thermal
+    - ueshima-1982-fe-mo-thermal::ueshima_1982_table2_pd_melting_standard
     parameters:
     - - original
       - state:
@@ -2780,6 +3155,31 @@ observations:
           pdf_page_index: 5
           table: '4'
           note: row=x2; heat 13; x_Mo=0.430; column=Tr (°C), reading 1
+        inference:
+          relation: celsius_to_kelvin
+          inputs:
+          - T_K = T_C + 273.15
+          - original_unit=C
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '1374'
+              locator:
+                published_page: 2573
+                pdf_page_index: 5
+                table: '4'
+                note: row=x2; heat 13; x_Mo=0.430; column=Tr (°C), reading 1
+          - - factor
+            - state:
+                tag: value
+                value: '273.15'
+              locator:
+                published_page: 2573
+                pdf_page_index: 5
+                table: '4'
+                note: row=x2; heat 13; x_Mo=0.430; column=Tr (°C), reading 1
+          output_unit: K
     - - factor
       - state:
           tag: value
@@ -2879,7 +3279,7 @@ observations:
     pdf_page_index: 5
     table: '4'
     note: row=x1; heat 151; x_Mo=0.339; column=Tc (°C), reading 1
-  read_from: unknown:ueshima-1982-fe-mo-thermal
+  read_from: pdf:ueshima-1982-fe-mo-thermal
   point_conditions:
     temperature_K:
       state:
@@ -2918,9 +3318,9 @@ observations:
   derived_from:
   - ueshima-1982-fe-mo-thermal::ueshima_1982_table2_pd_melting_standard
   derivation:
-    relation: celsius_to_kelvin
+    relation: author Eq. (4)-(8) temperature reduction from 56Fe ion-intensity transition and adopted Pd ΔT correction
     inputs:
-    - unknown:ueshima-1982-fe-mo-thermal
+    - ueshima-1982-fe-mo-thermal::ueshima_1982_table2_pd_melting_standard
     parameters:
     - - original
       - state:
@@ -2931,6 +3331,31 @@ observations:
           pdf_page_index: 5
           table: '4'
           note: row=x1; heat 151; x_Mo=0.339; column=Tc (°C), reading 1
+        inference:
+          relation: celsius_to_kelvin
+          inputs:
+          - T_K = T_C + 273.15
+          - original_unit=C
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '1374.3'
+              locator:
+                published_page: 2573
+                pdf_page_index: 5
+                table: '4'
+                note: row=x1; heat 151; x_Mo=0.339; column=Tc (°C), reading 1
+          - - factor
+            - state:
+                tag: value
+                value: '273.15'
+              locator:
+                published_page: 2573
+                pdf_page_index: 5
+                table: '4'
+                note: row=x1; heat 151; x_Mo=0.339; column=Tc (°C), reading 1
+          output_unit: K
     - - factor
       - state:
           tag: value
@@ -3030,7 +3455,7 @@ observations:
     pdf_page_index: 5
     table: '4'
     note: row=x2; heat 151; x_Mo=0.339; column=Tr (°C), reading 3
-  read_from: unknown:ueshima-1982-fe-mo-thermal
+  read_from: pdf:ueshima-1982-fe-mo-thermal
   point_conditions:
     temperature_K:
       state:
@@ -3069,9 +3494,9 @@ observations:
   derived_from:
   - ueshima-1982-fe-mo-thermal::ueshima_1982_table2_pd_melting_standard
   derivation:
-    relation: celsius_to_kelvin
+    relation: author Eq. (4)-(8) temperature reduction from 56Fe ion-intensity transition and adopted Pd ΔT correction
     inputs:
-    - unknown:ueshima-1982-fe-mo-thermal
+    - ueshima-1982-fe-mo-thermal::ueshima_1982_table2_pd_melting_standard
     parameters:
     - - original
       - state:
@@ -3082,6 +3507,31 @@ observations:
           pdf_page_index: 5
           table: '4'
           note: row=x2; heat 151; x_Mo=0.339; column=Tr (°C), reading 3
+        inference:
+          relation: celsius_to_kelvin
+          inputs:
+          - T_K = T_C + 273.15
+          - original_unit=C
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '1374.3'
+              locator:
+                published_page: 2573
+                pdf_page_index: 5
+                table: '4'
+                note: row=x2; heat 151; x_Mo=0.339; column=Tr (°C), reading 3
+          - - factor
+            - state:
+                tag: value
+                value: '273.15'
+              locator:
+                published_page: 2573
+                pdf_page_index: 5
+                table: '4'
+                note: row=x2; heat 151; x_Mo=0.339; column=Tr (°C), reading 3
+          output_unit: K
     - - factor
       - state:
           tag: value
@@ -3181,7 +3631,7 @@ observations:
     pdf_page_index: 5
     table: '4'
     note: row=x1; heat 156; x_Mo=0.340; column=Tc (°C), reading 1
-  read_from: unknown:ueshima-1982-fe-mo-thermal
+  read_from: pdf:ueshima-1982-fe-mo-thermal
   point_conditions:
     temperature_K:
       state:
@@ -3220,9 +3670,9 @@ observations:
   derived_from:
   - ueshima-1982-fe-mo-thermal::ueshima_1982_table2_pd_melting_standard
   derivation:
-    relation: celsius_to_kelvin
+    relation: author Eq. (4)-(8) temperature reduction from 56Fe ion-intensity transition and adopted Pd ΔT correction
     inputs:
-    - unknown:ueshima-1982-fe-mo-thermal
+    - ueshima-1982-fe-mo-thermal::ueshima_1982_table2_pd_melting_standard
     parameters:
     - - original
       - state:
@@ -3233,6 +3683,31 @@ observations:
           pdf_page_index: 5
           table: '4'
           note: row=x1; heat 156; x_Mo=0.340; column=Tc (°C), reading 1
+        inference:
+          relation: celsius_to_kelvin
+          inputs:
+          - T_K = T_C + 273.15
+          - original_unit=C
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '1374.4'
+              locator:
+                published_page: 2573
+                pdf_page_index: 5
+                table: '4'
+                note: row=x1; heat 156; x_Mo=0.340; column=Tc (°C), reading 1
+          - - factor
+            - state:
+                tag: value
+                value: '273.15'
+              locator:
+                published_page: 2573
+                pdf_page_index: 5
+                table: '4'
+                note: row=x1; heat 156; x_Mo=0.340; column=Tc (°C), reading 1
+          output_unit: K
     - - factor
       - state:
           tag: value
@@ -3332,7 +3807,7 @@ observations:
     pdf_page_index: 5
     table: '4'
     note: row=x2; heat 148; x_Mo=0.427; column=Tr (°C), reading 1
-  read_from: unknown:ueshima-1982-fe-mo-thermal
+  read_from: pdf:ueshima-1982-fe-mo-thermal
   point_conditions:
     temperature_K:
       state:
@@ -3371,9 +3846,9 @@ observations:
   derived_from:
   - ueshima-1982-fe-mo-thermal::ueshima_1982_table2_pd_melting_standard
   derivation:
-    relation: celsius_to_kelvin
+    relation: author Eq. (4)-(8) temperature reduction from 56Fe ion-intensity transition and adopted Pd ΔT correction
     inputs:
-    - unknown:ueshima-1982-fe-mo-thermal
+    - ueshima-1982-fe-mo-thermal::ueshima_1982_table2_pd_melting_standard
     parameters:
     - - original
       - state:
@@ -3384,6 +3859,31 @@ observations:
           pdf_page_index: 5
           table: '4'
           note: row=x2; heat 148; x_Mo=0.427; column=Tr (°C), reading 1
+        inference:
+          relation: celsius_to_kelvin
+          inputs:
+          - T_K = T_C + 273.15
+          - original_unit=C
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '1375'
+              locator:
+                published_page: 2573
+                pdf_page_index: 5
+                table: '4'
+                note: row=x2; heat 148; x_Mo=0.427; column=Tr (°C), reading 1
+          - - factor
+            - state:
+                tag: value
+                value: '273.15'
+              locator:
+                published_page: 2573
+                pdf_page_index: 5
+                table: '4'
+                note: row=x2; heat 148; x_Mo=0.427; column=Tr (°C), reading 1
+          output_unit: K
     - - factor
       - state:
           tag: value
@@ -3483,7 +3983,7 @@ observations:
     pdf_page_index: 5
     table: '4'
     note: row=x2; heat 151; x_Mo=0.339; column=Tr (°C), reading 2
-  read_from: unknown:ueshima-1982-fe-mo-thermal
+  read_from: pdf:ueshima-1982-fe-mo-thermal
   point_conditions:
     temperature_K:
       state:
@@ -3522,9 +4022,9 @@ observations:
   derived_from:
   - ueshima-1982-fe-mo-thermal::ueshima_1982_table2_pd_melting_standard
   derivation:
-    relation: celsius_to_kelvin
+    relation: author Eq. (4)-(8) temperature reduction from 56Fe ion-intensity transition and adopted Pd ΔT correction
     inputs:
-    - unknown:ueshima-1982-fe-mo-thermal
+    - ueshima-1982-fe-mo-thermal::ueshima_1982_table2_pd_melting_standard
     parameters:
     - - original
       - state:
@@ -3535,6 +4035,31 @@ observations:
           pdf_page_index: 5
           table: '4'
           note: row=x2; heat 151; x_Mo=0.339; column=Tr (°C), reading 2
+        inference:
+          relation: celsius_to_kelvin
+          inputs:
+          - T_K = T_C + 273.15
+          - original_unit=C
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '1375.6'
+              locator:
+                published_page: 2573
+                pdf_page_index: 5
+                table: '4'
+                note: row=x2; heat 151; x_Mo=0.339; column=Tr (°C), reading 2
+          - - factor
+            - state:
+                tag: value
+                value: '273.15'
+              locator:
+                published_page: 2573
+                pdf_page_index: 5
+                table: '4'
+                note: row=x2; heat 151; x_Mo=0.339; column=Tr (°C), reading 2
+          output_unit: K
     - - factor
       - state:
           tag: value
@@ -3634,7 +4159,7 @@ observations:
     pdf_page_index: 5
     table: '4'
     note: row=x2; heat 13; x_Mo=0.430; column=Tr (°C), reading 2
-  read_from: unknown:ueshima-1982-fe-mo-thermal
+  read_from: pdf:ueshima-1982-fe-mo-thermal
   point_conditions:
     temperature_K:
       state:
@@ -3673,9 +4198,9 @@ observations:
   derived_from:
   - ueshima-1982-fe-mo-thermal::ueshima_1982_table2_pd_melting_standard
   derivation:
-    relation: celsius_to_kelvin
+    relation: author Eq. (4)-(8) temperature reduction from 56Fe ion-intensity transition and adopted Pd ΔT correction
     inputs:
-    - unknown:ueshima-1982-fe-mo-thermal
+    - ueshima-1982-fe-mo-thermal::ueshima_1982_table2_pd_melting_standard
     parameters:
     - - original
       - state:
@@ -3686,6 +4211,31 @@ observations:
           pdf_page_index: 5
           table: '4'
           note: row=x2; heat 13; x_Mo=0.430; column=Tr (°C), reading 2
+        inference:
+          relation: celsius_to_kelvin
+          inputs:
+          - T_K = T_C + 273.15
+          - original_unit=C
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '1378.7'
+              locator:
+                published_page: 2573
+                pdf_page_index: 5
+                table: '4'
+                note: row=x2; heat 13; x_Mo=0.430; column=Tr (°C), reading 2
+          - - factor
+            - state:
+                tag: value
+                value: '273.15'
+              locator:
+                published_page: 2573
+                pdf_page_index: 5
+                table: '4'
+                note: row=x2; heat 13; x_Mo=0.430; column=Tr (°C), reading 2
+          output_unit: K
     - - factor
       - state:
           tag: value
@@ -3785,7 +4335,7 @@ observations:
     pdf_page_index: 5
     table: '4'
     note: row=x2; heat 148; x_Mo=0.427; column=Tc (°C), reading 1
-  read_from: unknown:ueshima-1982-fe-mo-thermal
+  read_from: pdf:ueshima-1982-fe-mo-thermal
   point_conditions:
     temperature_K:
       state:
@@ -3824,9 +4374,9 @@ observations:
   derived_from:
   - ueshima-1982-fe-mo-thermal::ueshima_1982_table2_pd_melting_standard
   derivation:
-    relation: celsius_to_kelvin
+    relation: author Eq. (4)-(8) temperature reduction from 56Fe ion-intensity transition and adopted Pd ΔT correction
     inputs:
-    - unknown:ueshima-1982-fe-mo-thermal
+    - ueshima-1982-fe-mo-thermal::ueshima_1982_table2_pd_melting_standard
     parameters:
     - - original
       - state:
@@ -3837,6 +4387,31 @@ observations:
           pdf_page_index: 5
           table: '4'
           note: row=x2; heat 148; x_Mo=0.427; column=Tc (°C), reading 1
+        inference:
+          relation: celsius_to_kelvin
+          inputs:
+          - T_K = T_C + 273.15
+          - original_unit=C
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '1383'
+              locator:
+                published_page: 2573
+                pdf_page_index: 5
+                table: '4'
+                note: row=x2; heat 148; x_Mo=0.427; column=Tc (°C), reading 1
+          - - factor
+            - state:
+                tag: value
+                value: '273.15'
+              locator:
+                published_page: 2573
+                pdf_page_index: 5
+                table: '4'
+                note: row=x2; heat 148; x_Mo=0.427; column=Tc (°C), reading 1
+          output_unit: K
     - - factor
       - state:
           tag: value
@@ -3936,7 +4511,7 @@ observations:
     pdf_page_index: 5
     table: '4'
     note: row=x2; heat 151; x_Mo=0.339; column=Tc (°C), reading 1
-  read_from: unknown:ueshima-1982-fe-mo-thermal
+  read_from: pdf:ueshima-1982-fe-mo-thermal
   point_conditions:
     temperature_K:
       state:
@@ -3975,9 +4550,9 @@ observations:
   derived_from:
   - ueshima-1982-fe-mo-thermal::ueshima_1982_table2_pd_melting_standard
   derivation:
-    relation: celsius_to_kelvin
+    relation: author Eq. (4)-(8) temperature reduction from 56Fe ion-intensity transition and adopted Pd ΔT correction
     inputs:
-    - unknown:ueshima-1982-fe-mo-thermal
+    - ueshima-1982-fe-mo-thermal::ueshima_1982_table2_pd_melting_standard
     parameters:
     - - original
       - state:
@@ -3988,6 +4563,31 @@ observations:
           pdf_page_index: 5
           table: '4'
           note: row=x2; heat 151; x_Mo=0.339; column=Tc (°C), reading 1
+        inference:
+          relation: celsius_to_kelvin
+          inputs:
+          - T_K = T_C + 273.15
+          - original_unit=C
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '1387.5'
+              locator:
+                published_page: 2573
+                pdf_page_index: 5
+                table: '4'
+                note: row=x2; heat 151; x_Mo=0.339; column=Tc (°C), reading 1
+          - - factor
+            - state:
+                tag: value
+                value: '273.15'
+              locator:
+                published_page: 2573
+                pdf_page_index: 5
+                table: '4'
+                note: row=x2; heat 151; x_Mo=0.339; column=Tc (°C), reading 1
+          output_unit: K
     - - factor
       - state:
           tag: value
@@ -4087,7 +4687,7 @@ observations:
     pdf_page_index: 5
     table: '4'
     note: row=x2; heat 151; x_Mo=0.339; column=Tc (°C), reading 2
-  read_from: unknown:ueshima-1982-fe-mo-thermal
+  read_from: pdf:ueshima-1982-fe-mo-thermal
   point_conditions:
     temperature_K:
       state:
@@ -4126,9 +4726,9 @@ observations:
   derived_from:
   - ueshima-1982-fe-mo-thermal::ueshima_1982_table2_pd_melting_standard
   derivation:
-    relation: celsius_to_kelvin
+    relation: author Eq. (4)-(8) temperature reduction from 56Fe ion-intensity transition and adopted Pd ΔT correction
     inputs:
-    - unknown:ueshima-1982-fe-mo-thermal
+    - ueshima-1982-fe-mo-thermal::ueshima_1982_table2_pd_melting_standard
     parameters:
     - - original
       - state:
@@ -4139,6 +4739,31 @@ observations:
           pdf_page_index: 5
           table: '4'
           note: row=x2; heat 151; x_Mo=0.339; column=Tc (°C), reading 2
+        inference:
+          relation: celsius_to_kelvin
+          inputs:
+          - T_K = T_C + 273.15
+          - original_unit=C
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '1388.7'
+              locator:
+                published_page: 2573
+                pdf_page_index: 5
+                table: '4'
+                note: row=x2; heat 151; x_Mo=0.339; column=Tc (°C), reading 2
+          - - factor
+            - state:
+                tag: value
+                value: '273.15'
+              locator:
+                published_page: 2573
+                pdf_page_index: 5
+                table: '4'
+                note: row=x2; heat 151; x_Mo=0.339; column=Tc (°C), reading 2
+          output_unit: K
     - - factor
       - state:
           tag: value
@@ -4238,7 +4863,7 @@ observations:
     pdf_page_index: 5
     table: '4'
     note: row=x2; heat 158; x_Mo=0.250; column=Tc (°C), reading 1
-  read_from: unknown:ueshima-1982-fe-mo-thermal
+  read_from: pdf:ueshima-1982-fe-mo-thermal
   point_conditions:
     temperature_K:
       state:
@@ -4277,9 +4902,9 @@ observations:
   derived_from:
   - ueshima-1982-fe-mo-thermal::ueshima_1982_table2_pd_melting_standard
   derivation:
-    relation: celsius_to_kelvin
+    relation: author Eq. (4)-(8) temperature reduction from 56Fe ion-intensity transition and adopted Pd ΔT correction
     inputs:
-    - unknown:ueshima-1982-fe-mo-thermal
+    - ueshima-1982-fe-mo-thermal::ueshima_1982_table2_pd_melting_standard
     parameters:
     - - original
       - state:
@@ -4290,6 +4915,31 @@ observations:
           pdf_page_index: 5
           table: '4'
           note: row=x2; heat 158; x_Mo=0.250; column=Tc (°C), reading 1
+        inference:
+          relation: celsius_to_kelvin
+          inputs:
+          - T_K = T_C + 273.15
+          - original_unit=C
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '1390.9'
+              locator:
+                published_page: 2573
+                pdf_page_index: 5
+                table: '4'
+                note: row=x2; heat 158; x_Mo=0.250; column=Tc (°C), reading 1
+          - - factor
+            - state:
+                tag: value
+                value: '273.15'
+              locator:
+                published_page: 2573
+                pdf_page_index: 5
+                table: '4'
+                note: row=x2; heat 158; x_Mo=0.250; column=Tc (°C), reading 1
+          output_unit: K
     - - factor
       - state:
           tag: value
@@ -4389,7 +5039,7 @@ observations:
     pdf_page_index: 5
     table: '4'
     note: row=x2; heat 156; x_Mo=0.340; column=Tc (°C), reading 1
-  read_from: unknown:ueshima-1982-fe-mo-thermal
+  read_from: pdf:ueshima-1982-fe-mo-thermal
   point_conditions:
     temperature_K:
       state:
@@ -4428,9 +5078,9 @@ observations:
   derived_from:
   - ueshima-1982-fe-mo-thermal::ueshima_1982_table2_pd_melting_standard
   derivation:
-    relation: celsius_to_kelvin
+    relation: author Eq. (4)-(8) temperature reduction from 56Fe ion-intensity transition and adopted Pd ΔT correction
     inputs:
-    - unknown:ueshima-1982-fe-mo-thermal
+    - ueshima-1982-fe-mo-thermal::ueshima_1982_table2_pd_melting_standard
     parameters:
     - - original
       - state:
@@ -4441,6 +5091,31 @@ observations:
           pdf_page_index: 5
           table: '4'
           note: row=x2; heat 156; x_Mo=0.340; column=Tc (°C), reading 1
+        inference:
+          relation: celsius_to_kelvin
+          inputs:
+          - T_K = T_C + 273.15
+          - original_unit=C
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '1391.6'
+              locator:
+                published_page: 2573
+                pdf_page_index: 5
+                table: '4'
+                note: row=x2; heat 156; x_Mo=0.340; column=Tc (°C), reading 1
+          - - factor
+            - state:
+                tag: value
+                value: '273.15'
+              locator:
+                published_page: 2573
+                pdf_page_index: 5
+                table: '4'
+                note: row=x2; heat 156; x_Mo=0.340; column=Tc (°C), reading 1
+          output_unit: K
     - - factor
       - state:
           tag: value
@@ -4540,7 +5215,7 @@ observations:
     pdf_page_index: 5
     table: '4'
     note: row=x2; heat 13; x_Mo=0.430; column=Tc (°C), reading 1
-  read_from: unknown:ueshima-1982-fe-mo-thermal
+  read_from: pdf:ueshima-1982-fe-mo-thermal
   point_conditions:
     temperature_K:
       state:
@@ -4579,9 +5254,9 @@ observations:
   derived_from:
   - ueshima-1982-fe-mo-thermal::ueshima_1982_table2_pd_melting_standard
   derivation:
-    relation: celsius_to_kelvin
+    relation: author Eq. (4)-(8) temperature reduction from 56Fe ion-intensity transition and adopted Pd ΔT correction
     inputs:
-    - unknown:ueshima-1982-fe-mo-thermal
+    - ueshima-1982-fe-mo-thermal::ueshima_1982_table2_pd_melting_standard
     parameters:
     - - original
       - state:
@@ -4592,6 +5267,31 @@ observations:
           pdf_page_index: 5
           table: '4'
           note: row=x2; heat 13; x_Mo=0.430; column=Tc (°C), reading 1
+        inference:
+          relation: celsius_to_kelvin
+          inputs:
+          - T_K = T_C + 273.15
+          - original_unit=C
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '1399'
+              locator:
+                published_page: 2573
+                pdf_page_index: 5
+                table: '4'
+                note: row=x2; heat 13; x_Mo=0.430; column=Tc (°C), reading 1
+          - - factor
+            - state:
+                tag: value
+                value: '273.15'
+              locator:
+                published_page: 2573
+                pdf_page_index: 5
+                table: '4'
+                note: row=x2; heat 13; x_Mo=0.430; column=Tc (°C), reading 1
+          output_unit: K
     - - factor
       - state:
           tag: value
@@ -4691,7 +5391,7 @@ observations:
     pdf_page_index: 5
     table: '4'
     note: row=x2; heat 158; x_Mo=0.250; column=Tc (°C), reading 2
-  read_from: unknown:ueshima-1982-fe-mo-thermal
+  read_from: pdf:ueshima-1982-fe-mo-thermal
   point_conditions:
     temperature_K:
       state:
@@ -4730,9 +5430,9 @@ observations:
   derived_from:
   - ueshima-1982-fe-mo-thermal::ueshima_1982_table2_pd_melting_standard
   derivation:
-    relation: celsius_to_kelvin
+    relation: author Eq. (4)-(8) temperature reduction from 56Fe ion-intensity transition and adopted Pd ΔT correction
     inputs:
-    - unknown:ueshima-1982-fe-mo-thermal
+    - ueshima-1982-fe-mo-thermal::ueshima_1982_table2_pd_melting_standard
     parameters:
     - - original
       - state:
@@ -4743,6 +5443,31 @@ observations:
           pdf_page_index: 5
           table: '4'
           note: row=x2; heat 158; x_Mo=0.250; column=Tc (°C), reading 2
+        inference:
+          relation: celsius_to_kelvin
+          inputs:
+          - T_K = T_C + 273.15
+          - original_unit=C
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '1399.9'
+              locator:
+                published_page: 2573
+                pdf_page_index: 5
+                table: '4'
+                note: row=x2; heat 158; x_Mo=0.250; column=Tc (°C), reading 2
+          - - factor
+            - state:
+                tag: value
+                value: '273.15'
+              locator:
+                published_page: 2573
+                pdf_page_index: 5
+                table: '4'
+                note: row=x2; heat 158; x_Mo=0.250; column=Tc (°C), reading 2
+          output_unit: K
     - - factor
       - state:
           tag: value
@@ -4842,7 +5567,7 @@ observations:
     pdf_page_index: 5
     table: '4'
     note: row=α = L + δ; heat 151; x_Mo=0.339; column=Tr (°C), reading 2
-  read_from: unknown:ueshima-1982-fe-mo-thermal
+  read_from: pdf:ueshima-1982-fe-mo-thermal
   point_conditions:
     temperature_K:
       state:
@@ -4881,9 +5606,9 @@ observations:
   derived_from:
   - ueshima-1982-fe-mo-thermal::ueshima_1982_table2_pd_melting_standard
   derivation:
-    relation: celsius_to_kelvin
+    relation: author Eq. (4)-(8) temperature reduction from 56Fe ion-intensity transition and adopted Pd ΔT correction
     inputs:
-    - unknown:ueshima-1982-fe-mo-thermal
+    - ueshima-1982-fe-mo-thermal::ueshima_1982_table2_pd_melting_standard
     parameters:
     - - original
       - state:
@@ -4894,6 +5619,31 @@ observations:
           pdf_page_index: 5
           table: '4'
           note: row=α = L + δ; heat 151; x_Mo=0.339; column=Tr (°C), reading 2
+        inference:
+          relation: celsius_to_kelvin
+          inputs:
+          - T_K = T_C + 273.15
+          - original_unit=C
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '1431.6'
+              locator:
+                published_page: 2573
+                pdf_page_index: 5
+                table: '4'
+                note: row=α = L + δ; heat 151; x_Mo=0.339; column=Tr (°C), reading 2
+          - - factor
+            - state:
+                tag: value
+                value: '273.15'
+              locator:
+                published_page: 2573
+                pdf_page_index: 5
+                table: '4'
+                note: row=α = L + δ; heat 151; x_Mo=0.339; column=Tr (°C), reading 2
+          output_unit: K
     - - factor
       - state:
           tag: value
@@ -4993,7 +5743,7 @@ observations:
     pdf_page_index: 5
     table: '4'
     note: row=α = L + δ; heat 151; x_Mo=0.339; column=Tr (°C), reading 1
-  read_from: unknown:ueshima-1982-fe-mo-thermal
+  read_from: pdf:ueshima-1982-fe-mo-thermal
   point_conditions:
     temperature_K:
       state:
@@ -5032,9 +5782,9 @@ observations:
   derived_from:
   - ueshima-1982-fe-mo-thermal::ueshima_1982_table2_pd_melting_standard
   derivation:
-    relation: celsius_to_kelvin
+    relation: author Eq. (4)-(8) temperature reduction from 56Fe ion-intensity transition and adopted Pd ΔT correction
     inputs:
-    - unknown:ueshima-1982-fe-mo-thermal
+    - ueshima-1982-fe-mo-thermal::ueshima_1982_table2_pd_melting_standard
     parameters:
     - - original
       - state:
@@ -5045,6 +5795,31 @@ observations:
           pdf_page_index: 5
           table: '4'
           note: row=α = L + δ; heat 151; x_Mo=0.339; column=Tr (°C), reading 1
+        inference:
+          relation: celsius_to_kelvin
+          inputs:
+          - T_K = T_C + 273.15
+          - original_unit=C
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '1445.1'
+              locator:
+                published_page: 2573
+                pdf_page_index: 5
+                table: '4'
+                note: row=α = L + δ; heat 151; x_Mo=0.339; column=Tr (°C), reading 1
+          - - factor
+            - state:
+                tag: value
+                value: '273.15'
+              locator:
+                published_page: 2573
+                pdf_page_index: 5
+                table: '4'
+                note: row=α = L + δ; heat 151; x_Mo=0.339; column=Tr (°C), reading 1
+          output_unit: K
     - - factor
       - state:
           tag: value
@@ -5144,7 +5919,7 @@ observations:
     pdf_page_index: 5
     table: '4'
     note: row=α = L + δ; heat 156; x_Mo=0.340; column=Tr (°C), reading 3
-  read_from: unknown:ueshima-1982-fe-mo-thermal
+  read_from: pdf:ueshima-1982-fe-mo-thermal
   point_conditions:
     temperature_K:
       state:
@@ -5183,9 +5958,9 @@ observations:
   derived_from:
   - ueshima-1982-fe-mo-thermal::ueshima_1982_table2_pd_melting_standard
   derivation:
-    relation: celsius_to_kelvin
+    relation: author Eq. (4)-(8) temperature reduction from 56Fe ion-intensity transition and adopted Pd ΔT correction
     inputs:
-    - unknown:ueshima-1982-fe-mo-thermal
+    - ueshima-1982-fe-mo-thermal::ueshima_1982_table2_pd_melting_standard
     parameters:
     - - original
       - state:
@@ -5196,6 +5971,31 @@ observations:
           pdf_page_index: 5
           table: '4'
           note: row=α = L + δ; heat 156; x_Mo=0.340; column=Tr (°C), reading 3
+        inference:
+          relation: celsius_to_kelvin
+          inputs:
+          - T_K = T_C + 273.15
+          - original_unit=C
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '1450.5'
+              locator:
+                published_page: 2573
+                pdf_page_index: 5
+                table: '4'
+                note: row=α = L + δ; heat 156; x_Mo=0.340; column=Tr (°C), reading 3
+          - - factor
+            - state:
+                tag: value
+                value: '273.15'
+              locator:
+                published_page: 2573
+                pdf_page_index: 5
+                table: '4'
+                note: row=α = L + δ; heat 156; x_Mo=0.340; column=Tr (°C), reading 3
+          output_unit: K
     - - factor
       - state:
           tag: value
@@ -5295,7 +6095,7 @@ observations:
     pdf_page_index: 5
     table: '4'
     note: row=α = L + δ; heat 156; x_Mo=0.340; column=Tr (°C), reading 2
-  read_from: unknown:ueshima-1982-fe-mo-thermal
+  read_from: pdf:ueshima-1982-fe-mo-thermal
   point_conditions:
     temperature_K:
       state:
@@ -5334,9 +6134,9 @@ observations:
   derived_from:
   - ueshima-1982-fe-mo-thermal::ueshima_1982_table2_pd_melting_standard
   derivation:
-    relation: celsius_to_kelvin
+    relation: author Eq. (4)-(8) temperature reduction from 56Fe ion-intensity transition and adopted Pd ΔT correction
     inputs:
-    - unknown:ueshima-1982-fe-mo-thermal
+    - ueshima-1982-fe-mo-thermal::ueshima_1982_table2_pd_melting_standard
     parameters:
     - - original
       - state:
@@ -5347,6 +6147,31 @@ observations:
           pdf_page_index: 5
           table: '4'
           note: row=α = L + δ; heat 156; x_Mo=0.340; column=Tr (°C), reading 2
+        inference:
+          relation: celsius_to_kelvin
+          inputs:
+          - T_K = T_C + 273.15
+          - original_unit=C
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '1450.7'
+              locator:
+                published_page: 2573
+                pdf_page_index: 5
+                table: '4'
+                note: row=α = L + δ; heat 156; x_Mo=0.340; column=Tr (°C), reading 2
+          - - factor
+            - state:
+                tag: value
+                value: '273.15'
+              locator:
+                published_page: 2573
+                pdf_page_index: 5
+                table: '4'
+                note: row=α = L + δ; heat 156; x_Mo=0.340; column=Tr (°C), reading 2
+          output_unit: K
     - - factor
       - state:
           tag: value
@@ -5446,7 +6271,7 @@ observations:
     pdf_page_index: 5
     table: '4'
     note: row=α = L + δ; heat 151; x_Mo=0.339; column=Tc (°C), reading 1
-  read_from: unknown:ueshima-1982-fe-mo-thermal
+  read_from: pdf:ueshima-1982-fe-mo-thermal
   point_conditions:
     temperature_K:
       state:
@@ -5485,9 +6310,9 @@ observations:
   derived_from:
   - ueshima-1982-fe-mo-thermal::ueshima_1982_table2_pd_melting_standard
   derivation:
-    relation: celsius_to_kelvin
+    relation: author Eq. (4)-(8) temperature reduction from 56Fe ion-intensity transition and adopted Pd ΔT correction
     inputs:
-    - unknown:ueshima-1982-fe-mo-thermal
+    - ueshima-1982-fe-mo-thermal::ueshima_1982_table2_pd_melting_standard
     parameters:
     - - original
       - state:
@@ -5498,6 +6323,31 @@ observations:
           pdf_page_index: 5
           table: '4'
           note: row=α = L + δ; heat 151; x_Mo=0.339; column=Tc (°C), reading 1
+        inference:
+          relation: celsius_to_kelvin
+          inputs:
+          - T_K = T_C + 273.15
+          - original_unit=C
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '1451.5'
+              locator:
+                published_page: 2573
+                pdf_page_index: 5
+                table: '4'
+                note: row=α = L + δ; heat 151; x_Mo=0.339; column=Tc (°C), reading 1
+          - - factor
+            - state:
+                tag: value
+                value: '273.15'
+              locator:
+                published_page: 2573
+                pdf_page_index: 5
+                table: '4'
+                note: row=α = L + δ; heat 151; x_Mo=0.339; column=Tc (°C), reading 1
+          output_unit: K
     - - factor
       - state:
           tag: value
@@ -5597,7 +6447,7 @@ observations:
     pdf_page_index: 5
     table: '4'
     note: row=α = L + δ; heat 156; x_Mo=0.340; column=Tr (°C), reading 1
-  read_from: unknown:ueshima-1982-fe-mo-thermal
+  read_from: pdf:ueshima-1982-fe-mo-thermal
   point_conditions:
     temperature_K:
       state:
@@ -5636,9 +6486,9 @@ observations:
   derived_from:
   - ueshima-1982-fe-mo-thermal::ueshima_1982_table2_pd_melting_standard
   derivation:
-    relation: celsius_to_kelvin
+    relation: author Eq. (4)-(8) temperature reduction from 56Fe ion-intensity transition and adopted Pd ΔT correction
     inputs:
-    - unknown:ueshima-1982-fe-mo-thermal
+    - ueshima-1982-fe-mo-thermal::ueshima_1982_table2_pd_melting_standard
     parameters:
     - - original
       - state:
@@ -5649,6 +6499,31 @@ observations:
           pdf_page_index: 5
           table: '4'
           note: row=α = L + δ; heat 156; x_Mo=0.340; column=Tr (°C), reading 1
+        inference:
+          relation: celsius_to_kelvin
+          inputs:
+          - T_K = T_C + 273.15
+          - original_unit=C
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '1452.7'
+              locator:
+                published_page: 2573
+                pdf_page_index: 5
+                table: '4'
+                note: row=α = L + δ; heat 156; x_Mo=0.340; column=Tr (°C), reading 1
+          - - factor
+            - state:
+                tag: value
+                value: '273.15'
+              locator:
+                published_page: 2573
+                pdf_page_index: 5
+                table: '4'
+                note: row=α = L + δ; heat 156; x_Mo=0.340; column=Tr (°C), reading 1
+          output_unit: K
     - - factor
       - state:
           tag: value
@@ -5748,7 +6623,7 @@ observations:
     pdf_page_index: 5
     table: '4'
     note: row=α = L + δ; heat 158; x_Mo=0.250; column=Tr (°C), reading 2
-  read_from: unknown:ueshima-1982-fe-mo-thermal
+  read_from: pdf:ueshima-1982-fe-mo-thermal
   point_conditions:
     temperature_K:
       state:
@@ -5787,9 +6662,9 @@ observations:
   derived_from:
   - ueshima-1982-fe-mo-thermal::ueshima_1982_table2_pd_melting_standard
   derivation:
-    relation: celsius_to_kelvin
+    relation: author Eq. (4)-(8) temperature reduction from 56Fe ion-intensity transition and adopted Pd ΔT correction
     inputs:
-    - unknown:ueshima-1982-fe-mo-thermal
+    - ueshima-1982-fe-mo-thermal::ueshima_1982_table2_pd_melting_standard
     parameters:
     - - original
       - state:
@@ -5800,6 +6675,31 @@ observations:
           pdf_page_index: 5
           table: '4'
           note: row=α = L + δ; heat 158; x_Mo=0.250; column=Tr (°C), reading 2
+        inference:
+          relation: celsius_to_kelvin
+          inputs:
+          - T_K = T_C + 273.15
+          - original_unit=C
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '1452.7'
+              locator:
+                published_page: 2573
+                pdf_page_index: 5
+                table: '4'
+                note: row=α = L + δ; heat 158; x_Mo=0.250; column=Tr (°C), reading 2
+          - - factor
+            - state:
+                tag: value
+                value: '273.15'
+              locator:
+                published_page: 2573
+                pdf_page_index: 5
+                table: '4'
+                note: row=α = L + δ; heat 158; x_Mo=0.250; column=Tr (°C), reading 2
+          output_unit: K
     - - factor
       - state:
           tag: value
@@ -5899,7 +6799,7 @@ observations:
     pdf_page_index: 5
     table: '4'
     note: row=α = L + δ; heat 156; x_Mo=0.340; column=Tc (°C), reading 1
-  read_from: unknown:ueshima-1982-fe-mo-thermal
+  read_from: pdf:ueshima-1982-fe-mo-thermal
   point_conditions:
     temperature_K:
       state:
@@ -5938,9 +6838,9 @@ observations:
   derived_from:
   - ueshima-1982-fe-mo-thermal::ueshima_1982_table2_pd_melting_standard
   derivation:
-    relation: celsius_to_kelvin
+    relation: author Eq. (4)-(8) temperature reduction from 56Fe ion-intensity transition and adopted Pd ΔT correction
     inputs:
-    - unknown:ueshima-1982-fe-mo-thermal
+    - ueshima-1982-fe-mo-thermal::ueshima_1982_table2_pd_melting_standard
     parameters:
     - - original
       - state:
@@ -5951,6 +6851,31 @@ observations:
           pdf_page_index: 5
           table: '4'
           note: row=α = L + δ; heat 156; x_Mo=0.340; column=Tc (°C), reading 1
+        inference:
+          relation: celsius_to_kelvin
+          inputs:
+          - T_K = T_C + 273.15
+          - original_unit=C
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '1453'
+              locator:
+                published_page: 2573
+                pdf_page_index: 5
+                table: '4'
+                note: row=α = L + δ; heat 156; x_Mo=0.340; column=Tc (°C), reading 1
+          - - factor
+            - state:
+                tag: value
+                value: '273.15'
+              locator:
+                published_page: 2573
+                pdf_page_index: 5
+                table: '4'
+                note: row=α = L + δ; heat 156; x_Mo=0.340; column=Tc (°C), reading 1
+          output_unit: K
     - - factor
       - state:
           tag: value
@@ -6050,7 +6975,7 @@ observations:
     pdf_page_index: 5
     table: '4'
     note: row=α = L + δ; heat 158; x_Mo=0.250; column=Tc (°C), reading 1
-  read_from: unknown:ueshima-1982-fe-mo-thermal
+  read_from: pdf:ueshima-1982-fe-mo-thermal
   point_conditions:
     temperature_K:
       state:
@@ -6089,9 +7014,9 @@ observations:
   derived_from:
   - ueshima-1982-fe-mo-thermal::ueshima_1982_table2_pd_melting_standard
   derivation:
-    relation: celsius_to_kelvin
+    relation: author Eq. (4)-(8) temperature reduction from 56Fe ion-intensity transition and adopted Pd ΔT correction
     inputs:
-    - unknown:ueshima-1982-fe-mo-thermal
+    - ueshima-1982-fe-mo-thermal::ueshima_1982_table2_pd_melting_standard
     parameters:
     - - original
       - state:
@@ -6102,6 +7027,31 @@ observations:
           pdf_page_index: 5
           table: '4'
           note: row=α = L + δ; heat 158; x_Mo=0.250; column=Tc (°C), reading 1
+        inference:
+          relation: celsius_to_kelvin
+          inputs:
+          - T_K = T_C + 273.15
+          - original_unit=C
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '1454.7'
+              locator:
+                published_page: 2573
+                pdf_page_index: 5
+                table: '4'
+                note: row=α = L + δ; heat 158; x_Mo=0.250; column=Tc (°C), reading 1
+          - - factor
+            - state:
+                tag: value
+                value: '273.15'
+              locator:
+                published_page: 2573
+                pdf_page_index: 5
+                table: '4'
+                note: row=α = L + δ; heat 158; x_Mo=0.250; column=Tc (°C), reading 1
+          output_unit: K
     - - factor
       - state:
           tag: value
@@ -6201,7 +7151,7 @@ observations:
     pdf_page_index: 5
     table: '4'
     note: row=α = L + δ; heat 158; x_Mo=0.250; column=Tr (°C), reading 1
-  read_from: unknown:ueshima-1982-fe-mo-thermal
+  read_from: pdf:ueshima-1982-fe-mo-thermal
   point_conditions:
     temperature_K:
       state:
@@ -6240,9 +7190,9 @@ observations:
   derived_from:
   - ueshima-1982-fe-mo-thermal::ueshima_1982_table2_pd_melting_standard
   derivation:
-    relation: celsius_to_kelvin
+    relation: author Eq. (4)-(8) temperature reduction from 56Fe ion-intensity transition and adopted Pd ΔT correction
     inputs:
-    - unknown:ueshima-1982-fe-mo-thermal
+    - ueshima-1982-fe-mo-thermal::ueshima_1982_table2_pd_melting_standard
     parameters:
     - - original
       - state:
@@ -6253,6 +7203,31 @@ observations:
           pdf_page_index: 5
           table: '4'
           note: row=α = L + δ; heat 158; x_Mo=0.250; column=Tr (°C), reading 1
+        inference:
+          relation: celsius_to_kelvin
+          inputs:
+          - T_K = T_C + 273.15
+          - original_unit=C
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '1455.4'
+              locator:
+                published_page: 2573
+                pdf_page_index: 5
+                table: '4'
+                note: row=α = L + δ; heat 158; x_Mo=0.250; column=Tr (°C), reading 1
+          - - factor
+            - state:
+                tag: value
+                value: '273.15'
+              locator:
+                published_page: 2573
+                pdf_page_index: 5
+                table: '4'
+                note: row=α = L + δ; heat 158; x_Mo=0.250; column=Tr (°C), reading 1
+          output_unit: K
     - - factor
       - state:
           tag: value
@@ -6352,7 +7327,7 @@ observations:
     pdf_page_index: 5
     table: '4'
     note: row=α = L + δ; heat 156; x_Mo=0.340; column=Tc (°C), reading 2
-  read_from: unknown:ueshima-1982-fe-mo-thermal
+  read_from: pdf:ueshima-1982-fe-mo-thermal
   point_conditions:
     temperature_K:
       state:
@@ -6391,9 +7366,9 @@ observations:
   derived_from:
   - ueshima-1982-fe-mo-thermal::ueshima_1982_table2_pd_melting_standard
   derivation:
-    relation: celsius_to_kelvin
+    relation: author Eq. (4)-(8) temperature reduction from 56Fe ion-intensity transition and adopted Pd ΔT correction
     inputs:
-    - unknown:ueshima-1982-fe-mo-thermal
+    - ueshima-1982-fe-mo-thermal::ueshima_1982_table2_pd_melting_standard
     parameters:
     - - original
       - state:
@@ -6404,6 +7379,31 @@ observations:
           pdf_page_index: 5
           table: '4'
           note: row=α = L + δ; heat 156; x_Mo=0.340; column=Tc (°C), reading 2
+        inference:
+          relation: celsius_to_kelvin
+          inputs:
+          - T_K = T_C + 273.15
+          - original_unit=C
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '1456'
+              locator:
+                published_page: 2573
+                pdf_page_index: 5
+                table: '4'
+                note: row=α = L + δ; heat 156; x_Mo=0.340; column=Tc (°C), reading 2
+          - - factor
+            - state:
+                tag: value
+                value: '273.15'
+              locator:
+                published_page: 2573
+                pdf_page_index: 5
+                table: '4'
+                note: row=α = L + δ; heat 156; x_Mo=0.340; column=Tc (°C), reading 2
+          output_unit: K
     - - factor
       - state:
           tag: value
@@ -6503,7 +7503,7 @@ observations:
     pdf_page_index: 5
     table: '4'
     note: row=δ = L + σ; heat 156; x_Mo=0.340; column=Tr (°C), reading 1
-  read_from: unknown:ueshima-1982-fe-mo-thermal
+  read_from: pdf:ueshima-1982-fe-mo-thermal
   point_conditions:
     temperature_K:
       state:
@@ -6542,9 +7542,9 @@ observations:
   derived_from:
   - ueshima-1982-fe-mo-thermal::ueshima_1982_table2_pd_melting_standard
   derivation:
-    relation: celsius_to_kelvin
+    relation: author Eq. (4)-(8) temperature reduction from 56Fe ion-intensity transition and adopted Pd ΔT correction
     inputs:
-    - unknown:ueshima-1982-fe-mo-thermal
+    - ueshima-1982-fe-mo-thermal::ueshima_1982_table2_pd_melting_standard
     parameters:
     - - original
       - state:
@@ -6555,6 +7555,31 @@ observations:
           pdf_page_index: 5
           table: '4'
           note: row=δ = L + σ; heat 156; x_Mo=0.340; column=Tr (°C), reading 1
+        inference:
+          relation: celsius_to_kelvin
+          inputs:
+          - T_K = T_C + 273.15
+          - original_unit=C
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '1479'
+              locator:
+                published_page: 2573
+                pdf_page_index: 5
+                table: '4'
+                note: row=δ = L + σ; heat 156; x_Mo=0.340; column=Tr (°C), reading 1
+          - - factor
+            - state:
+                tag: value
+                value: '273.15'
+              locator:
+                published_page: 2573
+                pdf_page_index: 5
+                table: '4'
+                note: row=δ = L + σ; heat 156; x_Mo=0.340; column=Tr (°C), reading 1
+          output_unit: K
     - - factor
       - state:
           tag: value
@@ -6654,7 +7679,7 @@ observations:
     pdf_page_index: 5
     table: '4'
     note: row=δ = L + σ; heat 148; x_Mo=0.427; column=Tr (°C), reading 1
-  read_from: unknown:ueshima-1982-fe-mo-thermal
+  read_from: pdf:ueshima-1982-fe-mo-thermal
   point_conditions:
     temperature_K:
       state:
@@ -6693,9 +7718,9 @@ observations:
   derived_from:
   - ueshima-1982-fe-mo-thermal::ueshima_1982_table2_pd_melting_standard
   derivation:
-    relation: celsius_to_kelvin
+    relation: author Eq. (4)-(8) temperature reduction from 56Fe ion-intensity transition and adopted Pd ΔT correction
     inputs:
-    - unknown:ueshima-1982-fe-mo-thermal
+    - ueshima-1982-fe-mo-thermal::ueshima_1982_table2_pd_melting_standard
     parameters:
     - - original
       - state:
@@ -6706,6 +7731,31 @@ observations:
           pdf_page_index: 5
           table: '4'
           note: row=δ = L + σ; heat 148; x_Mo=0.427; column=Tr (°C), reading 1
+        inference:
+          relation: celsius_to_kelvin
+          inputs:
+          - T_K = T_C + 273.15
+          - original_unit=C
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '1502.3'
+              locator:
+                published_page: 2573
+                pdf_page_index: 5
+                table: '4'
+                note: row=δ = L + σ; heat 148; x_Mo=0.427; column=Tr (°C), reading 1
+          - - factor
+            - state:
+                tag: value
+                value: '273.15'
+              locator:
+                published_page: 2573
+                pdf_page_index: 5
+                table: '4'
+                note: row=δ = L + σ; heat 148; x_Mo=0.427; column=Tr (°C), reading 1
+          output_unit: K
     - - factor
       - state:
           tag: value
@@ -6805,7 +7855,7 @@ observations:
     pdf_page_index: 5
     table: '4'
     note: row=δ = L + σ; heat 156; x_Mo=0.340; column=Tc (°C), reading 1
-  read_from: unknown:ueshima-1982-fe-mo-thermal
+  read_from: pdf:ueshima-1982-fe-mo-thermal
   point_conditions:
     temperature_K:
       state:
@@ -6844,9 +7894,9 @@ observations:
   derived_from:
   - ueshima-1982-fe-mo-thermal::ueshima_1982_table2_pd_melting_standard
   derivation:
-    relation: celsius_to_kelvin
+    relation: author Eq. (4)-(8) temperature reduction from 56Fe ion-intensity transition and adopted Pd ΔT correction
     inputs:
-    - unknown:ueshima-1982-fe-mo-thermal
+    - ueshima-1982-fe-mo-thermal::ueshima_1982_table2_pd_melting_standard
     parameters:
     - - original
       - state:
@@ -6857,6 +7907,31 @@ observations:
           pdf_page_index: 5
           table: '4'
           note: row=δ = L + σ; heat 156; x_Mo=0.340; column=Tc (°C), reading 1
+        inference:
+          relation: celsius_to_kelvin
+          inputs:
+          - T_K = T_C + 273.15
+          - original_unit=C
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '1502.8'
+              locator:
+                published_page: 2573
+                pdf_page_index: 5
+                table: '4'
+                note: row=δ = L + σ; heat 156; x_Mo=0.340; column=Tc (°C), reading 1
+          - - factor
+            - state:
+                tag: value
+                value: '273.15'
+              locator:
+                published_page: 2573
+                pdf_page_index: 5
+                table: '4'
+                note: row=δ = L + σ; heat 156; x_Mo=0.340; column=Tc (°C), reading 1
+          output_unit: K
     - - factor
       - state:
           tag: value
@@ -6956,7 +8031,7 @@ observations:
     pdf_page_index: 5
     table: '4'
     note: row=δ = L + σ; heat 156; x_Mo=0.340; column=Tc (°C), reading 2
-  read_from: unknown:ueshima-1982-fe-mo-thermal
+  read_from: pdf:ueshima-1982-fe-mo-thermal
   point_conditions:
     temperature_K:
       state:
@@ -6995,9 +8070,9 @@ observations:
   derived_from:
   - ueshima-1982-fe-mo-thermal::ueshima_1982_table2_pd_melting_standard
   derivation:
-    relation: celsius_to_kelvin
+    relation: author Eq. (4)-(8) temperature reduction from 56Fe ion-intensity transition and adopted Pd ΔT correction
     inputs:
-    - unknown:ueshima-1982-fe-mo-thermal
+    - ueshima-1982-fe-mo-thermal::ueshima_1982_table2_pd_melting_standard
     parameters:
     - - original
       - state:
@@ -7008,6 +8083,31 @@ observations:
           pdf_page_index: 5
           table: '4'
           note: row=δ = L + σ; heat 156; x_Mo=0.340; column=Tc (°C), reading 2
+        inference:
+          relation: celsius_to_kelvin
+          inputs:
+          - T_K = T_C + 273.15
+          - original_unit=C
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '1504.5'
+              locator:
+                published_page: 2573
+                pdf_page_index: 5
+                table: '4'
+                note: row=δ = L + σ; heat 156; x_Mo=0.340; column=Tc (°C), reading 2
+          - - factor
+            - state:
+                tag: value
+                value: '273.15'
+              locator:
+                published_page: 2573
+                pdf_page_index: 5
+                table: '4'
+                note: row=δ = L + σ; heat 156; x_Mo=0.340; column=Tc (°C), reading 2
+          output_unit: K
     - - factor
       - state:
           tag: value
@@ -7107,7 +8207,7 @@ observations:
     pdf_page_index: 5
     table: '4'
     note: row=δ = L + σ; heat 148; x_Mo=0.427; column=Tc (°C), reading 1
-  read_from: unknown:ueshima-1982-fe-mo-thermal
+  read_from: pdf:ueshima-1982-fe-mo-thermal
   point_conditions:
     temperature_K:
       state:
@@ -7146,9 +8246,9 @@ observations:
   derived_from:
   - ueshima-1982-fe-mo-thermal::ueshima_1982_table2_pd_melting_standard
   derivation:
-    relation: celsius_to_kelvin
+    relation: author Eq. (4)-(8) temperature reduction from 56Fe ion-intensity transition and adopted Pd ΔT correction
     inputs:
-    - unknown:ueshima-1982-fe-mo-thermal
+    - ueshima-1982-fe-mo-thermal::ueshima_1982_table2_pd_melting_standard
     parameters:
     - - original
       - state:
@@ -7159,6 +8259,31 @@ observations:
           pdf_page_index: 5
           table: '4'
           note: row=δ = L + σ; heat 148; x_Mo=0.427; column=Tc (°C), reading 1
+        inference:
+          relation: celsius_to_kelvin
+          inputs:
+          - T_K = T_C + 273.15
+          - original_unit=C
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '1520.6'
+              locator:
+                published_page: 2573
+                pdf_page_index: 5
+                table: '4'
+                note: row=δ = L + σ; heat 148; x_Mo=0.427; column=Tc (°C), reading 1
+          - - factor
+            - state:
+                tag: value
+                value: '273.15'
+              locator:
+                published_page: 2573
+                pdf_page_index: 5
+                table: '4'
+                note: row=δ = L + σ; heat 148; x_Mo=0.427; column=Tc (°C), reading 1
+          output_unit: K
     - - factor
       - state:
           tag: value
@@ -7258,7 +8383,7 @@ observations:
     pdf_page_index: 5
     table: '4'
     note: row=σ = L + (Mo); heat 149; x_Mo=0.666; column=Tr (°C), reading 2
-  read_from: unknown:ueshima-1982-fe-mo-thermal
+  read_from: pdf:ueshima-1982-fe-mo-thermal
   point_conditions:
     temperature_K:
       state:
@@ -7297,9 +8422,9 @@ observations:
   derived_from:
   - ueshima-1982-fe-mo-thermal::ueshima_1982_table2_pd_melting_standard
   derivation:
-    relation: celsius_to_kelvin
+    relation: author Eq. (4)-(8) temperature reduction from 56Fe ion-intensity transition and adopted Pd ΔT correction
     inputs:
-    - unknown:ueshima-1982-fe-mo-thermal
+    - ueshima-1982-fe-mo-thermal::ueshima_1982_table2_pd_melting_standard
     parameters:
     - - original
       - state:
@@ -7310,6 +8435,31 @@ observations:
           pdf_page_index: 5
           table: '4'
           note: row=σ = L + (Mo); heat 149; x_Mo=0.666; column=Tr (°C), reading 2
+        inference:
+          relation: celsius_to_kelvin
+          inputs:
+          - T_K = T_C + 273.15
+          - original_unit=C
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '1552.6'
+              locator:
+                published_page: 2573
+                pdf_page_index: 5
+                table: '4'
+                note: row=σ = L + (Mo); heat 149; x_Mo=0.666; column=Tr (°C), reading 2
+          - - factor
+            - state:
+                tag: value
+                value: '273.15'
+              locator:
+                published_page: 2573
+                pdf_page_index: 5
+                table: '4'
+                note: row=σ = L + (Mo); heat 149; x_Mo=0.666; column=Tr (°C), reading 2
+          output_unit: K
     - - factor
       - state:
           tag: value
@@ -7409,7 +8559,7 @@ observations:
     pdf_page_index: 5
     table: '4'
     note: row=σ = L + (Mo); heat 149; x_Mo=0.666; column=Tr (°C), reading 1
-  read_from: unknown:ueshima-1982-fe-mo-thermal
+  read_from: pdf:ueshima-1982-fe-mo-thermal
   point_conditions:
     temperature_K:
       state:
@@ -7448,9 +8598,9 @@ observations:
   derived_from:
   - ueshima-1982-fe-mo-thermal::ueshima_1982_table2_pd_melting_standard
   derivation:
-    relation: celsius_to_kelvin
+    relation: author Eq. (4)-(8) temperature reduction from 56Fe ion-intensity transition and adopted Pd ΔT correction
     inputs:
-    - unknown:ueshima-1982-fe-mo-thermal
+    - ueshima-1982-fe-mo-thermal::ueshima_1982_table2_pd_melting_standard
     parameters:
     - - original
       - state:
@@ -7461,6 +8611,31 @@ observations:
           pdf_page_index: 5
           table: '4'
           note: row=σ = L + (Mo); heat 149; x_Mo=0.666; column=Tr (°C), reading 1
+        inference:
+          relation: celsius_to_kelvin
+          inputs:
+          - T_K = T_C + 273.15
+          - original_unit=C
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '1575.2'
+              locator:
+                published_page: 2573
+                pdf_page_index: 5
+                table: '4'
+                note: row=σ = L + (Mo); heat 149; x_Mo=0.666; column=Tr (°C), reading 1
+          - - factor
+            - state:
+                tag: value
+                value: '273.15'
+              locator:
+                published_page: 2573
+                pdf_page_index: 5
+                table: '4'
+                note: row=σ = L + (Mo); heat 149; x_Mo=0.666; column=Tr (°C), reading 1
+          output_unit: K
     - - factor
       - state:
           tag: value
@@ -7560,7 +8735,7 @@ observations:
     pdf_page_index: 5
     table: '4'
     note: row=σ = L + (Mo); heat 159; x_Mo=0.613; column=Tr (°C), reading 3
-  read_from: unknown:ueshima-1982-fe-mo-thermal
+  read_from: pdf:ueshima-1982-fe-mo-thermal
   point_conditions:
     temperature_K:
       state:
@@ -7599,9 +8774,9 @@ observations:
   derived_from:
   - ueshima-1982-fe-mo-thermal::ueshima_1982_table2_pd_melting_standard
   derivation:
-    relation: celsius_to_kelvin
+    relation: author Eq. (4)-(8) temperature reduction from 56Fe ion-intensity transition and adopted Pd ΔT correction
     inputs:
-    - unknown:ueshima-1982-fe-mo-thermal
+    - ueshima-1982-fe-mo-thermal::ueshima_1982_table2_pd_melting_standard
     parameters:
     - - original
       - state:
@@ -7612,6 +8787,31 @@ observations:
           pdf_page_index: 5
           table: '4'
           note: row=σ = L + (Mo); heat 159; x_Mo=0.613; column=Tr (°C), reading 3
+        inference:
+          relation: celsius_to_kelvin
+          inputs:
+          - T_K = T_C + 273.15
+          - original_unit=C
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '1596.7'
+              locator:
+                published_page: 2573
+                pdf_page_index: 5
+                table: '4'
+                note: row=σ = L + (Mo); heat 159; x_Mo=0.613; column=Tr (°C), reading 3
+          - - factor
+            - state:
+                tag: value
+                value: '273.15'
+              locator:
+                published_page: 2573
+                pdf_page_index: 5
+                table: '4'
+                note: row=σ = L + (Mo); heat 159; x_Mo=0.613; column=Tr (°C), reading 3
+          output_unit: K
     - - factor
       - state:
           tag: value
@@ -7711,7 +8911,7 @@ observations:
     pdf_page_index: 5
     table: '4'
     note: row=σ = L + (Mo); heat 148; x_Mo=0.427; column=Tr (°C), reading 1
-  read_from: unknown:ueshima-1982-fe-mo-thermal
+  read_from: pdf:ueshima-1982-fe-mo-thermal
   point_conditions:
     temperature_K:
       state:
@@ -7750,9 +8950,9 @@ observations:
   derived_from:
   - ueshima-1982-fe-mo-thermal::ueshima_1982_table2_pd_melting_standard
   derivation:
-    relation: celsius_to_kelvin
+    relation: author Eq. (4)-(8) temperature reduction from 56Fe ion-intensity transition and adopted Pd ΔT correction
     inputs:
-    - unknown:ueshima-1982-fe-mo-thermal
+    - ueshima-1982-fe-mo-thermal::ueshima_1982_table2_pd_melting_standard
     parameters:
     - - original
       - state:
@@ -7763,6 +8963,31 @@ observations:
           pdf_page_index: 5
           table: '4'
           note: row=σ = L + (Mo); heat 148; x_Mo=0.427; column=Tr (°C), reading 1
+        inference:
+          relation: celsius_to_kelvin
+          inputs:
+          - T_K = T_C + 273.15
+          - original_unit=C
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '1599.2'
+              locator:
+                published_page: 2573
+                pdf_page_index: 5
+                table: '4'
+                note: row=σ = L + (Mo); heat 148; x_Mo=0.427; column=Tr (°C), reading 1
+          - - factor
+            - state:
+                tag: value
+                value: '273.15'
+              locator:
+                published_page: 2573
+                pdf_page_index: 5
+                table: '4'
+                note: row=σ = L + (Mo); heat 148; x_Mo=0.427; column=Tr (°C), reading 1
+          output_unit: K
     - - factor
       - state:
           tag: value
@@ -7862,7 +9087,7 @@ observations:
     pdf_page_index: 5
     table: '4'
     note: row=σ = L + (Mo); heat 147; x_Mo=0.427; column=Tr (°C), reading 1
-  read_from: unknown:ueshima-1982-fe-mo-thermal
+  read_from: pdf:ueshima-1982-fe-mo-thermal
   point_conditions:
     temperature_K:
       state:
@@ -7901,9 +9126,9 @@ observations:
   derived_from:
   - ueshima-1982-fe-mo-thermal::ueshima_1982_table2_pd_melting_standard
   derivation:
-    relation: celsius_to_kelvin
+    relation: author Eq. (4)-(8) temperature reduction from 56Fe ion-intensity transition and adopted Pd ΔT correction
     inputs:
-    - unknown:ueshima-1982-fe-mo-thermal
+    - ueshima-1982-fe-mo-thermal::ueshima_1982_table2_pd_melting_standard
     parameters:
     - - original
       - state:
@@ -7914,6 +9139,31 @@ observations:
           pdf_page_index: 5
           table: '4'
           note: row=σ = L + (Mo); heat 147; x_Mo=0.427; column=Tr (°C), reading 1
+        inference:
+          relation: celsius_to_kelvin
+          inputs:
+          - T_K = T_C + 273.15
+          - original_unit=C
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '1599.5'
+              locator:
+                published_page: 2573
+                pdf_page_index: 5
+                table: '4'
+                note: row=σ = L + (Mo); heat 147; x_Mo=0.427; column=Tr (°C), reading 1
+          - - factor
+            - state:
+                tag: value
+                value: '273.15'
+              locator:
+                published_page: 2573
+                pdf_page_index: 5
+                table: '4'
+                note: row=σ = L + (Mo); heat 147; x_Mo=0.427; column=Tr (°C), reading 1
+          output_unit: K
     - - factor
       - state:
           tag: value
@@ -8013,7 +9263,7 @@ observations:
     pdf_page_index: 5
     table: '4'
     note: row=σ = L + (Mo); heat 159; x_Mo=0.613; column=Tr (°C), reading 2
-  read_from: unknown:ueshima-1982-fe-mo-thermal
+  read_from: pdf:ueshima-1982-fe-mo-thermal
   point_conditions:
     temperature_K:
       state:
@@ -8052,9 +9302,9 @@ observations:
   derived_from:
   - ueshima-1982-fe-mo-thermal::ueshima_1982_table2_pd_melting_standard
   derivation:
-    relation: celsius_to_kelvin
+    relation: author Eq. (4)-(8) temperature reduction from 56Fe ion-intensity transition and adopted Pd ΔT correction
     inputs:
-    - unknown:ueshima-1982-fe-mo-thermal
+    - ueshima-1982-fe-mo-thermal::ueshima_1982_table2_pd_melting_standard
     parameters:
     - - original
       - state:
@@ -8065,6 +9315,31 @@ observations:
           pdf_page_index: 5
           table: '4'
           note: row=σ = L + (Mo); heat 159; x_Mo=0.613; column=Tr (°C), reading 2
+        inference:
+          relation: celsius_to_kelvin
+          inputs:
+          - T_K = T_C + 273.15
+          - original_unit=C
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '1601.9'
+              locator:
+                published_page: 2573
+                pdf_page_index: 5
+                table: '4'
+                note: row=σ = L + (Mo); heat 159; x_Mo=0.613; column=Tr (°C), reading 2
+          - - factor
+            - state:
+                tag: value
+                value: '273.15'
+              locator:
+                published_page: 2573
+                pdf_page_index: 5
+                table: '4'
+                note: row=σ = L + (Mo); heat 159; x_Mo=0.613; column=Tr (°C), reading 2
+          output_unit: K
     - - factor
       - state:
           tag: value
@@ -8164,7 +9439,7 @@ observations:
     pdf_page_index: 5
     table: '4'
     note: row=σ = L + (Mo); heat 159; x_Mo=0.613; column=Tr (°C), reading 1
-  read_from: unknown:ueshima-1982-fe-mo-thermal
+  read_from: pdf:ueshima-1982-fe-mo-thermal
   point_conditions:
     temperature_K:
       state:
@@ -8203,9 +9478,9 @@ observations:
   derived_from:
   - ueshima-1982-fe-mo-thermal::ueshima_1982_table2_pd_melting_standard
   derivation:
-    relation: celsius_to_kelvin
+    relation: author Eq. (4)-(8) temperature reduction from 56Fe ion-intensity transition and adopted Pd ΔT correction
     inputs:
-    - unknown:ueshima-1982-fe-mo-thermal
+    - ueshima-1982-fe-mo-thermal::ueshima_1982_table2_pd_melting_standard
     parameters:
     - - original
       - state:
@@ -8216,6 +9491,31 @@ observations:
           pdf_page_index: 5
           table: '4'
           note: row=σ = L + (Mo); heat 159; x_Mo=0.613; column=Tr (°C), reading 1
+        inference:
+          relation: celsius_to_kelvin
+          inputs:
+          - T_K = T_C + 273.15
+          - original_unit=C
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '1604.5'
+              locator:
+                published_page: 2573
+                pdf_page_index: 5
+                table: '4'
+                note: row=σ = L + (Mo); heat 159; x_Mo=0.613; column=Tr (°C), reading 1
+          - - factor
+            - state:
+                tag: value
+                value: '273.15'
+              locator:
+                published_page: 2573
+                pdf_page_index: 5
+                table: '4'
+                note: row=σ = L + (Mo); heat 159; x_Mo=0.613; column=Tr (°C), reading 1
+          output_unit: K
     - - factor
       - state:
           tag: value
@@ -8315,7 +9615,7 @@ observations:
     pdf_page_index: 5
     table: '4'
     note: row=σ = L + (Mo); heat 149; x_Mo=0.666; column=Tc (°C), reading 1
-  read_from: unknown:ueshima-1982-fe-mo-thermal
+  read_from: pdf:ueshima-1982-fe-mo-thermal
   point_conditions:
     temperature_K:
       state:
@@ -8354,9 +9654,9 @@ observations:
   derived_from:
   - ueshima-1982-fe-mo-thermal::ueshima_1982_table2_pd_melting_standard
   derivation:
-    relation: celsius_to_kelvin
+    relation: author Eq. (4)-(8) temperature reduction from 56Fe ion-intensity transition and adopted Pd ΔT correction
     inputs:
-    - unknown:ueshima-1982-fe-mo-thermal
+    - ueshima-1982-fe-mo-thermal::ueshima_1982_table2_pd_melting_standard
     parameters:
     - - original
       - state:
@@ -8367,6 +9667,31 @@ observations:
           pdf_page_index: 5
           table: '4'
           note: row=σ = L + (Mo); heat 149; x_Mo=0.666; column=Tc (°C), reading 1
+        inference:
+          relation: celsius_to_kelvin
+          inputs:
+          - T_K = T_C + 273.15
+          - original_unit=C
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '1607.4'
+              locator:
+                published_page: 2573
+                pdf_page_index: 5
+                table: '4'
+                note: row=σ = L + (Mo); heat 149; x_Mo=0.666; column=Tc (°C), reading 1
+          - - factor
+            - state:
+                tag: value
+                value: '273.15'
+              locator:
+                published_page: 2573
+                pdf_page_index: 5
+                table: '4'
+                note: row=σ = L + (Mo); heat 149; x_Mo=0.666; column=Tc (°C), reading 1
+          output_unit: K
     - - factor
       - state:
           tag: value
@@ -8466,7 +9791,7 @@ observations:
     pdf_page_index: 5
     table: '4'
     note: row=σ = L + (Mo); heat 159; x_Mo=0.613; column=Tc (°C), reading 2
-  read_from: unknown:ueshima-1982-fe-mo-thermal
+  read_from: pdf:ueshima-1982-fe-mo-thermal
   point_conditions:
     temperature_K:
       state:
@@ -8505,9 +9830,9 @@ observations:
   derived_from:
   - ueshima-1982-fe-mo-thermal::ueshima_1982_table2_pd_melting_standard
   derivation:
-    relation: celsius_to_kelvin
+    relation: author Eq. (4)-(8) temperature reduction from 56Fe ion-intensity transition and adopted Pd ΔT correction
     inputs:
-    - unknown:ueshima-1982-fe-mo-thermal
+    - ueshima-1982-fe-mo-thermal::ueshima_1982_table2_pd_melting_standard
     parameters:
     - - original
       - state:
@@ -8518,6 +9843,31 @@ observations:
           pdf_page_index: 5
           table: '4'
           note: row=σ = L + (Mo); heat 159; x_Mo=0.613; column=Tc (°C), reading 2
+        inference:
+          relation: celsius_to_kelvin
+          inputs:
+          - T_K = T_C + 273.15
+          - original_unit=C
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '1609.9'
+              locator:
+                published_page: 2573
+                pdf_page_index: 5
+                table: '4'
+                note: row=σ = L + (Mo); heat 159; x_Mo=0.613; column=Tc (°C), reading 2
+          - - factor
+            - state:
+                tag: value
+                value: '273.15'
+              locator:
+                published_page: 2573
+                pdf_page_index: 5
+                table: '4'
+                note: row=σ = L + (Mo); heat 159; x_Mo=0.613; column=Tc (°C), reading 2
+          output_unit: K
     - - factor
       - state:
           tag: value
@@ -8617,7 +9967,7 @@ observations:
     pdf_page_index: 5
     table: '4'
     note: row=σ = L + (Mo); heat 147; x_Mo=0.427; column=Tc (°C), reading 1
-  read_from: unknown:ueshima-1982-fe-mo-thermal
+  read_from: pdf:ueshima-1982-fe-mo-thermal
   point_conditions:
     temperature_K:
       state:
@@ -8656,9 +10006,9 @@ observations:
   derived_from:
   - ueshima-1982-fe-mo-thermal::ueshima_1982_table2_pd_melting_standard
   derivation:
-    relation: celsius_to_kelvin
+    relation: author Eq. (4)-(8) temperature reduction from 56Fe ion-intensity transition and adopted Pd ΔT correction
     inputs:
-    - unknown:ueshima-1982-fe-mo-thermal
+    - ueshima-1982-fe-mo-thermal::ueshima_1982_table2_pd_melting_standard
     parameters:
     - - original
       - state:
@@ -8669,6 +10019,31 @@ observations:
           pdf_page_index: 5
           table: '4'
           note: row=σ = L + (Mo); heat 147; x_Mo=0.427; column=Tc (°C), reading 1
+        inference:
+          relation: celsius_to_kelvin
+          inputs:
+          - T_K = T_C + 273.15
+          - original_unit=C
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '1610'
+              locator:
+                published_page: 2573
+                pdf_page_index: 5
+                table: '4'
+                note: row=σ = L + (Mo); heat 147; x_Mo=0.427; column=Tc (°C), reading 1
+          - - factor
+            - state:
+                tag: value
+                value: '273.15'
+              locator:
+                published_page: 2573
+                pdf_page_index: 5
+                table: '4'
+                note: row=σ = L + (Mo); heat 147; x_Mo=0.427; column=Tc (°C), reading 1
+          output_unit: K
     - - factor
       - state:
           tag: value
@@ -8768,7 +10143,7 @@ observations:
     pdf_page_index: 5
     table: '4'
     note: row=σ = L + (Mo); heat 159; x_Mo=0.613; column=Tc (°C), reading 3
-  read_from: unknown:ueshima-1982-fe-mo-thermal
+  read_from: pdf:ueshima-1982-fe-mo-thermal
   point_conditions:
     temperature_K:
       state:
@@ -8807,9 +10182,9 @@ observations:
   derived_from:
   - ueshima-1982-fe-mo-thermal::ueshima_1982_table2_pd_melting_standard
   derivation:
-    relation: celsius_to_kelvin
+    relation: author Eq. (4)-(8) temperature reduction from 56Fe ion-intensity transition and adopted Pd ΔT correction
     inputs:
-    - unknown:ueshima-1982-fe-mo-thermal
+    - ueshima-1982-fe-mo-thermal::ueshima_1982_table2_pd_melting_standard
     parameters:
     - - original
       - state:
@@ -8820,6 +10195,31 @@ observations:
           pdf_page_index: 5
           table: '4'
           note: row=σ = L + (Mo); heat 159; x_Mo=0.613; column=Tc (°C), reading 3
+        inference:
+          relation: celsius_to_kelvin
+          inputs:
+          - T_K = T_C + 273.15
+          - original_unit=C
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '1610.5'
+              locator:
+                published_page: 2573
+                pdf_page_index: 5
+                table: '4'
+                note: row=σ = L + (Mo); heat 159; x_Mo=0.613; column=Tc (°C), reading 3
+          - - factor
+            - state:
+                tag: value
+                value: '273.15'
+              locator:
+                published_page: 2573
+                pdf_page_index: 5
+                table: '4'
+                note: row=σ = L + (Mo); heat 159; x_Mo=0.613; column=Tc (°C), reading 3
+          output_unit: K
     - - factor
       - state:
           tag: value
@@ -8919,7 +10319,7 @@ observations:
     pdf_page_index: 5
     table: '4'
     note: row=σ = L + (Mo); heat 159; x_Mo=0.613; column=Tc (°C), reading 1
-  read_from: unknown:ueshima-1982-fe-mo-thermal
+  read_from: pdf:ueshima-1982-fe-mo-thermal
   point_conditions:
     temperature_K:
       state:
@@ -8958,9 +10358,9 @@ observations:
   derived_from:
   - ueshima-1982-fe-mo-thermal::ueshima_1982_table2_pd_melting_standard
   derivation:
-    relation: celsius_to_kelvin
+    relation: author Eq. (4)-(8) temperature reduction from 56Fe ion-intensity transition and adopted Pd ΔT correction
     inputs:
-    - unknown:ueshima-1982-fe-mo-thermal
+    - ueshima-1982-fe-mo-thermal::ueshima_1982_table2_pd_melting_standard
     parameters:
     - - original
       - state:
@@ -8971,6 +10371,31 @@ observations:
           pdf_page_index: 5
           table: '4'
           note: row=σ = L + (Mo); heat 159; x_Mo=0.613; column=Tc (°C), reading 1
+        inference:
+          relation: celsius_to_kelvin
+          inputs:
+          - T_K = T_C + 273.15
+          - original_unit=C
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '1611'
+              locator:
+                published_page: 2573
+                pdf_page_index: 5
+                table: '4'
+                note: row=σ = L + (Mo); heat 159; x_Mo=0.613; column=Tc (°C), reading 1
+          - - factor
+            - state:
+                tag: value
+                value: '273.15'
+              locator:
+                published_page: 2573
+                pdf_page_index: 5
+                table: '4'
+                note: row=σ = L + (Mo); heat 159; x_Mo=0.613; column=Tc (°C), reading 1
+          output_unit: K
     - - factor
       - state:
           tag: value
@@ -9070,7 +10495,7 @@ observations:
     pdf_page_index: 5
     table: '4'
     note: row=σ = L + (Mo); heat 148; x_Mo=0.427; column=Tc (°C), reading 1
-  read_from: unknown:ueshima-1982-fe-mo-thermal
+  read_from: pdf:ueshima-1982-fe-mo-thermal
   point_conditions:
     temperature_K:
       state:
@@ -9109,9 +10534,9 @@ observations:
   derived_from:
   - ueshima-1982-fe-mo-thermal::ueshima_1982_table2_pd_melting_standard
   derivation:
-    relation: celsius_to_kelvin
+    relation: author Eq. (4)-(8) temperature reduction from 56Fe ion-intensity transition and adopted Pd ΔT correction
     inputs:
-    - unknown:ueshima-1982-fe-mo-thermal
+    - ueshima-1982-fe-mo-thermal::ueshima_1982_table2_pd_melting_standard
     parameters:
     - - original
       - state:
@@ -9122,6 +10547,31 @@ observations:
           pdf_page_index: 5
           table: '4'
           note: row=σ = L + (Mo); heat 148; x_Mo=0.427; column=Tc (°C), reading 1
+        inference:
+          relation: celsius_to_kelvin
+          inputs:
+          - T_K = T_C + 273.15
+          - original_unit=C
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '1613.3'
+              locator:
+                published_page: 2573
+                pdf_page_index: 5
+                table: '4'
+                note: row=σ = L + (Mo); heat 148; x_Mo=0.427; column=Tc (°C), reading 1
+          - - factor
+            - state:
+                tag: value
+                value: '273.15'
+              locator:
+                published_page: 2573
+                pdf_page_index: 5
+                table: '4'
+                note: row=σ = L + (Mo); heat 148; x_Mo=0.427; column=Tc (°C), reading 1
+          output_unit: K
     - - factor
       - state:
           tag: value

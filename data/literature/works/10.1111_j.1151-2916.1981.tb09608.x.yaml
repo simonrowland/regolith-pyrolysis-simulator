@@ -9,9 +9,27 @@ work:
   source_files:
     corpus_repo: regolith-corpus
     corpus_commit:
-      tag: unknown
-      reason: INDEX does not give corpus commit
+      tag: value
+      value: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
     files:
+    - asset_id: pdf:kems-051-allibert-1981
+      role: pdf
+      path: raw/kems-051-allibert-1981/kems-051-allibert-1981.pdf
+      sha256:
+        tag: value
+        value: a610c96acf6417757d57562a738a402f001a82fbf43fc3c22c1afacc3f449815
+    - asset_id: pdftotext:kems-051-allibert-1981
+      role: pdftotext
+      path: text/kems-051-allibert-1981
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: tables:kems-051-allibert-1981
+      role: table_csv
+      path: tables/kems-051-allibert-1981
+      sha256:
+        tag: unknown
+        reason: INDEX does not give table sha256
     - asset_id: unknown:kems-051-allibert-1981
       role: pdftotext
       path: unknown

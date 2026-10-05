@@ -44,7 +44,7 @@ observations:
     page: 2
     equation: '5'
     note: Printed log a_NaO0.5 polynomial at 1300 C
-  read_from: unknown:ta-shirai-2000-lpsc
+  read_from: pdf:ta-shirai-2000-lpsc
   point_conditions:
     temperature_K:
       state:
@@ -56,6 +56,12 @@ observations:
         note: Printed log a_NaO0.5 polynomial at 1300 C
   derived_from:
   - ta-shirai-2000-lpsc::shirai_2000_ref6_activity_input
+  derivation:
+    relation: author_conversion_of_cited_activity_data
+    inputs:
+    - ta-shirai-2000-lpsc::shirai_2000_ref6_activity_input
+    parameters: []
+    output_unit: log10 activity dimensionless
 - observation_id: ta-shirai-2000-lpsc::shirai_2000_activity_fit_1400
   experiment_id: 4918b8eb09583a766be4ba5abac5a79c5180583d434f6dcf350b1040177e2bdd::ta-shirai-2000-lpsc
   identity:
@@ -98,7 +104,7 @@ observations:
     page: 2
     equation: '6'
     note: Printed log a_NaO0.5 polynomial at 1400 C
-  read_from: unknown:ta-shirai-2000-lpsc
+  read_from: pdf:ta-shirai-2000-lpsc
   point_conditions:
     temperature_K:
       state:
@@ -110,6 +116,12 @@ observations:
         note: Printed log a_NaO0.5 polynomial at 1400 C
   derived_from:
   - ta-shirai-2000-lpsc::shirai_2000_ref6_activity_input
+  derivation:
+    relation: author_conversion_of_cited_activity_data
+    inputs:
+    - ta-shirai-2000-lpsc::shirai_2000_ref6_activity_input
+    parameters: []
+    output_unit: log10 activity dimensionless
 - observation_id: ta-shirai-2000-lpsc::shirai_2000_alpha_star_1300_pO2_1e-10::point:0
   experiment_id: 4918b8eb09583a766be4ba5abac5a79c5180583d434f6dcf350b1040177e2bdd::experiment::shirai-fig1a-1300-pO2-1e-10
   identity:
@@ -194,7 +206,7 @@ observations:
     figure: 1a
     paragraph: Estimation of alpha*
     note: Printed alpha*=0.08 at p(O2)=10^-10 bar
-  read_from: unknown:ta-shirai-2000-lpsc
+  read_from: pdf:ta-shirai-2000-lpsc
   point_conditions:
     temperature_K:
       state:
@@ -220,11 +232,23 @@ observations:
   - ta-shirai-2000-lpsc::shirai_2000_fig1a_1300_pO2_1e-10::point:0
   - ta-shirai-2000-lpsc::shirai_2000_fig1a_1300_pO2_1e-10::point:1
   derivation:
-    relation: as_published
+    relation: author_least_squares_fit_of_concentration_time_series
     inputs:
-    - unknown:ta-shirai-2000-lpsc
+    - ta-shirai-2000-lpsc::shirai_2000_fig1a_1300_pO2_1e-8::point:0
+    - ta-shirai-2000-lpsc::shirai_2000_fig1a_1300_pO2_1e-8::point:1
+    - ta-shirai-2000-lpsc::shirai_2000_fig1a_1300_pO2_1e-8::point:2
+    - ta-shirai-2000-lpsc::shirai_2000_fig1a_1300_pO2_1e-8::point:3
+    - ta-shirai-2000-lpsc::shirai_2000_fig1a_1300_pO2_1e-8::point:4
+    - ta-shirai-2000-lpsc::shirai_2000_fig1a_1300_pO2_1e-8::point:5
+    - ta-shirai-2000-lpsc::shirai_2000_fig1a_1300_pO2_1e-8::point:6
+    - ta-shirai-2000-lpsc::shirai_2000_fig1a_1300_pO2_1e-9::point:0
+    - ta-shirai-2000-lpsc::shirai_2000_fig1a_1300_pO2_1e-9::point:1
+    - ta-shirai-2000-lpsc::shirai_2000_fig1a_1300_pO2_1e-9::point:2
+    - ta-shirai-2000-lpsc::shirai_2000_fig1a_1300_pO2_1e-9::point:3
+    - ta-shirai-2000-lpsc::shirai_2000_fig1a_1300_pO2_1e-10::point:0
+    - ta-shirai-2000-lpsc::shirai_2000_fig1a_1300_pO2_1e-10::point:1
     parameters: []
-    output_unit: dimensionless alpha* as printed
+    output_unit: dimensionless alpha*
 - observation_id: ta-shirai-2000-lpsc::shirai_2000_alpha_star_1300_pO2_1e-8::point:0
   experiment_id: 4918b8eb09583a766be4ba5abac5a79c5180583d434f6dcf350b1040177e2bdd::experiment::shirai-fig1a-1300-pO2-1e-8
   identity:
@@ -309,7 +333,7 @@ observations:
     figure: 1a
     paragraph: Estimation of alpha*
     note: Printed alpha*=0.13 at p(O2)=10^-8 bar
-  read_from: unknown:ta-shirai-2000-lpsc
+  read_from: pdf:ta-shirai-2000-lpsc
   point_conditions:
     temperature_K:
       state:
@@ -335,11 +359,23 @@ observations:
   - ta-shirai-2000-lpsc::shirai_2000_fig1a_1300_pO2_1e-10::point:0
   - ta-shirai-2000-lpsc::shirai_2000_fig1a_1300_pO2_1e-10::point:1
   derivation:
-    relation: as_published
+    relation: author_least_squares_fit_of_concentration_time_series
     inputs:
-    - unknown:ta-shirai-2000-lpsc
+    - ta-shirai-2000-lpsc::shirai_2000_fig1a_1300_pO2_1e-8::point:0
+    - ta-shirai-2000-lpsc::shirai_2000_fig1a_1300_pO2_1e-8::point:1
+    - ta-shirai-2000-lpsc::shirai_2000_fig1a_1300_pO2_1e-8::point:2
+    - ta-shirai-2000-lpsc::shirai_2000_fig1a_1300_pO2_1e-8::point:3
+    - ta-shirai-2000-lpsc::shirai_2000_fig1a_1300_pO2_1e-8::point:4
+    - ta-shirai-2000-lpsc::shirai_2000_fig1a_1300_pO2_1e-8::point:5
+    - ta-shirai-2000-lpsc::shirai_2000_fig1a_1300_pO2_1e-8::point:6
+    - ta-shirai-2000-lpsc::shirai_2000_fig1a_1300_pO2_1e-9::point:0
+    - ta-shirai-2000-lpsc::shirai_2000_fig1a_1300_pO2_1e-9::point:1
+    - ta-shirai-2000-lpsc::shirai_2000_fig1a_1300_pO2_1e-9::point:2
+    - ta-shirai-2000-lpsc::shirai_2000_fig1a_1300_pO2_1e-9::point:3
+    - ta-shirai-2000-lpsc::shirai_2000_fig1a_1300_pO2_1e-10::point:0
+    - ta-shirai-2000-lpsc::shirai_2000_fig1a_1300_pO2_1e-10::point:1
     parameters: []
-    output_unit: dimensionless alpha* as printed
+    output_unit: dimensionless alpha*
 - observation_id: ta-shirai-2000-lpsc::shirai_2000_alpha_star_1300_pO2_1e-9::point:0
   experiment_id: 4918b8eb09583a766be4ba5abac5a79c5180583d434f6dcf350b1040177e2bdd::experiment::shirai-fig1a-1300-pO2-1e-9
   identity:
@@ -424,7 +460,7 @@ observations:
     figure: 1a
     paragraph: Estimation of alpha*
     note: Printed alpha*=0.095 at p(O2)=10^-9 bar
-  read_from: unknown:ta-shirai-2000-lpsc
+  read_from: pdf:ta-shirai-2000-lpsc
   point_conditions:
     temperature_K:
       state:
@@ -450,11 +486,23 @@ observations:
   - ta-shirai-2000-lpsc::shirai_2000_fig1a_1300_pO2_1e-10::point:0
   - ta-shirai-2000-lpsc::shirai_2000_fig1a_1300_pO2_1e-10::point:1
   derivation:
-    relation: as_published
+    relation: author_least_squares_fit_of_concentration_time_series
     inputs:
-    - unknown:ta-shirai-2000-lpsc
+    - ta-shirai-2000-lpsc::shirai_2000_fig1a_1300_pO2_1e-8::point:0
+    - ta-shirai-2000-lpsc::shirai_2000_fig1a_1300_pO2_1e-8::point:1
+    - ta-shirai-2000-lpsc::shirai_2000_fig1a_1300_pO2_1e-8::point:2
+    - ta-shirai-2000-lpsc::shirai_2000_fig1a_1300_pO2_1e-8::point:3
+    - ta-shirai-2000-lpsc::shirai_2000_fig1a_1300_pO2_1e-8::point:4
+    - ta-shirai-2000-lpsc::shirai_2000_fig1a_1300_pO2_1e-8::point:5
+    - ta-shirai-2000-lpsc::shirai_2000_fig1a_1300_pO2_1e-8::point:6
+    - ta-shirai-2000-lpsc::shirai_2000_fig1a_1300_pO2_1e-9::point:0
+    - ta-shirai-2000-lpsc::shirai_2000_fig1a_1300_pO2_1e-9::point:1
+    - ta-shirai-2000-lpsc::shirai_2000_fig1a_1300_pO2_1e-9::point:2
+    - ta-shirai-2000-lpsc::shirai_2000_fig1a_1300_pO2_1e-9::point:3
+    - ta-shirai-2000-lpsc::shirai_2000_fig1a_1300_pO2_1e-10::point:0
+    - ta-shirai-2000-lpsc::shirai_2000_fig1a_1300_pO2_1e-10::point:1
     parameters: []
-    output_unit: dimensionless alpha* as printed
+    output_unit: dimensionless alpha*
 - observation_id: ta-shirai-2000-lpsc::shirai_2000_alpha_star_1400_pO2_1e-10::point:0
   experiment_id: 4918b8eb09583a766be4ba5abac5a79c5180583d434f6dcf350b1040177e2bdd::experiment::shirai-fig1b-1400-pO2-1e-10
   identity:
@@ -539,7 +587,7 @@ observations:
     figure: 1b
     paragraph: Estimation of alpha*
     note: Printed alpha*=0.05 at p(O2)=10^-10 bar
-  read_from: unknown:ta-shirai-2000-lpsc
+  read_from: pdf:ta-shirai-2000-lpsc
   point_conditions:
     temperature_K:
       state:
@@ -564,11 +612,22 @@ observations:
   - ta-shirai-2000-lpsc::shirai_2000_fig1b_1400_pO2_1e-10::point:2
   - ta-shirai-2000-lpsc::shirai_2000_fig1b_1400_pO2_1e-10::point:3
   derivation:
-    relation: as_published
+    relation: author_least_squares_fit_of_concentration_time_series
     inputs:
-    - unknown:ta-shirai-2000-lpsc
+    - ta-shirai-2000-lpsc::shirai_2000_fig1b_1400_pO2_1e-8::point:0
+    - ta-shirai-2000-lpsc::shirai_2000_fig1b_1400_pO2_1e-8::point:1
+    - ta-shirai-2000-lpsc::shirai_2000_fig1b_1400_pO2_1e-8::point:2
+    - ta-shirai-2000-lpsc::shirai_2000_fig1b_1400_pO2_1e-8::point:3
+    - ta-shirai-2000-lpsc::shirai_2000_fig1b_1400_pO2_1e-9::point:0
+    - ta-shirai-2000-lpsc::shirai_2000_fig1b_1400_pO2_1e-9::point:1
+    - ta-shirai-2000-lpsc::shirai_2000_fig1b_1400_pO2_1e-9::point:2
+    - ta-shirai-2000-lpsc::shirai_2000_fig1b_1400_pO2_1e-9::point:3
+    - ta-shirai-2000-lpsc::shirai_2000_fig1b_1400_pO2_1e-10::point:0
+    - ta-shirai-2000-lpsc::shirai_2000_fig1b_1400_pO2_1e-10::point:1
+    - ta-shirai-2000-lpsc::shirai_2000_fig1b_1400_pO2_1e-10::point:2
+    - ta-shirai-2000-lpsc::shirai_2000_fig1b_1400_pO2_1e-10::point:3
     parameters: []
-    output_unit: dimensionless alpha* as printed
+    output_unit: dimensionless alpha*
 - observation_id: ta-shirai-2000-lpsc::shirai_2000_alpha_star_1400_pO2_1e-8::point:0
   experiment_id: 4918b8eb09583a766be4ba5abac5a79c5180583d434f6dcf350b1040177e2bdd::experiment::shirai-fig1b-1400-pO2-1e-8
   identity:
@@ -653,7 +712,7 @@ observations:
     figure: 1b
     paragraph: Estimation of alpha*
     note: Printed alpha*=0.048 at p(O2)=10^-8 bar
-  read_from: unknown:ta-shirai-2000-lpsc
+  read_from: pdf:ta-shirai-2000-lpsc
   point_conditions:
     temperature_K:
       state:
@@ -678,11 +737,22 @@ observations:
   - ta-shirai-2000-lpsc::shirai_2000_fig1b_1400_pO2_1e-10::point:2
   - ta-shirai-2000-lpsc::shirai_2000_fig1b_1400_pO2_1e-10::point:3
   derivation:
-    relation: as_published
+    relation: author_least_squares_fit_of_concentration_time_series
     inputs:
-    - unknown:ta-shirai-2000-lpsc
+    - ta-shirai-2000-lpsc::shirai_2000_fig1b_1400_pO2_1e-8::point:0
+    - ta-shirai-2000-lpsc::shirai_2000_fig1b_1400_pO2_1e-8::point:1
+    - ta-shirai-2000-lpsc::shirai_2000_fig1b_1400_pO2_1e-8::point:2
+    - ta-shirai-2000-lpsc::shirai_2000_fig1b_1400_pO2_1e-8::point:3
+    - ta-shirai-2000-lpsc::shirai_2000_fig1b_1400_pO2_1e-9::point:0
+    - ta-shirai-2000-lpsc::shirai_2000_fig1b_1400_pO2_1e-9::point:1
+    - ta-shirai-2000-lpsc::shirai_2000_fig1b_1400_pO2_1e-9::point:2
+    - ta-shirai-2000-lpsc::shirai_2000_fig1b_1400_pO2_1e-9::point:3
+    - ta-shirai-2000-lpsc::shirai_2000_fig1b_1400_pO2_1e-10::point:0
+    - ta-shirai-2000-lpsc::shirai_2000_fig1b_1400_pO2_1e-10::point:1
+    - ta-shirai-2000-lpsc::shirai_2000_fig1b_1400_pO2_1e-10::point:2
+    - ta-shirai-2000-lpsc::shirai_2000_fig1b_1400_pO2_1e-10::point:3
     parameters: []
-    output_unit: dimensionless alpha* as printed
+    output_unit: dimensionless alpha*
 - observation_id: ta-shirai-2000-lpsc::shirai_2000_alpha_star_1400_pO2_1e-9::point:0
   experiment_id: 4918b8eb09583a766be4ba5abac5a79c5180583d434f6dcf350b1040177e2bdd::experiment::shirai-fig1b-1400-pO2-1e-9
   identity:
@@ -767,7 +837,7 @@ observations:
     figure: 1b
     paragraph: Estimation of alpha*
     note: Printed alpha*=0.043 at p(O2)=10^-9 bar
-  read_from: unknown:ta-shirai-2000-lpsc
+  read_from: pdf:ta-shirai-2000-lpsc
   point_conditions:
     temperature_K:
       state:
@@ -792,11 +862,22 @@ observations:
   - ta-shirai-2000-lpsc::shirai_2000_fig1b_1400_pO2_1e-10::point:2
   - ta-shirai-2000-lpsc::shirai_2000_fig1b_1400_pO2_1e-10::point:3
   derivation:
-    relation: as_published
+    relation: author_least_squares_fit_of_concentration_time_series
     inputs:
-    - unknown:ta-shirai-2000-lpsc
+    - ta-shirai-2000-lpsc::shirai_2000_fig1b_1400_pO2_1e-8::point:0
+    - ta-shirai-2000-lpsc::shirai_2000_fig1b_1400_pO2_1e-8::point:1
+    - ta-shirai-2000-lpsc::shirai_2000_fig1b_1400_pO2_1e-8::point:2
+    - ta-shirai-2000-lpsc::shirai_2000_fig1b_1400_pO2_1e-8::point:3
+    - ta-shirai-2000-lpsc::shirai_2000_fig1b_1400_pO2_1e-9::point:0
+    - ta-shirai-2000-lpsc::shirai_2000_fig1b_1400_pO2_1e-9::point:1
+    - ta-shirai-2000-lpsc::shirai_2000_fig1b_1400_pO2_1e-9::point:2
+    - ta-shirai-2000-lpsc::shirai_2000_fig1b_1400_pO2_1e-9::point:3
+    - ta-shirai-2000-lpsc::shirai_2000_fig1b_1400_pO2_1e-10::point:0
+    - ta-shirai-2000-lpsc::shirai_2000_fig1b_1400_pO2_1e-10::point:1
+    - ta-shirai-2000-lpsc::shirai_2000_fig1b_1400_pO2_1e-10::point:2
+    - ta-shirai-2000-lpsc::shirai_2000_fig1b_1400_pO2_1e-10::point:3
     parameters: []
-    output_unit: dimensionless alpha* as printed
+    output_unit: dimensionless alpha*
 - observation_id: ta-shirai-2000-lpsc::shirai_2000_fig1a_1300_pO2_1e-10::point:0
   experiment_id: 4918b8eb09583a766be4ba5abac5a79c5180583d434f6dcf350b1040177e2bdd::experiment::shirai-fig1a-1300-pO2-1e-10
   identity:
@@ -842,7 +923,7 @@ observations:
     page: 2
     figure: 1a
     note: p(O2)=10^-10 bar, t=0 min, open triangle; 600 dpi shape-template centroid
-  read_from: unknown:ta-shirai-2000-lpsc
+  read_from: pdf:ta-shirai-2000-lpsc
   point_conditions:
     temperature_K:
       state:
@@ -855,7 +936,7 @@ observations:
   derivation:
     relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
     inputs:
-    - unknown:ta-shirai-2000-lpsc
+    - pdf:ta-shirai-2000-lpsc
     parameters: []
     output_unit: Pa
 - observation_id: ta-shirai-2000-lpsc::shirai_2000_fig1a_1300_pO2_1e-10::point:1
@@ -903,7 +984,7 @@ observations:
     page: 2
     figure: 1a
     note: p(O2)=10^-10 bar, t=60 min, open triangle; 600 dpi shape-template centroid
-  read_from: unknown:ta-shirai-2000-lpsc
+  read_from: pdf:ta-shirai-2000-lpsc
   point_conditions:
     temperature_K:
       state:
@@ -916,7 +997,7 @@ observations:
   derivation:
     relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
     inputs:
-    - unknown:ta-shirai-2000-lpsc
+    - pdf:ta-shirai-2000-lpsc
     parameters: []
     output_unit: Pa
 - observation_id: ta-shirai-2000-lpsc::shirai_2000_fig1a_1300_pO2_1e-10::point:2
@@ -964,7 +1045,7 @@ observations:
     page: 2
     figure: 1a
     note: p(O2)=10^-10 bar, t=120 min, open triangle; 600 dpi shape-template centroid
-  read_from: unknown:ta-shirai-2000-lpsc
+  read_from: pdf:ta-shirai-2000-lpsc
   point_conditions:
     temperature_K:
       state:
@@ -977,7 +1058,7 @@ observations:
   derivation:
     relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
     inputs:
-    - unknown:ta-shirai-2000-lpsc
+    - pdf:ta-shirai-2000-lpsc
     parameters: []
     output_unit: Pa
 - observation_id: ta-shirai-2000-lpsc::shirai_2000_fig1a_1300_pO2_1e-10::point:3
@@ -1025,7 +1106,7 @@ observations:
     page: 2
     figure: 1a
     note: p(O2)=10^-10 bar, t=180 min, open triangle; 600 dpi shape-template centroid; overlaps the boxed-square marker
-  read_from: unknown:ta-shirai-2000-lpsc
+  read_from: pdf:ta-shirai-2000-lpsc
   point_conditions:
     temperature_K:
       state:
@@ -1038,7 +1119,7 @@ observations:
   derivation:
     relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
     inputs:
-    - unknown:ta-shirai-2000-lpsc
+    - pdf:ta-shirai-2000-lpsc
     parameters: []
     output_unit: Pa
 - observation_id: ta-shirai-2000-lpsc::shirai_2000_fig1a_1300_pO2_1e-8::point:0
@@ -1086,7 +1167,7 @@ observations:
     page: 2
     figure: 1a
     note: p(O2)=10^-8 bar, t=0 min, filled circle; 600 dpi shape-template centroid
-  read_from: unknown:ta-shirai-2000-lpsc
+  read_from: pdf:ta-shirai-2000-lpsc
   point_conditions:
     temperature_K:
       state:
@@ -1099,7 +1180,7 @@ observations:
   derivation:
     relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
     inputs:
-    - unknown:ta-shirai-2000-lpsc
+    - pdf:ta-shirai-2000-lpsc
     parameters: []
     output_unit: Pa
 - observation_id: ta-shirai-2000-lpsc::shirai_2000_fig1a_1300_pO2_1e-8::point:1
@@ -1147,7 +1228,7 @@ observations:
     page: 2
     figure: 1a
     note: p(O2)=10^-8 bar, t=60 min, filled circle; 600 dpi shape-template centroid
-  read_from: unknown:ta-shirai-2000-lpsc
+  read_from: pdf:ta-shirai-2000-lpsc
   point_conditions:
     temperature_K:
       state:
@@ -1160,7 +1241,7 @@ observations:
   derivation:
     relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
     inputs:
-    - unknown:ta-shirai-2000-lpsc
+    - pdf:ta-shirai-2000-lpsc
     parameters: []
     output_unit: Pa
 - observation_id: ta-shirai-2000-lpsc::shirai_2000_fig1a_1300_pO2_1e-8::point:2
@@ -1208,7 +1289,7 @@ observations:
     page: 2
     figure: 1a
     note: p(O2)=10^-8 bar, t=90 min, filled circle; 600 dpi shape-template centroid
-  read_from: unknown:ta-shirai-2000-lpsc
+  read_from: pdf:ta-shirai-2000-lpsc
   point_conditions:
     temperature_K:
       state:
@@ -1221,7 +1302,7 @@ observations:
   derivation:
     relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
     inputs:
-    - unknown:ta-shirai-2000-lpsc
+    - pdf:ta-shirai-2000-lpsc
     parameters: []
     output_unit: Pa
 - observation_id: ta-shirai-2000-lpsc::shirai_2000_fig1a_1300_pO2_1e-8::point:3
@@ -1269,7 +1350,7 @@ observations:
     page: 2
     figure: 1a
     note: p(O2)=10^-8 bar, t=120 min, filled circle; 600 dpi shape-template centroid
-  read_from: unknown:ta-shirai-2000-lpsc
+  read_from: pdf:ta-shirai-2000-lpsc
   point_conditions:
     temperature_K:
       state:
@@ -1282,7 +1363,7 @@ observations:
   derivation:
     relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
     inputs:
-    - unknown:ta-shirai-2000-lpsc
+    - pdf:ta-shirai-2000-lpsc
     parameters: []
     output_unit: Pa
 - observation_id: ta-shirai-2000-lpsc::shirai_2000_fig1a_1300_pO2_1e-8::point:4
@@ -1330,7 +1411,7 @@ observations:
     page: 2
     figure: 1a
     note: p(O2)=10^-8 bar, t=180 min, filled circle; 600 dpi shape-template centroid
-  read_from: unknown:ta-shirai-2000-lpsc
+  read_from: pdf:ta-shirai-2000-lpsc
   point_conditions:
     temperature_K:
       state:
@@ -1343,7 +1424,7 @@ observations:
   derivation:
     relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
     inputs:
-    - unknown:ta-shirai-2000-lpsc
+    - pdf:ta-shirai-2000-lpsc
     parameters: []
     output_unit: Pa
 - observation_id: ta-shirai-2000-lpsc::shirai_2000_fig1a_1300_pO2_1e-8::point:5
@@ -1391,7 +1472,7 @@ observations:
     page: 2
     figure: 1a
     note: p(O2)=10^-8 bar, t=300 min, filled circle; 600 dpi shape-template centroid
-  read_from: unknown:ta-shirai-2000-lpsc
+  read_from: pdf:ta-shirai-2000-lpsc
   point_conditions:
     temperature_K:
       state:
@@ -1404,7 +1485,7 @@ observations:
   derivation:
     relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
     inputs:
-    - unknown:ta-shirai-2000-lpsc
+    - pdf:ta-shirai-2000-lpsc
     parameters: []
     output_unit: Pa
 - observation_id: ta-shirai-2000-lpsc::shirai_2000_fig1a_1300_pO2_1e-8::point:6
@@ -1452,7 +1533,7 @@ observations:
     page: 2
     figure: 1a
     note: p(O2)=10^-8 bar, t=360 min, filled circle; 600 dpi shape-template centroid
-  read_from: unknown:ta-shirai-2000-lpsc
+  read_from: pdf:ta-shirai-2000-lpsc
   point_conditions:
     temperature_K:
       state:
@@ -1465,7 +1546,7 @@ observations:
   derivation:
     relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
     inputs:
-    - unknown:ta-shirai-2000-lpsc
+    - pdf:ta-shirai-2000-lpsc
     parameters: []
     output_unit: Pa
 - observation_id: ta-shirai-2000-lpsc::shirai_2000_fig1a_1300_pO2_1e-8::point:7
@@ -1513,7 +1594,7 @@ observations:
     page: 2
     figure: 1a
     note: p(O2)=10^-8 bar, t=540 min, filled circle; 600 dpi shape-template centroid
-  read_from: unknown:ta-shirai-2000-lpsc
+  read_from: pdf:ta-shirai-2000-lpsc
   point_conditions:
     temperature_K:
       state:
@@ -1526,7 +1607,7 @@ observations:
   derivation:
     relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
     inputs:
-    - unknown:ta-shirai-2000-lpsc
+    - pdf:ta-shirai-2000-lpsc
     parameters: []
     output_unit: Pa
 - observation_id: ta-shirai-2000-lpsc::shirai_2000_fig1a_1300_pO2_1e-9::point:0
@@ -1574,7 +1655,7 @@ observations:
     page: 2
     figure: 1a
     note: p(O2)=10^-9 bar, t=0 min, boxed square; 600 dpi shape-template centroid
-  read_from: unknown:ta-shirai-2000-lpsc
+  read_from: pdf:ta-shirai-2000-lpsc
   point_conditions:
     temperature_K:
       state:
@@ -1587,7 +1668,7 @@ observations:
   derivation:
     relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
     inputs:
-    - unknown:ta-shirai-2000-lpsc
+    - pdf:ta-shirai-2000-lpsc
     parameters: []
     output_unit: Pa
 - observation_id: ta-shirai-2000-lpsc::shirai_2000_fig1a_1300_pO2_1e-9::point:1
@@ -1635,7 +1716,7 @@ observations:
     page: 2
     figure: 1a
     note: p(O2)=10^-9 bar, t=60 min, boxed square; 600 dpi shape-template centroid
-  read_from: unknown:ta-shirai-2000-lpsc
+  read_from: pdf:ta-shirai-2000-lpsc
   point_conditions:
     temperature_K:
       state:
@@ -1648,7 +1729,7 @@ observations:
   derivation:
     relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
     inputs:
-    - unknown:ta-shirai-2000-lpsc
+    - pdf:ta-shirai-2000-lpsc
     parameters: []
     output_unit: Pa
 - observation_id: ta-shirai-2000-lpsc::shirai_2000_fig1a_1300_pO2_1e-9::point:2
@@ -1696,7 +1777,7 @@ observations:
     page: 2
     figure: 1a
     note: p(O2)=10^-9 bar, t=180 min, boxed square; 600 dpi shape-template centroid
-  read_from: unknown:ta-shirai-2000-lpsc
+  read_from: pdf:ta-shirai-2000-lpsc
   point_conditions:
     temperature_K:
       state:
@@ -1709,7 +1790,7 @@ observations:
   derivation:
     relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
     inputs:
-    - unknown:ta-shirai-2000-lpsc
+    - pdf:ta-shirai-2000-lpsc
     parameters: []
     output_unit: Pa
 - observation_id: ta-shirai-2000-lpsc::shirai_2000_fig1a_1300_pO2_1e-9::point:3
@@ -1757,7 +1838,7 @@ observations:
     page: 2
     figure: 1a
     note: p(O2)=10^-9 bar, t=240 min, boxed square; 600 dpi shape-template centroid
-  read_from: unknown:ta-shirai-2000-lpsc
+  read_from: pdf:ta-shirai-2000-lpsc
   point_conditions:
     temperature_K:
       state:
@@ -1770,7 +1851,7 @@ observations:
   derivation:
     relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
     inputs:
-    - unknown:ta-shirai-2000-lpsc
+    - pdf:ta-shirai-2000-lpsc
     parameters: []
     output_unit: Pa
 - observation_id: ta-shirai-2000-lpsc::shirai_2000_fig1b_1400_pO2_1e-10::point:0
@@ -1818,7 +1899,7 @@ observations:
     page: 2
     figure: 1b
     note: p(O2)=10^-10 bar, t=0 min, open triangle; 600 dpi shape-template centroid
-  read_from: unknown:ta-shirai-2000-lpsc
+  read_from: pdf:ta-shirai-2000-lpsc
   point_conditions:
     temperature_K:
       state:
@@ -1831,7 +1912,7 @@ observations:
   derivation:
     relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
     inputs:
-    - unknown:ta-shirai-2000-lpsc
+    - pdf:ta-shirai-2000-lpsc
     parameters: []
     output_unit: Pa
 - observation_id: ta-shirai-2000-lpsc::shirai_2000_fig1b_1400_pO2_1e-10::point:1
@@ -1879,7 +1960,7 @@ observations:
     page: 2
     figure: 1b
     note: p(O2)=10^-10 bar, t=10 min, open triangle; 600 dpi shape-template centroid
-  read_from: unknown:ta-shirai-2000-lpsc
+  read_from: pdf:ta-shirai-2000-lpsc
   point_conditions:
     temperature_K:
       state:
@@ -1892,7 +1973,7 @@ observations:
   derivation:
     relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
     inputs:
-    - unknown:ta-shirai-2000-lpsc
+    - pdf:ta-shirai-2000-lpsc
     parameters: []
     output_unit: Pa
 - observation_id: ta-shirai-2000-lpsc::shirai_2000_fig1b_1400_pO2_1e-10::point:2
@@ -1940,7 +2021,7 @@ observations:
     page: 2
     figure: 1b
     note: p(O2)=10^-10 bar, t=15 min, open triangle; 600 dpi shape-template centroid
-  read_from: unknown:ta-shirai-2000-lpsc
+  read_from: pdf:ta-shirai-2000-lpsc
   point_conditions:
     temperature_K:
       state:
@@ -1953,7 +2034,7 @@ observations:
   derivation:
     relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
     inputs:
-    - unknown:ta-shirai-2000-lpsc
+    - pdf:ta-shirai-2000-lpsc
     parameters: []
     output_unit: Pa
 - observation_id: ta-shirai-2000-lpsc::shirai_2000_fig1b_1400_pO2_1e-10::point:3
@@ -2001,7 +2082,7 @@ observations:
     page: 2
     figure: 1b
     note: p(O2)=10^-10 bar, t=20 min, open triangle; 600 dpi shape-template centroid
-  read_from: unknown:ta-shirai-2000-lpsc
+  read_from: pdf:ta-shirai-2000-lpsc
   point_conditions:
     temperature_K:
       state:
@@ -2014,7 +2095,7 @@ observations:
   derivation:
     relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
     inputs:
-    - unknown:ta-shirai-2000-lpsc
+    - pdf:ta-shirai-2000-lpsc
     parameters: []
     output_unit: Pa
 - observation_id: ta-shirai-2000-lpsc::shirai_2000_fig1b_1400_pO2_1e-10::point:4
@@ -2062,7 +2143,7 @@ observations:
     page: 2
     figure: 1b
     note: p(O2)=10^-10 bar, t=30 min, open triangle; 600 dpi shape-template centroid
-  read_from: unknown:ta-shirai-2000-lpsc
+  read_from: pdf:ta-shirai-2000-lpsc
   point_conditions:
     temperature_K:
       state:
@@ -2075,7 +2156,7 @@ observations:
   derivation:
     relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
     inputs:
-    - unknown:ta-shirai-2000-lpsc
+    - pdf:ta-shirai-2000-lpsc
     parameters: []
     output_unit: Pa
 - observation_id: ta-shirai-2000-lpsc::shirai_2000_fig1b_1400_pO2_1e-8::point:0
@@ -2123,7 +2204,7 @@ observations:
     page: 2
     figure: 1b
     note: p(O2)=10^-8 bar, t=0 min, filled circle; 600 dpi shape-template centroid
-  read_from: unknown:ta-shirai-2000-lpsc
+  read_from: pdf:ta-shirai-2000-lpsc
   point_conditions:
     temperature_K:
       state:
@@ -2136,7 +2217,7 @@ observations:
   derivation:
     relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
     inputs:
-    - unknown:ta-shirai-2000-lpsc
+    - pdf:ta-shirai-2000-lpsc
     parameters: []
     output_unit: Pa
 - observation_id: ta-shirai-2000-lpsc::shirai_2000_fig1b_1400_pO2_1e-8::point:1
@@ -2184,7 +2265,7 @@ observations:
     page: 2
     figure: 1b
     note: p(O2)=10^-8 bar, t=30 min, filled circle; 600 dpi shape-template centroid
-  read_from: unknown:ta-shirai-2000-lpsc
+  read_from: pdf:ta-shirai-2000-lpsc
   point_conditions:
     temperature_K:
       state:
@@ -2197,7 +2278,7 @@ observations:
   derivation:
     relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
     inputs:
-    - unknown:ta-shirai-2000-lpsc
+    - pdf:ta-shirai-2000-lpsc
     parameters: []
     output_unit: Pa
 - observation_id: ta-shirai-2000-lpsc::shirai_2000_fig1b_1400_pO2_1e-8::point:2
@@ -2245,7 +2326,7 @@ observations:
     page: 2
     figure: 1b
     note: p(O2)=10^-8 bar, t=60 min, filled circle; 600 dpi shape-template centroid
-  read_from: unknown:ta-shirai-2000-lpsc
+  read_from: pdf:ta-shirai-2000-lpsc
   point_conditions:
     temperature_K:
       state:
@@ -2258,7 +2339,7 @@ observations:
   derivation:
     relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
     inputs:
-    - unknown:ta-shirai-2000-lpsc
+    - pdf:ta-shirai-2000-lpsc
     parameters: []
     output_unit: Pa
 - observation_id: ta-shirai-2000-lpsc::shirai_2000_fig1b_1400_pO2_1e-8::point:3
@@ -2306,7 +2387,7 @@ observations:
     page: 2
     figure: 1b
     note: p(O2)=10^-8 bar, t=90 min, filled circle; 600 dpi shape-template centroid
-  read_from: unknown:ta-shirai-2000-lpsc
+  read_from: pdf:ta-shirai-2000-lpsc
   point_conditions:
     temperature_K:
       state:
@@ -2319,7 +2400,7 @@ observations:
   derivation:
     relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
     inputs:
-    - unknown:ta-shirai-2000-lpsc
+    - pdf:ta-shirai-2000-lpsc
     parameters: []
     output_unit: Pa
 - observation_id: ta-shirai-2000-lpsc::shirai_2000_fig1b_1400_pO2_1e-9::point:0
@@ -2367,7 +2448,7 @@ observations:
     page: 2
     figure: 1b
     note: p(O2)=10^-9 bar, t=0 min, boxed square; 600 dpi shape-template centroid
-  read_from: unknown:ta-shirai-2000-lpsc
+  read_from: pdf:ta-shirai-2000-lpsc
   point_conditions:
     temperature_K:
       state:
@@ -2380,7 +2461,7 @@ observations:
   derivation:
     relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
     inputs:
-    - unknown:ta-shirai-2000-lpsc
+    - pdf:ta-shirai-2000-lpsc
     parameters: []
     output_unit: Pa
 - observation_id: ta-shirai-2000-lpsc::shirai_2000_fig1b_1400_pO2_1e-9::point:1
@@ -2428,7 +2509,7 @@ observations:
     page: 2
     figure: 1b
     note: p(O2)=10^-9 bar, t=20 min, boxed square; 600 dpi shape-template centroid
-  read_from: unknown:ta-shirai-2000-lpsc
+  read_from: pdf:ta-shirai-2000-lpsc
   point_conditions:
     temperature_K:
       state:
@@ -2441,7 +2522,7 @@ observations:
   derivation:
     relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
     inputs:
-    - unknown:ta-shirai-2000-lpsc
+    - pdf:ta-shirai-2000-lpsc
     parameters: []
     output_unit: Pa
 - observation_id: ta-shirai-2000-lpsc::shirai_2000_fig1b_1400_pO2_1e-9::point:2
@@ -2489,7 +2570,7 @@ observations:
     page: 2
     figure: 1b
     note: p(O2)=10^-9 bar, t=40 min, boxed square; 600 dpi shape-template centroid
-  read_from: unknown:ta-shirai-2000-lpsc
+  read_from: pdf:ta-shirai-2000-lpsc
   point_conditions:
     temperature_K:
       state:
@@ -2502,7 +2583,7 @@ observations:
   derivation:
     relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
     inputs:
-    - unknown:ta-shirai-2000-lpsc
+    - pdf:ta-shirai-2000-lpsc
     parameters: []
     output_unit: Pa
 - observation_id: ta-shirai-2000-lpsc::shirai_2000_fig1b_1400_pO2_1e-9::point:3
@@ -2550,7 +2631,7 @@ observations:
     page: 2
     figure: 1b
     note: p(O2)=10^-9 bar, t=60 min, boxed square; 600 dpi shape-template centroid
-  read_from: unknown:ta-shirai-2000-lpsc
+  read_from: pdf:ta-shirai-2000-lpsc
   point_conditions:
     temperature_K:
       state:
@@ -2563,7 +2644,7 @@ observations:
   derivation:
     relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
     inputs:
-    - unknown:ta-shirai-2000-lpsc
+    - pdf:ta-shirai-2000-lpsc
     parameters: []
     output_unit: Pa
 - observation_id: ta-shirai-2000-lpsc::shirai_2000_jna_fig2_1300::point:0
@@ -2608,7 +2689,7 @@ observations:
     page: 2
     figure: '2'
     note: 1300 C dotted-line square at p(O2)=10^-10 bar
-  read_from: unknown:ta-shirai-2000-lpsc
+  read_from: pdf:ta-shirai-2000-lpsc
   point_conditions:
     temperature_K:
       state:
@@ -2660,7 +2741,7 @@ observations:
     page: 2
     figure: '2'
     note: 1300 C dotted-line square at p(O2)=10^-9 bar
-  read_from: unknown:ta-shirai-2000-lpsc
+  read_from: pdf:ta-shirai-2000-lpsc
   point_conditions:
     temperature_K:
       state:
@@ -2712,7 +2793,7 @@ observations:
     page: 2
     figure: '2'
     note: 1300 C dotted-line square at p(O2)=10^-8 bar
-  read_from: unknown:ta-shirai-2000-lpsc
+  read_from: pdf:ta-shirai-2000-lpsc
   point_conditions:
     temperature_K:
       state:
@@ -2764,7 +2845,7 @@ observations:
     page: 2
     figure: '2'
     note: 1400 C solid-line circle at p(O2)=10^-10 bar
-  read_from: unknown:ta-shirai-2000-lpsc
+  read_from: pdf:ta-shirai-2000-lpsc
   point_conditions:
     temperature_K:
       state:
@@ -2816,7 +2897,7 @@ observations:
     page: 2
     figure: '2'
     note: 1400 C solid-line circle at p(O2)=10^-9 bar
-  read_from: unknown:ta-shirai-2000-lpsc
+  read_from: pdf:ta-shirai-2000-lpsc
   point_conditions:
     temperature_K:
       state:
@@ -2868,7 +2949,7 @@ observations:
     page: 2
     figure: '2'
     note: 1400 C solid-line circle at p(O2)=10^-8 bar
-  read_from: unknown:ta-shirai-2000-lpsc
+  read_from: pdf:ta-shirai-2000-lpsc
   point_conditions:
     temperature_K:
       state:
@@ -2921,7 +3002,7 @@ observations:
     figure: '2'
     paragraph: The dependence of jNa on p(O2)
     note: Printed dotted-line power-law fit for 1300 C
-  read_from: unknown:ta-shirai-2000-lpsc
+  read_from: pdf:ta-shirai-2000-lpsc
   point_conditions:
     temperature_K:
       state:
@@ -2936,6 +3017,14 @@ observations:
   - ta-shirai-2000-lpsc::shirai_2000_jna_fig2_1300::point:0
   - ta-shirai-2000-lpsc::shirai_2000_jna_fig2_1300::point:1
   - ta-shirai-2000-lpsc::shirai_2000_jna_fig2_1300::point:2
+  derivation:
+    relation: author_power_law_fit_to_figure_2_series
+    inputs:
+    - ta-shirai-2000-lpsc::shirai_2000_jna_fig2_1300::point:0
+    - ta-shirai-2000-lpsc::shirai_2000_jna_fig2_1300::point:1
+    - ta-shirai-2000-lpsc::shirai_2000_jna_fig2_1300::point:2
+    parameters: []
+    output_unit: jNa as plotted per p(O2) in bar
 - observation_id: ta-shirai-2000-lpsc::shirai_2000_jna_fit_1400
   experiment_id: 4918b8eb09583a766be4ba5abac5a79c5180583d434f6dcf350b1040177e2bdd::ta-shirai-2000-lpsc
   identity:
@@ -2979,7 +3068,7 @@ observations:
     figure: '2'
     paragraph: The dependence of jNa on p(O2)
     note: Printed solid-line power-law fit for 1400 C
-  read_from: unknown:ta-shirai-2000-lpsc
+  read_from: pdf:ta-shirai-2000-lpsc
   point_conditions:
     temperature_K:
       state:
@@ -2994,6 +3083,14 @@ observations:
   - ta-shirai-2000-lpsc::shirai_2000_jna_fig2_1400::point:0
   - ta-shirai-2000-lpsc::shirai_2000_jna_fig2_1400::point:1
   - ta-shirai-2000-lpsc::shirai_2000_jna_fig2_1400::point:2
+  derivation:
+    relation: author_power_law_fit_to_figure_2_series
+    inputs:
+    - ta-shirai-2000-lpsc::shirai_2000_jna_fig2_1400::point:0
+    - ta-shirai-2000-lpsc::shirai_2000_jna_fig2_1400::point:1
+    - ta-shirai-2000-lpsc::shirai_2000_jna_fig2_1400::point:2
+    parameters: []
+    output_unit: jNa as plotted per p(O2) in bar
 - observation_id: ta-shirai-2000-lpsc::shirai_2000_ref6_activity_input
   experiment_id: 4918b8eb09583a766be4ba5abac5a79c5180583d434f6dcf350b1040177e2bdd::ta-shirai-2000-lpsc
   identity:
@@ -3037,4 +3134,4 @@ observations:
     equation: 5-6
     note: Reference [6] is the experimental activity source cited by the authors; its numeric source table is not reproduced
       in this abstract
-  read_from: unknown:ta-shirai-2000-lpsc
+  read_from: pdf:ta-shirai-2000-lpsc

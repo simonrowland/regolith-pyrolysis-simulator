@@ -11,9 +11,27 @@ work:
   source_files:
     corpus_repo: regolith-corpus
     corpus_commit:
-      tag: unknown
-      reason: INDEX does not give corpus commit
+      tag: value
+      value: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
     files:
+    - asset_id: pdf:jgr-p-2024-mars-sam-clay-sulfate-ega
+      role: pdf
+      path: raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf
+      sha256:
+        tag: value
+        value: da22bf1c34fafdc58c39202129fcd09af85a5a7c55768f168a1b8cedc04850d0
+    - asset_id: pdftotext:jgr-p-2024-mars-sam-clay-sulfate-ega
+      role: pdftotext
+      path: text/jgr-p-2024-mars-sam-clay-sulfate-ega
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: tables:jgr-p-2024-mars-sam-clay-sulfate-ega
+      role: table_csv
+      path: tables/jgr-p-2024-mars-sam-clay-sulfate-ega
+      sha256:
+        tag: unknown
+        reason: INDEX does not give table sha256
     - asset_id: unknown:jgr-p-2024-mars-sam-clay-sulfate-ega
       role: pdftotext
       path: unknown

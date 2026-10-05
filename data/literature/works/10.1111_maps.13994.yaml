@@ -8,9 +8,27 @@ work:
   source_files:
     corpus_repo: regolith-corpus
     corpus_commit:
-      tag: unknown
-      reason: INDEX does not give corpus commit
+      tag: value
+      value: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
     files:
+    - asset_id: pdf:vanbuchem-2023-lavatmos
+      role: pdf
+      path: raw/vanbuchem-2023-lavatmos/vanbuchem-2023-lavatmos.pdf
+      sha256:
+        tag: value
+        value: ae313546ebb368ec33e3337818f3ddcb17f2ad94390438e13fdf773d5c128d19
+    - asset_id: pdftotext:vanbuchem-2023-lavatmos
+      role: pdftotext
+      path: text/vanbuchem-2023-lavatmos
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: tables:vanbuchem-2023-lavatmos
+      role: table_csv
+      path: tables/vanbuchem-2023-lavatmos
+      sha256:
+        tag: unknown
+        reason: INDEX does not give table sha256
     - asset_id: unknown:vanbuchem-2023-lavatmos
       role: pdftotext
       path: unknown

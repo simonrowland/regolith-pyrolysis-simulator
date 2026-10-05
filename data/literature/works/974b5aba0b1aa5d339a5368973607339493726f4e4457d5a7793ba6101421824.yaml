@@ -8,9 +8,27 @@ work:
   source_files:
     corpus_repo: regolith-corpus
     corpus_commit:
-      tag: unknown
-      reason: INDEX does not give corpus commit
+      tag: value
+      value: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
     files:
+    - asset_id: pdf:deguzman-2026-simulant-physicochemical
+      role: pdf
+      path: raw/deguzman-2026-simulant-physicochemical/deguzman-2026-simulant-physicochemical.pdf
+      sha256:
+        tag: value
+        value: ebfc9d3f9e5f956a851a7ff6fe22ee4e048628ff180b58f2bc7c74b1e81108d3
+    - asset_id: pdftotext:deguzman-2026-simulant-physicochemical
+      role: pdftotext
+      path: text/deguzman-2026-simulant-physicochemical
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: tables:deguzman-2026-simulant-physicochemical
+      role: table_csv
+      path: tables/deguzman-2026-simulant-physicochemical
+      sha256:
+        tag: unknown
+        reason: INDEX does not give table sha256
     - asset_id: unknown:deguzman-2026-simulant-physicochemical
       role: pdftotext
       path: unknown

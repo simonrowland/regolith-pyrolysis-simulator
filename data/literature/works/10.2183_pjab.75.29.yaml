@@ -8,9 +8,27 @@ work:
   source_files:
     corpus_repo: regolith-corpus
     corpus_commit:
-      tag: unknown
-      reason: INDEX does not give corpus commit
+      tag: value
+      value: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
     files:
+    - asset_id: pdf:nagahara-ozawa-1999-forsterite-surface-microstructures
+      role: pdf
+      path: raw/nagahara-ozawa-1999-forsterite-surface-microstructures/nagahara-ozawa-1999-forsterite-surface-microstructures.pdf
+      sha256:
+        tag: value
+        value: 463f168022ef4550f96111bd742860f6196b835c7bed773ec3d341558bfba617
+    - asset_id: pdftotext:nagahara-ozawa-1999-forsterite-surface-microstructures
+      role: pdftotext
+      path: text/nagahara-ozawa-1999-forsterite-surface-microstructures
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: tables:nagahara-ozawa-1999-forsterite-surface-microstructures
+      role: table_csv
+      path: tables/nagahara-ozawa-1999-forsterite-surface-microstructures
+      sha256:
+        tag: unknown
+        reason: INDEX does not give table sha256
     - asset_id: unknown:nagahara-ozawa-1999-forsterite-surface-microstructures
       role: pdftotext
       path: unknown

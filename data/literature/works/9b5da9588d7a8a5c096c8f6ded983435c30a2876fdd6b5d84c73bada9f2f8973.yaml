@@ -9,9 +9,27 @@ work:
   source_files:
     corpus_repo: regolith-corpus
     corpus_commit:
-      tag: unknown
-      reason: INDEX does not give corpus commit
+      tag: value
+      value: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
     files:
+    - asset_id: pdf:llnl-2021-cai-aerodynamic-levitation
+      role: pdf
+      path: raw/llnl-2021-cai-aerodynamic-levitation/llnl-2021-cai-aerodynamic-levitation.pdf
+      sha256:
+        tag: value
+        value: 291c2ed5d38364720f931878233bdd53c9b262445d04c4b430bc60c5cf1096c2
+    - asset_id: pdftotext:llnl-2021-cai-aerodynamic-levitation
+      role: pdftotext
+      path: text/llnl-2021-cai-aerodynamic-levitation
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: tables:llnl-2021-cai-aerodynamic-levitation
+      role: table_csv
+      path: tables/llnl-2021-cai-aerodynamic-levitation
+      sha256:
+        tag: unknown
+        reason: INDEX does not give table sha256
     - asset_id: unknown:llnl-2021-cai-aerodynamic-levitation
       role: pdftotext
       path: unknown

@@ -8,9 +8,27 @@ work:
   source_files:
     corpus_repo: regolith-corpus
     corpus_commit:
-      tag: unknown
-      reason: INDEX does not give corpus commit
+      tag: value
+      value: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
     files:
+    - asset_id: pdf:2010zahnle-schaefer-fegley-cshperspect-ori-a004895-2019
+      role: pdf
+      path: raw/2010zahnle-schaefer-fegley-cshperspect-ori-a004895-2019/2010zahnle-schaefer-fegley-cshperspect-ori-a004895-2019.pdf
+      sha256:
+        tag: value
+        value: 251bafd1ea7dfbc61d79ae3e9be12871a40d9e2ac5665230f186c3225b5606bb
+    - asset_id: pdftotext:2010zahnle-schaefer-fegley-cshperspect-ori-a004895-2019
+      role: pdftotext
+      path: text/2010zahnle-schaefer-fegley-cshperspect-ori-a004895-2019
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: tables:2010zahnle-schaefer-fegley-cshperspect-ori-a004895-2019
+      role: table_csv
+      path: tables/2010zahnle-schaefer-fegley-cshperspect-ori-a004895-2019
+      sha256:
+        tag: unknown
+        reason: INDEX does not give table sha256
     - asset_id: unknown:2010zahnle-schaefer-fegley-cshperspect-ori-a004895-2019
       role: pdftotext
       path: unknown

@@ -9,9 +9,27 @@ work:
   source_files:
     corpus_repo: regolith-corpus
     corpus_commit:
-      tag: unknown
-      reason: INDEX does not give corpus commit
+      tag: value
+      value: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
     files:
+    - asset_id: pdf:sossi-2020-cu-zn-isotope-evap-formalism
+      role: pdf
+      path: raw/sossi-2020-cu-zn-isotope-evap-formalism/sossi-2020-cu-zn-isotope-evap-formalism.pdf
+      sha256:
+        tag: value
+        value: 1d1b34d21eaa733a4789daa796042852df8274e6373128e63c663e4b5e62e2f2
+    - asset_id: pdftotext:sossi-2020-cu-zn-isotope-evap-formalism
+      role: pdftotext
+      path: text/sossi-2020-cu-zn-isotope-evap-formalism
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: tables:sossi-2020-cu-zn-isotope-evap-formalism
+      role: table_csv
+      path: tables/sossi-2020-cu-zn-isotope-evap-formalism
+      sha256:
+        tag: unknown
+        reason: INDEX does not give table sha256
     - asset_id: unknown:sossi-2020-cu-zn-isotope-evap-formalism
       role: pdftotext
       path: unknown

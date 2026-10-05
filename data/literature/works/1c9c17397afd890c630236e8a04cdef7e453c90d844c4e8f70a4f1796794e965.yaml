@@ -9,9 +9,27 @@ work:
   source_files:
     corpus_repo: regolith-corpus
     corpus_commit:
-      tag: unknown
-      reason: INDEX does not give corpus commit
+      tag: value
+      value: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
     files:
+    - asset_id: pdf:fdm879
+      role: pdf
+      path: raw/fdm879/fdm879.pdf
+      sha256:
+        tag: value
+        value: c83e259420c7f100f8ebc9acd502e17a98a75f05f98df0788abec5a3b6d06628
+    - asset_id: pdftotext:fdm879
+      role: pdftotext
+      path: text/fdm879
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: tables:fdm879
+      role: table_csv
+      path: tables/fdm879
+      sha256:
+        tag: unknown
+        reason: INDEX does not give table sha256
     - asset_id: unknown:fdm879
       role: pdftotext
       path: unknown

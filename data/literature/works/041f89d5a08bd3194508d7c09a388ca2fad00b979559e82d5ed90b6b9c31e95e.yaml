@@ -8,9 +8,27 @@ work:
   source_files:
     corpus_repo: regolith-corpus
     corpus_commit:
-      tag: unknown
-      reason: INDEX does not give corpus commit
+      tag: value
+      value: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
     files:
+    - asset_id: pdf:kems-024-gibson-hubbard-1972
+      role: pdf
+      path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+      sha256:
+        tag: value
+        value: 4b63f804aee31466aefdbfc02dbadd136adb4c94db5bb2026bc75a0872974102
+    - asset_id: pdftotext:kems-024-gibson-hubbard-1972
+      role: pdftotext
+      path: text/kems-024-gibson-hubbard-1972
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: tables:kems-024-gibson-hubbard-1972
+      role: table_csv
+      path: tables/kems-024-gibson-hubbard-1972
+      sha256:
+        tag: unknown
+        reason: INDEX does not give table sha256
     - asset_id: unknown:kems-024-gibson-hubbard-1972
       role: pdftotext
       path: unknown

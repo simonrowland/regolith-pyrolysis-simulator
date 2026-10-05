@@ -9,9 +9,27 @@ work:
   source_files:
     corpus_repo: regolith-corpus
     corpus_commit:
-      tag: unknown
-      reason: INDEX does not give corpus commit
+      tag: value
+      value: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
     files:
+    - asset_id: pdf:senior-1991-solar-heating-jbis
+      role: pdf
+      path: raw/senior-1991-solar-heating-jbis/senior-1991-solar-heating-jbis.pdf
+      sha256:
+        tag: unknown
+        reason: INDEX does not give sha256
+    - asset_id: pdftotext:senior-1991-solar-heating-jbis
+      role: pdftotext
+      path: text/senior-1991-solar-heating-jbis
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: tables:senior-1991-solar-heating-jbis
+      role: table_csv
+      path: tables/senior-1991-solar-heating-jbis
+      sha256:
+        tag: unknown
+        reason: INDEX does not give table sha256
     - asset_id: unknown:senior-1991-solar-heating-jbis
       role: pdftotext
       path: unknown

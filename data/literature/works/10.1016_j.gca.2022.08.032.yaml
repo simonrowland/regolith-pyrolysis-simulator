@@ -8,9 +8,27 @@ work:
   source_files:
     corpus_repo: regolith-corpus
     corpus_commit:
-      tag: unknown
-      reason: INDEX does not give corpus commit
+      tag: value
+      value: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
     files:
+    - asset_id: pdf:boulliung-wood-2022-so2-solubility-silicate-melts
+      role: pdf
+      path: raw/boulliung-wood-2022-so2-solubility-silicate-melts/boulliung-wood-2022-so2-solubility-silicate-melts.pdf
+      sha256:
+        tag: value
+        value: fce48fc9bb01e3465332627e70103920aba254a8aaeb5e8ff9d7e879924a1e2c
+    - asset_id: pdftotext:boulliung-wood-2022-so2-solubility-silicate-melts
+      role: pdftotext
+      path: text/boulliung-wood-2022-so2-solubility-silicate-melts
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: tables:boulliung-wood-2022-so2-solubility-silicate-melts
+      role: table_csv
+      path: tables/boulliung-wood-2022-so2-solubility-silicate-melts
+      sha256:
+        tag: unknown
+        reason: INDEX does not give table sha256
     - asset_id: unknown:boulliung-wood-2022-so2-solubility-silicate-melts
       role: pdftotext
       path: unknown

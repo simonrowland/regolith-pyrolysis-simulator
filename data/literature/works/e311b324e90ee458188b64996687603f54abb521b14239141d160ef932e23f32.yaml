@@ -8,9 +8,27 @@ work:
   source_files:
     corpus_repo: regolith-corpus
     corpus_commit:
-      tag: unknown
-      reason: INDEX does not give corpus commit
+      tag: value
+      value: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
     files:
+    - asset_id: pdf:lpsc-2019-2641
+      role: pdf
+      path: raw/lpsc-2019-2641/lpsc-2019-2641.pdf
+      sha256:
+        tag: value
+        value: c9f0c84e9d63bfdaa8f2e74413e4006d2becbe5fd4312ec92d6deb5b8db726e8
+    - asset_id: pdftotext:lpsc-2019-2641
+      role: pdftotext
+      path: text/lpsc-2019-2641
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: tables:lpsc-2019-2641
+      role: table_csv
+      path: tables/lpsc-2019-2641
+      sha256:
+        tag: unknown
+        reason: INDEX does not give table sha256
     - asset_id: unknown:lpsc-2019-2641
       role: pdftotext
       path: unknown

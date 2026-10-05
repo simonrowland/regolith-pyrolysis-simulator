@@ -7,9 +7,27 @@ work:
   source_files:
     corpus_repo: regolith-corpus
     corpus_commit:
-      tag: unknown
-      reason: INDEX does not give corpus commit
+      tag: value
+      value: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
     files:
+    - asset_id: pdf:lpi-compendium-65701
+      role: pdf
+      path: raw/lpi-compendium-65701/lpi-compendium-65701.pdf
+      sha256:
+        tag: value
+        value: b4c99e056476ea6d39fedb1e371a1a1eb2be81897bda7cdb4a7e90a3c7d367f0
+    - asset_id: pdftotext:lpi-compendium-65701
+      role: pdftotext
+      path: text/lpi-compendium-65701
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: tables:lpi-compendium-65701
+      role: table_csv
+      path: tables/lpi-compendium-65701
+      sha256:
+        tag: unknown
+        reason: INDEX does not give table sha256
     - asset_id: unknown:lpi-compendium-65701
       role: pdftotext
       path: unknown

@@ -8,9 +8,27 @@ work:
   source_files:
     corpus_repo: regolith-corpus
     corpus_commit:
-      tag: unknown
-      reason: INDEX does not give corpus commit
+      tag: value
+      value: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
     files:
+    - asset_id: pdf:busemann-2024-noble-gases-ryugu-bennu
+      role: pdf
+      path: raw/busemann-2024-noble-gases-ryugu-bennu/busemann-2024-noble-gases-ryugu-bennu.pdf
+      sha256:
+        tag: value
+        value: fcff63d243c07d2abb94797836c5f3c6b51c6c43aba335c81dea2a2194331761
+    - asset_id: pdftotext:busemann-2024-noble-gases-ryugu-bennu
+      role: pdftotext
+      path: text/busemann-2024-noble-gases-ryugu-bennu
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: tables:busemann-2024-noble-gases-ryugu-bennu
+      role: table_csv
+      path: tables/busemann-2024-noble-gases-ryugu-bennu
+      sha256:
+        tag: unknown
+        reason: INDEX does not give table sha256
     - asset_id: unknown:busemann-2024-noble-gases-ryugu-bennu
       role: pdftotext
       path: unknown

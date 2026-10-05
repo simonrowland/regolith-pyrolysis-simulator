@@ -7,9 +7,27 @@ work:
   source_files:
     corpus_repo: regolith-corpus
     corpus_commit:
-      tag: unknown
-      reason: INDEX does not give corpus commit
+      tag: value
+      value: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
     files:
+    - asset_id: pdf:lpi-lunar-soils
+      role: pdf
+      path: raw/lpi-lunar-soils/lpi-lunar-soils.pdf
+      sha256:
+        tag: value
+        value: f1936409987aa122ff3332f37897ded42c08e449cec4bdff6477de6c52bfb5e6
+    - asset_id: pdftotext:lpi-lunar-soils
+      role: pdftotext
+      path: text/lpi-lunar-soils
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: tables:lpi-lunar-soils
+      role: table_csv
+      path: tables/lpi-lunar-soils
+      sha256:
+        tag: unknown
+        reason: INDEX does not give table sha256
     - asset_id: unknown:lpi-lunar-soils
       role: pdftotext
       path: unknown

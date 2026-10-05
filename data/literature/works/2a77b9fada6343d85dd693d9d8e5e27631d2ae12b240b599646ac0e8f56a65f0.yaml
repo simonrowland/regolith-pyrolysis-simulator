@@ -8,9 +8,27 @@ work:
   source_files:
     corpus_repo: regolith-corpus
     corpus_commit:
-      tag: unknown
-      reason: INDEX does not give corpus commit
+      tag: value
+      value: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
     files:
+    - asset_id: pdf:arxiv-2509-sio-flame-nucleation
+      role: pdf
+      path: raw/arxiv-2509-sio-flame-nucleation/arxiv-2509-sio-flame-nucleation.pdf
+      sha256:
+        tag: value
+        value: 5c42bdf5ed1a59be6d75358ac609af0a93c8a3bacfe4c25e9337e1d5cf3c0b4e
+    - asset_id: pdftotext:arxiv-2509-sio-flame-nucleation
+      role: pdftotext
+      path: text/arxiv-2509-sio-flame-nucleation
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: tables:arxiv-2509-sio-flame-nucleation
+      role: table_csv
+      path: tables/arxiv-2509-sio-flame-nucleation
+      sha256:
+        tag: unknown
+        reason: INDEX does not give table sha256
     - asset_id: unknown:arxiv-2509-sio-flame-nucleation
       role: pdftotext
       path: unknown

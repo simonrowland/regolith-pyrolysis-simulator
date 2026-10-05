@@ -1,0 +1,3952 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 10.7185/geochemlet.2617
+  citation: Aithala, S. P., Macris, C. A., and Hirschmann, M. M. (2026). Temperature dependence of magmatic iron redox speciation
+    to 2100 °C. Geochemical Perspectives Letters 40, 18–23.
+  source_ids:
+  - aithala-2026-magmatic-iron-redox-to-2100c
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
+    files:
+    - asset_id: pdf:aithala-2026-magmatic-iron-redox-to-2100c
+      role: pdf
+      path: raw/aithala-2026-magmatic-iron-redox-to-2100c/aithala-2026-magmatic-iron-redox-to-2100c.pdf
+      sha256:
+        tag: unknown
+        reason: INDEX does not give sha256
+    - asset_id: pdftotext:aithala-2026-magmatic-iron-redox-to-2100c
+      role: pdftotext
+      path: text/aithala-2026-magmatic-iron-redox-to-2100c
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: tables:aithala-2026-magmatic-iron-redox-to-2100c
+      role: table_csv
+      path: tables/aithala-2026-magmatic-iron-redox-to-2100c
+      sha256:
+        tag: unknown
+        reason: INDEX does not give table sha256
+    - asset_id: unknown:aithala-2026-magmatic-iron-redox-to-2100c
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
+  doi: 10.7185/geochemlet.2617
+experiments:
+- experiment_id: 10.7185/geochemlet.2617::experiment::aithala-2026-1800-30
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample:
+    initial_composition:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 8
+        published_page: SI-2
+        section: Methods
+        note: No numerical initial composition is given here; synthesis details are referred to an earlier paper
+    form:
+      state:
+        tag: value
+        value: Laser-levitated melt droplet
+      locator:
+        page: 8
+        published_page: SI-2
+        section: Methods
+    characterization:
+      state:
+        tag: value
+        value: Humphrey single martian-relevant basaltic composition
+      locator:
+        page: 8
+        published_page: SI-2
+        section: Methods
+        note: Starting-material name; synthesis details are referred to an earlier paper
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '2073.15'
+          approximate: false
+      locator:
+        page: 13
+        published_page: SI-7
+        table: S-1
+        section: Table S-1
+        note: Printed 1800 °C; converted with K = °C + 273.15.
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1800'
+            locator:
+              page: 13
+              published_page: SI-7
+              table: S-1
+              section: Table S-1
+              note: Printed 1800 °C; converted with K = °C + 273.15.
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 13
+              published_page: SI-7
+              table: S-1
+              section: Table S-1
+              note: Printed 1800 °C; converted with K = °C + 273.15.
+        output_unit: K
+    temperature_uncertainty_K:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 8
+        published_page: SI-2
+        section: Methods
+        note: No numerical pyrometric ±T uncertainty is supplied
+    log_fO2:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0'
+          approximate: false
+      locator:
+        page: 13
+        published_page: SI-7
+        table: S-1
+        section: Table S-1
+        note: Printed log fO2 0; reported for the imposed ultra-high-purity O2 gas atmosphere, not a sensor reading. Absolute
+          log10 fO2 uses P0 = 100 kPa, not a mineral buffer (article PDF p. 2, printed p. 19, Pressure and fO2 conventions).
+    log_fO2_as_printed:
+      state:
+        tag: value
+        value: '0'
+      locator:
+        page: 13
+        published_page: SI-7
+        table: S-1
+        section: Table S-1
+        note: Printed form for the ultra-high-purity O2 gas atmosphere
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '100000'
+          approximate: false
+      locator:
+        page: 2
+        published_page: '19'
+        section: Pressure
+        note: Article reports 100 kPa; conversion only, not 101325 Pa
+    sweep_gas:
+      state:
+        tag: value
+        value:
+          species: O2
+          flow_sccm:
+            tag: unknown
+            reason: would_invent
+          partial_pressure_Pa:
+            tag: unknown
+            reason: not_published
+      locator:
+        page: 8
+        published_page: SI-2
+        section: Methods
+        note: O2 purity and 300–340 cc/min are reported; no standard flow reference or per-run oxygen partial-pressure reading
+          is supplied
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 10.7185/geochemlet.2617
+  locator:
+    page: 13
+    published_page: SI-7
+    table: S-1
+    note: Run conditions for 1800-30.
+  fO2_control:
+    channel:
+      tag: value
+      value: gas_mix
+    buffer:
+      state:
+        tag: value
+        value: Laser heated and equilibrated with flowing UHP O2 gas while aerodynamically levitated
+      locator:
+        page: 8
+        published_page: SI-2
+        section: Methods
+        note: Reported ultra-high-purity O2 gas condition; log fO2 is atmosphere-imposed, not a per-run sensor measurement
+  bench_id: 10.7185/geochemlet.2617::bench::aithala-allf-laser-levitation
+  thermal_schedule:
+    method:
+      state:
+        tag: value
+        value: Laser heated and equilibrated at the listed temperature, then free-quenched
+      locator:
+        page: 8
+        published_page: SI-2
+        section: Methods
+        note: Aerodynamic laser-levitation, gas, heating and quench conditions
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '30'
+          approximate: false
+      locator:
+        page: 13
+        published_page: SI-7
+        table: S-1
+        note: Printed duration 30 s; seconds conversion only
+    cooling_or_quench:
+      state:
+        tag: value
+        value: Laser-off free quench
+      locator:
+        page: 10
+        published_page: SI-4
+        section: Quenching
+- experiment_id: 10.7185/geochemlet.2617::experiment::aithala-2026-1900-30
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample:
+    initial_composition:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 8
+        published_page: SI-2
+        section: Methods
+        note: No numerical initial composition is given here; synthesis details are referred to an earlier paper
+    form:
+      state:
+        tag: value
+        value: Laser-levitated melt droplet
+      locator:
+        page: 8
+        published_page: SI-2
+        section: Methods
+    characterization:
+      state:
+        tag: value
+        value: Humphrey single martian-relevant basaltic composition
+      locator:
+        page: 8
+        published_page: SI-2
+        section: Methods
+        note: Starting-material name; synthesis details are referred to an earlier paper
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '2173.15'
+          approximate: false
+      locator:
+        page: 13
+        published_page: SI-7
+        table: S-1
+        section: Table S-1
+        note: Printed 1900 °C; converted with K = °C + 273.15.
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1900'
+            locator:
+              page: 13
+              published_page: SI-7
+              table: S-1
+              section: Table S-1
+              note: Printed 1900 °C; converted with K = °C + 273.15.
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 13
+              published_page: SI-7
+              table: S-1
+              section: Table S-1
+              note: Printed 1900 °C; converted with K = °C + 273.15.
+        output_unit: K
+    temperature_uncertainty_K:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 8
+        published_page: SI-2
+        section: Methods
+        note: No numerical pyrometric ±T uncertainty is supplied
+    log_fO2:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0'
+          approximate: false
+      locator:
+        page: 13
+        published_page: SI-7
+        table: S-1
+        section: Table S-1
+        note: Printed log fO2 0; reported for the imposed ultra-high-purity O2 gas atmosphere, not a sensor reading. Absolute
+          log10 fO2 uses P0 = 100 kPa, not a mineral buffer (article PDF p. 2, printed p. 19, Pressure and fO2 conventions).
+    log_fO2_as_printed:
+      state:
+        tag: value
+        value: '0'
+      locator:
+        page: 13
+        published_page: SI-7
+        table: S-1
+        section: Table S-1
+        note: Printed form for the ultra-high-purity O2 gas atmosphere
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '100000'
+          approximate: false
+      locator:
+        page: 2
+        published_page: '19'
+        section: Pressure
+        note: Article reports 100 kPa; conversion only, not 101325 Pa
+    sweep_gas:
+      state:
+        tag: value
+        value:
+          species: O2
+          flow_sccm:
+            tag: unknown
+            reason: would_invent
+          partial_pressure_Pa:
+            tag: unknown
+            reason: not_published
+      locator:
+        page: 8
+        published_page: SI-2
+        section: Methods
+        note: O2 purity and 300–340 cc/min are reported; no standard flow reference or per-run oxygen partial-pressure reading
+          is supplied
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 10.7185/geochemlet.2617
+  locator:
+    page: 13
+    published_page: SI-7
+    table: S-1
+    note: Run conditions for 1900-30.
+  fO2_control:
+    channel:
+      tag: value
+      value: gas_mix
+    buffer:
+      state:
+        tag: value
+        value: Laser heated and equilibrated with flowing UHP O2 gas while aerodynamically levitated
+      locator:
+        page: 8
+        published_page: SI-2
+        section: Methods
+        note: Reported ultra-high-purity O2 gas condition; log fO2 is atmosphere-imposed, not a per-run sensor measurement
+  bench_id: 10.7185/geochemlet.2617::bench::aithala-allf-laser-levitation
+  thermal_schedule:
+    method:
+      state:
+        tag: value
+        value: Laser heated and equilibrated at the listed temperature, then free-quenched
+      locator:
+        page: 8
+        published_page: SI-2
+        section: Methods
+        note: Aerodynamic laser-levitation, gas, heating and quench conditions
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '30'
+          approximate: false
+      locator:
+        page: 13
+        published_page: SI-7
+        table: S-1
+        note: Printed duration 30 s; seconds conversion only
+    cooling_or_quench:
+      state:
+        tag: value
+        value: Laser-off free quench
+      locator:
+        page: 10
+        published_page: SI-4
+        section: Quenching
+- experiment_id: 10.7185/geochemlet.2617::experiment::aithala-2026-2000-10
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample:
+    initial_composition:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 8
+        published_page: SI-2
+        section: Methods
+        note: No numerical initial composition is given here; synthesis details are referred to an earlier paper
+    form:
+      state:
+        tag: value
+        value: Laser-levitated melt droplet
+      locator:
+        page: 8
+        published_page: SI-2
+        section: Methods
+    characterization:
+      state:
+        tag: value
+        value: Humphrey single martian-relevant basaltic composition
+      locator:
+        page: 8
+        published_page: SI-2
+        section: Methods
+        note: Starting-material name; synthesis details are referred to an earlier paper
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '2273.15'
+          approximate: false
+      locator:
+        page: 13
+        published_page: SI-7
+        table: S-1
+        section: Table S-1
+        note: Printed 2000 °C; converted with K = °C + 273.15.
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '2000'
+            locator:
+              page: 13
+              published_page: SI-7
+              table: S-1
+              section: Table S-1
+              note: Printed 2000 °C; converted with K = °C + 273.15.
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 13
+              published_page: SI-7
+              table: S-1
+              section: Table S-1
+              note: Printed 2000 °C; converted with K = °C + 273.15.
+        output_unit: K
+    temperature_uncertainty_K:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 8
+        published_page: SI-2
+        section: Methods
+        note: No numerical pyrometric ±T uncertainty is supplied
+    log_fO2:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0'
+          approximate: false
+      locator:
+        page: 13
+        published_page: SI-7
+        table: S-1
+        section: Table S-1
+        note: Printed log fO2 0; reported for the imposed ultra-high-purity O2 gas atmosphere, not a sensor reading. Absolute
+          log10 fO2 uses P0 = 100 kPa, not a mineral buffer (article PDF p. 2, printed p. 19, Pressure and fO2 conventions).
+    log_fO2_as_printed:
+      state:
+        tag: value
+        value: '0'
+      locator:
+        page: 13
+        published_page: SI-7
+        table: S-1
+        section: Table S-1
+        note: Printed form for the ultra-high-purity O2 gas atmosphere
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '100000'
+          approximate: false
+      locator:
+        page: 2
+        published_page: '19'
+        section: Pressure
+        note: Article reports 100 kPa; conversion only, not 101325 Pa
+    sweep_gas:
+      state:
+        tag: value
+        value:
+          species: O2
+          flow_sccm:
+            tag: unknown
+            reason: would_invent
+          partial_pressure_Pa:
+            tag: unknown
+            reason: not_published
+      locator:
+        page: 8
+        published_page: SI-2
+        section: Methods
+        note: O2 purity and 300–340 cc/min are reported; no standard flow reference or per-run oxygen partial-pressure reading
+          is supplied
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 10.7185/geochemlet.2617
+  locator:
+    page: 13
+    published_page: SI-7
+    table: S-1
+    note: Run conditions for 2000-10.
+  fO2_control:
+    channel:
+      tag: value
+      value: gas_mix
+    buffer:
+      state:
+        tag: value
+        value: Laser heated and equilibrated with flowing UHP O2 gas while aerodynamically levitated
+      locator:
+        page: 8
+        published_page: SI-2
+        section: Methods
+        note: Reported ultra-high-purity O2 gas condition; log fO2 is atmosphere-imposed, not a per-run sensor measurement
+  bench_id: 10.7185/geochemlet.2617::bench::aithala-allf-laser-levitation
+  thermal_schedule:
+    method:
+      state:
+        tag: value
+        value: Laser heated and equilibrated at the listed temperature, then free-quenched
+      locator:
+        page: 8
+        published_page: SI-2
+        section: Methods
+        note: Aerodynamic laser-levitation, gas, heating and quench conditions
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '10'
+          approximate: false
+      locator:
+        page: 13
+        published_page: SI-7
+        table: S-1
+        note: Printed duration 10 s; seconds conversion only
+    cooling_or_quench:
+      state:
+        tag: value
+        value: Laser-off free quench
+      locator:
+        page: 10
+        published_page: SI-4
+        section: Quenching
+- experiment_id: 10.7185/geochemlet.2617::experiment::aithala-2026-2000-120
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample:
+    initial_composition:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 8
+        published_page: SI-2
+        section: Methods
+        note: No numerical initial composition is given here; synthesis details are referred to an earlier paper
+    form:
+      state:
+        tag: value
+        value: Laser-levitated melt droplet
+      locator:
+        page: 8
+        published_page: SI-2
+        section: Methods
+    characterization:
+      state:
+        tag: value
+        value: Humphrey single martian-relevant basaltic composition
+      locator:
+        page: 8
+        published_page: SI-2
+        section: Methods
+        note: Starting-material name; synthesis details are referred to an earlier paper
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '2273.15'
+          approximate: false
+      locator:
+        page: 13
+        published_page: SI-7
+        table: S-1
+        section: Table S-1
+        note: Printed 2000 °C; converted with K = °C + 273.15.
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '2000'
+            locator:
+              page: 13
+              published_page: SI-7
+              table: S-1
+              section: Table S-1
+              note: Printed 2000 °C; converted with K = °C + 273.15.
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 13
+              published_page: SI-7
+              table: S-1
+              section: Table S-1
+              note: Printed 2000 °C; converted with K = °C + 273.15.
+        output_unit: K
+    temperature_uncertainty_K:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 8
+        published_page: SI-2
+        section: Methods
+        note: No numerical pyrometric ±T uncertainty is supplied
+    log_fO2:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0'
+          approximate: false
+      locator:
+        page: 13
+        published_page: SI-7
+        table: S-1
+        section: Table S-1
+        note: Printed log fO2 0; reported for the imposed ultra-high-purity O2 gas atmosphere, not a sensor reading. Absolute
+          log10 fO2 uses P0 = 100 kPa, not a mineral buffer (article PDF p. 2, printed p. 19, Pressure and fO2 conventions).
+    log_fO2_as_printed:
+      state:
+        tag: value
+        value: '0'
+      locator:
+        page: 13
+        published_page: SI-7
+        table: S-1
+        section: Table S-1
+        note: Printed form for the ultra-high-purity O2 gas atmosphere
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '100000'
+          approximate: false
+      locator:
+        page: 2
+        published_page: '19'
+        section: Pressure
+        note: Article reports 100 kPa; conversion only, not 101325 Pa
+    sweep_gas:
+      state:
+        tag: value
+        value:
+          species: O2
+          flow_sccm:
+            tag: unknown
+            reason: would_invent
+          partial_pressure_Pa:
+            tag: unknown
+            reason: not_published
+      locator:
+        page: 8
+        published_page: SI-2
+        section: Methods
+        note: O2 purity and 300–340 cc/min are reported; no standard flow reference or per-run oxygen partial-pressure reading
+          is supplied
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 10.7185/geochemlet.2617
+  locator:
+    page: 13
+    published_page: SI-7
+    table: S-1
+    note: Run conditions for 2000-120.
+  fO2_control:
+    channel:
+      tag: value
+      value: gas_mix
+    buffer:
+      state:
+        tag: value
+        value: Laser heated and equilibrated with flowing UHP O2 gas while aerodynamically levitated
+      locator:
+        page: 8
+        published_page: SI-2
+        section: Methods
+        note: Reported ultra-high-purity O2 gas condition; log fO2 is atmosphere-imposed, not a per-run sensor measurement
+  bench_id: 10.7185/geochemlet.2617::bench::aithala-allf-laser-levitation
+  thermal_schedule:
+    method:
+      state:
+        tag: value
+        value: Laser heated and equilibrated at the listed temperature, then free-quenched
+      locator:
+        page: 8
+        published_page: SI-2
+        section: Methods
+        note: Aerodynamic laser-levitation, gas, heating and quench conditions
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '120'
+          approximate: false
+      locator:
+        page: 13
+        published_page: SI-7
+        table: S-1
+        note: Printed duration 120 s; seconds conversion only
+    cooling_or_quench:
+      state:
+        tag: value
+        value: Laser-off free quench
+      locator:
+        page: 10
+        published_page: SI-4
+        section: Quenching
+- experiment_id: 10.7185/geochemlet.2617::experiment::aithala-2026-2000-30
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample:
+    initial_composition:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 8
+        published_page: SI-2
+        section: Methods
+        note: No numerical initial composition is given here; synthesis details are referred to an earlier paper
+    form:
+      state:
+        tag: value
+        value: Laser-levitated melt droplet
+      locator:
+        page: 8
+        published_page: SI-2
+        section: Methods
+    characterization:
+      state:
+        tag: value
+        value: Humphrey single martian-relevant basaltic composition
+      locator:
+        page: 8
+        published_page: SI-2
+        section: Methods
+        note: Starting-material name; synthesis details are referred to an earlier paper
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '2273.15'
+          approximate: false
+      locator:
+        page: 13
+        published_page: SI-7
+        table: S-1
+        section: Table S-1
+        note: Printed 2000 °C; converted with K = °C + 273.15.
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '2000'
+            locator:
+              page: 13
+              published_page: SI-7
+              table: S-1
+              section: Table S-1
+              note: Printed 2000 °C; converted with K = °C + 273.15.
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 13
+              published_page: SI-7
+              table: S-1
+              section: Table S-1
+              note: Printed 2000 °C; converted with K = °C + 273.15.
+        output_unit: K
+    temperature_uncertainty_K:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 8
+        published_page: SI-2
+        section: Methods
+        note: No numerical pyrometric ±T uncertainty is supplied
+    log_fO2:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0'
+          approximate: false
+      locator:
+        page: 13
+        published_page: SI-7
+        table: S-1
+        section: Table S-1
+        note: Printed log fO2 0; reported for the imposed ultra-high-purity O2 gas atmosphere, not a sensor reading. Absolute
+          log10 fO2 uses P0 = 100 kPa, not a mineral buffer (article PDF p. 2, printed p. 19, Pressure and fO2 conventions).
+    log_fO2_as_printed:
+      state:
+        tag: value
+        value: '0'
+      locator:
+        page: 13
+        published_page: SI-7
+        table: S-1
+        section: Table S-1
+        note: Printed form for the ultra-high-purity O2 gas atmosphere
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '100000'
+          approximate: false
+      locator:
+        page: 2
+        published_page: '19'
+        section: Pressure
+        note: Article reports 100 kPa; conversion only, not 101325 Pa
+    sweep_gas:
+      state:
+        tag: value
+        value:
+          species: O2
+          flow_sccm:
+            tag: unknown
+            reason: would_invent
+          partial_pressure_Pa:
+            tag: unknown
+            reason: not_published
+      locator:
+        page: 8
+        published_page: SI-2
+        section: Methods
+        note: O2 purity and 300–340 cc/min are reported; no standard flow reference or per-run oxygen partial-pressure reading
+          is supplied
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 10.7185/geochemlet.2617
+  locator:
+    page: 13
+    published_page: SI-7
+    table: S-1
+    note: Run conditions for 2000-30.
+  fO2_control:
+    channel:
+      tag: value
+      value: gas_mix
+    buffer:
+      state:
+        tag: value
+        value: Laser heated and equilibrated with flowing UHP O2 gas while aerodynamically levitated
+      locator:
+        page: 8
+        published_page: SI-2
+        section: Methods
+        note: Reported ultra-high-purity O2 gas condition; log fO2 is atmosphere-imposed, not a per-run sensor measurement
+  bench_id: 10.7185/geochemlet.2617::bench::aithala-allf-laser-levitation
+  thermal_schedule:
+    method:
+      state:
+        tag: value
+        value: Laser heated and equilibrated at the listed temperature, then free-quenched
+      locator:
+        page: 8
+        published_page: SI-2
+        section: Methods
+        note: Aerodynamic laser-levitation, gas, heating and quench conditions
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '30'
+          approximate: false
+      locator:
+        page: 13
+        published_page: SI-7
+        table: S-1
+        note: Printed duration 30 s; seconds conversion only
+    cooling_or_quench:
+      state:
+        tag: value
+        value: Laser-off free quench
+      locator:
+        page: 10
+        published_page: SI-4
+        section: Quenching
+- experiment_id: 10.7185/geochemlet.2617::experiment::aithala-2026-2100-30
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample:
+    initial_composition:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 8
+        published_page: SI-2
+        section: Methods
+        note: No numerical initial composition is given here; synthesis details are referred to an earlier paper
+    form:
+      state:
+        tag: value
+        value: Laser-levitated melt droplet
+      locator:
+        page: 8
+        published_page: SI-2
+        section: Methods
+    characterization:
+      state:
+        tag: value
+        value: Humphrey single martian-relevant basaltic composition
+      locator:
+        page: 8
+        published_page: SI-2
+        section: Methods
+        note: Starting-material name; synthesis details are referred to an earlier paper
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '2373.15'
+          approximate: false
+      locator:
+        page: 13
+        published_page: SI-7
+        table: S-1
+        section: Table S-1
+        note: Printed 2100 °C; converted with K = °C + 273.15.
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '2100'
+            locator:
+              page: 13
+              published_page: SI-7
+              table: S-1
+              section: Table S-1
+              note: Printed 2100 °C; converted with K = °C + 273.15.
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 13
+              published_page: SI-7
+              table: S-1
+              section: Table S-1
+              note: Printed 2100 °C; converted with K = °C + 273.15.
+        output_unit: K
+    temperature_uncertainty_K:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 8
+        published_page: SI-2
+        section: Methods
+        note: No numerical pyrometric ±T uncertainty is supplied
+    log_fO2:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0'
+          approximate: false
+      locator:
+        page: 13
+        published_page: SI-7
+        table: S-1
+        section: Table S-1
+        note: Printed log fO2 0; reported for the imposed ultra-high-purity O2 gas atmosphere, not a sensor reading. Absolute
+          log10 fO2 uses P0 = 100 kPa, not a mineral buffer (article PDF p. 2, printed p. 19, Pressure and fO2 conventions).
+    log_fO2_as_printed:
+      state:
+        tag: value
+        value: '0'
+      locator:
+        page: 13
+        published_page: SI-7
+        table: S-1
+        section: Table S-1
+        note: Printed form for the ultra-high-purity O2 gas atmosphere
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '100000'
+          approximate: false
+      locator:
+        page: 2
+        published_page: '19'
+        section: Pressure
+        note: Article reports 100 kPa; conversion only, not 101325 Pa
+    sweep_gas:
+      state:
+        tag: value
+        value:
+          species: O2
+          flow_sccm:
+            tag: unknown
+            reason: would_invent
+          partial_pressure_Pa:
+            tag: unknown
+            reason: not_published
+      locator:
+        page: 8
+        published_page: SI-2
+        section: Methods
+        note: O2 purity and 300–340 cc/min are reported; no standard flow reference or per-run oxygen partial-pressure reading
+          is supplied
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 10.7185/geochemlet.2617
+  locator:
+    page: 13
+    published_page: SI-7
+    table: S-1
+    note: Run conditions for 2100-30.
+  fO2_control:
+    channel:
+      tag: value
+      value: gas_mix
+    buffer:
+      state:
+        tag: value
+        value: Laser heated and equilibrated with flowing UHP O2 gas while aerodynamically levitated
+      locator:
+        page: 8
+        published_page: SI-2
+        section: Methods
+        note: Reported ultra-high-purity O2 gas condition; log fO2 is atmosphere-imposed, not a per-run sensor measurement
+  bench_id: 10.7185/geochemlet.2617::bench::aithala-allf-laser-levitation
+  thermal_schedule:
+    method:
+      state:
+        tag: value
+        value: Laser heated and equilibrated at the listed temperature, then free-quenched
+      locator:
+        page: 8
+        published_page: SI-2
+        section: Methods
+        note: Aerodynamic laser-levitation, gas, heating and quench conditions
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '30'
+          approximate: false
+      locator:
+        page: 13
+        published_page: SI-7
+        table: S-1
+        note: Printed duration 30 s; seconds conversion only
+    cooling_or_quench:
+      state:
+        tag: value
+        value: Laser-off free quench
+      locator:
+        page: 10
+        published_page: SI-4
+        section: Quenching
+- experiment_id: 10.7185/geochemlet.2617::experiment::aithala-2026-vf231
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample:
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '0.00003'
+          interval_high: '0.000035'
+          approximate: false
+      locator:
+        page: 7
+        published_page: SI-1
+        section: Methods
+        note: Approximately 30–35 mg as printed; SI conversion only
+    initial_composition:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 7
+        published_page: SI-1
+        section: Methods
+        note: No numerical initial composition is given here; synthesis details are referred to an earlier paper
+    form:
+      state:
+        tag: value
+        value: Melt charge suspended on Pt wire
+      locator:
+        page: 7
+        published_page: SI-1
+        section: Methods
+    characterization:
+      state:
+        tag: value
+        value: Humphrey single martian-relevant basaltic composition
+      locator:
+        page: 7
+        published_page: SI-1
+        section: Methods
+        note: Starting-material name; synthesis details are referred to an earlier paper
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1638.15'
+          approximate: false
+      locator:
+        page: 13
+        published_page: SI-7
+        table: S-1
+        section: Table S-1
+        note: Printed 1365 °C; converted with K = °C + 273.15.
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1365'
+            locator:
+              page: 13
+              published_page: SI-7
+              table: S-1
+              section: Table S-1
+              note: Printed 1365 °C; converted with K = °C + 273.15.
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 13
+              published_page: SI-7
+              table: S-1
+              section: Table S-1
+              note: Printed 1365 °C; converted with K = °C + 273.15.
+        output_unit: K
+    temperature_uncertainty_K:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 7
+        published_page: SI-1
+        section: Methods
+        note: No numerical ±T uncertainty is tabulated
+    log_fO2:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '-0.68'
+          approximate: false
+      locator:
+        page: 13
+        published_page: SI-7
+        table: S-1
+        section: Table S-1
+        note: Printed log fO2 -0.68; reported for the imposed air atmosphere, not a sensor reading. Absolute log10 fO2 uses
+          P0 = 100 kPa, not a mineral buffer (article PDF p. 2, printed p. 19, Pressure and fO2 conventions).
+    log_fO2_as_printed:
+      state:
+        tag: value
+        value: '-0.68'
+      locator:
+        page: 13
+        published_page: SI-7
+        table: S-1
+        section: Table S-1
+        note: Printed form for the air atmosphere
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '100000'
+          approximate: false
+      locator:
+        page: 2
+        published_page: '19'
+        section: Pressure
+        note: Article reports 100 kPa; conversion only, not 101325 Pa
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 7
+        published_page: SI-1
+        section: Methods
+        note: Air is stated as the imposed atmosphere; mixture flow/composition are not tabulated
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 10.7185/geochemlet.2617
+  locator:
+    page: 13
+    published_page: SI-7
+    table: S-1
+    note: Run conditions for vf231.
+  fO2_control:
+    channel:
+      tag: value
+      value: gas_mix
+    buffer:
+      state:
+        tag: value
+        value: Equilibrated in air in a vertical gas-mixing furnace
+      locator:
+        page: 7
+        published_page: SI-1
+        section: Methods
+        note: Reported air condition; log fO2 is atmosphere-imposed, not a per-run sensor measurement
+  bench_id: 10.7185/geochemlet.2617::bench::aithala-vf-gas-mixing-furnace
+  thermal_schedule:
+    method:
+      state:
+        tag: value
+        value: Equilibrated at the listed temperature, then quenched
+      locator:
+        page: 7
+        published_page: SI-1
+        section: Methods
+        note: Furnace, atmosphere, charge and quench conditions
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '21600'
+          approximate: false
+      locator:
+        page: 13
+        published_page: SI-7
+        table: S-1
+        note: Printed duration 6 h; seconds conversion only
+    cooling_or_quench:
+      state:
+        tag: value
+        value: Terminated by deionized-water quench
+      locator:
+        page: 7
+        published_page: SI-1
+        section: Methods
+- experiment_id: 10.7185/geochemlet.2617::experiment::aithala-2026-vf267
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample:
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '0.00003'
+          interval_high: '0.000035'
+          approximate: false
+      locator:
+        page: 7
+        published_page: SI-1
+        section: Methods
+        note: Approximately 30–35 mg as printed; SI conversion only
+    initial_composition:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 7
+        published_page: SI-1
+        section: Methods
+        note: No numerical initial composition is given here; synthesis details are referred to an earlier paper
+    form:
+      state:
+        tag: value
+        value: Melt charge suspended on Pt wire
+      locator:
+        page: 7
+        published_page: SI-1
+        section: Methods
+    characterization:
+      state:
+        tag: value
+        value: Humphrey single martian-relevant basaltic composition
+      locator:
+        page: 7
+        published_page: SI-1
+        section: Methods
+        note: Starting-material name; synthesis details are referred to an earlier paper
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1573.15'
+          approximate: false
+      locator:
+        page: 13
+        published_page: SI-7
+        table: S-1
+        section: Table S-1
+        note: Printed 1300 °C; converted with K = °C + 273.15.
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1300'
+            locator:
+              page: 13
+              published_page: SI-7
+              table: S-1
+              section: Table S-1
+              note: Printed 1300 °C; converted with K = °C + 273.15.
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 13
+              published_page: SI-7
+              table: S-1
+              section: Table S-1
+              note: Printed 1300 °C; converted with K = °C + 273.15.
+        output_unit: K
+    temperature_uncertainty_K:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 7
+        published_page: SI-1
+        section: Methods
+        note: No numerical ±T uncertainty is tabulated
+    log_fO2:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '-0.68'
+          approximate: false
+      locator:
+        page: 13
+        published_page: SI-7
+        table: S-1
+        section: Table S-1
+        note: Printed log fO2 -0.68; reported for the imposed air atmosphere, not a sensor reading. Absolute log10 fO2 uses
+          P0 = 100 kPa, not a mineral buffer (article PDF p. 2, printed p. 19, Pressure and fO2 conventions).
+    log_fO2_as_printed:
+      state:
+        tag: value
+        value: '-0.68'
+      locator:
+        page: 13
+        published_page: SI-7
+        table: S-1
+        section: Table S-1
+        note: Printed form for the air atmosphere
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '100000'
+          approximate: false
+      locator:
+        page: 2
+        published_page: '19'
+        section: Pressure
+        note: Article reports 100 kPa; conversion only, not 101325 Pa
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 7
+        published_page: SI-1
+        section: Methods
+        note: Air is stated as the imposed atmosphere; mixture flow/composition are not tabulated
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 10.7185/geochemlet.2617
+  locator:
+    page: 13
+    published_page: SI-7
+    table: S-1
+    note: Run conditions for vf267.
+  fO2_control:
+    channel:
+      tag: value
+      value: gas_mix
+    buffer:
+      state:
+        tag: value
+        value: Equilibrated in air in a vertical gas-mixing furnace
+      locator:
+        page: 7
+        published_page: SI-1
+        section: Methods
+        note: Reported air condition; log fO2 is atmosphere-imposed, not a per-run sensor measurement
+  bench_id: 10.7185/geochemlet.2617::bench::aithala-vf-gas-mixing-furnace
+  thermal_schedule:
+    method:
+      state:
+        tag: value
+        value: Equilibrated at the listed temperature, then quenched
+      locator:
+        page: 7
+        published_page: SI-1
+        section: Methods
+        note: Furnace, atmosphere, charge and quench conditions
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '86400'
+          approximate: false
+      locator:
+        page: 13
+        published_page: SI-7
+        table: S-1
+        note: Printed duration 24 h; seconds conversion only
+    cooling_or_quench:
+      state:
+        tag: value
+        value: Terminated by deionized-water quench
+      locator:
+        page: 7
+        published_page: SI-1
+        section: Methods
+- experiment_id: 10.7185/geochemlet.2617::experiment::aithala-2026-vf268
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample:
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '0.00003'
+          interval_high: '0.000035'
+          approximate: false
+      locator:
+        page: 7
+        published_page: SI-1
+        section: Methods
+        note: Approximately 30–35 mg as printed; SI conversion only
+    initial_composition:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 7
+        published_page: SI-1
+        section: Methods
+        note: No numerical initial composition is given here; synthesis details are referred to an earlier paper
+    form:
+      state:
+        tag: value
+        value: Melt charge suspended on Pt wire
+      locator:
+        page: 7
+        published_page: SI-1
+        section: Methods
+    characterization:
+      state:
+        tag: value
+        value: Humphrey single martian-relevant basaltic composition
+      locator:
+        page: 7
+        published_page: SI-1
+        section: Methods
+        note: Starting-material name; synthesis details are referred to an earlier paper
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1673.15'
+          approximate: false
+      locator:
+        page: 13
+        published_page: SI-7
+        table: S-1
+        section: Table S-1
+        note: Printed 1400 °C; converted with K = °C + 273.15.
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1400'
+            locator:
+              page: 13
+              published_page: SI-7
+              table: S-1
+              section: Table S-1
+              note: Printed 1400 °C; converted with K = °C + 273.15.
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 13
+              published_page: SI-7
+              table: S-1
+              section: Table S-1
+              note: Printed 1400 °C; converted with K = °C + 273.15.
+        output_unit: K
+    temperature_uncertainty_K:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 7
+        published_page: SI-1
+        section: Methods
+        note: No numerical ±T uncertainty is tabulated
+    log_fO2:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '-0.68'
+          approximate: false
+      locator:
+        page: 13
+        published_page: SI-7
+        table: S-1
+        section: Table S-1
+        note: Printed log fO2 -0.68; reported for the imposed air atmosphere, not a sensor reading. Absolute log10 fO2 uses
+          P0 = 100 kPa, not a mineral buffer (article PDF p. 2, printed p. 19, Pressure and fO2 conventions).
+    log_fO2_as_printed:
+      state:
+        tag: value
+        value: '-0.68'
+      locator:
+        page: 13
+        published_page: SI-7
+        table: S-1
+        section: Table S-1
+        note: Printed form for the air atmosphere
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '100000'
+          approximate: false
+      locator:
+        page: 2
+        published_page: '19'
+        section: Pressure
+        note: Article reports 100 kPa; conversion only, not 101325 Pa
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 7
+        published_page: SI-1
+        section: Methods
+        note: Air is stated as the imposed atmosphere; mixture flow/composition are not tabulated
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 10.7185/geochemlet.2617
+  locator:
+    page: 13
+    published_page: SI-7
+    table: S-1
+    note: Run conditions for vf268.
+  fO2_control:
+    channel:
+      tag: value
+      value: gas_mix
+    buffer:
+      state:
+        tag: value
+        value: Equilibrated in air in a vertical gas-mixing furnace
+      locator:
+        page: 7
+        published_page: SI-1
+        section: Methods
+        note: Reported air condition; log fO2 is atmosphere-imposed, not a per-run sensor measurement
+  bench_id: 10.7185/geochemlet.2617::bench::aithala-vf-gas-mixing-furnace
+  thermal_schedule:
+    method:
+      state:
+        tag: value
+        value: Equilibrated at the listed temperature, then quenched
+      locator:
+        page: 7
+        published_page: SI-1
+        section: Methods
+        note: Furnace, atmosphere, charge and quench conditions
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '21600'
+          approximate: false
+      locator:
+        page: 13
+        published_page: SI-7
+        table: S-1
+        note: Printed duration 6 h; seconds conversion only
+    cooling_or_quench:
+      state:
+        tag: value
+        value: Terminated by deionized-water quench
+      locator:
+        page: 7
+        published_page: SI-1
+        section: Methods
+- experiment_id: 10.7185/geochemlet.2617::experiment::aithala-2026-vf270
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample:
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '0.00003'
+          interval_high: '0.000035'
+          approximate: false
+      locator:
+        page: 7
+        published_page: SI-1
+        section: Methods
+        note: Approximately 30–35 mg as printed; SI conversion only
+    initial_composition:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 7
+        published_page: SI-1
+        section: Methods
+        note: No numerical initial composition is given here; synthesis details are referred to an earlier paper
+    form:
+      state:
+        tag: value
+        value: Melt charge suspended on Pt wire
+      locator:
+        page: 7
+        published_page: SI-1
+        section: Methods
+    characterization:
+      state:
+        tag: value
+        value: Humphrey single martian-relevant basaltic composition
+      locator:
+        page: 7
+        published_page: SI-1
+        section: Methods
+        note: Starting-material name; synthesis details are referred to an earlier paper
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1723.15'
+          approximate: false
+      locator:
+        page: 13
+        published_page: SI-7
+        table: S-1
+        section: Table S-1
+        note: Printed 1450 °C; converted with K = °C + 273.15.
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1450'
+            locator:
+              page: 13
+              published_page: SI-7
+              table: S-1
+              section: Table S-1
+              note: Printed 1450 °C; converted with K = °C + 273.15.
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 13
+              published_page: SI-7
+              table: S-1
+              section: Table S-1
+              note: Printed 1450 °C; converted with K = °C + 273.15.
+        output_unit: K
+    temperature_uncertainty_K:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 7
+        published_page: SI-1
+        section: Methods
+        note: No numerical ±T uncertainty is tabulated
+    log_fO2:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '-0.68'
+          approximate: false
+      locator:
+        page: 13
+        published_page: SI-7
+        table: S-1
+        section: Table S-1
+        note: Printed log fO2 -0.68; reported for the imposed air atmosphere, not a sensor reading. Absolute log10 fO2 uses
+          P0 = 100 kPa, not a mineral buffer (article PDF p. 2, printed p. 19, Pressure and fO2 conventions).
+    log_fO2_as_printed:
+      state:
+        tag: value
+        value: '-0.68'
+      locator:
+        page: 13
+        published_page: SI-7
+        table: S-1
+        section: Table S-1
+        note: Printed form for the air atmosphere
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '100000'
+          approximate: false
+      locator:
+        page: 2
+        published_page: '19'
+        section: Pressure
+        note: Article reports 100 kPa; conversion only, not 101325 Pa
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 7
+        published_page: SI-1
+        section: Methods
+        note: Air is stated as the imposed atmosphere; mixture flow/composition are not tabulated
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 10.7185/geochemlet.2617
+  locator:
+    page: 13
+    published_page: SI-7
+    table: S-1
+    note: Run conditions for vf270.
+  fO2_control:
+    channel:
+      tag: value
+      value: gas_mix
+    buffer:
+      state:
+        tag: value
+        value: Equilibrated in air in a vertical gas-mixing furnace
+      locator:
+        page: 7
+        published_page: SI-1
+        section: Methods
+        note: Reported air condition; log fO2 is atmosphere-imposed, not a per-run sensor measurement
+  bench_id: 10.7185/geochemlet.2617::bench::aithala-vf-gas-mixing-furnace
+  thermal_schedule:
+    method:
+      state:
+        tag: value
+        value: Equilibrated at the listed temperature, then quenched
+      locator:
+        page: 7
+        published_page: SI-1
+        section: Methods
+        note: Furnace, atmosphere, charge and quench conditions
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '7200'
+          approximate: false
+      locator:
+        page: 13
+        published_page: SI-7
+        table: S-1
+        note: Printed duration 2 h; seconds conversion only
+    cooling_or_quench:
+      state:
+        tag: value
+        value: Terminated by deionized-water quench
+      locator:
+        page: 7
+        published_page: SI-1
+        section: Methods
+- experiment_id: 10.7185/geochemlet.2617::experiment::aithala-2026-vf271
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample:
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '0.00003'
+          interval_high: '0.000035'
+          approximate: false
+      locator:
+        page: 7
+        published_page: SI-1
+        section: Methods
+        note: Approximately 30–35 mg as printed; SI conversion only
+    initial_composition:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 7
+        published_page: SI-1
+        section: Methods
+        note: No numerical initial composition is given here; synthesis details are referred to an earlier paper
+    form:
+      state:
+        tag: value
+        value: Melt charge suspended on Pt wire
+      locator:
+        page: 7
+        published_page: SI-1
+        section: Methods
+    characterization:
+      state:
+        tag: value
+        value: Humphrey single martian-relevant basaltic composition
+      locator:
+        page: 7
+        published_page: SI-1
+        section: Methods
+        note: Starting-material name; synthesis details are referred to an earlier paper
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1523.15'
+          approximate: false
+      locator:
+        page: 13
+        published_page: SI-7
+        table: S-1
+        section: Table S-1
+        note: Printed 1250 °C; converted with K = °C + 273.15.
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1250'
+            locator:
+              page: 13
+              published_page: SI-7
+              table: S-1
+              section: Table S-1
+              note: Printed 1250 °C; converted with K = °C + 273.15.
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 13
+              published_page: SI-7
+              table: S-1
+              section: Table S-1
+              note: Printed 1250 °C; converted with K = °C + 273.15.
+        output_unit: K
+    temperature_uncertainty_K:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 7
+        published_page: SI-1
+        section: Methods
+        note: No numerical ±T uncertainty is tabulated
+    log_fO2:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '-0.68'
+          approximate: false
+      locator:
+        page: 13
+        published_page: SI-7
+        table: S-1
+        section: Table S-1
+        note: Printed log fO2 -0.68; reported for the imposed air atmosphere, not a sensor reading. Absolute log10 fO2 uses
+          P0 = 100 kPa, not a mineral buffer (article PDF p. 2, printed p. 19, Pressure and fO2 conventions).
+    log_fO2_as_printed:
+      state:
+        tag: value
+        value: '-0.68'
+      locator:
+        page: 13
+        published_page: SI-7
+        table: S-1
+        section: Table S-1
+        note: Printed form for the air atmosphere
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '100000'
+          approximate: false
+      locator:
+        page: 2
+        published_page: '19'
+        section: Pressure
+        note: Article reports 100 kPa; conversion only, not 101325 Pa
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 7
+        published_page: SI-1
+        section: Methods
+        note: Air is stated as the imposed atmosphere; mixture flow/composition are not tabulated
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 10.7185/geochemlet.2617
+  locator:
+    page: 13
+    published_page: SI-7
+    table: S-1
+    note: Run conditions for vf271.
+  fO2_control:
+    channel:
+      tag: value
+      value: gas_mix
+    buffer:
+      state:
+        tag: value
+        value: Equilibrated in air in a vertical gas-mixing furnace
+      locator:
+        page: 7
+        published_page: SI-1
+        section: Methods
+        note: Reported air condition; log fO2 is atmosphere-imposed, not a per-run sensor measurement
+  bench_id: 10.7185/geochemlet.2617::bench::aithala-vf-gas-mixing-furnace
+  thermal_schedule:
+    method:
+      state:
+        tag: value
+        value: Equilibrated at the listed temperature, then quenched
+      locator:
+        page: 7
+        published_page: SI-1
+        section: Methods
+        note: Furnace, atmosphere, charge and quench conditions
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '259200'
+          approximate: false
+      locator:
+        page: 13
+        published_page: SI-7
+        table: S-1
+        note: Printed duration 72 h; seconds conversion only
+    cooling_or_quench:
+      state:
+        tag: value
+        value: Terminated by deionized-water quench
+      locator:
+        page: 7
+        published_page: SI-1
+        section: Methods
+- experiment_id: 10.7185/geochemlet.2617::experiment::aithala-2026-vf274
+  kind: literature
+  method:
+    tag: value
+    value: quench_equilibration
+  sample:
+    mass_kg:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '0.00003'
+          interval_high: '0.000035'
+          approximate: false
+      locator:
+        page: 7
+        published_page: SI-1
+        section: Methods
+        note: Approximately 30–35 mg as printed; SI conversion only
+    initial_composition:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 7
+        published_page: SI-1
+        section: Methods
+        note: No numerical initial composition is given here; synthesis details are referred to an earlier paper
+    form:
+      state:
+        tag: value
+        value: Melt charge suspended on Pt wire
+      locator:
+        page: 7
+        published_page: SI-1
+        section: Methods
+    characterization:
+      state:
+        tag: value
+        value: Humphrey single martian-relevant basaltic composition
+      locator:
+        page: 7
+        published_page: SI-1
+        section: Methods
+        note: Starting-material name; synthesis details are referred to an earlier paper
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '1773.15'
+          approximate: false
+      locator:
+        page: 13
+        published_page: SI-7
+        table: S-1
+        section: Table S-1
+        note: Printed 1500 °C; converted with K = °C + 273.15.
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1500'
+            locator:
+              page: 13
+              published_page: SI-7
+              table: S-1
+              section: Table S-1
+              note: Printed 1500 °C; converted with K = °C + 273.15.
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              page: 13
+              published_page: SI-7
+              table: S-1
+              section: Table S-1
+              note: Printed 1500 °C; converted with K = °C + 273.15.
+        output_unit: K
+    temperature_uncertainty_K:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 7
+        published_page: SI-1
+        section: Methods
+        note: No numerical ±T uncertainty is tabulated
+    log_fO2:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '-0.68'
+          approximate: false
+      locator:
+        page: 13
+        published_page: SI-7
+        table: S-1
+        section: Table S-1
+        note: Printed log fO2 -0.68; reported for the imposed air atmosphere, not a sensor reading. Absolute log10 fO2 uses
+          P0 = 100 kPa, not a mineral buffer (article PDF p. 2, printed p. 19, Pressure and fO2 conventions).
+    log_fO2_as_printed:
+      state:
+        tag: value
+        value: '-0.68'
+      locator:
+        page: 13
+        published_page: SI-7
+        table: S-1
+        section: Table S-1
+        note: Printed form for the air atmosphere
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '100000'
+          approximate: false
+      locator:
+        page: 2
+        published_page: '19'
+        section: Pressure
+        note: Article reports 100 kPa; conversion only, not 101325 Pa
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 7
+        published_page: SI-1
+        section: Methods
+        note: Air is stated as the imposed atmosphere; mixture flow/composition are not tabulated
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: 10.7185/geochemlet.2617
+  locator:
+    page: 13
+    published_page: SI-7
+    table: S-1
+    note: Run conditions for vf274.
+  fO2_control:
+    channel:
+      tag: value
+      value: gas_mix
+    buffer:
+      state:
+        tag: value
+        value: Equilibrated in air in a vertical gas-mixing furnace
+      locator:
+        page: 7
+        published_page: SI-1
+        section: Methods
+        note: Reported air condition; log fO2 is atmosphere-imposed, not a per-run sensor measurement
+  bench_id: 10.7185/geochemlet.2617::bench::aithala-vf-gas-mixing-furnace
+  thermal_schedule:
+    method:
+      state:
+        tag: value
+        value: Equilibrated at the listed temperature, then quenched
+      locator:
+        page: 7
+        published_page: SI-1
+        section: Methods
+        note: Furnace, atmosphere, charge and quench conditions
+    total_duration_s:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '3600'
+          approximate: false
+      locator:
+        page: 13
+        published_page: SI-7
+        table: S-1
+        note: Printed duration 1 h; seconds conversion only
+    cooling_or_quench:
+      state:
+        tag: value
+        value: Terminated by deionized-water quench
+      locator:
+        page: 7
+        published_page: SI-1
+        section: Methods
+benches:
+- id: 10.7185/geochemlet.2617::bench::aithala-allf-laser-levitation
+  work_id: 10.7185/geochemlet.2617
+  identity:
+    basis: described_in_this_work
+  apparatus_family:
+    state:
+      tag: value
+      value: Aerodynamic laser levitation
+    locator:
+      page: 8
+      published_page: SI-2
+      section: Methods
+  temperature_measurement:
+    instrument:
+      state:
+        tag: value
+        value: Chino IR-CAS single-wavelength pyrometer
+      locator:
+        page: 8
+        published_page: SI-2
+        section: Methods
+    wavelength_um:
+      state:
+        tag: value
+        value: '{''kind'': ''point'', ''point'': ''0.9''}'
+      locator:
+        page: 8
+        published_page: SI-2
+        section: Methods
+    emissivity_setting:
+      state:
+        tag: value
+        value: '{''kind'': ''point'', ''point'': ''0.92''}'
+      locator:
+        page: 8
+        published_page: SI-2
+        section: Methods
+    feedback_control:
+      state:
+        tag: value
+        value: Closed-loop feedback control
+      locator:
+        page: 8
+        published_page: SI-2
+        section: Methods
+    temperature_uncertainty_K:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 8
+        published_page: SI-2
+        section: Methods
+        note: No numerical pyrometric temperature uncertainty is supplied
+  heating_method:
+    state:
+      tag: value
+      value: 400 W CO2 laser; aerodynamic levitation
+    locator:
+      page: 8
+      published_page: SI-2
+      section: Methods
+  other_facts:
+  - name: oxygen_purity
+    value:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '99.994'
+          approximate: false
+      locator:
+        page: 8
+        published_page: SI-2
+        section: Methods
+    unit: percent
+  - name: oxygen_flow
+    value:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '300'
+          interval_high: '340'
+          approximate: false
+      locator:
+        page: 8
+        published_page: SI-2
+        section: Methods
+        note: Flow retained in the printed cc/min unit
+    unit: cc/min
+  - name: laser_power
+    value:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '400'
+          approximate: false
+      locator:
+        page: 8
+        published_page: SI-2
+        section: Methods
+    unit: W
+  - name: laser_power_ramp_rate
+    value:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '100'
+          approximate: false
+      locator:
+        page: 8
+        published_page: SI-2
+        section: Methods
+        note: Printed as 100 °C/s
+    unit: degrees_C_per_s
+- id: 10.7185/geochemlet.2617::bench::aithala-vf-gas-mixing-furnace
+  work_id: 10.7185/geochemlet.2617
+  identity:
+    basis: described_in_this_work
+  apparatus_family:
+    state:
+      tag: value
+      value: Deltech VT-28 HN-C vertical gas-mixing furnace
+    locator:
+      page: 7
+      published_page: SI-1
+      section: Methods
+  temperature_measurement:
+    thermocouples:
+      state:
+        tag: value
+        value: Type S and Type B thermocouples
+      locator:
+        page: 7
+        published_page: SI-1
+        section: Methods
+        note: The paper does not assign either type to individual runs
+    run_specific_type_assignment:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 7
+        published_page: SI-1
+        section: Methods
+        note: Both types are named without run-specific assignment
+  temperature_calibration:
+    checks:
+      state:
+        tag: value
+        value: Calibration details referred to Aithala et al. (2026)
+      locator:
+        page: 7
+        published_page: SI-1
+        section: Methods
+  heating_method:
+    state:
+      tag: value
+      value: Gas-mixing furnace
+    locator:
+      page: 7
+      published_page: SI-1
+      section: Methods
+  other_facts:
+  - name: oxygen_fugacity_sensor
+    value:
+      state:
+        tag: value
+        value:
+          kind: categorical
+          categorical: SIRO2 C700+ zirconia oxygen sensor
+          approximate: false
+      locator:
+        page: 7
+        published_page: SI-1
+        section: Methods
+    unit: as_printed
+context:
+- observation_id: aithala_2026_1800_30_a_sub_recalculated
+  experiment: aithala-2026-1800-30
+  type: recalculation_table
+  locator:
+    page: 15
+    table: S-3
+    published_page: SI-9
+    note: Fe3+/FeT A_sub. for 1800-30.
+  T_range_K:
+  - '2073.15'
+  - '2073.15'
+  phase: quenched silicate glass; recalculated
+  units: fraction (Fe3+/FeT)
+  uncertainty:
+    Fe3_over_FeT: ±0.017 (as printed)
+  values:
+    method_class: model_derived
+    evidence_class: model_derived
+    quantity: Fe3+/FeT
+    Fe3_over_FeT: '0.343'
+    reported_value: 0.343±0.017
+    target_log_fO2: '-0.68'
+    target_composition: Table S-2 reference composition
+  derived_from:
+  - aithala_2026_1800_30_xanes
+  - aithala_2026_1800_30_wdsepma_composition
+  derivation:
+    relation: 'Eq. S-2: log(XFe3+/XFe2+) is shifted to air and the Table S-2 reference composition using k = 0.1988 and dK2O
+      = -99.62; the adjusted ratio is converted to Fe3+/FeT.'
+    equations: Supplementary Eqs. S-1 through S-3; Fe3+/FeT = (XFe3+/XFe2+) / (1 + XFe3+/XFe2+).
+    inputs:
+    - aithala_2026_1800_30_xanes
+    - aithala_2026_1800_30_wdsepma_composition
+  context_id: aithala-2026-magmatic-iron-redox-to-2100c::context::aithala_2026_1800_30_a_sub_recalculated
+  work_id: 10.7185/geochemlet.2617
+  source_id: aithala-2026-magmatic-iron-redox-to-2100c
+  species: Fe
+- observation_id: aithala_2026_1800_30_air_recalculated
+  experiment: aithala-2026-1800-30
+  type: recalculation_table
+  locator:
+    page: 15
+    table: S-3
+    published_page: SI-9
+    note: Fe3+/FeT air recalculated for 1800-30.
+  T_range_K:
+  - '2073.15'
+  - '2073.15'
+  phase: quenched silicate glass; recalculated
+  units: fraction (Fe3+/FeT)
+  uncertainty:
+    Fe3_over_FeT: ±0.017 (as printed)
+  values:
+    method_class: model_derived
+    evidence_class: model_derived
+    quantity: Fe3+/FeT
+    Fe3_over_FeT: '0.352'
+    reported_value: 0.352±0.017
+    target_log_fO2: '-0.68'
+  derived_from:
+  - aithala_2026_1800_30_xanes
+  derivation:
+    relation: 'Eq. S-1: log(XFe3+/XFe2+) is shifted to log fO2 = -0.68 using k = 0.1988; the adjusted ratio is converted to
+      Fe3+/FeT.'
+    equations: Supplementary Eqs. S-1 through S-3; Fe3+/FeT = (XFe3+/XFe2+) / (1 + XFe3+/XFe2+).
+    inputs:
+    - aithala_2026_1800_30_xanes
+  context_id: aithala-2026-magmatic-iron-redox-to-2100c::context::aithala_2026_1800_30_air_recalculated
+  work_id: 10.7185/geochemlet.2617
+  source_id: aithala-2026-magmatic-iron-redox-to-2100c
+  species: Fe
+- observation_id: aithala_2026_1800_30_b18_recalculated
+  experiment: aithala-2026-1800-30
+  type: recalculation_table
+  locator:
+    page: 15
+    table: S-3
+    published_page: SI-9
+    note: Fe3+/FeT B18 for 1800-30.
+  T_range_K:
+  - '2073.15'
+  - '2073.15'
+  phase: quenched silicate glass; recalculated
+  units: fraction (Fe3+/FeT)
+  uncertainty:
+    Fe3_over_FeT: ±0.017 (as printed)
+  values:
+    method_class: model_derived
+    evidence_class: model_derived
+    quantity: Fe3+/FeT
+    Fe3_over_FeT: '0.344'
+    reported_value: 0.344±0.017
+    target_log_fO2: '-0.68'
+    target_composition: Table S-2 reference composition
+  derived_from:
+  - aithala_2026_1800_30_xanes
+  - aithala_2026_1800_30_wdsepma_composition
+  derivation:
+    relation: 'Eq. S-3: Borisov et al. (2018) compositional recalculation, with k = 0.1988, to air and the Table S-2 reference
+      composition; the adjusted ratio is converted to Fe3+/FeT.'
+    equations: Supplementary Eqs. S-1 through S-3; Fe3+/FeT = (XFe3+/XFe2+) / (1 + XFe3+/XFe2+).
+    inputs:
+    - aithala_2026_1800_30_xanes
+    - aithala_2026_1800_30_wdsepma_composition
+  context_id: aithala-2026-magmatic-iron-redox-to-2100c::context::aithala_2026_1800_30_b18_recalculated
+  work_id: 10.7185/geochemlet.2617
+  source_id: aithala-2026-magmatic-iron-redox-to-2100c
+  species: Fe
+- observation_id: aithala_2026_1900_30_a_sub_recalculated
+  experiment: aithala-2026-1900-30
+  type: recalculation_table
+  locator:
+    page: 15
+    table: S-3
+    published_page: SI-9
+    note: Fe3+/FeT A_sub. for 1900-30.
+  T_range_K:
+  - '2173.15'
+  - '2173.15'
+  phase: quenched silicate glass; recalculated
+  units: fraction (Fe3+/FeT)
+  uncertainty:
+    Fe3_over_FeT: ±0.017 (as printed)
+  values:
+    method_class: model_derived
+    evidence_class: model_derived
+    quantity: Fe3+/FeT
+    Fe3_over_FeT: '0.308'
+    reported_value: 0.308±0.017
+    target_log_fO2: '-0.68'
+    target_composition: Table S-2 reference composition
+  derived_from:
+  - aithala_2026_1900_30_xanes
+  - aithala_2026_1900_30_wdsepma_composition
+  derivation:
+    relation: 'Eq. S-2: log(XFe3+/XFe2+) is shifted to air and the Table S-2 reference composition using k = 0.1988 and dK2O
+      = -99.62; the adjusted ratio is converted to Fe3+/FeT.'
+    equations: Supplementary Eqs. S-1 through S-3; Fe3+/FeT = (XFe3+/XFe2+) / (1 + XFe3+/XFe2+).
+    inputs:
+    - aithala_2026_1900_30_xanes
+    - aithala_2026_1900_30_wdsepma_composition
+  context_id: aithala-2026-magmatic-iron-redox-to-2100c::context::aithala_2026_1900_30_a_sub_recalculated
+  work_id: 10.7185/geochemlet.2617
+  source_id: aithala-2026-magmatic-iron-redox-to-2100c
+  species: Fe
+- observation_id: aithala_2026_1900_30_air_recalculated
+  experiment: aithala-2026-1900-30
+  type: recalculation_table
+  locator:
+    page: 15
+    table: S-3
+    published_page: SI-9
+    note: Fe3+/FeT air recalculated for 1900-30.
+  T_range_K:
+  - '2173.15'
+  - '2173.15'
+  phase: quenched silicate glass; recalculated
+  units: fraction (Fe3+/FeT)
+  uncertainty:
+    Fe3_over_FeT: ±0.017 (as printed)
+  values:
+    method_class: model_derived
+    evidence_class: model_derived
+    quantity: Fe3+/FeT
+    Fe3_over_FeT: '0.318'
+    reported_value: 0.318±0.017
+    target_log_fO2: '-0.68'
+  derived_from:
+  - aithala_2026_1900_30_xanes
+  derivation:
+    relation: 'Eq. S-1: log(XFe3+/XFe2+) is shifted to log fO2 = -0.68 using k = 0.1988; the adjusted ratio is converted to
+      Fe3+/FeT.'
+    equations: Supplementary Eqs. S-1 through S-3; Fe3+/FeT = (XFe3+/XFe2+) / (1 + XFe3+/XFe2+).
+    inputs:
+    - aithala_2026_1900_30_xanes
+  context_id: aithala-2026-magmatic-iron-redox-to-2100c::context::aithala_2026_1900_30_air_recalculated
+  work_id: 10.7185/geochemlet.2617
+  source_id: aithala-2026-magmatic-iron-redox-to-2100c
+  species: Fe
+- observation_id: aithala_2026_1900_30_b18_recalculated
+  experiment: aithala-2026-1900-30
+  type: recalculation_table
+  locator:
+    page: 15
+    table: S-3
+    published_page: SI-9
+    note: Fe3+/FeT B18 for 1900-30.
+  T_range_K:
+  - '2173.15'
+  - '2173.15'
+  phase: quenched silicate glass; recalculated
+  units: fraction (Fe3+/FeT)
+  uncertainty:
+    Fe3_over_FeT: ±0.017 (as printed)
+  values:
+    method_class: model_derived
+    evidence_class: model_derived
+    quantity: Fe3+/FeT
+    Fe3_over_FeT: '0.304'
+    reported_value: 0.304±0.017
+    target_log_fO2: '-0.68'
+    target_composition: Table S-2 reference composition
+  derived_from:
+  - aithala_2026_1900_30_xanes
+  - aithala_2026_1900_30_wdsepma_composition
+  derivation:
+    relation: 'Eq. S-3: Borisov et al. (2018) compositional recalculation, with k = 0.1988, to air and the Table S-2 reference
+      composition; the adjusted ratio is converted to Fe3+/FeT.'
+    equations: Supplementary Eqs. S-1 through S-3; Fe3+/FeT = (XFe3+/XFe2+) / (1 + XFe3+/XFe2+).
+    inputs:
+    - aithala_2026_1900_30_xanes
+    - aithala_2026_1900_30_wdsepma_composition
+  context_id: aithala-2026-magmatic-iron-redox-to-2100c::context::aithala_2026_1900_30_b18_recalculated
+  work_id: 10.7185/geochemlet.2617
+  source_id: aithala-2026-magmatic-iron-redox-to-2100c
+  species: Fe
+- observation_id: aithala_2026_2000_10_a_sub_recalculated
+  experiment: aithala-2026-2000-10
+  type: recalculation_table
+  locator:
+    page: 15
+    table: S-3
+    published_page: SI-9
+    note: Fe3+/FeT A_sub. for 2000-10. This recalculation derives from the authors' 2000 °C equilibrium anchor run 2000-10
+      (SI-3, PDF p. 9).
+  T_range_K:
+  - '2273.15'
+  - '2273.15'
+  phase: quenched silicate glass; recalculated
+  units: fraction (Fe3+/FeT)
+  uncertainty:
+    Fe3_over_FeT: ±0.014 (as printed)
+  values:
+    method_class: model_derived
+    evidence_class: model_derived
+    quantity: Fe3+/FeT
+    Fe3_over_FeT: '0.303'
+    reported_value: 0.303±0.014
+    target_log_fO2: '-0.68'
+    target_composition: Table S-2 reference composition
+  derived_from:
+  - aithala_2026_2000_10_xanes
+  - aithala_2026_2000_10_wdsepma_composition
+  derivation:
+    relation: 'Eq. S-2: log(XFe3+/XFe2+) is shifted to air and the Table S-2 reference composition using k = 0.1988 and dK2O
+      = -99.62; the adjusted ratio is converted to Fe3+/FeT.'
+    equations: Supplementary Eqs. S-1 through S-3; Fe3+/FeT = (XFe3+/XFe2+) / (1 + XFe3+/XFe2+).
+    inputs:
+    - aithala_2026_2000_10_xanes
+    - aithala_2026_2000_10_wdsepma_composition
+  context_id: aithala-2026-magmatic-iron-redox-to-2100c::context::aithala_2026_2000_10_a_sub_recalculated
+  work_id: 10.7185/geochemlet.2617
+  source_id: aithala-2026-magmatic-iron-redox-to-2100c
+  species: Fe
+- observation_id: aithala_2026_2000_10_air_recalculated
+  experiment: aithala-2026-2000-10
+  type: recalculation_table
+  locator:
+    page: 15
+    table: S-3
+    published_page: SI-9
+    note: Fe3+/FeT air recalculated for 2000-10. This recalculation derives from the authors' 2000 °C equilibrium anchor run
+      2000-10 (SI-3, PDF p. 9).
+  T_range_K:
+  - '2273.15'
+  - '2273.15'
+  phase: quenched silicate glass; recalculated
+  units: fraction (Fe3+/FeT)
+  uncertainty:
+    Fe3_over_FeT: ±0.014 (as printed)
+  values:
+    method_class: model_derived
+    evidence_class: model_derived
+    quantity: Fe3+/FeT
+    Fe3_over_FeT: '0.308'
+    reported_value: 0.308±0.014
+    target_log_fO2: '-0.68'
+  derived_from:
+  - aithala_2026_2000_10_xanes
+  derivation:
+    relation: 'Eq. S-1: log(XFe3+/XFe2+) is shifted to log fO2 = -0.68 using k = 0.1988; the adjusted ratio is converted to
+      Fe3+/FeT.'
+    equations: Supplementary Eqs. S-1 through S-3; Fe3+/FeT = (XFe3+/XFe2+) / (1 + XFe3+/XFe2+).
+    inputs:
+    - aithala_2026_2000_10_xanes
+  context_id: aithala-2026-magmatic-iron-redox-to-2100c::context::aithala_2026_2000_10_air_recalculated
+  work_id: 10.7185/geochemlet.2617
+  source_id: aithala-2026-magmatic-iron-redox-to-2100c
+  species: Fe
+- observation_id: aithala_2026_2000_10_b18_recalculated
+  experiment: aithala-2026-2000-10
+  type: recalculation_table
+  locator:
+    page: 15
+    table: S-3
+    published_page: SI-9
+    note: Fe3+/FeT B18 for 2000-10. This recalculation derives from the authors' 2000 °C equilibrium anchor run 2000-10 (SI-3,
+      PDF p. 9).
+  T_range_K:
+  - '2273.15'
+  - '2273.15'
+  phase: quenched silicate glass; recalculated
+  units: fraction (Fe3+/FeT)
+  uncertainty:
+    Fe3_over_FeT: ±0.014 (as printed)
+  values:
+    method_class: model_derived
+    evidence_class: model_derived
+    quantity: Fe3+/FeT
+    Fe3_over_FeT: '0.297'
+    reported_value: 0.297±0.014
+    target_log_fO2: '-0.68'
+    target_composition: Table S-2 reference composition
+  derived_from:
+  - aithala_2026_2000_10_xanes
+  - aithala_2026_2000_10_wdsepma_composition
+  derivation:
+    relation: 'Eq. S-3: Borisov et al. (2018) compositional recalculation, with k = 0.1988, to air and the Table S-2 reference
+      composition; the adjusted ratio is converted to Fe3+/FeT.'
+    equations: Supplementary Eqs. S-1 through S-3; Fe3+/FeT = (XFe3+/XFe2+) / (1 + XFe3+/XFe2+).
+    inputs:
+    - aithala_2026_2000_10_xanes
+    - aithala_2026_2000_10_wdsepma_composition
+  context_id: aithala-2026-magmatic-iron-redox-to-2100c::context::aithala_2026_2000_10_b18_recalculated
+  work_id: 10.7185/geochemlet.2617
+  source_id: aithala-2026-magmatic-iron-redox-to-2100c
+  species: Fe
+- observation_id: aithala_2026_2000_120_a_sub_recalculated
+  experiment: aithala-2026-2000-120
+  type: recalculation_table
+  locator:
+    page: 15
+    table: S-3
+    published_page: SI-9
+    note: Fe3+/FeT A_sub. for 2000-120.
+  T_range_K:
+  - '2273.15'
+  - '2273.15'
+  phase: quenched silicate glass; recalculated
+  units: fraction (Fe3+/FeT)
+  uncertainty:
+    Fe3_over_FeT: ±0.014 (as printed)
+  values:
+    method_class: model_derived
+    evidence_class: model_derived
+    quantity: Fe3+/FeT
+    Fe3_over_FeT: '0.294'
+    reported_value: 0.294±0.014
+    target_log_fO2: '-0.68'
+    target_composition: Table S-2 reference composition
+  derived_from:
+  - aithala_2026_2000_120_xanes
+  - aithala_2026_2000_120_wdsepma_composition
+  derivation:
+    relation: 'Eq. S-2: log(XFe3+/XFe2+) is shifted to air and the Table S-2 reference composition using k = 0.1988 and dK2O
+      = -99.62; the adjusted ratio is converted to Fe3+/FeT.'
+    equations: Supplementary Eqs. S-1 through S-3; Fe3+/FeT = (XFe3+/XFe2+) / (1 + XFe3+/XFe2+).
+    inputs:
+    - aithala_2026_2000_120_xanes
+    - aithala_2026_2000_120_wdsepma_composition
+  context_id: aithala-2026-magmatic-iron-redox-to-2100c::context::aithala_2026_2000_120_a_sub_recalculated
+  work_id: 10.7185/geochemlet.2617
+  source_id: aithala-2026-magmatic-iron-redox-to-2100c
+  species: Fe
+- observation_id: aithala_2026_2000_120_air_recalculated
+  experiment: aithala-2026-2000-120
+  type: recalculation_table
+  locator:
+    page: 15
+    table: S-3
+    published_page: SI-9
+    note: Fe3+/FeT air recalculated for 2000-120.
+  T_range_K:
+  - '2273.15'
+  - '2273.15'
+  phase: quenched silicate glass; recalculated
+  units: fraction (Fe3+/FeT)
+  uncertainty:
+    Fe3_over_FeT: ±0.014 (as printed)
+  values:
+    method_class: model_derived
+    evidence_class: model_derived
+    quantity: Fe3+/FeT
+    Fe3_over_FeT: '0.308'
+    reported_value: 0.308±0.014
+    target_log_fO2: '-0.68'
+  derived_from:
+  - aithala_2026_2000_120_xanes
+  derivation:
+    relation: 'Eq. S-1: log(XFe3+/XFe2+) is shifted to log fO2 = -0.68 using k = 0.1988; the adjusted ratio is converted to
+      Fe3+/FeT.'
+    equations: Supplementary Eqs. S-1 through S-3; Fe3+/FeT = (XFe3+/XFe2+) / (1 + XFe3+/XFe2+).
+    inputs:
+    - aithala_2026_2000_120_xanes
+  context_id: aithala-2026-magmatic-iron-redox-to-2100c::context::aithala_2026_2000_120_air_recalculated
+  work_id: 10.7185/geochemlet.2617
+  source_id: aithala-2026-magmatic-iron-redox-to-2100c
+  species: Fe
+- observation_id: aithala_2026_2000_120_b18_recalculated
+  experiment: aithala-2026-2000-120
+  type: recalculation_table
+  locator:
+    page: 15
+    table: S-3
+    published_page: SI-9
+    note: Fe3+/FeT B18 for 2000-120.
+  T_range_K:
+  - '2273.15'
+  - '2273.15'
+  phase: quenched silicate glass; recalculated
+  units: fraction (Fe3+/FeT)
+  uncertainty:
+    Fe3_over_FeT: ±0.014 (as printed)
+  values:
+    method_class: model_derived
+    evidence_class: model_derived
+    quantity: Fe3+/FeT
+    Fe3_over_FeT: '0.282'
+    reported_value: 0.282±0.014
+    target_log_fO2: '-0.68'
+    target_composition: Table S-2 reference composition
+  derived_from:
+  - aithala_2026_2000_120_xanes
+  - aithala_2026_2000_120_wdsepma_composition
+  derivation:
+    relation: 'Eq. S-3: Borisov et al. (2018) compositional recalculation, with k = 0.1988, to air and the Table S-2 reference
+      composition; the adjusted ratio is converted to Fe3+/FeT.'
+    equations: Supplementary Eqs. S-1 through S-3; Fe3+/FeT = (XFe3+/XFe2+) / (1 + XFe3+/XFe2+).
+    inputs:
+    - aithala_2026_2000_120_xanes
+    - aithala_2026_2000_120_wdsepma_composition
+  context_id: aithala-2026-magmatic-iron-redox-to-2100c::context::aithala_2026_2000_120_b18_recalculated
+  work_id: 10.7185/geochemlet.2617
+  source_id: aithala-2026-magmatic-iron-redox-to-2100c
+  species: Fe
+- observation_id: aithala_2026_2000_30_a_sub_recalculated
+  experiment: aithala-2026-2000-30
+  type: recalculation_table
+  locator:
+    page: 15
+    table: S-3
+    published_page: SI-9
+    note: Fe3+/FeT A_sub. for 2000-30. This recalculation derives from the authors' anomalous run 2000-30 (SI-3, PDF p. 9).
+  T_range_K:
+  - '2273.15'
+  - '2273.15'
+  phase: quenched silicate glass; recalculated
+  units: fraction (Fe3+/FeT)
+  uncertainty:
+    Fe3_over_FeT: ±0.027 (as printed)
+  values:
+    method_class: model_derived
+    evidence_class: model_derived
+    quantity: Fe3+/FeT
+    Fe3_over_FeT: '0.323'
+    reported_value: 0.323±0.027
+    target_log_fO2: '-0.68'
+    target_composition: Table S-2 reference composition
+  derived_from:
+  - aithala_2026_2000_30_xanes
+  - aithala_2026_2000_30_wdsepma_composition
+  derivation:
+    relation: 'Eq. S-2: log(XFe3+/XFe2+) is shifted to air and the Table S-2 reference composition using k = 0.1988 and dK2O
+      = -99.62; the adjusted ratio is converted to Fe3+/FeT.'
+    equations: Supplementary Eqs. S-1 through S-3; Fe3+/FeT = (XFe3+/XFe2+) / (1 + XFe3+/XFe2+).
+    inputs:
+    - aithala_2026_2000_30_xanes
+    - aithala_2026_2000_30_wdsepma_composition
+  context_id: aithala-2026-magmatic-iron-redox-to-2100c::context::aithala_2026_2000_30_a_sub_recalculated
+  work_id: 10.7185/geochemlet.2617
+  source_id: aithala-2026-magmatic-iron-redox-to-2100c
+  species: Fe
+- observation_id: aithala_2026_2000_30_air_recalculated
+  experiment: aithala-2026-2000-30
+  type: recalculation_table
+  locator:
+    page: 15
+    table: S-3
+    published_page: SI-9
+    note: Fe3+/FeT air recalculated for 2000-30. This recalculation derives from the authors' anomalous run 2000-30 (SI-3,
+      PDF p. 9).
+  T_range_K:
+  - '2273.15'
+  - '2273.15'
+  phase: quenched silicate glass; recalculated
+  units: fraction (Fe3+/FeT)
+  uncertainty:
+    Fe3_over_FeT: ±0.027 (as printed)
+  values:
+    method_class: model_derived
+    evidence_class: model_derived
+    quantity: Fe3+/FeT
+    Fe3_over_FeT: '0.335'
+    reported_value: 0.335±0.027
+    target_log_fO2: '-0.68'
+  derived_from:
+  - aithala_2026_2000_30_xanes
+  derivation:
+    relation: 'Eq. S-1: log(XFe3+/XFe2+) is shifted to log fO2 = -0.68 using k = 0.1988; the adjusted ratio is converted to
+      Fe3+/FeT.'
+    equations: Supplementary Eqs. S-1 through S-3; Fe3+/FeT = (XFe3+/XFe2+) / (1 + XFe3+/XFe2+).
+    inputs:
+    - aithala_2026_2000_30_xanes
+  context_id: aithala-2026-magmatic-iron-redox-to-2100c::context::aithala_2026_2000_30_air_recalculated
+  work_id: 10.7185/geochemlet.2617
+  source_id: aithala-2026-magmatic-iron-redox-to-2100c
+  species: Fe
+- observation_id: aithala_2026_2000_30_b18_recalculated
+  experiment: aithala-2026-2000-30
+  type: recalculation_table
+  locator:
+    page: 15
+    table: S-3
+    published_page: SI-9
+    note: Fe3+/FeT B18 for 2000-30. This recalculation derives from the authors' anomalous run 2000-30 (SI-3, PDF p. 9).
+  T_range_K:
+  - '2273.15'
+  - '2273.15'
+  phase: quenched silicate glass; recalculated
+  units: fraction (Fe3+/FeT)
+  uncertainty:
+    Fe3_over_FeT: ±0.027 (as printed)
+  values:
+    method_class: model_derived
+    evidence_class: model_derived
+    quantity: Fe3+/FeT
+    Fe3_over_FeT: '0.317'
+    reported_value: 0.317±0.027
+    target_log_fO2: '-0.68'
+    target_composition: Table S-2 reference composition
+  derived_from:
+  - aithala_2026_2000_30_xanes
+  - aithala_2026_2000_30_wdsepma_composition
+  derivation:
+    relation: 'Eq. S-3: Borisov et al. (2018) compositional recalculation, with k = 0.1988, to air and the Table S-2 reference
+      composition; the adjusted ratio is converted to Fe3+/FeT.'
+    equations: Supplementary Eqs. S-1 through S-3; Fe3+/FeT = (XFe3+/XFe2+) / (1 + XFe3+/XFe2+).
+    inputs:
+    - aithala_2026_2000_30_xanes
+    - aithala_2026_2000_30_wdsepma_composition
+  context_id: aithala-2026-magmatic-iron-redox-to-2100c::context::aithala_2026_2000_30_b18_recalculated
+  work_id: 10.7185/geochemlet.2617
+  source_id: aithala-2026-magmatic-iron-redox-to-2100c
+  species: Fe
+- observation_id: aithala_2026_2100_30_a_sub_recalculated
+  experiment: aithala-2026-2100-30
+  type: recalculation_table
+  locator:
+    page: 15
+    table: S-3
+    published_page: SI-9
+    note: Fe3+/FeT A_sub. for 2100-30.
+  T_range_K:
+  - '2373.15'
+  - '2373.15'
+  phase: quenched silicate glass; recalculated
+  units: fraction (Fe3+/FeT)
+  uncertainty:
+    Fe3_over_FeT: ±0.014 (as printed)
+  values:
+    method_class: model_derived
+    evidence_class: model_derived
+    quantity: Fe3+/FeT
+    Fe3_over_FeT: '0.231'
+    reported_value: 0.231±0.014
+    target_log_fO2: '-0.68'
+    target_composition: Table S-2 reference composition
+  derived_from:
+  - aithala_2026_2100_30_xanes
+  - aithala_2026_2100_30_wdsepma_composition
+  derivation:
+    relation: 'Eq. S-2: log(XFe3+/XFe2+) is shifted to air and the Table S-2 reference composition using k = 0.1988 and dK2O
+      = -99.62; the adjusted ratio is converted to Fe3+/FeT.'
+    equations: Supplementary Eqs. S-1 through S-3; Fe3+/FeT = (XFe3+/XFe2+) / (1 + XFe3+/XFe2+).
+    inputs:
+    - aithala_2026_2100_30_xanes
+    - aithala_2026_2100_30_wdsepma_composition
+  context_id: aithala-2026-magmatic-iron-redox-to-2100c::context::aithala_2026_2100_30_a_sub_recalculated
+  work_id: 10.7185/geochemlet.2617
+  source_id: aithala-2026-magmatic-iron-redox-to-2100c
+  species: Fe
+- observation_id: aithala_2026_2100_30_air_recalculated
+  experiment: aithala-2026-2100-30
+  type: recalculation_table
+  locator:
+    page: 15
+    table: S-3
+    published_page: SI-9
+    note: Fe3+/FeT air recalculated for 2100-30.
+  T_range_K:
+  - '2373.15'
+  - '2373.15'
+  phase: quenched silicate glass; recalculated
+  units: fraction (Fe3+/FeT)
+  uncertainty:
+    Fe3_over_FeT: ±0.014 (as printed)
+  values:
+    method_class: model_derived
+    evidence_class: model_derived
+    quantity: Fe3+/FeT
+    Fe3_over_FeT: '0.244'
+    reported_value: 0.244±0.014
+    target_log_fO2: '-0.68'
+  derived_from:
+  - aithala_2026_2100_30_xanes
+  derivation:
+    relation: 'Eq. S-1: log(XFe3+/XFe2+) is shifted to log fO2 = -0.68 using k = 0.1988; the adjusted ratio is converted to
+      Fe3+/FeT.'
+    equations: Supplementary Eqs. S-1 through S-3; Fe3+/FeT = (XFe3+/XFe2+) / (1 + XFe3+/XFe2+).
+    inputs:
+    - aithala_2026_2100_30_xanes
+  context_id: aithala-2026-magmatic-iron-redox-to-2100c::context::aithala_2026_2100_30_air_recalculated
+  work_id: 10.7185/geochemlet.2617
+  source_id: aithala-2026-magmatic-iron-redox-to-2100c
+  species: Fe
+- observation_id: aithala_2026_2100_30_b18_recalculated
+  experiment: aithala-2026-2100-30
+  type: recalculation_table
+  locator:
+    page: 15
+    table: S-3
+    published_page: SI-9
+    note: Fe3+/FeT B18 for 2100-30.
+  T_range_K:
+  - '2373.15'
+  - '2373.15'
+  phase: quenched silicate glass; recalculated
+  units: fraction (Fe3+/FeT)
+  uncertainty:
+    Fe3_over_FeT: ±0.014 (as printed)
+  values:
+    method_class: model_derived
+    evidence_class: model_derived
+    quantity: Fe3+/FeT
+    Fe3_over_FeT: '0.216'
+    reported_value: 0.216±0.014
+    target_log_fO2: '-0.68'
+    target_composition: Table S-2 reference composition
+  derived_from:
+  - aithala_2026_2100_30_xanes
+  - aithala_2026_2100_30_wdsepma_composition
+  derivation:
+    relation: 'Eq. S-3: Borisov et al. (2018) compositional recalculation, with k = 0.1988, to air and the Table S-2 reference
+      composition; the adjusted ratio is converted to Fe3+/FeT.'
+    equations: Supplementary Eqs. S-1 through S-3; Fe3+/FeT = (XFe3+/XFe2+) / (1 + XFe3+/XFe2+).
+    inputs:
+    - aithala_2026_2100_30_xanes
+    - aithala_2026_2100_30_wdsepma_composition
+  context_id: aithala-2026-magmatic-iron-redox-to-2100c::context::aithala_2026_2100_30_b18_recalculated
+  work_id: 10.7185/geochemlet.2617
+  source_id: aithala-2026-magmatic-iron-redox-to-2100c
+  species: Fe
+- type: interpretation
+  locator:
+    page: 3
+    published_page: 20
+    section: Discussion
+    note: Article discussion preferring Eq. 8 and discussing composition independence.
+  units: as stated
+  values:
+    evidence_class: author_estimate
+    attribution: Aithala, Macris & Hirschmann (2026), Discussion
+    statement: Fe3+/Fe2+ decreases as temperature rises at fixed fO2; the temperature dependence is described as not appreciably
+      varying with melt composition. Equations 7–9 fit similarly; the authors favour Eq. 8 because it retains a non-zero ΔCp
+      independently established by calorimetry.
+  observation_id: aithala_2026_author_temperature_conclusion
+  context_id: aithala-2026-magmatic-iron-redox-to-2100c::context::aithala_2026_author_temperature_conclusion
+  work_id: 10.7185/geochemlet.2617
+  source_id: aithala-2026-magmatic-iron-redox-to-2100c
+  species: Fe
+- type: fitted_model_parameters
+  locator:
+    page: 15
+    table: S-4
+    published_page: SI-9
+    note: Equation Eq 7 fit row.
+  units: h in K; ΔCp in J/K; c dimensionless; χ² as printed
+  values:
+    evidence_class: model_derived
+    equation: Eq 7
+    fit_attribution: Aithala, Macris & Hirschmann (2026), Table S-4
+    derivation: Authors' published fit parameters for this equation; not measured Fe abundance.
+    h_K: '4894'
+    h_uncertainty_K: '232.5'
+    c: '-2.581'
+    c_uncertainty: '0.1241'
+    chi_squared: '20.2'
+    reduced_chi_squared: '2.53'
+  observation_id: aithala_2026_eq_7_fit
+  context_id: aithala-2026-magmatic-iron-redox-to-2100c::context::aithala_2026_eq_7_fit
+  work_id: 10.7185/geochemlet.2617
+  source_id: aithala-2026-magmatic-iron-redox-to-2100c
+  species: Fe
+- type: fitted_model_parameters
+  locator:
+    page: 15
+    table: S-4
+    published_page: SI-9
+    note: Equation Eq 8 fit row.
+  units: h in K; ΔCp in J/K; c dimensionless; χ² as printed
+  values:
+    evidence_class: model_derived
+    equation: Eq 8
+    fit_attribution: Aithala, Macris & Hirschmann (2026), Table S-4
+    derivation: Authors' published fit parameters for this equation; not measured Fe abundance.
+    h_K: '5235'
+    h_uncertainty_K: '243.4'
+    c: '-2.786'
+    c_uncertainty: '0.1296'
+    chi_squared: '23.4'
+    reduced_chi_squared: '2.92'
+    delta_Cp_J_per_K: '33.25'
+    delta_Cp_status: fixed_from_Hirschmann_2022
+  observation_id: aithala_2026_eq_8_fit
+  context_id: aithala-2026-magmatic-iron-redox-to-2100c::context::aithala_2026_eq_8_fit
+  work_id: 10.7185/geochemlet.2617
+  source_id: aithala-2026-magmatic-iron-redox-to-2100c
+  species: Fe
+- type: fitted_model_parameters
+  locator:
+    page: 15
+    table: S-4
+    published_page: SI-9
+    note: Equation Eq 9 fit row.
+  units: h in K; ΔCp in J/K; c dimensionless; χ² as printed
+  values:
+    evidence_class: model_derived
+    equation: Eq 9
+    fit_attribution: Aithala, Macris & Hirschmann (2026), Table S-4
+    derivation: Authors' published fit parameters for this equation; not measured Fe abundance.
+    h_K: '4511'
+    h_uncertainty_K: '691.7'
+    c: '-2.349'
+    c_uncertainty: '0.4117'
+    chi_squared: '20.2'
+    reduced_chi_squared: '2.88'
+    delta_Cp_J_per_K: '-23.74'
+    delta_Cp_uncertainty_J_per_K: '51.05'
+    delta_Cp_status: fitted
+  observation_id: aithala_2026_eq_9_fit
+  context_id: aithala-2026-magmatic-iron-redox-to-2100c::context::aithala_2026_eq_9_fit
+  work_id: 10.7185/geochemlet.2617
+  source_id: aithala-2026-magmatic-iron-redox-to-2100c
+  species: Fe
+- type: composition
+  locator:
+    page: 14
+    table: S-2
+    published_page: SI-8
+    note: 'Footnote a: average of VF267, VF231, VF268, VF270, and VF274.'
+  units: wt.% oxide
+  values:
+    method_class: measured_reduced
+    basis: oxide weight percent (wt.%) as printed
+    FeO_basis: FeO* as printed
+    source_samples:
+    - VF267
+    - VF231
+    - VF268
+    - VF270
+    - VF274
+    oxide_wt_percent:
+      SiO2: 47.77±1.39
+      TiO2: 0.50±0.02
+      Al2O3: 10.96±0.47
+      FeO*: 15.20±0.60
+      MgO: 12.28±0.39
+      CaO: 7.69±0.38
+      Na2O: 3.01±0.20
+      K2O: 0.055±0.010
+      P2O5: 0.347±0.09
+  derived_from:
+  - aithala_2026_vf267_wdsepma_composition
+  - aithala_2026_vf231_wdsepma_composition
+  - aithala_2026_vf268_wdsepma_composition
+  - aithala_2026_vf270_wdsepma_composition
+  - aithala_2026_vf274_wdsepma_composition
+  observation_id: aithala_2026_reference_composition
+  context_id: aithala-2026-magmatic-iron-redox-to-2100c::context::aithala_2026_reference_composition
+  work_id: 10.7185/geochemlet.2617
+  source_id: aithala-2026-magmatic-iron-redox-to-2100c
+  species: Fe
+- observation_id: aithala_2026_scope_and_reporting_notes
+  type: study_description
+  locator:
+    page: 1
+    published_page: 18
+    section: Abstract
+  units: as stated
+  values:
+    composition: One martian-relevant basalt composition (Humphrey); Table S-2 reports WDS EPMA oxide compositions and labels
+      FeO*; Table S-5 and the starting-composition description state wt.% for the reported composition. Na2O and K2O vary
+      across experiments through volatilization. No crystalline calibration standards are reported in this source; no polymorph
+      assignment is applicable.
+    redox: Fe3+/FeT is the source observable. Table S-1 reports 16 method-specific analytical determinations over 12 experimental
+      runs. Table S-3 is the author-selected raw and recalculated series.
+    authors_temperature_dependence: The abstract states that a survey of experimental results suggests the temperature dependence
+      of Fe3+/Fe2+ does not vary appreciably with melt composition.
+  context_id: aithala-2026-magmatic-iron-redox-to-2100c::context::aithala_2026_scope_and_reporting_notes
+  work_id: 10.7185/geochemlet.2617
+  source_id: aithala-2026-magmatic-iron-redox-to-2100c
+  species: Fe
+- type: recalculation_table
+  locator:
+    page: 15
+    table: S-3
+    published_page: SI-9
+    note: Table S-3 raw values and adjusted columns as printed; VF271 raw uncertainty differs from Table S-1 (±0.022 versus
+      ±0.019). VF271 is partially crystallised and below its liquidus; run 2000-30 is anomalous and 2000-10 is the authors'
+      2000 °C anchor (SI-3, PDF p. 9).
+  units: fraction (Fe3+/FeT)
+  values:
+    evidence_class: measured_tabulated
+    recalculated_values_evidence_class: model_derived
+    rows:
+    - Series: Vertical Furnace
+      ID: VF271
+      Fe3+/FeT raw: 0.816±0.022
+      Fe3+/FeT air recalculated: '-'
+      Fe3+/FeT A_sub.: 0.815±0.023
+      Fe3+/FeT B18: 0.801±0.024
+    - Series: Vertical Furnace
+      ID: VF267
+      Fe3+/FeT raw: 0.736±0.023
+      Fe3+/FeT air recalculated: '-'
+      Fe3+/FeT A_sub.: '-'
+      Fe3+/FeT B18: '-'
+    - Series: Vertical Furnace
+      ID: VF231
+      Fe3+/FeT raw: 0.716±0.023
+      Fe3+/FeT air recalculated: '-'
+      Fe3+/FeT A_sub.: '-'
+      Fe3+/FeT B18: '-'
+    - Series: Vertical Furnace
+      ID: VF268
+      Fe3+/FeT raw: 0.695±0.023
+      Fe3+/FeT air recalculated: '-'
+      Fe3+/FeT A_sub.: '-'
+      Fe3+/FeT B18: '-'
+    - Series: Vertical Furnace
+      ID: VF270
+      Fe3+/FeT raw: 0.661±0.023
+      Fe3+/FeT air recalculated: '-'
+      Fe3+/FeT A_sub.: '-'
+      Fe3+/FeT B18: '-'
+    - Series: Vertical Furnace
+      ID: VF274
+      Fe3+/FeT raw: 0.643±0.023
+      Fe3+/FeT air recalculated: '-'
+      Fe3+/FeT A_sub.: '-'
+      Fe3+/FeT B18: '-'
+    - Series: ALLF Temp. Series
+      ID: 1800-30
+      Fe3+/FeT raw: 0.426±0.018
+      Fe3+/FeT air recalculated: 0.352±0.017
+      Fe3+/FeT A_sub.: 0.343±0.017
+      Fe3+/FeT B18: 0.344±0.017
+    - Series: ALLF Temp. Series
+      ID: 1900-30
+      Fe3+/FeT raw: 0.389±0.019
+      Fe3+/FeT air recalculated: 0.318±0.017
+      Fe3+/FeT A_sub.: 0.308±0.017
+      Fe3+/FeT B18: 0.304±0.017
+    - Series: ALLF Temp. Series
+      ID: 2000-30
+      Fe3+/FeT raw: 0.407±0.031
+      Fe3+/FeT air recalculated: 0.335±0.027
+      Fe3+/FeT A_sub.: 0.323±0.027
+      Fe3+/FeT B18: 0.317±0.027
+    - Series: ALLF Temp. Series
+      ID: 2100-30
+      Fe3+/FeT raw: 0.306±0.018
+      Fe3+/FeT air recalculated: 0.244±0.014
+      Fe3+/FeT A_sub.: 0.231±0.014
+      Fe3+/FeT B18: 0.216±0.014
+    - Series: ALLF Time Series
+      ID: 2000-10
+      Fe3+/FeT raw: 0.378±0.015
+      Fe3+/FeT air recalculated: 0.308±0.014
+      Fe3+/FeT A_sub.: 0.303±0.014
+      Fe3+/FeT B18: 0.297±0.014
+    - Series: ALLF Time Series
+      ID: 2000-120
+      Fe3+/FeT raw: 0.378±0.015
+      Fe3+/FeT air recalculated: 0.308±0.014
+      Fe3+/FeT A_sub.: 0.294±0.014
+      Fe3+/FeT B18: 0.282±0.014
+  observation_id: aithala_2026_table_s3_raw_series
+  context_id: aithala-2026-magmatic-iron-redox-to-2100c::context::aithala_2026_table_s3_raw_series
+  work_id: 10.7185/geochemlet.2617
+  source_id: aithala-2026-magmatic-iron-redox-to-2100c
+  species: Fe
+- type: quoted_literature_compilation
+  locator:
+    page: 16
+    table: S-5
+    published_page: SI-10–SI-11
+    note: Continued on PDF page 17; rows are literature fits or the present study, all in air at constant composition and
+      variable temperature.
+  units: h in K; temperature range in °C; compositions in wt.%
+  values:
+    evidence_class: compilation_assessed
+    attribution: Source codes and per-row literature attributions are decoded in this Table S-5 compilation
+    slope_definition: regressed slope of log(XFe3+/XFe2+) versus T^-1 (K^-1), with 1σ uncertainties
+    asterisk_note: Series with exactly two experiments; no fitted uncertainty is printed.
+    source_key:
+      Ken48: Kennedy (1948)
+      Kil83: Kilinc et al. (1983)
+      KC88: Kress and Carmichael (1988)
+      M95: Moore et al. (1995)
+      BM2010: Borisov and McCammon (2010)
+      B13-18: Borisov et al. (2013, 2015, 2017, 2018)
+    rows:
+    - Source: Present Study
+      Temperature Series: Humphrey
+      n: '10'
+      Temperature Range (°C): 1250–2100
+      h (K): 4894±232.5
+      SiO2 (wt. %): '47.77'
+      FeO* (wt. %): '15.20'
+    - Source: Ken48
+      Temperature Series: NMF
+      n: '3'
+      Temperature Range (°C): 1200–1400
+      h (K): 4717±23.41
+      SiO2 (wt. %): '50.87'
+      FeO* (wt. %): '11.32'
+    - Source: Kil83
+      Temperature Series: '121'
+      n: '2'
+      Temperature Range (°C): 1344–1445
+      h (K): -909.0*
+      SiO2 (wt. %): '71.78'
+      FeO* (wt. %): '7.93'
+    - Source: Kil83
+      Temperature Series: '3114'
+      n: '2'
+      Temperature Range (°C): 1340–1454
+      h (K): 6582*
+      SiO2 (wt. %): '69.37'
+      FeO* (wt. %): '5.93'
+    - Source: Kil83
+      Temperature Series: '20424'
+      n: '2'
+      Temperature Range (°C): 1342–1447
+      h (K): 7865*
+      SiO2 (wt. %): '39.41'
+      FeO* (wt. %): '11.75'
+    - Source: Kil83
+      Temperature Series: 780-U-105
+      n: '2'
+      Temperature Range (°C): 1350–1445
+      h (K): 2820*
+      SiO2 (wt. %): '40.00'
+      FeO* (wt. %): '13.42'
+    - Source: Kil83
+      Temperature Series: 780-U-111
+      n: '2'
+      Temperature Range (°C): 1344–1445
+      h (K): 7082*
+      SiO2 (wt. %): '44.15'
+      FeO* (wt. %): '11.68'
+    - Source: Kil83
+      Temperature Series: CAM-49
+      n: '2'
+      Temperature Range (°C): 1342–1434
+      h (K): 264.1*
+      SiO2 (wt. %): '72.29'
+      FeO* (wt. %): '1.63'
+    - Source: Kil83
+      Temperature Series: IC-2
+      n: '4'
+      Temperature Range (°C): 1342–1443
+      h (K): -1960±406
+      SiO2 (wt. %): '73.76'
+      FeO* (wt. %): '3.24'
+    - Source: Kil83
+      Temperature Series: NIC-8
+      n: '2'
+      Temperature Range (°C): 1344–1430
+      h (K): 4198*
+      SiO2 (wt. %): '61.51'
+      FeO* (wt. %): '5.91'
+    - Source: KC88
+      Temperature Series: JDFD-2
+      n: '8'
+      Temperature Range (°C): 1360–1635
+      h (K): 5067±572.0
+      SiO2 (wt. %): '50.81'
+      FeO* (wt. %): '11.94'
+    - Source: M95
+      Temperature Series: MAS
+      n: '8'
+      Temperature Range (°C): 1215–1550
+      h (K): 7166±656.1
+      SiO2 (wt. %): '54.91'
+      FeO* (wt. %): '5.84'
+    - Source: M95
+      Temperature Series: NZC
+      n: '9'
+      Temperature Range (°C): 1250–1557
+      h (K): 7754±1026
+      SiO2 (wt. %): '74.6'
+      FeO* (wt. %): '5.07'
+    - Source: BM2010
+      Temperature Series: DAF_BM
+      n: '4'
+      Temperature Range (°C): 1398–1571
+      h (K): 4723±236.3
+      SiO2 (wt. %): '47.9'
+      FeO* (wt. %): '4.68'
+    - Source: BM2010
+      Temperature Series: DAFL
+      n: '2'
+      Temperature Range (°C): 1424–1540
+      h (K): 3909*
+      SiO2 (wt. %): '50.3'
+      FeO* (wt. %): '0.99'
+    - Source: BM2010
+      Temperature Series: DAS20F
+      n: '4'
+      Temperature Range (°C): 1398–1571
+      h (K): 4410±101.1
+      SiO2 (wt. %): '53.2'
+      FeO* (wt. %): '4.59'
+    - Source: BM2010
+      Temperature Series: DAS40F
+      n: '4'
+      Temperature Range (°C): 1398–1571
+      h (K): 3866±282.8
+      SiO2 (wt. %): '58.5'
+      FeO* (wt. %): '4.68'
+    - Source: BM2010
+      Temperature Series: DAS60F
+      n: '4'
+      Temperature Range (°C): 1398–1571
+      h (K): 5115±441.8
+      SiO2 (wt. %): '63.7'
+      FeO* (wt. %): '4.59'
+    - Source: BM2010
+      Temperature Series: DAS80F
+      n: '3'
+      Temperature Range (°C): 1450–1571
+      h (K): 5058±22.17
+      SiO2 (wt. %): '69.1'
+      FeO* (wt. %): '4.59'
+    - Source: B13-18
+      Temperature Series: DAF
+      n: '20'
+      Temperature Range (°C): 1399–1551
+      h (K): 5102±321.9
+      SiO2 (wt. %): '45.56'
+      FeO* (wt. %): '8.78'
+    - Source: B13-18
+      Temperature Series: DAF20
+      n: '4'
+      Temperature Range (°C): 1399–1550
+      h (K): 5513±277.4
+      SiO2 (wt. %): '40.42'
+      FeO* (wt. %): '17.42'
+    - Source: B13-18
+      Temperature Series: DAF5
+      n: '4'
+      Temperature Range (°C): 1399–1550
+      h (K): 4437±871.2
+      SiO2 (wt. %): '48.05'
+      FeO* (wt. %): '4.2'
+    - Source: B13-18
+      Temperature Series: DAFA22
+      n: '3'
+      Temperature Range (°C): 1450–1551
+      h (K): 4272±426.4
+      SiO2 (wt. %): '41.06'
+      FeO* (wt. %): '8.7'
+    - Source: B13-18
+      Temperature Series: DAFA30
+      n: '3'
+      Temperature Range (°C): 1450–1551
+      h (K): 4485±188.1
+      SiO2 (wt. %): '36.42'
+      FeO* (wt. %): '8.96'
+    - Source: B13-18
+      Temperature Series: DAFM15
+      n: '2'
+      Temperature Range (°C): 1501–1551
+      h (K): 4854*
+      SiO2 (wt. %): '42.79'
+      FeO* (wt. %): '8.78'
+    - Source: B13-18
+      Temperature Series: DAFM20
+      n: '2'
+      Temperature Range (°C): 1501–1551
+      h (K): 5566*
+      SiO2 (wt. %): '39.93'
+      FeO* (wt. %): '8.76'
+    - Source: B13-18
+      Temperature Series: DAFN15/DAFSK25
+      n: '2'
+      Temperature Range (°C): 1450–1500
+      h (K): 1100*
+      SiO2 (wt. %): '52.72'
+      FeO* (wt. %): '7.5'
+    - Source: B13-18
+      Temperature Series: DAFN8/HAFSK13
+      n: '2'
+      Temperature Range (°C): 1450–1499
+      h (K): 4798*
+      SiO2 (wt. %): '49.68'
+      FeO* (wt. %): '7.82'
+    - Source: B13-18
+      Temperature Series: DAFOL20
+      n: '3'
+      Temperature Range (°C): 1450–1550
+      h (K): 5117±87.86
+      SiO2 (wt. %): '44.95'
+      FeO* (wt. %): '8.6'
+    - Source: B13-18
+      Temperature Series: DAFOL40
+      n: '3'
+      Temperature Range (°C): 1450–1550
+      h (K): 4742±41.15
+      SiO2 (wt. %): '44.38'
+      FeO* (wt. %): '8.62'
+    - Source: B13-18
+      Temperature Series: DAFP05
+      n: '3'
+      Temperature Range (°C): 1451–1552
+      h (K): 4921±52.67
+      SiO2 (wt. %): '43.3'
+      FeO* (wt. %): '8.76'
+    - Source: B13-18
+      Temperature Series: DAFP10
+      n: '3'
+      Temperature Range (°C): 1451–1552
+      h (K): 4983±125.3
+      SiO2 (wt. %): '40.77'
+      FeO* (wt. %): '8.74'
+    - Source: B13-18
+      Temperature Series: DAFP15
+      n: '3'
+      Temperature Range (°C): 1451–1552
+      h (K): 4796±123.3
+      SiO2 (wt. %): '38.41'
+      FeO* (wt. %): '8.77'
+    - Source: B13-18
+      Temperature Series: DAFP20
+      n: '3'
+      Temperature Range (°C): 1451–1552
+      h (K): 4703±68.32
+      SiO2 (wt. %): '36.43'
+      FeO* (wt. %): '8.72'
+    - Source: B13-18
+      Temperature Series: DAFS
+      n: '15'
+      Temperature Range (°C): 1450–1551
+      h (K): 5817±892.8
+      SiO2 (wt. %): '65.67'
+      FeO* (wt. %): '8.92'
+    - Source: B13-18
+      Temperature Series: DAFSA15
+      n: '3'
+      Temperature Range (°C): 1450–1551
+      h (K): 5409±227.6
+      SiO2 (wt. %): '60.05'
+      FeO* (wt. %): '8.73'
+    - Source: B13-18
+      Temperature Series: DAFSA23
+      n: '3'
+      Temperature Range (°C): 1450–1551
+      h (K): 4392±208.1
+      SiO2 (wt. %): '54.08'
+      FeO* (wt. %): '8.8'
+    - Source: B13-18
+      Temperature Series: DAFSM13
+      n: '2'
+      Temperature Range (°C): 1501–1551
+      h (K): 5113*
+      SiO2 (wt. %): '60.58'
+      FeO* (wt. %): '9.06'
+    - Source: B13-18
+      Temperature Series: DAFSM21
+      n: '2'
+      Temperature Range (°C): 1501–1551
+      h (K): 4983*
+      SiO2 (wt. %): '54.4'
+      FeO* (wt. %): '9.07'
+    - Source: B13-18
+      Temperature Series: DAFSN15/DAFSK25
+      n: '2'
+      Temperature Range (°C): 1450–1500
+      h (K): 488.8*
+      SiO2 (wt. %): '56.7'
+      FeO* (wt. %): '7.49'
+    - Source: B13-18
+      Temperature Series: DAFSP08
+      n: '4'
+      Temperature Range (°C): 1501–1552
+      h (K): 4339±610.6
+      SiO2 (wt. %): '51.06'
+      FeO* (wt. %): '8.81'
+    - Source: B13-18
+      Temperature Series: DAFST15
+      n: '2'
+      Temperature Range (°C): 1451–1502
+      h (K): 8100*
+      SiO2 (wt. %): '55.44'
+      FeO* (wt. %): '8.43'
+    - Source: B13-18
+      Temperature Series: DAFST25
+      n: '2'
+      Temperature Range (°C): 1178–1229
+      h (K): 5641*
+      SiO2 (wt. %): '47.33'
+      FeO* (wt. %): '8.8'
+    - Source: B13-18
+      Temperature Series: DAFT10
+      n: '3'
+      Temperature Range (°C): 1400–1502
+      h (K): 6824±1041
+      SiO2 (wt. %): '40.8'
+      FeO* (wt. %): '8.45'
+    - Source: B13-18
+      Temperature Series: DAFT20
+      n: '3'
+      Temperature Range (°C): 1400–1502
+      h (K): 6270±1082
+      SiO2 (wt. %): '35.04'
+      FeO* (wt. %): '8.56'
+    - Source: B13-18
+      Temperature Series: DAFT30
+      n: '3'
+      Temperature Range (°C): 1400–1502
+      h (K): 5866±873.5
+      SiO2 (wt. %): '30.41'
+      FeO* (wt. %): '8.62'
+    - Source: B13-18
+      Temperature Series: HAF
+      n: '3'
+      Temperature Range (°C): 1450–1553
+      h (K): 5009±529.4
+      SiO2 (wt. %): '56.14'
+      FeO* (wt. %): '9.03'
+    - Source: B13-18
+      Temperature Series: HAFC11
+      n: '2'
+      Temperature Range (°C): 1500–1553
+      h (K): 5375*
+      SiO2 (wt. %): '49.3'
+      FeO* (wt. %): '8.94'
+    - Source: B13-18
+      Temperature Series: HAFC11S
+      n: '2'
+      Temperature Range (°C): 1500–1553
+      h (K): 4948*
+      SiO2 (wt. %): '61.48'
+      FeO* (wt. %): '8.67'
+    - Source: B13-18
+      Temperature Series: HAFC16
+      n: '3'
+      Temperature Range (°C): 1450–1553
+      h (K): 4826±247.2
+      SiO2 (wt. %): '45.92'
+      FeO* (wt. %): '9.05'
+    - Source: B13-18
+      Temperature Series: HAFC16S
+      n: '2'
+      Temperature Range (°C): 1500–1553
+      h (K): 4093*
+      SiO2 (wt. %): '60.24'
+      FeO* (wt. %): '8.93'
+    - Source: B13-18
+      Temperature Series: HAFC5
+      n: '2'
+      Temperature Range (°C): 1500–1553
+      h (K): 4826*
+      SiO2 (wt. %): '52.54'
+      FeO* (wt. %): '9.52'
+    - Source: B13-18
+      Temperature Series: HAFC5S
+      n: '2'
+      Temperature Range (°C): 1500–1553
+      h (K): 3176*
+      SiO2 (wt. %): '63.22'
+      FeO* (wt. %): '9.04'
+    - Source: B13-18
+      Temperature Series: HAFS
+      n: '5'
+      Temperature Range (°C): 1500–1553
+      h (K): 10190±4510
+      SiO2 (wt. %): '63.06'
+      FeO* (wt. %): '8.8'
+    - Source: B13-18
+      Temperature Series: HRF10
+      n: '4'
+      Temperature Range (°C): 1301–1451
+      h (K): 4145±158.7
+      SiO2 (wt. %): '57.5'
+      FeO* (wt. %): '8.85'
+    - Source: B13-18
+      Temperature Series: HRF20
+      n: '4'
+      Temperature Range (°C): 1301–1451
+      h (K): 3938±163.2
+      SiO2 (wt. %): '51.25'
+      FeO* (wt. %): '17.9'
+    - Source: B13-18
+      Temperature Series: HRF5
+      n: '4'
+      Temperature Range (°C): 1301–1451
+      h (K): 4595±217.0
+      SiO2 (wt. %): '60.12'
+      FeO* (wt. %): '5.05'
+    - Source: B13-18
+      Temperature Series: SAF
+      n: '3'
+      Temperature Range (°C): 1398–1499
+      h (K): 4428±102.7
+      SiO2 (wt. %): '64.88'
+      FeO* (wt. %): '8.75'
+    - Source: B13-18
+      Temperature Series: SAFM10
+      n: '2'
+      Temperature Range (°C): 1448–1449
+      h (K): 4903*
+      SiO2 (wt. %): '58.56'
+      FeO* (wt. %): '8.53'
+    - Source: B13-18
+      Temperature Series: SAFM15
+      n: '2'
+      Temperature Range (°C): 1448–1499
+      h (K): 4963*
+      SiO2 (wt. %): '55.04'
+      FeO* (wt. %): '8.69'
+    - Source: B13-18
+      Temperature Series: SAFM5
+      n: '3'
+      Temperature Range (°C): 1398–1499
+      h (K): 4632±18.05
+      SiO2 (wt. %): '61.8'
+      FeO* (wt. %): '8.53'
+  observation_id: aithala_2026_table_s5_quoted_compilation
+  context_id: aithala-2026-magmatic-iron-redox-to-2100c::context::aithala_2026_table_s5_quoted_compilation
+  work_id: 10.7185/geochemlet.2617
+  source_id: aithala-2026-magmatic-iron-redox-to-2100c
+  species: Fe
+- observation_id: aithala_2026_vf271_a_sub_recalculated
+  experiment: aithala-2026-vf271
+  type: recalculation_table
+  locator:
+    page: 15
+    table: S-3
+    published_page: SI-9
+    note: Fe3+/FeT A_sub. for VF271. VF271 is partially crystallised and below the starting composition's liquidus (SI-3,
+      PDF p. 9).
+  T_range_K:
+  - '1523.15'
+  - '1523.15'
+  phase: quenched silicate glass; recalculated
+  units: fraction (Fe3+/FeT)
+  uncertainty:
+    Fe3_over_FeT: ±0.023 (as printed)
+  values:
+    method_class: model_derived
+    evidence_class: model_derived
+    quantity: Fe3+/FeT
+    Fe3_over_FeT: '0.815'
+    reported_value: 0.815±0.023
+    target_log_fO2: '-0.68'
+    target_composition: Table S-2 reference composition
+  derived_from:
+  - aithala_2026_vf271_xanes
+  - aithala_2026_vf271_wdsepma_composition
+  derivation:
+    relation: 'Eq. S-2: log(XFe3+/XFe2+) is shifted to air and the Table S-2 reference composition using k = 0.1988 and dK2O
+      = -99.62; the adjusted ratio is converted to Fe3+/FeT.'
+    equations: Supplementary Eqs. S-1 through S-3; Fe3+/FeT = (XFe3+/XFe2+) / (1 + XFe3+/XFe2+).
+    inputs:
+    - aithala_2026_vf271_xanes
+    - aithala_2026_vf271_wdsepma_composition
+  context_id: aithala-2026-magmatic-iron-redox-to-2100c::context::aithala_2026_vf271_a_sub_recalculated
+  work_id: 10.7185/geochemlet.2617
+  source_id: aithala-2026-magmatic-iron-redox-to-2100c
+  species: Fe
+- observation_id: aithala_2026_vf271_b18_recalculated
+  experiment: aithala-2026-vf271
+  type: recalculation_table
+  locator:
+    page: 15
+    table: S-3
+    published_page: SI-9
+    note: Fe3+/FeT B18 for VF271. VF271 is partially crystallised and below the starting composition's liquidus (SI-3, PDF
+      p. 9).
+  T_range_K:
+  - '1523.15'
+  - '1523.15'
+  phase: quenched silicate glass; recalculated
+  units: fraction (Fe3+/FeT)
+  uncertainty:
+    Fe3_over_FeT: ±0.024 (as printed)
+  values:
+    method_class: model_derived
+    evidence_class: model_derived
+    quantity: Fe3+/FeT
+    Fe3_over_FeT: '0.801'
+    reported_value: 0.801±0.024
+    target_log_fO2: '-0.68'
+    target_composition: Table S-2 reference composition
+  derived_from:
+  - aithala_2026_vf271_xanes
+  - aithala_2026_vf271_wdsepma_composition
+  derivation:
+    relation: 'Eq. S-3: Borisov et al. (2018) compositional recalculation, with k = 0.1988, to air and the Table S-2 reference
+      composition; the adjusted ratio is converted to Fe3+/FeT.'
+    equations: Supplementary Eqs. S-1 through S-3; Fe3+/FeT = (XFe3+/XFe2+) / (1 + XFe3+/XFe2+).
+    inputs:
+    - aithala_2026_vf271_xanes
+    - aithala_2026_vf271_wdsepma_composition
+  context_id: aithala-2026-magmatic-iron-redox-to-2100c::context::aithala_2026_vf271_b18_recalculated
+  work_id: 10.7185/geochemlet.2617
+  source_id: aithala-2026-magmatic-iron-redox-to-2100c
+  species: Fe

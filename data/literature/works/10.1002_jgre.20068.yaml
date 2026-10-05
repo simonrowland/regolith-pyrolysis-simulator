@@ -9,9 +9,27 @@ work:
   source_files:
     corpus_repo: regolith-corpus
     corpus_commit:
-      tag: unknown
-      reason: INDEX does not give corpus commit
+      tag: value
+      value: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
     files:
+    - asset_id: pdf:lebrun-2013-magma-ocean-atmosphere
+      role: pdf
+      path: raw/lebrun-2013-magma-ocean-atmosphere/lebrun-2013-magma-ocean-atmosphere.pdf
+      sha256:
+        tag: value
+        value: b49cd3be78ee0c3d6edaac0128d28cc2a4929e95638532661e01354ae07aa9fa
+    - asset_id: pdftotext:lebrun-2013-magma-ocean-atmosphere
+      role: pdftotext
+      path: text/lebrun-2013-magma-ocean-atmosphere
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: tables:lebrun-2013-magma-ocean-atmosphere
+      role: table_csv
+      path: tables/lebrun-2013-magma-ocean-atmosphere
+      sha256:
+        tag: unknown
+        reason: INDEX does not give table sha256
     - asset_id: unknown:lebrun-2013-magma-ocean-atmosphere
       role: pdftotext
       path: unknown

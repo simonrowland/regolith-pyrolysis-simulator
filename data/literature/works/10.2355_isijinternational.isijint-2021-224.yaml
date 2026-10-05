@@ -8,9 +8,27 @@ work:
   source_files:
     corpus_repo: regolith-corpus
     corpus_commit:
-      tag: unknown
-      reason: INDEX does not give corpus commit
+      tag: value
+      value: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
     files:
+    - asset_id: pdf:guo-2021-mgo-activity-cmas-slag
+      role: pdf
+      path: raw/guo-2021-mgo-activity-cmas-slag/guo-2021-mgo-activity-cmas-slag.pdf
+      sha256:
+        tag: value
+        value: 5150f1d2724f81c946acbcca6b1d131ae8256d52eeeec51b110865f3cb4d7d63
+    - asset_id: pdftotext:guo-2021-mgo-activity-cmas-slag
+      role: pdftotext
+      path: text/guo-2021-mgo-activity-cmas-slag
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: tables:guo-2021-mgo-activity-cmas-slag
+      role: table_csv
+      path: tables/guo-2021-mgo-activity-cmas-slag
+      sha256:
+        tag: unknown
+        reason: INDEX does not give table sha256
     - asset_id: unknown:guo-2021-mgo-activity-cmas-slag
       role: pdftotext
       path: unknown

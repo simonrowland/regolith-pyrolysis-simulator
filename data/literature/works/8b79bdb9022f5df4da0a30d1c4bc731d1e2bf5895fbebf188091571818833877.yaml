@@ -9,9 +9,27 @@ work:
   source_files:
     corpus_repo: regolith-corpus
     corpus_commit:
-      tag: unknown
-      reason: INDEX does not give corpus commit
+      tag: value
+      value: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
     files:
+    - asset_id: pdf:lpsc-2024-bennu-pyrolysis-vandam
+      role: pdf
+      path: raw/lpsc-2024-bennu-pyrolysis-vandam/lpsc-2024-bennu-pyrolysis-vandam.pdf
+      sha256:
+        tag: value
+        value: 9444343099d69f6e02b8671e679d20a118e59b03678bcd4d5fe727cbc008d69b
+    - asset_id: pdftotext:lpsc-2024-bennu-pyrolysis-vandam
+      role: pdftotext
+      path: text/lpsc-2024-bennu-pyrolysis-vandam
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: tables:lpsc-2024-bennu-pyrolysis-vandam
+      role: table_csv
+      path: tables/lpsc-2024-bennu-pyrolysis-vandam
+      sha256:
+        tag: unknown
+        reason: INDEX does not give table sha256
     - asset_id: unknown:lpsc-2024-bennu-pyrolysis-vandam
       role: pdftotext
       path: unknown

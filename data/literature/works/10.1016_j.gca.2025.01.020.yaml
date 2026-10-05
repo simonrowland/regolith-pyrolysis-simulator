@@ -8,9 +8,27 @@ work:
   source_files:
     corpus_repo: regolith-corpus
     corpus_commit:
-      tag: unknown
-      reason: INDEX does not give corpus commit
+      tag: value
+      value: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
     files:
+    - asset_id: pdf:rusiecka-wood-2025-chlorine-nacl-hydrous-basaltic-melts
+      role: pdf
+      path: raw/rusiecka-wood-2025-chlorine-nacl-hydrous-basaltic-melts/rusiecka-wood-2025-chlorine-nacl-hydrous-basaltic-melts.pdf
+      sha256:
+        tag: value
+        value: e2c1d300f840129f9b1dba36f75e6cdbea0cb78428311c4aae7dadba2fc7befc
+    - asset_id: pdftotext:rusiecka-wood-2025-chlorine-nacl-hydrous-basaltic-melts
+      role: pdftotext
+      path: text/rusiecka-wood-2025-chlorine-nacl-hydrous-basaltic-melts
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: tables:rusiecka-wood-2025-chlorine-nacl-hydrous-basaltic-melts
+      role: table_csv
+      path: tables/rusiecka-wood-2025-chlorine-nacl-hydrous-basaltic-melts
+      sha256:
+        tag: unknown
+        reason: INDEX does not give table sha256
     - asset_id: unknown:rusiecka-wood-2025-chlorine-nacl-hydrous-basaltic-melts
       role: pdftotext
       path: unknown

@@ -9,9 +9,27 @@ work:
   source_files:
     corpus_repo: regolith-corpus
     corpus_commit:
-      tag: unknown
-      reason: INDEX does not give corpus commit
+      tag: value
+      value: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
     files:
+    - asset_id: pdf:senior-1992-vacuum-pyrolysis
+      role: pdf
+      path: raw/senior-1992-vacuum-pyrolysis/senior-1992-vacuum-pyrolysis.pdf
+      sha256:
+        tag: value
+        value: 526fc4262ccb23a9fdd156b67c93fd9f2c04f6be9bb03c4f439e99de14811cd3
+    - asset_id: pdftotext:senior-1992-vacuum-pyrolysis
+      role: pdftotext
+      path: text/senior-1992-vacuum-pyrolysis
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: tables:senior-1992-vacuum-pyrolysis
+      role: table_csv
+      path: tables/senior-1992-vacuum-pyrolysis
+      sha256:
+        tag: unknown
+        reason: INDEX does not give table sha256
     - asset_id: unknown:senior-1992-vacuum-pyrolysis
       role: pdftotext
       path: unknown

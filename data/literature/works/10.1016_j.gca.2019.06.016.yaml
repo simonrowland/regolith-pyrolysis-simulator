@@ -9,9 +9,27 @@ work:
   source_files:
     corpus_repo: regolith-corpus
     corpus_commit:
-      tag: unknown
-      reason: INDEX does not give corpus commit
+      tag: value
+      value: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
     files:
+    - asset_id: pdf:wimpenny-2019-zn-isotope-evaporation-extreme-t
+      role: pdf
+      path: raw/wimpenny-2019-zn-isotope-evaporation-extreme-t/wimpenny-2019-zn-isotope-evaporation-extreme-t.pdf
+      sha256:
+        tag: value
+        value: c6362194cc4313ed08194be4d2aff2d22bde0eb1f509e5831c6016215ceb1444
+    - asset_id: pdftotext:wimpenny-2019-zn-isotope-evaporation-extreme-t
+      role: pdftotext
+      path: text/wimpenny-2019-zn-isotope-evaporation-extreme-t
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: tables:wimpenny-2019-zn-isotope-evaporation-extreme-t
+      role: table_csv
+      path: tables/wimpenny-2019-zn-isotope-evaporation-extreme-t
+      sha256:
+        tag: unknown
+        reason: INDEX does not give table sha256
     - asset_id: unknown:wimpenny-2019-zn-isotope-evaporation-extreme-t
       role: pdftotext
       path: unknown

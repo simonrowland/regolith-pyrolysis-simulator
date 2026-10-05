@@ -8,9 +8,27 @@ work:
   source_files:
     corpus_repo: regolith-corpus
     corpus_commit:
-      tag: unknown
-      reason: INDEX does not give corpus commit
+      tag: value
+      value: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
     files:
+    - asset_id: pdf:holzheid-1997-feo-nio-coo-activity-metal-saturated
+      role: pdf
+      path: raw/holzheid-1997-feo-nio-coo-activity-metal-saturated/holzheid-1997-feo-nio-coo-activity-metal-saturated.pdf
+      sha256:
+        tag: value
+        value: c5fff890ccf7bd02db8d9c53f26259d87f069517eea3e4446507d9805f49d73d
+    - asset_id: pdftotext:holzheid-1997-feo-nio-coo-activity-metal-saturated
+      role: pdftotext
+      path: text/holzheid-1997-feo-nio-coo-activity-metal-saturated
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: tables:holzheid-1997-feo-nio-coo-activity-metal-saturated
+      role: table_csv
+      path: tables/holzheid-1997-feo-nio-coo-activity-metal-saturated
+      sha256:
+        tag: unknown
+        reason: INDEX does not give table sha256
     - asset_id: unknown:holzheid-1997-feo-nio-coo-activity-metal-saturated
       role: pdftotext
       path: unknown

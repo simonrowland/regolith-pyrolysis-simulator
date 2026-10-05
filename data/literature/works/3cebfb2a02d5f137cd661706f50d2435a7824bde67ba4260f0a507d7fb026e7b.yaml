@@ -8,9 +8,27 @@ work:
   source_files:
     corpus_repo: regolith-corpus
     corpus_commit:
-      tag: unknown
-      reason: INDEX does not give corpus commit
+      tag: value
+      value: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
     files:
+    - asset_id: pdf:cooper-2007-sintering-lunar-simulant
+      role: pdf
+      path: raw/cooper-2007-sintering-lunar-simulant/cooper-2007-sintering-lunar-simulant.pdf
+      sha256:
+        tag: value
+        value: cc4e554d614207e22854912e0a5a3facef473a0362e7630c22cef63e5e79fd9b
+    - asset_id: pdftotext:cooper-2007-sintering-lunar-simulant
+      role: pdftotext
+      path: text/cooper-2007-sintering-lunar-simulant
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: tables:cooper-2007-sintering-lunar-simulant
+      role: table_csv
+      path: tables/cooper-2007-sintering-lunar-simulant
+      sha256:
+        tag: unknown
+        reason: INDEX does not give table sha256
     - asset_id: unknown:cooper-2007-sintering-lunar-simulant
       role: pdftotext
       path: unknown

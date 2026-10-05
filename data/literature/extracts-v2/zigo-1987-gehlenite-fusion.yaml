@@ -1,0 +1,1350 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/extracts/zigo-1987-gehlenite-fusion.yaml
+observations:
+- observation_id: zigo-1987-gehlenite-fusion::zigo_1987_fusion_enthalpy_at_1863K
+  experiment_id: fb452fa635b46a767af5c67fd67d2b5dac81e9779337b0cdfc22bcec4e149298::zigo-1987-gehlenite-fusion
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'heat_of_fusion'
+    species:
+      formula: gehlenite
+      phase:
+        tag: unknown
+        reason: phase string 'gehlenite_C2AS_crystal_to_composition_matched_melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'heat_of_fusion'; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      reported_status: printed
+      value_kJ_mol-1: '6'
+      note: Combined from the 2.9 and 5.2 kJ mol−1 relative-enthalpy errors by Gauss law of error propagation.
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: zigo-1987-gehlenite-fusion
+  locator:
+    page: 179
+    pdf_page_index: 9
+    equation: '7'
+  read_from: pdf:zigo-1987-gehlenite-fusion
+- observation_id: zigo-1987-gehlenite-fusion::zigo_1987_fusion_entropy_at_1863K
+  experiment_id: fb452fa635b46a767af5c67fd67d2b5dac81e9779337b0cdfc22bcec4e149298::zigo-1987-gehlenite-fusion
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'entropy_of_fusion'
+    species:
+      formula: gehlenite
+      phase:
+        tag: unknown
+        reason: phase string 'gehlenite_C2AS_crystal_to_composition_matched_melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'entropy_of_fusion'; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      reported_status: printed
+      value_J_mol-1_K-1: '3.2'
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: zigo-1987-gehlenite-fusion
+  locator:
+    page: 179
+    pdf_page_index: 9
+    equation: '8'
+  read_from: pdf:zigo-1987-gehlenite-fusion
+- observation_id: zigo-1987-gehlenite-fusion::zigo_1987_fusion_temperature_selected
+  experiment_id: fb452fa635b46a767af5c67fd67d2b5dac81e9779337b0cdfc22bcec4e149298::zigo-1987-gehlenite-fusion
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'congruent_fusion_temperature'
+    species:
+      formula: gehlenite
+      phase:
+        tag: unknown
+        reason: phase string 'gehlenite_C2AS_crystal_and_composition_matched_melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'congruent_fusion_temperature'; refusing to pick
+      a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      reported_status: literature_range
+      note: Temperature range is 1584–1593 °C; selected value is 1863 K (1590 °C).
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped method_class quoted
+    original_method_class: quoted
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: zigo-1987-gehlenite-fusion
+  locator:
+    page: 172
+    pdf_page_index: 2
+    paragraph: introduction
+  read_from: pdf:zigo-1987-gehlenite-fusion
+- observation_id: zigo-1987-gehlenite-fusion::zigo_1987_fusion_temperature_sensitivity::points:h=54bedae60b48
+  experiment_id: fb452fa635b46a767af5c67fd67d2b5dac81e9779337b0cdfc22bcec4e149298::zigo-1987-gehlenite-fusion
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'heat_of_fusion_sensitivity_to_fusion_temperature'
+    species:
+      formula: gehlenite
+      phase:
+        tag: unknown
+        reason: phase string 'gehlenite_C2AS_crystal_to_composition_matched_melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      reported_status: printed
+      note: Both sensitivity values retain the printed ±6.0 kJ mol−1.
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: zigo-1987-gehlenite-fusion
+  locator:
+    page: 180
+    pdf_page_index: 10
+    paragraph: fusion temperature uncertainty
+  read_from: pdf:zigo-1987-gehlenite-fusion
+- observation_id: zigo-1987-gehlenite-fusion::zigo_1987_fusion_temperature_sensitivity::points:h=a6372be22745
+  experiment_id: fb452fa635b46a767af5c67fd67d2b5dac81e9779337b0cdfc22bcec4e149298::zigo-1987-gehlenite-fusion
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'heat_of_fusion_sensitivity_to_fusion_temperature'
+    species:
+      formula: gehlenite
+      phase:
+        tag: unknown
+        reason: phase string 'gehlenite_C2AS_crystal_to_composition_matched_melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      reported_status: printed
+      note: Both sensitivity values retain the printed ±6.0 kJ mol−1.
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: zigo-1987-gehlenite-fusion
+  locator:
+    page: 180
+    pdf_page_index: 10
+    paragraph: fusion temperature uncertainty
+  read_from: pdf:zigo-1987-gehlenite-fusion
+- observation_id: zigo-1987-gehlenite-fusion::zigo_1987_t1_crystal_cooling_fit
+  experiment_id: fb452fa635b46a767af5c67fd67d2b5dac81e9779337b0cdfc22bcec4e149298::zigo-1987-gehlenite-fusion
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'fitted_negative_enthalpy_change_on_cooling'
+    species:
+      formula: gehlenite
+      phase:
+        tag: unknown
+        reason: phase string 'crystalline_gehlenite_C2AS' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1519, 1799]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; no observable selected; T_range_K [1519, 1799] is a temperature domain,
+      not the observable
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Reported function error δ(ΔHcool,φ) = 1.6 kJ mol−1 at reliability coefficient (1−α)=0.95.
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: zigo-1987-gehlenite-fusion
+  locator:
+    page: 174
+    pdf_page_index: 4
+    table: '1'
+    equation: '2'
+  read_from: pdf:zigo-1987-gehlenite-fusion
+- observation_id: zigo-1987-gehlenite-fusion::zigo_1987_t1_crystal_cooling_measured::T=1519:h=e4427c6f8b88
+  experiment_id: fb452fa635b46a767af5c67fd67d2b5dac81e9779337b0cdfc22bcec4e149298::zigo-1987-gehlenite-fusion
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'negative_enthalpy_change_on_cooling'
+    species:
+      formula: gehlenite
+      phase:
+        tag: unknown
+        reason: phase string 'crystalline_gehlenite_C2AS' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1519'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      reported_status: not_reported_for_individual_points
+      note: Table 1 gives experimental values without pointwise uncertainties.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: zigo-1987-gehlenite-fusion
+  locator:
+    page: 174
+    pdf_page_index: 4
+    table: '1'
+  read_from: pdf:zigo-1987-gehlenite-fusion
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1519'
+      locator:
+        page: 174
+        pdf_page_index: 4
+        table: '1'
+- observation_id: zigo-1987-gehlenite-fusion::zigo_1987_t1_crystal_cooling_measured::T=1567:h=685c522c3c36
+  experiment_id: fb452fa635b46a767af5c67fd67d2b5dac81e9779337b0cdfc22bcec4e149298::zigo-1987-gehlenite-fusion
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'negative_enthalpy_change_on_cooling'
+    species:
+      formula: gehlenite
+      phase:
+        tag: unknown
+        reason: phase string 'crystalline_gehlenite_C2AS' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1567'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      reported_status: not_reported_for_individual_points
+      note: Table 1 gives experimental values without pointwise uncertainties.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: zigo-1987-gehlenite-fusion
+  locator:
+    page: 174
+    pdf_page_index: 4
+    table: '1'
+  read_from: pdf:zigo-1987-gehlenite-fusion
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1567'
+      locator:
+        page: 174
+        pdf_page_index: 4
+        table: '1'
+- observation_id: zigo-1987-gehlenite-fusion::zigo_1987_t1_crystal_cooling_measured::T=1582:h=85fd9bce320c
+  experiment_id: fb452fa635b46a767af5c67fd67d2b5dac81e9779337b0cdfc22bcec4e149298::zigo-1987-gehlenite-fusion
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'negative_enthalpy_change_on_cooling'
+    species:
+      formula: gehlenite
+      phase:
+        tag: unknown
+        reason: phase string 'crystalline_gehlenite_C2AS' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1582'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      reported_status: not_reported_for_individual_points
+      note: Table 1 gives experimental values without pointwise uncertainties.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: zigo-1987-gehlenite-fusion
+  locator:
+    page: 174
+    pdf_page_index: 4
+    table: '1'
+  read_from: pdf:zigo-1987-gehlenite-fusion
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1582'
+      locator:
+        page: 174
+        pdf_page_index: 4
+        table: '1'
+- observation_id: zigo-1987-gehlenite-fusion::zigo_1987_t1_crystal_cooling_measured::T=1691:h=507ee2e28d59
+  experiment_id: fb452fa635b46a767af5c67fd67d2b5dac81e9779337b0cdfc22bcec4e149298::zigo-1987-gehlenite-fusion
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'negative_enthalpy_change_on_cooling'
+    species:
+      formula: gehlenite
+      phase:
+        tag: unknown
+        reason: phase string 'crystalline_gehlenite_C2AS' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1691'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      reported_status: not_reported_for_individual_points
+      note: Table 1 gives experimental values without pointwise uncertainties.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: zigo-1987-gehlenite-fusion
+  locator:
+    page: 174
+    pdf_page_index: 4
+    table: '1'
+  read_from: pdf:zigo-1987-gehlenite-fusion
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1691'
+      locator:
+        page: 174
+        pdf_page_index: 4
+        table: '1'
+- observation_id: zigo-1987-gehlenite-fusion::zigo_1987_t1_crystal_cooling_measured::T=1730:h=b974bb2540a9
+  experiment_id: fb452fa635b46a767af5c67fd67d2b5dac81e9779337b0cdfc22bcec4e149298::zigo-1987-gehlenite-fusion
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'negative_enthalpy_change_on_cooling'
+    species:
+      formula: gehlenite
+      phase:
+        tag: unknown
+        reason: phase string 'crystalline_gehlenite_C2AS' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1730'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      reported_status: not_reported_for_individual_points
+      note: Table 1 gives experimental values without pointwise uncertainties.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: zigo-1987-gehlenite-fusion
+  locator:
+    page: 174
+    pdf_page_index: 4
+    table: '1'
+  read_from: pdf:zigo-1987-gehlenite-fusion
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1730'
+      locator:
+        page: 174
+        pdf_page_index: 4
+        table: '1'
+- observation_id: zigo-1987-gehlenite-fusion::zigo_1987_t1_crystal_cooling_measured::T=1799:h=c263b7178823
+  experiment_id: fb452fa635b46a767af5c67fd67d2b5dac81e9779337b0cdfc22bcec4e149298::zigo-1987-gehlenite-fusion
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'negative_enthalpy_change_on_cooling'
+    species:
+      formula: gehlenite
+      phase:
+        tag: unknown
+        reason: phase string 'crystalline_gehlenite_C2AS' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1799'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      reported_status: not_reported_for_individual_points
+      note: Table 1 gives experimental values without pointwise uncertainties.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: zigo-1987-gehlenite-fusion
+  locator:
+    page: 174
+    pdf_page_index: 4
+    table: '1'
+  read_from: pdf:zigo-1987-gehlenite-fusion
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1799'
+      locator:
+        page: 174
+        pdf_page_index: 4
+        table: '1'
+- observation_id: zigo-1987-gehlenite-fusion::zigo_1987_t2_crystal_solution_calorimetry
+  experiment_id: fb452fa635b46a767af5c67fd67d2b5dac81e9779337b0cdfc22bcec4e149298::zigo-1987-gehlenite-fusion
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'negative_heat_of_solution'
+    species:
+      formula: gehlenite
+      phase:
+        tag: unknown
+        reason: phase string 'gehlenite_sample_with_unreacted_admixtures' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '298'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'negative_heat_of_solution'; refusing to pick a
+      number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      reported_status: printed
+      value_kJ_mol-1: '4.9'
+      note: Error of the arithmetic mean, Student distribution, (1−α)=0.95.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: zigo-1987-gehlenite-fusion
+  locator:
+    page: 175
+    pdf_page_index: 5
+    table: '2'
+  read_from: pdf:zigo-1987-gehlenite-fusion
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '298'
+      locator:
+        page: 175
+        pdf_page_index: 5
+        table: '2'
+- observation_id: zigo-1987-gehlenite-fusion::zigo_1987_t2_crystal_solution_corrected
+  experiment_id: fb452fa635b46a767af5c67fd67d2b5dac81e9779337b0cdfc22bcec4e149298::zigo-1987-gehlenite-fusion
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'arithmetic_mean_heat_of_solution'
+    species:
+      formula: gehlenite
+      phase:
+        tag: unknown
+        reason: phase string 'crystalline_gehlenite_C2AS' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'arithmetic_mean_heat_of_solution'; refusing to
+      pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      reported_status: printed
+      value_kJ_mol-1: '4.9'
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: zigo-1987-gehlenite-fusion
+  locator:
+    page: 176
+    pdf_page_index: 6
+    table: '2'
+    equation: '3'
+    note: equation_result=4
+  read_from: pdf:zigo-1987-gehlenite-fusion
+- observation_id: zigo-1987-gehlenite-fusion::zigo_1987_t3_crystal_relative_enthalpy_fit
+  experiment_id: fb452fa635b46a767af5c67fd67d2b5dac81e9779337b0cdfc22bcec4e149298::zigo-1987-gehlenite-fusion
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'fitted_relative_enthalpy'
+    species:
+      formula: gehlenite
+      phase:
+        tag: unknown
+        reason: phase string 'crystalline_gehlenite_C2AS' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1519, 1799]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; no observable selected; T_range_K [1519, 1799] is a temperature domain,
+      not the observable
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      reported_status: printed
+      value_kJ_mol-1: '5.2'
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: zigo-1987-gehlenite-fusion
+  locator:
+    page: 176
+    pdf_page_index: 6
+    table: '3'
+    equation: '5'
+  read_from: pdf:zigo-1987-gehlenite-fusion
+- observation_id: zigo-1987-gehlenite-fusion::zigo_1987_t3_crystal_relative_enthalpy_measured_derived::T=1519:h=5477a387f8ec
+  experiment_id: fb452fa635b46a767af5c67fd67d2b5dac81e9779337b0cdfc22bcec4e149298::zigo-1987-gehlenite-fusion
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'relative_enthalpy'
+    species:
+      formula: gehlenite
+      phase:
+        tag: unknown
+        reason: phase string 'crystalline_gehlenite_C2AS' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1519'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      reported_status: not_reported_for_individual_points
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped method_class measured_derived
+    original_method_class: measured_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: zigo-1987-gehlenite-fusion
+  locator:
+    page: 176
+    pdf_page_index: 6
+    table: '3'
+  read_from: pdf:zigo-1987-gehlenite-fusion
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1519'
+      locator:
+        page: 176
+        pdf_page_index: 6
+        table: '3'
+- observation_id: zigo-1987-gehlenite-fusion::zigo_1987_t3_crystal_relative_enthalpy_measured_derived::T=1567:h=b0fa1163f10f
+  experiment_id: fb452fa635b46a767af5c67fd67d2b5dac81e9779337b0cdfc22bcec4e149298::zigo-1987-gehlenite-fusion
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'relative_enthalpy'
+    species:
+      formula: gehlenite
+      phase:
+        tag: unknown
+        reason: phase string 'crystalline_gehlenite_C2AS' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1567'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      reported_status: not_reported_for_individual_points
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped method_class measured_derived
+    original_method_class: measured_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: zigo-1987-gehlenite-fusion
+  locator:
+    page: 176
+    pdf_page_index: 6
+    table: '3'
+  read_from: pdf:zigo-1987-gehlenite-fusion
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1567'
+      locator:
+        page: 176
+        pdf_page_index: 6
+        table: '3'
+- observation_id: zigo-1987-gehlenite-fusion::zigo_1987_t3_crystal_relative_enthalpy_measured_derived::T=1582:h=295d9a8075e7
+  experiment_id: fb452fa635b46a767af5c67fd67d2b5dac81e9779337b0cdfc22bcec4e149298::zigo-1987-gehlenite-fusion
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'relative_enthalpy'
+    species:
+      formula: gehlenite
+      phase:
+        tag: unknown
+        reason: phase string 'crystalline_gehlenite_C2AS' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1582'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      reported_status: not_reported_for_individual_points
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped method_class measured_derived
+    original_method_class: measured_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: zigo-1987-gehlenite-fusion
+  locator:
+    page: 176
+    pdf_page_index: 6
+    table: '3'
+  read_from: pdf:zigo-1987-gehlenite-fusion
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1582'
+      locator:
+        page: 176
+        pdf_page_index: 6
+        table: '3'
+- observation_id: zigo-1987-gehlenite-fusion::zigo_1987_t3_crystal_relative_enthalpy_measured_derived::T=1691:h=da3c281d3c2f
+  experiment_id: fb452fa635b46a767af5c67fd67d2b5dac81e9779337b0cdfc22bcec4e149298::zigo-1987-gehlenite-fusion
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'relative_enthalpy'
+    species:
+      formula: gehlenite
+      phase:
+        tag: unknown
+        reason: phase string 'crystalline_gehlenite_C2AS' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1691'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      reported_status: not_reported_for_individual_points
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped method_class measured_derived
+    original_method_class: measured_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: zigo-1987-gehlenite-fusion
+  locator:
+    page: 176
+    pdf_page_index: 6
+    table: '3'
+  read_from: pdf:zigo-1987-gehlenite-fusion
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1691'
+      locator:
+        page: 176
+        pdf_page_index: 6
+        table: '3'
+- observation_id: zigo-1987-gehlenite-fusion::zigo_1987_t3_crystal_relative_enthalpy_measured_derived::T=1730:h=ec0b7f2fb936
+  experiment_id: fb452fa635b46a767af5c67fd67d2b5dac81e9779337b0cdfc22bcec4e149298::zigo-1987-gehlenite-fusion
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'relative_enthalpy'
+    species:
+      formula: gehlenite
+      phase:
+        tag: unknown
+        reason: phase string 'crystalline_gehlenite_C2AS' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1730'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      reported_status: not_reported_for_individual_points
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped method_class measured_derived
+    original_method_class: measured_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: zigo-1987-gehlenite-fusion
+  locator:
+    page: 176
+    pdf_page_index: 6
+    table: '3'
+  read_from: pdf:zigo-1987-gehlenite-fusion
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1730'
+      locator:
+        page: 176
+        pdf_page_index: 6
+        table: '3'
+- observation_id: zigo-1987-gehlenite-fusion::zigo_1987_t3_crystal_relative_enthalpy_measured_derived::T=1799:h=829f71999120
+  experiment_id: fb452fa635b46a767af5c67fd67d2b5dac81e9779337b0cdfc22bcec4e149298::zigo-1987-gehlenite-fusion
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'relative_enthalpy'
+    species:
+      formula: gehlenite
+      phase:
+        tag: unknown
+        reason: phase string 'crystalline_gehlenite_C2AS' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1799'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      reported_status: not_reported_for_individual_points
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped method_class measured_derived
+    original_method_class: measured_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: zigo-1987-gehlenite-fusion
+  locator:
+    page: 176
+    pdf_page_index: 6
+    table: '3'
+  read_from: pdf:zigo-1987-gehlenite-fusion
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1799'
+      locator:
+        page: 176
+        pdf_page_index: 6
+        table: '3'
+- observation_id: zigo-1987-gehlenite-fusion::zigo_1987_t4_melt_enthalpy_calorimetry::T=1873:h=1d63e3688ce3
+  experiment_id: fb452fa635b46a767af5c67fd67d2b5dac81e9779337b0cdfc22bcec4e149298::zigo-1987-gehlenite-fusion
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'melt_relative_enthalpy_calorimetry'
+    species:
+      formula: gehlenite
+      phase:
+        tag: unknown
+        reason: phase string 'C2AS_melt_composition_corresponding_to_gehlenite' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1873'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      reported_status: not_reported_for_individual_points
+      note: Each melt sample heat of solution is a mean of three or four measurements; table gives no per-row error.
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped method_class measured_derived
+    original_method_class: measured_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: zigo-1987-gehlenite-fusion
+  locator:
+    page: 177
+    pdf_page_index: 7
+    table: '4'
+  read_from: pdf:zigo-1987-gehlenite-fusion
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        page: 177
+        pdf_page_index: 7
+        table: '4'
+- observation_id: zigo-1987-gehlenite-fusion::zigo_1987_t4_melt_enthalpy_calorimetry::T=1888:h=eef417efef51
+  experiment_id: fb452fa635b46a767af5c67fd67d2b5dac81e9779337b0cdfc22bcec4e149298::zigo-1987-gehlenite-fusion
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'melt_relative_enthalpy_calorimetry'
+    species:
+      formula: gehlenite
+      phase:
+        tag: unknown
+        reason: phase string 'C2AS_melt_composition_corresponding_to_gehlenite' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1888'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      reported_status: not_reported_for_individual_points
+      note: Each melt sample heat of solution is a mean of three or four measurements; table gives no per-row error.
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped method_class measured_derived
+    original_method_class: measured_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: zigo-1987-gehlenite-fusion
+  locator:
+    page: 177
+    pdf_page_index: 7
+    table: '4'
+  read_from: pdf:zigo-1987-gehlenite-fusion
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1888'
+      locator:
+        page: 177
+        pdf_page_index: 7
+        table: '4'
+- observation_id: zigo-1987-gehlenite-fusion::zigo_1987_t4_melt_enthalpy_calorimetry::T=1908:h=9c24c97969f2
+  experiment_id: fb452fa635b46a767af5c67fd67d2b5dac81e9779337b0cdfc22bcec4e149298::zigo-1987-gehlenite-fusion
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'melt_relative_enthalpy_calorimetry'
+    species:
+      formula: gehlenite
+      phase:
+        tag: unknown
+        reason: phase string 'C2AS_melt_composition_corresponding_to_gehlenite' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1908'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      reported_status: not_reported_for_individual_points
+      note: Each melt sample heat of solution is a mean of three or four measurements; table gives no per-row error.
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped method_class measured_derived
+    original_method_class: measured_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: zigo-1987-gehlenite-fusion
+  locator:
+    page: 177
+    pdf_page_index: 7
+    table: '4'
+  read_from: pdf:zigo-1987-gehlenite-fusion
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1908'
+      locator:
+        page: 177
+        pdf_page_index: 7
+        table: '4'
+- observation_id: zigo-1987-gehlenite-fusion::zigo_1987_t4_melt_enthalpy_calorimetry::T=1932:h=a9dc3f6c944f
+  experiment_id: fb452fa635b46a767af5c67fd67d2b5dac81e9779337b0cdfc22bcec4e149298::zigo-1987-gehlenite-fusion
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'melt_relative_enthalpy_calorimetry'
+    species:
+      formula: gehlenite
+      phase:
+        tag: unknown
+        reason: phase string 'C2AS_melt_composition_corresponding_to_gehlenite' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1932'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      reported_status: not_reported_for_individual_points
+      note: Each melt sample heat of solution is a mean of three or four measurements; table gives no per-row error.
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped method_class measured_derived
+    original_method_class: measured_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: zigo-1987-gehlenite-fusion
+  locator:
+    page: 177
+    pdf_page_index: 7
+    table: '4'
+  read_from: pdf:zigo-1987-gehlenite-fusion
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1932'
+      locator:
+        page: 177
+        pdf_page_index: 7
+        table: '4'
+- observation_id: zigo-1987-gehlenite-fusion::zigo_1987_t4_melt_enthalpy_calorimetry::T=1948:h=ceb0c8cf7106
+  experiment_id: fb452fa635b46a767af5c67fd67d2b5dac81e9779337b0cdfc22bcec4e149298::zigo-1987-gehlenite-fusion
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'melt_relative_enthalpy_calorimetry'
+    species:
+      formula: gehlenite
+      phase:
+        tag: unknown
+        reason: phase string 'C2AS_melt_composition_corresponding_to_gehlenite' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1948'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      reported_status: not_reported_for_individual_points
+      note: Each melt sample heat of solution is a mean of three or four measurements; table gives no per-row error.
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped method_class measured_derived
+    original_method_class: measured_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: zigo-1987-gehlenite-fusion
+  locator:
+    page: 177
+    pdf_page_index: 7
+    table: '4'
+  read_from: pdf:zigo-1987-gehlenite-fusion
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1948'
+      locator:
+        page: 177
+        pdf_page_index: 7
+        table: '4'
+- observation_id: zigo-1987-gehlenite-fusion::zigo_1987_t4_melt_relative_enthalpy_fit
+  experiment_id: fb452fa635b46a767af5c67fd67d2b5dac81e9779337b0cdfc22bcec4e149298::zigo-1987-gehlenite-fusion
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'fitted_relative_enthalpy'
+    species:
+      formula: gehlenite
+      phase:
+        tag: unknown
+        reason: phase string 'C2AS_melt_composition_corresponding_to_gehlenite' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1873, 1948]; no midpoint invented
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; no observable selected; T_range_K [1873, 1948] is a temperature domain,
+      not the observable
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      reported_status: printed
+      value_kJ_mol-1: '2.9'
+  evidence:
+    class:
+      tag: value
+      value: model_derived
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: zigo-1987-gehlenite-fusion
+  locator:
+    page: 178
+    pdf_page_index: 8
+    table: '4'
+    equation: '6'
+  read_from: pdf:zigo-1987-gehlenite-fusion

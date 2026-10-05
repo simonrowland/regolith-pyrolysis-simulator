@@ -1,21 +1,41 @@
 schema_version: battery_work.v2.1
 work:
   work_id: 4242af6a486e26c206a3bd1fc16a0f995ab3c951e6b3adad11fb69233359532a
-  citation: bencze-yazhenskikh-2016
+  citation: Bencze, L., Rys-Matejczuk, M., Yazhenskikh, E., Ziegner, M. & Muller, M. (2016), Investigation of Vaporization
+    of Alkali Metals from Solidified Gasifier Slags by Knudsen Effusion Mass Spectrometry, Energy & Fuels, DOI 10.1021/acs.energyfuels.5b01620
   source_ids:
   - bencze-yazhenskikh-2016
   source_files:
     corpus_repo: regolith-corpus
     corpus_commit:
-      tag: unknown
-      reason: INDEX does not give corpus commit
+      tag: value
+      value: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
     files:
+    - asset_id: pdf:bencze-yazhenskikh-2016
+      role: pdf
+      path: raw/bencze-yazhenskikh-2016/bencze-yazhenskikh-2016.pdf
+      sha256:
+        tag: value
+        value: c91031c40bf8697f86f2a6da19f278d0d524f557d827560d8d70be43044596e7
+    - asset_id: pdftotext:bencze-yazhenskikh-2016
+      role: pdftotext
+      path: text/bencze-yazhenskikh-2016
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: tables:bencze-yazhenskikh-2016
+      role: table_csv
+      path: tables/bencze-yazhenskikh-2016
+      sha256:
+        tag: unknown
+        reason: INDEX does not give table sha256
     - asset_id: unknown:bencze-yazhenskikh-2016
       role: pdftotext
       path: unknown
       sha256:
         tag: unknown
         reason: INDEX does not give an unmatched-layer asset
+  doi: 10.1021/acs.energyfuels.5b01620
 experiments:
 - experiment_id: 4242af6a486e26c206a3bd1fc16a0f995ab3c951e6b3adad11fb69233359532a::experiment::bencze-2016-ir-kems
   kind: literature

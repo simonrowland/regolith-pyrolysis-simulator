@@ -9,9 +9,27 @@ work:
   source_files:
     corpus_repo: regolith-corpus
     corpus_commit:
-      tag: unknown
-      reason: INDEX does not give corpus commit
+      tag: value
+      value: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
     files:
+    - asset_id: pdf:britt-2019-asteroid-simulants
+      role: pdf
+      path: raw/britt-2019-asteroid-simulants/britt-2019-asteroid-simulants.pdf
+      sha256:
+        tag: value
+        value: e7da7329ef7598b536986fea97e46805ddd2c5cb39466afcddfe6c495aa0a351
+    - asset_id: pdftotext:britt-2019-asteroid-simulants
+      role: pdftotext
+      path: text/britt-2019-asteroid-simulants
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: tables:britt-2019-asteroid-simulants
+      role: table_csv
+      path: tables/britt-2019-asteroid-simulants
+      sha256:
+        tag: unknown
+        reason: INDEX does not give table sha256
     - asset_id: unknown:britt-2019-asteroid-simulants
       role: pdftotext
       path: unknown

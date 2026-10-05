@@ -9,9 +9,27 @@ work:
   source_files:
     corpus_repo: regolith-corpus
     corpus_commit:
-      tag: unknown
-      reason: INDEX does not give corpus commit
+      tag: value
+      value: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
     files:
+    - asset_id: pdf:metsoc-2024-6131
+      role: pdf
+      path: raw/metsoc-2024-6131/metsoc-2024-6131.pdf
+      sha256:
+        tag: value
+        value: 59f1e8a4681a9ad26eb7f5fd0bab5c7bc983ea8df99f81d4efff3d590888e717
+    - asset_id: pdftotext:metsoc-2024-6131
+      role: pdftotext
+      path: text/metsoc-2024-6131
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: tables:metsoc-2024-6131
+      role: table_csv
+      path: tables/metsoc-2024-6131
+      sha256:
+        tag: unknown
+        reason: INDEX does not give table sha256
     - asset_id: unknown:metsoc-2024-6131
       role: pdftotext
       path: unknown

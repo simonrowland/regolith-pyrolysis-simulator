@@ -8,9 +8,27 @@ work:
   source_files:
     corpus_repo: regolith-corpus
     corpus_commit:
-      tag: unknown
-      reason: INDEX does not give corpus commit
+      tag: value
+      value: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
     files:
+    - asset_id: pdf:burcat-third-millennium
+      role: pdf
+      path: raw/burcat-third-millennium/Introduction_2005.pdf
+      sha256:
+        tag: value
+        value: 153c71fa6493d19f864fe50e2b3aadc0a7abd7e7eded3aa3c15a52392ceee232
+    - asset_id: pdftotext:burcat-third-millennium
+      role: pdftotext
+      path: text/burcat-third-millennium
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: tables:burcat-third-millennium
+      role: table_csv
+      path: tables/burcat-third-millennium
+      sha256:
+        tag: unknown
+        reason: INDEX does not give table sha256
     - asset_id: unknown:burcat-third-millennium
       role: pdftotext
       path: unknown

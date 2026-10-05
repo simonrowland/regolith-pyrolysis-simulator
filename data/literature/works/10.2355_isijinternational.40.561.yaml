@@ -1,0 +1,449 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 10.2355/isijinternational.40.561
+  citation: Kume et al. (2000), "Activity Measurement of CaO-SiO2-AlO1.5-MgO Slags Equilibrated with Molten Silicon Alloys,"
+    ISIJ International 40(6):561-566.
+  source_ids:
+  - kume-2000-cao-activities
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
+    files:
+    - asset_id: pdf:kume-2000-cao-activities
+      role: pdf
+      path: raw/kume-2000-cao-activities/kume-2000-cao-activities.pdf
+      sha256:
+        tag: unknown
+        reason: INDEX does not give sha256
+    - asset_id: pdftotext:kume-2000-cao-activities
+      role: pdftotext
+      path: text/kume-2000-cao-activities
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: tables:kume-2000-cao-activities
+      role: table_csv
+      path: tables/kume-2000-cao-activities
+      sha256:
+        tag: unknown
+        reason: INDEX does not give table sha256
+    - asset_id: unknown:kume-2000-cao-activities
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
+  doi: 10.2355/isijinternational.40.561
+experiments:
+- experiment_id: 10.2355/isijinternational.40.561::experiment::kume-2000-table1-1823k
+  kind: literature
+  method:
+    tag: unknown
+    reason: Equilibration is stated; the procedure, including whether samples were quenched, is deferred to ref. 3.
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1823'
+      locator:
+        page: 562
+        table: '1'
+        note: Table 1 reports at 1823 K
+    system:
+      state:
+        tag: unknown
+        reason: condition system is not a scalar numeric value
+    crucible:
+      state:
+        tag: unknown
+        reason: in_cited_source
+      locator:
+        page: 562
+        section: 2.1 Experimental Procedure
+        note: Kume et al. defer this procedure detail to ref. 3; ref. 3 was not reviewed.
+    atmosphere:
+      state:
+        tag: unknown
+        reason: in_cited_source
+      locator:
+        page: 562
+        section: 2.1 Experimental Procedure
+        note: Kume et al. defer this procedure detail to ref. 3; ref. 3 was not reviewed.
+    equilibration_time:
+      state:
+        tag: unknown
+        reason: in_cited_source
+      locator:
+        page: 562
+        section: 2.1 Experimental Procedure
+        note: Kume et al. defer this procedure detail to ref. 3; ref. 3 was not reviewed.
+    quench:
+      state:
+        tag: unknown
+        reason: in_cited_source
+      locator:
+        page: 562
+        section: 2.1 Experimental Procedure
+        note: Kume et al. defer this procedure detail to ref. 3; ref. 3 was not reviewed.
+    chemical_analysis:
+      state:
+        tag: unknown
+        reason: in_cited_source
+      locator:
+        page: 562
+        section: 2.1 Experimental Procedure
+        note: Kume et al. defer this procedure detail to ref. 3; ref. 3 was not reviewed.
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2355/isijinternational.40.561
+  locator:
+    page: 562
+    table: '1'
+    section: 2.1 Experimental Procedure
+    note: Table 1 locator identifies the reported data; Sec. 2.1 on p. 562 states equilibration but defers the procedure to
+      ref. 3 and does not state whether samples were quenched.
+- experiment_id: 10.2355/isijinternational.40.561::experiment::kume-2000-table1-1873k
+  kind: literature
+  method:
+    tag: unknown
+    reason: Equilibration is stated; the procedure, including whether samples were quenched, is deferred to ref. 3.
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        page: 562
+        table: '1'
+        note: Table 1 reports at 1873 K
+    system:
+      state:
+        tag: unknown
+        reason: condition system is not a scalar numeric value
+    crucible:
+      state:
+        tag: unknown
+        reason: in_cited_source
+      locator:
+        page: 562
+        section: 2.1 Experimental Procedure
+        note: Kume et al. defer this procedure detail to ref. 3; ref. 3 was not reviewed.
+    atmosphere:
+      state:
+        tag: unknown
+        reason: in_cited_source
+      locator:
+        page: 562
+        section: 2.1 Experimental Procedure
+        note: Kume et al. defer this procedure detail to ref. 3; ref. 3 was not reviewed.
+    equilibration_time:
+      state:
+        tag: unknown
+        reason: in_cited_source
+      locator:
+        page: 562
+        section: 2.1 Experimental Procedure
+        note: Kume et al. defer this procedure detail to ref. 3; ref. 3 was not reviewed.
+    quench:
+      state:
+        tag: unknown
+        reason: in_cited_source
+      locator:
+        page: 562
+        section: 2.1 Experimental Procedure
+        note: Kume et al. defer this procedure detail to ref. 3; ref. 3 was not reviewed.
+    chemical_analysis:
+      state:
+        tag: unknown
+        reason: in_cited_source
+      locator:
+        page: 562
+        section: 2.1 Experimental Procedure
+        note: Kume et al. defer this procedure detail to ref. 3; ref. 3 was not reviewed.
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2355/isijinternational.40.561
+  locator:
+    page: 562
+    table: '1'
+    section: 2.1 Experimental Procedure
+    note: Table 1 locator identifies the reported data; Sec. 2.1 on p. 562 states equilibration but defers the procedure to
+      ref. 3 and does not state whether samples were quenched.
+- experiment_id: 10.2355/isijinternational.40.561::experiment::kume-2000-table2-1823k
+  kind: literature
+  method:
+    tag: unknown
+    reason: Equilibration is stated; the procedure, including whether samples were quenched, is deferred to ref. 3.
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1823'
+      locator:
+        page: 563
+        table: '2'
+        note: Table 2 reports at 1823 K
+    system:
+      state:
+        tag: unknown
+        reason: condition system is not a scalar numeric value
+    crucible:
+      state:
+        tag: unknown
+        reason: in_cited_source
+      locator:
+        page: 562
+        section: 2.1 Experimental Procedure
+        note: Kume et al. defer this procedure detail to ref. 3; ref. 3 was not reviewed.
+    atmosphere:
+      state:
+        tag: unknown
+        reason: in_cited_source
+      locator:
+        page: 562
+        section: 2.1 Experimental Procedure
+        note: Kume et al. defer this procedure detail to ref. 3; ref. 3 was not reviewed.
+    equilibration_time:
+      state:
+        tag: unknown
+        reason: in_cited_source
+      locator:
+        page: 562
+        section: 2.1 Experimental Procedure
+        note: Kume et al. defer this procedure detail to ref. 3; ref. 3 was not reviewed.
+    quench:
+      state:
+        tag: unknown
+        reason: in_cited_source
+      locator:
+        page: 562
+        section: 2.1 Experimental Procedure
+        note: Kume et al. defer this procedure detail to ref. 3; ref. 3 was not reviewed.
+    chemical_analysis:
+      state:
+        tag: unknown
+        reason: in_cited_source
+      locator:
+        page: 562
+        section: 2.1 Experimental Procedure
+        note: Kume et al. defer this procedure detail to ref. 3; ref. 3 was not reviewed.
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2355/isijinternational.40.561
+  locator:
+    page: 563
+    table: '2'
+    section: 2.1 Experimental Procedure
+    note: Table 2 locator identifies the reported data; Sec. 2.1 on p. 562 states equilibration but defers the procedure to
+      ref. 3 and does not state whether samples were quenched.
+- experiment_id: 10.2355/isijinternational.40.561::experiment::kume-2000-table3-1873k
+  kind: literature
+  method:
+    tag: unknown
+    reason: Equilibration is stated; the procedure, including whether samples were quenched, is deferred to ref. 3.
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        page: 564
+        table: '3'
+        note: Table 3 reports at 1873 K
+    system:
+      state:
+        tag: unknown
+        reason: condition system is not a scalar numeric value
+    crucible:
+      state:
+        tag: unknown
+        reason: in_cited_source
+      locator:
+        page: 562
+        section: 2.1 Experimental Procedure
+        note: Kume et al. defer this procedure detail to ref. 3; ref. 3 was not reviewed.
+    atmosphere:
+      state:
+        tag: unknown
+        reason: in_cited_source
+      locator:
+        page: 562
+        section: 2.1 Experimental Procedure
+        note: Kume et al. defer this procedure detail to ref. 3; ref. 3 was not reviewed.
+    equilibration_time:
+      state:
+        tag: unknown
+        reason: in_cited_source
+      locator:
+        page: 562
+        section: 2.1 Experimental Procedure
+        note: Kume et al. defer this procedure detail to ref. 3; ref. 3 was not reviewed.
+    quench:
+      state:
+        tag: unknown
+        reason: in_cited_source
+      locator:
+        page: 562
+        section: 2.1 Experimental Procedure
+        note: Kume et al. defer this procedure detail to ref. 3; ref. 3 was not reviewed.
+    chemical_analysis:
+      state:
+        tag: unknown
+        reason: in_cited_source
+      locator:
+        page: 562
+        section: 2.1 Experimental Procedure
+        note: Kume et al. defer this procedure detail to ref. 3; ref. 3 was not reviewed.
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2355/isijinternational.40.561
+  locator:
+    page: 564
+    table: '3'
+    section: 2.1 Experimental Procedure
+    note: Table 3 locator identifies the reported data; Sec. 2.1 on p. 562 states equilibration but defers the procedure to
+      ref. 3 and does not state whether samples were quenched.
+- experiment_id: 10.2355/isijinternational.40.561::experiment::kume-2000-table4-1873k
+  kind: literature
+  method:
+    tag: unknown
+    reason: Equilibration is stated; the procedure, including whether samples were quenched, is deferred to ref. 3.
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        page: 565
+        table: '4'
+        note: Table 4 reports at 1873 K
+    system:
+      state:
+        tag: unknown
+        reason: condition system is not a scalar numeric value
+    crucible:
+      state:
+        tag: unknown
+        reason: in_cited_source
+      locator:
+        page: 562
+        section: 2.1 Experimental Procedure
+        note: Kume et al. defer this procedure detail to ref. 3; ref. 3 was not reviewed.
+    atmosphere:
+      state:
+        tag: unknown
+        reason: in_cited_source
+      locator:
+        page: 562
+        section: 2.1 Experimental Procedure
+        note: Kume et al. defer this procedure detail to ref. 3; ref. 3 was not reviewed.
+    equilibration_time:
+      state:
+        tag: unknown
+        reason: in_cited_source
+      locator:
+        page: 562
+        section: 2.1 Experimental Procedure
+        note: Kume et al. defer this procedure detail to ref. 3; ref. 3 was not reviewed.
+    quench:
+      state:
+        tag: unknown
+        reason: in_cited_source
+      locator:
+        page: 562
+        section: 2.1 Experimental Procedure
+        note: Kume et al. defer this procedure detail to ref. 3; ref. 3 was not reviewed.
+    chemical_analysis:
+      state:
+        tag: unknown
+        reason: in_cited_source
+      locator:
+        page: 562
+        section: 2.1 Experimental Procedure
+        note: Kume et al. defer this procedure detail to ref. 3; ref. 3 was not reviewed.
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: 10.2355/isijinternational.40.561
+  locator:
+    page: 565
+    table: '4'
+    section: 2.1 Experimental Procedure
+    note: Table 4 locator identifies the reported data; Sec. 2.1 on p. 562 states equilibration but defers the procedure to
+      ref. 3 and does not state whether samples were quenched.

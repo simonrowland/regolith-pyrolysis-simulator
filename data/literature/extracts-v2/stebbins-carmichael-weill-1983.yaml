@@ -2,12 +2,12 @@ schema_version: battery_observations.v2.1
 sources:
 - data/literature/extracts/stebbins-carmichael-weill-1983.yaml
 observations:
-- observation_id: stebbins-carmichael-weill-1983::stebbins_1983_albite_analbite_calorimetry_tables_1_7
-  experiment_id: e21c26d90a0f5d14149da4616a8ffbd34a7e66901db372ac4ba5ceb16a1ecda4::stebbins-carmichael-weill-1983
+- observation_id: stebbins-carmichael-weill-1983::stebbins_1983_albite_analbite_calorimetry_measured_tables_1_5
+  experiment_id: e21c26d90a0f5d14149da4616a8ffbd34a7e66901db372ac4ba5ceb16a1ecda4::experiment::high-temperature-drop-calorimetry-series
   identity:
     quantity:
       tag: unknown
-      reason: source is calorimetric enthalpy/heat content, not delta_fG
+      reason: source does not state a closed quantity
     species:
       formula: NaAlSi3O8
       phase:
@@ -24,30 +24,234 @@ observations:
       reason: source T_range_K [323.0, 2000.0]; no midpoint invented
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; source is calorimetric enthalpy/heat content, not delta_fG; refusing
-      to pick a number
+    unavailable_reason: declared quantity is unknown; source does not state a closed quantity; refusing to pick a number
     approximate: false
   uncertainty:
     kind: printed
     verbatim:
-      note: Table 7 preferred heat of fusion is 15.0 +/- 0.5 kcal/mol. Table 5 printed 73.50 mean conflicts with its four
-        printed components; both are preserved.
+      note: Table 5 printed 73.50 mean conflicts with its four printed components; both are preserved.
   evidence:
     class:
-      tag: unknown
-      reason: 'page_grounded: method_class measured_and_compiled_calorimetry'
-    original_method_class: measured_and_compiled_calorimetry
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
   admission:
     status: pending
     reason: no observation admission_status mapped from source
   notices: []
   source_id: stebbins-carmichael-weill-1983
   locator:
-    note: tables=['1', '4', '5', '6', '7']; pages=PDF pp. 4-7 / printed pp. 720-723
-    source_path: docs-private/research/2026-08-27-ocr-repair/stebbins-carmichael-weill-1983/tables.md
-  read_from: unknown:stebbins-carmichael-weill-1983
-- observation_id: stebbins-carmichael-weill-1983::stebbins_1983_anorthite_calorimetry_tables_1_7
+    note: tables=['1', '5']; pages=PDF pp. 4 and 6 / printed pp. 720 and 722
+    source_path: text/stebbins-carmichael-weill-1983/pdftotext-layout.txt
+  read_from: pdftotext:stebbins-carmichael-weill-1983
+- observation_id: stebbins-carmichael-weill-1983::stebbins_1983_albite_heat_of_fusion_table_7
+  experiment_id: e21c26d90a0f5d14149da4616a8ffbd34a7e66901db372ac4ba5ceb16a1ecda4::experiment::high-temperature-drop-calorimetry-series
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'heat_of_fusion'
+    species:
+      formula: NaAlSi3O8
+      phase:
+        tag: unknown
+        reason: phase string 'NaAlSi3O8_liquid_and_disordered_crystalline_albite' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1373'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'heat_of_fusion'; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      value: '0.5'
+      units: kcal/mol
+      locator:
+        page: 717
+        section: Abstract
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: stebbins-carmichael-weill-1983
+  locator:
+    page: 723
+    table: '7'
+  read_from: pdf:stebbins-carmichael-weill-1983
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1373'
+      locator:
+        page: 723
+        table: '7'
+  derived_from:
+  - stebbins-carmichael-weill-1983::stebbins_1983_albite_analbite_calorimetry_measured_tables_1_5
+- observation_id: stebbins-carmichael-weill-1983::stebbins_1983_albite_robie_table_7_fusion_quote
   experiment_id: e21c26d90a0f5d14149da4616a8ffbd34a7e66901db372ac4ba5ceb16a1ecda4::stebbins-carmichael-weill-1983
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'heat_of_fusion'
+    species:
+      formula: NaAlSi3O8
+      phase:
+        tag: unknown
+        reason: phase string 'NaAlSi3O8_liquid_and_crystalline_disordered_albite' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'heat_of_fusion'; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: 'Table 7 footnote 3: Robie et al. (1978), adjusted to 1373 K for albite.'
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: stebbins-carmichael-weill-1983
+  locator:
+    page: PDF p. 7 / printed p. 723
+    table: '7'
+  read_from: pdf:stebbins-carmichael-weill-1983
+- observation_id: stebbins-carmichael-weill-1983::stebbins_1983_albite_table_4_fit
+  experiment_id: e21c26d90a0f5d14149da4616a8ffbd34a7e66901db372ac4ba5ceb16a1ecda4::stebbins-carmichael-weill-1983
+  identity:
+    quantity:
+      tag: unknown
+      reason: source does not state a closed quantity
+    species:
+      formula: NaAlSi3O8
+      phase:
+        tag: unknown
+        reason: phase string 'NaAlSi3O8_glass_liquid_and_crystalline_albite_analbite' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; source does not state a closed quantity; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: stebbins-carmichael-weill-1983
+  locator:
+    page: PDF p. 6 / printed p. 722
+    table: '4'
+  read_from: pdf:stebbins-carmichael-weill-1983
+- observation_id: stebbins-carmichael-weill-1983::stebbins_1983_albite_table_6_vitrification_quotes
+  experiment_id: e21c26d90a0f5d14149da4616a8ffbd34a7e66901db372ac4ba5ceb16a1ecda4::stebbins-carmichael-weill-1983
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'heat_of_vitrification'
+    species:
+      formula: NaAlSi3O8
+      phase:
+        tag: unknown
+        reason: phase string 'NaAlSi3O8_glass_liquid_and_crystalline_albite_analbite' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'heat_of_vitrification'; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: stebbins-carmichael-weill-1983
+  locator:
+    page: PDF p. 7 / printed p. 723
+    table: '6'
+  read_from: pdf:stebbins-carmichael-weill-1983
+- observation_id: stebbins-carmichael-weill-1983::stebbins_1983_albite_weill_table_7_fusion_quote
+  experiment_id: e21c26d90a0f5d14149da4616a8ffbd34a7e66901db372ac4ba5ceb16a1ecda4::stebbins-carmichael-weill-1983
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'heat_of_fusion'
+    species:
+      formula: NaAlSi3O8
+      phase:
+        tag: unknown
+        reason: phase string 'NaAlSi3O8_liquid_and_crystalline_disordered_albite' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'heat_of_fusion'; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: 'Table 7 footnote 1: Weill et al. (1980a), adjusted to 1373 K for albite.'
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: stebbins-carmichael-weill-1983
+  locator:
+    page: PDF p. 7 / printed p. 723
+    table: '7'
+  read_from: pdf:stebbins-carmichael-weill-1983
+- observation_id: stebbins-carmichael-weill-1983::stebbins_1983_anorthite_calorimetry_measured_table_1
+  experiment_id: e21c26d90a0f5d14149da4616a8ffbd34a7e66901db372ac4ba5ceb16a1ecda4::experiment::calvet-inverse-drop-series
   identity:
     quantity:
       tag: unknown
@@ -58,8 +262,8 @@ observations:
         tag: unknown
         reason: phase string 'CaAl2Si2O8_glass_and_crystalline_anorthite' is not in the closed automatic map
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
+        tag: value
+        value: anorthite
       charge:
         tag: value
         value: 0
@@ -74,13 +278,12 @@ observations:
   uncertainty:
     kind: printed
     verbatim:
-      note: Table 7 states no uncertainty for the anorthite 32.4 kcal/mol preferred estimate. Table 1 printed mean contradiction
-        is preserved without correction.
+      note: Table 1 printed mean contradiction is preserved without correction.
   evidence:
     class:
-      tag: unknown
-      reason: 'page_grounded: method_class measured_and_compiled_calorimetry'
-    original_method_class: measured_and_compiled_calorimetry
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
   admission:
     status: pending
     reason: no observation admission_status mapped from source
@@ -88,14 +291,53 @@ observations:
   source_id: stebbins-carmichael-weill-1983
   locator:
     note: tables=['1', '7']; pages=PDF pp. 4 and 7 / printed pp. 720 and 723
-    source_path: docs-private/research/2026-08-27-ocr-repair/stebbins-carmichael-weill-1983/tables.md
-  read_from: unknown:stebbins-carmichael-weill-1983
-- observation_id: stebbins-carmichael-weill-1983::stebbins_1983_diopside_calorimetry_tables_1_7
+    source_path: text/stebbins-carmichael-weill-1983/pdftotext-layout.txt
+  read_from: pdftotext:stebbins-carmichael-weill-1983
+- observation_id: stebbins-carmichael-weill-1983::stebbins_1983_anorthite_table_7_fusion_quotes
   experiment_id: e21c26d90a0f5d14149da4616a8ffbd34a7e66901db372ac4ba5ceb16a1ecda4::stebbins-carmichael-weill-1983
   identity:
     quantity:
       tag: unknown
-      reason: source is calorimetric enthalpy/heat content, not delta_fG
+      reason: unsupported quantity 'heat_of_fusion'
+    species:
+      formula: CaAl2Si2O8
+      phase:
+        tag: unknown
+        reason: phase string 'CaAl2Si2O8_glass_and_crystalline_anorthite' is not in the closed automatic map
+      polymorph:
+        tag: value
+        value: anorthite
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'heat_of_fusion'; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Table 7 states no uncertainty for the quoted preferred estimate.
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: stebbins-carmichael-weill-1983
+  locator:
+    page: PDF p. 7 / printed p. 723
+    table: '7'
+  read_from: pdf:stebbins-carmichael-weill-1983
+- observation_id: stebbins-carmichael-weill-1983::stebbins_1983_diopside_calorimetry_measured_tables_1_3
+  experiment_id: e21c26d90a0f5d14149da4616a8ffbd34a7e66901db372ac4ba5ceb16a1ecda4::experiment::high-temperature-drop-calorimetry-series
+  identity:
+    quantity:
+      tag: unknown
+      reason: source does not state a closed quantity
     species:
       formula: CaMgSi2O6
       phase:
@@ -112,42 +354,296 @@ observations:
       reason: source T_range_K [293.0, 2000.0]; no midpoint invented
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; source is calorimetric enthalpy/heat content, not delta_fG; refusing
-      to pick a number
+    unavailable_reason: declared quantity is unknown; source does not state a closed quantity; refusing to pick a number
     approximate: false
   uncertainty:
     kind: printed
     verbatim:
-      note: Per-point Table 2 uncertainty not reported; each point averages 2-4 measurements. Table 7 preferred heat of fusion
-        is 33.0 +/- 0.5 kcal/mol. Two Table 2 cells remain CONTESTED and have null admitted values.
+      note: Per-point Table 2 uncertainty not reported; each point averages 2-4 measurements. The PDF page image confirms
+        Cp=54.48 at 634.1 K and Cp=55.38 at 669.0 K.
   evidence:
     class:
-      tag: unknown
-      reason: 'page_grounded: method_class measured_and_compiled_calorimetry'
-    original_method_class: measured_and_compiled_calorimetry
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
   admission:
     status: pending
     reason: no observation admission_status mapped from source
   notices: []
   source_id: stebbins-carmichael-weill-1983
   locator:
-    note: tables=['1', '2', '3', '4', '6', '7']; pages=PDF pp. 4-7 / printed pp. 720-723
-    source_path: docs-private/research/2026-08-27-ocr-repair/stebbins-carmichael-weill-1983/tables.md
-  read_from: unknown:stebbins-carmichael-weill-1983
-- observation_id: stebbins-carmichael-weill-1983::stebbins_1983_nepheline_calorimetry_tables_3_7
+    note: tables=['1', '2', '3']; pages=PDF pp. 4-5 / printed pp. 720-721
+    source_path: text/stebbins-carmichael-weill-1983/pdftotext-layout.txt
+  read_from: pdftotext:stebbins-carmichael-weill-1983
+- observation_id: stebbins-carmichael-weill-1983::stebbins_1983_diopside_ferrier_table_7_fusion_quote
   experiment_id: e21c26d90a0f5d14149da4616a8ffbd34a7e66901db372ac4ba5ceb16a1ecda4::stebbins-carmichael-weill-1983
   identity:
     quantity:
       tag: unknown
-      reason: source is calorimetric enthalpy/heat content, not delta_fG
+      reason: unsupported quantity 'heat_of_fusion'
+    species:
+      formula: CaMgSi2O6
+      phase:
+        tag: unknown
+        reason: phase string 'CaMgSi2O6_liquid_and_crystalline_diopside' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1665'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'heat_of_fusion'; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: Ferrier (1968a)
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: stebbins-carmichael-weill-1983
+  locator:
+    page: PDF p. 7 / printed p. 723
+    table: '7'
+  read_from: pdf:stebbins-carmichael-weill-1983
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1665'
+      locator:
+        page: PDF p. 7 / printed p. 723
+        table: '7'
+- observation_id: stebbins-carmichael-weill-1983::stebbins_1983_diopside_heat_of_fusion_table_7
+  experiment_id: e21c26d90a0f5d14149da4616a8ffbd34a7e66901db372ac4ba5ceb16a1ecda4::experiment::high-temperature-drop-calorimetry-series
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'heat_of_fusion'
+    species:
+      formula: CaMgSi2O6
+      phase:
+        tag: unknown
+        reason: phase string 'CaMgSi2O6_liquid_and_crystalline_diopside' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1665'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'heat_of_fusion'; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      value: '0.5'
+      units: kcal/mol
+      locator:
+        page: 717
+        section: Abstract
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: stebbins-carmichael-weill-1983
+  locator:
+    page: 723
+    table: '7'
+  read_from: pdf:stebbins-carmichael-weill-1983
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1665'
+      locator:
+        page: 723
+        table: '7'
+  derived_from:
+  - stebbins-carmichael-weill-1983::stebbins_1983_diopside_calorimetry_measured_tables_1_3
+- observation_id: stebbins-carmichael-weill-1983::stebbins_1983_diopside_robie_table_7_fusion_quote
+  experiment_id: e21c26d90a0f5d14149da4616a8ffbd34a7e66901db372ac4ba5ceb16a1ecda4::stebbins-carmichael-weill-1983
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'heat_of_fusion'
+    species:
+      formula: CaMgSi2O6
+      phase:
+        tag: unknown
+        reason: phase string 'CaMgSi2O6_liquid_and_crystalline_diopside' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'heat_of_fusion'; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: 'Table 7 footnote 2: Robie et al. (1979).'
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: stebbins-carmichael-weill-1983
+  locator:
+    page: PDF p. 7 / printed p. 723
+    table: '7'
+  read_from: pdf:stebbins-carmichael-weill-1983
+- observation_id: stebbins-carmichael-weill-1983::stebbins_1983_diopside_table_4_fit
+  experiment_id: e21c26d90a0f5d14149da4616a8ffbd34a7e66901db372ac4ba5ceb16a1ecda4::stebbins-carmichael-weill-1983
+  identity:
+    quantity:
+      tag: unknown
+      reason: source does not state a closed quantity
+    species:
+      formula: CaMgSi2O6
+      phase:
+        tag: unknown
+        reason: phase string 'CaMgSi2O6_glass_liquid_and_crystalline_diopside' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; source does not state a closed quantity; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: stebbins-carmichael-weill-1983
+  locator:
+    page: PDF p. 6 / printed p. 722
+    table: '4'
+  read_from: pdf:stebbins-carmichael-weill-1983
+- observation_id: stebbins-carmichael-weill-1983::stebbins_1983_diopside_table_6_vitrification_quotes
+  experiment_id: e21c26d90a0f5d14149da4616a8ffbd34a7e66901db372ac4ba5ceb16a1ecda4::stebbins-carmichael-weill-1983
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'heat_of_vitrification'
+    species:
+      formula: CaMgSi2O6
+      phase:
+        tag: unknown
+        reason: phase string 'CaMgSi2O6_glass_liquid_and_crystalline_diopside' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'heat_of_vitrification'; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: stebbins-carmichael-weill-1983
+  locator:
+    page: PDF p. 7 / printed p. 723
+    table: '6'
+  read_from: pdf:stebbins-carmichael-weill-1983
+- observation_id: stebbins-carmichael-weill-1983::stebbins_1983_diopside_weill_table_7_fusion_quote
+  experiment_id: e21c26d90a0f5d14149da4616a8ffbd34a7e66901db372ac4ba5ceb16a1ecda4::stebbins-carmichael-weill-1983
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'heat_of_fusion'
+    species:
+      formula: CaMgSi2O6
+      phase:
+        tag: unknown
+        reason: phase string 'CaMgSi2O6_liquid_and_crystalline_diopside' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'heat_of_fusion'; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: 'Table 7 footnote 1: Weill et al. (1980a).'
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: stebbins-carmichael-weill-1983
+  locator:
+    page: PDF p. 7 / printed p. 723
+    table: '7'
+  read_from: pdf:stebbins-carmichael-weill-1983
+- observation_id: stebbins-carmichael-weill-1983::stebbins_1983_nepheline_calorimetry_measured_table_3
+  experiment_id: e21c26d90a0f5d14149da4616a8ffbd34a7e66901db372ac4ba5ceb16a1ecda4::experiment::high-temperature-drop-calorimetry-series
+  identity:
+    quantity:
+      tag: unknown
+      reason: source does not state a closed quantity
     species:
       formula: NaAlSiO4
       phase:
         tag: unknown
         reason: phase string 'NaAlSiO4_glass_liquid_and_crystalline_gamma_nepheline' is not in the closed automatic map
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
+        tag: value
+        value: gamma
       charge:
         tag: value
         value: 0
@@ -156,33 +652,163 @@ observations:
       reason: source T_range_K [985.0, 2000.0]; no midpoint invented
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; source is calorimetric enthalpy/heat content, not delta_fG; refusing
-      to pick a number
+    unavailable_reason: declared quantity is unknown; source does not state a closed quantity; refusing to pick a number
     approximate: false
   uncertainty:
     kind: printed
     verbatim:
-      note: Table 7 preferred heat of fusion is 11.7 +/- 0.5 kcal/mol; no per-point Table 3 uncertainty is stated.
+      note: No per-point Table 3 uncertainty is stated. Table 4 footnote 3 reports 78 cal/mol as the standard deviation of
+        the mean for the nepheline glass heat-content data at 985 K.
   evidence:
     class:
-      tag: unknown
-      reason: 'page_grounded: method_class measured_and_compiled_calorimetry'
-    original_method_class: measured_and_compiled_calorimetry
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
   admission:
     status: pending
     reason: no observation admission_status mapped from source
   notices: []
   source_id: stebbins-carmichael-weill-1983
   locator:
-    note: tables=['3', '4', '6', '7']; pages=PDF pp. 5-7 / printed pp. 721-723
-    source_path: docs-private/research/2026-08-27-ocr-repair/stebbins-carmichael-weill-1983/tables.md
-  read_from: unknown:stebbins-carmichael-weill-1983
-- observation_id: stebbins-carmichael-weill-1983::stebbins_1983_sanidine_calorimetry_tables_3_7
+    note: tables=['3']; pages=PDF p. 5 / printed p. 721
+    source_path: text/stebbins-carmichael-weill-1983/pdftotext-layout.txt
+  read_from: pdftotext:stebbins-carmichael-weill-1983
+- observation_id: stebbins-carmichael-weill-1983::stebbins_1983_nepheline_heat_of_fusion_table_7
+  experiment_id: e21c26d90a0f5d14149da4616a8ffbd34a7e66901db372ac4ba5ceb16a1ecda4::experiment::high-temperature-drop-calorimetry-series
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'heat_of_fusion'
+    species:
+      formula: NaAlSiO4
+      phase:
+        tag: unknown
+        reason: phase string 'NaAlSiO4_liquid_and_metastable_crystalline_gamma_nepheline' is not in the closed automatic map
+      polymorph:
+        tag: value
+        value: gamma
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1750'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'heat_of_fusion'; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      value: '0.5'
+      units: kcal/mol
+      locator:
+        page: 717
+        section: Abstract
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: stebbins-carmichael-weill-1983
+  locator:
+    page: 723
+    table: '7'
+  read_from: pdf:stebbins-carmichael-weill-1983
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1750'
+      locator:
+        page: 723
+        table: '7'
+  derived_from:
+  - stebbins-carmichael-weill-1983::stebbins_1983_nepheline_calorimetry_measured_table_3
+- observation_id: stebbins-carmichael-weill-1983::stebbins_1983_nepheline_table_4_fit
   experiment_id: e21c26d90a0f5d14149da4616a8ffbd34a7e66901db372ac4ba5ceb16a1ecda4::stebbins-carmichael-weill-1983
   identity:
     quantity:
       tag: unknown
-      reason: source is calorimetric enthalpy/heat content, not delta_fG
+      reason: source does not state a closed quantity
+    species:
+      formula: NaAlSiO4
+      phase:
+        tag: unknown
+        reason: phase string 'NaAlSiO4_glass_liquid_and_crystalline_gamma_nepheline' is not in the closed automatic map
+      polymorph:
+        tag: value
+        value: gamma
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; source does not state a closed quantity; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: stebbins-carmichael-weill-1983
+  locator:
+    page: PDF p. 6 / printed p. 722
+    table: '4'
+  read_from: pdf:stebbins-carmichael-weill-1983
+- observation_id: stebbins-carmichael-weill-1983::stebbins_1983_nepheline_table_6_vitrification_quotes
+  experiment_id: e21c26d90a0f5d14149da4616a8ffbd34a7e66901db372ac4ba5ceb16a1ecda4::stebbins-carmichael-weill-1983
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'heat_of_vitrification'
+    species:
+      formula: NaAlSiO4
+      phase:
+        tag: unknown
+        reason: phase string 'NaAlSiO4_glass_liquid_and_crystalline_gamma_nepheline' is not in the closed automatic map
+      polymorph:
+        tag: value
+        value: gamma
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'heat_of_vitrification'; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: stebbins-carmichael-weill-1983
+  locator:
+    page: PDF p. 7 / printed p. 723
+    table: '6'
+  read_from: pdf:stebbins-carmichael-weill-1983
+- observation_id: stebbins-carmichael-weill-1983::stebbins_1983_sanidine_calorimetry_measured_table_3
+  experiment_id: e21c26d90a0f5d14149da4616a8ffbd34a7e66901db372ac4ba5ceb16a1ecda4::experiment::high-temperature-drop-calorimetry-series
+  identity:
+    quantity:
+      tag: unknown
+      reason: source does not state a closed quantity
     species:
       formula: KAlSi3O8
       phase:
@@ -199,24 +825,191 @@ observations:
       reason: source T_range_K [293.0, 2000.0]; no midpoint invented
   value:
     kind: unavailable
-    unavailable_reason: declared quantity is unknown; source is calorimetric enthalpy/heat content, not delta_fG; refusing
-      to pick a number
+    unavailable_reason: declared quantity is unknown; source does not state a closed quantity; refusing to pick a number
     approximate: false
   uncertainty:
-    kind: printed
-    verbatim:
-      note: Table 7 preferred heat of fusion is 13.8 +/- 1.0 kcal/mol. Tamman Table 6 range remains 23 +/- 5, not a midpoint.
+    kind: none
   evidence:
     class:
-      tag: unknown
-      reason: 'page_grounded: method_class measured_and_compiled_calorimetry'
-    original_method_class: measured_and_compiled_calorimetry
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
   admission:
     status: pending
     reason: no observation admission_status mapped from source
   notices: []
   source_id: stebbins-carmichael-weill-1983
   locator:
-    note: tables=['3', '4', '6', '7']; pages=PDF pp. 5-7 / printed pp. 721-723
-    source_path: docs-private/research/2026-08-27-ocr-repair/stebbins-carmichael-weill-1983/tables.md
-  read_from: unknown:stebbins-carmichael-weill-1983
+    note: tables=['3']; pages=PDF p. 5 / printed p. 721
+    source_path: text/stebbins-carmichael-weill-1983/pdftotext-layout.txt
+  read_from: pdftotext:stebbins-carmichael-weill-1983
+- observation_id: stebbins-carmichael-weill-1983::stebbins_1983_sanidine_heat_of_fusion_table_7
+  experiment_id: e21c26d90a0f5d14149da4616a8ffbd34a7e66901db372ac4ba5ceb16a1ecda4::experiment::high-temperature-drop-calorimetry-series
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'heat_of_fusion'
+    species:
+      formula: KAlSi3O8
+      phase:
+        tag: unknown
+        reason: phase string 'KAlSi3O8_liquid_and_crystalline_sanidine' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1473'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'heat_of_fusion'; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      value: '1'
+      units: kcal/mol
+      locator:
+        page: 717
+        section: Abstract
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: stebbins-carmichael-weill-1983
+  locator:
+    page: 723
+    table: '7'
+  read_from: pdf:stebbins-carmichael-weill-1983
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1473'
+      locator:
+        page: 723
+        table: '7'
+  derived_from:
+  - stebbins-carmichael-weill-1983::stebbins_1983_sanidine_calorimetry_measured_table_3
+- observation_id: stebbins-carmichael-weill-1983::stebbins_1983_sanidine_robie_table_7_fusion_quote
+  experiment_id: e21c26d90a0f5d14149da4616a8ffbd34a7e66901db372ac4ba5ceb16a1ecda4::stebbins-carmichael-weill-1983
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'heat_of_fusion'
+    species:
+      formula: KAlSi3O8
+      phase:
+        tag: unknown
+        reason: phase string 'KAlSi3O8_liquid_and_crystalline_sanidine' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'heat_of_fusion'; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+    attribution: 'Table 7 footnote 3: Robie et al. (1978).'
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: stebbins-carmichael-weill-1983
+  locator:
+    page: PDF p. 7 / printed p. 723
+    table: '7'
+  read_from: pdf:stebbins-carmichael-weill-1983
+- observation_id: stebbins-carmichael-weill-1983::stebbins_1983_sanidine_table_4_fit
+  experiment_id: e21c26d90a0f5d14149da4616a8ffbd34a7e66901db372ac4ba5ceb16a1ecda4::stebbins-carmichael-weill-1983
+  identity:
+    quantity:
+      tag: unknown
+      reason: source does not state a closed quantity
+    species:
+      formula: KAlSi3O8
+      phase:
+        tag: unknown
+        reason: phase string 'KAlSi3O8_glass_liquid_and_crystalline_sanidine' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; source does not state a closed quantity; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_reduced
+    original_method_class: measured_reduced
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: stebbins-carmichael-weill-1983
+  locator:
+    page: PDF p. 6 / printed p. 722
+    table: '4'
+  read_from: pdf:stebbins-carmichael-weill-1983
+- observation_id: stebbins-carmichael-weill-1983::stebbins_1983_sanidine_table_6_vitrification_quotes
+  experiment_id: e21c26d90a0f5d14149da4616a8ffbd34a7e66901db372ac4ba5ceb16a1ecda4::stebbins-carmichael-weill-1983
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'heat_of_vitrification'
+    species:
+      formula: KAlSi3O8
+      phase:
+        tag: unknown
+        reason: phase string 'KAlSi3O8_glass_liquid_and_crystalline_sanidine' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'heat_of_vitrification'; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Tamman Table 6 range remains 23 +/- 5, not a midpoint.
+  evidence:
+    class:
+      tag: value
+      value: quoted_attributed
+    original_method_class: quoted_attributed
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: stebbins-carmichael-weill-1983
+  locator:
+    page: PDF p. 7 / printed p. 723
+    table: '6'
+  read_from: pdf:stebbins-carmichael-weill-1983

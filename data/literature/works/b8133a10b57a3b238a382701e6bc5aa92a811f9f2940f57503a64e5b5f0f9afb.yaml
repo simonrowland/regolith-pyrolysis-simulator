@@ -8,9 +8,27 @@ work:
   source_files:
     corpus_repo: regolith-corpus
     corpus_commit:
-      tag: unknown
-      reason: INDEX does not give corpus commit
+      tag: value
+      value: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
     files:
+    - asset_id: pdf:arxiv-1602-00658-fegley-rock-steam-solubility
+      role: pdf
+      path: raw/arxiv-1602-00658/arxiv-1602-00658.pdf
+      sha256:
+        tag: value
+        value: fb2feb010a60e77a5d17d88d208c24a4083dc1b4939bc7ef53d2cbc39a753726
+    - asset_id: pdftotext:arxiv-1602-00658-fegley-rock-steam-solubility
+      role: pdftotext
+      path: text/arxiv-1602-00658-fegley-rock-steam-solubility
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: tables:arxiv-1602-00658-fegley-rock-steam-solubility
+      role: table_csv
+      path: tables/arxiv-1602-00658-fegley-rock-steam-solubility
+      sha256:
+        tag: unknown
+        reason: INDEX does not give table sha256
     - asset_id: unknown:arxiv-1602-00658-fegley-rock-steam-solubility
       role: pdftotext
       path: unknown

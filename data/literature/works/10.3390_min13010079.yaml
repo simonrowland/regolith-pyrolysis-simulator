@@ -8,9 +8,27 @@ work:
   source_files:
     corpus_repo: regolith-corpus
     corpus_commit:
-      tag: unknown
-      reason: INDEX does not give corpus commit
+      tag: value
+      value: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
     files:
+    - asset_id: pdf:sublimation-kinetics-2023-minerals
+      role: pdf
+      path: raw/sublimation-kinetics-2023-minerals/sublimation-kinetics-2023-minerals.pdf
+      sha256:
+        tag: value
+        value: 315f84f68e6b3ea1ca25f19182f06031cb0c5daea12b2134f3c8da3b70a67442
+    - asset_id: pdftotext:sublimation-kinetics-2023-minerals
+      role: pdftotext
+      path: text/sublimation-kinetics-2023-minerals
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: tables:sublimation-kinetics-2023-minerals
+      role: table_csv
+      path: tables/sublimation-kinetics-2023-minerals
+      sha256:
+        tag: unknown
+        reason: INDEX does not give table sha256
     - asset_id: unknown:sublimation-kinetics-2023-minerals
       role: pdftotext
       path: unknown

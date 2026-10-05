@@ -9,9 +9,27 @@ work:
   source_files:
     corpus_repo: regolith-corpus
     corpus_commit:
-      tag: unknown
-      reason: INDEX does not give corpus commit
+      tag: value
+      value: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
     files:
+    - asset_id: pdf:okazaki-2022-ryugu-gas-treasure-box
+      role: pdf
+      path: raw/okazaki-2022-ryugu-gas-treasure-box/okazaki-2022-ryugu-gas-treasure-box.pdf
+      sha256:
+        tag: value
+        value: e6a3bec0eb00ed12ee75d61837006b61daf97a70d71abfaf908a2d0b0b5abb65
+    - asset_id: pdftotext:okazaki-2022-ryugu-gas-treasure-box
+      role: pdftotext
+      path: text/okazaki-2022-ryugu-gas-treasure-box
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: tables:okazaki-2022-ryugu-gas-treasure-box
+      role: table_csv
+      path: tables/okazaki-2022-ryugu-gas-treasure-box
+      sha256:
+        tag: unknown
+        reason: INDEX does not give table sha256
     - asset_id: unknown:okazaki-2022-ryugu-gas-treasure-box
       role: pdftotext
       path: unknown

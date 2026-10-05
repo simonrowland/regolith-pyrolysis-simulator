@@ -8,9 +8,27 @@ work:
   source_files:
     corpus_repo: regolith-corpus
     corpus_commit:
-      tag: unknown
-      reason: INDEX does not give corpus commit
+      tag: value
+      value: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
     files:
+    - asset_id: pdf:jaggi-2021-mercury-atmosphere
+      role: pdf
+      path: raw/jaggi-2021-mercury-atmosphere/jaggi-2021-mercury-atmosphere.pdf
+      sha256:
+        tag: value
+        value: 6ab99216145ca97687ac77ef767a47bdf5d1f4913b7bf69a1c1196bb41f5033b
+    - asset_id: pdftotext:jaggi-2021-mercury-atmosphere
+      role: pdftotext
+      path: text/jaggi-2021-mercury-atmosphere
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: tables:jaggi-2021-mercury-atmosphere
+      role: table_csv
+      path: tables/jaggi-2021-mercury-atmosphere
+      sha256:
+        tag: unknown
+        reason: INDEX does not give table sha256
     - asset_id: unknown:jaggi-2021-mercury-atmosphere
       role: pdftotext
       path: unknown

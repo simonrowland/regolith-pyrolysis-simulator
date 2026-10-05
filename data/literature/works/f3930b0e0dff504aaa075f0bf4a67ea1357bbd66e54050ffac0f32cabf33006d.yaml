@@ -9,9 +9,27 @@ work:
   source_files:
     corpus_repo: regolith-corpus
     corpus_commit:
-      tag: unknown
-      reason: INDEX does not give corpus commit
+      tag: value
+      value: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
     files:
+    - asset_id: pdf:filiberto-lpsc2011-2064-volatiles
+      role: pdf
+      path: raw/filiberto-lpsc2011-2064-volatiles/filiberto-lpsc2011-2064-volatiles.pdf
+      sha256:
+        tag: value
+        value: 1c41066c4b464243f4419c69da2182fc3d76227568e2d1708777aad85c5694d3
+    - asset_id: pdftotext:filiberto-lpsc2011-2064-volatiles
+      role: pdftotext
+      path: text/filiberto-lpsc2011-2064-volatiles
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: tables:filiberto-lpsc2011-2064-volatiles
+      role: table_csv
+      path: tables/filiberto-lpsc2011-2064-volatiles
+      sha256:
+        tag: unknown
+        reason: INDEX does not give table sha256
     - asset_id: unknown:filiberto-lpsc2011-2064-volatiles
       role: pdftotext
       path: unknown

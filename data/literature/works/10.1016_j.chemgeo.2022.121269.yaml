@@ -8,9 +8,27 @@ work:
   source_files:
     corpus_repo: regolith-corpus
     corpus_commit:
-      tag: unknown
-      reason: INDEX does not give corpus commit
+      tag: value
+      value: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
     files:
+    - asset_id: pdf:thomas-2022-chlorine-bonding-silicate-melts
+      role: pdf
+      path: raw/thomas-2022-chlorine-bonding-silicate-melts/thomas-2022-chlorine-bonding-silicate-melts.pdf
+      sha256:
+        tag: value
+        value: 50e804acc9e82f3e7b1db40a6c1d10a935f1e5ce13fa1bc22fba3e549ea6f0e8
+    - asset_id: pdftotext:thomas-2022-chlorine-bonding-silicate-melts
+      role: pdftotext
+      path: text/thomas-2022-chlorine-bonding-silicate-melts
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: tables:thomas-2022-chlorine-bonding-silicate-melts
+      role: table_csv
+      path: tables/thomas-2022-chlorine-bonding-silicate-melts
+      sha256:
+        tag: unknown
+        reason: INDEX does not give table sha256
     - asset_id: unknown:thomas-2022-chlorine-bonding-silicate-melts
       role: pdftotext
       path: unknown

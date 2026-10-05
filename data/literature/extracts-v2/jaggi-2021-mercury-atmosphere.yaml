@@ -91,7 +91,7 @@ observations:
     pdf_page_index: 4
     table: '1'
     record: LV row; H2 pressure column
-  read_from: unknown:jaggi-2021-mercury-atmosphere
+  read_from: pdf:jaggi-2021-mercury-atmosphere
   point_conditions:
     temperature_K:
       state:
@@ -105,9 +105,10 @@ observations:
   derived_from:
   - jaggi-2021-mercury-atmosphere::jaggi_2021_table2_magma_ocean_composition_input
   derivation:
-    relation: bar_to_Pa; species.phase=gas derived from quantity=partial_pressure (partial pressure is a gas-phase quantity)
+    relation: SPIDER/VapoRock model partial-pressure output using the Table 2 composition-input set; species.phase=gas derived
+      from quantity=partial_pressure (partial pressure is a gas-phase quantity)
     inputs:
-    - unknown:jaggi-2021-mercury-atmosphere
+    - jaggi-2021-mercury-atmosphere::jaggi_2021_table2_magma_ocean_composition_input
     parameters:
     - - original
       - state:
@@ -118,6 +119,31 @@ observations:
           pdf_page_index: 4
           table: '1'
           record: LV row; H2 pressure column
+        inference:
+          relation: bar_to_Pa
+          inputs:
+          - P_Pa = P_bar × 1e5
+          - original_unit=bar
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '5.8'
+              locator:
+                published_page: 4
+                pdf_page_index: 4
+                table: '1'
+                record: LV row; H2 pressure column
+          - - factor
+            - state:
+                tag: value
+                value: '100000'
+              locator:
+                published_page: 4
+                pdf_page_index: 4
+                table: '1'
+                record: LV row; H2 pressure column
+          output_unit: Pa
     - - factor
       - state:
           tag: value
@@ -217,7 +243,7 @@ observations:
     pdf_page_index: 4
     table: '1'
     record: SV row; H2 pressure column
-  read_from: unknown:jaggi-2021-mercury-atmosphere
+  read_from: pdf:jaggi-2021-mercury-atmosphere
   point_conditions:
     temperature_K:
       state:
@@ -231,9 +257,10 @@ observations:
   derived_from:
   - jaggi-2021-mercury-atmosphere::jaggi_2021_table2_magma_ocean_composition_input
   derivation:
-    relation: bar_to_Pa; species.phase=gas derived from quantity=partial_pressure (partial pressure is a gas-phase quantity)
+    relation: SPIDER/VapoRock model partial-pressure output using the Table 2 composition-input set; species.phase=gas derived
+      from quantity=partial_pressure (partial pressure is a gas-phase quantity)
     inputs:
-    - unknown:jaggi-2021-mercury-atmosphere
+    - jaggi-2021-mercury-atmosphere::jaggi_2021_table2_magma_ocean_composition_input
     parameters:
     - - original
       - state:
@@ -244,6 +271,31 @@ observations:
           pdf_page_index: 4
           table: '1'
           record: SV row; H2 pressure column
+        inference:
+          relation: bar_to_Pa
+          inputs:
+          - P_Pa = P_bar × 1e5
+          - original_unit=bar
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '3.2'
+              locator:
+                published_page: 4
+                pdf_page_index: 4
+                table: '1'
+                record: SV row; H2 pressure column
+          - - factor
+            - state:
+                tag: value
+                value: '100000'
+              locator:
+                published_page: 4
+                pdf_page_index: 4
+                table: '1'
+                record: SV row; H2 pressure column
+          output_unit: Pa
     - - factor
       - state:
           tag: value
@@ -343,7 +395,7 @@ observations:
     pdf_page_index: 4
     table: '1'
     record: LN3 row; SiO pressure column
-  read_from: unknown:jaggi-2021-mercury-atmosphere
+  read_from: pdf:jaggi-2021-mercury-atmosphere
   point_conditions:
     temperature_K:
       state:
@@ -357,9 +409,10 @@ observations:
   derived_from:
   - jaggi-2021-mercury-atmosphere::jaggi_2021_table2_magma_ocean_composition_input
   derivation:
-    relation: bar_to_Pa; species.phase=gas derived from quantity=partial_pressure (partial pressure is a gas-phase quantity)
+    relation: SPIDER/VapoRock model partial-pressure output using the Table 2 composition-input set; species.phase=gas derived
+      from quantity=partial_pressure (partial pressure is a gas-phase quantity)
     inputs:
-    - unknown:jaggi-2021-mercury-atmosphere
+    - jaggi-2021-mercury-atmosphere::jaggi_2021_table2_magma_ocean_composition_input
     parameters:
     - - original
       - state:
@@ -370,6 +423,31 @@ observations:
           pdf_page_index: 4
           table: '1'
           record: LN3 row; SiO pressure column
+        inference:
+          relation: bar_to_Pa
+          inputs:
+          - P_Pa = P_bar × 1e5
+          - original_unit=bar
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '0.00014'
+              locator:
+                published_page: 4
+                pdf_page_index: 4
+                table: '1'
+                record: LN3 row; SiO pressure column
+          - - factor
+            - state:
+                tag: value
+                value: '100000'
+              locator:
+                published_page: 4
+                pdf_page_index: 4
+                table: '1'
+                record: LN3 row; SiO pressure column
+          output_unit: Pa
     - - factor
       - state:
           tag: value
@@ -469,7 +547,7 @@ observations:
     pdf_page_index: 4
     table: '1'
     record: LN5 row; SiO pressure column
-  read_from: unknown:jaggi-2021-mercury-atmosphere
+  read_from: pdf:jaggi-2021-mercury-atmosphere
   point_conditions:
     temperature_K:
       state:
@@ -483,9 +561,10 @@ observations:
   derived_from:
   - jaggi-2021-mercury-atmosphere::jaggi_2021_table2_magma_ocean_composition_input
   derivation:
-    relation: bar_to_Pa; species.phase=gas derived from quantity=partial_pressure (partial pressure is a gas-phase quantity)
+    relation: SPIDER/VapoRock model partial-pressure output using the Table 2 composition-input set; species.phase=gas derived
+      from quantity=partial_pressure (partial pressure is a gas-phase quantity)
     inputs:
-    - unknown:jaggi-2021-mercury-atmosphere
+    - jaggi-2021-mercury-atmosphere::jaggi_2021_table2_magma_ocean_composition_input
     parameters:
     - - original
       - state:
@@ -496,6 +575,31 @@ observations:
           pdf_page_index: 4
           table: '1'
           record: LN5 row; SiO pressure column
+        inference:
+          relation: bar_to_Pa
+          inputs:
+          - P_Pa = P_bar × 1e5
+          - original_unit=bar
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '0.00014'
+              locator:
+                published_page: 4
+                pdf_page_index: 4
+                table: '1'
+                record: LN5 row; SiO pressure column
+          - - factor
+            - state:
+                tag: value
+                value: '100000'
+              locator:
+                published_page: 4
+                pdf_page_index: 4
+                table: '1'
+                record: LN5 row; SiO pressure column
+          output_unit: Pa
     - - factor
       - state:
           tag: value
@@ -595,7 +699,7 @@ observations:
     pdf_page_index: 4
     table: '1'
     record: SN3 row; SiO pressure column
-  read_from: unknown:jaggi-2021-mercury-atmosphere
+  read_from: pdf:jaggi-2021-mercury-atmosphere
   point_conditions:
     temperature_K:
       state:
@@ -609,9 +713,10 @@ observations:
   derived_from:
   - jaggi-2021-mercury-atmosphere::jaggi_2021_table2_magma_ocean_composition_input
   derivation:
-    relation: bar_to_Pa; species.phase=gas derived from quantity=partial_pressure (partial pressure is a gas-phase quantity)
+    relation: SPIDER/VapoRock model partial-pressure output using the Table 2 composition-input set; species.phase=gas derived
+      from quantity=partial_pressure (partial pressure is a gas-phase quantity)
     inputs:
-    - unknown:jaggi-2021-mercury-atmosphere
+    - jaggi-2021-mercury-atmosphere::jaggi_2021_table2_magma_ocean_composition_input
     parameters:
     - - original
       - state:
@@ -622,6 +727,31 @@ observations:
           pdf_page_index: 4
           table: '1'
           record: SN3 row; SiO pressure column
+        inference:
+          relation: bar_to_Pa
+          inputs:
+          - P_Pa = P_bar × 1e5
+          - original_unit=bar
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '0.00014'
+              locator:
+                published_page: 4
+                pdf_page_index: 4
+                table: '1'
+                record: SN3 row; SiO pressure column
+          - - factor
+            - state:
+                tag: value
+                value: '100000'
+              locator:
+                published_page: 4
+                pdf_page_index: 4
+                table: '1'
+                record: SN3 row; SiO pressure column
+          output_unit: Pa
     - - factor
       - state:
           tag: value
@@ -721,7 +851,7 @@ observations:
     pdf_page_index: 4
     table: '1'
     record: SN5 row; SiO pressure column
-  read_from: unknown:jaggi-2021-mercury-atmosphere
+  read_from: pdf:jaggi-2021-mercury-atmosphere
   point_conditions:
     temperature_K:
       state:
@@ -735,9 +865,10 @@ observations:
   derived_from:
   - jaggi-2021-mercury-atmosphere::jaggi_2021_table2_magma_ocean_composition_input
   derivation:
-    relation: bar_to_Pa; species.phase=gas derived from quantity=partial_pressure (partial pressure is a gas-phase quantity)
+    relation: SPIDER/VapoRock model partial-pressure output using the Table 2 composition-input set; species.phase=gas derived
+      from quantity=partial_pressure (partial pressure is a gas-phase quantity)
     inputs:
-    - unknown:jaggi-2021-mercury-atmosphere
+    - jaggi-2021-mercury-atmosphere::jaggi_2021_table2_magma_ocean_composition_input
     parameters:
     - - original
       - state:
@@ -748,6 +879,31 @@ observations:
           pdf_page_index: 4
           table: '1'
           record: SN5 row; SiO pressure column
+        inference:
+          relation: bar_to_Pa
+          inputs:
+          - P_Pa = P_bar × 1e5
+          - original_unit=bar
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '0.00014'
+              locator:
+                published_page: 4
+                pdf_page_index: 4
+                table: '1'
+                record: SN5 row; SiO pressure column
+          - - factor
+            - state:
+                tag: value
+                value: '100000'
+              locator:
+                published_page: 4
+                pdf_page_index: 4
+                table: '1'
+                record: SN5 row; SiO pressure column
+          output_unit: Pa
     - - factor
       - state:
           tag: value
@@ -843,4 +999,4 @@ observations:
     table: '2'
     section: 2.4 Magma ocean composition
     note: Typed parent records the printed composition-input set; complete oxide rows remain in context below.
-  read_from: unknown:jaggi-2021-mercury-atmosphere
+  read_from: pdf:jaggi-2021-mercury-atmosphere

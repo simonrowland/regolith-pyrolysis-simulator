@@ -8,9 +8,27 @@ work:
   source_files:
     corpus_repo: regolith-corpus
     corpus_commit:
-      tag: unknown
-      reason: INDEX does not give corpus commit
+      tag: value
+      value: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
     files:
+    - asset_id: pdf:nakano-hashimoto-2020-bubbles-to-chondrites-i
+      role: pdf
+      path: raw/nakano-hashimoto-2020-bubbles-to-chondrites-i/nakano-hashimoto-2020-bubbles-to-chondrites-i.pdf
+      sha256:
+        tag: value
+        value: 3855bc3b3e0fd758f0df029fea152552a5725e949b4577fb33e2eaee1a051c4c
+    - asset_id: pdftotext:nakano-hashimoto-2020-bubbles-to-chondrites-i
+      role: pdftotext
+      path: text/nakano-hashimoto-2020-bubbles-to-chondrites-i
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: tables:nakano-hashimoto-2020-bubbles-to-chondrites-i
+      role: table_csv
+      path: tables/nakano-hashimoto-2020-bubbles-to-chondrites-i
+      sha256:
+        tag: unknown
+        reason: INDEX does not give table sha256
     - asset_id: unknown:nakano-hashimoto-2020-bubbles-to-chondrites-i
       role: pdftotext
       path: unknown

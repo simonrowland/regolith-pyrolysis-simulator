@@ -8,9 +8,27 @@ work:
   source_files:
     corpus_repo: regolith-corpus
     corpus_commit:
-      tag: unknown
-      reason: INDEX does not give corpus commit
+      tag: value
+      value: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
     files:
+    - asset_id: pdf:kems-039-wolf-2023-vaporock
+      role: pdf
+      path: raw/kems-039-wolf-2023-vaporock/kems-039-wolf-2023-vaporock.pdf
+      sha256:
+        tag: value
+        value: e6365a9a81e8863f45526eafb37a61eb62ee013d0348340f1bc855f6f6a17666
+    - asset_id: pdftotext:kems-039-wolf-2023-vaporock
+      role: pdftotext
+      path: text/kems-039-wolf-2023-vaporock
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: tables:kems-039-wolf-2023-vaporock
+      role: table_csv
+      path: tables/kems-039-wolf-2023-vaporock
+      sha256:
+        tag: unknown
+        reason: INDEX does not give table sha256
     - asset_id: unknown:kems-039-wolf-2023-vaporock
       role: pdftotext
       path: unknown

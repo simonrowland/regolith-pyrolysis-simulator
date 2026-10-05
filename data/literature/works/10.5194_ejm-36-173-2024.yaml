@@ -8,9 +8,27 @@ work:
   source_files:
     corpus_repo: regolith-corpus
     corpus_commit:
-      tag: unknown
-      reason: INDEX does not give corpus commit
+      tag: value
+      value: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
     files:
+    - asset_id: pdf:ta-flemetakis-2024
+      role: pdf
+      path: raw/ta-flemetakis-2024/ta-flemetakis-2024.pdf
+      sha256:
+        tag: value
+        value: 1e8dc32994df67268491c052b95de619a3d784e2eddc32255e5aa9468b41ef99
+    - asset_id: pdftotext:ta-flemetakis-2024
+      role: pdftotext
+      path: text/ta-flemetakis-2024
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: tables:ta-flemetakis-2024
+      role: table_csv
+      path: tables/ta-flemetakis-2024
+      sha256:
+        tag: unknown
+        reason: INDEX does not give table sha256
     - asset_id: unknown:ta-flemetakis-2024
       role: pdftotext
       path: unknown

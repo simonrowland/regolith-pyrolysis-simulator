@@ -9,9 +9,27 @@ work:
   source_files:
     corpus_repo: regolith-corpus
     corpus_commit:
-      tag: unknown
-      reason: INDEX does not give corpus commit
+      tag: value
+      value: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
     files:
+    - asset_id: pdf:usgs-lunar-sourcebook-tab8-4
+      role: pdf
+      path: raw/usgs-lunar-sourcebook-tab8-4/usgs-lunar-sourcebook-tab8-4.pdf
+      sha256:
+        tag: value
+        value: 449159beaab4458f303140698b35587b4eba74dad092b6645da4d81cddb914fd
+    - asset_id: pdftotext:usgs-lunar-sourcebook-tab8-4
+      role: pdftotext
+      path: text/usgs-lunar-sourcebook-tab8-4
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: tables:usgs-lunar-sourcebook-tab8-4
+      role: table_csv
+      path: tables/usgs-lunar-sourcebook-tab8-4
+      sha256:
+        tag: unknown
+        reason: INDEX does not give table sha256
     - asset_id: unknown:usgs-lunar-sourcebook-tab8-4
       role: pdftotext
       path: unknown
