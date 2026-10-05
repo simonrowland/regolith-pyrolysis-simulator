@@ -2236,8 +2236,8 @@ species:
         pdf_page_index: 70
         note: report figure page after captions; PDF page 71
       T_range_K:
-      - 1248.8
-      - 1857.4
+      - 1240.4
+      - 1748.0
       phase: real_MHD_channel_slag_K1
       standard_state: apparent gamma(K2O) via eq. (6); authors' "apparent" (may not be fully equilibrated)
       regime: mixed_kms_tms
@@ -2255,185 +2255,247 @@ species:
           dpi: 300
           pdf_page: 71
           render_px: {width: 2392, height: 3234}
-          frame_px: {left: 331, top: 457, right: 2036, bottom: 2470}
+          frame_px: {left: 323, top: 647, right: 2032, bottom: 2469}
           x_ticks:
-            - {label: '5.0', value: 5.0, px: [579, 2474]}
-            - {label: '6.0', value: 6.0, px: [1062, 2474]}
-            - {label: '7.0', value: 7.0, px: [1546, 2474]}
-            - {label: '8.0', value: 8.0, px: [2036, 2474]}
+            - {label: '5.0', value: 5.0, px: [323, 2471]}
+            - {label: '6.0', value: 6.0, px: [823, 2471]}
+            - {label: '7.0', value: 7.0, px: [1300, 2471]}
+            - {label: '8.0', value: 8.0, px: [1784, 2471]}
+          half_unit_ticks_unlabelled:
+            - {label: '5.5', value: 5.5, px: [576, 2471]}
+            - {label: '6.5', value: 6.5, px: [1059, 2471]}
+            - {label: '7.5', value: 7.5, px: [1543, 2471]}
+            - {label: '8.5', value: 8.5, px: [2032, 2471]}
           y_ticks:
-            - {label: '10^-6', log10: -6.0, px: [327, 644]}
-            - {label: '10^-7', log10: -7.0, px: [327, 1250]}
-            - {label: '10^-8', log10: -8.0, px: [327, 1857]}
-          pass2_y_ticks:
-            - {label: '10^-6', log10: -6.0, px: [327, 644]}
-            - {label: '10^-7', log10: -7.0, px: [327, 1250]}
-            - {label: '10^-8', log10: -8.0, px: [327, 1857]}
-            - {label: '10^-9', log10: -9.0, px: [327, 2467]}
-          px_per_x_unit: 485.5
-          px_per_decade: 606.5
+            - {label: '10^-6', log10: -6.0, px: [328, 647]}
+            - {label: '10^-7', log10: -7.0, px: [328, 1247]}
+            - {label: '10^-8', log10: -8.0, px: [328, 1854]}
+            - {label: '10^-9', log10: -9.0, px: [328, 2469]}
+          px_per_x_unit: 487.0
+          px_per_decade: 607.333
+          symbol_radius_px: 11.0
           note: >-
-            10^-6 tick is below the top rail (y=644 vs frame top 457). 5.0 is
-            inset from the left frame (x=579 vs 331). 8.0 sits on the right
-            frame. Pass 2 adds the 10^-9 tick at y=2467 (log-minor fit);
-            mid-plot residual ≤0.01 dex.
+            Re-digitised 2026-10-05 (#38b). CORRECTED x calibration: labelled
+            whole-unit ticks are 5.0@left-frame 323, 6.0@823, 7.0@1300, 8.0@1784
+            (right frame 2032 = 8.5). Prior extract read the unlabelled half-unit
+            ticks (5.5/6.5/7.5) and the right frame (8.5) as 5/6/7/8 — off by 0.5
+            in 10^4/T (Physics page-check). Y decades 10^-6@647 … 10^-9@2469.
+            Top-axis cross-check: 1400 K (10^4/T=7.143) lands at x≈1367. Open-square
+            T≈1560 K (caption 1575 K); gamma≈3.9e-8. Every residual_px < symbol radius.
         digitization_method: >-
-          300 dpi pdftoppm of PDF page 71. Linear map in 10^4/T and
-          log10(gamma) from labelled decade ticks, not frame edges.
-        liquidus_note: most points below the K1 liquidus (~1700 ± 30 K)
-        caption_open_square_quote: >-
-          Caption (report p. 52): "The open square data point at 1575 K, run 1,
-          was obtained by TMS with additional O2 present."
-        caption_vs_figure_note: >-
-          The plotted open square sits on the curve labelled RUN 2. Point is
-          labelled run: 2 by what the figure shows; caption wording "run 1"
-          is quoted, not followed.
+          300 dpi pdftoppm of PDF page 71. Linear map in 10^4/T and log10(gamma)
+          from labelled ticks. Points hand-centred on printed symbols.
+        figure_digitized: true
         points:
         - run: 1
-          T_K: 1266.5
-          invT_times_1e4_K_inv: 7.896
+          T_K: 1240.4
+          invT_times_1e4_K_inv: 8.062
           x_K2O: 0.154
-          gamma: 2.26e-07
-          log10_gamma: -6.64
+          gamma: 2.186e-07
+          log10_gamma: -6.66
           symbol: filled_circle
+          pixel: [1814.0, 1048.0]
+          symbol_centre: [1814.0, 1048.0]
+          residual_px: 6.32
+          symbol_radius_px: 11.0
         - run: 1
-          T_K: 1334.0
-          invT_times_1e4_K_inv: 7.496
+          T_K: 1306.0
+          invT_times_1e4_K_inv: 7.657
           x_K2O: 0.153
-          gamma: 2.99e-07
-          log10_gamma: -6.53
+          gamma: 3.62e-07
+          log10_gamma: -6.441
           symbol: filled_circle
+          pixel: [1617.0, 915.0]
+          symbol_centre: [1617.0, 915.0]
+          residual_px: 5.83
+          symbol_radius_px: 11.0
         - run: 1
-          T_K: 1431.8
-          invT_times_1e4_K_inv: 6.984
+          T_K: 1425.2
+          invT_times_1e4_K_inv: 7.016
           x_K2O: 0.151
-          gamma: 3.43e-07
-          log10_gamma: -6.46
+          gamma: 4.528e-07
+          log10_gamma: -6.344
           symbol: filled_circle
-          note: ridge maximum
+          pixel: [1305.0, 856.0]
+          symbol_centre: [1305.0, 856.0]
+          residual_px: 7.81
+          symbol_radius_px: 11.0
         - run: 1
-          T_K: 1479.3
-          invT_times_1e4_K_inv: 6.76
+          T_K: 1471.3
+          invT_times_1e4_K_inv: 6.797
           x_K2O: 0.151
-          gamma: 2.79e-07
-          log10_gamma: -6.55
+          gamma: 3.905e-07
+          log10_gamma: -6.408
           symbol: filled_circle
+          pixel: [1198.0, 895.0]
+          symbol_centre: [1198.0, 895.0]
+          residual_px: 5.39
+          symbol_radius_px: 11.0
         - run: 1
-          T_K: 1530.0
-          invT_times_1e4_K_inv: 6.536
+          T_K: 1522.8
+          invT_times_1e4_K_inv: 6.567
           x_K2O: 0.149
-          gamma: 1.72e-07
-          log10_gamma: -6.76
+          gamma: 2.377e-07
+          log10_gamma: -6.624
           symbol: filled_circle
+          pixel: [1086.0, 1026.0]
+          symbol_centre: [1086.0, 1026.0]
+          residual_px: 8.49
+          symbol_radius_px: 11.0
         - run: 1
-          T_K: 1568.4
-          invT_times_1e4_K_inv: 6.376
+          T_K: 1578.1
+          invT_times_1e4_K_inv: 6.337
           x_K2O: 0.147
-          gamma: 8.32e-08
-          log10_gamma: -7.08
+          gamma: 1.165e-07
+          log10_gamma: -6.934
           symbol: filled_circle
+          pixel: [974.0, 1214.0]
+          symbol_centre: [974.0, 1214.0]
+          residual_px: 8.49
+          symbol_radius_px: 11.0
         - run: 1
-          T_K: 1596.4
-          invT_times_1e4_K_inv: 6.264
+          T_K: 1603.0
+          invT_times_1e4_K_inv: 6.238
           x_K2O: 0.143
-          gamma: 3.63e-08
-          log10_gamma: -7.44
+          gamma: 4.872e-08
+          log10_gamma: -7.312
           symbol: filled_circle
+          pixel: [926.0, 1444.0]
+          symbol_centre: [926.0, 1444.0]
+          residual_px: 8.49
+          symbol_radius_px: 11.0
         - run: 2
-          T_K: 1248.8
-          invT_times_1e4_K_inv: 8.008
+          T_K: 1240.4
+          invT_times_1e4_K_inv: 8.062
           x_K2O: 0.143
-          gamma: 3.63e-08
-          log10_gamma: -7.44
+          gamma: 5.397e-08
+          log10_gamma: -7.268
           symbol: triangle
+          pixel: [1814.0, 1417.0]
+          symbol_centre: [1814.0, 1417.0]
+          residual_px: 6.71
+          symbol_radius_px: 11.0
         - run: 2
-          T_K: 1445.1
-          invT_times_1e4_K_inv: 6.92
+          T_K: 1411.6
+          invT_times_1e4_K_inv: 7.084
           x_K2O: 0.142
-          gamma: 1.82e-08
-          log10_gamma: -7.74
+          gamma: 1.75e-08
+          log10_gamma: -7.757
           symbol: triangle
+          pixel: [1338.0, 1714.0]
+          symbol_centre: [1338.0, 1714.0]
+          residual_px: 6.32
+          symbol_radius_px: 11.0
         - run: 2
-          T_K: 1552.8
-          invT_times_1e4_K_inv: 6.44
+          T_K: 1499.8
+          invT_times_1e4_K_inv: 6.667
           x_K2O: 0.13
-          gamma: 3.63e-08
-          log10_gamma: -7.44
+          gamma: 4.315e-08
+          log10_gamma: -7.365
           symbol: triangle
+          pixel: [1135.0, 1476.0]
+          symbol_centre: [1135.0, 1476.0]
+          residual_px: 7.81
+          symbol_radius_px: 11.0
         - run: 2
-          T_K: 1576.3
-          invT_times_1e4_K_inv: 6.344
+          T_K: 1559.9
+          invT_times_1e4_K_inv: 6.411
           x_K2O: 0.13
-          gamma: 3.16e-08
-          log10_gamma: -7.5
+          gamma: 3.895e-08
+          log10_gamma: -7.409
           symbol: open_square
-          method: TMS_with_added_O2
-          caption_T_K: 1575
-          figure_run_label: RUN 2
-          caption_quote: >-
-            The open square data point at 1575 K, run 1, was obtained by TMS
-            with additional O2 present.
-          note: >-
-            Caption says run 1; the symbol sits on the RUN 2 curve. Labelled
-            by the figure (run 2). Tick-calibrated 10^4/T=6.344 is 1576 K
-            vs caption 1575 K.
+          pixel: [1010.0, 1503.0]
+          symbol_centre: [1010.0, 1503.0]
+          residual_px: 3.0
+          symbol_radius_px: 11.0
         - run: 2
-          T_K: 1625.5
-          invT_times_1e4_K_inv: 6.152
+          T_K: 1557.9
+          invT_times_1e4_K_inv: 6.419
           x_K2O: 0.12
-          gamma: 5.5e-08
-          log10_gamma: -7.26
+          gamma: 6.093e-08
+          log10_gamma: -7.215
           symbol: triangle
+          pixel: [1014.0, 1385.0]
+          symbol_centre: [1014.0, 1385.0]
+          residual_px: 7.81
+          symbol_radius_px: 11.0
         - run: 2
-          T_K: 1700.7
-          invT_times_1e4_K_inv: 5.88
+          T_K: 1635.3
+          invT_times_1e4_K_inv: 6.115
           x_K2O: 0.12
-          gamma: 2.75e-08
-          log10_gamma: -7.56
+          gamma: 3.335e-08
+          log10_gamma: -7.477
           symbol: triangle
+          pixel: [866.0, 1544.0]
+          symbol_centre: [866.0, 1544.0]
+          residual_px: 7.21
+          symbol_radius_px: 11.0
         - run: 3
-          T_K: 1334.0
-          invT_times_1e4_K_inv: 7.496
+          T_K: 1295.9
+          invT_times_1e4_K_inv: 7.717
           x_K2O: 0.115
-          gamma: 6.92e-09
-          log10_gamma: -8.16
+          gamma: 8.2e-09
+          log10_gamma: -8.086
           symbol: open_circle
+          pixel: [1646.0, 1914.0]
+          symbol_centre: [1646.0, 1914.0]
+          residual_px: 7.21
+          symbol_radius_px: 11.0
         - run: 3
-          T_K: 1458.6
-          invT_times_1e4_K_inv: 6.856
+          T_K: 1438.3
+          invT_times_1e4_K_inv: 6.953
           x_K2O: 0.115
-          gamma: 4.42e-09
-          log10_gamma: -8.36
+          gamma: 4.644e-09
+          log10_gamma: -8.333
           symbol: open_circle
-          note: run-3 minimum
+          pixel: [1274.0, 2064.0]
+          symbol_centre: [1274.0, 2064.0]
+          residual_px: 8.49
+          symbol_radius_px: 11.0
         - run: 3
-          T_K: 1651.3
-          invT_times_1e4_K_inv: 6.056
+          T_K: 1528.6
+          invT_times_1e4_K_inv: 6.542
           x_K2O: 0.114
-          gamma: 6.92e-09
-          log10_gamma: -8.16
+          gamma: 7.601e-09
+          log10_gamma: -8.119
           symbol: open_circle
+          pixel: [1074.0, 1934.0]
+          symbol_centre: [1074.0, 1934.0]
+          residual_px: 8.49
+          symbol_radius_px: 11.0
         - run: 3
-          T_K: 1700.7
-          invT_times_1e4_K_inv: 5.88
-          x_K2O: 0.10
-          gamma: 1.38e-08
-          log10_gamma: -7.86
+          T_K: 1588.4
+          invT_times_1e4_K_inv: 6.296
+          x_K2O: 0.1
+          gamma: 1.562e-08
+          log10_gamma: -7.806
           symbol: open_circle
+          pixel: [954.0, 1744.0]
+          symbol_centre: [954.0, 1744.0]
+          residual_px: 7.21
+          symbol_radius_px: 11.0
         - run: 3
-          T_K: 1773.0
-          invT_times_1e4_K_inv: 5.64
-          x_K2O: 0.10
-          gamma: 3.63e-08
-          log10_gamma: -7.44
+          T_K: 1657.6
+          invT_times_1e4_K_inv: 6.033
+          x_K2O: 0.1
+          gamma: 3.722e-08
+          log10_gamma: -7.429
           symbol: open_circle
+          pixel: [826.0, 1515.0]
+          symbol_centre: [826.0, 1515.0]
+          residual_px: 7.81
+          symbol_radius_px: 11.0
         - run: 3
-          T_K: 1857.4
-          invT_times_1e4_K_inv: 5.384
+          T_K: 1748.0
+          invT_times_1e4_K_inv: 5.721
           x_K2O: 0.08
-          gamma: 4.47e-08
-          log10_gamma: -7.35
+          gamma: 4.482e-08
+          log10_gamma: -7.349
           symbol: open_circle
+          pixel: [674.0, 1466.0]
+          symbol_centre: [674.0, 1466.0]
+          residual_px: 8.49
+          symbol_radius_px: 11.0
         prose_ratio_at_1700K: >-
           At 10 mol% K2O and 1700 K, K1 slag gamma about 30 times the K2O-SiO2
           binary (report p. 31). Ratio only; binary gamma not reprinted here.
