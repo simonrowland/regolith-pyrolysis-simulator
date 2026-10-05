@@ -731,3 +731,172 @@ def test_hashimoto_nonconvergence_is_partial_per_run_and_cohort_continues(
     )
     assert len(per_run_results) == 2
     assert per_run_results[1][3] is None
+
+
+# Production integrate_residue_inventory outputs, recorded before the shared
+# frozen-inventory depletion move. Hex is the integrator's result, not a
+# reimplementation of the debit.
+_RESIDUE_INVENTORY_HEX = {
+    "two_channel": {
+        "residue_mol": {"FeO": "0x1.048e1b5e354efp-10"},
+        "evaporated_mol": {
+            "Fe": "0x1.96c1d0e550c95p-18",
+            "O2": "0x1.96c1d0e550c95p-19",
+        },
+        "pO2_bar_by_step": ("0x1.8046881184a9ep-23",),
+        "atom_closure_mol": {"Fe": "0x0.0p+0", "O": "0x0.0p+0"},
+        "buffer_oxygen_exchange_mol": "0x0.0p+0",
+    },
+    "buffered": {
+        "residue_mol": {"FeO": "0x1.0624c085406a8p-10"},
+        "evaporated_mol": {"Fe": "0x1.ca9da353faa7cp-30"},
+        "pO2_bar_by_step": (
+            "0x1.26d42cce9b24cp-11",
+            "0x1.26d42cce9b24cp-11",
+        ),
+        "atom_closure_mol": {"Fe": "0x0.0p+0", "O": "0x1.5610000000000p-68"},
+        "buffer_oxygen_exchange_mol": "-0x1.ca9da353faa7cp-30",
+    },
+    "zero_alpha": {
+        "residue_mol": {
+            "FeO": "0x1.47ae147ae147bp-7",
+            "MgO": "0x1.47ae147ae147bp-7",
+        },
+        "evaporated_mol": {},
+        "pO2_bar_by_step": (None, None),
+        "atom_closure_mol": {
+            "Fe": "0x0.0p+0",
+            "Mg": "0x0.0p+0",
+            "O": "0x0.0p+0",
+        },
+        "buffer_oxygen_exchange_mol": "0x0.0p+0",
+    },
+    "zero_pressure": {
+        "residue_mol": {
+            "FeO": "0x1.47ae147ae147bp-7",
+            "MgO": "0x1.47ae147ae147bp-7",
+        },
+        "evaporated_mol": {},
+        "pO2_bar_by_step": (None, None),
+        "atom_closure_mol": {
+            "Fe": "0x0.0p+0",
+            "Mg": "0x0.0p+0",
+            "O": "0x0.0p+0",
+        },
+        "buffer_oxygen_exchange_mol": "0x0.0p+0",
+    },
+    "finite_step": {
+        "residue_mol": {
+            "FeO": "0x1.e68d7fa6a7aa3p-1",
+            "MgO": "0x1.d8d2dd4f5bc84p-2",
+        },
+        "evaporated_mol": {
+            "Fe": "0x1.97280595855d4p-5",
+            "Mg": "0x1.13969158521bep-1",
+            "O2": "0x1.2d0911b1aa71bp-2",
+        },
+        "pO2_bar_by_step": (
+            "0x1.33016061fb8fcp-20",
+            "0x1.e991dede9f015p-21",
+        ),
+        "atom_closure_mol": {
+            "Fe": "0x0.0p+0",
+            "Mg": "0x0.0p+0",
+            "O": "0x0.0p+0",
+        },
+        "buffer_oxygen_exchange_mol": "0x0.0p+0",
+    },
+}
+
+
+def _residue_inventory_hex(result) -> dict:
+    return {
+        "residue_mol": {
+            key: value.hex() for key, value in result.residue_mol.items()
+        },
+        "evaporated_mol": {
+            key: value.hex() for key, value in result.evaporated_mol.items()
+        },
+        "pO2_bar_by_step": tuple(
+            None if value is None else value.hex()
+            for value in result.pO2_bar_by_step
+        ),
+        "atom_closure_mol": {
+            key: value.hex() for key, value in result.atom_closure_mol.items()
+        },
+        "buffer_oxygen_exchange_mol": result.buffer_oxygen_exchange_mol.hex(),
+    }
+
+
+def test_residue_inventory_outputs_are_pinned() -> None:
+    from simulator.battery.residue import ResidueChannel, integrate_residue_inventory
+
+    temperature_K = 2073.0
+    two_channel_start = {"FeO": 1.0e-3}
+    fe_and_oxygen = (_residue_channels()[0], _residue_channels()[2])
+
+    def two_channel_pressure(_inventory: dict[str, float], log10_pO2_bar: float):
+        pO2_bar = 10.0**log10_pO2_bar
+        return {"Fe": 1.0e-3 / math.sqrt(pO2_bar), "O2": 1.0e5 * pO2_bar}
+
+    cases = {
+        "two_channel": integrate_residue_inventory(
+            two_channel_start,
+            fe_and_oxygen,
+            two_channel_pressure,
+            temperature_K=temperature_K,
+            duration_s=100.0,
+            area_evolution_m2=(1.0e-4,),
+        ),
+    }
+    fe_alpha, alpha_source = _residue_catalog_alpha("Fe")
+    cases["buffered"] = integrate_residue_inventory(
+        {"FeO": 1.0e-3},
+        (ResidueChannel("Fe", "Fe", "FeO", fe_alpha, alpha_source),),
+        lambda _inventory, _logp: {"Fe": 1.0e-3},
+        temperature_K=1773.15,
+        duration_s=60.0,
+        area_evolution_m2=(1.0e-4, 1.0e-4),
+        buffered_fO2_log=-3.25,
+    )
+    for name, alpha, zero_parent_pressure in (
+        ("zero_alpha", 0.0, False),
+        ("zero_pressure", 0.2, True),
+    ):
+        channels = list(_residue_channels())
+        channels[0] = replace(channels[0], alpha=alpha)
+        if alpha == 0.0:
+            channels[1] = replace(channels[1], alpha=0.0)
+            channels[2] = replace(channels[2], alpha=0.0)
+
+        def pressure_model(
+            inventory: dict[str, float],
+            log10_pO2_bar: float,
+            *,
+            _zero_parent=zero_parent_pressure,
+        ):
+            pressures = _residue_pressure_model(inventory, log10_pO2_bar)
+            if _zero_parent:
+                pressures["Fe"] = 0.0
+                pressures["Mg"] = 0.0
+            return pressures
+
+        cases[name] = integrate_residue_inventory(
+            {"FeO": 0.01, "MgO": 0.01},
+            tuple(channels),
+            pressure_model,
+            temperature_K=temperature_K,
+            duration_s=60.0,
+            area_evolution_m2=(0.01, 0.01),
+        )
+    cases["finite_step"] = integrate_residue_inventory(
+        {"FeO": 1.0, "MgO": 1.0},
+        _residue_channels(),
+        _residue_pressure_model,
+        temperature_K=temperature_K,
+        duration_s=200.0,
+        area_evolution_m2=(1.0, 1.0),
+    )
+    assert set(cases) == set(_RESIDUE_INVENTORY_HEX)
+    for name, result in cases.items():
+        assert _residue_inventory_hex(result) == _RESIDUE_INVENTORY_HEX[name]
