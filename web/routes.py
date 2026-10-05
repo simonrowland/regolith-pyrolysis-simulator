@@ -5396,7 +5396,7 @@ def additive_calc(key):
     comp = normalized_feedstock_component_masses_kg(fs, mass_kg)
 
     # Absolute kg of each oxide in the batch
-    FeO_kg, _fe2o3_kg = iron_oxide_values(comp)
+    FeO_kg, Fe2O3_kg = iron_oxide_values(comp)
     TiO2_kg = comp.get('TiO2', 0.0)
     Cr2O3_kg = comp.get('Cr2O3', 0.0)
     Al2O3_kg = comp.get('Al2O3', 0.0)
@@ -5407,7 +5407,7 @@ def additive_calc(key):
     SHUTTLE_LOSS = 0.25  # ~25% loss per cycle
 
     # K for C3-K shuttle; physical stoichiometry is owned by the simulator.
-    K_kg = k_shuttle_potassium_additive_kg(FeO_kg)
+    K_kg = k_shuttle_potassium_additive_kg(FeO_kg, Fe2O3_kg)
 
     # Na for C3-Na shuttle
     Na_kg = ((TiO2_kg * (4 * 22.99 / 79.87)

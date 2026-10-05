@@ -332,8 +332,10 @@ def test_ci_c0_char_diagnostic_reads_committed_ledger_inventory() -> None:
     assert "SiO2+C" in diagnostic["contamination_risk"]["out_of_scope"]
 
 
-def test_c0_char_feo_reduction_projection_ignores_ferric_oxide() -> None:
+def test_c0_char_reduction_potential_counts_ferric_oxygen_stoichiometry() -> None:
     sim = _build_sim("ci_carbonaceous_chondrite")
+    # The state below is a synthetic post-equilibrium inventory; its measured
+    # oxide split is independent of the feedstock's initial total-as-FeO data.
     snapshot = SimpleNamespace(
         campaign=CampaignPhase.C0,
         o2_bubbler_injected_kg=0.0,
@@ -347,7 +349,22 @@ def test_c0_char_feo_reduction_projection_ignores_ferric_oxide() -> None:
         sim, [snapshot], feedstock_id="ci_carbonaceous_chondrite"
     )
 
-    assert diagnostic["FeO_reduction_potential"]["melt_FeO_available_kg"] == 10.0
+    potential = diagnostic["FeO_reduction_potential"]
+    assert potential["melt_FeO_available_kg"] == 10.0
+    assert potential["melt_Fe2O3_available_kg"] == 50.0
+    # FeO + C -> Fe + CO consumes one C per FeO; Fe2O3 + 3C -> 2Fe + 3CO
+    # consumes three per Fe2O3. These hand molar masses give the oxygen
+    # removal capacity on the diagnostic's declared kg basis.
+    oxygen_available_mol = 10_000.0 / 71.844 + 3.0 * 50_000.0 / 159.687
+    assert potential["melt_iron_oxide_oxygen_available_mol"] == pytest.approx(
+        oxygen_available_mol
+    )
+    assert potential["iron_oxide_oxygen_reducible_mol"] == pytest.approx(
+        min(
+            diagnostic["inventory"]["refractory_char_C_mol"],
+            oxygen_available_mol,
+        )
+    )
 
 
 def test_c0_diagnostic_does_not_resurrect_consumed_char() -> None:

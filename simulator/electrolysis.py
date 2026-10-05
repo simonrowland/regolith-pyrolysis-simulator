@@ -617,7 +617,8 @@ class ElectrolysisModel:
         returns reason_refused=uncertified_multi_oxide_current_partition,
         omits product and energy quantities, and applies no Faraday reduction.
         A single oxide_to_metal target is weighted by SEL-1 and reduced by
-        Faraday's law. Ferric iron is excluded from this FeO-only route.
+        Faraday's law. A ferric-to-ferrous row may also be reduced without
+        consuming the oxide-to-metal current partition.
 
         Args:
             melt_state: Current melt composition
@@ -801,6 +802,25 @@ class ElectrolysisModel:
                     "oxide_to_metal", reference,
                 ))
 
+        if melt_state.composition_kg.get('Fe2O3', 0.0) >= 1e-6:
+            activity = mre_oxide_activity('Fe2O3', melt_account_mol)
+            feo_activity = mre_oxide_activity('FeO', melt_account_mol)
+            E_ferric = self.ferric_to_ferrous_voltage(
+                T_C,
+                activity,
+                pO2_bar=pO2_bar,
+                feo_activity=feo_activity,
+            )
+            if E_ferric < voltage_V:
+                reducible.append((
+                    'Fe2O3',
+                    E_ferric,
+                    voltage_V - E_ferric,
+                    activity,
+                    "ferric_to_ferrous",
+                    None,
+                ))
+
         if not reducible:
             if result['mre_raw_margin_refused_targets']:
                 result['reason_refused'] = MRE_RAW_MARGIN_REFUSAL
@@ -838,7 +858,7 @@ class ElectrolysisModel:
                 result['energy_kWh'] = voltage_V * current_A / 1000.0
             return result
 
-        for oxide, E, dV, a, _mode, reference in reducible:
+        for oxide, E, dV, a, mode, reference in reducible:
             fraction = weights[oxide] / total_weight
             I_species = current_A * fraction
 
@@ -848,7 +868,11 @@ class ElectrolysisModel:
             result['current_efficiency_by_oxide'][oxide] = ce_diagnostic
 
             # Faraday's law: mass reduced this hour            [FARADAY-1]
-            n = ELECTRONS_PER_OXIDE.get(oxide, 2)
+            n = (
+                FERRIC_TO_FERROUS_ELECTRONS
+                if mode == "ferric_to_ferrous"
+                else ELECTRONS_PER_OXIDE.get(oxide, 2)
+            )
             M_oxide_gmol = MOLAR_MASS.get(oxide, 100.0)  # g/mol
             t_s = 3600.0  # 1 hour in seconds
 
@@ -870,6 +894,21 @@ class ElectrolysisModel:
                 result['oxides_reduced_kg'][oxide] = kg_oxide_reduced
                 result['oxides_reduced_mol'][oxide] = moles_reduced
                 result['oxide_charge_electrons'][oxide] = n
+
+                if mode == "ferric_to_ferrous":
+                    feo_mol = moles_reduced * FERRIC_TO_FERROUS_FEO_PER_FE2O3
+                    feo_kg = feo_mol * MOLAR_MASS['FeO'] / 1000.0
+                    result['oxides_produced_kg']['FeO'] = (
+                        result['oxides_produced_kg'].get('FeO', 0.0) + feo_kg
+                    )
+                    result['oxides_produced_mol']['FeO'] = (
+                        result['oxides_produced_mol'].get('FeO', 0.0) + feo_mol
+                    )
+                    O2_mol = moles_reduced * FERRIC_TO_FERROUS_O2_PER_FE2O3
+                    O2_kg = O2_mol * MOLAR_MASS['O2'] / 1000.0
+                    result['O2_produced_kg'] += O2_kg
+                    result['O2_produced_mol'] += O2_mol
+                    continue
 
                 # Metal produced
                 metal_info = OXIDE_TO_METAL.get(oxide)

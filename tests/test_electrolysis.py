@@ -292,7 +292,7 @@ def test_step_hour_valid_feo_still_reduces():
     assert result["energy_kWh"] == pytest.approx(0.3)
 
 
-def test_step_hour_ignores_ferric_oxide_in_the_feo_only_route():
+def test_step_hour_counts_ferric_oxide_with_ferric_to_ferrous_stoichiometry():
     result = _legacy_model().step_hour(
         MeltState(composition_kg={"FeO": 1.0, "Fe2O3": 1.0}),
         voltage_V=3.0,
@@ -301,9 +301,15 @@ def test_step_hour_ignores_ferric_oxide_in_the_feo_only_route():
     )
 
     assert result.get("reason_refused") is None
-    assert result["oxides_reduced_kg"].get("FeO", 0.0) > 0.0
-    assert result["oxides_reduced_kg"].get("Fe2O3", 0.0) == 0.0
-    assert result["oxides_produced_kg"] == {}
+    ferric_reduced_mol = result["oxides_reduced_mol"]["Fe2O3"]
+    ferrous_from_ferric_mol = result["oxides_produced_mol"]["FeO"]
+    # Fe2O3 + 2 e- -> 2 FeO + 1/2 O2, so each ferric formula unit
+    # gives two ferrous formula units and half a mole of O2.
+    assert ferric_reduced_mol > 0.0
+    assert ferrous_from_ferric_mol == pytest.approx(2.0 * ferric_reduced_mol)
+    assert result["O2_produced_mol"] - 0.5 * result[
+        "oxides_reduced_mol"].get("FeO", 0.0
+    ) == pytest.approx(0.5 * ferric_reduced_mol)
 
 
 def test_step_hour_zero_current_and_voltage_remain_idle():
