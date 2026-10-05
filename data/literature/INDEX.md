@@ -15,12 +15,12 @@ Canonical `source_id` is the extract filename stem. Preset ids are aliases, neve
 
 ## Counts
 
-- Sources: 280
-- Extracts (`literature_extract.v1`): 278
+- Sources: 281
+- Extracts (`literature_extract.v1`): 279
 - PDFs present in this worktree: 0
 - Tracked PDFs in `docs/references/pdfs/99-kems-langmuir/`: 0
 - PDFs with no extract: 0
-- Extracts with no PDF: 278
+- Extracts with no PDF: 279
 - Alias groups needing owner/controller resolution: 41
 - Extracts with private/non-public row locators: 60
 
@@ -68,6 +68,7 @@ Canonical `source_id` is the extract filename stem. Preset ids are aliases, neve
 | `fray-schmitt-2009-ch4-1` | Fray & Schmitt (2009), Planet. Space Sci. 57:2053–2080, DOI 10.1016/j.pss.2009.09.011, CH4-1 correlation; disagreement vs Grundy already stored on the family row (~69.5% at 37 K). | 10.1016/j.pss.2009.09.011 | ABSENT, `` | `raw/fray-schmitt-2009-ch4-1/fray-schmitt-2009-ch4-1.pdf` (ABSENT, ); `text/fray-schmitt-2009-ch4-1/` (0 files, ABSENT); `tables/fray-schmitt-2009-ch4-1/` (0 files, ABSENT) | `data/literature/extracts/fray-schmitt-2009-ch4-1.yaml` (1 rows, draft) | `ledger/fray-schmitt-2009-ch4-1.yaml`: extracted (2026-09-06) |
 | `fray-schmitt-2009-co-1` | Fray & Schmitt (2009), Planet. Space Sci. 57:2053–2080, DOI 10.1016/j.pss.2009.09.011, CO-1 correlation (coefficients in NASA NTRS 20210019502 supplementary Table 2). Row already records disagreement at 31 K (~513% vs Grundy); use FS09 as the independent promotion check, not a second fit of Grundy. | 10.1016/j.pss.2009.09.011 | ABSENT, `` | `raw/fray-schmitt-2009-co-1/fray-schmitt-2009-co-1.pdf` (ABSENT, ); `text/fray-schmitt-2009-co-1/` (0 files, ABSENT); `tables/fray-schmitt-2009-co-1/` (0 files, ABSENT) | `data/literature/extracts/fray-schmitt-2009-co-1.yaml` (1 rows, draft) | `ledger/fray-schmitt-2009-co-1.yaml`: extracted (2026-09-06) |
 | `fray-schmitt-2009-nh3` | Fray & Schmitt (2009), Planet. Space Sci. 57:2053–2080, NH3 correlations (NASA NTRS supplementary Table 2). Alternate liquid branch: NIST Chemistry WebBook SRD 69 ammonia Antoine (Stull 1947 lineage), ~164–240 K liquid — independent of the 2024 QCM ice fit. |  | ABSENT, `` | `raw/fray-schmitt-2009-nh3/fray-schmitt-2009-nh3.pdf` (ABSENT, ); `text/fray-schmitt-2009-nh3/` (0 files, ABSENT); `tables/fray-schmitt-2009-nh3/` (0 files, ABSENT) | `data/literature/extracts/fray-schmitt-2009-nh3.yaml` (1 rows, draft) | `ledger/fray-schmitt-2009-nh3.yaml`: extracted (2026-09-06) |
+| `fujisawa-1990-cao-al2o3-activities` | T. Fujisawa, C. Yamauchi, and H. Sakao, "Equilibrium between Molten Iron Alloys and CaO-Al2O3-CaS Slags Saturated with CaS," Tetsu-to-Hagane, 76(3) (1990), 368-375. | 10.2355/tetsutohagane1955.76.3_368 | ABSENT, `` | `raw/fujisawa-1990-cao-al2o3-activities/fujisawa-1990-cao-al2o3-activities.pdf` (present, 9da85446); `text/fujisawa-1990-cao-al2o3-activities/` (11 files, exists); `tables/fujisawa-1990-cao-al2o3-activities/` (8 files, exists) | `data/literature/extracts/fujisawa-1990-cao-al2o3-activities.yaml` (0 rows, draft) | `ledger/fujisawa-1990-cao-al2o3-activities.yaml`: extracted (2026-10-04) |
 | `giauque-powell-1939-cl2` | Giauque, W.F. & Powell, T.M. (1939), "Chlorine. The Heat Capacity, Vapor Pressure, Heats of Fusion and Vaporization, and Entropy", J. Am. Chem. Soc. 61:1970–1974, DOI 10.1021/ja01877a012 — primary calorimetry/VP (use solid and liquid branches separately; do not promote a single Antoine across the triple point). | 10.1021/ja01877a012 | ABSENT, `` | `raw/giauque-powell-1939-cl2/giauque-powell-1939-cl2.pdf` (ABSENT, ); `text/giauque-powell-1939-cl2/` (0 files, ABSENT); `tables/giauque-powell-1939-cl2/` (0 files, ABSENT) | `data/literature/extracts/giauque-powell-1939-cl2.yaml` (1 rows, draft) | `ledger/giauque-powell-1939-cl2.yaml`: extracted (2026-09-06) |
 | `giauque-ruehrwein-1939-hcn-psat` | Giauque, W.F. & Ruehrwein, R.A. (1939), "The Entropy of Hydrogen Cyanide. Heat Capacity, Heat of Vaporization and Vapor Pressure of Hydrogen Cyanide. The Structure of the Hydrogen Cyanide Molecule", J. Am. Chem. Soc. 61:2626–2633, DOI 10.1021/ja01265a030 — classical vapor-pressure / calorimetry primary. | 10.1021/ja01265a030 | ABSENT, `` | `raw/giauque-ruehrwein-1939-hcn-psat/giauque-ruehrwein-1939-hcn-psat.pdf` (ABSENT, ); `text/giauque-ruehrwein-1939-hcn-psat/` (0 files, ABSENT); `tables/giauque-ruehrwein-1939-hcn-psat/` (0 files, ABSENT) | `data/literature/extracts/giauque-ruehrwein-1939-hcn-psat.yaml` (1 rows, draft) | `ledger/giauque-ruehrwein-1939-hcn-psat.yaml`: extracted (2026-09-06) |
 | `gornerup-1996-cao-corner-liquidus` | M. Görnerup and O. Wijk, "Liquidus Relationships in the CaO-corner of the Ternary System CaO-Al2O3-SiO2", ISIJ International, 36(12) (1996), 1465-1470. |  | ABSENT, `` | `raw/gornerup-1996-cao-corner-liquidus/gornerup-1996-cao-corner-liquidus.pdf` (present, 32751b05); `text/gornerup-1996-cao-corner-liquidus/` (9 files, exists); `tables/gornerup-1996-cao-corner-liquidus/` (2 files, exists) | `data/literature/extracts/gornerup-1996-cao-corner-liquidus.yaml` (0 rows, draft) | `ledger/gornerup-1996-cao-corner-liquidus.yaml`: extracted (2026-10-04) |
@@ -355,6 +356,7 @@ Canonical `source_id` is the extract filename stem. Preset ids are aliases, neve
 - `fray-schmitt-2009-ch4-1`
 - `fray-schmitt-2009-co-1`
 - `fray-schmitt-2009-nh3`
+- `fujisawa-1990-cao-al2o3-activities`
 - `giauque-powell-1939-cl2`
 - `giauque-ruehrwein-1939-hcn-psat`
 - `gornerup-1996-cao-corner-liquidus`
