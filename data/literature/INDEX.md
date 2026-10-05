@@ -15,12 +15,12 @@ Canonical `source_id` is the extract filename stem. Preset ids are aliases, neve
 
 ## Counts
 
-- Sources: 285
-- Extracts (`literature_extract.v1`): 283
+- Sources: 286
+- Extracts (`literature_extract.v1`): 284
 - PDFs present in this worktree: 0
 - Tracked PDFs in `docs/references/pdfs/99-kems-langmuir/`: 0
 - PDFs with no extract: 0
-- Extracts with no PDF: 283
+- Extracts with no PDF: 284
 - Alias groups needing owner/controller resolution: 41
 - Extracts with private/non-public row locators: 60
 
@@ -269,6 +269,7 @@ Canonical `source_id` is the extract filename stem. Preset ids are aliases, neve
 | `sf04-magma-companion-workbook` | Schaefer, L. & Fegley, B. (2004), "A thermodynamic model of high temperature lava vaporization on Io", Icarus 169:216-241; numerical MAGMA grid preserved in the VapoRock Schaefer2004-MAGMA-valid.xlsx companion workbook. | 10.1016/j.icarus.2003.08.023 | ABSENT, `` | `raw/sf04-magma-companion-workbook/sf04-magma-companion-workbook.pdf` (ABSENT, ); `text/sf04-magma-companion-workbook/` (0 files, ABSENT); `tables/sf04-magma-companion-workbook/` (0 files, ABSENT) | `data/literature/extracts/sf04-magma-companion-workbook.yaml` (7 rows, reviewed) | `ledger/sf04-magma-companion-workbook.yaml`: extracted (2026-09-06) |
 | `shornikov-1994-mullite-kems` | Shornikov, S. I., Stolyarova, V. L., and Shultz, M. M. (1994). High Temperature Mass Spectrometric Study of 3Al2O3·2SiO2. Rapid Communications in Mass Spectrometry, 8, 478–480. |  | ABSENT, `` | `raw/shornikov-1994-mullite-kems/shornikov-1994-mullite-kems.pdf` (present, 204dbd22); `text/shornikov-1994-mullite-kems/` (0 files, ABSENT); `tables/shornikov-1994-mullite-kems/` (0 files, ABSENT) | `data/literature/extracts/shornikov-1994-mullite-kems.yaml` (41 rows, draft) | `ledger/shornikov-1994-mullite-kems.yaml`: — (—) |
 | `shornikov-1997-cao-alumina-vapor` | Shornikov, S. I., Stolyarova, V. L., and Shul’ts, M. M. (1997), "A Mass-Spectrometric Study of Vapor Composition and Thermodynamic Properties of CaO–Al2O3 Melts", Russian Journal of Physical Chemistry 71(1):19–22 (translation of Zh. Fiz. Khim. 71(1):23–27) |  | ABSENT, `` | `raw/shornikov-1997-cao-alumina-vapor/shornikov-1997-cao-alumina-vapor.pdf` (present, 77e3fd13); `text/shornikov-1997-cao-alumina-vapor/` (0 files, ABSENT); `tables/shornikov-1997-cao-alumina-vapor/` (0 files, ABSENT) | `data/literature/extracts/shornikov-1997-cao-alumina-vapor.yaml` (6 rows, draft) | `ledger/shornikov-1997-cao-alumina-vapor.yaml`: — (—) |
+| `shornikov-1998-silica-vaporization` | Shornikov, S. I., Archakov, I. Yu., and Shul’ts, M. M. (1998). Mass Spectrometric Study of Vaporization and Thermodynamic Properties of Silicon Dioxide. I. Composition of the Gas Phase and Partial Vapor Pressures of the Molecular Forms over Silicon Dioxide. Russian Journal of General Chemistry, 68(8), 1171–1177. |  | ABSENT, `` | `raw/shornikov-1998-silica-vaporization/shornikov-1998-silica-vaporization.pdf` (present, 3a38a303); `text/shornikov-1998-silica-vaporization/` (3 files, exists); `tables/shornikov-1998-silica-vaporization/` (6 files, exists) | `data/literature/extracts/shornikov-1998-silica-vaporization.yaml` (0 rows, draft) | `ledger/shornikov-1998-silica-vaporization.yaml`: extracted (2026-10-04) |
 | `shornikov-2000-cao-silica-vaporization` | Shornikov, S. I., and Archakov, I. Yu. (2000). Mass Spectrometric Study of Phase Relations and Vaporization Processes in the CaO–SiO2 System. Glastech. Ber. Glass Sci. Technol., 73 C2, 51–57. |  | ABSENT, `` | `raw/shornikov-2000-cao-silica-vaporization/shornikov-2000-cao-silica-vaporization.pdf` (present, 3a1ed0b8); `text/shornikov-2000-cao-silica-vaporization/` (3 files, exists); `tables/shornikov-2000-cao-silica-vaporization/` (0 files, ABSENT) | `data/literature/extracts/shornikov-2000-cao-silica-vaporization.yaml` (0 rows, draft) | `ledger/shornikov-2000-cao-silica-vaporization.yaml`: extracted (2026-10-04) |
 | `shornikov-2007-cao-aluminosilicate-melts` | Shornikov, S. I. (2007), Thermodynamic properties of CaO-Al2O3-SiO2 melts, Experiment in Geosciences 14(1):35-37. |  | ABSENT, `` | `raw/shornikov-2007-cao-aluminosilicate-melts/shornikov-2007-cao-aluminosilicate-melts.pdf` (present, 9822bdf3); `text/shornikov-2007-cao-aluminosilicate-melts/` (3 files, exists); `tables/shornikov-2007-cao-aluminosilicate-melts/` (2 files, exists) | `data/literature/extracts/shornikov-2007-cao-aluminosilicate-melts.yaml` (6 rows, draft) | `ledger/shornikov-2007-cao-aluminosilicate-melts.yaml`: extracted (2026-10-04) |
 | `shornikov-2021-mgo-feo-silicate` | Shornikov, S. I., Ivanova, M. A., and Minaeva, M. S. (2021), Thermodynamic Properties of the MgO–FeO–SiO2 Melts, Experiment in Geosciences 27(1):67–69. |  | ABSENT, `` | `raw/shornikov-2021-mgo-feo-silicate/shornikov-2021-mgo-feo-silicate.pdf` (present, 6e3e5595); `text/shornikov-2021-mgo-feo-silicate/` (3 files, exists); `tables/shornikov-2021-mgo-feo-silicate/` (0 files, ABSENT) | `data/literature/extracts/shornikov-2021-mgo-feo-silicate.yaml` (0 rows, draft) | `ledger/shornikov-2021-mgo-feo-silicate.yaml`: extracted (2026-10-04) |
@@ -560,6 +561,7 @@ Canonical `source_id` is the extract filename stem. Preset ids are aliases, neve
 - `sf04-magma-companion-workbook`
 - `shornikov-1994-mullite-kems`
 - `shornikov-1997-cao-alumina-vapor`
+- `shornikov-1998-silica-vaporization`
 - `shornikov-2000-cao-silica-vaporization`
 - `shornikov-2007-cao-aluminosilicate-melts`
 - `shornikov-2021-mgo-feo-silicate`
