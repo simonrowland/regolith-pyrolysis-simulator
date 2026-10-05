@@ -3212,6 +3212,27 @@ class CondensationModel:
             wall_deposit_fraction_by_species[species] = 0.0
             wall_deposit_account_fractions_by_species[species] = {}
 
+            if species not in stage_route_by_species:
+                onset = _trace_onset_for_flow(
+                    species,
+                    self.wall_species_partial_pressures_pa,
+                    vapor_pressure_data=self.vapor_pressure_data,
+                    stages=self.train.stages,
+                )
+                if onset is not None:
+                    _record_trace_vapour_disposition(
+                        species,
+                        float(rate_kg_hr),
+                        onset,
+                        remaining_by_species=remaining_by_species,
+                        condensation_authority_by_species=(
+                            condensation_authority_by_species
+                        ),
+                        condensation_refusals_by_species=(
+                            condensation_refusals_by_species
+                        ),
+                    )
+                    continue
             stage_route = stage_route_by_species[species]
             T_cond = float(stage_route['T_cond_C'])
             hkl_condensed_by_stage = dict(
@@ -5067,6 +5088,16 @@ def _promote_non_debiting_carrier_status(
         vapor_pressure_data=vapor_pressure_data,
     )
     if admission_refusal is not None:
+        # A trace vapour with no Antoine row is not a missing-input zero.
+        # Its onset reports the mass. Catalog rows (Pb and the other
+        # dormant carriers) still refuse on their declared predicate.
+        if (
+            admission_refusal == CONDENSATION_ADMISSION_REFUSAL_NO_DATA
+            and designated_stage_number(species) is None
+            and species not in CONDENSATION_TEMPS_C
+            and species in _trace_vapour_carrier_sources()
+        ):
+            return current_status, None
         return VAPOUR_CARRIER_AUTHORITY_REFUSED, admission_refusal
     if _species_is_flux_dormant(
         species,
@@ -5074,6 +5105,46 @@ def _promote_non_debiting_carrier_status(
     ):
         return VAPOUR_CARRIER_AUTHORITY_REFUSED, CONDENSATION_FLUX_DORMANT_REFUSAL
     return current_status, None
+
+
+def _record_trace_vapour_disposition(
+    species: str,
+    rate_kg_hr: float,
+    onset: TraceVapourCondensationOnset,
+    *,
+    remaining_by_species: dict[str, float],
+    condensation_authority_by_species: dict[str, dict[str, Any]],
+    condensation_refusals_by_species: dict[str, dict[str, Any]],
+) -> None:
+    """Keep a trace vapour's mass and name an uncaptured condensate.
+
+    The mass stays in ``remaining_by_species``. It is not moved to a
+    vent account and it is not zeroed. Capture still waits on the
+    dormant channel's deposition curve; the onset only says where it
+    would land.
+    """
+
+    remaining_by_species[species] = rate_kg_hr
+    authority = condensation_authority_by_species[species]
+    authority["authoritative_for_condensation"] = False
+    authority["mass_disposition"] = onset.disposition
+    authority["hot_train_applicability"] = onset.hot_train_applicability
+    authority["condensation_onset_C"] = onset.temperature_C
+    authority["landing_stage_number"] = onset.landing_stage_number
+    authority["wall_landing_stage_number"] = onset.wall_landing_stage_number
+    if onset.disposition != "flagged_uncaptured_condensable":
+        return
+    condensation_refusals_by_species[species] = {
+        "status": "flagged",
+        "reason": "flagged_uncaptured_condensable",
+        "output_status": "status_bearing",
+        "mass_disposition": "flagged_uncaptured_condensable",
+        "authoritative_for_terminal_offgas": False,
+        "authoritative_for_condensation": False,
+        "input_mass_kg_hr": rate_kg_hr,
+        "remaining_mass_kg_hr": rate_kg_hr,
+        "condensed_mass_kg_hr": 0.0,
+    }
 
 
 def _species_has_compiled_or_legacy_pressure(
