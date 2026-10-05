@@ -210,3 +210,25 @@ def test_base_intrinsic_fO2_is_pinned_for_every_fe_oxide_entry() -> None:
     assert _digest(outputs) == (
         "291e9d828da424db6ef5e87d293e641a30d5ba0e4a6442331fe952725977476f"
     )
+
+
+def test_unknown_split_metadata_is_flagged_on_the_surveyed_non_lunar_entries() -> None:
+    expected = {
+        "ci_carbonaceous_chondrite",
+        "mars_global_mgs1",
+        "mars_basalt",
+        "mars_sulfate_rich",
+        "mars_phyllosilicate_clay",
+        "mars_perchlorate_rich",
+    }
+    flagged = {
+        key
+        for key, entry in FEEDSTOCKS.items()
+        if entry.get("fe_redox_split_unknown") is True
+    }
+
+    assert flagged == expected
+    for key in expected:
+        assert FEEDSTOCKS[key]["composition_basis"][
+            "fe_reporting_convention"
+        ] == "total Fe as FeO"

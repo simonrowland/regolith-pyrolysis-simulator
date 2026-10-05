@@ -288,12 +288,19 @@ def test_load_batch_preserves_non_melt_feedstock_inventory():
                     "SO3": 4.0,
                     "Cl": 1.0,
                     "ClO4": 0.5,
-                    "Fe": 6.0,
                     "Ni": 1.0,
                     "NiO": 1.2,
                     "ZrO2": 0.3,
                     "REE_oxides": 0.2,
                 },
+                "composition_basis": {
+                    "FeO": {"method": "synthetic assay", "source": "test"},
+                    "Fe2O3": {
+                        "method": "synthetic assay",
+                        "source": "test",
+                    },
+                },
+                "elemental_composition_wt_pct": {"Fe": 6.0},
                 "non_oxide_components": {
                     "S_wt_pct": [1.0, 3.0],
                 },
@@ -1351,7 +1358,7 @@ def test_declared_stage0_product_requires_matching_source_species():
         {
             "bad_declared_product": {
                 "label": "Bad declared product",
-                "composition_wt_pct": {"SiO2": 99.0, "Fe": 1.0},
+                "composition_wt_pct": {"SiO2": 99.0},
                 "declared_stage0_products": {"Ni_kg_per_tonne": 50.0},
             }
         }
@@ -1924,11 +1931,13 @@ def test_m_type_phosphorus_routes_to_drain_tap():
             "m_type": {
                 "label": "M type metal",
                 "composition_wt_pct": {
-                    "Fe": 90.0,
                     "Ni": 7.5,
                     "Co": 0.4,
                     "S": 1.25,
                     "P": 0.2,
+                },
+                "elemental_composition_wt_pct": {
+                    "Fe": 90.0,
                 },
             }
         }

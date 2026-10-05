@@ -10,6 +10,7 @@ from simulator.fe_redox import (
     kress91_fe3_over_sigma_fe,
     melt_mol_fractions_for_kress91,
 )
+from simulator.feedstock_composition import iron_oxide_values
 from simulator.state import MOLAR_MASS
 from simulator.terminal_product_taxonomy import (
     DEFAULT_TAXONOMY_PATH,
@@ -440,7 +441,8 @@ def _matches_constraints(
             return False
     minimum_fe = constraints.get("fe2o3_equivalent_min")
     if minimum_fe is not None:
-        total_fe = composition.get("Fe2O3", 0.0) + 1.1113 * composition.get("FeO", 0.0)
+        feo, fe2o3 = iron_oxide_values(composition)
+        total_fe = fe2o3 + 1.1113 * feo
         if total_fe < float(minimum_fe) - tolerance:
             return False
     return True
@@ -517,7 +519,8 @@ def _total_fe2o3_equivalent(
     composition: Mapping[str, float], model: Mapping[str, Any]
 ) -> float:
     factor = float(model.get("feo_to_fe2o3_factor", 1.1113))
-    return composition.get("Fe2O3", 0.0) + factor * composition.get("FeO", 0.0)
+    feo, fe2o3 = iron_oxide_values(composition)
+    return fe2o3 + factor * feo
 
 
 def _resolve_fe2_fraction(
@@ -530,8 +533,9 @@ def _resolve_fe2_fraction(
 ) -> tuple[float | None, str]:
     if explicit is not None:
         return max(0.0, min(1.0, float(explicit))), "provided"
-    feo_mol = composition.get("FeO", 0.0) / MOLAR_MASS["FeO"]
-    fe2o3_mol = composition.get("Fe2O3", 0.0) / MOLAR_MASS["Fe2O3"]
+    feo, fe2o3 = iron_oxide_values(composition)
+    feo_mol = feo / MOLAR_MASS["FeO"]
+    fe2o3_mol = fe2o3 / MOLAR_MASS["Fe2O3"]
     iron_atoms = feo_mol + 2.0 * fe2o3_mol
     if iron_atoms > 0.0:
         return feo_mol / iron_atoms, "ledger_speciation"

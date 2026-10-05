@@ -4289,6 +4289,34 @@ def test_additive_calc_returns_finite_non_negative_masses(client) -> None:
     assert all(math.isfinite(value) and value >= 0.0 for value in payload.values())
 
 
+def test_web_k_shuttle_uses_only_measured_feo(client, monkeypatch) -> None:
+    feedstocks = {
+            "measured_split": {
+                "composition_wt_pct": {"SiO2": 70.0, "FeO": 10.0, "Fe2O3": 20.0},
+                "composition_basis": {
+                    "FeO": {"method": "synthetic assay", "source": "test"},
+                    "Fe2O3": {
+                        "method": "synthetic assay",
+                        "source": "test",
+                    },
+                },
+            },
+        "ferrous_control": {
+            "composition_wt_pct": {"SiO2": 90.0, "FeO": 10.0},
+        },
+    }
+    monkeypatch.setattr(
+        web_routes,
+        "get_visible_feedstock",
+        lambda key, include_custom=True: feedstocks.get(key),
+    )
+
+    split_k = client.get("/api/additive-calc/measured_split?mass_kg=1000").get_json()["K"]
+    ferrous_k = client.get("/api/additive-calc/ferrous_control?mass_kg=1000").get_json()["K"]
+
+    assert split_k == ferrous_k
+
+
 def test_product_ledger_panel_has_ingots_glass_o2_volatiles_ceramic_and_mass_closure(
     client,
     tmp_path,

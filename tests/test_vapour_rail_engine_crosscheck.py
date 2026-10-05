@@ -14,6 +14,7 @@ from simulator.vapour_rail.engine_crosscheck import (
     _observation,
     build_crosscheck_report,
     divergence_label,
+    load_crosscheck_composition,
     render_crosscheck_markdown,
     run_engine_crosscheck,
     validate_fo2_grid,
@@ -26,6 +27,34 @@ COMPOSITION = CrosscheckComposition(
     composition_wt_pct={"SiO2": 90.0, "Na2O": 10.0},
     composition_mol={"SiO2": 9.0, "Na2O": 1.0},
 )
+
+
+def test_formula_to_mole_crosscheck_preserves_measured_ferric_split(tmp_path):
+    feedstocks = {
+        "synthetic_split": {
+            "composition_wt_pct": {"SiO2": 97.0, "FeO": 2.0, "Fe2O3": 1.0},
+            "composition_basis": {
+                "FeO": {"method": "wet chemistry", "source": "synthetic assay"},
+                "Fe2O3": {"method": "Mössbauer", "source": "synthetic assay"},
+            },
+        }
+    }
+    path = tmp_path / "feedstocks.yaml"
+    path.write_text(json.dumps(feedstocks))
+
+    resolved = load_crosscheck_composition(
+        "synthetic_split", feedstock_path=path
+    )
+    from simulator.core import MOLAR_MASS
+
+    assert resolved.composition_wt_pct["FeO"] == 2.0
+    assert resolved.composition_wt_pct["Fe2O3"] == 1.0
+    assert resolved.composition_mol["FeO"] == pytest.approx(
+        2.0 / float(MOLAR_MASS["FeO"]) * 1000.0
+    )
+    assert resolved.composition_mol["Fe2O3"] == pytest.approx(
+        1.0 / float(MOLAR_MASS["Fe2O3"]) * 1000.0
+    )
 
 
 class _FakeRailProvider:

@@ -376,13 +376,19 @@ from simulator.condensation_routing import (
 )
 from simulator.cost_ledger import CostImportContext, CostLedger
 from simulator.feedstock_guard import assert_feedstock_loadable
-from simulator.feedstock_composition import normalize_component_masses_kg
+from simulator.feedstock_composition import (
+    fe_metal,
+    iron_oxide_values,
+    normalize_component_masses_kg,
+    resolve_feedstock_composition,
+)
 from simulator.environment import DEFAULT_VACUUM_FLOOR_BAR, feedstock_body
 from simulator.fe_redox import (
     calphad_ferrous_feo_activity_diagnostic,
     feo_iw_log10_fO2_bar,
     feot_equivalent_wt_pct,
     floor_vacuum_pressure_bar,
+    intrinsic_melt_fO2,
     KRESS91_LIQUID_CALIBRATION_MIN_T_C,
     kress91_ln_fO2_temperature_delta,
     kress91_split,
@@ -1011,6 +1017,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         # evaluation classify a candidate that hit a real backend domain edge.
         self._last_backend_status = 'ok'
         self._backend_status_history: list[str] = []
+        self._feedstock_fe_redox_split_unknown = False
         self._last_backend_diagnostics: Dict[str, Any] = {}
         self._last_out_of_domain_diagnostics: Dict[str, Any] = {}
         self._engine_commissioning_steps: list[dict[str, Any]] = []
@@ -1471,6 +1478,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             self._stage0_carbonate_decomposition_specs = previous_carbonate_specs
             self._stage0_foulant_diagnostics = previous_foulant_diagnostics
             raise
+        self._feedstock_fe_redox_split_unknown = (
+            resolve_feedstock_composition(fs).fe_redox_split_unknown
+        )
 
         self._activated_additive_reagents = set()
         self.atom_ledger = self._new_atom_ledger()
@@ -5870,8 +5880,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
 
     def _ledger_ferric_fraction_diagnostic(self) -> Dict[str, Any]:
         melt_mol = self.atom_ledger.project_account_mol('process.cleaned_melt')
-        feo_mol = max(0.0, float(melt_mol.get('FeO', 0.0) or 0.0))
-        fe2o3_mol = max(0.0, float(melt_mol.get('Fe2O3', 0.0) or 0.0))
+        feo_mol, fe2o3_mol = iron_oxide_values(melt_mol)
         oxidized_fe_mol = feo_mol + 2.0 * fe2o3_mol
         threshold = float(FERRIC_DIVERGENCE_WARNING_THRESHOLD)
         if oxidized_fe_mol <= 0.0:
@@ -6818,10 +6827,6 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         if not math.isfinite(T_K) or T_K <= 0.0:
             raise ValueError('temperature_K must be finite and greater than zero')
         comp = self._melt_oxide_wt_pct()
-        feo = max(0.0, float(comp.get('FeO', 0.0)))
-        fe2o3 = max(0.0, float(comp.get('Fe2O3', 0.0)))
-        alkali = max(0.0, float(comp.get('Na2O', 0.0))) + max(
-            0.0, float(comp.get('K2O', 0.0)))
         # IW buffer fit: anchored at log10(fO2/bar) ~= -7.98 at 1873 K,
         # matching the Phase 1 contract's Kress91 basalt reference.
         # ★ THE FERRIC BRANCH BELOW IS INERT WHERE THIS IS ACTUALLY CALLED.
@@ -6883,14 +6888,10 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         # optimizer/sso-r-fe-redox-design.md. That replacement is
         # golden-affecting for sulfate feedstocks, so it is gated and
         # re-baselined there rather than swapped in here.
-        log_iw = -27215.0 / T_K + 6.57
-        redox_offset = 0.0
-        if feo > 0.0 and fe2o3 > 0.0:
-            redox_offset += 0.25 * math.log10(max(fe2o3 / feo, 1.0e-12))
-        redox_offset += min(0.15, alkali * 0.01)
-        return max(
-            math.log10(self._vacuum_floor_bar()),
-            min(0.0, log_iw + redox_offset),
+        return intrinsic_melt_fO2(
+            comp,
+            T_K,
+            vacuum_floor_bar=self._vacuum_floor_bar(),
         )
 
     def _compute_fe_redox_split_diagnostic(
@@ -9206,6 +9207,16 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
     def _record_equilibrium_status(self, result):
         """Record the per-call backend outcome and run the post-equilibrium
         SULFUR_SATURATION_GATE; returns ``result`` unchanged."""
+        if self._feedstock_fe_redox_split_unknown:
+            diagnostics = dict(getattr(result, 'diagnostics', {}) or {})
+            diagnostics['feedstock_iron_notice'] = {
+                'code': 'fe_redox_split_unknown',
+                'message': (
+                    'Iron was treated as all-ferrous using the existing FeO '
+                    'value because fe_redox_split_unknown is true.'
+                ),
+            }
+            result.diagnostics = diagnostics
         self._last_backend_status = getattr(result, 'status', 'ok')
         self._backend_status_history.append(str(self._last_backend_status))
         self._last_backend_diagnostics = dict(
@@ -10120,6 +10131,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         """Build raw, Stage 0, and cleaned melt inventories for a batch."""
         comp = feedstock.get('composition_wt_pct', {}) or {}
         raw = self._component_masses_from_wt_pct(comp, mass_kg)
+        metallic_fe_wt_pct = fe_metal(feedstock)
+        if metallic_fe_wt_pct is not None and metallic_fe_wt_pct > 0.0:
+            raw['Fe'] = raw.get('Fe', 0.0) + mass_kg * metallic_fe_wt_pct / 100.0
         declared_stage0_buckets = self._declared_stage0_product_buckets(
             feedstock, mass_kg)
 

@@ -30,6 +30,7 @@ from engines.magemin.domain import MAGEMinDomainGate
 import simulator.melt_backend.liquidus as liquidus_module
 from simulator.core import PyrolysisSimulator
 from simulator.melt_backend.base import LiquidFractionInvalidError, MeltCompositionError
+from simulator.feedstock_composition import FEOT_FROM_FE2O3
 from simulator.melt_backend.magemin import (
     COMPOSITION_PROJECTED,
     MAGEMIN_MODE_VECTOR_MASS_DEFICIT,
@@ -1282,10 +1283,7 @@ def test_magemin_feot_conversion_uses_iupac_2feo_mass():
     feot_numerator = 2 * feo_molar_mass
 
     assert feot_numerator == pytest.approx(143.688)
-    assert MAGEMinBackend._FEOT_FROM_FE2O3_MOLAR_MASS_G_PER_MOL == (
-        pytest.approx(feot_numerator)
-    )
-    assert MAGEMinBackend._FEOT_FROM_FE2O3_FACTOR == pytest.approx(
+    assert FEOT_FROM_FE2O3 == pytest.approx(
         feot_numerator / fe2o3_molar_mass
     )
 
@@ -1387,7 +1385,7 @@ def test_magemin_ig_bulk_vector_folds_fe2o3_to_feot():
     feot_index = MAGEMinBackend._IG_BULK_ORDER.index("FeOt")
     oxygen_index = MAGEMinBackend._IG_BULK_ORDER.index("O")
 
-    expected_feot = 10.0 + MAGEMinBackend._FEOT_FROM_FE2O3_FACTOR
+    expected_feot = 10.0 + FEOT_FROM_FE2O3
     assert vector[feot_index] == pytest.approx(expected_feot)
     assert vector[oxygen_index] == pytest.approx(
         MAGEMinBackend._EXCESS_O_FROM_FE2O3_FACTOR

@@ -31,6 +31,7 @@ from simulator.backends import (
     assert_stage0_subprocess_backend_safe,
     backend_resolution_status,
     is_spinel_rich_stage0_subprocess_feedstock,
+    _melts_major_oxide_sum,
     real_backend_feedstock_domain_reason,
     requires_stage0_subprocess,
     resolve_backend,
@@ -58,6 +59,16 @@ SPINEL_COMPOSITION_HANG_FEEDSTOCK_IDS = (
     "v_type_vesta_hed",
     "e_type_enstatite_aubrite",
 )
+
+
+def test_backend_major_oxide_sum_counts_measured_ferric_iron_once():
+    from simulator.feedstock_composition import total_fe
+
+    composition = {"SiO2": 40.0, "FeO": 0.0, "Fe2O3": 10.0}
+
+    assert _melts_major_oxide_sum(composition) == pytest.approx(
+        40.0 + total_fe(composition)
+    )
 NON_SPINEL_COMPOSITION_FAST_PATH_FEEDSTOCK_IDS = (
     "lunar_highland",
     "lunar_highlands_lhs1",

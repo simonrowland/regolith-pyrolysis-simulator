@@ -292,6 +292,20 @@ def test_step_hour_valid_feo_still_reduces():
     assert result["energy_kWh"] == pytest.approx(0.3)
 
 
+def test_step_hour_ignores_ferric_oxide_in_the_feo_only_route():
+    result = _legacy_model().step_hour(
+        MeltState(composition_kg={"FeO": 1.0, "Fe2O3": 1.0}),
+        voltage_V=3.0,
+        current_A=100.0,
+        T_C=1600.0,
+    )
+
+    assert result.get("reason_refused") is None
+    assert result["oxides_reduced_kg"].get("FeO", 0.0) > 0.0
+    assert result["oxides_reduced_kg"].get("Fe2O3", 0.0) == 0.0
+    assert result["oxides_produced_kg"] == {}
+
+
 def test_step_hour_zero_current_and_voltage_remain_idle():
     model = _legacy_model()
     melt = MeltState(composition_kg={"FeO": 1.0})

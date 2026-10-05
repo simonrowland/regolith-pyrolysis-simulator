@@ -35,6 +35,7 @@ from simulator.melt_backend.melt_envelope import (  # noqa: E402
     melt_extrapolation_diagnostic,
 )
 from simulator.melt_backend.vaporock import VapoRockBackend  # noqa: E402
+from simulator.fe_redox import intrinsic_melt_fO2  # noqa: E402
 from simulator.yaml_cache import load_cached_safe_yaml  # noqa: E402
 from simulator.optimize.canonical import (  # noqa: E402
     canonical_json_dumps,
@@ -798,23 +799,6 @@ def campaign_value(
         if key in configured:
             return configured[key], f"setpoints:{run_campaign}"
     return None, "none"
-
-
-def intrinsic_melt_fO2(composition_wt_pct: Mapping[str, float], temperature_k: float) -> float:
-    if temperature_k <= 0.0:
-        return -9.0
-    feo = max(0.0, float(composition_wt_pct.get("FeO", 0.0)))
-    fe2o3 = max(0.0, float(composition_wt_pct.get("Fe2O3", 0.0)))
-    alkali = max(0.0, float(composition_wt_pct.get("Na2O", 0.0))) + max(
-        0.0,
-        float(composition_wt_pct.get("K2O", 0.0)),
-    )
-    log_iw = -27215.0 / temperature_k + 6.57
-    redox_offset = 0.0
-    if feo > 0.0 and fe2o3 > 0.0:
-        redox_offset += 0.25 * math.log10(max(fe2o3 / feo, 1.0e-12))
-    redox_offset += min(0.15, alkali * 0.01)
-    return max(-9.0, min(0.0, log_iw + redox_offset))
 
 
 def resolve_profile_paths(values: Sequence[str]) -> list[Path]:

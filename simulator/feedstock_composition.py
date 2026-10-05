@@ -65,6 +65,11 @@ def resolve_feedstock_composition(
     if not isinstance(flag, bool):
         raise ValueError("fe_redox_split_unknown must be a boolean")
 
+    if "FeO_total" in composition:
+        raise ValueError(
+            "FeO_total is not a canonical feedstock oxide; use FeO with "
+            "fe_redox_split_unknown when the split is unknown"
+        )
     has_feo = "FeO" in composition
     has_fe2o3 = "Fe2O3" in composition
     if "Fe" in composition or "Fe0" in composition or "Fe_metal" in composition:
@@ -109,8 +114,13 @@ def resolve_feedstock_composition(
     elemental = feedstock.get("elemental_composition_wt_pct", {}) or {}
     if not isinstance(elemental, Mapping):
         raise ValueError("elemental_composition_wt_pct must be a mapping")
-    metal = _representative_number(
-        elemental.get("Fe"), "elemental_composition_wt_pct.Fe"
+    elemental_status = str(feedstock.get("elemental_composition_status", ""))
+    metal = (
+        None
+        if "cross_check_only" in elemental_status
+        else _representative_number(
+            elemental.get("Fe"), "elemental_composition_wt_pct.Fe"
+        )
     )
     feot = feot_equivalent_wt_pct(composition)
     if flag:
@@ -144,11 +154,21 @@ def iron_oxide_values(
 ) -> tuple[float, float]:
     """Read canonical FeO and Fe2O3 values through the iron owner."""
     composition = _composition_map(feedstock_or_composition)
-    feo = _representative_number(composition.get("FeO"), "composition_wt_pct.FeO")
-    fe2o3 = _representative_number(
-        composition.get("Fe2O3"), "composition_wt_pct.Fe2O3"
-    )
+    raw_feo = composition.get("FeO")
+    raw_fe2o3 = composition.get("Fe2O3")
+    feo = _representative_number(raw_feo, "composition_wt_pct.FeO")
+    fe2o3 = _representative_number(raw_fe2o3, "composition_wt_pct.Fe2O3")
+    if "FeO" in composition and feo is None:
+        raise ValueError("invalid feedstock declaration composition_wt_pct.FeO")
+    if "Fe2O3" in composition and fe2o3 is None:
+        raise ValueError("invalid feedstock declaration composition_wt_pct.Fe2O3")
     return feo or 0.0, fe2o3 or 0.0
+
+
+def feot_equivalent_moles(feedstock_or_composition: Mapping[str, Any]) -> float:
+    """Return total Fe moles represented on the FeO-equivalent mole basis."""
+    feo_moles, fe2o3_moles = iron_oxide_values(feedstock_or_composition)
+    return feo_moles + 2.0 * fe2o3_moles
 
 
 def measured_feo(feedstock: Mapping[str, Any]) -> float | None:
@@ -251,6 +271,11 @@ def normalized_feedstock_component_masses_kg(
                 is not None
                 and kg > 0.0
             }
+        )
+    iron_metal_wt_pct = fe_metal(feedstock)
+    if iron_metal_wt_pct is not None and iron_metal_wt_pct > 0.0:
+        raw_masses["Fe"] = raw_masses.get("Fe", 0.0) + (
+            batch_mass_kg * iron_metal_wt_pct / 100.0
         )
     for section_name in ("non_oxide_components", "bulk_additions", "structural_water"):
         section = feedstock.get(section_name, {}) or {}

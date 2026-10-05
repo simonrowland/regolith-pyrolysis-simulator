@@ -55,6 +55,7 @@ from simulator.backends import (
 )
 from simulator.config import ConfigBundle, load_config_bundle
 from simulator.fidelity_vocabulary import canonicalize_fidelity_emission
+from simulator.feedstock_composition import iron_oxide_values
 from simulator.campaigns import CampaignManager, CampaignPressureSetpointRefusal
 from simulator.accounting import AccountingQueries
 from simulator.accounting.ledger_api import LedgerAPI
@@ -2973,8 +2974,7 @@ def _c0_char_diagnostic(
 
     c0_end = c0_snapshots[-1]
     melt_feo_kg = max(
-        0.0,
-        float(c0_end.inventory.melt_oxide_kg.get("FeO", 0.0) or 0.0),
+        0.0, iron_oxide_values(c0_end.inventory.melt_oxide_kg)[0]
     )
     melt_feo_mol = melt_feo_kg / feo_molar_mass_kg_per_mol
     feo_reducible_mol = min(absorbed_residual_co2_mol, melt_feo_mol)

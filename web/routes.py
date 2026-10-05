@@ -52,7 +52,10 @@ from simulator.fidelity_vocabulary import (
     UnknownFidelityVocabularyTokenError,
     canonicalize_fidelity_emission,
 )
-from simulator.feedstock_composition import normalized_feedstock_component_masses_kg
+from simulator.feedstock_composition import (
+    iron_oxide_values,
+    normalized_feedstock_component_masses_kg,
+)
 from simulator.furnace_materials import (
     PROXY_FURNACE_GROUNDING_TIERS,
     load_furnace_materials,
@@ -5392,7 +5395,7 @@ def additive_calc(key):
     comp = normalized_feedstock_component_masses_kg(fs, mass_kg)
 
     # Absolute kg of each oxide in the batch
-    FeO_kg = comp.get('FeO', 0.0)
+    FeO_kg, _fe2o3_kg = iron_oxide_values(comp)
     TiO2_kg = comp.get('TiO2', 0.0)
     Cr2O3_kg = comp.get('Cr2O3', 0.0)
     Al2O3_kg = comp.get('Al2O3', 0.0)
