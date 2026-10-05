@@ -1,12 +1,12 @@
 # Battery v2.1 migration report
 
-rows in: 47795
-records out (observations): 121619
-works: 267
-experiments: 3556
-queue size: 77434
+rows in: 47822
+records out (observations): 121808
+works: 268
+experiments: 3557
+queue size: 77488
 identical-payload dedupe aliases: 342
-metadata files: 39
+metadata files: 43
 index sources: 271
 hard issues: 3637
 
@@ -16,7 +16,7 @@ hard issues: 3637
 |---|---:|---:|
 | citations | 147 | 270 (mismatch) |
 | doi_works | 56 | 128 (mismatch) |
-| no_doi_works | 91 | 139 (mismatch) |
+| no_doi_works | 91 | 140 (mismatch) |
 | admission_statuses | 374 | 1180 (mismatch) |
 | supersedes | 422 | 650 (mismatch) |
 | series | 60 | 597 (mismatch) |
@@ -15091,6 +15091,37 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/compilations/pankratz-1987-usbm-b689/source/image-verified-fixture-p0352-p0352.json` | 0 | 0 | 0 |
 | `data/literature/compilations/pankratz-1987-usbm-b689/source/image-verified-fixture.json` | 0 | 0 | 0 |
 | `data/literature/compilations/pankratz-1987-usbm-b689/source/sidecar.yaml` | 0 | 0 | 0 |
+| `data/literature/compilations/pankratz-1994-usbm-b696/census.json` | 0 | 0 | 0 |
+| `data/literature/compilations/pankratz-1994-usbm-b696/manifest.yaml` | 0 | 0 | 0 |
+| `data/literature/compilations/pankratz-1994-usbm-b696/records/page-0006.json` | 1 | 7 | 2 |
+| `data/literature/compilations/pankratz-1994-usbm-b696/records/page-0115.json` | 1 | 7 | 2 |
+| `data/literature/compilations/pankratz-1994-usbm-b696/records/page-0191.json` | 1 | 7 | 2 |
+| `data/literature/compilations/pankratz-1994-usbm-b696/records/page-0204.json` | 1 | 7 | 2 |
+| `data/literature/compilations/pankratz-1994-usbm-b696/records/page-0273.json` | 1 | 7 | 2 |
+| `data/literature/compilations/pankratz-1994-usbm-b696/records/page-0275.json` | 1 | 7 | 2 |
+| `data/literature/compilations/pankratz-1994-usbm-b696/records/page-0278.json` | 1 | 7 | 2 |
+| `data/literature/compilations/pankratz-1994-usbm-b696/records/page-0319.json` | 1 | 7 | 2 |
+| `data/literature/compilations/pankratz-1994-usbm-b696/records/page-0327.json` | 1 | 7 | 2 |
+| `data/literature/compilations/pankratz-1994-usbm-b696/records/page-0330.json` | 1 | 7 | 2 |
+| `data/literature/compilations/pankratz-1994-usbm-b696/records/page-0352.json` | 1 | 7 | 2 |
+| `data/literature/compilations/pankratz-1994-usbm-b696/records/page-0356.json` | 1 | 7 | 2 |
+| `data/literature/compilations/pankratz-1994-usbm-b696/records/page-0360.json` | 1 | 7 | 2 |
+| `data/literature/compilations/pankratz-1994-usbm-b696/records/page-0410.json` | 1 | 7 | 2 |
+| `data/literature/compilations/pankratz-1994-usbm-b696/records/page-0455.json` | 1 | 7 | 2 |
+| `data/literature/compilations/pankratz-1994-usbm-b696/records/page-0629.json` | 1 | 7 | 2 |
+| `data/literature/compilations/pankratz-1994-usbm-b696/records/page-0705.json` | 1 | 7 | 2 |
+| `data/literature/compilations/pankratz-1994-usbm-b696/records/page-0733.json` | 1 | 7 | 2 |
+| `data/literature/compilations/pankratz-1994-usbm-b696/records/page-0769.json` | 1 | 7 | 2 |
+| `data/literature/compilations/pankratz-1994-usbm-b696/records/page-0772.json` | 1 | 7 | 2 |
+| `data/literature/compilations/pankratz-1994-usbm-b696/records/page-0803.json` | 1 | 7 | 2 |
+| `data/literature/compilations/pankratz-1994-usbm-b696/records/page-0804.json` | 1 | 7 | 2 |
+| `data/literature/compilations/pankratz-1994-usbm-b696/records/page-0837.json` | 1 | 7 | 2 |
+| `data/literature/compilations/pankratz-1994-usbm-b696/records/page-0858.json` | 1 | 7 | 2 |
+| `data/literature/compilations/pankratz-1994-usbm-b696/records/page-0910.json` | 1 | 7 | 2 |
+| `data/literature/compilations/pankratz-1994-usbm-b696/records/page-0920.json` | 1 | 7 | 2 |
+| `data/literature/compilations/pankratz-1994-usbm-b696/records/page-0924.json` | 1 | 7 | 2 |
+| `data/literature/compilations/pankratz-1994-usbm-b696/source/image-verified-fixture.json` | 0 | 0 | 0 |
+| `data/literature/compilations/pankratz-1994-usbm-b696/source/sidecar.yaml` | 0 | 0 | 0 |
 | `data/literature/compilations/robie-hemingway-1995-usgs-b2131/auxiliary/atomic-weight-001.json` | 1 | 1 | 4 |
 | `data/literature/compilations/robie-hemingway-1995-usgs-b2131/auxiliary/atomic-weight-002.json` | 1 | 1 | 4 |
 | `data/literature/compilations/robie-hemingway-1995-usgs-b2131/auxiliary/atomic-weight-003.json` | 1 | 1 | 4 |
@@ -18278,8 +18309,8 @@ MODEL_DERIVED / MEASURED_REDUCED keep their mapped evidence class. Parent pointe
 
 ## Advisory issue census
 
-advisory issues: 217361
+advisory issues: 218171
 
 | kind | count |
 |---|---:|
-| `identity_incomplete` | 217361 |
+| `identity_incomplete` | 218171 |
