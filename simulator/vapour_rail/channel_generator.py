@@ -13,13 +13,18 @@ from typing import Any, Mapping
 
 from simulator.accounting.formulas import parse_formula
 from simulator.reference_data.janaf import feedstock_element_symbols
+from simulator.vapour_rail.catalog import _formula_atoms
 from simulator.vapour_rail.source_rail import (
     STANDARD_PRESSURE_PA,
     SourceRail,
     SourceRailRecord,
     load_source_rail,
 )
-from simulator.vapour_rail.stoich import derive_stoich_oxide_per_vapor, strip_phase
+from simulator.vapour_rail.stoich import (
+    balance_oxide_evaporation,
+    derive_stoich_oxide_per_vapor,
+    strip_phase,
+)
 from simulator.yaml_cache import load_cached_safe_yaml
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -129,49 +134,6 @@ def _is_metaborate(formula: str) -> bool:
 def _foreign_atoms(element: str, formula: str) -> frozenset[str]:
     atoms = parse_formula(formula).elements
     return frozenset(symbol for symbol in atoms if symbol not in {element, "O"})
-
-
-def _balance_oxide_reaction(
-    parent_oxide: str, vapor_formula: str
-) -> dict[str, Any]:
-    parent = parse_formula(parent_oxide)
-    vapor = parse_formula(vapor_formula)
-    metals = [symbol for symbol in vapor.elements if symbol != "O"]
-    if len(metals) != 1:
-        raise ValueError(f"{vapor_formula}: expected one metal")
-    metal = metals[0]
-    parent_metal = float(parent.elements.get(metal, 0.0))
-    vapor_metal = float(vapor.elements.get(metal, 0.0))
-    if parent_metal <= 0.0 or vapor_metal <= 0.0:
-        raise ValueError(f"{parent_oxide} does not supply {metal} for {vapor_formula}")
-    nu_parent = vapor_metal / parent_metal
-    nu_vapor = 1.0
-    parent_oxygen = float(parent.elements.get("O", 0.0))
-    vapor_oxygen = float(vapor.elements.get("O", 0.0))
-    nu_o2 = (parent_oxygen * nu_parent - vapor_oxygen * nu_vapor) / 2.0
-    reactants: list[dict[str, float | str]] = [
-        {"formula": f"{parent_oxide}(l)", "stoichiometry": nu_parent}
-    ]
-    products: list[dict[str, float | str]] = [
-        {"formula": f"{vapor_formula}(g)", "stoichiometry": nu_vapor}
-    ]
-    if nu_o2 > 0.0:
-        products.append({"formula": "O2(g)", "stoichiometry": nu_o2})
-    elif nu_o2 < 0.0:
-        reactants.append({"formula": "O2(g)", "stoichiometry": -nu_o2})
-    return {
-        "id": f"{parent_oxide}_l_to_{vapor_formula}_g",
-        "reactants": reactants,
-        "products": products,
-        "activity_input": {
-            "component_id": f"{parent_oxide}(l)",
-            "standard_state": {
-                "convention": "raoultian_pure_endmember",
-                "phase": "liquid",
-                "reference_pressure_bar": 1.0,
-            },
-        },
-    }
 
 
 def _intersection_band(
@@ -340,7 +302,13 @@ def generate_element_channels(
             )
             continue
         try:
-            reaction = _balance_oxide_reaction(parent_oxide, strip_phase(formula))
+            bare = strip_phase(formula)
+            reaction = balance_oxide_evaporation(
+                parent_oxide,
+                bare,
+                parent_atoms=_formula_atoms(parent_oxide),
+                vapor_atoms=_formula_atoms(bare),
+            )
         except ValueError as exc:
             gaps.append(
                 CoverageGap(

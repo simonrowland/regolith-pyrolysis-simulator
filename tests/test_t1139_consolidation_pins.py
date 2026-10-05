@@ -12,7 +12,8 @@ import pytest
 
 from simulator.battery.generators.janaf import janaf_fusion_energy
 from simulator.diagnostic_helpers.species_rail_differential import cea_delta_fG_kJ_mol
-from simulator.vapour_rail.channel_generator import _balance_oxide_reaction
+from simulator.vapour_rail.catalog import _formula_atoms
+from simulator.vapour_rail.stoich import balance_oxide_evaporation
 
 
 @pytest.mark.parametrize(
@@ -44,7 +45,12 @@ def test_janaf_fusion_energy_pin(oxide, temperature_K, delta_g, melting_K) -> No
 
 
 def test_ga2o3_to_ga_balance_pin() -> None:
-    reaction = _balance_oxide_reaction("Ga2O3", "Ga")
+    reaction = balance_oxide_evaporation(
+        "Ga2O3",
+        "Ga",
+        parent_atoms=_formula_atoms("Ga2O3"),
+        vapor_atoms=_formula_atoms("Ga"),
+    )
     assert reaction["reactants"] == [
         {"formula": "Ga2O3(l)", "stoichiometry": 0.5},
     ]

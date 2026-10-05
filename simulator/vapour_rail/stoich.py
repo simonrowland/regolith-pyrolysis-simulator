@@ -54,6 +54,56 @@ CATALOG_DERIVED_STOICH_SPECIES = frozenset(
 )
 
 
+def balance_oxide_evaporation(
+    parent_oxide: str,
+    vapor_formula: str,
+    *,
+    parent_atoms: Mapping[str, float],
+    vapor_atoms: Mapping[str, float],
+) -> dict[str, Any]:
+    """Balance parent(l) → vapor(g) ± O2(g) for one metal.
+
+    Atom counts are ``catalog._formula_atoms`` results. This module does not
+    import catalog: catalog already imports stoich.
+    """
+    metals = [symbol for symbol in vapor_atoms if symbol != "O"]
+    if len(metals) != 1:
+        raise ValueError(f"{vapor_formula}: expected one metal")
+    metal = metals[0]
+    parent_metal = float(parent_atoms.get(metal, 0.0))
+    vapor_metal = float(vapor_atoms.get(metal, 0.0))
+    if parent_metal <= 0.0 or vapor_metal <= 0.0:
+        raise ValueError(f"{parent_oxide} does not supply {metal} for {vapor_formula}")
+    nu_parent = vapor_metal / parent_metal
+    nu_vapor = 1.0
+    parent_oxygen = float(parent_atoms.get("O", 0.0))
+    vapor_oxygen = float(vapor_atoms.get("O", 0.0))
+    nu_o2 = (parent_oxygen * nu_parent - vapor_oxygen * nu_vapor) / 2.0
+    reactants: list[dict[str, float | str]] = [
+        {"formula": f"{parent_oxide}(l)", "stoichiometry": nu_parent}
+    ]
+    products: list[dict[str, float | str]] = [
+        {"formula": f"{vapor_formula}(g)", "stoichiometry": nu_vapor}
+    ]
+    if nu_o2 > 0.0:
+        products.append({"formula": "O2(g)", "stoichiometry": nu_o2})
+    elif nu_o2 < 0.0:
+        reactants.append({"formula": "O2(g)", "stoichiometry": -nu_o2})
+    return {
+        "id": f"{parent_oxide}_l_to_{vapor_formula}_g",
+        "reactants": reactants,
+        "products": products,
+        "activity_input": {
+            "component_id": f"{parent_oxide}(l)",
+            "standard_state": {
+                "convention": "raoultian_pure_endmember",
+                "phase": "liquid",
+                "reference_pressure_bar": 1.0,
+            },
+        },
+    }
+
+
 def strip_phase(formula: str) -> str:
     text = str(formula).strip()
     if text.endswith(")") and "(" in text:
