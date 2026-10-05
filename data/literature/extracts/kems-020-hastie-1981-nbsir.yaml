@@ -486,6 +486,11 @@ species:
       units: log10 P(K)/atm coefficients as published
       values:
         quantity: log10_P_K_atm_empirical_fit
+        composition_role:
+          value: initial_charge_only
+          locator: {page: 25, published_page: 25, pdf_page_index: 31, table: '2', note: footnote a to the System column}
+          quote: Initial compositions, given in weight percent (wt.%).
+          note: Every Table 2 system composition is the initial charge; the K-pressure fits describe the vaporizing (depleted) melt.
         equation_as_printed: log P (atm) = A - B/T + C + D - E
         illite_A: 6.286
         method_class: measured_direct
@@ -821,6 +826,11 @@ species:
       units: log10 P(K)/atm coefficients as published
       values:
         quantity: published_K_pressure_fit_table
+        composition_role:
+          value: initial_charge_only
+          locator: {page: 25, published_page: 25, pdf_page_index: 31, table: '2', note: footnote a to the System column}
+          quote: Initial compositions, given in weight percent (wt.%).
+          note: Every Table 2 system composition is the initial charge; the K-pressure fits describe the vaporizing (depleted) melt.
         method_class: model_derived
         equation_as_printed: log P (atm) = A - B/T + C + D - E
         rows:
