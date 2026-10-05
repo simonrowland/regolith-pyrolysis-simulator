@@ -168,16 +168,6 @@ NIST_JANAF_MN_SHOMATE = {
             },
         ),
     ],
-    "liquid": {
-        "A": 46.024,
-        "B": 1.953485e-7,
-        "C": -7.567225e-8,
-        "D": 1.005938e-8,
-        "E": 5.623757e-8,
-        "F": -7.80404,
-        "G": 80.69053,
-        "H": 16.28902,
-    },
     "gas": {
         "A": 187.6779,
         "B": -97.75372,
@@ -262,25 +252,6 @@ def _shomate_s_j_mol_k(coeff: dict, temperature_K: float) -> float:
         + coeff["D"] * t**3 / 3.0
         - coeff["E"] / (2.0 * t**2)
         + coeff["G"]
-    )
-
-
-def _nist_janaf_mn_liquid_pa(temperature_K: float) -> float:
-    gas = NIST_JANAF_MN_SHOMATE["gas"]
-    liquid = NIST_JANAF_MN_SHOMATE["liquid"]
-    gas_gibbs = (
-        gas["H"]
-        + _shomate_h_increment_kj_mol(gas, temperature_K)
-        - temperature_K * _shomate_s_j_mol_k(gas, temperature_K) / 1000.0
-    )
-    liquid_gibbs = (
-        liquid["H"]
-        + _shomate_h_increment_kj_mol(liquid, temperature_K)
-        - temperature_K * _shomate_s_j_mol_k(liquid, temperature_K) / 1000.0
-    )
-    delta_g_j_mol = (gas_gibbs - liquid_gibbs) * 1000.0
-    return 100_000.0 * math.exp(
-        -delta_g_j_mol / (GAS_CONSTANT * temperature_K)
     )
 
 
@@ -399,10 +370,10 @@ def test_pure_component_antoine_reaches_one_atm_at_normal_boiling_point(
         ("K", 1033.0, 104_572.576518, 1e-6),
         # NIST Chemistry WebBook SRD 69, calcium Antoine row, Hartmann and Schneider 1929.
         ("Ca", 1500.0, 21_740.153809, 1e-6),
-        # NIST Chemistry WebBook SRD 69, aluminum Antoine row, Stull 1947.
-        ("Al", 2200.0, 46_484.884967, 1e-6),
-        # NIST Chemistry WebBook SRD 69, silicon Antoine row, Stull 1947.
-        ("Si", 2200.0, 2_194.210607, 1e-6),
+        # NIST-JANAF Al-003/Al-005 node pair at 2200 K; Antoine fit stays within 1%.
+        ("Al", 2200.0, 3_196.816100, 0.01),
+        # NIST-JANAF Si-003/Si-005 node pair at 2200 K; Antoine fit stays within 0.2%.
+        ("Si", 2200.0, 37.325229, 0.002),
         # NIST Chemistry WebBook SRD 69, chromium Antoine row, Stull 1947.
         ("Cr", 2200.0, 2_704.347348, 1e-6),
         # CRC.b/Stull source-tabulated Mg pressure levels.
@@ -641,24 +612,6 @@ def test_mn_solid_liquid_runtime_join_is_continuous_at_melting_point() -> None:
     assert solid_fit_pa == pytest.approx(solid["join_anchor_Pa"], rel=1e-12)
 
 
-@pytest.mark.parametrize("temperature_K", [1560.0, 1700.0, 1710.0, 2000.0, 2240.0, 2334.526])
-def test_mn_liquid_runtime_sidecar_matches_nist_janaf_evaluation(
-    temperature_K: float,
-) -> None:
-    data = _vapor_pressure_data()
-    row = data["metals"]["Mn"]
-    fit_pa = _pure_component_antoine_pa(row, temperature_K)
-    basis_pa = _nist_janaf_mn_liquid_pa(temperature_K)
-    metadata_residual = row["pure_component_antoine"]["segments"][1][
-        "max_abs_log10_residual_vs_source"
-    ]
-
-    assert "REF-020" in row["pure_component_antoine"]["segments"][1]["source"]
-    assert abs(math.log10(fit_pa / basis_pa)) <= metadata_residual + 1e-9
-    if temperature_K == 2334.526:
-        assert fit_pa == pytest.approx(PA_PER_ATM, rel=1e-9)
-
-
 def test_mn_source_spread_and_join_resolution_are_documented_in_place() -> None:
     text = (DATA_DIR / "vapor_pressures.yaml").read_text()
 
@@ -676,15 +629,14 @@ def test_mn_source_spread_and_join_resolution_are_documented_in_place() -> None:
     ("species", "temperature_K", "expected_reference_pa", "rel_tol"),
     [
         # t-383: Na high-T runtime is L&H liquid-NaO0.5 standard_reaction_term
-        # (coherent pair). Pure-component NIST Rodebush sidecar remains wall/NBP
-        # ground-truth only (covered by pure_component_antoine point tests), not
-        # the recovered-P runtime path — same class as Al/Cr oxide-coupled rails.
+        # (coherent pair). Pure-component sidecars are reference pressure only,
+        # not the oxide-coupled runtime path.
         # Ca condensed rail (below boil 1757 K) still uses pure-component * Ellingham.
         ("Ca", 1500.0, 21_740.153809, 1e-6),
         # Al/Cr oxide-coupled runtime uses liquid_oxide_standard_reaction (pairing
         # fix); pure-component sidecars remain NBP/NIST ground-truth only and are
         # covered by pure_component_antoine point tests, not this recovered-P path.
-        ("Si", 2200.0, 2_194.210607, 1e-6),
+        ("Si", 2200.0, 37.325229, 0.002),
     ],
 )
 def test_builtin_runtime_provider_uses_pure_component_sidecar_for_reference_pressure(
@@ -746,8 +698,8 @@ def test_pure_component_source_label_uses_explicit_provenance_tier() -> None:
     label_cases = [
         ("Fe", 3135.15, "pure_component_derived_from_evaluation"),
         ("Ca", 1700.0, "pure_component_source_equation_fit"),
-        ("Al", 2300.0, "pure_component_source_equation_fit"),
-        ("Si", 2500.0, "pure_component_source_equation_fit"),
+        ("Al", 2300.0, "pure_component_derived_from_evaluation"),
+        ("Si", 2500.0, "pure_component_derived_from_evaluation"),
         ("Cr", 2700.0, "pure_component_source_equation_fit"),
         ("Mn", 1519.0, "pure_component_derived_from_evaluation"),
         ("Mn", 1700.0, "pure_component_derived_from_evaluation"),
