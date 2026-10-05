@@ -125,6 +125,7 @@ def _petthermotools_call_arguments(model_name: str | None):
     return backend, calls[0]
 
 
+# Code selections pinned from base 05b6309d30cfed84d5e2ecd0467106d5702ce628.
 @pytest.mark.parametrize(
     ('model_name', 'expected_code'),
     [
@@ -152,7 +153,7 @@ def test_petthermotools_blank_and_none_preserve_base_model_keywords() -> None:
         DEFAULT_ALPHAMELTS_MODEL
     )
 
-    # Base 05b6309d3 passed _model unchanged in the worker payload.
+    # Base 05b6309d30cfed84d5e2ecd0467106d5702ce628 passed _model unchanged.
     assert blank_call[1]['kwargs']['Model'] == ''
     assert none_call[1]['kwargs']['Model'] == 'None'
     assert default_call[1]['kwargs']['Model'] == DEFAULT_ALPHAMELTS_MODEL
@@ -309,7 +310,9 @@ def test_petthermotools_model_keyword_preserves_base_payload_bytes(
     operation,
     api_name,
 ) -> None:
-    # Base 05b6309d3 passed backend._model directly: blank was "" and None
+    # Base 05b6309d30cfed84d5e2ecd0467106d5702ce628
+    # passed _model directly:
+    # blank was "" and None
     # was "None" on every PetThermoTools API path.
     backend = AlphaMELTSBackend(model_name=model_name)
     backend._mode = 'python_api'

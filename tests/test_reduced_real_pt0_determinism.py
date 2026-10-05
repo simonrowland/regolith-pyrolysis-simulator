@@ -727,7 +727,8 @@ def test_python_api_accepted_replay_key_hashes_remain_base_bytes(
     model: str,
     expected_hash: str,
 ) -> None:
-    # Hashes captured by the review probe at base 05b6309d3.
+    # Hashes captured by the review probe at base
+    # 05b6309d30cfed84d5e2ecd0467106d5702ce628.
     key, _authority = _alphamelts_pt0_identity(model, mode="python_api")
 
     assert hashlib.sha256(rrd.canonical_json_bytes(key)).hexdigest() == expected_hash
