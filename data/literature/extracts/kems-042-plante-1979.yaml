@@ -50,7 +50,7 @@ fidelity_samples:
     field: po2_over_pK_as_published
     value: 0.226
     locator:
-      published_page: 279
+      published_page: 280
       equation: 'P_O2 = 0.226 P_K'
   - species: K2O
     observable: partial_pressure
@@ -185,7 +185,7 @@ experiments:
     buffer:
       state: {tag: unknown, reason: not_published}
       locator:
-        page: 279
+        page: 280
         equation: 'P_O2 = 0.226 P_K'
         note: >-
           Author oxygen is stoichiometric from dissociative vaporization,
@@ -26074,6 +26074,16 @@ species:
             table: '2'
             note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_s1123_r004_quoted
+      reason: >-
+        source_internally_inconsistent: Series 1123 Table 2 prints 24.46 wt%
+        K2O with P_K=2.64E-6 atm at 1469 K. Table 3 eq. (6) is
+        log10(P_K/atm)=4.721-15624/T+9.32N^2, where N=x(K2O). Using the
+        printed 24.46 wt% gives N=(24.46/94.196)/((24.46/94.196)+
+        (75.54/60.0843))=0.171185, so T=1469 K predicts log10(P_K/atm)=
+        -5.64169 and P_K=2.282E-6 atm versus the printed 2.64E-6 atm. Inverting
+        the printed pressure gives N=0.18999 or 26.89 wt% K2O, but this fit is
+        not a corrected cell; the neighboring printed 26.48 and 26.40 wt%
+        suggest the isolated 24.46 is likely about 26.4-26.5 wt%.
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
       derivation:
@@ -27044,6 +27054,13 @@ species:
             table: '2'
             note: 'Table 2 first row gives the K2Si2O5 charge as 43.94 wt% K2O and 56.06 wt% SiO2; the running Table 2 compositions remain on observations.'
     - observation_id: plante1979_table2_s1123_r014_quoted
+      reason: >-
+        source_internally_inconsistent: Series 1123 Table 2 prints P_K=1.67E-7
+        atm at 1451 K and 24.18 wt% K2O. Table 3 eq. (6) is
+        log10(P_K/atm)=4.721-15624/T+9.32N^2, where N=x(K2O). Using
+        N=(24.18/94.196)/((24.18/94.196)+(75.82/60.0843))=0.169037 and
+        T=1451 K gives log10(P_K/atm)=-5.78044 and P_K=1.6579E-6 atm, about
+        ten times the printed value.
       experiment: k2o-sio2-effusion-series
       derived_from: ["tables:kems-042-plante-1979"]
       derivation:

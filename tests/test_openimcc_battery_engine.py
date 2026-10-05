@@ -1131,10 +1131,11 @@ summary = next(
     row for row in headline_rows(residuals, context=context, engines=engines)
     if row["rail"] == "vapour" and row["engine"] == Engine.OPENIMCC.value
 )
-assert summary["n_score_eligible"] == 162
-assert summary["n_inside_band"] == 112
+# b-xxx: two Plante rows flagged source_internally_inconsistent (printed misprints) leave the headline
+assert summary["n_score_eligible"] == 160
+assert summary["n_inside_band"] == 111
 assert abs(float(summary["median_dex"]) - 0.0748) < 0.00005
-assert abs(float(summary["rms_dex"]) - 0.1617) < 0.00005
+assert abs(float(summary["rms_dex"]) - 0.1405) < 0.00005
 print(json.dumps({"headline": summary, "lineage": "independent"}))
 '''
     env = {
@@ -1154,10 +1155,11 @@ print(json.dumps({"headline": summary, "lineage": "independent"}))
     )
     assert completed.returncode == 0, completed.stderr
     result = json.loads(completed.stdout.strip().splitlines()[-1])
-    assert result["headline"]["n_score_eligible"] == 162
-    assert result["headline"]["n_inside_band"] == 112
+    # b-xxx: two Plante rows flagged source_internally_inconsistent (printed misprints) leave the headline
+    assert result["headline"]["n_score_eligible"] == 160
+    assert result["headline"]["n_inside_band"] == 111
     assert float(result["headline"]["median_dex"]) == pytest.approx(0.0748, abs=0.00005)
-    assert float(result["headline"]["rms_dex"]) == pytest.approx(0.1617, abs=0.00005)
+    assert float(result["headline"]["rms_dex"]) == pytest.approx(0.1405, abs=0.00005)
     assert result["lineage"] == "independent"
 
 
@@ -1435,11 +1437,12 @@ def test_plante_solved_effusion_uses_the_prediction_engine_notice() -> None:
         if row["rail"] == "vapour"
     }
     openimcc = summary[Engine.OPENIMCC.value]
-    assert openimcc["n_score_eligible"] == 162
-    assert openimcc["n_inside_band"] == 112
+    # b-xxx: two Plante rows flagged source_internally_inconsistent (printed misprints) leave the headline
+    assert openimcc["n_score_eligible"] == 160
+    assert openimcc["n_inside_band"] == 111
     assert float(openimcc["band_width_dex"]) == pytest.approx(0.1461, abs=0.00005)
     assert float(openimcc["median_dex"]) == pytest.approx(0.0748, abs=0.00005)
-    assert float(openimcc["rms_dex"]) == pytest.approx(0.1617, abs=0.00005)
+    assert float(openimcc["rms_dex"]) == pytest.approx(0.1405, abs=0.00005)
 
     solved_openimcc_notice = next(
         notice
