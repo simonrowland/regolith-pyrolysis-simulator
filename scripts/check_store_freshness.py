@@ -56,6 +56,18 @@ CODE_INPUTS = (
 )
 
 
+# Migrate-input commits that are PROVEN store-neutral: a full regen on a tree
+# containing them leaves every STORE_OUTPUT byte-identical, so no regen commit
+# can exist to follow them, and they would read as STALE forever. Each entry
+# needs that receipt (regen run, no store diff). Short shas, 9 characters,
+# matching the keys stale_input_commits() emits.
+#   1b78b5697, 574800443, 149df2858: bench payload and ledger/sticking changes
+#     not consumed by battery_migrate or build_index (R17).
+STORE_NEUTRAL_INPUT_COMMITS = frozenset({
+    "1b78b5697", "574800443", "149df2858",
+})
+
+
 def _git(*args: str) -> str:
     return subprocess.run(
         ["git", *args], cwd=ROOT, capture_output=True, text=True, check=True
@@ -118,6 +130,29 @@ def _untraced_extracts(head: str) -> list[str]:
     )
 
 
+def stale_input_commits(head: str, last_store: str) -> dict[str, list[str]]:
+    """Migrate-input commits after the last store-output commit, keyed
+    "<sha9> <subject>", minus the acknowledged STORE_NEUTRAL_INPUT_COMMITS."""
+    stale: dict[str, list[str]] = {}
+    log = _git(
+        "log", "--format=%H%x00%s", "--name-only", f"{last_store}..{head}", "--",
+        "data/literature", "simulator/battery", *CODE_INPUTS,
+    )
+    commit: str | None = None
+    subject = ""
+    for line in log.splitlines():
+        if "\x00" in line:
+            commit, subject = line.split("\x00", 1)
+        elif (
+            line.strip()
+            and commit is not None
+            and commit[:9] not in STORE_NEUTRAL_INPUT_COMMITS
+            and _is_input(line.strip())
+        ):
+            stale.setdefault(f"{commit[:9]} {subject}", []).append(line.strip())
+    return stale
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     parser.add_argument("--head", default="HEAD", help="ref to inspect (default: HEAD)")
@@ -129,18 +164,7 @@ def main(argv: list[str] | None = None) -> int:
         print("no commit touches the derived store; nothing to check against")
         return 1
 
-    stale: dict[str, list[str]] = {}
-    log = _git(
-        "log", "--format=%H%x00%s", "--name-only", f"{last_store}..{head}", "--",
-        "data/literature", "simulator/battery", *CODE_INPUTS,
-    )
-    commit: str | None = None
-    subject = ""
-    for line in log.splitlines():
-        if "\x00" in line:
-            commit, subject = line.split("\x00", 1)
-        elif line.strip() and commit is not None and _is_input(line.strip()):
-            stale.setdefault(f"{commit[:9]} {subject}", []).append(line.strip())
+    stale = stale_input_commits(head, last_store)
 
     untraced = _untraced_extracts(head)
     short = _git("log", "-1", "--format=%h %ad %s", "--date=short", last_store).strip()

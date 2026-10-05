@@ -116,24 +116,7 @@ def test_committed_store_has_no_stale_migrate_input_commits() -> None:
         "log", "-1", "--format=%H", head, "--", *freshness.STORE_OUTPUTS
     ).strip()
     assert last_store, "no store-output commit found"
-    log = _git(
-        "log",
-        "--format=%H%x00%s",
-        "--name-only",
-        f"{last_store}..{head}",
-        "--",
-        "data/literature",
-        "simulator/battery",
-        *freshness.CODE_INPUTS,
-    )
-    stale: dict[str, list[str]] = {}
-    commit: str | None = None
-    subject = ""
-    for line in log.splitlines():
-        if "\x00" in line:
-            commit, subject = line.split("\x00", 1)
-        elif line.strip() and commit is not None and freshness._is_input(line.strip()):
-            stale.setdefault(f"{commit[:9]} {subject}", []).append(line.strip())
+    stale = freshness.stale_input_commits(head, last_store)
     assert not stale, (
         "store is STALE w.r.t. migrate inputs; regenerate with "
         "scripts/battery_migrate.py + build_index --write-store-summary:\n"
@@ -201,23 +184,6 @@ def test_mutation_stale_tip_is_flagged_by_freshness_stale_half() -> None:
         "log", "-1", "--format=%H", head, "--", *freshness.STORE_OUTPUTS
     ).strip()
     assert last_store
-    log = _git(
-        "log",
-        "--format=%H%x00%s",
-        "--name-only",
-        f"{last_store}..{head}",
-        "--",
-        "data/literature",
-        "simulator/battery",
-        *freshness.CODE_INPUTS,
-    )
-    stale: dict[str, list[str]] = {}
-    commit: str | None = None
-    subject = ""
-    for line in log.splitlines():
-        if "\x00" in line:
-            commit, subject = line.split("\x00", 1)
-        elif line.strip() and commit is not None and freshness._is_input(line.strip()):
-            stale.setdefault(f"{commit[:9]} {subject}", []).append(line.strip())
+    stale = freshness.stale_input_commits(head, last_store)
     assert stale, "expected STALE_TIP to have post-regen migrate-input commits"
     assert any("d4f91337f" in k for k in stale), stale

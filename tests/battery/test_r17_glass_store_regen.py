@@ -32,9 +32,6 @@ JANAF_STORE = (
 STALE_TIP = "841954ffb^"
 FRESHNESS_STALE_TIP = "c2ba15805^"
 
-# These post-c2ba15805 inputs are proven store-neutral: the bench payload and
-# ledger/sticking changes are not consumed by battery_migrate or build_index.
-STORE_NEUTRAL_INPUT_COMMITS = {"1b78b5697", "574800443", "149df2858"}
 
 _MG_CP_ID = "nist-janaf-4th:Mg-013:cp:phase-window:whole"
 _W_CP_ID = "nist-janaf-4th:W-003:cp:phase-window:whole"
@@ -157,8 +154,10 @@ def test_committed_store_has_no_stale_migrate_input_commits() -> None:
     """Reject unacknowledged post-regen migrate-input commits."""
     if _git("rev-parse", "--is-shallow-repository").strip() == "true":
         pytest.skip("git_history_unavailable: freshness requires a full checkout")
-    _require_git_history(*sorted(STORE_NEUTRAL_INPUT_COMMITS))
-    for revision in STORE_NEUTRAL_INPUT_COMMITS:
+    freshness = _load_freshness()
+    neutral = freshness.STORE_NEUTRAL_INPUT_COMMITS
+    _require_git_history(*sorted(neutral))
+    for revision in neutral:
         if subprocess.run(
             ["git", "merge-base", "--is-ancestor", revision, "HEAD"],
             cwd=REPO_ROOT,
@@ -170,33 +169,13 @@ def test_committed_store_has_no_stale_migrate_input_commits() -> None:
                 "git_history_unavailable: acknowledged store-neutral input "
                 f"{revision} is not in HEAD history"
             )
-    freshness = _load_freshness()
     head = _git("rev-parse", "HEAD").strip()
     last_store = _git(
         "log", "-1", "--format=%H", head, "--", *freshness.STORE_OUTPUTS
     ).strip()
     assert last_store, "no store-output commit found"
-    log = _git(
-        "log",
-        "--format=%H%x00%s",
-        "--name-only",
-        f"{last_store}..{head}",
-        "--",
-        "data/literature",
-        "simulator/battery",
-        *freshness.CODE_INPUTS,
-    )
-    stale: dict[str, list[str]] = {}
-    commit: str | None = None
-    subject = ""
-    for line in log.splitlines():
-        if "\x00" in line:
-            commit, subject = line.split("\x00", 1)
-        elif line.strip() and commit is not None and freshness._is_input(line.strip()):
-            stale.setdefault(f"{commit[:9]} {subject}", []).append(line.strip())
-    unexpected = {
-        key.split(" ", 1)[0] for key in stale
-    } - STORE_NEUTRAL_INPUT_COMMITS
+    stale = freshness.stale_input_commits(head, last_store)
+    unexpected = {key.split(" ", 1)[0] for key in stale}
     assert not unexpected, f"unacknowledged post-regen migrate inputs: {unexpected}"
 
 
@@ -261,23 +240,6 @@ def test_mutation_stale_tip_is_flagged_by_freshness_stale_half() -> None:
         "log", "-1", "--format=%H", head, "--", *freshness.STORE_OUTPUTS
     ).strip()
     assert last_store
-    log = _git(
-        "log",
-        "--format=%H%x00%s",
-        "--name-only",
-        f"{last_store}..{head}",
-        "--",
-        "data/literature",
-        "simulator/battery",
-        *freshness.CODE_INPUTS,
-    )
-    stale: dict[str, list[str]] = {}
-    commit: str | None = None
-    subject = ""
-    for line in log.splitlines():
-        if "\x00" in line:
-            commit, subject = line.split("\x00", 1)
-        elif line.strip() and commit is not None and freshness._is_input(line.strip()):
-            stale.setdefault(f"{commit[:9]} {subject}", []).append(line.strip())
+    stale = freshness.stale_input_commits(head, last_store)
     assert stale, "expected STALE_TIP to have post-regen migrate-input commits"
     assert any("950c88655" in k for k in stale), stale
