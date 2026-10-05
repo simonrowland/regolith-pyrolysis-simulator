@@ -63,8 +63,12 @@ CODE_INPUTS = (
 # matching the keys stale_input_commits() emits.
 #   1b78b5697, 574800443, 149df2858: bench payload and ledger/sticking changes
 #     not consumed by battery_migrate or build_index (R17).
+#   9bb0a22ce, 1d254d51e, b8be6d576: kems-041 misprint notes and compilation
+#     status wording (t-1145, t-1146); regen at their merge produced no store
+#     diff on the pregate host and on the landing gate.
 STORE_NEUTRAL_INPUT_COMMITS = frozenset({
     "1b78b5697", "574800443", "149df2858",
+    "9bb0a22ce", "1d254d51e", "b8be6d576",
 })
 
 
