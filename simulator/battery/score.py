@@ -6379,7 +6379,6 @@ def _render_score_report_from_payloads_legacy(
                 f"{row['band_width_dex'] or '—'} | {row['rms_over_band'] or '—'} | "
                 f"{row['n_no_band']} | {rate_s} |"
             )
-    lines.extend(["", *aggregate.condition_hull_lines()])
     lines.extend(
         [
             "",
@@ -6404,6 +6403,7 @@ def _render_score_report_from_payloads_legacy(
                 f"| {row['stratum']} | {row['rail']} | {row['engine']} | "
                 f"{row['n']} | {row['median_dex'] or '—'} | {row['rms_dex'] or '—'} |"
             )
+    lines.extend(["", *aggregate.condition_hull_lines()])
     lines.extend(
         [
             "",
@@ -6614,19 +6614,21 @@ class _ConditionHull:
             self.composition[key] = self._widen(self.composition.get(key), amount)
 
     @staticmethod
-    def _span(bounds: tuple[Decimal, Decimal] | None, n: int) -> str:
+    def _range(bounds: tuple[Decimal, Decimal]) -> str:
+        # Display only: six significant figures of the stored extremes.
+        low, high = (f"{float(value):.6g}" for value in bounds)
+        return low if low == high else f"{low}–{high}"
+
+    @classmethod
+    def _span(cls, bounds: tuple[Decimal, Decimal] | None, n: int) -> str:
         if bounds is None:
             return "— (0)"
-        low, high = (_dec_token(value) for value in bounds)
-        text = low if low == high else f"{low}–{high}"
-        return f"{text} ({n})"
+        return f"{cls._range(bounds)} ({n})"
 
     def cells(self) -> tuple[str, str, str]:
         by_basis: dict[str, list[str]] = {}
         for (basis, component), bounds in sorted(self.composition.items()):
-            low, high = (_dec_token(value) for value in bounds)
-            span = low if low == high else f"{low}–{high}"
-            by_basis.setdefault(basis, []).append(f"{component} {span}")
+            by_basis.setdefault(basis, []).append(f"{component} {self._range(bounds)}")
         composition = (
             "; ".join(f"{basis}: {', '.join(parts)}" for basis, parts in by_basis.items())
             or "—"
@@ -6647,16 +6649,22 @@ def _condition_hull_lines(
         "## Condition hull per rail × engine",
         "",
         "Min–max of the stored (T, P, composition) of the numeric rows behind "
-        "each headline statistic (the n scored column). T and total pressure "
-        "are the reference row's own (a compilation cell's printed T); "
-        "composition is the row's stated composition per amount basis. "
-        "Nothing is filled in: bracketed counts are rows carrying a value. "
-        "Presentation only; no residual or statistic reads this table.",
+        "each per rail × engine statistic: the measured and compilation "
+        "headlines (the n scored column) and each flagged stratum (its n). "
+        "T and total pressure are the reference row's own (a compilation "
+        "cell's printed T); composition is the row's stated composition per "
+        "amount basis. Nothing is filled in: bracketed counts are rows "
+        "carrying a value. Six significant figures. Presentation only; no "
+        "residual or statistic reads this table.",
         "",
-        "| tier | rail | engine | n scored | T K (n) | total P Pa (n) | composition (n) |",
+        "| tier / stratum | rail | engine | n | T K (n) | total P Pa (n) | composition (n) |",
         "|---|---|---|---:|---|---|---|",
     ]
-    rows = [(key, hull) for key, hull in sorted(hulls.items()) if hull.n]
+    order = {"measured": 0, "compilation": 1}
+    rows = sorted(
+        ((key, hull) for key, hull in hulls.items() if hull.n),
+        key=lambda item: (order.get(item[0][0], 2), item[0]),
+    )
     if not rows:
         lines.append("| (none) | — | — | 0 | — | — | — |")
     for (tier, rail, engine), hull in rows:
@@ -7301,6 +7309,9 @@ def _apply_family_band_to_payload(
 def flagged_stratum_payloads(
     rows: Iterable[Mapping[str, object]],
     engines: Sequence[Engine],
+    *,
+    hulls: dict[tuple[str, str, str], _ConditionHull] | None = None,
+    observations: Mapping[str, Observation] | None = None,
 ) -> list[dict[str, object]]:
     groups: dict[tuple[str, str, str], list[Decimal]] = {}
     counts: dict[tuple[str, str, str], int] = {}
@@ -7321,6 +7332,13 @@ def flagged_stratum_payloads(
         for stratum in _flagged_payload_strata(row):
             key = (stratum, rail, engine)
             counts[key] = counts.get(key, 0) + 1
+            if hulls is not None:
+                from simulator.battery.compilation_tier import reference_observation
+
+                reference = str(row.get("reference") or "")
+                hulls.setdefault(
+                    (f"flagged:{stratum}", rail, engine), _ConditionHull()
+                ).add(reference, reference_observation(observations or {}, reference))
             dex = numeric.get("value") if numeric.get("operation") == MetricOperation.DEX.value else None
             if dex is None:
                 continue
@@ -7962,6 +7980,9 @@ class _ScorePayloadAccumulator:
             for stratum in flags:
                 key = (stratum, rail, engine)
                 self.flagged_counts[key] += 1
+                self.headline_hulls.setdefault(
+                    (f"flagged:{stratum}", rail, engine), _ConditionHull()
+                ).add(reference, metadata.observation)
                 if dex is not None and numeric_value is not None:
                     self.flagged_values[key].append(numeric_value)
         exclusions_tuple = tuple(exclusions or ())
@@ -8301,8 +8322,6 @@ def render_score_report_from_payloads(
             f"{row['n_inside_band']} | {rms} | {med} | {med_abs} | {band} | {ratio} | "
             f"{row['n_no_band']} | {rate_s} |"
         )
-    if hulls is not None:
-        lines.extend(["", *_condition_hull_lines(hulls)])
     lines.extend(
         [
             "",
@@ -8315,7 +8334,9 @@ def render_score_report_from_payloads(
             "|---|---|---|---:|---:|---:|",
         ]
     )
-    flagged_rows = flagged_stratum_payloads(rows, engines)
+    flagged_rows = flagged_stratum_payloads(
+        rows, engines, hulls=hulls, observations=observations
+    )
     if not flagged_rows:
         lines.append("| (none) | — | — | 0 | — | — |")
     else:
@@ -8324,6 +8345,8 @@ def render_score_report_from_payloads(
                 f"| {row['stratum']} | {row['rail']} | {row['engine']} | "
                 f"{row['n']} | {row['median_dex'] or '—'} | {row['rms_dex'] or '—'} |"
             )
+    if hulls is not None:
+        lines.extend(["", *_condition_hull_lines(hulls)])
     if compilation_lines:
         lines.extend(["", *compilation_lines])
     lines.extend(

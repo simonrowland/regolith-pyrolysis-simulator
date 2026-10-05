@@ -271,9 +271,9 @@ def _hull_section(report: str) -> list[str]:
 def test_streamed_report_prints_condition_hull_per_rail_and_engine() -> None:
     context, residuals = hull_fixture()
     rows = _hull_section(_report(context, residuals))
-    assert rows[0].startswith("| tier | rail | engine | n scored |")
+    assert rows[0].startswith("| tier / stratum | rail | engine | n |")
     # Refused act-refused (T 2500 K, P 1 Pa, CaO 0.99) is not behind a statistic.
-    assert rows[1:] == [HULL_COMPILATION, HULL_MELT, HULL_VAPOUR]
+    assert rows[1:] == [HULL_MELT, HULL_VAPOUR, HULL_COMPILATION]
 
 
 def test_report_only_render_prints_the_same_measured_hull() -> None:
@@ -306,6 +306,63 @@ def test_hull_counts_missing_conditions_and_never_imputes() -> None:
     hull.add("na-1", context.observations["na-1"])
     assert (hull.n, hull.n_t, hull.n_p, hull.n_composition) == (2, 1, 0, 0)
     assert hull.cells() == ("1100 (1)", "— (0)", "— (0)")
+    hull.add("act-1", context.observations["act-1"])
+    hull.add("act-3", context.observations["act-3"])
+    assert hull.cells() == (
+        "1100–1923 (3)",
+        "50000–100000 (2)",
+        "mole_fraction: CaO 0.3–0.4, SiO2 0.6–0.7 (2)",
+    )
+
+
+def test_flagged_stratum_gets_its_own_hull_and_leaves_headline_alone() -> None:
+    from simulator.battery.enums import NoticeKind, Quantity
+    from simulator.battery.records import Notice
+    from simulator.battery.score import (
+        FLAGGED_STRATUM_CELL_MATERIAL_INFERRED,
+        render_score_report_from_payloads,
+        residual_to_plain,
+    )
+
+    context, residuals = hull_fixture()
+    flag = Notice(
+        kind=NoticeKind.CELL_MATERIAL_INFERRED,
+        affected_quantities=(Quantity.ACTIVITY,),
+        reason="fixture cell material inferred",
+        origin="fixture",
+    )
+    flagged = tuple(
+        replace(r, notices=(flag,)) if r.reference == "act-3" else r for r in residuals
+    )
+    stratum = (
+        f"| flagged:{FLAGGED_STRATUM_CELL_MATERIAL_INFERRED} | melt_activity | "
+        "internal-analytical | 1 | 1923 (1) | 50000 (1) | "
+        "mole_fraction: CaO 0.3, SiO2 0.7 (1) |"
+    )
+    streamed = _hull_section(_report(context, flagged))
+    assert stratum in streamed
+    # The flagged row leaves the measured headline, so it leaves its hull too.
+    assert (
+        "| measured | melt_activity | internal-analytical | 2 | 1773–1873 (2) | "
+        "100000 (2) | mole_fraction: CaO 0.4–0.55, SiO2 0.45–0.6 (2) |"
+    ) in streamed
+    payloads = []
+    for residual in flagged:
+        payload = residual_to_plain(residual)
+        if residual.numeric is not None:
+            payload["numeric"]["value"] = str(residual.numeric.value)
+        payloads.append(payload)
+    report_only = _hull_section(
+        render_score_report_from_payloads(
+            payloads,
+            engines=(ENGINE,),
+            hostname="test",
+            store_stamp=STAMP,
+            observations=context.observations,
+            origins=context.origins,
+        )
+    )
+    assert stratum in report_only
 
 
 def test_compilation_point_temperature_reads_only_printed_cell_ids() -> None:
