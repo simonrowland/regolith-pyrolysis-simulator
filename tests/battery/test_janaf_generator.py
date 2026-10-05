@@ -2023,14 +2023,14 @@ def test_janaf_store_is_element_sharded() -> None:
     assert all(
         path.name.startswith("janaf-") and path.name.endswith(".yaml") for path in paths
     )
-    # Distinct formation-reference schedules split the tabulations into 23,845 observations.
+    # Green 23,845 + 18 restored formation-reference schedule splits = 23,863.
     n = compilation_shard_observation_count(ROOT, paths, CURRENT_STORE_DIR)
-    assert n == 23845
+    assert n == 23863
 
 
 def test_janaf_store_keeps_circularity_and_compilation_class() -> None:
     observations = _load_janaf_store_observations()
-    assert len(observations) == 23845
+    assert len(observations) == 23863
     warning = generator.CIRCULARITY_WARNING
     for observation in observations:
         evidence = (observation.get("evidence") or {}).get("class") or {}
