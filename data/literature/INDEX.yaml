@@ -9,13 +9,13 @@ scan:
   - hunt_ids column empty; --hunt-json not provided
   corpus_root: /Users/simonrowland/Repos/regolith-corpus
 counts:
-  sources: 286
-  extracts: 284
+  sources: 287
+  extracts: 285
   pdfs_present_in_worktree: 0
   extracts_with_private_locators: 60
   pdfs_tracked_99_kems_langmuir: 0
   pdfs_without_extract: 0
-  extracts_without_pdf: 284
+  extracts_without_pdf: 285
   alias_groups_needing_resolution: 41
 gaps:
   pdfs_without_extract: []
@@ -263,6 +263,7 @@ gaps:
   - shornikov-1998-silica-vaporization
   - shornikov-2000-cao-silica-vaporization
   - shornikov-2007-cao-aluminosilicate-melts
+  - shornikov-2008-redox-oxide-evaporation
   - shornikov-2021-mgo-feo-silicate
   - shornikov-2025-saratov-alkali-evaporation
   - slag-001-banya-1993
@@ -14936,6 +14937,64 @@ sources:
       last_stage: extracted
       date: '2026-10-04'
     commit: 1ce8e2fc3db83962928fccf9b9d4c72fdb8b699e
+- source_id: shornikov-2008-redox-oxide-evaporation
+  aliases: []
+  citation: Shornikov, S. I. (2008). Effect of Redox Conditions on the Evaporation of Oxide Melts in the
+    CaO–MgO–FeO–Al2O3–SiO2 System. Geochemistry International, 46(7), 724–729.
+  doi: 10.1134/S0016702908070069
+  report_number: null
+  identifier: 10.1134/S0016702908070069
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
+  extracts:
+  - path: data/literature/extracts/shornikov-2008-redox-oxide-evaporation.yaml
+    review_status: draft
+    rows: 29
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/shornikov-2008-redox-oxide-evaporation/shornikov-2008-redox-oxide-evaporation.pdf
+      present: true
+      sha256: 8c2cc9af061b5d4163b120611933ae0a4fc2b0e52ce4783dae9cf2e333e87811
+      matches_simulator: null
+    sidecar:
+      path: raw/shornikov-2008-redox-oxide-evaporation/sidecar.yaml
+      present: true
+    text:
+      path: text/shornikov-2008-redox-oxide-evaporation
+      exists: false
+      file_count: 0
+    tables:
+      path: tables/shornikov-2008-redox-oxide-evaporation
+      exists: true
+      file_count: 4
+    extract:
+      path: extracts/shornikov-2008-redox-oxide-evaporation.yaml
+      present: true
+      matches_simulator: true
+    ledger:
+      path: ledger/shornikov-2008-redox-oxide-evaporation.yaml
+      present: true
+      error: null
+      last_stage: extracted
+      date: '2026-10-04'
+    commit: d937549d195ad330cdedbe4fa2b55d8b028a2ea7
 - source_id: shornikov-2021-mgo-feo-silicate
   aliases: []
   citation: Shornikov, S. I., Ivanova, M. A., and Minaeva, M. S. (2021), Thermodynamic Properties of the
