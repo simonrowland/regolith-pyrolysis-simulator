@@ -1150,7 +1150,7 @@ species:
             published_page: 3711
             note: No numeric oxygen fugacity is printed for this row.
   O:
-    context:
+    observations:
     - observation_id: stolyarova_1991_printed_equilibrium_1
       type: thermodynamic_example
       locator:
@@ -1164,7 +1164,6 @@ species:
         quantity: printed_equilibrium
         method_class: method_only
         equation_as_printed: (WO3) = (WO2) + (O)
-    observations:
     - observation_id: stolyarova_1991_o_atomic_partial_pressure_1933k_equilibrium
       type: partial_pressure
       locator:
@@ -1186,7 +1185,6 @@ species:
         admission_status: admitted
         method: calculated-from-equilibrium-1
         method_as_printed: Calculated from equilibrium (1)
-        derivation: P_O calculated from the printed equilibrium (1) column; it is not a direct measured partial-pressure series.
         composition_component: SiO2
         composition_basis: mole fraction
         temperature_K: 1933.0
@@ -1299,12 +1297,7 @@ species:
       derived_from:
       - stolyarova_1991_printed_equilibrium_1
       derivation:
-        relation: Printed P_O column calculated from the WO2/WO3/O equilibrium (1); no numeric WO2/WO3 inputs are separately printed.
-        inputs:
-        - stolyarova_1991_printed_equilibrium_1
-        output_unit: Pa
-      inference:
-        relation: Printed P_O column calculated from the WO2/WO3/O equilibrium (1); no numeric WO2/WO3 inputs are separately printed.
+        relation: 'P_O is calculated from measured WO2 and WO3 partial pressures and the equilibrium constant for the printed gas reaction (WO3) = (WO2) + (O), Eq. [1]; numerical WO2/WO3 input pressures are not tabulated.'
         inputs:
         - stolyarova_1991_printed_equilibrium_1
         output_unit: Pa
@@ -1328,11 +1321,11 @@ species:
       units: dimensionless activity as printed
       values:
         quantity: activity
-        method_class: derived
+        method_class: measured_reduced
+        evidence_class: measured_reduced
         admission_status: admitted
         method: ion-comparison
         calculation_method: Eq. [2]
-        derivation: Activity calculated from measured ion-current/partial-pressure comparison; it is not a raw pressure cell.
         composition_component: SiO2
         composition_basis: mole fraction
         temperature_K: 1933.0
@@ -1416,11 +1409,7 @@ species:
       derived_from: &id001
       - stolyarova_1991_cao_partial_pressure_1993k_ion_comparison
       derivation:
-        relation: Activity calculated from measured ion-current/partial-pressure comparison; it is not a raw pressure cell.
-        inputs: *id001
-        output_unit: dimensionless activity
-      inference:
-        relation: Activity calculated from measured ion-current/partial-pressure comparison; it is not a raw pressure cell.
+        relation: 'Eq. [2a]: a_CaO,T = P_CaO/P°_CaO = I_CaO+/I°_CaO+; the activity is obtained by comparing measured CaO+ ion currents over the melt and individual CaO oxide.'
         inputs: *id001
         output_unit: dimensionless activity
     - observation_id: stolyarova_1991_cao_activity_eq5_1933k
@@ -1553,11 +1542,11 @@ species:
       units: dimensionless activity as printed
       values:
         quantity: activity
-        method_class: derived
+        method_class: measured_reduced
+        evidence_class: measured_reduced
         admission_status: admitted
         method: belton-fruehan
         calculation_method: Eq. [7]
-        derivation: Belton-Fruehan integration of the measured ion-current ratio, as printed.
         composition_component: SiO2
         composition_basis: mole fraction
         temperature_K: 1933.0
@@ -1637,14 +1626,10 @@ species:
         quantity_as_published: a_CaO
         formula: CaO
       derived_from: &id003
-      - stolyarova_1991_cao_partial_pressure_1993k_ion_comparison
+      - stolyarova_1991_ca_partial_pressure_1993k_ion_comparison
       - stolyarova_1991_sio_partial_pressure_1933k_ion_comparison
       derivation:
-        relation: Belton-Fruehan integration of the measured ion-current ratio, as printed.
-        inputs: *id003
-        output_unit: dimensionless activity
-      inference:
-        relation: Belton-Fruehan integration of the measured ion-current ratio, as printed.
+        relation: 'Eq. [7]: ln a_CaO = -∫ x_SiO2 d ln(I_SiO+/I_Ca+); Belton–Fruehan integration of the measured ion-current ratio.'
         inputs: *id003
         output_unit: dimensionless activity
   SiO2:
@@ -1685,11 +1670,11 @@ species:
       units: dimensionless activity as printed
       values:
         quantity: activity
-        method_class: derived
+        method_class: measured_reduced
+        evidence_class: measured_reduced
         admission_status: admitted
         method: ion-comparison
         calculation_method: Eq. [3]
-        derivation: Activity calculated from measured ion currents and WO3/WO2 ratios; it is not a raw pressure.
         composition_component: SiO2
         composition_basis: mole fraction
         temperature_K: 1933.0
@@ -1774,11 +1759,7 @@ species:
       - stolyarova_1991_sio2_gas_partial_pressure_1933k_ion_comparison
       - stolyarova_1991_sio_partial_pressure_1933k_ion_comparison
       derivation:
-        relation: Activity calculated from measured ion currents and WO3/WO2 ratios; it is not a raw pressure.
-        inputs: *id004
-        output_unit: dimensionless activity
-      inference:
-        relation: Activity calculated from measured ion currents and WO3/WO2 ratios; it is not a raw pressure.
+        relation: 'Eq. [3]: a_SiO2 = I_SiO+(I_WO3+/I_WO2+)/[I_SiO+°(I_WO3+/I_WO2+)°]; activity from the measured SiO+ and WO3+/WO2+ ion-current ratios over the melt and individual silica.'
         inputs: *id004
         output_unit: dimensionless activity
     - observation_id: stolyarova_1991_sio2_activity_eq6_1933k
@@ -1912,12 +1893,12 @@ species:
       units: dimensionless activity as printed
       values:
         quantity: activity
-        method_class: derived
+        method_class: measured_reduced
+        evidence_class: measured_reduced
         admission_status: admitted
         method: belton-fruehan
         calculation_method: Eq. [8]*
         footnote_as_printed: '* Evaluated values.'
-        derivation: Belton-Fruehan integration of the measured ion-current ratio, as printed.
         composition_component: SiO2
         composition_basis: mole fraction
         temperature_K: 1933.0
@@ -1997,14 +1978,10 @@ species:
         quantity_as_published: a_SiO2
         formula: SiO2
       derived_from: &id006
-      - stolyarova_1991_sio2_gas_partial_pressure_1933k_ion_comparison
+      - stolyarova_1991_ca_partial_pressure_1993k_ion_comparison
       - stolyarova_1991_sio_partial_pressure_1933k_ion_comparison
       derivation:
-        relation: Belton-Fruehan integration of the measured ion-current ratio, as printed.
-        inputs: *id006
-        output_unit: dimensionless activity
-      inference:
-        relation: Belton-Fruehan integration of the measured ion-current ratio, as printed.
+        relation: 'Eq. [8]*: ln a_SiO2 = ∫ x_CaO d ln(I_SiO+/I_Ca+); Belton–Fruehan integration of the measured ion-current ratio.'
         inputs: *id006
         output_unit: dimensionless activity
     - observation_id: stolyarova_1991_gibbs_integral_energy_fig3
