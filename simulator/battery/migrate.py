@@ -293,6 +293,7 @@ METHOD_CLASS_MAP: dict[str, EvidenceClass] = {
     "compilation_calculated_table": EvidenceClass.COMPILATION_ASSESSED,
     "compilation_derived": EvidenceClass.COMPILATION_ASSESSED,
     "compilation_foreign": EvidenceClass.COMPILATION_ASSESSED,
+    "compiled_melt_activity": EvidenceClass.COMPILATION_ASSESSED,
     "qualitative_review_compilation": EvidenceClass.COMPILATION_ASSESSED,
     "review_compilation": EvidenceClass.COMPILATION_ASSESSED,
     "secondary_compilation": EvidenceClass.COMPILATION_ASSESSED,
@@ -405,6 +406,8 @@ QUANTITY_ALIASES = {
     "raoultian_activity": Quantity.ACTIVITY,
     "activity_coefficient": Quantity.ACTIVITY_COEFFICIENT,
     "activity_coefficient_this_work": Quantity.ACTIVITY_COEFFICIENT,
+    "activity_coefficient_range": Quantity.ACTIVITY_COEFFICIENT,
+    "activity_coefficient_relation": Quantity.ACTIVITY_COEFFICIENT,
     "apparent_gamma_K2O": Quantity.ACTIVITY_COEFFICIENT,
     "henrian_activity_coefficient": Quantity.ACTIVITY_COEFFICIENT,
     "wagner_interaction_parameter": Quantity.INTERACTION_PARAMETER,
@@ -7513,7 +7516,12 @@ def _interval_selection(
     reason: str | None = None,
 ) -> SourceSelection:
     return SourceSelection(
-        value=Value(ValueKind.INTERVAL, interval_low=lo, interval_high=hi),
+        value=Value(
+            ValueKind.INTERVAL,
+            interval_low=lo,
+            interval_high=hi,
+            approximate=bool(payload.get("approximate")),
+        ),
         field_name=field_name,
         unit_trail="as_published",
         reason=reason,
@@ -7883,6 +7891,70 @@ def select_declared_source(
         )
 
     q_token = _quantity_token(declared)
+    if q_token is Quantity.ACTIVITY_COEFFICIENT_TEMPERATURE_FIT:
+        a_printed = payload.get("A_printed")
+        b_printed = payload.get("B_printed")
+        a = _as_dec_or_none(str(a_printed).replace(",", "").replace("−", "-"))
+        b = _as_dec_or_none(str(b_printed).replace(",", "").replace("−", "-"))
+        if a is not None and b is not None:
+            note = str(payload.get("notes_printed") or "")
+            numeric_temperature = r"([0-9][0-9,]*(?:\.[0-9]+)?)"
+            match = re.search(
+                rf"{numeric_temperature}\s*[–−-]\s*{numeric_temperature}\s*K\b",
+                note,
+                re.IGNORECASE,
+            )
+            validity_range: list[int | float] | None = None
+            if match is not None:
+                lo = Decimal(match.group(1).replace(",", ""))
+                hi = Decimal(match.group(2).replace(",", ""))
+                validity_range = [
+                    int(lo) if lo == lo.to_integral_value() else float(lo),
+                    int(hi) if hi == hi.to_integral_value() else float(hi),
+                ]
+            domain = {
+                "input_unit": "K",
+                "validity_range_K": validity_range,
+                "standard_state_as_printed": (
+                    "liquid standard state"
+                    if re.search(r"liquid standard state", note, re.IGNORECASE)
+                    else "not stated in Table 2 row"
+                ),
+                "notes_as_printed": note,
+                "A_as_printed": str(a_printed),
+                "B_as_printed": str(b_printed),
+            }
+            return SourceSelection(
+                value=Value(
+                    ValueKind.EXPRESSION,
+                    expression_text="log10 γ = A + B/T",
+                    expression_parameters=(("A", a), ("B", b)),
+                    expression_domain=json.dumps(
+                        domain, ensure_ascii=False, separators=(",", ":")
+                    ),
+                ),
+                field_name="A_printed/B_printed",
+                unit_trail="dimensionless",
+                condition_ranges=condition_ranges,
+            )
+    if q_token is Quantity.ACTIVITY_COEFFICIENT and isinstance(
+        payload.get("relation_parameters"), Mapping
+    ):
+        raw_parameters = payload["relation_parameters"]
+        slope = _as_dec_or_none(raw_parameters.get("slope"))
+        intercept = _as_dec_or_none(raw_parameters.get("intercept"))
+        if slope is not None and intercept is not None:
+            return SourceSelection(
+                value=Value(
+                    ValueKind.EXPRESSION,
+                    expression_text=str(payload.get("activity_relation_as_published") or ""),
+                    expression_parameters=(("slope", slope), ("intercept", intercept)),
+                    expression_domain="log10 activity-coefficient relation",
+                ),
+                field_name="activity_relation_as_published",
+                unit_trail="as_published",
+                condition_ranges=condition_ranges,
+            )
     if q_token is None and payload.get("semantics") in {"bound_not_point_ordering", "bound_not_point"}:
         reason = (declared.reason if isinstance(declared, State) else None) or (
             f"unsupported quantity {payload['quantity']!r}" if payload.get("quantity")
@@ -11457,7 +11529,7 @@ class Migrator:
             t_payload.setdefault("T_range_K", obs.get("T_range_K"))
         t_sel = select_declared_source(AXIS_TEMPERATURE_K, None, t_payload)
         t_known = t_sel.amount if t_sel.available else None
-        if t_sel.condition_ranges and t_known is None:
+        if t_sel.condition_ranges and t_known is None and q_token is not Quantity.ACTIVITY_COEFFICIENT:
             measured.range_only_T += 1
             name, lo, hi = t_sel.condition_ranges[0]
             self.result.add_queue(
@@ -11737,7 +11809,11 @@ class Migrator:
         ):
             ident_kwargs["temperature_K"] = State.of(Decimal("298.15"))
         source_reference_state = None
-        if q_token in {Quantity.ACTIVITY, Quantity.ACTIVITY_COEFFICIENT}:
+        if q_token in {
+            Quantity.ACTIVITY,
+            Quantity.ACTIVITY_COEFFICIENT,
+            Quantity.ACTIVITY_COEFFICIENT_TEMPERATURE_FIT,
+        }:
             # Activities and activity coefficients are dimensionless by the
             # closed quantity contract; ``per`` records that basis rather
             # than an unstated source measurement.
@@ -11761,6 +11837,10 @@ class Migrator:
                     source=source_key,
                     observation_id=obs_id,
                 )
+        elif q_token is Quantity.ACTIVITY_COEFFICIENT_TEMPERATURE_FIT:
+            ident_kwargs["reference_state"] = State.unknown(
+                "Table 2 row does not state a typed endmember standard state"
+            )
         elif suffix_reference:
             ident_kwargs["reference_state"] = State.unknown(
                 f"qualifier {suffix_reference} does not name a reference_state"
@@ -12226,6 +12306,13 @@ class Migrator:
             row_items = values.get("rows")
             if isinstance(row_items, list) and row_items:
                 row_point_containers.append(("rows", row_items))
+            printed_fit_rows = values.get("rows_as_printed")
+            if (
+                q_token is Quantity.ACTIVITY_COEFFICIENT_TEMPERATURE_FIT
+                and isinstance(printed_fit_rows, list)
+                and printed_fit_rows
+            ):
+                row_point_containers.append(("rows_as_printed", printed_fit_rows))
             if yield_items is None:
                 point_items = values.get("points")
                 if isinstance(point_items, list) and point_items:
@@ -12498,6 +12585,18 @@ class Migrator:
     ) -> None:
         raw_item = item.get("item")
         index = item.get("index", 0)
+        if (
+            source_id == "kems-041-sossi-fegley-2018"
+            and isinstance(raw_item, Mapping)
+            and isinstance(raw_item.get("method_class"), str)
+        ):
+            row_attribution = raw_item.get("references_as_published")
+            row_model = raw_item.get("evidence_model")
+            evidence, _ = self._evidence_for(
+                raw_item["method_class"],
+                attribution=(row_attribution if isinstance(row_attribution, str) else None),
+                model=(row_model if isinstance(row_model, str) else None),
+            )
         quantity, species, ident_kwargs = identity_base
         coord = None
         val = None
@@ -12533,6 +12632,22 @@ class Migrator:
                 )
                 species = make_species(
                     species_formula,
+                    species.phase,
+                    polymorph=species.polymorph,
+                    charge=species.charge,
+                )
+            elif (
+                raw_item.get("oxide")
+                and (
+                    q_for_species is Quantity.ACTIVITY_COEFFICIENT_TEMPERATURE_FIT
+                    or (
+                        source_id == "kems-041-sossi-fegley-2018"
+                        and q_for_species is Quantity.ACTIVITY_COEFFICIENT
+                    )
+                )
+            ):
+                species = make_species(
+                    str(raw_item["oxide"]).replace(" ", ""),
                     species.phase,
                     polymorph=species.polymorph,
                     charge=species.charge,
@@ -12593,7 +12708,10 @@ class Migrator:
                     printed = raw_item.get("as_published") or raw_item.get("value")
                     if printed is not None:
                         point_id = f"{parent_id}::printed:{printed}"
-            if t_sel.field_name and not t_sel.available:
+            if t_sel.field_name and not t_sel.available and q_for_species not in {
+                Quantity.ACTIVITY_COEFFICIENT,
+                Quantity.ACTIVITY_COEFFICIENT_TEMPERATURE_FIT,
+            }:
                 self.result.add_queue(
                     work.work_id,
                     point_locator,
@@ -12673,6 +12791,13 @@ class Migrator:
             if isinstance(quantity, State) and quantity.is_value
             else (quantity if isinstance(quantity, Quantity) else None)
         )
+        if (
+            q_token_point is Quantity.ACTIVITY_COEFFICIENT
+            and isinstance(raw_item, Mapping)
+            and raw_item.get("oxide_formula_as_published")
+        ):
+            provenance = dict(provenance or {})
+            provenance["activity_coefficient_table_row_as_printed"] = dict(raw_item)
         if (
             q_token_point not in {Quantity.ACTIVITY, Quantity.ACTIVITY_COEFFICIENT}
             and provenance is not None
@@ -12844,6 +12969,26 @@ class Migrator:
                     coord, t_trail, t_original, point_locator
                 )
             }
+        if (
+            isinstance(raw_item, Mapping)
+            and t_sel.condition_ranges
+            and q_token_point
+            in {
+                Quantity.ACTIVITY_COEFFICIENT,
+                Quantity.ACTIVITY_COEFFICIENT_TEMPERATURE_FIT,
+            }
+        ):
+            _range_name, lo, hi = t_sel.condition_ranges[0]
+            if coord is None or lo != hi:
+                point_conditions = {
+                    **(point_conditions or {}),
+                    "temperature_K": Located(
+                        State.of(
+                            _interval_selection(lo, hi, _range_name, {}, ()).value
+                        ),
+                        locator=point_locator,
+                    ),
+                }
         lab_pc = point_lab_conditions(
             series_item=raw_item if isinstance(raw_item, Mapping) else None,
             equipment=equipment,
