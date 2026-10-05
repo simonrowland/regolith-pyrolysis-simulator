@@ -1781,6 +1781,101 @@ def test_unknown_method_on_vapour_is_typed_method_unknown() -> None:
     assert residual.refusal.reason is not RefusalReason.UNDERDETERMINED_APPARATUS
 
 
+@pytest.mark.parametrize(
+    "quantity", (Quantity.ACTIVITY, Quantity.ACTIVITY_COEFFICIENT)
+)
+def test_published_typed_activity_unknown_method_scores_flagged_and_pressure_unknown_method_still_refuses(
+    quantity: Quantity,
+) -> None:
+    from simulator.battery.score import (
+        FLAGGED_STRATUM_UNVERIFIED_APPARATUS,
+        flagged_strata,
+    )
+
+    experiment = _unknown_method_experiment()
+    identity = replace(
+        F.activity_identity(
+            formula="CaO",
+            T_K=Decimal("1823"),
+            endmember_phase=Phase.L,
+            component_basis="CaO",
+        ),
+        quantity=quantity,
+    )
+    activity = F.observation(
+        "published-cao-activity-unknown-method",
+        experiment.experiment_id,
+        identity,
+        Decimal("0.4"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="published-activity-work",
+    )
+    residual, _candidate = _compile(
+        activity,
+        experiment,
+        _predict(Decimal("0.3"), identity),
+        review="reviewed",
+    )
+
+    assert residual.status is not ResidualStatus.REFUSED
+    assert residual.numeric is not None
+    assert residual.score_eligible is False
+    notice = next(
+        item
+        for item in residual.notices
+        if item.kind is NoticeKind.UNVERIFIED_APPARATUS
+    )
+    assert "method_unknown" in notice.reason
+    assert flagged_strata(residual.notices) == (
+        FLAGGED_STRATUM_UNVERIFIED_APPARATUS,
+    )
+
+    pressure_identities = (
+        (F.psat_identity("Na"), Decimal("0.1")),
+        (_partial_identity(), Decimal("1")),
+    )
+    for index, (pressure_identity, value) in enumerate(pressure_identities):
+        pressure = F.observation(
+            f"unknown-method-pressure-{index}",
+            experiment.experiment_id,
+            pressure_identity,
+            value,
+            evidence=EvidenceClass.MEASURED_DIRECT,
+            source_id="published-pressure-work",
+        )
+        refused, _candidate = _compile(
+            pressure,
+            experiment,
+            _predict(value, pressure_identity),
+            review="reviewed",
+        )
+        assert refused.status is ResidualStatus.REFUSED
+        assert refused.refusal is not None
+        assert refused.refusal.reason is RefusalReason.METHOD_UNKNOWN
+
+    untyped_identity = replace(
+        identity,
+        reference_state=State.not_applicable("published reference state is absent"),
+    )
+    untyped_activity = F.observation(
+        "published-cao-activity-unknown-method-untyped-reference",
+        experiment.experiment_id,
+        untyped_identity,
+        Decimal("0.4"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="published-activity-work",
+    )
+    untyped_refused, _candidate = _compile(
+        untyped_activity,
+        experiment,
+        _predict(Decimal("0.3"), untyped_identity),
+        review="reviewed",
+    )
+    assert untyped_refused.status is ResidualStatus.REFUSED
+    assert untyped_refused.refusal is not None
+    assert untyped_refused.refusal.reason is RefusalReason.METHOD_UNKNOWN
+
+
 def test_richter_langmuir_alpha_still_fails_exposed_area() -> None:
     geometry = ApparatusGeometry()
     exp = replace(
@@ -5238,6 +5333,103 @@ def test_periclase_solid_activity_fusion_conversion_uses_janaf_nodes() -> None:
     )
 
 
+@pytest.mark.parametrize(
+    ("temperature", "expected_shift_dex"),
+    (
+        (Decimal("1823"), Decimal("-0.96857")),
+        (Decimal("1873"), Decimal("-0.90911")),
+    ),
+)
+def test_unknown_cao_polymorph_converts_via_unique_janaf_solid_table(
+    temperature: Decimal,
+    expected_shift_dex: Decimal,
+) -> None:
+    """The sole eligible CaO(cr) JANAF table fixes the unknown solid reference.
+
+    For the same chemical potential, mu = G° + RT ln(a) gives
+    log10(a_l/a_s) = -DeltaG_fus/(RT ln(10)). JANAF's DeltaG_fus is in
+    kJ/mol, so convert by 1000 and use R = 8.314462618 J/(mol K). The
+    interpolated JANAF values are 33.80370 kJ/mol at 1823 K and 32.59870
+    kJ/mol at 1873 K, giving shifts -0.96857 and -0.90911 dex. As a
+    sanity check, DeltaH_fus(1 - T/Tm), with Tm = 3200 K, gives 34.208 and
+    32.966 kJ/mol at those temperatures, close to the JANAF interpolations.
+    """
+    from simulator.battery.score import _fusion_comparison_reference
+
+    experiment = F.kems_experiment()
+    identity = _with_activity_reference_polymorph(
+        F.activity_identity(
+            formula="CaO",
+            T_K=temperature,
+            endmember_phase=Phase.CR,
+            component_basis="CaO",
+        ),
+        None,
+    )
+    reference = F.observation(
+        f"cao-unknown-polymorph-at-{temperature}K",
+        experiment.experiment_id,
+        identity,
+        Decimal("0.25"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="synthetic-unknown-cao-polymorph",
+    )
+    assert reference.admission.status is AdmissionStatus.ADMITTED
+
+    converted = _fusion_comparison_reference(reference, engine=Engine.OPENIMCC)
+
+    assert converted.identity.reference_state.value.endmember.phase.value is Phase.L
+    assert converted.value.point != reference.value.point
+    assert abs(
+        (converted.value.point / reference.value.point).log10() - expected_shift_dex
+    ) < Decimal("0.0005")
+    notice = next(
+        item
+        for item in converted.notices
+        if item.kind is NoticeKind.DERIVATION_USES_COMPILATION
+    )
+    assert "reference_converted_via_fusion" in notice.reason
+    assert "source polymorph is unknown" in notice.reason
+
+
+def test_unknown_polymorph_with_multiple_eligible_solid_tables_still_refuses() -> None:
+    from simulator.battery.score import _fusion_comparison_reference
+
+    experiment = F.kems_experiment()
+    identity = _with_activity_reference_polymorph(
+        F.activity_identity(
+            formula="SiO2",
+            T_K=Decimal("1933"),
+            endmember_phase=Phase.CR,
+            component_basis="SiO2",
+        ),
+        None,
+    )
+    reference = F.observation(
+        "silica-unknown-polymorph-with-multiple-solid-tables",
+        experiment.experiment_id,
+        identity,
+        Decimal("0.3"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="synthetic-ambiguous-solid-reference",
+    )
+
+    comparison = _fusion_comparison_reference(reference, engine=Engine.OPENIMCC)
+
+    assert comparison.value.point == reference.value.point
+    assert comparison.identity.reference_state.value.endmember.phase.value is Phase.CR
+    assert not any(
+        item.kind is NoticeKind.DERIVATION_USES_COMPILATION
+        and "reference_converted_via_fusion" in item.reason
+        for item in comparison.notices
+    )
+    assert any(
+        "O-035 represents polymorph cristobalite_high" in item.reason
+        and "measured reference polymorph is unknown" in item.reason
+        for item in comparison.notices
+    )
+
+
 @pytest.mark.parametrize("polymorph", (None, "quartz"))
 def test_solid_activity_with_unmatched_polymorph_refuses_conversion(
     polymorph: str | None,
@@ -6371,13 +6563,34 @@ def test_admitted_model_derived_rows_emit_residuals_per_imcc_engine() -> None:
             == 14
         )
         assert all(not row.score_eligible for row in allibert_rows)
+        allibert_cao_rows = [
+            row
+            for row in allibert_rows
+            if observations[row.reference].identity.species.formula == "CaO"
+        ]
+        allibert_alumina_rows = [
+            row
+            for row in allibert_rows
+            if observations[row.reference].identity.species.formula == "Al2O3"
+        ]
+        assert len(allibert_cao_rows) == 8
+        assert all(
+            any(
+                notice.kind is NoticeKind.DERIVATION_USES_COMPILATION
+                and notice.reason.startswith("reference_converted_via_fusion;")
+                and "source polymorph is unknown" in notice.reason
+                for notice in row.notices
+            )
+            for row in allibert_cao_rows
+        )
+        assert len(allibert_alumina_rows) == 8
         assert all(
             any(
                 "fusion conversion missing input" in notice.reason
                 and "measured reference polymorph is unknown" in notice.reason
                 for notice in row.notices
             )
-            for row in allibert_rows
+            for row in allibert_alumina_rows
         )
         assert not any(row.reference in allibert_rejected for row in residuals)
 
@@ -6443,6 +6656,45 @@ def test_admitted_model_derived_rows_emit_residuals_per_imcc_engine() -> None:
         )
         assert all(not row.score_eligible for row in stolyarova_rows)
         assert all(row.status is ResidualStatus.REFUSED for row in stolyarova_1995_rows)
+
+
+def test_kume_real_migrated_activity_scores_numeric_with_openimcc(
+    tmp_path: Path,
+) -> None:
+    pytest.importorskip("openimcc", reason="openimcc is not importable")
+    from tests.battery.test_migrate import _migrate_real_extract
+
+    result = _migrate_real_extract(
+        tmp_path, "kume-2000-cao-activities.yaml", write=True
+    )
+    work_id = next(iter(result.works))
+    observation_id = next(
+        observation_id
+        for observation_id in result.observations
+        if observation_id.endswith("::kume_2000_table2_sample_101")
+    )
+    context = load_score_context(
+        tmp_path / "tree", sources=("kume-2000-cao-activities",)
+    )
+    reference = context.observations[observation_id]
+
+    assert reference.identity.species.phase.is_value
+    assert reference.identity.species.phase.value is Phase.L
+
+    residuals, _candidates = score_store(
+        context,
+        engines=(Engine.OPENIMCC,),
+        work_id=work_id,
+    )
+    residual = next(row for row in residuals if row.reference == observation_id)
+
+    assert residual.numeric is not None
+    assert residual.status is not ResidualStatus.REFUSED
+    assert residual.score_eligible is False
+    assert any(
+        notice.kind is NoticeKind.UNVERIFIED_APPARATUS
+        for notice in residual.notices
+    )
 
 
 def test_allibert_xcao_0_80_rows_refuse_bulk_not_liquid_composition(tmp_path: Path) -> None:

@@ -863,6 +863,8 @@ def _derivation_from_plain(payload: object) -> Derivation | None:
         if isinstance(item, (list, tuple)) and len(item) == 2:
             parameters.append((str(item[0]), _located_from_plain(item[1], as_decimal)))
     inputs = payload.get("inputs") or ()
+    if isinstance(inputs, str):
+        inputs = (inputs,)
     raw_marker = payload.get("pure_substance_reference")
     return Derivation(
         relation=str(payload.get("relation") or "identity"),
@@ -2839,6 +2841,7 @@ _PRINTED_COMPOSITION_MAP_KEYS = (
     "oxides_wt_pct",
     "major_oxide_wt_pct",
     "composition_wt_pct",
+    "composition_mass_percent",
     "sample_oxide_composition_wt_pct",
     "starting_glass_wt_pct",
     "printed_composition",
@@ -2863,6 +2866,7 @@ _BULK_PROPERTY_QUANTITIES = frozenset(
 )
 _COMPOSITION_LOOKED_FOR = (
     "oxides_wt_pct / major_oxide_wt_pct / composition_wt_pct / "
+    "composition_mole_fraction / composition_mass_percent / "
     "sample_oxide_composition_wt_pct / starting_glass_wt_pct / "
     "SiO2 Al2O3 FeO Fe2O3 MgO CaO Na2O K2O TiO2 MnO P2O5"
 )
@@ -2905,6 +2909,50 @@ def wt_pct_to_mole_fraction(wt: Mapping[str, Decimal]) -> Composition:
     )
 
 
+def _kume_formula_unit_oxide(name: str) -> tuple[str, Decimal] | None:
+    if name in _OXIDE_COMPONENT_KEYS:
+        return name, Decimal("1")
+    if name != "AlO1.5":
+        return None
+
+    # AlO1.5 is half an Al2O3 formula unit and M(AlO1.5) = M(Al2O3)/2.
+    # Mole conversion uses n(Al2O3) = n(AlO1.5)/2 before renormalising all
+    # components; mass percent is invariant, so rename AlO1.5 only. For the
+    # mole-to-mass path, x [mol/mol] * M [g/mol] = relative mass [g/mol].
+    # Sanity check: 50:50 CaO:AlO1.5 becomes 2/3 CaO, 1/3 Al2O3.
+    from simulator.chemistry.structural_activity import normalize_formula_unit_moles
+
+    mapped, unsupported = normalize_formula_unit_moles({name: 1.0})
+    if unsupported or len(mapped) != 1:
+        return None
+    oxide, factor = next(iter(mapped.items()))
+    if oxide not in _OXIDE_COMPONENT_KEYS:
+        return None
+    return oxide, Decimal(str(factor))
+
+
+def _kume_mole_amounts_from_mapping(
+    raw: object,
+) -> tuple[dict[str, Decimal], tuple[str, ...]]:
+    if not isinstance(raw, Mapping):
+        return {}, ()
+    amounts: dict[str, Decimal] = {}
+    omitted: list[str] = []
+    for name, amount in raw.items():
+        token = str(name).strip()
+        equivalent = _kume_formula_unit_oxide(token)
+        if equivalent is None:
+            omitted.append(token)
+            continue
+        parsed = _as_dec_or_none(amount)
+        if parsed is None:
+            omitted.append(token)
+            continue
+        oxide, factor = equivalent
+        amounts[oxide] = amounts.get(oxide, Decimal("0")) + parsed * factor
+    return amounts, tuple(omitted)
+
+
 def is_sample_code_formula(text: str) -> bool:
     return bool(_SAMPLE_CODE_FORMULA_RE.match(str(text).strip()))
 
@@ -2915,6 +2963,18 @@ def _oxide_map_from_mapping(obj: object) -> dict[str, Decimal] | None:
     for key in _PRINTED_COMPOSITION_MAP_KEYS:
         nested = obj.get(key)
         if isinstance(nested, Mapping):
+            if key == "composition_mass_percent":
+                comps: dict[str, Decimal] = {}
+                for name, value in nested.items():
+                    equivalent = _kume_formula_unit_oxide(str(name).strip())
+                    amount = _as_dec_or_none(value)
+                    if equivalent is None or amount is None:
+                        return None
+                    oxide, _factor = equivalent
+                    comps[oxide] = comps.get(oxide, Decimal("0")) + amount
+                if len(comps) >= 2:
+                    return comps
+                continue
             got = _oxide_map_from_mapping(nested)
             if got:
                 return got
@@ -2962,7 +3022,26 @@ def _initial_oxide_map_from_values(
             got = _oxide_map_from_mapping(item)
             if got:
                 return got
-    return _oxide_map_from_mapping(values)
+    got = _oxide_map_from_mapping(values)
+    if got:
+        return got
+    raw_moles = values.get("composition_mole_fraction")
+    if isinstance(raw_moles, Mapping):
+        formula_moles, omitted = _kume_mole_amounts_from_mapping(raw_moles)
+        if omitted or len(formula_moles) < 2:
+            return None
+        masses = {
+            oxide: amount * oxide_molar_mass(oxide)
+            for oxide, amount in formula_moles.items()
+        }
+        total_mass = sum(masses.values(), Decimal("0"))
+        if total_mass <= 0:
+            return None
+        return {
+            oxide: mass * Decimal("100") / total_mass
+            for oxide, mass in masses.items()
+        }
+    return None
 
 
 def _catalogue_composition_located_from_values(
@@ -3031,18 +3110,30 @@ def _mole_fraction_composition_from_values(
     from simulator.battery.score import parse_species_formula
 
     raw = values.get("composition_mol")
+    kume_mole_fraction = False
+    if not isinstance(raw, Mapping):
+        raw = values.get("composition_mole_fraction")
+        kume_mole_fraction = isinstance(raw, Mapping)
     components: list[tuple[str, Decimal]] = []
     omitted: list[str] = []
     if isinstance(raw, Mapping):
-        for name, amount in raw.items():
-            parsed = _as_dec_or_none(amount)
-            if parsed is None:
-                continue
-            token = str(name).strip()
-            if parse_species_formula(token) is None:
-                omitted.append(token)
-                continue
-            components.append((token, parsed))
+        if kume_mole_fraction:
+            mapped, omitted_names = _kume_mole_amounts_from_mapping(raw)
+            omitted.extend(omitted_names)
+            total = sum(mapped.values(), Decimal("0"))
+            if len(mapped) < 2 or total <= 0:
+                return None, tuple(omitted)
+            components = [(name, amount / total) for name, amount in mapped.items()]
+        else:
+            for name, amount in raw.items():
+                parsed = _as_dec_or_none(amount)
+                if parsed is None:
+                    continue
+                token = str(name).strip()
+                if parse_species_formula(token) is None:
+                    omitted.append(token)
+                    continue
+                components.append((token, parsed))
     if len(components) < 2:
         for key in ("X_Na2O_as_published", "X_Na2O"):
             fraction = _as_dec_or_none(values.get(key))
@@ -3129,7 +3220,7 @@ def composition_unknown_reason() -> str:
 
 def partial_composition_unknown_reason(omitted_components: Sequence[str]) -> str:
     return (
-        "partial_composition: omitted non-formula component(s): "
+        "partial_composition: unusable component(s): "
         + ", ".join(omitted_components)
     )
 
@@ -5242,6 +5333,7 @@ def lineage_parents_from_source(
     values: Mapping[str, Any],
     source_id: str,
     local_ids: set[str],
+    asset_ids: set[str] | frozenset[str] = frozenset(),
 ) -> tuple[tuple[str, ...], tuple[str, ...]]:
     """Source-stated lineage as (parents, prose). Never invents a pointer.
 
@@ -5274,9 +5366,11 @@ def lineage_parents_from_source(
         local = item[len(prefix):] if item.startswith(prefix) else item
         if local in local_ids:
             parents.append(f"{prefix}{local}")
-        elif item.startswith("tables:"):
-            # A reduced literature value may cite the registered table asset
-            # that carries the source's calibration/measurement lineage.
+        elif item == f"tables:{source_id}":
+            # The source's root table asset is a stable lineage link. More
+            # specific table filenames resolve only when registered.
+            parents.append(item)
+        elif item.startswith("tables:") and item in asset_ids:
             parents.append(item)
         elif "::" in item:
             # Source-stated qualified pointer; kept as written. If it
@@ -11315,7 +11409,7 @@ class Migrator:
                 work.work_id,
                 locator,
                 ["composition"],
-                "omitted non-formula composition component(s): "
+                "unusable composition component(s): "
                 + ", ".join(omitted_components),
                 source=source_key,
                 observation_id=obs_id,
@@ -11365,9 +11459,14 @@ class Migrator:
         regime = obs.get("regime") or values.get("regime")
         if method_class is None:
             measured.absent_classes += 1
+        source_asset_ids = {asset.asset_id for asset in work.source_files.files}
         try:
             derived_parents, derived_prose = lineage_parents_from_source(
-                obs, values, source_id, local_ids
+                obs,
+                values,
+                source_id,
+                local_ids,
+                source_asset_ids,
             )
         except ValueError as exc:
             derived_parents, derived_prose = (), (str(exc),)
@@ -11379,36 +11478,22 @@ class Migrator:
         derived_from = derived_parents or None
         source_derivation = source_derivation_from_source(obs, values)
         if source_derivation is not None:
-            source_derivation = replace(
-                source_derivation,
-                inputs=tuple(
-                    f"{source_id}::{item}" if item in local_ids else item
-                    for item in source_derivation.inputs
-                ),
+            derivation_parents, derivation_prose = lineage_parents_from_source(
+                {"derived_from": source_derivation.inputs},
+                {},
+                source_id,
+                local_ids,
+                source_asset_ids,
+            )
+            derived_prose = tuple(dict.fromkeys((*derived_prose, *derivation_prose)))
+            source_derivation = (
+                replace(source_derivation, inputs=derivation_parents)
+                if derivation_parents
+                else None
             )
             if not derived_prose:
-                self._author_derivations[obs_id] = source_derivation
-        conditional_method = str(method_class) if method_class else str(regime or "").strip()
-        if conditional_method not in _CONDITIONAL_REDUCED_METHODS:
-            source_derivation = None
-        for payload in (values, obs):
-            if not isinstance(payload.get("inference"), Mapping):
-                continue
-            try:
-                extractor_derivation = _derivation_from_plain(payload["inference"])
-            except (TypeError, ValueError):
-                continue
-            source_derivation = _merge_source_conversion_derivation(
-                source_derivation or Derivation(
-                    relation="as_published",
-                    inputs=(choose_read_from(work, locator),),
-                    parameters=(),
-                    output_unit="as_published",
-                ),
-                extractor_derivation,
-                choose_read_from(work, locator),
-            )
-            break
+                if source_derivation is not None:
+                    self._author_derivations[obs_id] = source_derivation
         evidence, ev_reason = self._evidence_for(
             method_class,
             evaluator_family=values.get("evaluator_family"),
@@ -11434,6 +11519,30 @@ class Migrator:
                 model=suffix_derivation,
                 attribution=evidence.attribution,
             )
+        if evidence.class_.is_value and evidence.class_.value not in {
+            EvidenceClass.MEASURED_REDUCED,
+            EvidenceClass.MODEL_DERIVED,
+        }:
+            source_derivation = None
+        for payload in (values, obs):
+            if not isinstance(payload.get("inference"), Mapping):
+                continue
+            try:
+                extractor_derivation = _derivation_from_plain(payload["inference"])
+            except (TypeError, ValueError):
+                continue
+            if source_derivation is None:
+                source_derivation = _merge_source_conversion_derivation(
+                    Derivation(
+                        relation="as_published",
+                        inputs=(choose_read_from(work, locator),),
+                        parameters=(),
+                        output_unit="as_published",
+                    ),
+                    extractor_derivation,
+                    choose_read_from(work, locator),
+                )
+            break
         if ev_reason:
             self.result.add_queue(
                 work.work_id,
@@ -11911,29 +12020,6 @@ class Migrator:
                 unmatched,
                 source=source_key,
                 observation_id=obs_id,
-            )
-        raw_derivation = values.get("derivation")
-        if raw_derivation is None:
-            raw_derivation = obs.get("derivation")
-        # Legacy extracts also use ``derivation`` for page/quote prose. Only
-        # promote the structured table-asset form; it has resolvable lineage.
-        derivation = (
-            _derivation_from_plain(raw_derivation)
-            if (
-                isinstance(raw_derivation, Mapping)
-                and isinstance(raw_derivation.get("inputs"), (list, tuple))
-                and any(
-                    str(item).startswith("tables:")
-                    for item in raw_derivation["inputs"]
-                )
-            )
-            else None
-        )
-        if derivation is not None:
-            value_derivation = _merge_source_conversion_derivation(
-                derivation,
-                value_conversion,
-                read_from,
             )
         if phase_provenance is not None and value.kind is not ValueKind.UNAVAILABLE:
             if value_derivation is None:
