@@ -18,6 +18,8 @@ from simulator.vapour_rail.source_rail import (
     GIBBS_CONVENTION_ABSOLUTE,
     GIBBS_CONVENTION_FORMATION,
     STANDARD_PRESSURE_PA,
+    SourceCoverageGap,
+    _element_reference_species_g,
     compare_g_over_overlap,
     convert_gas_g_j_per_mol,
     load_source_rail,
@@ -187,7 +189,18 @@ def test_nasa_o2_formation_gibbs_is_the_zero_of_the_reference(source_rail) -> No
 
 def test_two_source_formation_gibbs_residuals_on_common_basis(source_rail) -> None:
     """JANAF ΔfG vs NASA converted ΔfG. Residuals stay visible; none are tuned."""
-    samples = (("Ga", "gas"), ("Cu", "gas"), ("B2O3", "gas"), ("B2O3", "condensed_liquid"))
+    samples = (
+        ("Ga", "gas"),
+        ("Cu", "gas"),
+        ("B2O3", "gas"),
+        ("B2O3", "condensed_liquid"),
+        ("Si", "gas"),
+        ("SiO", "gas"),
+        ("Al", "gas"),
+        ("Al2O3", "condensed_solid"),
+        ("Fe", "gas"),
+        ("FeO", "gas"),
+    )
     reported: list[str] = []
     for formula, state in samples:
         overlap = source_rail.overlapping_sources(formula, state)
@@ -208,7 +221,37 @@ def test_two_source_formation_gibbs_residuals_on_common_basis(source_rail) -> No
             # is a real data disagreement: fail with the residual visible.
             assert abs(residual_kJ) < 5.0, line
     print("\n".join(reported))
-    assert len(reported) == 12
+    assert len(reported) == 30
+
+
+def test_nasa_si_reference_is_crystal_inside_condensed_coverage(source_rail) -> None:
+    """NG-1858's inverted first interval is skipped; gas is not the ref below Tm."""
+    index = source_rail._indexes["nasa-glenn"]
+    crystal = next(
+        record
+        for record in index.native_records_for("Si", "condensed_solid")
+        if record.record_id == "NG-1858"
+    )
+    assert crystal.T_min_K == pytest.approx(298.15)
+    assert crystal.T_max_K == pytest.approx(1690.0)
+    g_ref, atoms = _element_reference_species_g(index, "Si", 1400.0)
+    assert atoms == 1.0
+    assert g_ref == pytest.approx(crystal.thermo.evaluate(1400.0).g_J_per_mol)
+    gas = next(
+        record
+        for record in index.native_records_for("Si", "gas")
+        if record.T_min_K <= 1400.0 <= record.T_max_K
+    )
+    assert abs(g_ref - gas.thermo.evaluate(1400.0).g_J_per_mol) > 100_000.0
+    with pytest.raises(SourceCoverageGap, match="condensed coverage"):
+        _element_reference_species_g(index, "Si", 250.0)
+    g_hot, _atoms = _element_reference_species_g(index, "Si", 6050.0)
+    hot_gas = next(
+        record
+        for record in index.native_records_for("Si", "gas")
+        if record.T_min_K <= 6050.0 <= record.T_max_K
+    )
+    assert g_hot == pytest.approx(hot_gas.thermo.evaluate(6050.0).g_J_per_mol)
 
 
 def test_janaf_and_nasa_same_reaction_agree_once_converted(source_rail) -> None:

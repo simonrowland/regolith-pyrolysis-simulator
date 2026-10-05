@@ -243,6 +243,17 @@ def _element_reference_species_g(
                 if record.standard_state == "condensed_liquid"
             ]
             chosen = liquids[0] if liquids else covering[0]
+        elif condensed:
+            # JANAF ref: the gas is the standard only above condensed coverage.
+            # A hole or a T below the condensed tables is a gap, not a gas fallback.
+            coverage_high = max(record.T_max_K for record in condensed)
+            if temperature_K <= coverage_high:
+                raise SourceCoverageGap(
+                    formula,
+                    "reference",
+                    f"{element} condensed coverage ends at {coverage_high} K; "
+                    f"gas reference is not used at {temperature_K} K",
+                )
     if chosen is None:
         covering = _covering_records(
             index.native_records_for(formula, "gas"), temperature_K
@@ -620,6 +631,10 @@ def _nasa9_from_document(document: Mapping[str, Any]) -> NasaCeaPolynomial | Non
                 or len(coeffs) != 7
             ):
                 return None
+            # Inverted or zero-width interval (NASA Si(cr) NG-1858 prints
+            # 300 → 298.15). Skip that interval and keep the rest of the record.
+            if t_min >= t_max:
+                continue
             segments.append(
                 Nasa9Segment(
                     t_min,
