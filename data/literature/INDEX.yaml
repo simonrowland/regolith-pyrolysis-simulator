@@ -9,13 +9,13 @@ scan:
   - hunt_ids column empty; --hunt-json not provided
   corpus_root: /Users/simonrowland/Repos/regolith-corpus
 counts:
-  sources: 275
-  extracts: 273
+  sources: 276
+  extracts: 274
   pdfs_present_in_worktree: 0
   extracts_with_private_locators: 60
   pdfs_tracked_99_kems_langmuir: 0
   pdfs_without_extract: 0
-  extracts_without_pdf: 273
+  extracts_without_pdf: 274
   alias_groups_needing_resolution: 41
 gaps:
   pdfs_without_extract: []
@@ -191,6 +191,7 @@ gaps:
   - metsoc-2024-6224
   - miki-1999-si-alloy-thermodynamics
   - mogul-2023-pioneer-venus-co2-icarus
+  - morita-2000-sio2-activity-si-alloys
   - murchison-degassing-2023-springer
   - murchison-hydropyrolysis-1990s-gca
   - nagabayashi-hino-banya-1989-phosphorus
@@ -10638,6 +10639,64 @@ sources:
       last_stage: decoded
       date: '2026-09-06'
     commit: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
+- source_id: morita-2000-sio2-activity-si-alloys
+  aliases: []
+  citation: 'Morita, K., Kume, K. & Sano, N. (2000), "A Newly Developed Method for Determining SiO2 Activity
+    of the Silicate Slags Equilibrated with Molten Silicon Alloys," ISIJ International 40(6): 554–560.'
+  doi: 10.2355/isijinternational.40.554
+  report_number: null
+  identifier: 10.2355/isijinternational.40.554
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: OA
+  extracts:
+  - path: data/literature/extracts/morita-2000-sio2-activity-si-alloys.yaml
+    review_status: draft
+    rows: 172
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/morita-2000-sio2-activity-si-alloys/morita-2000-sio2-activity-si-alloys.pdf
+      present: true
+      sha256: f4d38726dcce0a78f924b439cbe4a989a212e1bd21ef7084195167f5e0499088
+      matches_simulator: null
+    sidecar:
+      path: raw/morita-2000-sio2-activity-si-alloys/sidecar.yaml
+      present: true
+    text:
+      path: text/morita-2000-sio2-activity-si-alloys
+      exists: true
+      file_count: 10
+    tables:
+      path: tables/morita-2000-sio2-activity-si-alloys
+      exists: true
+      file_count: 8
+    extract:
+      path: extracts/morita-2000-sio2-activity-si-alloys.yaml
+      present: true
+      matches_simulator: true
+    ledger:
+      path: ledger/morita-2000-sio2-activity-si-alloys.yaml
+      present: true
+      error: null
+      last_stage: extracted
+      date: '2026-10-03'
+    commit: 1ce8e2fc3db83962928fccf9b9d4c72fdb8b699e
 - source_id: murchison-degassing-2023-springer
   aliases: []
   citation: 'Voropaev, S. A., Dushenko, N. V., Fedulov, V. S. and Korochantsev, A. V. (2023), Osobennosti
