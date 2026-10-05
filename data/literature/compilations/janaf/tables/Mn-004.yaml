@@ -2115,7 +2115,7 @@ table:
         row_temperature_as_published: '2400'
         column: H-H(Tr)
     formation_enthalpy:
-      value: -224.34
+      value: null
       as_published: '224.340'
       locator:
         table_id: Mn-004
@@ -2123,7 +2123,12 @@ table:
         download_url: https://janaf.nist.gov/tables/Mn-004.txt
         row_temperature_as_published: '2400'
         column: delta-f H
-        parse_repair: nist_tail_whitespace_signs_restored
+        parse_repair: nist_tail_dfh_sign_undetermined
+        parse_repair_reason: formation enthalpy neighbor is zero
+        raw_tail_tokens:
+        - '224.340'
+        - '6.315'
+        - '0.137'
         line_number: 40
         raw_line: "2400\t46.024\t120.983\t78.211\t102.653\t224.340 6.315  0.137"
     formation_gibbs_energy:

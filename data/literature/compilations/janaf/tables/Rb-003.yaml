@@ -1110,7 +1110,7 @@ table:
         row_temperature_as_published: '1000'
         column: H-H(Tr)
     formation_enthalpy:
-      value: -71.481
+      value: null
       as_published: '71.481'
       locator:
         table_id: Rb-003
@@ -1118,7 +1118,12 @@ table:
         download_url: https://janaf.nist.gov/tables/Rb-003.txt
         row_temperature_as_published: '1000'
         column: delta-f H
-        parse_repair: nist_tail_whitespace_signs_restored
+        parse_repair: nist_tail_dfh_sign_undetermined
+        parse_repair_reason: formation enthalpy neighbor is zero
+        raw_tail_tokens:
+        - '71.481'
+        - '2.186'
+        - '0.114'
         line_number: 19
         raw_line: "1000\t31.171\t121.580\t99.757\t21.823\t71.481 2.186  0.114"
     formation_gibbs_energy:

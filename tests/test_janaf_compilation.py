@@ -140,7 +140,7 @@ def test_every_stored_number_reparses_from_table_text() -> None:
             "K-003",
             1100,
             {
-                "formation_enthalpy": -78.951,
+                "formation_enthalpy": None,
                 "formation_gibbs_energy": 4.610,
                 "log10_formation_equilibrium_constant": -0.219,
             },
@@ -169,6 +169,10 @@ def test_transition_following_rows_restore_signed_janaf_tail(
     row = rows[0]
     for key, value in expected.items():
         assert row[key]["value"] == value
+    if table_id == "K-003":
+        assert row["formation_enthalpy"]["locator"]["parse_repair"] == (
+            "nist_tail_dfh_sign_undetermined"
+        )
 
 
 @pytest.mark.parametrize(

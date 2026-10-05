@@ -3918,7 +3918,7 @@ table:
         row_temperature_as_published: '5000'
         column: H-H(Tr)
     formation_enthalpy:
-      value: -591.385
+      value: null
       as_published: '591.385'
       locator:
         table_id: Mo-003
@@ -3926,7 +3926,12 @@ table:
         download_url: https://janaf.nist.gov/tables/Mo-003.txt
         row_temperature_as_published: '5000'
         column: delta-f H
-        parse_repair: nist_tail_whitespace_signs_restored
+        parse_repair: nist_tail_dfh_sign_undetermined
+        parse_repair_reason: formation enthalpy neighbor is zero
+        raw_tail_tokens:
+        - '591.385'
+        - '5.731'
+        - '0.060'
         line_number: 60
         raw_line: "5000\t37.656\t131.087\t98.381\t163.527\t591.385 5.731  0.060"
     formation_gibbs_energy:
