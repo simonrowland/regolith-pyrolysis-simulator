@@ -1,8 +1,9 @@
 """Oxide-evaporation mass stoichiometry from a compiled source reaction.
 
-One helper (d-068). ``stoich_oxide_per_vapor`` and ``stoich_O2_per_vapor``
-are kg/kg of vapor: parent-oxide mass and signed O2 coproduct per kg vapor,
-with ``oxide = 1 + O2`` for mass closure.
+One derivation. ``derive_stoich_oxide_per_vapor`` walks the selected
+reaction once, returns each condensed reactant's kg per kg of vapor, and
+sets the scalar totals from that map: oxide is the sum, signed O2 is the
+O2 term from the same walk, and ``oxide = 1 + O2``.
 """
 
 from __future__ import annotations
@@ -134,18 +135,30 @@ def oxygen_coproduct_account(
     return "process.overhead_gas"
 
 
-def reactant_masses_and_o2_per_vapor_kg(
+def derive_stoich_oxide_per_vapor(
     *,
     formula: str,
+    parent_oxide: str,
     reaction: Mapping[str, Any],
-) -> tuple[dict[str, float], float]:
-    """Condensed-reactant kg and signed O2 kg per kg of vapor.
+) -> tuple[dict[str, float], float, float]:
+    """Return reactant kg, oxide kg, and signed O2 kg per kg of vapor.
 
-    O2 is not a key in the reactant map. The reactant masses sum to
-    ``1 + O2``. Keys are ledger component keys, with phase tags removed.
+    Association rows (parent formula equals vapor formula) transfer 1 kg/kg
+    with no O2 coproduct and an empty reactant map. The gas-association
+    reaction is pressure-only.
+
+    Every other row is one walk. Each condensed reactant, phase tag removed,
+    contributes ``stoichiometry * molar mass``. Oxide is the sum of those
+    masses. Signed O2 is the O2 term from the same walk. Mass closure is
+    ``oxide = 1 + O2``. A single condensed reactant therefore keeps the
+    historical scalar totals; two reactants each keep their own mass.
     """
 
-    vapor_key = ledger_component_key(formula)
+    vapor_key = strip_phase(formula)
+    parent_key = strip_phase(parent_oxide)
+    if vapor_key == parent_key:
+        return {}, 1.0, 0.0
+
     reactants = reaction.get("reactants") or []
     products = reaction.get("products") or []
     if not isinstance(reactants, list) or not isinstance(products, list):
@@ -158,7 +171,7 @@ def reactant_masses_and_o2_per_vapor_kg(
         for item in participants:
             if not isinstance(item, Mapping):
                 continue
-            part = ledger_component_key(str(item.get("formula") or ""))
+            part = strip_phase(str(item.get("formula") or ""))
             amount = float(item.get("stoichiometry"))
             if part == "O2":
                 o2_nu += sign * amount
@@ -170,71 +183,16 @@ def reactant_masses_and_o2_per_vapor_kg(
             if sign > 0.0 and part == vapor_key:
                 vapor_nu += amount
     if not condensed_g or vapor_nu <= 0.0:
-        raise ValueError(f"cannot derive reactant masses for {formula!r}")
+        raise ValueError(
+            f"cannot derive stoich for {formula!r} from parent {parent_oxide!r}"
+        )
     denom = vapor_nu * _molar_mass_g(vapor_key)
     masses = {key: grams / denom for key, grams in condensed_g.items()}
     o2 = (o2_nu * _molar_mass_g("O2")) / denom
     oxide = sum(masses.values())
     if not math.isclose(oxide, 1.0 + o2, rel_tol=1e-6, abs_tol=1e-9):
         raise ValueError(
-            f"{formula}: reactant masses do not conserve mass: "
-            f"oxide={oxide} O2={o2}"
-        )
-    return masses, o2
-
-
-def derive_stoich_oxide_per_vapor(
-    *,
-    formula: str,
-    parent_oxide: str,
-    reaction: Mapping[str, Any],
-) -> tuple[float, float]:
-    """Return ``(stoich_oxide_per_vapor, stoich_O2_per_vapor)`` in kg/kg.
-
-    Association rows (parent formula equals vapor formula) transfer 1 kg/kg
-    with no O2 coproduct — the gas-association reaction is pressure-only.
-    Oxide evaporation uses the condensed reactant and signed O2 of ``reaction``.
-    """
-    vapor_key = strip_phase(formula)
-    parent_key = strip_phase(parent_oxide)
-    if vapor_key == parent_key:
-        return 1.0, 0.0
-
-    reactants = reaction.get("reactants") or []
-    products = reaction.get("products") or []
-    if not isinstance(reactants, list) or not isinstance(products, list):
-        raise ValueError("reaction requires reactants and products lists")
-
-    condensed_nu = 0.0
-    condensed_formula = None
-    vapor_nu = 0.0
-    o2_nu = 0.0
-    for sign, participants in ((-1.0, reactants), (1.0, products)):
-        for item in participants:
-            if not isinstance(item, Mapping):
-                continue
-            part_formula = strip_phase(str(item.get("formula") or ""))
-            amount = float(item.get("stoichiometry"))
-            if part_formula == "O2":
-                o2_nu += sign * amount
-                continue
-            if sign < 0.0 and part_formula != vapor_key:
-                condensed_nu += amount
-                condensed_formula = part_formula
-            if sign > 0.0 and part_formula == vapor_key:
-                vapor_nu += amount
-    if condensed_formula is None or condensed_nu <= 0.0 or vapor_nu <= 0.0:
-        raise ValueError(
-            f"cannot derive stoich for {formula!r} from parent {parent_oxide!r}"
-        )
-    m_cond = _molar_mass_g(condensed_formula)
-    m_vap = _molar_mass_g(vapor_key)
-    m_o2 = _molar_mass_g("O2")
-    oxide = (condensed_nu * m_cond) / (vapor_nu * m_vap)
-    o2 = (o2_nu * m_o2) / (vapor_nu * m_vap)
-    if not math.isclose(oxide, 1.0 + o2, rel_tol=1e-6, abs_tol=1e-9):
-        raise ValueError(
             f"{formula}: derived stoich does not conserve mass: "
             f"oxide={oxide} O2={o2}"
         )
-    return oxide, o2
+    return masses, oxide, o2

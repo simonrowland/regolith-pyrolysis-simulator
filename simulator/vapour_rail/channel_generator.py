@@ -391,11 +391,12 @@ def generate_element_channels(
             )
             continue
         evaluator_family = next(iter(families))
-        oxide, o2 = derive_stoich_oxide_per_vapor(
+        derived = derive_stoich_oxide_per_vapor(
             formula=formula,
             parent_oxide=parent_oxide,
             reaction=reaction,
         )
+        oxide, o2 = derived[1], derived[2]
         species_id = f"t1139_{element}_{carrier}"
         family = _four_strata_family(
             species_id=species_id,

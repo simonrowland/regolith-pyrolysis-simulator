@@ -16,7 +16,10 @@ from simulator.accounting.formulas import parse_formula
 from simulator.chemistry.kernel import ChemistryIntent, IntentRequest
 from simulator.chemistry.kernel.dto import ProviderAccountView
 from simulator.evaporation import EvaporationMixin
-from simulator.vapour_rail.stoich import oxygen_coproduct_account
+from simulator.vapour_rail.stoich import (
+    derive_stoich_oxide_per_vapor,
+    oxygen_coproduct_account,
+)
 
 
 def _kg_per_kg_vapor(formula: str, nu: float, vapor: str, vapor_nu: float = 1.0) -> float:
@@ -214,6 +217,58 @@ def _first_order_rate(raw_kg_hr: float, total_draw_kg_hr: float, available_kg: f
     fraction = -math.expm1(-(total_draw_kg_hr / available_kg) * dt_hr)
     fraction = max(0.0, min(math.nextafter(1.0, 0.0), fraction))
     return raw_kg_hr * (available_kg * fraction) / total_draw_kg_hr
+
+
+def test_half_sodium_oxide_half_boria_is_one_kilogram_per_kilogram() -> None:
+    """½Na2O + ½B2O3 → NaBO2 is one kilogram of parents per kilogram of vapor."""
+
+    masses, oxide, o2 = derive_stoich_oxide_per_vapor(
+        formula="NaBO2",
+        parent_oxide="Na2O",
+        reaction=NABO2,
+    )
+    sodium = 0.5 * parse_formula("Na2O").molar_mass_g_per_mol()
+    boron = 0.5 * parse_formula("B2O3").molar_mass_g_per_mol()
+    vapor = parse_formula("NaBO2").molar_mass_g_per_mol()
+    assert masses["Na2O"] == pytest.approx(sodium / vapor)
+    assert masses["B2O3"] == pytest.approx(boron / vapor)
+    assert set(masses) == {"Na2O", "B2O3"}
+    assert oxide == pytest.approx(1.0, abs=1e-12)
+    assert o2 == pytest.approx(0.0, abs=1e-15)
+    assert oxide == pytest.approx(sum(masses.values()))
+    assert sodium + boron == pytest.approx(vapor, abs=1e-9)
+
+
+def test_association_returns_one_kilogram_and_no_reactant_map() -> None:
+    masses, oxide, o2 = derive_stoich_oxide_per_vapor(
+        formula="FeO",
+        parent_oxide="FeO",
+        reaction={"reactants": [], "products": []},
+    )
+    assert masses == {}
+    assert oxide == 1.0
+    assert o2 == 0.0
+
+
+def test_single_condensed_reactant_scalar_is_its_own_mass() -> None:
+    reaction = _reaction(
+        "na",
+        [("Na2O", 1.0)],
+        [("Na", 2.0), ("O2", 0.5)],
+    )
+    masses, oxide, o2 = derive_stoich_oxide_per_vapor(
+        formula="Na",
+        parent_oxide="Na2O",
+        reaction=reaction,
+    )
+    parent = parse_formula("Na2O").molar_mass_g_per_mol()
+    vapor = 2.0 * parse_formula("Na").molar_mass_g_per_mol()
+    oxygen = 0.5 * parse_formula("O2").molar_mass_g_per_mol()
+    assert set(masses) == {"Na2O"}
+    assert masses["Na2O"] == pytest.approx(parent / vapor)
+    assert oxide == pytest.approx(parent / vapor)
+    assert o2 == pytest.approx(oxygen / vapor)
+    assert oxide == pytest.approx(1.0 + o2)
 
 
 def test_oxide_vapour_vector_closes_and_credits_overhead_oxygen() -> None:

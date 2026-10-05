@@ -3965,11 +3965,12 @@ def _legacy_species_row(
             matched = [item for item in reactions if isinstance(item, Mapping)]
         if matched:
             try:
-                oxide, o2 = derive_stoich_oxide_per_vapor(
+                derived = derive_stoich_oxide_per_vapor(
                     formula=str(row.get("formula") or species_id),
                     parent_oxide=str(parent_oxide),
                     reaction=matched[0],
                 )
+                oxide, o2 = derived[1], derived[2]
             except CatalogCompileError:
                 raise
             except ValueError as exc:

@@ -40,8 +40,8 @@ from simulator.state import (
     clamp_stir_factor,
 )
 from simulator.vapour_rail.stoich import (
+    derive_stoich_oxide_per_vapor,
     oxygen_coproduct_account,
-    reactant_masses_and_o2_per_vapor_kg,
     strip_phase,
 )
 from simulator.vapour_rail.batch import (
@@ -4430,10 +4430,11 @@ class EvaporationMixin:
                 condensed.append(key)
         if len(set(condensed)) <= 1:
             return None
-        masses, o2 = reactant_masses_and_o2_per_vapor_kg(
-            formula=formula, reaction=chosen
+        masses, oxide, o2 = derive_stoich_oxide_per_vapor(
+            formula=formula,
+            parent_oxide=str(sp_data.get('parent_oxide') or ''),
+            reaction=chosen,
         )
-        oxide = sum(masses.values())
         declared_oxide = sp_data.get('stoich_oxide_per_vapor')
         declared_o2 = sp_data.get('stoich_O2_per_vapor')
         if declared_oxide is not None or declared_o2 is not None:
