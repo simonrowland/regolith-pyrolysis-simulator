@@ -4,9 +4,19 @@ from __future__ import annotations
 
 import hashlib
 import json
+from decimal import Decimal
 from pathlib import Path
 
 import yaml
+
+from simulator.battery.enums import (
+    MELT_ACTIVITY_QUANTITIES,
+    QUANTITY_UNITS,
+    Quantity,
+    ValueKind,
+)
+from simulator.battery.identity import profile_for
+from simulator.battery.migrate import Migrator
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -32,11 +42,122 @@ def test_sossi_fegley_2018_table_2_printed_rows_are_pinned() -> None:
     path = ROOT / "data/literature/extracts/kems-041-sossi-fegley-2018.yaml"
     doc = yaml.safe_load(path.read_text())
     rows = [
-        [formula, obs["observation_id"], obs.get("T_range_K"), obs.get("standard_state"), obs.get("values")]
+        [
+            formula,
+            obs["observation_id"],
+            obs.get("T_range_K"),
+            obs.get("standard_state"),
+            {
+                key: value
+                for key, value in (obs.get("values") or {}).items()
+                if key not in {"quantity", "rows", "range", "approximate", "compilation_note"}
+            },
+        ]
         for formula, species in doc["species"].items()
         for obs in species.get("observations", [])
         if str((obs.get("locator") or {}).get("table")) == "2"
     ]
 
     assert len(rows) == 31
-    assert _sha256(rows) == "49112e165ef0da3f7c2aa8b0287550db0dfc3ca3b441ea36aeb6dcb5cef99df3"
+    assert _sha256(rows) == "ff2408b65c69ae0aa84224fc88692e26de1d0a40fb847bfcb8f4b4f05e547cf6"
+
+
+def _migrate_extract(name: str):
+    migrator = Migrator(root=ROOT)
+    migrator._migrate_extract(ROOT / "data/literature/extracts" / f"{name}.yaml")
+    migrator.finalize()
+    assert migrator.result.registry_issues == []
+    return migrator.result
+
+
+def _quantity(observation) -> Quantity:
+    quantity = observation.identity.quantity
+    return quantity.value if hasattr(quantity, "is_value") else quantity
+
+
+def test_fegley_2023_table_2_migrates_all_numeric_fit_rows() -> None:
+    result = _migrate_extract("fegley-2023-chemical-equilibrium-calculations-bu")
+    observations = [
+        observation
+        for observation in result.observations.values()
+        if _quantity(observation) is Quantity.ACTIVITY_COEFFICIENT_TEMPERATURE_FIT
+    ]
+
+    assert QUANTITY_UNITS[Quantity.ACTIVITY_COEFFICIENT_TEMPERATURE_FIT] == "dimensionless"
+    fit_profile = profile_for(observations[0].identity)
+    assert fit_profile.required == frozenset({"per", "reference_state"})
+    assert Quantity.ACTIVITY_COEFFICIENT_TEMPERATURE_FIT not in MELT_ACTIVITY_QUANTITIES
+    assert len(observations) == 82
+    assert not [
+        issue
+        for issue in result.validation.hard_issues
+        if "fegley_2023_table_02_model" in issue.path
+    ]
+    assert all(observation.value.kind is ValueKind.EXPRESSION for observation in observations)
+    assert all(
+        set(dict(observation.value.expression_parameters or ())) == {"A", "B"}
+        for observation in observations
+    )
+
+    as2o3 = next(
+        observation
+        for observation in observations
+        if observation.identity.species.formula == "As2O3"
+        and dict(observation.value.expression_parameters or ()).get("A") == Decimal("3.4014")
+    )
+    assert dict(as2o3.value.expression_parameters or ()) == {
+        "A": Decimal("3.4014"),
+        "B": Decimal("-26309.08"),
+    }
+    domain = json.loads(as2o3.value.expression_domain)
+    assert domain["input_unit"] == "K"
+    assert domain["validity_range_K"] == [1800, 2200]
+    assert domain["notes_as_printed"] == "FactSage 1800−2200 K, CMAS+FeO"
+
+
+def test_sossi_fegley_2018_table_2_migrates_numeric_activity_rows() -> None:
+    result = _migrate_extract("kems-041-sossi-fegley-2018")
+    observations = [
+        observation
+        for observation in result.observations.values()
+        if _quantity(observation) is Quantity.ACTIVITY_COEFFICIENT
+        and observation.locator is not None
+        and observation.locator.table == "2"
+    ]
+
+    assert len(observations) == 44
+    assert result.validation.hard_issues == ()
+    assert sum(observation.value.kind is ValueKind.INTERVAL for observation in observations) == 37
+    assert sum(observation.value.kind is ValueKind.POINT for observation in observations) == 4
+    assert sum(observation.value.kind is ValueKind.EXPRESSION for observation in observations) == 3
+    phosphate = next(
+        observation
+        for observation in observations
+        if observation.identity.species.formula == "P"
+    )
+    assert phosphate.value.kind is ValueKind.INTERVAL
+    assert (phosphate.value.interval_low, phosphate.value.interval_high) == (
+        Decimal("1e-10"),
+        Decimal("1e-6"),
+    )
+    anorthite_diopside = next(
+        observation
+        for observation in observations
+        if observation.provenance
+        and observation.provenance.get("activity_coefficient_table_row_as_printed", {}).get(
+            "oxide_formula_as_published"
+        )
+        == "$AlO_{1.5}$"
+    )
+    assert anorthite_diopside.value.interval_low == Decimal(".28")
+    assert anorthite_diopside.value.interval_high == Decimal(".37")
+    printed_row = anorthite_diopside.provenance[
+        "activity_coefficient_table_row_as_printed"
+    ]
+    assert printed_row["melt_composition_as_published"] == "CMAS (An–Di)"
+    assert printed_row["standard_state_as_printed"].startswith("oxide activity coefficient")
+    temperature = anorthite_diopside.point_conditions["temperature_K"].state.value
+    assert (temperature.interval_low, temperature.interval_high) == (
+        Decimal("1573"),
+        Decimal("1773"),
+    )

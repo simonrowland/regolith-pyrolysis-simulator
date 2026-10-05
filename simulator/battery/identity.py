@@ -599,6 +599,23 @@ def profile_for(identity: Identity) -> QuantityProfile:
             "formation_elements",
             "subtype",
         )
+    elif q is Quantity.ACTIVITY_COEFFICIENT_TEMPERATURE_FIT:
+        req("per", "reference_state")
+        na(
+            "temperature_K",
+            "standard_pressure_Pa",
+            "composition",
+            "fO2_Pa",
+            "total_pressure_Pa",
+            "sweep_gas",
+            "exposure",
+            "sample_mass_kg",
+            "wall",
+            "reservoir",
+            "reaction",
+            "formation_elements",
+            "subtype",
+        )
     elif q in MELT_ACTIVITY_QUANTITIES:
         req(
             "temperature_K",

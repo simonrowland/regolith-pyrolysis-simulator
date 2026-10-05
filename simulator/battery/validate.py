@@ -36,6 +36,7 @@ Ambiguity resolutions:
 
 from __future__ import annotations
 
+import json
 import re
 from contextlib import contextmanager
 from dataclasses import dataclass, fields, is_dataclass
@@ -54,6 +55,7 @@ from simulator.battery.enums import (
     MEASURED_EVIDENCE,
     NoticeKind,
     Phase,
+    QUANTITY_UNITS,
     Quantity,
     RefusalReason,
     ResidualStatus,
@@ -1190,6 +1192,98 @@ def validate_observation(
     if observation.value.kind is ValueKind.POINT and observation.uncertainty.kind is UncertaintyKind.NONE:
         # none uncertainty is valid; never invent a z-score
         pass
+    if quantity_token(observation.identity) is Quantity.ACTIVITY_COEFFICIENT_TEMPERATURE_FIT:
+        issues.extend(
+            _validate_activity_coefficient_temperature_fit(
+                observation.value, f"{path}.value"
+            )
+        )
+    return issues
+
+
+def _validate_activity_coefficient_temperature_fit(
+    value: object, path: str
+) -> list[ValidationIssue]:
+    if not isinstance(value, Value) or value.kind is not ValueKind.EXPRESSION:
+        return [
+            _issue(
+                path,
+                RefusalReason.INVALID_SOURCE,
+                "activity-coefficient temperature fit requires an expression value",
+            )
+        ]
+    issues: list[ValidationIssue] = []
+    if value.expression_text != "log10 γ = A + B/T":
+        issues.append(
+            _issue(
+                f"{path}.expression_text",
+                RefusalReason.INVALID_SOURCE,
+                "activity-coefficient temperature fit must use log10 γ = A + B/T",
+            )
+        )
+    parameters = value.expression_parameters or ()
+    if len(parameters) != 2 or {name for name, _ in parameters} != {"A", "B"}:
+        issues.append(
+            _issue(
+                f"{path}.expression_parameters",
+                RefusalReason.INVALID_SOURCE,
+                "activity-coefficient temperature fit requires numeric A and B",
+            )
+        )
+    if QUANTITY_UNITS[Quantity.ACTIVITY_COEFFICIENT_TEMPERATURE_FIT] != "dimensionless":
+        issues.append(
+            _issue(
+                f"{path}.unit",
+                RefusalReason.INVALID_SOURCE,
+                "activity-coefficient temperature fit output must be dimensionless",
+            )
+        )
+    try:
+        domain = json.loads(value.expression_domain or "")
+    except (TypeError, ValueError):
+        domain = None
+    if not isinstance(domain, dict) or domain.get("input_unit") != "K":
+        issues.append(
+            _issue(
+                f"{path}.expression_domain",
+                RefusalReason.INVALID_SOURCE,
+                "activity-coefficient temperature fit domain must name temperature in K",
+            )
+        )
+    else:
+        temperature_range = domain.get("validity_range_K")
+        if temperature_range is not None:
+            try:
+                low, high = (Decimal(str(endpoint)) for endpoint in temperature_range)
+                valid_range = len(temperature_range) == 2 and low.is_finite() and high.is_finite() and low <= high
+            except (TypeError, ValueError):
+                valid_range = False
+            if not valid_range:
+                issues.append(
+                    _issue(
+                        f"{path}.expression_domain.validity_range_K",
+                        RefusalReason.INVALID_SOURCE,
+                        "fit validity range must be two ordered finite temperatures",
+                    )
+                )
+        if not isinstance(domain.get("standard_state_as_printed"), str) or not domain[
+            "standard_state_as_printed"
+        ].strip():
+            issues.append(
+                _issue(
+                    f"{path}.expression_domain.standard_state_as_printed",
+                    RefusalReason.INVALID_SOURCE,
+                    "fit row must state its printed standard state or that none is stated",
+                )
+            )
+        if not isinstance(domain.get("notes_as_printed"), str):
+            issues.append(
+                _issue(
+                    f"{path}.expression_domain.notes_as_printed",
+                    RefusalReason.INVALID_SOURCE,
+                    "fit row must preserve its printed note",
+                )
+            )
     return issues
 
 
