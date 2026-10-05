@@ -127,7 +127,7 @@ See [`docs/session-script-protocol.md`](session-script-protocol.md) for the full
 
 ## What to do next
 
-- **Understand the process model**: [`docs/concepts.md`](concepts.md) explains the three control levers, the four product classes, and the physical basis for the extraction sequence.
+- **Understand the process model**: [`docs/concepts.md`](concepts.md) explains the four control levers, the four product classes, and the physical basis for the extraction sequence.
 - **Design a recipe**: [`docs/recipe-playbook.md`](recipe-playbook.md) covers the campaign catalog, operator decision points, and worked example workflows.
 - **Read run outputs**: [`docs/output-interpretation.md`](output-interpretation.md) explains the per-hour summary fields, the final-state ledger, and what to plot.
 - **Know the limits**: [`docs/model-limitations.md`](model-limitations.md) lists what the simulator does not model and what results cannot be claimed from it.
