@@ -10,10 +10,13 @@ import yaml
 
 from simulator.chemistry.melt_activity import melt_oxide_activity
 from simulator.fe_redox import (
+    KRESS91_LIQUID_CALIBRATION_MAX_T_C,
+    KRESS91_LIQUID_CALIBRATION_MIN_T_C,
     kress91_ferrous_feo_activity,
     kress91_furnace_activity_pressure_bar,
+    kress91_temperature_band_case,
 )
-from simulator.physical_constants import GAS_CONSTANT
+from simulator.physical_constants import CELSIUS_TO_KELVIN_OFFSET, GAS_CONSTANT
 from simulator.vapour_rail.activity import (
     ActivityInputDeclaration,
     ActivityRefusalCode,
@@ -540,6 +543,23 @@ def test_tier_c_three_fail_closed_categories() -> None:
     assert continued.ln_value == pytest.approx(math.log(0.2))
     assert continued.ln_band == (-3.0, 4.0)
     assert continued.authority is False
+
+    extrapolated = resolver.resolve_tier_c(
+        _query(
+            "LiO0.5",
+            fractions={"LiO0.5": 0.2, "SiO2": 0.8},
+            out_of_domain=True,
+        )
+    )
+    assert extrapolated.verdict is ActivityVerdictKind.STATUS_BEARING_VALUE
+    assert extrapolated.verdict is not ActivityVerdictKind.REFUSAL
+    assert extrapolated.domain_status == "out_of_domain_extrapolated"
+    assert extrapolated.ln_value == pytest.approx(math.log(0.2))
+    assert extrapolated.value == pytest.approx(0.2)
+    tier_c_notice = extrapolated.derivation["extrapolation_notice"]
+    assert tier_c_notice["authority_level"] == "extrapolated"
+    assert tier_c_notice["reason"]
+    assert "certified_band" in tier_c_notice
 
     proven_zero = resolver.resolve_tier_c(
         _query("LiO0.5", fractions={"LiO0.5": 0.0, "SiO2": 1.0})
@@ -1094,7 +1114,15 @@ def test_tier_a_rejects_wrong_engine_identity_and_out_of_domain_temperature() ->
             source_standard_state=_tier_a_source_state(resolver, "CaO"),
         ),
     )
-    assert out_of_domain.refusal_code is ActivityRefusalCode.DESCRIPTOR_HULL_EXCEEDED
+    assert out_of_domain.verdict is ActivityVerdictKind.STATUS_BEARING_VALUE
+    assert out_of_domain.refusal_code is None
+    assert out_of_domain.domain_status == "out_of_domain_extrapolated"
+    assert out_of_domain.ln_value == pytest.approx(0.0)
+    notice = out_of_domain.derivation["extrapolation_notice"]
+    assert notice["authority_level"] == "extrapolated"
+    assert notice["reason"]
+    assert notice["certified_band"]["temperature_K"] == [1473.15, 1903.15]
+    assert notice["certified_band"]["pressure_bar"] == [0.0, 1.0]
 
 
 def test_fe_shadow_uses_exact_pressure_and_keeps_source_standard_state() -> None:
@@ -1136,3 +1164,36 @@ def test_fe_shadow_uses_exact_pressure_and_keeps_source_standard_state() -> None
     assert result.standard_state != result.target_standard_state
     assert result.derivation["pressure_bar"] == pressure_bar
     assert result.derivation["target_conversion_status"] == "mu0_target_pending"
+    assert "extrapolation_notice" not in result.derivation
+
+    cold_K = KRESS91_LIQUID_CALIBRATION_MIN_T_C + CELSIUS_TO_KELVIN_OFFSET - 10.0
+    cold_state = VapourResolveState(
+        temperature_K=cold_K,
+        total_pressure_Pa=100_000.0,
+        source_reaction_activities={"Fe": 0.1},
+        source_reaction_fO2_log10=intrinsic_log10,
+        source_reaction_activity_pressure_bar=pressure_bar,
+        source_reaction_redox_model_id="REF-001-kress-carmichael-1991",
+        source_reaction_composition_wt_pct=composition,
+    )
+    cold = build_shadow_for_vapour_batch(
+        rules=(),
+        ledger_snapshot={"process.cleaned_melt": {"FeO": 1.0}},
+        state=cold_state,
+    ).results_by_component["FeO"]
+    cold_expected = kress91_ferrous_feo_activity(
+        comp_wt=composition,
+        fO2_log=intrinsic_log10,
+        T_K=cold_K,
+        pressure_bar=pressure_bar,
+    )
+    band = kress91_temperature_band_case(cold_K - CELSIUS_TO_KELVIN_OFFSET)
+    assert cold.verdict is ActivityVerdictKind.STATUS_BEARING_VALUE
+    assert cold.value == cold_expected
+    cold_notice = cold.derivation["extrapolation_notice"]
+    assert cold_notice["authority_level"] == "extrapolated"
+    assert cold_notice["reason"] == band["source"]
+    assert cold_notice["certified_band"]["temperature_C"] == [
+        KRESS91_LIQUID_CALIBRATION_MIN_T_C,
+        KRESS91_LIQUID_CALIBRATION_MAX_T_C,
+    ]

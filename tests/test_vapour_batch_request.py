@@ -60,7 +60,6 @@ from simulator.vapour_rail.request import (
     REFUSAL_INAPPLICABLE_PREDICATE,
     REFUSAL_MISSING_OUTCOME_STATE,
     REFUSAL_NO_COMPLETE_BUNDLE_SOURCE,
-    REFUSAL_NO_ADMITTED_SOURCE,
     REFUSAL_OUTSIDE_DECLARED_DOMAIN,
     ProviderDomainCandidate,
     RequestRule,
@@ -847,11 +846,13 @@ def test_provider_domain_miss_not_refusal_when_other_candidate_covers() -> None:
             provider_id="vaporock",
             covers_state=vaporock_covers,
             evidence_class="analytical:vaporock_calibrated",
+            certified_band={"temperature_K": [1350.0, 1950.0]},
         ),
         ProviderDomainCandidate(
             provider_id="literature_antoine",
             covers_state=literature_covers,
             evidence_class="analytical:external_grounded",
+            certified_band={"temperature_K": [500.0, 2500.0]},
         ),
     ]
     catalog_species = _stub_catalog_species("Fe")
@@ -868,13 +869,14 @@ def test_provider_domain_miss_not_refusal_when_other_candidate_covers() -> None:
         f"provider-specific domain miss must not refuse when another "
         f"candidate covers; got {answer.refusal_code}: {answer.extra}"
     )
+    assert "extrapolation_notice" not in answer.extra
     # VapoRock alone would miss at 1200 K
     assert not vaporock_covers(state.as_mapping())
     assert literature_covers(state.as_mapping())
 
-    # Both candidates miss → step-2 refusal
+    # Both candidates miss → live answer, flagged, not a refusal.
     cold = VapourResolveState(temperature_K=100.0)
-    refused = refusal_closure(
+    extrapolated = refusal_closure(
         requested=frozenset({"Fe"}),
         rules=(rule,),
         ledger_snapshot=ledger,
@@ -882,8 +884,31 @@ def test_provider_domain_miss_not_refusal_when_other_candidate_covers() -> None:
         provider_candidates_by_species={"Fe": candidates},
         catalog_species=catalog_species,
     ).answers["Fe"]
-    assert refused.is_refused
-    assert refused.refusal_code == REFUSAL_NO_ADMITTED_SOURCE
+    assert not extrapolated.is_refused
+    assert isinstance(extrapolated.pressure, PressureValue)
+    notice = extrapolated.extra["extrapolation_notice"]
+    assert notice["authority_level"] == "extrapolated"
+    assert notice["reason"] == (
+        "no admitted source candidate covers requested state"
+    )
+    assert notice["certified_band"]["vaporock"]["temperature_K"] == [
+        1350.0,
+        1950.0,
+    ]
+    assert notice["certified_band"]["literature_antoine"]["temperature_K"] == [
+        500.0,
+        2500.0,
+    ]
+    batched = resolve_vapour_batch(
+        rules=(rule,),
+        ledger_snapshot=ledger,
+        state=cold,
+        provider_candidates_by_species={"Fe": candidates},
+        catalog_species=catalog_species,
+        flux_activation_context=_rg_activation_context(),
+    ).channel("Fe")
+    assert not batched.is_refused
+    assert batched.extra["extrapolation_notice"] == notice
 
 
 def test_fe_typed_shadow_traverses_per_answer_instrumentation() -> None:
