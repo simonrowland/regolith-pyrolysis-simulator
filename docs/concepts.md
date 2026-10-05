@@ -60,9 +60,9 @@ A drop of 11 decades in pO₂ (1 atm → ntorr) scales metal activity by ~560× 
 
 When this documentation says "Ellingham diagram" generically, it usually means the underlying plot; the two senses above describe how the plot is read.
 
-## The three levers
+## The four levers
 
-The extraction sequence is driven by three control axes acting on the Ellingham diagram (ΔG of oxidation vs T). The axes are pO₂, pN₂, and temperature.
+The extraction sequence is driven by four control axes acting on the Ellingham diagram (ΔG of oxidation vs T). The axes are pO₂, pN₂, temperature, and melt redox.
 
 ### pO₂
 
@@ -108,6 +108,12 @@ Temperature determines which species are above their vapor-pressure threshold at
 
 The practical implication is that Na/K → Fe → SiO can be sequenced thermally, while Mg opens only in a deep-reduction/deep-vacuum window whose phase-correct threshold is at or above the present furnace ceiling for the frozen lunar-mare comparison. Ca, Al, and Ti remain below their practical vapor threshold at any temperature the current crucible survives. The rump is the physical residue of that floor only for routes that did not later consume those oxides by C5/MRE or C6 thermite.
 
+### Melt redox
+
+Melt redox is the melt's own oxygen inventory, distinct from headspace pO₂. pO₂ is the gas-side oxygen potential at the surface; melt redox is set by what is dosed into the melt: elemental Na/K through the [alkali shuttle](#the-alkali-shuttle), Mg for the C6 thermite, carbon in cleanup, or an oxidant. Each melt reservoir's oxygen potential follows from its inventory.
+
+Melt redox sets the valence of every multivalent element (Fe²⁺/Fe³⁺/Fe⁰, Cr, Ti, V, Mn, Eu, Ce, S). That decides which species are volatile and in what form (metal vapour or oxide vapour), and whether Fe leaves as vapour or is tapped as liquid metal. The lever is local as well as global: a single unstirred lance stream saturates its own zone, a strongly reducing plume beside a more oxidised bulk, so dose rate and mixing are part of the lever.
+
 ## The alkali shuttle
 
 Na and K sit low on the Ellingham diagram at low temperature, but the JANAF-4th multiphase refit moves the practical melt-window story. Na₂O is still more stable than FeO at 1150 °C, so elemental Na can strip oxygen from residual FeO in a narrow cool cleanup window. K₂O crosses FeO near 836 °C, below practical melt operation; K is therefore refused as a FeO reductant in the staged recipe.
@@ -143,7 +149,7 @@ current model abstracts into fixed disposition outcomes.
 
 ## Hot walls and viscous flow as design invariants
 
-Two engineering requirements must hold for the recipe to work at all, regardless of how the three levers are set.
+Two engineering requirements must hold for the recipe to work at all, regardless of how the four levers are set.
 
 **Hot walls upstream of the designated condenser.** Stage 0 duct and upstream piping are maintained hot enough that evolved vapor does not condense before reaching its designated stage — and how hot that is depends on the species and the duty, not on a single number. The historically quoted ~1400 °C is the **SiO quiescent** figure (SiO at ~0.1 µbar partial pressure, pO₂ at the vacuum floor). During active millibar bake-off the same no-fouling condition demands ~1775 °C for Fe and ~1745 °C for SiO, while Na and K need only a few hundred °C; Mg quiescent is a typed refusal (outside the engine's certified range), not a number. The pO₂-cancellation shortcut (`T_wall > T_melt` for a melt-saturated stream) holds for SiO alone, because one equilibrium (`SiO₂(l) ⇌ SiO(g) + ½O₂`) sets both the melt side and the wall side; Na, K, Mg and Fe evaporate as elemental metal vapours whose wall side carries no pO₂ term, so nothing cancels for them. A single duct setpoint therefore cannot be right for the whole sequence: the wall schedule must track the species being driven, within the duct material limit (doloma-REE ceramic, max service temperature 1750 °C; `data/setpoints.yaml` §7). Per-species table and derivations: the hot-wall invariant in `CLAUDE.md`. A cold spot upstream of the designated condenser means the vapor condenses on the pipe wall rather than reaching Stage 1 (Fe), Stage 3 (SiO), or Stage 4 (alkali/Mg). Wall deposits of SiO on ceramic piping are particularly invasive: SiO disproportionates to Si + SiO₂ on cold surfaces, and the silica reacts with refractory oxides at high temperature. Na and K deposits on cold transfer ducts are the second-worst class.
 
