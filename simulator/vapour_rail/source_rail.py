@@ -1,4 +1,4 @@
-"""Source rail: JANAF / NASA Glenn / Burcat / Pankratz B677 → one P°.
+"""Source rail: JANAF / NASA Glenn / Burcat / Pankratz B677 → one P° and ΔfG.
 
 No ranked selector. Selection is d-071 order (JANAF when it tabulates the
 species, then NASA Glenn, Burcat, Pankratz B677). Every record is converted
@@ -6,6 +6,14 @@ to the 1 bar elemental reference used by Mode 2. Gases published at 1 atm
 gain ``R T ln(1 bar / 1 atm)``; condensed VΔP is neglected. Native phase,
 band, and source are recorded on every record. Ranking is only a two-source
 G(T) comparison where two evaluable compilations overlap.
+
+Gibbs convention (FOLD item 3): every returned record evaluates ΔfG(T)
+relative to the elements in their reference states at T. JANAF and Pankratz
+already tabulate that. NASA Glenn and Burcat publish absolute
+G° = H°(T) − T·S°(T) on H298(elements) = 0; the rail converts with
+ΔfG(T) = G°(species) − Σ ν_el·G°(element, same compilation, reference
+state at T). One implementation; the runtime reaction rule stays
+one compilation per reaction.
 """
 
 from __future__ import annotations
@@ -28,7 +36,9 @@ from simulator.vapour_rail.nasa_cea import (
     R_J_PER_MOL_K,
     Nasa7Segment,
     Nasa9Segment,
+    NasaCeaError,
     NasaCeaPolynomial,
+    ThermoState,
 )
 from simulator.vapour_rail.tabulated_gibbs import TabulatedThermo
 
@@ -45,6 +55,32 @@ SOURCE_ORDER: tuple[str, ...] = (
     "nasa-glenn",
     "burcat",
     "pankratz-1984-usbm-b677",
+)
+
+# Common rail convention after conversion.
+GIBBS_CONVENTION_FORMATION = "formation_gibbs"
+# NASA Glenn / Burcat native: G° = H°(T) − T·S°(T), H298(elements) = 0.
+GIBBS_CONVENTION_ABSOLUTE = "absolute_G"
+
+# JANAF/CEA 298 K gas-phase elemental standards (diatomic). Coefficient in
+# ΔfG is n_element / 2 because the reference species is E2(g).
+_DIATOMIC_GAS_REFERENCE: Mapping[str, str] = {
+    "H": "H2",
+    "N": "N2",
+    "O": "O2",
+    "F": "F2",
+    "Cl": "Cl2",
+}
+_DIATOMIC_CONDENSED_REFERENCE: Mapping[str, str] = {
+    "Br": "Br2",
+    "I": "I2",
+}
+_NOBLE_GAS_ELEMENTS: frozenset[str] = frozenset(
+    {"He", "Ne", "Ar", "Kr", "Xe", "Rn"}
+)
+# CEA solid allotropes that are not "cr".
+_SOLID_ALLOTROPE_PHASES: frozenset[str] = frozenset(
+    {"a", "b", "d", "gr", "I", "II", "III", "IV", "s", "S"}
 )
 
 _PHASE_TO_STANDARD_STATE: Mapping[str, str] = {
@@ -68,6 +104,19 @@ def canonical_standard_state(native_phase: str) -> str | None:
         token = token[token.rfind("(") + 1 : -1]
     key = token.lower().lstrip(".")
     return _PHASE_TO_STANDARD_STATE.get(key)
+
+
+def compilation_standard_state(native_phase: str) -> str | None:
+    """Map CEA/Burcat phase tokens, including solid allotropes, to a state."""
+    mapped = canonical_standard_state(native_phase)
+    if mapped is not None:
+        return mapped
+    token = str(native_phase).strip()
+    if token == "L":
+        return "condensed_liquid"
+    if token in _SOLID_ALLOTROPE_PHASES:
+        return "condensed_solid"
+    return None
 
 
 def _published_value(node: Any) -> float | None:
@@ -114,6 +163,8 @@ class SourceRailRecord:
     evaluator_family: str
     thermo: Any
     species_thermo: Mapping[str, Any]
+    gibbs_convention: str = GIBBS_CONVENTION_FORMATION
+    native_gibbs_convention: str = GIBBS_CONVENTION_FORMATION
 
 
 class SourceCoverageGap(Exception):
@@ -126,6 +177,130 @@ class SourceCoverageGap(Exception):
         super().__init__(f"{formula} ({phase}): {reason}")
 
 
+def _reference_species(element: str) -> tuple[str, bool]:
+    """Reference formula and whether the standard is gas-only."""
+    if element in _DIATOMIC_GAS_REFERENCE:
+        return _DIATOMIC_GAS_REFERENCE[element], True
+    if element in _NOBLE_GAS_ELEMENTS:
+        return element, True
+    if element in _DIATOMIC_CONDENSED_REFERENCE:
+        return _DIATOMIC_CONDENSED_REFERENCE[element], False
+    return element, False
+
+
+def _covering_records(
+    records: tuple[SourceRailRecord, ...], temperature_K: float
+) -> tuple[SourceRailRecord, ...]:
+    return tuple(
+        record
+        for record in records
+        if record.T_min_K <= temperature_K <= record.T_max_K
+    )
+
+
+def _element_reference_g_j_per_mol_atom(
+    index: "_CompilationIndex", element: str, temperature_K: float
+) -> float:
+    """G° of one mole of *atoms* of ``element`` in the compilation's reference state."""
+    formula, gas_only = _reference_species(element)
+    composition = parse_formula(formula)
+    atoms = float(composition.elements.get(element, 0.0))
+    if atoms <= 0.0:
+        raise SourceCoverageGap(
+            formula, "reference", f"{formula} does not contain {element}"
+        )
+    nu_species_per_atom = 1.0 / atoms
+    chosen: SourceRailRecord | None = None
+    if not gas_only:
+        condensed: list[SourceRailRecord] = []
+        for state in ("condensed_liquid", "condensed_solid", "condensed"):
+            condensed.extend(index.native_records_for(formula, state))
+        covering = _covering_records(tuple(condensed), temperature_K)
+        if covering:
+            liquids = [
+                record
+                for record in covering
+                if record.standard_state == "condensed_liquid"
+            ]
+            chosen = liquids[0] if liquids else covering[0]
+    if chosen is None:
+        covering = _covering_records(
+            index.native_records_for(formula, "gas"), temperature_K
+        )
+        if covering:
+            chosen = covering[0]
+    if chosen is None:
+        raise SourceCoverageGap(
+            formula,
+            "reference",
+            f"no {element} reference record covers {temperature_K} K",
+        )
+    return nu_species_per_atom * float(chosen.thermo.evaluate(temperature_K).g_J_per_mol)
+
+
+@dataclass
+class FormationGibbsThermo:
+    """Wrap absolute G° so ``evaluate`` returns ΔfG on the elemental reference."""
+
+    native: Any
+    formula: str
+    index: Any
+
+    @property
+    def T_min_K(self) -> float:
+        return float(self.native.T_min_K)
+
+    @property
+    def T_max_K(self) -> float:
+        return float(self.native.T_max_K)
+
+    def evaluate(self, T_K: float) -> ThermoState:
+        T = float(T_K)
+        native_state = self.native.evaluate(T)
+        g_j = float(native_state.g_J_per_mol)
+        composition = parse_formula(self.formula)
+        for element, count in composition.elements.items():
+            g_j -= float(count) * _element_reference_g_j_per_mol_atom(
+                self.index, element, T
+            )
+        return ThermoState(
+            T_K=T,
+            cp_over_R=math.nan,
+            h_over_RT=math.nan,
+            s_over_R=math.nan,
+            g_over_RT=g_j / (R_J_PER_MOL_K * T),
+        )
+
+
+def _with_formation_convention(
+    native: SourceRailRecord, index: "_CompilationIndex"
+) -> SourceRailRecord:
+    species_thermo = dict(native.species_thermo)
+    species_thermo["native_gibbs_convention"] = index.native_gibbs_convention
+    species_thermo["gibbs_convention"] = GIBBS_CONVENTION_FORMATION
+    thermo: Any = native.thermo
+    if index.native_gibbs_convention != GIBBS_CONVENTION_FORMATION:
+        thermo = FormationGibbsThermo(
+            native=native.thermo, formula=native.formula, index=index
+        )
+    return SourceRailRecord(
+        source_id=native.source_id,
+        record_id=native.record_id,
+        formula=native.formula,
+        native_phase=native.native_phase,
+        standard_state=native.standard_state,
+        T_min_K=native.T_min_K,
+        T_max_K=native.T_max_K,
+        native_reference_pressure_Pa=native.native_reference_pressure_Pa,
+        reference_pressure_Pa=native.reference_pressure_Pa,
+        evaluator_family=native.evaluator_family,
+        thermo=thermo,
+        species_thermo=species_thermo,
+        gibbs_convention=GIBBS_CONVENTION_FORMATION,
+        native_gibbs_convention=index.native_gibbs_convention,
+    )
+
+
 class _CompilationIndex:
     """Manifest (formula, standard_state) → on-disk locators, materialized on demand."""
 
@@ -133,24 +308,41 @@ class _CompilationIndex:
         self,
         locators: Mapping[tuple[str, str], tuple[Any, ...]],
         materialize: Callable[[Any], SourceRailRecord | None],
+        *,
+        native_gibbs_convention: str,
     ) -> None:
         self._locators = dict(locators)
         self._materialize = materialize
-        self._cache: dict[tuple[str, str], tuple[SourceRailRecord, ...]] = {}
+        self.native_gibbs_convention = native_gibbs_convention
+        self._native_cache: dict[tuple[str, str], tuple[SourceRailRecord, ...]] = {}
+        self._converted_cache: dict[tuple[str, str], tuple[SourceRailRecord, ...]] = {}
 
-    def records_for(
+    def native_records_for(
         self, formula: str, standard_state: str
     ) -> tuple[SourceRailRecord, ...]:
         key = (formula, standard_state)
-        if key in self._cache:
-            return self._cache[key]
+        if key in self._native_cache:
+            return self._native_cache[key]
         out: list[SourceRailRecord] = []
         for locator in self._locators.get(key, ()):
             record = self._materialize(locator)
             if record is not None:
                 out.append(record)
-        self._cache[key] = tuple(out)
-        return self._cache[key]
+        self._native_cache[key] = tuple(out)
+        return self._native_cache[key]
+
+    def records_for(
+        self, formula: str, standard_state: str
+    ) -> tuple[SourceRailRecord, ...]:
+        key = (formula, standard_state)
+        if key in self._converted_cache:
+            return self._converted_cache[key]
+        converted = tuple(
+            _with_formation_convention(record, self)
+            for record in self.native_records_for(formula, standard_state)
+        )
+        self._converted_cache[key] = converted
+        return converted
 
 
 class SourceRail:
@@ -362,16 +554,12 @@ def _janaf_index() -> _CompilationIndex:
     return _CompilationIndex(
         {key: tuple(paths) for key, paths in locators.items()},
         _janaf_record_from_path,
+        native_gibbs_convention=GIBBS_CONVENTION_FORMATION,
     )
 
 
 def _nasa_standard_state(phase: str) -> str | None:
-    mapped = canonical_standard_state(phase)
-    if mapped is not None:
-        return mapped
-    if str(phase) == "L":
-        return "condensed_liquid"
-    return None
+    return compilation_standard_state(phase)
 
 
 def _nasa9_from_document(document: Mapping[str, Any]) -> NasaCeaPolynomial | None:
@@ -379,31 +567,34 @@ def _nasa9_from_document(document: Mapping[str, Any]) -> NasaCeaPolynomial | Non
     if not intervals:
         return None
     segments: list[Nasa9Segment] = []
-    for interval in intervals:
-        t_min = _published_value(interval.get("T_min_K"))
-        t_max = _published_value(interval.get("T_max_K"))
-        b1 = _published_value(interval.get("b1"))
-        b2 = _published_value(interval.get("b2"))
-        coeffs_raw = interval.get("a_coefficients") or []
-        coeffs = [_published_value(item) for item in coeffs_raw[:7]]
-        if (
-            t_min is None
-            or t_max is None
-            or b1 is None
-            or b2 is None
-            or any(c is None for c in coeffs)
-            or len(coeffs) != 7
-        ):
-            return None
-        segments.append(
-            Nasa9Segment(
-                t_min,
-                t_max,
-                tuple(float(c) for c in coeffs),  # type: ignore[arg-type]
-                float(b1),
-                float(b2),
+    try:
+        for interval in intervals:
+            t_min = _published_value(interval.get("T_min_K"))
+            t_max = _published_value(interval.get("T_max_K"))
+            b1 = _published_value(interval.get("b1"))
+            b2 = _published_value(interval.get("b2"))
+            coeffs_raw = interval.get("a_coefficients") or []
+            coeffs = [_published_value(item) for item in coeffs_raw[:7]]
+            if (
+                t_min is None
+                or t_max is None
+                or b1 is None
+                or b2 is None
+                or any(c is None for c in coeffs)
+                or len(coeffs) != 7
+            ):
+                return None
+            segments.append(
+                Nasa9Segment(
+                    t_min,
+                    t_max,
+                    tuple(float(c) for c in coeffs),  # type: ignore[arg-type]
+                    float(b1),
+                    float(b2),
+                )
             )
-        )
+    except NasaCeaError:
+        return None
     if not segments:
         return None
     standard_state = _nasa_standard_state(str(document.get("phase") or ""))
@@ -496,6 +687,7 @@ def _nasa_glenn_index() -> _CompilationIndex:
     return _CompilationIndex(
         {key: tuple(paths) for key, paths in locators.items()},
         _nasa_record_from_path,
+        native_gibbs_convention=GIBBS_CONVENTION_ABSOLUTE,
     )
 
 
@@ -535,7 +727,7 @@ def _nasa7_from_burcat(document: Mapping[str, Any]) -> NasaCeaPolynomial | None:
     high_c = coeffs(high)
     if low_c is None or high_c is None:
         return None
-    standard_state = canonical_standard_state(str(document.get("phase") or ""))
+    standard_state = compilation_standard_state(str(document.get("phase") or ""))
     if standard_state is None:
         return None
     try:
@@ -615,7 +807,7 @@ def _burcat_index() -> _CompilationIndex:
         if entry.get("record_kind") not in (None, "nasa7_polynomial"):
             continue
         formula = str(entry.get("formula") or "")
-        standard_state = canonical_standard_state(str(entry.get("phase") or ""))
+        standard_state = compilation_standard_state(str(entry.get("phase") or ""))
         rel = str(entry.get("path") or "")
         if not formula or standard_state is None or not rel:
             continue
@@ -623,6 +815,7 @@ def _burcat_index() -> _CompilationIndex:
     return _CompilationIndex(
         {key: tuple(paths) for key, paths in locators.items()},
         _burcat_record_from_path,
+        native_gibbs_convention=GIBBS_CONVENTION_ABSOLUTE,
     )
 
 
@@ -738,6 +931,7 @@ def _pankratz_index() -> _CompilationIndex:
     return _CompilationIndex(
         {key: tuple(paths) for key, paths in locators.items()},
         _pankratz_record_from_path,
+        native_gibbs_convention=GIBBS_CONVENTION_FORMATION,
     )
 
 
@@ -777,6 +971,8 @@ def compare_g_over_overlap(
                 "left_g_J_per_mol": g_left,
                 "right_g_J_per_mol": g_right,
                 "delta_g_J_per_mol": g_left - g_right,
+                "left_gibbs_convention": left.gibbs_convention,
+                "right_gibbs_convention": right.gibbs_convention,
             }
         )
     return tuple(rows)

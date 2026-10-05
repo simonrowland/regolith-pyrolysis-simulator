@@ -15,6 +15,8 @@ from simulator.vapour_rail.catalog import (
 from simulator.vapour_rail.nasa_cea import R_J_PER_MOL_K
 from simulator.vapour_rail.source_rail import (
     ATM_PRESSURE_PA,
+    GIBBS_CONVENTION_ABSOLUTE,
+    GIBBS_CONVENTION_FORMATION,
     STANDARD_PRESSURE_PA,
     compare_g_over_overlap,
     convert_gas_g_j_per_mol,
@@ -113,6 +115,11 @@ def test_janaf_ga_gas_is_selected_before_nasa(source_rail) -> None:
     assert comparison
     # Disagreements stay visible: the sample is finite, not forced to zero.
     assert all(math.isfinite(row["delta_g_J_per_mol"]) for row in comparison)
+    assert all(
+        row["left_gibbs_convention"] == GIBBS_CONVENTION_FORMATION
+        and row["right_gibbs_convention"] == GIBBS_CONVENTION_FORMATION
+        for row in comparison
+    )
 
 
 def test_liquid_parents_are_on_the_rail(source_rail) -> None:
@@ -142,6 +149,102 @@ def test_feedstock_element_enumerator_is_the_janaf_owner() -> None:
 
 def test_catalog_derives_exactly_the_retired_hand_rows() -> None:
     assert CATALOG_DERIVED_STOICH_SPECIES == frozenset(STOICH_PINS)
+
+
+def _record_by_source(overlap, source_id: str):
+    for record in overlap:
+        if record.source_id == source_id:
+            return record
+    raise AssertionError(f"missing {source_id}")
+
+
+def test_every_returned_record_names_formation_gibbs_convention(source_rail) -> None:
+    samples = (
+        ("Ga", "gas"),
+        ("Cu", "gas"),
+        ("B2O3", "gas"),
+        ("B2O3", "condensed_liquid"),
+        ("O2", "gas"),
+        ("Ga2O3", "condensed_liquid"),
+        ("Cu2O", "condensed_liquid"),
+    )
+    for formula, state in samples:
+        for record in source_rail.records_for(formula, state):
+            assert record.gibbs_convention == GIBBS_CONVENTION_FORMATION
+            assert record.species_thermo["gibbs_convention"] == GIBBS_CONVENTION_FORMATION
+            if record.source_id in {"nasa-glenn", "burcat"}:
+                assert record.native_gibbs_convention == GIBBS_CONVENTION_ABSOLUTE
+            else:
+                assert record.native_gibbs_convention == GIBBS_CONVENTION_FORMATION
+
+
+def test_nasa_o2_formation_gibbs_is_the_zero_of_the_reference(source_rail) -> None:
+    oxygen = _record_by_source(source_rail.records_for("O2", "gas"), "nasa-glenn")
+    for temperature_K in (1400.0, 1600.0, 1800.0):
+        dfg = oxygen.thermo.evaluate(temperature_K).g_J_per_mol
+        assert dfg == pytest.approx(0.0, abs=1e-6)
+
+
+def test_two_source_formation_gibbs_residuals_on_common_basis(source_rail) -> None:
+    """JANAF ΔfG vs NASA converted ΔfG. Residuals stay visible; none are tuned."""
+    samples = (("Ga", "gas"), ("Cu", "gas"), ("B2O3", "gas"), ("B2O3", "condensed_liquid"))
+    reported: list[str] = []
+    for formula, state in samples:
+        overlap = source_rail.overlapping_sources(formula, state)
+        janaf = _record_by_source(overlap, "nist-janaf-4th")
+        nasa = _record_by_source(overlap, "nasa-glenn")
+        rows = compare_g_over_overlap(janaf, nasa)
+        assert rows
+        for row in rows:
+            residual_kJ = row["delta_g_J_per_mol"] / 1000.0
+            line = (
+                f"{formula}({state}) T={row['T_K']:.0f} "
+                f"JANAF-NASA={residual_kJ:.3f} kJ/mol"
+            )
+            reported.append(line)
+            assert math.isfinite(residual_kJ)
+            # Unconverted CEA G° disagrees by 75–500 kJ and grows with T.
+            # After conversion the residual is a few kJ. Anything above ~5 kJ
+            # is a real data disagreement: fail with the residual visible.
+            assert abs(residual_kJ) < 5.0, line
+    print("\n".join(reported))
+    assert len(reported) == 12
+
+
+def test_janaf_and_nasa_same_reaction_agree_once_converted(source_rail) -> None:
+    """B2O3(l) → B2O3(g): one compilation per side, common ΔfG basis."""
+    janaf_liquid = source_rail.require("B2O3", "condensed_liquid")
+    assert janaf_liquid.source_id == "nist-janaf-4th"
+    nasa_liquid = _record_by_source(
+        source_rail.records_for("B2O3", "condensed_liquid"), "nasa-glenn"
+    )
+    janaf_gas = _record_by_source(
+        source_rail.records_for("B2O3", "gas"), "nist-janaf-4th"
+    )
+    nasa_gas = _record_by_source(
+        source_rail.records_for("B2O3", "gas"), "nasa-glenn"
+    )
+    residuals_kJ: list[float] = []
+    for temperature_K in (1400.0, 1600.0, 1800.0):
+        dG_janaf = (
+            janaf_gas.thermo.evaluate(temperature_K).g_J_per_mol
+            - janaf_liquid.thermo.evaluate(temperature_K).g_J_per_mol
+        )
+        dG_nasa = (
+            nasa_gas.thermo.evaluate(temperature_K).g_J_per_mol
+            - nasa_liquid.thermo.evaluate(temperature_K).g_J_per_mol
+        )
+        residual_kJ = (dG_janaf - dG_nasa) / 1000.0
+        residuals_kJ.append(residual_kJ)
+        assert math.isfinite(residual_kJ)
+        assert abs(residual_kJ) < 5.0, (
+            f"B2O3(l)->B2O3(g) T={temperature_K:.0f} "
+            f"JANAF-NASA={residual_kJ:.3f} kJ/mol"
+        )
+    print(
+        "B2O3(l)->B2O3(g) JANAF-NASA kJ/mol at 1400/1600/1800 K: "
+        + ", ".join(f"{value:.3f}" for value in residuals_kJ)
+    )
 
 
 @pytest.mark.parametrize("species_id", sorted(STOICH_PINS))
