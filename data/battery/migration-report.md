@@ -1,14 +1,14 @@
 # Battery v2.1 migration report
 
-rows in: 47794
-records out (observations): 121524
+rows in: 47795
+records out (observations): 121525
 works: 267
-experiments: 3555
-queue size: 77654
+experiments: 3556
+queue size: 77631
 identical-payload dedupe aliases: 342
 metadata files: 39
 index sources: 271
-hard issues: 3664
+hard issues: 3639
 
 ## Spec vs measured
 
@@ -25,11 +25,11 @@ hard issues: 3664
 | gibbs_reference_101325 | 594 | 594 |
 | formulas | 1625 | 2044 (mismatch) |
 | equipment_payloads | 670 | 973 (mismatch) |
-| absent_admissions | 3511 | 5022 (mismatch) |
+| absent_admissions | 3511 | 5023 (mismatch) |
 | absent_classes | 2174 | 2203 (mismatch) |
 | range_only_T | 3125 | 2751 (mismatch) |
 | system_like_phases | 1065 | 2685 (mismatch) |
-| missing_phases | 237 | 587 (mismatch) |
+| missing_phases | 237 | 588 (mismatch) |
 | tabulated_lists | — | 6 |
 
 ## Evidence-class fall-throughs
@@ -37,7 +37,7 @@ hard issues: 3664
 | source method_class | count |
 |---|---:|
 | `absent` | 575 |
-| `method_only` | 38 |
+| `method_only` | 39 |
 | `derived_from_kems_equilibrium_constants` | 8 |
 | `third_law_kems` | 8 |
 | `authors_reduced_from_ion_intensities` | 6 |
@@ -18034,8 +18034,8 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/extracts/kems-048-turkdogan-2001-sio2-gamma.yaml` | 18 | 18 | 107 |
 | `data/literature/extracts/kems-049-kato-1993-ms-review.yaml` | 26 | 26 | 60 |
 | `data/literature/extracts/kems-050-gorokhov-1977.yaml` | 3 | 3 | 12 |
-| `data/literature/extracts/kems-051-allibert-1981.yaml` | 9 | 99 | 74 |
-| `data/literature/extracts/kems-053-stolyarova-1991.yaml` | 17 | 144 | 32 |
+| `data/literature/extracts/kems-051-allibert-1981.yaml` | 9 | 99 | 56 |
+| `data/literature/extracts/kems-053-stolyarova-1991.yaml` | 18 | 145 | 27 |
 | `data/literature/extracts/kems-057-kambayashi-1985.yaml` | 25 | 145 | 302 |
 | `data/literature/extracts/kems-058-ohara-1987.yaml` | 34 | 110 | 259 |
 | `data/literature/extracts/kems-066-ichise-1977.yaml` | 45 | 49 | 235 |
@@ -18213,13 +18213,13 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 
 ## Hard issue census
 
-hard issues: 3664
+hard issues: 3639
 
 MODEL_DERIVED / MEASURED_REDUCED keep their mapped evidence class. Parent pointers are not fabricated. Unstated derived_from / derivation is a hard conditional_field queued for page-grounding.
 
 | kind | count |
 |---|---:|
-| `conditional_field:derived_from` | 2016 |
+| `conditional_field:derived_from` | 1991 |
 | `conditional_field:derivation` | 1620 |
 | `conditional_field:attribution` | 28 |
 

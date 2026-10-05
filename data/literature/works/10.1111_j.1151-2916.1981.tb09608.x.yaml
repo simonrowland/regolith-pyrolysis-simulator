@@ -47,30 +47,157 @@ experiments:
   conditions:
     temperature_K:
       state:
-        tag: unknown
-        reason: experiment temperature not published
+        tag: value
+        value: '2060'
+      locator:
+        published_page: 309
+        pdf_page_index: 3
+        table: II
+        note: 'Table II caption: “Activity Data Obtained by Mass Spectrometry at 2060 K.”'
   pressure_environment:
     total_pressure_Pa:
       state:
         tag: unknown
-        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
-          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
-          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
-          / P_test_Torr in this extract
+        reason: not_published
+      locator:
+        published_page: 308
+        pdf_page_index: 2
+        section: II Mass-Spectrometric Measurements
+        note: KEMS cells are heated under vacuum; no in-cell total pressure or range is printed.
     sweep_gas:
       state:
-        tag: unknown
-        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        published_page: 308
+        pdf_page_index: 2
+        note: Vacuum KEMS operation; no sweep gas is described.
     regime:
       regime_class:
         tag: unknown
-        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+        reason: not_published
+      knudsen_number_orifice:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          published_page: 308
+          pdf_page_index: 2
+          note: No orifice Knudsen number is reported.
+    cell_internal_pressure_note:
+      state:
+        tag: value
+        value: The effusion cells were heated under vacuum; a numerical in-cell pressure is not reported.
+      locator:
+        published_page: 308
+        pdf_page_index: 2
+        section: II Mass-Spectrometric Measurements
+        note: “[The effusion block was] heated under vacuum”; no numerical in-cell pressure or range is printed.
   work_id: 10.1111/j.1151-2916.1981.tb09608.x
   locator:
     published_page: 308
     pdf_page_index: 2
     section: II Mass-Spectrometric Measurements
     note: 'Section II: "Six effusion cells were drilled in a molybdenum block."'
+  apparatus:
+    geometry:
+      orifice_diameter_m:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '0.0012'
+            approximate: false
+        locator:
+          published_page: 308
+          pdf_page_index: 2
+          section: II Mass-Spectrometric Measurements
+          note: “With effusion holes 1.2 mm in diameter”; unit conversion only.
+        inference:
+          relation: mm_to_m
+          inputs:
+          - L_m = L_mm / 1000
+          - original_unit=mm
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '1.2'
+              locator:
+                published_page: 308
+                pdf_page_index: 2
+                section: II Mass-Spectrometric Measurements
+                note: “With effusion holes 1.2 mm in diameter”; unit conversion only.
+          - - factor
+            - state:
+                tag: value
+                value: '1000'
+              locator:
+                published_page: 308
+                pdf_page_index: 2
+                section: II Mass-Spectrometric Measurements
+                note: “With effusion holes 1.2 mm in diameter”; unit conversion only.
+          output_unit: m
+    ionization:
+      activity_reduction_ions:
+        state:
+          tag: value
+          value: O+, Ca+, and Al+.
+        locator:
+          published_page: 308
+          pdf_page_index: 2
+          equation: 1-2
+          note: “The CaO and Al2O3 activities were independently deduced from the ion intensities of O+, Ca+, and Al+.”
+      observed_gaseous_species:
+        state:
+          tag: value
+          value: Ca, O, Al, Al2O, and AlO; Table I lists Ca+, Al+, O+, Al2O+, and AlO+.
+        locator:
+          published_page: 308
+          pdf_page_index: 2
+          table: I
+          section: II Mass-Spectrometric Measurements
+          note: Section II names Ca, O, Al, Al2O, and AlO; Table I lists the corresponding ion species.
+    calibration:
+      method:
+        state:
+          tag: value
+          value: Differential ion-intensity comparison under identical ionization and analysis conditions.
+        locator:
+          published_page: 308
+          pdf_page_index: 2
+          section: II Mass-Spectrometric Measurements
+          note: Melt and reference-cell gases “being ionized and analyzed under exactly identical conditions.”
+      reference_mixtures:
+        state:
+          tag: value
+          value: CaO-saturated melt and pure alpha-Al2O3.
+        locator:
+          published_page: 308
+          pdf_page_index: 2
+          section: II Mass-Spectrometric Measurements
+          note: The two reference cells contained “a CaO-saturated melt and pure Al2O3”; the Al2O3 reference is identified
+            as alpha-Al2O3 in the analysis.
+      reference_mixture_composition:
+        state:
+          tag: value
+          value: 'CaO reference: 20 wt% (12 mol%) Al2O3; Al2O3 reference: pure alpha-Al2O3.'
+        locator:
+          published_page: 309
+          pdf_page_index: 3
+          equation: 7-8
+          note: The CaO reference mixture contains 20 wt% (12 mol%) Al2O3; the Al2O3 reference is pure alpha-Al2O3.
+    temperature_measurement:
+      device:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          published_page: 308
+          pdf_page_index: 2
+          section: II Mass-Spectrometric Measurements
+          note: The procedure gives the measurement temperature as 2060 K but does not state the temperature sensor or measurement
+            method.
   bench_id: 10.1111/j.1151-2916.1981.tb09608.x::bench::allibert-1981-kems
 - experiment_id: 10.1111/j.1151-2916.1981.tb09608.x::kems-051-allibert-1981
   kind: literature
@@ -136,7 +263,50 @@ benches:
       pdf_page_index: 2
       section: II Mass-Spectrometric Measurements
       note: 'Section II: “Six effusion cells were drilled in a molybdenum block.”'
-  other_facts: []
+  other_facts:
+  - name: effusion_cell_count
+    value:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '6'
+          approximate: false
+      locator:
+        published_page: 308
+        pdf_page_index: 2
+        section: II Mass-Spectrometric Measurements
+        note: “Six effusion cells were drilled in a molybdenum block.”
+    unit: as_published
+  - name: molecular_beam_collimation
+    value:
+      state:
+        tag: value
+        value:
+          kind: categorical
+          categorical: Two cold diaphragms define the molecular beam.
+          approximate: false
+      locator:
+        published_page: 308
+        pdf_page_index: 2
+        section: II Mass-Spectrometric Measurements
+        note: “The molecular beam was defined using two cold diaphragms.”
+    unit: as_published
+  - name: cell_heating_environment
+    value:
+      state:
+        tag: value
+        value:
+          kind: categorical
+          categorical: Effusion cells heated under vacuum in the mass spectrometer.
+          approximate: false
+      locator:
+        published_page: 308
+        pdf_page_index: 2
+        section: II Mass-Spectrometric Measurements
+        note: “[The effusion block was] heated under vacuum to a temperature where some of the gaseous species effusing from
+          the cells can be observed.”
+    unit: as_published
 context:
 - observation_id: allibert_1981_emf_method_context
   type: method
