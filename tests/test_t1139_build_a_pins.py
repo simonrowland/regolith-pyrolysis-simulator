@@ -307,9 +307,14 @@ def test_hand_stoich_rows_pinned_from_legacy_view(
     oxide, o2, parent = STOICH_PINS[species_id]
     row = _legacy_row(production_catalog, species_id)
     assert row["parent_oxide"] == parent
-    assert row["stoich_oxide_per_vapor"] == oxide
-    assert row["stoich_O2_per_vapor"] == o2
-    assert math.isclose(oxide, 1.0 + o2, rel_tol=1e-6, abs_tol=1e-9)
+    assert row["stoich_oxide_per_vapor"] == pytest.approx(oxide, rel=0.0, abs=1e-12)
+    assert row["stoich_O2_per_vapor"] == pytest.approx(o2, rel=0.0, abs=1e-12)
+    assert math.isclose(
+        float(row["stoich_oxide_per_vapor"]),
+        1.0 + float(row["stoich_O2_per_vapor"]),
+        rel_tol=1e-6,
+        abs_tol=1e-9,
+    )
 
 
 def _atom_moles_for_kg(formula: str, kg: float) -> dict[str, float]:

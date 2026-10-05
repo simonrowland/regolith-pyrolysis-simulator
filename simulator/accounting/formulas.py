@@ -111,6 +111,7 @@ MOLAR_MASS_REL_TOLERANCE = 1e-6
 _OPEN_TO_CLOSE = {"(": ")", "[": "]", "{": "}"}
 _CLOSE_TO_OPEN = {v: k for k, v in _OPEN_TO_CLOSE.items()}
 _NUMBER_RE = re.compile(r"\d+(?:\.\d+)?")
+_UNGROUPED_FORMULA_RE = re.compile(r"([A-Z][a-z]?)(\d+(?:\.\d+)?)?")
 _PHASE_SUFFIX_RE = re.compile(
     r"(?:\((?:s|l|g|aq|cr|liq|liquid|solid|gas|vapor)\)|"
     r"\[(?:s|l|g|aq|cr|liq|liquid|solid|gas|vapor)\])$",
@@ -241,16 +242,22 @@ def parse_formula(
     if not cleaned:
         raise UnknownSpeciesError("formula is required")
 
-    totals: defaultdict[str, float] = defaultdict(float)
-    for segment in _split_formula_segments(cleaned):
-        multiplier, body = _leading_multiplier(segment)
-        parser = _FormulaParser(body)
-        elements = parser.parse()
-        for element, count in elements.items():
-            totals[element] += count * multiplier
-
     species_id = species or name or str(formula).strip()
-    return SpeciesFormula(species=species_id, elements=totals)
+    try:
+        return _species_from_cleaned(cleaned, species_id)
+    except (UnknownSpeciesError, AccountingError) as first:
+        # Hydrate split treats ASCII '.' as a separator (H2SO4.2H2O). Activity
+        # bases such as AlO1.5 / CuO0.5 fail that split; they are one ungrouped
+        # token cover with a decimal subscript, so retry as a single segment.
+        if "." not in cleaned:
+            raise first
+        tokens = list(_UNGROUPED_FORMULA_RE.finditer(cleaned))
+        if not tokens or "".join(token.group(0) for token in tokens) != cleaned:
+            raise first
+        try:
+            return _species_from_segments((cleaned,), species_id)
+        except (UnknownSpeciesError, AccountingError):
+            raise first from None
 
 
 def coerce_species_formula(species: str, value: Any | None = None) -> SpeciesFormula:
@@ -525,6 +532,23 @@ def _clean_formula_text(formula: str) -> str:
         previous = text
         text = _PHASE_SUFFIX_RE.sub("", text)
     return text
+
+
+def _species_from_cleaned(cleaned: str, species_id: str) -> SpeciesFormula:
+    return _species_from_segments(_split_formula_segments(cleaned), species_id)
+
+
+def _species_from_segments(
+    segments: tuple[str, ...] | list[str], species_id: str
+) -> SpeciesFormula:
+    totals: defaultdict[str, float] = defaultdict(float)
+    for segment in segments:
+        multiplier, body = _leading_multiplier(segment)
+        parser = _FormulaParser(body)
+        elements = parser.parse()
+        for element, count in elements.items():
+            totals[element] += count * multiplier
+    return SpeciesFormula(species=species_id, elements=totals)
 
 
 def _split_formula_segments(formula: str) -> list[str]:
