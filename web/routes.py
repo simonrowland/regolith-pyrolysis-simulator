@@ -20,6 +20,7 @@ import yaml
 from werkzeug.exceptions import BadRequest, RequestEntityTooLarge
 
 from simulator.backends import BackendResolutionStatus, backend_resolution_status
+from simulator.additive_calculations import k_shuttle_potassium_additive_kg
 from simulator.backend_names import (
     ANALYTICAL_BACKEND_CLASS_DISPLAY_NAME,
     ANALYTICAL_BACKEND_SERIALIZATION_TOKEN,
@@ -5405,8 +5406,8 @@ def additive_calc(key):
     MARGIN = 1.2
     SHUTTLE_LOSS = 0.25  # ~25% loss per cycle
 
-    # K for C3-K shuttle
-    K_kg = FeO_kg * (2 * 39.10 / 71.84) * SHUTTLE_LOSS * MARGIN
+    # K for C3-K shuttle; physical stoichiometry is owned by the simulator.
+    K_kg = k_shuttle_potassium_additive_kg(FeO_kg)
 
     # Na for C3-Na shuttle
     Na_kg = ((TiO2_kg * (4 * 22.99 / 79.87)
