@@ -175,6 +175,12 @@ _ENGINE_REPORTED_ACTIVITY["openimcc"] = EngineReportedActivity(
     Phase.L,
     _PARENT_OXIDE_COMPONENT_BASES,
 )
+_ENGINE_REPORTED_ACTIVITY["internal-analytical"] = EngineReportedActivity(
+    "trace_parent_activity_ladder",
+    ReferenceStateConvention.RAOULTIAN_PURE_ENDMEMBER,
+    Phase.L,
+    _PARENT_OXIDE_COMPONENT_BASES,
+)
 
 
 def _oxide_lookup_key(name: str) -> str:
@@ -281,6 +287,12 @@ def _engine_reports_formula(engine: str, formula: str) -> tuple[bool, str]:
         return _melts_reports_oxide_endmember(formula)
     if engine == "openimcc":
         return _imcc_reports_parent_oxide(formula)
+    if engine == "internal-analytical":
+        from simulator.vapour_rail.activity import trace_parent_formulas
+
+        if formula in trace_parent_formulas():
+            return True, "trace_parent_activity_ladder"
+        return False, f"typed-refusal:not_trace_parent:{formula}"
     return False, "typed-refusal:engine_does_not_report_parent_oxide_activity"
 
 

@@ -1204,7 +1204,14 @@ def _fusion_comparison_reference(
     if engine is not None:
         from simulator.battery.waypoints import MELT_ACTIVITY_ENGINES
 
-        if engine.value not in MELT_ACTIVITY_ENGINES:
+        # internal-analytical reports trace parents only. A solid CaO row
+        # is still an unestablished reference for that engine.
+        established = engine.value in MELT_ACTIVITY_ENGINES
+        if engine is Engine.INTERNAL_ANALYTICAL:
+            from simulator.vapour_rail.activity import trace_parent_formulas
+
+            established = formula in trace_parent_formulas()
+        if not established:
             notice = Notice(
                 kind=NoticeKind.OUT_OF_GAMMA_DOMAIN,
                 affected_quantities=(Quantity.ACTIVITY,),
@@ -3645,7 +3652,10 @@ def predict_with_engine(
         if quantity is Quantity.ACTIVITY_COEFFICIENT:
             details = getattr(cell, "melt_activity_coefficient_details", None)
             detail = details.get(formula) if isinstance(details, Mapping) else None
-            if isinstance(detail, Mapping):
+            # A detail with no standard_state is report metadata (rung, flag,
+            # source row). It is not a basis claim. A declared standard_state
+            # still has to match the observation.
+            if isinstance(detail, Mapping) and "standard_state" in detail:
                 reported_basis = detail.get("coefficient_basis")
                 reported_standard_state = detail.get("standard_state")
                 reference_state = identity.reference_state

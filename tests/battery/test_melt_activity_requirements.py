@@ -192,6 +192,27 @@ def _melt(experiment, bench, observation):
     return melt_activity_requests(collect_consumer_inputs(experiment, bench, observation))
 
 
+def _major_oxide_engines(results):
+    """Activity engines other than the trace-parent analytical ladder."""
+
+    return [
+        item
+        for item in results
+        if item.readiness.engine != "internal-analytical"
+    ]
+
+
+def _assert_trace_engine_does_not_report(results, formula: str) -> None:
+    item = next(
+        row for row in results if row.readiness.engine == "internal-analytical"
+    )
+    assert item.payload is None
+    assert item.readiness.status is ReadinessStatus.NOT_APPLICABLE
+    gap = item.readiness.gaps[0]
+    assert gap.reason is GapReason.REFERENCE_STATE_MISMATCH
+    assert formula in gap.missing[1]
+
+
 def test_requirement_tuple_does_not_include_pressure_or_oxygen():
     assert REQUIREMENTS["melt_activity"] == ("normalized_composition", "temperature_K")
     assert "pressure_boundary" not in REQUIREMENTS["melt_activity"]
@@ -206,8 +227,10 @@ def test_no_iron_without_oxygen_is_ready_and_engine_point_stays_gap():
     )
     results = _melt(experiment, bench, observation)
     assert [item.readiness.engine for item in results] == list(MELT_ACTIVITY_ENGINES)
-    assert all(item.readiness.status is ReadinessStatus.READY for item in results)
-    assert all(item.readiness.gaps == () for item in results)
+    majors = _major_oxide_engines(results)
+    assert all(item.readiness.status is ReadinessStatus.READY for item in majors)
+    assert all(item.readiness.gaps == () for item in majors)
+    _assert_trace_engine_does_not_report(results, "SiO2")
     payload = results[0].payload
     assert payload["engine"] == "alphamelts"
     assert payload["temperature_C"] == pytest.approx(1473.15 - 273.15)
@@ -234,8 +257,10 @@ def test_iron_without_oxygen_is_a_typed_refusal():
         formula="SiO2",
     )
     results = _melt(experiment, bench, observation)
-    assert all(item.payload is None for item in results)
-    assert all(item.readiness.status is ReadinessStatus.GAP for item in results)
+    majors = _major_oxide_engines(results)
+    assert all(item.payload is None for item in majors)
+    assert all(item.readiness.status is ReadinessStatus.GAP for item in majors)
+    _assert_trace_engine_does_not_report(results, "SiO2")
     gaps = results[0].readiness.gaps
     oxygen = [gap for gap in gaps if gap.waypoint == "oxygen_condition"]
     assert len(oxygen) == 1
@@ -251,7 +276,9 @@ def test_iron_with_point_oxygen_is_ready():
         formula="SiO2",
     )
     results = _melt(experiment, bench, observation)
-    assert all(item.readiness.status is ReadinessStatus.READY for item in results)
+    majors = _major_oxide_engines(results)
+    assert all(item.readiness.status is ReadinessStatus.READY for item in majors)
+    _assert_trace_engine_does_not_report(results, "SiO2")
     assert results[0].payload["fO2_log"] == pytest.approx(-9)
     assert "pressure_bar" not in results[0].payload
 
@@ -262,7 +289,9 @@ def test_zero_iron_does_not_demand_oxygen():
         formula="SiO2",
     )
     results = _melt(experiment, bench, observation)
-    assert all(item.readiness.status is ReadinessStatus.READY for item in results)
+    majors = _major_oxide_engines(results)
+    assert all(item.readiness.status is ReadinessStatus.READY for item in majors)
+    _assert_trace_engine_does_not_report(results, "SiO2")
     assert "fO2_log" not in results[0].payload
 
 
@@ -279,8 +308,10 @@ def test_missing_composition_is_refused_and_not_defaulted():
         ),
     )
     results = _melt(experiment, bench, observation)
-    assert all(item.payload is None for item in results)
-    assert all(item.readiness.status is ReadinessStatus.GAP for item in results)
+    majors = _major_oxide_engines(results)
+    assert all(item.payload is None for item in majors)
+    assert all(item.readiness.status is ReadinessStatus.GAP for item in majors)
+    _assert_trace_engine_does_not_report(results, "SiO2")
     assert results[0].readiness.gaps[0].waypoint == "normalized_composition"
     assert results[0].readiness.gaps[0].reason is GapReason.MISSING_EVIDENCE
     assert not any(gap.waypoint == "oxygen_condition" for gap in results[0].readiness.gaps)
@@ -309,7 +340,9 @@ def test_activity_coefficient_uses_the_same_contract():
         formula="SiO2",
     )
     results = _melt(experiment, bench, observation)
-    assert all(item.readiness.status is ReadinessStatus.READY for item in results)
+    majors = _major_oxide_engines(results)
+    assert all(item.readiness.status is ReadinessStatus.READY for item in majors)
+    _assert_trace_engine_does_not_report(results, "SiO2")
     assert results[0].payload["quantity"] == "activity_coefficient"
     assert results[0].payload["reference_state"] == "raoultian_pure_liquid_endmember"
     activity = _melt(*_case(
@@ -363,8 +396,10 @@ def test_multivalent_oxide_without_oxygen_is_a_typed_refusal(oxide):
         formula="SiO2",
     )
     results = _melt(experiment, bench, observation)
-    assert all(item.payload is None for item in results)
-    assert all(item.readiness.status is ReadinessStatus.GAP for item in results)
+    majors = _major_oxide_engines(results)
+    assert all(item.payload is None for item in majors)
+    assert all(item.readiness.status is ReadinessStatus.GAP for item in majors)
+    _assert_trace_engine_does_not_report(results, "SiO2")
     oxygen = [gap for gap in results[0].readiness.gaps if gap.waypoint == "oxygen_condition"]
     assert len(oxygen) == 1
     assert oxygen[0].reason is GapReason.MISSING_EVIDENCE
@@ -1183,3 +1218,74 @@ def test_scorer_compares_the_admitted_endmember_not_a_different_species(monkeypa
     assert coefficient.value != Decimal("0.2")
     assert coefficient.refusal_detail["reason"] == "reference_state_mismatch"
     assert opened == []
+
+
+def test_scorer_reads_trace_parent_gamma_without_a_basis_claim(monkeypatch):
+    """SnO gamma, rung, and source row reach the coefficient the scorer reads."""
+
+    from simulator.battery.enums import Engine
+    from simulator.battery.score import predict_with_engine
+    from simulator.diagnostic_helpers.binary_pot_battery import (
+        trace_parent_activity_coefficient_emission,
+    )
+
+    seen: dict[str, object] = {}
+
+    def _open(name):
+        return type("Handle", (), {
+            "name": name,
+            "available": True,
+            "unavailable_reason": None,
+            "supports_intrinsic_fO2": False,
+            "backend": object(),
+        })()
+
+    def _cell(_handle, _pot, *, temperature_K, po2, **_kwargs):
+        gammas, details = trace_parent_activity_coefficient_emission(temperature_K)
+        seen["temperature_K"] = temperature_K
+        seen["gammas"] = gammas
+        seen["details"] = details
+        return type("Cell", (), {
+            "status": "ok",
+            "refusal_reason": None,
+            "melt_activities": {},
+            "melt_activity_coefficients": gammas,
+            "melt_activity_coefficient_details": details,
+            "gas_partial_pressures_Pa": {},
+            "hostname": "test",
+            "exit_code": 0,
+            "exit_signal": None,
+            "notices": [],
+            "authority": None,
+            "certified_band": None,
+        })()
+
+    monkeypatch.setattr(
+        "simulator.diagnostic_helpers.binary_pot_battery.open_battery_engine",
+        _open,
+    )
+    monkeypatch.setattr(
+        "simulator.diagnostic_helpers.binary_pot_battery.equilibrate_cell",
+        _cell,
+    )
+    experiment, _bench, observation = _case(
+        composition=_composition(("SnO", "0.01"), ("SiO2", "0.99")),
+        quantity=Quantity.ACTIVITY_COEFFICIENT,
+        formula="SnO",
+        basis="SnO",
+    )
+    prediction = predict_with_engine(
+        Engine.INTERNAL_ANALYTICAL,
+        observation,
+        experiment=experiment,
+        isolated=False,
+    )
+    assert seen["temperature_K"] == pytest.approx(1473.15)
+    assert prediction.refusal_reason is None
+    assert prediction.value == Decimal(str(seen["gammas"]["SnO"]))
+    detail = seen["details"]["SnO"]
+    assert detail["rung"] == 2
+    assert detail["flag"]
+    assert detail["source_row_id"]
+    assert "standard_state" not in detail
+    assert "coefficient_basis" not in detail
