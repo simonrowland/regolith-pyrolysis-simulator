@@ -1922,6 +1922,9 @@ ci_carbonaceous_chondrite:
   label: "CI Carbonaceous Chondrite"
   source: "FAMILY-REPRESENTATIVE MODELED COMPOSITION (not a cited table); context basis: CI meteorites; Hayabusa2 Ryugu return; OSIRIS-REx Bennu return"
   confidence: "High"
+  fe_redox_split_unknown: true
+  composition_basis:
+    fe_reporting_convention: "total Fe as FeO"
   note: >
     Bulk composition includes ~20-35% volatile mass (H2O, C, S) lost during
     extended C0. Main composition_wt_pct gives the BULK including volatiles-
@@ -2428,6 +2431,8 @@ mars_global_mgs1:
     normalized_sum_check_wt_pct: 100.0
     excluded_classes: [sulfur, halides, perchlorates, salts, sulfides]
     citation: "Long-Fox J.M. et al. 2023, Frontiers in Space Technologies, Table 2 XRF for MGS-1."
+    fe_reporting_convention: "total Fe as FeO"
+  fe_redox_split_unknown: true
   glass_fraction:
     value: "not_reported"
     note: "MGS-1 captured sources do not report glass fraction."
@@ -2495,6 +2500,9 @@ mars_basalt:
       - perchlorate_to_chloride_o2
   source: "FAMILY-REPRESENTATIVE MODELED COMPOSITION (not a cited table); context basis: Curiosity/Spirit/Opportunity APXS; Phoenix lander"
   confidence: "High"
+  fe_redox_split_unknown: true
+  composition_basis:
+    fe_reporting_convention: "total Fe as FeO"
   note: >
     Thousands of APXS analyses across 4 sites; +-1-2 wt% major oxides.
     Includes SO3 and Cl as components (sulfate-bearing soil). FeO_total
@@ -2592,6 +2600,9 @@ mars_sulfate_rich:
       - co2_boudouard_to_co
   source: "FAMILY-REPRESENTATIVE MODELED COMPOSITION (not a cited table); context basis: Meridiani Planum soils, Vera Rubin Ridge margins, polar/sedimentary deposits"
   confidence: "High"
+  fe_redox_split_unknown: true
+  composition_basis:
+    fe_reporting_convention: "total Fe as FeO"
   note: >
     Elevated Ca/Mg/Fe sulfates (SO3 8-15 wt% vs 5-7% baseline).
     Midpoint sum ~105.5 wt%  --  wide SO3 range causes overshoot.
@@ -2668,6 +2679,9 @@ mars_phyllosilicate_clay:
     reactions: []
   source: "FAMILY-REPRESENTATIVE MODELED COMPOSITION (not a cited table); context basis: Gale Glen Torridon clays, Jezero clay units, Mawrth Vallis analogs"
   confidence: "High"
+  fe_redox_split_unknown: true
+  composition_basis:
+    fe_reporting_convention: "total Fe as FeO"
   note: >
     Smectite-rich deposits. Higher Al2O3 (12-18%) and bound water than
     baseline Mars basalt. Sum ~103.8 wt%  --  broad range midpoints overshoot.
@@ -2735,6 +2749,9 @@ mars_perchlorate_rich:
       - perchlorate_to_chloride_o2
   source: "FAMILY-REPRESENTATIVE MODELED COMPOSITION (not a cited table); context basis: Phoenix landing site, high-latitude/polar soils, scattered Gale/Jezero samples"
   confidence: "Medium-High"
+  fe_redox_split_unknown: true
+  composition_basis:
+    fe_reporting_convention: "total Fe as FeO"
   note: >
     Source data omits TiO2; estimated from mars_basalt range. Elevated
     oxychlorine salts (ClO4 0.4-1.5 wt%). Sum ~101.5 wt%.
