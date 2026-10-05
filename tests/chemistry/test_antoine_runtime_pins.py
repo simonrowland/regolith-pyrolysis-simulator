@@ -86,7 +86,8 @@ def test_normalized_runtime_callers_keep_bit_identical_antoine_pins(
     ("species", "temperature_K", "expected_hex"),
     (
         ("Ca", 1500.0, "0x1.53b09d7ffab5dp+14"),
-        ("Al", 1800.0, "0x1.f30c699a99c13p+10"),
+        # NIST-JANAF Al-003/Al-005 refit; updated from the superseded Stull sidecar.
+        ("Al", 1800.0, "0x1.40296898f0cb5p+6"),
         ("Ti", 1900.0, "0x1.fb90b6722b333p-3"),
     ),
 )

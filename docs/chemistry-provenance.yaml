@@ -353,25 +353,59 @@ values:
 
   - id: Al_pure_antoine
     quantity: "Pure liquid aluminum vapor-pressure Antoine coefficients."
-    value: {A: 10.73623, B: 13204.109, C: -24.306}
+    value: {A: 10.5215429528, B: 15145.174655, C: -42.6590481419}
     units: "log10(P_Pa) = A - B/(T_K + C)"
     tier: CITED
-    basis: "Pure liquid Al metal, Raoultian standard state; source log10(P/bar) Antoine row converted to Pa by adding 5 to A."
+    basis: "Pure liquid Al metal, Raoultian standard state; least-squares fit to NIST-JANAF Al-003/Al-005 nodes. This compatibility sidecar is not the melt-source rail."
     range:
-      T_K: [1557, 2329]
-      recipe_1773_2173K: within or near source range
+      T_K: [1000, 2700]
+      fit_node_count: 18
+      max_abs_log10_residual_vs_source: 0.007561597786
+      recipe_1773_2173K: interpolated
       measured_vs_extrapolated: interpolated
-    uncertainty: "NIST fit to Stull compilation data."
+    uncertainty: "Maximum Antoine residual is 0.007561597786 dex against the shared JANAF nodes."
     chosen:
-      ref: REF-002
-      locus: "Industrial & Engineering Chemistry 39(4):517-540; NIST WebBook Antoine table, 1557-2329 K aluminum row."
-      url: "https://doi.org/10.1021/ie50448a022"
-      why: "Existing project bibliography entry for the Stull compilation row used by NIST."
+      ref: REF-020
+      locus: "NIST-JANAF/Chase 1998 Al(l) and Al(g) tables Al-003/Al-005; 18 shared nodes from 1000 through 2700 K."
+      url: "https://janaf.nist.gov/"
+      why: "The coefficients minimize log-pressure residual against the recovered current JANAF nodes."
     alternatives:
       - ref: "earlier aluminum vapor-pressure primaries"
-        lacks: "not the exact NIST/Stull compilation row embedded in the data file"
+        lacks: "the recovered shared JANAF node set used for this fitted sidecar"
     code_sites:
       - "data/vapor_pressures.yaml:271 (metals.Al.pure_component_antoine)"
+    status: active
+
+  - id: Si_pure_antoine
+    quantity: "Pure silicon crystal/liquid vapor-pressure Antoine sidecar coefficients."
+    value:
+      crystal: {A: 12.645587188241636, B: 23452.94759360651, C: -0.0261074340068919}
+      liquid: {A: 10.6913003080, B: 19744.5887902, C: -34.7482634626}
+    units: "log10(P_Pa) = A - B/(T_K + C)"
+    tier: CITED
+    basis: "Pure Si(cr/l) Raoultian standard state; JANAF Si-002/Si-005 crystal and Si-003/Si-005 liquid fits, joined at 1685 K. Compatibility sidecar, not a melt-source rail answer."
+    range:
+      crystal_T_K: [100, 1685]
+      liquid_T_K: [1700, 3500]
+      crystal_fit_node_count: 20
+      crystal_max_abs_log10_residual_vs_source: 0.080953039489
+      crystal_rms_log10_residual_vs_source: 0.046467069627
+      liquid_fit_node_count: 19
+      liquid_max_abs_log10_residual_vs_source: 0.000999238802
+      join_T_K: 1685
+      join_step_log10_dex: 0.0
+      measured_vs_extrapolated: interpolated
+    uncertainty: "Crystal and liquid maximum log-pressure residuals are measured against their respective shared JANAF nodes."
+    chosen:
+      ref: REF-020
+      locus: "NIST-JANAF/Chase 1998 Si(cr), Si(l), and Si(g) tables Si-002/Si-003/Si-005."
+      url: "https://janaf.nist.gov/"
+      why: "Crystal and liquid branches use their matching condensed JANAF phase and share a continuous 1685 K join."
+    alternatives:
+      - ref: "CRC boiling point"
+        lacks: "single liquid boiling-point property does not provide separate crystal and liquid vapor-pressure fits"
+    code_sites:
+      - "data/vapor_pressures.yaml (metals.Si.pure_component_antoine)"
     status: active
 
   - id: Fe_pure_antoine
