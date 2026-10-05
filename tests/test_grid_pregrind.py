@@ -24,6 +24,7 @@ from scripts.grid_pregrind import (
     generate_simplex_grid,
     kress91_partitioned_composition_mol,
     load_feedstock_box,
+    melts_composition_wt_pct,
     point_inputs,
     temperature_grid,
 )
@@ -168,6 +169,32 @@ def test_grid_point_refuses_undeclared_non_melts_component() -> None:
         grid_pregrind.alphamelts_queue_domain_reason(point)
     with pytest.raises(ValueError, match="CaF2"):
         grid_pregrind.point_inputs(point, args)
+
+
+def test_measured_ferric_split_is_zeroed_for_melts_and_kept_in_mole_inventory():
+    composition = {"SiO2": 70.0, "FeO": 20.0, "Fe2O3": 10.0}
+    point = grid_pregrind.GridPoint(
+        ordinal=0,
+        temperature_C=1500.0,
+        intended_fO2_log=-8.0,
+        pressure_bar=1.0,
+        composition_wt_pct=composition,
+    )
+
+    melts = melts_composition_wt_pct(point)
+    moles = composition_wt_pct_to_mol(composition, batch_mass_kg=100.0)
+    from simulator.core import MOLAR_MASS
+
+    assert melts["FeO"] == pytest.approx(
+        grid_pregrind.feot_equivalent_wt_pct(composition)
+    )
+    assert melts["Fe2O3"] == 0.0
+    assert moles["FeO"] == pytest.approx(
+        20.0 / float(MOLAR_MASS["FeO"]) * 1000.0
+    )
+    assert moles["Fe2O3"] == pytest.approx(
+        10.0 / float(MOLAR_MASS["Fe2O3"]) * 1000.0
+    )
 
 
 def test_kress_partition_preserves_iron_and_moves_target_into_composition():

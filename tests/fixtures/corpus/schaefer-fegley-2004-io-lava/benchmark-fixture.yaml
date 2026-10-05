@@ -7,7 +7,11 @@ feedstock:
   key: schaefer_fegley_2004_tholeiite
   label: "Io tholeiitic basalt model composition (Schaefer & Fegley 2004 Table 5)"
   source: "Schaefer & Fegley 2004 Icarus 169, 216-241; original Williams et al. 2001"
+  composition_source: "Schaefer & Fegley 2004 Table 5, reported oxide composition"
   confidence: High
+  fe_redox_split_unknown: true
+  composition_basis:
+    fe_reporting_convention: total Fe as FeO
   composition_wt_pct:
     # Renormalised to volatile-free + minor/trace-free per SF04 §3, then mass-normalised to ~100.
     # Original Table 5 sum = 99.91 (incl. 1.62% MnO+H2O+P2O5). Removed 'Other'; Fe2O3 reduced to FeO equivalent

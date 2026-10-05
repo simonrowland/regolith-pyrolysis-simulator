@@ -117,6 +117,23 @@ def test_cleaned_melt_rejects_invalid_inventory(invalid_inventory) -> None:
     assert repr(invalid_inventory) in str(refusal)
 
 
+@pytest.mark.parametrize("iron_oxide", ("FeO", "Fe2O3"))
+@pytest.mark.parametrize(
+    "invalid_inventory",
+    (-1.0, float("nan"), float("inf"), True, "1.0", [1.0, 3.0]),
+)
+def test_cleaned_melt_rejects_invalid_iron_inventory(
+    iron_oxide: str, invalid_inventory
+) -> None:
+    with pytest.raises(OpenImccCompositionPolicyRefusal) as exc_info:
+        _cleaned_melt_projection({"SiO2": 2.0, iron_oxide: invalid_inventory})
+
+    refusal = exc_info.value
+    assert refusal.code == "openimcc_composition_invalid_input"
+    assert iron_oxide in str(refusal)
+    assert repr(invalid_inventory) in str(refusal)
+
+
 def test_cleaned_melt_treats_zero_inventory_as_absent() -> None:
     source_wt_pct, cleaned_mol = _cleaned_melt_projection(
         {"SiO2": 1.0, "MgO": 0.0}
@@ -674,6 +691,21 @@ def test_cleaned_melt_fe_fold_is_order_independent(composition) -> None:
     _wt, moles = _cleaned_melt_projection(composition)
     assert moles["FeO"] == pytest.approx(3.0, rel=0, abs=1e-12)
     assert moles["SiO2"] == pytest.approx(2.0, rel=0, abs=1e-12)
+
+
+def test_openimcc_measured_ferric_split_keeps_feo_equivalent_projection_notice():
+    from simulator.melt_backend.openimcc_bridge import _cleaned_melt_policy
+
+    composition = {"SiO2": 2.0, "FeO": 1.0, "Fe2O3": 0.5}
+    _source_wt, moles = _cleaned_melt_projection(composition)
+    _policy_wt, policy = _cleaned_melt_policy(composition)
+
+    assert moles["FeO"] == pytest.approx(2.0)
+    assert "Fe2O3" not in moles
+    assert policy["fe_redox_notice"] == {
+        "code": "openimcc_ferric_component_collapsed",
+        "message": "ferric component collapsed until d-072",
+    }
 
 
 def test_recorded_openimcc_pin_matches_pyproject_extra() -> None:

@@ -999,7 +999,22 @@ def test_explicit_ferric_to_wustite_vapor_stoich_is_atom_checked():
     sim = PyrolysisSimulator(
         backend,
         {"campaigns": {}},
-        {"ferric": {"label": "Ferric", "composition_wt_pct": {"Fe2O3": 100.0}}},
+        {
+            "ferric": {
+                "label": "Ferric",
+                "composition_wt_pct": {"FeO": 0.0, "Fe2O3": 100.0},
+                "composition_basis": {
+                    "FeO": {
+                        "method": "synthetic all-ferric test composition",
+                        "source": "test_explicit_ferric_to_wustite_vapor_stoich_is_atom_checked",
+                    },
+                    "Fe2O3": {
+                        "method": "synthetic all-ferric test composition",
+                        "source": "test_explicit_ferric_to_wustite_vapor_stoich_is_atom_checked",
+                    },
+                },
+            }
+        },
         {
             "metals": {},
             "oxide_vapors": {

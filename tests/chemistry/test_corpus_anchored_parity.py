@@ -70,6 +70,9 @@ from simulator.chemistry.kernel import (
     ProviderUnavailableError,
 )
 from simulator.core import PyrolysisSimulator
+from simulator.feedstock_composition import (
+    FE_REPORTING_CONVENTION_TOTAL_AS_FEO,
+)
 from simulator.melt_backend.base import InternalAnalyticalBackend
 
 from tests.chemistry.corpus_fixtures import (
@@ -93,6 +96,35 @@ DATA_DIR = Path(__file__).resolve().parent.parent.parent / "data"
 
 def _load_yaml(name: str) -> dict:
     return yaml.safe_load((DATA_DIR / name).read_text())
+
+
+def _anchor_iron_fields(anchor: CorpusAnchor | AtomicRatioAnchor) -> dict:
+    composition = anchor.composition_wt_pct
+    if anchor.fe_redox_split_unknown:
+        return {
+            "fe_redox_split_unknown": True,
+            "composition_basis": {
+                "fe_reporting_convention": (
+                    FE_REPORTING_CONVENTION_TOTAL_AS_FEO
+                ),
+            },
+        }
+
+    basis = dict(anchor.composition_basis)
+    if {"FeO", "Fe2O3"} <= set(composition) and not basis:
+        source = anchor.composition_source.strip()
+        if not source:
+            raise ValueError(
+                f"measured iron split has no composition source: {anchor.melt_id}"
+            )
+        basis = {
+            oxide: {
+                "method": "literature-reported oxide split",
+                "source": source,
+            }
+            for oxide in ("FeO", "Fe2O3")
+        }
+    return {"composition_basis": basis} if basis else {}
 
 
 # ---------------------------------------------------------------------
@@ -131,6 +163,7 @@ def _build_sim_for_anchor(
             f"corpus anchor melt ({anchor.melt_id})"
         ),
         "composition_wt_pct": dict(anchor.composition_wt_pct),
+        **_anchor_iron_fields(anchor),
     }
 
     # Shallow copy keeps the module-scoped fixture immutable.
@@ -431,6 +464,7 @@ def _build_sim_for_atomic_ratio_anchor(
     feedstocks[feedstock_key] = {
         "label": f"SF2004 Table 8 melt ({anchor.composition_key})",
         "composition_wt_pct": dict(anchor.composition_wt_pct),
+        **_anchor_iron_fields(anchor),
     }
 
     backend = InternalAnalyticalBackend()
@@ -1519,6 +1553,9 @@ def _cj_anchor_as_corpus_anchor(anchor: CJOlivineKEMSAnchor) -> CorpusAnchor:
         tolerance_decades=anchor.tolerance_decades,
         source=anchor.source,
         composition_wt_pct=dict(anchor.composition_wt_pct),
+        composition_source=anchor.composition_source,
+        composition_basis=dict(anchor.composition_basis),
+        fe_redox_split_unknown=anchor.fe_redox_split_unknown,
     )
 
 
@@ -1921,6 +1958,9 @@ paper_id: synthetic-test-paper
 feedstock:
   key: synthetic_feedstock
   label: "Synthetic test feedstock"
+  fe_redox_split_unknown: true
+  composition_basis:
+    fe_reporting_convention: total Fe as FeO
   composition_wt_pct:
     SiO2: 50.0
     MgO: 30.0

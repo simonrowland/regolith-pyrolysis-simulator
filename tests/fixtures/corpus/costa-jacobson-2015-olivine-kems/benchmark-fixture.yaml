@@ -9,6 +9,9 @@ feedstock:
   label: "Forsterite-rich olivine Fo93Fa7 (Norway, Nor Mineral / Miller & Co.)"
   source: "Costa & Jacobson 2015 NTRS 20150002321 — ICP-OES table (Experimental: Starting Material)"
   confidence: High           # ICP-OES quantitative table from paper, post-heat-treatment XRD pure olivine
+  fe_redox_split_unknown: true
+  composition_basis:
+    fe_reporting_convention: total Fe as FeO
   composition_wt_pct:
     # Computed from paper's ICP-OES elemental wt% by stoichiometric conversion to oxide-equivalents:
     #   Fe 5.01 wt% (+/- 0.03)  -> FeO  = 6.44   wt%

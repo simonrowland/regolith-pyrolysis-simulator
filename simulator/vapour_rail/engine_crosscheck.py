@@ -22,6 +22,10 @@ from statistics import median
 from typing import Any, Final
 
 from simulator.yaml_cache import load_cached_safe_yaml
+from simulator.feedstock_composition import (
+    iron_oxide_values,
+    resolve_feedstock_composition,
+)
 
 from engines.builtin.vapor_pressure import BuiltinVaporPressureProvider
 from simulator.chemistry.kernel import ChemistryIntent, IntentRequest
@@ -129,7 +133,9 @@ def load_crosscheck_composition(
 
     payload = load_cached_safe_yaml(feedstock_path.read_text()) or {}
     try:
-        raw = payload[feedstock_id]["composition_wt_pct"]
+        raw = resolve_feedstock_composition(
+            payload[feedstock_id]
+        ).canonical_wt_pct
     except (KeyError, TypeError) as exc:
         raise EngineCrosscheckError(
             f"feedstock {feedstock_id!r} has no composition_wt_pct"
@@ -141,7 +147,10 @@ def load_crosscheck_composition(
 
     wt_pct: dict[str, float] = {}
     mol: dict[str, float] = {}
+    feo_wt_pct, fe2o3_wt_pct = iron_oxide_values(raw)
     for oxide, value in raw.items():
+        if oxide in {"FeO", "Fe2O3"}:
+            continue
         weight = float(value)
         if not math.isfinite(weight) or weight < 0.0:
             raise EngineCrosscheckError(
@@ -155,6 +164,15 @@ def load_crosscheck_composition(
             )
         wt_pct[str(oxide)] = weight
         mol[str(oxide)] = weight / float(MOLAR_MASS[oxide]) * 1000.0
+    for oxide, weight in (("FeO", feo_wt_pct), ("Fe2O3", fe2o3_wt_pct)):
+        if weight <= 0.0:
+            continue
+        if oxide not in MOLAR_MASS:
+            raise EngineCrosscheckError(
+                f"{feedstock_id}.{oxide} has no simulator molar mass"
+            )
+        wt_pct[oxide] = weight
+        mol[oxide] = weight / float(MOLAR_MASS[oxide]) * 1000.0
     if not mol:
         raise EngineCrosscheckError(f"feedstock {feedstock_id!r} is empty")
     return CrosscheckComposition(feedstock_id, wt_pct, mol)

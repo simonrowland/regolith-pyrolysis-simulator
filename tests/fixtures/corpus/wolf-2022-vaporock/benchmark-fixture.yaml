@@ -6,6 +6,13 @@ feedstock:
   label: "Wolf et al. 2022 VapoRock BSE, JANAF thermochemistry"
   source: "Wolf et al. 2022, VapoRock model paper, Table 1 / Fig. 4 source data"
   confidence: High
+  composition_basis:
+    FeO:
+      method: model-reported oxide composition
+      source: "Wolf et al. 2022, VapoRock model paper, Table 1 / Fig. 4 source data"
+    Fe2O3:
+      method: model-reported oxide composition
+      source: "Wolf et al. 2022, VapoRock model paper, Table 1 / Fig. 4 source data"
   composition_wt_pct:
     SiO2: 45.97
     MgO: 36.66

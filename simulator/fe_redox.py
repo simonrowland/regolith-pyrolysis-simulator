@@ -4,10 +4,39 @@ import math
 from collections.abc import Mapping
 
 from simulator.environment import DEFAULT_VACUUM_FLOOR_BAR
+from simulator.feedstock_composition import (
+    feot_equivalent_wt_pct,
+    iron_oxide_values,
+)
 
 
 class Kress91InvalidControls(ValueError):
     """Invalid finite-control input for the Kress91 Fe-redox relation."""
+
+
+def intrinsic_melt_fO2(
+    composition_wt_pct: Mapping[str, float],
+    temperature_K: float,
+    *,
+    vacuum_floor_bar: float = DEFAULT_VACUUM_FLOOR_BAR,
+) -> float:
+    """Return the legacy intrinsic-fO2 diagnostic for an oxide composition."""
+    temperature = float(temperature_K)
+    if temperature <= 0.0:
+        return math.log10(vacuum_floor_bar)
+    feo, fe2o3 = iron_oxide_values(composition_wt_pct)
+    alkali = max(0.0, float(composition_wt_pct.get("Na2O", 0.0))) + max(
+        0.0, float(composition_wt_pct.get("K2O", 0.0))
+    )
+    log_iw = -27215.0 / temperature + 6.57
+    redox_offset = 0.0
+    if feo > 0.0 and fe2o3 > 0.0:
+        redox_offset += 0.25 * math.log10(max(fe2o3 / feo, 1.0e-12))
+    redox_offset += min(0.15, alkali * 0.01)
+    return max(
+        math.log10(vacuum_floor_bar),
+        min(0.0, log_iw + redox_offset),
+    )
 
 
 KRESS91_MOL_FRACTION_OXIDES = (
@@ -387,12 +416,6 @@ def kress91_furnace_activity_pressure_bar(
     return floor_vacuum_pressure_bar(0.0, floor_bar=floor_bar)
 
 
-def feot_equivalent_wt_pct(comp_wt: Mapping[str, float]) -> float:
-    feo = max(0.0, float(comp_wt.get('FeO', 0.0) or 0.0))
-    fe2o3 = max(0.0, float(comp_wt.get('Fe2O3', 0.0) or 0.0))
-    return feo + fe2o3 * (2.0 * 71.844 / 159.687)
-
-
 def _linear_interpolate_or_clamp(
     points: tuple[tuple[float, float], ...],
     x: float,
@@ -600,7 +623,14 @@ def melt_mol_fractions_for_kress91(comp_wt: Mapping[str, float]) -> dict[str, fl
     # GAS_CONSTANT. Keeping fe_redox.py a true leaf avoids that cycle.
     from simulator.state import MOLAR_MASS
 
-    for oxide in (*KRESS91_MOL_FRACTION_OXIDES, 'FeO', 'Fe2O3'):
+    try:
+        feo_wt, fe2o3_wt = iron_oxide_values(comp_wt)
+    except ValueError as exc:
+        raise Kress91InvalidControls(
+            'Kress91 composition FeO/Fe2O3 must be finite and non-negative'
+        ) from exc
+    iron_oxides = {'FeO': feo_wt, 'Fe2O3': fe2o3_wt}
+    for oxide in KRESS91_MOL_FRACTION_OXIDES:
         raw = comp_wt.get(oxide, 0.0)
         try:
             value = float(raw)
@@ -608,6 +638,11 @@ def melt_mol_fractions_for_kress91(comp_wt: Mapping[str, float]) -> dict[str, fl
             raise Kress91InvalidControls(
                 f'Kress91 composition {oxide} must be finite and non-negative'
             ) from exc
+        if not math.isfinite(value) or value < 0.0:
+            raise Kress91InvalidControls(
+                f'Kress91 composition {oxide} must be finite and non-negative'
+            )
+    for oxide, value in iron_oxides.items():
         if not math.isfinite(value) or value < 0.0:
             raise Kress91InvalidControls(
                 f'Kress91 composition {oxide} must be finite and non-negative'

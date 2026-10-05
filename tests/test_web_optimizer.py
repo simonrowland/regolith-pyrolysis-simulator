@@ -4289,6 +4289,43 @@ def test_additive_calc_returns_finite_non_negative_masses(client) -> None:
     assert all(math.isfinite(value) and value >= 0.0 for value in payload.values())
 
 
+def test_web_k_shuttle_counts_measured_ferric_iron(client, monkeypatch) -> None:
+    feedstocks = {
+            "measured_split": {
+                "composition_wt_pct": {"SiO2": 70.0, "FeO": 10.0, "Fe2O3": 20.0},
+                "composition_basis": {
+                    "FeO": {"method": "synthetic assay", "source": "test"},
+                    "Fe2O3": {
+                        "method": "synthetic assay",
+                        "source": "test",
+                    },
+                },
+            },
+        "ferrous_control": {
+            "composition_wt_pct": {"SiO2": 90.0, "FeO": 10.0},
+        },
+    }
+    monkeypatch.setattr(
+        web_routes,
+        "get_visible_feedstock",
+        lambda key, include_custom=True: feedstocks.get(key),
+    )
+
+    split_k = client.get("/api/additive-calc/measured_split?mass_kg=1000").get_json()["K"]
+    ferrous_k = client.get("/api/additive-calc/ferrous_control?mass_kg=1000").get_json()["K"]
+    # FeO + 2K -> Fe + K2O; Fe2O3 + 6K -> 2Fe + 3K2O.
+    # The feed contains 100 kg FeO and 200 kg Fe2O3 on its 1000 kg basis.
+    expected_split_k = round(
+        (100.0 / 71.84 * 2.0 + 200.0 / 159.687 * 6.0)
+        * 39.10
+        * 0.25
+        * 1.2,
+        1,
+    )
+    assert split_k == pytest.approx(expected_split_k)
+    assert split_k > ferrous_k
+
+
 def test_product_ledger_panel_has_ingots_glass_o2_volatiles_ceramic_and_mass_closure(
     client,
     tmp_path,

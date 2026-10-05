@@ -178,6 +178,10 @@ def _run_fe2o3_lookup_only_case(mode: str) -> dict[str, object]:
     composition = fe2o3_feedstock["composition_wt_pct"]
     composition["FeO"] -= 1.0
     composition["Fe2O3"] = 1.0
+    fe2o3_feedstock["composition_basis"] = {
+        "FeO": {"method": "synthetic assay", "source": "test"},
+        "Fe2O3": {"method": "synthetic assay", "source": "test"},
+    }
     feedstocks["c3_fe2o3_lookup_only"] = fe2o3_feedstock
 
     backend = InternalAnalyticalBackend()

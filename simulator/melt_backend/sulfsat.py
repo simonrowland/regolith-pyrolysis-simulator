@@ -75,6 +75,10 @@ from importlib import metadata as importlib_metadata
 from typing import Any, Dict, List, Mapping, Optional
 
 from simulator.fe_redox import kress91_split, melt_mol_fractions_for_kress91
+from simulator.feedstock_composition import (
+    feot_equivalent_wt_pct,
+    iron_oxide_values,
+)
 from simulator.scalar_boundary import is_declared_real_scalar
 
 
@@ -447,10 +451,7 @@ class SulfSatGate:
         """
         notes: List[str] = []
 
-        feo_total = (
-            liquid_comp_wt.get('FeO', 0.0)
-            + liquid_comp_wt.get('Fe2O3', 0.0) * (2.0 * 71.844 / 159.687)
-        )
+        feo_total = feot_equivalent_wt_pct(liquid_comp_wt)
 
         for model, bounds in (
             ('Smythe 2017 SCSS', _SCSS_CALIBRATION_BOUNDS_WT_PCT),
@@ -670,22 +671,19 @@ class SulfSatGate:
         import pandas as pd  # noqa: PLC0415 — lazy import, see docstring
 
         row: Dict[str, float] = {col: 0.0 for col in _OXIDE_TO_PYSULFSAT_COL.values()}
-        feo_total_wt = 0.0
+        feo_total_wt = feot_equivalent_wt_pct(liquid_comp_wt)
+        feo_wt, fe2o3_wt = iron_oxide_values(liquid_comp_wt)
         for oxide, wt in liquid_comp_wt.items():
+            if oxide in ('FeO', 'Fe2O3'):
+                continue
             if wt is None or float(wt) <= 0.0:
                 continue
             value = float(wt)
-            if oxide == 'FeO':
-                feo_total_wt += value
-                row['FeO_Liq'] = value
-            elif oxide == 'Fe2O3':
-                # Fe2O3 -> FeO equivalent (mass of 2*Fe basis).
-                feo_total_wt += value * (2.0 * 71.844 / 159.687)
-                row['Fe2O3_Liq'] = value
-            else:
-                col = _OXIDE_TO_PYSULFSAT_COL.get(oxide)
-                if col is not None:
-                    row[col] = value
+            col = _OXIDE_TO_PYSULFSAT_COL.get(oxide)
+            if col is not None:
+                row[col] = value
+        row['FeO_Liq'] = feo_wt
+        row['Fe2O3_Liq'] = fe2o3_wt
         row['FeOt_Liq'] = feo_total_wt
         return pd.DataFrame([row])
 
