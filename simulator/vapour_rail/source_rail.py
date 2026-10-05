@@ -468,10 +468,13 @@ class SourceRail:
         return tuple(selected)
 
 
-def _janaf_points(document: Mapping[str, Any]) -> tuple[tuple[float, float], ...]:
+def _janaf_points(
+    document: Mapping[str, Any],
+) -> tuple[tuple[tuple[float, float], ...], tuple[float, ...]]:
     table = document.get("table") or {}
     rows = table.get("values") or []
     points: list[tuple[float, float]] = []
+    missing: list[float] = []
     for row in rows:
         if not isinstance(row, Mapping):
             continue
@@ -479,7 +482,10 @@ def _janaf_points(document: Mapping[str, Any]) -> tuple[tuple[float, float], ...
         gibbs = row.get("formation_gibbs_energy") or {}
         t_k = _published_value(temperature)
         g_kj = _published_value(gibbs)
-        if t_k is None or g_kj is None or t_k <= 0.0:
+        if t_k is None or t_k <= 0.0:
+            continue
+        if g_kj is None:
+            missing.append(t_k)
             continue
         points.append((t_k, g_kj * JANAF_KJ_TO_J))
     points.sort(key=lambda item: item[0])
@@ -489,7 +495,9 @@ def _janaf_points(document: Mapping[str, Any]) -> tuple[tuple[float, float], ...
         if unique and t_k == unique[-1][0]:
             continue
         unique.append((t_k, g_j))
-    return tuple(unique)
+    printed = {t_k for t_k, _g in unique}
+    missing_nodes = tuple(t_k for t_k in missing if t_k not in printed)
+    return tuple(unique), missing_nodes
 
 
 def _janaf_skip_reason(index_entry: Mapping[str, Any]) -> str | None:
@@ -520,7 +528,7 @@ def _janaf_record_from_path(path: Path) -> SourceRailRecord | None:
     standard_state = canonical_standard_state(native_phase)
     if not formula or standard_state is None:
         return None
-    points = _janaf_points(document)
+    points, missing_nodes = _janaf_points(document)
     if len(points) < 2:
         return None
     table_id = str(table.get("table_id") or path.stem)
@@ -535,6 +543,7 @@ def _janaf_record_from_path(path: Path) -> SourceRailRecord | None:
         record_id=table_id,
         native_phase=native_phase,
         native_reference_pressure_Pa=STANDARD_PRESSURE_PA,
+        missing_nodes=missing_nodes,
     )
     species_thermo = {
         "evaluator_family": "tabulated_janaf",

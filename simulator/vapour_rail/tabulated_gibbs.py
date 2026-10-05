@@ -10,7 +10,7 @@ from __future__ import annotations
 
 import math
 from dataclasses import dataclass
-from typing import Sequence
+from typing import Any, Sequence
 
 from simulator.vapour_rail.nasa_cea import (
     R_J_PER_MOL_K,
@@ -30,15 +30,60 @@ class TabulatedGibbsConventionError(TabulatedGibbsError):
 class TabulatedDomainError(TabulatedGibbsError):
     """T outside the tabulated grid, or T is not finite and > 0 K."""
 
+    def __init__(self, message: str, *, kind: str = "domain") -> None:
+        self.kind = kind
+        super().__init__(message)
+
+
+class TabulatedMissingNodeError(TabulatedGibbsError):
+    """A blank node lies strictly inside the interpolation bracket."""
+
+    def __init__(self, missing_node: Any, temperature: Any) -> None:
+        self.missing_node = missing_node
+        self.temperature = temperature
+        super().__init__(
+            "needed tabulated formation Gibbs row missing at "
+            f"{missing_node} for interpolation at {temperature}"
+        )
+
+
+def _missing_tabulated_node(
+    points: Sequence[tuple[Any, Any]],
+    missing_nodes: Sequence[Any],
+    temperature: Any,
+) -> Any | None:
+    if any(node_temperature == temperature for node_temperature, _y in points):
+        return None
+    for (left, _y0), (right, _y1) in zip(points, points[1:]):
+        if left < temperature < right:
+            return next(
+                (node for node in missing_nodes if left < node < right),
+                None,
+            )
+    return None
+
 
 def interpolate_tabulated(
-    points: Sequence[tuple[float, float]], temperature_K: float
-) -> float:
-    """Linear interpolation of y(T) on a strictly increasing T grid."""
+    points: Sequence[tuple[Any, Any]],
+    temperature_K: Any,
+    *,
+    missing_nodes: Sequence[Any] = (),
+) -> Any:
+    """Linear interpolation of y(T) on a strictly increasing T grid.
+
+    Accepts float or Decimal points. Arithmetic is the caller's type.
+    A blank ``missing_nodes`` entry strictly inside the bracket is a refusal;
+    a temperature that lands on a printed node is that node's value.
+    """
+    if missing_nodes:
+        missing = _missing_tabulated_node(points, missing_nodes, temperature_K)
+        if missing is not None:
+            raise TabulatedMissingNodeError(missing, temperature_K)
     if temperature_K < points[0][0] or temperature_K > points[-1][0]:
         raise TabulatedDomainError(
             f"{temperature_K} K is outside tabulated range "
-            f"[{points[0][0]}, {points[-1][0]}] K"
+            f"[{points[0][0]}, {points[-1][0]}] K",
+            kind="out_of_range",
         )
     for (t0, y0), (t1, y1) in zip(points, points[1:]):
         if t0 <= temperature_K <= t1:
@@ -48,7 +93,8 @@ def interpolate_tabulated(
                 return y1
             return y0 + (y1 - y0) * (temperature_K - t0) / (t1 - t0)
     raise TabulatedDomainError(
-        f"{temperature_K} K is not bracketed by tabulated rows"
+        f"{temperature_K} K is not bracketed by tabulated rows",
+        kind="not_bracketed",
     )
 
 
@@ -67,6 +113,9 @@ class TabulatedThermo:
     record_id: str | None = None
     native_phase: str | None = None
     native_reference_pressure_Pa: float | None = None
+    # Temperatures with a row but no printed y. Empty for series that do not
+    # record blanks (Pankratz has no blank-node index).
+    missing_nodes: tuple[float, ...] = ()
 
     def __post_init__(self) -> None:
         if self.standard_state not in (
@@ -126,7 +175,9 @@ class TabulatedThermo:
                 f"{self.name}: T={T} K outside domain "
                 f"[{self.T_min_K}, {self.T_max_K}] K"
             )
-        g_j = interpolate_tabulated(self.formation_gibbs_J_per_mol, T)
+        g_j = interpolate_tabulated(
+            self.formation_gibbs_J_per_mol, T, missing_nodes=self.missing_nodes
+        )
         g_over_RT = g_j / (R_J_PER_MOL_K * T)
         return ThermoState(
             T_K=T,
