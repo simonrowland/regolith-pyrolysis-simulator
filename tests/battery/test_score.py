@@ -5528,6 +5528,53 @@ def test_solid_activity_with_unmatched_polymorph_refuses_conversion(
     )
 
 
+@pytest.mark.parametrize("polymorph", (None, "quartz"))
+def test_silica_solid_activity_with_unmatched_polymorph_refuses_conversion(
+    polymorph: str | None,
+) -> None:
+    from simulator.battery.score import _fusion_comparison_reference
+
+    experiment = F.kems_experiment()
+    identity = _with_activity_reference_polymorph(
+        F.activity_identity(
+            formula="SiO2",
+            T_K=Decimal("1933"),
+            endmember_phase=Phase.CR,
+            component_basis="SiO2",
+        ),
+        polymorph,
+    )
+    reference = F.observation(
+        f"silica-solid-activity-{polymorph or 'unknown'}-polymorph",
+        experiment.experiment_id,
+        identity,
+        Decimal("0.3"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="synthetic-unmatched-solid-polymorph",
+    )
+
+    comparison = _fusion_comparison_reference(reference, engine=Engine.OPENIMCC)
+    assert comparison.value.point == reference.value.point
+    assert comparison.identity.reference_state.value.endmember.phase.value is Phase.CR
+    assert any(
+        "fusion conversion missing input" in notice.reason
+        and "O-035 represents polymorph cristobalite_high" in notice.reason
+        for notice in comparison.notices
+    )
+
+    residual, _candidate = compile_residual(
+        reference,
+        Engine.OPENIMCC,
+        context=_context(F.work(), experiment, reference, review="reviewed"),
+    )
+    assert residual.status is ResidualStatus.REFUSED
+    assert residual.refusal is not None
+    assert residual.refusal.reason is RefusalReason.IDENTITY_INCOMPLETE
+    assert residual.refusal.detail["missing_input"] == (
+        "JANAF solid polymorph matching the selected table"
+    )
+
+
 def test_missing_janaf_fusion_node_refuses_activity_residual(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
@@ -6261,6 +6308,12 @@ def test_allibert_solid_activity_fusion_conversion_is_diagnostic_only(
         _fusion_comparison_reference(at_melting_reference).value.point
         == Decimal("1")
     )
+    alumina_fusion = janaf_fusion_energy("Al2O3", Decimal("2060"))
+    assert alumina_fusion.delta_g_fus_kJ_per_mol == Decimal("11.8498")
+    assert alumina_fusion.melting_temperature_K == Decimal(
+        "2326.528497409326424870466321"
+    )
+    assert alumina_fusion.accepted_melting_temperature_K == Decimal("2327")
     alumina_reference = replace(
         reference,
         observation_id="allibert-alumina-solid-activity",
@@ -6278,6 +6331,21 @@ def test_allibert_solid_activity_fusion_conversion_is_diagnostic_only(
     converted_alumina = _fusion_comparison_reference(alumina_reference)
     assert converted_alumina.value.point != alumina_reference.value.point
     assert converted_alumina.identity.reference_state.value.endmember.phase.value is Phase.L
+    assert (
+        converted_alumina.identity.reference_state.value.component_basis == "Al2O3"
+    )
+    alumina_notice = next(
+        notice
+        for notice in converted_alumina.notices
+        if notice.reason.startswith(
+            f"{FLAGGED_STRATUM_REFERENCE_CONVERTED_VIA_FUSION};"
+        )
+    )
+    assert (
+        "distance_below_JANAF_Tm=266.528497409326424870466321"
+        in alumina_notice.reason
+    )
+    assert "accepted_Tm~2327 K" in alumina_notice.reason
     assert any(
         notice.kind is NoticeKind.DERIVATION_USES_COMPILATION
         and notice.reason.startswith("reference_converted_via_fusion;")
@@ -6286,6 +6354,7 @@ def test_allibert_solid_activity_fusion_conversion_is_diagnostic_only(
     silica_fusion = janaf_fusion_energy("SiO2", Decimal("1933"))
     assert silica_fusion.delta_g_fus_kJ_per_mol == Decimal("0.27784")
     assert Decimal("1994.4") < silica_fusion.melting_temperature_K < Decimal("1994.5")
+    assert silica_fusion.accepted_melting_temperature_K == Decimal("1986")
 
     allibert_1933 = replace(
         reference,
@@ -6801,11 +6870,7 @@ def test_admitted_model_derived_rows_emit_residuals_per_imcc_engine() -> None:
         assert all(
             any(
                 "fusion conversion missing input" in notice.reason
-                and (
-                    "measured reference polymorph is unknown" in notice.reason
-                    or "missing at" in notice.reason
-                    or "spans missing grid node" in notice.reason
-                )
+                and "measured reference polymorph is unknown" in notice.reason
                 for notice in row.notices
             )
             for row in allibert_alumina_rows
