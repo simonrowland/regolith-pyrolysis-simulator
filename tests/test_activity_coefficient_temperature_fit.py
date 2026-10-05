@@ -10,6 +10,7 @@ from pathlib import Path
 import yaml
 
 from simulator.battery.enums import (
+    EvidenceClass,
     MELT_ACTIVITY_QUANTITIES,
     QUANTITY_UNITS,
     Quantity,
@@ -68,7 +69,11 @@ def test_sossi_fegley_2018_added_numeric_rows_are_pinned() -> None:
     path = ROOT / "data/literature/extracts/kems-041-sossi-fegley-2018.yaml"
     doc = yaml.safe_load(path.read_text())
     rows = [
-        row
+        {
+            key: value
+            for key, value in row.items()
+            if key not in {"method_class", "evidence_model"}
+        }
         for species in doc["species"].values()
         for obs in species.get("observations", [])
         if str((obs.get("locator") or {}).get("table")) == "2"
@@ -206,11 +211,34 @@ def test_sossi_fegley_2018_table_2_migrates_numeric_activity_rows() -> None:
     assert sum(observation.value.kind is ValueKind.INTERVAL for observation in observations) == 37
     assert sum(observation.value.kind is ValueKind.POINT for observation in observations) == 4
     assert sum(observation.value.kind is ValueKind.EXPRESSION for observation in observations) == 3
+    assert sum(
+        observation.evidence.class_.is_value
+        and observation.evidence.class_.value is EvidenceClass.MEASURED_TABULATED
+        for observation in observations
+    ) == 38
+    assert sum(
+        observation.evidence.class_.is_value
+        and observation.evidence.class_.value is EvidenceClass.COMPILATION_ASSESSED
+        for observation in observations
+    ) == 3
+    assert sum(
+        observation.evidence.class_.is_value
+        and observation.evidence.class_.value is EvidenceClass.QUOTED_ATTRIBUTED
+        for observation in observations
+    ) == 3
     for observation in observations:
         printed_row = observation.provenance[
             "activity_coefficient_table_row_as_printed"
         ]
         assert observation.identity.species.formula == printed_row["oxide"]
+        assert observation.evidence.class_.is_value
+        if printed_row.get("evidence_model") == "MELTS":
+            assert observation.evidence.model == "MELTS"
+            assert observation.evidence.class_.value is EvidenceClass.COMPILATION_ASSESSED
+        elif printed_row.get("relation_parameters"):
+            assert observation.evidence.class_.value is EvidenceClass.QUOTED_ATTRIBUTED
+        else:
+            assert observation.evidence.class_.value is EvidenceClass.MEASURED_TABULATED
     phosphate = next(
         observation
         for observation in observations

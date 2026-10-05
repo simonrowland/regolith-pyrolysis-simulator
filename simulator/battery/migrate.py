@@ -293,6 +293,7 @@ METHOD_CLASS_MAP: dict[str, EvidenceClass] = {
     "compilation_calculated_table": EvidenceClass.COMPILATION_ASSESSED,
     "compilation_derived": EvidenceClass.COMPILATION_ASSESSED,
     "compilation_foreign": EvidenceClass.COMPILATION_ASSESSED,
+    "compiled_melt_activity": EvidenceClass.COMPILATION_ASSESSED,
     "qualitative_review_compilation": EvidenceClass.COMPILATION_ASSESSED,
     "review_compilation": EvidenceClass.COMPILATION_ASSESSED,
     "secondary_compilation": EvidenceClass.COMPILATION_ASSESSED,
@@ -12584,6 +12585,18 @@ class Migrator:
     ) -> None:
         raw_item = item.get("item")
         index = item.get("index", 0)
+        if (
+            source_id == "kems-041-sossi-fegley-2018"
+            and isinstance(raw_item, Mapping)
+            and isinstance(raw_item.get("method_class"), str)
+        ):
+            row_attribution = raw_item.get("references_as_published")
+            row_model = raw_item.get("evidence_model")
+            evidence, _ = self._evidence_for(
+                raw_item["method_class"],
+                attribution=(row_attribution if isinstance(row_attribution, str) else None),
+                model=(row_model if isinstance(row_model, str) else None),
+            )
         quantity, species, ident_kwargs = identity_base
         coord = None
         val = None
