@@ -173,6 +173,19 @@ def compilation_point_id(
     return f"{observation_id}#{token}"
 
 
+def compilation_point_temperature(reference_id: str) -> Decimal | None:
+    """Printed T of a compilation series cell id, else None.
+
+    The inverse of the ``t`` token ``compilation_point_id`` writes. Ids that
+    are not a printed cell (plain ids, ``#<index>`` points) return None.
+    """
+
+    _parent, sep, suffix = reference_id.rpartition("#")
+    if not sep or not _is_point_suffix(suffix):
+        return None
+    return Decimal(suffix[1:].partition("v")[0])
+
+
 def parent_observation_id(reference_id: str) -> str:
     """Series-point ids end in ``#<index>`` or ``#t<T>v<value>``.
 
