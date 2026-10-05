@@ -101,9 +101,16 @@ def _load_data(filename):
         return yaml.safe_load(f) or {}
 
 
+def _select_python_api_for_test(backend: AlphaMELTSBackend) -> None:
+    backend._mode = 'python_api'
+    backend._python_api_model = simulator_config.resolve_alphamelts_python_api_model(
+        backend._raw_model_name
+    )
+
+
 def _petthermotools_call_arguments(model_name: str | None):
     backend = AlphaMELTSBackend(model_name=model_name)
-    backend._mode = 'python_api'
+    _select_python_api_for_test(backend)
     calls = []
     backend._require_petthermotools_runtime = lambda: object()
     backend._run_petthermotools_isolated = (
@@ -142,6 +149,7 @@ def test_petthermotools_model_code_pins_current_selection(
     expected_code: int,
 ) -> None:
     backend = AlphaMELTSBackend(model_name=model_name)
+    _select_python_api_for_test(backend)
 
     assert backend._melts_model_code() == expected_code
 
@@ -232,6 +240,7 @@ def test_petthermotools_resolver_is_the_model_code_owner() -> None:
     for model_name, expected_code in cases:
         resolved_model, code = resolver(model_name)
         backend = AlphaMELTSBackend(model_name=model_name)
+        _select_python_api_for_test(backend)
         assert code == expected_code
         assert backend._melts_model_code() == code
         assert resolved_model == (model_name or DEFAULT_ALPHAMELTS_MODEL)
@@ -295,9 +304,13 @@ def test_petthermotools_backend_uses_the_owner_resolved_code(monkeypatch) -> Non
         ),
     ],
 )
+@pytest.mark.parametrize(
+    'mode', ['python_api', None], ids=['requested-api', 'discovered-api']
+)
 def test_python_api_initialization_refuses_raw_model_before_worker_creation(
     monkeypatch,
     model_name,
+    mode,
 ) -> None:
     backend = AlphaMELTSBackend(model_name=model_name)
     imports = []
@@ -317,72 +330,37 @@ def test_python_api_initialization_refuses_raw_model_before_worker_creation(
         'simulator.melt_backend.alphamelts.WarmEngineWorker',
         lambda **kwargs: workers.append(kwargs),
     )
+    monkeypatch.setattr(
+        'simulator.engine_local_config.find_alphamelts_binary',
+        lambda _root: None,
+    )
+    backend._find_project_binary = lambda _root: None
+    monkeypatch.setattr(
+        'simulator.melt_backend.alphamelts._run_alphamelts_subprocess',
+        lambda *_args, **_kwargs: (_ for _ in ()).throw(FileNotFoundError()),
+    )
 
     with pytest.raises(AlphaMELTSConfigurationError):
-        backend.initialize({'mode': 'python_api', 'warm_worker': True})
+        backend.initialize({'mode': mode, 'warm_worker': True})
 
+    assert imports == []
     assert workers == []
     assert backend._mode is None
+    assert backend._pet_available is False
     assert backend._pet_worker is None
 
 
 @pytest.mark.parametrize(
-    'model_name', [' MELTSv1.0.2 ', ' pMELTS ', 'MELTSv1.1.0 ', ' \t ']
-)
-@pytest.mark.parametrize(
-    ('operation', 'api_name'),
+    ('model_name', 'base_model_keyword'),
     [
-        ('equilibrium', 'equilibrate_MELTS'),
-        ('liquidus_melts', 'findLiq_MELTS'),
-        ('liquidus_legacy', 'findLiq'),
-        ('decompression', 'isothermal_decompression'),
+        ('', ''),
+        (None, 'None'),
+        (DEFAULT_ALPHAMELTS_MODEL, DEFAULT_ALPHAMELTS_MODEL),
+        ('pMELTS', 'pMELTS'),
+        ('MELTSv1.1.0', 'MELTSv1.1.0'),
+        ('MELTSv1.2.0', 'MELTSv1.2.0'),
     ],
 )
-def test_petthermotools_rejects_non_exact_names_before_any_worker_launch(
-    monkeypatch,
-    model_name: str,
-    operation: str,
-    api_name: str,
-) -> None:
-    backend = AlphaMELTSBackend(model_name=model_name)
-    backend._pet_payload_preloaded = True
-    backend._pet_melts = object()
-    backend._pet_module = object()
-    isolated_calls = []
-    backend._require_petthermotools_runtime = lambda: types.SimpleNamespace(
-        **{api_name: lambda **kwargs: None}
-    )
-    backend._to_petthermotools_liq_comp = lambda comp: comp
-    backend._parse_petthermotools_result = lambda *_args, **_kwargs: EquilibriumResult(
-        status='ok', temperature_C=1400.0, pressure_bar=1.0, fO2_log=-9.0,
-        liquid_fraction=1.0,
-    )
-    monkeypatch.setattr(
-        backend,
-        '_run_petthermotools_isolated',
-        lambda *args, **kwargs: isolated_calls.append((args, kwargs)),
-    )
-
-    with pytest.raises(AlphaMELTSConfigurationError):
-        if operation == 'equilibrium':
-            backend._equilibrate_python(1400.0, {'SiO2': 100.0}, -9.0, 1.0)
-        elif operation.startswith('liquidus'):
-            backend._find_petthermotools_liquidus_C(
-                {'SiO2': 100.0}, pressure_bar=1.0, seed_T_C=1400.0
-            )
-        else:
-            backend._composition_kg_to_wt_pct = lambda _comp: {'SiO2': 100.0}
-            backend._domain_gate = lambda *_args, **_kwargs: None
-            backend._apply_engine_commissioning = lambda *_args, **_kwargs: {}
-            backend._normalize_composition_to_melts_basis = lambda comp: comp
-            backend.decompression_path(
-                1400.0, 1.0, 0.1, 0.1, composition_kg={'SiO2': 1.0}
-            )
-
-    assert isolated_calls == []
-
-
-@pytest.mark.parametrize(('model_name', 'base_model_keyword'), [('', ''), (None, 'None')])
 @pytest.mark.parametrize(
     ('operation', 'api_name'),
     [
@@ -401,10 +379,10 @@ def test_petthermotools_model_keyword_preserves_base_payload_bytes(
 ) -> None:
     # Base 05b6309d30cfed84d5e2ecd0467106d5702ce628
     # passed _model directly:
-    # blank was "" and None
-    # was "None" on every PetThermoTools API path.
+    # blank was "", None was "None", and exact names were passed unchanged
+    # on every PetThermoTools API path.
     backend = AlphaMELTSBackend(model_name=model_name)
-    backend._mode = 'python_api'
+    _select_python_api_for_test(backend)
     calls = []
     backend._require_petthermotools_runtime = lambda: types.SimpleNamespace(
         **{api_name: lambda **kwargs: None}
@@ -437,9 +415,17 @@ def test_petthermotools_model_keyword_preserves_base_payload_bytes(
     assert calls[0][1]['kwargs']['Model'] == base_model_keyword
 
 
-@pytest.mark.parametrize(('model_name', 'expected_code', 'base_model_keyword'), [
-    ('', 1, ''), (None, 1, 'None'),
-])
+@pytest.mark.parametrize(
+    ('model_name', 'expected_code', 'base_model_keyword'),
+    [
+        ('', 1, ''),
+        (None, 1, 'None'),
+        (DEFAULT_ALPHAMELTS_MODEL, 1, DEFAULT_ALPHAMELTS_MODEL),
+        ('pMELTS', 2, 'pMELTS'),
+        ('MELTSv1.1.0', 3, 'MELTSv1.1.0'),
+        ('MELTSv1.2.0', 4, 'MELTSv1.2.0'),
+    ],
+)
 def test_petthermotools_cold_worker_keeps_base_model_payload_and_code(
     monkeypatch,
     model_name,
@@ -447,6 +433,7 @@ def test_petthermotools_cold_worker_keeps_base_model_payload_and_code(
     base_model_keyword,
 ) -> None:
     backend = AlphaMELTSBackend(model_name=model_name)
+    _select_python_api_for_test(backend)
     process_calls = []
 
     class Endpoint:
@@ -492,7 +479,17 @@ def test_petthermotools_cold_worker_keeps_base_model_payload_and_code(
     assert process_calls[0]['args'][4]['Model'] == base_model_keyword
 
 
-@pytest.mark.parametrize(('model_name', 'expected_code'), [('', 1), (None, 1)])
+@pytest.mark.parametrize(
+    ('model_name', 'expected_code'),
+    [
+        ('', 1),
+        (None, 1),
+        (DEFAULT_ALPHAMELTS_MODEL, 1),
+        ('pMELTS', 2),
+        ('MELTSv1.1.0', 3),
+        ('MELTSv1.2.0', 4),
+    ],
+)
 def test_petthermotools_warm_worker_keeps_base_model_payload_and_code(
     monkeypatch,
     model_name,
@@ -579,7 +576,7 @@ def test_petthermotools_refuses_padded_model_before_worker_construction(
 
 def test_alphamelts_python_failures_mark_backend_unavailable():
     backend = AlphaMELTSBackend()
-    backend._mode = 'python_api'
+    _select_python_api_for_test(backend)
 
     with pytest.raises(ImportError, match='not preloaded'):
         backend._equilibrate_python(
@@ -738,7 +735,7 @@ def test_alphamelts_python_findliq_none_is_unavailable_without_bisection():
 
 def test_alphamelts_python_liquidus_timeout_marks_backend_unavailable():
     backend = AlphaMELTSBackend()
-    backend._mode = 'python_api'
+    _select_python_api_for_test(backend)
     backend._pet_module = types.SimpleNamespace(
         findLiq_MELTS=lambda **_kwargs: None
     )
@@ -2463,7 +2460,7 @@ def test_alphamelts_python_api_clamped_pressure_reports_solved_condition(
     monkeypatch,
 ):
     backend = AlphaMELTSBackend()
-    backend._mode = 'python_api'
+    _select_python_api_for_test(backend)
     backend._vaporock_available = True
     backend._vaporock_helper = _vaporock_helper_returning({'SiO': 0.25})
     seen = {}
@@ -2985,7 +2982,7 @@ def test_alphamelts_python_native_hang_is_killed_and_marks_unavailable(
             return FakeProcess()
 
     backend = AlphaMELTSBackend()
-    backend._mode = 'python_api'
+    _select_python_api_for_test(backend)
     backend._pet_payload_preloaded = True
     backend._pet_melts = object()
     backend._pet_module = types.SimpleNamespace()
@@ -7870,7 +7867,7 @@ def test_decompression_path_calls_verified_petthermotools_api():
             },
         }
 
-    backend._mode = 'python_api'
+    _select_python_api_for_test(backend)
     backend._pet_module = types.SimpleNamespace(
         isothermal_decompression=object())
     backend._run_petthermotools_isolated = fake_decompression
@@ -7908,7 +7905,7 @@ def test_decompression_path_calls_verified_petthermotools_api():
 
 def test_decompression_timeout_marks_python_backend_unavailable():
     backend = AlphaMELTSBackend()
-    backend._mode = 'python_api'
+    _select_python_api_for_test(backend)
     backend._pet_module = types.SimpleNamespace(
         isothermal_decompression=object()
     )
@@ -8263,7 +8260,7 @@ def test_alphamelts_accepts_applied_thermoengine_absolute_fo2(monkeypatch):
 
 def test_alphamelts_python_requires_solved_fo2_echo():
     backend = AlphaMELTSBackend()
-    backend._mode = 'python_api'
+    _select_python_api_for_test(backend)
     backend._pet_melts = object()
     backend._pet_payload_preloaded = True
     backend._pet_module = types.SimpleNamespace()
@@ -8287,7 +8284,7 @@ def test_alphamelts_python_requires_solved_fo2_echo():
 
 def test_alphamelts_python_preserves_solved_fo2_and_scales_physical_batches():
     backend = AlphaMELTSBackend()
-    backend._mode = 'python_api'
+    _select_python_api_for_test(backend)
     backend._pet_melts = object()
     backend._pet_payload_preloaded = True
     backend._pet_module = types.SimpleNamespace()

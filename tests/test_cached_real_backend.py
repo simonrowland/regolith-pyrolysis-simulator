@@ -634,6 +634,48 @@ def test_cached_real_subprocess_unverified_model_refuses_before_identity(
 
 
 @pytest.mark.parametrize(
+    ("backend_name", "family", "mode", "model", "expected", "refuses"),
+    [
+        ("alphamelts", RealBackendFamily.ALPHAMELTS, "subprocess", None, None, True),
+        ("alphamelts", RealBackendFamily.ALPHAMELTS, "subprocess", "", "MELTSv1.0.2", False),
+        ("alphamelts", RealBackendFamily.ALPHAMELTS, "subprocess", " MELTSv1.0.2 ", "MELTSv1.0.2", False),
+        ("alphamelts", RealBackendFamily.ALPHAMELTS, "subprocess", "not-a-model", None, True),
+        ("alphamelts", RealBackendFamily.ALPHAMELTS, "subprocess", "MELTSv1.0.2", "MELTSv1.0.2", False),
+        ("thermoengine", RealBackendFamily.THERMOENGINE, "thermoengine", None, "None", False),
+        ("thermoengine", RealBackendFamily.THERMOENGINE, "thermoengine", "", "MELTSv1.0.2", False),
+        ("thermoengine", RealBackendFamily.THERMOENGINE, "thermoengine", " pMELTS ", "pMELTS", False),
+        ("thermoengine", RealBackendFamily.THERMOENGINE, "thermoengine", "not-a-model", "not-a-model", False),
+        ("thermoengine", RealBackendFamily.THERMOENGINE, "thermoengine", "MELTSv1.0.2", "MELTSv1.0.2", False),
+    ],
+)
+def test_cached_real_non_python_api_model_normalization_is_unchanged(
+    tmp_path: Path,
+    backend_name,
+    family,
+    mode,
+    model,
+    expected,
+    refuses,
+) -> None:
+    config = _cache_config(
+        tmp_path / "cached-real.db",
+        "fail-loud",
+        name=backend_name,
+        family=family,
+        mode=mode,
+        model=model,
+    )
+    config["authorized_model"] = model
+
+    if refuses:
+        with pytest.raises(BackendUnavailableError):
+            normalize_cached_real_config(config)
+        return
+
+    assert normalize_cached_real_config(config).authorized_model == expected
+
+
+@pytest.mark.parametrize(
     "model",
     [
         " pMELTS ",

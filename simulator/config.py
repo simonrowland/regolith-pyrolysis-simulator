@@ -41,6 +41,10 @@ def resolve_alphamelts_python_api_model(
     # cannot change the computation. This transport accepts several models;
     # stripping here would turn a name that previously fell through to code 1
     # into code 2/3/4 under the unchanged replay identity.
+    if model_name is not None and not isinstance(model_name, str):
+        raise ValueError(
+            f"AlphaMELTS Python API model {model_name!r} is not verified"
+        )
     model = (
         DEFAULT_ALPHAMELTS_MODEL
         if model_name is None or model_name == ""

@@ -20,7 +20,10 @@ from simulator.chemistry.kernel.capabilities import CapabilityProfile
 from simulator.chemistry.kernel.dto import IntentRequest, IntentResult
 from simulator.chemistry.kernel.provider import ChemistryProvider
 from simulator.corpus_version import current_corpus_version
-from simulator.config import DEFAULT_ALPHAMELTS_MODEL
+from simulator.config import (
+    DEFAULT_ALPHAMELTS_MODEL,
+    resolve_alphamelts_python_api_model,
+)
 from simulator.grind_preflight import GrindSourceGateError
 from simulator.melt_backend.base import (
     EquilibriumResult,
@@ -639,6 +642,8 @@ def _alphamelts_pt0_identity(
     sim = _build_pt0_sim(store)
     backend = AlphaMELTSBackend(model_name=model)
     backend._mode = mode
+    if mode == "python_api":
+        backend._python_api_model = resolve_alphamelts_python_api_model(model)
     provider = AlphaMELTSProvider(backend=backend)
     sim.backend = backend
     sim._chem_registry.register(
@@ -721,6 +726,8 @@ def test_python_api_identity_pins_current_model_and_provider_fields(
         ("", "b43e6955cdee10f871c8aaceaa9b45eea9524da6d6fc9449f252c9f463281dd9"),
         (DEFAULT_ALPHAMELTS_MODEL, "7797a4c8de6ca270d6dd2118c5f22fe309175b95e991a70fb108a2a7f66d1645"),
         ("pMELTS", "632a85c2c53b207343c5b33ff54275f4d610bedfdad9a9d4e2774dee4140f2c5"),
+        ("MELTSv1.1.0", "da91bc89b90ad478d80e727462027fcffa9fd12435c60126dbcb9ffb315249c6"),
+        ("MELTSv1.2.0", "faecc7fca96b82b0121c50de8a431908cfaaccfe79bbe154fee91d5b7135d982"),
     ],
 )
 def test_python_api_accepted_replay_key_hashes_remain_base_bytes(
@@ -731,7 +738,8 @@ def test_python_api_accepted_replay_key_hashes_remain_base_bytes(
     # 05b6309d30cfed84d5e2ecd0467106d5702ce628.
     key, _authority = _alphamelts_pt0_identity(model, mode="python_api")
 
-    assert hashlib.sha256(rrd.canonical_json_bytes(key)).hexdigest() == expected_hash
+    actual_hash = hashlib.sha256(rrd.canonical_json_bytes(key)).hexdigest()
+    assert actual_hash == expected_hash
 
 
 def test_padded_python_api_name_refuses_during_key_build_before_replay_access(

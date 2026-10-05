@@ -934,8 +934,9 @@ class _MELTSBackendSupport(MeltBackend):
         self._redox_buffer: Optional[str] = None
         self._fo2_offset: Optional[float] = None
         self._fe3fet_ratio: Optional[float] = None
-        self._model_was_none = model_name is None
+        self._raw_model_name = model_name
         self._model = str(model_name)
+        self._python_api_model: tuple[str, int] | None = None
         self._timeout_s = ALPHAMELTS_DEFAULT_TIMEOUT_S
         self._last_normalization_warnings: List[str] = []
         self._vapor_pressure_table: Optional[dict] = None
@@ -963,6 +964,7 @@ class _MELTSBackendSupport(MeltBackend):
         self._pet_module = None
         self._pet_melts = None
         self._pet_payload_preloaded = False
+        self._python_api_model = None
         # PetThermoTools remains opt-in until its compiled MELTSdynamic
         # runtime is installed and passes the native byte-identity gate.
         # When selected, it uses the same kill/respawn isolation primitive.
@@ -978,11 +980,8 @@ class _MELTSBackendSupport(MeltBackend):
         self._fo2_offset = self._optional_float(config.get('fO2_offset'))
         self._fe3fet_ratio = self._normalize_fe3fet_ratio(
             config.get('Fe3Fet_Liq', config.get('fe3fet_ratio')))
-        model_name = config.get(
-            'model',
-            None if self._model_was_none else self._model,
-        )
-        self._model_was_none = model_name is None
+        model_name = config.get('model', self._raw_model_name)
+        self._raw_model_name = model_name
         self._model = str(model_name)
         self._timeout_s = _validated_timeout_s(
             config.get('timeout_s', ALPHAMELTS_DEFAULT_TIMEOUT_S)
@@ -1091,6 +1090,12 @@ class _MELTSBackendSupport(MeltBackend):
         *,
         require_petthermotools: bool,
     ) -> None:
+        try:
+            self._python_api_model = resolve_alphamelts_python_api_model(
+                self._raw_model_name
+            )
+        except ValueError as exc:
+            raise AlphaMELTSConfigurationError(str(exc)) from exc
         try:
             self._pet_module = self._import_petthermotools()
             self._engine_version = None
@@ -1226,12 +1231,11 @@ class _MELTSBackendSupport(MeltBackend):
         return self._resolved_python_api_model()[1]
 
     def _resolved_python_api_model(self) -> tuple[str, int]:
-        try:
-            return resolve_alphamelts_python_api_model(
-                None if self._model_was_none else self._model
+        if self._python_api_model is None:
+            raise AlphaMELTSConfigurationError(
+                'AlphaMELTS Python API model was not resolved at initialization'
             )
-        except ValueError as exc:
-            raise AlphaMELTSConfigurationError(str(exc)) from exc
+        return self._python_api_model
 
     def _find_project_binary(self, engine_root: Path) -> Optional[Path]:
         if not engine_root.exists():
