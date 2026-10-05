@@ -84,3 +84,10 @@ No `migrate.py` / `score.py` / `waypoints.py` edits, no extract edits, no baseli
 ## D-062 (design-note-only)
 
 See REPORT after `git diff --stat`: docs only; no behaviour change.
+
+## Ruling #10 outcome (regolith-main 2026-10-04 19:45 ET) — implemented
+
+- `proxy_flag = "initial_charge_only"`, option (a): the stamp rides on the typed composition `_located_printed_and_initial` builds for `point_conditions.composition`; the map is **not** dropped from the melt channels (option (b) rejected: it would turn rows into missing input).
+- Trigger: an explicit, page-located `composition_role: initial_charge_only` on the series row or its parent `values` (unknown token → queue entry, never a guess).
+- score: predict with the proxy composition; `_initial_charge_composition_notice` adds a `source_internally_inconsistent:` notice so the residual joins the existing `source-internally-inconsistent` flagged stratum. No refusal, no second stratum system.
+- Other consumers carry the flag unchanged. The "Honour rule" column above is superseded where it says return None / refuse.
