@@ -14,6 +14,10 @@ from typing import Any, Mapping
 
 from simulator.accounting.formulas import parse_formula
 from simulator.reference_data.janaf import feedstock_element_symbols
+from simulator.trace_oxide_parents import (
+    ACTIVITY_BASIS,
+    LIQUID_PARENT_OXIDE,
+)
 from simulator.vapour_rail.catalog import _formula_atoms
 from simulator.vapour_rail.source_rail import (
     STANDARD_PRESSURE_PA,
@@ -46,27 +50,7 @@ FIRST_BATCH_ELEMENTS: tuple[str, ...] = (
     "Li",
 )
 
-# Liquid oxide parents consistent with the γ basis. CuO0.5 is Cu2O(l).
-LIQUID_PARENT_OXIDE: Mapping[str, str] = {
-    "Ga": "Ga2O3",
-    "In": "In2O3",
-    "Pb": "PbO",
-    "Ge": "GeO2",
-    "Sn": "SnO",
-    "Rb": "Rb2O",
-    "Cs": "Cs2O",
-    "B": "B2O3",
-    "Cu": "Cu2O",
-    "V": "V2O3",
-    "Li": "Li2O",
-}
-
-ACTIVITY_BASIS: Mapping[str, str] = {
-    "Ga": "GaO1.5",
-    "In": "InO1.5",
-    "Cu": "CuO0.5",
-}
-
+# Re-exported from simulator.trace_oxide_parents. One parent table.
 PREFERRED_CARRIERS: Mapping[str, tuple[str, ...]] = {
     "Ge": ("GeO",),
     "Sn": ("SnO",),

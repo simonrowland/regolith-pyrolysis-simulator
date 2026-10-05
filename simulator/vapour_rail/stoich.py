@@ -11,6 +11,7 @@ import math
 from typing import Any, Mapping
 
 from simulator.accounting.formulas import parse_formula
+from simulator.trace_oxide_parents import ledger_component_key
 
 # Hand-written catalog rows retired by derivation. Other parent-oxide
 # elementals keep the STOICH_RATIOS fallback in evaporation.py.
@@ -105,10 +106,7 @@ def balance_oxide_evaporation(
 
 
 def strip_phase(formula: str) -> str:
-    text = str(formula).strip()
-    if text.endswith(")") and "(" in text:
-        return text[: text.rfind("(")]
-    return text
+    return ledger_component_key(formula)
 
 
 def _molar_mass_g(formula: str) -> float:

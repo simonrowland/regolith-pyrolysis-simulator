@@ -126,6 +126,22 @@ def test_metaborate_is_a_typed_gap(generated_batch) -> None:
     assert any(gap.carrier.endswith("BO2") for gap in metaborate)
 
 
+def test_parent_table_is_the_shared_leaf() -> None:
+    from simulator.trace_oxide_parents import (
+        ACTIVITY_BASIS as leaf_basis,
+        LIQUID_PARENT_OXIDE as leaf_parents,
+        ledger_component_key,
+    )
+    from simulator.vapour_rail.stoich import strip_phase
+
+    assert leaf_parents is LIQUID_PARENT_OXIDE
+    assert leaf_basis is ACTIVITY_BASIS
+    assert leaf_parents["Cu"] == "Cu2O"
+    assert leaf_parents["Sn"] == "SnO"
+    assert ledger_component_key("Ga2O3(l)") == "Ga2O3"
+    assert strip_phase("Ga2O3(l)") == ledger_component_key("Ga2O3(l)")
+
+
 def test_preferred_carrier_table_matches_steer() -> None:
     assert PREFERRED_CARRIERS["Ge"] == ("GeO",)
     assert PREFERRED_CARRIERS["Sn"] == ("SnO",)
