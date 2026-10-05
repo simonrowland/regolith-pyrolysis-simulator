@@ -15,12 +15,12 @@ Canonical `source_id` is the extract filename stem. Preset ids are aliases, neve
 
 ## Counts
 
-- Sources: 279
-- Extracts (`literature_extract.v1`): 277
+- Sources: 280
+- Extracts (`literature_extract.v1`): 278
 - PDFs present in this worktree: 0
 - Tracked PDFs in `docs/references/pdfs/99-kems-langmuir/`: 0
 - PDFs with no extract: 0
-- Extracts with no PDF: 277
+- Extracts with no PDF: 278
 - Alias groups needing owner/controller resolution: 41
 - Extracts with private/non-public row locators: 60
 
@@ -57,6 +57,7 @@ Canonical `source_id` is the extract filename stem. Preset ids are aliases, neve
 | `datz-1961-na2cl2` | Datz, Smith & Taylor (1961) J. Chem. Phys. 34:558–564 DOI 10.1063/1.1700984 Na2Cl2 dimer over NaCl(l); JANAF Na2Cl2(g) | 10.1063/1.1700984 | ABSENT, `` | `raw/datz-1961-na2cl2/datz-1961-na2cl2.pdf` (ABSENT, ); `text/datz-1961-na2cl2/` (0 files, ABSENT); `tables/datz-1961-na2cl2/` (0 files, ABSENT) | `data/literature/extracts/datz-1961-na2cl2.yaml` (1 rows, draft) | `ledger/datz-1961-na2cl2.yaml`: extracted (2026-09-06) |
 | `datz-and-smith-1961` | Datz, S. & Smith, W. T. Jr. (and related Datz 1961 tabulations) — Na2Cl2 dissociation equilibrium constants (Table II lineage) as transcribed in vp-acquire-5 chloride-dimers DRAFT |  | ABSENT, `` | `raw/datz-and-smith-1961/datz-and-smith-1961.pdf` (ABSENT, ); `text/datz-and-smith-1961/` (0 files, ABSENT); `tables/datz-and-smith-1961/` (0 files, ABSENT) | `data/literature/extracts/datz-and-smith-1961.yaml` (3 rows, draft) | `ledger/datz-and-smith-1961.yaml`: extracted (2026-09-06) |
 | `datz-smith-taylor-1961-nacl-vapor` | Zimmermann, K. / later KEMS salt reviews; preferred primary: Barton, J.L. & Bloom, H. (1956–), molten alkali-halide vapor pressures (transpirations), and Datz, S., Smith, W.T. & Taylor, E.H. (1961), "The Molecular Composition of Sodium Chloride Vapor", J. Chem. Phys. 34:558–564, DOI 10.1063/1.1700984 — monomer/dimer partials over liquid NaCl (independent of Stull Antoine). Thermochemical: NIST-JANAF NaCl(l)/NaCl(g)/Na2Cl2(g) Chase 1998 (REF-020). | 10.1063/1.1700984 | ABSENT, `` | `raw/datz-smith-taylor-1961-nacl-vapor/datz-smith-taylor-1961-nacl-vapor.pdf` (ABSENT, ); `text/datz-smith-taylor-1961-nacl-vapor/` (0 files, ABSENT); `tables/datz-smith-taylor-1961-nacl-vapor/` (0 files, ABSENT) | `data/literature/extracts/datz-smith-taylor-1961-nacl-vapor.yaml` (1 rows, draft) | `ledger/datz-smith-taylor-1961-nacl-vapor.yaml`: extracted (2026-09-06) |
+| `deffrennes-2020-ca-o-calphad` | G. Deffrennes, N. Jakse, C. M. S. S. Alvares, I. Nuta, A. Pasturel, A. Khvan, A. Pisch, "Thermodynamic modelling of the Ca-O system including 3rd generation description of CaO and CaO2", Calphad, 69 (2020), 101764. | 10.1016/j.calphad.2020.101764 | ABSENT, `` | `raw/deffrennes-2020-ca-o-calphad/deffrennes-2020-ca-o-calphad.pdf` (present, 8b5c40c4); `text/deffrennes-2020-ca-o-calphad/` (3 files, exists); `tables/deffrennes-2020-ca-o-calphad/` (8 files, exists) | `data/literature/extracts/deffrennes-2020-ca-o-calphad.yaml` (3 rows, draft) | `ledger/deffrennes-2020-ca-o-calphad.yaml`: extracted (2026-10-04) |
 | `deguzman-2026-simulant-physicochemical` | De Guzman, Alyssa Ang, Varghese, Anish Mathai, Alshalloudi, Saif, Kosca, Lance, Polychronopoulou, Kyriaki & Gacesa, Marko (2026), "Physicochemical properties of lunar regolith simulant for in situ oxygen production", arXiv:2601.14719. |  | ABSENT, `` | `raw/deguzman-2026-simulant-physicochemical/deguzman-2026-simulant-physicochemical.pdf` (present, ebfc9d3f); `text/deguzman-2026-simulant-physicochemical/` (32 files, exists); `tables/deguzman-2026-simulant-physicochemical/` (0 files, ABSENT) | `data/literature/extracts/deguzman-2026-simulant-physicochemical.yaml` (10 rows, draft) | `ledger/deguzman-2026-simulant-physicochemical.yaml`: decoded (2026-09-06) |
 | `engelschion-2020-eac1a-simulant` | Engelschiøn, V. S., Eriksson, S. R., Cowley, A., Fateri, M., Meurisse, A., Kueppers, U. & Sperl, M. (2020), "EAC-1A: A novel large-volume lunar regolith simulant", Scientific Reports 10:5473, DOI 10.1038/s41598-020-62312-4. | 10.1038/s41598-020-62312-4 | ABSENT, `` | `raw/engelschion-2020-eac1a-simulant/engelschion-2020-eac1a-simulant.pdf` (present, 7dbfc4c4); `text/engelschion-2020-eac1a-simulant/` (18 files, exists); `tables/engelschion-2020-eac1a-simulant/` (0 files, ABSENT) | `data/literature/extracts/engelschion-2020-eac1a-simulant.yaml` (2 rows, draft) | `ledger/engelschion-2020-eac1a-simulant.yaml`: decoded (2026-09-06) |
 | `fdm879` | Kulcinski, Gerald L. (1992), "A Resource Assessment and Extraction of Lunar 3He", UWFDM-879, Fusion Technology Institute, University of Wisconsin-Madison; presented at the US-USSR Workshop on D-3He Reactor Studies, Moscow, 25 September-2 October 1991. |  | ABSENT, `` | `raw/fdm879/fdm879.pdf` (present, c83e2594); `text/fdm879/` (12 files, exists); `tables/fdm879/` (0 files, ABSENT) | `data/literature/extracts/fdm879.yaml` (6 rows, draft) | `ledger/fdm879.yaml`: decoded (2026-09-06) |
@@ -343,6 +344,7 @@ Canonical `source_id` is the extract filename stem. Preset ids are aliases, neve
 - `datz-1961-na2cl2`
 - `datz-and-smith-1961`
 - `datz-smith-taylor-1961-nacl-vapor`
+- `deffrennes-2020-ca-o-calphad`
 - `deguzman-2026-simulant-physicochemical`
 - `engelschion-2020-eac1a-simulant`
 - `fdm879`
