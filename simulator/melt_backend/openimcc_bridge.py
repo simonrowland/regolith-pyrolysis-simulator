@@ -297,11 +297,8 @@ def _cleaned_melt_projection(
 
     source_mass_kg: dict[str, float] = {}
     cleaned_composition_mol: dict[str, float] = {}
-    feo_moles, fe2o3_moles = iron_oxide_values(canonical)
     for raw_name, raw_mol in canonical.items():
         name = str(raw_name)
-        if name in ("FeO", "Fe2O3"):
-            continue
         if not isinstance(raw_mol, numbers.Real) or isinstance(raw_mol, bool):
             raise OpenImccCompositionPolicyRefusal(
                 "openimcc_composition_invalid_input",
@@ -336,6 +333,9 @@ def _cleaned_melt_projection(
                     f"value={raw_mol!r}; inventory must be finite"
                 ),
             )
+        canonical[name] = mol
+        if name in ("FeO", "Fe2O3"):
+            continue
         if mol == 0.0:
             continue
         if name in OPENIMCC_PARENT_OXIDES:
@@ -349,6 +349,7 @@ def _cleaned_melt_projection(
             ) from exc
         source_mass_kg[name] = source_mass_kg.get(name, 0.0) + mass_kg
 
+    feo_moles, fe2o3_moles = iron_oxide_values(canonical)
     for oxide, mol in (("FeO", feo_moles), ("Fe2O3", fe2o3_moles)):
         if mol <= 0.0:
             continue

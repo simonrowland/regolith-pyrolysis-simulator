@@ -117,6 +117,23 @@ def test_cleaned_melt_rejects_invalid_inventory(invalid_inventory) -> None:
     assert repr(invalid_inventory) in str(refusal)
 
 
+@pytest.mark.parametrize("iron_oxide", ("FeO", "Fe2O3"))
+@pytest.mark.parametrize(
+    "invalid_inventory",
+    (-1.0, float("nan"), float("inf"), True, "1.0", [1.0, 3.0]),
+)
+def test_cleaned_melt_rejects_invalid_iron_inventory(
+    iron_oxide: str, invalid_inventory
+) -> None:
+    with pytest.raises(OpenImccCompositionPolicyRefusal) as exc_info:
+        _cleaned_melt_projection({"SiO2": 2.0, iron_oxide: invalid_inventory})
+
+    refusal = exc_info.value
+    assert refusal.code == "openimcc_composition_invalid_input"
+    assert iron_oxide in str(refusal)
+    assert repr(invalid_inventory) in str(refusal)
+
+
 def test_cleaned_melt_treats_zero_inventory_as_absent() -> None:
     source_wt_pct, cleaned_mol = _cleaned_melt_projection(
         {"SiO2": 1.0, "MgO": 0.0}
