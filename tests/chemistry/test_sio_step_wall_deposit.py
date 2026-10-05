@@ -225,9 +225,16 @@ def test_wall_deposit_is_rebaselined_after_corrected_hkl_mass_flux():
     # capped by available supply.  Re-grounding that executable chain moves
     # the 1050 C product deposit, without changing the 1400/1500 C threshold
     # zeros; this is a physics-derived pin, not a tuning adjustment.
-    # The new 1050 C value is 8.191905995448e-06 kg.
+    # t-1127: Si/Al sidecar corrected to JANAF; old Stull fit. The known b-729
+    # mis-wiring feeds metals.Si.pure_component_antoine into the internal
+    # analytical melt-source term. At the 1323.15 K campaign start, the new
+    # resolver selects the Si crystal segment: P_sat moves from
+    # 1.38227728085e-05 Pa (old) to 8.32053789704e-06 Pa (new). b-729 will
+    # move this pin again when fixed. Wall deposit moves from
+    # 8.191905995448e-06 to 8.191796266986e-06 kg
+    # (−1.09728462e-10 kg; −1.34e-5 relative).
     assert _sio_wall_product_deposit_kg(1050.0) == pytest.approx(
-        8.191905995448e-06, rel=1e-9
+        8.191796266986e-06, rel=1e-9
     )
     assert _sio_wall_product_deposit_kg(1400.0) == pytest.approx(
         0.0, rel=1e-9
