@@ -216,6 +216,17 @@ def test_sossi_fegley_2018_table_2_migrates_numeric_activity_rows() -> None:
         Decimal("1e-10"),
         Decimal("1e-6"),
     )
+
+
+def test_sossi_ranged_temperature_condition_output_is_pinned() -> None:
+    result = _migrate_extract("kems-041-sossi-fegley-2018")
+    observations = [
+        observation
+        for observation in result.observations.values()
+        if _quantity(observation) is Quantity.ACTIVITY_COEFFICIENT
+        and observation.locator is not None
+        and observation.locator.table == "2"
+    ]
     anorthite_diopside = next(
         observation
         for observation in observations
