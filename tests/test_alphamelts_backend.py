@@ -3030,6 +3030,7 @@ def test_alphamelts_python_worker_start_failure_closes_pipes(monkeypatch):
             return FakeProcess()
 
     backend = AlphaMELTSBackend()
+    _select_python_api_for_test(backend)
     monkeypatch.setattr(
         'simulator.melt_backend.alphamelts.multiprocessing.get_context',
         lambda method: FakeContext() if method == 'spawn' else None,
