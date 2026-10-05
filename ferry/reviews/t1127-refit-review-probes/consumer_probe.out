@@ -1,0 +1,74 @@
+##### base
+== Al
+  wall P_sat T=1000 K: 1.5966e-03 Pa  extrapolation_records=1 warnings=1
+  wall P_sat T=1200 K: 3.2013e-01 Pa  extrapolation_records=1 warnings=1
+  wall P_sat T=1400 K: 1.3743e+01 Pa  extrapolation_records=1 warnings=1
+  wall P_sat T=1600 K: 2.2718e+02 Pa  extrapolation_records=0 warnings=0
+  wall P_sat T=1800 K: 1.9962e+03 Pa  extrapolation_records=0 warnings=0
+  dew T at p=0.001 Pa: status=diagnostic_only T=985.6
+  dew T at p=0.1 Pa: status=diagnostic_only T=1149.4
+  dew T at p=10 Pa: status=diagnostic_only T=1380.5
+  ellingham effective P T=1600 pO2=1e-09: 1.1278e-11 Pa
+  ellingham effective P T=1600 pO2=1e-12: 2.0055e-09 Pa
+  ellingham effective P T=1800 pO2=1e-09: 1.1227e-07 Pa
+  ellingham effective P T=1800 pO2=1e-12: 1.9965e-05 Pa
+  ellingham effective P T=2000 pO2=1e-09: 1.6915e-04 Pa
+  ellingham effective P T=2000 pO2=1e-12: 3.0079e-02 Pa
+  builtin provider Al2O3=1 T=1600 pO2=1e-9: status=ok P_Al=1.1277583932277647e-11 rail=liquid_oxide_standard_reaction block=None
+  builtin provider Al2O3=1 T=1800 pO2=1e-9: status=ok P_Al=1.1227362866173997e-07 rail=liquid_oxide_standard_reaction block=None
+  builtin provider Al2O3=1 T=2000 pO2=1e-9: status=ok P_Al=0.00016914941182928362 rail=liquid_oxide_standard_reaction block=None
+== Si
+  wall P_sat T=1000 K: 9.6027e-13 Pa  extrapolation_records=1 warnings=1
+  wall P_sat T=1200 K: 8.3043e-08 Pa  extrapolation_records=1 warnings=1
+  wall P_sat T=1400 K: 2.0401e-04 Pa  extrapolation_records=1 warnings=1
+  wall P_sat T=1600 K: 6.0496e-02 Pa  extrapolation_records=1 warnings=1
+  wall P_sat T=1800 K: 4.6145e+00 Pa  extrapolation_records=1 warnings=1
+  dew T at p=0.001 Pa: status=diagnostic_only T=1450.2
+  dew T at p=0.1 Pa: status=diagnostic_only T=1620.7
+  dew T at p=10 Pa: status=diagnostic_only T=1841.5
+  ellingham effective P T=1600 pO2=1e-09: 6.0496e-02 Pa
+  ellingham effective P T=1600 pO2=1e-12: 6.0496e+01 Pa
+  ellingham effective P T=1800 pO2=1e-09: 4.6145e+00 Pa
+  ellingham effective P T=1800 pO2=1e-12: 4.6145e+03 Pa
+  ellingham effective P T=2000 pO2=1e-09: 1.3975e+02 Pa
+  ellingham effective P T=2000 pO2=1e-12: 1.3975e+05 Pa
+  builtin provider SiO2=1 T=1600 pO2=1e-9: status=ok P_Si=4.0977962998001336e-14 rail=liquid_oxide_standard_reaction block=None
+  builtin provider SiO2=1 T=1800 pO2=1e-9: status=ok P_Si=2.7630285785887898e-09 rail=liquid_oxide_standard_reaction block=None
+  builtin provider SiO2=1 T=2000 pO2=1e-9: status=ok P_Si=1.9588294241376347e-05 rail=liquid_oxide_standard_reaction block=None
+##### head
+== Al
+  wall P_sat T=1000 K: 5.0292e-06 Pa  extrapolation_records=0 warnings=0
+  wall P_sat T=1200 K: 2.7250e-03 Pa  extrapolation_records=0 warnings=0
+  wall P_sat T=1400 K: 2.3098e-01 Pa  extrapolation_records=0 warnings=0
+  wall P_sat T=1600 K: 6.2592e+00 Pa  extrapolation_records=0 warnings=0
+  wall P_sat T=1800 K: 8.0040e+01 Pa  extrapolation_records=0 warnings=0
+  dew T at p=0.001 Pa: status=diagnostic_only T=1162.7
+  dew T at p=0.1 Pa: status=diagnostic_only T=1357.2
+  dew T at p=10 Pa: status=diagnostic_only T=1633.3
+  ellingham effective P T=1600 pO2=1e-09: 1.1278e-11 Pa
+  ellingham effective P T=1600 pO2=1e-12: 2.0055e-09 Pa
+  ellingham effective P T=1800 pO2=1e-09: 1.1227e-07 Pa
+  ellingham effective P T=1800 pO2=1e-12: 1.9965e-05 Pa
+  ellingham effective P T=2000 pO2=1e-09: 1.6915e-04 Pa
+  ellingham effective P T=2000 pO2=1e-12: 3.0079e-02 Pa
+  builtin provider Al2O3=1 T=1600 pO2=1e-9: status=ok P_Al=1.1277583932277647e-11 rail=liquid_oxide_standard_reaction block=None
+  builtin provider Al2O3=1 T=1800 pO2=1e-9: status=ok P_Al=1.1227362866173997e-07 rail=liquid_oxide_standard_reaction block=None
+  builtin provider Al2O3=1 T=2000 pO2=1e-9: status=ok P_Al=0.00016914941182928362 rail=liquid_oxide_standard_reaction block=None
+== Si
+  wall P_sat T=1000 K: 1.7216e-10 Pa  extrapolation_records=1 warnings=1
+  wall P_sat T=1200 K: 5.5823e-07 Pa  extrapolation_records=1 warnings=1
+  wall P_sat T=1400 K: 1.6946e-04 Pa  extrapolation_records=1 warnings=1
+  wall P_sat T=1600 K: 1.1939e-02 Pa  extrapolation_records=1 warnings=1
+  wall P_sat T=1800 K: 3.2074e-01 Pa  extrapolation_records=0 warnings=0
+  dew T at p=0.001 Pa: status=diagnostic_only T=1476.9
+  dew T at p=0.1 Pa: status=diagnostic_only T=1723.6
+  dew T at p=10 Pa: status=diagnostic_only T=2072.1
+  ellingham effective P T=1600 pO2=1e-09: 1.1939e-02 Pa
+  ellingham effective P T=1600 pO2=1e-12: 1.1939e+01 Pa
+  ellingham effective P T=1800 pO2=1e-09: 3.2074e-01 Pa
+  ellingham effective P T=1800 pO2=1e-12: 3.2074e+02 Pa
+  ellingham effective P T=2000 pO2=1e-09: 4.4101e+00 Pa
+  ellingham effective P T=2000 pO2=1e-12: 4.4101e+03 Pa
+  builtin provider SiO2=1 T=1600 pO2=1e-9: status=ok P_Si=4.0977962998001336e-14 rail=liquid_oxide_standard_reaction block=None
+  builtin provider SiO2=1 T=1800 pO2=1e-9: status=ok P_Si=2.7630285785887898e-09 rail=liquid_oxide_standard_reaction block=None
+  builtin provider SiO2=1 T=2000 pO2=1e-9: status=ok P_Si=1.9588294241376347e-05 rail=liquid_oxide_standard_reaction block=None

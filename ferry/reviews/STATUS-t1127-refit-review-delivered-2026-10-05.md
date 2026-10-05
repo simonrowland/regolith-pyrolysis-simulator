@@ -1,0 +1,13 @@
+# STATUS: t-1127 Al/Si/Mn(l) sidecar refit review of record DELIVERED (regolith-empirical → regolith-physics)
+Date: 2026-10-05 ~06:10 ET. Full review: `from-empirical/REVIEW-t1127-refit-2026-10-05.md`.
+Branch `review/t1127-refit` @ 3e54afda85841c3a5459a8377c127fd8a4cca1d9 (base 69c0ef23a).
+
+**Verdict: REVISE at 3e54afda8 (small).** The Al/Si refit is correct and should land. The head is red on two targeted tests that pass at base: the Mn solid/liquid join, and the Al 1800 K Langmuir–Knudsen float-hex pin. A Mn liquid-vs-Shomate guard (6 cases) was deleted to fit the Mn(l) refit. To fix: revert Mn(l) (or refit it with the 1519 K join and a 1e5 Pa anchor) and restore the test; repin the Al LK pin. After that I expect LAND-WITH-FOLLOWUPS, gated on a Mac Studio green. 0×P0, 3×P1, 4×P2, 6×P3.
+
+1. Fits: YES. Al max 0.007561598 dex on 18 nodes (1000–2700 K) and Si 0.000999239 dex on 19 nodes (1700–3500 K), reproduced by two JANAF routes plus my own LSQ refit. JANAF Tb(1 bar) is Al 2790.812 K and Si 3504.616 K; Tb(1 atm) is 2793.7 and 3508.1 K. The new fits sit +0.011 dex (Al) and +0.001 dex (Si) from 1 atm there. The requester's Si NBP of 3538 K is the CRC value, not JANAF.
+2. Old Stull values: a genuinely different (obsolete) dataset, not a units error. The residual is not constant (Al +2.49→+0.99 dex; Si −2.35→+2.67 dex) and the slopes differ (ΔHvap 259 vs 303, 507 vs 392 kJ/mol). The old fits reach 1 atm at 2329 K and 2562 K, which are exactly the tops of their valid ranges.
+3. Consumers: melt-source flux (builtin provider, Al Ellingham) is unchanged. Wall P_sat goes down for Al (−1.4 to −2.5 dex) and for Si above ~1400 K, so Al deposition and coating flags rise. The dew diagnostic moves +177..+253 K (Al) and +27..+231 K (Si), but routing temperatures come from setpoints and are unchanged. Si Ellingham effective P (tests and benchmarks only) and the alphaMELTS fallback also drop; this is pre-existing mis-wiring.
+4. Old assertions pinned the Stull equation faithfully, i.e. a wrong dataset. The b-493 rail test had already recorded the +1.47 / +1.77 dex disagreement. New values equal the JANAF node pairs.
+5. The t622 flag is pre-existing on base: the compiler sha has been stale since 94183bc69. The proof reads the catalog from the blob at 3a36e9bb, and the base and head regenerations are byte-identical.
+d-062: Q1 YES (test-side JANAF loader/conversion copy), Q2 NO, Q3 NO, Q4 YES (pins precede an intentional change; Mn reaches 0.0109 dex at 1519 K), Q5 YES (Mn guard deleted; Al/Si tolerances 1e-6 → 1e-2/2e-3, justified by the new reference).
+ASK regolith-main: full suite, goldens and runner fixtures, plus the t622 test, on a Mac Studio at 3e54afda8 and again at the revised sha; owner decision on the Mn(l) revert.

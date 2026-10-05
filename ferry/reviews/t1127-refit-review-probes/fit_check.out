@@ -1,0 +1,74 @@
+== Al: new A=10.5215429528 B=15145.174655 C=-42.6590481419 range 1000-2700; nodes=18 (1000..2700)
+   max|resid| vs route F = 0.007561598 dex (yaml says 0.007561597786, count 18)
+   rms resid vs F = 0.004179992
+   max|resid| vs route A = 0.007556; max|F-A| = 0.000052 dex
+   my LSQ refit: A=10.5215429764 B=15145.174732 C=-42.6590443327; max|resid|=0.007561600
+   OLD fit residual vs JANAF inside OLD range 1557-2329: min +1.1197 max +1.5593 dex at T=1600..2300
+   T=  1000: JANAF(l/g) -5.2914  new -5.2985 (-0.0071)  old -2.7968 (+2.4946)
+   T=  1300: JANAF(l/g) -1.5293  new -1.5239 (+0.0055)  old +0.3857 (+1.9150)
+   T=  1500: JANAF(l/g) +0.1276  new +0.1292 (+0.0016)  old +1.7885 (+1.6609)
+   T=  1700: JANAF(l/g) +1.3857  new +1.3833 (-0.0024)  old +2.8564 (+1.4707)
+   T=  2000: JANAF(l/g) +2.7886  new +2.7839 (-0.0047)  old +4.0530 (+1.2643)
+   T=  2200: JANAF(l/g) +3.5047  new +3.5012 (-0.0035)  old +4.6673 (+1.1626)
+   T=  2500: JANAF(l/g) +4.3563  new +4.3583 (+0.0020)  old +5.4027 (+1.0464)
+   T=  2700: JANAF(l/g) +4.8146  new +4.8222 (+0.0076)  old +5.8014 (+0.9868)
+   T=  3000: JANAF(l/g) +5.3822  new +5.4003 (+0.0181)  old +6.2989 (+0.9167)
+   JANAF Tb(1 bar) published 2790.812 K; node-interp Tb(1 bar) 2790.83 K; Tb(1 atm) 2793.72 K
+   new fit: log10P at JANAF Tb(1bar)=5.0105, at Tb(1atm)=5.0163 (target 5.0057); new-fit T(1 atm)=2788.43 K
+   old fit: log10P at JANAF Tb(1atm)=5.9684; old-fit T(1 atm)=2328.48 K = 2055.3 C
+   yaml boiling_point_C=2519 -> 2792.15 K; new log10P there 5.0132; old 5.9657
+   new effective dHvap at 2000 K = 302.7 kJ/mol
+   old effective dHvap at 2000 K = 259.0 kJ/mol
+   JANAF secant dHvap 1900-2100 K = 302.7 kJ/mol
+   below-melt check T=900: JANAF cr/g -7.1371; new fit -7.1437 (-0.0066)
+   below-melt check T=1000: JANAF cr/g -5.2517; new fit -5.2985 (-0.0468)
+== Si: new A=10.691300308 B=19744.5887902 C=-34.7482634626 range 1700-3500; nodes=19 (1700..3500)
+   max|resid| vs route F = 0.000999239 dex (yaml says 0.000999238802, count 19)
+   rms resid vs F = 0.000534599
+   max|resid| vs route A = 0.000984; max|F-A| = 0.000062 dex
+   my LSQ refit: A=10.6913002973 B=19744.588738 C=-34.7482665579; max|resid|=0.000999240
+   OLD fit residual vs JANAF inside OLD range 1997-2560: min +1.5016 max +2.0754 dex at T=2000..2500
+   T=  1000: JANAF(l/g) -9.6726  new -9.7641 (-0.0915)  old -12.0176 (-2.3450)
+   T=  1300: JANAF(l/g) -4.8932  new -4.9140 (-0.0208)  old -5.2415 (-0.3483)
+   T=  1500: JANAF(l/g) -2.7775  new -2.7839 (-0.0064)  old -2.3645 (+0.4130)
+   T=  1700: JANAF(l/g) -1.1645  new -1.1655 (-0.0010)  old -0.2174 (+0.9471)
+   T=  2000: JANAF(l/g) +0.6437  new +0.6445 (+0.0007)  old +2.1453 (+1.5016)
+   T=  2200: JANAF(l/g) +1.5720  new +1.5725 (+0.0005)  old +3.3413 (+1.7693)
+   T=  2500: JANAF(l/g) +2.6824  new +2.6821 (-0.0003)  old +4.7578 (+2.0754)
+   T=  2700: JANAF(l/g) +3.2837  new +3.2831 (-0.0006)  old +5.5189 (+2.2352)
+   T=  3000: JANAF(l/g) +4.0331  new +4.0326 (-0.0005)  old +6.4622 (+2.4291)
+   T=  3500: JANAF(l/g) +4.9924  new +4.9934 (+0.0010)  old +7.6619 (+2.6694)
+   JANAF Tb(1 bar) published 3504.616 K; node-interp Tb(1 bar) 3504.62 K; Tb(1 atm) 3508.12 K
+   new fit: log10P at JANAF Tb(1bar)=5.0010, at Tb(1atm)=5.0067 (target 5.0057); new-fit T(1 atm)=3507.49 K
+   old fit: log10P at JANAF Tb(1atm)=7.6784; old-fit T(1 atm)=2561.64 K = 2288.5 C
+   yaml boiling_point_C=3265 -> 3538.15 K; new log10P there 5.0555; old 7.7390
+   new effective dHvap at 2000 K = 391.5 kJ/mol
+   old effective dHvap at 2000 K = 506.7 kJ/mol
+   JANAF secant dHvap 1900-2100 K = 391.5 kJ/mol
+   below-melt check T=900: JANAF cr/g -13.3486; new fit -12.1282 (+1.2204)
+   below-melt check T=1000: JANAF cr/g -10.7472; new fit -9.7641 (+0.9831)
+   below-melt check T=1300: JANAF cr/g -5.3570; new fit -4.9140 (+0.4430)
+   below-melt check T=1500: JANAF cr/g -2.9701; new fit -2.7839 (+0.1862)
+   below-melt check T=1600: JANAF cr/g -2.0028; new fit -1.9230 (+0.0798)
+== Mn: new A=9.808020661644 B=10488.603020313 C=-150.448750249 range 1519.0-2334.526; nodes=8 (1600..2300)
+   max|resid| vs route F = 0.004616193 dex (yaml says 0.00461619338, count 8)
+   rms resid vs F = 0.001832877
+   max|resid| vs route A = 0.004618; max|F-A| = 0.000025 dex
+   my LSQ refit: A=9.7159986206 B=10181.797667 C=-174.9088364542; max|resid|=0.000803953
+   OLD fit residual vs JANAF inside OLD range 1519-2334.526: min -0.0080 max +0.0045 dex at T=1600..2300
+   T=  1000: JANAF(l/g) -2.3856  new -2.5380 (-0.1525)  old -2.6013 (-0.2157)
+   T=  1300: JANAF(l/g) +0.6996  new +0.6839 (-0.0157)  old +0.6613 (-0.0383)
+   T=  1500: JANAF(l/g) +2.0371  new +2.0361 (-0.0010)  old +2.0245 (-0.0126)
+   T=  1700: JANAF(l/g) +3.0391  new +3.0392 (+0.0001)  old +3.0334 (-0.0057)
+   T=  2000: JANAF(l/g) +4.1378  new +4.1371 (-0.0006)  old +4.1355 (-0.0023)
+   T=  2200: JANAF(l/g) +4.6885  new +4.6905 (+0.0020)  old +4.6901 (+0.0016)
+   T=  2500: JANAF(l/g) +5.3317  new +5.3439 (+0.0123)  old +5.3442 (+0.0125)
+   T=  2700: JANAF(l/g) +5.6713  new +5.6941 (+0.0229)  old +5.6944 (+0.0231)
+   T=  3000: JANAF(l/g) +6.0840  new +6.1272 (+0.0433)  old +6.1272 (+0.0432)
+   JANAF Tb(1 bar) published 2334.526 K; node-interp Tb(1 bar) 2334.65 K; Tb(1 atm) 2337.29 K
+   new fit: log10P at JANAF Tb(1bar)=5.0057, at Tb(1atm)=5.0118 (target 5.0057); new-fit T(1 atm)=2334.53 K
+   old fit: log10P at JANAF Tb(1atm)=5.0118; old-fit T(1 atm)=2334.53 K = 2061.4 C
+   yaml boiling_point_C=2061 -> 2334.15 K; new log10P there 5.0049; old 5.0049
+   new effective dHvap at 2000 K = 234.8 kJ/mol
+   old effective dHvap at 2000 K = 235.4 kJ/mol
+   JANAF secant dHvap 1900-2100 K = 234.5 kJ/mol
