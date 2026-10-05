@@ -7,6 +7,7 @@ import json
 from decimal import Decimal
 from pathlib import Path
 
+import pytest
 import yaml
 
 from simulator.battery.enums import (
@@ -187,7 +188,25 @@ def test_fit_validator_rejects_non_numeric_and_non_finite_coefficients() -> None
         }
 
 
-def test_fit_validator_reports_malformed_temperature_range() -> None:
+@pytest.mark.parametrize(
+    ("temperature_range", "has_issue"),
+    [
+        ("12", True),
+        ({"1": "ignored", "2": "ignored"}, True),
+        ([1], True),
+        ([1, 2, 3], True),
+        ([[1], [2]], True),
+        ([True, 2], True),
+        ([1, False], True),
+        ([1, "2"], True),
+        ([float("nan"), 2], True),
+        ([2, 1], True),
+        ([1, 2], False),
+    ],
+)
+def test_fit_validator_temperature_range_shape(
+    temperature_range: object, has_issue: bool
+) -> None:
     value = Value(
         ValueKind.EXPRESSION,
         expression_text="log10 γ = A + B/T",
@@ -195,7 +214,7 @@ def test_fit_validator_reports_malformed_temperature_range() -> None:
         expression_domain=json.dumps(
             {
                 "input_unit": "K",
-                "validity_range_K": ["bad", "range"],
+                "validity_range_K": temperature_range,
                 "standard_state_as_printed": "not stated in Table 2 row",
                 "notes_as_printed": "",
             }
@@ -204,9 +223,10 @@ def test_fit_validator_reports_malformed_temperature_range() -> None:
 
     issues = _validate_activity_coefficient_temperature_fit(value, "value")
 
-    assert [issue.path for issue in issues] == [
-        "value.expression_domain.validity_range_K"
-    ]
+    expected_paths = (
+        ["value.expression_domain.validity_range_K"] if has_issue else []
+    )
+    assert [issue.path for issue in issues] == expected_paths
 
 
 def test_sossi_fegley_2018_table_2_migrates_numeric_activity_rows() -> None:

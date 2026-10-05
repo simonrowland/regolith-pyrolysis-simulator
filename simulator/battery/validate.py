@@ -1271,11 +1271,25 @@ def _validate_activity_coefficient_temperature_fit(
     else:
         temperature_range = domain.get("validity_range_K")
         if temperature_range is not None:
-            try:
-                low, high = (Decimal(str(endpoint)) for endpoint in temperature_range)
-                valid_range = len(temperature_range) == 2 and low.is_finite() and high.is_finite() and low <= high
-            except (InvalidOperation, TypeError, ValueError):
-                valid_range = False
+            valid_range = (
+                isinstance(temperature_range, list)
+                and len(temperature_range) == 2
+                and all(
+                    not isinstance(endpoint, bool)
+                    and isinstance(endpoint, (Decimal, int, float))
+                    for endpoint in temperature_range
+                )
+            )
+            if valid_range:
+                try:
+                    low, high = (
+                        Decimal(str(endpoint)) for endpoint in temperature_range
+                    )
+                    valid_range = (
+                        low.is_finite() and high.is_finite() and low <= high
+                    )
+                except (InvalidOperation, TypeError, ValueError):
+                    valid_range = False
             if not valid_range:
                 issues.append(
                     _issue(
