@@ -1843,7 +1843,8 @@ families:
           parent_oxide: Al2O3
           authority_class: uncertified
           source: REF-020 NIST-JANAF/Chase 1998 Al(l)/Al(g) fit on shared Al-003 and Al-005 nodes;
-            least-squares Antoine refit in log10(P/Pa) over 1000-2700 K
+            pure_component_antoine is retained as a legacy compatibility sidecar; the schema-v2 catalog
+            uses the activity-corrected liquid-AlO1.5 reaction
           pure_component_antoine:
             source: REF-020 NIST-JANAF/Chase 1998 Al(l) Al-003 and Al(g) Al-005 shared nodes
             derivation: 'Least-squares fit of log10(P/Pa)=A-B/(T+C) to the 18 shared JANAF nodes from
@@ -2001,7 +2002,7 @@ families:
           retain_analytical_pressure_channel: true
           flux_dormant: false
           source: REF-020 NIST-JANAF/Chase 1998 Si(l)/Si(g) fit on shared Si-003 and Si-005 nodes;
-            least-squares Antoine refit in log10(P/Pa) over 1700-3500 K
+            pure_component_antoine is a legacy compatibility sidecar and is not a melt-source catalog answer
           pure_component_antoine:
             source: REF-020 NIST-JANAF/Chase 1998 Si(l) Si-003 and Si(g) Si-005 shared nodes
             derivation: 'Least-squares fit of log10(P/Pa)=A-B/(T+C) to the 19 shared JANAF nodes from
@@ -2016,7 +2017,37 @@ families:
             - 3500
             fit_node_count: 19
             max_abs_log10_residual_vs_source: 0.000999238802
+            default_segment: liquid_janaf
+            segments:
+            - name: crystal_janaf
+              phase: crystal
+              source: REF-020 NIST-JANAF/Chase 1998 Si(cr) Si-002 and Si(g) Si-005 shared nodes
+              source_certification: derived_from_evaluation
+              fit_node_set: Si-002/Si-005 shared nodes, 100-1600 K
+              fit_node_count: 20
+              fit_method: constrained_least_squares_log10_pressure_with_exact_1685_K_join
+              max_abs_log10_residual_vs_source: 0.080953039489
+              rms_log10_residual_vs_source: 0.046467069627
+              join_anchor_K: 1685
+              join_anchor_Pa: 0.053297675518
+              join_step_log10_dex: 0.0
+              A: 12.645587188241636
+              B: 23452.94759360651
+              C: -0.0261074340068919
+              valid_range_K: [100, 1685]
+            - name: liquid_janaf
+              phase: liquid
+              source: REF-020 NIST-JANAF/Chase 1998 Si(l) Si-003 and Si(g) Si-005 shared nodes
+              source_certification: derived_from_evaluation
+              fit_node_set: Si-003/Si-005 shared nodes, 1700-3500 K
+              fit_node_count: 19
+              max_abs_log10_residual_vs_source: 0.000999238802
+              A: 10.6913003080
+              B: 19744.5887902
+              C: -34.7482634626
+              valid_range_K: [1700, 3500]
           boiling_point_C: 3265
+          boiling_point_note: CRC value; 3265 °C is 30 K above JANAF Tb(1 atm) of 3508.12 K.
           reaction:
             formula: SiO2(l) -> Si(g) + O2(g)
             basis: Existing liquid-SiO2-to-SiO standard-reaction reference plus landed NASA CEA SiO, Si,
@@ -2670,12 +2701,8 @@ families:
               - 2334.526
               dense_sample_step_K: 1
               normal_boiling_anchor_K: 2334.526
-              fit_node_set: Mn-003/Mn-005 shared JANAF nodes, 1600-2300 K
-              fit_node_count: 8
-              fit_form: log10(P/Pa)=A-B/(T+C)
-              fit_method: least_squares_log10_pressure_with_exact_101325_Pa_anchor_at_2334.526_K
-              max_abs_log10_residual_vs_source: 0.004616193380
-              rms_log10_residual_vs_source: 0.001832877458
+              max_abs_log10_residual_vs_source: 0.004586423
+              rms_log10_residual_vs_source: 0.002724018
               nist_janaf_shomate:
                 liquid_valid_range_K:
                 - 1519
@@ -2719,15 +2746,15 @@ families:
                 - 2240
               - - 101325
                 - 2334.526
-              A: 9.808020661644
-              B: 10488.603020313
-              C: -150.448750249
+              A: 9.79086818966
+              B: 10402.946653439165
+              C: -160.520331526149
               valid_range_K:
               - 1519
               - 2334.526
-            A: 9.808020661644
-            B: 10488.603020313
-            C: -150.448750249
+            A: 9.79086818966
+            B: 10402.946653439165
+            C: -160.520331526149
             valid_range_K:
             - 1228
             - 2334.526
@@ -7641,7 +7668,7 @@ families:
           formula: MgCl2
           molar_mass_g_mol: 95.205
           chemical_family: halide_salt
-          acquisition_status: grounded_janaf_monomer_fit
+          acquisition_status: ACTIVE_CEA_NASA9_REACTION_THERMO
           runtime_disposition: dormant_missing_stage0_source_reservoir
           flux_dormant: true
           reaction:

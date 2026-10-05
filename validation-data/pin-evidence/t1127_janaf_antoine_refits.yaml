@@ -1,0 +1,41 @@
+schema_version: 1
+kind: vapour_pressure_fit_evidence
+source_id: t1127-al-si-janaf-node-refit
+date: '2026-10-05'
+validation_use: reproducible_fit_provenance
+certification_ceiling: never
+derivation:
+  equation: log10(P_Pa) = A - B/(T_K + C)
+  janaf_pressure_equation: log10(P_Pa) = 5 + log10(P/P0)
+  log10_pressure_from_gibbs: log10(P/P0) = -(Gf(gas)-Gf(condensed))/(R*T*ln(10))
+  standard_pressure_Pa: 100000
+  fit_objective: least_squares_log10_pressure
+fits:
+  aluminum_liquid:
+    source_tables: [Al-003, Al-005]
+    condensed_phase: liquid
+    node_temperatures_K: [1000, 1100, 1200, 1300, 1400, 1500, 1600, 1700, 1800, 1900, 2000, 2100, 2200, 2300, 2400, 2500, 2600, 2700]
+    coefficients: {A: 10.5215429528, B: 15145.174655, C: -42.6590481419}
+    max_abs_log10_residual_dex: 0.007561597786
+    rms_log10_residual_dex: 0.00418
+  silicon_crystal:
+    source_tables: [Si-002, Si-005]
+    condensed_phase: crystal
+    node_temperatures_K: [100, 200, 250, 298.15, 300, 350, 400, 450, 500, 600, 700, 800, 900, 1000, 1100, 1200, 1300, 1400, 1500, 1600]
+    coefficients: {A: 12.645587188241636, B: 23452.94759360651, C: -0.0261074340068919}
+    fit_method: constrained_least_squares_with_exact_join_at_1685_K
+    max_abs_log10_residual_dex: 0.080953039489
+    rms_log10_residual_dex: 0.046467069627
+    join:
+      temperature_K: 1685
+      pressure_Pa: 0.053297675518
+      log10_step_dex: 0.0
+  silicon_liquid:
+    source_tables: [Si-003, Si-005]
+    condensed_phase: liquid
+    node_temperatures_K: [1700, 1800, 1900, 2000, 2100, 2200, 2300, 2400, 2500, 2600, 2700, 2800, 2900, 3000, 3100, 3200, 3300, 3400, 3500]
+    coefficients: {A: 10.6913003080, B: 19744.5887902, C: -34.7482634626}
+    max_abs_log10_residual_dex: 0.000999238802
+    rms_log10_residual_dex: 0.000535
+notes:
+  silicon_boiling_point: "boiling_point_C 3265 is the CRC value, 30 K above JANAF Tb(1 atm) = 3508.12 K; retained unchanged."

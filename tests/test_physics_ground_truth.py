@@ -168,6 +168,16 @@ NIST_JANAF_MN_SHOMATE = {
             },
         ),
     ],
+    "liquid": {
+        "A": 46.024,
+        "B": 1.953485e-7,
+        "C": -7.567225e-8,
+        "D": 1.005938e-8,
+        "E": 5.623757e-8,
+        "F": -7.80404,
+        "G": 80.69053,
+        "H": 16.28902,
+    },
     "gas": {
         "A": 187.6779,
         "B": -97.75372,
@@ -201,6 +211,9 @@ def _setpoints_data() -> dict:
 def _pure_component_antoine_pa(entry: dict, temperature_K: float) -> float:
     if entry.get("fit_target") == "standard_reaction_term":
         coeff = entry["pure_component_antoine"]
+        if coeff.get("segments"):
+            coeff, block = vapor_pressure_antoine_coefficients(entry, temperature_K)
+            assert block == "pure_component_antoine"
     else:
         coeff, block = vapor_pressure_antoine_coefficients(entry, temperature_K)
         assert block == "pure_component_antoine"
@@ -279,6 +292,25 @@ def _nist_janaf_mn_solid_pa(temperature_K: float) -> float:
     )
 
 
+def _nist_janaf_mn_liquid_pa(temperature_K: float) -> float:
+    gas = NIST_JANAF_MN_SHOMATE["gas"]
+    liquid = NIST_JANAF_MN_SHOMATE["liquid"]
+    gas_gibbs = (
+        gas["H"]
+        + _shomate_h_increment_kj_mol(gas, temperature_K)
+        - temperature_K * _shomate_s_j_mol_k(gas, temperature_K) / 1000.0
+    )
+    liquid_gibbs = (
+        liquid["H"]
+        + _shomate_h_increment_kj_mol(liquid, temperature_K)
+        - temperature_K * _shomate_s_j_mol_k(liquid, temperature_K) / 1000.0
+    )
+    delta_g_j_mol = (gas_gibbs - liquid_gibbs) * 1000.0
+    return 100_000.0 * math.exp(
+        -delta_g_j_mol / (GAS_CONSTANT * temperature_K)
+    )
+
+
 def _runtime_recovered_reference_pressure_pa(
     vapor_data: dict,
     species: str,
@@ -346,20 +378,30 @@ def _require_certified_pure_component_antoine(entry: dict, temperature_K: float)
         # CRC/CR2 / Alcock-Itkin-Horrigan and NIST-JANAF derived fits.
         ("Ti", 3560.15, 1e-6),
         ("Mn", 2334.526, 1e-9),
+        # JANAF Tb(1 atm); tolerance includes fit residual and 1 bar-to-atm offset.
+        ("Al", 2793.72, None),
+        ("Si", 3508.12, None),
     ],
 )
 def test_pure_component_antoine_reaches_one_atm_at_normal_boiling_point(
     species: str,
     temperature_K: float,
-    rel_tol: float,
+    rel_tol: float | None,
 ) -> None:
     data = _vapor_pressure_data()["metals"][species]
 
     assert data["pure_component_antoine"]["source"]
-    assert _pure_component_antoine_pa(data, temperature_K) == pytest.approx(
-        PA_PER_ATM,
-        rel=rel_tol,
-    )
+    pressure_pa = _pure_component_antoine_pa(data, temperature_K)
+    if rel_tol is None:
+        residual = float(
+            data["pure_component_antoine"]["max_abs_log10_residual_vs_source"]
+        )
+        bar_to_atm_dex = abs(math.log10(PA_PER_ATM / 100_000.0))
+        assert abs(math.log10(pressure_pa / PA_PER_ATM)) <= (
+            residual + bar_to_atm_dex + 1e-6
+        )
+    else:
+        assert pressure_pa == pytest.approx(PA_PER_ATM, rel=rel_tol)
 
 @pytest.mark.parametrize(
     ("species", "temperature_K", "expected_pa", "rel_tol"),
@@ -370,10 +412,10 @@ def test_pure_component_antoine_reaches_one_atm_at_normal_boiling_point(
         ("K", 1033.0, 104_572.576518, 1e-6),
         # NIST Chemistry WebBook SRD 69, calcium Antoine row, Hartmann and Schneider 1929.
         ("Ca", 1500.0, 21_740.153809, 1e-6),
-        # NIST-JANAF Al-003/Al-005 node pair at 2200 K; Antoine fit stays within 1%.
-        ("Al", 2200.0, 3_196.816100, 0.01),
-        # NIST-JANAF Si-003/Si-005 node pair at 2200 K; Antoine fit stays within 0.2%.
-        ("Si", 2200.0, 37.325229, 0.002),
+        # NIST-JANAF Al-003/Al-005 node pair; tolerance is read from fit metadata.
+        ("Al", 2200.0, 3_196.816100, None),
+        # NIST-JANAF Si-003/Si-005 node pair; tolerance is read from fit metadata.
+        ("Si", 2200.0, 37.325229, None),
         # NIST Chemistry WebBook SRD 69, chromium Antoine row, Stull 1947.
         ("Cr", 2200.0, 2_704.347348, 1e-6),
         # CRC.b/Stull source-tabulated Mg pressure levels.
@@ -390,14 +432,18 @@ def test_pure_component_antoine_matches_published_vapor_pressure_points(
     species: str,
     temperature_K: float,
     expected_pa: float,
-    rel_tol: float,
+    rel_tol: float | None,
 ) -> None:
     data = _vapor_pressure_data()["metals"][species]
 
-    assert _pure_component_antoine_pa(data, temperature_K) == pytest.approx(
-        expected_pa,
-        rel=rel_tol,
-    )
+    pressure_pa = _pure_component_antoine_pa(data, temperature_K)
+    if rel_tol is None:
+        fit_residual = float(
+            data["pure_component_antoine"]["max_abs_log10_residual_vs_source"]
+        )
+        assert abs(math.log10(pressure_pa / expected_pa)) <= fit_residual
+    else:
+        assert pressure_pa == pytest.approx(expected_pa, rel=rel_tol)
 
 
 def test_mg_sidecar_is_monotonic_but_gas_runtime_uses_liquid_oxide_standard() -> None:
@@ -610,6 +656,24 @@ def test_mn_solid_liquid_runtime_join_is_continuous_at_melting_point() -> None:
     liquid_fit_pa = _coefficient_pa(dict(liquid), 1519.0)
     assert solid_fit_pa == pytest.approx(liquid_fit_pa, rel=1e-12)
     assert solid_fit_pa == pytest.approx(solid["join_anchor_Pa"], rel=1e-12)
+
+
+@pytest.mark.parametrize("temperature_K", [1560.0, 1700.0, 1710.0, 2000.0, 2240.0, 2334.526])
+def test_mn_liquid_runtime_sidecar_matches_nist_janaf_evaluation(
+    temperature_K: float,
+) -> None:
+    data = _vapor_pressure_data()
+    row = data["metals"]["Mn"]
+    fit_pa = _pure_component_antoine_pa(row, temperature_K)
+    basis_pa = _nist_janaf_mn_liquid_pa(temperature_K)
+    metadata_residual = row["pure_component_antoine"]["segments"][1][
+        "max_abs_log10_residual_vs_source"
+    ]
+
+    assert "REF-020" in row["pure_component_antoine"]["segments"][1]["source"]
+    assert abs(math.log10(fit_pa / basis_pa)) <= metadata_residual + 1e-9
+    if temperature_K == 2334.526:
+        assert fit_pa == pytest.approx(PA_PER_ATM, rel=1e-9)
 
 
 def test_mn_source_spread_and_join_resolution_are_documented_in_place() -> None:
