@@ -13,6 +13,7 @@ of pilot extract files only.
 
 from __future__ import annotations
 
+import argparse
 import copy
 import re
 import sys
@@ -1728,5 +1729,18 @@ def main() -> int:
         return 0 if uniq else 1
 
 
+def _parse_args(argv: list[str] | None = None) -> argparse.Namespace:
+    """CLI entry only. ``--help`` must exit here without rewriting extracts."""
+    parser = argparse.ArgumentParser(
+        description=(
+            "One-shot pilot migration: acquisition DRAFT blocks → literature extracts. "
+            "Importing this module is side-effect free; running without flags executes "
+            "the migration."
+        )
+    )
+    return parser.parse_args(argv)
+
+
 if __name__ == "__main__":
+    _parse_args()
     raise SystemExit(main())
