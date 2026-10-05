@@ -6384,7 +6384,7 @@ def test_admitted_model_derived_rows_emit_residuals_per_imcc_engine() -> None:
         and obs.evidence.class_.value is EvidenceClass.MODEL_DERIVED
     }
     headline_diagnostic_references = (
-        stolyarova_activities
+        (stolyarova_activities & admitted_model_derived)
         | stolyarova_derived_pressures
         | stolyarova_1995_derived_pressures
         | stolyarova_1996_derived_pressures
@@ -6423,10 +6423,8 @@ def test_admitted_model_derived_rows_emit_residuals_per_imcc_engine() -> None:
     assert len(
         stolyarova_activities | stolyarova_derived_pressures | kems_model_derived
     ) == 91
-    assert len(headline_diagnostic_references) == 172
-    assert admitted_model_derived == (
-        allibert_admitted | headline_diagnostic_references
-    )
+    assert len(headline_diagnostic_references) == 136
+    assert admitted_model_derived == headline_diagnostic_references
     assert not admitted_model_derived & {
         obs.observation_id for obs in score_module.comparison_candidates(filtered)
     }
