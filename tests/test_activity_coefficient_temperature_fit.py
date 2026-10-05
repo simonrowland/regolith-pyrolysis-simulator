@@ -72,7 +72,13 @@ def test_sossi_fegley_2018_added_numeric_rows_are_pinned() -> None:
         {
             key: value
             for key, value in row.items()
-            if key not in {"method_class", "evidence_model"}
+            if key
+            not in {
+                "method_class",
+                "evidence_model",
+                "standard_state_as_printed",
+                "notes_as_printed",
+            }
         }
         for species in doc["species"].values()
         for obs in species.get("observations", [])
@@ -81,7 +87,14 @@ def test_sossi_fegley_2018_added_numeric_rows_are_pinned() -> None:
     ]
 
     assert len(rows) == 44
-    assert _sha256(rows) == "8207990870ce8a4a98ea8baa80820f002c63f93c742fe621b893b72d0c87bc64"
+    assert _sha256(rows) == "6d50eef7933cbb6f6b708a8cc4383eb3a93b2e5a05136772531db1b411b75ef4"
+    assert all(
+        not {"standard_state_as_printed", "notes_as_printed"}.intersection(row)
+        for species in doc["species"].values()
+        for obs in species.get("observations", [])
+        if str((obs.get("locator") or {}).get("table")) == "2"
+        for row in (obs.get("values") or {}).get("rows", [])
+    )
 
 
 def _migrate_extract(name: str):
@@ -230,6 +243,11 @@ def test_sossi_fegley_2018_table_2_migrates_numeric_activity_rows() -> None:
         printed_row = observation.provenance[
             "activity_coefficient_table_row_as_printed"
         ]
+        assert not {
+            "standard_state_as_printed",
+            "notes_as_printed",
+            "compilation_note",
+        }.intersection(printed_row)
         assert observation.identity.species.formula == printed_row["oxide"]
         assert observation.evidence.class_.is_value
         if printed_row.get("evidence_model") == "MELTS":
@@ -279,7 +297,10 @@ def test_sossi_ranged_temperature_condition_output_is_pinned() -> None:
         "activity_coefficient_table_row_as_printed"
     ]
     assert printed_row["melt_composition_as_published"] == "CMAS (An–Di)"
-    assert printed_row["standard_state_as_printed"].startswith("oxide activity coefficient")
+    assert not {
+        "standard_state_as_printed",
+        "notes_as_printed",
+    }.intersection(printed_row)
     temperature = anorthite_diopside.point_conditions["temperature_K"].state.value
     assert (temperature.interval_low, temperature.interval_high) == (
         Decimal("1573"),
