@@ -278,8 +278,8 @@ species:
       units: dimensionless activity
       values:
         quantity: activity
-        method_class: measured_reduced
-        evidence_class: measured_reduced
+        method_class: measured_tabulated
+        evidence_class: measured_tabulated
         admission_status: admitted
         measurement_status: author_reported_activity_calculated_from_directly_measured_ion_intensity_ratios
         experimental_method: ion-comparison
@@ -386,15 +386,9 @@ species:
           locator:
             published_page: 308
             note: No numeric KEMS oxygen fugacity is printed.
-      derived_from: &id001
-      - unknown:kems-051-allibert-1981
       derivation:
-        relation: 'Printed-reduction-only derivation: CaO activity is reduced from Ca+ and O+ ion-intensity ratios over the melt and CaO reference cell (Eqs. 1–2, 4, and 6–7, pp. 308–309). The paper states both activities were independently deduced from O+, Ca+, and Al+ intensities. Composition-resolved ion-intensity observations are not tabulated in this extract; reduced activity rows follow the landed KEMS pattern in stolyarova-1996-cao-alumina-silica-kems.yaml.'
-        inputs: *id001
-        output_unit: dimensionless activity
-      inference:
-        relation: author-published derived result
-        inputs: *id001
+        relation: 'Author-reported CaO activity reduction from Ca+ and O+ ion-intensity ratios over the melt and CaO reference cell (Eqs. 1–2, 4, and 6–7, pp. 308–309); the paper says both activities were independently deduced from O+, Ca+, and Al+ intensities.'
+        inputs: [melt/reference Ca+ and O+ ion-intensity ratios; input intensities not published]
         output_unit: dimensionless activity
     - observation_id: allibert_1981_fig6_log_activity_temperature_curves
       type: activity_coefficient
@@ -978,8 +972,8 @@ species:
       units: dimensionless activity
       values:
         quantity: activity
-        method_class: measured_reduced
-        evidence_class: measured_reduced
+        method_class: measured_tabulated
+        evidence_class: measured_tabulated
         admission_status: admitted
         measurement_status: author_reported_activity_calculated_from_directly_measured_ion_intensity_ratios
         experimental_method: ion-comparison
@@ -1085,16 +1079,9 @@ species:
           locator:
             published_page: 308
             note: No numeric KEMS oxygen fugacity is printed.
-      derived_from: &id006
-      - unknown:kems-051-allibert-1981
       derivation:
-        relation: 'Printed-reduction-only derivation: Al2O3 activity is reduced from Al+ and O+ ion-intensity ratios over the melt and pure alpha-Al2O3 reference cell (Eqs. 1–2, 3, 5, and 8, pp. 308–309). The paper states both activities were independently deduced from O+, Ca+, and Al+ intensities. Composition-resolved ion-intensity observations are not tabulated in this extract; reduced activity rows follow the landed KEMS pattern in stolyarova-1996-cao-alumina-silica-kems.yaml.'
-        inputs: *id006
-        inputs: *id006
-        output_unit: dimensionless activity
-      inference:
-        relation: author-published derived result
-        inputs: *id006
+        relation: 'Author-reported Al2O3 activity reduction from Al+ and O+ ion-intensity ratios over the melt and pure alpha-Al2O3 reference cell (Eqs. 1–2, 3, 5, and 8, pp. 308–309); the paper says both activities were independently deduced from O+, Ca+, and Al+ intensities.'
+        inputs: [melt/reference Al+ and O+ ion-intensity ratios; input intensities not published]
         output_unit: dimensionless activity
     - observation_id: allibert_1981_fig2_alumina_activity_gibbs_duhem
       type: activity_coefficient
