@@ -42,6 +42,7 @@ from simulator.chemistry.melt_activity import (
     single_cation_mole_fractions,
 )
 from simulator.scalar_boundary import is_declared_real_scalar
+from simulator.trace_oxide_parents import ledger_component_key
 from simulator.vapour_rail.activity import (
     ActivityInputDeclaration,
     ActivityVerdictKind,
@@ -647,6 +648,14 @@ def emit_request_rules(
         if not parents:
             parents.add(compiled.formula or species_id)
             required_atoms |= set(_formula_elements(compiled.formula or species_id))
+        # t1139 rows request the same ledger key the feedstock bridge writes.
+        # Phase tags and the O2 coproduct are not melt parents.
+        if str(row.get("chemical_family") or "") == "t1139_generated_carrier":
+            parents = {
+                ledger_component_key(formula)
+                for formula in parents
+                if ledger_component_key(formula) != "O2"
+            }
 
         alpha = compiled.vaporisation_coefficients.evaporation_alpha
         has_alpha = _alpha_contract_available(alpha)
