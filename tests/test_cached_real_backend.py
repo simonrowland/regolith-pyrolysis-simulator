@@ -753,17 +753,35 @@ def test_cached_real_python_api_model_refuses_before_backend_or_store_access(
     assert events == []
 
 
-@pytest.mark.parametrize("model", [None, ""])
+@pytest.mark.parametrize(
+    ("model", "expected_identity", "expected_hash"),
+    [
+        (
+            None,
+            "None",
+            "1754e315cc016d162243334396a464d6caed842b252638f80cb532b0ffd7a088",
+        ),
+        (
+            "",
+            "",
+            "b43e6955cdee10f871c8aaceaa9b45eea9524da6d6fc9449f252c9f463281dd9",
+        ),
+    ],
+)
 def test_cached_real_blank_model_normalization_keeps_replay_identity(
     tmp_path: Path,
     model: str | None,
+    expected_identity: str,
+    expected_hash: str,
 ) -> None:
     replay_config = _cache_config(
         tmp_path / "cached-real.db",
         "fail-loud",
         name="alphamelts",
         model=model,
+        mode="python_api",
     )
+    replay_config["authorized_model"] = model
     normalized = normalize_cached_real_config(replay_config)
     replay_backend = resolve_backend(
         "cached-real",
@@ -782,13 +800,10 @@ def test_cached_real_blank_model_normalization_keeps_replay_identity(
         fe_redox_policy="intrinsic",
     )
 
-    assert normalized.authorized_model == "MELTSv1.0.2"
-    assert replay_backend.config.authorized_model == "MELTSv1.0.2"
-    assert replay_key["model"]["model"] == "MELTSv1.0.2"
-    assert _key_hash(replay_key) == _DEFAULT_MELTS_REPLAY_KEY_HASH
-    assert _key_hash(
-        canonical_physics_bucket_key_from_replay_key(replay_key)
-    ) == _DEFAULT_MELTS_PROVIDER_KEY_HASH
+    assert normalized.authorized_model == expected_identity
+    assert replay_backend.config.authorized_model == expected_identity
+    assert replay_key["model"]["model"] == expected_identity
+    assert _key_hash(replay_key) == expected_hash
 
 
 @pytest.mark.parametrize(

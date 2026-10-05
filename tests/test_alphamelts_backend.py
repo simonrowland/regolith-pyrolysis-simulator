@@ -502,6 +502,112 @@ def test_petthermotools_cold_worker_keeps_base_model_payload_and_code(
 @pytest.mark.parametrize(
     ('model_name', 'expected_code'),
     [
+        ('pMELTS', 2),
+        ('MELTSv1.1.0', 3),
+        ('MELTSv1.2.0', 4),
+    ],
+)
+@pytest.mark.parametrize('warm_worker', [False, True], ids=['cold', 'warm'])
+def test_decompression_worker_receives_owner_model_code(
+    monkeypatch,
+    model_name,
+    expected_code,
+    warm_worker,
+) -> None:
+    backend = AlphaMELTSBackend(model_name=model_name)
+    backend._pet_warm_enabled = warm_worker
+    backend._import_petthermotools = lambda: types.SimpleNamespace(
+        isothermal_decompression=object()
+    )
+
+    def preload(_module):
+        backend._pet_melts = object()
+        backend._pet_payload_preloaded = True
+
+    backend._preload_petthermotools_payload = preload
+    warm_workers = []
+
+    class WarmWorker:
+        def __init__(self, **kwargs):
+            self.kwargs = kwargs
+            self.calls = []
+            warm_workers.append(self)
+
+        def start(self):
+            pass
+
+        def call(self, request, *, timeout_s):
+            self.calls.append((request, timeout_s))
+            return {}
+
+    monkeypatch.setattr(
+        'simulator.melt_backend.alphamelts.WarmEngineWorker', WarmWorker
+    )
+    backend._initialize_petthermotools(require_petthermotools=True)
+    backend._domain_gate = lambda *_args, **_kwargs: None
+    backend._apply_engine_commissioning = lambda *_args, **_kwargs: {}
+    backend._normalize_composition_to_melts_basis = lambda comp: comp
+    backend._to_petthermotools_liq_comp = lambda comp: comp
+    backend._parse_petthermotools_result = lambda *_args, **_kwargs: EquilibriumResult(
+        status='ok', temperature_C=1400.0, pressure_bar=1.0,
+        fO2_log=-9.0, liquid_fraction=1.0,
+    )
+
+    process_calls = []
+
+    class Endpoint:
+        def close(self):
+            pass
+
+        def poll(self, _timeout):
+            return True
+
+        def recv(self):
+            return ('ok', {})
+
+    class Process:
+        def __init__(self, **kwargs):
+            process_calls.append(kwargs)
+
+        def start(self):
+            pass
+
+        def join(self, timeout=None):
+            pass
+
+        def is_alive(self):
+            return False
+
+    class Context:
+        def Pipe(self, *, duplex):
+            assert duplex
+            return Endpoint(), Endpoint()
+
+        def Process(self, **kwargs):
+            return Process(**kwargs)
+
+    monkeypatch.setattr(
+        'simulator.melt_backend.alphamelts.multiprocessing.get_context',
+        lambda _name: Context(),
+    )
+
+    backend.decompression_path(
+        1400.0, 1.0, 0.1, 0.1, composition_kg={'SiO2': 1.0}
+    )
+
+    if warm_worker:
+        assert warm_workers[0].kwargs['bootstrap_args'] == (expected_code,)
+        request = warm_workers[0].calls[0][0]
+        assert request['operation'] == 'isothermal_decompression'
+    else:
+        launch = process_calls[0]['args']
+        assert launch[1] == 'isothermal_decompression'
+        assert launch[2] == expected_code
+
+
+@pytest.mark.parametrize(
+    ('model_name', 'expected_code'),
+    [
         ('', 1),
         (None, 1),
         (DEFAULT_ALPHAMELTS_MODEL, 1),

@@ -723,6 +723,7 @@ def test_python_api_identity_pins_current_model_and_provider_fields(
 @pytest.mark.parametrize(
     ("model", "expected_hash"),
     [
+        (None, "1754e315cc016d162243334396a464d6caed842b252638f80cb532b0ffd7a088"),
         ("", "b43e6955cdee10f871c8aaceaa9b45eea9524da6d6fc9449f252c9f463281dd9"),
         (DEFAULT_ALPHAMELTS_MODEL, "7797a4c8de6ca270d6dd2118c5f22fe309175b95e991a70fb108a2a7f66d1645"),
         ("pMELTS", "632a85c2c53b207343c5b33ff54275f4d610bedfdad9a9d4e2774dee4140f2c5"),
@@ -731,7 +732,7 @@ def test_python_api_identity_pins_current_model_and_provider_fields(
     ],
 )
 def test_python_api_accepted_replay_key_hashes_remain_base_bytes(
-    model: str,
+    model: str | None,
     expected_hash: str,
 ) -> None:
     # Hashes captured by the review probe at base
