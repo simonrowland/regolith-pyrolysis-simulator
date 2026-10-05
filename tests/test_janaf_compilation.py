@@ -403,11 +403,11 @@ def test_transition_enthalpy_refusal_prevents_the_fe004_wrong_sign() -> None:
     ),
 )
 def test_opposite_sign_enthalpy_neighbors_do_not_restore_tail(
-    table_id: str, temperature: str
+    table_id: str, temperature: str, janaf_source_dir: Path
 ) -> None:
     """Opposite-sign DfH brackets cannot establish a repaired sign."""
 
-    source_path = JANAF_SOURCE_DIR / f"{table_id}.txt"
+    source_path = janaf_source_dir / f"{table_id}.txt"
     lines = source_path.read_text(encoding="utf-8").splitlines()
     target_index = next(
         index
