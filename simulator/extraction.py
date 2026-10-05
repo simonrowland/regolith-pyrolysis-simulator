@@ -2771,6 +2771,9 @@ class ExtractionMixin:
                 'dt_hr': 1.0,
             },
         )
+        # The stirred melt makes feedstock and reagent K one well-mixed pool.
+        # Partial withdrawals attribute K to its live origins pro rata.
+        self.atom_ledger.mark_amalgamated_pool('process.cleaned_melt', ('K',))
         self._record_stage_routed_metal_credits('C3', transition)
         self._apply_transition_redox_source_terms(
             transition,
@@ -3146,6 +3149,9 @@ class ExtractionMixin:
                 'dt_hr': 1.0,
             },
         )
+        # The stirred melt makes feedstock and reagent Mg one well-mixed pool.
+        # Partial withdrawals attribute Mg to its live origins pro rata.
+        self.atom_ledger.mark_amalgamated_pool('process.cleaned_melt', ('Mg',))
         self._apply_transition_redox_source_terms(
             primary_transition,
             label='redox_source:c6_mg_thermite_primary',

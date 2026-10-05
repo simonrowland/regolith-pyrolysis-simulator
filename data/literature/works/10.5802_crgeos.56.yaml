@@ -9,9 +9,27 @@ work:
   source_files:
     corpus_repo: regolith-corpus
     corpus_commit:
-      tag: unknown
-      reason: INDEX does not give corpus commit
+      tag: value
+      value: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
     files:
+    - asset_id: pdf:ta-badro-2021
+      role: pdf
+      path: raw/ta-badro-2021/ta-badro-2021.pdf
+      sha256:
+        tag: value
+        value: 9cce11dc9bbf3e8b2ebfa2281d70c887199d5c2854e406f7838f471df5c28fe2
+    - asset_id: pdftotext:ta-badro-2021
+      role: pdftotext
+      path: text/ta-badro-2021
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: tables:ta-badro-2021
+      role: table_csv
+      path: tables/ta-badro-2021
+      sha256:
+        tag: unknown
+        reason: INDEX does not give table sha256
     - asset_id: unknown:ta-badro-2021
       role: pdftotext
       path: unknown
@@ -1436,6 +1454,15 @@ benches:
       published_page: 102
       pdf_page_index: 2
       section: 2. Experimental setup
+  cell_material_and_liner:
+    state:
+      tag: not_applicable
+      reason: not_applicable
+    locator:
+      published_page: 102
+      pdf_page_index: 2
+      section: 2. Experimental setup
+      note: Contactless sample supported by upward gas in a conical nozzle; no crucible or Knudsen cell.
   detector:
     state:
       tag: value
@@ -1453,6 +1480,15 @@ benches:
         published_page: 103
         pdf_page_index: 3
         figure: '2'
+    recording:
+      state:
+        tag: value
+        value: Pyrometer measures above 900 degC and returns a baseline of 900 degC below.
+      locator:
+        published_page: 104
+        pdf_page_index: 4
+        figure: '2'
+        paragraph: Caption
   heating_method:
     state:
       tag: value

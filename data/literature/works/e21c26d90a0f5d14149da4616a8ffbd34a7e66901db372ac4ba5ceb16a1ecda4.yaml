@@ -9,7 +9,7 @@ work:
     corpus_repo: regolith-corpus
     corpus_commit:
       tag: value
-      value: 2ef619255debb2beb4718b52908a77d8cf504b5f
+      value: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
     files:
     - asset_id: pdf:stebbins-carmichael-weill-1983
       role: pdf
@@ -36,50 +36,16 @@ work:
         tag: unknown
         reason: INDEX does not give an unmatched-layer asset
 experiments:
-- experiment_id: e21c26d90a0f5d14149da4616a8ffbd34a7e66901db372ac4ba5ceb16a1ecda4::experiment::drop-calorimetry-series
+- experiment_id: e21c26d90a0f5d14149da4616a8ffbd34a7e66901db372ac4ba5ceb16a1ecda4::experiment::calvet-inverse-drop-series
   kind: literature
   method:
     tag: unknown
-    reason: regime 'drop_calorimetry' is not a closed method token (kems_effusion alone is insufficient)
+    reason: 'unmapped published method: inverse-drop and drop-solution calorimetry'
   sample:
-    mass_kg:
-      state:
-        tag: value
-        value:
-          kind: point
-          point: '0.0016'
-          approximate: true
-      locator:
-        published_page: 718
-        section: Experimental methods
-        note: Printed about 1.6 g; unit conversion only
-      inference:
-        relation: g_to_kg
-        inputs:
-        - m_kg = m_g / 1000
-        - original_unit=g
-        parameters:
-        - - original
-          - state:
-              tag: value
-              value: '1.6'
-            locator:
-              published_page: 718
-              section: Experimental methods
-              note: Printed about 1.6 g; unit conversion only
-        - - factor
-          - state:
-              tag: value
-              value: '1000'
-            locator:
-              published_page: 718
-              section: Experimental methods
-              note: Printed about 1.6 g; unit conversion only
-        output_unit: kg
     form:
       state:
         tag: value
-        value: glass pieces; capsule cores produced as cylinders about 3 mm diameter and 60-190 mg
+        value: glass pieces; capsule cores produced as cylinders about 3 mm diameter
       locator:
         published_page: 718
         section: Experimental methods
@@ -124,7 +90,7 @@ experiments:
     published_page: 718
     section: Experimental methods
     note: Own inverse-drop and drop-solution measurements.
-  bench_id: e21c26d90a0f5d14149da4616a8ffbd34a7e66901db372ac4ba5ceb16a1ecda4::bench::calvet-drop-calorimeter
+  bench_id: e21c26d90a0f5d14149da4616a8ffbd34a7e66901db372ac4ba5ceb16a1ecda4::bench::twin-calvet-microcalorimeter-981k
   thermal_schedule:
     method:
       state:
@@ -151,43 +117,9 @@ experiments:
 - experiment_id: e21c26d90a0f5d14149da4616a8ffbd34a7e66901db372ac4ba5ceb16a1ecda4::experiment::dsc-heat-capacity-series
   kind: literature
   method:
-    tag: unknown
-    reason: regime 'differential_scanning_calorimetry' is not a closed method token (kems_effusion alone is insufficient)
+    tag: value
+    value: dta_dsc
   sample:
-    mass_kg:
-      state:
-        tag: value
-        value:
-          kind: point
-          point: '0.00003'
-          approximate: true
-      locator:
-        published_page: 718
-        section: Experimental methods
-        note: Printed about 30 mg; unit conversion only
-      inference:
-        relation: mg_to_kg
-        inputs:
-        - m_kg = m_mg / 1e6
-        - original_unit=mg
-        parameters:
-        - - original
-          - state:
-              tag: value
-              value: '30'
-            locator:
-              published_page: 718
-              section: Experimental methods
-              note: Printed about 30 mg; unit conversion only
-        - - factor
-          - state:
-              tag: value
-              value: '1000000'
-            locator:
-              published_page: 718
-              section: Experimental methods
-              note: Printed about 30 mg; unit conversion only
-        output_unit: kg
     characterization:
       state:
         tag: value
@@ -239,12 +171,54 @@ experiments:
         published_page: 717-718
         section: Experimental methods
         note: No DSC run duration is printed.
+- experiment_id: e21c26d90a0f5d14149da4616a8ffbd34a7e66901db372ac4ba5ceb16a1ecda4::experiment::high-temperature-drop-calorimetry-series
+  kind: literature
+  method:
+    tag: unknown
+    reason: 'unmapped published method: high-temperature diphenyl-ether drop calorimetry'
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 717-718
+        section: Experimental methods
+        note: Sample temperatures vary by run and are reported in Tables 3 and 5; the calorimeter reference temperature is
+          300 K on the bench.
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 718
+        section: Experimental methods
+        note: No measurement pressure is printed.
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 717
+        section: Experimental methods
+        note: Diphenyl ether is the calorimeter medium, not a published sweep-gas record.
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
+  work_id: e21c26d90a0f5d14149da4616a8ffbd34a7e66901db372ac4ba5ceb16a1ecda4
+  locator:
+    published_page: 717
+    section: Experimental methods
+    note: Own high-temperature enthalpy measurements.
+  bench_id: e21c26d90a0f5d14149da4616a8ffbd34a7e66901db372ac4ba5ceb16a1ecda4::bench::high-temperature-diphenyl-ether-drop-calorimeter
 - experiment_id: e21c26d90a0f5d14149da4616a8ffbd34a7e66901db372ac4ba5ceb16a1ecda4::stebbins-carmichael-weill-1983
   kind: literature
   method:
     tag: unknown
-    reason: regime 'inverse_drop_calorimetry_DSC_and_compiled_calorimetry' is not a closed method token (kems_effusion alone
-      is insufficient)
+    reason: source does not state method
   sample: {}
   conditions:
     temperature_K:
@@ -269,26 +243,26 @@ experiments:
         reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
   work_id: e21c26d90a0f5d14149da4616a8ffbd34a7e66901db372ac4ba5ceb16a1ecda4
   locator:
-    note: tables=['1', '2', '3', '4', '6', '7']; pages=PDF pp. 4-7 / printed pp. 720-723
-    source_path: docs-private/research/2026-08-27-ocr-repair/stebbins-carmichael-weill-1983/tables.md
+    page: PDF p. 6 / printed p. 722
+    table: '4'
 benches:
-- id: e21c26d90a0f5d14149da4616a8ffbd34a7e66901db372ac4ba5ceb16a1ecda4::bench::calvet-drop-calorimeter
+- id: e21c26d90a0f5d14149da4616a8ffbd34a7e66901db372ac4ba5ceb16a1ecda4::bench::high-temperature-diphenyl-ether-drop-calorimeter
   work_id: e21c26d90a0f5d14149da4616a8ffbd34a7e66901db372ac4ba5ceb16a1ecda4
   identity:
     basis: described_in_this_work
   apparatus_family:
     state:
       tag: value
-      value: twin Calvet-type drop calorimeter
+      value: diphenyl-ether drop calorimeter
     locator:
-      published_page: 718
+      published_page: 717
       section: Experimental methods
   method:
     state:
       tag: value
-      value: inverse-drop and drop-solution calorimetry
+      value: high-temperature drop calorimetry
     locator:
-      published_page: 718
+      published_page: 717
       section: Experimental methods
   cell_material_and_liner:
     state:
@@ -297,21 +271,6 @@ benches:
     locator:
       published_page: 718
       section: Experimental methods
-  detector:
-    state:
-      tag: value
-      value: twin Calvet-type microcalorimeter
-    locator:
-      published_page: 718
-      section: Experimental methods
-  temperature_calibration:
-    method:
-      state:
-        tag: value
-        value: NBS 720 sapphire standard and platinum-wire drops
-      locator:
-        published_page: 718
-        section: Experimental methods
   heating_method:
     state:
       tag: value
@@ -332,6 +291,32 @@ benches:
         published_page: 717
         section: Experimental methods
         note: Air was removed by repeated freezing under vacuum.
+    unit: as_published
+  - name: reference_temperature_K
+    value:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '300'
+          approximate: false
+      locator:
+        published_page: 717
+        section: Experimental methods
+        note: 300 K reference temperature.
+    unit: K
+  - name: heat_calibration_material
+    value:
+      state:
+        tag: value
+        value:
+          kind: categorical
+          categorical: NBS 720 sapphire standard reference material
+          approximate: false
+      locator:
+        published_page: 718
+        section: Experimental methods
+        note: Calorimeter calibration; not temperature calibration.
     unit: as_published
 - id: e21c26d90a0f5d14149da4616a8ffbd34a7e66901db372ac4ba5ceb16a1ecda4::bench::perkin-elmer-dsc-2
   work_id: e21c26d90a0f5d14149da4616a8ffbd34a7e66901db372ac4ba5ceb16a1ecda4
@@ -358,12 +343,75 @@ benches:
     locator:
       published_page: 717
       section: Experimental methods
-  temperature_calibration:
-    method:
+  other_facts:
+  - name: heat_calibration_material
+    value:
       state:
         tag: value
-        value: NBS 720 sapphire standard reference material
+        value:
+          kind: categorical
+          categorical: NBS 720 sapphire standard reference material
+          approximate: false
       locator:
         published_page: 718
         section: Experimental methods
-  other_facts: []
+        note: Calorimeter calibration; not temperature calibration.
+    unit: as_published
+- id: e21c26d90a0f5d14149da4616a8ffbd34a7e66901db372ac4ba5ceb16a1ecda4::bench::twin-calvet-microcalorimeter-981k
+  work_id: e21c26d90a0f5d14149da4616a8ffbd34a7e66901db372ac4ba5ceb16a1ecda4
+  identity:
+    basis: described_in_this_work
+  apparatus_family:
+    state:
+      tag: value
+      value: twin Calvet-type microcalorimeter
+    locator:
+      published_page: 718
+      section: Experimental methods
+  method:
+    state:
+      tag: value
+      value: inverse-drop and drop-solution calorimetry
+    locator:
+      published_page: 718
+      section: Experimental methods
+  cell_material_and_liner:
+    state:
+      tag: value
+      value: silica crucible
+    locator:
+      published_page: 718
+      section: Experimental methods
+  detector:
+    state:
+      tag: value
+      value: twin Calvet-type microcalorimeter
+    locator:
+      published_page: 718
+      section: Experimental methods
+  other_facts:
+  - name: operating_temperature_K
+    value:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '981'
+          approximate: false
+      locator:
+        published_page: 718
+        section: Experimental methods
+    unit: K
+  - name: heat_calibration_material
+    value:
+      state:
+        tag: value
+        value:
+          kind: categorical
+          categorical: platinum-wire drops
+          approximate: false
+      locator:
+        published_page: 718
+        section: Experimental methods
+        note: Absolute heat calibration by dropping platinum wire; not temperature calibration.
+    unit: as_published

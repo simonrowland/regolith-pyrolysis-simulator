@@ -8,9 +8,27 @@ work:
   source_files:
     corpus_repo: regolith-corpus
     corpus_commit:
-      tag: unknown
-      reason: INDEX does not give corpus commit
+      tag: value
+      value: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
     files:
+    - asset_id: pdf:jsc-lunar-catalog-12023
+      role: pdf
+      path: raw/jsc-lunar-catalog-12023/jsc-lunar-catalog-12023.pdf
+      sha256:
+        tag: value
+        value: 3ec719df22530feba34a40fa34bb1e52b47b7495bd56bffabd3a214c5192cb69
+    - asset_id: pdftotext:jsc-lunar-catalog-12023
+      role: pdftotext
+      path: text/jsc-lunar-catalog-12023
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: tables:jsc-lunar-catalog-12023
+      role: table_csv
+      path: tables/jsc-lunar-catalog-12023
+      sha256:
+        tag: unknown
+        reason: INDEX does not give table sha256
     - asset_id: unknown:jsc-lunar-catalog-12023
       role: pdftotext
       path: unknown

@@ -8,9 +8,27 @@ work:
   source_files:
     corpus_repo: regolith-corpus
     corpus_commit:
-      tag: unknown
-      reason: INDEX does not give corpus commit
+      tag: value
+      value: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
     files:
+    - asset_id: pdf:nakamura-2022-science-ryugu-thermal
+      role: pdf
+      path: raw/nakamura-2022-science-ryugu-thermal/nakamura-2022-science-ryugu-thermal.pdf
+      sha256:
+        tag: value
+        value: 777f0aa4bb64babe6c3d122a2600672cd147075b0011237c16c5c53d553f837f
+    - asset_id: pdftotext:nakamura-2022-science-ryugu-thermal
+      role: pdftotext
+      path: text/nakamura-2022-science-ryugu-thermal
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: tables:nakamura-2022-science-ryugu-thermal
+      role: table_csv
+      path: tables/nakamura-2022-science-ryugu-thermal
+      sha256:
+        tag: unknown
+        reason: INDEX does not give table sha256
     - asset_id: unknown:nakamura-2022-science-ryugu-thermal
       role: pdftotext
       path: unknown

@@ -8,9 +8,27 @@ work:
   source_files:
     corpus_repo: regolith-corpus
     corpus_commit:
-      tag: unknown
-      reason: INDEX does not give corpus commit
+      tag: value
+      value: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
     files:
+    - asset_id: pdf:tachibana-tsuchiyama-1998-forsterite-dust-lpsc
+      role: pdf
+      path: raw/tachibana-tsuchiyama-1998-forsterite-dust-lpsc/tachibana-tsuchiyama-1998-forsterite-dust-lpsc.pdf
+      sha256:
+        tag: value
+        value: dc6516ac2df7ebfc521f6ee6df4cb5e0312aa99861480874c47e9b506598e245
+    - asset_id: pdftotext:tachibana-tsuchiyama-1998-forsterite-dust-lpsc
+      role: pdftotext
+      path: text/tachibana-tsuchiyama-1998-forsterite-dust-lpsc
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: tables:tachibana-tsuchiyama-1998-forsterite-dust-lpsc
+      role: table_csv
+      path: tables/tachibana-tsuchiyama-1998-forsterite-dust-lpsc
+      sha256:
+        tag: unknown
+        reason: INDEX does not give table sha256
     - asset_id: unknown:tachibana-tsuchiyama-1998-forsterite-dust-lpsc
       role: pdftotext
       path: unknown

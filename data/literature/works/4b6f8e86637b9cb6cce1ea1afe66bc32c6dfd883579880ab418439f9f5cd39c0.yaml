@@ -8,9 +8,27 @@ work:
   source_files:
     corpus_repo: regolith-corpus
     corpus_commit:
-      tag: unknown
-      reason: INDEX does not give corpus commit
+      tag: value
+      value: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
     files:
+    - asset_id: pdf:ntrs-19730008085
+      role: pdf
+      path: raw/ntrs-19730008085/ntrs-19730008085.pdf
+      sha256:
+        tag: unknown
+        reason: INDEX does not give sha256
+    - asset_id: pdftotext:ntrs-19730008085
+      role: pdftotext
+      path: text/ntrs-19730008085
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: tables:ntrs-19730008085
+      role: table_csv
+      path: tables/ntrs-19730008085
+      sha256:
+        tag: unknown
+        reason: INDEX does not give table sha256
     - asset_id: unknown:ntrs-19730008085
       role: pdftotext
       path: unknown

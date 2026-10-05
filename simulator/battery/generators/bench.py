@@ -11,7 +11,7 @@ from simulator.battery.migrate import to_plain
 from simulator.battery.waypoints import (
     ConsumerReadiness, ReadinessStatus, ReadinessGap, GapReason,
     ENGINE_POINT_CONSUMERS, MELT_ACTIVITY_ENGINES, Waypoint, WaypointFlag,
-    WaypointResult, pure_substance_engine_point_gap,
+    WaypointResult, _prediction_pressure_waypoint, pure_substance_engine_point_gap,
 )
 
 
@@ -71,10 +71,21 @@ def _requirements(inputs, consumer, engine=None):
             missing = charges.absence.missing if charges.absence else ()
         else:
             waypoint = inputs.waypoints[name]
-            absent = waypoint.selected is None
-            missing = waypoint.absence.missing if waypoint.absence else ()
+            if consumer == "engine_point" and name == "pressure_boundary":
+                prediction = _prediction_pressure_waypoint(waypoint, inputs.method)
+                absent = prediction is None
+                missing = (
+                    waypoint.absence.missing
+                    if waypoint.absence
+                    else ("experiment.pressure_environment.total_pressure_Pa",)
+                )
+                selected_value = prediction.value if prediction is not None else None
+            else:
+                absent = waypoint.selected is None
+                missing = waypoint.absence.missing if waypoint.absence else ()
+                selected_value = waypoint.selected.value if waypoint.selected is not None else None
             if not absent and consumer == "engine_point" and name != "normalized_composition":
-                selected = waypoint.selected.value
+                selected = selected_value
                 if (name == "pressure_boundary"
                         and isinstance(selected, Value)
                         and selected.kind is ValueKind.BOUND
@@ -350,12 +361,20 @@ def _point(inputs, name):
 
 
 def _engine_pressure_point(inputs):
-    value = inputs.waypoints["pressure_boundary"].selected.value
+    selected = _prediction_pressure_waypoint(
+        inputs.waypoints["pressure_boundary"], inputs.method
+    )
+    if selected is None:
+        raise UnsupportedValue("pressure_boundary")
+    value = selected.value
     if (value.kind is ValueKind.BOUND
             and value.bound_operator in {"<", "<=", "≤"}
+            and inputs.waypoints["oxygen_condition"].selected is not None
             and inputs.waypoints["oxygen_condition"].selected.route == "vacuum_total_pressure_upper_bound"):
         return value.bound_value
-    return _point(inputs, "pressure_boundary")
+    if not isinstance(value, Value) or value.kind is not ValueKind.POINT:
+        raise UnsupportedValue("pressure_boundary")
+    return value.point
 
 
 def _document(inputs, name):

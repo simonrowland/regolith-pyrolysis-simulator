@@ -8,9 +8,27 @@ work:
   source_files:
     corpus_repo: regolith-corpus
     corpus_commit:
-      tag: unknown
-      reason: INDEX does not give corpus commit
+      tag: value
+      value: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
     files:
+    - asset_id: pdf:engelschion-2020-eac1a-simulant
+      role: pdf
+      path: raw/engelschion-2020-eac1a-simulant/engelschion-2020-eac1a-simulant.pdf
+      sha256:
+        tag: value
+        value: 7dbfc4c47f59f92260d0575bfe6f4a3e334bfc8d7171011a39b5e51e630ff7e4
+    - asset_id: pdftotext:engelschion-2020-eac1a-simulant
+      role: pdftotext
+      path: text/engelschion-2020-eac1a-simulant
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: tables:engelschion-2020-eac1a-simulant
+      role: table_csv
+      path: tables/engelschion-2020-eac1a-simulant
+      sha256:
+        tag: unknown
+        reason: INDEX does not give table sha256
     - asset_id: unknown:engelschion-2020-eac1a-simulant
       role: pdftotext
       path: unknown

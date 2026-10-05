@@ -7,9 +7,27 @@ work:
   source_files:
     corpus_repo: regolith-corpus
     corpus_commit:
-      tag: unknown
-      reason: INDEX does not give corpus commit
+      tag: value
+      value: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
     files:
+    - asset_id: pdf:pahlevan-2026-protolunar-volatile-outflows
+      role: pdf
+      path: raw/pahlevan-2026-protolunar-volatile-outflows/pahlevan-2026-protolunar-volatile-outflows.pdf
+      sha256:
+        tag: value
+        value: 6ef790619b731fb1b983657309dbb584263e0f43be779132ed9c37f1139385ca
+    - asset_id: pdftotext:pahlevan-2026-protolunar-volatile-outflows
+      role: pdftotext
+      path: text/pahlevan-2026-protolunar-volatile-outflows
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: tables:pahlevan-2026-protolunar-volatile-outflows
+      role: table_csv
+      path: tables/pahlevan-2026-protolunar-volatile-outflows
+      sha256:
+        tag: unknown
+        reason: INDEX does not give table sha256
     - asset_id: unknown:pahlevan-2026-protolunar-volatile-outflows
       role: pdftotext
       path: unknown

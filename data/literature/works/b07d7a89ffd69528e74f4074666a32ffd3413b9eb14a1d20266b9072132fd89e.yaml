@@ -8,9 +8,27 @@ work:
   source_files:
     corpus_repo: regolith-corpus
     corpus_commit:
-      tag: unknown
-      reason: INDEX does not give corpus commit
+      tag: value
+      value: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
     files:
+    - asset_id: pdf:jsc-a16-special-samples
+      role: pdf
+      path: raw/jsc-a16-special-samples/jsc-a16-special-samples.pdf
+      sha256:
+        tag: value
+        value: ba528cd2fad0d03270ec1965d62734639468d7dd07b8a102db5b2c63270f4aea
+    - asset_id: pdftotext:jsc-a16-special-samples
+      role: pdftotext
+      path: text/jsc-a16-special-samples
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: tables:jsc-a16-special-samples
+      role: table_csv
+      path: tables/jsc-a16-special-samples
+      sha256:
+        tag: unknown
+        reason: INDEX does not give table sha256
     - asset_id: unknown:jsc-a16-special-samples
       role: pdftotext
       path: unknown

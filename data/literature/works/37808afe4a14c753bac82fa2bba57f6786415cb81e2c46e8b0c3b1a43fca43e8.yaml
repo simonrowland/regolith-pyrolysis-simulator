@@ -8,9 +8,27 @@ work:
   source_files:
     corpus_repo: regolith-corpus
     corpus_commit:
-      tag: unknown
-      reason: INDEX does not give corpus commit
+      tag: value
+      value: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
     files:
+    - asset_id: pdf:ammin-75-781-hemingway-1990
+      role: pdf
+      path: raw/ammin-75-781/ammin-75-781.pdf
+      sha256:
+        tag: value
+        value: d64de2d3a137d3fb2e43c9f5cc58d9d94a58c7dfe7375e2638fcd546efc2f56b
+    - asset_id: pdftotext:ammin-75-781-hemingway-1990
+      role: pdftotext
+      path: text/ammin-75-781-hemingway-1990
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: tables:ammin-75-781-hemingway-1990
+      role: table_csv
+      path: tables/ammin-75-781-hemingway-1990
+      sha256:
+        tag: unknown
+        reason: INDEX does not give table sha256
     - asset_id: unknown:ammin-75-781-hemingway-1990
       role: pdftotext
       path: unknown

@@ -9,9 +9,27 @@ work:
   source_files:
     corpus_repo: regolith-corpus
     corpus_commit:
-      tag: unknown
-      reason: INDEX does not give corpus commit
+      tag: value
+      value: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
     files:
+    - asset_id: pdf:charnoz-2023-hydrogen-magma-ocean
+      role: pdf
+      path: raw/charnoz-2023-hydrogen-magma-ocean/charnoz-2023-hydrogen-magma-ocean.pdf
+      sha256:
+        tag: value
+        value: b375a3d3e93ee0ab6744573f9d0636c44325a044c040b61a8856ca877190d818
+    - asset_id: pdftotext:charnoz-2023-hydrogen-magma-ocean
+      role: pdftotext
+      path: text/charnoz-2023-hydrogen-magma-ocean
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: tables:charnoz-2023-hydrogen-magma-ocean
+      role: table_csv
+      path: tables/charnoz-2023-hydrogen-magma-ocean
+      sha256:
+        tag: unknown
+        reason: INDEX does not give table sha256
     - asset_id: unknown:charnoz-2023-hydrogen-magma-ocean
       role: pdftotext
       path: unknown

@@ -8,9 +8,27 @@ work:
   source_files:
     corpus_repo: regolith-corpus
     corpus_commit:
-      tag: unknown
-      reason: INDEX does not give corpus commit
+      tag: value
+      value: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
     files:
+    - asset_id: pdf:van-kooten-2020-lunar-outgassing
+      role: pdf
+      path: raw/van-kooten-2020-lunar-outgassing/van-kooten-2020-lunar-outgassing.pdf
+      sha256:
+        tag: value
+        value: 3f00400e5130fb44d43936fb73b3061a4c6b20559e7646efd067de6b146d8565
+    - asset_id: pdftotext:van-kooten-2020-lunar-outgassing
+      role: pdftotext
+      path: text/van-kooten-2020-lunar-outgassing
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: tables:van-kooten-2020-lunar-outgassing
+      role: table_csv
+      path: tables/van-kooten-2020-lunar-outgassing
+      sha256:
+        tag: unknown
+        reason: INDEX does not give table sha256
     - asset_id: unknown:van-kooten-2020-lunar-outgassing
       role: pdftotext
       path: unknown
@@ -46,6 +64,14 @@ experiments:
       regime_class:
         tag: unknown
         reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+    cell_internal_pressure_note:
+      state:
+        tag: value
+        value: unstated
+      locator:
+        published_page: 2
+        section: 2. Zinc Isotope Data of MGS and Mare Basalts
+        note: No vacuum or pressure parameter is printed.
   work_id: 10.3847/psj/abbe13
   locator:
     published_page: 2

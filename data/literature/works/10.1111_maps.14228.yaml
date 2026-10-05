@@ -9,9 +9,27 @@ work:
   source_files:
     corpus_repo: regolith-corpus
     corpus_commit:
-      tag: unknown
-      reason: INDEX does not give corpus commit
+      tag: value
+      value: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
     files:
+    - asset_id: pdf:hendrix-2024-reactivity-reduced-simulants
+      role: pdf
+      path: raw/hendrix-2024-reactivity-reduced-simulants/hendrix-2024-reactivity-reduced-simulants.pdf
+      sha256:
+        tag: value
+        value: efe795764ef1039e95044d866c0c3c9110c654d7643606b452a3e0ceb2a45558
+    - asset_id: pdftotext:hendrix-2024-reactivity-reduced-simulants
+      role: pdftotext
+      path: text/hendrix-2024-reactivity-reduced-simulants
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: tables:hendrix-2024-reactivity-reduced-simulants
+      role: table_csv
+      path: tables/hendrix-2024-reactivity-reduced-simulants
+      sha256:
+        tag: unknown
+        reason: INDEX does not give table sha256
     - asset_id: unknown:hendrix-2024-reactivity-reduced-simulants
       role: pdftotext
       path: unknown

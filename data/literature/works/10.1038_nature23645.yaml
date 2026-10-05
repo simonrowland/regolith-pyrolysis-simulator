@@ -8,9 +8,27 @@ work:
   source_files:
     corpus_repo: regolith-corpus
     corpus_commit:
-      tag: unknown
-      reason: INDEX does not give corpus commit
+      tag: value
+      value: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
     files:
+    - asset_id: pdf:norris-2017-earth-volatiles-nature
+      role: pdf
+      path: raw/norris-2017-earth-volatiles-nature/norris-2017-earth-volatiles-nature.pdf
+      sha256:
+        tag: value
+        value: dbc91276fac60a1049e227ab3e46f76fa53e5d732fed48744f39249483d90dcf
+    - asset_id: pdftotext:norris-2017-earth-volatiles-nature
+      role: pdftotext
+      path: text/norris-2017-earth-volatiles-nature
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: tables:norris-2017-earth-volatiles-nature
+      role: table_csv
+      path: tables/norris-2017-earth-volatiles-nature
+      sha256:
+        tag: unknown
+        reason: INDEX does not give table sha256
     - asset_id: unknown:norris-2017-earth-volatiles-nature
       role: pdftotext
       path: unknown

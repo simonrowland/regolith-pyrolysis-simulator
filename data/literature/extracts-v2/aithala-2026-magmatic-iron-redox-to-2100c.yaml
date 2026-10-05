@@ -1,0 +1,1678 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/extracts/aithala-2026-magmatic-iron-redox-to-2100c.yaml
+observations:
+- observation_id: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_1800_30_wdsepma_composition
+  experiment_id: 10.7185/geochemlet.2617::experiment::aithala-2026-1800-30
+  identity:
+    quantity:
+      tag: unknown
+      reason: source does not state a closed quantity
+    species:
+      formula: silicate_melt
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    total_pressure_Pa:
+      tag: value
+      value: '100000'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; source does not state a closed quantity; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: aithala-2026-magmatic-iron-redox-to-2100c
+  locator:
+    page: 14
+    published_page: SI-8
+    table: S-2
+    note: WDS EPMA composition for 1800-30; all oxide columns in wt.% as printed.
+  read_from: pdf:aithala-2026-magmatic-iron-redox-to-2100c
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - pdf:aithala-2026-magmatic-iron-redox-to-2100c
+    parameters: []
+    output_unit: Pa
+- observation_id: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_1800_30_xanes
+  experiment_id: 10.7185/geochemlet.2617::experiment::aithala-2026-1800-30
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'Fe3+/FeT'
+    species:
+      formula: Fe
+      phase:
+        tag: unknown
+        reason: phase string 'quenched silicate glass' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '2073.15'
+    total_pressure_Pa:
+      tag: value
+      value: '100000'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'Fe3+/FeT'; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      Fe3_over_FeT: ±0.018 (as printed; confidence level not specified in Table S-1)
+      XANES_centroid_eV: ±0.023 (as printed)
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: aithala-2026-magmatic-iron-redox-to-2100c
+  locator:
+    page: 13
+    published_page: SI-7
+    table: S-1
+    note: XANES determination for 1800-30. Fe K-edge XANES calibration is against Mössbauer-standardized martian basalt glasses
+      (SI-2–SI-3, PDF pp. 8–9). SI-3 (PDF p. 9) states ALLF glasses were analysed in one beamline 4-BM session alongside reanalysis
+      of previously reported VF glasses; the authors assume the Mössbauer-standardised XANES calibration applies to glasses
+      synthesised at ALLF temperatures.
+  read_from: pdf:aithala-2026-magmatic-iron-redox-to-2100c
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2073.15'
+      locator:
+        page: 13
+        published_page: SI-7
+        table: S-1
+        note: XANES determination for 1800-30. Fe K-edge XANES calibration is against Mössbauer-standardized martian basalt
+          glasses (SI-2–SI-3, PDF pp. 8–9). SI-3 (PDF p. 9) states ALLF glasses were analysed in one beamline 4-BM session
+          alongside reanalysis of previously reported VF glasses; the authors assume the Mössbauer-standardised XANES calibration
+          applies to glasses synthesised at ALLF temperatures.
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - pdf:aithala-2026-magmatic-iron-redox-to-2100c
+    parameters: []
+    output_unit: Pa
+- observation_id: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_1900_30_wdsepma_composition
+  experiment_id: 10.7185/geochemlet.2617::experiment::aithala-2026-1900-30
+  identity:
+    quantity:
+      tag: unknown
+      reason: source does not state a closed quantity
+    species:
+      formula: silicate_melt
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    total_pressure_Pa:
+      tag: value
+      value: '100000'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; source does not state a closed quantity; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: aithala-2026-magmatic-iron-redox-to-2100c
+  locator:
+    page: 14
+    published_page: SI-8
+    table: S-2
+    note: WDS EPMA composition for 1900-30; all oxide columns in wt.% as printed.
+  read_from: pdf:aithala-2026-magmatic-iron-redox-to-2100c
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - pdf:aithala-2026-magmatic-iron-redox-to-2100c
+    parameters: []
+    output_unit: Pa
+- observation_id: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_1900_30_xanes
+  experiment_id: 10.7185/geochemlet.2617::experiment::aithala-2026-1900-30
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'Fe3+/FeT'
+    species:
+      formula: Fe
+      phase:
+        tag: unknown
+        reason: phase string 'quenched silicate glass' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '2173.15'
+    total_pressure_Pa:
+      tag: value
+      value: '100000'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'Fe3+/FeT'; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      Fe3_over_FeT: ±0.019 (as printed; confidence level not specified in Table S-1)
+      XANES_centroid_eV: ±0.027 (as printed)
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: aithala-2026-magmatic-iron-redox-to-2100c
+  locator:
+    page: 13
+    published_page: SI-7
+    table: S-1
+    note: XANES determination for 1900-30. Fe K-edge XANES calibration is against Mössbauer-standardized martian basalt glasses
+      (SI-2–SI-3, PDF pp. 8–9). SI-3 (PDF p. 9) states ALLF glasses were analysed in one beamline 4-BM session alongside reanalysis
+      of previously reported VF glasses; the authors assume the Mössbauer-standardised XANES calibration applies to glasses
+      synthesised at ALLF temperatures.
+  read_from: pdf:aithala-2026-magmatic-iron-redox-to-2100c
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2173.15'
+      locator:
+        page: 13
+        published_page: SI-7
+        table: S-1
+        note: XANES determination for 1900-30. Fe K-edge XANES calibration is against Mössbauer-standardized martian basalt
+          glasses (SI-2–SI-3, PDF pp. 8–9). SI-3 (PDF p. 9) states ALLF glasses were analysed in one beamline 4-BM session
+          alongside reanalysis of previously reported VF glasses; the authors assume the Mössbauer-standardised XANES calibration
+          applies to glasses synthesised at ALLF temperatures.
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - pdf:aithala-2026-magmatic-iron-redox-to-2100c
+    parameters: []
+    output_unit: Pa
+- observation_id: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_2000_10_wdsepma_composition
+  experiment_id: 10.7185/geochemlet.2617::experiment::aithala-2026-2000-10
+  identity:
+    quantity:
+      tag: unknown
+      reason: source does not state a closed quantity
+    species:
+      formula: silicate_melt
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    total_pressure_Pa:
+      tag: value
+      value: '100000'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; source does not state a closed quantity; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: aithala-2026-magmatic-iron-redox-to-2100c
+  locator:
+    page: 14
+    published_page: SI-8
+    table: S-2
+    note: WDS EPMA composition for 2000-10; all oxide columns in wt.% as printed. The associated 2000 °C Fe determination,
+      run 2000-10, is the authors' equilibrium anchor (SI-3, PDF p. 9).
+  read_from: pdf:aithala-2026-magmatic-iron-redox-to-2100c
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - pdf:aithala-2026-magmatic-iron-redox-to-2100c
+    parameters: []
+    output_unit: Pa
+- observation_id: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_2000_10_xanes
+  experiment_id: 10.7185/geochemlet.2617::experiment::aithala-2026-2000-10
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'Fe3+/FeT'
+    species:
+      formula: Fe
+      phase:
+        tag: unknown
+        reason: phase string 'quenched silicate glass' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '2273.15'
+    total_pressure_Pa:
+      tag: value
+      value: '100000'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'Fe3+/FeT'; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      Fe3_over_FeT: ±0.015 (as printed; confidence level not specified in Table S-1)
+      XANES_centroid_eV: ±0.017 (as printed)
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: aithala-2026-magmatic-iron-redox-to-2100c
+  locator:
+    page: 13
+    published_page: SI-7
+    table: S-1
+    note: XANES determination for 2000-10. Fe K-edge XANES calibration is against Mössbauer-standardized martian basalt glasses
+      (SI-2–SI-3, PDF pp. 8–9). The authors use 2000-10 as their 2000 °C equilibrium anchor for the fitted temperature series
+      (SI-3, PDF p. 9). SI-3 prose values for 2000-10 and 2000-120 differ from Tables S-1/S-3; table values remain unchanged.
+      SI-3 (PDF p. 9) states ALLF glasses were analysed in one beamline 4-BM session alongside reanalysis of previously reported
+      VF glasses; the authors assume the Mössbauer-standardised XANES calibration applies to glasses synthesised at ALLF temperatures.
+  read_from: pdf:aithala-2026-magmatic-iron-redox-to-2100c
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2273.15'
+      locator:
+        page: 13
+        published_page: SI-7
+        table: S-1
+        note: XANES determination for 2000-10. Fe K-edge XANES calibration is against Mössbauer-standardized martian basalt
+          glasses (SI-2–SI-3, PDF pp. 8–9). The authors use 2000-10 as their 2000 °C equilibrium anchor for the fitted temperature
+          series (SI-3, PDF p. 9). SI-3 prose values for 2000-10 and 2000-120 differ from Tables S-1/S-3; table values remain
+          unchanged. SI-3 (PDF p. 9) states ALLF glasses were analysed in one beamline 4-BM session alongside reanalysis of
+          previously reported VF glasses; the authors assume the Mössbauer-standardised XANES calibration applies to glasses
+          synthesised at ALLF temperatures.
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - pdf:aithala-2026-magmatic-iron-redox-to-2100c
+    parameters: []
+    output_unit: Pa
+- observation_id: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_2000_120_wdsepma_composition
+  experiment_id: 10.7185/geochemlet.2617::experiment::aithala-2026-2000-120
+  identity:
+    quantity:
+      tag: unknown
+      reason: source does not state a closed quantity
+    species:
+      formula: silicate_melt
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    total_pressure_Pa:
+      tag: value
+      value: '100000'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; source does not state a closed quantity; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: aithala-2026-magmatic-iron-redox-to-2100c
+  locator:
+    page: 14
+    published_page: SI-8
+    table: S-2
+    note: WDS EPMA composition for 2000-120; all oxide columns in wt.% as printed.
+  read_from: pdf:aithala-2026-magmatic-iron-redox-to-2100c
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - pdf:aithala-2026-magmatic-iron-redox-to-2100c
+    parameters: []
+    output_unit: Pa
+- observation_id: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_2000_120_xanes
+  experiment_id: 10.7185/geochemlet.2617::experiment::aithala-2026-2000-120
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'Fe3+/FeT'
+    species:
+      formula: Fe
+      phase:
+        tag: unknown
+        reason: phase string 'quenched silicate glass' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '2273.15'
+    total_pressure_Pa:
+      tag: value
+      value: '100000'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'Fe3+/FeT'; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      Fe3_over_FeT: ±0.015 (as printed; confidence level not specified in Table S-1)
+      XANES_centroid_eV: ±0.016 (as printed)
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: aithala-2026-magmatic-iron-redox-to-2100c
+  locator:
+    page: 13
+    published_page: SI-7
+    table: S-1
+    note: XANES determination for 2000-120. Fe K-edge XANES calibration is against Mössbauer-standardized martian basalt glasses
+      (SI-2–SI-3, PDF pp. 8–9). SI-3 prose values for 2000-10 and 2000-120 differ from Tables S-1/S-3; table values remain
+      unchanged and no additional determinations are added. SI-3 (PDF p. 9) states ALLF glasses were analysed in one beamline
+      4-BM session alongside reanalysis of previously reported VF glasses; the authors assume the Mössbauer-standardised XANES
+      calibration applies to glasses synthesised at ALLF temperatures.
+  read_from: pdf:aithala-2026-magmatic-iron-redox-to-2100c
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2273.15'
+      locator:
+        page: 13
+        published_page: SI-7
+        table: S-1
+        note: XANES determination for 2000-120. Fe K-edge XANES calibration is against Mössbauer-standardized martian basalt
+          glasses (SI-2–SI-3, PDF pp. 8–9). SI-3 prose values for 2000-10 and 2000-120 differ from Tables S-1/S-3; table values
+          remain unchanged and no additional determinations are added. SI-3 (PDF p. 9) states ALLF glasses were analysed in
+          one beamline 4-BM session alongside reanalysis of previously reported VF glasses; the authors assume the Mössbauer-standardised
+          XANES calibration applies to glasses synthesised at ALLF temperatures.
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - pdf:aithala-2026-magmatic-iron-redox-to-2100c
+    parameters: []
+    output_unit: Pa
+- observation_id: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_2000_30_wdsepma_composition
+  experiment_id: 10.7185/geochemlet.2617::experiment::aithala-2026-2000-30
+  identity:
+    quantity:
+      tag: unknown
+      reason: source does not state a closed quantity
+    species:
+      formula: silicate_melt
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    total_pressure_Pa:
+      tag: value
+      value: '100000'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; source does not state a closed quantity; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: aithala-2026-magmatic-iron-redox-to-2100c
+  locator:
+    page: 14
+    published_page: SI-8
+    table: S-2
+    note: WDS EPMA composition for 2000-30; all oxide columns in wt.% as printed. Run 2000-30 is identified by the authors
+      as anomalous; 2000-10 is their 2000 °C equilibrium anchor (SI-3, PDF p. 9).
+  read_from: pdf:aithala-2026-magmatic-iron-redox-to-2100c
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - pdf:aithala-2026-magmatic-iron-redox-to-2100c
+    parameters: []
+    output_unit: Pa
+- observation_id: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_2000_30_xanes
+  experiment_id: 10.7185/geochemlet.2617::experiment::aithala-2026-2000-30
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'Fe3+/FeT'
+    species:
+      formula: Fe
+      phase:
+        tag: unknown
+        reason: phase string 'quenched silicate glass' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '2273.15'
+    total_pressure_Pa:
+      tag: value
+      value: '100000'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'Fe3+/FeT'; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      Fe3_over_FeT: ±0.031 (as printed; confidence level not specified in Table S-1)
+      XANES_centroid_eV: ±0.05 (as printed)
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: aithala-2026-magmatic-iron-redox-to-2100c
+  locator:
+    page: 13
+    published_page: SI-7
+    table: S-1
+    note: XANES determination for 2000-30. Fe K-edge XANES calibration is against Mössbauer-standardized martian basalt glasses
+      (SI-2–SI-3, PDF pp. 8–9). The authors identify 2000-30 as anomalous; their 2000 °C equilibrium interpretation and fitted
+      series use 2000-10 as the anchor (SI-3, PDF p. 9). SI-3 (PDF p. 9) states ALLF glasses were analysed in one beamline
+      4-BM session alongside reanalysis of previously reported VF glasses; the authors assume the Mössbauer-standardised XANES
+      calibration applies to glasses synthesised at ALLF temperatures.
+  read_from: pdf:aithala-2026-magmatic-iron-redox-to-2100c
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2273.15'
+      locator:
+        page: 13
+        published_page: SI-7
+        table: S-1
+        note: XANES determination for 2000-30. Fe K-edge XANES calibration is against Mössbauer-standardized martian basalt
+          glasses (SI-2–SI-3, PDF pp. 8–9). The authors identify 2000-30 as anomalous; their 2000 °C equilibrium interpretation
+          and fitted series use 2000-10 as the anchor (SI-3, PDF p. 9). SI-3 (PDF p. 9) states ALLF glasses were analysed
+          in one beamline 4-BM session alongside reanalysis of previously reported VF glasses; the authors assume the Mössbauer-standardised
+          XANES calibration applies to glasses synthesised at ALLF temperatures.
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - pdf:aithala-2026-magmatic-iron-redox-to-2100c
+    parameters: []
+    output_unit: Pa
+- observation_id: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_2100_30_wdsepma_composition
+  experiment_id: 10.7185/geochemlet.2617::experiment::aithala-2026-2100-30
+  identity:
+    quantity:
+      tag: unknown
+      reason: source does not state a closed quantity
+    species:
+      formula: silicate_melt
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    total_pressure_Pa:
+      tag: value
+      value: '100000'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; source does not state a closed quantity; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: aithala-2026-magmatic-iron-redox-to-2100c
+  locator:
+    page: 14
+    published_page: SI-8
+    table: S-2
+    note: WDS EPMA composition for 2100-30; all oxide columns in wt.% as printed.
+  read_from: pdf:aithala-2026-magmatic-iron-redox-to-2100c
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - pdf:aithala-2026-magmatic-iron-redox-to-2100c
+    parameters: []
+    output_unit: Pa
+- observation_id: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_2100_30_xanes
+  experiment_id: 10.7185/geochemlet.2617::experiment::aithala-2026-2100-30
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'Fe3+/FeT'
+    species:
+      formula: Fe
+      phase:
+        tag: unknown
+        reason: phase string 'quenched silicate glass' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '2373.15'
+    total_pressure_Pa:
+      tag: value
+      value: '100000'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'Fe3+/FeT'; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      Fe3_over_FeT: ±0.018 (as printed; confidence level not specified in Table S-1)
+      XANES_centroid_eV: ±0.031 (as printed)
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: aithala-2026-magmatic-iron-redox-to-2100c
+  locator:
+    page: 13
+    published_page: SI-7
+    table: S-1
+    note: XANES determination for 2100-30. Fe K-edge XANES calibration is against Mössbauer-standardized martian basalt glasses
+      (SI-2–SI-3, PDF pp. 8–9). SI-3 (PDF p. 9) states ALLF glasses were analysed in one beamline 4-BM session alongside reanalysis
+      of previously reported VF glasses; the authors assume the Mössbauer-standardised XANES calibration applies to glasses
+      synthesised at ALLF temperatures.
+  read_from: pdf:aithala-2026-magmatic-iron-redox-to-2100c
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2373.15'
+      locator:
+        page: 13
+        published_page: SI-7
+        table: S-1
+        note: XANES determination for 2100-30. Fe K-edge XANES calibration is against Mössbauer-standardized martian basalt
+          glasses (SI-2–SI-3, PDF pp. 8–9). SI-3 (PDF p. 9) states ALLF glasses were analysed in one beamline 4-BM session
+          alongside reanalysis of previously reported VF glasses; the authors assume the Mössbauer-standardised XANES calibration
+          applies to glasses synthesised at ALLF temperatures.
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - pdf:aithala-2026-magmatic-iron-redox-to-2100c
+    parameters: []
+    output_unit: Pa
+- observation_id: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_vf231_moessbauer
+  experiment_id: 10.7185/geochemlet.2617::experiment::aithala-2026-vf231
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'Fe3+/FeT'
+    species:
+      formula: Fe
+      phase:
+        tag: unknown
+        reason: phase string 'quenched silicate glass' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1638.15'
+    total_pressure_Pa:
+      tag: value
+      value: '100000'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'Fe3+/FeT'; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      Fe3_over_FeT: ±0.023 (as printed; confidence level not specified in Table S-1)
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: aithala-2026-magmatic-iron-redox-to-2100c
+  locator:
+    page: 13
+    published_page: SI-7
+    table: S-1
+    note: Mössbauer determination for VF231. VF data were also previously published in Aithala, Lange & Hirschmann (2026),
+      as noted in SI-1–SI-3 (PDF pp. 7–9).
+  read_from: pdf:aithala-2026-magmatic-iron-redox-to-2100c
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1638.15'
+      locator:
+        page: 13
+        published_page: SI-7
+        table: S-1
+        note: Mössbauer determination for VF231. VF data were also previously published in Aithala, Lange & Hirschmann (2026),
+          as noted in SI-1–SI-3 (PDF pp. 7–9).
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - pdf:aithala-2026-magmatic-iron-redox-to-2100c
+    parameters: []
+    output_unit: Pa
+- observation_id: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_vf231_wdsepma_composition
+  experiment_id: 10.7185/geochemlet.2617::experiment::aithala-2026-vf231
+  identity:
+    quantity:
+      tag: unknown
+      reason: source does not state a closed quantity
+    species:
+      formula: silicate_melt
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    total_pressure_Pa:
+      tag: value
+      value: '100000'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; source does not state a closed quantity; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: aithala-2026-magmatic-iron-redox-to-2100c
+  locator:
+    page: 14
+    published_page: SI-8
+    table: S-2
+    note: WDS EPMA composition for VF231; all oxide columns in wt.% as printed.
+  read_from: pdf:aithala-2026-magmatic-iron-redox-to-2100c
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - pdf:aithala-2026-magmatic-iron-redox-to-2100c
+    parameters: []
+    output_unit: Pa
+- observation_id: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_vf231_xanes
+  experiment_id: 10.7185/geochemlet.2617::experiment::aithala-2026-vf231
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'Fe3+/FeT'
+    species:
+      formula: Fe
+      phase:
+        tag: unknown
+        reason: phase string 'quenched silicate glass' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1638.15'
+    total_pressure_Pa:
+      tag: value
+      value: '100000'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'Fe3+/FeT'; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      Fe3_over_FeT: ±0.016 (as printed; confidence level not specified in Table S-1)
+      XANES_centroid_eV: ±0.008 (as printed)
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: aithala-2026-magmatic-iron-redox-to-2100c
+  locator:
+    page: 13
+    published_page: SI-7
+    table: S-1
+    note: XANES determination for VF231. VF data were also previously published in Aithala, Lange & Hirschmann (2026), as
+      noted in SI-1–SI-3 (PDF pp. 7–9). Fe K-edge XANES calibration is against Mössbauer-standardized martian basalt glasses
+      (SI-2–SI-3, PDF pp. 8–9).
+  read_from: pdf:aithala-2026-magmatic-iron-redox-to-2100c
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1638.15'
+      locator:
+        page: 13
+        published_page: SI-7
+        table: S-1
+        note: XANES determination for VF231. VF data were also previously published in Aithala, Lange & Hirschmann (2026),
+          as noted in SI-1–SI-3 (PDF pp. 7–9). Fe K-edge XANES calibration is against Mössbauer-standardized martian basalt
+          glasses (SI-2–SI-3, PDF pp. 8–9).
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - pdf:aithala-2026-magmatic-iron-redox-to-2100c
+    parameters: []
+    output_unit: Pa
+- observation_id: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_vf267_moessbauer
+  experiment_id: 10.7185/geochemlet.2617::experiment::aithala-2026-vf267
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'Fe3+/FeT'
+    species:
+      formula: Fe
+      phase:
+        tag: unknown
+        reason: phase string 'quenched silicate glass' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1573.15'
+    total_pressure_Pa:
+      tag: value
+      value: '100000'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'Fe3+/FeT'; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      Fe3_over_FeT: ±0.023 (as printed; confidence level not specified in Table S-1)
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: aithala-2026-magmatic-iron-redox-to-2100c
+  locator:
+    page: 13
+    published_page: SI-7
+    table: S-1
+    note: Mössbauer determination for VF267. VF data were also previously published in Aithala, Lange & Hirschmann (2026),
+      as noted in SI-1–SI-3 (PDF pp. 7–9).
+  read_from: pdf:aithala-2026-magmatic-iron-redox-to-2100c
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1573.15'
+      locator:
+        page: 13
+        published_page: SI-7
+        table: S-1
+        note: Mössbauer determination for VF267. VF data were also previously published in Aithala, Lange & Hirschmann (2026),
+          as noted in SI-1–SI-3 (PDF pp. 7–9).
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - pdf:aithala-2026-magmatic-iron-redox-to-2100c
+    parameters: []
+    output_unit: Pa
+- observation_id: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_vf267_wdsepma_composition
+  experiment_id: 10.7185/geochemlet.2617::experiment::aithala-2026-vf267
+  identity:
+    quantity:
+      tag: unknown
+      reason: source does not state a closed quantity
+    species:
+      formula: silicate_melt
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    total_pressure_Pa:
+      tag: value
+      value: '100000'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; source does not state a closed quantity; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: aithala-2026-magmatic-iron-redox-to-2100c
+  locator:
+    page: 14
+    published_page: SI-8
+    table: S-2
+    note: WDS EPMA composition for VF267; all oxide columns in wt.% as printed.
+  read_from: pdf:aithala-2026-magmatic-iron-redox-to-2100c
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - pdf:aithala-2026-magmatic-iron-redox-to-2100c
+    parameters: []
+    output_unit: Pa
+- observation_id: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_vf268_moessbauer
+  experiment_id: 10.7185/geochemlet.2617::experiment::aithala-2026-vf268
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'Fe3+/FeT'
+    species:
+      formula: Fe
+      phase:
+        tag: unknown
+        reason: phase string 'quenched silicate glass' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1673.15'
+    total_pressure_Pa:
+      tag: value
+      value: '100000'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'Fe3+/FeT'; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      Fe3_over_FeT: ±0.023 (as printed; confidence level not specified in Table S-1)
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: aithala-2026-magmatic-iron-redox-to-2100c
+  locator:
+    page: 13
+    published_page: SI-7
+    table: S-1
+    note: Mössbauer determination for VF268. VF data were also previously published in Aithala, Lange & Hirschmann (2026),
+      as noted in SI-1–SI-3 (PDF pp. 7–9).
+  read_from: pdf:aithala-2026-magmatic-iron-redox-to-2100c
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1673.15'
+      locator:
+        page: 13
+        published_page: SI-7
+        table: S-1
+        note: Mössbauer determination for VF268. VF data were also previously published in Aithala, Lange & Hirschmann (2026),
+          as noted in SI-1–SI-3 (PDF pp. 7–9).
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - pdf:aithala-2026-magmatic-iron-redox-to-2100c
+    parameters: []
+    output_unit: Pa
+- observation_id: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_vf268_wdsepma_composition
+  experiment_id: 10.7185/geochemlet.2617::experiment::aithala-2026-vf268
+  identity:
+    quantity:
+      tag: unknown
+      reason: source does not state a closed quantity
+    species:
+      formula: silicate_melt
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    total_pressure_Pa:
+      tag: value
+      value: '100000'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; source does not state a closed quantity; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: aithala-2026-magmatic-iron-redox-to-2100c
+  locator:
+    page: 14
+    published_page: SI-8
+    table: S-2
+    note: WDS EPMA composition for VF268; all oxide columns in wt.% as printed.
+  read_from: pdf:aithala-2026-magmatic-iron-redox-to-2100c
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - pdf:aithala-2026-magmatic-iron-redox-to-2100c
+    parameters: []
+    output_unit: Pa
+- observation_id: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_vf268_xanes
+  experiment_id: 10.7185/geochemlet.2617::experiment::aithala-2026-vf268
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'Fe3+/FeT'
+    species:
+      formula: Fe
+      phase:
+        tag: unknown
+        reason: phase string 'quenched silicate glass' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1673.15'
+    total_pressure_Pa:
+      tag: value
+      value: '100000'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'Fe3+/FeT'; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      Fe3_over_FeT: ±0.017 (as printed; confidence level not specified in Table S-1)
+      XANES_centroid_eV: ±0.016 (as printed)
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: aithala-2026-magmatic-iron-redox-to-2100c
+  locator:
+    page: 13
+    published_page: SI-7
+    table: S-1
+    note: XANES determination for VF268. VF data were also previously published in Aithala, Lange & Hirschmann (2026), as
+      noted in SI-1–SI-3 (PDF pp. 7–9). Fe K-edge XANES calibration is against Mössbauer-standardized martian basalt glasses
+      (SI-2–SI-3, PDF pp. 8–9).
+  read_from: pdf:aithala-2026-magmatic-iron-redox-to-2100c
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1673.15'
+      locator:
+        page: 13
+        published_page: SI-7
+        table: S-1
+        note: XANES determination for VF268. VF data were also previously published in Aithala, Lange & Hirschmann (2026),
+          as noted in SI-1–SI-3 (PDF pp. 7–9). Fe K-edge XANES calibration is against Mössbauer-standardized martian basalt
+          glasses (SI-2–SI-3, PDF pp. 8–9).
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - pdf:aithala-2026-magmatic-iron-redox-to-2100c
+    parameters: []
+    output_unit: Pa
+- observation_id: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_vf270_moessbauer
+  experiment_id: 10.7185/geochemlet.2617::experiment::aithala-2026-vf270
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'Fe3+/FeT'
+    species:
+      formula: Fe
+      phase:
+        tag: unknown
+        reason: phase string 'quenched silicate glass' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1723.15'
+    total_pressure_Pa:
+      tag: value
+      value: '100000'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'Fe3+/FeT'; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      Fe3_over_FeT: ±0.023 (as printed; confidence level not specified in Table S-1)
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: aithala-2026-magmatic-iron-redox-to-2100c
+  locator:
+    page: 13
+    published_page: SI-7
+    table: S-1
+    note: Mössbauer determination for VF270. VF data were also previously published in Aithala, Lange & Hirschmann (2026),
+      as noted in SI-1–SI-3 (PDF pp. 7–9).
+  read_from: pdf:aithala-2026-magmatic-iron-redox-to-2100c
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1723.15'
+      locator:
+        page: 13
+        published_page: SI-7
+        table: S-1
+        note: Mössbauer determination for VF270. VF data were also previously published in Aithala, Lange & Hirschmann (2026),
+          as noted in SI-1–SI-3 (PDF pp. 7–9).
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - pdf:aithala-2026-magmatic-iron-redox-to-2100c
+    parameters: []
+    output_unit: Pa
+- observation_id: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_vf270_wdsepma_composition
+  experiment_id: 10.7185/geochemlet.2617::experiment::aithala-2026-vf270
+  identity:
+    quantity:
+      tag: unknown
+      reason: source does not state a closed quantity
+    species:
+      formula: silicate_melt
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    total_pressure_Pa:
+      tag: value
+      value: '100000'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; source does not state a closed quantity; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: aithala-2026-magmatic-iron-redox-to-2100c
+  locator:
+    page: 14
+    published_page: SI-8
+    table: S-2
+    note: WDS EPMA composition for VF270; all oxide columns in wt.% as printed.
+  read_from: pdf:aithala-2026-magmatic-iron-redox-to-2100c
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - pdf:aithala-2026-magmatic-iron-redox-to-2100c
+    parameters: []
+    output_unit: Pa
+- observation_id: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_vf270_xanes
+  experiment_id: 10.7185/geochemlet.2617::experiment::aithala-2026-vf270
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'Fe3+/FeT'
+    species:
+      formula: Fe
+      phase:
+        tag: unknown
+        reason: phase string 'quenched silicate glass' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1723.15'
+    total_pressure_Pa:
+      tag: value
+      value: '100000'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'Fe3+/FeT'; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      Fe3_over_FeT: ±0.016 (as printed; confidence level not specified in Table S-1)
+      XANES_centroid_eV: ±0.012 (as printed)
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: aithala-2026-magmatic-iron-redox-to-2100c
+  locator:
+    page: 13
+    published_page: SI-7
+    table: S-1
+    note: XANES determination for VF270. VF data were also previously published in Aithala, Lange & Hirschmann (2026), as
+      noted in SI-1–SI-3 (PDF pp. 7–9). Fe K-edge XANES calibration is against Mössbauer-standardized martian basalt glasses
+      (SI-2–SI-3, PDF pp. 8–9).
+  read_from: pdf:aithala-2026-magmatic-iron-redox-to-2100c
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1723.15'
+      locator:
+        page: 13
+        published_page: SI-7
+        table: S-1
+        note: XANES determination for VF270. VF data were also previously published in Aithala, Lange & Hirschmann (2026),
+          as noted in SI-1–SI-3 (PDF pp. 7–9). Fe K-edge XANES calibration is against Mössbauer-standardized martian basalt
+          glasses (SI-2–SI-3, PDF pp. 8–9).
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - pdf:aithala-2026-magmatic-iron-redox-to-2100c
+    parameters: []
+    output_unit: Pa
+- observation_id: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_vf271_wdsepma_composition
+  experiment_id: 10.7185/geochemlet.2617::experiment::aithala-2026-vf271
+  identity:
+    quantity:
+      tag: unknown
+      reason: source does not state a closed quantity
+    species:
+      formula: silicate_melt
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    total_pressure_Pa:
+      tag: value
+      value: '100000'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; source does not state a closed quantity; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: aithala-2026-magmatic-iron-redox-to-2100c
+  locator:
+    page: 14
+    published_page: SI-8
+    table: S-2
+    note: WDS EPMA composition for VF271; all oxide columns in wt.% as printed. The 1250 °C VF271 sample was partially crystallised
+      and below the starting composition's liquidus (SI-3, PDF p. 9); VF data were previously published in Aithala, Lange
+      & Hirschmann (2026).
+  read_from: pdf:aithala-2026-magmatic-iron-redox-to-2100c
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - pdf:aithala-2026-magmatic-iron-redox-to-2100c
+    parameters: []
+    output_unit: Pa
+- observation_id: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_vf271_xanes
+  experiment_id: 10.7185/geochemlet.2617::experiment::aithala-2026-vf271
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'Fe3+/FeT'
+    species:
+      formula: Fe
+      phase:
+        tag: unknown
+        reason: phase string 'quenched silicate glass' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1523.15'
+    total_pressure_Pa:
+      tag: value
+      value: '100000'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'Fe3+/FeT'; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      Fe3_over_FeT: ±0.019 (as printed; confidence level not specified in Table S-1)
+      XANES_centroid_eV: ±0.008 (as printed)
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: aithala-2026-magmatic-iron-redox-to-2100c
+  locator:
+    page: 13
+    published_page: SI-7
+    table: S-1
+    note: XANES determination for VF271. VF data were also previously published in Aithala, Lange & Hirschmann (2026), as
+      noted in SI-1–SI-3 (PDF pp. 7–9). Fe K-edge XANES calibration is against Mössbauer-standardized martian basalt glasses
+      (SI-2–SI-3, PDF pp. 8–9). The 1250 °C VF271 sample was partially crystallised and below the starting composition's liquidus
+      (SI-3, PDF p. 9).
+  read_from: pdf:aithala-2026-magmatic-iron-redox-to-2100c
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1523.15'
+      locator:
+        page: 13
+        published_page: SI-7
+        table: S-1
+        note: XANES determination for VF271. VF data were also previously published in Aithala, Lange & Hirschmann (2026),
+          as noted in SI-1–SI-3 (PDF pp. 7–9). Fe K-edge XANES calibration is against Mössbauer-standardized martian basalt
+          glasses (SI-2–SI-3, PDF pp. 8–9). The 1250 °C VF271 sample was partially crystallised and below the starting composition's
+          liquidus (SI-3, PDF p. 9).
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - pdf:aithala-2026-magmatic-iron-redox-to-2100c
+    parameters: []
+    output_unit: Pa
+- observation_id: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_vf274_moessbauer
+  experiment_id: 10.7185/geochemlet.2617::experiment::aithala-2026-vf274
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'Fe3+/FeT'
+    species:
+      formula: Fe
+      phase:
+        tag: unknown
+        reason: phase string 'quenched silicate glass' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1773.15'
+    total_pressure_Pa:
+      tag: value
+      value: '100000'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'Fe3+/FeT'; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      Fe3_over_FeT: ±0.023 (as printed; confidence level not specified in Table S-1)
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: aithala-2026-magmatic-iron-redox-to-2100c
+  locator:
+    page: 13
+    published_page: SI-7
+    table: S-1
+    note: Mössbauer determination for VF274. VF data were also previously published in Aithala, Lange & Hirschmann (2026),
+      as noted in SI-1–SI-3 (PDF pp. 7–9).
+  read_from: pdf:aithala-2026-magmatic-iron-redox-to-2100c
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1773.15'
+      locator:
+        page: 13
+        published_page: SI-7
+        table: S-1
+        note: Mössbauer determination for VF274. VF data were also previously published in Aithala, Lange & Hirschmann (2026),
+          as noted in SI-1–SI-3 (PDF pp. 7–9).
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - pdf:aithala-2026-magmatic-iron-redox-to-2100c
+    parameters: []
+    output_unit: Pa
+- observation_id: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_vf274_wdsepma_composition
+  experiment_id: 10.7185/geochemlet.2617::experiment::aithala-2026-vf274
+  identity:
+    quantity:
+      tag: unknown
+      reason: source does not state a closed quantity
+    species:
+      formula: silicate_melt
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    total_pressure_Pa:
+      tag: value
+      value: '100000'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; source does not state a closed quantity; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: aithala-2026-magmatic-iron-redox-to-2100c
+  locator:
+    page: 14
+    published_page: SI-8
+    table: S-2
+    note: WDS EPMA composition for VF274; all oxide columns in wt.% as printed.
+  read_from: pdf:aithala-2026-magmatic-iron-redox-to-2100c
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - pdf:aithala-2026-magmatic-iron-redox-to-2100c
+    parameters: []
+    output_unit: Pa
+- observation_id: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_vf274_xanes
+  experiment_id: 10.7185/geochemlet.2617::experiment::aithala-2026-vf274
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'Fe3+/FeT'
+    species:
+      formula: Fe
+      phase:
+        tag: unknown
+        reason: phase string 'quenched silicate glass' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '1773.15'
+    total_pressure_Pa:
+      tag: value
+      value: '100000'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'Fe3+/FeT'; refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      Fe3_over_FeT: ±0.012 (as printed; confidence level not specified in Table S-1)
+      XANES_centroid_eV: ±0.005 (as printed)
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: aithala-2026-magmatic-iron-redox-to-2100c
+  locator:
+    page: 13
+    published_page: SI-7
+    table: S-1
+    note: XANES determination for VF274. VF data were also previously published in Aithala, Lange & Hirschmann (2026), as
+      noted in SI-1–SI-3 (PDF pp. 7–9). Fe K-edge XANES calibration is against Mössbauer-standardized martian basalt glasses
+      (SI-2–SI-3, PDF pp. 8–9).
+  read_from: pdf:aithala-2026-magmatic-iron-redox-to-2100c
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1773.15'
+      locator:
+        page: 13
+        published_page: SI-7
+        table: S-1
+        note: XANES determination for VF274. VF data were also previously published in Aithala, Lange & Hirschmann (2026),
+          as noted in SI-1–SI-3 (PDF pp. 7–9). Fe K-edge XANES calibration is against Mössbauer-standardized martian basalt
+          glasses (SI-2–SI-3, PDF pp. 8–9).
+  derivation:
+    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    inputs:
+    - pdf:aithala-2026-magmatic-iron-redox-to-2100c
+    parameters: []
+    output_unit: Pa

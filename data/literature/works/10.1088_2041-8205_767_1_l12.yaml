@@ -8,9 +8,27 @@ work:
   source_files:
     corpus_repo: regolith-corpus
     corpus_commit:
-      tag: unknown
-      reason: INDEX does not give corpus commit
+      tag: value
+      value: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
     files:
+    - asset_id: pdf:visscher-fegley-2013-debris-disks
+      role: pdf
+      path: raw/visscher-fegley-2013-debris-disks/visscher-fegley-2013-debris-disks.pdf
+      sha256:
+        tag: value
+        value: c9d44445d91f449a950b4192f0f3219d500ef4833685aa65a2abe673b696aefb
+    - asset_id: pdftotext:visscher-fegley-2013-debris-disks
+      role: pdftotext
+      path: text/visscher-fegley-2013-debris-disks
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: tables:visscher-fegley-2013-debris-disks
+      role: table_csv
+      path: tables/visscher-fegley-2013-debris-disks
+      sha256:
+        tag: unknown
+        reason: INDEX does not give table sha256
     - asset_id: unknown:visscher-fegley-2013-debris-disks
       role: pdftotext
       path: unknown

@@ -7,9 +7,27 @@ work:
   source_files:
     corpus_repo: regolith-corpus
     corpus_commit:
-      tag: unknown
-      reason: INDEX does not give corpus commit
+      tag: value
+      value: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
     files:
+    - asset_id: pdf:nasa-tm-2024-simulant-guide
+      role: pdf
+      path: raw/nasa-tm-2024-simulant-guide/nasa-tm-2024-simulant-guide.pdf
+      sha256:
+        tag: value
+        value: 52e52b195ef25e26004c8bb06b9d88614c64dcf3d0a8f4a3a5c64b94d3cd9c16
+    - asset_id: pdftotext:nasa-tm-2024-simulant-guide
+      role: pdftotext
+      path: text/nasa-tm-2024-simulant-guide
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: tables:nasa-tm-2024-simulant-guide
+      role: table_csv
+      path: tables/nasa-tm-2024-simulant-guide
+      sha256:
+        tag: unknown
+        reason: INDEX does not give table sha256
     - asset_id: unknown:nasa-tm-2024-simulant-guide
       role: pdftotext
       path: unknown

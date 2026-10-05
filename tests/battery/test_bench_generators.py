@@ -9,7 +9,7 @@ import pytest
 
 from simulator.battery.consumer_inputs import collect_consumer_inputs, REQUIREMENTS
 from simulator.battery.generators import engine_point_requests, kems_case, vacuum_pyrolysis_preset
-from simulator.battery.enums import AmountBasis, BenchIdentityBasis, ValueKind
+from simulator.battery.enums import AmountBasis, BenchIdentityBasis, MethodToken, ValueKind
 from simulator.battery.records import (
     Bench, BenchIdentity, BenchReference, Composition, Sample, State, Value,
     Derivation, FO2Control, ThermalSchedule, ThermalPoint, ApparatusGeometry,
@@ -23,6 +23,14 @@ from tests.battery import factories as f
 
 
 def case(*, single=False, pressure="1", oxygen=True):
+    """Knudsen fixture with explicit sample pressure for prediction.
+
+    Experiment ``total_pressure_Pa`` remains chamber background. Observation
+    ``point_conditions.total_pressure_Pa`` is source-grounded in-cell evidence
+    so engine-point / composition tests do not inherit chamber as system P.
+    Vacuum-bound oxygen tests that mean to use experiment total must clear the
+    observation pressure and use a non-Knudsen method (or assert the Knudsen gap).
+    """
     experiment = replace(f.kems_experiment(total_P=Decimal(pressure)),
         sample=Sample(mass_kg=f.located(Value.point_of("0.0001")),
             printed_composition=f.located({"MgO": Decimal(100)} if single else {"MgO": Decimal(50), "SiO2": Decimal(50)})),
@@ -35,11 +43,31 @@ def case(*, single=False, pressure="1", oxygen=True):
         clausing_factor=f.located(Value.point_of("0.5")))
     bench = Bench("bench", "work-1", BenchIdentity(BenchIdentityBasis.DESCRIBED_IN_THIS_WORK),
                   geometry=geometry, cell_material_and_liner=f.located("Pt"))
-    point = {"temperature_K": f.located(Decimal(1400))}
+    point = {
+        "temperature_K": f.located(Decimal(1400)),
+        # Explicit sample pressure (not chamber inheritance) for prediction routes.
+        "total_pressure_Pa": f.located(Decimal(pressure)),
+    }
     if oxygen:
         point["fO2_log"] = f.located(Decimal(-9))
     observation = replace(f.observation("obs", experiment.experiment_id, f.o2_identity(), 1), point_conditions=point)
     return experiment, bench, observation
+
+
+def _clear_sample_pressure(observation):
+    return replace(
+        observation,
+        point_conditions={
+            key: value
+            for key, value in observation.point_conditions.items()
+            if key != "total_pressure_Pa"
+        },
+    )
+
+
+def _as_langmuir(experiment):
+    """Non-Knudsen method: experiment total may still feed oxygen derivations."""
+    return replace(experiment, method=State.of(MethodToken.LANGMUIR_FREE_EVAPORATION))
 
 
 def complete_kems():
@@ -104,6 +132,8 @@ def test_uncontrolled_oxygen_refuses_every_engine():
 
 def test_vacuum_total_pressure_supplies_flagged_oxygen_bound_to_engine():
     experiment, bench, observation = case(oxygen=False, pressure="1e-4")
+    experiment = _as_langmuir(experiment)
+    observation = _clear_sample_pressure(observation)
     experiment = replace(experiment, pressure_environment=replace(
         experiment.pressure_environment,
         total_pressure_Pa=f.located(
@@ -131,6 +161,8 @@ def test_vacuum_total_pressure_supplies_flagged_oxygen_bound_to_engine():
 
 def test_converted_printed_run_vacuum_supplies_oxygen_bound():
     experiment, bench, observation = case(oxygen=False, pressure="1e-4")
+    experiment = _as_langmuir(experiment)
+    observation = _clear_sample_pressure(observation)
     pressure = Located(
         State.of(Value.point_of("0.01333223684210526315789473684")),
         locator=f.loc(note="printed vacuum during run"),
@@ -155,6 +187,8 @@ def test_converted_printed_run_vacuum_supplies_oxygen_bound():
 
 def test_approximate_printed_run_vacuum_stays_approximate():
     experiment, bench, observation = case(oxygen=False, pressure="1e-4")
+    experiment = _as_langmuir(experiment)
+    observation = _clear_sample_pressure(observation)
     experiment = replace(
         experiment,
         pressure_environment=replace(
@@ -175,6 +209,8 @@ def test_approximate_printed_run_vacuum_stays_approximate():
 
 def test_oxygen_precedence_keeps_printed_and_derived_routes_above_vacuum_bound():
     experiment, bench, observation = case(pressure="1e-4")
+    experiment = _as_langmuir(experiment)
+    observation = _clear_sample_pressure(observation)
     experiment = replace(
         experiment,
         pressure_environment=replace(
@@ -214,6 +250,8 @@ def test_oxygen_precedence_keeps_printed_and_derived_routes_above_vacuum_bound()
 
 def test_apparatus_ultimate_vacuum_without_run_pressure_refuses_oxygen_bound():
     experiment, bench, observation = case(oxygen=False)
+    experiment = _as_langmuir(experiment)
+    observation = _clear_sample_pressure(observation)
     pressure = replace(
         experiment.pressure_environment,
         total_pressure_Pa=Located(State.unknown("apparatus-only ultimate vacuum")),
@@ -227,6 +265,8 @@ def test_apparatus_ultimate_vacuum_without_run_pressure_refuses_oxygen_bound():
 
 def test_inferred_run_pressure_refuses_oxygen_bound():
     experiment, bench, observation = case(oxygen=False, pressure="1e-4")
+    experiment = _as_langmuir(experiment)
+    observation = _clear_sample_pressure(observation)
     inferred = Located(
         State.of(Value.point_of("1e-4")),
         locator=f.loc(note="vacuum inferred from gas load and pumping speed"),
@@ -248,6 +288,8 @@ def test_inferred_run_pressure_refuses_oxygen_bound():
 
 def test_buffer_derivation_and_domain():
     experiment, bench, observation = case(oxygen=False, pressure="100000")
+    experiment = _as_langmuir(experiment)
+    observation = _clear_sample_pressure(observation)
     experiment = replace(experiment, fO2_control=FO2Control(State.unknown("buffer"), buffer=f.located("IW")))
     observation = replace(observation, point_conditions={"temperature_K": f.located(Decimal(1000))})
     result = oxygen_condition(experiment, bench, observation).selected
@@ -261,6 +303,8 @@ def test_buffer_derivation_and_domain():
 
 def test_printed_gas_composition_derives_oxygen():
     experiment, bench, observation = case(oxygen=False, pressure="100000")
+    experiment = _as_langmuir(experiment)
+    observation = _clear_sample_pressure(observation)
     observation = replace(observation, point_conditions={**observation.point_conditions,
         "gas_composition": f.located(Composition("gas", (("O2", Decimal(".2")), ("Ar", Decimal(".8"))), AmountBasis.MOLE_FRACTION))})
     result = oxygen_condition(experiment, bench, observation).selected
@@ -272,6 +316,8 @@ def test_printed_control_pressure_outranks_gas_composition_derivation():
     """A printed fO2-control pO2 is direct evidence; the observation
     gas_composition x_O2 * P_total derivation must not shadow it."""
     experiment, bench, observation = case(oxygen=False, pressure="100000")
+    experiment = _as_langmuir(experiment)
+    observation = _clear_sample_pressure(observation)
     experiment = replace(experiment, fO2_control=FO2Control(State.unknown("channel"),
         oxygen_partial_pressure_Pa=f.located(Value.point_of(1))))
     observation = replace(observation, point_conditions={**observation.point_conditions,

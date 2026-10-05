@@ -8,9 +8,27 @@ work:
   source_files:
     corpus_repo: regolith-corpus
     corpus_commit:
-      tag: unknown
-      reason: INDEX does not give corpus commit
+      tag: value
+      value: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
     files:
+    - asset_id: pdf:shornikov-1994-mullite-kems
+      role: pdf
+      path: raw/shornikov-1994-mullite-kems/shornikov-1994-mullite-kems.pdf
+      sha256:
+        tag: value
+        value: 204dbd22c9c28c29ab5bd8d261143cda2dddd51be3d1d198609bb6422210df54
+    - asset_id: pdftotext:shornikov-1994-mullite-kems
+      role: pdftotext
+      path: text/shornikov-1994-mullite-kems
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: tables:shornikov-1994-mullite-kems
+      role: table_csv
+      path: tables/shornikov-1994-mullite-kems
+      sha256:
+        tag: unknown
+        reason: INDEX does not give table sha256
     - asset_id: unknown:shornikov-1994-mullite-kems
       role: pdftotext
       path: unknown

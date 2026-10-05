@@ -10,7 +10,7 @@ work:
     corpus_repo: regolith-corpus
     corpus_commit:
       tag: value
-      value: 2ef619255debb2beb4718b52908a77d8cf504b5f
+      value: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
     files:
     - asset_id: pdf:kems-116-nunoue-1987
       role: pdf
@@ -65,6 +65,14 @@ experiments:
       regime_class:
         tag: unknown
         reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+    cell_internal_pressure_note:
+      state:
+        tag: value
+        value: unstated; KEMS chamber pressure not printed as a number
+      locator:
+        published_page: 869
+        pdf_page_index: 2
+        section: '2.1'
   work_id: 10.2355/tetsutohagane1955.73.7_868
   locator:
     published_page: 872
@@ -136,6 +144,14 @@ experiments:
       regime_class:
         tag: unknown
         reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+    cell_internal_pressure_note:
+      state:
+        tag: value
+        value: unstated; KEMS chamber pressure not printed as a number
+      locator:
+        published_page: 869
+        pdf_page_index: 2
+        section: '2.1'
   work_id: 10.2355/tetsutohagane1955.73.7_868
   locator:
     published_page: 868

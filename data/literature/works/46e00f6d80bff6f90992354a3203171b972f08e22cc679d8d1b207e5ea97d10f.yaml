@@ -8,9 +8,27 @@ work:
   source_files:
     corpus_repo: regolith-corpus
     corpus_commit:
-      tag: unknown
-      reason: INDEX does not give corpus commit
+      tag: value
+      value: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
     files:
+    - asset_id: pdf:stolyarova-1996-cao-alumina-silica-kems
+      role: pdf
+      path: raw/stolyarova-1996-cao-alumina-silica-kems/stolyarova-1996-cao-alumina-silica-kems.pdf
+      sha256:
+        tag: value
+        value: ec6b2f1bc4e3f9202e31aa35dc4cd966d76c30a420ea29afbfac68eb5ecc8434
+    - asset_id: pdftotext:stolyarova-1996-cao-alumina-silica-kems
+      role: pdftotext
+      path: text/stolyarova-1996-cao-alumina-silica-kems
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: tables:stolyarova-1996-cao-alumina-silica-kems
+      role: table_csv
+      path: tables/stolyarova-1996-cao-alumina-silica-kems
+      sha256:
+        tag: unknown
+        reason: INDEX does not give table sha256
     - asset_id: unknown:stolyarova-1996-cao-alumina-silica-kems
       role: pdftotext
       path: unknown

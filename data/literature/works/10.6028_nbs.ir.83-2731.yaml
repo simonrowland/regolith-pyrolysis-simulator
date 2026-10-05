@@ -10,7 +10,7 @@ work:
     corpus_repo: regolith-corpus
     corpus_commit:
       tag: value
-      value: 2ef619255debb2beb4718b52908a77d8cf504b5f
+      value: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
     files:
     - asset_id: pdf:kems-027-plante-hastie-1983
       role: pdf
@@ -59,48 +59,49 @@ experiments:
           basis: printed_oxides
           components:
           - - SiO2
-            - '0.562871824962'
+            - '0.5938921583'
           - - Fe2O3
-            - '0.05278289609'
+            - '0.047758470182'
           - - Al2O3
-            - '0.031000156787'
+            - '0.030921702324'
           - - B2O3
-            - '0.068103589059'
+            - '0.06187701184'
           - - Li2O
-            - '0.111009946581'
+            - '0.087968881039'
           - - Na2O
-            - '0.10629819493'
+            - '0.091992362541'
           - - MnO2
-            - '0.024313151875'
+            - '0.027256386715'
           - - NiO
-            - '0.009142619817'
+            - '0.015995434101'
           - - CaO
-            - '0.01844039113'
+            - '0.011954641096'
           - - MgO
-            - '0.01097282716'
+            - '0.008892943842'
           - - ZrO2
-            - '0.003694601161'
+            - '0.020415071092'
           - - SrO
-            - '0.0005648861'
+            - '0.000320280537'
           - - Cs2O
-            - '0.000230781783'
+            - '0.000164870034'
           - - RuO2
-            - '0.000439872342'
+            - '0.00054867983'
           - - Re2O7
-            - '0.000134260223'
+            - '0.000041106527'
           amount_basis: mole_fraction
       locator:
         published_page: 3
         pdf_page_index: 9
         table: '1'
-        note: Nominal Weight % column selected because the source says it was used for thermodynamic estimates; normalized
-          mole fractions derived from the printed oxide wt% values
+        note: Analytical Weight % column selected as the measured KMS sample assay (Table 1); normalized mole fractions derived
+          from the printed oxide wt% values for all 15 components; nominal column retained under printed_composition for thermodynamic-estimate
+          role
       inference:
         relation: wt_pct_to_mole_fraction
         inputs:
         - x_i = (w_i / M_i) / sum_j(w_j / M_j)
         - original_unit=wt_pct
-        - nominal column selected as printed for thermodynamic estimates
+        - analytical column selected as printed measured sample assay for KMS measured records
         parameters: []
         output_unit: mole_fraction
     printed_composition:

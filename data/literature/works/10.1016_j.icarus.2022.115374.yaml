@@ -8,9 +8,27 @@ work:
   source_files:
     corpus_repo: regolith-corpus
     corpus_commit:
-      tag: unknown
-      reason: INDEX does not give corpus commit
+      tag: value
+      value: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
     files:
+    - asset_id: pdf:mogul-2023-pioneer-venus-co2-icarus
+      role: pdf
+      path: raw/mogul-2023-pioneer-venus-co2-icarus/mogul-2023-pioneer-venus-co2-icarus.pdf
+      sha256:
+        tag: value
+        value: 2e0f706260d6b9314f76021d6f48ca74155ccbec2ddc978a618c9c50adde6f6f
+    - asset_id: pdftotext:mogul-2023-pioneer-venus-co2-icarus
+      role: pdftotext
+      path: text/mogul-2023-pioneer-venus-co2-icarus
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: tables:mogul-2023-pioneer-venus-co2-icarus
+      role: table_csv
+      path: tables/mogul-2023-pioneer-venus-co2-icarus
+      sha256:
+        tag: unknown
+        reason: INDEX does not give table sha256
     - asset_id: unknown:mogul-2023-pioneer-venus-co2-icarus
       role: pdftotext
       path: unknown

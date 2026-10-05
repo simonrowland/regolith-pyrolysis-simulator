@@ -49,14 +49,15 @@ def _unknown():
 
 
 def test_oxygen_gap_omits_temperature_and_pressure_that_resolved() -> None:
+    # Temperature resolves from experiment conditions. Knudsen chamber total
+    # is not sample oxygen pressure (P1), so total_pressure_Pa stays missing.
     experiment = replace(factories.kems_experiment(), fO2_control=None)
     result = oxygen_condition(experiment, _bench())
     assert result.selected is None
     assert result.absence is not None
     assert result.absence.reason is GapReason.MISSING_EVIDENCE
-    assert result.absence.missing == ("fO2_log", "experiment.fO2_control")
+    assert result.absence.missing == ("fO2_log", "experiment.fO2_control", "total_pressure_Pa")
     assert "temperature_K" not in result.absence.missing
-    assert "total_pressure_Pa" not in result.absence.missing
 
 
 def test_oxygen_gap_keeps_the_full_set_when_nothing_resolved() -> None:
@@ -101,7 +102,8 @@ def test_reporting_a_shorter_gap_does_not_make_the_consumer_ready() -> None:
     assert engine.status is ReadinessStatus.GAP
     oxygen = next(gap for gap in engine.gaps if gap.waypoint == "oxygen_condition")
     assert "temperature_K" not in oxygen.missing
-    assert "total_pressure_Pa" not in oxygen.missing
+    # Knudsen chamber total does not resolve sample oxygen pressure (P1).
+    assert "total_pressure_Pa" in oxygen.missing
 
 
 def test_pressure_boundary_omits_a_present_pump_speed() -> None:
@@ -276,7 +278,8 @@ def test_conditions_fo2_log_is_not_oxygen_evidence() -> None:
     )
     assert result.selected is None
     assert result.absence is not None
-    assert result.absence.missing == ("fO2_log", "experiment.fO2_control")
+    # Knudsen chamber total is not sample oxygen pressure (P1).
+    assert result.absence.missing == ("fO2_log", "experiment.fO2_control", "total_pressure_Pa")
 
 
 def test_unusable_fo2_control_stays_in_the_gap() -> None:
@@ -336,7 +339,8 @@ def test_published_buffer_stays_present_when_temperature_is_absent() -> None:
     assert result.selected is None
     assert result.absence is not None
     assert "experiment.fO2_control" not in result.absence.missing
-    assert result.absence.missing == ("fO2_log", "temperature_K")
+    # Buffer present; temperature absent; Knudsen chamber total not usable (P1).
+    assert result.absence.missing == ("fO2_log", "temperature_K", "total_pressure_Pa")
 
 
 def test_categorical_mass_does_not_emit_an_empty_charge_gap() -> None:

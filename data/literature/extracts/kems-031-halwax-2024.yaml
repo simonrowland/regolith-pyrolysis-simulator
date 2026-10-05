@@ -118,6 +118,23 @@ experiments:
     temperature_K:
       state: {tag: unknown, reason: not_published}
       locator: {page: 825, section: 'III. Experimental', note: 'The polythermal range is retained in thermal_schedule; no single series setpoint'}
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        page: 825
+        section: 'III. Experimental'
+        note: "Measurement-time chamber background not printed; page-825 below-10^-5-mbar threshold is pre-heating pump-down only (see observation equipment residual_pressure_Pa_as_printed)"
+        quote: "As soon as the pressure decreased below 10^-5 mbar, heating could be started."
+    sweep_gas:
+      state: {tag: not_applicable, reason: not_applicable}
+      locator: {page: 825, section: 'III. Experimental'}
+    regime:
+      regime_class:
+        tag: unknown
+        reason: not_published
   thermal_schedule:
     setpoints_and_holds:
     - temperature_K:
@@ -167,7 +184,6 @@ species:
         - O(g)
         - O2(g)
         sample_mass_approx_mg: 50.0
-        chamber_pressure_start_mbar: 1.0e-05
         missing_for_motzfeldt:
         - clausing_factor
         - orifice_channel_length
@@ -175,10 +191,10 @@ species:
         missing_note: Lid orifice diameter 0.3 mm stated without channel length — Clausing not invented.
           Sample free-surface area not stated (powder load ~50 mg).
       equipment:
-        chamber_pressure:
-          value: 1.0e-05
-          units: mbar
-          locator: {page: 825, section: 'III. Experimental', note: 'Starting chamber pressure as printed; unit conversion only'}
+        residual_pressure_Pa_as_printed:
+          value: "Starting chamber pressure below 1e-5 mbar (<0.001 Pa) reached BEFORE heating; pump-down/startup context only — not a bound on background during hot measurements"
+          quote: "As soon as the pressure decreased below 10^-5 mbar, heating could be started."
+          locator: {page: 825, section: 'III. Experimental', note: 'Pre-heating pump-down threshold as printed; timing before heating; unit conversion only'}
       uncertainty:
         note: temperature systematic ±5 K estimated by authors; ΔfH product is primary result (not α)
     - observation_id: halwax_2024_mgo_third_law_formation_enthalpy

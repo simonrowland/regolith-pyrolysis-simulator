@@ -1,0 +1,361 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/extracts/robie-hemingway-wilson-1980-usgs-of-80-908.yaml
+observations:
+- observation_id: robie-hemingway-wilson-1980-usgs-of-80-908::t1101_robie1980_Ca2SiO4_alpha_prime_summary_29815
+  experiment_id: d34c16208ffa23e9808d5dc08844a0ed0347da79bba710f557aedc1071a2e3ea::robie-hemingway-wilson-1980-usgs-of-80-908
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'summary_thermodynamic_properties_at_298.15_K'
+    species:
+      formula: Ca2SiO4
+      phase:
+        tag: unknown
+        reason: phase string 'alpha prime' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '298.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'summary_thermodynamic_properties_at_298.15_K';
+      refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: compilation_assessed
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: robie-hemingway-wilson-1980-usgs-of-80-908
+  locator:
+    published_page: 113
+    pdf_page_index: 114
+    table: Summary of Critical Data
+  read_from: pdf:robie-hemingway-wilson-1980-usgs-of-80-908
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '298.15'
+      locator:
+        published_page: 113
+        pdf_page_index: 114
+        table: Summary of Critical Data
+- observation_id: robie-hemingway-wilson-1980-usgs-of-80-908::t1101_robie1980_Ca2SiO4_beta_larnite_summary_29815
+  experiment_id: d34c16208ffa23e9808d5dc08844a0ed0347da79bba710f557aedc1071a2e3ea::robie-hemingway-wilson-1980-usgs-of-80-908
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'summary_thermodynamic_properties_at_298.15_K'
+    species:
+      formula: Ca2SiO4
+      phase:
+        tag: unknown
+        reason: phase string 'beta (larnite)' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '298.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'summary_thermodynamic_properties_at_298.15_K';
+      refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: compilation_assessed
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: robie-hemingway-wilson-1980-usgs-of-80-908
+  locator:
+    published_page: 118
+    pdf_page_index: 119
+    table: Summary of Critical Data
+  read_from: pdf:robie-hemingway-wilson-1980-usgs-of-80-908
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '298.15'
+      locator:
+        published_page: 118
+        pdf_page_index: 119
+        table: Summary of Critical Data
+- observation_id: robie-hemingway-wilson-1980-usgs-of-80-908::t1101_robie1980_Ca2SiO4_ca_olivine_reference_summary_29815
+  experiment_id: d34c16208ffa23e9808d5dc08844a0ed0347da79bba710f557aedc1071a2e3ea::robie-hemingway-wilson-1980-usgs-of-80-908
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'summary_thermodynamic_properties_at_298.15_K'
+    species:
+      formula: Ca2SiO4
+      phase:
+        tag: unknown
+        reason: phase string 'Ca-olivine reference state' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '298.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'summary_thermodynamic_properties_at_298.15_K';
+      refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: compilation_assessed
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: robie-hemingway-wilson-1980-usgs-of-80-908
+  locator:
+    published_page: 107
+    pdf_page_index: 108
+    table: Summary of Critical Data
+  read_from: pdf:robie-hemingway-wilson-1980-usgs-of-80-908
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '298.15'
+      locator:
+        published_page: 107
+        pdf_page_index: 108
+        table: Summary of Critical Data
+- observation_id: robie-hemingway-wilson-1980-usgs-of-80-908::t1101_robie1980_Ca2SiO4_gamma_summary_29815
+  experiment_id: d34c16208ffa23e9808d5dc08844a0ed0347da79bba710f557aedc1071a2e3ea::robie-hemingway-wilson-1980-usgs-of-80-908
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'summary_thermodynamic_properties_at_298.15_K'
+    species:
+      formula: Ca2SiO4
+      phase:
+        tag: unknown
+        reason: phase string 'gamma (Ca olivine)' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '298.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'summary_thermodynamic_properties_at_298.15_K';
+      refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: compilation_assessed
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: robie-hemingway-wilson-1980-usgs-of-80-908
+  locator:
+    published_page: 116
+    pdf_page_index: 117
+    table: Summary of Critical Data
+  read_from: pdf:robie-hemingway-wilson-1980-usgs-of-80-908
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '298.15'
+      locator:
+        published_page: 116
+        pdf_page_index: 117
+        table: Summary of Critical Data
+- observation_id: robie-hemingway-wilson-1980-usgs-of-80-908::t1101_robie1980_Ca2SiO4_larnite_reference_summary_29815
+  experiment_id: d34c16208ffa23e9808d5dc08844a0ed0347da79bba710f557aedc1071a2e3ea::robie-hemingway-wilson-1980-usgs-of-80-908
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'summary_thermodynamic_properties_at_298.15_K'
+    species:
+      formula: Ca2SiO4
+      phase:
+        tag: unknown
+        reason: phase string 'larnite reference state' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '298.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'summary_thermodynamic_properties_at_298.15_K';
+      refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: compilation_assessed
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: robie-hemingway-wilson-1980-usgs-of-80-908
+  locator:
+    published_page: 109
+    pdf_page_index: 110
+    table: Summary of Critical Data
+  read_from: pdf:robie-hemingway-wilson-1980-usgs-of-80-908
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '298.15'
+      locator:
+        published_page: 109
+        pdf_page_index: 110
+        table: Summary of Critical Data
+- observation_id: robie-hemingway-wilson-1980-usgs-of-80-908::t1101_robie1980_ca2sio4_alpha_summary_29815_absent
+  experiment_id: d34c16208ffa23e9808d5dc08844a0ed0347da79bba710f557aedc1071a2e3ea::robie-hemingway-wilson-1980-usgs-of-80-908
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'summary_thermodynamic_properties_at_298.15_K'
+    species:
+      formula: Ca2SiO4
+      phase:
+        tag: unknown
+        reason: phase string 'alpha' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '298.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'summary_thermodynamic_properties_at_298.15_K';
+      refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: compilation_assessed
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: robie-hemingway-wilson-1980-usgs-of-80-908
+  locator:
+    published_page: 111
+    pdf_page_index: 112
+    table: Summary of Critical Data
+  read_from: pdf:robie-hemingway-wilson-1980-usgs-of-80-908
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '298.15'
+      locator:
+        published_page: 111
+        pdf_page_index: 112
+        table: Summary of Critical Data
+- observation_id: robie-hemingway-wilson-1980-usgs-of-80-908::t1101_robie1980_gehlenite_summary_29815
+  experiment_id: d34c16208ffa23e9808d5dc08844a0ed0347da79bba710f557aedc1071a2e3ea::robie-hemingway-wilson-1980-usgs-of-80-908
+  identity:
+    quantity:
+      tag: unknown
+      reason: unsupported quantity 'summary_thermodynamic_properties_at_298.15_K'
+    species:
+      formula: Ca2Al2SiO7
+      phase:
+        tag: unknown
+        reason: phase string 'gehlenite' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    temperature_K:
+      tag: value
+      value: '298.15'
+  value:
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; unsupported quantity 'summary_thermodynamic_properties_at_298.15_K';
+      refusing to pick a number
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: compilation_assessed
+  admission:
+    status: pending
+    reason: no observation admission_status mapped from source
+  notices: []
+  source_id: robie-hemingway-wilson-1980-usgs-of-80-908
+  locator:
+    published_page: 64
+    pdf_page_index: 65
+    table: Summary of Critical Data
+  read_from: pdf:robie-hemingway-wilson-1980-usgs-of-80-908
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '298.15'
+      locator:
+        published_page: 64
+        pdf_page_index: 65
+        table: Summary of Critical Data

@@ -4,13 +4,38 @@ work:
   citation: Lange, R. A., De Yoreo, J. J. & Navrotsky, A. (1991), "Scanning calorimetric measurement of heat capacity during
     incongruent melting of diopside", American Mineralogist 76, 904-912.
   source_ids:
+  - ammin-76-904-lange-1991
   - ammin-76-904
   source_files:
     corpus_repo: regolith-corpus
     corpus_commit:
-      tag: unknown
-      reason: INDEX does not give corpus commit
+      tag: value
+      value: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
     files:
+    - asset_id: pdf:ammin-76-904-lange-1991
+      role: pdf
+      path: raw/ammin-76-904/ammin-76-904.pdf
+      sha256:
+        tag: value
+        value: 7571d8ebc75a80c81634525a22ed53886da0bfaaba9ad7d6658e6ea827d94342
+    - asset_id: pdftotext:ammin-76-904-lange-1991
+      role: pdftotext
+      path: text/ammin-76-904-lange-1991
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: tables:ammin-76-904-lange-1991
+      role: table_csv
+      path: tables/ammin-76-904-lange-1991
+      sha256:
+        tag: unknown
+        reason: INDEX does not give table sha256
+    - asset_id: unknown:ammin-76-904-lange-1991
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
     - asset_id: unknown:ammin-76-904
       role: pdftotext
       path: unknown

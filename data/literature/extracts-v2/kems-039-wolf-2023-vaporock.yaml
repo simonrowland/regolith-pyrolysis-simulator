@@ -40,7 +40,7 @@ observations:
     published_page: 1
     pdf_page_index: 1
     section: abstract
-  read_from: unknown:kems-039-wolf-2023-vaporock
+  read_from: pdf:kems-039-wolf-2023-vaporock
 - observation_id: kems-039-wolf-2023-vaporock::wolf_2023_bse_vapor_model_scope
   experiment_id: f2e0decaf080185d6335e155731e9509598bd0aa2ce01d20c15398500c091e6d::kems-039-wolf-2023-vaporock
   identity:
@@ -126,7 +126,7 @@ observations:
     pdf_page_index: 22
     figure: '4'
     section: '4.3'
-  read_from: unknown:kems-039-wolf-2023-vaporock
+  read_from: pdf:kems-039-wolf-2023-vaporock
 - observation_id: kems-039-wolf-2023-vaporock::wolf_2023_demaria_lunar_kems_scope
   experiment_id: f2e0decaf080185d6335e155731e9509598bd0aa2ce01d20c15398500c091e6d::kems-039-wolf-2023-vaporock
   identity:
@@ -202,7 +202,7 @@ observations:
       tag: value
       value: quoted_attributed
     original_method_class: quoted_measurement
-    attribution: De Maria et al. 1971 KEMS measurements summarized by Wolf et al.
+    attribution: De Maria et al. 1971
   admission:
     status: pending
     reason: no observation admission_status mapped from source
@@ -213,7 +213,7 @@ observations:
     pdf_page_index: 12
     figure: '2'
     section: '3.3'
-  read_from: unknown:kems-039-wolf-2023-vaporock
+  read_from: pdf:kems-039-wolf-2023-vaporock
 - observation_id: kems-039-wolf-2023-vaporock::wolf_2023_eq9_sio_sio2_fo2_proxy
   experiment_id: f2e0decaf080185d6335e155731e9509598bd0aa2ce01d20c15398500c091e6d::kems-039-wolf-2023-vaporock
   identity:
@@ -299,7 +299,7 @@ observations:
     pdf_page_index: 25
     section: '4.5'
     equation: '9'
-  read_from: unknown:kems-039-wolf-2023-vaporock
+  read_from: pdf:kems-039-wolf-2023-vaporock
 - observation_id: kems-039-wolf-2023-vaporock::wolf_2023_hastie_kems_scope_and_uncertainty
   experiment_id: f2e0decaf080185d6335e155731e9509598bd0aa2ce01d20c15398500c091e6d::kems-039-wolf-2023-vaporock
   identity:
@@ -374,7 +374,7 @@ observations:
       tag: value
       value: quoted_attributed
     original_method_class: quoted_measurement
-    attribution: Hastie et al. 1981 and Hastie & Bonnell 1985, 1986 KEMS measurements summarized by Wolf et al.
+    attribution: Hastie et al. 1981; Hastie & Bonnell 1985, 1986
   admission:
     status: pending
     reason: no observation admission_status mapped from source
@@ -385,7 +385,7 @@ observations:
     pdf_page_index: 10
     figure: '1'
     section: '3.2'
-  read_from: unknown:kems-039-wolf-2023-vaporock
+  read_from: pdf:kems-039-wolf-2023-vaporock
 - observation_id: kems-039-wolf-2023-vaporock::wolf_2023_illite_and_srm_activity_fits
   experiment_id: f2e0decaf080185d6335e155731e9509598bd0aa2ce01d20c15398500c091e6d::kems-039-wolf-2023-vaporock
   identity:
@@ -470,9 +470,9 @@ observations:
     published_page: 11
     pdf_page_index: 11
     section: '3.2'
-  read_from: unknown:kems-039-wolf-2023-vaporock
+  read_from: pdf:kems-039-wolf-2023-vaporock
 - observation_id: kems-039-wolf-2023-vaporock::wolf_2023_lunar_basalt_12065_composition_compiled
-  experiment_id: f2e0decaf080185d6335e155731e9509598bd0aa2ce01d20c15398500c091e6d::kems-039-wolf-2023-vaporock
+  experiment_id: f2e0decaf080185d6335e155731e9509598bd0aa2ce01d20c15398500c091e6d::experiment::lunar-basalt-12065
   identity:
     quantity:
       tag: unknown
@@ -533,9 +533,9 @@ observations:
     published_page: 14
     pdf_page_index: 14
     table: '2'
-  read_from: unknown:kems-039-wolf-2023-vaporock
+  read_from: pdf:kems-039-wolf-2023-vaporock
 - observation_id: kems-039-wolf-2023-vaporock::wolf_2023_lunar_vaporock_activity_fits
-  experiment_id: f2e0decaf080185d6335e155731e9509598bd0aa2ce01d20c15398500c091e6d::kems-039-wolf-2023-vaporock
+  experiment_id: f2e0decaf080185d6335e155731e9509598bd0aa2ce01d20c15398500c091e6d::experiment::lunar-basalt-12065
   identity:
     quantity:
       tag: value
@@ -618,7 +618,7 @@ observations:
     published_page: 12
     pdf_page_index: 12
     section: '3.3'
-  read_from: unknown:kems-039-wolf-2023-vaporock
+  read_from: pdf:kems-039-wolf-2023-vaporock
 - observation_id: kems-039-wolf-2023-vaporock::wolf_2023_table2_model_compositions
   experiment_id: f2e0decaf080185d6335e155731e9509598bd0aa2ce01d20c15398500c091e6d::kems-039-wolf-2023-vaporock
   identity:
@@ -657,7 +657,7 @@ observations:
     published_page: 14
     pdf_page_index: 14
     table: '2'
-  read_from: unknown:kems-039-wolf-2023-vaporock
+  read_from: pdf:kems-039-wolf-2023-vaporock
 - observation_id: kems-039-wolf-2023-vaporock::wolf_2023_table3_vaporock_vs_magma22
   experiment_id: f2e0decaf080185d6335e155731e9509598bd0aa2ce01d20c15398500c091e6d::kems-039-wolf-2023-vaporock
   identity:
@@ -701,7 +701,7 @@ observations:
     pdf_page_index: 17
     table: '3'
     section: '3.4'
-  read_from: unknown:kems-039-wolf-2023-vaporock
+  read_from: pdf:kems-039-wolf-2023-vaporock
   point_conditions:
     temperature_K:
       state:
@@ -752,4 +752,4 @@ observations:
     pdf_page_index: 5
     table: '1'
     section: '2.2'
-  read_from: unknown:kems-039-wolf-2023-vaporock
+  read_from: pdf:kems-039-wolf-2023-vaporock

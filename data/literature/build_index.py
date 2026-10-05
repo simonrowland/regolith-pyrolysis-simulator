@@ -550,10 +550,43 @@ def nist_janaf_index_row(
     }
 
 def corpus_pointers(corpus: Path, source_id: str, pdf_sha: str | None,
-                    extract_path: Path, commit: str | None) -> dict:
+                    extract_path: Path, commit: str | None,
+                    extract_doc: dict | None = None) -> dict:
     if not corpus_available(corpus, commit):
         return dict.fromkeys(("raw", "sidecar", "text", "tables", "extract", "ledger", "commit"))
-    raw = corpus / "raw" / source_id / f"{source_id}.pdf"
+    raw_rel = f"raw/{source_id}/{source_id}.pdf"
+    if isinstance(extract_doc, dict):
+        def stated_raw_path(value):
+            if not isinstance(value, str):
+                return None
+            path = value.replace("\\", "/").strip()
+            corpus_prefix = posix(corpus.resolve()).rstrip("/") + "/"
+            if path.startswith(corpus_prefix):
+                path = path[len(corpus_prefix):]
+            elif path.startswith("corpus/raw/"):
+                path = path[len("corpus/"):]
+            return path if path.startswith("raw/") and path.lower().endswith(".pdf") else None
+
+        extraction = extract_doc.get("extraction")
+        provenance_path = stated_raw_path(
+            extraction.get("provenance_path") if isinstance(extraction, dict) else None
+        )
+        if provenance_path:
+            raw_rel = provenance_path
+        else:
+            locator_paths = set()
+            for body in (extract_doc.get("species") or {}).values():
+                if not isinstance(body, dict):
+                    continue
+                for row in body.get("observations") or []:
+                    locator = row.get("locator") if isinstance(row, dict) else None
+                    if isinstance(locator, dict):
+                        path = stated_raw_path(locator.get("source_path"))
+                        if path:
+                            locator_paths.add(path)
+            if len(locator_paths) == 1:
+                raw_rel = next(iter(locator_paths))
+    raw = corpus / raw_rel
     sidecar = raw.parent / "sidecar.yaml"
     extract = corpus / "extracts" / f"{source_id}.yaml"
     ledger = corpus / "ledger" / f"{source_id}.yaml"
@@ -829,7 +862,8 @@ def build_index(root: Path, *, private_roots: list[Path] | None = None, hunt_jso
             "measurement_sets": sorted(set(measure_hits)),
             "corpus_status": "available" if corpus_available(corpus, corpus_commit) else "unavailable",
             "corpus": corpus_pointers(corpus, source_id, (pdf or {}).get("sha256"),
-                                      root / "data/literature/extracts" / f"{source_id}.yaml", corpus_commit),
+                                      root / "data/literature/extracts" / f"{source_id}.yaml", corpus_commit,
+                                      extract_doc=(extract or {}).get("doc")),
         })
     janaf_row = nist_janaf_index_row(root, corpus, corpus_commit, compilations)
     if janaf_row is not None and all(row["source_id"] != janaf_row["source_id"] for row in rows):

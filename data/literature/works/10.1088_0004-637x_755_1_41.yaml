@@ -8,9 +8,27 @@ work:
   source_files:
     corpus_repo: regolith-corpus
     corpus_commit:
-      tag: unknown
-      reason: INDEX does not give corpus commit
+      tag: value
+      value: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
     files:
+    - asset_id: pdf:schaefer-fegley-2011-vaporization-earth
+      role: pdf
+      path: raw/schaefer-fegley-2011-vaporization-earth/schaefer-fegley-2011-vaporization-earth.pdf
+      sha256:
+        tag: value
+        value: 9b1e48b4275d28af171e82fa3f7a55c5dd17fadefc484831a5c80074026d3d2d
+    - asset_id: pdftotext:schaefer-fegley-2011-vaporization-earth
+      role: pdftotext
+      path: text/schaefer-fegley-2011-vaporization-earth
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: tables:schaefer-fegley-2011-vaporization-earth
+      role: table_csv
+      path: tables/schaefer-fegley-2011-vaporization-earth
+      sha256:
+        tag: unknown
+        reason: INDEX does not give table sha256
     - asset_id: unknown:schaefer-fegley-2011-vaporization-earth
       role: pdftotext
       path: unknown

@@ -4,13 +4,38 @@ work:
   citation: Jones, R. T. (1997), "Thermodynamics and its applications – an overview", SAIMM Pyrometallurgy School, Mintek,
     Randburg, 20–21 May 1997.
   source_ids:
+  - 1997jonesthermo-jones-1997
   - 1997jonesthermo
   source_files:
     corpus_repo: regolith-corpus
     corpus_commit:
-      tag: unknown
-      reason: INDEX does not give corpus commit
+      tag: value
+      value: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
     files:
+    - asset_id: pdf:1997jonesthermo-jones-1997
+      role: pdf
+      path: raw/1997jonesthermo/1997jonesthermo.pdf
+      sha256:
+        tag: value
+        value: d8ac7ea51f8dee42b56bee63f48a9d8dc761ead9ece61726b8b28cec744b8a3c
+    - asset_id: pdftotext:1997jonesthermo-jones-1997
+      role: pdftotext
+      path: text/1997jonesthermo-jones-1997
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: tables:1997jonesthermo-jones-1997
+      role: table_csv
+      path: tables/1997jonesthermo-jones-1997
+      sha256:
+        tag: unknown
+        reason: INDEX does not give table sha256
+    - asset_id: unknown:1997jonesthermo-jones-1997
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
     - asset_id: unknown:1997jonesthermo
       role: pdftotext
       path: unknown

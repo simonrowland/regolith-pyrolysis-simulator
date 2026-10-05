@@ -9,9 +9,27 @@ work:
   source_files:
     corpus_repo: regolith-corpus
     corpus_commit:
-      tag: unknown
-      reason: INDEX does not give corpus commit
+      tag: value
+      value: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
     files:
+    - asset_id: pdf:shornikov-1997-cao-alumina-vapor
+      role: pdf
+      path: raw/shornikov-1997-cao-alumina-vapor/shornikov-1997-cao-alumina-vapor.pdf
+      sha256:
+        tag: value
+        value: 77e3fd13ba6ce30de43945c4d80be1f439de1fa93dd7685f6f7dff91afe69d90
+    - asset_id: pdftotext:shornikov-1997-cao-alumina-vapor
+      role: pdftotext
+      path: text/shornikov-1997-cao-alumina-vapor
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: tables:shornikov-1997-cao-alumina-vapor
+      role: table_csv
+      path: tables/shornikov-1997-cao-alumina-vapor
+      sha256:
+        tag: unknown
+        reason: INDEX does not give table sha256
     - asset_id: unknown:shornikov-1997-cao-alumina-vapor
       role: pdftotext
       path: unknown

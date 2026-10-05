@@ -8,9 +8,27 @@ work:
   source_files:
     corpus_repo: regolith-corpus
     corpus_commit:
-      tag: unknown
-      reason: INDEX does not give corpus commit
+      tag: value
+      value: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
     files:
+    - asset_id: pdf:ta-yamanaka-1997-metsoc
+      role: pdf
+      path: raw/ta-yamanaka-1997-metsoc/ta-yamanaka-1997-metsoc.pdf
+      sha256:
+        tag: value
+        value: b0ea5696e89bac07b770efef10118a475e24fc2193494a5d11182eeabe4fda8a
+    - asset_id: pdftotext:ta-yamanaka-1997-metsoc
+      role: pdftotext
+      path: text/ta-yamanaka-1997-metsoc
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: tables:ta-yamanaka-1997-metsoc
+      role: table_csv
+      path: tables/ta-yamanaka-1997-metsoc
+      sha256:
+        tag: unknown
+        reason: INDEX does not give table sha256
     - asset_id: unknown:ta-yamanaka-1997-metsoc
       role: pdftotext
       path: unknown

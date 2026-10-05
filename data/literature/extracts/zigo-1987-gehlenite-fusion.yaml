@@ -1,0 +1,298 @@
+schema_version: literature_extract.v1
+source_id: zigo-1987-gehlenite-fusion
+source:
+  citation: 'Žigo, O., Adamkovičová, K., Kosa, L., Nerád, I. & Proks, I. (1987), "Determination of the heat of fusion of 2CaO·Al2O3·SiO2 (gehlenite)", Chemical Papers 41(2), 171–181'
+  doi: null
+  url: https://www.chempap.org/?id=7&paper=4269
+  year: 1987
+extraction:
+  method: 'Manual transcription of the complete 11-page publisher PDF. pdftotext -layout and PDF images were checked; Tables 1, 3, and 4 and equations (2), (5), and (6) were visually checked against page images. No unit conversion. The publisher gives no DOI in the paper.'
+  date: '2026-10-03'
+  worker: t1101-zigo1987
+  provenance_path: text/zigo-1987-gehlenite-fusion/pdftotext-layout.txt
+review_status: draft
+fidelity_samples:
+  - path: species.gehlenite.observations[zigo_1987_t1_crystal_cooling_measured].values.points[0].minus_delta_H_cool_kJ_mol-1
+    value: 335.9
+    locator: {page: 174, pdf_page_index: 4, table: '1'}
+  - path: species.gehlenite.observations[zigo_1987_t3_crystal_relative_enthalpy_measured_derived].values.points[5].H_rel_kJ_mol-1
+    value: 1282.4
+    locator: {page: 176, pdf_page_index: 6, table: '3'}
+  - path: species.gehlenite.observations[zigo_1987_t4_melt_enthalpy_calorimetry].values.points[4].H_rel_kJ_mol-1
+    value: 1519.0
+    locator: {page: 177, pdf_page_index: 7, table: '4'}
+  - species: gehlenite
+    observable: transition_point
+    observation_id: zigo_1987_fusion_temperature_selected
+    field: T_fus_K
+    value: 1863
+    locator: {page: 172, pdf_page_index: 2, paragraph: 'fusion temperature'}
+  - species: gehlenite
+    observable: heat_capacity_and_heat_content_series
+    observation_id: zigo_1987_fusion_enthalpy_at_1863K
+    field: delta_H_fus_kJ_mol-1
+    value: 172.1
+    locator: {page: 179, pdf_page_index: 9, equation: '7'}
+  - species: gehlenite
+    observable: heat_capacity_and_heat_content_series
+    observation_id: zigo_1987_fusion_entropy_at_1863K
+    field: delta_S_fus_J_mol-1_K-1
+    value: 92.4
+    locator: {page: 179, pdf_page_index: 9, equation: '8'}
+species:
+  gehlenite:
+    observations:
+      - observation_id: zigo_1987_t1_crystal_cooling_measured
+        type: heat_capacity_and_heat_content_series
+        locator: {page: 174, pdf_page_index: 4, table: '1'}
+        phase: crystalline_gehlenite_C2AS
+        regime: cooling_to_298_K_in_drop_calorimeter
+        units: 'K; kJ mol−1'
+        values:
+          quantity: negative_enthalpy_change_on_cooling
+          method_class: measured_direct
+          table_csv: tables/zigo-1987-gehlenite-fusion/t1.csv
+          sign_convention: 'The printed columns are −ΔHcool.'
+          points:
+            - {T_K: 1519, minus_delta_H_cool_kJ_mol-1: 335.9}
+            - {T_K: 1567, minus_delta_H_cool_kJ_mol-1: 354.1}
+            - {T_K: 1582, minus_delta_H_cool_kJ_mol-1: 359.5}
+            - {T_K: 1691, minus_delta_H_cool_kJ_mol-1: 393.2}
+            - {T_K: 1730, minus_delta_H_cool_kJ_mol-1: 407.5}
+            - {T_K: 1799, minus_delta_H_cool_kJ_mol-1: 432.5}
+        uncertainty: {reported_status: not_reported_for_individual_points, note: 'Table 1 gives experimental values without pointwise uncertainties.'}
+
+      - observation_id: zigo_1987_t1_crystal_cooling_fit
+        type: heat_capacity_and_heat_content_series
+        locator: {page: 174, pdf_page_index: 4, table: '1', equation: '2'}
+        phase: crystalline_gehlenite_C2AS
+        regime: least_squares_fit_to_drop_calorimetry
+        units: 'T in K; −ΔHcool in kJ mol−1'
+        values:
+          quantity: fitted_negative_enthalpy_change_on_cooling
+          method_class: model_derived
+          table_csv: tables/zigo-1987-gehlenite-fusion/t1.csv
+          equation_as_printed: '−ΔHcool,φ/(kJ mol−1) = −6.38 × 10^1 + 2.019 × 10−1 (T/K) + 4.090 × 10−5 (T/K)^2'
+          coefficients: {constant: -63.8, linear_per_K: 0.2019, quadratic_per_K2: 0.00004090}
+          T_range_K: [1519, 1799]
+          fit_error_kJ_mol-1: 1.6
+          fit_error_confidence: '95%; Student coefficient'
+          fit_points:
+            - {T_K: 1519, minus_delta_H_cool_kJ_mol-1: 337.3}
+            - {T_K: 1567, minus_delta_H_cool_kJ_mol-1: 353.0}
+            - {T_K: 1582, minus_delta_H_cool_kJ_mol-1: 358.0}
+            - {T_K: 1691, minus_delta_H_cool_kJ_mol-1: 394.6}
+            - {T_K: 1730, minus_delta_H_cool_kJ_mol-1: 407.9}
+            - {T_K: 1799, minus_delta_H_cool_kJ_mol-1: 431.8}
+        uncertainty: {note: 'Reported function error δ(ΔHcool,φ) = 1.6 kJ mol−1 at reliability coefficient (1−α)=0.95.'}
+
+      - observation_id: zigo_1987_t2_crystal_solution_calorimetry
+        type: heat_capacity_and_heat_content_series
+        locator: {page: 175, pdf_page_index: 5, table: '2'}
+        phase: gehlenite_sample_with_unreacted_admixtures
+        regime: solution_calorimetry_at_298_K
+        units: kJ mol−1
+        values:
+          quantity: negative_heat_of_solution
+          method_class: measured_direct
+          table_csv: tables/zigo-1987-gehlenite-fusion/t2.csv
+          sign_convention: 'The table prints −ΔHsol,φ.'
+          samples: [851.6, 854.2, 845.6, 848.8, 845.6, 857.0]
+          arithmetic_mean: 850.5
+          T_K: 298
+        uncertainty: {reported_status: printed, value_kJ_mol-1: 4.9, note: 'Error of the arithmetic mean, Student distribution, (1−α)=0.95.'}
+
+      - observation_id: zigo_1987_t2_crystal_solution_corrected
+        type: heat_capacity_and_heat_content_series
+        locator: {page: 176, pdf_page_index: 6, equation: '3', equation_result: '4', table: '2'}
+        phase: crystalline_gehlenite_C2AS
+        regime: impurity_corrected_solution_calorimetry_at_298_K
+        units: kJ mol−1
+        values:
+          quantity: arithmetic_mean_heat_of_solution
+          method_class: model_derived
+          delta_H_solution_kJ_mol-1: -849.9
+          uncertainty_kJ_mol-1: 4.9
+          correction_as_printed: 'ΔHsol,φ(C2AS,cryst) = ΔHsol,φ(C2AS,cryst,impur) − (1−x)·ΔHr'
+          admixture_mole_fraction: 0.02
+          note: 'Corrected for an assumed equimolar mixture of CS and CA admixtures, estimated at 0.02 mole fraction.'
+        uncertainty: {reported_status: printed, value_kJ_mol-1: 4.9}
+
+      - observation_id: zigo_1987_t3_crystal_relative_enthalpy_measured_derived
+        type: heat_capacity_and_heat_content_series
+        locator: {page: 176, pdf_page_index: 6, table: '3'}
+        phase: crystalline_gehlenite_C2AS
+        standard_state: 'Relative enthalpy referenced to the phase state in the dissolving mixture; Hrel = −(ΔHcool + ΔHsol).'
+        units: 'K; kJ mol−1'
+        values:
+          quantity: relative_enthalpy
+          method_class: measured_derived
+          table_csv: tables/zigo-1987-gehlenite-fusion/t3.csv
+          points:
+            - {T_K: 1519, H_rel_kJ_mol-1: 1185.8}
+            - {T_K: 1567, H_rel_kJ_mol-1: 1204.0}
+            - {T_K: 1582, H_rel_kJ_mol-1: 1209.4}
+            - {T_K: 1691, H_rel_kJ_mol-1: 1243.1}
+            - {T_K: 1730, H_rel_kJ_mol-1: 1257.4}
+            - {T_K: 1799, H_rel_kJ_mol-1: 1282.4}
+          calculation: '−ΔHcool plus −ΔHsol,φ(C2AS,cryst); uses the impurity-corrected mean solution enthalpy in Eq. (4).'
+        uncertainty: {reported_status: not_reported_for_individual_points}
+
+      - observation_id: zigo_1987_t3_crystal_relative_enthalpy_fit
+        type: heat_capacity_and_heat_content_series
+        locator: {page: 176, pdf_page_index: 6, table: '3', equation: '5'}
+        phase: crystalline_gehlenite_C2AS
+        standard_state: 'Relative enthalpy referenced to the phase state in the dissolving mixture.'
+        units: 'T in K; Hrel in kJ mol−1'
+        values:
+          quantity: fitted_relative_enthalpy
+          method_class: model_derived
+          table_csv: tables/zigo-1987-gehlenite-fusion/t3.csv
+          equation_as_printed: 'Hrel,φ/(kJ mol−1) = 7.861 × 10^2 + 2.019 × 10−1 (T/K) + 4.090 × 10−5 (T/K)^2'
+          coefficients: {constant: 786.1, linear_per_K: 0.2019, quadratic_per_K2: 0.00004090}
+          T_range_K: [1519, 1799]
+          fit_error_kJ_mol-1: 5.2
+          fit_error_confidence: '95%; propagated by the Gauss law from cooling and solution enthalpy errors'
+          fit_points:
+            - {T_K: 1519, H_rel_kJ_mol-1: 1187.2}
+            - {T_K: 1567, H_rel_kJ_mol-1: 1202.9}
+            - {T_K: 1582, H_rel_kJ_mol-1: 1207.9}
+            - {T_K: 1691, H_rel_kJ_mol-1: 1244.5}
+            - {T_K: 1730, H_rel_kJ_mol-1: 1257.8}
+            - {T_K: 1799, H_rel_kJ_mol-1: 1281.7}
+        uncertainty: {reported_status: printed, value_kJ_mol-1: 5.2}
+
+      - observation_id: zigo_1987_t4_melt_enthalpy_calorimetry
+        type: heat_capacity_and_heat_content_series
+        locator: {page: 177, pdf_page_index: 7, table: '4'}
+        phase: C2AS_melt_composition_corresponding_to_gehlenite
+        regime: drop_and_solution_calorimetry; cooling_to_298_K
+        units: 'K; kJ mol−1'
+        values:
+          quantity: melt_relative_enthalpy_calorimetry
+          method_class: measured_derived
+          table_csv: tables/zigo-1987-gehlenite-fusion/t4.csv
+          calculation: 'Hrel is obtained by adding the printed −ΔHcool and −ΔHsol values.'
+          points:
+            - {T_K: 1873, minus_delta_H_cool_kJ_mol-1: 545.1, minus_delta_H_solution_kJ_mol-1: 937.1, H_rel_kJ_mol-1: 1482.2}
+            - {T_K: 1888, minus_delta_H_cool_kJ_mol-1: 548.9, minus_delta_H_solution_kJ_mol-1: 938.2, H_rel_kJ_mol-1: 1487.1}
+            - {T_K: 1908, minus_delta_H_cool_kJ_mol-1: 561.5, minus_delta_H_solution_kJ_mol-1: 939.9, H_rel_kJ_mol-1: 1501.4}
+            - {T_K: 1932, minus_delta_H_cool_kJ_mol-1: 571.7, minus_delta_H_solution_kJ_mol-1: 941.9, H_rel_kJ_mol-1: 1513.6}
+            - {T_K: 1948, minus_delta_H_cool_kJ_mol-1: 584.3, minus_delta_H_solution_kJ_mol-1: 934.7, H_rel_kJ_mol-1: 1519.0}
+        uncertainty: {reported_status: not_reported_for_individual_points, note: 'Each melt sample heat of solution is a mean of three or four measurements; table gives no per-row error.'}
+
+      - observation_id: zigo_1987_t4_melt_relative_enthalpy_fit
+        type: heat_capacity_and_heat_content_series
+        locator: {page: 178, pdf_page_index: 8, table: '4', equation: '6'}
+        phase: C2AS_melt_composition_corresponding_to_gehlenite
+        units: 'T in K; Hrel in kJ mol−1'
+        values:
+          quantity: fitted_relative_enthalpy
+          method_class: model_derived
+          table_csv: tables/zigo-1987-gehlenite-fusion/t4.csv
+          equation_as_printed: 'Hrel,φ/(kJ mol−1) = 5.109 × 10^2 + 5.182 × 10−1 (T/K)'
+          coefficients: {constant: 510.9, linear_per_K: 0.5182}
+          T_range_K: [1873, 1948]
+          fit_error_kJ_mol-1: 2.9
+          fit_error_confidence: '95%; Student coefficient'
+          fit_points:
+            - {T_K: 1873, H_rel_kJ_mol-1: 1481.5}
+            - {T_K: 1888, H_rel_kJ_mol-1: 1489.3}
+            - {T_K: 1908, H_rel_kJ_mol-1: 1499.6}
+            - {T_K: 1932, H_rel_kJ_mol-1: 1512.1}
+            - {T_K: 1948, H_rel_kJ_mol-1: 1520.4}
+        uncertainty: {reported_status: printed, value_kJ_mol-1: 2.9}
+
+      - observation_id: zigo_1987_fusion_temperature_selected
+        type: transition_point
+        locator: {page: 172, pdf_page_index: 2, paragraph: 'introduction'}
+        phase: gehlenite_C2AS_crystal_and_composition_matched_melt
+        units: 'K; °C'
+        values:
+          quantity: congruent_fusion_temperature
+          method_class: quoted
+          T_fus_K: 1863
+          T_fus_degC: 1590
+          selection: 'Authors select this as the most reliable value from literature [2].'
+          literature_range_as_printed: '1584 °C to 1593 °C'
+          note: 'At 1863 K the selected temperature is explicitly called the equilibrium fusion temperature.'
+        uncertainty: {reported_status: literature_range, note: 'Temperature range is 1584–1593 °C; selected value is 1863 K (1590 °C).'}
+
+      - observation_id: zigo_1987_fusion_enthalpy_at_1863K
+        type: heat_capacity_and_heat_content_series
+        locator: {page: 179, pdf_page_index: 9, equation: '7'}
+        phase: gehlenite_C2AS_crystal_to_composition_matched_melt
+        units: 'kJ mol−1; K'
+        values:
+          quantity: heat_of_fusion
+          method_class: model_derived
+          delta_H_fus_kJ_mol-1: 172.1
+          T_fus_K: 1863
+          method: 'Difference between extrapolated melt and crystal relative enthalpies at the selected fusion temperature, from Eqs. (5) and (6).'
+          H_rel_melt_at_Tfus_kJ_mol-1: 1476.3
+          H_rel_melt_uncertainty_kJ_mol-1: 2.9
+          H_rel_crystal_at_Tfus_kJ_mol-1: 1304.2
+          H_rel_crystal_uncertainty_kJ_mol-1: 5.2
+          equation_as_printed: 'ΔHfus,φ = Hrel,φ(C2AS,melt; 1863 K) − Hrel,φ(C2AS,cryst; 1863 K)'
+        uncertainty: {reported_status: printed, value_kJ_mol-1: 6.0, note: 'Combined from the 2.9 and 5.2 kJ mol−1 relative-enthalpy errors by Gauss law of error propagation.'}
+
+      - observation_id: zigo_1987_fusion_entropy_at_1863K
+        type: heat_capacity_and_heat_content_series
+        locator: {page: 179, pdf_page_index: 9, equation: '8'}
+        phase: gehlenite_C2AS_crystal_to_composition_matched_melt
+        units: 'J mol−1 K−1; kJ mol−1; K'
+        values:
+          quantity: entropy_of_fusion
+          method_class: model_derived
+          delta_S_fus_J_mol-1_K-1: 92.4
+          uncertainty_J_mol-1_K-1: 3.2
+          T_fus_K: 1863
+          delta_H_fus_kJ_mol-1: 172.1
+          equation_as_printed: 'ΔSfus = ΔHfus/Tfus'
+          derivation_note: 'Unit conversion for the printed relation: (172.1 kJ mol−1 × 1000 J/kJ) / 1863 K = 92.4 J mol−1 K−1; (6.0 kJ mol−1 × 1000 J/kJ) / 1863 K = 3.2 J mol−1 K−1 after rounding. The reported entropy and uncertainty are retained as printed.'
+        uncertainty: {reported_status: printed, value_J_mol-1_K-1: 3.2}
+
+      - observation_id: zigo_1987_fusion_temperature_sensitivity
+        type: heat_capacity_and_heat_content_series
+        locator: {page: 180, pdf_page_index: 10, paragraph: 'fusion temperature uncertainty'}
+        phase: gehlenite_C2AS_crystal_to_composition_matched_melt
+        units: 'K; kJ mol−1'
+        values:
+          quantity: heat_of_fusion_sensitivity_to_fusion_temperature
+          method_class: model_derived
+          basis: 'Authors recalculate ΔHfus using the lowest and highest literature fusion temperatures.'
+          points:
+            - {T_fus_K: 1857, delta_H_fus_kJ_mol-1: 171.1, uncertainty_kJ_mol-1: 6.0}
+            - {T_fus_K: 1866, delta_H_fus_kJ_mol-1: 172.6, uncertainty_kJ_mol-1: 6.0}
+        uncertainty: {reported_status: printed, note: 'Both sensitivity values retain the printed ±6.0 kJ mol−1.'}
+
+    context:
+      - observation_id: zigo_1987_method_and_heat_capacity_scope
+        type: method
+        locator: {page: 171, pdf_page_index: 1, paragraph: 'abstract'}
+        units: as printed
+        values:
+          quantity: experiment_method_and_heat_capacity_coverage
+          method_class: method_only
+          crystal_relative_enthalpy_range_K: [1519, 1799]
+          melt_relative_enthalpy_range_K: [1873, 1948]
+          calorimetry: 'Drop calorimeter cooling measurements combined with heats of solution at 298 K.'
+      - observation_id: zigo_1987_heat_capacity_fit_scope
+        type: method
+        locator: {page: 180, pdf_page_index: 10, paragraph: 'results and discussion'}
+        units: as printed
+        values:
+          quantity: heat_capacity_fit_coverage
+          method_class: method_only
+          heat_capacity_fit_status: absent
+          heat_capacity_note: 'No new Cp values or Cp fit coefficients are reported. The discussion compares the solid relative-enthalpy fit with cited Barin et al. [2] heat-capacity data and says the melt linear relative-enthalpy fit is consistent with the usual constant melt Cp assumption.'
+      - observation_id: zigo_1987_prior_fusion_enthalpy_quoted
+        type: thermodynamic_example
+        locator: {page: 181, pdf_page_index: 11, references: '4', paragraph: 'Results and discussion'}
+        units: kJ mol−1
+        values:
+          quantity: prior_gehlenite_heat_of_fusion
+          method_class: quoted
+          delta_H_fus_kJ_mol-1: 156.2
+          cited_source: 'Scholze & Kumm (1969), Tonind. Ztg. 93, 360 [4]'
+          comparison_as_printed: 'The cited value is about 10% lower than the calorimetric value determined in this work.'

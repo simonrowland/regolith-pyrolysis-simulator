@@ -8,9 +8,27 @@ work:
   source_files:
     corpus_repo: regolith-corpus
     corpus_commit:
-      tag: unknown
-      reason: INDEX does not give corpus commit
+      tag: value
+      value: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
     files:
+    - asset_id: pdf:oneill-2002-feo-activity-coefficients-cmas
+      role: pdf
+      path: raw/oneill-2002-feo-activity-coefficients-cmas/oneill-2002-feo-activity-coefficients-cmas.pdf
+      sha256:
+        tag: value
+        value: d4006f3272e7f2d4c869e18b11fecf4e3597f7ee32547777e29832a93f84c887
+    - asset_id: pdftotext:oneill-2002-feo-activity-coefficients-cmas
+      role: pdftotext
+      path: text/oneill-2002-feo-activity-coefficients-cmas
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: tables:oneill-2002-feo-activity-coefficients-cmas
+      role: table_csv
+      path: tables/oneill-2002-feo-activity-coefficients-cmas
+      sha256:
+        tag: unknown
+        reason: INDEX does not give table sha256
     - asset_id: unknown:oneill-2002-feo-activity-coefficients-cmas
       role: pdftotext
       path: unknown

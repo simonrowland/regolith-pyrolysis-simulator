@@ -8,9 +8,27 @@ work:
   source_files:
     corpus_repo: regolith-corpus
     corpus_commit:
-      tag: unknown
-      reason: INDEX does not give corpus commit
+      tag: value
+      value: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
     files:
+    - asset_id: pdf:no27-fegley-cameron-1987-epsl
+      role: pdf
+      path: raw/no27-fegley-cameron-1987-epsl/no27-fegley-cameron-1987-epsl.pdf
+      sha256:
+        tag: value
+        value: 4b4f1f3792bec5d32179580df3b27c051ce19b58985be88544f71536909d7bee
+    - asset_id: pdftotext:no27-fegley-cameron-1987-epsl
+      role: pdftotext
+      path: text/no27-fegley-cameron-1987-epsl
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: tables:no27-fegley-cameron-1987-epsl
+      role: table_csv
+      path: tables/no27-fegley-cameron-1987-epsl
+      sha256:
+        tag: unknown
+        reason: INDEX does not give table sha256
     - asset_id: unknown:no27-fegley-cameron-1987-epsl
       role: pdftotext
       path: unknown

@@ -1,0 +1,128 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: fb452fa635b46a767af5c67fd67d2b5dac81e9779337b0cdfc22bcec4e149298
+  citation: Žigo, O., Adamkovičová, K., Kosa, L., Nerád, I. & Proks, I. (1987), "Determination of the heat of fusion of 2CaO·Al2O3·SiO2
+    (gehlenite)", Chemical Papers 41(2), 171–181
+  source_ids:
+  - zigo-1987-gehlenite-fusion
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
+    files:
+    - asset_id: pdf:zigo-1987-gehlenite-fusion
+      role: pdf
+      path: raw/zigo-1987-gehlenite-fusion/zigo-1987-gehlenite-fusion.pdf
+      sha256:
+        tag: unknown
+        reason: INDEX does not give sha256
+    - asset_id: pdftotext:zigo-1987-gehlenite-fusion
+      role: pdftotext
+      path: text/zigo-1987-gehlenite-fusion
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: tables:zigo-1987-gehlenite-fusion
+      role: table_csv
+      path: tables/zigo-1987-gehlenite-fusion
+      sha256:
+        tag: unknown
+        reason: INDEX does not give table sha256
+    - asset_id: unknown:zigo-1987-gehlenite-fusion
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
+experiments:
+- experiment_id: fb452fa635b46a767af5c67fd67d2b5dac81e9779337b0cdfc22bcec4e149298::zigo-1987-gehlenite-fusion
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'cooling_to_298_K_in_drop_calorimeter' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: no temperature field under keys T_K / T_C / temperature_K in this extract
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: no pressure field under keys chamber_pressure / total_pressure_Pa / total_pressure_atm / P_GPa / pressure_Pa
+          / pressure_pa / pressure_mbar / vacuum_mbar / vacuum_bar / vacuum_during_run_Torr / max_vacuum_Torr / chamber_pressure_bar
+          / chamber_pressure_Pa_about / chamber_pressure_start_mbar / chamber_pressure_run_mbar_about / chamber_pressure_fill_mbar_about
+          / P_test_Torr in this extract
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+    regime:
+      regime_class:
+        tag: unknown
+        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+  work_id: fb452fa635b46a767af5c67fd67d2b5dac81e9779337b0cdfc22bcec4e149298
+  locator:
+    page: 174
+    pdf_page_index: 4
+    table: '1'
+context:
+- observation_id: zigo_1987_heat_capacity_fit_scope
+  type: method
+  locator:
+    page: 180
+    pdf_page_index: 10
+    paragraph: results and discussion
+  units: as printed
+  values:
+    quantity: heat_capacity_fit_coverage
+    method_class: method_only
+    heat_capacity_fit_status: absent
+    heat_capacity_note: No new Cp values or Cp fit coefficients are reported. The discussion compares the solid relative-enthalpy
+      fit with cited Barin et al. [2] heat-capacity data and says the melt linear relative-enthalpy fit is consistent with
+      the usual constant melt Cp assumption.
+  context_id: zigo-1987-gehlenite-fusion::context::zigo_1987_heat_capacity_fit_scope
+  work_id: fb452fa635b46a767af5c67fd67d2b5dac81e9779337b0cdfc22bcec4e149298
+  source_id: zigo-1987-gehlenite-fusion
+  species: gehlenite
+- observation_id: zigo_1987_method_and_heat_capacity_scope
+  type: method
+  locator:
+    page: 171
+    pdf_page_index: 1
+    paragraph: abstract
+  units: as printed
+  values:
+    quantity: experiment_method_and_heat_capacity_coverage
+    method_class: method_only
+    crystal_relative_enthalpy_range_K:
+    - 1519
+    - 1799
+    melt_relative_enthalpy_range_K:
+    - 1873
+    - 1948
+    calorimetry: Drop calorimeter cooling measurements combined with heats of solution at 298 K.
+  context_id: zigo-1987-gehlenite-fusion::context::zigo_1987_method_and_heat_capacity_scope
+  work_id: fb452fa635b46a767af5c67fd67d2b5dac81e9779337b0cdfc22bcec4e149298
+  source_id: zigo-1987-gehlenite-fusion
+  species: gehlenite
+- observation_id: zigo_1987_prior_fusion_enthalpy_quoted
+  type: thermodynamic_example
+  locator:
+    page: 181
+    pdf_page_index: 11
+    references: '4'
+    paragraph: Results and discussion
+  units: kJ mol−1
+  values:
+    quantity: prior_gehlenite_heat_of_fusion
+    method_class: quoted
+    delta_H_fus_kJ_mol-1: '156.2'
+    cited_source: Scholze & Kumm (1969), Tonind. Ztg. 93, 360 [4]
+    comparison_as_printed: The cited value is about 10% lower than the calorimetric value determined in this work.
+  context_id: zigo-1987-gehlenite-fusion::context::zigo_1987_prior_fusion_enthalpy_quoted
+  work_id: fb452fa635b46a767af5c67fd67d2b5dac81e9779337b0cdfc22bcec4e149298
+  source_id: zigo-1987-gehlenite-fusion
+  species: gehlenite

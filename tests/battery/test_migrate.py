@@ -74,6 +74,7 @@ from simulator.battery.migrate import (
     compilation_record_asset_id,
     compilation_column_series_from_record,
     _provenance_from_extract,
+    _initial_oxide_map_from_values,
     load_migrated_store,
     expand_queue_entries,
     group_queue_entries,
@@ -405,7 +406,13 @@ def _write_min_tree(root: Path, extract: dict | None = None) -> Path:
     return root
 
 
-def _migrate_real_extract(tmp_path: Path, name: str, *, write: bool = False):
+def _migrate_real_extract(
+    tmp_path: Path,
+    name: str,
+    *,
+    write: bool = False,
+    use_repository_index_row: bool = False,
+):
     src = REPO_ROOT / "data" / "literature" / "extracts" / name
     doc = yaml.safe_load(src.read_text(encoding="utf-8"))
     assert isinstance(doc, dict)
@@ -414,16 +421,23 @@ def _migrate_real_extract(tmp_path: Path, name: str, *, write: bool = False):
     extracts.mkdir(parents=True)
     (root / "data" / "literature" / "compilations").mkdir(parents=True)
     source = doc.get("source") if isinstance(doc.get("source"), dict) else {}
-    index = {
-        "schema_version": "literature_index.v1",
-        "sources": [
-            {
-                "source_id": doc.get("source_id") or src.stem,
-                "citation": source.get("citation") or src.stem,
-                "doi": source.get("doi"),
-            }
-        ],
-    }
+    source_id = doc.get("source_id") or src.stem
+    if use_repository_index_row:
+        repository_index = yaml.safe_load(
+            (REPO_ROOT / "data" / "literature" / "INDEX.yaml").read_text(
+                encoding="utf-8"
+            )
+        )
+        index_row = next(
+            row for row in repository_index["sources"] if row["source_id"] == source_id
+        )
+    else:
+        index_row = {
+            "source_id": source_id,
+            "citation": source.get("citation") or src.stem,
+            "doi": source.get("doi"),
+        }
+    index = {"schema_version": "literature_index.v1", "sources": [index_row]}
     (root / "data" / "literature" / "INDEX.yaml").write_text(
         yaml.safe_dump(index, sort_keys=False),
         encoding="utf-8",
@@ -1086,6 +1100,25 @@ def test_lineage_parents_from_source_never_invents_pointer() -> None:
     )
     assert parents == ("src::local_a", "other::obs", "src::local_b")
     assert prose == ("prose note",)
+
+    parents, prose = lineage_parents_from_source(
+        {"derived_from": ["tables:src", "tables:src/t2.csv"]},
+        {},
+        "src",
+        set(),
+    )
+    assert parents == ("tables:src",)
+    assert prose == ("tables:src/t2.csv",)
+
+    parents, prose = lineage_parents_from_source(
+        {"derived_from": ["tables:src/t2.csv"]},
+        {},
+        "src",
+        set(),
+        asset_ids={"tables:src/t2.csv"},
+    )
+    assert parents == ("tables:src/t2.csv",)
+    assert prose == ()
 
     assert lineage_parents_from_source({}, {}, "src", {"local_a"}) == ((), ())
 
@@ -2419,6 +2452,31 @@ def test_t998_admitted_source_rows_survive_migration(tmp_path: Path) -> None:
     assert {row.derivation.relation for row in target if row.derivation} == {
         "nonlinear_least_squares_K_star_fit",
         "K_star_over_alpha_e_and_pure_system_equilibrium_constant",
+    }
+
+
+def test_t998_plante_reduced_derivation_keeps_registered_table_input(
+    tmp_path: Path,
+) -> None:
+    plante = _migrate_real_extract(
+        tmp_path / "plante",
+        "kems-042-plante-1979.yaml",
+        use_repository_index_row=True,
+    )
+    row = plante.observations[
+        "kems-042-plante-1979::plante1979_table2_k2o_s1104_000_1302K"
+    ]
+
+    assert row.evidence.original_method_class == "directly_reduced_measurement"
+    assert row.derivation is not None
+    assert row.derivation.relation.startswith("Plante eq. (2)")
+    assert "eq. (3)" in row.derivation.relation
+    assert "eq. (5)" in row.derivation.relation
+    assert row.derivation.inputs == ("tables:kems-042-plante-1979",)
+
+    work = plante.works[plante.experiments[row.experiment_id].work_id]
+    assert row.derivation.inputs[0] in {
+        asset.asset_id for asset in work.source_files.files
     }
 
 
@@ -4458,6 +4516,8 @@ def test_l02_reviewed_prefix_collisions_keep_the_unaliased_parse() -> None:
 
 
 _TYPE_CONTRADICTIONS = [
+    # These current rows pin quantity refusals. Four Stebbins replacements
+    # now exercise missing-quantity handling, not the former calorimetry guard.
     ("ames-walsh-white-1967.yaml", "Ames67_EuO_dissociation"),
     ("ames-walsh-white-1967.yaml", "Ames67_YbO_dissociation"),
     ("banchor-matsui-naito-1986.yaml", "Ban86_equations"),
@@ -4494,12 +4554,90 @@ _TYPE_CONTRADICTIONS = [
     ("kems-184-behrens-1979.yaml", "behrens_1979_sic2_equilibrium_enthalpy_and_barrier"),
     ("kems-184-behrens-1979.yaml", "behrens_1979_sic2_formation_enthalpies"),
     ("nist-webbook.yaml", "Rau74_critical_constants"),
-    ("stebbins-carmichael-weill-1983.yaml", "stebbins_1983_diopside_calorimetry_tables_1_7"),
-    ("stebbins-carmichael-weill-1983.yaml", "stebbins_1983_albite_analbite_calorimetry_tables_1_7"),
-    ("stebbins-carmichael-weill-1983.yaml", "stebbins_1983_sanidine_calorimetry_tables_3_7"),
-    ("stebbins-carmichael-weill-1983.yaml", "stebbins_1983_nepheline_calorimetry_tables_3_7"),
-    ("stebbins-carmichael-weill-1983.yaml", "stebbins_1983_anorthite_calorimetry_tables_1_7"),
+    # The four current series rows return missing quantity; inline fixtures
+    # below retain the former calorimetric gibbs_table guard probes. Anorthite
+    # still exercises that guard from the current extract.
+    ("stebbins-carmichael-weill-1983.yaml", "stebbins_1983_diopside_calorimetry_measured_tables_1_3"),
+    ("stebbins-carmichael-weill-1983.yaml", "stebbins_1983_albite_analbite_calorimetry_measured_tables_1_5"),
+    ("stebbins-carmichael-weill-1983.yaml", "stebbins_1983_sanidine_calorimetry_measured_table_3"),
+    ("stebbins-carmichael-weill-1983.yaml", "stebbins_1983_nepheline_calorimetry_measured_table_3"),
+    ("stebbins-carmichael-weill-1983.yaml", "stebbins_1983_anorthite_calorimetry_measured_table_1"),
     ("wetzel-gail-2013-sio-arrhenius.yaml", "wetzel_gail_2013_sio_arrhenius"),
+]
+_L05_CALORIMETRIC_GIBBS_GUARD_REASON = (
+    "source is calorimetric enthalpy/heat content, not delta_fG"
+)
+_L05_CALORIMETRIC_GIBBS_FIXTURES = [
+    (
+        "fixture:stebbins_1983_diopside_calorimetry_tables_1_7",
+        {
+            "observation_id": "fixture:stebbins_1983_diopside_calorimetry_tables_1_7",
+            "type": "gibbs_table",
+            "units": "as published",
+            "standard_state": "heat content referred to 300 K; heat of fusion at 1 bar",
+            "regime": "drop calorimetry",
+            "values": {
+                "composition": "CaMgSi2O6",
+                "system": "diopside calorimetric heat content",
+            },
+        },
+        _L05_CALORIMETRIC_GIBBS_GUARD_REASON,
+    ),
+    (
+        "fixture:stebbins_1983_albite_analbite_calorimetry_tables_1_7",
+        {
+            "observation_id": "fixture:stebbins_1983_albite_analbite_calorimetry_tables_1_7",
+            "type": "gibbs_table",
+            "units": "as published",
+            "standard_state": "heat content referred to 300 K; heat of fusion at 1 bar",
+            "regime": "drop calorimetry",
+            "values": {
+                "composition": "NaAlSi3O8",
+                "system": "albite and analbite calorimetric heat content",
+            },
+        },
+        _L05_CALORIMETRIC_GIBBS_GUARD_REASON,
+    ),
+    (
+        "fixture:stebbins_1983_sanidine_calorimetry_tables_3_7",
+        {
+            "observation_id": "fixture:stebbins_1983_sanidine_calorimetry_tables_3_7",
+            "type": "gibbs_table",
+            "units": "as published",
+            "standard_state": "heat content referred to 300 K; heat of fusion at 1 bar",
+            "regime": "drop calorimetry",
+            "values": {
+                "composition": "KAlSi3O8",
+                "system": "sanidine calorimetric heat content",
+            },
+        },
+        _L05_CALORIMETRIC_GIBBS_GUARD_REASON,
+    ),
+    (
+        "fixture:stebbins_1983_nepheline_calorimetry_tables_3_7",
+        {
+            "observation_id": "fixture:stebbins_1983_nepheline_calorimetry_tables_3_7",
+            "type": "gibbs_table",
+            "units": "as published",
+            "standard_state": "heat content referred to 300 K; heat of fusion at 1 bar",
+            "regime": "drop calorimetry",
+            "values": {
+                "composition": "NaAlSiO4",
+                "system": "nepheline calorimetric heat content",
+            },
+        },
+        _L05_CALORIMETRIC_GIBBS_GUARD_REASON,
+    ),
+]
+_L05_CALORIMETRIC_REPLACEMENT_REASONS = [
+    ("stebbins_1983_diopside_calorimetry_measured_tables_1_3", "missing quantity"),
+    ("stebbins_1983_albite_analbite_calorimetry_measured_tables_1_5", "missing quantity"),
+    ("stebbins_1983_sanidine_calorimetry_measured_table_3", "missing quantity"),
+    ("stebbins_1983_nepheline_calorimetry_measured_table_3", "missing quantity"),
+    (
+        "stebbins_1983_anorthite_calorimetry_measured_table_1",
+        _L05_CALORIMETRIC_GIBBS_GUARD_REASON,
+    ),
 ]
 _FIELD_ALPHA_CONTRADICTIONS = [
     ("kems-001-homma-1966.yaml", "homma_1966_mn_olette_alpha_exp_table1"),
@@ -4544,6 +4682,26 @@ def test_l05c1_type_contradictions_are_quantity_unknown() -> None:
         )
         assert not state.is_value, (oid, state, reason)
         assert reason
+
+
+def test_l05c1_calorimetric_gibbs_guard_reasons_are_pinned() -> None:
+    for fixture_id, row, expected_reason in _L05_CALORIMETRIC_GIBBS_FIXTURES:
+        assert fixture_id.startswith("fixture:")
+        state, reason = map_quantity(
+            row["type"], row["values"], units=row["units"], row=row
+        )
+        assert not state.is_value
+        assert reason == expected_reason, (fixture_id, state, reason)
+
+    for observation_id, expected_reason in _L05_CALORIMETRIC_REPLACEMENT_REASONS:
+        row = _extract_observation(
+            "stebbins-carmichael-weill-1983.yaml", observation_id
+        )
+        state, reason = map_quantity(
+            row.get("type"), row.get("values"), units=row.get("units"), row=row
+        )
+        assert not state.is_value
+        assert reason == expected_reason, (observation_id, state, reason)
 
 
 def test_l05c1_olette_alpha_fields_are_quantity_unknown() -> None:
@@ -5053,6 +5211,301 @@ def test_dacko_minor_constituents_are_omitted_from_activity_composition() -> Non
         composition, omitted = _mole_fraction_composition_from_values(row["values"])
         assert composition is None
         assert "minor constituents" in omitted
+
+
+def test_kume_activity_values_use_schema_type_and_map_to_activity() -> None:
+    extract = yaml.safe_load(
+        (REPO_ROOT / "data/literature/extracts/kume-2000-cao-activities.yaml")
+        .read_text(encoding="utf-8")
+    )
+    rows = []
+    for species in ("CaO", "SiO2"):
+        block = extract["species"][species]
+        rows.extend(
+            row
+            for row in block["observations"]
+            if "activity" in (row.get("values") or {})
+        )
+
+    assert len(rows) == 208
+    for row in rows:
+        assert row["type"] == "activity_coefficient", row["observation_id"]
+        quantity, reason = map_quantity(
+            row.get("type"), row.get("values"), units=row.get("units"), row=row
+        )
+        assert quantity.is_value and quantity.value is Quantity.ACTIVITY
+        assert reason is None
+
+    assert all(
+        sample["observable"] == "activity_coefficient"
+        for sample in extract["fidelity_samples"]
+    )
+
+
+def test_kume_experiment_temperatures_have_table_locators(tmp_path: Path) -> None:
+    result = _migrate_real_extract(
+        tmp_path, "kume-2000-cao-activities.yaml", write=False
+    )
+    expected = {
+        "kume-2000-table1-1823k": (Decimal("1823"), "1", 562),
+        "kume-2000-table1-1873k": (Decimal("1873"), "1", 562),
+        "kume-2000-table2-1823k": (Decimal("1823"), "2", 563),
+        "kume-2000-table3-1873k": (Decimal("1873"), "3", 564),
+        "kume-2000-table4-1873k": (Decimal("1873"), "4", 565),
+    }
+    seen = set()
+    for experiment in result.experiments.values():
+        local_id = experiment.experiment_id.rsplit("::", 1)[-1]
+        if local_id not in expected:
+            continue
+        temperature, table, page = expected[local_id]
+        condition = experiment.conditions["temperature_K"]
+        assert condition.state.is_value
+        assert condition.state.value == temperature
+        assert condition.locator is not None
+        assert str(condition.locator.table) == table
+        assert condition.locator.page == page
+        seen.add(local_id)
+
+    assert seen == set(expected)
+
+
+def test_kume_activity_compositions_map_to_parent_oxide_basis(tmp_path: Path) -> None:
+    name = "kume-2000-cao-activities.yaml"
+    result = _migrate_real_extract(tmp_path / "real", name)
+    observations = {
+        obs.observation_id.rsplit("::", 1)[-1]: obs
+        for obs in result.observations.values()
+    }
+
+    table2 = observations["kume_2000_table2_sample_101"]
+    assert table2.identity.composition is not None
+    assert table2.identity.composition.is_value
+    # Hand conversion: 0.085 mol AlO1.5 is 0.0425 mol Al2O3;
+    # the renormalised total is 0.876 + 0.039 + 0.0425 = 0.9575.
+    assert table2.identity.composition.value.as_map() == {
+        "SiO2": Decimal("0.876") / Decimal("0.9575"),
+        "CaO": Decimal("0.039") / Decimal("0.9575"),
+        "Al2O3": Decimal("0.0425") / Decimal("0.9575"),
+    }
+
+    table4 = observations["kume_2000_table4_sample_301"]
+    assert table4.identity.composition is not None
+    assert table4.identity.composition.is_value
+    raw_table4 = next(
+        row
+        for row in _extract_observations(name)
+        if row.get("observation_id") == "kume_2000_table4_sample_301"
+    )
+    table4_mass = _initial_oxide_map_from_values(raw_table4["values"])
+    assert table4_mass is not None
+    assert table4_mass["Al2O3"] == Decimal("27.8")
+    assert "AlO1.5" not in table4_mass
+
+    # A chemically parseable but unsupported oxide must invalidate the whole
+    # composition; mapping only the components we happen to recognise is lossy.
+    source = REPO_ROOT / "data" / "literature" / "extracts" / name
+    extract = yaml.safe_load(source.read_text(encoding="utf-8"))
+    extract["source_id"] = "fixture-source"
+    raw_table2 = next(
+        row
+        for row in _extract_observations(name)
+        if row.get("observation_id") == "kume_2000_table2_sample_101"
+    )
+    raw_table2["values"]["composition_mole_fraction"]["ZnO"] = 0.001
+    for block in extract["species"].values():
+        block["observations"] = [
+            raw_table2
+            if row.get("observation_id") == "kume_2000_table2_sample_101"
+            else row
+            for row in block.get("observations", [])
+        ]
+    unknown_result = migrate(_write_min_tree(tmp_path / "unknown", extract), write=False)
+    unknown_observation = next(
+        obs
+        for obs in unknown_result.observations.values()
+        if obs.observation_id.endswith("::kume_2000_table2_sample_101")
+    )
+    assert unknown_observation.identity.composition is not None
+    assert unknown_observation.identity.composition.is_unknown
+
+
+@pytest.mark.parametrize(
+    ("composition_key", "observation_id"),
+    [
+        ("composition_mole_fraction", "kume_2000_table2_sample_101"),
+        ("composition_mass_percent", "kume_2000_table4_sample_301"),
+    ],
+)
+def test_kume_malformed_declared_composition_amount_makes_whole_composition_unknown(
+    tmp_path: Path, composition_key: str, observation_id: str
+) -> None:
+    name = "kume-2000-cao-activities.yaml"
+    source = REPO_ROOT / "data" / "literature" / "extracts" / name
+    extract = yaml.safe_load(source.read_text(encoding="utf-8"))
+    extract["source_id"] = "fixture-source"
+    row = next(
+        row
+        for row in extract["species"]["CaO"]["observations"]
+        if row.get("observation_id") == observation_id
+    )
+    composition = row["values"][composition_key]
+    component = "CaO"
+    assert component in composition and len(composition) > 2
+    composition[component] = "not-a-number"
+
+    result = migrate(_write_min_tree(tmp_path, extract), write=False)
+    observation = next(
+        item
+        for item in result.observations.values()
+        if item.observation_id.endswith(f"::{observation_id}")
+    )
+    assert observation.identity.composition is not None
+    assert observation.identity.composition.is_unknown
+
+
+def test_kume_measured_reduced_activity_preserves_structured_derivation(
+    tmp_path: Path,
+) -> None:
+    name = "kume-2000-cao-activities.yaml"
+    result = _migrate_real_extract(tmp_path, name)
+    observation_id = "kume_2000_table2_sample_101"
+    observation = next(
+        obs
+        for obs in result.observations.values()
+        if obs.observation_id.endswith(f"::{observation_id}")
+    )
+    raw = next(
+        row
+        for row in _extract_observations(name)
+        if row.get("observation_id") == observation_id
+    )
+    raw_derivation = raw["derivation"]
+
+    assert observation.derivation is not None
+    assert observation.derivation.relation == raw_derivation["relation"]
+    assert observation.derivation.inputs == tuple(
+        f"kume-2000-cao-activities::{item}"
+        for item in raw_derivation["inputs"]
+    )
+    assert not any(
+        entry.observation_id == observation.observation_id
+        and entry.axes in (["derivation"], ["derived_from"])
+        for entry in result.queue
+    )
+
+
+def test_unregistered_table_derivation_input_is_not_retained(
+    tmp_path: Path,
+) -> None:
+    name = "kume-2000-cao-activities.yaml"
+    extract = yaml.safe_load(
+        (REPO_ROOT / "data" / "literature" / "extracts" / name).read_text(
+            encoding="utf-8"
+        )
+    )
+    extract["source_id"] = "fixture-source"
+    observation_id = "kume_2000_table2_sample_101"
+    unregistered = "tables:fixture-source/not-registered.csv"
+    row = next(
+        row
+        for block in extract["species"].values()
+        for row in block["observations"]
+        if row.get("observation_id") == observation_id
+    )
+    row["derivation"]["inputs"] = [unregistered]
+
+    result = migrate(_write_min_tree(tmp_path, extract), write=False)
+    observation = next(
+        obs
+        for obs in result.observations.values()
+        if obs.observation_id.endswith(f"::{observation_id}")
+    )
+    assert unregistered not in (observation.derived_from or ())
+    assert observation.derivation is None or unregistered not in observation.derivation.inputs
+
+    report = validate_corpus(
+        result.works, result.experiments, result.observations, residuals=None
+    )
+    assert not any(
+        issue.reason is RefusalReason.REFERENTIAL_INTEGRITY
+        for issue in report.hard_issues
+    )
+
+
+def test_measured_reduced_derivation_prose_input_is_queued_not_pointed(
+    tmp_path: Path,
+) -> None:
+    name = "stebbins-carmichael-weill-1983.yaml"
+    source = REPO_ROOT / "data" / "literature" / "extracts" / name
+    extract = yaml.safe_load(source.read_text(encoding="utf-8"))
+    extract["source_id"] = "fixture-source"
+    raw = next(
+        row
+        for block in extract["species"].values()
+        for row in block["observations"]
+        if row.get("observation_id") == "stebbins_1983_diopside_table_4_fit"
+    )
+    assert raw["values"]["derivation"]["inputs"] == [
+        "Table 2 DSC Cp points",
+        "Table 3 drop-calorimetric heat contents",
+    ]
+
+    result = migrate(_write_min_tree(tmp_path, extract), write=True)
+    observation = next(
+        obs
+        for obs in result.observations.values()
+        if obs.observation_id.endswith("::stebbins_1983_diopside_table_4_fit")
+    )
+    queued = [
+        entry
+        for entry in result.queue
+        if entry.observation_id == observation.observation_id
+        and "Table 2 DSC Cp points" in (entry.why or "")
+    ]
+    assert len(queued) == 1
+    assert queued[0].axes == ["derived_from"]
+    assert queued[0].locator
+    report = validate_corpus(
+        result.works, result.experiments, result.observations, residuals=None
+    )
+    assert not any(
+        issue.path.startswith(f"observation[{observation.observation_id}].")
+        and issue.reason is RefusalReason.REFERENTIAL_INTEGRITY
+        for issue in report.hard_issues
+    )
+
+
+def test_kume_measured_reduced_activity_without_derivation_stays_queued(
+    tmp_path: Path,
+) -> None:
+    name = "kume-2000-cao-activities.yaml"
+    source = REPO_ROOT / "data" / "literature" / "extracts" / name
+    extract = yaml.safe_load(source.read_text(encoding="utf-8"))
+    extract["source_id"] = "fixture-source"
+    observation_id = "kume_2000_table2_sample_101"
+    for block in extract["species"].values():
+        for row in block.get("observations", []):
+            if row.get("observation_id") == observation_id:
+                row.pop("derivation")
+
+    result = migrate(_write_min_tree(tmp_path, extract), write=False)
+    observation = next(
+        obs
+        for obs in result.observations.values()
+        if obs.observation_id.endswith(f"::{observation_id}")
+    )
+    assert observation.derivation is None
+    derivation_queue = [
+        entry
+        for entry in result.queue
+        if entry.observation_id == observation.observation_id
+        and entry.axes == ["derivation"]
+    ]
+    assert len(derivation_queue) == 1
+    assert derivation_queue[0].why == (
+        "derived evidence class with unstated derivation; queued for page-grounding"
+    )
 
 
 def test_l05g1a_table_qualifier_leaves_reference_state_unknown(tmp_path: Path) -> None:

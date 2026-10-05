@@ -10,7 +10,7 @@ work:
     corpus_repo: regolith-corpus
     corpus_commit:
       tag: value
-      value: 2ef619255debb2beb4718b52908a77d8cf504b5f
+      value: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
     files:
     - asset_id: pdf:kems-190-wu-1993
       role: pdf
@@ -95,3 +95,102 @@ experiments:
     table: '1'
     note: MgO liquid and solid rows
     source_path: docs-private/research/2026-09-06-wave-3/W3-wu-1993-feo-mgo-sio2/kems-190-wu-1993/tables/t1.csv
+context:
+- observation_id: wu_1993_calculated_peritectic_olivine_endmembers
+  type: analytical_composition
+  locator:
+    published_page: 34
+    paragraph: For the liquid phase
+    note: Calculated olivine endmember statement at the model ternary peritectic; not the liquid composition
+  phase: olivine_in_equilibrium_with_peritectic_liquid
+  regime: modified_quasichemical_model_asymmetric_combining_rule
+  units: wt_percent
+  values:
+    quantity: olivine_endmember_wt_pct
+    method_class: model_derived
+    admission_status: model_output_not_measurement
+    semantics: verbatim_phase_context_not_engine_input
+    associated_observation_id: wu_1993_calculated_ternary_peritectic
+    role: calculated_peritectic_olivine
+    Fe2SiO4_wt_pct_as_published: '61'
+    printed_quote: calculated olivine composition ... 61 wt% Fe2SiO4
+  uncertainty:
+    note: No numeric uncertainty is printed for the calculated olivine endmember amount.
+  context_id: kems-190-wu-1993::context::wu_1993_calculated_peritectic_olivine_endmembers
+  work_id: 10.2355/isijinternational.33.26
+  source_id: kems-190-wu-1993
+  species: FeO
+- observation_id: wu_1993_calculated_peritectic_pyroxene_endmembers
+  type: analytical_composition
+  locator:
+    published_page: 34
+    paragraph: For the liquid phase
+    note: Calculated pyroxene endmember statement at the model ternary peritectic; not the liquid composition
+  phase: pyroxene_in_equilibrium_with_peritectic_liquid
+  regime: modified_quasichemical_model_asymmetric_combining_rule
+  units: wt_percent
+  values:
+    quantity: pyroxene_endmember_wt_pct
+    method_class: model_derived
+    admission_status: model_output_not_measurement
+    semantics: verbatim_phase_context_not_engine_input
+    associated_observation_id: wu_1993_calculated_ternary_peritectic
+    role: calculated_peritectic_pyroxene
+    FeSiO3_wt_pct_as_published: '50'
+    printed_quote: calculated pyroxene composition ... 50 wt% FeSiO3
+  uncertainty:
+    note: No numeric uncertainty is printed for the calculated pyroxene endmember amount.
+  context_id: kems-190-wu-1993::context::wu_1993_calculated_peritectic_pyroxene_endmembers
+  work_id: 10.2355/isijinternational.33.26
+  source_id: kems-190-wu-1993
+  species: FeO
+- observation_id: wu_1993_reported_peritectic_olivine_endmembers
+  type: analytical_composition
+  locator:
+    published_page: 33
+    paragraph: The MgO-FeO-SiO2 System
+    note: Reported olivine endmember wt% at the ternary peritectic from reference 16; not the liquid composition
+  phase: olivine_in_equilibrium_with_peritectic_liquid
+  regime: reported_quench_experiment_from_Bowen_and_Schairer_1935
+  units: wt_percent
+  values:
+    quantity: olivine_endmember_wt_pct
+    method_class: measured_direct
+    semantics: verbatim_phase_context_not_engine_input
+    associated_observation_id: wu_1993_reported_ternary_peritectic
+    role: reported_peritectic_olivine
+    oxides_wt_pct_as_published:
+      Fe2SiO4: '68'
+      Mg2SiO4: '32'
+    printed_quote: olivine containing 68 wt% Fe2SiO4 and 32 wt% Mg2SiO4
+  uncertainty:
+    note: No numeric uncertainty is printed for the reported olivine endmember amounts.
+  context_id: kems-190-wu-1993::context::wu_1993_reported_peritectic_olivine_endmembers
+  work_id: 10.2355/isijinternational.33.26
+  source_id: kems-190-wu-1993
+  species: FeO
+- observation_id: wu_1993_reported_peritectic_pyroxene_endmembers
+  type: analytical_composition
+  locator:
+    published_page: 33
+    paragraph: The MgO-FeO-SiO2 System
+    note: Reported pyroxene endmember wt% at the ternary peritectic from reference 16; not the liquid composition
+  phase: pyroxene_in_equilibrium_with_peritectic_liquid
+  regime: reported_quench_experiment_from_Bowen_and_Schairer_1935
+  units: wt_percent
+  values:
+    quantity: pyroxene_endmember_wt_pct
+    method_class: measured_direct
+    semantics: verbatim_phase_context_not_engine_input
+    associated_observation_id: wu_1993_reported_ternary_peritectic
+    role: reported_peritectic_pyroxene
+    oxides_wt_pct_as_published:
+      FeSiO3: '62'
+      MgSiO3: '38'
+    printed_quote: pyroxene containing 62 wt% FeSiO3 and 38 wt% MgSiO3
+  uncertainty:
+    note: No numeric uncertainty is printed for the reported pyroxene endmember amounts.
+  context_id: kems-190-wu-1993::context::wu_1993_reported_peritectic_pyroxene_endmembers
+  work_id: 10.2355/isijinternational.33.26
+  source_id: kems-190-wu-1993
+  species: FeO

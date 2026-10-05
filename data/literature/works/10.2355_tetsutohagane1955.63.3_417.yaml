@@ -9,7 +9,7 @@ work:
     corpus_repo: regolith-corpus
     corpus_commit:
       tag: value
-      value: 2ef619255debb2beb4718b52908a77d8cf504b5f
+      value: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
     files:
     - asset_id: pdf:kems-066-ichise-1977
       role: pdf
@@ -911,6 +911,15 @@ experiments:
       regime_class:
         tag: unknown
         reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+    cell_internal_pressure_note:
+      state:
+        tag: value
+        value: unstated
+      locator:
+        published_page: 419
+        pdf_page_index: 3
+        section: '2.6'
+        note: vacuum quality / chamber pressure not printed; Fig. 3 is chamber voltage vs ion ratio
   work_id: 10.2355/tetsutohagane1955.63.3_417
   locator:
     published_page: 421
@@ -2054,8 +2063,9 @@ context:
         pdf_page_index: 2
         section: '2.2'
         note: Clausing factor not printed
-    chamber_pressure:
+    residual_pressure_Pa_as_printed:
       value: unstated
+      quote: unstated
       locator:
         published_page: 419
         pdf_page_index: 3

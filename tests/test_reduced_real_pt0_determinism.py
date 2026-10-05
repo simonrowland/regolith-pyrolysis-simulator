@@ -20,6 +20,7 @@ from simulator.chemistry.kernel.capabilities import CapabilityProfile
 from simulator.chemistry.kernel.dto import IntentRequest, IntentResult
 from simulator.chemistry.kernel.provider import ChemistryProvider
 from simulator.corpus_version import current_corpus_version
+from simulator.config import DEFAULT_ALPHAMELTS_MODEL
 from simulator.grind_preflight import GrindSourceGateError
 from simulator.melt_backend.base import (
     EquilibriumResult,
@@ -574,13 +575,15 @@ def test_interpolation_diagnostics_do_not_enter_replay_key() -> None:
     assert b"interpolation_feasibility" not in canonical_json_bytes(after)
 
 
-def test_alphamelts_provider_key_partitions_model_mode_not_engine_version() -> None:
+def test_alphamelts_provider_key_partitions_mode_not_engine_version() -> None:
     base = _alphamelts_silicate_equilibrium_key()
-    pmelts = _alphamelts_silicate_equilibrium_key(model="pMELTS")
     thermoengine = _alphamelts_silicate_equilibrium_key(mode="thermoengine")
     next_engine = _alphamelts_silicate_equilibrium_key(
         engine_version="alphamelts-authentic-test-2"
     )
+
+    with pytest.raises(ValueError, match="no verified ALPHAMELTS_CALC_MODE"):
+        _alphamelts_silicate_equilibrium_key(model="pMELTS")
 
     assert base["model"] == {
         "model": "MELTSv1.0.2",
@@ -590,10 +593,8 @@ def test_alphamelts_provider_key_partitions_model_mode_not_engine_version() -> N
     assert _key_hash(base) == (
         "3914dfa4cca7d7503c290122f70e67ab003fbcdaca1d5c230e49120236a8b048"
     )
-    assert pmelts["model"]["model"] == "pMELTS"
     assert thermoengine["model"]["mode"] == "thermoengine"
     assert "engine_version" not in next_engine["model"]
-    assert _key_hash(base) != _key_hash(pmelts)
     assert _key_hash(base) != _key_hash(thermoengine)
     assert _key_hash(base) == _key_hash(next_engine)
 
@@ -625,6 +626,64 @@ def _thermoengine_pt0_identity(model: str) -> tuple[dict, dict]:
     )
 
     return key, authority
+
+
+def _alphamelts_pt0_identity(model: str) -> tuple[dict, dict]:
+    from simulator.melt_backend.alphamelts import AlphaMELTSBackend
+
+    store = PT0DeterminismStore("capture")
+    sim = _build_pt0_sim(store)
+    backend = AlphaMELTSBackend(model_name=model)
+    backend._mode = "subprocess"
+    provider = AlphaMELTSProvider(backend=backend)
+    sim.backend = backend
+    sim._chem_registry.register(
+        provider,
+        [ChemistryIntent.SILICATE_EQUILIBRIUM],
+    )
+
+    key = store._equilibrium_key(sim)
+    authority = rrd._equilibrium_record_authority(
+        sim,
+        ChemistryIntent.SILICATE_EQUILIBRIUM,
+    )
+    return key, authority
+
+
+def test_blank_alphamelts_subprocess_model_resolves_to_default():
+    key, authority = _alphamelts_pt0_identity("")
+
+    assert key["model"]["model"] == DEFAULT_ALPHAMELTS_MODEL
+    assert authority["provider"]["model"] == DEFAULT_ALPHAMELTS_MODEL
+
+
+def test_explicit_default_alphamelts_subprocess_model_is_in_pt0_identity():
+    key, authority = _alphamelts_pt0_identity(DEFAULT_ALPHAMELTS_MODEL)
+
+    assert key["model"]["model"] == DEFAULT_ALPHAMELTS_MODEL
+    assert authority["provider"]["model"] == DEFAULT_ALPHAMELTS_MODEL
+
+
+def test_blank_and_explicit_default_alphamelts_identity_match_field_by_field():
+    blank_key, blank_authority = _alphamelts_pt0_identity("")
+    explicit_key, explicit_authority = _alphamelts_pt0_identity(
+        DEFAULT_ALPHAMELTS_MODEL
+    )
+
+    assert blank_key == explicit_key
+    assert blank_authority == explicit_authority
+
+    blank_non_model_key = copy.deepcopy(blank_key)
+    explicit_non_model_key = copy.deepcopy(explicit_key)
+    del blank_non_model_key["model"]["model"]
+    del explicit_non_model_key["model"]["model"]
+    assert blank_non_model_key == explicit_non_model_key
+
+    blank_non_model_provider = dict(blank_authority["provider"])
+    explicit_non_model_provider = dict(explicit_authority["provider"])
+    del blank_non_model_provider["model"]
+    del explicit_non_model_provider["model"]
+    assert blank_non_model_provider == explicit_non_model_provider
 
 
 def test_blank_thermoengine_model_resolves_to_default_in_pt0_identity() -> None:

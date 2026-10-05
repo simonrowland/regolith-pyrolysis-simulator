@@ -9,9 +9,27 @@ work:
   source_files:
     corpus_repo: regolith-corpus
     corpus_commit:
-      tag: unknown
-      reason: INDEX does not give corpus commit
+      tag: value
+      value: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
     files:
+    - asset_id: pdf:mendybaev-2021-cai-low-pressure-h2-evap
+      role: pdf
+      path: raw/mendybaev-2021-cai-low-pressure-h2-evap/mendybaev-2021-cai-low-pressure-h2-evap.pdf
+      sha256:
+        tag: value
+        value: a1878289814b0f7a6141c099e51c21d9c8454fb4388612e4a927bdd013a31ce3
+    - asset_id: pdftotext:mendybaev-2021-cai-low-pressure-h2-evap
+      role: pdftotext
+      path: text/mendybaev-2021-cai-low-pressure-h2-evap
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: tables:mendybaev-2021-cai-low-pressure-h2-evap
+      role: table_csv
+      path: tables/mendybaev-2021-cai-low-pressure-h2-evap
+      sha256:
+        tag: unknown
+        reason: INDEX does not give table sha256
     - asset_id: unknown:mendybaev-2021-cai-low-pressure-h2-evap
       role: pdftotext
       path: unknown

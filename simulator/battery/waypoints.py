@@ -9,7 +9,10 @@ from collections.abc import Iterator, Mapping
 
 from simulator.accounting.formulas import resolve_species_formula
 from simulator.battery.enums import AmountBasis, MethodToken, Quantity, ValueKind
-from simulator.battery.migrate import _OXIDE_COMPONENT_KEYS
+from simulator.battery.migrate import (
+    _OXIDE_COMPONENT_KEYS,
+    _knudsen_effusion_chamber_background_not_for_identity,
+)
 from simulator.battery.records import (
     Bench,
     Composition,
@@ -1077,6 +1080,31 @@ def pressure_boundary(
     return _result("pressure_boundary", routes, tuple(pressure_inputs), present=pressure_inputs)
 
 
+def _prediction_pressure_waypoint(
+    result: WaypointResult, method: State[MethodToken] | None
+) -> Waypoint | None:
+    """Select pressure eligible as sample pressure for a prediction.
+
+    Knudsen experiment chamber background (``printed_run_pressure``) stays
+    available on the raw pressure_boundary waypoint for exterior/validity
+    consumers. Prediction pressure instead uses the first non-chamber route,
+    or is absent when no such route exists. Other methods retain their
+    pressure_boundary selection unchanged.
+    """
+
+    selected = result.selected
+    if (
+        selected is not None
+        and selected.route == "printed_run_pressure"
+        and _knudsen_effusion_chamber_background_not_for_identity(method)
+    ):
+        for route in result.routes:
+            if route.route != "printed_run_pressure":
+                return route
+        return None
+    return selected
+
+
 def effective_escape_area(experiment: Experiment, bench: Bench) -> WaypointResult:
     del experiment
     routes: list[Waypoint] = []
@@ -1365,7 +1393,9 @@ def _c_co_pressure_Pa(
     if sweep.state.is_value and sweep.state.value.alternatives is None:
         gas = sweep.state.value
         if gas.species == "CO":
-            boundary = pressure_boundary(experiment, bench, observation).selected
+            boundary = _prediction_pressure_waypoint(
+                pressure_boundary(experiment, bench, observation), experiment.method
+            )
             if boundary is not None and boundary.value.kind is ValueKind.POINT:
                 return boundary.value, boundary.inputs
     return None
@@ -1380,6 +1410,8 @@ def _is_pressure_unit_conversion(inference: object) -> bool:
             for item in getattr(inference, "inputs", ())
         )
     )
+
+
 
 
 def oxygen_condition(
@@ -1436,7 +1468,9 @@ def oxygen_condition(
         comp = gas.state.value
         if isinstance(comp, Composition) and comp.amount_basis is AmountBasis.MOLE_FRACTION:
             fractions = dict(comp.components)
-            pressure = pressure_boundary(experiment, bench, observation).selected
+            pressure = _prediction_pressure_waypoint(
+                pressure_boundary(experiment, bench, observation), experiment.method
+            )
             if "O2" in fractions and pressure is not None:
                 # Ideal mixture: pO2=xO2*P. Units: dimensionless*Pa=Pa.
                 # At xO2=.2 and P=1e5 Pa, log10(fO2/bar)=log10(.2)=-.69897.
@@ -1507,7 +1541,9 @@ def oxygen_condition(
                     ))
         else:
             buffer = PUBLISHED_BUFFERS.get(buffer_token.upper())
-            pressure = pressure_boundary(experiment, bench, observation).selected
+            pressure = _prediction_pressure_waypoint(
+                pressure_boundary(experiment, bench, observation), experiment.method
+            )
             if buffer is not None and thermal is not None and pressure is not None:
                 temperature = thermal.value
                 if temperature.kind is ValueKind.SERIES and len({t for _, t in temperature.series}) == 1:
@@ -1532,7 +1568,9 @@ def oxygen_condition(
     # Sanity: P_total=1e-4 Pa=1e-9 bar gives log10(fO2/bar) <= -9.
     # Only the run pressure waypoint is inspected. Apparatus ultimate vacuum is
     # deliberately absent from pressure_boundary and cannot create this route.
-    boundary = pressure_boundary(experiment, bench, observation).selected
+    boundary = _prediction_pressure_waypoint(
+        pressure_boundary(experiment, bench, observation), experiment.method
+    )
     if boundary is not None and boundary.route in {"printed_run_pressure", "observation_total_pressure_Pa"}:
         pressure = boundary.value
         located_pressure = experiment.pressure_environment.total_pressure_Pa
@@ -1601,7 +1639,9 @@ def oxygen_condition(
         "fO2_log": False,
         "experiment.fO2_control": control_present,
         "temperature_K": thermal_path(experiment, bench, observation).selected is not None,
-        "total_pressure_Pa": pressure_boundary(experiment, bench, observation).selected is not None,
+        "total_pressure_Pa": _prediction_pressure_waypoint(
+            pressure_boundary(experiment, bench, observation), experiment.method
+        ) is not None,
     }
     return _result(
         "oxygen_condition",

@@ -1,0 +1,273 @@
+schema_version: literature_extract.v1
+source_id: robie-hemingway-wilson-1980-usgs-of-80-908
+source:
+  citation: Robie, R. A., Hemingway, B. S., and Wilson, W. H. (1980), Thermodynamic properties of minerals and related
+    substances at 298.15 K and 1 bar pressure and at higher temperatures, U.S. Geological Survey Open-File Report
+    80-908.
+  url: https://pubs.usgs.gov/of/1980/0908/report.pdf
+  report_number: USGS Open-File Report 80-908
+  year: 1980
+extraction:
+  method: >-
+    Target summary values were manually transcribed from rendered pages; high-temperature tables are transcribed-unverified
+    and deliberately not extracted (deferred: task t-1102).
+  date: '2026-10-03'
+  worker: t1101-robie1980
+review_status: draft
+classification:
+  primary: compilation_assessed
+  note: >-
+    The target summary properties and temperature tables are Robie et al. critical evaluations/fitted properties,
+    not direct measurements. Summary values were manually checked; high-temperature tables are transcribed-unverified
+    and deliberately not extracted (deferred: task t-1102).
+fidelity_samples:
+- species: gehlenite
+  observation_id: t1101_robie1980_gehlenite_summary_29815
+  field: S0_29815
+  value: 209.89
+  locator:
+    pdf_page_index: 65
+    published_page: 64
+    table: Summary of Critical Data
+- species: Ca2SiO4_ca_olivine_reference
+  observation_id: t1101_robie1980_Ca2SiO4_ca_olivine_reference_summary_29815
+  field: S0_29815
+  value: 120.499
+  locator:
+    pdf_page_index: 108
+    published_page: 107
+    table: Summary of Critical Data
+- species: Ca2SiO4_larnite_reference
+  observation_id: t1101_robie1980_Ca2SiO4_larnite_reference_summary_29815
+  field: S0_29815
+  value: 126.719
+  locator:
+    pdf_page_index: 110
+    published_page: 109
+    table: Summary of Critical Data
+- species: Ca2SiO4_alpha_prime
+  observation_id: t1101_robie1980_Ca2SiO4_alpha_prime_summary_29815
+  field: S0_29815
+  value: 116.049
+  locator:
+    pdf_page_index: 114
+    published_page: 113
+    table: Summary of Critical Data
+- species: Ca2SiO4_gamma
+  observation_id: t1101_robie1980_Ca2SiO4_gamma_summary_29815
+  field: S0_29815
+  value: 120.499
+  locator:
+    pdf_page_index: 117
+    published_page: 116
+    table: Summary of Critical Data
+- species: Ca2SiO4_beta_larnite
+  observation_id: t1101_robie1980_Ca2SiO4_beta_larnite_summary_29815
+  field: S0_29815
+  value: 126.719
+  locator:
+    pdf_page_index: 119
+    published_page: 118
+    table: Summary of Critical Data
+species:
+  gehlenite:
+    observations:
+    - observation_id: t1101_robie1980_gehlenite_summary_29815
+      type: gibbs_table
+      locator:
+        pdf_page_index: 65
+        published_page: 64
+        table: Summary of Critical Data
+      phase: gehlenite
+      standard_state: solid polymorph at 298.15 K; as identified in source
+      regime: summary_298.15_K
+      units: S° J/(mol·K); ΔH°f and ΔG°f kJ/mol, all as printed
+      values:
+        quantity: summary_thermodynamic_properties_at_298.15_K
+        method_class: compilation_assessed
+        evidence_class: compilation_assessed
+        phase: gehlenite
+        formula: Ca2Al2SiO7
+        temperature_K: 298.15
+        uncertainty_convention: ±2 sigma, as printed under Summary of Critical Data
+        S0_29815: 209.89
+        S0_uncertainty: 0.97
+        S0_units: J/(mol·K) as printed
+        delta_Hf0_29815_kJ_mol: -3981.7
+        delta_Hf0_uncertainty_kJ_mol: 2.5
+        delta_Hf0_units: kJ/mol as printed
+        delta_Gf0_29815_kJ_mol: -3783.0
+        delta_Gf0_uncertainty_kJ_mol: 2.3
+        delta_Gf0_units: kJ/mol as printed
+        comment: Assessed/fitted compilation value; uncertainty is reported as ±2 sigma. No unit conversion applied.
+  Ca2SiO4_ca_olivine_reference:
+    observations:
+    - observation_id: t1101_robie1980_Ca2SiO4_ca_olivine_reference_summary_29815
+      type: gibbs_table
+      locator:
+        pdf_page_index: 108
+        published_page: 107
+        table: Summary of Critical Data
+      phase: Ca-olivine reference state
+      standard_state: solid polymorph at 298.15 K; as identified in source
+      regime: summary_298.15_K
+      units: S° J/(mol·K); ΔH°f and ΔG°f kJ/mol, all as printed
+      values:
+        quantity: summary_thermodynamic_properties_at_298.15_K
+        method_class: compilation_assessed
+        evidence_class: compilation_assessed
+        phase: Ca-olivine reference state
+        formula: Ca2SiO4
+        temperature_K: 298.15
+        uncertainty_convention: ±2 sigma, as printed under Summary of Critical Data
+        S0_29815: 120.499
+        S0_uncertainty: 2.045
+        S0_units: J/(mol·K) as printed
+        delta_Hf0_29815_kJ_mol: -2316.534
+        delta_Hf0_uncertainty_kJ_mol: 2.441
+        delta_Hf0_units: kJ/mol as printed
+        delta_Gf0_29815_kJ_mol: -2199.776
+        delta_Gf0_uncertainty_kJ_mol: 1.881
+        delta_Gf0_units: kJ/mol as printed
+        comment: Assessed/fitted compilation value; uncertainty is reported as ±2 sigma. No unit conversion applied.
+  Ca2SiO4_larnite_reference:
+    observations:
+    - observation_id: t1101_robie1980_Ca2SiO4_larnite_reference_summary_29815
+      type: gibbs_table
+      locator:
+        pdf_page_index: 110
+        published_page: 109
+        table: Summary of Critical Data
+      phase: larnite reference state
+      standard_state: solid polymorph at 298.15 K; as identified in source
+      regime: summary_298.15_K
+      units: S° J/(mol·K); ΔH°f and ΔG°f kJ/mol, all as printed
+      values:
+        quantity: summary_thermodynamic_properties_at_298.15_K
+        method_class: compilation_assessed
+        evidence_class: compilation_assessed
+        phase: larnite reference state
+        formula: Ca2SiO4
+        temperature_K: 298.15
+        uncertainty_convention: ±2 sigma, as printed under Summary of Critical Data
+        S0_29815: 126.719
+        S0_uncertainty: 1.286
+        S0_units: J/(mol·K) as printed
+        delta_Hf0_29815_kJ_mol: -2306.697
+        delta_Hf0_uncertainty_kJ_mol: 1.328
+        delta_Hf0_units: kJ/mol as printed
+        delta_Gf0_29815_kJ_mol: -2191.794
+        delta_Gf0_uncertainty_kJ_mol: 1.039
+        delta_Gf0_units: kJ/mol as printed
+        comment: Assessed/fitted compilation value; uncertainty is reported as ±2 sigma. No unit conversion applied.
+  Ca2SiO4_alpha:
+    observations:
+    - observation_id: t1101_robie1980_ca2sio4_alpha_summary_29815_absent
+      type: gibbs_table
+      locator:
+        pdf_page_index: 112
+        published_page: 111
+        table: Summary of Critical Data
+      phase: alpha
+      standard_state: solid Ca2SiO4 alpha polymorph as identified in source
+      regime: summary_298.15_K
+      units: S° J/(mol·K); ΔH°f and ΔG°f kJ/mol as printed
+      values:
+        quantity: summary_thermodynamic_properties_at_298.15_K
+        method_class: compilation_assessed
+        evidence_class: compilation_assessed
+        formula: Ca2SiO4
+        temperature_K: 298.15
+        data_state: absent_in_source
+        note: The Summary of Critical Data heading and S°, ΔH°f, ΔG°f labels are printed, but their numeric values
+          and uncertainties are blank. The alpha table is limited to 1650–1800 K.
+  Ca2SiO4_alpha_prime:
+    observations:
+    - observation_id: t1101_robie1980_Ca2SiO4_alpha_prime_summary_29815
+      type: gibbs_table
+      locator:
+        pdf_page_index: 114
+        published_page: 113
+        table: Summary of Critical Data
+      phase: alpha prime
+      standard_state: solid polymorph at 298.15 K; as identified in source
+      regime: summary_298.15_K
+      units: S° J/(mol·K); ΔH°f and ΔG°f kJ/mol, all as printed
+      values:
+        quantity: summary_thermodynamic_properties_at_298.15_K
+        method_class: compilation_assessed
+        evidence_class: compilation_assessed
+        phase: alpha prime
+        formula: Ca2SiO4
+        temperature_K: 298.15
+        uncertainty_convention: ±2 sigma, as printed under Summary of Critical Data
+        S0_29815: 116.049
+        S0_uncertainty: 13.62
+        S0_units: J/(mol·K) as printed
+        delta_Hf0_29815_kJ_mol: -2198.074
+        delta_Hf0_uncertainty_kJ_mol: 7.537
+        delta_Hf0_units: kJ/mol as printed
+        delta_Gf0_29815_kJ_mol: -2079.989
+        delta_Gf0_uncertainty_kJ_mol: 3.536
+        delta_Gf0_units: kJ/mol as printed
+        comment: Assessed/fitted compilation value; uncertainty is reported as ±2 sigma. No unit conversion applied.
+  Ca2SiO4_gamma:
+    observations:
+    - observation_id: t1101_robie1980_Ca2SiO4_gamma_summary_29815
+      type: gibbs_table
+      locator:
+        pdf_page_index: 117
+        published_page: 116
+        table: Summary of Critical Data
+      phase: gamma (Ca olivine)
+      standard_state: solid polymorph at 298.15 K; as identified in source
+      regime: summary_298.15_K
+      units: S° J/(mol·K); ΔH°f and ΔG°f kJ/mol, all as printed
+      values:
+        quantity: summary_thermodynamic_properties_at_298.15_K
+        method_class: compilation_assessed
+        evidence_class: compilation_assessed
+        phase: gamma (Ca olivine)
+        formula: Ca2SiO4
+        temperature_K: 298.15
+        uncertainty_convention: ±2 sigma, as printed under Summary of Critical Data
+        S0_29815: 120.499
+        S0_uncertainty: 2.045
+        S0_units: J/(mol·K) as printed
+        delta_Hf0_29815_kJ_mol: -2316.534
+        delta_Hf0_uncertainty_kJ_mol: 2.441
+        delta_Hf0_units: kJ/mol as printed
+        delta_Gf0_29815_kJ_mol: -2199.776
+        delta_Gf0_uncertainty_kJ_mol: 1.881
+        delta_Gf0_units: kJ/mol as printed
+        comment: Assessed/fitted compilation value; uncertainty is reported as ±2 sigma. No unit conversion applied.
+  Ca2SiO4_beta_larnite:
+    observations:
+    - observation_id: t1101_robie1980_Ca2SiO4_beta_larnite_summary_29815
+      type: gibbs_table
+      locator:
+        pdf_page_index: 119
+        published_page: 118
+        table: Summary of Critical Data
+      phase: beta (larnite)
+      standard_state: solid polymorph at 298.15 K; as identified in source
+      regime: summary_298.15_K
+      units: S° J/(mol·K); ΔH°f and ΔG°f kJ/mol, all as printed
+      values:
+        quantity: summary_thermodynamic_properties_at_298.15_K
+        method_class: compilation_assessed
+        evidence_class: compilation_assessed
+        phase: beta (larnite)
+        formula: Ca2SiO4
+        temperature_K: 298.15
+        uncertainty_convention: ±2 sigma, as printed under Summary of Critical Data
+        S0_29815: 126.719
+        S0_uncertainty: 1.286
+        S0_units: J/(mol·K) as printed
+        delta_Hf0_29815_kJ_mol: -2306.697
+        delta_Hf0_uncertainty_kJ_mol: 1.328
+        delta_Hf0_units: kJ/mol as printed
+        delta_Gf0_29815_kJ_mol: -2191.794
+        delta_Gf0_uncertainty_kJ_mol: 1.039
+        delta_Gf0_units: kJ/mol as printed
+        comment: Assessed/fitted compilation value; uncertainty is reported as ±2 sigma. No unit conversion applied.

@@ -9,9 +9,27 @@ work:
   source_files:
     corpus_repo: regolith-corpus
     corpus_commit:
-      tag: unknown
-      reason: INDEX does not give corpus commit
+      tag: value
+      value: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
     files:
+    - asset_id: pdf:mendybaev-2017-fun-cai-lab-evaporation
+      role: pdf
+      path: raw/mendybaev-2017-fun-cai-lab-evaporation/mendybaev-2017-fun-cai-lab-evaporation.pdf
+      sha256:
+        tag: value
+        value: a2e99863bc07401d0d87607430ef78fbb61c7a6840405dc58467255a9cf0185b
+    - asset_id: pdftotext:mendybaev-2017-fun-cai-lab-evaporation
+      role: pdftotext
+      path: text/mendybaev-2017-fun-cai-lab-evaporation
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: tables:mendybaev-2017-fun-cai-lab-evaporation
+      role: table_csv
+      path: tables/mendybaev-2017-fun-cai-lab-evaporation
+      sha256:
+        tag: unknown
+        reason: INDEX does not give table sha256
     - asset_id: unknown:mendybaev-2017-fun-cai-lab-evaporation
       role: pdftotext
       path: unknown

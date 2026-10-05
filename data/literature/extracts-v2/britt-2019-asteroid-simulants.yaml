@@ -3,7 +3,7 @@ sources:
 - data/literature/extracts/britt-2019-asteroid-simulants.yaml
 observations:
 - observation_id: britt-2019-asteroid-simulants::britt_2019_ci_table3_xrf_major_oxide_composition
-  experiment_id: 10.1111/maps.13345::britt-2019-asteroid-simulants
+  experiment_id: 10.1111/maps.13345::experiment::xrf-ci
   identity:
     quantity:
       tag: unknown
@@ -68,7 +68,7 @@ observations:
     pdf_page_index: 9
     table: '3'
     note: Simulant prototype major element chemistry measured by XRF; CI Simulant column.
-  read_from: unknown:britt-2019-asteroid-simulants
+  read_from: pdf:britt-2019-asteroid-simulants
 - observation_id: britt-2019-asteroid-simulants::britt_2019_ci_tg_integrated_mass_loss
   experiment_id: 10.1111/maps.13345::experiment::tga-ega-ci
   identity:
@@ -112,8 +112,9 @@ observations:
       reason: no reservoir mapped from source
     composition:
       tag: unknown
-      reason: no composition field under keys oxides_wt_pct / major_oxide_wt_pct / composition_wt_pct / sample_oxide_composition_wt_pct
-        / starting_glass_wt_pct / SiO2 Al2O3 FeO Fe2O3 MgO CaO Na2O K2O TiO2 MnO P2O5 in this extract
+      reason: no composition field under keys oxides_wt_pct / major_oxide_wt_pct / composition_wt_pct / composition_mole_fraction
+        / composition_mass_percent / sample_oxide_composition_wt_pct / starting_glass_wt_pct / SiO2 Al2O3 FeO Fe2O3 MgO CaO
+        Na2O K2O TiO2 MnO P2O5 in this extract
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -156,15 +157,15 @@ observations:
     figure: 6a
     section: Thermogravimetry and Evolved Gas Analysis
     note: Body text prints CI total integrated mass loss from 0 to 1000 °C.
-  read_from: unknown:britt-2019-asteroid-simulants
+  read_from: pdf:britt-2019-asteroid-simulants
   derivation:
     relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
     inputs:
-    - unknown:britt-2019-asteroid-simulants
+    - pdf:britt-2019-asteroid-simulants
     parameters: []
     output_unit: Pa
 - observation_id: britt-2019-asteroid-simulants::britt_2019_cm_table3_xrf_major_oxide_composition
-  experiment_id: 10.1111/maps.13345::britt-2019-asteroid-simulants
+  experiment_id: 10.1111/maps.13345::experiment::xrf-cm
   identity:
     quantity:
       tag: unknown
@@ -229,7 +230,7 @@ observations:
     pdf_page_index: 9
     table: '3'
     note: Simulant prototype major element chemistry measured by XRF; CM Simulant column.
-  read_from: unknown:britt-2019-asteroid-simulants
+  read_from: pdf:britt-2019-asteroid-simulants
 - observation_id: britt-2019-asteroid-simulants::britt_2019_cm_tg_integrated_mass_loss
   experiment_id: 10.1111/maps.13345::experiment::tga-ega-cm
   identity:
@@ -273,8 +274,9 @@ observations:
       reason: no reservoir mapped from source
     composition:
       tag: unknown
-      reason: no composition field under keys oxides_wt_pct / major_oxide_wt_pct / composition_wt_pct / sample_oxide_composition_wt_pct
-        / starting_glass_wt_pct / SiO2 Al2O3 FeO Fe2O3 MgO CaO Na2O K2O TiO2 MnO P2O5 in this extract
+      reason: no composition field under keys oxides_wt_pct / major_oxide_wt_pct / composition_wt_pct / composition_mole_fraction
+        / composition_mass_percent / sample_oxide_composition_wt_pct / starting_glass_wt_pct / SiO2 Al2O3 FeO Fe2O3 MgO CaO
+        Na2O K2O TiO2 MnO P2O5 in this extract
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -317,15 +319,15 @@ observations:
     figure: 6a
     section: Thermogravimetry and Evolved Gas Analysis
     note: Body text prints CM total integrated mass loss from 0 to 1000 °C.
-  read_from: unknown:britt-2019-asteroid-simulants
+  read_from: pdf:britt-2019-asteroid-simulants
   derivation:
     relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
     inputs:
-    - unknown:britt-2019-asteroid-simulants
+    - pdf:britt-2019-asteroid-simulants
     parameters: []
     output_unit: Pa
 - observation_id: britt-2019-asteroid-simulants::britt_2019_cr_table3_xrf_major_oxide_composition
-  experiment_id: 10.1111/maps.13345::britt-2019-asteroid-simulants
+  experiment_id: 10.1111/maps.13345::experiment::xrf-cr
   identity:
     quantity:
       tag: unknown
@@ -390,7 +392,7 @@ observations:
     pdf_page_index: 9
     table: '3'
     note: Simulant prototype major element chemistry measured by XRF; CR Simulant column.
-  read_from: unknown:britt-2019-asteroid-simulants
+  read_from: pdf:britt-2019-asteroid-simulants
 - observation_id: britt-2019-asteroid-simulants::britt_2019_cr_tg_integrated_mass_loss
   experiment_id: 10.1111/maps.13345::experiment::tga-ega-cr
   identity:
@@ -434,8 +436,9 @@ observations:
       reason: no reservoir mapped from source
     composition:
       tag: unknown
-      reason: no composition field under keys oxides_wt_pct / major_oxide_wt_pct / composition_wt_pct / sample_oxide_composition_wt_pct
-        / starting_glass_wt_pct / SiO2 Al2O3 FeO Fe2O3 MgO CaO Na2O K2O TiO2 MnO P2O5 in this extract
+      reason: no composition field under keys oxides_wt_pct / major_oxide_wt_pct / composition_wt_pct / composition_mole_fraction
+        / composition_mass_percent / sample_oxide_composition_wt_pct / starting_glass_wt_pct / SiO2 Al2O3 FeO Fe2O3 MgO CaO
+        Na2O K2O TiO2 MnO P2O5 in this extract
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -478,11 +481,11 @@ observations:
     figure: 6a
     section: Thermogravimetry and Evolved Gas Analysis
     note: Body text prints CR total integrated mass loss from 0 to 1000 °C.
-  read_from: unknown:britt-2019-asteroid-simulants
+  read_from: pdf:britt-2019-asteroid-simulants
   derivation:
     relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
     inputs:
-    - unknown:britt-2019-asteroid-simulants
+    - pdf:britt-2019-asteroid-simulants
     parameters: []
     output_unit: Pa
 - observation_id: britt-2019-asteroid-simulants::britt_2019_table2_prototype_recipes
@@ -523,7 +526,7 @@ observations:
     pdf_page_index: 5
     table: '2'
     note: Initial prototype mineral recipes and suggested future updates; all values wt% as printed.
-  read_from: unknown:britt-2019-asteroid-simulants
+  read_from: pdf:britt-2019-asteroid-simulants
 - observation_id: britt-2019-asteroid-simulants::britt_2019_tga_ega_release_patterns
   experiment_id: 10.1111/maps.13345::britt-2019-asteroid-simulants
   identity:
@@ -565,7 +568,7 @@ observations:
     figure: 6b-d
     section: Thermogravimetry and Evolved Gas Analysis
     note: Text description of the measured EGA traces; curves were not digitized.
-  read_from: unknown:britt-2019-asteroid-simulants
+  read_from: pdf:britt-2019-asteroid-simulants
 - observation_id: britt-2019-asteroid-simulants::britt_2019_tga_ega_thermal_program
   experiment_id: 10.1111/maps.13345::britt-2019-asteroid-simulants
   identity:
@@ -610,4 +613,4 @@ observations:
     figure: '6'
     section: Thermogravimetry and Evolved Gas Analysis
     note: TG/EGA method paragraph; Labsys EVO DSC/TG connected to ThermoStar quadrupole mass spectrometer.
-  read_from: unknown:britt-2019-asteroid-simulants
+  read_from: pdf:britt-2019-asteroid-simulants

@@ -405,7 +405,7 @@ underlying measurement series; their `model_derived` evidence class stays intact
 The migrator defaults missing pressure evidence to unknown. When supplied,
 `pressure_environment` requires `total_pressure_Pa` and `sweep_gas` as
 Located values, and `regime.regime_class` as a State. Do not confuse cell-side
-chamber pressure with sample vapour pressure. There is no dedicated base-pressure
+chamber pressure with sample vapour pressure. For `knudsen_effusion`, the experiment-level `total_pressure_Pa` is the chamber background consumed by the validity gates. It is not inherited into observation identity, engine-point system pressure, or sample oxygen-condition derivations used for prediction (including the vacuum total-pressure upper-bound route). There is no dedicated base-pressure
 field in the current record: the complete example preserves its typed absence
 at `pressure_environment.pumping.base_pressure_Pa`; it is not run pressure.
 

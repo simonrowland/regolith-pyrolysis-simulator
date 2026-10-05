@@ -1,17 +1,41 @@
 schema_version: battery_work.v2.1
 work:
   work_id: 10.2138/rmg.2018.84.11
-  citation: Sossi, P.A. & Fegley, B. Jr. (2018), review compilation of metal-oxide vapour speciation and melt activity coefficients
-    (Table 1 pure oxides; Table 2 complex silicate melts)
+  citation: Sossi, P. A. & Fegley, B. Jr. (2018), "Thermodynamics of Element Volatility and its Application to Planetary Processes",
+    Reviews in Mineralogy and Geochemistry 84(1):393-459.
   source_ids:
-  - kems-041-sossi-fegley-2018
   - arxiv-1902-05005
+  - kems-041-sossi-fegley-2018
   source_files:
     corpus_repo: regolith-corpus
     corpus_commit:
       tag: value
-      value: 2ef619255debb2beb4718b52908a77d8cf504b5f
+      value: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
     files:
+    - asset_id: pdf:arxiv-1902-05005
+      role: pdf
+      path: raw/arxiv-1902-05005/arxiv-1902-05005.pdf
+      sha256:
+        tag: value
+        value: ae809bbb5bb7861299b48b2351aae3fe1140788335d28dbcd4c3ffca7c83b00b
+    - asset_id: pdftotext:arxiv-1902-05005
+      role: pdftotext
+      path: text/arxiv-1902-05005
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: tables:arxiv-1902-05005
+      role: table_csv
+      path: tables/arxiv-1902-05005
+      sha256:
+        tag: unknown
+        reason: INDEX does not give table sha256
+    - asset_id: unknown:arxiv-1902-05005
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
     - asset_id: pdf:kems-041-sossi-fegley-2018
       role: pdf
       path: raw/kems-041-sossi-fegley-2018/kems-041-sossi-fegley-2018.pdf
@@ -31,12 +55,6 @@ work:
         tag: unknown
         reason: INDEX does not give table sha256
     - asset_id: unknown:kems-041-sossi-fegley-2018
-      role: pdftotext
-      path: unknown
-      sha256:
-        tag: unknown
-        reason: INDEX does not give an unmatched-layer asset
-    - asset_id: unknown:arxiv-1902-05005
       role: pdftotext
       path: unknown
       sha256:

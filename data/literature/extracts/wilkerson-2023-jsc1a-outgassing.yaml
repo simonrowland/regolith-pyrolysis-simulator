@@ -231,8 +231,12 @@ species:
         ms_flowing_gas: Hiden QGA quadrupole mass spectrometer
         T_is: not_printed_whether_sample_or_furnace; recorded as the printed TGA temperature range
       equipment:
-        chamber_pressure:
-          value: <1x10^-4 mbar (continuous turbo; vacuum TGA runs)
+        pressure_mbar:
+          value: 0.0001
+          units: mbar
+          as_printed: "<1x10^-4 mbar (continuous turbo; vacuum TGA runs)"
+          quote: "<1x10^-4 mbar (continuous turbo; vacuum TGA runs)"
+          upper_bound: true
           locator:
             pdf_page_index: 6
             note: Icarus journal pre-proof; no printed pagination.
@@ -285,9 +289,9 @@ species:
             pdf_page_index: 7
             note: Icarus journal pre-proof; no printed pagination.
             section: 2.1-2.2 vacuum MS and chemical analysis
-        chamber_pressure:
-          value: ~1x10^-6 mbar base; low-10^-4 mbar with MS aperture; 0.01-0.1 mbar peak outgassing (as
-            printed)
+        residual_pressure_Pa_as_printed:
+          value: "~1x10^-6 mbar base; low-10^-4 mbar with MS aperture; 0.01-0.1 mbar peak outgassing (as printed)"
+          quote: "~1x10^-6 mbar base; low-10^-4 mbar with MS aperture; 0.01-0.1 mbar peak outgassing (as printed)"
           locator:
             pdf_page_index: 7
             note: Icarus journal pre-proof; no printed pagination.
