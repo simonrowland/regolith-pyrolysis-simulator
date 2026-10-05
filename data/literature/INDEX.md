@@ -15,12 +15,12 @@ Canonical `source_id` is the extract filename stem. Preset ids are aliases, neve
 
 ## Counts
 
-- Sources: 274
-- Extracts (`literature_extract.v1`): 272
+- Sources: 275
+- Extracts (`literature_extract.v1`): 273
 - PDFs present in this worktree: 0
 - Tracked PDFs in `docs/references/pdfs/99-kems-langmuir/`: 0
 - PDFs with no extract: 0
-- Extracts with no PDF: 272
+- Extracts with no PDF: 273
 - Alias groups needing owner/controller resolution: 41
 - Extracts with private/non-public row locators: 60
 
@@ -84,6 +84,7 @@ Canonical `source_id` is the extract filename stem. Preset ids are aliases, neve
 | `jgr-p-2024-mars-sam-clay-sulfate-ega` | Clark, J. V., Sutter, B., McAdam, A. C., Lewis, J. M. T., Franz, H., Archer, P. D., Chou, L., Eigenbrode, J., Knudson, C., Stern, J., Glavin, D., Steele, A., House, C. H., Schroeder, J., Berger, J., Rampe, E. B., Simpson, S., Tutolo, B., Milliken, R. E., Malespin, C., Mahaffy, P., Vasavada, A. (2024), Environmental Changes Recorded in Sedimentary Rocks in the Clay-Sulfate Transition Region in Gale Crater, Mars: Results From the Sample Analysis at Mars-Evolved Gas Analysis Instrument Onboard the Mars Science Laboratory Curiosity Rover, Journal of Geophysical Research: Planets | 10.1029/2024JE008587 | ABSENT, `` | `raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf` (present, da22bf1c); `text/jgr-p-2024-mars-sam-clay-sulfate-ega/` (38 files, exists); `tables/jgr-p-2024-mars-sam-clay-sulfate-ega/` (0 files, ABSENT) | `data/literature/extracts/jgr-p-2024-mars-sam-clay-sulfate-ega.yaml` (50 rows, draft, private_path) | `ledger/jgr-p-2024-mars-sam-clay-sulfate-ega.yaml`: decoded (2026-09-06) |
 | `jsc-a16-special-samples` | Horz, F., Carrier, W. D., Young, J. S., Duke, C. M., Nagle, J. S. and Fryxell, R., APOLLO 16 SPECIAL SAMPLES, NASA Manned Spacecraft Center, Houston, Texas. |  | ABSENT, `` | `raw/jsc-a16-special-samples/jsc-a16-special-samples.pdf` (present, ba528cd2); `text/jsc-a16-special-samples/` (148 files, exists); `tables/jsc-a16-special-samples/` (0 files, ABSENT) | `data/literature/extracts/jsc-a16-special-samples.yaml` (3 rows, draft, private_path) | `ledger/jsc-a16-special-samples.yaml`: decoded (2026-09-06) |
 | `jsc-lunar-catalog-12023` | Meyer, C. (2011), "12023 - 407.9 grams / 12024 - 56.5 grams: Trench Soils", Lunar Sample Compendium, Johnson Space Center. |  | ABSENT, `` | `raw/jsc-lunar-catalog-12023/jsc-lunar-catalog-12023.pdf` (present, 3ec719df); `text/jsc-lunar-catalog-12023/` (27 files, exists); `tables/jsc-lunar-catalog-12023/` (0 files, ABSENT) | `data/literature/extracts/jsc-lunar-catalog-12023.yaml` (12 rows, draft) | `ledger/jsc-lunar-catalog-12023.yaml`: decoded (2026-09-06) |
+| `kang-2007-sio2-activity-cas-low-silica` | Kang, Y., Sichen, D. & Morita, K. (2007), "Activities of SiO2 in Some CaO-Al2O3-SiO2(-10%MgO) Melts with Low SiO2 Contents at 1873 K," ISIJ International 47(6):805-810. |  | ABSENT, `` | `raw/kang-2007-sio2-activity-cas-low-silica/kang-2007-sio2-activity-cas-low-silica.pdf` (present, 61185571); `text/kang-2007-sio2-activity-cas-low-silica/` (3 files, exists); `tables/kang-2007-sio2-activity-cas-low-silica/` (12 files, exists) | `data/literature/extracts/kang-2007-sio2-activity-cas-low-silica.yaml` (66 rows, draft) | `ledger/kang-2007-sio2-activity-cas-low-silica.yaml`: extracted (2026-10-04) |
 | `kems-001-homma-1966` | Homma, M., Ohno, R. & Ishida, T. (1966), "Evaporation of Manganese, Copper and Tin from Molten Iron under Vacuum", J. Japan Inst. Metals 30:515–520, DOI 10.2320/jinstmet1952.30.6_515 | 10.2320/jinstmet1952.30.6_515 | ABSENT, `` | `raw/kems-001-homma-1966/kems-001-homma-1966.pdf` (present, 697fe8c6); `text/kems-001-homma-1966/` (53 files, exists); `tables/kems-001-homma-1966/` (7 files, exists) | `data/literature/extracts/kems-001-homma-1966.yaml` (32 rows, draft, private_path) | `ledger/kems-001-homma-1966.yaml`: extracted (2026-09-06) |
 | `kems-002-ohno-1967` | Ohno, R. & Ishida, T. (1967), "Rate of Evaporation of Mn, Cu, Sn, Cr and S from Molten Iron under Vacuum", J. Japan Inst. Metals 31:1164–1169, DOI 10.2320/jinstmet1952.31.10_1164 | 10.2320/jinstmet1952.31.10_1164 | ABSENT, `` | `raw/kems-002-ohno-1967/kems-002-ohno-1967.pdf` (present, 6cc07001); `text/kems-002-ohno-1967/` (41 files, exists); `tables/kems-002-ohno-1967/` (0 files, ABSENT) | `data/literature/extracts/kems-002-ohno-1967.yaml` (12 rows, draft, private_path) | `ledger/kems-002-ohno-1967.yaml`: extracted (2026-09-06) |
 | `kems-003-pound-1972` | Pound, G. M. (1972), "Selected values of evaporation and condensation coefficients for simple substances", J. Phys. Chem. Ref. Data 1:135-146, DOI 10.1063/1.3253096 (review compilation; Tables 1-3) | 10.1063/1.3253096 | ABSENT, `` | `raw/kems-003-pound-1972/kems-003-pound-1972.pdf` (present, e9d7aa79); `text/kems-003-pound-1972/` (35 files, exists); `tables/kems-003-pound-1972/` (6 files, exists) | `data/literature/extracts/kems-003-pound-1972.yaml` (18 rows, draft, private_path) | `ledger/kems-003-pound-1972.yaml`: extracted_2 (2026-09-06) |
@@ -365,6 +366,7 @@ Canonical `source_id` is the extract filename stem. Preset ids are aliases, neve
 - `jgr-p-2024-mars-sam-clay-sulfate-ega`
 - `jsc-a16-special-samples`
 - `jsc-lunar-catalog-12023`
+- `kang-2007-sio2-activity-cas-low-silica`
 - `kems-001-homma-1966`
 - `kems-002-ohno-1967`
 - `kems-003-pound-1972`

@@ -1,0 +1,2511 @@
+schema_version: literature_extract.v1
+source_id: kang-2007-sio2-activity-cas-low-silica
+source:
+  citation: 'Kang, Y., Sichen, D. & Morita, K. (2007), "Activities of SiO2 in Some CaO-Al2O3-SiO2(-10%MgO) Melts with Low SiO2 Contents at 1873 K," ISIJ International 47(6):805-810.'
+  url: https://www.jstage.jst.go.jp/article/isijinternational/47/6/47_6_805/_pdf/-char/en
+  year: 2007
+extraction:
+  method: manual transcription from the controller-supplied J-STAGE PDF with page-image verification at 180 dpi
+  date: '2026-10-04'
+  worker: extract-kang2007
+  provenance_path: tables/kang-2007-sio2-activity-cas-low-silica/
+review_status: draft
+fidelity_samples:
+  - species: SiO2
+    observable: activity_coefficient
+    observation_id: kang_2007_t2_sample_301_sio2_activity
+    field: activity
+    value: 0.00102
+    locator: {page: 2, published_page: 806, table: '2'}
+  - species: SiO2
+    observable: activity_coefficient
+    observation_id: kang_2007_t3_sample_401_sio2_activity
+    field: activity
+    value: 0.000376
+    locator: {page: 4, published_page: 808, table: '3'}
+  - species: Si
+    observable: concentration_series
+    observation_id: kang_2007_t2_sample_301_cu_assay
+    field: composition_mass_percent
+    value: {Si: 0.38}
+    locator: {page: 2, published_page: 806, table: '2'}
+  - species: SiO2
+    observable: composition_series
+    observation_id: kang_2007_t2_sample_301_slag_composition
+    field: composition_mass_percent
+    value: {CaO: 49, Al2O3: 40, SiO2: 11}
+    locator: {page: 2, published_page: 806, table: '2'}
+benches:
+  - id: kang-2007-mosi2-furnace
+    identity: {basis: described_in_this_work}
+    apparatus_family:
+      state: {tag: value, value: MoSi2 resistance furnace SS-1700-200, NEMS}
+      locator: {page: 1, published_page: 805, section: '2. Experimental'}
+    heating_method:
+      state: {tag: value, value: MoSi2 resistance furnace}
+      locator: {page: 1, published_page: 805, section: '2. Experimental'}
+    cell_material_and_liner:
+      state: {tag: value, value: graphite crucible in a larger graphite holder; mullite tube}
+      locator: {page: 2, published_page: 806, section: '2. Experimental', figure: '1'}
+    temperature_measurement:
+      sensor:
+        state: {tag: value, value: Pt-6%Rh/Pt-30%Rh thermocouple}
+        locator: {page: 2, published_page: 806, section: '2. Experimental'}
+    temperature_calibration:
+      calibration:
+        state: {tag: unknown, reason: not_published}
+        locator: {page: 2, published_page: 806, section: '2. Experimental', note: 'No calibration procedure is stated.'}
+      uncertainty:
+        state: {tag: unknown, reason: not_published}
+        locator: {page: 2, published_page: 806, section: '2. Experimental', note: 'No temperature control or measurement uncertainty is stated.'}
+    other_facts:
+      - name: temperature_control_method
+        unit: description
+        value:
+          state: {tag: value, value: {kind: categorical, categorical: proportional-integral-differential (PID) controller}}
+          locator: {page: 2, published_page: 806, section: '2. Experimental'}
+      - name: temperature_uncertainty
+        unit: K
+        value:
+          state: {tag: unknown, reason: not_published}
+          locator: {page: 2, published_page: 806, section: '2. Experimental'}
+experiments:
+  - experiment_id: copper-slag-equilibration-1873k
+    bench_id: kang-2007-mosi2-furnace
+    method: quench_equilibration
+    locator: {page: 2, published_page: 806, section: '2. Experimental'}
+    sample:
+      mass_kg:
+        state: {tag: unknown, reason: would_invent}
+        locator: {page: 2, published_page: 806, section: '2. Experimental', note: 'Approximately 10 g each of copper rod and synthetic slag are stated; no exact aggregate mass is printed.'}
+      printed_composition:
+        state: {tag: unknown, reason: not_published}
+        locator: {page: 2, published_page: 806, table: '1', note: 'Table 1 gives the synthetic oxide charge compositions; copper contains >99.9% Cu.'}
+      characterization:
+        state: {tag: value, value: 'Approximately 10 g Cu rod (>99.9% Cu) and approximately 10 g synthetic slag. Oxide charges made from reagent-grade Al2O3, SiO2, MgO and CaO calcined from CaCO3; premelted in a platinum crucible at 1923 K for 30 min, quenched and crushed.'}
+        locator: {page: 2, published_page: 806, section: '2. Experimental'}
+    conditions:
+      temperature_K: {state: {tag: value, value: 1873}, locator: {page: 2, published_page: 806, section: '2. Experimental'}}
+    fO2_control:
+      channel: buffer
+      buffer:
+        state: {tag: value, value: C(s)/CO(g) gas buffer in graphite crucible}
+        locator: {page: 2, published_page: 806, equation: '1-2', section: '2. Experimental'}
+      atmosphere: {state: {tag: value, value: CO gas at 1 atm in contact with graphite}, locator: {page: 2, published_page: 806, figure: '1', section: '2. Experimental'}}
+      oxygen_partial_pressure_Pa:
+        state: {tag: value, value: 4.4e-11}
+        locator: {page: 2, published_page: 806, section: '2. Experimental', equation: '1-2', note: 'Printed pO2 = 4.4 × 10^-16 atm; converted to Pa as 4.4 × 10^-16 atm × 101325 Pa/atm = 4.46 × 10^-11 Pa (rounded to 4.4 × 10^-11 Pa).'}
+    pressure_environment:
+      total_pressure_Pa:
+        state: {tag: value, value: 101325}
+        locator: {page: 2, published_page: 806, figure: '1', note: 'Figure labels CO gas (1 atm); 1 atm converted to 101325 Pa.'}
+      sweep_gas:
+        state: {tag: value, value: {species: CO, flow_sccm: {tag: unknown, reason: not_published}, partial_pressure_Pa: 101325}}
+        locator: {page: 2, published_page: 806, figure: '1'}
+      regime:
+        regime_class: {tag: unknown, reason: not_published}
+    thermal_schedule:
+      method:
+        state: {tag: value, value: 'Held at 1873 K for 18 h, quenched; authors state preliminary experiments confirmed 18 h was sufficient to reach equilibrium.'}
+        locator: {page: 2, published_page: 806, section: '2. Experimental'}
+      total_duration_s:
+        state: {tag: value, value: {kind: point, point: '64800'}}
+        locator: {page: 2, published_page: 806, section: '2. Experimental', note: '18 h as printed; conversion 18 × 3600 = 64800 s.'}
+      cooling_or_quench:
+        state: {tag: value, value: 'Sample quenched after equilibrium hold.'}
+        locator: {page: 2, published_page: 806, section: '2. Experimental'}
+species:
+  SiO2:
+    observations:
+      - observation_id: kang_2007_t2_sample_301_slag_composition
+        type: composition_series
+        regime: quench_equilibration
+        phase: l
+        experiment: copper-slag-equilibration-1873k
+        T_range_K: [1873, 1873]
+        locator: {page: 2, published_page: 806, table: '2', note: 'Sample 301, analyzed slag composition.'}
+        units: mass %
+        values:
+          temperature_K: 1873
+          method_class: measured_tabulated
+          admission_status: admitted
+          evidence_class: measured_tabulated
+          composition_mass_percent:
+            CaO: 49
+            Al2O3: 40
+            SiO2: 11
+      - observation_id: kang_2007_t2_sample_302_slag_composition
+        type: composition_series
+        regime: quench_equilibration
+        phase: l
+        experiment: copper-slag-equilibration-1873k
+        T_range_K: [1873, 1873]
+        locator: {page: 2, published_page: 806, table: '2', note: 'Sample 302, analyzed slag composition.'}
+        units: mass %
+        values:
+          temperature_K: 1873
+          method_class: measured_tabulated
+          admission_status: admitted
+          evidence_class: measured_tabulated
+          composition_mass_percent:
+            CaO: 55
+            Al2O3: 36
+            SiO2: 9
+      - observation_id: kang_2007_t2_sample_303_slag_composition
+        type: composition_series
+        regime: quench_equilibration
+        phase: l
+        experiment: copper-slag-equilibration-1873k
+        T_range_K: [1873, 1873]
+        locator: {page: 2, published_page: 806, table: '2', note: 'Sample 303, analyzed slag composition.'}
+        units: mass %
+        values:
+          temperature_K: 1873
+          method_class: measured_tabulated
+          admission_status: admitted
+          evidence_class: measured_tabulated
+          composition_mass_percent:
+            CaO: 47
+            Al2O3: 44
+            SiO2: 9
+      - observation_id: kang_2007_t2_sample_304_slag_composition
+        type: composition_series
+        regime: quench_equilibration
+        phase: l
+        experiment: copper-slag-equilibration-1873k
+        T_range_K: [1873, 1873]
+        locator: {page: 2, published_page: 806, table: '2', note: 'Sample 304, analyzed slag composition.'}
+        units: mass %
+        values:
+          temperature_K: 1873
+          method_class: measured_tabulated
+          admission_status: admitted
+          evidence_class: measured_tabulated
+          composition_mass_percent:
+            CaO: 39
+            Al2O3: 52
+            SiO2: 9
+      - observation_id: kang_2007_t2_sample_305_slag_composition
+        type: composition_series
+        regime: quench_equilibration
+        phase: l
+        experiment: copper-slag-equilibration-1873k
+        T_range_K: [1873, 1873]
+        locator: {page: 2, published_page: 806, table: '2', note: 'Sample 305, analyzed slag composition.'}
+        units: mass %
+        values:
+          temperature_K: 1873
+          method_class: measured_tabulated
+          admission_status: admitted
+          evidence_class: measured_tabulated
+          composition_mass_percent:
+            CaO: 48
+            Al2O3: 46
+            SiO2: 6
+      - observation_id: kang_2007_t2_sample_306_slag_composition
+        type: composition_series
+        regime: quench_equilibration
+        phase: l
+        experiment: copper-slag-equilibration-1873k
+        T_range_K: [1873, 1873]
+        locator: {page: 2, published_page: 806, table: '2', note: 'Sample 306, analyzed slag composition.'}
+        units: mass %
+        values:
+          temperature_K: 1873
+          method_class: measured_tabulated
+          admission_status: admitted
+          evidence_class: measured_tabulated
+          composition_mass_percent:
+            CaO: 54
+            Al2O3: 40
+            SiO2: 6
+      - observation_id: kang_2007_t2_sample_307_slag_composition
+        type: composition_series
+        regime: quench_equilibration
+        phase: l
+        experiment: copper-slag-equilibration-1873k
+        T_range_K: [1873, 1873]
+        locator: {page: 2, published_page: 806, table: '2', note: 'Sample 307, analyzed slag composition.'}
+        units: mass %
+        values:
+          temperature_K: 1873
+          method_class: measured_tabulated
+          admission_status: admitted
+          evidence_class: measured_tabulated
+          composition_mass_percent:
+            CaO: 40
+            Al2O3: 54
+            SiO2: 6
+      - observation_id: kang_2007_t2_sample_308_slag_composition
+        type: composition_series
+        regime: quench_equilibration
+        phase: l
+        experiment: copper-slag-equilibration-1873k
+        T_range_K: [1873, 1873]
+        locator: {page: 2, published_page: 806, table: '2', note: 'Sample 308, analyzed slag composition.'}
+        units: mass %
+        values:
+          temperature_K: 1873
+          method_class: measured_tabulated
+          admission_status: admitted
+          evidence_class: measured_tabulated
+          composition_mass_percent:
+            CaO: 46
+            Al2O3: 50
+            SiO2: 4
+      - observation_id: kang_2007_t2_sample_309_slag_composition
+        type: composition_series
+        regime: quench_equilibration
+        phase: l
+        experiment: copper-slag-equilibration-1873k
+        T_range_K: [1873, 1873]
+        locator: {page: 2, published_page: 806, table: '2', note: 'Sample 309, analyzed slag composition.'}
+        units: mass %
+        values:
+          temperature_K: 1873
+          method_class: measured_tabulated
+          admission_status: admitted
+          evidence_class: measured_tabulated
+          composition_mass_percent:
+            CaO: 40
+            Al2O3: 56
+            SiO2: 4
+      - observation_id: kang_2007_t2_sample_310_slag_composition
+        type: composition_series
+        regime: quench_equilibration
+        phase: l
+        experiment: copper-slag-equilibration-1873k
+        T_range_K: [1873, 1873]
+        locator: {page: 2, published_page: 806, table: '2', note: 'Sample 310, analyzed slag composition.'}
+        units: mass %
+        values:
+          temperature_K: 1873
+          method_class: measured_tabulated
+          admission_status: admitted
+          evidence_class: measured_tabulated
+          composition_mass_percent:
+            CaO: 54
+            Al2O3: 42
+            SiO2: 4
+      - observation_id: kang_2007_t3_sample_401_slag_composition
+        type: composition_series
+        regime: quench_equilibration
+        phase: l
+        experiment: copper-slag-equilibration-1873k
+        T_range_K: [1873, 1873]
+        locator: {page: 4, published_page: 808, table: '3', note: 'Sample 401, analyzed slag composition.'}
+        units: mass %
+        values:
+          temperature_K: 1873
+          method_class: measured_tabulated
+          admission_status: admitted
+          evidence_class: measured_tabulated
+          composition_mass_percent:
+            CaO: 42
+            Al2O3: 41
+            SiO2: 8
+            MgO: 9
+      - observation_id: kang_2007_t3_sample_402_slag_composition
+        type: composition_series
+        regime: quench_equilibration
+        phase: l
+        experiment: copper-slag-equilibration-1873k
+        T_range_K: [1873, 1873]
+        locator: {page: 4, published_page: 808, table: '3', note: 'Sample 402, analyzed slag composition.'}
+        units: mass %
+        values:
+          temperature_K: 1873
+          method_class: measured_tabulated
+          admission_status: admitted
+          evidence_class: measured_tabulated
+          composition_mass_percent:
+            CaO: 46
+            Al2O3: 35
+            SiO2: 9
+            MgO: 10
+      - observation_id: kang_2007_t3_sample_403_slag_composition
+        type: composition_series
+        regime: quench_equilibration
+        phase: l
+        experiment: copper-slag-equilibration-1873k
+        T_range_K: [1873, 1873]
+        locator: {page: 4, published_page: 808, table: '3', note: 'Sample 403, analyzed slag composition.'}
+        units: mass %
+        values:
+          temperature_K: 1873
+          method_class: measured_tabulated
+          admission_status: admitted
+          evidence_class: measured_tabulated
+          composition_mass_percent:
+            CaO: 38
+            Al2O3: 46
+            SiO2: 8
+            MgO: 8
+      - observation_id: kang_2007_t3_sample_404_slag_composition
+        type: composition_series
+        regime: quench_equilibration
+        phase: l
+        experiment: copper-slag-equilibration-1873k
+        T_range_K: [1873, 1873]
+        locator: {page: 4, published_page: 808, table: '3', note: 'Sample 404, analyzed slag composition.'}
+        units: mass %
+        values:
+          temperature_K: 1873
+          method_class: measured_tabulated
+          admission_status: admitted
+          evidence_class: measured_tabulated
+          composition_mass_percent:
+            CaO: 43
+            Al2O3: 42
+            SiO2: 6
+            MgO: 9
+      - observation_id: kang_2007_t3_sample_405_slag_composition
+        type: composition_series
+        regime: quench_equilibration
+        phase: l
+        experiment: copper-slag-equilibration-1873k
+        T_range_K: [1873, 1873]
+        locator: {page: 4, published_page: 808, table: '3', note: 'Sample 405, analyzed slag composition.'}
+        units: mass %
+        values:
+          temperature_K: 1873
+          method_class: measured_tabulated
+          admission_status: admitted
+          evidence_class: measured_tabulated
+          composition_mass_percent:
+            CaO: 46
+            Al2O3: 38
+            SiO2: 6
+            MgO: 10
+      - observation_id: kang_2007_t3_sample_406_slag_composition
+        type: composition_series
+        regime: quench_equilibration
+        phase: l
+        experiment: copper-slag-equilibration-1873k
+        T_range_K: [1873, 1873]
+        locator: {page: 4, published_page: 808, table: '3', note: 'Sample 406, analyzed slag composition.'}
+        units: mass %
+        values:
+          temperature_K: 1873
+          method_class: measured_tabulated
+          admission_status: admitted
+          evidence_class: measured_tabulated
+          composition_mass_percent:
+            CaO: 36
+            Al2O3: 49
+            SiO2: 5
+            MgO: 10
+      - observation_id: kang_2007_t3_sample_407_slag_composition
+        type: composition_series
+        regime: quench_equilibration
+        phase: l
+        experiment: copper-slag-equilibration-1873k
+        T_range_K: [1873, 1873]
+        locator: {page: 4, published_page: 808, table: '3', note: 'Sample 407, analyzed slag composition.'}
+        units: mass %
+        values:
+          temperature_K: 1873
+          method_class: measured_tabulated
+          admission_status: admitted
+          evidence_class: measured_tabulated
+          composition_mass_percent:
+            CaO: 41
+            Al2O3: 46
+            SiO2: 3
+            MgO: 10
+      - observation_id: kang_2007_t3_sample_408_slag_composition
+        type: composition_series
+        regime: quench_equilibration
+        phase: l
+        experiment: copper-slag-equilibration-1873k
+        T_range_K: [1873, 1873]
+        locator: {page: 4, published_page: 808, table: '3', note: 'Sample 408, analyzed slag composition.'}
+        units: mass %
+        values:
+          temperature_K: 1873
+          method_class: measured_tabulated
+          admission_status: admitted
+          evidence_class: measured_tabulated
+          composition_mass_percent:
+            CaO: 36
+            Al2O3: 52
+            SiO2: 3
+            MgO: 9
+      - observation_id: kang_2007_t3_sample_409_slag_composition
+        type: composition_series
+        regime: quench_equilibration
+        phase: l
+        experiment: copper-slag-equilibration-1873k
+        T_range_K: [1873, 1873]
+        locator: {page: 4, published_page: 808, table: '3', note: 'Sample 409, analyzed slag composition.'}
+        units: mass %
+        values:
+          temperature_K: 1873
+          method_class: measured_tabulated
+          admission_status: admitted
+          evidence_class: measured_tabulated
+          composition_mass_percent:
+            CaO: 45
+            Al2O3: 42
+            SiO2: 4
+            MgO: 9
+      - observation_id: kang_2007_t3_sample_410_slag_composition
+        type: composition_series
+        regime: quench_equilibration
+        phase: l
+        experiment: copper-slag-equilibration-1873k
+        T_range_K: [1873, 1873]
+        locator: {page: 4, published_page: 808, table: '3', note: 'Sample 410, analyzed slag composition.'}
+        units: mass %
+        values:
+          temperature_K: 1873
+          method_class: measured_tabulated
+          admission_status: admitted
+          evidence_class: measured_tabulated
+          composition_mass_percent:
+            CaO: 40
+            Al2O3: 42
+            SiO2: 8
+            MgO: 10
+      - observation_id: kang_2007_t3_sample_411_slag_composition
+        type: composition_series
+        regime: quench_equilibration
+        phase: l
+        experiment: copper-slag-equilibration-1873k
+        T_range_K: [1873, 1873]
+        locator: {page: 4, published_page: 808, table: '3', note: 'Sample 411, analyzed slag composition.'}
+        units: mass %
+        values:
+          temperature_K: 1873
+          method_class: measured_tabulated
+          admission_status: admitted
+          evidence_class: measured_tabulated
+          composition_mass_percent:
+            CaO: 47
+            Al2O3: 36
+            SiO2: 11
+            MgO: 6
+      - observation_id: kang_2007_t3_sample_412_slag_composition
+        type: composition_series
+        regime: quench_equilibration
+        phase: l
+        experiment: copper-slag-equilibration-1873k
+        T_range_K: [1873, 1873]
+        locator: {page: 4, published_page: 808, table: '3', note: 'Sample 412, analyzed slag composition.'}
+        units: mass %
+        values:
+          temperature_K: 1873
+          method_class: measured_tabulated
+          admission_status: admitted
+          evidence_class: measured_tabulated
+          composition_mass_percent:
+            CaO: 48
+            Al2O3: 31
+            SiO2: 15
+            MgO: 6
+      - observation_id: kang_2007_t2_sample_301_sio2_activity
+        type: activity_coefficient
+        regime: quench_equilibration
+        phase: l
+        locator: {page: 2, published_page: 806, table: '2', note: 'Sample 301, printed SiO2 activity; Table 2 heading multiplies the printed value by ×10^-3. Printed activity retained; source-level equation/activity inconsistency is recorded in the method context.'}
+        experiment: copper-slag-equilibration-1873k
+        T_range_K: [1873, 1873]
+        standard_state: 'Activity of SiO2 relative to pure solid SiO2; the polymorph is not specified.'
+        condensed_form: {state: solid SiO2, note: 'The authors state pure solid SiO2; no metastability category or polymorph is stated.'}
+        polymorph_notes: 'The paper says pure solid SiO2 and does not identify its polymorph.'
+        units: dimensionless
+        derived_from: [kang_2007_t2_sample_301_slag_composition, kang_2007_t2_sample_301_cu_assay]
+        derivation:
+          relation: 'From SiO2(s) = Si(l) + O2(g), log K3 = log(aSi·pO2/aSiO2) = -49799/T + 10.65; aSi = γSi XSi, using γSi in liquid Cu = 0.016 at infinite dilution and pO2 = 4.4×10^-16 atm. Printed value converted by the table multiplier ×10^-3.'
+          inputs: [kang_2007_t2_sample_301_slag_composition, kang_2007_t2_sample_301_cu_assay]
+        values:
+          composition_derivation: 'Same-sample analyzed slag mass percentages converted to mole fractions: x_i=(w_i/M_i)/Σ_j(w_j/M_j).'
+          CaO: 49
+          Al2O3: 40
+          SiO2: 11
+          oxygen_partial_pressure: {value: 4.4e-16, units: atm, locator: {page: 2, published_page: 806, equation: '1-2', note: 'Printed pO2 = 4.4 × 10^-16 atm.'}}
+          method_class: author_derived
+          evidence_class: measured_reduced
+          admission_status: admitted
+          activity: 0.00102
+          printed_activity: '1.02 × 10^-3'
+          temperature_K: 1873
+      - observation_id: kang_2007_t2_sample_302_sio2_activity
+        type: activity_coefficient
+        regime: quench_equilibration
+        phase: l
+        locator: {page: 2, published_page: 806, table: '2', note: 'Sample 302, printed SiO2 activity; Table 2 heading multiplies the printed value by ×10^-3. Printed activity retained; source-level equation/activity inconsistency is recorded in the method context.'}
+        experiment: copper-slag-equilibration-1873k
+        T_range_K: [1873, 1873]
+        standard_state: 'Activity of SiO2 relative to pure solid SiO2; the polymorph is not specified.'
+        condensed_form: {state: solid SiO2, note: 'The authors state pure solid SiO2; no metastability category or polymorph is stated.'}
+        polymorph_notes: 'The paper says pure solid SiO2 and does not identify its polymorph.'
+        units: dimensionless
+        derived_from: [kang_2007_t2_sample_302_slag_composition, kang_2007_t2_sample_302_cu_assay]
+        derivation:
+          relation: 'From SiO2(s) = Si(l) + O2(g), log K3 = log(aSi·pO2/aSiO2) = -49799/T + 10.65; aSi = γSi XSi, using γSi in liquid Cu = 0.016 at infinite dilution and pO2 = 4.4×10^-16 atm. Printed value converted by the table multiplier ×10^-3.'
+          inputs: [kang_2007_t2_sample_302_slag_composition, kang_2007_t2_sample_302_cu_assay]
+        values:
+          composition_derivation: 'Same-sample analyzed slag mass percentages converted to mole fractions: x_i=(w_i/M_i)/Σ_j(w_j/M_j).'
+          CaO: 55
+          Al2O3: 36
+          SiO2: 9
+          oxygen_partial_pressure: {value: 4.4e-16, units: atm, locator: {page: 2, published_page: 806, equation: '1-2', note: 'Printed pO2 = 4.4 × 10^-16 atm.'}}
+          method_class: author_derived
+          evidence_class: measured_reduced
+          admission_status: admitted
+          activity: 0.00064
+          printed_activity: '0.64 × 10^-3'
+          temperature_K: 1873
+      - observation_id: kang_2007_t2_sample_303_sio2_activity
+        type: activity_coefficient
+        regime: quench_equilibration
+        phase: l
+        locator: {page: 2, published_page: 806, table: '2', note: 'Sample 303, printed SiO2 activity; Table 2 heading multiplies the printed value by ×10^-3. Printed activity retained; source-level equation/activity inconsistency is recorded in the method context.'}
+        experiment: copper-slag-equilibration-1873k
+        T_range_K: [1873, 1873]
+        standard_state: 'Activity of SiO2 relative to pure solid SiO2; the polymorph is not specified.'
+        condensed_form: {state: solid SiO2, note: 'The authors state pure solid SiO2; no metastability category or polymorph is stated.'}
+        polymorph_notes: 'The paper says pure solid SiO2 and does not identify its polymorph.'
+        units: dimensionless
+        derived_from: [kang_2007_t2_sample_303_slag_composition, kang_2007_t2_sample_303_cu_assay]
+        derivation:
+          relation: 'From SiO2(s) = Si(l) + O2(g), log K3 = log(aSi·pO2/aSiO2) = -49799/T + 10.65; aSi = γSi XSi, using γSi in liquid Cu = 0.016 at infinite dilution and pO2 = 4.4×10^-16 atm. Printed value converted by the table multiplier ×10^-3.'
+          inputs: [kang_2007_t2_sample_303_slag_composition, kang_2007_t2_sample_303_cu_assay]
+        values:
+          composition_derivation: 'Same-sample analyzed slag mass percentages converted to mole fractions: x_i=(w_i/M_i)/Σ_j(w_j/M_j).'
+          CaO: 47
+          Al2O3: 44
+          SiO2: 9
+          oxygen_partial_pressure: {value: 4.4e-16, units: atm, locator: {page: 2, published_page: 806, equation: '1-2', note: 'Printed pO2 = 4.4 × 10^-16 atm.'}}
+          method_class: author_derived
+          evidence_class: measured_reduced
+          admission_status: admitted
+          activity: 0.00091
+          printed_activity: '0.91 × 10^-3'
+          temperature_K: 1873
+      - observation_id: kang_2007_t2_sample_304_sio2_activity
+        type: activity_coefficient
+        regime: quench_equilibration
+        phase: l
+        locator: {page: 2, published_page: 806, table: '2', note: 'Sample 304, printed SiO2 activity; Table 2 heading multiplies the printed value by ×10^-3. Printed activity retained; source-level equation/activity inconsistency is recorded in the method context.'}
+        experiment: copper-slag-equilibration-1873k
+        T_range_K: [1873, 1873]
+        standard_state: 'Activity of SiO2 relative to pure solid SiO2; the polymorph is not specified.'
+        condensed_form: {state: solid SiO2, note: 'The authors state pure solid SiO2; no metastability category or polymorph is stated.'}
+        polymorph_notes: 'The paper says pure solid SiO2 and does not identify its polymorph.'
+        units: dimensionless
+        derived_from: [kang_2007_t2_sample_304_slag_composition, kang_2007_t2_sample_304_cu_assay]
+        derivation:
+          relation: 'From SiO2(s) = Si(l) + O2(g), log K3 = log(aSi·pO2/aSiO2) = -49799/T + 10.65; aSi = γSi XSi, using γSi in liquid Cu = 0.016 at infinite dilution and pO2 = 4.4×10^-16 atm. Printed value converted by the table multiplier ×10^-3.'
+          inputs: [kang_2007_t2_sample_304_slag_composition, kang_2007_t2_sample_304_cu_assay]
+        values:
+          composition_derivation: 'Same-sample analyzed slag mass percentages converted to mole fractions: x_i=(w_i/M_i)/Σ_j(w_j/M_j).'
+          CaO: 39
+          Al2O3: 52
+          SiO2: 9
+          oxygen_partial_pressure: {value: 4.4e-16, units: atm, locator: {page: 2, published_page: 806, equation: '1-2', note: 'Printed pO2 = 4.4 × 10^-16 atm.'}}
+          method_class: author_derived
+          evidence_class: measured_reduced
+          admission_status: admitted
+          activity: 0.00164
+          printed_activity: '1.64 × 10^-3'
+          temperature_K: 1873
+      - observation_id: kang_2007_t2_sample_305_sio2_activity
+        type: activity_coefficient
+        regime: quench_equilibration
+        phase: l
+        locator: {page: 2, published_page: 806, table: '2', note: 'Sample 305, printed SiO2 activity; Table 2 heading multiplies the printed value by ×10^-3. Printed activity retained; source-level equation/activity inconsistency is recorded in the method context.'}
+        experiment: copper-slag-equilibration-1873k
+        T_range_K: [1873, 1873]
+        standard_state: 'Activity of SiO2 relative to pure solid SiO2; the polymorph is not specified.'
+        condensed_form: {state: solid SiO2, note: 'The authors state pure solid SiO2; no metastability category or polymorph is stated.'}
+        polymorph_notes: 'The paper says pure solid SiO2 and does not identify its polymorph.'
+        units: dimensionless
+        derived_from: [kang_2007_t2_sample_305_slag_composition, kang_2007_t2_sample_305_cu_assay]
+        derivation:
+          relation: 'From SiO2(s) = Si(l) + O2(g), log K3 = log(aSi·pO2/aSiO2) = -49799/T + 10.65; aSi = γSi XSi, using γSi in liquid Cu = 0.016 at infinite dilution and pO2 = 4.4×10^-16 atm. Printed value converted by the table multiplier ×10^-3.'
+          inputs: [kang_2007_t2_sample_305_slag_composition, kang_2007_t2_sample_305_cu_assay]
+        values:
+          composition_derivation: 'Same-sample analyzed slag mass percentages converted to mole fractions: x_i=(w_i/M_i)/Σ_j(w_j/M_j).'
+          CaO: 48
+          Al2O3: 46
+          SiO2: 6
+          oxygen_partial_pressure: {value: 4.4e-16, units: atm, locator: {page: 2, published_page: 806, equation: '1-2', note: 'Printed pO2 = 4.4 × 10^-16 atm.'}}
+          method_class: author_derived
+          evidence_class: measured_reduced
+          admission_status: admitted
+          activity: 0.00072
+          printed_activity: '0.72 × 10^-3'
+          temperature_K: 1873
+      - observation_id: kang_2007_t2_sample_306_sio2_activity
+        type: activity_coefficient
+        regime: quench_equilibration
+        phase: l
+        locator: {page: 2, published_page: 806, table: '2', note: 'Sample 306, printed SiO2 activity; Table 2 heading multiplies the printed value by ×10^-3. Printed activity retained; source-level equation/activity inconsistency is recorded in the method context.'}
+        experiment: copper-slag-equilibration-1873k
+        T_range_K: [1873, 1873]
+        standard_state: 'Activity of SiO2 relative to pure solid SiO2; the polymorph is not specified.'
+        condensed_form: {state: solid SiO2, note: 'The authors state pure solid SiO2; no metastability category or polymorph is stated.'}
+        polymorph_notes: 'The paper says pure solid SiO2 and does not identify its polymorph.'
+        units: dimensionless
+        derived_from: [kang_2007_t2_sample_306_slag_composition, kang_2007_t2_sample_306_cu_assay]
+        derivation:
+          relation: 'From SiO2(s) = Si(l) + O2(g), log K3 = log(aSi·pO2/aSiO2) = -49799/T + 10.65; aSi = γSi XSi, using γSi in liquid Cu = 0.016 at infinite dilution and pO2 = 4.4×10^-16 atm. Printed value converted by the table multiplier ×10^-3.'
+          inputs: [kang_2007_t2_sample_306_slag_composition, kang_2007_t2_sample_306_cu_assay]
+        values:
+          composition_derivation: 'Same-sample analyzed slag mass percentages converted to mole fractions: x_i=(w_i/M_i)/Σ_j(w_j/M_j).'
+          CaO: 54
+          Al2O3: 40
+          SiO2: 6
+          oxygen_partial_pressure: {value: 4.4e-16, units: atm, locator: {page: 2, published_page: 806, equation: '1-2', note: 'Printed pO2 = 4.4 × 10^-16 atm.'}}
+          method_class: author_derived
+          evidence_class: measured_reduced
+          admission_status: admitted
+          activity: 0.00019
+          printed_activity: '0.19 × 10^-3'
+          temperature_K: 1873
+      - observation_id: kang_2007_t2_sample_307_sio2_activity
+        type: activity_coefficient
+        regime: quench_equilibration
+        phase: l
+        locator: {page: 2, published_page: 806, table: '2', note: 'Sample 307, printed SiO2 activity; Table 2 heading multiplies the printed value by ×10^-3. Printed activity retained; source-level equation/activity inconsistency is recorded in the method context.'}
+        experiment: copper-slag-equilibration-1873k
+        T_range_K: [1873, 1873]
+        standard_state: 'Activity of SiO2 relative to pure solid SiO2; the polymorph is not specified.'
+        condensed_form: {state: solid SiO2, note: 'The authors state pure solid SiO2; no metastability category or polymorph is stated.'}
+        polymorph_notes: 'The paper says pure solid SiO2 and does not identify its polymorph.'
+        units: dimensionless
+        derived_from: [kang_2007_t2_sample_307_slag_composition, kang_2007_t2_sample_307_cu_assay]
+        derivation:
+          relation: 'From SiO2(s) = Si(l) + O2(g), log K3 = log(aSi·pO2/aSiO2) = -49799/T + 10.65; aSi = γSi XSi, using γSi in liquid Cu = 0.016 at infinite dilution and pO2 = 4.4×10^-16 atm. Printed value converted by the table multiplier ×10^-3.'
+          inputs: [kang_2007_t2_sample_307_slag_composition, kang_2007_t2_sample_307_cu_assay]
+        values:
+          composition_derivation: 'Same-sample analyzed slag mass percentages converted to mole fractions: x_i=(w_i/M_i)/Σ_j(w_j/M_j).'
+          CaO: 40
+          Al2O3: 54
+          SiO2: 6
+          oxygen_partial_pressure: {value: 4.4e-16, units: atm, locator: {page: 2, published_page: 806, equation: '1-2', note: 'Printed pO2 = 4.4 × 10^-16 atm.'}}
+          method_class: author_derived
+          evidence_class: measured_reduced
+          admission_status: admitted
+          activity: 0.00099
+          printed_activity: '0.99 × 10^-3'
+          temperature_K: 1873
+      - observation_id: kang_2007_t2_sample_308_sio2_activity
+        type: activity_coefficient
+        regime: quench_equilibration
+        phase: l
+        locator: {page: 2, published_page: 806, table: '2', note: 'Sample 308, printed SiO2 activity; Table 2 heading multiplies the printed value by ×10^-3. Printed activity retained; source-level equation/activity inconsistency is recorded in the method context.'}
+        experiment: copper-slag-equilibration-1873k
+        T_range_K: [1873, 1873]
+        standard_state: 'Activity of SiO2 relative to pure solid SiO2; the polymorph is not specified.'
+        condensed_form: {state: solid SiO2, note: 'The authors state pure solid SiO2; no metastability category or polymorph is stated.'}
+        polymorph_notes: 'The paper says pure solid SiO2 and does not identify its polymorph.'
+        units: dimensionless
+        derived_from: [kang_2007_t2_sample_308_slag_composition, kang_2007_t2_sample_308_cu_assay]
+        derivation:
+          relation: 'From SiO2(s) = Si(l) + O2(g), log K3 = log(aSi·pO2/aSiO2) = -49799/T + 10.65; aSi = γSi XSi, using γSi in liquid Cu = 0.016 at infinite dilution and pO2 = 4.4×10^-16 atm. Printed value converted by the table multiplier ×10^-3.'
+          inputs: [kang_2007_t2_sample_308_slag_composition, kang_2007_t2_sample_308_cu_assay]
+        values:
+          composition_derivation: 'Same-sample analyzed slag mass percentages converted to mole fractions: x_i=(w_i/M_i)/Σ_j(w_j/M_j).'
+          CaO: 46
+          Al2O3: 50
+          SiO2: 4
+          oxygen_partial_pressure: {value: 4.4e-16, units: atm, locator: {page: 2, published_page: 806, equation: '1-2', note: 'Printed pO2 = 4.4 × 10^-16 atm.'}}
+          method_class: author_derived
+          evidence_class: measured_reduced
+          admission_status: admitted
+          activity: 0.00038
+          printed_activity: '0.38 × 10^-3'
+          temperature_K: 1873
+      - observation_id: kang_2007_t2_sample_309_sio2_activity
+        type: activity_coefficient
+        regime: quench_equilibration
+        phase: l
+        locator: {page: 2, published_page: 806, table: '2', note: 'Sample 309, printed SiO2 activity; Table 2 heading multiplies the printed value by ×10^-3. Printed activity retained; source-level equation/activity inconsistency is recorded in the method context.'}
+        experiment: copper-slag-equilibration-1873k
+        T_range_K: [1873, 1873]
+        standard_state: 'Activity of SiO2 relative to pure solid SiO2; the polymorph is not specified.'
+        condensed_form: {state: solid SiO2, note: 'The authors state pure solid SiO2; no metastability category or polymorph is stated.'}
+        polymorph_notes: 'The paper says pure solid SiO2 and does not identify its polymorph.'
+        units: dimensionless
+        derived_from: [kang_2007_t2_sample_309_slag_composition, kang_2007_t2_sample_309_cu_assay]
+        derivation:
+          relation: 'From SiO2(s) = Si(l) + O2(g), log K3 = log(aSi·pO2/aSiO2) = -49799/T + 10.65; aSi = γSi XSi, using γSi in liquid Cu = 0.016 at infinite dilution and pO2 = 4.4×10^-16 atm. Printed value converted by the table multiplier ×10^-3.'
+          inputs: [kang_2007_t2_sample_309_slag_composition, kang_2007_t2_sample_309_cu_assay]
+        values:
+          composition_derivation: 'Same-sample analyzed slag mass percentages converted to mole fractions: x_i=(w_i/M_i)/Σ_j(w_j/M_j).'
+          CaO: 40
+          Al2O3: 56
+          SiO2: 4
+          oxygen_partial_pressure: {value: 4.4e-16, units: atm, locator: {page: 2, published_page: 806, equation: '1-2', note: 'Printed pO2 = 4.4 × 10^-16 atm.'}}
+          method_class: author_derived
+          evidence_class: measured_reduced
+          admission_status: admitted
+          activity: 0.00047
+          printed_activity: '0.47 × 10^-3'
+          temperature_K: 1873
+      - observation_id: kang_2007_t2_sample_310_sio2_activity
+        type: activity_coefficient
+        regime: quench_equilibration
+        phase: l
+        locator: {page: 2, published_page: 806, table: '2', note: 'Sample 310, printed SiO2 activity; Table 2 heading multiplies the printed value by ×10^-3. Printed activity retained; source-level equation/activity inconsistency is recorded in the method context.'}
+        experiment: copper-slag-equilibration-1873k
+        T_range_K: [1873, 1873]
+        standard_state: 'Activity of SiO2 relative to pure solid SiO2; the polymorph is not specified.'
+        condensed_form: {state: solid SiO2, note: 'The authors state pure solid SiO2; no metastability category or polymorph is stated.'}
+        polymorph_notes: 'The paper says pure solid SiO2 and does not identify its polymorph.'
+        units: dimensionless
+        derived_from: [kang_2007_t2_sample_310_slag_composition, kang_2007_t2_sample_310_cu_assay]
+        derivation:
+          relation: 'From SiO2(s) = Si(l) + O2(g), log K3 = log(aSi·pO2/aSiO2) = -49799/T + 10.65; aSi = γSi XSi, using γSi in liquid Cu = 0.016 at infinite dilution and pO2 = 4.4×10^-16 atm. Printed value converted by the table multiplier ×10^-3.'
+          inputs: [kang_2007_t2_sample_310_slag_composition, kang_2007_t2_sample_310_cu_assay]
+        values:
+          composition_derivation: 'Same-sample analyzed slag mass percentages converted to mole fractions: x_i=(w_i/M_i)/Σ_j(w_j/M_j).'
+          CaO: 54
+          Al2O3: 42
+          SiO2: 4
+          oxygen_partial_pressure: {value: 4.4e-16, units: atm, locator: {page: 2, published_page: 806, equation: '1-2', note: 'Printed pO2 = 4.4 × 10^-16 atm.'}}
+          method_class: author_derived
+          evidence_class: measured_reduced
+          admission_status: admitted
+          activity: 0.0001
+          printed_activity: '0.1 × 10^-3'
+          temperature_K: 1873
+      - observation_id: kang_2007_t3_sample_401_sio2_activity
+        type: activity_coefficient
+        regime: quench_equilibration
+        phase: l
+        locator: {page: 4, published_page: 808, table: '3', note: 'Sample 401, printed SiO2 activity; Table 3 heading multiplies the printed value by ×10^-4. Printed activity retained; source-level equation/activity inconsistency is recorded in the method context.'}
+        experiment: copper-slag-equilibration-1873k
+        T_range_K: [1873, 1873]
+        standard_state: 'Activity of SiO2 relative to pure solid SiO2; the polymorph is not specified.'
+        condensed_form: {state: solid SiO2, note: 'The authors state pure solid SiO2; no metastability category or polymorph is stated.'}
+        polymorph_notes: 'The paper says pure solid SiO2 and does not identify its polymorph.'
+        units: dimensionless
+        derived_from: [kang_2007_t3_sample_401_slag_composition, kang_2007_t3_sample_401_cu_assay]
+        derivation:
+          relation: 'From SiO2(s) = Si(l) + O2(g), log K3 = log(aSi·pO2/aSiO2) = -49799/T + 10.65; aSi = γSi XSi, using γSi in liquid Cu = 0.016 at infinite dilution and pO2 = 4.4×10^-16 atm. Printed value converted by the table multiplier ×10^-4.'
+          inputs: [kang_2007_t3_sample_401_slag_composition, kang_2007_t3_sample_401_cu_assay]
+        values:
+          composition_derivation: 'Same-sample analyzed slag mass percentages converted to mole fractions: x_i=(w_i/M_i)/Σ_j(w_j/M_j).'
+          CaO: 42
+          Al2O3: 41
+          SiO2: 8
+          MgO: 9
+          oxygen_partial_pressure: {value: 4.4e-16, units: atm, locator: {page: 2, published_page: 806, equation: '1-2', note: 'Printed pO2 = 4.4 × 10^-16 atm.'}}
+          method_class: author_derived
+          evidence_class: measured_reduced
+          admission_status: admitted
+          activity: 0.000376
+          printed_activity: '3.76 × 10^-4'
+          temperature_K: 1873
+      - observation_id: kang_2007_t3_sample_402_sio2_activity
+        type: activity_coefficient
+        regime: quench_equilibration
+        phase: l
+        locator: {page: 4, published_page: 808, table: '3', note: 'Sample 402, printed SiO2 activity; Table 3 heading multiplies the printed value by ×10^-4. Printed activity retained; source-level equation/activity inconsistency is recorded in the method context.'}
+        experiment: copper-slag-equilibration-1873k
+        T_range_K: [1873, 1873]
+        standard_state: 'Activity of SiO2 relative to pure solid SiO2; the polymorph is not specified.'
+        condensed_form: {state: solid SiO2, note: 'The authors state pure solid SiO2; no metastability category or polymorph is stated.'}
+        polymorph_notes: 'The paper says pure solid SiO2 and does not identify its polymorph.'
+        units: dimensionless
+        derived_from: [kang_2007_t3_sample_402_slag_composition, kang_2007_t3_sample_402_cu_assay]
+        derivation:
+          relation: 'From SiO2(s) = Si(l) + O2(g), log K3 = log(aSi·pO2/aSiO2) = -49799/T + 10.65; aSi = γSi XSi, using γSi in liquid Cu = 0.016 at infinite dilution and pO2 = 4.4×10^-16 atm. Printed value converted by the table multiplier ×10^-4.'
+          inputs: [kang_2007_t3_sample_402_slag_composition, kang_2007_t3_sample_402_cu_assay]
+        values:
+          composition_derivation: 'Same-sample analyzed slag mass percentages converted to mole fractions: x_i=(w_i/M_i)/Σ_j(w_j/M_j).'
+          CaO: 46
+          Al2O3: 35
+          SiO2: 9
+          MgO: 10
+          oxygen_partial_pressure: {value: 4.4e-16, units: atm, locator: {page: 2, published_page: 806, equation: '1-2', note: 'Printed pO2 = 4.4 × 10^-16 atm.'}}
+          method_class: author_derived
+          evidence_class: measured_reduced
+          admission_status: admitted
+          activity: 0.000219
+          printed_activity: '2.19 × 10^-4'
+          temperature_K: 1873
+      - observation_id: kang_2007_t3_sample_403_sio2_activity
+        type: activity_coefficient
+        regime: quench_equilibration
+        phase: l
+        locator: {page: 4, published_page: 808, table: '3', note: 'Sample 403, printed SiO2 activity; Table 3 heading multiplies the printed value by ×10^-4. Printed activity retained; source-level equation/activity inconsistency is recorded in the method context.'}
+        experiment: copper-slag-equilibration-1873k
+        T_range_K: [1873, 1873]
+        standard_state: 'Activity of SiO2 relative to pure solid SiO2; the polymorph is not specified.'
+        condensed_form: {state: solid SiO2, note: 'The authors state pure solid SiO2; no metastability category or polymorph is stated.'}
+        polymorph_notes: 'The paper says pure solid SiO2 and does not identify its polymorph.'
+        units: dimensionless
+        derived_from: [kang_2007_t3_sample_403_slag_composition, kang_2007_t3_sample_403_cu_assay]
+        derivation:
+          relation: 'From SiO2(s) = Si(l) + O2(g), log K3 = log(aSi·pO2/aSiO2) = -49799/T + 10.65; aSi = γSi XSi, using γSi in liquid Cu = 0.016 at infinite dilution and pO2 = 4.4×10^-16 atm. Printed value converted by the table multiplier ×10^-4.'
+          inputs: [kang_2007_t3_sample_403_slag_composition, kang_2007_t3_sample_403_cu_assay]
+        values:
+          composition_derivation: 'Same-sample analyzed slag mass percentages converted to mole fractions: x_i=(w_i/M_i)/Σ_j(w_j/M_j).'
+          CaO: 38
+          Al2O3: 46
+          SiO2: 8
+          MgO: 8
+          oxygen_partial_pressure: {value: 4.4e-16, units: atm, locator: {page: 2, published_page: 806, equation: '1-2', note: 'Printed pO2 = 4.4 × 10^-16 atm.'}}
+          method_class: author_derived
+          evidence_class: measured_reduced
+          admission_status: admitted
+          activity: 0.00036
+          printed_activity: '3.6 × 10^-4'
+          temperature_K: 1873
+      - observation_id: kang_2007_t3_sample_404_sio2_activity
+        type: activity_coefficient
+        regime: quench_equilibration
+        phase: l
+        locator: {page: 4, published_page: 808, table: '3', note: 'Sample 404, printed SiO2 activity; Table 3 heading multiplies the printed value by ×10^-4. Printed activity retained; source-level equation/activity inconsistency is recorded in the method context.'}
+        experiment: copper-slag-equilibration-1873k
+        T_range_K: [1873, 1873]
+        standard_state: 'Activity of SiO2 relative to pure solid SiO2; the polymorph is not specified.'
+        condensed_form: {state: solid SiO2, note: 'The authors state pure solid SiO2; no metastability category or polymorph is stated.'}
+        polymorph_notes: 'The paper says pure solid SiO2 and does not identify its polymorph.'
+        units: dimensionless
+        derived_from: [kang_2007_t3_sample_404_slag_composition, kang_2007_t3_sample_404_cu_assay]
+        derivation:
+          relation: 'From SiO2(s) = Si(l) + O2(g), log K3 = log(aSi·pO2/aSiO2) = -49799/T + 10.65; aSi = γSi XSi, using γSi in liquid Cu = 0.016 at infinite dilution and pO2 = 4.4×10^-16 atm. Printed value converted by the table multiplier ×10^-4.'
+          inputs: [kang_2007_t3_sample_404_slag_composition, kang_2007_t3_sample_404_cu_assay]
+        values:
+          composition_derivation: 'Same-sample analyzed slag mass percentages converted to mole fractions: x_i=(w_i/M_i)/Σ_j(w_j/M_j).'
+          CaO: 43
+          Al2O3: 42
+          SiO2: 6
+          MgO: 9
+          oxygen_partial_pressure: {value: 4.4e-16, units: atm, locator: {page: 2, published_page: 806, equation: '1-2', note: 'Printed pO2 = 4.4 × 10^-16 atm.'}}
+          method_class: author_derived
+          evidence_class: measured_reduced
+          admission_status: admitted
+          activity: 0.000185
+          printed_activity: '1.85 × 10^-4'
+          temperature_K: 1873
+      - observation_id: kang_2007_t3_sample_405_sio2_activity
+        type: activity_coefficient
+        regime: quench_equilibration
+        phase: l
+        locator: {page: 4, published_page: 808, table: '3', note: 'Sample 405, printed SiO2 activity; Table 3 heading multiplies the printed value by ×10^-4. Printed activity retained; source-level equation/activity inconsistency is recorded in the method context.'}
+        experiment: copper-slag-equilibration-1873k
+        T_range_K: [1873, 1873]
+        standard_state: 'Activity of SiO2 relative to pure solid SiO2; the polymorph is not specified.'
+        condensed_form: {state: solid SiO2, note: 'The authors state pure solid SiO2; no metastability category or polymorph is stated.'}
+        polymorph_notes: 'The paper says pure solid SiO2 and does not identify its polymorph.'
+        units: dimensionless
+        derived_from: [kang_2007_t3_sample_405_slag_composition, kang_2007_t3_sample_405_cu_assay]
+        derivation:
+          relation: 'From SiO2(s) = Si(l) + O2(g), log K3 = log(aSi·pO2/aSiO2) = -49799/T + 10.65; aSi = γSi XSi, using γSi in liquid Cu = 0.016 at infinite dilution and pO2 = 4.4×10^-16 atm. Printed value converted by the table multiplier ×10^-4.'
+          inputs: [kang_2007_t3_sample_405_slag_composition, kang_2007_t3_sample_405_cu_assay]
+        values:
+          composition_derivation: 'Same-sample analyzed slag mass percentages converted to mole fractions: x_i=(w_i/M_i)/Σ_j(w_j/M_j).'
+          CaO: 46
+          Al2O3: 38
+          SiO2: 6
+          MgO: 10
+          oxygen_partial_pressure: {value: 4.4e-16, units: atm, locator: {page: 2, published_page: 806, equation: '1-2', note: 'Printed pO2 = 4.4 × 10^-16 atm.'}}
+          method_class: author_derived
+          evidence_class: measured_reduced
+          admission_status: admitted
+          activity: 0.000122
+          printed_activity: '1.22 × 10^-4'
+          temperature_K: 1873
+      - observation_id: kang_2007_t3_sample_406_sio2_activity
+        type: activity_coefficient
+        regime: quench_equilibration
+        phase: l
+        locator: {page: 4, published_page: 808, table: '3', note: 'Sample 406, printed SiO2 activity; Table 3 heading multiplies the printed value by ×10^-4. Printed activity retained; source-level equation/activity inconsistency is recorded in the method context.'}
+        experiment: copper-slag-equilibration-1873k
+        T_range_K: [1873, 1873]
+        standard_state: 'Activity of SiO2 relative to pure solid SiO2; the polymorph is not specified.'
+        condensed_form: {state: solid SiO2, note: 'The authors state pure solid SiO2; no metastability category or polymorph is stated.'}
+        polymorph_notes: 'The paper says pure solid SiO2 and does not identify its polymorph.'
+        units: dimensionless
+        derived_from: [kang_2007_t3_sample_406_slag_composition, kang_2007_t3_sample_406_cu_assay]
+        derivation:
+          relation: 'From SiO2(s) = Si(l) + O2(g), log K3 = log(aSi·pO2/aSiO2) = -49799/T + 10.65; aSi = γSi XSi, using γSi in liquid Cu = 0.016 at infinite dilution and pO2 = 4.4×10^-16 atm. Printed value converted by the table multiplier ×10^-4.'
+          inputs: [kang_2007_t3_sample_406_slag_composition, kang_2007_t3_sample_406_cu_assay]
+        values:
+          composition_derivation: 'Same-sample analyzed slag mass percentages converted to mole fractions: x_i=(w_i/M_i)/Σ_j(w_j/M_j).'
+          CaO: 36
+          Al2O3: 49
+          SiO2: 5
+          MgO: 10
+          oxygen_partial_pressure: {value: 4.4e-16, units: atm, locator: {page: 2, published_page: 806, equation: '1-2', note: 'Printed pO2 = 4.4 × 10^-16 atm.'}}
+          method_class: author_derived
+          evidence_class: measured_reduced
+          admission_status: admitted
+          activity: 0.000343
+          printed_activity: '3.43 × 10^-4'
+          temperature_K: 1873
+      - observation_id: kang_2007_t3_sample_407_sio2_activity
+        type: activity_coefficient
+        regime: quench_equilibration
+        phase: l
+        locator: {page: 4, published_page: 808, table: '3', note: 'Sample 407, printed SiO2 activity; Table 3 heading multiplies the printed value by ×10^-4. Printed activity retained; source-level equation/activity inconsistency is recorded in the method context.'}
+        experiment: copper-slag-equilibration-1873k
+        T_range_K: [1873, 1873]
+        standard_state: 'Activity of SiO2 relative to pure solid SiO2; the polymorph is not specified.'
+        condensed_form: {state: solid SiO2, note: 'The authors state pure solid SiO2; no metastability category or polymorph is stated.'}
+        polymorph_notes: 'The paper says pure solid SiO2 and does not identify its polymorph.'
+        units: dimensionless
+        derived_from: [kang_2007_t3_sample_407_slag_composition, kang_2007_t3_sample_407_cu_assay]
+        derivation:
+          relation: 'From SiO2(s) = Si(l) + O2(g), log K3 = log(aSi·pO2/aSiO2) = -49799/T + 10.65; aSi = γSi XSi, using γSi in liquid Cu = 0.016 at infinite dilution and pO2 = 4.4×10^-16 atm. Printed value converted by the table multiplier ×10^-4.'
+          inputs: [kang_2007_t3_sample_407_slag_composition, kang_2007_t3_sample_407_cu_assay]
+        values:
+          composition_derivation: 'Same-sample analyzed slag mass percentages converted to mole fractions: x_i=(w_i/M_i)/Σ_j(w_j/M_j).'
+          CaO: 41
+          Al2O3: 46
+          SiO2: 3
+          MgO: 10
+          oxygen_partial_pressure: {value: 4.4e-16, units: atm, locator: {page: 2, published_page: 806, equation: '1-2', note: 'Printed pO2 = 4.4 × 10^-16 atm.'}}
+          method_class: author_derived
+          evidence_class: measured_reduced
+          admission_status: admitted
+          activity: 0.000121
+          printed_activity: '1.21 × 10^-4'
+          temperature_K: 1873
+      - observation_id: kang_2007_t3_sample_408_sio2_activity
+        type: activity_coefficient
+        regime: quench_equilibration
+        phase: l
+        locator: {page: 4, published_page: 808, table: '3', note: 'Sample 408, printed SiO2 activity; Table 3 heading multiplies the printed value by ×10^-4. Printed activity retained; source-level equation/activity inconsistency is recorded in the method context.'}
+        experiment: copper-slag-equilibration-1873k
+        T_range_K: [1873, 1873]
+        standard_state: 'Activity of SiO2 relative to pure solid SiO2; the polymorph is not specified.'
+        condensed_form: {state: solid SiO2, note: 'The authors state pure solid SiO2; no metastability category or polymorph is stated.'}
+        polymorph_notes: 'The paper says pure solid SiO2 and does not identify its polymorph.'
+        units: dimensionless
+        derived_from: [kang_2007_t3_sample_408_slag_composition, kang_2007_t3_sample_408_cu_assay]
+        derivation:
+          relation: 'From SiO2(s) = Si(l) + O2(g), log K3 = log(aSi·pO2/aSiO2) = -49799/T + 10.65; aSi = γSi XSi, using γSi in liquid Cu = 0.016 at infinite dilution and pO2 = 4.4×10^-16 atm. Printed value converted by the table multiplier ×10^-4.'
+          inputs: [kang_2007_t3_sample_408_slag_composition, kang_2007_t3_sample_408_cu_assay]
+        values:
+          composition_derivation: 'Same-sample analyzed slag mass percentages converted to mole fractions: x_i=(w_i/M_i)/Σ_j(w_j/M_j).'
+          CaO: 36
+          Al2O3: 52
+          SiO2: 3
+          MgO: 9
+          oxygen_partial_pressure: {value: 4.4e-16, units: atm, locator: {page: 2, published_page: 806, equation: '1-2', note: 'Printed pO2 = 4.4 × 10^-16 atm.'}}
+          method_class: author_derived
+          evidence_class: measured_reduced
+          admission_status: admitted
+          activity: 0.000189
+          printed_activity: '1.89 × 10^-4'
+          temperature_K: 1873
+      - observation_id: kang_2007_t3_sample_409_sio2_activity
+        type: activity_coefficient
+        regime: quench_equilibration
+        phase: l
+        locator: {page: 4, published_page: 808, table: '3', note: 'Sample 409, printed SiO2 activity; Table 3 heading multiplies the printed value by ×10^-4. Printed activity retained; source-level equation/activity inconsistency is recorded in the method context.'}
+        experiment: copper-slag-equilibration-1873k
+        T_range_K: [1873, 1873]
+        standard_state: 'Activity of SiO2 relative to pure solid SiO2; the polymorph is not specified.'
+        condensed_form: {state: solid SiO2, note: 'The authors state pure solid SiO2; no metastability category or polymorph is stated.'}
+        polymorph_notes: 'The paper says pure solid SiO2 and does not identify its polymorph.'
+        units: dimensionless
+        derived_from: [kang_2007_t3_sample_409_slag_composition, kang_2007_t3_sample_409_cu_assay]
+        derivation:
+          relation: 'From SiO2(s) = Si(l) + O2(g), log K3 = log(aSi·pO2/aSiO2) = -49799/T + 10.65; aSi = γSi XSi, using γSi in liquid Cu = 0.016 at infinite dilution and pO2 = 4.4×10^-16 atm. Printed value converted by the table multiplier ×10^-4.'
+          inputs: [kang_2007_t3_sample_409_slag_composition, kang_2007_t3_sample_409_cu_assay]
+        values:
+          composition_derivation: 'Same-sample analyzed slag mass percentages converted to mole fractions: x_i=(w_i/M_i)/Σ_j(w_j/M_j).'
+          CaO: 45
+          Al2O3: 42
+          SiO2: 4
+          MgO: 9
+          oxygen_partial_pressure: {value: 4.4e-16, units: atm, locator: {page: 2, published_page: 806, equation: '1-2', note: 'Printed pO2 = 4.4 × 10^-16 atm.'}}
+          method_class: author_derived
+          evidence_class: measured_reduced
+          admission_status: admitted
+          activity: 0.000093
+          printed_activity: '0.93 × 10^-4'
+          temperature_K: 1873
+      - observation_id: kang_2007_t3_sample_410_sio2_activity
+        type: activity_coefficient
+        regime: quench_equilibration
+        phase: l
+        locator: {page: 4, published_page: 808, table: '3', note: 'Sample 410, printed SiO2 activity; Table 3 heading multiplies the printed value by ×10^-4. Printed activity retained; source-level equation/activity inconsistency is recorded in the method context.'}
+        experiment: copper-slag-equilibration-1873k
+        T_range_K: [1873, 1873]
+        standard_state: 'Activity of SiO2 relative to pure solid SiO2; the polymorph is not specified.'
+        condensed_form: {state: solid SiO2, note: 'The authors state pure solid SiO2; no metastability category or polymorph is stated.'}
+        polymorph_notes: 'The paper says pure solid SiO2 and does not identify its polymorph.'
+        units: dimensionless
+        derived_from: [kang_2007_t3_sample_410_slag_composition, kang_2007_t3_sample_410_cu_assay]
+        derivation:
+          relation: 'From SiO2(s) = Si(l) + O2(g), log K3 = log(aSi·pO2/aSiO2) = -49799/T + 10.65; aSi = γSi XSi, using γSi in liquid Cu = 0.016 at infinite dilution and pO2 = 4.4×10^-16 atm. Printed value converted by the table multiplier ×10^-4.'
+          inputs: [kang_2007_t3_sample_410_slag_composition, kang_2007_t3_sample_410_cu_assay]
+        values:
+          composition_derivation: 'Same-sample analyzed slag mass percentages converted to mole fractions: x_i=(w_i/M_i)/Σ_j(w_j/M_j).'
+          CaO: 40
+          Al2O3: 42
+          SiO2: 8
+          MgO: 10
+          oxygen_partial_pressure: {value: 4.4e-16, units: atm, locator: {page: 2, published_page: 806, equation: '1-2', note: 'Printed pO2 = 4.4 × 10^-16 atm.'}}
+          method_class: author_derived
+          evidence_class: measured_reduced
+          admission_status: admitted
+          activity: 0.00041
+          printed_activity: '4.1 × 10^-4'
+          temperature_K: 1873
+      - observation_id: kang_2007_t3_sample_411_sio2_activity
+        type: activity_coefficient
+        regime: quench_equilibration
+        phase: l
+        locator: {page: 4, published_page: 808, table: '3', note: 'Sample 411, printed SiO2 activity; Table 3 heading multiplies the printed value by ×10^-4. Printed activity retained; source-level equation/activity inconsistency is recorded in the method context.'}
+        experiment: copper-slag-equilibration-1873k
+        T_range_K: [1873, 1873]
+        standard_state: 'Activity of SiO2 relative to pure solid SiO2; the polymorph is not specified.'
+        condensed_form: {state: solid SiO2, note: 'The authors state pure solid SiO2; no metastability category or polymorph is stated.'}
+        polymorph_notes: 'The paper says pure solid SiO2 and does not identify its polymorph.'
+        units: dimensionless
+        derived_from: [kang_2007_t3_sample_411_slag_composition, kang_2007_t3_sample_411_cu_assay]
+        derivation:
+          relation: 'From SiO2(s) = Si(l) + O2(g), log K3 = log(aSi·pO2/aSiO2) = -49799/T + 10.65; aSi = γSi XSi, using γSi in liquid Cu = 0.016 at infinite dilution and pO2 = 4.4×10^-16 atm. Printed value converted by the table multiplier ×10^-4.'
+          inputs: [kang_2007_t3_sample_411_slag_composition, kang_2007_t3_sample_411_cu_assay]
+        values:
+          composition_derivation: 'Same-sample analyzed slag mass percentages converted to mole fractions: x_i=(w_i/M_i)/Σ_j(w_j/M_j).'
+          CaO: 47
+          Al2O3: 36
+          SiO2: 11
+          MgO: 6
+          oxygen_partial_pressure: {value: 4.4e-16, units: atm, locator: {page: 2, published_page: 806, equation: '1-2', note: 'Printed pO2 = 4.4 × 10^-16 atm.'}}
+          method_class: author_derived
+          evidence_class: measured_reduced
+          admission_status: admitted
+          activity: 0.000349
+          printed_activity: '3.49 × 10^-4'
+          temperature_K: 1873
+      - observation_id: kang_2007_t3_sample_412_sio2_activity
+        type: activity_coefficient
+        regime: quench_equilibration
+        phase: l
+        locator: {page: 4, published_page: 808, table: '3', note: 'Sample 412, printed SiO2 activity; Table 3 heading multiplies the printed value by ×10^-4. Printed activity retained; source-level equation/activity inconsistency is recorded in the method context.'}
+        experiment: copper-slag-equilibration-1873k
+        T_range_K: [1873, 1873]
+        standard_state: 'Activity of SiO2 relative to pure solid SiO2; the polymorph is not specified.'
+        condensed_form: {state: solid SiO2, note: 'The authors state pure solid SiO2; no metastability category or polymorph is stated.'}
+        polymorph_notes: 'The paper says pure solid SiO2 and does not identify its polymorph.'
+        units: dimensionless
+        derived_from: [kang_2007_t3_sample_412_slag_composition, kang_2007_t3_sample_412_cu_assay]
+        derivation:
+          relation: 'From SiO2(s) = Si(l) + O2(g), log K3 = log(aSi·pO2/aSiO2) = -49799/T + 10.65; aSi = γSi XSi, using γSi in liquid Cu = 0.016 at infinite dilution and pO2 = 4.4×10^-16 atm. Printed value converted by the table multiplier ×10^-4.'
+          inputs: [kang_2007_t3_sample_412_slag_composition, kang_2007_t3_sample_412_cu_assay]
+        values:
+          composition_derivation: 'Same-sample analyzed slag mass percentages converted to mole fractions: x_i=(w_i/M_i)/Σ_j(w_j/M_j).'
+          CaO: 48
+          Al2O3: 31
+          SiO2: 15
+          MgO: 6
+          oxygen_partial_pressure: {value: 4.4e-16, units: atm, locator: {page: 2, published_page: 806, equation: '1-2', note: 'Printed pO2 = 4.4 × 10^-16 atm.'}}
+          method_class: author_derived
+          evidence_class: measured_reduced
+          admission_status: admitted
+          activity: 0.00062
+          printed_activity: '6.2 × 10^-4'
+          temperature_K: 1873
+    context:
+      - observation_id: kang_2007_t2_sample_301_slag_composition_payload
+        type: composition
+        regime: quench_equilibration
+        phase: l
+        locator: {page: 2, published_page: 806, table: '2', note: 'Sample 301, analyzed slag composition.'}
+        experiment: copper-slag-equilibration-1873k
+        T_range_K: [1873, 1873]
+        units: mass %
+        values:
+          method_class: measured_tabulated
+          evidence_class: measured_tabulated
+          composition_mass_percent:
+            CaO: 49
+            Al2O3: 40
+            SiO2: 11
+          temperature_K: 1873
+      - observation_id: kang_2007_t2_sample_302_slag_composition_payload
+        type: composition
+        regime: quench_equilibration
+        phase: l
+        locator: {page: 2, published_page: 806, table: '2', note: 'Sample 302, analyzed slag composition.'}
+        experiment: copper-slag-equilibration-1873k
+        T_range_K: [1873, 1873]
+        units: mass %
+        values:
+          method_class: measured_tabulated
+          evidence_class: measured_tabulated
+          composition_mass_percent:
+            CaO: 55
+            Al2O3: 36
+            SiO2: 9
+          temperature_K: 1873
+      - observation_id: kang_2007_t2_sample_303_slag_composition_payload
+        type: composition
+        regime: quench_equilibration
+        phase: l
+        locator: {page: 2, published_page: 806, table: '2', note: 'Sample 303, analyzed slag composition.'}
+        experiment: copper-slag-equilibration-1873k
+        T_range_K: [1873, 1873]
+        units: mass %
+        values:
+          method_class: measured_tabulated
+          evidence_class: measured_tabulated
+          composition_mass_percent:
+            CaO: 47
+            Al2O3: 44
+            SiO2: 9
+          temperature_K: 1873
+      - observation_id: kang_2007_t2_sample_304_slag_composition_payload
+        type: composition
+        regime: quench_equilibration
+        phase: l
+        locator: {page: 2, published_page: 806, table: '2', note: 'Sample 304, analyzed slag composition.'}
+        experiment: copper-slag-equilibration-1873k
+        T_range_K: [1873, 1873]
+        units: mass %
+        values:
+          method_class: measured_tabulated
+          evidence_class: measured_tabulated
+          composition_mass_percent: {CaO: 39, Al2O3: 52, SiO2: 9}
+          temperature_K: 1873
+      - observation_id: kang_2007_t2_sample_305_slag_composition_payload
+        type: composition
+        regime: quench_equilibration
+        phase: l
+        locator: {page: 2, published_page: 806, table: '2', note: 'Sample 305, analyzed slag composition.'}
+        experiment: copper-slag-equilibration-1873k
+        T_range_K: [1873, 1873]
+        units: mass %
+        values:
+          method_class: measured_tabulated
+          evidence_class: measured_tabulated
+          composition_mass_percent: {CaO: 48, Al2O3: 46, SiO2: 6}
+          temperature_K: 1873
+      - observation_id: kang_2007_t2_sample_306_slag_composition_payload
+        type: composition
+        regime: quench_equilibration
+        phase: l
+        locator: {page: 2, published_page: 806, table: '2', note: 'Sample 306, analyzed slag composition.'}
+        experiment: copper-slag-equilibration-1873k
+        T_range_K: [1873, 1873]
+        units: mass %
+        values:
+          method_class: measured_tabulated
+          evidence_class: measured_tabulated
+          composition_mass_percent: {CaO: 54, Al2O3: 40, SiO2: 6}
+          temperature_K: 1873
+      - observation_id: kang_2007_t2_sample_307_slag_composition_payload
+        type: composition
+        regime: quench_equilibration
+        phase: l
+        locator: {page: 2, published_page: 806, table: '2', note: 'Sample 307, analyzed slag composition.'}
+        experiment: copper-slag-equilibration-1873k
+        T_range_K: [1873, 1873]
+        units: mass %
+        values:
+          method_class: measured_tabulated
+          evidence_class: measured_tabulated
+          composition_mass_percent: {CaO: 40, Al2O3: 54, SiO2: 6}
+          temperature_K: 1873
+      - observation_id: kang_2007_t2_sample_308_slag_composition_payload
+        type: composition
+        regime: quench_equilibration
+        phase: l
+        locator: {page: 2, published_page: 806, table: '2', note: 'Sample 308, analyzed slag composition.'}
+        experiment: copper-slag-equilibration-1873k
+        T_range_K: [1873, 1873]
+        units: mass %
+        values:
+          method_class: measured_tabulated
+          evidence_class: measured_tabulated
+          composition_mass_percent:
+            CaO: 46
+            Al2O3: 50
+            SiO2: 4
+          temperature_K: 1873
+      - observation_id: kang_2007_t2_sample_309_slag_composition_payload
+        type: composition
+        regime: quench_equilibration
+        phase: l
+        locator: {page: 2, published_page: 806, table: '2', note: 'Sample 309, analyzed slag composition.'}
+        experiment: copper-slag-equilibration-1873k
+        T_range_K: [1873, 1873]
+        units: mass %
+        values:
+          method_class: measured_tabulated
+          evidence_class: measured_tabulated
+          composition_mass_percent:
+            CaO: 40
+            Al2O3: 56
+            SiO2: 4
+          temperature_K: 1873
+      - observation_id: kang_2007_t2_sample_310_slag_composition_payload
+        type: composition
+        regime: quench_equilibration
+        phase: l
+        locator: {page: 2, published_page: 806, table: '2', note: 'Sample 310, analyzed slag composition.'}
+        experiment: copper-slag-equilibration-1873k
+        T_range_K: [1873, 1873]
+        units: mass %
+        values:
+          method_class: measured_tabulated
+          evidence_class: measured_tabulated
+          composition_mass_percent:
+            CaO: 54
+            Al2O3: 42
+            SiO2: 4
+          temperature_K: 1873
+      - observation_id: kang_2007_t3_sample_401_slag_composition_payload
+        type: composition
+        regime: quench_equilibration
+        phase: l
+        locator: {page: 4, published_page: 808, table: '3', note: 'Sample 401, analyzed slag composition.'}
+        experiment: copper-slag-equilibration-1873k
+        T_range_K: [1873, 1873]
+        units: mass %
+        values:
+          method_class: measured_tabulated
+          evidence_class: measured_tabulated
+          composition_mass_percent:
+            CaO: 42
+            Al2O3: 41
+            SiO2: 8
+            MgO: 9
+          temperature_K: 1873
+      - observation_id: kang_2007_t3_sample_402_slag_composition_payload
+        type: composition
+        regime: quench_equilibration
+        phase: l
+        locator: {page: 4, published_page: 808, table: '3', note: 'Sample 402, analyzed slag composition.'}
+        experiment: copper-slag-equilibration-1873k
+        T_range_K: [1873, 1873]
+        units: mass %
+        values:
+          method_class: measured_tabulated
+          evidence_class: measured_tabulated
+          composition_mass_percent:
+            CaO: 46
+            Al2O3: 35
+            SiO2: 9
+            MgO: 10
+          temperature_K: 1873
+      - observation_id: kang_2007_t3_sample_403_slag_composition_payload
+        type: composition
+        regime: quench_equilibration
+        phase: l
+        locator: {page: 4, published_page: 808, table: '3', note: 'Sample 403, analyzed slag composition.'}
+        experiment: copper-slag-equilibration-1873k
+        T_range_K: [1873, 1873]
+        units: mass %
+        values:
+          method_class: measured_tabulated
+          evidence_class: measured_tabulated
+          composition_mass_percent:
+            CaO: 38
+            Al2O3: 46
+            SiO2: 8
+            MgO: 8
+          temperature_K: 1873
+      - observation_id: kang_2007_t3_sample_404_slag_composition_payload
+        type: composition
+        regime: quench_equilibration
+        phase: l
+        locator: {page: 4, published_page: 808, table: '3', note: 'Sample 404, analyzed slag composition.'}
+        experiment: copper-slag-equilibration-1873k
+        T_range_K: [1873, 1873]
+        units: mass %
+        values:
+          method_class: measured_tabulated
+          evidence_class: measured_tabulated
+          composition_mass_percent:
+            CaO: 43
+            Al2O3: 42
+            SiO2: 6
+            MgO: 9
+          temperature_K: 1873
+      - observation_id: kang_2007_t3_sample_405_slag_composition_payload
+        type: composition
+        regime: quench_equilibration
+        phase: l
+        locator: {page: 4, published_page: 808, table: '3', note: 'Sample 405, analyzed slag composition.'}
+        experiment: copper-slag-equilibration-1873k
+        T_range_K: [1873, 1873]
+        units: mass %
+        values:
+          method_class: measured_tabulated
+          evidence_class: measured_tabulated
+          composition_mass_percent:
+            CaO: 46
+            Al2O3: 38
+            SiO2: 6
+            MgO: 10
+          temperature_K: 1873
+      - observation_id: kang_2007_t3_sample_406_slag_composition_payload
+        type: composition
+        regime: quench_equilibration
+        phase: l
+        locator: {page: 4, published_page: 808, table: '3', note: 'Sample 406, analyzed slag composition.'}
+        experiment: copper-slag-equilibration-1873k
+        T_range_K: [1873, 1873]
+        units: mass %
+        values:
+          method_class: measured_tabulated
+          evidence_class: measured_tabulated
+          composition_mass_percent:
+            CaO: 36
+            Al2O3: 49
+            SiO2: 5
+            MgO: 10
+          temperature_K: 1873
+      - observation_id: kang_2007_t3_sample_407_slag_composition_payload
+        type: composition
+        regime: quench_equilibration
+        phase: l
+        locator: {page: 4, published_page: 808, table: '3', note: 'Sample 407, analyzed slag composition.'}
+        experiment: copper-slag-equilibration-1873k
+        T_range_K: [1873, 1873]
+        units: mass %
+        values:
+          method_class: measured_tabulated
+          evidence_class: measured_tabulated
+          composition_mass_percent:
+            CaO: 41
+            Al2O3: 46
+            SiO2: 3
+            MgO: 10
+          temperature_K: 1873
+      - observation_id: kang_2007_t3_sample_408_slag_composition_payload
+        type: composition
+        regime: quench_equilibration
+        phase: l
+        locator: {page: 4, published_page: 808, table: '3', note: 'Sample 408, analyzed slag composition.'}
+        experiment: copper-slag-equilibration-1873k
+        T_range_K: [1873, 1873]
+        units: mass %
+        values:
+          method_class: measured_tabulated
+          evidence_class: measured_tabulated
+          composition_mass_percent:
+            CaO: 36
+            Al2O3: 52
+            SiO2: 3
+            MgO: 9
+          temperature_K: 1873
+      - observation_id: kang_2007_t3_sample_409_slag_composition_payload
+        type: composition
+        regime: quench_equilibration
+        phase: l
+        locator: {page: 4, published_page: 808, table: '3', note: 'Sample 409, analyzed slag composition.'}
+        experiment: copper-slag-equilibration-1873k
+        T_range_K: [1873, 1873]
+        units: mass %
+        values:
+          method_class: measured_tabulated
+          evidence_class: measured_tabulated
+          composition_mass_percent:
+            CaO: 45
+            Al2O3: 42
+            SiO2: 4
+            MgO: 9
+          temperature_K: 1873
+      - observation_id: kang_2007_t3_sample_410_slag_composition_payload
+        type: composition
+        regime: quench_equilibration
+        phase: l
+        locator: {page: 4, published_page: 808, table: '3', note: 'Sample 410, analyzed slag composition.'}
+        experiment: copper-slag-equilibration-1873k
+        T_range_K: [1873, 1873]
+        units: mass %
+        values:
+          method_class: measured_tabulated
+          evidence_class: measured_tabulated
+          composition_mass_percent:
+            CaO: 40
+            Al2O3: 42
+            SiO2: 8
+            MgO: 10
+          temperature_K: 1873
+      - observation_id: kang_2007_t3_sample_411_slag_composition_payload
+        type: composition
+        regime: quench_equilibration
+        phase: l
+        locator: {page: 4, published_page: 808, table: '3', note: 'Sample 411, analyzed slag composition.'}
+        experiment: copper-slag-equilibration-1873k
+        T_range_K: [1873, 1873]
+        units: mass %
+        values:
+          method_class: measured_tabulated
+          evidence_class: measured_tabulated
+          composition_mass_percent:
+            CaO: 47
+            Al2O3: 36
+            SiO2: 11
+            MgO: 6
+          temperature_K: 1873
+      - observation_id: kang_2007_t3_sample_412_slag_composition_payload
+        type: composition
+        regime: quench_equilibration
+        phase: l
+        locator: {page: 4, published_page: 808, table: '3', note: 'Sample 412, analyzed slag composition.'}
+        experiment: copper-slag-equilibration-1873k
+        T_range_K: [1873, 1873]
+        units: mass %
+        values:
+          method_class: measured_tabulated
+          evidence_class: measured_tabulated
+          composition_mass_percent:
+            CaO: 48
+            Al2O3: 31
+            SiO2: 15
+            MgO: 6
+          temperature_K: 1873
+      - observation_id: kang_2007_t1_sample_301_charge_composition
+        type: composition
+        locator: {page: 2, published_page: 806, table: '1', note: 'Sample 301, weighed-in oxide charge composition.'}
+        units: mass %
+        values:
+          method_class: measured_tabulated
+          evidence_class: measured_tabulated
+          composition_mass_percent: {CaO: 49, Al2O3: 40, SiO2: 11}
+          sample_id: '301'
+          charge_group: ternary
+      - observation_id: kang_2007_t1_sample_302_charge_composition
+        type: composition
+        locator: {page: 2, published_page: 806, table: '1', note: 'Sample 302, weighed-in oxide charge composition.'}
+        units: mass %
+        values:
+          method_class: measured_tabulated
+          evidence_class: measured_tabulated
+          composition_mass_percent: {CaO: 56, Al2O3: 35, SiO2: 9}
+          sample_id: '302'
+          charge_group: ternary
+      - observation_id: kang_2007_t1_sample_303_charge_composition
+        type: composition
+        locator: {page: 2, published_page: 806, table: '1', note: 'Sample 303, weighed-in oxide charge composition.'}
+        units: mass %
+        values:
+          method_class: measured_tabulated
+          evidence_class: measured_tabulated
+          composition_mass_percent: {CaO: 48, Al2O3: 43, SiO2: 9}
+          sample_id: '303'
+          charge_group: ternary
+      - observation_id: kang_2007_t1_sample_304_charge_composition
+        type: composition
+        locator: {page: 2, published_page: 806, table: '1', note: 'Sample 304, weighed-in oxide charge composition.'}
+        units: mass %
+        values:
+          method_class: measured_tabulated
+          evidence_class: measured_tabulated
+          composition_mass_percent: {CaO: 40, Al2O3: 51, SiO2: 9}
+          sample_id: '304'
+          charge_group: ternary
+      - observation_id: kang_2007_t1_sample_305_charge_composition
+        type: composition
+        locator: {page: 2, published_page: 806, table: '1', note: 'Sample 305, weighed-in oxide charge composition.'}
+        units: mass %
+        values:
+          method_class: measured_tabulated
+          evidence_class: measured_tabulated
+          composition_mass_percent: {CaO: 47, Al2O3: 47, SiO2: 6}
+          sample_id: '305'
+          charge_group: ternary
+      - observation_id: kang_2007_t1_sample_306_charge_composition
+        type: composition
+        locator: {page: 2, published_page: 806, table: '1', note: 'Sample 306, weighed-in oxide charge composition.'}
+        units: mass %
+        values:
+          method_class: measured_tabulated
+          evidence_class: measured_tabulated
+          composition_mass_percent: {CaO: 55, Al2O3: 39, SiO2: 6}
+          sample_id: '306'
+          charge_group: ternary
+      - observation_id: kang_2007_t1_sample_307_charge_composition
+        type: composition
+        locator: {page: 2, published_page: 806, table: '1', note: 'Sample 307, weighed-in oxide charge composition.'}
+        units: mass %
+        values:
+          method_class: measured_tabulated
+          evidence_class: measured_tabulated
+          composition_mass_percent: {CaO: 40, Al2O3: 54, SiO2: 6}
+          sample_id: '307'
+          charge_group: ternary
+      - observation_id: kang_2007_t1_sample_308_charge_composition
+        type: composition
+        locator: {page: 2, published_page: 806, table: '1', note: 'Sample 308, weighed-in oxide charge composition.'}
+        units: mass %
+        values:
+          method_class: measured_tabulated
+          evidence_class: measured_tabulated
+          composition_mass_percent: {CaO: 47, Al2O3: 50, SiO2: 3}
+          sample_id: '308'
+          charge_group: ternary
+      - observation_id: kang_2007_t1_sample_309_charge_composition
+        type: composition
+        locator: {page: 2, published_page: 806, table: '1', note: 'Sample 309, weighed-in oxide charge composition.'}
+        units: mass %
+        values:
+          method_class: measured_tabulated
+          evidence_class: measured_tabulated
+          composition_mass_percent: {CaO: 40, Al2O3: 57, SiO2: 3}
+          sample_id: '309'
+          charge_group: ternary
+      - observation_id: kang_2007_t1_sample_310_charge_composition
+        type: composition
+        locator: {page: 2, published_page: 806, table: '1', note: 'Sample 310, weighed-in oxide charge composition.'}
+        units: mass %
+        values:
+          method_class: measured_tabulated
+          evidence_class: measured_tabulated
+          composition_mass_percent: {CaO: 55, Al2O3: 42, SiO2: 3}
+          sample_id: '310'
+          charge_group: ternary
+      - observation_id: kang_2007_t1_sample_401_charge_composition
+        type: composition
+        locator: {page: 2, published_page: 806, table: '1', note: 'Sample 401, weighed-in oxide charge composition.'}
+        units: mass %
+        values:
+          method_class: measured_tabulated
+          evidence_class: measured_tabulated
+          composition_mass_percent: {CaO: 41, Al2O3: 40, SiO2: 9, MgO: 10}
+          sample_id: '401'
+          charge_group: quaternary
+      - observation_id: kang_2007_t1_sample_402_charge_composition
+        type: composition
+        locator: {page: 2, published_page: 806, table: '1', note: 'Sample 402, weighed-in oxide charge composition.'}
+        units: mass %
+        values:
+          method_class: measured_tabulated
+          evidence_class: measured_tabulated
+          composition_mass_percent: {CaO: 46, Al2O3: 35, SiO2: 9, MgO: 10}
+          sample_id: '402'
+          charge_group: quaternary
+      - observation_id: kang_2007_t1_sample_403_charge_composition
+        type: composition
+        locator: {page: 2, published_page: 806, table: '1', note: 'Sample 403, weighed-in oxide charge composition.'}
+        units: mass %
+        values:
+          method_class: measured_tabulated
+          evidence_class: measured_tabulated
+          composition_mass_percent: {CaO: 37, Al2O3: 44, SiO2: 9, MgO: 10}
+          sample_id: '403'
+          charge_group: quaternary
+      - observation_id: kang_2007_t1_sample_404_charge_composition
+        type: composition
+        locator: {page: 2, published_page: 806, table: '1', note: 'Sample 404, weighed-in oxide charge composition.'}
+        units: mass %
+        values:
+          method_class: measured_tabulated
+          evidence_class: measured_tabulated
+          composition_mass_percent: {CaO: 42, Al2O3: 42, SiO2: 6, MgO: 10}
+          sample_id: '404'
+          charge_group: quaternary
+      - observation_id: kang_2007_t1_sample_405_charge_composition
+        type: composition
+        locator: {page: 2, published_page: 806, table: '1', note: 'Sample 405, weighed-in oxide charge composition.'}
+        units: mass %
+        values:
+          method_class: measured_tabulated
+          evidence_class: measured_tabulated
+          composition_mass_percent: {CaO: 46, Al2O3: 38, SiO2: 6, MgO: 10}
+          sample_id: '405'
+          charge_group: quaternary
+      - observation_id: kang_2007_t1_sample_406_charge_composition
+        type: composition
+        locator: {page: 2, published_page: 806, table: '1', note: 'Sample 406, weighed-in oxide charge composition.'}
+        units: mass %
+        values:
+          method_class: measured_tabulated
+          evidence_class: measured_tabulated
+          composition_mass_percent: {CaO: 36, Al2O3: 48, SiO2: 6, MgO: 10}
+          sample_id: '406'
+          charge_group: quaternary
+      - observation_id: kang_2007_t1_sample_407_charge_composition
+        type: composition
+        locator: {page: 2, published_page: 806, table: '1', note: 'Sample 407, weighed-in oxide charge composition.'}
+        units: mass %
+        values:
+          method_class: measured_tabulated
+          evidence_class: measured_tabulated
+          composition_mass_percent: {CaO: 41, Al2O3: 46, SiO2: 3, MgO: 10}
+          sample_id: '407'
+          charge_group: quaternary
+      - observation_id: kang_2007_t1_sample_408_charge_composition
+        type: composition
+        locator: {page: 2, published_page: 806, table: '1', note: 'Sample 408, weighed-in oxide charge composition.'}
+        units: mass %
+        values:
+          method_class: measured_tabulated
+          evidence_class: measured_tabulated
+          composition_mass_percent: {CaO: 35, Al2O3: 52, SiO2: 3, MgO: 10}
+          sample_id: '408'
+          charge_group: quaternary
+      - observation_id: kang_2007_t1_sample_409_charge_composition
+        type: composition
+        locator: {page: 2, published_page: 806, table: '1', note: 'Sample 409, weighed-in oxide charge composition.'}
+        units: mass %
+        values:
+          method_class: measured_tabulated
+          evidence_class: measured_tabulated
+          composition_mass_percent: {CaO: 45, Al2O3: 42, SiO2: 3, MgO: 10}
+          sample_id: '409'
+          charge_group: quaternary
+      - observation_id: kang_2007_t1_sample_410_charge_composition
+        type: composition
+        locator: {page: 2, published_page: 806, table: '1', note: 'Sample 410, weighed-in oxide charge composition.'}
+        units: mass %
+        values:
+          method_class: measured_tabulated
+          evidence_class: measured_tabulated
+          composition_mass_percent: {CaO: 39, Al2O3: 42, SiO2: 9, MgO: 10}
+          sample_id: '410'
+          charge_group: quaternary
+      - observation_id: kang_2007_t1_sample_411_charge_composition
+        type: composition
+        locator: {page: 2, published_page: 806, table: '1', note: 'Sample 411, weighed-in oxide charge composition.'}
+        units: mass %
+        values:
+          method_class: measured_tabulated
+          evidence_class: measured_tabulated
+          composition_mass_percent: {CaO: 47, Al2O3: 35, SiO2: 11, MgO: 7}
+          sample_id: '411'
+          charge_group: inclusions
+      - observation_id: kang_2007_t1_sample_412_charge_composition
+        type: composition
+        locator: {page: 2, published_page: 806, table: '1', note: 'Sample 412, weighed-in oxide charge composition.'}
+        units: mass %
+        values:
+          method_class: measured_tabulated
+          evidence_class: measured_tabulated
+          composition_mass_percent: {CaO: 48, Al2O3: 32, SiO2: 14, MgO: 6}
+          sample_id: '412'
+          charge_group: inclusions
+      - observation_id: kang_2007_t4_low_sio2_inclusion_ranges
+        type: thermodynamic_example
+        locator: {page: 5, published_page: 809, table: '4', note: 'Composition ranges of liquid inclusions after vacuum degassing; citation 2.'}
+        units: mass %
+        quote: 'Kang, Nzotta and Sichen (2006), unpublished work, as reproduced in Kang, Sichen and Morita (2007) Table 4, low-SiO2 inclusion composition ranges.'
+        attribution: 'Kang, Nzotta & Sichen (2006), unpublished work, cited as reference 2.'
+        values:
+          method_class: quoted_attributed
+          evidence_class: quoted_attributed
+          composition_mass_percent_ranges:
+            CaO: {lower: 30, upper: 38, printed: '30–38'}
+            Al2O3: {lower: 45, upper: 53, printed: '45–53'}
+            SiO2: {lower: 2, upper: 6, printed: '2–6'}
+            MgO: {lower: 8, upper: 10, printed: '8–10'}
+      - observation_id: kang_2007_t4_high_sio2_inclusion_ranges
+        type: thermodynamic_example
+        locator: {page: 5, published_page: 809, table: '4', note: 'Composition ranges of liquid inclusions after vacuum degassing; citation 2.'}
+        units: mass %
+        quote: 'Kang, Nzotta and Sichen (2006), unpublished work, as reproduced in Kang, Sichen and Morita (2007) Table 4, high-SiO2 inclusion composition ranges.'
+        attribution: 'Kang, Nzotta & Sichen (2006), unpublished work, cited as reference 2.'
+        values:
+          method_class: quoted_attributed
+          evidence_class: quoted_attributed
+          composition_mass_percent_ranges:
+            CaO: {lower: 44, upper: 48, printed: '44–48'}
+            Al2O3: {lower: 32, upper: 36, printed: '32–36'}
+            SiO2: {lower: 11, upper: 15, printed: '11–15'}
+            MgO: {lower: 5, upper: 7, printed: '5–7'}
+      - observation_id: kang_2007_t5_post_degassing_steel_composition
+        type: thermodynamic_example
+        locator: {page: 5, published_page: 809, table: '5', note: 'Typical steel composition after vacuum degassing; citation 2.'}
+        units: mass %
+        quote: 'Kang, Nzotta and Sichen (2006), unpublished work, as reproduced in Kang, Sichen and Morita (2007) Table 5.'
+        attribution: 'Kang, Nzotta & Sichen (2006), unpublished work, cited as reference 2.'
+        values:
+          method_class: quoted_attributed
+          evidence_class: quoted_attributed
+          composition_mass_percent: {C: 0.41, Si: 1.07, Mn: 0.39, Cr: 5.20, V: 0.92, Mo: 1.29, Al: 0.022, O: 0.0002}
+      - observation_id: kang_2007_t6_steel_interaction_parameters
+        type: thermodynamic_example
+        locator: {page: 5, published_page: 809, table: '6', note: 'Interaction parameters at 1873 K, references 13 and 14.'}
+        units: first-order interaction parameter e_i^j (weight-percent; 1 wt % dilute-solution standard state)
+        quote: 'Kang, Sichen and Morita (2007) Table 6 prints first-order weight-percent interaction parameters e_i^j at 1873 K.'
+        attribution: 'Sigworth & Elliott (1974), Met. Sci. 8:298; JSPS 19th Committee on Steelmaking (1988), Steelmaking Data Sourcebook, pp. 280/282.'
+        values:
+          method_class: quoted_attributed
+          evidence_class: quoted_attributed
+          temperature_K: 1873
+          epsilon:
+            Si: {O: -0.23, C: 0.18, Si: 0.11, Mn: 0.002, Cr: -0.0003, V: 0.025, Al: 0.058}
+            O: {O: -0.17, C: -0.421, Si: -0.066, Mn: -0.021, Cr: -0.055, V: -0.14, Al: -1.17}
+          standard_state: 'First-order e_i^j interaction parameters on a weight-percent basis, using the 1 wt % dilute-solution standard state for dissolved Si and O in liquid steel.'
+# Arithmetic check (shown once; printed values remain unchanged): at 1873 K, Eq. 2 gives log K1=6088/1873+4.33=7.5804; with pCO=1 atm and aC=1, pO2=(pCO/(aC K1))^2=6.91e-16 atm, 0.196 dex above the printed 4.4e-16 atm. Recomputing Eqs. 2-5 with gamma_Si=0.016 and the printed Si assays gives activities below the printed values by 0.05-0.16 dex in 21/22 rows (median about 0.09 dex); this flags activity level and is not a correction.
+      - observation_id: kang_2007_activity_method_context
+        type: thermodynamic_example
+        locator: {page: 2, published_page: 806, equation: '1-5', section: '2. Experimental'}
+        units: equations and dimensionless activity
+        values:
+          method_class: measured_tabulated
+          reference_metal: copper
+          gas_buffer_equation: 'C(s) + 1/2 O2(g) = CO(g)'
+          gas_buffer_logK1: 'log K1 = log[pCO/(aC·pO2^1/2)] = 6088/T + 4.33'
+          silica_equation: 'SiO2(s) = Si(l) + O2(g)'
+          silica_logK3: 'log K3 = log[aSi·pO2/aSiO2] = -49799/T + 10.65'
+          silicon_activity_equation: 'aSi = γSi·XSi'
+          copper_silicon_activity_coefficient: 0.016
+          copper_silicon_activity_coefficient_basis: 'infinite dilute solution'
+          activity_level_notice: 'The printed Cu-equilibrium activities are retained as reported. The paper''s Eq. 2 oxygen pressure and Eqs. 2-5 activity reductions are internally inconsistent; see the arithmetic comment immediately above this context row. This qualifies their level without correcting the printed values.'
+          oxygen_partial_pressure_at_1873K_atm: '4.4 × 10^-16'
+          silica_standard_state: 'pure solid SiO2; polymorph unspecified'
+          silicon_standard_state: 'pure liquid Si'
+          auxiliary_data_source: 'Hultgren et al. (1973), p. 793; Kubaschewski & Alcock (1979), p. 382; Turkdogan (1980), p. 7'
+      - observation_id: kang_2007_thermodynamic_steel_context
+        type: thermodynamic_example
+        locator: {page: 5, published_page: 809, equation: '8-10', table: '6'}
+        units: equations and dimensionless activity
+        quote: 'The authors report calculated aSi = 1.8, aO = 4.2 × 10^-5, and equilibrium aSiO2 = 1.4 × 10^-4 from the post-degassing steel composition and interaction parameters.'
+        attribution: 'Calculated by Kang, Sichen and Morita (2007) from Table 5 composition and Table 6 interaction parameters.'
+        values:
+          method_class: model_derived
+          evidence_class: model_derived
+          steel_equation: 'SiO2(s) = Si + 2O'
+          steel_logK8: 'log K8 = log[aSi·aO^2/aSiO2] = -30414/T + 11.59'
+          dissolved_activity_relation: 'ai = fi[%i]; log fi = sum_j e_i^j[%j]'
+          silica_standard_state: 'pure solid SiO2'
+          dissolved_standard_state: 'dilute solution on a weight percent basis'
+          calculated_aSi: 1.8
+          calculated_aO: 4.2e-5
+          calculated_aSiO2: 1.4e-4
+          parameter_source: 'Sigworth & Elliott (1974), Met. Sci. 8:298; JSPS (1988), Steelmaking Data Sourcebook, pp. 280/282'
+      - observation_id: kang_2007_quoted_rein_chipman_low_silica_point
+        type: thermodynamic_example
+        locator: {page: 3, published_page: 807, figure: '2', section: '3.1'}
+        units: dimensionless
+        quote: 'Rein and Chipman (1965) estimated a(SiO2) = 7.7 × 10^-4 at the hypothetical CaO + 2CaO·SiO2 doubly saturated point at 1873 K; Kang, Sichen and Morita (2007) report this attributed estimate.'
+        attribution: 'Rein & Chipman (1965), Trans. AIME 233:415, as cited and evaluated by Kang, Sichen & Morita (2007).'
+        values:
+          method_class: quoted_attributed
+          evidence_class: quoted_attributed
+          activity: 7.7e-4
+          temperature_K: 1873
+          qualifier: 'Hypothetical point; Rein and Chipman did not determine low-SiO2 activity experimentally.'
+      - observation_id: kang_2007_present_cao_tricalcium_silicate_saturation
+        type: thermodynamic_example
+        locator: {page: 3, published_page: 807, equation: '6-7', section: '3.1'}
+        units: dimensionless
+        quote: 'Kang, Sichen and Morita (2007) evaluate a(SiO2) = 2.2 × 10^-4 at CaO + 3CaO·SiO2 coexistence using Eq. 6-7.'
+        attribution: 'Phase statement from Slag Atlas (1995), 2nd ed., p. 105; log K6 thermodynamic data cited to Turkdogan (1980), p. 7.'
+        values:
+          method_class: author_estimate
+          evidence_class: author_estimate
+          activity: 2.2e-4
+          temperature_K: 1873
+          reaction: '3CaO·SiO2(s) = 3CaO(s) + SiO2(s)'
+          logK6: 'log K6 = -6211.2/T - 0.3509'
+          qualifier: 'Authors say it agrees very well with the measured value and supports reliability.'
+      - observation_id: kang_2007_quoted_rein_chipman_contours
+        type: thermodynamic_example
+        locator: {page: 3, published_page: 807, figure: '2'}
+        units: qualitative comparison
+        quote: 'Kang, Sichen and Morita (2007) report higher measured activities than Rein and Chipman (1965), a similar contour shape, and a sharper decline as CaO increases; Rein and Chipman extrapolated low-SiO2 values through their hypothetical saturation point.'
+        attribution: 'Rein & Chipman (1965), Trans. AIME 233:415.'
+        values:
+          method_class: quoted_attributed
+          evidence_class: quoted_attributed
+          comparison: 'Present measured values higher, similar contour shape, sharper decline with CaO.'
+          low_silica_qualification: 'Earlier low-SiO2 values were extrapolated from higher-SiO2 measurements via a hypothetical saturation point.'
+      - observation_id: kang_2007_quoted_kay_taylor_comparison
+        type: thermodynamic_example
+        locator: {page: 1, published_page: 805, section: '1. Introduction'}
+        units: qualitative comparison
+        quote: 'Kang, Sichen and Morita (2007) cite Kay and Tayler (1960, 1963) as reporting SiO2 activities in CaO-Al2O3-SiO2(-MgO) at 1823 K; this paper gives no numeric Kay and Tayler values for direct comparison.'
+        attribution: 'Kay & Tayler (1960), Trans. Faraday Soc. 56:1372; Kay & Tayler (1963), J. Iron Steel Inst. 201:67.'
+        values:
+          method_class: quoted_attributed
+          evidence_class: quoted_attributed
+          temperature_K: 1823
+          comparison: 'Prior reported activities are cited without numerical values in this paper.'
+      - observation_id: kang_2007_figure_2_comparison
+        type: thermodynamic_example
+        locator: {page: 3, published_page: 807, figure: '2'}
+        units: qualitative figure comparison
+        quote: 'Figure 2 shows present-work solid iso-a(SiO2) lines and dotted Rein and Chipman (1965) lines.'
+        attribution: 'Present curves by Kang, Sichen and Morita (2007); dotted comparator from Rein & Chipman (1965), Trans. AIME 233:415.'
+        values:
+          method_class: model_derived
+          evidence_class: model_derived
+          present_work_curve: 'Solid iso-a(SiO2) contours; visually transcribed, not digitized.'
+          comparator_curve: 'Dotted Rein and Chipman iso-a(SiO2) contours; visually transcribed, not digitized.'
+          qualifier: 'Figure contours not assigned numeric coordinates.'
+      - observation_id: kang_2007_experiment_protocol_context
+        type: laboratory_conditions
+        locator: {page: 2, published_page: 806, section: '2. Experimental', equation: '1-2', figure: '1'}
+        units: mixed
+        values:
+          method_class: measured_tabulated
+          system: 'CaO-Al2O3-SiO2(-MgO) slag equilibrated with Cu'
+          method: quench_equilibration
+          equilibrium_demonstration_quote: 'After holding at 1 873 K for 18 h, which were confirmed to be enough to reach equilibrium by preliminary experiments, the sample was quenched.'
+          equilibration_temperature_K: 1873
+          equilibration_time_h: 18
+          copper_rod_mass_g: 10
+          copper_mass_qualifier: about
+          slag_mass_g: 10
+          slag_mass_qualifier: about
+          copper_purity_mass_percent_lower_bound: 99.9
+          copper_purity_qualifier: '>'
+          gas_atmosphere: CO
+          CO_pressure_atm: 1
+          graphite_crucible_and_holder: true
+          oxygen_partial_pressure_atm: 4.4e-16
+          premelt_temperature_K: 1923
+          premelt_duration_min: 30
+          premelt_crucible: platinum
+          quench: 'quenched after equilibrium hold'
+      - observation_id: kang_2007_chemical_analysis_context
+        type: method
+        locator: {page: 2, published_page: 806, section: '2. Experimental'}
+        units: method descriptions
+        values:
+          method_class: measured_tabulated
+          copper_analysis: 'Si in Cu by ICP-AES (Seiko Instrument Co.)'
+          slag_analysis: 'slag compositions by ICP-AES; SiO2 content separately by gravimetry'
+          analytical_precision: {tag: unknown, reason: not_published}
+          gas_purification: {tag: unknown, reason: not_published}
+
+  Si:
+    observations:
+      - observation_id: kang_2007_t2_sample_301_cu_assay
+        type: concentration_series
+        regime: quench_equilibration
+        phase: l
+        experiment: copper-slag-equilibration-1873k
+        T_range_K: [1873, 1873]
+        locator: {page: 2, published_page: 806, table: '2', note: 'Sample 301, mass percent Si in Cu.'}
+        units: mass %
+        values:
+          temperature_K: 1873
+          method_class: measured_tabulated
+          admission_status: admitted
+          evidence_class: measured_tabulated
+          composition_mass_percent: {Si: 0.38}
+          solvent: Cu
+      - observation_id: kang_2007_t2_sample_302_cu_assay
+        type: concentration_series
+        regime: quench_equilibration
+        phase: l
+        experiment: copper-slag-equilibration-1873k
+        T_range_K: [1873, 1873]
+        locator: {page: 2, published_page: 806, table: '2', note: 'Sample 302, mass percent Si in Cu.'}
+        units: mass %
+        values:
+          temperature_K: 1873
+          method_class: measured_tabulated
+          admission_status: admitted
+          evidence_class: measured_tabulated
+          composition_mass_percent: {Si: 0.24}
+          solvent: Cu
+      - observation_id: kang_2007_t2_sample_303_cu_assay
+        type: concentration_series
+        regime: quench_equilibration
+        phase: l
+        experiment: copper-slag-equilibration-1873k
+        T_range_K: [1873, 1873]
+        locator: {page: 2, published_page: 806, table: '2', note: 'Sample 303, mass percent Si in Cu.'}
+        units: mass %
+        values:
+          temperature_K: 1873
+          method_class: measured_tabulated
+          admission_status: admitted
+          evidence_class: measured_tabulated
+          composition_mass_percent: {Si: 0.34}
+          solvent: Cu
+      - observation_id: kang_2007_t2_sample_304_cu_assay
+        type: concentration_series
+        regime: quench_equilibration
+        phase: l
+        experiment: copper-slag-equilibration-1873k
+        T_range_K: [1873, 1873]
+        locator: {page: 2, published_page: 806, table: '2', note: 'Sample 304, mass percent Si in Cu.'}
+        units: mass %
+        values:
+          temperature_K: 1873
+          method_class: measured_tabulated
+          admission_status: admitted
+          evidence_class: measured_tabulated
+          composition_mass_percent: {Si: 0.62}
+          solvent: Cu
+      - observation_id: kang_2007_t2_sample_305_cu_assay
+        type: concentration_series
+        regime: quench_equilibration
+        phase: l
+        experiment: copper-slag-equilibration-1873k
+        T_range_K: [1873, 1873]
+        locator: {page: 2, published_page: 806, table: '2', note: 'Sample 305, mass percent Si in Cu.'}
+        units: mass %
+        values:
+          temperature_K: 1873
+          method_class: measured_tabulated
+          admission_status: admitted
+          evidence_class: measured_tabulated
+          composition_mass_percent: {Si: 0.27}
+          solvent: Cu
+      - observation_id: kang_2007_t2_sample_306_cu_assay
+        type: concentration_series
+        regime: quench_equilibration
+        phase: l
+        experiment: copper-slag-equilibration-1873k
+        T_range_K: [1873, 1873]
+        locator: {page: 2, published_page: 806, table: '2', note: 'Sample 306, mass percent Si in Cu.'}
+        units: mass %
+        values:
+          temperature_K: 1873
+          method_class: measured_tabulated
+          admission_status: admitted
+          evidence_class: measured_tabulated
+          composition_mass_percent: {Si: 0.07}
+          solvent: Cu
+      - observation_id: kang_2007_t2_sample_307_cu_assay
+        type: concentration_series
+        regime: quench_equilibration
+        phase: l
+        experiment: copper-slag-equilibration-1873k
+        T_range_K: [1873, 1873]
+        locator: {page: 2, published_page: 806, table: '2', note: 'Sample 307, mass percent Si in Cu.'}
+        units: mass %
+        values:
+          temperature_K: 1873
+          method_class: measured_tabulated
+          admission_status: admitted
+          evidence_class: measured_tabulated
+          composition_mass_percent: {Si: 0.37}
+          solvent: Cu
+      - observation_id: kang_2007_t2_sample_308_cu_assay
+        type: concentration_series
+        regime: quench_equilibration
+        phase: l
+        experiment: copper-slag-equilibration-1873k
+        T_range_K: [1873, 1873]
+        locator: {page: 2, published_page: 806, table: '2', note: 'Sample 308, mass percent Si in Cu.'}
+        units: mass %
+        values:
+          temperature_K: 1873
+          method_class: measured_tabulated
+          admission_status: admitted
+          evidence_class: measured_tabulated
+          composition_mass_percent: {Si: 0.14}
+          solvent: Cu
+      - observation_id: kang_2007_t2_sample_309_cu_assay
+        type: concentration_series
+        regime: quench_equilibration
+        phase: l
+        experiment: copper-slag-equilibration-1873k
+        T_range_K: [1873, 1873]
+        locator: {page: 2, published_page: 806, table: '2', note: 'Sample 309, mass percent Si in Cu.'}
+        units: mass %
+        values:
+          temperature_K: 1873
+          method_class: measured_tabulated
+          admission_status: admitted
+          evidence_class: measured_tabulated
+          composition_mass_percent: {Si: 0.18}
+          solvent: Cu
+      - observation_id: kang_2007_t2_sample_310_cu_assay
+        type: concentration_series
+        regime: quench_equilibration
+        phase: l
+        experiment: copper-slag-equilibration-1873k
+        T_range_K: [1873, 1873]
+        locator: {page: 2, published_page: 806, table: '2', note: 'Sample 310, mass percent Si in Cu.'}
+        units: mass %
+        values:
+          temperature_K: 1873
+          method_class: measured_tabulated
+          admission_status: admitted
+          evidence_class: measured_tabulated
+          composition_mass_percent: {Si: 0.04}
+          solvent: Cu
+      - observation_id: kang_2007_t3_sample_401_cu_assay
+        type: concentration_series
+        regime: quench_equilibration
+        phase: l
+        experiment: copper-slag-equilibration-1873k
+        T_range_K: [1873, 1873]
+        locator: {page: 4, published_page: 808, table: '3', note: 'Sample 401, mass percent Si in Cu.'}
+        units: mass %
+        values:
+          temperature_K: 1873
+          method_class: measured_tabulated
+          admission_status: admitted
+          evidence_class: measured_tabulated
+          composition_mass_percent: {Si: 0.17}
+          solvent: Cu
+      - observation_id: kang_2007_t3_sample_402_cu_assay
+        type: concentration_series
+        regime: quench_equilibration
+        phase: l
+        experiment: copper-slag-equilibration-1873k
+        T_range_K: [1873, 1873]
+        locator: {page: 4, published_page: 808, table: '3', note: 'Sample 402, mass percent Si in Cu.'}
+        units: mass %
+        values:
+          temperature_K: 1873
+          method_class: measured_tabulated
+          admission_status: admitted
+          evidence_class: measured_tabulated
+          composition_mass_percent: {Si: 0.08}
+          solvent: Cu
+      - observation_id: kang_2007_t3_sample_403_cu_assay
+        type: concentration_series
+        regime: quench_equilibration
+        phase: l
+        experiment: copper-slag-equilibration-1873k
+        T_range_K: [1873, 1873]
+        locator: {page: 4, published_page: 808, table: '3', note: 'Sample 403, mass percent Si in Cu.'}
+        units: mass %
+        values:
+          temperature_K: 1873
+          method_class: measured_tabulated
+          admission_status: admitted
+          evidence_class: measured_tabulated
+          composition_mass_percent: {Si: 0.13}
+          solvent: Cu
+      - observation_id: kang_2007_t3_sample_404_cu_assay
+        type: concentration_series
+        regime: quench_equilibration
+        phase: l
+        experiment: copper-slag-equilibration-1873k
+        T_range_K: [1873, 1873]
+        locator: {page: 4, published_page: 808, table: '3', note: 'Sample 404, mass percent Si in Cu.'}
+        units: mass %
+        values:
+          temperature_K: 1873
+          method_class: measured_tabulated
+          admission_status: admitted
+          evidence_class: measured_tabulated
+          composition_mass_percent: {Si: 0.07}
+          solvent: Cu
+      - observation_id: kang_2007_t3_sample_405_cu_assay
+        type: concentration_series
+        regime: quench_equilibration
+        phase: l
+        experiment: copper-slag-equilibration-1873k
+        T_range_K: [1873, 1873]
+        locator: {page: 4, published_page: 808, table: '3', note: 'Sample 405, mass percent Si in Cu.'}
+        units: mass %
+        values:
+          temperature_K: 1873
+          method_class: measured_tabulated
+          admission_status: admitted
+          evidence_class: measured_tabulated
+          composition_mass_percent: {Si: 0.05}
+          solvent: Cu
+      - observation_id: kang_2007_t3_sample_406_cu_assay
+        type: concentration_series
+        regime: quench_equilibration
+        phase: l
+        experiment: copper-slag-equilibration-1873k
+        T_range_K: [1873, 1873]
+        locator: {page: 4, published_page: 808, table: '3', note: 'Sample 406, mass percent Si in Cu.'}
+        units: mass %
+        values:
+          temperature_K: 1873
+          method_class: measured_tabulated
+          admission_status: admitted
+          evidence_class: measured_tabulated
+          composition_mass_percent: {Si: 0.13}
+          solvent: Cu
+      - observation_id: kang_2007_t3_sample_407_cu_assay
+        type: concentration_series
+        regime: quench_equilibration
+        phase: l
+        experiment: copper-slag-equilibration-1873k
+        T_range_K: [1873, 1873]
+        locator: {page: 4, published_page: 808, table: '3', note: 'Sample 407, mass percent Si in Cu.'}
+        units: mass %
+        values:
+          temperature_K: 1873
+          method_class: measured_tabulated
+          admission_status: admitted
+          evidence_class: measured_tabulated
+          composition_mass_percent: {Si: 0.05}
+          solvent: Cu
+      - observation_id: kang_2007_t3_sample_408_cu_assay
+        type: concentration_series
+        regime: quench_equilibration
+        phase: l
+        experiment: copper-slag-equilibration-1873k
+        T_range_K: [1873, 1873]
+        locator: {page: 4, published_page: 808, table: '3', note: 'Sample 408, mass percent Si in Cu.'}
+        units: mass %
+        values:
+          temperature_K: 1873
+          method_class: measured_tabulated
+          admission_status: admitted
+          evidence_class: measured_tabulated
+          composition_mass_percent: {Si: 0.07}
+          solvent: Cu
+      - observation_id: kang_2007_t3_sample_409_cu_assay
+        type: concentration_series
+        regime: quench_equilibration
+        phase: l
+        experiment: copper-slag-equilibration-1873k
+        T_range_K: [1873, 1873]
+        locator: {page: 4, published_page: 808, table: '3', note: 'Sample 409, mass percent Si in Cu.'}
+        units: mass %
+        values:
+          temperature_K: 1873
+          method_class: measured_tabulated
+          admission_status: admitted
+          evidence_class: measured_tabulated
+          composition_mass_percent: {Si: 0.03}
+          solvent: Cu
+      - observation_id: kang_2007_t3_sample_410_cu_assay
+        type: concentration_series
+        regime: quench_equilibration
+        phase: l
+        experiment: copper-slag-equilibration-1873k
+        T_range_K: [1873, 1873]
+        locator: {page: 4, published_page: 808, table: '3', note: 'Sample 410, mass percent Si in Cu.'}
+        units: mass %
+        values:
+          temperature_K: 1873
+          method_class: measured_tabulated
+          admission_status: admitted
+          evidence_class: measured_tabulated
+          composition_mass_percent: {Si: 0.15}
+          solvent: Cu
+      - observation_id: kang_2007_t3_sample_411_cu_assay
+        type: concentration_series
+        regime: quench_equilibration
+        phase: l
+        experiment: copper-slag-equilibration-1873k
+        T_range_K: [1873, 1873]
+        locator: {page: 4, published_page: 808, table: '3', note: 'Sample 411, mass percent Si in Cu.'}
+        units: mass %
+        values:
+          temperature_K: 1873
+          method_class: measured_tabulated
+          admission_status: admitted
+          evidence_class: measured_tabulated
+          composition_mass_percent: {Si: 0.13}
+          solvent: Cu
+      - observation_id: kang_2007_t3_sample_412_cu_assay
+        type: concentration_series
+        regime: quench_equilibration
+        phase: l
+        experiment: copper-slag-equilibration-1873k
+        T_range_K: [1873, 1873]
+        locator: {page: 4, published_page: 808, table: '3', note: 'Sample 412, mass percent Si in Cu.'}
+        units: mass %
+        values:
+          temperature_K: 1873
+          method_class: measured_tabulated
+          admission_status: admitted
+          evidence_class: measured_tabulated
+          composition_mass_percent: {Si: 0.23}
+          solvent: Cu
+    context:
+      - observation_id: kang_2007_t2_sample_301_cu_assay_payload
+        type: composition
+        regime: quench_equilibration
+        phase: l
+        locator: {page: 2, published_page: 806, table: '2', note: 'Sample 301, mass percent Si in Cu.'}
+        experiment: copper-slag-equilibration-1873k
+        T_range_K: [1873, 1873]
+        units: mass %
+        values:
+          method_class: measured_tabulated
+          evidence_class: measured_tabulated
+          composition_mass_percent: {Si: 0.38}
+          solvent: Cu
+          temperature_K: 1873
+      - observation_id: kang_2007_t2_sample_302_cu_assay_payload
+        type: composition
+        regime: quench_equilibration
+        phase: l
+        locator: {page: 2, published_page: 806, table: '2', note: 'Sample 302, mass percent Si in Cu.'}
+        experiment: copper-slag-equilibration-1873k
+        T_range_K: [1873, 1873]
+        units: mass %
+        values:
+          method_class: measured_tabulated
+          evidence_class: measured_tabulated
+          composition_mass_percent: {Si: 0.24}
+          solvent: Cu
+          temperature_K: 1873
+      - observation_id: kang_2007_t2_sample_303_cu_assay_payload
+        type: composition
+        regime: quench_equilibration
+        phase: l
+        locator: {page: 2, published_page: 806, table: '2', note: 'Sample 303, mass percent Si in Cu.'}
+        experiment: copper-slag-equilibration-1873k
+        T_range_K: [1873, 1873]
+        units: mass %
+        values:
+          method_class: measured_tabulated
+          evidence_class: measured_tabulated
+          composition_mass_percent: {Si: 0.34}
+          solvent: Cu
+          temperature_K: 1873
+      - observation_id: kang_2007_t2_sample_304_cu_assay_payload
+        type: composition
+        regime: quench_equilibration
+        phase: l
+        locator: {page: 2, published_page: 806, table: '2', note: 'Sample 304, mass percent Si in Cu.'}
+        experiment: copper-slag-equilibration-1873k
+        T_range_K: [1873, 1873]
+        units: mass %
+        values:
+          method_class: measured_tabulated
+          evidence_class: measured_tabulated
+          composition_mass_percent: {Si: 0.62}
+          solvent: Cu
+          temperature_K: 1873
+      - observation_id: kang_2007_t2_sample_305_cu_assay_payload
+        type: composition
+        regime: quench_equilibration
+        phase: l
+        locator: {page: 2, published_page: 806, table: '2', note: 'Sample 305, mass percent Si in Cu.'}
+        experiment: copper-slag-equilibration-1873k
+        T_range_K: [1873, 1873]
+        units: mass %
+        values:
+          method_class: measured_tabulated
+          evidence_class: measured_tabulated
+          composition_mass_percent: {Si: 0.27}
+          solvent: Cu
+          temperature_K: 1873
+      - observation_id: kang_2007_t2_sample_306_cu_assay_payload
+        type: composition
+        regime: quench_equilibration
+        phase: l
+        locator: {page: 2, published_page: 806, table: '2', note: 'Sample 306, mass percent Si in Cu.'}
+        experiment: copper-slag-equilibration-1873k
+        T_range_K: [1873, 1873]
+        units: mass %
+        values:
+          method_class: measured_tabulated
+          evidence_class: measured_tabulated
+          composition_mass_percent: {Si: 0.07}
+          solvent: Cu
+          temperature_K: 1873
+      - observation_id: kang_2007_t2_sample_307_cu_assay_payload
+        type: composition
+        regime: quench_equilibration
+        phase: l
+        locator: {page: 2, published_page: 806, table: '2', note: 'Sample 307, mass percent Si in Cu.'}
+        experiment: copper-slag-equilibration-1873k
+        T_range_K: [1873, 1873]
+        units: mass %
+        values:
+          method_class: measured_tabulated
+          evidence_class: measured_tabulated
+          composition_mass_percent: {Si: 0.37}
+          solvent: Cu
+          temperature_K: 1873
+      - observation_id: kang_2007_t2_sample_308_cu_assay_payload
+        type: composition
+        regime: quench_equilibration
+        phase: l
+        locator: {page: 2, published_page: 806, table: '2', note: 'Sample 308, mass percent Si in Cu.'}
+        experiment: copper-slag-equilibration-1873k
+        T_range_K: [1873, 1873]
+        units: mass %
+        values:
+          method_class: measured_tabulated
+          evidence_class: measured_tabulated
+          composition_mass_percent: {Si: 0.14}
+          solvent: Cu
+          temperature_K: 1873
+      - observation_id: kang_2007_t2_sample_309_cu_assay_payload
+        type: composition
+        regime: quench_equilibration
+        phase: l
+        locator: {page: 2, published_page: 806, table: '2', note: 'Sample 309, mass percent Si in Cu.'}
+        experiment: copper-slag-equilibration-1873k
+        T_range_K: [1873, 1873]
+        units: mass %
+        values:
+          method_class: measured_tabulated
+          evidence_class: measured_tabulated
+          composition_mass_percent: {Si: 0.18}
+          solvent: Cu
+          temperature_K: 1873
+      - observation_id: kang_2007_t2_sample_310_cu_assay_payload
+        type: composition
+        regime: quench_equilibration
+        phase: l
+        locator: {page: 2, published_page: 806, table: '2', note: 'Sample 310, mass percent Si in Cu.'}
+        experiment: copper-slag-equilibration-1873k
+        T_range_K: [1873, 1873]
+        units: mass %
+        values:
+          method_class: measured_tabulated
+          evidence_class: measured_tabulated
+          composition_mass_percent: {Si: 0.04}
+          solvent: Cu
+          temperature_K: 1873
+      - observation_id: kang_2007_t3_sample_401_cu_assay_payload
+        type: composition
+        regime: quench_equilibration
+        phase: l
+        locator: {page: 4, published_page: 808, table: '3', note: 'Sample 401, mass percent Si in Cu.'}
+        experiment: copper-slag-equilibration-1873k
+        T_range_K: [1873, 1873]
+        units: mass %
+        values:
+          method_class: measured_tabulated
+          evidence_class: measured_tabulated
+          composition_mass_percent: {Si: 0.17}
+          solvent: Cu
+          temperature_K: 1873
+      - observation_id: kang_2007_t3_sample_402_cu_assay_payload
+        type: composition
+        regime: quench_equilibration
+        phase: l
+        locator: {page: 4, published_page: 808, table: '3', note: 'Sample 402, mass percent Si in Cu.'}
+        experiment: copper-slag-equilibration-1873k
+        T_range_K: [1873, 1873]
+        units: mass %
+        values:
+          method_class: measured_tabulated
+          evidence_class: measured_tabulated
+          composition_mass_percent: {Si: 0.08}
+          solvent: Cu
+          temperature_K: 1873
+      - observation_id: kang_2007_t3_sample_403_cu_assay_payload
+        type: composition
+        regime: quench_equilibration
+        phase: l
+        locator: {page: 4, published_page: 808, table: '3', note: 'Sample 403, mass percent Si in Cu.'}
+        experiment: copper-slag-equilibration-1873k
+        T_range_K: [1873, 1873]
+        units: mass %
+        values:
+          method_class: measured_tabulated
+          evidence_class: measured_tabulated
+          composition_mass_percent: {Si: 0.13}
+          solvent: Cu
+          temperature_K: 1873
+      - observation_id: kang_2007_t3_sample_404_cu_assay_payload
+        type: composition
+        regime: quench_equilibration
+        phase: l
+        locator: {page: 4, published_page: 808, table: '3', note: 'Sample 404, mass percent Si in Cu.'}
+        experiment: copper-slag-equilibration-1873k
+        T_range_K: [1873, 1873]
+        units: mass %
+        values:
+          method_class: measured_tabulated
+          evidence_class: measured_tabulated
+          composition_mass_percent: {Si: 0.07}
+          solvent: Cu
+          temperature_K: 1873
+      - observation_id: kang_2007_t3_sample_405_cu_assay_payload
+        type: composition
+        regime: quench_equilibration
+        phase: l
+        locator: {page: 4, published_page: 808, table: '3', note: 'Sample 405, mass percent Si in Cu.'}
+        experiment: copper-slag-equilibration-1873k
+        T_range_K: [1873, 1873]
+        units: mass %
+        values:
+          method_class: measured_tabulated
+          evidence_class: measured_tabulated
+          composition_mass_percent: {Si: 0.05}
+          solvent: Cu
+          temperature_K: 1873
+      - observation_id: kang_2007_t3_sample_406_cu_assay_payload
+        type: composition
+        regime: quench_equilibration
+        phase: l
+        locator: {page: 4, published_page: 808, table: '3', note: 'Sample 406, mass percent Si in Cu.'}
+        experiment: copper-slag-equilibration-1873k
+        T_range_K: [1873, 1873]
+        units: mass %
+        values:
+          method_class: measured_tabulated
+          evidence_class: measured_tabulated
+          composition_mass_percent: {Si: 0.13}
+          solvent: Cu
+          temperature_K: 1873
+      - observation_id: kang_2007_t3_sample_407_cu_assay_payload
+        type: composition
+        regime: quench_equilibration
+        phase: l
+        locator: {page: 4, published_page: 808, table: '3', note: 'Sample 407, mass percent Si in Cu.'}
+        experiment: copper-slag-equilibration-1873k
+        T_range_K: [1873, 1873]
+        units: mass %
+        values:
+          method_class: measured_tabulated
+          evidence_class: measured_tabulated
+          composition_mass_percent: {Si: 0.05}
+          solvent: Cu
+          temperature_K: 1873
+      - observation_id: kang_2007_t3_sample_408_cu_assay_payload
+        type: composition
+        regime: quench_equilibration
+        phase: l
+        locator: {page: 4, published_page: 808, table: '3', note: 'Sample 408, mass percent Si in Cu.'}
+        experiment: copper-slag-equilibration-1873k
+        T_range_K: [1873, 1873]
+        units: mass %
+        values:
+          method_class: measured_tabulated
+          evidence_class: measured_tabulated
+          composition_mass_percent: {Si: 0.07}
+          solvent: Cu
+          temperature_K: 1873
+      - observation_id: kang_2007_t3_sample_409_cu_assay_payload
+        type: composition
+        regime: quench_equilibration
+        phase: l
+        locator: {page: 4, published_page: 808, table: '3', note: 'Sample 409, mass percent Si in Cu.'}
+        experiment: copper-slag-equilibration-1873k
+        T_range_K: [1873, 1873]
+        units: mass %
+        values:
+          method_class: measured_tabulated
+          evidence_class: measured_tabulated
+          composition_mass_percent: {Si: 0.03}
+          solvent: Cu
+          temperature_K: 1873
+      - observation_id: kang_2007_t3_sample_410_cu_assay_payload
+        type: composition
+        regime: quench_equilibration
+        phase: l
+        locator: {page: 4, published_page: 808, table: '3', note: 'Sample 410, mass percent Si in Cu.'}
+        experiment: copper-slag-equilibration-1873k
+        T_range_K: [1873, 1873]
+        units: mass %
+        values:
+          method_class: measured_tabulated
+          evidence_class: measured_tabulated
+          composition_mass_percent: {Si: 0.15}
+          solvent: Cu
+          temperature_K: 1873
+      - observation_id: kang_2007_t3_sample_411_cu_assay_payload
+        type: composition
+        regime: quench_equilibration
+        phase: l
+        locator: {page: 4, published_page: 808, table: '3', note: 'Sample 411, mass percent Si in Cu.'}
+        experiment: copper-slag-equilibration-1873k
+        T_range_K: [1873, 1873]
+        units: mass %
+        values:
+          method_class: measured_tabulated
+          evidence_class: measured_tabulated
+          composition_mass_percent: {Si: 0.13}
+          solvent: Cu
+          temperature_K: 1873
+      - observation_id: kang_2007_t3_sample_412_cu_assay_payload
+        type: composition
+        regime: quench_equilibration
+        phase: l
+        locator: {page: 4, published_page: 808, table: '3', note: 'Sample 412, mass percent Si in Cu.'}
+        experiment: copper-slag-equilibration-1873k
+        T_range_K: [1873, 1873]
+        units: mass %
+        values:
+          method_class: measured_tabulated
+          evidence_class: measured_tabulated
+          composition_mass_percent: {Si: 0.23}
+          solvent: Cu
+          temperature_K: 1873
