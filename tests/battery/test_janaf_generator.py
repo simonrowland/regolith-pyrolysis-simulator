@@ -2023,7 +2023,7 @@ def test_janaf_store_is_element_sharded() -> None:
     assert all(
         path.name.startswith("janaf-") and path.name.endswith(".yaml") for path in paths
     )
-    # Green 23,845 + 18 restored formation-reference schedule splits = 23,863.
+    # Green 23,845 + 22 restored schedule observations - 4 replaced Cl IDs = 23,863.
     n = compilation_shard_observation_count(ROOT, paths, CURRENT_STORE_DIR)
     assert n == 23863
 
