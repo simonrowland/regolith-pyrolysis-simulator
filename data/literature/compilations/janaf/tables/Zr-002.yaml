@@ -18,12 +18,12 @@ compilation_role:
   circularity_warning: Do not validate an engine against a compilation it consumes.
 extraction:
   method: machine parse of NIST tab-delimited table download; source bytes cached unchanged
-  date: '2026-09-06'
   user_agent: RegolithPyrolysisSimulator-corpus-harvester/1.0 (public thermochemical reference-data research; polite cached
     client)
   source_cache_path: /Users/simonrowland/Library/CloudStorage/Dropbox/Starship Mission Design/Regolith Processing/regolith-pyrolysis-simulator/docs-private/research/2026-08-09-upstream-mission/IMCC-impl/janaf-mirror/Zr/Zr-002.txt
   source_sha256: ae1ca602fcba18ebfe61993ec8137a99f91f0b85928893f66c3651ac3529850f
   review_status: machine_transcribed_unreviewed
+  date: '2026-09-06'
 table:
   table_id: Zr-002
   url: https://janaf.nist.gov/tables/Zr-002.html
@@ -1200,6 +1200,92 @@ table:
         row_temperature_as_published: '1100'
         column: log Kf
   - temperature:
+      value: 1200.0
+      as_published: '1200'
+      locator:
+        table_id: Zr-002
+        url: https://janaf.nist.gov/tables/Zr-002.html
+        download_url: https://janaf.nist.gov/tables/Zr-002.txt
+        row_temperature_as_published: '1200'
+        column: T(K)
+    heat_capacity:
+      value: 33.502
+      as_published: '33.502'
+      locator:
+        table_id: Zr-002
+        url: https://janaf.nist.gov/tables/Zr-002.html
+        download_url: https://janaf.nist.gov/tables/Zr-002.txt
+        row_temperature_as_published: '1200'
+        column: Cp
+    entropy:
+      value: 77.783
+      as_published: '77.783'
+      locator:
+        table_id: Zr-002
+        url: https://janaf.nist.gov/tables/Zr-002.html
+        download_url: https://janaf.nist.gov/tables/Zr-002.txt
+        row_temperature_as_published: '1200'
+        column: S
+    negative_gibbs_enthalpy_function:
+      value: 56.113
+      as_published: '56.113'
+      locator:
+        table_id: Zr-002
+        url: https://janaf.nist.gov/tables/Zr-002.html
+        download_url: https://janaf.nist.gov/tables/Zr-002.txt
+        row_temperature_as_published: '1200'
+        column: -[G-H(Tr)]/T
+    enthalpy_increment:
+      value: 26.004
+      as_published: '26.004'
+      locator:
+        table_id: Zr-002
+        url: https://janaf.nist.gov/tables/Zr-002.html
+        download_url: https://janaf.nist.gov/tables/Zr-002.txt
+        row_temperature_as_published: '1200'
+        column: H-H(Tr)
+    formation_enthalpy:
+      value: null
+      as_published: '3.711'
+      locator:
+        table_id: Zr-002
+        url: https://janaf.nist.gov/tables/Zr-002.html
+        download_url: https://janaf.nist.gov/tables/Zr-002.txt
+        row_temperature_as_published: '1200'
+        column: delta-f H
+        parse_repair: nist_tail_dfh_sign_undetermined
+        parse_repair_reason: formation enthalpy neighbors span a transition marker
+        raw_tail_tokens:
+        - '3.711'
+        - '0.222'
+        - '0.010'
+        line_number: 20
+        raw_line: "1200\t33.502\t77.783\t56.113\t26.004\t3.711 0.222  0.010"
+    formation_gibbs_energy:
+      value: 0.222
+      as_published: '0.222'
+      locator:
+        table_id: Zr-002
+        url: https://janaf.nist.gov/tables/Zr-002.html
+        download_url: https://janaf.nist.gov/tables/Zr-002.txt
+        row_temperature_as_published: '1200'
+        column: delta-f G
+        parse_repair: nist_tail_whitespace_signs_restored
+        line_number: 20
+        raw_line: "1200\t33.502\t77.783\t56.113\t26.004\t3.711 0.222  0.010"
+    log10_formation_equilibrium_constant:
+      value: -0.01
+      as_published: '0.010'
+      locator:
+        table_id: Zr-002
+        url: https://janaf.nist.gov/tables/Zr-002.html
+        download_url: https://janaf.nist.gov/tables/Zr-002.txt
+        row_temperature_as_published: '1200'
+        column: log Kf
+        parse_repair: nist_tail_whitespace_signs_restored
+        line_number: 20
+        raw_line: "1200\t33.502\t77.783\t56.113\t26.004\t3.711 0.222  0.010"
+  - temperature:
       value: 1300.0
       as_published: '1300'
       locator:
@@ -1562,12 +1648,6 @@ table:
   parse_ambiguities:
   - line_number: 19
     raw_line: "1135.000\t32.724\t75.939\t54.925\t23.851\tALPHA <--> BETA"
-    reason: expected 8 tab-separated values; found 6
-    locator:
-      table_id: Zr-002
-      url: https://janaf.nist.gov/tables/Zr-002.html
-  - line_number: 20
-    raw_line: "1200\t33.502\t77.783\t56.113\t26.004\t3.711 0.222  0.010"
     reason: expected 8 tab-separated values; found 6
     locator:
       table_id: Zr-002

@@ -18,12 +18,12 @@ compilation_role:
   circularity_warning: Do not validate an engine against a compilation it consumes.
 extraction:
   method: machine parse of NIST tab-delimited table download; source bytes cached unchanged
-  date: '2026-09-06'
   user_agent: RegolithPyrolysisSimulator-corpus-harvester/1.0 (public thermochemical reference-data research; polite cached
     client)
   source_cache_path: /Users/simonrowland/Library/CloudStorage/Dropbox/Starship Mission Design/Regolith Processing/regolith-pyrolysis-simulator/docs-private/research/2026-08-09-upstream-mission/IMCC-impl/janaf-mirror/H/H-033.txt
   source_sha256: 5d9c4d5235e2746982bbbb9b4fc9062d833796630d37ff2c16664a6dca4b94d7
   review_status: machine_transcribed_unreviewed
+  date: '2026-09-06'
 table:
   table_id: H-033
   url: https://janaf.nist.gov/tables/H-033.html
@@ -551,6 +551,92 @@ table:
         download_url: https://janaf.nist.gov/tables/H-033.txt
         row_temperature_as_published: '500'
         column: log Kf
+  - temperature:
+      value: 600.0
+      as_published: '600'
+      locator:
+        table_id: H-033
+        url: https://janaf.nist.gov/tables/H-033.html
+        download_url: https://janaf.nist.gov/tables/H-033.txt
+        row_temperature_as_published: '600'
+        column: T(K)
+    heat_capacity:
+      value: 86.023
+      as_published: '86.023'
+      locator:
+        table_id: H-033
+        url: https://janaf.nist.gov/tables/H-033.html
+        download_url: https://janaf.nist.gov/tables/H-033.txt
+        row_temperature_as_published: '600'
+        column: Cp
+    entropy:
+      value: 125.685
+      as_published: '125.685'
+      locator:
+        table_id: H-033
+        url: https://janaf.nist.gov/tables/H-033.html
+        download_url: https://janaf.nist.gov/tables/H-033.txt
+        row_temperature_as_published: '600'
+        column: S
+    negative_gibbs_enthalpy_function:
+      value: 77.861
+      as_published: '77.861'
+      locator:
+        table_id: H-033
+        url: https://janaf.nist.gov/tables/H-033.html
+        download_url: https://janaf.nist.gov/tables/H-033.txt
+        row_temperature_as_published: '600'
+        column: -[G-H(Tr)]/T
+    enthalpy_increment:
+      value: 28.694
+      as_published: '28.694'
+      locator:
+        table_id: H-033
+        url: https://janaf.nist.gov/tables/H-033.html
+        download_url: https://janaf.nist.gov/tables/H-033.txt
+        row_temperature_as_published: '600'
+        column: H-H(Tr)
+    formation_enthalpy:
+      value: null
+      as_published: '418.055'
+      locator:
+        table_id: H-033
+        url: https://janaf.nist.gov/tables/H-033.html
+        download_url: https://janaf.nist.gov/tables/H-033.txt
+        row_temperature_as_published: '600'
+        column: delta-f H
+        parse_repair: nist_tail_dfh_sign_undetermined
+        parse_repair_reason: formation enthalpy neighbors span a transition marker
+        raw_tail_tokens:
+        - '418.055'
+        - '332.373'
+        - '28.936'
+        line_number: 13
+        raw_line: "600\t86.023\t125.685\t77.861\t28.694\t418.055  332.373 28.936"
+    formation_gibbs_energy:
+      value: -332.373
+      as_published: '332.373'
+      locator:
+        table_id: H-033
+        url: https://janaf.nist.gov/tables/H-033.html
+        download_url: https://janaf.nist.gov/tables/H-033.txt
+        row_temperature_as_published: '600'
+        column: delta-f G
+        parse_repair: nist_tail_whitespace_signs_restored
+        line_number: 13
+        raw_line: "600\t86.023\t125.685\t77.861\t28.694\t418.055  332.373 28.936"
+    log10_formation_equilibrium_constant:
+      value: 28.936
+      as_published: '28.936'
+      locator:
+        table_id: H-033
+        url: https://janaf.nist.gov/tables/H-033.html
+        download_url: https://janaf.nist.gov/tables/H-033.txt
+        row_temperature_as_published: '600'
+        column: log Kf
+        parse_repair: nist_tail_whitespace_signs_restored
+        line_number: 13
+        raw_line: "600\t86.023\t125.685\t77.861\t28.694\t418.055  332.373 28.936"
   - temperature:
       value: 700.0
       as_published: '700'
@@ -1214,12 +1300,6 @@ table:
       url: https://janaf.nist.gov/tables/H-033.html
   - line_number: 12
     raw_line: "596.000\t86.023\t125.110\t77.542\t28.350\tII <--> LIQUID"
-    reason: expected 8 tab-separated values; found 6
-    locator:
-      table_id: H-033
-      url: https://janaf.nist.gov/tables/H-033.html
-  - line_number: 13
-    raw_line: "600\t86.023\t125.685\t77.861\t28.694\t418.055  332.373 28.936"
     reason: expected 8 tab-separated values; found 6
     locator:
       table_id: H-033
