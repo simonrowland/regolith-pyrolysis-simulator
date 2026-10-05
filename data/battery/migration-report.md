@@ -4,7 +4,7 @@ rows in: 47794
 records out (observations): 121506
 works: 267
 experiments: 3555
-queue size: 77684
+queue size: 77656
 identical-payload dedupe aliases: 342
 metadata files: 39
 index sources: 271
@@ -17,7 +17,7 @@ hard issues: 3664
 | citations | 147 | 270 (mismatch) |
 | doi_works | 56 | 128 (mismatch) |
 | no_doi_works | 91 | 139 (mismatch) |
-| admission_statuses | 374 | 1178 (mismatch) |
+| admission_statuses | 374 | 1180 (mismatch) |
 | supersedes | 422 | 650 (mismatch) |
 | series | 60 | 597 (mismatch) |
 | gibbs_reference_pressures | 1617 | 1635 (mismatch) |
@@ -25,10 +25,10 @@ hard issues: 3664
 | gibbs_reference_101325 | 594 | 594 |
 | formulas | 1625 | 2044 (mismatch) |
 | equipment_payloads | 670 | 973 (mismatch) |
-| absent_admissions | 3511 | 5024 (mismatch) |
-| absent_classes | 2174 | 2205 (mismatch) |
+| absent_admissions | 3511 | 5022 (mismatch) |
+| absent_classes | 2174 | 2203 (mismatch) |
 | range_only_T | 3125 | 2751 (mismatch) |
-| system_like_phases | 1065 | 2687 (mismatch) |
+| system_like_phases | 1065 | 2685 (mismatch) |
 | missing_phases | 237 | 587 (mismatch) |
 | tabulated_lists | — | 6 |
 
@@ -36,7 +36,7 @@ hard issues: 3664
 
 | source method_class | count |
 |---|---:|
-| `absent` | 577 |
+| `absent` | 575 |
 | `method_only` | 38 |
 | `derived_from_kems_equilibrium_constants` | 8 |
 | `third_law_kems` | 8 |
@@ -18008,7 +18008,7 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/extracts/kems-019-miller-armatys-2013.yaml` | 28 | 28 | 60 |
 | `data/literature/extracts/kems-020-hastie-1981-nbsir.yaml` | 41 | 112 | 294 |
 | `data/literature/extracts/kems-021-plante-1992-feo.yaml` | 10 | 25 | 40 |
-| `data/literature/extracts/kems-022-demaria-1971.yaml` | 32 | 117 | 223 |
+| `data/literature/extracts/kems-022-demaria-1971.yaml` | 32 | 117 | 195 |
 | `data/literature/extracts/kems-023-demaria-1973.yaml` | 30 | 75 | 58 |
 | `data/literature/extracts/kems-024-gibson-hubbard-1972.yaml` | 108 | 108 | 314 |
 | `data/literature/extracts/kems-025-markova-1983.yaml` | 22 | 44 | 63 |
@@ -18278,8 +18278,8 @@ MODEL_DERIVED / MEASURED_REDUCED keep their mapped evidence class. Parent pointe
 
 ## Advisory issue census
 
-advisory issues: 217059
+advisory issues: 217119
 
 | kind | count |
 |---|---:|
-| `identity_incomplete` | 217059 |
+| `identity_incomplete` | 217119 |
