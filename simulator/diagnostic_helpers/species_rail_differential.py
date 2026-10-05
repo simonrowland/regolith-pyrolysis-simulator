@@ -78,6 +78,10 @@ from simulator.vapour_rail.catalog import (
 )
 from simulator.vapour_rail.engine_crosscheck import divergence_label
 from simulator.vapour_rail.nasa_cea import NasaCeaDomainError
+from simulator.vapour_rail.source_rail import (
+    DIATOMIC_GAS_REFERENCE,
+    formation_gibbs_from_absolute,
+)
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 LEDGER_PATH = REPO_ROOT / "data" / "literature" / "species_rail_differential_ledger.yaml"
@@ -181,16 +185,6 @@ _CODED_SOLID = frozenset({"cr", "c", "s", "condensed_solid", "condensed"})
 _CODED_LIQUID = frozenset({"l", "liquid", "condensed_liquid"})
 _CODED_REF = frozenset({"ref"})
 _CODED_MIXED = frozenset({"cr,l", "c,l", "c,1", "l,g"})
-
-# Diatomic elemental standard states (JANAF/CEA convention, 298 K and above
-# for H, N, O, F, Cl). Coefficient in ΔfG is n_element / 2.
-_DIATOMIC_STANDARD_FORMULA = {
-    "H": "H2",
-    "N": "N2",
-    "O": "O2",
-    "F": "F2",
-    "Cl": "Cl2",
-}
 
 PHASE_GAS = "gas"
 PHASE_SOLID = "solid"
@@ -598,9 +592,9 @@ def resolve_cea_species(formula: str, phase_kind: str, T_K: float) -> CeaResolut
 
 
 def _elemental_cea_entry(element: str, T_K: float) -> CeaResolution:
-    std_formula = _DIATOMIC_STANDARD_FORMULA.get(element, element)
+    std_formula = DIATOMIC_GAS_REFERENCE.get(element, element)
     hits = list(cea_by_formula().get(std_formula, ()))
-    if element in _DIATOMIC_STANDARD_FORMULA:
+    if element in DIATOMIC_GAS_REFERENCE:
         hits = [e for e in hits if e.phase == "gas"]
     else:
         hits = [e for e in hits if e.phase != "gas"]
@@ -649,7 +643,9 @@ def cea_delta_fG_kJ_mol(cea_key: str, T_K: float) -> float:
         raise GibbsDomainRefusal(
             f"{TYPED_REFUSAL_PREFIX}cea_formula_unmapped:{formula}"
         )
-    for element, count in composition:
+    reference_g: dict[str, float] = {}
+    atoms_per_reference: dict[str, float] = {}
+    for element, _count in composition:
         resolved = _elemental_cea_entry(element, T)
         if resolved.cea_key is None:
             reason = resolved.reason or "cea_elemental_unmapped"
@@ -658,15 +654,24 @@ def cea_delta_fG_kJ_mol(cea_key: str, T_K: float) -> float:
             raise GibbsDomainRefusal(
                 f"{TYPED_REFUSAL_PREFIX}{reason}:{element}{extra}"
             )
-        n_std = 2.0 if element in _DIATOMIC_STANDARD_FORMULA else 1.0
         el_poly = cea_polynomial(resolved.cea_key)
         try:
-            g -= (count / n_std) * el_poly.evaluate(T).g_J_per_mol
+            reference_g[element] = float(el_poly.evaluate(T).g_J_per_mol)
         except NasaCeaDomainError as exc:
             raise GibbsDomainRefusal(
                 f"{TYPED_REFUSAL_PREFIX}engine_channel_out_of_range:{exc}"
             ) from exc
-    return g / 1000.0
+        # Gas diatomics only. Br/I stay monatomic here; the rail's condensed
+        # Br2/I2 standard is a different reference and is not this map.
+        atoms_per_reference[element] = (
+            2.0 if element in DIATOMIC_GAS_REFERENCE else 1.0
+        )
+    return (
+        formation_gibbs_from_absolute(
+            g, composition, reference_g, atoms_per_reference
+        )
+        / 1000.0
+    )
 
 
 def _pilot_channel_for_cea_key(cea_key: str) -> PilotChannel | None:

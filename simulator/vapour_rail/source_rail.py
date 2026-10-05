@@ -64,7 +64,8 @@ GIBBS_CONVENTION_ABSOLUTE = "absolute_G"
 
 # JANAF/CEA 298 K gas-phase elemental standards (diatomic). Coefficient in
 # ΔfG is n_element / 2 because the reference species is E2(g).
-_DIATOMIC_GAS_REFERENCE: Mapping[str, str] = {
+# Diagnostic ΔfG uses this same map; Br2/I2 stay on the condensed map below.
+DIATOMIC_GAS_REFERENCE: Mapping[str, str] = {
     "H": "H2",
     "N": "N2",
     "O": "O2",
@@ -177,10 +178,30 @@ class SourceCoverageGap(Exception):
         super().__init__(f"{formula} ({phase}): {reason}")
 
 
+def formation_gibbs_from_absolute(
+    g_abs_J_per_mol: float,
+    composition: Mapping[str, float] | tuple[tuple[str, float], ...] | list[tuple[str, float]],
+    element_reference_g_J_per_mol: Mapping[str, float],
+    atoms_per_reference_species: Mapping[str, float],
+) -> float:
+    """ΔfG = G°(species) − Σ (n_el / n_std) · G°(reference species).
+
+    ``element_reference_g_J_per_mol`` is G° of the reference species (O2, Si(cr), …),
+    not per atom. ``atoms_per_reference_species`` is n_std for that species.
+    Subtraction order follows ``composition``.
+    """
+    g = float(g_abs_J_per_mol)
+    items = composition.items() if isinstance(composition, Mapping) else composition
+    for element, count in items:
+        n_std = float(atoms_per_reference_species[element])
+        g -= (float(count) / n_std) * float(element_reference_g_J_per_mol[element])
+    return g
+
+
 def _reference_species(element: str) -> tuple[str, bool]:
     """Reference formula and whether the standard is gas-only."""
-    if element in _DIATOMIC_GAS_REFERENCE:
-        return _DIATOMIC_GAS_REFERENCE[element], True
+    if element in DIATOMIC_GAS_REFERENCE:
+        return DIATOMIC_GAS_REFERENCE[element], True
     if element in _NOBLE_GAS_ELEMENTS:
         return element, True
     if element in _DIATOMIC_CONDENSED_REFERENCE:
@@ -198,10 +219,10 @@ def _covering_records(
     )
 
 
-def _element_reference_g_j_per_mol_atom(
+def _element_reference_species_g(
     index: "_CompilationIndex", element: str, temperature_K: float
-) -> float:
-    """G° of one mole of *atoms* of ``element`` in the compilation's reference state."""
+) -> tuple[float, float]:
+    """G° of the reference species and the atom count of ``element`` in it."""
     formula, gas_only = _reference_species(element)
     composition = parse_formula(formula)
     atoms = float(composition.elements.get(element, 0.0))
@@ -209,7 +230,6 @@ def _element_reference_g_j_per_mol_atom(
         raise SourceCoverageGap(
             formula, "reference", f"{formula} does not contain {element}"
         )
-    nu_species_per_atom = 1.0 / atoms
     chosen: SourceRailRecord | None = None
     if not gas_only:
         condensed: list[SourceRailRecord] = []
@@ -235,7 +255,7 @@ def _element_reference_g_j_per_mol_atom(
             "reference",
             f"no {element} reference record covers {temperature_K} K",
         )
-    return nu_species_per_atom * float(chosen.thermo.evaluate(temperature_K).g_J_per_mol)
+    return float(chosen.thermo.evaluate(temperature_K).g_J_per_mol), atoms
 
 
 @dataclass
@@ -257,12 +277,19 @@ class FormationGibbsThermo:
     def evaluate(self, T_K: float) -> ThermoState:
         T = float(T_K)
         native_state = self.native.evaluate(T)
-        g_j = float(native_state.g_J_per_mol)
         composition = parse_formula(self.formula)
-        for element, count in composition.elements.items():
-            g_j -= float(count) * _element_reference_g_j_per_mol_atom(
-                self.index, element, T
-            )
+        reference_g: dict[str, float] = {}
+        atoms_per_reference: dict[str, float] = {}
+        for element in composition.elements:
+            g_species, n_std = _element_reference_species_g(self.index, element, T)
+            reference_g[element] = g_species
+            atoms_per_reference[element] = n_std
+        g_j = formation_gibbs_from_absolute(
+            float(native_state.g_J_per_mol),
+            composition.elements,
+            reference_g,
+            atoms_per_reference,
+        )
         return ThermoState(
             T_K=T,
             cp_over_R=math.nan,
