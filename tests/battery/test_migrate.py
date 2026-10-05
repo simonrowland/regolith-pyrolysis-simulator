@@ -7769,6 +7769,31 @@ def test_cardiff_tests_explode_without_inventing_bound_t(tmp_path: Path) -> None
     assert not any(n.kind is NoticeKind.SOURCE_DISAGREEMENT for n in mls.notices)
 
 
+def test_partial_pressure_point_sample_is_not_species_formula(tmp_path: Path) -> None:
+    extract = _scalar_extract(
+        quantity="partial_pressure",
+        units="Pa",
+        values={
+            "quantity": "partial_pressure",
+            "method_class": "measured_direct",
+            "admission_status": "admitted",
+            "points": [{"T_K": 1200.0, "p_Pa": 2.0, "sample": "12022"}],
+        },
+    )
+    row = extract["species"]["Na"]["observations"][0]
+    row["phase"] = "basaltic_silicate_melt"
+    extract["species"] = {"O2": {"observations": [row]}}
+    root = _write_min_tree(tmp_path, extract)
+    result = migrate(root, write=False)
+
+    observation = next(
+        o
+        for o in result.observations.values()
+        if quantity_token(o.identity) is Quantity.P_PARTIAL
+    )
+    assert observation.identity.species.formula == "O2"
+
+
 def test_live_pyrolysis_extracts_map_distinct_yield_quantities(tmp_path: Path) -> None:
     extracts_src = REPO_ROOT / "data" / "literature" / "extracts"
     names = [

@@ -12513,12 +12513,19 @@ class Migrator:
                     charge=species.charge,
                 )
             elif sample_label and q_for_species is not Quantity.RESIDUE_COMPONENT_COMPOSITION:
-                species = make_species(
-                    sample_label,
-                    species.phase,
-                    polymorph=species.polymorph,
-                    charge=species.charge,
-                )
+                from simulator.accounting.formulas import parse_formula
+
+                try:
+                    parse_formula(sample_label)
+                except ValueError:
+                    pass
+                else:
+                    species = make_species(
+                        sample_label,
+                        species.phase,
+                        polymorph=species.polymorph,
+                        charge=species.charge,
+                    )
             if raw_item.get("locator"):
                 point_locator = (
                     locator_from_mapping(
