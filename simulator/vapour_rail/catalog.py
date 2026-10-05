@@ -3945,6 +3945,11 @@ def _legacy_species_row(
             and (reaction_id is None or item.get("id") == reaction_id)
         ]
         if not matched:
+            if species_id in CATALOG_DERIVED_STOICH_SPECIES:
+                raise CatalogCompileError(
+                    f"{species_id}: source_reaction_id does not match a "
+                    "source reaction for derived stoichiometry"
+                )
             matched = [item for item in reactions if isinstance(item, Mapping)]
         if matched:
             try:
@@ -3953,7 +3958,13 @@ def _legacy_species_row(
                     parent_oxide=str(parent_oxide),
                     reaction=matched[0],
                 )
-            except ValueError:
+            except CatalogCompileError:
+                raise
+            except ValueError as exc:
+                if species_id in CATALOG_DERIVED_STOICH_SPECIES:
+                    raise CatalogCompileError(
+                        f"{species_id}: cannot derive stoichiometry: {exc}"
+                    ) from exc
                 oxide, o2 = None, None
             if oxide is not None and o2 is not None:
                 declared_oxide = result.get("stoich_oxide_per_vapor")

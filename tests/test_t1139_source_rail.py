@@ -10,6 +10,8 @@ from simulator.accounting.formulas import parse_formula
 from simulator.reference_data.janaf import feedstock_element_symbols
 from simulator.vapour_rail.catalog import (
     RUNTIME_THERMO_EVALUATOR_FAMILIES,
+    CatalogCompileError,
+    _legacy_species_row,
     compile_vapour_rail_catalog,
 )
 from simulator.vapour_rail.nasa_cea import R_J_PER_MOL_K
@@ -148,6 +150,63 @@ def test_feedstock_element_enumerator_is_the_janaf_owner() -> None:
     symbols = feedstock_element_symbols()
     for element in ("Ga", "In", "Pb", "Ge", "Sn", "Rb", "Cs", "B", "Cu", "V", "Li"):
         assert element in symbols
+
+
+def _legacy_model(**overrides):
+    model = {
+        "evaluator_family": "nasa_cea_9",
+        "compatibility_omit_valid_range_K": True,
+        "compatibility_omit_antoine": True,
+        "availability": "unavailable_pending_acquisition",
+        "valid_domain": {},
+    }
+    model.update(overrides)
+    return model
+
+
+def test_derived_species_refuses_an_unmatched_source_reaction() -> None:
+    row = {
+        "formula": "SiO",
+        "parent_oxide": "SiO2",
+        "source_reactions": [
+            {
+                "id": "real",
+                "reactants": [{"formula": "SiO2(l)", "stoichiometry": 1.0}],
+                "products": [
+                    {"formula": "SiO(g)", "stoichiometry": 1.0},
+                    {"formula": "O2(g)", "stoichiometry": 0.5},
+                ],
+            }
+        ],
+    }
+    with pytest.raises(CatalogCompileError, match="source_reaction_id"):
+        _legacy_species_row(
+            species_id="SiO",
+            row=row,
+            model=_legacy_model(source_reaction_id="missing"),
+            routing={},
+            kinetics={},
+            code={},
+        )
+    broken = {
+        **row,
+        "source_reactions": [
+            {
+                "id": "real",
+                "reactants": [{"formula": "SiO2(l)", "stoichiometry": 1.0}],
+                "products": [{"formula": "Si(g)", "stoichiometry": 1.0}],
+            }
+        ],
+    }
+    with pytest.raises(CatalogCompileError, match="cannot derive stoichiometry"):
+        _legacy_species_row(
+            species_id="SiO",
+            row=broken,
+            model=_legacy_model(source_reaction_id="real"),
+            routing={},
+            kinetics={},
+            code={},
+        )
 
 
 def test_catalog_derives_exactly_the_retired_hand_rows() -> None:
