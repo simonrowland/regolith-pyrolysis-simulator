@@ -32,7 +32,7 @@ from simulator.config import (
     resolve_alphamelts_subprocess_model,
 )
 from simulator.core import PyrolysisSimulator
-from simulator.feedstock_composition import total_fe
+from simulator.feedstock_composition import iron_oxide_values, total_fe
 from simulator.grind_preflight import STAGE0_INPROCESS_SAFE_FEEDSTOCK_IDS
 from simulator.melt_backend.alphamelts import (
     AlphaMELTSBackend,
@@ -665,6 +665,13 @@ def _oxide_wt_pct(composition: Mapping[str, Any], oxide: str) -> float:
             return total_fe(composition)
         except ValueError:
             return 0.0
+    if oxide == "Fe2O3":
+        try:
+            return iron_oxide_values(composition)[1]
+        except ValueError:
+            return 0.0
+    if oxide in {"Fe", "Fe0", "Fe_metal"}:
+        return 0.0
     value = composition.get(oxide, 0.0)
     try:
         number = float(value)

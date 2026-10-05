@@ -10,7 +10,12 @@ from simulator.fe_redox import (
     kress91_fe3_over_sigma_fe,
     melt_mol_fractions_for_kress91,
 )
-from simulator.feedstock_composition import iron_oxide_values
+from simulator.feedstock_composition import (
+    DEFAULT_FEO_TO_FE2O3_EQUIVALENT_FACTOR,
+    fe2o3_equivalent_wt_pct,
+    feot_equivalent_moles,
+    iron_oxide_values,
+)
 from simulator.state import MOLAR_MASS
 from simulator.terminal_product_taxonomy import (
     DEFAULT_TAXONOMY_PATH,
@@ -441,8 +446,7 @@ def _matches_constraints(
             return False
     minimum_fe = constraints.get("fe2o3_equivalent_min")
     if minimum_fe is not None:
-        feo, fe2o3 = iron_oxide_values(composition)
-        total_fe = fe2o3 + 1.1113 * feo
+        total_fe = fe2o3_equivalent_wt_pct(composition)
         if total_fe < float(minimum_fe) - tolerance:
             return False
     return True
@@ -518,9 +522,16 @@ def _service_temp(cell: Mapping[str, Any]) -> CeramicServiceTemperature:
 def _total_fe2o3_equivalent(
     composition: Mapping[str, float], model: Mapping[str, Any]
 ) -> float:
-    factor = float(model.get("feo_to_fe2o3_factor", 1.1113))
+    factor = float(
+        model.get(
+            "feo_to_fe2o3_factor",
+            DEFAULT_FEO_TO_FE2O3_EQUIVALENT_FACTOR,
+        )
+    )
     feo, fe2o3 = iron_oxide_values(composition)
-    return fe2o3 + factor * feo
+    return fe2o3_equivalent_wt_pct(
+        composition, feo_to_fe2o3_factor=factor
+    )
 
 
 def _resolve_fe2_fraction(
@@ -536,7 +547,9 @@ def _resolve_fe2_fraction(
     feo, fe2o3 = iron_oxide_values(composition)
     feo_mol = feo / MOLAR_MASS["FeO"]
     fe2o3_mol = fe2o3 / MOLAR_MASS["Fe2O3"]
-    iron_atoms = feo_mol + 2.0 * fe2o3_mol
+    iron_atoms = feot_equivalent_moles(
+        {"FeO": feo_mol, "Fe2O3": fe2o3_mol}
+    )
     if iron_atoms > 0.0:
         return feo_mol / iron_atoms, "ledger_speciation"
     if pO2_mbar is None or temperature_C is None or iron_atoms <= 0.0:

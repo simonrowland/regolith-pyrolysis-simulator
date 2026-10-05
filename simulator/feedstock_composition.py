@@ -7,11 +7,17 @@ from dataclasses import dataclass
 import math
 from typing import Any
 
+from simulator.accounting.exceptions import UnknownSpeciesError
+from simulator.accounting.formulas import (
+    ATOMIC_WEIGHTS_G_PER_MOL,
+    resolve_species_formula,
+)
 from simulator.scalar_boundary import is_declared_real_scalar
 
 
 FEOT_FROM_FE2O3 = 2.0 * 71.844 / 159.687
 OXYGEN_IN_FEO = 15.999 / 71.844
+DEFAULT_FEO_TO_FE2O3_EQUIVALENT_FACTOR = 1.1113
 FE_REPORTING_CONVENTION_TOTAL_AS_FEO = "total Fe as FeO"
 UNKNOWN_FERRIC_UPPER_BOUND_REASON = (
     "no stated maximum Fe3+/ΣFe for this body"
@@ -171,6 +177,15 @@ def feot_equivalent_moles(feedstock_or_composition: Mapping[str, Any]) -> float:
     return feo_moles + 2.0 * fe2o3_moles
 
 
+def fe2o3_equivalent_wt_pct(
+    feedstock_or_composition: Mapping[str, Any],
+    feo_to_fe2o3_factor: float = DEFAULT_FEO_TO_FE2O3_EQUIVALENT_FACTOR,
+) -> float:
+    """Return ferric-oxide-equivalent wt% using the caller's model factor."""
+    feo, fe2o3 = iron_oxide_values(feedstock_or_composition)
+    return fe2o3 + float(feo_to_fe2o3_factor) * feo
+
+
 def measured_feo(feedstock: Mapping[str, Any]) -> float | None:
     return resolve_feedstock_composition(feedstock).measured_feo
 
@@ -190,17 +205,35 @@ def split_known(feedstock: Mapping[str, Any]) -> bool:
 def total_oxygen_bounds(
     feedstock: Mapping[str, Any],
 ) -> TotalOxygenBounds:
-    """Return iron-oxide oxygen bounds; unknown ferric maxima stay refused."""
+    """Return oxide oxygen on the declared basis; unknown ferric maxima stay refused."""
     resolved = resolve_feedstock_composition(feedstock)
+    oxygen_wt_pct = 0.0
+    for species, raw_value in resolved.canonical_wt_pct.items():
+        if resolved.fe_redox_split_unknown and species in {"FeO", "Fe2O3"}:
+            continue
+        try:
+            formula = resolve_species_formula(str(species))
+        except UnknownSpeciesError:
+            continue
+        oxygen_atoms = formula.elements.get("O", 0.0)
+        if oxygen_atoms <= 0.0:
+            continue
+        amount = _representative_number(
+            raw_value, f"composition_wt_pct.{species}"
+        )
+        if amount is None:
+            continue
+        oxygen_mass = oxygen_atoms * ATOMIC_WEIGHTS_G_PER_MOL["O"]
+        oxygen_wt_pct += amount * oxygen_mass / formula.molar_mass_g_per_mol()
+
     if resolved.fe_redox_split_unknown:
         return TotalOxygenBounds(
-            lower=OxygenBound(resolved.total_fe * OXYGEN_IN_FEO),
+            lower=OxygenBound(
+                oxygen_wt_pct + resolved.total_fe * OXYGEN_IN_FEO
+            ),
             upper=OxygenBound(None, UNKNOWN_FERRIC_UPPER_BOUND_REASON),
         )
-    feo = resolved.measured_feo or 0.0
-    fe2o3 = resolved.measured_fe2o3 or 0.0
-    oxygen = feo * OXYGEN_IN_FEO + fe2o3 * (3.0 * 15.999 / 159.687)
-    bound = OxygenBound(oxygen)
+    bound = OxygenBound(oxygen_wt_pct)
     return TotalOxygenBounds(lower=bound, upper=bound)
 
 

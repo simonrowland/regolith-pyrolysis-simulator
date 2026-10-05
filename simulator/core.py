@@ -378,6 +378,7 @@ from simulator.cost_ledger import CostImportContext, CostLedger
 from simulator.feedstock_guard import assert_feedstock_loadable
 from simulator.feedstock_composition import (
     fe_metal,
+    feot_equivalent_moles,
     iron_oxide_values,
     normalize_component_masses_kg,
     resolve_feedstock_composition,
@@ -5881,7 +5882,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
     def _ledger_ferric_fraction_diagnostic(self) -> Dict[str, Any]:
         melt_mol = self.atom_ledger.project_account_mol('process.cleaned_melt')
         feo_mol, fe2o3_mol = iron_oxide_values(melt_mol)
-        oxidized_fe_mol = feo_mol + 2.0 * fe2o3_mol
+        oxidized_fe_mol = feot_equivalent_moles(melt_mol)
         threshold = float(FERRIC_DIVERGENCE_WARNING_THRESHOLD)
         if oxidized_fe_mol <= 0.0:
             return {

@@ -5,10 +5,16 @@ from pathlib import Path
 import pytest
 import yaml
 
+from simulator.accounting.formulas import (
+    ATOMIC_WEIGHTS_G_PER_MOL,
+    resolve_species_formula,
+)
 from simulator.core import PyrolysisSimulator
 from simulator.feedstock_composition import (
     UNKNOWN_FERRIC_UPPER_BOUND_REASON,
+    fe2o3_equivalent_wt_pct,
     fe_metal,
+    feot_equivalent_moles,
     measured_fe2o3,
     measured_feo,
     resolve_feedstock_composition,
@@ -54,6 +60,44 @@ def _unknown_split() -> dict:
     }
 
 
+def _oxygen_mass_fraction(species: str) -> float:
+    formula = resolve_species_formula(species)
+    oxygen_g_per_mol = (
+        formula.elements["O"] * ATOMIC_WEIGHTS_G_PER_MOL["O"]
+    )
+    return oxygen_g_per_mol / formula.molar_mass_g_per_mol()
+
+
+def test_unknown_split_metadata_covers_every_non_lunar_unmeasured_iron_entry() -> None:
+    expected = {
+        "s_type_asteroid_silicate",
+        "m_type_silicate_phase",
+        "v_type_vesta_hed",
+        "e_type_enstatite_aubrite",
+        "ci_carbonaceous_chondrite",
+        "cm_carbonaceous_chondrite",
+        "ceres_regolith",
+        "comet_nucleus",
+        "mars_global_mgs1",
+        "mars_basalt",
+        "mars_sulfate_rich",
+        "mars_phyllosilicate_clay",
+        "mars_perchlorate_rich",
+    }
+    feedstocks = _load_yaml("feedstocks.yaml")
+    flagged = {
+        key
+        for key, entry in feedstocks.items()
+        if entry.get("fe_redox_split_unknown") is True
+    }
+
+    assert flagged == expected
+    for key in expected:
+        assert feedstocks[key]["composition_basis"][
+            "fe_reporting_convention"
+        ] == "total Fe as FeO"
+
+
 def test_resolver_exposes_canonical_map_provenance_and_explicit_iron_accessors() -> None:
     entry = _measured_split()
     resolved = resolve_feedstock_composition(entry)
@@ -71,6 +115,22 @@ def test_resolver_exposes_canonical_map_provenance_and_explicit_iron_accessors()
     assert measured_fe2o3(entry) == 1.0
     assert fe_metal(entry) == 0.25
     assert split_known(entry) is True
+
+
+def test_fe2o3_equivalent_preserves_the_declared_mass_model_factor() -> None:
+    composition = _measured_split()["composition_wt_pct"]
+
+    assert fe2o3_equivalent_wt_pct(composition) == pytest.approx(3.2226)
+    assert fe2o3_equivalent_wt_pct(
+        composition, feo_to_fe2o3_factor=2.0
+    ) == pytest.approx(5.0)
+
+
+def test_feot_equivalent_moles_counts_two_iron_atoms_per_ferric_formula_unit() -> None:
+    # Two FeO formula units and three Fe2O3 formula units contain eight Fe atoms.
+    assert feot_equivalent_moles({"FeO": 2.0, "Fe2O3": 3.0}) == pytest.approx(
+        8.0
+    )
 
 
 def test_redox_helpers_consume_both_measured_oxides() -> None:
@@ -93,6 +153,7 @@ def test_unknown_split_is_all_ferrous_with_typed_oxygen_upper_absence() -> None:
     entry = _unknown_split()
     resolved = resolve_feedstock_composition(entry)
     bounds = total_oxygen_bounds(entry)
+    expected_lower = 70.0 * _oxygen_mass_fraction("SiO2") + 3.0 * _oxygen_mass_fraction("FeO")
 
     assert resolved.fe_redox_split_unknown is True
     assert resolved.total_fe == 3.0
@@ -102,10 +163,22 @@ def test_unknown_split_is_all_ferrous_with_typed_oxygen_upper_absence() -> None:
     assert measured_fe2o3(entry) is None
     assert fe_metal(entry) == 0.25
     assert split_known(entry) is False
-    assert bounds.lower.value_wt_pct is not None
-    assert bounds.lower.value_wt_pct > 0.0
+    assert bounds.lower.value_wt_pct == pytest.approx(expected_lower)
     assert bounds.upper.value_wt_pct is None
     assert bounds.upper.refused_reason == UNKNOWN_FERRIC_UPPER_BOUND_REASON
+
+
+def test_known_total_oxygen_bounds_include_non_iron_oxides() -> None:
+    entry = _measured_split()
+    bounds = total_oxygen_bounds(entry)
+    expected = (
+        70.0 * _oxygen_mass_fraction("SiO2")
+        + 2.0 * _oxygen_mass_fraction("FeO")
+        + 1.0 * _oxygen_mass_fraction("Fe2O3")
+    )
+
+    assert bounds.lower.value_wt_pct == pytest.approx(expected)
+    assert bounds.upper.value_wt_pct == pytest.approx(expected)
 
 
 def test_feedstock_json_round_trip_keeps_unknown_split_provenance(
