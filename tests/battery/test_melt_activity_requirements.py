@@ -1220,13 +1220,106 @@ def test_scorer_compares_the_admitted_endmember_not_a_different_species(monkeypa
     assert opened == []
 
 
-def test_scorer_reads_trace_parent_gamma_without_a_basis_claim(monkeypatch):
-    """SnO gamma, rung, and source row reach the coefficient the scorer reads."""
-
+def _predict_sn_coefficient(monkeypatch, details, gammas, *, phase: Phase = Phase.L):
     from simulator.battery.enums import Engine
+    from simulator.battery.score import predict_with_engine
+
+    def _open(name):
+        return type("Handle", (), {
+            "name": name,
+            "available": True,
+            "unavailable_reason": None,
+            "supports_intrinsic_fO2": False,
+            "backend": object(),
+        })()
+
+    def _cell(_handle, _pot, *, temperature_K, po2, **_kwargs):
+        return type("Cell", (), {
+            "status": "ok",
+            "refusal_reason": None,
+            "melt_activities": {},
+            "melt_activity_coefficients": dict(gammas),
+            "melt_activity_coefficient_details": details,
+            "gas_partial_pressures_Pa": {},
+            "hostname": "test",
+            "exit_code": 0,
+            "exit_signal": None,
+            "notices": [],
+            "authority": None,
+            "certified_band": None,
+        })()
+
+    monkeypatch.setattr(
+        "simulator.diagnostic_helpers.binary_pot_battery.open_battery_engine",
+        _open,
+    )
+    monkeypatch.setattr(
+        "simulator.diagnostic_helpers.binary_pot_battery.equilibrate_cell",
+        _cell,
+    )
+    experiment, _bench, observation = _case(
+        composition=_composition(("SnO", "0.01"), ("SiO2", "0.99")),
+        quantity=Quantity.ACTIVITY_COEFFICIENT,
+        formula="SnO",
+        basis="SnO",
+        phase=phase,
+    )
+    return predict_with_engine(
+        Engine.INTERNAL_ANALYTICAL,
+        observation,
+        experiment=experiment,
+        isolated=False,
+    )
+
+
+def test_coefficient_detail_without_standard_state_is_a_mismatch(monkeypatch):
+    """Missing standard_state metadata does not establish compatibility."""
+
+    from simulator.battery.enums import RefusalReason
+
+    prediction = _predict_sn_coefficient(
+        monkeypatch,
+        {"SnO": {"value": 0.25, "rung": 2, "flag": "published"}},
+        {"SnO": 0.25},
+    )
+    assert prediction.value is None
+    assert prediction.refusal_reason is RefusalReason.COEFFICIENT_BASIS_MISMATCH
+    assert prediction.refusal_detail["reported_standard_state"] is None
+    assert "source_basis" not in prediction.refusal_detail
+
+
+def test_matching_standard_state_still_scores_the_coefficient(monkeypatch):
+    prediction = _predict_sn_coefficient(
+        monkeypatch,
+        {
+            "SnO": {
+                "value": 0.25,
+                "coefficient_basis": "single_cation",
+                "standard_state": {
+                    "convention": "raoultian_pure_endmember",
+                    "phase": "l",
+                    "component_basis": "SnO",
+                },
+            }
+        },
+        {"SnO": 0.25},
+    )
+    assert prediction.refusal_reason is None
+    assert prediction.value == Decimal("0.25")
+    assert prediction.coefficient_basis == "single_cation"
+
+
+def test_scorer_refuses_trace_parent_gamma_with_an_unstated_basis(monkeypatch):
+    """SnO's printed basis reaches the scorer and does not become a point."""
+
+    from simulator.battery.enums import Engine, RefusalReason
     from simulator.battery.score import predict_with_engine
     from simulator.diagnostic_helpers.binary_pot_battery import (
         trace_parent_activity_coefficient_emission,
+    )
+    from simulator.vapour_rail.activity import (
+        StandardStateIdentity,
+        resolve_trace_parent_activity,
     )
 
     seen: dict[str, object] = {}
@@ -1280,12 +1373,48 @@ def test_scorer_reads_trace_parent_gamma_without_a_basis_claim(monkeypatch):
         experiment=experiment,
         isolated=False,
     )
+    assert prediction.value is None
+    assert prediction.refusal_reason is RefusalReason.COEFFICIENT_BASIS_MISMATCH
+    _solid_experiment, _solid_bench, solid_observation = _case(
+        composition=_composition(("SnO", "0.01"), ("SiO2", "0.99")),
+        quantity=Quantity.ACTIVITY_COEFFICIENT,
+        formula="SnO",
+        basis="SnO",
+        phase=Phase.CR,
+    )
+    solid = predict_with_engine(
+        Engine.INTERNAL_ANALYTICAL,
+        solid_observation,
+        experiment=_solid_experiment,
+        isolated=False,
+    )
+    assert solid.value is None
+    assert solid.refusal_detail["reason"] == "reference_state_mismatch"
+    owner = resolve_trace_parent_activity(
+        "SnO",
+        temperature_K=seen["temperature_K"],
+        activity_exponent=1.0,
+        standard_state=StandardStateIdentity(
+            convention="raoultian_pure_endmember",
+            phase="liquid",
+            reference_pressure_bar=1.0,
+        ),
+    )
     assert seen["temperature_K"] == pytest.approx(1473.15)
-    assert prediction.refusal_reason is None
-    assert prediction.value == Decimal(str(seen["gammas"]["SnO"]))
     detail = seen["details"]["SnO"]
     assert detail["rung"] == 2
     assert detail["flag"]
     assert detail["source_row_id"]
     assert "standard_state" not in detail
     assert "coefficient_basis" not in detail
+    assert detail["source_basis"]["standard_state_as_printed"] == (
+        owner.derivation["standard_state_as_printed"]
+    )
+    assert detail["source_basis"]["standard_state_as_printed"]
+    assert detail["source_basis"]["convention"] is None
+    assert detail["target_basis"]["convention"] == "raoultian_pure_endmember"
+    assert detail["target_basis"]["phase"] == "liquid"
+    assert detail["target_basis"]["component_basis"] == "SnO"
+    assert prediction.refusal_detail["reported_standard_state"] is None
+    assert prediction.refusal_detail["source_basis"] == detail["source_basis"]
+    assert prediction.refusal_detail["target_basis"] == detail["target_basis"]

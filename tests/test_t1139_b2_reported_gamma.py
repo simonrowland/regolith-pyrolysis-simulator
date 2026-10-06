@@ -81,8 +81,26 @@ def _assert_copies_owner(formula: str, detail: Mapping[str, object], owner) -> N
     assert detail["verdict"] == owner.verdict.value
     assert detail["certified_band"] == certified_band
     assert detail["coefficient_formula"] == derivation.get("coefficient_formula")
-    assert "standard_state" not in detail
+    assert detail["source_basis"] == {
+        "component": derivation.get("row_formula"),
+        "standard_state_as_printed": derivation.get("standard_state_as_printed"),
+        "convention": derivation.get("source_convention"),
+        "phase": derivation.get("source_phase"),
+    }
+    assert detail["target_basis"] == {
+        "convention": derivation.get("target_convention", owner.standard_state.convention),
+        "phase": derivation.get("target_phase", owner.standard_state.phase),
+        "component_basis": formula,
+    }
     assert "coefficient_basis" not in detail
+    if derivation.get("basis_established") is True:
+        assert detail["standard_state"] == {
+            "convention": derivation["source_convention"],
+            "phase": "l",
+            "component_basis": formula,
+        }
+    else:
+        assert "standard_state" not in detail
 
 
 def test_production_report_copies_every_trace_parent() -> None:
@@ -126,6 +144,24 @@ def test_homologue_is_copied_before_unity() -> None:
         assert gammas[formula] == owner.derivation["gamma"]
         assert gammas[formula] != 1.0
         assert detail["verdict"] != ActivityVerdictKind.UPPER_BOUND.value
+
+
+def test_printed_phrase_is_not_a_standard_state_claim() -> None:
+    """A caller-matching row may claim a basis. A printed phrase may not."""
+
+    bare = _row("SnO", row_id="bare", B="-1000", notes="one published fit")
+    printed = {
+        **_row("SnO", row_id="printed", B="-1000", notes="one published fit"),
+        "standard_state_as_printed": "not stated in Table 2 row",
+    }
+    for rows, established in (([bare], True), ([printed], False)):
+        _gammas, details = trace_parent_activity_coefficient_emission(
+            1500.0, rows=rows
+        )
+        owner = _owner("SnO", 1500.0, rows)
+        _assert_copies_owner("SnO", details["SnO"], owner)
+        assert owner.derivation["basis_established"] is established
+        assert (details["SnO"].get("standard_state") is not None) is established
 
 
 def test_empty_table_upper_bound_is_not_a_point() -> None:

@@ -965,7 +965,9 @@ def trace_parent_activity_coefficient_emission(
         certified_band = (
             notice.get("certified_band") if isinstance(notice, Mapping) else None
         )
-        details[str(formula)] = {
+        # Copy the ladder's basis. This function does not decide whether
+        # the source matches the target.
+        payload: dict[str, Any] = {
             "value": row.get("gamma"),
             "rung": row.get("rung"),
             "source_row_id": row.get("source_row_id"),
@@ -976,7 +978,13 @@ def trace_parent_activity_coefficient_emission(
             "verdict": row.get("verdict"),
             "certified_band": certified_band,
             "coefficient_formula": row.get("coefficient_formula"),
+            "source_basis": dict(row["source_basis"]),
+            "target_basis": dict(row["target_basis"]),
         }
+        claim = row.get("standard_state")
+        if isinstance(claim, Mapping):
+            payload["standard_state"] = dict(claim)
+        details[str(formula)] = payload
         number = _finite_float(row.get("gamma"))
         if number is not None and number > 0.0:
             gammas[str(formula)] = number

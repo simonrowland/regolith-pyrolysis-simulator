@@ -3652,10 +3652,9 @@ def predict_with_engine(
         if quantity is Quantity.ACTIVITY_COEFFICIENT:
             details = getattr(cell, "melt_activity_coefficient_details", None)
             detail = details.get(formula) if isinstance(details, Mapping) else None
-            # A detail with no standard_state is report metadata (rung, flag,
-            # source row). It is not a basis claim. A declared standard_state
-            # still has to match the observation.
-            if isinstance(detail, Mapping) and "standard_state" in detail:
+            # Every coefficient detail is a basis claim. A missing or
+            # non-mapping standard_state does not match the observation.
+            if isinstance(detail, Mapping):
                 reported_basis = detail.get("coefficient_basis")
                 reported_standard_state = detail.get("standard_state")
                 reference_state = identity.reference_state
@@ -3709,6 +3708,16 @@ def predict_with_engine(
                                 if expected_standard_state is not None
                                 and expected_phase is not None
                                 else None
+                            ),
+                            **(
+                                {"source_basis": dict(detail["source_basis"])}
+                                if isinstance(detail.get("source_basis"), Mapping)
+                                else {}
+                            ),
+                            **(
+                                {"target_basis": dict(detail["target_basis"])}
+                                if isinstance(detail.get("target_basis"), Mapping)
+                                else {}
                             ),
                         },
                         identity=identity,

@@ -1944,6 +1944,66 @@ def _same_phase_token(left: str, right: str) -> bool:
     )
 
 
+def _closed_phase_token(phase: object) -> str | None:
+    """Phase token the coefficient scorer compares.
+
+    ``liquid`` and ``l`` close to ``l``. ``solid``, ``s``, and ``cr``
+    close to ``cr``. The match is group membership. A string that only
+    contains one of those tokens is not a phase.
+    """
+
+    text = str(phase).strip()
+    if not text:
+        return None
+    for group in _PHASE_TOKEN_GROUPS:
+        if text not in group:
+            continue
+        closed = group & {"l", "cr"}
+        if len(closed) == 1:
+            return next(iter(closed))
+    return None
+
+
+def _basis_annotation(
+    *,
+    row: Mapping[str, Any] | None,
+    standard_state: StandardStateIdentity,
+    established: bool,
+) -> dict[str, Any]:
+    """Source and target basis carried with one ladder answer.
+
+    A printed Table 2 phrase is the source text. It is not a convention
+    and it is not a phase. Stated fields are the source only when no
+    phrase is printed. With neither, an established row stands on the
+    caller's identity.
+    """
+
+    printed = None if row is None else row.get("standard_state_as_printed")
+    stated_convention = None if row is None else row.get("stated_convention")
+    stated_phase = None if row is None else row.get("stated_phase")
+    if printed is not None:
+        source_convention = None
+        source_phase = None
+    elif stated_convention or stated_phase:
+        source_convention = stated_convention
+        source_phase = stated_phase
+    elif established:
+        source_convention = standard_state.convention
+        source_phase = standard_state.phase
+    else:
+        source_convention = None
+        source_phase = None
+    return {
+        "basis_established": established,
+        "row_formula": None if row is None else str(row["formula"]),
+        "standard_state_as_printed": None if printed is None else printed,
+        "source_convention": source_convention,
+        "source_phase": source_phase,
+        "target_convention": standard_state.convention,
+        "target_phase": standard_state.phase,
+    }
+
+
 def _standard_state_established(
     row: Mapping[str, Any], standard_state: StandardStateIdentity
 ) -> bool:
@@ -1985,6 +2045,7 @@ def _from_selected_row(
     gamma = _gamma_at(row, temperature_K)
     notice = _extrapolation_notice(row, temperature_K)
     published = row["origin"] == "published"
+    established = _standard_state_established(row, standard_state)
     if notice is not None:
         flag = "extrapolated"
         verdict = ActivityVerdictKind.STATUS_BEARING_VALUE
@@ -1993,7 +2054,7 @@ def _from_selected_row(
             if published
             else "proxy_gamma_extrapolated"
         )
-    elif published and _standard_state_established(row, standard_state):
+    elif published and established:
         flag = "published"
         verdict = ActivityVerdictKind.POINT
         reason = "published_gamma"
@@ -2027,10 +2088,11 @@ def _from_selected_row(
     )
     return _annotate(
         answer,
-        row_formula=str(row["formula"]),
-        standard_state_as_printed=row.get("standard_state_as_printed"),
-        target_convention=standard_state.convention,
-        target_phase=standard_state.phase,
+        **_basis_annotation(
+            row=row,
+            standard_state=standard_state,
+            established=established,
+        ),
     )
 
 
@@ -2070,6 +2132,11 @@ def _rung4(
         target_flag=None,
         target_rung=None,
         algebra="gamma = 1; a <= X when the activity exponent is non-negative",
+        **_basis_annotation(
+            row=None,
+            standard_state=standard_state,
+            established=False,
+        ),
     )
     return replace(annotated, tier=ActivityTier.C)
 
@@ -2086,7 +2153,9 @@ def _retag_homologue(
     coefficient_formula: str | None,
 ) -> SourceReactionActivity:
     derivation = followed.derivation
-    return _ladder_result(
+    # The followed row's basis is that other component's. It does not
+    # establish this parent's standard state.
+    answer = _ladder_result(
         component_id=component_id,
         standard_state=standard_state,
         state_fingerprint=state_fingerprint,
@@ -2107,6 +2176,16 @@ def _retag_homologue(
         tier=ActivityTier.C,
         target_flag=derivation.get("flag"),
         target_rung=derivation.get("rung"),
+    )
+    return _annotate(
+        answer,
+        basis_established=False,
+        row_formula=derivation.get("row_formula"),
+        standard_state_as_printed=derivation.get("standard_state_as_printed"),
+        source_convention=derivation.get("source_convention"),
+        source_phase=derivation.get("source_phase"),
+        target_convention=standard_state.convention,
+        target_phase=standard_state.phase,
     )
 
 
@@ -2290,12 +2369,56 @@ def trace_parent_formulas() -> tuple[str, ...]:
     )
 
 
+def _report_basis(
+    derivation: Mapping[str, Any],
+    formula: str,
+    standard_state: StandardStateIdentity,
+) -> dict[str, Any]:
+    """Source basis, target basis, and the claim the scorer compares.
+
+    ``standard_state`` is present only when the row's basis is the
+    caller's. The phase on that claim is the closed token (``l`` or
+    ``cr``). A printed phrase, a homologue, or a unity bound leaves the
+    claim off: the target is reported beside the source and is not
+    reused as compatibility.
+    """
+
+    source_phase = derivation.get("source_phase")
+    source_basis = {
+        "component": derivation.get("row_formula"),
+        "standard_state_as_printed": derivation.get("standard_state_as_printed"),
+        "convention": derivation.get("source_convention"),
+        "phase": source_phase,
+    }
+    target_basis = {
+        "convention": derivation.get("target_convention", standard_state.convention),
+        "phase": derivation.get("target_phase", standard_state.phase),
+        "component_basis": formula,
+    }
+    payload: dict[str, Any] = {
+        "source_basis": source_basis,
+        "target_basis": target_basis,
+    }
+    if derivation.get("basis_established") is not True:
+        return payload
+    convention = source_basis["convention"]
+    phase = _closed_phase_token(source_phase) if source_phase else None
+    if not isinstance(convention, str) or not convention or phase is None:
+        return payload
+    payload["standard_state"] = {
+        "convention": convention,
+        "phase": phase,
+        "component_basis": formula,
+    }
+    return payload
+
+
 def trace_parent_gamma_report(
     temperature_K: float,
     *,
     rows: Sequence[Mapping[str, Any]] | None = None,
 ) -> dict[str, dict[str, Any]]:
-    """Gamma or bound for every trace parent. Reporting data only."""
+    """Gamma or bound for every trace parent, with its source and target basis."""
 
     standard_state = StandardStateIdentity(
         convention="raoultian_pure_endmember",
@@ -2326,6 +2449,7 @@ def trace_parent_gamma_report(
                 dict(row) for row in (derivation.get("candidate_rows") or ())
             ],
             "coefficient_formula": derivation.get("coefficient_formula"),
+            **_report_basis(derivation, formula, standard_state),
         }
     return report
 

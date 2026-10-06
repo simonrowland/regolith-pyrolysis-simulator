@@ -96,6 +96,10 @@ def test_internal_analytical_adapter_emits_trace_parent_coefficients() -> None:
     assert reported_activity_coefficients(result) == gammas
     assert result.vapor_pressures_Pa["Fe"] == 1.0
     assert "standard_state" not in details["SnO"]
+    assert details["SnO"]["source_basis"]["standard_state_as_printed"]
+    assert details["SnO"]["source_basis"]["convention"] is None
+    assert details["SnO"]["target_basis"]["component_basis"] == "SnO"
+    assert details["SnO"]["target_basis"]["phase"] == "liquid"
     assert details["SnO"]["rung"] == 2
     assert details["SnO"]["flag"]
     assert details["SnO"]["source_row_id"]
