@@ -1,0 +1,35 @@
+14076 unique formula strings under data/; 34 parse differently at 1e8ed29ae vs 3c56d0351
+'(Cs.65Na.19Rb.03)Al2Si4O12·H2O' | base ERR UnknownSpeciesError | head {'Al': 2.0, 'Cs': 0.65, 'H': 2.0, 'Na': 0.19, 'O': 13.0, 'Rb': 0.03, 'Si': 4.0}
+'(Na.78K.22)AlSiO4' | base ERR UnknownSpeciesError | head {'Al': 1.0, 'K': 0.22, 'Na': 0.78, 'O': 4.0, 'Si': 1.0}
+'Ba0.543Sr0.457TiO3(c)' | base ERR AccountingError | head ERR UnknownSpeciesError
+'Ca1.02Na0.14K.01(Al2.18Si6.82O18) · 7.33H2O' | base ERR AccountingError | head ERR UnknownSpeciesError
+'Cu0.75Fe2.25O4(c)' | base ERR AccountingError | head ERR UnknownSpeciesError
+'F6 .877 S' | base {'F': 6.0, 'S': 877.0} | head {'F': 6.877, 'S': 1.0}
+'F6.877S' | base {'F': 6.0, 'S': 877.0} | head {'F': 6.877, 'S': 1.0}
+'Fe.90S' | base {'Fe': 1.0, 'S': 90.0} | head {'Fe': 0.9, 'S': 1.0}
+'Fe.9470' | base ERR UnknownSpeciesError | head {'Fe': 0.947}
+'Fe.947O' | base {'Fe': 1.0, 'O': 947.0} | head {'Fe': 0.947, 'O': 1.0}
+'Fe.95O' | base {'Fe': 1.0, 'O': 95.0} | head {'Fe': 0.95, 'O': 1.0}
+'Fe0.877S(c)' | base ERR AccountingError | head ERR UnknownSpeciesError
+'Fe0.947O(c)' | base ERR AccountingError | head ERR UnknownSpeciesError
+'H15O10.5S' | base {'H': 15.0, 'O': 10.0, 'S': 5.0} | head {'H': 15.0, 'O': 10.5, 'S': 1.0}
+'H15O10.5S1' | base {'H': 15.0, 'O': 10.0, 'S': 5.0} | head {'H': 15.0, 'O': 10.5, 'S': 1.0}
+'K0.80Na0.20AlSi1.94O5.88 · 1.81H2O' | base ERR AccountingError | head ERR UnknownSpeciesError
+'K0.91N 8 o.~lSi1.810S.62·1.79H~' | base ERR AccountingError | head ERR UnknownSpeciesError
+'KO0.5(l) -> K(g) + 0.25 O2(g)' | base ERR AccountingError | head ERR UnknownSpeciesError
+'Li0.05Zn0.90Fe2.05O4(c,annealed)' | base ERR AccountingError | head ERR UnknownSpeciesError
+'Li0.05Zn0.90Fe2.05O4(c,annealed)*' | base ERR AccountingError | head ERR UnknownSpeciesError
+'Li0.05Zn0.90Fe2.05O4(c,quenched)' | base ERR AccountingError | head ERR UnknownSpeciesError
+'MoN.5' | base ERR UnknownSpeciesError | head {'Mo': 1.0, 'N': 0.5}
+'N1.5617IO.41959Ar.00937C.00032' | base ERR UnknownSpeciesError | head {'Ar': 52.63129, 'C': 1.79744, 'I': 5617.0, 'N': 1.0, 'O': 2356.83703}
+'N1.5617O.41959Ar.00937C.00032' | base ERR UnknownSpeciesError | head {'Ar': 0.00937, 'C': 0.00032, 'N': 1.5617, 'O': 0.41959}
+'NaO0.5(l) -> Na(g) + 0.25 O2(g)' | base ERR AccountingError | head ERR UnknownSpeciesError
+'NbC.98' | base ERR UnknownSpeciesError | head {'C': 0.98, 'Nb': 1.0}
+'Ni0.1Zn0.9Fe2O4(c)' | base ERR AccountingError | head ERR UnknownSpeciesError
+'Ni0.2Zn0.8Fe2O4(c)' | base ERR AccountingError | head ERR UnknownSpeciesError
+'Ni0.3Zn0.7Fe2O4(c)' | base ERR AccountingError | head ERR UnknownSpeciesError
+'Ni0.4Zn0.6Fe2O4(c)' | base ERR AccountingError | head ERR UnknownSpeciesError
+'VC.5' | base ERR UnknownSpeciesError | head {'C': 0.5, 'V': 1.0}
+'VC.88' | base ERR UnknownSpeciesError | head {'C': 0.88, 'V': 1.0}
+'W.465' | base ERR UnknownSpeciesError | head {'W': 0.465}
+'ZrC.96' | base ERR UnknownSpeciesError | head {'C': 0.96, 'Zr': 1.0}
