@@ -201,6 +201,9 @@ class NoticeKind(StrEnum):
     REFERENCE_PHASE_BY_CONVENTION = "reference_phase_by_convention"
     # Extract omitted admission or said pending/pending_validation; d-056 admits by default, not a reviewer decision.
     ADMISSION_DEFAULTED = "admission_defaulted"
+    # t-1123a: printed point sits between printed liquidus positions; scored as
+    # liquid, flagged (all-numeric line only). Reason carries the stated liquidus.
+    LIQUIDUS_POSITION_CONTESTED = "liquidus_position_contested"
 
 
 class ReferenceStateConvention(StrEnum):

@@ -2474,6 +2474,7 @@ def test_flagged_stratum_classifiers_agree_for_each_stratum() -> None:
     from simulator.battery.score import (
         FLAGGED_STRATUM_CATALOGUE_COMPOSITION,
         FLAGGED_STRATUM_IMCC_COMPLEX_SATURATION,
+        FLAGGED_STRATUM_LIQUIDUS_POSITION_CONTESTED,
         FLAGGED_STRATUM_REFERENCE_CONVERTED_VIA_FUSION,
         FLAGGED_STRATUM_SOURCE_INTERNALLY_INCONSISTENT,
         FLAGGED_STRATUM_UNVERIFIED_APPARATUS,
@@ -2507,6 +2508,11 @@ def test_flagged_stratum_classifiers_agree_for_each_stratum() -> None:
             FLAGGED_STRATUM_REFERENCE_CONVERTED_VIA_FUSION,
             NoticeKind.DERIVATION_USES_COMPILATION,
             "reference_converted_via_fusion;probe",
+        ),
+        (
+            FLAGGED_STRATUM_LIQUIDUS_POSITION_CONTESTED,
+            NoticeKind.LIQUIDUS_POSITION_CONTESTED,
+            "liquidus_position_contested:probe",
         ),
     )
     for stratum, kind, reason in cases:
