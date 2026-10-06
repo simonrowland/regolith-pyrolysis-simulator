@@ -1615,6 +1615,13 @@ _FEGLEY_GAMMA_TABLE = (
 )
 _PROXY_SET_EQUAL = re.compile(r"\bset\s*=", re.IGNORECASE)
 _PROXY_INTERPOLATED = re.compile(r"interpolat", re.IGNORECASE)
+# Oxide formula as printed in a gamma note: GeO2, SiO2, AsO1.5, CuO0.5.
+_OXIDE_IN_NOTE = r"[A-Z][a-z]?\d*O\d*(?:\.\d+)?"
+# g(this) = g(other), including a "log" between the equals and the second g.
+_GAMMA_EQUALS_OTHER = re.compile(
+    rf"g\s*\(\s*({_OXIDE_IN_NOTE})\s*\)\s*=\s*(?:log\s*)?g\s*\(\s*({_OXIDE_IN_NOTE})\s*\)",
+    re.IGNORECASE,
+)
 _TRACE_HOMOLOGUE = {
     "Rb2O": "K2O",
     "Cs2O": "K2O",
@@ -1648,10 +1655,23 @@ def _coefficient_formula(component_id: str) -> str:
 
 
 def _proxy_notes(notes: str) -> bool:
-    return (
-        _PROXY_SET_EQUAL.search(notes) is not None
-        or _PROXY_INTERPOLATED.search(notes) is not None
-    )
+    """True when the row's origin text borrows another component's gamma.
+
+    ``set =`` and interpolation wording are proxies. So is an equality of
+    one component's gamma to another's, read from the whole note:
+    ``g(GeO2) = g(SiO2) from FactSage``. A numeric assignment of this
+    component's own gamma (``g(GeO2) = 7.4``, ``Set log g(B2O3) = -3.2``)
+    is not that equality.
+    """
+
+    if _PROXY_SET_EQUAL.search(notes) is not None:
+        return True
+    if _PROXY_INTERPOLATED.search(notes) is not None:
+        return True
+    for match in _GAMMA_EQUALS_OTHER.finditer(notes):
+        if match.group(1).casefold() != match.group(2).casefold():
+            return True
+    return False
 
 
 def _normalize_gamma_row(raw: Mapping[str, Any]) -> dict[str, Any]:

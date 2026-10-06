@@ -158,6 +158,57 @@ def test_set_log_phrase_stays_published() -> None:
     assert answer.verdict is ActivityVerdictKind.POINT
 
 
+def test_gamma_equality_to_another_oxide_is_a_proxy() -> None:
+    answer = _resolve(
+        "GeO2",
+        [
+            _row(
+                "GeO2",
+                row_id="equality",
+                A="-0.01",
+                B="-580.4",
+                notes="g(GeO2) = g(SiO2) from FactSage",
+            )
+        ],
+    )
+    assert answer.derivation["origin"] == "proxy_estimate"
+    assert answer.derivation["flag"] == "proxy_estimate"
+    assert answer.verdict is not ActivityVerdictKind.POINT
+    assert answer.derivation["source_row_id"] == "equality"
+
+
+def test_numeric_gamma_assignment_stays_published() -> None:
+    answer = _resolve(
+        "GeO2",
+        [
+            _row(
+                "GeO2",
+                row_id="numeric",
+                A="0.8692",
+                B="0",
+                notes="g(GeO2) = 7.4, FactSage",
+            )
+        ],
+    )
+    assert answer.derivation["origin"] == "published"
+    assert answer.derivation["flag"] == "published"
+    assert answer.verdict is ActivityVerdictKind.POINT
+
+
+def test_production_geo2_equality_row_is_a_proxy() -> None:
+    table = load_fegley2023_gamma_table()["rows"]
+    matched = [
+        row
+        for row in table
+        if row["formula"] == "GeO2"
+        and "g(SiO2)" in str(row["notes_as_printed"])
+    ]
+    assert len(matched) == 1
+    answer = _resolve("GeO2", matched)
+    assert answer.derivation["origin"] == "proxy_estimate"
+    assert answer.derivation["source_row_id"] == matched[0]["source_row_id"]
+
+
 def test_several_rows_stay_unranked_and_do_not_fall_through() -> None:
     published = [
         _row("Rb2O", row_id="a", B="-1000", notes="model one"),
