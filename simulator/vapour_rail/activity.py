@@ -1768,12 +1768,64 @@ def _select_gamma_rows(
     if len(published) == 1:
         return "one", published
     if len(published) > 1:
-        return "many", matched
+        return "many", published
     if len(proxies) == 1:
         return "one", proxies
     if len(proxies) > 1:
         return "many", proxies
     return "none", ()
+
+
+def _stated_band(row: Mapping[str, Any]) -> tuple[float, float] | None:
+    band = row.get("validity_range_K")
+    if not isinstance(band, (list, tuple)) or len(band) != 2:
+        return None
+    low = float(band[0])
+    high = float(band[1])
+    if not math.isfinite(low) or not math.isfinite(high) or high < low:
+        return None
+    return low, high
+
+
+def _band_distance(band: tuple[float, float], temperature_K: float) -> float:
+    low, high = band
+    if temperature_K < low:
+        return low - temperature_K
+    if temperature_K > high:
+        return temperature_K - high
+    return 0.0
+
+
+def _select_banded_row(
+    rows: Sequence[Mapping[str, Any]], temperature_K: float
+) -> Mapping[str, Any] | None:
+    """The stated band that covers T, otherwise the unique nearest band.
+
+    A missing validity range is not a band and is never chosen. The lowest
+    residual is not a selector. Several covering bands, or two bands at the
+    same distance, means this rule does not apply.
+    """
+
+    covering: list[Mapping[str, Any]] = []
+    banded: list[tuple[float, str, Mapping[str, Any]]] = []
+    for row in rows:
+        band = _stated_band(row)
+        if band is None:
+            continue
+        distance = _band_distance(band, temperature_K)
+        banded.append((distance, str(row.get("source_row_id") or ""), row))
+        if distance == 0.0:
+            covering.append(row)
+    if len(covering) == 1:
+        return covering[0]
+    if len(covering) > 1:
+        return None
+    if not banded:
+        return None
+    banded.sort(key=lambda item: (item[0], item[1]))
+    if len(banded) > 1 and banded[0][0] == banded[1][0]:
+        return None
+    return banded[0][2]
 
 
 def _annotate(
@@ -1911,47 +1963,6 @@ def _from_selected_row(
     )
 
 
-def _from_unranked_rows(
-    *,
-    component_id: str,
-    group: Sequence[Mapping[str, Any]],
-    temperature_K: float,
-    mole_fraction: float | None,
-    standard_state: StandardStateIdentity,
-    state_fingerprint: str | None,
-    solve_group_id: str | None,
-    coefficient_formula: str | None,
-) -> SourceReactionActivity:
-    del mole_fraction
-    records = tuple(_candidate_record(row, temperature_K) for row in group)
-    published = any(row["origin"] == "published" for row in group)
-    flag = (
-        "published_gamma_rows_unranked"
-        if published
-        else "proxy_rows_unranked"
-    )
-    return _ladder_result(
-        component_id=component_id,
-        standard_state=standard_state,
-        state_fingerprint=state_fingerprint,
-        solve_group_id=solve_group_id,
-        rung=2,
-        gamma=None,
-        mole_fraction=None,
-        verdict=ActivityVerdictKind.STATUS_BEARING_VALUE,
-        flag=flag,
-        reason=flag,
-        source_row_id=None,
-        source_row_ids=tuple(str(row["source_row_id"]) for row in group),
-        origin=None,
-        homologue=None,
-        coefficient_formula=coefficient_formula,
-        extrapolation_notice=None,
-        candidate_rows=records,
-        tier=ActivityTier.B,
-    )
-
-
 def _rung4(
     *,
     component_id: str,
@@ -2042,9 +2053,13 @@ def resolve_trace_parent_activity(
     """Resolve one trace-parent gamma on the existing verdict types.
 
     Rung 1 (openimcc N-parent pack) is absent. Rung 2 is a Table 2 fit.
-    A single published row is published gamma. A single proxy row is a
-    flagged estimate. Several published rows stay unranked. Rung 3 follows
-    the homologue before rung 4. Rung 4 is the Henrian unity upper bound.
+    One published row is that gamma. One proxy row is a flagged estimate.
+    Several rows of one origin are the row whose stated band covers T, or
+    the unique nearest band outside that range (flagged extrapolated).
+    A row with no stated band is not selected, and the lowest residual is
+    not a selector. If that rule does not apply, rung 3 follows the
+    homologue (Li2O follows Na2O). Rung 4 is the Henrian unity upper bound.
+    Every non-refusal result carries a numeric gamma.
     """
 
     try:
@@ -2114,16 +2129,18 @@ def resolve_trace_parent_activity(
                     coefficient_formula=alias,
                 )
             if kind == "many":
-                return _from_unranked_rows(
-                    component_id=component_id,
-                    group=group,
-                    temperature_K=temperature,
-                    mole_fraction=mole_fraction,
-                    standard_state=standard_state,
-                    state_fingerprint=state_fingerprint,
-                    solve_group_id=solve_group_id,
-                    coefficient_formula=alias,
-                )
+                chosen = _select_banded_row(group, temperature)
+                if chosen is not None:
+                    return _from_selected_row(
+                        component_id=component_id,
+                        row=chosen,
+                        temperature_K=temperature,
+                        mole_fraction=mole_fraction,
+                        standard_state=standard_state,
+                        state_fingerprint=state_fingerprint,
+                        solve_group_id=solve_group_id,
+                        coefficient_formula=alias,
+                    )
         except (TypeError, ValueError) as exc:
             return _refusal(
                 component_id,

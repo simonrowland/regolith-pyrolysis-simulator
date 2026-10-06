@@ -209,32 +209,110 @@ def test_production_geo2_equality_row_is_a_proxy() -> None:
     assert answer.derivation["source_row_id"] == matched[0]["source_row_id"]
 
 
-def test_several_rows_stay_unranked_and_do_not_fall_through() -> None:
+def test_rows_without_a_stated_band_fall_through_to_the_homologue() -> None:
     published = [
         _row("Rb2O", row_id="a", B="-1000", notes="model one"),
         _row("Rb2O", row_id="b", B="-2000", notes="model two"),
         _row("K2O", row_id="k", B="-13400", notes="homologue bait"),
     ]
     answer = _resolve("Rb2O", published)
-    assert answer.derivation["rung"] == 2
-    assert answer.derivation["flag"] == "published_gamma_rows_unranked"
-    assert answer.derivation["gamma"] is None
-    assert answer.derivation["homologue"] is None
-    assert answer.value is None
+    assert answer.derivation["rung"] == 3
+    assert answer.derivation["flag"] == "homologue"
+    assert answer.derivation["homologue"] == "K2O"
+    assert answer.derivation["gamma"] is not None
+    assert answer.value is not None
     assert answer.verdict is ActivityVerdictKind.STATUS_BEARING_VALUE
-    assert {row["source_row_id"] for row in answer.derivation["candidate_rows"]} == {
-        "a",
-        "b",
-    }
+    assert answer.derivation["source_row_id"] == "k"
 
     proxies = [
         _row("V2O3", row_id="p1", B="-1", notes="set = Ti2O3"),
         _row("V2O3", row_id="p2", B="-2", notes="set = Fe2O3"),
     ]
     proxy_answer = _resolve("V2O3", proxies)
-    assert proxy_answer.derivation["flag"] == "proxy_rows_unranked"
-    assert proxy_answer.derivation["gamma"] is None
-    assert proxy_answer.derivation["rung"] == 2
+    assert proxy_answer.verdict is ActivityVerdictKind.UPPER_BOUND
+    assert proxy_answer.derivation["flag"] == "henrian_gamma_unmeasured"
+    assert proxy_answer.derivation["gamma"] == 1.0
+    assert proxy_answer.derivation["rung"] == 4
+    assert proxy_answer.value is not None
+    assert _point_only(proxy_answer) is None
+
+
+def test_covering_band_selects_that_row() -> None:
+    rows = [
+        _row("PbO", row_id="far", B="-100", band=[2000.0, 2200.0]),
+        _row("PbO", row_id="cover", B="-5000", band=[1400.0, 1600.0]),
+        _row("PbO", row_id="null-band", B="0", notes="no stated range"),
+    ]
+    answer = _resolve("PbO", rows, temperature_K=1500.0)
+    assert answer.derivation["source_row_id"] == "cover"
+    assert answer.derivation["flag"] == "published"
+    assert answer.verdict is ActivityVerdictKind.POINT
+    assert answer.derivation["gamma"] is not None
+    assert answer.value is not None
+
+
+def test_nearest_band_is_not_the_lowest_residual() -> None:
+    # 1500 K. The nearer band is the more extreme coefficient. The farther
+    # band is gamma = 1, which would win a "closest to ideal" residual.
+    rows = [
+        _row("PbO", row_id="near", B="-20000", band=[1800.0, 1900.0]),
+        _row("PbO", row_id="far", B="0", band=[1000.0, 1050.0]),
+    ]
+    answer = _resolve("PbO", rows, temperature_K=1500.0)
+    assert answer.derivation["source_row_id"] == "near"
+    assert answer.derivation["flag"] == "extrapolated"
+    assert answer.verdict is ActivityVerdictKind.STATUS_BEARING_VALUE
+    assert answer.derivation["gamma"] is not None
+    assert answer.value is not None
+    notice = answer.derivation["extrapolation_notice"]
+    assert notice["authority_level"] == "extrapolated"
+    assert notice["certified_band"]["temperature_K"] == [1800.0, 1900.0]
+
+
+def test_tied_nearest_bands_fall_through() -> None:
+    rows = [
+        _row("Rb2O", row_id="low", B="-100", band=[1000.0, 1200.0]),
+        _row("Rb2O", row_id="high", B="-9000", band=[1800.0, 2000.0]),
+        _row("K2O", row_id="k", B="-13400", notes="homologue"),
+    ]
+    answer = _resolve("Rb2O", rows, temperature_K=1500.0)
+    assert answer.derivation["rung"] == 3
+    assert answer.derivation["homologue"] == "K2O"
+    assert answer.derivation["source_row_id"] == "k"
+    assert answer.derivation["gamma"] is not None
+
+
+def test_li2o_without_a_band_follows_na2o() -> None:
+    rows = [
+        _row("Li2O", row_id="air", B="3973", notes="air point"),
+        _row("Li2O", row_id="low-fo2", B="853.7", notes="reduced point"),
+        _row("Na2O", row_id="na", B="-8000", notes="sodium fit"),
+    ]
+    answer = _resolve("Li2O", rows, temperature_K=1673.0)
+    assert answer.derivation["rung"] == 3
+    assert answer.derivation["flag"] == "homologue"
+    assert answer.derivation["homologue"] == "Na2O"
+    assert answer.derivation["source_row_id"] == "na"
+    assert answer.derivation["gamma"] is not None
+    assert answer.value is not None
+    assert answer.verdict is not ActivityVerdictKind.UPPER_BOUND
+
+
+def test_production_li2o_uses_its_nearest_stated_band() -> None:
+    table = load_fegley2023_gamma_table()["rows"]
+    banded = [
+        row
+        for row in table
+        if row["formula"] == "Li2O" and row["validity_range_K"] is not None
+    ]
+    assert len(banded) == 1
+    for temperature_K in (1500.0, 1673.0):
+        answer = _resolve("Li2O", None, temperature_K=temperature_K)
+        assert answer.derivation["source_row_id"] == banded[0]["source_row_id"]
+        assert answer.derivation["flag"] == "extrapolated"
+        assert answer.derivation["homologue"] is None
+        assert answer.derivation["gamma"] is not None
+        assert answer.value is not None
 
 
 def test_one_published_row_wins_over_a_proxy() -> None:
@@ -439,11 +517,11 @@ def test_phase_tag_resolves_on_the_ledger_key() -> None:
     assert notice["certified_band"]["temperature_K"] == [1800.0, 2200.0]
 
 
-def test_production_trace_parents_are_ranked_or_unranked_on_rung_2() -> None:
+def test_production_trace_parents_have_an_executable_activity() -> None:
     for formula in trace_parent_formulas():
-        answer = _resolve(formula, None, temperature_K=1673.0, mole_fraction=None)
+        answer = _resolve(formula, None, temperature_K=1673.0)
         assert answer.verdict is not ActivityVerdictKind.REFUSAL, formula
-        assert answer.derivation["rung"] == 2, formula
-        assert answer.derivation["flag"] != "henrian_gamma_unmeasured", formula
-        assert "rung" in answer.derivation
+        assert answer.derivation["gamma"] is not None, formula
+        assert answer.value is not None, formula
+        assert answer.derivation["rung"] in {2, 3, 4}, formula
         assert "flag" in answer.derivation
