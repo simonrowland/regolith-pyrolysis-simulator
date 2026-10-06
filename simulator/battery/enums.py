@@ -201,6 +201,8 @@ class NoticeKind(StrEnum):
     REFERENCE_PHASE_BY_CONVENTION = "reference_phase_by_convention"
     # Extract omitted admission or said pending/pending_validation; d-056 admits by default, not a reviewer decision.
     ADMISSION_DEFAULTED = "admission_defaulted"
+    FIGURE_ONLY = "figure_only"
+    REACTIVE_CELL_NOT_MODELLED = "reactive_cell_not_modelled"
 
 
 class ReferenceStateConvention(StrEnum):
