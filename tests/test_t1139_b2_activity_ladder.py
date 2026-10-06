@@ -662,7 +662,7 @@ def test_cuo05_converts_a_published_parent_row() -> None:
 
 
 def test_missing_cation_relationship_is_not_a_conversion() -> None:
-    assert pure_liquid_reference_coefficient("Li2O", "LiO0.5", 0.25) is None
+    assert pure_liquid_reference_coefficient("As2O3", "AsO1.5", 0.25) is None
     assert pure_liquid_reference_coefficient("In2O3", "GaO1.5", 0.25) is None
     assert pure_liquid_reference_coefficient("SnO", "SnO", 0.3) == 0.3
     # Inverse of the 0.02 anchor: the parent coefficient converts back.

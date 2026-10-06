@@ -49,9 +49,11 @@ from simulator.vapour_rail.activity import (
     CondensedPhaseActivityProvider,
     SourceReactionActivity,
     StandardStateIdentity,
+    _coefficient_formula,
     _fingerprint_float,
     _is_nonfinite_number,
     composition_fingerprint,
+    is_trace_parent_component,
 )
 from simulator.vapour_rail.batch import (
     CERTIFICATION_CEILING_NEVER,
@@ -1393,15 +1395,27 @@ def refusal_closure(
                     "melt_oxide_X_single_cation"
                 )
                 if reported_mole_fraction is None:
+                    # One projector. Majors use the legacy coefficient's
+                    # parent oxide. A trace parent has no such entry; its
+                    # fraction is the same projection keyed by the Table 2
+                    # row formula (InO1.5 reads In2O3).
                     coeff = melt_oxide_activity_coefficient(
                         declaration.component_id
                     )
                     if coeff is not None:
+                        fraction_key = coeff.parent_oxide
+                    elif is_trace_parent_component(declaration.component_id):
+                        fraction_key = _coefficient_formula(
+                            declaration.component_id
+                        )
+                    else:
+                        fraction_key = None
+                    if fraction_key is not None:
                         source_fractions = single_cation_mole_fractions(
                             _account_mols(ledger_snapshot, rule.source_account)
                         )
                         reported_mole_fraction = source_fractions.get(
-                            coeff.parent_oxide
+                            fraction_key
                         )
                 source_reaction_activity = (
                     activity_provider.resolve_source_reaction_activity(

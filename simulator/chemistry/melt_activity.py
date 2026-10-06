@@ -232,11 +232,19 @@ MELT_OXIDE_CATIONS_PER_FORMULA = {
     "P2O5": 2.0,
     "NiO": 1.0,
     "CoO": 1.0,
-    # One-cation activity components of these parents are different formulas
-    # (InO1.5, GaO1.5, CuO0.5). The metal subscript is the cation count.
+    # Trace-parent ledger oxides. The metal subscript is the cation count.
+    # InO1.5, GaO1.5 and CuO0.5 are the one-cation spellings, not extra keys.
     "In2O3": 2.0,
     "Ga2O3": 2.0,
     "Cu2O": 2.0,
+    "Li2O": 2.0,
+    "Rb2O": 2.0,
+    "Cs2O": 2.0,
+    "B2O3": 2.0,
+    "V2O3": 2.0,
+    "PbO": 1.0,
+    "GeO2": 1.0,
+    "SnO": 1.0,
 }
 
 
