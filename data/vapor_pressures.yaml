@@ -1842,19 +1842,23 @@ families:
           electrons_per_atom: 3
           parent_oxide: Al2O3
           authority_class: uncertified
-          source: REF-002 NIST Chemistry WebBook SRD 69 Stull 1947 aluminum (C7429905); pure_component_antoine
-            is retained as a legacy compatibility sidecar; the schema-v2 catalog uses the activity-corrected
-            liquid-AlO1.5 reaction
+          source: REF-020 NIST-JANAF/Chase 1998 Al(l)/Al(g) fit on shared Al-003 and Al-005 nodes;
+            pure_component_antoine is retained as a legacy compatibility sidecar; the schema-v2 catalog
+            uses the activity-corrected liquid-AlO1.5 reaction
           pure_component_antoine:
-            source: REF-002 NIST Chemistry WebBook SRD 69 Stull 1947 aluminum (C7429905); log10(P/bar)=5.73623-13204.109/(T-24.306),
-              converted to Pa by A+5
-            source_certification: source_equation_fit
-            A: 10.73623
-            B: 13204.109
-            C: -24.306
+            source: REF-020 NIST-JANAF/Chase 1998 Al(l) Al-003 and Al(g) Al-005 shared nodes
+            derivation: 'Least-squares fit of log10(P/Pa)=A-B/(T+C) to the 18 shared JANAF nodes from
+              1000 through 2700 K inclusive, using log10(P/Pa)=5-(Gf(Al(g))-Gf(Al(l)))/(R*T*ln(10)).
+              Measured maximum absolute residual on those nodes: 0.007561597786 dex.'
+            source_certification: derived_from_evaluation
+            A: 10.5215429528
+            B: 15145.174655
+            C: -42.6590481419
             valid_range_K:
-            - 1557
-            - 2329
+            - 1000
+            - 2700
+            fit_node_count: 18
+            max_abs_log10_residual_vs_source: 0.007561597786
           boiling_point_C: 2519
           notes: dH_vap ~ 332.0 kJ/mol. AlO and Al2O are measured Apollo-basalt carriers and are modelled
             separately; their ratios to Al vary strongly with oxygen fugacity, so this metal branch alone
@@ -1997,19 +2001,53 @@ families:
           prefer_compiled_reference_pressure_model: true
           retain_analytical_pressure_channel: true
           flux_dormant: false
-          source: REF-002 NIST Chemistry WebBook SRD 69 Stull 1947 silicon (C7440213); pure_component_antoine
-            remains a legacy pure-element sidecar and is not a melt-source catalog answer
+          source: REF-020 NIST-JANAF/Chase 1998 Si(l)/Si(g) fit on shared Si-003 and Si-005 nodes;
+            pure_component_antoine is a legacy compatibility sidecar and is not a melt-source catalog answer
           pure_component_antoine:
-            source: REF-002 NIST Chemistry WebBook SRD 69 Stull 1947 silicon (C7440213); log10(P/bar)=9.56436-23308.848/(T-123.133),
-              converted to Pa by A+5
-            source_certification: source_equation_fit
-            A: 14.56436
-            B: 23308.848
-            C: -123.133
+            source: REF-020 NIST-JANAF/Chase 1998 Si(l) Si-003 and Si(g) Si-005 shared nodes
+            derivation: 'Least-squares fit of log10(P/Pa)=A-B/(T+C) to the 19 shared JANAF nodes from
+              1700 through 3500 K inclusive, using log10(P/Pa)=5-(Gf(Si(g))-Gf(Si(l)))/(R*T*ln(10)).
+              Measured maximum absolute residual on those nodes: 0.000999238802 dex.'
+            source_certification: derived_from_evaluation
+            A: 10.6913003080
+            B: 19744.5887902
+            C: -34.7482634626
             valid_range_K:
-            - 1997
-            - 2560
+            - 1700
+            - 3500
+            fit_node_count: 19
+            max_abs_log10_residual_vs_source: 0.000999238802
+            default_segment: liquid_janaf
+            segments:
+            - name: crystal_janaf
+              phase: crystal
+              source: REF-020 NIST-JANAF/Chase 1998 Si(cr) Si-002 and Si(g) Si-005 shared nodes
+              source_certification: derived_from_evaluation
+              fit_node_set: Si-002/Si-005 shared nodes, 100-1600 K
+              fit_node_count: 20
+              fit_method: constrained_least_squares_log10_pressure_with_exact_1685_K_join
+              max_abs_log10_residual_vs_source: 0.080953039489
+              rms_log10_residual_vs_source: 0.046467069627
+              join_anchor_K: 1685
+              join_anchor_Pa: 0.053297675518
+              join_step_log10_dex: 0.0
+              A: 12.645587188241636
+              B: 23452.94759360651
+              C: -0.0261074340068919
+              valid_range_K: [100, 1685]
+            - name: liquid_janaf
+              phase: liquid
+              source: REF-020 NIST-JANAF/Chase 1998 Si(l) Si-003 and Si(g) Si-005 shared nodes
+              source_certification: derived_from_evaluation
+              fit_node_set: Si-003/Si-005 shared nodes, 1700-3500 K
+              fit_node_count: 19
+              max_abs_log10_residual_vs_source: 0.000999238802
+              A: 10.6913003080
+              B: 19744.5887902
+              C: -34.7482634626
+              valid_range_K: [1700, 3500]
           boiling_point_C: 3265
+          boiling_point_note: CRC value; 3265 °C is 30 K above JANAF Tb(1 atm) of 3508.12 K.
           reaction:
             formula: SiO2(l) -> Si(g) + O2(g)
             basis: Existing liquid-SiO2-to-SiO standard-reaction reference plus landed NASA CEA SiO, Si,
@@ -7630,12 +7668,12 @@ families:
           formula: MgCl2
           molar_mass_g_mol: 95.205
           chemical_family: halide_salt
-          acquisition_status: grounded_janaf_monomer_fit
+          acquisition_status: ACTIVE_CEA_NASA9_REACTION_THERMO
           runtime_disposition: dormant_missing_stage0_source_reservoir
           flux_dormant: true
           reaction:
             formula: MgCl2(l) -> MgCl2(g)
-            basis: Existing JANAF monomer partial-pressure fit over pure liquid MgCl2.
+            basis: Active evaluator is NASA CEA; the legacy JANAF fit interval and coefficients are not exposed.
             derivation: 'Premise: one liquid MgCl2 formula unit transfers to one MgCl2 vapor and no O2
               participates. Algebra: p_v=P_sat(T), pure-condensed activity is one, and pO2 exponent=0.
               Unit check: P_sat is Pa. Sanity: phase transfer conserves Mg and Cl exactly.'
