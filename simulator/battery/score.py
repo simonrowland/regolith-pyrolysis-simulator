@@ -2121,7 +2121,12 @@ def populate_numeric(
     experiments: Mapping[str, Experiment] | None = None,
     derived_band: DecisionBand | None = None,
     operation_override: MetricOperation | None = None,
+    band_operation: MetricOperation | None = None,
 ) -> tuple[ResidualNumeric | None, RefusalReason | None, dict[str, object]]:
+    """``band_operation`` checks a row's OWN printed band against the row's
+    identity-aware metric. It is None for every borrowed/derived band, which
+    keeps the quantity-default dimension check (no envelope transfer).
+    """
     operation = operation_override or metric_operation(quantity)
     if operation is None:
         return None, RefusalReason.METRIC_DOMAIN, {"quantity": quantity.value}
@@ -2153,12 +2158,12 @@ def populate_numeric(
             observations=observations,
             experiments=experiments,
             derived_band=derived_band,
-            operation=operation,
+            operation=band_operation,
         )
     # Dimension guard. decision_band_for normally filters mismatched bands;
     # keep this check for callers that replace it in a focused test.
     if band is not None and not band_dimension_matches(
-        quantity, band, operation=operation
+        quantity, band, operation=band_operation
     ):
         return None, RefusalReason.DECISION_RULE_MISSING, {
             "reason": f"band_dimension_mismatch:{quantity.value}",
@@ -4843,16 +4848,21 @@ def compile_residual(
                 ref_point,
                 source_observation=reference,
             ) or cell_band
+        row_operation = _residual_metric_operation(quantity, reference)
+        own_band_operation: MetricOperation | None = None
         if figure_only:
             # Figure reading band comes only from this row's stored uncertainty.
             # Never fall back to the global measured KEMS cell band (that
-            # borrows another source's envelope).
+            # borrows another source's envelope). Being the row's own band, it
+            # is dimension-checked in the row's identity-aware metric (r2 F4).
             cell_band = _printed_uncertainty_band(
                 quantity,
                 reference.uncertainty,
                 ref_point,
                 source_observation=reference,
             )
+            if cell_band is not None:
+                own_band_operation = row_operation
         numeric, metric_reason, metric_detail = populate_numeric(
             quantity=quantity,
             candidate=prediction.value,
@@ -4872,7 +4882,8 @@ def compile_residual(
             observations=context.observations,
             experiments=context.experiments,
             derived_band=cell_band,
-            operation_override=_residual_metric_operation(quantity, reference),
+            operation_override=row_operation,
+            band_operation=own_band_operation,
         )
     if numeric is None:
         return _refused(
