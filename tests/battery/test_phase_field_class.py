@@ -121,3 +121,177 @@ def test_stolyarova_1991_x036_to_x040_rows_stay_numeric(
     # (t-1123 proposal section 4: 40 single-liquid numeric = 26 openimcc + 14 here).
     assert len(numeric) == 14
     assert all(residual.status is not ResidualStatus.REFUSED for residual in numeric)
+
+
+# --- t-1123a general two-test rule (simulator/battery/phase_field.py) ----
+
+def _records(liquidus=None, plateau_cells=None, named_failure=None):
+    from simulator.battery.phase_field import phase_field_records
+
+    cells = plateau_cells or {"0.33": ("10.0 ± 1.0", "1.00 ± 0.05"), "0.25": ("10.5 ± 1.0", "0.98 ± 0.05")}
+    points_a = [{"x": x, "p": a} for x, (a, _b) in cells.items()]
+    points_b = [{"x": x, "p": b} for x, (_a, b) in cells.items()]
+    doc = {
+        "species": {
+            "A": {"observations": [{"observation_id": "series_a", "values": {"points": points_a}}]},
+            "B": {"observations": [{"observation_id": "series_b", "values": {"points": points_b}}]},
+        },
+        "phase_field_records": {
+            "liquidus": [
+                liquidus
+                or {
+                    "id": "liq",
+                    "component": "SiO2",
+                    "position": "0.37",
+                    "sigma": "0.02",
+                    "outside_side": "below",
+                    "superseded_positions": ["0.41"],
+                    "locator": {"page": 1},
+                }
+            ],
+            "plateaus": [
+                {
+                    "id": "plat",
+                    "composition_field": "x",
+                    "compositions": list(cells),
+                    "series": [
+                        {"observation_id": "series_a", "field": "p", "sigma_basis": "printed"},
+                        {"observation_id": "series_b", "field": "p", "sigma_basis": "printed"},
+                    ],
+                    **({"named_failure": named_failure} if named_failure else {}),
+                }
+            ],
+        },
+    }
+    return phase_field_records(doc)
+
+
+def _declared(x, **test_values):
+    values = {
+        "x": x,
+        "liquidus": "0.37",
+        "liquidus_sigma": "0.02",
+        "plateau_max_z": "0.35",
+        "plateau_series_tested": 2,
+        "plateau_series_failing": [],
+        "plateau_series_untestable": 0,
+    }
+    values.update(test_values)
+    return {
+        "class": "outside_single_liquid_field",
+        "basis": {
+            "criterion": "stated_liquidus_side_and_printed_plateau_within_2_sigma",
+            "liquidus": "liq",
+            "plateau": "plat",
+            "locator": {"page": 1},
+            "test_values": values,
+        },
+    }
+
+
+def test_two_test_rule_classifies_lime_side_plateau_points() -> None:
+    from simulator.battery.phase_field import OUTSIDE_SINGLE_LIQUID_FIELD, classify_point
+
+    records = _records()
+    # z(series_a) = 0.5 / sqrt(2) = 0.354 -> 0.35; z(series_b) = 0.02 / sqrt(0.005) = 0.28.
+    assert records.plateaus["plat"].z_by_series == {
+        "series_a": Decimal("0.35"),
+        "series_b": Decimal("0.28"),
+    }
+    outcome = classify_point(
+        records,
+        observation_id="series_a",
+        x_by_component={"SiO2": Decimal("0.33"), "CaO": Decimal("0.67")},
+        declared=_declared("0.33"),
+    )
+    assert outcome.kind == OUTSIDE_SINGLE_LIQUID_FIELD and outcome.problem is None
+
+
+def test_two_test_rule_refuses_points_inside_the_liquidus_sigma_band() -> None:
+    from simulator.battery.phase_field import LIQUIDUS_POSITION_CONTESTED, classify_point
+
+    records = _records(plateau_cells={"0.36": ("10.0 ± 1.0", "1.00 ± 0.05"), "0.25": ("10.5 ± 1.0", "0.98 ± 0.05")})
+    outcome = classify_point(
+        records,
+        observation_id="series_a",
+        x_by_component={"SiO2": Decimal("0.36")},
+        declared=_declared("0.36"),
+    )
+    # 0.36 is not below 0.37 - 0.02: test (i) fails, the row stays liquid and contested.
+    assert outcome.kind == LIQUIDUS_POSITION_CONTESTED
+    assert "test (i)" in (outcome.problem or "")
+    assert outcome.payload["stated_liquidus"] == "0.37"
+    assert outcome.payload["stated_liquidus_sigma"] == "0.02"
+
+
+def test_two_test_rule_refuses_a_plateau_that_is_not_flat_within_2_sigma() -> None:
+    from simulator.battery.phase_field import LIQUIDUS_POSITION_CONTESTED, classify_point
+
+    # z(series_a) = 3.0 / sqrt(2) = 2.12 > 2, z(series_b) = 0.3 / sqrt(0.005) = 4.24 > 2.
+    records = _records(plateau_cells={"0.33": ("10.0 ± 1.0", "1.00 ± 0.05"), "0.25": ("13.0 ± 1.0", "0.70 ± 0.05")})
+    assert records.plateaus["plat"].failing == ("series_a", "series_b")
+    outcome = classify_point(
+        records,
+        observation_id="series_a",
+        x_by_component={"SiO2": Decimal("0.33")},
+        declared=_declared("0.33"),
+    )
+    assert outcome.kind == LIQUIDUS_POSITION_CONTESTED
+    assert "at most one named series may fail" in (outcome.problem or "")
+
+    # Only series_b fails: z = 0.15 / sqrt(0.005) = 2.12 > 2; series_a stays 0.35.
+    one = _records(
+        plateau_cells={"0.33": ("10.0 ± 1.0", "1.00 ± 0.05"), "0.25": ("10.5 ± 1.0", "0.85 ± 0.05")},
+        named_failure={"observation_id": "series_b", "reason": "integral-derived"},
+    )
+    assert one.plateaus["plat"].failing == ("series_b",)
+    assert one.plateaus["plat"].problem is None
+    unnamed = _records(
+        plateau_cells={"0.33": ("10.0 ± 1.0", "1.00 ± 0.05"), "0.25": ("10.5 ± 1.0", "0.85 ± 0.05")},
+    )
+    assert unnamed.plateaus["plat"].problem is not None
+
+
+def test_two_test_rule_refuses_carried_test_values_that_do_not_match() -> None:
+    from simulator.battery.phase_field import LIQUIDUS_POSITION_CONTESTED, classify_point
+
+    outcome = classify_point(
+        _records(),
+        observation_id="series_a",
+        x_by_component={"SiO2": Decimal("0.33")},
+        declared=_declared("0.33", plateau_max_z="0.10"),
+    )
+    assert outcome.kind == LIQUIDUS_POSITION_CONTESTED
+    assert "do not match" in (outcome.problem or "")
+
+
+def test_two_test_rule_leaves_single_liquid_rows_and_mirrors_the_outside_side() -> None:
+    from simulator.battery.phase_field import LIQUIDUS_POSITION_CONTESTED, classify_point
+
+    records = _records()
+    for x in ("0.41", "0.50"):
+        outcome = classify_point(
+            records, observation_id="series_a", x_by_component={"SiO2": Decimal(x)}, declared=None
+        )
+        assert outcome.kind is None and outcome.problem is None
+    outcome = classify_point(
+        records, observation_id="series_a", x_by_component={"SiO2": Decimal("0.40")}, declared=None
+    )
+    assert outcome.kind == LIQUIDUS_POSITION_CONTESTED
+    above = _records(
+        liquidus={
+            "id": "liq",
+            "component": "SiO2",
+            "position": "0.60",
+            "sigma": "0.02",
+            "outside_side": "above",
+            "superseded_positions": ["0.55"],
+            "locator": {"page": 1},
+        }
+    )
+    assert classify_point(
+        above, observation_id="series_a", x_by_component={"SiO2": Decimal("0.56")}, declared=None
+    ).kind == LIQUIDUS_POSITION_CONTESTED
+    assert classify_point(
+        above, observation_id="series_a", x_by_component={"SiO2": Decimal("0.50")}, declared=None
+    ).kind is None

@@ -144,6 +144,13 @@ from simulator.battery.validate import (
     validate_corpus,
 )
 from simulator.physical_constants import STANDARD_ATMOSPHERE_PA
+from simulator.battery.phase_field import (
+    OUTSIDE_SINGLE_LIQUID_FIELD,
+    PhaseFieldRecords,
+    PointPhaseField,
+    classify_point,
+    phase_field_records,
+)
 
 # ---------------------------------------------------------------------------
 # Paths
@@ -10345,6 +10352,8 @@ class Migrator:
         self._registry_value_initial_experiments: set[str] = set()
         # Compilation record JSON paths registered as Work assets (not INDEX).
         self._work_extra_assets: dict[str, dict[str, SourceFile]] = defaultdict(dict)
+        # t-1123a: per-source printed liquidus / plateau records (phase_field.py).
+        self._phase_field_records: dict[str, PhaseFieldRecords | None] = {}
 
     def _count(self, path: str) -> SourceCount:
         rec = self.result.source_counts.get(path)
@@ -11224,6 +11233,16 @@ class Migrator:
         )
         rows = list(iter_extract_observations(doc))
         pressure_identity_context = _pressure_identity_context(doc, rows)
+        records = phase_field_records(doc)
+        self._phase_field_records[source_id] = records
+        for problem in () if records is None else records.problems:
+            self.result.registry_issues.append(
+                ValidationIssue(
+                    path=f"extract[{rel}].phase_field_records",
+                    reason=RefusalReason.CONDITIONAL_FIELD,
+                    detail=problem,
+                )
+            )
         count.rows_in += len(rows)
         self.result.measured.citations += 1
         local_ids = {str(obs.get("observation_id")) for _, obs in rows if obs.get("observation_id")}
@@ -11279,6 +11298,65 @@ class Migrator:
         self._record_silent_extract_if_needed(
             doc=doc, work=work, source_key=rel, path_stem=path.stem
         )
+
+    def _point_phase_field(
+        self,
+        *,
+        source_id: str,
+        parent_id: str,
+        point_id: str,
+        raw_item: object,
+        point_conditions: Mapping[str, Located[Any]] | None,
+        printed_phase_kind: str | None,
+    ) -> PointPhaseField:
+        """Apply the phase_field.py two-test rule to one printed point."""
+
+        records = self._phase_field_records.get(source_id)
+        declared = raw_item.get("phase_field_class") if isinstance(raw_item, Mapping) else None
+        located = (point_conditions or {}).get("composition")
+        composition = (
+            located.state.value
+            if isinstance(located, Located) and located.state.is_value
+            else None
+        )
+        outcome = PointPhaseField(None, None)
+        if records is None:
+            if declared is not None:
+                outcome = PointPhaseField(
+                    None, None, "phase_field_class without phase_field_records"
+                )
+        elif printed_phase_kind is not None:
+            # A printed phase wins over a classified one; both on one point is a conflict.
+            if declared is not None:
+                outcome = PointPhaseField(
+                    None, None, "phase_field_class on a point with a printed phase"
+                )
+        elif (
+            isinstance(composition, Composition)
+            and composition.amount_basis is AmountBasis.MOLE_FRACTION
+        ):
+            prefix = f"{source_id}::"
+            outcome = classify_point(
+                records,
+                observation_id=(
+                    parent_id[len(prefix):] if parent_id.startswith(prefix) else parent_id
+                ),
+                x_by_component=dict(composition.components),
+                declared=declared,
+            )
+        elif declared is not None:
+            outcome = PointPhaseField(
+                None, None, "phase_field_class needs a printed mole-fraction composition"
+            )
+        if outcome.problem is not None:
+            self.result.registry_issues.append(
+                ValidationIssue(
+                    path=f"observation[{point_id}].phase_field_class",
+                    reason=RefusalReason.CONDITIONAL_FIELD,
+                    detail=outcome.problem,
+                )
+            )
+        return outcome
 
     def _record_silent_extract_if_needed(
         self,
@@ -13390,6 +13468,33 @@ class Migrator:
                     ),
                     origin=point_id,
                     band=_TWO_PHASE_BULK_COMPOSITION_STATUS,
+                )
+            )
+        phase_field = self._point_phase_field(
+            source_id=source_id,
+            parent_id=parent_id,
+            point_id=point_id,
+            raw_item=raw_item,
+            point_conditions=point_conditions,
+            printed_phase_kind=printed_phase_kind,
+        )
+        if phase_field.kind is not None and isinstance(q_token_point, Quantity):
+            # The class rides on a notice only: species phase and
+            # identity.composition are never written from it (t-1123a R1).
+            child_notices.append(
+                Notice(
+                    kind=NoticeKind.OUT_OF_CERTIFIED_BAND,
+                    affected_quantities=(q_token_point,),
+                    reason=phase_field.notice_reason(),
+                    origin=point_id,
+                    band=_TWO_PHASE_BULK_COMPOSITION_STATUS,
+                )
+                if phase_field.kind == OUTSIDE_SINGLE_LIQUID_FIELD
+                else Notice(
+                    kind=NoticeKind.LIQUIDUS_POSITION_CONTESTED,
+                    affected_quantities=(q_token_point,),
+                    reason=phase_field.notice_reason(),
+                    origin=point_id,
                 )
             )
         observation = Observation(
