@@ -14,6 +14,31 @@ from simulator.battery.generators.janaf import janaf_fusion_energy
 from simulator.diagnostic_helpers.species_rail_differential import cea_delta_fG_kJ_mol
 from simulator.vapour_rail.catalog import _formula_atoms
 from simulator.vapour_rail.stoich import balance_oxide_evaporation
+from simulator.diagnostic_helpers.species_rail import (
+    parse_formula_composition,
+    parse_formula_elements,
+)
+
+
+@pytest.mark.parametrize(
+    ("formula", "expected"),
+    (
+        ("Fe.947O", (("Fe", "0x1.e4dd2f1a9fbe7p-1"), ("O", "0x1.0000000000000p+0"))),
+        ("Fe.90S", (("Fe", "0x1.ccccccccccccdp-1"), ("S", "0x1.0000000000000p+0"))),
+        ("NaCl.2H2O", (("Cl", "0x1.999999999999ap-3"), ("H", "0x1.0000000000000p+1"), ("Na", "0x1.0000000000000p+0"), ("O", "0x1.0000000000000p+0"))),
+        ("CuSO4.5H2O", (("Cu", "0x1.0000000000000p+0"), ("H", "0x1.0000000000000p+1"), ("O", "0x1.6000000000000p+2"), ("S", "0x1.0000000000000p+0"))),
+        ("H2SO4.2H2O", (("H", "0x1.0000000000000p+2"), ("O", "0x1.4cccccccccccdp+2"), ("S", "0x1.0000000000000p+0"))),
+        ("(Na.78K.22)AlSiO4", None),
+    ),
+)
+def test_diagnostic_leading_dot_normalization_pin(formula, expected) -> None:
+    """Capture existing diagnostic output before moving its normalization rule."""
+    composition = parse_formula_composition(formula)
+    actual = None if composition is None else tuple((e, n.hex()) for e, n in composition)
+    assert actual == expected
+    assert parse_formula_elements(formula) == (
+        None if expected is None else tuple(e for e, _n in expected)
+    )
 
 
 @pytest.mark.parametrize(
