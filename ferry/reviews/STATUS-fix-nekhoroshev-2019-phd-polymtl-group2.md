@@ -12,8 +12,8 @@
     p.222 and is bound to the Combeite-Wo-NC2S2 eutectic group continued from p.221 (stated in provenance + locator note). Bold rows =
     `model_derived`; bracketed rows keep their attribution ([117], [428]).
   - Item 2, Table 21.1, pp.301–302 / PDF358–359: 54 rows added → **57 rows** (54 temperatures + 111 composition cells = 165 values).
-    New columns `published_page` (per row) and `Print_note`. p.301 rows 4–5 inherit NM5S12-pEn-Oliv across the page break. 26 reported
-    rows printing identical Na2O and MgO (several summing >100 mol%) are carried as printed and flagged, not repaired. p.302
+    New columns `published_page` (per row) and `Print_note`. p.301 rows 4–5 inherit NM5S12-pEn-Oliv across the page break. 18 reported
+    rows printing identical Na2O and MgO (16 of them summing >100 mol%) are carried as printed and flagged, not repaired. p.302
     Tri-NM5S12-NM2S6: the non-bold composition is bound to the 1018 [391, 495] row (first reported row, as in every other group; the
     print sits between lines, stated explicitly), the bold composition to the bold 993 row, 1013 [158] has no composition.
     Provenance also carries the p.300 "hand-plotted, could be not precise" qualifier and the p.302 Botvinkin [497] exclusion note.
