@@ -5112,7 +5112,7 @@ def _promote_non_debiting_carrier_status(
         if (
             admission_refusal == CONDENSATION_ADMISSION_REFUSAL_NO_DATA
             and not has_declared_routing(species)
-            and species in _trace_vapour_carrier_sources()
+            and species in _trace_vapour_carrier_formulas()
         ):
             return current_status, None
         return VAPOUR_CARRIER_AUTHORITY_REFUSED, admission_refusal
@@ -5565,7 +5565,7 @@ def trace_vapour_condensation_onset(
             status="inputs_required",
             detail="partial pressure must be finite and positive",
         )
-    if species not in _trace_vapour_carrier_sources():
+    if species not in _trace_vapour_carrier_formulas():
         return _onset_unavailable(
             species,
             partial_pressure_pa=pressure_pa,
@@ -5580,11 +5580,20 @@ def trace_vapour_condensation_onset(
     )
     if antoine is not None:
         return antoine
-    return _thermo_saturation_onset(
-        species,
-        pressure_pa,
-        stages=stages,
-    )
+    try:
+        return _thermo_saturation_onset(
+            species,
+            pressure_pa,
+            stages=stages,
+        )
+    except _SourceRailUnavailable as exc:
+        return _onset_unavailable(
+            species,
+            partial_pressure_pa=pressure_pa,
+            status="source_rail_unavailable",
+            method="thermo_saturation",
+            detail=str(exc),
+        )
 
 
 def _declared_routing_onset(
@@ -5809,19 +5818,53 @@ def _antoine_trace_onset(
     return None
 
 
+class _SourceRailUnavailable(Exception):
+    """The Build A source rail could not be read. Onset stays typed."""
+
+
+@lru_cache(maxsize=1)
+def _trace_vapour_carrier_formulas() -> frozenset[str]:
+    """First-batch carrier formulas from the demand manifest.
+
+    Membership is this set. It does not open ``data/literature/compilations``.
+    A sparse seat can refuse a non-trace species without that directory.
+    """
+
+    from simulator.vapour_rail.channel_generator import (
+        FIRST_BATCH_ELEMENTS,
+        demand_pairs_for_element,
+        load_demand_manifest,
+    )
+    from simulator.vapour_rail.stoich import strip_phase
+
+    manifest = load_demand_manifest()
+    formulas: set[str] = set()
+    for element in FIRST_BATCH_ELEMENTS:
+        for pair in demand_pairs_for_element(element, manifest=manifest):
+            formula = strip_phase(
+                str(pair.get("formula") or pair.get("carrier") or "")
+            )
+            if formula:
+                formulas.add(formula)
+    return frozenset(formulas)
+
+
 @lru_cache(maxsize=1)
 def _trace_vapour_carrier_sources() -> dict[str, str | None]:
     """Carrier formula → gas compilation the Build A channel selected.
 
-    The first channel wins when two elements share a formula. The cache
-    is the channel index; callers do not reload the rail per species.
+    The first channel wins when two elements share a formula. Callers
+    that only need membership use ``_trace_vapour_carrier_formulas``.
     """
 
     from simulator.vapour_rail.channel_generator import generate_first_batch
     from simulator.vapour_rail.source_rail import load_source_rail
     from simulator.vapour_rail.stoich import strip_phase
 
-    batch = generate_first_batch(rail=load_source_rail())
+    try:
+        batch = generate_first_batch(rail=load_source_rail())
+    except (OSError, ValueError, RuntimeError) as exc:
+        raise _SourceRailUnavailable(str(exc)) from exc
     sources: dict[str, str | None] = {}
     for channel in batch.channels:
         formula = strip_phase(channel.carrier)
@@ -5851,8 +5894,13 @@ def _thermo_saturation_onset(
         TabulatedGibbsConventionError,
     )
 
-    preferred = _trace_vapour_carrier_sources().get(species)
-    rail = load_source_rail()
+    try:
+        preferred = _trace_vapour_carrier_sources().get(species)
+        rail = load_source_rail()
+    except _SourceRailUnavailable:
+        raise
+    except (OSError, ValueError, RuntimeError) as exc:
+        raise _SourceRailUnavailable(str(exc)) from exc
     source_order: list[str] = []
     if preferred:
         source_order.append(preferred)
