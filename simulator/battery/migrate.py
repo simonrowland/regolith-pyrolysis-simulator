@@ -7118,6 +7118,9 @@ class SourceSelection:
     reason: str | None = None
     unused_ancillary: tuple[str, ...] = ()
     condition_ranges: tuple[tuple[str, Decimal, Decimal], ...] = ()
+    # b-686: an exact reduction of printed numbers into the declared quantity
+    # (relation, ((printed name, printed amount), ...)). None = read as printed.
+    reduction: tuple[str, tuple[tuple[str, Decimal], ...]] | None = None
 
     @property
     def available(self) -> bool:
@@ -7549,6 +7552,188 @@ def _interval_selection(
     )
 
 
+# ---------------------------------------------------------------------------
+# b-686: Fe3+/Fe2+ under the EXISTING Quantity.FE3_FE2_RATIO (no new quantity).
+#
+# The scored variable is the cation ratio R = n(Fe3+)/n(Fe2+) (controller
+# ruling 2026-10-03; chemistry plan r13 IV.7). Sources print the redox state
+# in two other forms. Both reductions are exact and model-free, so the row is
+# measured_reduced, the relation is recorded, and the printed numbers are
+# kept as the derivation's parameters (the printed parent).
+#
+# (1) Ferric fraction r = Fe3+/sum Fe = n3/(n2 + n3) (XANES, Moessbauer):
+#         n3 = r (n2 + n3)  =>  n3 (1 - r) = r n2  =>  R = r/(1 - r).
+#     Defined only for 0 < r < 1: r = 1 leaves no Fe2+ (R infinite) and r = 0
+#     gives R = 0, outside the log10 metric domain. Both are refused with a
+#     reason, never clipped.
+# (2) Kress-style oxide wt % of ONE analysis, w3 = wt % Fe2O3, w2 = wt % FeO
+#     (Fe2O3 printed as such, not FeO* total iron). Per 100 g: n(Fe2O3) =
+#     w3/M(Fe2O3), n(FeO) = w2/M(FeO); each Fe2O3 carries two Fe3+ and each
+#     FeO one Fe2+, so
+#         R = 2 (w3/M(Fe2O3))/(w2/M(FeO)) = (2 M(FeO)/M(Fe2O3)) w3/w2.
+#     The molar masses come from the ONE oxide table, oxide_molar_mass()
+#     (simulator.state.MOLAR_MASS: FeO 71.844, Fe2O3 159.687 g/mol), so the
+#     factor is 2 x 71.844/159.687 = 0.89981 (the ruling's 159.688 =
+#     2 x 55.845 + 3 x 15.9994 gives 0.89980; the two differ by 6e-6
+#     relative, far below any printed wt % precision). Requires w3 > 0 and
+#     w2 > 0.
+#
+# A ratio printed directly (fe3_fe2_ratio / Fe3_over_Fe2) is read as printed.
+# Model-specific recastings (e.g. Kress 1991's oxide-mole-fraction ratio)
+# belong on the prediction side, never here.
+# ---------------------------------------------------------------------------
+FE3_FE2_RATIO_PRINTED_FIELDS: tuple[str, ...] = ("fe3_fe2_ratio", "Fe3_over_Fe2")
+FERRIC_FRACTION_FIELDS: tuple[str, ...] = ("Fe3_over_FeT", "Fe3_over_sum_Fe")
+KRESS_FE2O3_WT_PCT_FIELD = "Fe2O3_wt_pct"
+KRESS_FEO_WT_PCT_FIELD = "FeO_wt_pct"
+FERRIC_FRACTION_RELATION = "fe3_fe2_ratio = r/(1 - r); r = Fe3+/sum Fe as printed"
+
+
+def kress_wt_pct_relation() -> str:
+    """The recorded relation, with the molar masses actually used."""
+
+    m3, m2 = oxide_molar_mass("Fe2O3"), oxide_molar_mass("FeO")
+    factor = (Decimal(2) * m2 / m3).quantize(Decimal("0.0001"))
+    return (
+        f"fe3_fe2_ratio = 2 (w_Fe2O3/{m3})/(w_FeO/{m2}) = {factor} w_Fe2O3/w_FeO; "
+        "oxide wt % as printed; molar masses from oxide_molar_mass"
+    )
+
+
+def fe3_fe2_ratio_from_ferric_fraction(r: Decimal) -> Decimal | None:
+    """R = r/(1 - r) for printed Fe3+/sum Fe; None outside 0 < r < 1."""
+
+    if not r.is_finite() or r <= 0 or r >= 1:
+        return None
+    return r / (Decimal(1) - r)
+
+
+def fe3_fe2_ratio_from_oxide_wt_pct(w_fe2o3: Decimal, w_feo: Decimal) -> Decimal | None:
+    """R = 2 (w3/M(Fe2O3))/(w2/M(FeO)); None unless both are finite and > 0."""
+
+    if not (w_fe2o3.is_finite() and w_feo.is_finite()) or w_fe2o3 <= 0 or w_feo <= 0:
+        return None
+    return (
+        Decimal(2) * (w_fe2o3 / oxide_molar_mass("Fe2O3"))
+        / (w_feo / oxide_molar_mass("FeO"))
+    )
+
+
+def _fe3_fe2_ratio_selection(
+    payload: Mapping[str, Any],
+    condition_ranges: tuple[tuple[str, Decimal, Decimal], ...],
+) -> SourceSelection | None:
+    """Select fe3_fe2_ratio from a printed ratio, ferric fraction, or oxide wt %."""
+
+    for key in FE3_FE2_RATIO_PRINTED_FIELDS:
+        if key not in payload:
+            continue
+        amount = _numeric_field(payload, key)
+        if amount is None:
+            return _unavailable_selection(
+                f"printed field {key} is not numeric: {payload[key]!r}",
+                condition_ranges=condition_ranges,
+                unused_ancillary=_unused_ancillary(payload, key),
+                field_name=key,
+            )
+        return _point_selection(amount, key, "identity", payload, condition_ranges)
+    for key in FERRIC_FRACTION_FIELDS:
+        if key not in payload:
+            continue
+        r = _numeric_field(payload, key)
+        ratio = None if r is None else fe3_fe2_ratio_from_ferric_fraction(r)
+        if ratio is None:
+            return _unavailable_selection(
+                f"printed Fe3+/sum Fe {key}={payload[key]!r} is not a fraction in (0, 1); "
+                "fe3_fe2_ratio = r/(1 - r) is undefined",
+                condition_ranges=condition_ranges,
+                unused_ancillary=_unused_ancillary(payload, key),
+                field_name=key,
+            )
+        selection = _point_selection(
+            ratio, key, "ferric_fraction_to_fe3_fe2_ratio", payload, condition_ranges
+        )
+        return replace(selection, reduction=(FERRIC_FRACTION_RELATION, ((key, r),)))
+    if KRESS_FE2O3_WT_PCT_FIELD in payload or KRESS_FEO_WT_PCT_FIELD in payload:
+        if KRESS_FE2O3_WT_PCT_FIELD not in payload or KRESS_FEO_WT_PCT_FIELD not in payload:
+            # A lone FeO or Fe2O3 is a composition entry, not a redox statement.
+            return None
+        w3 = _numeric_field(payload, KRESS_FE2O3_WT_PCT_FIELD)
+        w2 = _numeric_field(payload, KRESS_FEO_WT_PCT_FIELD)
+        ratio = (
+            None if w3 is None or w2 is None else fe3_fe2_ratio_from_oxide_wt_pct(w3, w2)
+        )
+        if ratio is None:
+            return _unavailable_selection(
+                f"printed {KRESS_FE2O3_WT_PCT_FIELD}={payload[KRESS_FE2O3_WT_PCT_FIELD]!r} "
+                f"and {KRESS_FEO_WT_PCT_FIELD}={payload[KRESS_FEO_WT_PCT_FIELD]!r} must both "
+                "be positive numbers; fe3_fe2_ratio is undefined",
+                condition_ranges=condition_ranges,
+                unused_ancillary=_unused_ancillary(payload, KRESS_FE2O3_WT_PCT_FIELD),
+                field_name=KRESS_FE2O3_WT_PCT_FIELD,
+            )
+        selection = _point_selection(
+            ratio,
+            KRESS_FE2O3_WT_PCT_FIELD,
+            "oxide_wt_pct_to_fe3_fe2_ratio",
+            payload,
+            condition_ranges,
+        )
+        return replace(
+            selection,
+            reduction=(
+                kress_wt_pct_relation(),
+                ((KRESS_FE2O3_WT_PCT_FIELD, w3), (KRESS_FEO_WT_PCT_FIELD, w2)),
+            ),
+        )
+    return None
+
+
+def fe3_fe2_ratio_reduction(
+    selection: SourceSelection,
+    evidence: Evidence,
+    locator: Locator | None,
+    read_from: str,
+    source_derivation: Derivation | None = None,
+) -> tuple[Evidence, Derivation | None]:
+    """Evidence and derivation for a selection that reduced printed numbers.
+
+    The printed inputs are kept as ``original_<field>`` parameters at the
+    row's locator. A measured printed value becomes measured_reduced (the
+    original method class is retained); a non-measured one keeps its class.
+    """
+
+    if selection.reduction is None or not selection.available:
+        return evidence, source_derivation
+    relation, printed = selection.reduction
+    parameters = tuple(
+        (f"original_{name}", Located(State.of(amount), locator=locator))
+        for name, amount in printed
+    )
+    if source_derivation is None:
+        derivation = Derivation(
+            relation=relation,
+            inputs=(read_from,),
+            parameters=parameters,
+            output_unit="dimensionless",
+        )
+    else:
+        derivation = replace(
+            source_derivation,
+            relation=f"{source_derivation.relation}; {relation}",
+            parameters=source_derivation.parameters + parameters,
+            output_unit="dimensionless",
+        )
+    if evidence.class_.is_value and evidence.class_.value in MEASURED_EVIDENCE:
+        evidence = replace(
+            evidence,
+            class_=State.of(EvidenceClass.MEASURED_REDUCED),
+            original_method_class=evidence.original_method_class
+            or evidence.class_.value.value,
+        )
+    return evidence, derivation
+
+
 def _selection_from_named_field(
     payload: Mapping[str, Any],
     q_token: Quantity,
@@ -7629,6 +7814,8 @@ def _selection_from_named_field(
                 unit_trail=trail or "identity",
             )
         return None
+    if q_token is Quantity.FE3_FE2_RATIO:
+        return _fe3_fe2_ratio_selection(payload, condition_ranges)
     for key in QUANTITY_SOURCE_FIELDS.get(q_token, ()):
         if key not in payload:
             continue
@@ -11780,6 +11967,14 @@ class Migrator:
                 value_conversion,
                 choose_read_from(work, locator),
             )
+        if value_sel.reduction is not None:
+            evidence, value_derivation = fe3_fe2_ratio_reduction(
+                value_sel,
+                evidence,
+                locator,
+                choose_read_from(work, locator),
+                source_derivation,
+            )
         if omitted_components:
             ident_kwargs["composition"] = State.unknown(
                 partial_composition_unknown_reason(omitted_components)
@@ -12925,6 +13120,10 @@ class Migrator:
         if source_derivation is not None:
             derivation = _merge_source_conversion_derivation(
                 source_derivation, converted, read_from
+            )
+        if value_sel is not None and value_sel.reduction is not None:
+            evidence, derivation = fe3_fe2_ratio_reduction(
+                value_sel, evidence, point_locator, read_from, source_derivation
             )
         if phase_provenance is not None and emitted.kind is not ValueKind.UNAVAILABLE:
             if derivation is None:
