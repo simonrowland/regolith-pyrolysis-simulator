@@ -38,6 +38,8 @@ def test_route_flags_rb_and_cs_without_zeroing_or_venting() -> None:
         assert refusal["mass_disposition"] == "flagged_uncaptured_condensable"
         assert refusal["authoritative_for_terminal_offgas"] is False
         assert refusal["remaining_mass_kg_hr"] == flux.species_kg_hr[species]
+        assert "lower bound" in refusal["activity_premise"]
+        assert "co-condensation is not modelled" in refusal["activity_premise"]
         assert result.condensation_authority_by_species[species][
             "hot_train_applicability"
         ] == "uncaptured_condensable"

@@ -5158,6 +5158,10 @@ def _record_trace_vapour_disposition(
         "mass_disposition": "flagged_uncaptured_condensable",
         "authoritative_for_terminal_offgas": False,
         "authoritative_for_condensation": False,
+        "activity_premise": (
+            "pure condensate at unit activity is a lower bound on the "
+            "onset temperature; co-condensation is not modelled"
+        ),
         "input_mass_kg_hr": rate_kg_hr,
         "remaining_mass_kg_hr": rate_kg_hr,
         "condensed_mass_kg_hr": 0.0,
@@ -5569,6 +5573,11 @@ def trace_vapour_condensation_onset(
 
     ``K`` is ``reaction_equilibrium_constant``. Each condensate is a
     pure phase, so its activity is 1 and does not appear in ``K``.
+    That unit activity makes the onset a lower bound on the true onset
+    temperature. Co-condensation is not modelled: Rb and Cs with K into
+    the stage-4 alkali condensate, and Ga, In, Ge, Sn, and Cu into the
+    stage-1 Fe condensate. ``uncaptured_condensable`` for Rb and Cs is
+    that pure-phase statement.
     ``P°`` is ``STANDARD_PRESSURE_PA`` (1 bar = 100000 Pa). Invert
     ``p_sat(T) = p_local`` by bisection on the temperature overlap.
     A partial pressure outside that image is unavailable; the ends are
