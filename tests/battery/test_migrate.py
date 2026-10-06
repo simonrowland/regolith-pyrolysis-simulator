@@ -3225,6 +3225,24 @@ def _census_expected_point(item: dict, q_token: str | None, units: str):
         }:
             return amount / as_decimal("100")
         return amount
+    if q_token == "H_minus_H298":
+        # Heat-content series (first adopter: abdul-2023-cao-sio2-calphad Tables 3-4,
+        # printed in J per mol of formula unit). The store keeps H(T)-H(298.15) in kJ/mol
+        # (migrate derivation J_to_kJ_exact), so a J/mol cell is divided by exactly 1000:
+        # 147,433.0 J/mol / 1000 = 147.433 kJ/mol. Any other unit is not inferred.
+        for key in ("enthalpy_increment", "H_minus_H298"):
+            if key not in item:
+                continue
+            amount = _num(item.get(key))
+            if amount is None:
+                return None
+            unit = str(units or "").strip().lower().replace(" ", "")
+            if unit in {"j/mol", "jmol-1", "jmol^-1"}:
+                return amount / as_decimal("1000")
+            if unit in {"kj/mol", "kjmol-1", "kjmol^-1"}:
+                return amount
+            return None
+        return None
     if q_token == "delta_fG":
         if "delta_fG" in item:
             return _num(item.get("delta_fG"))
@@ -3524,7 +3542,14 @@ def test_j01_store_census_series_numeric_matches_declared_field() -> None:
     # O'Neill & Eggins 2002 adds 91 activity_coefficient cells: n_numeric 1668->1759.
     # t-1122 adds the eight printed residue component points above: 1759->1767.
     # t-1152 adds 110 printed residue component cells: 1767->1877.
-    assert n_numeric == 1877, (n_numeric, census, n_unavailable)
+    # Re-pinned for item24 Abdul 2023 (Cem. Concr. Res. 173, 107309): Table 3 rankinite
+    # (7) and Table 4 belite (6) printed heat contents, J/mol per formula unit, stored
+    # as kJ/mol (exact /1000). Per-source delta abdul-2023-cao-sio2-calphad 0->13;
+    # H_minus_H298 0->13; n_numeric 1877->1890 (1759 + 8 + 110 + 13). The census now
+    # reads H_minus_H298; no check was relaxed and mismatches stay 0.
+    assert census.get("H_minus_H298") == 13
+    assert per_source.get("abdul-2023-cao-sio2-calphad") == {"H_minus_H298": 13}
+    assert n_numeric == 1890, (n_numeric, census, n_unavailable)
 
 
 def test_residue_point_condition_values_keep_their_printed_types() -> None:
