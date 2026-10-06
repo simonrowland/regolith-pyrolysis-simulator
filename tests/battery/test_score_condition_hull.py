@@ -276,7 +276,7 @@ def test_streamed_report_prints_condition_hull_per_rail_and_engine() -> None:
     assert rows[1:] == [HULL_MELT, HULL_VAPOUR, HULL_COMPILATION]
 
 
-def test_report_only_render_prints_the_same_measured_hull() -> None:
+def test_report_only_render_prints_the_same_hull_as_the_streamed_report() -> None:
     from simulator.battery.score import render_score_report_from_payloads, residual_to_plain
 
     context, residuals = hull_fixture()
@@ -294,7 +294,10 @@ def test_report_only_render_prints_the_same_measured_hull() -> None:
         observations=context.observations,
         origins=context.origins,
     )
-    assert _hull_section(report)[1:] == [HULL_MELT, HULL_VAPOUR]
+    # --report-only must print the compilation-tier hull too (ROR-t1110 P1):
+    # the two writers' hull sections are the same, row for row.
+    assert _hull_section(report)[1:] == [HULL_MELT, HULL_VAPOUR, HULL_COMPILATION]
+    assert _hull_section(report) == _hull_section(_report(context, residuals))
 
 
 def test_hull_counts_missing_conditions_and_never_imputes() -> None:
@@ -363,6 +366,7 @@ def test_flagged_stratum_gets_its_own_hull_and_leaves_headline_alone() -> None:
         )
     )
     assert stratum in report_only
+    assert report_only == streamed
 
 
 def test_compilation_point_temperature_reads_only_printed_cell_ids() -> None:
@@ -385,3 +389,13 @@ def test_hull_is_presentation_only_no_residual_reads_it() -> None:
     assert aggregate.headline_hulls  # collected
     blob = json.dumps(aggregate.summary_payload(STAMP), sort_keys=True)
     assert "hull" not in blob
+
+
+def test_hull_text_states_total_pressure_and_compilation_pooling() -> None:
+    # ROR-t1110 P2: a JANAF/USGS table stores standard_pressure_Pa (1 bar), not
+    # a total pressure, so its total P cell is "— (0)"; and the compilation
+    # row pools every table on the rail x engine. The section says both.
+    context, residuals = hull_fixture()
+    report = _report(context, residuals)
+    assert "standard-state pressure (standard_pressure_Pa) is not a total pressure" in report
+    assert "A compilation row pools every compilation table on that rail × engine" in report
