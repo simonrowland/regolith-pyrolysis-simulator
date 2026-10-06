@@ -26,6 +26,11 @@ SKIP = migrate._WALK_SKIP_KEYS
 
 
 def fingerprint(raw: object) -> tuple[tuple[str, str], ...] | None:
+    """Unwrap Located/State/Composition, then defer to the migrator's owner.
+
+    Map identity has one owner, ``migrate._printed_fingerprint`` (ROR-b718
+    hygiene: no second copy of the equality rule in this script).
+    """
     if isinstance(raw, migrate.Located):
         if not raw.state.is_value:
             return None
@@ -36,18 +41,7 @@ def fingerprint(raw: object) -> tuple[tuple[str, str], ...] | None:
         raw = raw.value
     if isinstance(raw, migrate.Composition):
         raw = raw.as_map()
-    if isinstance(raw, Mapping) and isinstance(raw.get("components"), Mapping):
-        raw = raw["components"]
-    if not isinstance(raw, Mapping):
-        return None
-    pairs = []
-    for key, value in raw.items():
-        if key in SKIP or key == "locator":
-            continue
-        number = migrate._as_dec_or_none(value)
-        if number is not None:
-            pairs.append((str(key), migrate._dec_str(number)))
-    return tuple(sorted(pairs)) if pairs else None
+    return migrate._printed_fingerprint(raw)
 
 
 def locator_key(locator: object) -> tuple[tuple[str, str], ...] | None:
@@ -85,14 +79,8 @@ def map_nodes(roots, vocabulary, fallback_locator):
             for key, value in obj.items():
                 name = str(key)
                 if name in names and isinstance(value, Mapping):
-                    comps = {
-                        str(k): v for k, v in value.items()
-                        if k not in SKIP and k != "locator"
-                        and migrate._as_dec_or_none(v) is not None
-                    }
-                    if comps and loc is not None:
-                        fp = tuple(sorted((k, migrate._dec_str(migrate.as_decimal(v)))
-                                          for k, v in comps.items()))
+                    fp = migrate._printed_fingerprint(value)
+                    if fp is not None and loc is not None:
                         found.append({
                             "fingerprint": fp,
                             "locator": locator_key(loc),

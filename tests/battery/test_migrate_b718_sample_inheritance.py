@@ -442,3 +442,31 @@ def test_real_hashimoto_depleted_rows_do_not_resolve_starting_charge() -> None:
     assert start.experiment_id.endswith("::experiment::fcmas-free-evap-series")
     norm = normalized_composition(result.experiments[start.experiment_id], None, start)
     assert norm.selected is not None
+
+
+def test_real_hashimoto_class_b1_geometry_rows_share_declared_start() -> None:
+    """ROR note: the Fe class-B1 row sat alone on an auto experiment while the
+    Mg and SiO class-B1 rows (same preform, same Table 1 map) were declared.
+    All three now resolve the declared FCMAS start from one experiment."""
+
+    result = _migrate_real("kems-015-hashimoto-1983")
+    expected = {"SiO2": "35.43", "Al2O3": "3.16", "FeO": "35.04", "MgO": "23.84", "CaO": "2.53"}
+    for local_id in (
+        "hashimoto_1983_fe_geometry_class_b1",
+        "hashimoto_1983_mg_geometry_class_b1",
+        "hashimoto_1983_sio_geometry_class_b1",
+    ):
+        observation = result.observations[f"kems-015-hashimoto-1983::{local_id}"]
+        assert observation.experiment_id.endswith(
+            "::experiment::fcmas-free-evap-series"
+        ), (local_id, observation.experiment_id)
+        experiment = result.experiments[observation.experiment_id]
+        printed = experiment.sample.printed_composition
+        assert printed is not None and printed.state.is_value
+        assert {k: str(as_decimal(v)) for k, v in printed.state.value.items()} == expected
+        norm = normalized_composition(experiment, None, observation)
+        assert norm.selected is not None
+        assert norm.selected.route == "normalized_printed_composition", (
+            local_id,
+            norm.selected.route,
+        )
