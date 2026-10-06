@@ -5367,6 +5367,36 @@ def authoritative_condensation_temperature(
     }
 
 
+def _bisect_monotone_threshold(
+    low: float,
+    high: float,
+    *,
+    target: float,
+    increasing: bool,
+    steps: int,
+    value_at,
+) -> float:
+    """Invert a monotone ``value_at`` on a bracket that already contains ``target``.
+
+    Shared by the Antoine dewpoint and the rail saturation onset. A
+    ``None`` sample stops the search and returns that midpoint, which is
+    the Antoine inverter's certified-surface failure. The rail onset
+    raises instead of returning ``None`` when a sample has no phase.
+    """
+
+    midpoint = (low + high) / 2.0
+    for _ in range(steps):
+        midpoint = (low + high) / 2.0
+        value = value_at(midpoint)
+        if value is None:
+            return midpoint
+        if (float(value) < target) == increasing:
+            low = midpoint
+        else:
+            high = midpoint
+    return (low + high) / 2.0
+
+
 def antoine_dew_temperature_diagnostic(
     species: str,
     partial_pressure_pa: float,
@@ -5439,22 +5469,25 @@ def antoine_dew_temperature_diagnostic(
             "routing_authority": False,
         }
     increasing = p_high > p_low
-    for _ in range(80):
-        midpoint = (low + high) / 2.0
-        pressure = _antoine_psat_pa(
+
+    def _antoine_pressure(temperature_K: float) -> float | None:
+        return _antoine_psat_pa(
             species,
-            midpoint,
+            temperature_K,
             vapor_pressure_data=vapor_pressure_data,
         )
-        if pressure is None:
-            break
-        if (pressure < target) == increasing:
-            low = midpoint
-        else:
-            high = midpoint
+
+    temperature_K = _bisect_monotone_threshold(
+        low,
+        high,
+        target=target,
+        increasing=increasing,
+        steps=80,
+        value_at=_antoine_pressure,
+    )
     return {
         "status": "diagnostic_only",
-        "temperature_K": (low + high) / 2.0,
+        "temperature_K": temperature_K,
         "partial_pressure_Pa": target,
         "valid_range_K": [min(item[0] for item in candidate_ranges), max(item[1] for item in candidate_ranges)],
         "provenance": "existing_condensation_antoine_surface",
@@ -5506,32 +5539,42 @@ def trace_vapour_condensation_onset(
 
     Derivation
     ----------
-    Premise: a trace vapour condenses as itself. The receiving phase is
-    the condensed form of that vapour formula (the stable liquid or
-    solid), not the parent-oxide evaporation reaction. Equilibrium is
-    ``M(cond) <=> M(g)``. Species already named by ``DESIGNATED_STAGE``
-    or ``CONDENSATION_TEMPS_C`` keep that declared routing temperature;
-    this function does not replace it with a dewpoint. Where the vapour
-    has a certified Antoine wall curve,
+    Premise: the receiving phase is a condensed assemblage in the same
+    compilation that the gas can reach by one balanced reaction. That
+    is the gas formula when a condensed record of that formula exists,
+    a formula-unit multiple (``VO2`` → ½ ``V2O4``, ``Cs2`` → 2 ``Cs``),
+    or an O-conserving disproportionation (``GeO`` → ½ ``Ge`` +
+    ½ ``GeO2``). The stable assemblage is the reaction with the highest
+    saturation temperature: it condenses first on cooling. The reaction
+    is written per molecule of gas, ``Σ ν_i Cond_i <=> Gas(g)``.
+    Species already named by ``DESIGNATED_STAGE`` or
+    ``CONDENSATION_TEMPS_C`` keep that declared routing temperature.
+    Where the vapour has a certified Antoine wall curve,
     ``antoine_dew_temperature_diagnostic`` supplies the temperature.
-    Otherwise both Gibbs functions are the Build A source-rail records
-    for one compilation: the gas record the channel selected, and the
-    condensed phase of that same compilation. Compilations are never
-    mixed. There is no second "first stage below dewpoint" rule; the
-    landing stage below is read from this onset.
+    Otherwise both sides are Build A source-rail records of one
+    compilation: the gas the channel selected, and condensed formulas
+    of that same compilation. Compilations are never mixed inside one
+    reaction. A receiver that balances only by exchanging O2 is not
+    given a temperature; its status is
+    ``receiving_phase_requires_local_pO2`` and it names the phase.
+    ``no_receiving_condensed_phase`` remains when that compilation has
+    no O-conserving receiver. There is no second "first stage below
+    dewpoint" rule; the landing stage below is read from this onset.
 
     Algebra::
 
-        K(T) = P_sat / P° = exp(-(G_gas(T) - G_cond(T)) / (R T))
-        P_sat(T) = P° * K(T)
+        K(T) = p_sat / P° = exp(-ΔG°(T) / (R T))
+        ΔG° / (R T) = G_gas/(R T) - Σ ν_i G_i/(R T)
+        p_sat(T) = P° * K(T)
 
-    ``K`` is ``reaction_equilibrium_constant`` on the two rail states.
+    ``K`` is ``reaction_equilibrium_constant``. Each condensate is a
+    pure phase, so its activity is 1 and does not appear in ``K``.
     ``P°`` is ``STANDARD_PRESSURE_PA`` (1 bar = 100000 Pa). Invert
-    ``P_sat(T) = p_local`` by bisection on the temperature overlap of
-    the gas band and a condensed band. A partial pressure outside that
-    image is unavailable; the ends are not clamped. At each temperature
-    the receiving phase is the lower-G record among the first liquid
-    and the first solid of that compilation whose band covers T.
+    ``p_sat(T) = p_local`` by bisection on the temperature overlap.
+    A partial pressure outside that image is unavailable; the ends are
+    not clamped. At each temperature every condensed formula contributes
+    its lowest-G record whose band covers T, duplicate tables of one
+    state included.
 
     The landing stage is the first train stage in flow order, after the
     hot duct, whose lower temperature edge is at or below the onset.
@@ -5546,7 +5589,8 @@ def trace_vapour_condensation_onset(
     Sanity: JANAF Pb liquid (Pb-003) marks the liquid/ideal-gas
     transition at fugacity 1 bar and 2019.022 K. The nist-janaf-4th Pb
     gas and liquid, evaluated at ``P° = 100000 Pa``, invert to that
-    temperature.
+    temperature. GeO has no condensed GeO record; ½ Ge + ½ GeO2 on the
+    channel's NASA compilation inverts to about 779 °C at 100 Pa.
     """
 
     declared = _declared_routing_onset(
@@ -5661,6 +5705,7 @@ def _onset_unavailable(
     detail: str,
     method: str = "unavailable",
     source_id: str | None = None,
+    receiving_phase: str | None = None,
 ) -> TraceVapourCondensationOnset:
     return TraceVapourCondensationOnset(
         species=str(species),
@@ -5672,7 +5717,7 @@ def _onset_unavailable(
         wall_landing_stage_number=None,
         hot_train_applicability="unavailable",
         disposition="unavailable",
-        receiving_phase=None,
+        receiving_phase=receiving_phase,
         source_id=source_id,
         status=status,
         detail=detail,
@@ -5873,26 +5918,162 @@ def _trace_vapour_carrier_sources() -> dict[str, str | None]:
     return sources
 
 
+_RECEIVING_METAL_COUNTS = range(1, 7)
+_RECEIVING_OXYGEN_COUNTS = range(0, 13)
+_REACTION_NU_TOLERANCE = 1e-8
+
+
+def trace_vapour_saturation_pressure_pa(
+    species: str,
+    temperature_K: float,
+) -> float | None:
+    """Lowest O-conserving saturation pressure at ``temperature_K``.
+
+    The reactions are the ones ``trace_vapour_condensation_onset`` inverts.
+    The minimum is the stable assemblage at this temperature. ``None``
+    means this species has no rail curve here (declared routing, not a
+    trace carrier, or the rail could not be read).
+    """
+
+    try:
+        temperature = float(temperature_K)
+    except (TypeError, ValueError):
+        return None
+    if (
+        not math.isfinite(temperature)
+        or temperature <= 0.0
+        or has_declared_routing(species)
+        or species not in _trace_vapour_carrier_formulas()
+    ):
+        return None
+    try:
+        bundle = _receiving_bundle(species)
+    except _SourceRailUnavailable:
+        return None
+    if bundle is None:
+        return None
+    _gas, present, reactions, _source_id, _differs = bundle
+    return _lowest_saturation_pressure_pa(
+        reactions,
+        _gas,
+        present,
+        temperature,
+    )
+
+
 def _thermo_saturation_onset(
     species: str,
     pressure_pa: float,
     *,
     stages: Sequence[CondensationStage] | None,
 ) -> TraceVapourCondensationOnset:
-    from simulator.vapour_rail.nasa_cea import (
-        NasaCeaError,
-        reaction_equilibrium_constant,
+    try:
+        bundle = _receiving_bundle(species)
+    except _SourceRailUnavailable:
+        raise
+    if bundle is None:
+        return _onset_unavailable(
+            species,
+            partial_pressure_pa=pressure_pa,
+            status="no_receiving_condensed_phase",
+            method="thermo_saturation",
+            source_id=_trace_channel_source_id(species),
+            detail=(
+                "no single compilation has an O-conserving condensed "
+                "receiver for this gas"
+            ),
+        )
+    gas, present, reactions, source_id, differs = bundle
+    if not reactions:
+        named = _nearest_o2_coupled_formula(species, present)
+        if named is not None:
+            return _onset_unavailable(
+                species,
+                partial_pressure_pa=pressure_pa,
+                status="receiving_phase_requires_local_pO2",
+                method="thermo_saturation",
+                source_id=source_id,
+                receiving_phase=named,
+                detail=(
+                    f"{named} balances {species} only by exchanging O2; "
+                    "the onset needs the local oxygen pressure"
+                ),
+            )
+        return _onset_unavailable(
+            species,
+            partial_pressure_pa=pressure_pa,
+            status="no_receiving_condensed_phase",
+            method="thermo_saturation",
+            source_id=source_id,
+            detail=(
+                "no single compilation has an O-conserving condensed "
+                "receiver for this gas"
+            ),
+        )
+    best_temperature: float | None = None
+    best_label: str | None = None
+    domain_failure: str | None = None
+    for reaction in reactions:
+        solved, failure = _reaction_onset_temperature(
+            reaction,
+            gas,
+            present,
+            pressure_pa,
+        )
+        if solved is None:
+            domain_failure = failure or domain_failure
+            continue
+        if best_temperature is None or solved[0] > best_temperature:
+            best_temperature = solved[0]
+            best_label = solved[1]
+    if best_temperature is None or best_label is None:
+        named = _nearest_o2_coupled_formula(species, present)
+        detail = domain_failure or (
+            "flowing partial pressure is outside the saturation "
+            "curve on the overlapping band"
+        )
+        if named is not None:
+            detail = f"{detail}; nearest O2-coupled phase {named}"
+        return _onset_unavailable(
+            species,
+            partial_pressure_pa=pressure_pa,
+            status="pressure_outside_saturation_domain",
+            method="thermo_saturation",
+            source_id=source_id,
+            receiving_phase=_reaction_formula_label(reactions[0]),
+            detail=detail,
+        )
+    detail = "source-rail G(T) saturation at the flowing partial pressure"
+    if differs:
+        detail = f"{detail}; source_differs_from_channel"
+    return _onset_from_temperature(
+        species,
+        pressure_pa,
+        best_temperature,
+        method="thermo_saturation",
+        stages=stages,
+        receiving_phase=best_label,
+        source_id=source_id,
+        detail=detail,
     )
-    from simulator.vapour_rail.source_rail import (
-        SOURCE_ORDER,
-        STANDARD_PRESSURE_PA,
-        SourceCoverageGap,
-        load_source_rail,
-    )
-    from simulator.vapour_rail.tabulated_gibbs import (
-        TabulatedDomainError,
-        TabulatedGibbsConventionError,
-    )
+
+
+def _trace_channel_source_id(species: str) -> str | None:
+    try:
+        return _trace_vapour_carrier_sources().get(species)
+    except _SourceRailUnavailable:
+        return None
+
+
+def _receiving_bundle(species: str):
+    """Gas record, condensed formulas, and O-conserving reactions.
+
+    The channel's compilation is tried first. A later compilation is
+    used only when that one has the gas and no condensed formula of the
+    metal, and the result is marked ``source_differs_from_channel``.
+    """
+
+    from simulator.vapour_rail.source_rail import SOURCE_ORDER, load_source_rail
 
     try:
         preferred = _trace_vapour_carrier_sources().get(species)
@@ -5907,191 +6088,372 @@ def _thermo_saturation_onset(
     for source_id in SOURCE_ORDER:
         if source_id not in source_order:
             source_order.append(source_id)
-    gas = None
-    condensed: list[Any] = []
-    source_id: str | None = None
-    for candidate_source in source_order:
+    for candidate in source_order:
         gases = [
             record
             for record in rail.records_for(species, "gas")
-            if record.source_id == candidate_source
+            if record.source_id == candidate
         ]
-        phases: list[Any] = []
-        for state in _CONDENSED_STANDARD_STATES:
-            phases.extend(
-                record
-                for record in rail.records_for(species, state)
-                if record.source_id == candidate_source
+        if not gases:
+            continue
+        present = _condensed_records_for_metal(rail, species, candidate)
+        if not present:
+            continue
+        reactions = _o_conserving_reactions(species, present)
+        differs = bool(preferred) and candidate != preferred
+        return gases[0], present, reactions, candidate, differs
+    return None
+
+
+def _condensed_records_for_metal(rail: Any, gas: str, source_id: str) -> dict[str, list[Any]]:
+    counts = _formula_counts(gas)
+    metal = None if counts is None else _sole_metal(counts)
+    if metal is None:
+        return {}
+    present: dict[str, list[Any]] = {}
+    for metal_count in _RECEIVING_METAL_COUNTS:
+        for oxygen_count in _RECEIVING_OXYGEN_COUNTS:
+            formula = _spell_oxide(metal, metal_count, oxygen_count)
+            records: list[Any] = []
+            for state in _CONDENSED_STANDARD_STATES:
+                records.extend(
+                    record
+                    for record in rail.records_for(formula, state)
+                    if record.source_id == source_id
+                )
+            if records:
+                present[formula] = records
+    return present
+
+
+def _o_conserving_reactions(
+    gas: str,
+    present: Mapping[str, Sequence[Any]],
+) -> tuple[tuple[tuple[str, float], ...], ...]:
+    counts = _formula_counts(gas)
+    metal = None if counts is None else _sole_metal(counts)
+    if counts is None or metal is None:
+        return ()
+    metal_count = counts.get(metal, 0)
+    oxygen_count = counts.get("O", 0)
+    phase_counts = {
+        formula: _formula_counts(formula) for formula in present
+    }
+    reactions: list[tuple[tuple[str, float], ...]] = []
+    formulas = list(present)
+    for formula in formulas:
+        phase = phase_counts.get(formula)
+        if phase is None or _sole_metal(phase) != metal:
+            continue
+        condensed_metal = phase.get(metal, 0)
+        if condensed_metal <= 0:
+            continue
+        nu = metal_count / condensed_metal
+        if nu <= _REACTION_NU_TOLERANCE:
+            continue
+        if abs(nu * phase.get("O", 0) - oxygen_count) <= 1e-8:
+            reactions.append(((formula, nu),))
+    for index, left in enumerate(formulas):
+        left_counts = phase_counts.get(left)
+        if left_counts is None or _sole_metal(left_counts) != metal:
+            continue
+        for right in formulas[index + 1 :]:
+            right_counts = phase_counts.get(right)
+            if right_counts is None or _sole_metal(right_counts) != metal:
+                continue
+            solved = _balance_two_condensates(
+                counts,
+                left_counts,
+                right_counts,
+                metal,
             )
-        if gases and phases:
-            gas = gases[0]
-            condensed = phases
-            source_id = candidate_source
-            break
-    if gas is None or source_id is None:
-        return _onset_unavailable(
-            species,
-            partial_pressure_pa=pressure_pa,
-            status="no_receiving_condensed_phase",
-            method="thermo_saturation",
-            source_id=preferred,
-            detail=(
-                "no single compilation tabulates the gas and a condensed "
-                "phase of the same formula"
-            ),
-        )
-    covering = [
-        record
-        for record in condensed
-        if record.T_max_K >= gas.T_min_K and record.T_min_K <= gas.T_max_K
-    ]
-    if not covering:
-        return _onset_unavailable(
-            species,
-            partial_pressure_pa=pressure_pa,
-            status="no_overlapping_band",
-            method="thermo_saturation",
-            source_id=source_id,
-            detail="gas and condensed bands do not overlap",
-        )
-    low = max(gas.T_min_K, min(record.T_min_K for record in covering))
-    high = min(gas.T_max_K, max(record.T_max_K for record in covering))
+            if solved is None:
+                continue
+            reactions.append(((left, solved[0]), (right, solved[1])))
+    return tuple(reactions)
+
+
+def _balance_two_condensates(
+    gas_counts: Mapping[str, int],
+    left_counts: Mapping[str, int],
+    right_counts: Mapping[str, int],
+    metal: str,
+) -> tuple[float, float] | None:
+    metal_gas = gas_counts.get(metal, 0)
+    oxygen_gas = gas_counts.get("O", 0)
+    left_metal = left_counts.get(metal, 0)
+    right_metal = right_counts.get(metal, 0)
+    left_oxygen = left_counts.get("O", 0)
+    right_oxygen = right_counts.get("O", 0)
+    determinant = left_metal * right_oxygen - right_metal * left_oxygen
+    if abs(determinant) < 1e-12:
+        return None
+    nu_left = (
+        metal_gas * right_oxygen - oxygen_gas * right_metal
+    ) / determinant
+    nu_right = (
+        left_metal * oxygen_gas - left_oxygen * metal_gas
+    ) / determinant
+    if nu_left <= _REACTION_NU_TOLERANCE or nu_right <= _REACTION_NU_TOLERANCE:
+        return None
+    return nu_left, nu_right
+
+
+def _nearest_o2_coupled_formula(
+    gas: str,
+    present: Mapping[str, Sequence[Any]],
+) -> str | None:
+    counts = _formula_counts(gas)
+    metal = None if counts is None else _sole_metal(counts)
+    if counts is None or metal is None:
+        return None
+    best_formula: str | None = None
+    best_exchange: float | None = None
+    for formula in present:
+        phase = _formula_counts(formula)
+        if phase is None or _sole_metal(phase) != metal:
+            continue
+        condensed_metal = phase.get(metal, 0)
+        if condensed_metal <= 0:
+            continue
+        nu = counts.get(metal, 0) / condensed_metal
+        oxygen_exchange = (
+            counts.get("O", 0) - nu * phase.get("O", 0)
+        ) / 2.0
+        magnitude = abs(oxygen_exchange)
+        if magnitude <= 1e-8:
+            continue
+        if best_exchange is None or magnitude < best_exchange:
+            best_formula = formula
+            best_exchange = magnitude
+    return best_formula
+
+
+def _reaction_onset_temperature(
+    reaction: Sequence[tuple[str, float]],
+    gas_record: Any,
+    present: Mapping[str, Sequence[Any]],
+    pressure_pa: float,
+) -> tuple[tuple[float, str] | None, str | None]:
+    from simulator.vapour_rail.nasa_cea import NasaCeaError
+    from simulator.vapour_rail.source_rail import SourceCoverageGap
+    from simulator.vapour_rail.tabulated_gibbs import (
+        TabulatedDomainError,
+        TabulatedGibbsConventionError,
+    )
+
+    lows: list[float] = []
+    highs: list[float] = []
+    for formula, _nu in reaction:
+        records = present[formula]
+        lows.append(min(float(record.T_min_K) for record in records))
+        highs.append(max(float(record.T_max_K) for record in records))
+    low = max(float(gas_record.T_min_K), max(lows))
+    high = min(float(gas_record.T_max_K), min(highs))
     if not high > low:
-        return _onset_unavailable(
-            species,
-            partial_pressure_pa=pressure_pa,
-            status="no_overlapping_band",
-            method="thermo_saturation",
-            source_id=source_id,
-            detail="gas and condensed bands do not overlap",
-        )
-
-    def saturation(temperature_K: float) -> tuple[float, Any] | None:
-        phase = _stable_receiving_phase(condensed, temperature_K)
-        if phase is None:
-            return None
-        gas_state = gas.thermo.evaluate(temperature_K)
-        condensed_state = phase.thermo.evaluate(temperature_K)
-        k_eq = reaction_equilibrium_constant(
-            ((1.0, gas_state), (-1.0, condensed_state)),
-            T_K=temperature_K,
-        )
-        return STANDARD_PRESSURE_PA * k_eq, phase
-
-    try:
-        low_point = saturation(low)
-        high_point = saturation(high)
-    except (
+        return None, "gas and condensed bands do not overlap"
+    errors = (
         NasaCeaError,
         TabulatedDomainError,
         TabulatedGibbsConventionError,
         SourceCoverageGap,
         ValueError,
-    ) as exc:
-        return _onset_unavailable(
-            species,
-            partial_pressure_pa=pressure_pa,
-            status="saturation_unavailable",
-            method="thermo_saturation",
-            source_id=source_id,
-            detail=str(exc),
+    )
+
+    def saturation(temperature_K: float) -> float | None:
+        point = _assemblage_saturation_pa(
+            reaction,
+            gas_record,
+            present,
+            temperature_K,
         )
+        if point is None:
+            return None
+        return point[0]
+
+    try:
+        low_pressure = saturation(low)
+        high_pressure = saturation(high)
+    except errors as exc:
+        return None, str(exc)
     if (
-        low_point is None
-        or high_point is None
-        or not math.isfinite(low_point[0])
-        or not math.isfinite(high_point[0])
-        or high_point[0] < low_point[0]
-        or not low_point[0] <= pressure_pa <= high_point[0]
+        low_pressure is None
+        or high_pressure is None
+        or not math.isfinite(low_pressure)
+        or not math.isfinite(high_pressure)
+        or high_pressure < low_pressure
+        or not low_pressure <= pressure_pa <= high_pressure
     ):
-        return _onset_unavailable(
-            species,
-            partial_pressure_pa=pressure_pa,
-            status="pressure_outside_saturation_domain",
-            method="thermo_saturation",
-            source_id=source_id,
-            detail=(
-                "flowing partial pressure is outside the saturation "
-                "curve on the overlapping band"
-            ),
+        return None, (
+            "flowing partial pressure is outside the saturation "
+            "curve on the overlapping band"
         )
-    for _ in range(_ONSET_BISECTION_STEPS):
-        midpoint = (low + high) / 2.0
+
+    class _Gap(Exception):
+        pass
+
+    def value_at(temperature_K: float) -> float:
         try:
-            point = saturation(midpoint)
+            pressure = saturation(temperature_K)
+        except errors as exc:
+            raise _Gap(str(exc)) from exc
+        if pressure is None:
+            raise _Gap(f"no receiving phase covers {temperature_K} K")
+        return pressure
+
+    try:
+        solved = _bisect_monotone_threshold(
+            low,
+            high,
+            target=pressure_pa,
+            increasing=True,
+            steps=_ONSET_BISECTION_STEPS,
+            value_at=value_at,
+        )
+        point = _assemblage_saturation_pa(reaction, gas_record, present, solved)
+    except _Gap as exc:
+        return None, str(exc)
+    except errors as exc:
+        return None, str(exc)
+    if point is None:
+        return None, f"no receiving phase covers {solved} K"
+    return (solved, _reaction_phase_label(reaction, point[1])), None
+
+
+def _lowest_saturation_pressure_pa(
+    reactions: Sequence[Sequence[tuple[str, float]]],
+    gas_record: Any,
+    present: Mapping[str, Sequence[Any]],
+    temperature_K: float,
+) -> float | None:
+    from simulator.vapour_rail.nasa_cea import NasaCeaError
+    from simulator.vapour_rail.source_rail import SourceCoverageGap
+    from simulator.vapour_rail.tabulated_gibbs import (
+        TabulatedDomainError,
+        TabulatedGibbsConventionError,
+    )
+
+    best: float | None = None
+    for reaction in reactions:
+        try:
+            point = _assemblage_saturation_pa(
+                reaction,
+                gas_record,
+                present,
+                temperature_K,
+            )
         except (
             NasaCeaError,
             TabulatedDomainError,
             TabulatedGibbsConventionError,
             SourceCoverageGap,
             ValueError,
-        ) as exc:
-            return _onset_unavailable(
-                species,
-                partial_pressure_pa=pressure_pa,
-                status="saturation_unavailable",
-                method="thermo_saturation",
-                source_id=source_id,
-                detail=str(exc),
-            )
-        if point is None:
-            return _onset_unavailable(
-                species,
-                partial_pressure_pa=pressure_pa,
-                status="saturation_domain_gap",
-                method="thermo_saturation",
-                source_id=source_id,
-                detail=f"no receiving phase covers {midpoint} K",
-            )
-        if point[0] < pressure_pa:
-            low = midpoint
-        else:
-            high = midpoint
-    solved = (low + high) / 2.0
+        ):
+            continue
+        if point is None or not math.isfinite(point[0]) or point[0] <= 0.0:
+            continue
+        if best is None or point[0] < best:
+            best = point[0]
+    return best
+
+
+def _assemblage_saturation_pa(
+    reaction: Sequence[tuple[str, float]],
+    gas_record: Any,
+    present: Mapping[str, Sequence[Any]],
+    temperature_K: float,
+) -> tuple[float, tuple[Any, ...]] | None:
+    from simulator.vapour_rail.nasa_cea import reaction_equilibrium_constant
+    from simulator.vapour_rail.source_rail import STANDARD_PRESSURE_PA
+
+    terms: list[tuple[float, Any]] = [
+        (1.0, gas_record.thermo.evaluate(temperature_K))
+    ]
+    phases: list[Any] = []
+    for formula, nu in reaction:
+        phase = _stable_receiving_phase(present[formula], temperature_K)
+        if phase is None:
+            return None
+        terms.append((-float(nu), phase.thermo.evaluate(temperature_K)))
+        phases.append(phase)
+    k_eq = reaction_equilibrium_constant(tuple(terms), T_K=temperature_K)
+    if not math.isfinite(k_eq) or k_eq <= 0.0:
+        return None
+    return STANDARD_PRESSURE_PA * k_eq, tuple(phases)
+
+
+def _formula_counts(formula: str) -> dict[str, int] | None:
+    from simulator.accounting.formulas import parse_formula
+    from simulator.accounting.exceptions import AccountingError
+
     try:
-        solved_point = saturation(solved)
-    except (
-        NasaCeaError,
-        TabulatedDomainError,
-        TabulatedGibbsConventionError,
-        SourceCoverageGap,
-        ValueError,
-    ) as exc:
-        return _onset_unavailable(
-            species,
-            partial_pressure_pa=pressure_pa,
-            status="saturation_unavailable",
-            method="thermo_saturation",
-            source_id=source_id,
-            detail=str(exc),
-        )
-    phase = None if solved_point is None else solved_point[1]
-    return _onset_from_temperature(
-        species,
-        pressure_pa,
-        solved,
-        method="thermo_saturation",
-        stages=stages,
-        receiving_phase=None if phase is None else str(phase.native_phase),
-        source_id=source_id,
-        detail="source-rail G(T) saturation at the flowing partial pressure",
-    )
+        parsed = parse_formula(str(formula)).elements
+    except (AccountingError, ValueError, TypeError):
+        return None
+    counts: dict[str, int] = {}
+    for symbol, count in parsed.items():
+        rounded = int(round(float(count)))
+        if rounded <= 0 or abs(float(count) - rounded) > 1e-6:
+            return None
+        counts[str(symbol)] = rounded
+    return counts or None
+
+
+def _sole_metal(counts: Mapping[str, int]) -> str | None:
+    metals = [symbol for symbol in counts if symbol != "O"]
+    if len(metals) != 1:
+        return None
+    return metals[0]
+
+
+def _spell_oxide(metal: str, metal_count: int, oxygen_count: int) -> str:
+    body = metal if metal_count == 1 else f"{metal}{metal_count}"
+    if oxygen_count <= 0:
+        return body
+    if oxygen_count == 1:
+        return f"{body}O"
+    return f"{body}O{oxygen_count}"
+
+
+def _format_stoichiometry(nu: float) -> str:
+    return f"{float(nu):.6g}"
+
+
+def _reaction_formula_label(reaction: Sequence[tuple[str, float]]) -> str:
+    parts: list[str] = []
+    for formula, nu in reaction:
+        if abs(float(nu) - 1.0) <= 1e-8:
+            parts.append(str(formula))
+        else:
+            parts.append(f"{_format_stoichiometry(nu)}*{formula}")
+    return "+".join(parts)
+
+
+def _reaction_phase_label(
+    reaction: Sequence[tuple[str, float]],
+    phases: Sequence[Any],
+) -> str:
+    parts: list[str] = []
+    for (formula, nu), phase in zip(reaction, phases):
+        body = f"{formula}({phase.native_phase})"
+        if abs(float(nu) - 1.0) > 1e-8:
+            body = f"{_format_stoichiometry(nu)}*{body}"
+        parts.append(body)
+    return "+".join(parts)
 
 
 def _stable_receiving_phase(condensed: Sequence[Any], temperature_K: float) -> Any | None:
-    """Lower-G phase among the first liquid and first solid that cover T."""
+    """Lowest-G record whose band covers ``temperature_K``.
 
-    chosen: list[Any] = []
-    for state in _CONDENSED_STANDARD_STATES:
-        for record in condensed:
-            if record.standard_state != state:
-                continue
-            if record.T_min_K <= temperature_K <= record.T_max_K:
-                chosen.append(record)
-                break
+    Every covering record competes. Duplicate tables of one state are
+    not settled by file order.
+    """
+
     best = None
     best_g: float | None = None
-    for record in chosen:
+    for record in condensed:
+        if not record.T_min_K <= temperature_K <= record.T_max_K:
+            continue
         g_over_rt = float(record.thermo.evaluate(temperature_K).g_over_RT)
         if best is None or best_g is None or g_over_rt < best_g:
             best = record

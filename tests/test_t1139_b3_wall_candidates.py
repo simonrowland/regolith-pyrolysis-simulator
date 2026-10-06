@@ -70,8 +70,10 @@ def test_every_onset_species_is_a_wall_candidate_the_coating_sums() -> None:
         assert names
         coated.append(species)
         deposits.setdefault(names[0], {})[species] = 1.0
-    assert {"Rb", "Cs", "Pb", "Ga", "SnO", "Li"} <= set(coated)
-    assert {"GeO", "BO2", "VO2"} <= set(gaps)
+    assert {"Rb", "Cs", "Pb", "Ga", "SnO", "Li", "GeO", "VO2"} <= set(coated)
+    assert "BO2" in gaps
+    assert "GeO" not in gaps
+    assert "VO2" not in gaps
     areas = {segment: 1.0 for segment in deposits}
     thickness = thickness_proxy_by_segment_m(
         FoulingTerminalSnapshot(wall_deposit_by_segment_species_kg=deposits),

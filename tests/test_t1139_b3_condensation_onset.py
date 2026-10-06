@@ -16,14 +16,11 @@ from simulator.condensation import (
     TraceVapourCondensationOnset,
     _landing_stages_for_onset,
     trace_vapour_condensation_onset,
+    trace_vapour_saturation_pressure_pa,
 )
 from simulator.condensation_routing import DESIGNATED_STAGE, designated_stage_number
 from simulator.state import CondensationTrain
-from simulator.vapour_rail.nasa_cea import reaction_equilibrium_constant
-from simulator.vapour_rail.source_rail import (
-    STANDARD_PRESSURE_PA,
-    load_source_rail,
-)
+from simulator.vapour_rail.source_rail import STANDARD_PRESSURE_PA
 
 
 _JANAF_PB_1BAR_BOILING_K = 2019.022
@@ -69,7 +66,7 @@ def test_pb_onset_matches_the_janaf_1_bar_boiling_point() -> None:
     onset = trace_vapour_condensation_onset("Pb", STANDARD_PRESSURE_PA)
     assert onset.method == "thermo_saturation"
     assert onset.source_id == "nist-janaf-4th"
-    assert onset.receiving_phase == "l"
+    assert onset.receiving_phase == "Pb(l)"
     assert onset.temperature_K == pytest.approx(_JANAF_PB_1BAR_BOILING_K, abs=0.05)
     assert onset.temperature_C == pytest.approx(
         onset.temperature_K - 273.15, abs=1e-9
@@ -79,42 +76,42 @@ def test_pb_onset_matches_the_janaf_1_bar_boiling_point() -> None:
 
 
 def test_onset_inverts_the_rail_equilibrium_constant() -> None:
+    """The onset inverts the production saturation pressure, not a second picker."""
+
     temperature_K = 1500.0
-    rail = load_source_rail()
-    gas = next(
-        record
-        for record in rail.records_for("Pb", "gas")
-        if record.source_id == "nist-janaf-4th"
-    )
-    liquid = next(
-        record
-        for record in rail.records_for("Pb", "condensed_liquid")
-        if record.source_id == "nist-janaf-4th"
-    )
-    solid = next(
-        record
-        for record in rail.records_for("Pb", "condensed_solid")
-        if record.source_id == "nist-janaf-4th"
-        and record.T_min_K <= temperature_K <= record.T_max_K
-    )
-    gas_state = gas.thermo.evaluate(temperature_K)
-    liquid_state = liquid.thermo.evaluate(temperature_K)
-    solid_state = solid.thermo.evaluate(temperature_K)
-    condensed_state = (
-        liquid_state
-        if liquid_state.g_over_RT <= solid_state.g_over_RT
-        else solid_state
-    )
-    k_eq = reaction_equilibrium_constant(
-        ((1.0, gas_state), (-1.0, condensed_state)),
-        T_K=temperature_K,
-    )
-    onset = trace_vapour_condensation_onset(
-        "Pb",
-        STANDARD_PRESSURE_PA * k_eq,
-    )
+    pressure_pa = trace_vapour_saturation_pressure_pa("Pb", temperature_K)
+    assert pressure_pa is not None and pressure_pa > 0.0
+    onset = trace_vapour_condensation_onset("Pb", pressure_pa)
     assert onset.status == "ok"
+    assert onset.receiving_phase == "Pb(l)"
     assert onset.temperature_K == pytest.approx(temperature_K, abs=1e-3)
+
+
+def test_cs_and_rb_match_janaf_printed_rows_at_1_pa() -> None:
+    """JANAF log Kf rows at 1 Pa. The code uses NASA Glenn, so the check is cross-compilation.
+
+    Cs-005: -5.377 at 400 K and -4.318 at 450 K interpolates to 416.5 K.
+    Rb-005: -5.793 at 400 K and -4.671 at 450 K interpolates to 434.1 K.
+    """
+
+    cesium = trace_vapour_condensation_onset("Cs", 1.0)
+    rubidium = trace_vapour_condensation_onset("Rb", 1.0)
+    assert cesium.temperature_K == pytest.approx(416.5, abs=1.0)
+    assert rubidium.temperature_K == pytest.approx(434.1, abs=1.0)
+    assert cesium.receiving_phase == "Cs(L)"
+    assert rubidium.receiving_phase == "Rb(L)"
+
+
+def test_geo_onset_is_the_disproportionation() -> None:
+    """½ Ge + ½ GeO2 on the NASA compilation, about 779 °C at 100 Pa."""
+
+    onset = trace_vapour_condensation_onset("GeO", 100.0)
+    assert onset.status == "ok"
+    assert onset.source_id == "nasa-glenn"
+    assert onset.receiving_phase == "0.5*Ge(cr)+0.5*GeO2(II)"
+    assert onset.temperature_C == pytest.approx(778.6, abs=0.5)
+    assert onset.landing_stage_number == 4
+    assert onset.wall_landing_stage_number == 4
 
 
 def test_rb_and_cs_are_flagged_uncaptured_at_both_report_pressures() -> None:
@@ -142,14 +139,41 @@ def test_rb_and_cs_are_flagged_uncaptured_at_both_report_pressures() -> None:
             assert wall == onset.wall_landing_stage_number
 
 
-def test_missing_receiving_phase_is_a_visible_gap() -> None:
-    for species in ("GeO", "BO2", "VO2"):
-        onset = trace_vapour_condensation_onset(species, 100.0)
-        assert onset.status == "no_receiving_condensed_phase"
-        assert onset.temperature_K is None
-        assert onset.wall_landing_stage_number is None
-        assert onset.disposition == "unavailable"
-        assert onset.detail
+def test_typed_gaps_name_the_receiver_they_actually_lack() -> None:
+    dioxide = trace_vapour_condensation_onset("BO2", 100.0)
+    assert dioxide.status == "receiving_phase_requires_local_pO2"
+    assert dioxide.receiving_phase == "B2O3"
+    assert dioxide.temperature_K is None
+    assert dioxide.disposition == "unavailable"
+    assert "O2" in dioxide.detail
+
+    dimer = trace_vapour_condensation_onset("B2", 100.0)
+    assert dimer.status == "pressure_outside_saturation_domain"
+    assert dimer.receiving_phase == "2*B"
+    assert dimer.temperature_K is None
+    assert "B2O3" in dimer.detail
+
+    dioxide_vanadium = trace_vapour_condensation_onset("VO2", 100.0)
+    assert dioxide_vanadium.status == "ok"
+    assert dioxide_vanadium.receiving_phase == "0.5*V2O4(l)"
+    assert dioxide_vanadium.landing_stage_number == 1
+
+
+def test_a_foreign_channel_source_is_flagged(monkeypatch) -> None:
+    from simulator.condensation import _trace_vapour_carrier_sources
+
+    def foreign() -> dict[str, str | None]:
+        return {"Pb": "not-a-compilation"}
+
+    monkeypatch.setattr(
+        "simulator.condensation._trace_vapour_carrier_sources",
+        foreign,
+    )
+    _trace_vapour_carrier_sources.cache_clear()
+    onset = trace_vapour_condensation_onset("Pb", 100.0)
+    assert onset.status == "ok"
+    assert onset.source_id == "nist-janaf-4th"
+    assert "source_differs_from_channel" in onset.detail
 
 
 def test_non_positive_pressure_does_not_invent_an_onset() -> None:
