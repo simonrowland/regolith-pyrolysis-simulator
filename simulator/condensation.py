@@ -3143,6 +3143,46 @@ class CondensationModel:
             condensation_authority_by_species[species]["status"] = (
                 VAPOUR_CARRIER_AUTHORITY_REFUSED
             )
+        trace_wall_species: set[str] = set()
+        for species, rate_kg_hr in evap_flux.species_kg_hr.items():
+            if (
+                species in stage_route_by_species
+                or float(rate_kg_hr) <= 0.0
+                or carrier_authority_status_by_species.get(species)
+                in non_debiting_carrier_statuses
+                or has_declared_routing(species)
+            ):
+                continue
+            onset = _trace_onset_for_flow(
+                species,
+                self.wall_species_partial_pressures_pa,
+                vapor_pressure_data=self.vapor_pressure_data,
+                stages=self.train.stages,
+            )
+            if (
+                onset is None
+                or onset.status != "ok"
+                or onset.temperature_C is None
+            ):
+                continue
+            _record_trace_vapour_disposition(
+                species,
+                float(rate_kg_hr),
+                onset,
+                remaining_by_species=remaining_by_species,
+                condensation_authority_by_species=(
+                    condensation_authority_by_species
+                ),
+                condensation_refusals_by_species=(
+                    condensation_refusals_by_species
+                ),
+            )
+            stage_route_by_species[species] = _trace_wall_stage_route(
+                onset,
+                float(rate_kg_hr),
+                [segment.name for segment in self.pipe_segments],
+            )
+            trace_wall_species.add(species)
         wall_hkl_by_species = (
             self._resolve_wall_deposit_candidates_by_species_segment_kg(
                 evap_flux=evap_flux,
@@ -3154,6 +3194,13 @@ class CondensationModel:
                 ),
             )
         )
+        for species in trace_wall_species:
+            stage_route_by_species[species]["capture_budget_kg"] = (
+                _trace_wall_capture_budget_kg(
+                    float(evap_flux.species_kg_hr[species]),
+                    wall_hkl_by_species.get(species, {}),
+                )
+            )
         wall_saturation_pressure_refusals_by_species: dict[
             str, dict[str, dict[str, Any]]
         ] = {}
@@ -5270,6 +5317,44 @@ def _record_trace_vapour_disposition(
         }
 
 
+def _trace_wall_stage_route(
+    onset: TraceVapourCondensationOnset,
+    rate_kg_hr: float,
+    segment_names: Sequence[str],
+) -> dict[str, Any]:
+    """Stage row that admits an ok trace onset to wall competition.
+
+    The stage sink is empty. ``capture_budget_kg`` stays 0 until the
+    wall resolver returns supply-capped kinetic candidates;
+    ``_trace_wall_capture_budget_kg`` then sets the budget to their sum.
+    The existing weight split spends that budget. It is not a second
+    allocator.
+    """
+
+    inlet_kg_hr = max(0.0, float(rate_kg_hr))
+    return {
+        "T_cond_C": float(onset.temperature_C),
+        "hkl_condensed_by_stage": {},
+        "remaining_after_stage": {},
+        "stage_alpha_records_by_stage": {},
+        "segment_supply": {name: inlet_kg_hr for name in segment_names},
+        "capture_budget_kg": 0.0,
+        "capture_budget_alpha_record": {},
+    }
+
+
+def _trace_wall_capture_budget_kg(
+    inlet_kg_hr: float,
+    wall_candidates_kg: Mapping[str, float],
+) -> float:
+    """Finite cap for a trace vapour: the supply-capped kinetic wall sum."""
+
+    kinetic_kg_hr = sum(
+        max(0.0, float(value)) for value in wall_candidates_kg.values()
+    )
+    return min(max(0.0, float(inlet_kg_hr)), kinetic_kg_hr)
+
+
 def _species_has_compiled_or_legacy_pressure(
     species: str,
     *,
@@ -5898,6 +5983,8 @@ def _trace_onset_for_flow(
 
     Designated species and the declared Ca/Al/Ti temperatures do not
     reach the rail. A missing partial pressure does not invent a stage.
+    Landing uses this train-level pressure. Wall flux prefers the
+    per-segment map once the resolver has filled it.
     """
 
     if has_declared_routing(species):
@@ -7284,6 +7371,10 @@ def _try_antoine_psat_pa(
     species has Antoine data somewhere but no segment covers ``T_K``
     (``_antoine_psat_pa`` returns None without raising). Never invent a
     pressure for that gap (b-127 fabricated 100 Pa).
+
+    A certified Antoine fit stays first. A non-dormant trace carrier
+    with no such fit uses ``trace_vapour_saturation_pressure_pa``, the
+    same rail curve the onset inverts. A dormant trace does not.
     """
 
     from engines.builtin.vapor_pressure import VaporPressureRangeError
@@ -7306,6 +7397,13 @@ def _try_antoine_psat_pa(
         )
     except (CatalogCompileError, VaporPressureRangeError, NasaCeaDomainError, ShomateDomainError,
             WallSaturationPressureRefusal) as exc:
+        thermo_pa = _trace_wall_saturation_pressure_pa(
+            species,
+            T_K,
+            vapor_pressure_data=vapor_pressure_data,
+        )
+        if thermo_pa is not None:
+            return thermo_pa, False
         if antoine_extrapolations is not None:
             antoine_extrapolations[f"{species}#wall:{T_K}"] = {
                 "temperature_K": T_K, "status": "refused", "reason": str(exc),
@@ -7321,8 +7419,36 @@ def _try_antoine_psat_pa(
             antoine_extrapolation_warnings.append(str(exc))
         return None, True
     if pressure_pa is None:
+        thermo_pa = _trace_wall_saturation_pressure_pa(
+            species,
+            T_K,
+            vapor_pressure_data=vapor_pressure_data,
+        )
+        if thermo_pa is not None:
+            return thermo_pa, False
         return None, True
     return float(pressure_pa), False
+
+
+def _trace_wall_saturation_pressure_pa(
+    species: str,
+    temperature_K: float,
+    *,
+    vapor_pressure_data: Mapping[str, Any] | None,
+) -> float | None:
+    """Rail saturation pressure for a trace wall, or None to keep Antoine.
+
+    Declared species and dormant trace rows stay on the existing refusal.
+    """
+
+    if has_declared_routing(species) or species not in _trace_vapour_carrier_formulas():
+        return None
+    if _species_is_flux_dormant(
+        species,
+        vapor_pressure_data=vapor_pressure_data,
+    ):
+        return None
+    return trace_vapour_saturation_pressure_pa(species, temperature_K)
 
 
 def _local_species_pressure_pa(
@@ -7628,6 +7754,18 @@ def _molecular_mass_kg_per_molecule(
     value = data.get('molar_mass_g_mol') if isinstance(data, Mapping) else None
     if value is None:
         value = MOLAR_MASS.get(species)
+    if value is None:
+        # The explicit table does not list trace vapours. The formula
+        # parser already owns those atomic weights; wall deposition uses
+        # the same parser for its shadow record. An unparseable name
+        # still refuses below.
+        from simulator.accounting.exceptions import AccountingError
+        from simulator.accounting.formulas import parse_formula
+
+        try:
+            value = parse_formula(str(species)).molar_mass_g_per_mol()
+        except (AccountingError, ValueError, TypeError):
+            value = None
     # b-193. This used to substitute 50.0 g/mol for any species whose molar
     # mass was missing or unusable, and hand that invented number to the HKL
     # impingement flux below. Hertz-Knudsen-Langmuir gives

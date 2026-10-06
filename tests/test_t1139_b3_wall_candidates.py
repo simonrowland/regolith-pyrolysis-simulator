@@ -1,12 +1,14 @@
 """Wall candidates for trace vapours come from the one onset derivation.
 
 Carriers with no receiving condensed phase stay a visible gap. Ca, Al,
-and Ti keep an empty candidate list.
+and Ti keep an empty candidate list. A cold trace vapour reaches the
+coating ledger from route(), not from a hand-built deposit map.
 """
 
 from __future__ import annotations
 
 import inspect
+from types import SimpleNamespace
 
 import pytest
 
@@ -20,7 +22,7 @@ from simulator.condensation import (
     trace_vapour_condensation_onset,
 )
 from simulator.condensation_routing import designated_stage_number
-from simulator.state import CondensationTrain
+from simulator.state import CondensationTrain, EvaporationFlux, MeltState
 
 
 def _model_at(pressure_pa: float) -> CondensationModel:
@@ -40,9 +42,8 @@ def test_wall_builder_calls_the_onset_function() -> None:
     assert "DESIGNATED_STAGE" not in source
 
 
-def test_every_onset_species_is_a_wall_candidate_the_coating_sums() -> None:
+def test_every_ok_onset_is_a_wall_candidate() -> None:
     model = _model_at(100.0)
-    deposits: dict[str, dict[str, float]] = {}
     coated: list[str] = []
     gaps: list[str] = []
     for species in sorted(_trace_vapour_carrier_sources()):
@@ -69,22 +70,58 @@ def test_every_onset_species_is_a_wall_candidate_the_coating_sums() -> None:
         assert names == expected
         assert names
         coated.append(species)
-        deposits.setdefault(names[0], {})[species] = 1.0
     assert {"Rb", "Cs", "Pb", "Ga", "SnO", "Li", "GeO", "VO2"} <= set(coated)
     assert "BO2" in gaps
     assert "GeO" not in gaps
     assert "VO2" not in gaps
-    areas = {segment: 1.0 for segment in deposits}
+
+
+def test_cold_trace_vapour_reaches_the_coating_ledger() -> None:
+    model = CondensationModel(CondensationTrain.create_default())
+    model.configure_operating_conditions(
+        overhead_pressure_mbar=10.0,
+        species_partial_pressures_mbar={"Rb": 1.0},
+        pipe_diameter_m=0.12,
+        gas_temperature_C=1700.0,
+        wall_temperature_C=50.0,
+        stage_area_m2_by_stage={
+            str(stage.stage_number): 1.0 for stage in model.train.stages
+        },
+    )
+    flux = EvaporationFlux(species_kg_hr={"Rb": 0.4})
+    flux.update_totals()
+
+    result = model.route(flux, MeltState())
+
+    deposited_kg = result.wall_deposit_by_species["Rb"]
+    assert deposited_kg > 0.0
+    assert (
+        result.remaining_by_species["Rb"]
+        + result.retained_in_source_by_species.get("Rb", 0.0)
+        + deposited_kg
+    ) == pytest.approx(0.4)
+    snapshot = FoulingTerminalSnapshot.from_trace(
+        SimpleNamespace(
+            wall_deposit_by_segment_species_kg=(
+                result.wall_deposit_by_segment_species
+            ),
+        )
+    )
+    coated_kg = sum(
+        species_kg.get("Rb", 0.0)
+        for species_kg in snapshot.deposit_plain().values()
+    )
+    assert coated_kg == pytest.approx(deposited_kg)
+    areas = {segment: 1.0 for segment in snapshot.deposit_plain()}
     thickness = thickness_proxy_by_segment_m(
-        FoulingTerminalSnapshot(wall_deposit_by_segment_species_kg=deposits),
+        snapshot,
         segment_area_m2=areas,
         rho_deposit_kg_m3=1000.0,
     )
-    counted: set[str] = set()
-    for segment, species_kg in deposits.items():
-        assert thickness[segment] == pytest.approx(len(species_kg) / 1000.0)
-        counted.update(species_kg)
-    assert counted == set(coated)
+    assert sum(thickness.values()) > 0.0
+    assert result.condensation_refusals_by_species["Rb"]["reason"] == (
+        "flagged_uncaptured_condensable"
+    )
 
 
 def test_declared_species_wall_lists_do_not_move() -> None:
