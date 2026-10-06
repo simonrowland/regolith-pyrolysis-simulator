@@ -122,3 +122,81 @@ def test_universal_row_maps_promote_to_experiment_sample(tmp_path: Path) -> None
     printed = experiment.sample.printed_composition
     assert printed is not None and printed.state.is_value
     assert as_decimal(printed.state.value["SiO2"]) == as_decimal("55")
+
+
+# --- Pin (b718 ROR fix): printed-map selection before the fingerprint helper
+# is factored out of _printed_composition_from_roots. These hold on the
+# pre-move code and must keep holding after the move.
+
+
+def _vocab():
+    from simulator.battery.migrate import load_lab_parameter_vocabulary
+
+    return load_lab_parameter_vocabulary()
+
+
+def test_pin_printed_roots_single_map_normalises_decimals() -> None:
+    from simulator.battery.migrate import _printed_composition_from_roots
+
+    got = _printed_composition_from_roots(
+        [("values", {"locator": {"table": "1"}, "composition_wt_pct": {"SiO2": 60.20, "Al2O3": "26.0"}})],
+        _vocab(),
+    )
+    assert got is not None and got.state.is_value
+    assert got.state.value == {"Al2O3": "26", "SiO2": "60.2"}
+
+
+def test_pin_printed_roots_equal_maps_with_different_spelling_agree() -> None:
+    from simulator.battery.migrate import _printed_composition_from_roots
+
+    got = _printed_composition_from_roots(
+        [
+            ("values", {"locator": {"table": "1"}, "composition_wt_pct": {"SiO2": "60.0", "MgO": 40}}),
+            ("equipment", {"locator": {"table": "2"}, "oxides_wt_pct": {"MgO": "40.00", "SiO2": 60}}),
+        ],
+        _vocab(),
+    )
+    assert got is not None and got.state.value == {"MgO": "40", "SiO2": "60"}
+
+
+def test_pin_printed_roots_charge_key_beats_residual_map() -> None:
+    from simulator.battery.migrate import _printed_composition_from_roots
+
+    got = _printed_composition_from_roots(
+        [
+            (
+                "values",
+                {
+                    "locator": {"table": "1"},
+                    "starting_glass_wt_pct": {"SiO2": 50, "MgO": 50},
+                    "composition_wt_pct": {"SiO2": 70, "MgO": 30},
+                },
+            )
+        ],
+        _vocab(),
+    )
+    assert got is not None and got.state.value == {"MgO": "50", "SiO2": "50"}
+
+
+def test_pin_printed_roots_conflicting_non_charge_maps_select_nothing() -> None:
+    from simulator.battery.migrate import _printed_composition_from_roots
+
+    got = _printed_composition_from_roots(
+        [
+            ("values", {"locator": {"table": "1"}, "composition_wt_pct": {"SiO2": 70, "MgO": 30}}),
+            ("equipment", {"locator": {"table": "2"}, "oxides_wt_pct": {"SiO2": 60, "MgO": 40}}),
+        ],
+        _vocab(),
+    )
+    assert got is None
+
+
+def test_pin_printed_roots_map_without_locator_is_ignored() -> None:
+    from simulator.battery.migrate import _printed_composition_from_roots
+
+    assert (
+        _printed_composition_from_roots(
+            [("values", {"composition_wt_pct": {"SiO2": 70, "MgO": 30}})], _vocab()
+        )
+        is None
+    )
