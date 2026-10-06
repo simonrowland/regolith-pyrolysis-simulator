@@ -1632,6 +1632,12 @@ _TRACE_HOMOLOGUE = {
     "GeO2": "SiO2",
     "In2O3": "Ga2O3",
 }
+# Author's stated nominal: formula, a phrase that appears in that row's
+# note, and the Fegley 2023 text that names it. Exactly one matching row
+# is the nominal. This is not a residual ranking.
+_SOURCE_STATED_NOMINAL: tuple[tuple[str, str, str], ...] = (
+    ("Cu2O", "Altman (1978)", "fegley2023:1636-1641"),
+)
 # Whole phase tokens only. ``liquid`` matches ``l``; a longer string that
 # merely contains one of these tokens does not.
 _PHASE_TOKEN_GROUPS: tuple[frozenset[str], ...] = (
@@ -1817,7 +1823,9 @@ def _select_banded_row(
 ) -> Mapping[str, Any] | None:
     """The stated band that covers T, otherwise the unique nearest band.
 
-    A missing validity range is not a band and is never chosen. The lowest
+    A missing validity range is not a band and is never chosen. A point
+    temperature named only in the notes (``1673 K point``) is not a band
+    either: the note is not parsed into ``validity_range_K``. The lowest
     residual is not a selector. Several covering bands, or two bands at the
     same distance, means this rule does not apply.
     """
@@ -1842,6 +1850,110 @@ def _select_banded_row(
     if len(banded) > 1 and banded[0][0] == banded[1][0]:
         return None
     return banded[0][2]
+
+
+def _stated_nominal_row(
+    formula: str, rows: Sequence[Mapping[str, Any]]
+) -> tuple[Mapping[str, Any], str] | None:
+    """The unique row whose note contains the source's stated nominal.
+
+    The scan includes proxies. A published-only filter would hide a
+    nominal the author placed on a proxy row. Several matches, or a note
+    that contains two recorded phrases, is not a nominal.
+    """
+
+    phrases = tuple(item for item in _SOURCE_STATED_NOMINAL if item[0] == formula)
+    if not phrases:
+        return None
+    matched: list[tuple[Mapping[str, Any], str]] = []
+    for row in rows:
+        notes = str(row.get("notes_as_printed") or "")
+        hits = tuple(cite for _formula, phrase, cite in phrases if phrase in notes)
+        if len(hits) > 1:
+            return None
+        if len(hits) == 1:
+            matched.append((row, hits[0]))
+    if len(matched) != 1:
+        return None
+    return matched[0]
+
+
+def _geometric_mean(values: Sequence[float]) -> float:
+    ordered = tuple(sorted(float(value) for value in values))
+    return math.exp(sum(math.log(value) for value in ordered) / len(ordered))
+
+
+def _extreme_gamma_row(
+    rows: Sequence[Mapping[str, Any]],
+    temperature_K: float,
+    *,
+    high: bool,
+) -> Mapping[str, Any]:
+    """Row at one edge of the envelope. A tie keeps the smaller source id."""
+
+    def key(row: Mapping[str, Any]) -> tuple[float, str]:
+        gamma = _gamma_at(row, temperature_K)
+        identity = str(row.get("source_row_id") or "")
+        return (-gamma if high else gamma, identity)
+
+    return min(rows, key=key)
+
+
+def _envelope_ln_band(
+    *,
+    parent_formula: str,
+    parent_gamma: float,
+    gamma_min: float,
+    gamma_max: float,
+    mole_fraction: float | None,
+    single_cation: bool,
+) -> tuple[float, float] | None:
+    """Activity-ln offsets of the candidate envelope around the chosen value.
+
+    The offsets enclose zero. They are absent when the activity is not a
+    positive finite number. An alias uses ``a_single = a_parent ** (1/c)``.
+    The envelope gammas stay on the parent-row basis. This is an activity
+    band, not a pressure band: the activity exponent does not flip it.
+    """
+
+    if (
+        mole_fraction is None
+        or parent_gamma <= 0.0
+        or gamma_min <= 0.0
+        or gamma_max <= 0.0
+    ):
+        return None
+    try:
+        fraction = float(mole_fraction)
+    except (TypeError, ValueError):
+        return None
+    if not math.isfinite(fraction) or fraction <= 0.0:
+        return None
+
+    def activity(gamma: float) -> float | None:
+        if single_cation:
+            pair = activities_from_molecular_henrian_row(
+                parent_formula, gamma, fraction
+            )
+            if pair is None:
+                return None
+            chosen = pair[1]
+        else:
+            chosen = gamma * fraction
+        if not math.isfinite(chosen) or chosen <= 0.0:
+            return None
+        return chosen
+
+    selected = activity(parent_gamma)
+    low = activity(gamma_min)
+    high = activity(gamma_max)
+    if selected is None or low is None or high is None:
+        return None
+    lower = math.log(low / selected)
+    upper = math.log(high / selected)
+    if not (math.isfinite(lower) and math.isfinite(upper) and lower <= 0.0 <= upper):
+        return None
+    return (lower, upper)
 
 
 def _annotate(
@@ -2210,11 +2322,17 @@ def resolve_trace_parent_activity(
     standard state that does not state the caller's typed basis is not a
     published point. One proxy row is a flagged estimate. Several rows of
     one origin are the row whose stated band covers T, or the unique
-    nearest band outside that range (flagged extrapolated). A row with no
-    stated band is not selected, and the lowest residual is not a
-    selector. If that rule does not apply, rung 3 follows the homologue
-    (Li2O follows Na2O). Rung 4 is the Henrian unity upper bound. Every
-    non-refusal result carries a numeric gamma.
+    nearest band outside that range (flagged extrapolated). A point
+    temperature in the notes is not a band. The lowest residual is not a
+    selector. When that rule does not select and the source names a
+    nominal row, the nominal is a flagged rung-2 value and the candidate
+    envelope is its uncertainty. Published rows with no nominal are a
+    bound at the extreme gamma when every candidate lies on one side of
+    1, otherwise the geometric mean (``envelope_midpoint``). A unity
+    Henrian bound is not emitted against those measured rows. Otherwise
+    rung 3 follows the homologue when the target itself resolved at rung
+    2 or 3. Rung 4 is the unmeasured-gamma unity bound. Every non-refusal
+    result carries a numeric gamma.
     """
 
     try:
@@ -2259,6 +2377,35 @@ def resolve_trace_parent_activity(
                 answer = _annotate(answer, coefficient_formula=alias)
         return answer
 
+    def _apply_henrian_gamma(
+        current: str, parent_gamma: float
+    ) -> tuple[float, float | None] | None:
+        """Stored coefficient and activity for one parent-basis gamma.
+
+        An alias of the original request stores the pure-liquid reference
+        coefficient and ``a_single = a_parent ** (1/c)``. Any other
+        component stores the parent gamma and ``gamma * X``. None means
+        the alias relationship is not established.
+        """
+
+        if alias is None or current != formula:
+            return float(parent_gamma), _activity_value(parent_gamma, mole_fraction)
+        converted = pure_liquid_reference_coefficient(
+            row_formula=current,
+            requested_formula=bare,
+            row_gamma=float(parent_gamma),
+        )
+        if converted is None:
+            return None
+        if mole_fraction is None:
+            return converted, None
+        pair = activities_from_molecular_henrian_row(
+            current, float(parent_gamma), float(mole_fraction)
+        )
+        if pair is None:
+            return None
+        return converted, pair[1]
+
     def _accept_row_basis(
         current: str, row: Mapping[str, Any]
     ) -> SourceReactionActivity | None:
@@ -2286,26 +2433,10 @@ def resolve_trace_parent_activity(
         gamma = answer.derivation.get("gamma")
         if not isinstance(gamma, (int, float)):
             return None
-        converted = pure_liquid_reference_coefficient(
-            row_formula=current,
-            requested_formula=bare,
-            row_gamma=float(gamma),
-        )
-        if converted is None:
+        applied = _apply_henrian_gamma(current, float(gamma))
+        if applied is None:
             return None
-        # The stored gamma is the pure-liquid reference coefficient.
-        # At a real composition the activity is not that coefficient
-        # times the caller's X: a_single = a_parent ** (1/c), and
-        # a_parent = row_gamma * X_molecular.
-        if mole_fraction is None:
-            value = None
-        else:
-            pair = activities_from_molecular_henrian_row(
-                current, float(gamma), float(mole_fraction)
-            )
-            if pair is None:
-                return None
-            _parent_activity, value = pair
+        converted, value = applied
         # ln_value is derived from value. Clearing it makes __post_init__
         # recompute the logarithm of the converted activity.
         return replace(
@@ -2313,6 +2444,161 @@ def resolve_trace_parent_activity(
             component_id=component_id,
             value=value,
             ln_value=None,
+        )
+
+    def _with_candidate_envelope(
+        answer: SourceReactionActivity,
+        *,
+        rows: Sequence[Mapping[str, Any]],
+        parent_gamma: float,
+        flag: str,
+        reason: str,
+        verdict: ActivityVerdictKind,
+        bound_direction: BoundDirection | None,
+        report_label: str,
+        source_row_id: str | None,
+        single_cation: bool,
+        nominal_cite: str | None = None,
+    ) -> SourceReactionActivity:
+        """Attach the candidate envelope. The chosen gamma stays put.
+
+        Envelope min and max are parent-row coefficients. The activity
+        bound is not the unmeasured unity bound, so a row-level
+        extrapolation notice is not the reason for this answer.
+        """
+
+        ordered = tuple(
+            sorted(rows, key=lambda row: str(row.get("source_row_id") or ""))
+        )
+        records = tuple(_candidate_record(row, temperature) for row in ordered)
+        gammas = tuple(float(record["gamma"]) for record in records)
+        extra: dict[str, Any] = {
+            "flag": flag,
+            "gamma_envelope_min": min(gammas),
+            "gamma_envelope_max": max(gammas),
+            "source_row_id": source_row_id,
+            "source_row_ids": tuple(str(row["source_row_id"]) for row in ordered),
+            "candidate_rows": records,
+            "extrapolation_notice": None,
+        }
+        if nominal_cite is not None:
+            extra["nominal_cite"] = nominal_cite
+        ln_band = _envelope_ln_band(
+            parent_formula=str(ordered[0]["formula"]),
+            parent_gamma=parent_gamma,
+            gamma_min=min(gammas),
+            gamma_max=max(gammas),
+            mole_fraction=mole_fraction,
+            single_cation=single_cation,
+        )
+        annotated = _annotate(answer, **extra)
+        return replace(
+            annotated,
+            verdict=verdict,
+            bound_direction=bound_direction,
+            reason=reason,
+            report_label=report_label,
+            model_row_id=source_row_id,
+            evidence_ref=source_row_id,
+            ln_band=ln_band,
+        )
+
+    def _published_envelope(
+        current: str, group: Sequence[Mapping[str, Any]]
+    ) -> SourceReactionActivity | None:
+        """Bound or midpoint for published rows the band rule did not select.
+
+        Every candidate above 1 is a lower bound at the minimum gamma.
+        Every candidate below 1 is an upper bound at the maximum gamma.
+        A candidate on the other side of 1, or equal to 1, is the
+        geometric mean, flagged ``envelope_midpoint``. Proxy-only groups
+        are not this rule.
+        """
+
+        if not group or any(row["origin"] != "published" for row in group):
+            return None
+        gammas = tuple(_gamma_at(row, temperature) for row in group)
+        single_cation = alias is not None and current == formula
+        if all(gamma > 1.0 for gamma in gammas):
+            row = _extreme_gamma_row(group, temperature, high=False)
+            accepted = _accept_row_basis(current, row)
+            if accepted is None:
+                return None
+            return _with_candidate_envelope(
+                accepted,
+                rows=group,
+                parent_gamma=_gamma_at(row, temperature),
+                flag="envelope_lower_bound",
+                reason="envelope_lower_bound",
+                verdict=ActivityVerdictKind.LOWER_BOUND,
+                bound_direction=BoundDirection.LOWER,
+                report_label=LOWER_BOUND_NOT_POINT,
+                source_row_id=str(row["source_row_id"]),
+                single_cation=single_cation,
+            )
+        if all(gamma < 1.0 for gamma in gammas):
+            row = _extreme_gamma_row(group, temperature, high=True)
+            accepted = _accept_row_basis(current, row)
+            if accepted is None:
+                return None
+            return _with_candidate_envelope(
+                accepted,
+                rows=group,
+                parent_gamma=_gamma_at(row, temperature),
+                flag="envelope_upper_bound",
+                reason="envelope_upper_bound",
+                verdict=ActivityVerdictKind.UPPER_BOUND,
+                bound_direction=BoundDirection.UPPER,
+                report_label=BOUND_NOT_POINT,
+                source_row_id=str(row["source_row_id"]),
+                single_cation=single_cation,
+            )
+        geomean = _geometric_mean(gammas)
+        applied = _apply_henrian_gamma(current, geomean)
+        if applied is None:
+            return None
+        stored_gamma, value = applied
+        answer = _ladder_result(
+            component_id=component_id,
+            standard_state=standard_state,
+            state_fingerprint=state_fingerprint,
+            solve_group_id=solve_group_id,
+            rung=2,
+            gamma=stored_gamma,
+            mole_fraction=None,
+            verdict=ActivityVerdictKind.STATUS_BEARING_VALUE,
+            flag="envelope_midpoint",
+            reason="envelope_midpoint",
+            source_row_id=None,
+            source_row_ids=(),
+            origin="published",
+            homologue=None,
+            coefficient_formula=formula if single_cation else None,
+            extrapolation_notice=None,
+            candidate_rows=(),
+            tier=ActivityTier.B,
+        )
+        answer = replace(answer, value=value, ln_value=None)
+        answer = _annotate(
+            answer,
+            **_basis_annotation(
+                row=None,
+                standard_state=standard_state,
+                established=False,
+            ),
+            algebra="geometric mean of the published candidate gammas",
+        )
+        return _with_candidate_envelope(
+            answer,
+            rows=group,
+            parent_gamma=geomean,
+            flag="envelope_midpoint",
+            reason="envelope_midpoint",
+            verdict=ActivityVerdictKind.STATUS_BEARING_VALUE,
+            bound_direction=None,
+            report_label=STATUS_BEARING_NOT_POINT,
+            source_row_id=None,
+            single_cation=single_cation,
         )
 
     def _walk(current: str, seen: frozenset[str]) -> SourceReactionActivity:
@@ -2326,18 +2612,41 @@ def resolve_trace_parent_activity(
                 solve_group_id=solve_group_id,
                 coefficient_formula=alias,
             )
+        matched = tuple(row for row in table if row["formula"] == current)
         kind, group = _select_gamma_rows(current, table)
         try:
-            if kind == "one":
-                accepted = _accept_row_basis(current, group[0])
-                if accepted is not None:
-                    return accepted
             if kind == "many":
                 chosen = _select_banded_row(group, temperature)
                 if chosen is not None:
                     accepted = _accept_row_basis(current, chosen)
                     if accepted is not None:
                         return accepted
+            nominal = _stated_nominal_row(current, matched)
+            if nominal is not None:
+                row, cite = nominal
+                accepted = _accept_row_basis(current, row)
+                if accepted is not None:
+                    return _with_candidate_envelope(
+                        accepted,
+                        rows=matched,
+                        parent_gamma=_gamma_at(row, temperature),
+                        flag="source_stated_nominal",
+                        reason="source_stated_nominal",
+                        verdict=ActivityVerdictKind.STATUS_BEARING_VALUE,
+                        bound_direction=None,
+                        report_label=STATUS_BEARING_NOT_POINT,
+                        source_row_id=str(row["source_row_id"]),
+                        single_cation=alias is not None and current == formula,
+                        nominal_cite=cite,
+                    )
+            if kind == "one":
+                accepted = _accept_row_basis(current, group[0])
+                if accepted is not None:
+                    return accepted
+            if kind == "many":
+                enveloped = _published_envelope(current, group)
+                if enveloped is not None:
+                    return enveloped
         except (TypeError, ValueError) as exc:
             return _refusal(
                 component_id,

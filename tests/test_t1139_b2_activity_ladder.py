@@ -10,6 +10,7 @@ from __future__ import annotations
 import hashlib
 import importlib.util
 import json
+import math
 from pathlib import Path
 
 import pytest
@@ -233,20 +234,31 @@ def test_production_geo2_equality_row_is_a_proxy() -> None:
     assert answer.derivation["source_row_id"] == matched[0]["source_row_id"]
 
 
-def test_rows_without_a_stated_band_fall_through_to_the_homologue() -> None:
+def test_unbanded_published_rows_are_an_envelope_and_proxies_stay_unity() -> None:
     published = [
         _row("Rb2O", row_id="a", B="-1000", notes="model one"),
         _row("Rb2O", row_id="b", B="-2000", notes="model two"),
         _row("K2O", row_id="k", B="-13400", notes="homologue bait"),
     ]
     answer = _resolve("Rb2O", published)
-    assert answer.derivation["rung"] == 3
-    assert answer.derivation["flag"] == "homologue"
-    assert answer.derivation["homologue"] == "K2O"
-    assert answer.derivation["gamma"] is not None
-    assert answer.value is not None
-    assert answer.verdict is ActivityVerdictKind.STATUS_BEARING_VALUE
-    assert answer.derivation["source_row_id"] == "k"
+    alone = {
+        row["source_row_id"]: _resolve("Rb2O", [row]).derivation["gamma"]
+        for row in published
+        if row["formula"] == "Rb2O"
+    }
+    assert all(gamma < 1.0 for gamma in alone.values())
+    assert answer.derivation["rung"] == 2
+    assert answer.derivation["flag"] == "envelope_upper_bound"
+    assert answer.verdict is ActivityVerdictKind.UPPER_BOUND
+    assert answer.bound_direction is BoundDirection.UPPER
+    assert answer.provider == "trace_parent_activity_ladder"
+    assert answer.derivation["homologue"] is None
+    assert answer.derivation["source_row_id"] == max(alone, key=alone.__getitem__)
+    assert answer.derivation["gamma"] == max(alone.values())
+    assert answer.derivation["gamma_envelope_min"] == min(alone.values())
+    assert answer.derivation["gamma_envelope_max"] == max(alone.values())
+    assert answer.value == pytest.approx(answer.derivation["gamma"] * 1e-6)
+    assert answer.reason != "henrian_gamma_unmeasured"
 
     proxies = [
         _row("V2O3", row_id="p1", B="-1", notes="set = Ti2O3"),
@@ -293,32 +305,55 @@ def test_nearest_band_is_not_the_lowest_residual() -> None:
     assert notice["certified_band"]["temperature_K"] == [1800.0, 1900.0]
 
 
-def test_tied_nearest_bands_fall_through() -> None:
+def test_tied_nearest_bands_use_the_envelope() -> None:
     rows = [
         _row("Rb2O", row_id="low", B="-100", band=[1000.0, 1200.0]),
         _row("Rb2O", row_id="high", B="-9000", band=[1800.0, 2000.0]),
         _row("K2O", row_id="k", B="-13400", notes="homologue"),
     ]
     answer = _resolve("Rb2O", rows, temperature_K=1500.0)
-    assert answer.derivation["rung"] == 3
-    assert answer.derivation["homologue"] == "K2O"
-    assert answer.derivation["source_row_id"] == "k"
-    assert answer.derivation["gamma"] is not None
+    alone = {
+        row["source_row_id"]: _resolve(
+            "Rb2O", [row], temperature_K=1500.0
+        ).derivation["gamma"]
+        for row in rows
+        if row["formula"] == "Rb2O"
+    }
+    assert all(gamma < 1.0 for gamma in alone.values())
+    assert answer.derivation["rung"] == 2
+    assert answer.derivation["flag"] == "envelope_upper_bound"
+    assert answer.verdict is ActivityVerdictKind.UPPER_BOUND
+    assert answer.derivation["homologue"] is None
+    assert answer.derivation["source_row_id"] == max(alone, key=alone.__getitem__)
+    assert answer.derivation["gamma"] == max(alone.values())
+    assert answer.derivation["extrapolation_notice"] is None
 
 
-def test_li2o_without_a_band_follows_na2o() -> None:
+def test_unbanded_li2o_is_an_envelope_bound() -> None:
+    """Published Li2O rows with no band stay on Li2O. They do not follow Na2O."""
+
     rows = [
         _row("Li2O", row_id="air", B="3973", notes="air point"),
         _row("Li2O", row_id="low-fo2", B="853.7", notes="reduced point"),
         _row("Na2O", row_id="na", B="-8000", notes="sodium fit"),
     ]
     answer = _resolve("Li2O", rows, temperature_K=1673.0)
-    assert answer.derivation["rung"] == 3
-    assert answer.derivation["flag"] == "homologue"
-    assert answer.derivation["homologue"] == "Na2O"
-    assert answer.derivation["source_row_id"] == "na"
-    assert answer.derivation["gamma"] is not None
-    assert answer.value is not None
+    alone = {
+        row["source_row_id"]: _resolve(
+            "Li2O", [row], temperature_K=1673.0
+        ).derivation["gamma"]
+        for row in rows
+        if row["formula"] == "Li2O"
+    }
+    assert all(gamma > 1.0 for gamma in alone.values())
+    assert answer.derivation["rung"] == 2
+    assert answer.derivation["flag"] == "envelope_lower_bound"
+    assert answer.verdict is ActivityVerdictKind.LOWER_BOUND
+    assert answer.bound_direction is BoundDirection.LOWER
+    assert answer.derivation["homologue"] is None
+    assert answer.provider == "trace_parent_activity_ladder"
+    assert answer.derivation["source_row_id"] == min(alone, key=alone.__getitem__)
+    assert answer.derivation["gamma"] == min(alone.values())
     assert answer.verdict is not ActivityVerdictKind.UPPER_BOUND
 
 
@@ -729,3 +764,140 @@ def test_production_trace_parents_have_an_executable_activity() -> None:
         assert answer.value is not None, formula
         assert answer.derivation["rung"] in {2, 3, 4}, formula
         assert "flag" in answer.derivation
+
+
+def _published_gammas(
+    formula: str, rows: list[dict[str, object]], temperature_K: float
+) -> list[float]:
+    published: list[float] = []
+    for row in rows:
+        if row["formula"] != formula:
+            continue
+        alone = _resolve(formula, [row], temperature_K=temperature_K)
+        if alone.derivation["origin"] == "published":
+            published.append(float(alone.derivation["gamma"]))
+    return published
+
+
+def test_straddling_unbanded_rows_use_the_geometric_mean() -> None:
+    rows = [
+        _row("PbO", row_id="low", B="-1000", notes="below"),
+        _row("PbO", row_id="high", B="1000", notes="above"),
+    ]
+    answer = _resolve("PbO", rows)
+    gammas = _published_gammas("PbO", rows, 1500.0)
+    assert min(gammas) < 1.0 < max(gammas)
+    midpoint = math.exp(sum(math.log(gamma) for gamma in sorted(gammas)) / len(gammas))
+    assert answer.derivation["flag"] == "envelope_midpoint"
+    assert answer.verdict is ActivityVerdictKind.STATUS_BEARING_VALUE
+    assert answer.bound_direction is None
+    assert answer.derivation["rung"] == 2
+    assert answer.derivation["source_row_id"] is None
+    assert answer.derivation["homologue"] is None
+    assert answer.provider == "trace_parent_activity_ladder"
+    assert answer.derivation["gamma"] == pytest.approx(midpoint)
+    assert answer.value == pytest.approx(midpoint * 1e-6)
+    assert answer.derivation["gamma_envelope_min"] == min(gammas)
+    assert answer.derivation["gamma_envelope_max"] == max(gammas)
+    assert set(answer.derivation["source_row_ids"]) == {"low", "high"}
+    assert answer.reason != "henrian_gamma_unmeasured"
+
+
+def test_stated_nominal_beats_the_envelope_extreme() -> None:
+    rows = [
+        _row("Cu2O", row_id="big", B="5000", notes="other model"),
+        _row("Cu2O", row_id="altman", B="373.261", notes="Altman (1978)"),
+    ]
+    answer = _resolve("Cu2O", rows)
+    nominal = _resolve("Cu2O", [rows[1]])
+    other = _resolve("Cu2O", [rows[0]])
+    assert answer.derivation["source_row_id"] == "altman"
+    assert answer.derivation["flag"] == "source_stated_nominal"
+    assert answer.reason == "source_stated_nominal"
+    assert answer.verdict is ActivityVerdictKind.STATUS_BEARING_VALUE
+    assert answer.verdict is not ActivityVerdictKind.UPPER_BOUND
+    assert answer.derivation["rung"] == 2
+    assert answer.derivation["gamma"] == nominal.derivation["gamma"]
+    assert answer.derivation["gamma"] != other.derivation["gamma"]
+    assert answer.derivation["nominal_cite"] == "fegley2023:1636-1641"
+    assert set(answer.derivation["source_row_ids"]) == {"big", "altman"}
+    assert answer.derivation["gamma_envelope_min"] == min(
+        nominal.derivation["gamma"], other.derivation["gamma"]
+    )
+    assert answer.derivation["gamma_envelope_max"] == max(
+        nominal.derivation["gamma"], other.derivation["gamma"]
+    )
+    assert answer.provider == "trace_parent_activity_ladder"
+
+
+def test_production_cu2o_uses_altman_and_not_a_unity_bound() -> None:
+    table = load_fegley2023_gamma_table()["rows"]
+    cu_rows = [row for row in table if row["formula"] == "Cu2O"]
+    named = [
+        row for row in cu_rows if "Altman (1978)" in str(row["notes_as_printed"])
+    ]
+    assert len(named) == 1
+    assert all(row["validity_range_K"] is None for row in cu_rows)
+    for temperature_K in (1500.0, 1673.0, 1923.0):
+        answer = _resolve("Cu2O", None, temperature_K=temperature_K)
+        nominal = _resolve("Cu2O", named, temperature_K=temperature_K)
+        each = _published_gammas("Cu2O", cu_rows, temperature_K)
+        assert min(each) > 1.0
+        assert answer.derivation["source_row_id"] == named[0]["source_row_id"]
+        assert answer.derivation["flag"] == "source_stated_nominal"
+        assert answer.reason == "source_stated_nominal"
+        assert answer.verdict is ActivityVerdictKind.STATUS_BEARING_VALUE
+        assert answer.derivation["rung"] == 2
+        assert answer.provider == "trace_parent_activity_ladder"
+        assert answer.derivation["gamma"] == nominal.derivation["gamma"]
+        assert answer.derivation["gamma"] != 1.0
+        assert answer.derivation["gamma_envelope_min"] == min(each)
+        assert answer.derivation["gamma_envelope_max"] == max(each)
+        assert answer.derivation["homologue"] is None
+        assert len(answer.derivation["source_row_ids"]) == len(cu_rows)
+        alias = _resolve("CuO0.5", None, temperature_K=temperature_K)
+        assert alias.derivation["flag"] == "source_stated_nominal"
+        assert alias.derivation["coefficient_formula"] == "Cu2O"
+        assert alias.derivation["source_row_id"] == answer.derivation["source_row_id"]
+        assert (
+            alias.derivation["gamma_envelope_min"]
+            == answer.derivation["gamma_envelope_min"]
+        )
+        assert (
+            alias.derivation["gamma_envelope_max"]
+            == answer.derivation["gamma_envelope_max"]
+        )
+        assert answer.value == pytest.approx(alias.value**2)
+        converted = pure_liquid_reference_coefficient(
+            "Cu2O", "CuO0.5", answer.derivation["gamma"]
+        )
+        assert alias.derivation["gamma"] == converted
+
+
+def test_production_geo2_straddle_is_the_envelope_midpoint() -> None:
+    table = load_fegley2023_gamma_table()["rows"]
+    geo_rows = [row for row in table if row["formula"] == "GeO2"]
+    assert all(row["validity_range_K"] is None for row in geo_rows)
+    for temperature_K in (1500.0, 1673.0):
+        published = _published_gammas("GeO2", geo_rows, temperature_K)
+        assert len(published) == 3
+        assert min(published) < 1.0 < max(published)
+        midpoint = math.exp(
+            sum(math.log(gamma) for gamma in sorted(published)) / len(published)
+        )
+        answer = _resolve("GeO2", None, temperature_K=temperature_K)
+        assert answer.derivation["flag"] == "envelope_midpoint"
+        assert answer.verdict is ActivityVerdictKind.STATUS_BEARING_VALUE
+        assert answer.bound_direction is None
+        assert answer.derivation["rung"] == 2
+        assert answer.derivation["source_row_id"] is None
+        assert answer.provider == "trace_parent_activity_ladder"
+        assert answer.derivation["homologue"] is None
+        assert answer.reason == "envelope_midpoint"
+        assert answer.derivation["gamma"] == pytest.approx(midpoint)
+        assert answer.value == pytest.approx(answer.derivation["gamma"] * 1e-6)
+        assert answer.derivation["gamma_envelope_min"] == min(published)
+        assert answer.derivation["gamma_envelope_max"] == max(published)
+        assert len(answer.derivation["source_row_ids"]) == 3
+        assert answer.reason != "henrian_gamma_unmeasured"
+        assert answer.derivation["gamma"] != 1.0

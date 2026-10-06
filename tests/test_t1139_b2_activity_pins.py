@@ -33,8 +33,10 @@ PIN_MOLE_FRACTION = 1e-6
 # activity-basis spelling keeps the pure-liquid reference coefficient in
 # gamma and sets the activity by a_single = a_parent ** (1/c). A Table 2
 # row that does not state the caller's standard state is status-bearing,
-# not a point. Parents with no selectable band end on the unity upper
-# bound, whose activity is the mole fraction.
+# not a point. Published rows that no band selects are the source's stated
+# nominal when one is recorded (Cu, Altman 1978), otherwise the candidate
+# envelope (GeO2, geometric mean). The unity upper bound remains only where
+# no published row was measured.
 _AFTER_LADDER = json.loads(
     r"""
 {
@@ -101,55 +103,55 @@ _AFTER_LADDER = json.loads(
   },
   "Cu2O": {
     "authority": false,
-    "bound": "upper",
+    "bound": null,
     "coefficient_formula": null,
     "extrapolation_notice": null,
-    "flag": "henrian_gamma_unmeasured",
+    "flag": "source_stated_nominal",
     "gamma_hex": {
-      "1500": "0x1.0000000000000p+0",
-      "1673": "0x1.0000000000000p+0"
+      "1500": "0x1.c606a1a8023e8p+0",
+      "1673": "0x1.abe807e222328p+0"
     },
     "homologue": null,
     "may_certify": false,
-    "origin": null,
-    "provider": "henrian_bound_policy",
-    "reason": "henrian_gamma_unmeasured",
-    "report_label": "bound-not-point",
-    "rung": 4,
-    "source_row_count": 0,
-    "source_row_id": null,
-    "tier": "C",
+    "origin": "published",
+    "provider": "trace_parent_activity_ladder",
+    "reason": "source_stated_nominal",
+    "report_label": "status-bearing-not-point",
+    "rung": 2,
+    "source_row_count": 4,
+    "source_row_id": "fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_02_model::rows_as_printed:h=fa5591300e55",
+    "tier": "B",
     "value_hex": {
-      "1500": "0x1.0c6f7a0b5ed8dp-20",
-      "1673": "0x1.0c6f7a0b5ed8dp-20"
+      "1500": "0x1.dc14a68f4dbc6p-20",
+      "1673": "0x1.c0b13ddbbc1d6p-20"
     },
-    "verdict": "UpperBound"
+    "verdict": "StatusBearingValue"
   },
   "CuO0.5": {
     "authority": false,
-    "bound": "upper",
+    "bound": null,
     "coefficient_formula": "Cu2O",
     "extrapolation_notice": null,
-    "flag": "henrian_gamma_unmeasured",
+    "flag": "source_stated_nominal",
     "gamma_hex": {
-      "1500": "0x1.0000000000000p+0",
-      "1673": "0x1.0000000000000p+0"
+      "1500": "0x1.54ed175ec4c24p+0",
+      "1673": "0x1.4af97008ebc1fp+0"
     },
     "homologue": null,
     "may_certify": false,
-    "origin": null,
-    "provider": "henrian_bound_policy",
-    "reason": "henrian_gamma_unmeasured",
-    "report_label": "bound-not-point",
-    "rung": 4,
-    "source_row_count": 0,
-    "source_row_id": null,
-    "tier": "C",
+    "origin": "published",
+    "provider": "trace_parent_activity_ladder",
+    "reason": "source_stated_nominal",
+    "report_label": "status-bearing-not-point",
+    "rung": 2,
+    "source_row_count": 4,
+    "source_row_id": "fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_02_model::rows_as_printed:h=fa5591300e55",
+    "tier": "B",
     "value_hex": {
-      "1500": "0x1.0c6f7a0b5ed8dp-20",
-      "1673": "0x1.0c6f7a0b5ed8dp-20"
+      "1500": "0x1.5d1bbdd1aedb6p-10",
+      "1673": "0x1.52eaf1b31e78cp-10"
     },
-    "verdict": "UpperBound"
+    "verdict": "StatusBearingValue"
   },
   "Ga2O3": {
     "authority": false,
@@ -205,29 +207,29 @@ _AFTER_LADDER = json.loads(
   },
   "GeO2": {
     "authority": false,
-    "bound": "upper",
+    "bound": null,
     "coefficient_formula": null,
     "extrapolation_notice": null,
-    "flag": "henrian_gamma_unmeasured",
+    "flag": "envelope_midpoint",
     "gamma_hex": {
-      "1500": "0x1.0000000000000p+0",
-      "1673": "0x1.0000000000000p+0"
+      "1500": "0x1.03e7223198b04p-2",
+      "1673": "0x1.ad5ac6bebcc0bp-2"
     },
     "homologue": null,
     "may_certify": false,
-    "origin": null,
-    "provider": "henrian_bound_policy",
-    "reason": "henrian_gamma_unmeasured",
-    "report_label": "bound-not-point",
-    "rung": 4,
-    "source_row_count": 0,
+    "origin": "published",
+    "provider": "trace_parent_activity_ladder",
+    "reason": "envelope_midpoint",
+    "report_label": "status-bearing-not-point",
+    "rung": 2,
+    "source_row_count": 3,
     "source_row_id": null,
-    "tier": "C",
+    "tier": "B",
     "value_hex": {
-      "1500": "0x1.0c6f7a0b5ed8dp-20",
-      "1673": "0x1.0c6f7a0b5ed8dp-20"
+      "1500": "0x1.108724eb70dedp-22",
+      "1673": "0x1.c235ff1c2efdfp-22"
     },
-    "verdict": "UpperBound"
+    "verdict": "StatusBearingValue"
   },
   "In2O3": {
     "authority": false,
