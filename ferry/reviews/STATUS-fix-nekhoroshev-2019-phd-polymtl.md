@@ -20,7 +20,7 @@
 - Review items addressed: **10/10**. Item 7 is partial: 40 of the 138 numbered equations are carried.
 - Mismatches fixed: **6/6** (4 row-binding, 2 locator).
 - Table rows added: **152** (14.1 +14, 21.1 +54, A.42 +27, 1.1 +40, 1.2 +17). There are 2 new table files, and the ledger table_count is now 69.
-- New context rows: 6 (t1.1, t1.2, activity_reference_states, activity_reduction_lineage, per_study_method_facts, narrative_quantities, plus numbered_equations = 7 non-table rows in total with the scope context edits). The extract now has 76 context rows.
+- New context rows: **7** (69 → 76). Two are table rows (Tables 1.1 and 1.2). Five are non-table rows: activity_reference_states, activity_reduction_lineage, per_study_method_facts, narrative_quantities and numbered_equations. The scope context unknowns were also re-pointed. (This corrects the first delivery of this file, mailbox 9435e048, which garbled this line.)
 - Diff cfaa7465..b6f2b469: 16 files, +2979/−47.
 - Migrator hard issues after finalize: **0**. Fidelity validator: OK. `tools/test_ledgers_valid.py`: 674 passed (Mac; green 61ec839d).
 
