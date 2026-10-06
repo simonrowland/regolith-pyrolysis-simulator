@@ -617,3 +617,38 @@ def test_r2_f5_oxygen_input_decision_is_one_policy_on_both_cell_branches(
         reactive_outcome[1].get("reason"),
         reactive_outcome[2],
     ) == expected
+
+
+def test_r2_f4_guard_borrowed_envelope_never_attaches_to_residue_dex_rows() -> None:
+    """B guard for the F4 fix: a borrowed envelope never uses the row's metric.
+
+    score_store hands every row the KEMS p_partial pressure envelope as
+    derived_band. On a measured residue element-ppm (DEX) row that envelope
+    must stay rejected by the quantity-default dimension check, exactly as
+    at green 8089eadbf (Sossi 2019 rows stay NO_BAND, B unchanged). Red at
+    cc10e8386, where the identity-aware DEX operation also admitted borrowed
+    envelopes.
+    """
+
+    from simulator.battery.enums import SourceRelation
+    from simulator.battery.records import DecisionBand
+    from simulator.battery.score import populate_numeric
+
+    envelope = DecisionBand(
+        Decimal("0.146"), "dimensionless", "KEMS p_partial measured uncertainty"
+    )
+    common = dict(
+        quantity=Quantity.RESIDUE_COMPONENT_COMPOSITION,
+        candidate=Decimal("10"),
+        reference=Decimal("5"),
+        source_relation=SourceRelation.INDEPENDENT,
+        rail=Rail.RESIDUE_COMPOSITION,
+        observations={},
+        experiments={},
+        derived_band=envelope,
+        operation_override=MetricOperation.DEX,
+    )
+    borrowed, _reason, _detail = populate_numeric(**common)
+    assert borrowed is not None
+    assert borrowed.operation is MetricOperation.DEX
+    assert borrowed.decision_band is None
