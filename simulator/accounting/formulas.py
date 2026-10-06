@@ -253,21 +253,7 @@ def parse_formula(
         raise UnknownSpeciesError("formula is required")
 
     species_id = species or name or str(formula).strip()
-    try:
-        return _species_from_cleaned(cleaned, species_id)
-    except (UnknownSpeciesError, AccountingError) as first:
-        # Hydrate split treats ASCII '.' as a separator (H2SO4.2H2O). Activity
-        # bases such as AlO1.5 / CuO0.5 fail that split; they are one ungrouped
-        # token cover with a decimal subscript, so retry as a single segment.
-        if "." not in cleaned:
-            raise first
-        tokens = list(_UNGROUPED_FORMULA_RE.finditer(cleaned))
-        if not tokens or "".join(token.group(0) for token in tokens) != cleaned:
-            raise first
-        try:
-            return _species_from_segments((cleaned,), species_id)
-        except (UnknownSpeciesError, AccountingError):
-            raise first from None
+    return _species_from_cleaned(cleaned, species_id)
 
 
 def coerce_species_formula(species: str, value: Any | None = None) -> SpeciesFormula:
@@ -553,6 +539,7 @@ def _species_from_segments(
 ) -> SpeciesFormula:
     totals: defaultdict[str, float] = defaultdict(float)
     for segment in segments:
+        segment = _normalize_leading_dot_subscripts(segment)
         multiplier, body = _leading_multiplier(segment)
         parser = _FormulaParser(body)
         elements = parser.parse()
@@ -562,8 +549,33 @@ def _species_from_segments(
 
 
 def _split_formula_segments(formula: str) -> list[str]:
-    normalized = formula.replace("·", ".")
-    segments = [segment for segment in normalized.split(".") if segment]
+    # USGS/JANAF omit the zero in fractional element occupancies (Fe.947O).
+    # A middle dot is always an adduct separator. Preserve the legacy ASCII
+    # spelling when a coefficient multiplies a complete molecular formula with
+    # multiple elements (5H2O, 4CO2, 2Al2O3); a monatomic tail is a subscript.
+    pieces = re.split(r"([.·])", formula)
+    segments = [pieces[0]]
+    for separator, tail in zip(pieces[1::2], pieces[2::2]):
+        coefficient = re.match(r"\d+(.*)", tail)
+        body = coefficient.group(1) if coefficient else ""
+        tokens = list(_UNGROUPED_FORMULA_RE.finditer(body))
+        molecular_adduct = (
+            "".join(token.group(0) for token in tokens) == body
+            and len({token.group(1) for token in tokens}) > 1
+        )
+        if (
+            separator == "."
+            and coefficient is not None
+            and segments[-1]
+            and segments[-1][-1].isalnum()
+            # Splitting an explicit zero would leave an invalid zero atom
+            # count (Fe0.2SiO4); it unambiguously belongs to the subscript.
+            and (not molecular_adduct or re.search(r"[A-Z][a-z]?0$", segments[-1]))
+        ):
+            segments[-1] += separator + tail
+        else:
+            segments.append(tail)
+    segments = [segment for segment in segments if segment]
     if not segments:
         raise UnknownSpeciesError("formula is required")
     return segments

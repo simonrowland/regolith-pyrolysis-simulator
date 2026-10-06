@@ -62,6 +62,28 @@ def test_decimal_subscript_formulas_parse_for_activity_basis() -> None:
     assert hydrate.elements["O"] == pytest.approx(6.0)
 
 
+@pytest.mark.parametrize(
+    ("formula", "atoms"),
+    (
+        ("Fe.947O", {"Fe": 0.947, "O": 1}),
+        ("Fe0.947O", {"Fe": 0.947, "O": 1}),
+        ("Mg1.8Fe0.2SiO4", {"Mg": 1.8, "Fe": 0.2, "Si": 1, "O": 4}),
+        ("Ba0.543Sr0.457TiO3", {"Ba": 0.543, "Sr": 0.457, "Ti": 1, "O": 3}),
+        ("Ni0.4Zn0.6Fe2O4", {"Ni": 0.4, "Zn": 0.6, "Fe": 2, "O": 4}),
+        ("Fe.90S", {"Fe": 0.90, "S": 1}),
+        ("NbC.98", {"Nb": 1, "C": 0.98}),
+        ("(Na.78K.22)AlSiO4", {"Na": 0.78, "K": 0.22, "Al": 1, "Si": 1, "O": 4}),
+        ("CuSO4.5H2O", {"Cu": 1, "S": 1, "O": 9, "H": 10}),
+        ("H2SO4.2H2O", {"S": 1, "O": 6, "H": 6}),
+        ("NaCl.2H2O", {"Na": 1, "Cl": 1, "O": 2, "H": 4}),
+        ("SrHgO.4CO2.5H2O", {"Sr": 1, "Hg": 1, "C": 4, "O": 14, "H": 10}),
+    ),
+)
+def test_printed_decimal_subscripts_preserve_molecular_adducts(formula, atoms) -> None:
+    """USGS/JANAF leading-dot occupancy; hydrates retain whole water molecules."""
+    assert dict(parse_formula(formula).elements) == pytest.approx(atoms)
+
+
 def test_tabulated_janaf_is_a_runtime_thermo_family() -> None:
     assert "tabulated_janaf" in RUNTIME_THERMO_EVALUATOR_FAMILIES
     assert "nasa_cea_7" in RUNTIME_THERMO_EVALUATOR_FAMILIES
