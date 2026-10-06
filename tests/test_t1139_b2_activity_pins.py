@@ -32,11 +32,13 @@ PIN_MOLE_FRACTION = 1e-6
 # A parent row uses a = gamma * X on the molecular basis passed in. An
 # activity-basis spelling keeps the pure-liquid reference coefficient in
 # gamma and sets the activity by a_single = a_parent ** (1/c). A Table 2
-# row that does not state the caller's standard state is status-bearing,
-# not a point. Published rows that no band selects are the source's stated
-# nominal when one is recorded (Cu, Altman 1978), otherwise the candidate
-# envelope (GeO2, geometric mean). The unity upper bound remains only where
-# no published row was measured.
+# row whose note assigns the gamma to another oxide, and an activity-basis
+# conversion of the row, are status-bearing, not points. A printed phrase
+# alone is not a basis. The paper's stated convention, phase, and molecular
+# fraction make an in-basis published row a point. Published rows that no
+# band selects are the source's stated nominal when one is recorded (Cu,
+# Altman 1978), otherwise the candidate envelope (GeO2, geometric mean).
+# The unity upper bound remains only where no published row was measured.
 _AFTER_LADDER = json.loads(
     r"""
 {
@@ -80,7 +82,7 @@ _AFTER_LADDER = json.loads(
     "bound": null,
     "coefficient_formula": null,
     "extrapolation_notice": null,
-    "flag": "standard_state_basis_unestablished",
+    "flag": "published",
     "gamma_hex": {
       "1500": "0x1.137459234191cp-27",
       "1673": "0x1.d957152e02175p-25"
@@ -89,8 +91,8 @@ _AFTER_LADDER = json.loads(
     "may_certify": false,
     "origin": "published",
     "provider": "trace_parent_activity_ladder",
-    "reason": "standard_state_basis_unestablished",
-    "report_label": "status-bearing-not-point",
+    "reason": "published_gamma",
+    "report_label": null,
     "rung": 2,
     "source_row_count": 1,
     "source_row_id": "fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_02_model::rows_as_printed:h=88048d19eeb1",
@@ -99,7 +101,7 @@ _AFTER_LADDER = json.loads(
       "1500": "0x1.20d5c0153d76ap-47",
       "1673": "0x1.f0554896df580p-45"
     },
-    "verdict": "StatusBearingValue"
+    "verdict": "Point"
   },
   "Cu2O": {
     "authority": false,
@@ -236,7 +238,7 @@ _AFTER_LADDER = json.loads(
     "bound": null,
     "coefficient_formula": null,
     "extrapolation_notice": null,
-    "flag": "standard_state_basis_unestablished",
+    "flag": "published",
     "gamma_hex": {
       "1500": "0x1.71736527bbfbdp-15",
       "1673": "0x1.0496141e2f5f6p-13"
@@ -245,8 +247,8 @@ _AFTER_LADDER = json.loads(
     "may_certify": false,
     "origin": "published",
     "provider": "trace_parent_activity_ladder",
-    "reason": "standard_state_basis_unestablished",
-    "report_label": "status-bearing-not-point",
+    "reason": "published_gamma",
+    "report_label": null,
     "rung": 2,
     "source_row_count": 1,
     "source_row_id": "fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_02_model::rows_as_printed:h=aaa9829cdabd",
@@ -255,14 +257,14 @@ _AFTER_LADDER = json.loads(
       "1500": "0x1.8365af0fdc11bp-35",
       "1673": "0x1.113e965d6b437p-33"
     },
-    "verdict": "StatusBearingValue"
+    "verdict": "Point"
   },
   "InO1.5": {
     "authority": false,
     "bound": null,
     "coefficient_formula": "In2O3",
     "extrapolation_notice": null,
-    "flag": "standard_state_basis_unestablished",
+    "flag": "component_basis_derived",
     "gamma_hex": {
       "1500": "0x1.b2ec84119b89ap-8",
       "1673": "0x1.6d4469e3ed039p-7"
@@ -271,7 +273,7 @@ _AFTER_LADDER = json.loads(
     "may_certify": false,
     "origin": "published",
     "provider": "trace_parent_activity_ladder",
-    "reason": "standard_state_basis_unestablished",
+    "reason": "component_basis_derived",
     "report_label": "status-bearing-not-point",
     "rung": 2,
     "source_row_count": 1,
@@ -358,7 +360,7 @@ _AFTER_LADDER = json.loads(
     "bound": null,
     "coefficient_formula": null,
     "extrapolation_notice": null,
-    "flag": "standard_state_basis_unestablished",
+    "flag": "published",
     "gamma_hex": {
       "1500": "0x1.407beea69aaacp-30",
       "1673": "0x1.501d1a32d102cp-27"
@@ -367,8 +369,8 @@ _AFTER_LADDER = json.loads(
     "may_certify": false,
     "origin": "published",
     "provider": "trace_parent_activity_ladder",
-    "reason": "standard_state_basis_unestablished",
-    "report_label": "status-bearing-not-point",
+    "reason": "published_gamma",
+    "report_label": null,
     "rung": 2,
     "source_row_count": 1,
     "source_row_id": "fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_02_model::rows_as_printed:h=13d25d543cb0",
@@ -377,7 +379,7 @@ _AFTER_LADDER = json.loads(
       "1500": "0x1.500d4c5c2ff36p-50",
       "1673": "0x1.6070d4485b1b3p-47"
     },
-    "verdict": "StatusBearingValue"
+    "verdict": "Point"
   },
   "SnO": {
     "authority": false,

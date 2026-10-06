@@ -2,9 +2,11 @@
 
 The runtime must not import the battery extract schema. This tool copies
 each activity_coefficient_temperature_fit row, including the printed
-standard-state phrase. It does not decide whether that phrase matches a
-caller. Origin labels (published versus proxy) are classified by the
-activity owner, not here.
+standard-state phrase and, when the extract carries them, the stated
+convention, phase, mole-fraction basis, and cite. It does not decide
+whether those fields match a caller and it does not invent them. Origin
+labels (published versus proxy) are classified by the activity owner,
+not here.
 """
 
 from __future__ import annotations
@@ -54,6 +56,22 @@ def _parameters(observation: dict[str, Any]) -> dict[str, str]:
     return {str(name): _parameter_text(number) for name, number in raw}
 
 
+_COPIED_DOMAIN_TEXT = (
+    "stated_convention",
+    "stated_phase",
+    "mole_fraction_basis",
+    "stated_basis_cite",
+)
+
+
+def _optional_text(domain: dict[str, Any], key: str) -> str | None:
+    value = domain.get(key)
+    if not isinstance(value, str):
+        return None
+    text = value.strip()
+    return text or None
+
+
 def _domain(observation: dict[str, Any]) -> dict[str, Any]:
     value = observation.get("value") or {}
     raw = value.get("expression_domain")
@@ -101,17 +119,20 @@ def build_table(extract_path: Path) -> dict[str, Any]:
                 f"{observation.get('observation_id')}: fit has no printed "
                 "standard state"
             )
-        rows.append(
-            {
-                "source_row_id": str(observation.get("observation_id") or ""),
-                "formula": formula,
-                "A": parameters["A"],
-                "B": parameters["B"],
-                "validity_range_K": band,
-                "notes_as_printed": str(domain.get("notes_as_printed") or ""),
-                "standard_state_as_printed": printed_state.strip(),
-            }
-        )
+        row = {
+            "source_row_id": str(observation.get("observation_id") or ""),
+            "formula": formula,
+            "A": parameters["A"],
+            "B": parameters["B"],
+            "validity_range_K": band,
+            "notes_as_printed": str(domain.get("notes_as_printed") or ""),
+            "standard_state_as_printed": printed_state.strip(),
+        }
+        for key in _COPIED_DOMAIN_TEXT:
+            copied = _optional_text(domain, key)
+            if copied is not None:
+                row[key] = copied
+        rows.append(row)
     rows.sort(key=lambda row: (row["formula"], row["source_row_id"]))
     if not rows:
         raise ValueError(f"{extract_path}: no {QUANTITY} rows")

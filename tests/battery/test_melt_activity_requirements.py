@@ -1443,15 +1443,21 @@ def test_proxy_and_published_coefficients_keep_their_verdict(monkeypatch):
     assert published_candidate.provenance["flag"] == "published"
 
 
-def test_scorer_refuses_trace_parent_gamma_with_an_unstated_basis(monkeypatch):
-    """SnO's printed basis reaches the scorer and does not become a point."""
+def test_scorer_accepts_trace_parent_gamma_on_the_stated_paper_basis(monkeypatch):
+    """SnO's paper basis matches a liquid observation.
 
-    from simulator.battery.enums import Engine, RefusalReason
+    1473 K is outside the certified band, so the coefficient stays
+    status-bearing and extrapolated. The printed Table 2 phrase is still
+    recorded. A solid observation remains a reference-state mismatch.
+    """
+
+    from simulator.battery.enums import Engine
     from simulator.battery.score import predict_with_engine
     from simulator.diagnostic_helpers.binary_pot_battery import (
         trace_parent_activity_coefficient_emission,
     )
     from simulator.vapour_rail.activity import (
+        ActivityVerdictKind,
         StandardStateIdentity,
         resolve_trace_parent_activity,
     )
@@ -1507,8 +1513,8 @@ def test_scorer_refuses_trace_parent_gamma_with_an_unstated_basis(monkeypatch):
         experiment=experiment,
         isolated=False,
     )
-    assert prediction.value is None
-    assert prediction.refusal_reason is RefusalReason.COEFFICIENT_BASIS_MISMATCH
+    assert prediction.refusal_reason is None
+    assert prediction.value is not None
     _solid_experiment, _solid_bench, solid_observation = _case(
         composition=_composition(("SnO", "0.01"), ("SiO2", "0.99")),
         quantity=Quantity.ACTIVITY_COEFFICIENT,
@@ -1537,21 +1543,26 @@ def test_scorer_refuses_trace_parent_gamma_with_an_unstated_basis(monkeypatch):
     assert seen["temperature_K"] == pytest.approx(1473.15)
     detail = seen["details"]["SnO"]
     assert detail["rung"] == 2
-    assert detail["flag"]
+    assert detail["flag"] == "extrapolated"
     assert detail["source_row_id"]
-    assert "standard_state" not in detail
+    assert detail["standard_state"] == {
+        "convention": "raoultian_pure_endmember",
+        "phase": "l",
+        "component_basis": "SnO",
+    }
     assert "coefficient_basis" not in detail
     assert detail["source_basis"]["standard_state_as_printed"] == (
         owner.derivation["standard_state_as_printed"]
     )
-    assert detail["source_basis"]["standard_state_as_printed"]
-    assert detail["source_basis"]["convention"] is None
+    assert detail["source_basis"]["standard_state_as_printed"] == (
+        "not stated in Table 2 row"
+    )
+    assert detail["source_basis"]["convention"] == "raoultian_pure_endmember"
     assert detail["target_basis"]["convention"] == "raoultian_pure_endmember"
     assert detail["target_basis"]["phase"] == "liquid"
     assert detail["target_basis"]["component_basis"] == "SnO"
-    assert prediction.refusal_detail["reported_standard_state"] is None
-    assert prediction.refusal_detail["source_basis"] == detail["source_basis"]
-    assert prediction.refusal_detail["target_basis"] == detail["target_basis"]
     assert prediction.refusal_detail["verdict"] == owner.verdict.value
     assert prediction.refusal_detail["rung"] == owner.derivation["rung"]
     assert prediction.refusal_detail["flag"] == owner.derivation["flag"]
+    assert owner.derivation["basis_established"] is True
+    assert owner.verdict is not ActivityVerdictKind.POINT

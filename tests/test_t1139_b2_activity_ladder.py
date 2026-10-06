@@ -72,6 +72,7 @@ def _row(
     standard_state_as_printed: str | None = None,
     stated_convention: str | None = None,
     stated_phase: str | None = None,
+    mole_fraction_basis: str | None = None,
 ) -> dict[str, object]:
     payload: dict[str, object] = {
         "source_row_id": row_id,
@@ -87,6 +88,8 @@ def _row(
         payload["stated_convention"] = stated_convention
     if stated_phase is not None:
         payload["stated_phase"] = stated_phase
+    if mole_fraction_basis is not None:
+        payload["mole_fraction_basis"] = mole_fraction_basis
     return payload
 
 
@@ -133,6 +136,11 @@ def test_generated_table_matches_the_extract_sha() -> None:
         "liquid standard state",
     }
     assert "not stated in Table 2 row" in phrases
+    for row in committed["rows"]:
+        assert row["stated_convention"] == "raoultian_pure_endmember"
+        assert row["stated_phase"] == "liquid"
+        assert row["mole_fraction_basis"] == "conventional_oxide_molecular"
+        assert row["stated_basis_cite"] == "fegley2023:206,269-297,504-515"
 
 
 def test_published_row_is_rung_2_point() -> None:
@@ -532,8 +540,14 @@ def test_out_of_band_fit_extrapolates_with_the_certified_band() -> None:
         assert below.derivation["rung"] == 2
         assert below.derivation["source_row_id"] == matched[0]["source_row_id"]
         inside = _resolve(formula, None, temperature_K=(low + high) / 2.0)
-        assert inside.verdict is not ActivityVerdictKind.POINT
-        assert inside.derivation["flag"] == "standard_state_basis_unestablished"
+        assert inside.verdict is ActivityVerdictKind.POINT
+        assert inside.derivation["flag"] == "published"
+        assert inside.derivation["basis_established"] is True
+        assert inside.derivation["component_basis_derived"] is False
+        assert inside.derivation["source_convention"] == "raoultian_pure_endmember"
+        assert inside.derivation["mole_fraction_basis"] == (
+            "conventional_oxide_molecular"
+        )
         assert (
             inside.derivation["standard_state_as_printed"]
             == "not stated in Table 2 row"
@@ -601,13 +615,16 @@ def test_ino15_reproduces_the_published_anchor_at_1923_k() -> None:
     assert abs(parent.derivation["gamma"] - 0.02) > 1e-3
     assert single.derivation["candidate_rows"][0]["gamma"] == parent.derivation["gamma"]
     assert single.value == single.derivation["gamma"]
+    assert parent.verdict is ActivityVerdictKind.POINT
+    assert parent.derivation["flag"] == "published"
+    assert parent.derivation["basis_established"] is True
     assert single.verdict is not ActivityVerdictKind.POINT
-    assert parent.verdict is not ActivityVerdictKind.POINT
-    assert single.derivation["flag"] == "standard_state_basis_unestablished"
-    assert parent.derivation["flag"] == "standard_state_basis_unestablished"
+    assert single.derivation["flag"] == "component_basis_derived"
+    assert single.derivation["component_basis_derived"] is True
+    assert single.derivation["basis_established"] is False
 
 
-def test_unstated_standard_state_is_not_a_point_on_solid_or_liquid() -> None:
+def test_paper_basis_is_a_liquid_point_and_not_a_solid_point() -> None:
     liquid = _resolve("In2O3", None, temperature_K=1923.0)
     solid = _resolve(
         "In2O3",
@@ -619,8 +636,12 @@ def test_unstated_standard_state_is_not_a_point_on_solid_or_liquid() -> None:
             reference_pressure_bar=1.0,
         ),
     )
-    assert liquid.verdict is not ActivityVerdictKind.POINT
+    assert liquid.verdict is ActivityVerdictKind.POINT
+    assert liquid.derivation["flag"] == "published"
+    assert liquid.derivation["basis_established"] is True
     assert solid.verdict is not ActivityVerdictKind.POINT
+    assert solid.derivation["flag"] == "standard_state_basis_unestablished"
+    assert solid.derivation["basis_established"] is False
     assert liquid.derivation["gamma"] == solid.derivation["gamma"]
     assert liquid.derivation["target_phase"] == "liquid"
     assert solid.derivation["target_phase"] == "solid"
@@ -687,6 +708,86 @@ def test_printed_liquid_phrase_does_not_establish_the_convention() -> None:
     assert answer.verdict is not ActivityVerdictKind.POINT
     assert answer.derivation["flag"] == "standard_state_basis_unestablished"
     assert answer.derivation["gamma"] is not None
+
+
+def test_stated_fields_establish_beside_the_printed_phrase() -> None:
+    row = _row(
+        "SnO",
+        row_id="stated-liquid",
+        B="-90.4",
+        notes="measured",
+        standard_state_as_printed="not stated in Table 2 row",
+        stated_convention="raoultian_pure_endmember",
+        stated_phase="liquid",
+        mole_fraction_basis="conventional_oxide_molecular",
+    )
+    liquid = _resolve("SnO", [row])
+    solid = _resolve(
+        "SnO",
+        [row],
+        standard_state=StandardStateIdentity(
+            convention="raoultian_pure_endmember",
+            phase="solid",
+            reference_pressure_bar=1.0,
+        ),
+    )
+    cation = _row(
+        "SnO",
+        row_id="cation-basis",
+        B="-90.4",
+        notes="measured",
+        standard_state_as_printed="not stated in Table 2 row",
+        stated_convention="raoultian_pure_endmember",
+        stated_phase="liquid",
+        mole_fraction_basis="single_cation",
+    )
+    assert liquid.verdict is ActivityVerdictKind.POINT
+    assert liquid.derivation["basis_established"] is True
+    assert liquid.derivation["source_convention"] == "raoultian_pure_endmember"
+    assert liquid.derivation["mole_fraction_basis"] == "conventional_oxide_molecular"
+    assert solid.verdict is not ActivityVerdictKind.POINT
+    assert solid.derivation["flag"] == "standard_state_basis_unestablished"
+    cation_answer = _resolve("SnO", [cation])
+    assert cation_answer.verdict is not ActivityVerdictKind.POINT
+    assert cation_answer.derivation["basis_established"] is False
+
+
+def test_gamma_of_another_oxide_is_not_the_row_component() -> None:
+    stated = dict(
+        standard_state_as_printed="not stated in Table 2 row",
+        stated_convention="raoultian_pure_endmember",
+        stated_phase="liquid",
+        mole_fraction_basis="conventional_oxide_molecular",
+    )
+    converted = _row(
+        "As2O3",
+        row_id="chen",
+        B="-4791",
+        notes="g (AsO1.5) = 0.03 at 1573 K",
+        **stated,
+    )
+    answer = _resolve("As2O3", [converted])
+    assert answer.verdict is not ActivityVerdictKind.POINT
+    assert answer.derivation["flag"] == "component_basis_derived"
+    assert answer.derivation["component_basis_derived"] is True
+    assert answer.derivation["basis_established"] is False
+    system = _row("As2O3", row_id="system", B="-100", notes="CMAS+FeO", **stated)
+    melt = _resolve("As2O3", [system])
+    assert melt.verdict is ActivityVerdictKind.POINT
+    assert melt.derivation["component_basis_derived"] is False
+    table = load_fegley2023_gamma_table()["rows"]
+    chen = [
+        row
+        for row in table
+        if row["formula"] == "As2O3" and "AsO1.5" in str(row["notes_as_printed"])
+    ]
+    assert len(chen) >= 2
+    for row in chen:
+        production = _resolve("As2O3", [row])
+        assert production.verdict is not ActivityVerdictKind.POINT
+        assert production.derivation["component_basis_derived"] is True
+        assert production.derivation["basis_established"] is False
+        assert production.derivation["flag"] == "component_basis_derived"
 
 
 def test_unestablished_component_basis_does_not_reuse_the_row_gamma(
@@ -868,6 +969,9 @@ def test_production_cu2o_uses_altman_and_not_a_unity_bound() -> None:
             == answer.derivation["gamma_envelope_max"]
         )
         assert answer.value == pytest.approx(alias.value**2)
+        assert answer.derivation["basis_established"] is True
+        assert alias.derivation["basis_established"] is False
+        assert alias.derivation["component_basis_derived"] is True
         converted = pure_liquid_reference_coefficient(
             "Cu2O", "CuO0.5", answer.derivation["gamma"]
         )
@@ -901,6 +1005,11 @@ def test_production_geo2_straddle_is_the_envelope_midpoint() -> None:
         assert len(answer.derivation["source_row_ids"]) == 3
         assert answer.reason != "henrian_gamma_unmeasured"
         assert answer.derivation["gamma"] != 1.0
+        assert answer.derivation["basis_established"] is True
+        assert answer.derivation["source_convention"] == "raoultian_pure_endmember"
+        assert answer.derivation["mole_fraction_basis"] == (
+            "conventional_oxide_molecular"
+        )
 
 
 def test_production_homologue_targets_resolve_before_unity() -> None:

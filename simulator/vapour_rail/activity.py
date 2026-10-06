@@ -1624,6 +1624,12 @@ _GAMMA_EQUALS_OTHER = re.compile(
     rf"g\s*\(\s*({_OXIDE_IN_NOTE})\s*\)\s*=\s*(?:log\s*)?g\s*\(\s*({_OXIDE_IN_NOTE})\s*\)",
     re.IGNORECASE,
 )
+# g(oxide), including the spaced ``g (AsO1.5)`` printed in Table 2.
+_GAMMA_OF_OXIDE = re.compile(
+    rf"g\s*\(\s*({_OXIDE_IN_NOTE})\s*\)",
+    re.IGNORECASE,
+)
+_MOLECULAR_FRACTION_BASIS = "conventional_oxide_molecular"
 _TRACE_HOMOLOGUE = {
     "Rb2O": "K2O",
     "Cs2O": "K2O",
@@ -1688,6 +1694,30 @@ def _proxy_notes(notes: str) -> bool:
     return False
 
 
+def _component_basis_derived(row: Mapping[str, Any]) -> bool:
+    """True when the note assigns the gamma to a different oxide.
+
+    ``g(AsO1.5)`` on an As2O3 row is that case: Table 2 stores some
+    M2O3 rows on the one-cation component and some not. A melt system
+    in the note (``CMAS+FeO``, a ternary) does not assign the gamma.
+    """
+
+    formula = str(row.get("formula") or "")
+    notes = str(row.get("notes_as_printed") or "")
+    for match in _GAMMA_OF_OXIDE.finditer(notes):
+        if match.group(1).casefold() != formula.casefold():
+            return True
+    return False
+
+
+def _optional_row_text(raw: Mapping[str, Any], key: str) -> str | None:
+    value = raw.get(key)
+    if value is None:
+        return None
+    text = str(value).strip()
+    return text or None
+
+
 def _normalize_gamma_row(raw: Mapping[str, Any]) -> dict[str, Any]:
     notes = str(raw.get("notes_as_printed") or "")
     origin = raw.get("origin")
@@ -1712,6 +1742,8 @@ def _normalize_gamma_row(raw: Mapping[str, Any]) -> dict[str, Any]:
             None if not stated_convention else str(stated_convention)
         ),
         "stated_phase": None if not stated_phase else str(stated_phase),
+        "mole_fraction_basis": _optional_row_text(raw, "mole_fraction_basis"),
+        "stated_basis_cite": _optional_row_text(raw, "stated_basis_cite"),
     }
 
 
@@ -2086,20 +2118,22 @@ def _basis_annotation(
     """Source and target basis carried with one ladder answer.
 
     A printed Table 2 phrase is the source text. It is not a convention
-    and it is not a phase. Stated fields are the source only when no
-    phrase is printed. With neither, an established row stands on the
-    caller's identity.
+    and it is not a phase. Stated convention and phase are the source
+    when the row carries them, including when the table also prints that
+    the row itself did not state a standard state. With neither, an
+    established row stands on the caller's identity.
     """
 
     printed = None if row is None else row.get("standard_state_as_printed")
     stated_convention = None if row is None else row.get("stated_convention")
     stated_phase = None if row is None else row.get("stated_phase")
-    if printed is not None:
-        source_convention = None
-        source_phase = None
-    elif stated_convention or stated_phase:
+    derived = False if row is None else _component_basis_derived(row)
+    if stated_convention and stated_phase and not derived:
         source_convention = stated_convention
         source_phase = stated_phase
+    elif printed is not None:
+        source_convention = None
+        source_phase = None
     elif established:
         source_convention = standard_state.convention
         source_phase = standard_state.phase
@@ -2108,10 +2142,13 @@ def _basis_annotation(
         source_phase = None
     return {
         "basis_established": established,
+        "component_basis_derived": derived,
         "row_formula": None if row is None else str(row["formula"]),
         "standard_state_as_printed": None if printed is None else printed,
         "source_convention": source_convention,
         "source_phase": source_phase,
+        "mole_fraction_basis": None if row is None else row.get("mole_fraction_basis"),
+        "stated_basis_cite": None if row is None else row.get("stated_basis_cite"),
         "target_convention": standard_state.convention,
         "target_phase": standard_state.phase,
     }
@@ -2123,25 +2160,63 @@ def _standard_state_established(
     """True when the row's basis is the caller's standard state.
 
     A printed Table 2 phrase is not a typed convention. ``not stated in
-    Table 2 row`` and ``liquid standard state`` do not establish
-    ``raoultian_pure_endmember``, for either a liquid or a solid caller.
-    A row with no printed phrase stands on the caller's identity, unless
-    it carries ``stated_convention`` and ``stated_phase``, which must
-    match that identity.
+    Table 2 row`` and ``liquid standard state`` do not by themselves
+    establish ``raoultian_pure_endmember``. Stated convention and phase
+    do, including beside that printed phrase, when they match the caller
+    and the mole-fraction basis is the conventional-oxide molecular one
+    or is absent. A note that assigns the gamma to a different oxide
+    does not establish the row formula's component.
+    A row with neither a printed phrase nor stated fields stands on the
+    caller's identity.
     """
 
-    if row.get("standard_state_as_printed") is not None:
+    if _component_basis_derived(row):
         return False
     stated_convention = row.get("stated_convention")
     stated_phase = row.get("stated_phase")
     if stated_convention or stated_phase:
         if not stated_convention or not stated_phase:
             return False
+        fraction_basis = row.get("mole_fraction_basis")
+        if fraction_basis not in (None, _MOLECULAR_FRACTION_BASIS):
+            return False
         return (
             str(stated_convention) == standard_state.convention
             and _same_phase_token(str(stated_phase), standard_state.phase)
         )
+    if row.get("standard_state_as_printed") is not None:
+        return False
     return True
+
+
+def _mark_derived_spelling(
+    answer: SourceReactionActivity,
+) -> SourceReactionActivity:
+    """An activity-basis conversion is not the stored row's component.
+
+    The parent row may be a point on the paper's basis. This spelling
+    keeps the converted activity and does not claim that standard state.
+    A value that was a point becomes ``component_basis_derived``. A
+    proxy, an extrapolation, or a nominal keeps its own flag.
+    """
+
+    answer = _annotate(
+        answer,
+        component_basis_derived=True,
+        basis_established=False,
+        source_convention=None,
+        source_phase=None,
+    )
+    if answer.verdict is not ActivityVerdictKind.POINT:
+        return answer
+    answer = replace(
+        answer,
+        verdict=ActivityVerdictKind.STATUS_BEARING_VALUE,
+        bound_direction=None,
+        reason="component_basis_derived",
+        report_label=STATUS_BEARING_NOT_POINT,
+    )
+    return _annotate(answer, flag="component_basis_derived")
 
 
 def _from_selected_row(
@@ -2159,6 +2234,7 @@ def _from_selected_row(
     notice = _extrapolation_notice(row, temperature_K)
     published = row["origin"] == "published"
     established = _standard_state_established(row, standard_state)
+    derived = _component_basis_derived(row)
     if notice is not None:
         flag = "extrapolated"
         verdict = ActivityVerdictKind.STATUS_BEARING_VALUE
@@ -2171,6 +2247,10 @@ def _from_selected_row(
         flag = "published"
         verdict = ActivityVerdictKind.POINT
         reason = "published_gamma"
+    elif published and derived:
+        flag = "component_basis_derived"
+        verdict = ActivityVerdictKind.STATUS_BEARING_VALUE
+        reason = "component_basis_derived"
     elif published:
         flag = "standard_state_basis_unestablished"
         verdict = ActivityVerdictKind.STATUS_BEARING_VALUE
@@ -2318,9 +2398,13 @@ def resolve_trace_parent_activity(
     Rung 1 (openimcc N-parent pack) is absent. Rung 2 is a Table 2 fit.
     One published row is that gamma on the row's own component. An
     activity-basis spelling uses the row only after the pure-liquid
-    reference conversion; the lookup name is not the conversion. A printed
-    standard state that does not state the caller's typed basis is not a
-    published point. One proxy row is a flagged estimate. Several rows of
+    reference conversion; the lookup name is not the conversion, and that
+    spelling is not a published point. A printed standard-state phrase is
+    not a typed basis. Stated convention, phase, and the
+    conventional-oxide molecular fraction establish the caller when they
+    match, including beside that phrase. A note that assigns the gamma to
+    a different oxide is not a published point. One proxy row is a flagged
+    estimate. Several rows of
     one origin are the row whose stated band covers T, or the unique
     nearest band outside that range (flagged extrapolated). A point
     temperature in the notes is not a band. The lowest residual is not a
@@ -2439,12 +2523,13 @@ def resolve_trace_parent_activity(
         converted, value = applied
         # ln_value is derived from value. Clearing it makes __post_init__
         # recompute the logarithm of the converted activity.
-        return replace(
+        answer = replace(
             _annotate(answer, gamma=converted, coefficient_formula=current),
             component_id=component_id,
             value=value,
             ln_value=None,
         )
+        return _mark_derived_spelling(answer)
 
     def _with_candidate_envelope(
         answer: SourceReactionActivity,
@@ -2579,13 +2664,30 @@ def resolve_trace_parent_activity(
             tier=ActivityTier.B,
         )
         answer = replace(answer, value=value, ln_value=None)
-        answer = _annotate(
-            answer,
-            **_basis_annotation(
+        if single_cation:
+            # The mean was converted onto the one-cation spelling.
+            answer = _mark_derived_spelling(answer)
+            basis = {}
+        elif all(
+            _standard_state_established(row, standard_state) for row in group
+        ):
+            representative = min(
+                group, key=lambda row: str(row.get("source_row_id") or "")
+            )
+            basis = _basis_annotation(
+                row=representative,
+                standard_state=standard_state,
+                established=True,
+            )
+        else:
+            basis = _basis_annotation(
                 row=None,
                 standard_state=standard_state,
                 established=False,
-            ),
+            )
+        answer = _annotate(
+            answer,
+            **basis,
             algebra="geometric mean of the published candidate gammas",
         )
         return _with_candidate_envelope(
