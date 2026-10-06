@@ -1,0 +1,17 @@
+# STATUS fix group 2: boulliung-wood-2023-sulfur-solubility
+
+**From:** regolith-empirical seat (batch 5, fix lane)   **At:** 2026-10-05 ~21:55 ET
+Group 2 tip pushed: **1fe05387656f597421629523d27d7e12c92250b8** (parent 26eb664a440c3d16d9766897fcb4e68a534faa20)
+File changed: `extracts/boulliung-wood-2023-sulfur-solubility.yaml` only.
+
+Review items in this group: 4, 5, 6, 7, 13 (13 finished in group 3 for Eqs. 10–12 and JANAF).
+
+| review item | what changed | page evidence |
+|---|---|---|
+| 4 defining equations | New `model_derived` record `bw2023_defining_equations`: abstract `log C_S2− = log S_melt(wt%) + 0.5 log(fO2/fS2)`; Eq. (1) `1/2 S2(gas) + O2−(melt) = 1/2 O2(gas) + S2−(melt)`; Eq. (2) `log[S2−] = log C_S2− + log(fS2/fO2)^(1/2)`; Eq. (3) `1/2 S2(gas) + 3/2 O2(gas) + O2−(melt) = SO4 2−(melt)`; Eq. (4) `log[SO4 2−] = log C_S6+ + 1/2 log fS2 + 3/2 log fO2`; Eq. (5) `log C_S2− = A0 + Σ_M X_M A_M` with X_M on a single-oxygen basis (Si0.5O, Al0.67O, MgO, CaO), A_M ~ (G0_CaO − G0_CaS), (G0_FeO − G0_FeS), 1/T term and A_M/T | p. 1 abstract; p. 2 Eqs. (1)–(4); p. 5 Eq. (5) and the text after it |
+| 5 fit qualifications | New `model_derived` record `bw2023_capacity_regressions`: Eqs. (6), (7), (9) strings moved unchanged from the figure_only record and also structured (constant, each over-T coefficient with its printed standard error, SE of fit, R²); SPSS stepwise, F test α = 0.05; X_FeO from total Fe via Kress & Carmichael (1991), actual FeO not total Fe; O'Neill & Mavrogenes (2002) input 1 atm, 1673 K, 19 compositions (SiO2-Al2O3-MgO-CaO-TiO2-FeO) + 150 with Na and K, only runs ≥ 8 h; "ours from 1273 to 1773 K" quoted as printed with `temperature_range_conflict: source_internally_inconsistent` vs 1473–1773 K (Table 2, pp. 1, 4, 13); abstract form of Eq. (7) without errors; X_FeO·X_Ti0.5O not significant; Eq. (9) refit on single-oxygen basis; Eqs. (7)+(9) with (2)+(4) give S6+/ΣS; spreadsheet in supplement (not supplied) | p. 6 both columns; p. 7 right column; p. 8 top left |
+| 6 Nash 2019 filter | New record `bw2023_comparison_with_previous_studies` (quoted_attributed items): Nash 1573 K, 1 atm, 100% → 0% sulfide; filter S6+/ΣS < 0.03 (fO2 ≤ FMQ − 0.78); Fig. 3 caption 6 compositions, FMQ − 0.78, − 1.02, − 1.76; 2 dacite exceptions at low C_S2−; SIMS 32S/18O, primary JFR, secondary L17; < 50% SiO2 standards vs dacite up to 64 wt.% SiO2. Fig. 3 in-panel R² not carried (figure-only). Also O'Neill (2021) (predominantly 1473 K; small shift to lower capacities) and O'Neill & Mavrogenes (2022) Fig. 2b comparison | p. 6 right column + Fig. 3 caption; p. 7 top left |
+| 7 Matjuschkin / Eq. (8) | New record `bw2023_pressure_hypotheses_matjuschkin_and_eq8`: Matjuschkin 0.5–1.5 GPa, 1173–1223 K; S2− field from just above NNO at 0.2 GPa to about 2 log fO2 units above at 1.5 GPa; Eq. (8) `FeS + 8FeO1.5 = 8FeO + FeSO4` (Nash 2019), pure-solid data not measured in any melt; equilibrium moves strongly left on cooling | p. 7 left column |
+| 13 method_class (part) | Regression strings removed from figure_only `bw2023_model_and_comparative_claims` and placed on `model_derived` records; no observation rows created | pp. 5–7 |
+
+Checks at this tip (same set-up as group 1): migrator + finalize hard issues **0** (13 context rows, 0 observations); evidence_for known, no queue reason; fidelity validator `OK: 1 extract file(s) valid`; test_ledgers_valid 687 passed; no absolute paths.
