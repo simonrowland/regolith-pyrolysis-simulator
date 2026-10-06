@@ -25,8 +25,8 @@ Fail-loud rules (non-exhaustive; see data/literature/extracts/SCHEMA.md):
 * sibling ``context`` container rows (unscored experiment context, d-032):
   observation-shaped contract, but a scored observation ``type`` parked
   there is refused
-* absolute machine-local provenance_path refused
-* absolute provenance/locator path count ratchet (may only fall)
+* absolute machine-local path values refused on every path-valued key
+  (parsed, so quoted scalars and YAML aliases count; PATH_VALUE_KEYS)
 
 Usage::
 
@@ -132,27 +132,38 @@ _ABS_PATH_RE = re.compile(r"^(/|[A-Za-z]:\\|\\\\)")
 # path segments: bare key or key[index_or_id]
 _PATH_SEGMENT_RE = re.compile(r"^([^.\[]+)(?:\[([^\]]*)\])?$")
 
-# Provenance / locator path value keys that must stay corpus- or
-# repository-relative (never machine-local absolute).
+# Path-valued keys that must stay corpus- or repository-relative (never
+# machine-local absolute). The first four are the provenance/locator fields;
+# the rest are every other key whose values are file paths in the extract tree
+# (survey of all 273 extracts on green 61ec839da: original_scan is the Gibson &
+# Hubbard anchor aliased into locator source_path; chapter_pdf, corpus_asset,
+# repaired_table_path, table_transcription and verified_data_path each carry
+# a raw/ or docs path). ``url`` values are URLs and stay out.
 PATH_VALUE_KEYS = frozenset(
     {
         "provenance_path",
         "source_path",
         "source_pdf",
         "source_pdf_path",
+        "original_scan",
+        "chapter_pdf",
+        "corpus_asset",
+        "repaired_table_path",
+        "table_transcription",
+        "verified_data_path",
     }
 )
-
-# Ratchet on absolute PATH_VALUE_KEYS hits across data/literature/extracts.
-# The count may only fall. b-713 rewrote every hit to corpus-relative and
-# lowered the ceiling to zero; new absolute paths are refused.
-ABSOLUTE_PATH_COUNT_CEILING = 0
 
 
 def _walk_absolute_path_values(
     node: Any, *, path: str = ""
 ) -> list[tuple[str, str]]:
-    """Return (dotted-path, value) for absolute PATH_VALUE_KEYS hits."""
+    """Return (dotted-path, value) for absolute PATH_VALUE_KEYS hits.
+
+    Walks the *parsed* document, so a quoted scalar and a YAML alias
+    (``source_path: *scan``) count exactly like an unquoted scalar, and an
+    anchor reused N times yields N hits (one per place a consumer reads it).
+    """
     hits: list[tuple[str, str]] = []
     if isinstance(node, Mapping):
         for key, value in node.items():
@@ -172,57 +183,25 @@ def _walk_absolute_path_values(
     return hits
 
 
-# Line-oriented matcher for absolute PATH_VALUE_KEYS (block or flow style).
-# Counts extract *lines*, matching the b-713 "absolute-path lines" ledger —
-# not YAML-alias expansions (those inflate the parsed walk).
-_ABS_PATH_FIELD_LINE_RE = re.compile(
-    r"(?:provenance_path|source_path|source_pdf_path|source_pdf)\s*:\s*"
-    r"(?:/|[A-Za-z]:\\|\\\\)"
-)
+def _absolute_path_value_errors(doc: Any, label: str) -> list[str]:
+    """Refuse every absolute path value in one parsed extract (fails closed).
 
-
-def count_absolute_paths_in_extracts(
-    paths: Iterable[Path] | None = None,
-) -> tuple[int, dict[str, int]]:
-    """Count absolute provenance/locator path *lines* under extracts/.
-
-    Returns ``(total, {filename: count})`` for files with at least one hit.
-    Counting is line-oriented so YAML anchors/aliases are not double-counted.
+    One error per distinct (key, value): an anchor expanded at many aliases is
+    reported once with its expansion count, so the message stays readable.
     """
-    files = list(paths) if paths is not None else discover_extracts()
-    per_file: dict[str, int] = {}
-    total = 0
-    for path in files:
-        try:
-            text = path.read_text(encoding="utf-8")
-        except OSError:
-            continue
-        n = sum(1 for line in text.splitlines() if _ABS_PATH_FIELD_LINE_RE.search(line))
-        if n:
-            per_file[path.name] = n
-            total += n
-    return total, per_file
-
-
-def check_absolute_path_count_ceiling(
-    paths: Iterable[Path] | None = None,
-    *,
-    ceiling: int | None = None,
-) -> list[str]:
-    """Fail when absolute provenance/locator path count rises above the ceiling."""
-    limit = ABSOLUTE_PATH_COUNT_CEILING if ceiling is None else ceiling
-    total, per_file = count_absolute_paths_in_extracts(paths)
-    if total <= limit:
-        return []
-    top = ", ".join(
-        f"{name}:{count}"
-        for name, count in sorted(per_file.items(), key=lambda kv: (-kv[1], kv[0]))[:8]
-    )
-    return [
-        f"absolute provenance/locator path count {total} exceeds ceiling "
-        f"{limit} (count may only fall; top files: {top})"
-    ]
-
+    hits = _walk_absolute_path_values(doc)
+    by_value: dict[tuple[str, str], list[str]] = {}
+    for dotted, value in hits:
+        key = dotted.rsplit(".", 1)[-1]
+        by_value.setdefault((key, value), []).append(dotted)
+    errors: list[str] = []
+    for (key, value), where in by_value.items():
+        more = f" (+{len(where) - 1} more via YAML aliases/repeats)" if len(where) > 1 else ""
+        errors.append(
+            f"{label}: {where[0]} must be repository-relative "
+            f"(absolute/machine-local path refused): {value!r}{more}"
+        )
+    return errors
 
 
 class ExtractValidationError(Exception):
@@ -1596,12 +1575,11 @@ def validate_extract_document(
             errors.append(
                 f"{label}: extraction.date must be ISO YYYY-MM-DD, got {date!r}"
             )
-        prov = extraction.get("provenance_path")
-        if prov is not None and isinstance(prov, str) and _ABS_PATH_RE.match(prov):
-            errors.append(
-                f"{label}: extraction.provenance_path must be repository-relative "
-                f"(absolute/machine-local path refused): {prov!r}"
-            )
+
+    # Every absolute path value, parsed (quoted, aliased, nested), including
+    # extraction.provenance_path. b-713 replaced a line-regex count ceiling
+    # that missed quoted scalars and YAML aliases.
+    errors.extend(_absolute_path_value_errors(doc, label))
 
     review = doc.get("review_status")
     if review not in REVIEW_STATUSES:
@@ -1766,7 +1744,6 @@ def validate_all(
                 check_fidelity_match=check_fidelity_match,
             )
         )
-    errors.extend(check_absolute_path_count_ceiling(files))
     return errors
 
 

@@ -1,7 +1,12 @@
-"""Ratchet for absolute provenance/locator paths in literature extracts (b-713).
+"""Absolute machine-local paths in literature extracts are refused (b-713).
 
-After the fix, the extract tree must carry zero absolute provenance/locator
-path lines, and the validator ceiling refuses any rise above zero.
+The gate is the parsed walk inside ``validate_extract_document``: every
+absolute value on a path-valued key (``PATH_VALUE_KEYS``) is an error for that
+one extract, whatever its YAML spelling (unquoted, quoted, or an alias of an
+anchor such as Gibson & Hubbard's ``original_scan: &scan`` reused as
+``source_path: *scan``). These tests drive ``validate_extract_document``,
+``validate_extract_file`` and ``validate_all`` so removing the wiring fails
+here, not only in the (separately red) whole-tree green test.
 """
 
 from __future__ import annotations
@@ -16,107 +21,149 @@ from tools import validate_literature_extracts as vle
 REPO_ROOT = Path(__file__).resolve().parents[1]
 EXTRACTS = REPO_ROOT / "data" / "literature" / "extracts"
 
-# Post-fix absolute-path total (b-713): every hit rewritten to corpus-relative.
-PINNED_ABSOLUTE_PATH_TOTAL = 0
-PINNED_EXTRACT_FILES_WITH_ABS = 0
+ABS = "/Users/someone/Repos/regolith-corpus/raw/probe/probe.pdf"
+REL = "corpus/raw/probe/probe.pdf"
+
+# Minimal extract that validate_extract_document accepts with zero errors;
+# ``{extraction_extra}`` and ``{locator}`` are the spelling under test.
+_TEMPLATE = """\
+schema_version: literature_extract.v1
+source_id: probe
+source:
+  citation: Probe et al. (2026), Test Journal 1:1
+extraction:
+  method: unit_test
+  date: '2026-10-05'
+  worker: pytest
+{extraction_extra}review_status: draft
+fidelity_samples:
+- path: species.Fe.observations[fe_alpha_1].values.alpha
+  value: 0.24
+  note: fixture fidelity sample
+  locator: {{page: 1, table: '1'}}
+species:
+  Fe:
+    observations:
+    - observation_id: fe_alpha_1
+      type: alpha
+      locator: {locator}
+      T_range_K: [1700.0, 1800.0]
+      phase: silicate_melt
+      regime: langmuir_free_evaporation
+      units: dimensionless
+      uncertainty: {{note: fixture band, relative: 0.1}}
+      values: {{alpha: 0.24}}
+"""
 
 
-def test_absolute_path_count_matches_pin() -> None:
-    total, per_file = vle.count_absolute_paths_in_extracts()
-    assert total == PINNED_ABSOLUTE_PATH_TOTAL
-    assert len(per_file) == PINNED_EXTRACT_FILES_WITH_ABS
-    assert sum(per_file.values()) == total
-
-
-def test_absolute_path_ceiling_constant_matches_pin() -> None:
-    assert vle.ABSOLUTE_PATH_COUNT_CEILING == PINNED_ABSOLUTE_PATH_TOTAL
-
-
-def test_absolute_path_ceiling_check_passes_at_pin() -> None:
-    assert vle.check_absolute_path_count_ceiling() == []
-
-
-def test_absolute_path_ceiling_refuses_a_rise(tmp_path: Path) -> None:
-    """A synthetic extra absolute path must fail the ceiling (count may only fall)."""
-    # Copy one real extract that already has absolute paths, then add one more.
-    donor = EXTRACTS / "kems-039-wolf-2023-vaporock.yaml"
-    doc = yaml.safe_load(donor.read_text(encoding="utf-8"))
-    assert isinstance(doc, dict)
-    extraction = doc.setdefault("extraction", {})
-    assert isinstance(extraction, dict)
-    # Force an absolute path distinct from any rewrite target.
-    extraction["provenance_path"] = "/tmp/b713-ratchet-extra/not-corpus.pdf"
-    # Also plant an absolute locator source_path so PATH_VALUE_KEYS walk sees it
-    # even if provenance_path were already absolute on the donor.
-    species = doc.setdefault("species", {})
-    if not isinstance(species, dict) or not species:
-        doc["species"] = {
-            "Xe": {
-                "observations": [
-                    {
-                        "observation_id": "b713_ratchet_probe",
-                        "type": "partial_pressure",
-                        "locator": {"source_path": "/tmp/b713-ratchet-extra/loc.pdf"},
-                        "values": {"note": "ratchet probe"},
-                    }
-                ]
-            }
-        }
-    else:
-        # Append a tiny absolute source_path on the first observation if present.
-        first_block = next(iter(species.values()))
-        if isinstance(first_block, dict):
-            obs_list = first_block.get("observations")
-            if isinstance(obs_list, list) and obs_list and isinstance(obs_list[0], dict):
-                loc = obs_list[0].setdefault("locator", {})
-                if isinstance(loc, dict):
-                    loc["source_path"] = "/tmp/b713-ratchet-extra/loc.pdf"
-
-    probe = tmp_path / "b713-ratchet-probe.yaml"
-    probe.write_text(
-        yaml.safe_dump(doc, sort_keys=False, allow_unicode=True),
-        encoding="utf-8",
-    )
-
-    # Ceiling equal to the real-tree pin: adding this probe file alone must rise.
-    errs = vle.check_absolute_path_count_ceiling(
-        [probe],
-        ceiling=0,
-    )
-    assert errs, "expected ceiling refusal when absolute paths are present above 0"
-    assert "exceeds ceiling" in errs[0]
-    assert "may only fall" in errs[0]
-
-
-def test_walk_absolute_path_values_finds_nested_source_path() -> None:
-    doc = {
-        "extraction": {"provenance_path": "corpus/raw/x/x.pdf"},
-        "species": {
-            "Fe": {
-                "observations": [
-                    {
-                        "observation_id": "o1",
-                        "locator": {
-                            "source_path": "/Users/someone/Repos/regolith-corpus/raw/x/x.pdf"
-                        },
-                        "values": {"x": 1},
-                    }
-                ]
-            }
-        },
+def _forms(path: str) -> dict[str, tuple[str, str]]:
+    """(extraction_extra, locator) per YAML spelling of one source path."""
+    return {
+        "unquoted": ("", "{source_path: " + path + ", page: 1, table: '1'}"),
+        "quoted": ("", '{source_path: "' + path + '", page: 1, table: \'1\'}'),
+        "gibson_anchor_alias": (
+            f"  original_scan: &scan {path}\n",
+            "{source_path: *scan, page: 1, table: '1'}",
+        ),
+        "provenance_path": (
+            f"  provenance_path: '{path}'\n",
+            "{page: 1, table: '1'}",
+        ),
     }
-    hits = vle._walk_absolute_path_values(doc)
-    assert len(hits) == 1
-    assert hits[0][0].endswith("source_path")
-    assert hits[0][1].startswith("/Users/")
 
 
-def test_path_value_keys_cover_provenance_and_locator_fields() -> None:
+def _text(form: str, path: str) -> str:
+    extraction_extra, locator = _forms(path)[form]
+    return _TEMPLATE.format(extraction_extra=extraction_extra, locator=locator)
+
+
+def _absolute_errors(errors: list[str]) -> list[str]:
+    return [e for e in errors if "absolute/machine-local path refused" in e]
+
+
+@pytest.mark.parametrize("form", sorted(_forms(ABS)))
+def test_validate_extract_document_refuses_every_spelling(form: str) -> None:
+    doc = yaml.safe_load(_text(form, ABS))
+    errors = vle.validate_extract_document(doc, expected_source_id="probe")
+    assert _absolute_errors(errors), errors
+    # Nothing else is wrong with the probe, so the refusal is not buried.
+    assert errors == _absolute_errors(errors)
+
+
+@pytest.mark.parametrize("form", sorted(_forms(REL)))
+def test_relative_spelling_validates_clean(form: str) -> None:
+    doc = yaml.safe_load(_text(form, REL))
+    assert vle.validate_extract_document(doc, expected_source_id="probe") == []
+
+
+@pytest.mark.parametrize("form", ["quoted", "gibson_anchor_alias"])
+def test_validate_all_refuses_one_extract(tmp_path: Path, form: str) -> None:
+    probe = tmp_path / "probe.yaml"
+    probe.write_text(_text(form, ABS), encoding="utf-8")
+    errors = vle.validate_all(
+        [probe], check_priority=False, check_fidelity_policy=False
+    )
+    assert _absolute_errors(errors), errors
+    assert all(str(probe) in e for e in _absolute_errors(errors))
+
+
+def test_alias_expansion_counts_every_reuse() -> None:
+    # One absolute anchor read by three locators: three parsed values, one
+    # line of text. The old line-regex ceiling counted this as 1 (or 0 when
+    # the anchor sat on a non-path key).
+    doc = yaml.safe_load(
+        "scan: &scan " + ABS + "\n"
+        "a: {source_path: *scan}\n"
+        "b: [{source_path: *scan}, {source_path: *scan}]\n"
+    )
+    assert len(vle._walk_absolute_path_values(doc)) == 3
+    errors = vle._absolute_path_value_errors(doc, "probe")
+    assert len(errors) == 1
+    assert "+2 more via YAML aliases/repeats" in errors[0]
+
+
+def test_unaliased_original_scan_is_refused() -> None:
+    doc = yaml.safe_load(_text("gibson_anchor_alias", REL))
+    doc["extraction"]["original_scan"] = ABS
+    errors = vle.validate_extract_document(doc, expected_source_id="probe")
+    assert any("extraction.original_scan" in e for e in _absolute_errors(errors))
+
+
+def test_repo_extracts_carry_no_absolute_path_values() -> None:
+    """Whole tree, same function the validator uses; unreadable files fail."""
+    files = vle.discover_extracts()
+    assert len(files) > 200
+    offenders: list[str] = []
+    for path in files:
+        doc = yaml.safe_load(path.read_text(encoding="utf-8"))
+        offenders.extend(vle._absolute_path_value_errors(doc, path.name))
+    assert offenders == [], "\n".join(offenders[:20])
+
+
+def test_path_value_keys_cover_provenance_locator_and_path_fields() -> None:
     assert vle.PATH_VALUE_KEYS == frozenset(
         {
             "provenance_path",
             "source_path",
             "source_pdf",
             "source_pdf_path",
+            "original_scan",
+            "chapter_pdf",
+            "corpus_asset",
+            "repaired_table_path",
+            "table_transcription",
+            "verified_data_path",
         }
     )
+
+
+def test_line_regex_ceiling_is_gone() -> None:
+    # A second pass/fail signal could report clean while parsed values are
+    # absolute (ROR-b713); the parsed walk is the only rule.
+    for name in (
+        "ABSOLUTE_PATH_COUNT_CEILING",
+        "_ABS_PATH_FIELD_LINE_RE",
+        "count_absolute_paths_in_extracts",
+        "check_absolute_path_count_ceiling",
+    ):
+        assert not hasattr(vle, name), name
