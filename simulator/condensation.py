@@ -1915,6 +1915,22 @@ CONDENSATION_TEMPS_C = {
     'Ti':  1500,   # negligible at process T
 }
 
+
+def has_declared_routing(species: str) -> bool:
+    """True when an existing table already routes this species.
+
+    ``DESIGNATED_STAGE`` and ``CONDENSATION_TEMPS_C`` are that table.
+    Trace vapours are everyone else. The predicate lives here, beside
+    the temperature table: ``condensation_routing`` cannot import this
+    module.
+    """
+
+    return (
+        designated_stage_number(species) is not None
+        or str(species) in CONDENSATION_TEMPS_C
+    )
+
+
 _CONFIG_BUNDLE = load_config_bundle(DATA_DIR)
 from simulator.vapour_rail.catalog import (
     VaporPressureCompatibilityView,
@@ -4289,8 +4305,10 @@ class CondensationModel:
     ) -> list[PipeSegment]:
         if self.lab_geometry is not None:
             return list(self.pipe_segments)
-        target_stage_number = designated_stage_number(species)
-        if target_stage_number is None and species not in CONDENSATION_TEMPS_C:
+        if has_declared_routing(species):
+            target_stage_number = designated_stage_number(species)
+        else:
+            target_stage_number = None
             onset = _trace_onset_for_flow(
                 species,
                 self.wall_species_partial_pressures_pa,
@@ -5093,8 +5111,7 @@ def _promote_non_debiting_carrier_status(
         # dormant carriers) still refuse on their declared predicate.
         if (
             admission_refusal == CONDENSATION_ADMISSION_REFUSAL_NO_DATA
-            and designated_stage_number(species) is None
-            and species not in CONDENSATION_TEMPS_C
+            and not has_declared_routing(species)
             and species in _trace_vapour_carrier_sources()
         ):
             return current_status, None
@@ -5577,12 +5594,12 @@ def _declared_routing_onset(
     vapor_pressure_data: Mapping[str, Any] | None,
     stages: Sequence[CondensationStage] | None,
 ) -> TraceVapourCondensationOnset | None:
-    del stages
     """Majors keep the declared table. Do not recompute a dewpoint."""
 
-    stage_number = designated_stage_number(species)
-    if stage_number is None and species not in CONDENSATION_TEMPS_C:
+    del stages
+    if not has_declared_routing(species):
         return None
+    stage_number = designated_stage_number(species)
     try:
         pressure_pa = float(partial_pressure_pa)
     except (TypeError, ValueError):
@@ -5702,10 +5719,7 @@ def _trace_onset_for_flow(
     reach the rail. A missing partial pressure does not invent a stage.
     """
 
-    if (
-        designated_stage_number(species) is not None
-        or species in CONDENSATION_TEMPS_C
-    ):
+    if has_declared_routing(species):
         return None
     if (
         not isinstance(partial_pressures_pa, Mapping)
@@ -8439,11 +8453,17 @@ def cold_spot_diagnostic(
         )
         if kg_hr <= 1e-15:
             continue
-        target_stage_number = designated_stage_number(species)
         trace_applicability: str | None = None
-        if target_stage_number is None:
-            if species in CONDENSATION_TEMPS_C:
+        if has_declared_routing(species):
+            target_stage_number = designated_stage_number(species)
+            if target_stage_number is None:
                 continue
+            condensation_T_C = _species_condensation_temperature_C(
+                species,
+                temps=temps,
+                vapor_pressure_data=vapor_pressure_data,
+            )
+        else:
             onset = _trace_onset_for_flow(
                 str(species),
                 species_partial_pressures_pa,
@@ -8459,12 +8479,6 @@ def cold_spot_diagnostic(
             target_stage_number = onset.wall_landing_stage_number
             condensation_T_C = float(onset.temperature_C)
             trace_applicability = onset.hot_train_applicability
-        else:
-            condensation_T_C = _species_condensation_temperature_C(
-                species,
-                temps=temps,
-                vapor_pressure_data=vapor_pressure_data,
-            )
         threshold_C = condensation_T_C - margin_C
 
         def _stamp_applicability(finding: dict[str, Any]) -> dict[str, Any]:
