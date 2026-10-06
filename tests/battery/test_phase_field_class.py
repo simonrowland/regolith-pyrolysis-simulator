@@ -123,7 +123,132 @@ def test_stolyarova_1991_x036_to_x040_rows_stay_numeric(
     assert all(residual.status is not ResidualStatus.REFUSED for residual in numeric)
 
 
-# --- t-1123a general two-test rule (simulator/battery/phase_field.py) ----
+# --- t-1123a reader rule (simulator/battery/phase_field.py) -----------------
+
+
+def _notices(observation, kind):
+    return [notice for notice in observation.notices if notice.kind is kind]
+
+
+def _payload(notice, prefix):
+    import json
+
+    assert notice.reason.startswith(prefix + ":")
+    return json.loads(notice.reason[len(prefix) + 1 :])
+
+
+def test_stolyarova_1991_class_s_is_exactly_the_28_points_at_x033_and_x025(migrated) -> None:
+    from simulator.battery.enums import NoticeKind
+    from simulator.battery.phase_field import OUTSIDE_SINGLE_LIQUID_FIELD
+
+    band = "two_phase_bulk_composition_not_liquid_composition"
+    classified = {}
+    for observation in _printed_rows(migrated):
+        hits = [
+            notice
+            for notice in _notices(observation, NoticeKind.OUT_OF_CERTIFIED_BAND)
+            if notice.band == band
+        ]
+        if hits:
+            assert len(hits) == 1
+            classified[observation.observation_id] = (_x_sio2(observation), hits[0])
+    assert len(classified) == 28
+    assert {x for x, _notice in classified.values()} == set(CLASS_S_X)
+    for x, notice in classified.values():
+        payload = _payload(notice, OUTSIDE_SINGLE_LIQUID_FIELD)
+        assert payload["criterion"] == "stated_liquidus_side_and_printed_plateau_within_2_sigma"
+        assert payload["locator"]["page"] == 3711
+        values = payload["test_values"]
+        assert Decimal(values["x"]) == x
+        assert (values["liquidus"], values["liquidus_sigma"]) == ("0.37", "0.02")
+        assert Decimal(values["plateau_max_z"]) <= 2
+    assert not migrated.registry_issues
+
+
+def test_stolyarova_1991_contested_rows_carry_stated_liquidus_and_sigma(migrated) -> None:
+    from simulator.battery.enums import NoticeKind
+    from simulator.battery.phase_field import LIQUIDUS_POSITION_CONTESTED
+
+    rows = _printed_rows(migrated)
+    contested = {
+        observation.observation_id: observation
+        for observation in rows
+        if _notices(observation, NoticeKind.LIQUIDUS_POSITION_CONTESTED)
+    }
+    assert len(contested) == 44
+    for observation in rows:
+        flagged = observation.observation_id in contested
+        assert flagged == (_x_sio2(observation) in CONTESTED_X), observation.observation_id
+    for observation in contested.values():
+        (notice,) = _notices(observation, NoticeKind.LIQUIDUS_POSITION_CONTESTED)
+        payload = _payload(notice, LIQUIDUS_POSITION_CONTESTED)
+        assert Decimal(payload["x"]) == _x_sio2(observation)
+        assert payload["stated_liquidus"] == "0.37"
+        assert payload["stated_liquidus_sigma"] == "0.02"
+        assert payload["superseded_liquidus"] == ["0.41"]
+        assert payload["locator"]["page"] == 3711
+        assert not any(notice.band for notice in observation.notices)
+
+
+def test_stolyarova_1991_class_s_refuses_single_liquid_with_bulk_diagnostic(
+    migrated, internal_analytical_residuals
+) -> None:
+    from simulator.battery.enums import RefusalReason
+
+    class_s = [
+        observation
+        for observation in _printed_rows(migrated)
+        if _x_sio2(observation) in CLASS_S_X
+    ]
+    assert len(class_s) == 28
+    diagnostics = []
+    for observation in class_s:
+        residual = internal_analytical_residuals[observation.observation_id]
+        assert residual.numeric is None and not residual.score_eligible
+        assert residual.refusal.reason is RefusalReason.BULK_NOT_LIQUID_COMPOSITION
+        diagnostic = residual.refusal.detail["bulk_composition_diagnostic"]
+        assert diagnostic["scored"] is False
+        assert diagnostic["basis"] == "single_liquid_engine_at_bulk_composition"
+        diagnostics.append((observation, diagnostic))
+    numeric = [d for _o, d in diagnostics if d["value"] is not None]
+    # Green has 8 internal-analytical numeric residuals on these rows; all 8
+    # survive as non-scored diagnostics, the rest keep their green refusal.
+    assert len(numeric) == 8
+    assert {d["refusal_reason"] for _o, d in diagnostics if d["value"] is None} == {
+        "effusion_regime_unverified",
+        "unsupported",
+    }
+    sio_025 = [
+        d
+        for o, d in diagnostics
+        if o.observation_id.split("::")[1]
+        == "stolyarova_1991_sio_partial_pressure_1933k_complete_evaporation"
+        and _x_sio2(o) == Decimal("0.25")
+    ]
+    # ROR-t1123 spot value: internal-analytical +0.833 dex at x(SiO2) = 0.25.
+    assert len(sio_025) == 1 and sio_025[0]["value"].startswith("0.833")
+
+
+def test_stolyarova_1991_contested_numeric_rows_are_flagged_out_of_certified_line(
+    migrated, internal_analytical_residuals
+) -> None:
+    from simulator.battery.score import (
+        FLAGGED_STRATUM_LIQUIDUS_POSITION_CONTESTED,
+        flagged_strata,
+    )
+
+    contested = [
+        internal_analytical_residuals[observation.observation_id]
+        for observation in _printed_rows(migrated)
+        if _x_sio2(observation) in CONTESTED_X
+    ]
+    numeric = [residual for residual in contested if residual.numeric is not None]
+    assert len(numeric) == 14
+    assert all(
+        FLAGGED_STRATUM_LIQUIDUS_POSITION_CONTESTED in flagged_strata(residual.notices)
+        for residual in contested
+    )
+
 
 def _records(liquidus=None, plateau_cells=None, named_failure=None):
     from simulator.battery.phase_field import phase_field_records
