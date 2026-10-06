@@ -2925,14 +2925,32 @@ class CondensationModel:
         # refused status the evaporation debit reader already withholds on.
         non_debiting_reason_by_species: dict[str, str] = {}
         cleanup_offgas_authorization: dict[str, dict[str, Any]] = {}
+        # Promote reads the flowing pressure so a no-data bypass can
+        # require an ok onset. A missing entry is not an ok onset.
+        self.wall_species_partial_pressures_pa = (
+            _flowing_species_partial_pressures_pa(
+                evap_flux.species_kg_hr,
+                self.overhead_pressure_mbar * 100.0,
+                reported_partial_pressures_mbar=self.species_partial_pressures_mbar,
+            )
+            if self._species_partial_pressures_configured
+            else {}
+        )
         for species in evap_flux.species_kg_hr:
             current_status = carrier_authority_status_by_species.get(
                 species, VAPOUR_CARRIER_AUTHORITY_MISSING
+            )
+            partial_pressure_pa = (
+                self.wall_species_partial_pressures_pa[species]
+                if species in self.wall_species_partial_pressures_pa
+                else None
             )
             promoted, reason = _promote_non_debiting_carrier_status(
                 species,
                 current_status,
                 vapor_pressure_data=self.vapor_pressure_data,
+                partial_pressure_pa=partial_pressure_pa,
+                stages=self.train.stages,
             )
             extra = carrier_authority_by_species.get(species, {}).get('extra', {})
             evidence = extra.get('applicability_evidence', {})
@@ -2978,15 +2996,6 @@ class CondensationModel:
         # outcomes (no longer silent return 0.0 without a consumer channel).
         efficiency_outcomes_by_species: dict[str, list[dict[str, Any]]] = {}
         used_capture_budget_regularizer = False
-        self.wall_species_partial_pressures_pa = (
-            _flowing_species_partial_pressures_pa(
-                evap_flux.species_kg_hr,
-                self.overhead_pressure_mbar * 100.0,
-                reported_partial_pressures_mbar=self.species_partial_pressures_mbar,
-            )
-            if self._species_partial_pressures_configured
-            else {}
-        )
         knudsen_diagnostic = self._enforce_knudsen_regime()
         diagnostic = cold_spot_diagnostic(
             [segment for segment in self.pipe_segments
@@ -5134,6 +5143,8 @@ def _promote_non_debiting_carrier_status(
     current_status: str,
     *,
     vapor_pressure_data: Mapping[str, Any] | None = None,
+    partial_pressure_pa: float | None = None,
+    stages: Sequence[CondensationStage] | None = None,
 ) -> tuple[str, str | None]:
     """Map admission-refusal and flux_dormant onto the refused debit status.
 
@@ -5142,6 +5153,12 @@ def _promote_non_debiting_carrier_status(
     input: refuse the debit. flux_dormant is the same: never inventory-debit,
     even when a bypass emits species_kg_hr > 0. Already-refused and
     proven-zero statuses are left unchanged so their distinct reasons survive.
+
+    A trace vapour with no Antoine row bypasses that refusal only when
+    ``trace_vapour_condensation_onset`` status is ok. The onset then names
+    the mass. Any other onset status is the refusal reason, and the mass
+    stays retained in source. flux_dormant is decided before that bypass.
+    A missing partial pressure is not an ok onset.
     """
 
     from simulator.vapour_rail.instrumentation import (
@@ -5159,15 +5176,34 @@ def _promote_non_debiting_carrier_status(
         vapor_pressure_data=vapor_pressure_data,
     )
     if admission_refusal is not None:
-        # A trace vapour with no Antoine row is not a missing-input zero.
-        # Its onset reports the mass. Catalog rows (Pb and the other
-        # dormant carriers) still refuse on their declared predicate.
         if (
             admission_refusal == CONDENSATION_ADMISSION_REFUSAL_NO_DATA
             and not has_declared_routing(species)
             and species in _trace_vapour_carrier_formulas()
         ):
-            return current_status, None
+            # Ahead of the bypass: a dormant row never becomes routable
+            # just because it also lacks an Antoine table.
+            if _species_is_flux_dormant(
+                species,
+                vapor_pressure_data=vapor_pressure_data,
+            ):
+                return (
+                    VAPOUR_CARRIER_AUTHORITY_REFUSED,
+                    CONDENSATION_FLUX_DORMANT_REFUSAL,
+                )
+            onset = None
+            if partial_pressure_pa is not None:
+                onset = trace_vapour_condensation_onset(
+                    species,
+                    partial_pressure_pa,
+                    vapor_pressure_data=vapor_pressure_data,
+                    stages=stages,
+                )
+            if onset is not None and onset.status == "ok":
+                return current_status, None
+            if onset is not None:
+                return VAPOUR_CARRIER_AUTHORITY_REFUSED, onset.status
+            return VAPOUR_CARRIER_AUTHORITY_REFUSED, admission_refusal
         return VAPOUR_CARRIER_AUTHORITY_REFUSED, admission_refusal
     if _species_is_flux_dormant(
         species,
@@ -5186,12 +5222,13 @@ def _record_trace_vapour_disposition(
     condensation_authority_by_species: dict[str, dict[str, Any]],
     condensation_refusals_by_species: dict[str, dict[str, Any]],
 ) -> None:
-    """Keep a trace vapour's mass and name an uncaptured condensate.
+    """Keep an ok trace vapour's mass on a named record.
 
     The mass stays in ``remaining_by_species``. It is not moved to a
-    vent account and it is not zeroed. Capture still waits on the
-    dormant channel's deposition curve; the onset only says where it
-    would land.
+    vent account and it is not zeroed. An uncaptured condensate is
+    flagged. A captured-stage condensate is ``pending_capture_model``
+    until wall competition takes the mass. A non-ok onset never reaches
+    here: promote refuses it and retains the mass in source.
     """
 
     remaining_by_species[species] = rate_kg_hr
@@ -5202,23 +5239,35 @@ def _record_trace_vapour_disposition(
     authority["condensation_onset_C"] = onset.temperature_C
     authority["landing_stage_number"] = onset.landing_stage_number
     authority["wall_landing_stage_number"] = onset.wall_landing_stage_number
-    if onset.disposition != "flagged_uncaptured_condensable":
+    if onset.disposition == "flagged_uncaptured_condensable":
+        condensation_refusals_by_species[species] = {
+            "status": "flagged",
+            "reason": "flagged_uncaptured_condensable",
+            "output_status": "status_bearing",
+            "mass_disposition": "flagged_uncaptured_condensable",
+            "authoritative_for_terminal_offgas": False,
+            "authoritative_for_condensation": False,
+            "activity_premise": (
+                "pure condensate at unit activity is a lower bound on the "
+                "onset temperature; co-condensation is not modelled"
+            ),
+            "input_mass_kg_hr": rate_kg_hr,
+            "remaining_mass_kg_hr": rate_kg_hr,
+            "condensed_mass_kg_hr": 0.0,
+        }
         return
-    condensation_refusals_by_species[species] = {
-        "status": "flagged",
-        "reason": "flagged_uncaptured_condensable",
-        "output_status": "status_bearing",
-        "mass_disposition": "flagged_uncaptured_condensable",
-        "authoritative_for_terminal_offgas": False,
-        "authoritative_for_condensation": False,
-        "activity_premise": (
-            "pure condensate at unit activity is a lower bound on the "
-            "onset temperature; co-condensation is not modelled"
-        ),
-        "input_mass_kg_hr": rate_kg_hr,
-        "remaining_mass_kg_hr": rate_kg_hr,
-        "condensed_mass_kg_hr": 0.0,
-    }
+    if onset.disposition == "pending_capture_model":
+        condensation_refusals_by_species[species] = {
+            "status": "pending",
+            "reason": "pending_capture_model",
+            "output_status": "status_bearing",
+            "mass_disposition": "pending_capture_model",
+            "authoritative_for_terminal_offgas": False,
+            "authoritative_for_condensation": False,
+            "input_mass_kg_hr": rate_kg_hr,
+            "remaining_mass_kg_hr": rate_kg_hr,
+            "condensed_mass_kg_hr": 0.0,
+        }
 
 
 def _species_has_compiled_or_legacy_pressure(
@@ -5818,7 +5867,9 @@ def _onset_from_temperature(
             applicability = "condenses_upstream_of_train"
         else:
             applicability = "applicable"
-        disposition = "impurity_capture"
+        # The landing stage is known. The mass is not booked as a
+        # captured impurity: wall competition has not taken it.
+        disposition = "pending_capture_model"
     return TraceVapourCondensationOnset(
         species=str(species),
         partial_pressure_Pa=pressure_pa,
