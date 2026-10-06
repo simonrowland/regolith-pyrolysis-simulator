@@ -112,6 +112,7 @@ _OPEN_TO_CLOSE = {"(": ")", "[": "]", "{": "}"}
 _CLOSE_TO_OPEN = {v: k for k, v in _OPEN_TO_CLOSE.items()}
 _NUMBER_RE = re.compile(r"\d+(?:\.\d+)?")
 _UNGROUPED_FORMULA_RE = re.compile(r"([A-Z][a-z]?)(\d+(?:\.\d+)?)?")
+_LEADING_DOT_SUBSCRIPT_RE = re.compile(r"([A-Z][a-z]?)\.(\d+)")
 _PHASE_SUFFIX_RE = re.compile(
     r"(?:\((?:s|l|g|aq|cr|liq|liquid|solid|gas|vapor)\)|"
     r"\[(?:s|l|g|aq|cr|liq|liquid|solid|gas|vapor)\])$",
@@ -228,6 +229,15 @@ class SpeciesFormula:
     def atom_moles(self, species_moles: float) -> dict[str, float]:
         moles = float(species_moles)
         return {element: count * moles for element, count in self.elements.items()}
+
+
+def _normalize_leading_dot_subscripts(formula: str) -> str:
+    """Spell a printed leading-dot element subscript with an explicit zero.
+
+    Callers must distinguish molecular adduct separators before applying this
+    operation; the diagnostic JANAF tokenizer retains its existing convention.
+    """
+    return _LEADING_DOT_SUBSCRIPT_RE.sub(r"\g<1>0.\2", formula)
 
 
 def parse_formula(
