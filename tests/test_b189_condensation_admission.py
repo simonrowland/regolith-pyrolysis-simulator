@@ -296,11 +296,84 @@ def test_route_failure_does_not_leave_a_stale_catalog(payload, monkeypatch):
 
 @pytest.mark.parametrize("species_id", DORMANT_CARRIERS)
 def test_dormant_carrier_refused_at_condensation_seam(payload, species_id) -> None:
-    """Rows that previously yielded pressure (for example Pb) now decline."""
+    """Rows that previously yielded pressure (for example Pb) now decline.
+
+    A t1139 trace row refuses because its request rule is dormant. The
+    applicability token is not the condensation answer. Other dormant
+    rows still refuse on that token.
+    """
 
     assert not _species_has_antoine_data(species_id, vapor_pressure_data=payload)
+    expected = (
+        CONDENSATION_FLUX_DORMANT_REFUSAL
+        if species_id in {"Pb", "SnO", "PbO", "B2O3"}
+        else REFUSAL_INAPPLICABLE_PREDICATE
+    )
     assert _condensation_admission_refusal(
         species_id, vapor_pressure_data=payload
+    ) == expected
+
+
+# Live rows among the 45 first-batch carriers whose token is still
+# not_applicable. The yaml is not rewritten. Condensation refuses them
+# because the row is dormant.
+_TRACE_ROWS_STILL_DORMANT = (
+    "B2O3",
+    "Cs2O",
+    "Cs2O2",
+    "Cu",
+    "Cu2",
+    "CuO",
+    "Ga",
+    "Ga2O",
+    "GaO",
+    "Ge",
+    "Ge2",
+    "GeO",
+    "GeO2",
+    "In",
+    "In2O",
+    "InO",
+    "Li",
+    "Li2",
+    "Li2O",
+    "LiO",
+    "Pb",
+    "PbO",
+    "Rb2O",
+    "Rb2O2",
+    "Sn",
+    "Sn2",
+    "SnO",
+    "SnO2",
+    "VO",
+)
+
+
+def test_trace_rows_refuse_on_dormancy_not_the_applicability_token(payload) -> None:
+    from simulator.vapour_rail.instrumentation import (
+        VAPOUR_CARRIER_AUTHORITY_MISSING,
+        VAPOUR_CARRIER_AUTHORITY_REFUSED,
+    )
+
+    catalog = compiled_catalog_for(payload, emit_u0_request_rules=False)
+    assert len(_TRACE_ROWS_STILL_DORMANT) == 29
+    for species_id in _TRACE_ROWS_STILL_DORMANT:
+        compiled = catalog.species[species_id]
+        assert compiled.code_metadata.hot_train_applicability == "not_applicable"
+        assert compiled.code_metadata.request_rule == "dormant_pending_validation"
+        assert _condensation_admission_refusal(
+            species_id, vapor_pressure_data=payload
+        ) == CONDENSATION_FLUX_DORMANT_REFUSAL
+        status, reason = _promote_non_debiting_carrier_status(
+            species_id,
+            VAPOUR_CARRIER_AUTHORITY_MISSING,
+            vapor_pressure_data=payload,
+        )
+        assert status == VAPOUR_CARRIER_AUTHORITY_REFUSED
+        assert reason == CONDENSATION_FLUX_DORMANT_REFUSAL
+    assert _condensation_admission_refusal(
+        "Ba", vapor_pressure_data=payload
     ) == REFUSAL_INAPPLICABLE_PREDICATE
 
 
@@ -312,7 +385,9 @@ def test_dormant_carrier_pressure_path_is_typed_refusal(payload) -> None:
         vapor_pressure_data=payload,
         antoine_extrapolation_warnings=warnings,
     ) == (None, True)
-    assert any(REFUSAL_INAPPLICABLE_PREDICATE in warning for warning in warnings)
+    assert any(
+        CONDENSATION_FLUX_DORMANT_REFUSAL in warning for warning in warnings
+    )
 
 
 def test_previously_possible_bypass_is_now_refused(payload) -> None:
@@ -330,7 +405,7 @@ def test_previously_possible_bypass_is_now_refused(payload) -> None:
     )
     refusal = result.condensation_refusals_by_species["Pb"]
     assert refusal["status"] == "refused"
-    assert refusal["reason"] == REFUSAL_INAPPLICABLE_PREDICATE
+    assert refusal["reason"] == CONDENSATION_FLUX_DORMANT_REFUSAL
     assert refusal["output_status"] == "refused"
     assert refusal["mass_disposition"] == "retained_in_source_pending_authority"
     assert "Pb" not in result.wall_deposit_fraction_by_species
@@ -345,10 +420,10 @@ def test_previously_possible_bypass_is_now_refused(payload) -> None:
 
 def test_unknown_applicability_predicate_fails_closed(payload) -> None:
     mutated = deepcopy(payload)
-    _set_applicability(mutated, "Pb", "hot_train")
+    _set_applicability(mutated, "Ba", "hot_train")
 
     assert _condensation_admission_refusal(
-        "Pb", vapor_pressure_data=mutated
+        "Ba", vapor_pressure_data=mutated
     ) == REFUSAL_INAPPLICABLE_PREDICATE
 
 
@@ -419,11 +494,11 @@ def test_refusal_out_of_domain_and_proven_zero_stay_distinct(payload) -> None:
             reactive_product_backstop=False,
             antoine_extrapolations=extrapolations,
         )
-    assert exc_info.value.reason == REFUSAL_INAPPLICABLE_PREDICATE
+    assert exc_info.value.reason == CONDENSATION_FLUX_DORMANT_REFUSAL
     notice = extrapolations["Pb#wall:1500.0"]
     assert notice["status"] == "refused"
     assert notice["authority_level"] == "unavailable"
-    assert REFUSAL_INAPPLICABLE_PREDICATE in notice["reason"]
+    assert CONDENSATION_FLUX_DORMANT_REFUSAL in notice["reason"]
 
     admitted_extrapolations: dict[str, dict] = {}
     pressure = _antoine_psat_pa(
@@ -587,7 +662,7 @@ def test_admission_and_flux_dormant_promote_onto_refused_debit_status(
     assert not _species_is_flux_dormant("Fe", vapor_pressure_data=payload)
     assert _condensation_admission_refusal(
         "Pb", vapor_pressure_data=payload
-    ) == REFUSAL_INAPPLICABLE_PREDICATE
+    ) == CONDENSATION_FLUX_DORMANT_REFUSAL
 
     for incoming in (
         VAPOUR_CARRIER_AUTHORITY_MISSING,
@@ -598,7 +673,7 @@ def test_admission_and_flux_dormant_promote_onto_refused_debit_status(
             "Pb", incoming, vapor_pressure_data=payload
         )
         assert status == VAPOUR_CARRIER_AUTHORITY_REFUSED
-        assert reason == REFUSAL_INAPPLICABLE_PREDICATE
+        assert reason == CONDENSATION_FLUX_DORMANT_REFUSAL
 
         status, reason = _promote_non_debiting_carrier_status(
             "MnO_gas", incoming, vapor_pressure_data=payload

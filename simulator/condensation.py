@@ -5025,12 +5025,20 @@ def _assert_condensation_applicable(
     lookup. Condensation deliberately has no Stage-0 context, so ``stage0_only``
     rows refuse here; Stage-0 callers can supply context at the catalog seam.
 
-    Trace vapours have no catalog row. Their applicability is
-    ``TraceVapourCondensationOnset.hot_train_applicability``, read by
-    ``cold_spot_diagnostic`` and ``route``. This gate does not grow a
-    second list, and a declared row such as Pb still refuses here.
+    A t1139 trace carrier does not answer from
+    ``code_metadata.hot_train_applicability``. ``route`` and
+    ``cold_spot_diagnostic`` read ``trace_vapour_condensation_onset`` at
+    the flowing partial pressure. This gate does not call that function:
+    it has no partial pressure, and calling it would load the source rail.
+    Dormancy of a trace row is ``request_rule`` / ``flux_dormant``, checked
+    by ``_species_is_flux_dormant``.
     """
 
+    if (
+        not has_declared_routing(species)
+        and species in _trace_vapour_carrier_formulas()
+    ):
+        return
     catalog_payload = _authoritative_vapour_catalog_payload(vapor_pressure_data)
     if catalog_payload is None:
         return
@@ -5055,6 +5063,15 @@ def _condensation_admission_refusal(
         )
     except HotTrainInapplicable as exc:
         return exc.refusal_code
+    if (
+        not has_declared_routing(species)
+        and species in _trace_vapour_carrier_formulas()
+        and _species_is_flux_dormant(
+            species,
+            vapor_pressure_data=vapor_pressure_data,
+        )
+    ):
+        return CONDENSATION_FLUX_DORMANT_REFUSAL
     if _species_has_compiled_or_legacy_pressure(
         species,
         vapor_pressure_data=vapor_pressure_data,
@@ -5068,12 +5085,30 @@ def _species_is_flux_dormant(
     *,
     vapor_pressure_data: Mapping[str, Any] | None = None,
 ) -> bool:
-    """True when the catalog row forbids an inventory debit."""
+    """True when the catalog row forbids an inventory debit.
 
-    return _species_vapor_data(
+    Legacy ``metals`` / ``oxide_vapors`` rows carry ``flux_dormant`` on
+    the compatibility view. A t1139 trace row lives in another family,
+    so its dormancy is the compiled ``request_rule``, not the
+    applicability token.
+    """
+
+    if _species_vapor_data(
         species,
         vapor_pressure_data=vapor_pressure_data,
-    ).get("flux_dormant") is True
+    ).get("flux_dormant") is True:
+        return True
+    if has_declared_routing(species) or species not in _trace_vapour_carrier_formulas():
+        return False
+    catalog_payload = _authoritative_vapour_catalog_payload(vapor_pressure_data)
+    if catalog_payload is None:
+        return False
+    compiled = _condensation_catalog(
+        vapor_pressure_data, catalog_payload
+    ).species.get(str(species))
+    if compiled is None:
+        return False
+    return compiled.code_metadata.request_rule == "dormant_pending_validation"
 
 
 def _promote_non_debiting_carrier_status(
@@ -7018,6 +7053,18 @@ def _antoine_psat_pa(
             species,
             vapor_pressure_data=vapor_pressure_data,
         )
+        if _species_is_flux_dormant(
+            species,
+            vapor_pressure_data=vapor_pressure_data,
+        ) and (
+            not has_declared_routing(species)
+            and species in _trace_vapour_carrier_formulas()
+        ):
+            raise WallSaturationPressureRefusal(
+                species,
+                T_K,
+                CONDENSATION_FLUX_DORMANT_REFUSAL,
+            )
     data = _species_vapor_data(
         species,
         vapor_pressure_data=vapor_pressure_data,
