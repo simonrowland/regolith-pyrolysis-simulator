@@ -1,0 +1,521 @@
+schema_version: literature_extract.v1
+source_id: shornikov-2021-mgo-feo-silicate
+source:
+  citation: "Shornikov, S. I., Ivanova, M. A., and Minaeva, M. S. (2021), Thermodynamic Properties of the MgO–FeO–SiO2 Melts, Experiment in Geosciences 27(1):67–69."
+  year: 2021
+  corpus_asset: raw/shornikov-2021-mgo-feo-silicate/shornikov-2021-mgo-feo-silicate.pdf
+  corpus_sha256: 6e3e55953c0c8138920aaa81cded6552ea58f8bbea41a4a874310a2aa9a7afa4
+extraction:
+  method: "pdftotext -layout transcription checked against every page rendered at 250 dpi; all figure curves remain figure-only and were not digitized."
+  date: '2026-10-04'
+  worker: x-2021-mgo-feo-silicate
+  provenance_path: text/shornikov-2021-mgo-feo-silicate/pdftotext-layout.txt
+review_status: draft
+fidelity_samples:
+  - species: MgO
+    observable: method
+    observation_id: shornikov_2021_study_aim_and_temperature
+    field: temperature_range_as_printed
+    value: 1800–2400 K
+    locator:
+      page: 67
+      published_page: 67
+      pdf_page_index: 2
+      section: Abstract
+      note: The abstract states 1800–2400 K.
+  - species: MgO
+    observation_id: shornikov_2021_model_species_and_equilibrium
+    field: gas_species_as_printed
+    value: [Mg, Mg2, MgO, Fe, Fe2, FeO, FeO2, Si, Si2, SiO, SiO2, Si2O2, O, O2, O3, O4]
+    locator:
+      page: 68
+      published_page: 68
+      pdf_page_index: 3
+      section: Model description
+  - species: MgO
+    observation_id: shornikov_2021_fig1_phase_diagrams
+    field: method_class
+    value: figure_only
+    locator:
+      page: 67
+      published_page: 67
+      pdf_page_index: 2
+      figure: '1'
+  - species: FeO
+    observation_id: shornikov_2021_prior_feo_experiments
+    field: temperature_range_as_printed
+    value: 1577–2173 K
+    locator:
+      page: 67
+      published_page: 67
+      pdf_page_index: 2
+      section: Introduction
+  - species: FeO
+    observation_id: shornikov_2021_fig2_feo_activity
+    field: method_class
+    value: figure_only
+    locator:
+      page: 67
+      published_page: 67
+      pdf_page_index: 2
+      figure: '2'
+  - species: MgO
+    observation_id: shornikov_2021_fig3_activities_and_mixing_energy
+    field: method_class
+    value: figure_only
+    locator:
+      page: 68
+      published_page: 68
+      pdf_page_index: 3
+      figure: '3'
+  - species: MgO
+    observation_id: shornikov_2021_activity_standard_states
+    field: standard_state_status_as_reported
+    value: The paper does not state an activity standard state.
+    locator:
+      page: 68
+      published_page: 68
+      pdf_page_index: 3
+      figure: '3'
+  - species: MgO
+    observation_id: shornikov_2021_model_qualifications
+    field: reported_mixing_energy_range_as_printed
+    value: "−10 to −25 kJ/mol"
+    locator:
+      page: 69
+      published_page: 69
+      pdf_page_index: 4
+      section: Results and discussion
+species:
+  MgO:
+    observations: []
+    context:
+      - observation_id: shornikov_2021_study_aim_and_temperature
+        type: method
+        locator:
+          page: 67
+          published_page: 67
+          pdf_page_index: 2
+          section: Abstract and Introduction
+        units: as printed
+        values:
+          quantity: present_study_method_and_scope
+          study_kind_as_reported: theoretical calculations
+          model_as_reported: semi-empirical model (Shornikov, 2019)
+          aim_as_reported: calculate oxide activities and mixing energies in MgO–FeO–SiO2 melts to refine model parameters
+          temperature_range_as_printed: 1800–2400 K
+      - observation_id: shornikov_2021_model_species_and_equilibrium
+        type: method
+        locator:
+          page: 68
+          published_page: 68
+          pdf_page_index: 3
+          section: Model description
+        units: as printed
+        values:
+          quantity: model_inputs_and_vapor_speciation
+          parameter_basis_as_reported: standard Gibbs energies of formation of MgO, FeO, SiO2, their binary compounds, and vapor species
+          parameter_source_as_reported: experimental and theoretical data of the standard Gibbs energies (ΔG°) of formation
+          ternary_compound_statement_as_printed: no ternary compounds were found in the MgO–FeO–SiO2 system
+          equilibrium_basis_as_reported: standard Gibbs energies of condensed phases and vapor species over the melt used to find equilibrium conditions for given melt composition and temperature
+          prior_binary_melt_work_as_reported: thermodynamic properties of MgO–SiO2, FeO–SiO2, and MgO–FeO binary melts were considered earlier by Shornikov (2006), Shornikov (2015), and Shornikov et al. (2020)
+          prior_model_comparison_as_reported: Bjorkvall et al. (2000) and Wu et al. (1993) performed similar detailed calculations of oxide activities and mixing energies at 1873 K and 2273 K, respectively
+          gas_species_as_printed:
+            - Mg
+            - Mg2
+            - MgO
+            - Fe
+            - Fe2
+            - FeO
+            - FeO2
+            - Si
+            - Si2
+            - SiO
+            - SiO2
+            - Si2O2
+            - O
+            - O2
+            - O3
+            - O4
+      - observation_id: shornikov_2021_experimental_facts_not_applicable
+        type: laboratory_conditions
+        locator:
+          page: 67
+          published_page: 67
+          pdf_page_index: 2
+          section: Abstract
+          note: The article describes theoretical calculations; inspection of pages 67–69 found no experimental procedure or physical run set.
+        units: typed absence
+        values:
+          quantity: experimental_apparatus_and_sample_facts
+          study_kind_as_reported: theoretical calculations
+          experiment_method:
+            state:
+              tag: not_applicable
+              reason: not_applicable
+            locator:
+              page: 67
+              published_page: 67
+              pdf_page_index: 2
+              section: Abstract
+              note: No experimental run set is reported on article pages 67–69.
+          cell_material_and_liner:
+            state:
+              tag: not_applicable
+              reason: not_applicable
+            locator:
+              page: 67
+              published_page: 67
+              pdf_page_index: 2
+              section: Abstract
+              note: No physical experiment or effusion cell is reported on article pages 67–69.
+          orifice:
+            diameter_m:
+              state:
+                tag: not_applicable
+                reason: not_applicable
+              locator:
+                page: 67
+                published_page: 67
+                pdf_page_index: 2
+                section: Abstract
+                note: No physical experiment or effusion orifice is reported on article pages 67–69.
+            channel_length_m:
+              state:
+                tag: not_applicable
+                reason: not_applicable
+              locator:
+                page: 67
+                published_page: 67
+                pdf_page_index: 2
+                section: Abstract
+                note: No physical experiment or effusion orifice is reported on article pages 67–69.
+          calibration:
+            method:
+              state:
+                tag: not_applicable
+                reason: not_applicable
+              locator:
+                page: 67
+                published_page: 67
+                pdf_page_index: 2
+                section: Abstract
+                note: No measured intensities or pressure conversion are reported on article pages 67–69.
+            reference_substance:
+              state:
+                tag: not_applicable
+                reason: not_applicable
+              locator:
+                page: 67
+                published_page: 67
+                pdf_page_index: 2
+                section: Abstract
+                note: No measured intensities or calibration substance are reported on article pages 67–69.
+          ionization:
+            energy_eV:
+              state:
+                tag: not_applicable
+                reason: not_applicable
+              locator:
+                page: 67
+                published_page: 67
+                pdf_page_index: 2
+                section: Abstract
+                note: No ion source or ionization measurement is reported on article pages 67–69.
+            cross_sections:
+              state:
+                tag: not_applicable
+                reason: not_applicable
+              locator:
+                page: 67
+                published_page: 67
+                pdf_page_index: 2
+                section: Abstract
+                note: No measured ion intensities or cross-sections are reported on article pages 67–69.
+            cross_section_source:
+              state:
+                tag: not_applicable
+                reason: not_applicable
+              locator:
+                page: 67
+                published_page: 67
+                pdf_page_index: 2
+                section: Abstract
+                note: No measured ion intensities or cross-sections are reported on article pages 67–69.
+            multiplier_correction:
+              state:
+                tag: not_applicable
+                reason: not_applicable
+              locator:
+                page: 67
+                published_page: 67
+                pdf_page_index: 2
+                section: Abstract
+                note: No ion-current corrections are reported on article pages 67–69.
+            isotope_correction:
+              state:
+                tag: not_applicable
+                reason: not_applicable
+              locator:
+                page: 67
+                published_page: 67
+                pdf_page_index: 2
+                section: Abstract
+                note: No ion-current corrections are reported on article pages 67–69.
+          temperature_measurement:
+            sensor:
+              state:
+                tag: not_applicable
+                reason: not_applicable
+              locator:
+                page: 67
+                published_page: 67
+                pdf_page_index: 2
+                section: Abstract
+                note: Temperatures are model conditions; no physical temperature measurement is reported on article pages 67–69.
+          temperature_calibration:
+            method:
+              state:
+                tag: not_applicable
+                reason: not_applicable
+              locator:
+                page: 67
+                published_page: 67
+                pdf_page_index: 2
+                section: Abstract
+                note: Temperatures are model conditions; no physical temperature calibration is reported on article pages 67–69.
+          pressure_environment:
+            total_pressure_Pa:
+              state:
+                tag: not_applicable
+                reason: not_applicable
+              locator:
+                page: 67
+                published_page: 67
+                pdf_page_index: 2
+                section: Abstract
+                note: No chamber, residual, or background pressure is reported on article pages 67–69.
+          sample:
+            preparation:
+              state:
+                tag: not_applicable
+                reason: not_applicable
+              locator:
+                page: 67
+                published_page: 67
+                pdf_page_index: 2
+                section: Abstract
+                note: The study reports calculations and no prepared physical sample on article pages 67–69.
+            starting_materials_and_purity:
+              state:
+                tag: not_applicable
+                reason: not_applicable
+              locator:
+                page: 67
+                published_page: 67
+                pdf_page_index: 2
+                section: Abstract
+                note: The study reports calculations and no prepared physical sample on article pages 67–69.
+            composition_as_prepared:
+              state:
+                tag: not_applicable
+                reason: not_applicable
+              locator:
+                page: 67
+                published_page: 67
+                pdf_page_index: 2
+                section: Abstract
+                note: The study reports calculations and no prepared physical sample on article pages 67–69.
+            composition_after_runs:
+              state:
+                tag: not_applicable
+                reason: not_applicable
+              locator:
+                page: 67
+                published_page: 67
+                pdf_page_index: 2
+                section: Abstract
+                note: The study reports calculations and no physical runs on article pages 67–69.
+          activity_defining_ions:
+            a_MgO:
+              state:
+                tag: not_applicable
+                reason: not_applicable
+              locator:
+                page: 68
+                published_page: 68
+                pdf_page_index: 3
+                figure: '3'
+                note: The present study calculates activities; no ion measurements define them.
+            a_FeO:
+              state:
+                tag: not_applicable
+                reason: not_applicable
+              locator:
+                page: 68
+                published_page: 68
+                pdf_page_index: 3
+                figure: '3'
+                note: The present study calculates activities; no ion measurements define them.
+            a_SiO2:
+              state:
+                tag: not_applicable
+                reason: not_applicable
+              locator:
+                page: 68
+                published_page: 68
+                pdf_page_index: 3
+                figure: '3'
+                note: The present study calculates activities; no ion measurements define them.
+      - observation_id: shornikov_2021_fig1_phase_diagrams
+        type: figure_only_context
+        locator:
+          page: 67
+          published_page: 67
+          pdf_page_index: 2
+          figure: '1'
+        units: caption and symbols as printed
+        values:
+          quantity: historical_phase_diagrams
+          method_class: figure_only
+          attribution: Bowen and Schairer (1935)
+          systems_as_printed:
+            - MgSiO3–FeSiO3
+            - Mg2SiO2–Fe2SiO4
+          phase_fields_as_printed:
+            - '1: olivine + liquid'
+            - '2: olivine + clinopyroxene + liquid'
+            - '3: clinopyroxene + liquid'
+            - '4: clinopyroxene + tridymite + liquid'
+            - '5: clinopyroxene'
+            - '6: rhombic pyroxene'
+            - '7: clinopyroxene + olivine + tridymite'
+            - '8: olivine + tridymite'
+            - '9: olivine + tridymite + liquid'
+            - '10: tridymite + liquid'
+            - '11: cristobalite + liquid'
+            - '12: liquid'
+            - '13: olivine'
+          note: 'Phase-diagram lines are not digitized. The Fig. 1(b) axis endpoint label prints Mg2SiO4; this appears to be a misprint in the text, which prints Mg2SiO2–Fe2SiO4 in the Fig. 1 caption and p. 67 introduction, the Fig. 3 caption, and the p. 69 discussion. The as-printed system value follows the text.'
+      - observation_id: shornikov_2021_fig3_activities_and_mixing_energy
+        type: figure_only_context
+        locator:
+          page: 68
+          published_page: 68
+          pdf_page_index: 3
+          figure: '3'
+        units: activities and kJ/mol as plotted
+        values:
+          quantity: oxide_activities_and_mixing_energy
+          method_class: figure_only
+          systems_as_printed:
+            - MgSiO3–FeSiO3 (panels a–d)
+            - Mg2SiO2–Fe2SiO4 (panels e–h; formula retained as printed)
+          panels_as_printed:
+            MgO_activity: panels a and e
+            FeO_activity: panels b and f
+            SiO2_activity: panels c and g
+            mixing_energy: panels d and h
+          temperatures_and_series_as_printed: 1873 K (series 1–4 and 6); 2273 K (series 5 and 7)
+          experimental_series_as_attributed: 1 Kojima et al. (1969); 2 Sakawa et al. (1976); 3 Costa et al. (2017)
+          calculated_series_as_attributed: 4 Bjorkvall et al. (2000); 5 Wu et al. (1993); 6 and 7 present study
+          reason: 'source_internally_inconsistent: the p. 67 Introduction, Fig. 1 caption, Fig. 3 caption, and p. 69 discussion print Mg2SiO2–Fe2SiO4; only the Fig. 1(b) axis endpoint label prints Mg2SiO4. Mg2SiO4 (forsterite, the end-member paired with fayalite Fe2SiO4) is the chemically consistent formula, so Mg2SiO2 in the text appears to be the misprint; the as-printed text value is retained.'
+          note: Figure curves are not digitized; current-study calculated curves remain figure-only context.
+      - observation_id: shornikov_2021_activity_standard_states
+        type: method
+        locator:
+          page: 68
+          published_page: 68
+          pdf_page_index: 3
+          figure: '3'
+          note: The caption identifies MgO, FeO, and SiO2 activities; no standard state is given in the article text or captions.
+        units: activity standard state as stated
+        values:
+          quantity: activity_standard_state
+          standard_state_status_as_reported: The paper does not state an activity standard state.
+          activities:
+            a_MgO:
+              state:
+                tag: unknown
+                reason: not_published
+              locator:
+                page: 68
+                published_page: 68
+                pdf_page_index: 3
+                figure: '3'
+            a_FeO:
+              state:
+                tag: unknown
+                reason: not_published
+              locator:
+                page: 68
+                published_page: 68
+                pdf_page_index: 3
+                figure: '3'
+            a_SiO2:
+              state:
+                tag: unknown
+                reason: not_published
+              locator:
+                page: 68
+                published_page: 68
+                pdf_page_index: 3
+                figure: '3'
+      - observation_id: shornikov_2021_model_qualifications
+        type: thermodynamic_example
+        locator:
+          page: 69
+          published_page: 69
+          pdf_page_index: 4
+          section: Results and discussion
+        units: as printed
+        values:
+          quantity: model_results_and_qualifications
+          method_class: model_derived
+          reported_mixing_energy_range_as_printed: "−10 to −25 kJ/mol"
+          reported_temperature_span_as_printed: 1873–2273 K
+          statements_as_reported:
+            - Fig. 2 results show discrepancies between obtained FeO activity results.
+            - The article reports no satisfactory agreement between experimental oxide activities in ternary melts and values for the MgO–SiO2 and FeO–SiO2 boundary melts.
+            - The article characterizes the available thermodynamic information as varied.
+            - Present-study MgO activity calculations at significant FeO concentration correspond satisfactorily to Wu et al. (1993), Bjorkvall et al. (2000), and Costa et al. (2017), but large discrepancies occur in the forsterite region (Fig. 3e).
+            - Experimental and theoretical FeO activities correspond except the Bjorkvall et al. (2000) calculations, which show significant positive deviations from ideality (Fig. 3b and f).
+            - SiO2 activities in the presented cross sections and the present calculations differ approximately 3 times from Wu et al. (1993) and Bjorkvall et al. (2000), whose values do not quite correspond to accepted boundary-melt values.
+            - The observed discrepancies are probably due to low mixing-energy values in the MgSiO3–FeSiO3 and Mg2SiO2–Fe2SiO4 melts.
+            - Mixing energies are described as practically unchanged at 1873–2273 K, indicating melt behavior close to ideal.
+            - The conclusion states that calculated oxide activities in MgO–FeO–SiO2 melts at 1800–2400 K satisfactorily correspond to available physicochemical experimental and theoretical data.
+          uncertainty_as_reported: No numerical uncertainty, confidence interval, or error bars are reported for the present calculations.
+  FeO:
+    observations: []
+    context:
+      - observation_id: shornikov_2021_prior_feo_experiments
+        type: thermodynamic_example
+        locator:
+          page: 67
+          published_page: 67
+          pdf_page_index: 2
+          section: Introduction
+        units: K and method names as printed
+        values:
+          quantity: prior_FeO_activity_experimental_conditions
+          method_class: quoted_attributed
+          attribution: Kitayama and Katsura (1968); Kojima et al. (1969); Sakawa et al. (1976); Ban-ya and Shim (1982); Plante et al. (1992); Costa et al. (2017)
+          temperature_range_as_printed: 1577–2173 K
+          methods_as_reported: various approaches, including the Knudsen effusion mass spectrometric method
+      - observation_id: shornikov_2021_fig2_feo_activity
+        type: figure_only_context
+        locator:
+          page: 67
+          published_page: 67
+          pdf_page_index: 2
+          figure: '2'
+        units: dimensionless activity as plotted
+        values:
+          quantity: FeO_activity_comparison
+          method_class: figure_only
+          system_as_printed: FeO–MgSiO3 melts
+          temperature_K: 1873
+          horizontal_axis_as_printed: FeO, mol %
+          experimental_series_as_attributed: 1 Kojima et al. (1969); 2 Ban-ya and Shim (1982); 3 Plante et al. (1992)
+          calculated_series_as_attributed: 4 present study
+          note: Figure 2 curves are not digitized.
