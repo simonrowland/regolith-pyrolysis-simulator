@@ -1,0 +1,59 @@
+# STATUS (fix): tsuchiyama-1998-forsterite-mg2sio4-h2
+
+**From:** regolith-empirical (corpus fix seat), **To:** regolith-main, **At:** 2026-10-05 ~22:55 ET. Answers REQ-corpus-batch12 section B (after the fix: grok confirm).
+Source: Tsuchiyama, Takahashi & Tachibana (1998), Mineralogical Journal 20(3) 113–126, DOI 10.2465/minerj.20.113.
+
+- Start tip (REQ): `293f51b694971ef9b42cb2965e3a5636b3946393`. Mirror origin tip at start was the same sha.
+- **New tip on mirror `hunt/tsuchiyama-1998-forsterite-mg2sio4-h2`: `80c8635cb1d3e45ab1be87f90d24cf87589518c0`** (fast-forward, one commit `80c8635c`; no force-push; no `-r2` branch needed).
+- Review applied: our review.md (rows checked 25, mismatches 10, printed numbers not carried 4), required changes R1–R10.
+- **Items fixed 10/10 required (R1–R10); mismatches corrected 10/10; printed numbers not carried 4/4 now carried; advisories A1, A3 and the optional part of R4 also applied.**
+- Corrections count: 10 mismatches fixed, 4 numbers carried, plus 7 qualifier quotes (R8), 12 equations (R9), 5 `source_internally_inconsistent` reasons (R2/R7).
+- Hard issues: **0** (migrator `_migrate_extract` + `finalize()`); fidelity validator `OK: 1 extract file(s) valid`; corpus `tools/test_ledgers_valid.py` rc 0.
+- Files changed (explicit pathspecs, `git add --sparse`): `extracts/<sid>.yaml`, `tables/<sid>/t2.csv`. Ledger, sidecar, t1.csv, README unchanged.
+
+## How it was done
+- Sparse worktree on Simon's MacBook: `~/Repos/regolith-corpus/worktrees/fix-tsuchiyama-1998-forsterite-mg2sio4-h2` (`git worktree add --no-checkout`, sparse-checkout `'/*' '!/raw/*/*' '!/text/*/*' '/raw/*/sidecar.yaml' /raw/<sid>/* /text/<sid>/*`). No build_index.py, no migrate_pilot_extracts.py. Mac free disk 57 GB at the start. Worktree removed after push (see end).
+- All 14 pages rendered with `pdftoppm -r 220` and read from the images. 400-dpi crops were read for Eqs. (1)–(2) (p.118), Eqs. (3)–(5) and the α definition (p.120), Table 2 header and footnote (p.122), and Eqs. (A1)–(A13) (pp.124–126).
+- Readers: `~/ci-scratch/regolith-green-ro` at `61ec839da3ba288c5df4a80f6d3ef142bd8ab461` (read-only), `/Users/simonrowland/Repos/regolith-pyrolysis-simulator/.venv/bin/python`, PYTHONPATH = that clone. The extract was passed by path to the corpus worktree. `engines/engines.local.toml` exists in that clone (as in the review).
+- The edits were made by one script that does exact-count string replacements, so any drift aborts it. The 18 run blocks were generated from `t1.csv`, which the review checked digit by digit against print. Each generated row was asserted equal to the extract's existing series row (T, time, initial wt., ΔM/S) before the split. The row text was moved verbatim, so no Table 1 cell changed.
+
+## Per-item table (review item → what changed → page evidence)
+| Item | What changed | Page evidence (printed page / PDF index) |
+|---|---|---|
+| R1 (binding) | Added 18 experiments `forsterite-h2-run-<run>` (e.g. `forsterite-h2-run-foh-1`). Each has `conditions.temperature_K`, `thermal_schedule.setpoints_and_holds: [{temperature_K, hold_duration_s}]` and `sample.mass_kg` (Initial wt.). Locators point to Table 1 p.116 with notes "unit conversion only (h→s, ×3600)" / "(g→kg)". Furnace, pressure, sample form and composition are copied from the series experiment. The single Table 1 observation `tsuchiyama_1998_table1_run_results` is split into 18 observations `tsuchiyama_1998_table1_run_<run>`, each with `experiment: forsterite-h2-run-<run>` and its row moved verbatim. `fidelity_samples[0]` now points to `tsuchiyama_1998_table1_run_foh_1`. Both rate fits' `derived_from` and `derivation.inputs` list the 18 ids. | Table 1 Time /hr column, p.116/3: 24,48,66,24,36,48,12,18,24,4,8,12,3,6,24,2,3,6 h |
+| R2 | Series `total_duration_s` 10800→**7200**–237600 s, locator Table 1 p.116/3. The false "Table 1 durations: 3–66 h" is removed. Note: `source_internally_inconsistent: prose p.114 says "durations ranging from 3 to 66 hours"; Table 1 p.116 prints run A-1 at 2 h`. The same reason is on the A-1 observation. | p.114/1 "for durations ranging from 3 to 66 hours"; p.116/3 A-1 1450 °C 2 h |
+| R3 | `cell_materials`: Mo only (Ta and W removed). `cell_material_and_liner` = "Mo sample crucible (16 mm inner diameter, 124 mm length); sample hung with Mo wire; no liner stated", with quotes in the note. `sample.form` adds "each sample hung with Mo wire" (p.114 locator, Fig. 1b quote). New `other_facts.thermal_shield_material` Ta (Fig. 1 caption "TS: thermal shield of Ta"). Heater Ta and walls W stay in other_facts. | p.115/2 "heated in a molybdenum crucible (16 mm and 124 mm…)"; p.114/1 "Each sample was hung with Mo-wires"; Fig. 1 caption p.115/2 |
+| R4 | Table 2 `table_provenance`: the footnote prints only `* //(001)`, keyed to "Single crystal*" in the Nagahara et al. (1997) row. The line "for other oxides." is identified as the end of the p.121 body sentence. Optional part: the α=1 claim in `alpha_discussion_qualifiers` now ends "as Sata et al. (1978) proposed for other oxides" (pp.121–122). | p.122/9 below Table 2; p.121/8 last line |
+| R5 | Table 2 `notes` carries the printed headers `Strting material (forsterite) \| Temperature range /°C \| Atmospere \| Evaportion regime \| Pressure range /bar \| Range of α \| Refference` as source typos. The false "OCR error" claim is removed. | p.122/9 header (400-dpi crop) |
+| R6 | `fidelity_samples[1]` → 118/5 (Equation (1)). `tsuchiyama_1998_measured_rate_fit` → 118/5, with a note that the abstract also prints it at 113/0. `tsuchiyama_1998_normal_rate_fit` → 118/5. `tsuchiyama_1998_surface_observations` → 118/5. `tsuchiyama_1998_figure_only_curves` → 117/4 (section "Figures 2 and 3"). | Eqs. (1)–(2), steps/hillocks/contaminants text and Fig. 4 on p.118/5; Figs. 2–3 on p.117/4 |
+| R7a | `reason: source_internally_inconsistent` on `tsuchiyama_1998_table2_compilation`: Table 2 "This study" α 0.04-0.2 vs Abstract and p.121 0.04–0.12. Values carried as printed. | p.122/9 row 7 "0.04-0.2"; p.113/0 and p.121/8 "0.04-0.12" / "0.04 to 0.12" |
+| R7b | `reason` on `tsuchiyama_1998_surface_observations` and on the FoH-12 observation: Fig. 4 caption "1250°C, 24 hrs" vs Table 1 48 h. | Fig. 4 caption p.118/5; Table 1 p.116/3 FoH-12 1250 48 |
+| R7c | `reason` on `tsuchiyama_1998_normal_rate_fit`. The printed exponent 10⁻⁵ and the unit [cm⁻² sec⁻¹] are both inconsistent with Eq. (1). Reviewer arithmetic, labelled as not printed: V_Fo ≈ 140.7/3.227 ≈ 43.6 cm³ mol⁻¹, so 2480×43.6 ≈ 1.08×10⁵ cm s⁻¹. `printed_unit_note` is extended: do not use 1.09e-05 as a prefactor. Values are carried as printed. | p.118/5 Eq. (2) "1.09×10⁻⁵ [cm⁻²sec⁻¹]" (400-dpi crop); ρ 3.227 p.117/4 |
+| R8 / N1–N4 | New context row `tsuchiyama_1998_printed_numeric_context_and_qualifiers` (quoted_unattributed). Each item has its own locator: N4 α "about 0.03 to 0.2" (113/0); N1 nominal size about 1 × 0.1 × 1 cm along a, b, c (114/1); N2 about 10 min heat-up (115/2); "proceeds lineally with time" (117/4, "lineally" as printed); "this anisotropy was ignored for simplicity" (117/4); "plates with b0<<a0~c0 … nearly equal to those of {010} surfaces" (117/4); Fig. 3 caption "Errors are hidden in the symbols" (117/4). New row `tsuchiyama_1998_anisotropy_attributed_context` (quoted_attributed, attribution Nagahara et al. (1997)) holds N3: c-axis rate "twice or triple faster", factor 2–3, 1500–1800 °C, vacuum (117/4). | pp.113, 114, 115, 117 as listed |
+| R9 | New context row `tsuchiyama_1998_model_equations_as_printed` (model_derived). Each equation is carried as printed, with its locator and printed "where" text: Eq. (3) j_Fo(FED)=α j_Fo^id(FED) (120/7); α (= j_Fo/j_Fo^id) (120/7); the inline j_Fo(HRD)=α j_Fo^id(HRD) (120/7); (A1) (124/11); (A3), (A4), (A6), (A7), (A8) (125/12); (A11), (A12), (A13) (126/13). (A12)'s printed cross-reference "reaction of Eq.(3)" is flagged in a note and not corrected: Eq. (3) as printed is the α relation, not a reaction. Eqs. (4), (5), (A2), (A5), (A9), (A10) were already carried and are unchanged. | 400-dpi crops of pp.120, 124, 125, 126 |
+| R10 | Table 2 row 4 endpoint 2 is now `1.3e-10` in `t2.csv` and in the extract. Migrated context reads `[1.3e-09, 1.3e-10]`. | p.122/9 "1.3×10⁻⁹-1.3×10⁻¹⁰" |
+| A1 (advisory) | Context `ionization_energy_eV` and `multiplier_or_isotope_corrections` now read "not applicable; no mass spectrometer was used", in line with the bench's `not_applicable`. | pp.114–116 (no mass spectrometer) |
+| A3 (advisory) | The recondensation-flux and Mo-crucible claims are attributed to Tsuchiyama (1998) as printed. | p.122/9 |
+
+## Gates (green 61ec839da, extract passed by path)
+| Check | Result |
+|---|---|
+| `Migrator(root=Path.cwd(), index={}, aliases={})._migrate_extract(<extract>)` + `finalize()` | completes; **hard issues 0**; observations 18 (unchanged), experiments 19 (1 series + 18 per-run), context rows 14 (11 + 3 new) |
+| Duration on migrated rows (R1 acceptance) | All 18 migrated observations bind to their run experiment. `collect_consumer_inputs(...).waypoints["hold_duration_s"]` resolves through `experiment.thermal_schedule.setpoints_and_holds[0].hold_duration_s`: FoH-1 86400, FoH-14 172800, FoH-18 237600, FoH-11 86400, A-10 129600, FoH-12 172800, A-7 43200, A-6 64800, A-4 86400, A-2 14400, A-9 28800, A-5 43200, FoH-19 10800, FoH-16 21600, FoH-15 86400, A-1 7200, FoH-20 10800, FoH-17 21600 s. Each equals Table 1 h × 3600. Authority is `derived` because of the unit conversion. |
+| Migrated value spot-check | FoH-1 0.01740 kg m⁻² at 1473.15 K; experiment mass 0.00032694 kg; FoH-17 0.32460 kg m⁻² at 1723.15 K; A-1 hold 7200 s |
+| Bench | cell `Mo sample crucible (16 mm inner diameter, 124 mm length); sample hung with Mo wire; no liner stated`; cell_materials `['Mo']` |
+| `evidence_for()` on every method_class | measured_tabulated, model_derived, quoted_unattributed, quoted_attributed (Nagahara et al. (1997)), measured_direct, figure_only: all known; unknowns 0 |
+| `tools/validate_literature_extracts.py --check-fidelity-match <worktree>/extracts/<sid>.yaml` (from green clone) | `OK: 1 extract file(s) valid` |
+| corpus `python3 tools/test_ledgers_valid.py` | rc 0 |
+| `rg "/Users/\|/private/"` over extract, t1/t2/README, ledger, sidecar | no matches |
+
+## Notes for the confirm reviewer
+- **Queue items: 18 instead of 1, all non-hard, all the same cause** (`axes=['method']`, "source does not state method"). The migrator emits one per experiment, and the run set is now 18 experiments. The paper names no closed method token, so method stays a typed absence; no method was invented. The AMENDMENT from the extraction report still applies: a method token for isothermal evaporation under maintained H2.
+- The per-row duration reaches scoring through the bound experiment (the consumer `hold_duration_s` waypoint). The migrated `Observation.identity.exposure` stays None, because green fills `exposure` only on the residue-composition path. No reader change was made. If main wants `exposure.duration_s` on mass-loss rows, that is a reader amendment.
+- The series experiment `forsterite-single-crystal-h2-series` is kept as the umbrella record (furnace, base pressure, 2–66 h total duration). No observation binds to it now. Finalize raised nothing for that.
+- Nothing could not be confirmed. Every item above was re-read on the page images. Reviewer arithmetic (R7c) is labelled as not printed.
+
+## Worktree
+Removed after push: `git worktree remove` of `~/Repos/regolith-corpus/worktrees/fix-tsuchiyama-1998-forsterite-mg2sio4-h2` (the local branch `fix/tsuchiyama-1998-forsterite-mg2sio4-h2` was deleted too; the mirror branch holds the tip). No other seat's worktree or branch was touched. No merge to green/main, no Mac listen pools armed.
+
+!COMPLETE: fix-tsuchiyama-1998-forsterite-mg2sio4-h2 — 80c8635cb1d3e45ab1be87f90d24cf87589518c0, items fixed 10/10, not-carried carried 4/4, hard issues 0
