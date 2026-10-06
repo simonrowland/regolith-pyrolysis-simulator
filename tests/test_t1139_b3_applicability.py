@@ -70,5 +70,7 @@ def test_cold_spot_reads_applicability_from_the_onset() -> None:
 
 
 def test_route_passes_the_train_stages_into_the_cold_spot() -> None:
-    source = inspect.getsource(CondensationModel._route)
-    assert "stages=self.train.stages" in source
+    route_source = inspect.getsource(CondensationModel._route)
+    tick_source = inspect.getsource(CondensationModel._route_tick)
+    assert "_route_tick" in route_source
+    assert "stages=self.train.stages" in tick_source

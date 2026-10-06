@@ -2847,6 +2847,15 @@ class CondensationModel:
                 data._route_catalog = previous
 
     def _route(self, evap_flux: EvaporationFlux, melt: MeltState):
+        """One tick. The trace-onset cache lives only for this call."""
+
+        _push_trace_onset_tick()
+        try:
+            return self._route_tick(evap_flux, melt)
+        finally:
+            _pop_trace_onset_tick()
+
+    def _route_tick(self, evap_flux: EvaporationFlux, melt: MeltState):
         """
         Route all evaporated species through the train.
 
@@ -5694,6 +5703,74 @@ _CONDENSED_STANDARD_STATES = (
     "condensed",
 )
 _ONSET_BISECTION_STEPS = 80
+# Active only inside ``_route``. None outside a tick, so a patched rail
+# on a direct onset call is not masked by an earlier tick.
+_TRACE_ONSET_CACHE: dict[
+    tuple[str, float, tuple[tuple[int, float, float], ...]],
+    TraceVapourCondensationOnset,
+] | None = None
+_TRACE_ONSET_DEPTH = 0
+
+
+def _push_trace_onset_tick() -> None:
+    """Start a route tick. Nested ticks share the outer cache."""
+
+    global _TRACE_ONSET_CACHE, _TRACE_ONSET_DEPTH
+    if _TRACE_ONSET_DEPTH == 0:
+        _TRACE_ONSET_CACHE = {}
+    _TRACE_ONSET_DEPTH += 1
+
+
+def _pop_trace_onset_tick() -> None:
+    """Drop the tick cache once the outermost ``_route`` returns."""
+
+    global _TRACE_ONSET_CACHE, _TRACE_ONSET_DEPTH
+    _TRACE_ONSET_DEPTH -= 1
+    if _TRACE_ONSET_DEPTH <= 0:
+        _TRACE_ONSET_DEPTH = 0
+        _TRACE_ONSET_CACHE = None
+
+
+def _stage_edge_key(
+    stages: Sequence[CondensationStage] | None,
+) -> tuple[tuple[int, float, float], ...]:
+    """Stage number and temperature edges, the landing half of the cache key."""
+
+    ordered = (
+        stages
+        if stages is not None
+        else CondensationTrain.create_default().stages
+    )
+    return tuple(
+        (
+            int(stage.stage_number),
+            float(stage.temp_range_C[0]),
+            float(stage.temp_range_C[1]),
+        )
+        for stage in ordered
+    )
+
+
+def _trace_onset_cache_key(
+    species: str,
+    partial_pressure_pa: float,
+    stages: Sequence[CondensationStage] | None,
+) -> tuple[str, float, tuple[tuple[int, float, float], ...]] | None:
+    """``(species, pressure to 6 significant figures, stage edges)``.
+
+    A non-finite or non-positive pressure is not a cache key. The
+    vapour-pressure table is not part of the key: one tick has one table.
+    ``trace_vapour_saturation_pressure_pa`` is the curve at one
+    temperature and stays uncached.
+    """
+
+    try:
+        pressure_pa = float(partial_pressure_pa)
+    except (TypeError, ValueError):
+        return None
+    if not math.isfinite(pressure_pa) or pressure_pa <= 0.0:
+        return None
+    return (str(species), float(f"{pressure_pa:.6g}"), _stage_edge_key(stages))
 
 
 @dataclass(frozen=True)
@@ -5787,7 +5864,37 @@ def trace_vapour_condensation_onset(
     gas and liquid, evaluated at ``P° = 100000 Pa``, invert to that
     temperature. GeO has no condensed GeO record; ½ Ge + ½ GeO2 on the
     channel's NASA compilation inverts to about 779 °C at 100 Pa.
+
+    A route tick reuses this object for the same species, the partial
+    pressure rounded to six significant figures, and the stage-edge
+    tuple. The next tick computes it again.
     """
+
+    key = _trace_onset_cache_key(species, partial_pressure_pa, stages)
+    cache = _TRACE_ONSET_CACHE
+    if cache is not None and key is not None:
+        cached = cache.get(key)
+        if cached is not None:
+            return cached
+    onset = _compute_trace_vapour_condensation_onset(
+        species,
+        partial_pressure_pa,
+        vapor_pressure_data=vapor_pressure_data,
+        stages=stages,
+    )
+    if cache is not None and key is not None:
+        cache[key] = onset
+    return onset
+
+
+def _compute_trace_vapour_condensation_onset(
+    species: str,
+    partial_pressure_pa: float,
+    *,
+    vapor_pressure_data: Mapping[str, Any] | None = None,
+    stages: Sequence[CondensationStage] | None = None,
+) -> TraceVapourCondensationOnset:
+    """Uncached body of ``trace_vapour_condensation_onset``."""
 
     declared = _declared_routing_onset(
         species,

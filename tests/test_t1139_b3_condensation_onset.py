@@ -11,15 +11,17 @@ from pathlib import Path
 
 import pytest
 
+import simulator.condensation as condensation
 from simulator.condensation import (
     CONDENSATION_TEMPS_C,
+    CondensationModel,
     TraceVapourCondensationOnset,
     _landing_stages_for_onset,
     trace_vapour_condensation_onset,
     trace_vapour_saturation_pressure_pa,
 )
 from simulator.condensation_routing import DESIGNATED_STAGE, designated_stage_number
-from simulator.state import CondensationTrain
+from simulator.state import CondensationTrain, EvaporationFlux, MeltState
 from simulator.vapour_rail.source_rail import STANDARD_PRESSURE_PA
 
 
@@ -196,3 +198,54 @@ def test_non_positive_pressure_does_not_invent_an_onset() -> None:
     assert onset.status == "inputs_required"
     assert onset.temperature_K is None
     assert onset.disposition == "unavailable"
+
+
+def test_onset_is_reused_inside_one_route_tick(monkeypatch) -> None:
+    stages = CondensationTrain.create_default().stages
+    calls = {"n": 0}
+    original = condensation._thermo_saturation_onset
+
+    def counting(species, pressure_pa, *, stages):
+        calls["n"] += 1
+        return original(species, pressure_pa, stages=stages)
+
+    monkeypatch.setattr(condensation, "_thermo_saturation_onset", counting)
+
+    outside_a = trace_vapour_condensation_onset("Rb", 100.0, stages=stages)
+    outside_b = trace_vapour_condensation_onset("Rb", 100.0, stages=stages)
+    assert calls["n"] == 2
+    assert outside_a is not outside_b
+
+    calls["n"] = 0
+    condensation._push_trace_onset_tick()
+    try:
+        first = trace_vapour_condensation_onset("Rb", 100.0, stages=stages)
+        second = trace_vapour_condensation_onset("Rb", 100.0, stages=stages)
+        # Six significant figures: 100.0001 Pa is the same key as 100 Pa.
+        rounded = trace_vapour_condensation_onset(
+            "Rb", 100.0001, stages=stages
+        )
+        other = trace_vapour_condensation_onset("Rb", 1.0, stages=stages)
+    finally:
+        condensation._pop_trace_onset_tick()
+    assert calls["n"] == 2
+    assert first is second is rounded
+    assert other is not first
+
+    calls["n"] = 0
+    model = CondensationModel(CondensationTrain.create_default())
+    model.configure_operating_conditions(
+        overhead_pressure_mbar=10.0,
+        species_partial_pressures_mbar={"Rb": 1.0},
+        pipe_diameter_m=0.12,
+        gas_temperature_C=1700.0,
+        stage_area_m2_by_stage={
+            str(stage.stage_number): 1.0 for stage in model.train.stages
+        },
+    )
+    flux = EvaporationFlux(species_kg_hr={"Rb": 0.4})
+    flux.update_totals()
+    model.route(flux, MeltState())
+    assert calls["n"] == 1
+    model.route(flux, MeltState())
+    assert calls["n"] == 2
