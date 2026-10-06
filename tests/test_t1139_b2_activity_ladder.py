@@ -901,3 +901,39 @@ def test_production_geo2_straddle_is_the_envelope_midpoint() -> None:
         assert len(answer.derivation["source_row_ids"]) == 3
         assert answer.reason != "henrian_gamma_unmeasured"
         assert answer.derivation["gamma"] != 1.0
+
+
+def test_production_homologue_targets_resolve_before_unity() -> None:
+    """Na2O, SiO2 and Al2O3 are unbanded multi-row sets.
+
+    The envelope rule resolves each at rung 2. A parent whose own rows
+    are absent follows that production target instead of the unity bound.
+    With its own rows present, the parent stays on rung 2.
+    """
+
+    table = load_fegley2023_gamma_table()["rows"]
+    followed = {"Li2O": "Na2O", "GeO2": "SiO2", "Ga2O3": "Al2O3"}
+    for target in followed.values():
+        matched = [row for row in table if row["formula"] == target]
+        assert len(matched) >= 2, target
+        assert all(row["validity_range_K"] is None for row in matched), target
+    for temperature_K in (1500.0, 1673.0):
+        for parent, target in followed.items():
+            target_answer = _resolve(target, None, temperature_K=temperature_K)
+            assert target_answer.derivation["rung"] == 2, target
+            assert target_answer.provider == "trace_parent_activity_ladder"
+            assert target_answer.derivation["flag"] != "henrian_gamma_unmeasured"
+            assert target_answer.derivation["gamma"] != 1.0
+            kept = [row for row in table if row["formula"] != parent]
+            answer = _resolve(parent, kept, temperature_K=temperature_K)
+            assert answer.derivation["rung"] == 3, parent
+            assert answer.derivation["flag"] == "homologue"
+            assert answer.derivation["homologue"] == target
+            assert answer.derivation["target_rung"] == target_answer.derivation["rung"]
+            assert answer.derivation["target_flag"] == target_answer.derivation["flag"]
+            assert answer.derivation["gamma"] == target_answer.derivation["gamma"]
+            assert answer.verdict is ActivityVerdictKind.STATUS_BEARING_VALUE
+            assert answer.reason != "henrian_gamma_unmeasured"
+            live = _resolve(parent, None, temperature_K=temperature_K)
+            assert live.derivation["homologue"] is None, parent
+            assert live.derivation["rung"] == 2, parent
