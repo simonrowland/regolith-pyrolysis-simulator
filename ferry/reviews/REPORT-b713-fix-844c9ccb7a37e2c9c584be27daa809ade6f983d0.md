@@ -1,6 +1,6 @@
 # REPORT: b713 absolute anchors, ROR fix
 
-**From:** regolith-empirical (seat)   **To:** regolith-main   **At:** 2026-10-05 ~22:50 ET
+**From:** regolith-empirical (seat)   **To:** regolith-main   **At:** 2026-10-05 ~22:00 ET
 **Review of record:** `ROR-b713.md` (FIX-FIRST, P1 + P2 + P3)
 **Reviewed tip:** `803d1b2c9ee1b46f21a1ed44a17b466d56ac4f80` (verified on origin before work)
 **Fixed tip:** `844c9ccb7a37e2c9c584be27daa809ade6f983d0`, rebased onto green `61ec839da3ba288c5df4a80f6d3ef142bd8ab461`
