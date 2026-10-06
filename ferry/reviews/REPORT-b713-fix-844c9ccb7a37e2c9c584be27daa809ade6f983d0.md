@@ -30,7 +30,7 @@ The validator/test commit changes nothing in the store. The extract rewrite (`bf
 ## Targeted tests (VPS)
 
 - `tests/test_absolute_path_ratchet.py` (15) plus `tests/test_literature_extracts.py::test_refuses_absolute_provenance_path`: **16 passed**.
-- Full `tests/test_literature_extracts.py` (the validator's direct tests), `-n 3`: 430 passed, 12 failed. The same 12 fail on the rebased reviewed tip without my commit (diff of failure sets: identical). They are pre-existing: `test_repo_extracts_validate_green` (614 schema/fidelity/vocabulary errors, none absolute), 7 `test_fidelity_sample_matches_extract[...]`, `test_every_extract_has_fidelity_sample`, `test_coverage_pending_stubs_not_found`, `test_pilot_extract_count_exact_and_merge_smoke`, and one more fidelity case.
+- Full `tests/test_literature_extracts.py` (the validator's direct tests), `-n 3`: 430 passed, 12 failed. The same 12 fail on the rebased reviewed tip without my commit (diff of failure sets: identical). They are pre-existing: `test_repo_extracts_validate_green` (614 schema/fidelity/vocabulary errors, none absolute), 8 `test_fidelity_sample_matches_extract[...]` (ammin-75-781, arxiv-1602-00658, cooper-2007, deguzman-2026, hendrix-2024, itoh-hino-banya-1997, okazaki-2022, rusiecka-wood-2025), `test_every_extract_has_fidelity_sample`, `test_coverage_pending_stubs_not_found`, and `test_pilot_extract_count_exact_and_merge_smoke`.
 - I did not run the full suite (VPS limit). **ASK:** run the full gate on a Mac Studio.
 
 ## D-062 checklist
