@@ -288,6 +288,61 @@ def test_298k_next_line_formula_is_page_grounded() -> None:
     assert stored == []
 
 
+def test_298k_formula_lines_are_uncertainties_with_row_pages() -> None:
+    """B1452 printed pp. 21–22: Quartz and the two nonstoichiometric Tb oxides."""
+    generated = _generation(TABLE_298K)
+    for row, formula, entropy, uncertainty, page in (
+        (401, "SiO2", "41.46", "0.20", 21),
+        (427, "TbO1.714", "80.75", "4.20", 22),
+        (429, "TbO1.812", "81.17", "4.20", 22),
+    ):
+        values = _observations_for(generated, Quantity.S, formula=formula, row=row)
+        assert len(values) == 1
+        value = values[0]
+        assert value.value.point == Decimal(entropy)
+        assert value.uncertainty.kind is UncertaintyKind.PRINTED
+        assert value.uncertainty.verbatim == uncertainty
+        assert value.locator.published_page == page
+        assert value.locator.pdf_page_index == page + 6
+        formation_uncertainties = (
+            ("1000", "1100", "0.193") if formula == "SiO2"
+            else ("4180", "4200", "0.736")
+        )
+        for quantity, printed in zip(
+            (Quantity.DELTA_FH, Quantity.DELTA_FG, Quantity.LOG10_KF),
+            formation_uncertainties,
+        ):
+            formation_values = _observations_for(
+                generated, quantity, formula=formula, row=row
+            )
+            assert len(formation_values) == 1
+            assert formation_values[0].uncertainty.kind is UncertaintyKind.PRINTED
+            assert formation_values[0].uncertainty.verbatim == printed
+        assert _observations_for(generated, Quantity.S, formula=formula, row=row + 1) == []
+        excluded = {
+            item["column"]: item["reason"]
+            for item in generated.report["exclusions"]
+            if item["row_index"] == row + 1
+        }
+        for column in generator.STORED_298K_COLUMNS:
+            assert excluded[column] == generator.UNCERTAINTY_EXCLUDE_REASON
+
+
+def test_298k_locator_covers_every_summary_page() -> None:
+    """First value row of each printed page, independently read from the PDF."""
+    generated = _generation(TABLE_298K)
+    for row, page in (
+        (0, 12), (28, 13), (85, 14), (115, 15), (171, 16), (203, 17),
+        (259, 18), (286, 19), (315, 20), (371, 21), (425, 22), (477, 23),
+        (513, 24), (567, 25), (619, 26), (648, 27), (675, 28), (701, 29),
+    ):
+        values = _observations_for(generated, Quantity.S, row=row)
+        assert values
+        for value in values:
+            assert value.locator.published_page == page
+            assert value.locator.pdf_page_index == page + 6
+
+
 def test_unresolved_formula_refuses_and_names_consulted_fields() -> None:
     generated = _generation(TABLE_298K)
     greenockite = [
