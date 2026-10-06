@@ -1643,6 +1643,7 @@ _TRACE_HOMOLOGUE = {
 # is the nominal. This is not a residual ranking.
 _SOURCE_STATED_NOMINAL: tuple[tuple[str, str, str], ...] = (
     ("Cu2O", "Altman (1978)", "fegley2023:1636-1641"),
+    ("Cs2O", "set = g(Na2O) FactSage", "fegley2023:1398-1400"),
 )
 # Whole phase tokens only. ``liquid`` matches ``l``; a longer string that
 # merely contains one of these tokens does not.

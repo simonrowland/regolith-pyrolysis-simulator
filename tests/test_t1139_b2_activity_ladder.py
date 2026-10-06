@@ -931,6 +931,42 @@ def test_stated_nominal_beats_the_envelope_extreme() -> None:
     assert answer.provider == "trace_parent_activity_ladder"
 
 
+def test_production_cs2o_uses_the_factsage_nominal() -> None:
+    """Fegley adopts log g(Cs2O) = log g(Na2O) from FactSage, not Bennour."""
+
+    table = load_fegley2023_gamma_table()["rows"]
+    cs_rows = [row for row in table if row["formula"] == "Cs2O"]
+    named = [
+        row
+        for row in cs_rows
+        if "set = g(Na2O) FactSage" in str(row["notes_as_printed"])
+    ]
+    bennour = [
+        row for row in cs_rows if "Bennour" in str(row["notes_as_printed"])
+    ]
+    assert len(named) == 1
+    assert len(bennour) == 1
+    for temperature_K in (1500.0, 1673.0):
+        answer = _resolve("Cs2O", None, temperature_K=temperature_K)
+        nominal = _resolve("Cs2O", named, temperature_K=temperature_K)
+        other = _resolve("Cs2O", bennour, temperature_K=temperature_K)
+        assert answer.derivation["source_row_id"] == named[0]["source_row_id"]
+        assert answer.derivation["source_row_id"] != bennour[0]["source_row_id"]
+        assert answer.derivation["flag"] == "source_stated_nominal"
+        assert answer.reason == "source_stated_nominal"
+        assert answer.verdict is ActivityVerdictKind.STATUS_BEARING_VALUE
+        assert answer.derivation["rung"] == 2
+        assert answer.derivation["nominal_cite"] == "fegley2023:1398-1400"
+        assert answer.derivation["gamma"] == nominal.derivation["gamma"]
+        assert answer.derivation["gamma"] != other.derivation["gamma"]
+        assert answer.derivation["gamma"] != 1.0
+        assert set(answer.derivation["source_row_ids"]) == {
+            row["source_row_id"] for row in cs_rows
+        }
+        assert answer.derivation["component_basis_derived"] is True
+        assert answer.derivation["basis_established"] is False
+
+
 def test_production_cu2o_uses_altman_and_not_a_unity_bound() -> None:
     table = load_fegley2023_gamma_table()["rows"]
     cu_rows = [row for row in table if row["formula"] == "Cu2O"]

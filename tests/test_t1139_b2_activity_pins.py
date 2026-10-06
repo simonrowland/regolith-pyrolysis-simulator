@@ -37,7 +37,8 @@ PIN_MOLE_FRACTION = 1e-6
 # alone is not a basis. The paper's stated convention, phase, and molecular
 # fraction make an in-basis published row a point. Published rows that no
 # band selects are the source's stated nominal when one is recorded (Cu,
-# Altman 1978), otherwise the candidate envelope (GeO2, geometric mean).
+# Altman 1978; Cs2O, the FactSage equality to Na2O), otherwise the
+# candidate envelope (GeO2, geometric mean).
 # The unity upper bound remains only where no published row was measured.
 _AFTER_LADDER = json.loads(
     r"""
@@ -82,26 +83,26 @@ _AFTER_LADDER = json.loads(
     "bound": null,
     "coefficient_formula": null,
     "extrapolation_notice": null,
-    "flag": "published",
+    "flag": "source_stated_nominal",
     "gamma_hex": {
-      "1500": "0x1.137459234191cp-27",
-      "1673": "0x1.d957152e02175p-25"
+      "1500": "0x1.71a1d9bda5457p-31",
+      "1673": "0x1.9255c88ef8328p-28"
     },
     "homologue": null,
     "may_certify": false,
-    "origin": "published",
+    "origin": "proxy_estimate",
     "provider": "trace_parent_activity_ladder",
-    "reason": "published_gamma",
-    "report_label": null,
+    "reason": "source_stated_nominal",
+    "report_label": "status-bearing-not-point",
     "rung": 2,
-    "source_row_count": 1,
-    "source_row_id": "fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_02_model::rows_as_printed:h=88048d19eeb1",
+    "source_row_count": 2,
+    "source_row_id": "fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_02_model::rows_as_printed:h=9dda0852511e",
     "tier": "B",
     "value_hex": {
-      "1500": "0x1.20d5c0153d76ap-47",
-      "1673": "0x1.f0554896df580p-45"
+      "1500": "0x1.839665577eea9p-51",
+      "1673": "0x1.a5e100f662268p-48"
     },
-    "verdict": "Point"
+    "verdict": "StatusBearingValue"
   },
   "Cu2O": {
     "authority": false,
