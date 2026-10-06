@@ -7395,7 +7395,11 @@ def _condition_hull_lines(
         "T and total pressure are the reference row's own (a compilation "
         "cell's printed T); composition is the row's stated composition per "
         "amount basis. Nothing is filled in: bracketed counts are rows "
-        "carrying a value. Six significant figures. Presentation only; no "
+        "carrying a value. Total P is the stored total pressure only; a "
+        "table's standard-state pressure (standard_pressure_Pa) is not a "
+        "total pressure and is not shown. A compilation row pools every "
+        "compilation table on that rail × engine, so its T span is not one "
+        "table's window. Six significant figures. Presentation only; no "
         "residual or statistic reads this table.",
         "",
         "| tier / stratum | rail | engine | n | T K (n) | total P Pa (n) | composition (n) |",
@@ -9009,15 +9013,29 @@ def render_score_report_from_payloads(
         rows, lambda row: not _flagged_payload_strata(row)
     )
     measured_rows: Iterable[Mapping[str, object]] = unflagged_rows
+    compilation_rows: Iterable[Mapping[str, object]] = ()
     compilation_lines: list[str] = []
     if observations is not None:
         from simulator.battery.compilation_tier import (
+            compilation_row_observation,
             compilation_tier_lines_from_payloads,
         )
+
+        def is_compilation(row: Mapping[str, object]) -> bool:
+            return (
+                compilation_row_observation(
+                    str(row.get("reference") or ""), observations, origins
+                )
+                is not None
+            )
 
         measured_rows = _FilteredPayloadRows(
             unflagged_rows, _payload_measured_reference(observations, origins)
         )
+        # The live writer hulls these same rows at
+        # _ScorePayloadAccumulator._add_headline(tier="compilation"):
+        # unflagged rows whose reference is a compilation observation.
+        compilation_rows = _FilteredPayloadRows(unflagged_rows, is_compilation)
         compilation_lines = compilation_tier_lines_from_payloads(
             unflagged_rows, observations, origins
         )
@@ -9112,6 +9130,15 @@ def render_score_report_from_payloads(
                 f"{row['n']} | {row['median_dex'] or '—'} | {row['rms_dex'] or '—'} |"
             )
     if hulls is not None:
+        # Compilation headline hull (t-1110 ROR P1). Only the hull is kept: the
+        # compilation statistics are printed by compilation_lines below.
+        headline_payloads(
+            compilation_rows,
+            engines,
+            tier="compilation",
+            hulls=hulls,
+            observations=observations,
+        )
         lines.extend(["", *_condition_hull_lines(hulls)])
     if compilation_lines:
         lines.extend(["", *compilation_lines])
