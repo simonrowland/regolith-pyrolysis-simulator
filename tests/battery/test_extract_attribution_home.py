@@ -8,8 +8,10 @@ only (no alias chain). These pins are red on ``work-v064-green`` 8089eadbf:
 * names that sat under those keys reach ``Evidence.attribution`` through the real
   migrator (class flips quoted_unattributed -> quoted_attributed, list values joined
   with "; ");
-* the page-repaired records (t-1117 section 1 plus Tachibana 1998) carry the name the
-  page prints, and no touched extract leaves a ``quoted_attributed`` record without one.
+* the page-repaired records (t-1117 section 1, Tachibana 1998 and the Stebbins 1983
+  Table 6/7 quotes) carry the name the page prints, and no extract the migrator walks
+  leaves a ``quoted_attributed`` record without one (every ``extracts/*.yaml``, so a
+  later extract of that shape fails here, not only the files this ruling touched).
 
 Row-level keys are out of scope and must be left alone (Schaefer & Fegley 2011 context
 prose and per-row footnote attributions).
@@ -47,6 +49,13 @@ REPAIRED = {
     ("lpi-compendium-65701.yaml", "lpi_compendium_65701_attributed_trace_and_exposure_values"): "Moore et al. (1973); Kerridge et al. (1975); Cirlin and Housley (1981); Wrigley (1973); Walton et al. (1973); Graf (1993), from data by Butler et al. (1973)",
     ("itoh-hino-banya-1998-spinel.yaml", "itoh_1998_quoted_prior_interaction_parameters"): "Mizin et al. (1983, ref 10) for e_Mg_Al_1873K; Sponseller and Flinn (1964, ref 11) for e_Ca_Al_1873K",
     ("tachibana-tsuchiyama-1998-forsterite-dust-lpsc.yaml", "tachibana_1998_forsterite_prior_experiment_alpha_constraint"): "experiments [1-4]: Hashimoto (1990) [1]; Wang et al. (1993) [2]; Nagahara and Ozawa (1996) [3]; Tsuchiyama et al., in preparation [4]",
+    # Stebbins, Carmichael & Weill 1983, printed p. 723: the Table 6 row labels and the Table 7
+    # anorthite footnotes 3-4, hoisted in table order from the nested per-estimate sources.
+    ("stebbins-carmichael-weill-1983.yaml", "stebbins_1983_diopside_table_6_vitrification_quotes"): "Weill et al. (1980a); Navrotsky and Coons (1976); Ferrier (1968a); Tamman (1903)",
+    ("stebbins-carmichael-weill-1983.yaml", "stebbins_1983_albite_table_6_vitrification_quotes"): "Weill et al. (1980a); Waldbaum and Robie (1971); Hlabse and Kleppa (1968), Holm and Kleppa (1968); Kracek and Neuvonen (1952)",
+    ("stebbins-carmichael-weill-1983.yaml", "stebbins_1983_sanidine_table_6_vitrification_quotes"): "Waldbaum and Robie (1971); Tamman (1903)",
+    ("stebbins-carmichael-weill-1983.yaml", "stebbins_1983_nepheline_table_6_vitrification_quotes"): "Navrotsky et al. (1980)",
+    ("stebbins-carmichael-weill-1983.yaml", "stebbins_1983_anorthite_table_7_fusion_quotes"): "Weill et al. (1980b); Robie et al. (1978)",
 }
 
 TURKDOGAN_REF2 = (
@@ -55,23 +64,7 @@ TURKDOGAN_REF2 = (
     "E. T. Turkdogan: ISIJ Int., 40 (2000), 964 (ref 2; the author's recent publication)",
 )
 
-TOUCHED = sorted(
-    {name for name, _ in RENAMED}
-    | {name for name, _ in REPAIRED}
-    | {
-        "busemann-2000-phase-q-noble-gases.yaml",
-        "deguzman-2026-simulant-physicochemical.yaml",
-        "kems-048-turkdogan-2001-sio2-gamma.yaml",
-        "kems-049-kato-1993-ms-review.yaml",
-        "kems-058-ohara-1987.yaml",
-        "kems-069-furukawa-1976.yaml",
-        "kems-105-yamada-1983.yaml",
-        "kems-116-nunoue-1987.yaml",
-        "murchison-degassing-2023-springer.yaml",
-        "reiss-2019-thermal-extraction-nulht2m.yaml",
-        "schaefer-and-fegley-2007-icarus-outgassing-of-oc.yaml",
-    }
-)
+ALL_EXTRACTS = sorted(path.name for path in EXTRACTS.glob("*.yaml"))
 
 
 def _extract_values(name: str, raw_id: str) -> dict:
@@ -135,7 +128,7 @@ def test_turkdogan_self_citation_names_reference_2() -> None:
     assert _extract_values(name, raw_id).get("attribution") == expected
 
 
-@pytest.mark.parametrize("name", TOUCHED)
+@pytest.mark.parametrize("name", ALL_EXTRACTS)
 def test_no_quoted_attributed_record_without_attribution(tmp_path: Path, name: str) -> None:
     result = _migrate_real_extract(tmp_path, name)
     missing = [
