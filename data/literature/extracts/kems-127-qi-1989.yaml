@@ -110,8 +110,10 @@ species:
             0.3 mm W wire. Pt/Pt-Rh thermocouple at the bottom of the cell holder (%Rh unstated). Orifices
             0.3 and 0.5 mm tested; 0.5 mm used.'
           locator: *id001
-        residual_pressure_Pa_as_printed:
-          value: "7e-5 Pa furnace vacuum (not in-cell total)"
+        pressure_Pa:
+          value: 7e-05
+          units: Pa
+          as_printed: "7e-5 Pa as printed (furnace vacuum)"
           quote: "The vacuum in the furnace could be maintained at 7 x 10^-5 Pa"
           locator:
             published_page: 577
