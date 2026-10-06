@@ -251,6 +251,13 @@ def parse_formula(
     cleaned = _clean_formula_text(formula)
     if not cleaned:
         raise UnknownSpeciesError("formula is required")
+    # Known damaged transcriptions in B677 (wustite, vanadium nitride) and
+    # NASA-Glenn NG-2032 (InertAir). Their valid-looking grammar cannot verify
+    # the intended species; retain refusal until the source is corrected.
+    if cleaned in {"Fe.9470", "W.465", "N1.5617IO.41959Ar.00937C.00032"}:
+        raise UnknownSpeciesError(
+            f"unverified OCR formula {formula!r}; source correction required"
+        )
 
     species_id = species or name or str(formula).strip()
     return _species_from_cleaned(cleaned, species_id)

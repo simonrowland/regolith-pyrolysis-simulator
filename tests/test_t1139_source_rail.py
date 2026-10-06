@@ -106,6 +106,17 @@ def test_ambiguous_decimal_hydrate_coefficient_is_refused() -> None:
         parse_formula("CaSO4.0.5H2O")
 
 
+@pytest.mark.parametrize(
+    "formula", ("Fe.9470", "W.465", "N1.5617IO.41959Ar.00937C.00032")
+)
+def test_unverified_ocr_formulas_do_not_claim_a_composition(formula) -> None:
+    from simulator.battery.validate import _term_composition
+
+    with pytest.raises(UnknownSpeciesError, match="unverified OCR formula"):
+        parse_formula(formula)
+    assert _term_composition(formula) is None
+
+
 def test_tabulated_janaf_is_a_runtime_thermo_family() -> None:
     assert "tabulated_janaf" in RUNTIME_THERMO_EVALUATOR_FAMILIES
     assert "nasa_cea_7" in RUNTIME_THERMO_EVALUATOR_FAMILIES
