@@ -3628,6 +3628,7 @@ def predict_with_engine(
     reported: Mapping[str, float]
     unit = QUANTITY_UNITS[quantity]
     coefficient_basis: str | None = None
+    ladder_meta: dict[str, object] | None = None
     if quantity in MELT_ACTIVITY_QUANTITIES:
         coefficients = dict(getattr(cell, "melt_activity_coefficients", None) or {})
         selected = melt_quantity_report(quantity, activities, coefficients)
@@ -3719,6 +3720,7 @@ def predict_with_engine(
                                 if isinstance(detail.get("target_basis"), Mapping)
                                 else {}
                             ),
+                            **_ladder_keys(detail),
                         },
                         identity=identity,
                         requested_composition=requested,
@@ -3726,6 +3728,9 @@ def predict_with_engine(
                     )
                 if isinstance(reported_basis, str):
                     coefficient_basis = reported_basis
+                recorded = _ladder_keys(detail)
+                if recorded:
+                    ladder_meta = recorded
         reported = selected
         unit = "dimensionless"
     elif quantity in _VAPOUR_EQUILIBRIUM:
@@ -3817,7 +3822,46 @@ def predict_with_engine(
         identity=identity,
         requested_composition=requested,
         version=engine_version,
+        refusal_detail=ladder_meta or {},
     )
+
+
+def _ladder_keys(detail: Mapping[str, object]) -> dict[str, object]:
+    """Verdict, rung, and flag when the coefficient detail carries them.
+
+    OpenIMCC details have none of these keys and stay ordinary points.
+    """
+
+    if "verdict" not in detail or ("rung" not in detail and "flag" not in detail):
+        return {}
+    return {
+        "verdict": detail.get("verdict"),
+        "rung": detail.get("rung"),
+        "flag": detail.get("flag"),
+    }
+
+
+def _melt_activity_ladder(prediction: EnginePrediction) -> Mapping[str, object] | None:
+    if prediction.refusal_reason is not None:
+        return None
+    identity = prediction.identity
+    if identity is None or quantity_token(identity) not in MELT_ACTIVITY_QUANTITIES:
+        return None
+    detail = prediction.refusal_detail
+    if not isinstance(detail, Mapping):
+        return None
+    recorded = _ladder_keys(detail)
+    return recorded or None
+
+
+def _ladder_bound_operator(verdict: object) -> str | None:
+    from simulator.vapour_rail.activity import ActivityVerdictKind
+
+    if verdict == ActivityVerdictKind.UPPER_BOUND.value:
+        return "<="
+    if verdict == ActivityVerdictKind.LOWER_BOUND.value:
+        return ">="
+    return None
 
 
 def candidate_observation(
@@ -3825,6 +3869,8 @@ def candidate_observation(
     prediction: EnginePrediction,
 ) -> Observation:
     identity = prediction.identity or reference.identity
+    ladder = _melt_activity_ladder(prediction)
+    provenance = None
     if prediction.value is None:
         value = Value(
             kind=ValueKind.UNAVAILABLE,
@@ -3832,8 +3878,32 @@ def candidate_observation(
                 (prediction.refusal_detail or {}).get("reason") or "engine produced no value"
             ),
         )
+    elif ladder is not None and _ladder_bound_operator(ladder.get("verdict")) is not None:
+        value = Value(
+            kind=ValueKind.BOUND,
+            bound_operator=_ladder_bound_operator(ladder.get("verdict")),
+            bound_value=prediction.value,
+        )
     else:
+        from simulator.vapour_rail.activity import ActivityVerdictKind
+
         value = Value.point_of(prediction.value)
+        if (
+            ladder is not None
+            and ladder.get("verdict") != ActivityVerdictKind.POINT.value
+        ):
+            value = replace(value, approximate=True)
+    if ladder is not None:
+        provenance = {
+            "verdict": ladder.get("verdict"),
+            "rung": ladder.get("rung"),
+            "flag": ladder.get("flag"),
+        }
+    elif (
+        quantity_token(identity) is Quantity.RESIDUE_COMPONENT_COMPOSITION
+        and prediction.value is not None
+    ):
+        provenance = dict(prediction.refusal_detail)
     return Observation(
         observation_id=f"engine:{prediction.engine.value}:{reference.observation_id}",
         experiment_id=reference.experiment_id,
@@ -3859,12 +3929,7 @@ def candidate_observation(
         ),
         authority=prediction.authority,
         certified_band=prediction.certified_band,
-        provenance=(
-            dict(prediction.refusal_detail)
-            if quantity_token(identity) is Quantity.RESIDUE_COMPONENT_COMPOSITION
-            and prediction.value is not None
-            else None
-        ),
+        provenance=provenance,
     )
 
 
@@ -4615,6 +4680,35 @@ def compile_residual(
             execution=prediction.execution,
             extra_notices=prediction.notices,
             source_relation=source_relation,
+        )
+
+    ladder = _melt_activity_ladder(prediction)
+    bound_operator = (
+        _ladder_bound_operator(ladder.get("verdict")) if ladder is not None else None
+    )
+    if bound_operator is not None:
+        # An activity bound is not a residual point. Refuse before
+        # populate_numeric reads the magnitude as one.
+        candidate = candidate_observation(reference, prediction)
+        return _refused(
+            RefusalReason.METRIC_DOMAIN,
+            {
+                "reason": "activity_bound_not_a_point",
+                "verdict": None if ladder is None else ladder.get("verdict"),
+                "rung": None if ladder is None else ladder.get("rung"),
+                "flag": None if ladder is None else ladder.get("flag"),
+                "bound_operator": candidate.value.bound_operator,
+                "bound_value": (
+                    str(candidate.value.bound_value)
+                    if candidate.value.bound_value is not None
+                    else None
+                ),
+            },
+            execution=prediction.execution,
+            extra_notices=prediction.notices,
+            candidate=candidate,
+            source_relation=source_relation,
+            exclusions=("valid_metric_domain",),
         )
 
     implied_alpha = implied_alpha_reference is not None

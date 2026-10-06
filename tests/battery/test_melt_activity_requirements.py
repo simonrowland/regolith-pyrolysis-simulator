@@ -1220,7 +1220,9 @@ def test_scorer_compares_the_admitted_endmember_not_a_different_species(monkeypa
     assert opened == []
 
 
-def _predict_sn_coefficient(monkeypatch, details, gammas, *, phase: Phase = Phase.L):
+def _predict_sn_coefficient(
+    monkeypatch, details, gammas, *, phase: Phase = Phase.L, comparable: bool = False
+):
     from simulator.battery.enums import Engine
     from simulator.battery.score import predict_with_engine
 
@@ -1264,12 +1266,24 @@ def _predict_sn_coefficient(monkeypatch, details, gammas, *, phase: Phase = Phas
         basis="SnO",
         phase=phase,
     )
-    return predict_with_engine(
+    if comparable:
+        from simulator.battery.enums import PerBasis
+
+        observation = replace(
+            observation,
+            identity=replace(
+                observation.identity,
+                per=State.of(PerBasis.DIMENSIONLESS),
+                fO2_Pa=State.of(Decimal("1")),
+            ),
+        )
+    prediction = predict_with_engine(
         Engine.INTERNAL_ANALYTICAL,
         observation,
         experiment=experiment,
         isolated=False,
     )
+    return prediction, experiment, observation
 
 
 def test_coefficient_detail_without_standard_state_is_a_mismatch(monkeypatch):
@@ -1277,7 +1291,7 @@ def test_coefficient_detail_without_standard_state_is_a_mismatch(monkeypatch):
 
     from simulator.battery.enums import RefusalReason
 
-    prediction = _predict_sn_coefficient(
+    prediction, _experiment, _observation = _predict_sn_coefficient(
         monkeypatch,
         {"SnO": {"value": 0.25, "rung": 2, "flag": "published"}},
         {"SnO": 0.25},
@@ -1289,7 +1303,7 @@ def test_coefficient_detail_without_standard_state_is_a_mismatch(monkeypatch):
 
 
 def test_matching_standard_state_still_scores_the_coefficient(monkeypatch):
-    prediction = _predict_sn_coefficient(
+    prediction, _experiment, _observation = _predict_sn_coefficient(
         monkeypatch,
         {
             "SnO": {
@@ -1307,6 +1321,126 @@ def test_matching_standard_state_still_scores_the_coefficient(monkeypatch):
     assert prediction.refusal_reason is None
     assert prediction.value == Decimal("0.25")
     assert prediction.coefficient_basis == "single_cation"
+    assert "verdict" not in prediction.refusal_detail
+
+
+def _compile_sn_coefficient(observation, prediction):
+    from dataclasses import replace as data_replace
+
+    from simulator.battery.enums import Engine
+    from simulator.battery.score import ScoreContext, compile_residual
+
+    # The KEMS fixture refuses on background pressure before a coefficient
+    # comparison. A tabulation row reaches that comparison.
+    experiment = f.tabulation_experiment()
+    observation = data_replace(observation, experiment_id=experiment.experiment_id)
+    work = f.work()
+    context = ScoreContext(
+        works={work.work_id: work},
+        experiments={experiment.experiment_id: experiment},
+        observations={observation.observation_id: observation},
+        extract_review={"": "reviewed", observation.source_id: "reviewed"},
+        hostname="test",
+    )
+    return compile_residual(
+        observation,
+        Engine.INTERNAL_ANALYTICAL,
+        context=context,
+        predict=lambda _engine, _obs, **_kwargs: prediction,
+    )
+
+
+def _ladder_coefficient_detail(verdict: str, rung: int, flag: str) -> dict:
+    return {
+        "SnO": {
+            "value": 0.25,
+            "coefficient_basis": "single_cation",
+            "standard_state": {
+                "convention": "raoultian_pure_endmember",
+                "phase": "l",
+                "component_basis": "SnO",
+            },
+            "verdict": verdict,
+            "rung": rung,
+            "flag": flag,
+        }
+    }
+
+
+def test_upper_bound_coefficient_is_not_scored_as_a_point(monkeypatch):
+    from simulator.battery.enums import RefusalReason, ResidualStatus, ValueKind
+    from simulator.vapour_rail.activity import ActivityVerdictKind
+
+    prediction, _experiment, observation = _predict_sn_coefficient(
+        monkeypatch,
+        _ladder_coefficient_detail(
+            ActivityVerdictKind.UPPER_BOUND.value, 4, "henrian_gamma_unmeasured"
+        ),
+        {"SnO": 0.25},
+    )
+    assert prediction.refusal_reason is None
+    assert prediction.value == Decimal("0.25")
+    assert prediction.refusal_detail["verdict"] == ActivityVerdictKind.UPPER_BOUND.value
+    assert prediction.refusal_detail["rung"] == 4
+    assert prediction.refusal_detail["flag"] == "henrian_gamma_unmeasured"
+    residual, candidate = _compile_sn_coefficient(observation, prediction)
+    assert residual.status is ResidualStatus.REFUSED
+    assert residual.numeric is None
+    assert residual.refusal is not None
+    assert residual.refusal.reason is RefusalReason.METRIC_DOMAIN
+    assert residual.refusal.detail["reason"] == "activity_bound_not_a_point"
+    assert candidate is not None
+    assert candidate.value.kind is ValueKind.BOUND
+    assert candidate.value.bound_operator == "<="
+    assert candidate.value.bound_value == Decimal("0.25")
+    assert candidate.value.point is None
+    assert candidate.provenance["verdict"] == ActivityVerdictKind.UPPER_BOUND.value
+    assert candidate.provenance["flag"] == "henrian_gamma_unmeasured"
+
+
+def test_proxy_and_published_coefficients_keep_their_verdict(monkeypatch):
+    from simulator.battery.enums import ResidualStatus, ValueKind
+    from simulator.vapour_rail.activity import ActivityVerdictKind
+
+    proxy, _proxy_experiment, proxy_observation = _predict_sn_coefficient(
+        monkeypatch,
+        _ladder_coefficient_detail(
+            ActivityVerdictKind.STATUS_BEARING_VALUE.value, 2, "proxy_estimate"
+        ),
+        {"SnO": 0.25},
+        comparable=True,
+    )
+    proxy_residual, proxy_candidate = _compile_sn_coefficient(
+        proxy_observation, proxy
+    )
+    assert proxy.refusal_reason is None
+    assert proxy_residual.status is not ResidualStatus.REFUSED
+    assert proxy_residual.numeric is not None
+    assert proxy_candidate is not None
+    assert proxy_candidate.value.kind is ValueKind.POINT
+    assert proxy_candidate.value.approximate is True
+    assert proxy_candidate.provenance["verdict"] == (
+        ActivityVerdictKind.STATUS_BEARING_VALUE.value
+    )
+    assert proxy_candidate.provenance["rung"] == 2
+    assert proxy_candidate.provenance["flag"] == "proxy_estimate"
+
+    published, _published_experiment, published_observation = _predict_sn_coefficient(
+        monkeypatch,
+        _ladder_coefficient_detail(ActivityVerdictKind.POINT.value, 2, "published"),
+        {"SnO": 0.25},
+        comparable=True,
+    )
+    published_residual, published_candidate = _compile_sn_coefficient(
+        published_observation, published
+    )
+    assert published_residual.status is not ResidualStatus.REFUSED
+    assert published_residual.numeric is not None
+    assert published_candidate is not None
+    assert published_candidate.value.kind is ValueKind.POINT
+    assert published_candidate.value.approximate is False
+    assert published_candidate.provenance["verdict"] == ActivityVerdictKind.POINT.value
+    assert published_candidate.provenance["flag"] == "published"
 
 
 def test_scorer_refuses_trace_parent_gamma_with_an_unstated_basis(monkeypatch):
@@ -1418,3 +1552,6 @@ def test_scorer_refuses_trace_parent_gamma_with_an_unstated_basis(monkeypatch):
     assert prediction.refusal_detail["reported_standard_state"] is None
     assert prediction.refusal_detail["source_basis"] == detail["source_basis"]
     assert prediction.refusal_detail["target_basis"] == detail["target_basis"]
+    assert prediction.refusal_detail["verdict"] == owner.verdict.value
+    assert prediction.refusal_detail["rung"] == owner.derivation["rung"]
+    assert prediction.refusal_detail["flag"] == owner.derivation["flag"]
