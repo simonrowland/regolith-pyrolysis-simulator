@@ -56,6 +56,8 @@ from simulator.melt_backend.alphamelts import (
     AlphaMELTSConfigurationError,
     AlphaMELTSSubprocessContractError,
     AlphaMELTSSubprocessRunMode,
+    _bootstrap_petthermotools_worker,
+    _handle_petthermotools_request,
     activity_from_chem_potential,
     serialize_melts_file_temperature_C,
 )
@@ -603,6 +605,46 @@ def test_decompression_worker_receives_owner_model_code(
         launch = process_calls[0]['args']
         assert launch[1] == 'isothermal_decompression'
         assert launch[2] == expected_code
+
+
+@pytest.mark.parametrize(
+    ('model_name', 'expected_code'),
+    [
+        ('pMELTS', 2),
+        ('MELTSv1.1.0', 3),
+        ('MELTSv1.2.0', 4),
+    ],
+)
+def test_warm_petthermotools_bootstrap_preserves_model_code(
+    monkeypatch,
+    model_name: str,
+    expected_code: int,
+) -> None:
+    loader_calls = []
+    module = types.SimpleNamespace(
+        MELTSdynamic=lambda code: loader_calls.append(code) or {'code': code},
+        equilibrate_MELTS=lambda **kwargs: kwargs,
+        __version__='test-stub',
+    )
+    monkeypatch.setattr(
+        'simulator.melt_backend.alphamelts.importlib.import_module',
+        lambda _module_name: module,
+    )
+    backend = AlphaMELTSBackend(model_name=model_name)
+    _select_python_api_for_test(backend)
+
+    resource, _version = _bootstrap_petthermotools_worker(
+        backend._melts_model_code()
+    )
+    result = _handle_petthermotools_request(
+        resource,
+        {'operation': 'equilibrate_MELTS'},
+        None,
+    )
+
+    assert resource['model_code'] == expected_code
+    assert loader_calls == [expected_code]
+    assert result['melts'] == {'code': expected_code}
 
 
 @pytest.mark.parametrize(
