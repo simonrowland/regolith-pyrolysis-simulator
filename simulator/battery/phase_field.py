@@ -39,8 +39,11 @@ from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
 from decimal import ROUND_HALF_EVEN, Decimal, InvalidOperation
 
+from simulator.battery.enums import NoticeKind
+
 OUTSIDE_SINGLE_LIQUID_FIELD = "outside_single_liquid_field"
-LIQUIDUS_POSITION_CONTESTED = "liquidus_position_contested"
+# One home for the token: the notice kind the migrator attaches (enums.py).
+LIQUIDUS_POSITION_CONTESTED = NoticeKind.LIQUIDUS_POSITION_CONTESTED.value
 TWO_TEST_CRITERION = "stated_liquidus_side_and_printed_plateau_within_2_sigma"
 PLATEAU_Z_LIMIT = Decimal(2)
 _Z_QUANTUM = Decimal("0.01")
