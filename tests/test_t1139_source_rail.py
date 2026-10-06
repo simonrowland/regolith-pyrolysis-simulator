@@ -7,6 +7,7 @@ import math
 import pytest
 
 from simulator.accounting.formulas import parse_formula
+from simulator.accounting.exceptions import UnknownSpeciesError
 from simulator.reference_data import janaf
 from simulator.reference_data.janaf import feedstock_element_symbols
 from simulator.vapour_rail.catalog import (
@@ -82,6 +83,27 @@ def test_decimal_subscript_formulas_parse_for_activity_basis() -> None:
 def test_printed_decimal_subscripts_preserve_molecular_adducts(formula, atoms) -> None:
     """USGS/JANAF leading-dot occupancy; hydrates retain whole water molecules."""
     assert dict(parse_formula(formula).elements) == pytest.approx(atoms)
+
+
+@pytest.mark.parametrize(
+    ("formula", "atoms"),
+    (
+        ("K0.5Na1.5AlSiO4", {"K": 0.5, "Na": 1.5, "Al": 1, "Si": 1, "O": 4}),
+        ("Na.76K.22AlSiO4", {"Na": 0.76, "K": 0.22, "Al": 1, "Si": 1, "O": 4}),
+        ("Mg1.5Fe.5SiO4", {"Mg": 1.5, "Fe": 0.5, "Si": 1, "O": 4}),
+        ("Ca.5Mg.5CO3", {"Ca": 0.5, "Mg": 0.5, "C": 1, "O": 3}),
+        ("Fe.5MgSiO4", {"Fe": 0.5, "Mg": 1, "Si": 1, "O": 4}),
+        ("Mg1.5Fe1SiO4", {"Mg": 1.5, "Fe": 1, "Si": 1, "O": 4}),
+        ("Mg1Fe0.2SiO4", {"Mg": 1, "Fe": 0.2, "Si": 1, "O": 4}),
+    ),
+)
+def test_mixed_fractional_subscripts_are_not_adduct_multipliers(formula, atoms) -> None:
+    assert dict(parse_formula(formula).elements) == pytest.approx(atoms)
+
+
+def test_ambiguous_decimal_hydrate_coefficient_is_refused() -> None:
+    with pytest.raises(UnknownSpeciesError):
+        parse_formula("CaSO4.0.5H2O")
 
 
 def test_tabulated_janaf_is_a_runtime_thermo_family() -> None:

@@ -553,6 +553,10 @@ def _split_formula_segments(formula: str) -> list[str]:
     # A middle dot is always an adduct separator. Preserve the legacy ASCII
     # spelling when a coefficient multiplies a complete molecular formula with
     # multiple elements (5H2O, 4CO2, 2Al2O3); a monatomic tail is a subscript.
+    # A lone element before the dot takes a fractional occupancy as well.
+    # Once a segment has a fractional occupancy, its remaining ASCII dots are
+    # subscripts too. Fractional formulas must use a middle dot for adducts;
+    # a malformed repeated decimal then fails in the formula parser.
     pieces = re.split(r"([.·])", formula)
     segments = [pieces[0]]
     for separator, tail in zip(pieces[1::2], pieces[2::2]):
@@ -568,9 +572,12 @@ def _split_formula_segments(formula: str) -> list[str]:
             and coefficient is not None
             and segments[-1]
             and segments[-1][-1].isalnum()
-            # Splitting an explicit zero would leave an invalid zero atom
-            # count (Fe0.2SiO4); it unambiguously belongs to the subscript.
-            and (not molecular_adduct or re.search(r"[A-Z][a-z]?0$", segments[-1]))
+            and (
+                not molecular_adduct
+                or "." in segments[-1]
+                or _UNGROUPED_FORMULA_RE.fullmatch(segments[-1]) is not None
+                or re.search(r"[A-Z][a-z]?0$", segments[-1])
+            )
         ):
             segments[-1] += separator + tail
         else:
