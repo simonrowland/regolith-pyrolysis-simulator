@@ -133,50 +133,72 @@ _ABS_PATH_RE = re.compile(r"^(/|[A-Za-z]:\\|\\\\)")
 _PATH_SEGMENT_RE = re.compile(r"^([^.\[]+)(?:\[([^\]]*)\])?$")
 
 # Path-valued keys that must stay corpus- or repository-relative (never
-# machine-local absolute). The first four are the provenance/locator fields;
-# the rest are every other key whose values are file paths in the extract tree
-# (survey of all 273 extracts on green 61ec839da: original_scan is the Gibson &
-# Hubbard anchor aliased into locator source_path; chapter_pdf, corpus_asset,
-# repaired_table_path, table_transcription and verified_data_path each carry
-# a raw/ or docs path). ``url`` values are URLs and stay out.
+# machine-local absolute). This frozenset is the ONE definition of which keys
+# carry paths: the walk below, the refusal, and the tests
+# (tests/test_absolute_path_ratchet.py plants an absolute value on each member
+# and checks the set against the extract tree) all read it; there is no second
+# list. Membership comes from a survey of all 273 extracts on green 61ec839da
+# (ROR-b713-r2): every key with a path-shaped value (corpus/raw/tables/text/
+# data/docs prefix or a file extension, no whitespace) is a member.
+# Deliberately out: table_transcription (printed table text, e.g. a unit
+# token "/K" is not a path), url (http/https), path and metadata_path
+# (fidelity dot-paths), record (row identifiers), new_corpus_tables (table
+# numbers), note / derived_from (prose that mentions paths).
 PATH_VALUE_KEYS = frozenset(
     {
         "provenance_path",
         "source_path",
         "source_pdf",
         "source_pdf_path",
-        "original_scan",
+        "original_scan",  # Gibson & Hubbard anchor aliased into source_path
+        "table_csv",  # 110 tables/... values
+        "table_file",
+        "table_path",
+        "quotes_path",
+        "source_csv",
+        "corpus_transcription",
+        "corpus_provenance",
+        "transcription",  # string form; dict form (page/table/title) is walked
+        "repaired_table_path",
+        "verified_data_path",
+        "corpus_tables",  # directory string or list of csv paths
+        "table_provenance_root",
         "chapter_pdf",
         "corpus_asset",
-        "repaired_table_path",
-        "table_transcription",
-        "verified_data_path",
     }
 )
 
 
+def _is_absolute_path(value: Any) -> bool:
+    return isinstance(value, str) and bool(_ABS_PATH_RE.match(value))
+
+
 def _walk_absolute_path_values(
     node: Any, *, path: str = ""
-) -> list[tuple[str, str]]:
-    """Return (dotted-path, value) for absolute PATH_VALUE_KEYS hits.
+) -> list[tuple[str, str, str]]:
+    """Return (key, dotted-path, value) for absolute PATH_VALUE_KEYS hits.
 
     Walks the *parsed* document, so a quoted scalar and a YAML alias
     (``source_path: *scan``) count exactly like an unquoted scalar, and an
     anchor reused N times yields N hits (one per place a consumer reads it).
+    A path key's value may be a string (checked), a list (each string element
+    checked, e.g. ``corpus_tables: [tables/x/t1.csv, ...]``; other elements
+    walked), or a mapping (walked, e.g. the ``transcription`` page/table dict).
     """
-    hits: list[tuple[str, str]] = []
+    hits: list[tuple[str, str, str]] = []
     if isinstance(node, Mapping):
         for key, value in node.items():
             key_s = str(key)
             child = f"{path}.{key_s}" if path else key_s
-            if (
-                key_s in PATH_VALUE_KEYS
-                and isinstance(value, str)
-                and _ABS_PATH_RE.match(value)
-            ):
-                hits.append((child, value))
-            else:
-                hits.extend(_walk_absolute_path_values(value, path=child))
+            if key_s in PATH_VALUE_KEYS:
+                if _is_absolute_path(value):
+                    hits.append((key_s, child, value))
+                    continue
+                if isinstance(value, (list, tuple)):
+                    for i, item in enumerate(value):
+                        if _is_absolute_path(item):
+                            hits.append((key_s, f"{child}[{i}]", item))
+            hits.extend(_walk_absolute_path_values(value, path=child))
     elif isinstance(node, (list, tuple)):
         for i, item in enumerate(node):
             hits.extend(_walk_absolute_path_values(item, path=f"{path}[{i}]"))
@@ -191,8 +213,7 @@ def _absolute_path_value_errors(doc: Any, label: str) -> list[str]:
     """
     hits = _walk_absolute_path_values(doc)
     by_value: dict[tuple[str, str], list[str]] = {}
-    for dotted, value in hits:
-        key = dotted.rsplit(".", 1)[-1]
+    for key, dotted, value in hits:
         by_value.setdefault((key, value), []).append(dotted)
     errors: list[str] = []
     for (key, value), where in by_value.items():
