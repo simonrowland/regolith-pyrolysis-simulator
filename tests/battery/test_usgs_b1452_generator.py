@@ -6,6 +6,8 @@ import json
 from decimal import Decimal
 from pathlib import Path
 
+import pytest
+
 import yaml
 
 from simulator.battery.enums import (
@@ -341,6 +343,48 @@ def test_298k_locator_covers_every_summary_page() -> None:
         for value in values:
             assert value.locator.published_page == page
             assert value.locator.pdf_page_index == page + 6
+
+
+@pytest.mark.parametrize(
+    ("row", "quantity", "printed"),
+    (
+        (70, Quantity.DELTA_FH, ","),
+        (117, Quantity.DELTA_FG, "-120"),
+        (413, Quantity.LOG10_KF, "2780.374"),
+        (579, Quantity.DELTA_FG, "500'"),
+    ),
+)
+def test_damaged_summary_uncertainties_remain_unvalidated_notes(row, quantity, printed) -> None:
+    from simulator.battery.score import _printed_uncertainty_band
+
+    observation, = _observations_for(_generation(TABLE_298K), quantity, row=row)
+    assert observation.uncertainty.kind is UncertaintyKind.NONE
+    assert observation.uncertainty.verbatim == printed
+    assert "unvalidated" in observation.uncertainty.basis
+    assert _printed_uncertainty_band(
+        quantity, observation.uncertainty, observation.value.point,
+        source_observation=observation,
+    ) is None
+
+
+@pytest.mark.parametrize("printed", ("0.201", "50.00"))
+def test_summary_uncertainty_requires_printed_grain_and_plausible_magnitude(printed) -> None:
+    record = _load(TABLE_298K)
+    record["rows"][402]["cells"]["entropy_s298"]["as_published"] = printed
+    observation, = _observations_for(
+        generator.generate_record(record), Quantity.S, formula="SiO2", name="QUARTZ"
+    )
+    assert observation.uncertainty.kind is UncertaintyKind.NONE
+    assert observation.uncertainty.verbatim == printed
+    assert "unvalidated" in observation.uncertainty.basis
+
+
+def test_summary_uncertainty_requires_the_page_column_unit(monkeypatch) -> None:
+    monkeypatch.setitem(generator.TABLE_298K_PAGE_UNITS, "entropy_s298", "dimensionless")
+    observation, = _observations_for(_generation(TABLE_298K), Quantity.S, row=401)
+    assert observation.uncertainty.kind is UncertaintyKind.NONE
+    assert observation.uncertainty.verbatim == "0.20"
+    assert "unit" in observation.uncertainty.basis
 
 
 def test_unresolved_formula_refuses_and_names_consulted_fields() -> None:

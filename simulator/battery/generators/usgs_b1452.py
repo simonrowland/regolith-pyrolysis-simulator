@@ -1530,6 +1530,34 @@ def _store_value(token: RawToken, value: Decimal) -> Decimal:
     return value
 
 
+def _summary_uncertainty(
+    token: RawToken, printed: str, value: Decimal, grain: Decimal | None
+) -> Uncertainty:
+    """Keep damaged summary tokens as notes, never as scoring uncertainties."""
+    width = _published_decimal(printed)
+    quantity = COLUMN_QUANTITY[token.column]
+    expected_unit = (
+        "J/mol" if quantity in {Quantity.DELTA_FH, Quantity.DELTA_FG}
+        else "J/mol·K" if quantity is Quantity.S
+        else QUANTITY_UNITS[quantity]
+    )
+    reason = None
+    if _page_units(token.table_kind, token.column) != expected_unit:
+        reason = "column unit does not match the printed quantity"
+    elif width is None or not width.is_finite() or width < 0:
+        reason = "token is not a nonnegative scalar number"
+    elif grain is None or width % grain != 0:
+        reason = "token does not match the column's printed grain"
+    elif width > abs(value):
+        reason = "uncertainty exceeds the magnitude of the printed value"
+    if reason is not None:
+        return Uncertainty(
+            kind=UncertaintyKind.NONE, verbatim=printed,
+            basis=f"unvalidated printed uncertainty: {reason}",
+        )
+    return Uncertainty(kind=UncertaintyKind.PRINTED, verbatim=printed)
+
+
 def _observation(
     *,
     record: Mapping[str, Any],
@@ -2214,8 +2242,9 @@ def generate_record(payload: Mapping[str, Any]) -> RecordGeneration:
                 rows[token.row_index + 1]["cells"].get(token.column)
             )
             if printed_uncertainty and printed_uncertainty[0].strip() not in {"", "-", "—"}:
-                uncertainty = Uncertainty(
-                    kind=UncertaintyKind.PRINTED, verbatim=printed_uncertainty[0]
+                uncertainty = _summary_uncertainty(
+                    token, printed_uncertainty[0], value,
+                    grains.get((token.column, token.formation_basis)),
                 )
         if reconstruction and reconstruction.get("uncertainty") is not None:
             uncertainty = Uncertainty(
