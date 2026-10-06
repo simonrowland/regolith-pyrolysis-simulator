@@ -6860,11 +6860,30 @@ def _identity_provenance_for_value_derivation(
     )
 
 
-def polymorph_from_extract(obs: Mapping[str, Any]) -> State[str] | None:
+def polymorph_from_extract(obs: Mapping[str, Any]) -> State[Polymorph] | State[str] | None:
+    """Read condensed_form.polymorph from an extract observation.
+
+    Plain closed tokens stay ``State.of(str(...))`` for Species coercion.
+    Typed State mappings (``{tag: unknown|not_applicable|value, ...}``) are
+    accepted via ``_state_from_plain`` — never stringified into an
+    "unrecognised polymorph" blob (b-685).
+    """
+
     form = obs.get("condensed_form")
-    if isinstance(form, Mapping) and form.get("polymorph"):
-        return State.of(str(form["polymorph"]))
-    return None
+    if not isinstance(form, Mapping):
+        return None
+    raw = form.get("polymorph")
+    if not raw:
+        return None
+    if isinstance(raw, Mapping):
+        try:
+            return _state_from_plain(raw, _polymorph_from_plain)
+        except ValueError:
+            from simulator.battery.polymorph_dictionary import unrecognised_polymorph_reason
+
+            spelling = raw.get("value") if str(raw.get("tag") or "") == "value" else raw
+            return State.unknown(unrecognised_polymorph_reason(spelling))
+    return State.of(str(raw))
 
 
 def fill_identity(
