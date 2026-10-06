@@ -1,11 +1,11 @@
 # Battery v2.1 migration report
 
 rows in: 47822
-records out (observations): 121808
+records out (observations): 121764
 works: 268
-experiments: 3557
+experiments: 3561
 queue size: 77488
-identical-payload dedupe aliases: 342
+identical-payload dedupe aliases: 339
 metadata files: 43
 index sources: 271
 hard issues: 3637
@@ -16407,7 +16407,7 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/manifest.yaml` | 0 | 0 | 0 |
 | `data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0001.json` | 1 | 0 | 0 |
 | `data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0002.json` | 1 | 0 | 0 |
-| `data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0003.json` | 1 | 1850 | 0 |
+| `data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0003.json` | 1 | 1646 | 0 |
 | `data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0004-phase-02.json` | 1 | 18 | 0 |
 | `data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0004.json` | 1 | 30 | 0 |
 | `data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0005-phase-02.json` | 1 | 29 | 0 |
@@ -16744,8 +16744,8 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0199.json` | 1 | 16 | 0 |
 | `data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0200.json` | 1 | 0 | 0 |
 | `data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0201.json` | 1 | 62 | 0 |
-| `data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0202.json` | 1 | 0 | 0 |
-| `data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0203.json` | 1 | 0 | 0 |
+| `data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0202.json` | 1 | 34 | 0 |
+| `data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0203.json` | 1 | 27 | 0 |
 | `data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0204.json` | 1 | 38 | 0 |
 | `data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0205-phase-02.json` | 1 | 30 | 0 |
 | `data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0205.json` | 1 | 37 | 0 |
@@ -17156,7 +17156,7 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-298k-0142-eskolaite.json` | 1 | 4 | 0 |
 | `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-298k-0143-tenorite.json` | 1 | 4 | 0 |
 | `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-298k-0144-cuprite.json` | 1 | 4 | 0 |
-| `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-298k-0145-wustite.json` | 1 | 0 | 0 |
+| `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-298k-0145-wustite.json` | 1 | 3 | 0 |
 | `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-298k-0146-ferrous-oxide.json` | 1 | 4 | 0 |
 | `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-298k-0147-hematite.json` | 1 | 4 | 0 |
 | `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-298k-0148-magnetite.json` | 1 | 4 | 0 |
@@ -17429,7 +17429,7 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0081-eskolaite.json` | 1 | 89 | 0 |
 | `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0082-tenorite.json` | 1 | 50 | 0 |
 | `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0083-cuprite.json` | 1 | 50 | 0 |
-| `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0084-wustite.json` | 1 | 0 | 0 |
+| `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0084-wustite.json` | 1 | 96 | 0 |
 | `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0085-ferrous-oxide-stoichiometric.json` | 1 | 96 | 0 |
 | `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0086-hematite.json` | 1 | 93 | 0 |
 | `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0087-magnetite.json` | 1 | 80 | 0 |
@@ -18309,8 +18309,8 @@ MODEL_DERIVED / MEASURED_REDUCED keep their mapped evidence class. Parent pointe
 
 ## Advisory issue census
 
-advisory issues: 218171
+advisory issues: 218191
 
 | kind | count |
 |---|---:|
-| `identity_incomplete` | 218171 |
+| `identity_incomplete` | 218191 |
