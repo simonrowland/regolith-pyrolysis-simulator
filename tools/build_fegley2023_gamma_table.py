@@ -1,8 +1,10 @@
 """Translate Fegley 2023 Table 2 fits into the vapour-rail gamma table.
 
 The runtime must not import the battery extract schema. This tool copies
-each activity_coefficient_temperature_fit row. Origin labels (published
-versus proxy) are classified by the activity owner, not here.
+each activity_coefficient_temperature_fit row, including the printed
+standard-state phrase. It does not decide whether that phrase matches a
+caller. Origin labels (published versus proxy) are classified by the
+activity owner, not here.
 """
 
 from __future__ import annotations
@@ -93,6 +95,12 @@ def build_table(extract_path: Path) -> dict[str, Any]:
             raise ValueError(
                 f"{observation.get('observation_id')}: fit has no formula"
             )
+        printed_state = domain.get("standard_state_as_printed")
+        if not isinstance(printed_state, str) or not printed_state.strip():
+            raise ValueError(
+                f"{observation.get('observation_id')}: fit has no printed "
+                "standard state"
+            )
         rows.append(
             {
                 "source_row_id": str(observation.get("observation_id") or ""),
@@ -101,6 +109,7 @@ def build_table(extract_path: Path) -> dict[str, Any]:
                 "B": parameters["B"],
                 "validity_range_K": band,
                 "notes_as_printed": str(domain.get("notes_as_printed") or ""),
+                "standard_state_as_printed": printed_state.strip(),
             }
         )
     rows.sort(key=lambda row: (row["formula"], row["source_row_id"]))

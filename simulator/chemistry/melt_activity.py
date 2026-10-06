@@ -232,6 +232,11 @@ MELT_OXIDE_CATIONS_PER_FORMULA = {
     "P2O5": 2.0,
     "NiO": 1.0,
     "CoO": 1.0,
+    # One-cation activity components of these parents are different formulas
+    # (InO1.5, GaO1.5, CuO0.5). The metal subscript is the cation count.
+    "In2O3": 2.0,
+    "Ga2O3": 2.0,
+    "Cu2O": 2.0,
 }
 
 
@@ -412,6 +417,98 @@ def single_cation_component_formula(parent_oxide: str) -> str:
     oxygen = float(match.group(2) or 1.0) / cations
     oxygen_text = str(int(oxygen)) if oxygen.is_integer() else str(oxygen)
     return f"{match.group(1)}O{oxygen_text}"
+
+
+def pure_liquid_reference_coefficient(
+    row_formula: str,
+    requested_formula: str,
+    row_gamma: float,
+) -> float | None:
+    """Convert a coefficient between a parent oxide and its one-cation component.
+
+    Premise. With pure-liquid references,
+    ``mu(MO_{v/2}) = (1/c) * mu(M_c O_v)``, so
+    ``a(MO) = a(parent) ** (1/c)``. ``c`` is that parent's cation count in
+    ``MELT_OXIDE_CATIONS_PER_FORMULA``. Activity and mole fraction transform
+    together: on each component ``a = gamma * X``, and
+    ``gamma_target = a_target / X_target``. Renaming the component is not
+    this conversion. A parent missing from the cation table has no
+    established relationship; this returns None and the caller must not
+    reuse ``row_gamma``.
+
+    Algebra at the pure-liquid reference, where both mole fractions are 1.
+    Forward (row is the parent, request is the one-cation component):
+    ``a_parent = row_gamma * X_parent = row_gamma * 1``,
+    ``a_single = a_parent ** (1/c)``,
+    ``gamma_single = a_single / X_single = a_single / 1``.
+    Inverse (row is the one-cation component):
+    ``a_single = row_gamma * 1``,
+    ``a_parent = a_single ** c``,
+    ``gamma_parent = a_parent / 1``.
+    The value returned is that pure-reference coefficient. A caller's
+    activity at mole fraction X is the coefficient times X. A dilute
+    inventory is a different pair of mole fractions: ``n(In2O3) = 1e-6``
+    with ``n(SiO2) = 1`` does not keep the coefficient at 0.02.
+
+    Unit check. Activity, mole fraction, and gamma are dimensionless.
+    ``10 ** (A + B/T)`` is dimensionless, and a real power of a
+    positive dimensionless number stays dimensionless.
+
+    Sanity. Wood and Wade (2013), as cited by Fegley 2023 Group 13, give
+    gamma(InO1.5) = 0.02 at 1923 K. Table 2 stores that anchor on the
+    In2O3 row (A = 0, B = -6534.2), so
+    gamma(In2O3) = 10 ** (-6534.2 / 1923) = (0.02) ** 2. With
+    X(In2O3) = X(InO1.5) = 1,
+    a(In2O3) = (0.02) ** 2, a(InO1.5) = 0.02, and
+    gamma(InO1.5) = 0.02.
+    """
+
+    row = str(row_formula)
+    requested = str(requested_formula)
+    try:
+        gamma = float(row_gamma)
+    except (TypeError, ValueError):
+        return None
+    if not math.isfinite(gamma) or gamma <= 0.0:
+        return None
+    if row == requested:
+        return gamma
+    row_cations = MELT_OXIDE_CATIONS_PER_FORMULA.get(row)
+    if (
+        row_cations is not None
+        and float(row_cations) != 1.0
+        and single_cation_component_formula(row) == requested
+    ):
+        # X_parent = 1, so the parent activity passed here is the row gamma.
+        activity, fraction = single_cation_activity_and_fraction(
+            row, gamma, {row: 1.0}
+        )
+        if fraction <= 0.0 or not math.isfinite(activity):
+            return None
+        converted = activity / fraction
+        if not math.isfinite(converted) or converted <= 0.0:
+            return None
+        return converted
+    requested_cations = MELT_OXIDE_CATIONS_PER_FORMULA.get(requested)
+    if (
+        requested_cations is not None
+        and float(requested_cations) != 1.0
+        and single_cation_component_formula(requested) == row
+    ):
+        # X_single = 1, so the single-cation activity is the row gamma.
+        # thermodynamic_parent_activity is a_single ** c.
+        parent_activity = MeltOxideActivity(
+            parent_oxide=requested,
+            single_cation_component=row,
+            gamma=gamma,
+            x_single_cation=1.0,
+            activity=gamma,
+            citation="pure-liquid reference; a = gamma * X at X = 1",
+        ).thermodynamic_parent_activity()
+        if not math.isfinite(parent_activity) or parent_activity <= 0.0:
+            return None
+        return parent_activity
+    return None
 
 
 def melt_oxide_activity_coefficient(

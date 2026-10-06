@@ -29,6 +29,7 @@ from simulator.chemistry.melt_activity import (
     MELT_OXIDE_IDEAL_ASSERTION_TIER,
     MELT_OXIDE_IDEAL_SOLUTION_MODEL,
     melt_oxide_activity_coefficient,
+    pure_liquid_reference_coefficient,
 )
 from simulator.trace_oxide_parents import (
     ACTIVITY_BASIS,
@@ -1630,6 +1631,12 @@ _TRACE_HOMOLOGUE = {
     "GeO2": "SiO2",
     "In2O3": "Ga2O3",
 }
+# Whole phase tokens only. ``liquid`` matches ``l``; a longer string that
+# merely contains one of these tokens does not.
+_PHASE_TOKEN_GROUPS: tuple[frozenset[str], ...] = (
+    frozenset({"liquid", "l"}),
+    frozenset({"solid", "s", "cr"}),
+)
 _FEGLEY_GAMMA_CACHE: dict[str, Any] | None = None
 
 
@@ -1682,6 +1689,9 @@ def _normalize_gamma_row(raw: Mapping[str, Any]) -> dict[str, Any]:
     band = raw.get("validity_range_K")
     if band is not None:
         band = [float(band[0]), float(band[1])]
+    printed = raw.get("standard_state_as_printed")
+    stated_convention = raw.get("stated_convention")
+    stated_phase = raw.get("stated_phase")
     return {
         "source_row_id": str(raw.get("source_row_id") or ""),
         "formula": str(raw.get("formula") or ""),
@@ -1690,6 +1700,11 @@ def _normalize_gamma_row(raw: Mapping[str, Any]) -> dict[str, Any]:
         "validity_range_K": band,
         "notes_as_printed": notes,
         "origin": origin,
+        "standard_state_as_printed": None if printed is None else str(printed),
+        "stated_convention": (
+            None if not stated_convention else str(stated_convention)
+        ),
+        "stated_phase": None if not stated_phase else str(stated_phase),
     }
 
 
@@ -1911,6 +1926,51 @@ def _ladder_result(
     )
 
 
+def _same_phase_token(left: str, right: str) -> bool:
+    """True when both strings are the same phase token.
+
+    Membership is exact. ``"l" in "liquid"`` is a substring test and is
+    not used.
+    """
+
+    first = str(left).strip()
+    second = str(right).strip()
+    if not first or not second:
+        return False
+    if first == second:
+        return True
+    return any(
+        first in group and second in group for group in _PHASE_TOKEN_GROUPS
+    )
+
+
+def _standard_state_established(
+    row: Mapping[str, Any], standard_state: StandardStateIdentity
+) -> bool:
+    """True when the row's basis is the caller's standard state.
+
+    A printed Table 2 phrase is not a typed convention. ``not stated in
+    Table 2 row`` and ``liquid standard state`` do not establish
+    ``raoultian_pure_endmember``, for either a liquid or a solid caller.
+    A row with no printed phrase stands on the caller's identity, unless
+    it carries ``stated_convention`` and ``stated_phase``, which must
+    match that identity.
+    """
+
+    if row.get("standard_state_as_printed") is not None:
+        return False
+    stated_convention = row.get("stated_convention")
+    stated_phase = row.get("stated_phase")
+    if stated_convention or stated_phase:
+        if not stated_convention or not stated_phase:
+            return False
+        return (
+            str(stated_convention) == standard_state.convention
+            and _same_phase_token(str(stated_phase), standard_state.phase)
+        )
+    return True
+
+
 def _from_selected_row(
     *,
     component_id: str,
@@ -1933,15 +1993,19 @@ def _from_selected_row(
             if published
             else "proxy_gamma_extrapolated"
         )
-    elif published:
+    elif published and _standard_state_established(row, standard_state):
         flag = "published"
         verdict = ActivityVerdictKind.POINT
         reason = "published_gamma"
+    elif published:
+        flag = "standard_state_basis_unestablished"
+        verdict = ActivityVerdictKind.STATUS_BEARING_VALUE
+        reason = "standard_state_basis_unestablished"
     else:
         flag = "proxy_estimate"
         verdict = ActivityVerdictKind.STATUS_BEARING_VALUE
         reason = "proxy_gamma_estimate"
-    return _ladder_result(
+    answer = _ladder_result(
         component_id=component_id,
         standard_state=standard_state,
         state_fingerprint=state_fingerprint,
@@ -1960,6 +2024,13 @@ def _from_selected_row(
         extrapolation_notice=notice,
         candidate_rows=(_candidate_record(row, temperature_K),),
         tier=ActivityTier.B,
+    )
+    return _annotate(
+        answer,
+        row_formula=str(row["formula"]),
+        standard_state_as_printed=row.get("standard_state_as_printed"),
+        target_convention=standard_state.convention,
+        target_phase=standard_state.phase,
     )
 
 
@@ -2053,13 +2124,17 @@ def resolve_trace_parent_activity(
     """Resolve one trace-parent gamma on the existing verdict types.
 
     Rung 1 (openimcc N-parent pack) is absent. Rung 2 is a Table 2 fit.
-    One published row is that gamma. One proxy row is a flagged estimate.
-    Several rows of one origin are the row whose stated band covers T, or
-    the unique nearest band outside that range (flagged extrapolated).
-    A row with no stated band is not selected, and the lowest residual is
-    not a selector. If that rule does not apply, rung 3 follows the
-    homologue (Li2O follows Na2O). Rung 4 is the Henrian unity upper bound.
-    Every non-refusal result carries a numeric gamma.
+    One published row is that gamma on the row's own component. An
+    activity-basis spelling uses the row only after the pure-liquid
+    reference conversion; the lookup name is not the conversion. A printed
+    standard state that does not state the caller's typed basis is not a
+    published point. One proxy row is a flagged estimate. Several rows of
+    one origin are the row whose stated band covers T, or the unique
+    nearest band outside that range (flagged extrapolated). A row with no
+    stated band is not selected, and the lowest residual is not a
+    selector. If that rule does not apply, rung 3 follows the homologue
+    (Li2O follows Na2O). Rung 4 is the Henrian unity upper bound. Every
+    non-refusal result carries a numeric gamma.
     """
 
     try:
@@ -2104,6 +2179,49 @@ def resolve_trace_parent_activity(
                 answer = _annotate(answer, coefficient_formula=alias)
         return answer
 
+    def _accept_row_basis(
+        current: str, row: Mapping[str, Any]
+    ) -> SourceReactionActivity | None:
+        """Keep a selected row, converting an activity-basis spelling.
+
+        Conversion runs only on the lookup formula of the original
+        request (InO1.5 reads In2O3). A homologue hop is a different
+        element and is not cation-converted. None means the component
+        relationship is not established: the caller must not reuse the
+        row gamma.
+        """
+
+        answer = _from_selected_row(
+            component_id=component_id,
+            row=row,
+            temperature_K=temperature,
+            mole_fraction=mole_fraction,
+            standard_state=standard_state,
+            state_fingerprint=state_fingerprint,
+            solve_group_id=solve_group_id,
+            coefficient_formula=alias,
+        )
+        if alias is None or current != formula:
+            return answer
+        gamma = answer.derivation.get("gamma")
+        if not isinstance(gamma, (int, float)):
+            return None
+        converted = pure_liquid_reference_coefficient(
+            row_formula=current,
+            requested_formula=bare,
+            row_gamma=float(gamma),
+        )
+        if converted is None:
+            return None
+        # ln_value is derived from value. Clearing it makes __post_init__
+        # recompute the logarithm of the converted activity.
+        return replace(
+            _annotate(answer, gamma=converted, coefficient_formula=current),
+            component_id=component_id,
+            value=_activity_value(converted, mole_fraction),
+            ln_value=None,
+        )
+
     def _walk(current: str, seen: frozenset[str]) -> SourceReactionActivity:
         if current in seen:
             return _rung4(
@@ -2118,29 +2236,15 @@ def resolve_trace_parent_activity(
         kind, group = _select_gamma_rows(current, table)
         try:
             if kind == "one":
-                return _from_selected_row(
-                    component_id=component_id,
-                    row=group[0],
-                    temperature_K=temperature,
-                    mole_fraction=mole_fraction,
-                    standard_state=standard_state,
-                    state_fingerprint=state_fingerprint,
-                    solve_group_id=solve_group_id,
-                    coefficient_formula=alias,
-                )
+                accepted = _accept_row_basis(current, group[0])
+                if accepted is not None:
+                    return accepted
             if kind == "many":
                 chosen = _select_banded_row(group, temperature)
                 if chosen is not None:
-                    return _from_selected_row(
-                        component_id=component_id,
-                        row=chosen,
-                        temperature_K=temperature,
-                        mole_fraction=mole_fraction,
-                        standard_state=standard_state,
-                        state_fingerprint=state_fingerprint,
-                        solve_group_id=solve_group_id,
-                        coefficient_formula=alias,
-                    )
+                    accepted = _accept_row_basis(current, chosen)
+                    if accepted is not None:
+                        return accepted
         except (TypeError, ValueError) as exc:
             return _refusal(
                 component_id,
