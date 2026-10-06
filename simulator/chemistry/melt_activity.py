@@ -336,18 +336,22 @@ class MeltOxideActivity:
 _MELT_INVENTORY_NUMERICAL_DUST_MOL = 1.0e-12
 
 
-def single_cation_mole_fractions(
+def _projected_oxide_moles(
     account_mol: Mapping[str, float],
 ) -> dict[str, float]:
-    """Return X_MOx on the single-cation mole-fraction basis."""
+    """Positive moles of the oxides this projector counts.
 
-    cation_mol: dict[str, float] = {}
-    total = 0.0
+    Membership is ``MELT_OXIDE_CATIONS_PER_FORMULA``. A key that is not
+    in that table is skipped. The dust floor is the same cutoff the
+    single-cation projection already used. This is not a second inventory.
+    """
+
+    moles: dict[str, float] = {}
     for parent_oxide, mol in account_mol.items():
-        mol_value = float(mol)
-        cations = MELT_OXIDE_CATIONS_PER_FORMULA.get(str(parent_oxide))
-        if cations is None:
+        name = str(parent_oxide)
+        if MELT_OXIDE_CATIONS_PER_FORMULA.get(name) is None:
             continue
+        mol_value = float(mol)
         if not math.isfinite(mol_value):
             raise ValueError(
                 f"melt inventory for {parent_oxide!r} must be finite "
@@ -364,28 +368,61 @@ def single_cation_mole_fractions(
             )
         if mol_value == 0.0:
             continue
+        moles[name] = mol_value
+    return moles
+
+
+def _normalized_fractions(
+    weighted: Mapping[str, float], *, what: str
+) -> dict[str, float]:
+    total = 0.0
+    for value in weighted.values():
+        if not math.isfinite(value):
+            raise ValueError(f"{what} projection overflowed")
+        total += value
+    if not math.isfinite(total):
+        raise ValueError(f"{what} total overflowed")
+    if total <= 0.0:
+        return {}
+    fractions = {oxide: value / total for oxide, value in weighted.items()}
+    if any(not math.isfinite(value) for value in fractions.values()):
+        raise ValueError(f"{what} must be finite after normalization")
+    return fractions
+
+
+def single_cation_mole_fractions(
+    account_mol: Mapping[str, float],
+) -> dict[str, float]:
+    """Return X_MOx on the single-cation mole-fraction basis."""
+
+    cation_mol: dict[str, float] = {}
+    for parent_oxide, mol_value in _projected_oxide_moles(account_mol).items():
+        cations = float(MELT_OXIDE_CATIONS_PER_FORMULA[parent_oxide])
         cation_value = mol_value * cations
         if not math.isfinite(cation_value):
             raise ValueError(
                 f"melt inventory for {parent_oxide!r} overflowed the "
                 "single-cation mole-fraction projection"
             )
-        cation_mol[str(parent_oxide)] = cation_value
-        total += cation_value
-    if not math.isfinite(total):
-        raise ValueError(
-            "single-cation mole-fraction total overflowed"
-        )
-    if total <= 0.0:
-        return {}
-    fractions = {
-        oxide: cations / total for oxide, cations in cation_mol.items()
-    }
-    if any(not math.isfinite(value) for value in fractions.values()):
-        raise ValueError(
-            "single-cation mole fractions must be finite after normalization"
-        )
-    return fractions
+        cation_mol[parent_oxide] = cation_value
+    return _normalized_fractions(cation_mol, what="single-cation mole-fraction")
+
+
+def molecular_mole_fractions(
+    account_mol: Mapping[str, float],
+) -> dict[str, float]:
+    """Return X_i = n_i / sum(n_j) on the conventional-oxide basis.
+
+    The oxides are the same keys ``single_cation_mole_fractions`` counts.
+    Each formula contributes its own moles, not its cation count. This is
+    the Henrian X of a Fegley Table 2 row: moles of that oxide over moles
+    of all counted oxides.
+    """
+
+    return _normalized_fractions(
+        _projected_oxide_moles(account_mol),
+        what="molecular mole-fraction",
+    )
 
 
 def single_cation_activity_and_fraction(
@@ -453,10 +490,14 @@ def pure_liquid_reference_coefficient(
     ``a_single = row_gamma * 1``,
     ``a_parent = a_single ** c``,
     ``gamma_parent = a_parent / 1``.
-    The value returned is that pure-reference coefficient. A caller's
-    activity at mole fraction X is the coefficient times X. A dilute
-    inventory is a different pair of mole fractions: ``n(In2O3) = 1e-6``
-    with ``n(SiO2) = 1`` does not keep the coefficient at 0.02.
+    The value returned is that pure-reference coefficient, where both
+    mole fractions are 1. At a real composition a constant gamma on the
+    parent is a different Henrian model from a constant gamma on the
+    one-cation component. ``activities_from_molecular_henrian_row``
+    applies the row gamma to the molecular fraction and derives the
+    other spelling by ``a_single = a_parent ** (1/c)``. A dilute
+    inventory ``n(In2O3) = 1e-6`` with ``n(SiO2) = 1`` does not keep
+    the coefficient at 0.02.
 
     Unit check. Activity, mole fraction, and gamma are dimensionless.
     ``10 ** (A + B/T)`` is dimensionless, and a real power of a
@@ -517,6 +558,47 @@ def pure_liquid_reference_coefficient(
             return None
         return parent_activity
     return None
+
+
+def activities_from_molecular_henrian_row(
+    parent_oxide: str,
+    row_gamma: float,
+    molecular_mole_fraction: float,
+) -> tuple[float, float] | None:
+    """Return ``(a_parent, a_single)`` for one constant-gamma molecular row.
+
+    ``a_parent = row_gamma * X_molecular``. ``a_single = a_parent ** (1/c)``,
+    with ``c`` the parent cation count. The two spellings agree at the
+    composition, including a dilute melt. They agree with
+    ``pure_liquid_reference_coefficient`` only when both mole fractions
+    are 1. A parent missing from the cation table has no relationship.
+    """
+
+    parent = str(parent_oxide)
+    cations = MELT_OXIDE_CATIONS_PER_FORMULA.get(parent)
+    if cations is None:
+        return None
+    try:
+        gamma = float(row_gamma)
+        mole_fraction = float(molecular_mole_fraction)
+    except (TypeError, ValueError):
+        return None
+    if (
+        not math.isfinite(gamma)
+        or gamma <= 0.0
+        or not math.isfinite(mole_fraction)
+        or mole_fraction < 0.0
+    ):
+        return None
+    parent_activity = gamma * mole_fraction
+    if not math.isfinite(parent_activity) or parent_activity < 0.0:
+        return None
+    if parent_activity == 0.0:
+        return 0.0, 0.0
+    single_activity = parent_activity ** (1.0 / float(cations))
+    if not math.isfinite(single_activity) or single_activity < 0.0:
+        return None
+    return parent_activity, single_activity
 
 
 def melt_oxide_activity_coefficient(

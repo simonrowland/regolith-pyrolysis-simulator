@@ -28,6 +28,7 @@ from simulator.chemistry.melt_activity import (
     MELT_OXIDE_ACTIVITY_TIER,
     MELT_OXIDE_IDEAL_ASSERTION_TIER,
     MELT_OXIDE_IDEAL_SOLUTION_MODEL,
+    activities_from_molecular_henrian_row,
     melt_oxide_activity_coefficient,
     pure_liquid_reference_coefficient,
 )
@@ -1649,7 +1650,7 @@ def is_trace_parent_component(component_id: str) -> bool:
     )
 
 
-def _coefficient_formula(component_id: str) -> str:
+def coefficient_formula(component_id: str) -> str:
     """Conventional oxide formula whose Table 2 rows answer this component."""
 
     bare = ledger_component_key(str(component_id))
@@ -2244,7 +2245,7 @@ def resolve_trace_parent_activity(
         )
 
     bare = ledger_component_key(str(component_id))
-    formula = _coefficient_formula(bare)
+    formula = coefficient_formula(bare)
     alias = formula if formula != bare else None
 
     def _finish(answer: SourceReactionActivity) -> SourceReactionActivity:
@@ -2292,12 +2293,25 @@ def resolve_trace_parent_activity(
         )
         if converted is None:
             return None
+        # The stored gamma is the pure-liquid reference coefficient.
+        # At a real composition the activity is not that coefficient
+        # times the caller's X: a_single = a_parent ** (1/c), and
+        # a_parent = row_gamma * X_molecular.
+        if mole_fraction is None:
+            value = None
+        else:
+            pair = activities_from_molecular_henrian_row(
+                current, float(gamma), float(mole_fraction)
+            )
+            if pair is None:
+                return None
+            _parent_activity, value = pair
         # ln_value is derived from value. Clearing it makes __post_init__
         # recompute the logarithm of the converted activity.
         return replace(
             _annotate(answer, gamma=converted, coefficient_formula=current),
             component_id=component_id,
-            value=_activity_value(converted, mole_fraction),
+            value=value,
             ln_value=None,
         )
 
@@ -2474,6 +2488,7 @@ __all__ = [
     "StateFingerprint",
     "ThermoEnginePotentialEvidence",
     "activity_from_chemical_potentials",
+    "coefficient_formula",
     "composition_fingerprint",
     "henrian_unknown_gamma_upper_bound",
     "is_trace_parent_component",

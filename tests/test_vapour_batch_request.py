@@ -29,7 +29,7 @@ from simulator.backend_names import (
     VAPOUR_ANALYTICAL_EXTERNAL_GROUNDED,
     VAPOUR_ANALYTICAL_VAPOROCK_CALIBRATED,
 )
-from simulator.chemistry.melt_activity import single_cation_mole_fractions
+from simulator.chemistry.melt_activity import molecular_mole_fractions
 from simulator.vapour_rail.activity import (
     ActivityRefusalCode,
     ActivityTier,
@@ -1024,7 +1024,7 @@ def test_trace_parent_request_returns_a_numeric_activity() -> None:
     assert activity.verdict is not ActivityVerdictKind.REFUSAL
     assert activity.value is not None
     assert math.isfinite(activity.value)
-    fraction = single_cation_mole_fractions(inventory)["In2O3"]
+    fraction = molecular_mole_fractions(inventory)["In2O3"]
     owner = resolve_trace_parent_activity(
         "In2O3",
         temperature_K=1673.0,

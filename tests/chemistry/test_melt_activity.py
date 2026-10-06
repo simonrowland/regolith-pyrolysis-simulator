@@ -12,6 +12,7 @@ from simulator.chemistry.melt_activity import (
     P2O5_ACTIVITY_COEFFICIENT,
     melt_oxide_activity,
     melt_oxide_gamma_domain_authority,
+    molecular_mole_fractions,
     na_reductant_activity_shift_kj_per_mol_o2,
     single_cation_mole_fractions,
     table_gamma_effective,
@@ -146,6 +147,18 @@ def test_single_cation_finite_inventory_still_normalizes() -> None:
     fractions = single_cation_mole_fractions({"SiO2": 1.0, "Al2O3": 1.0})
     assert fractions["SiO2"] == pytest.approx(1.0 / 3.0)
     assert fractions["Al2O3"] == pytest.approx(2.0 / 3.0)
+
+
+def test_molecular_fraction_counts_oxide_moles() -> None:
+    fractions = molecular_mole_fractions({"SiO2": 1.0, "Al2O3": 1.0})
+    assert fractions["SiO2"] == pytest.approx(0.5)
+    assert fractions["Al2O3"] == pytest.approx(0.5)
+    dilute = molecular_mole_fractions({"In2O3": 1.0e-6, "SiO2": 1.0})
+    assert dilute["In2O3"] == pytest.approx(1.0e-6 / (1.0e-6 + 1.0))
+    assert molecular_mole_fractions({"Cr2O3": -1.76e-15}) == {}
+    cation = single_cation_mole_fractions({"In2O3": 1.0e-6, "SiO2": 1.0})
+    assert cation["In2O3"] == pytest.approx(2.0e-6 / (2.0e-6 + 1.0))
+    assert cation["In2O3"] != pytest.approx(dilute["In2O3"])
 
 
 def test_trace_parent_inventory_uses_the_same_cation_projection() -> None:

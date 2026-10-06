@@ -29,11 +29,12 @@ PIN_MOLE_FRACTION = 1e-6
 
 # Recorded from CondensedPhaseActivityProvider after the ladder. Gamma hex is
 # the fit coefficient on the requested component; value hex is the activity.
-# A selected row uses a = gamma * X. An activity-basis spelling converts the
-# pure-liquid reference coefficient (InO1.5, GaO1.5); the row gamma stays on
-# the published component. A Table 2 row that does not state the caller's
-# standard state is status-bearing, not a point. Parents with no selectable
-# band end on the unity upper bound, whose activity is the mole fraction.
+# A parent row uses a = gamma * X on the molecular basis passed in. An
+# activity-basis spelling keeps the pure-liquid reference coefficient in
+# gamma and sets the activity by a_single = a_parent ** (1/c). A Table 2
+# row that does not state the caller's standard state is status-bearing,
+# not a point. Parents with no selectable band end on the unity upper
+# bound, whose activity is the mole fraction.
 _AFTER_LADDER = json.loads(
     r"""
 {
@@ -197,8 +198,8 @@ _AFTER_LADDER = json.loads(
     "source_row_id": "fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_02_model::rows_as_printed:h=d8fd97ad84fe",
     "tier": "B",
     "value_hex": {
-      "1500": "0x1.0e0317272a923p-27",
-      "1673": "0x1.bdad66912fad6p-27"
+      "1500": "0x1.07af049c3f92cp-17",
+      "1673": "0x1.b33b5629c88f6p-17"
     },
     "verdict": "StatusBearingValue"
   },
@@ -275,8 +276,8 @@ _AFTER_LADDER = json.loads(
     "source_row_id": "fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_02_model::rows_as_printed:h=aaa9829cdabd",
     "tier": "B",
     "value_hex": {
-      "1500": "0x1.c80cfe27bab3cp-28",
-      "1673": "0x1.7f02ada759af2p-27"
+      "1500": "0x1.bd5cb032cc53ap-18",
+      "1673": "0x1.76089d956d950p-17"
     },
     "verdict": "StatusBearingValue"
   },

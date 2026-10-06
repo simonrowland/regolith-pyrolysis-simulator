@@ -12,7 +12,13 @@ import importlib.util
 import json
 from pathlib import Path
 
-from simulator.chemistry.melt_activity import pure_liquid_reference_coefficient
+import pytest
+
+from simulator.chemistry.melt_activity import (
+    molecular_mole_fractions,
+    pure_liquid_reference_coefficient,
+    single_cation_mole_fractions,
+)
 from simulator.vapour_rail.activity import (
     ActivityInputDeclaration,
     ActivityRefusalCode,
@@ -501,7 +507,7 @@ def test_out_of_band_fit_extrapolates_with_the_certified_band() -> None:
         assert inside.derivation["gamma"] is not None
 
 
-def test_activity_basis_converts_activity_and_mole_fraction() -> None:
+def test_activity_basis_derives_the_single_cation_activity() -> None:
     rows = [
         _row(
             "Ga2O3",
@@ -523,8 +529,30 @@ def test_activity_basis_converts_activity_and_mole_fraction() -> None:
     )
     assert converted is not None
     assert alias.derivation["gamma"] == converted
-    assert alias.value == alias.derivation["gamma"] * 1e-6
+    assert parent.value is not None and alias.value is not None
+    assert parent.value == pytest.approx(alias.value**2)
+    assert alias.value != pytest.approx(alias.derivation["gamma"] * 1e-6)
     assert alias.derivation["candidate_rows"][0]["gamma"] == parent.derivation["gamma"]
+
+
+def test_parent_activity_is_the_single_cation_activity_to_the_cation_count() -> None:
+    """Dilute melt {In2O3: 1e-6, SiO2: 1} at 1923 K. Both spellings agree."""
+
+    inventory = {"In2O3": 1.0e-6, "SiO2": 1.0}
+    mole_fraction = molecular_mole_fractions(inventory)["In2O3"]
+    parent = _resolve(
+        "In2O3", None, temperature_K=1923.0, mole_fraction=mole_fraction
+    )
+    single = _resolve(
+        "InO1.5", None, temperature_K=1923.0, mole_fraction=mole_fraction
+    )
+    assert parent.value is not None and single.value is not None
+    assert parent.value == pytest.approx(single.value**2)
+    assert parent.value == pytest.approx(
+        parent.derivation["gamma"] * mole_fraction
+    )
+    cation = single_cation_mole_fractions(inventory)["In2O3"]
+    assert parent.value != pytest.approx(parent.derivation["gamma"] * cation)
 
 
 def test_ino15_reproduces_the_published_anchor_at_1923_k() -> None:

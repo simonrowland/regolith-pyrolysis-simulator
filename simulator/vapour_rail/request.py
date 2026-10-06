@@ -39,6 +39,7 @@ from simulator.backend_names import (
 from simulator.vapour_rail.calibration import _RAW_VAPOROCK_SOURCE_LABELS
 from simulator.chemistry.melt_activity import (
     melt_oxide_activity_coefficient,
+    molecular_mole_fractions,
     single_cation_mole_fractions,
 )
 from simulator.scalar_boundary import is_declared_real_scalar
@@ -49,7 +50,7 @@ from simulator.vapour_rail.activity import (
     CondensedPhaseActivityProvider,
     SourceReactionActivity,
     StandardStateIdentity,
-    _coefficient_formula,
+    coefficient_formula,
     _fingerprint_float,
     _is_nonfinite_number,
     composition_fingerprint,
@@ -1396,27 +1397,26 @@ def refusal_closure(
                 )
                 if reported_mole_fraction is None:
                     # One projector. Majors use the legacy coefficient's
-                    # parent oxide. A trace parent has no such entry; its
-                    # fraction is the same projection keyed by the Table 2
-                    # row formula (InO1.5 reads In2O3).
+                    # parent oxide on the single-cation basis. A trace
+                    # parent has no such entry. Its Table 2 row is a
+                    # molecular Henrian model, so the fraction is
+                    # molecular_mole_fractions of the row formula
+                    # (InO1.5 reads In2O3). The other spelling's activity
+                    # is derived from that, not by reusing this X.
+                    account = _account_mols(
+                        ledger_snapshot, rule.source_account
+                    )
                     coeff = melt_oxide_activity_coefficient(
                         declaration.component_id
                     )
                     if coeff is not None:
-                        fraction_key = coeff.parent_oxide
+                        reported_mole_fraction = single_cation_mole_fractions(
+                            account
+                        ).get(coeff.parent_oxide)
                     elif is_trace_parent_component(declaration.component_id):
-                        fraction_key = _coefficient_formula(
-                            declaration.component_id
-                        )
-                    else:
-                        fraction_key = None
-                    if fraction_key is not None:
-                        source_fractions = single_cation_mole_fractions(
-                            _account_mols(ledger_snapshot, rule.source_account)
-                        )
-                        reported_mole_fraction = source_fractions.get(
-                            fraction_key
-                        )
+                        reported_mole_fraction = molecular_mole_fractions(
+                            account
+                        ).get(coefficient_formula(declaration.component_id))
                 source_reaction_activity = (
                     activity_provider.resolve_source_reaction_activity(
                         declaration,
