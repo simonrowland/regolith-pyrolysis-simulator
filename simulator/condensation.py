@@ -5750,7 +5750,21 @@ def _onset_from_temperature(
         applicability = "uncaptured_condensable"
         disposition = "flagged_uncaptured_condensable"
     else:
-        applicability = "applicable"
+        hot_duct_C = None
+        for stage in (
+            stages
+            if stages is not None
+            else CondensationTrain.create_default().stages
+        ):
+            if int(stage.stage_number) == 0:
+                hot_duct_C = float(stage.temp_range_C[0])
+                break
+        # Landing stays stage 1. The label says the vapour is already
+        # condensed at or above the hot-duct floor.
+        if hot_duct_C is not None and temperature_C >= hot_duct_C:
+            applicability = "condenses_upstream_of_train"
+        else:
+            applicability = "applicable"
         disposition = "impurity_capture"
     return TraceVapourCondensationOnset(
         species=str(species),

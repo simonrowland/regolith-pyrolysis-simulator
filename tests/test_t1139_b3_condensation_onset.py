@@ -72,7 +72,22 @@ def test_pb_onset_matches_the_janaf_1_bar_boiling_point() -> None:
         onset.temperature_K - 273.15, abs=1e-9
     )
     assert onset.landing_stage_number == 1
-    assert onset.hot_train_applicability == "applicable"
+    assert onset.hot_train_applicability == "condenses_upstream_of_train"
+
+
+def test_onset_inside_the_hot_duct_is_upstream_of_the_train() -> None:
+    """Cu at 100 Pa sits inside the stage-0 band and still lands on stage 1."""
+
+    stages = CondensationTrain.create_default().stages
+    hot_duct = next(stage for stage in stages if stage.stage_number == 0)
+    onset = trace_vapour_condensation_onset("Cu", 100.0, stages=stages)
+    assert onset.status == "ok"
+    assert onset.temperature_C >= hot_duct.temp_range_C[0]
+    assert onset.landing_stage_number == 1
+    assert onset.hot_train_applicability == "condenses_upstream_of_train"
+    gallium = trace_vapour_condensation_onset("Ga", 100.0, stages=stages)
+    assert gallium.temperature_C < hot_duct.temp_range_C[0]
+    assert gallium.hot_train_applicability == "applicable"
 
 
 def test_onset_inverts_the_rail_equilibrium_constant() -> None:
