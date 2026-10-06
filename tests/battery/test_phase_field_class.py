@@ -123,6 +123,39 @@ def test_stolyarova_1991_x036_to_x040_rows_stay_numeric(
     assert all(residual.status is not ResidualStatus.REFUSED for residual in numeric)
 
 
+def _locators(node):
+    if isinstance(node, dict):
+        for key, value in node.items():
+            if key.endswith("locator") and isinstance(value, dict):
+                yield key, value
+            yield from _locators(value)
+    elif isinstance(node, list):
+        for item in node:
+            yield from _locators(item)
+
+
+def test_stolyarova_1991_phase_field_record_locators_have_no_null_keys() -> None:
+    # A YAML flow mapping such as {table: Ib, IIa, IIb} silently parses as
+    # table='Ib' plus null-valued keys 'IIa' and 'IIb'; every locator under
+    # phase_field_records must carry only non-null values.
+    from pathlib import Path
+
+    import yaml
+
+    path = Path(__file__).resolve().parents[2] / "data" / "literature" / "extracts" / EXTRACT
+    records = yaml.safe_load(path.read_text(encoding="utf-8"))["phase_field_records"]
+    locators = list(_locators(records))
+    # liquidus 1, plateaus 2, the four 15% sigma locators, caption note 1.
+    assert len(locators) == 8
+    for key, locator in locators:
+        assert all(value is not None for value in locator.values()), (key, locator)
+    tables = {plateau["id"]: plateau["locator"]["table"] for plateau in records["plateaus"]}
+    assert tables == {
+        "stolyarova-1991-table-ia-1993k-lime-plateau": "Ia",
+        "stolyarova-1991-tables-ib-ii-1933k-lime-plateau": "Ib, IIa, IIb",
+    }
+
+
 # --- t-1123a reader rule (simulator/battery/phase_field.py) -----------------
 
 
@@ -420,3 +453,140 @@ def test_two_test_rule_leaves_single_liquid_rows_and_mirrors_the_outside_side() 
     assert classify_point(
         above, observation_id="series_a", x_by_component={"SiO2": Decimal("0.50")}, declared=None
     ).kind is None
+
+
+# --- t-1123a r2: remaining reader guards (each has a mutation proof) ---------
+
+
+def _classify(records, x="0.33", declared=None, observation_id="series_a"):
+    from simulator.battery.phase_field import classify_point
+
+    return classify_point(
+        records,
+        observation_id=observation_id,
+        x_by_component={"SiO2": Decimal(x)},
+        declared=declared if declared is not None else _declared(x),
+    )
+
+
+def test_two_test_rule_refuses_a_liquidus_record_without_a_locator() -> None:
+    records = _records(
+        liquidus={
+            "id": "liq",
+            "component": "SiO2",
+            "position": "0.37",
+            "sigma": "0.02",
+            "outside_side": "below",
+        }
+    )
+    assert records.liquidus == {}
+    assert len(records.problems) == 1 and "locator" in records.problems[0]
+    outcome = _classify(records)
+    assert outcome.kind is None
+    assert outcome.problem == "phase_field_class without an applicable liquidus record"
+
+
+def test_two_test_rule_refuses_a_basis_that_does_not_name_the_records() -> None:
+    from simulator.battery.phase_field import LIQUIDUS_POSITION_CONTESTED
+
+    records = _records()
+    cases = {
+        "criterion": ("plateau_only", "basis.criterion must be"),
+        "liquidus": ("another-liquidus", "names another liquidus record"),
+        "plateau": ("another-plateau", "names no plateau record"),
+        "locator": (None, "basis needs a locator"),
+    }
+    for key, (value, message) in cases.items():
+        declared = _declared("0.33")
+        declared["basis"][key] = value
+        outcome = _classify(records, declared=declared)
+        # The row is not class S; it falls back to the contested flag.
+        assert outcome.kind == LIQUIDUS_POSITION_CONTESTED, key
+        assert message in (outcome.problem or ""), (key, outcome.problem)
+    wrong_class = _declared("0.33")
+    wrong_class["class"] = "two_phase"
+    assert "phase_field_class must be" in (_classify(records, declared=wrong_class).problem or "")
+
+
+def test_two_test_rule_test_ii_needs_the_point_in_the_plateau_record() -> None:
+    from simulator.battery.phase_field import LIQUIDUS_POSITION_CONTESTED
+
+    records = _records()
+    # x(SiO2) 0.30 passes test (i) (0.30 < 0.35) but is not a plateau composition.
+    outcome = _classify(records, x="0.30")
+    assert outcome.kind == LIQUIDUS_POSITION_CONTESTED
+    assert "test (ii) fails" in (outcome.problem or "")
+    # Right composition, but a series the plateau record does not list.
+    outcome = _classify(records, observation_id="series_c")
+    assert outcome.kind == LIQUIDUS_POSITION_CONTESTED
+    assert "test (ii) fails" in (outcome.problem or "")
+
+
+def test_two_test_rule_never_counts_untestable_or_parenthesised_cells() -> None:
+    from simulator.battery.phase_field import phase_field_records
+
+    def doc(cell_033, cell_025, basis):
+        return {
+            "species": {
+                "A": {
+                    "observations": [
+                        {
+                            "observation_id": "series_a",
+                            "values": {"points": [{"x": "0.33", "p": cell_033}, {"x": "0.25", "p": cell_025}]},
+                        }
+                    ]
+                }
+            },
+            "phase_field_records": {
+                "liquidus": [],
+                "plateaus": [
+                    {
+                        "id": "plat",
+                        "composition_field": "x",
+                        "compositions": ["0.33", "0.25"],
+                        "series": [{"observation_id": "series_a", "field": "p", "sigma_basis": basis}],
+                    }
+                ],
+            },
+        }
+
+    untestable = phase_field_records(doc("6.7", "6.8", "none_printed")).plateaus["plat"]
+    assert untestable.untestable == ("series_a",) and untestable.z_by_series == {}
+    assert untestable.problem == "plateau has no testable series"
+    # "(5.3)" is a parenthesised (not measured) cell: it is never a plateau value.
+    parenthesised = phase_field_records(doc("(5.3) ± 1.0", "2.0 ± 1.0", "printed")).plateaus["plat"]
+    assert parenthesised.z_by_series == {}
+    assert "lacks a usable printed cell" in (parenthesised.problem or "")
+
+
+def test_migrator_refuses_misplaced_phase_field_class() -> None:
+    from types import SimpleNamespace
+
+    from simulator.battery.enums import RefusalReason
+    from simulator.battery.migrate import Migrator
+
+    declared = {"phase_field_class": _declared("0.33")}
+    cases = (
+        ("no records", None, None, "phase_field_class without phase_field_records"),
+        ("printed phase", _records(), "liquid", "phase_field_class on a point with a printed phase"),
+        ("no composition", _records(), None, "phase_field_class needs a printed mole-fraction composition"),
+    )
+    for name, records, printed_phase_kind, message in cases:
+        stub = SimpleNamespace(
+            _phase_field_records={"src": records},
+            result=SimpleNamespace(registry_issues=[]),
+        )
+        outcome = Migrator._point_phase_field(
+            stub,
+            source_id="src",
+            parent_id="src::series_a",
+            point_id="src::series_a::p0",
+            raw_item=declared,
+            point_conditions=None,
+            printed_phase_kind=printed_phase_kind,
+        )
+        assert outcome.kind is None, name
+        assert outcome.problem == message, name
+        (issue,) = stub.result.registry_issues
+        assert issue.reason is RefusalReason.CONDITIONAL_FIELD, name
+        assert issue.detail == message, name
