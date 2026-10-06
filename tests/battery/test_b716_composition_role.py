@@ -151,14 +151,64 @@ def test_markova_1983_initial_sample_points_are_stamped(tmp_path) -> None:
     assert flags == {INITIAL_CHARGE_ONLY}
 
 
-def test_hastie_1981_table2_initial_maps_are_stamped(tmp_path) -> None:
+# Hastie Table 2 (NBSIR 81-2279) point ids on green 61ec839da. Footnote a says
+# the System column prints initial compositions; only these four rows also
+# print a run K2O below that initial value (K1 "~ 14" vs 19.5, Western
+# "18.9-17.6" vs 22.7, Eastern "23.3-22.1" vs 23.6, K2 "6" vs 8.7).
+_HASTIE_ORIGINAL = "kems-020-hastie-1981-nbsir::hastie_1981_table2_k_logP_coefficients::rows:"
+_HASTIE_SLAG_INITIAL_CHARGE_IDS = {
+    _HASTIE_ORIGINAL + "h=e3f647c078ee",  # K1
+    _HASTIE_ORIGINAL + "h=c3c57e8f6757",  # synthetic Western
+    _HASTIE_ORIGINAL + "h=5990a63e7c0b",  # synthetic Eastern
+    _HASTIE_ORIGINAL + "h=65d014284ac8",  # K2
+}
+# Illite prints K2O 7.4 and no different run K2O: its map is the printed
+# analysis (df0dea51b kept it for that reason), so it carries no role.
+_HASTIE_ILLITE_IDS = {
+    _HASTIE_ORIGINAL + "h=0ec91612e9c7",
+    "kems-020-hastie-1981-nbsir::hastie_1981_table2_k_logP_coefficients_quoted_20260906"
+    "::rows:h=34540a470ebb",
+}
+
+
+def test_hastie_1981_table2_only_depleted_slag_maps_are_stamped(tmp_path) -> None:
     result = _migrate_real_extract(tmp_path, "kems-020-hastie-1981-nbsir.yaml")
-    points = _point_compositions(
-        result, "kems-020-hastie-1981-nbsir::hastie_1981_table2_k_logP_coefficients"
+    points = dict(
+        _point_compositions(
+            result, "kems-020-hastie-1981-nbsir::hastie_1981_table2_k_logP_coefficients"
+        )
     )
-    assert len(points) == 6
-    flags = {_assert_dual_promotion(conditions).proxy_flag for _, conditions in points}
-    assert flags == {INITIAL_CHARGE_ONLY}
+    # Ids are unchanged by the row-level declaration (series_row_extra skip).
+    assert set(points) == _HASTIE_SLAG_INITIAL_CHARGE_IDS | _HASTIE_ILLITE_IDS
+    flags = {
+        obs_id: _assert_dual_promotion(conditions).proxy_flag
+        for obs_id, conditions in points.items()
+    }
+    for obs_id in _HASTIE_SLAG_INITIAL_CHARGE_IDS:
+        assert flags[obs_id] == INITIAL_CHARGE_ONLY, obs_id
+    for obs_id in _HASTIE_ILLITE_IDS:
+        composition = points[obs_id]["composition"].state.value
+        # x(K2O) for the printed 7.4 wt% illite analysis.
+        assert abs(float(dict(composition.components)["K2O"]) - 0.055513) < 1e-6
+        assert flags[obs_id] is None, obs_id
+
+
+def test_composition_role_does_not_rename_a_series_row() -> None:
+    from simulator.battery.stable_ids import series_row_extra
+
+    row = {"system": "illite", "composition_wt_pct": {"K2O": 7.4, "SiO2": 60.2}}
+    declared = {
+        **row,
+        "composition_role": {
+            "value": INITIAL_CHARGE_ONLY,
+            "locator": {"page": 24, "table": "2"},
+            "quote": "6[K2O].",
+        },
+    }
+    assert series_row_extra(declared) == series_row_extra(row)
+    assert series_row_extra(declared, include_locator=False) == series_row_extra(
+        row, include_locator=False
+    )
 
 
 # --- the four ``rg proxy_flag tests`` hits: catalogue token paths ---------
