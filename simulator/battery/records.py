@@ -345,6 +345,14 @@ class Reaction:
             raise ValueError("Reaction requires at least one term")
 
 
+# Composition.proxy_flag tokens. Absent (None) means a printed analysis of the
+# point. ``composition_from_sample_catalog``: a catalogue proxy.
+# ``initial_charge_only``: the source prints the starting charge while the
+# datum describes a later (depleted) state; consumers may predict with it but
+# the residual is flagged (b-716).
+INITIAL_CHARGE_ONLY_PROXY_FLAG = "initial_charge_only"
+
+
 @dataclass(frozen=True)
 class Composition:
     basis: str
