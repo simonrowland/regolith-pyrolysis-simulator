@@ -3116,6 +3116,24 @@ class CondensationModel:
                 'positive condensable vapor species; missing '
                 + ', '.join(missing_partial_species)
             )
+        for species, rate_kg_hr in evap_flux.species_kg_hr.items():
+            if (
+                float(rate_kg_hr) <= 0.0
+                or species in stage_route_by_species
+                or has_declared_routing(species)
+                or species not in _trace_vapour_carrier_formulas()
+                or species in self.wall_species_partial_pressures_pa
+            ):
+                continue
+            carrier_authority_status_by_species[species] = (
+                VAPOUR_CARRIER_AUTHORITY_REFUSED
+            )
+            non_debiting_reason_by_species[species] = (
+                "wall_species_partial_pressure_missing"
+            )
+            condensation_authority_by_species[species]["status"] = (
+                VAPOUR_CARRIER_AUTHORITY_REFUSED
+            )
         wall_hkl_by_species = (
             self._resolve_wall_deposit_candidates_by_species_segment_kg(
                 evap_flux=evap_flux,
