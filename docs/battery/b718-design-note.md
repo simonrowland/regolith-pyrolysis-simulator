@@ -55,3 +55,33 @@ experiment sample and attaches them on the owning observation instead.
 - Comparison-candidate set and residuals for same-material rows unchanged.
 - Re-run sweep: Class B count drops toward 0 for declared sources; remaining B only where
   subset promotion was the sole path and extract edits have not yet bound a declaration.
+
+## Review-of-record fixes (regolith-main ROR-b718, 2026-10-06)
+
+The rule above was right; the implementation had a second path that broke it.
+
+- **Nested row maps (P0).** `sample_from_equipment` walks into `values.rows`, `series`,
+  `points` and `tests`, so a map printed on one nested row (quoted Hastie Table 2, body row 16
+  illite) was attached to the parent's `point_conditions`. Every exploded sibling inherited it, and
+  the universal promotion then saw "one fingerprint on every row". The parent now attaches a map
+  only if the observation prints it outside every nested row list
+  (`_printed_map_is_observation_level`). The owning row still carries its own map through
+  `_oxide_map_from_mapping` in `_emit_exploded_point`.
+- **Row-local maps never promote.** A child whose printed map is its own row's (not inherited from
+  the parent) blocks rule 2 (`_row_local_printed_observations`). One row's measured composition,
+  often a residue after mass loss, is not the experiment's sample.
+- **Printed initial-charge row.** The one nested row the source prints as the series' starting
+  charge (`T_C_is_initial_composition: true`, or T_C = 0 with 0 mass loss) stays on
+  `experiment.sample` (`_is_printed_initial_charge`). This restores Markova 1984 Table 2.
+- **Declaration owns the sample.** A row that only restates the declared map (often with an extra
+  printed `Total`) does not attach and shadow it (`_repeats_declared_sample_map`). A prose
+  declaration ("12 MgO, 46 SiO2, ...") is not an oxide map, so it does not get protection.
+- **One owner of map identity.** `_printed_fingerprint` is used by the roots walk, the
+  attachment gate, the declared-repeat check and the promotion.
+- **Hashimoto depleted rows.** `hashimoto_1983_cao_al2o3_residue_enrichment` and
+  `hashimoto_1983_stage_iv_cao_relative_volatility` are unbound from `fcmas-free-evap-series`.
+  They describe a depleted state, and the readers cannot yet tell that state from the initial
+  charge.
+
+The composition role (printed analysis / calculated with derivation / initial charge only /
+two-phase bulk) is still not a field. See the fix REPORT for the proposal.

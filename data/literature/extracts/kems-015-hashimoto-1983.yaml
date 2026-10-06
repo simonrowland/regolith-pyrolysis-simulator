@@ -33,7 +33,7 @@ experiments:
     printed_composition:
       state:
         tag: value
-        value: {SiO2: '35.43', Al2O3: '3.16', FeO: '35.04', MgO: '23.84', CaO: '2.53'}
+        value: {SiO2: 35.43, Al2O3: 3.16, FeO: 35.04, MgO: 23.84, CaO: 2.53}
       locator: {published_page: 113, pdf_page_index: 3, table: '1', note: 'Table 1 row (1) Ave.; regarded as the starting composition in the experiments'}
 - experiment_id: hashimoto-1983-run-17c1
   bench_id: graphite-vacuum-furnace
@@ -13106,7 +13106,6 @@ species:
   Ca:
     observations:
     - observation_id: hashimoto_1983_cao_al2o3_residue_enrichment
-      experiment: fcmas-free-evap-series
       type: rate_series
       locator:
         source_path: docs-private/research/ocr-artifacts/kems-015-hashimoto-1983/spool/out/kems-015-hashimoto-1983/vlm/kems-015-hashimoto-1983.md
@@ -13138,7 +13137,6 @@ species:
         note: Residue enrichment is composition-path evidence, not an absolute evaporation rate or
           an activity coefficient.
     - observation_id: hashimoto_1983_stage_iv_cao_relative_volatility
-      experiment: fcmas-free-evap-series
       type: rate_series
       locator:
         source_path: docs-private/research/ocr-artifacts/kems-015-hashimoto-1983/spool/out/kems-015-hashimoto-1983/vlm/kems-015-hashimoto-1983.md
