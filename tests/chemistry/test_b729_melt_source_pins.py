@@ -1,7 +1,8 @@
 """Numeric pins for b-729's melt-source consumers, independent of live engines."""
 
-import pytest
 from pathlib import Path
+
+import pytest
 
 from simulator.accounting.formulas import resolve_species_formula
 from simulator.config import load_config_bundle
@@ -16,19 +17,20 @@ FEEDSTOCKS = (
     "mars_basalt", "s_type_asteroid_silicate", "ci_carbonaceous_chondrite",
 )
 TEMPERATURES_K = (1800.0, 2400.0)
+# b-729: 2400 K uses the catalog's flagged physical continuation.
 PRESSURE_PINS = {
-    ("lunar_mare_low_ti", 1800.0): ("0x1.1ea791992acbcp-3", "0x1.1ea791992acbcp-3", "0x1.839f19a7d90c6p-28", "0x1.015bf369919c8p+2"),
-    ("lunar_mare_low_ti", 2400.0): ("0x1.80fea08b163d4p+6", "0x1.80fea08b163d4p+6", "0x1.d6d8238b4c8d1p-2", "0x1.39f659f3dab57p+9"),
-    ("lunar_mare_high_ti", 1800.0): ("0x1.11899dbdf1e4ep-3", "0x1.11899dbdf1e4ep-3", "0x1.71e264836600dp-28", "0x1.eb2a5865e9dddp+1"),
-    ("lunar_mare_high_ti", 2400.0): ("0x1.6f60b0f0d4e5bp+6", "0x1.6f60b0f0d4e5bp+6", "0x1.c14c89290665fp-2", "0x1.2b988217eb56ap+9"),
-    ("lunar_highland", 1800.0): ("0x1.12c48275db689p-3", "0x1.12c48275db689p-3", "0x1.689d834cd46e1p-27", "0x1.dedb6c8db7f4bp+2"),
-    ("lunar_highland", 2400.0): ("0x1.71079cc2344eap+6", "0x1.71079cc2344eap+6", "0x1.b60a3223e4290p-1", "0x1.24168b228fcf2p+10"),
-    ("mars_basalt", 1800.0): ("0x1.27d90ccf5c470p-3", "0x1.27d90ccf5c470p-3", "0x1.3050506caa7fbp-28", "0x1.94184b34c6f22p+1"),
-    ("mars_basalt", 2400.0): ("0x1.8d577f23b9e52p+6", "0x1.8d577f23b9e52p+6", "0x1.71a67739b919ep-2", "0x1.ecf887ae0e57ap+8"),
-    ("s_type_asteroid_silicate", 1800.0): ("0x1.16603cbd4490ap-3", "0x1.16603cbd4490ap-3", "0x1.211f318bab4dep-30", "0x1.7febf901ec0c9p-1"),
-    ("s_type_asteroid_silicate", 2400.0): ("0x1.75e03c32a6d45p+6", "0x1.75e03c32a6d45p+6", "0x1.5f32589d2b6c1p-4", "0x1.d45c608fa9552p+6"),
-    ("ci_carbonaceous_chondrite", 1800.0): ("0x1.971fedb5a064ep-4", "0x1.971fedb5a064ep-4", "0x1.46a4f68c1ad80p-30", "0x1.b1bf5eaf7a240p-1"),
-    ("ci_carbonaceous_chondrite", 2400.0): ("0x1.11658f3fb533ep+6", "0x1.11658f3fb533ep+6", "0x1.8cc67c74e4c0ap-4", "0x1.089296472c50dp+7"),
+    ("lunar_mare_low_ti", 1800.0): ("0x1.4b6e943922b7cp-30", "0x1.4b6e943922b7cp-30", "0x1.839f19a7d90c9p-28", "0x1.839f19a7d90c9p-28"),
+    ("lunar_mare_low_ti", 2400.0): ("0x1.388e1b674848fp+2", "0x1.388e1b674848fp+2", "0x1.d88a532b372f8p-2", "0x1.d88a532b372f8p-2"),
+    ("lunar_mare_high_ti", 1800.0): ("0x1.3c44176d1eb1bp-30", "0x1.3c44176d1eb1bp-30", "0x1.71e264836600ep-28", "0x1.71e264836600ep-28"),
+    ("lunar_mare_high_ti", 2400.0): ("0x1.2a40bf8c578c9p+2", "0x1.2a40bf8c578c9p+2", "0x1.c2eada9b686d7p-2", "0x1.c2eada9b686d7p-2"),
+    ("lunar_highland", 1800.0): ("0x1.3db02c65a3bb9p-30", "0x1.3db02c65a3bb9p-30", "0x1.689d834cd46d8p-27", "0x1.689d834cd46d8p-27"),
+    ("lunar_highland", 2400.0): ("0x1.2b9817fdcb3c6p+2", "0x1.2b9817fdcb3c6p+2", "0x1.b79e21a7e2805p-1", "0x1.b79e21a7e2805p-1"),
+    ("mars_basalt", 1800.0): ("0x1.560fb0a41e131p-30", "0x1.560fb0a41e131p-30", "0x1.3050506caa7f2p-28", "0x1.3050506caa7f2p-28"),
+    ("mars_basalt", 2400.0): ("0x1.42943c6dd2a07p+2", "0x1.42943c6dd2a07p+2", "0x1.72fb5619b4be6p-2", "0x1.72fb5619b4be6p-2"),
+    ("s_type_asteroid_silicate", 1800.0): ("0x1.41dc318f2ee62p-30", "0x1.41dc318f2ee62p-30", "0x1.211f318bab4e4p-30", "0x1.211f318bab4e4p-30"),
+    ("s_type_asteroid_silicate", 2400.0): ("0x1.2f8748cb485c8p+2", "0x1.2f8748cb485c8p+2", "0x1.6076332c23543p-4", "0x1.6076332c23543p-4"),
+    ("ci_carbonaceous_chondrite", 1800.0): ("0x1.d6b8696bcefa3p-31", "0x1.d6b8696bcefa3p-31", "0x1.46a4f68c1ad78p-30", "0x1.46a4f68c1ad78p-30"),
+    ("ci_carbonaceous_chondrite", 2400.0): ("0x1.bbe908834dffbp+1", "0x1.bbe908834dffbp+1", "0x1.8e345eb71df9ep-4", "0x1.8e345eb71df9ep-4"),
 }
 
 
