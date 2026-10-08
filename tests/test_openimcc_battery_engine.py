@@ -1116,6 +1116,17 @@ engine_rows = [
     if candidate.engine is not None and candidate.engine.name is Engine.OPENIMCC
 ]
 assert len(engine_rows) == 162
+binary_pot_residual, binary_pot_candidate = next(
+    (residual, candidate)
+    for residual, candidate in engine_rows
+    if candidate.observation_id
+    == "engine:openimcc:kems-042-plante-1979::plante1979_table2_s1104_r001_quoted"
+)
+assert binary_pot_residual.key == (
+    "kems-042-plante-1979::plante1979_table2_s1104_r001_quoted:"
+    "T=1302::p_partial::vapour::openimcc"
+)
+assert binary_pot_residual.candidate == binary_pot_candidate.observation_id
 assert {
     (candidate.engine.lineage_complete, residual.source_relation.value)
     for residual, candidate in engine_rows

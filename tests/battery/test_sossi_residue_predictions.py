@@ -248,7 +248,7 @@ def test_mixed_hashimoto_and_sossi_score_keep_separate_engine_cohorts(
     monkeypatch.setattr(residue, "_predict_hashimoto_residue_cohort", hashimoto_cohort)
     monkeypatch.setattr(residue, "_predict_sossi_residue_cohort", sossi_cohort)
 
-    residuals, _ = score_store(
+    residuals, candidates = score_store(
         context,
         engines=(Engine.OPENIMCC,),
         rail=Rail.RESIDUE_COMPOSITION,
@@ -259,6 +259,17 @@ def test_mixed_hashimoto_and_sossi_score_keep_separate_engine_cohorts(
         if row.reference
         == "kems-012-sossi-2019::sossi_2019_mn_table2_open_furnace_residue_ppm_quoted_20260906::T=1573.15:h=0eaa2bb3c525"
     )
+    assert pinned_score.key == (
+        "kems-012-sossi-2019::sossi_2019_mn_table2_open_furnace_residue_ppm_quoted_20260906::"
+        "T=1573.15:h=0eaa2bb3c525:T=1573.15::residue_component_composition::"
+        "residue_composition::openimcc"
+    )
+    assert pinned_score.candidate == (
+        "engine:openimcc:kems-012-sossi-2019::"
+        "sossi_2019_mn_table2_open_furnace_residue_ppm_quoted_20260906::"
+        "T=1573.15:h=0eaa2bb3c525"
+    )
+    assert candidates[pinned_score.candidate].observation_id == pinned_score.candidate
     assert pinned_score.numeric is not None
     assert float(pinned_score.numeric.value).hex() == "0x1.88fea8359f38fp-4"
     hashimoto_ids = {
