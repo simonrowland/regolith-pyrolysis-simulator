@@ -72,10 +72,20 @@ def test_preferred_oxide_carriers_compile_dormant(generated_batch) -> None:
         tuple(by_key[key] for key in sorted(wanted))
     )
     catalog = compile_vapour_rail_catalog(payload, emit_u0_request_rules=False)
+    compiled_planes: set[str] = set()
     for element, carrier in wanted:
         channel = by_key[(element, carrier)]
         compiled = catalog.species[channel.species_id]
         assert compiled.evaluator is not None
+        model = channel.family["physical_properties"]["species"][
+            channel.species_id
+        ]["pressure_models"][0]
+        declared_plane = model["oxygen_fugacity_channel"]
+        if compiled.evaluator.pO2_exponent != 0.0:
+            assert compiled.evaluator.oxygen_fugacity_channel == declared_plane
+            compiled_planes.add(declared_plane)
+        else:
+            assert compiled.evaluator.oxygen_fugacity_channel is None
         assert compiled.code_metadata.request_rule == "dormant_pending_validation"
         assert compiled.code_metadata.hot_train_applicability == "not_applicable"
         assert compiled.evaluator.evaluate(1600.0, pO2_bar=1.0e-8).pressure_pa > 0.0
@@ -88,6 +98,7 @@ def test_preferred_oxide_carriers_compile_dormant(generated_batch) -> None:
         for record_id, source_id in channel.selected_sources.items():
             assert source_id
             assert record_id in channel.native_phases
+    assert compiled_planes == {"intrinsic_melt", "transport_headspace"}
 
 
 def test_sn_parent_is_sno(generated_batch) -> None:
@@ -140,6 +151,45 @@ def test_parent_table_is_the_shared_leaf() -> None:
     assert leaf_parents["Sn"] == "SnO"
     assert ledger_component_key("Ga2O3(l)") == "Ga2O3"
     assert strip_phase("Ga2O3(l)") == ledger_component_key("Ga2O3(l)")
+
+
+def test_generated_fo2_plane_follows_vapor_oxygen(generated_batch) -> None:
+    from simulator.vapour_rail.catalog import _formula_atoms
+    from simulator.vapour_rail.stoich import oxygen_fugacity_plane
+
+    seen: set[tuple[bool, str]] = set()
+    for channel in generated_batch.channels:
+        species = channel.family["physical_properties"]["species"][
+            channel.species_id
+        ]
+        oxygen_atoms = float(_formula_atoms(species["formula"]).get("O", 0.0))
+        plane = oxygen_fugacity_plane(vapor_oxygen_atoms=oxygen_atoms)
+        model = species["pressure_models"][0]
+        assert model["oxygen_fugacity_channel"] == plane
+        assert species["flux_dormant"] is True
+        seen.add((oxygen_atoms <= 0.0, plane))
+    assert (True, "intrinsic_melt") in seen
+    assert (False, "transport_headspace") in seen
+
+
+def test_generated_alpha_is_the_shared_upper_bound(generated_batch) -> None:
+    from simulator.alpha_kinetics import ANALYTICAL_UPPER_BOUND_ALPHA_STATUS
+
+    assert generated_batch.channels
+    for channel in generated_batch.channels:
+        alpha = channel.family["vaporisation_coefficients"]["evaporation_alpha"]
+        assert alpha == {
+            "value": 1.0,
+            "status": ANALYTICAL_UPPER_BOUND_ALPHA_STATUS,
+        }
+        species = channel.family["physical_properties"]["species"][
+            channel.species_id
+        ]
+        assert species["flux_dormant"] is True
+        assert (
+            channel.family["code_metadata"]["request_rule"]
+            == "dormant_pending_validation"
+        )
 
 
 def test_preferred_carrier_table_matches_steer() -> None:

@@ -20,7 +20,7 @@ from typing import Any, Final
 
 from simulator.yaml_cache import load_cached_safe_yaml
 
-from simulator.physical_constants import GAS_CONSTANT
+from simulator.physical_constants import CELSIUS_TO_KELVIN_OFFSET, GAS_CONSTANT
 from simulator.chemistry.melt_activity import (
     MELT_OXIDE_CATIONS_PER_FORMULA,
     melt_oxide_activity,
@@ -1697,16 +1697,19 @@ class MeltActivityResolver:
                 model_row_id=row_id,
             )
         if not (
-            minimum_T <= query.temperature_K <= maximum_T
-            and minimum_P <= query.pressure_bar <= maximum_P
+            math.isfinite(query.temperature_K) and math.isfinite(query.pressure_bar)
         ):
             return self._refusal(
                 query,
-                ActivityRefusalCode.DESCRIPTOR_HULL_EXCEEDED,
-                "query T/P lies outside the admitted Tier A row domain",
+                ActivityRefusalCode.MISSING_EVIDENCE,
+                "query T/P must be finite",
                 tier=ActivityTier.A,
                 model_row_id=row_id,
             )
+        outside_row_domain = not (
+            minimum_T <= query.temperature_K <= maximum_T
+            and minimum_P <= query.pressure_bar <= maximum_P
+        )
         if query.matrix_domain_ref != domain.get("matrix_domain_ref"):
             return self._refusal(
                 query,
@@ -1839,6 +1842,27 @@ class MeltActivityResolver:
         except OverflowError:
             legacy_value = None
         value = legacy_value if legacy_value != 0.0 else None
+        domain_status = "in_domain_pending_validation"
+        derivation: dict[str, Any] = {
+            "routes": [name for name, _ in candidates],
+            "basis_coefficients": list(coefficients),
+            "engine_component_ids": list(engine.engine_component_ids),
+            "target_mu0_J_per_mol": target_mu0,
+            "canonical_space": "ln_activity",
+            "legacy_value_edge": (
+                "representable" if value is not None else "unrepresentable"
+            ),
+        }
+        if outside_row_domain:
+            domain_status = "out_of_domain_extrapolated"
+            derivation["extrapolation_notice"] = {
+                "reason": "query T/P lies outside the admitted Tier A row domain",
+                "authority_level": "extrapolated",
+                "certified_band": {
+                    "temperature_K": [minimum_T, maximum_T],
+                    "pressure_bar": [minimum_P, maximum_P],
+                },
+            }
         return SourceReactionActivity(
             component_id=query.component_id,
             value=value,
@@ -1856,7 +1880,7 @@ class MeltActivityResolver:
             report_label="status-bearing-not-point",
             tier=ActivityTier.A,
             model_row_id=row_id,
-            domain_status="in_domain_pending_validation",
+            domain_status=domain_status,
             conversion_ref=engine.conversion_ref,
             source_standard_state=engine.source_standard_state,
             target_standard_state=query.target_standard_state,
@@ -1871,16 +1895,7 @@ class MeltActivityResolver:
                 query.state_fingerprint,
                 str(query.target_standard_state.identity_id),
             ),
-            derivation={
-                "routes": [name for name, _ in candidates],
-                "basis_coefficients": list(coefficients),
-                "engine_component_ids": list(engine.engine_component_ids),
-                "target_mu0_J_per_mol": target_mu0,
-                "canonical_space": "ln_activity",
-                "legacy_value_edge": (
-                    "representable" if value is not None else "unrepresentable"
-                ),
-            },
+            derivation=derivation,
         )
 
     def resolve_tier_c(self, query: MeltActivityQuery) -> SourceReactionActivity:
@@ -2013,14 +2028,16 @@ class MeltActivityResolver:
                 tier=ActivityTier.C,
                 model_row_id=None,
             )
+        extrapolation_notice = None
         if query.out_of_domain and query.continuation_ln_band is None:
-            return self._refusal(
-                query,
-                ActivityRefusalCode.DESCRIPTOR_HULL_EXCEEDED,
-                "out-of-domain Tier C evaluation needs an explicit continuation band",
-                tier=ActivityTier.C,
-                model_row_id=None,
-            )
+            extrapolation_notice = {
+                "reason": (
+                    "out-of-domain Tier C evaluation has no explicit "
+                    "continuation band"
+                ),
+                "authority_level": "extrapolated",
+                "certified_band": None,
+            }
         try:
             mole_fraction = float(query.component_mole_fractions[query.component_id])
         except (TypeError, ValueError):
@@ -2075,6 +2092,11 @@ class MeltActivityResolver:
                 derivation={
                     "inventory_complete": True,
                     "zero_proof": "complete atom-balanced inventory has X_i=0",
+                    **(
+                        {"extrapolation_notice": extrapolation_notice}
+                        if extrapolation_notice is not None
+                        else {}
+                    ),
                 },
             )
         ln_value = math.log(mole_fraction)
@@ -2095,10 +2117,22 @@ class MeltActivityResolver:
             ln_band: tuple[float | None, float | None] = (lower, upper)
             band_kind = "out_of_domain_model_form_envelope"
             domain_status = "out_of_domain_continuation_status_bearing"
+        elif extrapolation_notice is not None:
+            ln_band = (None, None)
+            band_kind = "unbounded_model_form"
+            domain_status = "out_of_domain_extrapolated"
         else:
             ln_band = (None, None)
             band_kind = "unbounded_model_form"
             domain_status = "in_domain_model_form_unbounded"
+        derivation = {
+            "model": "declared_ideal_solution",
+            "algebra": "ln(a_i)=ln(X_i)",
+            "composition_basis": query.composition_basis,
+            "certification_ceiling": "never",
+        }
+        if extrapolation_notice is not None:
+            derivation["extrapolation_notice"] = extrapolation_notice
         return SourceReactionActivity(
             component_id=query.component_id,
             value=mole_fraction,
@@ -2127,12 +2161,7 @@ class MeltActivityResolver:
                 query.state_fingerprint,
                 str(query.target_standard_state.identity_id),
             ),
-            derivation={
-                "model": "declared_ideal_solution",
-                "algebra": "ln(a_i)=ln(X_i)",
-                "composition_basis": query.composition_basis,
-                "certification_ceiling": "never",
-            },
+            derivation=derivation,
         )
 
     def adapt_legacy_value(
@@ -2278,16 +2307,6 @@ class MeltActivityResolver:
                 tier=ActivityTier.A,
                 model_row_id=row_id,
             )
-        minimum_K = 1200.0 + 273.15
-        maximum_K = 1630.0 + 273.15
-        if not minimum_K <= query.temperature_K <= maximum_K:
-            return self._refusal(
-                query,
-                ActivityRefusalCode.REDOX_MODEL_OUT_OF_DOMAIN,
-                "Kress-Carmichael authoritative calibration is 1200-1630 C",
-                tier=ActivityTier.A,
-                model_row_id=row_id,
-            )
         if not query.composition_wt_pct:
             return self._refusal(
                 query,
@@ -2297,9 +2316,24 @@ class MeltActivityResolver:
                 model_row_id=row_id,
             )
         from simulator.fe_redox import (
+            KRESS91_LIQUID_CALIBRATION_MAX_T_C,
+            KRESS91_LIQUID_CALIBRATION_MIN_T_C,
             calphad_ferrous_feo_activity_diagnostic,
             kress91_ferrous_feo_activity,
+            kress91_temperature_band_case,
         )
+
+        band = kress91_temperature_band_case(
+            query.temperature_K - CELSIUS_TO_KELVIN_OFFSET
+        )
+        if band["status"] == "refused":
+            return self._refusal(
+                query,
+                ActivityRefusalCode.REDOX_STATE_UNRESOLVED,
+                "Kress-Carmichael temperature is not finite",
+                tier=ActivityTier.A,
+                model_row_id=row_id,
+            )
 
         if query.redox_model_pressure_bar is None:
             return self._refusal(
@@ -2351,6 +2385,29 @@ class MeltActivityResolver:
         source_standard_state = self.registry.row_standard_state(
             row, "source_standard_state"
         )
+        domain_status = "source_basis_in_domain_target_conversion_unresolved"
+        derivation = {
+            "formulation": "Kress-Carmichael-1991 with current FeO authority blend",
+            "model_version": "REF-001-kress-carmichael-1991",
+            "composition_basis": "oxide_weight_percent_to_Kress91_mole_fraction",
+            "intrinsic_fO2_log10": query.intrinsic_fO2_log10,
+            "temperature_K": query.temperature_K,
+            "pressure_bar": pressure_control,
+            "target_conversion_status": "mu0_target_pending",
+            "redox_receipt": diagnostic,
+        }
+        if band["extrapolation"]:
+            domain_status = "out_of_domain_extrapolated"
+            derivation["extrapolation_notice"] = {
+                "reason": str(band["source"]),
+                "authority_level": "extrapolated",
+                "certified_band": {
+                    "temperature_C": [
+                        float(KRESS91_LIQUID_CALIBRATION_MIN_T_C),
+                        float(KRESS91_LIQUID_CALIBRATION_MAX_T_C),
+                    ],
+                },
+            }
         return SourceReactionActivity(
             component_id="FeO",
             value=typed_value,
@@ -2368,7 +2425,7 @@ class MeltActivityResolver:
             report_label="shadow-only-not-point",
             tier=ActivityTier.A,
             model_row_id=row_id,
-            domain_status="source_basis_in_domain_target_conversion_unresolved",
+            domain_status=domain_status,
             source_standard_state=source_standard_state,
             target_standard_state=query.target_standard_state,
             attempts=(
@@ -2382,16 +2439,7 @@ class MeltActivityResolver:
                 query.state_fingerprint,
                 str(query.target_standard_state.identity_id),
             ),
-            derivation={
-                "formulation": "Kress-Carmichael-1991 with current FeO authority blend",
-                "model_version": "REF-001-kress-carmichael-1991",
-                "composition_basis": "oxide_weight_percent_to_Kress91_mole_fraction",
-                "intrinsic_fO2_log10": query.intrinsic_fO2_log10,
-                "temperature_K": query.temperature_K,
-                "pressure_bar": pressure_control,
-                "target_conversion_status": "mu0_target_pending",
-                "redox_receipt": diagnostic,
-            },
+            derivation=derivation,
         )
 
     def unsupported_reservoir_results(

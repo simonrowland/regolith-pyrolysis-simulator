@@ -13,6 +13,7 @@ from pathlib import Path
 from typing import Any, Mapping
 
 from simulator.accounting.formulas import parse_formula
+from simulator.alpha_kinetics import ANALYTICAL_UPPER_BOUND_ALPHA_STATUS
 from simulator.reference_data.janaf import feedstock_element_symbols
 from simulator.trace_oxide_parents import (
     ACTIVITY_BASIS,
@@ -29,6 +30,7 @@ from simulator.vapour_rail.source_rail import (
 from simulator.vapour_rail.stoich import (
     balance_oxide_evaporation,
     derive_stoich_oxide_per_vapor,
+    oxygen_fugacity_plane,
     strip_phase,
 )
 from simulator.yaml_cache import load_cached_safe_yaml
@@ -167,6 +169,7 @@ def _four_strata_family(
     bands_K: Mapping[str, tuple[float, float]],
     oxide_per_vapor: float,
     o2_per_vapor: float,
+    vapor_oxygen_atoms: float,
 ) -> dict[str, Any]:
     family_id = f"t1139_{element}_{carrier}_family"
     return {
@@ -218,7 +221,9 @@ def _four_strata_family(
                             },
                             "activity_exponent": 0.0,
                             "pO2_reference_bar": 1.0,
-                            "oxygen_fugacity_channel": "transport_headspace",
+                            "oxygen_fugacity_channel": oxygen_fugacity_plane(
+                                vapor_oxygen_atoms=vapor_oxygen_atoms
+                            ),
                         }
                     ],
                 }
@@ -239,9 +244,8 @@ def _four_strata_family(
         },
         "vaporisation_coefficients": {
             "evaporation_alpha": {
-                "status": "no_data",
-                "policy": "refuse_nonzero_flux",
-                "compatibility_policy_field": "refuse_nonzero_flux",
+                "value": 1.0,
+                "status": ANALYTICAL_UPPER_BOUND_ALPHA_STATUS,
             },
             "alpha_domain_and_uncertainty": {},
             "extrapolation_policy": "conservative_slope_continuation",
@@ -312,11 +316,12 @@ def generate_element_channels(
             continue
         try:
             bare = strip_phase(formula)
+            vapor_atoms = _formula_atoms(bare)
             reaction = balance_oxide_evaporation(
                 parent_oxide,
                 bare,
                 parent_atoms=_formula_atoms(parent_oxide),
-                vapor_atoms=_formula_atoms(bare),
+                vapor_atoms=vapor_atoms,
             )
         except ValueError as exc:
             gaps.append(
@@ -421,6 +426,7 @@ def generate_element_channels(
             },
             oxide_per_vapor=oxide,
             o2_per_vapor=o2,
+            vapor_oxygen_atoms=float(vapor_atoms.get("O", 0.0)),
         )
         family_id = f"t1139_{element}_{carrier}_family"
         payload_family = {family_id: family}

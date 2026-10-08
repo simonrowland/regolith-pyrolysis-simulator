@@ -45,6 +45,7 @@ from simulator.physical_constants import (
 )
 from simulator.battery.enums import NoticeKind
 from simulator.yaml_cache import load_cached_safe_yaml
+from simulator.vapour_rail.activity import trace_parent_gamma_report
 from simulator.vapour_rail.engine_crosscheck import divergence_label
 
 
@@ -944,6 +945,50 @@ def reported_activity_coefficients(result: Any) -> dict[str, float]:
         if number is not None and number > 0.0:
             gammas[str(name)] = number
     return gammas
+
+
+def trace_parent_activity_coefficient_emission(
+    temperature_K: float,
+    *,
+    rows: Sequence[Mapping[str, Any]] | None = None,
+) -> tuple[dict[str, float], dict[str, dict[str, Any]]]:
+    """Copy every trace parent's ladder gamma onto the scorer's maps.
+
+    The ladder owns the rung. This function does not choose one.
+    """
+
+    report = trace_parent_gamma_report(temperature_K, rows=rows)
+    gammas: dict[str, float] = {}
+    details: dict[str, dict[str, Any]] = {}
+    for formula, row in report.items():
+        notice = row.get("extrapolation_notice")
+        certified_band = (
+            notice.get("certified_band") if isinstance(notice, Mapping) else None
+        )
+        # Copy the ladder's basis. This function does not decide whether
+        # the source matches the target.
+        payload: dict[str, Any] = {
+            "value": row.get("gamma"),
+            "rung": row.get("rung"),
+            "source_row_id": row.get("source_row_id"),
+            "source_row_ids": list(row.get("source_row_ids") or ()),
+            "flag": row.get("flag"),
+            "origin": row.get("origin"),
+            "homologue": row.get("homologue"),
+            "verdict": row.get("verdict"),
+            "certified_band": certified_band,
+            "coefficient_formula": row.get("coefficient_formula"),
+            "source_basis": dict(row["source_basis"]),
+            "target_basis": dict(row["target_basis"]),
+        }
+        claim = row.get("standard_state")
+        if isinstance(claim, Mapping):
+            payload["standard_state"] = dict(claim)
+        details[str(formula)] = payload
+        number = _finite_float(row.get("gamma"))
+        if number is not None and number > 0.0:
+            gammas[str(formula)] = number
+    return gammas, details
 
 
 def _imcc_activity_coefficient_reports(
@@ -2442,11 +2487,18 @@ def _internal_analytical_vapor_pressure_adapter(
         "vapor_pressure_diagnostic": core_diagnostic,
         "imcc_notices": oxygen_notices,
     }
+    reported_gammas, coefficient_details = (
+        trace_parent_activity_coefficient_emission(
+            temperature + CELSIUS_TO_KELVIN_OFFSET
+        )
+    )
     return SimpleNamespace(
         status="ok",
         diagnostics=diagnostics,
         warnings=[],
         activity_coefficients=dict(core_diagnostic.get("activities") or {}),
+        reported_activity_coefficients=reported_gammas,
+        activity_coefficient_details=coefficient_details,
         vapor_pressures_Pa=dict(equilibrium.vapor_pressures_Pa or {}),
         vapor_pressures_source=dict(equilibrium.vapor_pressures_source or {}),
         vapor_pressure_backend_status=diagnostics["vapor_pressure_backend_status"],

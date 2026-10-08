@@ -21,8 +21,10 @@ from simulator.diagnostic_helpers.binary_pot_battery import (
     PO2_COMMANDED,
     Po2Request,
     _InternalAnalyticalInputRefusal,
-    _new_internal_analytical_core,
     _internal_analytical_vapor_pressure_adapter,
+    _new_internal_analytical_core,
+    reported_activity_coefficients,
+    trace_parent_activity_coefficient_emission,
 )
 from tests.battery import factories as F
 
@@ -58,6 +60,56 @@ def _hand_built_observation() -> tuple[object, Identity]:
         source_id="internal-analytical-test",
     )
     return observation, identity
+
+
+def test_internal_analytical_adapter_emits_trace_parent_coefficients() -> None:
+    """The vapor adapter copies ladder gamma. The kernel refresh is not the report."""
+
+    core = _new_internal_analytical_core()
+
+    def fast_refresh(equilibrium, **_kwargs):
+        equilibrium.vapor_pressures_Pa = {"Fe": 1.0}
+        equilibrium.vapor_pressures_source = {"Fe": "test"}
+        core._last_vapor_pressure_diagnostic = {
+            "activities": {},
+            "vapor_pressure_authority": {"status": "authoritative"},
+        }
+
+    core._refresh_vapor_pressures_from_kernel = fast_refresh
+    temperature_C = 1500.0 - 273.15
+    result = _internal_analytical_vapor_pressure_adapter(
+        core=core,
+        temperature_C=temperature_C,
+        pressure_bar=1.0,
+        composition_kg=None,
+        composition_mol={"SiO2": 0.5, "FeO": 0.3, "MgO": 0.2},
+        fO2_log=-9.0,
+        po2_request=Po2Request(mode=PO2_COMMANDED, po2_bar=1e-9),
+    )
+    from simulator.physical_constants import CELSIUS_TO_KELVIN_OFFSET
+
+    gammas, details = trace_parent_activity_coefficient_emission(
+        temperature_C + CELSIUS_TO_KELVIN_OFFSET
+    )
+    assert result.activity_coefficient_details == details
+    assert result.reported_activity_coefficients == gammas
+    assert reported_activity_coefficients(result) == gammas
+    assert result.vapor_pressures_Pa["Fe"] == 1.0
+    assert details["SnO"]["standard_state"] == {
+        "convention": "raoultian_pure_endmember",
+        "phase": "l",
+        "component_basis": "SnO",
+    }
+    assert details["SnO"]["source_basis"]["standard_state_as_printed"] == (
+        "not stated in Table 2 row"
+    )
+    assert details["SnO"]["source_basis"]["convention"] == "raoultian_pure_endmember"
+    assert details["SnO"]["flag"] == "extrapolated"
+    assert details["SnO"]["target_basis"]["component_basis"] == "SnO"
+    assert details["SnO"]["target_basis"]["phase"] == "liquid"
+    assert details["SnO"]["rung"] == 2
+    assert details["SnO"]["flag"]
+    assert details["SnO"]["source_row_id"]
 
 
 def test_internal_analytical_observation_uses_core_vapor_pressure_intent() -> None:

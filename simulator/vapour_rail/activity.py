@@ -16,9 +16,10 @@ import json
 import math
 import re
 from collections.abc import Mapping, Sequence
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, replace
 from decimal import Decimal
 from enum import Enum
+from pathlib import Path
 from typing import Any, Final
 
 import numpy as np
@@ -27,7 +28,14 @@ from simulator.chemistry.melt_activity import (
     MELT_OXIDE_ACTIVITY_TIER,
     MELT_OXIDE_IDEAL_ASSERTION_TIER,
     MELT_OXIDE_IDEAL_SOLUTION_MODEL,
+    activities_from_molecular_henrian_row,
     melt_oxide_activity_coefficient,
+    pure_liquid_reference_coefficient,
+)
+from simulator.trace_oxide_parents import (
+    ACTIVITY_BASIS,
+    LIQUID_PARENT_OXIDE,
+    ledger_component_key,
 )
 from simulator.physical_constants import GAS_CONSTANT
 from simulator.scalar_boundary import is_declared_real_scalar
@@ -780,6 +788,7 @@ def henrian_unknown_gamma_upper_bound(
     mole_fraction: float | None = None,
     state_fingerprint: str | None = None,
     solve_group_id: str | None = None,
+    gamma_anchor: float | None = None,
 ) -> SourceReactionActivity:
     """Classify a unity-gamma activity by the coefficient *property*.
 
@@ -865,8 +874,47 @@ def henrian_unknown_gamma_upper_bound(
     ):
         x_value = None
 
-    coeff = melt_oxide_activity_coefficient(component_id)
-    if coeff is None or x_value is None:
+    supplied_gamma: float | None
+    if gamma_anchor is None:
+        supplied_gamma = None
+    else:
+        try:
+            if not is_declared_real_scalar(
+                gamma_anchor,
+                allow_numeric_str=True,
+            ):
+                raise TypeError
+            supplied_gamma = float(gamma_anchor)
+        except (TypeError, ValueError):
+            supplied_gamma = math.nan
+        if not math.isfinite(supplied_gamma) or supplied_gamma <= 0.0:
+            return SourceReactionActivity(
+                component_id=component_id,
+                value=None,
+                verdict=ActivityVerdictKind.REFUSAL,
+                bound_direction=None,
+                reason=REASON_HENRIAN_GAMMA_UNMEASURED,
+                standard_state=standard_state,
+                phase_assemblage_ref=None,
+                chemical_potential_ref=None,
+                state_fingerprint=state_fingerprint,
+                solve_group_id=solve_group_id,
+                provider="henrian_bound_policy",
+                authority=False,
+                report_label=BOUND_NOT_POINT,
+                refusal_code=ActivityRefusalCode.MISSING_EVIDENCE,
+                detail=(
+                    "unity-gamma bound requires a finite positive gamma_anchor; "
+                    f"got {gamma_anchor!r}"
+                ),
+            )
+
+    coeff = (
+        None
+        if supplied_gamma is not None
+        else melt_oxide_activity_coefficient(component_id)
+    )
+    if supplied_gamma is None and (coeff is None or x_value is None):
         assumed_activity = x_value if x_value is not None else 1.0
         missing = []
         if coeff is None:
@@ -903,7 +951,10 @@ def henrian_unknown_gamma_upper_bound(
             evidence_tier=MELT_OXIDE_IDEAL_ASSERTION_TIER,
         )
 
-    gamma_is_at_most_unity = float(coeff.gamma) <= 1.0
+    gamma_value = (
+        supplied_gamma if supplied_gamma is not None else float(coeff.gamma)
+    )
+    gamma_is_at_most_unity = gamma_value <= 1.0
     pressure_increases_with_activity = exponent >= 0.0
     is_upper = gamma_is_at_most_unity == pressure_increases_with_activity
     direction = BoundDirection.UPPER if is_upper else BoundDirection.LOWER
@@ -939,11 +990,17 @@ def henrian_unknown_gamma_upper_bound(
             "limiting_case": "gamma=1 makes the bound exact at a=X",
             "activity_exponent": exponent,
             "mole_fraction": x_value,
-            "gamma_anchor": float(coeff.gamma),
+            "gamma_anchor": gamma_value,
             "gamma_property": "gamma<=1" if gamma_is_at_most_unity else "gamma>1",
-            "coefficient_domain_K": coeff.valid_range_K,
+            "coefficient_domain_K": (
+                None if supplied_gamma is not None else coeff.valid_range_K
+            ),
         },
-        evidence_ref=coeff.citation,
+        evidence_ref=(
+            "henrian_unknown_gamma_upper_bound"
+            if supplied_gamma is not None
+            else coeff.citation
+        ),
         evidence_tier=MELT_OXIDE_ACTIVITY_TIER,
     )
 
@@ -1022,6 +1079,7 @@ class CondensedPhaseActivityProvider:
         reported_activity_standard_state: StandardStateIdentity | None = None,
         reported_activity_provenance: Mapping[str, Any] | None = None,
         compound_bearing_state: bool = False,
+        temperature_K: float | None = None,
     ) -> SourceReactionActivity:
         """Answer one ``activity_input`` declaration with a typed activity."""
 
@@ -1248,6 +1306,28 @@ class CondensedPhaseActivityProvider:
             )
 
         if magemin is None and thermoengine is None:
+            if (
+                declaration.allow_henrian_upper_bound
+                and is_trace_parent_component(declaration.component_id)
+            ):
+                if temperature_K is None:
+                    return _refusal(
+                        declaration.component_id,
+                        ActivityRefusalCode.MISSING_EVIDENCE,
+                        "trace parent activity requires temperature_K",
+                        standard_state=declaration.standard_state,
+                        state_fingerprint=state_fingerprint,
+                        solve_group_id=solve_group_id,
+                    )
+                return resolve_trace_parent_activity(
+                    declaration.component_id,
+                    temperature_K=temperature_K,
+                    activity_exponent=activity_exponent,
+                    standard_state=declaration.standard_state,
+                    mole_fraction=mole_fraction,
+                    state_fingerprint=state_fingerprint,
+                    solve_group_id=solve_group_id,
+                )
             if declaration.allow_henrian_upper_bound:
                 return henrian_unknown_gamma_upper_bound(
                     component_id=declaration.component_id,
@@ -1529,6 +1609,1277 @@ def _stable_hash(payload: Any) -> str:
     return hashlib.sha256(encoded).hexdigest()[:24]
 
 
+_FEGLEY_GAMMA_TABLE = (
+    Path(__file__).resolve().parents[2]
+    / "data"
+    / "vapour_rail"
+    / "fegley2023_table2_gamma.json"
+)
+_PROXY_SET_EQUAL = re.compile(r"\bset\s*=", re.IGNORECASE)
+_PROXY_INTERPOLATED = re.compile(r"interpolat", re.IGNORECASE)
+# Oxide formula as printed in a gamma note: GeO2, SiO2, AsO1.5, CuO0.5.
+_OXIDE_IN_NOTE = r"[A-Z][a-z]?\d*O\d*(?:\.\d+)?"
+# g(this) = g(other), including a "log" between the equals and the second g.
+_GAMMA_EQUALS_OTHER = re.compile(
+    rf"g\s*\(\s*({_OXIDE_IN_NOTE})\s*\)\s*=\s*(?:log\s*)?g\s*\(\s*({_OXIDE_IN_NOTE})\s*\)",
+    re.IGNORECASE,
+)
+# g(oxide), including the spaced ``g (AsO1.5)`` printed in Table 2.
+_GAMMA_OF_OXIDE = re.compile(
+    rf"g\s*\(\s*({_OXIDE_IN_NOTE})\s*\)",
+    re.IGNORECASE,
+)
+_MOLECULAR_FRACTION_BASIS = "conventional_oxide_molecular"
+_TRACE_HOMOLOGUE = {
+    "Rb2O": "K2O",
+    "Cs2O": "K2O",
+    "Li2O": "Na2O",
+    "Ga2O3": "Al2O3",
+    "GeO2": "SiO2",
+    "In2O3": "Ga2O3",
+}
+# Author's stated nominal: formula, a phrase that appears in that row's
+# note, and the Fegley 2023 text that names it. Exactly one matching row
+# is the nominal. This is not a residual ranking.
+_SOURCE_STATED_NOMINAL: tuple[tuple[str, str, str], ...] = (
+    ("Cu2O", "Altman (1978)", "fegley2023:1636-1641"),
+    ("Cs2O", "set = g(Na2O) FactSage", "fegley2023:1398-1400"),
+)
+# Whole phase tokens only. ``liquid`` matches ``l``; a longer string that
+# merely contains one of these tokens does not.
+_PHASE_TOKEN_GROUPS: tuple[frozenset[str], ...] = (
+    frozenset({"liquid", "l"}),
+    frozenset({"solid", "s", "cr"}),
+)
+_FEGLEY_GAMMA_CACHE: dict[str, Any] | None = None
+
+
+def is_trace_parent_component(component_id: str) -> bool:
+    """True for a generator parent oxide or its activity-basis spelling."""
+
+    bare = ledger_component_key(str(component_id))
+    return bare in set(LIQUID_PARENT_OXIDE.values()) or bare in set(
+        ACTIVITY_BASIS.values()
+    )
+
+
+def coefficient_formula(component_id: str) -> str:
+    """Conventional oxide formula whose Table 2 rows answer this component."""
+
+    bare = ledger_component_key(str(component_id))
+    if bare in set(LIQUID_PARENT_OXIDE.values()) or bare in _TRACE_HOMOLOGUE:
+        return bare
+    for element, basis in ACTIVITY_BASIS.items():
+        if bare == basis:
+            return LIQUID_PARENT_OXIDE[element]
+    return bare
+
+
+def _proxy_notes(notes: str) -> bool:
+    """True when the row's origin text borrows another component's gamma.
+
+    ``set =`` and interpolation wording are proxies. So is an equality of
+    one component's gamma to another's, read from the whole note:
+    ``g(GeO2) = g(SiO2) from FactSage``. A numeric assignment of this
+    component's own gamma (``g(GeO2) = 7.4``, ``Set log g(B2O3) = -3.2``)
+    is not that equality.
+    """
+
+    if _PROXY_SET_EQUAL.search(notes) is not None:
+        return True
+    if _PROXY_INTERPOLATED.search(notes) is not None:
+        return True
+    for match in _GAMMA_EQUALS_OTHER.finditer(notes):
+        if match.group(1).casefold() != match.group(2).casefold():
+            return True
+    return False
+
+
+def _component_basis_derived(row: Mapping[str, Any]) -> bool:
+    """True when the note assigns the gamma to a different oxide.
+
+    ``g(AsO1.5)`` on an As2O3 row is that case: Table 2 stores some
+    M2O3 rows on the one-cation component and some not. A melt system
+    in the note (``CMAS+FeO``, a ternary) does not assign the gamma.
+    """
+
+    formula = str(row.get("formula") or "")
+    notes = str(row.get("notes_as_printed") or "")
+    for match in _GAMMA_OF_OXIDE.finditer(notes):
+        if match.group(1).casefold() != formula.casefold():
+            return True
+    return False
+
+
+def _optional_row_text(raw: Mapping[str, Any], key: str) -> str | None:
+    value = raw.get(key)
+    if value is None:
+        return None
+    text = str(value).strip()
+    return text or None
+
+
+def _normalize_gamma_row(raw: Mapping[str, Any]) -> dict[str, Any]:
+    notes = str(raw.get("notes_as_printed") or "")
+    origin = raw.get("origin")
+    if origin not in {"published", "proxy_estimate"}:
+        origin = "proxy_estimate" if _proxy_notes(notes) else "published"
+    band = raw.get("validity_range_K")
+    if band is not None:
+        band = [float(band[0]), float(band[1])]
+    printed = raw.get("standard_state_as_printed")
+    stated_convention = raw.get("stated_convention")
+    stated_phase = raw.get("stated_phase")
+    return {
+        "source_row_id": str(raw.get("source_row_id") or ""),
+        "formula": str(raw.get("formula") or ""),
+        "A": str(raw.get("A")),
+        "B": str(raw.get("B")),
+        "validity_range_K": band,
+        "notes_as_printed": notes,
+        "origin": origin,
+        "standard_state_as_printed": None if printed is None else str(printed),
+        "stated_convention": (
+            None if not stated_convention else str(stated_convention)
+        ),
+        "stated_phase": None if not stated_phase else str(stated_phase),
+        "mole_fraction_basis": _optional_row_text(raw, "mole_fraction_basis"),
+        "stated_basis_cite": _optional_row_text(raw, "stated_basis_cite"),
+    }
+
+
+def load_fegley2023_gamma_table() -> dict[str, Any]:
+    """Runtime Table 2 rows. Provenance names the extract and its sha256."""
+
+    global _FEGLEY_GAMMA_CACHE
+    if _FEGLEY_GAMMA_CACHE is None:
+        _FEGLEY_GAMMA_CACHE = json.loads(
+            _FEGLEY_GAMMA_TABLE.read_text(encoding="utf-8")
+        )
+    return _FEGLEY_GAMMA_CACHE
+
+
+def _gamma_rows(rows: Sequence[Mapping[str, Any]] | None) -> tuple[dict[str, Any], ...]:
+    source = (
+        load_fegley2023_gamma_table()["rows"] if rows is None else rows
+    )
+    return tuple(_normalize_gamma_row(row) for row in source)
+
+
+def _gamma_at(row: Mapping[str, Any], temperature_K: float) -> float:
+    # log10 γ = A + B/T, T in K. Owner of the Table 2 numeric evaluation.
+    exponent = float(row["A"]) + float(row["B"]) / float(temperature_K)
+    gamma = 10.0 ** exponent
+    if not math.isfinite(gamma) or gamma <= 0.0:
+        raise ValueError(
+            f"non-finite gamma for {row.get('source_row_id')!r} at {temperature_K}"
+        )
+    return gamma
+
+
+def _row_extrapolated(row: Mapping[str, Any], temperature_K: float) -> bool:
+    band = row.get("validity_range_K")
+    if band is None:
+        return False
+    return float(temperature_K) < float(band[0]) or float(temperature_K) > float(
+        band[1]
+    )
+
+
+def _extrapolation_notice(
+    row: Mapping[str, Any], temperature_K: float
+) -> dict[str, Any] | None:
+    if not _row_extrapolated(row, temperature_K):
+        return None
+    band = row.get("validity_range_K")
+    return {
+        "reason": "temperature outside the fit validity range",
+        "authority_level": "extrapolated",
+        "certified_band": {
+            "temperature_K": [float(band[0]), float(band[1])],
+        },
+    }
+
+
+def _candidate_record(
+    row: Mapping[str, Any], temperature_K: float
+) -> dict[str, Any]:
+    return {
+        "source_row_id": row["source_row_id"],
+        "gamma": _gamma_at(row, temperature_K),
+        "origin": row["origin"],
+        "extrapolated": _row_extrapolated(row, temperature_K),
+        "validity_range_K": row.get("validity_range_K"),
+        "notes_as_printed": row["notes_as_printed"],
+    }
+
+
+def _select_gamma_rows(
+    formula: str, rows: Sequence[Mapping[str, Any]]
+) -> tuple[str, tuple[Mapping[str, Any], ...]]:
+    matched = tuple(row for row in rows if row["formula"] == formula)
+    published = tuple(row for row in matched if row["origin"] == "published")
+    proxies = tuple(row for row in matched if row["origin"] == "proxy_estimate")
+    if len(published) == 1:
+        return "one", published
+    if len(published) > 1:
+        return "many", published
+    if len(proxies) == 1:
+        return "one", proxies
+    if len(proxies) > 1:
+        return "many", proxies
+    return "none", ()
+
+
+def _stated_band(row: Mapping[str, Any]) -> tuple[float, float] | None:
+    band = row.get("validity_range_K")
+    if not isinstance(band, (list, tuple)) or len(band) != 2:
+        return None
+    low = float(band[0])
+    high = float(band[1])
+    if not math.isfinite(low) or not math.isfinite(high) or high < low:
+        return None
+    return low, high
+
+
+def _band_distance(band: tuple[float, float], temperature_K: float) -> float:
+    low, high = band
+    if temperature_K < low:
+        return low - temperature_K
+    if temperature_K > high:
+        return temperature_K - high
+    return 0.0
+
+
+def _select_banded_row(
+    rows: Sequence[Mapping[str, Any]], temperature_K: float
+) -> Mapping[str, Any] | None:
+    """The stated band that covers T, otherwise the unique nearest band.
+
+    A missing validity range is not a band and is never chosen. A point
+    temperature named only in the notes (``1673 K point``) is not a band
+    either: the note is not parsed into ``validity_range_K``. The lowest
+    residual is not a selector. Several covering bands, or two bands at the
+    same distance, means this rule does not apply.
+    """
+
+    covering: list[Mapping[str, Any]] = []
+    banded: list[tuple[float, str, Mapping[str, Any]]] = []
+    for row in rows:
+        band = _stated_band(row)
+        if band is None:
+            continue
+        distance = _band_distance(band, temperature_K)
+        banded.append((distance, str(row.get("source_row_id") or ""), row))
+        if distance == 0.0:
+            covering.append(row)
+    if len(covering) == 1:
+        return covering[0]
+    if len(covering) > 1:
+        return None
+    if not banded:
+        return None
+    banded.sort(key=lambda item: (item[0], item[1]))
+    if len(banded) > 1 and banded[0][0] == banded[1][0]:
+        return None
+    return banded[0][2]
+
+
+def _stated_nominal_row(
+    formula: str, rows: Sequence[Mapping[str, Any]]
+) -> tuple[Mapping[str, Any], str] | None:
+    """The unique row whose note contains the source's stated nominal.
+
+    The scan includes proxies. A published-only filter would hide a
+    nominal the author placed on a proxy row. Several matches, or a note
+    that contains two recorded phrases, is not a nominal.
+    """
+
+    phrases = tuple(item for item in _SOURCE_STATED_NOMINAL if item[0] == formula)
+    if not phrases:
+        return None
+    matched: list[tuple[Mapping[str, Any], str]] = []
+    for row in rows:
+        notes = str(row.get("notes_as_printed") or "")
+        hits = tuple(cite for _formula, phrase, cite in phrases if phrase in notes)
+        if len(hits) > 1:
+            return None
+        if len(hits) == 1:
+            matched.append((row, hits[0]))
+    if len(matched) != 1:
+        return None
+    return matched[0]
+
+
+def _geometric_mean(values: Sequence[float]) -> float:
+    ordered = tuple(sorted(float(value) for value in values))
+    return math.exp(sum(math.log(value) for value in ordered) / len(ordered))
+
+
+def _extreme_gamma_row(
+    rows: Sequence[Mapping[str, Any]],
+    temperature_K: float,
+    *,
+    high: bool,
+) -> Mapping[str, Any]:
+    """Row at one edge of the envelope. A tie keeps the smaller source id."""
+
+    def key(row: Mapping[str, Any]) -> tuple[float, str]:
+        gamma = _gamma_at(row, temperature_K)
+        identity = str(row.get("source_row_id") or "")
+        return (-gamma if high else gamma, identity)
+
+    return min(rows, key=key)
+
+
+def _envelope_ln_band(
+    *,
+    parent_formula: str,
+    parent_gamma: float,
+    gamma_min: float,
+    gamma_max: float,
+    mole_fraction: float | None,
+    single_cation: bool,
+) -> tuple[float, float] | None:
+    """Activity-ln offsets of the candidate envelope around the chosen value.
+
+    The offsets enclose zero. They are absent when the activity is not a
+    positive finite number. An alias uses ``a_single = a_parent ** (1/c)``.
+    The envelope gammas stay on the parent-row basis. This is an activity
+    band, not a pressure band: the activity exponent does not flip it.
+    """
+
+    if (
+        mole_fraction is None
+        or parent_gamma <= 0.0
+        or gamma_min <= 0.0
+        or gamma_max <= 0.0
+    ):
+        return None
+    try:
+        fraction = float(mole_fraction)
+    except (TypeError, ValueError):
+        return None
+    if not math.isfinite(fraction) or fraction <= 0.0:
+        return None
+
+    def activity(gamma: float) -> float | None:
+        if single_cation:
+            pair = activities_from_molecular_henrian_row(
+                parent_formula, gamma, fraction
+            )
+            if pair is None:
+                return None
+            chosen = pair[1]
+        else:
+            chosen = gamma * fraction
+        if not math.isfinite(chosen) or chosen <= 0.0:
+            return None
+        return chosen
+
+    selected = activity(parent_gamma)
+    low = activity(gamma_min)
+    high = activity(gamma_max)
+    if selected is None or low is None or high is None:
+        return None
+    lower = math.log(low / selected)
+    upper = math.log(high / selected)
+    if not (math.isfinite(lower) and math.isfinite(upper) and lower <= 0.0 <= upper):
+        return None
+    return (lower, upper)
+
+
+def _annotate(
+    answer: SourceReactionActivity, **extra: Any
+) -> SourceReactionActivity:
+    derivation = dict(answer.derivation)
+    derivation.update(extra)
+    return replace(answer, derivation=derivation)
+
+
+def _activity_value(
+    gamma: float | None, mole_fraction: float | None
+) -> float | None:
+    if gamma is None or mole_fraction is None:
+        return None
+    value = float(gamma) * float(mole_fraction)
+    if not math.isfinite(value) or value < 0.0:
+        return None
+    return value
+
+
+def _ladder_result(
+    *,
+    component_id: str,
+    standard_state: StandardStateIdentity,
+    state_fingerprint: str | None,
+    solve_group_id: str | None,
+    rung: int,
+    gamma: float | None,
+    mole_fraction: float | None,
+    verdict: ActivityVerdictKind,
+    flag: str,
+    reason: str,
+    source_row_id: str | None,
+    source_row_ids: tuple[str, ...],
+    origin: str | None,
+    homologue: str | None,
+    coefficient_formula: str | None,
+    extrapolation_notice: Mapping[str, Any] | None,
+    candidate_rows: Sequence[Mapping[str, Any]],
+    tier: ActivityTier,
+    target_flag: str | None = None,
+    target_rung: int | None = None,
+) -> SourceReactionActivity:
+    status_bearing = verdict is not ActivityVerdictKind.POINT
+    return SourceReactionActivity(
+        component_id=component_id,
+        value=_activity_value(gamma, mole_fraction),
+        verdict=verdict,
+        bound_direction=None,
+        reason=reason,
+        standard_state=standard_state,
+        phase_assemblage_ref=None,
+        chemical_potential_ref=None,
+        state_fingerprint=state_fingerprint,
+        solve_group_id=solve_group_id,
+        provider="trace_parent_activity_ladder",
+        authority=False,
+        report_label=STATUS_BEARING_NOT_POINT if status_bearing else None,
+        tier=tier,
+        model_row_id=source_row_id,
+        evidence_ref=source_row_id,
+        evidence_tier=origin or flag,
+        derivation={
+            "rung": rung,
+            "gamma": gamma,
+            "source_row_id": source_row_id,
+            "source_row_ids": source_row_ids,
+            "flag": flag,
+            "origin": origin,
+            "homologue": homologue,
+            "coefficient_formula": coefficient_formula,
+            "extrapolation_notice": (
+                None
+                if extrapolation_notice is None
+                else dict(extrapolation_notice)
+            ),
+            "candidate_rows": tuple(dict(row) for row in candidate_rows),
+            "target_flag": target_flag,
+            "target_rung": target_rung,
+            "algebra": "log10 gamma = A + B/T",
+        },
+    )
+
+
+def _same_phase_token(left: str, right: str) -> bool:
+    """True when both strings are the same phase token.
+
+    Membership is exact. ``"l" in "liquid"`` is a substring test and is
+    not used.
+    """
+
+    first = str(left).strip()
+    second = str(right).strip()
+    if not first or not second:
+        return False
+    if first == second:
+        return True
+    return any(
+        first in group and second in group for group in _PHASE_TOKEN_GROUPS
+    )
+
+
+def _closed_phase_token(phase: object) -> str | None:
+    """Phase token the coefficient scorer compares.
+
+    ``liquid`` and ``l`` close to ``l``. ``solid``, ``s``, and ``cr``
+    close to ``cr``. The match is group membership. A string that only
+    contains one of those tokens is not a phase.
+    """
+
+    text = str(phase).strip()
+    if not text:
+        return None
+    for group in _PHASE_TOKEN_GROUPS:
+        if text not in group:
+            continue
+        closed = group & {"l", "cr"}
+        if len(closed) == 1:
+            return next(iter(closed))
+    return None
+
+
+def _basis_annotation(
+    *,
+    row: Mapping[str, Any] | None,
+    standard_state: StandardStateIdentity,
+    established: bool,
+) -> dict[str, Any]:
+    """Source and target basis carried with one ladder answer.
+
+    A printed Table 2 phrase is the source text. It is not a convention
+    and it is not a phase. Stated convention and phase are the source
+    when the row carries them, including when the table also prints that
+    the row itself did not state a standard state. With neither, an
+    established row stands on the caller's identity.
+    """
+
+    printed = None if row is None else row.get("standard_state_as_printed")
+    stated_convention = None if row is None else row.get("stated_convention")
+    stated_phase = None if row is None else row.get("stated_phase")
+    derived = False if row is None else _component_basis_derived(row)
+    if stated_convention and stated_phase and not derived:
+        source_convention = stated_convention
+        source_phase = stated_phase
+    elif printed is not None:
+        source_convention = None
+        source_phase = None
+    elif established:
+        source_convention = standard_state.convention
+        source_phase = standard_state.phase
+    else:
+        source_convention = None
+        source_phase = None
+    return {
+        "basis_established": established,
+        "component_basis_derived": derived,
+        "row_formula": None if row is None else str(row["formula"]),
+        "standard_state_as_printed": None if printed is None else printed,
+        "source_convention": source_convention,
+        "source_phase": source_phase,
+        "mole_fraction_basis": None if row is None else row.get("mole_fraction_basis"),
+        "stated_basis_cite": None if row is None else row.get("stated_basis_cite"),
+        "target_convention": standard_state.convention,
+        "target_phase": standard_state.phase,
+    }
+
+
+def _standard_state_established(
+    row: Mapping[str, Any], standard_state: StandardStateIdentity
+) -> bool:
+    """True when the row's basis is the caller's standard state.
+
+    A printed Table 2 phrase is not a typed convention. ``not stated in
+    Table 2 row`` and ``liquid standard state`` do not by themselves
+    establish ``raoultian_pure_endmember``. Stated convention and phase
+    do, including beside that printed phrase, when they match the caller
+    and the mole-fraction basis is the conventional-oxide molecular one
+    or is absent. A note that assigns the gamma to a different oxide
+    does not establish the row formula's component.
+    A row with neither a printed phrase nor stated fields stands on the
+    caller's identity.
+    """
+
+    if _component_basis_derived(row):
+        return False
+    stated_convention = row.get("stated_convention")
+    stated_phase = row.get("stated_phase")
+    if stated_convention or stated_phase:
+        if not stated_convention or not stated_phase:
+            return False
+        fraction_basis = row.get("mole_fraction_basis")
+        if fraction_basis not in (None, _MOLECULAR_FRACTION_BASIS):
+            return False
+        return (
+            str(stated_convention) == standard_state.convention
+            and _same_phase_token(str(stated_phase), standard_state.phase)
+        )
+    if row.get("standard_state_as_printed") is not None:
+        return False
+    return True
+
+
+def _mark_derived_spelling(
+    answer: SourceReactionActivity,
+) -> SourceReactionActivity:
+    """An activity-basis conversion is not the stored row's component.
+
+    The parent row may be a point on the paper's basis. This spelling
+    keeps the converted activity and does not claim that standard state.
+    A value that was a point becomes ``component_basis_derived``. A
+    proxy, an extrapolation, or a nominal keeps its own flag.
+    """
+
+    answer = _annotate(
+        answer,
+        component_basis_derived=True,
+        basis_established=False,
+        source_convention=None,
+        source_phase=None,
+    )
+    if answer.verdict is not ActivityVerdictKind.POINT:
+        return answer
+    answer = replace(
+        answer,
+        verdict=ActivityVerdictKind.STATUS_BEARING_VALUE,
+        bound_direction=None,
+        reason="component_basis_derived",
+        report_label=STATUS_BEARING_NOT_POINT,
+    )
+    return _annotate(answer, flag="component_basis_derived")
+
+
+def _from_selected_row(
+    *,
+    component_id: str,
+    row: Mapping[str, Any],
+    temperature_K: float,
+    mole_fraction: float | None,
+    standard_state: StandardStateIdentity,
+    state_fingerprint: str | None,
+    solve_group_id: str | None,
+    coefficient_formula: str | None,
+) -> SourceReactionActivity:
+    gamma = _gamma_at(row, temperature_K)
+    notice = _extrapolation_notice(row, temperature_K)
+    published = row["origin"] == "published"
+    established = _standard_state_established(row, standard_state)
+    derived = _component_basis_derived(row)
+    if notice is not None:
+        flag = "extrapolated"
+        verdict = ActivityVerdictKind.STATUS_BEARING_VALUE
+        reason = (
+            "published_gamma_extrapolated"
+            if published
+            else "proxy_gamma_extrapolated"
+        )
+    elif published and established:
+        flag = "published"
+        verdict = ActivityVerdictKind.POINT
+        reason = "published_gamma"
+    elif published and derived:
+        flag = "component_basis_derived"
+        verdict = ActivityVerdictKind.STATUS_BEARING_VALUE
+        reason = "component_basis_derived"
+    elif published:
+        flag = "standard_state_basis_unestablished"
+        verdict = ActivityVerdictKind.STATUS_BEARING_VALUE
+        reason = "standard_state_basis_unestablished"
+    else:
+        flag = "proxy_estimate"
+        verdict = ActivityVerdictKind.STATUS_BEARING_VALUE
+        reason = "proxy_gamma_estimate"
+    answer = _ladder_result(
+        component_id=component_id,
+        standard_state=standard_state,
+        state_fingerprint=state_fingerprint,
+        solve_group_id=solve_group_id,
+        rung=2,
+        gamma=gamma,
+        mole_fraction=mole_fraction,
+        verdict=verdict,
+        flag=flag,
+        reason=reason,
+        source_row_id=str(row["source_row_id"]),
+        source_row_ids=(str(row["source_row_id"]),),
+        origin=str(row["origin"]),
+        homologue=None,
+        coefficient_formula=coefficient_formula,
+        extrapolation_notice=notice,
+        candidate_rows=(_candidate_record(row, temperature_K),),
+        tier=ActivityTier.B,
+    )
+    return _annotate(
+        answer,
+        **_basis_annotation(
+            row=row,
+            standard_state=standard_state,
+            established=established,
+        ),
+    )
+
+
+def _rung4(
+    *,
+    component_id: str,
+    activity_exponent: float,
+    standard_state: StandardStateIdentity,
+    mole_fraction: float | None,
+    state_fingerprint: str | None,
+    solve_group_id: str | None,
+    coefficient_formula: str | None,
+) -> SourceReactionActivity:
+    bound = henrian_unknown_gamma_upper_bound(
+        component_id=component_id,
+        activity_exponent=activity_exponent,
+        standard_state=standard_state,
+        mole_fraction=mole_fraction,
+        state_fingerprint=state_fingerprint,
+        solve_group_id=solve_group_id,
+        gamma_anchor=1.0,
+    )
+    if bound.verdict is ActivityVerdictKind.REFUSAL:
+        return bound
+    annotated = _annotate(
+        bound,
+        rung=4,
+        gamma=1.0,
+        source_row_id=None,
+        source_row_ids=(),
+        flag="henrian_gamma_unmeasured",
+        origin=None,
+        homologue=None,
+        coefficient_formula=coefficient_formula,
+        extrapolation_notice=None,
+        candidate_rows=(),
+        target_flag=None,
+        target_rung=None,
+        algebra="gamma = 1; a <= X when the activity exponent is non-negative",
+        **_basis_annotation(
+            row=None,
+            standard_state=standard_state,
+            established=False,
+        ),
+    )
+    return replace(annotated, tier=ActivityTier.C)
+
+
+def _retag_homologue(
+    *,
+    component_id: str,
+    homologue: str,
+    followed: SourceReactionActivity,
+    mole_fraction: float | None,
+    standard_state: StandardStateIdentity,
+    state_fingerprint: str | None,
+    solve_group_id: str | None,
+    coefficient_formula: str | None,
+) -> SourceReactionActivity:
+    derivation = followed.derivation
+    # The followed row's basis is that other component's. It does not
+    # establish this parent's standard state.
+    answer = _ladder_result(
+        component_id=component_id,
+        standard_state=standard_state,
+        state_fingerprint=state_fingerprint,
+        solve_group_id=solve_group_id,
+        rung=3,
+        gamma=derivation.get("gamma"),
+        mole_fraction=mole_fraction,
+        verdict=ActivityVerdictKind.STATUS_BEARING_VALUE,
+        flag="homologue",
+        reason="homologue_gamma",
+        source_row_id=derivation.get("source_row_id"),
+        source_row_ids=tuple(derivation.get("source_row_ids") or ()),
+        origin=derivation.get("origin"),
+        homologue=homologue,
+        coefficient_formula=coefficient_formula,
+        extrapolation_notice=derivation.get("extrapolation_notice"),
+        candidate_rows=tuple(derivation.get("candidate_rows") or ()),
+        tier=ActivityTier.C,
+        target_flag=derivation.get("flag"),
+        target_rung=derivation.get("rung"),
+    )
+    return _annotate(
+        answer,
+        basis_established=False,
+        row_formula=derivation.get("row_formula"),
+        standard_state_as_printed=derivation.get("standard_state_as_printed"),
+        source_convention=derivation.get("source_convention"),
+        source_phase=derivation.get("source_phase"),
+        target_convention=standard_state.convention,
+        target_phase=standard_state.phase,
+    )
+
+
+def resolve_trace_parent_activity(
+    component_id: str,
+    *,
+    temperature_K: float,
+    activity_exponent: float,
+    standard_state: StandardStateIdentity,
+    mole_fraction: float | None = None,
+    rows: Sequence[Mapping[str, Any]] | None = None,
+    state_fingerprint: str | None = None,
+    solve_group_id: str | None = None,
+) -> SourceReactionActivity:
+    """Resolve one trace-parent gamma on the existing verdict types.
+
+    Rung 1 (openimcc N-parent pack) is absent. Rung 2 is a Table 2 fit.
+    One published row is that gamma on the row's own component. An
+    activity-basis spelling uses the row only after the pure-liquid
+    reference conversion; the lookup name is not the conversion, and that
+    spelling is not a published point. A printed standard-state phrase is
+    not a typed basis. Stated convention, phase, and the
+    conventional-oxide molecular fraction establish the caller when they
+    match, including beside that phrase. A note that assigns the gamma to
+    a different oxide is not a published point. One proxy row is a flagged
+    estimate. Several rows of
+    one origin are the row whose stated band covers T, or the unique
+    nearest band outside that range (flagged extrapolated). A point
+    temperature in the notes is not a band. The lowest residual is not a
+    selector. When that rule does not select and the source names a
+    nominal row, the nominal is a flagged rung-2 value and the candidate
+    envelope is its uncertainty. Published rows with no nominal are a
+    bound at the extreme gamma when every candidate lies on one side of
+    1, otherwise the geometric mean (``envelope_midpoint``). A unity
+    Henrian bound is not emitted against those measured rows. Otherwise
+    rung 3 follows the homologue when the target itself resolved at rung
+    2 or 3. Rung 4 is the unmeasured-gamma unity bound. Every non-refusal
+    result carries a numeric gamma.
+    """
+
+    try:
+        if not is_declared_real_scalar(temperature_K, allow_numeric_str=True):
+            raise TypeError
+        temperature = float(temperature_K)
+    except (TypeError, ValueError):
+        temperature = math.nan
+    if not math.isfinite(temperature) or temperature <= 0.0:
+        return _refusal(
+            component_id,
+            ActivityRefusalCode.MISSING_EVIDENCE,
+            "trace parent activity requires a finite positive temperature_K",
+            standard_state=standard_state,
+            state_fingerprint=state_fingerprint,
+            solve_group_id=solve_group_id,
+        )
+    try:
+        table = _gamma_rows(rows)
+    except (TypeError, ValueError, KeyError) as exc:
+        return _refusal(
+            component_id,
+            ActivityRefusalCode.MISSING_EVIDENCE,
+            f"trace parent gamma table is invalid: {exc}",
+            standard_state=standard_state,
+            state_fingerprint=state_fingerprint,
+            solve_group_id=solve_group_id,
+        )
+
+    bare = ledger_component_key(str(component_id))
+    formula = coefficient_formula(bare)
+    alias = formula if formula != bare else None
+
+    def _finish(answer: SourceReactionActivity) -> SourceReactionActivity:
+        if answer.verdict is ActivityVerdictKind.REFUSAL:
+            return answer
+        if answer.component_id != component_id or (
+            alias is not None and answer.derivation.get("coefficient_formula") != alias
+        ):
+            answer = replace(answer, component_id=component_id)
+            if alias is not None:
+                answer = _annotate(answer, coefficient_formula=alias)
+        return answer
+
+    def _apply_henrian_gamma(
+        current: str, parent_gamma: float
+    ) -> tuple[float, float | None] | None:
+        """Stored coefficient and activity for one parent-basis gamma.
+
+        An alias of the original request stores the pure-liquid reference
+        coefficient and ``a_single = a_parent ** (1/c)``. Any other
+        component stores the parent gamma and ``gamma * X``. None means
+        the alias relationship is not established.
+        """
+
+        if alias is None or current != formula:
+            return float(parent_gamma), _activity_value(parent_gamma, mole_fraction)
+        converted = pure_liquid_reference_coefficient(
+            row_formula=current,
+            requested_formula=bare,
+            row_gamma=float(parent_gamma),
+        )
+        if converted is None:
+            return None
+        if mole_fraction is None:
+            return converted, None
+        pair = activities_from_molecular_henrian_row(
+            current, float(parent_gamma), float(mole_fraction)
+        )
+        if pair is None:
+            return None
+        return converted, pair[1]
+
+    def _accept_row_basis(
+        current: str, row: Mapping[str, Any]
+    ) -> SourceReactionActivity | None:
+        """Keep a selected row, converting an activity-basis spelling.
+
+        Conversion runs only on the lookup formula of the original
+        request (InO1.5 reads In2O3). A homologue hop is a different
+        element and is not cation-converted. None means the component
+        relationship is not established: the caller must not reuse the
+        row gamma.
+        """
+
+        answer = _from_selected_row(
+            component_id=component_id,
+            row=row,
+            temperature_K=temperature,
+            mole_fraction=mole_fraction,
+            standard_state=standard_state,
+            state_fingerprint=state_fingerprint,
+            solve_group_id=solve_group_id,
+            coefficient_formula=alias,
+        )
+        if alias is None or current != formula:
+            return answer
+        gamma = answer.derivation.get("gamma")
+        if not isinstance(gamma, (int, float)):
+            return None
+        applied = _apply_henrian_gamma(current, float(gamma))
+        if applied is None:
+            return None
+        converted, value = applied
+        # ln_value is derived from value. Clearing it makes __post_init__
+        # recompute the logarithm of the converted activity.
+        answer = replace(
+            _annotate(answer, gamma=converted, coefficient_formula=current),
+            component_id=component_id,
+            value=value,
+            ln_value=None,
+        )
+        return _mark_derived_spelling(answer)
+
+    def _with_candidate_envelope(
+        answer: SourceReactionActivity,
+        *,
+        rows: Sequence[Mapping[str, Any]],
+        parent_gamma: float,
+        flag: str,
+        reason: str,
+        verdict: ActivityVerdictKind,
+        bound_direction: BoundDirection | None,
+        report_label: str,
+        source_row_id: str | None,
+        single_cation: bool,
+        nominal_cite: str | None = None,
+    ) -> SourceReactionActivity:
+        """Attach the candidate envelope. The chosen gamma stays put.
+
+        Envelope min and max are parent-row coefficients. The activity
+        bound is not the unmeasured unity bound, so a row-level
+        extrapolation notice is not the reason for this answer.
+        """
+
+        ordered = tuple(
+            sorted(rows, key=lambda row: str(row.get("source_row_id") or ""))
+        )
+        records = tuple(_candidate_record(row, temperature) for row in ordered)
+        gammas = tuple(float(record["gamma"]) for record in records)
+        extra: dict[str, Any] = {
+            "flag": flag,
+            "gamma_envelope_min": min(gammas),
+            "gamma_envelope_max": max(gammas),
+            "source_row_id": source_row_id,
+            "source_row_ids": tuple(str(row["source_row_id"]) for row in ordered),
+            "candidate_rows": records,
+            "extrapolation_notice": None,
+        }
+        if nominal_cite is not None:
+            extra["nominal_cite"] = nominal_cite
+        ln_band = _envelope_ln_band(
+            parent_formula=str(ordered[0]["formula"]),
+            parent_gamma=parent_gamma,
+            gamma_min=min(gammas),
+            gamma_max=max(gammas),
+            mole_fraction=mole_fraction,
+            single_cation=single_cation,
+        )
+        annotated = _annotate(answer, **extra)
+        return replace(
+            annotated,
+            verdict=verdict,
+            bound_direction=bound_direction,
+            reason=reason,
+            report_label=report_label,
+            model_row_id=source_row_id,
+            evidence_ref=source_row_id,
+            ln_band=ln_band,
+        )
+
+    def _published_envelope(
+        current: str, group: Sequence[Mapping[str, Any]]
+    ) -> SourceReactionActivity | None:
+        """Bound or midpoint for published rows the band rule did not select.
+
+        Every candidate above 1 is a lower bound at the minimum gamma.
+        Every candidate below 1 is an upper bound at the maximum gamma.
+        A candidate on the other side of 1, or equal to 1, is the
+        geometric mean, flagged ``envelope_midpoint``. Proxy-only groups
+        are not this rule.
+        """
+
+        if not group or any(row["origin"] != "published" for row in group):
+            return None
+        gammas = tuple(_gamma_at(row, temperature) for row in group)
+        single_cation = alias is not None and current == formula
+        if all(gamma > 1.0 for gamma in gammas):
+            row = _extreme_gamma_row(group, temperature, high=False)
+            accepted = _accept_row_basis(current, row)
+            if accepted is None:
+                return None
+            return _with_candidate_envelope(
+                accepted,
+                rows=group,
+                parent_gamma=_gamma_at(row, temperature),
+                flag="envelope_lower_bound",
+                reason="envelope_lower_bound",
+                verdict=ActivityVerdictKind.LOWER_BOUND,
+                bound_direction=BoundDirection.LOWER,
+                report_label=LOWER_BOUND_NOT_POINT,
+                source_row_id=str(row["source_row_id"]),
+                single_cation=single_cation,
+            )
+        if all(gamma < 1.0 for gamma in gammas):
+            row = _extreme_gamma_row(group, temperature, high=True)
+            accepted = _accept_row_basis(current, row)
+            if accepted is None:
+                return None
+            return _with_candidate_envelope(
+                accepted,
+                rows=group,
+                parent_gamma=_gamma_at(row, temperature),
+                flag="envelope_upper_bound",
+                reason="envelope_upper_bound",
+                verdict=ActivityVerdictKind.UPPER_BOUND,
+                bound_direction=BoundDirection.UPPER,
+                report_label=BOUND_NOT_POINT,
+                source_row_id=str(row["source_row_id"]),
+                single_cation=single_cation,
+            )
+        geomean = _geometric_mean(gammas)
+        applied = _apply_henrian_gamma(current, geomean)
+        if applied is None:
+            return None
+        stored_gamma, value = applied
+        answer = _ladder_result(
+            component_id=component_id,
+            standard_state=standard_state,
+            state_fingerprint=state_fingerprint,
+            solve_group_id=solve_group_id,
+            rung=2,
+            gamma=stored_gamma,
+            mole_fraction=None,
+            verdict=ActivityVerdictKind.STATUS_BEARING_VALUE,
+            flag="envelope_midpoint",
+            reason="envelope_midpoint",
+            source_row_id=None,
+            source_row_ids=(),
+            origin="published",
+            homologue=None,
+            coefficient_formula=formula if single_cation else None,
+            extrapolation_notice=None,
+            candidate_rows=(),
+            tier=ActivityTier.B,
+        )
+        answer = replace(answer, value=value, ln_value=None)
+        if single_cation:
+            # The mean was converted onto the one-cation spelling.
+            answer = _mark_derived_spelling(answer)
+            basis = {}
+        elif all(
+            _standard_state_established(row, standard_state) for row in group
+        ):
+            representative = min(
+                group, key=lambda row: str(row.get("source_row_id") or "")
+            )
+            basis = _basis_annotation(
+                row=representative,
+                standard_state=standard_state,
+                established=True,
+            )
+        else:
+            basis = _basis_annotation(
+                row=None,
+                standard_state=standard_state,
+                established=False,
+            )
+        answer = _annotate(
+            answer,
+            **basis,
+            algebra="geometric mean of the published candidate gammas",
+        )
+        return _with_candidate_envelope(
+            answer,
+            rows=group,
+            parent_gamma=geomean,
+            flag="envelope_midpoint",
+            reason="envelope_midpoint",
+            verdict=ActivityVerdictKind.STATUS_BEARING_VALUE,
+            bound_direction=None,
+            report_label=STATUS_BEARING_NOT_POINT,
+            source_row_id=None,
+            single_cation=single_cation,
+        )
+
+    def _walk(current: str, seen: frozenset[str]) -> SourceReactionActivity:
+        if current in seen:
+            return _rung4(
+                component_id=component_id,
+                activity_exponent=activity_exponent,
+                standard_state=standard_state,
+                mole_fraction=mole_fraction,
+                state_fingerprint=state_fingerprint,
+                solve_group_id=solve_group_id,
+                coefficient_formula=alias,
+            )
+        matched = tuple(row for row in table if row["formula"] == current)
+        kind, group = _select_gamma_rows(current, table)
+        try:
+            if kind == "many":
+                chosen = _select_banded_row(group, temperature)
+                if chosen is not None:
+                    accepted = _accept_row_basis(current, chosen)
+                    if accepted is not None:
+                        return accepted
+            nominal = _stated_nominal_row(current, matched)
+            if nominal is not None:
+                row, cite = nominal
+                accepted = _accept_row_basis(current, row)
+                if accepted is not None:
+                    return _with_candidate_envelope(
+                        accepted,
+                        rows=matched,
+                        parent_gamma=_gamma_at(row, temperature),
+                        flag="source_stated_nominal",
+                        reason="source_stated_nominal",
+                        verdict=ActivityVerdictKind.STATUS_BEARING_VALUE,
+                        bound_direction=None,
+                        report_label=STATUS_BEARING_NOT_POINT,
+                        source_row_id=str(row["source_row_id"]),
+                        single_cation=alias is not None and current == formula,
+                        nominal_cite=cite,
+                    )
+            if kind == "one":
+                accepted = _accept_row_basis(current, group[0])
+                if accepted is not None:
+                    return accepted
+            if kind == "many":
+                enveloped = _published_envelope(current, group)
+                if enveloped is not None:
+                    return enveloped
+        except (TypeError, ValueError) as exc:
+            return _refusal(
+                component_id,
+                ActivityRefusalCode.MISSING_EVIDENCE,
+                f"trace parent gamma row is invalid: {exc}",
+                standard_state=standard_state,
+                state_fingerprint=state_fingerprint,
+                solve_group_id=solve_group_id,
+            )
+        target = _TRACE_HOMOLOGUE.get(current)
+        if target is not None:
+            followed = _walk(target, seen | {current})
+            if followed.verdict is ActivityVerdictKind.REFUSAL:
+                return followed
+            rung = followed.derivation.get("rung")
+            if rung in {2, 3}:
+                return _retag_homologue(
+                    component_id=component_id,
+                    homologue=target,
+                    followed=followed,
+                    mole_fraction=mole_fraction,
+                    standard_state=standard_state,
+                    state_fingerprint=state_fingerprint,
+                    solve_group_id=solve_group_id,
+                    coefficient_formula=alias,
+                )
+        return _rung4(
+            component_id=component_id,
+            activity_exponent=activity_exponent,
+            standard_state=standard_state,
+            mole_fraction=mole_fraction,
+            state_fingerprint=state_fingerprint,
+            solve_group_id=solve_group_id,
+            coefficient_formula=alias,
+        )
+
+    return _finish(_walk(formula, frozenset()))
+
+
+def trace_parent_formulas() -> tuple[str, ...]:
+    return tuple(
+        sorted(set(LIQUID_PARENT_OXIDE.values()) | set(ACTIVITY_BASIS.values()))
+    )
+
+
+def _report_basis(
+    derivation: Mapping[str, Any],
+    formula: str,
+    standard_state: StandardStateIdentity,
+) -> dict[str, Any]:
+    """Source basis, target basis, and the claim the scorer compares.
+
+    ``standard_state`` is present only when the row's basis is the
+    caller's. The phase on that claim is the closed token (``l`` or
+    ``cr``). A printed phrase, a homologue, or a unity bound leaves the
+    claim off: the target is reported beside the source and is not
+    reused as compatibility.
+    """
+
+    source_phase = derivation.get("source_phase")
+    source_basis = {
+        "component": derivation.get("row_formula"),
+        "standard_state_as_printed": derivation.get("standard_state_as_printed"),
+        "convention": derivation.get("source_convention"),
+        "phase": source_phase,
+    }
+    target_basis = {
+        "convention": derivation.get("target_convention", standard_state.convention),
+        "phase": derivation.get("target_phase", standard_state.phase),
+        "component_basis": formula,
+    }
+    payload: dict[str, Any] = {
+        "source_basis": source_basis,
+        "target_basis": target_basis,
+    }
+    if derivation.get("basis_established") is not True:
+        return payload
+    convention = source_basis["convention"]
+    phase = _closed_phase_token(source_phase) if source_phase else None
+    if not isinstance(convention, str) or not convention or phase is None:
+        return payload
+    payload["standard_state"] = {
+        "convention": convention,
+        "phase": phase,
+        "component_basis": formula,
+    }
+    return payload
+
+
+def trace_parent_gamma_report(
+    temperature_K: float,
+    *,
+    rows: Sequence[Mapping[str, Any]] | None = None,
+) -> dict[str, dict[str, Any]]:
+    """Gamma or bound for every trace parent, with its source and target basis."""
+
+    standard_state = StandardStateIdentity(
+        convention="raoultian_pure_endmember",
+        phase="liquid",
+        reference_pressure_bar=1.0,
+    )
+    report: dict[str, dict[str, Any]] = {}
+    for formula in trace_parent_formulas():
+        answer = resolve_trace_parent_activity(
+            formula,
+            temperature_K=temperature_K,
+            activity_exponent=1.0,
+            standard_state=standard_state,
+            rows=rows,
+        )
+        derivation = answer.derivation
+        report[formula] = {
+            "verdict": answer.verdict.value,
+            "gamma": derivation.get("gamma"),
+            "rung": derivation.get("rung"),
+            "source_row_id": derivation.get("source_row_id"),
+            "source_row_ids": list(derivation.get("source_row_ids") or ()),
+            "flag": derivation.get("flag"),
+            "homologue": derivation.get("homologue"),
+            "origin": derivation.get("origin"),
+            "extrapolation_notice": derivation.get("extrapolation_notice"),
+            "candidate_rows": [
+                dict(row) for row in (derivation.get("candidate_rows") or ())
+            ],
+            "coefficient_formula": derivation.get("coefficient_formula"),
+            **_report_basis(derivation, formula, standard_state),
+        }
+    return report
+
+
 __all__ = [
     "BOUND_NOT_POINT",
     "DIAGNOSTIC_AUTHORITY",
@@ -1549,8 +2900,14 @@ __all__ = [
     "StateFingerprint",
     "ThermoEnginePotentialEvidence",
     "activity_from_chemical_potentials",
+    "coefficient_formula",
     "composition_fingerprint",
     "henrian_unknown_gamma_upper_bound",
+    "is_trace_parent_component",
+    "load_fegley2023_gamma_table",
     "prove_pressure_monotone_nondecreasing_in_activity",
+    "resolve_trace_parent_activity",
+    "trace_parent_formulas",
+    "trace_parent_gamma_report",
     "validation_row_may_certify",
 ]

@@ -39,6 +39,7 @@ from simulator.backend_names import (
 from simulator.vapour_rail.calibration import _RAW_VAPOROCK_SOURCE_LABELS
 from simulator.chemistry.melt_activity import (
     melt_oxide_activity_coefficient,
+    molecular_mole_fractions,
     single_cation_mole_fractions,
 )
 from simulator.scalar_boundary import is_declared_real_scalar
@@ -49,9 +50,11 @@ from simulator.vapour_rail.activity import (
     CondensedPhaseActivityProvider,
     SourceReactionActivity,
     StandardStateIdentity,
+    coefficient_formula,
     _fingerprint_float,
     _is_nonfinite_number,
     composition_fingerprint,
+    is_trace_parent_component,
 )
 from simulator.vapour_rail.batch import (
     CERTIFICATION_CEILING_NEVER,
@@ -206,6 +209,7 @@ class ProviderDomainCandidate:
     solve_group_id: str = ""
     state_fingerprint: str = ""
     evaluation_review_record: str | None = None
+    certified_band: Mapping[str, Any] | None = None
     _admitted_identity: tuple[str, str, str] = field(
         init=False,
         repr=False,
@@ -246,6 +250,12 @@ class ProviderDomainCandidate:
             "validation_residual_dex_by_species",
             MappingProxyType(dict(self.validation_residual_dex_by_species)),
         )
+        if self.certified_band is not None:
+            object.__setattr__(
+                self,
+                "certified_band",
+                MappingProxyType(dict(self.certified_band)),
+            )
         object.__setattr__(
             self,
             "_admitted_identity",
@@ -1172,6 +1182,33 @@ def _candidates_cover_state(
     )
 
 
+def _uncovered_domain_notice(
+    candidates: Sequence[ProviderDomainCandidate],
+    compiled: Any | None,
+) -> dict[str, Any]:
+    """Flag a live answer whose admitted candidates all miss the state."""
+
+    bands: dict[str, Any] = {}
+    for candidate in candidates:
+        band = candidate.certified_band
+        bands[candidate.provider_id] = None if band is None else dict(band)
+    evaluator = getattr(compiled, "evaluator", None)
+    evaluator_band = getattr(evaluator, "valid_temperature_K", None)
+    if evaluator_band is not None:
+        try:
+            low, high = evaluator_band
+            bands["evaluator"] = {
+                "temperature_K": [float(low), float(high)],
+            }
+        except (TypeError, ValueError):
+            pass
+    return {
+        "reason": "no admitted source candidate covers requested state",
+        "authority_level": "extrapolated",
+        "certified_band": bands,
+    }
+
+
 @dataclass(frozen=True)
 class RefusalClosureResult:
     """Answers plus whether the closure loop truly reached a fixed point."""
@@ -1359,16 +1396,27 @@ def refusal_closure(
                     "melt_oxide_X_single_cation"
                 )
                 if reported_mole_fraction is None:
+                    # One projector. Majors use the legacy coefficient's
+                    # parent oxide on the single-cation basis. A trace
+                    # parent has no such entry. Its Table 2 row is a
+                    # molecular Henrian model, so the fraction is
+                    # molecular_mole_fractions of the row formula
+                    # (InO1.5 reads In2O3). The other spelling's activity
+                    # is derived from that, not by reusing this X.
+                    account = _account_mols(
+                        ledger_snapshot, rule.source_account
+                    )
                     coeff = melt_oxide_activity_coefficient(
                         declaration.component_id
                     )
                     if coeff is not None:
-                        source_fractions = single_cation_mole_fractions(
-                            _account_mols(ledger_snapshot, rule.source_account)
-                        )
-                        reported_mole_fraction = source_fractions.get(
-                            coeff.parent_oxide
-                        )
+                        reported_mole_fraction = single_cation_mole_fractions(
+                            account
+                        ).get(coeff.parent_oxide)
+                    elif is_trace_parent_component(declaration.component_id):
+                        reported_mole_fraction = molecular_mole_fractions(
+                            account
+                        ).get(coefficient_formula(declaration.component_id))
                 source_reaction_activity = (
                     activity_provider.resolve_source_reaction_activity(
                         declaration,
@@ -1377,6 +1425,7 @@ def refusal_closure(
                         activity_exponent=evaluator_activity_exponent,
                         solve_group_id=rule.solve_group_id,
                         state_fingerprint=state_identity,
+                        temperature_K=state.temperature_K,
                         mole_fraction=reported_mole_fraction,
                         reported_activity=reported_activity,
                         reported_activity_provider=(
@@ -1725,6 +1774,12 @@ def refusal_closure(
                     or "status-bearing-not-point"
                 )
         extra_payload.update(evaluation_extra)
+        domain_notice = domain_extrapolation.get(rule.species_id)
+        if (
+            domain_notice is not None
+            and "extrapolation_notice" not in extra_payload
+        ):
+            extra_payload["extrapolation_notice"] = domain_notice
         return VapourAnswer(
             species_id=rule.species_id,
             pressure=pressure,
@@ -1751,6 +1806,7 @@ def refusal_closure(
     # runs to a true fixed point (``changed is False``); cascade edges for
     # association/mass-action dependents are deferred to later R-chunks.
     # Do not invent a dependents map that is never read.
+    domain_extrapolation: dict[str, dict[str, Any]] = {}
     changed = True
     iterations = 0
     max_iterations = max(8, len(requested) + 2)
@@ -1811,19 +1867,13 @@ def refusal_closure(
                 continue
 
             # 4) Provider-independent domain: any admitted candidate covers
-            #    the state. A single provider domain miss is NOT a step-2
-            #    refusal when another candidate remains.
+            #    the state. A miss extrapolates and flags. It does not refuse.
+            #    Missing temperature and a missing evaluator still refuse below.
             cands = candidates_map.get(species_id)
             if cands is not None and not _candidates_cover_state(cands, state):
-                answers[species_id] = _make_refusal(
-                    rule,
-                    REFUSAL_NO_ADMITTED_SOURCE,
-                    "no admitted source candidate covers requested state "
-                    f"(candidates={[c.provider_id for c in cands]})",
+                domain_extrapolation[species_id] = _uncovered_domain_notice(
+                    cands, catalog_species.get(species_id)
                 )
-                refused.add(species_id)
-                changed = True
-                continue
 
             # 5) Missing outcome-determining state (temperature / live
             #    evaluator). Typed refusal — never a flux-active zero.

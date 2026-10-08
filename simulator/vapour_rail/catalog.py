@@ -32,7 +32,11 @@ from simulator.physical_constants import (
 )
 from simulator.scalar_boundary import is_declared_real_scalar
 
-from simulator.alpha_kinetics import AlphaSpecError, parse_alpha_contract
+from simulator.alpha_kinetics import (
+    ANALYTICAL_UPPER_BOUND_ALPHA_STATUS,
+    AlphaSpecError,
+    parse_alpha_contract,
+)
 from simulator.vapour_rail.activity import (
     ActivityInputDeclaration,
     ActivityVerdictKind,
@@ -4241,7 +4245,7 @@ def _validate_kinetics(family_id: str, kinetics: Mapping[str, Any]) -> None:
             # fail closed on misspellings or invented authority classes.
             authority_status = str(alpha_contract.get("status") or "").strip()
             if authority_status and authority_status not in {
-                "analytical_upper_bound",
+                ANALYTICAL_UPPER_BOUND_ALPHA_STATUS,
                 "diagnostic_upper_bound",
             }:
                 raise CatalogCompileError(

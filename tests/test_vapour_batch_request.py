@@ -29,12 +29,14 @@ from simulator.backend_names import (
     VAPOUR_ANALYTICAL_EXTERNAL_GROUNDED,
     VAPOUR_ANALYTICAL_VAPOROCK_CALIBRATED,
 )
+from simulator.chemistry.melt_activity import molecular_mole_fractions
 from simulator.vapour_rail.activity import (
     ActivityRefusalCode,
     ActivityTier,
     ActivityVerdictKind,
     SourceReactionActivity,
     StandardStateIdentity,
+    resolve_trace_parent_activity,
 )
 from simulator.vapour_rail.batch import (
     FLUX_ACTIVATION_EPOCH_PRE_RG,
@@ -60,7 +62,6 @@ from simulator.vapour_rail.request import (
     REFUSAL_INAPPLICABLE_PREDICATE,
     REFUSAL_MISSING_OUTCOME_STATE,
     REFUSAL_NO_COMPLETE_BUNDLE_SOURCE,
-    REFUSAL_NO_ADMITTED_SOURCE,
     REFUSAL_OUTSIDE_DECLARED_DOMAIN,
     ProviderDomainCandidate,
     RequestRule,
@@ -847,11 +848,13 @@ def test_provider_domain_miss_not_refusal_when_other_candidate_covers() -> None:
             provider_id="vaporock",
             covers_state=vaporock_covers,
             evidence_class="analytical:vaporock_calibrated",
+            certified_band={"temperature_K": [1350.0, 1950.0]},
         ),
         ProviderDomainCandidate(
             provider_id="literature_antoine",
             covers_state=literature_covers,
             evidence_class="analytical:external_grounded",
+            certified_band={"temperature_K": [500.0, 2500.0]},
         ),
     ]
     catalog_species = _stub_catalog_species("Fe")
@@ -868,13 +871,14 @@ def test_provider_domain_miss_not_refusal_when_other_candidate_covers() -> None:
         f"provider-specific domain miss must not refuse when another "
         f"candidate covers; got {answer.refusal_code}: {answer.extra}"
     )
+    assert "extrapolation_notice" not in answer.extra
     # VapoRock alone would miss at 1200 K
     assert not vaporock_covers(state.as_mapping())
     assert literature_covers(state.as_mapping())
 
-    # Both candidates miss → step-2 refusal
+    # Both candidates miss → live answer, flagged, not a refusal.
     cold = VapourResolveState(temperature_K=100.0)
-    refused = refusal_closure(
+    extrapolated = refusal_closure(
         requested=frozenset({"Fe"}),
         rules=(rule,),
         ledger_snapshot=ledger,
@@ -882,8 +886,31 @@ def test_provider_domain_miss_not_refusal_when_other_candidate_covers() -> None:
         provider_candidates_by_species={"Fe": candidates},
         catalog_species=catalog_species,
     ).answers["Fe"]
-    assert refused.is_refused
-    assert refused.refusal_code == REFUSAL_NO_ADMITTED_SOURCE
+    assert not extrapolated.is_refused
+    assert isinstance(extrapolated.pressure, PressureValue)
+    notice = extrapolated.extra["extrapolation_notice"]
+    assert notice["authority_level"] == "extrapolated"
+    assert notice["reason"] == (
+        "no admitted source candidate covers requested state"
+    )
+    assert notice["certified_band"]["vaporock"]["temperature_K"] == [
+        1350.0,
+        1950.0,
+    ]
+    assert notice["certified_band"]["literature_antoine"]["temperature_K"] == [
+        500.0,
+        2500.0,
+    ]
+    batched = resolve_vapour_batch(
+        rules=(rule,),
+        ledger_snapshot=ledger,
+        state=cold,
+        provider_candidates_by_species={"Fe": candidates},
+        catalog_species=catalog_species,
+        flux_activation_context=_rg_activation_context(),
+    ).channel("Fe")
+    assert not batched.is_refused
+    assert batched.extra["extrapolation_notice"] == notice
 
 
 def test_fe_typed_shadow_traverses_per_answer_instrumentation() -> None:
@@ -954,6 +981,62 @@ def test_fe_typed_shadow_traverses_per_answer_instrumentation() -> None:
     assert answer.source_reaction_activity_shadow_evaluation["status"] == (
         "shadow_only_no_behavior_authority"
     )
+
+
+def test_trace_parent_request_returns_a_numeric_activity() -> None:
+    """In2O3 has no legacy coefficient. The ledger still supplies X."""
+
+    payload = _minimal_family("In", parent_oxide="In2O3")
+    species = payload["families"]["in_test_family"]["physical_properties"][
+        "species"
+    ]["In"]
+    reaction = species["source_reactions"][0]
+    reaction["id"] = "in2o3_to_in"
+    reaction["reactants"] = [{"formula": "In2O3", "stoichiometry": 1.0}]
+    reaction["products"] = [
+        {"formula": "In", "stoichiometry": 2.0},
+        {"formula": "O2", "stoichiometry": 1.5},
+    ]
+    reaction["activity_input"]["component_id"] = "In2O3"
+    reaction["activity_input"]["allow_henrian_upper_bound"] = True
+    reaction["activity_input"]["require_assemblage_match"] = False
+    model = species["pressure_models"][0]
+    model["source_reaction_id"] = "in2o3_to_in"
+    # q In2O3 -> 2 In + 1.5 O2, so a**(1/2) and pO2**(-0.75).
+    model["activity_exponent"] = 0.5
+    model["pO2_exponent"] = -0.75
+    catalog = compile_vapour_rail_catalog(payload, u0_manifest=_u0_stub("In"))
+    inventory = {"In2O3": 1.0e-6, "SiO2": 1.0}
+    ledger = {"process.cleaned_melt": inventory}
+    batch = catalog.resolve_batch(
+        ledger,
+        VapourResolveState(
+            temperature_K=1673.0,
+            total_pressure_Pa=1.0e5,
+            fO2_bar=1.0e-8,
+            source_reaction_fO2_bar=1.0e-8,
+        ),
+        flux_activation_context=_pre_rg_activation_context(),
+    )
+    answer = batch.channel("In")
+    activity = answer.source_reaction_activity
+    assert activity is not None
+    assert activity.verdict is not ActivityVerdictKind.REFUSAL
+    assert activity.value is not None
+    assert math.isfinite(activity.value)
+    fraction = molecular_mole_fractions(inventory)["In2O3"]
+    owner = resolve_trace_parent_activity(
+        "In2O3",
+        temperature_K=1673.0,
+        activity_exponent=0.5,
+        standard_state=activity.standard_state,
+        mole_fraction=fraction,
+    )
+    assert activity.value == owner.value
+    assert activity.derivation["row_formula"] == "In2O3"
+    assert not answer.is_refused
+    assert isinstance(answer.pressure, PressureValue)
+    assert answer.pressure.pa > 0.0
 
 
 # ---------------------------------------------------------------------------

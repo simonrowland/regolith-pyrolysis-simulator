@@ -25,6 +25,7 @@ from simulator.vapour_rail.catalog import (
 from simulator.vapour_rail.stoich import (
     derive_stoich_oxide_per_vapor,
     oxygen_coproduct_account,
+    oxygen_fugacity_plane,
 )
 from simulator.yaml_cache import load_cached_safe_yaml
 
@@ -460,6 +461,7 @@ def test_oxide_vapour_vector_closes_and_credits_overhead_oxygen() -> None:
     assert oxygen_coproduct_account(None, vapor_oxygen_atoms=1.0) == (
         "process.overhead_gas"
     )
+    assert oxygen_fugacity_plane(vapor_oxygen_atoms=1.0) == "transport_headspace"
 
 
 def test_metal_vapour_vector_credits_fo2_buffer() -> None:
@@ -479,6 +481,7 @@ def test_metal_vapour_vector_credits_fo2_buffer() -> None:
     assert oxygen_coproduct_account(None, vapor_oxygen_atoms=0.0) == (
         "reservoir.fo2_buffer"
     )
+    assert oxygen_fugacity_plane(vapor_oxygen_atoms=0.0) == "intrinsic_melt"
 
 
 def test_zero_oxygen_metaborate_debits_both_parents() -> None:

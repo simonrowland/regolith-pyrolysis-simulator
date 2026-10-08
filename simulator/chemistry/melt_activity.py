@@ -232,6 +232,19 @@ MELT_OXIDE_CATIONS_PER_FORMULA = {
     "P2O5": 2.0,
     "NiO": 1.0,
     "CoO": 1.0,
+    # Trace-parent ledger oxides. The metal subscript is the cation count.
+    # InO1.5, GaO1.5 and CuO0.5 are the one-cation spellings, not extra keys.
+    "In2O3": 2.0,
+    "Ga2O3": 2.0,
+    "Cu2O": 2.0,
+    "Li2O": 2.0,
+    "Rb2O": 2.0,
+    "Cs2O": 2.0,
+    "B2O3": 2.0,
+    "V2O3": 2.0,
+    "PbO": 1.0,
+    "GeO2": 1.0,
+    "SnO": 1.0,
 }
 
 
@@ -323,18 +336,22 @@ class MeltOxideActivity:
 _MELT_INVENTORY_NUMERICAL_DUST_MOL = 1.0e-12
 
 
-def single_cation_mole_fractions(
+def _projected_oxide_moles(
     account_mol: Mapping[str, float],
 ) -> dict[str, float]:
-    """Return X_MOx on the single-cation mole-fraction basis."""
+    """Positive moles of the oxides this projector counts.
 
-    cation_mol: dict[str, float] = {}
-    total = 0.0
+    Membership is ``MELT_OXIDE_CATIONS_PER_FORMULA``. A key that is not
+    in that table is skipped. The dust floor is the same cutoff the
+    single-cation projection already used. This is not a second inventory.
+    """
+
+    moles: dict[str, float] = {}
     for parent_oxide, mol in account_mol.items():
-        mol_value = float(mol)
-        cations = MELT_OXIDE_CATIONS_PER_FORMULA.get(str(parent_oxide))
-        if cations is None:
+        name = str(parent_oxide)
+        if MELT_OXIDE_CATIONS_PER_FORMULA.get(name) is None:
             continue
+        mol_value = float(mol)
         if not math.isfinite(mol_value):
             raise ValueError(
                 f"melt inventory for {parent_oxide!r} must be finite "
@@ -351,28 +368,61 @@ def single_cation_mole_fractions(
             )
         if mol_value == 0.0:
             continue
+        moles[name] = mol_value
+    return moles
+
+
+def _normalized_fractions(
+    weighted: Mapping[str, float], *, what: str
+) -> dict[str, float]:
+    total = 0.0
+    for value in weighted.values():
+        if not math.isfinite(value):
+            raise ValueError(f"{what} projection overflowed")
+        total += value
+    if not math.isfinite(total):
+        raise ValueError(f"{what} total overflowed")
+    if total <= 0.0:
+        return {}
+    fractions = {oxide: value / total for oxide, value in weighted.items()}
+    if any(not math.isfinite(value) for value in fractions.values()):
+        raise ValueError(f"{what} must be finite after normalization")
+    return fractions
+
+
+def single_cation_mole_fractions(
+    account_mol: Mapping[str, float],
+) -> dict[str, float]:
+    """Return X_MOx on the single-cation mole-fraction basis."""
+
+    cation_mol: dict[str, float] = {}
+    for parent_oxide, mol_value in _projected_oxide_moles(account_mol).items():
+        cations = float(MELT_OXIDE_CATIONS_PER_FORMULA[parent_oxide])
         cation_value = mol_value * cations
         if not math.isfinite(cation_value):
             raise ValueError(
                 f"melt inventory for {parent_oxide!r} overflowed the "
                 "single-cation mole-fraction projection"
             )
-        cation_mol[str(parent_oxide)] = cation_value
-        total += cation_value
-    if not math.isfinite(total):
-        raise ValueError(
-            "single-cation mole-fraction total overflowed"
-        )
-    if total <= 0.0:
-        return {}
-    fractions = {
-        oxide: cations / total for oxide, cations in cation_mol.items()
-    }
-    if any(not math.isfinite(value) for value in fractions.values()):
-        raise ValueError(
-            "single-cation mole fractions must be finite after normalization"
-        )
-    return fractions
+        cation_mol[parent_oxide] = cation_value
+    return _normalized_fractions(cation_mol, what="single-cation mole-fraction")
+
+
+def molecular_mole_fractions(
+    account_mol: Mapping[str, float],
+) -> dict[str, float]:
+    """Return X_i = n_i / sum(n_j) on the conventional-oxide basis.
+
+    The oxides are the same keys ``single_cation_mole_fractions`` counts.
+    Each formula contributes its own moles, not its cation count. This is
+    the Henrian X of a Fegley Table 2 row: moles of that oxide over moles
+    of all counted oxides.
+    """
+
+    return _normalized_fractions(
+        _projected_oxide_moles(account_mol),
+        what="molecular mole-fraction",
+    )
 
 
 def single_cation_activity_and_fraction(
@@ -412,6 +462,143 @@ def single_cation_component_formula(parent_oxide: str) -> str:
     oxygen = float(match.group(2) or 1.0) / cations
     oxygen_text = str(int(oxygen)) if oxygen.is_integer() else str(oxygen)
     return f"{match.group(1)}O{oxygen_text}"
+
+
+def pure_liquid_reference_coefficient(
+    row_formula: str,
+    requested_formula: str,
+    row_gamma: float,
+) -> float | None:
+    """Convert a coefficient between a parent oxide and its one-cation component.
+
+    Premise. With pure-liquid references,
+    ``mu(MO_{v/2}) = (1/c) * mu(M_c O_v)``, so
+    ``a(MO) = a(parent) ** (1/c)``. ``c`` is that parent's cation count in
+    ``MELT_OXIDE_CATIONS_PER_FORMULA``. Activity and mole fraction transform
+    together: on each component ``a = gamma * X``, and
+    ``gamma_target = a_target / X_target``. Renaming the component is not
+    this conversion. A parent missing from the cation table has no
+    established relationship; this returns None and the caller must not
+    reuse ``row_gamma``.
+
+    Algebra at the pure-liquid reference, where both mole fractions are 1.
+    Forward (row is the parent, request is the one-cation component):
+    ``a_parent = row_gamma * X_parent = row_gamma * 1``,
+    ``a_single = a_parent ** (1/c)``,
+    ``gamma_single = a_single / X_single = a_single / 1``.
+    Inverse (row is the one-cation component):
+    ``a_single = row_gamma * 1``,
+    ``a_parent = a_single ** c``,
+    ``gamma_parent = a_parent / 1``.
+    The value returned is that pure-reference coefficient, where both
+    mole fractions are 1. At a real composition a constant gamma on the
+    parent is a different Henrian model from a constant gamma on the
+    one-cation component. ``activities_from_molecular_henrian_row``
+    applies the row gamma to the molecular fraction and derives the
+    other spelling by ``a_single = a_parent ** (1/c)``. A dilute
+    inventory ``n(In2O3) = 1e-6`` with ``n(SiO2) = 1`` does not keep
+    the coefficient at 0.02.
+
+    Unit check. Activity, mole fraction, and gamma are dimensionless.
+    ``10 ** (A + B/T)`` is dimensionless, and a real power of a
+    positive dimensionless number stays dimensionless.
+
+    Sanity. Wood and Wade (2013), as cited by Fegley 2023 Group 13, give
+    gamma(InO1.5) = 0.02 at 1923 K. Table 2 stores that anchor on the
+    In2O3 row (A = 0, B = -6534.2), so
+    gamma(In2O3) = 10 ** (-6534.2 / 1923) = (0.02) ** 2. With
+    X(In2O3) = X(InO1.5) = 1,
+    a(In2O3) = (0.02) ** 2, a(InO1.5) = 0.02, and
+    gamma(InO1.5) = 0.02.
+    """
+
+    row = str(row_formula)
+    requested = str(requested_formula)
+    try:
+        gamma = float(row_gamma)
+    except (TypeError, ValueError):
+        return None
+    if not math.isfinite(gamma) or gamma <= 0.0:
+        return None
+    if row == requested:
+        return gamma
+    row_cations = MELT_OXIDE_CATIONS_PER_FORMULA.get(row)
+    if (
+        row_cations is not None
+        and float(row_cations) != 1.0
+        and single_cation_component_formula(row) == requested
+    ):
+        # X_parent = 1, so the parent activity passed here is the row gamma.
+        activity, fraction = single_cation_activity_and_fraction(
+            row, gamma, {row: 1.0}
+        )
+        if fraction <= 0.0 or not math.isfinite(activity):
+            return None
+        converted = activity / fraction
+        if not math.isfinite(converted) or converted <= 0.0:
+            return None
+        return converted
+    requested_cations = MELT_OXIDE_CATIONS_PER_FORMULA.get(requested)
+    if (
+        requested_cations is not None
+        and float(requested_cations) != 1.0
+        and single_cation_component_formula(requested) == row
+    ):
+        # X_single = 1, so the single-cation activity is the row gamma.
+        # thermodynamic_parent_activity is a_single ** c.
+        parent_activity = MeltOxideActivity(
+            parent_oxide=requested,
+            single_cation_component=row,
+            gamma=gamma,
+            x_single_cation=1.0,
+            activity=gamma,
+            citation="pure-liquid reference; a = gamma * X at X = 1",
+        ).thermodynamic_parent_activity()
+        if not math.isfinite(parent_activity) or parent_activity <= 0.0:
+            return None
+        return parent_activity
+    return None
+
+
+def activities_from_molecular_henrian_row(
+    parent_oxide: str,
+    row_gamma: float,
+    molecular_mole_fraction: float,
+) -> tuple[float, float] | None:
+    """Return ``(a_parent, a_single)`` for one constant-gamma molecular row.
+
+    ``a_parent = row_gamma * X_molecular``. ``a_single = a_parent ** (1/c)``,
+    with ``c`` the parent cation count. The two spellings agree at the
+    composition, including a dilute melt. They agree with
+    ``pure_liquid_reference_coefficient`` only when both mole fractions
+    are 1. A parent missing from the cation table has no relationship.
+    """
+
+    parent = str(parent_oxide)
+    cations = MELT_OXIDE_CATIONS_PER_FORMULA.get(parent)
+    if cations is None:
+        return None
+    try:
+        gamma = float(row_gamma)
+        mole_fraction = float(molecular_mole_fraction)
+    except (TypeError, ValueError):
+        return None
+    if (
+        not math.isfinite(gamma)
+        or gamma <= 0.0
+        or not math.isfinite(mole_fraction)
+        or mole_fraction < 0.0
+    ):
+        return None
+    parent_activity = gamma * mole_fraction
+    if not math.isfinite(parent_activity) or parent_activity < 0.0:
+        return None
+    if parent_activity == 0.0:
+        return 0.0, 0.0
+    single_activity = parent_activity ** (1.0 / float(cations))
+    if not math.isfinite(single_activity) or single_activity < 0.0:
+        return None
+    return parent_activity, single_activity
 
 
 def melt_oxide_activity_coefficient(
