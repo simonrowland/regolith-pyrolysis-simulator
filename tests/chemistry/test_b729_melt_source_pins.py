@@ -70,3 +70,48 @@ def test_melt_source_pressure_pin(feedstock, temperature_K, vapor_pressure_data)
     # Order: Si graph/fallback, Al graph/fallback; captured from executable paths.
     actual = melt_source_pressures(feedstock, temperature_K, vapor_pressure_data)
     assert tuple(value.hex() for value in actual) == PRESSURE_PINS[(feedstock, temperature_K)]
+
+
+@pytest.mark.parametrize("temperature_K", TEMPERATURES_K)
+def test_melt_source_consumers_use_catalog_reaction(temperature_K, vapor_pressure_data):
+    from simulator.vapour_rail.catalog import compiled_catalog_for
+
+    catalog = compiled_catalog_for(vapor_pressure_data.catalog_payload)
+    backend = AlphaMELTSBackend()
+    fallback = backend._activities_times_antoine(
+        temperature_K - 273.15, {"SiO2": 0.4, "Al2O3": 0.4}, {}, pO2_bar=1e-9,
+    )
+    for species in ("Si", "Al"):
+        expected = catalog.evaluator_for(species).evaluate(
+            temperature_K, source_activity=0.4, pO2_bar=1e-9,
+        )
+        graph = effective_equilibrium_pressure_Pa(
+            species, temperature_K, 1e-9, a_oxide=0.4,
+            vapor_pressure_data=vapor_pressure_data,
+        )
+        assert graph == expected.pressure_pa
+        assert fallback[species] == expected.pressure_pa
+        assert expected.out_of_range == (temperature_K == 2400.0)
+
+
+def test_pure_sidecar_is_not_a_melt_source_input(monkeypatch, vapor_pressure_data):
+    import copy
+
+    backend = AlphaMELTSBackend()
+    table = copy.deepcopy(backend._load_vapor_pressure_table())
+    for species in ("Si", "Al"):
+        table[species]["pure_component_antoine"] = {"A": 50.0, "B": 1.0, "C": 0.0}
+    monkeypatch.setattr(backend, "_vapor_pressure_table", table)
+    actual = backend._activities_times_antoine(
+        1800.0 - 273.15, {"SiO2": 0.4, "Al2O3": 0.4}, {}, pO2_bar=1e-9,
+    )
+    for species in ("Si", "Al"):
+        assert actual[species] == effective_equilibrium_pressure_Pa(
+            species, 1800.0, 1e-9, a_oxide=0.4, vapor_pressure_data=vapor_pressure_data,
+        )
+
+
+def test_melt_source_fallback_refuses_missing_oxygen_input():
+    backend = AlphaMELTSBackend()
+    with pytest.raises(RuntimeError, match="without pO2_bar"):
+        backend._activities_times_antoine(1800.0 - 273.15, {"SiO2": 0.4}, {})

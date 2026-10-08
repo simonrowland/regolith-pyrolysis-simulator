@@ -274,25 +274,58 @@ def effective_equilibrium_pressure_Pa(
 ) -> float:
     """Effective equilibrium pressure on the phase-correct E-08 rail (Pa).
 
-    Metals use the builtin Ellingham + Antoine path unless their row declares
-    ``fit_target: standard_reaction_term``. Standard-reaction metals and oxide
-    vapors (for example ``K`` and ``SiO``) use the declared Antoine row with
-    activity and pO2 scaling from :mod:`engines.builtin.vapor_pressure`.
+    Declared catalog source reactions own the activity and oxygen terms.
+    Rows without one retain their phase-correct Ellingham or fitted reaction
+    rail; a pure-element saturation sidecar cannot replace a source reaction.
     """
 
     from engines.builtin.vapor_pressure import vapor_pressure_antoine_coefficients
 
-    data = _resolve_vapor_pressure_data(vapor_pressure_data)
+    payload = vapor_pressure_data
+    if payload is None:
+        payload = _load_default_vapor_pressure_data()
+    data = _resolve_vapor_pressure_data(payload)
     T_K = float(temperature_K)
     pO2 = _physical_pO2_bar(pO2_bar)
     a_ox = max(float(a_oxide), 0.0)
 
+    from simulator.vapour_rail.catalog import compiled_catalog_for
+
+    row = (data.get("metals", {}) or {}).get(species)
+    if row is None:
+        row = (data.get("oxide_vapors", {}) or {}).get(species, {}) or {}
+    if str(row.get("consumer_status", "")).lower() == "inactive":
+        return 0.0
+    catalog_payload = getattr(payload, "catalog_payload", payload)
+    reaction_evaluator = None
+    if (
+        catalog_payload.get("schema_version") == 2
+        and (row.get("reference_pressure_model") or row.get("liquid_oxide_standard_reaction"))
+    ):
+        reaction_evaluator = compiled_catalog_for(catalog_payload).evaluator_for_hot_train(species)
+    if reaction_evaluator is not None:
+        if a_ox == 0.0:
+            return 0.0
+        evaluation = reaction_evaluator.evaluate(
+            T_K, source_activity=a_ox, pO2_bar=pO2,
+        )
+        if evaluation.out_of_range:
+            import warnings
+
+            warnings.warn(
+                f"{species} melt-source reaction: {evaluation.status} "
+                f"at {T_K:g} K", UserWarning, stacklevel=2,
+            )
+        return evaluation.pressure_pa
+    if row.get("reference_pressure_model") or row.get("liquid_oxide_standard_reaction"):
+        raise EllinghamPressureRefusal(
+            f"{species!r} requires its catalog melt-source reaction; "
+            "the legacy projection alone lacks source inputs"
+        )
+
     metals = data.get("metals", {}) or {}
     if species in metals:
         sp_data = metals[species] or {}
-        if str(sp_data.get("consumer_status", "")).lower() == "inactive":
-            # Declared inactive: proven nonvolatile by catalog contract.
-            return 0.0
         if species not in ELLINGHAM_THERMO:
             raise EllinghamPressureRefusal(
                 f"species {species!r} lacks ELLINGHAM_THERMO; refusing "
@@ -301,31 +334,11 @@ def effective_equilibrium_pressure_Pa(
         fit_target = str(sp_data.get("fit_target", "") or "")
         if not math.isfinite(T_K):
             ellingham_metal_phase_kind(species, T_K)
-        liquid_rxn = sp_data.get("liquid_oxide_standard_reaction")
-        if (
-            fit_target != "standard_reaction_term"
-            and isinstance(liquid_rxn, Mapping)
-            and liquid_rxn.get("antoine")
-        ):
-            antoine_liq = liquid_rxn.get("antoine") or {}
-            P_reference_Pa = _antoine_reference_pressure_Pa(antoine_liq, T_K)
-            if P_reference_Pa is None:
-                raise EllinghamPressureRefusal(
-                    f"Antoine reference pressure unavailable for {species!r} "
-                    f"liquid-oxide rail at T_K={T_K!r}; refusing P_eff=0.0"
-                )
-            activity_exponent = float(
-                liquid_rxn.get("oxide_activity_exponent", 1.0) or 1.0
+        if fit_target == "standard_reaction_term" and not sp_data.get("antoine"):
+            raise EllinghamPressureRefusal(
+                f"{species!r} lacks a melt-source reaction evaluator; "
+                "a pure-component sidecar is not a melt pressure"
             )
-            P_eq_Pa = P_reference_Pa * (a_ox ** activity_exponent)
-            pO2_exponent = float(liquid_rxn.get("pO2_exponent", 0.0) or 0.0)
-            if pO2_exponent:
-                pO2_reference_bar = max(
-                    1e-30,
-                    float(liquid_rxn.get("pO2_reference_bar", 1.0) or 1.0),
-                )
-                P_eq_Pa *= (pO2 / pO2_reference_bar) ** pO2_exponent
-            return max(P_eq_Pa, 0.0)
         metal_segment = (
             ellingham_segment_for_temperature(species, T_K)
             if fit_target != "standard_reaction_term"

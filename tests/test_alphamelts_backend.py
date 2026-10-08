@@ -7062,7 +7062,13 @@ def test_activities_times_antoine_maps_thermoengine_liquid_activity_keys():
     assert all(pressures[species] > 0.0 for species in required)
     assert pressures['Na'].hex() == '0x1.27fb918b2b0aep+8'
     assert pressures['K'].hex() == '0x1.19c380c94a644p+14'
-    assert pressures['Mg'].hex() == '0x1.0e7fbeab5e7f0p+18'
+    from simulator.chemistry.ellingham_graph import effective_equilibrium_pressure_Pa
+
+    assert pressures['Mg'] == effective_equilibrium_pressure_Pa(
+        'Mg', 1600.0 + 273.15, 1e-9,
+        a_oxide=backend._activity_for_vapor_species('Mg', activities),
+        vapor_pressure_data=backend._vapor_pressure_catalog_payload,
+    )
     assert pressures['SiO'].hex() == '0x1.3edd07a85de8dp+0'
     assert backend._activity_for_vapor_species('Na', activities) == pytest.approx(
         9.57e-5

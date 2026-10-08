@@ -599,11 +599,31 @@ class EquilibriumMixin:
             coefficient_block: str | None = None
             P_reference_Pa: float | None = None
             reconstructed_vapor_limit: dict[str, Any] | None = None
+            compiled_reference_evaluator = None
             if not gas_standard_rail and liquid_rxn_early is None:
                 antoine, coefficient_block = vapor_pressure_antoine_coefficients(
                     sp_data,
                     temperature_K=T_K,
                 )
+                if (
+                    fit_target == FIT_TARGET_STANDARD_REACTION
+                    and bool(sp_data.get("prefer_compiled_reference_pressure_model"))
+                ):
+                    from simulator.vapour_rail.catalog import compiled_catalog_for
+
+                    catalog = getattr(self, "vapour_rail_catalog", None)
+                    if catalog is None:
+                        payload = getattr(self.vapor_pressures, "catalog_payload", None)
+                        if payload is not None:
+                            catalog = compiled_catalog_for(payload)
+                    if catalog is None:
+                        raise RuntimeError(f"{species} requires its melt-source catalog reaction")
+                    compiled_reference_evaluator = catalog.evaluator_for_hot_train(species)
+                    P_reference_Pa = compiled_reference_evaluator.evaluate(
+                        T_K, source_activity=1.0,
+                        pO2_bar=compiled_reference_evaluator.pO2_reference_bar,
+                    ).pressure_pa
+                    coefficient_block = "compiled_reference_pressure_model"
                 if _is_noncertifying_pseudo_vapor_pressure_runtime(
                     species,
                     sp_data,
@@ -627,7 +647,7 @@ class EquilibriumMixin:
                 A = antoine.get('A', 0)
                 B = antoine.get('B', 0)
                 C = antoine.get('C', 0)
-                if not (A > 0 and T_K > 300):
+                if P_reference_Pa is None and not (A > 0 and T_K > 300):
                     continue
                 reconstructed_segment = sp_data.get(
                     RECONSTRUCTED_VAPOR_PRESSURE_SEGMENT_KEY
@@ -682,10 +702,12 @@ class EquilibriumMixin:
                         T_K,
                         consumer="legacy_condensed_rail",
                     )
-                    valid_range = vapor_pressure_valid_range_K(
-                        sp_data,
-                        coefficient_block,
-                        temperature_K=T_K,
+                    valid_range = (
+                        compiled_reference_evaluator.valid_temperature_K
+                        if compiled_reference_evaluator is not None
+                        else vapor_pressure_valid_range_K(
+                            sp_data, coefficient_block, temperature_K=T_K,
+                        )
                     )
                     if valid_range and len(valid_range) == 2:
                         valid_low = float(valid_range[0])
@@ -700,12 +722,13 @@ class EquilibriumMixin:
                                 f"valid_range_K [{valid_low:g}, {valid_high:g}] at "
                                 f"{T_K:.3f} K"
                             )
-                    log_P = _antoine_log10_pressure(A, B, C, T_K)
-                    P_reference_Pa = _pow10_pressure_or_raise(
-                        log_P,
-                        species=species,
-                        field="P_reference_Pa",
-                    )
+                    if P_reference_Pa is None:
+                        log_P = _antoine_log10_pressure(A, B, C, T_K)
+                        P_reference_Pa = _pow10_pressure_or_raise(
+                            log_P,
+                            species=species,
+                            field="P_reference_Pa",
+                        )
                 else:
                     P_reference_Pa = float(
                         reconstructed_vapor_limit["pressure_Pa"]

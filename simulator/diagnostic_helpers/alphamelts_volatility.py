@@ -90,7 +90,7 @@ def alphamelts_activity_volatility_diagnostic(
     comp_wt = _finite_positive_mapping(composition_wt_pct)
     pO2_values = _normalise_pO2_grid(pO2_grid_bar)
     source = activity_source or alphamelts_equilibrium_activity_source
-    vapor_data = dict(vapor_pressure_data or _load_default_vapor_pressure_data())
+    vapor_data = vapor_pressure_data or _load_default_vapor_pressure_data()
 
     domain = _alphamelts_domain_diagnostic(
         composition_wt_pct=comp_wt,
@@ -292,12 +292,60 @@ def _analytical_vapor_pressures_from_activities(
     by_species: dict[str, dict[str, Any]] = {}
     extrapolations: dict[str, Any] = {}
 
+    from simulator.vapour_rail.catalog import compiled_catalog_for
+
+    catalog_payload = getattr(vapor_pressure_data, "catalog_payload", vapor_pressure_data)
+    catalog = (
+        compiled_catalog_for(catalog_payload)
+        if catalog_payload.get("schema_version") == 2 else None
+    )
+
     for species in _ELLINGHAM_THERMO:
         sp_data = (vapor_pressure_data.get("metals", {}) or {}).get(species, {}) or {}
         if not sp_data or str(sp_data.get("consumer_status", "")).lower() == "inactive":
             continue
         parent_oxide = str(sp_data.get("parent_oxide", "") or "")
         if not parent_oxide:
+            continue
+        if sp_data.get("reference_pressure_model") or sp_data.get("liquid_oxide_standard_reaction"):
+            if catalog is None:
+                raise RuntimeError(f"{species} requires its melt-source catalog reaction")
+            evaluator = catalog.evaluator_for(species)
+            activity = float(activities.get(parent_oxide, 0.0) or 0.0)
+            wt_activity = max(0.0, float(comp_wt.get(parent_oxide, 0.0) or 0.0) / 100.0)
+            if activity <= 0.0 and wt_activity <= 0.0:
+                continue
+            reference = evaluator.evaluate(
+                T_K, source_activity=1.0, pO2_bar=evaluator.pO2_reference_bar,
+            )
+            pressure = (
+                evaluator.evaluate(T_K, source_activity=activity, pO2_bar=pO2).pressure_pa
+                if activity > 0.0 else 0.0
+            )
+            wt_pressure = (
+                evaluator.evaluate(T_K, source_activity=wt_activity, pO2_bar=pO2).pressure_pa
+                if wt_activity > 0.0 else 0.0
+            )
+            if sp_data.get("liquid_oxide_standard_reaction"):
+                authority_limit = ellingham_authority_limit(
+                    T_K, species=species, consumer="alphamelts-volatility-diagnostic",
+                )
+                if authority_limit is not None:
+                    extrapolations[species] = authority_limit
+            if reference.out_of_range:
+                extrapolations[species] = {
+                    "temperature_K": T_K,
+                    "valid_range_K": evaluator.valid_temperature_K,
+                    "authority_status": "extrapolation_limited",
+                }
+            by_species[species] = _species_payload(
+                parent_oxide=parent_oxide, P_eq_Pa=pressure,
+                P_eq_wt_fraction_Pa=wt_pressure, melt_oxide_activity=activity,
+                wt_fraction_activity=wt_activity, activity_factor=activity,
+                wt_fraction_activity_factor=wt_activity,
+                P_reference_Antoine_Pa=reference.pressure_pa, pO2_bar=pO2,
+                source_label="alphamelts_activity_diagnostic:catalog_melt_source_reaction",
+            )
             continue
         coefficient_block = None
         antoine, coefficient_block = vapor_pressure_antoine_coefficients(
@@ -891,9 +939,9 @@ def _load_default_vapor_pressure_data() -> dict[str, Any]:
     root = Path(__file__).resolve().parents[2]
     with (root / "data" / "vapor_pressures.yaml").open() as handle:
         payload = load_cached_safe_yaml(handle.read()) or {}
-    from simulator.vapour_rail.catalog import vapor_pressure_legacy_view
+    from simulator.vapour_rail.catalog import vapor_pressure_compatibility_view
 
-    return vapor_pressure_legacy_view(payload)
+    return vapor_pressure_compatibility_view(payload)
 
 
 __all__ = (
