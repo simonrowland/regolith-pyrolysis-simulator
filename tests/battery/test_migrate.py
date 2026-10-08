@@ -446,6 +446,39 @@ def _migrate_real_extract(
     return migrate(root, write=write)
 
 
+def test_fegley_temperature_fit_regen_fields_pin(tmp_path: Path) -> None:
+    """Pin all current regenerated fields except the four planned basis additions."""
+    result = _migrate_real_extract(
+        tmp_path,
+        "fegley-2023-chemical-equilibrium-calculations-bu.yaml",
+        use_repository_index_row=True,
+    )
+    rows = sorted(
+        (to_plain(obs) for obs in result.observations.values()),
+        key=lambda row: row["observation_id"],
+    )
+    assert len(rows) == 109
+    fit_rows = [
+        row for row in rows
+        if row["identity"]["quantity"].get("value")
+        == Quantity.ACTIVITY_COEFFICIENT_TEMPERATURE_FIT.value
+    ]
+    assert len(fit_rows) == 82
+    for row in fit_rows:
+        domain = json.loads(row["value"]["expression_domain"])
+        for key in (
+            "stated_convention", "stated_phase", "mole_fraction_basis", "stated_basis_cite"
+        ):
+            domain.pop(key, None)
+        row["value"]["expression_domain"] = json.dumps(
+            domain, ensure_ascii=False, separators=(",", ":")
+        )
+    digest = hashlib.sha256(
+        json.dumps(rows, sort_keys=True, ensure_ascii=False, separators=(",", ":")).encode()
+    ).hexdigest()
+    assert digest == "e8249b8baa0cd0bd46fe7aeb620f644646f2182393d4ea7ee620aab517872197"
+
+
 def _extract_observations(name: str) -> list[dict]:
     src = REPO_ROOT / "data" / "literature" / "extracts" / name
     doc = yaml.safe_load(src.read_text(encoding="utf-8"))
