@@ -463,8 +463,8 @@ def test_openimcc_producer_emits_activity_and_vapour_rails() -> None:
     assert cell.status == "ok", cell.engine_reason
     assert cell.melt_activities["K2O"] > 0.0
     assert cell.gas_partial_pressures_Pa["K"] > 0.0
-    assert "openimcc" in cell.vapor_pressures_source["K"]
-    assert "gas-shomate.csv" in cell.vapor_pressures_source["K"]
+    gas_digest = handle.identity["engine_binding_identity"]["gas_table_digest"]
+    assert cell.vapor_pressures_source["K"] == f"openimcc-gas-table:sha256:{gas_digest}"
     assert cell.model_id == "IMCC-SF04"
 
 
