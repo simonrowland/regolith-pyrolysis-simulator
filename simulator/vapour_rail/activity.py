@@ -2766,7 +2766,7 @@ def resolve_trace_parent_activity(
                 return followed
             rung = followed.derivation.get("rung")
             if rung in {2, 3}:
-                return _retag_homologue(
+                answer = _retag_homologue(
                     component_id=component_id,
                     homologue=target,
                     followed=followed,
@@ -2776,6 +2776,18 @@ def resolve_trace_parent_activity(
                     solve_group_id=solve_group_id,
                     coefficient_formula=alias,
                 )
+                gamma = answer.derivation.get("gamma")
+                applied = _apply_henrian_gamma(current, float(gamma))
+                if applied is not None:
+                    converted, value = applied
+                    answer = replace(
+                        _annotate(answer, gamma=converted),
+                        value=value,
+                        ln_value=None,
+                    )
+                    if alias is not None and current == formula:
+                        answer = _mark_derived_spelling(answer)
+                    return answer
         return _rung4(
             component_id=component_id,
             activity_exponent=activity_exponent,

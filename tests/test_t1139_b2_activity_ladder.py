@@ -804,9 +804,9 @@ def test_unestablished_component_basis_does_not_reuse_the_row_gamma(
     parent = _resolve("In2O3", rows)
     single = _resolve("InO1.5", rows)
     assert parent.derivation["rung"] == 2
-    assert single.derivation["rung"] == 3
-    assert single.derivation["homologue"] == "Ga2O3"
-    assert single.derivation["gamma"] != parent.derivation["gamma"]
+    assert single.derivation["rung"] == 4
+    assert single.derivation["homologue"] is None
+    assert single.derivation["flag"] == "henrian_gamma_unmeasured"
     assert single.derivation["gamma"] is not None
     assert single.verdict is not ActivityVerdictKind.POINT
 
@@ -1046,6 +1046,18 @@ def test_production_geo2_straddle_is_the_envelope_midpoint() -> None:
         assert answer.derivation["mole_fraction_basis"] == (
             "conventional_oxide_molecular"
         )
+
+
+@pytest.mark.parametrize("parent,single", [("Ga2O3", "GaO1.5"), ("In2O3", "InO1.5")])
+def test_production_homologue_preserves_molecular_activity(parent, single) -> None:
+    rows = [row for row in load_fegley2023_gamma_table()["rows"]
+            if row["formula"] not in {"Ga2O3", "In2O3"}]
+    molecular = _resolve(parent, rows, temperature_K=1673.0, mole_fraction=1e-6)
+    cation = _resolve(single, rows, temperature_K=1673.0, mole_fraction=1e-6)
+    assert molecular.derivation["rung"] == cation.derivation["rung"] == 3
+    assert molecular.derivation["flag"] == cation.derivation["flag"] == "homologue"
+    assert molecular.value == pytest.approx(cation.value ** 2)
+    assert cation.derivation["component_basis_derived"] is True
 
 
 def test_production_homologue_targets_resolve_before_unity() -> None:
