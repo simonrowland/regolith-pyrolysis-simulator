@@ -888,7 +888,7 @@ def test_straddling_unbanded_rows_use_the_geometric_mean() -> None:
     answer = _resolve("PbO", rows)
     gammas = _published_gammas("PbO", rows, 1500.0)
     assert min(gammas) < 1.0 < max(gammas)
-    midpoint = math.exp(sum(math.log(gamma) for gamma in sorted(gammas)) / len(gammas))
+    midpoint = math.sqrt(min(gammas) * max(gammas))
     assert answer.derivation["flag"] == "envelope_midpoint"
     assert answer.verdict is ActivityVerdictKind.STATUS_BEARING_VALUE
     assert answer.bound_direction is None
@@ -1022,9 +1022,7 @@ def test_production_geo2_straddle_is_the_envelope_midpoint() -> None:
         published = _published_gammas("GeO2", geo_rows, temperature_K)
         assert len(published) == 3
         assert min(published) < 1.0 < max(published)
-        midpoint = math.exp(
-            sum(math.log(gamma) for gamma in sorted(published)) / len(published)
-        )
+        midpoint = math.sqrt(min(published) * max(published))
         answer = _resolve("GeO2", None, temperature_K=temperature_K)
         assert answer.derivation["flag"] == "envelope_midpoint"
         assert answer.verdict is ActivityVerdictKind.STATUS_BEARING_VALUE

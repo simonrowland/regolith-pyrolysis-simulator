@@ -215,8 +215,8 @@ _AFTER_LADDER = json.loads(
     "extrapolation_notice": null,
     "flag": "envelope_midpoint",
     "gamma_hex": {
-      "1500": "0x1.03e7223198b04p-2",
-      "1673": "0x1.ad5ac6bebcc0bp-2"
+      "1500": "0x1.bf703d74f75e1p-2",
+      "1673": "0x1.a256321814ba1p-1"
     },
     "homologue": null,
     "may_certify": false,
@@ -229,8 +229,8 @@ _AFTER_LADDER = json.loads(
     "source_row_id": null,
     "tier": "B",
     "value_hex": {
-      "1500": "0x1.108724eb70dedp-22",
-      "1673": "0x1.c235ff1c2efdfp-22"
+      "1500": "0x1.d52c575075904p-22",
+      "1673": "0x1.b6a8674096b56p-21"
     },
     "verdict": "StatusBearingValue"
   },

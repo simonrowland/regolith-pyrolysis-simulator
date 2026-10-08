@@ -2597,7 +2597,7 @@ def resolve_trace_parent_activity(
         Every candidate above 1 is a lower bound at the minimum gamma.
         Every candidate below 1 is an upper bound at the maximum gamma.
         A candidate on the other side of 1, or equal to 1, is the
-        geometric mean, flagged ``envelope_midpoint``. Proxy-only groups
+        geometric mean of the endpoints, flagged ``envelope_midpoint``. Proxy-only groups
         are not this rule.
         """
 
@@ -2639,7 +2639,7 @@ def resolve_trace_parent_activity(
                 source_row_id=str(row["source_row_id"]),
                 single_cation=single_cation,
             )
-        geomean = _geometric_mean(gammas)
+        geomean = _geometric_mean((min(gammas), max(gammas)))
         applied = _apply_henrian_gamma(current, geomean)
         if applied is None:
             return None
@@ -2689,7 +2689,7 @@ def resolve_trace_parent_activity(
         answer = _annotate(
             answer,
             **basis,
-            algebra="geometric mean of the published candidate gammas",
+            algebra="geometric mean of the published gamma envelope endpoints",
         )
         return _with_candidate_envelope(
             answer,
