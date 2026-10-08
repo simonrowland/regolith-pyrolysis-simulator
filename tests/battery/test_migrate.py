@@ -479,6 +479,31 @@ def test_fegley_temperature_fit_regen_fields_pin(tmp_path: Path) -> None:
     assert digest == "e8249b8baa0cd0bd46fe7aeb620f644646f2182393d4ea7ee620aab517872197"
 
 
+def test_fegley_temperature_fit_source_basis_survives_regen(tmp_path: Path) -> None:
+    name = "fegley-2023-chemical-equilibrium-calculations-bu.yaml"
+    source = next(
+        obs for obs in _extract_observations(name)
+        if obs["values"].get("quantity")
+        == Quantity.ACTIVITY_COEFFICIENT_TEMPERATURE_FIT.value
+    )
+    values = source["values"]
+    assert values["standard_state_note_locator"]["page"] == [5, 6, 10, 11]
+    declarations = {
+        key: values[key] for key in (
+            "stated_convention", "stated_phase", "mole_fraction_basis", "stated_basis_cite"
+        )
+    }
+    result = _migrate_real_extract(tmp_path, name, use_repository_index_row=True)
+    fits = [
+        obs for obs in result.observations.values()
+        if obs.identity.quantity.value is Quantity.ACTIVITY_COEFFICIENT_TEMPERATURE_FIT
+    ]
+    assert len(fits) == 82
+    for obs in fits:
+        domain = json.loads(obs.value.expression_domain)
+        assert {key: domain.get(key) for key in declarations} == declarations
+
+
 def _extract_observations(name: str) -> list[dict]:
     src = REPO_ROOT / "data" / "literature" / "extracts" / name
     doc = yaml.safe_load(src.read_text(encoding="utf-8"))

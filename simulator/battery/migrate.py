@@ -7083,6 +7083,9 @@ QUANTITY_SOURCE_FIELDS: dict[Quantity, tuple[str, ...]] = {
 _CONDITION_RANGE_KEYS = ("T_range_K", "temperature_range_k", "temperature_range_K")
 AXIS_TEMPERATURE_K = "temperature_K"
 AXIS_STANDARD_PRESSURE_PA = "standard_pressure_Pa"
+_ACTIVITY_FIT_BASIS_FIELDS = (
+    "stated_convention", "stated_phase", "mole_fraction_basis", "stated_basis_cite"
+)
 
 _PRESSURE_UNIT_BY_KEY = dict(_PRESSURE_SERIES_KEYS)
 _PRESSURE_UNIT_BY_KEY.update({key: "Pa" for key in _PARTIAL_PRESSURE_FIELDS})
@@ -7924,6 +7927,9 @@ def select_declared_source(
                 "A_as_printed": str(a_printed),
                 "B_as_printed": str(b_printed),
             }
+            for key in _ACTIVITY_FIT_BASIS_FIELDS:
+                if key in payload:
+                    domain[key] = payload[key]
             return SourceSelection(
                 value=Value(
                     ValueKind.EXPRESSION,
@@ -12723,7 +12729,17 @@ class Migrator:
             q_token = quantity.value if isinstance(quantity, State) and quantity.is_value else (
                 quantity if isinstance(quantity, Quantity) else None
             )
-            value_sel = select_declared_source(q_token, units, raw_item)
+            value_payload = raw_item
+            if (
+                q_token is Quantity.ACTIVITY_COEFFICIENT_TEMPERATURE_FIT
+                and isinstance(parent_values, Mapping)
+            ):
+                value_payload = {
+                    key: parent_values[key]
+                    for key in _ACTIVITY_FIT_BASIS_FIELDS if key in parent_values
+                }
+                value_payload.update(raw_item)
+            value_sel = select_declared_source(q_token, units, value_payload)
             val = value_sel.amount
             trail = value_sel.unit_trail
             if not value_sel.available and value_sel.field_name in {"P", "p"}:

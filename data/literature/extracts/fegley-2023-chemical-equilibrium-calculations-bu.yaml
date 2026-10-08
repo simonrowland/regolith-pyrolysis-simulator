@@ -609,6 +609,16 @@ species:
         evidence_class: thermodynamic_model_parameter
         measurement_kind: model
         quantity: activity_coefficient_temperature_fit
+        stated_convention: raoultian_pure_endmember
+        stated_phase: liquid
+        mole_fraction_basis: conventional_oxide_molecular
+        stated_basis_cite: fegley2023:206,269-297,504-515
+        standard_state_note_locator:
+          page: [5, 6, 10, 11]
+          section: '2. Computational Methods and Data Sources'
+          note: 'PDF pp. 5-6: liquid MgO and oxide-molecular mole fractions; p. 10: CuO/Cu2O
+            mole fractions; p. 11: liquid oxide model and Raoultian pure-component activity.
+            These declarations apply to all Table 2 fits (PDF pp. 62-64).'
         rows_as_printed:
         - oxide: Ag2O
           A_printed: '0'
