@@ -225,9 +225,10 @@ def test_wall_deposit_is_rebaselined_after_corrected_hkl_mass_flux():
     # capped by available supply.  Re-grounding that executable chain moves
     # the 1050 C product deposit, without changing the 1400/1500 C threshold
     # zeros; this is a physics-derived pin, not a tuning adjustment.
-    # The new 1050 C value is 8.191905995448e-06 kg.
+    # b-729/b-732 pre-fix laptop/config-absent executable pin. The Studio
+    # 8.191905995448e-06 kg pin is traced separately before rebaselining.
     assert _sio_wall_product_deposit_kg(1050.0) == pytest.approx(
-        8.191905995448e-06, rel=1e-9
+        8.191796266986e-06, rel=1e-9
     )
     assert _sio_wall_product_deposit_kg(1400.0) == pytest.approx(
         0.0, rel=1e-9
