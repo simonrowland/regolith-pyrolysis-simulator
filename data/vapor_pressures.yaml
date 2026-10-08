@@ -2056,10 +2056,6 @@ families:
               one O2. Algebra: K=(p_Si/P0)*(pO2/P0)/a_SiO2, hence p_Si is proportional to a_SiO2*(pO2/P0)^-1
               and the exponent is -nu_O2/nu_vapor=-1/1=-1. Unit check: K, activity, and pressure ratios
               are dimensionless; multiplying by P0 returns Pa. Sanity: SiO2 -> Si + O2 is atom balanced.'
-          stoich_oxide_per_vapor: 2.13932704290547
-          stoich_O2_per_vapor: 1.13932704290547
-          stoichiometry_derivation: 'M(SiO2)/M(Si)=60.083/28.085=2.13932704290547 kg/kg; M(O2)/M(Si)=31.998/28.085=1.13932704290547
-            kg/kg. Unit check: kg/kg. Mass sanity: 2.13932704290547 = 1 + 1.13932704290547.'
           oxide_activity_exponent: 1.0
           pO2_exponent: -1.0
           pO2_reference_bar: 1.0e-09
@@ -2909,10 +2905,6 @@ families:
               the condensed standard state. Unit check: K, activities, and pressure ratios are dimensionless;
               final pressure is Pa. Sanity: dividing by Ti(g) gives K_exchange*(pO2/P0)^0.5, so TiO/Ti
               falls as pO2 falls.'
-          stoich_oxide_per_vapor: 1.25050887796324
-          stoich_O2_per_vapor: 0.250508877963236
-          stoichiometry_derivation: 'M(TiO2)/M(TiO)=79.865/63.866=1.25050887796324 kg/kg; 0.5*M(O2)/M(TiO)=0.5*31.998/63.866=0.250508877963236
-            kg/kg. Unit check: kg/kg. Mass sanity: 1.25050887796324 = 1 + 0.250508877963236.'
           oxide_activity_exponent: 1.0
           pO2_exponent: -0.5
           pO2_reference_bar: 1.0
@@ -3074,10 +3066,6 @@ families:
               Ti+O2->TiO2 is composed with the existing liquid-TiO2->Ti rail. Unit check: K and activity
               are dimensionless, pressure is Pa. Sanity: TiO2/Ti=K_exchange*(pO2/P0), so the oxide carrier
               falls relative to Ti when pO2 falls.'
-          stoich_oxide_per_vapor: 1.0
-          stoich_O2_per_vapor: 0.0
-          stoichiometry_derivation: Identical TiO2 formulas give M_parent/M_vapor=79.865/79.865=1 and
-            zero O2. Unit kg/kg; mass sanity 1=1+0.
           oxide_activity_exponent: 1.0
           # Premise: TiO2(l) -> TiO2(g). Identical formulas; no O2 on either side.
           # Algebra: K=(p_TiO2/Pstd) / a_TiO2; p_TiO2/Pstd = K * a_TiO2^1 * (fO2/Pstd)^0.
@@ -3242,10 +3230,6 @@ families:
               is composed with the existing crystalline-CaO->Ca rail. Unit check: K and activity are dimensionless,
               pressure is Pa. Sanity: CaO/Ca=K_exchange*(pO2/P0)^0.5, so CaO becomes less important at
               lower pO2.'
-          stoich_oxide_per_vapor: 1.0
-          stoich_O2_per_vapor: 0.0
-          stoichiometry_derivation: Identical CaO formulas give 56.077/56.077=1 kg/kg and zero O2; mass
-            sanity 1=1+0.
           oxide_activity_exponent: 1.0
           pO2_exponent: 0.0
           pO2_reference_bar: 1.0
@@ -3425,10 +3409,6 @@ families:
               composed with the existing liquid AlO1.5->Al rail. Unit check: all activities/ratios are
               dimensionless and output is Pa. Sanity: AlO/Al is proportional to pO2^0.5 and falls under
               stronger reduction.'
-          stoich_oxide_per_vapor: 1.18611911993611
-          stoich_O2_per_vapor: 0.186119119936108
-          stoichiometry_derivation: 0.5*M(Al2O3)/M(AlO)= 0.5*101.960077/42.9805385=1.18611911993611 kg/kg;
-            0.25*M(O2)/M(AlO)=0.186119119936108 kg/kg. Unit kg/kg; mass sanity 1.18611911993611=1+0.186119119936108.
           oxide_activity_exponent: 1.0
           pO2_exponent: -0.25
           pO2_reference_bar: 1.0
@@ -3574,10 +3554,6 @@ families:
               exponent=2/1=2 and pO2 exponent=-1/1=-1. K(T)=exp(-DeltaG_rxn/(R*T)); CEA 2Al+0.5O2->Al2O
               is composed with two copies of the liquid-AlO1.5->Al rail. Unit check: ratios and K are
               dimensionless; output is Pa. Sanity: Al2O/Al^2 is proportional to pO2^0.5.'
-          stoich_oxide_per_vapor: 1.45736206487981
-          stoich_O2_per_vapor: 0.457362064879806
-          stoichiometry_derivation: M(Al2O3)/M(Al2O)= 101.960077/69.962077=1.45736206487981 kg/kg; M(O2)/M(Al2O)=31.998/69.962077=0.457362064879806
-            kg/kg. Unit kg/kg; mass sanity 1.45736206487981=1+0.457362064879806.
           oxide_activity_exponent: 2.0
           pO2_exponent: -1.0
           pO2_reference_bar: 1.0
@@ -3725,10 +3701,6 @@ families:
               Unit check: K, activities, and pressure ratios are dimensionless; evaluator output is Pa.
               Sanity check: the independently stored kg identity is oxide_per=1.88944149719261=1+O2_per
               (0.889441497192608).'
-          stoich_oxide_per_vapor: 1.8894414971926081
-          stoich_O2_per_vapor: 0.8894414971926082
-          stoichiometry_derivation: 1*M(Al2O3)/M(Al2)=1.88944149719261 kg/kg; 1.5*M(O2)/M(Al2)=0.889441497192608
-            kg/kg. Unit check kg/kg; mass identity 1.88944149719261=1+(0.889441497192608).
           oxide_activity_exponent: 2.0
           pO2_exponent: -1.5
           pO2_reference_bar: 1.0
@@ -3873,10 +3845,6 @@ families:
               Unit check: K, activities, and pressure ratios are dimensionless; evaluator output is Pa.
               Sanity check: the independently stored kg identity is oxide_per=1.18611911993611=1+O2_per
               (0.186119119936108).'
-          stoich_oxide_per_vapor: 1.1861191199361079
-          stoich_O2_per_vapor: 0.18611911993610783
-          stoichiometry_derivation: 1*M(Al2O3)/M(Al2O2)=1.18611911993611 kg/kg; 0.5*M(O2)/M(Al2O2)=0.186119119936108
-            kg/kg. Unit check kg/kg; mass identity 1.18611911993611=1+(0.186119119936108).
           oxide_activity_exponent: 2.0
           pO2_exponent: -0.5
           pO2_reference_bar: 1.0
@@ -4024,10 +3992,6 @@ families:
               Algebra: K=(p_vapor/P0)*(pO2/P0)^0/a_AlO1.5^2, so activity exponent=2 and pO2 exponent=-nu_O2/nu_vapor=-0.
               Unit check: K, activities, and pressure ratios are dimensionless; evaluator output is Pa.
               Sanity check: the independently stored kg identity is oxide_per=1=1+O2_per (0).'
-          stoich_oxide_per_vapor: 1.0
-          stoich_O2_per_vapor: 0.0
-          stoichiometry_derivation: 1*M(Al2O3)/M(Al2O3)=1 kg/kg; 0*M(O2)/M(Al2O3)=0 kg/kg. Unit check
-            kg/kg; mass identity 1=1+(0).
           oxide_activity_exponent: 2.0
           pO2_exponent: -0.0
           pO2_reference_bar: 1.0
@@ -4174,10 +4138,6 @@ families:
               Unit check: K, activities, and pressure ratios are dimensionless; evaluator output is Pa.
               Sanity check: the independently stored kg identity is oxide_per=0.864368216445098=1+O2_per
               (-0.135631783554902).'
-          stoich_oxide_per_vapor: 0.8643682164450982
-          stoich_O2_per_vapor: -0.13563178355490185
-          stoichiometry_derivation: 0.5*M(Al2O3)/M(AlO2)=0.864368216445098 kg/kg; -0.25*M(O2)/M(AlO2)=-0.135631783554902
-            kg/kg. Unit check kg/kg; mass identity 0.864368216445098=1+(-0.135631783554902).
           oxide_activity_exponent: 1.0
           pO2_exponent: 0.25
           pO2_reference_bar: 1.0
@@ -4326,10 +4286,6 @@ families:
               Unit check: K, activities, and pressure ratios are dimensionless; evaluator output is Pa.
               Sanity check: the independently stored kg identity is oxide_per=1.39919656669494=1+O2_per
               (0.399196566694945).'
-          stoich_oxide_per_vapor: 1.3991965666949446
-          stoich_O2_per_vapor: 0.39919656669494485
-          stoichiometry_derivation: 2*M(CaO)/M(Ca2)=1.39919656669494 kg/kg; 1*M(O2)/M(Ca2)=0.399196566694945
-            kg/kg. Unit check kg/kg; mass identity 1.39919656669494=1+(0.399196566694945).
           oxide_activity_exponent: 2.0
           pO2_exponent: -1.0
           pO2_reference_bar: 1.0
@@ -4512,10 +4468,6 @@ families:
               Unit check: K, activities, and pressure ratios are dimensionless; evaluator output is Pa.
               Sanity check: the independently stored kg identity is oxide_per=1.11764818347204=1+O2_per
               (0.117648183472044).'
-          stoich_oxide_per_vapor: 1.1176481834720444
-          stoich_O2_per_vapor: 0.11764818347204432
-          stoichiometry_derivation: 0.5*M(Cr2O3)/M(CrO)=1.11764818347204 kg/kg; 0.25*M(O2)/M(CrO)=0.117648183472044
-            kg/kg. Unit check kg/kg; mass identity 1.11764818347204=1+(0.117648183472044).
           oxide_activity_exponent: 1.0
           pO2_exponent: -0.25
           pO2_reference_bar: 1.0
@@ -4693,8 +4645,6 @@ families:
               fit_log10_P_ref_Pa: 2.044520449
               fit_P_ref_Pa: 110.795073
               lunar_mare_activity_scaled_P_Pa: 48.36
-          stoich_oxide_per_vapor: 1.362920787587333
-          stoich_O2_per_vapor: 0.36292078758733326
           suppression_equation: p(SiO) = K(T) * a(SiO2) / sqrt pO2
           pO2_reference_bar: 1.0e-09
           suppression_factor_at_1mbar_O2: '>300*'
@@ -4850,10 +4800,6 @@ families:
               Unit check: K, activities, and pressure ratios are dimensionless; evaluator output is Pa.
               Sanity check: the independently stored kg identity is oxide_per=0.904761167748687=1+O2_per
               (-0.0952388322513129).'
-          stoich_oxide_per_vapor: 0.9047611677486871
-          stoich_O2_per_vapor: -0.0952388322513129
-          stoichiometry_derivation: 0.5*M(Cr2O3)/M(CrO2)=0.904761167748687 kg/kg; -0.25*M(O2)/M(CrO2)=-0.0952388322513129
-            kg/kg. Unit check kg/kg; mass identity 0.904761167748687=1+(-0.0952388322513129).
           oxide_activity_exponent: 1.0
           pO2_exponent: 0.25
           pO2_reference_bar: 1.0
@@ -9085,11 +9031,6 @@ families:
               CEA Cr+1.5O2->CrO3 is composed with the existing liquid CrO1.5->Cr rail. Unit check: K/activity/pressure
               ratios are dimensionless and output is Pa. Sanity: pressure tends to zero as pO2 tends to
               zero, unlike reduced Cr and CrO2 carriers.'
-          stoich_oxide_per_vapor: 0.759998439892353
-          stoich_O2_per_vapor: -0.240001560107647
-          stoichiometry_derivation: 0.5*M(Cr2O3)/M(CrO3)= 0.5*151.9892/99.9931=0.759998439892353 kg/kg;
-            oxygen is consumed, so -0.75*M(O2)/M(CrO3)=-0.240001560107647 kg/kg. Unit kg/kg; mass sanity
-            0.759998439892353=1-0.240001560107647.
           oxide_activity_exponent: 1.0
           pO2_exponent: 0.75
           pO2_reference_bar: 1.0
@@ -10866,8 +10807,6 @@ families:
           chemical_family: phosphorus_carrier
           molar_mass_g_mol: 46.973161998
           parent_oxide: P2O5
-          stoich_oxide_per_vapor: 1.5109024672856537
-          stoich_O2_per_vapor: 0.5109024672856538
           source_oxide_mol_per_vapor_mol: 0.5
           source_O2_mol_per_vapor_mol: 0.75
           oxide_activity_exponent: 0.5
@@ -11084,8 +11023,6 @@ families:
           chemical_family: phosphorus_carrier
           molar_mass_g_mol: 62.972561998
           parent_oxide: P2O5
-          stoich_oxide_per_vapor: 1.1270331295518468
-          stoich_O2_per_vapor: 0.12703312955184684
           source_oxide_mol_per_vapor_mol: 0.5
           source_O2_mol_per_vapor_mol: 0.25
           oxide_activity_exponent: 0.5
@@ -11284,8 +11221,6 @@ families:
           chemical_family: phosphorus_carrier
           molar_mass_g_mol: 219.891447992
           parent_oxide: P2O5
-          stoich_oxide_per_vapor: 1.2910376873446114
-          stoich_O2_per_vapor: 0.2910376873446116
           source_oxide_mol_per_vapor_mol: 2.0
           source_O2_mol_per_vapor_mol: 2.0
           oxide_activity_exponent: 2.0
@@ -11480,8 +11415,6 @@ families:
           chemical_family: phosphorus_carrier
           molar_mass_g_mol: 283.889047992
           parent_oxide: P2O5
-          stoich_oxide_per_vapor: 1
-          stoich_O2_per_vapor: 0
           source_oxide_mol_per_vapor_mol: 2.0
           source_O2_mol_per_vapor_mol: 0.0
           oxide_activity_exponent: 2.0
@@ -11725,8 +11658,6 @@ families:
           chemical_family: phosphorus_carrier
           molar_mass_g_mol: 61.947523996
           parent_oxide: P2O5
-          stoich_oxide_per_vapor: 2.291334904768193
-          stoich_O2_per_vapor: 1.2913349047681928
           source_oxide_mol_per_vapor_mol: 1.0
           source_O2_mol_per_vapor_mol: 2.5
           oxide_activity_exponent: 1.0
@@ -11912,8 +11843,6 @@ families:
           chemical_family: phosphorus_carrier
           molar_mass_g_mol: 123.895047992
           parent_oxide: P2O5
-          stoich_oxide_per_vapor: 2.291334904768193
-          stoich_O2_per_vapor: 1.2913349047681928
           source_oxide_mol_per_vapor_mol: 2.0
           source_O2_mol_per_vapor_mol: 5.0
           oxide_activity_exponent: 2.0
@@ -12845,11 +12774,6 @@ families:
               therefore pO2 exponent=-nu_O2/nu_vapor=-0.5 and activity exponent=nu_parent/nu_vapor=1.0.
               Unit check: K, activity, and pressure ratios are dimensionless; multiplying by P0 returns
               Pa. Sanity: the atom-balanced source reaction conserves every element.'
-          stoich_oxide_per_vapor: 1.2045996884775
-          stoich_O2_per_vapor: 0.204599688477504
-          stoichiometry_derivation: 'Premise: parent debit is 1.0 mol K2O per mol K2. Algebra gives 1.2045996884775
-            kg parent/kg vapor and 0.204599688477504 kg O2/kg vapor. Unit check: kg/kg. Sanity: 1.2045996884775
-            = 1 + 0.204599688477504.'
           oxide_activity_exponent: 1.0
           pO2_exponent: -0.5
           pO2_reference_bar: 1
@@ -12988,10 +12912,6 @@ families:
               therefore pO2 exponent=-nu_O2/nu_vapor=0.0 and activity exponent=nu_parent/nu_vapor=1.0.
               Unit check: K, activity, and pressure ratios are dimensionless; multiplying by P0 returns
               Pa. Sanity: the atom-balanced source reaction conserves every element.'
-          stoich_oxide_per_vapor: 1
-          stoich_O2_per_vapor: 0
-          stoichiometry_derivation: 'Premise: parent debit is 1.0 mol K2O per mol K2O. Algebra gives 1
-            kg parent/kg vapor and 0 kg O2/kg vapor. Unit check: kg/kg. Sanity: 1 = 1 + 0.'
           oxide_activity_exponent: 1.0
           pO2_exponent: 0.0
           pO2_reference_bar: 1
@@ -13135,11 +13055,6 @@ families:
               therefore pO2 exponent=-nu_O2/nu_vapor=-1.0 and activity exponent=nu_parent/nu_vapor=2.0.
               Unit check: K, activity, and pressure ratios are dimensionless; multiplying by P0 returns
               Pa. Sanity: the atom-balanced source reaction conserves every element.'
-          stoich_oxide_per_vapor: 1.65825961736268
-          stoich_O2_per_vapor: 0.658259617362683
-          stoichiometry_derivation: 'Premise: parent debit is 2.0 mol MgO per mol Mg2. Algebra gives 1.65825961736268
-            kg parent/kg vapor and 0.658259617362683 kg O2/kg vapor. Unit check: kg/kg. Sanity: 1.65825961736268
-            = 1 + 0.658259617362683.'
           oxide_activity_exponent: 2.0
           pO2_exponent: -1.0
           pO2_reference_bar: 1
@@ -13304,10 +13219,6 @@ families:
               therefore pO2 exponent=-nu_O2/nu_vapor=0.0 and activity exponent=nu_parent/nu_vapor=1.0.
               Unit check: K, activity, and pressure ratios are dimensionless; multiplying by P0 returns
               Pa. Sanity: the atom-balanced source reaction conserves every element.'
-          stoich_oxide_per_vapor: 1
-          stoich_O2_per_vapor: 0
-          stoichiometry_derivation: 'Premise: parent debit is 1.0 mol MgO per mol MgO. Algebra gives 1
-            kg parent/kg vapor and 0 kg O2/kg vapor. Unit check: kg/kg. Sanity: 1 = 1 + 0.'
           oxide_activity_exponent: 1.0
           pO2_exponent: 0.0
           pO2_reference_bar: 1
@@ -13477,11 +13388,6 @@ families:
               therefore pO2 exponent=-nu_O2/nu_vapor=-0.5 and activity exponent=nu_parent/nu_vapor=1.0.
               Unit check: K, activity, and pressure ratios are dimensionless; multiplying by P0 returns
               Pa. Sanity: the atom-balanced source reaction conserves every element.'
-          stoich_oxide_per_vapor: 1.34795912488601
-          stoich_O2_per_vapor: 0.347959124886007
-          stoichiometry_derivation: 'Premise: parent debit is 1.0 mol Na2O per mol Na2. Algebra gives
-            1.34795912488601 kg parent/kg vapor and 0.347959124886007 kg O2/kg vapor. Unit check: kg/kg.
-            Sanity: 1.34795912488601 = 1 + 0.347959124886007.'
           oxide_activity_exponent: 1.0
           pO2_exponent: -0.5
           pO2_reference_bar: 1
@@ -13679,10 +13585,6 @@ families:
               therefore pO2 exponent=-nu_O2/nu_vapor=0.0 and activity exponent=nu_parent/nu_vapor=1.0.
               Unit check: K, activity, and pressure ratios are dimensionless; multiplying by P0 returns
               Pa. Sanity: the atom-balanced source reaction conserves every element.'
-          stoich_oxide_per_vapor: 1
-          stoich_O2_per_vapor: 0
-          stoichiometry_derivation: 'Premise: parent debit is 1.0 mol Na2O per mol Na2O. Algebra gives
-            1 kg parent/kg vapor and 0 kg O2/kg vapor. Unit check: kg/kg. Sanity: 1 = 1 + 0.'
           oxide_activity_exponent: 1.0
           pO2_exponent: 0.0
           pO2_reference_bar: 1
@@ -13887,11 +13789,6 @@ families:
               therefore pO2 exponent=-nu_O2/nu_vapor=-2.0 and activity exponent=nu_parent/nu_vapor=2.0.
               Unit check: K, activity, and pressure ratios are dimensionless; multiplying by P0 returns
               Pa. Sanity: the atom-balanced source reaction conserves every element.'
-          stoich_oxide_per_vapor: 2.13932704290547
-          stoich_O2_per_vapor: 1.13932704290547
-          stoichiometry_derivation: 'Premise: parent debit is 2.0 mol SiO2 per mol Si2. Algebra gives
-            2.13932704290547 kg parent/kg vapor and 1.13932704290547 kg O2/kg vapor. Unit check: kg/kg.
-            Sanity: 2.13932704290547 = 1 + 1.13932704290547.'
           oxide_activity_exponent: 2.0
           pO2_exponent: -2.0
           pO2_reference_bar: 1e-9
@@ -14037,11 +13934,6 @@ families:
               therefore pO2 exponent=-nu_O2/nu_vapor=-3.0 and activity exponent=nu_parent/nu_vapor=3.0.
               Unit check: K, activity, and pressure ratios are dimensionless; multiplying by P0 returns
               Pa. Sanity: the atom-balanced source reaction conserves every element.'
-          stoich_oxide_per_vapor: 2.13932704290547
-          stoich_O2_per_vapor: 1.13932704290547
-          stoichiometry_derivation: 'Premise: parent debit is 3.0 mol SiO2 per mol Si3. Algebra gives
-            2.13932704290547 kg parent/kg vapor and 1.13932704290547 kg O2/kg vapor. Unit check: kg/kg.
-            Sanity: 2.13932704290547 = 1 + 1.13932704290547.'
           oxide_activity_exponent: 3.0
           pO2_exponent: -3.0
           pO2_reference_bar: 1e-9
@@ -14188,10 +14080,6 @@ families:
               therefore pO2 exponent=-nu_O2/nu_vapor=0.0 and activity exponent=nu_parent/nu_vapor=1.0.
               Unit check: K, activity, and pressure ratios are dimensionless; multiplying by P0 returns
               Pa. Sanity: the atom-balanced source reaction conserves every element.'
-          stoich_oxide_per_vapor: 1
-          stoich_O2_per_vapor: 0
-          stoichiometry_derivation: 'Premise: parent debit is 1.0 mol SiO2 per mol SiO2. Algebra gives
-            1 kg parent/kg vapor and 0 kg O2/kg vapor. Unit check: kg/kg. Sanity: 1 = 1 + 0.'
           oxide_activity_exponent: 1.0
           pO2_exponent: 0.0
           pO2_reference_bar: 1e-9
@@ -14440,11 +14328,6 @@ families:
               O2 gas Gibbs rows.
             derivation: Association-only pressure composition; the Fe base already carries its effective
               cleaned-melt dependence, so no second activity factor is applied.
-          stoich_oxide_per_vapor: 1.0
-          stoich_O2_per_vapor: 0.0
-          stoichiometry_derivation: Ledger transfer is one mol FeO parent to one mol FeO vapor, so parent/vapor
-            mass ratio is 1 kg/kg and no O2 coproduct is booked. The gas-association reaction below controls
-            pressure only; it does not double-book the oxygen already present in the FeO debit.
           notes: Status-bearing analytical association carrier. The inherited Fe base is an effective
             pressure fit, not an independently validated unit-activity FeO standard reaction; this row
             instruments the high-fO2 competitor and can never certify.
@@ -14580,10 +14463,6 @@ families:
               Ni, NiO, and O2 gas Gibbs rows.
             derivation: Congruent transfer of one NiO reservoir unit into one NiO vapor; the O2 terms
               in the monatomic base and gas association cancel in the net source reaction.
-          stoich_oxide_per_vapor: 1.0
-          stoich_O2_per_vapor: 0.0
-          stoichiometry_derivation: One mol NiO parent transfers intact to one mol NiO vapor, giving
-            1 kg parent/kg vapor and 0 kg O2/kg vapor; mass sanity is 1=1+0.
           oxide_activity_exponent: 1.0
           pO2_reference_bar: 1.0
           notes: Status-bearing analytical carrier. The liquid-NiO base fit and ideal-HKL kinetic ceiling
@@ -14740,10 +14619,6 @@ families:
               IVTAN MnO(g) Shomate rows and landed NASA CEA Mn/O2 gas rows.
             derivation: Congruent transfer of one MnO reservoir unit into one MnO vapor; the O2 terms
               in the monatomic base and gas association cancel in the net source reaction.
-          stoich_oxide_per_vapor: 1.0
-          stoich_O2_per_vapor: 0.0
-          stoichiometry_derivation: One mol MnO parent transfers intact to one mol MnO vapor, giving
-            1 kg parent/kg vapor and 0 kg O2/kg vapor; mass sanity is 1=1+0.
           oxide_activity_exponent: 1.0
           pO2_reference_bar: 1.0
           gas_thermo_fit_domain_K:
@@ -14908,10 +14783,6 @@ families:
               CoO(g) Shomate rows and landed NASA CEA Co/O2 gas rows.
             derivation: Congruent transfer of one CoO crystalline reference unit into one CoO vapor; the
               O2 terms in the monatomic base and gas association cancel in the net source reaction.
-          stoich_oxide_per_vapor: 1.0
-          stoich_O2_per_vapor: 0.0
-          stoichiometry_derivation: One mol CoO parent transfers intact to one mol CoO vapor, giving
-            1 kg parent/kg vapor and 0 kg O2/kg vapor; mass sanity is 1=1+0.
           oxide_activity_exponent: 1.0
           pO2_reference_bar: 1.0
           gas_thermo_fit_domain_K:

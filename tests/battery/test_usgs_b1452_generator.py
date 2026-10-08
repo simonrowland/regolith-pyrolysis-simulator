@@ -6,6 +6,8 @@ import json
 from decimal import Decimal
 from pathlib import Path
 
+import pytest
+
 import yaml
 
 from simulator.battery.enums import (
@@ -39,10 +41,10 @@ ROOT = Path(__file__).resolve().parents[2]
 B1452_STORE_DIR = ROOT / "data" / "literature" / "observations-v2"
 B1452_STORE_PATTERN = "compilations-robie-hemingway-fisher-1978-usgs-b1452.yaml"
 B1452_RAW = 55707
-B1452_STORE_STORED = 15155
-B1452_STORED = 15160
-B1452_REFUSED = 19713
-B1452_EXCLUDED = 20834
+B1452_STORE_STORED = 15012
+B1452_STORED = 15012
+B1452_REFUSED = 19007
+B1452_EXCLUDED = 21688
 B1452_MERGED_PROPOSED = 457
 B1452_MERGED_STORED = 376
 B1452_MERGED_REFUSED = 15
@@ -52,12 +54,12 @@ B1452_UNGUARDED_MERGED_STORED = 165
 B1452_UNGUARDED_298K_S = 157
 B1452_UNGUARDED_HT_DH = 7
 B1452_UNGUARDED_HT_CP = 1
-B1452_IDENTITY_10X = 205
+B1452_IDENTITY_10X = 5
 B1452_IDENTITY_1X_10X = 9
 HOLMIUM_HT_PHASE_02 = "robie-hemingway-fisher-1978-usgs-b1452-0036-phase-02"
 SPINEL_HT = "robie-hemingway-fisher-1978-usgs-b1452-0236"
-B1452_FORMULA_UNRESOLVED_HT = 49
-B1452_FORMULA_UNRESOLVED_298K_ROWS = 53
+B1452_FORMULA_UNRESOLVED_HT = 47
+B1452_FORMULA_UNRESOLVED_298K_ROWS = 49
 TABLE_298K = "robie-hemingway-fisher-1978-usgs-b1452-0003"
 TABLE1 = "robie-hemingway-fisher-1978-usgs-b1452-0001"
 SILVER_HT = "robie-hemingway-fisher-1978-usgs-b1452-0004"
@@ -286,6 +288,103 @@ def test_298k_next_line_formula_is_page_grounded() -> None:
         generated, Quantity.S, temperature="298.15", formula="Quartz", row=401
     )
     assert stored == []
+
+
+def test_298k_formula_lines_are_uncertainties_with_row_pages() -> None:
+    """B1452 printed pp. 21–22: Quartz and the two nonstoichiometric Tb oxides."""
+    generated = _generation(TABLE_298K)
+    for row, formula, entropy, uncertainty, page in (
+        (401, "SiO2", "41.46", "0.20", 21),
+        (427, "TbO1.714", "80.75", "4.20", 22),
+        (429, "TbO1.812", "81.17", "4.20", 22),
+    ):
+        values = _observations_for(generated, Quantity.S, formula=formula, row=row)
+        assert len(values) == 1
+        value = values[0]
+        assert value.value.point == Decimal(entropy)
+        assert value.uncertainty.kind is UncertaintyKind.PRINTED
+        assert value.uncertainty.verbatim == uncertainty
+        assert value.locator.published_page == page
+        assert value.locator.pdf_page_index == page + 6
+        formation_uncertainties = (
+            ("1000", "1100", "0.193") if formula == "SiO2"
+            else ("4180", "4200", "0.736")
+        )
+        for quantity, printed in zip(
+            (Quantity.DELTA_FH, Quantity.DELTA_FG, Quantity.LOG10_KF),
+            formation_uncertainties,
+        ):
+            formation_values = _observations_for(
+                generated, quantity, formula=formula, row=row
+            )
+            assert len(formation_values) == 1
+            assert formation_values[0].uncertainty.kind is UncertaintyKind.PRINTED
+            assert formation_values[0].uncertainty.verbatim == printed
+        assert _observations_for(generated, Quantity.S, formula=formula, row=row + 1) == []
+        excluded = {
+            item["column"]: item["reason"]
+            for item in generated.report["exclusions"]
+            if item["row_index"] == row + 1
+        }
+        for column in generator.STORED_298K_COLUMNS:
+            assert excluded[column] == generator.UNCERTAINTY_EXCLUDE_REASON
+
+
+def test_298k_locator_covers_every_summary_page() -> None:
+    """First value row of each printed page, independently read from the PDF."""
+    generated = _generation(TABLE_298K)
+    for row, page in (
+        (0, 12), (28, 13), (85, 14), (115, 15), (171, 16), (203, 17),
+        (259, 18), (286, 19), (315, 20), (371, 21), (425, 22), (477, 23),
+        (513, 24), (567, 25), (619, 26), (648, 27), (675, 28), (701, 29),
+    ):
+        values = _observations_for(generated, Quantity.S, row=row)
+        assert values
+        for value in values:
+            assert value.locator.published_page == page
+            assert value.locator.pdf_page_index == page + 6
+
+
+@pytest.mark.parametrize(
+    ("row", "quantity", "printed"),
+    (
+        (70, Quantity.DELTA_FH, ","),
+        (117, Quantity.DELTA_FG, "-120"),
+        (413, Quantity.LOG10_KF, "2780.374"),
+        (579, Quantity.DELTA_FG, "500'"),
+    ),
+)
+def test_damaged_summary_uncertainties_remain_unvalidated_notes(row, quantity, printed) -> None:
+    from simulator.battery.score import _printed_uncertainty_band
+
+    observation, = _observations_for(_generation(TABLE_298K), quantity, row=row)
+    assert observation.uncertainty.kind is UncertaintyKind.NONE
+    assert observation.uncertainty.verbatim == printed
+    assert "unvalidated" in observation.uncertainty.basis
+    assert _printed_uncertainty_band(
+        quantity, observation.uncertainty, observation.value.point,
+        source_observation=observation,
+    ) is None
+
+
+@pytest.mark.parametrize("printed", ("0.201", "50.00"))
+def test_summary_uncertainty_requires_printed_grain_and_plausible_magnitude(printed) -> None:
+    record = _load(TABLE_298K)
+    record["rows"][402]["cells"]["entropy_s298"]["as_published"] = printed
+    observation, = _observations_for(
+        generator.generate_record(record), Quantity.S, formula="SiO2", name="QUARTZ"
+    )
+    assert observation.uncertainty.kind is UncertaintyKind.NONE
+    assert observation.uncertainty.verbatim == printed
+    assert "unvalidated" in observation.uncertainty.basis
+
+
+def test_summary_uncertainty_requires_the_page_column_unit(monkeypatch) -> None:
+    monkeypatch.setitem(generator.TABLE_298K_PAGE_UNITS, "entropy_s298", "dimensionless")
+    observation, = _observations_for(_generation(TABLE_298K), Quantity.S, row=401)
+    assert observation.uncertainty.kind is UncertaintyKind.NONE
+    assert observation.uncertainty.verbatim == "0.20"
+    assert "unit" in observation.uncertainty.basis
 
 
 def test_unresolved_formula_refuses_and_names_consulted_fields() -> None:

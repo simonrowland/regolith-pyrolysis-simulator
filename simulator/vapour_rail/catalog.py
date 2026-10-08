@@ -67,6 +67,19 @@ from simulator.vapour_rail.shomate import (
     ShomateSegment,
     coefficients_from_mapping,
 )
+from simulator.vapour_rail.source_rail import (
+    ATM_PRESSURE_PA,
+    GIBBS_CONVENTION_ABSOLUTE,
+    GIBBS_CONVENTION_FORMATION,
+)
+from simulator.vapour_rail.stoich import (
+    CATALOG_DERIVED_STOICH_SPECIES,
+    derive_stoich_oxide_per_vapor,
+)
+from simulator.vapour_rail.tabulated_gibbs import (
+    TabulatedDomainError,
+    TabulatedThermo,
+)
 
 
 SCHEMA_VERSION = 2
@@ -86,11 +99,15 @@ _THERMO_FAMILY_ALIASES: Mapping[str, str] = MappingProxyType(
         "nasa_cea_7": "nasa_cea_7",
         "nasa_cea_9": "nasa_cea_9",
         "shomate": "shomate",
+        "tabulated_janaf": "tabulated_janaf",
+        "janaf_tabulated": "tabulated_janaf",
+        "tabulated_formation_gibbs": "tabulated_janaf",
     }
 )
 RUNTIME_THERMO_EVALUATOR_FAMILIES = frozenset(
-    {"nasa_cea_7", "nasa_cea_9", "shomate"}
+    {"nasa_cea_7", "nasa_cea_9", "shomate", "tabulated_janaf"}
 )
+_ABSOLUTE_GIBBS_FAMILIES = frozenset({"nasa_cea_7", "nasa_cea_9", "shomate"})
 # CEA / JANAF standard-state pressure P° (Pa).
 _THERMO_REFERENCE_PRESSURE_PA = 100_000.0
 _THERMO_EXTRACT_DIR = (
@@ -1390,7 +1407,12 @@ class CompiledPressureEvaluator:
             # thermo domain is also exceeded (e.g. CEA P-family floor 699 K).
             try:
                 return float(self.reference_model.log10_pressure(temperature_K))
-            except (NasaCeaDomainError, ShomateDomainError, CatalogCompileError):
+            except (
+                NasaCeaDomainError,
+                ShomateDomainError,
+                TabulatedDomainError,
+                CatalogCompileError,
+            ):
                 return self._reciprocal_T_tangent_log10(temperature_K)
 
         # mode == "reciprocal_T_tangent"
@@ -2896,6 +2918,27 @@ def _compile_reference_model(
     )
 
 
+def _coefficient_gibbs_basis(
+    family: str, record: Mapping[str, Any], field: str
+) -> str:
+    """Basis the coefficients actually evaluate, checked against any label."""
+    if family == "tabulated_janaf":
+        expected = GIBBS_CONVENTION_FORMATION
+    elif family in _ABSOLUTE_GIBBS_FAMILIES:
+        expected = GIBBS_CONVENTION_ABSOLUTE
+    else:
+        raise CatalogCompileError(
+            f"{field}: no Gibbs basis for evaluator family {family!r}"
+        )
+    label = record.get("gibbs_convention")
+    if label is not None and str(label) != expected:
+        raise CatalogCompileError(
+            f"{field}: gibbs_convention {label!r} does not match "
+            f"what the coefficients evaluate ({expected})"
+        )
+    return expected
+
+
 def _compile_thermo_reference_model(
     *,
     species_id: str,
@@ -2996,18 +3039,46 @@ def _compile_thermo_reference_model(
                 f"{species_id}: species_thermo must be a mapping of formula → record"
             )
         polys: dict[str, Any] = {}
+        prepared: list[tuple[str, str, Mapping[str, Any]]] = []
+        bases: set[str] = set()
         for formula, rec in species_thermo_raw.items():
-            rec_map = _mapping(rec, f"{species_id}.species_thermo[{formula}]")
-            rec_map = _resolve_thermo_record(
-                rec_map, field=f"{species_id}.species_thermo[{formula}]"
-            )
+            field = f"{species_id}.species_thermo[{formula}]"
+            rec_map = _mapping(rec, field)
+            rec_map = _resolve_thermo_record(rec_map, field=field)
             fam = evaluator_family
             if rec_map.get("evaluator_family") or rec_map.get("evaluator"):
                 fam = _normalize_thermo_family(
                     str(rec_map.get("evaluator_family") or rec_map.get("evaluator")),
-                    field=f"{species_id}.species_thermo[{formula}].evaluator",
+                    field=f"{field}.evaluator",
                 )
-            polys[str(formula)] = _polynomial_from_thermo_record(
+            bases.add(_coefficient_gibbs_basis(fam, rec_map, field))
+            pressure = _finite_positive(
+                rec_map.get("reference_pressure_Pa", _THERMO_REFERENCE_PRESSURE_PA),
+                f"{field}.reference_pressure_Pa",
+            )
+            state = str(rec_map.get("standard_state") or "")
+            # CEA condensed rows are labelled 1 atm. That label does not enter
+            # G (condensed VΔP is neglected; the ratio evaluator ignores it).
+            # A gas at any other pressure is a second reaction P°.
+            condensed_atm_label = state.startswith("condensed") and math.isclose(
+                pressure, ATM_PRESSURE_PA, rel_tol=0.0, abs_tol=1e-6
+            )
+            if (
+                not math.isclose(pressure, Pstd, rel_tol=0.0, abs_tol=1e-6)
+                and not condensed_atm_label
+            ):
+                raise CatalogCompileError(
+                    f"{field}: reference_pressure_Pa {pressure} does not match "
+                    f"the reaction standard {Pstd}"
+                )
+            prepared.append((str(formula), fam, rec_map))
+        if len(bases) > 1:
+            raise CatalogCompileError(
+                f"{species_id}: reaction participants must share one Gibbs basis, "
+                f"got {sorted(bases)}"
+            )
+        for formula, fam, rec_map in prepared:
+            polys[formula] = _polynomial_from_thermo_record(
                 name=f"{species_id}:{formula}",
                 family=fam,
                 record=rec_map,
@@ -3536,8 +3607,8 @@ def _polynomial_from_thermo_record(
     family: str,
     record: Mapping[str, Any],
     default_standard_state: str | None = None,
-) -> NasaCeaPolynomial | ShomatePolynomial:
-    """Build a landed NASA or Shomate polynomial from a catalog thermo record."""
+) -> NasaCeaPolynomial | ShomatePolynomial | TabulatedThermo:
+    """Build a landed NASA, Shomate, or tabulated-ΔfG record."""
     fam = family
     if record.get("evaluator_family") or record.get("evaluator"):
         fam = _normalize_thermo_family(
@@ -3660,6 +3731,67 @@ def _polynomial_from_thermo_record(
             citation=citation_s,
             reference_pressure_Pa=Pstd,
         )
+
+    if fam == "tabulated_janaf":
+        points_raw = record.get("formation_gibbs_points") or record.get("points")
+        if not isinstance(points_raw, list) or not points_raw:
+            raise CatalogCompileError(
+                f"{name}: tabulated_janaf record requires formation_gibbs_points"
+            )
+        points: list[tuple[float, float]] = []
+        for index, item in enumerate(points_raw):
+            if isinstance(item, Mapping):
+                t_k = item.get("T_K", item.get("temperature_K"))
+                g_j = item.get("delta_f_G_J_per_mol", item.get("g_J_per_mol"))
+            elif isinstance(item, (list, tuple)) and len(item) == 2:
+                t_k, g_j = item
+            else:
+                raise CatalogCompileError(
+                    f"{name}: formation_gibbs_points[{index}] must be "
+                    "{{T_K, delta_f_G_J_per_mol}} or [T, G]"
+                )
+            points.append(
+                (
+                    _finite_positive(t_k, f"{name}.formation_gibbs_points[{index}].T_K"),
+                    float(g_j),
+                )
+            )
+        missing_raw = record.get("missing_nodes") or ()
+        if isinstance(missing_raw, (str, bytes)) or not isinstance(
+            missing_raw, Sequence
+        ):
+            raise CatalogCompileError(
+                f"{name}: missing_nodes must be a list of temperatures"
+            )
+        missing_nodes = tuple(
+            _finite_positive(node, f"{name}.missing_nodes[{index}]")
+            for index, node in enumerate(missing_raw)
+        )
+        try:
+            return TabulatedThermo(
+                name=name,
+                standard_state=standard_state,  # type: ignore[arg-type]
+                formation_gibbs_J_per_mol=tuple(points),
+                formula=formula_s,
+                citation=citation_s,
+                reference_pressure_Pa=Pstd,
+                source_id=(
+                    str(record["source_id"]) if record.get("source_id") else None
+                ),
+                record_id=(
+                    str(record["record_id"]) if record.get("record_id") else None
+                ),
+                native_phase=(
+                    str(record["native_phase"])
+                    if record.get("native_phase")
+                    else None
+                ),
+                missing_nodes=missing_nodes,
+            )
+        except Exception as exc:
+            raise CatalogCompileError(
+                f"{name}: tabulated_janaf record is not evaluable: {exc}"
+            ) from exc
 
     raise CatalogCompileError(f"{name}: unsupported thermo family {fam!r}")
 
@@ -3809,6 +3941,67 @@ def _legacy_species_row(
     compatibility_fields = routing.get("compatibility_fields", {})
     if isinstance(compatibility_fields, Mapping):
         result.update(deepcopy(dict(compatibility_fields)))
+    parent_oxide = result.get("parent_oxide")
+    reactions = row.get("source_reactions")
+    if (
+        isinstance(parent_oxide, str)
+        and parent_oxide.strip()
+        and isinstance(reactions, list)
+        and reactions
+    ):
+        reaction_id = model.get("source_reaction_id")
+        matched = [
+            item
+            for item in reactions
+            if isinstance(item, Mapping)
+            and (reaction_id is None or item.get("id") == reaction_id)
+        ]
+        if not matched:
+            if species_id in CATALOG_DERIVED_STOICH_SPECIES:
+                raise CatalogCompileError(
+                    f"{species_id}: source_reaction_id does not match a "
+                    "source reaction for derived stoichiometry"
+                )
+            matched = [item for item in reactions if isinstance(item, Mapping)]
+        if matched:
+            try:
+                oxide, o2 = derive_stoich_oxide_per_vapor(
+                    formula=str(row.get("formula") or species_id),
+                    parent_oxide=str(parent_oxide),
+                    reaction=matched[0],
+                )
+            except CatalogCompileError:
+                raise
+            except ValueError as exc:
+                if species_id in CATALOG_DERIVED_STOICH_SPECIES:
+                    raise CatalogCompileError(
+                        f"{species_id}: cannot derive stoichiometry: {exc}"
+                    ) from exc
+                oxide, o2 = None, None
+            if oxide is not None and o2 is not None:
+                declared_oxide = result.get("stoich_oxide_per_vapor")
+                declared_o2 = result.get("stoich_O2_per_vapor")
+                if declared_oxide is not None and not math.isclose(
+                    float(declared_oxide), oxide, rel_tol=0.0, abs_tol=1.0e-12
+                ):
+                    raise CatalogCompileError(
+                        f"{species_id}: derived stoich_oxide_per_vapor {oxide} "
+                        f"disagrees with declared {declared_oxide}"
+                    )
+                if declared_o2 is not None and not math.isclose(
+                    float(declared_o2), o2, rel_tol=0.0, abs_tol=1.0e-12
+                ):
+                    raise CatalogCompileError(
+                        f"{species_id}: derived stoich_O2_per_vapor {o2} "
+                        f"disagrees with declared {declared_o2}"
+                    )
+                if (
+                    species_id in CATALOG_DERIVED_STOICH_SPECIES
+                    or declared_oxide is not None
+                    or declared_o2 is not None
+                ):
+                    result["stoich_oxide_per_vapor"] = oxide
+                    result["stoich_O2_per_vapor"] = o2
     # b-133 namespace bridge: the builtin pressure provider consumes the
     # compatibility projection, while P carrier eligibility is authoritative
     # in schema-v2 code_metadata.  Project only this family's stage boundary so
