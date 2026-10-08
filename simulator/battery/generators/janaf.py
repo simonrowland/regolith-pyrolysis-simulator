@@ -29,6 +29,11 @@ from simulator.battery.enums import (
     ValueKind,
 )
 from simulator.yaml_cache import load_cached_safe_yaml
+from simulator.vapour_rail.tabulated_gibbs import (
+    TabulatedDomainError,
+    TabulatedMissingNodeError,
+    interpolate_tabulated,
+)
 from simulator.battery.identity import log10K_from_delta_fG_kJ_mol
 from simulator.battery.migrate import dump_yaml, fill_identity, make_species, to_plain
 from simulator.battery.polymorph_dictionary import (
@@ -2669,22 +2674,31 @@ def _fusion_missing_gibbs_temperatures(table_id: str) -> tuple[Decimal, ...]:
 def _interpolate_formation_gibbs(
     points: tuple[tuple[Decimal, Decimal], ...], temperature_K: Decimal
 ) -> Decimal:
+    """JANAF grid policy, then the one tabulated interpolator."""
+
     if temperature_K < points[0][0] or temperature_K > points[-1][0]:
         raise ValueError(f"{temperature_K} K is outside the JANAF table range")
     missing_node = _missing_node_for_interpolation(points, (), temperature_K)
-    if missing_node is not None:
-        raise ValueError(
-            f"JANAF formation Gibbs interpolation spans missing grid node "
-            f"{missing_node} K at {temperature_K} K"
+    try:
+        value = interpolate_tabulated(
+            points,
+            temperature_K,
+            missing_nodes=(missing_node,) if missing_node is not None else (),
         )
-    for (t0, g0), (t1, g1) in zip(points, points[1:]):
-        if t0 <= temperature_K <= t1:
-            if temperature_K == t0:
-                return g0
-            if temperature_K == t1:
-                return g1
-            return g0 + (g1 - g0) * (temperature_K - t0) / (t1 - t0)
-    raise ValueError(f"{temperature_K} K is not bracketed by JANAF table rows")
+    except TabulatedMissingNodeError as exc:
+        raise ValueError(
+            "JANAF formation Gibbs interpolation spans missing grid node "
+            f"{exc.missing_node} K at {temperature_K} K"
+        ) from exc
+    except TabulatedDomainError as exc:
+        if exc.kind == "not_bracketed":
+            raise ValueError(
+                f"{temperature_K} K is not bracketed by JANAF table rows"
+            ) from exc
+        raise ValueError(
+            f"{temperature_K} K is outside the JANAF table range"
+        ) from exc
+    return value
 
 
 def _missing_node_for_interpolation(
@@ -2768,9 +2782,9 @@ def janaf_fusion_energy(oxide: str, temperature_K: Decimal) -> JANAFFusionEnergy
         raise ValueError(f"{oxide}: JANAF tables have fewer than two complete overlap nodes")
 
     def difference(t: Decimal) -> Decimal:
-        return _interpolate_formation_gibbs(
-            liquid, t
-        ) - _interpolate_formation_gibbs(crystal, t)
+        return _interpolate_formation_gibbs(liquid, t) - _interpolate_formation_gibbs(
+            crystal, t
+        )
 
     crossings: list[Decimal] = []
     for left, right in zip(overlap, overlap[1:]):

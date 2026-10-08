@@ -8,6 +8,7 @@ import argparse
 import json
 import re
 import time
+from bisect import bisect_right
 from collections import Counter, defaultdict
 from dataclasses import dataclass
 from decimal import Decimal, InvalidOperation
@@ -82,6 +83,13 @@ TABLE1_UNIT_LOCATOR = "Table 1 PDF p. 9 / printed p. 3"
 TITLE_PRESSURE_QUOTE = "298.15 K and 1 bar (10^5 pascals) pressure"
 CIRCULARITY_WARNING = ROLE["circularity_warning"]
 TABLE_298K_RECORD_ID = "robie-hemingway-fisher-1978-usgs-b1452-0003"
+# First captured source-text line on each printed summary page, pp. 12–29.
+# Grounded against PDF pp. 18–35; gaps also contain section/continuation labels,
+# so counting gaps or assigning the record's first page is not a page locator.
+TABLE_298K_PAGE_START_LINES = (
+    3, 33, 92, 124, 182, 215, 272, 300, 331,
+    388, 443, 496, 533, 588, 641, 671, 726, 779,
+)
 TABLE1_RECORD_ID = "robie-hemingway-fisher-1978-usgs-b1452-0001"
 TABLE2_RECORD_ID = "robie-hemingway-fisher-1978-usgs-b1452-0002"
 REFERENCE_TEMPERATURE_K = Decimal("298.15")
@@ -178,7 +186,7 @@ MISSING_FORMATION_BASIS_REASON = (
 )
 UNCERTAINTY_EXCLUDE_REASON = (
     "printed uncertainty; attached to stored sibling observations of the matching "
-    "column (298.15 K per-row when a grain-unique merged split exists; T-grid "
+    "column (298.15 K formula-line or grain-unique merged split; T-grid "
     "table-level uncertainty_values). Not itself a stored quantity."
 )
 NEIGHBOUR_SIGN_REFUSAL_REASON = (
@@ -1006,6 +1014,11 @@ def _formula_weight_index_from_298k() -> dict[str, str]:
     }
 
 
+def _is_298k_uncertainty_pair(value_fw: str | None, next_fw: str | None) -> bool:
+    """The summary prints FW on the value line and leaves it blank below."""
+    return bool(value_fw) and not next_fw
+
+
 def _iter_298k_name_rows() -> tuple[tuple[str, str | None, str | None], ...]:
     """Name, printed FW, and formula. The 298 K table prints each substance
     as a name+FW value line followed by a formula line with blank FW.
@@ -1030,7 +1043,7 @@ def _iter_298k_name_rows() -> tuple[tuple[str, str | None, str | None], ...]:
     for index, (name, fw, formula) in enumerate(extracted):
         if formula is None and fw and index + 1 < len(extracted):
             next_name, next_fw, next_embedded = extracted[index + 1]
-            if not next_fw:
+            if _is_298k_uncertainty_pair(fw, next_fw):
                 next_formula = next_embedded or _formula_from_formula_line(next_name)[0]
                 if next_formula:
                     formula = next_formula
@@ -1489,11 +1502,21 @@ def _unit_row_locator(kind: str) -> Locator:
     )
 
 
-def _pages(record: Mapping[str, Any]) -> tuple[int | None, int | None]:
+def _pages(
+    record: Mapping[str, Any], row_index: int | None = None
+) -> tuple[int | None, int | None]:
     locator = record.get("source_locator") if isinstance(record.get("source_locator"), Mapping) else {}
     printed = list(locator.get("printed_pages") or ())
     pdf = list(locator.get("pdf_pages") or ())
-    return (printed[0] if printed else None), (pdf[0] if pdf else None)
+    page_index = 0
+    if record.get("record_id") == TABLE_298K_RECORD_ID and row_index is not None:
+        line = record["rows"][row_index].get("source_text_line")
+        if isinstance(line, int):
+            page_index = max(0, bisect_right(TABLE_298K_PAGE_START_LINES, line) - 1)
+    return (
+        printed[page_index] if page_index < len(printed) else None,
+        pdf[page_index] if page_index < len(pdf) else None,
+    )
 
 
 def _store_value(token: RawToken, value: Decimal) -> Decimal:
@@ -1505,6 +1528,34 @@ def _store_value(token: RawToken, value: Decimal) -> Decimal:
     }:
         return value / Decimal("1000")
     return value
+
+
+def _summary_uncertainty(
+    token: RawToken, printed: str, value: Decimal, grain: Decimal | None
+) -> Uncertainty:
+    """Keep damaged summary tokens as notes, never as scoring uncertainties."""
+    width = _published_decimal(printed)
+    quantity = COLUMN_QUANTITY[token.column]
+    expected_unit = (
+        "J/mol" if quantity in {Quantity.DELTA_FH, Quantity.DELTA_FG}
+        else "J/mol·K" if quantity is Quantity.S
+        else QUANTITY_UNITS[quantity]
+    )
+    reason = None
+    if _page_units(token.table_kind, token.column) != expected_unit:
+        reason = "column unit does not match the printed quantity"
+    elif width is None or not width.is_finite() or width < 0:
+        reason = "token is not a nonnegative scalar number"
+    elif grain is None or width % grain != 0:
+        reason = "token does not match the column's printed grain"
+    elif width > abs(value):
+        reason = "uncertainty exceeds the magnitude of the printed value"
+    if reason is not None:
+        return Uncertainty(
+            kind=UncertaintyKind.NONE, verbatim=printed,
+            basis=f"unvalidated printed uncertainty: {reason}",
+        )
+    return Uncertainty(kind=UncertaintyKind.PRINTED, verbatim=printed)
 
 
 def _observation(
@@ -1533,7 +1584,7 @@ def _observation(
     if quantity in {Quantity.DELTA_FH, Quantity.DELTA_FG, Quantity.LOG10_KF}:
         known["reaction"], known["formation_elements"] = _basis_states(species, basis)
     identity = fill_identity(quantity, species, **known)
-    published_page, pdf_page = _pages(record)
+    published_page, pdf_page = _pages(record, token.row_index)
     unit = _page_units(token.table_kind, token.column)
     source_path = f"{SOURCE_PATH_PREFIX}/{record_id}.json"
     unit_locator = (
@@ -1828,9 +1879,19 @@ def generate_record(payload: Mapping[str, Any]) -> RecordGeneration:
     guided_recon: dict[tuple[int, str], dict[str, Any]] = {}
     integer_glue_refuse: dict[tuple[int, str], str] = {}
     rows = payload.get("rows") or []
+    uncertainty_rows: set[int] = set()
+    if kind == "table_298k" and isinstance(rows, list):
+        for row_index in range(1, len(rows)):
+            if _is_298k_uncertainty_pair(
+                _formula_weight_as_published(payload, row_index=row_index - 1),
+                _formula_weight_as_published(payload, row_index=row_index),
+            ):
+                uncertainty_rows.add(row_index)
     if isinstance(rows, list) and kind in {"ht_grid", "table_298k"}:
         for row_index, row in enumerate(rows):
             if not isinstance(row, Mapping):
+                continue
+            if row_index in uncertainty_rows:
                 continue
             if kind == "ht_grid":
                 if row_index in unusable_t:
@@ -2061,6 +2122,9 @@ def generate_record(payload: Mapping[str, Any]) -> RecordGeneration:
                 "blank printed cell" if stripped == "" else "printed blank marker",
             )
             continue
+        if token.row_index in uncertainty_rows and token.column in STORED_298K_COLUMNS:
+            exclude(token, UNCERTAINTY_EXCLUDE_REASON)
+            continue
         if (
             kind == "ht_grid"
             and token.row_index is not None
@@ -2173,6 +2237,15 @@ def generate_record(payload: Mapping[str, Any]) -> RecordGeneration:
                 ),
             )
         uncertainty = Uncertainty(kind=UncertaintyKind.NONE)
+        if kind == "table_298k" and token.row_index + 1 in uncertainty_rows:
+            printed_uncertainty = _as_published_cell(
+                rows[token.row_index + 1]["cells"].get(token.column)
+            )
+            if printed_uncertainty and printed_uncertainty[0].strip() not in {"", "-", "—"}:
+                uncertainty = _summary_uncertainty(
+                    token, printed_uncertainty[0], value,
+                    grains.get((token.column, token.formation_basis)),
+                )
         if reconstruction and reconstruction.get("uncertainty") is not None:
             uncertainty = Uncertainty(
                 kind=UncertaintyKind.PRINTED,

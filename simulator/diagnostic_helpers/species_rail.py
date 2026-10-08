@@ -27,6 +27,7 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Iterable, Mapping
 
+from simulator.accounting.formulas import _normalize_leading_dot_subscripts
 from simulator.reference_data.janaf import (
     ELEMENT_SYMBOLS,
     FEEDSTOCKS_PATH,
@@ -59,7 +60,6 @@ TIER_RANK = {TIER_MAJOR: 0, TIER_MINOR: 1, TIER_TRACE: 2}
 MAJOR_MIN_FEEDSTOCKS = 18
 MINOR_MIN_FEEDSTOCKS = 7
 
-_LEADING_DOT_SUBSCRIPT_RE = re.compile(r"([A-Z][a-z]?)\.(\d+)")
 _ANY_PHASE_SUFFIX_RE = re.compile(r"\([^)]*\)$")
 
 
@@ -128,7 +128,7 @@ def parse_formula_elements(formula: str) -> tuple[str, ...] | None:
     if not raw:
         return None
     raw = _ANY_PHASE_SUFFIX_RE.sub("", raw)
-    raw = _LEADING_DOT_SUBSCRIPT_RE.sub(r"\g<1>0.\2", raw)
+    raw = _normalize_leading_dot_subscripts(raw)
     if raw in ELEMENT_SYMBOLS:
         return (raw,)
     elements = formula_elements(raw)
@@ -147,7 +147,7 @@ def parse_formula_composition(formula: str) -> tuple[tuple[str, float], ...] | N
     if not raw:
         return None
     raw = _ANY_PHASE_SUFFIX_RE.sub("", raw)
-    raw = _LEADING_DOT_SUBSCRIPT_RE.sub(r"\g<1>0.\2", raw)
+    raw = _normalize_leading_dot_subscripts(raw)
     if raw in ELEMENT_SYMBOLS:
         return ((raw, 1.0),)
     return formula_composition(raw)

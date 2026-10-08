@@ -111,6 +111,8 @@ MOLAR_MASS_REL_TOLERANCE = 1e-6
 _OPEN_TO_CLOSE = {"(": ")", "[": "]", "{": "}"}
 _CLOSE_TO_OPEN = {v: k for k, v in _OPEN_TO_CLOSE.items()}
 _NUMBER_RE = re.compile(r"\d+(?:\.\d+)?")
+_UNGROUPED_FORMULA_RE = re.compile(r"([A-Z][a-z]?)(\d+(?:\.\d+)?)?")
+_LEADING_DOT_SUBSCRIPT_RE = re.compile(r"([A-Z][a-z]?)\.(\d+)")
 _PHASE_SUFFIX_RE = re.compile(
     r"(?:\((?:s|l|g|aq|cr|liq|liquid|solid|gas|vapor)\)|"
     r"\[(?:s|l|g|aq|cr|liq|liquid|solid|gas|vapor)\])$",
@@ -229,6 +231,15 @@ class SpeciesFormula:
         return {element: count * moles for element, count in self.elements.items()}
 
 
+def _normalize_leading_dot_subscripts(formula: str) -> str:
+    """Spell a printed leading-dot element subscript with an explicit zero.
+
+    Callers must distinguish molecular adduct separators before applying this
+    operation; the diagnostic JANAF tokenizer retains its existing convention.
+    """
+    return _LEADING_DOT_SUBSCRIPT_RE.sub(r"\g<1>0.\2", formula)
+
+
 def parse_formula(
     formula: str,
     species: str | None = None,
@@ -240,17 +251,16 @@ def parse_formula(
     cleaned = _clean_formula_text(formula)
     if not cleaned:
         raise UnknownSpeciesError("formula is required")
-
-    totals: defaultdict[str, float] = defaultdict(float)
-    for segment in _split_formula_segments(cleaned):
-        multiplier, body = _leading_multiplier(segment)
-        parser = _FormulaParser(body)
-        elements = parser.parse()
-        for element, count in elements.items():
-            totals[element] += count * multiplier
+    # Known damaged transcriptions in B677 (wustite, vanadium nitride) and
+    # NASA-Glenn NG-2032 (InertAir). Their valid-looking grammar cannot verify
+    # the intended species; retain refusal until the source is corrected.
+    if cleaned in {"Fe.9470", "W.465", "N1.5617IO.41959Ar.00937C.00032"}:
+        raise UnknownSpeciesError(
+            f"unverified OCR formula {formula!r}; source correction required"
+        )
 
     species_id = species or name or str(formula).strip()
-    return SpeciesFormula(species=species_id, elements=totals)
+    return _species_from_cleaned(cleaned, species_id)
 
 
 def coerce_species_formula(species: str, value: Any | None = None) -> SpeciesFormula:
@@ -527,9 +537,59 @@ def _clean_formula_text(formula: str) -> str:
     return text
 
 
+def _species_from_cleaned(cleaned: str, species_id: str) -> SpeciesFormula:
+    return _species_from_segments(_split_formula_segments(cleaned), species_id)
+
+
+def _species_from_segments(
+    segments: tuple[str, ...] | list[str], species_id: str
+) -> SpeciesFormula:
+    totals: defaultdict[str, float] = defaultdict(float)
+    for segment in segments:
+        segment = _normalize_leading_dot_subscripts(segment)
+        multiplier, body = _leading_multiplier(segment)
+        parser = _FormulaParser(body)
+        elements = parser.parse()
+        for element, count in elements.items():
+            totals[element] += count * multiplier
+    return SpeciesFormula(species=species_id, elements=totals)
+
+
 def _split_formula_segments(formula: str) -> list[str]:
-    normalized = formula.replace("·", ".")
-    segments = [segment for segment in normalized.split(".") if segment]
+    # USGS/JANAF omit the zero in fractional element occupancies (Fe.947O).
+    # A middle dot is always an adduct separator. Preserve the legacy ASCII
+    # spelling when a coefficient multiplies a complete molecular formula with
+    # multiple elements (5H2O, 4CO2, 2Al2O3); a monatomic tail is a subscript.
+    # A lone element before the dot takes a fractional occupancy as well.
+    # Once a segment has a fractional occupancy, its remaining ASCII dots are
+    # subscripts too. Fractional formulas must use a middle dot for adducts;
+    # a malformed repeated decimal then fails in the formula parser.
+    pieces = re.split(r"([.·])", formula)
+    segments = [pieces[0]]
+    for separator, tail in zip(pieces[1::2], pieces[2::2]):
+        coefficient = re.match(r"\d+(.*)", tail)
+        body = coefficient.group(1) if coefficient else ""
+        tokens = list(_UNGROUPED_FORMULA_RE.finditer(body))
+        molecular_adduct = (
+            "".join(token.group(0) for token in tokens) == body
+            and len({token.group(1) for token in tokens}) > 1
+        )
+        if (
+            separator == "."
+            and coefficient is not None
+            and segments[-1]
+            and segments[-1][-1].isalnum()
+            and (
+                not molecular_adduct
+                or "." in segments[-1]
+                or _UNGROUPED_FORMULA_RE.fullmatch(segments[-1]) is not None
+                or re.search(r"[A-Z][a-z]?0$", segments[-1])
+            )
+        ):
+            segments[-1] += separator + tail
+        else:
+            segments.append(tail)
+    segments = [segment for segment in segments if segment]
     if not segments:
         raise UnknownSpeciesError("formula is required")
     return segments

@@ -1,0 +1,482 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-298k-0145-wustite.json
+observations:
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-298k-0145-wustite:S:shared:T=298.15:col=entropy:name=wustite:v=bf92656f13:poly=wustite
+  experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-298k-0145-wustite:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: S
+    species:
+      formula: Fe.947O
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: value
+        value: wustite
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile S does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '298.15'
+    standard_pressure_Pa:
+      tag: value
+      value: '101325'
+    reaction:
+      tag: not_applicable
+      reason: profile S does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile S does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile S does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile S does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile S does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile S does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile S does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile S does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile S does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile S does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile S does not use wall
+  value:
+    kind: point
+    point: '57.57184'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 16
+        pdf_page_index: 22
+        table: b1259-298k-0145-wustite
+        note: as_published='13.76'; unit='cal deg^-1 gfw^-1' quoted from Table 1 PDF p. 9 / printed p. 3; captured units_as_published
+          ignored; printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184
+          J/cal); standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
+        source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-298k-0145-wustite.json
+        record: b1259-298k-0145-wustite
+  notices: []
+  source_id: robie-waldbaum-1968-usgs-b1259
+  locator:
+    published_page: 16
+    pdf_page_index: 22
+    table: b1259-298k-0145-wustite
+    note: as_published='13.76'; unit='cal deg^-1 gfw^-1' quoted from Table 1 PDF p. 9 / printed p. 3; captured units_as_published
+      ignored; printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184
+      J/cal); standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure)
+    source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-298k-0145-wustite.json
+    record: b1259-298k-0145-wustite
+  read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-298k-0145-wustite.json
+  derivation:
+    relation: Direct B1259 tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
+      not validate an engine against a compilation it consumes.
+    inputs:
+    - compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-298k-0145-wustite.json
+    parameters:
+    - - cal_th_to_J
+      - state:
+          tag: value
+          value: '4.184'
+        locator:
+          published_page: 3
+          pdf_page_index: 9
+          note: 'Table 1 PDF p. 9 / printed p. 3: ΔHf and ΔGf in cal gfw^-1'
+    output_unit: J_per_declared_mol_basis_per_K
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-298k-0145-wustite:delta_fG:from_the_elements:T=298.15:col=delta_f_G:name=wustite:v=a064eb2eff:poly=wustite
+  experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-298k-0145-wustite:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: delta_fG
+    species:
+      formula: Fe.947O
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: value
+        value: wustite
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '298.15'
+    standard_pressure_Pa:
+      tag: value
+      value: '101325'
+    reaction:
+      tag: value
+      value:
+        terms:
+        - species:
+            formula: Fe.947O
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: wustite
+            charge:
+              tag: value
+              value: 0
+          coefficient: '1'
+        - species:
+            formula: Fe
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: alpha
+            charge:
+              tag: value
+              value: 0
+          coefficient: -947/1000
+        - species:
+            formula: O2
+            phase:
+              tag: value
+              value: g
+            polymorph:
+              tag: not_applicable
+              reason: not crystalline
+            charge:
+              tag: value
+              value: 0
+          coefficient: -1/2
+    formation_elements:
+      tag: value
+      value:
+      - - Fe
+        - formula: Fe
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: alpha
+          charge:
+            tag: value
+            value: 0
+      - - O
+        - formula: O2
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystalline
+          charge:
+            tag: value
+            value: 0
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: point
+    point: '-245.178216'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 16
+        pdf_page_index: 22
+        table: b1259-298k-0145-wustite
+        note: as_published='-58599'; unit='cal gfw^-1' quoted from Table 1 PDF p. 9 / printed p. 3; captured units_as_published
+          ignored; printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184
+          J/cal); standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure);
+          formation_basis=from_the_elements; elemental_reference_state_tables=Fe=B1259 reference-state table p.45/PDF p.51,
+          O=B1259 reference-state table p.59/PDF p.65
+        source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-298k-0145-wustite.json
+        record: b1259-298k-0145-wustite
+  notices: []
+  source_id: robie-waldbaum-1968-usgs-b1259
+  locator:
+    published_page: 16
+    pdf_page_index: 22
+    table: b1259-298k-0145-wustite
+    note: as_published='-58599'; unit='cal gfw^-1' quoted from Table 1 PDF p. 9 / printed p. 3; captured units_as_published
+      ignored; printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184
+      J/cal); standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure);
+      formation_basis=from_the_elements; elemental_reference_state_tables=Fe=B1259 reference-state table p.45/PDF p.51, O=B1259
+      reference-state table p.59/PDF p.65
+    source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-298k-0145-wustite.json
+    record: b1259-298k-0145-wustite
+  read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-298k-0145-wustite.json
+  derivation:
+    relation: Direct B1259 tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
+      not validate an engine against a compilation it consumes.; formation_basis=B1259 Table 1 (PDF p. 9 / printed p. 3) defines
+      ΔHf / ΔGf as heat / Gibbs free energy of formation from the reference state. Unmarked 298.15 K rows and high-T grids
+      are this convention. Schema v2.1 has no closed token for it.
+    inputs:
+    - compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-298k-0145-wustite.json
+    parameters:
+    - - cal_th_to_kJ
+      - state:
+          tag: value
+          value: '0.004184'
+        locator:
+          published_page: 3
+          pdf_page_index: 9
+          note: 'Table 1 PDF p. 9 / printed p. 3: ΔHf and ΔGf in cal gfw^-1'
+    output_unit: kJ_per_declared_mol_basis
+- observation_id: robie-waldbaum-1968-usgs-b1259:b1259-298k-0145-wustite:delta_fH:from_the_elements:T=298.15:col=delta_f_H:name=wustite:v=fe26285148:poly=wustite
+  experiment_id: robie-waldbaum-1968-usgs-b1259:b1259-298k-0145-wustite:tabulation
+  identity:
+    quantity:
+      tag: value
+      value: delta_fH
+    species:
+      formula: Fe.947O
+      phase:
+        tag: value
+        value: cr
+      polymorph:
+        tag: value
+        value: wustite
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fH does not use subtype
+    per:
+      tag: value
+      value: mol_species
+    temperature_K:
+      tag: value
+      value: '298.15'
+    standard_pressure_Pa:
+      tag: value
+      value: '101325'
+    reaction:
+      tag: value
+      value:
+        terms:
+        - species:
+            formula: Fe.947O
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: wustite
+            charge:
+              tag: value
+              value: 0
+          coefficient: '1'
+        - species:
+            formula: Fe
+            phase:
+              tag: value
+              value: cr
+            polymorph:
+              tag: value
+              value: alpha
+            charge:
+              tag: value
+              value: 0
+          coefficient: -947/1000
+        - species:
+            formula: O2
+            phase:
+              tag: value
+              value: g
+            polymorph:
+              tag: not_applicable
+              reason: not crystalline
+            charge:
+              tag: value
+              value: 0
+          coefficient: -1/2
+    formation_elements:
+      tag: value
+      value:
+      - - Fe
+        - formula: Fe
+          phase:
+            tag: value
+            value: cr
+          polymorph:
+            tag: value
+            value: alpha
+          charge:
+            tag: value
+            value: 0
+      - - O
+        - formula: O2
+          phase:
+            tag: value
+            value: g
+          polymorph:
+            tag: not_applicable
+            reason: not crystalline
+          charge:
+            tag: value
+            value: 0
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fH does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fH does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fH does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fH does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fH does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fH does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fH does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fH does not use wall
+  value:
+    kind: point
+    point: '-266.26976'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: assessed_thermodynamic_functions
+    model: assessed_thermodynamic_functions
+  admission:
+    status: admitted
+    reason: identity-complete printed cell admitted under the 2026-09-30 compilation ruling
+    decided_by:
+      worker: source-level compilation ruling
+      date: '2026-09-30'
+      evidence:
+        published_page: 16
+        pdf_page_index: 22
+        table: b1259-298k-0145-wustite
+        note: as_published='-63640'; unit='cal gfw^-1' quoted from Table 1 PDF p. 9 / printed p. 3; captured units_as_published
+          ignored; printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184
+          J/cal); standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure);
+          formation_basis=from_the_elements; elemental_reference_state_tables=Fe=B1259 reference-state table p.45/PDF p.51,
+          O=B1259 reference-state table p.59/PDF p.65
+        source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-298k-0145-wustite.json
+        record: b1259-298k-0145-wustite
+  notices: []
+  source_id: robie-waldbaum-1968-usgs-b1259
+  locator:
+    published_page: 16
+    pdf_page_index: 22
+    table: b1259-298k-0145-wustite
+    note: as_published='-63640'; unit='cal gfw^-1' quoted from Table 1 PDF p. 9 / printed p. 3; captured units_as_published
+      ignored; printed value is the evidence (calories stay as published; SI is derived with thermochemical calorie 4.184
+      J/cal); standard_pressure=1 atm = 101325 Pa from title (298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure);
+      formation_basis=from_the_elements; elemental_reference_state_tables=Fe=B1259 reference-state table p.45/PDF p.51, O=B1259
+      reference-state table p.59/PDF p.65
+    source_path: data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-298k-0145-wustite.json
+    record: b1259-298k-0145-wustite
+  read_from: compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-298k-0145-wustite.json
+  derivation:
+    relation: Direct B1259 tabulation; compilation_role engine_reference_input=true, scoring_eligible=false; circularity_warning=Do
+      not validate an engine against a compilation it consumes.; formation_basis=B1259 Table 1 (PDF p. 9 / printed p. 3) defines
+      ΔHf / ΔGf as heat / Gibbs free energy of formation from the reference state. Unmarked 298.15 K rows and high-T grids
+      are this convention. Schema v2.1 has no closed token for it.
+    inputs:
+    - compilation_record:data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-298k-0145-wustite.json
+    parameters:
+    - - cal_th_to_kJ
+      - state:
+          tag: value
+          value: '0.004184'
+        locator:
+          published_page: 3
+          pdf_page_index: 9
+          note: 'Table 1 PDF p. 9 / printed p. 3: ΔHf and ΔGf in cal gfw^-1'
+    output_unit: kJ_per_declared_mol_basis
