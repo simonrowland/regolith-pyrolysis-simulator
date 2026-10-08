@@ -157,13 +157,6 @@ _GOLDEN = {
     },
 }
 
-_GAS_SOURCE_CLASSES = {
-    "Ca": "janaf_fitted", "CaO": "janaf_fitted", "O": "janaf_fitted",
-    "O2": "janaf_fitted", "Si": "janaf_fitted", "Si2": "janaf_fitted",
-    "Si3": "janaf_fitted", "SiO": "janaf_fitted", "SiO2": "janaf_fitted",
-    "Fe": "janaf_transcribed", "FeO": "janaf_transcribed",
-    "Mg": "janaf_fitted", "MgO": "janaf_fitted",
-}
 _PROVENANCE_CLASSES = {
     "Al": "janaf_fitted", "Al2": "janaf_fitted", "Al2O": "janaf_fitted",
     "Al2O2": "janaf_fitted", "AlO": "janaf_fitted", "AlO2": "janaf_fitted",
@@ -317,7 +310,10 @@ def test_binary_pot_gas_records_engine_binding_identity_and_hex_pins() -> None:
         assert (None if buffer is None else float(buffer).hex()) == expected["buffer"]
         assert set(result.vapor_pressures_source) == set(expected["pressures"])
         expected_sources = {
-            species: f"openimcc:{gas_table}:{_GAS_SOURCE_CLASSES[species]}"
+            species: (
+                "openimcc-gas-table:sha256:"
+                f"{package_identity.gas_table_digest}"
+            )
             for species in expected["pressures"]
             if species not in _CELL_SOURCE_LABELS
         }
