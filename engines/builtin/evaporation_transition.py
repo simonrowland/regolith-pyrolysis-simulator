@@ -23,7 +23,9 @@ a re-derivation of the stoich math (which still routes through
     ``process.overhead_gas``),
   * ``stoich`` -- the pre-validated stoich dict from
     :meth:`_evaporation_stoich` carrying ``parent_oxide``,
-    ``oxide_per_product_kg``, ``O2_per_product_kg``,
+    ``oxide_per_product_kg``, ``O2_per_product_kg``, and, when the
+    reaction has more than one condensed reactant,
+    ``reactants_kg_per_vapor``,
   * ``species`` -- the vapor species name,
   * ``sp_data`` -- the raw vapor_pressures.yaml metadata for the
     species (used only to look up
@@ -33,8 +35,9 @@ a re-derivation of the stoich math (which still routes through
   * ``dt_hr`` -- the tick duration in hours (always 1.0 in the current
     simulator; passed through explicitly so the provider stays unit-
     correct if the simulator's tick step ever changes),
-  * ``available_kg`` -- the parent-oxide kg currently held in
-    ``process.cleaned_melt``. Grouped analytic depletion already applied
+  * ``available_kg`` -- parent-oxide kg in ``process.cleaned_melt``, or
+    the scarcest condensed reactant when ``reactants_kg_per_vapor`` has
+    more than one entry. Grouped analytic depletion already applied
     before dispatch; this only preserves the no-stock short-circuit.
 
 Returns an :class:`IntentResult` with ``transition`` populated by a
@@ -122,8 +125,10 @@ class BuiltinEvaporationTransitionProvider(ChemistryProvider):
         # Lazy import: simulator.accounting.formulas pulls in
         # simulator/__init__ which re-enters this module during package
         # init -- see engines/builtin/__init__.py for the cycle
-        # description.
+        # description. stoich is imported here for the same reason:
+        # it imports formulas.
         from simulator.accounting.formulas import resolve_species_formula
+        from simulator.vapour_rail.stoich import oxygen_coproduct_account
 
         wrong_intent = reject_wrong_intent(
             request, ChemistryIntent.EVAPORATION_TRANSITION
@@ -273,10 +278,21 @@ class BuiltinEvaporationTransitionProvider(ChemistryProvider):
             species, condensed_kg, sp_data, registry,
             resolve_species_formula,
         )
+        vector = stoich.get("reactants_kg_per_vapor")
+        reactant_kg: dict[str, float] = {}
+        if isinstance(vector, Mapping) and len(vector) > 1:
+            reactant_kg = {
+                str(reactant): rate_kg_hr * dt_hr * float(kg_per)
+                for reactant, kg_per in vector.items()
+            }
         coupled_leg_kg = {
             "parent_oxide": oxide_removed,
             "remaining_vapor": remaining_kg,
             "oxygen_coproduct": abs(O2_kg),
+            **{
+                f"reactant:{reactant}": kg
+                for reactant, kg in reactant_kg.items()
+            },
             **{
                 f"condensed:{product_species}": (
                     float(product_mol)
@@ -308,18 +324,33 @@ class BuiltinEvaporationTransitionProvider(ChemistryProvider):
 
         # ------------------------------------------------------------------
         # Build the mol-native proposal. Per-account species_mol dicts:
-        #   debits:  process.cleaned_melt -> {parent_oxide: mol}
+        #   debits:  process.cleaned_melt -> {reactant: mol, ...}
         #   credits: process.condensation_train -> {product: mol, ...}
         #            process.overhead_gas        -> {species: mol, O2: mol}
         #            reservoir.fo2_buffer        -> {O2: mol}
+        # A single parent debits parent_oxide for oxide_removed. A
+        # multi-reactant vector debits each condensed reactant for its
+        # own kg instead of that one parent key.
         # ------------------------------------------------------------------
         debits: dict[str, dict[str, float]] = {}
         credits: dict[str, dict[str, float]] = {}
 
-        parent_oxide_formula = resolve_species_formula(parent_oxide, registry)
-        oxide_mol = oxide_removed / parent_oxide_formula.molar_mass_kg_per_mol()
-        if oxide_mol > 0.0:
-            debits["process.cleaned_melt"] = {parent_oxide: oxide_mol}
+        if reactant_kg:
+            melt_debit: dict[str, float] = {}
+            for reactant, kg in reactant_kg.items():
+                if kg <= 0.0:
+                    continue
+                reactant_formula = resolve_species_formula(reactant, registry)
+                mol = kg / reactant_formula.molar_mass_kg_per_mol()
+                if mol > 0.0:
+                    melt_debit[reactant] = mol
+            if melt_debit:
+                debits["process.cleaned_melt"] = melt_debit
+        else:
+            parent_oxide_formula = resolve_species_formula(parent_oxide, registry)
+            oxide_mol = oxide_removed / parent_oxide_formula.molar_mass_kg_per_mol()
+            if oxide_mol > 0.0:
+                debits["process.cleaned_melt"] = {parent_oxide: oxide_mol}
 
         # Once the parent debit clears the transition floor, retain every
         # positive stoichiometric leg. Dropping a smaller coproduct here makes
@@ -335,13 +366,11 @@ class BuiltinEvaporationTransitionProvider(ChemistryProvider):
         if O2_kg > 0.0:
             o2_formula = resolve_species_formula("O2", registry)
             o2_mol = O2_kg / o2_formula.molar_mass_kg_per_mol()
-            if (
-                oxygen_destination == "reservoir.fo2_buffer"
-                or (
-                    not oxygen_destination
-                    and vapor_oxygen_atoms <= 0.0
-                )
-            ):
+            account = oxygen_coproduct_account(
+                oxygen_destination or None,
+                vapor_oxygen_atoms=vapor_oxygen_atoms,
+            )
+            if account == "reservoir.fo2_buffer":
                 credits["reservoir.fo2_buffer"] = {"O2": o2_mol}
             else:
                 overhead_credit["O2"] = o2_mol

@@ -377,10 +377,10 @@ from simulator.condensation_routing import (
 from simulator.cost_ledger import CostImportContext, CostLedger
 from simulator.feedstock_guard import assert_feedstock_loadable
 from simulator.feedstock_composition import (
-    fe_metal,
     feot_equivalent_moles,
     iron_oxide_values,
     normalize_component_masses_kg,
+    normalized_feedstock_component_masses_kg,
     resolve_feedstock_composition,
 )
 from simulator.environment import DEFAULT_VACUUM_FLOOR_BAR, feedstock_body
@@ -10130,22 +10130,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         feedstock_key: str | None = None,
     ) -> ProcessInventory:
         """Build raw, Stage 0, and cleaned melt inventories for a batch."""
-        comp = feedstock.get('composition_wt_pct', {}) or {}
-        raw = self._component_masses_from_wt_pct(comp, mass_kg)
-        metallic_fe_wt_pct = fe_metal(feedstock)
-        if metallic_fe_wt_pct is not None and metallic_fe_wt_pct > 0.0:
-            raw['Fe'] = raw.get('Fe', 0.0) + mass_kg * metallic_fe_wt_pct / 100.0
+        raw = normalized_feedstock_component_masses_kg(feedstock, mass_kg)
         declared_stage0_buckets = self._declared_stage0_product_buckets(
             feedstock, mass_kg)
-
-        for section_name in ('non_oxide_components', 'bulk_additions'):
-            extra = self._component_masses_from_named_section(
-                feedstock.get(section_name, {}) or {}, mass_kg)
-            self._merge_masses(raw, extra)
-        structural = self._component_masses_from_named_section(
-            feedstock.get('structural_water', {}) or {}, mass_kg)
-        self._merge_masses(raw, structural)
-        normalize_component_masses_kg(raw, mass_kg)
         inert_melt = self._inert_trace_component_masses(feedstock, raw)
         self._validate_stage0_unmodeled_nitrate_components(
             raw,
@@ -11579,23 +11566,6 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 masses[str(component)] = kg
         return masses
 
-    @classmethod
-    def _component_masses_from_named_section(
-        cls, values: Mapping[str, Any], mass_kg: float
-    ) -> Dict[str, float]:
-        masses: Dict[str, float] = {}
-        for raw_name, raw_value in values.items():
-            name = cls._component_name_from_field(str(raw_name))
-            if str(raw_name).endswith('_kg_per_tonne'):
-                kg = cls._mass_from_declared_kg_per_tonne(
-                    raw_value, mass_kg, str(raw_name))
-            else:
-                kg = cls._mass_from_declared_wt_pct(
-                    raw_value, mass_kg, str(raw_name))
-            if kg is not None and kg > 0.0:
-                masses[name] = masses.get(name, 0.0) + kg
-        return masses
-
     @staticmethod
     def _merge_masses(target: Dict[str, float],
                       additions: Mapping[str, float]) -> None:
@@ -12226,15 +12196,6 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         if number is None:
             return None
         return mass_kg * number / 100.0
-
-    @classmethod
-    def _mass_from_declared_kg_per_tonne(
-        cls, value: Any, batch_mass_kg: float, field: str
-    ) -> Optional[float]:
-        number = cls._declared_nonnegative_number(value, field)
-        if number is None:
-            return None
-        return batch_mass_kg * number / 1000.0
 
     @staticmethod
     def _declared_nonnegative_number(value: Any, field: str) -> Optional[float]:

@@ -64,13 +64,14 @@ def _digest(value: Any) -> str:
 
 
 # Captured by running the production normalizers on base 257a87a0bbd25ec8190443f47e3215f476c5d727.
+# The six lunar-family digests include the t1139 trace-oxide bridge.
 _NORMALIZED_KG_PINS = {
-    "lunar_mare_low_ti": "8564b6c17a8da2ab4b2144b3f60f8bc13c52f70eff093a320eff0b9a08c48b8e",
-    "lunar_mare_high_ti": "5fb2357b11624c00baee20b149cbf4e766feaf8531c132d904cde8a7940acfc4",
-    "lunar_highland": "aaf6a5a3de7b8eeafa0f5c4cdc7c26a0264608fb26c66338f2477cb3dbdcd42b",
-    "lunar_pkt_kreep_average": "62fd7298b60c327df77387e0026988a7fb31eabebb22879791ff679bfa6ef146",
-    "lunar_spa_kreep_influenced": "e6d74afc1d342b481c6dd60909c806a48db289ca65515ec85d0558ecefbf9776",
-    "targeted_super_kreep_ore": "2829c35bd650d5240876cea9873b9317b1bb334e69f9c2883340fadedad94208",
+    "lunar_mare_low_ti": "5354d9293e9c2928181053c2f6bcac4bf4f5997659a8e8ac33b9089a90ef7eac",
+    "lunar_mare_high_ti": "d259c944ed17e25a1b9ab331c4613ae5efacdd3a40f5a078914ba4fcb080c26a",
+    "lunar_highland": "d2cb29d3f32242ccd9842887455e776a71139bb6fe66d9b59836bb3ac5b771a2",
+    "lunar_pkt_kreep_average": "28c1713258e2c65ed1fde9d625f5fbc691914d5edca1f50d73bfdfff156b9dce",
+    "lunar_spa_kreep_influenced": "0646c9fb3d5e6938fccd5f1533f378473c4f9c8ef27bad6e8625eebe28798db4",
+    "targeted_super_kreep_ore": "40a9df616e55df2a750d79d464c4c5656448a5b5452eda0f0bb320581d98f36d",
     "lunar_highlands_lhs1": "db1c4c641e574f77073a8e1518073fb3928128d80a49829ebb3e81e3d82c2705",
     "lunar_highlands_lhs1_yu_2025_reference": "9d6ba8b764273c7dfaa5845e6df9db2e1760a4594bc27a60d249f0e33eece71c",
     "lunar_mare_lms1": "483151e140a082e9b3d8ebac1fded19b7584f16d5bf66c7b103bf16473ccf8e8",

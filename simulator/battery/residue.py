@@ -378,9 +378,9 @@ def integrate_residue_inventory(
     returned kg h^-1 is converted at the boundary back to mol s^-1.
 
     For a parent with inventory ``N`` mol and requested parent draw ``r`` mol
-    s^-1, analytic depletion debits ``N * (1 - exp(-r*dt/N))`` mol during the
-    step. Concurrent channels sharing a parent divide that debit in proportion
-    to their HKL parent draw. Inventory and atom closure stay mol-native; gas
+    s^-1, ``split_frozen_inventory`` debits ``N * (1 - exp(-r*dt/N))`` mol
+    during the step and divides that debit across channels in proportion to
+    their HKL parent draw. Inventory and atom closure stay mol-native; gas
     mass is never subtracted as oxide mass. After those finite parent debits,
     the oxygen atom remainder is computed from the actual gas products and
     divided between O and O2 in the solved pressure-root flux ratio. This is
@@ -396,6 +396,8 @@ def integrate_residue_inventory(
     for large dt no parent can be depleted below zero. Missing area evolution
     is a typed absence because the integrator must not choose geometry policy.
     """
+    from simulator.evaporation import split_frozen_inventory
+
     if area_evolution_m2 is None or len(area_evolution_m2) == 0:
         raise ResidueInventoryRefusal(
             "melt_surface_area_evolution_missing",
@@ -529,28 +531,35 @@ def integrate_residue_inventory(
         actual_products: dict[str, float] = {}
         for parent, parent_channels in channels_by_parent.items():
             available_parent = float(inventory.get(parent, 0.0))
-            requested_parent_rate = math.fsum(
+            draws = tuple(
                 product_rate * term.parent_moles_per_product
                 for term, product_rate in parent_channels
             )
-            if available_parent <= 0.0 or requested_parent_rate <= 0.0:
-                continue
-            # Analytic first-order depletion in mol: 1-exp(-k*dt), with
-            # k = requested parent mol s^-1 / current parent mol.
-            debit = available_parent * -math.expm1(
-                -requested_parent_rate * dt_s / available_parent
+            coefficients = tuple(
+                term.parent_moles_per_product
+                for term, _product_rate in parent_channels
             )
-            debit = min(available_parent, max(0.0, debit))
+            requested_parent_rate = math.fsum(draws)
+            split = split_frozen_inventory(
+                available_parent,
+                draws,
+                coefficients,
+                dt=dt_s,
+                total_draw=requested_parent_rate,
+                available_floor=0.0,
+                draw_floor=0.0,
+                fraction_cap=1.0,
+                clamp_consumed_to_stock=True,
+                divide_draw_by_stock_first=False,
+            )
+            if split is None:
+                continue
+            debit, products = split
             actual_parent_debits[parent] = debit
             inventory[parent] = max(0.0, available_parent - debit)
-            for term, product_rate in parent_channels:
-                share = (
-                    product_rate * term.parent_moles_per_product
-                    / requested_parent_rate
-                )
-                product_mol = (
-                    debit * share / term.parent_moles_per_product
-                )
+            for (term, _product_rate), product_mol in zip(
+                parent_channels, products, strict=True
+            ):
                 actual_products[term.source.species] = product_mol
                 evaporated[term.source.species] += product_mol
 
