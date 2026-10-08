@@ -8,6 +8,8 @@ coating ledger from route(), not from a hand-built deposit map.
 from __future__ import annotations
 
 import inspect
+from copy import deepcopy
+from pathlib import Path
 from types import SimpleNamespace
 
 import pytest
@@ -76,11 +78,22 @@ def test_every_ok_onset_is_a_wall_candidate() -> None:
     assert "VO2" not in gaps
 
 
-def test_cold_trace_vapour_reaches_the_coating_ledger() -> None:
-    model = CondensationModel(CondensationTrain.create_default())
+@pytest.mark.parametrize("species", ["Rb", "Pb", "SnO", "GeO"])
+def test_cold_trace_vapour_reaches_the_coating_ledger(species) -> None:
+    from simulator.yaml_cache import load_cached_safe_yaml
+
+    payload = deepcopy(load_cached_safe_yaml(
+        (Path(__file__).resolve().parents[1] / "data" / "vapor_pressures.yaml").read_text()
+    ))
+    family = next(family for family in payload["families"].values()
+                  if species in family["physical_properties"]["species"])
+    family["code_metadata"]["request_rule"] = "source_inventory_present"
+    family["physical_properties"]["species"][species]["flux_dormant"] = False
+    family["fiat_routing"]["compatibility_fields"]["flux_dormant"] = False
+    model = CondensationModel(CondensationTrain.create_default(), vapor_pressure_data=payload)
     model.configure_operating_conditions(
         overhead_pressure_mbar=10.0,
-        species_partial_pressures_mbar={"Rb": 1.0},
+        species_partial_pressures_mbar={species: 1.0},
         pipe_diameter_m=0.12,
         gas_temperature_C=1700.0,
         wall_temperature_C=50.0,
@@ -88,16 +101,17 @@ def test_cold_trace_vapour_reaches_the_coating_ledger() -> None:
             str(stage.stage_number): 1.0 for stage in model.train.stages
         },
     )
-    flux = EvaporationFlux(species_kg_hr={"Rb": 0.4})
+    flux = EvaporationFlux(species_kg_hr={species: 0.4})
     flux.update_totals()
 
     result = model.route(flux, MeltState())
 
-    deposited_kg = result.wall_deposit_by_species["Rb"]
+    deposited_kg = result.wall_deposit_by_species[species]
     assert deposited_kg > 0.0
     assert (
-        result.remaining_by_species["Rb"]
-        + result.retained_in_source_by_species.get("Rb", 0.0)
+        result.remaining_by_species[species]
+        + result.retained_in_source_by_species.get(species, 0.0)
+        + sum(stage.get(species, 0.0) for stage in result.condensed_by_stage_species.values())
         + deposited_kg
     ) == pytest.approx(0.4)
     snapshot = FoulingTerminalSnapshot.from_trace(
@@ -108,7 +122,7 @@ def test_cold_trace_vapour_reaches_the_coating_ledger() -> None:
         )
     )
     coated_kg = sum(
-        species_kg.get("Rb", 0.0)
+        species_kg.get(species, 0.0)
         for species_kg in snapshot.deposit_plain().values()
     )
     assert coated_kg == pytest.approx(deposited_kg)
@@ -119,9 +133,10 @@ def test_cold_trace_vapour_reaches_the_coating_ledger() -> None:
         rho_deposit_kg_m3=1000.0,
     )
     assert sum(thickness.values()) > 0.0
-    assert result.condensation_refusals_by_species["Rb"]["reason"] == (
-        "flagged_uncaptured_condensable"
-    )
+    if species == "Rb":
+        assert result.condensation_refusals_by_species[species]["reason"] == (
+            "flagged_uncaptured_condensable"
+        )
 
 
 def test_declared_species_wall_lists_do_not_move() -> None:

@@ -3033,10 +3033,7 @@ class CondensationModel:
                 or species in cleanup_offgas_authorization
             ):
                 continue
-            if not _species_has_antoine_data(
-                species,
-                vapor_pressure_data=self.vapor_pressure_data,
-            ):
+            if not has_declared_routing(species):
                 continue
             T_cond = _species_condensation_temperature_C(
                 species,
@@ -6154,6 +6151,14 @@ def _antoine_trace_onset(
     A missing curve falls through to the rail. A certified curve that
     refuses the pressure stays refused: thermo must not override it.
     """
+
+    from engines.builtin.vapor_pressure import wall_condensation_antoine_coefficients
+
+    coefficients, _block = wall_condensation_antoine_coefficients(
+        _species_vapor_data(species, vapor_pressure_data=vapor_pressure_data)
+    )
+    if not coefficients or _missing_required_antoine_keys(coefficients):
+        return None
 
     diagnostic = antoine_dew_temperature_diagnostic(
         species,
