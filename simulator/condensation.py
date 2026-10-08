@@ -82,9 +82,10 @@ from __future__ import annotations
 import copy
 import math
 import warnings
-from collections.abc import Mapping, MutableMapping
+from collections.abc import Mapping, MutableMapping, Sequence
 from contextvars import ContextVar
 from dataclasses import dataclass, field, replace
+from functools import lru_cache
 from pathlib import Path
 from typing import Any, Dict
 
@@ -1914,6 +1915,22 @@ CONDENSATION_TEMPS_C = {
     'Ti':  1500,   # negligible at process T
 }
 
+
+def has_declared_routing(species: str) -> bool:
+    """True when an existing table already routes this species.
+
+    ``DESIGNATED_STAGE`` and ``CONDENSATION_TEMPS_C`` are that table.
+    Trace vapours are everyone else. The predicate lives here, beside
+    the temperature table: ``condensation_routing`` cannot import this
+    module.
+    """
+
+    return (
+        designated_stage_number(species) is not None
+        or str(species) in CONDENSATION_TEMPS_C
+    )
+
+
 _CONFIG_BUNDLE = load_config_bundle(DATA_DIR)
 from simulator.vapour_rail.catalog import (
     VaporPressureCompatibilityView,
@@ -2830,6 +2847,15 @@ class CondensationModel:
                 data._route_catalog = previous
 
     def _route(self, evap_flux: EvaporationFlux, melt: MeltState):
+        """One tick. The trace-onset cache lives only for this call."""
+
+        _push_trace_onset_tick()
+        try:
+            return self._route_tick(evap_flux, melt)
+        finally:
+            _pop_trace_onset_tick()
+
+    def _route_tick(self, evap_flux: EvaporationFlux, melt: MeltState):
         """
         Route all evaporated species through the train.
 
@@ -2908,14 +2934,32 @@ class CondensationModel:
         # refused status the evaporation debit reader already withholds on.
         non_debiting_reason_by_species: dict[str, str] = {}
         cleanup_offgas_authorization: dict[str, dict[str, Any]] = {}
+        # Promote reads the flowing pressure so a no-data bypass can
+        # require an ok onset. A missing entry is not an ok onset.
+        self.wall_species_partial_pressures_pa = (
+            _flowing_species_partial_pressures_pa(
+                evap_flux.species_kg_hr,
+                self.overhead_pressure_mbar * 100.0,
+                reported_partial_pressures_mbar=self.species_partial_pressures_mbar,
+            )
+            if self._species_partial_pressures_configured
+            else {}
+        )
         for species in evap_flux.species_kg_hr:
             current_status = carrier_authority_status_by_species.get(
                 species, VAPOUR_CARRIER_AUTHORITY_MISSING
+            )
+            partial_pressure_pa = (
+                self.wall_species_partial_pressures_pa[species]
+                if species in self.wall_species_partial_pressures_pa
+                else None
             )
             promoted, reason = _promote_non_debiting_carrier_status(
                 species,
                 current_status,
                 vapor_pressure_data=self.vapor_pressure_data,
+                partial_pressure_pa=partial_pressure_pa,
+                stages=self.train.stages,
             )
             extra = carrier_authority_by_species.get(species, {}).get('extra', {})
             evidence = extra.get('applicability_evidence', {})
@@ -2961,15 +3005,6 @@ class CondensationModel:
         # outcomes (no longer silent return 0.0 without a consumer channel).
         efficiency_outcomes_by_species: dict[str, list[dict[str, Any]]] = {}
         used_capture_budget_regularizer = False
-        self.wall_species_partial_pressures_pa = (
-            _flowing_species_partial_pressures_pa(
-                evap_flux.species_kg_hr,
-                self.overhead_pressure_mbar * 100.0,
-                reported_partial_pressures_mbar=self.species_partial_pressures_mbar,
-            )
-            if self._species_partial_pressures_configured
-            else {}
-        )
         knudsen_diagnostic = self._enforce_knudsen_regime()
         diagnostic = cold_spot_diagnostic(
             [segment for segment in self.pipe_segments
@@ -2980,6 +3015,7 @@ class CondensationModel:
             temps=self.condensation_temperatures_C,
             vapor_pressure_data=self.vapor_pressure_data,
             species_partial_pressures_pa=self.wall_species_partial_pressures_pa or None,
+            stages=self.train.stages,
         )
         self.last_cold_spot_diagnostic = copy.deepcopy(diagnostic)
         self.cold_spot_history.append(copy.deepcopy(diagnostic))
@@ -3098,6 +3134,64 @@ class CondensationModel:
                 'positive condensable vapor species; missing '
                 + ', '.join(missing_partial_species)
             )
+        for species, rate_kg_hr in evap_flux.species_kg_hr.items():
+            if (
+                float(rate_kg_hr) <= 0.0
+                or species in stage_route_by_species
+                or has_declared_routing(species)
+                or species not in _trace_vapour_carrier_formulas()
+                or species in self.wall_species_partial_pressures_pa
+            ):
+                continue
+            carrier_authority_status_by_species[species] = (
+                VAPOUR_CARRIER_AUTHORITY_REFUSED
+            )
+            non_debiting_reason_by_species[species] = (
+                "wall_species_partial_pressure_missing"
+            )
+            condensation_authority_by_species[species]["status"] = (
+                VAPOUR_CARRIER_AUTHORITY_REFUSED
+            )
+        trace_wall_species: set[str] = set()
+        for species, rate_kg_hr in evap_flux.species_kg_hr.items():
+            if (
+                species in stage_route_by_species
+                or float(rate_kg_hr) <= 0.0
+                or carrier_authority_status_by_species.get(species)
+                in non_debiting_carrier_statuses
+                or has_declared_routing(species)
+            ):
+                continue
+            onset = _trace_onset_for_flow(
+                species,
+                self.wall_species_partial_pressures_pa,
+                vapor_pressure_data=self.vapor_pressure_data,
+                stages=self.train.stages,
+            )
+            if (
+                onset is None
+                or onset.status != "ok"
+                or onset.temperature_C is None
+            ):
+                continue
+            _record_trace_vapour_disposition(
+                species,
+                float(rate_kg_hr),
+                onset,
+                remaining_by_species=remaining_by_species,
+                condensation_authority_by_species=(
+                    condensation_authority_by_species
+                ),
+                condensation_refusals_by_species=(
+                    condensation_refusals_by_species
+                ),
+            )
+            stage_route_by_species[species] = _trace_wall_stage_route(
+                onset,
+                float(rate_kg_hr),
+                [segment.name for segment in self.pipe_segments],
+            )
+            trace_wall_species.add(species)
         wall_hkl_by_species = (
             self._resolve_wall_deposit_candidates_by_species_segment_kg(
                 evap_flux=evap_flux,
@@ -3109,6 +3203,13 @@ class CondensationModel:
                 ),
             )
         )
+        for species in trace_wall_species:
+            stage_route_by_species[species]["capture_budget_kg"] = (
+                _trace_wall_capture_budget_kg(
+                    float(evap_flux.species_kg_hr[species]),
+                    wall_hkl_by_species.get(species, {}),
+                )
+            )
         wall_saturation_pressure_refusals_by_species: dict[
             str, dict[str, dict[str, Any]]
         ] = {}
@@ -3210,6 +3311,27 @@ class CondensationModel:
             wall_deposit_fraction_by_species[species] = 0.0
             wall_deposit_account_fractions_by_species[species] = {}
 
+            if species not in stage_route_by_species:
+                onset = _trace_onset_for_flow(
+                    species,
+                    self.wall_species_partial_pressures_pa,
+                    vapor_pressure_data=self.vapor_pressure_data,
+                    stages=self.train.stages,
+                )
+                if onset is not None:
+                    _record_trace_vapour_disposition(
+                        species,
+                        float(rate_kg_hr),
+                        onset,
+                        remaining_by_species=remaining_by_species,
+                        condensation_authority_by_species=(
+                            condensation_authority_by_species
+                        ),
+                        condensation_refusals_by_species=(
+                            condensation_refusals_by_species
+                        ),
+                    )
+                    continue
             stage_route = stage_route_by_species[species]
             T_cond = float(stage_route['T_cond_C'])
             hkl_condensed_by_stage = dict(
@@ -4266,7 +4388,18 @@ class CondensationModel:
     ) -> list[PipeSegment]:
         if self.lab_geometry is not None:
             return list(self.pipe_segments)
-        target_stage_number = designated_stage_number(species)
+        if has_declared_routing(species):
+            target_stage_number = designated_stage_number(species)
+        else:
+            target_stage_number = None
+            onset = _trace_onset_for_flow(
+                species,
+                self.wall_species_partial_pressures_pa,
+                vapor_pressure_data=self.vapor_pressure_data,
+                stages=self.train.stages,
+            )
+            if onset is not None:
+                target_stage_number = onset.wall_landing_stage_number
         if target_stage_number is None:
             return []
         segments: list[PipeSegment] = []
@@ -4974,8 +5107,21 @@ def _assert_condensation_applicable(
     Applicability must bind before either legacy or compiled coefficient-source
     lookup. Condensation deliberately has no Stage-0 context, so ``stage0_only``
     rows refuse here; Stage-0 callers can supply context at the catalog seam.
+
+    A t1139 trace carrier does not answer from
+    ``code_metadata.hot_train_applicability``. ``route`` and
+    ``cold_spot_diagnostic`` read ``trace_vapour_condensation_onset`` at
+    the flowing partial pressure. This gate does not call that function:
+    it has no partial pressure, and calling it would load the source rail.
+    Dormancy of a trace row is ``request_rule`` / ``flux_dormant``, checked
+    by ``_species_is_flux_dormant``.
     """
 
+    if (
+        not has_declared_routing(species)
+        and species in _trace_vapour_carrier_formulas()
+    ):
+        return
     catalog_payload = _authoritative_vapour_catalog_payload(vapor_pressure_data)
     if catalog_payload is None:
         return
@@ -5000,6 +5146,15 @@ def _condensation_admission_refusal(
         )
     except HotTrainInapplicable as exc:
         return exc.refusal_code
+    if (
+        not has_declared_routing(species)
+        and species in _trace_vapour_carrier_formulas()
+        and _species_is_flux_dormant(
+            species,
+            vapor_pressure_data=vapor_pressure_data,
+        )
+    ):
+        return CONDENSATION_FLUX_DORMANT_REFUSAL
     if _species_has_compiled_or_legacy_pressure(
         species,
         vapor_pressure_data=vapor_pressure_data,
@@ -5013,12 +5168,30 @@ def _species_is_flux_dormant(
     *,
     vapor_pressure_data: Mapping[str, Any] | None = None,
 ) -> bool:
-    """True when the catalog row forbids an inventory debit."""
+    """True when the catalog row forbids an inventory debit.
 
-    return _species_vapor_data(
+    Legacy ``metals`` / ``oxide_vapors`` rows carry ``flux_dormant`` on
+    the compatibility view. A t1139 trace row lives in another family,
+    so its dormancy is the compiled ``request_rule``, not the
+    applicability token.
+    """
+
+    if _species_vapor_data(
         species,
         vapor_pressure_data=vapor_pressure_data,
-    ).get("flux_dormant") is True
+    ).get("flux_dormant") is True:
+        return True
+    if has_declared_routing(species) or species not in _trace_vapour_carrier_formulas():
+        return False
+    catalog_payload = _authoritative_vapour_catalog_payload(vapor_pressure_data)
+    if catalog_payload is None:
+        return False
+    compiled = _condensation_catalog(
+        vapor_pressure_data, catalog_payload
+    ).species.get(str(species))
+    if compiled is None:
+        return False
+    return compiled.code_metadata.request_rule == "dormant_pending_validation"
 
 
 def _promote_non_debiting_carrier_status(
@@ -5026,6 +5199,8 @@ def _promote_non_debiting_carrier_status(
     current_status: str,
     *,
     vapor_pressure_data: Mapping[str, Any] | None = None,
+    partial_pressure_pa: float | None = None,
+    stages: Sequence[CondensationStage] | None = None,
 ) -> tuple[str, str | None]:
     """Map admission-refusal and flux_dormant onto the refused debit status.
 
@@ -5034,6 +5209,12 @@ def _promote_non_debiting_carrier_status(
     input: refuse the debit. flux_dormant is the same: never inventory-debit,
     even when a bypass emits species_kg_hr > 0. Already-refused and
     proven-zero statuses are left unchanged so their distinct reasons survive.
+
+    A trace vapour with no Antoine row bypasses that refusal only when
+    ``trace_vapour_condensation_onset`` status is ok. The onset then names
+    the mass. Any other onset status is the refusal reason, and the mass
+    stays retained in source. flux_dormant is decided before that bypass.
+    A missing partial pressure is not an ok onset.
     """
 
     from simulator.vapour_rail.instrumentation import (
@@ -5051,6 +5232,34 @@ def _promote_non_debiting_carrier_status(
         vapor_pressure_data=vapor_pressure_data,
     )
     if admission_refusal is not None:
+        if (
+            admission_refusal == CONDENSATION_ADMISSION_REFUSAL_NO_DATA
+            and not has_declared_routing(species)
+            and species in _trace_vapour_carrier_formulas()
+        ):
+            # Ahead of the bypass: a dormant row never becomes routable
+            # just because it also lacks an Antoine table.
+            if _species_is_flux_dormant(
+                species,
+                vapor_pressure_data=vapor_pressure_data,
+            ):
+                return (
+                    VAPOUR_CARRIER_AUTHORITY_REFUSED,
+                    CONDENSATION_FLUX_DORMANT_REFUSAL,
+                )
+            onset = None
+            if partial_pressure_pa is not None:
+                onset = trace_vapour_condensation_onset(
+                    species,
+                    partial_pressure_pa,
+                    vapor_pressure_data=vapor_pressure_data,
+                    stages=stages,
+                )
+            if onset is not None and onset.status == "ok":
+                return current_status, None
+            if onset is not None:
+                return VAPOUR_CARRIER_AUTHORITY_REFUSED, onset.status
+            return VAPOUR_CARRIER_AUTHORITY_REFUSED, admission_refusal
         return VAPOUR_CARRIER_AUTHORITY_REFUSED, admission_refusal
     if _species_is_flux_dormant(
         species,
@@ -5058,6 +5267,101 @@ def _promote_non_debiting_carrier_status(
     ):
         return VAPOUR_CARRIER_AUTHORITY_REFUSED, CONDENSATION_FLUX_DORMANT_REFUSAL
     return current_status, None
+
+
+def _record_trace_vapour_disposition(
+    species: str,
+    rate_kg_hr: float,
+    onset: TraceVapourCondensationOnset,
+    *,
+    remaining_by_species: dict[str, float],
+    condensation_authority_by_species: dict[str, dict[str, Any]],
+    condensation_refusals_by_species: dict[str, dict[str, Any]],
+) -> None:
+    """Keep an ok trace vapour's mass on a named record.
+
+    The mass stays in ``remaining_by_species``. It is not moved to a
+    vent account and it is not zeroed. An uncaptured condensate is
+    flagged. A captured-stage condensate is ``pending_capture_model``
+    until wall competition takes the mass. A non-ok onset never reaches
+    here: promote refuses it and retains the mass in source.
+    """
+
+    remaining_by_species[species] = rate_kg_hr
+    authority = condensation_authority_by_species[species]
+    authority["authoritative_for_condensation"] = False
+    authority["mass_disposition"] = onset.disposition
+    authority["hot_train_applicability"] = onset.hot_train_applicability
+    authority["condensation_onset_C"] = onset.temperature_C
+    authority["landing_stage_number"] = onset.landing_stage_number
+    authority["wall_landing_stage_number"] = onset.wall_landing_stage_number
+    if onset.disposition == "flagged_uncaptured_condensable":
+        condensation_refusals_by_species[species] = {
+            "status": "flagged",
+            "reason": "flagged_uncaptured_condensable",
+            "output_status": "status_bearing",
+            "mass_disposition": "flagged_uncaptured_condensable",
+            "authoritative_for_terminal_offgas": False,
+            "authoritative_for_condensation": False,
+            "activity_premise": (
+                "pure condensate at unit activity is a lower bound on the "
+                "onset temperature; co-condensation is not modelled"
+            ),
+            "input_mass_kg_hr": rate_kg_hr,
+            "remaining_mass_kg_hr": rate_kg_hr,
+            "condensed_mass_kg_hr": 0.0,
+        }
+        return
+    if onset.disposition == "pending_capture_model":
+        condensation_refusals_by_species[species] = {
+            "status": "pending",
+            "reason": "pending_capture_model",
+            "output_status": "status_bearing",
+            "mass_disposition": "pending_capture_model",
+            "authoritative_for_terminal_offgas": False,
+            "authoritative_for_condensation": False,
+            "input_mass_kg_hr": rate_kg_hr,
+            "remaining_mass_kg_hr": rate_kg_hr,
+            "condensed_mass_kg_hr": 0.0,
+        }
+
+
+def _trace_wall_stage_route(
+    onset: TraceVapourCondensationOnset,
+    rate_kg_hr: float,
+    segment_names: Sequence[str],
+) -> dict[str, Any]:
+    """Stage row that admits an ok trace onset to wall competition.
+
+    The stage sink is empty. ``capture_budget_kg`` stays 0 until the
+    wall resolver returns supply-capped kinetic candidates;
+    ``_trace_wall_capture_budget_kg`` then sets the budget to their sum.
+    The existing weight split spends that budget. It is not a second
+    allocator.
+    """
+
+    inlet_kg_hr = max(0.0, float(rate_kg_hr))
+    return {
+        "T_cond_C": float(onset.temperature_C),
+        "hkl_condensed_by_stage": {},
+        "remaining_after_stage": {},
+        "stage_alpha_records_by_stage": {},
+        "segment_supply": {name: inlet_kg_hr for name in segment_names},
+        "capture_budget_kg": 0.0,
+        "capture_budget_alpha_record": {},
+    }
+
+
+def _trace_wall_capture_budget_kg(
+    inlet_kg_hr: float,
+    wall_candidates_kg: Mapping[str, float],
+) -> float:
+    """Finite cap for a trace vapour: the supply-capped kinetic wall sum."""
+
+    kinetic_kg_hr = sum(
+        max(0.0, float(value)) for value in wall_candidates_kg.values()
+    )
+    return min(max(0.0, float(inlet_kg_hr)), kinetic_kg_hr)
 
 
 def _species_has_compiled_or_legacy_pressure(
@@ -5263,6 +5567,36 @@ def authoritative_condensation_temperature(
     }
 
 
+def _bisect_monotone_threshold(
+    low: float,
+    high: float,
+    *,
+    target: float,
+    increasing: bool,
+    steps: int,
+    value_at,
+) -> float:
+    """Invert a monotone ``value_at`` on a bracket that already contains ``target``.
+
+    Shared by the Antoine dewpoint and the rail saturation onset. A
+    ``None`` sample stops the search and returns that midpoint, which is
+    the Antoine inverter's certified-surface failure. The rail onset
+    raises instead of returning ``None`` when a sample has no phase.
+    """
+
+    midpoint = (low + high) / 2.0
+    for _ in range(steps):
+        midpoint = (low + high) / 2.0
+        value = value_at(midpoint)
+        if value is None:
+            return midpoint
+        if (float(value) < target) == increasing:
+            low = midpoint
+        else:
+            high = midpoint
+    return (low + high) / 2.0
+
+
 def antoine_dew_temperature_diagnostic(
     species: str,
     partial_pressure_pa: float,
@@ -5335,27 +5669,1117 @@ def antoine_dew_temperature_diagnostic(
             "routing_authority": False,
         }
     increasing = p_high > p_low
-    for _ in range(80):
-        midpoint = (low + high) / 2.0
-        pressure = _antoine_psat_pa(
+
+    def _antoine_pressure(temperature_K: float) -> float | None:
+        return _antoine_psat_pa(
             species,
-            midpoint,
+            temperature_K,
             vapor_pressure_data=vapor_pressure_data,
         )
-        if pressure is None:
-            break
-        if (pressure < target) == increasing:
-            low = midpoint
-        else:
-            high = midpoint
+
+    temperature_K = _bisect_monotone_threshold(
+        low,
+        high,
+        target=target,
+        increasing=increasing,
+        steps=80,
+        value_at=_antoine_pressure,
+    )
     return {
         "status": "diagnostic_only",
-        "temperature_K": (low + high) / 2.0,
+        "temperature_K": temperature_K,
         "partial_pressure_Pa": target,
         "valid_range_K": [min(item[0] for item in candidate_ranges), max(item[1] for item in candidate_ranges)],
         "provenance": "existing_condensation_antoine_surface",
         "routing_authority": False,
     }
+
+
+# Stages that collect a condensate. Later stages can still wet a wall.
+_CAPTURE_STAGE_NUMBERS = frozenset({1, 2, 3, 4})
+_CONDENSED_STANDARD_STATES = (
+    "condensed_liquid",
+    "condensed_solid",
+    "condensed",
+)
+_ONSET_BISECTION_STEPS = 80
+# Active only inside ``_route``. None outside a tick, so a patched rail
+# on a direct onset call is not masked by an earlier tick.
+_TRACE_ONSET_CACHE: dict[
+    tuple[str, float, tuple[tuple[int, float, float], ...]],
+    TraceVapourCondensationOnset,
+] | None = None
+_TRACE_ONSET_DEPTH = 0
+
+
+def _push_trace_onset_tick() -> None:
+    """Start a route tick. Nested ticks share the outer cache."""
+
+    global _TRACE_ONSET_CACHE, _TRACE_ONSET_DEPTH
+    if _TRACE_ONSET_DEPTH == 0:
+        _TRACE_ONSET_CACHE = {}
+    _TRACE_ONSET_DEPTH += 1
+
+
+def _pop_trace_onset_tick() -> None:
+    """Drop the tick cache once the outermost ``_route`` returns."""
+
+    global _TRACE_ONSET_CACHE, _TRACE_ONSET_DEPTH
+    _TRACE_ONSET_DEPTH -= 1
+    if _TRACE_ONSET_DEPTH <= 0:
+        _TRACE_ONSET_DEPTH = 0
+        _TRACE_ONSET_CACHE = None
+
+
+def _stage_edge_key(
+    stages: Sequence[CondensationStage] | None,
+) -> tuple[tuple[int, float, float], ...]:
+    """Stage number and temperature edges, the landing half of the cache key."""
+
+    ordered = (
+        stages
+        if stages is not None
+        else CondensationTrain.create_default().stages
+    )
+    return tuple(
+        (
+            int(stage.stage_number),
+            float(stage.temp_range_C[0]),
+            float(stage.temp_range_C[1]),
+        )
+        for stage in ordered
+    )
+
+
+def _trace_onset_cache_key(
+    species: str,
+    partial_pressure_pa: float,
+    stages: Sequence[CondensationStage] | None,
+) -> tuple[str, float, tuple[tuple[int, float, float], ...]] | None:
+    """``(species, pressure to 6 significant figures, stage edges)``.
+
+    A non-finite or non-positive pressure is not a cache key. The
+    vapour-pressure table is not part of the key: one tick has one table.
+    ``trace_vapour_saturation_pressure_pa`` is the curve at one
+    temperature and stays uncached.
+    """
+
+    try:
+        pressure_pa = float(partial_pressure_pa)
+    except (TypeError, ValueError):
+        return None
+    if not math.isfinite(pressure_pa) or pressure_pa <= 0.0:
+        return None
+    return (str(species), float(f"{pressure_pa:.6g}"), _stage_edge_key(stages))
+
+
+@dataclass(frozen=True)
+class TraceVapourCondensationOnset:
+    """One species' condensation onset. Every consumer reads this object.
+
+    ``hot_train_applicability`` is derived here. It is not a catalog token
+    and it is not a second table.
+    """
+
+    species: str
+    partial_pressure_Pa: float | None
+    temperature_K: float | None
+    temperature_C: float | None
+    method: str
+    landing_stage_number: int | None
+    wall_landing_stage_number: int | None
+    hot_train_applicability: str
+    disposition: str
+    receiving_phase: str | None
+    source_id: str | None
+    status: str
+    detail: str
+
+
+def trace_vapour_condensation_onset(
+    species: str,
+    partial_pressure_pa: float,
+    *,
+    vapor_pressure_data: Mapping[str, Any] | None = None,
+    stages: Sequence[CondensationStage] | None = None,
+) -> TraceVapourCondensationOnset:
+    """Derive one condensation onset at the flowing partial pressure.
+
+    Derivation
+    ----------
+    Premise: the receiving phase is a condensed assemblage in the same
+    compilation that the gas can reach by one balanced reaction. That
+    is the gas formula when a condensed record of that formula exists,
+    a formula-unit multiple (``VO2`` → ½ ``V2O4``, ``Cs2`` → 2 ``Cs``),
+    or an O-conserving disproportionation (``GeO`` → ½ ``Ge`` +
+    ½ ``GeO2``). The stable assemblage is the reaction with the highest
+    saturation temperature: it condenses first on cooling. The reaction
+    is written per molecule of gas, ``Σ ν_i Cond_i <=> Gas(g)``.
+    Species already named by ``DESIGNATED_STAGE`` or
+    ``CONDENSATION_TEMPS_C`` keep that declared routing temperature.
+    Where the vapour has a certified Antoine wall curve,
+    ``antoine_dew_temperature_diagnostic`` supplies the temperature.
+    Otherwise both sides are Build A source-rail records of one
+    compilation: the gas the channel selected, and condensed formulas
+    of that same compilation. Compilations are never mixed inside one
+    reaction. A receiver that balances only by exchanging O2 is not
+    given a temperature; its status is
+    ``receiving_phase_requires_local_pO2`` and it names the phase.
+    ``no_receiving_condensed_phase`` remains when that compilation has
+    no O-conserving receiver. There is no second "first stage below
+    dewpoint" rule; the landing stage below is read from this onset.
+
+    Algebra::
+
+        K(T) = p_sat / P° = exp(-ΔG°(T) / (R T))
+        ΔG° / (R T) = G_gas/(R T) - Σ ν_i G_i/(R T)
+        p_sat(T) = P° * K(T)
+
+    ``K`` is ``reaction_equilibrium_constant``. Each condensate is a
+    pure phase, so its activity is 1 and does not appear in ``K``.
+    That unit activity makes the onset a lower bound on the true onset
+    temperature. Co-condensation is not modelled: Rb and Cs with K into
+    the stage-4 alkali condensate, and Ga, In, Ge, Sn, and Cu into the
+    stage-1 Fe condensate. ``uncaptured_condensable`` for Rb and Cs is
+    that pure-phase statement.
+    ``P°`` is ``STANDARD_PRESSURE_PA`` (1 bar = 100000 Pa). Invert
+    ``p_sat(T) = p_local`` by bisection on the temperature overlap.
+    A partial pressure outside that image is unavailable; the ends are
+    not clamped. At each temperature every condensed formula contributes
+    its lowest-G record whose band covers T, duplicate tables of one
+    state included.
+
+    The landing stage is the first train stage in flow order, after the
+    hot duct, whose lower temperature edge is at or below the onset.
+    Stages 1-4 can capture. A later stage is wall-only, so the coating
+    model still sees the vapour. An onset colder than every stage floor
+    lands on the last stage rather than disappearing.
+
+    Units: ``G/(R T)`` is dimensionless, so ``K`` is ``P_sat/P°``.
+    ``P_sat`` and the flowing partial pressure are both pascals.
+    Celsius is kelvin minus ``CELSIUS_TO_KELVIN_OFFSET``.
+
+    Sanity: JANAF Pb liquid (Pb-003) marks the liquid/ideal-gas
+    transition at fugacity 1 bar and 2019.022 K. The nist-janaf-4th Pb
+    gas and liquid, evaluated at ``P° = 100000 Pa``, invert to that
+    temperature. GeO has no condensed GeO record; ½ Ge + ½ GeO2 on the
+    channel's NASA compilation inverts to about 779 °C at 100 Pa.
+
+    A route tick reuses this object for the same species, the partial
+    pressure rounded to six significant figures, and the stage-edge
+    tuple. The next tick computes it again.
+    """
+
+    key = _trace_onset_cache_key(species, partial_pressure_pa, stages)
+    cache = _TRACE_ONSET_CACHE
+    if cache is not None and key is not None:
+        cached = cache.get(key)
+        if cached is not None:
+            return cached
+    onset = _compute_trace_vapour_condensation_onset(
+        species,
+        partial_pressure_pa,
+        vapor_pressure_data=vapor_pressure_data,
+        stages=stages,
+    )
+    if cache is not None and key is not None:
+        cache[key] = onset
+    return onset
+
+
+def _compute_trace_vapour_condensation_onset(
+    species: str,
+    partial_pressure_pa: float,
+    *,
+    vapor_pressure_data: Mapping[str, Any] | None = None,
+    stages: Sequence[CondensationStage] | None = None,
+) -> TraceVapourCondensationOnset:
+    """Uncached body of ``trace_vapour_condensation_onset``."""
+
+    declared = _declared_routing_onset(
+        species,
+        partial_pressure_pa,
+        vapor_pressure_data=vapor_pressure_data,
+        stages=stages,
+    )
+    if declared is not None:
+        return declared
+    pressure_pa = _finite_positive_partial_pressure(partial_pressure_pa)
+    if pressure_pa is None:
+        return _onset_unavailable(
+            species,
+            partial_pressure_pa=None,
+            status="inputs_required",
+            detail="partial pressure must be finite and positive",
+        )
+    if species not in _trace_vapour_carrier_formulas():
+        return _onset_unavailable(
+            species,
+            partial_pressure_pa=pressure_pa,
+            status="not_a_trace_vapour",
+            detail="species is not a first-batch trace vapour carrier",
+        )
+    antoine = _antoine_trace_onset(
+        species,
+        pressure_pa,
+        vapor_pressure_data=vapor_pressure_data,
+        stages=stages,
+    )
+    if antoine is not None:
+        return antoine
+    try:
+        return _thermo_saturation_onset(
+            species,
+            pressure_pa,
+            stages=stages,
+        )
+    except _SourceRailUnavailable as exc:
+        return _onset_unavailable(
+            species,
+            partial_pressure_pa=pressure_pa,
+            status="source_rail_unavailable",
+            method="thermo_saturation",
+            detail=str(exc),
+        )
+
+
+def _declared_routing_onset(
+    species: str,
+    partial_pressure_pa: float,
+    *,
+    vapor_pressure_data: Mapping[str, Any] | None,
+    stages: Sequence[CondensationStage] | None,
+) -> TraceVapourCondensationOnset | None:
+    """Majors keep the declared table. Do not recompute a dewpoint."""
+
+    del stages
+    if not has_declared_routing(species):
+        return None
+    stage_number = designated_stage_number(species)
+    try:
+        pressure_pa = float(partial_pressure_pa)
+    except (TypeError, ValueError):
+        pressure_pa = math.nan
+    if not math.isfinite(pressure_pa):
+        pressure_pa = None
+    temperature_C = _species_condensation_temperature_C(
+        species,
+        vapor_pressure_data=vapor_pressure_data,
+    )
+    temperature_K = temperature_C + CELSIUS_TO_KELVIN_OFFSET
+    if stage_number is None:
+        applicability = "declared_no_wall_stage"
+        disposition = "declared_temperature"
+    else:
+        applicability = "declared_routing"
+        disposition = "designated"
+    return TraceVapourCondensationOnset(
+        species=str(species),
+        partial_pressure_Pa=pressure_pa,
+        temperature_K=temperature_K,
+        temperature_C=temperature_C,
+        method="declared_routing_temperature",
+        landing_stage_number=stage_number,
+        wall_landing_stage_number=stage_number,
+        hot_train_applicability=applicability,
+        disposition=disposition,
+        receiving_phase=None,
+        source_id=None,
+        status="declared",
+        detail="CONDENSATION_TEMPS_C / DESIGNATED_STAGE",
+    )
+
+
+def _finite_positive_partial_pressure(partial_pressure_pa: float) -> float | None:
+    try:
+        pressure_pa = float(partial_pressure_pa)
+    except (TypeError, ValueError):
+        return None
+    if not math.isfinite(pressure_pa) or pressure_pa <= 0.0:
+        return None
+    return pressure_pa
+
+
+def _onset_unavailable(
+    species: str,
+    *,
+    partial_pressure_pa: float | None,
+    status: str,
+    detail: str,
+    method: str = "unavailable",
+    source_id: str | None = None,
+    receiving_phase: str | None = None,
+) -> TraceVapourCondensationOnset:
+    return TraceVapourCondensationOnset(
+        species=str(species),
+        partial_pressure_Pa=partial_pressure_pa,
+        temperature_K=None,
+        temperature_C=None,
+        method=method,
+        landing_stage_number=None,
+        wall_landing_stage_number=None,
+        hot_train_applicability="unavailable",
+        disposition="unavailable",
+        receiving_phase=receiving_phase,
+        source_id=source_id,
+        status=status,
+        detail=detail,
+    )
+
+
+def _onset_from_temperature(
+    species: str,
+    pressure_pa: float,
+    temperature_K: float,
+    *,
+    method: str,
+    stages: Sequence[CondensationStage] | None,
+    receiving_phase: str | None,
+    source_id: str | None,
+    detail: str,
+) -> TraceVapourCondensationOnset:
+    temperature_C = float(temperature_K) - CELSIUS_TO_KELVIN_OFFSET
+    capture_stage, wall_stage = _landing_stages_for_onset(temperature_C, stages)
+    if capture_stage is None:
+        applicability = "uncaptured_condensable"
+        disposition = "flagged_uncaptured_condensable"
+    else:
+        hot_duct_C = None
+        for stage in (
+            stages
+            if stages is not None
+            else CondensationTrain.create_default().stages
+        ):
+            if int(stage.stage_number) == 0:
+                hot_duct_C = float(stage.temp_range_C[0])
+                break
+        # Landing stays stage 1. The label says the vapour is already
+        # condensed at or above the hot-duct floor.
+        if hot_duct_C is not None and temperature_C >= hot_duct_C:
+            applicability = "condenses_upstream_of_train"
+        else:
+            applicability = "applicable"
+        # The landing stage is known. The mass is not booked as a
+        # captured impurity: wall competition has not taken it.
+        disposition = "pending_capture_model"
+    return TraceVapourCondensationOnset(
+        species=str(species),
+        partial_pressure_Pa=pressure_pa,
+        temperature_K=float(temperature_K),
+        temperature_C=temperature_C,
+        method=method,
+        landing_stage_number=capture_stage,
+        wall_landing_stage_number=wall_stage,
+        hot_train_applicability=applicability,
+        disposition=disposition,
+        receiving_phase=receiving_phase,
+        source_id=source_id,
+        status="ok",
+        detail=detail,
+    )
+
+
+def _trace_onset_for_flow(
+    species: str,
+    partial_pressures_pa: Mapping[str, float] | None,
+    *,
+    vapor_pressure_data: Mapping[str, Any] | None = None,
+    stages: Sequence[CondensationStage] | None = None,
+) -> TraceVapourCondensationOnset | None:
+    """Onset for an undesignated trace carrier at its flowing pressure.
+
+    Designated species and the declared Ca/Al/Ti temperatures do not
+    reach the rail. A missing partial pressure does not invent a stage.
+    Landing uses this train-level pressure. Wall flux prefers the
+    per-segment map once the resolver has filled it.
+    """
+
+    if has_declared_routing(species):
+        return None
+    if (
+        not isinstance(partial_pressures_pa, Mapping)
+        or species not in partial_pressures_pa
+    ):
+        return None
+    return trace_vapour_condensation_onset(
+        species,
+        partial_pressures_pa[species],
+        vapor_pressure_data=vapor_pressure_data,
+        stages=stages,
+    )
+
+
+def _landing_stages_for_onset(
+    temperature_C: float,
+    stages: Sequence[CondensationStage] | None,
+) -> tuple[int | None, int | None]:
+    """First stage whose lower edge is at or below the onset.
+
+    Called only from ``trace_vapour_condensation_onset``. Designated
+    species never reach it.
+    """
+
+    ordered = sorted(
+        stages if stages is not None else CondensationTrain.create_default().stages,
+        key=lambda stage: int(stage.stage_number),
+    )
+    capture_stage: int | None = None
+    wall_stage: int | None = None
+    for stage in ordered:
+        number = int(stage.stage_number)
+        if number <= 0:
+            continue
+        lower_C, _upper_C = stage.temp_range_C
+        if float(lower_C) <= float(temperature_C):
+            wall_stage = number
+            if number in _CAPTURE_STAGE_NUMBERS:
+                capture_stage = number
+            break
+    if wall_stage is None and ordered:
+        last = int(ordered[-1].stage_number)
+        if last > 0:
+            wall_stage = last
+    return capture_stage, wall_stage
+
+
+def _antoine_trace_onset(
+    species: str,
+    pressure_pa: float,
+    *,
+    vapor_pressure_data: Mapping[str, Any] | None,
+    stages: Sequence[CondensationStage] | None,
+) -> TraceVapourCondensationOnset | None:
+    """Reuse the Antoine inverter when it actually returns a dewpoint.
+
+    A missing curve falls through to the rail. A certified curve that
+    refuses the pressure stays refused: thermo must not override it.
+    """
+
+    diagnostic = antoine_dew_temperature_diagnostic(
+        species,
+        pressure_pa,
+        vapor_pressure_data=vapor_pressure_data,
+    )
+    status = str(diagnostic.get("status") or "")
+    if status == "diagnostic_only" and diagnostic.get("temperature_K") is not None:
+        return _onset_from_temperature(
+            species,
+            pressure_pa,
+            float(diagnostic["temperature_K"]),
+            method="antoine_dewpoint",
+            stages=stages,
+            receiving_phase=None,
+            source_id=str(diagnostic.get("provenance") or ""),
+            detail="antoine_dew_temperature_diagnostic",
+        )
+    if status == "refused_pressure_outside_certified_range":
+        return _onset_unavailable(
+            species,
+            partial_pressure_pa=pressure_pa,
+            status=status,
+            method="antoine_dewpoint",
+            source_id=str(diagnostic.get("provenance") or ""),
+            detail="Antoine pressure is outside the certified range",
+        )
+    return None
+
+
+class _SourceRailUnavailable(Exception):
+    """The Build A source rail could not be read. Onset stays typed."""
+
+
+@lru_cache(maxsize=1)
+def _trace_vapour_carrier_formulas() -> frozenset[str]:
+    """First-batch carrier formulas from the demand manifest.
+
+    Membership is this set. It does not open ``data/literature/compilations``.
+    A sparse seat can refuse a non-trace species without that directory.
+    """
+
+    from simulator.vapour_rail.channel_generator import (
+        FIRST_BATCH_ELEMENTS,
+        demand_pairs_for_element,
+        load_demand_manifest,
+    )
+    from simulator.vapour_rail.stoich import strip_phase
+
+    manifest = load_demand_manifest()
+    formulas: set[str] = set()
+    for element in FIRST_BATCH_ELEMENTS:
+        for pair in demand_pairs_for_element(element, manifest=manifest):
+            formula = strip_phase(
+                str(pair.get("formula") or pair.get("carrier") or "")
+            )
+            if formula:
+                formulas.add(formula)
+    return frozenset(formulas)
+
+
+@lru_cache(maxsize=1)
+def _trace_vapour_carrier_sources() -> dict[str, str | None]:
+    """Carrier formula → gas compilation the Build A channel selected.
+
+    The first channel wins when two elements share a formula. Callers
+    that only need membership use ``_trace_vapour_carrier_formulas``.
+    """
+
+    from simulator.vapour_rail.channel_generator import generate_first_batch
+    from simulator.vapour_rail.source_rail import load_source_rail
+    from simulator.vapour_rail.stoich import strip_phase
+
+    try:
+        batch = generate_first_batch(rail=load_source_rail())
+    except (OSError, ValueError, RuntimeError) as exc:
+        raise _SourceRailUnavailable(str(exc)) from exc
+    sources: dict[str, str | None] = {}
+    for channel in batch.channels:
+        formula = strip_phase(channel.carrier)
+        gas_key = f"{formula}(g)"
+        sources.setdefault(formula, channel.selected_sources.get(gas_key))
+    return sources
+
+
+_RECEIVING_METAL_COUNTS = range(1, 7)
+_RECEIVING_OXYGEN_COUNTS = range(0, 13)
+_REACTION_NU_TOLERANCE = 1e-8
+
+
+def trace_vapour_saturation_pressure_pa(
+    species: str,
+    temperature_K: float,
+) -> float | None:
+    """Lowest O-conserving saturation pressure at ``temperature_K``.
+
+    The reactions are the ones ``trace_vapour_condensation_onset`` inverts.
+    The minimum is the stable assemblage at this temperature. ``None``
+    means this species has no rail curve here (declared routing, not a
+    trace carrier, or the rail could not be read).
+    """
+
+    try:
+        temperature = float(temperature_K)
+    except (TypeError, ValueError):
+        return None
+    if (
+        not math.isfinite(temperature)
+        or temperature <= 0.0
+        or has_declared_routing(species)
+        or species not in _trace_vapour_carrier_formulas()
+    ):
+        return None
+    try:
+        bundle = _receiving_bundle(species)
+    except _SourceRailUnavailable:
+        return None
+    if bundle is None:
+        return None
+    _gas, present, reactions, _source_id, _differs = bundle
+    return _lowest_saturation_pressure_pa(
+        reactions,
+        _gas,
+        present,
+        temperature,
+    )
+
+
+def _thermo_saturation_onset(
+    species: str,
+    pressure_pa: float,
+    *,
+    stages: Sequence[CondensationStage] | None,
+) -> TraceVapourCondensationOnset:
+    try:
+        bundle = _receiving_bundle(species)
+    except _SourceRailUnavailable:
+        raise
+    if bundle is None:
+        return _onset_unavailable(
+            species,
+            partial_pressure_pa=pressure_pa,
+            status="no_receiving_condensed_phase",
+            method="thermo_saturation",
+            source_id=_trace_channel_source_id(species),
+            detail=(
+                "no single compilation has an O-conserving condensed "
+                "receiver for this gas"
+            ),
+        )
+    gas, present, reactions, source_id, differs = bundle
+    if not reactions:
+        named = _nearest_o2_coupled_formula(species, present)
+        if named is not None:
+            return _onset_unavailable(
+                species,
+                partial_pressure_pa=pressure_pa,
+                status="receiving_phase_requires_local_pO2",
+                method="thermo_saturation",
+                source_id=source_id,
+                receiving_phase=named,
+                detail=(
+                    f"{named} balances {species} only by exchanging O2; "
+                    "the onset needs the local oxygen pressure"
+                ),
+            )
+        return _onset_unavailable(
+            species,
+            partial_pressure_pa=pressure_pa,
+            status="no_receiving_condensed_phase",
+            method="thermo_saturation",
+            source_id=source_id,
+            detail=(
+                "no single compilation has an O-conserving condensed "
+                "receiver for this gas"
+            ),
+        )
+    best_temperature: float | None = None
+    best_label: str | None = None
+    domain_failure: str | None = None
+    for reaction in reactions:
+        solved, failure = _reaction_onset_temperature(
+            reaction,
+            gas,
+            present,
+            pressure_pa,
+        )
+        if solved is None:
+            domain_failure = failure or domain_failure
+            continue
+        if best_temperature is None or solved[0] > best_temperature:
+            best_temperature = solved[0]
+            best_label = solved[1]
+    if best_temperature is None or best_label is None:
+        named = _nearest_o2_coupled_formula(species, present)
+        detail = domain_failure or (
+            "flowing partial pressure is outside the saturation "
+            "curve on the overlapping band"
+        )
+        if named is not None:
+            detail = f"{detail}; nearest O2-coupled phase {named}"
+        return _onset_unavailable(
+            species,
+            partial_pressure_pa=pressure_pa,
+            status="pressure_outside_saturation_domain",
+            method="thermo_saturation",
+            source_id=source_id,
+            receiving_phase=_reaction_formula_label(reactions[0]),
+            detail=detail,
+        )
+    detail = "source-rail G(T) saturation at the flowing partial pressure"
+    if differs:
+        detail = f"{detail}; source_differs_from_channel"
+    return _onset_from_temperature(
+        species,
+        pressure_pa,
+        best_temperature,
+        method="thermo_saturation",
+        stages=stages,
+        receiving_phase=best_label,
+        source_id=source_id,
+        detail=detail,
+    )
+
+
+def _trace_channel_source_id(species: str) -> str | None:
+    try:
+        return _trace_vapour_carrier_sources().get(species)
+    except _SourceRailUnavailable:
+        return None
+
+
+def _receiving_bundle(species: str):
+    """Gas record, condensed formulas, and O-conserving reactions.
+
+    The channel's compilation is tried first. A later compilation is
+    used only when that one has the gas and no condensed formula of the
+    metal, and the result is marked ``source_differs_from_channel``.
+    """
+
+    from simulator.vapour_rail.source_rail import SOURCE_ORDER, load_source_rail
+
+    try:
+        preferred = _trace_vapour_carrier_sources().get(species)
+        rail = load_source_rail()
+    except _SourceRailUnavailable:
+        raise
+    except (OSError, ValueError, RuntimeError) as exc:
+        raise _SourceRailUnavailable(str(exc)) from exc
+    source_order: list[str] = []
+    if preferred:
+        source_order.append(preferred)
+    for source_id in SOURCE_ORDER:
+        if source_id not in source_order:
+            source_order.append(source_id)
+    for candidate in source_order:
+        gases = [
+            record
+            for record in rail.records_for(species, "gas")
+            if record.source_id == candidate
+        ]
+        if not gases:
+            continue
+        present = _condensed_records_for_metal(rail, species, candidate)
+        if not present:
+            continue
+        reactions = _o_conserving_reactions(species, present)
+        differs = bool(preferred) and candidate != preferred
+        return gases[0], present, reactions, candidate, differs
+    return None
+
+
+def _condensed_records_for_metal(rail: Any, gas: str, source_id: str) -> dict[str, list[Any]]:
+    counts = _formula_counts(gas)
+    metal = None if counts is None else _sole_metal(counts)
+    if metal is None:
+        return {}
+    present: dict[str, list[Any]] = {}
+    for metal_count in _RECEIVING_METAL_COUNTS:
+        for oxygen_count in _RECEIVING_OXYGEN_COUNTS:
+            formula = _spell_oxide(metal, metal_count, oxygen_count)
+            records: list[Any] = []
+            for state in _CONDENSED_STANDARD_STATES:
+                records.extend(
+                    record
+                    for record in rail.records_for(formula, state)
+                    if record.source_id == source_id
+                )
+            if records:
+                present[formula] = records
+    return present
+
+
+def _o_conserving_reactions(
+    gas: str,
+    present: Mapping[str, Sequence[Any]],
+) -> tuple[tuple[tuple[str, float], ...], ...]:
+    counts = _formula_counts(gas)
+    metal = None if counts is None else _sole_metal(counts)
+    if counts is None or metal is None:
+        return ()
+    metal_count = counts.get(metal, 0)
+    oxygen_count = counts.get("O", 0)
+    phase_counts = {
+        formula: _formula_counts(formula) for formula in present
+    }
+    reactions: list[tuple[tuple[str, float], ...]] = []
+    formulas = list(present)
+    for formula in formulas:
+        phase = phase_counts.get(formula)
+        if phase is None or _sole_metal(phase) != metal:
+            continue
+        condensed_metal = phase.get(metal, 0)
+        if condensed_metal <= 0:
+            continue
+        nu = metal_count / condensed_metal
+        if nu <= _REACTION_NU_TOLERANCE:
+            continue
+        if abs(nu * phase.get("O", 0) - oxygen_count) <= 1e-8:
+            reactions.append(((formula, nu),))
+    for index, left in enumerate(formulas):
+        left_counts = phase_counts.get(left)
+        if left_counts is None or _sole_metal(left_counts) != metal:
+            continue
+        for right in formulas[index + 1 :]:
+            right_counts = phase_counts.get(right)
+            if right_counts is None or _sole_metal(right_counts) != metal:
+                continue
+            solved = _balance_two_condensates(
+                counts,
+                left_counts,
+                right_counts,
+                metal,
+            )
+            if solved is None:
+                continue
+            reactions.append(((left, solved[0]), (right, solved[1])))
+    return tuple(reactions)
+
+
+def _balance_two_condensates(
+    gas_counts: Mapping[str, int],
+    left_counts: Mapping[str, int],
+    right_counts: Mapping[str, int],
+    metal: str,
+) -> tuple[float, float] | None:
+    metal_gas = gas_counts.get(metal, 0)
+    oxygen_gas = gas_counts.get("O", 0)
+    left_metal = left_counts.get(metal, 0)
+    right_metal = right_counts.get(metal, 0)
+    left_oxygen = left_counts.get("O", 0)
+    right_oxygen = right_counts.get("O", 0)
+    determinant = left_metal * right_oxygen - right_metal * left_oxygen
+    if abs(determinant) < 1e-12:
+        return None
+    nu_left = (
+        metal_gas * right_oxygen - oxygen_gas * right_metal
+    ) / determinant
+    nu_right = (
+        left_metal * oxygen_gas - left_oxygen * metal_gas
+    ) / determinant
+    if nu_left <= _REACTION_NU_TOLERANCE or nu_right <= _REACTION_NU_TOLERANCE:
+        return None
+    return nu_left, nu_right
+
+
+def _nearest_o2_coupled_formula(
+    gas: str,
+    present: Mapping[str, Sequence[Any]],
+) -> str | None:
+    counts = _formula_counts(gas)
+    metal = None if counts is None else _sole_metal(counts)
+    if counts is None or metal is None:
+        return None
+    best_formula: str | None = None
+    best_exchange: float | None = None
+    for formula in present:
+        phase = _formula_counts(formula)
+        if phase is None or _sole_metal(phase) != metal:
+            continue
+        condensed_metal = phase.get(metal, 0)
+        if condensed_metal <= 0:
+            continue
+        nu = counts.get(metal, 0) / condensed_metal
+        oxygen_exchange = (
+            counts.get("O", 0) - nu * phase.get("O", 0)
+        ) / 2.0
+        magnitude = abs(oxygen_exchange)
+        if magnitude <= 1e-8:
+            continue
+        if best_exchange is None or magnitude < best_exchange:
+            best_formula = formula
+            best_exchange = magnitude
+    return best_formula
+
+
+def _reaction_onset_temperature(
+    reaction: Sequence[tuple[str, float]],
+    gas_record: Any,
+    present: Mapping[str, Sequence[Any]],
+    pressure_pa: float,
+) -> tuple[tuple[float, str] | None, str | None]:
+    from simulator.vapour_rail.nasa_cea import NasaCeaError
+    from simulator.vapour_rail.source_rail import SourceCoverageGap
+    from simulator.vapour_rail.tabulated_gibbs import (
+        TabulatedDomainError,
+        TabulatedGibbsConventionError,
+    )
+
+    lows: list[float] = []
+    highs: list[float] = []
+    for formula, _nu in reaction:
+        records = present[formula]
+        lows.append(min(float(record.T_min_K) for record in records))
+        highs.append(max(float(record.T_max_K) for record in records))
+    low = max(float(gas_record.T_min_K), max(lows))
+    high = min(float(gas_record.T_max_K), min(highs))
+    if not high > low:
+        return None, "gas and condensed bands do not overlap"
+    errors = (
+        NasaCeaError,
+        TabulatedDomainError,
+        TabulatedGibbsConventionError,
+        SourceCoverageGap,
+        ValueError,
+    )
+
+    def saturation(temperature_K: float) -> float | None:
+        point = _assemblage_saturation_pa(
+            reaction,
+            gas_record,
+            present,
+            temperature_K,
+        )
+        if point is None:
+            return None
+        return point[0]
+
+    try:
+        low_pressure = saturation(low)
+        high_pressure = saturation(high)
+    except errors as exc:
+        return None, str(exc)
+    if (
+        low_pressure is None
+        or high_pressure is None
+        or not math.isfinite(low_pressure)
+        or not math.isfinite(high_pressure)
+        or high_pressure < low_pressure
+        or not low_pressure <= pressure_pa <= high_pressure
+    ):
+        return None, (
+            "flowing partial pressure is outside the saturation "
+            "curve on the overlapping band"
+        )
+
+    class _Gap(Exception):
+        pass
+
+    def value_at(temperature_K: float) -> float:
+        try:
+            pressure = saturation(temperature_K)
+        except errors as exc:
+            raise _Gap(str(exc)) from exc
+        if pressure is None:
+            raise _Gap(f"no receiving phase covers {temperature_K} K")
+        return pressure
+
+    try:
+        solved = _bisect_monotone_threshold(
+            low,
+            high,
+            target=pressure_pa,
+            increasing=True,
+            steps=_ONSET_BISECTION_STEPS,
+            value_at=value_at,
+        )
+        point = _assemblage_saturation_pa(reaction, gas_record, present, solved)
+    except _Gap as exc:
+        return None, str(exc)
+    except errors as exc:
+        return None, str(exc)
+    if point is None:
+        return None, f"no receiving phase covers {solved} K"
+    return (solved, _reaction_phase_label(reaction, point[1])), None
+
+
+def _lowest_saturation_pressure_pa(
+    reactions: Sequence[Sequence[tuple[str, float]]],
+    gas_record: Any,
+    present: Mapping[str, Sequence[Any]],
+    temperature_K: float,
+) -> float | None:
+    from simulator.vapour_rail.nasa_cea import NasaCeaError
+    from simulator.vapour_rail.source_rail import SourceCoverageGap
+    from simulator.vapour_rail.tabulated_gibbs import (
+        TabulatedDomainError,
+        TabulatedGibbsConventionError,
+    )
+
+    best: float | None = None
+    for reaction in reactions:
+        try:
+            point = _assemblage_saturation_pa(
+                reaction,
+                gas_record,
+                present,
+                temperature_K,
+            )
+        except (
+            NasaCeaError,
+            TabulatedDomainError,
+            TabulatedGibbsConventionError,
+            SourceCoverageGap,
+            ValueError,
+        ):
+            continue
+        if point is None or not math.isfinite(point[0]) or point[0] <= 0.0:
+            continue
+        if best is None or point[0] < best:
+            best = point[0]
+    return best
+
+
+def _assemblage_saturation_pa(
+    reaction: Sequence[tuple[str, float]],
+    gas_record: Any,
+    present: Mapping[str, Sequence[Any]],
+    temperature_K: float,
+) -> tuple[float, tuple[Any, ...]] | None:
+    from simulator.vapour_rail.nasa_cea import reaction_equilibrium_constant
+    from simulator.vapour_rail.source_rail import STANDARD_PRESSURE_PA
+
+    terms: list[tuple[float, Any]] = [
+        (1.0, gas_record.thermo.evaluate(temperature_K))
+    ]
+    phases: list[Any] = []
+    for formula, nu in reaction:
+        phase = _stable_receiving_phase(present[formula], temperature_K)
+        if phase is None:
+            return None
+        terms.append((-float(nu), phase.thermo.evaluate(temperature_K)))
+        phases.append(phase)
+    k_eq = reaction_equilibrium_constant(tuple(terms), T_K=temperature_K)
+    if not math.isfinite(k_eq) or k_eq <= 0.0:
+        return None
+    return STANDARD_PRESSURE_PA * k_eq, tuple(phases)
+
+
+def _formula_counts(formula: str) -> dict[str, int] | None:
+    from simulator.accounting.formulas import parse_formula
+    from simulator.accounting.exceptions import AccountingError
+
+    try:
+        parsed = parse_formula(str(formula)).elements
+    except (AccountingError, ValueError, TypeError):
+        return None
+    counts: dict[str, int] = {}
+    for symbol, count in parsed.items():
+        rounded = int(round(float(count)))
+        if rounded <= 0 or abs(float(count) - rounded) > 1e-6:
+            return None
+        counts[str(symbol)] = rounded
+    return counts or None
+
+
+def _sole_metal(counts: Mapping[str, int]) -> str | None:
+    metals = [symbol for symbol in counts if symbol != "O"]
+    if len(metals) != 1:
+        return None
+    return metals[0]
+
+
+def _spell_oxide(metal: str, metal_count: int, oxygen_count: int) -> str:
+    body = metal if metal_count == 1 else f"{metal}{metal_count}"
+    if oxygen_count <= 0:
+        return body
+    if oxygen_count == 1:
+        return f"{body}O"
+    return f"{body}O{oxygen_count}"
+
+
+def _format_stoichiometry(nu: float) -> str:
+    return f"{float(nu):.6g}"
+
+
+def _reaction_formula_label(reaction: Sequence[tuple[str, float]]) -> str:
+    parts: list[str] = []
+    for formula, nu in reaction:
+        if abs(float(nu) - 1.0) <= 1e-8:
+            parts.append(str(formula))
+        else:
+            parts.append(f"{_format_stoichiometry(nu)}*{formula}")
+    return "+".join(parts)
+
+
+def _reaction_phase_label(
+    reaction: Sequence[tuple[str, float]],
+    phases: Sequence[Any],
+) -> str:
+    parts: list[str] = []
+    for (formula, nu), phase in zip(reaction, phases):
+        body = f"{formula}({phase.native_phase})"
+        if abs(float(nu) - 1.0) > 1e-8:
+            body = f"{_format_stoichiometry(nu)}*{body}"
+        parts.append(body)
+    return "+".join(parts)
+
+
+def _stable_receiving_phase(condensed: Sequence[Any], temperature_K: float) -> Any | None:
+    """Lowest-G record whose band covers ``temperature_K``.
+
+    Every covering record competes. Duplicate tables of one state are
+    not settled by file order.
+    """
+
+    best = None
+    best_g: float | None = None
+    for record in condensed:
+        if not record.T_min_K <= temperature_K <= record.T_max_K:
+            continue
+        g_over_rt = float(record.thermo.evaluate(temperature_K).g_over_RT)
+        if best is None or best_g is None or g_over_rt < best_g:
+            best = record
+            best_g = g_over_rt
+    return best
 
 
 def _materials_source(materials: Mapping[str, Any] | None = None) -> Mapping[str, Any]:
@@ -5892,6 +7316,18 @@ def _antoine_psat_pa(
             species,
             vapor_pressure_data=vapor_pressure_data,
         )
+        if _species_is_flux_dormant(
+            species,
+            vapor_pressure_data=vapor_pressure_data,
+        ) and (
+            not has_declared_routing(species)
+            and species in _trace_vapour_carrier_formulas()
+        ):
+            raise WallSaturationPressureRefusal(
+                species,
+                T_K,
+                CONDENSATION_FLUX_DORMANT_REFUSAL,
+            )
     data = _species_vapor_data(
         species,
         vapor_pressure_data=vapor_pressure_data,
@@ -6042,6 +7478,10 @@ def _try_antoine_psat_pa(
     species has Antoine data somewhere but no segment covers ``T_K``
     (``_antoine_psat_pa`` returns None without raising). Never invent a
     pressure for that gap (b-127 fabricated 100 Pa).
+
+    A certified Antoine fit stays first. A non-dormant trace carrier
+    with no such fit uses ``trace_vapour_saturation_pressure_pa``, the
+    same rail curve the onset inverts. A dormant trace does not.
     """
 
     from engines.builtin.vapor_pressure import VaporPressureRangeError
@@ -6064,6 +7504,13 @@ def _try_antoine_psat_pa(
         )
     except (CatalogCompileError, VaporPressureRangeError, NasaCeaDomainError, ShomateDomainError,
             WallSaturationPressureRefusal) as exc:
+        thermo_pa = _trace_wall_saturation_pressure_pa(
+            species,
+            T_K,
+            vapor_pressure_data=vapor_pressure_data,
+        )
+        if thermo_pa is not None:
+            return thermo_pa, False
         if antoine_extrapolations is not None:
             antoine_extrapolations[f"{species}#wall:{T_K}"] = {
                 "temperature_K": T_K, "status": "refused", "reason": str(exc),
@@ -6079,8 +7526,36 @@ def _try_antoine_psat_pa(
             antoine_extrapolation_warnings.append(str(exc))
         return None, True
     if pressure_pa is None:
+        thermo_pa = _trace_wall_saturation_pressure_pa(
+            species,
+            T_K,
+            vapor_pressure_data=vapor_pressure_data,
+        )
+        if thermo_pa is not None:
+            return thermo_pa, False
         return None, True
     return float(pressure_pa), False
+
+
+def _trace_wall_saturation_pressure_pa(
+    species: str,
+    temperature_K: float,
+    *,
+    vapor_pressure_data: Mapping[str, Any] | None,
+) -> float | None:
+    """Rail saturation pressure for a trace wall, or None to keep Antoine.
+
+    Declared species and dormant trace rows stay on the existing refusal.
+    """
+
+    if has_declared_routing(species) or species not in _trace_vapour_carrier_formulas():
+        return None
+    if _species_is_flux_dormant(
+        species,
+        vapor_pressure_data=vapor_pressure_data,
+    ):
+        return None
+    return trace_vapour_saturation_pressure_pa(species, temperature_K)
 
 
 def _local_species_pressure_pa(
@@ -6386,6 +7861,18 @@ def _molecular_mass_kg_per_molecule(
     value = data.get('molar_mass_g_mol') if isinstance(data, Mapping) else None
     if value is None:
         value = MOLAR_MASS.get(species)
+    if value is None:
+        # The explicit table does not list trace vapours. The formula
+        # parser already owns those atomic weights; wall deposition uses
+        # the same parser for its shadow record. An unparseable name
+        # still refuses below.
+        from simulator.accounting.exceptions import AccountingError
+        from simulator.accounting.formulas import parse_formula
+
+        try:
+            value = parse_formula(str(species)).molar_mass_g_per_mol()
+        except (AccountingError, ValueError, TypeError):
+            value = None
     # b-193. This used to substitute 50.0 g/mol for any species whose molar
     # mass was missing or unusable, and hand that invented number to the HKL
     # impingement flux below. Hertz-Knudsen-Langmuir gives
@@ -7735,6 +9222,7 @@ def cold_spot_diagnostic(
     temps: Mapping[str, float] | None = None,
     vapor_pressure_data: Mapping[str, Any] | None = None,
     species_partial_pressures_pa: Mapping[str, float] | None = None,
+    stages: Sequence[CondensationStage] | None = None,
 ) -> dict[str, Any]:
     """Flag pipe segments that would condense flowing vapor too early.
 
@@ -7759,15 +9247,39 @@ def cold_spot_diagnostic(
         )
         if kg_hr <= 1e-15:
             continue
-        target_stage_number = designated_stage_number(species)
-        if target_stage_number is None:
-            continue
-        condensation_T_C = _species_condensation_temperature_C(
-            species,
-            temps=temps,
-            vapor_pressure_data=vapor_pressure_data,
-        )
+        trace_applicability: str | None = None
+        if has_declared_routing(species):
+            target_stage_number = designated_stage_number(species)
+            if target_stage_number is None:
+                continue
+            condensation_T_C = _species_condensation_temperature_C(
+                species,
+                temps=temps,
+                vapor_pressure_data=vapor_pressure_data,
+            )
+        else:
+            onset = _trace_onset_for_flow(
+                str(species),
+                species_partial_pressures_pa,
+                vapor_pressure_data=vapor_pressure_data,
+                stages=stages,
+            )
+            if (
+                onset is None
+                or onset.temperature_C is None
+                or onset.wall_landing_stage_number is None
+            ):
+                continue
+            target_stage_number = onset.wall_landing_stage_number
+            condensation_T_C = float(onset.temperature_C)
+            trace_applicability = onset.hot_train_applicability
         threshold_C = condensation_T_C - margin_C
+
+        def _stamp_applicability(finding: dict[str, Any]) -> dict[str, Any]:
+            if trace_applicability is not None:
+                finding["hot_train_applicability"] = trace_applicability
+            return finding
+
         p_local_pa = None
         if species_partial_pressures_pa is not None:
             raw_partial = species_partial_pressures_pa.get(species)
@@ -7790,7 +9302,7 @@ def cold_spot_diagnostic(
                 and math.isfinite(hot_wall_threshold_C)
                 and wall_T_C < hot_wall_threshold_C
             ):
-                upstream_hot_wall_findings.append({
+                upstream_hot_wall_findings.append(_stamp_applicability({
                     'segment': segment.name,
                     'account': segment.wall_deposit_account,
                     'species': str(species),
@@ -7803,7 +9315,7 @@ def cold_spot_diagnostic(
                         f'{wall_T_C:.1f} C below {hot_wall_threshold_C:.1f} C '
                         f'before stage {target_stage_number}'
                     ),
-                })
+                }))
             if p_local_pa is not None:
                 # Premise: fouling requires p_i > P_sat(T_wall) (mandate
                 # hot-wall invariant). Algebra: supersaturation iff
@@ -7825,7 +9337,7 @@ def cold_spot_diagnostic(
                     and math.isfinite(P_sat_pa)
                     and p_local_pa > P_sat_pa
                 ):
-                    upstream_hot_wall_findings.append({
+                    upstream_hot_wall_findings.append(_stamp_applicability({
                         'segment': segment.name,
                         'account': segment.wall_deposit_account,
                         'species': str(species),
@@ -7839,10 +9351,10 @@ def cold_spot_diagnostic(
                             f'saturation at {wall_T_C:.1f} C before stage '
                             f'{target_stage_number}'
                         ),
-                    })
+                    }))
             if wall_T_C >= threshold_C:
                 continue
-            findings.append({
+            findings.append(_stamp_applicability({
                 'segment': segment.name,
                 'account': segment.wall_deposit_account,
                 'species': str(species),
@@ -7856,7 +9368,7 @@ def cold_spot_diagnostic(
                     f'{wall_T_C:.1f} C before stage {target_stage_number}; '
                     f'threshold {threshold_C:.1f} C'
                 ),
-            })
+            }))
 
     warnings = [str(finding['warning']) for finding in findings]
     upstream_hot_wall_warnings = [

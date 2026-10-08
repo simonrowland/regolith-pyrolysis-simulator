@@ -87,7 +87,10 @@ def test_preferred_oxide_carriers_compile_dormant(generated_batch) -> None:
         else:
             assert compiled.evaluator.oxygen_fugacity_channel is None
         assert compiled.code_metadata.request_rule == "dormant_pending_validation"
-        assert compiled.code_metadata.hot_train_applicability == "not_applicable"
+        assert (
+            compiled.code_metadata.hot_train_applicability
+            == "derived_from_condensation_onset"
+        )
         assert compiled.evaluator.evaluate(1600.0, pO2_bar=1.0e-8).pressure_pa > 0.0
         assert channel.parent_oxide == LIQUID_PARENT_OXIDE[element]
         if element in ACTIVITY_BASIS:

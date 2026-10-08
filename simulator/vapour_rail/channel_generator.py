@@ -259,7 +259,7 @@ def _four_strata_family(
             "solve_group_id": family_id,
             "compatibility_projection": "t1139_generated_carriers",
             "canonical_aliases": [],
-            "hot_train_applicability": "not_applicable",
+            "hot_train_applicability": "derived_from_condensation_onset",
             "hot_train_not_applicable_reason": (
                 "t-1139 Build A generated row; pressure is diagnostic and flux is dormant."
             ),
