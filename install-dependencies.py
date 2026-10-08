@@ -18,7 +18,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent
 VENV_DIR = ROOT / ".venv"
 REQUIREMENTS = ROOT / "requirements.txt"
-MIN_PYTHON = (3, 10)
+MIN_PYTHON = (3, 12)
 ALPHAMELTS_VERSION = "2.3.1"
 ALPHAMELTS_RELEASE = (
     "https://github.com/magmasource/alphaMELTS/releases/download/v2.3.1"

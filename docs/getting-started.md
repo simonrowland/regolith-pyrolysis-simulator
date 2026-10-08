@@ -10,7 +10,7 @@ JSON output for downstream analysis.
 
 ## Prerequisites
 
-- Python 3.12 (the simulator and its tests are developed against 3.12; 3.13+ may encounter compatibility issues with optional engine packages)
+- Python 3.12+ (the simulator and its tests are developed against 3.12; 3.13+ may encounter compatibility issues with optional engine packages). The core also needs Python 3.11 or later because it uses `tomllib`; the optional `imcc` extra (openimcc) and the project lock file require 3.12, so 3.12 is the supported floor.
 - `git`, `uv` or `pip` available on `PATH`
 - For the full thermochemical engine stack on macOS arm64: Xcode command-line tools (`xcode-select --install`) and [Homebrew](https://brew.sh) — the installer uses `brew` to fetch `nlopt`, `open-mpi`, and `gsl` before compiling MAGEMin and ThermoEngine from source
 
