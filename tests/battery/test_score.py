@@ -2531,6 +2531,71 @@ def test_flagged_stratum_classifiers_agree_for_each_stratum() -> None:
         assert _flagged_payload_strata(payload) == (stratum,)
 
 
+def test_flagged_stratum_classifiers_pin_order_and_combined_output() -> None:
+    from simulator.battery.score import (
+        FLAGGED_STRATUM_CALIBRATION_NOT_GROUNDED,
+        FLAGGED_STRATUM_CATALOGUE_COMPOSITION,
+        FLAGGED_STRATUM_CELL_MATERIAL_INFERRED,
+        FLAGGED_STRATUM_FIGURE_ONLY,
+        FLAGGED_STRATUM_IMCC_COMPLEX_SATURATION,
+        FLAGGED_STRATUM_LIQUIDUS_POSITION_CONTESTED,
+        FLAGGED_STRATUM_REACTIVE_CELL_NOT_MODELLED,
+        FLAGGED_STRATUM_REFERENCE_CONVERTED_VIA_FUSION,
+        FLAGGED_STRATUM_SOURCE_INTERNALLY_INCONSISTENT,
+        FLAGGED_STRATUM_UNVERIFIED_APPARATUS,
+        _flagged_payload_strata,
+        flagged_strata,
+    )
+
+    facts = (
+        (NoticeKind.UNVERIFIED_APPARATUS, "calibration_not_grounded:probe"),
+        (NoticeKind.UNVERIFIED_APPARATUS, "apparatus_unverified:probe"),
+        (NoticeKind.CELL_MATERIAL_INFERRED, "cell_material_inferred:probe"),
+        (NoticeKind.COMPOSITION_FROM_SAMPLE_CATALOG, "catalogue_composition:probe"),
+        (NoticeKind.SOURCE_DISAGREEMENT, "source_internally_inconsistent:probe"),
+        (NoticeKind.IMCC_COMPLEX_SATURATION, "imcc_complex_saturation:probe"),
+        (
+            NoticeKind.DERIVATION_USES_COMPILATION,
+            "reference_converted_via_fusion;probe",
+        ),
+        (NoticeKind.FIGURE_ONLY, "figure_only:probe"),
+        (NoticeKind.REACTIVE_CELL_NOT_MODELLED, "reactive_cell_not_modelled:probe"),
+        (
+            NoticeKind.LIQUIDUS_POSITION_CONTESTED,
+            "liquidus_position_contested:probe",
+        ),
+    )
+    notices = tuple(
+        Notice(
+            kind=kind,
+            affected_quantities=(Quantity.P_PARTIAL,),
+            reason=reason,
+            origin="ordered-pin",
+        )
+        for kind, reason in facts
+    )
+    expected = (
+        FLAGGED_STRATUM_CALIBRATION_NOT_GROUNDED,
+        FLAGGED_STRATUM_UNVERIFIED_APPARATUS,
+        FLAGGED_STRATUM_CELL_MATERIAL_INFERRED,
+        FLAGGED_STRATUM_CATALOGUE_COMPOSITION,
+        FLAGGED_STRATUM_SOURCE_INTERNALLY_INCONSISTENT,
+        FLAGGED_STRATUM_IMCC_COMPLEX_SATURATION,
+        FLAGGED_STRATUM_REFERENCE_CONVERTED_VIA_FUSION,
+        FLAGGED_STRATUM_FIGURE_ONLY,
+        FLAGGED_STRATUM_REACTIVE_CELL_NOT_MODELLED,
+        FLAGGED_STRATUM_LIQUIDUS_POSITION_CONTESTED,
+    )
+    payload = {
+        "notices": [
+            {"kind": kind.value, "reason": reason} for kind, reason in facts
+        ]
+    }
+
+    assert flagged_strata(notices) == expected
+    assert _flagged_payload_strata(payload) == expected
+
+
 def test_knudsen_absolute_flux_requires_orifice_area() -> None:
     exp = F.kems_experiment(orifice_area=None, clausing=None)
     assert exp.apparatus is not None

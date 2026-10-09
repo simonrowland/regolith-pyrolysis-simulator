@@ -5806,6 +5806,82 @@ def test_kume_malformed_declared_composition_amount_makes_whole_composition_unkn
         assert key_matches == []
 
 
+def _score_activity_composition_case(
+    tmp_path: Path, *, malformed: bool, exploded: bool
+):
+    values = {
+        "quantity": "activity",
+        "activity": 0.2,
+        "method_class": "measured_direct",
+    }
+    if malformed:
+        values["composition_mol"] = {
+            "SiO2": 0.6,
+            "MgO": "not-a-number",
+            "CaO": 0.4,
+        }
+    if exploded:
+        values["points"] = [{"T_K": 1773.15, "activity": 0.2}]
+    extract = _scalar_extract(
+        quantity="activity",
+        units="dimensionless",
+        values=values,
+        obs_type="activity_coefficient",
+    )
+    row = extract["species"]["Na"]["observations"][0]
+    row.update(
+        {
+            "experiment": "sample",
+            "T_K": 1773.15,
+            "standard_state": "Raoultian pure liquid MgO",
+        }
+    )
+    extract["species"] = {"MgO": {"observations": [row]}}
+    extract["experiments"] = [
+        {
+            "experiment_id": "sample",
+            "sample": {
+                "printed_composition": {
+                    "state": {"tag": "value", "value": {"SiO2": 50, "MgO": 50}},
+                    "locator": {"table": "1", "page": 1},
+                }
+            },
+        }
+    ]
+    result = migrate(_write_min_tree(tmp_path, extract), write=False)
+    observation = next(iter(result.observations.values()))
+    experiment = result.experiments[observation.experiment_id]
+    prediction = predict_with_engine(
+        Engine.OPENIMCC, observation, experiment=experiment
+    )
+    return observation, experiment, prediction
+
+
+@pytest.mark.parametrize("exploded", [False, True], ids=["row", "exploded-child"])
+def test_malformed_activity_composition_sample_fallback_numeric_pin(
+    tmp_path: Path, exploded: bool
+) -> None:
+    observation, _experiment, prediction = _score_activity_composition_case(
+        tmp_path, malformed=True, exploded=exploded
+    )
+
+    assert observation.identity.composition is not None
+    assert observation.identity.composition.is_unknown
+    assert prediction.value is not None
+    assert float(prediction.value).hex() == "0x1.a4079127a495dp-5"
+    assert prediction.refusal_reason is None
+
+
+def test_activity_without_row_composition_uses_sample_numeric_pin(tmp_path: Path) -> None:
+    _observation, _experiment, prediction = _score_activity_composition_case(
+        tmp_path, malformed=False, exploded=False
+    )
+
+    assert prediction.value is not None
+    assert float(prediction.value).hex() == "0x1.a4079127a495dp-5"
+    assert prediction.refusal_reason is None
+
+
 @pytest.mark.parametrize("printed_marker", ["<0.01", "tr."])
 def test_kume_bound_and_trace_composition_amounts_are_typed_absence(
     tmp_path: Path, printed_marker: str

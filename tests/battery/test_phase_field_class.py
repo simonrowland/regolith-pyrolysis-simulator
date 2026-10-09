@@ -57,6 +57,13 @@ def _x_sio2(observation) -> Decimal | None:
     return dict(located.state.value.components).get("SiO2")
 
 
+def _point_temperature(observation) -> Decimal | None:
+    located = (observation.point_conditions or {}).get("temperature_K")
+    if located is None or not located.state.is_value:
+        return None
+    return located.state.value
+
+
 def _printed_rows(migrated):
     return [
         observation
@@ -187,6 +194,11 @@ def test_stolyarova_1991_class_s_is_exactly_the_28_points_at_x033_and_x025(migra
             classified[observation.observation_id] = (_x_sio2(observation), hits[0])
     assert len(classified) == 28
     assert {x for x, _notice in classified.values()} == set(CLASS_S_X)
+    assert Counter(
+        _point_temperature(observation)
+        for observation in _printed_rows(migrated)
+        if observation.observation_id in classified
+    ) == {Decimal("1933.0"): 20, Decimal("1993.0"): 8}
     for x, notice in classified.values():
         payload = _payload(notice, OUTSIDE_SINGLE_LIQUID_FIELD)
         assert payload["criterion"] == "stated_liquidus_side_and_printed_plateau_within_2_sigma"
