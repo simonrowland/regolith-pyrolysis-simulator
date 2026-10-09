@@ -2631,6 +2631,64 @@ def test_e15_report_rows_cover_three_stolyarova_sources() -> None:
     assert "not computed: no binding K° for Al2O3(cr) -> 2 Al(g) + 3 O(g)" in report
 
 
+@pytest.mark.parametrize(
+    (
+        "source_token",
+        "source",
+        "series",
+        "x_axis",
+        "expected_n",
+        "expected_slope",
+    ),
+    (
+        (
+            "stolyarova-1991",
+            "kems-053-stolyarova-1991",
+            "stolyarova_1991_ca_partial_pressure_1993k_complete_evaporation",
+            "x(SiO2)",
+            11,
+            Decimal("-3.87"),
+        ),
+        (
+            "stolyarova-1995",
+            "stolyarova-1995-cao-alumina-kems",
+            "stolyarova_1995_ca_partial_pressure_table2",
+            "x(CaO)",
+            8,
+            Decimal("1.04"),
+        ),
+    ),
+)
+def test_e15_production_accumulator_pins_stolyarova_pca(
+    source_token: str,
+    source: str,
+    series: str,
+    x_axis: str,
+    expected_n: int,
+    expected_slope: Decimal,
+) -> None:
+    from simulator.battery import score as score_mod
+    from simulator.battery.score import _ScorePayloadAccumulator
+
+    context = load_score_context(sources=(source_token,))
+    residuals, _ = score_store(context, engines=(Engine.OPENIMCC,))
+    payloads = [residual_to_plain(residual) for residual in residuals]
+    aggregate = _ScorePayloadAccumulator.from_rows(
+        payloads, context=context, engines=(Engine.OPENIMCC,)
+    )
+    shape = next(
+        row
+        for row in score_mod._e15_level_shape_rows(aggregate.e15_points)
+        if row["source"] == source
+        and row["series"] == series
+        and row["statistic"] == "shape"
+    )
+    assert shape["population"] == "liquid"
+    assert shape["x_axis"] == x_axis
+    assert shape["n"] == expected_n
+    assert shape["slope_dex_per_x"].quantize(Decimal("0.01")) == expected_slope
+
+
 def test_e15_stolyarova_1996_real_axis_slope_and_report_path() -> None:
     from simulator.battery import score as score_mod
 
@@ -2671,6 +2729,8 @@ def test_e15_stolyarova_1996_real_axis_slope_and_report_path() -> None:
         and row["statistic"] == "shape"
     )
     assert production_shape["n"] == 22
+    assert production_shape["population"] == "liquid"
+    assert production_shape["x_axis"] == "x(CaO)"
     assert production_shape["slope_dex_per_x"].quantize(
         Decimal("0.01")
     ) == Decimal("6.38")
