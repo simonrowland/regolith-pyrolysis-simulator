@@ -1280,27 +1280,18 @@ def _hold_notices(
     admitted: bool = False,
     engine_failed: bool = False,
 ) -> dict[str, Any]:
-    """Attach the hold, unavailable, and crust notices for this hour.
-
-    A refused commit with cohorts already on the books holds them. An
-    engine that never returned homes, and no cohort yet, is the unsplit
-    path. Crystals are not a crust area law.
-    """
-    from simulator.accounting.phase_homes import MELTS_BINDING
+    """Pass this hour's cohort flags to the notice owner."""
+    from simulator.accounting.phase_homes import (
+        MELTS_BINDING,
+        phase_home_presence_notices,
+    )
 
     cohorts = _view_has_binding_cohort(request, MELTS_BINDING)
-    if cohorts and not admitted:
-        note['assemblage_held_from_previous_hour'] = {
-            'reason': 'assemblage_held_from_previous_hour',
-        }
-    if engine_failed and not cohorts:
-        note['species_resolved_homes_unavailable'] = {
-            'reason': 'species_resolved_homes_unavailable',
-        }
-    if cohorts or admitted:
-        note['surface_crust_not_modeled'] = {
-            'reason': 'surface_crust_not_modeled',
-        }
+    note.update(phase_home_presence_notices(
+        crystals_present=cohorts,
+        admitted=admitted,
+        engine_failed=engine_failed,
+    ))
     return note
 
 

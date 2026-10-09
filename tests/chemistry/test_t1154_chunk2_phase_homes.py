@@ -44,6 +44,7 @@ from simulator.accounting.phase_homes import (
     holds_positive_crystal_moles,
     locked_cohort_update,
     locked_cohorts,
+    phase_home_presence_notices,
     signed_locked_masses,
 )
 from simulator.melt_backend.base import (
@@ -514,6 +515,35 @@ def test_phase_role_is_positive_membership_of_the_engine_table():
     }
     assert "water" not in folded
     assert "solid alloy" not in folded
+
+
+def test_presence_notices_come_from_one_owner():
+    assert phase_home_presence_notices(
+        crystals_present=True,
+        admitted=False,
+    ) == {
+        "assemblage_held_from_previous_hour": {
+            "reason": "assemblage_held_from_previous_hour",
+        },
+        "surface_crust_not_modeled": {"reason": "surface_crust_not_modeled"},
+    }
+    assert phase_home_presence_notices(
+        crystals_present=False,
+        engine_failed=True,
+        detail="down",
+    ) == {
+        "species_resolved_homes_unavailable": {
+            "reason": "species_resolved_homes_unavailable",
+            "detail": "down",
+        },
+    }
+    assert phase_home_presence_notices(
+        crystals_present=True,
+        admitted=True,
+    ) == {
+        "surface_crust_not_modeled": {"reason": "surface_crust_not_modeled"},
+    }
+    assert phase_home_presence_notices(crystals_present=False) == {}
 
 
 def test_dust_under_the_phase_floor_is_not_a_cohort_and_does_not_hold_f_off():

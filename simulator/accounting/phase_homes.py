@@ -67,6 +67,39 @@ REASON_COHORT_MOLES_INVALID = "phase_home_cohort_moles_invalid"
 REASON_DISSOLUTION_SHORT = "phase_home_dissolution_short"
 REASON_GROWTH_WITHOUT_COMPOSITION = "phase_home_growth_without_composition"
 REASON_NON_SILICATE = "engine_reported_non_silicate_phase"
+REASON_HELD = "assemblage_held_from_previous_hour"
+REASON_HOMES_UNAVAILABLE = "species_resolved_homes_unavailable"
+REASON_CRUST_NOT_MODELED = "surface_crust_not_modeled"
+
+
+def phase_home_presence_notices(
+    *,
+    crystals_present: bool,
+    admitted: bool = False,
+    engine_failed: bool = False,
+    detail: str | None = None,
+) -> dict[str, dict[str, str]]:
+    """Hold, unavailable, and crust notices for one hour.
+
+    Crystals already booked, when this hour is not admitted, are held.
+    An engine that never returned homes, and no cohort yet, is the
+    unsplit path. Crystals are not a crust-area law. Callers pass the
+    flags through; they do not assemble the notice dicts.
+    """
+    notes: dict[str, dict[str, str]] = {}
+    if crystals_present and not admitted:
+        held = {"reason": REASON_HELD}
+        if detail is not None:
+            held["detail"] = detail
+        notes[REASON_HELD] = held
+    if engine_failed and not crystals_present:
+        unavailable = {"reason": REASON_HOMES_UNAVAILABLE}
+        if detail is not None:
+            unavailable["detail"] = detail
+        notes[REASON_HOMES_UNAVAILABLE] = unavailable
+    if crystals_present or admitted:
+        notes[REASON_CRUST_NOT_MODELED] = {"reason": REASON_CRUST_NOT_MODELED}
+    return notes
 
 _ACCOUNT_RE = re.compile(
     r"^process\.crystal\."

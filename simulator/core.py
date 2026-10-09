@@ -373,7 +373,11 @@ from simulator.accounting.ledger import (
 from simulator.accounting.oxide_assignment import (
     PHASE_OXIDE_MASS_ABS_TOLERANCE_KG,
 )
-from simulator.accounting.phase_homes import holds_positive_crystal_moles
+from simulator.accounting.phase_homes import (
+    REASON_CRUST_NOT_MODELED,
+    holds_positive_crystal_moles,
+    phase_home_presence_notices,
+)
 from simulator.condensation_routing import (
     designated_stage_number,
     target_species_for_stage_number,
@@ -3365,70 +3369,51 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 return True
         return False
 
-    def _engine_failure_phase_home_diagnostic(self, detail: str) -> dict[str, Any]:
-        """Hold flag when crystals exist; otherwise homes were never opened."""
-        backend: dict[str, Any] = {}
+    def _crystal_cohorts_present(self) -> bool:
         ledger = getattr(self, 'atom_ledger', None)
-        crystals = (
+        return (
             ledger is not None
             and holds_positive_crystal_moles(ledger.mol_by_account())
         )
-        if crystals:
-            backend['assemblage_held_from_previous_hour'] = {
-                'reason': 'assemblage_held_from_previous_hour',
-                'detail': detail,
-            }
-        else:
-            backend['species_resolved_homes_unavailable'] = {
-                'reason': 'species_resolved_homes_unavailable',
-                'detail': detail,
-            }
-        return {'backend_diagnostics': backend}
+
+    def _engine_failure_phase_home_diagnostic(self, detail: str) -> dict[str, Any]:
+        """Hold flag when crystals exist; otherwise homes were never opened."""
+        return {
+            'backend_diagnostics': phase_home_presence_notices(
+                crystals_present=self._crystal_cohorts_present(),
+                engine_failed=True,
+                detail=detail,
+            ),
+        }
 
     def _annotate_phase_home_engine_failure(self, status: str) -> None:
         diagnostic = dict(self._phase_home_diagnostic)
         backend = dict(diagnostic.get('backend_diagnostics') or {})
-        ledger = getattr(self, 'atom_ledger', None)
-        crystals = (
-            ledger is not None
-            and holds_positive_crystal_moles(ledger.mol_by_account())
+        notices = phase_home_presence_notices(
+            crystals_present=self._crystal_cohorts_present(),
+            engine_failed=True,
+            detail=status,
         )
-        if crystals:
-            backend.setdefault(
-                'assemblage_held_from_previous_hour',
-                {
-                    'reason': 'assemblage_held_from_previous_hour',
-                    'detail': status,
-                },
-            )
-        else:
-            backend.setdefault(
-                'species_resolved_homes_unavailable',
-                {
-                    'reason': 'species_resolved_homes_unavailable',
-                    'detail': status,
-                },
-            )
+        for key, value in notices.items():
+            backend.setdefault(key, value)
         diagnostic['backend_diagnostics'] = backend
         self._phase_home_diagnostic = diagnostic
 
     def _mark_assemblage_presence(self) -> None:
-        """Binding flag and crust notice follow the post-commit ledger."""
-        ledger = getattr(self, 'atom_ledger', None)
-        present = (
-            ledger is not None
-            and holds_positive_crystal_moles(ledger.mol_by_account())
-        )
+        """Binding flag follows the post-commit ledger. Crust comes from the notice owner."""
+        present = self._crystal_cohorts_present()
         self._assemblage_binding_active = present
         diagnostic = dict(getattr(self, '_phase_home_diagnostic', {}) or {})
         backend = dict(diagnostic.get('backend_diagnostics') or {})
         if present:
-            backend.setdefault(
-                'surface_crust_not_modeled',
-                {'reason': 'surface_crust_not_modeled'},
+            notices = phase_home_presence_notices(
+                crystals_present=True,
+                admitted=True,
             )
+            for key, value in notices.items():
+                backend.setdefault(key, value)
         else:
-            backend.pop('surface_crust_not_modeled', None)
+            backend.pop(REASON_CRUST_NOT_MODELED, None)
         if backend or 'backend_diagnostics' in diagnostic:
             diagnostic['backend_diagnostics'] = backend
             self._phase_home_diagnostic = diagnostic
