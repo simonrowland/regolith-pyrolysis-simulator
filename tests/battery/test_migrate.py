@@ -5396,6 +5396,50 @@ def test_kume_malformed_declared_composition_amount_makes_whole_composition_unkn
     )
     assert observation.identity.composition is not None
     assert observation.identity.composition.is_unknown
+    hard = result.validation.hard_issues if result.validation is not None else ()
+    key_matches = [
+        issue
+        for issue in hard
+        if issue.reason is RefusalReason.INVALID_SOURCE
+        and composition_key in (issue.path or "")
+        and "malformed declared amount" in (issue.detail or "")
+    ]
+    if composition_key == "composition_mole_fraction":
+        assert len(key_matches) == 1
+    else:
+        assert key_matches == []
+
+
+@pytest.mark.parametrize("printed_marker", ["<0.01", "tr."])
+def test_kume_bound_and_trace_composition_amounts_are_typed_absence(
+    tmp_path: Path, printed_marker: str
+) -> None:
+    name = "kume-2000-cao-activities.yaml"
+    source = REPO_ROOT / "data" / "literature" / "extracts" / name
+    extract = yaml.safe_load(source.read_text(encoding="utf-8"))
+    extract["source_id"] = "fixture-source"
+    observation_id = "kume_2000_table2_sample_101"
+    row = next(
+        row
+        for row in extract["species"]["CaO"]["observations"]
+        if row.get("observation_id") == observation_id
+    )
+    row["values"]["composition_mole_fraction"]["CaO"] = printed_marker
+
+    result = migrate(_write_min_tree(tmp_path, extract), write=False)
+    observation = next(
+        item
+        for item in result.observations.values()
+        if item.observation_id.endswith(f"::{observation_id}")
+    )
+    assert observation.identity.composition is not None
+    assert observation.identity.composition.is_unknown
+    hard = result.validation.hard_issues if result.validation is not None else ()
+    assert not any(
+        issue.reason is RefusalReason.INVALID_SOURCE
+        and "composition_mole_fraction" in (issue.path or "")
+        for issue in hard
+    )
 
 
 def test_kume_measured_reduced_activity_preserves_structured_derivation(
