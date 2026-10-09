@@ -33,6 +33,7 @@ from simulator.lab_schedule import (
     normalize_lab_schedule,
     pO2_enforcement_row,
     pO2_setpoint_mbar_from_schedule,
+    reported_status_text,
     schedule_sample_time_h,
 )
 from simulator.furnace_materials import (
@@ -1944,7 +1945,7 @@ class CampaignManager:
         background_fraction = 0.0
         if (
             isinstance(background_gas, Mapping)
-            and str(background_gas.get('reported_status', '') or '') != 'not_reported'
+            and reported_status_text(background_gas) != 'not_reported'
         ):
             background_species = str(background_gas.get('species') or '').strip()
             raw_background_fraction = background_gas.get('mole_fraction', 1.0)
@@ -2002,7 +2003,7 @@ class CampaignManager:
             return None
         gas_boundary = schedule.get("gas_boundary") or {}
         pressure_control = gas_boundary.get("pressure_control") or {}
-        if str(pressure_control.get("reported_status", "") or "") == "not_reported":
+        if reported_status_text(pressure_control) == "not_reported":
             return None
         mode = str(pressure_control.get("mode") or "").strip()
         if mode not in PRESSURE_CONTROLLED_HEADSPACE_MODES:

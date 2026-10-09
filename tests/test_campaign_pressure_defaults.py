@@ -687,6 +687,12 @@ def test_unreported_or_unlisted_pressure_mode_stays_sealed() -> None:
     manager.configure_campaign(melt, CampaignPhase.C2A)
     assert manager.pressure_controlled_total_bar(melt) is None
 
+    padded = deepcopy(withheld)
+    padded["gas_boundary"]["pressure_control"]["reported_status"] = " not_reported "
+    manager.overrides["C2A"] = {"lab_schedule": padded}
+    manager.configure_campaign(melt, CampaignPhase.C2A)
+    assert manager.pressure_controlled_total_bar(melt) is None
+
 
 def test_zero_o2_argon_lab_schedule_does_not_synthesize_n2():
     from simulator.overhead import OverheadGasModel

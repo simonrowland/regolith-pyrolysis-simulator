@@ -554,6 +554,20 @@ def _normalize_gas_boundary(raw: Any) -> Mapping[str, Any]:
     return MappingProxyType(normalized)
 
 
+def reported_status_text(raw: Any) -> str:
+    """reported_status with surrounding whitespace removed.
+
+    Validation treats ``" not_reported "`` as not_reported
+    (``_normalize_gas_boundary_field``). Readers of a stored schedule use
+    the same text, because validation freezes the original mapping and
+    does not rewrite the field.
+    """
+
+    if not isinstance(raw, Mapping):
+        return ""
+    return str(raw.get("reported_status", "") or "").strip()
+
+
 def _normalize_gas_boundary_field(
     raw: Any,
     *,
@@ -562,7 +576,7 @@ def _normalize_gas_boundary_field(
 ) -> Mapping[str, Any]:
     if not isinstance(raw, Mapping):
         raise LabScheduleValidationError(f"missing_gas_boundary_{field}")
-    reported_status = str(raw.get("reported_status", "") or "").strip()
+    reported_status = reported_status_text(raw)
     if reported_status == "not_reported":
         for key in ("source_class", "citation_id", "digest"):
             if not str(raw.get(key, "") or "").strip():
