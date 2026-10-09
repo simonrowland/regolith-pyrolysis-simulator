@@ -726,9 +726,18 @@ species:
           NaBO2 plot. Printed plate is Figure 7; §8 caption 5.
       T_range_K: [1073.15, 1423.15]
       phase: SNW_alkali_bearing_glass
-      standard_state: >-
-        a(NaBO2) = P(NaBO2)/P°(NaBO2,l) with P° from JANAF 1971. Not a
-        Raoultian Na2O activity.
+      standard_state:
+        state:
+          tag: value
+          value:
+            convention: raoultian_pure_endmember
+            endmember: {formula: NaBO2, phase: {tag: value, value: l}}
+            component_basis: NaBO2
+        inferred: false
+        note: >-
+          a(NaBO2) = P(NaBO2)/P°(NaBO2,l) with P° from JANAF 1971. This is
+          not a Raoultian Na2O activity.
+        locator: {published_page: 16, figure: '7'}
       regime: kems_effusion
       units: dimensionless
       values:
@@ -981,7 +990,16 @@ species:
         note: activity of LiBO2 in SNW glass is about 0.1 with some T dependence vs JANAF P°(LiBO2,l)
       T_range_K: [1073.15, 1423.15]
       phase: SNW_alkali_bearing_glass
-      standard_state: a(LiBO2)=P/P°(JANAF 1971 LiBO2,l)
+      standard_state:
+        state:
+          tag: value
+          value:
+            convention: raoultian_pure_endmember
+            endmember: {formula: LiBO2, phase: {tag: value, value: l}}
+            component_basis: LiBO2
+        inferred: false
+        note: a(LiBO2)=P/P°(JANAF 1971 LiBO2,l).
+        locator: {published_page: 16, figure: '6'}
       regime: kems_effusion
       units: dimensionless
       values:
@@ -1117,7 +1135,18 @@ species:
         note: a(CsBO2)_obs = 4e-6 at 1200 K; P_obs ~ 1e-8 atm at 1200 K
       T_range_K: [1200.0, 1200.0]
       phase: SNW_alkali_bearing_glass
-      standard_state: a(CsBO2)=P/P° with P° from Gurvich and Veits 1983; not ideal CsBO2(l) mixing
+      standard_state:
+        state:
+          tag: value
+          value:
+            convention: raoultian_pure_endmember
+            endmember: {formula: CsBO2, phase: {tag: value, value: l}}
+            component_basis: CsBO2
+        inferred: false
+        note: >-
+          a(CsBO2)=P/P° with P° from Gurvich and Veits 1983; the measured
+          activity is not ideal CsBO2(l) mixing.
+        locator: {published_page: 36, section: '4.1.1 Cs'}
       regime: kems_effusion
       units: dimensionless
       values:
