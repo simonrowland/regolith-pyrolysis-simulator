@@ -168,17 +168,17 @@ def test_generated_heat_preserves_missing_enthalpy_guard():
     legacy = catalog.legacy_view()
     with pytest.raises(TabulatedMissingNodeError) as caught:
         evaporation_enthalpy_budget(
-            {"t1139_Cu_Cu": 1e-9}, vapor_pressures=legacy, temperature_K=1523.15,
+            {"Cu": 1e-9}, vapor_pressures=legacy, temperature_K=1523.15,
         )
     assert caught.value.missing_node == 1600.0
-    row = dict(legacy["t1139_generated_carriers"]["t1139_Cu_Cu"])
+    row = dict(legacy["t1139_generated_carriers"]["Cu"])
     from copy import deepcopy
     row = deepcopy(row)
     for record in row["reference_pressure_model"]["species_thermo"].values():
         record.pop("formation_enthalpy_points", None)
     with pytest.raises(ValueError, match="missing printed formation enthalpy"):
         evaporation_enthalpy_budget(
-            {"t1139_Cu_Cu": 1e-9}, vapor_pressures={"t1139_Cu_Cu": row}, temperature_K=2000.0,
+            {"Cu": 1e-9}, vapor_pressures={"Cu": row}, temperature_K=2000.0,
         )
 
 

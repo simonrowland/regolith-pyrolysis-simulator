@@ -18,4 +18,15 @@ def test_generated_rows_are_inserted_in_the_production_catalog():
     for family in actual.values():
         species_id = family["code_metadata"]["formula_id"]
         assert catalog.species[species_id].evaluator is not None
-        assert catalog.species[species_id].code_metadata.request_rule == "dormant_pending_validation"
+        compiled = catalog.species[species_id]
+        row = family["physical_properties"]["species"][species_id]
+        if row["flux_dormant"]:
+            assert compiled.code_metadata.request_rule == "dormant_pending_validation"
+            assert row["dormancy_reason"]["table"] == "Cu-020"
+            assert row["dormancy_reason"]["temperature_K"] == 1600.0
+        else:
+            assert compiled.code_metadata.request_rule == "trace_source_inventory"
+        assert compiled.code_metadata.source_account == "process.cleaned_melt"
+        assert compiled.source_reaction_activity.allow_henrian_upper_bound
+    assert sum(not next(iter(f["physical_properties"]["species"].values()))["flux_dormant"]
+               for f in actual.values()) == 42

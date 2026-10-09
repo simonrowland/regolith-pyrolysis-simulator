@@ -994,8 +994,16 @@ def flux_pressures_from_batch(
             and bool(dict(answer.extra).get("out_of_range", False))
         )
     )
-    catalog_continuation_fallback_species_ids = (
-        missing_source_species_ids & out_of_range_active_species_ids
+    from simulator.vapour_rail.request import _is_trace_source_inventory
+
+    catalog_inventory_species_ids = frozenset(
+        species_id for species_id in batch_active_species_ids
+        if _is_trace_source_inventory(
+            batch.channels_by_species[species_id].extra.get("request_rule", "")
+        )
+    )
+    catalog_continuation_fallback_species_ids = missing_source_species_ids & (
+        out_of_range_active_species_ids | catalog_inventory_species_ids
     )
     missing_source_species = sorted(missing_source_species_ids)
     unresolved_missing_source_species = sorted(
@@ -1007,9 +1015,8 @@ def flux_pressures_from_batch(
         catalog_continuation_fallback_species_ids
     )
     report["effective_pressure_species_not_batch_active"] = extra_source_species
-    # Only OOD point answers may bridge a genuine seam absence with their
-    # catalog continuation. An in-domain seam gap remains a typed failure:
-    # accepting its catalog point would be an implicit RG-1 value cutover.
+    # Trace source-inventory rows use their compiled reaction in either domain.
+    # Other in-domain seam gaps remain typed failures until the RG-1 cutover.
     if unresolved_missing_source_species:
         report["selection_source"] = (
             "typed_failure_effective_pressure_species_set_mismatch"
@@ -1063,7 +1070,9 @@ def flux_pressures_from_batch(
                 )
             else:
                 selected_pressure_source_by_species[species_id] = (
-                    "vapour_batch_catalog_continuation"
+                    "vapour_batch_catalog_source_inventory"
+                    if species_id in catalog_inventory_species_ids
+                    else "vapour_batch_catalog_continuation"
                 )
         elif state == "zero_by_physics":
             selected_runtime_pa_by_species[species_id] = 0.0

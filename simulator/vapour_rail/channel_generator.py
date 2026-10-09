@@ -1,8 +1,7 @@
 """Element identity → Mode 2 ``source_reactions`` + ``species_thermo`` rows.
 
-Build A: dormant only. Emits every demand-manifest carrier for the first
-batch as an evaluable family or a typed coverage gap. Does not inject rows
-into the production catalog.
+Emits demand-manifest carriers as complete source-inventory families or
+typed coverage gaps. The production catalog owns their compilation.
 """
 
 from __future__ import annotations
@@ -172,6 +171,41 @@ def _four_strata_family(
     vapor_oxygen_atoms: float,
 ) -> dict[str, Any]:
     family_id = f"t1139_{element}_{carrier}_family"
+    missing_enthalpy = [formula for formula, record in species_thermo.items()
+                        if record.get("evaluator_family") == "tabulated_janaf"
+                        and not record.get("formation_enthalpy_points")]
+    dormancy_reason = None
+    if missing_enthalpy:
+        dormancy_reason = {
+            "kind": "missing_printed_formation_enthalpy",
+            "participants": missing_enthalpy,
+        }
+    else:
+        # Controller source ruling: Cu-020's unsigned printed 1600 K tail
+        # cannot supply reaction heat. A same-table sign repair removes this
+        # missing node and makes the row complete through this same predicate.
+        for participant_formula, record in species_thermo.items():
+            if (record.get("record_id") == "Cu-020"
+                    and 1600.0 in record.get("missing_enthalpy_nodes", ())):
+                dormancy_reason = {
+                    "kind": "missing_printed_formation_enthalpy",
+                    "detail": "ambiguous_printed_sign",
+                    "participant": participant_formula,
+                    "table": "Cu-020",
+                    "temperature_K": 1600.0,
+                }
+                break
+    flux_dormant = dormancy_reason is not None
+    source_reaction = dict(reaction)
+    source_reaction["activity_input"] = {
+        **source_reaction["activity_input"],
+        "activity_model": "provider_reported_thermodynamic_activity",
+        "allow_henrian_upper_bound": True,
+        "standard_state": {
+            **source_reaction["activity_input"]["standard_state"],
+            "component_basis": "raoultian_pure_endmember",
+        },
+    }
     family = {
         "physical_properties": {
             "species": {
@@ -182,7 +216,7 @@ def _four_strata_family(
                     "chemical_family": "t1139_generated_carrier",
                     "authority_class": "analytical_non_authoritative",
                     "runtime_disposition": "status_bearing_non_authoritative",
-                    "flux_dormant": True,
+                    "flux_dormant": flux_dormant,
                     "retain_analytical_pressure_channel": True,
                     "activity_basis": activity_basis,
                     "selected_sources": dict(selected_sources),
@@ -200,7 +234,7 @@ def _four_strata_family(
                         "certification_ceiling": "never",
                         "anchor_refs": [],
                     },
-                    "source_reactions": [dict(reaction)],
+                    "source_reactions": [source_reaction],
                     "pressure_models": [
                         {
                             "fit_target": "standard_reaction_term",
@@ -213,13 +247,11 @@ def _four_strata_family(
                             "source_reaction_id": reaction["id"],
                             "species_thermo": dict(species_thermo),
                             "reference_pressure_Pa": STANDARD_PRESSURE_PA,
-                            "activity_semantics": "pure_condensed_phase",
-                            "pure_condensed_phase_identity": {
-                                "component_id": f"{parent_oxide}(l)",
-                                "phase": "condensed_liquid",
-                                "source_account": "process.t1139_generated_pure_condensed",
-                            },
-                            "activity_exponent": 0.0,
+                            "activity_semantics": "source_reaction_activity",
+                            # balance_oxide_evaporation normalizes to one
+                            # mole of vapor; its first reactant is the parent.
+                            # The mass ratio belongs only to the ledger bridge.
+                            "activity_exponent": reaction["reactants"][0]["stoichiometry"],
                             "pO2_reference_bar": 1.0,
                             "oxygen_fugacity_channel": oxygen_fugacity_plane(
                                 vapor_oxygen_atoms=vapor_oxygen_atoms
@@ -231,12 +263,12 @@ def _four_strata_family(
         },
         "fiat_routing": {
             "plant_bin": None,
-            "engineering_capture_policy": "diagnostic_only",
+            "engineering_capture_policy": "derived_from_condensation_onset",
             "products_and_coproducts": [],
             "process_or_terminal_destination": "process.condensation_train",
             "compatibility_fields": {
-                "flux_dormant": True,
                 "consumer_status": "status_bearing_non_authoritative",
+                "source_activity_basis": "parent_oxide",
                 "parent_oxide": parent_oxide,
                 "stoich_oxide_per_vapor": oxide_per_vapor,
                 "stoich_O2_per_vapor": o2_per_vapor,
@@ -254,27 +286,20 @@ def _four_strata_family(
         },
         "code_metadata": {
             "formula_id": species_id,
-            "source_account": "process.t1139_generated_pure_condensed",
-            "request_rule": "dormant_pending_validation",
+            "source_account": "process.cleaned_melt",
+            "request_rule": ("dormant_pending_validation" if flux_dormant
+                             else "trace_source_inventory"),
             "solve_group_id": family_id,
             "compatibility_projection": "t1139_generated_carriers",
             "canonical_aliases": [],
-            "hot_train_applicability": "derived_from_condensation_onset",
-            "hot_train_not_applicable_reason": (
-                "t-1139 Build A generated row; pressure is diagnostic and flux is dormant."
-            ),
+            "hot_train_applicability": ("not_applicable" if flux_dormant
+                                        else "derived_from_condensation_onset"),
         },
     }
-    missing_enthalpy = [formula for formula, record in species_thermo.items()
-                        if record.get("evaluator_family") == "tabulated_janaf"
-                        and not record.get("formation_enthalpy_points")]
-    if missing_enthalpy:
-        family["physical_properties"]["species"][species_id]["dormancy_reason"] = {
-            "kind": "missing_printed_formation_enthalpy",
-            "participants": missing_enthalpy,
-        }
+    if dormancy_reason is not None:
+        family["physical_properties"]["species"][species_id]["dormancy_reason"] = dormancy_reason
         family["code_metadata"]["hot_train_not_applicable_reason"] = (
-            "missing_printed_formation_enthalpy: " + ", ".join(missing_enthalpy)
+            "missing_printed_formation_enthalpy: " + str(dormancy_reason)
         )
     return family
 
@@ -414,7 +439,7 @@ def generate_element_channels(
             reaction=reaction,
         )
         oxide, o2 = derived[1], derived[2]
-        species_id = f"t1139_{element}_{carrier}"
+        species_id = carrier
         family = _four_strata_family(
             species_id=species_id,
             element=element,

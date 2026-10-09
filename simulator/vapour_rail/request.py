@@ -43,6 +43,7 @@ from simulator.chemistry.melt_activity import (
     single_cation_mole_fractions,
 )
 from simulator.scalar_boundary import is_declared_real_scalar
+from simulator.physical_constants import CATALOG_PHYSICAL_PRESSURE_CEILING_PA
 from simulator.trace_oxide_parents import ledger_component_key
 from simulator.vapour_rail.activity import (
     ActivityInputDeclaration,
@@ -909,6 +910,10 @@ def assert_request_coverage(
         )
 
 
+def _is_trace_source_inventory(request_rule: str) -> bool:
+    return request_rule == "trace_source_inventory"
+
+
 def applicability_verdict(
     predicate: str,
     *,
@@ -922,7 +927,7 @@ def applicability_verdict(
     predicates fail closed (b-175 doctrine).
     """
 
-    if predicate in {"applicable", "always"}:
+    if predicate in {"applicable", "always", "derived_from_condensation_onset"}:
         return True, ""
     if predicate in {"not_applicable", "inapplicable"}:
         return (
@@ -1718,6 +1723,15 @@ def refusal_closure(
             verdict = VERDICT_STATUS_BEARING_NON_AUTHORITATIVE
 
         extra_payload: dict[str, Any] = {"origin": rule.origin}
+        if _is_trace_source_inventory(rule.request_rule_kind):
+            extra_payload["request_rule"] = rule.request_rule_kind
+        if pressure_pa is not None and pressure_pa >= CATALOG_PHYSICAL_PRESSURE_CEILING_PA:
+            extra_payload["supply_limited_pressure"] = {
+                "reason": "activity_weighted_pressure_exceeds_physical_guard",
+                "pressure_pa": float(pressure_pa),
+                "guard_pa": CATALOG_PHYSICAL_PRESSURE_CEILING_PA,
+                "inventory_policy": "split_frozen_inventory",
+            }
         evidence = _applicability_evidence(rule, state)
         if evidence:
             extra_payload["applicability_evidence"] = evidence
@@ -2671,7 +2685,11 @@ def resolve_vapour_batch(
     # RG-1 may activate the full manifest/catalog union after its
     # activity-corrected value path lands.
     if flux_activation_context.epoch == FLUX_ACTIVATION_EPOCH_PRE_RG:
-        claimed = flux_activation_context.effective_pressure_species_ids
+        claimed = flux_activation_context.effective_pressure_species_ids | frozenset(
+            rule.species_id for rule in rules
+            if _is_trace_source_inventory(rule.request_rule_kind)
+            and rule.species_id in union_eligible
+        )
         demoted_non_debiting = frozenset(
             species_id
             for species_id in claimed
