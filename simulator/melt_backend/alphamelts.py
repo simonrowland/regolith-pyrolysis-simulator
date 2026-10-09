@@ -5184,6 +5184,16 @@ class _MELTSBackendSupport(MeltBackend):
             self._antoine_vapor_pressure_source_by_species(base_source, pressures),
         )
 
+    @staticmethod
+    def _antoine_uses_reaction_pressure(spec: Mapping[str, object]) -> bool:
+        """Select the reaction owner for both pressure and provenance."""
+        return bool(
+            spec.get("reference_pressure_model")
+            or spec.get("liquid_oxide_standard_reaction")
+            or spec.get("pure_component_antoine")
+            or spec.get("fit_target") == "standard_reaction_term"
+        )
+
     def _antoine_vapor_pressure_source_by_species(
         self,
         base_source: str,
@@ -5201,10 +5211,7 @@ class _MELTSBackendSupport(MeltBackend):
         labels: Dict[str, str] = {}
         for species in pressures:
             spec = table.get(str(species), {})
-            reaction_source = bool(
-                spec.get("reference_pressure_model")
-                or spec.get("liquid_oxide_standard_reaction")
-            )
+            reaction_source = self._antoine_uses_reaction_pressure(spec)
             label = vapor_pressure_source_label(
                 base_source,
                 dict(spec, fit_target=FIT_TARGET_STANDARD_REACTION) if reaction_source else spec,
@@ -5353,7 +5360,6 @@ class _MELTSBackendSupport(MeltBackend):
             pO2_exponent = float(reaction.get('pO2_exponent', 0.0) or 0.0)
             uses_sidecar = bool(spec.get('pure_component_antoine'))
             uses_catalog = bool(spec.get('reference_pressure_model') or spec.get('liquid_oxide_standard_reaction'))
-            standard = spec.get('fit_target') == 'standard_reaction_term'
             if pO2_bar is None and (pO2_exponent or uses_sidecar or uses_catalog):
                 raise RuntimeError(
                     'AlphaMELTS Antoine fallback cannot evaluate '
@@ -5361,7 +5367,7 @@ class _MELTSBackendSupport(MeltBackend):
                     'refusing activity-only vapor pressure'
                 )
             pO2_value = float(pO2_bar) if pO2_bar is not None else 1.0
-            if uses_sidecar or uses_catalog or standard:
+            if self._antoine_uses_reaction_pressure(spec):
                 group = 'metals' if species in ELLINGHAM_THERMO else 'oxide_vapors'
                 p_i = effective_equilibrium_pressure_Pa(
                     species, T_K, pO2_value, a_oxide=float(raw_activity),

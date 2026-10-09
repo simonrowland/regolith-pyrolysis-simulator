@@ -8285,11 +8285,11 @@ def test_vapor_bridge_helper_unavailable_uses_explicit_antoine_fallback_nonempty
     # refuse — silent Na/K drop is the A2 fail-closed class).
     pressures, source = backend._vapor_pressures_via_vaporock_or_antoine(
         T_C=1600.0,
-        solved_melt_wt_pct={'SiO2': 45.0, 'Na2O': 4.0, 'K2O': 1.0},
+        solved_melt_wt_pct={'SiO2': 45.0, 'Na2O': 4.0, 'K2O': 1.0, 'MgO': 10.0},
         liquid_fraction=1.0,
         fO2_log=-8.0,
         pressure_bar=1e-6,
-        activities={'Na2O': 0.2, 'SiO2': 0.4, 'K2O': 0.05},
+        activities={'Na2O': 0.2, 'SiO2': 0.4, 'K2O': 0.05, 'MgO': 0.1352},
     )
 
     # t-383: Na high-T rail is L&H liquid-NaO0.5 standard_reaction_term
@@ -8301,6 +8301,11 @@ def test_vapor_bridge_helper_unavailable_uses_explicit_antoine_fallback_nonempty
     # standard_reaction_term (melt-activity + pO2 context), and the
     # provenance token reports it.
     assert source["SiO"] == (
+        "antoine_fallback_from_vaporock:standard_reaction_term"
+    )
+    # Mg's pure-component sidecar routes pressure through Ellingham's
+    # gas-reaction rail here; provenance must follow that selected rail.
+    assert source["Mg"] == (
         "antoine_fallback_from_vaporock:standard_reaction_term"
     )
     # FAIL-LOUD: the fallback is a real Antoine dict, NOT a silent {} that
