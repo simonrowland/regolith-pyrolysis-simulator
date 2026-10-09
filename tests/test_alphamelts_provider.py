@@ -27,6 +27,7 @@ from __future__ import annotations
 
 import ast
 import inspect
+import math
 from pathlib import Path
 from types import SimpleNamespace
 
@@ -1087,7 +1088,16 @@ def test_parser_sr12_current_default_values_are_pinned_without_notice():
     assert result.temperature_C == 1200.0
     assert result.pressure_bar == 1.0
     assert result.liquid_viscosity_Pa_s is None
-    assert diagnostics.backend_warnings == ()
+    assert result.warnings == []
+    assert result.status == 'ok'
+    assert set(result.diagnostics) == {
+        'executed_temperature_C',
+        'condensed_phase_reference_pressure_bar',
+        'liquid_viscosity_Pa_s',
+    }
+    assert result.diagnostics['executed_temperature_C'] == float('inf')
+    assert math.isnan(result.diagnostics['condensed_phase_reference_pressure_bar'])
+    assert math.isnan(result.diagnostics['liquid_viscosity_Pa_s'])
 
 
 def test_alphamelts_writer_populates_structured_field_and_warning():
