@@ -16,7 +16,7 @@ import os
 import sqlite3
 import subprocess
 from collections import Counter
-from collections.abc import Mapping
+from collections.abc import Mapping, Sequence
 from datetime import datetime
 from datetime import timezone
 from decimal import Decimal
@@ -65,10 +65,15 @@ _LOGGER = logging.getLogger(__name__)
 
 SCHEMA_VERSION = "pt0-reduced-real-determinism-v1"
 PHYSICS_BUCKET_SCHEMA_VERSION = "pt1-reduced-real-physics-bucket-v2"
-PT1_STORE_SCHEMA_VERSION = "pt1-reduced-real-equilibrium-store-v2"
+PT1_LEGACY_STORE_SCHEMA_VERSION = "pt1-reduced-real-equilibrium-store-v2"
+PT1_STORE_SCHEMA_VERSION = "pt1-reduced-real-equilibrium-store-v3"
 PT1_EQUILIBRIUM_TABLE = "reduced_real_equilibrium_payloads"
 PT1_METADATA_TABLE = "reduced_real_metadata"
 PT1_READ_ONLY_BASE_ALIAS = "pt1_read_only_base"
+REPAIR_NOTICE_COLLECTOR_ATTRIBUTE = "_reduced_real_repair_notices"
+REPAIR_NOTICES_UNAVAILABLE_NOTICE = {
+    "kind": "repair_notices_unavailable_for_legacy_row"
+}
 DEFAULT_SHARD_BUSY_TIMEOUT_MS = 60_000.0
 PHYSICS_BUCKET_LADDER_RUNGS = (
     ("h40", 4.0),
@@ -494,7 +499,13 @@ class PT0DeterminismStore:
             if mol > 0.0
         }
 
-    def capture_equilibrium(self, sim: Any, result: EquilibriumResult) -> None:
+    def capture_equilibrium(
+        self,
+        sim: Any,
+        result: EquilibriumResult,
+        *,
+        repair_notices: Sequence[Mapping[str, Any]] | None = None,
+    ) -> None:
         if not _is_cacheable_equilibrium_result(result):
             self._mark_uncacheable_capture(sim)
             return
@@ -508,6 +519,7 @@ class PT0DeterminismStore:
             key,
             payload,
             engine_version_provenance=_engine_version_provenance(sim, intent),
+            repair_notices=_repair_notices_for_capture(sim, repair_notices),
         )
         sim._last_reduced_real_cache_state = self.last_cache_state
 
@@ -519,13 +531,18 @@ class PT0DeterminismStore:
             "equilibrium_post_record",
             key,
             physics_bucket_key=canonical_physics_bucket_key_from_replay_key(key),
+            sim=sim,
         )
         if payload is None:
             return None
         return self._equilibrium_from_payload(sim, payload)
 
     def replay_equilibrium(self, sim: Any) -> EquilibriumResult:
-        payload = self._lookup("equilibrium_post_record", self._equilibrium_key(sim))
+        payload = self._lookup(
+            "equilibrium_post_record",
+            self._equilibrium_key(sim),
+            sim=sim,
+        )
         return self._equilibrium_from_payload(sim, payload)
 
     def _equilibrium_key(self, sim: Any) -> dict[str, Any]:
@@ -616,6 +633,7 @@ class PT0DeterminismStore:
         *,
         fO2_log: float,
         curve: Mapping[str, Any],
+        repair_notices: Sequence[Mapping[str, Any]] | None = None,
     ) -> None:
         if not _is_cacheable_gate_curve(curve):
             self._mark_uncacheable_capture(sim)
@@ -639,6 +657,7 @@ class PT0DeterminismStore:
                 ChemistryIntent.GATE_LIQUID_FRACTION,
                 provider_role=provider_role,
             ),
+            repair_notices=_repair_notices_for_capture(sim, repair_notices),
         )
         sim._last_reduced_real_cache_state = self.last_cache_state
 
@@ -659,7 +678,7 @@ class PT0DeterminismStore:
             )
             for provider_role in _gate_provider_roles_for_replay(sim)
         )
-        payload = self._lookup_first_available("freeze_gate_curve", keys)
+        payload = self._lookup_first_available("freeze_gate_curve", keys, sim=sim)
         sim._last_reduced_real_cache_state = self.last_cache_state
         return _curve_from_payload(payload["curve"])
 
@@ -747,10 +766,12 @@ class PT0DeterminismStore:
         payload: Mapping[str, Any],
         *,
         engine_version_provenance: str | None = None,
+        repair_notices: Sequence[Mapping[str, Any]] = (),
     ) -> None:
         validate_reduced_real_equilibrium_record_key(artifact, key, payload)
         key_bytes = canonical_json_bytes(key)
         payload_bytes = canonical_json_bytes(payload)
+        repair_notices_json = encode_repair_notices_json(repair_notices)
         key_hash = _sha256(key_bytes)
         payload_hash = _sha256(payload_bytes)
         physics_bucket_key = canonical_physics_bucket_key_from_replay_key(key)
@@ -772,6 +793,10 @@ class PT0DeterminismStore:
                     f"{key_hash}"
                 )
             self._verify_entry(artifact, key, key_bytes, key_hash, existing)
+            existing["repair_notices_json"] = monotonic_repair_notices_json(
+                existing.get("repair_notices_json"),
+                repair_notices_json,
+            )
             if self.persistent_store is not None:
                 self.persistent_store.put(
                     artifact=artifact,
@@ -781,6 +806,7 @@ class PT0DeterminismStore:
                     payload=payload,
                     payload_bytes=payload_bytes,
                     payload_hash=payload_hash,
+                    repair_notices_json=repair_notices_json,
                     engine_version_provenance=engine_version_provenance,
                     physics_bucket_key=physics_bucket_key,
                     physics_bucket_bytes=physics_bucket_bytes,
@@ -797,6 +823,7 @@ class PT0DeterminismStore:
                 payload=payload,
                 payload_bytes=payload_bytes,
                 payload_hash=payload_hash,
+                repair_notices_json=repair_notices_json,
                 engine_version_provenance=engine_version_provenance,
                 physics_bucket_key=physics_bucket_key,
                 physics_bucket_bytes=physics_bucket_bytes,
@@ -809,6 +836,7 @@ class PT0DeterminismStore:
             "key_bytes": key_bytes.decode("utf-8"),
             "payload": copy.deepcopy(dict(payload)),
             "payload_hash": payload_hash,
+            "repair_notices_json": repair_notices_json,
             "physics_bucket_key": copy.deepcopy(dict(physics_bucket_key)),
             "physics_bucket_hash": physics_bucket_hash,
             "cache_state": "live_fill",
@@ -818,16 +846,25 @@ class PT0DeterminismStore:
         self.last_cache_state = "live_fill"
         self._record_cache_event(artifact, "live_fill")
 
-    def _lookup(self, artifact: str, key: Mapping[str, Any]) -> dict[str, Any]:
+    def _lookup(
+        self,
+        artifact: str,
+        key: Mapping[str, Any],
+        *,
+        sim: Any | None = None,
+    ) -> dict[str, Any]:
         return self._lookup_first_available(
             artifact,
             tuple(_compatible_replay_keys(key)),
+            sim=sim,
         )
 
     def _lookup_first_available(
         self,
         artifact: str,
         keys: tuple[Mapping[str, Any], ...],
+        *,
+        sim: Any | None = None,
     ) -> dict[str, Any]:
         if not keys:
             raise PT0CacheMiss(f"PT-0 cached replay miss: no keys for {artifact}")
@@ -861,6 +898,7 @@ class PT0DeterminismStore:
             self.hits += 1
             self.last_cache_state = "cached_exact"
             self._record_cache_event(artifact, "cached_exact")
+            _emit_repair_notices(sim, (entry.get("repair_notices_json"),))
             return copy.deepcopy(entry["payload"])
 
         key, _key_bytes, key_hash = checked[0]
@@ -887,6 +925,7 @@ class PT0DeterminismStore:
         key: Mapping[str, Any],
         *,
         physics_bucket_key: Mapping[str, Any] | None = None,
+        sim: Any | None = None,
     ) -> dict[str, Any] | None:
         tier_ceiling = str(
             getattr(self, "cache_tier_ceiling", "cached_interpolated")
@@ -954,7 +993,11 @@ class PT0DeterminismStore:
             if entry is not None:
                 break
             if tier_ceiling == "cached_interpolated":
-                interpolated = self._lookup_interpolated(artifact, candidate_key)
+                interpolated = self._lookup_interpolated(
+                    artifact,
+                    candidate_key,
+                    sim=sim,
+                )
                 if interpolated is not None:
                     return interpolated
         else:
@@ -986,6 +1029,14 @@ class PT0DeterminismStore:
         self.hits += 1
         self.last_cache_state = cache_state
         self._record_cache_event(artifact, cache_state)
+        if cache_state == "cached_exact":
+            _emit_repair_notices(sim, (entry.get("repair_notices_json"),))
+        else:
+            _emit_repair_notices(
+                sim,
+                (entry.get("repair_notices_json"),),
+                approximation_cache_state=cache_state,
+            )
         return copy.deepcopy(entry["payload"])
 
     def _entry_for_key(
@@ -1043,6 +1094,8 @@ class PT0DeterminismStore:
         self,
         artifact: str,
         key: Mapping[str, Any],
+        *,
+        sim: Any | None = None,
     ) -> dict[str, Any] | None:
         from simulator.reduced_real_cache_interpolation import (
             attempt_cached_interpolation,
@@ -1081,6 +1134,14 @@ class PT0DeterminismStore:
         self.hits += 1
         self.last_cache_state = "cached_interpolated"
         self._record_cache_event(artifact, "cached_interpolated")
+        _emit_repair_notices(
+            sim,
+            tuple(
+                neighbor.get("repair_notices_json")
+                for neighbor in attempt["neighbors"]
+            ),
+            approximation_cache_state="cached_interpolated",
+        )
         return copy.deepcopy(attempt["payload"])
 
     def _entry_for_physics_ladder_bucket(
@@ -1209,12 +1270,14 @@ class PT1PersistentEquilibriumStore:
         payload: Mapping[str, Any],
         payload_bytes: bytes,
         payload_hash: str,
+        repair_notices_json: str | None = "[]",
         engine_version_provenance: str | None = None,
         physics_bucket_key: Mapping[str, Any] | None = None,
         physics_bucket_bytes: bytes | None = None,
         physics_bucket_hash: str | None = None,
     ) -> None:
         validate_reduced_real_equilibrium_record_key(artifact, key, payload)
+        validate_repair_notices_json(repair_notices_json)
         if self.strict_vapor_gate:
             assert_strict_vapor_pt1_row(
                 artifact=artifact,
@@ -1247,6 +1310,16 @@ class PT1PersistentEquilibriumStore:
                     raise PT1PersistentStoreCorrupt(
                         f"PT-1 payload collision for {artifact}: {key_hash}"
                     )
+                merged_notices = monotonic_repair_notices_json(
+                    _row_repair_notices(existing),
+                    repair_notices_json,
+                )
+                if merged_notices != _row_repair_notices(existing):
+                    conn.execute(
+                        f"UPDATE {PT1_EQUILIBRIUM_TABLE} "
+                        "SET repair_notices_json = ? WHERE key_hash = ?",
+                        (merged_notices, key_hash),
+                    )
                 self._update_physics_bucket_columns(
                     conn,
                     key_hash=key_hash,
@@ -1271,6 +1344,7 @@ class PT1PersistentEquilibriumStore:
                     corpus_version,
                     engine_version,
                     data_digests_json,
+                    repair_notices_json,
                     physics_bucket_schema_version,
                     physics_bucket_sha256,
                     replay_scope_sha256,
@@ -1285,7 +1359,7 @@ class PT1PersistentEquilibriumStore:
                     physics_bucket_h30c_distance,
                     created_at,
                     git_dirty
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 """,
                 (
                     key_hash,
@@ -1300,6 +1374,7 @@ class PT1PersistentEquilibriumStore:
                     None,
                     _none_or_str(engine_version_provenance),
                     "{}",
+                    repair_notices_json,
                     PHYSICS_BUCKET_SCHEMA_VERSION,
                     physics_bucket_hash,
                     _replay_scope_hash(physics_bucket_key),
@@ -1439,6 +1514,9 @@ class PT1PersistentEquilibriumStore:
                             "key": copy.deepcopy(dict(entry["key"])),
                             "key_hash": row_hash,
                             "payload": copy.deepcopy(dict(entry["payload"])),
+                            "repair_notices_json": entry[
+                                "repair_notices_json"
+                            ],
                         }
                     )
             return candidates
@@ -1579,6 +1657,7 @@ class PT1PersistentEquilibriumStore:
                 corpus_version TEXT,
                 engine_version TEXT,
                 data_digests_json TEXT NOT NULL,
+                repair_notices_json TEXT,
                 physics_bucket_schema_version TEXT,
                 physics_bucket_sha256 TEXT,
                 replay_scope_sha256 TEXT,
@@ -1639,10 +1718,23 @@ class PT1PersistentEquilibriumStore:
             f"SELECT value FROM {PT1_METADATA_TABLE} WHERE key = ?",
             ("store_schema_version",),
         ).fetchone()
-        if metadata is not None and metadata["value"] != PT1_STORE_SCHEMA_VERSION:
+        if metadata is not None and metadata["value"] not in {
+            PT1_LEGACY_STORE_SCHEMA_VERSION,
+            PT1_STORE_SCHEMA_VERSION,
+        }:
             raise PT1PersistentStoreCorrupt(
                 "PT-1 persistent store schema version drift: "
                 f"{metadata['value']} != {PT1_STORE_SCHEMA_VERSION}"
+            )
+        conn.execute(
+            f"UPDATE {PT1_EQUILIBRIUM_TABLE} SET store_schema_version = ? "
+            "WHERE store_schema_version = ?",
+            (PT1_STORE_SCHEMA_VERSION, PT1_LEGACY_STORE_SCHEMA_VERSION),
+        )
+        if metadata is not None and metadata["value"] != PT1_STORE_SCHEMA_VERSION:
+            conn.execute(
+                f"UPDATE {PT1_METADATA_TABLE} SET value = ? WHERE key = ?",
+                (PT1_STORE_SCHEMA_VERSION, "store_schema_version"),
             )
         conn.execute(
             f"""
@@ -1659,6 +1751,7 @@ class PT1PersistentEquilibriumStore:
         }
         columns = {
             "corpus_version": "TEXT",
+            "repair_notices_json": "TEXT",
             "physics_bucket_schema_version": "TEXT",
             "physics_bucket_sha256": "TEXT",
             "replay_scope_sha256": "TEXT",
@@ -1735,36 +1828,53 @@ class PT1PersistentEquilibriumStore:
         conn: sqlite3.Connection,
         key_hash: str,
     ) -> sqlite3.Row | None:
-        query = f"""
-            SELECT
-                key_hash,
-                artifact,
-                store_schema_version,
-                request_schema_version,
-                key_sha256,
-                payload_sha256,
-                key_bytes,
-                payload_bytes,
-                code_version,
-                corpus_version,
-                engine_version,
-                data_digests_json
-            FROM {{table}}
-            WHERE key_hash = ?
-            """
-        row = conn.execute(
-            query.format(table=PT1_EQUILIBRIUM_TABLE),
-            (key_hash,),
-        ).fetchone()
-        if row is not None:
-            return row
+        tables = [PT1_EQUILIBRIUM_TABLE]
         read_only_table = self._read_only_equilibrium_table(conn)
-        if read_only_table is None:
-            return None
-        return conn.execute(
-            query.format(table=read_only_table),
-            (key_hash,),
-        ).fetchone()
+        if read_only_table is not None:
+            tables.append(read_only_table)
+        for table in tables:
+            repair_column = (
+                "repair_notices_json"
+                if self._table_has_column(conn, table, "repair_notices_json")
+                else "NULL"
+            )
+            row = conn.execute(
+                f"""
+                SELECT
+                    key_hash,
+                    artifact,
+                    store_schema_version,
+                    request_schema_version,
+                    key_sha256,
+                    payload_sha256,
+                    key_bytes,
+                    payload_bytes,
+                    code_version,
+                    corpus_version,
+                    engine_version,
+                    data_digests_json,
+                    {repair_column} AS repair_notices_json
+                FROM {table}
+                WHERE key_hash = ?
+                """,
+                (key_hash,),
+            ).fetchone()
+            if row is not None:
+                return row
+        return None
+
+    @staticmethod
+    def _table_has_column(
+        conn: sqlite3.Connection,
+        table: str,
+        column: str,
+    ) -> bool:
+        if "." in table:
+            schema, table_name = table.split(".", 1)
+            rows = conn.execute(f"PRAGMA {schema}.table_info({table_name})")
+        else:
+            rows = conn.execute(f"PRAGMA table_info({table})")
+        return any(str(row["name"]) == column for row in rows)
 
     def _entry_from_row(
         self,
@@ -1777,7 +1887,10 @@ class PT1PersistentEquilibriumStore:
     ) -> dict[str, Any]:
         row_key_bytes = _sqlite_bytes(row["key_bytes"])
         row_payload_bytes = _sqlite_bytes(row["payload_bytes"])
-        if row["store_schema_version"] != PT1_STORE_SCHEMA_VERSION:
+        if row["store_schema_version"] not in {
+            PT1_LEGACY_STORE_SCHEMA_VERSION,
+            PT1_STORE_SCHEMA_VERSION,
+        }:
             raise PT1PersistentStoreCorrupt(
                 "PT-1 row store schema version drift: "
                 f"{row['store_schema_version']} != {PT1_STORE_SCHEMA_VERSION}"
@@ -1819,6 +1932,8 @@ class PT1PersistentEquilibriumStore:
         validate_reduced_real_equilibrium_record_key(
             artifact, row_key, row_payload
         )
+        repair_notices_json = _row_repair_notices(row)
+        validate_repair_notices_json(repair_notices_json)
         return {
             "artifact": artifact,
             "key": copy.deepcopy(dict(row_key)),
@@ -1826,6 +1941,7 @@ class PT1PersistentEquilibriumStore:
             "key_bytes": row_key_bytes.decode("utf-8"),
             "payload": copy.deepcopy(dict(row_payload)),
             "payload_hash": row["payload_sha256"],
+            "repair_notices_json": repair_notices_json,
             "cache_state": "live_fill",
         }
 
@@ -2875,6 +2991,138 @@ def canonical_json_bytes(value: Any) -> bytes:
         separators=(",", ":"),
         allow_nan=False,
     ).encode("utf-8")
+
+
+def encode_repair_notices_json(
+    notices: Sequence[Mapping[str, Any]],
+) -> str:
+    """Serialize typed notice mappings with the existing canonical JSON codec."""
+
+    if not all(isinstance(notice, Mapping) for notice in notices):
+        raise TypeError("PT-1 repair notices must be typed mappings")
+    return canonical_json_bytes(list(notices)).decode("utf-8")
+
+
+def decode_repair_notices_json(raw: str | None) -> list[dict[str, Any]] | None:
+    if raw is None:
+        return None
+    if not isinstance(raw, str):
+        raise PT1PersistentStoreCorrupt(
+            "PT-1 repair_notices_json must be TEXT or NULL"
+        )
+    try:
+        notices = json.loads(raw)
+    except json.JSONDecodeError as exc:
+        raise PT1PersistentStoreCorrupt(
+            "PT-1 repair_notices_json is invalid JSON"
+        ) from exc
+    if not isinstance(notices, list) or not all(
+        isinstance(notice, Mapping) for notice in notices
+    ):
+        raise PT1PersistentStoreCorrupt(
+            "PT-1 repair_notices_json must contain a list of typed mappings"
+        )
+    if encode_repair_notices_json(notices) != raw:
+        raise PT1PersistentStoreCorrupt(
+            "PT-1 repair_notices_json is not canonical"
+        )
+    return [copy.deepcopy(dict(notice)) for notice in notices]
+
+
+def validate_repair_notices_json(raw: str | None) -> str | None:
+    decode_repair_notices_json(raw)
+    return raw
+
+
+def monotonic_repair_notices_json(
+    existing: str | None,
+    incoming: str | None,
+) -> str | None:
+    old_notices = decode_repair_notices_json(existing)
+    new_notices = decode_repair_notices_json(incoming)
+    if old_notices is None:
+        return incoming
+    if new_notices is None:
+        return existing
+    old_values = {canonical_json_bytes(notice) for notice in old_notices}
+    new_values = {canonical_json_bytes(notice) for notice in new_notices}
+    return incoming if old_values < new_values else existing
+
+
+def record_repair_notice(sim: Any, notice: Mapping[str, Any]) -> None:
+    """Append a typed repair notice to the runtime-only per-run collector."""
+
+    if not isinstance(notice, Mapping):
+        raise TypeError("repair notice must be a typed mapping")
+    normalized = json.loads(canonical_json_bytes(notice).decode("utf-8"))
+    notices = getattr(sim, REPAIR_NOTICE_COLLECTOR_ATTRIBUTE, None)
+    if not isinstance(notices, list):
+        notices = []
+        setattr(sim, REPAIR_NOTICE_COLLECTOR_ATTRIBUTE, notices)
+    encoded = canonical_json_bytes(normalized)
+    if all(canonical_json_bytes(existing) != encoded for existing in notices):
+        notices.append(normalized)
+
+
+def _repair_notices_for_capture(
+    sim: Any,
+    notices: Sequence[Mapping[str, Any]] | None,
+) -> list[dict[str, Any]]:
+    source = (
+        getattr(sim, REPAIR_NOTICE_COLLECTOR_ATTRIBUTE, ())
+        if notices is None
+        else notices
+    )
+    if not isinstance(source, Sequence) or isinstance(source, (str, bytes)):
+        raise TypeError("PT-1 repair notice collector must be a sequence")
+    encoded = encode_repair_notices_json(source)
+    return decode_repair_notices_json(encoded) or []
+
+
+def _row_repair_notices(row: Mapping[str, Any] | sqlite3.Row) -> str | None:
+    keys = row.keys()
+    if "repair_notices_json" not in keys:
+        return None
+    raw = row["repair_notices_json"]
+    if raw is not None and not isinstance(raw, str):
+        raise PT1PersistentStoreCorrupt(
+            "PT-1 repair_notices_json must be TEXT or NULL"
+        )
+    return raw
+
+
+def _emit_repair_notices(
+    sim: Any | None,
+    groups: Sequence[str | None],
+    *,
+    approximation_cache_state: str | None = None,
+) -> None:
+    if sim is None:
+        return
+    collected: list[dict[str, Any]] = []
+    seen: set[bytes] = set()
+    legacy_history_unavailable = False
+    for raw in groups:
+        notices = decode_repair_notices_json(raw)
+        if notices is None:
+            legacy_history_unavailable = True
+            continue
+        for notice in notices:
+            identity = canonical_json_bytes(notice)
+            if identity not in seen:
+                seen.add(identity)
+                collected.append(notice)
+    if legacy_history_unavailable:
+        collected.append(dict(REPAIR_NOTICES_UNAVAILABLE_NOTICE))
+    if approximation_cache_state is not None:
+        collected.append(
+            {
+                "kind": "reduced_real_cache_approximation",
+                "cache_state": approximation_cache_state,
+            }
+        )
+    for notice in collected:
+        record_repair_notice(sim, notice)
 
 
 def _curve_payload(curve: Mapping[str, Any]) -> dict[str, Any]:

@@ -1069,11 +1069,23 @@ def _seed_cache_rows_from_base(
             conn,
             f"{_SEED_BASE_ALIAS}.{PT1_EQUILIBRIUM_TABLE}",
         )
-        if columns != source_columns:
+        target_without_notices = [
+            name for name in columns if name != "repair_notices_json"
+        ]
+        source_without_notices = [
+            name for name in source_columns if name != "repair_notices_json"
+        ]
+        if target_without_notices != source_without_notices:
             raise ValueError(
                 "acquisition seed source schema mismatch: "
                 f"{base_cache} does not match {shard_db}"
             )
+        select_columns = [
+            name
+            if name in source_columns
+            else "NULL AS repair_notices_json"
+            for name in columns
+        ]
         placeholders = ",".join("?" for _ in point_ids)
         rows = conn.execute(
             f"""
@@ -1109,12 +1121,13 @@ def _seed_cache_rows_from_base(
             seeded_sources.append(point)
         seed_ids = [str(point["point_id"]) for point in seeded_sources]
         quoted_columns = ", ".join(columns)
+        selected_columns = ", ".join(select_columns)
         if seed_ids:
             seed_placeholders = ",".join("?" for _ in seed_ids)
             conn.execute(
                 f"""
                 INSERT OR IGNORE INTO {PT1_EQUILIBRIUM_TABLE} ({quoted_columns})
-                SELECT {quoted_columns}
+                SELECT {selected_columns}
                 FROM {_SEED_BASE_ALIAS}.{PT1_EQUILIBRIUM_TABLE}
                 WHERE key_hash IN ({seed_placeholders})
                 """,

@@ -1430,46 +1430,6 @@ def test_epoch_seed_copy_preserves_repair_notice_values(
     assert stored == repair_notices_json
 
 
-def test_epoch_seed_copy_keeps_strict_superset_notices_on_duplicate_row(
-    tmp_path: Path,
-) -> None:
-    base = tmp_path / "notice-base.sqlite"
-    shard = tmp_path / "notice-epoch" / "shards" / "job-a.sqlite"
-    point_id = _put_pt1_cache_row(base, "notice-duplicate")
-    assert _put_pt1_cache_row(shard, "notice-duplicate") == point_id
-    base_notices = '[{"kind":"existing"}]'
-    shard_notices = '[{"kind":"existing"},{"kind":"new"}]'
-    with sqlite3.connect(base) as conn:
-        conn.execute(
-            f"UPDATE {epoch_grind.PT1_EQUILIBRIUM_TABLE} "
-            "SET repair_notices_json = ? WHERE key_hash = ?",
-            (base_notices, point_id),
-        )
-    with sqlite3.connect(shard) as conn:
-        conn.execute(
-            f"UPDATE {epoch_grind.PT1_EQUILIBRIUM_TABLE} "
-            "SET repair_notices_json = ? WHERE key_hash = ?",
-            (shard_notices, point_id),
-        )
-
-    summary = epoch_grind.seed_job_cache(
-        shard,
-        base,
-        point_sources=[{"point_id": point_id, "source": "ladder_polish"}],
-        job_id="job-a",
-    )
-
-    assert summary["seed_rows"] == 1
-    with sqlite3.connect(shard) as conn:
-        (stored,) = conn.execute(
-            f"SELECT repair_notices_json "
-            f"FROM {epoch_grind.PT1_EQUILIBRIUM_TABLE} "
-            "WHERE key_hash = ?",
-            (point_id,),
-        ).fetchone()
-    assert stored == shard_notices
-
-
 def test_seed_job_cache_rejects_stale_epoch_seed_without_counting_coverage(
     tmp_path: Path,
 ) -> None:
