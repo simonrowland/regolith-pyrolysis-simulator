@@ -813,7 +813,10 @@ def test_fugacity_storage_cannot_open_or_score_engine(monkeypatch):
     for engine in SCORE_ENGINE_SET:
         prediction = predict_with_engine(engine, reference)
         assert prediction.value is None
-        assert prediction.refusal_detail["reason"] == "quantity_has_no_engine_pot"
+        assert prediction.refusal_detail == {
+            "reason": "quantity_not_predicted",
+            "quantity": Quantity.FUGACITY.value,
+        }
     residuals, _ = score_store(context, engines=(Engine.MAGEMIN,), include_diagnostics=False)
     assert residuals and all(not r.score_eligible and r.numeric is None for r in residuals)
     numeric, reason, _ = populate_numeric(quantity=Quantity.FUGACITY, candidate=Decimal("33.7"),
