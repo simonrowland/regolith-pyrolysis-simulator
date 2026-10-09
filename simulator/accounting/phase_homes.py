@@ -28,7 +28,7 @@ from simulator.accounting.oxide_assignment import (
     PHASE_OXIDE_MASS_ABS_TOLERANCE_KG,
 )
 from simulator.chemistry.kernel.dto import LedgerTransitionProposal
-from simulator.melt_backend.base import is_engine_liquid_phase
+from simulator.melt_backend.base import engine_phase_role
 
 
 # Post-commit kilogram band of AtomLedger. Not imported: the ledger
@@ -54,6 +54,7 @@ REASON_PHASE_TOKEN_INVALID = "phase_home_phase_token_invalid"
 REASON_COHORT_MOLES_INVALID = "phase_home_cohort_moles_invalid"
 REASON_DISSOLUTION_SHORT = "phase_home_dissolution_short"
 REASON_GROWTH_WITHOUT_COMPOSITION = "phase_home_growth_without_composition"
+REASON_NON_SILICATE = "engine_reported_non_silicate_phase"
 
 _ACCOUNT_RE = re.compile(
     r"^process\.crystal\."
@@ -396,16 +397,11 @@ def _phase_table(
     rows: Sequence[Mapping[str, object]],
 ) -> dict[str, tuple[float, dict[str, float]]]:
     table: dict[str, tuple[float, dict[str, float]]] = {}
+    liquid_names: set[str] = set()
     for row in rows:
         phase_name = str(row.get("phase") or "").strip()
-        if not phase_name or is_engine_liquid_phase(phase_name):
+        if not phase_name:
             continue
-        token = sanitise_phase_token(phase_name)
-        if not token:
-            raise _PhaseRowError(
-                REASON_PHASE_TOKEN_INVALID,
-                f"phase {phase_name!r} has no account token",
-            )
         try:
             mass_kg = float(row.get("mass_kg"))
         except (TypeError, ValueError):
@@ -420,6 +416,21 @@ def _phase_table(
             )
         if mass_kg <= PHASE_OXIDE_MASS_ABS_TOLERANCE_KG:
             continue
+        role = engine_phase_role(phase_name)
+        if role == "silicate_liquid":
+            liquid_names.add(phase_name)
+            continue
+        if role == "non_silicate":
+            raise _PhaseRowError(
+                REASON_NON_SILICATE,
+                f"phase {phase_name!r} is not a silicate solid",
+            )
+        token = sanitise_phase_token(phase_name)
+        if not token:
+            raise _PhaseRowError(
+                REASON_PHASE_TOKEN_INVALID,
+                f"phase {phase_name!r} has no account token",
+            )
         oxides = _positive_oxides(row.get("oxide_mol") or {})
         if oxides is None:
             raise _PhaseRowError(
@@ -434,6 +445,12 @@ def _phase_table(
         for species, moles in oxides.items():
             merged[species] = merged.get(species, 0.0) + moles
         table[token] = (previous[0] + mass_kg, merged)
+    if len(liquid_names) > 1:
+        names = ", ".join(sorted(liquid_names))
+        raise _PhaseRowError(
+            REASON_NON_SILICATE,
+            f"engine reported more than one silicate liquid: {names}",
+        )
     return table
 
 

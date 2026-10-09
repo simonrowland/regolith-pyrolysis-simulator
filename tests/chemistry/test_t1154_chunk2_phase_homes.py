@@ -22,6 +22,7 @@ from simulator.accounting.oxide_assignment import PHASE_OXIDE_MASS_ABS_TOLERANCE
 from simulator.accounting.phase_homes import (
     MELTS_BINDING,
     REASON_LIQUID_INSUFFICIENT,
+    REASON_NON_SILICATE,
     crystal_accounts_for_binding,
     holds_positive_crystal_moles,
     locked_cohort_update,
@@ -352,6 +353,32 @@ def test_growth_the_liquid_cannot_fund_refuses_the_whole_commit():
 
     assert update.proposal is None
     assert update.refusal_reason == REASON_LIQUID_INSUFFICIENT
+
+
+def test_a_second_liquid_or_an_alloy_refuses_the_whole_commit():
+    """One silicate liquid is skipped. Two liquids, or water/alloy, refuse."""
+    olivine = _phase(
+        "olivine",
+        0.01,
+        {"SiO2": _moles(0.004, "SiO2"), "MgO": _moles(0.006, "MgO")},
+    )
+    liquid = _phase("liquid", 0.5, {"SiO2": _moles(0.5, "SiO2")})
+    cases = (
+        (liquid, _phase("liquid2", 0.4, {"MgO": _moles(0.4, "MgO")}), olivine),
+        (liquid, _phase("alloy1", 0.1, {"Fe": _moles(0.1, "Fe")}), olivine),
+        (liquid, _phase("water1", 0.01, {"H2O": _moles(0.01, "H2O")}), olivine),
+    )
+    for rows in cases:
+        update = locked_cohort_update(
+            binding=MELTS_BINDING,
+            liquid_oxide_mol={"SiO2": _moles(1.0, "SiO2"), "MgO": _moles(1.0, "MgO")},
+            accessible_phases=rows,
+            probe_phases=None,
+            locked=(),
+        )
+        assert update.proposal is None
+        assert update.refusal_reason == REASON_NON_SILICATE
+        assert update.touched_crystal_accounts == ()
 
 
 def test_dust_under_the_phase_floor_is_not_a_cohort_and_does_not_hold_f_off():
@@ -795,6 +822,7 @@ def test_phase_home_hook_does_not_count_a_null_transition_as_a_no_op(
     assert sim._chem_no_op_dispatch_count == before
 
     committed: list[tuple] = []
+    projected: list[bool] = []
 
     def with_proposal(intent, **_kwargs):
         return SimpleNamespace(status="ok", transition=object(), diagnostic={})
@@ -804,8 +832,10 @@ def test_phase_home_hook_does_not_count_a_null_transition_as_a_no_op(
 
     sim._dispatch_only = with_proposal
     sim._commit_proposal = capture
+    sim._project_cleaned_melt_from_atom_ledger = lambda: projected.append(True)
     sim._commit_phase_homes()
     assert committed[0][2] == "phase_home"
+    assert projected == [True]
     assert sim._chem_no_op_dispatch_count == before
 
     def unavailable(*_args, **_kwargs):

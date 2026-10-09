@@ -76,6 +76,39 @@ def is_engine_liquid_phase(phase_name: str) -> bool:
     )
 
 
+# MELTS reports these as their own phases. The stem drops a trailing
+# instance digit, so ``water1`` and ``alloy1`` match. They are not
+# silicate solids and must not be booked as crystal homes.
+_NON_SILICATE_PHASE_STEMS = frozenset({
+    'alloy',
+    'metal',
+    'fluid',
+    'water',
+})
+
+
+def _engine_phase_stem(phase_name: str) -> str:
+    name = str(phase_name).strip().lower()
+    end = len(name)
+    while end > 0 and name[end - 1].isdigit():
+        end -= 1
+    return name[:end]
+
+
+def engine_phase_role(phase_name: str) -> str:
+    """``silicate_liquid``, ``silicate_solid``, or ``non_silicate``.
+
+    Silicate liquid is :func:`is_engine_liquid_phase`. Alloy, metal,
+    fluid, and water are the engine's non-silicate phases. Every other
+    name is a silicate solid.
+    """
+    if is_engine_liquid_phase(phase_name):
+        return 'silicate_liquid'
+    if _engine_phase_stem(phase_name) in _NON_SILICATE_PHASE_STEMS:
+        return 'non_silicate'
+    return 'silicate_solid'
+
+
 def liquid_fraction_from_phase_masses(
     phase_masses_kg: Mapping[str, float],
 ) -> Optional[float]:
