@@ -1,0 +1,5149 @@
+schema_version: literature_extract.v1
+source_id: takeda-1990-sn-slag-matertrans
+source:
+  citation: Takeda, Y., Yazawa, A., Chit, P. P. and Ujiie, H. (1990), “Equilibria between liquid tin and FeOx-CaO-SiO2
+    slag”, Materials Transactions JIM 31(9), 793–801.
+  doi: 10.2320/matertrans1989.31.793
+  year: 1990
+extraction:
+  method: Rendered all nine PDF pages at 220 dpi and 240 dpi; visually transcribed numeric tables with OCR used
+    only as a lead and checked against page images.
+  date: '2026-10-05'
+  worker: codex-resume-93179-1791212419
+  provenance_path: tables/takeda-1990-sn-slag-matertrans/provenance.md
+review_status: draft
+experiments:
+- experiment_id: takeda_1990_table1_gamma_summary
+  method: tabulation
+  method_as_printed: reported and compared activity-coefficient ranges
+  locator:
+    published_page: 794
+    pdf_page_index: 1
+    table: '1'
+  sample:
+    form:
+      state:
+        tag: value
+        value: literature comparison values and this study summary
+      locator:
+        published_page: 794
+        pdf_page_index: 1
+        table: '1'
+    printed_composition:
+      state:
+        tag: unknown
+        reason: heterogeneous composition ranges as reported per source
+      locator:
+        published_page: 794
+        pdf_page_index: 1
+        table: '1'
+- experiment_id: takeda_1990_reference_cell
+  method: emf_cell
+  method_as_printed: oxygen concentration cell; Sn-SnO reference equilibrium
+  locator:
+    published_page: 795
+    pdf_page_index: 2
+    table: '2'
+  sample:
+    form:
+      state:
+        tag: value
+        value: SnO plus Sn metal
+      locator:
+        published_page: 795
+        pdf_page_index: 2
+        table: '2'
+    container:
+      state:
+        tag: value
+        value: magnesia crucible
+      locator:
+        published_page: 795
+        pdf_page_index: 2
+        table: '2'
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: varies by test; 1366–1573 K in Table 2
+      locator:
+        published_page: 795
+        pdf_page_index: 2
+        table: '2'
+  pressure_environment:
+    total_pressure_Pa:
+      state: {tag: unknown, reason: not_published}
+      locator: {published_page: 795, pdf_page_index: 2, section: Reference-cell measurement}
+    sweep_gas:
+      state: {tag: value, value: {species: Ar, flow_sccm: {tag: unknown, reason: not_published}, partial_pressure_Pa: {tag: unknown, reason: not_published}}}
+      locator: {published_page: 795, pdf_page_index: 2, section: Reference-cell measurement, note: 'Argon flow is printed; no numerical flow or background pressure is stated.'}
+    regime: {regime_class: {tag: unknown, reason: not_published}}
+- experiment_id: takeda_1990_iron_crucible_runs
+  method: emf_cell
+  method_as_printed: oxygen concentration cell; slag-metal equilibrium
+  locator:
+    published_page: 796
+    pdf_page_index: 3
+    table: '3'
+  sample:
+    form:
+      state:
+        tag: value
+        value: liquid Sn-Fe metal equilibrated with FeOx-CaO-SiO2 slag
+      locator:
+        published_page: 796
+        pdf_page_index: 3
+        table: '3'
+    container:
+      state:
+        tag: value
+        value: iron crucible
+      locator:
+        published_page: 793
+        pdf_page_index: 0
+        section: Experimental
+    printed_composition:
+      state:
+        tag: value
+        value: per-test slag and metal mass percentages in Table 3
+      locator:
+        published_page: 796
+        pdf_page_index: 3
+        table: '3'
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: 1573 K and 1673 K test rows; see Table 3
+      locator:
+        published_page: 796
+        pdf_page_index: 3
+        table: '3'
+  pressure_environment:
+    total_pressure_Pa:
+      state: {tag: unknown, reason: not_published}
+      locator: {published_page: 793, pdf_page_index: 0, section: Experimental}
+    sweep_gas:
+      state: {tag: value, value: {species: Ar, flow_sccm: {tag: unknown, reason: not_published}, partial_pressure_Pa: {tag: unknown, reason: not_published}}}
+      locator: {published_page: 793, pdf_page_index: 0, section: Experimental, note: 'Printed argon stream 4 cm3/s; no standard-condition cm3/min conversion or background pressure is stated.'}
+    regime: {regime_class: {tag: unknown, reason: not_published}}
+- experiment_id: takeda_1990_magnesia_1573_runs
+  method: emf_cell
+  method_as_printed: oxygen concentration cell; slag-metal equilibrium
+  locator:
+    published_page: 796
+    pdf_page_index: 3
+    table: '4'
+  sample:
+    form:
+      state:
+        tag: value
+        value: Sn-Fe metal and FeOx-CaO-SiO2 slag
+      locator:
+        published_page: 796
+        pdf_page_index: 3
+        table: '4'
+    container:
+      state:
+        tag: value
+        value: magnesia crucible
+      locator:
+        published_page: 796
+        pdf_page_index: 3
+        table: '4'
+    printed_composition:
+      state:
+        tag: value
+        value: per-test slag mass percentages in Tables 4 and 6
+      locator:
+        published_page: 796
+        pdf_page_index: 3
+        table: '4'
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: 1573
+      locator:
+        published_page: 796
+        pdf_page_index: 3
+        table: '4'
+  pressure_environment:
+    total_pressure_Pa:
+      state: {tag: unknown, reason: not_published}
+      locator: {published_page: 793, pdf_page_index: 0, section: Experimental}
+    sweep_gas:
+      state: {tag: value, value: {species: Ar, flow_sccm: {tag: unknown, reason: not_published}, partial_pressure_Pa: {tag: unknown, reason: not_published}}}
+      locator: {published_page: 793, pdf_page_index: 0, section: Experimental, note: 'Printed argon stream 4 cm3/s; no standard-condition cm3/min conversion or background pressure is stated.'}
+    regime: {regime_class: {tag: unknown, reason: not_published}}
+- experiment_id: takeda_1990_magnesia_1473_runs
+  method: emf_cell
+  method_as_printed: oxygen concentration cell; slag-metal equilibrium
+  locator:
+    published_page: 797
+    pdf_page_index: 4
+    table: '5'
+  sample:
+    form:
+      state:
+        tag: value
+        value: Sn-Fe metal and silica-free FeOx-CaO slag
+      locator:
+        published_page: 797
+        pdf_page_index: 4
+        table: '5'
+    container:
+      state:
+        tag: value
+        value: magnesia crucible
+      locator:
+        published_page: 797
+        pdf_page_index: 4
+        table: '5'
+    printed_composition:
+      state:
+        tag: value
+        value: per-test slag and metal values in Table 5
+      locator:
+        published_page: 797
+        pdf_page_index: 4
+        table: '5'
+  conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: 1473
+      locator:
+        published_page: 797
+        pdf_page_index: 4
+        table: '5'
+  pressure_environment:
+    total_pressure_Pa:
+      state: {tag: unknown, reason: not_published}
+      locator: {published_page: 793, pdf_page_index: 0, section: Experimental}
+    sweep_gas:
+      state: {tag: value, value: {species: Ar, flow_sccm: {tag: unknown, reason: not_published}, partial_pressure_Pa: {tag: unknown, reason: not_published}}}
+      locator: {published_page: 793, pdf_page_index: 0, section: Experimental, note: 'Printed argon stream 4 cm3/s; no standard-condition cm3/min conversion or background pressure is stated.'}
+    regime: {regime_class: {tag: unknown, reason: not_published}}
+fidelity_samples:
+- species: SnO
+  observation_id: takeda_1990_table1_gamma_11
+  observable: context
+  field: gamma_as_published
+  value: 1.0–7.0
+  locator:
+    published_page: 794
+    table: '1'
+    note: This experiment summary range
+- species: SnO
+  observation_id: takeda_1990_t3_row_a_5
+  observable: context
+  field: slag_Sn_mass_percent
+  value: 2.0
+  locator:
+    published_page: 796
+    table: '3'
+    note: Test A 5
+- species: SnO
+  observation_id: takeda_1990_t6_row_a_s51
+  observable: context
+  field: slag_Sn_mass_percent
+  value: 2.4
+  locator:
+    published_page: 797
+    table: '6'
+    note: Test A-S51
+species:
+  SnO:
+    context:
+    - observation_id: takeda_1990_source_relation_takeda_yazawa_1989
+      type: context
+      locator:
+        note: 'Source-specific assignment provenance: Sossi & Fegley 2018 Table 2 cites Takeda & Yazawa 1989; owner-supplied
+          note identifies this open-access 1990 paper as the stand-in.'
+      units: as printed
+      values:
+        quantity: source_relationship
+        relation: Open-access stand-in for Takeda & Yazawa 1989; Sossi & Fegley 2018 Table 2 cites Takeda & Yazawa
+          1989 for SnO activity coefficients. This 1990 article is the available primary study used here.
+    - observation_id: takeda_1990_method_apparatus
+      type: method
+      locator:
+        published_page: 793
+        pdf_page_index: 0
+        section: Experimental
+      units: as printed
+      values:
+        quantity: method_and_apparatus
+        method: emf_cell
+        method_as_printed: oxygen concentration cell (electromotive force)
+        crucibles: magnesia and iron crucibles, both with inner diameter 26 mm
+        cell_configuration_as_printed: Pt/Ni·NiO(s)/ZrO2·MgO/Sn-slag(l)/electrode/Pt
+        sample_side_electrodes_as_printed: Iron for iron saturation; tungsten for lower oxygen partial pressure;
+          lanthanum-chromate for higher oxygen partial pressure than the metal miscibility gap, respectively.
+        cell_train_and_electrode_locator: {published_page: 794, pdf_page_index: 1, section: Experimental, note: Continuation of the p.793 cell description}
+        electrode_connection: Each short sample-side rod was connected with a platinum wire.
+        electrode_protection: Tungsten or lanthanum-chromate rods were covered with a magnesia tube.
+        oxygen_measurement: EMF against Ni/NiO oxygen reference, converted to log pO2 using the printed cell relation
+          and standard Gibbs energies
+        oxygen_potential_control: Sn-Fe metal composition and ratio of pre-melted FeOx-CaO-SiO2 slag to chemical reagents
+        temperature_calibration: not stated for the slag-metal experiments
+        mass_spectrometry: not used; ionization cross sections, ionization energy, multiplier/isotope corrections
+          and vapour-pressure calibration are not applicable
+    - observation_id: takeda_1990_sample_preparation
+      type: context
+      locator:
+        published_page: 793
+        pdf_page_index: 0
+        section: Experimental
+      units: as printed
+      values:
+        quantity: sample_preparation
+        starting_mass_metal_g: 16
+        starting_mass_slag_formers_g: 10
+        starting_chemicals: reagent-grade Fe2O3, CaO, SiO2 and SnO
+        slag_preparation: FeOx-CaO-SiO2 slag pre-melted in an iron crucible; starting slag composition sets A, B,
+          C, D, E, a, b, c and d shown in Fig. 1
+        atmosphere: argon at 4 cm3/s
+        holding_time_ks_as_printed: 4–8
+        EMF_sampling_time_s_as_printed: 200–600
+        runs: mostly 1573 K; selected tests at 1473 K and 1673 K
+    - observation_id: takeda_1990_melting_and_equilibrium_timing
+      type: context
+      locator:
+        published_page: 794
+        pdf_page_index: 1
+        section: Experimental
+      units: seconds and ks as printed
+      values:
+        quantity: melting_and_equilibration_timing
+        slag_materials_melted_within_s: 400
+        target_temperature_reached_within_ks: 2
+        steady_emf_and_slag_tin_reached_in_ks: 3
+        steady_state_example_slag: C
+    - observation_id: takeda_1990_temperature_and_cell_measurement
+      type: context
+      locator:
+        published_page: 795
+        pdf_page_index: 2
+        section: Thermal analysis, Results and Discussions
+      units: as printed
+      values:
+        quantity: temperature_measurement
+        experiment_binding: Thermal analysis of tin oxide coexisting with metallic tin; distinct from the 15 g SnO plus 25 g Sn reference-cell charge.
+        sensor: thermocouple protected by a magnesia tube for the thermal-analysis charge of 15 g SnO and 15 g Sn
+        temperature_uncertainty: not stated for slag-metal table measurements
+        cell_calibration: Ni/NiO oxygen concentration cell; printed standard free-energy equations used to calculate
+          pO2
+        uncertainty_table2_EMF_mV:
+        - ±1.5
+        - ±1.5
+        - ±1.0
+        - ±3.2
+        - ±2.3
+    - observation_id: takeda_1990_unprinted_quantities
+      type: context
+      locator:
+        published_page: 793
+        pdf_page_index: 0
+        section: Experimental
+      units: typed absence
+      values:
+        quantity: not_reported_or_not_applicable
+        sample_chamber_background_pressure_Pa: null
+        pressure_calibration_substance: null
+        ionisation_cross_sections: null
+        ionisation_energy_eV: null
+        mass_spectrometer_corrections: null
+        uncertainty_for_table3_to_table6_compositions: null
+        Fe3plus_over_Fe2plus_per_row: null
+        note: These are absent or inapplicable; no zero values are implied.
+    - observation_id: takeda_1990_oxygen_scale_equations
+      type: context
+      locator:
+        published_page: 795
+        pdf_page_index: 2
+        equation: 2–5
+      units: as printed
+      values:
+        quantity: oxygen_potential_and_standard_state_equations
+        log_pO2_relation_as_printed: log pO2 = 20170 E/T − 24290/T + 8.73; oxygen standard pressure 101325 Pa
+        Ni_NiO_deltaG_J_per_mol_as_printed: −232500 + 83.60T
+        Sn_liquid_oxidation_reaction: Sn(l) + 1/2 O2 = SnO(l)
+        SnO_liquid_deltaG_J_per_mol_as_printed: −274500 + 93.3T
+        comparison_Grau_deltaG_J_per_mol_as_printed: −277200 + 96.0T
+        E_unit_as_printed: V
+        Ni_oxidation_reaction_as_printed: Ni(s) + 1/2 O2 = NiO(s)
+        equation_5_reference_assumption: Activities of unity for both SnO(l) and Sn(l); this is the reference equilibrium, not every Sn-Fe alloy run.
+    - observation_id: takeda_1990_analysis_and_qualifications
+      type: context
+      locator:
+        published_page: 794
+        pdf_page_index: 1
+        section: Experimental
+      units: as printed
+      values:
+        quantity: analysis_and_data_qualifications
+        analysis: HCl dissolution; Si gravimetric; Fe in slag or metal over 20% and ferrous iron in slag
+          by volumetric K2Cr2O7 titration; Ca by spectrophotometric EDTA titration; small Fe/Sn/MgO by AAS;
+          tin in slag and metal over 20 mass% by KI standard-solution titration.
+        ferric_correction_reaction: 2Fe3+(slag) + Sn2+(slag) = 2Fe2+(aq) + Sn4+(aq)
+        ferric_uncertainty: authors state stoichiometry of the ferric correction was uncertain; Fe3+ derived by
+          difference from total and ferrous iron
+        volatilization_qualification: authors considered oxygen-potential decrease from SnO volatilization insignificant
+          because samples were taken within one minute after EMF and diffusion was faster than SnO volatilization
+        stirring: viscous slag B stirred two or three times with a magnesia rod before EMF measurement
+        postrun_sampling: slag sampled immediately after EMF with a water-cooled copper tube; liquid metal sucked through a silica tube
+        composition_drift: composition changes with oxygen potential; measured equilibrium slag/metal compositions
+          are reported per test rather than treated as fixed starting compositions
+    - observation_id: takeda_1990_figure_only_activity_curves
+      type: figure_only
+      locator:
+        published_page: 799
+        pdf_page_index: 6
+        figure: 6–7
+      units: figure-only; curves not digitized
+      values:
+        quantity: SnO_activity_coefficient_curves
+        method_class: figure_only
+        note: Activity-coefficient curves are plotted against SnO content and slag composition; no point values
+          are tabulated.
+    - observation_id: takeda_1990_figures_other_curves
+      type: figure_only
+      locator:
+        published_page: 798
+        pdf_page_index: 5
+        figure: '4'
+        continuation_locator: {published_page: 799, pdf_page_index: 6, figure: '5'}
+      units: figure-only; curves not digitized
+      values:
+        quantity: oxygen_potential_and_composition_curves
+        method_class: figure_only
+        note: Figures 4–5 plot tin solubility, iron dissolution, and related slag/metal relations; curves are not
+          digitized.
+    - observation_id: takeda_1990_t2_row_01
+      type: context
+      locator:
+        published_page: 795
+        pdf_page_index: 2
+        table: '2'
+        note: Test S1
+      units: EMF mV and MgO mass% as printed
+      values:
+        quantity: table_2_emf_and_mgo_measurements
+        method_class: measured_tabulated
+        test_no: S1
+        temperature_K: 1366
+        EMF_mV_as_printed: −147.7 ± 1.5
+        EMF_mV: -147.7
+        EMF_uncertainty_mV: 1.5
+        MgO_mass_percent: null
+        SnO_phase_as_printed: '* solid tin oxide'
+    - observation_id: takeda_1990_t2_row_02
+      type: context
+      locator:
+        published_page: 795
+        pdf_page_index: 2
+        table: '2'
+        note: Test S1 continued
+      units: EMF mV and MgO mass% as printed
+      values:
+        quantity: table_2_emf_and_mgo_measurements
+        method_class: measured_tabulated
+        test_no: S1 continued
+        temperature_K: 1405
+        EMF_mV_as_printed: −145.5 ± 1.5
+        EMF_mV: -145.5
+        EMF_uncertainty_mV: 1.5
+        MgO_mass_percent: 2.52
+        SnO_phase_as_printed: '** liquid tin oxide'
+    - observation_id: takeda_1990_t2_row_03
+      type: context
+      locator:
+        published_page: 795
+        pdf_page_index: 2
+        table: '2'
+        note: Test S2
+      units: EMF mV and MgO mass% as printed
+      values:
+        quantity: table_2_emf_and_mgo_measurements
+        method_class: measured_tabulated
+        test_no: S2
+        temperature_K: 1433
+        EMF_mV_as_printed: −144.6 ± 1.0
+        EMF_mV: -144.6
+        EMF_uncertainty_mV: 1.0
+        MgO_mass_percent: 0.76
+        SnO_phase_as_printed: '** liquid tin oxide'
+    - observation_id: takeda_1990_t2_row_04
+      type: context
+      locator:
+        published_page: 795
+        pdf_page_index: 2
+        table: '2'
+        note: Test S3
+      units: EMF mV and MgO mass% as printed
+      values:
+        quantity: table_2_emf_and_mgo_measurements
+        method_class: measured_tabulated
+        test_no: S3
+        temperature_K: 1473
+        EMF_mV_as_printed: −143.1 ± 3.2
+        EMF_mV: -143.1
+        EMF_uncertainty_mV: 3.2
+        MgO_mass_percent: 0.81
+        SnO_phase_as_printed: '** liquid tin oxide'
+    - observation_id: takeda_1990_t2_row_05
+      type: context
+      locator:
+        published_page: 795
+        pdf_page_index: 2
+        table: '2'
+        note: Test S4
+      units: EMF mV and MgO mass% as printed
+      values:
+        quantity: table_2_emf_and_mgo_measurements
+        method_class: measured_tabulated
+        test_no: S4
+        temperature_K: 1573
+        EMF_mV_as_printed: −138.9 ± 2.3
+        EMF_mV: -138.9
+        EMF_uncertainty_mV: 2.3
+        MgO_mass_percent: 1.72
+        SnO_phase_as_printed: '** liquid tin oxide'
+    - observation_id: takeda_1990_t3_row_a_5
+      type: context
+      locator:
+        published_page: 796
+        pdf_page_index: 3
+        table: '3'
+        note: Test A 5
+      units: mass% for slag and metal composition; log pO2 dimensionless as printed
+      values:
+        temperature_K: 1573
+        log_pO2: -11.4
+        slag_Sn_mass_percent: 2.0
+        slag_CaO_mass_percent: 0
+        slag_SiO2_mass_percent: 37.9
+        slag_Fe2plus_mass_percent: 43.8
+        slag_Fe3plus_mass_percent: 0.9
+        metal_Sn_mass_percent: 31.5
+        metal_Fe_mass_percent: 69.0
+        test_no: A 5
+        table: '3'
+        quantity: table_equilibrium_composition_and_oxygen_potential
+        method_class: measured_tabulated
+        composition_basis: mass percent as printed
+        standard_state_related_quantity: SnO(l) for γSnO in liquid slag
+    - observation_id: takeda_1990_t3_row_a_6
+      type: context
+      locator:
+        published_page: 796
+        pdf_page_index: 3
+        table: '3'
+        note: Test a 6
+      units: mass% for slag and metal composition; log pO2 dimensionless as printed
+      values:
+        temperature_K: 1573
+        log_pO2: -10.8
+        slag_Sn_mass_percent: 4.2
+        slag_CaO_mass_percent: 0
+        slag_SiO2_mass_percent: 13.9
+        slag_Fe2plus_mass_percent: 55.3
+        slag_Fe3plus_mass_percent: 6.2
+        metal_Sn_mass_percent: 29.8
+        metal_Fe_mass_percent: 70.6
+        test_no: a 6
+        table: '3'
+        quantity: table_equilibrium_composition_and_oxygen_potential
+        method_class: measured_tabulated
+        composition_basis: mass percent as printed
+        standard_state_related_quantity: SnO(l) for γSnO in liquid slag
+    - observation_id: takeda_1990_t3_row_b_7
+      type: context
+      locator:
+        published_page: 796
+        pdf_page_index: 3
+        table: '3'
+        note: Test B 7
+      units: mass% for slag and metal composition; log pO2 dimensionless as printed
+      values:
+        temperature_K: 1573
+        log_pO2: -12.12
+        slag_Sn_mass_percent: 0.35
+        slag_CaO_mass_percent: 24.6
+        slag_SiO2_mass_percent: 51.3
+        slag_Fe2plus_mass_percent: 17.0
+        slag_Fe3plus_mass_percent: 0.7
+        metal_Sn_mass_percent: 29.8
+        metal_Fe_mass_percent: 71.2
+        test_no: B 7
+        table: '3'
+        quantity: table_equilibrium_composition_and_oxygen_potential
+        method_class: measured_tabulated
+        composition_basis: mass percent as printed
+        standard_state_related_quantity: SnO(l) for γSnO in liquid slag
+    - observation_id: takeda_1990_t3_row_b_8
+      type: context
+      locator:
+        published_page: 796
+        pdf_page_index: 3
+        table: '3'
+        note: Test b 8
+      units: mass% for slag and metal composition; log pO2 dimensionless as printed
+      values:
+        temperature_K: 1573
+        log_pO2: -10.78
+        slag_Sn_mass_percent: 3.3
+        slag_CaO_mass_percent: 7.3
+        slag_SiO2_mass_percent: 16.3
+        slag_Fe2plus_mass_percent: 50.2
+        slag_Fe3plus_mass_percent: 5.2
+        metal_Sn_mass_percent: 29.9
+        metal_Fe_mass_percent: 70.1
+        test_no: b 8
+        table: '3'
+        quantity: table_equilibrium_composition_and_oxygen_potential
+        method_class: measured_tabulated
+        composition_basis: mass percent as printed
+        standard_state_related_quantity: SnO(l) for γSnO in liquid slag
+    - observation_id: takeda_1990_t3_row_e_9
+      type: context
+      locator:
+        published_page: 796
+        pdf_page_index: 3
+        table: '3'
+        note: Test E 9
+      units: mass% for slag and metal composition; log pO2 dimensionless as printed
+      values:
+        temperature_K: 1573
+        log_pO2: -11.1
+        slag_Sn_mass_percent: 0.75
+        slag_CaO_mass_percent: 25.1
+        slag_SiO2_mass_percent: 33.9
+        slag_Fe2plus_mass_percent: 28.5
+        slag_Fe3plus_mass_percent: 2.2
+        metal_Sn_mass_percent: 31.2
+        metal_Fe_mass_percent: 68.5
+        test_no: E 9
+        table: '3'
+        quantity: table_equilibrium_composition_and_oxygen_potential
+        method_class: measured_tabulated
+        composition_basis: mass percent as printed
+        standard_state_related_quantity: SnO(l) for γSnO in liquid slag
+    - observation_id: takeda_1990_t3_row_c_10
+      type: context
+      locator:
+        published_page: 796
+        pdf_page_index: 3
+        table: '3'
+        note: Test C 10
+      units: mass% for slag and metal composition; log pO2 dimensionless as printed
+      values:
+        temperature_K: 1573
+        log_pO2: -11.5
+        slag_Sn_mass_percent: 0.4
+        slag_CaO_mass_percent: 34.8
+        slag_SiO2_mass_percent: 38.7
+        slag_Fe2plus_mass_percent: 18.3
+        slag_Fe3plus_mass_percent: 1.0
+        metal_Sn_mass_percent: 31.1
+        metal_Fe_mass_percent: 69.0
+        test_no: C 10
+        table: '3'
+        quantity: table_equilibrium_composition_and_oxygen_potential
+        method_class: measured_tabulated
+        composition_basis: mass percent as printed
+        standard_state_related_quantity: SnO(l) for γSnO in liquid slag
+    - observation_id: takeda_1990_t3_row_c_11
+      type: context
+      locator:
+        published_page: 796
+        pdf_page_index: 3
+        table: '3'
+        note: Test c 11
+      units: mass% for slag and metal composition; log pO2 dimensionless as printed
+      values:
+        temperature_K: 1573
+        log_pO2: -10.78
+        slag_Sn_mass_percent: 2.8
+        slag_CaO_mass_percent: 13.8
+        slag_SiO2_mass_percent: 15.3
+        slag_Fe2plus_mass_percent: 44.8
+        slag_Fe3plus_mass_percent: 6.1
+        metal_Sn_mass_percent: 28.5
+        metal_Fe_mass_percent: 69.9
+        test_no: c 11
+        table: '3'
+        quantity: table_equilibrium_composition_and_oxygen_potential
+        method_class: measured_tabulated
+        composition_basis: mass percent as printed
+        standard_state_related_quantity: SnO(l) for γSnO in liquid slag
+    - observation_id: takeda_1990_t3_row_d_12
+      type: context
+      locator:
+        published_page: 796
+        pdf_page_index: 3
+        table: '3'
+        note: Test D 12
+      units: mass% for slag and metal composition; log pO2 dimensionless as printed
+      values:
+        temperature_K: 1573
+        log_pO2: -11.16
+        slag_Sn_mass_percent: 3.5
+        slag_CaO_mass_percent: 22.3
+        slag_SiO2_mass_percent: 0
+        slag_Fe2plus_mass_percent: 42.8
+        slag_Fe3plus_mass_percent: 12.3
+        metal_Sn_mass_percent: 30.1
+        metal_Fe_mass_percent: 69.0
+        test_no: D 12
+        table: '3'
+        quantity: table_equilibrium_composition_and_oxygen_potential
+        method_class: measured_tabulated
+        composition_basis: mass percent as printed
+        standard_state_related_quantity: SnO(l) for γSnO in liquid slag
+    - observation_id: takeda_1990_t3_row_d_13
+      type: context
+      locator:
+        published_page: 796
+        pdf_page_index: 3
+        table: '3'
+        note: Test d 13
+      units: mass% for slag and metal composition; log pO2 dimensionless as printed
+      values:
+        temperature_K: 1573
+        log_pO2: -10.84
+        slag_Sn_mass_percent: 3.9
+        slag_CaO_mass_percent: 10.4
+        slag_SiO2_mass_percent: 0
+        slag_Fe2plus_mass_percent: 53.2
+        slag_Fe3plus_mass_percent: 11.0
+        metal_Sn_mass_percent: 31.1
+        metal_Fe_mass_percent: 69.3
+        test_no: d 13
+        table: '3'
+        quantity: table_equilibrium_composition_and_oxygen_potential
+        method_class: measured_tabulated
+        composition_basis: mass percent as printed
+        standard_state_related_quantity: SnO(l) for γSnO in liquid slag
+    - observation_id: takeda_1990_t3_row_f_14
+      type: context
+      locator:
+        published_page: 796
+        pdf_page_index: 3
+        table: '3'
+        note: Test f 14
+      units: mass% for slag and metal composition; log pO2 dimensionless as printed
+      values:
+        temperature_K: 1673
+        log_pO2: -9.8
+        slag_Sn_mass_percent: 2.2
+        slag_CaO_mass_percent: 0
+        slag_SiO2_mass_percent: 0
+        slag_Fe2plus_mass_percent: 68.0
+        slag_Fe3plus_mass_percent: 6.2
+        metal_Sn_mass_percent: 16.5
+        metal_Fe_mass_percent: 84.0
+        test_no: f 14
+        table: '3'
+        quantity: table_equilibrium_composition_and_oxygen_potential
+        method_class: measured_tabulated
+        composition_basis: mass percent as printed
+        standard_state_related_quantity: SnO(l) for γSnO in liquid slag
+    - observation_id: takeda_1990_t3_row_f_15
+      type: context
+      locator:
+        published_page: 796
+        pdf_page_index: 3
+        table: '3'
+        note: Test f 15
+      units: mass% for slag and metal composition; log pO2 dimensionless as printed
+      values:
+        temperature_K: 1673
+        log_pO2: -9.79
+        slag_Sn_mass_percent: 2.4
+        slag_CaO_mass_percent: 0
+        slag_SiO2_mass_percent: 0
+        slag_Fe2plus_mass_percent: 68.5
+        slag_Fe3plus_mass_percent: 6.0
+        metal_Sn_mass_percent: 16.8
+        metal_Fe_mass_percent: 83.1
+        test_no: f 15
+        table: '3'
+        quantity: table_equilibrium_composition_and_oxygen_potential
+        method_class: measured_tabulated
+        composition_basis: mass percent as printed
+        standard_state_related_quantity: SnO(l) for γSnO in liquid slag
+    - observation_id: takeda_1990_t4_row_a_a16
+      type: context
+      locator:
+        published_page: 796
+        pdf_page_index: 3
+        table: '4'
+        note: Test A-a16
+      units: mass% for slag and metal composition; log pO2 dimensionless as printed
+      values:
+        temperature_K: 1573
+        log_pO2: -11.11
+        slag_Sn_mass_percent: 4.1
+        slag_CaO_mass_percent: 0
+        slag_MgO_mass_percent: 5.1
+        slag_SiO2_mass_percent: 35.7
+        slag_Fe2plus_mass_percent_as_printed: 39.2
+        slag_Fe3plus_mass_percent: 2.2
+        test_no: A-a16
+        table: '4'
+        quantity: table_equilibrium_composition_and_oxygen_potential
+        method_class: measured_tabulated
+        composition_basis: mass percent as printed
+        standard_state_related_quantity: SnO(l) for γSnO in liquid slag
+        first_coexisting_metal_phase_Sn_mass_percent: 80.0
+        second_coexisting_metal_phase_Sn_mass_percent: 53.0
+        Sn_activity_at_miscibility_gap: 0.8
+        coexisting_metal_phases_as_printed: 80 mass% Sn-Fe and 53 mass% Sn-Fe
+    - observation_id: takeda_1990_t4_row_17
+      type: context
+      locator:
+        published_page: 796
+        pdf_page_index: 3
+        table: '4'
+        note: Test 17
+      units: mass% for slag and metal composition; log pO2 dimensionless as printed
+      values:
+        temperature_K: 1573
+        log_pO2: -10.94
+        slag_Sn_mass_percent: 5.8
+        slag_CaO_mass_percent: 0
+        slag_MgO_mass_percent: 4.5
+        slag_SiO2_mass_percent: 28.0
+        slag_Fe2plus_mass_percent_as_printed: 44.1
+        slag_Fe3plus_mass_percent: 3.4
+        test_no: '17'
+        table: '4'
+        quantity: table_equilibrium_composition_and_oxygen_potential
+        method_class: measured_tabulated
+        composition_basis: mass percent as printed
+        standard_state_related_quantity: SnO(l) for γSnO in liquid slag
+        first_coexisting_metal_phase_Sn_mass_percent: 80.0
+        second_coexisting_metal_phase_Sn_mass_percent: 53.0
+        Sn_activity_at_miscibility_gap: 0.8
+        coexisting_metal_phases_as_printed: 80 mass% Sn-Fe and 53 mass% Sn-Fe
+    - observation_id: takeda_1990_t4_row_18
+      type: context
+      locator:
+        published_page: 796
+        pdf_page_index: 3
+        table: '4'
+        note: Test 18
+      units: mass% for slag and metal composition; log pO2 dimensionless as printed
+      values:
+        temperature_K: 1573
+        log_pO2: -10.8
+        slag_Sn_mass_percent: 6.3
+        slag_CaO_mass_percent: 0
+        slag_MgO_mass_percent: 4.3
+        slag_SiO2_mass_percent: 23.3
+        slag_Fe2plus_mass_percent_as_printed: 46.0
+        slag_Fe3plus_mass_percent: 4.3
+        test_no: '18'
+        table: '4'
+        quantity: table_equilibrium_composition_and_oxygen_potential
+        method_class: measured_tabulated
+        composition_basis: mass percent as printed
+        standard_state_related_quantity: SnO(l) for γSnO in liquid slag
+        first_coexisting_metal_phase_Sn_mass_percent: 80.0
+        second_coexisting_metal_phase_Sn_mass_percent: 53.0
+        Sn_activity_at_miscibility_gap: 0.8
+        coexisting_metal_phases_as_printed: 80 mass% Sn-Fe and 53 mass% Sn-Fe
+    - observation_id: takeda_1990_t4_row_19
+      type: context
+      locator:
+        published_page: 796
+        pdf_page_index: 3
+        table: '4'
+        note: Test 19
+      units: mass% for slag and metal composition; log pO2 dimensionless as printed
+      values:
+        temperature_K: 1573
+        log_pO2: -10.75
+        slag_Sn_mass_percent: 6.8
+        slag_CaO_mass_percent: 0
+        slag_MgO_mass_percent: 3.8
+        slag_SiO2_mass_percent: 19.1
+        slag_Fe2plus_mass_percent_as_printed: 48.4
+        slag_Fe3plus_mass_percent: 5.0
+        test_no: '19'
+        table: '4'
+        quantity: table_equilibrium_composition_and_oxygen_potential
+        method_class: measured_tabulated
+        composition_basis: mass percent as printed
+        standard_state_related_quantity: SnO(l) for γSnO in liquid slag
+        first_coexisting_metal_phase_Sn_mass_percent: 80.0
+        second_coexisting_metal_phase_Sn_mass_percent: 53.0
+        Sn_activity_at_miscibility_gap: 0.8
+        coexisting_metal_phases_as_printed: 80 mass% Sn-Fe and 53 mass% Sn-Fe
+    - observation_id: takeda_1990_t4_row_20
+      type: context
+      locator:
+        published_page: 796
+        pdf_page_index: 3
+        table: '4'
+        note: Test 20
+      units: mass% for slag and metal composition; log pO2 dimensionless as printed
+      values:
+        temperature_K: 1573
+        log_pO2: -10.65
+        slag_Sn_mass_percent: 7.2
+        slag_CaO_mass_percent: 0
+        slag_MgO_mass_percent: 3.3
+        slag_SiO2_mass_percent: 15.3
+        slag_Fe2plus_mass_percent_as_printed: 49.5
+        slag_Fe3plus_mass_percent: 6.8
+        test_no: '20'
+        table: '4'
+        quantity: table_equilibrium_composition_and_oxygen_potential
+        method_class: measured_tabulated
+        composition_basis: mass percent as printed
+        standard_state_related_quantity: SnO(l) for γSnO in liquid slag
+        first_coexisting_metal_phase_Sn_mass_percent: 80.0
+        second_coexisting_metal_phase_Sn_mass_percent: 53.0
+        Sn_activity_at_miscibility_gap: 0.8
+        coexisting_metal_phases_as_printed: 80 mass% Sn-Fe and 53 mass% Sn-Fe
+    - observation_id: takeda_1990_t4_row_b_b21
+      type: context
+      locator:
+        published_page: 796
+        pdf_page_index: 3
+        table: '4'
+        note: Test B-b21
+      units: mass% for slag and metal composition; log pO2 dimensionless as printed
+      values:
+        temperature_K: 1573
+        log_pO2: -11.76
+        slag_Sn_mass_percent: 0.8
+        slag_CaO_mass_percent: 22.1
+        slag_MgO_mass_percent: 7.3
+        slag_SiO2_mass_percent: 46.8
+        slag_Fe2plus_mass_percent_as_printed: 16.1
+        slag_Fe3plus_mass_percent: 1.2
+        test_no: B-b21
+        table: '4'
+        quantity: table_equilibrium_composition_and_oxygen_potential
+        method_class: measured_tabulated
+        composition_basis: mass percent as printed
+        standard_state_related_quantity: SnO(l) for γSnO in liquid slag
+        first_coexisting_metal_phase_Sn_mass_percent: 80.0
+        second_coexisting_metal_phase_Sn_mass_percent: 53.0
+        Sn_activity_at_miscibility_gap: 0.8
+        coexisting_metal_phases_as_printed: 80 mass% Sn-Fe and 53 mass% Sn-Fe
+    - observation_id: takeda_1990_t4_row_22
+      type: context
+      locator:
+        published_page: 796
+        pdf_page_index: 3
+        table: '4'
+        note: Test 22
+      units: mass% for slag and metal composition; log pO2 dimensionless as printed
+      values:
+        temperature_K: 1573
+        log_pO2: -11.35
+        slag_Sn_mass_percent: 1.6
+        slag_CaO_mass_percent: 19.2
+        slag_MgO_mass_percent: 7.1
+        slag_SiO2_mass_percent: 41.1
+        slag_Fe2plus_mass_percent_as_printed: 19.4
+        slag_Fe3plus_mass_percent: 2.2
+        test_no: '22'
+        table: '4'
+        quantity: table_equilibrium_composition_and_oxygen_potential
+        method_class: measured_tabulated
+        composition_basis: mass percent as printed
+        standard_state_related_quantity: SnO(l) for γSnO in liquid slag
+        first_coexisting_metal_phase_Sn_mass_percent: 80.0
+        second_coexisting_metal_phase_Sn_mass_percent: 53.0
+        Sn_activity_at_miscibility_gap: 0.8
+        coexisting_metal_phases_as_printed: 80 mass% Sn-Fe and 53 mass% Sn-Fe
+    - observation_id: takeda_1990_t4_row_23
+      type: context
+      locator:
+        published_page: 796
+        pdf_page_index: 3
+        table: '4'
+        note: Test 23
+      units: mass% for slag and metal composition; log pO2 dimensionless as printed
+      values:
+        temperature_K: 1573
+        log_pO2: -11.1
+        slag_Sn_mass_percent: 2.4
+        slag_CaO_mass_percent: 17.1
+        slag_MgO_mass_percent: 6.3
+        slag_SiO2_mass_percent: 35.9
+        slag_Fe2plus_mass_percent_as_printed: 25.2
+        slag_Fe3plus_mass_percent: 3.0
+        test_no: '23'
+        table: '4'
+        quantity: table_equilibrium_composition_and_oxygen_potential
+        method_class: measured_tabulated
+        composition_basis: mass percent as printed
+        standard_state_related_quantity: SnO(l) for γSnO in liquid slag
+        first_coexisting_metal_phase_Sn_mass_percent: 80.0
+        second_coexisting_metal_phase_Sn_mass_percent: 53.0
+        Sn_activity_at_miscibility_gap: 0.8
+        coexisting_metal_phases_as_printed: 80 mass% Sn-Fe and 53 mass% Sn-Fe
+    - observation_id: takeda_1990_t4_row_24
+      type: context
+      locator:
+        published_page: 796
+        pdf_page_index: 3
+        table: '4'
+        note: Test 24
+      units: mass% for slag and metal composition; log pO2 dimensionless as printed
+      values:
+        temperature_K: 1573
+        log_pO2: -10.88
+        slag_Sn_mass_percent: 2.5
+        slag_CaO_mass_percent: 13.7
+        slag_MgO_mass_percent: 6.5
+        slag_SiO2_mass_percent: 31.6
+        slag_Fe2plus_mass_percent_as_printed: 29.7
+        slag_Fe3plus_mass_percent: 4.4
+        test_no: '24'
+        table: '4'
+        quantity: table_equilibrium_composition_and_oxygen_potential
+        method_class: measured_tabulated
+        composition_basis: mass percent as printed
+        standard_state_related_quantity: SnO(l) for γSnO in liquid slag
+        first_coexisting_metal_phase_Sn_mass_percent: 80.0
+        second_coexisting_metal_phase_Sn_mass_percent: 53.0
+        Sn_activity_at_miscibility_gap: 0.8
+        coexisting_metal_phases_as_printed: 80 mass% Sn-Fe and 53 mass% Sn-Fe
+    - observation_id: takeda_1990_t4_row_25
+      type: context
+      locator:
+        published_page: 796
+        pdf_page_index: 3
+        table: '4'
+        note: Test 25
+      units: mass% for slag and metal composition; log pO2 dimensionless as printed
+      values:
+        temperature_K: 1573
+        log_pO2: -10.79
+        slag_Sn_mass_percent: 4.8
+        slag_CaO_mass_percent: 13.0
+        slag_MgO_mass_percent: 3.9
+        slag_SiO2_mass_percent: 27.0
+        slag_Fe2plus_mass_percent_as_printed: 32.1
+        slag_Fe3plus_mass_percent: 5.8
+        test_no: '25'
+        table: '4'
+        quantity: table_equilibrium_composition_and_oxygen_potential
+        method_class: measured_tabulated
+        composition_basis: mass percent as printed
+        standard_state_related_quantity: SnO(l) for γSnO in liquid slag
+        first_coexisting_metal_phase_Sn_mass_percent: 80.0
+        second_coexisting_metal_phase_Sn_mass_percent: 53.0
+        Sn_activity_at_miscibility_gap: 0.8
+        coexisting_metal_phases_as_printed: 80 mass% Sn-Fe and 53 mass% Sn-Fe
+    - observation_id: takeda_1990_t4_row_26
+      type: context
+      locator:
+        published_page: 796
+        pdf_page_index: 3
+        table: '4'
+        note: Test 26
+      units: mass% for slag and metal composition; log pO2 dimensionless as printed
+      values:
+        temperature_K: 1573
+        log_pO2: -10.72
+        slag_Sn_mass_percent: 6.0
+        slag_CaO_mass_percent: 7.9
+        slag_MgO_mass_percent: 2.5
+        slag_SiO2_mass_percent: 20.3
+        slag_Fe2plus_mass_percent_as_printed: 37.8
+        slag_Fe3plus_mass_percent: 8.4
+        test_no: '26'
+        table: '4'
+        quantity: table_equilibrium_composition_and_oxygen_potential
+        method_class: measured_tabulated
+        composition_basis: mass percent as printed
+        standard_state_related_quantity: SnO(l) for γSnO in liquid slag
+        first_coexisting_metal_phase_Sn_mass_percent: 80.0
+        second_coexisting_metal_phase_Sn_mass_percent: 53.0
+        Sn_activity_at_miscibility_gap: 0.8
+        coexisting_metal_phases_as_printed: 80 mass% Sn-Fe and 53 mass% Sn-Fe
+    - observation_id: takeda_1990_t4_row_e27
+      type: context
+      locator:
+        published_page: 796
+        pdf_page_index: 3
+        table: '4'
+        note: Test E27
+      units: mass% for slag and metal composition; log pO2 dimensionless as printed
+      values:
+        temperature_K: 1573
+        log_pO2: -10.81
+        slag_Sn_mass_percent: 2.2
+        slag_CaO_mass_percent: 23.4
+        slag_MgO_mass_percent: 6.5
+        slag_SiO2_mass_percent: 29.1
+        slag_Fe2plus_mass_percent_as_printed: 25.1
+        slag_Fe3plus_mass_percent: 2.5
+        test_no: E27
+        table: '4'
+        quantity: table_equilibrium_composition_and_oxygen_potential
+        method_class: measured_tabulated
+        composition_basis: mass percent as printed
+        standard_state_related_quantity: SnO(l) for γSnO in liquid slag
+        first_coexisting_metal_phase_Sn_mass_percent: 80.0
+        second_coexisting_metal_phase_Sn_mass_percent: 53.0
+        Sn_activity_at_miscibility_gap: 0.8
+        coexisting_metal_phases_as_printed: 80 mass% Sn-Fe and 53 mass% Sn-Fe
+    - observation_id: takeda_1990_t4_row_28
+      type: context
+      locator:
+        published_page: 796
+        pdf_page_index: 3
+        table: '4'
+        note: Test 28
+      units: mass% for slag and metal composition; log pO2 dimensionless as printed
+      values:
+        temperature_K: 1573
+        log_pO2: -10.84
+        slag_Sn_mass_percent: 2.1
+        slag_CaO_mass_percent: 21.3
+        slag_MgO_mass_percent: 6.9
+        slag_SiO2_mass_percent: 31.7
+        slag_Fe2plus_mass_percent_as_printed: 25.7
+        slag_Fe3plus_mass_percent: 2.7
+        test_no: '28'
+        table: '4'
+        quantity: table_equilibrium_composition_and_oxygen_potential
+        method_class: measured_tabulated
+        composition_basis: mass percent as printed
+        standard_state_related_quantity: SnO(l) for γSnO in liquid slag
+        first_coexisting_metal_phase_Sn_mass_percent: 80.0
+        second_coexisting_metal_phase_Sn_mass_percent: 53.0
+        Sn_activity_at_miscibility_gap: 0.8
+        coexisting_metal_phases_as_printed: 80 mass% Sn-Fe and 53 mass% Sn-Fe
+    - observation_id: takeda_1990_t4_row_29
+      type: context
+      locator:
+        published_page: 796
+        pdf_page_index: 3
+        table: '4'
+        note: Test 29
+      units: mass% for slag and metal composition; log pO2 dimensionless as printed
+      values:
+        temperature_K: 1573
+        log_pO2: -10.87
+        slag_Sn_mass_percent: 2.1
+        slag_CaO_mass_percent: 21.5
+        slag_MgO_mass_percent: 6.7
+        slag_SiO2_mass_percent: 31.2
+        slag_Fe2plus_mass_percent_as_printed: 25.7
+        slag_Fe3plus_mass_percent: 2.7
+        test_no: '29'
+        table: '4'
+        quantity: table_equilibrium_composition_and_oxygen_potential
+        method_class: measured_tabulated
+        composition_basis: mass percent as printed
+        standard_state_related_quantity: SnO(l) for γSnO in liquid slag
+        first_coexisting_metal_phase_Sn_mass_percent: 80.0
+        second_coexisting_metal_phase_Sn_mass_percent: 53.0
+        Sn_activity_at_miscibility_gap: 0.8
+        coexisting_metal_phases_as_printed: 80 mass% Sn-Fe and 53 mass% Sn-Fe
+    - observation_id: takeda_1990_t4_row_c_c30
+      type: context
+      locator:
+        published_page: 796
+        pdf_page_index: 3
+        table: '4'
+        note: Test C-c30
+      units: mass% for slag and metal composition; log pO2 dimensionless as printed
+      values:
+        temperature_K: 1573
+        log_pO2: -11.19
+        slag_Sn_mass_percent: 1.2
+        slag_CaO_mass_percent: 35.1
+        slag_MgO_mass_percent: 4.5
+        slag_SiO2_mass_percent: 34.9
+        slag_Fe2plus_mass_percent_as_printed: 16.6
+        slag_Fe3plus_mass_percent: 1.6
+        test_no: C-c30
+        table: '4'
+        quantity: table_equilibrium_composition_and_oxygen_potential
+        method_class: measured_tabulated
+        composition_basis: mass percent as printed
+        standard_state_related_quantity: SnO(l) for γSnO in liquid slag
+        first_coexisting_metal_phase_Sn_mass_percent: 80.0
+        second_coexisting_metal_phase_Sn_mass_percent: 53.0
+        Sn_activity_at_miscibility_gap: 0.8
+        coexisting_metal_phases_as_printed: 80 mass% Sn-Fe and 53 mass% Sn-Fe
+    - observation_id: takeda_1990_t4_row_31
+      type: context
+      locator:
+        published_page: 796
+        pdf_page_index: 3
+        table: '4'
+        note: Test 31
+      units: mass% for slag and metal composition; log pO2 dimensionless as printed
+      values:
+        temperature_K: 1573
+        log_pO2: -11.08
+        slag_Sn_mass_percent: 1.1
+        slag_CaO_mass_percent: 33.4
+        slag_MgO_mass_percent: 4.6
+        slag_SiO2_mass_percent: 36.4
+        slag_Fe2plus_mass_percent_as_printed: 17.5
+        slag_Fe3plus_mass_percent: 1.3
+        test_no: '31'
+        table: '4'
+        quantity: table_equilibrium_composition_and_oxygen_potential
+        method_class: measured_tabulated
+        composition_basis: mass percent as printed
+        standard_state_related_quantity: SnO(l) for γSnO in liquid slag
+        first_coexisting_metal_phase_Sn_mass_percent: 80.0
+        second_coexisting_metal_phase_Sn_mass_percent: 53.0
+        Sn_activity_at_miscibility_gap: 0.8
+        coexisting_metal_phases_as_printed: 80 mass% Sn-Fe and 53 mass% Sn-Fe
+    - observation_id: takeda_1990_t4_row_32
+      type: context
+      locator:
+        published_page: 796
+        pdf_page_index: 3
+        table: '4'
+        note: Test 32
+      units: mass% for slag and metal composition; log pO2 dimensionless as printed
+      values:
+        temperature_K: 1573
+        log_pO2: -10.98
+        slag_Sn_mass_percent: 1.4
+        slag_CaO_mass_percent: 33.1
+        slag_MgO_mass_percent: 4.3
+        slag_SiO2_mass_percent: 33.2
+        slag_Fe2plus_mass_percent_as_printed: 19.3
+        slag_Fe3plus_mass_percent: 1.7
+        test_no: '32'
+        table: '4'
+        quantity: table_equilibrium_composition_and_oxygen_potential
+        method_class: measured_tabulated
+        composition_basis: mass percent as printed
+        standard_state_related_quantity: SnO(l) for γSnO in liquid slag
+        first_coexisting_metal_phase_Sn_mass_percent: 80.0
+        second_coexisting_metal_phase_Sn_mass_percent: 53.0
+        Sn_activity_at_miscibility_gap: 0.8
+        coexisting_metal_phases_as_printed: 80 mass% Sn-Fe and 53 mass% Sn-Fe
+    - observation_id: takeda_1990_t4_row_33
+      type: context
+      locator:
+        published_page: 796
+        pdf_page_index: 3
+        table: '4'
+        note: Test 33
+      units: mass% for slag and metal composition; log pO2 dimensionless as printed
+      values:
+        temperature_K: 1573
+        log_pO2: -10.77
+        slag_Sn_mass_percent: 2.4
+        slag_CaO_mass_percent: 27.9
+        slag_MgO_mass_percent: 5.0
+        slag_SiO2_mass_percent: 28.1
+        slag_Fe2plus_mass_percent_as_printed: 24.1
+        slag_Fe3plus_mass_percent: 3.2
+        test_no: '33'
+        table: '4'
+        quantity: table_equilibrium_composition_and_oxygen_potential
+        method_class: measured_tabulated
+        composition_basis: mass percent as printed
+        standard_state_related_quantity: SnO(l) for γSnO in liquid slag
+        first_coexisting_metal_phase_Sn_mass_percent: 80.0
+        second_coexisting_metal_phase_Sn_mass_percent: 53.0
+        Sn_activity_at_miscibility_gap: 0.8
+        coexisting_metal_phases_as_printed: 80 mass% Sn-Fe and 53 mass% Sn-Fe
+    - observation_id: takeda_1990_t4_row_34
+      type: context
+      locator:
+        published_page: 796
+        pdf_page_index: 3
+        table: '4'
+        note: Test 34
+      units: mass% for slag and metal composition; log pO2 dimensionless as printed
+      values:
+        temperature_K: 1573
+        log_pO2: -10.76
+        slag_Sn_mass_percent: 3.2
+        slag_CaO_mass_percent: 24.3
+        slag_MgO_mass_percent: 3.8
+        slag_SiO2_mass_percent: 24.8
+        slag_Fe2plus_mass_percent_as_printed: 28.3
+        slag_Fe3plus_mass_percent: 3.9
+        test_no: '34'
+        table: '4'
+        quantity: table_equilibrium_composition_and_oxygen_potential
+        method_class: measured_tabulated
+        composition_basis: mass percent as printed
+        standard_state_related_quantity: SnO(l) for γSnO in liquid slag
+        first_coexisting_metal_phase_Sn_mass_percent: 80.0
+        second_coexisting_metal_phase_Sn_mass_percent: 53.0
+        Sn_activity_at_miscibility_gap: 0.8
+        coexisting_metal_phases_as_printed: 80 mass% Sn-Fe and 53 mass% Sn-Fe
+    - observation_id: takeda_1990_t4_row_35
+      type: context
+      locator:
+        published_page: 796
+        pdf_page_index: 3
+        table: '4'
+        note: Test 35
+      units: mass% for slag and metal composition; log pO2 dimensionless as printed
+      values:
+        temperature_K: 1573
+        log_pO2: -10.69
+        slag_Sn_mass_percent: 4.3
+        slag_CaO_mass_percent: 19.3
+        slag_MgO_mass_percent: 2.2
+        slag_SiO2_mass_percent: 21.3
+        slag_Fe2plus_mass_percent_as_printed: 36.2
+        slag_Fe3plus_mass_percent: 4.8
+        test_no: '35'
+        table: '4'
+        quantity: table_equilibrium_composition_and_oxygen_potential
+        method_class: measured_tabulated
+        composition_basis: mass percent as printed
+        standard_state_related_quantity: SnO(l) for γSnO in liquid slag
+        first_coexisting_metal_phase_Sn_mass_percent: 80.0
+        second_coexisting_metal_phase_Sn_mass_percent: 53.0
+        Sn_activity_at_miscibility_gap: 0.8
+        coexisting_metal_phases_as_printed: 80 mass% Sn-Fe and 53 mass% Sn-Fe
+    - observation_id: takeda_1990_t4_row_36
+      type: context
+      locator:
+        published_page: 796
+        pdf_page_index: 3
+        table: '4'
+        note: Test 36
+      units: mass% for slag and metal composition; log pO2 dimensionless as printed
+      values:
+        temperature_K: 1573
+        log_pO2: -10.72
+        slag_Sn_mass_percent: 4.5
+        slag_CaO_mass_percent: 19.3
+        slag_MgO_mass_percent: 2.7
+        slag_SiO2_mass_percent: 20.9
+        slag_Fe2plus_mass_percent_as_printed: 34.2
+        slag_Fe3plus_mass_percent: 5.0
+        test_no: '36'
+        table: '4'
+        quantity: table_equilibrium_composition_and_oxygen_potential
+        method_class: measured_tabulated
+        composition_basis: mass percent as printed
+        standard_state_related_quantity: SnO(l) for γSnO in liquid slag
+        first_coexisting_metal_phase_Sn_mass_percent: 80.0
+        second_coexisting_metal_phase_Sn_mass_percent: 53.0
+        Sn_activity_at_miscibility_gap: 0.8
+        coexisting_metal_phases_as_printed: 80 mass% Sn-Fe and 53 mass% Sn-Fe
+    - observation_id: takeda_1990_t4_row_37
+      type: context
+      locator:
+        published_page: 796
+        pdf_page_index: 3
+        table: '4'
+        note: Test 37
+      units: mass% for slag and metal composition; log pO2 dimensionless as printed
+      values:
+        temperature_K: 1573
+        log_pO2: -10.65
+        slag_Sn_mass_percent: 4.9
+        slag_CaO_mass_percent: 17.3
+        slag_MgO_mass_percent: 2.7
+        slag_SiO2_mass_percent: 18.1
+        slag_Fe2plus_mass_percent_as_printed: 36.7
+        slag_Fe3plus_mass_percent: 5.9
+        test_no: '37'
+        table: '4'
+        quantity: table_equilibrium_composition_and_oxygen_potential
+        method_class: measured_tabulated
+        composition_basis: mass percent as printed
+        standard_state_related_quantity: SnO(l) for γSnO in liquid slag
+        first_coexisting_metal_phase_Sn_mass_percent: 80.0
+        second_coexisting_metal_phase_Sn_mass_percent: 53.0
+        Sn_activity_at_miscibility_gap: 0.8
+        coexisting_metal_phases_as_printed: 80 mass% Sn-Fe and 53 mass% Sn-Fe
+    - observation_id: takeda_1990_t4_row_d_d38
+      type: context
+      locator:
+        published_page: 796
+        pdf_page_index: 3
+        table: '4'
+        note: Test D-d38
+      units: mass% for slag and metal composition; log pO2 dimensionless as printed
+      values:
+        temperature_K: 1573
+        log_pO2: -11.15
+        slag_Sn_mass_percent: 6.4
+        slag_CaO_mass_percent: 27.0
+        slag_MgO_mass_percent: 1.5
+        slag_SiO2_mass_percent: 0
+        slag_Fe2plus_mass_percent_as_printed: 33.8
+        slag_Fe3plus_mass_percent: 12.9
+        test_no: D-d38
+        table: '4'
+        quantity: table_equilibrium_composition_and_oxygen_potential
+        method_class: measured_tabulated
+        composition_basis: mass percent as printed
+        standard_state_related_quantity: SnO(l) for γSnO in liquid slag
+        first_coexisting_metal_phase_Sn_mass_percent: 80.0
+        second_coexisting_metal_phase_Sn_mass_percent: 53.0
+        Sn_activity_at_miscibility_gap: 0.8
+        coexisting_metal_phases_as_printed: 80 mass% Sn-Fe and 53 mass% Sn-Fe
+    - observation_id: takeda_1990_t4_row_39
+      type: context
+      locator:
+        published_page: 796
+        pdf_page_index: 3
+        table: '4'
+        note: Test 39
+      units: mass% for slag and metal composition; log pO2 dimensionless as printed
+      values:
+        temperature_K: 1573
+        log_pO2: -11.03
+        slag_Sn_mass_percent: 7.0
+        slag_CaO_mass_percent: 23.0
+        slag_MgO_mass_percent: 1.2
+        slag_SiO2_mass_percent: 0
+        slag_Fe2plus_mass_percent_as_printed: 36.5
+        slag_Fe3plus_mass_percent: 13.5
+        test_no: '39'
+        table: '4'
+        quantity: table_equilibrium_composition_and_oxygen_potential
+        method_class: measured_tabulated
+        composition_basis: mass percent as printed
+        standard_state_related_quantity: SnO(l) for γSnO in liquid slag
+        first_coexisting_metal_phase_Sn_mass_percent: 80.0
+        second_coexisting_metal_phase_Sn_mass_percent: 53.0
+        Sn_activity_at_miscibility_gap: 0.8
+        coexisting_metal_phases_as_printed: 80 mass% Sn-Fe and 53 mass% Sn-Fe
+    - observation_id: takeda_1990_t4_row_40
+      type: context
+      locator:
+        published_page: 796
+        pdf_page_index: 3
+        table: '4'
+        note: Test 40
+      units: mass% for slag and metal composition; log pO2 dimensionless as printed
+      values:
+        temperature_K: 1573
+        log_pO2: -10.97
+        slag_Sn_mass_percent: 7.5
+        slag_CaO_mass_percent: 20.8
+        slag_MgO_mass_percent: 1.1
+        slag_SiO2_mass_percent: 0
+        slag_Fe2plus_mass_percent_as_printed: 37.8
+        slag_Fe3plus_mass_percent: 12.7
+        test_no: '40'
+        table: '4'
+        quantity: table_equilibrium_composition_and_oxygen_potential
+        method_class: measured_tabulated
+        composition_basis: mass percent as printed
+        standard_state_related_quantity: SnO(l) for γSnO in liquid slag
+        first_coexisting_metal_phase_Sn_mass_percent: 80.0
+        second_coexisting_metal_phase_Sn_mass_percent: 53.0
+        Sn_activity_at_miscibility_gap: 0.8
+        coexisting_metal_phases_as_printed: 80 mass% Sn-Fe and 53 mass% Sn-Fe
+    - observation_id: takeda_1990_t4_row_41
+      type: context
+      locator:
+        published_page: 796
+        pdf_page_index: 3
+        table: '4'
+        note: Test 41
+      units: mass% for slag and metal composition; log pO2 dimensionless as printed
+      values:
+        temperature_K: 1573
+        log_pO2: -10.95
+        slag_Sn_mass_percent: 7.9
+        slag_CaO_mass_percent: 21.3
+        slag_MgO_mass_percent: 1.1
+        slag_SiO2_mass_percent: 0
+        slag_Fe2plus_mass_percent_as_printed: 37.7
+        slag_Fe3plus_mass_percent: 13.3
+        test_no: '41'
+        table: '4'
+        quantity: table_equilibrium_composition_and_oxygen_potential
+        method_class: measured_tabulated
+        composition_basis: mass percent as printed
+        standard_state_related_quantity: SnO(l) for γSnO in liquid slag
+        first_coexisting_metal_phase_Sn_mass_percent: 80.0
+        second_coexisting_metal_phase_Sn_mass_percent: 53.0
+        Sn_activity_at_miscibility_gap: 0.8
+        coexisting_metal_phases_as_printed: 80 mass% Sn-Fe and 53 mass% Sn-Fe
+    - observation_id: takeda_1990_t4_row_42
+      type: context
+      locator:
+        published_page: 796
+        pdf_page_index: 3
+        table: '4'
+        note: Test 42
+      units: mass% for slag and metal composition; log pO2 dimensionless as printed
+      values:
+        temperature_K: 1573
+        log_pO2: -10.95
+        slag_Sn_mass_percent: 6.9
+        slag_CaO_mass_percent: 20.4
+        slag_MgO_mass_percent: 1.1
+        slag_SiO2_mass_percent: 0
+        slag_Fe2plus_mass_percent_as_printed: 38.2
+        slag_Fe3plus_mass_percent: 13.4
+        test_no: '42'
+        table: '4'
+        quantity: table_equilibrium_composition_and_oxygen_potential
+        method_class: measured_tabulated
+        composition_basis: mass percent as printed
+        standard_state_related_quantity: SnO(l) for γSnO in liquid slag
+        first_coexisting_metal_phase_Sn_mass_percent: 80.0
+        second_coexisting_metal_phase_Sn_mass_percent: 53.0
+        Sn_activity_at_miscibility_gap: 0.8
+        coexisting_metal_phases_as_printed: 80 mass% Sn-Fe and 53 mass% Sn-Fe
+    - observation_id: takeda_1990_t4_row_43
+      type: context
+      locator:
+        published_page: 796
+        pdf_page_index: 3
+        table: '4'
+        note: Test 43
+      units: mass% for slag and metal composition; log pO2 dimensionless as printed
+      values:
+        temperature_K: 1573
+        log_pO2: -10.76
+        slag_Sn_mass_percent: 7.6
+        slag_CaO_mass_percent: 14.9
+        slag_MgO_mass_percent: 0.8
+        slag_SiO2_mass_percent: 0
+        slag_Fe2plus_mass_percent_as_printed: 43.8
+        slag_Fe3plus_mass_percent: 13.3
+        test_no: '43'
+        table: '4'
+        quantity: table_equilibrium_composition_and_oxygen_potential
+        method_class: measured_tabulated
+        composition_basis: mass percent as printed
+        standard_state_related_quantity: SnO(l) for γSnO in liquid slag
+        first_coexisting_metal_phase_Sn_mass_percent: 80.0
+        second_coexisting_metal_phase_Sn_mass_percent: 53.0
+        Sn_activity_at_miscibility_gap: 0.8
+        coexisting_metal_phases_as_printed: 80 mass% Sn-Fe and 53 mass% Sn-Fe
+    - observation_id: takeda_1990_t4_row_44
+      type: context
+      locator:
+        published_page: 796
+        pdf_page_index: 3
+        table: '4'
+        note: Test 44
+      units: mass% for slag and metal composition; log pO2 dimensionless as printed
+      values:
+        temperature_K: 1573
+        log_pO2: -10.7
+        slag_Sn_mass_percent: 8.0
+        slag_CaO_mass_percent: 10.4
+        slag_MgO_mass_percent: 0.7
+        slag_SiO2_mass_percent: 0
+        slag_Fe2plus_mass_percent_as_printed: 48.7
+        slag_Fe3plus_mass_percent: 12.0
+        test_no: '44'
+        table: '4'
+        quantity: table_equilibrium_composition_and_oxygen_potential
+        method_class: measured_tabulated
+        composition_basis: mass percent as printed
+        standard_state_related_quantity: SnO(l) for γSnO in liquid slag
+        first_coexisting_metal_phase_Sn_mass_percent: 80.0
+        second_coexisting_metal_phase_Sn_mass_percent: 53.0
+        Sn_activity_at_miscibility_gap: 0.8
+        coexisting_metal_phases_as_printed: 80 mass% Sn-Fe and 53 mass% Sn-Fe
+    - observation_id: takeda_1990_t5_row_d_s45
+      type: context
+      locator:
+        published_page: 797
+        pdf_page_index: 4
+        table: '5'
+        note: Test D-S45
+      units: mass% for slag and metal composition; log pO2 dimensionless as printed
+      values:
+        temperature_K: 1473
+        slag_Sn_mass_percent: 7.9
+        slag_CaO_mass_percent: 23.2
+        slag_MgO_mass_percent: 0.6
+        slag_Fe2plus_mass_percent: 39.0
+        slag_Fe3plus_mass_percent: 11.4
+        metal_Sn_mass_percent: null
+        metal_Fe_mass_percent: null
+        test_no: D-S45
+        table: '5'
+        log_pO2: -12.03
+        sample_side_electrode: W
+        quantity: table_equilibrium_composition_and_oxygen_potential
+        method_class: measured_tabulated
+        composition_basis: mass percent as printed
+        standard_state_related_quantity: SnO(l) for γSnO in liquid slag
+    - observation_id: takeda_1990_t5_row_46
+      type: context
+      locator:
+        published_page: 797
+        pdf_page_index: 4
+        table: '5'
+        note: Test 46
+      units: mass% for slag and metal composition; log pO2 dimensionless as printed
+      values:
+        temperature_K: 1473
+        slag_Sn_mass_percent: 12.3
+        slag_CaO_mass_percent: 23.1
+        slag_MgO_mass_percent: 0.7
+        slag_Fe2plus_mass_percent: 30.6
+        slag_Fe3plus_mass_percent: 16.7
+        metal_Sn_mass_percent: null
+        metal_Fe_mass_percent: 4.8
+        test_no: '46'
+        table: '5'
+        log_pO2: -11.75
+        sample_side_electrode: LaCrO3
+        quantity: table_equilibrium_composition_and_oxygen_potential
+        method_class: measured_tabulated
+        composition_basis: mass percent as printed
+        standard_state_related_quantity: SnO(l) for γSnO in liquid slag
+    - observation_id: takeda_1990_t5_row_47
+      type: context
+      locator:
+        published_page: 797
+        pdf_page_index: 4
+        table: '5'
+        note: Test 47
+      units: mass% for slag and metal composition; log pO2 dimensionless as printed
+      values:
+        temperature_K: 1473
+        slag_Sn_mass_percent: 13.1
+        slag_CaO_mass_percent: 23.0
+        slag_MgO_mass_percent: 0.7
+        slag_Fe2plus_mass_percent: 30.6
+        slag_Fe3plus_mass_percent: 15.7
+        metal_Sn_mass_percent: null
+        metal_Fe_mass_percent: 3.1
+        test_no: '47'
+        table: '5'
+        log_pO2: -11.69
+        sample_side_electrode: LaCrO3
+        quantity: table_equilibrium_composition_and_oxygen_potential
+        method_class: measured_tabulated
+        composition_basis: mass percent as printed
+        standard_state_related_quantity: SnO(l) for γSnO in liquid slag
+    - observation_id: takeda_1990_t5_row_48
+      type: context
+      locator:
+        published_page: 797
+        pdf_page_index: 4
+        table: '5'
+        note: Test 48
+      units: mass% for slag and metal composition; log pO2 dimensionless as printed
+      values:
+        temperature_K: 1473
+        slag_Sn_mass_percent: 14.3
+        slag_CaO_mass_percent: 23.5
+        slag_MgO_mass_percent: 0.9
+        slag_Fe2plus_mass_percent: 29.1
+        slag_Fe3plus_mass_percent: 15.6
+        metal_Sn_mass_percent: null
+        metal_Fe_mass_percent: 2.5
+        test_no: '48'
+        table: '5'
+        log_pO2: -11.75
+        sample_side_electrode: LaCrO3
+        quantity: table_equilibrium_composition_and_oxygen_potential
+        method_class: measured_tabulated
+        composition_basis: mass percent as printed
+        standard_state_related_quantity: SnO(l) for γSnO in liquid slag
+    - observation_id: takeda_1990_t5_row_49
+      type: context
+      locator:
+        published_page: 797
+        pdf_page_index: 4
+        table: '5'
+        note: Test 49
+      units: mass% for slag and metal composition; log pO2 dimensionless as printed
+      values:
+        temperature_K: 1473
+        slag_Sn_mass_percent: 16.3
+        slag_CaO_mass_percent: 21.3
+        slag_MgO_mass_percent: 0.7
+        slag_Fe2plus_mass_percent: 27.1
+        slag_Fe3plus_mass_percent: 16.4
+        metal_Sn_mass_percent: null
+        metal_Fe_mass_percent: 1.7
+        test_no: '49'
+        table: '5'
+        log_pO2: -11.31
+        sample_side_electrode: LaCrO3
+        quantity: table_equilibrium_composition_and_oxygen_potential
+        method_class: measured_tabulated
+        composition_basis: mass percent as printed
+        standard_state_related_quantity: SnO(l) for γSnO in liquid slag
+    - observation_id: takeda_1990_t5_row_50
+      type: context
+      locator:
+        published_page: 797
+        pdf_page_index: 4
+        table: '5'
+        note: Test 50
+      units: mass% for slag and metal composition; log pO2 dimensionless as printed
+      values:
+        temperature_K: 1473
+        slag_Sn_mass_percent: 18.8
+        slag_CaO_mass_percent: 20.7
+        slag_MgO_mass_percent: 0.8
+        slag_Fe2plus_mass_percent: 25.2
+        slag_Fe3plus_mass_percent: 17.5
+        metal_Sn_mass_percent: null
+        metal_Fe_mass_percent: 1.5
+        test_no: '50'
+        table: '5'
+        log_pO2: -11.12
+        sample_side_electrode: LaCrO3
+        quantity: table_equilibrium_composition_and_oxygen_potential
+        method_class: measured_tabulated
+        composition_basis: mass percent as printed
+        standard_state_related_quantity: SnO(l) for γSnO in liquid slag
+    - observation_id: takeda_1990_t6_row_a_s51
+      type: context
+      locator:
+        published_page: 797
+        pdf_page_index: 4
+        table: '6'
+        note: Test A-S51
+      units: mass% for slag and metal composition; log pO2 dimensionless as printed
+      values:
+        temperature_K: 1573
+        slag_Sn_mass_percent: 2.4
+        slag_CaO_mass_percent: 0
+        slag_MgO_mass_percent: 4.4
+        slag_SiO2_mass_percent: 34.3
+        slag_Fe2plus_mass_percent_as_printed: 42.5
+        slag_Fe3plus_mass_percent_as_printed: 1.0
+        metal_Sn_mass_percent: 37.8
+        metal_Fe_mass_percent: 61.1
+        test_no: A-S51
+        table: '6'
+        log_pO2: -11.3
+        sample_side_electrode: W
+        quantity: table_equilibrium_composition_and_oxygen_potential
+        method_class: measured_tabulated
+        composition_basis: mass percent as printed
+        standard_state_related_quantity: SnO(l) for γSnO in liquid slag
+    - observation_id: takeda_1990_t6_row_52
+      type: context
+      locator:
+        published_page: 797
+        pdf_page_index: 4
+        table: '6'
+        note: Test 52
+      units: mass% for slag and metal composition; log pO2 dimensionless as printed
+      values:
+        temperature_K: 1573
+        slag_Sn_mass_percent: 5.0
+        slag_CaO_mass_percent: 0
+        slag_MgO_mass_percent: 5.2
+        slag_SiO2_mass_percent: 34.2
+        slag_Fe2plus_mass_percent_as_printed: 38.0
+        slag_Fe3plus_mass_percent_as_printed: 2.8
+        metal_Sn_mass_percent: null
+        metal_Fe_mass_percent: 9.1
+        test_no: '52'
+        table: '6'
+        log_pO2: -10.95
+        sample_side_electrode: W
+        quantity: table_equilibrium_composition_and_oxygen_potential
+        method_class: measured_tabulated
+        composition_basis: mass percent as printed
+        standard_state_related_quantity: SnO(l) for γSnO in liquid slag
+    - observation_id: takeda_1990_t6_row_53
+      type: context
+      locator:
+        published_page: 797
+        pdf_page_index: 4
+        table: '6'
+        note: Test 53
+      units: mass% for slag and metal composition; log pO2 dimensionless as printed
+      values:
+        temperature_K: 1573
+        slag_Sn_mass_percent: 9.0
+        slag_CaO_mass_percent: 0
+        slag_MgO_mass_percent: 5.3
+        slag_SiO2_mass_percent: 33.8
+        slag_Fe2plus_mass_percent_as_printed: 36.5
+        slag_Fe3plus_mass_percent_as_printed: 2.5
+        metal_Sn_mass_percent: null
+        metal_Fe_mass_percent: 3.7
+        test_no: '53'
+        table: '6'
+        log_pO2: -10.63
+        sample_side_electrode: W
+        quantity: table_equilibrium_composition_and_oxygen_potential
+        method_class: measured_tabulated
+        composition_basis: mass percent as printed
+        standard_state_related_quantity: SnO(l) for γSnO in liquid slag
+    - observation_id: takeda_1990_t6_row_54
+      type: context
+      locator:
+        published_page: 797
+        pdf_page_index: 4
+        table: '6'
+        note: Test 54
+      units: mass% for slag and metal composition; log pO2 dimensionless as printed
+      values:
+        temperature_K: 1573
+        slag_Sn_mass_percent: 14.6
+        slag_CaO_mass_percent: 0
+        slag_MgO_mass_percent: 5.4
+        slag_SiO2_mass_percent: 31.3
+        slag_Fe2plus_mass_percent_as_printed: 32.5
+        slag_Fe3plus_mass_percent_as_printed: 3.4
+        metal_Sn_mass_percent: null
+        metal_Fe_mass_percent: 2.0
+        test_no: '54'
+        table: '6'
+        log_pO2: -10.13
+        sample_side_electrode: LaCrO3
+        quantity: table_equilibrium_composition_and_oxygen_potential
+        method_class: measured_tabulated
+        composition_basis: mass percent as printed
+        standard_state_related_quantity: SnO(l) for γSnO in liquid slag
+    - observation_id: takeda_1990_t6_row_55
+      type: context
+      locator:
+        published_page: 797
+        pdf_page_index: 4
+        table: '6'
+        note: Test 55
+      units: mass% for slag and metal composition; log pO2 dimensionless as printed
+      values:
+        temperature_K: 1573
+        slag_Sn_mass_percent: 19.6
+        slag_CaO_mass_percent: 0
+        slag_MgO_mass_percent: 4.8
+        slag_SiO2_mass_percent: 29.1
+        slag_Fe2plus_mass_percent_as_printed: 28.9
+        slag_Fe3plus_mass_percent_as_printed: 4.0
+        metal_Sn_mass_percent: null
+        metal_Fe_mass_percent: 0.97
+        test_no: '55'
+        table: '6'
+        log_pO2: -9.73
+        sample_side_electrode: LaCrO3
+        quantity: table_equilibrium_composition_and_oxygen_potential
+        method_class: measured_tabulated
+        composition_basis: mass percent as printed
+        standard_state_related_quantity: SnO(l) for γSnO in liquid slag
+    - observation_id: takeda_1990_t6_row_56
+      type: context
+      locator:
+        published_page: 797
+        pdf_page_index: 4
+        table: '6'
+        note: Test 56
+      units: mass% for slag and metal composition; log pO2 dimensionless as printed
+      values:
+        temperature_K: 1573
+        slag_Sn_mass_percent: 29.5
+        slag_CaO_mass_percent: 0
+        slag_MgO_mass_percent: 4.5
+        slag_SiO2_mass_percent: 25.5
+        slag_Fe2plus_mass_percent_as_printed: 23.0
+        slag_Fe3plus_mass_percent_as_printed: 4.3
+        metal_Sn_mass_percent: null
+        metal_Fe_mass_percent: 0.64
+        test_no: '56'
+        table: '6'
+        log_pO2: -9.57
+        sample_side_electrode: LaCrO3
+        quantity: table_equilibrium_composition_and_oxygen_potential
+        method_class: measured_tabulated
+        composition_basis: mass percent as printed
+        standard_state_related_quantity: SnO(l) for γSnO in liquid slag
+    - observation_id: takeda_1990_t6_row_57
+      type: context
+      locator:
+        published_page: 797
+        pdf_page_index: 4
+        table: '6'
+        note: Test 57
+      units: mass% for slag and metal composition; log pO2 dimensionless as printed
+      values:
+        temperature_K: 1573
+        slag_Sn_mass_percent: 36.5
+        slag_CaO_mass_percent: 0
+        slag_MgO_mass_percent: 4.2
+        slag_SiO2_mass_percent: 23.7
+        slag_Fe2plus_mass_percent_as_printed: 19.1
+        slag_Fe3plus_mass_percent_as_printed: 5.1
+        metal_Sn_mass_percent: null
+        metal_Fe_mass_percent: 0.68
+        test_no: '57'
+        table: '6'
+        log_pO2: -9.38
+        sample_side_electrode: LaCrO3
+        quantity: table_equilibrium_composition_and_oxygen_potential
+        method_class: measured_tabulated
+        composition_basis: mass percent as printed
+        standard_state_related_quantity: SnO(l) for γSnO in liquid slag
+    - observation_id: takeda_1990_t6_row_58
+      type: context
+      locator:
+        published_page: 797
+        pdf_page_index: 4
+        table: '6'
+        note: Test 58
+      units: mass% for slag and metal composition; log pO2 dimensionless as printed
+      values:
+        temperature_K: 1573
+        slag_Sn_mass_percent: 45.8
+        slag_CaO_mass_percent: 0
+        slag_MgO_mass_percent: 3.2
+        slag_SiO2_mass_percent: 19.3
+        slag_Fe2plus_mass_percent_as_printed: 14.1
+        slag_Fe3plus_mass_percent_as_printed: 5.1
+        metal_Sn_mass_percent: null
+        metal_Fe_mass_percent: 0.6
+        test_no: '58'
+        table: '6'
+        log_pO2: -9.34
+        sample_side_electrode: LaCrO3
+        quantity: table_equilibrium_composition_and_oxygen_potential
+        method_class: measured_tabulated
+        composition_basis: mass percent as printed
+        standard_state_related_quantity: SnO(l) for γSnO in liquid slag
+    - observation_id: takeda_1990_t6_row_59
+      type: context
+      locator:
+        published_page: 797
+        pdf_page_index: 4
+        table: '6'
+        note: Test 59
+      units: mass% for slag and metal composition; log pO2 dimensionless as printed
+      values:
+        temperature_K: 1573
+        slag_Sn_mass_percent: 58.1
+        slag_CaO_mass_percent: 0
+        slag_MgO_mass_percent: 2.6
+        slag_SiO2_mass_percent: 15.2
+        slag_Fe2plus_mass_percent_as_printed: 5.8
+        slag_Fe3plus_mass_percent_as_printed: 6.3
+        metal_Sn_mass_percent: null
+        metal_Fe_mass_percent: 0.26
+        test_no: '59'
+        table: '6'
+        log_pO2: -9.13
+        sample_side_electrode: LaCrO3
+        quantity: table_equilibrium_composition_and_oxygen_potential
+        method_class: measured_tabulated
+        composition_basis: mass percent as printed
+        standard_state_related_quantity: SnO(l) for γSnO in liquid slag
+    - observation_id: takeda_1990_t6_row_a_s60
+      type: context
+      locator:
+        published_page: 797
+        pdf_page_index: 4
+        table: '6'
+        note: Test a-S60
+      units: mass% for slag and metal composition; log pO2 dimensionless as printed
+      values:
+        temperature_K: 1573
+        slag_Sn_mass_percent: 4.7
+        slag_CaO_mass_percent: 0
+        slag_MgO_mass_percent: 2.3
+        slag_SiO2_mass_percent: 14.2
+        slag_Fe2plus_mass_percent_as_printed: 52.2
+        slag_Fe3plus_mass_percent_as_printed: 6.8
+        metal_Sn_mass_percent: 40.0
+        metal_Fe_mass_percent: 60.4
+        test_no: a-S60
+        table: '6'
+        log_pO2: -10.78
+        sample_side_electrode: W
+        quantity: table_equilibrium_composition_and_oxygen_potential
+        method_class: measured_tabulated
+        composition_basis: mass percent as printed
+        standard_state_related_quantity: SnO(l) for γSnO in liquid slag
+    - observation_id: takeda_1990_t6_row_61
+      type: context
+      locator:
+        published_page: 797
+        pdf_page_index: 4
+        table: '6'
+        note: Test 61
+      units: mass% for slag and metal composition; log pO2 dimensionless as printed
+      values:
+        temperature_K: 1573
+        slag_Sn_mass_percent: 8.4
+        slag_CaO_mass_percent: 0
+        slag_MgO_mass_percent: 2.7
+        slag_SiO2_mass_percent: 13.0
+        slag_Fe2plus_mass_percent_as_printed: 48.8
+        slag_Fe3plus_mass_percent_as_printed: 6.9
+        metal_Sn_mass_percent: null
+        metal_Fe_mass_percent: 16.5
+        test_no: '61'
+        table: '6'
+        log_pO2: -10.35
+        sample_side_electrode: LaCrO3
+        quantity: table_equilibrium_composition_and_oxygen_potential
+        method_class: measured_tabulated
+        composition_basis: mass percent as printed
+        standard_state_related_quantity: SnO(l) for γSnO in liquid slag
+    - observation_id: takeda_1990_t6_row_62
+      type: context
+      locator:
+        published_page: 797
+        pdf_page_index: 4
+        table: '6'
+        note: Test 62
+      units: mass% for slag and metal composition; log pO2 dimensionless as printed
+      values:
+        temperature_K: 1573
+        slag_Sn_mass_percent: 9.8
+        slag_CaO_mass_percent: 0
+        slag_MgO_mass_percent: 2.7
+        slag_SiO2_mass_percent: 12.3
+        slag_Fe2plus_mass_percent_as_printed: 47.6
+        slag_Fe3plus_mass_percent_as_printed: 7.7
+        metal_Sn_mass_percent: null
+        metal_Fe_mass_percent: 8.5
+        test_no: '62'
+        table: '6'
+        log_pO2: -10.2
+        sample_side_electrode: LaCrO3
+        quantity: table_equilibrium_composition_and_oxygen_potential
+        method_class: measured_tabulated
+        composition_basis: mass percent as printed
+        standard_state_related_quantity: SnO(l) for γSnO in liquid slag
+    - observation_id: takeda_1990_t6_row_63
+      type: context
+      locator:
+        published_page: 797
+        pdf_page_index: 4
+        table: '6'
+        note: Test 63
+      units: mass% for slag and metal composition; log pO2 dimensionless as printed
+      values:
+        temperature_K: 1573
+        slag_Sn_mass_percent: 15.1
+        slag_CaO_mass_percent: 0
+        slag_MgO_mass_percent: 2.5
+        slag_SiO2_mass_percent: 11.0
+        slag_Fe2plus_mass_percent_as_printed: 43.5
+        slag_Fe3plus_mass_percent_as_printed: 8.1
+        metal_Sn_mass_percent: null
+        metal_Fe_mass_percent: 2.7
+        test_no: '63'
+        table: '6'
+        log_pO2: -9.93
+        sample_side_electrode: LaCrO3
+        quantity: table_equilibrium_composition_and_oxygen_potential
+        method_class: measured_tabulated
+        composition_basis: mass percent as printed
+        standard_state_related_quantity: SnO(l) for γSnO in liquid slag
+    - observation_id: takeda_1990_t6_row_64
+      type: context
+      locator:
+        published_page: 797
+        pdf_page_index: 4
+        table: '6'
+        note: Test 64
+      units: mass% for slag and metal composition; log pO2 dimensionless as printed
+      values:
+        temperature_K: 1573
+        slag_Sn_mass_percent: 35.0
+        slag_CaO_mass_percent: 0
+        slag_MgO_mass_percent: 2.2
+        slag_SiO2_mass_percent: 8.1
+        slag_Fe2plus_mass_percent_as_printed: 25.4
+        slag_Fe3plus_mass_percent_as_printed: 10.8
+        metal_Sn_mass_percent: null
+        metal_Fe_mass_percent: 0.93
+        test_no: '64'
+        table: '6'
+        log_pO2: -9.25
+        sample_side_electrode: LaCrO3
+        quantity: table_equilibrium_composition_and_oxygen_potential
+        method_class: measured_tabulated
+        composition_basis: mass percent as printed
+        standard_state_related_quantity: SnO(l) for γSnO in liquid slag
+    - observation_id: takeda_1990_t6_row_65
+      type: context
+      locator:
+        published_page: 797
+        pdf_page_index: 4
+        table: '6'
+        note: Test 65
+      units: mass% for slag and metal composition; log pO2 dimensionless as printed
+      values:
+        temperature_K: 1573
+        slag_Sn_mass_percent: 47.0
+        slag_CaO_mass_percent: 0
+        slag_MgO_mass_percent: 1.9
+        slag_SiO2_mass_percent: 6.2
+        slag_Fe2plus_mass_percent_as_printed: 15.2
+        slag_Fe3plus_mass_percent_as_printed: 14.0
+        metal_Sn_mass_percent: null
+        metal_Fe_mass_percent: 0.76
+        test_no: '65'
+        table: '6'
+        log_pO2: -9.12
+        sample_side_electrode: LaCrO3
+        quantity: table_equilibrium_composition_and_oxygen_potential
+        method_class: measured_tabulated
+        composition_basis: mass percent as printed
+        standard_state_related_quantity: SnO(l) for γSnO in liquid slag
+    - observation_id: takeda_1990_t6_row_66
+      type: context
+      locator:
+        published_page: 797
+        pdf_page_index: 4
+        table: '6'
+        note: Test 66
+      units: mass% for slag and metal composition; log pO2 dimensionless as printed
+      values:
+        temperature_K: 1573
+        slag_Sn_mass_percent: 55.7
+        slag_CaO_mass_percent: 0
+        slag_MgO_mass_percent: 1.5
+        slag_SiO2_mass_percent: 3.0
+        slag_Fe2plus_mass_percent_as_printed: 7.5
+        slag_Fe3plus_mass_percent_as_printed: 15.0
+        metal_Sn_mass_percent: null
+        metal_Fe_mass_percent: 0.34
+        test_no: '66'
+        table: '6'
+        log_pO2: -8.96
+        sample_side_electrode: LaCrO3
+        quantity: table_equilibrium_composition_and_oxygen_potential
+        method_class: measured_tabulated
+        composition_basis: mass percent as printed
+        standard_state_related_quantity: SnO(l) for γSnO in liquid slag
+    - observation_id: takeda_1990_t6_row_b_s67
+      type: context
+      locator:
+        published_page: 797
+        pdf_page_index: 4
+        table: '6'
+        note: Test B-S67
+      units: mass% for slag and metal composition; log pO2 dimensionless as printed
+      values:
+        temperature_K: 1573
+        slag_Sn_mass_percent: 0.45
+        slag_CaO_mass_percent: 24.2
+        slag_MgO_mass_percent: 5.0
+        slag_SiO2_mass_percent: 49.4
+        slag_Fe2plus_mass_percent_as_printed: 14.8
+        slag_Fe3plus_mass_percent_as_printed: 0.7
+        metal_Sn_mass_percent: 38.1
+        metal_Fe_mass_percent: 62.4
+        test_no: B-S67
+        table: '6'
+        log_pO2: -11.9
+        sample_side_electrode: W
+        quantity: table_equilibrium_composition_and_oxygen_potential
+        method_class: measured_tabulated
+        composition_basis: mass percent as printed
+        standard_state_related_quantity: SnO(l) for γSnO in liquid slag
+    - observation_id: takeda_1990_t6_row_68
+      type: context
+      locator:
+        published_page: 797
+        pdf_page_index: 4
+        table: '6'
+        note: Test 68
+      units: mass% for slag and metal composition; log pO2 dimensionless as printed
+      values:
+        temperature_K: 1573
+        slag_Sn_mass_percent: 0.8
+        slag_CaO_mass_percent: 23.5
+        slag_MgO_mass_percent: 6.6
+        slag_SiO2_mass_percent: 48.9
+        slag_Fe2plus_mass_percent_as_printed: 14.6
+        slag_Fe3plus_mass_percent_as_printed: 0.9
+        metal_Sn_mass_percent: null
+        metal_Fe_mass_percent: 10.6
+        test_no: '68'
+        table: '6'
+        log_pO2: -11.55
+        sample_side_electrode: W
+        quantity: table_equilibrium_composition_and_oxygen_potential
+        method_class: measured_tabulated
+        composition_basis: mass percent as printed
+        standard_state_related_quantity: SnO(l) for γSnO in liquid slag
+    - observation_id: takeda_1990_t6_row_69
+      type: context
+      locator:
+        published_page: 797
+        pdf_page_index: 4
+        table: '6'
+        note: Test 69
+      units: mass% for slag and metal composition; log pO2 dimensionless as printed
+      values:
+        temperature_K: 1573
+        slag_Sn_mass_percent: 1.1
+        slag_CaO_mass_percent: 23.0
+        slag_MgO_mass_percent: 8.3
+        slag_SiO2_mass_percent: 48.1
+        slag_Fe2plus_mass_percent_as_printed: 13.5
+        slag_Fe3plus_mass_percent_as_printed: 0.5
+        metal_Sn_mass_percent: null
+        metal_Fe_mass_percent: 4.8
+        test_no: '69'
+        table: '6'
+        log_pO2: -11.41
+        sample_side_electrode: LaCrO3
+        quantity: table_equilibrium_composition_and_oxygen_potential
+        method_class: measured_tabulated
+        composition_basis: mass percent as printed
+        standard_state_related_quantity: SnO(l) for γSnO in liquid slag
+    - observation_id: takeda_1990_t6_row_70
+      type: context
+      locator:
+        published_page: 797
+        pdf_page_index: 4
+        table: '6'
+        note: Test 70
+      units: mass% for slag and metal composition; log pO2 dimensionless as printed
+      values:
+        temperature_K: 1573
+        slag_Sn_mass_percent: 1.5
+        slag_CaO_mass_percent: 22.1
+        slag_MgO_mass_percent: 9.1
+        slag_SiO2_mass_percent: 48.4
+        slag_Fe2plus_mass_percent_as_printed: 13.8
+        slag_Fe3plus_mass_percent_as_printed: 0.8
+        metal_Sn_mass_percent: null
+        metal_Fe_mass_percent: 5.0
+        test_no: '70'
+        table: '6'
+        log_pO2: -11.2
+        sample_side_electrode: LaCrO3
+        quantity: table_equilibrium_composition_and_oxygen_potential
+        method_class: measured_tabulated
+        composition_basis: mass percent as printed
+        standard_state_related_quantity: SnO(l) for γSnO in liquid slag
+    - observation_id: takeda_1990_t6_row_71
+      type: context
+      locator:
+        published_page: 797
+        pdf_page_index: 4
+        table: '6'
+        note: Test 71
+      units: mass% for slag and metal composition; log pO2 dimensionless as printed
+      values:
+        temperature_K: 1573
+        slag_Sn_mass_percent: 2.9
+        slag_CaO_mass_percent: 21.9
+        slag_MgO_mass_percent: 10.6
+        slag_SiO2_mass_percent: 47.4
+        slag_Fe2plus_mass_percent_as_printed: 10.8
+        slag_Fe3plus_mass_percent_as_printed: 0.8
+        metal_Sn_mass_percent: null
+        metal_Fe_mass_percent: 1.3
+        test_no: '71'
+        table: '6'
+        log_pO2: -10.75
+        sample_side_electrode: LaCrO3
+        quantity: table_equilibrium_composition_and_oxygen_potential
+        method_class: measured_tabulated
+        composition_basis: mass percent as printed
+        standard_state_related_quantity: SnO(l) for γSnO in liquid slag
+    - observation_id: takeda_1990_t6_row_72
+      type: context
+      locator:
+        published_page: 797
+        pdf_page_index: 4
+        table: '6'
+        note: Test 72
+      units: mass% for slag and metal composition; log pO2 dimensionless as printed
+      values:
+        temperature_K: 1573
+        slag_Sn_mass_percent: 6.8
+        slag_CaO_mass_percent: 20.8
+        slag_MgO_mass_percent: 9.7
+        slag_SiO2_mass_percent: 46.0
+        slag_Fe2plus_mass_percent_as_printed: 8.2
+        slag_Fe3plus_mass_percent_as_printed: 2.5
+        metal_Sn_mass_percent: null
+        metal_Fe_mass_percent: 0.5
+        test_no: '72'
+        table: '6'
+        log_pO2: -10.29
+        sample_side_electrode: W
+        quantity: table_equilibrium_composition_and_oxygen_potential
+        method_class: measured_tabulated
+        composition_basis: mass percent as printed
+        standard_state_related_quantity: SnO(l) for γSnO in liquid slag
+    - observation_id: takeda_1990_t6_row_73
+      type: context
+      locator:
+        published_page: 797
+        pdf_page_index: 4
+        table: '6'
+        note: Test 73
+      units: mass% for slag and metal composition; log pO2 dimensionless as printed
+      values:
+        temperature_K: 1573
+        slag_Sn_mass_percent: 10.2
+        slag_CaO_mass_percent: 20.1
+        slag_MgO_mass_percent: 9.9
+        slag_SiO2_mass_percent: 44.7
+        slag_Fe2plus_mass_percent_as_printed: 7.6
+        slag_Fe3plus_mass_percent_as_printed: 2.9
+        metal_Sn_mass_percent: null
+        metal_Fe_mass_percent: 0.53
+        test_no: '73'
+        table: '6'
+        log_pO2: -10.03
+        sample_side_electrode: LaCrO3
+        quantity: table_equilibrium_composition_and_oxygen_potential
+        method_class: measured_tabulated
+        composition_basis: mass percent as printed
+        standard_state_related_quantity: SnO(l) for γSnO in liquid slag
+    - observation_id: takeda_1990_t6_row_74
+      type: context
+      locator:
+        published_page: 797
+        pdf_page_index: 4
+        table: '6'
+        note: Test 74
+      units: mass% for slag and metal composition; log pO2 dimensionless as printed
+      values:
+        temperature_K: 1573
+        slag_Sn_mass_percent: 9.3
+        slag_CaO_mass_percent: 20.6
+        slag_MgO_mass_percent: 8.3
+        slag_SiO2_mass_percent: 47.2
+        slag_Fe2plus_mass_percent_as_printed: 7.7
+        slag_Fe3plus_mass_percent_as_printed: 3.4
+        metal_Sn_mass_percent: null
+        metal_Fe_mass_percent: 0.25
+        test_no: '74'
+        table: '6'
+        log_pO2: -9.98
+        sample_side_electrode: LaCrO3
+        quantity: table_equilibrium_composition_and_oxygen_potential
+        method_class: measured_tabulated
+        composition_basis: mass percent as printed
+        standard_state_related_quantity: SnO(l) for γSnO in liquid slag
+    - observation_id: takeda_1990_t6_row_75
+      type: context
+      locator:
+        published_page: 797
+        pdf_page_index: 4
+        table: '6'
+        note: Test 75
+      units: mass% for slag and metal composition; log pO2 dimensionless as printed
+      values:
+        temperature_K: 1573
+        slag_Sn_mass_percent: 9.2
+        slag_CaO_mass_percent: 20.3
+        slag_MgO_mass_percent: 7.3
+        slag_SiO2_mass_percent: 45.4
+        slag_Fe2plus_mass_percent_as_printed: 9.0
+        slag_Fe3plus_mass_percent_as_printed: 2.7
+        metal_Sn_mass_percent: null
+        metal_Fe_mass_percent: 0.35
+        test_no: '75'
+        table: '6'
+        log_pO2: -9.85
+        sample_side_electrode: LaCrO3
+        quantity: table_equilibrium_composition_and_oxygen_potential
+        method_class: measured_tabulated
+        composition_basis: mass percent as printed
+        standard_state_related_quantity: SnO(l) for γSnO in liquid slag
+    - observation_id: takeda_1990_t6_row_76
+      type: context
+      locator:
+        published_page: 797
+        pdf_page_index: 4
+        table: '6'
+        note: Test 76
+      units: mass% for slag and metal composition; log pO2 dimensionless as printed
+      values:
+        temperature_K: 1573
+        slag_Sn_mass_percent: 15.3
+        slag_CaO_mass_percent: 18.2
+        slag_MgO_mass_percent: 8.0
+        slag_SiO2_mass_percent: 41.7
+        slag_Fe2plus_mass_percent_as_printed: 8.8
+        slag_Fe3plus_mass_percent_as_printed: 2.6
+        metal_Sn_mass_percent: null
+        metal_Fe_mass_percent: 0.21
+        test_no: '76'
+        table: '6'
+        log_pO2: -9.72
+        sample_side_electrode: LaCrO3
+        quantity: table_equilibrium_composition_and_oxygen_potential
+        method_class: measured_tabulated
+        composition_basis: mass percent as printed
+        standard_state_related_quantity: SnO(l) for γSnO in liquid slag
+    - observation_id: takeda_1990_t6_row_77
+      type: context
+      locator:
+        published_page: 797
+        pdf_page_index: 4
+        table: '6'
+        note: Test 77
+      units: mass% for slag and metal composition; log pO2 dimensionless as printed
+      values:
+        temperature_K: 1573
+        slag_Sn_mass_percent: 14.2
+        slag_CaO_mass_percent: 19.7
+        slag_MgO_mass_percent: 4.8
+        slag_SiO2_mass_percent: 43.7
+        slag_Fe2plus_mass_percent_as_printed: 7.1
+        slag_Fe3plus_mass_percent_as_printed: 3.7
+        metal_Sn_mass_percent: null
+        metal_Fe_mass_percent: 0.23
+        test_no: '77'
+        table: '6'
+        log_pO2: -9.5
+        sample_side_electrode: LaCrO3
+        quantity: table_equilibrium_composition_and_oxygen_potential
+        method_class: measured_tabulated
+        composition_basis: mass percent as printed
+        standard_state_related_quantity: SnO(l) for γSnO in liquid slag
+    - observation_id: takeda_1990_t6_row_78
+      type: context
+      locator:
+        published_page: 797
+        pdf_page_index: 4
+        table: '6'
+        note: Test 78
+      units: mass% for slag and metal composition; log pO2 dimensionless as printed
+      values:
+        temperature_K: 1573
+        slag_Sn_mass_percent: 28.8
+        slag_CaO_mass_percent: 13.8
+        slag_MgO_mass_percent: 6.1
+        slag_SiO2_mass_percent: 35.8
+        slag_Fe2plus_mass_percent_as_printed: 5.0
+        slag_Fe3plus_mass_percent_as_printed: 3.6
+        metal_Sn_mass_percent: null
+        metal_Fe_mass_percent: 0.1
+        test_no: '78'
+        table: '6'
+        log_pO2: -9.25
+        sample_side_electrode: LaCrO3
+        quantity: table_equilibrium_composition_and_oxygen_potential
+        method_class: measured_tabulated
+        composition_basis: mass percent as printed
+        standard_state_related_quantity: SnO(l) for γSnO in liquid slag
+    - observation_id: takeda_1990_t6_row_79
+      type: context
+      locator:
+        published_page: 797
+        pdf_page_index: 4
+        table: '6'
+        note: Test 79
+      units: mass% for slag and metal composition; log pO2 dimensionless as printed
+      values:
+        temperature_K: 1573
+        slag_Sn_mass_percent: 43.0
+        slag_CaO_mass_percent: 8.2
+        slag_MgO_mass_percent: 6.1
+        slag_SiO2_mass_percent: 25.4
+        slag_Fe2plus_mass_percent_as_printed: 4.2
+        slag_Fe3plus_mass_percent_as_printed: 4.3
+        metal_Sn_mass_percent: null
+        metal_Fe_mass_percent: 0.16
+        test_no: '79'
+        table: '6'
+        log_pO2: -9.17
+        sample_side_electrode: LaCrO3
+        quantity: table_equilibrium_composition_and_oxygen_potential
+        method_class: measured_tabulated
+        composition_basis: mass percent as printed
+        standard_state_related_quantity: SnO(l) for γSnO in liquid slag
+    - observation_id: takeda_1990_t6_row_80
+      type: context
+      locator:
+        published_page: 797
+        pdf_page_index: 4
+        table: '6'
+        note: Test 80
+      units: mass% for slag and metal composition; log pO2 dimensionless as printed
+      values:
+        temperature_K: 1573
+        slag_Sn_mass_percent: 30.5
+        slag_CaO_mass_percent: 13.8
+        slag_MgO_mass_percent: 7.6
+        slag_SiO2_mass_percent: 33.0
+        slag_Fe2plus_mass_percent_as_printed: 5.8
+        slag_Fe3plus_mass_percent_as_printed: 3.1
+        metal_Sn_mass_percent: null
+        metal_Fe_mass_percent: 0.25
+        test_no: '80'
+        table: '6'
+        log_pO2: -9.18
+        sample_side_electrode: LaCrO3
+        quantity: table_equilibrium_composition_and_oxygen_potential
+        method_class: measured_tabulated
+        composition_basis: mass percent as printed
+        standard_state_related_quantity: SnO(l) for γSnO in liquid slag
+    - observation_id: takeda_1990_t6_row_81
+      type: context
+      locator:
+        published_page: 797
+        pdf_page_index: 4
+        table: '6'
+        note: Test 81
+      units: mass% for slag and metal composition; log pO2 dimensionless as printed
+      values:
+        temperature_K: 1573
+        slag_Sn_mass_percent: 60.7
+        slag_CaO_mass_percent: 4.2
+        slag_MgO_mass_percent: 4.0
+        slag_SiO2_mass_percent: 17.0
+        slag_total_Fe_mass_percent: 4.5
+        slag_iron_basis_as_printed: FeT
+        slag_iron_as_printed: FeT:4.5
+        slag_Fe2plus_mass_percent_as_printed: null
+        slag_Fe3plus_mass_percent_as_printed: null
+        metal_Sn_mass_percent: null
+        metal_Fe_mass_percent: 0.09
+        test_no: '81'
+        table: '6'
+        log_pO2: -8.86
+        sample_side_electrode: LaCrO3
+        quantity: table_equilibrium_composition_and_oxygen_potential
+        method_class: measured_tabulated
+        composition_basis: mass percent as printed
+        standard_state_related_quantity: SnO(l) for γSnO in liquid slag
+    - observation_id: takeda_1990_t6_row_b_s82
+      type: context
+      locator:
+        published_page: 797
+        pdf_page_index: 4
+        table: '6'
+        note: Test b-S82
+      units: mass% for slag and metal composition; log pO2 dimensionless as printed
+      values:
+        temperature_K: 1573
+        slag_Sn_mass_percent: 3.6
+        slag_CaO_mass_percent: 8.5
+        slag_MgO_mass_percent: 2.2
+        slag_SiO2_mass_percent: 19.1
+        slag_Fe2plus_mass_percent_as_printed: 50.2
+        slag_Fe3plus_mass_percent_as_printed: 0.9
+        metal_Sn_mass_percent: 41.3
+        metal_Fe_mass_percent: 60.8
+        test_no: b-S82
+        table: '6'
+        log_pO2: -10.7
+        sample_side_electrode: W
+        quantity: table_equilibrium_composition_and_oxygen_potential
+        method_class: measured_tabulated
+        composition_basis: mass percent as printed
+        standard_state_related_quantity: SnO(l) for γSnO in liquid slag
+    - observation_id: takeda_1990_t6_row_83
+      type: context
+      locator:
+        published_page: 797
+        pdf_page_index: 4
+        table: '6'
+        note: Test 83
+      units: mass% for slag and metal composition; log pO2 dimensionless as printed
+      values:
+        temperature_K: 1573
+        slag_Sn_mass_percent: 7.2
+        slag_CaO_mass_percent: 7.3
+        slag_MgO_mass_percent: 2.8
+        slag_SiO2_mass_percent: 17.7
+        slag_Fe2plus_mass_percent_as_printed: 43.0
+        slag_Fe3plus_mass_percent_as_printed: 5.6
+        metal_Sn_mass_percent: null
+        metal_Fe_mass_percent: 12.4
+        test_no: '83'
+        table: '6'
+        log_pO2: -10.45
+        sample_side_electrode: LaCrO3
+        quantity: table_equilibrium_composition_and_oxygen_potential
+        method_class: measured_tabulated
+        composition_basis: mass percent as printed
+        standard_state_related_quantity: SnO(l) for γSnO in liquid slag
+    - observation_id: takeda_1990_t6_row_84
+      type: context
+      locator:
+        published_page: 797
+        pdf_page_index: 4
+        table: '6'
+        note: Test 84
+      units: mass% for slag and metal composition; log pO2 dimensionless as printed
+      values:
+        temperature_K: 1573
+        slag_Sn_mass_percent: 7.7
+        slag_CaO_mass_percent: 7.2
+        slag_MgO_mass_percent: 2.7
+        slag_SiO2_mass_percent: 17.5
+        slag_Fe2plus_mass_percent_as_printed: 42.9
+        slag_Fe3plus_mass_percent_as_printed: 6.3
+        metal_Sn_mass_percent: null
+        metal_Fe_mass_percent: 9.5
+        test_no: '84'
+        table: '6'
+        log_pO2: -10.2
+        sample_side_electrode: LaCrO3
+        quantity: table_equilibrium_composition_and_oxygen_potential
+        method_class: measured_tabulated
+        composition_basis: mass percent as printed
+        standard_state_related_quantity: SnO(l) for γSnO in liquid slag
+    - observation_id: takeda_1990_t6_row_85
+      type: context
+      locator:
+        published_page: 797
+        pdf_page_index: 4
+        table: '6'
+        note: Test 85
+      units: mass% for slag and metal composition; log pO2 dimensionless as printed
+      values:
+        temperature_K: 1573
+        slag_Sn_mass_percent: 14.2
+        slag_CaO_mass_percent: 5.5
+        slag_MgO_mass_percent: 3.9
+        slag_SiO2_mass_percent: 14.6
+        slag_Fe2plus_mass_percent_as_printed: 34.4
+        slag_Fe3plus_mass_percent_as_printed: 9.5
+        metal_Sn_mass_percent: null
+        metal_Fe_mass_percent: 2.3
+        test_no: '85'
+        table: '6'
+        log_pO2: -9.83
+        sample_side_electrode: LaCrO3
+        quantity: table_equilibrium_composition_and_oxygen_potential
+        method_class: measured_tabulated
+        composition_basis: mass percent as printed
+        standard_state_related_quantity: SnO(l) for γSnO in liquid slag
+    - observation_id: takeda_1990_t6_row_86
+      type: context
+      locator:
+        published_page: 797
+        pdf_page_index: 4
+        table: '6'
+        note: Test 86
+      units: mass% for slag and metal composition; log pO2 dimensionless as printed
+      values:
+        temperature_K: 1573
+        slag_Sn_mass_percent: 27.2
+        slag_CaO_mass_percent: 5.3
+        slag_MgO_mass_percent: 3.8
+        slag_SiO2_mass_percent: 12.6
+        slag_Fe2plus_mass_percent_as_printed: 23.8
+        slag_Fe3plus_mass_percent_as_printed: 11.0
+        metal_Sn_mass_percent: null
+        metal_Fe_mass_percent: 0.81
+        test_no: '86'
+        table: '6'
+        log_pO2: -9.39
+        sample_side_electrode: LaCrO3
+        quantity: table_equilibrium_composition_and_oxygen_potential
+        method_class: measured_tabulated
+        composition_basis: mass percent as printed
+        standard_state_related_quantity: SnO(l) for γSnO in liquid slag
+    - observation_id: takeda_1990_t6_row_87
+      type: context
+      locator:
+        published_page: 797
+        pdf_page_index: 4
+        table: '6'
+        note: Test 87
+      units: mass% for slag and metal composition; log pO2 dimensionless as printed
+      values:
+        temperature_K: 1573
+        slag_Sn_mass_percent: 42.5
+        slag_CaO_mass_percent: 3.3
+        slag_MgO_mass_percent: 3.1
+        slag_SiO2_mass_percent: 8.7
+        slag_Fe2plus_mass_percent_as_printed: 17.2
+        slag_Fe3plus_mass_percent_as_printed: 10.2
+        metal_Sn_mass_percent: null
+        metal_Fe_mass_percent: 0.51
+        test_no: '87'
+        table: '6'
+        log_pO2: -9.11
+        sample_side_electrode: LaCrO3
+        quantity: table_equilibrium_composition_and_oxygen_potential
+        method_class: measured_tabulated
+        composition_basis: mass percent as printed
+        standard_state_related_quantity: SnO(l) for γSnO in liquid slag
+    - observation_id: takeda_1990_t6_row_88
+      type: context
+      locator:
+        published_page: 797
+        pdf_page_index: 4
+        table: '6'
+        note: Test 88
+      units: mass% for slag and metal composition; log pO2 dimensionless as printed
+      values:
+        temperature_K: 1573
+        slag_Sn_mass_percent: 49.8
+        slag_CaO_mass_percent: 3.9
+        slag_MgO_mass_percent: 2.6
+        slag_SiO2_mass_percent: 8.9
+        slag_Fe2plus_mass_percent_as_printed: 13.0
+        slag_Fe3plus_mass_percent_as_printed: 8.5
+        metal_Sn_mass_percent: null
+        metal_Fe_mass_percent: 0.14
+        test_no: '88'
+        table: '6'
+        log_pO2: -8.95
+        sample_side_electrode: LaCrO3
+        quantity: table_equilibrium_composition_and_oxygen_potential
+        method_class: measured_tabulated
+        composition_basis: mass percent as printed
+        standard_state_related_quantity: SnO(l) for γSnO in liquid slag
+    - observation_id: takeda_1990_t6_row_e_s89
+      type: context
+      locator:
+        published_page: 797
+        pdf_page_index: 4
+        table: '6'
+        note: Test E-S89
+      units: mass% for slag and metal composition; log pO2 dimensionless as printed
+      values:
+        temperature_K: 1573
+        slag_Sn_mass_percent: 1.4
+        slag_CaO_mass_percent: 21.7
+        slag_MgO_mass_percent: 7.1
+        slag_SiO2_mass_percent: 31.3
+        slag_Fe2plus_mass_percent_as_printed: 25.8
+        slag_Fe3plus_mass_percent_as_printed: 3.0
+        metal_Sn_mass_percent: 44.3
+        metal_Fe_mass_percent: 56.2
+        test_no: E-S89
+        table: '6'
+        log_pO2: -10.94
+        sample_side_electrode: W
+        quantity: table_equilibrium_composition_and_oxygen_potential
+        method_class: measured_tabulated
+        composition_basis: mass percent as printed
+        standard_state_related_quantity: SnO(l) for γSnO in liquid slag
+    - observation_id: takeda_1990_t6_row_90
+      type: context
+      locator:
+        published_page: 797
+        pdf_page_index: 4
+        table: '6'
+        note: Test 90
+      units: mass% for slag and metal composition; log pO2 dimensionless as printed
+      values:
+        temperature_K: 1573
+        slag_Sn_mass_percent: 2.6
+        slag_CaO_mass_percent: 21.9
+        slag_MgO_mass_percent: 6.7
+        slag_SiO2_mass_percent: 31.6
+        slag_Fe2plus_mass_percent_as_printed: 24.9
+        slag_Fe3plus_mass_percent_as_printed: 2.6
+        metal_Sn_mass_percent: null
+        metal_Fe_mass_percent: 12.3
+        test_no: '90'
+        table: '6'
+        log_pO2: -10.74
+        sample_side_electrode: W
+        quantity: table_equilibrium_composition_and_oxygen_potential
+        method_class: measured_tabulated
+        composition_basis: mass percent as printed
+        standard_state_related_quantity: SnO(l) for γSnO in liquid slag
+    - observation_id: takeda_1990_t6_row_91
+      type: context
+      locator:
+        published_page: 797
+        pdf_page_index: 4
+        table: '6'
+        note: Test 91
+      units: mass% for slag and metal composition; log pO2 dimensionless as printed
+      values:
+        temperature_K: 1573
+        slag_Sn_mass_percent: 2.7
+        slag_CaO_mass_percent: 21.3
+        slag_MgO_mass_percent: 6.9
+        slag_SiO2_mass_percent: 31.6
+        slag_Fe2plus_mass_percent_as_printed: 24.5
+        slag_Fe3plus_mass_percent_as_printed: 2.5
+        metal_Sn_mass_percent: null
+        metal_Fe_mass_percent: 9.8
+        test_no: '91'
+        table: '6'
+        log_pO2: -10.67
+        sample_side_electrode: W
+        quantity: table_equilibrium_composition_and_oxygen_potential
+        method_class: measured_tabulated
+        composition_basis: mass percent as printed
+        standard_state_related_quantity: SnO(l) for γSnO in liquid slag
+    - observation_id: takeda_1990_t6_row_92
+      type: context
+      locator:
+        published_page: 797
+        pdf_page_index: 4
+        table: '6'
+        note: Test 92
+      units: mass% for slag and metal composition; log pO2 dimensionless as printed
+      values:
+        temperature_K: 1573
+        slag_Sn_mass_percent: 3.5
+        slag_CaO_mass_percent: 24.0
+        slag_MgO_mass_percent: 6.0
+        slag_SiO2_mass_percent: 29.5
+        slag_Fe2plus_mass_percent_as_printed: 24.1
+        slag_Fe3plus_mass_percent_as_printed: 4.1
+        metal_Sn_mass_percent: null
+        metal_Fe_mass_percent: 6.7
+        test_no: '92'
+        table: '6'
+        log_pO2: -10.57
+        sample_side_electrode: W
+        quantity: table_equilibrium_composition_and_oxygen_potential
+        method_class: measured_tabulated
+        composition_basis: mass percent as printed
+        standard_state_related_quantity: SnO(l) for γSnO in liquid slag
+    - observation_id: takeda_1990_t6_row_93
+      type: context
+      locator:
+        published_page: 797
+        pdf_page_index: 4
+        table: '6'
+        note: Test 93
+      units: mass% for slag and metal composition; log pO2 dimensionless as printed
+      values:
+        temperature_K: 1573
+        slag_Sn_mass_percent: 5.5
+        slag_CaO_mass_percent: 24.0
+        slag_MgO_mass_percent: 6.6
+        slag_SiO2_mass_percent: 30.7
+        slag_Fe2plus_mass_percent_as_printed: 19.8
+        slag_Fe3plus_mass_percent_as_printed: 4.5
+        metal_Sn_mass_percent: null
+        metal_Fe_mass_percent: 3.0
+        test_no: '93'
+        table: '6'
+        log_pO2: -10.3
+        sample_side_electrode: W
+        quantity: table_equilibrium_composition_and_oxygen_potential
+        method_class: measured_tabulated
+        composition_basis: mass percent as printed
+        standard_state_related_quantity: SnO(l) for γSnO in liquid slag
+    - observation_id: takeda_1990_t6_row_94
+      type: context
+      locator:
+        published_page: 797
+        pdf_page_index: 4
+        table: '6'
+        note: Test 94
+      units: mass% for slag and metal composition; log pO2 dimensionless as printed
+      values:
+        temperature_K: 1573
+        slag_Sn_mass_percent: 7.6
+        slag_CaO_mass_percent: 23.1
+        slag_MgO_mass_percent: 6.9
+        slag_SiO2_mass_percent: 29.7
+        slag_Fe2plus_mass_percent_as_printed: 17.2
+        slag_Fe3plus_mass_percent_as_printed: 6.9
+        metal_Sn_mass_percent: null
+        metal_Fe_mass_percent: 1.7
+        test_no: '94'
+        table: '6'
+        log_pO2: -9.98
+        sample_side_electrode: W
+        quantity: table_equilibrium_composition_and_oxygen_potential
+        method_class: measured_tabulated
+        composition_basis: mass percent as printed
+        standard_state_related_quantity: SnO(l) for γSnO in liquid slag
+    - observation_id: takeda_1990_t6_row_95
+      type: context
+      locator:
+        published_page: 797
+        pdf_page_index: 4
+        table: '6'
+        note: Test 95
+      units: mass% for slag and metal composition; log pO2 dimensionless as printed
+      values:
+        temperature_K: 1573
+        slag_Sn_mass_percent: 11.2
+        slag_CaO_mass_percent: 21.9
+        slag_MgO_mass_percent: 6.8
+        slag_SiO2_mass_percent: 28.1
+        slag_Fe2plus_mass_percent_as_printed: 16.4
+        slag_Fe3plus_mass_percent_as_printed: 5.8
+        metal_Sn_mass_percent: null
+        metal_Fe_mass_percent: 0.93
+        test_no: '95'
+        table: '6'
+        log_pO2: -9.46
+        sample_side_electrode: LaCrO3
+        quantity: table_equilibrium_composition_and_oxygen_potential
+        method_class: measured_tabulated
+        composition_basis: mass percent as printed
+        standard_state_related_quantity: SnO(l) for γSnO in liquid slag
+    - observation_id: takeda_1990_t6_row_96
+      type: context
+      locator:
+        published_page: 797
+        pdf_page_index: 4
+        table: '6'
+        note: Test 96
+      units: mass% for slag and metal composition; log pO2 dimensionless as printed
+      values:
+        temperature_K: 1573
+        slag_Sn_mass_percent: 15.6
+        slag_CaO_mass_percent: 20.7
+        slag_MgO_mass_percent: 6.5
+        slag_SiO2_mass_percent: 27.1
+        slag_Fe2plus_mass_percent_as_printed: 14.1
+        slag_Fe3plus_mass_percent_as_printed: 6.2
+        metal_Sn_mass_percent: null
+        metal_Fe_mass_percent: 0.61
+        test_no: '96'
+        table: '6'
+        log_pO2: -9.25
+        sample_side_electrode: LaCrO3
+        quantity: table_equilibrium_composition_and_oxygen_potential
+        method_class: measured_tabulated
+        composition_basis: mass percent as printed
+        standard_state_related_quantity: SnO(l) for γSnO in liquid slag
+    - observation_id: takeda_1990_t6_row_97
+      type: context
+      locator:
+        published_page: 797
+        pdf_page_index: 4
+        table: '6'
+        note: Test 97
+      units: mass% for slag and metal composition; log pO2 dimensionless as printed
+      values:
+        temperature_K: 1573
+        slag_Sn_mass_percent: 15.6
+        slag_CaO_mass_percent: 19.0
+        slag_MgO_mass_percent: 7.6
+        slag_SiO2_mass_percent: 26.9
+        slag_Fe2plus_mass_percent_as_printed: 14.3
+        slag_Fe3plus_mass_percent_as_printed: 6.9
+        metal_Sn_mass_percent: null
+        metal_Fe_mass_percent: 0.5
+        test_no: '97'
+        table: '6'
+        log_pO2: -9.2
+        sample_side_electrode: LaCrO3
+        quantity: table_equilibrium_composition_and_oxygen_potential
+        method_class: measured_tabulated
+        composition_basis: mass percent as printed
+        standard_state_related_quantity: SnO(l) for γSnO in liquid slag
+    - observation_id: takeda_1990_t6_row_98
+      type: context
+      locator:
+        published_page: 797
+        pdf_page_index: 4
+        table: '6'
+        note: Test 98
+      units: mass% for slag and metal composition; log pO2 dimensionless as printed
+      values:
+        temperature_K: 1573
+        slag_Sn_mass_percent: 26.9
+        slag_CaO_mass_percent: 15.3
+        slag_MgO_mass_percent: 6.3
+        slag_SiO2_mass_percent: 24.4
+        slag_Fe2plus_mass_percent_as_printed: 11.2
+        slag_Fe3plus_mass_percent_as_printed: 6.7
+        metal_Sn_mass_percent: null
+        metal_Fe_mass_percent: 0.4
+        test_no: '98'
+        table: '6'
+        log_pO2: -8.9
+        sample_side_electrode: LaCrO3
+        quantity: table_equilibrium_composition_and_oxygen_potential
+        method_class: measured_tabulated
+        composition_basis: mass percent as printed
+        standard_state_related_quantity: SnO(l) for γSnO in liquid slag
+    - observation_id: takeda_1990_t6_row_99
+      type: context
+      locator:
+        published_page: 797
+        pdf_page_index: 4
+        table: '6'
+        note: Test 99
+      units: mass% for slag and metal composition; log pO2 dimensionless as printed
+      values:
+        temperature_K: 1573
+        slag_Sn_mass_percent: 44.7
+        slag_CaO_mass_percent: 8.6
+        slag_MgO_mass_percent: 4.4
+        slag_SiO2_mass_percent: 16.1
+        slag_Fe2plus_mass_percent_as_printed: 5.6
+        slag_Fe3plus_mass_percent_as_printed: 8.8
+        metal_Sn_mass_percent: null
+        metal_Fe_mass_percent: 0.16
+        test_no: '99'
+        table: '6'
+        log_pO2: -8.8
+        sample_side_electrode: LaCrO3
+        quantity: table_equilibrium_composition_and_oxygen_potential
+        method_class: measured_tabulated
+        composition_basis: mass percent as printed
+        standard_state_related_quantity: SnO(l) for γSnO in liquid slag
+    - observation_id: takeda_1990_t6_row_100
+      type: context
+      locator:
+        published_page: 797
+        pdf_page_index: 4
+        table: '6'
+        note: Test 100
+      units: mass% for slag and metal composition; log pO2 dimensionless as printed
+      values:
+        temperature_K: 1573
+        slag_Sn_mass_percent: 64.2
+        slag_CaO_mass_percent: 5.0
+        slag_MgO_mass_percent: 2.2
+        slag_SiO2_mass_percent: 9.6
+        slag_total_Fe_mass_percent: 8.5
+        slag_iron_basis_as_printed: FeT
+        slag_iron_as_printed: FeT:8.5
+        slag_Fe2plus_mass_percent_as_printed: null
+        slag_Fe3plus_mass_percent_as_printed: null
+        metal_Sn_mass_percent: null
+        metal_Fe_mass_percent: 0.05
+        test_no: '100'
+        table: '6'
+        log_pO2: -8.63
+        sample_side_electrode: LaCrO3
+        quantity: table_equilibrium_composition_and_oxygen_potential
+        method_class: measured_tabulated
+        composition_basis: mass percent as printed
+        standard_state_related_quantity: SnO(l) for γSnO in liquid slag
+    - observation_id: takeda_1990_t6_row_c_s101
+      type: context
+      locator:
+        published_page: 797
+        pdf_page_index: 4
+        table: '6'
+        note: Test C-S101
+      units: mass% for slag and metal composition; log pO2 dimensionless as printed
+      values:
+        temperature_K: 1573
+        slag_Sn_mass_percent: 0.86
+        slag_CaO_mass_percent: 32.7
+        slag_MgO_mass_percent: 4.7
+        slag_SiO2_mass_percent: 36.0
+        slag_Fe2plus_mass_percent_as_printed: 17.9
+        slag_Fe3plus_mass_percent_as_printed: 1.3
+        metal_Sn_mass_percent: 43.5
+        metal_Fe_mass_percent: 55.0
+        test_no: C-S101
+        table: '6'
+        log_pO2: -11.13
+        sample_side_electrode: W
+        quantity: table_equilibrium_composition_and_oxygen_potential
+        method_class: measured_tabulated
+        composition_basis: mass percent as printed
+        standard_state_related_quantity: SnO(l) for γSnO in liquid slag
+    - observation_id: takeda_1990_t6_row_102
+      type: context
+      locator:
+        published_page: 797
+        pdf_page_index: 4
+        table: '6'
+        note: Test 102
+      units: mass% for slag and metal composition; log pO2 dimensionless as printed
+      values:
+        temperature_K: 1573
+        slag_Sn_mass_percent: 1.3
+        slag_CaO_mass_percent: 33.3
+        slag_MgO_mass_percent: 4.9
+        slag_SiO2_mass_percent: 36.4
+        slag_Fe2plus_mass_percent_as_printed: 17.1
+        slag_Fe3plus_mass_percent_as_printed: 1.3
+        metal_Sn_mass_percent: null
+        metal_Fe_mass_percent: 7.7
+        test_no: '102'
+        table: '6'
+        log_pO2: -10.93
+        sample_side_electrode: W
+        quantity: table_equilibrium_composition_and_oxygen_potential
+        method_class: measured_tabulated
+        composition_basis: mass percent as printed
+        standard_state_related_quantity: SnO(l) for γSnO in liquid slag
+    - observation_id: takeda_1990_t6_row_103
+      type: context
+      locator:
+        published_page: 797
+        pdf_page_index: 4
+        table: '6'
+        note: Test 103
+      units: mass% for slag and metal composition; log pO2 dimensionless as printed
+      values:
+        temperature_K: 1573
+        slag_Sn_mass_percent: 2.8
+        slag_CaO_mass_percent: 32.4
+        slag_MgO_mass_percent: 5.7
+        slag_SiO2_mass_percent: 32.5
+        slag_Fe2plus_mass_percent_as_printed: 17.9
+        slag_Fe3plus_mass_percent_as_printed: 2.5
+        metal_Sn_mass_percent: null
+        metal_Fe_mass_percent: 1.9
+        test_no: '103'
+        table: '6'
+        log_pO2: -10.6
+        sample_side_electrode: W
+        quantity: table_equilibrium_composition_and_oxygen_potential
+        method_class: measured_tabulated
+        composition_basis: mass percent as printed
+        standard_state_related_quantity: SnO(l) for γSnO in liquid slag
+    - observation_id: takeda_1990_t6_row_104
+      type: context
+      locator:
+        published_page: 797
+        pdf_page_index: 4
+        table: '6'
+        note: Test 104
+      units: mass% for slag and metal composition; log pO2 dimensionless as printed
+      values:
+        temperature_K: 1573
+        slag_Sn_mass_percent: 8.4
+        slag_CaO_mass_percent: 29.8
+        slag_MgO_mass_percent: 4.9
+        slag_SiO2_mass_percent: 34.6
+        slag_Fe2plus_mass_percent_as_printed: 9.6
+        slag_Fe3plus_mass_percent_as_printed: 6.2
+        metal_Sn_mass_percent: null
+        metal_Fe_mass_percent: 0.61
+        test_no: '104'
+        table: '6'
+        log_pO2: -9.57
+        sample_side_electrode: LaCrO3
+        quantity: table_equilibrium_composition_and_oxygen_potential
+        method_class: measured_tabulated
+        composition_basis: mass percent as printed
+        standard_state_related_quantity: SnO(l) for γSnO in liquid slag
+    - observation_id: takeda_1990_t6_row_105
+      type: context
+      locator:
+        published_page: 797
+        pdf_page_index: 4
+        table: '6'
+        note: Test 105
+      units: mass% for slag and metal composition; log pO2 dimensionless as printed
+      values:
+        temperature_K: 1573
+        slag_Sn_mass_percent: 10.2
+        slag_CaO_mass_percent: 27.2
+        slag_MgO_mass_percent: 5.8
+        slag_SiO2_mass_percent: 33.1
+        slag_Fe2plus_mass_percent_as_printed: 10.4
+        slag_Fe3plus_mass_percent_as_printed: 6.0
+        metal_Sn_mass_percent: null
+        metal_Fe_mass_percent: 0.77
+        test_no: '105'
+        table: '6'
+        log_pO2: -9.47
+        sample_side_electrode: LaCrO3
+        quantity: table_equilibrium_composition_and_oxygen_potential
+        method_class: measured_tabulated
+        composition_basis: mass percent as printed
+        standard_state_related_quantity: SnO(l) for γSnO in liquid slag
+    - observation_id: takeda_1990_t6_row_106
+      type: context
+      locator:
+        published_page: 797
+        pdf_page_index: 4
+        table: '6'
+        note: Test 106
+      units: mass% for slag and metal composition; log pO2 dimensionless as printed
+      values:
+        temperature_K: 1573
+        slag_Sn_mass_percent: 19.1
+        slag_CaO_mass_percent: 23.9
+        slag_MgO_mass_percent: 5.6
+        slag_SiO2_mass_percent: 30.9
+        slag_Fe2plus_mass_percent_as_printed: 5.9
+        slag_Fe3plus_mass_percent_as_printed: 7.2
+        metal_Sn_mass_percent: null
+        metal_Fe_mass_percent: 0.33
+        test_no: '106'
+        table: '6'
+        log_pO2: -8.99
+        sample_side_electrode: LaCrO3
+        quantity: table_equilibrium_composition_and_oxygen_potential
+        method_class: measured_tabulated
+        composition_basis: mass percent as printed
+        standard_state_related_quantity: SnO(l) for γSnO in liquid slag
+    - observation_id: takeda_1990_t6_row_107
+      type: context
+      locator:
+        published_page: 797
+        pdf_page_index: 4
+        table: '6'
+        note: Test 107
+      units: mass% for slag and metal composition; log pO2 dimensionless as printed
+      values:
+        temperature_K: 1573
+        slag_Sn_mass_percent: 30.9
+        slag_CaO_mass_percent: 19.0
+        slag_MgO_mass_percent: 4.4
+        slag_SiO2_mass_percent: 24.6
+        slag_Fe2plus_mass_percent_as_printed: 4.4
+        slag_Fe3plus_mass_percent_as_printed: 6.0
+        metal_Sn_mass_percent: null
+        metal_Fe_mass_percent: 0.12
+        test_no: '107'
+        table: '6'
+        log_pO2: -8.87
+        sample_side_electrode: LaCrO3
+        quantity: table_equilibrium_composition_and_oxygen_potential
+        method_class: measured_tabulated
+        composition_basis: mass percent as printed
+        standard_state_related_quantity: SnO(l) for γSnO in liquid slag
+    - observation_id: takeda_1990_t6_row_c_s108
+      type: context
+      locator:
+        published_page: 797
+        pdf_page_index: 4
+        table: '6'
+        note: Test c-S108
+      units: mass% for slag and metal composition; log pO2 dimensionless as printed
+      values:
+        temperature_K: 1573
+        slag_Sn_mass_percent: 3.5
+        slag_CaO_mass_percent: 15.6
+        slag_MgO_mass_percent: 1.2
+        slag_SiO2_mass_percent: 17.5
+        slag_Fe2plus_mass_percent_as_printed: 41.7
+        slag_Fe3plus_mass_percent_as_printed: 6.4
+        metal_Sn_mass_percent: 40.8
+        metal_Fe_mass_percent: 60.4
+        test_no: c-S108
+        table: '6'
+        log_pO2: -10.74
+        sample_side_electrode: W
+        quantity: table_equilibrium_composition_and_oxygen_potential
+        method_class: measured_tabulated
+        composition_basis: mass percent as printed
+        standard_state_related_quantity: SnO(l) for γSnO in liquid slag
+    - observation_id: takeda_1990_t6_row_109
+      type: context
+      locator:
+        published_page: 797
+        pdf_page_index: 4
+        table: '6'
+        note: Test 109
+      units: mass% for slag and metal composition; log pO2 dimensionless as printed
+      values:
+        temperature_K: 1573
+        slag_Sn_mass_percent: 6.1
+        slag_CaO_mass_percent: 15.5
+        slag_MgO_mass_percent: 2.0
+        slag_SiO2_mass_percent: 18.0
+        slag_Fe2plus_mass_percent_as_printed: 37.0
+        slag_Fe3plus_mass_percent_as_printed: 6.7
+        metal_Sn_mass_percent: null
+        metal_Fe_mass_percent: 12.0
+        test_no: '109'
+        table: '6'
+        log_pO2: -10.45
+        sample_side_electrode: LaCrO3
+        quantity: table_equilibrium_composition_and_oxygen_potential
+        method_class: measured_tabulated
+        composition_basis: mass percent as printed
+        standard_state_related_quantity: SnO(l) for γSnO in liquid slag
+    - observation_id: takeda_1990_t6_row_110
+      type: context
+      locator:
+        published_page: 797
+        pdf_page_index: 4
+        table: '6'
+        note: Test 110
+      units: mass% for slag and metal composition; log pO2 dimensionless as printed
+      values:
+        temperature_K: 1573
+        slag_Sn_mass_percent: 7.4
+        slag_CaO_mass_percent: 14.2
+        slag_MgO_mass_percent: 1.6
+        slag_SiO2_mass_percent: 16.3
+        slag_Fe2plus_mass_percent_as_printed: 38.6
+        slag_Fe3plus_mass_percent_as_printed: 7.1
+        metal_Sn_mass_percent: null
+        metal_Fe_mass_percent: 8.7
+        test_no: '110'
+        table: '6'
+        log_pO2: -10.3
+        sample_side_electrode: LaCrO3
+        quantity: table_equilibrium_composition_and_oxygen_potential
+        method_class: measured_tabulated
+        composition_basis: mass percent as printed
+        standard_state_related_quantity: SnO(l) for γSnO in liquid slag
+    - observation_id: takeda_1990_t6_row_111
+      type: context
+      locator:
+        published_page: 797
+        pdf_page_index: 4
+        table: '6'
+        note: Test 111
+      units: mass% for slag and metal composition; log pO2 dimensionless as printed
+      values:
+        temperature_K: 1573
+        slag_Sn_mass_percent: 15.7
+        slag_CaO_mass_percent: 10.8
+        slag_MgO_mass_percent: 2.9
+        slag_SiO2_mass_percent: 13.7
+        slag_Fe2plus_mass_percent_as_printed: 30.1
+        slag_Fe3plus_mass_percent_as_printed: 9.7
+        metal_Sn_mass_percent: null
+        metal_Fe_mass_percent: 1.5
+        test_no: '111'
+        table: '6'
+        log_pO2: -9.74
+        sample_side_electrode: LaCrO3
+        quantity: table_equilibrium_composition_and_oxygen_potential
+        method_class: measured_tabulated
+        composition_basis: mass percent as printed
+        standard_state_related_quantity: SnO(l) for γSnO in liquid slag
+    - observation_id: takeda_1990_t6_row_112
+      type: context
+      locator:
+        published_page: 797
+        pdf_page_index: 4
+        table: '6'
+        note: Test 112
+      units: mass% for slag and metal composition; log pO2 dimensionless as printed
+      values:
+        temperature_K: 1573
+        slag_Sn_mass_percent: 28.2
+        slag_CaO_mass_percent: 9.0
+        slag_MgO_mass_percent: 3.6
+        slag_SiO2_mass_percent: 11.2
+        slag_Fe2plus_mass_percent_as_printed: 21.7
+        slag_Fe3plus_mass_percent_as_printed: 11.0
+        metal_Sn_mass_percent: null
+        metal_Fe_mass_percent: 0.98
+        test_no: '112'
+        table: '6'
+        log_pO2: -9.45
+        sample_side_electrode: LaCrO3
+        quantity: table_equilibrium_composition_and_oxygen_potential
+        method_class: measured_tabulated
+        composition_basis: mass percent as printed
+        standard_state_related_quantity: SnO(l) for γSnO in liquid slag
+    - observation_id: takeda_1990_t6_row_113
+      type: context
+      locator:
+        published_page: 797
+        pdf_page_index: 4
+        table: '6'
+        note: Test 113
+      units: mass% for slag and metal composition; log pO2 dimensionless as printed
+      values:
+        temperature_K: 1573
+        slag_Sn_mass_percent: 39.9
+        slag_CaO_mass_percent: 7.5
+        slag_MgO_mass_percent: 3.0
+        slag_SiO2_mass_percent: 8.2
+        slag_Fe2plus_mass_percent_as_printed: 18.1
+        slag_Fe3plus_mass_percent_as_printed: 8.3
+        metal_Sn_mass_percent: null
+        metal_Fe_mass_percent: 0.33
+        test_no: '113'
+        table: '6'
+        log_pO2: -9.04
+        sample_side_electrode: LaCrO3
+        quantity: table_equilibrium_composition_and_oxygen_potential
+        method_class: measured_tabulated
+        composition_basis: mass percent as printed
+        standard_state_related_quantity: SnO(l) for γSnO in liquid slag
+    - observation_id: takeda_1990_t6_row_114
+      type: context
+      locator:
+        published_page: 797
+        pdf_page_index: 4
+        table: '6'
+        note: Test 114
+      units: mass% for slag and metal composition; log pO2 dimensionless as printed
+      values:
+        temperature_K: 1573
+        slag_Sn_mass_percent: 51.2
+        slag_CaO_mass_percent: 5.0
+        slag_MgO_mass_percent: 3.3
+        slag_SiO2_mass_percent: 6.3
+        slag_Fe2plus_mass_percent_as_printed: 8.4
+        slag_Fe3plus_mass_percent_as_printed: 11.0
+        metal_Sn_mass_percent: null
+        metal_Fe_mass_percent: 0.37
+        test_no: '114'
+        table: '6'
+        log_pO2: -8.79
+        sample_side_electrode: LaCrO3
+        quantity: table_equilibrium_composition_and_oxygen_potential
+        method_class: measured_tabulated
+        composition_basis: mass percent as printed
+        standard_state_related_quantity: SnO(l) for γSnO in liquid slag
+    - observation_id: takeda_1990_t6_row_d_s115
+      type: context
+      locator:
+        published_page: 797
+        pdf_page_index: 4
+        table: '6'
+        note: Test D-S115
+      units: mass% for slag and metal composition; log pO2 dimensionless as printed
+      values:
+        temperature_K: 1573
+        slag_Sn_mass_percent: 4.7
+        slag_CaO_mass_percent: 20.1
+        slag_MgO_mass_percent: 1.1
+        slag_SiO2_mass_percent: 0
+        slag_Fe2plus_mass_percent_as_printed: 40.2
+        slag_Fe3plus_mass_percent_as_printed: 14.5
+        metal_Sn_mass_percent: 40.3
+        metal_Fe_mass_percent: 58.0
+        test_no: D-S115
+        table: '6'
+        log_pO2: -11.07
+        sample_side_electrode: W
+        quantity: table_equilibrium_composition_and_oxygen_potential
+        method_class: measured_tabulated
+        composition_basis: mass percent as printed
+        standard_state_related_quantity: SnO(l) for γSnO in liquid slag
+    - observation_id: takeda_1990_t6_row_116
+      type: context
+      locator:
+        published_page: 797
+        pdf_page_index: 4
+        table: '6'
+        note: Test 116
+      units: mass% for slag and metal composition; log pO2 dimensionless as printed
+      values:
+        temperature_K: 1573
+        slag_Sn_mass_percent: 8.8
+        slag_CaO_mass_percent: 20.1
+        slag_MgO_mass_percent: 1.2
+        slag_SiO2_mass_percent: 0
+        slag_Fe2plus_mass_percent_as_printed: 35.9
+        slag_Fe3plus_mass_percent_as_printed: 13.9
+        metal_Sn_mass_percent: null
+        metal_Fe_mass_percent: 13.9
+        test_no: '116'
+        table: '6'
+        log_pO2: -10.89
+        sample_side_electrode: W
+        quantity: table_equilibrium_composition_and_oxygen_potential
+        method_class: measured_tabulated
+        composition_basis: mass percent as printed
+        standard_state_related_quantity: SnO(l) for γSnO in liquid slag
+    - observation_id: takeda_1990_t6_row_117
+      type: context
+      locator:
+        published_page: 797
+        pdf_page_index: 4
+        table: '6'
+        note: Test 117
+      units: mass% for slag and metal composition; log pO2 dimensionless as printed
+      values:
+        temperature_K: 1573
+        slag_Sn_mass_percent: 9.8
+        slag_CaO_mass_percent: 20.5
+        slag_MgO_mass_percent: 1.1
+        slag_SiO2_mass_percent: 0
+        slag_Fe2plus_mass_percent_as_printed: 34.3
+        slag_Fe3plus_mass_percent_as_printed: 14.7
+        metal_Sn_mass_percent: null
+        metal_Fe_mass_percent: 8.2
+        test_no: '117'
+        table: '6'
+        log_pO2: -10.75
+        sample_side_electrode: W
+        quantity: table_equilibrium_composition_and_oxygen_potential
+        method_class: measured_tabulated
+        composition_basis: mass percent as printed
+        standard_state_related_quantity: SnO(l) for γSnO in liquid slag
+    - observation_id: takeda_1990_t6_row_118
+      type: context
+      locator:
+        published_page: 797
+        pdf_page_index: 4
+        table: '6'
+        note: Test 118
+      units: mass% for slag and metal composition; log pO2 dimensionless as printed
+      values:
+        temperature_K: 1573
+        slag_Sn_mass_percent: 13.9
+        slag_CaO_mass_percent: 20.0
+        slag_MgO_mass_percent: 1.2
+        slag_SiO2_mass_percent: 0
+        slag_Fe2plus_mass_percent_as_printed: 31.0
+        slag_Fe3plus_mass_percent_as_printed: 15.0
+        metal_Sn_mass_percent: null
+        metal_Fe_mass_percent: 3.9
+        test_no: '118'
+        table: '6'
+        log_pO2: -10.62
+        sample_side_electrode: W
+        quantity: table_equilibrium_composition_and_oxygen_potential
+        method_class: measured_tabulated
+        composition_basis: mass percent as printed
+        standard_state_related_quantity: SnO(l) for γSnO in liquid slag
+    - observation_id: takeda_1990_t6_row_119
+      type: context
+      locator:
+        published_page: 797
+        pdf_page_index: 4
+        table: '6'
+        note: Test 119
+      units: mass% for slag and metal composition; log pO2 dimensionless as printed
+      values:
+        temperature_K: 1573
+        slag_Sn_mass_percent: 16.3
+        slag_CaO_mass_percent: 16.2
+        slag_MgO_mass_percent: 1.6
+        slag_SiO2_mass_percent: 0
+        slag_Fe2plus_mass_percent_as_printed: 27.2
+        slag_Fe3plus_mass_percent_as_printed: 19.4
+        metal_Sn_mass_percent: null
+        metal_Fe_mass_percent: 1.9
+        test_no: '119'
+        table: '6'
+        log_pO2: -10.03
+        sample_side_electrode: W
+        quantity: table_equilibrium_composition_and_oxygen_potential
+        method_class: measured_tabulated
+        composition_basis: mass percent as printed
+        standard_state_related_quantity: SnO(l) for γSnO in liquid slag
+    - observation_id: takeda_1990_t6_row_120
+      type: context
+      locator:
+        published_page: 797
+        pdf_page_index: 4
+        table: '6'
+        note: Test 120
+      units: mass% for slag and metal composition; log pO2 dimensionless as printed
+      values:
+        temperature_K: 1573
+        slag_Sn_mass_percent: 21.3
+        slag_CaO_mass_percent: 17.7
+        slag_MgO_mass_percent: 1.3
+        slag_SiO2_mass_percent: 0
+        slag_Fe2plus_mass_percent_as_printed: 22.2
+        slag_Fe3plus_mass_percent_as_printed: 19.3
+        metal_Sn_mass_percent: null
+        metal_Fe_mass_percent: 1.4
+        test_no: '120'
+        table: '6'
+        log_pO2: -9.78
+        sample_side_electrode: LaCrO3
+        quantity: table_equilibrium_composition_and_oxygen_potential
+        method_class: measured_tabulated
+        composition_basis: mass percent as printed
+        standard_state_related_quantity: SnO(l) for γSnO in liquid slag
+    - observation_id: takeda_1990_t6_row_121
+      type: context
+      locator:
+        published_page: 797
+        pdf_page_index: 4
+        table: '6'
+        note: Test 121
+      units: mass% for slag and metal composition; log pO2 dimensionless as printed
+      values:
+        temperature_K: 1573
+        slag_Sn_mass_percent: 27.1
+        slag_CaO_mass_percent: 15.7
+        slag_MgO_mass_percent: 1.5
+        slag_SiO2_mass_percent: 0
+        slag_Fe2plus_mass_percent_as_printed: 18.5
+        slag_Fe3plus_mass_percent_as_printed: 19.0
+        metal_Sn_mass_percent: null
+        metal_Fe_mass_percent: 1.3
+        test_no: '121'
+        table: '6'
+        log_pO2: -9.8
+        sample_side_electrode: LaCrO3
+        quantity: table_equilibrium_composition_and_oxygen_potential
+        method_class: measured_tabulated
+        composition_basis: mass percent as printed
+        standard_state_related_quantity: SnO(l) for γSnO in liquid slag
+    - observation_id: takeda_1990_t6_row_122
+      type: context
+      locator:
+        published_page: 797
+        pdf_page_index: 4
+        table: '6'
+        note: Test 122
+      units: mass% for slag and metal composition; log pO2 dimensionless as printed
+      values:
+        temperature_K: 1573
+        slag_Sn_mass_percent: 33.5
+        slag_CaO_mass_percent: 14.8
+        slag_MgO_mass_percent: 1.2
+        slag_SiO2_mass_percent: 0
+        slag_Fe2plus_mass_percent_as_printed: 14.3
+        slag_Fe3plus_mass_percent_as_printed: 20.4
+        metal_Sn_mass_percent: null
+        metal_Fe_mass_percent: 0.78
+        test_no: '122'
+        table: '6'
+        log_pO2: -9.62
+        sample_side_electrode: LaCrO3
+        quantity: table_equilibrium_composition_and_oxygen_potential
+        method_class: measured_tabulated
+        composition_basis: mass percent as printed
+        standard_state_related_quantity: SnO(l) for γSnO in liquid slag
+    - observation_id: takeda_1990_t6_row_123
+      type: context
+      locator:
+        published_page: 797
+        pdf_page_index: 4
+        table: '6'
+        note: Test 123
+      units: mass% for slag and metal composition; log pO2 dimensionless as printed
+      values:
+        temperature_K: 1573
+        slag_Sn_mass_percent: 37.4
+        slag_CaO_mass_percent: 13.7
+        slag_MgO_mass_percent: 1.2
+        slag_SiO2_mass_percent: 0
+        slag_Fe2plus_mass_percent_as_printed: 13.2
+        slag_Fe3plus_mass_percent_as_printed: 17.6
+        metal_Sn_mass_percent: null
+        metal_Fe_mass_percent: 0.49
+        test_no: '123'
+        table: '6'
+        log_pO2: -9.4
+        sample_side_electrode: LaCrO3
+        quantity: table_equilibrium_composition_and_oxygen_potential
+        method_class: measured_tabulated
+        composition_basis: mass percent as printed
+        standard_state_related_quantity: SnO(l) for γSnO in liquid slag
+    - observation_id: takeda_1990_t6_row_124
+      type: context
+      locator:
+        published_page: 797
+        pdf_page_index: 4
+        table: '6'
+        note: Test 124
+      units: mass% for slag and metal composition; log pO2 dimensionless as printed
+      values:
+        temperature_K: 1573
+        slag_Sn_mass_percent: 57.2
+        slag_CaO_mass_percent: 7.7
+        slag_MgO_mass_percent: 1.1
+        slag_SiO2_mass_percent: 0
+        slag_total_Fe_mass_percent: 18.5
+        slag_iron_basis_as_printed: FeT
+        slag_iron_as_printed: FeT:18.5
+        slag_Fe2plus_mass_percent_as_printed: null
+        slag_Fe3plus_mass_percent_as_printed: null
+        metal_Sn_mass_percent: null
+        metal_Fe_mass_percent: 0.36
+        test_no: '124'
+        table: '6'
+        log_pO2: -9.1
+        sample_side_electrode: LaCrO3
+        quantity: table_equilibrium_composition_and_oxygen_potential
+        method_class: measured_tabulated
+        composition_basis: mass percent as printed
+        standard_state_related_quantity: SnO(l) for γSnO in liquid slag
+    - observation_id: takeda_1990_t6_row_d_s125
+      type: context
+      locator:
+        published_page: 797
+        pdf_page_index: 4
+        table: '6'
+        note: Test d-S125
+      units: mass% for slag and metal composition; log pO2 dimensionless as printed
+      values:
+        temperature_K: 1573
+        slag_Sn_mass_percent: 5.2
+        slag_CaO_mass_percent: 10.7
+        slag_MgO_mass_percent: 0.7
+        slag_SiO2_mass_percent: 0
+        slag_Fe2plus_mass_percent_as_printed: 49.9
+        slag_Fe3plus_mass_percent_as_printed: 12.0
+        metal_Sn_mass_percent: 39.8
+        metal_Fe_mass_percent: 61.2
+        test_no: d-S125
+        table: '6'
+        log_pO2: -10.79
+        sample_side_electrode: W
+        quantity: table_equilibrium_composition_and_oxygen_potential
+        method_class: measured_tabulated
+        composition_basis: mass percent as printed
+        standard_state_related_quantity: SnO(l) for γSnO in liquid slag
+    - observation_id: takeda_1990_t6_row_126
+      type: context
+      locator:
+        published_page: 797
+        pdf_page_index: 4
+        table: '6'
+        note: Test 126
+      units: mass% for slag and metal composition; log pO2 dimensionless as printed
+      values:
+        temperature_K: 1573
+        slag_Sn_mass_percent: 8.4
+        slag_CaO_mass_percent: 11.1
+        slag_MgO_mass_percent: 0.7
+        slag_SiO2_mass_percent: 0
+        slag_Fe2plus_mass_percent_as_printed: 46.6
+        slag_Fe3plus_mass_percent_as_printed: 12.0
+        metal_Sn_mass_percent: null
+        metal_Fe_mass_percent: 13.4
+        test_no: '126'
+        table: '6'
+        log_pO2: -10.58
+        sample_side_electrode: LaCrO3
+        quantity: table_equilibrium_composition_and_oxygen_potential
+        method_class: measured_tabulated
+        composition_basis: mass percent as printed
+        standard_state_related_quantity: SnO(l) for γSnO in liquid slag
+    - observation_id: takeda_1990_t6_row_127
+      type: context
+      locator:
+        published_page: 797
+        pdf_page_index: 4
+        table: '6'
+        note: Test 127
+      units: mass% for slag and metal composition; log pO2 dimensionless as printed
+      values:
+        temperature_K: 1573
+        slag_Sn_mass_percent: 9.5
+        slag_CaO_mass_percent: 11.2
+        slag_MgO_mass_percent: 0.7
+        slag_SiO2_mass_percent: 0
+        slag_Fe2plus_mass_percent_as_printed: 45.5
+        slag_Fe3plus_mass_percent_as_printed: 12.1
+        metal_Sn_mass_percent: null
+        metal_Fe_mass_percent: 14.8
+        test_no: '127'
+        table: '6'
+        log_pO2: -10.37
+        sample_side_electrode: LaCrO3
+        quantity: table_equilibrium_composition_and_oxygen_potential
+        method_class: measured_tabulated
+        composition_basis: mass percent as printed
+        standard_state_related_quantity: SnO(l) for γSnO in liquid slag
+    - observation_id: takeda_1990_t6_row_128
+      type: context
+      locator:
+        published_page: 797
+        pdf_page_index: 4
+        table: '6'
+        note: Test 128
+      units: mass% for slag and metal composition; log pO2 dimensionless as printed
+      values:
+        temperature_K: 1573
+        slag_Sn_mass_percent: 11.6
+        slag_CaO_mass_percent: 10.4
+        slag_MgO_mass_percent: 0.8
+        slag_SiO2_mass_percent: 0
+        slag_Fe2plus_mass_percent_as_printed: 43.2
+        slag_Fe3plus_mass_percent_as_printed: 13.6
+        metal_Sn_mass_percent: null
+        metal_Fe_mass_percent: 4.8
+        test_no: '128'
+        table: '6'
+        log_pO2: -10.3
+        sample_side_electrode: LaCrO3
+        quantity: table_equilibrium_composition_and_oxygen_potential
+        method_class: measured_tabulated
+        composition_basis: mass percent as printed
+        standard_state_related_quantity: SnO(l) for γSnO in liquid slag
+    - observation_id: takeda_1990_t6_row_129
+      type: context
+      locator:
+        published_page: 797
+        pdf_page_index: 4
+        table: '6'
+        note: Test 129
+      units: mass% for slag and metal composition; log pO2 dimensionless as printed
+      values:
+        temperature_K: 1573
+        slag_Sn_mass_percent: 35.2
+        slag_CaO_mass_percent: 7.0
+        slag_MgO_mass_percent: 1.1
+        slag_SiO2_mass_percent: 0
+        slag_Fe2plus_mass_percent_as_printed: 22.1
+        slag_Fe3plus_mass_percent_as_printed: 17.0
+        metal_Sn_mass_percent: null
+        metal_Fe_mass_percent: 0.82
+        test_no: '129'
+        table: '6'
+        log_pO2: -9.43
+        sample_side_electrode: LaCrO3
+        quantity: table_equilibrium_composition_and_oxygen_potential
+        method_class: measured_tabulated
+        composition_basis: mass percent as printed
+        standard_state_related_quantity: SnO(l) for γSnO in liquid slag
+    - observation_id: takeda_1990_t6_row_130
+      type: context
+      locator:
+        published_page: 797
+        pdf_page_index: 4
+        table: '6'
+        note: Test 130
+      units: mass% for slag and metal composition; log pO2 dimensionless as printed
+      values:
+        temperature_K: 1573
+        slag_Sn_mass_percent: 44.8
+        slag_CaO_mass_percent: 4.9
+        slag_MgO_mass_percent: 1.2
+        slag_SiO2_mass_percent: 0
+        slag_Fe2plus_mass_percent_as_printed: 9.5
+        slag_Fe3plus_mass_percent_as_printed: 20.2
+        metal_Sn_mass_percent: null
+        metal_Fe_mass_percent: 0.62
+        test_no: '130'
+        table: '6'
+        log_pO2: -9.25
+        sample_side_electrode: LaCrO3
+        quantity: table_equilibrium_composition_and_oxygen_potential
+        method_class: measured_tabulated
+        composition_basis: mass percent as printed
+        standard_state_related_quantity: SnO(l) for γSnO in liquid slag
+    - observation_id: takeda_1990_t6_row_131
+      type: context
+      locator:
+        published_page: 797
+        pdf_page_index: 4
+        table: '6'
+        note: Test 131
+      units: mass% for slag and metal composition; log pO2 dimensionless as printed
+      values:
+        temperature_K: 1573
+        slag_Sn_mass_percent: 55.3
+        slag_CaO_mass_percent: 2.0
+        slag_MgO_mass_percent: 1.3
+        slag_SiO2_mass_percent: 0
+        slag_total_Fe_mass_percent: 23.9
+        slag_iron_basis_as_printed: FeT
+        slag_iron_as_printed: FeT:23.9
+        slag_Fe2plus_mass_percent_as_printed: null
+        slag_Fe3plus_mass_percent_as_printed: null
+        metal_Sn_mass_percent: null
+        metal_Fe_mass_percent: 0.34
+        test_no: '131'
+        table: '6'
+        log_pO2: -8.93
+        sample_side_electrode: LaCrO3
+        quantity: table_equilibrium_composition_and_oxygen_potential
+        method_class: measured_tabulated
+        composition_basis: mass percent as printed
+        standard_state_related_quantity: SnO(l) for γSnO in liquid slag
+    - observation_id: takeda_1990_fig4_legend_A_S
+      type: figure_only
+      locator:
+        published_page: 798
+        pdf_page_index: 5
+        figure: '4'
+        note: Legend composition ratios for A-S
+      units: mole-ratio bounds as printed
+      values:
+        quantity: figure_4_slag_composition_legend
+        method_class: figure_only
+        slag_set: A-S
+        n_CaO_plus_MgO_over_total_as_printed: 0–0.21
+        n_CaO_plus_MgO_over_total_range:
+        - 0.0
+        - 0.21
+        n_FeOn_over_total_as_printed: 0.40–0.56
+        n_FeOn_over_total_range:
+        - 0.4
+        - 0.56
+    - observation_id: takeda_1990_fig4_legend_B_S
+      type: figure_only
+      locator:
+        published_page: 798
+        pdf_page_index: 5
+        figure: '4'
+        note: Legend composition ratios for B-S
+      units: mole-ratio bounds as printed
+      values:
+        quantity: figure_4_slag_composition_legend
+        method_class: figure_only
+        slag_set: B-S
+        n_CaO_plus_MgO_over_total_as_printed: 0.34–0.45
+        n_CaO_plus_MgO_over_total_range:
+        - 0.34
+        - 0.45
+        n_FeOn_over_total_as_printed: 0.12–0.19
+        n_FeOn_over_total_range:
+        - 0.12
+        - 0.19
+    - observation_id: takeda_1990_fig4_legend_E_S
+      type: figure_only
+      locator:
+        published_page: 798
+        pdf_page_index: 5
+        figure: '4'
+        note: Legend composition ratios for E-S
+      units: mole-ratio bounds as printed
+      values:
+        quantity: figure_4_slag_composition_legend
+        method_class: figure_only
+        slag_set: E-S
+        n_CaO_plus_MgO_over_total_as_printed: 0.44–0.54
+        n_CaO_plus_MgO_over_total_range:
+        - 0.44
+        - 0.54
+        n_FeOn_over_total_as_printed: 0.27–0.35
+        n_FeOn_over_total_range:
+        - 0.27
+        - 0.35
+    - observation_id: takeda_1990_fig4_legend_C_S
+      type: figure_only
+      locator:
+        published_page: 798
+        pdf_page_index: 5
+        figure: '4'
+        note: Legend composition ratios for C-S
+      units: mole-ratio bounds as printed
+      values:
+        quantity: figure_4_slag_composition_legend
+        method_class: figure_only
+        slag_set: C-S
+        n_CaO_plus_MgO_over_total_as_printed: 0.49–0.57
+        n_CaO_plus_MgO_over_total_range:
+        - 0.49
+        - 0.57
+        n_FeOn_over_total_as_printed: 0.18–0.22
+        n_FeOn_over_total_range:
+        - 0.18
+        - 0.22
+    - observation_id: takeda_1990_fig4_legend_D_S
+      type: figure_only
+      locator:
+        published_page: 798
+        pdf_page_index: 5
+        figure: '4'
+        note: Legend composition ratios for D-S
+      units: mole-ratio bounds as printed
+      values:
+        quantity: figure_4_slag_composition_legend
+        method_class: figure_only
+        slag_set: D-S
+        n_CaO_plus_MgO_over_total_as_printed: '1.0'
+        n_CaO_plus_MgO_over_total_range:
+        - 1.0
+        n_FeOn_over_total_as_printed: 0.67–0.72
+        n_FeOn_over_total_range:
+        - 0.67
+        - 0.72
+    - observation_id: takeda_1990_fig4_legend_a_S
+      type: figure_only
+      locator:
+        published_page: 798
+        pdf_page_index: 5
+        figure: '4'
+        note: Legend composition ratios for a-S
+      units: mole-ratio bounds as printed
+      values:
+        quantity: figure_4_slag_composition_legend
+        method_class: figure_only
+        slag_set: a-S
+        n_CaO_plus_MgO_over_total_as_printed: 0–0.33
+        n_CaO_plus_MgO_over_total_range:
+        - 0.0
+        - 0.33
+        n_FeOn_over_total_as_printed: 0.77–0.85
+        n_FeOn_over_total_range:
+        - 0.77
+        - 0.85
+    - observation_id: takeda_1990_fig4_legend_b_S
+      type: figure_only
+      locator:
+        published_page: 798
+        pdf_page_index: 5
+        figure: '4'
+        note: Legend composition ratios for b-S
+      units: mole-ratio bounds as printed
+      values:
+        quantity: figure_4_slag_composition_legend
+        method_class: figure_only
+        slag_set: b-S
+        n_CaO_plus_MgO_over_total_as_printed: 0.33–0.48
+        n_CaO_plus_MgO_over_total_range:
+        - 0.33
+        - 0.48
+        n_FeOn_over_total_as_printed: 0.58–0.71
+        n_FeOn_over_total_range:
+        - 0.58
+        - 0.71
+    - observation_id: takeda_1990_fig4_legend_c_S
+      type: figure_only
+      locator:
+        published_page: 798
+        pdf_page_index: 5
+        figure: '4'
+        note: Legend composition ratios for c-S
+      units: mole-ratio bounds as printed
+      values:
+        quantity: figure_4_slag_composition_legend
+        method_class: figure_only
+        slag_set: c-S
+        n_CaO_plus_MgO_over_total_as_printed: 0.49–0.62
+        n_CaO_plus_MgO_over_total_range:
+        - 0.49
+        - 0.62
+        n_FeOn_over_total_as_printed: 0.56–0.65
+        n_FeOn_over_total_range:
+        - 0.56
+        - 0.65
+    - observation_id: takeda_1990_fig4_legend_d_S
+      type: figure_only
+      locator:
+        published_page: 798
+        pdf_page_index: 5
+        figure: '4'
+        note: Legend composition ratios for d-S
+      units: mole-ratio bounds as printed
+      values:
+        quantity: figure_4_slag_composition_legend
+        method_class: figure_only
+        slag_set: d-S
+        n_CaO_plus_MgO_over_total_as_printed: '0'
+        n_CaO_plus_MgO_over_total_range:
+        - 0.0
+        n_FeOn_over_total_as_printed: 0.82–0.86
+        n_FeOn_over_total_range:
+        - 0.82
+        - 0.86
+    - observation_id: takeda_1990_intro_metal_smelting_numeric_context
+      type: context
+      locator:
+        published_page: 793
+        pdf_page_index: 0
+        section: Introduction
+      units: mass% as printed
+      values:
+        quantity: two_stage_smelting_conditions
+        weak_reduction_metal_Fe_mass_percent: a few
+        weak_reduction_slag_SnO_mass_percent:
+        - 10
+        - 20
+        second_stage_hardhead_Fe_mass_percent_approx: 40
+        statement_as_printed: 'Weak-reduction smelting: tin metal containing a few mass% iron coexists with slag
+          dissolving 10 to 20 mass% SnO. Strong-reduction second step recovers dissolved tin as hardhead, a Sn-Fe
+          alloy containing around 40 mass% Fe.'
+    - observation_id: takeda_1990_sno_phase_temperature_context
+      type: context
+      locator:
+        published_page: 795
+        pdf_page_index: 2
+        section: SnO melting and solidification
+      units: K and g as printed
+      values:
+        quantity: SnO_phase_transition_context
+        melting_points_reported_by_other_workers_K:
+        - {temperature_K: 1313, attribution: Hansen, reference: '10'}
+        - {temperature_K: 1318, attribution: Kuxmann et al., reference: '11'}
+        - {temperature_K: 1373, attribution: Grau et al., reference: '4'}
+        reagent_grade_SnO_melting_temperature_K: 1395
+        cooling_solidification_point_K: 1363
+        possible_assignment_as_printed: may correspond to a monotectic
+        thermal_analysis_charge_1_g_SnO: 15
+        thermal_analysis_charge_1_g_Sn: 15
+        thermal_analysis_charge_2_g_SnO: 15
+        thermal_analysis_charge_2_g_Sn: 25
+        equilibrium_measurement_temperature_range_K:
+        - 1366
+        - 1573
+        thermal_analysis_heating_cooling_cycles: 3
+        thermal_analysis_atmosphere: argon
+        melting_reaction_as_printed: Sn3O4(s) = 2SnO(l) + SnO2(s)
+        melting_reaction_qualification: Melting at 1395 K corresponds probably to the temperature where this reaction proceeded.
+        cooling_reaction_as_printed: 4SnO(l) = Sn3O4(s) + Sn(l)
+        cooling_reaction_qualification: The 1363 K solidification point may correspond to the monotectic reaction isotherm; the reaction may be estimated from the phase diagram.
+        reference_cell_electrode: lanthanum-chromate rod
+        reference_cell_atmosphere: argon
+        maximum_MgO_in_liquid_tin_oxide_percent_as_printed: 2.5
+        maximum_MgO_locator: {published_page: 795, pdf_page_index: 2, section: Right column after Table 2}
+    - observation_id: takeda_1990_gamma_derivation_inputs
+      type: context
+      locator:
+        published_page: 795
+        pdf_page_index: 2
+        equations: 6–7
+      units: as printed
+      values:
+        quantity: SnO_activity_coefficient_calculation_inputs
+        standard_state: SnO(l), pure liquid oxide standard as denoted by γSnO(l)
+        method: Author reduction using K, (%Sn), [%Sn], (n_T), [n_T], pO2 and [gamma_Sn] in equations (6)–(7).
+          K comes from equation (5); slag/metal composition and oxygen-cell measurements are this study's inputs.
+          Metal [gamma_Sn] at 1573 K was estimated from Nunoue data at 1823 K and 1873 K.
+        activity_basis: SnO is estimated as divalent; no gas-ion or ion-current definition is used
+        equation_6_as_printed: K = a_SnO/(a_Sn pO2^(1/2)) = (gamma_SnO)(%Sn)[n_T]/{[gamma_Sn](n_T)[%Sn]pO2^(1/2)}
+        equation_7_as_printed: (%Sn) = K[%Sn](n_T)pO2^(1/2)[gamma_Sn]/{(gamma_SnO)[n_T]}
+        definitions: Parentheses designate slag and square brackets designate metal; a is activity and gamma is activity coefficient.
+        n_T_basis_g: 100
+        n_T_definition: Total mole number of constituents in 100 g of metal or slag; [n_T] is metal and (n_T) is slag.
+        calculation_discussion_locator: {published_page: 798, pdf_page_index: 5, section: Activity coefficient of SnO}
+        reduction_scope: The published 1.0–7.0 summary endpoints are not uniquely assigned to individual table rows; retained as author-reduction context with no invented reduced Observation.
+    - observation_id: takeda_1990_table5_dagger_note
+      type: context
+      locator:
+        published_page: 797
+        pdf_page_index: 4
+        table: '5'
+        note: Footnote for D-S45
+      units: as printed
+      values:
+        quantity: table_5_footnote
+        statement_as_printed: With two metal phases of 81 mass% Sn-Fe and 49 mass% Sn-Fe.
+    - observation_id: takeda_1990_table4_sample_side_electrode
+      experiment: takeda_1990_magnesia_1573_runs
+      type: context
+      locator:
+        published_page: 796
+        pdf_page_index: 3
+        table: '4'
+        section: Left column, second-kind-of-experiment paragraph above Table 3
+      units: as printed
+      values:
+        quantity: table_4_experiment_apparatus
+        experiment_binding: Table 4 slags equilibrated with two metal phases in a magnesia crucible at 1573 K.
+        temperature_K: 1573
+        crucible: magnesia
+        oxygen_measurement: oxygen concentration cell
+        sample_side_electrode: short tungsten rod
+        statement_as_printed: The oxygen potential in the sample was measured by the oxygen concentration cell using a short tungsten rod as the sample side electrode.
+    - observation_id: takeda_1990_table3_wustite_comparison
+      type: context
+      locator:
+        published_page: 796
+        pdf_page_index: 3
+        table: '3'
+        section: Results and Discussion
+      units: mass% and K as printed
+      values:
+        quantity: plain_wustite_comparison
+        method_class: author_estimate
+        statement_as_printed: At 1573 K the oxygen partial pressures are the lowest and iron contents in metal phase
+          are the highest, 70%. Tin solubility in liquid wustite saturated with solid iron is 2.3% at 1673 K and
+          gamma_SnO(l) of 1.0 is derived.
+        temperature_K: 1573.0
+        metal_Fe_mass_percent: 70.0
+        wustite_Sn_mass_percent_at_1673K: 2.3
+        derived_gamma_SnO_at_1673K: 1.0
+        composition_evidence: Table 3 compositions are measured_tabulated; gamma_SnO(l)=1.0 is an author reduction at 1673 K.
+        reduction_inputs: Sn solubility 2.3% in liquid wustite saturated with solid iron at 1673 K and reference relations (4)–(7); no pointwise gamma input mapping is supplied.
+        coexisting_metal_phases_at_1573K: [{Sn_mass_percent: 80, Fe_mass_percent: 20}, {Sn_mass_percent: 53, Fe_mass_percent: 47}]
+        coexisting_metal_Sn_activity: 0.8
+        coexisting_metal_attribution: Nunoue and Kato, reference 12
+        coexisting_metal_locator: {published_page: 796, pdf_page_index: 3, section: Left column before Table 3}
+    - observation_id: takeda_1990_figures_untabulated
+      type: figure_only
+      locator:
+        published_page: 794
+        pdf_page_index: 1
+        figure: '1'
+        continuation_locator: {published_page: 795, pdf_page_index: 2, figure: '2'}
+      units: figure-only; curves and diagram not digitized
+      values:
+        quantity: initial_slag_field_and_heating_cooling_figures
+        method_class: figure_only
+        note: Initial slag fields are in Fig.1 on p.794; heating/cooling curves are in Fig.2 on p.795; no curve values digitized.
+    - observation_id: takeda_1990_figures_8_to_10
+      type: figure_only
+      locator:
+        published_page: 800
+        pdf_page_index: 7
+        figure: 8–10
+      units: figure-only; curves not digitized
+      values:
+        quantity: magnesia_tin_metal_figures
+        method_class: figure_only
+        note: Figs. 8–10 plot magnesia in slag, iron in metal and tin content against composition/oxygen potential;
+          curves not digitized.
+    - observation_id: takeda_1990_directional_claim_01
+      type: context
+      locator:
+        published_page: 793
+        pdf_page_index: 0
+        section: Abstract
+      units: verbatim statement
+      values:
+        quantity: directional_or_comparative_claim
+        statement_as_printed: Increasing oxygen potential resulted in increasing tin content in slag and decreasing
+          iron content in metal.
+    - observation_id: takeda_1990_directional_claim_02
+      type: context
+      locator:
+        published_page: 793
+        pdf_page_index: 0
+        section: Abstract
+      units: verbatim statement
+      values:
+        quantity: directional_or_comparative_claim
+        statement_as_printed: Tin in slag was estimated as being divalent.
+    - observation_id: takeda_1990_directional_claim_03
+      type: context
+      locator:
+        published_page: 793
+        pdf_page_index: 0
+        section: Abstract
+      units: verbatim statement
+      values:
+        quantity: directional_or_comparative_claim
+        statement_as_printed: The contents of tin were generally similar for both binary fayalite (FeOx-SiO2) and
+          ferrite (FeOx-CaO) type slags, and much higher than those in ternary FeOx-CaO-SiO2 slag.
+    - observation_id: takeda_1990_directional_claim_04
+      type: context
+      locator:
+        published_page: 793
+        pdf_page_index: 0
+        section: Abstract
+      units: verbatim statement
+      values:
+        quantity: directional_or_comparative_claim
+        statement_as_printed: The minimum solubility of tin in slag may be observed at the molar ratio of CaO/SiO2
+          which is near 2 if the slag is in the molten state.
+    - observation_id: takeda_1990_directional_claim_05
+      type: context
+      locator:
+        published_page: 793
+        pdf_page_index: 0
+        section: Abstract
+      units: verbatim statement
+      values:
+        quantity: directional_or_comparative_claim
+        statement_as_printed: Increasing iron oxide content results in increasing tin content in slag.
+    - observation_id: takeda_1990_directional_claim_06
+      type: context
+      locator:
+        published_page: 793
+        pdf_page_index: 0
+        section: Abstract
+      units: verbatim statement
+      values:
+        quantity: directional_or_comparative_claim
+        statement_as_printed: The activity coefficient of SnO(l) in binary fayalite (FeOx-SiO2) or ferrite (FeOx-CaO)
+          slag is 1 to 2 and the maximum activity coefficient is around 7 in the ternary FeOx-CaO-SiO2 slag whose
+          composition is close to saturation with solid dicalcium silicate and 25 mass% iron oxide.
+    - observation_id: takeda_1990_directional_claim_07
+      type: context
+      locator:
+        published_page: 793
+        pdf_page_index: 0
+        section: Introduction
+      units: verbatim statement
+      values:
+        quantity: directional_or_comparative_claim
+        statement_as_printed: In the first weak reduction smelting, tin metal containing a few mass% iron is in
+          coexistence with slag dissolving 10 to 20 mass% SnO.
+    - observation_id: takeda_1990_directional_claim_08
+      type: context
+      locator:
+        published_page: 793
+        pdf_page_index: 0
+        section: Introduction
+      units: verbatim statement
+      values:
+        quantity: directional_or_comparative_claim
+        statement_as_printed: As the second step, this slag is reduced strongly to recover dissolved tin as hardhead,
+          a Sn-Fe alloy containing around 40 mass% Fe.
+    - observation_id: takeda_1990_directional_claim_09
+      type: context
+      locator:
+        published_page: 798
+        pdf_page_index: 5
+        section: Results and Discussion
+      units: verbatim statement
+      values:
+        quantity: directional_or_comparative_claim
+        statement_as_printed: The activity coefficient of SnO in the slag phase remains constant obeying SnO the
+          Henry’s law.
+    - observation_id: takeda_1990_directional_claim_10
+      type: context
+      locator:
+        published_page: 798
+        pdf_page_index: 5
+        section: Results and Discussion
+      units: verbatim statement
+      values:
+        quantity: directional_or_comparative_claim
+        statement_as_printed: This is observed for each slag composition in the region of moderate oxygen partial
+          pressure in Fig. 4 and suggests the divalent dissolution of tin in slag.
+    - observation_id: takeda_1990_directional_claim_11
+      type: context
+      locator:
+        published_page: 798
+        pdf_page_index: 5
+        section: Results and Discussion
+      units: verbatim statement
+      values:
+        quantity: directional_or_comparative_claim
+        statement_as_printed: The deviations from the slope of 1/2 in the lower oxygen partial pressure region are
+          due to the variation in metal composition from Sn to the Sn-Fe alloy.
+    - observation_id: takeda_1990_directional_claim_12
+      type: context
+      locator:
+        published_page: 798
+        pdf_page_index: 5
+        section: Results and Discussion
+      units: verbatim statement
+      values:
+        quantity: directional_or_comparative_claim
+        statement_as_printed: On the other hand, those in the higher oxygen partial pressure region may be ascribed
+          to the variation in slag composition with increasing SnO content.
+    - observation_id: takeda_1990_directional_claim_13
+      type: context
+      locator:
+        published_page: 798
+        pdf_page_index: 5
+        section: Results and Discussion
+      units: verbatim statement
+      values:
+        quantity: directional_or_comparative_claim
+        statement_as_printed: It should be noticed that the solubility of tin in slag is also considerably dependent
+          on slag composition.
+    - observation_id: takeda_1990_directional_claim_14
+      type: context
+      locator:
+        published_page: 798
+        pdf_page_index: 5
+        section: Results and Discussion
+      units: verbatim statement
+      values:
+        quantity: directional_or_comparative_claim
+        statement_as_printed: As shown in Fig. 4, tin contents in binary fayalite (A) or ferrite (D) type slags
+          are three times higher than those in FeOx-CaO-SiO2 ternary slags (B, C, E).
+    - observation_id: takeda_1990_directional_claim_15
+      type: context
+      locator:
+        published_page: 798
+        pdf_page_index: 5
+        section: Results and Discussion
+      units: verbatim statement
+      values:
+        quantity: directional_or_comparative_claim
+        statement_as_printed: Among the ternary slags, the higher ratio of CaO/SiO2 seems to result in lower solubility,
+          and the minimum solubility is expected at the ratio of CaO/SiO2 which is near 2, if the slag is in the
+          molten state.
+    - observation_id: takeda_1990_directional_claim_16
+      type: context
+      locator:
+        published_page: 798
+        pdf_page_index: 5
+        section: Results and Discussion
+      units: verbatim statement
+      values:
+        quantity: directional_or_comparative_claim
+        statement_as_printed: The total tin loss in slag depends on both the tin solubility and the amount of slag
+          in practice, and increasing CaO/SiO2 ratio in ternary slag usually results in increasing amount of slag.
+          Thus, optimum slag composition must be selected by considering these two factors.
+    - observation_id: takeda_1990_directional_claim_17
+      type: context
+      locator:
+        published_page: 798
+        pdf_page_index: 5
+        section: Results and Discussion
+      units: verbatim statement
+      values:
+        quantity: directional_or_comparative_claim
+        statement_as_printed: The difference in solubility between 1473 and 1573 K is largely due to the difference
+          in the equilibrium constant.
+    - observation_id: takeda_1990_directional_claim_18
+      type: context
+      locator:
+        published_page: 798
+        pdf_page_index: 5
+        section: Results and Discussion
+      units: verbatim statement
+      values:
+        quantity: directional_or_comparative_claim
+        statement_as_printed: This solid oxide seems to be an FeO-SnO double oxide from its X-ray diffraction chart.
+    - observation_id: takeda_1990_directional_claim_19
+      type: context
+      locator:
+        published_page: 798
+        pdf_page_index: 5
+        section: Results and Discussion
+      units: verbatim statement
+      values:
+        quantity: directional_or_comparative_claim
+        statement_as_printed: The values of [gamma_Sn] appear to be inconsistent with each other.
+    - observation_id: takeda_1990_directional_claim_20
+      type: context
+      locator:
+        published_page: 798
+        pdf_page_index: 5
+        section: Results and Discussion
+      units: verbatim statement
+      values:
+        quantity: directional_or_comparative_claim
+        statement_as_printed: Data on [gamma_Sn] reported by Nunoue and Kato is available to this study, which gives
+          constant activity coefficients of SnO in SnO dilute slag solutions.
+    - observation_id: takeda_1990_directional_claim_21
+      type: context
+      locator:
+        published_page: 798
+        pdf_page_index: 5
+        section: Results and Discussion
+      units: verbatim statement
+      values:
+        quantity: directional_or_comparative_claim
+        statement_as_printed: A fixed value of gamma_SnO corresponding to the horizontal line less than about 10%
+          Sn in slag is observed for each slag.
+    - observation_id: takeda_1990_directional_claim_22
+      type: context
+      locator:
+        published_page: 798
+        pdf_page_index: 5
+        section: Results and Discussion
+      units: verbatim statement
+      values:
+        quantity: directional_or_comparative_claim
+        statement_as_printed: The activity coefficients of SnO for slags (B), (C) and (E) are especially high at
+          5 to 7, suggesting the low tin contents in these slags.
+    - observation_id: takeda_1990_directional_claim_23
+      type: context
+      locator:
+        published_page: 798
+        pdf_page_index: 5
+        section: Results and Discussion
+      units: verbatim statement
+      values:
+        quantity: directional_or_comparative_claim
+        statement_as_printed: gamma_SnO must be unity at point S in Fig. 6, and does not deviate considerably from
+          unity for FeOx-SiO2 (A) or FeOx-CaO (D) binary slag under varying oxygen potentials.
+    - observation_id: takeda_1990_directional_claim_24
+      type: context
+      locator:
+        published_page: 798
+        pdf_page_index: 5
+        section: Results and Discussion
+      units: verbatim statement
+      values:
+        quantity: directional_or_comparative_claim
+        statement_as_printed: gamma_SnO for FeOx-SiO2-CaO ternary slag (B), (E) or (C) over 10 mass% Sn in slag
+          changes from 5 or 7 to 1 with increasing SnO content in slag.
+    - observation_id: takeda_1990_directional_claim_25
+      type: context
+      locator:
+        published_page: 798
+        pdf_page_index: 5
+        section: Results and Discussion
+      units: verbatim statement
+      values:
+        quantity: directional_or_comparative_claim
+        statement_as_printed: The activity coefficient in fayalite or calcium ferrite slag are 1 to 2.
+    - observation_id: takeda_1990_directional_claim_26
+      type: context
+      locator:
+        published_page: 798
+        pdf_page_index: 5
+        section: Results and Discussion
+      units: verbatim statement
+      values:
+        quantity: directional_or_comparative_claim
+        statement_as_printed: The addition of CaO to fayalite slag or SiO2 to ferrite slag increases the activity
+          coefficient of SnO and decreases the solubility of Sn in slag.
+    - observation_id: takeda_1990_directional_claim_27
+      type: context
+      locator:
+        published_page: 798
+        pdf_page_index: 5
+        section: Results and Discussion
+      units: verbatim statement
+      values:
+        quantity: directional_or_comparative_claim
+        statement_as_printed: The maximum activity coefficient of SnO is around 7 in the ternary FeOx-CaO-SiO2 slag
+          which is saturated with solid dicalcium silicate and contains about 25 mass% iron oxide.
+    - observation_id: takeda_1990_directional_claim_28
+      type: context
+      locator:
+        published_page: 798
+        pdf_page_index: 5
+        section: Results and Discussion
+      units: verbatim statement
+      values:
+        quantity: directional_or_comparative_claim
+        statement_as_printed: The increase in the activity coefficient of SnO is due to the formation of a stable
+          solution by neutralization of acidic SiO2 with basic CaO.
+    - observation_id: takeda_1990_directional_claim_29
+      type: context
+      locator:
+        published_page: 798
+        pdf_page_index: 5
+        section: Results and Discussion
+      units: verbatim statement
+      values:
+        quantity: directional_or_comparative_claim
+        statement_as_printed: When a constituent U which has a big affinity for a constituent V makes a stable solution
+          UV, the solution tends to exclude a constituent W which does not have big affinities for U and V.
+    - observation_id: takeda_1990_directional_claim_30
+      type: context
+      locator:
+        published_page: 799
+        pdf_page_index: 6
+        section: Magnesia discussion continued from p.798
+        continuation_from_locator: {published_page: 798, pdf_page_index: 5, section: Final right-column paragraph}
+      units: verbatim statement
+      values:
+        quantity: directional_or_comparative_claim
+        statement_as_printed: The slags free from silica dissolve magnesia only 1 to 2 mass%, but the silicate slags
+          contain 4 to 10 mass% magnesia.
+    - observation_id: takeda_1990_directional_claim_31
+      type: context
+      locator:
+        published_page: 799
+        pdf_page_index: 6
+        section: Results and Discussion
+      units: verbatim statement
+      values:
+        quantity: directional_or_comparative_claim
+        statement_as_printed: The dissolution of iron in the metal phase increases with decreasing oxygen potential.
+    - observation_id: takeda_1990_directional_claim_32
+      type: context
+      locator:
+        published_page: 799
+        pdf_page_index: 6
+        section: Results and Discussion
+      units: verbatim statement
+      values:
+        quantity: directional_or_comparative_claim
+        statement_as_printed: The slope of these lines become steeper as the oxygen potential decreases.
+    - observation_id: takeda_1990_directional_claim_33
+      type: context
+      locator:
+        published_page: 799
+        pdf_page_index: 6
+        section: Results and Discussion
+      units: verbatim statement
+      values:
+        quantity: directional_or_comparative_claim
+        statement_as_printed: The h and h-prime marks correspond to the miscibility gap in the Fe-Sn alloy, and
+          i is the point saturated with solid iron.
+    - observation_id: takeda_1990_directional_claim_34
+      type: context
+      locator:
+        published_page: 799
+        pdf_page_index: 6
+        section: Results and Discussion
+      units: verbatim statement
+      values:
+        quantity: directional_or_comparative_claim
+        statement_as_printed: The tin content in slag decreases with increasing Fe content in the metal phase, which
+          is a measure of the reducibility.
+    - observation_id: takeda_1990_directional_claim_35
+      type: context
+      locator:
+        published_page: 799
+        pdf_page_index: 6
+        section: Results and Discussion
+      units: verbatim statement
+      values:
+        quantity: directional_or_comparative_claim
+        statement_as_printed: During the second step in tin smelting, it may be better to make tin rich hardhead
+          of 80 mass% Sn-20 mass% Fe because strong reduction will not improve tin recovery from slag in the range
+          of the miscibility gap.
+    - observation_id: takeda_1990_directional_claim_36
+      type: context
+      locator:
+        published_page: 800
+        pdf_page_index: 7
+        section: Conclusions
+      units: verbatim statement
+      values:
+        quantity: directional_or_comparative_claim
+        statement_as_printed: The dissolution of tin in slag was greatly affected by the oxygen potential and estimated
+          as the forming divalent oxide.
+    - observation_id: takeda_1990_directional_claim_37
+      type: context
+      locator:
+        published_page: 800
+        pdf_page_index: 7
+        section: Conclusions
+      units: verbatim statement
+      values:
+        quantity: directional_or_comparative_claim
+        statement_as_printed: The tin content in slag is similar for binary fayalite (FeOx-SiO2) and ferrite (FeOx-CaO)
+          slags, but lower in ternary FeOx-CaO-SiO2 slag.
+    - observation_id: takeda_1990_directional_claim_38
+      type: context
+      locator:
+        published_page: 800
+        pdf_page_index: 7
+        section: Conclusions
+      units: verbatim statement
+      values:
+        quantity: directional_or_comparative_claim
+        statement_as_printed: The minimum solubility is expected at the ratio of CaO/SiO2 which is near 2 theoretically.
+    - observation_id: takeda_1990_directional_claim_39
+      type: context
+      locator:
+        published_page: 800
+        pdf_page_index: 7
+        section: Conclusions
+      units: verbatim statement
+      values:
+        quantity: directional_or_comparative_claim
+        statement_as_printed: Increasing FeOx content or decreasing temperature results in increasing tin content
+          in slag.
+    - observation_id: takeda_1990_directional_claim_40
+      type: context
+      locator:
+        published_page: 800
+        pdf_page_index: 7
+        section: Conclusions
+      units: verbatim statement
+      values:
+        quantity: directional_or_comparative_claim
+        statement_as_printed: The slag containing low FeO and high CaO is preferred as the second slag.
+    - observation_id: takeda_1990_fig4_ratio_definitions
+      type: context
+      locator: {published_page: 798, pdf_page_index: 5, figure: '4', section: Legend column headings}
+      units: mole ratios as printed
+      values:
+        quantity: figure_4_slag_composition_ratio_definitions
+        n_CaO_plus_MgO_over_total_definition: (n_CaO+n_MgO)/(n_CaO+n_MgO+n_SiO2)
+        n_FeOn_over_total_definition: n_FeOn/(n_CaO+n_MgO+n_SiO2+n_FeOn)
+        applies_to: All nine Figure 4 legend rows, t7.csv.
+    - observation_id: takeda_1990_point_S_oxygen
+      type: context
+      locator: {published_page: 797, pdf_page_index: 4, section: Right column below Table 6}
+      units: percent as printed
+      values:
+        quantity: oxygen_content_in_metal_at_point_S
+        method_class: quoted_attributed
+        attribution: Kuxmann et al., reference 11
+        oxygen_percent: 0.2
+        condition: Point S at the extreme top right of Figure 4, plain SnO-Sn equilibrium.
+    - observation_id: takeda_1990_slag_D_precipitation
+      type: context
+      locator: {published_page: 798, pdf_page_index: 5, section: First right-column paragraph}
+      units: log pO2 and K as printed
+      values:
+        quantity: solid_oxide_separation_condition
+        slag: D
+        log_pO2: -11.1
+        temperature_K: 1473
+        identification_qualification: This solid oxide seems to be an FeO·SnO double oxide from its X-ray diffraction chart.
+    - observation_id: takeda_1990_two_metal_phase_slag_tin_bound
+      type: context
+      locator: {published_page: 798, pdf_page_index: 5, section: Right column introducing Figure 7}
+      units: mass percent as printed
+      values:
+        quantity: slag_tin_content_qualification
+        tin_mass_percent_upper_bound: 8
+        bound_operator: '<'
+        statement_as_printed: Tin contents in slag are less than 8 mass% in these experiments.
+        condition: Slags equilibrated with two metal phases h and h-prime; this prose qualification does not alter the printed Table 4 value 8.0.
+    - observation_id: takeda_1990_equation_8
+      type: context
+      locator: {published_page: 799, pdf_page_index: 6, equation: '8'}
+      units: as printed
+      values:
+        quantity: printed_FeO_activity_relation
+        reaction_as_printed: Fe + 1/2 O2 = FeO
+        relation_as_printed: K = a_FeO/(a_Fe pO2^(1/2))
+    - observation_id: takeda_1990_table1_gamma_11
+      experiment: takeda_1990_table1_gamma_summary
+      type: context
+      locator:
+        published_page: 794
+        pdf_page_index: 1
+        table: '1'
+        note: Reported comparison for This experiment
+      T_range_K:
+      - 1573
+      - 1573
+      phase: FeOx-CaO-SiO2 liquid slag
+      standard_state: SnO(l), pure liquid oxide standard as denoted by γSnO(l) in the paper
+      units: dimensionless activity coefficient range
+      values:
+        quantity: activity_coefficient_range
+        method_class: author_estimate
+        gamma_as_published: 1.0–7.0
+        range:
+        - 1.0
+        - 7.0
+        composition_mole_percent_ranges:
+          SiO2_mole_percent_as_printed:
+          - 0.0
+          - 53.0
+          CaO_mole_percent_as_printed:
+          - 0.0
+          - 39.0
+          FeOx_mole_percent_as_printed:
+          - 0.0
+          - 86.0
+          Al2O3_mole_percent_as_printed: null
+          SnO_mole_percent_as_printed:
+          - 100.0
+          - 0.0
+        oxygen_condition: null
+        temperature_K_as_published: '1573'
+        references_as_published: This experiment
+        attribution: null
+        reported_in_this_source: true
+        reduction_disclosure: Author-derived summary; equations and inputs are carried in takeda_1990_gamma_derivation_inputs. The endpoints are not linked to individual rows in the print.
+    observations:
+    - observation_id: takeda_1990_table1_gamma_01
+      experiment: takeda_1990_table1_gamma_summary
+      type: activity_coefficient
+      locator:
+        published_page: 794
+        pdf_page_index: 1
+        table: '1'
+        note: Reported comparison for Chizhikov
+      T_range_K:
+      - 1423
+      - 1423
+      phase: liquid slag
+      standard_state: SnO(l), pure liquid oxide standard as denoted by γSnO(l) in the paper
+      units: dimensionless activity coefficient range
+      values:
+        quantity: activity_coefficient_range
+        method_class: quoted_attributed
+        gamma_as_published: 1.0–1.3
+        range:
+        - 1.0
+        - 1.3
+        composition_mole_percent_ranges:
+          SiO2_mole_percent_as_printed:
+          - 0.0
+          - 60.0
+          CaO_mole_percent_as_printed: null
+          FeOx_mole_percent_as_printed: null
+          Al2O3_mole_percent_as_printed: null
+          SnO_mole_percent_as_printed:
+          - 100.0
+          - 40.0
+        oxygen_condition: null
+        temperature_K_as_published: '1423'
+        references_as_published: Chizhikov
+        attribution: Chizhikov
+        reported_in_this_source: true
+    - observation_id: takeda_1990_table1_gamma_02
+      experiment: takeda_1990_table1_gamma_summary
+      type: activity_coefficient
+      locator:
+        published_page: 794
+        pdf_page_index: 1
+        table: '1'
+        note: Reported comparison for Kozuka
+      T_range_K:
+      - 1373
+      - 1373
+      phase: liquid slag
+      standard_state: SnO(l), pure liquid oxide standard as denoted by γSnO(l) in the paper
+      units: dimensionless activity coefficient range
+      values:
+        quantity: activity_coefficient_range
+        method_class: quoted_attributed
+        gamma_as_published: 1.0–1.4
+        range:
+        - 1.0
+        - 1.4
+        composition_mole_percent_ranges:
+          SiO2_mole_percent_as_printed:
+          - 0.0
+          - 60.0
+          CaO_mole_percent_as_printed: null
+          FeOx_mole_percent_as_printed: null
+          Al2O3_mole_percent_as_printed: null
+          SnO_mole_percent_as_printed:
+          - 100.0
+          - 40.0
+        oxygen_condition: null
+        temperature_K_as_published: '1373'
+        references_as_published: Kozuka
+        attribution: Kozuka
+        reported_in_this_source: true
+    - observation_id: takeda_1990_table1_gamma_03
+      experiment: takeda_1990_table1_gamma_summary
+      type: activity_coefficient
+      locator:
+        published_page: 794
+        pdf_page_index: 1
+        table: '1'
+        note: Reported comparison for Carbo
+      T_range_K:
+      - 1433
+      - 1433
+      phase: liquid slag
+      standard_state: SnO(l), pure liquid oxide standard as denoted by γSnO(l) in the paper
+      units: dimensionless activity coefficient range
+      values:
+        quantity: activity_coefficient_range
+        method_class: quoted_attributed
+        gamma_as_published: 1.0–1.6
+        range:
+        - 1.0
+        - 1.6
+        composition_mole_percent_ranges:
+          SiO2_mole_percent_as_printed:
+          - 0.0
+          - 60.0
+          CaO_mole_percent_as_printed: null
+          FeOx_mole_percent_as_printed: null
+          Al2O3_mole_percent_as_printed: null
+          SnO_mole_percent_as_printed:
+          - 100.0
+          - 40.0
+        oxygen_condition: null
+        temperature_K_as_published: '1433'
+        references_as_published: Carbo
+        attribution: Carbo
+        reported_in_this_source: true
+    - observation_id: takeda_1990_table1_gamma_04
+      experiment: takeda_1990_table1_gamma_summary
+      type: activity_coefficient
+      locator:
+        published_page: 794
+        pdf_page_index: 1
+        table: '1'
+        note: Reported comparison for Grau
+      T_range_K:
+      - 1373
+      - 1373
+      phase: liquid slag
+      standard_state: SnO(l), pure liquid oxide standard as denoted by γSnO(l) in the paper
+      units: dimensionless activity coefficient range
+      values:
+        quantity: activity_coefficient_range
+        method_class: quoted_attributed
+        gamma_as_published: 1.0–1.6
+        range:
+        - 1.0
+        - 1.6
+        composition_mole_percent_ranges:
+          SiO2_mole_percent_as_printed:
+          - 0.0
+          - 60.0
+          CaO_mole_percent_as_printed: null
+          FeOx_mole_percent_as_printed: null
+          Al2O3_mole_percent_as_printed: null
+          SnO_mole_percent_as_printed:
+          - 100.0
+          - 40.0
+        oxygen_condition: null
+        temperature_K_as_published: '1373'
+        references_as_published: Grau
+        attribution: Grau
+        reported_in_this_source: true
+    - observation_id: takeda_1990_table1_gamma_05
+      experiment: takeda_1990_table1_gamma_summary
+      type: activity_coefficient
+      locator:
+        published_page: 794
+        pdf_page_index: 1
+        table: '1'
+        note: Reported comparison for Koike
+      T_range_K:
+      - 1423
+      - 1423
+      phase: liquid slag
+      standard_state: SnO(l), pure liquid oxide standard as denoted by γSnO(l) in the paper
+      units: dimensionless activity coefficient range
+      values:
+        quantity: activity_coefficient_range
+        method_class: quoted_attributed
+        gamma_as_published: 1.4–0.9
+        range:
+        - 1.4
+        - 0.9
+        composition_mole_percent_ranges:
+          SiO2_mole_percent_as_printed:
+          - 0.0
+          - 60.0
+          CaO_mole_percent_as_printed: null
+          FeOx_mole_percent_as_printed: null
+          Al2O3_mole_percent_as_printed: null
+          SnO_mole_percent_as_printed:
+          - 100.0
+          - 40.0
+        oxygen_condition: null
+        temperature_K_as_published: '1423'
+        references_as_published: Koike
+        attribution: Koike
+        reported_in_this_source: true
+    - observation_id: takeda_1990_table1_gamma_06
+      experiment: takeda_1990_table1_gamma_summary
+      type: activity_coefficient
+      locator:
+        published_page: 794
+        pdf_page_index: 1
+        table: '1'
+        note: Reported comparison for Watanabe
+      T_range_K:
+      - 1373
+      - 1373
+      phase: liquid slag
+      standard_state: SnO(l), pure liquid oxide standard as denoted by γSnO(l) in the paper
+      units: dimensionless activity coefficient range
+      values:
+        quantity: activity_coefficient_range
+        method_class: quoted_attributed
+        gamma_as_published: 1.6–1.7
+        range:
+        - 1.6
+        - 1.7
+        composition_mole_percent_ranges:
+          SiO2_mole_percent_as_printed:
+          - 37.0
+          - 46.0
+          CaO_mole_percent_as_printed:
+          - 12.0
+          - 16.0
+          FeOx_mole_percent_as_printed: null
+          Al2O3_mole_percent_as_printed: null
+          SnO_mole_percent_as_printed:
+          - 52.0
+          - 39.0
+        oxygen_condition: null
+        temperature_K_as_published: '1373'
+        references_as_published: Watanabe
+        attribution: Watanabe
+        reported_in_this_source: true
+    - observation_id: takeda_1990_table1_gamma_07
+      experiment: takeda_1990_table1_gamma_summary
+      type: activity_coefficient
+      locator:
+        published_page: 794
+        pdf_page_index: 1
+        table: '1'
+        note: Reported comparison for Koike
+      T_range_K:
+      - 1423
+      - 1423
+      phase: liquid slag
+      standard_state: SnO(l), pure liquid oxide standard as denoted by γSnO(l) in the paper
+      units: dimensionless activity coefficient range
+      values:
+        quantity: activity_coefficient_range
+        method_class: quoted_attributed
+        gamma_as_published: 1.1–1.8
+        range:
+        - 1.1
+        - 1.8
+        composition_mole_percent_ranges:
+          SiO2_mole_percent_as_printed:
+          - 42.0
+          - 58.0
+          CaO_mole_percent_as_printed:
+          - 0.0
+          - 13.0
+          FeOx_mole_percent_as_printed: null
+          Al2O3_mole_percent_as_printed: null
+          SnO_mole_percent_as_printed:
+          - 58.0
+          - 32.0
+        oxygen_condition: null
+        temperature_K_as_published: '1423'
+        references_as_published: Koike
+        attribution: Koike
+        reported_in_this_source: true
+    - observation_id: takeda_1990_table1_gamma_08
+      experiment: takeda_1990_table1_gamma_summary
+      type: activity_coefficient
+      locator:
+        published_page: 794
+        pdf_page_index: 1
+        table: '1'
+        note: Reported comparison for Watanabe
+      T_range_K:
+      - 1373
+      - 1373
+      phase: liquid slag
+      standard_state: SnO(l), pure liquid oxide standard as denoted by γSnO(l) in the paper
+      units: dimensionless activity coefficient range
+      values:
+        quantity: activity_coefficient_range
+        method_class: quoted_attributed
+        gamma_as_published: 1.2–1.4
+        range:
+        - 1.2
+        - 1.4
+        composition_mole_percent_ranges:
+          SiO2_mole_percent_as_printed:
+          - 32.0
+          - 47.0
+          CaO_mole_percent_as_printed: null
+          FeOx_mole_percent_as_printed:
+          - 10.0
+          - 12.0
+          Al2O3_mole_percent_as_printed: null
+          SnO_mole_percent_as_printed:
+          - 58.0
+          - 43.0
+        oxygen_condition: null
+        temperature_K_as_published: '1373'
+        references_as_published: Watanabe
+        attribution: Watanabe
+        reported_in_this_source: true
+    - observation_id: takeda_1990_table1_gamma_09
+      experiment: takeda_1990_table1_gamma_summary
+      type: activity_coefficient
+      locator:
+        published_page: 794
+        pdf_page_index: 1
+        table: '1'
+        note: Reported comparison for Koike
+      T_range_K:
+      - 1423
+      - 1423
+      phase: liquid slag
+      standard_state: SnO(l), pure liquid oxide standard as denoted by γSnO(l) in the paper
+      units: dimensionless activity coefficient range
+      values:
+        quantity: activity_coefficient_range
+        method_class: quoted_attributed
+        gamma_as_published: 0.9–1.6
+        range:
+        - 0.9
+        - 1.6
+        composition_mole_percent_ranges:
+          SiO2_mole_percent_as_printed:
+          - 43.0
+          - 57.0
+          CaO_mole_percent_as_printed: null
+          FeOx_mole_percent_as_printed:
+          - 0.0
+          - 20.0
+          Al2O3_mole_percent_as_printed: null
+          SnO_mole_percent_as_printed:
+          - 48.0
+          - 34.0
+        oxygen_condition: null
+        temperature_K_as_published: '1423'
+        references_as_published: Koike
+        attribution: Koike
+        reported_in_this_source: true
+    - observation_id: takeda_1990_table1_gamma_10
+      experiment: takeda_1990_table1_gamma_summary
+      type: activity_coefficient
+      locator:
+        published_page: 794
+        pdf_page_index: 1
+        table: '1'
+        note: Reported comparison for Carbo
+      T_range_K:
+      - 1433
+      - 1433
+      phase: liquid slag
+      standard_state: SnO(l), pure liquid oxide standard as denoted by γSnO(l) in the paper
+      units: dimensionless activity coefficient
+      values:
+        quantity: activity_coefficient
+        method_class: quoted_attributed
+        gamma_as_published: '1.8'
+        gamma: 1.8
+        composition_mole_percent_ranges:
+          SiO2_mole_percent_as_printed:
+          - 69.0
+          CaO_mole_percent_as_printed:
+          - 16.0
+          FeOx_mole_percent_as_printed:
+          - 25.0
+          Al2O3_mole_percent_as_printed:
+          - 3.0
+          SnO_mole_percent_as_printed:
+          - 14.0
+        oxygen_condition: null
+        temperature_K_as_published: '1433'
+        references_as_published: Carbo
+        attribution: Carbo
+        reported_in_this_source: true
+    - observation_id: takeda_1990_table1_gamma_12
+      experiment: takeda_1990_table1_gamma_summary
+      type: activity_coefficient
+      locator:
+        published_page: 794
+        pdf_page_index: 1
+        table: '1'
+        note: Reported comparison for Nagamori
+      T_range_K:
+      - 1473
+      - 1573
+      phase: liquid slag
+      standard_state: SnO(l), pure liquid oxide standard as denoted by γSnO(l) in the paper
+      units: dimensionless activity coefficient range
+      values:
+        quantity: activity_coefficient_range
+        method_class: quoted_attributed
+        gamma_as_published: 0.8–2.4
+        range:
+        - 0.8
+        - 2.4
+        composition_mole_percent_ranges:
+          SiO2_mole_percent_as_printed:
+          - 30.0
+          - 35.0
+          CaO_mole_percent_as_printed: null
+          FeOx_mole_percent_as_printed:
+          - 55.0
+          - 63.0
+          Al2O3_mole_percent_as_printed:
+          - 5.0
+          - 11.0
+          SnO_mole_percent_as_printed: null
+        oxygen_condition: null
+        temperature_K_as_published: 1473, 1573
+        references_as_published: Nagamori
+        attribution: Nagamori
+        reported_in_this_source: true
+    - observation_id: takeda_1990_table1_gamma_13
+      experiment: takeda_1990_table1_gamma_summary
+      type: activity_coefficient
+      locator:
+        published_page: 794
+        pdf_page_index: 1
+        table: '1'
+        note: Reported comparison for Takeda
+      T_range_K:
+      - 1523
+      - 1523
+      phase: liquid slag
+      standard_state: SnO(l), pure liquid oxide standard as denoted by γSnO(l) in the paper
+      units: dimensionless activity coefficient
+      values:
+        quantity: activity_coefficient
+        method_class: quoted_attributed
+        gamma_as_published: '1.7'
+        gamma: 1.7
+        composition_mole_percent_ranges:
+          SiO2_mole_percent_as_printed:
+          - 42.0
+          - 45.0
+          CaO_mole_percent_as_printed: null
+          FeOx_mole_percent_as_printed:
+          - 58.0
+          - 55.0
+          Al2O3_mole_percent_as_printed: null
+          SnO_mole_percent_as_printed: null
+        oxygen_condition: null
+        temperature_K_as_published: '1523'
+        references_as_published: Takeda
+        attribution: Takeda
+        reported_in_this_source: true
+    - observation_id: takeda_1990_table1_gamma_14
+      experiment: takeda_1990_table1_gamma_summary
+      type: activity_coefficient
+      locator:
+        published_page: 794
+        pdf_page_index: 1
+        table: '1'
+        note: Reported comparison for Takeda
+      T_range_K:
+      - 1523
+      - 1523
+      phase: liquid slag
+      standard_state: SnO(l), pure liquid oxide standard as denoted by γSnO(l) in the paper
+      units: dimensionless activity coefficient
+      values:
+        quantity: activity_coefficient
+        method_class: quoted_attributed
+        gamma_as_published: '0.9'
+        gamma: 0.9
+        composition_mole_percent_ranges:
+          SiO2_mole_percent_as_printed: null
+          CaO_mole_percent_as_printed:
+          - 32.0
+          FeOx_mole_percent_as_printed:
+          - 68.0
+          Al2O3_mole_percent_as_printed: null
+          SnO_mole_percent_as_printed: null
+        oxygen_condition: null
+        temperature_K_as_published: '1523'
+        references_as_published: Takeda
+        attribution: Takeda
+        reported_in_this_source: true

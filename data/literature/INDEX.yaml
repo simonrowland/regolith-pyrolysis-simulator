@@ -9,13 +9,13 @@ scan:
   - hunt_ids column empty; --hunt-json not provided
   corpus_root: /Users/simonrowland/Repos/regolith-corpus
 counts:
-  sources: 271
-  extracts: 269
+  sources: 272
+  extracts: 270
   pdfs_present_in_worktree: 0
   extracts_with_private_locators: 60
   pdfs_tracked_99_kems_langmuir: 0
   pdfs_without_extract: 0
-  extracts_without_pdf: 269
+  extracts_without_pdf: 270
   alias_groups_needing_resolution: 41
 gaps:
   pdfs_without_extract: []
@@ -272,6 +272,7 @@ gaps:
   - ta-shirai-2000-lpsc
   - ta-yamanaka-1997-metsoc
   - tachibana-tsuchiyama-1998-forsterite-dust-lpsc
+  - takeda-1990-sn-slag-matertrans
   - thomas-2022-chlorine-bonding-silicate-melts
   - thomas-wood-2021-chlorine-silicate-melts
   - ts1985
@@ -15446,6 +15447,64 @@ sources:
       error: null
       last_stage: decoded
       date: '2026-09-06'
+    commit: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
+- source_id: takeda-1990-sn-slag-matertrans
+  aliases: []
+  citation: Takeda, Y., Yazawa, A., Chit, P. P. and Ujiie, H. (1990), “Equilibria between liquid tin and
+    FeOx-CaO-SiO2 slag”, Materials Transactions JIM 31(9), 793–801.
+  doi: 10.2320/matertrans1989.31.793
+  report_number: null
+  identifier: 10.2320/matertrans1989.31.793
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
+  extracts:
+  - path: data/literature/extracts/takeda-1990-sn-slag-matertrans.yaml
+    review_status: draft
+    rows: 13
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/takeda-1990-sn-slag-matertrans/takeda-1990-sn-slag-matertrans.pdf
+      present: false
+      sha256: null
+      matches_simulator: null
+    sidecar:
+      path: raw/takeda-1990-sn-slag-matertrans/sidecar.yaml
+      present: false
+    text:
+      path: text/takeda-1990-sn-slag-matertrans
+      exists: false
+      file_count: 0
+    tables:
+      path: tables/takeda-1990-sn-slag-matertrans
+      exists: false
+      file_count: 0
+    extract:
+      path: extracts/takeda-1990-sn-slag-matertrans.yaml
+      present: false
+      matches_simulator: null
+    ledger:
+      path: ledger/takeda-1990-sn-slag-matertrans.yaml
+      present: false
+      error: null
+      last_stage: null
+      date: null
     commit: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
 - source_id: thomas-2022-chlorine-bonding-silicate-melts
   aliases: []
