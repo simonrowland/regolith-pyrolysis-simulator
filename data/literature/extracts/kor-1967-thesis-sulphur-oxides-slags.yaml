@@ -1,0 +1,301 @@
+schema_version: literature_extract.v1
+source_id: kor-1967-thesis-sulphur-oxides-slags
+source:
+  citation: 'G. J. W. Kor, "Sulphur in crystalline oxides and liquid slags", PhD thesis, University of London (Imperial College), 1967.'
+  doi: null
+  url: https://spiral.imperial.ac.uk/entities/publication/469f4fe7-5da5-4e2e-b5e9-613ac88d0914
+  year: 1967
+  corpus_source_id: kor-1967-thesis-sulphur-oxides-slags
+extraction:
+  method: Manual transcription from 250 dpi pdftoppm page renders of the Imperial Spiral PDF (regolith-corpus
+    raw/kor-1967-thesis-sulphur-oxides-slags) plus pdftotext -layout cross-check. Table XXIV cells read from page-image
+    (PDF page 94 / thesis p. 94), not from OmniPage OCR alone. Figures recorded figure_only (not digitised). No unit
+    conversion, no rounding, no inventing values.
+  date: '2026-10-04'
+  worker: empirical-cao-al2o3-slot-02
+  provenance_path: ferry-inbox/cao-al2o3-sources/kor-1967-thesis-sulphur-oxides-slags/
+review_status: draft
+fidelity_samples:
+- path: species.CaO.observations[kor_1967_table_xxiv_cas_sat_lime_activities].values.rows[0].a_CaO
+  value: 0.22
+  note: Table XXIV first this-work row aCaO at CaS saturation
+  locator:
+    published_page: 94
+    pdf_page_index: 94
+    table: XXIV
+    row: '1500 C this work; before N_CaO=0.59'
+- path: species.CaO.observations[kor_1967_table_xxiv_cas_sat_lime_activities].values.rows[1].a_CaO
+  value: 0.43
+  note: Table XXIV second this-work row aCaO at CaS saturation
+  locator:
+    published_page: 94
+    pdf_page_index: 94
+    table: XXIV
+    row: '1500 C this work; before N_CaO=0.66'
+- path: species.CaO.observations[kor_1967_table_xxiv_cas_sat_lime_activities].values.rows[0].N_CaO_after
+  value: 0.57
+  note: Table XXIV after-expt N_CaO for first this-work row
+  locator:
+    published_page: 94
+    pdf_page_index: 94
+    table: XXIV
+species:
+  CaO:
+    context:
+    - observation_id: kor_1967_chV_gas_slag_method_and_constants
+      type: method
+      locator:
+        published_page: 94
+        pdf_page_index: 94
+        section: '4.1 Binary CaO-Al2O3 melts'
+        note: Method continued on thesis p. 96 (PDF page 96) for K and equilibrium proof
+      units: dimensionless; K as printed
+      values:
+        quantity: gas_slag_equilibration_method_constants_standard_states
+        method_class: method_only
+        experimental_method: gas-slag equilibration with sulphurising gas mixtures at 1500 C; CaS saturation from break in
+          log(wt% S) vs log((pS2/pO2)^1/2) (Fig. 16 least-squares lines)
+        temperature_C: 1500
+        temperature_K: 1773
+        standard_state_CaO_as_printed: pure solid oxide
+        equilibrium_reaction_as_printed: 'CaO (s) + 1/2 S2 (g) = CaS (s) + 1/2 O2 (g)'
+        equilibrium_constant_K_at_1500_C: 2.75e-3
+        equilibrium_constant_locator:
+          published_page: 96
+          pdf_page_index: 96
+          note: 'At 1500 C: K = 2.75 x 10-3 (Chapter IV, sec. 2.3.)'
+        a_CaO_at_CaS_sat_formula_as_printed: '(aCaO)sat from K with aCaS=1'
+        sulphur_capacity_definition_as_printed: 'Cs = (wt% S) x (pO2/pS2)^1/2'
+        how_equilibrium_shown_as_printed: CaS X-ray diffraction lines begin to show for (pS2/pO2)^1/2 exceeding the saturation
+          value from Tables XXII/XXIII; melts quench to 12CaO.7Al2O3 + CaO.Al2O3 (45 wt% CaO start) or 12CaO.7Al2O3 + 3CaO.Al2O3
+          (52 wt% CaO start), consistent with the CaO-Al2O3 phase diagram
+        comparison_as_printed: substantial agreement with Sharma and Richardson (ref. 55); sulphur capacities 1-2% lower;
+          Cameron et al. (ref. 56) 1550 C values tabulated alongside for comparison and later argued to be in error
+        original_melt_compositions_as_printed:
+        - '52 wt% CaO, 48 wt% Al2O3'
+        - '45 wt% CaO, 55 wt% Al2O3'
+      quote: 'At 1500 C: K = 2.75 x 10-3 (Chapter IV, sec. 2.3.). For a melt saturated with CaS, aCaS = 1, and (aCaO)sat.
+        may be calculated with the aid of the above equation.'
+    - observation_id: kor_1967_fig16_sulphur_uptake_figure_only
+      type: method
+      locator:
+        published_page: 95
+        pdf_page_index: 95
+        figure: '16'
+      units: none
+      values:
+        quantity: sulphur_uptake_plot
+        method_class: method_only
+        admission_status: figure_only
+        note: Fig. 16 log(wt% S) vs log((pS2/pO2)^1/2) at 1500 C; points not digitised; saturation limits taken from Table XXIV
+          as printed
+    - observation_id: kor_1967_chV_printed_solubility_and_activity_relations
+      type: method
+      locator: {published_page: 84, pdf_page_index: 84, section: '2. Phase changes at 1500 C'}
+      units: as printed
+      values:
+        method_class: method_only
+        numeric_relations_as_printed:
+        - {name: K1_at_1500_C, relation_as_printed: 'K1 = a_CaO (pS2/pO2)^1/2', value_as_printed: 'K1 = 367', locator: {published_page: 87, pdf_page_index: 87}}
+        - {name: alumina_rich_liquidus_N_CaO, value_as_printed: '0.58', locator: {published_page: 87, pdf_page_index: 87}}
+        - {name: alumina_rich_liquidus_a_CaO, value_as_printed: '0.21', locator: {published_page: 87, pdf_page_index: 87}}
+        - {name: r2_at_1500_C, relation_as_printed: 'r2 = K1/(a_CaO)_liq', value_as_printed: '1750', locator: {published_page: 87, pdf_page_index: 87}}
+        - {name: equation_2, relation_as_printed: '(wt% S)_liq = (2C - 86)/(C + 156.5) x 100; valid at 1500 C', locator: {published_page: 84, pdf_page_index: 84, equation: '2'}}
+        - {name: equation_3, relation_as_printed: '(wt% S)_C.A = (2C - 71)/(C + 190.5) x 100', locator: {published_page: 87, pdf_page_index: 87, equation: '3'}}
+        - {name: equation_5, relation_as_printed: '(wt% S)_C.A2 = (2C - 43)/(C + 253) x 100', locator: {published_page: 89, pdf_page_index: 89, equation: '5'}}
+        - {name: equation_7, relation_as_printed: '(wt% S)_max = 2C/(C + 350) x 100', locator: {published_page: 89, pdf_page_index: 89, equation: '7'}}
+        - {name: r3_relation, relation_as_printed: 'r3 = 1/K4', locator: {published_page: 87, pdf_page_index: 87, equation: '4'}}
+        - {name: r4_relation, relation_as_printed: 'r4 = 1/K6', locator: {published_page: 89, pdf_page_index: 89, equation: '6'}}
+        - {name: Cameron_saturation_sulphur, value_as_printed: '6.1 wt% S', composition_as_printed: 'molar alumina/lime = 0.45/0.55', attribution: Cameron, Gibbons and Taylor (ref. 56), locator: {published_page: 83, pdf_page_index: 83}}
+        - {name: Sharma_Richardson_saturation_sulphur, value_as_printed: '0.6 wt% S', attribution: Sharma and Richardson (ref. 55), locator: {published_page: 83, pdf_page_index: 83}}
+        - {name: least_squares_break_52wtpct_CaO, value_as_printed: 'log(pS2/pO2)^1/2 = 2.93', locator: {published_page: 94, pdf_page_index: 94}}
+        - {name: Cameron_saturation_comparison, value_as_printed: 'about five times', condition_as_printed: 'N_CaO = 0.59', locator: {published_page: 103, pdf_page_index: 103}}
+        - {name: Cameron_difference_explanation, value_as_printed: '200 kcal/mole', locator: {published_page: 103, pdf_page_index: 103}}
+        - {name: partial_molal_free_energy_CaO_1500_C, value_as_printed: '-9.6 kcal', locator: {published_page: 103, pdf_page_index: 103}}
+        - {name: partial_molal_free_energy_CaO_1550_C, value_as_printed: '-9.8 kcal', locator: {published_page: 103, pdf_page_index: 103}}
+    - observation_id: kor_1967_table_xxi_calculated_r3_r4
+      type: method
+      locator: {published_page: 91, pdf_page_index: 91, table: XXI}
+      units: pressure ratio (pS2/pO2)^1/2
+      values:
+        method_class: method_only
+        note: Calculated from alternative printed formation-free-energy expressions; no existing quantity represents r3/r4.
+        columns: [delta_G10_as_printed, r3, r4]
+        rows: [['-1000 - 6.1 T', '12000', '10500'], ['-4000 - 6.1 T', '5130', '24800']]
+    - observation_id: kor_1967_table_xxiv_cameron_comparator_rows
+      type: method
+      locator: {published_page: 94, pdf_page_index: 94, table: XXIV}
+      units: as printed
+      values:
+        method_class: method_only
+        note: Cameron et al. comparator values are retained as quoted context, not admitted as measurements from Kor's work; Kor disputes their consistency on pp. 102-103.
+        columns: [source, T_C, N_Al2O3_before, N_CaO_before, N_CaO_after, N_CaO_over_N_Al2O3_after, (pS2/pO2)^1/2_at_saturation, wt%_S, N_CaS, gamma_CaS, Cs_times_1e3, a_CaO]
+        rows:
+        - ['Cameron et al.', '1550', '0.42', '0.58', '0.48', '1.39', '6600', '4.0', '0.10', 'dash', 'dash', '0.043']
+        - ['Cameron et al.', '1550', '0.35', '0.65', '0.615', '1.82', '1550', '1.6', '0.036', 'dash', 'dash', '0.18']
+    - observation_id: kor_1967_p98_measured_r3_transitions
+      type: method
+      locator: {published_page: 98, pdf_page_index: 98, figure: '17'}
+      units: (pS2/pO2)^1/2
+      values:
+        method_class: method_only
+        note: Text reports transition settings read from Fig. 17; no existing quantity represents these pressure ratios.
+        temperature_C: [1350, 1500, 1550]
+        r3_as_printed: ['10800', '5900', '4200']
+    observations:
+    - observation_id: kor_1967_table_xxii_sulphur_melt_values
+      type: sulfur_solubility_and_sulfate_capacity_series
+      locator: {published_page: 92, pdf_page_index: 92, table: XXII}
+      units: wt% S; pressure ratio and pSO2 as printed
+      values:
+        quantity: sulfur_solubility_wt_percent
+        method_class: measured_tabulated
+        original_composition_as_printed: 52 wt% CaO + 48 wt% Al2O3; N_CaO = 0.66
+        temperature_C: 1500
+        treatment_time_hours: 8
+        columns: [(pS2/pO2)^1/2, pSO2, wt%_S_replicates, average_wt%_S, CaS_Xray_intensity_2.846A, CaS_Xray_intensity_2.013A, CaS_Xray_intensity_1.644A]
+        rows:
+        - ['150', '0.02', ['0.274', '0.263'], '0.268', 'no measurement', 'no measurement', 'no measurement']
+        - ['250', '0.02', ['0.400', '0.390'], '0.395', 'no measurement', 'no measurement', 'no measurement']
+        - ['500', '0.02', ['0.735', '0.725'], '0.730', 'no measurement', 'no measurement', 'no measurement']
+        - ['500', '0.03', ['0.751', '0.829'], '0.790', 'zero', 'zero', 'zero']
+        - ['650', '0.03', ['1.094', '1.000'], '1.097', 'zero', 'zero', 'zero']
+        - ['725', '0.02', ['1.420', '1.420'], '1.420', 'zero', 'zero', 'zero']
+        - ['800', '0.03', ['1.770', '1.770'], '1.770', 'weak', 'very weak', 'zero']
+        - ['800', '0.03', ['2.400', '2.188'], '2.294', 'weak', 'very weak', 'zero']
+        - ['900', '0.03', ['2.478', '2.225'], '2.352', 'weak', 'very weak', 'zero']
+        - ['900', '0.02', ['3.360', '3.360'], '3.360', 'medium', 'weak', 'very weak']
+        - ['1000', '0.02', ['4.460', '4.430'], '4.445', 'strong', 'medium', 'weak']
+        - ['1100', '0.02', ['6.055', '6.165'], '6.110', 'strong', 'medium', 'weak']
+    - observation_id: kor_1967_table_xxiii_sulphur_melt_values
+      type: sulfur_solubility_and_sulfate_capacity_series
+      locator: {published_page: 93, pdf_page_index: 93, table: XXIII}
+      units: wt% S; pressure ratio and pSO2 as printed
+      values:
+        quantity: sulfur_solubility_wt_percent
+        method_class: measured_tabulated
+        original_composition_as_printed: 45 wt% CaO + 55 wt% Al2O3; N_CaO = 0.59
+        temperature_C: 1500
+        treatment_time_hours: 8 unless noted
+        footnotes: ['1: initial sulphur content 3.10 wt% S; treatment time 24 hours', '2: treatment time 24 hours']
+        columns: [(pS2/pO2)^1/2, pSO2, wt%_S_replicates, average_wt%_S, CaS_Xray_intensity_2.846A, CaS_Xray_intensity_2.013A, CaS_Xray_intensity_1.644A, treatment_time_hours]
+        rows:
+        - ['150', '0.02', ['0.092', '0.098'], '0.095', 'no measurement', 'no measurement', 'no measurement', 8]
+        - ['250', '0.02', ['0.113', '0.128'], '0.1205', 'no measurement', 'no measurement', 'no measurement', 8]
+        - ['500', '0.02', ['0.283', '0.275'], '0.279', 'no measurement', 'no measurement', 'no measurement', 8]
+        - ['650', '0.03', ['0.360', '0.356'], '0.358', 'zero', 'zero', 'zero', 8]
+        - ['800', '0.03', ['0.326', '0.376'], '0.351', 'zero', 'zero', 'zero', 8]
+        - ['800', '0.03', ['0.393', '0.400'], '0.3965', 'no measurement', 'no measurement', 'no measurement', 8]
+        - ['800', '0.01', ['0.382', '0.388'], '0.385', 'zero', 'zero', 'zero', 8]
+        - ['1000', '0.02', ['0.487', '0.484'], '0.4855', 'zero', 'zero', 'zero', 8]
+        - ['1200', '0.02', ['0.671', '0.676'], '0.6735', 'zero', 'zero', 'zero', 8]
+        - ['1200', '0.02', ['0.632', '0.631'], '0.6315', 'zero', 'zero', 'zero', 8]
+        - ['1350', '0.02', ['0.703', '0.674'], '0.6885', 'no measurement', 'no measurement', 'no measurement', 8]
+        - ['1350^1', '0.02', ['0.540', '0.510'], '0.525', 'zero', 'zero', 'zero', 24]
+        - ['1500', '0.02', ['0.607', '0.609'], '0.608', 'zero', 'zero', 'zero', 8]
+        - ['1500', '0.02', ['0.651', '0.650'], '0.6505', 'zero', 'zero', 'zero', 8]
+        - ['1500', '0.01', ['0.767', '0.799'], '0.783', 'zero', 'zero', 'zero', 8]
+        - ['1600', '0.02', ['0.890', '0.922'], '0.906', 'zero', 'zero', 'zero', 8]
+        - ['1700', '0.02', ['2.510', '2.400'], '2.455', 'medium', 'medium', 'very weak', 8]
+        - ['1850', '0.02', ['3.393', '3.496'], '3.4445', 'strong', 'medium', 'very weak', 8]
+        - ['2000', '0.02', ['2.860', '2.640'], '2.750', 'strong', 'medium', 'weak', 8]
+        - ['2000', '0.02', ['3.130', '3.080'], '3.105', 'strong', 'medium', 'weak', 8]
+        - ['2000^2', '0.02', ['4.140', '4.210'], '4.175', 'no measurement', 'no measurement', 'no measurement', 24]
+        - ['4000', '0.02', ['6.050', '6.000'], '6.025', 'very strong', 'strong', 'medium', 8]
+        - ['6500', '0.02', ['6.490', '6.540'], '6.515', 'very strong', 'strong', 'medium', 8]
+        - ['8800^2', '0.01', ['5.950', '5.960'], '5.955', 'very strong', 'strong', 'medium', 24]
+    - observation_id: kor_1967_table_xxv_sulphur_solid_aluminates
+      type: sulfur_solubility_and_sulfate_capacity_series
+      locator: {published_page: 97, pdf_page_index: 97, table: XXV}
+      units: wt% S; pressure ratio as printed
+      values:
+        quantity: sulfur_solubility_wt_percent
+        method_class: measured_tabulated
+        composition_as_printed: 33 wt% CaO + 67 wt% Al2O3; solid CaO.Al2O3 + CaO.2Al2O3
+        pSO2: '0.02'
+        treatment_time_hours: 8
+        columns: [temperature_C, (pS2/pO2)^1/2, wt%_S_left, wt%_S_right, average_wt%_S, CaS_Xray_intensity_2.846A, CaS_Xray_intensity_2.013A, CaS_Xray_intensity_1.644A]
+        rows:
+        - [1350, '6500', '0.000', '0.000', '0.000', 'zero', 'zero', 'zero']
+        - [1350, '8000', '0.000', '0.001', '0.0005', 'zero', 'zero', 'zero']
+        - [1350, '9000', '0.018', '0.017', '0.0175', 'zero', 'zero', 'zero']
+        - [1350, '10000', '0.013', '0.017', '0.015', 'zero', 'zero', 'zero']
+        - [1350, '11000', '0.100', '0.097', '0.0985', 'zero', 'zero', 'zero']
+        - [1350, '12000', '0.370', '0.320', '0.345', 'zero', 'zero', 'zero']
+        - [1350, '16000', '2.670', '2.770', '2.720', 'medium', 'weak', 'zero']
+        - [1500, '4000', '0.001', '0.002', '0.0015', 'zero', 'zero', 'zero']
+        - [1500, '5500', '0.001', '0.001', '0.001', 'zero', 'zero', 'zero']
+        - [1500, '6000', '0.136', '0.137', '0.1365', 'zero', 'zero', 'zero']
+        - [1500, '6250', '2.400', '2.360', '2.380', 'medium', 'weak', 'very weak']
+        - [1500, '6500', '1.550', '1.620', '1.585', 'medium', 'weak', 'very weak']
+        - [1550, '3000', '0.000', '0.001', '0.0005', 'zero', 'zero', 'zero']
+        - [1550, '4000', '0.001', '0.000', '0.0005', 'zero', 'zero', 'zero']
+        - [1550, '4250', '0.075', '0.265', 'no average recorded', 'zero', 'zero', 'zero']
+        - [1550, '4500', '2.95', '2.90', '2.925', 'strong', 'medium', 'weak']
+        - [1550, '4750', '4.07', '4.04', '4.055', 'strong', 'medium', 'weak']
+        - [1550, '5000', '4.87', '4.81', '4.84', 'strong', 'medium', 'weak']
+    - observation_id: kor_1967_table_xxiv_cas_sat_lime_activities
+      type: activity_coefficient
+      locator:
+        published_page: 94
+        pdf_page_index: 94
+        table: XXIV
+      T_range_K:
+      - 1773.0
+      - 1773.0
+      phase: l
+      standard_state: pure solid CaO (thesis p. 84 / p. 96)
+      units: mole fraction; dimensionless activity; wt% S; Cs x 10^3 as printed
+      values:
+        quantity: activity
+        method_class: measured_reduced
+        admission_status: admitted
+        measurement_status: author_reported_a_CaO_from_CaS_saturation_and_K
+        experimental_method: gas-slag equilibration
+        table_title_as_printed: 'TABLE XXIV: CaS saturation limits, activity coefficient of CaS, sulphide capacities and lime
+          activities for CaO-Al2O3 melts at 1500 C, compared with results of Cameron et al. at 1550 C.'
+        rows:
+        - source_as_printed: '1500 C this work'
+          T_C: 1500
+          T_K: 1773
+          N_Al2O3_before: 0.41
+          N_CaO_before: 0.59
+          N_CaO_after: 0.57
+          N_CaO_over_N_Al2O3_after: 1.39
+          pS2_over_pO2_half_at_sat: 1640
+          wt_pct_S_at_sat: 0.81
+          N_CaS_at_sat: 0.019
+          gamma_CaS_at_sat: 53.0
+          Cs_times_1e3: 0.495
+          a_CaO: 0.22
+          a_CaO_as_printed: '0.22'
+          activity: 0.22
+          activity_as_published: '0.22'
+        - source_as_printed: '1500 C this work'
+          T_C: 1500
+          T_K: 1773
+          N_Al2O3_before: 0.34
+          N_CaO_before: 0.66
+          N_CaO_after: 0.62
+          N_CaO_over_N_Al2O3_after: 1.82
+          pS2_over_pO2_half_at_sat: 840
+          wt_pct_S_at_sat: 1.53
+          N_CaS_at_sat: 0.035
+          gamma_CaS_at_sat: 29.1
+          Cs_times_1e3: 1.82
+          a_CaO: 0.43
+          a_CaO_as_printed: '0.43'
+          activity: 0.43
+          activity_as_published: '0.43'
+        formula: CaO
+        quantity_as_published: lime_activity_aCaO
+      uncertainty:
+        reported_status: not_reported_on_table
+        note: No numeric uncertainty printed on Table XXIV aCaO cells
+      quote: 'TABLE XXIV: CaS saturation limits, activity coefficient of CaS, sulphide capacities and lime activities for CaO-Al2O3
+        melts at 1500 C, compared with results of Cameron et al. at 1550 C. 1500 C this work: aCaO 0.22 (N_CaO after 0.57) and
+        0.43 (N_CaO after 0.62).'
+      derived_from: [tables:kor-1967-thesis-sulphur-oxides-slags]
+      derivation:
+        relation: 'At CaS saturation, aCaO is calculated from the printed CaO + 1/2 S2 = CaS + 1/2 O2 equilibrium and K at 1500 C, with aCaS=1.'
+        inputs: [tables:kor-1967-thesis-sulphur-oxides-slags]
