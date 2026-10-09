@@ -639,6 +639,21 @@ def _as_dec_or_none(value: object) -> Decimal | None:
         return None
 
 
+def parse_declared_amount(value: object) -> Decimal:
+    """Single owner for source-declared numeric amounts.
+
+    Soft optional fields keep ``_as_dec_or_none``. A declared amount that is
+    absent, boolean, or unparseable is a typed refusal — never a silent drop.
+    """
+
+    if value is None or value == "" or isinstance(value, bool):
+        raise ValueError(f"malformed declared amount: {value!r}")
+    try:
+        return as_decimal(value)
+    except (TypeError, ValueError, ArithmeticError) as exc:
+        raise ValueError(f"malformed declared amount: {value!r}") from exc
+
+
 def _provenance_from_extract(
     obs: Mapping[str, Any],
     values: Mapping[str, Any],
@@ -2943,12 +2958,15 @@ def _kume_mole_amounts_from_mapping(
     omitted: list[str] = []
     for name, amount in raw.items():
         token = str(name).strip()
-        equivalent = _kume_formula_unit_oxide(token)
-        if equivalent is None:
+        if token in _COMPOSITION_MOL_META_KEYS:
+            continue
+        printed = str(amount).strip().casefold() if isinstance(amount, str) else ""
+        if printed in {"tr.", "tr"} or printed.startswith(("<", ">", "≤", "≥")):
             omitted.append(token)
             continue
-        parsed = _as_dec_or_none(amount)
-        if parsed is None:
+        parsed = parse_declared_amount(amount)
+        equivalent = _kume_formula_unit_oxide(token)
+        if equivalent is None:
             omitted.append(token)
             continue
         oxide, factor = equivalent
@@ -3030,7 +3048,10 @@ def _initial_oxide_map_from_values(
         return got
     raw_moles = values.get("composition_mole_fraction")
     if isinstance(raw_moles, Mapping):
-        formula_moles, omitted = _kume_mole_amounts_from_mapping(raw_moles)
+        try:
+            formula_moles, omitted = _kume_mole_amounts_from_mapping(raw_moles)
+        except ValueError:
+            return None
         if omitted or len(formula_moles) < 2:
             return None
         masses = {
@@ -3167,9 +3188,8 @@ def _mole_fraction_composition_from_values(
                 token = str(name).strip()
                 if token in _COMPOSITION_MOL_META_KEYS:
                     continue
-                parsed = _as_dec_or_none(amount)
-                if parsed is None:
-                    continue
+                # Declared amounts have one owner; malformed → ValueError (hard issue).
+                parsed = parse_declared_amount(amount)
                 if parse_species_formula(token) is None:
                     omitted.append(token)
                     continue
@@ -11538,9 +11558,29 @@ class Migrator:
         initial_oxide_map = _initial_oxide_map_from_values(values)
         composition_located = _composition_located_from_values(values, locator)
         catalogue_composition = _catalogue_composition_located_from_values(values, locator)
-        initial_composition, omitted_components = _mole_fraction_composition_from_values(
-            values
-        )
+        malformed_composition_amount: str | None = None
+        try:
+            initial_composition, omitted_components = (
+                _mole_fraction_composition_from_values(values)
+            )
+        except ValueError as exc:
+            detail = str(exc)
+            if not detail.startswith("malformed declared amount"):
+                raise
+            initial_composition, omitted_components = None, ()
+            malformed_composition_amount = detail
+            composition_key = (
+                "composition_mol"
+                if isinstance(values.get("composition_mol"), Mapping)
+                else "composition_mole_fraction"
+            )
+            self.result.registry_issues.append(
+                ValidationIssue(
+                    path=f"observations.{obs_id}.values.{composition_key}",
+                    reason=RefusalReason.INVALID_SOURCE,
+                    detail=detail,
+                )
+            )
         if omitted_components:
             self.result.add_queue(
                 work.work_id,
@@ -11801,7 +11841,9 @@ class Migrator:
                 value_conversion,
                 choose_read_from(work, locator),
             )
-        if omitted_components:
+        if malformed_composition_amount is not None:
+            ident_kwargs["composition"] = State.unknown(malformed_composition_amount)
+        elif omitted_components:
             ident_kwargs["composition"] = State.unknown(
                 partial_composition_unknown_reason(omitted_components)
             )
@@ -12650,6 +12692,7 @@ class Migrator:
         point_oxide_map: dict[str, Decimal] | None = None
         point_composition_located: Located[Composition] | None = None
         point_catalogue: Located[Composition] | None = None
+        malformed_composition_amount: str | None = None
         if isinstance(raw_item, Mapping):
             q_for_species = (
                 quantity.value
@@ -12713,9 +12756,21 @@ class Migrator:
                     )
                     or locator
                 )
-            point_composition, _point_omitted = _mole_fraction_composition_from_values(
-                raw_item
-            )
+            try:
+                point_composition, _point_omitted = (
+                    _mole_fraction_composition_from_values(raw_item)
+                )
+            except ValueError as exc:
+                detail = str(exc)
+                if not detail.startswith("malformed declared amount"):
+                    raise
+                point_composition = None
+                malformed_composition_amount = detail
+                composition_key = (
+                    "composition_mol"
+                    if isinstance(raw_item.get("composition_mol"), Mapping)
+                    else "composition_mole_fraction"
+                )
             point_composition_located = (
                 None
                 if point_composition is None
@@ -12800,7 +12855,16 @@ class Migrator:
                 point_id = f"{parent_id}::point:{index}"
 
         ident_kwargs = dict(ident_kwargs)
-        if point_catalogue is not None:
+        if malformed_composition_amount is not None:
+            self.result.registry_issues.append(
+                ValidationIssue(
+                    path=f"observations.{point_id}.values.{composition_key}",
+                    reason=RefusalReason.INVALID_SOURCE,
+                    detail=malformed_composition_amount,
+                )
+            )
+            ident_kwargs["composition"] = State.unknown(malformed_composition_amount)
+        elif point_catalogue is not None:
             ident_kwargs["composition"] = point_catalogue.state
             point_composition_located = point_catalogue
         elif point_composition_located is not None:
