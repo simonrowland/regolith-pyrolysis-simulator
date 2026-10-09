@@ -1584,48 +1584,15 @@ def _fusion_comparison_reference(
                 band="MELTS/JANAF liquid reference gap",
             )
 
-    if temperature_K >= fusion.melting_temperature_K:
-        if tridymite_to_cristobalite:
-            cristobalite_endmember = replace(
-                standard_state.endmember,
-                phase=Phase.CR,
-                polymorph=State.of(Polymorph.CRISTOBALITE_HIGH),
-            )
-            cristobalite_state = replace(
-                standard_state,
-                endmember=cristobalite_endmember,
-            )
-            comparison_identity = replace(
-                identity,
-                reference_state=State.of(cristobalite_state),
-            )
-            corrected_activity = reference.value.point * (
-                tridymite_offset_dex * Decimal(10).ln()
-            ).exp()
-            notice = Notice(
-                kind=NoticeKind.OUT_OF_GAMMA_DOMAIN,
-                affected_quantities=(Quantity.ACTIVITY,),
-                reason=(
-                    f"solid reference recorded at T={temperature_K} K >= "
-                    f"JANAF T_fus={fusion.melting_temperature_K} K; "
-                    "JANAF liquid fusion shift not applied because liquid is "
-                    "natural; B1259 tridymite-to-cristobalite shift applied"
-                ),
-                origin=reference.observation_id,
-                band=(
-                    f"JANAF fusion crossing {fusion.melting_temperature_K} K; "
-                    f"tables={fusion.crystal_table}/{fusion.liquid_table}"
-                ),
-            )
-            return replace(
-                reference,
-                identity=comparison_identity,
-                value=replace(reference.value, point=corrected_activity),
-                notices=union_notices(
-                    reference.notices,
-                    (notice, tridymite_notice),
-                ),
-            )
+    # For tridymite above the O-035 crossing, first use B1259 to move the
+    # reported solid activity to cristobalite, then JANAF ΔG_fus=G_l−G_cr to
+    # move it to liquid. Since μ=G°+RT ln(a), each step multiplies activity
+    # by exp(−ΔG/RT). B1259's common printed H/S grid ends at 2000 K; its edge
+    # H/S are held beyond that limit (dCp=0) and the notice marks extrapolation.
+    if (
+        temperature_K >= fusion.melting_temperature_K
+        and not tridymite_to_cristobalite
+    ):
         notice = Notice(
             kind=NoticeKind.OUT_OF_GAMMA_DOMAIN,
             affected_quantities=(Quantity.ACTIVITY,),
@@ -1660,6 +1627,17 @@ def _fusion_comparison_reference(
     ).exp()
     mismatch_K = fusion.melting_temperature_K - fusion.accepted_melting_temperature_K
     extrapolation_K = fusion.melting_temperature_K - temperature_K
+    if temperature_K >= fusion.melting_temperature_K:
+        fusion_distance = (
+            f"distance_above_JANAF_Tm={temperature_K - fusion.melting_temperature_K} K"
+        )
+        fusion_reference_note = "liquid is stable above the JANAF fusion crossing"
+    else:
+        fusion_distance = f"distance_below_JANAF_Tm={extrapolation_K} K"
+        fusion_reference_note = (
+            "table/accepted melting-point mismatch adds uncertainty to the "
+            "metastable-liquid reference"
+        )
     notice = Notice(
         kind=NoticeKind.DERIVATION_USES_COMPILATION,
         affected_quantities=(Quantity.ACTIVITY,),
@@ -1671,12 +1649,10 @@ def _fusion_comparison_reference(
             f"converted_activity_liquid={converted_activity}; "
             f"offset_dex=+{offset_dex}; "
             f"DeltaG_fus={fusion.delta_g_fus_kJ_per_mol} kJ/mol; T={temperature_K} K; "
-            f"JANAF_Tm={fusion.melting_temperature_K} K; "
-            f"distance_below_JANAF_Tm={extrapolation_K} K; "
+            f"JANAF_Tm={fusion.melting_temperature_K} K; {fusion_distance}; "
             f"accepted_Tm~{fusion.accepted_melting_temperature_K} K; "
             f"JANAF_minus_accepted_Tm={mismatch_K} K; "
-            "table/accepted melting-point mismatch adds uncertainty to the "
-            f"metastable-liquid reference; tables={fusion.crystal_table}/"
+            f"{fusion_reference_note}; tables={fusion.crystal_table}/"
             f"{fusion.liquid_table}; source_sha256={fusion.source_sha256[0]}/"
             f"{fusion.source_sha256[1]}"
         ),

@@ -5494,7 +5494,10 @@ def test_unknown_polymorph_with_multiple_eligible_solid_tables_still_refuses() -
 
 def test_tridymite_fusion_conversion_extrapolation_is_flagged() -> None:
     from simulator.battery.enums import Polymorph
-    from simulator.battery.generators.janaf import JANAF_R_J_PER_MOL_K
+    from simulator.battery.generators.janaf import (
+        JANAF_R_J_PER_MOL_K,
+        janaf_fusion_energy,
+    )
     from simulator.battery.score import _fusion_comparison_reference
 
     experiment = F.kems_experiment()
@@ -5532,7 +5535,7 @@ def test_tridymite_fusion_conversion_extrapolation_is_flagged() -> None:
     )
     assert (
         after_comparison.identity.reference_state.value.endmember.phase.value
-        is Phase.CR
+        is Phase.L
     )
     offset_notice = next(
         notice
@@ -5543,25 +5546,22 @@ def test_tridymite_fusion_conversion_extrapolation_is_flagged() -> None:
     assert offset_notice.band == "B1259 common printed H/S band [298.15, 2000.0] K"
     assert "fusion conversion missing input:" in offset_notice.reason
     assert "authority=extrapolated" in offset_notice.reason
-    assert any(
-        "JANAF liquid fusion shift not applied because liquid is natural"
-        in notice.reason
-        for notice in after_comparison.notices
-    )
     # Freeze the printed 2000 K differences beyond the B1259 band:
     # ΔH=0.105 kcal/mol and ΔS=0.060 cal/(mol K) at 2001 K.
     delta_g_tr_J_per_mol = (
         Decimal("0.105") * Decimal("4184")
         - Decimal("2001") * Decimal("0.060") * Decimal("4.184")
     )
+    fusion = janaf_fusion_energy("SiO2", Decimal("2001"))
     expected = Decimal("0.3") * (
-        -delta_g_tr_J_per_mol / (JANAF_R_J_PER_MOL_K * Decimal("2001"))
+        -(
+            delta_g_tr_J_per_mol
+            + fusion.delta_g_fus_kJ_per_mol * Decimal("1000")
+        )
+        / (JANAF_R_J_PER_MOL_K * Decimal("2001"))
     ).exp()
     assert after_comparison.value.point == expected
-    assert (
-        after_comparison.identity.reference_state.value.endmember.polymorph.value
-        is Polymorph.CRISTOBALITE_HIGH
-    )
+    assert after_comparison.identity.reference_state.value.endmember.polymorph is None
 
 
 def test_tridymite_fusion_conversion_applies_b1259_offset_to_value() -> None:
@@ -5619,80 +5619,61 @@ def test_tridymite_fusion_conversion_applies_b1259_offset_to_value() -> None:
     )
 
 
-def test_tridymite_offset_residual_scores_in_band_and_extrapolated_values() -> None:
+def test_tridymite_offset_real_predictor_scores_above_fusion() -> None:
     from simulator.battery.enums import Polymorph
-    from simulator.battery.score import (
-        EnginePrediction,
-        _fusion_comparison_reference,
-    )
 
     experiment = F.kems_experiment()
-    for temperature, polymorph, offset_authority in (
-        (Decimal("1900"), Polymorph.TRIDYMITE, Authority.CERTIFIED),
-        (Decimal("2001"), Polymorph.TRIDYMITE, Authority.EXTRAPOLATED),
-        (Decimal("1900"), Polymorph.CRISTOBALITE_HIGH, None),
-    ):
+    composition = Composition(
+        basis="ordered_complete_mole_inventory",
+        components=(
+            ("SiO2", Decimal("0.6")),
+            ("CaO", Decimal("0.4")),
+        ),
+        amount_basis=AmountBasis.MOLE_FRACTION,
+    )
+    for temperature in (Decimal("2001"), Decimal("2300")):
         identity = _with_activity_reference_polymorph(
             F.activity_identity(
                 formula="SiO2",
                 T_K=temperature,
                 endmember_phase=Phase.CR,
                 component_basis="SiO2",
+                composition=composition,
             ),
-            polymorph,
+            Polymorph.TRIDYMITE,
         )
         reference = F.observation(
-            f"silica-{polymorph.value}-residual-at-{temperature}K",
+            f"silica-tridymite-residual-at-{temperature}K",
             experiment.experiment_id,
             identity,
             Decimal("0.3"),
             evidence=EvidenceClass.MEASURED_DIRECT,
             source_id="synthetic-tridymite-residual-reference",
         )
-        converted = _fusion_comparison_reference(
-            reference, engine=Engine.OPENIMCC
-        )
-        prediction = EnginePrediction(
-            engine=Engine.OPENIMCC,
-            channel="openimcc",
-            execution=Execution(
-                state=ExecutionState.PRODUCED,
-                call_evidence="test:tridymite-offset-residual",
-            ),
-            value=converted.value.point,
-            unit="dimensionless",
-            authority=Authority.CERTIFIED,
-            coefficient_sources=("nasa-cea-thermo",),
-            lineage_complete=True,
-            identity=converted.identity,
-        )
-
         residual, candidate = compile_residual(
             reference,
             Engine.OPENIMCC,
             context=_context(F.work(), experiment, reference, review="reviewed"),
-            prediction=prediction,
         )
 
         assert candidate is not None
-        assert residual.status is ResidualStatus.NO_BAND
         assert residual.numeric is not None
-        assert residual.numeric.value == 0
+        assert (
+            candidate.identity.reference_state.value.endmember.phase.value
+            is Phase.L
+        )
         offset_notices = [
             notice
             for notice in residual.notices
             if "B1259 tridymite→cristobalite offset applied" in notice.reason
         ]
-        if offset_authority is None:
-            assert offset_notices == []
-        else:
-            assert len(offset_notices) == 1
-            offset_notice = offset_notices[0]
-            assert offset_notice.authority is offset_authority
-            assert offset_notice.reason.startswith(
-                "B1259 tridymite→cristobalite offset applied;"
-            )
-            assert "fusion conversion missing input:" in offset_notice.reason
+        assert len(offset_notices) == 1
+        offset_notice = offset_notices[0]
+        assert offset_notice.authority is Authority.EXTRAPOLATED
+        assert offset_notice.reason.startswith(
+            "B1259 tridymite→cristobalite offset applied;"
+        )
+        assert "fusion conversion missing input:" in offset_notice.reason
 
 
 @pytest.mark.parametrize("polymorph", (None, "quartz"))
