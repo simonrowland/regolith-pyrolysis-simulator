@@ -3974,6 +3974,66 @@ def test_uncacheable_gate_curve_fallback_skips_every_memo(
     assert store.capture_sequence == []
 
 
+def test_freeze_gate_sr19_names_nonok_backend_as_failed_source(
+    monkeypatch,
+    vapor_pressure_data,
+    feedstocks_data,
+    setpoints_data,
+):
+    sim = _build_freeze_gate_sim(
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+        enabled=True,
+    )
+    sim.melt.temperature_C = 1600.0
+    sim.melt.p_total_mbar = 10.0
+    monkeypatch.setattr(
+        engine_binding_admission,
+        'gate_curve_memo_eligibility',
+        lambda *_args, **_kwargs: True,
+    )
+    monkeypatch.setattr(
+        sim,
+        '_dispatch_only',
+        lambda intent, **_kwargs: IntentResult(
+            intent=intent,
+            status='ok',
+            transition=None,
+            diagnostic={'solidus_T_C': 1300.0, 'liquidus_T_C': 1200.0},
+        ),
+    )
+    monkeypatch.setattr(
+        sim.backend,
+        'find_liquidus_solidus',
+        lambda **_kwargs: SimpleNamespace(status='not_converged', diagnostics={}),
+        raising=False,
+    )
+    monkeypatch.setattr(
+        sim,
+        '_freeze_gate_curve_from_kernel_liquidus',
+        lambda *_args, **_kwargs: {
+            'source': 'liquidus_solidus:kernel',
+            'solidus_T_C': 1000.0,
+            'liquidus_T_C': 1300.0,
+            'path': ((1000.0, 0.0), (1300.0, 1.0)),
+        },
+    )
+
+    curve = sim._freeze_gate_curve()
+
+    assert curve['source'] == 'liquidus_solidus:kernel'
+    assert sim._reduced_real_repair_notices == [
+        {
+            'type': 'typed_notice',
+            'kind': 'freeze_gate_curve_source_replaced',
+            'site': 'SR19',
+            'failed_source': 'liquidus_solidus:backend',
+            'replacement_source': 'liquidus_solidus:kernel',
+        }
+    ]
+
+
 def test_fallback_authorized_redox_transition_is_balanced_and_provenanced(
     monkeypatch,
     vapor_pressure_data,
