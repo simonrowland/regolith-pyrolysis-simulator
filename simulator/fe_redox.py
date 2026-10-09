@@ -5,16 +5,14 @@ from collections.abc import Mapping
 from dataclasses import dataclass
 
 from simulator.environment import DEFAULT_VACUUM_FLOOR_BAR
-from simulator.physical_constants import (
-    MELT_DISSOCIATION_PO2_MAX_BAR,
-    MELT_DISSOCIATION_PO2_MIN_BAR,
-)
+from simulator.physical_constants import MELT_DISSOCIATION_PO2_MIN_BAR
 from simulator.feedstock_composition import (
     FEOT_FROM_FE2O3,
     OXYGEN_IN_FEO,
     FeRedoxPrior,
     feot_equivalent_wt_pct,
     iron_oxide_values,
+    refuse_fully_ferric_measured_fraction,
 )
 
 
@@ -51,9 +49,10 @@ def intrinsic_melt_fO2(
     A measured Fe3+/sum-Fe prior in (0, 1) inverts Kress91 at this
     temperature (``kress91_fO2_log_for_fe3_fraction``); Kress91 already
     carries the Na2O and K2O terms, so alkali is not added on top.
-    Fractions of exactly 0 or 1 have no finite Kress91 root. They seed
-    the melt-dissociation envelope (``measured_fe3_fraction_seed``),
-    not this IW-plus-alkali fallthrough.
+    f = 0 has no finite Kress91 root and seeds the reducing
+    melt-dissociation floor (``measured_fe3_fraction_seed``), not this
+    IW-plus-alkali fallthrough. f = 1 is refused: the oxidizing
+    ceiling is not a finite Kress91 potential.
 
     Algebra, no prior: log10(fO2/bar) = feo_iw_log10_fO2_bar(T) + redox_offset.
     feo_iw_log10_fO2_bar is Holzheid, Palme & Chakraborty 1997 liquid FeO
@@ -865,13 +864,17 @@ def measured_fe3_fraction_seed_domain(fe3_fraction: float) -> str:
 
     Kress91's molar ratio r = f / (2 (1 - f)) is zero at f = 0 and
     infinite at f = 1, so the inversion has no finite log10(fO2).
-    Those two endpoints use the melt-dissociation envelope. Every other
-    fraction, including values the parser will later refuse, is the
-    Kress91 domain; the inversion itself still rejects f outside (0, 1).
+    f = 0 uses the reducing melt-dissociation floor. f = 1 is refused
+    (``refuse_fully_ferric_measured_fraction``): the oxidizing ceiling
+    is more reducing than the inversion of an interior fraction near 1.
+    Every other fraction, including values the parser will later refuse,
+    is the Kress91 domain; the inversion itself still rejects f outside
+    (0, 1).
     """
 
     fraction = float(fe3_fraction)
-    if fraction == 0.0 or fraction == 1.0:
+    refuse_fully_ferric_measured_fraction(fraction)
+    if fraction == 0.0:
         return MEASURED_FRACTION_SEED_DISSOCIATION_ENVELOPE
     return MEASURED_FRACTION_SEED_KRESS91
 
@@ -886,38 +889,36 @@ def measured_fe3_fraction_seed(
     """log10(fO2/bar) for a measured ferric fraction, and its domain.
 
     Premise: an interior fraction inverts Kress91 once
-    (``kress91_fO2_log_for_fe3_fraction``). f = 0 and f = 1 make that
-    log ratio diverge, so there is no finite Kress91 root. Seeding both
-    of those endpoints with IW plus alkali would give one potential
-    (Holzheid IW at 1673.15 K is -9.740754, and a small alkali offset
-    does not separate the two inventories) and the forward relation
-    would read it as a small ferric fraction. The ledger still writes
-    f = 0 as all FeO and f = 1 as all Fe2O3.
+    (``kress91_fO2_log_for_fe3_fraction``). f = 0 makes that log ratio
+    diverge, so there is no finite Kress91 root. Seeding f = 0 with IW
+    plus alkali would give Holzheid IW at 1673.15 K (-9.740754, plus a
+    small alkali offset) and the forward relation would read it as a
+    small ferric fraction. The ledger still writes f = 0 as all FeO.
+    The reducing vapour mass-action floor is
+    MELT_DISSOCIATION_PO2_MIN_BAR = 1e-30 bar. That floor is a disclosed
+    approximation, not a Kress91 solution.
 
-    The existing vapour mass-action envelope already bounds melt pO2:
-    MELT_DISSOCIATION_PO2_MIN_BAR is 1e-30 bar and
-    MELT_DISSOCIATION_PO2_MAX_BAR is 100 bar. f = 0 takes the reducing
-    bound and f = 1 the oxidizing bound. That is the dissociation
-    envelope, not a Kress91 solution.
+    f = 1 also makes the ratio diverge. The oxidizing ceiling
+    (log10(100 bar) = 2) is more reducing than the inversion of f = 0.9
+    on a basaltic melt, and the forward relation at that ceiling returns
+    a fraction below 0.9. Substituting the ceiling would reverse the
+    seed. A measured fraction of exactly 1 is therefore refused.
 
-    Algebra: log10(fO2/bar) = log10(1e-30) = -30 at f = 0, and
-    log10(100) = 2 at f = 1. Interior fractions use the inversion.
+    Algebra: log10(fO2/bar) = log10(1e-30) = -30 at f = 0. Interior
+    fractions use the inversion. f = 1 raises
+    FullyFerricHasNoFiniteKress91Potential.
 
     Units: f is dimensionless Fe3+/sum-Fe. T_K is kelvin. pressure_bar
     is bar. The result is dimensionless log10(fO2/bar).
 
-    Sanity: f = 0 returns -30 and f = 1 returns 2. Neither equals
-    Holzheid IW at 1673.15 K (-9.740754).
+    Sanity: f = 0 returns -30, which is not Holzheid IW at 1673.15 K
+    (-9.740754). On SiO2 = 45, FeO = 16.5, Na2O = 1 at 1673.15 K the
+    interior seeds increase with f, and f = 0.9 already lies above +2.
     """
 
     domain = measured_fe3_fraction_seed_domain(fe3_fraction)
     if domain == MEASURED_FRACTION_SEED_DISSOCIATION_ENVELOPE:
-        bound_bar = (
-            MELT_DISSOCIATION_PO2_MIN_BAR
-            if float(fe3_fraction) == 0.0
-            else MELT_DISSOCIATION_PO2_MAX_BAR
-        )
-        return math.log10(bound_bar), domain
+        return math.log10(MELT_DISSOCIATION_PO2_MIN_BAR), domain
     return (
         kress91_fO2_log_for_fe3_fraction(
             fe3_fraction=float(fe3_fraction),
@@ -964,6 +965,7 @@ def fe3_fraction_for_prior(
     """
 
     if prior.kind == "measured_fe3_fraction":
+        refuse_fully_ferric_measured_fraction(prior.value)
         return float(prior.value)
     if prior.kind != "delta_iw":
         raise Kress91InvalidControls(

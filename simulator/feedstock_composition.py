@@ -24,6 +24,48 @@ FEOT_FROM_FE2O3 = 2.0 * 71.844 / 159.687
 OXYGEN_IN_FEO = 15.999 / 71.844
 DEFAULT_FEO_TO_FE2O3_EQUIVALENT_FACTOR = 1.1113
 FE_REPORTING_CONVENTION_TOTAL_AS_FEO = "total Fe as FeO"
+FULLY_FERRIC_HAS_NO_FINITE_KRESS91_POTENTIAL = (
+    "fully_ferric_has_no_finite_kress91_potential"
+)
+
+
+class FullyFerricHasNoFiniteKress91Potential(ValueError):
+    """Typed refusal: Fe3+/sum-Fe of exactly 1 has no finite Kress91 fO2.
+
+    Premise: Kress & Carmichael 1991 write the molar ratio
+    r = Fe2O3/FeO = f / (2 (1 - f)). At f = 1 the denominator is zero,
+    so log10(fO2) diverges. The vapour mass-action ceiling,
+    log10(100 bar) = 2, is more reducing than the inversion of an
+    interior fraction near 1, so substituting that ceiling reverses
+    the seed. f = 0 remains the disclosed reducing floor
+    (log10(1e-30 bar) = -30) and is not this refusal.
+
+    The mass identity FeOT -> Fe2O3 at f = 1 stays in
+    ``feo_fe2o3_kg_from_feot``. This class refuses the oxygen
+    potential and a measured prior that would seed it.
+
+    Units: f is dimensionless Fe3+/sum-Fe. The missing result would
+    have been dimensionless log10(fO2/bar).
+
+    Sanity: on SiO2 = 45, FeO = 16.5, Na2O = 1 at 1673.15 K the
+    production inversion at f = 0.9 lies above +2, and the forward
+    relation at +2 returns a fraction below 0.9.
+    """
+
+    reason = FULLY_FERRIC_HAS_NO_FINITE_KRESS91_POTENTIAL
+
+    def __init__(self) -> None:
+        super().__init__(
+            f"{self.reason}: measured Fe3+/sum-Fe of exactly 1 "
+            "has no finite Kress91 log10(fO2)"
+        )
+
+
+def refuse_fully_ferric_measured_fraction(fe3_fraction: float) -> None:
+    """Raise when a measured fraction is exactly the fully ferric endpoint."""
+
+    if float(fe3_fraction) == 1.0:
+        raise FullyFerricHasNoFiniteKress91Potential()
 
 
 @dataclass(frozen=True)
@@ -122,6 +164,10 @@ def _parse_fe_redox_prior(feedstock: Mapping[str, Any]) -> FeRedoxPrior | None:
     range_low = None
     range_high = None
     if kind == "measured_fe3_fraction":
+        # f = 1 is inside the unit interval and still has no finite
+        # Kress91 potential. Refuse it before the closed-interval check
+        # so the reason is the potential, not a range typo.
+        refuse_fully_ferric_measured_fraction(value)
         if not 0.0 <= value <= 1.0:
             raise ValueError(
                 "fe_redox_prior.measured_fe3_fraction.value "

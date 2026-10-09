@@ -8984,11 +8984,11 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             seed_domain = measured_fe3_fraction_seed_domain(float(prior.value))
             if seed_domain == MEASURED_FRACTION_SEED_DISSOCIATION_ENVELOPE:
                 message = (
-                    "The measured Fe3+/sum-Fe fraction is an endpoint. "
-                    "Kress91's molar ratio has no finite root there, so "
-                    "the seed is the melt-dissociation pressure envelope, "
-                    "not a Kress91 solution. The ledger still writes that "
-                    "fraction."
+                    "The measured Fe3+/sum-Fe fraction is fully ferrous. "
+                    "Kress91's molar ratio is zero there and has no finite "
+                    "root, so the seed is the reducing melt-dissociation "
+                    "pressure floor, not a Kress91 solution. The ledger "
+                    "still writes that fraction."
                 )
             else:
                 message = (
@@ -9011,12 +9011,11 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             notice["seed_domain"] = seed_domain
             if seed_domain == MEASURED_FRACTION_SEED_DISSOCIATION_ENVELOPE:
                 notice["seed_domain_reason"] = (
-                    "Kress91 molar ratio f/(2*(1-f)) is zero at f=0 and "
-                    "infinite at f=1, so the inversion has no finite "
-                    "log10(fO2). The seed is log10 of the melt-dissociation "
-                    "envelope (1e-30 bar when f=0, 100 bar when f=1). "
-                    "That envelope is the vapour mass-action bound, not a "
-                    "Kress91 root."
+                    "Kress91 molar ratio f/(2*(1-f)) is zero at f=0, so "
+                    "the inversion has no finite log10(fO2). The seed is "
+                    "log10(1e-30 bar), the reducing melt-dissociation "
+                    "floor. That floor is the vapour mass-action bound, "
+                    "not a Kress91 root."
                 )
         seed_temperature_C = float(self.melt.temperature_C)
         band = kress91_temperature_band_case(seed_temperature_C)
