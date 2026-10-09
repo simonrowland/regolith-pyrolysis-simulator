@@ -7,6 +7,9 @@ import pytest
 
 from simulator.reference_data import janaf
 from simulator.accounting.formulas import parse_formula
+from simulator.config import load_config_bundle
+from simulator.thermal_budget import evaporation_enthalpy_budget
+from simulator.vapour_rail.catalog import compile_vapour_rail_catalog
 from simulator.vapour_rail.catalog import _polynomial_from_thermo_record
 from simulator.vapour_rail.channel_generator import generate_first_batch
 from simulator.vapour_rail.tabulated_gibbs import (
@@ -135,3 +138,45 @@ def test_each_generated_reaction_satisfies_gibbs_helmholtz(channel):
         derivative += weight * G / node / 100.0
         tolerance += T**2 * abs(weight) * rounding / node / 100.0
     assert abs(H + T**2 * derivative) <= tolerance
+
+
+@pytest.mark.parametrize("temperature_K", [2000.0, 50.0])
+def test_generated_heat_uses_one_source_reaction_and_flags_extrapolation(temperature_K):
+    catalog = compile_vapour_rail_catalog(
+        load_config_bundle().vapor_pressures.catalog_payload, emit_u0_request_rules=False,
+    )
+    legacy = catalog.legacy_view()
+    rows = legacy["t1139_generated_carriers"]
+    result = evaporation_enthalpy_budget(
+        {species: 1e-9 for species in rows}, vapor_pressures=legacy,
+        temperature_K=temperature_K,
+    )
+    assert len(result["dissociation_by_species_kWh"]) == 45
+    assert set(result["latent_by_species_kWh"].values()) == {0.0}
+    assert all(math.isfinite(value) for value in result["dissociation_by_species_kWh"].values())
+    for species, row in rows.items():
+        source = result["sources"]["analytical_source_reaction:" + species]
+        assert "Same-record" in source
+        if temperature_K == 50.0:
+            assert "out_of_range_source_function_extrapolation" in source
+
+
+def test_generated_heat_preserves_missing_enthalpy_guard():
+    catalog = compile_vapour_rail_catalog(
+        load_config_bundle().vapor_pressures.catalog_payload, emit_u0_request_rules=False,
+    )
+    legacy = catalog.legacy_view()
+    with pytest.raises(TabulatedMissingNodeError) as caught:
+        evaporation_enthalpy_budget(
+            {"t1139_Cu_Cu": 1e-9}, vapor_pressures=legacy, temperature_K=1523.15,
+        )
+    assert caught.value.missing_node == 1600.0
+    row = dict(legacy["t1139_generated_carriers"]["t1139_Cu_Cu"])
+    from copy import deepcopy
+    row = deepcopy(row)
+    for record in row["reference_pressure_model"]["species_thermo"].values():
+        record.pop("formation_enthalpy_points", None)
+    with pytest.raises(ValueError, match="missing printed formation enthalpy"):
+        evaporation_enthalpy_budget(
+            {"t1139_Cu_Cu": 1e-9}, vapor_pressures={"t1139_Cu_Cu": row}, temperature_K=2000.0,
+        )

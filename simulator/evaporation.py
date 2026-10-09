@@ -45,6 +45,7 @@ from simulator.vapour_rail.batch import (
     FluxActivationContext,
 )
 from simulator.vapour_rail.activity import StandardStateIdentity
+from simulator.vapour_rail.catalog import EVAPORATION_METADATA_GROUPS
 from simulator.vapour_rail.instrumentation import (
     CONTROL_BATCH_REPORT_KEY,
     CONTROL_FLUX_PRESSURES_KEY,
@@ -361,11 +362,10 @@ def refuse_viscous_p_bulk_out_of_domain(
 # NOTE: the evaporation alpha default lives at engines/builtin/evaporation_flux.py
 # (_DEFAULT_EVAPORATION_ALPHA), which is the authoritative flux path; the former
 # duplicate here was dead (unused, not imported) and was removed (SC-09 / BUG-051).
-_EVAPORATION_ALPHA_GROUPS = ("metals", "oxide_vapors", "t1139_generated_carriers")
 
 
 def _evaporation_species_data(vapor_pressures: Mapping[str, Any], species: str) -> dict:
-    for group in _EVAPORATION_ALPHA_GROUPS:
+    for group in EVAPORATION_METADATA_GROUPS:
         row = (vapor_pressures.get(group, {}) or {}).get(species, {})
         if row:
             return row
@@ -504,7 +504,7 @@ def _load_evaporation_alpha_by_species(vapor_pressure_data: dict) -> dict[str, A
 
     vapor_pressure_data = vapor_pressure_legacy_view(vapor_pressure_data)
     alpha_by_species: dict[str, Any] = {}
-    for group_name in _EVAPORATION_ALPHA_GROUPS:
+    for group_name in EVAPORATION_METADATA_GROUPS:
         group = vapor_pressure_data.get(group_name, {}) or {}
         for species, species_data in group.items():
             if not isinstance(species_data, dict):
@@ -574,7 +574,7 @@ def _load_hkl_upper_bound_transport_species(
 
     legacy = vapor_pressure_legacy_view(vapor_pressure_data)
     species_ids: set[str] = set()
-    for group_name in _EVAPORATION_ALPHA_GROUPS:
+    for group_name in EVAPORATION_METADATA_GROUPS:
         group = legacy.get(group_name, {}) or {}
         for species, species_data in group.items():
             if not isinstance(species_data, Mapping):
@@ -672,7 +672,7 @@ def _load_evaporation_alpha_envelope_by_species(
 
     vapor_pressure_data = vapor_pressure_legacy_view(vapor_pressure_data)
     envelope_by_species: dict[str, tuple[float, float]] = {}
-    for group_name in _EVAPORATION_ALPHA_GROUPS:
+    for group_name in EVAPORATION_METADATA_GROUPS:
         group = vapor_pressure_data.get(group_name, {}) or {}
         for species, species_data in group.items():
             if not isinstance(species_data, dict):

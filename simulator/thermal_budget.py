@@ -34,6 +34,7 @@ from simulator.furnace_materials import load_furnace_materials
 from simulator.physical_constants import CELSIUS_TO_KELVIN_OFFSET
 from simulator.scalar_boundary import is_declared_real_scalar
 from simulator.state import GAS_CONSTANT, MOLAR_MASS, OXIDE_TO_METAL, STOICH_RATIOS
+from simulator.vapour_rail.catalog import EVAPORATION_METADATA_GROUPS
 
 
 CITED = "CITED"
@@ -737,7 +738,7 @@ def _vapor_metadata(
 ) -> dict[str, Any]:
     if not vapor_pressures:
         return {}
-    for section in ("metals", "oxide_vapors"):
+    for section in EVAPORATION_METADATA_GROUPS:
         section_data = vapor_pressures.get(section, {})
         if isinstance(section_data, Mapping) and species in section_data:
             raw = section_data.get(species, {})
@@ -759,6 +760,29 @@ def _analytical_reaction_enthalpy(
     """Return NASA-polynomial delta-H per mole vapor for a source reaction."""
 
     model = metadata.get("reference_pressure_model")
+    if metadata.get("chemical_family") == "t1139_generated_carrier":
+        if not isinstance(model, Mapping):
+            raise ValueError(f"analytical source-reaction model unavailable for {species!r}")
+        reaction = metadata.get("source_reaction")
+        if not isinstance(reaction, Mapping):
+            raise ValueError(f"analytical source reaction unavailable for {species!r}")
+        if temperature_K is None or not math.isfinite(temperature_K) or temperature_K <= 0:
+            raise ValueError("temperature_K must be finite and positive")
+        terms = [(sign * float(part["stoichiometry"]), str(part["formula"]))
+                 for sign, side in ((-1, "reactants"), (1, "products"))
+                 for part in reaction[side]]
+        vapor_formula = str(metadata["formula"]) + "(g)"
+        vapor_mol = sum(nu for nu, formula in terms if nu > 0 and formula == vapor_formula)
+        if vapor_mol <= 0:
+            raise ValueError(f"analytical vapor stoichiometry unavailable for {species!r}")
+        delta_h, extrapolated = _source_reaction_delta_h(
+            species, model["species_thermo"], str(model["evaluator_family"]),
+            terms, float(temperature_K), extrapolate=True,
+        )
+        flag = "; out_of_range_source_function_extrapolation" if extrapolated else ""
+        return EnthalpyCoefficient(delta_h / vapor_mol / 1000.0,
+            f"Same-record {model['evaluator_family']} source-reaction delta-H(T={temperature_K:.2f} K); "
+            f"analytical/status-bearing, cannot certify{flag}")
     if isinstance(model, Mapping) and isinstance(
         model.get("gas_exchange_reaction"), Mapping
     ):
@@ -814,31 +838,13 @@ def _analytical_reaction_enthalpy(
             f"analytical source-reaction thermo unavailable for {species!r}: {missing}"
         )
 
-    # Reuse the catalog's landed NASA7/NASA9 parser so pressure and energy
-    # diagnostics evaluate the same CEA coefficient convention.
-    from simulator.vapour_rail.catalog import _polynomial_from_thermo_record
-
-    polynomials = {
-        formula: _polynomial_from_thermo_record(
-            name=f"thermal_budget:{species}:{formula}",
-            family=family,
-            record=thermo[formula],
-        )
-        for formula in required
-    }
-    delta_h_J_per_mol_vapor = (
-        polynomials[species].evaluate(T_K).h_J_per_mol
-        + (
-            oxygen_mol * polynomials["O2"].evaluate(T_K).h_J_per_mol
-            if oxygen_mol > 0.0
-            else 0.0
-        )
-        - parent_mol * polynomials[parent].evaluate(T_K).h_J_per_mol
+    terms = [(1.0, species)]
+    if oxygen_mol > 0:
+        terms.append((oxygen_mol, "O2"))
+    terms.append((-parent_mol, parent))
+    delta_h_J_per_mol_vapor, _extrapolated = _source_reaction_delta_h(
+        species, thermo, family, terms, T_K,
     )
-    if not math.isfinite(delta_h_J_per_mol_vapor):
-        raise ValueError(
-            f"analytical source-reaction enthalpy is non-finite for {species!r}"
-        )
     parent_record = thermo[parent]
     parent_reference = str(parent_record.get("cea_name") or parent)
     phase_status = ""
@@ -855,6 +861,47 @@ def _analytical_reaction_enthalpy(
             f"cannot certify{phase_status}"
         ),
     )
+
+
+def _source_reaction_delta_h(
+    species: str, thermo: Mapping[str, Any], family: str,
+    terms: list[tuple[float, str]], temperature_K: float, *, extrapolate: bool = False,
+) -> tuple[float, bool]:
+    """Sum source-record reaction enthalpy; pressure uses these same records."""
+    from simulator.vapour_rail.catalog import (
+        _polynomial_from_thermo_record, _resolve_thermo_record,
+    )
+    from simulator.vapour_rail.nasa_cea import R_J_PER_MOL_K
+    from simulator.vapour_rail.tabulated_gibbs import TabulatedThermo
+
+    total = 0.0
+    extrapolated = False
+    # ΔH_rxn = Σν ΔfH(products) − Σν ΔfH(reactants), J/mol reaction.
+    # Balanced NASA reactions equivalently cancel their absolute elemental basis.
+    for nu, formula in terms:
+        polynomial = _polynomial_from_thermo_record(
+            name=f"thermal_budget:{species}:{formula}", family=family,
+            record=_resolve_thermo_record(thermo[formula], field=f"thermal_budget:{species}:{formula}"),
+        )
+        outside = not polynomial.T_min_K <= temperature_K <= polynomial.T_max_K
+        extrapolated |= outside
+        if isinstance(polynomial, TabulatedThermo):
+            if not polynomial.formation_enthalpy_J_per_mol:
+                raise ValueError(f"missing printed formation enthalpy for {species!r}:{formula}")
+            H = polynomial.evaluate(temperature_K, extrapolate=extrapolate).h_J_per_mol
+        elif outside and extrapolate:
+            segment = (polynomial.segments[0] if temperature_K < polynomial.T_min_K
+                       else polynomial.segments[-1])
+            _cp, h_over_RT, _s, _g = segment.evaluate_ratios(temperature_K)
+            H = h_over_RT * R_J_PER_MOL_K * temperature_K
+        else:
+            H = polynomial.evaluate(temperature_K).h_J_per_mol
+        if not math.isfinite(H):
+            raise ValueError(f"non-finite source-reaction enthalpy for {species!r}:{formula}")
+        total += nu * H
+    if not math.isfinite(total):
+        raise ValueError(f"analytical source-reaction enthalpy is non-finite for {species!r}")
+    return total, extrapolated
 
 
 def _composite_exchange_reaction_enthalpy(
@@ -910,16 +957,11 @@ def _composite_exchange_reaction_enthalpy(
             f"analytical gas-exchange thermo unavailable for {species!r}"
         )
 
-    from simulator.vapour_rail.catalog import (
-        _polynomial_from_thermo_record,
-        _resolve_thermo_record,
-    )
-
     target_formula = str(metadata.get("formula") or species)
     base_formula = str(model.get("base_vapor_formula") or "")
     target_nu = 0.0
     base_reactant_nu = 0.0
-    exchange_delta_h_J_per_mol = 0.0
+    terms = []
     for sign, side in ((-1.0, "reactants"), (1.0, "products")):
         participants = exchange.get(side)
         if not isinstance(participants, list):
@@ -938,17 +980,7 @@ def _composite_exchange_reaction_enthalpy(
                 raise ValueError(
                     f"analytical gas-exchange thermo unavailable for {species!r}:{formula!r}"
                 )
-            resolved = _resolve_thermo_record(
-                record, field=f"thermal_budget:{species}:{formula}"
-            )
-            polynomial = _polynomial_from_thermo_record(
-                name=f"thermal_budget:{species}:{formula}",
-                family=family,
-                record=resolved,
-            )
-            exchange_delta_h_J_per_mol += (
-                sign * amount * polynomial.evaluate(T_K).h_J_per_mol
-            )
+            terms.append((sign * amount, formula))
             if sign > 0.0 and formula == target_formula:
                 target_nu += amount
             if sign < 0.0 and formula == base_formula:
@@ -957,6 +989,10 @@ def _composite_exchange_reaction_enthalpy(
         raise ValueError(
             f"analytical gas-exchange stoichiometry unavailable for {species!r}"
         )
+
+    exchange_delta_h_J_per_mol, _extrapolated = _source_reaction_delta_h(
+        species, thermo, family, terms, T_K,
+    )
 
     delta_h_J_per_mol_vapor = (
         base_reactant_nu * base_delta_h_J_per_mol
@@ -1000,28 +1036,14 @@ def _direct_phase_transfer_reaction_enthalpy(
     ):
         raise ValueError(f"analytical phase-transfer thermo unavailable for {species!r}")
 
-    from simulator.vapour_rail.catalog import (
-        _polynomial_from_thermo_record,
-        _resolve_thermo_record,
-    )
-
-    polynomials = {}
     for formula in ("P2O5(L)", "P2O5"):
         record = thermo.get(formula)
         if not isinstance(record, Mapping):
             raise ValueError(
                 f"analytical phase-transfer thermo unavailable for {species!r}:{formula}"
             )
-        polynomials[formula] = _polynomial_from_thermo_record(
-            name=f"thermal_budget:{species}:{formula}",
-            family=family,
-            record=_resolve_thermo_record(
-                record, field=f"thermal_budget:{species}:{formula}"
-            ),
-        )
-    delta_h_J_per_mol = (
-        polynomials["P2O5"].evaluate(T_K).h_J_per_mol
-        - polynomials["P2O5(L)"].evaluate(T_K).h_J_per_mol
+    delta_h_J_per_mol, _extrapolated = _source_reaction_delta_h(
+        species, thermo, family, [(1.0, "P2O5"), (-1.0, "P2O5(L)")], T_K,
     )
     return EnthalpyCoefficient(
         delta_h_J_per_mol / 1000.0,

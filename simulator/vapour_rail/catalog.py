@@ -95,6 +95,7 @@ FOUR_STRATA = (
     "code_metadata",
 )
 DEFAULT_EXTRAPOLATION_POLICY = "conservative_slope_continuation"
+EVAPORATION_METADATA_GROUPS = ("metals", "oxide_vapors", "t1139_generated_carriers")
 OUT_OF_RANGE_STATUS = "out_of_range_conservative_continuation"
 # Runtime thermo evaluator families (VR-4b). Short aliases accepted in YAML.
 _THERMO_FAMILY_ALIASES: Mapping[str, str] = MappingProxyType(
@@ -3864,6 +3865,12 @@ def _legacy_species_row(
     result = deepcopy(dict(row))
     result.pop("pressure_models", None)
     result.pop("source_reactions", None)
+    if row.get("chemical_family") == "t1139_generated_carrier":
+        # The heat budget consumes the same balanced reaction as pressure.
+        result["source_reaction"] = deepcopy(next(
+            reaction for reaction in row["source_reactions"]
+            if reaction["id"] == model["source_reaction_id"]
+        ))
     result.pop("validation", None)
     result["fit_target"] = model.get(
         "compatibility_fit_target",
