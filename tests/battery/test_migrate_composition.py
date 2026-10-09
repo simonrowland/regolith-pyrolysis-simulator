@@ -421,6 +421,44 @@ def test_markova_vi_lherzolite_carries_printed_five_oxide_composition() -> None:
     assert later_printed != printed, "ramp residual composition was collapsed into one map"
 
 
+def test_markova_1984_mass_loss_identity_uses_its_own_panel_initial_charge() -> None:
+    """Cumulative mass loss uses each panel's own T=0 charge as X0."""
+
+    store = _OBS_ROOTS[0] / "kems-026-markova-1984.yaml"
+    doc = yaml.safe_load(store.read_text(encoding="utf-8"))
+    panels = {
+        "VI_lherzolite": {"SiO2": "44.02", "MgO": "36.44"},
+        "V_alumina_basalt": {"SiO2": "52.32", "Al2O3": "19.13"},
+    }
+
+    for panel, signature in panels.items():
+        prefix = f"kems-026-markova-1984::markova_1984_table2_residual_melt_{panel}"
+        rows = [
+            obs
+            for obs in (doc.get("observations") or [])
+            if str(obs.get("observation_id") or "").startswith(prefix)
+            and _quantity(obs) == "mass_loss_fraction"
+        ]
+        assert len(rows) == 12, (panel, len(rows))
+        t0 = next(
+            obs
+            for obs in rows
+            if str(obs.get("observation_id") or "").endswith("::point:0")
+        )
+        charge = _printed_wt_map(t0)
+        for oxide, expected in signature.items():
+            assert charge[oxide] == as_decimal(expected), (panel, oxide, charge)
+        expected_x0 = dict(wt_pct_to_mole_fraction(charge).components)
+        for row in rows:
+            identity_x0 = _identity_composition_components(row)
+            assert identity_x0, (panel, row.get("observation_id"))
+            assert identity_x0.keys() == expected_x0.keys(), (panel, row.get("observation_id"))
+            assert all(
+                abs(identity_x0[oxide] - value) < as_decimal("1e-12")
+                for oxide, value in expected_x0.items()
+            ), (panel, row.get("observation_id"), identity_x0)
+
+
 def test_bulk_property_rows_do_not_use_sample_code_as_formula() -> None:
     """MLS-* / MS[0-9] are sample labels, not chemical formulas."""
 
