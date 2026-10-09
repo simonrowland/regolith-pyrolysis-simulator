@@ -5262,10 +5262,22 @@ def test_kume_activity_values_use_schema_type_and_map_to_activity() -> None:
         assert quantity.is_value and quantity.value is Quantity.ACTIVITY
         assert reason is None
 
-    assert all(
-        sample["observable"] == "activity_coefficient"
+    expected_observables = {
+        "kume_2000_table1_sample_1": "activity_coefficient",
+        "kume_2000_table2_sample_101": "activity_coefficient",
+        "kume_2000_table3_sample_201": "activity_coefficient",
+        "kume_2000_table4_sample_301": "activity_coefficient",
+        "kume_2000_table3_sample_207_sio2_activity": "activity_coefficient",
+        "kume_2000_table3_sample_207_mgo_activity": "activity_coefficient",
+        "kume_2000_table4_sample_306_mgo_activity": "activity_coefficient",
+        "kume_2000_table4_sample_306_alo1_5_activity": "activity_coefficient",
+        "kume_2000_table3_sample_207_metal_composition": "concentration_series",
+        "kume_2000_table4_sample_306_metal_composition": "concentration_series",
+    }
+    assert {
+        sample["observation_id"]: sample["observable"]
         for sample in extract["fidelity_samples"]
-    )
+    } == expected_observables
 
 
 def test_kume_experiment_temperatures_have_table_locators(tmp_path: Path) -> None:
