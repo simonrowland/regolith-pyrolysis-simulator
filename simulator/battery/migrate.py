@@ -12812,7 +12812,11 @@ class Migrator:
                     "melt_reference_pairing",
                 }
             } or None
-        if ident_kwargs.get("composition") is None:
+        if q_token_point is Quantity.P_PARTIAL and point_oxide_map:
+            ident_kwargs["composition"] = State.of(
+                wt_pct_to_mole_fraction(point_oxide_map)
+            )
+        elif ident_kwargs.get("composition") is None:
             initial_map = _initial_oxide_map_from_values(parent_values)
             if initial_map:
                 ident_kwargs["composition"] = State.of(
