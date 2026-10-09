@@ -192,6 +192,7 @@ gaps:
   - murchison-hydropyrolysis-1990s-gca
   - nagabayashi-hino-banya-1989-phosphorus
   - nagahara-ozawa-1999-forsterite-surface-microstructures
+  - nagata-1989-emf-calcium-aluminates
   - nakamura-2022-science-ryugu-thermal
   - nakano-hashimoto-2020-bubbles-to-chondrites-i
   - nasa-cea-thermo
@@ -1706,7 +1707,7 @@ sources:
     extract:
       path: extracts/britt-2019-asteroid-simulants.yaml
       present: true
-      matches_simulator: true
+      matches_simulator: false
     ledger:
       path: ledger/britt-2019-asteroid-simulants.yaml
       present: true
@@ -2646,7 +2647,7 @@ sources:
     extract:
       path: extracts/fegley-2023-chemical-equilibrium-calculations-bu.yaml
       present: true
-      matches_simulator: true
+      matches_simulator: false
     ledger:
       path: ledger/fegley-2023-chemical-equilibrium-calculations-bu.yaml
       present: true
@@ -3530,7 +3531,7 @@ sources:
     extract:
       path: extracts/itoh-hino-banya-1998-spinel.yaml
       present: true
-      matches_simulator: true
+      matches_simulator: false
     ledger:
       path: ledger/itoh-hino-banya-1998-spinel.yaml
       present: true
@@ -4991,7 +4992,7 @@ sources:
   extracts:
   - path: data/literature/extracts/kems-020-hastie-1981-nbsir.yaml
     review_status: draft
-    rows: 38
+    rows: 41
     locator_status: private_path
   battery_datasets: []
   hunt_ids: []
@@ -5103,7 +5104,7 @@ sources:
   extracts:
   - path: data/literature/extracts/kems-022-demaria-1971.yaml
     review_status: draft
-    rows: 31
+    rows: 32
     locator_status: private_path
   battery_datasets: []
   hunt_ids: []
@@ -5248,7 +5249,7 @@ sources:
     extract:
       path: extracts/kems-024-gibson-hubbard-1972.yaml
       present: true
-      matches_simulator: true
+      matches_simulator: false
     ledger:
       path: ledger/kems-024-gibson-hubbard-1972.yaml
       present: true
@@ -5743,7 +5744,7 @@ sources:
   extracts:
   - path: data/literature/extracts/kems-035-sauerborn-2005.yaml
     review_status: draft
-    rows: 60
+    rows: 62
     locator_status: private_path
   battery_datasets: []
   hunt_ids: []
@@ -5770,7 +5771,7 @@ sources:
     extract:
       path: extracts/kems-035-sauerborn-2005.yaml
       present: true
-      matches_simulator: true
+      matches_simulator: false
     ledger:
       path: ledger/kems-035-sauerborn-2005.yaml
       present: true
@@ -6007,7 +6008,7 @@ sources:
     extract:
       path: extracts/kems-039-wolf-2023-vaporock.yaml
       present: true
-      matches_simulator: true
+      matches_simulator: false
     ledger:
       path: ledger/kems-039-wolf-2023-vaporock.yaml
       present: true
@@ -6121,7 +6122,7 @@ sources:
     extract:
       path: extracts/kems-041-sossi-fegley-2018.yaml
       present: true
-      matches_simulator: true
+      matches_simulator: false
     ledger:
       path: ledger/kems-041-sossi-fegley-2018.yaml
       present: true
@@ -6359,7 +6360,7 @@ sources:
     extract:
       path: extracts/kems-046-van-limpt-2007.yaml
       present: true
-      matches_simulator: true
+      matches_simulator: false
     ledger:
       path: ledger/kems-046-van-limpt-2007.yaml
       present: true
@@ -6683,7 +6684,7 @@ sources:
   extracts:
   - path: data/literature/extracts/kems-053-stolyarova-1991.yaml
     review_status: draft
-    rows: 17
+    rows: 18
   battery_datasets: []
   hunt_ids: []
   copies: []
@@ -7855,7 +7856,7 @@ sources:
     extract:
       path: extracts/kems-127-qi-1989.yaml
       present: true
-      matches_simulator: true
+      matches_simulator: false
     ledger:
       path: ledger/kems-127-qi-1989.yaml
       present: true
@@ -8456,7 +8457,7 @@ sources:
     extract:
       path: extracts/kems-190-wu-1993.yaml
       present: true
-      matches_simulator: true
+      matches_simulator: false
     ledger:
       path: ledger/kems-190-wu-1993.yaml
       present: true
@@ -8514,7 +8515,7 @@ sources:
     extract:
       path: extracts/kems-198-ichise-ueshima-1989.yaml
       present: true
-      matches_simulator: true
+      matches_simulator: false
     ledger:
       path: ledger/kems-198-ichise-ueshima-1989.yaml
       present: true
@@ -8572,7 +8573,7 @@ sources:
     extract:
       path: extracts/kems-200-ueshima-1983.yaml
       present: true
-      matches_simulator: true
+      matches_simulator: false
     ledger:
       path: ledger/kems-200-ueshima-1983.yaml
       present: true
@@ -9685,7 +9686,7 @@ sources:
     extract:
       path: extracts/lpi-compendium-65701.yaml
       present: true
-      matches_simulator: true
+      matches_simulator: false
     ledger:
       path: ledger/lpi-compendium-65701.yaml
       present: true
@@ -9744,7 +9745,7 @@ sources:
     extract:
       path: extracts/lpi-lunar-soils.yaml
       present: true
-      matches_simulator: true
+      matches_simulator: false
     ledger:
       path: ledger/lpi-lunar-soils.yaml
       present: true
@@ -10692,13 +10693,71 @@ sources:
     extract:
       path: extracts/nagahara-ozawa-1999-forsterite-surface-microstructures.yaml
       present: true
-      matches_simulator: true
+      matches_simulator: false
     ledger:
       path: ledger/nagahara-ozawa-1999-forsterite-surface-microstructures.yaml
       present: true
       error: null
       last_stage: decoded
       date: '2026-09-06'
+    commit: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
+- source_id: nagata-1989-emf-calcium-aluminates
+  aliases: []
+  citation: K. Nagata, J. Tanabe, K. S. Goto, "Standard Free Energies of Formation of CaO-Al2O3 Intermediate
+    Compounds by Means of EMF Measurement of Galvanic Cells", Tetsu-to-Hagane 75 (1989) No. 11, 2023–2030.
+  doi: 10.2355/tetsutohagane1955.75.11_2023
+  report_number: null
+  identifier: 10.2355/tetsutohagane1955.75.11_2023
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: OA
+  extracts:
+  - path: data/literature/extracts/nagata-1989-emf-calcium-aluminates.yaml
+    review_status: draft
+    rows: 1
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/nagata-1989-emf-calcium-aluminates/nagata-1989-emf-calcium-aluminates.pdf
+      present: false
+      sha256: null
+      matches_simulator: null
+    sidecar:
+      path: raw/nagata-1989-emf-calcium-aluminates/sidecar.yaml
+      present: false
+    text:
+      path: text/nagata-1989-emf-calcium-aluminates
+      exists: false
+      file_count: 0
+    tables:
+      path: tables/nagata-1989-emf-calcium-aluminates
+      exists: false
+      file_count: 0
+    extract:
+      path: extracts/nagata-1989-emf-calcium-aluminates.yaml
+      present: false
+      matches_simulator: null
+    ledger:
+      path: ledger/nagata-1989-emf-calcium-aluminates.yaml
+      present: false
+      error: null
+      last_stage: null
+      date: null
     commit: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
 - source_id: nakamura-2022-science-ryugu-thermal
   aliases: []
@@ -11273,7 +11332,7 @@ sources:
     extract:
       path: extracts/ntrs-19650014783.yaml
       present: true
-      matches_simulator: true
+      matches_simulator: false
     ledger:
       path: ledger/ntrs-19650014783.yaml
       present: true
@@ -14391,7 +14450,7 @@ sources:
     extract:
       path: extracts/slag-003-hino-kitagawa-banya-1993.yaml
       present: true
-      matches_simulator: true
+      matches_simulator: false
     ledger:
       path: ledger/slag-003-hino-kitagawa-banya-1993.yaml
       present: true
@@ -14736,7 +14795,7 @@ sources:
     extract:
       path: extracts/steurer-1985-vapor-phase-pyrolysis.yaml
       present: true
-      matches_simulator: true
+      matches_simulator: false
     ledger:
       path: ledger/steurer-1985-vapor-phase-pyrolysis.yaml
       present: true
@@ -14970,7 +15029,7 @@ sources:
     extract:
       path: extracts/street-2010-thermal-properties-simulants.yaml
       present: true
-      matches_simulator: true
+      matches_simulator: false
     ledger:
       path: ledger/street-2010-thermal-properties-simulants.yaml
       present: true
@@ -15029,7 +15088,7 @@ sources:
     extract:
       path: extracts/sublimation-kinetics-2023-minerals.yaml
       present: true
-      matches_simulator: true
+      matches_simulator: false
     ledger:
       path: ledger/sublimation-kinetics-2023-minerals.yaml
       present: true
@@ -16025,7 +16084,7 @@ sources:
     extract:
       path: extracts/van-kooten-2020-lunar-outgassing.yaml
       present: true
-      matches_simulator: true
+      matches_simulator: false
     ledger:
       path: ledger/van-kooten-2020-lunar-outgassing.yaml
       present: true
@@ -16380,7 +16439,7 @@ sources:
     extract:
       path: extracts/wilkerson-2023-jsc1a-outgassing.yaml
       present: true
-      matches_simulator: true
+      matches_simulator: false
     ledger:
       path: ledger/wilkerson-2023-jsc1a-outgassing.yaml
       present: true
@@ -16548,7 +16607,7 @@ sources:
     extract:
       path: extracts/yam1983.yaml
       present: true
-      matches_simulator: true
+      matches_simulator: false
     ledger:
       path: ledger/yam1983.yaml
       present: true
