@@ -603,7 +603,7 @@ def main():
                "inheriting_observation_id", "quantity", "species", "evidence",
                "different_material", "is_comparison_candidate"]
     with CSV_PATH.open("w", encoding="utf-8", newline="") as handle:
-        writer = csv.DictWriter(handle, fieldnames=columns)
+        writer = csv.DictWriter(handle, fieldnames=columns, lineterminator="\n")
         writer.writeheader()
         writer.writerows(csv_rows)
 

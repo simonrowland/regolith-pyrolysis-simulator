@@ -11943,7 +11943,6 @@ class Migrator:
                 source_context=pressure_identity_context,
                 provenance=extract_provenance,
             )
-        self._promote_universal_observation_printed_compositions(work.work_id)
         # b-555: do not leave a silent extract — absence is fine, silence is not.
         self._record_silent_extract_if_needed(
             doc=doc, work=work, source_key=rel, path_stem=path.stem
@@ -15956,6 +15955,8 @@ class Migrator:
     def finalize(self) -> None:
         self._rebuild_works()
         self._apply_supersedes()
+        for work_id in self.result.works:
+            self._promote_universal_observation_printed_compositions(work_id)
         self._resolve_queue_ids()
         self._retarget_exploded_parents()
         self._close_conditional_method_classes()
