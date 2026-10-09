@@ -9273,18 +9273,18 @@ class _ScorePayloadAccumulator:
                 engine=engine,
                 numeric_value=numeric_value,
             )
-            if row.get("status") == ResidualStatus.REFUSED.value:
-                refusal = row.get("refusal") or {}
-                if isinstance(refusal, Mapping):
-                    reason = str(refusal.get("reason") or "refused")
-                    detail = (
-                        refusal.get("detail")
-                        if isinstance(refusal.get("detail"), Mapping)
-                        else {}
-                    )
-                    token = _short_refusal_token((detail or {}).get("reason"))
-                    key = reason if token is None else f"{reason}:{token}"
-                    self.refusal_counts[key] += 1
+        if measured and row.get("status") == ResidualStatus.REFUSED.value:
+            refusal = row.get("refusal") or {}
+            if isinstance(refusal, Mapping):
+                reason = str(refusal.get("reason") or "refused")
+                detail = (
+                    refusal.get("detail")
+                    if isinstance(refusal.get("detail"), Mapping)
+                    else {}
+                )
+                token = _short_refusal_token((detail or {}).get("reason"))
+                key = reason if token is None else f"{reason}:{token}"
+                self.refusal_counts[key] += 1
         if compilation_observation is not None:
             self.tier_accumulator.add(
                 _tier_cell_from_payload_fields(

@@ -2640,6 +2640,7 @@ def test_e15_report_rows_cover_three_stolyarova_sources() -> None:
         "x_axis",
         "expected_n",
         "expected_slope",
+        "expected_population",
     ),
     (
         (
@@ -2647,8 +2648,9 @@ def test_e15_report_rows_cover_three_stolyarova_sources() -> None:
             "kems-053-stolyarova-1991",
             "stolyarova_1991_ca_partial_pressure_1993k_complete_evaporation",
             "x(SiO2)",
-            11,
-            Decimal("-3.87"),
+            6,
+            Decimal("-7.33"),
+            "contested",
         ),
         (
             "stolyarova-1995",
@@ -2657,6 +2659,7 @@ def test_e15_report_rows_cover_three_stolyarova_sources() -> None:
             "x(CaO)",
             8,
             Decimal("1.04"),
+            "liquid",
         ),
     ),
 )
@@ -2667,6 +2670,7 @@ def test_e15_production_accumulator_pins_stolyarova_pca(
     x_axis: str,
     expected_n: int,
     expected_slope: Decimal,
+    expected_population: str,
 ) -> None:
     from simulator.battery import score as score_mod
     from simulator.battery.score import _ScorePayloadAccumulator
@@ -2685,7 +2689,7 @@ def test_e15_production_accumulator_pins_stolyarova_pca(
         and row["series"] == series
         and row["statistic"] == "shape"
     )
-    assert shape["population"] == "liquid"
+    assert shape["population"] == expected_population
     assert shape["x_axis"] == x_axis
     assert shape["n"] == expected_n
     assert shape["slope_dex_per_x"].quantize(Decimal("0.01")) == expected_slope
@@ -2826,11 +2830,41 @@ def test_e15_production_accumulator_uses_exact_residual_predicate() -> None:
         and score_mod._e15_residual_point(payload(observation), observation)
         is not None
     )
+    two_phase_reference = replace(
+        measured_reference,
+        observation_id=f"{measured_reference.observation_id}::two-phase-fixture",
+        notices=(*measured_reference.notices, _two_phase_notice()),
+    )
+    outside_single_liquid_reference = replace(
+        measured_reference,
+        observation_id=f"{measured_reference.observation_id}::outside-single-liquid-fixture",
+        notices=(
+            *measured_reference.notices,
+            Notice(
+                kind=NoticeKind.OUT_OF_CERTIFIED_BAND,
+                affected_quantities=(Quantity.P_PARTIAL,),
+                origin="test_score",
+                reason="outside_single_liquid_field:e15-predicate-fixture",
+            ),
+        ),
+    )
+    context = replace(
+        context,
+        observations={
+            **context.observations,
+            two_phase_reference.observation_id: two_phase_reference,
+            outside_single_liquid_reference.observation_id: (
+                outside_single_liquid_reference
+            ),
+        },
+    )
     rows = [payload(observation) for observation in model_derived_e15]
     rows.extend(
         (
             payload(measured_reference, status=ResidualStatus.REFUSED),
             payload(measured_reference, numeric=False),
+            payload(two_phase_reference),
+            payload(outside_single_liquid_reference),
             payload(
                 measured_reference,
                 notice=NoticeKind.CELL_MATERIAL_INFERRED,
@@ -2846,6 +2880,16 @@ def test_e15_production_accumulator_uses_exact_residual_predicate() -> None:
     )
 
     assert len(aggregate.e15_points) == 2
+    for phase_reference in (
+        two_phase_reference,
+        outside_single_liquid_reference,
+    ):
+        phase_aggregate = _ScorePayloadAccumulator.from_rows(
+            (payload(phase_reference),),
+            context=context,
+            engines=(Engine.OPENIMCC,),
+        )
+        assert phase_aggregate.e15_points == []
     flagged_liquid = next(
         point for point in aggregate.e15_points if point.population == "liquid"
     )
@@ -2858,6 +2902,41 @@ def test_e15_production_accumulator_uses_exact_residual_predicate() -> None:
     assert (
         score_mod.FLAGGED_STRATUM_LIQUIDUS_POSITION_CONTESTED in contested.flags
     )
+
+
+def test_measured_no_rail_refusal_stays_in_accumulator_and_legacy_report() -> None:
+    from simulator.battery import score as score_mod
+    from simulator.battery.score import _ScorePayloadAccumulator
+    from tests.battery import test_compilation_tier as fixture
+
+    identity = fixture._na2o_liquid(Quantity.VISCOSITY)
+    experiment = fixture.F.tabulation_experiment()
+    observation = fixture.F.observation(
+        "viscosity-no-rail",
+        experiment.experiment_id,
+        identity,
+        Decimal("1"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="ror-measured-viscosity-source",
+    )
+    context = fixture._context(observation)
+    residual, _ = compile_residual(
+        observation, Engine.OPENIMCC, context=context
+    )
+    payload = score_mod.residual_to_plain(residual)
+    aggregate = _ScorePayloadAccumulator.from_rows(
+        (payload,), context=context, engines=(Engine.OPENIMCC,)
+    )
+
+    assert residual.rail is None
+    assert aggregate.refusal_counts == {"unsupported:no_headline_rail:viscosity": 1}
+    report = score_mod._render_score_report_from_payloads_legacy(
+        (payload,), context=context, engines=(Engine.OPENIMCC,)
+    )
+    refusal_census = report.split("## Refusal census", 1)[1].split(
+        "## Admission", 1
+    )[0]
+    assert "`unsupported:no_headline_rail:viscosity` | 1" in refusal_census
 
 
 def test_e15_stolyarova_1996_real_axis_slope_and_report_path() -> None:
