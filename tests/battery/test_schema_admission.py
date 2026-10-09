@@ -421,7 +421,9 @@ def _located(value):
 
 
 def _typed(components):
-    return _located({"basis": "printed_oxides", "amount_basis": "mass_percent", "components": components})
+    return _located(
+        {"basis": "printed_oxides", "amount_basis": "mass_percent", "components": components}
+    )
 
 
 @pytest.mark.parametrize("field", ["initial_composition", "printed_composition"])
@@ -438,6 +440,8 @@ def _typed(components):
 @pytest.mark.parametrize("existing_unknown", [False, True])
 def test_typed_sample_composition_survives_serialized_consumption(field, components, valid, existing_unknown):
     raw = {field: _typed(components), "mass_kg": _located({"kind": "point", "point": "0.001"})}
+    if field == "printed_composition":
+        raw[field]["locator"]["note"] = "Printed starting material composition"
     if field == "printed_composition" and existing_unknown:
         raw["initial_composition"] = {"state": {"tag": "unknown", "reason": "not printed on a molar basis"}}
     sample = M._sample_from_plain(raw)
@@ -584,6 +588,7 @@ def test_typed_print_completeness_survives_canonical_fallback(monkeypatch, bound
     sample = {"initial_composition": canonical}
     conditions["printed_composition"] = printed
     if boundary == "sample_printed":
+        printed["locator"]["note"] = "Printed starting material composition"
         sample["printed_composition"] = conditions.pop("printed_composition")
     elif boundary == "row_printed_row_initial":
         conditions["composition"] = canonical
@@ -598,8 +603,9 @@ def test_typed_print_completeness_survives_canonical_fallback(monkeypatch, bound
         if not expected_valid:
             assert waypoint.selected is None
             assert waypoint.absence.reason is GapReason.UNSUPPORTED_PRINT_FORM
-            if component != "Cl" or boundary != "sample_printed":
-                assert any(path.endswith(f".{component}") for path in waypoint.absence.missing)
+            assert any(
+                path.endswith(f".{component}") for path in waypoint.absence.missing
+            )
         requests = engine_point_requests(inputs)
     assert len(requests) == 7
     expected_valid = component == "MgO" or (

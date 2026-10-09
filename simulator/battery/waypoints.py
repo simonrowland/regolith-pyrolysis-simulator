@@ -533,6 +533,10 @@ def charge_moles_by_species(
 class _EnginePrintRefused(Exception):
     """Printed map is a composition the engine must not flatten."""
 
+    def __init__(self, reason: object, components: tuple[str, ...] = ()) -> None:
+        super().__init__(reason)
+        self.components = components
+
 
 _TOTAL_IRON_AS_FEO = "total_iron_as_FeO"
 _FEOT_FLAG = "total iron reported as FeO; Fe3+/Fe2+ not printed"
@@ -644,7 +648,10 @@ def _engine_mole_fraction(
         if not _is_engine_oxide_component(name)
     ]
     if any(amount > 0 for _name, amount in non_oxides):
-        raise _EnginePrintRefused("non-oxide mole fraction")
+        raise _EnginePrintRefused(
+            "non-oxide mole fraction",
+            tuple(name for name, amount in non_oxides if amount > 0),
+        )
     oxides = {
         name: amount
         for name, amount in parsed
@@ -704,9 +711,15 @@ def _engine_printed_oxides(
     ]
     omitted_total = sum((amount for _name, amount in others), Decimal("0"))
     if omitted_total > _TRACE_NON_OXIDE_LIMIT_WT_PCT:
-        raise _EnginePrintRefused(omitted_total)
+        raise _EnginePrintRefused(
+            omitted_total,
+            tuple(name for name, amount in others if amount > 0),
+        )
     if feot is not None and ("FeO" in oxides or "Fe2O3" in oxides):
-        raise _EnginePrintRefused("ambiguous total iron")
+        raise _EnginePrintRefused(
+            "ambiguous total iron",
+            ("FeOT", "FeO" if "FeO" in oxides else "Fe2O3"),
+        )
     raw_by_name = {name: value for name, value in pairs}
     exempt: set[str] = set()
     notes: list[str] = []
@@ -790,6 +803,7 @@ def normalized_composition(
         basis_exempt: set[str] = set()
         basis_notice: str | None = None
         basis_inference: Derivation | None = None
+        refused_components: tuple[str, ...] = ()
         as_moles = False
         if field == "printed_composition":
             components = raw.get("components") if isinstance(raw, Mapping) else None
@@ -815,7 +829,8 @@ def normalized_composition(
                 # molar-mass conversion both misread them.
                 try:
                     mole = _engine_mole_fraction(raw)
-                except _EnginePrintRefused:
+                except _EnginePrintRefused as exc:
+                    refused_components = exc.components
                     raw = None
                 else:
                     if mole is None:
@@ -832,7 +847,8 @@ def normalized_composition(
             else:
                 try:
                     engine_oxides = _engine_printed_oxides(raw)
-                except _EnginePrintRefused:
+                except _EnginePrintRefused as exc:
+                    refused_components = exc.components
                     raw = None
                 else:
                     if engine_oxides is not None:
@@ -951,7 +967,10 @@ def normalized_composition(
             missing.append(f"{path} (unknown relation: {located.inference.relation})")
         except (ValueError, TypeError, ArithmeticError):
             unsupported = True
-            missing.append(path)
+            if refused_components:
+                missing.extend(f"{path}.{species}" for species in refused_components)
+            else:
+                missing.append(path)
     routes = [route for _, route in sorted(zip(evidence_ranks, routes),
                                           key=lambda pair: pair[0], reverse=True)]
     result = _result("normalized_composition", routes, tuple(absent))
