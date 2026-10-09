@@ -59,6 +59,21 @@ from tests.chemistry.conftest import _build_sim
 DATA_DIR = Path(__file__).resolve().parent.parent / "data"
 
 
+@pytest.fixture(autouse=True)
+def _synthetic_binding_receipt_for_pt0_store_tests(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Give replay mechanics a test-only receipt, never a real engine pin."""
+    from tests.binding_admission_fixtures import install_synthetic_binding_receipt
+
+    install_synthetic_binding_receipt(
+        tmp_path,
+        monkeypatch,
+        bind_direct_backend=False,
+    )
+
+
 def _load_yaml(name: str) -> dict:
     return yaml.safe_load((DATA_DIR / name).read_text())
 
