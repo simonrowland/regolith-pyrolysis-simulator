@@ -6,6 +6,8 @@ from types import SimpleNamespace
 
 import pytest
 
+from simulator import engine_binding_admission as admission
+from simulator.backends import CachedRealBackend
 from simulator.engine_binding_admission import (
     BindingAssessmentCandidate,
     BindingIdentity,
@@ -14,9 +16,11 @@ from simulator.engine_binding_admission import (
     assessment_candidates,
     authorize_binding,
     binding_admission_run_notice,
+    install_provenance,
     live_cache_eligibility,
     version_getter_provenance,
 )
+from simulator.reduced_real_determinism import PT0DeterminismStore
 
 
 FIXTURES = Path(__file__).parent / "fixtures"
@@ -46,7 +50,11 @@ def _candidate(
         artifact="freeze_gate_curve",
         simulator=None,
         result=curve or SYNTHETIC_CURVE,
-        provenance=provenance or {"runtime_artifact": "test-only"},
+        provenance=provenance
+        or {
+            "binding_provenance_verifiable": True,
+            "runtime_artifact": "test-only",
+        },
     )
 
 
@@ -87,6 +95,31 @@ def test_projection_mismatch_is_recorded_but_not_admitted(tmp_path: Path) -> Non
 
     assert results[0].status == "failed"
     with pytest.raises(EngineBindingAdmissionError, match="differs"):
+        authorize_binding(
+            SYNTHETIC_IDENTITY,
+            candidate.provenance,
+            receipt_path=receipt_path,
+        )
+
+
+def test_matching_projection_with_unverifiable_install_is_not_admitted(
+    tmp_path: Path,
+) -> None:
+    candidate = _candidate(
+        provenance={
+            "binding_provenance_verifiable": False,
+            "runtime_artifact": "test-only",
+        }
+    )
+    receipt_path = _assess(tmp_path, candidate)
+
+    results = assess_bindings(
+        [candidate], pin_directory=SYNTHETIC_PINS, receipt_path=receipt_path
+    )
+
+    assert results[0].status == "failed"
+    assert results[0].reason == "install provenance unverifiable"
+    with pytest.raises(EngineBindingAdmissionError, match="unverifiable"):
         authorize_binding(
             SYNTHETIC_IDENTITY,
             candidate.provenance,
@@ -194,6 +227,185 @@ def test_failed_version_getter_records_typed_unknown_not_unavailable() -> None:
     assert state["value"] != "unavailable"
 
 
+def test_install_provenance_binds_alpha_subprocess_environment(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from simulator import engine_local_config
+
+    monkeypatch.setattr(
+        engine_local_config,
+        "config_path",
+        lambda: tmp_path / "engines.local.toml",
+    )
+    monkeypatch.delenv("ALPHAMELTS_CALC_MODE", raising=False)
+    identity = BindingIdentity(
+        "alphamelts",
+        "MELTSv1.0.2",
+        "alphamelts-r1",
+        "subprocess",
+    )
+    initial = install_provenance(identity)["runtime_environment"]
+    monkeypatch.setenv("ALPHAMELTS_CALC_MODE", "conflicting-mode")
+    changed = install_provenance(identity)["runtime_environment"]
+
+    assert initial["sha256"] != changed["sha256"]
+
+
+def test_cached_real_admission_lifecycle_clears_and_publishes_after_init(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    provenance = {"binding_provenance_verifiable": True, "runtime": "test"}
+    authorized = True
+
+    class LiveBackend:
+        initialized = True
+        available = True
+
+        def initialize(self, _config=None):
+            return self.initialized
+
+        def is_available(self):
+            return self.available
+
+        def get_engine_version(self):
+            return "synthetic-fake test"
+
+    def authorize(identity, _provenance):
+        if not authorized:
+            raise EngineBindingAdmissionError(identity, "receipt stale")
+        return {"status": "admitted"}
+
+    monkeypatch.setattr(
+        admission,
+        "binding_identity_for_cached_real",
+        lambda _config: SYNTHETIC_IDENTITY,
+    )
+    monkeypatch.setattr(
+        admission,
+        "cached_real_provenance",
+        lambda _config, _backend: provenance,
+    )
+    monkeypatch.setattr(admission, "authorize_binding", authorize)
+    live = LiveBackend()
+    facade = CachedRealBackend(
+        config=SimpleNamespace(
+            miss_policy="live-fill",
+            authorized_backend_family=SimpleNamespace(name="ALPHAMELTS"),
+        ),
+        live_backend=live,
+    )
+
+    assert facade._admitted_bindings == {}
+    live.initialized = False
+    assert not facade.initialize()
+    assert facade._admitted_bindings == {}
+
+    live.initialized = True
+    assert facade.initialize()
+    assert facade._admitted_bindings == {
+        SYNTHETIC_IDENTITY.producer_transport: admission.admission_fingerprint(
+            SYNTHETIC_IDENTITY,
+            provenance,
+        )
+    }
+
+    live.initialized = False
+    assert not facade.initialize()
+    assert facade._admitted_bindings == {}
+
+    live.initialized = True
+    authorized = False
+    assert facade.initialize()
+    assert facade._admitted_bindings == {}
+    assert facade._binding_admission_errors[
+        SYNTHETIC_IDENTITY.producer_transport
+    ].reason == "receipt stale"
+
+
+def test_direct_replay_only_constructor_uses_receipt_authorizer(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    calls = []
+
+    def authorize(identity, provenance):
+        calls.append((identity, provenance))
+        return {"status": "admitted"}
+
+    monkeypatch.setattr(
+        admission,
+        "binding_identity_for_cached_real",
+        lambda _config: SYNTHETIC_IDENTITY,
+    )
+    monkeypatch.setattr(
+        admission,
+        "cached_real_provenance",
+        lambda _config, _backend: {"binding_provenance_verifiable": True},
+    )
+    monkeypatch.setattr(admission, "authorize_binding", authorize)
+
+    facade = CachedRealBackend(
+        config=SimpleNamespace(
+            miss_policy="fail-loud",
+            authorized_backend_family=SimpleNamespace(name="ALPHAMELTS"),
+        ),
+        live_backend=None,
+    )
+
+    assert calls == [(SYNTHETIC_IDENTITY, {"binding_provenance_verifiable": True})]
+    assert SYNTHETIC_IDENTITY.producer_transport in facade._admitted_bindings
+
+
+def test_gate_replay_skips_unadmitted_optional_fallback_candidate(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    import simulator.reduced_real_determinism as replay
+
+    monkeypatch.setattr(
+        replay,
+        "_gate_provider_roles_for_replay",
+        lambda _sim: ("authoritative", "fallback"),
+    )
+    monkeypatch.setattr(
+        replay,
+        "canonical_replay_key",
+        lambda _sim, **kwargs: {"provider_role": kwargs["provider_role"]},
+    )
+    store = PT0DeterminismStore("replay", db_path=tmp_path / "unused.db")
+    authorized_roles = []
+    lookup_keys = []
+
+    def authorize(_sim, *, provider_role=None):
+        authorized_roles.append(provider_role)
+        if provider_role == "fallback":
+            raise EngineBindingAdmissionError(
+                SYNTHETIC_IDENTITY,
+                "receipt missing",
+            )
+
+    def lookup(_artifact, keys, *, sim):
+        lookup_keys.extend(keys)
+        return {
+            "curve": {
+                "source": "gate_liquid_fraction",
+                "solidus_T_C": 1000.0,
+                "liquidus_T_C": 1300.0,
+                "path": [],
+            }
+        }
+
+    monkeypatch.setattr(store, "_authorize_cached_real_replay", authorize)
+    monkeypatch.setattr(store, "_lookup_first_available", lookup)
+    sim = SimpleNamespace()
+
+    result = store.replay_gate_curve(sim, fO2_log=-10.0)
+
+    assert result["liquidus_T_C"] == 1300.0
+    assert authorized_roles == ["authoritative", "fallback"]
+    assert lookup_keys == [{"provider_role": "authoritative"}]
+
+
 def test_live_cache_gate_fails_open_and_deduplicates_typed_notice(
     tmp_path: Path,
 ) -> None:
@@ -239,6 +451,44 @@ def test_live_cache_gate_fails_open_and_deduplicates_typed_notice(
     assert len(notice["notices"]) == 2
 
 
+@pytest.mark.parametrize("failure", ["failed", "stale", "transport-mismatched"])
+def test_live_cache_gate_refuses_failed_stale_and_wrong_transport_receipts(
+    tmp_path: Path,
+    failure: str,
+) -> None:
+    candidate = _candidate()
+    receipt_path = _assess(tmp_path, candidate)
+    receipt = json.loads(receipt_path.read_text())
+    entry = receipt["entries"][0]
+    if failure == "failed":
+        entry["status"] = "failed"
+        entry["reason"] = "reviewed projection did not match"
+    elif failure == "stale":
+        entry["provenance"]["runtime_artifact"] = "different-install"
+    else:
+        entry["identity"]["transport"] = "python_api"
+    receipt_path.write_text(json.dumps(receipt))
+
+    sim = SimpleNamespace()
+    assert not live_cache_eligibility(
+        sim,
+        SYNTHETIC_IDENTITY,
+        candidate.provenance,
+        receipt_path=receipt_path,
+    )
+    notice = binding_admission_run_notice(sim)
+    assert notice is not None
+    assert len(notice["notices"]) == 1
+    assert notice["notices"][0]["kind"] == "engine_binding_not_admitted"
+    expected_reason = {
+        "failed": "reviewed projection did not match",
+        "stale": "receipt stale",
+        "transport-mismatched": "transport mismatch",
+    }[failure]
+    assert notice["notices"][0]["reason"] == expected_reason
+    assert expected_reason in notice["notices"][0]["message"]
+
+
 def test_real_assessment_targets_fail_closed_without_reviewed_pins(
     tmp_path: Path,
 ) -> None:
@@ -260,3 +510,91 @@ def test_real_assessment_targets_fail_closed_without_reviewed_pins(
     )
     assert len(receipt["entries"]) == 7
     assert all(entry["status"] == "failed" for entry in receipt["entries"])
+
+
+def test_equilibrium_binding_producers_follow_input_selected_dependencies(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    import simulator.reduced_real_determinism as replay
+
+    monkeypatch.setattr(
+        replay,
+        "record_dependency_vector",
+        lambda *_args, **_kwargs: {
+            "vapor_pressure_provider_selection": "builtin-vapor-pressure",
+            "sulfur_side": {"S_input_ppm": 12.0},
+        },
+    )
+    sim = SimpleNamespace(
+        setpoints={"high_t_melt_activity": " OpenIMCC "},
+        melt=SimpleNamespace(temperature_C=2000.0),
+        _sulfsat_gate=object(),
+    )
+
+    from simulator.reduced_real_determinism import record_binding_producer_ids
+
+    assert record_binding_producer_ids(
+        sim,
+        artifact="equilibrium_post_record",
+    ) == ("builtin-vapor-pressure", "openimcc", "sulfsat")
+    assert record_binding_producer_ids(
+        SimpleNamespace(
+            setpoints={"high_t_melt_activity": "openimcc"},
+            melt=SimpleNamespace(temperature_C=1000.0),
+            _sulfsat_gate=object(),
+        ),
+        artifact="equilibrium_post_record",
+    ) == ("builtin-vapor-pressure", "sulfsat")
+    assert record_binding_producer_ids(
+        sim,
+        artifact="freeze_gate_curve",
+    ) == ()
+
+
+def test_missing_selected_contributor_disables_live_cache_and_replay(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    import simulator.reduced_real_determinism as replay
+    from tests.binding_admission_fixtures import install_synthetic_binding_receipt
+
+    monkeypatch.setattr(
+        replay,
+        "record_binding_producer_ids",
+        lambda _sim, *, artifact, **_kwargs: (
+            ("builtin-vapor-pressure",)
+            if artifact == "equilibrium_post_record"
+            else ()
+        ),
+    )
+    install_synthetic_binding_receipt(
+        tmp_path,
+        monkeypatch,
+        bind_direct_backend=True,
+    )
+    backend = SimpleNamespace(
+        name="synthetic-fake",
+        get_engine_version=lambda: "fixture-runtime",
+    )
+    sim = SimpleNamespace(backend=backend)
+    admission.publish_live_backend_admission(backend)
+
+    assert not admission.live_binding_cache_eligibility(
+        sim,
+        artifact="equilibrium_post_record",
+    )
+    notice = binding_admission_run_notice(sim)
+    assert notice is not None
+    assert len(notice["notices"]) == 1
+    assert notice["notices"][0]["identity"]["engine_id"] == (
+        "builtin-vapor-pressure"
+    )
+
+    with pytest.raises(
+        EngineBindingAdmissionError,
+        match="builtin-vapor-pressure/native",
+    ):
+        admission.authorize_sim_binding_replay(
+            sim,
+            artifact="equilibrium_post_record",
+        )

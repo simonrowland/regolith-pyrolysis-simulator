@@ -42,7 +42,6 @@ from simulator.melt_backend.melt_envelope import (
 import simulator.reduced_real_determinism as rrd
 from simulator.reduced_real_determinism import (
     ControlQuantization,
-    PT0CacheCollision,
     PT0CacheMiss,
     PT0DeterminismStore,
     PT1_EQUILIBRIUM_TABLE,
@@ -59,6 +58,21 @@ _DEFAULT_MELTS_REPLAY_KEY_HASH = (
 _DEFAULT_MELTS_PROVIDER_KEY_HASH = (
     "0435dada46c55b064f6593edae3fbbac9c556e00ea56807944400dccbc3bc30a"
 )
+
+
+@pytest.fixture(autouse=True)
+def _synthetic_binding_receipt_for_cache_tests(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Keep cache-mechanics tests on a test-only binding, never real pins."""
+    from tests.binding_admission_fixtures import install_synthetic_binding_receipt
+
+    install_synthetic_binding_receipt(
+        tmp_path,
+        monkeypatch,
+        bind_direct_backend=True,
+    )
 
 
 class _FakeLiveRealBackend(RealBackendAuthority):
@@ -1159,8 +1173,8 @@ def test_cached_real_live_fill_populates_then_fail_loud_hits(tmp_path: Path) -> 
 
     live_result = live_sim._get_equilibrium()
 
-    assert backend._live_backend is not None
-    assert backend._live_backend.calls == 1
+    assert live_backend._live_backend is not None
+    assert live_backend._live_backend.calls == 1
     assert live_result.status == "ok"
     assert live_sim._last_reduced_real_cache_state == "live_fill"
 
@@ -1204,6 +1218,9 @@ def test_receiptless_live_fill_computes_without_cache_lookup_or_capture(
         "config_path",
         lambda: tmp_path / "engines.local.toml",
     )
+    from simulator import engine_binding_admission as admission
+
+    admission.binding_receipt_path().unlink(missing_ok=True)
     config = _cache_config(tmp_path / "receiptless-live.db", "live-fill")
     backend = resolve_backend(
         "cached-real",
@@ -1244,6 +1261,9 @@ def test_receiptless_replay_only_refuses_before_cache_lookup(
         "config_path",
         lambda: tmp_path / "engines.local.toml",
     )
+    from simulator import engine_binding_admission as admission
+
+    admission.binding_receipt_path().unlink(missing_ok=True)
     config = _cache_config(tmp_path / "receiptless-replay.db", "fail-loud")
     backend = resolve_backend(
         "cached-real",
@@ -2035,45 +2055,10 @@ def test_cached_real_skips_direct_alphamelts_unavailable_equilibrium_cache(
     assert "equilibrium_post_record" not in direct_summary[
         "capture_calls_by_artifact"
     ]
-    direct_gate_key = direct_sim._pt0_store().capture_sequence[-1]["key"]
-
-    replay_config = _cache_config(
-        db_path,
-        "fail-loud",
-        name="alphamelts",
-        version=AlphaMELTSBackend.engine_version,
-        model=direct_gate_key["model"]["model"],
-        mode=direct_gate_key["model"]["mode"],
-    )
-    replay_backend = resolve_backend(
-        "cached-real",
-        BackendSelectionPolicy.RUNNER_STRICT,
-        cached_real_config=replay_config,
-    )
-    replay_sim = _build_cached_real_sim(
-        backend=replay_backend,
-        cache_config=replay_config,
-    )
-
-    with pytest.raises(PT0CacheMiss):
-        replay_sim._get_equilibrium()
-    replay_curve = replay_sim._pt0_store().replay_gate_curve(
-        replay_sim,
-        fO2_log=replay_sim._compute_intrinsic_melt_fO2(),
-    )
-
-    assert replay_curve == curve
-    summary = replay_sim._pt0_store().summary()
-    assert "equilibrium_post_record" not in summary[
-        "cache_state_counts_by_artifact"
-    ]
-    assert (
-        summary["cache_state_counts_by_artifact"]["freeze_gate_curve"][
-            "cached_exact"
-        ]
-        == 1
-    )
-    assert summary["misses"] == 1
+    assert direct_sim._pt0_store().capture_sequence == []
+    notice = binding_admission_run_notice(direct_sim)
+    assert notice is not None
+    assert notice["notices"][0]["kind"] == "engine_binding_not_admitted"
 
 
 def test_direct_alphamelts_fallback_gate_curve_replay_exact_hits(
@@ -2119,11 +2104,12 @@ def test_cached_real_direct_alphamelts_gate_curve_engine_change_is_key_neutral(
     tmp_path: Path,
 ) -> None:
     db_path = tmp_path / "cached-real.db"
-    direct_sim = _build_direct_real_sim(
-        AlphaMELTSBackend(),
-        db_path=db_path,
-    )
-    direct_sim._get_equilibrium()
+    direct_backend = AlphaMELTSBackend()
+    assert direct_backend.initialize({})
+    from simulator.engine_binding_admission import publish_live_backend_admission
+
+    publish_live_backend_admission(direct_backend)
+    direct_sim = _build_direct_real_sim(direct_backend, db_path=db_path)
     direct_sim._pt0_store().capture_gate_curve(
         direct_sim,
         fO2_log=direct_sim._compute_intrinsic_melt_fO2(),
@@ -2181,9 +2167,9 @@ def test_cached_real_refuses_authoritative_gate_cache_for_fallback_curve(
         "source": "gate_liquid_fraction:fallback:magemin-shadow",
     }
 
-    with pytest.raises(PT0CacheCollision, match="provider role mismatch"):
-        sim._pt0_store().capture_gate_curve(
-            sim,
-            fO2_log=sim._compute_intrinsic_melt_fO2(),
-            curve=curve,
-        )
+    sim._pt0_store().capture_gate_curve(
+        sim,
+        fO2_log=sim._compute_intrinsic_melt_fO2(),
+        curve=curve,
+    )
+    assert sim._pt0_store().capture_sequence == []
