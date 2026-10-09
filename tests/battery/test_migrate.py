@@ -2885,10 +2885,10 @@ def test_j01_explicit_pressure_atm_control_still_lifts(tmp_path: Path) -> None:
 
 
 def test_j01_fedkin_alpha_series_not_mass_loss_rate(tmp_path: Path) -> None:
-    src = REPO_ROOT / "data" / "literature" / "extracts" / "fedkin-grossman-ghiorso-2006.yaml"
+    src = REPO_ROOT / "data" / "literature" / "extracts" / "kems-005-fedkin-2006.yaml"
     extract = load_cached_safe_yaml(src.read_text(encoding="utf-8"))
     root = _write_min_tree(tmp_path, extract)
-    (root / "data" / "literature" / "extracts" / "fedkin-grossman-ghiorso-2006.yaml").write_text(
+    (root / "data" / "literature" / "extracts" / "kems-005-fedkin-2006.yaml").write_text(
         src.read_text(encoding="utf-8"), encoding="utf-8"
     )
     (root / "data" / "literature" / "extracts" / "fixture-source.yaml").unlink()
@@ -2896,7 +2896,8 @@ def test_j01_fedkin_alpha_series_not_mass_loss_rate(tmp_path: Path) -> None:
     alpha_points = [
         o
         for o in result.observations.values()
-        if "per_T_alpha_series::T=" in o.observation_id
+        if "_table3::T=" in o.observation_id
+        or "sio_hashimoto_table3_complete_b1::T=" in o.observation_id
     ]
     assert len(alpha_points) == 12
     for obs in alpha_points:
@@ -2906,7 +2907,7 @@ def test_j01_fedkin_alpha_series_not_mass_loss_rate(tmp_path: Path) -> None:
     fe0 = next(
         o
         for o in alpha_points
-        if "fe_hashimoto_langmuir_per_T_alpha_series::T=1973" in o.observation_id
+        if "fe_hashimoto_langmuir_table3::T=1973" in o.observation_id
     )
     assert fe0.value.point == as_decimal("0.23")
     assert float(fe0.identity.temperature_K.value) == 1973.0
@@ -3535,7 +3536,7 @@ def test_k04_census_goes_red_when_stored_alpha_is_corrupted(tmp_path: Path) -> N
         pytest.skip("migrated store not generated yet")
     dest = tmp_path / "extracts-v2"
     shutil.copytree(extracts_v2, dest)
-    fedkin = dest / "fedkin-grossman-ghiorso-2006.yaml"
+    fedkin = dest / "kems-005-fedkin-2006.yaml"
     stored = yaml.safe_load(fedkin.read_text(encoding="utf-8"))
     n_mutated = 0
     for obs in stored.get("observations") or []:
