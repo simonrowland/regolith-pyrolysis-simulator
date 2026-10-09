@@ -2497,15 +2497,6 @@ def test_e15_level_shape_pin_and_constant_offset_mutation() -> None:
     assert shape["shape_rms_dex"].quantize(Decimal("0.000001")) == Decimal("1.414214")
     assert shape["slope_dex_per_x"] == Decimal("12")
     assert shape["x_axis"] == "x(CaO)"
-    separated = _e15_level_shape_rows(
-        (*points, replace(points[0], population="contested"))
-    )
-    assert [
-        (row["population"], row["n"])
-        for row in separated
-        if row["statistic"] == "level"
-    ] == [("contested", 1), ("liquid", 4)]
-
     # Mutation: adding the same offset changes level while mean-removed shape
     # remains pinned. A pure offset therefore has zero shape RMS and slope.
     shifted = tuple(
@@ -2590,6 +2581,30 @@ def test_e15_report_rows_cover_three_stolyarova_sources() -> None:
                 }
             )
 
+    contested_row = next(
+        row
+        for row in rows
+        if row["reference"].startswith(
+            "stolyarova-1996-cao-alumina-silica-kems::"
+        )
+    )
+    contested_row["notices"].append(
+        {
+            "kind": NoticeKind.LIQUIDUS_POSITION_CONTESTED.value,
+            "reason": "liquidus_position_contested:test",
+        }
+    )
+    from simulator.battery.score import _ScorePayloadAccumulator, _e15_report_lines
+
+    aggregate = _ScorePayloadAccumulator.from_rows(
+        rows, context=context, engines=(Engine.OPENIMCC,)
+    )
+    contested_points = [
+        point for point in aggregate.e15_points if point.population == "contested"
+    ]
+    assert contested_points
+    assert _e15_report_lines(contested_points, context.observations)
+
     report = render_score_report_from_payloads(
         rows,
         engines=(Engine.OPENIMCC,),
@@ -2611,6 +2626,68 @@ def test_e15_report_rows_cover_three_stolyarova_sources() -> None:
     )
     assert "not computed: no binding K° for CaO(cr) -> Ca(g) + O(g)" in report
     assert "not computed: no binding K° for Al2O3(cr) -> 2 Al(g) + 3 O(g)" in report
+
+
+def test_e15_stolyarova_1996_real_axis_slope_and_report_path() -> None:
+    from simulator.battery import score as score_mod
+
+    context = load_score_context(
+        sources=("stolyarova-1996-cao-alumina-silica-kems",)
+    )
+    residuals, _ = score_store(context, engines=(Engine.OPENIMCC,))
+    selected = [
+        (residual, point)
+        for residual in residuals
+        if (
+            point := score_mod._e15_residual_point(
+                residual, context.observations.get(residual.reference)
+            )
+        ) is not None
+        and point.series == "stolyarova_1996_table2_pCa_1933k"
+    ]
+    assert len(selected) == 22
+    points = tuple(point for _residual, point in selected)
+    shape = score_mod._e15_level_shape_rows(points)[1]
+    assert shape["x_axis"] == "x(CaO)"
+    assert shape["slope_dex_per_x"].quantize(Decimal("0.01")) == Decimal("6.38")
+
+    si_axis_points = tuple(
+        replace(
+            point,
+            x_axis="x(SiO2)",
+            x=dict(
+                context.observations[residual.reference]
+                .point_conditions["composition"].state.value.components
+            )["SiO2"],
+        )
+        for residual, point in selected
+    )
+    wrong_axis_shape = score_mod._e15_level_shape_rows(si_axis_points)[1]
+    assert wrong_axis_shape["slope_dex_per_x"].quantize(
+        Decimal("0.01")
+    ) == Decimal("-4.94")
+
+    payloads = [residual_to_plain(residual) for residual in residuals]
+    contested_payload = next(
+        payload
+        for payload in payloads
+        if payload["reference"] == selected[0][0].reference
+    )
+    contested_payload = dict(contested_payload)
+    contested_payload["notices"] = [
+        *contested_payload["notices"],
+        {
+            "kind": NoticeKind.LIQUIDUS_POSITION_CONTESTED.value,
+            "reason": "liquidus_position_contested:test",
+        },
+    ]
+    report = score_mod._render_score_report_from_payloads_legacy(
+        (*payloads, contested_payload),
+        context=context,
+        engines=(Engine.OPENIMCC,),
+    )
+    assert "## E15 level, shape, and activity pre-check" in report
+    assert "| contested | stolyarova-1996-cao-alumina-silica-kems |" in report
 
 
 def test_flagged_stratum_classifiers_agree_for_each_stratum() -> None:

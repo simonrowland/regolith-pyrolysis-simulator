@@ -8403,10 +8403,11 @@ class _ScorePayloadAccumulator:
         exclusions = row.get("exclusions")
         compilation_observation = metadata.observation if metadata.is_compilation else None
         measured = metadata.is_measured
-        if measured:
+        if measured or _E15_CONTESTED_STRATUM in flags:
             e15_point = _e15_residual_point(row, metadata.observation)
             if e15_point is not None:
                 self.e15_points.append(e15_point)
+        if measured:
             if _reference_has_measured_evidence(None, exclusions=exclusions):
                 rail = str(row.get("rail") or "")
                 if rail:
