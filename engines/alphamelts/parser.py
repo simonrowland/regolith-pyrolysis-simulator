@@ -190,6 +190,9 @@ def project_equilibrium_to_diagnostics(
         backend_diagnostics=dict(
             getattr(equilibrium_result, 'diagnostics', {}) or {}
         ),
+        phase_species_mol=dict(
+            getattr(equilibrium_result, 'phase_species_mol', {}) or {}
+        ),
     )
 
 
@@ -346,6 +349,15 @@ def diagnostics_to_equilibrium(
         bulk_composition_wt_pct=dict(
             diagnostics.bulk_composition_wt_pct
         ),
+        phase_species_mol={
+            str(phase): {
+                str(species): float(amount)
+                for species, amount in dict(species or {}).items()
+            }
+            for phase, species in dict(
+                diagnostics.phase_species_mol or {}
+            ).items()
+        },
     )
 
 

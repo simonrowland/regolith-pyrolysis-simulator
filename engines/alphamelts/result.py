@@ -44,6 +44,7 @@ caller wants for trace + UI:
 * ``backend_status_reason`` -- structured reason for non-``ok`` statuses,
   when available.
 * ``backend_warnings``     -- non-fatal warnings the adapter surfaced.
+* ``phase_species_mol``    -- oxide moles per engine phase token.
 
 The dataclass is frozen; the provider builds one per dispatch and
 attaches a plain dict projection to ``IntentResult.diagnostic`` so the
@@ -114,6 +115,9 @@ class LiquidusDiagnostics:
     backend_status_reason: Optional[str] = None
     chem_potentials: Optional[Mapping[str, Mapping[str, Any]]] = None
     phase_affinities: Optional[Mapping[str, Mapping[str, Any]]] = None
+    phase_species_mol: Mapping[str, Mapping[str, float]] = field(
+        default_factory=dict
+    )
 
     def __post_init__(self) -> None:
         # Coerce mappings to plain dict so the asdict() projection drops
@@ -265,6 +269,19 @@ class LiquidusDiagnostics:
             object.__setattr__(self, 'applied_fe3fet', float(self.applied_fe3fet))
         if self.intrinsic_fO2_log is not None:
             object.__setattr__(self, 'intrinsic_fO2_log', float(self.intrinsic_fO2_log))
+        object.__setattr__(
+            self,
+            'phase_species_mol',
+            {
+                str(phase): {
+                    str(species): float(amount)
+                    for species, amount in dict(species or {}).items()
+                }
+                for phase, species in dict(
+                    self.phase_species_mol or {}
+                ).items()
+            },
+        )
 
     def as_diagnostic(self) -> Dict[str, Any]:
         """Plain-dict projection for the kernel's ``IntentResult.diagnostic``."""

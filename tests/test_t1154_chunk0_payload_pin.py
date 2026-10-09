@@ -20,7 +20,10 @@ from pathlib import Path
 
 import pytest
 
-from engines.alphamelts.parser import project_equilibrium_to_diagnostics
+from engines.alphamelts.parser import (
+    diagnostics_to_equilibrium,
+    project_equilibrium_to_diagnostics,
+)
 from engines.alphamelts.provider import AlphaMELTSProvider
 from simulator.chemistry.kernel import ChemistryIntent, IntentRequest
 from simulator.chemistry.kernel.dto import ProviderAccountView
@@ -301,7 +304,7 @@ def test_magemin_subprocess_scales_recorded_mode_and_keeps_oxide_wt(
     )
 
 
-def test_alphamelts_phase_species_mol_is_keyed_by_instance_formula_token():
+def test_alphamelts_phase_species_mol_aggregates_oxides_by_phase():
     backend = AlphaMELTSBackend()
     phase = (
         "index 1 Pressure 1.00 Temperature 1100.00 SiO2 FeO MgO\n"
@@ -319,22 +322,29 @@ def test_alphamelts_phase_species_mol_is_keyed_by_instance_formula_token():
         item["physical_mass_kg"] = float(row["solver_basis_mass_kg"])
         instances.append(item)
 
-    species_mol, species_kg = backend._phase_species_from_instances(instances)
+    species_mol, species_kg, refusals = backend._phase_species_from_instances(
+        instances
+    )
 
-    assert set(species_kg) == {"olivine0", "olivine1", "liquid1"}
-    assert set(species_kg["olivine0"]) == {"(Mg0.8Fe''0.2)2SiO4"}
-    assert set(species_kg["olivine1"]) == {"(Mg0.6Fe0.4)2SiO4"}
-    assert "olivine" not in species_kg
-    assert species_kg["liquid1"]["SiO2"] == pytest.approx(0.1 * 0.50)
-    assert species_mol["liquid1"]["SiO2"] > 0.0
+    assert refusals == ()
+    assert set(species_kg) == {"olivine", "liquid"}
+    # Table weight percent, not the formula token. Masses are the recorded
+    # solver grams converted at 1000 g/kg: olivine 40 g and 60 g, liquid 100 g.
+    assert species_kg["olivine"]["SiO2"] == pytest.approx(0.04 * 0.40 + 0.06 * 0.35)
+    assert species_kg["olivine"]["FeO"] == pytest.approx(0.04 * 0.10 + 0.06 * 0.30)
+    assert species_kg["olivine"]["MgO"] == pytest.approx(0.04 * 0.50 + 0.06 * 0.35)
+    assert species_kg["liquid"]["SiO2"] == pytest.approx(0.1 * 0.50)
+    assert species_mol["liquid"]["SiO2"] > 0.0
+    assert sum(species_kg["olivine"].values()) == pytest.approx(0.10)
+    assert sum(species_kg["liquid"].values()) == pytest.approx(0.10)
     assert "phase_species_mol" not in parsed
 
 
-def test_diagnostic_dto_omits_phase_species_mol():
+def test_diagnostic_dto_carries_phase_species_mol():
     equilibrium = EquilibriumResult(
         temperature_C=1200.0,
         pressure_bar=1.0,
-        liquid_fraction=0.4,
+        liquid_fraction=0.0,
         status="ok",
         phases_present=["olivine0"],
         phase_masses_kg={"olivine0": 0.6},
@@ -349,10 +359,18 @@ def test_diagnostic_dto_omits_phase_species_mol():
     )
     payload = diagnostic.as_diagnostic()
 
-    assert "phase_species_mol" not in payload
+    assert payload["phase_species_mol"]["olivine0"][
+        "(Mg0.8Fe0.2)2SiO4"
+    ] == pytest.approx(0.01)
     assert "phase_species_kg" not in payload
     rebuilt = type(diagnostic)(**payload)
-    assert not hasattr(rebuilt, "phase_species_mol")
+    assert rebuilt.phase_species_mol["olivine0"][
+        "(Mg0.8Fe0.2)2SiO4"
+    ] == pytest.approx(0.01)
+    restored = diagnostics_to_equilibrium(rebuilt, {})
+    assert restored.phase_species_mol["olivine0"][
+        "(Mg0.8Fe0.2)2SiO4"
+    ] == pytest.approx(0.01)
 
 
 def test_equilibrium_crystallization_path_has_no_phase_inventory_field():
@@ -422,7 +440,7 @@ def test_equilibrium_crystallization_returns_liquid_path_and_no_transition():
     assert diagnostic["liquid_fraction"] == pytest.approx(
         path[-1]["liquid_fraction"]
     )
-    assert "phase_species_mol" not in diagnostic
+    assert diagnostic["phase_species_mol"] == {}
     assert "isothermal_phase_inventories" not in diagnostic
     # The path samples the solidus-liquidus grid only. Request temperature
     # is not an extra isothermal inventory call.

@@ -60,6 +60,7 @@ from simulator.accounting.formulas import (
     ATOMIC_WEIGHTS_G_PER_MOL,
     resolve_species_formula,
 )
+from simulator.accounting.oxide_assignment import assign_phase_oxides
 from simulator.accounting.exceptions import UnknownSpeciesError
 from simulator.config import (
     DEFAULT_ALPHAMELTS_MODEL,
@@ -3603,50 +3604,20 @@ class _MELTSBackendSupport(MeltBackend):
     @staticmethod
     def _phase_species_from_instances(
         phase_instances: List[Mapping[str, object]],
-    ) -> tuple[Dict[str, Dict[str, float]], Dict[str, Dict[str, float]]]:
-        species_mol: Dict[str, Dict[str, float]] = {}
-        species_kg: Dict[str, Dict[str, float]] = {}
-        for instance in phase_instances:
-            instance_id = str(instance['instance_id'])
-            mass_kg = float(instance.get('physical_mass_kg') or 0.0)
-            if not math.isfinite(mass_kg) or mass_kg <= 0.0:
-                continue
-            formula_token = str(
-                instance.get('formula_or_endmember_token') or ''
-            ).strip()
-            if not str(instance.get('phase') or '').startswith('liquid'):
-                try:
-                    molar_mass = (
-                        _MELTSBackendSupport._alphamelts_formula_molar_mass_kg_mol(
-                            formula_token
-                        )
-                    )
-                except ValueError:  # solver tokens are not always formulas
-                    molar_mass = 0.0
-                if molar_mass > 0.0 and math.isfinite(molar_mass):
-                    species_kg[instance_id] = {formula_token: mass_kg}
-                    species_mol[instance_id] = {
-                        formula_token: mass_kg / molar_mass
-                    }
-                    continue
-
-            composition = dict(instance.get('composition_wt_pct') or {})
-            instance_kg: Dict[str, float] = {}
-            instance_mol: Dict[str, float] = {}
-            for species, raw_wt_pct in composition.items():
-                wt_pct = float(raw_wt_pct)
-                if not math.isfinite(wt_pct) or wt_pct <= 0.0:
-                    continue
-                component_kg = mass_kg * wt_pct / 100.0
-                molar_mass = resolve_species_formula(
-                    str(species)
-                ).molar_mass_kg_per_mol()
-                instance_kg[str(species)] = component_kg
-                instance_mol[str(species)] = component_kg / molar_mass
-            if instance_kg:
-                species_kg[instance_id] = instance_kg
-                species_mol[instance_id] = instance_mol
-        return species_mol, species_kg
+    ) -> tuple[
+        Dict[str, Dict[str, float]],
+        Dict[str, Dict[str, float]],
+        tuple,
+    ]:
+        # Oxide assignment owns the formula and weight-percent conversion.
+        # A refused phase is omitted here; the caller records the refusal
+        # and leaves phase mass and liquid fraction unchanged.
+        assignment = assign_phase_oxides(phase_instances)
+        return (
+            assignment.species_mol,
+            assignment.species_kg,
+            assignment.refusals,
+        )
 
     @staticmethod
     def _alphamelts_formula_molar_mass_kg_mol(formula: str) -> float:
@@ -4217,9 +4188,18 @@ class _MELTSBackendSupport(MeltBackend):
             instance['physical_mass_kg'] = (
                 float(instance['solver_basis_mass_kg']) * mass_scale
             )
-        phase_species_mol, phase_species_kg = (
+        phase_species_mol, phase_species_kg, oxide_refusals = (
             self._phase_species_from_instances(phase_instances)
         )
+        if oxide_refusals:
+            result_diagnostics['phase_oxide_assignment_refusals'] = [
+                {
+                    'phase': refusal.phase,
+                    'reason': refusal.reason,
+                    'token': refusal.token,
+                }
+                for refusal in oxide_refusals
+            ]
         eq = self._emit_equilibrium_result(
             temperature_C=executed_temperature_C,
             requested_temperature_C=requested_temperature_C,

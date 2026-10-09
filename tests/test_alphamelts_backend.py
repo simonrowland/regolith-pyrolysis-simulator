@@ -1475,11 +1475,16 @@ def test_alphamelts_phase_main_preserves_same_base_instances_and_formulas():
     })
     first_instance = dict(parsed['phase_instances'][0])
     first_instance['physical_mass_kg'] = 0.04
-    species_mol, species_kg = backend._phase_species_from_instances(
+    species_mol, species_kg, refusals = backend._phase_species_from_instances(
         [first_instance]
     )
-    assert species_kg['olivine0'] == {"(Mg0.8Fe''0.2)2SiO4": 0.04}
-    assert species_mol['olivine0']["(Mg0.8Fe''0.2)2SiO4"] > 0.0
+    assert refusals == ()
+    assert species_kg['olivine'] == pytest.approx({
+        'SiO2': 0.016,
+        'FeO': 0.004,
+        'MgO': 0.020,
+    })
+    assert species_mol['olivine']['SiO2'] > 0.0
 
 
 def test_builtin_subprocess_vapor_projection_populates_representative_melt():
@@ -1749,8 +1754,8 @@ def test_alphamelts_subprocess_isothermal_emits_and_parses_system_properties(
     assert result.phase_compositions['liquid']['SiO2'] == pytest.approx(50.0)
     assert result.solid_composition_wt_pct == {}
     assert result.bulk_composition_wt_pct['SiO2'] == pytest.approx(50.0)
-    assert result.phase_species_kg['liquid1']['Na2O'] == pytest.approx(5.0)
-    assert result.phase_species_mol['liquid1']['Na2O'] > 0.0
+    assert result.phase_species_kg['liquid']['Na2O'] == pytest.approx(5.0)
+    assert result.phase_species_mol['liquid']['Na2O'] > 0.0
     assert result.vapor_pressures_Pa == {'Na': pytest.approx(12.5)}
     assert result.vapor_pressures_source['Na'].startswith('builtin_authoritative')
     assert result.diagnostics['intrinsic_fO2_log'] == pytest.approx(-9.0)
