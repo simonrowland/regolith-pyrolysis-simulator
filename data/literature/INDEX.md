@@ -15,12 +15,12 @@ Canonical `source_id` is the extract filename stem. Preset ids are aliases, neve
 
 ## Counts
 
-- Sources: 272
-- Extracts (`literature_extract.v1`): 270
+- Sources: 273
+- Extracts (`literature_extract.v1`): 271
 - PDFs present in this worktree: 0
 - Tracked PDFs in `docs/references/pdfs/99-kems-langmuir/`: 0
 - PDFs with no extract: 0
-- Extracts with no PDF: 270
+- Extracts with no PDF: 271
 - Alias groups needing owner/controller resolution: 41
 - Extracts with private/non-public row locators: 60
 
@@ -166,6 +166,7 @@ Canonical `source_id` is the extract filename stem. Preset ids are aliases, neve
 | `kems-200-ueshima-1983` | Ueshima, Y., Ichise, E. & Mori, T. (1983), "Iron-Molybdenum Phase Diagram in the Temperature Range of 1360 to 1622 C", Tetsu-to-Hagane 69(6):556-563, DOI 10.2355/tetsutohagane1955.69.6_556 | 10.2355/tetsutohagane1955.69.6_556 | ABSENT, `` | `raw/kems-200-ueshima-1983/kems-200-ueshima-1983.pdf` (present, 19b1bb01); `text/kems-200-ueshima-1983/` (3 files, exists); `tables/kems-200-ueshima-1983/` (0 files, ABSENT) | `data/literature/extracts/kems-200-ueshima-1983.yaml` (63 rows, draft) | `ledger/kems-200-ueshima-1983.yaml`: extracted (2026-09-13) |
 | `kems-201-ichise-1986` | Ichise, E., Ueshima, Y. & Miyagawa, S. (1986), "Reexamination of the High Temperature Region of Fe-W Binary Alloy Phase Diagram", Tetsu-to-Hagane 72(7):791-798, DOI 10.2355/tetsutohagane1955.72.7_791 | 10.2355/tetsutohagane1955.72.7_791 | ABSENT, `` | `raw/kems-201-ichise-1986/kems-201-ichise-1986.pdf` (present, 5fc1999b); `text/kems-201-ichise-1986/` (3 files, exists); `tables/kems-201-ichise-1986/` (0 files, ABSENT) | `data/literature/extracts/kems-201-ichise-1986.yaml` (11 rows, draft) | `ledger/kems-201-ichise-1986.yaml`: extracted (2026-09-13) |
 | `kems-ms2000-044` | Tsaplin, A. A., Zaitsev, A. I., Shelkova, N. E. & Mogutnov, B. M., "Thermodynamic properties and phase equilibria in Na2O-SiO2 and K2O-SiO2 systems", conference preprint, 24 pp. |  | ABSENT, `` | `raw/kems-ms2000-044/kems-ms2000-044.pdf` (present, 3d78f4e6); `text/kems-ms2000-044/` (24 files, exists); `tables/kems-ms2000-044/` (8 files, exists) | `data/literature/extracts/kems-ms2000-044.yaml` (100 rows, draft, private_path) | `ledger/kems-ms2000-044.yaml`: deepened (2026-09-06) |
+| `kor-1967-thesis-sulphur-oxides-slags` | G. J. W. Kor, "Sulphur in crystalline oxides and liquid slags", PhD thesis, University of London (Imperial College), 1967. |  | ABSENT, `` | `raw/kor-1967-thesis-sulphur-oxides-slags/kor-1967-thesis-sulphur-oxides-slags.pdf` (ABSENT, ); `text/kor-1967-thesis-sulphur-oxides-slags/` (0 files, ABSENT); `tables/kor-1967-thesis-sulphur-oxides-slags/` (0 files, ABSENT) | `data/literature/extracts/kor-1967-thesis-sulphur-oxides-slags.yaml` (4 rows, draft) | `ledger/kor-1967-thesis-sulphur-oxides-slags.yaml`: — (—) |
 | `kume-2000-cao-activities` | Kume et al. (2000), "Activity Measurement of CaO-SiO2-AlO1.5-MgO Slags Equilibrated with Molten Silicon Alloys," ISIJ International 40(6):561-566. | 10.2355/isijinternational.40.561 | ABSENT, `` | `raw/kume-2000-cao-activities/kume-2000-cao-activities.pdf` (ABSENT, ); `text/kume-2000-cao-activities/` (0 files, ABSENT); `tables/kume-2000-cao-activities/` (0 files, ABSENT) | `data/literature/extracts/kume-2000-cao-activities.yaml` (312 rows, draft) | `ledger/kume-2000-cao-activities.yaml`: — (—) |
 | `lamoreaux-hildenbrand-1984` | Lamoreaux, R. H. & Hildenbrand, D. L., High Temperature Vaporization Behavior of Oxides. I. Alkali Metal Binary Oxides, J. Phys. Chem. Ref. Data 13 (1984) 151–173 | 10.1063/1.555706 | ABSENT, `` | `raw/lamoreaux-hildenbrand-1984/lamoreaux-hildenbrand-1984.pdf` (ABSENT, ); `text/lamoreaux-hildenbrand-1984/` (0 files, ABSENT); `tables/lamoreaux-hildenbrand-1984/` (0 files, ABSENT) | `data/literature/extracts/lamoreaux-hildenbrand-1984.yaml` (20 rows, draft, private_path) | `ledger/lamoreaux-hildenbrand-1984.yaml`: extracted (2026-09-27) |
 | `lamoreaux-hildenbrand-hildenbrand-1987` | Lamoreaux, R. H., Hildenbrand, D. L. & Brewer, L., High-Temperature Vaporization Behavior of Oxides II. Oxides of Be, Mg, Ca, Sr, Ba, B, Al, Ga, In, Tl, Si, Ge, Sn, Pb, Zn, Cd, and Hg, J. Phys. Chem. Ref. Data 16 (1987) 419–443 | 10.1063/1.555799 | ABSENT, `` | `raw/lamoreaux-hildenbrand-hildenbrand-1987/lamoreaux-hildenbrand-hildenbrand-1987.pdf` (ABSENT, ); `text/lamoreaux-hildenbrand-hildenbrand-1987/` (0 files, ABSENT); `tables/lamoreaux-hildenbrand-hildenbrand-1987/` (0 files, ABSENT) | `data/literature/extracts/lamoreaux-hildenbrand-hildenbrand-1987.yaml` (6 rows, draft) | `ledger/lamoreaux-hildenbrand-hildenbrand-1987.yaml`: extracted (2026-09-06) |
@@ -448,6 +449,7 @@ Canonical `source_id` is the extract filename stem. Preset ids are aliases, neve
 - `kems-200-ueshima-1983`
 - `kems-201-ichise-1986`
 - `kems-ms2000-044`
+- `kor-1967-thesis-sulphur-oxides-slags`
 - `kume-2000-cao-activities`
 - `lamoreaux-hildenbrand-1984`
 - `lamoreaux-hildenbrand-hildenbrand-1987`
