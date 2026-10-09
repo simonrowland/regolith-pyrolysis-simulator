@@ -105,7 +105,7 @@ import time
 import warnings
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Dict, Iterator, List, Mapping, Optional, Tuple
+from typing import Any, Dict, Iterator, List, Mapping, Optional, Sequence, Tuple
 
 from engines.domain_reason import OutOfDomainReason
 from simulator.melt_backend.base import (
@@ -1128,37 +1128,16 @@ def _assert_magemin_bulk_echo(
             )
 
 
-def _stdout_phase_mode(stdout: str, phase_name: str) -> Optional[float]:
-    """Mode of one phase in the compact Phase/Mode block, or None if absent.
-
-    Same block ``_parse_subprocess_stdout`` reads. That parser owns the
-    unit-mass contract and drops buffer names from the material phases.
-    This read only answers whether the named buffer row was present.
-    """
+def _mode_for_name(
+    rows: Sequence[Tuple[str, float]],
+    phase_name: str,
+) -> Optional[float]:
+    """Last Mode value for one name in rows the Phase/Mode parser already read."""
     wanted = str(phase_name).strip().lower()
-    phase_line: Optional[str] = None
-    mode_line: Optional[str] = None
-    for line in stdout.splitlines():
-        stripped = line.strip()
-        if stripped.startswith('Phase :') or stripped.startswith('Phase:'):
-            phase_line = stripped.split(':', 1)[1]
-        elif stripped.startswith('Mode'):
-            if ':' in stripped:
-                mode_line = stripped.split(':', 1)[1]
-    if phase_line is None or mode_line is None:
-        return None
-    names = phase_line.split()
-    values = mode_line.split()
-    if len(names) != len(values):
-        return None
     found: Optional[float] = None
-    for name, raw in zip(names, values):
-        if name.lower() != wanted:
-            continue
-        try:
-            found = float(raw)
-        except ValueError:
-            return None
+    for name, fraction in rows:
+        if str(name).lower() == wanted:
+            found = float(fraction)
     return found
 
 
@@ -2669,15 +2648,16 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                 f'{stderr or "no stderr"}'
             )
 
-        self._record_buffer_activity(
-            operating_point_diagnostics,
-            buffer_name=buffer_name,
-            buffer_mode=_stdout_phase_mode(completed.stdout or '', buffer_name),
-        )
-
         try:
-            phases = self._parse_subprocess_stdout(completed.stdout or '')
+            phases, mode_rows = self._parse_phase_mode_block(
+                completed.stdout or ''
+            )
         except _MAGEMinModeVectorMassDeficit as exc:
+            self._record_buffer_activity(
+                operating_point_diagnostics,
+                buffer_name=buffer_name,
+                buffer_mode=_mode_for_name(exc.parsed_modes, buffer_name),
+            )
             return {
                 'mode_vector_mass_deficit': {
                     'mode_sum': exc.mode_sum,
@@ -2693,6 +2673,11 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                 'buffer_warnings': buffer_warnings,
                 'operating_point_diagnostics': operating_point_diagnostics,
             }
+        self._record_buffer_activity(
+            operating_point_diagnostics,
+            buffer_name=buffer_name,
+            buffer_mode=_mode_for_name(mode_rows, buffer_name),
+        )
         if not phases:
             raise RuntimeError(
                 'MAGEMin binary produced no parseable Phase/Mode block'
@@ -3039,6 +3024,18 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
 
     @staticmethod
     def _parse_subprocess_stdout(stdout: str) -> Dict[str, Dict[str, float]]:
+        """Material phases from the compact Phase/Mode block.
+
+        Buffer rows stay out of this dict. Buffer activity reads the same
+        parsed rows from ``_parse_phase_mode_block``.
+        """
+        phases, _mode_rows = MAGEMinBackend._parse_phase_mode_block(stdout)
+        return phases
+
+    @staticmethod
+    def _parse_phase_mode_block(
+        stdout: str,
+    ) -> Tuple[Dict[str, Dict[str, float]], Tuple[Tuple[str, float], ...]]:
         """
         Parse the compact MAGEMin ``--Verb=0`` ``Phase :`` / ``Mode :``
         block.
@@ -3048,13 +3045,15 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
              Phase :       ol      liq      spl      qfm
              Mode  :  0.02491  0.96156  0.00213  0.01140
 
-        Mode values are one-atom fractions of the system, not mass
-        fractions.  This parser keeps that number under ``mass_kg`` on a
-        unit-mass basis so the stdout pin stays byte-stable.  The
-        subprocess caller replaces it with ``fraction[wt]`` times the
-        hosted batch.  The buffer pseudo-phase (any name in
-        ``_BUFFER_CHOICES``) is dropped — it is a control row, not a
-        material phase.
+        Returns material phases and every Mode row, including buffer
+        names and zero fractions. Mode values are one-atom fractions of
+        the system, not mass fractions. The phase dict keeps that number
+        under ``mass_kg`` on a unit-mass basis so the stdout pin stays
+        byte-stable. The subprocess caller replaces it with
+        ``fraction[wt]`` times the hosted batch. The buffer pseudo-phase
+        (any name in ``_BUFFER_CHOICES``) is dropped from the phase dict
+        — it is a control row, not a material phase. A line that merely
+        starts with ``Mode`` (``Model``, for example) is not a Mode row.
         """
         phase_line: Optional[str] = None
         mode_line: Optional[str] = None
@@ -3067,12 +3066,12 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
             elif stripped.startswith('Mode  :'):
                 mode_line = stripped.split(':', 1)[1]
         if phase_line is None or mode_line is None:
-            return {}
+            return {}, ()
 
         names = phase_line.split()
         values = mode_line.split()
         if not names or len(names) != len(values):
-            return {}
+            return {}, ()
 
         parsed_modes: list[tuple[str, float]] = []
         for name, raw in zip(names, values):
@@ -3106,7 +3105,7 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
             if fraction <= 0.0:
                 continue
             phases[name] = {'mass_kg': fraction}
-        return phases
+        return phases, tuple(parsed_modes)
 
     # ------------------------------------------------------------------
     # Pure-phase standard-state properties (diagnostic accessor)

@@ -2637,6 +2637,10 @@ def test_magemin_subprocess_fo2_log_substitution_recorded(monkeypatch):
     [
         ("Phase : liq qfm\nMode  : 0.98000 0.02000\n", "0.02000"),
         ("Phase : liq qfm\nMode  : 1.000 0.000\n", "0.000"),
+        (
+            "Phase : liq qfm\nMode  : 0.98000 0.02000\nModel : 9 9\n",
+            "0.02000",
+        ),
     ],
 )
 def test_magemin_records_the_printed_qfm_mode_token(monkeypatch, stdout, token):
