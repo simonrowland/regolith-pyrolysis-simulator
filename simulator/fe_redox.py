@@ -14,29 +14,61 @@ class Kress91InvalidControls(ValueError):
     """Invalid finite-control input for the Kress91 Fe-redox relation."""
 
 
+def melt_fO2_seed_without_ferric_iron(
+    composition_wt_pct: Mapping[str, float],
+) -> bool:
+    """True when the seed has no Fe2O3 term to move it off the IW buffer."""
+
+    _feo, fe2o3 = iron_oxide_values(composition_wt_pct)
+    return fe2o3 <= 0.0
+
+
 def intrinsic_melt_fO2(
     composition_wt_pct: Mapping[str, float],
     temperature_K: float,
-    *,
-    vacuum_floor_bar: float = DEFAULT_VACUUM_FLOOR_BAR,
 ) -> float:
-    """Return the legacy intrinsic-fO2 diagnostic for an oxide composition."""
+    """Melt oxygen potential adopted from the iron-wüstite buffer.
+
+    Premise: before a liquid redox step has a reference temperature, the
+    melt potential is the pure-FeO IW buffer at the temperature where it
+    is adopted, plus the alkali offset already used by this seed. The
+    ferric term applies only when both FeO and Fe2O3 are present. Fe2O3
+    absent does not invent an IW-1 offset; the caller carries
+    ``melt_fO2_seed_without_ferric_iron``.
+
+    Algebra: log10(fO2/bar) = feo_iw_log10_fO2_bar(T) + redox_offset.
+    feo_iw_log10_fO2_bar is Holzheid, Palme & Chakraborty 1997 liquid FeO
+    at a_FeO = 1 (ΔG = -244118 + 115.559 T - 8.474 T ln T J/mol;
+    ln(fO2) = 2 ΔG / (R T); log10 = ln / ln(10)). Alkali offset is
+    min(0.15, (Na2O + K2O) wt% * 0.01) dex. Ferric offset, when both
+    oxides are positive, is 0.25 * log10(Fe2O3/FeO).
+
+    Units: T in K, ΔG in J/mol, R in J/(mol·K), result dimensionless
+    log10(fO2/bar).
+
+    Sanity: Holzheid IW is -13.3608 at 1338 K (4.36e-14 bar) and -10.0490
+    at 1638 K (8.93e-11 bar). At 1800 K it is -8.731 (1.86e-9 bar). The
+    headspace vacuum floor is not applied here. Vapour mass action still
+    uses the 1e-30..100 bar melt-dissociation envelope
+    (MELT_DISSOCIATION_PO2_MIN_BAR / MAX_BAR).
+
+    The 0.25 ferric coefficient is not a Kress91 inversion. Kress91's
+    a = 0.196 would be ~5.1 per log10 molar ratio, and it takes a molar
+    ratio rather than this weight ratio. On a ledger Fe2O3 that never
+    equilibrated, inverting Kress91 is a category error.
+    """
+
     temperature = float(temperature_K)
-    if temperature <= 0.0:
-        return math.log10(vacuum_floor_bar)
     feo, fe2o3 = iron_oxide_values(composition_wt_pct)
     alkali = max(0.0, float(composition_wt_pct.get("Na2O", 0.0))) + max(
         0.0, float(composition_wt_pct.get("K2O", 0.0))
     )
-    log_iw = -27215.0 / temperature + 6.57
+    log_iw = feo_iw_log10_fO2_bar(temperature, a_feo=1.0)
     redox_offset = 0.0
     if feo > 0.0 and fe2o3 > 0.0:
         redox_offset += 0.25 * math.log10(max(fe2o3 / feo, 1.0e-12))
     redox_offset += min(0.15, alkali * 0.01)
-    return max(
-        math.log10(vacuum_floor_bar),
-        min(0.0, log_iw + redox_offset),
-    )
+    return log_iw + redox_offset
 
 
 KRESS91_MOL_FRACTION_OXIDES = (

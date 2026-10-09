@@ -1441,6 +1441,7 @@ class PyrolysisRun:
                 "backend_authoritative": bool(execution.backend_authoritative),
             }
         )
+        _attach_melt_fO2_seed_notice(run_metadata, sim)
         _attach_engine_commissioning_notice(run_metadata, sim)
         _attach_diagnostic_gate_authority_notice(run_metadata, sim)
         _attach_sulfur_saturation_notice(run_metadata, sim)
@@ -3409,6 +3410,27 @@ def _final_summary_report(
     }
 
 
+def _melt_fO2_seed_notice(sim: Any) -> dict[str, Any] | None:
+    if sim is None:
+        return None
+    reader = getattr(sim, "melt_fO2_seed_run_notice", None)
+    if not callable(reader):
+        return None
+    notice = reader()
+    if not isinstance(notice, Mapping) or not notice:
+        return None
+    return dict(notice)
+
+
+def _attach_melt_fO2_seed_notice(
+    run_metadata: dict[str, Any],
+    sim: Any,
+) -> None:
+    notice = _melt_fO2_seed_notice(sim)
+    if notice:
+        run_metadata["melt_fO2_seed_notice"] = _json_safe(notice)
+
+
 def _engine_commissioning_notice(sim: Any) -> dict[str, Any] | None:
     reader = getattr(sim, "engine_commissioning_run_notice", None)
     if not callable(reader):
@@ -5210,6 +5232,7 @@ def _runner_failure_result(
                 refusal_diagnostic
             )
     sim = getattr(execution, "simulator", None) if execution is not None else None
+    _attach_melt_fO2_seed_notice(run_metadata, sim)
     _attach_engine_commissioning_notice(run_metadata, sim)
     _attach_diagnostic_gate_authority_notice(run_metadata, sim)
     _attach_sulfur_saturation_notice(run_metadata, sim)

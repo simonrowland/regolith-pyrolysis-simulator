@@ -25,6 +25,7 @@ from engines.builtin.vapor_pressure import BuiltinVaporPressureProvider
 from simulator.chemistry.kernel import ChemistryIntent
 from simulator.chemistry.kernel.dto import IntentRequest, ProviderAccountView
 from simulator.core import PyrolysisSimulator
+from simulator.fe_redox import feo_iw_log10_fO2_bar
 from simulator.melt_backend.base import InternalAnalyticalBackend
 from simulator.melt_backend.vaporock import VapoRockBackend
 from simulator.state import Atmosphere
@@ -140,7 +141,10 @@ def test_intrinsic_kress91_iw_regime_guards_against_vacuum_floor_conflation():
     sim.melt.melt_fO2_log = intrinsic_fO2_log
     equilibrium = sim._internal_analytical_equilibrium()
 
-    assert -8.10 <= intrinsic_fO2_log <= -7.85
+    # Holzheid IW at 1873.15 K, plus at most the seed's +0.15 dex alkali cap.
+    # The retired -27215/T+6.57 neighborhood (-8.10..-7.85) is not the buffer.
+    iw = feo_iw_log10_fO2_bar(1873.15)
+    assert iw <= intrinsic_fO2_log <= iw + 0.15
     assert equilibrium.fO2_log == pytest.approx(intrinsic_fO2_log, abs=0.05)
     assert abs(equilibrium.fO2_log - (-9.0)) > 0.75
 

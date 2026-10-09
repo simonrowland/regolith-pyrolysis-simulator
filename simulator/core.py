@@ -393,6 +393,7 @@ from simulator.fe_redox import (
     KRESS91_LIQUID_CALIBRATION_MIN_T_C,
     kress91_ln_fO2_temperature_delta,
     kress91_split,
+    melt_fO2_seed_without_ferric_iron,
     melt_mol_fractions_for_kress91,
 )
 from simulator.melt_regime import MeltRegime, melt_regime
@@ -1543,6 +1544,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self.melt.p_total_mbar = self.melt.ambient_pressure_mbar
         self.melt.pO2_mbar = 0.0
         base_intrinsic_fO2_log = self._compute_intrinsic_melt_fO2()
+        self._melt_fO2_seed_without_ferric_iron = (
+            melt_fO2_seed_without_ferric_iron(self._melt_oxide_wt_pct())
+        )
         self.melt.fO2_log = base_intrinsic_fO2_log
         self.melt.melt_fO2_log = base_intrinsic_fO2_log
         self.melt.campaign = CampaignPhase.IDLE
@@ -5143,14 +5147,24 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             T_now,
             gate_authority=gate_authority,
         ):
-            # Sub-solidus redox is quenched: Kress91 is a liquid relation, so
-            # glass has no equilibrium fO2 to re-reference. Diagnostics below
-            # solidus intentionally read the last liquid couple.
+            if reference_T_K is None:
+                # Premise: the seed is a melt property evaluated where it is
+                # adopted. Until the first liquid tick the reservoir tracks
+                # IW(T) + redox_offset at the current T. The 25 C load value
+                # is not that potential, and Kress91 is not integrated across
+                # the sub-liquid interval.
+                # Algebra: log10(fO2/bar) = intrinsic_melt_fO2(composition, T).
+                # Units: T_now is kelvin; the returned log is dimensionless.
+                # Sanity: lunar alkali offset is +0.005 dex, so 1338.15 K is
+                # Holzheid -13.3588 + 0.005, not the 1e-9 bar headspace floor.
+                return self._compute_intrinsic_melt_fO2(T_now), None
+            # After a liquid adoption, sub-solidus redox is quenched: Kress91
+            # is a liquid relation, so glass keeps the last liquid couple.
             return self._current_melt_redox_fO2_log(), reference_T_K
         if reference_T_K is None:
-            # load_batch seeds at 25 C; Kress91 is a liquid relation, so the
-            # seed is treated as defined at the first liquid tick instead.
-            return self._current_melt_redox_fO2_log(), T_now
+            # First liquid tick: fix the seed at this temperature. Later
+            # ticks move only by the Kress91 block below plus source terms.
+            return self._compute_intrinsic_melt_fO2(T_now), T_now
 
         base_ln_fO2 = self._current_melt_redox_fO2_log() * math.log(10.0)
         pressure_bar = floor_vacuum_pressure_bar(
@@ -6932,72 +6946,12 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         if not math.isfinite(T_K) or T_K <= 0.0:
             raise ValueError('temperature_K must be finite and greater than zero')
         comp = self._melt_oxide_wt_pct()
-        # IW buffer fit: anchored at log10(fO2/bar) ~= -7.98 at 1873 K,
-        # matching the Phase 1 contract's Kress91 basalt reference.
-        # ★ THE FERRIC BRANCH BELOW IS INERT WHERE THIS IS ACTUALLY CALLED.
-        # Measured 2026-08-18 (t-655); an earlier version of this comment said
-        # the branch was live and that "intrinsic fO2 sets melt.fO2_log every
-        # tick (core.py:5398)". Both claims were FALSE, and the false one cost
-        # a full investigation, so the evidence is written out here.
-        #
-        #   * The only caller is load_batch, immediately after it sets
-        #     self.melt.temperature_C = 25.0. So T = 298.15 K, not process T.
-        #     (core.py:5398 is an OXYGEN_BUBBLER dispatch and never touched
-        #     this.) After load_batch, fO2 is a STATE VARIABLE and Kress91 is
-        #     used FORWARD by FE_REDOX_RESPECIATION -- nothing re-derives fO2
-        #     from this heuristic per tick.
-        #   * Magnitude check at the seed temperature:
-        #         log_iw = -27215/298.15 + 6.57 = -84.710
-        #     and the return floors at log10(vacuum_floor) ~ -9, so the offset
-        #     must exceed -9 - (-84.710) = +75.71 dex to change anything. Its
-        #     ceiling is 0.25*log10(100) = +0.50 dex at an absurd Fe2O3/FeO of
-        #     100. It cannot move the seed. The floor wins for every feedstock.
-        #   * Exposure is zero independently: 0 of 25 loadable feedstocks put
-        #     non-zero Fe2O3 into cleaned_melt, mars_basalt and
-        #     mars_sulfate_rich included once their required carbon is
-        #     supplied. Shipped Mars sulfate is bulk SO3 with FeSO4 deferred,
-        #     so the Stage-0 FeSO4->Fe2O3 route (foulant_thermo.yaml:199-215;
-        #     test_stage0_cation_routing.py:433-434) never fires today.
-        #
-        # The coefficient IS wrong on its own terms, and that is worth knowing
-        # before anyone revives the branch: Kress91's a = 0.196 (fe_redox.py)
-        # inverts to d(log10 fO2)/d(log10 ratio) = 1/0.196 = 5.102, so 0.25 is
-        # ~20x too weak, and it is handed a WEIGHT ratio where Kress91 takes a
-        # MOLAR one (factor 71.844/159.688 = 0.4499). Do NOT "fix" it by
-        # swapping the constant: on a ledger Fe2O3 that never equilibrated,
-        # inverting Kress91 is a category error, not a correction.
-        #
-        # Numerical proximity to Frost 1991 does not validate this IW fit over
-        # the claimed 1273-2273 K interval. Subtracting Frost's Table 1 form
-        # from this expression gives
-        #
-        #   (-27215/T + 6.57) - (-27489/T + 6.702)
-        #       = 274 K/T - 0.132 dex.
-        #
-        # T is in kelvin, so K/T is dimensionless and the difference is in
-        # log10-fugacity units. It is +0.083 dex at 1273 K and -0.011 dex at
-        # 2273 K, which explains the numerical closeness but not physical
-        # validity. Frost Table 1 limits IW to 565-1200 degC
-        # (838.15-1473.15 K), while NIST-JANAF FeO(cr,l) records the
-        # crystal-liquid transition at 1650 K. Thus the old comparison extended
-        # 800 degC beyond Frost's upper limit and crossed a phase boundary.
-        # The correct replacement outside the published window is unestablished;
-        # do not alter the coefficient without the gated SSO-R replacement.
-        # Sources: Frost 1991, doi:10.2138/rmg.1991.25.1, Table 1;
-        # NIST-JANAF FeO(cr,l), https://janaf.nist.gov/tables/Fe-020.html.
-        # Evidence: docs-private/research/2026-08-18-t655-fo2-gap/.
-        #
-        # SSO-R task #41 is the intended grounded replacement (explicit
-        # Fe3+/Fe2+ policy, Kress & Carmichael 1991, fO2 as state variable ->
-        # split) in docs-private/research/2026-06-18-staged-selectivity-
-        # optimizer/sso-r-fe-redox-design.md. That replacement is
-        # golden-affecting for sulfate feedstocks, so it is gated and
-        # re-baselined there rather than swapped in here.
-        return intrinsic_melt_fO2(
-            comp,
-            T_K,
-            vacuum_floor_bar=self._vacuum_floor_bar(),
-        )
+        # The seed is intrinsic_melt_fO2 at T_K: Holzheid IW plus the alkali
+        # offset (and the ferric term only when both iron oxides are present).
+        # The headspace vacuum floor is not a melt property and is not applied.
+        # Callers before the first liquid tick pass the current temperature;
+        # load_batch's 25 C value does not remain the adopted potential.
+        return intrinsic_melt_fO2(comp, T_K)
 
     def _compute_fe_redox_split_diagnostic(
         self,
@@ -7028,10 +6982,13 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             diagnostic_pressure_bar,
             floor_bar=self._vacuum_floor_bar(),
         )
+        # Same IW as the melt seed and native-Fe saturation: Holzheid pure
+        # FeO via feo_iw_log10_fO2_bar. The retired -27215/T + 6.57 fit is
+        # not a second buffer.
         log_iw = (
-            -27215.0 / T_K + 6.57
+            feo_iw_log10_fO2_bar(T_K, a_feo=1.0)
             if T_K > 0.0
-            else math.log10(self._vacuum_floor_bar())
+            else float('nan')
         )
         base = {
             'fO2_log': float(fO2_log),
@@ -8928,6 +8885,24 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             steps = []
             self._sulfur_saturation_steps = steps
         steps.append(step)
+
+    def melt_fO2_seed_run_notice(self) -> Dict[str, Any] | None:
+        """Predict-and-flag when the seed has no Fe3+/Fe2+ term.
+
+        Authority is the IW buffer. Fe2O3 absent does not move the seed
+        to IW-1; the Holzheid value plus the alkali offset stands.
+        """
+
+        if not getattr(self, '_melt_fO2_seed_without_ferric_iron', False):
+            return None
+        return {
+            'code': 'melt_fO2_seed_without_ferric_iron',
+            'authority': 'IW buffer, no Fe3+/Fe2+',
+            'message': (
+                'Melt fO2 seed is the Holzheid iron-wustite buffer plus the '
+                'alkali offset. Fe2O3 is absent, so there is no Fe3+/Fe2+ term.'
+            ),
+        }
 
     def sulfur_saturation_run_notice(self) -> Dict[str, Any] | None:
         """Run-level SulfSat notice, or None when every step was in range."""

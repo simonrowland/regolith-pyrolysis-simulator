@@ -134,14 +134,18 @@ def test_explicit_feedstock_body_sets_run_vacuum_floor() -> None:
     assert sim._commanded_pO2_bar() == pytest.approx(MOON_VACUUM_FLOOR_BAR)
 
 
-def test_intrinsic_melt_fo2_clamp_lowers_to_vacuum_body_floor() -> None:
+def test_intrinsic_melt_fo2_ignores_the_headspace_vacuum_floor() -> None:
+    from simulator.fe_redox import intrinsic_melt_fO2
+
     sim = _sim()
     sim.load_batch("lunar_mare_low_ti", mass_kg=1000.0)
+    expected = intrinsic_melt_fO2(sim._melt_oxide_wt_pct(), 1000.0)
 
-    default_clamped = sim._compute_intrinsic_melt_fO2(temperature_K=1000.0)
+    default_seed = sim._compute_intrinsic_melt_fO2(temperature_K=1000.0)
     sim.melt.body = "moon"
-    lunar_clamped = sim._compute_intrinsic_melt_fO2(temperature_K=1000.0)
+    lunar_seed = sim._compute_intrinsic_melt_fO2(temperature_K=1000.0)
 
-    assert default_clamped == pytest.approx(math.log10(DEFAULT_VACUUM_FLOOR_BAR))
-    assert lunar_clamped == pytest.approx(math.log10(MOON_VACUUM_FLOOR_BAR))
-    assert lunar_clamped < default_clamped
+    assert default_seed == pytest.approx(expected)
+    assert lunar_seed == pytest.approx(expected)
+    assert default_seed != pytest.approx(math.log10(DEFAULT_VACUUM_FLOOR_BAR))
+    assert lunar_seed != pytest.approx(math.log10(MOON_VACUUM_FLOOR_BAR))

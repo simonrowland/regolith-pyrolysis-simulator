@@ -82,6 +82,7 @@ from simulator.runner import (
     RunnerError,
     _attach_diagnostic_gate_authority_notice,
     _attach_engine_commissioning_notice,
+    _attach_melt_fO2_seed_notice,
     _attach_rump_expectation_notice,
     _attach_sulfur_saturation_notice,
     _composition_projected_liquidus_notice,
@@ -2825,6 +2826,7 @@ def _available_runner_payload(
             dict(refusal_diagnostic)
         )
     for attach_notice in (
+        _attach_melt_fO2_seed_notice,
         _attach_engine_commissioning_notice,
         _attach_diagnostic_gate_authority_notice,
         _attach_sulfur_saturation_notice,

@@ -123,6 +123,7 @@ def test_native_fe_saturation_split_routes_fe_to_drain_tap() -> None:
     sim = _make_sim("lunar_mare_low_ti", temperature_C=1600.0)
     _seed_redox_liquidus_curve(sim)
     sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log = -10.0
+    sim.melt.oxygen_reservoir.reference_T_K = 1600.0 + 273.15
     sim.melt.fO2_log = -10.0
     sim.melt.melt_fO2_log = -10.0
 
@@ -204,6 +205,7 @@ def test_native_fe_authoritative_extent_ignores_diagnostic_payload(
     sim = _make_sim("lunar_mare_low_ti", temperature_C=1600.0)
     _seed_redox_liquidus_curve(sim)
     sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log = -10.0
+    sim.melt.oxygen_reservoir.reference_T_K = 1600.0 + 273.15
     sim.melt.fO2_log = -10.0
     sim.melt.melt_fO2_log = -10.0
     pre_poison_split = sim._compute_fe_redox_split_diagnostic()

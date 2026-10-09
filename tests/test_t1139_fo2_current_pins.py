@@ -19,8 +19,14 @@ from engines.builtin.overhead_gas_equilibrium import (
     BuiltinOverheadGasEquilibriumProvider,
 )
 from simulator.campaigns import CampaignManager
+from simulator.core import PyrolysisSimulator
 from simulator.environment import DEFAULT_VACUUM_FLOOR_BAR
-from simulator.fe_redox import intrinsic_melt_fO2
+from simulator.fe_redox import (
+    feo_iw_log10_fO2_bar,
+    intrinsic_melt_fO2,
+    melt_fO2_seed_without_ferric_iron,
+)
+from simulator.melt_backend.base import InternalAnalyticalBackend
 from simulator.state import Atmosphere, CampaignPhase, MeltState
 
 
@@ -85,18 +91,64 @@ def _n2_lab_schedule() -> dict:
     }
 
 
-def test_pin_intrinsic_melt_fo2_at_25c_is_the_vacuum_floor() -> None:
-    composition = _ferrous_lunar_composition()
-    seeded = intrinsic_melt_fO2(composition, 298.15)
-    moon_floor = intrinsic_melt_fO2(
-        composition,
-        298.15,
-        vacuum_floor_bar=1.3e-12,
+def _sim() -> PyrolysisSimulator:
+    return PyrolysisSimulator(
+        InternalAnalyticalBackend(),
+        _setpoints(),
+        yaml.safe_load((DATA_DIR / "feedstocks.yaml").read_text()) or {},
+        yaml.safe_load((DATA_DIR / "vapor_pressures.yaml").read_text()) or {},
     )
 
-    assert seeded == pytest.approx(math.log10(DEFAULT_VACUUM_FLOOR_BAR))
-    assert seeded == pytest.approx(-9.0)
-    assert moon_floor == pytest.approx(math.log10(1.3e-12))
+
+def test_melt_seed_is_holzheid_iw_plus_alkali_without_a_vacuum_floor() -> None:
+    composition = _ferrous_lunar_composition()
+    # Lunar Na2O 0.4 + K2O 0.1 = 0.50 wt% alkali. The seed's alkali term is
+    # 0.01 dex per wt%, capped at 0.15, so this composition is +0.005 dex.
+    alkali_offset_dex = 0.005
+    seeded = intrinsic_melt_fO2(composition, 1338.15)
+    no_alkali = intrinsic_melt_fO2({"SiO2": 45.0, "FeO": 16.5}, 1338.15)
+
+    assert no_alkali == pytest.approx(feo_iw_log10_fO2_bar(1338.15))
+    assert seeded - no_alkali == pytest.approx(alkali_offset_dex)
+    assert intrinsic_melt_fO2(composition, 298.15) == pytest.approx(
+        feo_iw_log10_fO2_bar(298.15) + alkali_offset_dex
+    )
+    assert seeded != pytest.approx(math.log10(DEFAULT_VACUUM_FLOOR_BAR))
+    assert melt_fO2_seed_without_ferric_iron(composition) is True
+    assert melt_fO2_seed_without_ferric_iron(
+        {"FeO": 2.0, "Fe2O3": 1.0}
+    ) is False
+
+
+def test_reservoir_tracks_iw_until_the_first_liquid_tick() -> None:
+    sim = _sim()
+    sim.load_batch("lunar_mare_low_ti", mass_kg=1000.0)
+    composition = sim._melt_oxide_wt_pct()
+    notice = sim.melt_fO2_seed_run_notice()
+    assert notice is not None
+    assert notice["code"] == "melt_fO2_seed_without_ferric_iron"
+    assert notice["authority"] == "IW buffer, no Fe3+/Fe2+"
+
+    sim.melt.temperature_C = 1100.0
+    sim._re_reference_melt_fO2_to_temperature()
+    subliquid = intrinsic_melt_fO2(composition, 1100.0 + 273.15)
+    assert sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log == pytest.approx(
+        subliquid
+    )
+    assert sim.melt.oxygen_reservoir.reference_T_K is None
+
+    sim.melt.temperature_C = 1215.0
+    sim._re_reference_melt_fO2_to_temperature()
+    fixed = intrinsic_melt_fO2(composition, 1215.0 + 273.15)
+    assert sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log == pytest.approx(fixed)
+    assert sim.melt.oxygen_reservoir.reference_T_K == pytest.approx(1215.0 + 273.15)
+
+    sim.melt.temperature_C = 1230.0
+    sim._re_reference_melt_fO2_to_temperature()
+    fresh = intrinsic_melt_fO2(composition, 1230.0 + 273.15)
+    assert sim.melt.oxygen_reservoir.reference_T_K == pytest.approx(1230.0 + 273.15)
+    assert sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log != pytest.approx(fresh)
+    assert sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log != pytest.approx(fixed)
 
 
 def test_pin_zero_o2_argon_schedule_is_controlled_o2() -> None:
