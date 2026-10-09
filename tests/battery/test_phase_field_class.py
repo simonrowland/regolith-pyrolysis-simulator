@@ -365,6 +365,65 @@ def test_two_test_rule_classifies_lime_side_plateau_points() -> None:
     assert outcome.kind == OUTSIDE_SINGLE_LIQUID_FIELD and outcome.problem is None
 
 
+def test_plateau_z_just_above_two_sigma_is_a_failing_series() -> None:
+    from simulator.battery.phase_field import phase_field_records
+
+    records = phase_field_records(
+        {
+            "species": {
+                "A": {
+                    "observations": [
+                        {
+                            "observation_id": "series_a",
+                            "values": {
+                                "points": [
+                                    {"x": "0.1", "p": "1.000 ± 0.5"},
+                                    {"x": "0.2", "p": "2.417 ± 0.5"},
+                                ]
+                            },
+                        }
+                    ]
+                }
+            },
+            "phase_field_records": {
+                "liquidus": [
+                    {
+                        "id": "liq",
+                        "component": "CaO",
+                        "position": "0.5",
+                        "sigma": "0.01",
+                        "outside_side": "below",
+                        "locator": {"table": "fixture"},
+                    }
+                ],
+                "plateaus": [
+                    {
+                        "id": "plat",
+                        "composition_field": "x",
+                        "compositions": ["0.1", "0.2"],
+                        "series": [
+                            {
+                                "observation_id": "series_a",
+                                "field": "p",
+                                "sigma_basis": "printed",
+                            }
+                        ],
+                    }
+                ],
+            },
+        }
+    )
+    assert records is not None
+    plateau = records.plateaus["plat"]
+    # The printed cells differ by 2.417 - 1.000 = 1.417; independent
+    # propagation gives 1.417 / sqrt(0.5^2 + 0.5^2) = 2.0039 > 2.
+    expected_z = Decimal("1.417") / (Decimal("0.5") ** 2 + Decimal("0.5") ** 2).sqrt()
+    assert plateau.z_by_series["series_a"] == expected_z
+    assert expected_z > Decimal(2)
+    assert plateau.failing == ("series_a",)
+    assert plateau.problem is not None
+
+
 def test_two_test_rule_refuses_points_inside_the_liquidus_sigma_band() -> None:
     from simulator.battery.phase_field import LIQUIDUS_POSITION_CONTESTED, classify_point
 
