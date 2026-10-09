@@ -1295,6 +1295,8 @@ class PT1PersistentEquilibriumStore:
         with self._connect() as conn:
             self._initialize(conn)
             existing = self._fetch(conn, key_hash)
+            insert_source = None
+            effective_notices_json = repair_notices_json
             if existing is not None:
                 entry = self._entry_from_row(
                     existing,
@@ -1310,25 +1312,77 @@ class PT1PersistentEquilibriumStore:
                     raise PT1PersistentStoreCorrupt(
                         f"PT-1 payload collision for {artifact}: {key_hash}"
                     )
-                merged_notices = monotonic_repair_notices_json(
-                    _row_repair_notices(existing),
+                existing_notices_json = _row_repair_notices(existing)
+                effective_notices_json = monotonic_repair_notices_json(
+                    existing_notices_json,
                     repair_notices_json,
                 )
-                if merged_notices != _row_repair_notices(existing):
-                    conn.execute(
-                        f"UPDATE {PT1_EQUILIBRIUM_TABLE} "
-                        "SET repair_notices_json = ? WHERE key_hash = ?",
-                        (merged_notices, key_hash),
+                local_row = conn.execute(
+                    f"SELECT 1 FROM {PT1_EQUILIBRIUM_TABLE} WHERE key_hash = ?",
+                    (key_hash,),
+                ).fetchone()
+                if local_row is not None:
+                    if effective_notices_json != existing_notices_json:
+                        conn.execute(
+                            f"UPDATE {PT1_EQUILIBRIUM_TABLE} "
+                            "SET repair_notices_json = ? WHERE key_hash = ?",
+                            (effective_notices_json, key_hash),
+                        )
+                    self._update_physics_bucket_columns(
+                        conn,
+                        key_hash=key_hash,
+                        physics_bucket_key=physics_bucket_key,
+                        physics_bucket_bytes=physics_bucket_bytes,
+                        physics_bucket_hash=physics_bucket_hash,
+                        ladder_values=ladder_values,
                     )
-                self._update_physics_bucket_columns(
-                    conn,
-                    key_hash=key_hash,
-                    physics_bucket_key=physics_bucket_key,
-                    physics_bucket_bytes=physics_bucket_bytes,
-                    physics_bucket_hash=physics_bucket_hash,
-                    ladder_values=ladder_values,
-                )
-                return
+                    return
+                if effective_notices_json == existing_notices_json:
+                    return
+                insert_source = existing
+            source = insert_source
+            source_key_bytes = (
+                _sqlite_bytes(source["key_bytes"]) if source is not None else key_bytes
+            )
+            source_payload_bytes = (
+                _sqlite_bytes(source["payload_bytes"])
+                if source is not None
+                else payload_bytes
+            )
+            source_payload_hash = (
+                str(source["payload_sha256"])
+                if source is not None
+                else payload_hash
+            )
+            source_request_schema = (
+                str(source["request_schema_version"])
+                if source is not None
+                else SCHEMA_VERSION
+            )
+            source_code_version = (
+                str(source["code_version"]) if source is not None else _code_version()
+            )
+            source_corpus_version = (
+                source["corpus_version"] if source is not None else None
+            )
+            source_engine_version = (
+                source["engine_version"]
+                if source is not None
+                else _none_or_str(engine_version_provenance)
+            )
+            source_data_digests_json = (
+                str(source["data_digests_json"]) if source is not None else "{}"
+            )
+            source_created_at = (
+                str(source["created_at"])
+                if source is not None
+                else datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
+            )
+            source_git_dirty = (
+                int(source["git_dirty"])
+                if source is not None
+                else self._epoch_git_dirty
+            )
             conn.execute(
                 f"""
                 INSERT INTO {PT1_EQUILIBRIUM_TABLE} (
@@ -1365,16 +1419,16 @@ class PT1PersistentEquilibriumStore:
                     key_hash,
                     artifact,
                     PT1_STORE_SCHEMA_VERSION,
-                    SCHEMA_VERSION,
+                    source_request_schema,
                     key_hash,
-                    payload_hash,
-                    sqlite3.Binary(key_bytes),
-                    sqlite3.Binary(payload_bytes),
-                    _code_version(),
-                    None,
-                    _none_or_str(engine_version_provenance),
-                    "{}",
-                    repair_notices_json,
+                    source_payload_hash,
+                    sqlite3.Binary(source_key_bytes),
+                    sqlite3.Binary(source_payload_bytes),
+                    source_code_version,
+                    source_corpus_version,
+                    source_engine_version,
+                    source_data_digests_json,
+                    effective_notices_json,
                     PHYSICS_BUCKET_SCHEMA_VERSION,
                     physics_bucket_hash,
                     _replay_scope_hash(physics_bucket_key),
@@ -1387,8 +1441,8 @@ class PT1PersistentEquilibriumStore:
                     ladder_values["h40c"]["distance"],
                     ladder_values["h30c"]["sha256"],
                     ladder_values["h30c"]["distance"],
-                    datetime.now(timezone.utc).isoformat().replace("+00:00", "Z"),
-                    self._epoch_git_dirty,
+                    source_created_at,
+                    source_git_dirty,
                 ),
             )
 
@@ -1853,6 +1907,8 @@ class PT1PersistentEquilibriumStore:
                     corpus_version,
                     engine_version,
                     data_digests_json,
+                    created_at,
+                    git_dirty,
                     {repair_column} AS repair_notices_json
                 FROM {table}
                 WHERE key_hash = ?
