@@ -20,6 +20,8 @@ from __future__ import annotations
 
 from enum import StrEnum
 
+from simulator.state_types import StateTag
+
 
 class Engine(StrEnum):
     """Closed first-class engine tokens. Not derived from resolve_backend."""
@@ -442,12 +444,6 @@ class IdentityEqualKind(StrEnum):
     IDENTITY_MISMATCH = "identity_mismatch"
     IDENTITY_UNKNOWN = "identity_unknown"
     INVALID_IDENTITY = "invalid_identity"
-
-
-class StateTag(StrEnum):
-    VALUE = "value"
-    UNKNOWN = "unknown"
-    NOT_APPLICABLE = "not_applicable"
 
 
 # Canonical storage unit from quantity (+ per, where the unit names the basis).

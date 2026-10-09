@@ -12,6 +12,8 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Mapping, Sequence
 
+from simulator.state_types import State
+
 
 RECEIPT_SCHEMA_VERSION = 1
 RECEIPT_FILENAME = "engines.local.binding-admission.json"
@@ -1354,7 +1356,7 @@ def binding_admission_run_notice(sim: Any) -> dict[str, Any] | None:
     return {"notices": [dict(notice) for notice in notices]}
 
 
-def version_getter_provenance(getter: Any) -> dict[str, Any]:
+def _version_getter_state(getter: Any) -> State[str]:
     try:
         value = getter()
         if (
@@ -1363,17 +1365,18 @@ def version_getter_provenance(getter: Any) -> dict[str, Any]:
             or str(value).strip().lower() == "unavailable"
         ):
             raise ValueError("empty version")
-        return {
-            "tag": "value",
-            "value": str(value).strip(),
-            "reason": None,
-        }
+        return State.of(str(value).strip())
     except Exception as exc:  # noqa: BLE001 - version is provenance only
-        return {
-            "tag": "unknown",
-            "value": None,
-            "reason": f"version getter failed: {type(exc).__name__}",
-        }
+        return State.unknown(f"version getter failed: {type(exc).__name__}")
+
+
+def version_getter_provenance(getter: Any) -> dict[str, Any]:
+    state = _version_getter_state(getter)
+    return {
+        "tag": state.tag.value,
+        "value": state.value,
+        "reason": state.reason,
+    }
 
 
 def install_provenance(
