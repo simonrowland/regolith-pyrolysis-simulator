@@ -181,19 +181,32 @@ def _four_strata_family(
             "participants": missing_enthalpy,
         }
     else:
-        # Controller source ruling: Cu-020's unsigned printed 1600 K tail
-        # cannot supply reaction heat. A same-table sign repair removes this
-        # missing node and makes the row complete through this same predicate.
+        # A retained hole inside the printed grid makes interpolation refuse.
+        # Decide dormancy before runtime for every table, without bridging the
+        # hole. Blank rows outside the usable grid do not enter its brackets.
+        # A source repair removes the hole and activates the same row.
         for participant_formula, record in species_thermo.items():
-            if (record.get("record_id") == "Cu-020"
-                    and 1600.0 in record.get("missing_enthalpy_nodes", ())):
-                dormancy_reason = {
-                    "kind": "missing_printed_formation_enthalpy",
-                    "detail": "ambiguous_printed_sign",
-                    "participant": participant_formula,
-                    "table": "Cu-020",
-                    "temperature_K": 1600.0,
-                }
+            for points_key, missing_key, kind in (
+                ("formation_enthalpy_points", "missing_enthalpy_nodes",
+                 "missing_printed_formation_enthalpy"),
+                ("formation_gibbs_points", "missing_nodes",
+                 "missing_printed_formation_gibbs"),
+            ):
+                grid = [point["T_K"] for point in record.get(points_key, ())]
+                if not grid:
+                    continue
+                node = next((T for T in record.get(missing_key, ())
+                             if min(grid) < T < max(grid)), None)
+                if node is not None:
+                    dormancy_reason = {
+                        "kind": kind,
+                        "detail": "missing_or_ambiguous_printed_node",
+                        "participant": participant_formula,
+                        "table": record["record_id"],
+                        "temperature_K": node,
+                    }
+                    break
+            if dormancy_reason is not None:
                 break
     flux_dormant = dormancy_reason is not None
     source_reaction = dict(reaction)
@@ -299,7 +312,7 @@ def _four_strata_family(
     if dormancy_reason is not None:
         family["physical_properties"]["species"][species_id]["dormancy_reason"] = dormancy_reason
         family["code_metadata"]["hot_train_not_applicable_reason"] = (
-            "missing_printed_formation_enthalpy: " + str(dormancy_reason)
+            dormancy_reason["kind"] + ": " + str(dormancy_reason)
         )
     return family
 

@@ -13584,7 +13584,7 @@ families:
           chemical_family: t1139_generated_carrier
           authority_class: analytical_non_authoritative
           runtime_disposition: status_bearing_non_authoritative
-          flux_dormant: false
+          flux_dormant: true
           retain_analytical_pressure_channel: true
           activity_basis: Li2O
           selected_sources:
@@ -13606,6 +13606,12 @@ families:
             - 100.0
             - 6000.0
           liquid_parent_extension: false
+          dormancy_reason:
+            kind: missing_printed_formation_enthalpy
+            detail: missing_or_ambiguous_printed_node
+            participant: Li2O(l)
+            table: Li-015
+            temperature_K: 1900.0
           validation:
             status: pending_validation
             certification_ceiling: never
@@ -14380,11 +14386,14 @@ families:
     code_metadata:
       formula_id: Li
       source_account: process.cleaned_melt
-      request_rule: trace_source_inventory
+      request_rule: dormant_pending_validation
       solve_group_id: t1139_Li_Li_family
       compatibility_projection: t1139_generated_carriers
       canonical_aliases: []
-      hot_train_applicability: derived_from_condensation_onset
+      hot_train_applicability: not_applicable
+      hot_train_not_applicable_reason: 'missing_printed_formation_enthalpy: {''kind'': ''missing_printed_formation_enthalpy'',
+        ''detail'': ''missing_or_ambiguous_printed_node'', ''participant'': ''Li2O(l)'', ''table'': ''Li-015'',
+        ''temperature_K'': 1900.0}'
   t1139_Li_Li2_family:
     physical_properties:
       species:
@@ -14395,7 +14404,7 @@ families:
           chemical_family: t1139_generated_carrier
           authority_class: analytical_non_authoritative
           runtime_disposition: status_bearing_non_authoritative
-          flux_dormant: false
+          flux_dormant: true
           retain_analytical_pressure_channel: true
           activity_basis: Li2O
           selected_sources:
@@ -14417,6 +14426,12 @@ families:
             - 100.0
             - 6000.0
           liquid_parent_extension: false
+          dormancy_reason:
+            kind: missing_printed_formation_enthalpy
+            detail: missing_or_ambiguous_printed_node
+            participant: Li2O(l)
+            table: Li-015
+            temperature_K: 1900.0
           validation:
             status: pending_validation
             certification_ceiling: never
@@ -14983,11 +14998,14 @@ families:
     code_metadata:
       formula_id: Li2
       source_account: process.cleaned_melt
-      request_rule: trace_source_inventory
+      request_rule: dormant_pending_validation
       solve_group_id: t1139_Li_Li2_family
       compatibility_projection: t1139_generated_carriers
       canonical_aliases: []
-      hot_train_applicability: derived_from_condensation_onset
+      hot_train_applicability: not_applicable
+      hot_train_not_applicable_reason: 'missing_printed_formation_enthalpy: {''kind'': ''missing_printed_formation_enthalpy'',
+        ''detail'': ''missing_or_ambiguous_printed_node'', ''participant'': ''Li2O(l)'', ''table'': ''Li-015'',
+        ''temperature_K'': 1900.0}'
   t1139_Li_Li2O_family:
     physical_properties:
       species:
@@ -14998,7 +15016,7 @@ families:
           chemical_family: t1139_generated_carrier
           authority_class: analytical_non_authoritative
           runtime_disposition: status_bearing_non_authoritative
-          flux_dormant: false
+          flux_dormant: true
           retain_analytical_pressure_channel: true
           activity_basis: Li2O
           selected_sources:
@@ -15015,6 +15033,12 @@ families:
             - 100.0
             - 6000.0
           liquid_parent_extension: false
+          dormancy_reason:
+            kind: missing_printed_formation_enthalpy
+            detail: missing_or_ambiguous_printed_node
+            participant: Li2O(l)
+            table: Li-015
+            temperature_K: 1900.0
           validation:
             status: pending_validation
             certification_ceiling: never
@@ -15437,11 +15461,14 @@ families:
     code_metadata:
       formula_id: Li2O
       source_account: process.cleaned_melt
-      request_rule: trace_source_inventory
+      request_rule: dormant_pending_validation
       solve_group_id: t1139_Li_Li2O_family
       compatibility_projection: t1139_generated_carriers
       canonical_aliases: []
-      hot_train_applicability: derived_from_condensation_onset
+      hot_train_applicability: not_applicable
+      hot_train_not_applicable_reason: 'missing_printed_formation_enthalpy: {''kind'': ''missing_printed_formation_enthalpy'',
+        ''detail'': ''missing_or_ambiguous_printed_node'', ''participant'': ''Li2O(l)'', ''table'': ''Li-015'',
+        ''temperature_K'': 1900.0}'
   t1139_Li_Li2O2_family:
     physical_properties:
       species:
@@ -15452,7 +15479,7 @@ families:
           chemical_family: t1139_generated_carrier
           authority_class: analytical_non_authoritative
           runtime_disposition: status_bearing_non_authoritative
-          flux_dormant: false
+          flux_dormant: true
           retain_analytical_pressure_channel: true
           activity_basis: Li2O
           selected_sources:
@@ -15474,6 +15501,12 @@ families:
             - 100.0
             - 6000.0
           liquid_parent_extension: false
+          dormancy_reason:
+            kind: missing_printed_formation_enthalpy
+            detail: missing_or_ambiguous_printed_node
+            participant: Li2O(l)
+            table: Li-015
+            temperature_K: 1900.0
           validation:
             status: pending_validation
             certification_ceiling: never
@@ -16040,11 +16073,14 @@ families:
     code_metadata:
       formula_id: Li2O2
       source_account: process.cleaned_melt
-      request_rule: trace_source_inventory
+      request_rule: dormant_pending_validation
       solve_group_id: t1139_Li_Li2O2_family
       compatibility_projection: t1139_generated_carriers
       canonical_aliases: []
-      hot_train_applicability: derived_from_condensation_onset
+      hot_train_applicability: not_applicable
+      hot_train_not_applicable_reason: 'missing_printed_formation_enthalpy: {''kind'': ''missing_printed_formation_enthalpy'',
+        ''detail'': ''missing_or_ambiguous_printed_node'', ''participant'': ''Li2O(l)'', ''table'': ''Li-015'',
+        ''temperature_K'': 1900.0}'
   t1139_Li_LiO_family:
     physical_properties:
       species:
@@ -16055,7 +16091,7 @@ families:
           chemical_family: t1139_generated_carrier
           authority_class: analytical_non_authoritative
           runtime_disposition: status_bearing_non_authoritative
-          flux_dormant: false
+          flux_dormant: true
           retain_analytical_pressure_channel: true
           activity_basis: Li2O
           selected_sources:
@@ -16077,6 +16113,12 @@ families:
             - 100.0
             - 6000.0
           liquid_parent_extension: false
+          dormancy_reason:
+            kind: missing_printed_formation_enthalpy
+            detail: missing_or_ambiguous_printed_node
+            participant: Li2O(l)
+            table: Li-015
+            temperature_K: 1900.0
           validation:
             status: pending_validation
             certification_ceiling: never
@@ -16643,11 +16685,14 @@ families:
     code_metadata:
       formula_id: LiO
       source_account: process.cleaned_melt
-      request_rule: trace_source_inventory
+      request_rule: dormant_pending_validation
       solve_group_id: t1139_Li_LiO_family
       compatibility_projection: t1139_generated_carriers
       canonical_aliases: []
-      hot_train_applicability: derived_from_condensation_onset
+      hot_train_applicability: not_applicable
+      hot_train_not_applicable_reason: 'missing_printed_formation_enthalpy: {''kind'': ''missing_printed_formation_enthalpy'',
+        ''detail'': ''missing_or_ambiguous_printed_node'', ''participant'': ''Li2O(l)'', ''table'': ''Li-015'',
+        ''temperature_K'': 1900.0}'
   t1139_V_V_family:
     physical_properties:
       species:
@@ -16658,7 +16703,7 @@ families:
           chemical_family: t1139_generated_carrier
           authority_class: analytical_non_authoritative
           runtime_disposition: status_bearing_non_authoritative
-          flux_dormant: false
+          flux_dormant: true
           retain_analytical_pressure_channel: true
           activity_basis: V2O3
           selected_sources:
@@ -16680,6 +16725,12 @@ families:
             - 100.0
             - 6000.0
           liquid_parent_extension: false
+          dormancy_reason:
+            kind: missing_printed_formation_enthalpy
+            detail: missing_or_ambiguous_printed_node
+            participant: V2O3(l)
+            table: O-063
+            temperature_K: 2400.0
           validation:
             status: pending_validation
             certification_ceiling: never
@@ -17454,11 +17505,14 @@ families:
     code_metadata:
       formula_id: V
       source_account: process.cleaned_melt
-      request_rule: trace_source_inventory
+      request_rule: dormant_pending_validation
       solve_group_id: t1139_V_V_family
       compatibility_projection: t1139_generated_carriers
       canonical_aliases: []
-      hot_train_applicability: derived_from_condensation_onset
+      hot_train_applicability: not_applicable
+      hot_train_not_applicable_reason: 'missing_printed_formation_enthalpy: {''kind'': ''missing_printed_formation_enthalpy'',
+        ''detail'': ''missing_or_ambiguous_printed_node'', ''participant'': ''V2O3(l)'', ''table'': ''O-063'',
+        ''temperature_K'': 2400.0}'
   t1139_V_V4O10_family:
     physical_properties:
       species:
@@ -17705,7 +17759,7 @@ families:
           chemical_family: t1139_generated_carrier
           authority_class: analytical_non_authoritative
           runtime_disposition: status_bearing_non_authoritative
-          flux_dormant: false
+          flux_dormant: true
           retain_analytical_pressure_channel: true
           activity_basis: V2O3
           selected_sources:
@@ -17727,6 +17781,12 @@ families:
             - 100.0
             - 6000.0
           liquid_parent_extension: false
+          dormancy_reason:
+            kind: missing_printed_formation_enthalpy
+            detail: missing_or_ambiguous_printed_node
+            participant: V2O3(l)
+            table: O-063
+            temperature_K: 2400.0
           validation:
             status: pending_validation
             certification_ceiling: never
@@ -18293,11 +18353,14 @@ families:
     code_metadata:
       formula_id: VO
       source_account: process.cleaned_melt
-      request_rule: trace_source_inventory
+      request_rule: dormant_pending_validation
       solve_group_id: t1139_V_VO_family
       compatibility_projection: t1139_generated_carriers
       canonical_aliases: []
-      hot_train_applicability: derived_from_condensation_onset
+      hot_train_applicability: not_applicable
+      hot_train_not_applicable_reason: 'missing_printed_formation_enthalpy: {''kind'': ''missing_printed_formation_enthalpy'',
+        ''detail'': ''missing_or_ambiguous_printed_node'', ''participant'': ''V2O3(l)'', ''table'': ''O-063'',
+        ''temperature_K'': 2400.0}'
   t1139_V_VO2_family:
     physical_properties:
       species:
@@ -18308,7 +18371,7 @@ families:
           chemical_family: t1139_generated_carrier
           authority_class: analytical_non_authoritative
           runtime_disposition: status_bearing_non_authoritative
-          flux_dormant: false
+          flux_dormant: true
           retain_analytical_pressure_channel: true
           activity_basis: V2O3
           selected_sources:
@@ -18330,6 +18393,12 @@ families:
             - 100.0
             - 6000.0
           liquid_parent_extension: false
+          dormancy_reason:
+            kind: missing_printed_formation_enthalpy
+            detail: missing_or_ambiguous_printed_node
+            participant: V2O3(l)
+            table: O-063
+            temperature_K: 2400.0
           validation:
             status: pending_validation
             certification_ceiling: never
@@ -18896,11 +18965,14 @@ families:
     code_metadata:
       formula_id: VO2
       source_account: process.cleaned_melt
-      request_rule: trace_source_inventory
+      request_rule: dormant_pending_validation
       solve_group_id: t1139_V_VO2_family
       compatibility_projection: t1139_generated_carriers
       canonical_aliases: []
-      hot_train_applicability: derived_from_condensation_onset
+      hot_train_applicability: not_applicable
+      hot_train_not_applicable_reason: 'missing_printed_formation_enthalpy: {''kind'': ''missing_printed_formation_enthalpy'',
+        ''detail'': ''missing_or_ambiguous_printed_node'', ''participant'': ''V2O3(l)'', ''table'': ''O-063'',
+        ''temperature_K'': 2400.0}'
   t1139_Cu_Cu_family:
     physical_properties:
       species:
@@ -18935,7 +19007,7 @@ families:
           liquid_parent_extension: false
           dormancy_reason:
             kind: missing_printed_formation_enthalpy
-            detail: ambiguous_printed_sign
+            detail: missing_or_ambiguous_printed_node
             participant: Cu2O(l)
             table: Cu-020
             temperature_K: 1600.0
@@ -19639,8 +19711,8 @@ families:
       canonical_aliases: []
       hot_train_applicability: not_applicable
       hot_train_not_applicable_reason: 'missing_printed_formation_enthalpy: {''kind'': ''missing_printed_formation_enthalpy'',
-        ''detail'': ''ambiguous_printed_sign'', ''participant'': ''Cu2O(l)'', ''table'': ''Cu-020'', ''temperature_K'':
-        1600.0}'
+        ''detail'': ''missing_or_ambiguous_printed_node'', ''participant'': ''Cu2O(l)'', ''table'': ''Cu-020'',
+        ''temperature_K'': 1600.0}'
   t1139_Cu_Cu2_family:
     physical_properties:
       species:
@@ -19675,7 +19747,7 @@ families:
           liquid_parent_extension: false
           dormancy_reason:
             kind: missing_printed_formation_enthalpy
-            detail: ambiguous_printed_sign
+            detail: missing_or_ambiguous_printed_node
             participant: Cu2O(l)
             table: Cu-020
             temperature_K: 1600.0
@@ -20211,8 +20283,8 @@ families:
       canonical_aliases: []
       hot_train_applicability: not_applicable
       hot_train_not_applicable_reason: 'missing_printed_formation_enthalpy: {''kind'': ''missing_printed_formation_enthalpy'',
-        ''detail'': ''ambiguous_printed_sign'', ''participant'': ''Cu2O(l)'', ''table'': ''Cu-020'', ''temperature_K'':
-        1600.0}'
+        ''detail'': ''missing_or_ambiguous_printed_node'', ''participant'': ''Cu2O(l)'', ''table'': ''Cu-020'',
+        ''temperature_K'': 1600.0}'
   t1139_Cu_CuO_family:
     physical_properties:
       species:
@@ -20247,7 +20319,7 @@ families:
           liquid_parent_extension: false
           dormancy_reason:
             kind: missing_printed_formation_enthalpy
-            detail: ambiguous_printed_sign
+            detail: missing_or_ambiguous_printed_node
             participant: Cu2O(l)
             table: Cu-020
             temperature_K: 1600.0
@@ -20783,8 +20855,8 @@ families:
       canonical_aliases: []
       hot_train_applicability: not_applicable
       hot_train_not_applicable_reason: 'missing_printed_formation_enthalpy: {''kind'': ''missing_printed_formation_enthalpy'',
-        ''detail'': ''ambiguous_printed_sign'', ''participant'': ''Cu2O(l)'', ''table'': ''Cu-020'', ''temperature_K'':
-        1600.0}'
+        ''detail'': ''missing_or_ambiguous_printed_node'', ''participant'': ''Cu2O(l)'', ''table'': ''Cu-020'',
+        ''temperature_K'': 1600.0}'
   t1139_B_B_family:
     physical_properties:
       species:
@@ -20795,7 +20867,7 @@ families:
           chemical_family: t1139_generated_carrier
           authority_class: analytical_non_authoritative
           runtime_disposition: status_bearing_non_authoritative
-          flux_dormant: false
+          flux_dormant: true
           retain_analytical_pressure_channel: true
           activity_basis: B2O3
           selected_sources:
@@ -20817,6 +20889,12 @@ families:
             - 100.0
             - 6000.0
           liquid_parent_extension: false
+          dormancy_reason:
+            kind: missing_printed_formation_enthalpy
+            detail: missing_or_ambiguous_printed_node
+            participant: B2O3(l)
+            table: B-096
+            temperature_K: 800.0
           validation:
             status: pending_validation
             certification_ceiling: never
@@ -21554,11 +21632,14 @@ families:
     code_metadata:
       formula_id: B
       source_account: process.cleaned_melt
-      request_rule: trace_source_inventory
+      request_rule: dormant_pending_validation
       solve_group_id: t1139_B_B_family
       compatibility_projection: t1139_generated_carriers
       canonical_aliases: []
-      hot_train_applicability: derived_from_condensation_onset
+      hot_train_applicability: not_applicable
+      hot_train_not_applicable_reason: 'missing_printed_formation_enthalpy: {''kind'': ''missing_printed_formation_enthalpy'',
+        ''detail'': ''missing_or_ambiguous_printed_node'', ''participant'': ''B2O3(l)'', ''table'': ''B-096'',
+        ''temperature_K'': 800.0}'
   t1139_B_B2_family:
     physical_properties:
       species:
@@ -21569,7 +21650,7 @@ families:
           chemical_family: t1139_generated_carrier
           authority_class: analytical_non_authoritative
           runtime_disposition: status_bearing_non_authoritative
-          flux_dormant: false
+          flux_dormant: true
           retain_analytical_pressure_channel: true
           activity_basis: B2O3
           selected_sources:
@@ -21591,6 +21672,12 @@ families:
             - 100.0
             - 6000.0
           liquid_parent_extension: false
+          dormancy_reason:
+            kind: missing_printed_formation_enthalpy
+            detail: missing_or_ambiguous_printed_node
+            participant: B2O3(l)
+            table: B-096
+            temperature_K: 800.0
           validation:
             status: pending_validation
             certification_ceiling: never
@@ -22138,11 +22225,14 @@ families:
     code_metadata:
       formula_id: B2
       source_account: process.cleaned_melt
-      request_rule: trace_source_inventory
+      request_rule: dormant_pending_validation
       solve_group_id: t1139_B_B2_family
       compatibility_projection: t1139_generated_carriers
       canonical_aliases: []
-      hot_train_applicability: derived_from_condensation_onset
+      hot_train_applicability: not_applicable
+      hot_train_not_applicable_reason: 'missing_printed_formation_enthalpy: {''kind'': ''missing_printed_formation_enthalpy'',
+        ''detail'': ''missing_or_ambiguous_printed_node'', ''participant'': ''B2O3(l)'', ''table'': ''B-096'',
+        ''temperature_K'': 800.0}'
   t1139_B_B2O_family:
     physical_properties:
       species:
@@ -22153,7 +22243,7 @@ families:
           chemical_family: t1139_generated_carrier
           authority_class: analytical_non_authoritative
           runtime_disposition: status_bearing_non_authoritative
-          flux_dormant: false
+          flux_dormant: true
           retain_analytical_pressure_channel: true
           activity_basis: B2O3
           selected_sources:
@@ -22175,6 +22265,12 @@ families:
             - 100.0
             - 6000.0
           liquid_parent_extension: false
+          dormancy_reason:
+            kind: missing_printed_formation_enthalpy
+            detail: missing_or_ambiguous_printed_node
+            participant: B2O3(l)
+            table: B-096
+            temperature_K: 800.0
           validation:
             status: pending_validation
             certification_ceiling: never
@@ -22722,11 +22818,14 @@ families:
     code_metadata:
       formula_id: B2O
       source_account: process.cleaned_melt
-      request_rule: trace_source_inventory
+      request_rule: dormant_pending_validation
       solve_group_id: t1139_B_B2O_family
       compatibility_projection: t1139_generated_carriers
       canonical_aliases: []
-      hot_train_applicability: derived_from_condensation_onset
+      hot_train_applicability: not_applicable
+      hot_train_not_applicable_reason: 'missing_printed_formation_enthalpy: {''kind'': ''missing_printed_formation_enthalpy'',
+        ''detail'': ''missing_or_ambiguous_printed_node'', ''participant'': ''B2O3(l)'', ''table'': ''B-096'',
+        ''temperature_K'': 800.0}'
   t1139_B_B2O2_family:
     physical_properties:
       species:
@@ -22737,7 +22836,7 @@ families:
           chemical_family: t1139_generated_carrier
           authority_class: analytical_non_authoritative
           runtime_disposition: status_bearing_non_authoritative
-          flux_dormant: false
+          flux_dormant: true
           retain_analytical_pressure_channel: true
           activity_basis: B2O3
           selected_sources:
@@ -22759,6 +22858,12 @@ families:
             - 100.0
             - 6000.0
           liquid_parent_extension: false
+          dormancy_reason:
+            kind: missing_printed_formation_enthalpy
+            detail: missing_or_ambiguous_printed_node
+            participant: B2O3(l)
+            table: B-096
+            temperature_K: 800.0
           validation:
             status: pending_validation
             certification_ceiling: never
@@ -23306,11 +23411,14 @@ families:
     code_metadata:
       formula_id: B2O2
       source_account: process.cleaned_melt
-      request_rule: trace_source_inventory
+      request_rule: dormant_pending_validation
       solve_group_id: t1139_B_B2O2_family
       compatibility_projection: t1139_generated_carriers
       canonical_aliases: []
-      hot_train_applicability: derived_from_condensation_onset
+      hot_train_applicability: not_applicable
+      hot_train_not_applicable_reason: 'missing_printed_formation_enthalpy: {''kind'': ''missing_printed_formation_enthalpy'',
+        ''detail'': ''missing_or_ambiguous_printed_node'', ''participant'': ''B2O3(l)'', ''table'': ''B-096'',
+        ''temperature_K'': 800.0}'
   t1139_B_B2O3_family:
     physical_properties:
       species:
@@ -23321,7 +23429,7 @@ families:
           chemical_family: t1139_generated_carrier
           authority_class: analytical_non_authoritative
           runtime_disposition: status_bearing_non_authoritative
-          flux_dormant: false
+          flux_dormant: true
           retain_analytical_pressure_channel: true
           activity_basis: B2O3
           selected_sources:
@@ -23338,6 +23446,12 @@ families:
             - 100.0
             - 6000.0
           liquid_parent_extension: false
+          dormancy_reason:
+            kind: missing_printed_formation_enthalpy
+            detail: missing_or_ambiguous_printed_node
+            participant: B2O3(l)
+            table: B-096
+            temperature_K: 800.0
           validation:
             status: pending_validation
             certification_ceiling: never
@@ -23741,11 +23855,14 @@ families:
     code_metadata:
       formula_id: B2O3
       source_account: process.cleaned_melt
-      request_rule: trace_source_inventory
+      request_rule: dormant_pending_validation
       solve_group_id: t1139_B_B2O3_family
       compatibility_projection: t1139_generated_carriers
       canonical_aliases: []
-      hot_train_applicability: derived_from_condensation_onset
+      hot_train_applicability: not_applicable
+      hot_train_not_applicable_reason: 'missing_printed_formation_enthalpy: {''kind'': ''missing_printed_formation_enthalpy'',
+        ''detail'': ''missing_or_ambiguous_printed_node'', ''participant'': ''B2O3(l)'', ''table'': ''B-096'',
+        ''temperature_K'': 800.0}'
   t1139_B_BO_family:
     physical_properties:
       species:
@@ -23756,7 +23873,7 @@ families:
           chemical_family: t1139_generated_carrier
           authority_class: analytical_non_authoritative
           runtime_disposition: status_bearing_non_authoritative
-          flux_dormant: false
+          flux_dormant: true
           retain_analytical_pressure_channel: true
           activity_basis: B2O3
           selected_sources:
@@ -23778,6 +23895,12 @@ families:
             - 100.0
             - 6000.0
           liquid_parent_extension: false
+          dormancy_reason:
+            kind: missing_printed_formation_enthalpy
+            detail: missing_or_ambiguous_printed_node
+            participant: B2O3(l)
+            table: B-096
+            temperature_K: 800.0
           validation:
             status: pending_validation
             certification_ceiling: never
@@ -24325,11 +24448,14 @@ families:
     code_metadata:
       formula_id: BO
       source_account: process.cleaned_melt
-      request_rule: trace_source_inventory
+      request_rule: dormant_pending_validation
       solve_group_id: t1139_B_BO_family
       compatibility_projection: t1139_generated_carriers
       canonical_aliases: []
-      hot_train_applicability: derived_from_condensation_onset
+      hot_train_applicability: not_applicable
+      hot_train_not_applicable_reason: 'missing_printed_formation_enthalpy: {''kind'': ''missing_printed_formation_enthalpy'',
+        ''detail'': ''missing_or_ambiguous_printed_node'', ''participant'': ''B2O3(l)'', ''table'': ''B-096'',
+        ''temperature_K'': 800.0}'
   t1139_B_BO2_family:
     physical_properties:
       species:
@@ -24340,7 +24466,7 @@ families:
           chemical_family: t1139_generated_carrier
           authority_class: analytical_non_authoritative
           runtime_disposition: status_bearing_non_authoritative
-          flux_dormant: false
+          flux_dormant: true
           retain_analytical_pressure_channel: true
           activity_basis: B2O3
           selected_sources:
@@ -24362,6 +24488,12 @@ families:
             - 100.0
             - 6000.0
           liquid_parent_extension: false
+          dormancy_reason:
+            kind: missing_printed_formation_enthalpy
+            detail: missing_or_ambiguous_printed_node
+            participant: B2O3(l)
+            table: B-096
+            temperature_K: 800.0
           validation:
             status: pending_validation
             certification_ceiling: never
@@ -24909,11 +25041,14 @@ families:
     code_metadata:
       formula_id: BO2
       source_account: process.cleaned_melt
-      request_rule: trace_source_inventory
+      request_rule: dormant_pending_validation
       solve_group_id: t1139_B_BO2_family
       compatibility_projection: t1139_generated_carriers
       canonical_aliases: []
-      hot_train_applicability: derived_from_condensation_onset
+      hot_train_applicability: not_applicable
+      hot_train_not_applicable_reason: 'missing_printed_formation_enthalpy: {''kind'': ''missing_printed_formation_enthalpy'',
+        ''detail'': ''missing_or_ambiguous_printed_node'', ''participant'': ''B2O3(l)'', ''table'': ''B-096'',
+        ''temperature_K'': 800.0}'
   t1139_Cs_Cs_family:
     physical_properties:
       species:
@@ -28340,7 +28475,7 @@ families:
           chemical_family: t1139_generated_carrier
           authority_class: analytical_non_authoritative
           runtime_disposition: status_bearing_non_authoritative
-          flux_dormant: false
+          flux_dormant: true
           retain_analytical_pressure_channel: true
           activity_basis: PbO
           selected_sources:
@@ -28362,6 +28497,12 @@ families:
             - 100.0
             - 6000.0
           liquid_parent_extension: false
+          dormancy_reason:
+            kind: missing_printed_formation_enthalpy
+            detail: missing_or_ambiguous_printed_node
+            participant: PbO(l)
+            table: O-007
+            temperature_K: 1200.0
           validation:
             status: pending_validation
             certification_ceiling: never
@@ -29076,11 +29217,14 @@ families:
     code_metadata:
       formula_id: Pb
       source_account: process.cleaned_melt
-      request_rule: trace_source_inventory
+      request_rule: dormant_pending_validation
       solve_group_id: t1139_Pb_Pb_family
       compatibility_projection: t1139_generated_carriers
       canonical_aliases: []
-      hot_train_applicability: derived_from_condensation_onset
+      hot_train_applicability: not_applicable
+      hot_train_not_applicable_reason: 'missing_printed_formation_enthalpy: {''kind'': ''missing_printed_formation_enthalpy'',
+        ''detail'': ''missing_or_ambiguous_printed_node'', ''participant'': ''PbO(l)'', ''table'': ''O-007'',
+        ''temperature_K'': 1200.0}'
   t1139_Pb_PbO_family:
     physical_properties:
       species:
@@ -29091,7 +29235,7 @@ families:
           chemical_family: t1139_generated_carrier
           authority_class: analytical_non_authoritative
           runtime_disposition: status_bearing_non_authoritative
-          flux_dormant: false
+          flux_dormant: true
           retain_analytical_pressure_channel: true
           activity_basis: PbO
           selected_sources:
@@ -29108,6 +29252,12 @@ families:
             - 100.0
             - 6000.0
           liquid_parent_extension: false
+          dormancy_reason:
+            kind: missing_printed_formation_enthalpy
+            detail: missing_or_ambiguous_printed_node
+            participant: PbO(l)
+            table: O-007
+            temperature_K: 1200.0
           validation:
             status: pending_validation
             certification_ceiling: never
@@ -29500,11 +29650,14 @@ families:
     code_metadata:
       formula_id: PbO
       source_account: process.cleaned_melt
-      request_rule: trace_source_inventory
+      request_rule: dormant_pending_validation
       solve_group_id: t1139_Pb_PbO_family
       compatibility_projection: t1139_generated_carriers
       canonical_aliases: []
-      hot_train_applicability: derived_from_condensation_onset
+      hot_train_applicability: not_applicable
+      hot_train_not_applicable_reason: 'missing_printed_formation_enthalpy: {''kind'': ''missing_printed_formation_enthalpy'',
+        ''detail'': ''missing_or_ambiguous_printed_node'', ''participant'': ''PbO(l)'', ''table'': ''O-007'',
+        ''temperature_K'': 1200.0}'
   t1139_Pb_PbO2_family:
     physical_properties:
       species:

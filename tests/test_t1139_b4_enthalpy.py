@@ -206,3 +206,51 @@ def test_generator_types_dormancy_when_source_prints_no_enthalpy(monkeypatch):
         assert row["flux_dormant"]
         assert row["dormancy_reason"]["kind"] == "missing_printed_formation_enthalpy"
         assert row["dormancy_reason"]["participants"]
+
+
+@pytest.mark.parametrize("column,missing_key,kind", [
+    ("formation_enthalpy_points", "missing_enthalpy_nodes",
+     "missing_printed_formation_enthalpy"),
+    ("formation_gibbs_points", "missing_nodes", "missing_printed_formation_gibbs"),
+])
+def test_generated_activation_follows_repaired_printed_nodes(column, missing_key, kind):
+    from copy import deepcopy
+    from simulator.vapour_rail.channel_generator import _four_strata_family
+
+    channel = next(c for c in generate_first_batch().channels if c.species_id == "Pb")
+    row = channel.family["physical_properties"]["species"][channel.species_id]
+    model = row["pressure_models"][0]
+    thermo = deepcopy(model["species_thermo"])
+    # Remove an actually printed node, then restore that exact source value.
+    # Clear the unrelated existing H sign hole to isolate the column under test.
+    parent = thermo["PbO(l)"]
+    parent["missing_enthalpy_nodes"] = []
+    original_points = deepcopy(parent[column])
+    point = next(p for p in original_points if p["T_K"] == 1400.0)
+    parent[column] = [p for p in original_points if p["T_K"] != point["T_K"]]
+    parent[missing_key] = [100.0, 200.0, point["T_K"]]
+
+    def generate():
+        return _four_strata_family(
+            species_id=channel.species_id, element=channel.element,
+            carrier=channel.carrier, formula=row["formula"],
+            parent_oxide=channel.parent_oxide, activity_basis=channel.activity_basis,
+            reaction=row["source_reactions"][0], species_thermo=thermo,
+            evaluator_family=model["evaluator_family"],
+            domain=tuple(model["valid_domain"]["temperature_K"]),
+            selected_sources=channel.selected_sources, native_phases=channel.native_phases,
+            bands_K=channel.bands_K,
+            oxide_per_vapor=channel.family["fiat_routing"]["compatibility_fields"]["stoich_oxide_per_vapor"],
+            o2_per_vapor=channel.family["fiat_routing"]["compatibility_fields"]["stoich_O2_per_vapor"],
+            vapor_oxygen_atoms=0.0,
+        )["physical_properties"]["species"][channel.species_id]
+
+    dormant = generate()
+    assert dormant["flux_dormant"]
+    assert dormant["dormancy_reason"] == {
+        "kind": kind, "detail": "missing_or_ambiguous_printed_node",
+        "participant": "PbO(l)", "table": "O-007", "temperature_K": 1400.0,
+    }
+    parent[column] = original_points
+    parent[missing_key] = [100.0, 200.0]
+    assert not generate()["flux_dormant"]

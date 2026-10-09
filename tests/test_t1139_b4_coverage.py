@@ -26,11 +26,20 @@ def test_every_manifest_pair_is_evaluated_or_a_typed_gap(coverage):
     manifest = load_demand_manifest()
     assert len(pairs) == len(manifest["pairs"]) == 1874
     _assert_manifest_coverage(pairs, manifest)
-    for carrier in ("Cu", "Cu2", "CuO"):
-        row = next(p for p in pairs if p["element"] == "Cu" and p["carrier"] == carrier)
+    for element, carrier, table, temperature in (
+        ("Cu", "Cu", "Cu-020", 1600.0),
+        ("Cu", "Cu2", "Cu-020", 1600.0),
+        ("Cu", "CuO", "Cu-020", 1600.0),
+        ("Pb", "Pb", "O-007", 1200.0),
+        ("Pb", "PbO", "O-007", 1200.0),
+        ("B", "BO2", "B-096", 800.0),
+        ("V", "VO", "O-063", 2400.0),
+        ("Li", "Li", "Li-015", 1900.0),
+    ):
+        row = next(p for p in pairs if p["element"] == element and p["carrier"] == carrier)
         assert row["path"] == "typed_gap"
-        assert row["reasons"][0]["table"] == "Cu-020"
-        assert row["reasons"][0]["temperature_K"] == 1600.0
+        assert row["reasons"][0]["table"] == table
+        assert row["reasons"][0]["temperature_K"] == temperature
 
 
 def test_gate_rejects_a_silent_omission(coverage):

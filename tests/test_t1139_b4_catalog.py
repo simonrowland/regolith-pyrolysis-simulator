@@ -22,11 +22,18 @@ def test_generated_rows_are_inserted_in_the_production_catalog():
         row = family["physical_properties"]["species"][species_id]
         if row["flux_dormant"]:
             assert compiled.code_metadata.request_rule == "dormant_pending_validation"
-            assert row["dormancy_reason"]["table"] == "Cu-020"
-            assert row["dormancy_reason"]["temperature_K"] == 1600.0
+            reason = row["dormancy_reason"]
+            assert reason["kind"] in {
+                "missing_printed_formation_enthalpy", "missing_printed_formation_gibbs",
+            }
+            record = row["pressure_models"][0]["species_thermo"][reason["participant"]]
+            assert reason["table"] == record["record_id"]
+            nodes = record["missing_enthalpy_nodes" if reason["kind"].endswith("enthalpy")
+                           else "missing_nodes"]
+            assert reason["temperature_K"] in nodes
         else:
             assert compiled.code_metadata.request_rule == "trace_source_inventory"
         assert compiled.code_metadata.source_account == "process.cleaned_melt"
         assert compiled.source_reaction_activity.allow_henrian_upper_bound
     assert sum(not next(iter(f["physical_properties"]["species"].values()))["flux_dormant"]
-               for f in actual.values()) == 42
+               for f in actual.values()) == 25
