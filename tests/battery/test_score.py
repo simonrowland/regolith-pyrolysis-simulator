@@ -5473,6 +5473,7 @@ def test_unknown_polymorph_with_multiple_eligible_solid_tables_still_refuses() -
 
 def test_tridymite_fusion_conversion_extrapolation_is_flagged() -> None:
     from simulator.battery.enums import Polymorph
+    from simulator.battery.generators.janaf import JANAF_R_J_PER_MOL_K
     from simulator.battery.score import _fusion_comparison_reference
 
     experiment = F.kems_experiment()
@@ -5510,7 +5511,7 @@ def test_tridymite_fusion_conversion_extrapolation_is_flagged() -> None:
     )
     assert (
         after_comparison.identity.reference_state.value.endmember.phase.value
-        is Phase.L
+        is Phase.CR
     )
     offset_notice = next(
         notice
@@ -5521,6 +5522,25 @@ def test_tridymite_fusion_conversion_extrapolation_is_flagged() -> None:
     assert offset_notice.band == "B1259 common printed H/S band [298.15, 2000.0] K"
     assert "fusion conversion missing input:" in offset_notice.reason
     assert "authority=extrapolated" in offset_notice.reason
+    assert any(
+        "JANAF liquid fusion shift not applied because liquid is natural"
+        in notice.reason
+        for notice in after_comparison.notices
+    )
+    # Freeze the printed 2000 K differences beyond the B1259 band:
+    # ΔH=0.105 kcal/mol and ΔS=0.060 cal/(mol K) at 2001 K.
+    delta_g_tr_J_per_mol = (
+        Decimal("0.105") * Decimal("4184")
+        - Decimal("2001") * Decimal("0.060") * Decimal("4.184")
+    )
+    expected = Decimal("0.3") * (
+        -delta_g_tr_J_per_mol / (JANAF_R_J_PER_MOL_K * Decimal("2001"))
+    ).exp()
+    assert after_comparison.value.point == expected
+    assert (
+        after_comparison.identity.reference_state.value.endmember.polymorph.value
+        is Polymorph.CRISTOBALITE_HIGH
+    )
 
 
 def test_tridymite_fusion_conversion_applies_b1259_offset_to_value() -> None:
@@ -5529,7 +5549,10 @@ def test_tridymite_fusion_conversion_applies_b1259_offset_to_value() -> None:
         JANAF_R_J_PER_MOL_K,
         janaf_fusion_energy,
     )
-    from simulator.battery.score import _fusion_comparison_reference
+    from simulator.battery.score import (
+        _b1259_tridymite_cristobalite_delta_g,
+        _fusion_comparison_reference,
+    )
 
     temperature = Decimal("1900")
     experiment = F.kems_experiment()
@@ -5567,6 +5590,11 @@ def test_tridymite_fusion_conversion_applies_b1259_offset_to_value() -> None:
         "B1259 tridymite→cristobalite offset applied" in notice.reason
         and notice.authority is Authority.CERTIFIED
         for notice in converted.notices
+    )
+    # Linear interpolation between the printed 1800 and 1900 K H/S rows:
+    # ΔH=0.105 kcal/mol and ΔS=0.060 cal/(mol K), so ΔG at 1850 K is −6 cal/mol.
+    assert _b1259_tridymite_cristobalite_delta_g(Decimal("1850"))[0] == Decimal(
+        "-25.104"
     )
 
 

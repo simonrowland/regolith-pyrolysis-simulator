@@ -1253,6 +1253,9 @@ def _b1259_tridymite_cristobalite_delta_g(
     # common printed grid; beyond it use the edge ΔH/ΔS (dCp=0). At 2000 K,
     # dH=0.105 kcal/mol and dS=0.060 cal/(mol K), so dG=−15 cal/mol, matching
     # the printed ΔfG difference (−131.621−(−131.606) kcal/mol) to precision.
+    # At the printed 1743 K tridymite→cristobalite transition the computed
+    # difference is +5.94 J/mol (the two printed ΔfG values tie at precision),
+    # and it is −12.55 J/mol at 1800 K, consistent with the transition crossing.
     # Units: kcal/mol×4184 J/kcal − K×cal/(mol K)×4.184 J/cal = J/mol.
     return delta_h - temperature_K * delta_s, lower, upper, extrapolated
 
@@ -1501,6 +1504,47 @@ def _fusion_comparison_reference(
             )
 
     if temperature_K >= fusion.melting_temperature_K:
+        if tridymite_to_cristobalite:
+            cristobalite_endmember = replace(
+                standard_state.endmember,
+                phase=Phase.CR,
+                polymorph=State.of(Polymorph.CRISTOBALITE_HIGH),
+            )
+            cristobalite_state = replace(
+                standard_state,
+                endmember=cristobalite_endmember,
+            )
+            comparison_identity = replace(
+                identity,
+                reference_state=State.of(cristobalite_state),
+            )
+            corrected_activity = reference.value.point * (
+                tridymite_offset_dex * Decimal(10).ln()
+            ).exp()
+            notice = Notice(
+                kind=NoticeKind.OUT_OF_GAMMA_DOMAIN,
+                affected_quantities=(Quantity.ACTIVITY,),
+                reason=(
+                    f"solid reference recorded at T={temperature_K} K >= "
+                    f"JANAF T_fus={fusion.melting_temperature_K} K; "
+                    "JANAF liquid fusion shift not applied because liquid is "
+                    "natural; B1259 tridymite-to-cristobalite shift applied"
+                ),
+                origin=reference.observation_id,
+                band=(
+                    f"JANAF fusion crossing {fusion.melting_temperature_K} K; "
+                    f"tables={fusion.crystal_table}/{fusion.liquid_table}"
+                ),
+            )
+            return replace(
+                reference,
+                identity=comparison_identity,
+                value=replace(reference.value, point=corrected_activity),
+                notices=union_notices(
+                    reference.notices,
+                    (notice, tridymite_notice),
+                ),
+            )
         notice = Notice(
             kind=NoticeKind.OUT_OF_GAMMA_DOMAIN,
             affected_quantities=(Quantity.ACTIVITY,),
