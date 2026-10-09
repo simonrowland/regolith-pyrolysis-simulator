@@ -29,6 +29,7 @@ from simulator.accounting.exceptions import AccountingError
 from simulator.accounting.formulas import resolve_species_formula
 from simulator.config import (
     DEFAULT_ALPHAMELTS_MODEL,
+    resolve_alphamelts_python_api_model,
     resolve_alphamelts_subprocess_model,
 )
 from simulator.core import PyrolysisSimulator
@@ -249,7 +250,7 @@ class CachedRealConfig:
     corpus_version: str = ""
     interoperable_corpus_versions: tuple[str, ...] = ()
     authorized_backend_version: str = ""
-    authorized_model: str = ""
+    authorized_model: str | None = ""
     authorized_mode: str = ""
     miss_policy: str = "fail-loud"
     cache_tier_ceiling: str = DEFAULT_CACHE_TIER_CEILING
@@ -439,11 +440,23 @@ def normalize_cached_real_config(
     authorized_backend_version = str(
         value.get("authorized_backend_version", "")
     ).strip()
-    authorized_model = str(value.get("authorized_model", "")).strip()
+    raw_authorized_model = value.get("authorized_model", "")
     authorized_mode = str(value.get("authorized_mode", "")).strip()
     if _is_alphamelts_authorized_name(authorized_backend_name):
         authorized_mode = authorized_mode or DEFAULT_ALPHAMELTS_MODE
-        if authorized_mode == DEFAULT_ALPHAMELTS_MODE:
+        if authorized_mode == "python_api":
+            try:
+                resolve_alphamelts_python_api_model(
+                    raw_authorized_model
+                )
+            except ValueError as exc:
+                raise stamp_config_reason(
+                    unavailable_error_cls(str(exc)),
+                    "invalid_run_input",
+                ) from exc
+            authorized_model = raw_authorized_model
+        elif authorized_mode == DEFAULT_ALPHAMELTS_MODE:
+            authorized_model = str(raw_authorized_model).strip()
             try:
                 authorized_model, _ = resolve_alphamelts_subprocess_model(
                     authorized_model
@@ -454,10 +467,14 @@ def normalize_cached_real_config(
                     "invalid_run_input",
                 ) from exc
         else:
+            authorized_model = str(raw_authorized_model).strip()
             authorized_model = authorized_model or DEFAULT_ALPHAMELTS_MODEL
     elif _is_thermoengine_authorized_name(authorized_backend_name):
+        authorized_model = str(raw_authorized_model).strip()
         authorized_model = authorized_model or DEFAULT_ALPHAMELTS_MODEL
         authorized_mode = authorized_mode or 'thermoengine'
+    else:
+        authorized_model = str(raw_authorized_model).strip()
     miss_policy = str(value.get("miss_policy", "fail-loud")).strip().lower()
     miss_policy = miss_policy.replace("_", "-")
     if miss_policy not in CACHED_REAL_MISS_POLICIES:

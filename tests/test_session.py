@@ -9,7 +9,7 @@ import pytest
 import yaml
 
 import simulator.session as session_module
-from simulator.backends import BackendSelectionPolicy
+from simulator.backends import BackendSelectionPolicy, BackendUnavailableError
 from simulator.campaigns import CampaignManager
 from simulator.feedstock_guard import is_blocked_feedstock
 from simulator.session import (
@@ -65,6 +65,44 @@ def test_session_passes_stage0_subprocess_inputs_to_resolver(monkeypatch):
     assert calls[0]["feedstock_id"] == "spinel-feed"
     assert calls[0]["feedstocks"] == {"spinel-feed": {"spinel_rich": True}}
     assert calls[0]["stage0_subprocess_required"] is True
+
+
+@pytest.mark.parametrize(
+    "model",
+    [None, "", "MELTSv1.0.2", "pMELTS", "MELTSv1.1.0", "MELTSv1.2.0"],
+)
+def test_cached_real_python_api_model_session_reaches_build_simulator(
+    tmp_path: Path,
+    monkeypatch,
+    model: str | None,
+) -> None:
+    reached = []
+
+    class ReachedBuildSimulator(Exception):
+        pass
+
+    def stop_at_build_simulator(build_config):
+        reached.append(build_config.backend.config.authorized_model)
+        raise ReachedBuildSimulator
+
+    monkeypatch.setattr(session_module, "build_simulator", stop_at_build_simulator)
+
+    with pytest.raises(ReachedBuildSimulator):
+        SimSession().start(
+            _config(
+                backend_name="cached-real",
+                unavailable_error_cls=BackendUnavailableError,
+                reduced_real_cache={
+                    "db_path": str(tmp_path / "cached-real.db"),
+                    "miss_policy": "fail-loud",
+                    "authorized_backend_name": "alphamelts",
+                    "authorized_mode": "python_api",
+                    "authorized_model": model,
+                },
+            )
+        )
+
+    assert reached == [model]
 
 
 def test_session_rejects_metallic_real_backend_before_resolver(monkeypatch):

@@ -20,7 +20,10 @@ from simulator.chemistry.kernel.capabilities import CapabilityProfile
 from simulator.chemistry.kernel.dto import IntentRequest, IntentResult
 from simulator.chemistry.kernel.provider import ChemistryProvider
 from simulator.corpus_version import current_corpus_version
-from simulator.config import DEFAULT_ALPHAMELTS_MODEL
+from simulator.config import (
+    DEFAULT_ALPHAMELTS_MODEL,
+    resolve_alphamelts_python_api_model,
+)
 from simulator.grind_preflight import GrindSourceGateError
 from simulator.melt_backend.base import (
     EquilibriumResult,
@@ -628,13 +631,19 @@ def _thermoengine_pt0_identity(model: str) -> tuple[dict, dict]:
     return key, authority
 
 
-def _alphamelts_pt0_identity(model: str) -> tuple[dict, dict]:
+def _alphamelts_pt0_identity(
+    model: str,
+    *,
+    mode: str = "subprocess",
+) -> tuple[dict, dict]:
     from simulator.melt_backend.alphamelts import AlphaMELTSBackend
 
     store = PT0DeterminismStore("capture")
     sim = _build_pt0_sim(store)
     backend = AlphaMELTSBackend(model_name=model)
-    backend._mode = "subprocess"
+    backend._mode = mode
+    if mode == "python_api":
+        backend._python_api_model = resolve_alphamelts_python_api_model(model)
     provider = AlphaMELTSProvider(backend=backend)
     sim.backend = backend
     sim._chem_registry.register(
@@ -684,6 +693,105 @@ def test_blank_and_explicit_default_alphamelts_identity_match_field_by_field():
     del blank_non_model_provider["model"]
     del explicit_non_model_provider["model"]
     assert blank_non_model_provider == explicit_non_model_provider
+
+
+@pytest.mark.parametrize(
+    ("model", "expected_identity"),
+    [
+        ("", "alphamelts-diagnostic"),
+        (DEFAULT_ALPHAMELTS_MODEL, DEFAULT_ALPHAMELTS_MODEL),
+        ("pMELTS", "pMELTS"),
+    ],
+)
+def test_python_api_identity_pins_current_model_and_provider_fields(
+    model: str,
+    expected_identity: str,
+) -> None:
+    key, authority = _alphamelts_pt0_identity(model, mode="python_api")
+
+    assert key["model"] == {
+        "model": expected_identity,
+        "mode": "python_api",
+        "magemin_database": None,
+    }
+    assert authority["provider"]["resolved_provider_id"] == (
+        "alphamelts-diagnostic"
+    )
+    assert authority["provider"]["model"] == expected_identity
+
+
+@pytest.mark.parametrize(
+    ("model", "expected_hash"),
+    [
+        (None, "1754e315cc016d162243334396a464d6caed842b252638f80cb532b0ffd7a088"),
+        ("", "b43e6955cdee10f871c8aaceaa9b45eea9524da6d6fc9449f252c9f463281dd9"),
+        (DEFAULT_ALPHAMELTS_MODEL, "7797a4c8de6ca270d6dd2118c5f22fe309175b95e991a70fb108a2a7f66d1645"),
+        ("pMELTS", "632a85c2c53b207343c5b33ff54275f4d610bedfdad9a9d4e2774dee4140f2c5"),
+        ("MELTSv1.1.0", "da91bc89b90ad478d80e727462027fcffa9fd12435c60126dbcb9ffb315249c6"),
+        ("MELTSv1.2.0", "faecc7fca96b82b0121c50de8a431908cfaaccfe79bbe154fee91d5b7135d982"),
+    ],
+)
+def test_python_api_accepted_replay_key_hashes_remain_base_bytes(
+    model: str | None,
+    expected_hash: str,
+) -> None:
+    # Hashes captured by the review probe at base
+    # 05b6309d30cfed84d5e2ecd0467106d5702ce628.
+    key, _authority = _alphamelts_pt0_identity(model, mode="python_api")
+
+    actual_hash = hashlib.sha256(rrd.canonical_json_bytes(key)).hexdigest()
+    assert actual_hash == expected_hash
+
+
+@pytest.mark.parametrize(
+    ("model", "expected_hash"),
+    [
+        (None, "1754e315cc016d162243334396a464d6caed842b252638f80cb532b0ffd7a088"),
+        ("", "7797a4c8de6ca270d6dd2118c5f22fe309175b95e991a70fb108a2a7f66d1645"),
+        (DEFAULT_ALPHAMELTS_MODEL, "7797a4c8de6ca270d6dd2118c5f22fe309175b95e991a70fb108a2a7f66d1645"),
+        ("pMELTS", "632a85c2c53b207343c5b33ff54275f4d610bedfdad9a9d4e2774dee4140f2c5"),
+        ("MELTSv1.1.0", "da91bc89b90ad478d80e727462027fcffa9fd12435c60126dbcb9ffb315249c6"),
+        ("MELTSv1.2.0", "faecc7fca96b82b0121c50de8a431908cfaaccfe79bbe154fee91d5b7135d982"),
+    ],
+)
+def test_cached_real_python_api_replay_key_hashes_remain_base_bytes(
+    tmp_path: Path,
+    model: str | None,
+    expected_hash: str,
+) -> None:
+    from simulator.backends import CachedRealBackend, normalize_cached_real_config
+
+    config = normalize_cached_real_config(
+        {
+            "db_path": str(tmp_path / "identity.db"),
+            "miss_policy": "fail-loud",
+            "authorized_backend_name": "alphamelts",
+            "authorized_mode": "python_api",
+            "authorized_model": model,
+        }
+    )
+    store = PT0DeterminismStore("capture")
+    sim = _build_pt0_sim(None)
+    sim.backend = CachedRealBackend(config=config)
+    sim._chem_registry.replace_for_test(
+        ChemistryIntent.SILICATE_EQUILIBRIUM,
+        None,
+    )
+
+    key = store._equilibrium_key(sim)
+    actual_hash = hashlib.sha256(rrd.canonical_json_bytes(key)).hexdigest()
+
+    # Base 05b6309d30cfed84d5e2ecd0467106d5702ce628 reviewer probe.
+    assert actual_hash == expected_hash
+    if model is None:
+        live_key, _authority = _alphamelts_pt0_identity(
+            model,
+            mode="python_api",
+        )
+        assert key == live_key
+        payload = {"authority": _alphamelts_record_authority()}
+        store._store("equilibrium_post_record", live_key, payload)
+        assert store._lookup("equilibrium_post_record", key) == payload
 
 
 def test_blank_thermoengine_model_resolves_to_default_in_pt0_identity() -> None:

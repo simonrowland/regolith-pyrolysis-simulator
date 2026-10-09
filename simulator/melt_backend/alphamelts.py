@@ -64,6 +64,7 @@ from simulator.accounting.formulas import (
 from simulator.accounting.exceptions import UnknownSpeciesError
 from simulator.config import (
     DEFAULT_ALPHAMELTS_MODEL,
+    resolve_alphamelts_python_api_model,
     resolve_alphamelts_subprocess_model,
 )
 from simulator.melt_backend.base import (
@@ -934,7 +935,9 @@ class _MELTSBackendSupport(MeltBackend):
         self._redox_buffer: Optional[str] = None
         self._fo2_offset: Optional[float] = None
         self._fe3fet_ratio: Optional[float] = None
+        self._raw_model_name = model_name
         self._model = str(model_name)
+        self._python_api_model: tuple[str, int] | None = None
         self._timeout_s = ALPHAMELTS_DEFAULT_TIMEOUT_S
         self._last_normalization_warnings: List[str] = []
         self._vapor_pressure_table: Optional[dict] = None
@@ -962,6 +965,7 @@ class _MELTSBackendSupport(MeltBackend):
         self._pet_module = None
         self._pet_melts = None
         self._pet_payload_preloaded = False
+        self._python_api_model = None
         # PetThermoTools remains opt-in until its compiled MELTSdynamic
         # runtime is installed and passes the native byte-identity gate.
         # When selected, it uses the same kill/respawn isolation primitive.
@@ -977,7 +981,9 @@ class _MELTSBackendSupport(MeltBackend):
         self._fo2_offset = self._optional_float(config.get('fO2_offset'))
         self._fe3fet_ratio = self._normalize_fe3fet_ratio(
             config.get('Fe3Fet_Liq', config.get('fe3fet_ratio')))
-        self._model = str(config.get('model', self._model))
+        model_name = config.get('model', self._raw_model_name)
+        self._raw_model_name = model_name
+        self._model = str(model_name)
         self._timeout_s = _validated_timeout_s(
             config.get('timeout_s', ALPHAMELTS_DEFAULT_TIMEOUT_S)
         )
@@ -1085,6 +1091,12 @@ class _MELTSBackendSupport(MeltBackend):
         *,
         require_petthermotools: bool,
     ) -> None:
+        try:
+            self._python_api_model = resolve_alphamelts_python_api_model(
+                self._raw_model_name
+            )
+        except ValueError as exc:
+            raise AlphaMELTSConfigurationError(str(exc)) from exc
         try:
             self._pet_module = self._import_petthermotools()
             self._engine_version = None
@@ -1217,13 +1229,14 @@ class _MELTSBackendSupport(MeltBackend):
         self._pet_payload_preloaded = True
 
     def _melts_model_code(self) -> int:
-        if self._model == 'pMELTS':
-            return 2
-        if self._model == 'MELTSv1.1.0':
-            return 3
-        if self._model == 'MELTSv1.2.0':
-            return 4
-        return 1
+        return self._resolved_python_api_model()[1]
+
+    def _resolved_python_api_model(self) -> tuple[str, int]:
+        if self._python_api_model is None:
+            raise AlphaMELTSConfigurationError(
+                'AlphaMELTS Python API model was not resolved at initialization'
+            )
+        return self._python_api_model
 
     def _find_project_binary(self, engine_root: Path) -> Optional[Path]:
         if not engine_root.exists():
@@ -2506,6 +2519,7 @@ class _MELTSBackendSupport(MeltBackend):
                     warnings=warnings,
                 )
             )
+            self._melts_model_code()
             results = self._run_petthermotools_isolated(
                 'equilibrate_MELTS',
                 kwargs={
@@ -2595,7 +2609,11 @@ class _MELTSBackendSupport(MeltBackend):
         except EngineWorkerTimeout:
             # The worker was already killed and will respawn on the next call.
             raise
-        except (ImportError, AlphaMELTSSubprocessContractError):
+        except (
+            ImportError,
+            AlphaMELTSConfigurationError,
+            AlphaMELTSSubprocessContractError,
+        ):
             self._mode = None
             raise
         except Exception as e:
@@ -2669,6 +2687,7 @@ class _MELTSBackendSupport(MeltBackend):
         timeout_s: float,
     ):
         """Retain per-call isolation until native reset earns byte parity."""
+        model_code = self._melts_model_code()
         context = multiprocessing.get_context('spawn')
         parent, child = context.Pipe(duplex=True)
         process = context.Process(
@@ -2676,7 +2695,7 @@ class _MELTSBackendSupport(MeltBackend):
             args=(
                 child,
                 operation,
-                self._melts_model_code(),
+                model_code,
                 tuple(args),
                 dict(kwargs or {}),
             ),
@@ -2862,6 +2881,7 @@ class _MELTSBackendSupport(MeltBackend):
         find_liq_melts = getattr(ptt, 'findLiq_MELTS', None)
         find_liq = getattr(ptt, 'findLiq', None)
         try:
+            self._melts_model_code()
             if callable(find_liq_melts):
                 raw = self._run_petthermotools_isolated(
                     'findLiq_MELTS',
@@ -2890,7 +2910,11 @@ class _MELTSBackendSupport(MeltBackend):
                 )
             else:
                 return None, ('PetThermoTools findLiq API not found',)
-        except (ImportError, AlphaMELTSSubprocessContractError):
+        except (
+            ImportError,
+            AlphaMELTSConfigurationError,
+            AlphaMELTSSubprocessContractError,
+        ):
             self._mode = None
             raise
         except Exception as exc:  # noqa: BLE001 - optional engine boundary
@@ -4836,6 +4860,7 @@ class _MELTSBackendSupport(MeltBackend):
         comp_wt = self._normalize_composition_to_melts_basis(raw_comp_wt)
         ptt = self._require_petthermotools_runtime()
         ptt_comp = self._to_petthermotools_liq_comp(comp_wt)
+        self._melts_model_code()
         if not hasattr(ptt, 'isothermal_decompression'):
             raise AttributeError(
                 'PetThermoTools isothermal_decompression API not found'
