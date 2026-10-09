@@ -50,11 +50,17 @@ species:
         - 0.003
         - 0.036
 fidelity_samples:
-- path: species.SiO.observations[costa_jacobson_2015_sio_olivine_kems].values.gas_species
-  value: SiO(g)
-  note: The retained observation is the SiO species shown in the SiO+ panel; its scalar alpha remains unknown.
+- path: species.SiO.observations[costa_jacobson_2015_sio_olivine_kems].values
+  value:
+    alpha: null
+    alpha_range:
+    - 0.003
+    - 0.036
+    gas_species: SiO(g)
+    material: Fo93Fa7_olivine
+  note: Unique Costa SiO+ panel interval; scalar alpha remains unknown and plotted range is retained.
   locator:
     page: 11
     pdf_page_index: 10
     figure: Measured vaporization coefficients of Fe+ and SiO+ (unnumbered figure caption)
-    note: SiO+ panel; plotted coefficients are not transcribed as a scalar.
+    record: costa_jacobson_2015_sio_olivine_kems
