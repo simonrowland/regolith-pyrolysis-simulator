@@ -201,20 +201,20 @@ experiments:
           section: Technique
           note: Technique described in cited companion paper [2].
     calibration:
-      calibration:
-        state: {tag: unknown, reason: not_published}
+      method:
+        state: {tag: value, value: In-situ Au vapour-pressure calibration}
         locator:
           published_page: 869
           pdf_page_index: 1
           section: Technique
-          note: The cited companion reports joint heating of an Au standard but does not identify it as a pressure calibration.
-      gold_standard:
+          note: calibration role inferred from the jointly heated Au standard (1983LPI....14..869Y p. 869); not stated explicitly
+      reference_substance:
         state: {tag: value, value: Au standard jointly heated in the W cell}
         locator:
           published_page: 869
           pdf_page_index: 1
           section: Technique
-          note: Technique described in cited companion paper [2]. This fact alone does not identify a pressure calibration method.
+          note: Technique described in cited companion paper [2].
     geometry:
       orifice_diameter_m:
         state: {tag: unknown, reason: not_published}
