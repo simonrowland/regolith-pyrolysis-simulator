@@ -17,7 +17,7 @@ experimental_regime: kems_effusion
 authority: diagnostic_only
 certifies: false
 records:
-  - record_id: kems-007-costa-2015::costa_2015_fe_vaporization_coefficient_alpha_digitized
+  - record_id: costa_jacobson_2015_fe_olivine_kems
     species: Fe
     regime: kems_effusion
     material: Fo93Fa7_olivine
@@ -29,8 +29,9 @@ records:
       olivine Fe+ vaporization-coefficient points at 1700-1800 K
     doi_or_url: https://ntrs.nasa.gov/citations/20150002321
     extraction_note: >-
-      Direct marker-center reading at 1753.84 K from the Fe+ panel on PDF p. 11;
-      the envelope is the min/max of the five digitized owner-series points.
+      Owner observation kems-007-costa-2015::costa_2015_fe_vaporization_coefficient_alpha_digitized;
+      high-side figure reading at 1753.84 K from the Fe+ panel on PDF p. 11.
+      The envelope is the min/max of the five digitized owner-series points.
       Still diagnostic for rail certification.
     certifies: false
 
