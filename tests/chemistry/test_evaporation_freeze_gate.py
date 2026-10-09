@@ -11,6 +11,7 @@ import pytest
 
 from simulator import evaporation as evaporation_module
 from simulator import engine_binding_admission as admission_module
+from simulator import engine_binding_admission
 from simulator.chemistry.kernel import (
     CapabilityProfile,
     ChemistryIntent,
@@ -30,6 +31,11 @@ from simulator.fe_redox import (
     kress91_ln_fO2_temperature_delta,
 )
 from simulator.melt_backend.base import EquilibriumResult, MeltCompositionError
+from simulator.reduced_real_determinism import (
+    PT0DeterminismStore,
+    canonical_json_bytes,
+    record_dependency_vector,
+)
 from simulator.runner import _attach_composition_projected_liquidus_notice
 from simulator.state import CampaignPhase, EvaporationFlux
 from tests.chemistry.conftest import _build_sim
@@ -3683,10 +3689,11 @@ def test_invalid_redox_gate_curve_does_not_poison_valid_retry(
     monkeypatch.setattr(sim, '_freeze_gate_curve', invalid_then_valid_curve)
     key = _freeze_gate_key_for_current_state(sim)
 
+    assert not hasattr(sim, '_freeze_gate_liquid_fraction_curve_memo')
+
     invalid = sim._melt_redox_liquidus_gate_curve()
 
     assert invalid.liquidus_status == 'invalid'
-    assert key not in sim._freeze_gate_liquid_fraction_curve_memo
     assert sim._freeze_gate_liquid_fraction_cache is None
 
     valid = sim._melt_redox_liquidus_gate_curve()
@@ -3697,7 +3704,257 @@ def test_invalid_redox_gate_curve_does_not_poison_valid_retry(
         'solidus_T_C': 1000.0,
         'liquidus_T_C': 1700.0,
     }
-    assert sim._freeze_gate_liquid_fraction_curve_memo[key] == valid
+    assert sim._freeze_gate_liquid_fraction_cache['key'] == key
+    assert sim._freeze_gate_liquid_fraction_cache['curve'] == valid
+
+
+@pytest.mark.parametrize('memo_form', ('local', 'shared'))
+def test_freeze_gate_memo_refuses_dependency_vector_mismatch(
+    monkeypatch,
+    vapor_pressure_data,
+    feedstocks_data,
+    setpoints_data,
+    memo_form,
+):
+    sim = _build_freeze_gate_sim(
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+        enabled=True,
+    )
+    sim.melt.temperature_C = 1600.0
+    sim.melt.p_total_mbar = 10.0
+    key = _freeze_gate_key_for_current_state(sim)
+    dependency_vector = record_dependency_vector(
+        sim,
+        ChemistryIntent.GATE_LIQUID_FRACTION,
+        artifact='freeze_gate_curve',
+        provider_role='authoritative',
+    )
+    mismatched_vector = deepcopy(dependency_vector)
+    mismatched_vector['model']['model'] = 'other-admitted-model'
+    stale_curve = {
+        'source': 'stale-binding',
+        'solidus_T_C': 900.0,
+        'liquidus_T_C': 1200.0,
+    }
+    shared_cache = {}
+    if memo_form == 'local':
+        sim._freeze_gate_liquid_fraction_cache = {
+            'key': key,
+            'curve': stale_curve,
+            'dependency_vector': mismatched_vector,
+            'repair_notices': [],
+        }
+    else:
+        sim._freeze_gate_shared_curve_cache = shared_cache
+        shared_cache[key] = {
+            **stale_curve,
+            'dependency_vector': mismatched_vector,
+            'repair_notices': [],
+        }
+    monkeypatch.setattr(
+        engine_binding_admission,
+        'gate_curve_memo_eligibility',
+        lambda *_args, **_kwargs: True,
+    )
+    calls = []
+
+    def dispatch(intent, *args, **kwargs):
+        calls.append(intent)
+        return IntentResult(
+            intent=intent,
+            status='ok',
+            transition=None,
+            diagnostic={'solidus_T_C': 1000.0, 'liquidus_T_C': 1300.0},
+        )
+
+    monkeypatch.setattr(sim, '_dispatch_only', dispatch)
+
+    curve = sim._freeze_gate_curve()
+
+    assert calls == [ChemistryIntent.GATE_LIQUID_FRACTION]
+    assert curve['source'] == 'gate_liquid_fraction'
+
+
+def test_freeze_gate_curve_path_records_sr18_repair_notice(
+    vapor_pressure_data,
+    feedstocks_data,
+    setpoints_data,
+):
+    sim = _build_freeze_gate_sim(
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+        enabled=True,
+    )
+
+    curve = sim._freeze_gate_curve_from_path(
+        (
+            {'temperature_C': 1000.0, 'liquid_fraction': -0.2},
+            {'temperature_C': 1100.0, 'liquid_fraction': 0.5},
+            {'temperature_C': 1200.0, 'liquid_fraction': 1.2},
+            {'temperature_C': None, 'liquid_fraction': 0.7},
+        ),
+        solidus_T_C=1000.0,
+        liquidus_T_C=1200.0,
+        source='gate_liquid_fraction',
+    )
+
+    assert curve['path'] == ((1000.0, 0.0), (1100.0, 0.5), (1200.0, 1.0))
+    assert [notice['site'] for notice in sim._reduced_real_repair_notices] == [
+        'SR18',
+        'SR18',
+        'SR18',
+    ]
+    assert [notice['action'] for notice in sim._reduced_real_repair_notices] == [
+        'clamp_fraction',
+        'clamp_fraction',
+        'drop_point',
+    ]
+    assert [notice['raw_fraction'] for notice in sim._reduced_real_repair_notices] == [
+        -0.2,
+        1.2,
+        0.7,
+    ]
+
+
+def test_freeze_gate_memos_preserve_sr18_and_sr19_repair_notices(
+    monkeypatch,
+    vapor_pressure_data,
+    feedstocks_data,
+    setpoints_data,
+):
+    sim = _build_freeze_gate_sim(
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+        enabled=True,
+    )
+    sim.melt.temperature_C = 1600.0
+    sim.melt.p_total_mbar = 10.0
+    shared_cache = {}
+    sim._freeze_gate_shared_curve_cache = shared_cache
+    store = PT0DeterminismStore('capture')
+    sim.configure_pt0_determinism_store(store)
+    monkeypatch.setattr(
+        engine_binding_admission,
+        'gate_curve_memo_eligibility',
+        lambda *_args, **_kwargs: True,
+    )
+
+    def dispatch(intent, *args, **kwargs):
+        if intent is ChemistryIntent.OVERHEAD_GAS_EQUILIBRIUM:
+            return IntentResult(
+                intent=intent,
+                status='ok',
+                transition=None,
+                diagnostic={},
+            )
+        return IntentResult(
+            intent=intent,
+            status='ok',
+            transition=None,
+            diagnostic={
+                'backend_status': 'ok',
+                'solidus_T_C': 1300.0,
+                'liquidus_T_C': 1200.0,
+                'liquid_fraction_path': (
+                    {'temperature_C': 1000.0, 'liquid_fraction': -0.2},
+                    {'temperature_C': None, 'liquid_fraction': 0.5},
+                ),
+            },
+        )
+
+    monkeypatch.setattr(sim, '_dispatch_only', dispatch)
+    monkeypatch.setattr(
+        sim,
+        '_freeze_gate_curve_from_backend_liquidus',
+        lambda _reasons, **_kwargs: {
+            'source': 'liquidus_solidus:backend',
+            'solidus_T_C': 1000.0,
+            'liquidus_T_C': 1300.0,
+            'path': ((1000.0, 0.0), (1300.0, 1.0)),
+        },
+    )
+
+    curve = sim._freeze_gate_curve()
+
+    expected_sites = ['SR18', 'SR18', 'SR19']
+    assert curve['solidus_T_C'] == 1000.0
+    assert curve['liquidus_T_C'] == 1300.0
+    assert [notice['site'] for notice in sim._reduced_real_repair_notices] == (
+        expected_sites
+    )
+    assert sim._reduced_real_repair_notices[-1]['failed_source'] == (
+        'gate_liquid_fraction'
+    )
+    assert sim._reduced_real_repair_notices[-1]['replacement_source'] == (
+        'liquidus_solidus:backend'
+    )
+    local = sim._freeze_gate_liquid_fraction_cache
+    shared = shared_cache[local['key']]
+    assert local['repair_notices'] == sim._reduced_real_repair_notices
+    assert shared['repair_notices'] == sim._reduced_real_repair_notices
+    assert next(iter(store.entries.values()))['repair_notices_json'] == (
+        canonical_json_bytes(sim._reduced_real_repair_notices).decode('utf-8')
+    )
+
+
+def test_uncacheable_gate_curve_fallback_skips_every_memo(
+    monkeypatch,
+    tmp_path,
+    vapor_pressure_data,
+    feedstocks_data,
+    setpoints_data,
+):
+    sim = _build_freeze_gate_sim(
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+        enabled=True,
+    )
+    sim.melt.temperature_C = 1600.0
+    sim.melt.p_total_mbar = 10.0
+    shared_cache = {}
+    sim._freeze_gate_shared_curve_cache = shared_cache
+    store = PT0DeterminismStore('capture', db_path=tmp_path / 'uncacheable.db')
+    sim.configure_pt0_determinism_store(store)
+    monkeypatch.setattr(
+        engine_binding_admission,
+        'gate_curve_memo_eligibility',
+        lambda *_args, **_kwargs: True,
+    )
+
+    def unavailable_dispatch(intent, *args, **kwargs):
+        if intent is ChemistryIntent.OVERHEAD_GAS_EQUILIBRIUM:
+            return IntentResult(
+                intent=intent,
+                status='ok',
+                transition=None,
+                diagnostic={},
+            )
+        raise ProviderUnavailableError('gate provider runtime failure')
+
+    monkeypatch.setattr(sim, '_dispatch_only', unavailable_dispatch)
+    monkeypatch.setattr(
+        sim,
+        '_freeze_gate_curve_from_backend_liquidus',
+        lambda _reasons, **_kwargs: {
+            'source': 'liquidus_solidus:backend',
+            'solidus_T_C': 1000.0,
+            'liquidus_T_C': 1300.0,
+            'path': ((1000.0, 0.0), (1300.0, 1.0)),
+        },
+    )
+
+    curve = sim._freeze_gate_curve()
+
+    assert curve['solidus_T_C'] == 1000.0
+    assert curve['liquidus_T_C'] == 1300.0
+    assert sim._freeze_gate_liquid_fraction_cache is None
+    assert shared_cache == {}
+    assert store.capture_sequence == []
 
 
 def test_fallback_authorized_redox_transition_is_balanced_and_provenanced(

@@ -12,6 +12,7 @@ import threading
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 from types import SimpleNamespace
+from typing import Any
 
 import pytest
 import yaml
@@ -626,6 +627,39 @@ def _silicate_equilibrium_key(
         [ChemistryIntent.SILICATE_EQUILIBRIUM],
     )
     return store._equilibrium_key(sim)
+
+
+def _pt0_equilibrium_capture_context(
+    store: PT0DeterminismStore,
+) -> tuple[Any, EquilibriumResult]:
+    class AlphaMELTSBackend(RealBackendAuthority):
+        real_backend_family = RealBackendFamily.ALPHAMELTS
+
+        def get_engine_version(self) -> str:
+            return "non-stub-test"
+
+    provider = _CountingSilicateEquilibriumProvider(
+        provider_id="alphamelts-diagnostic",
+        engine_version="alpha-v1",
+    )
+    sim = _build_pt0_sim(store)
+    sim.backend = AlphaMELTSBackend()
+    sim._chem_registry.register(
+        provider,
+        [ChemistryIntent.SILICATE_EQUILIBRIUM],
+    )
+    result = EquilibriumResult(
+        temperature_C=float(sim.melt.temperature_C),
+        pressure_bar=float(sim.melt.p_total_mbar) / 1000.0,
+        phases_present=["liquid"],
+        phase_masses_kg={"liquid": 1.0},
+        liquid_fraction=1.0,
+        liquid_composition_wt_pct={"SiO2": 45.0, "FeO": 10.0},
+        vapor_pressures_Pa={"SiO": 1.0},
+        vapor_pressures_source={"SiO": "test"},
+        fO2_log=sim._compute_intrinsic_melt_fO2(),
+    )
+    return sim, result
 
 
 def _alphamelts_silicate_equilibrium_key(
@@ -2174,6 +2208,104 @@ def test_pt2_persistent_physics_bucket_hit_is_not_cached_exact(tmp_path: Path) -
     assert counts["cached_exact"] == 0
 
 
+def test_pt0_exact_route_refuses_dependency_vector_mismatch() -> None:
+    capture = PT0DeterminismStore("capture")
+    sim, result = _pt0_equilibrium_capture_context(capture)
+    capture.capture_equilibrium(sim, result)
+    query_key = copy.deepcopy(capture.capture_sequence[-1]["key"])
+    query_key["model"]["model"] = "different-admitted-model"
+
+    with pytest.raises(PT0CacheMiss):
+        capture._lookup("equilibrium_post_record", query_key)
+
+    assert capture.hits == 0
+
+
+def test_pt0_approximate_route_refuses_dependency_vector_mismatch() -> None:
+    capture = PT0DeterminismStore("capture")
+    sim, result = _pt0_equilibrium_capture_context(capture)
+    capture.capture_equilibrium(sim, result)
+    source_key = capture.capture_sequence[-1]["key"]
+    query_key = copy.deepcopy(source_key)
+    query_key["model"]["model"] = "different-admitted-model"
+    query_bucket = canonical_physics_bucket_key_from_replay_key(query_key)
+    source_hash = _key_hash(source_key)
+    query_bucket_hash = _key_hash(query_bucket)
+    capture.physics_bucket_entries[query_bucket_hash] = source_hash
+    capture.cache_tier_ceiling = "cached_physics_bucket"
+
+    payload = capture._lookup_optional(
+        "equilibrium_post_record",
+        query_key,
+        physics_bucket_key=query_bucket,
+    )
+
+    assert payload is None
+    assert capture.hits == 0
+
+
+@pytest.mark.parametrize(
+    "rung_tag",
+    ("h40", "h30", "h40c", "h30c"),
+)
+def test_pt0_physics_ladder_route_refuses_dependency_vector_mismatch(
+    monkeypatch: pytest.MonkeyPatch,
+    rung_tag: str,
+) -> None:
+    capture = PT0DeterminismStore("capture")
+    sim, result = _pt0_equilibrium_capture_context(capture)
+    capture.capture_equilibrium(sim, result)
+    source_key = capture.capture_sequence[-1]["key"]
+    source_hash = _key_hash(source_key)
+    source_entry = capture.entries[source_hash]
+    query_key = copy.deepcopy(source_key)
+    query_key["model"]["model"] = "different-admitted-model"
+    query_bucket = canonical_physics_bucket_key_from_replay_key(query_key)
+    capture.cache_tier_ceiling = "cached_physics_bucket"
+    monkeypatch.setattr(
+        capture,
+        "_entry_for_physics_bucket",
+        lambda *_args, **_kwargs: None,
+    )
+
+    def ladder_entry(_artifact, candidate_rung, *_args, **_kwargs):
+        return source_entry if candidate_rung == rung_tag else None
+
+    monkeypatch.setattr(
+        capture,
+        "_entry_for_physics_ladder_bucket",
+        ladder_entry,
+    )
+
+    payload = capture._lookup_optional(
+        "equilibrium_post_record",
+        query_key,
+        physics_bucket_key=query_bucket,
+    )
+
+    assert payload is None
+    assert capture.hits == 0
+
+
+def test_pt0_capture_refuses_dependency_vector_mismatch(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    capture = PT0DeterminismStore("capture")
+    sim, result = _pt0_equilibrium_capture_context(capture)
+    original_key = capture._equilibrium_key
+
+    def mismatched_key(current_sim):
+        key = original_key(current_sim)
+        key["model"]["model"] = "different-admitted-model"
+        return key
+
+    monkeypatch.setattr(capture, "_equilibrium_key", mismatched_key)
+    capture.capture_equilibrium(sim, result)
+
+    assert capture.capture_sequence == []
+    assert capture.entries == {}
+
+
 def test_control_quantization_coarse_store_fine_lookup_uses_ladder(
     tmp_path: Path,
 ) -> None:
@@ -2572,10 +2704,26 @@ def test_pt1_repair_notices_are_outside_payload_and_reemit_on_exact_replay(
         "liquidus_T_C": 1600.0,
         "path": ((1100.0, 0.0), (1600.0, 1.0)),
     }
-    notice = {"kind": "test_repair", "field": "SiO2"}
+    notices = [
+        {
+            "type": "typed_notice",
+            "kind": "freeze_gate_curve_point_repaired",
+            "site": "SR18",
+            "temperature_C": 1200.0,
+            "raw_fraction": -0.2,
+            "action": "clamp_fraction",
+        },
+        {
+            "type": "typed_notice",
+            "kind": "freeze_gate_curve_source_replaced",
+            "site": "SR19",
+            "failed_source": "gate_liquid_fraction",
+            "replacement_source": "liquidus_solidus:backend",
+        },
+    ]
     rows = []
     db_paths = (tmp_path / "without-notice.db", tmp_path / "with-notice.db")
-    for db_path, notices in zip(db_paths, ([], [notice]), strict=True):
+    for db_path, captured_notices in zip(db_paths, ([], notices), strict=True):
         capture = PT0DeterminismStore("capture", db_path=db_path)
         sim = _build_pt0_sim(capture)
         sim.start_campaign(CampaignPhase.C2A_STAGED)
@@ -2583,7 +2731,7 @@ def test_pt1_repair_notices_are_outside_payload_and_reemit_on_exact_replay(
             sim,
             fO2_log=sim._compute_intrinsic_melt_fO2(),
             curve=curve,
-            repair_notices=notices,
+            repair_notices=captured_notices,
         )
         with sqlite3.connect(db_path) as conn:
             rows.append(
@@ -2597,7 +2745,7 @@ def test_pt1_repair_notices_are_outside_payload_and_reemit_on_exact_replay(
 
     assert rows[0][:2] == rows[1][:2]
     assert rows[0][2] == "[]"
-    assert rows[1][2] == canonical_json_bytes([notice]).decode("utf-8")
+    assert rows[1][2] == canonical_json_bytes(notices).decode("utf-8")
 
     replay = PT0DeterminismStore("replay", db_path=db_paths[1])
     replay_sim = _build_pt0_sim(replay)
@@ -2606,7 +2754,7 @@ def test_pt1_repair_notices_are_outside_payload_and_reemit_on_exact_replay(
         replay_sim,
         fO2_log=replay_sim._compute_intrinsic_melt_fO2(),
     ) == curve
-    assert replay_sim._reduced_real_repair_notices == [notice]
+    assert replay_sim._reduced_real_repair_notices == notices
 
 
 def test_pt1_legacy_null_repair_notices_emit_typed_unavailable_notice(
