@@ -2858,6 +2858,9 @@ _PRINTED_COMPOSITION_TOTAL_KEYS = frozenset(
         "sum_as_published",
     }
 )
+_COMPOSITION_CONDITION_KEYS = frozenset(
+    {"T_C", "T_K", "mass_loss_pct", "mass_loss_wt_pct", "t_min", "Nr"}
+)
 _CHARGE_PRINTED_COMPOSITION_NAMES = frozenset(
     {
         "printed_composition",
@@ -2987,7 +2990,11 @@ def is_sample_code_formula(text: str) -> bool:
     return bool(_SAMPLE_CODE_FORMULA_RE.match(str(text).strip()))
 
 
-def _oxide_map_from_mapping(obj: object) -> dict[str, Decimal] | None:
+def _oxide_map_from_mapping(
+    obj: object,
+    *,
+    refusal_reason: list[str] | None = None,
+) -> dict[str, Decimal] | None:
     if not isinstance(obj, Mapping):
         return None
     for key in _PRINTED_COMPOSITION_MAP_KEYS:
@@ -2997,6 +3004,8 @@ def _oxide_map_from_mapping(obj: object) -> dict[str, Decimal] | None:
                 comps: dict[str, Decimal] = {}
                 for name, value in nested.items():
                     token = str(name).strip()
+                    if token in _COMPOSITION_CONDITION_KEYS:
+                        continue
                     amount = _as_dec_or_none(value)
                     if amount is None:
                         return None
@@ -3009,20 +3018,26 @@ def _oxide_map_from_mapping(obj: object) -> dict[str, Decimal] | None:
                 if len(comps) >= 2:
                     try:
                         wt_pct_to_mole_fraction(comps)
-                    except ValueError:
+                    except ValueError as exc:
+                        if refusal_reason is not None:
+                            refusal_reason.append(str(exc))
                         return None
                     return comps
                 continue
-            got = _oxide_map_from_mapping(nested)
+            got = _oxide_map_from_mapping(nested, refusal_reason=refusal_reason)
             if got:
                 for name, value in nested.items():
                     token = str(name).strip()
+                    if token in _COMPOSITION_CONDITION_KEYS:
+                        continue
                     amount = _as_dec_or_none(value)
                     if amount is not None and token not in got:
                         got[token] = amount
                 try:
                     wt_pct_to_mole_fraction(got)
-                except ValueError:
+                except ValueError as exc:
+                    if refusal_reason is not None:
+                        refusal_reason.append(str(exc))
                     return None
                 return got
     comps: dict[str, Decimal] = {}
@@ -3032,26 +3047,24 @@ def _oxide_map_from_mapping(obj: object) -> dict[str, Decimal] | None:
         if amount is None:
             continue
         # Point records share the flat map with these condition fields.
-        if name in {
-            "T_C",
-            "T_K",
-            "mass_loss_pct",
-            "t_min",
-            "Nr",
-        }:
+        if name in _COMPOSITION_CONDITION_KEYS:
             continue
         comps[name] = amount
     if len(comps) < 2:
         return None
     try:
         wt_pct_to_mole_fraction(comps)
-    except ValueError:
+    except ValueError as exc:
+        if refusal_reason is not None:
+            refusal_reason.append(str(exc))
         return None
     return comps
 
 
 def _initial_oxide_map_from_values(
     values: object,
+    *,
+    refusal_reason: list[str] | None = None,
 ) -> dict[str, Decimal] | None:
     if not isinstance(values, Mapping):
         return None
@@ -3064,7 +3077,7 @@ def _initial_oxide_map_from_values(
         ]
         for item in ranked:
             if item.get("T_C_is_initial_composition") is True:
-                got = _oxide_map_from_mapping(item)
+                got = _oxide_map_from_mapping(item, refusal_reason=refusal_reason)
                 if got:
                     return got
         for item in ranked:
@@ -3073,14 +3086,14 @@ def _initial_oxide_map_from_values(
                 item.get("mass_loss_pct") or item.get("mass_loss_wt_pct")
             )
             if t_c == 0 and loss == 0:
-                got = _oxide_map_from_mapping(item)
+                got = _oxide_map_from_mapping(item, refusal_reason=refusal_reason)
                 if got:
                     return got
         for item in ranked:
-            got = _oxide_map_from_mapping(item)
+            got = _oxide_map_from_mapping(item, refusal_reason=refusal_reason)
             if got:
                 return got
-    got = _oxide_map_from_mapping(values)
+    got = _oxide_map_from_mapping(values, refusal_reason=refusal_reason)
     if got:
         return got
     raw_moles = values.get("composition_mole_fraction")
@@ -3263,6 +3276,8 @@ def wt_pct_to_mole_fraction_derivation(
 ) -> Derivation:
     params: list[tuple[str, Located[Decimal]]] = []
     for oxide, weight in wt.items():
+        if str(oxide).strip().casefold() in _PRINTED_COMPOSITION_TOTAL_KEYS:
+            continue
         params.append(
             (
                 f"original_{oxide}_wt_pct",
@@ -3312,7 +3327,9 @@ def _composition_located_from_values(
     )
 
 
-def composition_unknown_reason() -> str:
+def composition_unknown_reason(refusal_reasons: Sequence[str] = ()) -> str:
+    if refusal_reasons:
+        return refusal_reasons[0]
     return f"no composition field under keys {_COMPOSITION_LOOKED_FOR} in this extract"
 
 
@@ -3360,11 +3377,17 @@ def _located_printed_and_initial(
     if not wt or len(wt) < 2:
         return None, None
     printed = located_value(_printed_map_payload(wt), locator)
-    initial = Located(
-        State.of(wt_pct_to_mole_fraction(wt)),
-        locator=locator,
-        inference=wt_pct_to_mole_fraction_derivation(wt, locator),
-    )
+    try:
+        initial = Located(
+            State.of(wt_pct_to_mole_fraction(wt)),
+            locator=locator,
+            inference=wt_pct_to_mole_fraction_derivation(wt, locator),
+        )
+    except (ArithmeticError, ValueError) as exc:
+        initial = Located(
+            State.unknown(f"mass-percent composition is not usable: {exc}"),
+            locator=locator,
+        )
     return printed, initial
 
 
@@ -9258,6 +9281,7 @@ def _printed_composition_from_roots(
                         str(k): v
                         for k, v in value.items()
                         if k not in _WALK_SKIP_KEYS
+                        and str(k) not in _COMPOSITION_CONDITION_KEYS
                         and k != "locator"
                         and _as_dec_or_none(v) is not None
                     }
@@ -9631,17 +9655,28 @@ def sample_from_equipment(
     printed = None if catalogue_marked else _printed_composition_from_roots(
         roots, vocab, fallback_locator=locator
     )
-    if printed is None and catalogue is None and not catalogue_marked:
-        oxide_map = _initial_oxide_map_from_values(values)
-        printed, _ = _located_printed_and_initial(oxide_map, locator)
     initial = catalogue
+    if printed is None and catalogue is None and not catalogue_marked:
+        refusal_reason: list[str] = []
+        oxide_map = _initial_oxide_map_from_values(
+            values, refusal_reason=refusal_reason
+        )
+        printed, _ = _located_printed_and_initial(oxide_map, locator)
+        if oxide_map is None and refusal_reason:
+            initial = Located(
+                State.unknown(
+                    f"mass-percent composition is not usable: {refusal_reason[0]}"
+                ),
+                locator=locator,
+            )
     if initial is None and printed is not None and printed.state.is_value:
         raw = printed.state.value
         if isinstance(raw, Mapping):
             wt = {
                 str(k): as_decimal(v)
                 for k, v in raw.items()
-                if str(k) in _OXIDE_COMPONENT_KEYS and _as_dec_or_none(v) is not None
+                if str(k) not in _COMPOSITION_CONDITION_KEYS
+                and _as_dec_or_none(v) is not None
             }
             if len(wt) >= 2:
                 _, initial = _located_printed_and_initial(wt, printed.locator or locator)
@@ -11823,7 +11858,10 @@ class Migrator:
                 species = make_species(
                     suffix_formula, phase, polymorph=polymorph_from_extract(obs)
                 )
-        initial_oxide_map = _initial_oxide_map_from_values(values)
+        composition_refusal: list[str] = []
+        initial_oxide_map = _initial_oxide_map_from_values(
+            values, refusal_reason=composition_refusal
+        )
         composition_located = _composition_located_from_values(values, locator)
         catalogue_composition = _catalogue_composition_located_from_values(values, locator)
         initial_composition, omitted_components = _mole_fraction_composition_from_values(
@@ -12112,7 +12150,9 @@ class Migrator:
                 wt_pct_to_mole_fraction(initial_oxide_map)
             )
         elif q_token in _BULK_PROPERTY_QUANTITIES:
-            ident_kwargs["composition"] = State.unknown(composition_unknown_reason())
+            ident_kwargs["composition"] = State.unknown(
+                composition_unknown_reason(composition_refusal)
+            )
         derived_oxygen = collect_author_ratio_oxygen((values,), locator)
         if raw_adm == AdmissionStatus.ADMITTED.value:
             oxygen = derived_oxygen
@@ -13149,14 +13189,17 @@ class Migrator:
                 }
             } or None
         if ident_kwargs.get("composition") is None:
-            initial_map = _initial_oxide_map_from_values(parent_values)
+            composition_refusal: list[str] = []
+            initial_map = _initial_oxide_map_from_values(
+                parent_values, refusal_reason=composition_refusal
+            )
             if initial_map:
                 ident_kwargs["composition"] = State.of(
                     wt_pct_to_mole_fraction(initial_map)
                 )
             elif q_token_point in _BULK_PROPERTY_QUANTITIES:
                 ident_kwargs["composition"] = State.unknown(
-                    composition_unknown_reason()
+                    composition_unknown_reason(composition_refusal)
                 )
         printed_phase_text = (
             _printed_point_phase_text(raw_item)
