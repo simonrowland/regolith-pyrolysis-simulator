@@ -1515,8 +1515,13 @@ def refusal_closure(
                 # oxygen_fugacity_channel is the coproduct class, not this
                 # input. Oxygen-free evaluators keep the headspace value,
                 # including None, and are not refused for a missing reservoir.
+                # No exponent attribute means oxygen-free, same default as
+                # channels.count_o2_dependent_compiled_evaluators.
                 evaluator_fO2_bar = state.fO2_bar
-                if abs(float(compiled.evaluator.pO2_exponent or 0.0)) > 0.0:
+                oxygen_exponent = float(
+                    getattr(compiled.evaluator, "pO2_exponent", 0.0) or 0.0
+                )
+                if abs(oxygen_exponent) > 0.0:
                     try:
                         evaluator_fO2_bar = surface_oxygen_potential_bar(
                             mode=(state.extras or {}).get(
