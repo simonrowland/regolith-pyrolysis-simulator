@@ -5471,7 +5471,7 @@ def test_unknown_polymorph_with_multiple_eligible_solid_tables_still_refuses() -
     )
 
 
-def test_tridymite_does_not_use_cristobalite_high_fusion_conversion() -> None:
+def test_tridymite_fusion_conversion_extrapolation_is_flagged() -> None:
     from simulator.battery.enums import Polymorph
     from simulator.battery.score import _fusion_comparison_reference
 
@@ -5510,17 +5510,63 @@ def test_tridymite_does_not_use_cristobalite_high_fusion_conversion() -> None:
     )
     assert (
         after_comparison.identity.reference_state.value.endmember.phase.value
-        is Phase.CR
+        is Phase.L
     )
-    assert after_comparison.value.point == after.value.point
-    missing_input = next(
+    offset_notice = next(
         notice
         for notice in after_comparison.notices
-        if notice.reason.startswith("fusion conversion missing input:")
+        if "B1259 tridymite→cristobalite offset applied" in notice.reason
     )
-    assert missing_input.reason == (
-        "fusion conversion missing input: JANAF solid table O-035 represents "
-        "polymorph cristobalite_high, but measured reference polymorph is tridymite"
+    assert offset_notice.authority is Authority.EXTRAPOLATED
+    assert offset_notice.band == "B1259 common printed H/S band [298.15, 2000.0] K"
+    assert "fusion conversion missing input:" in offset_notice.reason
+    assert "authority=extrapolated" in offset_notice.reason
+
+
+def test_tridymite_fusion_conversion_applies_b1259_offset_to_value() -> None:
+    from simulator.battery.enums import Polymorph
+    from simulator.battery.generators.janaf import (
+        JANAF_R_J_PER_MOL_K,
+        janaf_fusion_energy,
+    )
+    from simulator.battery.score import _fusion_comparison_reference
+
+    temperature = Decimal("1900")
+    experiment = F.kems_experiment()
+    identity = _with_activity_reference_polymorph(
+        F.activity_identity(
+            formula="SiO2",
+            T_K=temperature,
+            endmember_phase=Phase.CR,
+            component_basis="SiO2",
+        ),
+        Polymorph.TRIDYMITE,
+    )
+    reference = F.observation(
+        "silica-tridymite-reference-at-1900K",
+        experiment.experiment_id,
+        identity,
+        Decimal("0.3"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="synthetic-tridymite-reference",
+    )
+
+    converted = _fusion_comparison_reference(reference, engine=Engine.OPENIMCC)
+    # B1259 p. 145/p. 144 prints ΔfG=-136.315/-136.324 kcal/mol at 1900 K.
+    # For equal chemical potential, both that source offset and the production
+    # JANAF fusion Gibbs energy multiply activity by exp(-ΔG/RT).
+    delta_g_tr_J_per_mol = Decimal("-0.009") * Decimal("4184")
+    fusion = janaf_fusion_energy("SiO2", temperature)
+    expected = Decimal("0.3") * (
+        -(delta_g_tr_J_per_mol + fusion.delta_g_fus_kJ_per_mol * Decimal(1000))
+        / (JANAF_R_J_PER_MOL_K * temperature)
+    ).exp()
+    assert converted.value.point == expected
+    assert converted.identity.reference_state.value.endmember.phase.value is Phase.L
+    assert any(
+        "B1259 tridymite→cristobalite offset applied" in notice.reason
+        and notice.authority is Authority.CERTIFIED
+        for notice in converted.notices
     )
 
 
