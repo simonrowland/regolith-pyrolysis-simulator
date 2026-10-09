@@ -1111,6 +1111,14 @@ def test_phase_home_hook_does_not_count_a_null_transition_as_a_no_op(
             "assemblage_held_from_previous_hour"
         ]["reason"] == "assemblage_held_from_previous_hour"
         assert sim._assemblage_binding_active is True
+        hour = sim._make_snapshot()
+        backend = sim._phase_home_diagnostic["backend_diagnostics"]
+        assert hour.assemblage_held_from_previous_hour == (
+            backend["assemblage_held_from_previous_hour"]
+        )
+        assert hour.surface_crust_not_modeled == (
+            backend["surface_crust_not_modeled"]
+        )
 
 
 def test_a_solve_without_activities_is_not_admitted():
@@ -1605,6 +1613,8 @@ def test_recorded_water_row_refuses_the_homes_hour():
     ) == ()
     snapshot = sim._make_snapshot()
     assert abs(snapshot.mass_balance_error_pct) < 5e-12
+    assert snapshot.surface_crust_not_modeled is None
+    assert snapshot.assemblage_held_from_previous_hour is None
 
 
 def test_recorded_silicate_hour_commits_and_closes():
@@ -1641,3 +1651,7 @@ def test_recorded_silicate_hour_commits_and_closes():
     assert state["oxygen_root"] == pytest.approx(_RECORDED_PTT_LOG_FO2)
     snapshot = sim._make_snapshot()
     assert abs(snapshot.mass_balance_error_pct) < 5e-12
+    assert snapshot.surface_crust_not_modeled == (
+        diagnostic["surface_crust_not_modeled"]
+    )
+    assert snapshot.assemblage_held_from_previous_hour is None

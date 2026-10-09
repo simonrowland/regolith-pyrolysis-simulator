@@ -375,6 +375,7 @@ from simulator.accounting.oxide_assignment import (
 )
 from simulator.accounting.phase_homes import (
     REASON_CRUST_NOT_MODELED,
+    REASON_HELD,
     holds_positive_crystal_moles,
     phase_home_presence_notices,
 )
@@ -3368,6 +3369,19 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             ):
                 return True
         return False
+
+    def _phase_home_notice(self, key: str) -> dict[str, Any] | None:
+        """Copy one notice onto the hour record. Absent stays None."""
+        diagnostic = getattr(self, '_phase_home_diagnostic', None) or {}
+        if not isinstance(diagnostic, Mapping):
+            return None
+        backend = diagnostic.get('backend_diagnostics')
+        if not isinstance(backend, Mapping):
+            return None
+        notice = backend.get(key)
+        if not isinstance(notice, Mapping):
+            return None
+        return {str(name): value for name, value in notice.items()}
 
     def _crystal_cohorts_present(self) -> bool:
         ledger = getattr(self, 'atom_ledger', None)
@@ -14860,6 +14874,12 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             knudsen_regime_summary=self._latest_knudsen_summary(),
             # b-149 silent-zero class (diagnostic only).
             silent_zero_diagnostic=self._silent_zero_diagnostic_payload(),
+            surface_crust_not_modeled=self._phase_home_notice(
+                REASON_CRUST_NOT_MODELED,
+            ),
+            assemblage_held_from_previous_hour=self._phase_home_notice(
+                REASON_HELD,
+            ),
         )
         if error_category:
             setattr(snapshot, 'mass_balance_error_category', error_category)

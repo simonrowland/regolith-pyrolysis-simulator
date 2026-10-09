@@ -1274,6 +1274,11 @@ class HourSnapshot:
     # expectation is that values converge to zero within ~1-2 ticks
     # for a stable campaign. M2 historical-audit closure (2026-05-28).
 
+    # Phase-home notices copied from this hour's diagnostic so the
+    # hour record, not only the private attribute, carries them.
+    surface_crust_not_modeled: Dict[str, Any] | None = None
+    assemblage_held_from_previous_hour: Dict[str, Any] | None = None
+
 
 @dataclass
 class DecisionPoint:
