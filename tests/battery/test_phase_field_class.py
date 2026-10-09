@@ -351,11 +351,12 @@ def test_two_test_rule_classifies_lime_side_plateau_points() -> None:
     from simulator.battery.phase_field import OUTSIDE_SINGLE_LIQUID_FIELD, classify_point
 
     records = _records()
-    # z(series_a) = 0.5 / sqrt(2) = 0.354 -> 0.35; z(series_b) = 0.02 / sqrt(0.005) = 0.28.
+    # z(series_a) = 0.5 / sqrt(2) = 0.354; z(series_b) = 0.02 / sqrt(0.005) = 0.28.
     assert records.plateaus["plat"].z_by_series == {
-        "series_a": Decimal("0.35"),
-        "series_b": Decimal("0.28"),
+        "series_a": Decimal("0.5") / Decimal(2).sqrt(),
+        "series_b": Decimal("0.02") / Decimal("0.005").sqrt(),
     }
+    assert records.plateaus["plat"].max_passing_z == Decimal("0.35")
     outcome = classify_point(
         records,
         observation_id="series_a",
