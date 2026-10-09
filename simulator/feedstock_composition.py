@@ -7,11 +7,10 @@ from dataclasses import dataclass
 import math
 from typing import Any
 
-from simulator.accounting.exceptions import AccountingError, UnknownSpeciesError
+from simulator.accounting.exceptions import AccountingError
 from simulator.accounting.formulas import (
     ATOMIC_WEIGHTS_G_PER_MOL,
     parse_formula,
-    resolve_species_formula,
 )
 from simulator.scalar_boundary import is_declared_real_scalar
 from simulator.trace_oxide_parents import (
@@ -25,9 +24,6 @@ FEOT_FROM_FE2O3 = 2.0 * 71.844 / 159.687
 OXYGEN_IN_FEO = 15.999 / 71.844
 DEFAULT_FEO_TO_FE2O3_EQUIVALENT_FACTOR = 1.1113
 FE_REPORTING_CONVENTION_TOTAL_AS_FEO = "total Fe as FeO"
-UNKNOWN_FERRIC_UPPER_BOUND_REASON = (
-    "no stated maximum Fe3+/ΣFe for this body"
-)
 
 
 @dataclass(frozen=True)
@@ -53,10 +49,9 @@ class ResolvedFeedstockComposition:
 
     ``total_fe`` is expressed as FeO-equivalent wt% on the entry's declared
     composition basis. ``fe_metal`` is elemental Fe wt% from the separate
-    elemental composition field. ``measured_feo`` / ``measured_fe2o3`` are
-    set only when the entry declares both oxides. Absent Fe2O3 is not a
-    measured zero. A ``fe_redox_prior`` resolves the split without claiming
-    that laboratory pair.
+    elemental composition field. Absent Fe2O3 is not a measured zero. A
+    ``fe_redox_prior`` resolves the split at load and does not invent a
+    laboratory FeO/Fe2O3 pair on this map.
     """
 
     canonical_wt_pct: Mapping[str, Any]
@@ -64,23 +59,8 @@ class ResolvedFeedstockComposition:
     fe_redox_split_unknown: bool
     total_fe: float
     total_fe_basis: str
-    measured_feo: float | None
-    measured_fe2o3: float | None
     fe_metal: float | None
-    split_known: bool
     fe_redox_prior: FeRedoxPrior | None = None
-
-
-@dataclass(frozen=True)
-class OxygenBound:
-    value_wt_pct: float | None
-    refused_reason: str | None = None
-
-
-@dataclass(frozen=True)
-class TotalOxygenBounds:
-    lower: OxygenBound
-    upper: OxygenBound
 
 
 def _finite_prior_number(value: Any, field: str) -> float:
@@ -234,10 +214,6 @@ def resolve_feedstock_composition(
                     "method and source"
                 )
 
-    feo = _representative_number(composition.get("FeO"), "composition_wt_pct.FeO")
-    fe2o3 = _representative_number(
-        composition.get("Fe2O3"), "composition_wt_pct.Fe2O3"
-    )
     elemental = feedstock.get("elemental_composition_wt_pct", {}) or {}
     if not isinstance(elemental, Mapping):
         raise ValueError("elemental_composition_wt_pct must be a mapping")
@@ -250,17 +226,9 @@ def resolve_feedstock_composition(
         )
     )
     feot = feot_equivalent_wt_pct(composition)
-    # A declared FeO/Fe2O3 pair is the only laboratory split. FeO with no
-    # Fe2O3 used to be reported as measured Fe2O3 = 0. That reading is the
-    # SC-308 failure: a total-Fe analysis is not a measurement that Fe3+ is
-    # zero. A prior resolves the split and still does not invent that pair.
-    oxides_declared = has_feo and has_fe2o3 and not flag
-    if oxides_declared:
-        measured_feo_value = feo
-        measured_fe2o3_value = fe2o3
-    else:
-        measured_feo_value = None
-        measured_fe2o3_value = None
+    # FeO with no Fe2O3 used to be reported as a measured ferric zero.
+    # A total-Fe analysis is not that measurement. The load split owns
+    # the ferric fraction; this map keeps the declared oxides.
 
     return ResolvedFeedstockComposition(
         canonical_wt_pct=dict(composition),
@@ -268,10 +236,7 @@ def resolve_feedstock_composition(
         fe_redox_split_unknown=flag,
         total_fe=feot,
         total_fe_basis="FeO-equivalent wt% on the declared composition basis",
-        measured_feo=measured_feo_value,
-        measured_fe2o3=measured_fe2o3_value,
         fe_metal=metal,
-        split_known=bool(oxides_declared or prior is not None),
         fe_redox_prior=prior,
     )
 
@@ -313,66 +278,8 @@ def fe2o3_equivalent_wt_pct(
     return fe2o3 + float(feo_to_fe2o3_factor) * feo
 
 
-def measured_feo(feedstock: Mapping[str, Any]) -> float | None:
-    return resolve_feedstock_composition(feedstock).measured_feo
-
-
-def measured_fe2o3(feedstock: Mapping[str, Any]) -> float | None:
-    return resolve_feedstock_composition(feedstock).measured_fe2o3
-
-
 def fe_metal(feedstock: Mapping[str, Any]) -> float | None:
     return resolve_feedstock_composition(feedstock).fe_metal
-
-
-def split_known(feedstock: Mapping[str, Any]) -> bool:
-    return resolve_feedstock_composition(feedstock).split_known
-
-
-def total_oxygen_bounds(
-    feedstock: Mapping[str, Any],
-) -> TotalOxygenBounds:
-    """Return oxide oxygen on the declared basis; unknown ferric maxima stay refused."""
-    resolved = resolve_feedstock_composition(feedstock)
-    oxygen_wt_pct = 0.0
-    for species, raw_value in resolved.canonical_wt_pct.items():
-        if resolved.fe_redox_split_unknown and species in {"FeO", "Fe2O3"}:
-            continue
-        try:
-            formula = resolve_species_formula(str(species))
-        except UnknownSpeciesError:
-            continue
-        oxygen_atoms = formula.elements.get("O", 0.0)
-        if oxygen_atoms <= 0.0:
-            continue
-        amount = _representative_number(
-            raw_value, f"composition_wt_pct.{species}"
-        )
-        if amount is None:
-            continue
-        oxygen_mass = oxygen_atoms * ATOMIC_WEIGHTS_G_PER_MOL["O"]
-        oxygen_wt_pct += amount * oxygen_mass / formula.molar_mass_g_per_mol()
-
-    if resolved.fe_redox_prior is not None and resolved.total_fe > 0.0:
-        # Lazy import: fe_redox imports this module at load. The omitted-oxygen
-        # coefficient and the Kress91 fraction live there so this bound cannot
-        # drift from the ledger split.
-        from simulator.fe_redox import omitted_ferric_oxygen_wt_pct
-
-        oxygen_wt_pct += omitted_ferric_oxygen_wt_pct(
-            resolved.canonical_wt_pct,
-            resolved.fe_redox_prior,
-        )
-
-    if resolved.fe_redox_split_unknown:
-        return TotalOxygenBounds(
-            lower=OxygenBound(
-                oxygen_wt_pct + resolved.total_fe * OXYGEN_IN_FEO
-            ),
-            upper=OxygenBound(None, UNKNOWN_FERRIC_UPPER_BOUND_REASON),
-        )
-    bound = OxygenBound(oxygen_wt_pct)
-    return TotalOxygenBounds(lower=bound, upper=bound)
 
 
 def feot_equivalent_wt_pct(comp_wt: Mapping[str, Any]) -> float:

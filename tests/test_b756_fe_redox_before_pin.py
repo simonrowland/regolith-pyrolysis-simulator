@@ -171,9 +171,8 @@ def test_lunar_resolver_does_not_invent_a_measured_ferric_zero() -> None:
         _feedstocks()["lunar_mare_low_ti"]
     )
     assert resolved.fe_redox_split_unknown is False
-    assert resolved.measured_feo is None
-    assert resolved.measured_fe2o3 is None
-    assert resolved.split_known is True
+    assert resolved.canonical_wt_pct.get("Fe2O3", 0.0) == 0.0
+    assert resolved.canonical_wt_pct["FeO"] == pytest.approx(16.5)
     assert resolved.fe_redox_prior is not None
     assert resolved.fe_redox_prior.kind == "delta_iw"
     assert resolved.total_fe == pytest.approx(16.5)

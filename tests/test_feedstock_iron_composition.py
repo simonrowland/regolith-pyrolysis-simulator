@@ -5,22 +5,13 @@ from pathlib import Path
 import pytest
 import yaml
 
-from simulator.accounting.formulas import (
-    ATOMIC_WEIGHTS_G_PER_MOL,
-    resolve_species_formula,
-)
 from simulator.core import PyrolysisSimulator
 from simulator.feedstock_composition import (
-    UNKNOWN_FERRIC_UPPER_BOUND_REASON,
     fe2o3_equivalent_wt_pct,
     fe_metal,
     feot_equivalent_moles,
-    measured_fe2o3,
-    measured_feo,
     resolve_feedstock_composition,
-    split_known,
     total_fe,
-    total_oxygen_bounds,
 )
 from simulator.fe_redox import (
     feot_equivalent_wt_pct,
@@ -58,14 +49,6 @@ def _unknown_split() -> dict:
         },
         "elemental_composition_wt_pct": {"Fe": 0.25},
     }
-
-
-def _oxygen_mass_fraction(species: str) -> float:
-    formula = resolve_species_formula(species)
-    oxygen_g_per_mol = (
-        formula.elements["O"] * ATOMIC_WEIGHTS_G_PER_MOL["O"]
-    )
-    return oxygen_g_per_mol / formula.molar_mass_g_per_mol()
 
 
 def test_unknown_split_metadata_covers_every_total_basis_entry_without_a_prior() -> None:
@@ -111,16 +94,14 @@ def test_resolver_exposes_canonical_map_provenance_and_explicit_iron_accessors()
     assert resolved.canonical_wt_pct == entry["composition_wt_pct"]
     assert resolved.provenance == entry["composition_basis"]
     assert resolved.fe_redox_split_unknown is False
-    assert resolved.split_known is True
     assert resolved.total_fe_basis == (
         "FeO-equivalent wt% on the declared composition basis"
     )
     assert resolved.total_fe == feot_equivalent_wt_pct(entry["composition_wt_pct"])
     assert total_fe(entry["composition_wt_pct"]) == resolved.total_fe
-    assert measured_feo(entry) == 2.0
-    assert measured_fe2o3(entry) == 1.0
+    assert resolved.canonical_wt_pct["FeO"] == 2.0
+    assert resolved.canonical_wt_pct["Fe2O3"] == 1.0
     assert fe_metal(entry) == 0.25
-    assert split_known(entry) is True
 
 
 def test_fe2o3_equivalent_preserves_the_declared_mass_model_factor() -> None:
@@ -155,36 +136,15 @@ def test_redox_helpers_consume_both_measured_oxides() -> None:
     assert split_fO2 != ferrous_only_fO2
 
 
-def test_unknown_split_is_all_ferrous_with_typed_oxygen_upper_absence() -> None:
+def test_unknown_split_keeps_total_fe_and_metal_without_a_ferric_oxide() -> None:
     entry = _unknown_split()
     resolved = resolve_feedstock_composition(entry)
-    bounds = total_oxygen_bounds(entry)
-    expected_lower = 70.0 * _oxygen_mass_fraction("SiO2") + 3.0 * _oxygen_mass_fraction("FeO")
 
     assert resolved.fe_redox_split_unknown is True
     assert resolved.total_fe == 3.0
-    assert resolved.measured_feo is None
-    assert resolved.measured_fe2o3 is None
-    assert measured_feo(entry) is None
-    assert measured_fe2o3(entry) is None
+    assert resolved.canonical_wt_pct.get("Fe2O3", 0.0) == 0.0
+    assert resolved.canonical_wt_pct["FeO"] == 3.0
     assert fe_metal(entry) == 0.25
-    assert split_known(entry) is False
-    assert bounds.lower.value_wt_pct == pytest.approx(expected_lower)
-    assert bounds.upper.value_wt_pct is None
-    assert bounds.upper.refused_reason == UNKNOWN_FERRIC_UPPER_BOUND_REASON
-
-
-def test_known_total_oxygen_bounds_include_non_iron_oxides() -> None:
-    entry = _measured_split()
-    bounds = total_oxygen_bounds(entry)
-    expected = (
-        70.0 * _oxygen_mass_fraction("SiO2")
-        + 2.0 * _oxygen_mass_fraction("FeO")
-        + 1.0 * _oxygen_mass_fraction("Fe2O3")
-    )
-
-    assert bounds.lower.value_wt_pct == pytest.approx(expected)
-    assert bounds.upper.value_wt_pct == pytest.approx(expected)
 
 
 def test_feedstock_json_round_trip_keeps_unknown_split_provenance(

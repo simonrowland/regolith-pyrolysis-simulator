@@ -48,7 +48,6 @@ from simulator.physical_constants import (
 from simulator.feedstock_composition import (
     FeRedoxPrior,
     resolve_feedstock_composition,
-    total_oxygen_bounds,
 )
 from simulator.melt_backend.base import InternalAnalyticalBackend
 
@@ -547,15 +546,4 @@ def test_delta_iw_load_splits_at_the_kress_reference_and_seeds_iw_plus_offset() 
     assert resolution.fe3_fraction == pytest.approx(expected_fraction)
 
 
-def test_prior_oxygen_bound_is_a_point_on_the_same_coefficient() -> None:
-    entry = _ferrous_entry(fe_redox_prior=_measured_block(0.25))
-    bounds = total_oxygen_bounds(entry)
-    resolved = resolve_feedstock_composition(entry)
-    assert bounds.upper.value_wt_pct == pytest.approx(bounds.lower.value_wt_pct)
-    assert bounds.upper.refused_reason is None
-    ferrous = _ferrous_entry()
-    ferrous_oxygen = total_oxygen_bounds(ferrous).lower.value_wt_pct
-    assert bounds.lower.value_wt_pct == pytest.approx(
-        ferrous_oxygen
-        + omitted_ferric_oxygen_kg(resolved.total_fe, 0.25)
-    )
+

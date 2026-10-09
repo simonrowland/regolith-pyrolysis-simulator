@@ -1121,21 +1121,6 @@ def apply_feot_split_to_oxide_kg(
     return oxygen_kg
 
 
-def omitted_ferric_oxygen_wt_pct(
-    composition_wt_pct: Mapping[str, float],
-    prior: FeRedoxPrior,
-) -> float:
-    """Wt% oxygen the declared FeOT omits at this prior.
-
-    ``omitted_ferric_oxygen_kg`` is linear in the FeOT mass, so a wt%
-    FeOT returns a wt% of oxygen.
-    """
-
-    feot_wt_pct = feot_equivalent_wt_pct(composition_wt_pct)
-    fraction = fe3_fraction_for_prior(composition_wt_pct, prior)
-    return omitted_ferric_oxygen_kg(feot_wt_pct, fraction)
-
-
 @dataclass(frozen=True)
 class LoadFeRedox:
     """The one load-time iron resolution every consumer reads.
