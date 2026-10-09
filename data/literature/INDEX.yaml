@@ -9,13 +9,13 @@ scan:
   - hunt_ids column empty; --hunt-json not provided
   corpus_root: /Users/simonrowland/Repos/regolith-corpus
 counts:
-  sources: 272
-  extracts: 270
+  sources: 273
+  extracts: 271
   pdfs_present_in_worktree: 0
   extracts_with_private_locators: 60
   pdfs_tracked_99_kems_langmuir: 0
   pdfs_without_extract: 0
-  extracts_without_pdf: 270
+  extracts_without_pdf: 271
   alias_groups_needing_resolution: 41
 gaps:
   pdfs_without_extract: []
@@ -157,6 +157,7 @@ gaps:
   - kems-200-ueshima-1983
   - kems-201-ichise-1986
   - kems-ms2000-044
+  - kor-1967-thesis-sulphur-oxides-slags
   - kume-2000-cao-activities
   - lamoreaux-hildenbrand-1984
   - lamoreaux-hildenbrand-hildenbrand-1987
@@ -8633,6 +8634,64 @@ sources:
       last_stage: deepened
       date: '2026-09-06'
     commit: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
+- source_id: kor-1967-thesis-sulphur-oxides-slags
+  aliases: []
+  citation: G. J. W. Kor, "Sulphur in crystalline oxides and liquid slags", PhD thesis, University of London
+    (Imperial College), 1967.
+  doi: null
+  report_number: null
+  identifier: null
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
+  extracts:
+  - path: data/literature/extracts/kor-1967-thesis-sulphur-oxides-slags.yaml
+    review_status: draft
+    rows: 4
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/kor-1967-thesis-sulphur-oxides-slags/kor-1967-thesis-sulphur-oxides-slags.pdf
+      present: false
+      sha256: null
+      matches_simulator: null
+    sidecar:
+      path: raw/kor-1967-thesis-sulphur-oxides-slags/sidecar.yaml
+      present: false
+    text:
+      path: text/kor-1967-thesis-sulphur-oxides-slags
+      exists: false
+      file_count: 0
+    tables:
+      path: tables/kor-1967-thesis-sulphur-oxides-slags
+      exists: false
+      file_count: 0
+    extract:
+      path: extracts/kor-1967-thesis-sulphur-oxides-slags.yaml
+      present: false
+      matches_simulator: null
+    ledger:
+      path: ledger/kor-1967-thesis-sulphur-oxides-slags.yaml
+      present: false
+      error: null
+      last_stage: null
+      date: null
+  commit: 164c4c552e9044b4c0ab10d02a754ba7ab98db93
 - source_id: kume-2000-cao-activities
   aliases: []
   citation: Kume et al. (2000), "Activity Measurement of CaO-SiO2-AlO1.5-MgO Slags Equilibrated with Molten

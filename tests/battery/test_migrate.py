@@ -476,6 +476,56 @@ def _run_migrate_cli(args: list[str]) -> subprocess.CompletedProcess[str]:
     )
 
 
+def test_kor_sulfur_tables_are_typed_refusals_and_keep_24_hour_footnote() -> None:
+    extract = REPO_ROOT / "data/literature/extracts/kor-1967-thesis-sulphur-oxides-slags.yaml"
+    tables = {
+        row["observation_id"]: row
+        for row in _extract_observations(extract.name)
+        if row["observation_id"] in {
+            "kor_1967_table_xxii_sulphur_melt_values",
+            "kor_1967_table_xxiii_sulphur_melt_values",
+            "kor_1967_table_xxv_sulphur_solid_aluminates",
+        }
+    }
+    expected_rows = {
+        "kor_1967_table_xxii_sulphur_melt_values": 12,
+        "kor_1967_table_xxiii_sulphur_melt_values": 24,
+        "kor_1967_table_xxv_sulphur_solid_aluminates": 18,
+    }
+    assert set(tables) == set(expected_rows)
+    for observation_id, row_count in expected_rows.items():
+        table = tables[observation_id]
+        assert table["type"] == "sulfur_solubility_and_sulfate_capacity_series"
+        assert table["values"]["quantity"] == "sulfur_solubility_wt_percent"
+        assert len(table["values"]["rows"]) == row_count
+
+    xxiii = tables["kor_1967_table_xxiii_sulphur_melt_values"]["values"]
+    assert xxiii["columns"][-1] == "treatment_time_hours"
+    assert xxiii["rows"][-1][0] == "8800^2"
+    assert xxiii["rows"][-1][-1] == 24
+
+    migrator = Migrator(root=REPO_ROOT, index=None, aliases={})
+    migrator._migrate_extract(extract)
+    migrator.finalize()
+    observations = migrator.result.observations.values()
+    table_rows = [obs for obs in observations if "::rows:" in obs.observation_id]
+    assert len(table_rows) == 54
+    assert all(
+        obs.identity.quantity.is_unknown and obs.value.kind is ValueKind.UNAVAILABLE
+        for obs in table_rows
+    )
+    activities = [
+        obs
+        for obs in observations
+        if obs.identity.quantity.is_value
+        and obs.identity.quantity.value is Quantity.ACTIVITY
+    ]
+    assert len(activities) == 2
+    assert all(obs.admission.status is AdmissionStatus.ADMITTED for obs in activities)
+    assert migrator.result.validation is not None
+    assert migrator.result.validation.hard_issues == ()
+
+
 def test_identity_complete_compilation_cells_are_admitted_at_source_level() -> None:
     migrator = Migrator()
     source = "data/literature/compilations/janaf/tables/O-029.yaml"
