@@ -854,6 +854,16 @@ def _nonempty_printed_paths(value, prefix=""):
     ]
 
 
+def _numeric_evidence_paths(leaves):
+    return [
+        path
+        for path, value in leaves
+        if isinstance(value, (int, float))
+        and not isinstance(value, bool)
+        and not re.search(r"index|source_line|page|schema|year", path)
+    ]
+
+
 def _store_kind(path: Path) -> str | None:
     parts = path.parts
     if "extracts-v2" in parts:
@@ -900,13 +910,7 @@ def absence_audit(paths=STORE_PATHS, *, source_documents=None):
                             else yaml.load(raw, Loader=_YAML_LOADER)
                         )
                         leaves = list(_leaves(record))
-                        numeric = [
-                            path
-                            for path, value in leaves
-                            if isinstance(value, (int, float))
-                            and not isinstance(value, bool)
-                            and not re.search(r"index|source_line|page|schema|year", path)
-                        ]
+                        numeric = _numeric_evidence_paths(leaves)
                         compilation_audit_cache[source] = (record, leaves, numeric)
                     record, leaves, numeric = compilation_audit_cache[source]
                 else:
@@ -926,8 +930,7 @@ def absence_audit(paths=STORE_PATHS, *, source_documents=None):
                 judged[family] += 1
                 if directory != "observations-v2":
                     leaves = list(_leaves(record))
-                    numeric = [p for p, v in leaves if isinstance(v, (int, float)) and not isinstance(v, bool)
-                               and not re.search(r"index|source_line|page|schema|year", p)]
+                    numeric = _numeric_evidence_paths(leaves)
                 for reason_path, reason in _leaves(obs):
                     if not reason_path.endswith(("reason", "unavailable_reason")) or not isinstance(reason, str):
                         continue
