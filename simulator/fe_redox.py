@@ -132,6 +132,11 @@ KRESS91_PRESSURE_SQUARED_COEFFICIENT = 0.0000000000000000385
 # thermodynamic source; higher-temperature bands are flagged, not model-swapped.
 KRESS91_LIQUID_CALIBRATION_MIN_T_C = 1200.0
 KRESS91_LIQUID_CALIBRATION_MAX_T_C = 1630.0
+# A measured Fe3+/sum-Fe prior is bulk speciation (XANES, mineralogy, or
+# an oxide pair), not a liquid-equilibrium determination. The seed still
+# inverts the liquid relation. The notice names this reason and does not
+# refuse the run.
+BULK_ROCK_ON_LIQUID_RELATION_REASON = "bulk_rock_fraction_on_liquid_relation"
 KRESS91_AITHALA_EXPERIMENTAL_CONFIRMATION_MAX_T_C = 2100.0
 KRESS91_HIGH_UNCERTAINTY_MAX_T_C = 2500.0
 # 1400 C cache-label convention for isochemical redox keys, not new physics.

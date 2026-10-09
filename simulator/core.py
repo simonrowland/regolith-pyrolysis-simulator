@@ -390,9 +390,12 @@ from simulator.fe_redox import (
     feot_equivalent_wt_pct,
     floor_vacuum_pressure_bar,
     intrinsic_melt_fO2,
+    BULK_ROCK_ON_LIQUID_RELATION_REASON,
+    KRESS91_LIQUID_CALIBRATION_MAX_T_C,
     KRESS91_LIQUID_CALIBRATION_MIN_T_C,
     kress91_ln_fO2_temperature_delta,
     kress91_split,
+    kress91_temperature_band_case,
     MEASURED_FRACTION_SEED_DISSOCIATION_ENVELOPE,
     measured_fe3_fraction_seed_domain,
     melt_fO2_seed_without_ferric_iron,
@@ -8949,6 +8952,12 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         Authority is measured, prior, or lower_bound. No oxide iron and no
         prior produces no notice. A lower bound keeps today's all-ferrous
         ledger and IW-plus-alkali seed, and says so as a bound on Fe3+.
+
+        The Kress91 band is ``kress91_temperature_band_case`` at the current
+        melt temperature. A Kress-based seed below that band is extrapolated.
+        Any measured Fe3+/sum-Fe fraction is bulk speciation on the liquid
+        relation, so it stays extrapolated inside the band too. The run is
+        not refused.
         """
 
         resolution = getattr(self, "_load_fe_redox", None)
@@ -9008,6 +9017,24 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                     "That envelope is the vapour mass-action bound, not a "
                     "Kress91 root."
                 )
+        seed_temperature_C = float(self.melt.temperature_C)
+        band = kress91_temperature_band_case(seed_temperature_C)
+        uses_kress = resolution.authority == "prior" or (
+            resolution.authority == "measured"
+            and seed_domain != MEASURED_FRACTION_SEED_DISSOCIATION_ENVELOPE
+        )
+        reasons: list[str] = []
+        if uses_kress and bool(band.get("extrapolation")):
+            reasons.append(str(band.get("status")))
+        if prior is not None and prior.kind == "measured_fe3_fraction":
+            reasons.append(BULK_ROCK_ON_LIQUID_RELATION_REASON)
+        notice["seed_temperature_K"] = seed_temperature_C + 273.15
+        notice["adopting_temperature_K"] = self._current_melt_redox_reference_T_K()
+        notice["kress91_calibration_min_T_C"] = KRESS91_LIQUID_CALIBRATION_MIN_T_C
+        notice["kress91_calibration_max_T_C"] = KRESS91_LIQUID_CALIBRATION_MAX_T_C
+        notice["kress91_temperature_band"] = band
+        notice["extrapolated"] = bool(reasons)
+        notice["extrapolation_reasons"] = reasons
         return notice
 
     def sulfur_saturation_run_notice(self) -> Dict[str, Any] | None:

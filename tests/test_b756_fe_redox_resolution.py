@@ -18,9 +18,14 @@ from simulator.accounting.formulas import (
     resolve_species_formula,
 )
 from simulator.core import PyrolysisSimulator
+from types import SimpleNamespace
+
 from simulator.fe_redox import (
+    BULK_ROCK_ON_LIQUID_RELATION_REASON,
     LOAD_FE_SPLIT_PRESSURE_BAR,
     KRESS91_FO2_KEY_REFERENCE_T_K,
+    KRESS91_LIQUID_CALIBRATION_MAX_T_C,
+    KRESS91_LIQUID_CALIBRATION_MIN_T_C,
     MEASURED_FRACTION_SEED_DISSOCIATION_ENVELOPE,
     MEASURED_FRACTION_SEED_KRESS91,
     fe3_fraction_for_prior,
@@ -29,6 +34,7 @@ from simulator.fe_redox import (
     intrinsic_melt_fO2,
     kress91_fO2_log_for_fe3_fraction,
     kress91_fe3_over_sigma_fe,
+    kress91_temperature_band_case,
     measured_fe3_fraction_seed,
     melt_mol_fractions_for_kress91,
     omitted_ferric_oxygen_kg,
@@ -326,6 +332,82 @@ def test_delta_iw_seed_is_production_iw_plus_the_offset_without_alkali() -> None
     )
     no_prior = intrinsic_melt_fO2(composition, temperature_K)
     assert no_prior != pytest.approx(seeded)
+
+
+def test_seed_notice_carries_the_kress_band_and_does_not_refuse() -> None:
+    """A cold or bulk-rock seed is flagged. The load still completes."""
+
+    feedstocks = _feedstocks()
+    lunar = _sim(feedstocks)
+    lunar.load_batch("lunar_mare_low_ti", mass_kg=1000.0)
+    cold_band = kress91_temperature_band_case(lunar.melt.temperature_C)
+    notice = lunar.melt_fO2_seed_run_notice()
+    assert notice is not None
+    assert notice["seed_temperature_K"] == pytest.approx(
+        lunar.melt.temperature_C + 273.15
+    )
+    assert notice["adopting_temperature_K"] is None
+    assert notice["kress91_calibration_min_T_C"] == KRESS91_LIQUID_CALIBRATION_MIN_T_C
+    assert notice["kress91_calibration_max_T_C"] == KRESS91_LIQUID_CALIBRATION_MAX_T_C
+    assert notice["kress91_temperature_band"]["case"] == cold_band["case"]
+    assert notice["extrapolated"] is True
+    assert cold_band["status"] in notice["extrapolation_reasons"]
+    assert BULK_ROCK_ON_LIQUID_RELATION_REASON not in notice["extrapolation_reasons"]
+
+    lunar.melt.temperature_C = KRESS91_LIQUID_CALIBRATION_MIN_T_C
+    inside = lunar.melt_fO2_seed_run_notice()
+    assert inside is not None
+    assert inside["extrapolated"] is False
+    assert inside["extrapolation_reasons"] == []
+    lunar.melt.oxygen_reservoir = SimpleNamespace(reference_T_K=1600.65)
+    adopted = lunar.melt_fO2_seed_run_notice()
+    assert adopted is not None
+    assert adopted["adopting_temperature_K"] == pytest.approx(1600.65)
+
+    measured_entry = dict(feedstocks["lunar_mare_low_ti"])
+    measured_entry["fe_redox_prior"] = _measured_block(0.2)
+    feedstocks["lunar_mare_low_ti"] = measured_entry
+    measured = _sim(feedstocks)
+    measured.load_batch("lunar_mare_low_ti", mass_kg=1000.0)
+    measured.melt.temperature_C = 1400.0
+    bulk = measured.melt_fO2_seed_run_notice()
+    assert bulk is not None
+    assert bulk["extrapolated"] is True
+    assert bulk["extrapolation_reasons"] == [BULK_ROCK_ON_LIQUID_RELATION_REASON]
+    measured.melt.temperature_C = 25.0
+    both = measured.melt_fO2_seed_run_notice()
+    assert both is not None
+    floor = kress91_temperature_band_case(25.0)
+    assert floor["status"] in both["extrapolation_reasons"]
+    assert BULK_ROCK_ON_LIQUID_RELATION_REASON in both["extrapolation_reasons"]
+
+    endpoint_entry = dict(feedstocks["ci_carbonaceous_chondrite"])
+    endpoint_entry["fe_redox_prior"] = _measured_block(0.0)
+    feedstocks["ci_carbonaceous_chondrite"] = endpoint_entry
+    endpoint = _sim(feedstocks)
+    endpoint.load_batch("ci_carbonaceous_chondrite", mass_kg=1000.0)
+    endpoint.melt.temperature_C = 1400.0
+    endpoint_notice = endpoint.melt_fO2_seed_run_notice()
+    assert endpoint_notice is not None
+    assert endpoint_notice["seed_domain"] == (
+        MEASURED_FRACTION_SEED_DISSOCIATION_ENVELOPE
+    )
+    assert endpoint_notice["extrapolation_reasons"] == [
+        BULK_ROCK_ON_LIQUID_RELATION_REASON
+    ]
+
+    unsplit = _feedstocks()
+    plain = dict(unsplit["lunar_mare_low_ti"])
+    plain.pop("fe_redox_prior", None)
+    unsplit["lunar_mare_low_ti"] = plain
+    lower_sim = _sim(unsplit)
+    lower_sim.load_batch("lunar_mare_low_ti", mass_kg=1000.0)
+    lower = lower_sim.melt_fO2_seed_run_notice()
+    assert lower is not None
+    assert lower["authority"] == "lower_bound"
+    assert lower["extrapolated"] is False
+    assert lower["extrapolation_reasons"] == []
+    assert lower["adopting_temperature_K"] is None
 
 
 def test_declared_ferric_pair_is_not_a_lower_bound() -> None:
