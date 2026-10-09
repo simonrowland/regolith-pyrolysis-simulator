@@ -10,7 +10,12 @@ import yaml
 from simulator.battery.migrate import migrate
 from simulator.battery.records import as_decimal
 from simulator.battery.waypoints import normalized_composition
-from tests.battery.test_migrate import FIXTURE_EXTRACT, _write_min_tree
+from tests.battery.test_migrate import (
+    FIXTURE_EXTRACT,
+    _named_extract,
+    _write_min_tree,
+    _write_multi_extract_tree,
+)
 
 
 def _base() -> dict:
@@ -122,6 +127,40 @@ def test_universal_row_maps_promote_to_experiment_sample(tmp_path: Path) -> None
     printed = experiment.sample.printed_composition
     assert printed is not None and printed.state.is_value
     assert as_decimal(printed.state.value["SiO2"]) == as_decimal("55")
+
+
+def test_composition_free_row_in_later_extract_blocks_sample_promotion(
+    tmp_path: Path,
+) -> None:
+    """A later extract's bare row must be included in the promotion decision."""
+
+    first = _named_extract("aaa-first", "10.1234/SHARED")
+    first["experiments"] = [{"experiment_id": "shared"}]
+    template = first["species"]["Na"]["observations"][0]
+    first["species"]["Na"]["observations"] = [
+        _obs(template, "owner", composition={"SiO2": 60, "MgO": 40}, experiment="shared")
+    ]
+    first_root = _write_multi_extract_tree(tmp_path / "first", [("aaa-first", first)])
+    first_result = migrate(first_root, write=False)
+    experiment_id = next(
+        eid for eid in first_result.experiments if eid.endswith("::experiment::shared")
+    )
+
+    second = _named_extract("bbb-second", "10.1234/SHARED")
+    second_template = second["species"]["Na"]["observations"][0]
+    bare = _obs(second_template, "bare", experiment=experiment_id)
+    bare["values"].pop("series", None)
+    bare["values"]["pressure_atm"] = 1.0
+    second["species"]["Na"]["observations"] = [bare]
+    root = _write_multi_extract_tree(
+        tmp_path / "complete", [("aaa-first", first), ("bbb-second", second)]
+    )
+
+    result = migrate(root, write=False)
+    bare_obs = result.observations["bbb-second::bare"]
+    experiment = result.experiments[bare_obs.experiment_id]
+    assert experiment.sample.printed_composition is None
+    assert normalized_composition(experiment, None, bare_obs).selected is None
 
 
 # --- Pin (b718 ROR fix): printed-map selection before the fingerprint helper
