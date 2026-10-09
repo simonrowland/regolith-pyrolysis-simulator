@@ -54,8 +54,8 @@ observations:
   experiment_id: 10.7185/geochemlet.2617::experiment::aithala-2026-1800-30
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'Fe3+/FeT'
+      tag: value
+      value: fe3_fe2_ratio
     species:
       formula: Fe
       phase:
@@ -67,15 +67,54 @@ observations:
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use per
     temperature_K:
       tag: value
       value: '2073.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: value
       value: '100000'
+    sweep_gas:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; unsupported quantity 'Fe3+/FeT'; refusing to pick a number
+    kind: point
+    point: '0.7421602787456445993031358885'
     approximate: false
   uncertainty:
     kind: printed
@@ -85,12 +124,17 @@ observations:
   evidence:
     class:
       tag: value
-      value: measured_direct
+      value: measured_reduced
     original_method_class: measured_direct
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - fe3_fe2_ratio
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_1800_30_xanes
   source_id: aithala-2026-magmatic-iron-redox-to-2100c
   locator:
     page: 13
@@ -115,11 +159,23 @@ observations:
           alongside reanalysis of previously reported VF glasses; the authors assume the Mössbauer-standardised XANES calibration
           applies to glasses synthesised at ALLF temperatures.
   derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    relation: fe3_fe2_ratio = r/(1 - r); r = Fe3+/sum Fe as printed
     inputs:
     - pdf:aithala-2026-magmatic-iron-redox-to-2100c
-    parameters: []
-    output_unit: Pa
+    parameters:
+    - - original_Fe3_over_FeT
+      - state:
+          tag: value
+          value: '0.426'
+        locator:
+          page: 13
+          published_page: SI-7
+          table: S-1
+          note: XANES determination for 1800-30. Fe K-edge XANES calibration is against Mössbauer-standardized martian basalt
+            glasses (SI-2–SI-3, PDF pp. 8–9). SI-3 (PDF p. 9) states ALLF glasses were analysed in one beamline 4-BM session
+            alongside reanalysis of previously reported VF glasses; the authors assume the Mössbauer-standardised XANES calibration
+            applies to glasses synthesised at ALLF temperatures.
+    output_unit: dimensionless
 - observation_id: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_1900_30_wdsepma_composition
   experiment_id: 10.7185/geochemlet.2617::experiment::aithala-2026-1900-30
   identity:
@@ -172,8 +228,8 @@ observations:
   experiment_id: 10.7185/geochemlet.2617::experiment::aithala-2026-1900-30
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'Fe3+/FeT'
+      tag: value
+      value: fe3_fe2_ratio
     species:
       formula: Fe
       phase:
@@ -185,15 +241,54 @@ observations:
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use per
     temperature_K:
       tag: value
       value: '2173.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: value
       value: '100000'
+    sweep_gas:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; unsupported quantity 'Fe3+/FeT'; refusing to pick a number
+    kind: point
+    point: '0.6366612111292962356792144026'
     approximate: false
   uncertainty:
     kind: printed
@@ -203,12 +298,17 @@ observations:
   evidence:
     class:
       tag: value
-      value: measured_direct
+      value: measured_reduced
     original_method_class: measured_direct
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - fe3_fe2_ratio
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_1900_30_xanes
   source_id: aithala-2026-magmatic-iron-redox-to-2100c
   locator:
     page: 13
@@ -233,11 +333,23 @@ observations:
           alongside reanalysis of previously reported VF glasses; the authors assume the Mössbauer-standardised XANES calibration
           applies to glasses synthesised at ALLF temperatures.
   derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    relation: fe3_fe2_ratio = r/(1 - r); r = Fe3+/sum Fe as printed
     inputs:
     - pdf:aithala-2026-magmatic-iron-redox-to-2100c
-    parameters: []
-    output_unit: Pa
+    parameters:
+    - - original_Fe3_over_FeT
+      - state:
+          tag: value
+          value: '0.389'
+        locator:
+          page: 13
+          published_page: SI-7
+          table: S-1
+          note: XANES determination for 1900-30. Fe K-edge XANES calibration is against Mössbauer-standardized martian basalt
+            glasses (SI-2–SI-3, PDF pp. 8–9). SI-3 (PDF p. 9) states ALLF glasses were analysed in one beamline 4-BM session
+            alongside reanalysis of previously reported VF glasses; the authors assume the Mössbauer-standardised XANES calibration
+            applies to glasses synthesised at ALLF temperatures.
+    output_unit: dimensionless
 - observation_id: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_2000_10_wdsepma_composition
   experiment_id: 10.7185/geochemlet.2617::experiment::aithala-2026-2000-10
   identity:
@@ -291,8 +403,8 @@ observations:
   experiment_id: 10.7185/geochemlet.2617::experiment::aithala-2026-2000-10
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'Fe3+/FeT'
+      tag: value
+      value: fe3_fe2_ratio
     species:
       formula: Fe
       phase:
@@ -304,15 +416,54 @@ observations:
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use per
     temperature_K:
       tag: value
       value: '2273.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: value
       value: '100000'
+    sweep_gas:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; unsupported quantity 'Fe3+/FeT'; refusing to pick a number
+    kind: point
+    point: '0.6077170418006430868167202572'
     approximate: false
   uncertainty:
     kind: printed
@@ -322,12 +473,17 @@ observations:
   evidence:
     class:
       tag: value
-      value: measured_direct
+      value: measured_reduced
     original_method_class: measured_direct
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - fe3_fe2_ratio
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_2000_10_xanes
   source_id: aithala-2026-magmatic-iron-redox-to-2100c
   locator:
     page: 13
@@ -355,11 +511,25 @@ observations:
           previously reported VF glasses; the authors assume the Mössbauer-standardised XANES calibration applies to glasses
           synthesised at ALLF temperatures.
   derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    relation: fe3_fe2_ratio = r/(1 - r); r = Fe3+/sum Fe as printed
     inputs:
     - pdf:aithala-2026-magmatic-iron-redox-to-2100c
-    parameters: []
-    output_unit: Pa
+    parameters:
+    - - original_Fe3_over_FeT
+      - state:
+          tag: value
+          value: '0.378'
+        locator:
+          page: 13
+          published_page: SI-7
+          table: S-1
+          note: XANES determination for 2000-10. Fe K-edge XANES calibration is against Mössbauer-standardized martian basalt
+            glasses (SI-2–SI-3, PDF pp. 8–9). The authors use 2000-10 as their 2000 °C equilibrium anchor for the fitted temperature
+            series (SI-3, PDF p. 9). SI-3 prose values for 2000-10 and 2000-120 differ from Tables S-1/S-3; table values remain
+            unchanged. SI-3 (PDF p. 9) states ALLF glasses were analysed in one beamline 4-BM session alongside reanalysis
+            of previously reported VF glasses; the authors assume the Mössbauer-standardised XANES calibration applies to
+            glasses synthesised at ALLF temperatures.
+    output_unit: dimensionless
 - observation_id: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_2000_120_wdsepma_composition
   experiment_id: 10.7185/geochemlet.2617::experiment::aithala-2026-2000-120
   identity:
@@ -412,8 +582,8 @@ observations:
   experiment_id: 10.7185/geochemlet.2617::experiment::aithala-2026-2000-120
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'Fe3+/FeT'
+      tag: value
+      value: fe3_fe2_ratio
     species:
       formula: Fe
       phase:
@@ -425,15 +595,54 @@ observations:
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use per
     temperature_K:
       tag: value
       value: '2273.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: value
       value: '100000'
+    sweep_gas:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; unsupported quantity 'Fe3+/FeT'; refusing to pick a number
+    kind: point
+    point: '0.6077170418006430868167202572'
     approximate: false
   uncertainty:
     kind: printed
@@ -443,12 +652,17 @@ observations:
   evidence:
     class:
       tag: value
-      value: measured_direct
+      value: measured_reduced
     original_method_class: measured_direct
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - fe3_fe2_ratio
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_2000_120_xanes
   source_id: aithala-2026-magmatic-iron-redox-to-2100c
   locator:
     page: 13
@@ -475,11 +689,24 @@ observations:
           one beamline 4-BM session alongside reanalysis of previously reported VF glasses; the authors assume the Mössbauer-standardised
           XANES calibration applies to glasses synthesised at ALLF temperatures.
   derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    relation: fe3_fe2_ratio = r/(1 - r); r = Fe3+/sum Fe as printed
     inputs:
     - pdf:aithala-2026-magmatic-iron-redox-to-2100c
-    parameters: []
-    output_unit: Pa
+    parameters:
+    - - original_Fe3_over_FeT
+      - state:
+          tag: value
+          value: '0.378'
+        locator:
+          page: 13
+          published_page: SI-7
+          table: S-1
+          note: XANES determination for 2000-120. Fe K-edge XANES calibration is against Mössbauer-standardized martian basalt
+            glasses (SI-2–SI-3, PDF pp. 8–9). SI-3 prose values for 2000-10 and 2000-120 differ from Tables S-1/S-3; table
+            values remain unchanged and no additional determinations are added. SI-3 (PDF p. 9) states ALLF glasses were analysed
+            in one beamline 4-BM session alongside reanalysis of previously reported VF glasses; the authors assume the Mössbauer-standardised
+            XANES calibration applies to glasses synthesised at ALLF temperatures.
+    output_unit: dimensionless
 - observation_id: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_2000_30_wdsepma_composition
   experiment_id: 10.7185/geochemlet.2617::experiment::aithala-2026-2000-30
   identity:
@@ -533,8 +760,8 @@ observations:
   experiment_id: 10.7185/geochemlet.2617::experiment::aithala-2026-2000-30
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'Fe3+/FeT'
+      tag: value
+      value: fe3_fe2_ratio
     species:
       formula: Fe
       phase:
@@ -546,15 +773,54 @@ observations:
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use per
     temperature_K:
       tag: value
       value: '2273.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: value
       value: '100000'
+    sweep_gas:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; unsupported quantity 'Fe3+/FeT'; refusing to pick a number
+    kind: point
+    point: '0.6863406408094435075885328836'
     approximate: false
   uncertainty:
     kind: printed
@@ -564,12 +830,17 @@ observations:
   evidence:
     class:
       tag: value
-      value: measured_direct
+      value: measured_reduced
     original_method_class: measured_direct
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - fe3_fe2_ratio
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_2000_30_xanes
   source_id: aithala-2026-magmatic-iron-redox-to-2100c
   locator:
     page: 13
@@ -596,11 +867,24 @@ observations:
           in one beamline 4-BM session alongside reanalysis of previously reported VF glasses; the authors assume the Mössbauer-standardised
           XANES calibration applies to glasses synthesised at ALLF temperatures.
   derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    relation: fe3_fe2_ratio = r/(1 - r); r = Fe3+/sum Fe as printed
     inputs:
     - pdf:aithala-2026-magmatic-iron-redox-to-2100c
-    parameters: []
-    output_unit: Pa
+    parameters:
+    - - original_Fe3_over_FeT
+      - state:
+          tag: value
+          value: '0.407'
+        locator:
+          page: 13
+          published_page: SI-7
+          table: S-1
+          note: XANES determination for 2000-30. Fe K-edge XANES calibration is against Mössbauer-standardized martian basalt
+            glasses (SI-2–SI-3, PDF pp. 8–9). The authors identify 2000-30 as anomalous; their 2000 °C equilibrium interpretation
+            and fitted series use 2000-10 as the anchor (SI-3, PDF p. 9). SI-3 (PDF p. 9) states ALLF glasses were analysed
+            in one beamline 4-BM session alongside reanalysis of previously reported VF glasses; the authors assume the Mössbauer-standardised
+            XANES calibration applies to glasses synthesised at ALLF temperatures.
+    output_unit: dimensionless
 - observation_id: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_2100_30_wdsepma_composition
   experiment_id: 10.7185/geochemlet.2617::experiment::aithala-2026-2100-30
   identity:
@@ -653,8 +937,8 @@ observations:
   experiment_id: 10.7185/geochemlet.2617::experiment::aithala-2026-2100-30
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'Fe3+/FeT'
+      tag: value
+      value: fe3_fe2_ratio
     species:
       formula: Fe
       phase:
@@ -666,15 +950,54 @@ observations:
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use per
     temperature_K:
       tag: value
       value: '2373.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: value
       value: '100000'
+    sweep_gas:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; unsupported quantity 'Fe3+/FeT'; refusing to pick a number
+    kind: point
+    point: '0.4409221902017291066282420749'
     approximate: false
   uncertainty:
     kind: printed
@@ -684,12 +1007,17 @@ observations:
   evidence:
     class:
       tag: value
-      value: measured_direct
+      value: measured_reduced
     original_method_class: measured_direct
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - fe3_fe2_ratio
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_2100_30_xanes
   source_id: aithala-2026-magmatic-iron-redox-to-2100c
   locator:
     page: 13
@@ -714,17 +1042,29 @@ observations:
           alongside reanalysis of previously reported VF glasses; the authors assume the Mössbauer-standardised XANES calibration
           applies to glasses synthesised at ALLF temperatures.
   derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    relation: fe3_fe2_ratio = r/(1 - r); r = Fe3+/sum Fe as printed
     inputs:
     - pdf:aithala-2026-magmatic-iron-redox-to-2100c
-    parameters: []
-    output_unit: Pa
+    parameters:
+    - - original_Fe3_over_FeT
+      - state:
+          tag: value
+          value: '0.306'
+        locator:
+          page: 13
+          published_page: SI-7
+          table: S-1
+          note: XANES determination for 2100-30. Fe K-edge XANES calibration is against Mössbauer-standardized martian basalt
+            glasses (SI-2–SI-3, PDF pp. 8–9). SI-3 (PDF p. 9) states ALLF glasses were analysed in one beamline 4-BM session
+            alongside reanalysis of previously reported VF glasses; the authors assume the Mössbauer-standardised XANES calibration
+            applies to glasses synthesised at ALLF temperatures.
+    output_unit: dimensionless
 - observation_id: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_vf231_moessbauer
   experiment_id: 10.7185/geochemlet.2617::experiment::aithala-2026-vf231
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'Fe3+/FeT'
+      tag: value
+      value: fe3_fe2_ratio
     species:
       formula: Fe
       phase:
@@ -736,15 +1076,54 @@ observations:
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use per
     temperature_K:
       tag: value
       value: '1638.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: value
       value: '100000'
+    sweep_gas:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; unsupported quantity 'Fe3+/FeT'; refusing to pick a number
+    kind: point
+    point: '2.521126760563380281690140845'
     approximate: false
   uncertainty:
     kind: printed
@@ -753,12 +1132,17 @@ observations:
   evidence:
     class:
       tag: value
-      value: measured_direct
+      value: measured_reduced
     original_method_class: measured_direct
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - fe3_fe2_ratio
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_vf231_moessbauer
   source_id: aithala-2026-magmatic-iron-redox-to-2100c
   locator:
     page: 13
@@ -779,11 +1163,21 @@ observations:
         note: Mössbauer determination for VF231. VF data were also previously published in Aithala, Lange & Hirschmann (2026),
           as noted in SI-1–SI-3 (PDF pp. 7–9).
   derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    relation: fe3_fe2_ratio = r/(1 - r); r = Fe3+/sum Fe as printed
     inputs:
     - pdf:aithala-2026-magmatic-iron-redox-to-2100c
-    parameters: []
-    output_unit: Pa
+    parameters:
+    - - original_Fe3_over_FeT
+      - state:
+          tag: value
+          value: '0.716'
+        locator:
+          page: 13
+          published_page: SI-7
+          table: S-1
+          note: Mössbauer determination for VF231. VF data were also previously published in Aithala, Lange & Hirschmann (2026),
+            as noted in SI-1–SI-3 (PDF pp. 7–9).
+    output_unit: dimensionless
 - observation_id: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_vf231_wdsepma_composition
   experiment_id: 10.7185/geochemlet.2617::experiment::aithala-2026-vf231
   identity:
@@ -836,8 +1230,8 @@ observations:
   experiment_id: 10.7185/geochemlet.2617::experiment::aithala-2026-vf231
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'Fe3+/FeT'
+      tag: value
+      value: fe3_fe2_ratio
     species:
       formula: Fe
       phase:
@@ -849,15 +1243,54 @@ observations:
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use per
     temperature_K:
       tag: value
       value: '1638.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: value
       value: '100000'
+    sweep_gas:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; unsupported quantity 'Fe3+/FeT'; refusing to pick a number
+    kind: point
+    point: '2.64963503649635036496350365'
     approximate: false
   uncertainty:
     kind: printed
@@ -867,12 +1300,17 @@ observations:
   evidence:
     class:
       tag: value
-      value: measured_direct
+      value: measured_reduced
     original_method_class: measured_direct
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - fe3_fe2_ratio
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_vf231_xanes
   source_id: aithala-2026-magmatic-iron-redox-to-2100c
   locator:
     page: 13
@@ -895,17 +1333,28 @@ observations:
           as noted in SI-1–SI-3 (PDF pp. 7–9). Fe K-edge XANES calibration is against Mössbauer-standardized martian basalt
           glasses (SI-2–SI-3, PDF pp. 8–9).
   derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    relation: fe3_fe2_ratio = r/(1 - r); r = Fe3+/sum Fe as printed
     inputs:
     - pdf:aithala-2026-magmatic-iron-redox-to-2100c
-    parameters: []
-    output_unit: Pa
+    parameters:
+    - - original_Fe3_over_FeT
+      - state:
+          tag: value
+          value: '0.726'
+        locator:
+          page: 13
+          published_page: SI-7
+          table: S-1
+          note: XANES determination for VF231. VF data were also previously published in Aithala, Lange & Hirschmann (2026),
+            as noted in SI-1–SI-3 (PDF pp. 7–9). Fe K-edge XANES calibration is against Mössbauer-standardized martian basalt
+            glasses (SI-2–SI-3, PDF pp. 8–9).
+    output_unit: dimensionless
 - observation_id: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_vf267_moessbauer
   experiment_id: 10.7185/geochemlet.2617::experiment::aithala-2026-vf267
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'Fe3+/FeT'
+      tag: value
+      value: fe3_fe2_ratio
     species:
       formula: Fe
       phase:
@@ -917,15 +1366,54 @@ observations:
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use per
     temperature_K:
       tag: value
       value: '1573.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: value
       value: '100000'
+    sweep_gas:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; unsupported quantity 'Fe3+/FeT'; refusing to pick a number
+    kind: point
+    point: '2.787878787878787878787878788'
     approximate: false
   uncertainty:
     kind: printed
@@ -934,12 +1422,17 @@ observations:
   evidence:
     class:
       tag: value
-      value: measured_direct
+      value: measured_reduced
     original_method_class: measured_direct
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - fe3_fe2_ratio
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_vf267_moessbauer
   source_id: aithala-2026-magmatic-iron-redox-to-2100c
   locator:
     page: 13
@@ -960,11 +1453,21 @@ observations:
         note: Mössbauer determination for VF267. VF data were also previously published in Aithala, Lange & Hirschmann (2026),
           as noted in SI-1–SI-3 (PDF pp. 7–9).
   derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    relation: fe3_fe2_ratio = r/(1 - r); r = Fe3+/sum Fe as printed
     inputs:
     - pdf:aithala-2026-magmatic-iron-redox-to-2100c
-    parameters: []
-    output_unit: Pa
+    parameters:
+    - - original_Fe3_over_FeT
+      - state:
+          tag: value
+          value: '0.736'
+        locator:
+          page: 13
+          published_page: SI-7
+          table: S-1
+          note: Mössbauer determination for VF267. VF data were also previously published in Aithala, Lange & Hirschmann (2026),
+            as noted in SI-1–SI-3 (PDF pp. 7–9).
+    output_unit: dimensionless
 - observation_id: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_vf267_wdsepma_composition
   experiment_id: 10.7185/geochemlet.2617::experiment::aithala-2026-vf267
   identity:
@@ -1017,8 +1520,8 @@ observations:
   experiment_id: 10.7185/geochemlet.2617::experiment::aithala-2026-vf268
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'Fe3+/FeT'
+      tag: value
+      value: fe3_fe2_ratio
     species:
       formula: Fe
       phase:
@@ -1030,15 +1533,54 @@ observations:
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use per
     temperature_K:
       tag: value
       value: '1673.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: value
       value: '100000'
+    sweep_gas:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; unsupported quantity 'Fe3+/FeT'; refusing to pick a number
+    kind: point
+    point: '2.278688524590163934426229508'
     approximate: false
   uncertainty:
     kind: printed
@@ -1047,12 +1589,17 @@ observations:
   evidence:
     class:
       tag: value
-      value: measured_direct
+      value: measured_reduced
     original_method_class: measured_direct
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - fe3_fe2_ratio
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_vf268_moessbauer
   source_id: aithala-2026-magmatic-iron-redox-to-2100c
   locator:
     page: 13
@@ -1073,11 +1620,21 @@ observations:
         note: Mössbauer determination for VF268. VF data were also previously published in Aithala, Lange & Hirschmann (2026),
           as noted in SI-1–SI-3 (PDF pp. 7–9).
   derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    relation: fe3_fe2_ratio = r/(1 - r); r = Fe3+/sum Fe as printed
     inputs:
     - pdf:aithala-2026-magmatic-iron-redox-to-2100c
-    parameters: []
-    output_unit: Pa
+    parameters:
+    - - original_Fe3_over_FeT
+      - state:
+          tag: value
+          value: '0.695'
+        locator:
+          page: 13
+          published_page: SI-7
+          table: S-1
+          note: Mössbauer determination for VF268. VF data were also previously published in Aithala, Lange & Hirschmann (2026),
+            as noted in SI-1–SI-3 (PDF pp. 7–9).
+    output_unit: dimensionless
 - observation_id: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_vf268_wdsepma_composition
   experiment_id: 10.7185/geochemlet.2617::experiment::aithala-2026-vf268
   identity:
@@ -1130,8 +1687,8 @@ observations:
   experiment_id: 10.7185/geochemlet.2617::experiment::aithala-2026-vf268
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'Fe3+/FeT'
+      tag: value
+      value: fe3_fe2_ratio
     species:
       formula: Fe
       phase:
@@ -1143,15 +1700,54 @@ observations:
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use per
     temperature_K:
       tag: value
       value: '1673.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: value
       value: '100000'
+    sweep_gas:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; unsupported quantity 'Fe3+/FeT'; refusing to pick a number
+    kind: point
+    point: '1.857142857142857142857142857'
     approximate: false
   uncertainty:
     kind: printed
@@ -1161,12 +1757,17 @@ observations:
   evidence:
     class:
       tag: value
-      value: measured_direct
+      value: measured_reduced
     original_method_class: measured_direct
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - fe3_fe2_ratio
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_vf268_xanes
   source_id: aithala-2026-magmatic-iron-redox-to-2100c
   locator:
     page: 13
@@ -1189,17 +1790,28 @@ observations:
           as noted in SI-1–SI-3 (PDF pp. 7–9). Fe K-edge XANES calibration is against Mössbauer-standardized martian basalt
           glasses (SI-2–SI-3, PDF pp. 8–9).
   derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    relation: fe3_fe2_ratio = r/(1 - r); r = Fe3+/sum Fe as printed
     inputs:
     - pdf:aithala-2026-magmatic-iron-redox-to-2100c
-    parameters: []
-    output_unit: Pa
+    parameters:
+    - - original_Fe3_over_FeT
+      - state:
+          tag: value
+          value: '0.65'
+        locator:
+          page: 13
+          published_page: SI-7
+          table: S-1
+          note: XANES determination for VF268. VF data were also previously published in Aithala, Lange & Hirschmann (2026),
+            as noted in SI-1–SI-3 (PDF pp. 7–9). Fe K-edge XANES calibration is against Mössbauer-standardized martian basalt
+            glasses (SI-2–SI-3, PDF pp. 8–9).
+    output_unit: dimensionless
 - observation_id: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_vf270_moessbauer
   experiment_id: 10.7185/geochemlet.2617::experiment::aithala-2026-vf270
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'Fe3+/FeT'
+      tag: value
+      value: fe3_fe2_ratio
     species:
       formula: Fe
       phase:
@@ -1211,15 +1823,54 @@ observations:
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use per
     temperature_K:
       tag: value
       value: '1723.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: value
       value: '100000'
+    sweep_gas:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; unsupported quantity 'Fe3+/FeT'; refusing to pick a number
+    kind: point
+    point: '1.949852507374631268436578171'
     approximate: false
   uncertainty:
     kind: printed
@@ -1228,12 +1879,17 @@ observations:
   evidence:
     class:
       tag: value
-      value: measured_direct
+      value: measured_reduced
     original_method_class: measured_direct
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - fe3_fe2_ratio
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_vf270_moessbauer
   source_id: aithala-2026-magmatic-iron-redox-to-2100c
   locator:
     page: 13
@@ -1254,11 +1910,21 @@ observations:
         note: Mössbauer determination for VF270. VF data were also previously published in Aithala, Lange & Hirschmann (2026),
           as noted in SI-1–SI-3 (PDF pp. 7–9).
   derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    relation: fe3_fe2_ratio = r/(1 - r); r = Fe3+/sum Fe as printed
     inputs:
     - pdf:aithala-2026-magmatic-iron-redox-to-2100c
-    parameters: []
-    output_unit: Pa
+    parameters:
+    - - original_Fe3_over_FeT
+      - state:
+          tag: value
+          value: '0.661'
+        locator:
+          page: 13
+          published_page: SI-7
+          table: S-1
+          note: Mössbauer determination for VF270. VF data were also previously published in Aithala, Lange & Hirschmann (2026),
+            as noted in SI-1–SI-3 (PDF pp. 7–9).
+    output_unit: dimensionless
 - observation_id: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_vf270_wdsepma_composition
   experiment_id: 10.7185/geochemlet.2617::experiment::aithala-2026-vf270
   identity:
@@ -1311,8 +1977,8 @@ observations:
   experiment_id: 10.7185/geochemlet.2617::experiment::aithala-2026-vf270
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'Fe3+/FeT'
+      tag: value
+      value: fe3_fe2_ratio
     species:
       formula: Fe
       phase:
@@ -1324,15 +1990,54 @@ observations:
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use per
     temperature_K:
       tag: value
       value: '1723.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: value
       value: '100000'
+    sweep_gas:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; unsupported quantity 'Fe3+/FeT'; refusing to pick a number
+    kind: point
+    point: '2.174603174603174603174603175'
     approximate: false
   uncertainty:
     kind: printed
@@ -1342,12 +2047,17 @@ observations:
   evidence:
     class:
       tag: value
-      value: measured_direct
+      value: measured_reduced
     original_method_class: measured_direct
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - fe3_fe2_ratio
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_vf270_xanes
   source_id: aithala-2026-magmatic-iron-redox-to-2100c
   locator:
     page: 13
@@ -1370,11 +2080,22 @@ observations:
           as noted in SI-1–SI-3 (PDF pp. 7–9). Fe K-edge XANES calibration is against Mössbauer-standardized martian basalt
           glasses (SI-2–SI-3, PDF pp. 8–9).
   derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    relation: fe3_fe2_ratio = r/(1 - r); r = Fe3+/sum Fe as printed
     inputs:
     - pdf:aithala-2026-magmatic-iron-redox-to-2100c
-    parameters: []
-    output_unit: Pa
+    parameters:
+    - - original_Fe3_over_FeT
+      - state:
+          tag: value
+          value: '0.685'
+        locator:
+          page: 13
+          published_page: SI-7
+          table: S-1
+          note: XANES determination for VF270. VF data were also previously published in Aithala, Lange & Hirschmann (2026),
+            as noted in SI-1–SI-3 (PDF pp. 7–9). Fe K-edge XANES calibration is against Mössbauer-standardized martian basalt
+            glasses (SI-2–SI-3, PDF pp. 8–9).
+    output_unit: dimensionless
 - observation_id: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_vf271_wdsepma_composition
   experiment_id: 10.7185/geochemlet.2617::experiment::aithala-2026-vf271
   identity:
@@ -1429,8 +2150,8 @@ observations:
   experiment_id: 10.7185/geochemlet.2617::experiment::aithala-2026-vf271
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'Fe3+/FeT'
+      tag: value
+      value: fe3_fe2_ratio
     species:
       formula: Fe
       phase:
@@ -1442,15 +2163,54 @@ observations:
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use per
     temperature_K:
       tag: value
       value: '1523.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: value
       value: '100000'
+    sweep_gas:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; unsupported quantity 'Fe3+/FeT'; refusing to pick a number
+    kind: point
+    point: '4.434782608695652173913043478'
     approximate: false
   uncertainty:
     kind: printed
@@ -1460,12 +2220,17 @@ observations:
   evidence:
     class:
       tag: value
-      value: measured_direct
+      value: measured_reduced
     original_method_class: measured_direct
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - fe3_fe2_ratio
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_vf271_xanes
   source_id: aithala-2026-magmatic-iron-redox-to-2100c
   locator:
     page: 13
@@ -1490,17 +2255,29 @@ observations:
           glasses (SI-2–SI-3, PDF pp. 8–9). The 1250 °C VF271 sample was partially crystallised and below the starting composition's
           liquidus (SI-3, PDF p. 9).
   derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    relation: fe3_fe2_ratio = r/(1 - r); r = Fe3+/sum Fe as printed
     inputs:
     - pdf:aithala-2026-magmatic-iron-redox-to-2100c
-    parameters: []
-    output_unit: Pa
+    parameters:
+    - - original_Fe3_over_FeT
+      - state:
+          tag: value
+          value: '0.816'
+        locator:
+          page: 13
+          published_page: SI-7
+          table: S-1
+          note: XANES determination for VF271. VF data were also previously published in Aithala, Lange & Hirschmann (2026),
+            as noted in SI-1–SI-3 (PDF pp. 7–9). Fe K-edge XANES calibration is against Mössbauer-standardized martian basalt
+            glasses (SI-2–SI-3, PDF pp. 8–9). The 1250 °C VF271 sample was partially crystallised and below the starting composition's
+            liquidus (SI-3, PDF p. 9).
+    output_unit: dimensionless
 - observation_id: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_vf274_moessbauer
   experiment_id: 10.7185/geochemlet.2617::experiment::aithala-2026-vf274
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'Fe3+/FeT'
+      tag: value
+      value: fe3_fe2_ratio
     species:
       formula: Fe
       phase:
@@ -1512,15 +2289,54 @@ observations:
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use per
     temperature_K:
       tag: value
       value: '1773.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: value
       value: '100000'
+    sweep_gas:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; unsupported quantity 'Fe3+/FeT'; refusing to pick a number
+    kind: point
+    point: '1.801120448179271708683473389'
     approximate: false
   uncertainty:
     kind: printed
@@ -1529,12 +2345,17 @@ observations:
   evidence:
     class:
       tag: value
-      value: measured_direct
+      value: measured_reduced
     original_method_class: measured_direct
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - fe3_fe2_ratio
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_vf274_moessbauer
   source_id: aithala-2026-magmatic-iron-redox-to-2100c
   locator:
     page: 13
@@ -1555,11 +2376,21 @@ observations:
         note: Mössbauer determination for VF274. VF data were also previously published in Aithala, Lange & Hirschmann (2026),
           as noted in SI-1–SI-3 (PDF pp. 7–9).
   derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    relation: fe3_fe2_ratio = r/(1 - r); r = Fe3+/sum Fe as printed
     inputs:
     - pdf:aithala-2026-magmatic-iron-redox-to-2100c
-    parameters: []
-    output_unit: Pa
+    parameters:
+    - - original_Fe3_over_FeT
+      - state:
+          tag: value
+          value: '0.643'
+        locator:
+          page: 13
+          published_page: SI-7
+          table: S-1
+          note: Mössbauer determination for VF274. VF data were also previously published in Aithala, Lange & Hirschmann (2026),
+            as noted in SI-1–SI-3 (PDF pp. 7–9).
+    output_unit: dimensionless
 - observation_id: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_vf274_wdsepma_composition
   experiment_id: 10.7185/geochemlet.2617::experiment::aithala-2026-vf274
   identity:
@@ -1612,8 +2443,8 @@ observations:
   experiment_id: 10.7185/geochemlet.2617::experiment::aithala-2026-vf274
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'Fe3+/FeT'
+      tag: value
+      value: fe3_fe2_ratio
     species:
       formula: Fe
       phase:
@@ -1625,15 +2456,54 @@ observations:
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use per
     temperature_K:
       tag: value
       value: '1773.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use reservoir
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
     total_pressure_Pa:
       tag: value
       value: '100000'
+    sweep_gas:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile fe3_fe2_ratio does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; unsupported quantity 'Fe3+/FeT'; refusing to pick a number
+    kind: point
+    point: '1.754820936639118457300275482'
     approximate: false
   uncertainty:
     kind: printed
@@ -1643,12 +2513,17 @@ observations:
   evidence:
     class:
       tag: value
-      value: measured_direct
+      value: measured_reduced
     original_method_class: measured_direct
   admission:
-    status: pending
-    reason: no observation admission_status mapped from source
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - fe3_fe2_ratio
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_vf274_xanes
   source_id: aithala-2026-magmatic-iron-redox-to-2100c
   locator:
     page: 13
@@ -1671,8 +2546,19 @@ observations:
           as noted in SI-1–SI-3 (PDF pp. 7–9). Fe K-edge XANES calibration is against Mössbauer-standardized martian basalt
           glasses (SI-2–SI-3, PDF pp. 8–9).
   derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    relation: fe3_fe2_ratio = r/(1 - r); r = Fe3+/sum Fe as printed
     inputs:
     - pdf:aithala-2026-magmatic-iron-redox-to-2100c
-    parameters: []
-    output_unit: Pa
+    parameters:
+    - - original_Fe3_over_FeT
+      - state:
+          tag: value
+          value: '0.637'
+        locator:
+          page: 13
+          published_page: SI-7
+          table: S-1
+          note: XANES determination for VF274. VF data were also previously published in Aithala, Lange & Hirschmann (2026),
+            as noted in SI-1–SI-3 (PDF pp. 7–9). Fe K-edge XANES calibration is against Mössbauer-standardized martian basalt
+            glasses (SI-2–SI-3, PDF pp. 8–9).
+    output_unit: dimensionless

@@ -95,7 +95,11 @@ class Plateau:
     @property
     def max_passing_z(self) -> Decimal | None:
         passing = [z for name, z in self.z_by_series.items() if name not in self.failing]
-        return max(passing) if passing else None
+        return (
+            max(passing).quantize(_Z_QUANTUM, rounding=ROUND_HALF_EVEN)
+            if passing
+            else None
+        )
 
 
 @dataclass(frozen=True)
@@ -157,7 +161,7 @@ def _series_z(
         if denominator == 0:
             raise ValueError("zero combined sigma")
         worst = max(worst, abs(v_i - v_j) / denominator)
-    return worst.quantize(_Z_QUANTUM, rounding=ROUND_HALF_EVEN)
+    return worst
 
 
 def _plateau(raw: Mapping[str, object], observations: Mapping[str, Mapping[str, object]]) -> Plateau:
@@ -211,6 +215,8 @@ def _plateau(raw: Mapping[str, object], observations: Mapping[str, Mapping[str, 
             z_by_series[obs_id] = _series_z(cells)
         except ValueError:
             problem = problem or f"plateau series {obs_id!r} has zero sigma"
+    # Apply the strict 2-sigma rule to the unrounded statistic; quantization is
+    # reserved for the plateau_max_z value recorded by max_passing_z.
     failing = tuple(sorted(name for name, z in z_by_series.items() if z > PLATEAU_Z_LIMIT))
     named = raw.get("named_failure")
     named_id = str(named.get("observation_id") or "") if isinstance(named, Mapping) else ""

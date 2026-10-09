@@ -130,7 +130,7 @@ observations:
     parameters: []
     output_unit: Pa
 - observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_ba_14163_11
-  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::experiment::14163_1050°C 1 hr
+  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::experiment::gibson-hubbard-1972-run-14163-1050c-1hr
   identity:
     quantity:
       tag: unknown
@@ -217,7 +217,7 @@ observations:
     parameters: []
     output_unit: Pa
 - observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_ba_14163_12
-  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::experiment::14163_1050°C 6 hr
+  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::experiment::gibson-hubbard-1972-run-14163-1050c-6hr
   identity:
     quantity:
       tag: unknown
@@ -304,7 +304,7 @@ observations:
     parameters: []
     output_unit: Pa
 - observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_ba_14163_13
-  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::experiment::14163_1050°C 72 hr
+  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::experiment::gibson-hubbard-1972-run-14163-1050c-72hr
   identity:
     quantity:
       tag: unknown
@@ -1885,12 +1885,12 @@ observations:
     - pdf:kems-024-gibson-hubbard-1972
     parameters: []
     output_unit: Pa
-- observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_k_14163_10
-  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::experiment::14163_1050°C instantaneous
+- observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_k_14163_1050c_residue_series::T=1323.15:row=k-row;-14163-1050°c-1-hr-column:h=2186ede236fe
+  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::experiment::gibson-hubbard-1972-run-14163-1050c-1hr
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'elemental_abundance'
+      tag: value
+      value: residue_component_composition
     species:
       formula: K
       phase:
@@ -1902,102 +1902,36 @@ observations:
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: value
+      value: element_ppm_by_mass
     temperature_K:
       tag: value
       value: '1323.15'
-    total_pressure_Pa:
-      tag: value
-      value: '0.0002666447368421052631578947368'
-  value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; unsupported quantity 'elemental_abundance'; refusing to pick a number
-    approximate: false
-  uncertainty:
-    kind: none
-  evidence:
-    class:
-      tag: value
-      value: measured_direct
-    original_method_class: measured_direct
-    attribution: K | 14163 | 1050°C instantaneous | 4220
-  admission:
-    status: pending
-    reason: source admission_status=pending_validation
-  notices: []
-  source_id: kems-024-gibson-hubbard-1972
-  locator:
-    published_page: 2005
-    table: '2'
-    paragraph: K row; 14163 1050°C instantaneous column
-    source_path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
-  read_from: pdf:kems-024-gibson-hubbard-1972
-  point_conditions:
-    temperature_K:
-      state:
-        tag: value
-        value: '1323.15'
-      locator:
-        published_page: 2005
-        table: '2'
-        paragraph: K row; 14163 1050°C instantaneous column
-        source_path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
-      inference:
-        relation: celsius_to_kelvin
-        inputs:
-        - T_K = T_C + 273.15
-        - original_unit=C
-        parameters:
-        - - original
-          - state:
-              tag: value
-              value: '1050'
-            locator:
-              published_page: 2005
-              table: '2'
-              paragraph: K row; 14163 1050°C instantaneous column
-              source_path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
-        - - factor
-          - state:
-              tag: value
-              value: '273.15'
-            locator:
-              published_page: 2005
-              table: '2'
-              paragraph: K row; 14163 1050°C instantaneous column
-              source_path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
-        output_unit: K
-  derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
-    inputs:
-    - pdf:kems-024-gibson-hubbard-1972
-    parameters: []
-    output_unit: Pa
-- observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_k_14163_11
-  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::experiment::14163_1050°C 1 hr
-  identity:
-    quantity:
+    composition:
       tag: unknown
-      reason: unsupported quantity 'elemental_abundance'
-    species:
-      formula: K
-      phase:
-        tag: unknown
-        reason: source does not state phase
-      polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-      charge:
-        tag: value
-        value: 0
-    temperature_K:
-      tag: value
-      value: '1323.15'
+      reason: source has no located starting composition for this run
+    fO2_Pa:
+      tag: unknown
+      reason: source has no located oxygen condition for this run
     total_pressure_Pa:
       tag: value
       value: '0.0002666447368421052631578947368'
+    exposure:
+      tag: value
+      value:
+        area_m2:
+          tag: unknown
+          reason: source has no located exposed area for this run
+        duration_s:
+          tag: value
+          value: '3600'
+    sample_mass_kg:
+      tag: unknown
+      reason: source has no located point sample mass for this run
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; unsupported quantity 'elemental_abundance'; refusing to pick a number
+    kind: point
+    point: '3027'
     approximate: false
   uncertainty:
     kind: none
@@ -2006,11 +1940,16 @@ observations:
       tag: value
       value: measured_direct
     original_method_class: measured_direct
-    attribution: K | 14163 | 1050°C 1 hr | 3027
+    attribution: K | 14163 | 1050°C instantaneous | 4220; 1050°C 1 hr | 3027; 1050°C 6 hr | 1437; 1050°C 72 hr | 88
   admission:
-    status: pending
-    reason: source admission_status=pending_validation
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: source admission_status=pending_validation; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - residue_component_composition
+    reason: 'admission_defaulted: source admission_status=pending_validation; owner ruling d-056; not a reviewer decision'
+    origin: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_k_14163_1050c_residue_series::T=1323.15:row=k-row;-14163-1050°c-1-hr-column:h=2186ede236fe
   source_id: kems-024-gibson-hubbard-1972
   locator:
     published_page: 2005
@@ -2053,18 +1992,75 @@ observations:
               paragraph: K row; 14163 1050°C 1 hr column
               source_path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
         output_unit: K
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.0002666447368421052631578947368'
+          approximate: false
+      locator:
+        published_page: 2004
+        section: Experimental procedures
+        note: Printed evacuated to 2 x 10^-6 Torr; also 'P = 10^-6 Torr' in the 14163 discussion (p. 2009); unit conversion
+          only
+        source_path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+      inference:
+        relation: Torr_to_Pa
+        inputs:
+        - P_Pa = P_Torr × 101325 / 760
+        - original_unit=Torr
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.000002'
+            locator:
+              published_page: 2004
+              section: Experimental procedures
+              note: Printed evacuated to 2 x 10^-6 Torr; also 'P = 10^-6 Torr' in the 14163 discussion (p. 2009); unit conversion
+                only
+              source_path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '133.3223684210526315789473684'
+            locator:
+              published_page: 2004
+              section: Experimental procedures
+              note: Printed evacuated to 2 x 10^-6 Torr; also 'P = 10^-6 Torr' in the 14163 discussion (p. 2009); unit conversion
+                only
+              source_path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+        output_unit: Pa
+    atmosphere:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        published_page: 2004
+        section: Experimental procedures
+        source_path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+    time_min:
+      state:
+        tag: value
+        value: '60'
+      locator:
+        published_page: 2005
+        table: '2'
+        paragraph: K row; 14163 1050°C 1 hr column
+        source_path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
   derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    relation: as_published
     inputs:
     - pdf:kems-024-gibson-hubbard-1972
     parameters: []
-    output_unit: Pa
-- observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_k_14163_12
-  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::experiment::14163_1050°C 6 hr
+    output_unit: ppm
+- observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_k_14163_1050c_residue_series::T=1323.15:row=k-row;-14163-1050°c-6-hr-column:h=5bb5bda06fe4
+  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::experiment::gibson-hubbard-1972-run-14163-1050c-6hr
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'elemental_abundance'
+      tag: value
+      value: residue_component_composition
     species:
       formula: K
       phase:
@@ -2076,15 +2072,36 @@ observations:
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: value
+      value: element_ppm_by_mass
     temperature_K:
       tag: value
       value: '1323.15'
+    composition:
+      tag: unknown
+      reason: source has no located starting composition for this run
+    fO2_Pa:
+      tag: unknown
+      reason: source has no located oxygen condition for this run
     total_pressure_Pa:
       tag: value
       value: '0.0002666447368421052631578947368'
+    exposure:
+      tag: value
+      value:
+        area_m2:
+          tag: unknown
+          reason: source has no located exposed area for this run
+        duration_s:
+          tag: value
+          value: '21600'
+    sample_mass_kg:
+      tag: unknown
+      reason: source has no located point sample mass for this run
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; unsupported quantity 'elemental_abundance'; refusing to pick a number
+    kind: point
+    point: '1437'
     approximate: false
   uncertainty:
     kind: none
@@ -2093,11 +2110,16 @@ observations:
       tag: value
       value: measured_direct
     original_method_class: measured_direct
-    attribution: K | 14163 | 1050°C 6 hr | 1437
+    attribution: K | 14163 | 1050°C instantaneous | 4220; 1050°C 1 hr | 3027; 1050°C 6 hr | 1437; 1050°C 72 hr | 88
   admission:
-    status: pending
-    reason: source admission_status=pending_validation
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: source admission_status=pending_validation; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - residue_component_composition
+    reason: 'admission_defaulted: source admission_status=pending_validation; owner ruling d-056; not a reviewer decision'
+    origin: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_k_14163_1050c_residue_series::T=1323.15:row=k-row;-14163-1050°c-6-hr-column:h=5bb5bda06fe4
   source_id: kems-024-gibson-hubbard-1972
   locator:
     published_page: 2005
@@ -2140,18 +2162,75 @@ observations:
               paragraph: K row; 14163 1050°C 6 hr column
               source_path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
         output_unit: K
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.0002666447368421052631578947368'
+          approximate: false
+      locator:
+        published_page: 2004
+        section: Experimental procedures
+        note: Printed evacuated to 2 x 10^-6 Torr; also 'P = 10^-6 Torr' in the 14163 discussion (p. 2009); unit conversion
+          only
+        source_path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+      inference:
+        relation: Torr_to_Pa
+        inputs:
+        - P_Pa = P_Torr × 101325 / 760
+        - original_unit=Torr
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.000002'
+            locator:
+              published_page: 2004
+              section: Experimental procedures
+              note: Printed evacuated to 2 x 10^-6 Torr; also 'P = 10^-6 Torr' in the 14163 discussion (p. 2009); unit conversion
+                only
+              source_path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '133.3223684210526315789473684'
+            locator:
+              published_page: 2004
+              section: Experimental procedures
+              note: Printed evacuated to 2 x 10^-6 Torr; also 'P = 10^-6 Torr' in the 14163 discussion (p. 2009); unit conversion
+                only
+              source_path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+        output_unit: Pa
+    atmosphere:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        published_page: 2004
+        section: Experimental procedures
+        source_path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+    time_min:
+      state:
+        tag: value
+        value: '360'
+      locator:
+        published_page: 2005
+        table: '2'
+        paragraph: K row; 14163 1050°C 6 hr column
+        source_path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
   derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    relation: as_published
     inputs:
     - pdf:kems-024-gibson-hubbard-1972
     parameters: []
-    output_unit: Pa
-- observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_k_14163_13
-  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::experiment::14163_1050°C 72 hr
+    output_unit: ppm
+- observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_k_14163_1050c_residue_series::T=1323.15:row=k-row;-14163-1050°c-72-hr-column:h=dc7443d5d14a
+  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::experiment::gibson-hubbard-1972-run-14163-1050c-72hr
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'elemental_abundance'
+      tag: value
+      value: residue_component_composition
     species:
       formula: K
       phase:
@@ -2163,15 +2242,36 @@ observations:
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: value
+      value: element_ppm_by_mass
     temperature_K:
       tag: value
       value: '1323.15'
+    composition:
+      tag: unknown
+      reason: source has no located starting composition for this run
+    fO2_Pa:
+      tag: unknown
+      reason: source has no located oxygen condition for this run
     total_pressure_Pa:
       tag: value
       value: '0.0002666447368421052631578947368'
+    exposure:
+      tag: value
+      value:
+        area_m2:
+          tag: unknown
+          reason: source has no located exposed area for this run
+        duration_s:
+          tag: value
+          value: '259200'
+    sample_mass_kg:
+      tag: unknown
+      reason: source has no located point sample mass for this run
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; unsupported quantity 'elemental_abundance'; refusing to pick a number
+    kind: point
+    point: '88'
     approximate: false
   uncertainty:
     kind: none
@@ -2180,11 +2280,16 @@ observations:
       tag: value
       value: measured_direct
     original_method_class: measured_direct
-    attribution: K | 14163 | 1050°C 72 hr | 88
+    attribution: K | 14163 | 1050°C instantaneous | 4220; 1050°C 1 hr | 3027; 1050°C 6 hr | 1437; 1050°C 72 hr | 88
   admission:
-    status: pending
-    reason: source admission_status=pending_validation
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: source admission_status=pending_validation; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - residue_component_composition
+    reason: 'admission_defaulted: source admission_status=pending_validation; owner ruling d-056; not a reviewer decision'
+    origin: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_k_14163_1050c_residue_series::T=1323.15:row=k-row;-14163-1050°c-72-hr-column:h=dc7443d5d14a
   source_id: kems-024-gibson-hubbard-1972
   locator:
     published_page: 2005
@@ -2227,12 +2332,230 @@ observations:
               paragraph: K row; 14163 1050°C 72 hr column
               source_path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
         output_unit: K
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.0002666447368421052631578947368'
+          approximate: false
+      locator:
+        published_page: 2004
+        section: Experimental procedures
+        note: Printed evacuated to 2 x 10^-6 Torr; also 'P = 10^-6 Torr' in the 14163 discussion (p. 2009); unit conversion
+          only
+        source_path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+      inference:
+        relation: Torr_to_Pa
+        inputs:
+        - P_Pa = P_Torr × 101325 / 760
+        - original_unit=Torr
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.000002'
+            locator:
+              published_page: 2004
+              section: Experimental procedures
+              note: Printed evacuated to 2 x 10^-6 Torr; also 'P = 10^-6 Torr' in the 14163 discussion (p. 2009); unit conversion
+                only
+              source_path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '133.3223684210526315789473684'
+            locator:
+              published_page: 2004
+              section: Experimental procedures
+              note: Printed evacuated to 2 x 10^-6 Torr; also 'P = 10^-6 Torr' in the 14163 discussion (p. 2009); unit conversion
+                only
+              source_path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+        output_unit: Pa
+    atmosphere:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        published_page: 2004
+        section: Experimental procedures
+        source_path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+    time_min:
+      state:
+        tag: value
+        value: '4320'
+      locator:
+        published_page: 2005
+        table: '2'
+        paragraph: K row; 14163 1050°C 72 hr column
+        source_path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
   derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    relation: as_published
     inputs:
     - pdf:kems-024-gibson-hubbard-1972
     parameters: []
-    output_unit: Pa
+    output_unit: ppm
+- observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_k_14163_1050c_residue_series::T=1323.15:row=k-row;-14163-1050°c-instantaneous-column:h=fa9e2b94082c
+  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::experiment::gibson-hubbard-1972-run-14163-1050c-instantaneous
+  identity:
+    quantity:
+      tag: value
+      value: residue_component_composition
+    species:
+      formula: K
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: element_ppm_by_mass
+    temperature_K:
+      tag: value
+      value: '1323.15'
+    composition:
+      tag: unknown
+      reason: source has no located starting composition for this run
+    fO2_Pa:
+      tag: unknown
+      reason: source has no located oxygen condition for this run
+    total_pressure_Pa:
+      tag: value
+      value: '0.0002666447368421052631578947368'
+    exposure:
+      tag: value
+      value:
+        area_m2:
+          tag: unknown
+          reason: source has no located exposed area for this run
+        duration_s:
+          tag: unknown
+          reason: source has no located run duration for this point
+    sample_mass_kg:
+      tag: unknown
+      reason: source has no located point sample mass for this run
+  value:
+    kind: point
+    point: '4220'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+    attribution: K | 14163 | 1050°C instantaneous | 4220; 1050°C 1 hr | 3027; 1050°C 6 hr | 1437; 1050°C 72 hr | 88
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: source admission_status=pending_validation; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - residue_component_composition
+    reason: 'admission_defaulted: source admission_status=pending_validation; owner ruling d-056; not a reviewer decision'
+    origin: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_k_14163_1050c_residue_series::T=1323.15:row=k-row;-14163-1050°c-instantaneous-column:h=fa9e2b94082c
+  source_id: kems-024-gibson-hubbard-1972
+  locator:
+    published_page: 2005
+    table: '2'
+    paragraph: K row; 14163 1050°C instantaneous column
+    source_path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+  read_from: pdf:kems-024-gibson-hubbard-1972
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1323.15'
+      locator:
+        published_page: 2005
+        table: '2'
+        paragraph: K row; 14163 1050°C instantaneous column
+        source_path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1050'
+            locator:
+              published_page: 2005
+              table: '2'
+              paragraph: K row; 14163 1050°C instantaneous column
+              source_path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 2005
+              table: '2'
+              paragraph: K row; 14163 1050°C instantaneous column
+              source_path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+        output_unit: K
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.0002666447368421052631578947368'
+          approximate: false
+      locator:
+        published_page: 2004
+        section: Experimental procedures
+        note: Printed evacuated to 2 x 10^-6 Torr; also 'P = 10^-6 Torr' in the 14163 discussion (p. 2009); unit conversion
+          only
+        source_path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+      inference:
+        relation: Torr_to_Pa
+        inputs:
+        - P_Pa = P_Torr × 101325 / 760
+        - original_unit=Torr
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.000002'
+            locator:
+              published_page: 2004
+              section: Experimental procedures
+              note: Printed evacuated to 2 x 10^-6 Torr; also 'P = 10^-6 Torr' in the 14163 discussion (p. 2009); unit conversion
+                only
+              source_path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '133.3223684210526315789473684'
+            locator:
+              published_page: 2004
+              section: Experimental procedures
+              note: Printed evacuated to 2 x 10^-6 Torr; also 'P = 10^-6 Torr' in the 14163 discussion (p. 2009); unit conversion
+                only
+              source_path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+        output_unit: Pa
+    atmosphere:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        published_page: 2004
+        section: Experimental procedures
+        source_path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:kems-024-gibson-hubbard-1972
+    parameters: []
+    output_unit: ppm
 - observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_k_14163_9
   experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::kems-024-gibson-hubbard-1972::14163_Initial†
   identity:
@@ -2667,7 +2990,7 @@ observations:
     parameters: []
     output_unit: Pa
 - observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_k_ba_14163_10
-  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::experiment::14163_1050°C instantaneous
+  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::experiment::gibson-hubbard-1972-run-14163-1050c-instantaneous
   identity:
     quantity:
       tag: unknown
@@ -2755,7 +3078,7 @@ observations:
     parameters: []
     output_unit: Pa
 - observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_k_ba_14163_11
-  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::experiment::14163_1050°C 1 hr
+  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::experiment::gibson-hubbard-1972-run-14163-1050c-1hr
   identity:
     quantity:
       tag: unknown
@@ -2843,7 +3166,7 @@ observations:
     parameters: []
     output_unit: Pa
 - observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_k_ba_14163_12
-  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::experiment::14163_1050°C 6 hr
+  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::experiment::gibson-hubbard-1972-run-14163-1050c-6hr
   identity:
     quantity:
       tag: unknown
@@ -2931,7 +3254,7 @@ observations:
     parameters: []
     output_unit: Pa
 - observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_k_ba_14163_13
-  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::experiment::14163_1050°C 72 hr
+  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::experiment::gibson-hubbard-1972-run-14163-1050c-72hr
   identity:
     quantity:
       tag: unknown
@@ -3711,7 +4034,7 @@ observations:
     parameters: []
     output_unit: Pa
 - observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_k_rb_14163_10
-  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::experiment::14163_1050°C instantaneous
+  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::experiment::gibson-hubbard-1972-run-14163-1050c-instantaneous
   identity:
     quantity:
       tag: unknown
@@ -3799,7 +4122,7 @@ observations:
     parameters: []
     output_unit: Pa
 - observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_k_rb_14163_11
-  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::experiment::14163_1050°C 1 hr
+  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::experiment::gibson-hubbard-1972-run-14163-1050c-1hr
   identity:
     quantity:
       tag: unknown
@@ -3887,7 +4210,7 @@ observations:
     parameters: []
     output_unit: Pa
 - observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_k_rb_14163_12
-  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::experiment::14163_1050°C 6 hr
+  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::experiment::gibson-hubbard-1972-run-14163-1050c-6hr
   identity:
     quantity:
       tag: unknown
@@ -3975,7 +4298,7 @@ observations:
     parameters: []
     output_unit: Pa
 - observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_k_rb_14163_13
-  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::experiment::14163_1050°C 72 hr
+  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::experiment::gibson-hubbard-1972-run-14163-1050c-72hr
   identity:
     quantity:
       tag: unknown
@@ -5183,12 +5506,12 @@ observations:
     - pdf:kems-024-gibson-hubbard-1972
     parameters: []
     output_unit: Pa
-- observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_na_14163_10
-  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::experiment::14163_1050°C instantaneous
+- observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_na_14163_1050c_residue_series::T=1323.15:row=na-row;-14163-1050°c-1-hr-column:h=8a94209c3035
+  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::experiment::gibson-hubbard-1972-run-14163-1050c-1hr
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'elemental_abundance'
+      tag: value
+      value: residue_component_composition
     species:
       formula: Na
       phase:
@@ -5200,102 +5523,36 @@ observations:
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: value
+      value: element_ppm_by_mass
     temperature_K:
       tag: value
       value: '1323.15'
-    total_pressure_Pa:
-      tag: value
-      value: '0.0002666447368421052631578947368'
-  value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; unsupported quantity 'elemental_abundance'; refusing to pick a number
-    approximate: false
-  uncertainty:
-    kind: none
-  evidence:
-    class:
-      tag: value
-      value: measured_direct
-    original_method_class: measured_direct
-    attribution: Na | 14163 | 1050°C instantaneous | 4660
-  admission:
-    status: pending
-    reason: source admission_status=pending_validation
-  notices: []
-  source_id: kems-024-gibson-hubbard-1972
-  locator:
-    published_page: 2005
-    table: '2'
-    paragraph: Na row; 14163 1050°C instantaneous column
-    source_path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
-  read_from: pdf:kems-024-gibson-hubbard-1972
-  point_conditions:
-    temperature_K:
-      state:
-        tag: value
-        value: '1323.15'
-      locator:
-        published_page: 2005
-        table: '2'
-        paragraph: Na row; 14163 1050°C instantaneous column
-        source_path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
-      inference:
-        relation: celsius_to_kelvin
-        inputs:
-        - T_K = T_C + 273.15
-        - original_unit=C
-        parameters:
-        - - original
-          - state:
-              tag: value
-              value: '1050'
-            locator:
-              published_page: 2005
-              table: '2'
-              paragraph: Na row; 14163 1050°C instantaneous column
-              source_path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
-        - - factor
-          - state:
-              tag: value
-              value: '273.15'
-            locator:
-              published_page: 2005
-              table: '2'
-              paragraph: Na row; 14163 1050°C instantaneous column
-              source_path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
-        output_unit: K
-  derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
-    inputs:
-    - pdf:kems-024-gibson-hubbard-1972
-    parameters: []
-    output_unit: Pa
-- observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_na_14163_11
-  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::experiment::14163_1050°C 1 hr
-  identity:
-    quantity:
+    composition:
       tag: unknown
-      reason: unsupported quantity 'elemental_abundance'
-    species:
-      formula: Na
-      phase:
-        tag: unknown
-        reason: source does not state phase
-      polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-      charge:
-        tag: value
-        value: 0
-    temperature_K:
-      tag: value
-      value: '1323.15'
+      reason: source has no located starting composition for this run
+    fO2_Pa:
+      tag: unknown
+      reason: source has no located oxygen condition for this run
     total_pressure_Pa:
       tag: value
       value: '0.0002666447368421052631578947368'
+    exposure:
+      tag: value
+      value:
+        area_m2:
+          tag: unknown
+          reason: source has no located exposed area for this run
+        duration_s:
+          tag: value
+          value: '3600'
+    sample_mass_kg:
+      tag: unknown
+      reason: source has no located point sample mass for this run
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; unsupported quantity 'elemental_abundance'; refusing to pick a number
+    kind: point
+    point: '4110'
     approximate: false
   uncertainty:
     kind: none
@@ -5304,11 +5561,16 @@ observations:
       tag: value
       value: measured_direct
     original_method_class: measured_direct
-    attribution: Na | 14163 | 1050°C 1 hr | 4110
+    attribution: Na | 14163 | 1050°C instantaneous | 4660; 1050°C 1 hr | 4110; 1050°C 6 hr | 3140; 1050°C 72 hr | 1730
   admission:
-    status: pending
-    reason: source admission_status=pending_validation
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: source admission_status=pending_validation; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - residue_component_composition
+    reason: 'admission_defaulted: source admission_status=pending_validation; owner ruling d-056; not a reviewer decision'
+    origin: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_na_14163_1050c_residue_series::T=1323.15:row=na-row;-14163-1050°c-1-hr-column:h=8a94209c3035
   source_id: kems-024-gibson-hubbard-1972
   locator:
     published_page: 2005
@@ -5351,18 +5613,75 @@ observations:
               paragraph: Na row; 14163 1050°C 1 hr column
               source_path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
         output_unit: K
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.0002666447368421052631578947368'
+          approximate: false
+      locator:
+        published_page: 2004
+        section: Experimental procedures
+        note: Printed evacuated to 2 x 10^-6 Torr; also 'P = 10^-6 Torr' in the 14163 discussion (p. 2009); unit conversion
+          only
+        source_path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+      inference:
+        relation: Torr_to_Pa
+        inputs:
+        - P_Pa = P_Torr × 101325 / 760
+        - original_unit=Torr
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.000002'
+            locator:
+              published_page: 2004
+              section: Experimental procedures
+              note: Printed evacuated to 2 x 10^-6 Torr; also 'P = 10^-6 Torr' in the 14163 discussion (p. 2009); unit conversion
+                only
+              source_path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '133.3223684210526315789473684'
+            locator:
+              published_page: 2004
+              section: Experimental procedures
+              note: Printed evacuated to 2 x 10^-6 Torr; also 'P = 10^-6 Torr' in the 14163 discussion (p. 2009); unit conversion
+                only
+              source_path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+        output_unit: Pa
+    atmosphere:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        published_page: 2004
+        section: Experimental procedures
+        source_path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+    time_min:
+      state:
+        tag: value
+        value: '60'
+      locator:
+        published_page: 2005
+        table: '2'
+        paragraph: Na row; 14163 1050°C 1 hr column
+        source_path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
   derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    relation: as_published
     inputs:
     - pdf:kems-024-gibson-hubbard-1972
     parameters: []
-    output_unit: Pa
-- observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_na_14163_12
-  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::experiment::14163_1050°C 6 hr
+    output_unit: ppm
+- observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_na_14163_1050c_residue_series::T=1323.15:row=na-row;-14163-1050°c-6-hr-column:h=44e6a5e22b28
+  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::experiment::gibson-hubbard-1972-run-14163-1050c-6hr
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'elemental_abundance'
+      tag: value
+      value: residue_component_composition
     species:
       formula: Na
       phase:
@@ -5374,15 +5693,36 @@ observations:
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: value
+      value: element_ppm_by_mass
     temperature_K:
       tag: value
       value: '1323.15'
+    composition:
+      tag: unknown
+      reason: source has no located starting composition for this run
+    fO2_Pa:
+      tag: unknown
+      reason: source has no located oxygen condition for this run
     total_pressure_Pa:
       tag: value
       value: '0.0002666447368421052631578947368'
+    exposure:
+      tag: value
+      value:
+        area_m2:
+          tag: unknown
+          reason: source has no located exposed area for this run
+        duration_s:
+          tag: value
+          value: '21600'
+    sample_mass_kg:
+      tag: unknown
+      reason: source has no located point sample mass for this run
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; unsupported quantity 'elemental_abundance'; refusing to pick a number
+    kind: point
+    point: '3140'
     approximate: false
   uncertainty:
     kind: none
@@ -5391,11 +5731,16 @@ observations:
       tag: value
       value: measured_direct
     original_method_class: measured_direct
-    attribution: Na | 14163 | 1050°C 6 hr | 3140
+    attribution: Na | 14163 | 1050°C instantaneous | 4660; 1050°C 1 hr | 4110; 1050°C 6 hr | 3140; 1050°C 72 hr | 1730
   admission:
-    status: pending
-    reason: source admission_status=pending_validation
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: source admission_status=pending_validation; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - residue_component_composition
+    reason: 'admission_defaulted: source admission_status=pending_validation; owner ruling d-056; not a reviewer decision'
+    origin: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_na_14163_1050c_residue_series::T=1323.15:row=na-row;-14163-1050°c-6-hr-column:h=44e6a5e22b28
   source_id: kems-024-gibson-hubbard-1972
   locator:
     published_page: 2005
@@ -5438,18 +5783,75 @@ observations:
               paragraph: Na row; 14163 1050°C 6 hr column
               source_path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
         output_unit: K
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.0002666447368421052631578947368'
+          approximate: false
+      locator:
+        published_page: 2004
+        section: Experimental procedures
+        note: Printed evacuated to 2 x 10^-6 Torr; also 'P = 10^-6 Torr' in the 14163 discussion (p. 2009); unit conversion
+          only
+        source_path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+      inference:
+        relation: Torr_to_Pa
+        inputs:
+        - P_Pa = P_Torr × 101325 / 760
+        - original_unit=Torr
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.000002'
+            locator:
+              published_page: 2004
+              section: Experimental procedures
+              note: Printed evacuated to 2 x 10^-6 Torr; also 'P = 10^-6 Torr' in the 14163 discussion (p. 2009); unit conversion
+                only
+              source_path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '133.3223684210526315789473684'
+            locator:
+              published_page: 2004
+              section: Experimental procedures
+              note: Printed evacuated to 2 x 10^-6 Torr; also 'P = 10^-6 Torr' in the 14163 discussion (p. 2009); unit conversion
+                only
+              source_path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+        output_unit: Pa
+    atmosphere:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        published_page: 2004
+        section: Experimental procedures
+        source_path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+    time_min:
+      state:
+        tag: value
+        value: '360'
+      locator:
+        published_page: 2005
+        table: '2'
+        paragraph: Na row; 14163 1050°C 6 hr column
+        source_path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
   derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    relation: as_published
     inputs:
     - pdf:kems-024-gibson-hubbard-1972
     parameters: []
-    output_unit: Pa
-- observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_na_14163_13
-  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::experiment::14163_1050°C 72 hr
+    output_unit: ppm
+- observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_na_14163_1050c_residue_series::T=1323.15:row=na-row;-14163-1050°c-72-hr-column:h=fef5d179c6b3
+  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::experiment::gibson-hubbard-1972-run-14163-1050c-72hr
   identity:
     quantity:
-      tag: unknown
-      reason: unsupported quantity 'elemental_abundance'
+      tag: value
+      value: residue_component_composition
     species:
       formula: Na
       phase:
@@ -5461,15 +5863,36 @@ observations:
       charge:
         tag: value
         value: 0
+    subtype:
+      tag: value
+      value: element_ppm_by_mass
     temperature_K:
       tag: value
       value: '1323.15'
+    composition:
+      tag: unknown
+      reason: source has no located starting composition for this run
+    fO2_Pa:
+      tag: unknown
+      reason: source has no located oxygen condition for this run
     total_pressure_Pa:
       tag: value
       value: '0.0002666447368421052631578947368'
+    exposure:
+      tag: value
+      value:
+        area_m2:
+          tag: unknown
+          reason: source has no located exposed area for this run
+        duration_s:
+          tag: value
+          value: '259200'
+    sample_mass_kg:
+      tag: unknown
+      reason: source has no located point sample mass for this run
   value:
-    kind: unavailable
-    unavailable_reason: declared quantity is unknown; unsupported quantity 'elemental_abundance'; refusing to pick a number
+    kind: point
+    point: '1730'
     approximate: false
   uncertainty:
     kind: none
@@ -5478,11 +5901,16 @@ observations:
       tag: value
       value: measured_direct
     original_method_class: measured_direct
-    attribution: Na | 14163 | 1050°C 72 hr | 1730
+    attribution: Na | 14163 | 1050°C instantaneous | 4660; 1050°C 1 hr | 4110; 1050°C 6 hr | 3140; 1050°C 72 hr | 1730
   admission:
-    status: pending
-    reason: source admission_status=pending_validation
-  notices: []
+    status: admitted
+    reason: 'admission_defaulted: source admission_status=pending_validation; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - residue_component_composition
+    reason: 'admission_defaulted: source admission_status=pending_validation; owner ruling d-056; not a reviewer decision'
+    origin: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_na_14163_1050c_residue_series::T=1323.15:row=na-row;-14163-1050°c-72-hr-column:h=fef5d179c6b3
   source_id: kems-024-gibson-hubbard-1972
   locator:
     published_page: 2005
@@ -5525,12 +5953,230 @@ observations:
               paragraph: Na row; 14163 1050°C 72 hr column
               source_path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
         output_unit: K
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.0002666447368421052631578947368'
+          approximate: false
+      locator:
+        published_page: 2004
+        section: Experimental procedures
+        note: Printed evacuated to 2 x 10^-6 Torr; also 'P = 10^-6 Torr' in the 14163 discussion (p. 2009); unit conversion
+          only
+        source_path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+      inference:
+        relation: Torr_to_Pa
+        inputs:
+        - P_Pa = P_Torr × 101325 / 760
+        - original_unit=Torr
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.000002'
+            locator:
+              published_page: 2004
+              section: Experimental procedures
+              note: Printed evacuated to 2 x 10^-6 Torr; also 'P = 10^-6 Torr' in the 14163 discussion (p. 2009); unit conversion
+                only
+              source_path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '133.3223684210526315789473684'
+            locator:
+              published_page: 2004
+              section: Experimental procedures
+              note: Printed evacuated to 2 x 10^-6 Torr; also 'P = 10^-6 Torr' in the 14163 discussion (p. 2009); unit conversion
+                only
+              source_path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+        output_unit: Pa
+    atmosphere:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        published_page: 2004
+        section: Experimental procedures
+        source_path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+    time_min:
+      state:
+        tag: value
+        value: '4320'
+      locator:
+        published_page: 2005
+        table: '2'
+        paragraph: Na row; 14163 1050°C 72 hr column
+        source_path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
   derivation:
-    relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
+    relation: as_published
     inputs:
     - pdf:kems-024-gibson-hubbard-1972
     parameters: []
-    output_unit: Pa
+    output_unit: ppm
+- observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_na_14163_1050c_residue_series::T=1323.15:row=na-row;-14163-1050°c-instantaneous-column:h=741c7948e873
+  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::experiment::gibson-hubbard-1972-run-14163-1050c-instantaneous
+  identity:
+    quantity:
+      tag: value
+      value: residue_component_composition
+    species:
+      formula: Na
+      phase:
+        tag: unknown
+        reason: source does not state phase
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: value
+      value: element_ppm_by_mass
+    temperature_K:
+      tag: value
+      value: '1323.15'
+    composition:
+      tag: unknown
+      reason: source has no located starting composition for this run
+    fO2_Pa:
+      tag: unknown
+      reason: source has no located oxygen condition for this run
+    total_pressure_Pa:
+      tag: value
+      value: '0.0002666447368421052631578947368'
+    exposure:
+      tag: value
+      value:
+        area_m2:
+          tag: unknown
+          reason: source has no located exposed area for this run
+        duration_s:
+          tag: unknown
+          reason: source has no located run duration for this point
+    sample_mass_kg:
+      tag: unknown
+      reason: source has no located point sample mass for this run
+  value:
+    kind: point
+    point: '4660'
+    approximate: false
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+    attribution: Na | 14163 | 1050°C instantaneous | 4660; 1050°C 1 hr | 4110; 1050°C 6 hr | 3140; 1050°C 72 hr | 1730
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: source admission_status=pending_validation; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - residue_component_composition
+    reason: 'admission_defaulted: source admission_status=pending_validation; owner ruling d-056; not a reviewer decision'
+    origin: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_na_14163_1050c_residue_series::T=1323.15:row=na-row;-14163-1050°c-instantaneous-column:h=741c7948e873
+  source_id: kems-024-gibson-hubbard-1972
+  locator:
+    published_page: 2005
+    table: '2'
+    paragraph: Na row; 14163 1050°C instantaneous column
+    source_path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+  read_from: pdf:kems-024-gibson-hubbard-1972
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1323.15'
+      locator:
+        published_page: 2005
+        table: '2'
+        paragraph: Na row; 14163 1050°C instantaneous column
+        source_path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1050'
+            locator:
+              published_page: 2005
+              table: '2'
+              paragraph: Na row; 14163 1050°C instantaneous column
+              source_path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 2005
+              table: '2'
+              paragraph: Na row; 14163 1050°C instantaneous column
+              source_path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+        output_unit: K
+    total_pressure_Pa:
+      state:
+        tag: value
+        value:
+          kind: point
+          point: '0.0002666447368421052631578947368'
+          approximate: false
+      locator:
+        published_page: 2004
+        section: Experimental procedures
+        note: Printed evacuated to 2 x 10^-6 Torr; also 'P = 10^-6 Torr' in the 14163 discussion (p. 2009); unit conversion
+          only
+        source_path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+      inference:
+        relation: Torr_to_Pa
+        inputs:
+        - P_Pa = P_Torr × 101325 / 760
+        - original_unit=Torr
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '0.000002'
+            locator:
+              published_page: 2004
+              section: Experimental procedures
+              note: Printed evacuated to 2 x 10^-6 Torr; also 'P = 10^-6 Torr' in the 14163 discussion (p. 2009); unit conversion
+                only
+              source_path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '133.3223684210526315789473684'
+            locator:
+              published_page: 2004
+              section: Experimental procedures
+              note: Printed evacuated to 2 x 10^-6 Torr; also 'P = 10^-6 Torr' in the 14163 discussion (p. 2009); unit conversion
+                only
+              source_path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+        output_unit: Pa
+    atmosphere:
+      state:
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        published_page: 2004
+        section: Experimental procedures
+        source_path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:kems-024-gibson-hubbard-1972
+    parameters: []
+    output_unit: ppm
 - observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_na_14163_9
   experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::kems-024-gibson-hubbard-1972::14163_Initial†
   identity:
@@ -6519,7 +7165,7 @@ observations:
     parameters: []
     output_unit: Pa
 - observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_rb_14163_10
-  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::experiment::14163_1050°C instantaneous
+  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::experiment::gibson-hubbard-1972-run-14163-1050c-instantaneous
   identity:
     quantity:
       tag: unknown
@@ -6606,7 +7252,7 @@ observations:
     parameters: []
     output_unit: Pa
 - observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_rb_14163_11
-  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::experiment::14163_1050°C 1 hr
+  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::experiment::gibson-hubbard-1972-run-14163-1050c-1hr
   identity:
     quantity:
       tag: unknown
@@ -6693,7 +7339,7 @@ observations:
     parameters: []
     output_unit: Pa
 - observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_rb_14163_12
-  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::experiment::14163_1050°C 6 hr
+  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::experiment::gibson-hubbard-1972-run-14163-1050c-6hr
   identity:
     quantity:
       tag: unknown
@@ -6780,7 +7426,7 @@ observations:
     parameters: []
     output_unit: Pa
 - observation_id: kems-024-gibson-hubbard-1972::gibson_hubbard_1972_rb_14163_13
-  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::experiment::14163_1050°C 72 hr
+  experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::experiment::gibson-hubbard-1972-run-14163-1050c-72hr
   identity:
     quantity:
       tag: unknown
