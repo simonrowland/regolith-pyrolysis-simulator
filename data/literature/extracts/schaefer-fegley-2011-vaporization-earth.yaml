@@ -28,22 +28,22 @@ corrections: []
 fidelity_samples:
   - path: species.continental_crust.observations[schaefer_2012_table2_continental_crust_bulk_composition].values.rows[0].value_as_printed
     value: '47.20'
-    locator: {source_path: /Users/simonrowland/Repos/regolith-corpus/raw/schaefer-fegley-2011-vaporization-earth/schaefer-fegley-2011-vaporization-earth.pdf, pdf_page_index: 32, table: '2', row: O, column: 'Continental Crust (wt%)'}
+    locator: {source_path: corpus/raw/schaefer-fegley-2011-vaporization-earth/schaefer-fegley-2011-vaporization-earth.pdf, pdf_page_index: 32, table: '2', row: O, column: 'Continental Crust (wt%)'}
   - path: species.bulk_silicate_earth.observations[schaefer_2012_table2_bse_bulk_composition].values.rows[14].value_as_printed
     value: '0.88×10^-4'
-    locator: {source_path: /Users/simonrowland/Repos/regolith-corpus/raw/schaefer-fegley-2011-vaporization-earth/schaefer-fegley-2011-vaporization-earth.pdf, pdf_page_index: 32, table: '2', row: 'N', column: 'Bulk Silicate Earth (wt%)'}
+    locator: {source_path: corpus/raw/schaefer-fegley-2011-vaporization-earth/schaefer-fegley-2011-vaporization-earth.pdf, pdf_page_index: 32, table: '2', row: 'N', column: 'Bulk Silicate Earth (wt%)'}
   - path: species.continental_crust.observations[schaefer_2012_table3_cc_extreme_atmospheres].values.rows[0].abundance_as_printed
     value: '49%'
-    locator: {source_path: /Users/simonrowland/Repos/regolith-corpus/raw/schaefer-fegley-2011-vaporization-earth/schaefer-fegley-2011-vaporization-earth.pdf, pdf_page_index: 33, table: '3', row: 'low P / low T / continental crust', column: H2O}
+    locator: {source_path: corpus/raw/schaefer-fegley-2011-vaporization-earth/schaefer-fegley-2011-vaporization-earth.pdf, pdf_page_index: 33, table: '3', row: 'low P / low T / continental crust', column: H2O}
   - path: species.photochemical_gases.observations[schaefer_2012_table4_j1_photolysis_rates].values.rows[0].value_as_printed
     value: '1.18×10^-5'
-    locator: {source_path: /Users/simonrowland/Repos/regolith-corpus/raw/schaefer-fegley-2011-vaporization-earth/schaefer-fegley-2011-vaporization-earth.pdf, pdf_page_index: 34, table: '4', row: H2O, column: 'J1 (s^-1), 1 AU'}
+    locator: {source_path: corpus/raw/schaefer-fegley-2011-vaporization-earth/schaefer-fegley-2011-vaporization-earth.pdf, pdf_page_index: 34, table: '4', row: H2O, column: 'J1 (s^-1), 1 AU'}
   - path: species.continental_crust.observations[schaefer_2012_cc_100bar_major_gas_summary].values.rows[0].result_as_printed
     value: '~55%'
-    locator: {source_path: /Users/simonrowland/Repos/regolith-corpus/raw/schaefer-fegley-2011-vaporization-earth/schaefer-fegley-2011-vaporization-earth.pdf, pdf_page_index: 7, section: '3.1.1 Continental Crust', paragraph: 'Figure 1 discussion', row: 'broad temperature range', column: steam abundance}
+    locator: {source_path: corpus/raw/schaefer-fegley-2011-vaporization-earth/schaefer-fegley-2011-vaporization-earth.pdf, pdf_page_index: 7, section: '3.1.1 Continental Crust', paragraph: 'Figure 1 discussion', row: 'broad temperature range', column: steam abundance}
   - path: species.volatile_boundary_map.observations[schaefer_2012_figure8_volatile_boundaries].values.rows[0].temperature_K_as_plotted
     value: '~1800'
-    locator: {source_path: /Users/simonrowland/Repos/regolith-corpus/raw/schaefer-fegley-2011-vaporization-earth/schaefer-fegley-2011-vaporization-earth.pdf, pdf_page_index: 47, figure: '8', row: H, column: 'log P = -6 bars; boundary temperature (K)'}
+    locator: {source_path: corpus/raw/schaefer-fegley-2011-vaporization-earth/schaefer-fegley-2011-vaporization-earth.pdf, pdf_page_index: 47, figure: '8', row: H, column: 'log P = -6 bars; boundary temperature (K)'}
 
 species:
   planetary_context:
