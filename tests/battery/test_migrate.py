@@ -5356,7 +5356,9 @@ def test_kume_activity_compositions_map_to_parent_oxide_basis(tmp_path: Path) ->
     assert unknown_observation.identity.composition.is_unknown
 
 
-def test_kume_tables_3_and_4_composition_gap_baseline_pin(tmp_path: Path) -> None:
+def test_kume_tables_3_and_4_printed_compositions_and_activities_bind(
+    tmp_path: Path,
+) -> None:
     result = _migrate_real_extract(
         tmp_path / "real", "kume-2000-cao-activities.yaml"
     )
@@ -5365,15 +5367,48 @@ def test_kume_tables_3_and_4_composition_gap_baseline_pin(tmp_path: Path) -> Non
         for obs in result.observations.values()
     }
 
-    # Printed table compositions are currently attached to the CaO rows only.
-    sio2 = observations["kume_2000_table3_sample_207_sio2_activity"]
-    assert sio2.identity.composition is not None
-    assert sio2.identity.composition.is_unknown
-    assert sio2.identity.composition.reason == "no composition mapped from source"
+    sio2_rows = [
+        obs for obs in observations.values()
+        if obs.observation_id.endswith("_sio2_activity")
+    ]
+    assert len(sio2_rows) == 104
+    assert all(
+        obs.identity.composition is not None
+        and obs.identity.composition.is_value
+        for obs in sio2_rows
+    )
+    for sample_id in (
+        "kume_2000_table3_sample_207",
+        "kume_2000_table4_sample_306",
+    ):
+        assert (
+            observations[f"{sample_id}_sio2_activity"].identity.composition
+            == observations[sample_id].identity.composition
+        )
 
-    # The extract currently omits the Table 3/4 MgO and AlO1.5 activity rows.
-    assert not any("_mgo_activity" in observation_id for observation_id in observations)
-    assert not any("_alo1_5_activity" in observation_id for observation_id in observations)
+    mgo_rows = [
+        obs for obs in observations.values()
+        if obs.observation_id.endswith("_mgo_activity")
+    ]
+    alo_rows = [
+        obs for obs in observations.values()
+        if obs.observation_id.endswith("_alo1_5_activity")
+    ]
+    assert len(mgo_rows) == 45
+    assert len(alo_rows) == 18
+
+    table3_mgo = observations["kume_2000_table3_sample_207_mgo_activity"]
+    assert table3_mgo.value.point == Decimal("0.103")
+    assert (
+        table3_mgo.identity.composition
+        == observations["kume_2000_table3_sample_207"].identity.composition
+    )
+    table4_mgo = observations["kume_2000_table4_sample_306_mgo_activity"]
+    table4_al = observations["kume_2000_table4_sample_306_alo1_5_activity"]
+    assert table4_mgo.value.point == Decimal("0.362")
+    assert table4_al.value.point == Decimal("0.0076")
+    assert table4_al.identity.composition.value.as_map()["Al2O3"] > 0
+    assert "AlO1.5" not in table4_al.identity.composition.value.as_map()
 
 
 @pytest.mark.parametrize(
