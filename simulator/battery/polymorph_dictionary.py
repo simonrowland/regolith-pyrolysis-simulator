@@ -227,6 +227,21 @@ CROSS_SOURCE_EQUIVALENCES: tuple[tuple[str, str, str, Polymorph], ...] = (
     ("Al2SiO5", "Sillimanite", "Sillimanite", Polymorph.SILLIMANITE),
 )
 
+_GENERIC_CRYSTAL_QUALIFIERS = frozenset(
+    {
+        Polymorph.ALPHA,
+        Polymorph.BETA,
+        Polymorph.GAMMA,
+        Polymorph.DELTA,
+        Polymorph.KAPPA,
+        Polymorph.I,
+        Polymorph.II,
+        Polymorph.III,
+        Polymorph.IV,
+        Polymorph.V,
+    }
+)
+
 
 def classify_printed_qualifier(qualifier: str | None) -> PrintedQualifierKind:
     if not qualifier:
@@ -387,3 +402,37 @@ def resolve_printed_name_polymorph(name: str | None) -> Polymorph | None:
         return coerce_polymorph_token(text)
     except ValueError:
         return None
+
+
+def resolve_formula_polymorph(
+    formula: str, printed_name: str | None
+) -> Polymorph | None:
+    """Resolve a printed polymorph in its formula context.
+
+    Generic qualifiers such as ``alpha`` are not identities by themselves;
+    first resolve them through the formula-keyed JANAF dictionary. When that
+    dictionary has no entry for the formula, preserve the existing generic
+    token. Named mineral polymorphs such as tridymite remain closed tokens
+    when no JANAF qualifier exists for that formula.
+    """
+
+    text = str(printed_name or "").strip()
+    token = resolve_printed_name_polymorph(text)
+    if token is None:
+        return None
+    if token not in _GENERIC_CRYSTAL_QUALIFIERS:
+        return token
+
+    for _, qualifier in JANAF_CRYSTAL_DICTIONARY:
+        if qualifier.casefold() == text.casefold():
+            resolved = lookup_janaf_crystal(formula, qualifier)
+            if resolved is not None:
+                return resolved
+    return token
+
+
+def is_generic_polymorph_name(printed_name: str | None) -> bool:
+    """Whether a printed name is a formula-dependent crystal qualifier."""
+
+    token = resolve_printed_name_polymorph(printed_name)
+    return token in _GENERIC_CRYSTAL_QUALIFIERS

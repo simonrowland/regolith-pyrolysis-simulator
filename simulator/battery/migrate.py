@@ -54,7 +54,8 @@ import yaml
 
 from simulator.battery.polymorph_dictionary import (
     POLYMORPH_ALIASES,
-    resolve_printed_name_polymorph,
+    is_generic_polymorph_name,
+    resolve_formula_polymorph,
 )
 from simulator.battery.enums import (
     AdmissionStatus,
@@ -6022,26 +6023,12 @@ def reference_state_from_extract(
             + r")(?![A-Za-z0-9_])",
             re.IGNORECASE,
         )
-        generic_names = {
-            Polymorph.ALPHA,
-            Polymorph.BETA,
-            Polymorph.GAMMA,
-            Polymorph.DELTA,
-            Polymorph.KAPPA,
-            Polymorph.I,
-            Polymorph.II,
-            Polymorph.III,
-            Polymorph.IV,
-            Polymorph.V,
-        }
         named_polymorphs = set()
         for match in name_pattern.finditer(text):
-            token = resolve_printed_name_polymorph(match.group())
-            if token is None or token is Polymorph.REFERENCE:
-                continue
-            if token in generic_names:
-                # These aliases also occur as coefficients or table numerals;
-                # require a named phase context for them.
+            printed_name = match.group()
+            if is_generic_polymorph_name(printed_name):
+                # These qualifiers also occur as coefficients or table
+                # numerals; require a named phase context for them.
                 before = text[max(0, match.start() - 48) : match.start()]
                 after = text[match.end() : match.end() + 48]
                 formula_before = re.search(
@@ -6057,6 +6044,9 @@ def reference_state_from_extract(
                 )
                 if not is_named_form:
                     continue
+            token = resolve_formula_polymorph(formula, printed_name)
+            if token is None or token is Polymorph.REFERENCE:
+                continue
             named_polymorphs.add(token)
         if len(named_polymorphs) > 1:
             polymorph = State.unknown("source names more than one polymorph")
