@@ -2984,24 +2984,43 @@ def _oxide_map_from_mapping(obj: object) -> dict[str, Decimal] | None:
     comps: dict[str, Decimal] = {}
     for key, value in obj.items():
         name = str(key)
-        oxide = name.removesuffix("_wt_pct")
-        if oxide not in _OXIDE_COMPONENT_KEYS:
+        if name not in _OXIDE_COMPONENT_KEYS:
             continue
         amount = _as_dec_or_none(value)
         if amount is None:
             continue
-        if name in _OXIDE_COMPONENT_KEYS or oxide not in comps:
-            comps[oxide] = amount
+        comps[name] = amount
     if len(comps) < 2:
         return None
     return comps
 
 
+def _mass_loss_oxide_map_from_mapping(obj: object) -> dict[str, Decimal] | None:
+    if not isinstance(obj, Mapping):
+        return None
+    components = {
+        oxide: obj[f"{oxide}_wt_pct"]
+        for oxide in ("SiO2", "Al2O3", "FeO", "MgO", "CaO")
+        if f"{oxide}_wt_pct" in obj
+    }
+    return _oxide_map_from_mapping(components)
+
+
 def _initial_oxide_map_from_values(
     values: object,
+    *,
+    mass_loss_fraction: bool = False,
 ) -> dict[str, Decimal] | None:
     if not isinstance(values, Mapping):
         return None
+
+    def point_oxide_map(point: Mapping[str, Any]) -> dict[str, Decimal] | None:
+        if mass_loss_fraction:
+            got = _mass_loss_oxide_map_from_mapping(point)
+            if got:
+                return got
+        return _oxide_map_from_mapping(point)
+
     points = values.get("points")
     if not isinstance(points, list):
         points = values.get("tests")
@@ -3011,7 +3030,7 @@ def _initial_oxide_map_from_values(
         ]
         for item in ranked:
             if item.get("T_C_is_initial_composition") is True:
-                got = _oxide_map_from_mapping(item)
+                got = point_oxide_map(item)
                 if got:
                     return got
         for item in ranked:
@@ -3020,11 +3039,11 @@ def _initial_oxide_map_from_values(
                 item.get("mass_loss_pct") or item.get("mass_loss_wt_pct")
             )
             if t_c == 0 and loss == 0:
-                got = _oxide_map_from_mapping(item)
+                got = point_oxide_map(item)
                 if got:
                     return got
         for item in ranked:
-            got = _oxide_map_from_mapping(item)
+            got = point_oxide_map(item)
             if got:
                 return got
     got = _oxide_map_from_mapping(values)
@@ -12650,11 +12669,17 @@ class Migrator:
                 if q_for_species is Quantity.RESIDUE_COMPONENT_COMPOSITION
                 else _oxide_map_from_mapping(raw_item)
             )
+            if q_for_species is Quantity.MASS_LOSS_FRACTION:
+                point_oxide_map = (
+                    _mass_loss_oxide_map_from_mapping(raw_item) or point_oxide_map
+                )
             if (
                 q_for_species is Quantity.MASS_LOSS_FRACTION
                 and point_oxide_map is None
             ):
-                point_oxide_map = _initial_oxide_map_from_values(parent_values)
+                point_oxide_map = _initial_oxide_map_from_values(
+                    parent_values, mass_loss_fraction=True
+                )
             if q_for_species in _BULK_PROPERTY_QUANTITIES:
                 species_formula = bulk_property_species_formula(
                     quantity=q_for_species,

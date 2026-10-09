@@ -456,6 +456,7 @@ def test_markova_table2_migrates_both_quantities_and_printed_charge(tmp_path: Pa
     for row in zero_rows:
         assert row["admission"]["status"] == "pending"
         assert row["identity"]["temperature_K"]["tag"] == "unknown"
+        assert "T_range_K" in row["identity"]["temperature_K"]["reason"]
     assert {
         Decimal(row["value"]["point"])
         for row in mass_loss_rows.values()
@@ -549,6 +550,41 @@ def test_markova_table2_migrates_both_quantities_and_printed_charge(tmp_path: Pa
         }
         assert sample.initial_composition is not None
         assert dict(sample.initial_composition.state.value.components) == expected_moles
+
+
+def test_holzheid_v69_activity_does_not_gain_printed_composition(
+    tmp_path: Path,
+) -> None:
+    result = _migrate_real_extract(
+        tmp_path,
+        "holzheid-1997-feo-nio-coo-activity-metal-saturated.yaml",
+        use_repository_index_row=True,
+    )
+    stem = "holzheid-1997-feo-nio-coo-activity-metal-saturated"
+    parent_id = "holzheid_1997_table3a_ad_co_variable_mgo_1_1"
+    source = yaml.safe_load(
+        (REPO_ROOT / "data/literature/extracts" / f"{stem}.yaml").read_text(
+            encoding="utf-8"
+        )
+    )
+    source_row = next(
+        point
+        for observation in source["species"]["CoO"]["observations"]
+        if observation["observation_id"] == parent_id
+        for point in observation["values"]["series"]
+        if point["run"] == "V 69"
+    )
+    assert as_decimal(str(source_row["CoO_wt_pct"])) == as_decimal("2.03")
+    assert as_decimal(str(source_row["MgO_wt_pct"])) == as_decimal("6.97")
+
+    prefix = f"{stem}::{parent_id}::"
+    matches = [
+        observation
+        for observation_id, observation in result.observations.items()
+        if observation_id.startswith(prefix)
+    ]
+    assert len(matches) == 1
+    assert "printed_composition" not in (matches[0].point_conditions or {})
 
 
 def test_bulk_property_rows_do_not_use_sample_code_as_formula() -> None:
