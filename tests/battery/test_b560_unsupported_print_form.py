@@ -120,7 +120,7 @@ def test_both_present_unusable_forms_are_both_named() -> None:
 
 
 def test_dropped_printed_species_still_names_only_the_species() -> None:
-    printed = {"SiO2": Decimal("50"), "MgO": Decimal("30"), "FeOT": Decimal("20")}
+    printed = {"SiO2": Decimal("50"), "MgO": Decimal("30"), "Cl": Decimal("20")}
     wt = {"SiO2": Decimal("50"), "MgO": Decimal("30")}
     experiment = replace(
         factories.kems_experiment(),
@@ -136,4 +136,52 @@ def test_dropped_printed_species_still_names_only_the_species() -> None:
     assert result.selected is None
     assert result.absence is not None
     assert result.absence.reason is GapReason.UNSUPPORTED_PRINT_FORM
+    assert result.absence.missing == (f"{_PRINTED}.Cl",)
+
+
+def test_feot_print_is_refused_when_initial_composition_lost_its_iron() -> None:
+    printed = {"SiO2": Decimal("50"), "MgO": Decimal("30"), "FeOT": Decimal("20")}
+    initial = {"SiO2": Decimal("50"), "MgO": Decimal("50")}
+    experiment = replace(
+        factories.kems_experiment(),
+        sample=Sample(
+            printed_composition=factories.located(printed),
+            initial_composition=Located(
+                factories.State.of(wt_pct_to_mole_fraction(initial)),
+                factories.loc(),
+            ),
+        ),
+    )
+
+    result = normalized_composition(experiment, _bench())
+
+    assert result.selected is None
+    assert result.absence is not None
+    assert result.absence.reason is GapReason.UNSUPPORTED_PRINT_FORM
     assert result.absence.missing == (f"{_PRINTED}.FeOT",)
+
+
+def test_feot_print_selects_when_initial_composition_carries_converted_iron() -> None:
+    printed = {"SiO2": Decimal("50"), "MgO": Decimal("30"), "FeOT": Decimal("20")}
+    initial = {"SiO2": Decimal("50"), "MgO": Decimal("30"), "FeOT": Decimal("20")}
+    experiment = replace(
+        factories.kems_experiment(),
+        sample=Sample(
+            printed_composition=factories.located(printed),
+            initial_composition=Located(
+                factories.State.of(wt_pct_to_mole_fraction(initial)),
+                factories.loc(),
+            ),
+        ),
+    )
+
+    result = normalized_composition(experiment, _bench())
+
+    assert result.selected is not None
+    assert set(result.selected.value) == {"SiO2", "MgO", "FeO"}
+    assert any(
+        route.notice is not None
+        and "total_iron_as_FeO" in route.notice
+        and "total iron reported as FeO; Fe3+/Fe2+ not printed" in route.notice
+        for route in result.routes
+    )

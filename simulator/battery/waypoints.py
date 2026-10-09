@@ -927,9 +927,19 @@ def normalized_composition(
     result = _result("normalized_composition", routes, tuple(absent))
     if result.selected is not None and printed_species is not None:
         represented = {str(species) for species in result.selected.value}
-        if str(result.selected.route).endswith("normalized_printed_composition"):
+        selected_printed = str(result.selected.route).endswith(
+            "normalized_printed_composition"
+        )
+        if selected_printed:
             represented |= printed_basis_exempt
-        dropped = tuple(sorted(printed_species - represented))
+        dropped = tuple(
+            sorted(
+                species
+                for species in printed_species
+                if ("FeO" if species == "FeOT" else species) not in represented
+                and not (selected_printed and species in printed_basis_exempt)
+            )
+        )
         if dropped:
             # The print names species the selected route dropped; emitting the
             # reduced sibling would silently vanish printed sample mass.

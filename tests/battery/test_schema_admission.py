@@ -428,7 +428,7 @@ def _typed(components):
 @pytest.mark.parametrize("components,valid", [
     ([["SiO2", "60"], ["MgO", "40"]], True),
     ([["SiO2", "60"], ["Cl", "40"]], False),
-    ([["SiO2", "60"], ["FeOT", "40"]], False),
+    ([["SiO2", "60"], ["FeOT", "40"]], True),
     ([["SiO2", "-1"], ["MgO", "101"]], False),
     ([["SiO2", "0"], ["MgO", "0"]], False),
     ([["SiO2", "-10"], ["SiO2", "60"], ["MgO", "40"]], False),
@@ -463,7 +463,12 @@ def test_typed_sample_composition_survives_serialized_consumption(field, compone
     elif sample.initial_composition.state.is_value:
         from simulator.battery.score import composition_wt_pct
 
-        assert composition_wt_pct(sample.initial_composition.state.value) == pytest.approx({"SiO2": 60, "MgO": 40})
+        expected_wt = (
+            {"SiO2": 60, "FeO": 40}
+            if feot_printed
+            else {"SiO2": 60, "MgO": 40}
+        )
+        assert composition_wt_pct(sample.initial_composition.state.value) == pytest.approx(expected_wt)
 
 
 def _point_result(monkeypatch, conditions, sample=None):
@@ -587,15 +592,25 @@ def test_typed_print_completeness_survives_canonical_fallback(monkeypatch, bound
     else:
         inputs = _serialized_consumer_inputs(sample, conditions)
         waypoint = inputs.waypoints["normalized_composition"]
-        if component != "MgO":
+        expected_valid = component == "MgO" or (
+            component == "FeOT" and boundary == "sample_printed"
+        )
+        if not expected_valid:
             assert waypoint.selected is None
             assert waypoint.absence.reason is GapReason.UNSUPPORTED_PRINT_FORM
-            assert any(path.endswith(f".{component}") for path in waypoint.absence.missing)
+            if component != "Cl" or boundary != "sample_printed":
+                assert any(path.endswith(f".{component}") for path in waypoint.absence.missing)
         requests = engine_point_requests(inputs)
     assert len(requests) == 7
+    expected_valid = component == "MgO" or (
+        component == "FeOT" and boundary == "sample_printed"
+    )
     for request in requests:
-        assert (request.payload is not None) == (component == "MgO")
-        if component != "MgO":
+        assert (request.payload is not None) == expected_valid
+        if component == "FeOT" and expected_valid:
+            assert "total_iron_as_FeO" in request.payload["composition_notice"]
+            assert "total iron reported as FeO; Fe3+/Fe2+ not printed" in request.payload["composition_notice"]
+        if not expected_valid:
             assert request.readiness.status.value == "gap"
 
 
@@ -611,7 +626,16 @@ def test_row_composition_override_fallback_controls(row_field):
     inputs = _serialized_consumer_inputs(sample, conditions)
     requests = engine_point_requests(inputs)
     assert len(requests) == 7
-    assert all(request.payload is None and request.readiness.status.value == "gap" for request in requests)
+    if row_field == "composition":
+        assert all(request.payload is not None for request in requests)
+        assert all("FeO" in request.payload["composition_mol"] for request in requests)
+        assert all(
+            request.payload.get("composition_notice") is not None
+            and "FeOT (total iron) treated as FeO" in request.payload["composition_notice"]
+            for request in requests
+        )
+    else:
+        assert all(request.payload is None and request.readiness.status.value == "gap" for request in requests)
 
 
 @pytest.mark.parametrize("boundary", ["sample_printed", "sample_initial", "row_printed"])
