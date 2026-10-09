@@ -29,6 +29,7 @@ from simulator.battery.migrate import (
     map_quantity,
     migrate,
     select_declared_source,
+    wt_pct_to_mole_fraction,
 )
 from simulator.battery.records import State
 from simulator.battery.validity import underdetermined_apparatus
@@ -427,7 +428,12 @@ def test_g2_plante_source_points_and_comparison_fence(tmp_path):
             for notice in obs.notices
         )
         composition = obs.identity.composition
-        assert composition is None or not composition.is_value
+        assert composition is not None and composition.is_value
+        source_row = _extract_observation(
+            "kems-042-plante-1979.yaml", obs.observation_id.split("::", 1)[1]
+        )
+        composition_wt_pct = source_row["values"]["composition_wt_pct"]
+        assert composition.value == wt_pct_to_mole_fraction(composition_wt_pct)
         fo2 = obs.identity.fO2_Pa
         assert fo2 is None or not fo2.is_value
     for obs in buckets["superseded"]:
@@ -483,8 +489,17 @@ def test_plante_1979_quoted_row_composition_binding_pin(tmp_path):
         f"kems-042-plante-1979::{observation_id}"
     ]
 
-    assert source["values"]["composition_K2O_wt_percent_as_published"] == 21.14
-    assert observation.identity.composition is None or not observation.identity.composition.is_value
+    composition_wt_pct = source["values"]["composition_wt_pct"]
+    assert composition_wt_pct["K2O"] == 21.14
+    assert composition_wt_pct["SiO2"] == 78.86
+    composition = observation.identity.composition
+    assert composition is not None and composition.is_value
+    assert composition.value == wt_pct_to_mole_fraction(composition_wt_pct)
+    composition_condition = observation.point_conditions["composition"]
+    assert composition_condition.inference is not None
+    assert composition_condition.inference.relation == (
+        "SiO2_wt_pct=100-K2O_wt_pct;wt_pct_to_mole_fraction"
+    )
     assert source["values"]["two_phase_marker"] == "a"
     assert any(
         notice.band == "two_phase_bulk_composition_not_liquid_composition"
