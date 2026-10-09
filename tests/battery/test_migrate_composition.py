@@ -434,15 +434,35 @@ def test_markova_table2_migrates_both_quantities_and_printed_charge(tmp_path: Pa
         for observation_id, observation in result.observations.items()
         if observation_id.startswith(prefix)
     }
-    mass_loss = {
-        Decimal(row["value"]["point"])
-        for row in rows.values()
+    mass_loss_rows = {
+        observation_id: row
+        for observation_id, row in rows.items()
         if _quantity(row) == "mass_loss_fraction"
     }
-    assert len(mass_loss) == 22
-    assert mass_loss == {
+    assert len(mass_loss_rows) == 24
+    assert {
+        row["identity"]["species"]["formula"] for row in mass_loss_rows.values()
+    } == {"unknown"}
+    assert sum(
+        row["admission"]["status"] == "admitted"
+        for row in mass_loss_rows.values()
+    ) == 22
+    zero_rows = [
+        row
+        for row in mass_loss_rows.values()
+        if Decimal(row["value"]["point"]) == Decimal("0")
+    ]
+    assert len(zero_rows) == 2
+    for row in zero_rows:
+        assert row["admission"]["status"] == "pending"
+        assert row["identity"]["temperature_K"]["tag"] == "unknown"
+    assert {
+        Decimal(row["value"]["point"])
+        for row in mass_loss_rows.values()
+    } == {
         Decimal(value)
         for value in (
+            "0",
             "0.0146", "0.0416", "0.0974", "0.218", "0.3835", "0.6521",
             "0.8605", "0.8925", "0.9181", "0.9551", "0.9834", "0.0117",
             "0.0439", "0.1441", "0.3717", "0.5353", "0.6601", "0.6935",
