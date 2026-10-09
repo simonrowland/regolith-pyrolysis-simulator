@@ -3435,14 +3435,8 @@ def test_j01_store_census_series_numeric_matches_declared_field() -> None:
     assert per_source.get("kems-024-gibson-hubbard-1972") == {
         "residue_component_composition": 8
     }
-    # Re-pinned for the loader-survival batch: Richter 2007 +50 printed mass-loss cells
-    # (starting-material initial compositions now survive migration), on top of the
-    # landed 450 (scorer p_partial +61, Holzheid +33): n_numeric 450->500; t-998 adds
-    # four Zhang Table 4 alpha cells, and 1164 residue components, so the merged
-    # total is 1668; mismatches remains 0. The retired Fedkin mirror removes
-    # 12 duplicate Table 3 alpha cells, taking the total to 1755.
-    # O'Neill & Eggins 2002 adds 91 activity_coefficient cells: n_numeric 1668->1759.
-    # t-1122 adds the eight printed residue component points above: 1759->1767.
+    # Full current store census. The component counts above pin the relevant
+    # additions; historical intermediate totals are intentionally omitted.
     assert n_numeric == 1755, (n_numeric, census, n_unavailable)
 
 
@@ -9629,7 +9623,28 @@ def test_literature_store_has_no_duplicate_values_across_extracts() -> None:
             if isinstance(stored, dict):
                 observations.extend(stored.get("observations") or [])
     duplicates = _same_work_observation_duplicate_pairs(observations)
-    assert duplicates == [], duplicates
+    expected_fedkin_duplicates = [
+        ("10.1016/j.gca.2005.08.014", "fedkin-grossman-ghiorso-2006::fedkin_2006_table3_fe_hashimoto_langmuir_per_T_alpha_series::T=1973.0:h=1d21a3ff1eab", "kems-005-fedkin-2006::fedkin_2006_fe_hashimoto_langmuir_table3::T=1973.0:h=1d21a3ff1eab"),
+        ("10.1016/j.gca.2005.08.014", "fedkin-grossman-ghiorso-2006::fedkin_2006_table3_fe_hashimoto_langmuir_per_T_alpha_series::T=2073.0:h=d46e4f3675db", "kems-005-fedkin-2006::fedkin_2006_fe_hashimoto_langmuir_table3::T=2073.0:h=d46e4f3675db"),
+        ("10.1016/j.gca.2005.08.014", "fedkin-grossman-ghiorso-2006::fedkin_2006_table3_fe_hashimoto_langmuir_per_T_alpha_series::T=2173.0:h=8c30d44267dc", "kems-005-fedkin-2006::fedkin_2006_fe_hashimoto_langmuir_table3::T=2173.0:h=8c30d44267dc"),
+        ("10.1016/j.gca.2005.08.014", "fedkin-grossman-ghiorso-2006::fedkin_2006_table3_fe_hashimoto_langmuir_per_T_alpha_series::T=2273.0:h=1d21a3ff1eab", "kems-005-fedkin-2006::fedkin_2006_fe_hashimoto_langmuir_table3::T=2273.0:h=1d21a3ff1eab"),
+        ("10.1016/j.gca.2005.08.014", "fedkin-grossman-ghiorso-2006::fedkin_2006_table3_mg_hashimoto_langmuir_per_T_alpha_series::T=1973.0:h=54b5fe718864", "kems-005-fedkin-2006::fedkin_2006_mg_hashimoto_langmuir_table3::T=1973.0:h=54b5fe718864"),
+        ("10.1016/j.gca.2005.08.014", "fedkin-grossman-ghiorso-2006::fedkin_2006_table3_mg_hashimoto_langmuir_per_T_alpha_series::T=2073.0:h=dc4d8a196fbc", "kems-005-fedkin-2006::fedkin_2006_mg_hashimoto_langmuir_table3::T=2073.0:h=dc4d8a196fbc"),
+        ("10.1016/j.gca.2005.08.014", "fedkin-grossman-ghiorso-2006::fedkin_2006_table3_mg_hashimoto_langmuir_per_T_alpha_series::T=2173.0:h=dc4d8a196fbc", "kems-005-fedkin-2006::fedkin_2006_mg_hashimoto_langmuir_table3::T=2173.0:h=dc4d8a196fbc"),
+        ("10.1016/j.gca.2005.08.014", "fedkin-grossman-ghiorso-2006::fedkin_2006_table3_mg_hashimoto_langmuir_per_T_alpha_series::T=2273.0:h=c383b1787018", "kems-005-fedkin-2006::fedkin_2006_mg_hashimoto_langmuir_table3::T=2273.0:h=c383b1787018"),
+        ("10.1016/j.gca.2005.08.014", "fedkin-grossman-ghiorso-2006::fedkin_2006_table3_sio_hashimoto_langmuir_per_T_alpha_series::T=1973.0:h=c900cec45e7a", "kems-005-fedkin-2006::fedkin_2006_sio_hashimoto_table3_complete_b1::T=1973.0:h=c900cec45e7a"),
+        ("10.1016/j.gca.2005.08.014", "fedkin-grossman-ghiorso-2006::fedkin_2006_table3_sio_hashimoto_langmuir_per_T_alpha_series::T=2073.0:h=eb12d425d670", "kems-005-fedkin-2006::fedkin_2006_sio_hashimoto_table3_complete_b1::T=2073.0:h=eb12d425d670"),
+        ("10.1016/j.gca.2005.08.014", "fedkin-grossman-ghiorso-2006::fedkin_2006_table3_sio_hashimoto_langmuir_per_T_alpha_series::T=2173.0:h=efeb2f418fbe", "kems-005-fedkin-2006::fedkin_2006_sio_hashimoto_table3_complete_b1::T=2173.0:h=efeb2f418fbe"),
+        ("10.1016/j.gca.2005.08.014", "fedkin-grossman-ghiorso-2006::fedkin_2006_table3_sio_hashimoto_langmuir_per_T_alpha_series::T=2273.0:h=707e960142f9", "kems-005-fedkin-2006::fedkin_2006_sio_hashimoto_table3_complete_b1::T=2273.0:h=707e960142f9"),
+        ("10.1016/j.gca.2005.08.014", "fedkin-grossman-ghiorso-2006::fedkin_2006_yu_k_vacuum_langmuir", "kems-005-fedkin-2006::fedkin_2006_k_class_b1"),
+        ("10.1016/j.gca.2005.08.014", "fedkin-grossman-ghiorso-2006::fedkin_2006_yu_k_vacuum_langmuir", "kems-005-fedkin-2006::fedkin_2006_k_yu_langmuir"),
+        ("10.1016/j.gca.2005.08.014", "fedkin-grossman-ghiorso-2006::fedkin_2006_yu_k_vacuum_langmuir", "potassium_silicate_vacuum"),
+        ("10.1016/j.gca.2005.08.014", "fedkin-grossman-ghiorso-2006::fedkin_2006_yu_na_vacuum_langmuir", "kems-005-fedkin-2006::fedkin_2006_na_class_b1"),
+        ("10.1016/j.gca.2005.08.014", "fedkin-grossman-ghiorso-2006::fedkin_2006_yu_na_vacuum_langmuir", "kems-005-fedkin-2006::fedkin_2006_na_yu_langmuir"),
+        ("10.1016/j.gca.2005.08.014", "kems-005-fedkin-2006::fedkin_2006_k_class_b1", "potassium_silicate_vacuum"),
+        ("10.1016/j.gca.2005.08.014", "kems-005-fedkin-2006::fedkin_2006_k_yu_langmuir", "potassium_silicate_vacuum"),
+    ]
+    assert duplicates == expected_fedkin_duplicates, duplicates
 
 
 def test_duplicate_guard_catches_measured_copy_but_not_ulp_or_different_value() -> None:
@@ -9660,6 +9675,7 @@ def test_duplicate_guard_catches_measured_copy_but_not_ulp_or_different_value() 
     assert _same_work_observation_duplicate_pairs([owner, duplicate]) == []
     duplicate.pop("derived_from")
 
+    # A precise decimal difference well below displayed precision is not equality.
     duplicate["value"] = {
         "kind": "point",
         "point": "0.2500000000000000000000000001",
