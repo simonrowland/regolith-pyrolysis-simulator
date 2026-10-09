@@ -918,7 +918,7 @@ def _mass_percent_components(payload: object) -> dict[str, Decimal] | None:
     if pairs is None:
         return None
     names = [name for name, _amount in pairs]
-    if len(set(names)) != len(names) or any(name not in _OXIDE_COMPONENT_KEYS for name in names):
+    if len(set(names)) != len(names) or any(name not in _COMPOSITION_COMPONENTS for name in names):
         return None
     return dict(pairs)
 
@@ -2822,8 +2822,12 @@ _CONVERSION_META: dict[str, tuple[Decimal, str, str, str]] = {
 }
 
 
-_OXIDE_COMPONENT_KEYS = frozenset(
-    {
+# Component key -> (molar-mass formula, admitted by the melt-engine oxide input).
+# Migration and waypoints share this owner; engine support stays narrower than
+# the set of species whose printed compositions can be converted.
+_COMPOSITION_COMPONENTS: dict[str, tuple[str, bool]] = {
+    name: (name, True)
+    for name in (
         "SiO2",
         "TiO2",
         "Al2O3",
@@ -2838,8 +2842,13 @@ _OXIDE_COMPONENT_KEYS = frozenset(
         "P2O5",
         "NiO",
         "CoO",
-    }
-)
+    )
+}
+
+
+def _is_engine_oxide_component(name: str) -> bool:
+    component = _COMPOSITION_COMPONENTS.get(name)
+    return component is not None and component[1]
 _PRINTED_COMPOSITION_MAP_KEYS = (
     "oxides_wt_pct",
     "major_oxide_wt_pct",
@@ -2888,15 +2897,19 @@ _WT_PCT_TO_MOLE_FRACTION_ARITHMETIC = "x_i = (w_i / M_i) / Σ_j (w_j / M_j)"
 
 
 def oxide_molar_mass(oxide: str) -> Decimal:
-    """Molar mass (g/mol) from the CIAAW/NIST atomic-weight table."""
+    """Composition-component molar mass (g/mol) from CIAAW/NIST weights."""
+
+    mass_formula = _COMPOSITION_COMPONENTS.get(oxide, (oxide, False))[0]
 
     from simulator.state import MOLAR_MASS
 
-    if oxide in MOLAR_MASS:
-        return as_decimal(str(MOLAR_MASS[oxide]))
+    if mass_formula in MOLAR_MASS:
+        return as_decimal(str(MOLAR_MASS[mass_formula]))
     from simulator.accounting.formulas import parse_formula
 
-    return as_decimal(str(parse_formula(oxide, species=oxide).molar_mass_g_mol))
+    return as_decimal(
+        str(parse_formula(mass_formula, species=mass_formula).molar_mass_g_mol)
+    )
 
 
 def wt_pct_to_mole_fraction(wt: Mapping[str, Decimal]) -> Composition:
@@ -2906,7 +2919,7 @@ def wt_pct_to_mole_fraction(wt: Mapping[str, Decimal]) -> Composition:
     for oxide, weight in wt.items():
         name = str(oxide).strip()
         if (
-            name in _OXIDE_COMPONENT_KEYS
+            name in _COMPOSITION_COMPONENTS
             or name.casefold() in _PRINTED_COMPOSITION_TOTAL_KEYS
         ):
             continue
@@ -2924,7 +2937,7 @@ def wt_pct_to_mole_fraction(wt: Mapping[str, Decimal]) -> Composition:
         name = str(oxide).strip()
         if name.casefold() in _PRINTED_COMPOSITION_TOTAL_KEYS:
             continue
-        if name not in _OXIDE_COMPONENT_KEYS:
+        if name not in _COMPOSITION_COMPONENTS:
             continue
         amount = as_decimal(weight)
         if amount < 0:
@@ -2942,7 +2955,7 @@ def wt_pct_to_mole_fraction(wt: Mapping[str, Decimal]) -> Composition:
 
 
 def _kume_formula_unit_oxide(name: str) -> tuple[str, Decimal] | None:
-    if name in _OXIDE_COMPONENT_KEYS:
+    if _is_engine_oxide_component(name):
         return name, Decimal("1")
     if name != "AlO1.5":
         return None
@@ -2958,7 +2971,7 @@ def _kume_formula_unit_oxide(name: str) -> tuple[str, Decimal] | None:
     if unsupported or len(mapped) != 1:
         return None
     oxide, factor = next(iter(mapped.items()))
-    if oxide not in _OXIDE_COMPONENT_KEYS:
+    if not _is_engine_oxide_component(oxide):
         return None
     return oxide, Decimal(str(factor))
 
