@@ -1,0 +1,1757 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/extracts/fedkin-grossman-ghiorso-2006.yaml
+observations:
+- observation_id: fedkin-grossman-ghiorso-2006::fedkin_2006_table3_fe_hashimoto_langmuir
+  experiment_id: 10.1016/j.gca.2005.08.014::fedkin-grossman-ghiorso-2006
+  identity:
+    quantity:
+      tag: value
+      value: evaporation_coefficient_alpha
+    species:
+      formula: Fe
+      phase:
+        tag: unknown
+        reason: phase string 'silicate_melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1973.0, 2273.0]; no midpoint invented
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use wall
+  value:
+    kind: point
+    point: '0.24'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Distinct from Costa KEMS pin; do not average into one Fe alpha
+      alpha_range:
+      - '0.21'
+      - '0.27'
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped regime 'langmuir_free_evaporation'
+    original_method_class: langmuir_free_evaporation
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - evaporation_coefficient_alpha
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: fedkin-grossman-ghiorso-2006::fedkin_2006_table3_fe_hashimoto_langmuir
+  source_id: fedkin-grossman-ghiorso-2006
+  locator:
+    note: Fedkin, A. V., Grossman, L. & Ghiorso, M. S. (2006), Geochim. Cosmochim. Acta 70:206-223, Table 3 pp. 212-213; primary
+      vacuum free-evaporation data Hashimoto, A. (1983), Geochem. J. 17:111-145
+    record: fedkin_2006_table3_fe_hashimoto_langmuir
+  read_from: pdf:fedkin-grossman-ghiorso-2006
+- observation_id: fedkin-grossman-ghiorso-2006::fedkin_2006_table3_fe_hashimoto_langmuir_per_T_alpha_series::T=1973.0:h=1d21a3ff1eab
+  experiment_id: 10.1016/j.gca.2005.08.014::fedkin-grossman-ghiorso-2006
+  identity:
+    quantity:
+      tag: value
+      value: evaporation_coefficient_alpha
+    species:
+      formula: Fe
+      phase:
+        tag: unknown
+        reason: phase string 'silicate_melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '1973'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use wall
+  value:
+    kind: point
+    point: '0.23'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      sigma: '0.02'
+      parent: fedkin-grossman-ghiorso-2006::fedkin_2006_table3_fe_hashimoto_langmuir_per_T_alpha_series
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped regime 'langmuir_free_evaporation'
+    original_method_class: langmuir_free_evaporation
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - evaporation_coefficient_alpha
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: fedkin-grossman-ghiorso-2006::fedkin_2006_table3_fe_hashimoto_langmuir_per_T_alpha_series::T=1973.0:h=1d21a3ff1eab
+  source_id: fedkin-grossman-ghiorso-2006
+  locator:
+    table: '3'
+    note: Fedkin 2006 Table 3 per-temperature alpha (from Hashimoto 1983)
+    record: fedkin_2006_table3_fe_hashimoto_langmuir
+  read_from: pdf:fedkin-grossman-ghiorso-2006
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1973'
+      locator:
+        table: '3'
+        note: Fedkin 2006 Table 3 per-temperature alpha (from Hashimoto 1983)
+        record: fedkin_2006_table3_fe_hashimoto_langmuir
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:fedkin-grossman-ghiorso-2006
+    parameters: []
+    output_unit: dimensionless alpha vs T_K
+- observation_id: fedkin-grossman-ghiorso-2006::fedkin_2006_table3_fe_hashimoto_langmuir_per_T_alpha_series::T=2073.0:h=d46e4f3675db
+  experiment_id: 10.1016/j.gca.2005.08.014::fedkin-grossman-ghiorso-2006
+  identity:
+    quantity:
+      tag: value
+      value: evaporation_coefficient_alpha
+    species:
+      formula: Fe
+      phase:
+        tag: unknown
+        reason: phase string 'silicate_melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '2073'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use wall
+  value:
+    kind: point
+    point: '0.25'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      sigma: '0.02'
+      parent: fedkin-grossman-ghiorso-2006::fedkin_2006_table3_fe_hashimoto_langmuir_per_T_alpha_series
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped regime 'langmuir_free_evaporation'
+    original_method_class: langmuir_free_evaporation
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - evaporation_coefficient_alpha
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: fedkin-grossman-ghiorso-2006::fedkin_2006_table3_fe_hashimoto_langmuir_per_T_alpha_series::T=2073.0:h=d46e4f3675db
+  source_id: fedkin-grossman-ghiorso-2006
+  locator:
+    table: '3'
+    note: Fedkin 2006 Table 3 per-temperature alpha (from Hashimoto 1983)
+    record: fedkin_2006_table3_fe_hashimoto_langmuir
+  read_from: pdf:fedkin-grossman-ghiorso-2006
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2073'
+      locator:
+        table: '3'
+        note: Fedkin 2006 Table 3 per-temperature alpha (from Hashimoto 1983)
+        record: fedkin_2006_table3_fe_hashimoto_langmuir
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:fedkin-grossman-ghiorso-2006
+    parameters: []
+    output_unit: dimensionless alpha vs T_K
+- observation_id: fedkin-grossman-ghiorso-2006::fedkin_2006_table3_fe_hashimoto_langmuir_per_T_alpha_series::T=2173.0:h=8c30d44267dc
+  experiment_id: 10.1016/j.gca.2005.08.014::fedkin-grossman-ghiorso-2006
+  identity:
+    quantity:
+      tag: value
+      value: evaporation_coefficient_alpha
+    species:
+      formula: Fe
+      phase:
+        tag: unknown
+        reason: phase string 'silicate_melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '2173'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use wall
+  value:
+    kind: point
+    point: '0.24'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      sigma: '0.02'
+      parent: fedkin-grossman-ghiorso-2006::fedkin_2006_table3_fe_hashimoto_langmuir_per_T_alpha_series
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped regime 'langmuir_free_evaporation'
+    original_method_class: langmuir_free_evaporation
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - evaporation_coefficient_alpha
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: fedkin-grossman-ghiorso-2006::fedkin_2006_table3_fe_hashimoto_langmuir_per_T_alpha_series::T=2173.0:h=8c30d44267dc
+  source_id: fedkin-grossman-ghiorso-2006
+  locator:
+    table: '3'
+    note: Fedkin 2006 Table 3 per-temperature alpha (from Hashimoto 1983)
+    record: fedkin_2006_table3_fe_hashimoto_langmuir
+  read_from: pdf:fedkin-grossman-ghiorso-2006
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2173'
+      locator:
+        table: '3'
+        note: Fedkin 2006 Table 3 per-temperature alpha (from Hashimoto 1983)
+        record: fedkin_2006_table3_fe_hashimoto_langmuir
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:fedkin-grossman-ghiorso-2006
+    parameters: []
+    output_unit: dimensionless alpha vs T_K
+- observation_id: fedkin-grossman-ghiorso-2006::fedkin_2006_table3_fe_hashimoto_langmuir_per_T_alpha_series::T=2273.0:h=1d21a3ff1eab
+  experiment_id: 10.1016/j.gca.2005.08.014::fedkin-grossman-ghiorso-2006
+  identity:
+    quantity:
+      tag: value
+      value: evaporation_coefficient_alpha
+    species:
+      formula: Fe
+      phase:
+        tag: unknown
+        reason: phase string 'silicate_melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '2273'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use wall
+  value:
+    kind: point
+    point: '0.23'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      sigma: '0.02'
+      parent: fedkin-grossman-ghiorso-2006::fedkin_2006_table3_fe_hashimoto_langmuir_per_T_alpha_series
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped regime 'langmuir_free_evaporation'
+    original_method_class: langmuir_free_evaporation
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - evaporation_coefficient_alpha
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: fedkin-grossman-ghiorso-2006::fedkin_2006_table3_fe_hashimoto_langmuir_per_T_alpha_series::T=2273.0:h=1d21a3ff1eab
+  source_id: fedkin-grossman-ghiorso-2006
+  locator:
+    table: '3'
+    note: Fedkin 2006 Table 3 per-temperature alpha (from Hashimoto 1983)
+    record: fedkin_2006_table3_fe_hashimoto_langmuir
+  read_from: pdf:fedkin-grossman-ghiorso-2006
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2273'
+      locator:
+        table: '3'
+        note: Fedkin 2006 Table 3 per-temperature alpha (from Hashimoto 1983)
+        record: fedkin_2006_table3_fe_hashimoto_langmuir
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:fedkin-grossman-ghiorso-2006
+    parameters: []
+    output_unit: dimensionless alpha vs T_K
+- observation_id: fedkin-grossman-ghiorso-2006::fedkin_2006_table3_mg_hashimoto_langmuir
+  experiment_id: 10.1016/j.gca.2005.08.014::fedkin-grossman-ghiorso-2006
+  identity:
+    quantity:
+      tag: value
+      value: evaporation_coefficient_alpha
+    species:
+      formula: Mg
+      phase:
+        tag: unknown
+        reason: phase string 'silicate_melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1973.0, 2273.0]; no midpoint invented
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use wall
+  value:
+    kind: point
+    point: '0.27'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Runtime 0.20 [0.1,0.21] is lower-bound conservative vs Table 3; either keep pin or re-center on 0.27 with wider
+        envelope
+      alpha_range:
+      - '0.23'
+      - '0.29'
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped regime 'langmuir_free_evaporation'
+    original_method_class: langmuir_free_evaporation
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - evaporation_coefficient_alpha
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: fedkin-grossman-ghiorso-2006::fedkin_2006_table3_mg_hashimoto_langmuir
+  source_id: fedkin-grossman-ghiorso-2006
+  locator:
+    note: Fedkin et al. (2006) GCA 70:206-223 Table 3; Hashimoto (1983) Geochem. J. 17:111-145 vacuum free evaporation
+    record: fedkin_2006_table3_mg_hashimoto_langmuir
+  read_from: pdf:fedkin-grossman-ghiorso-2006
+- observation_id: fedkin-grossman-ghiorso-2006::fedkin_2006_table3_mg_hashimoto_langmuir_per_T_alpha_series::T=1973.0:h=54b5fe718864
+  experiment_id: 10.1016/j.gca.2005.08.014::fedkin-grossman-ghiorso-2006
+  identity:
+    quantity:
+      tag: value
+      value: evaporation_coefficient_alpha
+    species:
+      formula: Mg
+      phase:
+        tag: unknown
+        reason: phase string 'silicate_melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '1973'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use wall
+  value:
+    kind: point
+    point: '0.24'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      sigma: '0.01'
+      parent: fedkin-grossman-ghiorso-2006::fedkin_2006_table3_mg_hashimoto_langmuir_per_T_alpha_series
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped regime 'langmuir_free_evaporation'
+    original_method_class: langmuir_free_evaporation
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - evaporation_coefficient_alpha
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: fedkin-grossman-ghiorso-2006::fedkin_2006_table3_mg_hashimoto_langmuir_per_T_alpha_series::T=1973.0:h=54b5fe718864
+  source_id: fedkin-grossman-ghiorso-2006
+  locator:
+    table: '3'
+    note: Fedkin 2006 Table 3 per-temperature alpha (from Hashimoto 1983)
+    record: fedkin_2006_table3_mg_hashimoto_langmuir
+  read_from: pdf:fedkin-grossman-ghiorso-2006
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1973'
+      locator:
+        table: '3'
+        note: Fedkin 2006 Table 3 per-temperature alpha (from Hashimoto 1983)
+        record: fedkin_2006_table3_mg_hashimoto_langmuir
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:fedkin-grossman-ghiorso-2006
+    parameters: []
+    output_unit: dimensionless alpha vs T_K
+- observation_id: fedkin-grossman-ghiorso-2006::fedkin_2006_table3_mg_hashimoto_langmuir_per_T_alpha_series::T=2073.0:h=dc4d8a196fbc
+  experiment_id: 10.1016/j.gca.2005.08.014::fedkin-grossman-ghiorso-2006
+  identity:
+    quantity:
+      tag: value
+      value: evaporation_coefficient_alpha
+    species:
+      formula: Mg
+      phase:
+        tag: unknown
+        reason: phase string 'silicate_melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '2073'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use wall
+  value:
+    kind: point
+    point: '0.28'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      sigma: '0.01'
+      parent: fedkin-grossman-ghiorso-2006::fedkin_2006_table3_mg_hashimoto_langmuir_per_T_alpha_series
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped regime 'langmuir_free_evaporation'
+    original_method_class: langmuir_free_evaporation
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - evaporation_coefficient_alpha
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: fedkin-grossman-ghiorso-2006::fedkin_2006_table3_mg_hashimoto_langmuir_per_T_alpha_series::T=2073.0:h=dc4d8a196fbc
+  source_id: fedkin-grossman-ghiorso-2006
+  locator:
+    table: '3'
+    note: Fedkin 2006 Table 3 per-temperature alpha (from Hashimoto 1983)
+    record: fedkin_2006_table3_mg_hashimoto_langmuir
+  read_from: pdf:fedkin-grossman-ghiorso-2006
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2073'
+      locator:
+        table: '3'
+        note: Fedkin 2006 Table 3 per-temperature alpha (from Hashimoto 1983)
+        record: fedkin_2006_table3_mg_hashimoto_langmuir
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:fedkin-grossman-ghiorso-2006
+    parameters: []
+    output_unit: dimensionless alpha vs T_K
+- observation_id: fedkin-grossman-ghiorso-2006::fedkin_2006_table3_mg_hashimoto_langmuir_per_T_alpha_series::T=2173.0:h=dc4d8a196fbc
+  experiment_id: 10.1016/j.gca.2005.08.014::fedkin-grossman-ghiorso-2006
+  identity:
+    quantity:
+      tag: value
+      value: evaporation_coefficient_alpha
+    species:
+      formula: Mg
+      phase:
+        tag: unknown
+        reason: phase string 'silicate_melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '2173'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use wall
+  value:
+    kind: point
+    point: '0.28'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      sigma: '0.01'
+      parent: fedkin-grossman-ghiorso-2006::fedkin_2006_table3_mg_hashimoto_langmuir_per_T_alpha_series
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped regime 'langmuir_free_evaporation'
+    original_method_class: langmuir_free_evaporation
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - evaporation_coefficient_alpha
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: fedkin-grossman-ghiorso-2006::fedkin_2006_table3_mg_hashimoto_langmuir_per_T_alpha_series::T=2173.0:h=dc4d8a196fbc
+  source_id: fedkin-grossman-ghiorso-2006
+  locator:
+    table: '3'
+    note: Fedkin 2006 Table 3 per-temperature alpha (from Hashimoto 1983)
+    record: fedkin_2006_table3_mg_hashimoto_langmuir
+  read_from: pdf:fedkin-grossman-ghiorso-2006
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2173'
+      locator:
+        table: '3'
+        note: Fedkin 2006 Table 3 per-temperature alpha (from Hashimoto 1983)
+        record: fedkin_2006_table3_mg_hashimoto_langmuir
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:fedkin-grossman-ghiorso-2006
+    parameters: []
+    output_unit: dimensionless alpha vs T_K
+- observation_id: fedkin-grossman-ghiorso-2006::fedkin_2006_table3_mg_hashimoto_langmuir_per_T_alpha_series::T=2273.0:h=c383b1787018
+  experiment_id: 10.1016/j.gca.2005.08.014::fedkin-grossman-ghiorso-2006
+  identity:
+    quantity:
+      tag: value
+      value: evaporation_coefficient_alpha
+    species:
+      formula: Mg
+      phase:
+        tag: unknown
+        reason: phase string 'silicate_melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '2273'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use wall
+  value:
+    kind: point
+    point: '0.27'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      sigma: '0.01'
+      parent: fedkin-grossman-ghiorso-2006::fedkin_2006_table3_mg_hashimoto_langmuir_per_T_alpha_series
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped regime 'langmuir_free_evaporation'
+    original_method_class: langmuir_free_evaporation
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - evaporation_coefficient_alpha
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: fedkin-grossman-ghiorso-2006::fedkin_2006_table3_mg_hashimoto_langmuir_per_T_alpha_series::T=2273.0:h=c383b1787018
+  source_id: fedkin-grossman-ghiorso-2006
+  locator:
+    table: '3'
+    note: Fedkin 2006 Table 3 per-temperature alpha (from Hashimoto 1983)
+    record: fedkin_2006_table3_mg_hashimoto_langmuir
+  read_from: pdf:fedkin-grossman-ghiorso-2006
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2273'
+      locator:
+        table: '3'
+        note: Fedkin 2006 Table 3 per-temperature alpha (from Hashimoto 1983)
+        record: fedkin_2006_table3_mg_hashimoto_langmuir
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:fedkin-grossman-ghiorso-2006
+    parameters: []
+    output_unit: dimensionless alpha vs T_K
+- observation_id: fedkin-grossman-ghiorso-2006::fedkin_2006_table3_sio_hashimoto_langmuir
+  experiment_id: 10.1016/j.gca.2005.08.014::fedkin-grossman-ghiorso-2006
+  identity:
+    quantity:
+      tag: value
+      value: evaporation_coefficient_alpha
+    species:
+      formula: SiO
+      phase:
+        tag: unknown
+        reason: phase string 'silicate_melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1973.0, 2273.0]; no midpoint invented
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use wall
+  value:
+    kind: point
+    point: '0.17'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Cross-check only; T band mostly above Wetzel valid_range_K ceiling
+      alpha_range:
+      - '0.11'
+      - '0.22'
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped regime 'langmuir_free_evaporation'
+    original_method_class: langmuir_free_evaporation
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - evaporation_coefficient_alpha
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: fedkin-grossman-ghiorso-2006::fedkin_2006_table3_sio_hashimoto_langmuir
+  source_id: fedkin-grossman-ghiorso-2006
+  locator:
+    note: Fedkin et al. (2006) GCA 70:206-223 Table 3; Hashimoto (1983)
+    record: fedkin_2006_table3_sio_hashimoto_langmuir
+  read_from: pdf:fedkin-grossman-ghiorso-2006
+- observation_id: fedkin-grossman-ghiorso-2006::fedkin_2006_table3_sio_hashimoto_langmuir_per_T_alpha_series::T=1973.0:h=c900cec45e7a
+  experiment_id: 10.1016/j.gca.2005.08.014::fedkin-grossman-ghiorso-2006
+  identity:
+    quantity:
+      tag: value
+      value: evaporation_coefficient_alpha
+    species:
+      formula: SiO
+      phase:
+        tag: unknown
+        reason: phase string 'silicate_melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '1973'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use wall
+  value:
+    kind: point
+    point: '0.12'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      sigma: '0.01'
+      parent: fedkin-grossman-ghiorso-2006::fedkin_2006_table3_sio_hashimoto_langmuir_per_T_alpha_series
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped regime 'langmuir_free_evaporation'
+    original_method_class: langmuir_free_evaporation
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - evaporation_coefficient_alpha
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: fedkin-grossman-ghiorso-2006::fedkin_2006_table3_sio_hashimoto_langmuir_per_T_alpha_series::T=1973.0:h=c900cec45e7a
+  source_id: fedkin-grossman-ghiorso-2006
+  locator:
+    table: '3'
+    note: Fedkin 2006 Table 3 per-temperature alpha (from Hashimoto 1983)
+    record: fedkin_2006_table3_sio_hashimoto_langmuir
+  read_from: pdf:fedkin-grossman-ghiorso-2006
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1973'
+      locator:
+        table: '3'
+        note: Fedkin 2006 Table 3 per-temperature alpha (from Hashimoto 1983)
+        record: fedkin_2006_table3_sio_hashimoto_langmuir
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:fedkin-grossman-ghiorso-2006
+    parameters: []
+    output_unit: dimensionless alpha vs T_K
+- observation_id: fedkin-grossman-ghiorso-2006::fedkin_2006_table3_sio_hashimoto_langmuir_per_T_alpha_series::T=2073.0:h=eb12d425d670
+  experiment_id: 10.1016/j.gca.2005.08.014::fedkin-grossman-ghiorso-2006
+  identity:
+    quantity:
+      tag: value
+      value: evaporation_coefficient_alpha
+    species:
+      formula: SiO
+      phase:
+        tag: unknown
+        reason: phase string 'silicate_melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '2073'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use wall
+  value:
+    kind: point
+    point: '0.17'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      sigma: '0.01'
+      parent: fedkin-grossman-ghiorso-2006::fedkin_2006_table3_sio_hashimoto_langmuir_per_T_alpha_series
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped regime 'langmuir_free_evaporation'
+    original_method_class: langmuir_free_evaporation
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - evaporation_coefficient_alpha
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: fedkin-grossman-ghiorso-2006::fedkin_2006_table3_sio_hashimoto_langmuir_per_T_alpha_series::T=2073.0:h=eb12d425d670
+  source_id: fedkin-grossman-ghiorso-2006
+  locator:
+    table: '3'
+    note: Fedkin 2006 Table 3 per-temperature alpha (from Hashimoto 1983)
+    record: fedkin_2006_table3_sio_hashimoto_langmuir
+  read_from: pdf:fedkin-grossman-ghiorso-2006
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2073'
+      locator:
+        table: '3'
+        note: Fedkin 2006 Table 3 per-temperature alpha (from Hashimoto 1983)
+        record: fedkin_2006_table3_sio_hashimoto_langmuir
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:fedkin-grossman-ghiorso-2006
+    parameters: []
+    output_unit: dimensionless alpha vs T_K
+- observation_id: fedkin-grossman-ghiorso-2006::fedkin_2006_table3_sio_hashimoto_langmuir_per_T_alpha_series::T=2173.0:h=efeb2f418fbe
+  experiment_id: 10.1016/j.gca.2005.08.014::fedkin-grossman-ghiorso-2006
+  identity:
+    quantity:
+      tag: value
+      value: evaporation_coefficient_alpha
+    species:
+      formula: SiO
+      phase:
+        tag: unknown
+        reason: phase string 'silicate_melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '2173'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use wall
+  value:
+    kind: point
+    point: '0.2'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      sigma: '0.01'
+      parent: fedkin-grossman-ghiorso-2006::fedkin_2006_table3_sio_hashimoto_langmuir_per_T_alpha_series
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped regime 'langmuir_free_evaporation'
+    original_method_class: langmuir_free_evaporation
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - evaporation_coefficient_alpha
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: fedkin-grossman-ghiorso-2006::fedkin_2006_table3_sio_hashimoto_langmuir_per_T_alpha_series::T=2173.0:h=efeb2f418fbe
+  source_id: fedkin-grossman-ghiorso-2006
+  locator:
+    table: '3'
+    note: Fedkin 2006 Table 3 per-temperature alpha (from Hashimoto 1983)
+    record: fedkin_2006_table3_sio_hashimoto_langmuir
+  read_from: pdf:fedkin-grossman-ghiorso-2006
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2173'
+      locator:
+        table: '3'
+        note: Fedkin 2006 Table 3 per-temperature alpha (from Hashimoto 1983)
+        record: fedkin_2006_table3_sio_hashimoto_langmuir
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:fedkin-grossman-ghiorso-2006
+    parameters: []
+    output_unit: dimensionless alpha vs T_K
+- observation_id: fedkin-grossman-ghiorso-2006::fedkin_2006_table3_sio_hashimoto_langmuir_per_T_alpha_series::T=2273.0:h=707e960142f9
+  experiment_id: 10.1016/j.gca.2005.08.014::fedkin-grossman-ghiorso-2006
+  identity:
+    quantity:
+      tag: value
+      value: evaporation_coefficient_alpha
+    species:
+      formula: SiO
+      phase:
+        tag: unknown
+        reason: phase string 'silicate_melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '2273'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use wall
+  value:
+    kind: point
+    point: '0.21'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      sigma: '0.01'
+      parent: fedkin-grossman-ghiorso-2006::fedkin_2006_table3_sio_hashimoto_langmuir_per_T_alpha_series
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped regime 'langmuir_free_evaporation'
+    original_method_class: langmuir_free_evaporation
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - evaporation_coefficient_alpha
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: fedkin-grossman-ghiorso-2006::fedkin_2006_table3_sio_hashimoto_langmuir_per_T_alpha_series::T=2273.0:h=707e960142f9
+  source_id: fedkin-grossman-ghiorso-2006
+  locator:
+    table: '3'
+    note: Fedkin 2006 Table 3 per-temperature alpha (from Hashimoto 1983)
+    record: fedkin_2006_table3_sio_hashimoto_langmuir
+  read_from: pdf:fedkin-grossman-ghiorso-2006
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2273'
+      locator:
+        table: '3'
+        note: Fedkin 2006 Table 3 per-temperature alpha (from Hashimoto 1983)
+        record: fedkin_2006_table3_sio_hashimoto_langmuir
+  derivation:
+    relation: as_published
+    inputs:
+    - pdf:fedkin-grossman-ghiorso-2006
+    parameters: []
+    output_unit: dimensionless alpha vs T_K
+- observation_id: fedkin-grossman-ghiorso-2006::fedkin_2006_yu_k_vacuum_langmuir
+  experiment_id: 10.1016/j.gca.2005.08.014::fedkin-grossman-ghiorso-2006
+  identity:
+    quantity:
+      tag: value
+      value: evaporation_coefficient_alpha
+    species:
+      formula: K
+      phase:
+        tag: unknown
+        reason: phase string 'silicate_melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '1723.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use wall
+  value:
+    kind: point
+    point: '0.13'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      alpha_range:
+      - '0.11'
+      - '0.15'
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped regime 'langmuir_free_evaporation'
+    original_method_class: langmuir_free_evaporation
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - evaporation_coefficient_alpha
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: fedkin-grossman-ghiorso-2006::fedkin_2006_yu_k_vacuum_langmuir
+  source_id: fedkin-grossman-ghiorso-2006
+  locator:
+    note: Fedkin et al. (2006) GCA 70:206-223 models Yu et al. (2003) GCA 67:773-786; tabulated with uncertainty also by Richter
+      lineage; rail sidecar vapour_rail_langmuir_anchors.yaml::fedkin_2006_k_silicate_vacuum_langmuir
+    record: fedkin_2006_yu_k_vacuum_langmuir
+  read_from: pdf:fedkin-grossman-ghiorso-2006
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1723.15'
+      locator:
+        note: Fedkin et al. (2006) GCA 70:206-223 models Yu et al. (2003) GCA 67:773-786; tabulated with uncertainty also
+          by Richter lineage; rail sidecar vapour_rail_langmuir_anchors.yaml::fedkin_2006_k_silicate_vacuum_langmuir
+        record: fedkin_2006_yu_k_vacuum_langmuir
+- observation_id: fedkin-grossman-ghiorso-2006::fedkin_2006_yu_na_vacuum_langmuir
+  experiment_id: 10.1016/j.gca.2005.08.014::fedkin-grossman-ghiorso-2006
+  identity:
+    quantity:
+      tag: value
+      value: evaporation_coefficient_alpha
+    species:
+      formula: Na
+      phase:
+        tag: unknown
+        reason: phase string 'silicate_melt' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: value
+      value: '1723.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use wall
+  value:
+    kind: point
+    point: '0.26'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: 'OWNER GATE: flip runtime Na from open-furnace 1.0 to vacuum 0.26 only after series-resistance model review'
+      alpha_range:
+      - '0.21'
+      - '0.31'
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped regime 'langmuir_free_evaporation'
+    original_method_class: langmuir_free_evaporation
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - evaporation_coefficient_alpha
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: fedkin-grossman-ghiorso-2006::fedkin_2006_yu_na_vacuum_langmuir
+  source_id: fedkin-grossman-ghiorso-2006
+  locator:
+    note: Fedkin et al. (2006) GCA 70:206-223 pp. 213-214; primary experiment Yu, Y., Hewins, R. H., Alexander, C. M. O'D.
+      & Wang, J. (2003) Geochim. Cosmochim. Acta 67:773-786
+    record: fedkin_2006_yu_na_vacuum_langmuir
+  read_from: pdf:fedkin-grossman-ghiorso-2006
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1723.15'
+      locator:
+        note: Fedkin et al. (2006) GCA 70:206-223 pp. 213-214; primary experiment Yu, Y., Hewins, R. H., Alexander, C. M.
+          O'D. & Wang, J. (2003) Geochim. Cosmochim. Acta 67:773-786
+        record: fedkin_2006_yu_na_vacuum_langmuir

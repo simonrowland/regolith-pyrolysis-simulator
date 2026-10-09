@@ -1,0 +1,96 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/extracts/pound-1972-cr-langmuir-knudsen.yaml
+observations:
+- observation_id: pound-1972-cr-langmuir-knudsen::pound_1972_cr_langmuir_knudsen
+  experiment_id: 10.1063/1.3253096::pound-1972-cr-langmuir-knudsen
+  identity:
+    quantity:
+      tag: value
+      value: evaporation_coefficient_alpha
+    species:
+      formula: Cr
+      phase:
+        tag: unknown
+        reason: phase string 'solid_metal' is not in the closed automatic map
+      polymorph:
+        tag: unknown
+        reason: phase unknown; polymorph unresolved
+      charge:
+        tag: value
+        value: 0
+    subtype:
+      tag: unknown
+      reason: no subtype mapped from source
+    per:
+      tag: unknown
+      reason: no per mapped from source
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1318.0, 1563.0]; no midpoint invented
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: no reservoir mapped from source
+    composition:
+      tag: unknown
+      reason: no composition mapped from source
+    fO2_Pa:
+      tag: unknown
+      reason: no fO2_Pa mapped from source
+    total_pressure_Pa:
+      tag: unknown
+      reason: no total_pressure_Pa mapped from source
+    sweep_gas:
+      tag: unknown
+      reason: no sweep_gas mapped from source
+    exposure:
+      tag: unknown
+      reason: no exposure mapped from source
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use wall
+  value:
+    kind: point
+    point: '0.9'
+    approximate: false
+  uncertainty:
+    kind: printed
+    verbatim:
+      alpha_range:
+      - '0.8'
+      - '1'
+  evidence:
+    class:
+      tag: unknown
+      reason: unmapped regime 'langmuir_free_evaporation'
+    original_method_class: langmuir_free_evaporation
+  admission:
+    status: admitted
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+  notices:
+  - kind: admission_defaulted
+    affected_quantities:
+    - evaporation_coefficient_alpha
+    reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
+    origin: pound-1972-cr-langmuir-knudsen::pound_1972_cr_langmuir_knudsen
+  source_id: pound-1972-cr-langmuir-knudsen
+  locator:
+    note: Pound, G. M. (1972), J. Phys. Chem. Ref. Data 1:135-146 Table 1, DOI 10.1063/1.3253096; primary McCabe, Hudson &
+      Paxton (1958), Trans. Met. Soc. AIME 212:102
+    record: pound_1972_cr_langmuir_knudsen
+  read_from: pdf:pound-1972-cr-langmuir-knudsen
