@@ -47,6 +47,9 @@ _LIQ_ONLY_MATLAB = (
     " SiO2\n"
     " liq 1.0\n"
     "\n"
+    "Stable mineral assemblage:\n"
+    "phase fraction[wt]\n"
+    "liq +1.00000\n"
 )
 
 

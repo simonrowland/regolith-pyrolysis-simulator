@@ -921,6 +921,103 @@ def _parse_magemin_sys_oxide_row(
     return None
 
 
+def _magemin_phase_weight_fractions(matlab_text: str) -> Dict[str, float]:
+    """System weight fraction of each material phase from ``fraction[wt]``.
+
+    Stdout ``Mode`` is the one-atom fraction (``ss_n`` / ``ph_frac_1at``
+    in MAGEMin 1.9.6 ``PrintOutput``). ``fraction[wt]`` is ``ph_frac_wt``
+    after ``compute_phase_mol_fraction`` divides by the sum of
+    material-phase weights. That sum omits the buffer pseudo-phase
+    (``pp_flags[][4] == 1``), whose printed weight is 0. The values
+    therefore sum to 1 over the hosted assemblage, not over an input
+    bulk whose excess oxygen the buffer does not put in a phase.
+    """
+    start: Optional[int] = None
+    lines = matlab_text.splitlines()
+    for index, line in enumerate(lines):
+        stripped = line.strip()
+        if stripped.startswith("phase") and "fraction[wt]" in stripped:
+            start = index + 1
+            break
+    if start is None:
+        raise RuntimeError(
+            "MAGEMin matlab dump lacks a fraction[wt] table"
+        )
+    fractions: Dict[str, float] = {}
+    for line in lines[start:]:
+        tokens = line.split()
+        if not tokens or tokens[0] == "SYS":
+            break
+        name = tokens[0]
+        if name.lower() in MAGEMinBackend._BUFFER_CHOICES:
+            continue
+        if len(tokens) < 2:
+            raise RuntimeError(
+                f"MAGEMin fraction[wt] row for {name!r} has no value"
+            )
+        try:
+            value = float(tokens[1])
+        except ValueError as exc:
+            raise RuntimeError(
+                f"MAGEMin fraction[wt] token for {name!r} is not numeric: "
+                f"{tokens[1]!r}"
+            ) from exc
+        if not math.isfinite(value) or value < 0.0 or value > 1.0 + 1.0e-4:
+            raise RuntimeError(
+                f"MAGEMin fraction[wt] token for {name!r} is invalid: "
+                f"{tokens[1]!r}"
+            )
+        fractions[name] = value
+    return fractions
+
+
+def _hosted_assemblage_kg(
+    *,
+    batch_kg: float,
+    bulk_wt_pct: Mapping[str, float],
+    phase_weight_fraction: Mapping[str, float],
+    phase_composition_wt_pct: Mapping[str, Mapping[str, float]],
+) -> float:
+    """Kilograms the material phases actually host.
+
+    ``fraction[wt]`` is a fraction of that hosted mass. The excess ``O``
+    sent to the qfm buffer is not in any phase row, so
+    ``fraction[wt] * batch_kg`` still inflates every other oxide.
+    Hosted mass is the input batch with that unhosted oxygen removed:
+
+        R_O = sum_i fraction[wt]_i * (phase O wt%_i / 100)
+        hosted_kg = (batch_kg - O_kg) / (1 - R_O)
+
+    When the phases host the bulk's oxygen, R_O equals O_kg/batch_kg and
+    hosted_kg is the batch. Unit check: kg / (kg/kg) = kg.
+    """
+    oxygen_in_phases = 0.0
+    for name, weight_fraction in phase_weight_fraction.items():
+        composition = phase_composition_wt_pct.get(name) or {}
+        oxygen_in_phases += float(weight_fraction) * (
+            float(composition.get("O", 0.0)) / 100.0
+        )
+    if not math.isfinite(oxygen_in_phases) or oxygen_in_phases >= 1.0:
+        raise RuntimeError(
+            "MAGEMin phase rows do not leave a hosted-mass fraction "
+            f"(oxygen weight fraction {oxygen_in_phases!r})"
+        )
+    bulk_sum = sum(float(value) for value in bulk_wt_pct.values())
+    if bulk_sum <= 0.0:
+        raise RuntimeError("MAGEMin bulk projection sums to zero")
+    oxygen_kg = float(batch_kg) * float(bulk_wt_pct.get("O", 0.0)) / bulk_sum
+    if not math.isfinite(oxygen_kg) or oxygen_kg < 0.0 or oxygen_kg > float(batch_kg):
+        raise RuntimeError(
+            f"MAGEMin bulk oxygen mass is not inside the batch: {oxygen_kg!r}"
+        )
+    hosted_kg = (float(batch_kg) - oxygen_kg) / (1.0 - oxygen_in_phases)
+    if not math.isfinite(hosted_kg) or hosted_kg < 0.0:
+        raise RuntimeError(
+            f"MAGEMin hosted assemblage mass is not usable: {hosted_kg!r}"
+        )
+    return hosted_kg
+
+
 def _magemin_phase_oxide_wt_pct(
     matlab_text: str,
 ) -> Dict[str, Dict[str, float]]:
@@ -2425,6 +2522,7 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                 f'MAGEMin batch_kg must be finite and non-negative: {batch_kg!r}'
             )
         compositions = _magemin_phase_oxide_wt_pct(matlab_text)
+        weight_fractions = _magemin_phase_weight_fractions(matlab_text)
         for name, row in phases.items():
             composition = compositions.get(name)
             if composition is None:
@@ -2432,13 +2530,31 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                     'MAGEMin oxide table lacks material phase '
                     f'{name!r}'
                 )
+            weight_fraction = weight_fractions.get(name)
+            if weight_fraction is None:
+                raise RuntimeError(
+                    'MAGEMin fraction[wt] table lacks material phase '
+                    f'{name!r}'
+                )
             row['composition_wt_pct'] = composition
-            # Mode is a mass fraction of MAGEMin's unit-mass system.
-            # Physical mass: m_kg = mode * batch_kg, with batch_kg the
-            # in-database mass sent to the binary.
-            # Unit check: (kg/kg) * kg = kg.
-            # Sanity: mode 1 on a 50 kg in-database batch is 50 kg.
-            row['mass_kg'] = float(row['mass_kg']) * float(batch_kg)
+            row['mass_kg'] = weight_fraction
+        # Mode (still in the stdout parser) is the one-atom fraction.
+        # Multiplying it by batch_kg rebuilt 13.794 kg Al2O3 from 13.5 kg
+        # on the 1100 C lunar-mare fixture. fraction[wt] is the hosted
+        # assemblage's weight fraction; scale that, not Mode.
+        # Sanity: one phase, fraction 1, no excess O, is the whole batch.
+        hosted_kg = _hosted_assemblage_kg(
+            batch_kg=float(batch_kg),
+            bulk_wt_pct=bulk_projection.composition_wt_pct,
+            phase_weight_fraction={
+                name: float(row['mass_kg']) for name, row in phases.items()
+            },
+            phase_composition_wt_pct={
+                name: row['composition_wt_pct'] for name, row in phases.items()
+            },
+        )
+        for row in phases.values():
+            row['mass_kg'] = float(row['mass_kg']) * hosted_kg
         return {
             'phases': phases,
             'buffer_warnings': buffer_warnings,
@@ -2675,12 +2791,13 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
              Phase :       ol      liq      spl      qfm
              Mode  :  0.02491  0.96156  0.00213  0.01140
 
-        Mode values are mass fractions of the system.  The buffer
-        pseudo-phase (any name in ``_BUFFER_CHOICES``) is dropped — it is
-        a control row, not a material phase.  Returns
-        ``{phase: {'mass_kg': fraction}}`` on a unit-mass basis (the
-        adapter only needs relative masses for ``liquid_fraction`` and
-        modal parity).
+        Mode values are one-atom fractions of the system, not mass
+        fractions.  This parser keeps that number under ``mass_kg`` on a
+        unit-mass basis so the stdout pin stays byte-stable.  The
+        subprocess caller replaces it with ``fraction[wt]`` times the
+        hosted batch.  The buffer pseudo-phase (any name in
+        ``_BUFFER_CHOICES``) is dropped — it is a control row, not a
+        material phase.
         """
         phase_line: Optional[str] = None
         mode_line: Optional[str] = None

@@ -44,7 +44,9 @@ from simulator.melt_backend.magemin import (
 )
 
 
-# Recorded Phase/Mode blocks. Mode is a mass fraction of a unit-mass system.
+# Recorded Phase/Mode blocks. Mode is the one-atom fraction, not a mass
+# fraction. The stdout parser still returns it under mass_kg; physical
+# mass comes from fraction[wt] on the subprocess path.
 _LUNAR_MARE_STDOUT = {
     1100: (
         " Phase :      liq      fsp      cpx       ol      spl      qfm \n"
@@ -126,6 +128,27 @@ _LUNAR_MARE_OXIDE_WT_FR = {
 }
 
 
+# Recorded ``fraction[wt]`` from the Stable mineral assemblage table.
+# These are not the Mode column. qfm prints +0.00000 and is not a phase.
+_LUNAR_MARE_WEIGHT_FRACTIONS = {
+    1100: {
+        "liq": 0.45209,
+        "fsp": 0.25402,
+        "cpx": 0.11616,
+        "ol": 0.16864,
+        "spl": 0.00910,
+    },
+    1200: {
+        "liq": 0.96856,
+        "ol": 0.02324,
+        "spl": 0.00820,
+    },
+    1400: {
+        "liq": 1.00000,
+    },
+}
+
+
 def _lunar_mare_matlab(temperature_C: int) -> str:
     lines = [
         "Oxide compositions [wt fr]:",
@@ -134,6 +157,13 @@ def _lunar_mare_matlab(temperature_C: int) -> str:
     for name, fractions in _LUNAR_MARE_OXIDE_WT_FR[temperature_C].items():
         rendered = " ".join(f"{value:.5f}" for value in fractions)
         lines.append(f"{name} {rendered}")
+    lines.append("")
+    lines.append("Stable mineral assemblage:")
+    lines.append("phase fraction[wt] G[J]")
+    for name, weight_fraction in _LUNAR_MARE_WEIGHT_FRACTIONS[temperature_C].items():
+        lines.append(f"{name} {weight_fraction:+.5f} -1.00000")
+    lines.append("qfm +0.00000 -1.00000")
+    lines.append("SYS -1.00000")
     lines.append("")
     return "\n".join(lines)
 
@@ -250,10 +280,15 @@ def test_magemin_out_of_database_element_is_excluded_and_majors_solve():
 
 
 @pytest.mark.parametrize("temperature_C", (1100, 1200, 1400))
-def test_magemin_subprocess_scales_recorded_mode_and_keeps_oxide_wt(
+def test_magemin_subprocess_scales_recorded_weight_fraction_and_keeps_oxide_wt(
     temperature_C, monkeypatch,
 ):
-    """Recorded Verb=0 stdout plus the matlab oxide table, through equilibrate."""
+    """Recorded Verb=0 stdout plus the matlab weight table, through equilibrate.
+
+    Mode is the one-atom fraction. Treating it as a mass fraction rebuilt
+    13.794 kg of Al2O3 from 13.5 kg at 1100 C. fraction[wt] is the hosted
+    assemblage's weight fraction (the qfm row is 0 and is not reassigned).
+    """
     captured = {}
 
     class FakeCompleted:
@@ -289,20 +324,59 @@ def test_magemin_subprocess_scales_recorded_mode_and_keeps_oxide_wt(
     assert any(arg == "--out_matlab=1" for arg in captured["args"])
     assert "qfm" not in result.phase_masses_kg
     batch_kg = sum(_LUNAR_MARE_MAJORS_KG.values())
+    weights = _LUNAR_MARE_WEIGHT_FRACTIONS[temperature_C]
     material = _material_modes(temperature_C)
-    assert set(result.phase_masses_kg) == set(material)
-    for name, fraction in material.items():
-        assert result.phase_masses_kg[name] == pytest.approx(fraction * batch_kg)
+    assert set(result.phase_masses_kg) == set(weights) == set(material)
+    hosted_scales = []
+    for name, weight_fraction in weights.items():
+        # The one-atom Mode times the batch is not this phase's mass.
+        assert result.phase_masses_kg[name] != pytest.approx(
+            material[name] * batch_kg, rel=1.0e-4,
+        )
+        hosted_scales.append(result.phase_masses_kg[name] / weight_fraction)
         recorded = _LUNAR_MARE_OXIDE_WT_FR[temperature_C][name]
         expected = {
-            oxide: weight_fraction * 100.0
-            for oxide, weight_fraction in zip(_OXIDE_HEADER, recorded)
-            if weight_fraction > 0.0
+            oxide: fraction * 100.0
+            for oxide, fraction in zip(_OXIDE_HEADER, recorded)
+            if fraction > 0.0
         }
         assert result.phase_compositions[name] == pytest.approx(expected)
         assert "Fe2O3" not in result.phase_compositions[name]
+    # One scale for every phase: fraction[wt] of the hosted assemblage.
+    assert hosted_scales == pytest.approx([hosted_scales[0]] * len(hosted_scales))
+    sent = MAGEMinBackend()._build_db_bulk_projection(
+        dict(_LUNAR_MARE_MAJORS_KG), database="ig",
+    )
+    sent_kg = {
+        ("FeO" if name == "FeOt" else name): (
+            batch_kg * float(value) / sent.projected_sum_wt_pct
+        )
+        for name, value in sent.composition_wt_pct.items()
+    }
+    # Hosted mass sits on the batch with the unhosted excess oxygen removed,
+    # not on the full batch. fraction[wt] * batch_kg is the full batch.
+    assert hosted_scales[0] == pytest.approx(batch_kg - sent_kg["O"], rel=0.01)
+    assert hosted_scales[0] != pytest.approx(batch_kg, rel=0.01)
+    for oxide, target_kg in sent_kg.items():
+        if oxide == "O" or target_kg == 0.0:
+            continue
+        got_kg = sum(
+            result.phase_masses_kg[name]
+            * result.phase_compositions[name].get(oxide, 0.0)
+            / 100.0
+            for name in result.phase_masses_kg
+        )
+        # 5-decimal matlab print. Al2O3's old 0.294 kg miss fails this.
+        assert got_kg == pytest.approx(target_kg, abs=max(0.002, 0.001 * target_kg))
+    hosted_oxygen_kg = sum(
+        result.phase_masses_kg[name]
+        * result.phase_compositions[name].get("O", 0.0)
+        / 100.0
+        for name in result.phase_masses_kg
+    )
+    assert hosted_oxygen_kg < 0.5 * sent_kg["O"]
     assert result.liquid_fraction == pytest.approx(
-        material["liq"] / sum(material.values())
+        weights["liq"] / sum(weights.values())
     )
 
 
