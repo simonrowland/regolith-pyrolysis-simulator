@@ -1,9 +1,11 @@
 # Deliberate analytical-model corpus release tag.
 # Bump only when the operator decides cached-real rows are no longer reusable.
-# 2026-07-31 VR-3 compatibility-only bump: retire optimizer keys containing
-# code/data/provider fingerprints. This changes identity shape, not physics.
-# Prior corpus rows are intentionally non-interoperable so old and new key
-# shapes cannot collide after fingerprints become provenance-only.
-corpus_version: "analytical-corpus-2026-07-31-vapour-rail-key-v2"
+# 2026-07-31 VR-3 compatibility-only bump retired optimizer keys that contained
+# code/data/provider fingerprints. That tag is no longer interoperable.
+# 2026-10-09 b-756: the load-time iron split (fe_redox_prior) changes the
+# feedstock ledger FeO/Fe2O3 and the melt fO2 seed. Cached optimizer rows
+# from the previous all-ferrous split are retired. Prior corpus rows stay
+# non-interoperable so a stale key cannot be served as this split.
+corpus_version: "analytical-corpus-2026-10-09-b756-fe-redox-split"
 interoperable_versions:
-  - "analytical-corpus-2026-07-31-vapour-rail-key-v2"
+  - "analytical-corpus-2026-10-09-b756-fe-redox-split"

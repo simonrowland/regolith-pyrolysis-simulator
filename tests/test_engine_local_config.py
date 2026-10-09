@@ -193,9 +193,10 @@ def test_rekey_migration_round_trip_and_idempotency(
     # VR-3 (be07c4d5) retired the June redox-v3 corpus: optimizer identity
     # dropped data/provider fingerprints and bumped corpus_version to
     # analytical-corpus-2026-07-31-vapour-rail-key-v2, declared
-    # non-interoperable with prior epochs. Rekey only accepts an
-    # interoperable target; the old June string is a refused epoch, not a
-    # migration destination.
+    # non-interoperable with prior epochs. b-756 later retired that tag
+    # for the load-time iron split. Rekey only accepts an interoperable
+    # target; the old June string is a refused epoch, not a migration
+    # destination. This test follows current_corpus_version().
     target = current_corpus_version()
     key = {
         "schema_version": "test",

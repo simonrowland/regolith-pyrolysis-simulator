@@ -677,7 +677,12 @@ def test_no_pin_schema_is_golden_neutral_for_search_and_evalspec_hash() -> None:
     # serialize those fingerprints, and the June corpus is not interoperable.
     # Pin recomputed from this tree's executable cache_key(spec).
     # 2026-09-30 C7d removed the physics-gate version and class from this digest.
-    assert cache_key(spec) == "f6d1c88ba2fcbcca5ae07e720bfe53a721601506fbd93611c907e8869352c7a3"
+    # 2026-10-09 b-756: corpus_version is the sole data lever in this key
+    # (canonical_evalspec_json). The bump to
+    # analytical-corpus-2026-10-09-b756-fe-redox-split retires cached rows
+    # from the all-ferrous split. No feedstock digest was added. Pin
+    # recomputed from this tree's executable cache_key(spec).
+    assert cache_key(spec) == "24c9299fd2d4cbafb8656d264dd9334cc3fdbe49ccae518b8ceaad6f865dc583"
 
 
 def test_bounds_and_type_checks_for_allowlisted_knob() -> None:

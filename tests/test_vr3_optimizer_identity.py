@@ -88,8 +88,10 @@ def test_recipe_run_inputs_and_corpus_version_remain_identity() -> None:
     )
     assert cache_key(prior_corpus) != cache_key(base)
     assert cache_key(base) != OLD_FINGERPRINT_KEY_SHAPE
+    # b-756 retired the VR-3 tag. Cached rows from the all-ferrous split
+    # are not interoperable with the load-time iron split.
     assert current_corpus_version() == (
-        "analytical-corpus-2026-07-31-vapour-rail-key-v2"
+        "analytical-corpus-2026-10-09-b756-fe-redox-split"
     )
 
 
