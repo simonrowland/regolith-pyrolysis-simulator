@@ -495,3 +495,23 @@ def test_provider_diagnostic_shape_matches_alphamelts_keys():
         'backend_warnings',
     ):
         assert key in diag, f'diagnostic missing key {key!r}'
+
+
+def test_projected_phase_and_liquid_fields_pin_has_no_repair_warning():
+    from simulator.melt_backend.base import EquilibriumResult
+
+    diagnostic = MAGEMinShadowProvider._project_equilibrium(
+        EquilibriumResult(
+            phases_present=['liquid'],
+            phase_masses_kg={'liquid': 1.0},
+            liquid_composition_wt_pct={'SiO2': 50.0, 'MgO': 50.0},
+            liquid_fraction=1.0,
+        ),
+        mode='shadow',
+        engine_version='test',
+    )
+
+    assert diagnostic.phase_masses_kg == {'liquid': 1.0}
+    assert diagnostic.phase_modes_wt_pct == {'liquid': 100.0}
+    assert diagnostic.liquid_composition_wt_pct == {'SiO2': 50.0, 'MgO': 50.0}
+    assert diagnostic.backend_warnings == ()
