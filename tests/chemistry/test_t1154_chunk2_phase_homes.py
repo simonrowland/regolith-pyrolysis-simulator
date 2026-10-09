@@ -779,15 +779,18 @@ def test_phase_home_hook_does_not_count_a_null_transition_as_a_no_op(
 
     backend._mode = "python_api"
     _load_crystal(sim)
-    dispatched: list[object] = []
+    dispatched: list[tuple] = []
+    reservoir_fO2 = float(sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log)
 
-    def no_transition(intent, **_kwargs):
-        dispatched.append(intent)
+    def no_transition(intent, **kwargs):
+        dispatched.append((intent, kwargs.get("fO2_log")))
         return SimpleNamespace(status="ok", transition=None, diagnostic={})
 
     sim._dispatch_only = no_transition
     sim._commit_phase_homes()
-    assert dispatched == [ChemistryIntent.EQUILIBRIUM_CRYSTALLIZATION]
+    assert dispatched == [
+        (ChemistryIntent.EQUILIBRIUM_CRYSTALLIZATION, reservoir_fO2),
+    ]
     assert _OLIVINE_0 in provider._crystal_accounts
     assert sim._chem_no_op_dispatch_count == before
 

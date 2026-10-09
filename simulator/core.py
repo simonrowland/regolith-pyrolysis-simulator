@@ -3255,9 +3255,14 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         from simulator.melt_backend.liquidus import LiquidusSampleError
 
         try:
+            # Same reservoir value silicate equilibrium passes. Omitting
+            # it made the provider substitute absolute -9.0.
             result = self._dispatch_only(
                 ChemistryIntent.EQUILIBRIUM_CRYSTALLIZATION,
                 control_inputs={},
+                fO2_log=float(
+                    self.melt.oxygen_reservoir.melt_intrinsic_fO2_log
+                ),
             )
         except (
             ProviderUnavailableError,
