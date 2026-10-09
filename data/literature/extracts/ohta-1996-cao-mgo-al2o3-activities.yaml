@@ -17,10 +17,10 @@ extraction:
   provenance_path: ferry-inbox/cao-al2o3-sources/ohta-1996-cao-mgo-al2o3-activities/
 review_status: draft
 fidelity_samples:
-- path: species.CaO.context[ohta_1996_method_scope].values.temperatures_K[0]
+- path: species.Al2O3.observations[ohta_1996_table1_spinel_sat_compositions].values.rows[6].T_K
   value: 1823
-  note: experimental temperatures
-  locator: {published_page: 983, pdf_page_index: 1, section: Synopsis}
+  note: first Table 1 row at 1823 K
+  locator: {published_page: 984, pdf_page_index: 2, table: '1', row: '1823-1'}
 - path: species.Al2O3.observations[ohta_1996_table1_spinel_sat_compositions].values.rows[0].slag_mass_pct_Al2O3
   value: 57.5
   note: Table 1 first 1873 K slag Al2O3 mass%
@@ -31,6 +31,7 @@ fidelity_samples:
   locator: {published_page: 984, pdf_page_index: 2, table: '1'}
 species:
   CaO:
+    observations: []
     context:
     - observation_id: ohta_1996_method_scope
       type: method
@@ -42,8 +43,19 @@ species:
       values:
         quantity: slag_metal_equilibration_method_and_activity_assessment_scope
         method_class: method_only
-        experimental_method: equilibrium between CaO-Al2O3-MgO slag (with minor MnO, FetO, S) and liquid iron in Al2O3 or MgO
-          crucibles at 1823 and 1873 K under deoxidized Ar; ~2 h to equilibrium
+        experimental_method: >-
+          Master slag was premelted from reagent CaCO3, MgO, and Al2O3 in a Pt
+          crucible under air. Each experiment used 30 g electrolytic iron
+          initially containing about 500 to 1000 mass ppm O and 7 g
+          CaO-Al2O3-MgO slag with an appropriate amount of FeS. Fe-1 to 20
+          mass% Al or Fe-1 to 10 mass% Mn alloy was added by dropping. The
+          slag-metal charge was held in an Al2O3 or MgO crucible at 1823 or
+          1873 K under deoxidized Ar; it was stirred for 2 h in MgO crucibles
+          and 3 h in Al2O3 crucibles, with an Al2O3 rod used for 90 s every
+          30 min. Equilibrium was reached in about 2 h; the melt was unstirred
+          for at least 1 h before quenching, then quenched rapidly in a He gas
+          stream and in water. Chemical analysis methods for metal and slag
+          phases are described in the cited prior articles.
         temperatures_K: [1823, 1873]
         a_CaO_assessment_as_printed: activities of CaO in entire liquid region first determined at 1823 and 1873 K from reported
           sulfide capacities coupled with activity coefficients of CaS estimated from those in CaO-Al2O3 slags
@@ -51,7 +63,11 @@ species:
           using spinel-saturation a(Al2O3) and a(MgO) as starting points
         binary_edge_note: for the CaO-Al2O3 binary join this paper is partly derived from prior Cs / γ(CaS) data (refs cited),
           not an independent gas-slag binary activity table; iso-activity figures (Fig. 6) are figure_only here
-        standard_states_as_printed: solid standard states for oxide activities as used in deoxidation equilibria discussion
+        standard_states_as_printed: >-
+          Solute activities in liquid iron use a dilute solution of one mass
+          percent standard state. Al2O3, CaO, MgO, and MnO activities use
+          solid standard states. Fe_tO activity coefficient is referred to
+          the liquid standard state.
         how_equilibrium_shown_as_printed: time trials found equilibrium in ~2 h; unstirred >=1 h before quench; metal/slag
           analyses as in prior articles
     - observation_id: ohta_1996_fig6_iso_activity_cao_figure_only
@@ -70,7 +86,7 @@ species:
   Al2O3:
     observations:
     - observation_id: ohta_1996_table1_spinel_sat_compositions
-      type: composition
+      type: composition_series
       locator:
         published_page: 984
         pdf_page_index: 2
