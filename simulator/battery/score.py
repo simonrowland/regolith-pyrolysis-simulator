@@ -62,6 +62,7 @@ from simulator.battery.enums import (
 from simulator.battery.identity import (
     Identity,
     IdentityEqualKind,
+    THERMOCHEMICAL_CALORIE_J,
     identity_equal,
     profile_for,
     quantity_token,
@@ -1205,8 +1206,8 @@ def _b1259_tridymite_cristobalite_offset_rows() -> tuple[
                 continue
             # B1259 H is kcal/mol and S is cal/(mol K). Convert both to SI.
             rows[key] = (
-                Decimal(str(enthalpy)) * Decimal("4184"),
-                Decimal(str(entropy)) * Decimal("4.184"),
+                Decimal(str(enthalpy)) * Decimal(1000) * THERMOCHEMICAL_CALORIE_J,
+                Decimal(str(entropy)) * THERMOCHEMICAL_CALORIE_J,
             )
         tables[str(record["record_id"])] = rows
     cristobalite = tables["b1259-ht-0113-cristobalite"]
@@ -1445,7 +1446,7 @@ def _fusion_comparison_reference(
             kind=NoticeKind.DERIVATION_USES_COMPILATION,
             affected_quantities=(Quantity.ACTIVITY,),
             reason=(
-                f"{original_reason}; B1259 tridymite→cristobalite offset applied; "
+                f"B1259 tridymite→cristobalite offset applied; {original_reason}; "
                 f"DeltaG_cristobalite_minus_tridymite={delta_g_tr_J_per_mol} J/mol; "
                 f"offset_dex={tridymite_offset_dex}; authority={authority.value}; "
                 f"certified_band=[{band_lo}, {band_hi}] K"
@@ -1560,8 +1561,6 @@ def _fusion_comparison_reference(
             ),
         )
         notices = (notice,) if melts_notice is None else (notice, melts_notice)
-        if tridymite_notice is not None:
-            notices += (tridymite_notice,)
         return replace(
             reference,
             identity=comparison_identity,

@@ -5598,6 +5598,82 @@ def test_tridymite_fusion_conversion_applies_b1259_offset_to_value() -> None:
     )
 
 
+def test_tridymite_offset_residual_scores_in_band_and_extrapolated_values() -> None:
+    from simulator.battery.enums import Polymorph
+    from simulator.battery.score import (
+        EnginePrediction,
+        _fusion_comparison_reference,
+    )
+
+    experiment = F.kems_experiment()
+    for temperature, polymorph, offset_authority in (
+        (Decimal("1900"), Polymorph.TRIDYMITE, Authority.CERTIFIED),
+        (Decimal("2001"), Polymorph.TRIDYMITE, Authority.EXTRAPOLATED),
+        (Decimal("1900"), Polymorph.CRISTOBALITE_HIGH, None),
+    ):
+        identity = _with_activity_reference_polymorph(
+            F.activity_identity(
+                formula="SiO2",
+                T_K=temperature,
+                endmember_phase=Phase.CR,
+                component_basis="SiO2",
+            ),
+            polymorph,
+        )
+        reference = F.observation(
+            f"silica-{polymorph.value}-residual-at-{temperature}K",
+            experiment.experiment_id,
+            identity,
+            Decimal("0.3"),
+            evidence=EvidenceClass.MEASURED_DIRECT,
+            source_id="synthetic-tridymite-residual-reference",
+        )
+        converted = _fusion_comparison_reference(
+            reference, engine=Engine.OPENIMCC
+        )
+        prediction = EnginePrediction(
+            engine=Engine.OPENIMCC,
+            channel="openimcc",
+            execution=Execution(
+                state=ExecutionState.PRODUCED,
+                call_evidence="test:tridymite-offset-residual",
+            ),
+            value=converted.value.point,
+            unit="dimensionless",
+            authority=Authority.CERTIFIED,
+            coefficient_sources=("nasa-cea-thermo",),
+            lineage_complete=True,
+            identity=converted.identity,
+        )
+
+        residual, candidate = compile_residual(
+            reference,
+            Engine.OPENIMCC,
+            context=_context(F.work(), experiment, reference, review="reviewed"),
+            prediction=prediction,
+        )
+
+        assert candidate is not None
+        assert residual.status is ResidualStatus.NO_BAND
+        assert residual.numeric is not None
+        assert residual.numeric.value == 0
+        offset_notices = [
+            notice
+            for notice in residual.notices
+            if "B1259 tridymite→cristobalite offset applied" in notice.reason
+        ]
+        if offset_authority is None:
+            assert offset_notices == []
+        else:
+            assert len(offset_notices) == 1
+            offset_notice = offset_notices[0]
+            assert offset_notice.authority is offset_authority
+            assert offset_notice.reason.startswith(
+                "B1259 tridymite→cristobalite offset applied;"
+            )
+            assert "fusion conversion missing input:" in offset_notice.reason
+
+
 @pytest.mark.parametrize("polymorph", (None, "quartz"))
 def test_solid_activity_with_unmatched_polymorph_refuses_conversion(
     polymorph: str | None,
