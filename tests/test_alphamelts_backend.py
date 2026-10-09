@@ -7069,6 +7069,13 @@ def test_activities_times_antoine_maps_thermoengine_liquid_activity_keys():
         a_oxide=backend._activity_for_vapor_species('Mg', activities),
         vapor_pressure_data=backend._vapor_pressure_catalog_payload,
     )
+    # Independent JANAF Mg-010 pin (Chase 1998, rows 1400-2000 K):
+    # 2 Mg(g) + O2 -> 2 MgO(s), dG = -1463.2445 + 0.411822143*T
+    # kJ/mol O2. At 1873.15 K, K = exp(dG*1000/(R*T)); with
+    # a_MgO = 2*0.0676 and pO2/P° = 1e-9, mass action gives
+    # p_Mg = 100000*sqrt(K*a_MgO**2/1e-9) = 0.0965708 Pa for
+    # R = 8.314462618 J/(mol K). Allow the owner's rounded R = 8.31446.
+    assert pressures['Mg'] == pytest.approx(0.0965708, rel=1e-5)
     assert pressures['SiO'].hex() == '0x1.3edd07a85de8dp+0'
     assert backend._activity_for_vapor_species('Na', activities) == pytest.approx(
         9.57e-5
