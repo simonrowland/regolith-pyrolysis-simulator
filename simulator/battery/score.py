@@ -843,8 +843,9 @@ def _initial_charge_composition_notice(reference: Observation) -> Notice | None:
         return None
     if reference.source_id == "kems-020-hastie-1981-nbsir":
         reason = (
-            "composition = printed initial charge; run composition evolves during "
-            "vaporization"
+            f"{SOURCE_INTERNALLY_INCONSISTENT_REASON_PREFIX} "
+            "composition_role=initial_charge_only: composition = printed initial "
+            "charge; run composition evolves during vaporization"
         )
     else:
         reason = (

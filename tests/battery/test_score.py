@@ -2368,8 +2368,13 @@ def test_catalogue_composition_is_flagged_and_excluded_from_headline() -> None:
 
 
 def test_hastie_initial_charge_notice_reaches_residual() -> None:
+    from simulator.battery.score import (
+        FLAGGED_STRATUM_SOURCE_INTERNALLY_INCONSISTENT,
+        flagged_strata,
+    )
+
     experiment = F.kems_experiment()
-    identity = _partial_identity()
+    identity = F.activity_identity()
     assert identity.composition is not None and identity.composition.is_value
     identity = replace(
         identity,
@@ -2392,12 +2397,20 @@ def test_hastie_initial_charge_notice_reaches_residual() -> None:
         reference,
         Engine.INTERNAL_ANALYTICAL,
         context=_context(F.work(), experiment, reference, review="reviewed"),
-        prediction=_partial_prediction(Engine.INTERNAL_ANALYTICAL, reference),
+        prediction=_predict(Decimal("0.3"), identity),
     )
-    assert any(
-        notice.reason
-        == "composition = printed initial charge; run composition evolves during vaporization"
+    hastie_notices = [
+        notice
         for notice in residual.notices
+        if "composition = printed initial charge; run composition evolves during vaporization"
+        in notice.reason
+    ]
+    assert len(hastie_notices) == 1
+    assert residual.numeric is not None
+    assert residual.score_eligible is False
+    assert "not_flagged_stratum" in residual.exclusions
+    assert flagged_strata(residual.notices) == (
+        FLAGGED_STRATUM_SOURCE_INTERNALLY_INCONSISTENT,
     )
 
 
