@@ -150,6 +150,30 @@ def test_magemin_defaults_to_subprocess_even_if_pymagemin_importable(monkeypatch
     assert backend._magemin_module is None
 
 
+def test_magemin_phase_composition_projection_pin_has_no_repair_warning():
+    from simulator.melt_backend.base import EquilibriumResult
+
+    backend = MAGEMinBackend()
+    result = EquilibriumResult(liquid_fraction=0.5)
+    backend._populate_result(
+        result,
+        {
+            'phases': {
+                'liq': {
+                    'mass_kg': 1.0,
+                    'composition_wt_pct': {'SiO2': 50.0, 'MgO': 50.0},
+                },
+            },
+        },
+    )
+
+    assert result.phase_compositions == {
+        'liq': {'SiO2': 50.0, 'MgO': 50.0},
+    }
+    assert result.liquid_composition_wt_pct == {'SiO2': 50.0, 'MgO': 50.0}
+    assert result.warnings == []
+
+
 def test_magemin_reinitialize_closes_existing_warm_pool(monkeypatch):
     class FakePool:
         close_calls = 0
