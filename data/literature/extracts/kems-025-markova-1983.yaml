@@ -167,6 +167,19 @@ experiments:
           note: A base-pressure value is not reported.
     regime:
       regime_class: {tag: unknown, reason: not_published}
+    cell_internal_pressure_note:
+      state:
+        tag: value
+        value: >-
+          The paper states that vaporization occurred in a Knudsen cell, but gives
+          no in-cell pressure or separate quantitative effusion-regime criterion.
+      locator:
+        published_page: 460
+        pdf_page_index: 1
+        section: Technique
+        note: >-
+          The Technique paragraph identifies a Knudsen cell and MS-1301 mass
+          spectrometry; it does not report cell pressure or an orifice dimension.
 species:
   Al2O3:
     observations:
