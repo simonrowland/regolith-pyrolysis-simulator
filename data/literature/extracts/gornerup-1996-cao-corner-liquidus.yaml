@@ -1390,13 +1390,22 @@ species:
         type: literature_context
         locator: {page: 1, published_page: 1465, section: '2.1'}
         units: °C
-        quote: 'Rankin and Wright (1915, reference 6) report optical-pyrometer temperature-measurement accuracy estimated at ±20 °C; almost the entire ternary system was examined at composition intervals of five wt%, with a maximum operating temperature of 1600 °C imposed by the experimental equipment.'
+        quote: 'The accuracy of temperature measurements, which were carried out with an optical pyrometer, was estimated to be ±20°C.'
         values:
           method_class: quoted_attributed
           evidence_class: quoted_attributed
           attribution: 'G. A. Rankin and F. E. Wright, Am. J. Sci., XXXIX (1915), 4th ser., no. 229, p. 1 (reference 6).'
           optical_pyrometer_accuracy_magnitude_C: 20
           stated_sign: ±
+      - observation_id: gornerup_1996_quoted_rankin_wright_1915_ternary_intervals
+        type: literature_context
+        locator: {page: 1, published_page: 1465, section: '2.3'}
+        units: as printed
+        quote: 'Almost the entire ternary system was examined at composition intervals of five wt%. The only limitation was set by the experimental equipment, which had a maximum operating temperature of 1600°C.'
+        values:
+          method_class: quoted_attributed
+          evidence_class: quoted_attributed
+          attribution: 'G. A. Rankin and F. E. Wright, Am. J. Sci., XXXIX (1915), 4th ser., no. 229, p. 1 (reference 6).'
           composition_interval_wt_percent: 5
           equipment_maximum_operating_temperature_C: 1600
       - observation_id: gornerup_1996_quoted_welch_gutt_1959

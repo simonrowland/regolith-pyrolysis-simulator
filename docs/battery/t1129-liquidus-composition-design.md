@@ -18,8 +18,8 @@ The existing per-engine prediction allowlist must refuse these rows as
 prediction branch belongs to t-1113. No ValueKind, quantity, profile, or store
 schema change is needed.
 
-The r2 note identifies Görnerup & Wijk 1996 Table 1 as a 39-row corpus extract.
-That extract is absent from this simulator checkout, so its data rows are not
-encoded here. Once the corpus source is available, verify each row's own liquid
-map, printed zeros and temperature, unknown Sample composition, and solid in
-`point_conditions` before regenerating the derived store.
+Görnerup & Wijk 1996 Table 1 is encoded as a 39-row extract. Migration stores
+each row's own liquid map (including printed zeros), printed temperature,
+unknown Sample composition, and saturating solid in `point_conditions`. The
+derived observation store is not committed; migrating the extract is expected
+to add 39 liquidus observation rows.
