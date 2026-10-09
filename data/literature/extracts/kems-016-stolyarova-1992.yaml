@@ -14,11 +14,10 @@ extraction:
 review_status: draft
 species:
   SiO2:
-    observations:
+    context:
     - observation_id: stolyarova_1992_silicate_kems_geometry_activities
       type: method
       locator:
-        source_path: docs-private/research/ocr-artifacts/kems-016-stolyarova-1992/spool/out/kems-016-stolyarova-1992/vlm/kems-016-stolyarova-1992.md
         section: 2. Experimental procedures
         line_range: 15-19
       T_range_K:
@@ -58,9 +57,8 @@ species:
         numeric_activity_note: Conference paper states oxide activities were determined
           (Belton–Fruehan / comparison method) but does not tabulate component γ or a.
           Table 1 is integral −ΔG of mixing (kcal/mol); Table 2 is Wilson binary λ parameters;
-          Tables 3–4 are Gibbs / μ(Na2O). Those live on the gibbs_table observations. Locator
-          docs-private/research/ocr-artifacts/kems-016-stolyarova-1992/spool/out/kems-016-stolyarova-1992/vlm/kems-016-stolyarova-1992.md
-          §2 / Table 1 (line_range 15-27).
+          Tables 3–4 are Gibbs / μ(Na2O). Those live on the gibbs_table observations.
+          See §2 and Table 1, lines 15-27.
       uncertainty:
         note: short conference paper; geometry ratios only
       equipment:
@@ -73,7 +71,6 @@ species:
             absolute_orifice_area_m2: null
             note: ratios only — not Whitman-Motzfeldt multi-cell α with numeric d
           locator:
-            source_path: docs-private/research/ocr-artifacts/kems-016-stolyarova-1992/spool/out/kems-016-stolyarova-1992/vlm/kems-016-stolyarova-1992.md
             paragraph: ratio of the areas of the effusion hole and vaporization was equaled to 1:100,400,500
             line_range: '17'
         sample_surface_area:
@@ -85,15 +82,14 @@ species:
             - 500
             numeric_m2: null
           locator:
-            source_path: docs-private/research/ocr-artifacts/kems-016-stolyarova-1992/spool/out/kems-016-stolyarova-1992/vlm/kems-016-stolyarova-1992.md
             paragraph: ratio of the areas of the effusion hole and vaporization
             line_range: '17'
         cell_material:
           value: Pt, Mo, and W effusion cells (selection system-dependent)
           locator:
-            source_path: docs-private/research/ocr-artifacts/kems-016-stolyarova-1992/spool/out/kems-016-stolyarova-1992/vlm/kems-016-stolyarova-1992.md
             paragraph: Vaporization from platinum, molybdenum and tungsten effusion cells
             line_range: '17'
+    observations:
     - observation_id: stolyarova_1992_gibbs_cas_and_fcm_table1
       type: gibbs_table
       locator:
@@ -486,14 +482,17 @@ fidelity_samples:
     source_path: docs-private/research/ocr-artifacts/kems-016-stolyarova-1992/spool/out/kems-016-stolyarova-1992/vlm/kems-016-stolyarova-1992.md
     table: '1'
     line_range: '27'
-- path: species.SiO2.observations[stolyarova_1992_silicate_kems_geometry_activities].values.hole_to_vaporization_area_ratios
+- species: SiO2
+  observable: method
+  observation_id: stolyarova_1992_silicate_kems_geometry_activities
+  field: hole_to_vaporization_area_ratios
   value:
   - 100
   - 400
   - 500
   note: geometry ratios 1:100,400,500
   locator:
-    source_path: docs-private/research/ocr-artifacts/kems-016-stolyarova-1992/spool/out/kems-016-stolyarova-1992/vlm/kems-016-stolyarova-1992.md
+    section: 2. Experimental procedures
     line_range: '17'
 - path: species.Na.observations[stolyarova_1992_na2o_chemical_potential_nbs_table4].values.points[0].mu_Na2O_exp_kcal_mol
   value: 56.0
