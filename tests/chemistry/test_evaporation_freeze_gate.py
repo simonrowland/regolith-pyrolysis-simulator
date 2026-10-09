@@ -3900,6 +3900,23 @@ def test_freeze_gate_memos_preserve_sr18_and_sr19_repair_notices(
         canonical_json_bytes(sim._reduced_real_repair_notices).decode('utf-8')
     )
 
+    expected_notices = list(sim._reduced_real_repair_notices)
+    sim._reduced_real_repair_notices = []
+    assert sim._freeze_gate_curve() == curve
+    assert sim._reduced_real_repair_notices == expected_notices
+
+    sibling = _build_freeze_gate_sim(
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+        enabled=True,
+    )
+    sibling.melt.temperature_C = 1600.0
+    sibling.melt.p_total_mbar = 10.0
+    sibling._freeze_gate_shared_curve_cache = shared_cache
+    assert sibling._freeze_gate_curve() == curve
+    assert sibling._reduced_real_repair_notices == expected_notices
+
 
 def test_uncacheable_gate_curve_fallback_skips_every_memo(
     monkeypatch,
