@@ -6812,7 +6812,7 @@ def test_g5_compilation_column_mapping_mutation_proof() -> None:
 
 def test_l05c1_costa_control_is_not_condensation() -> None:
     row = _extract_observation(
-        "costa-jacobson-2015.yaml", "costa_jacobson_2015_fe_olivine_kems"
+        "kems-007-costa-2015.yaml", "costa_2015_fe_olivine_kems_alpha_multicell"
     )
     values = row.get("values") if isinstance(row.get("values"), dict) else {}
     state, reason = map_quantity(
@@ -7952,7 +7952,7 @@ def test_f4_antoine_and_points_and_range_restore_corroborated_quantity(
     assert state.is_value and state.value is Quantity.P_SAT
 
     costa = _extract_observation(
-        "costa-jacobson-2015.yaml", "costa_jacobson_2015_sio_olivine_kems"
+        "kems-007-costa-2015.yaml", "costa_2015_sio_olivine_kems_alpha_multicell"
     )
     state, _reason = map_quantity(
         costa.get("type"), costa.get("values"), units=costa.get("units"), row=costa
@@ -7973,7 +7973,7 @@ def test_f4_antoine_and_points_and_range_restore_corroborated_quantity(
         "habermann-daane-1964.yaml",
         "nist-webbook.yaml",
         "berkowitz-chupka-inghram-1957.yaml",
-        "costa-jacobson-2015.yaml",
+        "kems-007-costa-2015.yaml",
         "sf04-magma-companion-workbook.yaml",
     ):
         _copy_extract(root, fname)
@@ -8025,7 +8025,7 @@ def test_f4_antoine_and_points_and_range_restore_corroborated_quantity(
     )
 
     costa_obs = result.observations[
-        "costa-jacobson-2015::costa_jacobson_2015_sio_olivine_kems"
+        "kems-007-costa-2015::costa_2015_sio_olivine_kems_alpha_multicell"
     ]
     assert quantity_token(costa_obs.identity) is Quantity.EVAPORATION_COEFFICIENT_ALPHA
     assert costa_obs.value.kind is ValueKind.INTERVAL
