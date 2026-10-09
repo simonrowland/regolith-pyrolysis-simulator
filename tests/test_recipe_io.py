@@ -411,7 +411,9 @@ def test_runner_malformed_recipe_cli_fails_loud(tmp_path: Path) -> None:
     assert "unknown top-level recipe key" in payload["error_message"]
 
 
-def test_no_recipe_run_matches_committed_golden_text() -> None:
+def test_no_recipe_run_matches_committed_golden_text(
+    isolated_engine_config,
+) -> None:
     # Fixture regenerated 2026-08-02 under REPAIRED MAGEMin config per the
     # train13 adjudication; prior value was generated against the
     # broken-liquidus job tree. docs-private/research/2026-08-02-train13-adjudication.md
