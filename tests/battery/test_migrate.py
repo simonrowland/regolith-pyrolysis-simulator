@@ -5098,6 +5098,98 @@ def test_reference_prose_keeps_printed_endmember_and_does_not_stamp_one_bar() ->
     assert henry.value.endmember.phase.value is Phase.L
 
 
+def test_ts1985_and_yam1983_tridymite_reference_state_baseline() -> None:
+    ts1985 = next(
+        row
+        for row in _extract_observations("ts1985.yaml")
+        if row.get("observation_id") == "ts1985_sio2_gibbs_duhem_1200C_X0500"
+    )
+    ts_state = reference_state_from_extract(
+        ts1985["standard_state"], species_formula="SiO2", values=ts1985["values"]
+    )
+    assert ts_state is not None and ts_state.is_value
+    assert ts_state.value.endmember.polymorph is not None
+    assert ts_state.value.endmember.polymorph.is_value
+    assert ts_state.value.endmember.polymorph.value is Polymorph.TRIDYMITE
+
+    allibert = next(
+        row
+        for row in _extract_observations("kems-051-allibert-1981.yaml")
+        if row.get("observation_id")
+        == "allibert_1981_table2_alumina_activity_kems"
+    )
+    allibert_state = reference_state_from_extract(
+        allibert["standard_state"],
+        species_formula="Al2O3",
+        values=allibert["values"],
+    )
+    assert allibert_state is not None and allibert_state.is_value
+    allibert_polymorph = allibert_state.value.endmember.polymorph
+    assert allibert_polymorph is not None and allibert_polymorph.is_value
+    assert allibert_polymorph.value is Polymorph.CORUNDUM
+
+    ca2sio4_alpha = next(
+        row
+        for row in _extract_observations(
+            "robie-hemingway-wilson-1980-usgs-of-80-908.yaml"
+        )
+        if row.get("observation_id")
+        == "t1101_robie1980_ca2sio4_alpha_summary_29815_absent"
+    )
+    ca2sio4_state = reference_state_from_extract(
+        ca2sio4_alpha["standard_state"],
+        species_formula="Ca2SiO4_alpha",
+        values=ca2sio4_alpha["values"],
+    )
+    assert ca2sio4_state is not None and ca2sio4_state.is_value
+    ca2sio4_polymorph = ca2sio4_state.value.endmember.polymorph
+    assert ca2sio4_polymorph is not None and ca2sio4_polymorph.is_value
+    assert ca2sio4_polymorph.value is Polymorph.ALPHA
+
+    ambiguous = reference_state_from_extract(
+        "Pure solid tridymite or quartz; endmember=SiO2",
+        species_formula="SiO2",
+        values={},
+    )
+    assert ambiguous is not None and ambiguous.is_value
+    ambiguous_polymorph = ambiguous.value.endmember.polymorph
+    assert ambiguous_polymorph is not None and ambiguous_polymorph.is_unknown
+    assert ambiguous_polymorph.reason == "source names more than one polymorph"
+
+    coefficient = reference_state_from_extract(
+        "Raoultian pure solid SiO2; gamma_SiO2 relative to solid SiO2",
+        species_formula="SiO2",
+        values={},
+    )
+    assert coefficient is not None and coefficient.is_value
+    coefficient_polymorph = coefficient.value.endmember.polymorph
+    assert coefficient_polymorph is not None and coefficient_polymorph.is_unknown
+    assert coefficient_polymorph.reason == "source does not state polymorph"
+
+    table_number = reference_state_from_extract(
+        "solid CaO standard state; Table II footnote",
+        species_formula="CaO",
+        values={},
+    )
+    assert table_number is not None and table_number.is_value
+    table_polymorph = table_number.value.endmember.polymorph
+    assert table_polymorph is not None and table_polymorph.is_unknown
+    assert table_polymorph.reason == "source does not state polymorph"
+
+    yam1983 = next(
+        row
+        for row in _extract_observations("yam1983.yaml")
+        if row.get("observation_id") == "yam1983_sio2_table2_minus_log10_a_AT_B"
+    )
+    yam_state = reference_state_from_extract(
+        yam1983["standard_state"], species_formula="SiO2", values=yam1983["values"]
+    )
+    assert yam_state is not None and yam_state.is_unknown
+    assert yam_state.reason == (
+        "source standard_state does not name one reference endmember"
+    )
+
+
 def test_reference_prose_rejects_ambiguous_or_negated_raoult_conventions() -> None:
     furukawa = next(
         row

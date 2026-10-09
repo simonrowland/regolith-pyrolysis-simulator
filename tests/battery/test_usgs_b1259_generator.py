@@ -100,6 +100,23 @@ def _observations_for(
     return result
 
 
+def test_tridymite_record_name_uses_the_closed_polymorph_alias() -> None:
+    generated = _generation("b1259-ht-0114-tridymite")
+    assert generated.observations
+    assert all(
+        observation.identity.species.polymorph.is_value
+        and observation.identity.species.polymorph.value is Polymorph.TRIDYMITE
+        for observation in generated.observations
+    )
+
+    o_tridymite = _generation("b1259-298k-0185-o-tridymite")
+    assert o_tridymite.observations
+    assert all(
+        observation.identity.species.polymorph.is_unknown
+        for observation in o_tridymite.observations
+    )
+
+
 def test_table1_states_calorie_r_and_joule_companion() -> None:
     record = _load(TABLE1)
     symbols = {
