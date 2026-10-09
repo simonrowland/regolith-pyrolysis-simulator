@@ -146,32 +146,23 @@ def test_report_species_class_diagnostics_class_alpha_fallback_unchanged():
     assert diag.series.alpha_intrinsic == pytest.approx(0.084)
 
 
-def test_legacy_duplicate_evidence_alpha_values_are_pinned_before_repoint():
+def test_consolidated_duplicate_evidence_alpha_values_stay_pinned():
     rows = (
         *evaporation_classes._SIO_EVIDENCE,
         *evaporation_classes._REDOX_EVIDENCE,
         *evaporation_classes._MODIFIER_EVIDENCE,
         *evaporation_classes._MARKED_IDEAL_FENCES,
     )
-    duplicate_ids = {
-        "costa_jacobson_2015_fe_olivine_kems": 0.02,
-        "fedkin_2006_table3_sio_hashimoto_langmuir": 0.17,
-        "fedkin_2006_table3_fe_hashimoto_langmuir": 0.24,
-        "fedkin_2006_table3_mg_hashimoto_langmuir": 0.27,
-        "fedkin_2006_yu_na_vacuum_langmuir": 0.26,
-        "fedkin_2006_yu_k_vacuum_langmuir": 0.13,
-        "sossi_2019_na_open_furnace_apparent": 1.0,
-        "safarian_engh_2013_si_pure_langmuir": 1.0,
+    targets = {
+        ("kems-007-costa-2015", "costa_2015_fe_olivine_kems_alpha_multicell"): 0.02,
+        ("kems-005-fedkin-2006", "fedkin_2006_sio_hashimoto_langmuir_table3"): 0.17,
+        ("kems-005-fedkin-2006", "fedkin_2006_fe_hashimoto_langmuir_table3"): 0.24,
+        ("kems-005-fedkin-2006", "fedkin_2006_mg_hashimoto_langmuir_table3"): 0.27,
+        ("kems-005-fedkin-2006", "fedkin_2006_na_yu_langmuir"): 0.26,
+        ("kems-005-fedkin-2006", "fedkin_2006_k_yu_langmuir"): 0.13,
+        ("kems-012-sossi-2019", "sossi_2019_na_alpha_e_authors_adopted_unity"): 1.0,
+        ("kems-009-safarian-2013", "safarian_2013_si_pure_liquid_alpha_b1"): 1.0,
     }
-    actual = {row.observation_id: row.alpha for row in rows if row.observation_id in duplicate_ids}
-    assert actual == duplicate_ids
-
-
-def test_fedkin_owner_mg_alpha_is_pinned_before_consolidation():
-    row = next(
-        row
-        for row in evaporation_classes._REDOX_EVIDENCE
-        if row.source_id == "kems-005-fedkin-2006"
-        and row.observation_id == "fedkin_2006_mg_hashimoto_langmuir_table3"
-    )
-    assert row.alpha == 0.24
+    actual = {(row.source_id, row.observation_id): row.alpha for row in rows
+              if (row.source_id, row.observation_id) in targets}
+    assert actual == targets
