@@ -5396,6 +5396,27 @@ def test_ts1985_and_yam1983_tridymite_reference_state_baseline() -> None:
     )
 
 
+def test_allibert_alumina_polymorph_binds_in_isolated_migration(
+    tmp_path: Path,
+) -> None:
+    result = _migrate_real_extract(tmp_path, "kems-051-allibert-1981.yaml")
+    rows = [
+        observation
+        for observation in result.observations.values()
+        if observation.observation_id.startswith(
+            "kems-051-allibert-1981::allibert_1981_table2_alumina_activity_kems"
+        )
+    ]
+
+    assert len(rows) == 8
+    for observation in rows:
+        reference_state = observation.identity.reference_state
+        assert reference_state is not None and reference_state.is_value
+        polymorph = reference_state.value.endmember.polymorph
+        assert polymorph is not None and polymorph.is_value
+        assert polymorph.value is Polymorph.CORUNDUM
+
+
 def test_reference_prose_rejects_ambiguous_or_negated_raoult_conventions() -> None:
     furukawa = next(
         row

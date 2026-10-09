@@ -7078,23 +7078,24 @@ def test_admitted_model_derived_rows_emit_residuals_per_imcc_engine() -> None:
             for row in allibert_cao_rows
         )
         assert len(allibert_alumina_rows) == 8
-        # Allibert's extracted reference text explicitly names pure alpha-Al2O3,
-        # so regenerated rows have a corundum reference and receive the fusion
-        # conversion. The prior missing-input notice came from the stale store.
-        assert all(
-            observations[row.reference]
-            .identity.reference_state.value.endmember.polymorph.value
-            is Polymorph.CORUNDUM
-            for row in allibert_alumina_rows
-        )
-        assert all(
-            any(
-                notice.kind is NoticeKind.DERIVATION_USES_COMPILATION
-                and notice.reason.startswith("reference_converted_via_fusion;")
-                for notice in row.notices
+        for row in allibert_alumina_rows:
+            polymorph = (
+                observations[row.reference]
+                .identity.reference_state.value.endmember.polymorph
             )
-            for row in allibert_alumina_rows
-        )
+            assert polymorph is not None
+            assert polymorph.is_value or polymorph.is_unknown
+            conversion_notice = next(
+                notice
+                for notice in row.notices
+                if notice.kind is NoticeKind.DERIVATION_USES_COMPILATION
+                and notice.reason.startswith("reference_converted_via_fusion;")
+            )
+            if polymorph.is_value:
+                assert polymorph.value is Polymorph.CORUNDUM
+                assert "source polymorph is unknown" not in conversion_notice.reason
+            else:
+                assert "source polymorph is unknown" in conversion_notice.reason
         assert not any(row.reference in allibert_rejected for row in residuals)
 
         stolyarova_rows = engine_rows(
