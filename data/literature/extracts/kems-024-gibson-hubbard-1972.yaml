@@ -17,6 +17,12 @@ fidelity_samples:
   field: abundance_ppm
   value: '1824'
   locator: {source_path: *scan, published_page: 2005, table: '2', paragraph: "Na row; 12022 Initial column"}
+- path: species.Na.observations[gibson_hubbard_1972_na_14163_1050c_residue_series].values.series[3].residue_ppm
+  value: '1730'
+  locator: {source_path: *scan, published_page: 2005, table: '2', paragraph: "Na row; 14163 1050°C 72 hr column"}
+- path: species.K.observations[gibson_hubbard_1972_k_14163_1050c_residue_series].values.series[1].residue_ppm
+  value: '3027'
+  locator: {source_path: *scan, published_page: 2005, table: '2', paragraph: "K row; 14163 1050°C 1 hr column"}
 # Shared locators and conditions apply only where explicitly referenced below.
 source_locators:
   abstract: &abstract {source_path: *scan, published_page: 2003, section: Abstract}
@@ -221,22 +227,254 @@ experiments:
   bench_id: mettler-vta
   method: vacuum_chamber_pyrolysis
   locator: *procedures
-- experiment_id: '14163_1050°C instantaneous'
+- experiment_id: gibson-hubbard-1972-run-14163-1050c-instantaneous
   bench_id: mettler-vta
   method: vacuum_chamber_pyrolysis
-  locator: *procedures
-- experiment_id: '14163_1050°C 1 hr'
+  locator: {source_path: *scan, published_page: 2005, table: '2', paragraph: "14163 Soil | 1050°C instantaneous column", note: "One physical aliquot of the 14163 constant temperature-variable time series (p. 2006); the authors call the heated portions aliquots (p. 2009)"}
+  sample:
+    mass_kg:
+      state: {tag: unknown, reason: not_published}
+      locator: {<<: *procedures, note: "Sample weight was continuously recorded but no numerical aliquot mass is printed. Any mass an engine uses is a declared assumption"}
+    printed_composition:
+      state: {tag: unknown, reason: in_cited_source}
+      locator: {<<: *table2, paragraph: "14163 soil / Initial† column", note: "Table 2 prints only K, Rb, Na and Ba for a separate initial aliquot attributed to Hubbard et al. (1972); no major-element oxide composition is printed in this paper"}
+    form:
+      state: {tag: value, value: powdered lunar soil 14163}
+      locator: *procedures
+    container:
+      state: {tag: value, value: platinum crucible}
+      locator: *procedures
+    pretreatment:
+      state: {tag: value, value: homogenized by grinding to 74 μ}
+      locator: {source_path: *scan, published_page: 2006, section: Results, note: "Printed '74 μ'; no sieve fraction or size distribution stated"}
+  apparatus:
+    cell_material_and_liner:
+      state: {tag: value, value: platinum crucible}
+      locator: *procedures
+    geometry:
+      exposed_area_m2:
+        state: {tag: unknown, reason: not_published}
+        locator: {<<: *procedures, note: "Crucible dimensions, bed depth, exposed area and whether the crucible was open or covered are not printed (apparatus cited to Gibson and Johnson, 1972). DECLARED-ASSUMPTION FLAG: any geometry an engine uses for this run is a modelling assumption, not source evidence"}
+  conditions:
+    temperature_K:
+      state: {tag: value, value: '1323.15'}
+      locator: {source_path: *scan, published_page: 2005, table: '2', note: "Printed 1050°C; unit conversion only"}
+  pressure_environment:
+    total_pressure_Pa:
+      state: {tag: value, value: {kind: point, point: '0.0002666447368421052631578947368'}}
+      locator: {<<: *procedures, note: "Printed evacuated to 2 x 10^-6 Torr; also 'P = 10^-6 Torr' in the 14163 discussion (p. 2009); unit conversion only"}
+    sweep_gas: {state: {tag: not_applicable, reason: not_applicable}, locator: *procedures}
+    regime: {regime_class: {tag: unknown, reason: not_published}}
+    pumping:
+      base_pressure_Pa: {state: {tag: unknown, reason: not_published}, locator: {<<: *procedures, note: No distinct base-pressure history printed}}
+  fO2_control:
+    channel: {tag: unknown, reason: not_published}
+    buffer:
+      state: {tag: unknown, reason: not_published}
+      locator: {source_path: *scan, published_page: 2004, section: Introduction and Experimental procedures, note: "Only an upper bound P(O2) < 10^-10 atm calculated from mass spectra is printed (also p. 2009); no buffer or gas mix is described; bound not a point"}
+  thermal_schedule:
+    method:
+      state: {tag: value, value: 'Heated at 4 or 6°C/min to 1050°C (per-run rate not assigned), held for the printed time, then cooled along the furnace normal cooling curve'}
+      locator: *procedures
+    setpoints_and_holds:
+    - temperature_K:
+        state: {tag: value, value: {kind: point, point: '1323.15'}}
+        locator: {source_path: *scan, published_page: 2005, table: '2', note: "Printed 1050°C; unit conversion only"}
+      hold_duration_s:
+        state: {tag: unknown, reason: not_numeric}
+        locator: {source_path: *scan, published_page: 2005, table: '2', note: "Printed 'instantaneous'; no zero hold or instantaneous quench inferred"}
+    total_duration_s:
+      state: {tag: unknown, reason: not_published}
+      locator: {<<: *procedures, note: "Printed hold label 'instantaneous' only; heating ramp and cooling time to and from 1050°C not printed for this run"}
+    cooling_or_quench:
+      state: {tag: value, value: allowed to cool along the furnace normal cooling curve}
+      locator: *procedures
+- experiment_id: gibson-hubbard-1972-run-14163-1050c-1hr
   bench_id: mettler-vta
   method: vacuum_chamber_pyrolysis
-  locator: *procedures
-- experiment_id: '14163_1050°C 6 hr'
+  locator: {source_path: *scan, published_page: 2005, table: '2', paragraph: "14163 Soil | 1050°C 1 hr column", note: "One physical aliquot of the 14163 constant temperature-variable time series (p. 2006); the authors call the heated portions aliquots (p. 2009)"}
+  sample:
+    mass_kg:
+      state: {tag: unknown, reason: not_published}
+      locator: {<<: *procedures, note: "Sample weight was continuously recorded but no numerical aliquot mass is printed. Any mass an engine uses is a declared assumption"}
+    printed_composition:
+      state: {tag: unknown, reason: in_cited_source}
+      locator: {<<: *table2, paragraph: "14163 soil / Initial† column", note: "Table 2 prints only K, Rb, Na and Ba for a separate initial aliquot attributed to Hubbard et al. (1972); no major-element oxide composition is printed in this paper"}
+    form:
+      state: {tag: value, value: powdered lunar soil 14163}
+      locator: *procedures
+    container:
+      state: {tag: value, value: platinum crucible}
+      locator: *procedures
+    pretreatment:
+      state: {tag: value, value: homogenized by grinding to 74 μ}
+      locator: {source_path: *scan, published_page: 2006, section: Results, note: "Printed '74 μ'; no sieve fraction or size distribution stated"}
+  apparatus:
+    cell_material_and_liner:
+      state: {tag: value, value: platinum crucible}
+      locator: *procedures
+    geometry:
+      exposed_area_m2:
+        state: {tag: unknown, reason: not_published}
+        locator: {<<: *procedures, note: "Crucible dimensions, bed depth, exposed area and whether the crucible was open or covered are not printed (apparatus cited to Gibson and Johnson, 1972). DECLARED-ASSUMPTION FLAG: any geometry an engine uses for this run is a modelling assumption, not source evidence"}
+  conditions:
+    temperature_K:
+      state: {tag: value, value: '1323.15'}
+      locator: {source_path: *scan, published_page: 2005, table: '2', note: "Printed 1050°C; unit conversion only"}
+  pressure_environment:
+    total_pressure_Pa:
+      state: {tag: value, value: {kind: point, point: '0.0002666447368421052631578947368'}}
+      locator: {<<: *procedures, note: "Printed evacuated to 2 x 10^-6 Torr; also 'P = 10^-6 Torr' in the 14163 discussion (p. 2009); unit conversion only"}
+    sweep_gas: {state: {tag: not_applicable, reason: not_applicable}, locator: *procedures}
+    regime: {regime_class: {tag: unknown, reason: not_published}}
+    pumping:
+      base_pressure_Pa: {state: {tag: unknown, reason: not_published}, locator: {<<: *procedures, note: No distinct base-pressure history printed}}
+  fO2_control:
+    channel: {tag: unknown, reason: not_published}
+    buffer:
+      state: {tag: unknown, reason: not_published}
+      locator: {source_path: *scan, published_page: 2004, section: Introduction and Experimental procedures, note: "Only an upper bound P(O2) < 10^-10 atm calculated from mass spectra is printed (also p. 2009); no buffer or gas mix is described; bound not a point"}
+  thermal_schedule:
+    method:
+      state: {tag: value, value: 'Heated at 4 or 6°C/min to 1050°C (per-run rate not assigned), held for the printed time, then cooled along the furnace normal cooling curve'}
+      locator: *procedures
+    setpoints_and_holds:
+    - temperature_K:
+        state: {tag: value, value: {kind: point, point: '1323.15'}}
+        locator: {source_path: *scan, published_page: 2005, table: '2', note: "Printed 1050°C; unit conversion only"}
+      hold_duration_s:
+        state: {tag: value, value: {kind: point, point: '3600'}}
+        locator: {source_path: *scan, published_page: 2005, table: '2', note: "Printed 1 hr hold at 1050°C; unit conversion only"}
+    total_duration_s:
+      state: {tag: unknown, reason: not_published}
+      locator: {<<: *procedures, note: "Printed 1 hr is the hold at 1050°C; total exposure including the heating ramp and cooling curve is not printed (pp. 2004, 2007-2008)"}
+    cooling_or_quench:
+      state: {tag: value, value: allowed to cool along the furnace normal cooling curve}
+      locator: *procedures
+- experiment_id: gibson-hubbard-1972-run-14163-1050c-6hr
   bench_id: mettler-vta
   method: vacuum_chamber_pyrolysis
-  locator: *procedures
-- experiment_id: '14163_1050°C 72 hr'
+  locator: {source_path: *scan, published_page: 2005, table: '2', paragraph: "14163 Soil | 1050°C 6 hr column", note: "One physical aliquot of the 14163 constant temperature-variable time series (p. 2006); the authors call the heated portions aliquots (p. 2009)"}
+  sample:
+    mass_kg:
+      state: {tag: unknown, reason: not_published}
+      locator: {<<: *procedures, note: "Sample weight was continuously recorded but no numerical aliquot mass is printed. Any mass an engine uses is a declared assumption"}
+    printed_composition:
+      state: {tag: unknown, reason: in_cited_source}
+      locator: {<<: *table2, paragraph: "14163 soil / Initial† column", note: "Table 2 prints only K, Rb, Na and Ba for a separate initial aliquot attributed to Hubbard et al. (1972); no major-element oxide composition is printed in this paper"}
+    form:
+      state: {tag: value, value: powdered lunar soil 14163}
+      locator: *procedures
+    container:
+      state: {tag: value, value: platinum crucible}
+      locator: *procedures
+    pretreatment:
+      state: {tag: value, value: homogenized by grinding to 74 μ}
+      locator: {source_path: *scan, published_page: 2006, section: Results, note: "Printed '74 μ'; no sieve fraction or size distribution stated"}
+  apparatus:
+    cell_material_and_liner:
+      state: {tag: value, value: platinum crucible}
+      locator: *procedures
+    geometry:
+      exposed_area_m2:
+        state: {tag: unknown, reason: not_published}
+        locator: {<<: *procedures, note: "Crucible dimensions, bed depth, exposed area and whether the crucible was open or covered are not printed (apparatus cited to Gibson and Johnson, 1972). DECLARED-ASSUMPTION FLAG: any geometry an engine uses for this run is a modelling assumption, not source evidence"}
+  conditions:
+    temperature_K:
+      state: {tag: value, value: '1323.15'}
+      locator: {source_path: *scan, published_page: 2005, table: '2', note: "Printed 1050°C; unit conversion only"}
+  pressure_environment:
+    total_pressure_Pa:
+      state: {tag: value, value: {kind: point, point: '0.0002666447368421052631578947368'}}
+      locator: {<<: *procedures, note: "Printed evacuated to 2 x 10^-6 Torr; also 'P = 10^-6 Torr' in the 14163 discussion (p. 2009); unit conversion only"}
+    sweep_gas: {state: {tag: not_applicable, reason: not_applicable}, locator: *procedures}
+    regime: {regime_class: {tag: unknown, reason: not_published}}
+    pumping:
+      base_pressure_Pa: {state: {tag: unknown, reason: not_published}, locator: {<<: *procedures, note: No distinct base-pressure history printed}}
+  fO2_control:
+    channel: {tag: unknown, reason: not_published}
+    buffer:
+      state: {tag: unknown, reason: not_published}
+      locator: {source_path: *scan, published_page: 2004, section: Introduction and Experimental procedures, note: "Only an upper bound P(O2) < 10^-10 atm calculated from mass spectra is printed (also p. 2009); no buffer or gas mix is described; bound not a point"}
+  thermal_schedule:
+    method:
+      state: {tag: value, value: 'Heated at 4 or 6°C/min to 1050°C (per-run rate not assigned), held for the printed time, then cooled along the furnace normal cooling curve'}
+      locator: *procedures
+    setpoints_and_holds:
+    - temperature_K:
+        state: {tag: value, value: {kind: point, point: '1323.15'}}
+        locator: {source_path: *scan, published_page: 2005, table: '2', note: "Printed 1050°C; unit conversion only"}
+      hold_duration_s:
+        state: {tag: value, value: {kind: point, point: '21600'}}
+        locator: {source_path: *scan, published_page: 2005, table: '2', note: "Printed 6 hr hold at 1050°C; unit conversion only"}
+    total_duration_s:
+      state: {tag: unknown, reason: not_published}
+      locator: {<<: *procedures, note: "Printed 6 hr is the hold at 1050°C; total exposure including the heating ramp and cooling curve is not printed (pp. 2004, 2007-2008)"}
+    cooling_or_quench:
+      state: {tag: value, value: allowed to cool along the furnace normal cooling curve}
+      locator: *procedures
+- experiment_id: gibson-hubbard-1972-run-14163-1050c-72hr
   bench_id: mettler-vta
   method: vacuum_chamber_pyrolysis
-  locator: *procedures
+  locator: {source_path: *scan, published_page: 2005, table: '2', paragraph: "14163 Soil | 1050°C 72 hr column", note: "One physical aliquot of the 14163 constant temperature-variable time series (p. 2006); the authors call the heated portions aliquots (p. 2009)"}
+  sample:
+    mass_kg:
+      state: {tag: unknown, reason: not_published}
+      locator: {<<: *procedures, note: "Sample weight was continuously recorded but no numerical aliquot mass is printed. Any mass an engine uses is a declared assumption"}
+    printed_composition:
+      state: {tag: unknown, reason: in_cited_source}
+      locator: {<<: *table2, paragraph: "14163 soil / Initial† column", note: "Table 2 prints only K, Rb, Na and Ba for a separate initial aliquot attributed to Hubbard et al. (1972); no major-element oxide composition is printed in this paper"}
+    form:
+      state: {tag: value, value: powdered lunar soil 14163}
+      locator: *procedures
+    container:
+      state: {tag: value, value: platinum crucible}
+      locator: *procedures
+    pretreatment:
+      state: {tag: value, value: homogenized by grinding to 74 μ}
+      locator: {source_path: *scan, published_page: 2006, section: Results, note: "Printed '74 μ'; no sieve fraction or size distribution stated"}
+  apparatus:
+    cell_material_and_liner:
+      state: {tag: value, value: platinum crucible}
+      locator: *procedures
+    geometry:
+      exposed_area_m2:
+        state: {tag: unknown, reason: not_published}
+        locator: {<<: *procedures, note: "Crucible dimensions, bed depth, exposed area and whether the crucible was open or covered are not printed (apparatus cited to Gibson and Johnson, 1972). DECLARED-ASSUMPTION FLAG: any geometry an engine uses for this run is a modelling assumption, not source evidence"}
+  conditions:
+    temperature_K:
+      state: {tag: value, value: '1323.15'}
+      locator: {source_path: *scan, published_page: 2005, table: '2', note: "Printed 1050°C; unit conversion only"}
+  pressure_environment:
+    total_pressure_Pa:
+      state: {tag: value, value: {kind: point, point: '0.0002666447368421052631578947368'}}
+      locator: {<<: *procedures, note: "Printed evacuated to 2 x 10^-6 Torr; also 'P = 10^-6 Torr' in the 14163 discussion (p. 2009); unit conversion only"}
+    sweep_gas: {state: {tag: not_applicable, reason: not_applicable}, locator: *procedures}
+    regime: {regime_class: {tag: unknown, reason: not_published}}
+    pumping:
+      base_pressure_Pa: {state: {tag: unknown, reason: not_published}, locator: {<<: *procedures, note: No distinct base-pressure history printed}}
+  fO2_control:
+    channel: {tag: unknown, reason: not_published}
+    buffer:
+      state: {tag: unknown, reason: not_published}
+      locator: {source_path: *scan, published_page: 2004, section: Introduction and Experimental procedures, note: "Only an upper bound P(O2) < 10^-10 atm calculated from mass spectra is printed (also p. 2009); no buffer or gas mix is described; bound not a point"}
+  thermal_schedule:
+    method:
+      state: {tag: value, value: 'Heated at 4 or 6°C/min to 1050°C (per-run rate not assigned), held for the printed time, then cooled along the furnace normal cooling curve'}
+      locator: *procedures
+    setpoints_and_holds:
+    - temperature_K:
+        state: {tag: value, value: {kind: point, point: '1323.15'}}
+        locator: {source_path: *scan, published_page: 2005, table: '2', note: "Printed 1050°C; unit conversion only"}
+      hold_duration_s:
+        state: {tag: value, value: {kind: point, point: '259200'}}
+        locator: {source_path: *scan, published_page: 2005, table: '2', note: "Printed 72 hr hold at 1050°C; unit conversion only"}
+    total_duration_s:
+      state: {tag: unknown, reason: not_published}
+      locator: {<<: *procedures, note: "Printed 72 hr is the hold at 1050°C; total exposure including the heating ramp and cooling curve is not printed (pp. 2004, 2007-2008)"}
+    cooling_or_quench:
+      state: {tag: value, value: allowed to cool along the furnace normal cooling curve}
+      locator: *procedures
 species:
   K:
     observations:
@@ -435,89 +673,55 @@ species:
         abundance_ppm: "4840"
         condition_as_printed: "Initial†"
         attribution: "Hubbard et al. (1972), separate aliquot, Table 2 dagger footnote"
-    - observation_id: gibson_hubbard_1972_k_14163_10
-      experiment: '14163_1050°C instantaneous'
+    - observation_id: gibson_hubbard_1972_k_14163_1050c_residue_series
+      experiment: lunar-volatilization-series
       type: rate_series
       class_tag: measured
-      locator: {<<: *table2, paragraph: "K row; 14163 1050°C instantaneous column"}
-      quote: "K | 14163 | 1050°C instantaneous | 4220"
+      locator: {<<: *table2, paragraph: "K row; 14163 Soil columns 1050°C instantaneous, 1 hr, 6 hr, 72 hr", note: "One residue time series at 1050°C; each column is a separate heated aliquot (p. 2009 'aliquots'; p. 2006 constant temperature-variable time runs)"}
+      quote: "K | 14163 | 1050°C instantaneous | 4220; 1050°C 1 hr | 3027; 1050°C 6 hr | 1437; 1050°C 72 hr | 88"
       units: ppm
       regime: vacuum_chamber_pyrolysis
       equipment: *heated
       values:
-        quantity: elemental_abundance
+        quantity: residue_composition_vs_time
         method_class: measured_direct
         admission_status: pending_validation
-        composition_id: "14163_1050°C instantaneous"
+        semantics: residue_time_series_of_separate_aliquots
         sample_number: '14163'
         sample_form: soil
         component: "K"
-        abundance_ppm: "4220"
-        condition_as_printed: "1050°C instantaneous"
-        T_C: 1050
-    - observation_id: gibson_hubbard_1972_k_14163_11
-      experiment: '14163_1050°C 1 hr'
-      type: rate_series
-      class_tag: measured
-      locator: {<<: *table2, paragraph: "K row; 14163 1050°C 1 hr column"}
-      quote: "K | 14163 | 1050°C 1 hr | 3027"
-      units: ppm
-      regime: vacuum_chamber_pyrolysis
-      equipment: *heated
-      values:
-        quantity: elemental_abundance
-        method_class: measured_direct
-        admission_status: pending_validation
-        composition_id: "14163_1050°C 1 hr"
-        sample_number: '14163'
-        sample_form: soil
-        component: "K"
-        abundance_ppm: "3027"
-        condition_as_printed: "1050°C 1 hr"
-        T_C: 1050
-        hold_time_hr: 1
-    - observation_id: gibson_hubbard_1972_k_14163_12
-      experiment: '14163_1050°C 6 hr'
-      type: rate_series
-      class_tag: measured
-      locator: {<<: *table2, paragraph: "K row; 14163 1050°C 6 hr column"}
-      quote: "K | 14163 | 1050°C 6 hr | 1437"
-      units: ppm
-      regime: vacuum_chamber_pyrolysis
-      equipment: *heated
-      values:
-        quantity: elemental_abundance
-        method_class: measured_direct
-        admission_status: pending_validation
-        composition_id: "14163_1050°C 6 hr"
-        sample_number: '14163'
-        sample_form: soil
-        component: "K"
-        abundance_ppm: "1437"
-        condition_as_printed: "1050°C 6 hr"
-        T_C: 1050
-        hold_time_hr: 6
-    - observation_id: gibson_hubbard_1972_k_14163_13
-      experiment: '14163_1050°C 72 hr'
-      type: rate_series
-      class_tag: measured
-      locator: {<<: *table2, paragraph: "K row; 14163 1050°C 72 hr column"}
-      quote: "K | 14163 | 1050°C 72 hr | 88"
-      units: ppm
-      regime: vacuum_chamber_pyrolysis
-      equipment: *heated
-      values:
-        quantity: elemental_abundance
-        method_class: measured_direct
-        admission_status: pending_validation
-        composition_id: "14163_1050°C 72 hr"
-        sample_number: '14163'
-        sample_form: soil
-        component: "K"
-        abundance_ppm: "88"
-        condition_as_printed: "1050°C 72 hr"
-        T_C: 1050
-        hold_time_hr: 72
+        initial_reference_observation_id: gibson_hubbard_1972_k_14163_9
+        initial_reference_note: Table 2 Initial† is a separate aliquot attributed to Hubbard et al. (1972) (dagger footnote, p. 2005); it is a composition reference, not a zero-time run of this work, so it is not a series point.
+        t_min_basis: Printed hold time at 1050°C converted hr x 60 = min (unit conversion only). It excludes the 4 or 6°C/min heating ramp and the furnace cooling curve (p. 2004); the authors warn that losses integrate over heating and cooling (pp. 2007-2008).
+        geometry_status: Sample mass per aliquot, crucible dimensions, bed depth, exposed area and open/covered crucible are not printed (p. 2004 cites Gibson and Johnson, 1972, for the apparatus). Any geometry or mass an engine uses for these runs is a DECLARED ASSUMPTION, not source evidence.
+        series:
+        - run_id: 14163-1050c-instantaneous
+          condition_as_printed: "1050°C instantaneous"
+          T_C: 1050
+          hold_time_as_printed: instantaneous
+          residue_ppm: "4220"
+          locator: {source_path: *scan, published_page: 2005, table: '2', paragraph: "K row; 14163 1050°C instantaneous column"}
+        - run_id: 14163-1050c-1hr
+          condition_as_printed: "1050°C 1 hr"
+          T_C: 1050
+          hold_time_hr_as_printed: 1
+          t_min: 60
+          residue_ppm: "3027"
+          locator: {source_path: *scan, published_page: 2005, table: '2', paragraph: "K row; 14163 1050°C 1 hr column"}
+        - run_id: 14163-1050c-6hr
+          condition_as_printed: "1050°C 6 hr"
+          T_C: 1050
+          hold_time_hr_as_printed: 6
+          t_min: 360
+          residue_ppm: "1437"
+          locator: {source_path: *scan, published_page: 2005, table: '2', paragraph: "K row; 14163 1050°C 6 hr column"}
+        - run_id: 14163-1050c-72hr
+          condition_as_printed: "1050°C 72 hr"
+          T_C: 1050
+          hold_time_hr_as_printed: 72
+          t_min: 4320
+          residue_ppm: "88"
+          locator: {source_path: *scan, published_page: 2005, table: '2', paragraph: "K row; 14163 1050°C 72 hr column"}
     - observation_id: gibson_hubbard_1972_k_rb_10017_0
       type: rate_series
       class_tag: measured
@@ -724,7 +928,7 @@ species:
         attribution: "Hubbard et al. (1972), separate aliquot, Table 2 dagger footnote"
         evidence_note: Printed ratio of measured abundances; not recalculated here, not an ion intensity ratio.
     - observation_id: gibson_hubbard_1972_k_rb_14163_10
-      experiment: '14163_1050°C instantaneous'
+      experiment: gibson-hubbard-1972-run-14163-1050c-instantaneous
       type: rate_series
       class_tag: measured
       locator: {<<: *table2, paragraph: "K/Rb row; 14163 1050°C instantaneous column"}
@@ -745,7 +949,7 @@ species:
         T_C: 1050
         evidence_note: Printed ratio of measured abundances; not recalculated here, not an ion intensity ratio.
     - observation_id: gibson_hubbard_1972_k_rb_14163_11
-      experiment: '14163_1050°C 1 hr'
+      experiment: gibson-hubbard-1972-run-14163-1050c-1hr
       type: rate_series
       class_tag: measured
       locator: {<<: *table2, paragraph: "K/Rb row; 14163 1050°C 1 hr column"}
@@ -767,7 +971,7 @@ species:
         hold_time_hr: 1
         evidence_note: Printed ratio of measured abundances; not recalculated here, not an ion intensity ratio.
     - observation_id: gibson_hubbard_1972_k_rb_14163_12
-      experiment: '14163_1050°C 6 hr'
+      experiment: gibson-hubbard-1972-run-14163-1050c-6hr
       type: rate_series
       class_tag: measured
       locator: {<<: *table2, paragraph: "K/Rb row; 14163 1050°C 6 hr column"}
@@ -789,7 +993,7 @@ species:
         hold_time_hr: 6
         evidence_note: Printed ratio of measured abundances; not recalculated here, not an ion intensity ratio.
     - observation_id: gibson_hubbard_1972_k_rb_14163_13
-      experiment: '14163_1050°C 72 hr'
+      experiment: gibson-hubbard-1972-run-14163-1050c-72hr
       type: rate_series
       class_tag: measured
       locator: {<<: *table2, paragraph: "K/Rb row; 14163 1050°C 72 hr column"}
@@ -936,7 +1140,7 @@ species:
         attribution: "Hubbard et al. (1972), separate aliquot, Table 2 dagger footnote"
         evidence_note: Printed ratio of measured abundances; not recalculated here, not an ion intensity ratio.
     - observation_id: gibson_hubbard_1972_k_ba_14163_10
-      experiment: '14163_1050°C instantaneous'
+      experiment: gibson-hubbard-1972-run-14163-1050c-instantaneous
       type: rate_series
       class_tag: measured
       locator: {<<: *table2, paragraph: "K/Ba row; 14163 1050°C instantaneous column"}
@@ -958,7 +1162,7 @@ species:
         semantics: approximate_as_printed_not_exact_point
         evidence_note: Printed ratio of measured abundances; not recalculated here, not an ion intensity ratio.
     - observation_id: gibson_hubbard_1972_k_ba_14163_11
-      experiment: '14163_1050°C 1 hr'
+      experiment: gibson-hubbard-1972-run-14163-1050c-1hr
       type: rate_series
       class_tag: measured
       locator: {<<: *table2, paragraph: "K/Ba row; 14163 1050°C 1 hr column"}
@@ -980,7 +1184,7 @@ species:
         hold_time_hr: 1
         evidence_note: Printed ratio of measured abundances; not recalculated here, not an ion intensity ratio.
     - observation_id: gibson_hubbard_1972_k_ba_14163_12
-      experiment: '14163_1050°C 6 hr'
+      experiment: gibson-hubbard-1972-run-14163-1050c-6hr
       type: rate_series
       class_tag: measured
       locator: {<<: *table2, paragraph: "K/Ba row; 14163 1050°C 6 hr column"}
@@ -1002,7 +1206,7 @@ species:
         hold_time_hr: 6
         evidence_note: Printed ratio of measured abundances; not recalculated here, not an ion intensity ratio.
     - observation_id: gibson_hubbard_1972_k_ba_14163_13
-      experiment: '14163_1050°C 72 hr'
+      experiment: gibson-hubbard-1972-run-14163-1050c-72hr
       type: rate_series
       class_tag: measured
       locator: {<<: *table2, paragraph: "K/Ba row; 14163 1050°C 72 hr column"}
@@ -1237,7 +1441,7 @@ species:
         condition_as_printed: "Initial†"
         attribution: "Hubbard et al. (1972), separate aliquot, Table 2 dagger footnote"
     - observation_id: gibson_hubbard_1972_rb_14163_10
-      experiment: '14163_1050°C instantaneous'
+      experiment: gibson-hubbard-1972-run-14163-1050c-instantaneous
       type: rate_series
       class_tag: measured
       locator: {<<: *table2, paragraph: "Rb row; 14163 1050°C instantaneous column"}
@@ -1257,7 +1461,7 @@ species:
         condition_as_printed: "1050°C instantaneous"
         T_C: 1050
     - observation_id: gibson_hubbard_1972_rb_14163_11
-      experiment: '14163_1050°C 1 hr'
+      experiment: gibson-hubbard-1972-run-14163-1050c-1hr
       type: rate_series
       class_tag: measured
       locator: {<<: *table2, paragraph: "Rb row; 14163 1050°C 1 hr column"}
@@ -1278,7 +1482,7 @@ species:
         T_C: 1050
         hold_time_hr: 1
     - observation_id: gibson_hubbard_1972_rb_14163_12
-      experiment: '14163_1050°C 6 hr'
+      experiment: gibson-hubbard-1972-run-14163-1050c-6hr
       type: rate_series
       class_tag: measured
       locator: {<<: *table2, paragraph: "Rb row; 14163 1050°C 6 hr column"}
@@ -1299,7 +1503,7 @@ species:
         T_C: 1050
         hold_time_hr: 6
     - observation_id: gibson_hubbard_1972_rb_14163_13
-      experiment: '14163_1050°C 72 hr'
+      experiment: gibson-hubbard-1972-run-14163-1050c-72hr
       type: rate_series
       class_tag: measured
       locator: {<<: *table2, paragraph: "Rb row; 14163 1050°C 72 hr column"}
@@ -1513,89 +1717,55 @@ species:
         abundance_ppm: "5100"
         condition_as_printed: "Initial†"
         attribution: "Hubbard et al. (1972), separate aliquot, Table 2 dagger footnote"
-    - observation_id: gibson_hubbard_1972_na_14163_10
-      experiment: '14163_1050°C instantaneous'
+    - observation_id: gibson_hubbard_1972_na_14163_1050c_residue_series
+      experiment: lunar-volatilization-series
       type: rate_series
       class_tag: measured
-      locator: {<<: *table2, paragraph: "Na row; 14163 1050°C instantaneous column"}
-      quote: "Na | 14163 | 1050°C instantaneous | 4660"
+      locator: {<<: *table2, paragraph: "Na row; 14163 Soil columns 1050°C instantaneous, 1 hr, 6 hr, 72 hr", note: "One residue time series at 1050°C; each column is a separate heated aliquot (p. 2009 'aliquots'; p. 2006 constant temperature-variable time runs)"}
+      quote: "Na | 14163 | 1050°C instantaneous | 4660; 1050°C 1 hr | 4110; 1050°C 6 hr | 3140; 1050°C 72 hr | 1730"
       units: ppm
       regime: vacuum_chamber_pyrolysis
       equipment: *heated
       values:
-        quantity: elemental_abundance
+        quantity: residue_composition_vs_time
         method_class: measured_direct
         admission_status: pending_validation
-        composition_id: "14163_1050°C instantaneous"
+        semantics: residue_time_series_of_separate_aliquots
         sample_number: '14163'
         sample_form: soil
         component: "Na"
-        abundance_ppm: "4660"
-        condition_as_printed: "1050°C instantaneous"
-        T_C: 1050
-    - observation_id: gibson_hubbard_1972_na_14163_11
-      experiment: '14163_1050°C 1 hr'
-      type: rate_series
-      class_tag: measured
-      locator: {<<: *table2, paragraph: "Na row; 14163 1050°C 1 hr column"}
-      quote: "Na | 14163 | 1050°C 1 hr | 4110"
-      units: ppm
-      regime: vacuum_chamber_pyrolysis
-      equipment: *heated
-      values:
-        quantity: elemental_abundance
-        method_class: measured_direct
-        admission_status: pending_validation
-        composition_id: "14163_1050°C 1 hr"
-        sample_number: '14163'
-        sample_form: soil
-        component: "Na"
-        abundance_ppm: "4110"
-        condition_as_printed: "1050°C 1 hr"
-        T_C: 1050
-        hold_time_hr: 1
-    - observation_id: gibson_hubbard_1972_na_14163_12
-      experiment: '14163_1050°C 6 hr'
-      type: rate_series
-      class_tag: measured
-      locator: {<<: *table2, paragraph: "Na row; 14163 1050°C 6 hr column"}
-      quote: "Na | 14163 | 1050°C 6 hr | 3140"
-      units: ppm
-      regime: vacuum_chamber_pyrolysis
-      equipment: *heated
-      values:
-        quantity: elemental_abundance
-        method_class: measured_direct
-        admission_status: pending_validation
-        composition_id: "14163_1050°C 6 hr"
-        sample_number: '14163'
-        sample_form: soil
-        component: "Na"
-        abundance_ppm: "3140"
-        condition_as_printed: "1050°C 6 hr"
-        T_C: 1050
-        hold_time_hr: 6
-    - observation_id: gibson_hubbard_1972_na_14163_13
-      experiment: '14163_1050°C 72 hr'
-      type: rate_series
-      class_tag: measured
-      locator: {<<: *table2, paragraph: "Na row; 14163 1050°C 72 hr column"}
-      quote: "Na | 14163 | 1050°C 72 hr | 1730"
-      units: ppm
-      regime: vacuum_chamber_pyrolysis
-      equipment: *heated
-      values:
-        quantity: elemental_abundance
-        method_class: measured_direct
-        admission_status: pending_validation
-        composition_id: "14163_1050°C 72 hr"
-        sample_number: '14163'
-        sample_form: soil
-        component: "Na"
-        abundance_ppm: "1730"
-        condition_as_printed: "1050°C 72 hr"
-        T_C: 1050
-        hold_time_hr: 72
+        initial_reference_observation_id: gibson_hubbard_1972_na_14163_9
+        initial_reference_note: Table 2 Initial† is a separate aliquot attributed to Hubbard et al. (1972) (dagger footnote, p. 2005); it is a composition reference, not a zero-time run of this work, so it is not a series point.
+        t_min_basis: Printed hold time at 1050°C converted hr x 60 = min (unit conversion only). It excludes the 4 or 6°C/min heating ramp and the furnace cooling curve (p. 2004); the authors warn that losses integrate over heating and cooling (pp. 2007-2008).
+        geometry_status: Sample mass per aliquot, crucible dimensions, bed depth, exposed area and open/covered crucible are not printed (p. 2004 cites Gibson and Johnson, 1972, for the apparatus). Any geometry or mass an engine uses for these runs is a DECLARED ASSUMPTION, not source evidence.
+        series:
+        - run_id: 14163-1050c-instantaneous
+          condition_as_printed: "1050°C instantaneous"
+          T_C: 1050
+          hold_time_as_printed: instantaneous
+          residue_ppm: "4660"
+          locator: {source_path: *scan, published_page: 2005, table: '2', paragraph: "Na row; 14163 1050°C instantaneous column"}
+        - run_id: 14163-1050c-1hr
+          condition_as_printed: "1050°C 1 hr"
+          T_C: 1050
+          hold_time_hr_as_printed: 1
+          t_min: 60
+          residue_ppm: "4110"
+          locator: {source_path: *scan, published_page: 2005, table: '2', paragraph: "Na row; 14163 1050°C 1 hr column"}
+        - run_id: 14163-1050c-6hr
+          condition_as_printed: "1050°C 6 hr"
+          T_C: 1050
+          hold_time_hr_as_printed: 6
+          t_min: 360
+          residue_ppm: "3140"
+          locator: {source_path: *scan, published_page: 2005, table: '2', paragraph: "Na row; 14163 1050°C 6 hr column"}
+        - run_id: 14163-1050c-72hr
+          condition_as_printed: "1050°C 72 hr"
+          T_C: 1050
+          hold_time_hr_as_printed: 72
+          t_min: 4320
+          residue_ppm: "1730"
+          locator: {source_path: *scan, published_page: 2005, table: '2', paragraph: "Na row; 14163 1050°C 72 hr column"}
     - observation_id: gibson_hubbard_1972_na_volatilization_statement
       experiment: lunar-volatilization-series
       type: rate_series
@@ -1671,7 +1841,7 @@ species:
         condition_as_printed: "Initial†"
         attribution: "Hubbard et al. (1972), separate aliquot, Table 2 dagger footnote"
     - observation_id: gibson_hubbard_1972_ba_14163_11
-      experiment: '14163_1050°C 1 hr'
+      experiment: gibson-hubbard-1972-run-14163-1050c-1hr
       type: rate_series
       class_tag: measured
       locator: {<<: *table2, paragraph: "Ba row; 14163 1050°C 1 hr column"}
@@ -1692,7 +1862,7 @@ species:
         T_C: 1050
         hold_time_hr: 1
     - observation_id: gibson_hubbard_1972_ba_14163_12
-      experiment: '14163_1050°C 6 hr'
+      experiment: gibson-hubbard-1972-run-14163-1050c-6hr
       type: rate_series
       class_tag: measured
       locator: {<<: *table2, paragraph: "Ba row; 14163 1050°C 6 hr column"}
@@ -1713,7 +1883,7 @@ species:
         T_C: 1050
         hold_time_hr: 6
     - observation_id: gibson_hubbard_1972_ba_14163_13
-      experiment: '14163_1050°C 72 hr'
+      experiment: gibson-hubbard-1972-run-14163-1050c-72hr
       type: rate_series
       class_tag: measured
       locator: {<<: *table2, paragraph: "Ba row; 14163 1050°C 72 hr column"}
@@ -2380,6 +2550,7 @@ verification:
   narrative_review: Apparatus and schedule on original page 2; thresholds on pages 1 and 4; integrated exposure on pages 5-6 checked visually.
   image_warning: MinerU table crop disagrees with original scan at Sm 20.9, Eu 2.14 and Ce 17.7. Original scan controls; no crop-based corrections applied.
   scope: 97 Table 2 observations (73 abundance cells, 24 ratios) plus 11 qualitative element statements. No numerical figure points.
+  t1122_residue_series: 2026-10-05 regolith-empirical re-read Table 2 (p. 2005) at 400 dpi for the 14163 Soil columns and pp. 2004, 2006, 2007, 2009 for conditions. The eight Na and K heated-aliquot cells (1050°C instantaneous, 1, 6, 72 hr) now live as two residue_composition_vs_time series rows (one point per aliquot, run_id -> per-aliquot experiment); the 73 Table 2 abundance cells are now 65 single-cell rows plus 8 series points. Rb, Ba and ratio cells unchanged.
   schema_limitation: Current migrator has no elemental-abundance or elemental-ratio quantity and no ppm-composition vocabulary. Preserve printed data here; fail-closed unknown quantities in v2 are not executable measurements. No schema or vocabulary change in this extract-only task.
   vocabulary_gaps:
     - initial_elemental_composition_ppm
