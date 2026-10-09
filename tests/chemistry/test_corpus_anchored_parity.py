@@ -56,6 +56,8 @@ import yaml
 
 from scripts import cache_convert
 from scripts import grid_pregrind
+from simulator.corpus_version import current_corpus_version
+from simulator.reduced_real_determinism import validated_rekey_corpus_version
 from scripts import rekey_cache_engine_identity as rekey
 from scripts import sso_r_validation_map
 from scripts import validate_cache_c4_interpolation as c4_validation
@@ -2209,7 +2211,7 @@ def test_f354_physics_derivation_failure_rolls_back_identity_rewrite(
     with pytest.raises(ValueError, match="physics derivation failure"):
         rekey.rekey_cache(
             db_path,
-            target_corpus_version=rekey.current_corpus_version(),
+            target_corpus_version=current_corpus_version(),
         )
 
     with sqlite3.connect(db_path) as conn:
@@ -2223,7 +2225,7 @@ def test_f354_physics_derivation_failure_rolls_back_identity_rewrite(
 
 def test_f360_rekey_rejects_undeclared_corpus_version() -> None:
     with pytest.raises(SystemExit, match="not declared interoperable"):
-        rekey._validated_target_corpus_version("analytical-corpus-typo")
+        validated_rekey_corpus_version("analytical-corpus-typo")
 
 
 def _tooling_payload(
