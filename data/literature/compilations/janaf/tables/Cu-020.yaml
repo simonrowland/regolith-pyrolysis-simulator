@@ -16,6 +16,7 @@ compilation_role:
   scoring_eligible: false
   battery_refusal: gibbs_table_not_runtime_observable
   circularity_warning: Do not validate an engine against a compilation it consumes.
+  pure_substance_reference: true
 extraction:
   method: machine parse of NIST tab-delimited table download; source bytes cached unchanged
   user_agent: RegolithPyrolysisSimulator-corpus-harvester/1.0 (public thermochemical reference-data research; polite cached
@@ -23,7 +24,6 @@ extraction:
   source_cache_path: /Users/simonrowland/Library/CloudStorage/Dropbox/Starship Mission Design/Regolith Processing/regolith-pyrolysis-simulator/docs-private/research/2026-08-09-upstream-mission/IMCC-impl/janaf-mirror/Cu/Cu-020.txt
   source_sha256: 973b32867fe099ee38615c87298ae0231e65097c5e7614cc7f2e9adb3a8d4e92
   review_status: machine_transcribed_unreviewed
-  date: '2026-09-06'
 table:
   table_id: Cu-020
   url: https://janaf.nist.gov/tables/Cu-020.html

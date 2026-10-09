@@ -239,6 +239,14 @@ def test_cu020_1600k_enthalpy_uses_the_page_read_sign() -> None:
     assert parsed_row["formation_enthalpy"]["as_published"] == "-123.836"
 
 
+def test_page_read_sign_provenance_has_no_machine_local_paths() -> None:
+    forbidden = ("/private/", "/Users/", "/tmp/")
+    for entry in janaf_reference.PAGE_READ_SIGNS:
+        for field, value in entry.items():
+            if isinstance(value, str):
+                assert not any(path in value for path in forbidden), field
+
+
 def test_page_read_sign_refuses_a_mismatched_text_layer_magnitude(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
