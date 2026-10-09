@@ -12,14 +12,14 @@ counts:
   by_stage:
     located: 150
     inbox: 168
-    in_progress: 17
-    ingested_partial: 44
+    in_progress: 11
+    ingested_partial: 46
     ingested_complete: 3
     wired: 0
-    unknown: 236
+    unknown: 240
 anti_loss:
   corpus_uncommitted:
-    count: 41260
+    count: 41261
     ids:
     - .agent-scratch/item24/corpus-1ce8/
     - .agent-scratch/item24/corpus-1ce8e2fc-item24.tar
@@ -40284,6 +40284,7 @@ anti_loss:
     - inbox/2026-10-05-openimcc-redox-plan-r2/PLAN.md
     - inbox/2026-10-05-openimcc-redox-plan.md
     - inbox/2026-10-08-openimcc-species-to-engine/NOTE.md
+    - inbox/2026-10-09-openimcc-rankinite-recommendation.md
     - inbox/2026Shornikov.pdf
     - inbox/2315.pdf
     - inbox/A2018-122Shornikov6134.pdf
@@ -41310,13 +41311,34 @@ anti_loss:
       - safarian-engh-2013-si-pure-langmuir
       - sossi-et-al-2019
     byte_mismatch:
-      count: 79
+      count: 127
       ids:
+      - 1997jonesthermo-jones-1997
+      - 2010zahnle-schaefer-fegley-cshperspect-ori-a004895-2019
+      - ammin-73-470-oneill-1988
+      - ammin-75-781-hemingway-1990
+      - ammin-76-904-lange-1991
+      - arxiv-1902-05005
       - bencze-yazhenskikh-2016
+      - bencze-yazhenskikh-2016-table-s1-k
+      - boulliung-2025-mercury-volatile-metals-magmatic
+      - boulliung-wood-2022-so2-solubility-silicate-melts
       - britt-2019-asteroid-simulants
+      - busemann-2000-phase-q-noble-gases
+      - busemann-2024-noble-gases-ryugu-bennu
+      - charnoz-2023-hydrogen-magma-ocean
+      - cooper-2007-sintering-lunar-simulant
+      - deguzman-2026-simulant-physicochemical
+      - engelschion-2020-eac1a-simulant
       - fegley-2023-chemical-equilibrium-calculations-bu
+      - filiberto-lpsc2011-2064-volatiles
+      - hashimoto-nakano-2021-bubbles-to-chondrites-ii
       - holzheid-1997-feo-nio-coo-activity-metal-saturated
+      - itoh-hino-banya-1997-mg-deoxidation
       - itoh-hino-banya-1998-spinel
+      - jgr-p-2024-mars-sam-clay-sulfate-ega
+      - jsc-a16-special-samples
+      - jsc-lunar-catalog-12023
       - kems-001-homma-1966
       - kems-002-ohno-1967
       - kems-006-zhang-2021
@@ -41342,6 +41364,8 @@ anti_loss:
       - kems-041-sossi-fegley-2018
       - kems-042-plante-1979
       - kems-046-van-limpt-2007
+      - kems-048-turkdogan-2001-sio2-gamma
+      - kems-049-kato-1993-ms-review
       - kems-051-allibert-1981
       - kems-053-stolyarova-1991
       - kems-057-kambayashi-1985
@@ -41372,12 +41396,32 @@ anti_loss:
       - kems-201-ichise-1986
       - kems-ms2000-044
       - lamoreaux-hildenbrand-1984
+      - lebrun-2013-magma-ocean-atmosphere
+      - lpi-compendium-14240
+      - lpi-compendium-15013
+      - lpi-compendium-62231
       - lpi-compendium-65701
       - lpi-lunar-soils
+      - lpi-lunar-sourcebook-chapter08
+      - lpsc-2017-2171
+      - lpsc-2019-2641
       - mendybaev-2017-fun-cai-lab-evaporation
+      - mendybaev-2021-cai-low-pressure-h2-evap
       - metsoc-2019-6005
+      - mogul-2023-pioneer-venus-co2-icarus
+      - murchison-degassing-2023-springer
+      - nagabayashi-hino-banya-1989-phosphorus
       - nagahara-ozawa-1999-forsterite-surface-microstructures
+      - nakamura-2022-science-ryugu-thermal
+      - nasa-tm-2024-simulant-guide
+      - norris-2017-earth-volatiles-nature
       - ntrs-19650014783
+      - okazaki-2022-ryugu-gas-treasure-box
+      - pahlevan-2026-protolunar-volatile-outflows
+      - reiss-2019-thermal-extraction-nulht2m
+      - rusiecka-wood-2025-chlorine-nacl-hydrous-basaltic-melts
+      - schaefer-and-fegley-2007-icarus-outgassing-of-oc
+      - schaefer-fegley-2011-vaporization-earth
       - slag-003-hino-kitagawa-banya-1993
       - stebbins-carmichael-weill-1983
       - steurer-1985-vapor-phase-pyrolysis
@@ -41385,9 +41429,14 @@ anti_loss:
       - sublimation-kinetics-2023-minerals
       - ta-badro-2021
       - ta-dacko-conradt-low-p-transpiration
+      - ta-flemetakis-2024
+      - tachibana-tsuchiyama-1998-forsterite-dust-lpsc
+      - thomas-2022-chlorine-bonding-silicate-melts
       - ts1985
       - ueshima-1982-fe-mo-thermal
+      - usgs-lunar-sourcebook-tab8-4
       - van-kooten-2020-lunar-outgassing
+      - vanbuchem-2025-lavatmos2
       - wilkerson-2023-jsc1a-outgassing
       - wimpenny-2019-zn-isotope-evaporation-extreme-t
       - yam1983
@@ -41641,14 +41690,13 @@ sources:
   total_rows: 1
   inbox_exclusion_reason: null
 - source_id: aithala-2026-magmatic-iron-redox-to-2100c
-  stage: unknown
+  stage: ingested_partial
   evidence:
-    decided_by: unknown
+    decided_by: ingested_partial
     artefacts:
     - data/literature/extracts-v2/aithala-2026-magmatic-iron-redox-to-2100c.yaml
-    reason: v2.1 store present but 0 of 28 rows are battery-usable (measured evidence class AND known
-      quantity AND stored numeric value); not partial (needs ≥1) and not complete (needs all)
-  usable_rows: 0
+    reason: v2.1 store present; 16/28 rows battery-usable
+  usable_rows: 16
   total_rows: 28
   inbox_exclusion_reason: null
 - source_id: alcock-itkin-horrigan-1984
@@ -42256,14 +42304,15 @@ sources:
   total_rows: 8
   inbox_exclusion_reason: null
 - source_id: fedkin-grossman-ghiorso-2006
-  stage: in_progress
+  stage: unknown
   evidence:
-    decided_by: in_progress
+    decided_by: unknown
     artefacts:
-    - extracts/fedkin-grossman-ghiorso-2006.yaml
-    reason: extract present; no v2.1 store work
+    - data/literature/extracts-v2/fedkin-grossman-ghiorso-2006.yaml
+    reason: v2.1 store present but 0 of 17 rows are battery-usable (measured evidence class AND known
+      quantity AND stored numeric value); not partial (needs ≥1) and not complete (needs all)
   usable_rows: 0
-  total_rows: 0
+  total_rows: 17
   inbox_exclusion_reason: null
 - source_id: fegley-2016-rock-steam-solubility
   stage: unknown
@@ -45137,14 +45186,13 @@ sources:
   total_rows: 75
   inbox_exclusion_reason: null
 - source_id: kems-024-gibson-hubbard-1972
-  stage: unknown
+  stage: ingested_partial
   evidence:
-    decided_by: unknown
+    decided_by: ingested_partial
     artefacts:
     - data/literature/extracts-v2/kems-024-gibson-hubbard-1972.yaml
-    reason: v2.1 store present but 0 of 108 rows are battery-usable (measured evidence class AND known
-      quantity AND stored numeric value); not partial (needs ≥1) and not complete (needs all)
-  usable_rows: 0
+    reason: v2.1 store present; 8/108 rows battery-usable
+  usable_rows: 8
   total_rows: 108
   inbox_exclusion_reason: null
 - source_id: kems-025-markova-1983
@@ -48272,24 +48320,26 @@ sources:
   total_rows: 1
   inbox_exclusion_reason: null
 - source_id: pound-1972-cr-langmuir-knudsen
-  stage: in_progress
+  stage: unknown
   evidence:
-    decided_by: in_progress
+    decided_by: unknown
     artefacts:
-    - extracts/pound-1972-cr-langmuir-knudsen.yaml
-    reason: extract present; no v2.1 store work
+    - data/literature/extracts-v2/pound-1972-cr-langmuir-knudsen.yaml
+    reason: v2.1 store present but 0 of 1 rows are battery-usable (measured evidence class AND known quantity
+      AND stored numeric value); not partial (needs ≥1) and not complete (needs all)
   usable_rows: 0
-  total_rows: 0
+  total_rows: 1
   inbox_exclusion_reason: null
 - source_id: pound-1972-mccabe-cr
-  stage: in_progress
+  stage: unknown
   evidence:
-    decided_by: in_progress
+    decided_by: unknown
     artefacts:
-    - extracts/pound-1972-mccabe-cr.yaml
-    reason: extract present; no v2.1 store work
+    - data/literature/extracts-v2/pound-1972-mccabe-cr.yaml
+    reason: v2.1 store present but 0 of 1 rows are battery-usable (measured evidence class AND known quantity
+      AND stored numeric value); not partial (needs ≥1) and not complete (needs all)
   usable_rows: 0
-  total_rows: 0
+  total_rows: 1
   inbox_exclusion_reason: null
 - source_id: rau-1974-se-vp
   stage: unknown
@@ -48303,14 +48353,15 @@ sources:
   total_rows: 1
   inbox_exclusion_reason: null
 - source_id: ref-016-sio-kems-1700-2000k
-  stage: in_progress
+  stage: unknown
   evidence:
-    decided_by: in_progress
+    decided_by: unknown
     artefacts:
-    - extracts/ref-016-sio-kems-1700-2000k.yaml
-    reason: extract present; no v2.1 store work
+    - data/literature/extracts-v2/ref-016-sio-kems-1700-2000k.yaml
+    reason: v2.1 store present but 0 of 1 rows are battery-usable (measured evidence class AND known quantity
+      AND stored numeric value); not partial (needs ≥1) and not complete (needs all)
   usable_rows: 0
-  total_rows: 0
+  total_rows: 1
   inbox_exclusion_reason: null
 - source_id: ref-032-al
   stage: unknown
@@ -49488,14 +49539,15 @@ sources:
   total_rows: 14
   inbox_exclusion_reason: null
 - source_id: safarian-engh-2013-si-pure-langmuir
-  stage: in_progress
+  stage: unknown
   evidence:
-    decided_by: in_progress
+    decided_by: unknown
     artefacts:
-    - extracts/safarian-engh-2013-si-pure-langmuir.yaml
-    reason: extract present; no v2.1 store work
+    - data/literature/extracts-v2/safarian-engh-2013-si-pure-langmuir.yaml
+    reason: v2.1 store present but 0 of 1 rows are battery-usable (measured evidence class AND known quantity
+      AND stored numeric value); not partial (needs ≥1) and not complete (needs all)
   usable_rows: 0
-  total_rows: 0
+  total_rows: 1
   inbox_exclusion_reason: null
 - source_id: schaefer-and-fegley-2007-icarus-outgassing-of-oc
   stage: unknown
@@ -50772,14 +50824,15 @@ sources:
   total_rows: 101
   inbox_exclusion_reason: null
 - source_id: sossi-et-al-2019
-  stage: in_progress
+  stage: unknown
   evidence:
-    decided_by: in_progress
+    decided_by: unknown
     artefacts:
-    - extracts/sossi-et-al-2019.yaml
-    reason: extract present; no v2.1 store work
+    - data/literature/extracts-v2/sossi-et-al-2019.yaml
+    reason: v2.1 store present but 0 of 1 rows are battery-usable (measured evidence class AND known quantity
+      AND stored numeric value); not partial (needs ≥1) and not complete (needs all)
   usable_rows: 0
-  total_rows: 0
+  total_rows: 1
   inbox_exclusion_reason: null
 - source_id: sossi-fegley-2018
   stage: located
