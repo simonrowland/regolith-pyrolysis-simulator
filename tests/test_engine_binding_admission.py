@@ -570,7 +570,7 @@ def test_missing_selected_contributor_disables_live_cache_and_replay(
         replay,
         "record_binding_producer_ids",
         lambda _sim, *, artifact, **_kwargs: (
-            ("builtin-vapor-pressure",)
+            ("builtin-vapor-pressure", "openimcc", "sulfsat")
             if artifact == "equilibrium_post_record"
             else ()
         ),
@@ -588,10 +588,14 @@ def test_missing_selected_contributor_disables_live_cache_and_replay(
     )
     notice = binding_admission_run_notice(sim)
     assert notice is not None
-    assert len(notice["notices"]) == 1
-    assert notice["notices"][0]["identity"]["engine_id"] == (
-        "builtin-vapor-pressure"
+    assert [
+        item["identity"]["engine_id"] for item in notice["notices"]
+    ] == ["builtin-vapor-pressure", "openimcc", "sulfsat"]
+    assert not admission.live_binding_cache_eligibility(
+        sim,
+        artifact="equilibrium_post_record",
     )
+    assert len(binding_admission_run_notice(sim)["notices"]) == 3
 
     with pytest.raises(
         EngineBindingAdmissionError,
