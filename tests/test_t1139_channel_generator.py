@@ -1,4 +1,4 @@
-"""t-1139 first-batch generator: demand-manifest carriers, dormant, gaps."""
+"""t-1139 first-batch generator: demand-manifest carriers, activation, gaps."""
 
 from __future__ import annotations
 
@@ -48,7 +48,7 @@ def test_first_batch_emits_every_demand_carrier_or_gap(generated_batch) -> None:
     assert generated_batch.gaps
 
 
-def test_preferred_oxide_carriers_compile_dormant(generated_batch) -> None:
+def test_preferred_oxide_carriers_compile_with_declared_activation(generated_batch) -> None:
     wanted = {
         ("Ge", "GeO"),
         ("Sn", "SnO"),
@@ -86,12 +86,18 @@ def test_preferred_oxide_carriers_compile_dormant(generated_batch) -> None:
             compiled_planes.add(declared_plane)
         else:
             assert compiled.evaluator.oxygen_fugacity_channel is None
-        assert compiled.code_metadata.request_rule == "dormant_pending_validation"
-        assert (
-            compiled.code_metadata.hot_train_applicability
-            == "derived_from_condensation_onset"
+        species = channel.family["physical_properties"]["species"][channel.species_id]
+        dormant = species["flux_dormant"]
+        assert dormant is bool(species.get("dormancy_reason"))
+        assert compiled.code_metadata.request_rule == (
+            "dormant_pending_validation" if dormant else "trace_source_inventory"
         )
-        assert compiled.evaluator.evaluate(1600.0, pO2_bar=1.0e-8).pressure_pa > 0.0
+        assert compiled.code_metadata.hot_train_applicability == (
+            "not_applicable" if dormant else "derived_from_condensation_onset"
+        )
+        assert compiled.evaluator.evaluate(
+            1600.0, pO2_bar=1.0e-8, source_activity=1.0e-8
+        ).pressure_pa > 0.0
         assert channel.parent_oxide == LIQUID_PARENT_OXIDE[element]
         if element in ACTIVITY_BASIS:
             assert channel.activity_basis == ACTIVITY_BASIS[element]
@@ -169,7 +175,6 @@ def test_generated_fo2_plane_follows_vapor_oxygen(generated_batch) -> None:
         plane = oxygen_fugacity_plane(vapor_oxygen_atoms=oxygen_atoms)
         model = species["pressure_models"][0]
         assert model["oxygen_fugacity_channel"] == plane
-        assert species["flux_dormant"] is True
         seen.add((oxygen_atoms <= 0.0, plane))
     assert (True, "intrinsic_melt") in seen
     assert (False, "transport_headspace") in seen
@@ -185,14 +190,6 @@ def test_generated_alpha_is_the_shared_upper_bound(generated_batch) -> None:
             "value": 1.0,
             "status": ANALYTICAL_UPPER_BOUND_ALPHA_STATUS,
         }
-        species = channel.family["physical_properties"]["species"][
-            channel.species_id
-        ]
-        assert species["flux_dormant"] is True
-        assert (
-            channel.family["code_metadata"]["request_rule"]
-            == "dormant_pending_validation"
-        )
 
 
 def test_preferred_carrier_table_matches_steer() -> None:
@@ -237,7 +234,7 @@ def _ga_payload(generated_batch):
 def _ga_thermo(payload):
     return payload["families"]["t1139_Ga_Ga_family"]["physical_properties"][
         "species"
-    ]["t1139_Ga_Ga"]["pressure_models"][0]["species_thermo"]
+    ]["Ga"]["pressure_models"][0]["species_thermo"]
 
 
 def test_compiler_rejects_mixed_gibbs_basis_and_pressure(generated_batch) -> None:
