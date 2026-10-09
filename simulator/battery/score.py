@@ -5918,12 +5918,16 @@ def _e15_residual_point(
         numeric = row.numeric
         if numeric is None:
             return None
+        if row.status is ResidualStatus.REFUSED:
+            return None
         if numeric.operation is not MetricOperation.DEX:
             return None
         flags = flagged_strata(row.notices)
         engine = _engine_of(row)
         residual_dex = numeric.value
     else:
+        if row.get("status") == ResidualStatus.REFUSED.value:
+            return None
         numeric = row.get("numeric")
         if not isinstance(numeric, Mapping) or numeric.get("value") is None:
             return None
@@ -5940,6 +5944,8 @@ def _e15_residual_point(
             residual_dex = as_decimal(numeric.get("value"))
         except (TypeError, ValueError, ArithmeticError):
             return None
+    if not _reference_has_measured_evidence(observation):
+        return None
     if (
         _is_bulk_not_liquid_composition(observation)
         or _without_outside_single_liquid_field(observation) is not None
