@@ -170,6 +170,119 @@ def test_zero_o2_argon_schedule_is_a_closed_sweep() -> None:
     assert melt.background_gas_species == "Ar"
 
 
+_RH03_FE_MOL = 581.861950497938
+
+
+def _load_overhead(sim: PyrolysisSimulator, species_mol: dict[str, float]) -> None:
+    sim._overhead_headspace_config["enabled"] = True
+    sim._overhead_headspace_config["volume_m3"] = _RH03_VOLUME_M3
+    sim.melt.temperature_C = _RH03_TEMPERATURE_K - 273.15
+    sim.atom_ledger.load_external_mol(
+        "process.overhead_gas",
+        species_mol,
+        source="t1139 pressure-control bound",
+        material_origin="feedstock",
+    )
+
+
+def _c2a_pressure_schedule(mode: str) -> dict:
+    schedule = deepcopy(_n2_lab_schedule())
+    schedule["gas_boundary"]["background_gas"]["species"] = "Ar"
+    schedule["gas_boundary"]["pressure_control"]["mode"] = mode
+    return schedule
+
+
+def test_pressure_controlled_o2_partial_does_not_exceed_mole_fraction_times_total() -> None:
+    sim = _sim()
+    sim.load_batch("lunar_mare_low_ti", mass_kg=1000.0)
+    sim.campaign_mgr.overrides["C2A"] = {
+        "lab_schedule": _c2a_pressure_schedule("flow_through_with_pump"),
+        "lab_schedule_pO2_setpoint_mbar": 1.0,
+    }
+    sim.melt.campaign = CampaignPhase.C2A
+    sim.campaign_mgr.configure_campaign(sim.melt, CampaignPhase.C2A)
+    _load_overhead(sim, {"O2": _RH03_O2_MOL, "Fe": _RH03_FE_MOL})
+
+    holdup = sim.atom_ledger.mol_by_account("process.overhead_gas")
+    n_o2 = float(holdup["O2"])
+    n_total = sum(float(mol) for mol in holdup.values())
+    p_controlled = sim.campaign_mgr.pressure_controlled_total_bar(sim.melt)
+    assert p_controlled == pytest.approx(13.0 / 1000.0)
+    cap = n_o2 / n_total * p_controlled
+    ledger = sim._headspace_ledger_pO2_bar_from_o2_mol(n_o2)
+
+    assert sim.melt.atmosphere is Atmosphere.CONTROLLED_O2
+    assert ledger == pytest.approx(_RH03_IDEAL_O2_BAR, rel=1e-12)
+    assert ledger > cap
+    transport = sim._headspace_transport_pO2_bar_from_ledger(
+        ledger,
+        head_o2_mol=n_o2,
+    )
+    assert transport == pytest.approx(cap)
+    sim._refresh_oxygen_reservoir_transport_pO2_for_vapor()
+    assert sim.melt.oxygen_reservoir.headspace_ledger_pO2_bar == pytest.approx(
+        ledger
+    )
+    assert sim._headspace_transport_pO2_bar() == pytest.approx(cap)
+    # A zero stored transport falls through to the sealed diagnostic partial.
+    # That read is still bounded; the diagnostic itself stays on n R T / V.
+    sim.melt.oxygen_reservoir.headspace_transport_pO2_bar = 0.0
+    assert sim._headspace_transport_pO2_bar() == pytest.approx(cap)
+    diagnostic = sim._overhead_gas_equilibrium_diagnostic()
+    assert float(diagnostic["partial_pressures_bar"]["O2"]) == pytest.approx(
+        ledger,
+        rel=1e-12,
+    )
+
+
+def test_pressure_controlled_bound_does_not_lift_an_underpressured_partial() -> None:
+    sim = _sim()
+    sim.load_batch("lunar_mare_low_ti", mass_kg=1000.0)
+    sim.campaign_mgr.overrides["C2A"] = {
+        "lab_schedule": _c2a_pressure_schedule("flow_through_with_pump"),
+        "lab_schedule_pO2_setpoint_mbar": 1.0,
+    }
+    sim.melt.campaign = CampaignPhase.C2A
+    sim.campaign_mgr.configure_campaign(sim.melt, CampaignPhase.C2A)
+    sim._overhead_headspace_config["enabled"] = True
+    sim._overhead_headspace_config["volume_m3"] = _RH03_VOLUME_M3
+    sim.melt.temperature_C = _RH03_TEMPERATURE_K - 273.15
+    o2_mol = sim._headspace_o2_mol_for_pO2_bar(0.005)
+    _load_overhead(sim, {"O2": o2_mol})
+
+    n_o2 = float(sim.atom_ledger.mol_by_account("process.overhead_gas")["O2"])
+    ledger = sim._headspace_ledger_pO2_bar_from_o2_mol(n_o2)
+    p_controlled = sim.campaign_mgr.pressure_controlled_total_bar(sim.melt)
+    transport = sim._headspace_transport_pO2_bar_from_ledger(
+        ledger,
+        head_o2_mol=n_o2,
+    )
+
+    assert ledger == pytest.approx(0.005)
+    assert p_controlled is not None and ledger < p_controlled
+    assert transport == pytest.approx(ledger)
+
+
+def test_sealed_headspace_keeps_the_ideal_gas_o2_partial() -> None:
+    sim = _sim()
+    sim.load_batch("lunar_mare_low_ti", mass_kg=1000.0)
+    sim.melt.atmosphere = Atmosphere.CONTROLLED_O2
+    sim.melt.pO2_mbar = 1.0
+    sim.melt.p_total_mbar = 13.0
+    assert sim.campaign_mgr.pressure_controlled_total_bar(sim.melt) is None
+    _load_overhead(sim, {"O2": _RH03_O2_MOL, "Fe": _RH03_FE_MOL})
+
+    n_o2 = float(sim.atom_ledger.mol_by_account("process.overhead_gas")["O2"])
+    ledger = sim._headspace_ledger_pO2_bar_from_o2_mol(n_o2)
+    transport = sim._headspace_transport_pO2_bar_from_ledger(
+        ledger,
+        head_o2_mol=n_o2,
+    )
+
+    assert ledger == pytest.approx(_RH03_IDEAL_O2_BAR, rel=1e-12)
+    assert transport == pytest.approx(ledger)
+
+
 def test_pin_sealed_ideal_gas_partial_matches_the_rh03_hour0_holdup() -> None:
     partials = BuiltinOverheadGasEquilibriumProvider.compute_partial_pressures_bar(
         {"O2": _RH03_O2_MOL},

@@ -28,6 +28,7 @@ from simulator.accounting import UnknownSpeciesError, resolve_species_formula
 from simulator.lab_schedule import (
     LAB_SCHEDULE_OVERRIDE_KEY,
     LAB_SCHEDULE_PO2_SETPOINT_KEY,
+    PRESSURE_CONTROLLED_HEADSPACE_MODES,
     interpolate_schedule_points,
     normalize_lab_schedule,
     pO2_enforcement_row,
@@ -1981,6 +1982,32 @@ class CampaignManager:
             melt.atmosphere = Atmosphere.HARD_VACUUM
         self.last_pO2_enforcement = dict(row)
         melt.validate_melt_pressures()
+
+    def pressure_controlled_total_bar(self, melt: MeltState) -> float | None:
+        """Held total pressure (bar), or None for a sealed headspace.
+
+        Premise: only a pressure-controlled lab schedule holds the chamber
+        at the scheduled total. A missing schedule, a mode outside
+        PRESSURE_CONTROLLED_HEADSPACE_MODES, or reported_status
+        not_reported is sealed, and the vapour read keeps n R T / V.
+        Algebra: P_bar = melt.p_total_mbar / 1000. Units: mbar / 1000 = bar.
+        Sanity: RH03's 13 mbar flow-through schedule is 0.013 bar.
+        """
+
+        campaign = getattr(melt, "campaign", None)
+        if not isinstance(campaign, CampaignPhase):
+            return None
+        schedule = self._lab_schedule(campaign)
+        if schedule is None:
+            return None
+        gas_boundary = schedule.get("gas_boundary") or {}
+        pressure_control = gas_boundary.get("pressure_control") or {}
+        if str(pressure_control.get("reported_status", "") or "") == "not_reported":
+            return None
+        mode = str(pressure_control.get("mode") or "").strip()
+        if mode not in PRESSURE_CONTROLLED_HEADSPACE_MODES:
+            return None
+        return float(melt.p_total_mbar) / 1000.0
 
     def _apply_ramp_override(self, campaign: CampaignPhase,
                              target_T: Optional[float],

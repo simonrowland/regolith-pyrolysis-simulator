@@ -32,6 +32,23 @@ LAB_SCHEDULE_DEPOSIT_SAMPLE_BASIS = frozenset(
         "not_reported",
     }
 )
+# Headspaces whose scheduled total pressure is the held pressure. A
+# transport partial at the vapour read cannot exceed x_i * P_controlled.
+# Sealed vessels stay on n R T / V.
+# - flow_through_with_pump: Robinot / RH03; the pump holds chamber pressure.
+# - pumped_dynamic_uhv_exposure: Sesko; pumps hold the measured pressure.
+# - achieved_pressure_not_reported_runtime_floor_assumption: Pomeroy;
+#   the preset treats the scheduled chamber pressure as the held pressure.
+# - controlled, regulated: the same held-pressure binding in test fixtures.
+PRESSURE_CONTROLLED_HEADSPACE_MODES = frozenset(
+    {
+        "flow_through_with_pump",
+        "pumped_dynamic_uhv_exposure",
+        "achieved_pressure_not_reported_runtime_floor_assumption",
+        "controlled",
+        "regulated",
+    }
+)
 
 
 class LabScheduleValidationError(ValueError):

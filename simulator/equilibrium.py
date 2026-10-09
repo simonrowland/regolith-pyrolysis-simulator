@@ -206,8 +206,17 @@ class EquilibriumMixin:
                 or 0.0
             )
             if pO2_bar > 0.0:
-                return max(pO2_bar, self._vacuum_floor_bar())
-        return self._commanded_pO2_bar()
+                partial_bar = max(pO2_bar, self._vacuum_floor_bar())
+            else:
+                partial_bar = self._commanded_pO2_bar()
+        else:
+            partial_bar = self._commanded_pO2_bar()
+        # The simulator owns the pressure-control bound. A host without
+        # that method (the legacy equilibrium stub) keeps this partial.
+        bound = getattr(self, "_bound_pressure_controlled_o2_partial_bar", None)
+        if callable(bound):
+            return float(bound(partial_bar))
+        return partial_bar
 
     # --- Ellingham thermodynamic data for oxide equilibrium ---        [ELLI]
     #

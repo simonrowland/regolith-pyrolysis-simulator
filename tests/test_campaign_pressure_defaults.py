@@ -641,6 +641,53 @@ def test_configure_campaign_reset_does_not_clobber_lab_schedule_background():
     assert melt.background_gas_mole_fraction == pytest.approx(0.8)
 
 
+@pytest.mark.parametrize(
+    "mode",
+    [
+        "flow_through_with_pump",
+        "pumped_dynamic_uhv_exposure",
+        "achieved_pressure_not_reported_runtime_floor_assumption",
+        "controlled",
+        "regulated",
+    ],
+)
+def test_pressure_controlled_modes_report_the_held_total(mode: str) -> None:
+    schedule = deepcopy(_n2_lab_schedule())
+    schedule["gas_boundary"]["pressure_control"]["mode"] = mode
+    manager = CampaignManager(_setpoints())
+    manager.overrides["C2A"] = {"lab_schedule": schedule}
+    melt = MeltState(campaign=CampaignPhase.C2A)
+
+    manager.configure_campaign(melt, CampaignPhase.C2A)
+
+    assert manager.pressure_controlled_total_bar(melt) == pytest.approx(0.010)
+
+
+def test_unreported_or_unlisted_pressure_mode_stays_sealed() -> None:
+    manager = CampaignManager(_setpoints())
+    melt = MeltState(campaign=CampaignPhase.C2A)
+    assert manager.pressure_controlled_total_bar(melt) is None
+
+    unlisted = deepcopy(_n2_lab_schedule())
+    unlisted["gas_boundary"]["pressure_control"]["mode"] = "manual_valve"
+    manager.overrides["C2A"] = {"lab_schedule": unlisted}
+    manager.configure_campaign(melt, CampaignPhase.C2A)
+    assert manager.pressure_controlled_total_bar(melt) is None
+
+    withheld = deepcopy(_n2_lab_schedule())
+    withheld["gas_boundary"]["pressure_control"] = {
+        "reported_status": "not_reported",
+        "mode": "flow_through_with_pump",
+        "source_class": "test_fixture",
+        "citation_id": "unit_test",
+        "digest": "not_applicable",
+        "reason": "unit test",
+    }
+    manager.overrides["C2A"] = {"lab_schedule": withheld}
+    manager.configure_campaign(melt, CampaignPhase.C2A)
+    assert manager.pressure_controlled_total_bar(melt) is None
+
+
 def test_zero_o2_argon_lab_schedule_does_not_synthesize_n2():
     from simulator.overhead import OverheadGasModel
     from simulator.state import CondensationTrain, EvaporationFlux

@@ -4204,12 +4204,53 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 head_o2_mol = self._headspace_o2_mol_for_pO2_bar(
                     ledger_pO2_bar
                 )
-            return self._inert_sweep_transport_pO2_bar(head_o2_mol)
-        return max(
-            float(ledger_pO2_bar),
-            self._headspace_control_floor_pO2_bar(),
-            self._vacuum_floor_bar(),
-        )
+            partial_bar = self._inert_sweep_transport_pO2_bar(head_o2_mol)
+        else:
+            partial_bar = max(
+                float(ledger_pO2_bar),
+                self._headspace_control_floor_pO2_bar(),
+                self._vacuum_floor_bar(),
+            )
+        return self._bound_pressure_controlled_o2_partial_bar(partial_bar)
+
+    def _bound_pressure_controlled_o2_partial_bar(self, partial_bar: float) -> float:
+        """Upper bound on a vapour-read O2 partial under a held total pressure.
+
+        Premise: a pressure-controlled headspace cannot present a species
+        partial above its mole fraction of the controlled total. The bound
+        does not lift an underpressured gas up to that value. Sealed modes
+        return the argument unchanged; their partial remains
+        BuiltinOverheadGasEquilibriumProvider.compute_partial_pressures_bar,
+        p_i = n_i R T / (V * 1e5), with R = GAS_CONSTANT.
+        Algebra: cap = (n_O2 / n_total) * P_controlled when n_total > 0;
+        result = min(partial, cap). Units: mol/mol * bar = bar.
+        Sanity: RH03 hour 0 holds 823.214 mol O2 and 581.862 mol Fe at
+        0.013 bar, so the O2 cap is about 0.00762 bar against an ideal-gas
+        partial of 2284.62 bar.
+        The vapour provider refuses an explicit pO2 below the headspace
+        vacuum floor. When the cap is below that floor the returned value
+        is the floor; the excess over the cap is at most the floor, not
+        the ideal-gas holdup. Bleed keeps the uncapped diagnostic.
+        """
+
+        manager = getattr(self, "campaign_mgr", None)
+        reader = getattr(manager, "pressure_controlled_total_bar", None)
+        if not callable(reader):
+            return float(partial_bar)
+        p_controlled_bar = reader(self.melt)
+        if p_controlled_bar is None:
+            return float(partial_bar)
+        holdup = self.atom_ledger.mol_by_account("process.overhead_gas")
+        n_total = sum(max(0.0, float(mol)) for mol in holdup.values())
+        if n_total <= 0.0:
+            return float(partial_bar)
+        n_o2 = max(0.0, float(holdup.get(OXYGEN_SPECIES, 0.0)))
+        cap_bar = n_o2 / n_total * float(p_controlled_bar)
+        bounded = min(float(partial_bar), cap_bar)
+        floor_bar = self._vacuum_floor_bar()
+        if bounded < floor_bar:
+            return floor_bar
+        return bounded
 
     def _refresh_oxygen_reservoir_transport_pO2_for_vapor(
         self,
