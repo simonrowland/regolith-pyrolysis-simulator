@@ -7020,8 +7020,7 @@ def test_g5_compilation_column_mapping_mutation_proof() -> None:
 
 def test_l05c1_costa_owner_fe_control_is_not_condensation() -> None:
     row = _extract_observation(
-        "kems-007-costa-2015.yaml",
-        "costa_2015_fe_vaporization_coefficient_alpha_digitized",
+        "costa-jacobson-2015.yaml", "costa_jacobson_2015_fe_olivine_kems"
     )
     values = row.get("values") if isinstance(row.get("values"), dict) else {}
     state, reason = map_quantity(
@@ -7029,7 +7028,18 @@ def test_l05c1_costa_owner_fe_control_is_not_condensation() -> None:
     )
     assert state.is_value and state.value is Quantity.EVAPORATION_COEFFICIENT_ALPHA
     assert reason is None
-    assert [point["alpha"] for point in values["points"]] == [
+
+    owner = _extract_observation(
+        "kems-007-costa-2015.yaml",
+        "costa_2015_fe_vaporization_coefficient_alpha_digitized",
+    )
+    owner_values = owner.get("values") if isinstance(owner.get("values"), dict) else {}
+    owner_state, owner_reason = map_quantity(
+        owner.get("type"), owner_values, units=owner.get("units"), row=owner
+    )
+    assert owner_state.is_value and owner_state.value is Quantity.EVAPORATION_COEFFICIENT_ALPHA
+    assert owner_reason is None
+    assert [point["alpha"] for point in owner_values["points"]] == [
         0.016269, 0.015517, 0.01978, 0.011505, 0.013045
     ]
 
