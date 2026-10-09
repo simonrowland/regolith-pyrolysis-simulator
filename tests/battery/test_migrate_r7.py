@@ -1021,12 +1021,23 @@ def _source_observation_rows(path: Path) -> int | None:
 def test_g1_whole_store_absence_claims_match_sources(path):
     source_documents = None
     if path.name == "kems-016-stolyarova-1992.yaml":
+        source_revision = "f52151badbd918f7e096b14d45dc8639a1d0278f"
+        source_path = "data/literature/extracts/kems-016-stolyarova-1992.yaml"
+        source_object = f"{source_revision}:{source_path}"
+        available = subprocess.run(
+            ["git", "cat-file", "-e", source_object],
+            cwd=REPO_ROOT,
+            capture_output=True,
+            check=False,
+        )
+        if available.returncode != 0:
+            pytest.skip(
+                "git_history_unavailable: required source revision "
+                f"{source_revision!r} is absent"
+            )
         green_source = subprocess.run(
-            [
-                "git",
-                "show",
-                "f52151badbd918f7e096b14d45dc8639a1d0278f:data/literature/extracts/kems-016-stolyarova-1992.yaml",
-            ],
+            ["git", "show", source_object],
+            cwd=REPO_ROOT,
             check=True,
             capture_output=True,
             text=True,
