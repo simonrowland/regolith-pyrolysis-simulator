@@ -21,6 +21,7 @@ from simulator.battery.migrate import (
     sample_from_equipment,
     to_plain,
     wt_pct_to_mole_fraction,
+    wt_pct_to_mole_fraction_derivation,
 )
 from simulator.battery.records import as_decimal
 from tests.battery.test_migrate import _migrate_real_extract, _write_min_tree
@@ -89,6 +90,126 @@ def test_flat_composition_with_unsupported_numeric_key_is_refused() -> None:
     assert _initial_oxide_map_from_values(
         {"SiO2": Decimal("50"), "MgO": Decimal("40"), "B2O3": Decimal("10")}
     ) is None
+
+
+def test_sample_from_equipment_withholds_unsupported_numeric_component() -> None:
+    sample = sample_from_equipment(
+        {},
+        values={
+            "locator": {"table": "1"},
+            "composition_wt_pct": {
+                "SiO2": Decimal("50"),
+                "MgO": Decimal("40"),
+                "Rb2O": Decimal("10"),
+                "sum_wt_pct": Decimal("100"),
+            },
+        },
+    )
+
+    assert sample.printed_composition is not None
+    assert sample.printed_composition.state.value == {
+        "MgO": "40",
+        "Rb2O": "10",
+        "SiO2": "50",
+        "sum_wt_pct": "100",
+    }
+    assert sample.initial_composition is not None
+    assert sample.initial_composition.state.is_unknown
+    assert "Rb2O" in sample.initial_composition.state.reason
+
+
+def test_sample_without_composition_locator_keeps_unsupported_key_reason() -> None:
+    sample = sample_from_equipment(
+        {},
+        values={
+            "composition_wt_pct": {
+                "SiO2": Decimal("50"),
+                "MgO": Decimal("40"),
+                "FeOT": Decimal("10"),
+            },
+        },
+    )
+
+    assert sample.initial_composition is not None
+    assert sample.initial_composition.state.is_unknown
+    assert "FeOT" in sample.initial_composition.state.reason
+
+
+def test_wt_percent_derivation_ignores_printed_totals() -> None:
+    derivation = wt_pct_to_mole_fraction_derivation(
+        {
+            "SiO2": Decimal("50"),
+            "MgO": Decimal("49"),
+            "Total": Decimal("99"),
+        },
+        None,
+    )
+
+    assert "M_Total_g_mol" not in dict(derivation.parameters)
+
+
+def test_nested_and_flat_composition_maps_skip_mass_loss_conditions() -> None:
+    components = {"SiO2": Decimal("50"), "MgO": Decimal("40")}
+    assert _initial_oxide_map_from_values(
+        {"composition_wt_pct": {**components, "T_C": 0, "mass_loss_wt_pct": 10}}
+    ) == components
+    assert _initial_oxide_map_from_values(
+        {**components, "mass_loss_wt_pct": 10}
+    ) == components
+
+
+def test_bulk_observation_withholds_unsupported_composition_with_key_reason(
+    tmp_path: Path,
+) -> None:
+    root = _write_min_tree(
+        tmp_path,
+        {
+            "schema_version": "literature_extract.v1",
+            "source_id": "fixture-source",
+            "source": {
+                "citation": "Fixture, A. (2026), Test Journal 1:1, DOI 10.1234/FIXTURE",
+                "doi": "10.1234/FIXTURE",
+            },
+            "extraction": {
+                "method": "unit_test",
+                "date": "2026-09-19",
+                "worker": "pytest",
+            },
+            "review_status": "draft",
+            "fidelity_samples": [],
+            "species": {
+                "MLS-1A": {
+                    "observations": [
+                        {
+                            "observation_id": "unsupported-composition",
+                            "type": "measurement",
+                            "locator": {"table": "1", "page": 3},
+                            "phase": "mixed_simulants",
+                            "units": "%",
+                            "values": {
+                                "quantity": "mass_loss_fraction",
+                                "method_class": "measured_direct",
+                                "mass_loss_fraction": 0.2,
+                                "composition_wt_pct": {
+                                    "SiO2": 50,
+                                    "MgO": 40,
+                                    "Rb2O": 10,
+                                },
+                            },
+                        }
+                    ]
+                }
+            },
+        },
+    )
+    result = migrate(root, write=False)
+    observation = result.observations[
+        "fixture-source::unsupported-composition"
+    ]
+
+    assert observation.identity.composition is not None
+    assert observation.identity.composition.is_unknown
+    assert "Rb2O" in observation.identity.composition.reason
 
 
 def test_flat_point_composition_ignores_temperature_and_loss_fields() -> None:
