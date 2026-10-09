@@ -519,6 +519,86 @@ def test_markova_1983_rows_use_each_points_own_printed_composition(
     assert not mismatches, f"{len(mismatches)} composition mismatches: {mismatches}"
 
 
+def test_markova_table2_migrates_both_quantities_and_printed_charge(tmp_path: Path) -> None:
+    result = _migrate_real_extract(
+        tmp_path,
+        "kems-026-markova-1984.yaml",
+        use_repository_index_row=True,
+    )
+    prefix = "kems-026-markova-1984::markova_1984_table2_residual_melt_"
+    rows = {
+        observation_id: to_plain(observation)
+        for observation_id, observation in result.observations.items()
+        if observation_id.startswith(prefix)
+    }
+    mass_loss = {
+        Decimal(row["value"]["point"])
+        for row in rows.values()
+        if _quantity(row) == "mass_loss_fraction"
+    }
+    assert len(mass_loss) == 22
+    assert mass_loss == {
+        Decimal(value)
+        for value in (
+            "0.0146", "0.0416", "0.0974", "0.218", "0.3835", "0.6521",
+            "0.8605", "0.8925", "0.9181", "0.9551", "0.9834", "0.0117",
+            "0.0439", "0.1441", "0.3717", "0.5353", "0.6601", "0.6935",
+            "0.7133", "0.7619", "0.8368", "0.9799",
+        )
+    }
+
+    residue = {
+        observation_id: row
+        for observation_id, row in rows.items()
+        if _quantity(row) == "residue_component_composition"
+    }
+    assert len(residue) == 110
+    printed_cells = {
+        ("VI", "1748.15", "MgO"): Decimal("36.92"),
+        ("VI", "2156.15", "SiO2"): Decimal("13.6"),
+        ("VI", "2311.15", "MgO"): Decimal("0.0"),
+        ("V", "1992.15", "MgO"): Decimal("8.11"),
+    }
+    for (panel, temperature, oxide), expected in printed_cells.items():
+        matching = [
+            row
+            for observation_id, row in residue.items()
+            if row["experiment_id"].endswith(f"::{panel}")
+            and row["identity"]["species"]["formula"] == oxide
+            and row["identity"]["temperature_K"]["value"] == temperature
+        ]
+        assert len(matching) == 1
+        assert Decimal(matching[0]["value"]["point"]) == expected
+
+    charges = {
+        "VI": {
+            "SiO2": Decimal("44.02"), "Al2O3": Decimal("4.56"),
+            "FeO": Decimal("8.04"), "MgO": Decimal("36.44"),
+            "CaO": Decimal("6.95"),
+        },
+        "V": {
+            "SiO2": Decimal("52.32"), "Al2O3": Decimal("19.13"),
+            "FeO": Decimal("9.37"), "MgO": Decimal("6.25"),
+            "CaO": Decimal("12.93"),
+        },
+    }
+    for panel, charge in charges.items():
+        row = next(
+            value for value in residue.values()
+            if value["experiment_id"].endswith(f"::{panel}")
+        )
+        identity = _identity_composition_components(row)
+        expected_moles = dict(wt_pct_to_mole_fraction(charge).components)
+        assert identity == expected_moles
+        sample = result.experiments[row["experiment_id"]].sample
+        assert sample.printed_composition is not None
+        assert sample.printed_composition.state.value == {
+            oxide: str(value) for oxide, value in charge.items()
+        }
+        assert sample.initial_composition is not None
+        assert dict(sample.initial_composition.state.value.components) == expected_moles
+
+
 def test_bulk_property_rows_do_not_use_sample_code_as_formula() -> None:
     """MLS-* / MS[0-9] are sample labels, not chemical formulas."""
 

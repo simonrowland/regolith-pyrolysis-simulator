@@ -12958,10 +12958,23 @@ class Migrator:
                 observation_id=obs_id,
             )
         yield_key, yield_items = _yield_table_items(values)
-        if yield_items:
-            yield_quantity: Quantity | State[Quantity] = (
-                quantity.value if quantity.is_value else Quantity.MASS_LOSS_FRACTION
+        if (
+            yield_items is None
+            and q_token is Quantity.RESIDUE_COMPONENT_COMPOSITION
+            and isinstance(values.get("series"), list)
+            and any(
+                isinstance(item, Mapping) and _item_mass_loss_field(item)
+                for item in values["series"]
             )
+        ):
+            yield_key, yield_items = "series", values["series"]
+        if yield_items:
+            if yield_key == "series":
+                yield_quantity: Quantity | State[Quantity] = Quantity.MASS_LOSS_FRACTION
+            elif quantity.is_value:
+                yield_quantity = quantity.value
+            else:
+                yield_quantity = Quantity.MASS_LOSS_FRACTION
             before = self._count(source_key).observations_out
             for index, item in enumerate(yield_items):
                 if not isinstance(item, Mapping) or _item_mass_loss_field(item) is None:
@@ -13008,7 +13021,11 @@ class Migrator:
                         ),
                     )
                 self._emit_exploded_point(
-                    parent_id=obs_id,
+                    parent_id=(
+                        f"{obs_id}::mass_loss_fraction"
+                        if yield_key == "series"
+                        else obs_id
+                    ),
                     item={"index": index, "item": item, "units": obs.get("units")},
                     work=work,
                     source_id=source_id,
@@ -13032,7 +13049,10 @@ class Migrator:
                     provenance=observation_provenance,
                     parent_point_conditions=point_conditions,
                 )
-            if self._count(source_key).observations_out > before:
+            if (
+                self._count(source_key).observations_out > before
+                and q_token is not Quantity.RESIDUE_COMPONENT_COMPOSITION
+            ):
                 return
         if (
             q_token is Quantity.RESIDUE_COMPONENT_COMPOSITION
