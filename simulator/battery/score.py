@@ -79,6 +79,8 @@ from simulator.battery.migrate import (
     to_plain,
 )
 from simulator.battery.records import (
+    INITIAL_CHARGE_ONLY_PROXY_FLAG,
+    SOURCE_INTERNALLY_INCONSISTENT_REASON_PREFIX,
     Bench,
     CandidateRequest,
     Composition,
@@ -371,12 +373,16 @@ FLAGGED_STRATUM_CATALOGUE_COMPOSITION = "catalogue-composition"
 FLAGGED_STRATUM_SOURCE_INTERNALLY_INCONSISTENT = "source-internally-inconsistent"
 FLAGGED_STRATUM_IMCC_COMPLEX_SATURATION = "imcc_complex_saturation"
 FLAGGED_STRATUM_REFERENCE_CONVERTED_VIA_FUSION = "reference_converted_via_fusion"
+FLAGGED_STRATUM_FIGURE_ONLY = "figure_only"
+FLAGGED_STRATUM_REACTIVE_CELL_NOT_MODELLED = "reactive-cell-not-modelled"
 _FLAGGED_STRATUM_NOTICE_KINDS: frozenset[NoticeKind] = frozenset(
     {
         NoticeKind.UNVERIFIED_APPARATUS,
         NoticeKind.CELL_MATERIAL_INFERRED,
         NoticeKind.COMPOSITION_FROM_SAMPLE_CATALOG,
         NoticeKind.IMCC_COMPLEX_SATURATION,
+        NoticeKind.FIGURE_ONLY,
+        NoticeKind.REACTIVE_CELL_NOT_MODELLED,
     }
 )
 
@@ -666,6 +672,17 @@ def metric_operation_for_identity(identity: Identity) -> MetricOperation | None:
     return metric_operation(quantity)
 
 
+def _residual_metric_operation(
+    quantity: Quantity | None, observation: object | None
+) -> MetricOperation | None:
+    """Metric of a residual on ``observation``: identity-aware when typed."""
+
+    identity = getattr(observation, "identity", None)
+    if isinstance(identity, Identity) and quantity_token(identity) is quantity:
+        return metric_operation_for_identity(identity)
+    return metric_operation(quantity)
+
+
 def compute_metric(
     operation: MetricOperation,
     candidate: Decimal,
@@ -797,6 +814,42 @@ def _catalogue_composition_notice(reference: Observation) -> Notice | None:
         ),
         origin=reference.observation_id,
         source=composition.proxy_source,
+    )
+
+
+def _initial_charge_composition_notice(reference: Observation) -> Notice | None:
+    """Predict with an initial-charge composition, then flag the residual.
+
+    ``proxy_flag == initial_charge_only`` marks a printed starting charge
+    standing in for a later (depleted) state. The residual joins the existing
+    source-internally-inconsistent diagnostic stratum (b-716).
+    """
+
+    identity = reference.identity
+    if not isinstance(identity, Identity):
+        return None
+    quantity = quantity_token(identity)
+    if quantity is None:
+        return None
+    point = (reference.point_conditions or {}).get("composition")
+    states = (identity.composition, point.state if isinstance(point, Located) else None)
+    if not any(
+        state is not None
+        and state.is_value
+        and isinstance(state.value, Composition)
+        and state.value.proxy_flag == INITIAL_CHARGE_ONLY_PROXY_FLAG
+        for state in states
+    ):
+        return None
+    return Notice(
+        kind=NoticeKind.SOURCE_DISAGREEMENT,
+        affected_quantities=(quantity,),
+        reason=(
+            f"{SOURCE_INTERNALLY_INCONSISTENT_REASON_PREFIX} "
+            f"composition_role={INITIAL_CHARGE_ONLY_PROXY_FLAG}: the printed "
+            "composition is the starting charge, not the state of this datum"
+        ),
+        origin=reference.observation_id,
     )
 
 
@@ -1002,6 +1055,11 @@ def _flagged_stratum_notices(
         _unverified_apparatus_notices(reference, experiment, gates),
         _cell_apparatus_inference_notices(reference, experiment, bench),
         (() if (notice := _catalogue_composition_notice(reference)) is None else (notice,)),
+        (
+            ()
+            if (notice := _initial_charge_composition_notice(reference)) is None
+            else (notice,)
+        ),
     )
 
 
@@ -1102,6 +1160,10 @@ def flagged_strata(notices: Sequence[Notice]) -> tuple[str, ...]:
         strata.append(FLAGGED_STRATUM_IMCC_COMPLEX_SATURATION)
     if any(_is_fusion_conversion_notice(notice) for notice in notices):
         strata.append(FLAGGED_STRATUM_REFERENCE_CONVERTED_VIA_FUSION)
+    if NoticeKind.FIGURE_ONLY in kinds:
+        strata.append(FLAGGED_STRATUM_FIGURE_ONLY)
+    if NoticeKind.REACTIVE_CELL_NOT_MODELLED in kinds:
+        strata.append(FLAGGED_STRATUM_REACTIVE_CELL_NOT_MODELLED)
     return tuple(strata)
 
 
@@ -1695,18 +1757,24 @@ def unit_dimension(unit: str) -> str | None:
     return _UNIT_DIMENSION.get(unit)
 
 
-def band_dimension_matches(quantity: Quantity, band: DecisionBand) -> bool:
+def band_dimension_matches(
+    quantity: Quantity,
+    band: DecisionBand,
+    *,
+    operation: MetricOperation | None = None,
+) -> bool:
     """True only when the band and the quantity share one dimension.
 
     Residual metrics (relative and dex) are dimensionless even when their
     source quantity has a physical unit. kJ/mol does not match J/mol/K.
     Scale aliases that are not in ``_UNIT_DIMENSION`` fail closed.
+    ``operation`` is the residual's own (identity-aware) metric when the
+    caller knows it; default is the quantity's metric.
     """
 
-    if (
-        band.unit == "dimensionless"
-        and metric_operation(quantity) in {MetricOperation.RELATIVE, MetricOperation.DEX}
-    ):
+    if band.unit == "dimensionless" and (
+        operation or metric_operation(quantity)
+    ) in {MetricOperation.RELATIVE, MetricOperation.DEX}:
         return True
     quantity_dim = unit_dimension(QUANTITY_UNITS[quantity])
     band_dim = unit_dimension(band.unit)
@@ -1978,6 +2046,7 @@ def decision_band_for(
     observations: Mapping[str, Observation] | None = None,
     experiments: Mapping[str, Experiment] | None = None,
     derived_band: DecisionBand | None = None,
+    operation: MetricOperation | None = None,
 ) -> DecisionBand | None:
     if (
         quantity is Quantity.P_PARTIAL
@@ -1990,10 +2059,12 @@ def decision_band_for(
         # no unflagged candidates.  Do not refill it with the public helper,
         # whose inputs cannot include the bench map.
         band = derived_band
-        if band is not None and band_dimension_matches(quantity, band):
+        if band is not None and band_dimension_matches(
+            quantity, band, operation=operation
+        ):
             return band
     if derived_band is not None:
-        if band_dimension_matches(quantity, derived_band):
+        if band_dimension_matches(quantity, derived_band, operation=operation):
             return derived_band
         return None
     if quantity not in GIBBS_BAND_QUANTITIES:
@@ -2006,6 +2077,60 @@ def decision_band_for(
     return band
 
 
+def _mapped_reading_uncertainty_dex(
+    uncertainty: Uncertainty,
+) -> Decimal | None:
+    """Dex width from mapped PRINTED verbatim or typed value/basis=dex.
+
+    Extracts store reading uncertainty as a verbatim mapping with keys such as
+    ``dex``, ``sigma_log10P_dex_per_point``, or nested
+    ``figure_reading_estimate.log10_p_atm_absolute_uncertainty_dex``. A typed
+    ``value`` with a dex ``basis`` is accepted the same way. Scalar PRINTED
+    strings remain handled by ``_printed_uncertainty_band``.
+    """
+
+    if uncertainty.value is not None and uncertainty.basis:
+        basis = uncertainty.basis.casefold()
+        if "dex" in basis:
+            raw = uncertainty.value
+            if isinstance(raw, tuple):
+                raw = abs(raw[1] - raw[0])
+            try:
+                width = abs(as_decimal(raw))
+            except (TypeError, ValueError, ArithmeticError, InvalidOperation):
+                width = None
+            if width is not None and width.is_finite() and width > 0:
+                return width
+
+    verbatim = uncertainty.verbatim
+    if isinstance(verbatim, Mapping):
+        return _dex_width_from_mapping(verbatim)
+    return None
+
+
+def _dex_width_from_mapping(mapping: Mapping[str, object]) -> Decimal | None:
+    keys = (
+        "dex",
+        "sigma_log10P_dex_per_point",
+        "sigma_log10p_dex_per_point",
+        "log10_p_atm_absolute_uncertainty_dex",
+    )
+    lower = {str(key).casefold(): value for key, value in mapping.items()}
+    for key in keys:
+        if key.casefold() not in lower:
+            continue
+        try:
+            width = abs(as_decimal(lower[key.casefold()]))
+        except (TypeError, ValueError, ArithmeticError, InvalidOperation):
+            continue
+        if width.is_finite() and width > 0:
+            return width
+    nested = mapping.get("figure_reading_estimate")
+    if isinstance(nested, Mapping):
+        return _dex_width_from_mapping(nested)
+    return None
+
+
 def _printed_uncertainty_band(
     quantity: Quantity,
     uncertainty: Uncertainty | None,
@@ -2013,13 +2138,28 @@ def _printed_uncertainty_band(
     *,
     source_observation: Observation | None = None,
 ) -> DecisionBand | None:
-    """Convert a scalar printed cell uncertainty to the scorer's metric unit."""
+    """Convert a printed cell uncertainty to the scorer's metric unit.
 
-    if (
-        uncertainty is None
-        or uncertainty.kind is not UncertaintyKind.PRINTED
-        or not isinstance(uncertainty.verbatim, str)
-    ):
+    Accepts scalar PRINTED strings (``±30%``) and the mapped reading forms
+    extracts actually store (``dex`` / ``sigma_log10P_dex_per_point`` / nested
+    figure-reading dex), plus typed dex value+basis.
+    """
+
+    if uncertainty is None or uncertainty.kind is not UncertaintyKind.PRINTED:
+        return None
+    # The band must be in the residual's own metric: the same identity-aware
+    # selector populate_numeric uses (residue element ppm is DEX, oxide wt%
+    # ABSOLUTE), not the quantity default (b-693/b-691 r2 finding 4).
+    operation = _residual_metric_operation(quantity, source_observation)
+    mapped = _mapped_reading_uncertainty_dex(uncertainty)
+    if mapped is not None:
+        if operation is MetricOperation.DEX:
+            return DecisionBand(
+                mapped, "dimensionless", "source-printed per-cell uncertainty"
+            )
+        # Mapped dex widths are already in log10 space; only attach on DEX rails.
+        return None
+    if not isinstance(uncertainty.verbatim, str):
         return None
     match = re.fullmatch(
         r"\s*(?:(?:±|\+/-)\s*)?\(?([+-]?(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][+-]?\d+)?)\)?\s*(%)?\s*",
@@ -2034,7 +2174,6 @@ def _printed_uncertainty_band(
     if not width.is_finite():
         return None
 
-    operation = metric_operation(quantity)
     if operation is None:
         return None
     percent = match.group(2) is not None
@@ -2139,7 +2278,12 @@ def populate_numeric(
     experiments: Mapping[str, Experiment] | None = None,
     derived_band: DecisionBand | None = None,
     operation_override: MetricOperation | None = None,
+    band_operation: MetricOperation | None = None,
 ) -> tuple[ResidualNumeric | None, RefusalReason | None, dict[str, object]]:
+    """``band_operation`` checks a row's OWN printed band against the row's
+    identity-aware metric. It is None for every borrowed/derived band, which
+    keeps the quantity-default dimension check (no envelope transfer).
+    """
     operation = operation_override or metric_operation(quantity)
     if operation is None:
         return None, RefusalReason.METRIC_DOMAIN, {"quantity": quantity.value}
@@ -2171,10 +2315,13 @@ def populate_numeric(
             observations=observations,
             experiments=experiments,
             derived_band=derived_band,
+            operation=band_operation,
         )
     # Dimension guard. decision_band_for normally filters mismatched bands;
     # keep this check for callers that replace it in a focused test.
-    if band is not None and not band_dimension_matches(quantity, band):
+    if band is not None and not band_dimension_matches(
+        quantity, band, operation=band_operation
+    ):
         return None, RefusalReason.DECISION_RULE_MISSING, {
             "reason": f"band_dimension_mismatch:{quantity.value}",
             "quantity": quantity.value,
@@ -2643,6 +2790,49 @@ def _omission_notice(quantity: Quantity, reason: str) -> Notice:
     )
 
 
+def _reactive_cell_not_modelled_notice(
+    quantity: Quantity,
+    materials: Sequence[Located[CellMaterial]] | None,
+) -> Notice:
+    cell_material = [
+        {
+            "field": "bench.cell_materials",
+            "value": item.state.value.value,
+        }
+        for item in materials or ()
+        if item.state.is_value and isinstance(item.state.value, CellMaterial)
+    ]
+    payload = json.dumps(
+        {"cell_material": cell_material},
+        ensure_ascii=False,
+        sort_keys=True,
+        separators=(",", ":"),
+    )
+    return Notice(
+        kind=NoticeKind.REACTIVE_CELL_NOT_MODELLED,
+        affected_quantities=(quantity,),
+        reason=(
+            "reactive cell: oxygen balance of the cell not modelled "
+            f"{payload}"
+        ),
+        origin="score:predict_with_engine",
+    )
+
+
+def _figure_only_notice(
+    quantity: Quantity | None, observation: Observation
+) -> Notice:
+    # Quantity may be unknown (typed refusal quantity_unknown); the evidence
+    # class label must still attach. Empty affected_quantities is allowed only
+    # for FIGURE_ONLY (see Notice.__post_init__).
+    return Notice(
+        kind=NoticeKind.FIGURE_ONLY,
+        affected_quantities=() if quantity is None else (quantity,),
+        reason="figure_only",
+        origin=observation.observation_id,
+    )
+
+
 def _cell_material_class(
     materials: Sequence[Located[CellMaterial]] | None,
 ) -> str:
@@ -2973,6 +3163,87 @@ def _implied_alpha_numeric(
     )
 
 
+def _knudsen_vapour_equilibrium(
+    quantity: Quantity, experiment: Experiment | None
+) -> bool:
+    """Vapour-equilibrium quantity measured by Knudsen effusion."""
+
+    return bool(
+        quantity in _VAPOUR_EQUILIBRIUM
+        and experiment is not None
+        and experiment.method.is_value
+        and experiment.method.value is MethodToken.KNUDSEN_EFFUSION
+    )
+
+
+def _cell_oxygen_class(
+    materials: Sequence[Located[CellMaterial]] | None,
+) -> tuple[str, str | None]:
+    """(material class, modelled reactive reservoir metal or None)."""
+
+    material_class = _cell_material_class(materials)
+    modelled = (
+        _uniform_modelled_reactive_cell(materials)
+        if material_class == "reactive"
+        else None
+    )
+    return material_class, modelled
+
+
+def _oxygen_input_request(
+    *,
+    engine: Engine,
+    channel: str,
+    sources: tuple[str, ...],
+    identity: Identity,
+    requested: State[Composition] | None,
+    quantity: Quantity,
+    composition_value: Composition | None,
+    input_notices: list[Notice],
+) -> "Po2Request | EnginePrediction":
+    """The scorer's one oxygen-input decision (b-693/b-691 r2 finding 5).
+
+    A printed fO2 is the commanded point (fO2_Pa is fugacity; pO2_bar =
+    fO2_Pa / 1e5 under the stated ideal-gas assumption, 1 bar = 100000 Pa
+    exactly). Otherwise a quantity that needs oxygen refuses
+    ``missing_fO2``; one that does not records the omission notice on
+    ``input_notices`` and runs with oxygen not an input. Every cell branch of
+    ``predict_with_engine`` consumes this; none re-derives it.
+    """
+
+    # Same lazy import predict_with_engine already uses (no new layer edge).
+    from simulator.diagnostic_helpers.binary_pot_battery import (
+        PO2_COMMANDED,
+        PO2_NOT_AN_INPUT,
+        Po2Request,
+    )
+
+    oxygen_required, oxygen_why, redox = oxygen_is_scorer_input(
+        identity, composition_value
+    )
+    fo2_state = identity.fO2_Pa
+    if fo2_state is not None and fo2_state.is_value and fo2_state.value is not None:
+        return Po2Request(mode=PO2_COMMANDED, po2_bar=float(fo2_state.value) / 1.0e5)
+    if oxygen_required:
+        return _input_refusal(
+            engine=engine,
+            channel=channel,
+            sources=sources,
+            identity=identity,
+            requested=requested,
+            reason=RefusalReason.IDENTITY_INCOMPLETE,
+            detail={
+                "reason": "missing_fO2",
+                "quantity": quantity.value,
+                "why": oxygen_why,
+                "multivalent": list(redox),
+            },
+            notices=tuple(input_notices),
+        )
+    input_notices.append(_omission_notice(quantity, oxygen_why))
+    return Po2Request(mode=PO2_NOT_AN_INPUT, po2_bar=None)
+
+
 def predict_with_engine(
     engine: Engine,
     observation: Observation,
@@ -3301,13 +3572,9 @@ def predict_with_engine(
         if pressure_notice is not None:
             input_notices.append(pressure_notice)
 
-    fo2_state = identity.fO2_Pa
-    oxygen_balance_effusion = (
-        quantity in _VAPOUR_EQUILIBRIUM
-        and experiment is not None
-        and experiment.method.is_value
-        and experiment.method.value is MethodToken.KNUDSEN_EFFUSION
-        and not _has_printed_fo2(observation, identity)
+    knudsen_vapour = _knudsen_vapour_equilibrium(quantity, experiment)
+    oxygen_balance_effusion = knudsen_vapour and not _has_printed_fo2(
+        observation, identity
     )
     if activity_payload is not None:
         # The contract's oxygen point, or none. Never an engine default.
@@ -3320,15 +3587,28 @@ def predict_with_engine(
             po2 = Po2Request(mode=PO2_NOT_AN_INPUT, po2_bar=None)
     elif oxygen_balance_effusion:
         cell_materials = bench.cell_materials if bench is not None else None
-        material_class = _cell_material_class(cell_materials)
-        modelled = (
-            _uniform_modelled_reactive_cell(cell_materials)
-            if material_class == "reactive"
-            else None
-        )
-        if material_class != "inert" and modelled is None:
+        material_class, modelled = _cell_oxygen_class(cell_materials)
+        if material_class == "reactive" and modelled is None:
+            # Out-of-domain physics: predict and flag. Keep refusal only when
+            # a required input is genuinely missing (the shared decision).
+            input_notices.append(
+                _reactive_cell_not_modelled_notice(quantity, cell_materials)
+            )
+            decision = _oxygen_input_request(
+                engine=engine,
+                channel=channel,
+                sources=sources,
+                identity=identity,
+                requested=requested,
+                quantity=quantity,
+                composition_value=composition_value,
+                input_notices=input_notices,
+            )
+            if isinstance(decision, EnginePrediction):
+                return decision
+            po2 = decision
+        elif material_class != "inert" and modelled is None:
             refusal_token = {
-                "reactive": "reactive_cell_oxygen_reservoir",
                 "not_inert": "cell_material_not_inert",
                 "unknown": "cell_material_unknown",
             }[material_class]
@@ -3356,52 +3636,56 @@ def predict_with_engine(
                 },
                 notices=tuple(input_notices),
             )
-        if engine not in OXYGEN_BALANCE_EFFUSION_ENGINES:
-            return _input_refusal(
-                engine=engine,
-                channel=channel,
-                sources=sources,
-                identity=identity,
-                requested=requested,
-                reason=RefusalReason.UNSUPPORTED,
-                detail={
-                    "reason": "oxygen_balance_effusion_unsupported_engine",
-                    "engine": engine.value,
-                },
-                notices=tuple(input_notices),
-            )
-        # The openimcc bridge discards pressure_bar; its balance solve uses
-        # printed composition-derived activities and T, never measured p_K.
-        po2 = Po2Request(
-            mode=PO2_OXYGEN_BALANCE_EFFUSION,
-            po2_bar=None,
-            cell_material=modelled,
-        )
-    else:
-        oxygen_required, oxygen_why, redox = oxygen_is_scorer_input(identity, composition_value)
-        if fo2_state is not None and fo2_state.is_value and fo2_state.value is not None:
-            # fO2_Pa is fugacity. Commanded pO2_bar = fO2_Pa / 1e5 under the
-            # stated ideal-gas assumption (1 bar = 100000 Pa exactly).
-            po2 = Po2Request(mode=PO2_COMMANDED, po2_bar=float(fo2_state.value) / 1.0e5)
-        elif oxygen_required:
-            return _input_refusal(
-                engine=engine,
-                channel=channel,
-                sources=sources,
-                identity=identity,
-                requested=requested,
-                reason=RefusalReason.IDENTITY_INCOMPLETE,
-                detail={
-                    "reason": "missing_fO2",
-                    "quantity": quantity.value,
-                    "why": oxygen_why,
-                    "multivalent": list(redox),
-                },
-                notices=tuple(input_notices),
-            )
         else:
-            po2 = Po2Request(mode=PO2_NOT_AN_INPUT, po2_bar=None)
-            input_notices.append(_omission_notice(quantity, oxygen_why))
+            if engine not in OXYGEN_BALANCE_EFFUSION_ENGINES:
+                return _input_refusal(
+                    engine=engine,
+                    channel=channel,
+                    sources=sources,
+                    identity=identity,
+                    requested=requested,
+                    reason=RefusalReason.UNSUPPORTED,
+                    detail={
+                        "reason": "oxygen_balance_effusion_unsupported_engine",
+                        "engine": engine.value,
+                    },
+                    notices=tuple(input_notices),
+                )
+            # The openimcc bridge discards pressure_bar; its balance solve uses
+            # printed composition-derived activities and T, never measured p_K.
+            po2 = Po2Request(
+                mode=PO2_OXYGEN_BALANCE_EFFUSION,
+                po2_bar=None,
+                cell_material=modelled,
+            )
+    else:
+        decision = _oxygen_input_request(
+            engine=engine,
+            channel=channel,
+            sources=sources,
+            identity=identity,
+            requested=requested,
+            quantity=quantity,
+            composition_value=composition_value,
+            input_notices=input_notices,
+        )
+        if isinstance(decision, EnginePrediction):
+            return decision
+        po2 = decision
+        # Printed-O2 (or oxygen-not-required) Knudsen path: still flag an
+        # unmodelled reactive cell so the label travels with the prediction.
+        if knudsen_vapour and bench is not None:
+            material_class, modelled = _cell_oxygen_class(bench.cell_materials)
+            if material_class == "reactive" and modelled is None:
+                if not any(
+                    notice.kind is NoticeKind.REACTIVE_CELL_NOT_MODELLED
+                    for notice in input_notices
+                ):
+                    input_notices.append(
+                        _reactive_cell_not_modelled_notice(
+                            quantity, bench.cell_materials
+                        )
+                    )
 
     if composition_value is not None:
         wt = composition_wt_pct(composition_value)
@@ -4431,7 +4715,15 @@ def compile_residual(
         else _bench_for_score(experiment, context.benches)
     )
     flagged_notices = _flagged_stratum_notices(reference, experiment, gates, bench)
-    notices = union_notices(reference.notices, flagged_notices)
+    figure_only_notices: tuple[Notice, ...] = ()
+    evidence_class = reference.evidence.class_
+    figure_only = (
+        evidence_class.is_value
+        and evidence_class.value is EvidenceClass.FIGURE_ONLY
+    )
+    if figure_only:
+        figure_only_notices = (_figure_only_notice(quantity, reference),)
+    notices = union_notices(reference.notices, flagged_notices, figure_only_notices)
     comparison_ids = comparison_ids or {reference.observation_id}
 
     def _refused(
@@ -4593,7 +4885,12 @@ def compile_residual(
             "handles": handles,
             "experiment": experiment,
         }
-        if predict is None and experiment is not None:
+        # The recorded bench goes to the built-in predictor whether it is
+        # selected implicitly (predict=None) or explicitly
+        # (predict=predict_with_engine): the reactive-cell label follows the
+        # bench, not the call style (b-693/b-691 r2 finding 6). Caller-supplied
+        # predictors keep the handles/experiment keyword contract.
+        if predictor is predict_with_engine and experiment is not None:
             recorded = _bench_for_score(experiment, context.benches)
             if recorded is not None:
                 predictor_kwargs["bench"] = recorded
@@ -4828,6 +5125,21 @@ def compile_residual(
                 ref_point,
                 source_observation=reference,
             ) or cell_band
+        row_operation = _residual_metric_operation(quantity, reference)
+        own_band_operation: MetricOperation | None = None
+        if figure_only:
+            # Figure reading band comes only from this row's stored uncertainty.
+            # Never fall back to the global measured KEMS cell band (that
+            # borrows another source's envelope). Being the row's own band, it
+            # is dimension-checked in the row's identity-aware metric (r2 F4).
+            cell_band = _printed_uncertainty_band(
+                quantity,
+                reference.uncertainty,
+                ref_point,
+                source_observation=reference,
+            )
+            if cell_band is not None:
+                own_band_operation = row_operation
         numeric, metric_reason, metric_detail = populate_numeric(
             quantity=quantity,
             candidate=prediction.value,
@@ -4847,7 +5159,8 @@ def compile_residual(
             observations=context.observations,
             experiments=context.experiments,
             derived_band=cell_band,
-            operation_override=metric_operation_for_identity(reference.identity),
+            operation_override=row_operation,
+            band_operation=own_band_operation,
         )
     if numeric is None:
         return _refused(
@@ -4859,12 +5172,20 @@ def compile_residual(
             source_relation=source_relation,
             exclusions=("valid_metric_domain",),
         )
+    # figure_only and reactive-cell-not-modelled keep their numeric band: they
+    # are labels on a predicted quantity, not reasons the reading band is void.
+    # Catalogue-composition on a figure row is the same kind of label: preserve
+    # the stored reading band while keeping the row out of the certified subset.
+    band_preserving_kinds = {
+        NoticeKind.CELL_MATERIAL_INFERRED,
+        NoticeKind.FIGURE_ONLY,
+        NoticeKind.REACTIVE_CELL_NOT_MODELLED,
+    }
+    if figure_only:
+        band_preserving_kinds.add(NoticeKind.COMPOSITION_FROM_SAMPLE_CATALOG)
     has_no_band_flag = any(
-        notice.kind is not NoticeKind.CELL_MATERIAL_INFERRED
-        for notice in flagged_notices
-    ) or any(
-        _is_fusion_conversion_notice(notice) for notice in notices
-    )
+        notice.kind not in band_preserving_kinds for notice in flagged_notices
+    ) or any(_is_fusion_conversion_notice(notice) for notice in notices)
     if has_no_band_flag:
         numeric = replace(numeric, decision_band=None)
     if implied_alpha:
@@ -5011,12 +5332,23 @@ def load_score_context(
 
 
 def comparison_candidates(context: ScoreContext) -> tuple[Observation, ...]:
-    """Measured evidence, admitted or pending (pending is diagnostic)."""
+    """Measured or figure_only evidence, admitted or pending (pending is diagnostic).
+
+    FIGURE_ONLY rows are candidates (owner mandate: score everything; evidence
+    class is a label). They stay out of the certified/measured headline via
+    the figure_only notice and by not being in MEASURED_EVIDENCE.
+    """
 
     out: list[Observation] = []
     for obs in context.observations.values():
         ev = obs.evidence.class_
-        if not (ev.is_value and ev.value in MEASURED_EVIDENCE):
+        if not (
+            ev.is_value
+            and (
+                ev.value in MEASURED_EVIDENCE
+                or ev.value is EvidenceClass.FIGURE_ONLY
+            )
+        ):
             continue
         if obs.admission.status not in {AdmissionStatus.ADMITTED, AdmissionStatus.PENDING}:
             continue
@@ -5742,6 +6074,25 @@ def _rms(values: Sequence[Decimal]) -> Decimal | None:
     return (sum((value * value for value in values), Decimal(0)) / Decimal(len(values))).sqrt()
 
 
+def _iqr(values: Sequence[Decimal]) -> Decimal | None:
+    """Interquartile range of ``values``; None when fewer than two samples."""
+
+    if len(values) < 2:
+        return None
+    ordered = sorted(values)
+    n = len(ordered)
+
+    def _quartile(p: float) -> Decimal:
+        # Inclusive rank; matches the descriptive IQR used in the report.
+        pos = p * (n - 1)
+        lo = int(pos)
+        hi = min(lo + 1, n - 1)
+        frac = Decimal(str(pos - lo))
+        return ordered[lo] + (ordered[hi] - ordered[lo]) * frac
+
+    return _quartile(0.75) - _quartile(0.25)
+
+
 def _measured_residuals(
     residuals: Sequence[Residual],
     context: ScoreContext | None,
@@ -5997,6 +6348,10 @@ def headline_rows(
     compilation rows remain a separate diagnostic tier.
     """
 
+    if tier == ALL_NUMERIC_TIER:
+        return _all_numeric_rows_from_residuals(
+            residuals, context=context, engines=engines
+        )
     groups: dict[tuple[str, str], list[Residual]] = {}
     engines_seen: set[str] = set()
     if tier == "measured":
@@ -6085,12 +6440,386 @@ def headline_records(
     context: ScoreContext | None = None,
     engines: Sequence[Engine] | None = None,
 ) -> list[dict[str, object]]:
-    """Machine-readable measured and compilation band-membership records."""
+    """Machine-readable all-numeric (A), certified (B), and compilation records."""
 
     return [
+        *headline_rows(residuals, context=context, tier=ALL_NUMERIC_TIER, engines=engines),
         *headline_rows(residuals, context=context, tier="measured", engines=engines),
         *headline_rows(residuals, context=context, tier="compilation", engines=engines),
     ]
+
+
+# ---------------------------------------------------------------------------
+# b-691 all-numeric (A) headline: ONE owner (b-693/b-691 round-2 finding 5).
+#
+# Every writer (typed JSON, streamed JSON + Markdown, report-only payload JSON
+# + Markdown) feeds the same facts to ``_AllNumericHeadline`` and prints its
+# records. A never re-derives admission: ``certified`` on each fact is the
+# caller's own measured/certified (B) membership decision for that row.
+# Statistics are stratified by quantity / metric operation / unit; only DEX
+# residuals contribute to a ``*_dex`` statistic (round-2 finding 3).
+# ---------------------------------------------------------------------------
+
+ALL_NUMERIC_TIER = "all_numeric"
+
+
+@dataclass(frozen=True)
+class _AllNumericFact:
+    rail: str
+    engine: str
+    quantity: str
+    operation: str
+    unit: str
+    value: Decimal
+    status: str
+    score_eligible: bool
+    strata: tuple[str, ...]
+    source_id: str
+    certified: bool
+
+
+def _residual_key_quantity(key: object) -> str:
+    """Quantity token of a ``residual_key`` (``…::q::rail::engine``)."""
+
+    parts = str(key or "").rsplit("::", 3)
+    return parts[1] if len(parts) == 4 and parts[1] else "quantity_unknown"
+
+
+def _all_numeric_source_id(reference: str, observation: Observation | None) -> str:
+    return (
+        observation.source_id
+        if observation is not None and observation.source_id
+        else reference
+    )
+
+
+def _all_numeric_fact(
+    row: Mapping[str, object],
+    *,
+    engine: str,
+    observation: Observation | None,
+    certified: bool,
+    value: Decimal | None = None,
+) -> _AllNumericFact | None:
+    """One numeric residual payload as the A headline sees it, or None."""
+
+    numeric = row.get("numeric")
+    rail = str(row.get("rail") or "")
+    if not rail or not isinstance(numeric, Mapping):
+        return None
+    if value is None:
+        raw = numeric.get("value")
+        if raw is None:
+            return None
+        try:
+            value = as_decimal(raw)
+        except (TypeError, ValueError, ArithmeticError):
+            return None
+    return _AllNumericFact(
+        rail=rail,
+        engine=engine,
+        quantity=_residual_key_quantity(row.get("key")),
+        operation=str(numeric.get("operation") or ""),
+        unit=str(numeric.get("unit") or ""),
+        value=value,
+        status=str(row.get("status") or ""),
+        score_eligible=bool(row.get("score_eligible")),
+        strata=_flagged_payload_strata(row),
+        source_id=_all_numeric_source_id(str(row.get("reference") or ""), observation),
+        certified=certified,
+    )
+
+
+def _all_numeric_metric_label(operation: str, unit: str) -> str:
+    """Label of one metric stratum. Only a DEX metric is ever called dex."""
+
+    if operation == MetricOperation.DEX.value:
+        return "dex"
+    if operation == MetricOperation.RELATIVE.value:
+        return f"relative ({unit})"
+    return f"absolute ({unit})"
+
+
+def _all_numeric_stats(values: Sequence[Decimal]) -> dict[str, str | None]:
+    median = _median(values)
+    median_abs = _median_abs(values)
+    iqr = _iqr(values)
+    rms = _rms(values)
+    return {
+        "median": None if median is None else str(median),
+        "median_abs": None if median_abs is None else str(median_abs),
+        "iqr": None if iqr is None else str(iqr),
+        "rms": None if rms is None else str(rms),
+    }
+
+
+class _AllNumericHeadline:
+    """Single owner of the A headline: grid, strata, flag classes, sources."""
+
+    def __init__(self) -> None:
+        self._facts: dict[tuple[str, str], list[_AllNumericFact]] = defaultdict(list)
+
+    def add(self, fact: _AllNumericFact | None) -> None:
+        if fact is not None:
+            self._facts[(fact.rail, fact.engine)].append(fact)
+
+    @property
+    def engines_seen(self) -> set[str]:
+        return {engine for _rail, engine in self._facts}
+
+    def records(
+        self,
+        engine_names: Iterable[str],
+        *,
+        include_seen: bool = True,
+    ) -> list[dict[str, object]]:
+        """Complete rail × engine grid; empty cells are n = 0 records."""
+
+        names = set(engine_names)
+        if include_seen:
+            names |= self.engines_seen
+        return [
+            self._record(rail, engine, self._facts.get((rail, engine), ()))
+            for rail, engine in sorted(
+                (rail.value, engine) for rail in Rail for engine in names
+            )
+        ]
+
+    @staticmethod
+    def _record(
+        rail: str, engine: str, facts: Sequence[_AllNumericFact]
+    ) -> dict[str, object]:
+        dex_values = [
+            fact.value for fact in facts if fact.operation == MetricOperation.DEX.value
+        ]
+        dex = _all_numeric_stats(dex_values)
+        strata: dict[tuple[str, str, str], list[Decimal]] = defaultdict(list)
+        flag_counts: dict[str, int] = defaultdict(int)
+        sources: dict[str, dict[str, object]] = {}
+        for fact in facts:
+            strata[(fact.quantity, fact.operation, fact.unit)].append(fact.value)
+            for stratum in fact.strata or ("unflagged",):
+                flag_counts[stratum] += 1
+            entry = sources.setdefault(
+                fact.source_id,
+                {
+                    "source_id": fact.source_id,
+                    "n_numeric": 0,
+                    "n_certified": 0,
+                    "n_flagged": 0,
+                    "flag_class_counts": defaultdict(int),
+                },
+            )
+            entry["n_numeric"] = int(entry["n_numeric"]) + 1
+            entry["n_certified"] = int(entry["n_certified"]) + int(fact.certified)
+            if fact.strata:
+                entry["n_flagged"] = int(entry["n_flagged"]) + 1
+                source_flags = entry["flag_class_counts"]
+                assert isinstance(source_flags, defaultdict)
+                for stratum in fact.strata:
+                    source_flags[stratum] += 1
+        return {
+            "tier": ALL_NUMERIC_TIER,
+            "rail": rail,
+            "engine": engine,
+            "n": len(facts),
+            "n_certified": sum(1 for fact in facts if fact.certified),
+            "n_flagged": sum(1 for fact in facts if fact.strata),
+            "n_score_eligible": sum(1 for fact in facts if fact.score_eligible),
+            "n_inside_band": sum(
+                1 for fact in facts if fact.status == ResidualStatus.MATCH.value
+            ),
+            "n_no_band": sum(
+                1 for fact in facts if fact.status == ResidualStatus.NO_BAND.value
+            ),
+            "n_dex": len(dex_values),
+            "median_dex": dex["median"],
+            "median_abs_dex": dex["median_abs"],
+            "iqr_dex": dex["iqr"],
+            "rms_dex": dex["rms"],
+            "metric_strata": [
+                {
+                    "quantity": quantity,
+                    "operation": operation,
+                    "unit": unit,
+                    "label": _all_numeric_metric_label(operation, unit),
+                    "n": len(values),
+                    **_all_numeric_stats(values),
+                }
+                for (quantity, operation, unit), values in sorted(strata.items())
+            ],
+            "flag_class_counts": dict(sorted(flag_counts.items())),
+            "sources": [
+                {
+                    **{key: value for key, value in entry.items() if key != "flag_class_counts"},
+                    "flag_class_counts": dict(
+                        sorted(entry["flag_class_counts"].items())  # type: ignore[union-attr]
+                    ),
+                }
+                for _source_id, entry in sorted(sources.items())
+            ],
+        }
+
+
+def _all_numeric_rows_from_residuals(
+    residuals: Sequence[Residual],
+    *,
+    context: ScoreContext | None,
+    engines: Sequence[Engine] | None,
+) -> list[dict[str, object]]:
+    """Typed adapter: certified membership is ``_measured_residuals`` (B)."""
+
+    from simulator.battery.compilation_tier import reference_observation
+
+    certified_ids = {id(residual) for residual in _measured_residuals(residuals, context)}
+    owner = _AllNumericHeadline()
+    for residual in residuals:
+        if residual.numeric is None or residual.rail is None:
+            continue
+        owner.add(
+            _all_numeric_fact(
+                residual_to_plain(residual),
+                engine=_engine_of(residual),
+                observation=(
+                    None
+                    if context is None
+                    else reference_observation(context.observations, residual.reference)
+                ),
+                certified=id(residual) in certified_ids,
+                value=residual.numeric.value,
+            )
+        )
+    engine_names = [engine.value for engine in engines or ()]
+    if not engine_names and not owner.engines_seen:
+        engine_names = [engine.value for engine in SCORE_ENGINE_SET]
+    return owner.records(engine_names)
+
+
+def _payload_measured_reference(
+    observations: Mapping[str, Observation] | None,
+    origins: Mapping[str, str] | None,
+) -> Callable[[Mapping[str, object]], bool]:
+    """Measured-tier reference membership for residual payloads (one owner)."""
+
+    if observations is None:
+        return lambda row: _reference_has_measured_evidence(
+            None, exclusions=row.get("exclusions")
+        )
+    from simulator.battery.compilation_tier import compilation_row_observation
+
+    def member(row: Mapping[str, object]) -> bool:
+        reference = str(row.get("reference") or "")
+        return compilation_row_observation(
+            reference, observations, origins
+        ) is None and _reference_has_measured_evidence(
+            observations.get(reference), exclusions=row.get("exclusions")
+        )
+
+    return member
+
+
+def all_numeric_payload_records(
+    rows: Iterable[Mapping[str, object]],
+    *,
+    engines: Sequence[Engine],
+    observations: Mapping[str, Observation] | None = None,
+    origins: Mapping[str, str] | None = None,
+) -> list[dict[str, object]]:
+    """Report-only adapter shared by the payload JSON and Markdown writers.
+
+    ``certified`` is the payload B decision: measured-tier reference
+    membership plus the measured headline row filter.
+    """
+
+    from simulator.battery.compilation_tier import reference_observation
+
+    measured_reference = _payload_measured_reference(observations, origins)
+    owner = _AllNumericHeadline()
+    for row in rows:
+        reference = str(row.get("reference") or "")
+        owner.add(
+            _all_numeric_fact(
+                row,
+                engine=_ScorePayloadAccumulator._engine(row),
+                observation=(
+                    None
+                    if observations is None
+                    else reference_observation(observations, reference)
+                ),
+                certified=measured_reference(row)
+                and _headline_payload_admits(row, tier="measured"),
+            )
+        )
+    return owner.records(engine.value for engine in engines)
+
+
+def _all_numeric_markdown_lines(
+    records: Sequence[Mapping[str, object]],
+    *,
+    regenerated: bool = True,
+) -> list[str]:
+    """The A section for both Markdown writers; every grid row is printed."""
+
+    lines = [
+        "## All-numeric tier",
+        "",
+        "Co-equal descriptive headline (A) over every priced residual, certified and "
+        "flagged. Every rail × engine cell is printed, n = 0 included. Dex statistics "
+        "use DEX residuals only; every other metric stays in its own quantity / "
+        "operation / unit stratum below and is never labelled dex. n certified is the "
+        "measured (B) membership decision, consumed rather than recomputed. Does not "
+        "change the measured/certified table.",
+        "",
+    ]
+    if not regenerated:
+        lines.append("Not regenerated.")
+        return lines
+    lines.extend(
+        [
+            "| rail | engine | n | n certified | n flagged | n dex | median dex | "
+            "IQR dex | flag classes | sources |",
+            "|---|---|---:|---:|---:|---:|---:|---:|---|---|",
+        ]
+    )
+    strata_lines: list[str] = []
+    for row in records:
+        flags = row.get("flag_class_counts") or {}
+        assert isinstance(flags, Mapping)
+        flag_s = ", ".join(f"{k}={v}" for k, v in flags.items()) if flags else "—"
+        sources = row.get("sources") or []
+        assert isinstance(sources, Sequence)
+        source_s = (
+            ", ".join(
+                f"{s.get('source_id')}(n={s.get('n_numeric')},"
+                f"cert={s.get('n_certified')},flag={s.get('n_flagged')})"
+                for s in sources
+                if isinstance(s, Mapping)
+            )
+            or "—"
+        )
+        lines.append(
+            f"| {row['rail']} | {row['engine']} | {row['n']} | {row['n_certified']} | "
+            f"{row['n_flagged']} | {row['n_dex']} | {row.get('median_dex') or '—'} | "
+            f"{row.get('iqr_dex') or '—'} | {flag_s} | {source_s} |"
+        )
+        for stratum in row.get("metric_strata") or ():
+            assert isinstance(stratum, Mapping)
+            strata_lines.append(
+                f"| {row['rail']} | {row['engine']} | {stratum['quantity']} | "
+                f"{stratum['label']} | {stratum['n']} | {stratum.get('median') or '—'} | "
+                f"{stratum.get('iqr') or '—'} |"
+            )
+    lines.extend(
+        [
+            "",
+            "### All-numeric metric strata",
+            "",
+            "| rail | engine | quantity | metric | n | median | IQR |",
+            "|---|---|---|---|---:|---:|---:|",
+            *(strata_lines or ["| (none) | — | — | — | 0 | — | — |"]),
+        ]
+    )
+    return lines
 
 
 HEADLINE_SUMMARY_KIND = "battery_headline_summary"
@@ -6472,6 +7201,21 @@ def _render_score_report_from_payloads_legacy(
     else:
         for row in unassigned_census:
             lines.append(_census_count_line(row, f"`{row['reason']}`"))
+    report_engine_names = set(aggregate.report_engine_names)
+    if not report_engine_names:
+        report_engine_names = {engine.value for engine in SCORE_ENGINE_SET}
+    report_engines = tuple(Engine(name) for name in sorted(report_engine_names))
+    # A has its own complete engine × rail grid (the run's engines plus any
+    # engine with an A row); B keeps its measured-only membership below.
+    lines.extend(
+        [
+            "",
+            *_all_numeric_markdown_lines(
+                aggregate.all_numeric.records(engine.value for engine in engines),
+                regenerated=has_residuals,
+            ),
+        ]
+    )
     lines.extend(
         [
             "",
@@ -6493,10 +7237,6 @@ def _render_score_report_from_payloads_legacy(
                 "|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|",
             ]
         )
-        report_engine_names = set(aggregate.report_engine_names)
-        if not report_engine_names:
-            report_engine_names = {engine.value for engine in SCORE_ENGINE_SET}
-        report_engines = tuple(Engine(name) for name in sorted(report_engine_names))
         for row in aggregate.headline_records(engines=report_engines):
             if row.get("tier") != "measured":
                 continue
@@ -6769,16 +7509,9 @@ def headline_payloads(
         for engine in engine_names:
             groups[(rail.value, engine)] = _empty_headline_payload_stats()
     for row in rows:
-        if _flagged_payload_strata(row):
+        if not _headline_payload_admits(row, tier=tier):
             continue
-        if tier == "measured" and not _reference_has_measured_evidence(
-            None, exclusions=row.get("exclusions")
-        ):
-            continue
-        raw_rail = row.get("rail")
-        if not raw_rail:
-            continue
-        rail = str(raw_rail)
+        rail = str(row.get("rail"))
         engine = str(
             ((row.get("candidate_request") or {}) if isinstance(row.get("candidate_request"), Mapping) else {}).get("engine")
             or str(row.get("key") or "").rsplit("::", 1)[-1]
@@ -6839,6 +7572,22 @@ def headline_payloads(
     return out
 
 
+def _headline_payload_admits(row: Mapping[str, object], *, tier: str) -> bool:
+    """Row filter of the measured/compilation payload headline (one owner).
+
+    Flagged rows never enter; the measured tier also needs measured evidence.
+    The all-numeric headline consumes this as the payload B decision.
+    """
+
+    if _flagged_payload_strata(row):
+        return False
+    if tier == "measured" and not _reference_has_measured_evidence(
+        None, exclusions=row.get("exclusions")
+    ):
+        return False
+    return bool(row.get("rail"))
+
+
 def _flagged_payload_strata(row: Mapping[str, object]) -> tuple[str, ...]:
     notices = tuple(
         notice
@@ -6877,6 +7626,10 @@ def _flagged_payload_strata(row: Mapping[str, object]) -> tuple[str, ...]:
         out.append(FLAGGED_STRATUM_IMCC_COMPLEX_SATURATION)
     if any(_is_fusion_conversion_reason(notice.get("reason")) for notice in notices):
         out.append(FLAGGED_STRATUM_REFERENCE_CONVERTED_VIA_FUSION)
+    if NoticeKind.FIGURE_ONLY.value in kinds:
+        out.append(FLAGGED_STRATUM_FIGURE_ONLY)
+    if NoticeKind.REACTIVE_CELL_NOT_MODELLED.value in kinds:
+        out.append(FLAGGED_STRATUM_REACTIVE_CELL_NOT_MODELLED)
     return tuple(out)
 
 
@@ -7364,8 +8117,11 @@ def headline_payload_records(
 ) -> list[dict[str, object]]:
     """Machine-readable headline records from residual payloads."""
 
-    measured_rows: Iterable[Mapping[str, object]]
     compilation_rows: Iterable[Mapping[str, object]] = ()
+    is_measured = _payload_measured_reference(observations, origins)
+    measured_rows: Iterable[Mapping[str, object]] = (
+        row for row in rows if is_measured(row)
+    )
     if observations is not None:
         from simulator.battery.compilation_tier import compilation_row_observation
 
@@ -7377,23 +8133,11 @@ def headline_payload_records(
                 is not None
             )
 
-        def is_measured(row: Mapping[str, object]) -> bool:
-            reference = observations.get(str(row.get("reference") or ""))
-            return not is_compilation(row) and _reference_has_measured_evidence(
-                reference, exclusions=row.get("exclusions")
-            )
-
-        measured_rows = (row for row in rows if is_measured(row))
         compilation_rows = (row for row in rows if is_compilation(row))
-    else:
-        measured_rows = (
-            row
-            for row in rows
-            if _reference_has_measured_evidence(
-                None, exclusions=row.get("exclusions")
-            )
-        )
     records = [
+        *all_numeric_payload_records(
+            rows, engines=engines, observations=observations, origins=origins
+        ),
         *headline_payloads(measured_rows, engines, tier="measured"),
         *headline_payloads(compilation_rows, engines, tier="compilation"),
     ]
@@ -7596,6 +8340,7 @@ class _ScorePayloadAccumulator:
         self.headline_groups: dict[
             str, dict[tuple[str, str], dict[str, object]]
         ] = {"measured": {}, "compilation": {}}
+        self.all_numeric = _AllNumericHeadline()
         self.report_engine_names: set[str] = set()
         self.count = 0
         self.scored_count = 0
@@ -7892,18 +8637,35 @@ class _ScorePayloadAccumulator:
         exclusions = row.get("exclusions")
         compilation_observation = metadata.observation if metadata.is_compilation else None
         measured = metadata.is_measured
+        rail = str(row.get("rail") or "")
+        # The certified (B) membership decision for this row, made once and
+        # consumed by the all-numeric (A) owner rather than re-derived there.
+        in_measured_headline = bool(
+            measured
+            and _reference_has_measured_evidence(None, exclusions=exclusions)
+            and rail
+        )
+        if numeric_value is not None:
+            # A never adds to report_engine_names: that set is B's grid.
+            self.all_numeric.add(
+                _all_numeric_fact(
+                    row,
+                    engine=engine,
+                    observation=metadata.observation,
+                    certified=in_measured_headline,
+                    value=numeric_value,
+                )
+            )
         if measured:
-            if _reference_has_measured_evidence(None, exclusions=exclusions):
-                rail = str(row.get("rail") or "")
-                if rail:
-                    self.report_engine_names.add(engine)
-                    self._add_headline(
-                        row,
-                        tier="measured",
-                        rail=rail,
-                        engine=engine,
-                        numeric_value=numeric_value,
-                    )
+            if in_measured_headline:
+                self.report_engine_names.add(engine)
+                self._add_headline(
+                    row,
+                    tier="measured",
+                    rail=rail,
+                    engine=engine,
+                    numeric_value=numeric_value,
+                )
             if row.get("status") == ResidualStatus.REFUSED.value:
                 refusal = row.get("refusal") or {}
                 if isinstance(refusal, Mapping):
@@ -7992,7 +8754,9 @@ class _ScorePayloadAccumulator:
         selected_names = (
             self.engine_names if engines is None else {engine.value for engine in engines}
         )
-        records: list[dict[str, object]] = []
+        records: list[dict[str, object]] = self.all_numeric.records(
+            selected_names, include_seen=engines is None
+        )
         for tier in ("measured", "compilation"):
             groups = self.headline_groups[tier]
             keys = {
@@ -8215,20 +8979,11 @@ def render_score_report_from_payloads(
     compilation_lines: list[str] = []
     if observations is not None:
         from simulator.battery.compilation_tier import (
-            compilation_row_observation,
             compilation_tier_lines_from_payloads,
         )
 
         measured_rows = _FilteredPayloadRows(
-            unflagged_rows,
-            lambda row: _reference_has_measured_evidence(
-                observations.get(str(row.get("reference") or "")),
-                exclusions=row.get("exclusions"),
-            )
-            and compilation_row_observation(
-                str(row.get("reference") or ""), observations, origins
-            )
-            is None,
+            unflagged_rows, _payload_measured_reference(observations, origins)
         )
         compilation_lines = compilation_tier_lines_from_payloads(
             unflagged_rows, observations, origins
@@ -8253,6 +9008,16 @@ def render_score_report_from_payloads(
         [
             "",
             f"Engines: {', '.join(e.value for e in engines)}.",
+            "",
+            *_all_numeric_markdown_lines(
+                all_numeric_payload_records(
+                    rows, engines=engines, observations=observations, origins=origins
+                )
+            ),
+        ]
+    )
+    lines.extend(
+        [
             "",
             "## Measured tier" if observations is not None else "## Per rail × engine headline",
             "",

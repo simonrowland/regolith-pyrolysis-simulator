@@ -1,14 +1,14 @@
 # Battery v2.1 migration report
 
-rows in: 47835
-records out (observations): 121777
+rows in: 47829
+records out (observations): 121821
 works: 269
-experiments: 3568
-queue size: 77514
-identical-payload dedupe aliases: 339
+experiments: 3564
+queue size: 77476
+identical-payload dedupe aliases: 342
 metadata files: 43
 index sources: 272
-hard issues: 3609
+hard issues: 3625
 
 ## Spec vs measured
 
@@ -17,19 +17,19 @@ hard issues: 3609
 | citations | 147 | 271 (mismatch) |
 | doi_works | 56 | 129 (mismatch) |
 | no_doi_works | 91 | 140 (mismatch) |
-| admission_statuses | 374 | 1180 (mismatch) |
+| admission_statuses | 374 | 1174 (mismatch) |
 | supersedes | 422 | 650 (mismatch) |
-| series | 60 | 597 (mismatch) |
+| series | 60 | 599 (mismatch) |
 | gibbs_reference_pressures | 1617 | 1635 (mismatch) |
 | gibbs_reference_100000 | 1023 | 1029 (mismatch) |
 | gibbs_reference_101325 | 594 | 594 |
 | formulas | 1625 | 2044 (mismatch) |
-| equipment_payloads | 670 | 972 (mismatch) |
+| equipment_payloads | 670 | 966 (mismatch) |
 | absent_admissions | 3511 | 5036 (mismatch) |
 | absent_classes | 2174 | 2203 (mismatch) |
 | range_only_T | 3125 | 2666 (mismatch) |
 | system_like_phases | 1065 | 2698 (mismatch) |
-| missing_phases | 237 | 588 (mismatch) |
+| missing_phases | 237 | 582 (mismatch) |
 | tabulated_lists | — | 6 |
 
 ## Evidence-class fall-throughs
@@ -16407,7 +16407,7 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/manifest.yaml` | 0 | 0 | 0 |
 | `data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0001.json` | 1 | 0 | 0 |
 | `data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0002.json` | 1 | 0 | 0 |
-| `data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0003.json` | 1 | 1646 | 0 |
+| `data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0003.json` | 1 | 1850 | 0 |
 | `data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0004-phase-02.json` | 1 | 18 | 0 |
 | `data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0004.json` | 1 | 30 | 0 |
 | `data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0005-phase-02.json` | 1 | 29 | 0 |
@@ -16744,8 +16744,8 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0199.json` | 1 | 16 | 0 |
 | `data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0200.json` | 1 | 0 | 0 |
 | `data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0201.json` | 1 | 62 | 0 |
-| `data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0202.json` | 1 | 34 | 0 |
-| `data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0203.json` | 1 | 27 | 0 |
+| `data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0202.json` | 1 | 0 | 0 |
+| `data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0203.json` | 1 | 0 | 0 |
 | `data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0204.json` | 1 | 38 | 0 |
 | `data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0205-phase-02.json` | 1 | 30 | 0 |
 | `data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/records/robie-hemingway-fisher-1978-usgs-b1452-0205.json` | 1 | 37 | 0 |
@@ -17156,7 +17156,7 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-298k-0142-eskolaite.json` | 1 | 4 | 0 |
 | `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-298k-0143-tenorite.json` | 1 | 4 | 0 |
 | `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-298k-0144-cuprite.json` | 1 | 4 | 0 |
-| `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-298k-0145-wustite.json` | 1 | 3 | 0 |
+| `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-298k-0145-wustite.json` | 1 | 0 | 0 |
 | `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-298k-0146-ferrous-oxide.json` | 1 | 4 | 0 |
 | `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-298k-0147-hematite.json` | 1 | 4 | 0 |
 | `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-298k-0148-magnetite.json` | 1 | 4 | 0 |
@@ -17429,7 +17429,7 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0081-eskolaite.json` | 1 | 89 | 0 |
 | `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0082-tenorite.json` | 1 | 50 | 0 |
 | `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0083-cuprite.json` | 1 | 50 | 0 |
-| `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0084-wustite.json` | 1 | 96 | 0 |
+| `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0084-wustite.json` | 1 | 0 | 0 |
 | `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0085-ferrous-oxide-stoichiometric.json` | 1 | 96 | 0 |
 | `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0086-hematite.json` | 1 | 93 | 0 |
 | `data/literature/compilations/robie-waldbaum-1968-usgs-b1259/records/b1259-ht-0087-magnetite.json` | 1 | 80 | 0 |
@@ -17966,7 +17966,7 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/compilations/sgte-unary/source/sidecar.yaml` | 0 | 0 | 0 |
 | `data/literature/extracts/1997jonesthermo-jones-1997.yaml` | 2 | 2 | 10 |
 | `data/literature/extracts/2010zahnle-schaefer-fegley-cshperspect-ori-a004895-2019.yaml` | 8 | 9 | 43 |
-| `data/literature/extracts/aithala-2026-magmatic-iron-redox-to-2100c.yaml` | 28 | 28 | 112 |
+| `data/literature/extracts/aithala-2026-magmatic-iron-redox-to-2100c.yaml` | 28 | 28 | 96 |
 | `data/literature/extracts/ames-walsh-white-1967.yaml` | 2 | 2 | 8 |
 | `data/literature/extracts/ammin-73-470-oneill-1988.yaml` | 9 | 9 | 43 |
 | `data/literature/extracts/ammin-75-781-hemingway-1990.yaml` | 12 | 12 | 48 |
@@ -18041,7 +18041,7 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 | `data/literature/extracts/kems-021-plante-1992-feo.yaml` | 10 | 25 | 40 |
 | `data/literature/extracts/kems-022-demaria-1971.yaml` | 32 | 117 | 195 |
 | `data/literature/extracts/kems-023-demaria-1973.yaml` | 30 | 75 | 58 |
-| `data/literature/extracts/kems-024-gibson-hubbard-1972.yaml` | 108 | 108 | 314 |
+| `data/literature/extracts/kems-024-gibson-hubbard-1972.yaml` | 102 | 108 | 292 |
 | `data/literature/extracts/kems-025-markova-1983.yaml` | 22 | 44 | 63 |
 | `data/literature/extracts/kems-026-markova-1984.yaml` | 15 | 37 | 61 |
 | `data/literature/extracts/kems-027-plante-hastie-1983.yaml` | 26 | 48 | 110 |
@@ -18245,13 +18245,13 @@ Unrecognised printed spellings become State.unknown with the original spelling i
 
 ## Hard issue census
 
-hard issues: 3609
+hard issues: 3625
 
 MODEL_DERIVED / MEASURED_REDUCED keep their mapped evidence class. Parent pointers are not fabricated. Unstated derived_from / derivation is a hard conditional_field queued for page-grounding.
 
 | kind | count |
 |---|---:|
-| `conditional_field:derived_from` | 1990 |
+| `conditional_field:derived_from` | 2006 |
 | `conditional_field:derivation` | 1619 |
 
 ## Hard issues (first 50)
@@ -18266,6 +18266,22 @@ MODEL_DERIVED / MEASURED_REDUCED keep their mapped evidence class. Parent pointe
 - `observation[2010zahnle-schaefer-fegley-cshperspect-ori-a004895-2019::zahnle_2010_hot_rock_vapor_species].derivation` conditional_field: derived observation requires derivation
 - `observation[2010zahnle-schaefer-fegley-cshperspect-ori-a004895-2019::zahnle_2010_hadean_timeline_and_co2_model].derived_from` conditional_field: derived observation requires derived_from
 - `observation[2010zahnle-schaefer-fegley-cshperspect-ori-a004895-2019::zahnle_2010_hadean_timeline_and_co2_model].derivation` conditional_field: derived observation requires derivation
+- `observation[aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_vf271_xanes].derived_from` conditional_field: derived observation requires derived_from
+- `observation[aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_vf267_moessbauer].derived_from` conditional_field: derived observation requires derived_from
+- `observation[aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_vf231_xanes].derived_from` conditional_field: derived observation requires derived_from
+- `observation[aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_vf231_moessbauer].derived_from` conditional_field: derived observation requires derived_from
+- `observation[aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_vf268_xanes].derived_from` conditional_field: derived observation requires derived_from
+- `observation[aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_vf268_moessbauer].derived_from` conditional_field: derived observation requires derived_from
+- `observation[aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_vf270_xanes].derived_from` conditional_field: derived observation requires derived_from
+- `observation[aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_vf270_moessbauer].derived_from` conditional_field: derived observation requires derived_from
+- `observation[aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_vf274_xanes].derived_from` conditional_field: derived observation requires derived_from
+- `observation[aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_vf274_moessbauer].derived_from` conditional_field: derived observation requires derived_from
+- `observation[aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_1800_30_xanes].derived_from` conditional_field: derived observation requires derived_from
+- `observation[aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_1900_30_xanes].derived_from` conditional_field: derived observation requires derived_from
+- `observation[aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_2000_30_xanes].derived_from` conditional_field: derived observation requires derived_from
+- `observation[aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_2100_30_xanes].derived_from` conditional_field: derived observation requires derived_from
+- `observation[aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_2000_10_xanes].derived_from` conditional_field: derived observation requires derived_from
+- `observation[aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_2000_120_xanes].derived_from` conditional_field: derived observation requires derived_from
 - `observation[ammin-73-470-oneill-1988::oneill_1988_fe3o4_fe2o3_third_law_enthalpy].derived_from` conditional_field: derived observation requires derived_from
 - `observation[ammin-73-470-oneill-1988::oneill_1988_fe3o4_fe2o3_third_law_enthalpy].derivation` conditional_field: derived observation requires derivation
 - `observation[ammin-75-781-hemingway-1990::hemingway_1990_nio_cp_fits].derived_from` conditional_field: derived observation requires derived_from
@@ -18290,27 +18306,11 @@ MODEL_DERIVED / MEASURED_REDUCED keep their mapped evidence class. Parent pointe
 - `observation[arxiv-1602-00658-fegley-rock-steam-solubility::fegley_2016_table_6_model].derivation` conditional_field: derived observation requires derivation
 - `observation[arxiv-2509-sio-flame-nucleation::haugen_2025_sio2_nucleation_model].derived_from` conditional_field: derived observation requires derived_from
 - `observation[arxiv-2509-sio-flame-nucleation::haugen_2025_sio2_nucleation_model].derivation` conditional_field: derived observation requires derivation
-- `observation[arxiv-2509-sio-flame-nucleation::haugen_2025_sio2_surface_energy_temperature_model].derived_from` conditional_field: derived observation requires derived_from
-- `observation[arxiv-2509-sio-flame-nucleation::haugen_2025_sio2_surface_energy_temperature_model].derivation` conditional_field: derived observation requires derivation
-- `observation[arxiv-2509-sio-flame-nucleation::haugen_2025_sio2_saturation_pressure_model].derived_from` conditional_field: derived observation requires derived_from
-- `observation[arxiv-2509-sio-flame-nucleation::haugen_2025_sio2_saturation_pressure_model].derivation` conditional_field: derived observation requires derivation
-- `observation[arxiv-2509-sio-flame-nucleation::haugen_2025_sio2_transition_thresholds].derived_from` conditional_field: derived observation requires derived_from
-- `observation[arxiv-2509-sio-flame-nucleation::haugen_2025_sio2_transition_thresholds].derivation` conditional_field: derived observation requires derivation
-- `observation[arxiv-2509-sio-flame-nucleation::haugen_2025_sio2_melting_threshold_result].derived_from` conditional_field: derived observation requires derived_from
-- `observation[arxiv-2509-sio-flame-nucleation::haugen_2025_sio2_melting_threshold_result].derivation` conditional_field: derived observation requires derivation
-- `observation[arxiv-2509-sio-flame-nucleation::haugen_2025_sio2_particle_density].derived_from` conditional_field: derived observation requires derived_from
-- `observation[arxiv-2509-sio-flame-nucleation::haugen_2025_sio2_particle_density].derivation` conditional_field: derived observation requires derivation
-- `observation[arxiv-2509-sio-flame-nucleation::haugen_2025_sio2_condensation_growth_model].derived_from` conditional_field: derived observation requires derived_from
-- `observation[arxiv-2509-sio-flame-nucleation::haugen_2025_sio2_condensation_growth_model].derivation` conditional_field: derived observation requires derivation
-- `observation[arxiv-2509-sio-flame-nucleation::haugen_2025_sio2_reaction_mechanism].derived_from` conditional_field: derived observation requires derived_from
-- `observation[arxiv-2509-sio-flame-nucleation::haugen_2025_sio2_reaction_mechanism].derivation` conditional_field: derived observation requires derivation
-- `observation[arxiv-2509-sio-flame-nucleation::haugen_2025_sio2_nonreactive_validation_setup].derived_from` conditional_field: derived observation requires derived_from
-- `observation[arxiv-2509-sio-flame-nucleation::haugen_2025_sio2_nonreactive_validation_setup].derivation` conditional_field: derived observation requires derivation
 
 ## Advisory issue census
 
-advisory issues: 218218
+advisory issues: 218254
 
 | kind | count |
 |---|---:|
-| `identity_incomplete` | 218218 |
+| `identity_incomplete` | 218254 |

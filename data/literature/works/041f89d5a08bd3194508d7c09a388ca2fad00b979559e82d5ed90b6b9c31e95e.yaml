@@ -504,12 +504,33 @@ experiments:
     section: Experimental procedures
     source_path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
   bench_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::bench::mettler-vta
-- experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::experiment::14163_1050°C 1 hr
+- experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::experiment::gibson-hubbard-1972-run-14163-1050c-1hr
   kind: literature
   method:
     tag: value
     value: vacuum_chamber_pyrolysis
   sample:
+    mass_kg:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 2004
+        section: Experimental procedures
+        note: Sample weight was continuously recorded but no numerical aliquot mass is printed. Any mass an engine uses is
+          a declared assumption
+        source_path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+    printed_composition:
+      state:
+        tag: unknown
+        reason: in_cited_source
+      locator:
+        published_page: 2005
+        table: '2'
+        paragraph: 14163 soil / Initial† column
+        note: Table 2 prints only K, Rb, Na and Ba for a separate initial aliquot attributed to Hubbard et al. (1972); no
+          major-element oxide composition is printed in this paper
+        source_path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
     form:
       state:
         tag: value
@@ -526,11 +547,50 @@ experiments:
         published_page: 2004
         section: Experimental procedures
         source_path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+    pretreatment:
+      state:
+        tag: value
+        value: homogenized by grinding to 74 μ
+      locator:
+        published_page: 2006
+        section: Results
+        note: Printed '74 μ'; no sieve fraction or size distribution stated
+        source_path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
   conditions:
     temperature_K:
       state:
-        tag: unknown
-        reason: experiment temperature not published
+        tag: value
+        value: '1323.15'
+      locator:
+        published_page: 2005
+        table: '2'
+        note: Printed 1050°C; unit conversion only
+        source_path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1050'
+            locator:
+              published_page: 2005
+              table: '2'
+              note: Printed 1050°C; unit conversion only
+              source_path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 2005
+              table: '2'
+              note: Printed 1050°C; unit conversion only
+              source_path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+        output_unit: K
   pressure_environment:
     total_pressure_Pa:
       state:
@@ -542,14 +602,14 @@ experiments:
       locator:
         published_page: 2004
         section: Experimental procedures
+        note: Printed evacuated to 2 x 10^-6 Torr; also 'P = 10^-6 Torr' in the 14163 discussion (p. 2009); unit conversion
+          only
         source_path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
       inference:
         relation: Torr_to_Pa
         inputs:
         - P_Pa = P_Torr × 101325 / 760
         - original_unit=Torr
-        - as_published=2e-06 Torr
-        - printed=chamber_pressure
         parameters:
         - - original
           - state:
@@ -558,6 +618,8 @@ experiments:
             locator:
               published_page: 2004
               section: Experimental procedures
+              note: Printed evacuated to 2 x 10^-6 Torr; also 'P = 10^-6 Torr' in the 14163 discussion (p. 2009); unit conversion
+                only
               source_path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
         - - factor
           - state:
@@ -566,28 +628,206 @@ experiments:
             locator:
               published_page: 2004
               section: Experimental procedures
+              note: Printed evacuated to 2 x 10^-6 Torr; also 'P = 10^-6 Torr' in the 14163 discussion (p. 2009); unit conversion
+                only
               source_path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
         output_unit: Pa
     sweep_gas:
       state:
-        tag: unknown
-        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        published_page: 2004
+        section: Experimental procedures
+        source_path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
     regime:
       regime_class:
         tag: unknown
-        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+        reason: not_published
+    pumping:
+      base_pressure_Pa:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          published_page: 2004
+          section: Experimental procedures
+          note: No distinct base-pressure history printed
+          source_path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
   work_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e
   locator:
-    published_page: 2004
-    section: Experimental procedures
+    published_page: 2005
+    table: '2'
+    paragraph: 14163 Soil | 1050°C 1 hr column
+    note: One physical aliquot of the 14163 constant temperature-variable time series (p. 2006); the authors call the heated
+      portions aliquots (p. 2009)
     source_path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+  apparatus:
+    cell_material_and_liner:
+      state:
+        tag: value
+        value: platinum crucible
+      locator:
+        published_page: 2004
+        section: Experimental procedures
+        source_path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+    geometry:
+      exposed_area_m2:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          published_page: 2004
+          section: Experimental procedures
+          note: 'Crucible dimensions, bed depth, exposed area and whether the crucible was open or covered are not printed
+            (apparatus cited to Gibson and Johnson, 1972). DECLARED-ASSUMPTION FLAG: any geometry an engine uses for this
+            run is a modelling assumption, not source evidence'
+          source_path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+  fO2_control:
+    channel:
+      tag: unknown
+      reason: not_published
+    buffer:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 2004
+        section: Introduction and Experimental procedures
+        note: Only an upper bound P(O2) < 10^-10 atm calculated from mass spectra is printed (also p. 2009); no buffer or
+          gas mix is described; bound not a point
+        source_path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
   bench_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::bench::mettler-vta
-- experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::experiment::14163_1050°C 6 hr
+  thermal_schedule:
+    method:
+      state:
+        tag: value
+        value: Heated at 4 or 6°C/min to 1050°C (per-run rate not assigned), held for the printed time, then cooled along
+          the furnace normal cooling curve
+      locator:
+        published_page: 2004
+        section: Experimental procedures
+        source_path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+    setpoints_and_holds:
+    - temperature_K:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '1323.15'
+            approximate: false
+        locator:
+          published_page: 2005
+          table: '2'
+          note: Printed 1050°C; unit conversion only
+          source_path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+        inference:
+          relation: celsius_to_kelvin
+          inputs:
+          - T_K = T_C + 273.15
+          - original_unit=C
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '1050'
+              locator:
+                published_page: 2005
+                table: '2'
+                note: Printed 1050°C; unit conversion only
+                source_path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+          - - factor
+            - state:
+                tag: value
+                value: '273.15'
+              locator:
+                published_page: 2005
+                table: '2'
+                note: Printed 1050°C; unit conversion only
+                source_path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+          output_unit: K
+      hold_duration_s:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '3600'
+            approximate: false
+        locator:
+          published_page: 2005
+          table: '2'
+          note: Printed 1 hr hold at 1050°C; unit conversion only
+          source_path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+        inference:
+          relation: h_to_s
+          inputs:
+          - t_s = t_h × 3600
+          - original_unit=h
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '1'
+              locator:
+                published_page: 2005
+                table: '2'
+                note: Printed 1 hr hold at 1050°C; unit conversion only
+                source_path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+          - - factor
+            - state:
+                tag: value
+                value: '3600'
+              locator:
+                published_page: 2005
+                table: '2'
+                note: Printed 1 hr hold at 1050°C; unit conversion only
+                source_path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+          output_unit: s
+    total_duration_s:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 2004
+        section: Experimental procedures
+        note: Printed 1 hr is the hold at 1050°C; total exposure including the heating ramp and cooling curve is not printed
+          (pp. 2004, 2007-2008)
+        source_path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+    cooling_or_quench:
+      state:
+        tag: value
+        value: allowed to cool along the furnace normal cooling curve
+      locator:
+        published_page: 2004
+        section: Experimental procedures
+        source_path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+- experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::experiment::gibson-hubbard-1972-run-14163-1050c-6hr
   kind: literature
   method:
     tag: value
     value: vacuum_chamber_pyrolysis
   sample:
+    mass_kg:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 2004
+        section: Experimental procedures
+        note: Sample weight was continuously recorded but no numerical aliquot mass is printed. Any mass an engine uses is
+          a declared assumption
+        source_path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+    printed_composition:
+      state:
+        tag: unknown
+        reason: in_cited_source
+      locator:
+        published_page: 2005
+        table: '2'
+        paragraph: 14163 soil / Initial† column
+        note: Table 2 prints only K, Rb, Na and Ba for a separate initial aliquot attributed to Hubbard et al. (1972); no
+          major-element oxide composition is printed in this paper
+        source_path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
     form:
       state:
         tag: value
@@ -604,11 +844,50 @@ experiments:
         published_page: 2004
         section: Experimental procedures
         source_path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+    pretreatment:
+      state:
+        tag: value
+        value: homogenized by grinding to 74 μ
+      locator:
+        published_page: 2006
+        section: Results
+        note: Printed '74 μ'; no sieve fraction or size distribution stated
+        source_path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
   conditions:
     temperature_K:
       state:
-        tag: unknown
-        reason: experiment temperature not published
+        tag: value
+        value: '1323.15'
+      locator:
+        published_page: 2005
+        table: '2'
+        note: Printed 1050°C; unit conversion only
+        source_path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1050'
+            locator:
+              published_page: 2005
+              table: '2'
+              note: Printed 1050°C; unit conversion only
+              source_path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 2005
+              table: '2'
+              note: Printed 1050°C; unit conversion only
+              source_path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+        output_unit: K
   pressure_environment:
     total_pressure_Pa:
       state:
@@ -620,14 +899,14 @@ experiments:
       locator:
         published_page: 2004
         section: Experimental procedures
+        note: Printed evacuated to 2 x 10^-6 Torr; also 'P = 10^-6 Torr' in the 14163 discussion (p. 2009); unit conversion
+          only
         source_path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
       inference:
         relation: Torr_to_Pa
         inputs:
         - P_Pa = P_Torr × 101325 / 760
         - original_unit=Torr
-        - as_published=2e-06 Torr
-        - printed=chamber_pressure
         parameters:
         - - original
           - state:
@@ -636,6 +915,8 @@ experiments:
             locator:
               published_page: 2004
               section: Experimental procedures
+              note: Printed evacuated to 2 x 10^-6 Torr; also 'P = 10^-6 Torr' in the 14163 discussion (p. 2009); unit conversion
+                only
               source_path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
         - - factor
           - state:
@@ -644,28 +925,206 @@ experiments:
             locator:
               published_page: 2004
               section: Experimental procedures
+              note: Printed evacuated to 2 x 10^-6 Torr; also 'P = 10^-6 Torr' in the 14163 discussion (p. 2009); unit conversion
+                only
               source_path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
         output_unit: Pa
     sweep_gas:
       state:
-        tag: unknown
-        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        published_page: 2004
+        section: Experimental procedures
+        source_path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
     regime:
       regime_class:
         tag: unknown
-        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+        reason: not_published
+    pumping:
+      base_pressure_Pa:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          published_page: 2004
+          section: Experimental procedures
+          note: No distinct base-pressure history printed
+          source_path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
   work_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e
   locator:
-    published_page: 2004
-    section: Experimental procedures
+    published_page: 2005
+    table: '2'
+    paragraph: 14163 Soil | 1050°C 6 hr column
+    note: One physical aliquot of the 14163 constant temperature-variable time series (p. 2006); the authors call the heated
+      portions aliquots (p. 2009)
     source_path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+  apparatus:
+    cell_material_and_liner:
+      state:
+        tag: value
+        value: platinum crucible
+      locator:
+        published_page: 2004
+        section: Experimental procedures
+        source_path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+    geometry:
+      exposed_area_m2:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          published_page: 2004
+          section: Experimental procedures
+          note: 'Crucible dimensions, bed depth, exposed area and whether the crucible was open or covered are not printed
+            (apparatus cited to Gibson and Johnson, 1972). DECLARED-ASSUMPTION FLAG: any geometry an engine uses for this
+            run is a modelling assumption, not source evidence'
+          source_path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+  fO2_control:
+    channel:
+      tag: unknown
+      reason: not_published
+    buffer:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 2004
+        section: Introduction and Experimental procedures
+        note: Only an upper bound P(O2) < 10^-10 atm calculated from mass spectra is printed (also p. 2009); no buffer or
+          gas mix is described; bound not a point
+        source_path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
   bench_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::bench::mettler-vta
-- experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::experiment::14163_1050°C 72 hr
+  thermal_schedule:
+    method:
+      state:
+        tag: value
+        value: Heated at 4 or 6°C/min to 1050°C (per-run rate not assigned), held for the printed time, then cooled along
+          the furnace normal cooling curve
+      locator:
+        published_page: 2004
+        section: Experimental procedures
+        source_path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+    setpoints_and_holds:
+    - temperature_K:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '1323.15'
+            approximate: false
+        locator:
+          published_page: 2005
+          table: '2'
+          note: Printed 1050°C; unit conversion only
+          source_path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+        inference:
+          relation: celsius_to_kelvin
+          inputs:
+          - T_K = T_C + 273.15
+          - original_unit=C
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '1050'
+              locator:
+                published_page: 2005
+                table: '2'
+                note: Printed 1050°C; unit conversion only
+                source_path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+          - - factor
+            - state:
+                tag: value
+                value: '273.15'
+              locator:
+                published_page: 2005
+                table: '2'
+                note: Printed 1050°C; unit conversion only
+                source_path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+          output_unit: K
+      hold_duration_s:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '21600'
+            approximate: false
+        locator:
+          published_page: 2005
+          table: '2'
+          note: Printed 6 hr hold at 1050°C; unit conversion only
+          source_path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+        inference:
+          relation: h_to_s
+          inputs:
+          - t_s = t_h × 3600
+          - original_unit=h
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '6'
+              locator:
+                published_page: 2005
+                table: '2'
+                note: Printed 6 hr hold at 1050°C; unit conversion only
+                source_path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+          - - factor
+            - state:
+                tag: value
+                value: '3600'
+              locator:
+                published_page: 2005
+                table: '2'
+                note: Printed 6 hr hold at 1050°C; unit conversion only
+                source_path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+          output_unit: s
+    total_duration_s:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 2004
+        section: Experimental procedures
+        note: Printed 6 hr is the hold at 1050°C; total exposure including the heating ramp and cooling curve is not printed
+          (pp. 2004, 2007-2008)
+        source_path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+    cooling_or_quench:
+      state:
+        tag: value
+        value: allowed to cool along the furnace normal cooling curve
+      locator:
+        published_page: 2004
+        section: Experimental procedures
+        source_path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+- experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::experiment::gibson-hubbard-1972-run-14163-1050c-72hr
   kind: literature
   method:
     tag: value
     value: vacuum_chamber_pyrolysis
   sample:
+    mass_kg:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 2004
+        section: Experimental procedures
+        note: Sample weight was continuously recorded but no numerical aliquot mass is printed. Any mass an engine uses is
+          a declared assumption
+        source_path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+    printed_composition:
+      state:
+        tag: unknown
+        reason: in_cited_source
+      locator:
+        published_page: 2005
+        table: '2'
+        paragraph: 14163 soil / Initial† column
+        note: Table 2 prints only K, Rb, Na and Ba for a separate initial aliquot attributed to Hubbard et al. (1972); no
+          major-element oxide composition is printed in this paper
+        source_path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
     form:
       state:
         tag: value
@@ -682,11 +1141,50 @@ experiments:
         published_page: 2004
         section: Experimental procedures
         source_path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+    pretreatment:
+      state:
+        tag: value
+        value: homogenized by grinding to 74 μ
+      locator:
+        published_page: 2006
+        section: Results
+        note: Printed '74 μ'; no sieve fraction or size distribution stated
+        source_path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
   conditions:
     temperature_K:
       state:
-        tag: unknown
-        reason: experiment temperature not published
+        tag: value
+        value: '1323.15'
+      locator:
+        published_page: 2005
+        table: '2'
+        note: Printed 1050°C; unit conversion only
+        source_path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1050'
+            locator:
+              published_page: 2005
+              table: '2'
+              note: Printed 1050°C; unit conversion only
+              source_path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 2005
+              table: '2'
+              note: Printed 1050°C; unit conversion only
+              source_path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+        output_unit: K
   pressure_environment:
     total_pressure_Pa:
       state:
@@ -698,14 +1196,14 @@ experiments:
       locator:
         published_page: 2004
         section: Experimental procedures
+        note: Printed evacuated to 2 x 10^-6 Torr; also 'P = 10^-6 Torr' in the 14163 discussion (p. 2009); unit conversion
+          only
         source_path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
       inference:
         relation: Torr_to_Pa
         inputs:
         - P_Pa = P_Torr × 101325 / 760
         - original_unit=Torr
-        - as_published=2e-06 Torr
-        - printed=chamber_pressure
         parameters:
         - - original
           - state:
@@ -714,6 +1212,8 @@ experiments:
             locator:
               published_page: 2004
               section: Experimental procedures
+              note: Printed evacuated to 2 x 10^-6 Torr; also 'P = 10^-6 Torr' in the 14163 discussion (p. 2009); unit conversion
+                only
               source_path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
         - - factor
           - state:
@@ -722,28 +1222,206 @@ experiments:
             locator:
               published_page: 2004
               section: Experimental procedures
+              note: Printed evacuated to 2 x 10^-6 Torr; also 'P = 10^-6 Torr' in the 14163 discussion (p. 2009); unit conversion
+                only
               source_path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
         output_unit: Pa
     sweep_gas:
       state:
-        tag: unknown
-        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        published_page: 2004
+        section: Experimental procedures
+        source_path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
     regime:
       regime_class:
         tag: unknown
-        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+        reason: not_published
+    pumping:
+      base_pressure_Pa:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          published_page: 2004
+          section: Experimental procedures
+          note: No distinct base-pressure history printed
+          source_path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
   work_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e
   locator:
-    published_page: 2004
-    section: Experimental procedures
+    published_page: 2005
+    table: '2'
+    paragraph: 14163 Soil | 1050°C 72 hr column
+    note: One physical aliquot of the 14163 constant temperature-variable time series (p. 2006); the authors call the heated
+      portions aliquots (p. 2009)
     source_path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+  apparatus:
+    cell_material_and_liner:
+      state:
+        tag: value
+        value: platinum crucible
+      locator:
+        published_page: 2004
+        section: Experimental procedures
+        source_path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+    geometry:
+      exposed_area_m2:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          published_page: 2004
+          section: Experimental procedures
+          note: 'Crucible dimensions, bed depth, exposed area and whether the crucible was open or covered are not printed
+            (apparatus cited to Gibson and Johnson, 1972). DECLARED-ASSUMPTION FLAG: any geometry an engine uses for this
+            run is a modelling assumption, not source evidence'
+          source_path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+  fO2_control:
+    channel:
+      tag: unknown
+      reason: not_published
+    buffer:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 2004
+        section: Introduction and Experimental procedures
+        note: Only an upper bound P(O2) < 10^-10 atm calculated from mass spectra is printed (also p. 2009); no buffer or
+          gas mix is described; bound not a point
+        source_path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
   bench_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::bench::mettler-vta
-- experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::experiment::14163_1050°C instantaneous
+  thermal_schedule:
+    method:
+      state:
+        tag: value
+        value: Heated at 4 or 6°C/min to 1050°C (per-run rate not assigned), held for the printed time, then cooled along
+          the furnace normal cooling curve
+      locator:
+        published_page: 2004
+        section: Experimental procedures
+        source_path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+    setpoints_and_holds:
+    - temperature_K:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '1323.15'
+            approximate: false
+        locator:
+          published_page: 2005
+          table: '2'
+          note: Printed 1050°C; unit conversion only
+          source_path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+        inference:
+          relation: celsius_to_kelvin
+          inputs:
+          - T_K = T_C + 273.15
+          - original_unit=C
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '1050'
+              locator:
+                published_page: 2005
+                table: '2'
+                note: Printed 1050°C; unit conversion only
+                source_path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+          - - factor
+            - state:
+                tag: value
+                value: '273.15'
+              locator:
+                published_page: 2005
+                table: '2'
+                note: Printed 1050°C; unit conversion only
+                source_path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+          output_unit: K
+      hold_duration_s:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '259200'
+            approximate: false
+        locator:
+          published_page: 2005
+          table: '2'
+          note: Printed 72 hr hold at 1050°C; unit conversion only
+          source_path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+        inference:
+          relation: h_to_s
+          inputs:
+          - t_s = t_h × 3600
+          - original_unit=h
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '72'
+              locator:
+                published_page: 2005
+                table: '2'
+                note: Printed 72 hr hold at 1050°C; unit conversion only
+                source_path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+          - - factor
+            - state:
+                tag: value
+                value: '3600'
+              locator:
+                published_page: 2005
+                table: '2'
+                note: Printed 72 hr hold at 1050°C; unit conversion only
+                source_path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+          output_unit: s
+    total_duration_s:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 2004
+        section: Experimental procedures
+        note: Printed 72 hr is the hold at 1050°C; total exposure including the heating ramp and cooling curve is not printed
+          (pp. 2004, 2007-2008)
+        source_path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+    cooling_or_quench:
+      state:
+        tag: value
+        value: allowed to cool along the furnace normal cooling curve
+      locator:
+        published_page: 2004
+        section: Experimental procedures
+        source_path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+- experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::experiment::gibson-hubbard-1972-run-14163-1050c-instantaneous
   kind: literature
   method:
     tag: value
     value: vacuum_chamber_pyrolysis
   sample:
+    mass_kg:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 2004
+        section: Experimental procedures
+        note: Sample weight was continuously recorded but no numerical aliquot mass is printed. Any mass an engine uses is
+          a declared assumption
+        source_path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+    printed_composition:
+      state:
+        tag: unknown
+        reason: in_cited_source
+      locator:
+        published_page: 2005
+        table: '2'
+        paragraph: 14163 soil / Initial† column
+        note: Table 2 prints only K, Rb, Na and Ba for a separate initial aliquot attributed to Hubbard et al. (1972); no
+          major-element oxide composition is printed in this paper
+        source_path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
     form:
       state:
         tag: value
@@ -760,11 +1438,50 @@ experiments:
         published_page: 2004
         section: Experimental procedures
         source_path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+    pretreatment:
+      state:
+        tag: value
+        value: homogenized by grinding to 74 μ
+      locator:
+        published_page: 2006
+        section: Results
+        note: Printed '74 μ'; no sieve fraction or size distribution stated
+        source_path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
   conditions:
     temperature_K:
       state:
-        tag: unknown
-        reason: experiment temperature not published
+        tag: value
+        value: '1323.15'
+      locator:
+        published_page: 2005
+        table: '2'
+        note: Printed 1050°C; unit conversion only
+        source_path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+      inference:
+        relation: celsius_to_kelvin
+        inputs:
+        - T_K = T_C + 273.15
+        - original_unit=C
+        parameters:
+        - - original
+          - state:
+              tag: value
+              value: '1050'
+            locator:
+              published_page: 2005
+              table: '2'
+              note: Printed 1050°C; unit conversion only
+              source_path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+        - - factor
+          - state:
+              tag: value
+              value: '273.15'
+            locator:
+              published_page: 2005
+              table: '2'
+              note: Printed 1050°C; unit conversion only
+              source_path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+        output_unit: K
   pressure_environment:
     total_pressure_Pa:
       state:
@@ -776,14 +1493,14 @@ experiments:
       locator:
         published_page: 2004
         section: Experimental procedures
+        note: Printed evacuated to 2 x 10^-6 Torr; also 'P = 10^-6 Torr' in the 14163 discussion (p. 2009); unit conversion
+          only
         source_path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
       inference:
         relation: Torr_to_Pa
         inputs:
         - P_Pa = P_Torr × 101325 / 760
         - original_unit=Torr
-        - as_published=2e-06 Torr
-        - printed=chamber_pressure
         parameters:
         - - original
           - state:
@@ -792,6 +1509,8 @@ experiments:
             locator:
               published_page: 2004
               section: Experimental procedures
+              note: Printed evacuated to 2 x 10^-6 Torr; also 'P = 10^-6 Torr' in the 14163 discussion (p. 2009); unit conversion
+                only
               source_path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
         - - factor
           - state:
@@ -800,22 +1519,151 @@ experiments:
             locator:
               published_page: 2004
               section: Experimental procedures
+              note: Printed evacuated to 2 x 10^-6 Torr; also 'P = 10^-6 Torr' in the 14163 discussion (p. 2009); unit conversion
+                only
               source_path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
         output_unit: Pa
     sweep_gas:
       state:
-        tag: unknown
-        reason: no sweep-gas field under keys sweep_gas / carrier_gas / buffer_gas in this extract
+        tag: not_applicable
+        reason: not_applicable
+      locator:
+        published_page: 2004
+        section: Experimental procedures
+        source_path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
     regime:
       regime_class:
         tag: unknown
-        reason: no flow-regime field under keys regime_class / knudsen_number_orifice / knudsen_number_chamber in this extract
+        reason: not_published
+    pumping:
+      base_pressure_Pa:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          published_page: 2004
+          section: Experimental procedures
+          note: No distinct base-pressure history printed
+          source_path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
   work_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e
   locator:
-    published_page: 2004
-    section: Experimental procedures
+    published_page: 2005
+    table: '2'
+    paragraph: 14163 Soil | 1050°C instantaneous column
+    note: One physical aliquot of the 14163 constant temperature-variable time series (p. 2006); the authors call the heated
+      portions aliquots (p. 2009)
     source_path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+  apparatus:
+    cell_material_and_liner:
+      state:
+        tag: value
+        value: platinum crucible
+      locator:
+        published_page: 2004
+        section: Experimental procedures
+        source_path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+    geometry:
+      exposed_area_m2:
+        state:
+          tag: unknown
+          reason: not_published
+        locator:
+          published_page: 2004
+          section: Experimental procedures
+          note: 'Crucible dimensions, bed depth, exposed area and whether the crucible was open or covered are not printed
+            (apparatus cited to Gibson and Johnson, 1972). DECLARED-ASSUMPTION FLAG: any geometry an engine uses for this
+            run is a modelling assumption, not source evidence'
+          source_path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+  fO2_control:
+    channel:
+      tag: unknown
+      reason: not_published
+    buffer:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 2004
+        section: Introduction and Experimental procedures
+        note: Only an upper bound P(O2) < 10^-10 atm calculated from mass spectra is printed (also p. 2009); no buffer or
+          gas mix is described; bound not a point
+        source_path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
   bench_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::bench::mettler-vta
+  thermal_schedule:
+    method:
+      state:
+        tag: value
+        value: Heated at 4 or 6°C/min to 1050°C (per-run rate not assigned), held for the printed time, then cooled along
+          the furnace normal cooling curve
+      locator:
+        published_page: 2004
+        section: Experimental procedures
+        source_path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+    setpoints_and_holds:
+    - temperature_K:
+        state:
+          tag: value
+          value:
+            kind: point
+            point: '1323.15'
+            approximate: false
+        locator:
+          published_page: 2005
+          table: '2'
+          note: Printed 1050°C; unit conversion only
+          source_path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+        inference:
+          relation: celsius_to_kelvin
+          inputs:
+          - T_K = T_C + 273.15
+          - original_unit=C
+          parameters:
+          - - original
+            - state:
+                tag: value
+                value: '1050'
+              locator:
+                published_page: 2005
+                table: '2'
+                note: Printed 1050°C; unit conversion only
+                source_path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+          - - factor
+            - state:
+                tag: value
+                value: '273.15'
+              locator:
+                published_page: 2005
+                table: '2'
+                note: Printed 1050°C; unit conversion only
+                source_path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+          output_unit: K
+      hold_duration_s:
+        state:
+          tag: unknown
+          reason: not_numeric
+        locator:
+          published_page: 2005
+          table: '2'
+          note: Printed 'instantaneous'; no zero hold or instantaneous quench inferred
+          source_path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+    total_duration_s:
+      state:
+        tag: unknown
+        reason: not_published
+      locator:
+        published_page: 2004
+        section: Experimental procedures
+        note: Printed hold label 'instantaneous' only; heating ramp and cooling time to and from 1050°C not printed for this
+          run
+        source_path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
+    cooling_or_quench:
+      state:
+        tag: value
+        value: allowed to cool along the furnace normal cooling curve
+      locator:
+        published_page: 2004
+        section: Experimental procedures
+        source_path: raw/kems-024-gibson-hubbard-1972/kems-024-gibson-hubbard-1972.pdf
 - experiment_id: 041f89d5a08bd3194508d7c09a388ca2fad00b979559e82d5ed90b6b9c31e95e::experiment::lunar-volatilization-series
   kind: literature
   method:

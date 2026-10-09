@@ -21,9 +21,12 @@ from simulator.reduced_real_determinism import (  # noqa: E402
     PT1_EQUILIBRIUM_TABLE,
     PT1_METADATA_TABLE,
     PT1_STORE_SCHEMA_VERSION,
+    PT1_SUPPORTED_STORE_SCHEMA_VERSIONS,
     PT1PersistentEquilibriumStore,
     canonical_json_bytes,
+    monotonic_repair_notices_json,
     validate_reduced_real_equilibrium_record_key,
+    validate_repair_notices_json,
 )
 
 
@@ -72,7 +75,7 @@ def _format_schema_mismatch(source: Path, field: str, found: Any) -> str:
     return (
         "PT-1 cache source schema mismatch: "
         f"source={source} field={field} "
-        f"found={found!r} expected={PT1_STORE_SCHEMA_VERSION!r}"
+        f"found={found!r} expected_one_of={PT1_SUPPORTED_STORE_SCHEMA_VERSIONS!r}"
     )
 
 
@@ -101,7 +104,7 @@ def validate_source_schema(source: Path) -> None:
             ).fetchone()
             if row is not None:
                 found_schema = str(row[0])
-        if found_schema != PT1_STORE_SCHEMA_VERSION:
+        if found_schema not in PT1_SUPPORTED_STORE_SCHEMA_VERSIONS:
             raise CacheSourceSchemaMismatch(
                 _format_schema_mismatch(
                     source,
@@ -123,7 +126,9 @@ def validate_source_schema(source: Path) -> None:
             )
         ]
         mismatched = sorted(
-            version for version in versions if version != PT1_STORE_SCHEMA_VERSION
+            version
+            for version in versions
+            if version not in PT1_SUPPORTED_STORE_SCHEMA_VERSIONS
         )
         if mismatched:
             raise CacheSourceSchemaMismatch(
@@ -170,6 +175,11 @@ def _source_payload_rows(source: Path) -> list[dict[str, Any]]:
             if "corpus_version" in columns
             else "NULL AS corpus_version"
         )
+        repair_notices_column = (
+            "repair_notices_json"
+            if "repair_notices_json" in columns
+            else "NULL AS repair_notices_json"
+        )
         return [
             dict(row)
             for row in con.execute(
@@ -187,6 +197,7 @@ def _source_payload_rows(source: Path) -> list[dict[str, Any]]:
                     {corpus_column},
                     engine_version,
                     data_digests_json,
+                    {repair_notices_column},
                     created_at,
                     git_dirty
                 FROM {PAYLOAD_TABLE}
@@ -215,6 +226,10 @@ def validate_cache_source_rows(source: Path) -> list[dict[str, Any]]:
         for field in ("corpus_version", "engine_version"):
             if row[field] is not None and not isinstance(row[field], str):
                 invalid_types.append(field)
+        if row["repair_notices_json"] is not None and not isinstance(
+            row["repair_notices_json"], str
+        ):
+            invalid_types.append("repair_notices_json")
         if type(row["git_dirty"]) is not int:
             invalid_types.append("git_dirty")
         if invalid_types:
@@ -222,6 +237,13 @@ def validate_cache_source_rows(source: Path) -> list[dict[str, Any]]:
                 "PT-1 cache source row invalid storage types: "
                 f"{source} fields={','.join(invalid_types)}"
             )
+        try:
+            validate_repair_notices_json(row["repair_notices_json"])
+        except RuntimeError as exc:
+            raise CacheSourceRowInvalid(
+                "PT-1 cache source row has invalid repair notices: "
+                f"{source}:{row['key_hash']}"
+            ) from exc
         artifact = str(row["artifact"])
         key_hash = str(row["key_hash"])
         key_bytes = bytes(row["key_bytes"])
@@ -282,6 +304,7 @@ def validate_cache_source_rows(source: Path) -> list[dict[str, Any]]:
             payload=payload,
             context=f"PT-1 cache source {source}:{artifact}:{key_hash}",
         )
+        row["store_schema_version"] = PT1_STORE_SCHEMA_VERSION
         row["validated_key"] = key
         row["validated_payload"] = payload
     return rows
@@ -328,7 +351,8 @@ def merge_cache_source(
                 SELECT artifact, store_schema_version, request_schema_version,
                        key_sha256, payload_sha256, key_bytes, payload_bytes,
                        code_version, corpus_version, engine_version,
-                       data_digests_json, created_at, git_dirty
+                       data_digests_json, repair_notices_json,
+                       created_at, git_dirty
                 FROM {PAYLOAD_TABLE}
                 WHERE key_hash = ?
                 """,
@@ -338,6 +362,16 @@ def merge_cache_source(
                 if _row_identity(existing) != _row_identity(row):
                     raise CacheMergeCollision(
                         f"PT-1 cache collision while merging {key_hash}"
+                    )
+                merged_notices = monotonic_repair_notices_json(
+                    existing["repair_notices_json"],
+                    row["repair_notices_json"],
+                )
+                if merged_notices != existing["repair_notices_json"]:
+                    conn.execute(
+                        f"UPDATE {PAYLOAD_TABLE} "
+                        "SET repair_notices_json = ? WHERE key_hash = ?",
+                        (merged_notices, key_hash),
                     )
                 continue
             conn.execute(
@@ -355,9 +389,10 @@ def merge_cache_source(
                     corpus_version,
                     engine_version,
                     data_digests_json,
+                    repair_notices_json,
                     created_at,
                     git_dirty
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 """,
                 (
                     key_hash,
@@ -372,6 +407,7 @@ def merge_cache_source(
                     row.get("corpus_version"),
                     row["engine_version"],
                     str(row["data_digests_json"]),
+                    row["repair_notices_json"],
                     str(row["created_at"]),
                     int(row["git_dirty"]),
                 ),

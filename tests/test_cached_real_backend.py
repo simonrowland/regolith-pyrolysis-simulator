@@ -24,6 +24,7 @@ from simulator.backends import (
 )
 from simulator.chemistry.kernel import ChemistryIntent
 from simulator.config import load_config_bundle
+from engines.alphamelts import AlphaMELTSProvider
 from simulator.melt_backend.base import (
     EquilibriumResult,
     InternalAnalyticalBackend,
@@ -975,6 +976,151 @@ def test_cached_real_provider_fallback_resolves_absent_or_blank_model(
     assert _key_hash(
         canonical_physics_bucket_key_from_replay_key(replay_key)
     ) == _DEFAULT_MELTS_PROVIDER_KEY_HASH
+
+
+def test_current_cached_real_replay_key_bytes_and_live_result_shape(
+    tmp_path: Path,
+) -> None:
+    # Captured from green 0a99e3afe9f059e5b80960c84561ca01beff479e.
+    cases = (
+        (
+            "alphamelts-subprocess",
+            _cache_config(
+                tmp_path / "alpha-subprocess.db",
+                "fail-loud",
+                name="alphamelts",
+                version="alphamelts-test 1.0.0",
+                model="MELTSv1.0.2",
+                mode="subprocess",
+            ),
+            792,
+            "0e50712f6fafc213d62c8c496d135dd8d801800c373cbe934a919b093d821b5e",
+        ),
+        (
+            "alphamelts-python-api-normalized",
+            _cache_config(
+                tmp_path / "alpha-python.db",
+                "fail-loud",
+                name="alphamelts",
+                version="alphamelts-test 1.0.0",
+                model="",
+                mode="python_api",
+            ),
+            792,
+            "6768a423ef0a7b5dc476f44ec34cd100a2dc685a29271ef1434731e6ee68b3ff",
+        ),
+        (
+            "thermoengine",
+            _cache_config(
+                tmp_path / "thermoengine.db",
+                "fail-loud",
+                name="thermoengine",
+                version="thermoengine-test 1.0.0",
+                model="MELTSv1.0.2",
+                mode="thermoengine",
+                family=RealBackendFamily.THERMOENGINE,
+            ),
+            761,
+            "910db5e7dcb63560d952207f990bb0ae61800a17dc83dc3414440df08240886b",
+        ),
+    )
+
+    for label, config, expected_size, expected_sha256 in cases:
+        backend = resolve_backend(
+            "cached-real",
+            BackendSelectionPolicy.RUNNER_STRICT,
+            cached_real_config=config,
+        )
+        sim = _build_cached_real_sim(backend=backend, cache_config=config)
+        key = canonical_replay_key(
+            sim,
+            artifact="equilibrium_post_record",
+            intent=ChemistryIntent.SILICATE_EQUILIBRIUM,
+            fO2_log=None,
+            fe_redox_policy="intrinsic",
+        )
+        key_bytes = canonical_json_bytes(key)
+
+        assert len(key_bytes) == expected_size, label
+        assert hashlib.sha256(key_bytes).hexdigest() == expected_sha256, label
+
+    # The direct provider has no initialized model and keeps its existing identity.
+    direct_sim = _build_direct_real_sim(_FakeLiveRealBackend())
+    direct_sim._chem_registry.register(
+        AlphaMELTSProvider(), [ChemistryIntent.SILICATE_EQUILIBRIUM]
+    )
+    direct_key = canonical_replay_key(
+        direct_sim,
+        artifact="equilibrium_post_record",
+        intent=ChemistryIntent.SILICATE_EQUILIBRIUM,
+        fO2_log=None,
+        fe_redox_policy="intrinsic",
+    )
+    direct_bytes = canonical_json_bytes(direct_key)
+    assert direct_key["model"] == {
+        "model": "alphamelts-diagnostic",
+        "mode": "AlphaMELTSProvider",
+        "magemin_database": None,
+    }
+    assert len(direct_bytes) == 810
+    assert hashlib.sha256(direct_bytes).hexdigest() == (
+        "c1b77e3754d6d4bc7ebfc2d941dba750dbf08c2acbe18ebfbfcbbf8436361cfe"
+    )
+
+    live_sim = _build_direct_real_sim(_FakeLiveRealBackend())
+    live_result = live_sim._get_equilibrium()
+    live_payload = equilibrium_payload(live_sim, live_result)
+    live_payload_bytes = canonical_json_bytes(live_payload)
+    assert len(live_payload_bytes) == 2690
+    assert hashlib.sha256(live_payload_bytes).hexdigest() == (
+        "2e173b88b420ee27a678e0db649d8c521e8a164e1cc70a834feb5fcb2157ab46"
+    )
+    assert set(live_payload) == {
+        "authority",
+        "equilibrium_result",
+        "last_vapor_pressure_diagnostic",
+        "last_vapor_pressures_source",
+    }
+    assert set(live_payload["equilibrium_result"]) == {
+        "activity_coefficients",
+        "bulk_composition_wt_pct",
+        "chem_potentials",
+        "diagnostics",
+        "fO2_log",
+        "liquid_composition_wt_pct",
+        "liquid_density_kg_m3",
+        "liquid_fraction",
+        "liquid_viscosity_Pa_s",
+        "liquidus_T_C",
+        "phase_affinities",
+        "phase_assemblage_available",
+        "phase_compositions",
+        "phase_instances",
+        "phase_masses_kg",
+        "phase_species_kg",
+        "phase_species_mol",
+        "phase_thermo",
+        "phases_present",
+        "pressure_bar",
+        "requested_temperature_C",
+        "solid_composition_wt_pct",
+        "status",
+        "sulfur_saturation",
+        "system_chisqr",
+        "system_dVdP",
+        "system_dVdT",
+        "system_enthalpy",
+        "system_entropy",
+        "system_fO2_delta_QFM",
+        "system_heat_capacity_Cp",
+        "system_phi",
+        "system_solid_density_rhos",
+        "system_volume",
+        "temperature_C",
+        "vapor_pressures_Pa",
+        "vapor_pressures_source",
+        "warnings",
+    }
 
 
 def test_cached_real_resolver_requires_cache_config() -> None:

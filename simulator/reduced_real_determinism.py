@@ -16,7 +16,7 @@ import os
 import sqlite3
 import subprocess
 from collections import Counter
-from collections.abc import Mapping
+from collections.abc import Mapping, Sequence
 from datetime import datetime
 from datetime import timezone
 from decimal import Decimal
@@ -65,10 +65,19 @@ _LOGGER = logging.getLogger(__name__)
 
 SCHEMA_VERSION = "pt0-reduced-real-determinism-v1"
 PHYSICS_BUCKET_SCHEMA_VERSION = "pt1-reduced-real-physics-bucket-v2"
-PT1_STORE_SCHEMA_VERSION = "pt1-reduced-real-equilibrium-store-v2"
+PT1_LEGACY_STORE_SCHEMA_VERSION = "pt1-reduced-real-equilibrium-store-v2"
+PT1_STORE_SCHEMA_VERSION = "pt1-reduced-real-equilibrium-store-v3"
+PT1_SUPPORTED_STORE_SCHEMA_VERSIONS = (
+    PT1_LEGACY_STORE_SCHEMA_VERSION,
+    PT1_STORE_SCHEMA_VERSION,
+)
 PT1_EQUILIBRIUM_TABLE = "reduced_real_equilibrium_payloads"
 PT1_METADATA_TABLE = "reduced_real_metadata"
 PT1_READ_ONLY_BASE_ALIAS = "pt1_read_only_base"
+REPAIR_NOTICE_COLLECTOR_ATTRIBUTE = "_reduced_real_repair_notices"
+REPAIR_NOTICES_UNAVAILABLE_NOTICE = {
+    "kind": "repair_notices_unavailable_for_legacy_row"
+}
 DEFAULT_SHARD_BUSY_TIMEOUT_MS = 60_000.0
 PHYSICS_BUCKET_LADDER_RUNGS = (
     ("h40", 4.0),
@@ -494,18 +503,27 @@ class PT0DeterminismStore:
             if mol > 0.0
         }
 
-    def capture_equilibrium(self, sim: Any, result: EquilibriumResult) -> None:
+    def capture_equilibrium(
+        self,
+        sim: Any,
+        result: EquilibriumResult,
+        *,
+        repair_notices: Sequence[Mapping[str, Any]] | None = None,
+    ) -> None:
         if not _is_cacheable_equilibrium_result(result):
             self._mark_uncacheable_capture(sim)
             return
         intent = _equilibrium_payload_intent(sim)
         key = self._equilibrium_key(sim)
-        payload = equilibrium_payload(sim, result)
+        payload = canonical_replay_output_projection(
+            "equilibrium_post_record", sim, result
+        )
         self._store(
             "equilibrium_post_record",
             key,
             payload,
             engine_version_provenance=_engine_version_provenance(sim, intent),
+            repair_notices=_repair_notices_for_capture(sim, repair_notices),
         )
         sim._last_reduced_real_cache_state = self.last_cache_state
 
@@ -517,13 +535,18 @@ class PT0DeterminismStore:
             "equilibrium_post_record",
             key,
             physics_bucket_key=canonical_physics_bucket_key_from_replay_key(key),
+            sim=sim,
         )
         if payload is None:
             return None
         return self._equilibrium_from_payload(sim, payload)
 
     def replay_equilibrium(self, sim: Any) -> EquilibriumResult:
-        payload = self._lookup("equilibrium_post_record", self._equilibrium_key(sim))
+        payload = self._lookup(
+            "equilibrium_post_record",
+            self._equilibrium_key(sim),
+            sim=sim,
+        )
         return self._equilibrium_from_payload(sim, payload)
 
     def _equilibrium_key(self, sim: Any) -> dict[str, Any]:
@@ -614,6 +637,7 @@ class PT0DeterminismStore:
         *,
         fO2_log: float,
         curve: Mapping[str, Any],
+        repair_notices: Sequence[Mapping[str, Any]] | None = None,
     ) -> None:
         if not _is_cacheable_gate_curve(curve):
             self._mark_uncacheable_capture(sim)
@@ -631,12 +655,13 @@ class PT0DeterminismStore:
         self._store(
             "freeze_gate_curve",
             key,
-            {"curve": _curve_payload(curve)},
+            canonical_replay_output_projection("freeze_gate_curve", sim, curve),
             engine_version_provenance=_engine_version_provenance(
                 sim,
                 ChemistryIntent.GATE_LIQUID_FRACTION,
                 provider_role=provider_role,
             ),
+            repair_notices=_repair_notices_for_capture(sim, repair_notices),
         )
         sim._last_reduced_real_cache_state = self.last_cache_state
 
@@ -657,7 +682,7 @@ class PT0DeterminismStore:
             )
             for provider_role in _gate_provider_roles_for_replay(sim)
         )
-        payload = self._lookup_first_available("freeze_gate_curve", keys)
+        payload = self._lookup_first_available("freeze_gate_curve", keys, sim=sim)
         sim._last_reduced_real_cache_state = self.last_cache_state
         return _curve_from_payload(payload["curve"])
 
@@ -745,10 +770,12 @@ class PT0DeterminismStore:
         payload: Mapping[str, Any],
         *,
         engine_version_provenance: str | None = None,
+        repair_notices: Sequence[Mapping[str, Any]] = (),
     ) -> None:
         validate_reduced_real_equilibrium_record_key(artifact, key, payload)
         key_bytes = canonical_json_bytes(key)
         payload_bytes = canonical_json_bytes(payload)
+        repair_notices_json = encode_repair_notices_json(repair_notices)
         key_hash = _sha256(key_bytes)
         payload_hash = _sha256(payload_bytes)
         physics_bucket_key = canonical_physics_bucket_key_from_replay_key(key)
@@ -770,22 +797,12 @@ class PT0DeterminismStore:
                     f"{key_hash}"
                 )
             self._verify_entry(artifact, key, key_bytes, key_hash, existing)
-            if self.persistent_store is not None:
-                self.persistent_store.put(
-                    artifact=artifact,
-                    key=key,
-                    key_bytes=key_bytes,
-                    key_hash=key_hash,
-                    payload=payload,
-                    payload_bytes=payload_bytes,
-                    payload_hash=payload_hash,
-                    engine_version_provenance=engine_version_provenance,
-                    physics_bucket_key=physics_bucket_key,
-                    physics_bucket_bytes=physics_bucket_bytes,
-                    physics_bucket_hash=physics_bucket_hash,
-                )
-            self.physics_bucket_entries.setdefault(physics_bucket_hash, key_hash)
-            return
+            effective_notices_json = monotonic_repair_notices_json(
+                existing.get("repair_notices_json"),
+                repair_notices_json,
+            )
+        else:
+            effective_notices_json = repair_notices_json
         if self.persistent_store is not None:
             self.persistent_store.put(
                 artifact=artifact,
@@ -795,11 +812,27 @@ class PT0DeterminismStore:
                 payload=payload,
                 payload_bytes=payload_bytes,
                 payload_hash=payload_hash,
+                repair_notices_json=repair_notices_json,
                 engine_version_provenance=engine_version_provenance,
                 physics_bucket_key=physics_bucket_key,
                 physics_bucket_bytes=physics_bucket_bytes,
                 physics_bucket_hash=physics_bucket_hash,
             )
+            persisted = self.persistent_store.get(
+                artifact=artifact,
+                key=key,
+                key_bytes=key_bytes,
+                key_hash=key_hash,
+            )
+            if persisted is None:
+                raise PT1PersistentStoreCorrupt(
+                    f"PT-1 capture disappeared after write: {key_hash}"
+                )
+            effective_notices_json = persisted["repair_notices_json"]
+        if existing is not None:
+            existing["repair_notices_json"] = effective_notices_json
+            self.physics_bucket_entries.setdefault(physics_bucket_hash, key_hash)
+            return
         self.entries[key_hash] = {
             "artifact": artifact,
             "key": copy.deepcopy(dict(key)),
@@ -807,6 +840,7 @@ class PT0DeterminismStore:
             "key_bytes": key_bytes.decode("utf-8"),
             "payload": copy.deepcopy(dict(payload)),
             "payload_hash": payload_hash,
+            "repair_notices_json": effective_notices_json,
             "physics_bucket_key": copy.deepcopy(dict(physics_bucket_key)),
             "physics_bucket_hash": physics_bucket_hash,
             "cache_state": "live_fill",
@@ -816,16 +850,25 @@ class PT0DeterminismStore:
         self.last_cache_state = "live_fill"
         self._record_cache_event(artifact, "live_fill")
 
-    def _lookup(self, artifact: str, key: Mapping[str, Any]) -> dict[str, Any]:
+    def _lookup(
+        self,
+        artifact: str,
+        key: Mapping[str, Any],
+        *,
+        sim: Any | None = None,
+    ) -> dict[str, Any]:
         return self._lookup_first_available(
             artifact,
             tuple(_compatible_replay_keys(key)),
+            sim=sim,
         )
 
     def _lookup_first_available(
         self,
         artifact: str,
         keys: tuple[Mapping[str, Any], ...],
+        *,
+        sim: Any | None = None,
     ) -> dict[str, Any]:
         if not keys:
             raise PT0CacheMiss(f"PT-0 cached replay miss: no keys for {artifact}")
@@ -859,6 +902,7 @@ class PT0DeterminismStore:
             self.hits += 1
             self.last_cache_state = "cached_exact"
             self._record_cache_event(artifact, "cached_exact")
+            _emit_repair_notices(sim, (entry.get("repair_notices_json"),))
             return copy.deepcopy(entry["payload"])
 
         key, _key_bytes, key_hash = checked[0]
@@ -885,6 +929,7 @@ class PT0DeterminismStore:
         key: Mapping[str, Any],
         *,
         physics_bucket_key: Mapping[str, Any] | None = None,
+        sim: Any | None = None,
     ) -> dict[str, Any] | None:
         tier_ceiling = str(
             getattr(self, "cache_tier_ceiling", "cached_interpolated")
@@ -952,7 +997,11 @@ class PT0DeterminismStore:
             if entry is not None:
                 break
             if tier_ceiling == "cached_interpolated":
-                interpolated = self._lookup_interpolated(artifact, candidate_key)
+                interpolated = self._lookup_interpolated(
+                    artifact,
+                    candidate_key,
+                    sim=sim,
+                )
                 if interpolated is not None:
                     return interpolated
         else:
@@ -984,6 +1033,14 @@ class PT0DeterminismStore:
         self.hits += 1
         self.last_cache_state = cache_state
         self._record_cache_event(artifact, cache_state)
+        if cache_state == "cached_exact":
+            _emit_repair_notices(sim, (entry.get("repair_notices_json"),))
+        else:
+            _emit_repair_notices(
+                sim,
+                (entry.get("repair_notices_json"),),
+                approximation_cache_state=cache_state,
+            )
         return copy.deepcopy(entry["payload"])
 
     def _entry_for_key(
@@ -1041,6 +1098,8 @@ class PT0DeterminismStore:
         self,
         artifact: str,
         key: Mapping[str, Any],
+        *,
+        sim: Any | None = None,
     ) -> dict[str, Any] | None:
         from simulator.reduced_real_cache_interpolation import (
             attempt_cached_interpolation,
@@ -1079,6 +1138,14 @@ class PT0DeterminismStore:
         self.hits += 1
         self.last_cache_state = "cached_interpolated"
         self._record_cache_event(artifact, "cached_interpolated")
+        _emit_repair_notices(
+            sim,
+            tuple(
+                neighbor.get("repair_notices_json")
+                for neighbor in attempt["neighbors"]
+            ),
+            approximation_cache_state="cached_interpolated",
+        )
         return copy.deepcopy(attempt["payload"])
 
     def _entry_for_physics_ladder_bucket(
@@ -1207,12 +1274,14 @@ class PT1PersistentEquilibriumStore:
         payload: Mapping[str, Any],
         payload_bytes: bytes,
         payload_hash: str,
+        repair_notices_json: str | None = "[]",
         engine_version_provenance: str | None = None,
         physics_bucket_key: Mapping[str, Any] | None = None,
         physics_bucket_bytes: bytes | None = None,
         physics_bucket_hash: str | None = None,
     ) -> None:
         validate_reduced_real_equilibrium_record_key(artifact, key, payload)
+        validate_repair_notices_json(repair_notices_json)
         if self.strict_vapor_gate:
             assert_strict_vapor_pt1_row(
                 artifact=artifact,
@@ -1230,6 +1299,8 @@ class PT1PersistentEquilibriumStore:
         with self._connect() as conn:
             self._initialize(conn)
             existing = self._fetch(conn, key_hash)
+            insert_source = None
+            effective_notices_json = repair_notices_json
             if existing is not None:
                 entry = self._entry_from_row(
                     existing,
@@ -1245,15 +1316,77 @@ class PT1PersistentEquilibriumStore:
                     raise PT1PersistentStoreCorrupt(
                         f"PT-1 payload collision for {artifact}: {key_hash}"
                     )
-                self._update_physics_bucket_columns(
-                    conn,
-                    key_hash=key_hash,
-                    physics_bucket_key=physics_bucket_key,
-                    physics_bucket_bytes=physics_bucket_bytes,
-                    physics_bucket_hash=physics_bucket_hash,
-                    ladder_values=ladder_values,
+                existing_notices_json = _row_repair_notices(existing)
+                effective_notices_json = monotonic_repair_notices_json(
+                    existing_notices_json,
+                    repair_notices_json,
                 )
-                return
+                local_row = conn.execute(
+                    f"SELECT 1 FROM {PT1_EQUILIBRIUM_TABLE} WHERE key_hash = ?",
+                    (key_hash,),
+                ).fetchone()
+                if local_row is not None:
+                    if effective_notices_json != existing_notices_json:
+                        conn.execute(
+                            f"UPDATE {PT1_EQUILIBRIUM_TABLE} "
+                            "SET repair_notices_json = ? WHERE key_hash = ?",
+                            (effective_notices_json, key_hash),
+                        )
+                    self._update_physics_bucket_columns(
+                        conn,
+                        key_hash=key_hash,
+                        physics_bucket_key=physics_bucket_key,
+                        physics_bucket_bytes=physics_bucket_bytes,
+                        physics_bucket_hash=physics_bucket_hash,
+                        ladder_values=ladder_values,
+                    )
+                    return
+                if effective_notices_json == existing_notices_json:
+                    return
+                insert_source = existing
+            source = insert_source
+            source_key_bytes = (
+                _sqlite_bytes(source["key_bytes"]) if source is not None else key_bytes
+            )
+            source_payload_bytes = (
+                _sqlite_bytes(source["payload_bytes"])
+                if source is not None
+                else payload_bytes
+            )
+            source_payload_hash = (
+                str(source["payload_sha256"])
+                if source is not None
+                else payload_hash
+            )
+            source_request_schema = (
+                str(source["request_schema_version"])
+                if source is not None
+                else SCHEMA_VERSION
+            )
+            source_code_version = (
+                str(source["code_version"]) if source is not None else _code_version()
+            )
+            source_corpus_version = (
+                source["corpus_version"] if source is not None else None
+            )
+            source_engine_version = (
+                source["engine_version"]
+                if source is not None
+                else _none_or_str(engine_version_provenance)
+            )
+            source_data_digests_json = (
+                str(source["data_digests_json"]) if source is not None else "{}"
+            )
+            source_created_at = (
+                str(source["created_at"])
+                if source is not None
+                else datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
+            )
+            source_git_dirty = (
+                int(source["git_dirty"])
+                if source is not None
+                else self._epoch_git_dirty
+            )
             conn.execute(
                 f"""
                 INSERT INTO {PT1_EQUILIBRIUM_TABLE} (
@@ -1269,6 +1402,7 @@ class PT1PersistentEquilibriumStore:
                     corpus_version,
                     engine_version,
                     data_digests_json,
+                    repair_notices_json,
                     physics_bucket_schema_version,
                     physics_bucket_sha256,
                     replay_scope_sha256,
@@ -1283,21 +1417,22 @@ class PT1PersistentEquilibriumStore:
                     physics_bucket_h30c_distance,
                     created_at,
                     git_dirty
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 """,
                 (
                     key_hash,
                     artifact,
                     PT1_STORE_SCHEMA_VERSION,
-                    SCHEMA_VERSION,
+                    source_request_schema,
                     key_hash,
-                    payload_hash,
-                    sqlite3.Binary(key_bytes),
-                    sqlite3.Binary(payload_bytes),
-                    _code_version(),
-                    None,
-                    _none_or_str(engine_version_provenance),
-                    "{}",
+                    source_payload_hash,
+                    sqlite3.Binary(source_key_bytes),
+                    sqlite3.Binary(source_payload_bytes),
+                    source_code_version,
+                    source_corpus_version,
+                    source_engine_version,
+                    source_data_digests_json,
+                    effective_notices_json,
                     PHYSICS_BUCKET_SCHEMA_VERSION,
                     physics_bucket_hash,
                     _replay_scope_hash(physics_bucket_key),
@@ -1310,8 +1445,8 @@ class PT1PersistentEquilibriumStore:
                     ladder_values["h40c"]["distance"],
                     ladder_values["h30c"]["sha256"],
                     ladder_values["h30c"]["distance"],
-                    datetime.now(timezone.utc).isoformat().replace("+00:00", "Z"),
-                    self._epoch_git_dirty,
+                    source_created_at,
+                    source_git_dirty,
                 ),
             )
 
@@ -1437,6 +1572,9 @@ class PT1PersistentEquilibriumStore:
                             "key": copy.deepcopy(dict(entry["key"])),
                             "key_hash": row_hash,
                             "payload": copy.deepcopy(dict(entry["payload"])),
+                            "repair_notices_json": entry[
+                                "repair_notices_json"
+                            ],
                         }
                     )
             return candidates
@@ -1577,6 +1715,7 @@ class PT1PersistentEquilibriumStore:
                 corpus_version TEXT,
                 engine_version TEXT,
                 data_digests_json TEXT NOT NULL,
+                repair_notices_json TEXT,
                 physics_bucket_schema_version TEXT,
                 physics_bucket_sha256 TEXT,
                 replay_scope_sha256 TEXT,
@@ -1637,10 +1776,23 @@ class PT1PersistentEquilibriumStore:
             f"SELECT value FROM {PT1_METADATA_TABLE} WHERE key = ?",
             ("store_schema_version",),
         ).fetchone()
-        if metadata is not None and metadata["value"] != PT1_STORE_SCHEMA_VERSION:
+        if (
+            metadata is not None
+            and metadata["value"] not in PT1_SUPPORTED_STORE_SCHEMA_VERSIONS
+        ):
             raise PT1PersistentStoreCorrupt(
                 "PT-1 persistent store schema version drift: "
                 f"{metadata['value']} != {PT1_STORE_SCHEMA_VERSION}"
+            )
+        conn.execute(
+            f"UPDATE {PT1_EQUILIBRIUM_TABLE} SET store_schema_version = ? "
+            "WHERE store_schema_version = ?",
+            (PT1_STORE_SCHEMA_VERSION, PT1_LEGACY_STORE_SCHEMA_VERSION),
+        )
+        if metadata is not None and metadata["value"] != PT1_STORE_SCHEMA_VERSION:
+            conn.execute(
+                f"UPDATE {PT1_METADATA_TABLE} SET value = ? WHERE key = ?",
+                (PT1_STORE_SCHEMA_VERSION, "store_schema_version"),
             )
         conn.execute(
             f"""
@@ -1657,6 +1809,7 @@ class PT1PersistentEquilibriumStore:
         }
         columns = {
             "corpus_version": "TEXT",
+            "repair_notices_json": "TEXT",
             "physics_bucket_schema_version": "TEXT",
             "physics_bucket_sha256": "TEXT",
             "replay_scope_sha256": "TEXT",
@@ -1672,10 +1825,24 @@ class PT1PersistentEquilibriumStore:
         }
         for name, column_type in columns.items():
             if name not in existing:
-                conn.execute(
-                    f"ALTER TABLE {PT1_EQUILIBRIUM_TABLE} "
-                    f"ADD COLUMN {name} {column_type}"
-                )
+                try:
+                    conn.execute(
+                        f"ALTER TABLE {PT1_EQUILIBRIUM_TABLE} "
+                        f"ADD COLUMN {name} {column_type}"
+                    )
+                except sqlite3.OperationalError as exc:
+                    if f"duplicate column name: {name}" not in str(exc).casefold():
+                        raise
+                    existing = {
+                        str(row["name"])
+                        for row in conn.execute(
+                            f"PRAGMA table_info({PT1_EQUILIBRIUM_TABLE})"
+                        )
+                    }
+                    if name not in existing:
+                        raise
+                else:
+                    existing.add(name)
 
     def _update_physics_bucket_columns(
         self,
@@ -1733,36 +1900,55 @@ class PT1PersistentEquilibriumStore:
         conn: sqlite3.Connection,
         key_hash: str,
     ) -> sqlite3.Row | None:
-        query = f"""
-            SELECT
-                key_hash,
-                artifact,
-                store_schema_version,
-                request_schema_version,
-                key_sha256,
-                payload_sha256,
-                key_bytes,
-                payload_bytes,
-                code_version,
-                corpus_version,
-                engine_version,
-                data_digests_json
-            FROM {{table}}
-            WHERE key_hash = ?
-            """
-        row = conn.execute(
-            query.format(table=PT1_EQUILIBRIUM_TABLE),
-            (key_hash,),
-        ).fetchone()
-        if row is not None:
-            return row
+        tables = [PT1_EQUILIBRIUM_TABLE]
         read_only_table = self._read_only_equilibrium_table(conn)
-        if read_only_table is None:
-            return None
-        return conn.execute(
-            query.format(table=read_only_table),
-            (key_hash,),
-        ).fetchone()
+        if read_only_table is not None:
+            tables.append(read_only_table)
+        for table in tables:
+            repair_column = (
+                "repair_notices_json"
+                if self._table_has_column(conn, table, "repair_notices_json")
+                else "NULL"
+            )
+            row = conn.execute(
+                f"""
+                SELECT
+                    key_hash,
+                    artifact,
+                    store_schema_version,
+                    request_schema_version,
+                    key_sha256,
+                    payload_sha256,
+                    key_bytes,
+                    payload_bytes,
+                    code_version,
+                    corpus_version,
+                    engine_version,
+                    data_digests_json,
+                    created_at,
+                    git_dirty,
+                    {repair_column} AS repair_notices_json
+                FROM {table}
+                WHERE key_hash = ?
+                """,
+                (key_hash,),
+            ).fetchone()
+            if row is not None:
+                return row
+        return None
+
+    @staticmethod
+    def _table_has_column(
+        conn: sqlite3.Connection,
+        table: str,
+        column: str,
+    ) -> bool:
+        if "." in table:
+            schema, table_name = table.split(".", 1)
+            rows = conn.execute(f"PRAGMA {schema}.table_info({table_name})")
+        else:
+            rows = conn.execute(f"PRAGMA table_info({table})")
+        return any(str(row["name"]) == column for row in rows)
 
     def _entry_from_row(
         self,
@@ -1775,7 +1961,7 @@ class PT1PersistentEquilibriumStore:
     ) -> dict[str, Any]:
         row_key_bytes = _sqlite_bytes(row["key_bytes"])
         row_payload_bytes = _sqlite_bytes(row["payload_bytes"])
-        if row["store_schema_version"] != PT1_STORE_SCHEMA_VERSION:
+        if row["store_schema_version"] not in PT1_SUPPORTED_STORE_SCHEMA_VERSIONS:
             raise PT1PersistentStoreCorrupt(
                 "PT-1 row store schema version drift: "
                 f"{row['store_schema_version']} != {PT1_STORE_SCHEMA_VERSION}"
@@ -1817,6 +2003,8 @@ class PT1PersistentEquilibriumStore:
         validate_reduced_real_equilibrium_record_key(
             artifact, row_key, row_payload
         )
+        repair_notices_json = _row_repair_notices(row)
+        validate_repair_notices_json(repair_notices_json)
         return {
             "artifact": artifact,
             "key": copy.deepcopy(dict(row_key)),
@@ -1824,6 +2012,7 @@ class PT1PersistentEquilibriumStore:
             "key_bytes": row_key_bytes.decode("utf-8"),
             "payload": copy.deepcopy(dict(row_payload)),
             "payload_hash": row["payload_sha256"],
+            "repair_notices_json": repair_notices_json,
             "cache_state": "live_fill",
         }
 
@@ -2057,6 +2246,77 @@ def _backend_boundary_composition(
     return _composition_mol_fraction_from_mol(cleaned, sig_figs=sig_figs)
 
 
+def record_dependency_vector(
+    sim: Any,
+    intent: ChemistryIntent,
+    *,
+    artifact: str,
+    provider_role: str | None = None,
+) -> dict[str, Any]:
+    provider = _provider_identity(sim, intent, provider_role=provider_role)
+    vapor_provider = _provider_identity(sim, ChemistryIntent.VAPOR_PRESSURE)
+    resolved_backend = _resolved_backend_for_cache_identity(
+        sim, intent, provider_role
+    )
+    sulfsat_gate = getattr(sim, "_sulfsat_gate", None)
+    return {
+        "namespace_id": _engine_result_namespace_id(
+            artifact=artifact,
+            intent=intent,
+            backend=resolved_backend,
+        ),
+        "vapor_pressure_provider_selection": vapor_provider.get(
+            "resolved_provider_id"
+        ),
+        "sulfur_side": {
+            "S_input_ppm": _sigfig(sim._stage0_sulfur_input_ppm(), 6),
+            "inventory": _json_ready(
+                {
+                    "salt_phase": _positive_float_map(
+                        getattr(sim.inventory, "salt_phase_kg", {}) or {}
+                    ),
+                    "sulfide_matte": _positive_float_map(
+                        getattr(sim.inventory, "sulfide_matte_kg", {}) or {}
+                    ),
+                }
+            ),
+            "sulfsat_available": _sulfsat_available(sulfsat_gate),
+            "sulfsat_provider_selection": type(sulfsat_gate).__name__,
+        },
+        "model": {
+            "model": provider.get("model"),
+            "mode": provider.get("mode"),
+            "magemin_database": _effective_magemin_database(
+                sim, intent, provider_role
+            ),
+        },
+    }
+
+
+def replay_scope_dependency_vector(key: Mapping[str, Any]) -> dict[str, Any]:
+    sulfur_side = key.get("sulfur_side", {})
+    if not isinstance(sulfur_side, Mapping):
+        sulfur_side = {}
+    vector: dict[str, Any] = {
+        "namespace_id": key.get("namespace_id"),
+        "vapor_pressure_provider_selection": key.get(
+            "vapor_pressure_provider_selection"
+        ),
+        "model": _json_ready(key.get("model", {})),
+    }
+    sulfur_input_ppm = _sulfur_input_ppm_from_replay_key(key)
+    if sulfur_input_ppm and sulfur_input_ppm > 0.0:
+        vector["sulfsat"] = {
+            name: sulfur_side.get(name)
+            for name in (
+                "sulfsat_available",
+                "sulfsat_provider_selection",
+            )
+            if sulfur_side.get(name) is not None
+        }
+    return vector
+
+
 def canonical_replay_key(
     sim: Any,
     *,
@@ -2140,28 +2400,13 @@ def canonical_replay_key(
             "non-finite commanded pO2 passed to PT-0 cache key quantization: "
             f"{commanded_pO2_bar!r} bar"
         )
-    sulfur_inventory = {
-        "salt_phase": _positive_float_map(
-            getattr(sim.inventory, "salt_phase_kg", {}) or {}
-        ),
-        "sulfide_matte": _positive_float_map(
-            getattr(sim.inventory, "sulfide_matte_kg", {}) or {}
-        ),
-    }
-    provider = _provider_identity(
+    dependency_vector = record_dependency_vector(
         sim,
         intent,
+        artifact=artifact,
         provider_role=provider_role,
     )
-    vapor_provider = _provider_identity(sim, ChemistryIntent.VAPOR_PRESSURE)
-    resolved_backend = _resolved_backend_for_cache_identity(
-        sim, intent, provider_role
-    )
-    namespace_id = _engine_result_namespace_id(
-        artifact=artifact,
-        intent=intent,
-        backend=resolved_backend,
-    )
+    namespace_id = dependency_vector["namespace_id"]
     total_amount_kg = sum(
         float(value)
         for value in sim.atom_ledger.project_account_kg(
@@ -2184,12 +2429,7 @@ def canonical_replay_key(
         raise PT0InvalidControls(
             "non-finite vapor transport pO2 passed to PT-0 cache key"
         )
-    sulfsat_gate = getattr(sim, "_sulfsat_gate", None)
-    model_identity = {
-        "model": provider.get("model"),
-        "mode": provider.get("mode"),
-        "magemin_database": _effective_magemin_database(sim, intent, provider_role),
-    }
+    dependency_vector.pop("namespace_id")
     key = {
         "namespace_id": namespace_id,
         "composition_mol_fraction": _backend_boundary_composition(
@@ -2209,16 +2449,7 @@ def canonical_replay_key(
         "redox": {
             "fe_redox_policy": str(fe_redox_policy),
         },
-        "vapor_pressure_provider_selection": vapor_provider.get(
-            "resolved_provider_id"
-        ),
-        "sulfur_side": {
-            "S_input_ppm": _sigfig(sim._stage0_sulfur_input_ppm(), 6),
-            "inventory": _json_ready(sulfur_inventory),
-            "sulfsat_available": _sulfsat_available(sulfsat_gate),
-            "sulfsat_provider_selection": type(sulfsat_gate).__name__,
-        },
-        "model": model_identity,
+        **dependency_vector,
     }
     if include_amount:
         key["total_submitted_amount_kg"] = _sigfig(
@@ -2290,15 +2521,7 @@ def canonical_physics_bucket_key_from_replay_key(
     stage0_inventory = _stage0_inventory_digest_from_replay_key(key)
     if stage0_inventory is not None:
         bucket_sulfur["inventory"] = stage0_inventory
-    replay_scope: dict[str, Any] = {
-        "namespace_id": key.get("namespace_id"),
-        "vapor_pressure_provider_selection": key.get(
-            "vapor_pressure_provider_selection"
-        ),
-        "model": _json_ready(key.get("model", {})),
-    }
-    if sulfur_input_ppm and sulfur_input_ppm > 0.0:
-        replay_scope["sulfsat"] = _sulfsat_scope_from_key(key)
+    replay_scope = replay_scope_dependency_vector(key)
 
     return {
         "physics_bucket": {
@@ -2606,7 +2829,15 @@ def _row_provider_matches_family(
     return False
 
 
-def equilibrium_payload(sim: Any, result: EquilibriumResult) -> dict[str, Any]:
+def canonical_replay_output_projection(
+    artifact: str,
+    sim: Any,
+    result: Any,
+) -> dict[str, Any]:
+    if artifact == "freeze_gate_curve":
+        return {"curve": _curve_payload(result)}
+    if artifact != "equilibrium_post_record":
+        raise ValueError(f"unsupported PT-1 replay artifact: {artifact}")
     transition = getattr(result, "ledger_transition", None)
     if transition is not None:
         raise PT0CacheCollision(
@@ -2650,6 +2881,12 @@ def equilibrium_payload(sim: Any, result: EquilibriumResult) -> dict[str, Any]:
             else _json_ready(alphamelts_diagnostics)
         )
     return payload
+
+
+def equilibrium_payload(sim: Any, result: EquilibriumResult) -> dict[str, Any]:
+    return canonical_replay_output_projection(
+        "equilibrium_post_record", sim, result
+    )
 
 
 def _equilibrium_record_authority(
@@ -2825,6 +3062,138 @@ def canonical_json_bytes(value: Any) -> bytes:
         separators=(",", ":"),
         allow_nan=False,
     ).encode("utf-8")
+
+
+def encode_repair_notices_json(
+    notices: Sequence[Mapping[str, Any]],
+) -> str:
+    """Serialize typed notice mappings with the existing canonical JSON codec."""
+
+    if not all(isinstance(notice, Mapping) for notice in notices):
+        raise TypeError("PT-1 repair notices must be typed mappings")
+    return canonical_json_bytes(list(notices)).decode("utf-8")
+
+
+def decode_repair_notices_json(raw: str | None) -> list[dict[str, Any]] | None:
+    if raw is None:
+        return None
+    if not isinstance(raw, str):
+        raise PT1PersistentStoreCorrupt(
+            "PT-1 repair_notices_json must be TEXT or NULL"
+        )
+    try:
+        notices = json.loads(raw)
+    except json.JSONDecodeError as exc:
+        raise PT1PersistentStoreCorrupt(
+            "PT-1 repair_notices_json is invalid JSON"
+        ) from exc
+    if not isinstance(notices, list) or not all(
+        isinstance(notice, Mapping) for notice in notices
+    ):
+        raise PT1PersistentStoreCorrupt(
+            "PT-1 repair_notices_json must contain a list of typed mappings"
+        )
+    if encode_repair_notices_json(notices) != raw:
+        raise PT1PersistentStoreCorrupt(
+            "PT-1 repair_notices_json is not canonical"
+        )
+    return [copy.deepcopy(dict(notice)) for notice in notices]
+
+
+def validate_repair_notices_json(raw: str | None) -> str | None:
+    decode_repair_notices_json(raw)
+    return raw
+
+
+def monotonic_repair_notices_json(
+    existing: str | None,
+    incoming: str | None,
+) -> str | None:
+    old_notices = decode_repair_notices_json(existing)
+    new_notices = decode_repair_notices_json(incoming)
+    if old_notices is None:
+        return incoming
+    if new_notices is None:
+        return existing
+    old_values = {canonical_json_bytes(notice) for notice in old_notices}
+    new_values = {canonical_json_bytes(notice) for notice in new_notices}
+    return incoming if old_values < new_values else existing
+
+
+def record_repair_notice(sim: Any, notice: Mapping[str, Any]) -> None:
+    """Append a typed repair notice to the runtime-only per-run collector."""
+
+    if not isinstance(notice, Mapping):
+        raise TypeError("repair notice must be a typed mapping")
+    normalized = json.loads(canonical_json_bytes(notice).decode("utf-8"))
+    notices = getattr(sim, REPAIR_NOTICE_COLLECTOR_ATTRIBUTE, None)
+    if not isinstance(notices, list):
+        notices = []
+        setattr(sim, REPAIR_NOTICE_COLLECTOR_ATTRIBUTE, notices)
+    encoded = canonical_json_bytes(normalized)
+    if all(canonical_json_bytes(existing) != encoded for existing in notices):
+        notices.append(normalized)
+
+
+def _repair_notices_for_capture(
+    sim: Any,
+    notices: Sequence[Mapping[str, Any]] | None,
+) -> list[dict[str, Any]]:
+    source = (
+        getattr(sim, REPAIR_NOTICE_COLLECTOR_ATTRIBUTE, ())
+        if notices is None
+        else notices
+    )
+    if not isinstance(source, Sequence) or isinstance(source, (str, bytes)):
+        raise TypeError("PT-1 repair notice collector must be a sequence")
+    encoded = encode_repair_notices_json(source)
+    return decode_repair_notices_json(encoded) or []
+
+
+def _row_repair_notices(row: Mapping[str, Any] | sqlite3.Row) -> str | None:
+    keys = row.keys()
+    if "repair_notices_json" not in keys:
+        return None
+    raw = row["repair_notices_json"]
+    if raw is not None and not isinstance(raw, str):
+        raise PT1PersistentStoreCorrupt(
+            "PT-1 repair_notices_json must be TEXT or NULL"
+        )
+    return raw
+
+
+def _emit_repair_notices(
+    sim: Any | None,
+    groups: Sequence[str | None],
+    *,
+    approximation_cache_state: str | None = None,
+) -> None:
+    if sim is None:
+        return
+    collected: list[dict[str, Any]] = []
+    seen: set[bytes] = set()
+    legacy_history_unavailable = False
+    for raw in groups:
+        notices = decode_repair_notices_json(raw)
+        if notices is None:
+            legacy_history_unavailable = True
+            continue
+        for notice in notices:
+            identity = canonical_json_bytes(notice)
+            if identity not in seen:
+                seen.add(identity)
+                collected.append(notice)
+    if legacy_history_unavailable:
+        collected.append(dict(REPAIR_NOTICES_UNAVAILABLE_NOTICE))
+    if approximation_cache_state is not None:
+        collected.append(
+            {
+                "kind": "reduced_real_cache_approximation",
+                "cache_state": approximation_cache_state,
+            }
+        )
+    for notice in collected:
+        record_repair_notice(sim, notice)
 
 
 def _curve_payload(curve: Mapping[str, Any]) -> dict[str, Any]:
@@ -3402,20 +3771,6 @@ def _sulfur_input_ppm_from_replay_key(key: Mapping[str, Any]) -> float:
     return float(_sigfig(value, 6) or 0.0)
 
 
-def _sulfsat_scope_from_key(key: Mapping[str, Any]) -> dict[str, Any]:
-    sulfur_side = key.get("sulfur_side", {})
-    if not isinstance(sulfur_side, Mapping):
-        sulfur_side = {}
-    return {
-        name: sulfur_side.get(name)
-        for name in (
-            "sulfsat_available",
-            "sulfsat_provider_selection",
-        )
-        if sulfur_side.get(name) is not None
-    }
-
-
 def _physics_bucket_consumes_log_fO2(key: Mapping[str, Any]) -> bool:
     return key.get("controls") is not None
 
@@ -3778,6 +4133,118 @@ def _positive_float_map(value: Mapping[str, Any]) -> dict[str, float]:
         for key, item in dict(value or {}).items()
         if item is not None and float(item) > 0.0
     }
+
+
+def validated_rekey_corpus_version(target_corpus_version: str | None) -> str:
+    from simulator.corpus_version import (
+        current_corpus_version,
+        interoperable_corpus_versions,
+    )
+
+    target = (target_corpus_version or current_corpus_version()).strip()
+    if not target:
+        raise SystemExit("target corpus version must be non-empty")
+    allowed = frozenset(interoperable_corpus_versions())
+    if target not in allowed:
+        raise SystemExit(
+            "target corpus version is not declared interoperable in "
+            f"data/corpus_version.yaml: {target!r}"
+        )
+    return target
+
+
+def _rekey_dict(value: Any) -> dict[str, Any]:
+    return value if isinstance(value, dict) else {}
+
+
+def rekey_row_matches_engine(key: Mapping[str, Any], engine: str) -> bool:
+    engine_key = str(engine or "").strip().lower()
+    if not engine_key:
+        return True
+    backend = _rekey_dict(key.get("backend"))
+    provider = _rekey_dict(key.get("provider"))
+    fields = (
+        backend.get("backend_name"),
+        backend.get("backend_class"),
+        provider.get("resolved_provider_id"),
+        provider.get("authoritative_provider_id"),
+        provider.get("fallback_provider_id"),
+        provider.get("model"),
+        key.get("engine_version"),
+    )
+    return any(engine_key in str(value or "").lower() for value in fields)
+
+
+def rekey_engine_version_provenance(
+    key: Mapping[str, Any],
+    row_engine_version: Any,
+) -> str | None:
+    if row_engine_version not in (None, ""):
+        return str(row_engine_version)
+    provider = _rekey_dict(key.get("provider"))
+    backend = _rekey_dict(key.get("backend"))
+    for value in (
+        key.get("engine_version"),
+        provider.get("engine_version"),
+        backend.get("backend_version"),
+    ):
+        if value not in (None, ""):
+            return str(value)
+    return None
+
+
+def replace_rekey_cache_identity(
+    key: dict[str, Any],
+    target_corpus_version: str,
+) -> bool:
+    changed = False
+    for field in ("engine_version", "source_module_digest", "code_version"):
+        if field in key:
+            key.pop(field, None)
+            changed = True
+    if key.get("corpus_version") != target_corpus_version:
+        key["corpus_version"] = target_corpus_version
+        changed = True
+
+    backend = key.get("backend")
+    if isinstance(backend, dict):
+        if "backend_version" in backend:
+            backend.pop("backend_version", None)
+            changed = True
+        if backend.get("corpus_version") != target_corpus_version:
+            backend["corpus_version"] = target_corpus_version
+            changed = True
+
+    for section in ("provider", "vapor_pressure_provider"):
+        provider = key.get(section)
+        if isinstance(provider, dict) and "engine_version" in provider:
+            provider.pop("engine_version", None)
+            changed = True
+    return changed
+
+
+def cache_row_needs_rekey(
+    key: Mapping[str, Any], target_corpus_version: str
+) -> bool:
+    from simulator.engine_local_config import is_legacy_cache_version
+
+    if key.get("corpus_version") != target_corpus_version:
+        return True
+    if "source_module_digest" in key:
+        return True
+    if "code_version" in key:
+        return True
+    if is_legacy_cache_version(str(key.get("engine_version") or "")):
+        return True
+    if "engine_version" in key:
+        return True
+    backend = _rekey_dict(key.get("backend"))
+    provider = _rekey_dict(key.get("provider"))
+    vapor_provider = _rekey_dict(key.get("vapor_pressure_provider"))
+    return any(
+        "engine_version" in value or "backend_version" in value
+        for value in (backend, provider, vapor_provider)
+    )
 
 
 def _json_ready(value: Any, path: str = "$") -> Any:

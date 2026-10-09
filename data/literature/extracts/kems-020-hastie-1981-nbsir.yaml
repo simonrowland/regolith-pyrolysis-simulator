@@ -49,11 +49,11 @@ fidelity_samples:
       table: '3'
       note: Table 3 Na2O activity non-ideal N2 column as printed 3.4(-8)
   - path: species.K2O.observations[hastie_1981_fig11_k1_slag_k2o_gamma_digitized].values.points[0].gamma
-    value: 2.26e-07
+    value: 2.186e-07
     locator:
       page: 61
       figure: '11'
-      note: Run 1 rightmost filled circle; printed x(K2O)=0.154; 300 dpi tick-calibrated render
+      note: Run 1 rightmost filled circle; printed x(K2O)=0.154; 300 dpi tick-calibrated render (#38b corrected x ticks)
   - path: species.K.observations[hastie_1981_table2_k_logP_coefficients_quoted_20260906].values.rows[15].A
     value: 6.286
     locator:
@@ -256,7 +256,7 @@ source_metadata:
     locator:
       page: 53
       figure: '20'
-      pdf_page_index: 59
+      pdf_page_index: 58
     diameter_mm: 0.34
     quote: KMS data with Pt-cell orifice diameter of 0.34 mm.
     note: >-
@@ -299,14 +299,14 @@ benches:
       locator:
         page: 53
         figure: '20'
-        pdf_page_index: 59
+        pdf_page_index: 58
         note: 'Figure 20 caption: “KMS data with Pt-cell orifice diameter of 0.34 mm.”'
   cell_material_and_liner:
     state: {tag: value, value: platinum KMS cell}
     locator:
       page: 53
       figure: '20'
-      pdf_page_index: 59
+      pdf_page_index: 58
       note: 'Figure 20 caption: “KMS data with Pt-cell orifice diameter of 0.34 mm.”'
 - id: hastie-1981-tms
   identity: {basis: described_in_this_work}
@@ -333,7 +333,7 @@ experiments:
   locator:
     page: 53
     figure: '20'
-    pdf_page_index: 59
+    pdf_page_index: 58
     note: 'Figure 20 caption: "KMS data with Pt-cell orifice diameter of 0.34 mm."'
 - experiment_id: hastie-1981-pt-tms
   bench_id: hastie-1981-tms
@@ -348,7 +348,7 @@ experiments:
     table: '3'
     page: 43
     published_page: 43
-    pdf_page_index: 49
+    pdf_page_index: 48
     note: Table 3 SOLGASMIX soda-lime-silica model glass; scoped so recipe does not lift into shared default sample
   sample:
     printed_composition:
@@ -362,7 +362,7 @@ experiments:
         table: '3'
         page: 43
         published_page: 43
-        pdf_page_index: 49
+        pdf_page_index: 48
         note: 'Glass: Na2O (17 wt.%), CaO (12 wt.%), SiO2 (71 wt.%); model recipe only'
 
 - experiment_id: hastie-1981-measured-soda-lime-glass
@@ -375,7 +375,7 @@ experiments:
     figure: '5'
     page: 51
     published_page: 51
-    pdf_page_index: 57
+    pdf_page_index: 56
     note: >-
       Figure 5/6 measured soda-lime-silica glass mixed KMS/TMS ledger scope;
       caption p.51/PDF57; initial 17/12/71 recipe printed p.18/PDF24. No
@@ -391,7 +391,7 @@ experiments:
       locator:
         page: 18
         published_page: 18
-        pdf_page_index: 24
+        pdf_page_index: 23
         note: >-
           Measured starting glass Na2O 17 / CaO 12 / SiO2 71 wt%; Fig. 6 is
           0.45 wt% Na2CO3 impurity in this glass (caption p.51/PDF57)
@@ -402,7 +402,7 @@ experiments:
     figure: '5'
     page: 51
     published_page: 51
-    pdf_page_index: 57
+    pdf_page_index: 56
     note: >-
       Fig.5 KMS digitized points on measured soda-lime glass; initial
       17/12/71 wt% printed p.18/PDF24. KMS bench only (R2-1).
@@ -417,7 +417,7 @@ experiments:
       locator:
         page: 18
         published_page: 18
-        pdf_page_index: 24
+        pdf_page_index: 23
         note: >-
           Measured starting glass Na2O 17 / CaO 12 / SiO2 71 wt%; Fig. 6 is
           0.45 wt% Na2CO3 impurity in this glass (caption p.51/PDF57)
@@ -428,7 +428,7 @@ experiments:
     figure: '5'
     page: 51
     published_page: 51
-    pdf_page_index: 57
+    pdf_page_index: 56
     note: >-
       Fig.5 TMS digitized points and Fig.6 TMS Na2CO3 gamma on measured
       soda-lime glass; initial 17/12/71 wt% printed p.18/PDF24. Accepted
@@ -444,26 +444,27 @@ experiments:
       locator:
         page: 18
         published_page: 18
-        pdf_page_index: 24
+        pdf_page_index: 23
         note: >-
           Measured starting glass Na2O 17 / CaO 12 / SiO2 71 wt%; Fig. 6 is
           0.45 wt% Na2CO3 impurity in this glass (caption p.51/PDF57)
 - experiment_id: hastie-1981-table2-quoted-fits
-  method:
-    tag: unknown
-    reason: >-
-      Quoted Table 2 empirical K logP fit collection spans heterogeneous
-      systems (R3-1). Bench-free sample-free registry scope so a sole
-      row-local composition map does not promote onto the shared default
-      Hastie experiment.
+  method: transpiration
   locator:
-    table: '2'
-    page: 23
-    published_page: 23
-    pdf_page_index: 28
+    page: 22
+    published_page: 22
+    pdf_page_index: 27
+    section: '10.1'
+    paragraph: The potassium vapor pressure data were obtained under neutral conditions using the TMS technique.
     note: >-
-      Quoted Table 2 empirical fit collection; no shared sample, bench, or
-      apparatus. Illite map stays row-local on body row 16.
+      Method carried as transpiration (TMS) per the printed p. 22 text; Table 2
+      footnote d (printed p. 25) reads KMS, so the live Table 2 row carries
+      source_internally_inconsistent: technique_assignment_ambiguous (#38,
+      physics ruling 2026-10-04). Quoted Table 2 empirical K logP fit
+      collection spans heterogeneous systems (R3-1); no shared sample, bench,
+      or apparatus, so a sole row-local composition map does not promote onto
+      the shared default Hastie experiment. Illite map stays row-local on body
+      row 16.
 species:
   K:
     observations:
@@ -475,7 +476,7 @@ species:
         table: '2'
         page: 23
         published_page: 23
-        pdf_page_index: 29
+        pdf_page_index: 28
         note: Table 2 continues report pp. 23-25 / PDF pp. 29-31
       T_range_K:
       - 1100.0
@@ -513,13 +514,13 @@ species:
           C_multiplier: x_K2O_squared
           original_source: Plante et al. (1975) compared; this summary higher because of orifice effect
         - system: K2O-Al2O3
-          phases: KAlO2 + K2O.5Al2O3
+          phases: KAlO2 → K2O.5Al2O3
           T_K_range: [1300, 1800]
           A: 5.489
           B: 15036.0
           original_source: Plante et al. (1975)
         - system: K2O-Al2O3
-          phases: K2O.9Al2O3 + Al2O3
+          phases: K2O.9Al2O3 → Al2O3
           T_K_range: [1500, 1800]
           A: 7.487
           B: 21453.0
@@ -604,6 +605,11 @@ species:
           B: 16650.0
           original_source: Hastie et al. (1980)
           note: equation corresponds to [K2O] ~14; Illinois no. 6 / UTSI
+          composition_role:
+            value: initial_charge_only
+            locator: {page: 24, published_page: 24, pdf_page_index: 30, table: '2', note: 'body row 13; Comments column, with footnote a'}
+            quote: 'Equation corresponds to [K2O] ~ 14.'
+            note: 'Footnote a: the System column prints initial compositions. The fit is for K2O ~14 wt%, below the printed 19.5.'
         - system: synthetic Western channel slag
           composition_wt_pct:
             K2O: 22.7
@@ -618,6 +624,11 @@ species:
           B: 18472.0
           original_source: Plante and Cook (1978)
           K2O_during_run_wt_pct_as_published: 18.9-17.6
+          composition_role:
+            value: initial_charge_only
+            locator: {page: 24, published_page: 24, pdf_page_index: 30, table: '2', note: 'body row 14; Comments column, with footnote a'}
+            quote: '[K2O] 18.9-17.6.'
+            note: 'Footnote a: the System column prints initial compositions. Run K2O 18.9-17.6 wt%, below the printed 22.7.'
         - system: synthetic Eastern channel slag
           composition_wt_pct:
             K2O: 23.6
@@ -632,6 +643,11 @@ species:
           B: 19056.0
           original_source: Plante and Cook (1978)
           K2O_during_run_wt_pct_as_published: 23.3-22.1
+          composition_role:
+            value: initial_charge_only
+            locator: {page: 24, published_page: 24, pdf_page_index: 30, table: '2', note: 'body row 15; Comments column, with footnote a'}
+            quote: '23.3-22.1 [K2O].'
+            note: 'Footnote a: the System column prints initial compositions. Run K2O 23.3-22.1 wt%, below the printed 23.6.'
         - system: illite
           composition_wt_pct:
             K2O: 7.4
@@ -658,6 +674,11 @@ species:
           B: 17863.0
           original_source: Hastie et al. (1980)
           note: 6[K2O]; initial P_O2 >= P_K, later fell to the level of K2O
+          composition_role:
+            value: initial_charge_only
+            locator: {page: 25, published_page: 25, pdf_page_index: 31, table: '2', note: 'body row 17; Comments column, with footnote a'}
+            quote: '6[K2O].'
+            note: 'Footnote a: the System column prints initial compositions. The fit is for K2O ~6 wt%, below the printed 8.7.'
         note: >-
           T columns are ranges. A,B,C,D,E stored as printed; P(T) not evaluated.
           Do not average with the 1975/1978/1979/1980 originals if those later
@@ -674,7 +695,7 @@ species:
           locator:
             page: 22
             published_page: 22
-            pdf_page_index: 28
+            pdf_page_index: 27
             paragraph: Table 2 potassium pressures as TMS under neutral conditions
     - observation_id: hastie_1981_table2_17k2o_A_as_printed_note
       type: psat_series
@@ -682,7 +703,7 @@ species:
         table: '2'
         page: 23
         published_page: 23
-        pdf_page_index: 29
+        pdf_page_index: 28
         note: rotated Table 2 ~17[K2O] row; report p. 23
       T_range_K:
       - 1600.0
@@ -824,6 +845,12 @@ species:
       phase: K-bearing_oxide_and_slag_mix
       regime: published_model_or_fit
       units: log10 P(K)/atm coefficients as published
+      reason: >-
+        source_internally_inconsistent: technique_assignment_ambiguous. Text p. 22
+        (PDF p. 28): "The potassium vapor pressure data were obtained under neutral
+        conditions using the TMS technique." Table 2 footnote d, p. 25 (PDF p. 31):
+        "Results obtained by KMS. See comments for applicable compositions."
+        Physics ruling 2026-10-04: carry Table 2 as transpiration, flagged.
       values:
         quantity: published_K_pressure_fit_table
         method_class: model_derived
@@ -846,15 +873,21 @@ species:
           additional_coefficients_as_printed: C = 9.32
           comments_as_printed: Pressures higher than earlier data of Plante et al. (1975) because of orifice
             effect.
+          method_class: quoted_literature
+          quoted_from: >-
+            kems-042-plante-1979 Table 3 series 1104-1129 master fit
+            (B0=4.721, B1=-15624, B2=9.32). Coefficients identical to Plante's
+            printed master fit; not an independent Hastie measurement. Hastie
+            Table 2 comments cite Plante et al. (1975) orifice-effect comparison.
         - locator:
             page: 23
             table: '2'
             note: body row 2
           class_tag: model
-          quote: K2O-Al2O3 | KAlO2 + K2O·5Al2O3[f] | 1300-1800 | 5.489 | 15036 | PK independent of bulk composition.
+          quote: K2O-Al2O3 | KAlO2 → K2O·5Al2O3[f] | 1300-1800 | 5.489 | 15036 | PK independent of bulk composition.
             Plante et al. (1975).
           system_as_printed: K2O-Al2O3
-          phases_as_printed: KAlO2 + K2O·5Al2O3[f]
+          phases_as_printed: KAlO2 → K2O·5Al2O3[f]
           T_range_K:
           - 1300
           - 1800
@@ -892,6 +925,11 @@ species:
           B: 12873
           additional_coefficients_as_printed: ''
           comments_as_printed: Plante (1977).[g]
+          reason: >-
+            source_internally_inconsistent: identical_coefficients_distinct_systems.
+            Printed Table 2 K2O-ZrO2 row: A=4.524 B=12873 (Plante 1977).[g].
+            Printed Table 2 K2O-Fe2O3 row: A=4.524 B=12873 (Plante 1979b).
+            Identical printed coefficients for distinct systems; kept as printed.
         - locator:
             page: 23
             table: '2'
@@ -909,6 +947,11 @@ species:
           additional_coefficients_as_printed: ''
           comments_as_printed: Phase boundary composition slightly dependent on T. Data adjusted for constant
             K/O2. Plante (1979b).
+          reason: >-
+            source_internally_inconsistent: identical_coefficients_distinct_systems.
+            Printed Table 2 K2O-ZrO2 row: A=4.524 B=12873 (Plante 1977).[g].
+            Printed Table 2 K2O-Fe2O3 row: A=4.524 B=12873 (Plante 1979b).
+            Identical printed coefficients for distinct systems; kept as printed.
         - locator:
             page: 23
             table: '2'
@@ -1190,7 +1233,7 @@ species:
         page: 53
         published_page: 53
         figure: '20'
-        pdf_page_index: 59
+        pdf_page_index: 58
       quote: KMS data with Pt-cell orifice diameter of 0.34 mm.
       phase: K2_slag_liquid
       regime: kems_effusion
@@ -1254,7 +1297,7 @@ species:
         source_path: docs-private/research/2026-08-27-ocr-repair/kems-020-hastie-1981-nbsir/tables.md
         page: 11
         published_page: 11
-        pdf_page_index: 17
+        pdf_page_index: 16
         paragraph: log P_NaCl (atm) = 4.85 (+- 0.3) - 8820 (+- 200)/T
       T_range_K:
       - 1300.0
@@ -1354,7 +1397,7 @@ species:
         table: '3'
         page: 43
         published_page: 43
-        pdf_page_index: 49
+        pdf_page_index: 48
       T_range_K:
       - 1400.0
       - 1400.0
@@ -1398,7 +1441,7 @@ species:
         table: '3'
         page: 43
         published_page: 43
-        pdf_page_index: 49
+        pdf_page_index: 48
       T_range_K:
       - 1400.0
       - 1400.0
@@ -1479,7 +1522,7 @@ species:
         figure: '5'
         page: 59
         published_page: 59
-        pdf_page_index: 65
+        pdf_page_index: 64
       T_K: 1493.7
       phase: soda_lime_silica_glass
       regime: transpiration_mass_spectrometry
@@ -1508,7 +1551,7 @@ species:
         figure: '5'
         page: 59
         published_page: 59
-        pdf_page_index: 65
+        pdf_page_index: 64
       T_K: 1333.3
       phase: soda_lime_silica_glass
       regime: transpiration_mass_spectrometry
@@ -1536,7 +1579,7 @@ species:
         figure: '5'
         page: 59
         published_page: 59
-        pdf_page_index: 65
+        pdf_page_index: 64
       T_K: 1333.3
       phase: soda_lime_silica_glass
       regime: transpiration_mass_spectrometry
@@ -1564,7 +1607,7 @@ species:
         figure: '5'
         page: 59
         published_page: 59
-        pdf_page_index: 65
+        pdf_page_index: 64
       T_range_K:
       - 1333.3
       - 1488.8
@@ -1663,7 +1706,7 @@ species:
       locator:
         figure: '6'
         page: 60
-        pdf_page_index: 66
+        pdf_page_index: 65
       T_range_K:
       - 1200.0
       - 1700.0
@@ -2056,7 +2099,7 @@ species:
       locator:
         page: 12
         published_page: 12
-        pdf_page_index: 18
+        pdf_page_index: 17
         paragraph: Na2SO4(l) = 2Na + SO2 + O2
       T_range_K:
       - 1550.0
@@ -2088,7 +2131,7 @@ species:
       locator:
         page: 13
         published_page: 13
-        pdf_page_index: 19
+        pdf_page_index: 18
         paragraph: Kohl et al. (1975), who give
       T_range_K:
       - 1267.0
@@ -2185,7 +2228,7 @@ species:
       locator:
         page: 22
         published_page: 22
-        pdf_page_index: 28
+        pdf_page_index: 27
         equation: '6'
       T_range_K:
       - 1100.0
@@ -2215,11 +2258,11 @@ species:
         figure: '11'
         page: 61
         published_page: 61
-        pdf_page_index: 71
+        pdf_page_index: 70
         note: report figure page after captions; PDF page 71
       T_range_K:
-      - 1248.8
-      - 1857.4
+      - 1240.4
+      - 1748.0
       phase: real_MHD_channel_slag_K1
       standard_state: apparent gamma(K2O) via eq. (6); authors' "apparent" (may not be fully equilibrated)
       regime: mixed_kms_tms
@@ -2237,185 +2280,247 @@ species:
           dpi: 300
           pdf_page: 71
           render_px: {width: 2392, height: 3234}
-          frame_px: {left: 331, top: 457, right: 2036, bottom: 2470}
+          frame_px: {left: 323, top: 647, right: 2032, bottom: 2469}
           x_ticks:
-            - {label: '5.0', value: 5.0, px: [579, 2474]}
-            - {label: '6.0', value: 6.0, px: [1062, 2474]}
-            - {label: '7.0', value: 7.0, px: [1546, 2474]}
-            - {label: '8.0', value: 8.0, px: [2036, 2474]}
+            - {label: '5.0', value: 5.0, px: [323, 2471]}
+            - {label: '6.0', value: 6.0, px: [823, 2471]}
+            - {label: '7.0', value: 7.0, px: [1300, 2471]}
+            - {label: '8.0', value: 8.0, px: [1784, 2471]}
+          half_unit_ticks_unlabelled:
+            - {label: '5.5', value: 5.5, px: [576, 2471]}
+            - {label: '6.5', value: 6.5, px: [1059, 2471]}
+            - {label: '7.5', value: 7.5, px: [1543, 2471]}
+            - {label: '8.5', value: 8.5, px: [2032, 2471]}
           y_ticks:
-            - {label: '10^-6', log10: -6.0, px: [327, 644]}
-            - {label: '10^-7', log10: -7.0, px: [327, 1250]}
-            - {label: '10^-8', log10: -8.0, px: [327, 1857]}
-          pass2_y_ticks:
-            - {label: '10^-6', log10: -6.0, px: [327, 644]}
-            - {label: '10^-7', log10: -7.0, px: [327, 1250]}
-            - {label: '10^-8', log10: -8.0, px: [327, 1857]}
-            - {label: '10^-9', log10: -9.0, px: [327, 2467]}
-          px_per_x_unit: 485.5
-          px_per_decade: 606.5
+            - {label: '10^-6', log10: -6.0, px: [328, 647]}
+            - {label: '10^-7', log10: -7.0, px: [328, 1247]}
+            - {label: '10^-8', log10: -8.0, px: [328, 1854]}
+            - {label: '10^-9', log10: -9.0, px: [328, 2469]}
+          px_per_x_unit: 487.0
+          px_per_decade: 607.333
+          symbol_radius_px: 11.0
           note: >-
-            10^-6 tick is below the top rail (y=644 vs frame top 457). 5.0 is
-            inset from the left frame (x=579 vs 331). 8.0 sits on the right
-            frame. Pass 2 adds the 10^-9 tick at y=2467 (log-minor fit);
-            mid-plot residual ≤0.01 dex.
+            Re-digitised 2026-10-05 (#38b). CORRECTED x calibration: labelled
+            whole-unit ticks are 5.0@left-frame 323, 6.0@823, 7.0@1300, 8.0@1784
+            (right frame 2032 = 8.5). Prior extract read the unlabelled half-unit
+            ticks (5.5/6.5/7.5) and the right frame (8.5) as 5/6/7/8 — off by 0.5
+            in 10^4/T (Physics page-check). Y decades 10^-6@647 … 10^-9@2469.
+            Top-axis cross-check: 1400 K (10^4/T=7.143) lands at x≈1367. Open-square
+            T≈1560 K (caption 1575 K); gamma≈3.9e-8. Every residual_px < symbol radius.
         digitization_method: >-
-          300 dpi pdftoppm of PDF page 71. Linear map in 10^4/T and
-          log10(gamma) from labelled decade ticks, not frame edges.
-        liquidus_note: most points below the K1 liquidus (~1700 ± 30 K)
-        caption_open_square_quote: >-
-          Caption (report p. 52): "The open square data point at 1575 K, run 1,
-          was obtained by TMS with additional O2 present."
-        caption_vs_figure_note: >-
-          The plotted open square sits on the curve labelled RUN 2. Point is
-          labelled run: 2 by what the figure shows; caption wording "run 1"
-          is quoted, not followed.
+          300 dpi pdftoppm of PDF page 71. Linear map in 10^4/T and log10(gamma)
+          from labelled ticks. Points hand-centred on printed symbols.
+        figure_digitized: true
         points:
         - run: 1
-          T_K: 1266.5
-          invT_times_1e4_K_inv: 7.896
+          T_K: 1240.4
+          invT_times_1e4_K_inv: 8.062
           x_K2O: 0.154
-          gamma: 2.26e-07
-          log10_gamma: -6.64
+          gamma: 2.186e-07
+          log10_gamma: -6.66
           symbol: filled_circle
+          pixel: [1814.0, 1048.0]
+          symbol_centre: [1814.0, 1048.0]
+          residual_px: 6.32
+          symbol_radius_px: 11.0
         - run: 1
-          T_K: 1334.0
-          invT_times_1e4_K_inv: 7.496
+          T_K: 1306.0
+          invT_times_1e4_K_inv: 7.657
           x_K2O: 0.153
-          gamma: 2.99e-07
-          log10_gamma: -6.53
+          gamma: 3.62e-07
+          log10_gamma: -6.441
           symbol: filled_circle
+          pixel: [1617.0, 915.0]
+          symbol_centre: [1617.0, 915.0]
+          residual_px: 5.83
+          symbol_radius_px: 11.0
         - run: 1
-          T_K: 1431.8
-          invT_times_1e4_K_inv: 6.984
+          T_K: 1425.2
+          invT_times_1e4_K_inv: 7.016
           x_K2O: 0.151
-          gamma: 3.43e-07
-          log10_gamma: -6.46
+          gamma: 4.528e-07
+          log10_gamma: -6.344
           symbol: filled_circle
-          note: ridge maximum
+          pixel: [1305.0, 856.0]
+          symbol_centre: [1305.0, 856.0]
+          residual_px: 7.81
+          symbol_radius_px: 11.0
         - run: 1
-          T_K: 1479.3
-          invT_times_1e4_K_inv: 6.76
+          T_K: 1471.3
+          invT_times_1e4_K_inv: 6.797
           x_K2O: 0.151
-          gamma: 2.79e-07
-          log10_gamma: -6.55
+          gamma: 3.905e-07
+          log10_gamma: -6.408
           symbol: filled_circle
+          pixel: [1198.0, 895.0]
+          symbol_centre: [1198.0, 895.0]
+          residual_px: 5.39
+          symbol_radius_px: 11.0
         - run: 1
-          T_K: 1530.0
-          invT_times_1e4_K_inv: 6.536
+          T_K: 1522.8
+          invT_times_1e4_K_inv: 6.567
           x_K2O: 0.149
-          gamma: 1.72e-07
-          log10_gamma: -6.76
+          gamma: 2.377e-07
+          log10_gamma: -6.624
           symbol: filled_circle
+          pixel: [1086.0, 1026.0]
+          symbol_centre: [1086.0, 1026.0]
+          residual_px: 8.49
+          symbol_radius_px: 11.0
         - run: 1
-          T_K: 1568.4
-          invT_times_1e4_K_inv: 6.376
+          T_K: 1578.1
+          invT_times_1e4_K_inv: 6.337
           x_K2O: 0.147
-          gamma: 8.32e-08
-          log10_gamma: -7.08
+          gamma: 1.165e-07
+          log10_gamma: -6.934
           symbol: filled_circle
+          pixel: [974.0, 1214.0]
+          symbol_centre: [974.0, 1214.0]
+          residual_px: 8.49
+          symbol_radius_px: 11.0
         - run: 1
-          T_K: 1596.4
-          invT_times_1e4_K_inv: 6.264
+          T_K: 1603.0
+          invT_times_1e4_K_inv: 6.238
           x_K2O: 0.143
-          gamma: 3.63e-08
-          log10_gamma: -7.44
+          gamma: 4.872e-08
+          log10_gamma: -7.312
           symbol: filled_circle
+          pixel: [926.0, 1444.0]
+          symbol_centre: [926.0, 1444.0]
+          residual_px: 8.49
+          symbol_radius_px: 11.0
         - run: 2
-          T_K: 1248.8
-          invT_times_1e4_K_inv: 8.008
+          T_K: 1240.4
+          invT_times_1e4_K_inv: 8.062
           x_K2O: 0.143
-          gamma: 3.63e-08
-          log10_gamma: -7.44
+          gamma: 5.397e-08
+          log10_gamma: -7.268
           symbol: triangle
+          pixel: [1814.0, 1417.0]
+          symbol_centre: [1814.0, 1417.0]
+          residual_px: 6.71
+          symbol_radius_px: 11.0
         - run: 2
-          T_K: 1445.1
-          invT_times_1e4_K_inv: 6.92
+          T_K: 1411.6
+          invT_times_1e4_K_inv: 7.084
           x_K2O: 0.142
-          gamma: 1.82e-08
-          log10_gamma: -7.74
+          gamma: 1.75e-08
+          log10_gamma: -7.757
           symbol: triangle
+          pixel: [1338.0, 1714.0]
+          symbol_centre: [1338.0, 1714.0]
+          residual_px: 6.32
+          symbol_radius_px: 11.0
         - run: 2
-          T_K: 1552.8
-          invT_times_1e4_K_inv: 6.44
+          T_K: 1499.8
+          invT_times_1e4_K_inv: 6.667
           x_K2O: 0.13
-          gamma: 3.63e-08
-          log10_gamma: -7.44
+          gamma: 4.315e-08
+          log10_gamma: -7.365
           symbol: triangle
+          pixel: [1135.0, 1476.0]
+          symbol_centre: [1135.0, 1476.0]
+          residual_px: 7.81
+          symbol_radius_px: 11.0
         - run: 2
-          T_K: 1576.3
-          invT_times_1e4_K_inv: 6.344
+          T_K: 1559.9
+          invT_times_1e4_K_inv: 6.411
           x_K2O: 0.13
-          gamma: 3.16e-08
-          log10_gamma: -7.5
+          gamma: 3.895e-08
+          log10_gamma: -7.409
           symbol: open_square
-          method: TMS_with_added_O2
-          caption_T_K: 1575
-          figure_run_label: RUN 2
-          caption_quote: >-
-            The open square data point at 1575 K, run 1, was obtained by TMS
-            with additional O2 present.
-          note: >-
-            Caption says run 1; the symbol sits on the RUN 2 curve. Labelled
-            by the figure (run 2). Tick-calibrated 10^4/T=6.344 is 1576 K
-            vs caption 1575 K.
+          pixel: [1010.0, 1503.0]
+          symbol_centre: [1010.0, 1503.0]
+          residual_px: 3.0
+          symbol_radius_px: 11.0
         - run: 2
-          T_K: 1625.5
-          invT_times_1e4_K_inv: 6.152
+          T_K: 1557.9
+          invT_times_1e4_K_inv: 6.419
           x_K2O: 0.12
-          gamma: 5.5e-08
-          log10_gamma: -7.26
+          gamma: 6.093e-08
+          log10_gamma: -7.215
           symbol: triangle
+          pixel: [1014.0, 1385.0]
+          symbol_centre: [1014.0, 1385.0]
+          residual_px: 7.81
+          symbol_radius_px: 11.0
         - run: 2
-          T_K: 1700.7
-          invT_times_1e4_K_inv: 5.88
+          T_K: 1635.3
+          invT_times_1e4_K_inv: 6.115
           x_K2O: 0.12
-          gamma: 2.75e-08
-          log10_gamma: -7.56
+          gamma: 3.335e-08
+          log10_gamma: -7.477
           symbol: triangle
+          pixel: [866.0, 1544.0]
+          symbol_centre: [866.0, 1544.0]
+          residual_px: 7.21
+          symbol_radius_px: 11.0
         - run: 3
-          T_K: 1334.0
-          invT_times_1e4_K_inv: 7.496
+          T_K: 1295.9
+          invT_times_1e4_K_inv: 7.717
           x_K2O: 0.115
-          gamma: 6.92e-09
-          log10_gamma: -8.16
+          gamma: 8.2e-09
+          log10_gamma: -8.086
           symbol: open_circle
+          pixel: [1646.0, 1914.0]
+          symbol_centre: [1646.0, 1914.0]
+          residual_px: 7.21
+          symbol_radius_px: 11.0
         - run: 3
-          T_K: 1458.6
-          invT_times_1e4_K_inv: 6.856
+          T_K: 1438.3
+          invT_times_1e4_K_inv: 6.953
           x_K2O: 0.115
-          gamma: 4.42e-09
-          log10_gamma: -8.36
+          gamma: 4.644e-09
+          log10_gamma: -8.333
           symbol: open_circle
-          note: run-3 minimum
+          pixel: [1274.0, 2064.0]
+          symbol_centre: [1274.0, 2064.0]
+          residual_px: 8.49
+          symbol_radius_px: 11.0
         - run: 3
-          T_K: 1651.3
-          invT_times_1e4_K_inv: 6.056
+          T_K: 1528.6
+          invT_times_1e4_K_inv: 6.542
           x_K2O: 0.114
-          gamma: 6.92e-09
-          log10_gamma: -8.16
+          gamma: 7.601e-09
+          log10_gamma: -8.119
           symbol: open_circle
+          pixel: [1074.0, 1934.0]
+          symbol_centre: [1074.0, 1934.0]
+          residual_px: 8.49
+          symbol_radius_px: 11.0
         - run: 3
-          T_K: 1700.7
-          invT_times_1e4_K_inv: 5.88
-          x_K2O: 0.10
-          gamma: 1.38e-08
-          log10_gamma: -7.86
+          T_K: 1588.4
+          invT_times_1e4_K_inv: 6.296
+          x_K2O: 0.1
+          gamma: 1.562e-08
+          log10_gamma: -7.806
           symbol: open_circle
+          pixel: [954.0, 1744.0]
+          symbol_centre: [954.0, 1744.0]
+          residual_px: 7.21
+          symbol_radius_px: 11.0
         - run: 3
-          T_K: 1773.0
-          invT_times_1e4_K_inv: 5.64
-          x_K2O: 0.10
-          gamma: 3.63e-08
-          log10_gamma: -7.44
+          T_K: 1657.6
+          invT_times_1e4_K_inv: 6.033
+          x_K2O: 0.1
+          gamma: 3.722e-08
+          log10_gamma: -7.429
           symbol: open_circle
+          pixel: [826.0, 1515.0]
+          symbol_centre: [826.0, 1515.0]
+          residual_px: 7.81
+          symbol_radius_px: 11.0
         - run: 3
-          T_K: 1857.4
-          invT_times_1e4_K_inv: 5.384
+          T_K: 1748.0
+          invT_times_1e4_K_inv: 5.721
           x_K2O: 0.08
-          gamma: 4.47e-08
-          log10_gamma: -7.35
+          gamma: 4.482e-08
+          log10_gamma: -7.349
           symbol: open_circle
+          pixel: [674.0, 1466.0]
+          symbol_centre: [674.0, 1466.0]
+          residual_px: 8.49
+          symbol_radius_px: 11.0
         prose_ratio_at_1700K: >-
           At 10 mol% K2O and 1700 K, K1 slag gamma about 30 times the K2O-SiO2
           binary (report p. 31). Ratio only; binary gamma not reprinted here.
@@ -2478,10 +2583,10 @@ species:
         figure: '4'
         page: 58
         published_page: 58
-        pdf_page_index: 64
+        pdf_page_index: 63
       T_range_K:
-      - 1745.1
-      - 1961.3
+      - 1702.0
+      - 1977.1
       phase: illite_liquid
       regime: kems_effusion
       units: atm as published
@@ -2494,35 +2599,28 @@ species:
           dpi: 300
           pdf_page: 64
           render_px: {width: 2392, height: 3234}
-          frame_px: {left: 650, top: 562, right: 2032, bottom: 2268}
+          frame_px: {left: 650, top: 555, right: 2028, bottom: 2268}
           x_ticks:
-            - {label: '5.0', value: 5.0, px: [870, 2272]}
-            - {label: '6.0', value: 6.0, px: [1453, 2272]}
-            - {label: '7.0', value: 7.0, px: [2032, 2272]}
+            - {label: '5.0', value: 5.0, px: [868.0, 2270]}
+            - {label: '6.0', value: 6.0, px: [1452.0, 2270]}
+            - {label: '7.0', value: 7.0, px: [2028.0, 2270]}
           y_ticks:
-            - {label: '10^-4', log10: -4.0, px: [650, 562]}
-            - {label: '10^-5', log10: -5.0, px: [2038, 1126]}
-            - {label: '10^-6', log10: -6.0, px: [2038, 1704]}
-            - {label: '10^-7', log10: -7.0, px: [650, 2268]}
-          pass2_y_ticks_left_axis:
-            - {label: '10^-4', log10: -4.0, px: [650, 562]}
-            - {label: '10^-5', log10: -5.0, px: [650, 1124]}
-            - {label: '10^-6', log10: -6.0, px: [650, 1703]}
-            - {label: '10^-7', log10: -7.0, px: [650, 2268]}
-          pass2_x_ticks:
-            - {label: '5.0', value: 5.0, px: [868, 2272]}
-            - {label: '6.0', value: 6.0, px: [1450, 2272]}
-            - {label: '7.0', value: 7.0, px: [2032, 2272]}
-          px_per_x_unit: 581.0
-          px_per_decade: 569.6
+            - {label: '10^-4', log10: -4.0, px: [650, 555.0]}
+            - {label: '10^-5', log10: -5.0, px: [650, 1124.0]}
+            - {label: '10^-6', log10: -6.0, px: [650, 1701.0]}
+            - {label: '10^-7', log10: -7.0, px: [650, 2268.0]}
+          px_per_x_unit: 580.0
+          px_per_decade: 571.0
+          symbol_radius_px: 9.0
           note: >-
-            10^-4 and 10^-7 sit on the top/bottom frame. 5.0 is inset from the
-            left frame (x=870 vs 650); 7.0 is the right frame. Pass 2 uses
-            left-axis decades and x-tick cluster edges.
+            Re-digitised 2026-10-05 (#38b). X from labelled ticks 5.0@868.0,
+            6.0@1452.0, 7.0@2028.0. Y from labelled decades
+            10^-4@555.0, 10^-5@1124.0, 10^-6@1701.0,
+            10^-7@2268.0. All 13 K open-circle points re-digitised
+            (prior pass had only 5, sitting up-left of symbol centres).
         digitization_method: >-
           300 dpi pdftoppm of PDF page 64. Linear map in 10^4/T and log10 P
-          from labelled ticks. residual_dex_vs_pass2 is pass1 minus pass2 at
-          the same pixel.
+          from labelled ticks. Every K point residual under symbol radius.
         points:
         - T_K: 1946.8
           invT_times_1e4_K_inv: 5.137
@@ -2574,50 +2672,141 @@ species:
           symbol: open_square
           species: SiO
         k_open_circle_points:
-        - T_K: 1961.3
-          invT_times_1e4_K_inv: 5.099
-          p_atm: 5.38e-05
-          log10_p_atm: -4.269
-          pixel_pass1: [928, 714]
-          residual_dex_vs_pass2: 0.002
+        - T_K: 1977.1
+          invT_times_1e4_K_inv: 5.058
+          p_atm: 6.619e-05
+          log10_p_atm: -4.179
+          pixel: [901.6, 657.3]
+          symbol_centre: [901.6, 657.3]
+          residual_px: 0.0
+          symbol_radius_px: 9.0
           symbol: open_circle
           species: K
-        - T_K: 1914.8
-          invT_times_1e4_K_inv: 5.223
-          p_atm: 3.58e-05
-          log10_p_atm: -4.447
-          pixel_pass1: [1000, 815]
-          residual_dex_vs_pass2: 0.001
+        - T_K: 1953.4
+          invT_times_1e4_K_inv: 5.119
+          p_atm: 4.916e-05
+          log10_p_atm: -4.308
+          pixel: [937.2, 731.1]
+          symbol_centre: [937.2, 731.1]
+          residual_px: 0.0
+          symbol_radius_px: 9.0
           symbol: open_circle
           species: K
-        - T_K: 1841.9
-          invT_times_1e4_K_inv: 5.429
-          p_atm: 1.02e-05
-          log10_p_atm: -4.991
-          pixel_pass1: [1120, 1125]
-          residual_dex_vs_pass2: 0.001
+        - T_K: 1934.8
+          invT_times_1e4_K_inv: 5.169
+          p_atm: 3.646e-05
+          log10_p_atm: -4.438
+          pixel: [965.8, 805.2]
+          symbol_centre: [965.8, 805.2]
+          residual_px: 0.0
+          symbol_radius_px: 9.0
           symbol: open_circle
           species: K
-        - T_K: 1788.1
-          invT_times_1e4_K_inv: 5.593
-          p_atm: 4.55e-06
-          log10_p_atm: -5.342
-          pixel_pass1: [1215, 1325]
-          residual_dex_vs_pass2: 0.001
+        - T_K: 1904.3
+          invT_times_1e4_K_inv: 5.251
+          p_atm: 2.838e-05
+          log10_p_atm: -4.547
+          pixel: [1013.8, 867.3]
+          symbol_centre: [1013.8, 867.3]
+          residual_px: 0.0
+          symbol_radius_px: 9.0
           symbol: open_circle
           species: K
-        - T_K: 1745.1
-          invT_times_1e4_K_inv: 5.730
-          p_atm: 2.11e-06
-          log10_p_atm: -5.676
-          pixel_pass1: [1295, 1515]
-          residual_dex_vs_pass2: 0.001
+        - T_K: 1882.4
+          invT_times_1e4_K_inv: 5.312
+          p_atm: 1.916e-05
+          log10_p_atm: -4.718
+          pixel: [1049.2, 964.7]
+          symbol_centre: [1049.2, 964.7]
+          residual_px: 0.0
+          symbol_radius_px: 9.0
+          symbol: open_circle
+          species: K
+        - T_K: 1862.9
+          invT_times_1e4_K_inv: 5.368
+          p_atm: 1.345e-05
+          log10_p_atm: -4.871
+          pixel: [1081.4, 1052.5]
+          symbol_centre: [1081.4, 1052.5]
+          residual_px: 0.0
+          symbol_radius_px: 9.0
+          symbol: open_circle
+          species: K
+        - T_K: 1837.8
+          invT_times_1e4_K_inv: 5.441
+          p_atm: 9.397e-06
+          log10_p_atm: -5.027
+          pixel: [1124.0, 1141.4]
+          symbol_centre: [1124.0, 1141.4]
+          residual_px: 0.0
+          symbol_radius_px: 9.0
+          symbol: open_circle
+          species: K
+        - T_K: 1814.1
+          invT_times_1e4_K_inv: 5.512
+          p_atm: 6.575e-06
+          log10_p_atm: -5.182
+          pixel: [1165.1, 1230.0]
+          symbol_centre: [1165.1, 1230.0]
+          residual_px: 0.0
+          symbol_radius_px: 9.0
+          symbol: open_circle
+          species: K
+        - T_K: 1788.7
+          invT_times_1e4_K_inv: 5.591
+          p_atm: 4.561e-06
+          log10_p_atm: -5.341
+          pixel: [1210.6, 1320.7]
+          symbol_centre: [1210.6, 1320.7]
+          residual_px: 0.0
+          symbol_radius_px: 9.0
+          symbol: open_circle
+          species: K
+        - T_K: 1768.9
+          invT_times_1e4_K_inv: 5.653
+          p_atm: 3.172e-06
+          log10_p_atm: -5.499
+          pixel: [1247.0, 1410.8]
+          symbol_centre: [1247.0, 1410.8]
+          residual_px: 0.0
+          symbol_radius_px: 9.0
+          symbol: open_circle
+          species: K
+        - T_K: 1744.4
+          invT_times_1e4_K_inv: 5.733
+          p_atm: 2.184e-06
+          log10_p_atm: -5.661
+          pixel: [1292.9, 1503.2]
+          symbol_centre: [1292.9, 1503.2]
+          residual_px: 0.0
+          symbol_radius_px: 9.0
+          symbol: open_circle
+          species: K
+        - T_K: 1721.3
+          invT_times_1e4_K_inv: 5.81
+          p_atm: 1.49e-06
+          log10_p_atm: -5.827
+          pixel: [1337.6, 1598.1]
+          symbol_centre: [1337.6, 1598.1]
+          residual_px: 0.0
+          symbol_radius_px: 9.0
+          symbol: open_circle
+          species: K
+        - T_K: 1702.0
+          invT_times_1e4_K_inv: 5.875
+          p_atm: 1.05e-06
+          log10_p_atm: -5.979
+          pixel: [1375.8, 1684.9]
+          symbol_centre: [1375.8, 1684.9]
+          residual_px: 0.0
+          symbol_radius_px: 9.0
           symbol: open_circle
           species: K
         table2_crosscheck: >-
           Illite Table 2 A=6.286 B=20642 at 1961 K gives log10 P(K)/atm=-4.240
           vs digitized -4.269 (0.03 dex). Prefer Table 2 coefficients for P(K);
-          SiO has no table.
+          SiO has no table. Cross-check uses prior 5-point digitization; all 13
+          K open circles now re-digitised (#38b).
         o2_and_tms: >-
           Filled circles are O2 (ticks = T chronology). TMS K triangles at
           10^4/T~6.3 and 6.6 with large error bars. Not digitized as points
@@ -2653,7 +2842,7 @@ species:
       locator:
         figure: '15'
         page: 63
-        pdf_page_index: 75
+        pdf_page_index: 74
         paragraph: report p. 35-36
       T_range_K:
       - 1074.0
@@ -2731,7 +2920,7 @@ species:
       locator:
         figure: '15'
         page: 63
-        pdf_page_index: 75
+        pdf_page_index: 74
       T_range_K:
       - 1074.0
       - 1074.0

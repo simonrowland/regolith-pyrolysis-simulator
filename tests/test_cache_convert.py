@@ -153,6 +153,22 @@ def test_legacy_physics_key_shape_with_schema_version_still_converts():
     assert materialized.source_payload_bytes == row["payload_bytes"]
 
 
+@pytest.mark.parametrize(
+    "repair_notices_json",
+    ['[{"kind":"convert_repair"}]', "[]", None],
+)
+def test_cache_convert_preserves_repair_notice_value_in_provenance(
+    repair_notices_json: str | None,
+) -> None:
+    row = cache_convert._load_cache_conversion_fixture_row()
+    row["repair_notices_json"] = repair_notices_json
+
+    materialized = cache_convert.materialize_legacy_row(row, "0" * 64)
+
+    provenance = json.loads(materialized.alpha["capture_provenance_json"])
+    assert provenance["repair_notices_json"] == repair_notices_json
+
+
 def test_physics_key_schema_column_mismatch_is_rejected():
     row = cache_convert._load_cache_conversion_fixture_row()
     row["physics_bucket_schema_version"] = "mismatched-store-schema"

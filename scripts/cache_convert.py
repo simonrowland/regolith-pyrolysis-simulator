@@ -20,6 +20,12 @@ import time
 from collections.abc import Iterable, Mapping, Sequence
 from typing import Any
 
+REPO_ROOT = pathlib.Path(__file__).resolve().parents[1]
+if str(REPO_ROOT) not in sys.path:
+    sys.path.insert(0, str(REPO_ROOT))
+
+from simulator.reduced_real_determinism import monotonic_repair_notices_json
+
 
 DESIGN_VERSION = "0.2.0"
 DESTINATION_SCHEMA_VERSION = "rr-cache-schema-v0.2.0"
@@ -1947,6 +1953,11 @@ def materialize_legacy_row(
     compatibility_shape_json = display_json(compatibility_shape)
 
     capture_common = {
+        "repair_notices_json": (
+            row["repair_notices_json"]
+            if "repair_notices_json" in row.keys()
+            else None
+        ),
         "legacy_source": {
             "source_db_sha256": source_db_sha256,
             "source_rowid": int(row["legacy_rowid"]),
@@ -3056,7 +3067,14 @@ def _insert_materialized_with_collision_policy(
             sources.append(existing_provenance["legacy_source"])
         if new_source not in sources:
             sources.append(new_source)
-        merged = {**existing_provenance, "legacy_sources": sources}
+        merged = {
+            **existing_provenance,
+            "legacy_sources": sources,
+            "repair_notices_json": monotonic_repair_notices_json(
+                existing_provenance.get("repair_notices_json"),
+                _capture_provenance(materialized).get("repair_notices_json"),
+            ),
+        }
         for table in (
             "rr_alphamelts_outputs",
             "rr_vaporock_outputs",
