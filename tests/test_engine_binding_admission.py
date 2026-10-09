@@ -11,6 +11,7 @@ from simulator.engine_binding_admission import (
     BindingIdentity,
     EngineBindingAdmissionError,
     assess_bindings,
+    assessment_candidates,
     authorize_binding,
     binding_admission_run_notice,
     live_cache_eligibility,
@@ -236,3 +237,26 @@ def test_live_cache_gate_fails_open_and_deduplicates_typed_notice(
     notice = binding_admission_run_notice(sim)
     assert notice is not None
     assert len(notice["notices"]) == 2
+
+
+def test_real_assessment_targets_fail_closed_without_reviewed_pins(
+    tmp_path: Path,
+) -> None:
+    candidates = assessment_candidates(tmp_path / "empty-real-pins")
+    receipt_path = tmp_path / "receipt.json"
+
+    results = assess_bindings(
+        candidates,
+        pin_directory=tmp_path / "empty-real-pins",
+        receipt_path=receipt_path,
+    )
+    receipt = json.loads(receipt_path.read_text())
+
+    assert len(results) == 9
+    assert all(result.status == "failed" for result in results)
+    assert all(
+        result.reason.startswith("no reviewed pins for ")
+        for result in results
+    )
+    assert len(receipt["entries"]) == 7
+    assert all(entry["status"] == "failed" for entry in receipt["entries"])
