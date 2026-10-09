@@ -242,6 +242,23 @@ _GENERIC_CRYSTAL_QUALIFIERS = frozenset(
     }
 )
 
+# Named minerals in the JANAF dictionary are formula-specific. Keep this
+# association beside the token aliases so prose resolution cannot bind a
+# mineral to an unrelated endmember. Tridymite and alpha-quartz are not JANAF
+# qualifier rows, but their formula is unambiguous.
+NAMED_POLYMORPH_FORMULAS: dict[str, frozenset[str]] = {
+    name: frozenset(
+        formula
+        for formula, _qualifier, row_token, _table_ids in _JANAF_CRYSTAL_ROWS
+        if row_token is token and token not in _GENERIC_CRYSTAL_QUALIFIERS
+    )
+    for name, token in POLYMORPH_ALIASES.items()
+    if token not in _GENERIC_CRYSTAL_QUALIFIERS
+}
+NAMED_POLYMORPH_FORMULAS["alpha_quartz"] = frozenset({"SiO2"})
+NAMED_POLYMORPH_FORMULAS["alpha-quartz"] = frozenset({"SiO2"})
+NAMED_POLYMORPH_FORMULAS["tridymite"] = frozenset({"SiO2"})
+
 
 def classify_printed_qualifier(qualifier: str | None) -> PrintedQualifierKind:
     if not qualifier:
@@ -412,8 +429,8 @@ def resolve_formula_polymorph(
     Generic qualifiers such as ``alpha`` are not identities by themselves;
     first resolve them through the formula-keyed JANAF dictionary. When that
     dictionary has no entry for the formula, preserve the existing generic
-    token. Named mineral polymorphs such as tridymite remain closed tokens
-    when no JANAF qualifier exists for that formula.
+    token. Named minerals resolve only for their associated formulas in
+    ``NAMED_POLYMORPH_FORMULAS``.
     """
 
     text = str(printed_name or "").strip()
@@ -421,6 +438,11 @@ def resolve_formula_polymorph(
     if token is None:
         return None
     if token not in _GENERIC_CRYSTAL_QUALIFIERS:
+        formulas = NAMED_POLYMORPH_FORMULAS.get(text.casefold())
+        if formulas is None or formula.casefold() not in {
+            item.casefold() for item in formulas
+        }:
+            return None
         return token
 
     for _, qualifier in JANAF_CRYSTAL_DICTIONARY:

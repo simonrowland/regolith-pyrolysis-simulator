@@ -5396,6 +5396,45 @@ def test_ts1985_and_yam1983_tridymite_reference_state_baseline() -> None:
     )
 
 
+def test_reference_prose_binds_polymorphs_to_their_own_endmember() -> None:
+    ms2000_text = (
+        "raoultian pure solid; beta-Na2O, solid K2O, and quartz as published; "
+        "endmember=K2O"
+    )
+    k2o_state = reference_state_from_extract(
+        ms2000_text, species_formula="K2O", values={}
+    )
+    assert k2o_state is not None and k2o_state.is_value
+    assert k2o_state.value.endmember.phase.value is Phase.CR
+    assert k2o_state.value.endmember.polymorph.is_unknown
+
+    na2o_state = reference_state_from_extract(
+        ms2000_text.replace("endmember=K2O", "endmember=Na2O"),
+        species_formula="Na2O",
+        values={},
+    )
+    assert na2o_state is not None and na2o_state.is_value
+    assert na2o_state.value.endmember.polymorph.is_value
+    assert na2o_state.value.endmember.polymorph.value is Polymorph.BETA
+
+    multi_endmember_text = (
+        "raoultian pure solid; quartz for SiO2 and corundum for Al2O3; "
+        "endmember=SiO2"
+    )
+    quartz_state = reference_state_from_extract(
+        multi_endmember_text, species_formula="SiO2", values={}
+    )
+    corundum_state = reference_state_from_extract(
+        multi_endmember_text.replace("endmember=SiO2", "endmember=Al2O3"),
+        species_formula="Al2O3",
+        values={},
+    )
+    assert quartz_state is not None and quartz_state.is_value
+    assert quartz_state.value.endmember.polymorph.value is Polymorph.QUARTZ
+    assert corundum_state is not None and corundum_state.is_value
+    assert corundum_state.value.endmember.polymorph.value is Polymorph.CORUNDUM
+
+
 def test_allibert_alumina_polymorph_binds_in_isolated_migration(
     tmp_path: Path,
 ) -> None:
