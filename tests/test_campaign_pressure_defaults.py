@@ -798,6 +798,50 @@ def test_declared_zero_background_fraction_is_not_the_sweep_balance(
     assert nominal.composition.get("Ar", 0.0) == pytest.approx(0.0)
 
 
+@pytest.mark.parametrize("headspace_kind", ["finite", "no_headspace"])
+def test_controlled_atmosphere_background_matches_the_declared_partial(
+    headspace_kind: str,
+) -> None:
+    """The controlled-atmosphere carrier partial is the helper's value.
+
+    Both overhead writers. The expected partial comes from
+    declared_background_partial_mbar, the production resolver.
+    """
+
+    from simulator.overhead import OverheadGasModel, declared_background_partial_mbar
+    from simulator.state import CondensationTrain, EvaporationFlux
+
+    schedule = deepcopy(_n2_lab_schedule())
+    schedule["gas_boundary"]["background_gas"]["species"] = "Ar"
+    schedule["gas_boundary"]["background_gas"]["mole_fraction"] = 0.8
+    manager = CampaignManager(_setpoints())
+    manager.overrides["C2A"] = {
+        "lab_schedule": schedule,
+        "lab_schedule_pO2_setpoint_mbar": 1.0,
+    }
+    melt = MeltState()
+    manager.configure_campaign(melt, CampaignPhase.C2A)
+
+    assert melt.atmosphere is Atmosphere.CONTROLLED_O2
+    species, partial = declared_background_partial_mbar(melt)
+    assert species == "Ar"
+
+    headspace = (
+        {"enabled": True, "volume_m3": 1.0}
+        if headspace_kind == "finite"
+        else {"enabled": False}
+    )
+    gas = OverheadGasModel(headspace).update(
+        EvaporationFlux(),
+        melt,
+        CondensationTrain.create_default(),
+    )
+
+    assert gas.composition.get("Ar", 0.0) == pytest.approx(partial)
+    assert gas.composition.get("O2", 0.0) == pytest.approx(melt.pO2_mbar)
+    assert gas.composition.get("N2", 0.0) == pytest.approx(0.0)
+
+
 def test_declared_pure_co2_keeps_its_mole_fraction():
     from simulator.overhead import OverheadGasModel
     from simulator.state import CondensationTrain, EvaporationFlux

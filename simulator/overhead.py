@@ -1238,18 +1238,9 @@ class OverheadGasModel:
             'CONTROLLED_O2_FLOW',
             'O2_BACKPRESSURE',
         } and melt.p_total_mbar > 0:
+            # The carrier partial is write_declared_background_partial above.
+            # This arm only raises the reported total when that helper declined.
             gas.pressure_mbar = max(gas.pressure_mbar, melt.p_total_mbar)  # mbar — controlled total pressure floor
-            background_species = str(
-                getattr(melt, 'background_gas_species', '') or '').strip()
-            if background_species and background_species.upper() != 'O2':
-                background_fraction = float(  # dimensionless — background gas mole fraction
-                    getattr(melt, 'background_gas_mole_fraction', 1.0) or 0.0)
-                background_fraction = min(1.0, max(0.0, background_fraction))  # dimensionless — clamped mole fraction
-                gas.composition[background_species] = max(  # mbar — background gas partial pressure
-                    gas.composition.get(background_species, 0.0),
-                    max(0.0, melt.p_total_mbar - melt.pO2_mbar)
-                    * background_fraction,  # mbar — background gas partial pressure share
-                )
 
         partial_pressure_sum_mbar = sum(  # mbar — sum of nonnegative reported partial pressures
             max(0.0, float(partial_pressure))
@@ -1372,17 +1363,8 @@ class OverheadGasModel:
                     gas.composition.get('O2', 0.0), melt.pO2_mbar)  # mbar — controlled O2 partial pressure floor
             gas.pressure_mbar = max(  # mbar — controlled total pressure floor
                 gas.pressure_mbar, melt.pO2_mbar, melt.p_total_mbar)  # mbar — controlled total pressure floor
-            background_species = str(
-                getattr(melt, 'background_gas_species', '') or '').strip()
-            if background_species and background_species.upper() != 'O2':
-                background_fraction = float(  # dimensionless — background gas mole fraction
-                    getattr(melt, 'background_gas_mole_fraction', 1.0) or 0.0)
-                background_fraction = min(1.0, max(0.0, background_fraction))  # dimensionless — clamped mole fraction
-                gas.composition[background_species] = max(  # mbar — background gas partial pressure
-                    gas.composition.get(background_species, 0.0),
-                    max(0.0, melt.p_total_mbar - melt.pO2_mbar)
-                    * background_fraction,  # mbar — background gas partial pressure share
-                )
+            # Carrier partial stays the helper's write above. Re-applying
+            # (p_total - pO2) * y here would be a second evaluation.
 
     @staticmethod
     def _reset_gas(gas: OverheadGas) -> None:
