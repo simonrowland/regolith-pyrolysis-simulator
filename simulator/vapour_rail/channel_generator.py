@@ -172,7 +172,7 @@ def _four_strata_family(
     vapor_oxygen_atoms: float,
 ) -> dict[str, Any]:
     family_id = f"t1139_{element}_{carrier}_family"
-    return {
+    family = {
         "physical_properties": {
             "species": {
                 species_id: {
@@ -265,6 +265,18 @@ def _four_strata_family(
             ),
         },
     }
+    missing_enthalpy = [formula for formula, record in species_thermo.items()
+                        if record.get("evaluator_family") == "tabulated_janaf"
+                        and not record.get("formation_enthalpy_points")]
+    if missing_enthalpy:
+        family["physical_properties"]["species"][species_id]["dormancy_reason"] = {
+            "kind": "missing_printed_formation_enthalpy",
+            "participants": missing_enthalpy,
+        }
+        family["code_metadata"]["hot_train_not_applicable_reason"] = (
+            "missing_printed_formation_enthalpy: " + ", ".join(missing_enthalpy)
+        )
+    return family
 
 
 def generate_element_channels(

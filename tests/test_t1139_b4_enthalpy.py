@@ -180,3 +180,29 @@ def test_generated_heat_preserves_missing_enthalpy_guard():
         evaporation_enthalpy_budget(
             {"t1139_Cu_Cu": 1e-9}, vapor_pressures={"t1139_Cu_Cu": row}, temperature_K=2000.0,
         )
+
+
+def test_generator_types_dormancy_when_source_prints_no_enthalpy(monkeypatch):
+    from dataclasses import replace
+    from simulator.vapour_rail.source_rail import load_source_rail
+    from simulator.vapour_rail.channel_generator import generate_element_channels
+
+    rail = load_source_rail()
+    original = rail.select_common_source
+    def missing_heat(participants):
+        selected = original(participants)
+        if selected is None:
+            return None
+        source, records = selected
+        return source, {key: replace(record, species_thermo={
+            name: value for name, value in record.species_thermo.items()
+            if name != "formation_enthalpy_points"
+        }) for key, record in records.items()}
+    monkeypatch.setattr(rail, "select_common_source", missing_heat)
+    channels, _gaps = generate_element_channels("Cu", rail=rail)
+    assert channels
+    for channel in channels:
+        row = next(iter(channel.family["physical_properties"]["species"].values()))
+        assert row["flux_dormant"]
+        assert row["dormancy_reason"]["kind"] == "missing_printed_formation_enthalpy"
+        assert row["dormancy_reason"]["participants"]
