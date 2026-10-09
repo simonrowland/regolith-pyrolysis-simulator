@@ -9258,19 +9258,19 @@ class _ScorePayloadAccumulator:
                     value=numeric_value,
                 )
             )
-        if measured:
+        if measured or _E15_CONTESTED_STRATUM in flags:
             e15_point = _e15_residual_point(row, metadata.observation)
             if e15_point is not None:
                 self.e15_points.append(e15_point)
-            if in_measured_headline:
-                self.report_engine_names.add(engine)
-                self._add_headline(
-                    row,
-                    tier="measured",
-                    rail=rail,
-                    engine=engine,
-                    numeric_value=numeric_value,
-                )
+        if in_measured_headline:
+            self.report_engine_names.add(engine)
+            self._add_headline(
+                row,
+                tier="measured",
+                rail=rail,
+                engine=engine,
+                numeric_value=numeric_value,
+            )
             if row.get("status") == ResidualStatus.REFUSED.value:
                 refusal = row.get("refusal") or {}
                 if isinstance(refusal, Mapping):
