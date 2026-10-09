@@ -3012,14 +3012,12 @@ def _oxide_map_from_mapping(obj: object) -> dict[str, Decimal] | None:
     comps: dict[str, Decimal] = {}
     for key, value in obj.items():
         name = str(key)
-        oxide = name.removesuffix("_wt_pct")
-        if oxide not in _OXIDE_COMPONENT_KEYS:
+        if name not in _OXIDE_COMPONENT_KEYS:
             continue
         amount = _as_dec_or_none(value)
         if amount is None:
             continue
-        if name in _OXIDE_COMPONENT_KEYS or oxide not in comps:
-            comps[oxide] = amount
+        comps[name] = amount
     if len(comps) < 2:
         return None
     return comps
@@ -3048,7 +3046,7 @@ def _printed_initial_charge_row_map(values: object) -> dict[str, Decimal] | None
     ranked = _point_rows(values)
     for item in ranked:
         if item.get("T_C_is_initial_composition") is True:
-            got = _oxide_map_from_mapping(item)
+            got = _mass_loss_oxide_map_from_mapping(item) or _oxide_map_from_mapping(item)
             if got:
                 return got
     for item in ranked:
@@ -3060,10 +3058,21 @@ def _printed_initial_charge_row_map(values: object) -> dict[str, Decimal] | None
         )
         loss = _as_dec_or_none(loss_raw)
         if t_c == 0 and loss == 0:
-            got = _oxide_map_from_mapping(item)
+            got = _mass_loss_oxide_map_from_mapping(item) or _oxide_map_from_mapping(item)
             if got:
                 return got
     return None
+
+
+def _mass_loss_oxide_map_from_mapping(obj: object) -> dict[str, Decimal] | None:
+    if not isinstance(obj, Mapping):
+        return None
+    components = {
+        oxide: obj[f"{oxide}_wt_pct"]
+        for oxide in ("SiO2", "Al2O3", "FeO", "MgO", "CaO")
+        if f"{oxide}_wt_pct" in obj
+    }
+    return _oxide_map_from_mapping(components)
 
 
 def _initial_oxide_map_from_values(
@@ -3076,6 +3085,7 @@ def _initial_oxide_map_from_values(
         got = _printed_initial_charge_row_map(values)
         if got:
             return got
+
     got = _oxide_map_from_mapping(values)
     if got:
         return got
@@ -13457,6 +13467,10 @@ class Migrator:
                 if q_for_species is Quantity.RESIDUE_COMPONENT_COMPOSITION
                 else _oxide_map_from_mapping(raw_item)
             )
+            if q_for_species is Quantity.MASS_LOSS_FRACTION:
+                point_oxide_map = (
+                    _mass_loss_oxide_map_from_mapping(raw_item) or point_oxide_map
+                )
             if (
                 q_for_species is Quantity.MASS_LOSS_FRACTION
                 and point_oxide_map is None
