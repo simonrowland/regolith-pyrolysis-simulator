@@ -86,12 +86,12 @@ The rule above was right; the implementation had a second path that broke it.
 - **Hashimoto Fe class-B1 row.** `hashimoto_1983_fe_geometry_class_b1` is bound to
   `fcmas-free-evap-series` like the Mg and SiO class-B1 rows (same preform, same Table 1 map), so
   the three no longer split across a declared and an auto experiment.
-- **Sweep script.** `b718-sweep.py` now uses `migrate._printed_fingerprint` for map identity
-  instead of its own copy. The recorded "post-fix Class B = 0" in `b718-sweep-after-fix.md` was
-  produced by the reviewed commit and is a false negative for quoted Hastie Table 2: once every
-  child carried the copied parent map, the sweep's universal rule counted the copy as agreement.
-  That file is kept as the record of the reviewed run, not as evidence for this fix. The quoted
-  Table 2 shape is now pinned by unit and real-extract tests instead.
+- **Sweep reports.** The committed before/after reports remain as historical outputs. The
+  executable audit script was retired because its map traversal duplicated the migrator's owner.
+  The recorded "post-fix Class B = 0" in `b718-sweep-after-fix.md` is a false negative for quoted
+  Hastie Table 2: once every child carried the copied parent map, the sweep's universal rule counted
+  the copy as agreement. That report is kept as the record of the reviewed run, not as evidence for
+  this fix. The quoted Table 2 shape is now pinned by unit and real-extract tests instead.
 
 The composition role (printed analysis / calculated with derivation / initial charge only /
 two-phase bulk) is still not a field. See the fix REPORT for the proposal.
