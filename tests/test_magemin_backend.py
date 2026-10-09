@@ -2273,6 +2273,55 @@ def test_magemin_liquidus_refuses_when_inactive_solid_decides_the_solidus(
     )
 
 
+def test_magemin_liquidus_refuses_when_inactive_solid_sits_above_active_sample(
+    monkeypatch,
+):
+    """Inactive solids from 1100 C up to, but not including, 1400 C.
+
+    The buffered curve closes at solidus 1000 C and liquidus 1100 C.
+    The finder's monotone step would lift each inactive 0 to the
+    preceding 0.01 and report liquidus 1400 C. Those samples are above
+    the first buffer-active solid, so the bracket is refused with no
+    temperatures.
+    """
+    backend = MAGEMinBackend()
+    backend._available = True
+    backend._bridge = "subprocess"
+    backend._config["liquidus_finder_budget_s"] = 30.0
+
+    def equilibrate(temperature_C, **_kwargs):
+        temperature = float(temperature_C)
+        if 1100.0 <= temperature < 1400.0:
+            return _inactive_buffer_solid(temperature)
+        if temperature < 1000.0:
+            fraction = 0.0
+        elif temperature < 1100.0:
+            fraction = 0.01
+        else:
+            fraction = 1.0
+        return _buffered_melt(temperature, fraction)
+
+    monkeypatch.setattr(backend, "equilibrate", equilibrate)
+    refused = backend.find_liquidus_solidus(
+        composition_kg={"SiO2": 50.0, "FeO": 16.0, "MgO": 10.0},
+        fO2_log=-9.0,
+        pressure_bar=1.0,
+        min_T_C=400.0,
+        max_T_C=1600.0,
+        scan_step_C=50.0,
+        tolerance_C=5.0,
+    )
+    assert refused.status == "out_of_domain"
+    assert refused.solidus_T_C is None
+    assert refused.liquidus_T_C is None
+    assert refused.samples
+    assert refused.diagnostics["reason"] == INACTIVE_BUFFER_DECIDES_BOUNDARY
+    assert (
+        refused.diagnostics["backend_status_reason"]
+        == INACTIVE_BUFFER_DECIDES_BOUNDARY
+    )
+
+
 def test_magemin_empty_melt_composition_marks_status_out_of_domain(monkeypatch):
     # A composition with no species in MAGEMin's 14-oxide basis (only
     # native Fe / sulfide / halide) collapses to an empty wt% projection.
