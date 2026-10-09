@@ -67,6 +67,7 @@ from simulator.battery.identity import (
     profile_for,
     quantity_token,
 )
+from simulator.battery.phase_field import is_outside_single_liquid_field_reason
 from simulator.battery.migrate import (
     REPO_ROOT,
     canonicalize_rail,
@@ -382,6 +383,7 @@ FLAGGED_STRATUM_IMCC_COMPLEX_SATURATION = "imcc_complex_saturation"
 FLAGGED_STRATUM_REFERENCE_CONVERTED_VIA_FUSION = "reference_converted_via_fusion"
 FLAGGED_STRATUM_FIGURE_ONLY = "figure_only"
 FLAGGED_STRATUM_REACTIVE_CELL_NOT_MODELLED = "reactive-cell-not-modelled"
+FLAGGED_STRATUM_LIQUIDUS_POSITION_CONTESTED = "liquidus-position-contested"
 _FLAGGED_STRATUM_NOTICE_KINDS: frozenset[NoticeKind] = frozenset(
     {
         NoticeKind.UNVERIFIED_APPARATUS,
@@ -390,6 +392,7 @@ _FLAGGED_STRATUM_NOTICE_KINDS: frozenset[NoticeKind] = frozenset(
         NoticeKind.IMCC_COMPLEX_SATURATION,
         NoticeKind.FIGURE_ONLY,
         NoticeKind.REACTIVE_CELL_NOT_MODELLED,
+        NoticeKind.LIQUIDUS_POSITION_CONTESTED,
     }
 )
 
@@ -1175,6 +1178,8 @@ def flagged_strata(notices: Sequence[Notice]) -> tuple[str, ...]:
         strata.append(FLAGGED_STRATUM_FIGURE_ONLY)
     if NoticeKind.REACTIVE_CELL_NOT_MODELLED in kinds:
         strata.append(FLAGGED_STRATUM_REACTIVE_CELL_NOT_MODELLED)
+    if NoticeKind.LIQUIDUS_POSITION_CONTESTED in kinds:
+        strata.append(FLAGGED_STRATUM_LIQUIDUS_POSITION_CONTESTED)
     return tuple(strata)
 
 
@@ -4717,6 +4722,36 @@ def _is_bulk_not_liquid_composition(observation: Observation) -> bool:
     )
 
 
+def _without_outside_single_liquid_field(observation: Observation) -> Observation | None:
+    """The same row without its phase_field_class notice; None if it has none."""
+
+    kept = tuple(
+        notice
+        for notice in observation.notices
+        if not is_outside_single_liquid_field_reason(notice.reason)
+    )
+    if len(kept) == len(observation.notices):
+        return None
+    return replace(observation, notices=kept)
+
+
+def _bulk_composition_diagnostic(residual: Residual) -> dict[str, object]:
+    """Non-scored record of what a single-liquid engine gives at bulk composition (E16)."""
+
+    numeric = residual.numeric
+    refusal = residual.refusal
+    return {
+        "scored": False,
+        "basis": "single_liquid_engine_at_bulk_composition",
+        "status": residual.status.value,
+        "execution": residual.execution.state.value,
+        "value": None if numeric is None else str(numeric.value),
+        "unit": None if numeric is None else numeric.unit,
+        "operation": None if numeric is None else numeric.operation.value,
+        "refusal_reason": None if refusal is None else str(refusal.reason.value),
+    }
+
+
 def _none_uncertainty() -> Uncertainty:
     from simulator.battery.enums import UncertaintyKind
 
@@ -4738,6 +4773,7 @@ def compile_residual(
     point_observations: Sequence[Observation] | None = None,
 ) -> tuple[Residual, Observation | None]:
     _require_score_engine(engine)
+    source_reference = reference
     reference = _fusion_comparison_reference(reference, engine=engine)
     identity = reference.identity
     quantity = quantity_token(identity) if isinstance(identity, Identity) else None
@@ -4857,13 +4893,36 @@ def compile_residual(
             exclusions=("status_match_or_mismatch",),
         )
     if engine in SINGLE_LIQUID_ENGINES and _is_bulk_not_liquid_composition(reference):
+        bulk_detail: dict[str, object] = {
+            "reason": RefusalReason.BULK_NOT_LIQUID_COMPOSITION.value,
+            "composition_status": TWO_PHASE_BULK_COMPOSITION_STATUS,
+            "engine": engine.value,
+        }
+        unclassified = _without_outside_single_liquid_field(source_reference)
+        if unclassified is not None:
+            # t-1123a / E16: a classified (not printed) outside-single-liquid row
+            # is never scored at bulk composition, but the number the engine
+            # gives there is kept as a non-scored diagnostic so nothing
+            # disappears silently.
+            diagnostic, _ = compile_residual(
+                unclassified,
+                engine,
+                context=context,
+                prediction=prediction,
+                comparison_ids=comparison_ids,
+                predict=predict,
+                handles=handles,
+                lineage_observation_id=lineage_observation_id,
+                table_index=table_index,
+                derived_band=derived_band,
+                point_observations=point_observations,
+            )
+            bulk_detail["bulk_composition_diagnostic"] = _bulk_composition_diagnostic(
+                diagnostic
+            )
         return _refused(
             RefusalReason.BULK_NOT_LIQUID_COMPOSITION,
-            {
-                "reason": RefusalReason.BULK_NOT_LIQUID_COMPOSITION.value,
-                "composition_status": TWO_PHASE_BULK_COMPOSITION_STATUS,
-                "engine": engine.value,
-            },
+            bulk_detail,
             execution=Execution(state=ExecutionState.NOT_PROBED),
         )
     if (
@@ -7665,6 +7724,8 @@ def _flagged_payload_strata(row: Mapping[str, object]) -> tuple[str, ...]:
         out.append(FLAGGED_STRATUM_FIGURE_ONLY)
     if NoticeKind.REACTIVE_CELL_NOT_MODELLED.value in kinds:
         out.append(FLAGGED_STRATUM_REACTIVE_CELL_NOT_MODELLED)
+    if NoticeKind.LIQUIDUS_POSITION_CONTESTED.value in kinds:
+        out.append(FLAGGED_STRATUM_LIQUIDUS_POSITION_CONTESTED)
     return tuple(out)
 
 
