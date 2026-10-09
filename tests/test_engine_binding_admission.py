@@ -374,10 +374,12 @@ def test_gate_replay_skips_unadmitted_optional_fallback_candidate(
     )
     store = PT0DeterminismStore("replay", db_path=tmp_path / "unused.db")
     authorized_roles = []
+    authorized_artifacts = []
     lookup_keys = []
 
-    def authorize(_sim, *, provider_role=None):
+    def authorize(_sim, *, provider_role=None, artifact=None):
         authorized_roles.append(provider_role)
+        authorized_artifacts.append(artifact)
         if provider_role == "fallback":
             raise EngineBindingAdmissionError(
                 SYNTHETIC_IDENTITY,
@@ -403,6 +405,7 @@ def test_gate_replay_skips_unadmitted_optional_fallback_candidate(
 
     assert result["liquidus_T_C"] == 1300.0
     assert authorized_roles == ["authoritative", "fallback"]
+    assert authorized_artifacts == ["freeze_gate_curve", "freeze_gate_curve"]
     assert lookup_keys == [{"provider_role": "authoritative"}]
 
 
@@ -558,6 +561,11 @@ def test_missing_selected_contributor_disables_live_cache_and_replay(
     import simulator.reduced_real_determinism as replay
     from tests.binding_admission_fixtures import install_synthetic_binding_receipt
 
+    install_synthetic_binding_receipt(
+        tmp_path,
+        monkeypatch,
+        bind_direct_backend=True,
+    )
     monkeypatch.setattr(
         replay,
         "record_binding_producer_ids",
@@ -566,11 +574,6 @@ def test_missing_selected_contributor_disables_live_cache_and_replay(
             if artifact == "equilibrium_post_record"
             else ()
         ),
-    )
-    install_synthetic_binding_receipt(
-        tmp_path,
-        monkeypatch,
-        bind_direct_backend=True,
     )
     backend = SimpleNamespace(
         name="synthetic-fake",
