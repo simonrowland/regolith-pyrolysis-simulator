@@ -3280,6 +3280,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             control_inputs={},
             transition_source='phase_home',
         )
+        # Redox capacity reads inventory.melt_oxide_kg. Refresh it from
+        # the post-split liquid before that consumer runs.
+        self._project_cleaned_melt_from_atom_ledger()
 
     def _o2_bubbler_external_o2_overhead_mol(self) -> float:
         return max(
