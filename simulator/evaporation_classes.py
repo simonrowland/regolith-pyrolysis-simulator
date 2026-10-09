@@ -238,10 +238,10 @@ _REDOX_EVIDENCE: tuple[EvidenceRow, ...] = (
         species="Mg",
         system_class="silicate_melt",
         transformation_class="redox_reduction_required",
-        alpha_note="0.27 at 2273 K (Table 3 per-temperature series)",
+        alpha_note="0.24",
         comparable=True,
         role="grounding",
-        alpha=0.27,
+        alpha=0.24,
     ),
     EvidenceRow(
         source_id="kems-037-richter-2002",

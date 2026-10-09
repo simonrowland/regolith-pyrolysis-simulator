@@ -76,46 +76,6 @@ points:
   status: mismatch
   note: Expanded real-harness pin; residual is reported, not tuned.
   temperature_K: 2273.0
-- key: fedkin_2006_fe_hashimoto_langmuir_table3:T=1973
-  case_id: kems-005-fedkin-2006::fedkin_2006_fe_hashimoto_langmuir_table3
-  source_id: kems-005-fedkin-2006
-  observation_type: alpha
-  species: Fe
-  residual_dex: 1.0606978403536116
-  band_dex: 0.01
-  status: mismatch
-  note: Expanded real-harness pin; residual is reported, not tuned.
-  temperature_K: 1973.0
-- key: fedkin_2006_fe_hashimoto_langmuir_table3:T=2073
-  case_id: kems-005-fedkin-2006::fedkin_2006_fe_hashimoto_langmuir_table3
-  source_id: kems-005-fedkin-2006
-  observation_type: alpha
-  species: Fe
-  residual_dex: 1.0969100130080565
-  band_dex: 0.01
-  status: mismatch
-  note: Expanded real-harness pin; residual is reported, not tuned.
-  temperature_K: 2073.0
-- key: fedkin_2006_fe_hashimoto_langmuir_table3:T=2173
-  case_id: kems-005-fedkin-2006::fedkin_2006_fe_hashimoto_langmuir_table3
-  source_id: kems-005-fedkin-2006
-  observation_type: alpha
-  species: Fe
-  residual_dex: 1.0791812460476249
-  band_dex: 0.01
-  status: mismatch
-  note: Expanded real-harness pin; residual is reported, not tuned.
-  temperature_K: 2173.0
-- key: fedkin_2006_fe_hashimoto_langmuir_table3:T=2273
-  case_id: kems-005-fedkin-2006::fedkin_2006_fe_hashimoto_langmuir_table3
-  source_id: kems-005-fedkin-2006
-  observation_type: alpha
-  species: Fe
-  residual_dex: 1.0606978403536116
-  band_dex: 0.01
-  status: mismatch
-  note: Expanded real-harness pin; residual is reported, not tuned.
-  temperature_K: 2273.0
 - key: fedkin_2006_mg_hashimoto_langmuir_table3:T=1973
   case_id: kems-005-fedkin-2006::fedkin_2006_mg_hashimoto_langmuir_table3
   source_id: kems-005-fedkin-2006
@@ -125,6 +85,16 @@ points:
   band_dex: 0.01
   status: mismatch
   note: Expanded real-harness pin; residual is reported, not tuned.
+  temperature_K: 1973.0
+- key: fedkin_2006_table3_mg_hashimoto_langmuir:T=1973
+  case_id: kems-005-fedkin-2006::fedkin_2006_mg_hashimoto_langmuir_table3
+  source_id: kems-005-fedkin-2006
+  observation_type: alpha
+  species: Mg
+  residual_dex: 0.0791812460476248
+  band_dex: 0.01
+  status: mismatch
+  note: U0 legacy anchor for the owner Mg row; values match the owner pin.
   temperature_K: 1973.0
 - key: fedkin_2006_mg_hashimoto_langmuir_table3:T=2073
   case_id: kems-005-fedkin-2006::fedkin_2006_mg_hashimoto_langmuir_table3
@@ -529,50 +499,6 @@ points:
   status: mismatch
   note: 'd-006 binary-closure admission: Tsaplin/Zaitsev binary melt, composition completed from x_SiO2_as_published (second component 1-x); parent-basis comparison a_parent = a_single_cation^cations per chemistry-methods 3.1. FINDING: constant-gamma table cannot track the binary composition dependence; residual reported, not tuned.'
   temperature_K: 1673.0
-- key: fedkin_2006_mg_hashimoto_langmuir_table3:T=1973
-  case_id: "kems-005-fedkin-2006::fedkin_2006_mg_hashimoto_langmuir_table3"
-  source_id: kems-005-fedkin-2006
-  observation_type: alpha
-  species: Mg
-  residual_dex: 0.0791812460476248
-  band_dex: 0.01
-  residual: -0.03999999999999998
-  status: mismatch
-  note: Fedkin 2006 Mg Hashimoto/Langmuir table3 per-T transcription (replaces the T=2123 placeholder). Residual reported, not tuned.
-  temperature_K: 1973.0
-- key: fedkin_2006_mg_hashimoto_langmuir_table3:T=2073
-  case_id: "kems-005-fedkin-2006::fedkin_2006_mg_hashimoto_langmuir_table3"
-  source_id: kems-005-fedkin-2006
-  observation_type: alpha
-  species: Mg
-  residual_dex: 0.146128035678238
-  band_dex: 0.01
-  residual: -0.08000000000000002
-  status: mismatch
-  note: Fedkin 2006 Mg Hashimoto/Langmuir table3 per-T transcription (replaces the T=2123 placeholder). Residual reported, not tuned.
-  temperature_K: 2073.0
-- key: fedkin_2006_mg_hashimoto_langmuir_table3:T=2173
-  case_id: "kems-005-fedkin-2006::fedkin_2006_mg_hashimoto_langmuir_table3"
-  source_id: kems-005-fedkin-2006
-  observation_type: alpha
-  species: Mg
-  residual_dex: 0.146128035678238
-  band_dex: 0.01
-  residual: -0.08000000000000002
-  status: mismatch
-  note: Fedkin 2006 Mg Hashimoto/Langmuir table3 per-T transcription (replaces the T=2123 placeholder). Residual reported, not tuned.
-  temperature_K: 2173.0
-- key: fedkin_2006_mg_hashimoto_langmuir_table3:T=2273
-  case_id: "kems-005-fedkin-2006::fedkin_2006_mg_hashimoto_langmuir_table3"
-  source_id: kems-005-fedkin-2006
-  observation_type: alpha
-  species: Mg
-  residual_dex: 0.13033376849500614
-  band_dex: 0.01
-  residual: -0.07
-  status: mismatch
-  note: Fedkin 2006 Mg Hashimoto/Langmuir table3 per-T transcription (replaces the T=2123 placeholder). Residual reported, not tuned.
-  temperature_K: 2273.0
 - key: zhang_2021_table4_K_evaporation_coefficients:T=1473.15
   case_id: "kems-006-zhang-2021::zhang_2021_table4_K_evaporation_coefficients"
   source_id: kems-006-zhang-2021
