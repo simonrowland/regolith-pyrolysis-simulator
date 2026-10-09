@@ -12252,6 +12252,11 @@ class Migrator:
             )
 
         t_payload = dict(values)
+        if (
+            q_token is Quantity.P_PARTIAL
+            and t_payload.get("reference_temperature_K") is not None
+        ):
+            t_payload.setdefault("temperature_K", t_payload["reference_temperature_K"])
         if obs.get("T_K") is not None:
             t_payload.setdefault("T_K", obs.get("T_K"))
         if obs.get("T_range_K") is not None:
