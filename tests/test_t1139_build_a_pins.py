@@ -9,9 +9,7 @@ from __future__ import annotations
 
 import math
 from collections import defaultdict
-from dataclasses import fields, is_dataclass
 from pathlib import Path
-from typing import Any, Mapping
 
 import pytest
 
@@ -21,6 +19,7 @@ from simulator.vapour_rail.catalog import (
     compile_vapour_rail_catalog,
     vapor_pressure_legacy_view,
 )
+from simulator.vapour_rail.channel_generator import generate_first_batch
 from simulator.yaml_cache import load_cached_safe_yaml
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -264,6 +263,12 @@ def production_catalog():
     return compile_vapour_rail_catalog(payload, emit_u0_request_rules=False)
 
 
+@pytest.fixture(scope="module")
+def generated_rows():
+    return {channel.species_id: channel.family["physical_properties"]["species"][channel.species_id]
+            for channel in generate_first_batch().channels}
+
+
 def _legacy_row(catalog, species_id: str) -> dict:
     for group in catalog.legacy_view().values():
         if isinstance(group, dict) and species_id in group:
@@ -295,14 +300,22 @@ def test_vapour_rail_pressure_pins(production_catalog, species_id: str) -> None:
 
 
 @pytest.mark.parametrize("species_id", FIRST_BATCH_EXISTING)
-def test_first_batch_existing_rows_are_dormant(
-    production_catalog, species_id: str
+def test_first_batch_existing_rows_follow_declared_activation(
+    production_catalog, generated_rows, species_id: str
 ) -> None:
     compiled = production_catalog.species[species_id]
-    assert compiled.code_metadata.request_rule == "dormant_pending_validation"
-    assert compiled.code_metadata.hot_train_applicability == "not_applicable"
+    declared = generated_rows[species_id]
+    dormant = declared["flux_dormant"]
+    assert dormant is bool(declared.get("dormancy_reason"))
+    assert compiled.code_metadata.request_rule == (
+        "dormant_pending_validation" if dormant else "trace_source_inventory"
+    )
+    assert compiled.code_metadata.hot_train_applicability == (
+        "not_applicable" if dormant else "derived_from_condensation_onset"
+    )
     row = _legacy_row(production_catalog, species_id)
-    assert row["flux_dormant"] is True
+    assert row["flux_dormant"] is dormant
+    assert row.get("dormancy_reason") == declared.get("dormancy_reason")
     assert compiled.evaluator is not None
 
 
@@ -359,70 +372,26 @@ def test_hand_stoich_atom_and_mass_closure(
     assert math.isclose(oxide_kg, 1.0 + o2_kg, rel_tol=1e-6, abs_tol=1e-9)
 
 
-def _t1139_ids(value: Any) -> list[str]:
-    found: list[str] = []
-    seen: set[int] = set()
-
-    def walk(node: Any) -> None:
-        if isinstance(node, str):
-            if "t1139_" in node:
-                found.append(node)
-            return
-        if node is None or isinstance(node, (int, float, bool, bytes)):
-            return
-        ident = id(node)
-        if ident in seen:
-            return
-        seen.add(ident)
-        if isinstance(node, Mapping):
-            for key, item in node.items():
-                walk(key)
-                walk(item)
-            return
-        if isinstance(node, (list, tuple, set, frozenset)):
-            for item in node:
-                walk(item)
-            return
-        if is_dataclass(node) and not isinstance(node, type):
-            for item in fields(node):
-                walk(getattr(node, item.name))
-
-    walk(value)
-    return found
-
-
-def _compiled_t1139_ids(catalog) -> list[str]:
-    found: list[str] = []
-    for species_id, compiled in catalog.species.items():
-        found.extend(
-            _t1139_ids(
-                (
-                    species_id,
-                    compiled.species_id,
-                    compiled.family_id,
-                    compiled.source_reaction_id,
-                    compiled.code_metadata,
-                )
-            )
-        )
-    found.extend(_t1139_ids(catalog.request_rules))
-    return found
-
-
-def test_live_catalog_legacy_view_and_config_bundle_have_zero_t1139_ids() -> None:
+def test_live_catalog_views_expose_inserted_rows_with_canonical_species_ids(generated_rows) -> None:
     payload = load_cached_safe_yaml(CATALOG_PATH.read_text(encoding="utf-8"))
     catalog = compile_vapour_rail_catalog(payload, emit_u0_request_rules=True)
     bundle = load_config_bundle()
-    surfaces = {
-        "catalog": _compiled_t1139_ids(catalog),
-        "legacy_view": _t1139_ids(catalog.legacy_view()),
-        "vapor_pressure_legacy_view": _t1139_ids(
-            vapor_pressure_legacy_view(payload)
-        ),
-        "config_bundle": _t1139_ids(bundle.vapor_pressures),
-        "config_bundle_payload": _t1139_ids(
-            getattr(bundle.vapor_pressures, "catalog_payload", {})
-        ),
-    }
-    leaked = {name: ids for name, ids in surfaces.items() if ids}
-    assert not leaked
+    views = (catalog.legacy_view(), vapor_pressure_legacy_view(payload),
+             bundle.vapor_pressures)
+    for species_id, declared in generated_rows.items():
+        assert species_id in catalog.species
+        assert not species_id.startswith("t1139_")
+        compiled = catalog.species[species_id]
+        assert compiled.family_id.startswith("t1139_")
+        stored = bundle.vapor_pressures.catalog_payload["families"][compiled.family_id]
+        assert stored["physical_properties"]["species"][species_id] == declared
+        for view in views:
+            rows = [group[species_id] for group in view.values()
+                    if isinstance(group, dict) and species_id in group]
+            assert len(rows) == 1, species_id
+            assert rows[0]["flux_dormant"] is declared["flux_dormant"]
+            assert rows[0]["parent_oxide"] == declared["parent_oxide"]
+    for view in views:
+        assert not any(str(species_id).startswith("t1139_")
+                       for group in view.values() if isinstance(group, dict)
+                       for species_id in group)
