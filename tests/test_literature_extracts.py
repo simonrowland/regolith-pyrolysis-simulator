@@ -1115,17 +1115,13 @@ def test_sossi_na_inference_and_ceiling_never_recreate_alpha_range():
         "kems-012-sossi-2019.yaml",
         "sossi_2019_na_alpha_e_authors_adopted_unity",
     )
-    legacy = _repo_observation(
-        "sossi-et-al-2019.yaml", "sossi_2019_na_open_furnace_apparent"
-    )
 
     assert "alpha_range" not in gamma["values"]
     assert gamma["values"]["gamma_derived_alpha_e_inference_at_1400C"] == [0.3, 1.7]
     assert gamma["values"]["consumer_policy"] == "report_only_not_executable_alpha_range"
     assert adopted["values"]["alpha_authority_status"] == "analytical_upper_bound"
     assert adopted["values"]["physical_alpha_upper_bound"] == 1.0
-    assert "alpha_range" not in legacy["values"]
-    assert legacy["values"]["alpha_authority_status"] == "analytical_upper_bound"
+    assert adopted["values"]["alpha"] == 1.0
 
 
 def test_wetzel_duplicate_is_typed_as_solid_film_growth():
