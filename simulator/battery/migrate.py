@@ -10654,7 +10654,9 @@ class Migrator:
         row_printed = sample.printed_composition
         if experiment_id in self._registry_printed_composition_experiments:
             sample = replace(sample, printed_composition=None)
-            if row_printed is not None:
+            if row_printed is not None and not self._repeats_declared_sample_map(
+                experiment_id, row_printed
+            ):
                 sample = replace(sample, initial_composition=None)
         elif row_printed is not None and not _is_printed_initial_charge(
             row_printed, values
