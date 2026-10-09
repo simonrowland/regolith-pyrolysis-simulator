@@ -656,7 +656,7 @@ def test_zero_o2_argon_lab_schedule_does_not_synthesize_n2():
 
     assert melt.pO2_mbar == pytest.approx(0.0)
     assert melt.p_total_mbar == pytest.approx(10.0)
-    assert melt.atmosphere is Atmosphere.CONTROLLED_O2
+    assert melt.atmosphere is Atmosphere.PN2_SWEEP
     assert melt.background_gas_species == "Ar"
 
     gas = OverheadGasModel({
@@ -666,5 +666,43 @@ def test_zero_o2_argon_lab_schedule_does_not_synthesize_n2():
         "volume_m3": 1.0,
     }).update(EvaporationFlux(), melt, CondensationTrain.create_default())
 
-    assert gas.composition.get("Ar", 0.0) == pytest.approx(8.0)
+    # The sweep writes the full balance p_total - pO2 onto the stamped
+    # carrier. It does not scale that balance by background mole fraction.
+    assert gas.composition.get("Ar", 0.0) == pytest.approx(10.0)
     assert gas.composition.get("N2", 0.0) == pytest.approx(0.0)
+
+
+@pytest.mark.parametrize(
+    ("species", "mole_fraction", "pO2_setpoint_mbar", "atmosphere"),
+    [
+        ("Ar", 1.0, None, Atmosphere.PN2_SWEEP),
+        ("Kr", 1.0, None, Atmosphere.PN2_SWEEP),
+        ("He", 1.0, None, Atmosphere.PN2_SWEEP),
+        ("N2", 1.0, None, Atmosphere.PN2_SWEEP),
+        ("CO2", 1.0, None, Atmosphere.CO2_BACKPRESSURE),
+        ("O2", 0.0, None, Atmosphere.CONTROLLED_O2),
+        ("Ar", 1.0, 1.0, Atmosphere.CONTROLLED_O2),
+    ],
+)
+def test_zero_o2_inert_background_is_a_closed_binding(
+    species: str,
+    mole_fraction: float,
+    pO2_setpoint_mbar: float | None,
+    atmosphere: Atmosphere,
+):
+    schedule = deepcopy(_n2_lab_schedule())
+    schedule["gas_boundary"]["background_gas"]["species"] = species
+    schedule["gas_boundary"]["background_gas"]["mole_fraction"] = mole_fraction
+    overrides: dict = {"lab_schedule": schedule}
+    if pO2_setpoint_mbar is not None:
+        overrides["lab_schedule_pO2_setpoint_mbar"] = pO2_setpoint_mbar
+    manager = CampaignManager(_setpoints())
+    manager.overrides["C2A"] = overrides
+    melt = MeltState()
+
+    manager.configure_campaign(melt, CampaignPhase.C2A)
+
+    assert melt.atmosphere is atmosphere
+    assert melt.background_gas_species == species
+    if pO2_setpoint_mbar is None and species.upper() != "O2":
+        assert melt.pO2_mbar == pytest.approx(0.0)

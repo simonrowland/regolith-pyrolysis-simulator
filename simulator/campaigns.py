@@ -1964,14 +1964,17 @@ class CampaignManager:
         melt.pO2_mbar = float(row['achieved_mbar'])
         melt.background_gas_species = background_species
         melt.background_gas_mole_fraction = background_fraction
-        if melt.pO2_mbar > 0.0:
+        # A zero O2 command on an inert background is the closed sweep
+        # binding. CONTROLLED_O2 is an oxygen setpoint or an oxygen
+        # background. Overhead keys the sweep balance off
+        # background_gas_species, so PN2_SWEEP does not synthesize N2
+        # for Ar, Kr, or He. CO2 is not a sweep here: the existing closed
+        # cover is CO2_BACKPRESSURE (the C0 ambient path).
+        species_key = background_species.upper()
+        if melt.pO2_mbar > 0.0 or species_key == 'O2':
             melt.atmosphere = Atmosphere.CONTROLLED_O2
-        elif background_species and background_species.upper() not in {'N2', 'O2'}:
-            # F-080: a positive-pressure zero-O2 inert schedule is a measured
-            # background cover, not a nitrogen sweep. Keep it on the controlled
-            # pressure path so overhead composes the declared species instead
-            # of synthesizing N2 from total-minus-O2.
-            melt.atmosphere = Atmosphere.CONTROLLED_O2
+        elif melt.p_total_mbar > 0.0 and species_key == 'CO2':
+            melt.atmosphere = Atmosphere.CO2_BACKPRESSURE
         elif melt.p_total_mbar > 0.0:
             melt.atmosphere = Atmosphere.PN2_SWEEP
         else:

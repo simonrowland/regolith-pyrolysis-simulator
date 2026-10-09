@@ -151,7 +151,7 @@ def test_reservoir_tracks_iw_until_the_first_liquid_tick() -> None:
     assert sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log != pytest.approx(fixed)
 
 
-def test_pin_zero_o2_argon_schedule_is_controlled_o2() -> None:
+def test_zero_o2_argon_schedule_is_a_closed_sweep() -> None:
     schedule = deepcopy(_n2_lab_schedule())
     schedule["gas_boundary"]["background_gas"]["species"] = "Ar"
     manager = CampaignManager(_setpoints())
@@ -166,7 +166,7 @@ def test_pin_zero_o2_argon_schedule_is_controlled_o2() -> None:
     )
 
     assert melt.pO2_mbar == pytest.approx(0.0)
-    assert melt.atmosphere is Atmosphere.CONTROLLED_O2
+    assert melt.atmosphere is Atmosphere.PN2_SWEEP
     assert melt.background_gas_species == "Ar"
 
 
