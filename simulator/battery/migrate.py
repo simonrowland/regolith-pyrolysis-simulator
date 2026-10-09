@@ -2849,6 +2849,14 @@ _PRINTED_COMPOSITION_MAP_KEYS = (
     "starting_glass_wt_pct",
     "printed_composition",
 )
+_PRINTED_COMPOSITION_TOTAL_KEYS = frozenset(
+    {
+        "total",
+        "sum",
+        "sum_wt_pct",
+        "sum_as_published",
+    }
+)
 _CHARGE_PRINTED_COMPOSITION_NAMES = frozenset(
     {
         "printed_composition",
@@ -2891,10 +2899,28 @@ def oxide_molar_mass(oxide: str) -> Decimal:
 def wt_pct_to_mole_fraction(wt: Mapping[str, Decimal]) -> Composition:
     """Convert a printed oxide wt% map to mole fraction. Does not renormalize wt%."""
 
+    unsupported = []
+    for oxide, weight in wt.items():
+        name = str(oxide).strip()
+        if (
+            name in _OXIDE_COMPONENT_KEYS
+            or name.casefold() in _PRINTED_COMPOSITION_TOTAL_KEYS
+        ):
+            continue
+        if _as_dec_or_none(weight) is not None:
+            unsupported.append(name)
+    if unsupported:
+        raise ValueError(
+            "printed oxide wt% map has unsupported numeric component(s): "
+            + ", ".join(sorted(unsupported))
+        )
+
     moles: list[tuple[str, Decimal]] = []
     total = Decimal("0")
     for oxide, weight in wt.items():
-        name = str(oxide)
+        name = str(oxide).strip()
+        if name.casefold() in _PRINTED_COMPOSITION_TOTAL_KEYS:
+            continue
         if name not in _OXIDE_COMPONENT_KEYS:
             continue
         amount = as_decimal(weight)
@@ -2969,28 +2995,56 @@ def _oxide_map_from_mapping(obj: object) -> dict[str, Decimal] | None:
             if key == "composition_mass_percent":
                 comps: dict[str, Decimal] = {}
                 for name, value in nested.items():
-                    equivalent = _kume_formula_unit_oxide(str(name).strip())
+                    token = str(name).strip()
                     amount = _as_dec_or_none(value)
-                    if equivalent is None or amount is None:
+                    if amount is None:
                         return None
+                    equivalent = _kume_formula_unit_oxide(token)
+                    if equivalent is None:
+                        comps[token] = amount
+                        continue
                     oxide, _factor = equivalent
                     comps[oxide] = comps.get(oxide, Decimal("0")) + amount
                 if len(comps) >= 2:
+                    try:
+                        wt_pct_to_mole_fraction(comps)
+                    except ValueError:
+                        return None
                     return comps
                 continue
             got = _oxide_map_from_mapping(nested)
             if got:
+                for name, value in nested.items():
+                    token = str(name).strip()
+                    amount = _as_dec_or_none(value)
+                    if amount is not None and token not in got:
+                        got[token] = amount
+                try:
+                    wt_pct_to_mole_fraction(got)
+                except ValueError:
+                    return None
                 return got
     comps: dict[str, Decimal] = {}
     for key, value in obj.items():
-        name = str(key)
-        if name not in _OXIDE_COMPONENT_KEYS:
-            continue
+        name = str(key).strip()
         amount = _as_dec_or_none(value)
         if amount is None:
             continue
+        # Point records share the flat map with these condition fields.
+        if name in {
+            "T_C",
+            "T_K",
+            "mass_loss_pct",
+            "t_min",
+            "Nr",
+        }:
+            continue
         comps[name] = amount
     if len(comps) < 2:
+        return None
+    try:
+        wt_pct_to_mole_fraction(comps)
+    except ValueError:
         return None
     return comps
 
