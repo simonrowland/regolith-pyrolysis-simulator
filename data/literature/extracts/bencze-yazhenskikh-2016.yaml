@@ -8,7 +8,7 @@ extraction:
   method: pdftotext -layout transcription of the supplied seven-page supplemental PDF; Tables S-I and S-II only
   date: '2026-09-20'
   worker: i1-bencze-yazhenskikh-2016
-  provenance_path: /Users/simonrowland/Repos/regolith-corpus/raw/bencze-yazhenskikh-2016/bencze-yazhenskikh-2016.pdf
+  provenance_path: corpus/raw/bencze-yazhenskikh-2016/bencze-yazhenskikh-2016.pdf
 review_status: draft
 scope_assessment:
   document_type: supplemental parameter tables from a primary Knudsen-effusion mass-spectrometry study of alkali vaporization from solidified gasifier slags
@@ -33,7 +33,7 @@ benches:
   apparatus_family:
     state: {tag: value, value: Knudsen effusion mass spectrometry}
     locator:
-      source_path: /Users/simonrowland/Repos/regolith-corpus/raw/bencze-yazhenskikh-2016/bencze-yazhenskikh-2016.pdf
+      source_path: corpus/raw/bencze-yazhenskikh-2016/bencze-yazhenskikh-2016.pdf
       page: 1-7
       note: Study title identifies KEMS; the supplied supplement contains parameter tables only.
   cell_materials:
@@ -41,7 +41,7 @@ benches:
         tag: value
         value: Ir
       locator:
-        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/bencze-yazhenskikh-2016/bencze-yazhenskikh-2016.pdf
+        source_path: corpus/raw/bencze-yazhenskikh-2016/bencze-yazhenskikh-2016.pdf
         page: 1-7
         note: 'Table footnote: “there is a thin graphite coating on the inner surface of the lid of the iridium cell”; a thin
           graphite disc later replaced the coating.'
@@ -49,14 +49,14 @@ benches:
         tag: value
         value: C_graphite
       locator:
-        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/bencze-yazhenskikh-2016/bencze-yazhenskikh-2016.pdf
+        source_path: corpus/raw/bencze-yazhenskikh-2016/bencze-yazhenskikh-2016.pdf
         page: 1-7
         note: 'Table footnote: “there is a thin graphite coating on the inner surface of the lid of the iridium cell”; a thin
           graphite disc later replaced the coating.'
   cell_material_and_liner:
     state: {tag: value, value: iridium cell with graphite-coated lid; later graphite disc}
     locator:
-      source_path: /Users/simonrowland/Repos/regolith-corpus/raw/bencze-yazhenskikh-2016/bencze-yazhenskikh-2016.pdf
+      source_path: corpus/raw/bencze-yazhenskikh-2016/bencze-yazhenskikh-2016.pdf
       page: 1-7
       note: 'Table footnote: “there is a thin graphite coating on the inner surface of the lid of the iridium cell”; a thin graphite disc later replaced the coating.'
 
@@ -72,7 +72,7 @@ species:
     - observation_id: bencze_2016_table_s1_na_all_subsamples
       type: psat_series
       locator:
-        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/bencze-yazhenskikh-2016/bencze-yazhenskikh-2016.pdf
+        source_path: corpus/raw/bencze-yazhenskikh-2016/bencze-yazhenskikh-2016.pdf
         page: 1-6
         table: S-I
         note: 'Columns: ln(p(Na(g))/Pa)=A+B/T; vapor pressure p(Na(g))/Pa at 1273 K; activity a(Na2O) at 1273 K.'
@@ -160,7 +160,7 @@ species:
         note: Table S-I prints no uncertainty for individual fitted rows.
     - observation_id: bencze_2016_table_s2_na_selected_means
       type: psat_series
-      locator: {source_path: /Users/simonrowland/Repos/regolith-corpus/raw/bencze-yazhenskikh-2016/bencze-yazhenskikh-2016.pdf, page: 7, table: S-II}
+      locator: {source_path: corpus/raw/bencze-yazhenskikh-2016/bencze-yazhenskikh-2016.pdf, page: 7, table: S-II}
       phase: solidified_gasifier_slag_selected_subsamples
       experiment: bencze-2016-ir-kems
       regime: knudsen_effusion_mass_spectrometry
@@ -182,7 +182,7 @@ species:
     observations:
     - observation_id: bencze_2016_table_s1_k_all_subsamples
       type: psat_series
-      locator: {source_path: /Users/simonrowland/Repos/regolith-corpus/raw/bencze-yazhenskikh-2016/bencze-yazhenskikh-2016.pdf, page: 1-6, table: S-I, note: 'Columns: ln(p(K(g))/Pa)=A+B/T; vapor pressure p(K(g))/Pa at 1273 K; activity a(K2O) at 1273 K.'}
+      locator: {source_path: corpus/raw/bencze-yazhenskikh-2016/bencze-yazhenskikh-2016.pdf, page: 1-6, table: S-I, note: 'Columns: ln(p(K(g))/Pa)=A+B/T; vapor pressure p(K(g))/Pa at 1273 K; activity a(K2O) at 1273 K.'}
       phase: solidified_gasifier_slag_subsamples
       experiment: bencze-2016-ir-kems
       regime: knudsen_effusion_mass_spectrometry
@@ -199,7 +199,7 @@ species:
       uncertainty: {reported_status: not_reported_for_individual_rows, note: Table S-I prints no uncertainty for individual fitted rows.}
     - observation_id: bencze_2016_table_s2_k_selected_means
       type: psat_series
-      locator: {source_path: /Users/simonrowland/Repos/regolith-corpus/raw/bencze-yazhenskikh-2016/bencze-yazhenskikh-2016.pdf, page: 7, table: S-II}
+      locator: {source_path: corpus/raw/bencze-yazhenskikh-2016/bencze-yazhenskikh-2016.pdf, page: 7, table: S-II}
       phase: solidified_gasifier_slag_selected_subsamples
       experiment: bencze-2016-ir-kems
       regime: knudsen_effusion_mass_spectrometry

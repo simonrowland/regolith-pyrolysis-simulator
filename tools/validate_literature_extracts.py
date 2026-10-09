@@ -25,7 +25,8 @@ Fail-loud rules (non-exhaustive; see data/literature/extracts/SCHEMA.md):
 * sibling ``context`` container rows (unscored experiment context, d-032):
   observation-shaped contract, but a scored observation ``type`` parked
   there is refused
-* absolute machine-local provenance_path refused
+* absolute machine-local path values refused on every path-valued key
+  (parsed, so quoted scalars and YAML aliases count; PATH_VALUE_KEYS)
 
 Usage::
 
@@ -130,6 +131,98 @@ _ISO_DATE_RE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
 _ABS_PATH_RE = re.compile(r"^(/|[A-Za-z]:\\|\\\\)")
 # path segments: bare key or key[index_or_id]
 _PATH_SEGMENT_RE = re.compile(r"^([^.\[]+)(?:\[([^\]]*)\])?$")
+
+# Path-valued keys that must stay corpus- or repository-relative (never
+# machine-local absolute). This frozenset is the ONE definition of which keys
+# carry paths: the walk below, the refusal, and the tests
+# (tests/test_absolute_path_ratchet.py plants an absolute value on each member
+# and checks the set against the extract tree) all read it; there is no second
+# list. Membership comes from a survey of all 273 extracts on green 61ec839da
+# (ROR-b713-r2): every key with a path-shaped value (corpus/raw/tables/text/
+# data/docs prefix or a file extension, no whitespace) is a member.
+# Deliberately out: table_transcription (printed table text, e.g. a unit
+# token "/K" is not a path), url (http/https), path and metadata_path
+# (fidelity dot-paths), record (row identifiers), new_corpus_tables (table
+# numbers), note / derived_from (prose that mentions paths).
+PATH_VALUE_KEYS = frozenset(
+    {
+        "provenance_path",
+        "source_path",
+        "source_pdf",
+        "source_pdf_path",
+        "original_scan",  # Gibson & Hubbard anchor aliased into source_path
+        "table_csv",  # 110 tables/... values
+        "table_file",
+        "table_path",
+        "quotes_path",
+        "source_csv",
+        "corpus_transcription",
+        "corpus_provenance",
+        "transcription",  # string form; dict form (page/table/title) is walked
+        "repaired_table_path",
+        "verified_data_path",
+        "corpus_tables",  # directory string or list of csv paths
+        "table_provenance_root",
+        "chapter_pdf",
+        "corpus_asset",
+    }
+)
+
+
+def _is_absolute_path(value: Any) -> bool:
+    return isinstance(value, str) and bool(_ABS_PATH_RE.match(value))
+
+
+def _walk_absolute_path_values(
+    node: Any, *, path: str = ""
+) -> list[tuple[str, str, str]]:
+    """Return (key, dotted-path, value) for absolute PATH_VALUE_KEYS hits.
+
+    Walks the *parsed* document, so a quoted scalar and a YAML alias
+    (``source_path: *scan``) count exactly like an unquoted scalar, and an
+    anchor reused N times yields N hits (one per place a consumer reads it).
+    A path key's value may be a string (checked), a list (each string element
+    checked, e.g. ``corpus_tables: [tables/x/t1.csv, ...]``; other elements
+    walked), or a mapping (walked, e.g. the ``transcription`` page/table dict).
+    """
+    hits: list[tuple[str, str, str]] = []
+    if isinstance(node, Mapping):
+        for key, value in node.items():
+            key_s = str(key)
+            child = f"{path}.{key_s}" if path else key_s
+            if key_s in PATH_VALUE_KEYS:
+                if _is_absolute_path(value):
+                    hits.append((key_s, child, value))
+                    continue
+                if isinstance(value, (list, tuple)):
+                    for i, item in enumerate(value):
+                        if _is_absolute_path(item):
+                            hits.append((key_s, f"{child}[{i}]", item))
+            hits.extend(_walk_absolute_path_values(value, path=child))
+    elif isinstance(node, (list, tuple)):
+        for i, item in enumerate(node):
+            hits.extend(_walk_absolute_path_values(item, path=f"{path}[{i}]"))
+    return hits
+
+
+def _absolute_path_value_errors(doc: Any, label: str) -> list[str]:
+    """Refuse every absolute path value in one parsed extract (fails closed).
+
+    One error per distinct (key, value): an anchor expanded at many aliases is
+    reported once with its expansion count, so the message stays readable.
+    """
+    hits = _walk_absolute_path_values(doc)
+    by_value: dict[tuple[str, str], list[str]] = {}
+    for key, dotted, value in hits:
+        by_value.setdefault((key, value), []).append(dotted)
+    errors: list[str] = []
+    for (key, value), where in by_value.items():
+        more = f" (+{len(where) - 1} more via YAML aliases/repeats)" if len(where) > 1 else ""
+        errors.append(
+            f"{label}: {where[0]} must be repository-relative "
+            f"(absolute/machine-local path refused): {value!r}{more}"
+        )
+    return errors
 
 
 class ExtractValidationError(Exception):
@@ -1503,12 +1596,11 @@ def validate_extract_document(
             errors.append(
                 f"{label}: extraction.date must be ISO YYYY-MM-DD, got {date!r}"
             )
-        prov = extraction.get("provenance_path")
-        if prov is not None and isinstance(prov, str) and _ABS_PATH_RE.match(prov):
-            errors.append(
-                f"{label}: extraction.provenance_path must be repository-relative "
-                f"(absolute/machine-local path refused): {prov!r}"
-            )
+
+    # Every absolute path value, parsed (quoted, aliased, nested), including
+    # extraction.provenance_path. b-713 replaced a line-regex count ceiling
+    # that missed quoted scalars and YAML aliases.
+    errors.extend(_absolute_path_value_errors(doc, label))
 
     review = doc.get("review_status")
     if review not in REVIEW_STATUSES:

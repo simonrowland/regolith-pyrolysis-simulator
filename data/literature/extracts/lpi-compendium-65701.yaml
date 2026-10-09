@@ -13,20 +13,20 @@ extraction:
 review_status: draft
 source_locators:
   sample_overview: &sample_overview
-    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/lpi-compendium-65701/lpi-compendium-65701.pdf
+    source_path: corpus/raw/lpi-compendium-65701/lpi-compendium-65701.pdf
     pdf_page_index: 1
     section: Introduction and Petrography
   chemistry: &chemistry
-    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/lpi-compendium-65701/lpi-compendium-65701.pdf
+    source_path: corpus/raw/lpi-compendium-65701/lpi-compendium-65701.pdf
     pdf_page_index: 4
     table: '1'
     section: Chemical composition of 65701
   chemistry_narrative: &chemistry_narrative
-    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/lpi-compendium-65701/lpi-compendium-65701.pdf
+    source_path: corpus/raw/lpi-compendium-65701/lpi-compendium-65701.pdf
     pdf_page_index: 1
     section: Chemistry
   grain_size: &grain_size
-    source_path: /Users/simonrowland/Repos/regolith-corpus/raw/lpi-compendium-65701/lpi-compendium-65701.pdf
+    source_path: corpus/raw/lpi-compendium-65701/lpi-compendium-65701.pdf
     pdf_page_index: 2
     figure: '7'
     section: Petrography
@@ -300,7 +300,7 @@ species:
       experiment: handbook-characterization
       type: rate_series
       locator:
-        source_path: /Users/simonrowland/Repos/regolith-corpus/raw/lpi-compendium-65701/lpi-compendium-65701.pdf
+        source_path: corpus/raw/lpi-compendium-65701/lpi-compendium-65701.pdf
         pdf_page_index: 1
         figure: '4'
       phase: lunar_soil

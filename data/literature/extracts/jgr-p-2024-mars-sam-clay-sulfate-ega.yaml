@@ -564,37 +564,37 @@ fidelity_samples:
   observation_id: jgr_2024_fig5_h2o_ca2
   field: evolved_gas_yield_H2O
   value: 2.3
-  locator: {source_path: /Users/simonrowland/Repos/regolith-corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf, pdf_page_index: 11, figure: '5', row: CA2, column: 'SAM H2O abundance (wt.%)'}
+  locator: {source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf, pdf_page_index: 11, figure: '5', row: CA2, column: 'SAM H2O abundance (wt.%)'}
 - species: SO3
   observable: concentration_series
   observation_id: jgr_2024_fig6_so3_mg2
   field: evolved_gas_yield_SO3
   value: 2.1
-  locator: {source_path: /Users/simonrowland/Repos/regolith-corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf, pdf_page_index: 12, figure: '6', row: MG2, column: 'SAM-derived SO3 (wt.%)'}
+  locator: {source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf, pdf_page_index: 12, figure: '6', row: MG2, column: 'SAM-derived SO3 (wt.%)'}
 - species: MgSO4
   observation_id: jgr_2024_fig7_mg_sulfate_ca2
   field: evolved_so2_source_phase_apportionment_fraction
   value: 0.65
-  locator: {source_path: /Users/simonrowland/Repos/regolith-corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf, pdf_page_index: 13, figure: '7', row: CA2, column: 'Mg-sulfate fraction'}
+  locator: {source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf, pdf_page_index: 13, figure: '7', row: CA2, column: 'Mg-sulfate fraction'}
 - species: Cl
   observable: concentration_series
   observation_id: jgr_2024_fig8_cl_ze
   field: evolved_gas_yield_Cl
   value: 0.37
-  locator: {source_path: /Users/simonrowland/Repos/regolith-corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf, pdf_page_index: 15, figure: '8', row: ZE, column: 'SAM-derived Cl (wt.%)'}
+  locator: {source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf, pdf_page_index: 15, figure: '8', row: ZE, column: 'SAM-derived Cl (wt.%)'}
 - species: CO2
   observable: concentration_series
   observation_id: jgr_2024_fig9_co2_mg2
   field: evolved_gas_yield_CO2
   value: 1640
-  locator: {source_path: /Users/simonrowland/Repos/regolith-corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf, pdf_page_index: 16, figure: '9', row: MG2, column: 'C from CO2 (µg/g)'}
+  locator: {source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf, pdf_page_index: 16, figure: '9', row: MG2, column: 'C from CO2 (µg/g)'}
 
 species:
   H2O:
     context:
     - observation_id: jgr_2024_method_and_h2o_printed_facts
       type: method
-      locator: {source_path: /Users/simonrowland/Repos/regolith-corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf, pdf_page_index: 7, section: '2.1-2.2'}
+      locator: {source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf, pdf_page_index: 7, section: '2.1-2.2'}
       units: 'as printed in the PDF'
       values:
         quantity: sam_ega_method_parameters
@@ -609,7 +609,7 @@ species:
         equations_as_printed: 'O2, formaldehyde, NO, and CO signals are corrected using m/z equations (1)-(4); coefficients are printed in the cited equations and Table S1.'
     - observation_id: jgr_2024_h2o_printed_abundance_and_profile
       type: results_summary
-      locator: {source_path: /Users/simonrowland/Repos/regolith-corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf, pdf_page_index: 11, figure: '5', section: '3.1'}
+      locator: {source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf, pdf_page_index: 11, figure: '5', section: '3.1'}
       units: 'wt.% and °C as printed'
       values:
         quantity: printed_h2o_abundance_and_release_windows
@@ -624,7 +624,7 @@ species:
         absence_statement: H2O was not detected in the post-ZE blank; this is retained as absence evidence, never as a zero.
     - observation_id: jgr_2024_o2_no_printed_status
       type: results_summary
-      locator: {source_path: /Users/simonrowland/Repos/regolith-corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf, pdf_page_index: 13, section: '3.3 O2 and NO'}
+      locator: {source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf, pdf_page_index: 13, section: '3.3 O2 and NO'}
       units: 'wt.% and °C as printed'
       values:
         quantity: printed_o2_no_status
@@ -638,68 +638,68 @@ species:
     - observation_id: jgr_2024_fig5_h2o_ca2
       experiment: ca2
       type: concentration_series
-      locator: {source_path: /Users/simonrowland/Repos/regolith-corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf, pdf_page_index: 11, figure: '5', row: CA2, column: 'SAM H2O abundance (wt.%)'}
+      locator: {source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf, pdf_page_index: 11, figure: '5', row: CA2, column: 'SAM H2O abundance (wt.%)'}
       units: wt.% as printed
       values: {quantity: evolved_gas_yield, method_class: figure_only, derivation: 'Digitized from the Figure 5 SAM bar height against the printed 0-15 wt.% axis; rounded to approximately 0.1 wt.%', sample: CA2, evolved_gas_yield_H2O: 2.3}
     - observation_id: jgr_2024_fig5_h2o_ca1
       experiment: ca1
       type: concentration_series
-      locator: {source_path: /Users/simonrowland/Repos/regolith-corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf, pdf_page_index: 11, figure: '5', row: CA1, column: 'SAM H2O abundance (wt.%)'}
+      locator: {source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf, pdf_page_index: 11, figure: '5', row: CA1, column: 'SAM H2O abundance (wt.%)'}
       units: wt.% as printed
       values: {quantity: evolved_gas_yield, method_class: figure_only, derivation: 'Digitized from the Figure 5 SAM bar height against the printed 0-15 wt.% axis; rounded to approximately 0.1 wt.%', sample: CA1, evolved_gas_yield_H2O: 3.3}
     - observation_id: jgr_2024_fig5_h2o_av
       experiment: av
       type: concentration_series
-      locator: {source_path: /Users/simonrowland/Repos/regolith-corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf, pdf_page_index: 11, figure: '5', row: AV, column: 'SAM H2O abundance (wt.%)'}
+      locator: {source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf, pdf_page_index: 11, figure: '5', row: AV, column: 'SAM H2O abundance (wt.%)'}
       units: wt.% as printed
       values: {quantity: evolved_gas_yield, method_class: figure_only, derivation: 'Digitized from the Figure 5 SAM bar height against the printed 0-15 wt.% axis; rounded to approximately 0.1 wt.%', sample: AV, evolved_gas_yield_H2O: 2.9}
     - observation_id: jgr_2024_fig5_h2o_ze
       experiment: ze
       type: concentration_series
-      locator: {source_path: /Users/simonrowland/Repos/regolith-corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf, pdf_page_index: 11, figure: '5', row: ZE, column: 'SAM H2O abundance (wt.%)'}
+      locator: {source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf, pdf_page_index: 11, figure: '5', row: ZE, column: 'SAM H2O abundance (wt.%)'}
       units: wt.% as printed
       values: {quantity: evolved_gas_yield, method_class: figure_only, derivation: 'Digitized from the Figure 5 SAM bar height against the printed 0-15 wt.% axis; rounded to approximately 0.1 wt.%', sample: ZE, evolved_gas_yield_H2O: 5.3}
     - observation_id: jgr_2024_fig5_h2o_mg2
       experiment: mg2
       type: concentration_series
-      locator: {source_path: /Users/simonrowland/Repos/regolith-corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf, pdf_page_index: 11, figure: '5', row: MG2, column: 'SAM H2O abundance (wt.%)'}
+      locator: {source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf, pdf_page_index: 11, figure: '5', row: MG2, column: 'SAM H2O abundance (wt.%)'}
       units: wt.% as printed
       values: {quantity: evolved_gas_yield, method_class: figure_only, derivation: 'Digitized from the Figure 5 SAM bar height against the printed 0-15 wt.% axis; rounded to approximately 0.1 wt.%', sample: MG2, evolved_gas_yield_H2O: 7.7}
     - observation_id: jgr_2024_fig5_h2o_mg1
       experiment: mg1
       type: concentration_series
-      locator: {source_path: /Users/simonrowland/Repos/regolith-corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf, pdf_page_index: 11, figure: '5', row: MG1, column: 'SAM H2O abundance (wt.%)'}
+      locator: {source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf, pdf_page_index: 11, figure: '5', row: MG1, column: 'SAM H2O abundance (wt.%)'}
       units: wt.% as printed
       values: {quantity: evolved_gas_yield, method_class: figure_only, derivation: 'Digitized from the Figure 5 SAM bar height against the printed 0-15 wt.% axis; rounded to approximately 0.1 wt.%', sample: MG1, evolved_gas_yield_H2O: 7.2}
     - observation_id: jgr_2024_fig5_h2o_pt
       experiment: pt
       type: concentration_series
-      locator: {source_path: /Users/simonrowland/Repos/regolith-corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf, pdf_page_index: 11, figure: '5', row: PT, column: 'SAM H2O abundance (wt.%)'}
+      locator: {source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf, pdf_page_index: 11, figure: '5', row: PT, column: 'SAM H2O abundance (wt.%)'}
       units: wt.% as printed
       values: {quantity: evolved_gas_yield, method_class: figure_only, derivation: 'Digitized from the Figure 5 SAM bar height against the printed 0-15 wt.% axis; rounded to approximately 0.1 wt.%', sample: PT, evolved_gas_yield_H2O: 0.8}
     - observation_id: jgr_2024_fig5_h2o_bd
       experiment: bd
       type: concentration_series
-      locator: {source_path: /Users/simonrowland/Repos/regolith-corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf, pdf_page_index: 11, figure: '5', row: BD, column: 'SAM H2O abundance (wt.%)'}
+      locator: {source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf, pdf_page_index: 11, figure: '5', row: BD, column: 'SAM H2O abundance (wt.%)'}
       units: wt.% as printed
       values: {quantity: evolved_gas_yield, method_class: figure_only, derivation: 'Digitized from the Figure 5 SAM bar height against the printed 0-15 wt.% axis; rounded to approximately 0.1 wt.%', sample: BD, evolved_gas_yield_H2O: 1.6}
     - observation_id: jgr_2024_fig5_h2o_nt2
       experiment: nt2
       type: concentration_series
-      locator: {source_path: /Users/simonrowland/Repos/regolith-corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf, pdf_page_index: 11, figure: '5', row: NT2, column: 'SAM H2O abundance (wt.%)'}
+      locator: {source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf, pdf_page_index: 11, figure: '5', row: NT2, column: 'SAM H2O abundance (wt.%)'}
       units: wt.% as printed
       values: {quantity: evolved_gas_yield, method_class: figure_only, derivation: 'Digitized from the Figure 5 SAM bar height against the printed 0-15 wt.% axis; rounded to approximately 0.1 wt.%', sample: NT2, evolved_gas_yield_H2O: 1.8}
     - observation_id: jgr_2024_fig5_h2o_nt1
       experiment: nt1
       type: concentration_series
-      locator: {source_path: /Users/simonrowland/Repos/regolith-corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf, pdf_page_index: 11, figure: '5', row: NT1, column: 'SAM H2O abundance (wt.%)'}
+      locator: {source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf, pdf_page_index: 11, figure: '5', row: NT1, column: 'SAM H2O abundance (wt.%)'}
       units: wt.% as printed
       values: {quantity: evolved_gas_yield, method_class: figure_only, derivation: 'Digitized from the Figure 5 SAM bar height against the printed 0-15 wt.% axis; rounded to approximately 0.1 wt.%', sample: NT1, evolved_gas_yield_H2O: 2.2}
   SO3:
     context:
     - observation_id: jgr_2024_so3_printed_ranges_and_peaks
       type: results_summary
-      locator: {source_path: /Users/simonrowland/Repos/regolith-corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf, pdf_page_index: 12, figure: '6', section: '3.2'}
+      locator: {source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf, pdf_page_index: 12, figure: '6', section: '3.2'}
       units: 'wt.% and °C as printed'
       values:
         quantity: printed_so3_and_sulfate_release_facts
@@ -713,7 +713,7 @@ species:
         - {field: nt2_high_temperature_peak_C, value: 790, locator: {pdf_page_index: 12, figure: '6', row: NT2, column: 'high-temperature sulfate peak'} }
     - observation_id: jgr_2024_fig6_ca_starkeyite_label
       type: characterization
-      locator: {source_path: /Users/simonrowland/Repos/regolith-corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf, pdf_page_index: 12, figure: '6', row: CA, column: '2.3 wt.% starkeyite'}
+      locator: {source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf, pdf_page_index: 12, figure: '6', row: CA, column: '2.3 wt.% starkeyite'}
       units: wt.% as printed
       values:
         quantity: printed_starkeyite_abundance
@@ -724,68 +724,68 @@ species:
     - observation_id: jgr_2024_fig6_so3_ca2
       experiment: ca2
       type: concentration_series
-      locator: {source_path: /Users/simonrowland/Repos/regolith-corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf, pdf_page_index: 12, figure: '6', row: CA2, column: 'SAM SO3 / APXS SO3 (wt.%)'}
+      locator: {source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf, pdf_page_index: 12, figure: '6', row: CA2, column: 'SAM SO3 / APXS SO3 (wt.%)'}
       units: wt.% as printed
       values: {quantity: evolved_gas_yield, method_class: figure_only, derivation: 'Digitized from Figure 6 bar heights against the printed axes; small SAM bar is approximate', sample: CA2, evolved_gas_yield_SO3: 0.22, apxs_SO3_wt_pct: 19.0}
     - observation_id: jgr_2024_fig6_so3_ca1
       experiment: ca1
       type: concentration_series
-      locator: {source_path: /Users/simonrowland/Repos/regolith-corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf, pdf_page_index: 12, figure: '6', row: CA1, column: 'SAM SO3 / APXS SO3 (wt.%)'}
+      locator: {source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf, pdf_page_index: 12, figure: '6', row: CA1, column: 'SAM SO3 / APXS SO3 (wt.%)'}
       units: wt.% as printed
       values: {quantity: evolved_gas_yield, method_class: figure_only, derivation: 'Digitized from Figure 6 bar heights against the printed axes; small SAM bar is approximate', sample: CA1, evolved_gas_yield_SO3: 0.22, apxs_SO3_wt_pct: 19.0}
     - observation_id: jgr_2024_fig6_so3_av
       experiment: av
       type: concentration_series
-      locator: {source_path: /Users/simonrowland/Repos/regolith-corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf, pdf_page_index: 12, figure: '6', row: AV, column: 'SAM SO3 / APXS SO3 (wt.%)'}
+      locator: {source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf, pdf_page_index: 12, figure: '6', row: AV, column: 'SAM SO3 / APXS SO3 (wt.%)'}
       units: wt.% as printed
       values: {quantity: evolved_gas_yield, method_class: figure_only, derivation: 'Digitized from Figure 6 bar heights against the printed axes; values rounded to approximately 0.1 wt.%', sample: AV, evolved_gas_yield_SO3: 0.8, apxs_SO3_wt_pct: 5.0}
     - observation_id: jgr_2024_fig6_so3_ze
       experiment: ze
       type: concentration_series
-      locator: {source_path: /Users/simonrowland/Repos/regolith-corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf, pdf_page_index: 12, figure: '6', row: ZE, column: 'SAM SO3 / APXS SO3 (wt.%)'}
+      locator: {source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf, pdf_page_index: 12, figure: '6', row: ZE, column: 'SAM SO3 / APXS SO3 (wt.%)'}
       units: wt.% as printed
       values: {quantity: evolved_gas_yield, method_class: figure_only, derivation: 'Digitized from Figure 6 bar heights against the printed axes; small SAM bar is approximate', sample: ZE, evolved_gas_yield_SO3: 0.8, apxs_SO3_wt_pct: 5.3}
     - observation_id: jgr_2024_fig6_so3_mg2
       experiment: mg2
       type: concentration_series
-      locator: {source_path: /Users/simonrowland/Repos/regolith-corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf, pdf_page_index: 12, figure: '6', row: MG2, column: 'SAM SO3 / APXS SO3 (wt.%)'}
+      locator: {source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf, pdf_page_index: 12, figure: '6', row: MG2, column: 'SAM SO3 / APXS SO3 (wt.%)'}
       units: wt.% as printed
       values: {quantity: evolved_gas_yield, method_class: figure_only, derivation: 'Digitized from Figure 6 bar heights against the printed axes; bars are approximate', sample: MG2, evolved_gas_yield_SO3: 2.1, apxs_SO3_wt_pct: 10.3}
     - observation_id: jgr_2024_fig6_so3_mg1
       experiment: mg1
       type: concentration_series
-      locator: {source_path: /Users/simonrowland/Repos/regolith-corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf, pdf_page_index: 12, figure: '6', row: MG1, column: 'SAM SO3 / APXS SO3 (wt.%)'}
+      locator: {source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf, pdf_page_index: 12, figure: '6', row: MG1, column: 'SAM SO3 / APXS SO3 (wt.%)'}
       units: wt.% as printed
       values: {quantity: evolved_gas_yield, method_class: figure_only, derivation: 'Digitized from Figure 6 bar heights against the printed axes; bars are approximate', sample: MG1, evolved_gas_yield_SO3: 1.8, apxs_SO3_wt_pct: 10.3}
     - observation_id: jgr_2024_fig6_so3_pt
       experiment: pt
       type: concentration_series
-      locator: {source_path: /Users/simonrowland/Repos/regolith-corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf, pdf_page_index: 12, figure: '6', row: PT, column: 'SAM SO3 / APXS SO3 (wt.%)'}
+      locator: {source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf, pdf_page_index: 12, figure: '6', row: PT, column: 'SAM SO3 / APXS SO3 (wt.%)'}
       units: wt.% as printed
       values: {quantity: evolved_gas_yield, method_class: figure_only, derivation: 'Digitized from Figure 6 bar heights against the printed axes; small SAM bar is approximate', sample: PT, evolved_gas_yield_SO3: 0.4, apxs_SO3_wt_pct: 9.3}
     - observation_id: jgr_2024_fig6_so3_bd
       experiment: bd
       type: concentration_series
-      locator: {source_path: /Users/simonrowland/Repos/regolith-corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf, pdf_page_index: 12, figure: '6', row: BD, column: 'SAM SO3 / APXS SO3 (wt.%)'}
+      locator: {source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf, pdf_page_index: 12, figure: '6', row: BD, column: 'SAM SO3 / APXS SO3 (wt.%)'}
       units: wt.% as printed
       values: {quantity: evolved_gas_yield, method_class: figure_only, derivation: 'Digitized from Figure 6 bar heights against the printed axes; small SAM bar is approximate', sample: BD, evolved_gas_yield_SO3: 0.4, apxs_SO3_wt_pct: 7.2}
     - observation_id: jgr_2024_fig6_so3_nt2
       experiment: nt2
       type: concentration_series
-      locator: {source_path: /Users/simonrowland/Repos/regolith-corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf, pdf_page_index: 12, figure: '6', row: NT2, column: 'SAM SO3 / APXS SO3 (wt.%)'}
+      locator: {source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf, pdf_page_index: 12, figure: '6', row: NT2, column: 'SAM SO3 / APXS SO3 (wt.%)'}
       units: wt.% as printed
       values: {quantity: evolved_gas_yield, method_class: figure_only, derivation: 'Digitized from Figure 6 bar heights against the printed axes; small SAM bar is approximate', sample: NT2, evolved_gas_yield_SO3: 0.6, apxs_SO3_wt_pct: 5.4}
     - observation_id: jgr_2024_fig6_so3_nt1
       experiment: nt1
       type: concentration_series
-      locator: {source_path: /Users/simonrowland/Repos/regolith-corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf, pdf_page_index: 12, figure: '6', row: NT1, column: 'SAM SO3 / APXS SO3 (wt.%)'}
+      locator: {source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf, pdf_page_index: 12, figure: '6', row: NT1, column: 'SAM SO3 / APXS SO3 (wt.%)'}
       units: wt.% as printed
       values: {quantity: evolved_gas_yield, method_class: figure_only, derivation: 'Digitized from Figure 6 bar heights against the printed axes; small SAM bar is approximate', sample: NT1, evolved_gas_yield_SO3: 0.5, apxs_SO3_wt_pct: 5.4}
   MgSO4:
     context:
     - observation_id: jgr_2024_mgso4_printed_composition_facts
       type: characterization
-      locator: {source_path: /Users/simonrowland/Repos/regolith-corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf, pdf_page_index: 11, figure: '7', section: '3.1-3.2'}
+      locator: {source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf, pdf_page_index: 11, figure: '7', section: '3.1-3.2'}
       units: wt.% as printed
       values:
         quantity: printed_mg_sulfate_bearing_phase_facts
@@ -796,7 +796,7 @@ species:
     - observation_id: jgr_2024_fig7_mg_sulfate_ca2
       experiment: ca2
       type: apportionment
-      locator: {source_path: /Users/simonrowland/Repos/regolith-corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf, pdf_page_index: 13, figure: '7', row: CA2, column: 'Mg-sulfate fraction'}
+      locator: {source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf, pdf_page_index: 13, figure: '7', row: CA2, column: 'Mg-sulfate fraction'}
       units: dimensionless fraction as plotted
       values:
         method_class: figure_only
@@ -807,7 +807,7 @@ species:
     - observation_id: jgr_2024_fig7_mg_sulfate_ca1
       experiment: ca1
       type: apportionment
-      locator: {source_path: /Users/simonrowland/Repos/regolith-corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf, pdf_page_index: 13, figure: '7', row: CA1, column: 'Mg-sulfate fraction'}
+      locator: {source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf, pdf_page_index: 13, figure: '7', row: CA1, column: 'Mg-sulfate fraction'}
       units: dimensionless fraction as plotted
       values:
         method_class: figure_only
@@ -818,7 +818,7 @@ species:
     - observation_id: jgr_2024_fig7_mg_sulfate_av
       experiment: av
       type: apportionment
-      locator: {source_path: /Users/simonrowland/Repos/regolith-corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf, pdf_page_index: 13, figure: '7', row: AV, column: 'Mg-sulfate fraction'}
+      locator: {source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf, pdf_page_index: 13, figure: '7', row: AV, column: 'Mg-sulfate fraction'}
       units: dimensionless fraction as plotted
       values:
         method_class: figure_only
@@ -829,7 +829,7 @@ species:
     - observation_id: jgr_2024_fig7_mg_sulfate_ze
       experiment: ze
       type: apportionment
-      locator: {source_path: /Users/simonrowland/Repos/regolith-corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf, pdf_page_index: 13, figure: '7', row: ZE, column: 'Mg-sulfate fraction'}
+      locator: {source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf, pdf_page_index: 13, figure: '7', row: ZE, column: 'Mg-sulfate fraction'}
       units: dimensionless fraction as plotted
       values:
         method_class: figure_only
@@ -840,7 +840,7 @@ species:
     - observation_id: jgr_2024_fig7_mg_sulfate_mg2
       experiment: mg2
       type: apportionment
-      locator: {source_path: /Users/simonrowland/Repos/regolith-corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf, pdf_page_index: 13, figure: '7', row: MG2, column: 'Mg-sulfate fraction'}
+      locator: {source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf, pdf_page_index: 13, figure: '7', row: MG2, column: 'Mg-sulfate fraction'}
       units: dimensionless fraction as plotted
       values:
         method_class: figure_only
@@ -851,7 +851,7 @@ species:
     - observation_id: jgr_2024_fig7_mg_sulfate_mg1
       experiment: mg1
       type: apportionment
-      locator: {source_path: /Users/simonrowland/Repos/regolith-corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf, pdf_page_index: 13, figure: '7', row: MG1, column: 'Mg-sulfate fraction'}
+      locator: {source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf, pdf_page_index: 13, figure: '7', row: MG1, column: 'Mg-sulfate fraction'}
       units: dimensionless fraction as plotted
       values:
         method_class: figure_only
@@ -862,7 +862,7 @@ species:
     - observation_id: jgr_2024_fig7_mg_sulfate_pt
       experiment: pt
       type: apportionment
-      locator: {source_path: /Users/simonrowland/Repos/regolith-corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf, pdf_page_index: 13, figure: '7', row: PT, column: 'Mg-sulfate fraction'}
+      locator: {source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf, pdf_page_index: 13, figure: '7', row: PT, column: 'Mg-sulfate fraction'}
       units: dimensionless fraction as plotted
       values:
         method_class: figure_only
@@ -873,7 +873,7 @@ species:
     - observation_id: jgr_2024_fig7_mg_sulfate_bd
       experiment: bd
       type: apportionment
-      locator: {source_path: /Users/simonrowland/Repos/regolith-corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf, pdf_page_index: 13, figure: '7', row: BD, column: 'Mg-sulfate fraction'}
+      locator: {source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf, pdf_page_index: 13, figure: '7', row: BD, column: 'Mg-sulfate fraction'}
       units: dimensionless fraction as plotted
       values:
         method_class: figure_only
@@ -884,7 +884,7 @@ species:
     - observation_id: jgr_2024_fig7_mg_sulfate_nt2
       experiment: nt2
       type: apportionment
-      locator: {source_path: /Users/simonrowland/Repos/regolith-corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf, pdf_page_index: 13, figure: '7', row: NT2, column: 'Mg-sulfate fraction'}
+      locator: {source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf, pdf_page_index: 13, figure: '7', row: NT2, column: 'Mg-sulfate fraction'}
       units: dimensionless fraction as plotted
       values:
         method_class: figure_only
@@ -895,7 +895,7 @@ species:
     - observation_id: jgr_2024_fig7_mg_sulfate_nt1
       experiment: nt1
       type: apportionment
-      locator: {source_path: /Users/simonrowland/Repos/regolith-corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf, pdf_page_index: 13, figure: '7', row: NT1, column: 'Mg-sulfate fraction'}
+      locator: {source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf, pdf_page_index: 13, figure: '7', row: NT1, column: 'Mg-sulfate fraction'}
       units: dimensionless fraction as plotted
       values:
         method_class: figure_only
@@ -908,7 +908,7 @@ species:
     context:
     - observation_id: jgr_2024_cl_printed_range_and_profile
       type: results_summary
-      locator: {source_path: /Users/simonrowland/Repos/regolith-corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf, pdf_page_index: 15, figure: '8', section: '3.4'}
+      locator: {source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf, pdf_page_index: 15, figure: '8', section: '3.4'}
       units: 'wt.% and °C as printed'
       values:
         quantity: printed_hcl_and_chlorine_release_facts
@@ -922,68 +922,68 @@ species:
     - observation_id: jgr_2024_fig8_cl_ca2
       experiment: ca2
       type: concentration_series
-      locator: {source_path: /Users/simonrowland/Repos/regolith-corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf, pdf_page_index: 15, figure: '8', row: CA2, column: 'SAM Cl / APXS Cl (wt.%)'}
+      locator: {source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf, pdf_page_index: 15, figure: '8', row: CA2, column: 'SAM Cl / APXS Cl (wt.%)'}
       units: wt.% as printed
       values: {quantity: evolved_gas_yield, method_class: figure_only, derivation: 'Digitized from Figure 8 bar heights against the printed axes; bars are approximate', sample: CA2, evolved_gas_yield_Cl: 0.11, apxs_Cl_wt_pct: 1.26}
     - observation_id: jgr_2024_fig8_cl_ca1
       experiment: ca1
       type: concentration_series
-      locator: {source_path: /Users/simonrowland/Repos/regolith-corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf, pdf_page_index: 15, figure: '8', row: CA1, column: 'SAM Cl / APXS Cl (wt.%)'}
+      locator: {source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf, pdf_page_index: 15, figure: '8', row: CA1, column: 'SAM Cl / APXS Cl (wt.%)'}
       units: wt.% as printed
       values: {quantity: evolved_gas_yield, method_class: figure_only, derivation: 'Digitized from Figure 8 bar heights against the printed axes; bars are approximate', sample: CA1, evolved_gas_yield_Cl: 0.14, apxs_Cl_wt_pct: 1.26}
     - observation_id: jgr_2024_fig8_cl_av
       experiment: av
       type: concentration_series
-      locator: {source_path: /Users/simonrowland/Repos/regolith-corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf, pdf_page_index: 15, figure: '8', row: AV, column: 'SAM Cl / APXS Cl (wt.%)'}
+      locator: {source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf, pdf_page_index: 15, figure: '8', row: AV, column: 'SAM Cl / APXS Cl (wt.%)'}
       units: wt.% as printed
       values: {quantity: evolved_gas_yield, method_class: figure_only, derivation: 'Digitized from Figure 8 bar heights against the printed axes; bars are approximate', sample: AV, evolved_gas_yield_Cl: 0.17, apxs_Cl_wt_pct: 0.73}
     - observation_id: jgr_2024_fig8_cl_ze
       experiment: ze
       type: concentration_series
-      locator: {source_path: /Users/simonrowland/Repos/regolith-corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf, pdf_page_index: 15, figure: '8', row: ZE, column: 'SAM Cl / APXS Cl (wt.%)'}
+      locator: {source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf, pdf_page_index: 15, figure: '8', row: ZE, column: 'SAM Cl / APXS Cl (wt.%)'}
       units: wt.% as printed
       values: {quantity: evolved_gas_yield, method_class: figure_only, derivation: 'Digitized from Figure 8 bar heights against the printed axes; bars are approximate', sample: ZE, evolved_gas_yield_Cl: 0.37, apxs_Cl_wt_pct: 1.83}
     - observation_id: jgr_2024_fig8_cl_mg2
       experiment: mg2
       type: concentration_series
-      locator: {source_path: /Users/simonrowland/Repos/regolith-corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf, pdf_page_index: 15, figure: '8', row: MG2, column: 'SAM Cl / APXS Cl (wt.%)'}
+      locator: {source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf, pdf_page_index: 15, figure: '8', row: MG2, column: 'SAM Cl / APXS Cl (wt.%)'}
       units: wt.% as printed
       values: {quantity: evolved_gas_yield, method_class: figure_only, derivation: 'Digitized from Figure 8 bar heights against the printed axes; bars are approximate', sample: MG2, evolved_gas_yield_Cl: 0.63, apxs_Cl_wt_pct: 1.04}
     - observation_id: jgr_2024_fig8_cl_mg1
       experiment: mg1
       type: concentration_series
-      locator: {source_path: /Users/simonrowland/Repos/regolith-corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf, pdf_page_index: 15, figure: '8', row: MG1, column: 'SAM Cl / APXS Cl (wt.%)'}
+      locator: {source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf, pdf_page_index: 15, figure: '8', row: MG1, column: 'SAM Cl / APXS Cl (wt.%)'}
       units: wt.% as printed
       values: {quantity: evolved_gas_yield, method_class: figure_only, derivation: 'Digitized from Figure 8 bar heights against the printed axes; bars are approximate', sample: MG1, evolved_gas_yield_Cl: 0.35, apxs_Cl_wt_pct: 1.04}
     - observation_id: jgr_2024_fig8_cl_pt
       experiment: pt
       type: concentration_series
-      locator: {source_path: /Users/simonrowland/Repos/regolith-corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf, pdf_page_index: 15, figure: '8', row: PT, column: 'SAM Cl / APXS Cl (wt.%)'}
+      locator: {source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf, pdf_page_index: 15, figure: '8', row: PT, column: 'SAM Cl / APXS Cl (wt.%)'}
       units: wt.% as printed
       values: {quantity: evolved_gas_yield, method_class: figure_only, derivation: 'Digitized from Figure 8 bar heights against the printed axes; bars are approximate', sample: PT, evolved_gas_yield_Cl: 0.11, apxs_Cl_wt_pct: 1.45}
     - observation_id: jgr_2024_fig8_cl_bd
       experiment: bd
       type: concentration_series
-      locator: {source_path: /Users/simonrowland/Repos/regolith-corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf, pdf_page_index: 15, figure: '8', row: BD, column: 'SAM Cl / APXS Cl (wt.%)'}
+      locator: {source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf, pdf_page_index: 15, figure: '8', row: BD, column: 'SAM Cl / APXS Cl (wt.%)'}
       units: wt.% as printed
       values: {quantity: evolved_gas_yield, method_class: figure_only, derivation: 'Digitized from Figure 8 bar heights against the printed axes; bars are approximate', sample: BD, evolved_gas_yield_Cl: 0.17, apxs_Cl_wt_pct: 0.99}
     - observation_id: jgr_2024_fig8_cl_nt2
       experiment: nt2
       type: concentration_series
-      locator: {source_path: /Users/simonrowland/Repos/regolith-corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf, pdf_page_index: 15, figure: '8', row: NT2, column: 'SAM Cl / APXS Cl (wt.%)'}
+      locator: {source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf, pdf_page_index: 15, figure: '8', row: NT2, column: 'SAM Cl / APXS Cl (wt.%)'}
       units: wt.% as printed
       values: {quantity: evolved_gas_yield, method_class: figure_only, derivation: 'Digitized from Figure 8 bar heights against the printed axes; bars are approximate', sample: NT2, evolved_gas_yield_Cl: 0.12, apxs_Cl_wt_pct: 0.89}
     - observation_id: jgr_2024_fig8_cl_nt1
       experiment: nt1
       type: concentration_series
-      locator: {source_path: /Users/simonrowland/Repos/regolith-corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf, pdf_page_index: 15, figure: '8', row: NT1, column: 'SAM Cl / APXS Cl (wt.%)'}
+      locator: {source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf, pdf_page_index: 15, figure: '8', row: NT1, column: 'SAM Cl / APXS Cl (wt.%)'}
       units: wt.% as printed
       values: {quantity: evolved_gas_yield, method_class: figure_only, derivation: 'Digitized from Figure 8 bar heights against the printed axes; bars are approximate', sample: NT1, evolved_gas_yield_Cl: 0.12, apxs_Cl_wt_pct: 0.89}
   CO2:
     context:
     - observation_id: jgr_2024_co2_printed_range_and_profile
       type: results_summary
-      locator: {source_path: /Users/simonrowland/Repos/regolith-corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf, pdf_page_index: 16, figure: '9', section: '3.5'}
+      locator: {source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf, pdf_page_index: 16, figure: '9', section: '3.5'}
       units: 'µg/g, µmol, and °C as printed'
       values:
         quantity: printed_co2_carbon_release_facts
@@ -998,68 +998,68 @@ species:
     - observation_id: jgr_2024_fig9_co2_ca2
       experiment: ca2
       type: concentration_series
-      locator: {source_path: /Users/simonrowland/Repos/regolith-corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf, pdf_page_index: 16, figure: '9', row: CA2, column: 'C from CO2 (µg/g)'}
+      locator: {source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf, pdf_page_index: 16, figure: '9', row: CA2, column: 'C from CO2 (µg/g)'}
       units: µg/g as printed
       values: {quantity: evolved_gas_yield, method_class: figure_only, derivation: 'Digitized from Figure 9 bar height against the printed 0-4000 µg/g axis; approximate to tens of µg/g', sample: CA2, evolved_gas_yield_CO2: 225}
     - observation_id: jgr_2024_fig9_co2_ca1
       experiment: ca1
       type: concentration_series
-      locator: {source_path: /Users/simonrowland/Repos/regolith-corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf, pdf_page_index: 16, figure: '9', row: CA1, column: 'C from CO2 (µg/g)'}
+      locator: {source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf, pdf_page_index: 16, figure: '9', row: CA1, column: 'C from CO2 (µg/g)'}
       units: µg/g as printed
       values: {quantity: evolved_gas_yield, method_class: figure_only, derivation: 'Digitized from Figure 9 bar height against the printed 0-4000 µg/g axis; approximate to tens of µg/g', sample: CA1, evolved_gas_yield_CO2: 170}
     - observation_id: jgr_2024_fig9_co2_av
       experiment: av
       type: concentration_series
-      locator: {source_path: /Users/simonrowland/Repos/regolith-corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf, pdf_page_index: 16, figure: '9', row: AV, column: 'C from CO2 (µg/g)'}
+      locator: {source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf, pdf_page_index: 16, figure: '9', row: AV, column: 'C from CO2 (µg/g)'}
       units: µg/g as printed
       values: {quantity: evolved_gas_yield, method_class: figure_only, derivation: 'Digitized from Figure 9 bar height against the printed 0-4000 µg/g axis; approximate to tens of µg/g', sample: AV, evolved_gas_yield_CO2: 530}
     - observation_id: jgr_2024_fig9_co2_ze
       experiment: ze
       type: concentration_series
-      locator: {source_path: /Users/simonrowland/Repos/regolith-corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf, pdf_page_index: 16, figure: '9', row: ZE, column: 'C from CO2 (µg/g)'}
+      locator: {source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf, pdf_page_index: 16, figure: '9', row: ZE, column: 'C from CO2 (µg/g)'}
       units: µg/g as printed
       values: {quantity: evolved_gas_yield, method_class: figure_only, derivation: 'Digitized from Figure 9 bar height against the printed 0-4000 µg/g axis; approximate to tens of µg/g', sample: ZE, evolved_gas_yield_CO2: 530}
     - observation_id: jgr_2024_fig9_co2_mg2
       experiment: mg2
       type: concentration_series
-      locator: {source_path: /Users/simonrowland/Repos/regolith-corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf, pdf_page_index: 16, figure: '9', row: MG2, column: 'C from CO2 (µg/g)'}
+      locator: {source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf, pdf_page_index: 16, figure: '9', row: MG2, column: 'C from CO2 (µg/g)'}
       units: µg/g as printed
       values: {quantity: evolved_gas_yield, method_class: figure_only, derivation: 'Digitized from Figure 9 bar height against the printed 0-4000 µg/g axis; approximate to tens of µg/g', sample: MG2, evolved_gas_yield_CO2: 1640}
     - observation_id: jgr_2024_fig9_co2_mg1
       experiment: mg1
       type: concentration_series
-      locator: {source_path: /Users/simonrowland/Repos/regolith-corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf, pdf_page_index: 16, figure: '9', row: MG1, column: 'C from CO2 (µg/g)'}
+      locator: {source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf, pdf_page_index: 16, figure: '9', row: MG1, column: 'C from CO2 (µg/g)'}
       units: µg/g as printed
       values: {quantity: evolved_gas_yield, method_class: figure_only, derivation: 'Digitized from Figure 9 bar height against the printed 0-4000 µg/g axis; approximate to tens of µg/g', sample: MG1, evolved_gas_yield_CO2: 900}
     - observation_id: jgr_2024_fig9_co2_pt
       experiment: pt
       type: concentration_series
-      locator: {source_path: /Users/simonrowland/Repos/regolith-corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf, pdf_page_index: 16, figure: '9', row: PT, column: 'C from CO2 (µg/g)'}
+      locator: {source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf, pdf_page_index: 16, figure: '9', row: PT, column: 'C from CO2 (µg/g)'}
       units: µg/g as printed
       values: {quantity: evolved_gas_yield, method_class: figure_only, derivation: 'Digitized from Figure 9 bar height against the printed 0-4000 µg/g axis; approximate to tens of µg/g', sample: PT, evolved_gas_yield_CO2: 100}
     - observation_id: jgr_2024_fig9_co2_bd
       experiment: bd
       type: concentration_series
-      locator: {source_path: /Users/simonrowland/Repos/regolith-corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf, pdf_page_index: 16, figure: '9', row: BD, column: 'C from CO2 (µg/g)'}
+      locator: {source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf, pdf_page_index: 16, figure: '9', row: BD, column: 'C from CO2 (µg/g)'}
       units: µg/g as printed
       values: {quantity: evolved_gas_yield, method_class: figure_only, derivation: 'Digitized from Figure 9 bar height against the printed 0-4000 µg/g axis; approximate to tens of µg/g', sample: BD, evolved_gas_yield_CO2: 630}
     - observation_id: jgr_2024_fig9_co2_nt2
       experiment: nt2
       type: concentration_series
-      locator: {source_path: /Users/simonrowland/Repos/regolith-corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf, pdf_page_index: 16, figure: '9', row: NT2, column: 'C from CO2 (µg/g)'}
+      locator: {source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf, pdf_page_index: 16, figure: '9', row: NT2, column: 'C from CO2 (µg/g)'}
       units: µg/g as printed
       values: {quantity: evolved_gas_yield, method_class: figure_only, derivation: 'Digitized from Figure 9 bar height against the printed 0-4000 µg/g axis; approximate to tens of µg/g', sample: NT2, evolved_gas_yield_CO2: 610}
     - observation_id: jgr_2024_fig9_co2_nt1
       experiment: nt1
       type: concentration_series
-      locator: {source_path: /Users/simonrowland/Repos/regolith-corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf, pdf_page_index: 16, figure: '9', row: NT1, column: 'C from CO2 (µg/g)'}
+      locator: {source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf, pdf_page_index: 16, figure: '9', row: NT1, column: 'C from CO2 (µg/g)'}
       units: µg/g as printed
       values: {quantity: evolved_gas_yield, method_class: figure_only, derivation: 'Digitized from Figure 9 bar height against the printed 0-4000 µg/g axis; approximate to tens of µg/g', sample: NT1, evolved_gas_yield_CO2: 320}
   CO:
     context:
     - observation_id: jgr_2024_co_printed_range_and_profile
       type: results_summary
-      locator: {source_path: /Users/simonrowland/Repos/regolith-corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf, pdf_page_index: 18, figure: '10', section: '3.6'}
+      locator: {source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf, pdf_page_index: 18, figure: '10', section: '3.6'}
       units: 'µmol and °C as printed'
       values:
         quantity: printed_co_release_facts
@@ -1070,77 +1070,77 @@ species:
         - {field: high_temperature_release_C, value: '~800 and >850', locator: {pdf_page_index: 18, figure: '10', column: 'CO release window'} }
     - observation_id: jgr_2024_refused_supplementary_tables
       type: data_availability
-      locator: {source_path: /Users/simonrowland/Repos/regolith-corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf, pdf_page_index: 7, section: '2.1-2.5', note: 'Main PDF references Tables S1-S9, but the supplied corpus PDF does not contain those supplementary tables'}
+      locator: {source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf, pdf_page_index: 7, section: '2.1-2.5', note: 'Main PDF references Tables S1-S9, but the supplied corpus PDF does not contain those supplementary tables'}
       units: as printed
       values: {status: refused, reason: 'The cited supplementary tables are not present in the supplied source material; exact table-row values cannot be transcribed without inventing them.', method_class: measured_direct}
     - observation_id: jgr_2024_refused_per_run_fugacity
       type: data_availability
-      locator: {source_path: /Users/simonrowland/Repos/regolith-corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf, pdf_page_index: 7, section: '2.2', note: No per-aliquot pO2/fO2 or oxygen fugacity is printed'}
+      locator: {source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf, pdf_page_index: 7, section: '2.2', note: No per-aliquot pO2/fO2 or oxygen fugacity is printed'}
       units: as printed
       values: {status: refused, reason: 'pO2/fO2 is absent from the article; no oxygen fugacity is inferred from He carrier gas or mineralogy.', method_class: measured_direct}
     - observation_id: jgr_2024_refused_exact_figure_values
       type: data_availability
-      locator: {source_path: /Users/simonrowland/Repos/regolith-corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf, pdf_page_index: 11, figure: '5-10', note: Raster bar panels do not print numeric labels for every bar'}
+      locator: {source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf, pdf_page_index: 11, figure: '5-10', note: Raster bar panels do not print numeric labels for every bar'}
       units: as plotted
       values: {status: refused, reason: 'Exact unrounded bar values are not printed; retained values are explicitly approximate digitizations and must not be treated as measured-printed.', method_class: measured_direct}
     observations:
     - observation_id: jgr_2024_fig10_co_ca2
       experiment: ca2
       type: concentration_series
-      locator: {source_path: /Users/simonrowland/Repos/regolith-corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf, pdf_page_index: 18, figure: '10', row: CA2, column: 'C from CO (µg/g)'}
+      locator: {source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf, pdf_page_index: 18, figure: '10', row: CA2, column: 'C from CO (µg/g)'}
       units: µg/g as printed
       values: {quantity: evolved_gas_yield, method_class: figure_only, derivation: 'Digitized from Figure 10 bar height against the printed 0-1200 µg/g axis; approximate to tens of µg/g', sample: CA2, evolved_gas_yield_CO: 50}
     - observation_id: jgr_2024_fig10_co_ca1
       experiment: ca1
       type: concentration_series
-      locator: {source_path: /Users/simonrowland/Repos/regolith-corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf, pdf_page_index: 18, figure: '10', row: CA1, column: 'C from CO (µg/g)'}
+      locator: {source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf, pdf_page_index: 18, figure: '10', row: CA1, column: 'C from CO (µg/g)'}
       units: µg/g as printed
       values: {quantity: evolved_gas_yield, method_class: figure_only, derivation: 'Digitized from Figure 10 bar height against the printed 0-1200 µg/g axis; approximate to tens of µg/g', sample: CA1, evolved_gas_yield_CO: 30}
     - observation_id: jgr_2024_fig10_co_av
       experiment: av
       type: concentration_series
-      locator: {source_path: /Users/simonrowland/Repos/regolith-corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf, pdf_page_index: 18, figure: '10', row: AV, column: 'C from CO (µg/g)'}
+      locator: {source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf, pdf_page_index: 18, figure: '10', row: AV, column: 'C from CO (µg/g)'}
       units: µg/g as printed
       values: {quantity: evolved_gas_yield, method_class: figure_only, derivation: 'Digitized from Figure 10 bar height against the printed 0-1200 µg/g axis; approximate to tens of µg/g', sample: AV, evolved_gas_yield_CO: 190}
     - observation_id: jgr_2024_fig10_co_ze
       experiment: ze
       type: concentration_series
-      locator: {source_path: /Users/simonrowland/Repos/regolith-corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf, pdf_page_index: 18, figure: '10', row: ZE, column: 'C from CO (µg/g)'}
+      locator: {source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf, pdf_page_index: 18, figure: '10', row: ZE, column: 'C from CO (µg/g)'}
       units: µg/g as printed
       values: {quantity: evolved_gas_yield, method_class: figure_only, derivation: 'Digitized from Figure 10 bar height against the printed 0-1200 µg/g axis; approximate to tens of µg/g', sample: ZE, evolved_gas_yield_CO: 130}
     - observation_id: jgr_2024_fig10_co_mg2
       experiment: mg2
       type: concentration_series
-      locator: {source_path: /Users/simonrowland/Repos/regolith-corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf, pdf_page_index: 18, figure: '10', row: MG2, column: 'C from CO (µg/g)'}
+      locator: {source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf, pdf_page_index: 18, figure: '10', row: MG2, column: 'C from CO (µg/g)'}
       units: µg/g as printed
       values: {quantity: evolved_gas_yield, method_class: figure_only, derivation: 'Digitized from Figure 10 bar height against the printed 0-1200 µg/g axis; approximate to tens of µg/g', sample: MG2, evolved_gas_yield_CO: 675}
     - observation_id: jgr_2024_fig10_co_mg1
       experiment: mg1
       type: concentration_series
-      locator: {source_path: /Users/simonrowland/Repos/regolith-corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf, pdf_page_index: 18, figure: '10', row: MG1, column: 'C from CO (µg/g)'}
+      locator: {source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf, pdf_page_index: 18, figure: '10', row: MG1, column: 'C from CO (µg/g)'}
       units: µg/g as printed
       values: {quantity: evolved_gas_yield, method_class: figure_only, derivation: 'Digitized from Figure 10 bar height against the printed 0-1200 µg/g axis; approximate to tens of µg/g', sample: MG1, evolved_gas_yield_CO: 180}
     - observation_id: jgr_2024_fig10_co_pt
       experiment: pt
       type: concentration_series
-      locator: {source_path: /Users/simonrowland/Repos/regolith-corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf, pdf_page_index: 18, figure: '10', row: PT, column: 'C from CO (µg/g)'}
+      locator: {source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf, pdf_page_index: 18, figure: '10', row: PT, column: 'C from CO (µg/g)'}
       units: µg/g as printed
       values: {quantity: evolved_gas_yield, method_class: figure_only, derivation: 'Digitized from Figure 10 bar height against the printed 0-1200 µg/g axis; approximate to tens of µg/g', sample: PT, evolved_gas_yield_CO: 30}
     - observation_id: jgr_2024_fig10_co_bd
       experiment: bd
       type: concentration_series
-      locator: {source_path: /Users/simonrowland/Repos/regolith-corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf, pdf_page_index: 18, figure: '10', row: BD, column: 'C from CO (µg/g)'}
+      locator: {source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf, pdf_page_index: 18, figure: '10', row: BD, column: 'C from CO (µg/g)'}
       units: µg/g as printed
       values: {quantity: evolved_gas_yield, method_class: figure_only, derivation: 'Digitized from Figure 10 bar height against the printed 0-1200 µg/g axis; approximate to tens of µg/g', sample: BD, evolved_gas_yield_CO: 80}
     - observation_id: jgr_2024_fig10_co_nt2
       experiment: nt2
       type: concentration_series
-      locator: {source_path: /Users/simonrowland/Repos/regolith-corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf, pdf_page_index: 18, figure: '10', row: NT2, column: 'C from CO (µg/g)'}
+      locator: {source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf, pdf_page_index: 18, figure: '10', row: NT2, column: 'C from CO (µg/g)'}
       units: µg/g as printed
       values: {quantity: evolved_gas_yield, method_class: figure_only, derivation: 'Digitized from Figure 10 bar height against the printed 0-1200 µg/g axis; approximate to tens of µg/g', sample: NT2, evolved_gas_yield_CO: 180}
     - observation_id: jgr_2024_fig10_co_nt1
       experiment: nt1
       type: concentration_series
-      locator: {source_path: /Users/simonrowland/Repos/regolith-corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf, pdf_page_index: 18, figure: '10', row: NT1, column: 'C from CO (µg/g)'}
+      locator: {source_path: corpus/raw/jgr-p-2024-mars-sam-clay-sulfate-ega/jgr-p-2024-mars-sam-clay-sulfate-ega.pdf, pdf_page_index: 18, figure: '10', row: NT1, column: 'C from CO (µg/g)'}
       units: µg/g as printed
       values: {quantity: evolved_gas_yield, method_class: figure_only, derivation: 'Digitized from Figure 10 bar height against the printed 0-1200 µg/g axis; approximate to tens of µg/g', sample: NT1, evolved_gas_yield_CO: 90}
