@@ -672,6 +672,10 @@ class ChemistryKernel:
         """
 
         profile = provider.capability_profile()
+        # Snapshot before dispatch. A cohort opened by this call is not
+        # in the snapshot; a caller narrowing still drops accounts that
+        # were already declared and left out of the request.
+        profile_accounts_before = frozenset(profile.declared_accounts)
         if not profile.can_dispatch(intent):
             raise UnauthorizedIntentError(
                 f"provider {profile.provider_id!r} no longer declares dispatch "
@@ -728,7 +732,14 @@ class ChemistryKernel:
                     f"with non-committable status {result.status!r}"
                 )
             validate_intent_authority(intent, profile)
-            validate_proposal_accounts(result.transition, declared_accounts)
+            admitted = (
+                frozenset(provider.capability_profile().declared_accounts)
+                - profile_accounts_before
+            )
+            validate_proposal_accounts(
+                result.transition,
+                frozenset(declared_accounts) | admitted,
+            )
             validate_atom_balance(result.transition, self._species_formula_registry)
         if result.control_audit is not None:
             validate_control_audit(result.control_audit, request)

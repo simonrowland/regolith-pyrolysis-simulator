@@ -11,6 +11,7 @@ from typing import Any
 
 from simulator.alpha_kinetics import parse_alpha_contract
 from simulator.accounting import AccountingError, resolve_species_formula
+from simulator.accounting.phase_homes import holds_positive_crystal_moles
 from simulator.account_ids import SPENT_REDUCTANT_RESIDUE_ACCOUNT
 from simulator.chemistry.melt_activity import single_cation_mole_fractions
 from simulator.chemistry.kernel import (
@@ -1274,7 +1275,12 @@ class EvaporationMixin:
             raise EvaporationFluxRefusal(reason, diagnostic)
         flux_kg_hr = diagnostic.get('evaporation_flux_kg_hr') or {}
         liquid_fraction_factor = 1.0
-        if flux_kg_hr and self._freeze_gate_enabled():
+        ledger = getattr(self, 'atom_ledger', None)
+        crystals_hold_mass = (
+            ledger is not None
+            and holds_positive_crystal_moles(ledger.mol_by_account())
+        )
+        if flux_kg_hr and self._freeze_gate_enabled() and not crystals_hold_mass:
             if gate_authority is _RESOLVE_EVAPORATION_GATE_AUTHORITY:
                 liquid_fraction_factor = (
                     self._freeze_gate_liquid_fraction_factor()

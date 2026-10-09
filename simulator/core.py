@@ -370,6 +370,7 @@ from simulator.accounting.ledger import (
     KNOWN_LEDGER_ACCOUNT_PREFIXES,
     snapshot_atom_ledger,
 )
+from simulator.accounting.phase_homes import holds_positive_crystal_moles
 from simulator.condensation_routing import (
     designated_stage_number,
     target_species_for_stage_number,
@@ -2181,9 +2182,10 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         """Register AlphaMELTSProvider when the active backend supports it.
 
         \\goal ALPHAMELTS-DIAGNOSTIC-GATE (#8): AlphaMELTS is registered
-        as the authoritative (diagnostic-only) provider for
-        SILICATE_LIQUIDUS, SILICATE_EQUILIBRIUM, and
-        EQUILIBRIUM_CRYSTALLIZATION. The provider wraps the live
+        as the authoritative provider for SILICATE_LIQUIDUS,
+        SILICATE_EQUILIBRIUM, and EQUILIBRIUM_CRYSTALLIZATION.
+        Liquidus and equilibrium stay diagnostic. Crystallization may
+        emit the phase-home proposal. The provider wraps the live
         :class:`AlphaMELTSBackend` instance so the subprocess and
         PetThermoTools paths stay owned by the today-hook adapter (goal #1
         hardened it; this goal only adds the kernel envelope around it).
@@ -2254,10 +2256,11 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
 
             # Intentional per-intent exception: the selected MELTS provider is
             # the only liquid-fraction source for this narrow freeze dispatch.
-            # Its registry authority is dispatch-only; the diagnostic provider
-            # still has no ledger-transition authority. Runner provenance
-            # exposes this through run_metadata.diagnostic_gate_authority_notice
-            # and the operator product-classification notice channel.
+            # This instance serves GATE_LIQUID_FRACTION. That intent has no
+            # ledger-transition authority. Crystallization is a different
+            # provider object. Runner provenance exposes the gate through
+            # run_metadata.diagnostic_gate_authority_notice and the operator
+            # product-classification notice channel.
             self._chem_registry.register_idempotent(
                 AlphaMELTSProvider(backend=backend),
                 [ChemistryIntent.GATE_LIQUID_FRACTION],
@@ -3216,6 +3219,62 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             transition_meta=transition_meta,
         )
         return result
+
+    def _commit_phase_homes(self) -> None:
+        """Commit the current-temperature crystal homes before redox.
+
+        Runs only when the crystallization provider's backend is the
+        Python API. A missing provider, an unavailable sample, or a
+        null transition leaves the hour as it was and does not count
+        as a kernel no-op. A ledger rejection still aborts the hour.
+        """
+        registry = getattr(self, '_chem_registry', None)
+        if registry is None or self.atom_ledger is None:
+            return
+        provider = registry.authoritative_for(
+            ChemistryIntent.EQUILIBRIUM_CRYSTALLIZATION
+        )
+        if provider is None:
+            return
+        from engines.alphamelts.petthermo import python_api_available
+
+        if not python_api_available(getattr(provider, '_backend', None)):
+            return
+        sync = getattr(provider, 'sync_crystal_accounts', None)
+        if callable(sync):
+            from simulator.accounting.phase_homes import (
+                MELTS_BINDING,
+                crystal_accounts_for_binding,
+            )
+
+            sync(crystal_accounts_for_binding(
+                self.atom_ledger.mol_by_account(),
+                MELTS_BINDING,
+            ))
+        from simulator.melt_backend.base import LiquidFractionInvalidError
+        from simulator.melt_backend.liquidus import LiquidusSampleError
+
+        try:
+            result = self._dispatch_only(
+                ChemistryIntent.EQUILIBRIUM_CRYSTALLIZATION,
+                control_inputs={},
+            )
+        except (
+            ProviderUnavailableError,
+            LiquidusSampleError,
+            LiquidFractionInvalidError,
+        ):
+            return
+        proposal = result.transition
+        if proposal is None or str(result.status) != 'ok':
+            return
+        self._commit_proposal(
+            ChemistryIntent.EQUILIBRIUM_CRYSTALLIZATION,
+            proposal,
+            diagnostic=result.diagnostic,
+            control_inputs={},
+            transition_source='phase_home',
+        )
 
     def _o2_bubbler_external_o2_overhead_mol(self) -> float:
         return max(
@@ -4952,6 +5011,15 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             T_K,
             gate_authority=gate_authority,
         )
+        # A crystal cohort is already out of the liquid account. Scaling
+        # by F would remove that iron twice. The factor call above still
+        # records the unsplit diagnostic when no cohort holds mass.
+        ledger = getattr(self, 'atom_ledger', None)
+        if (
+            ledger is not None
+            and holds_positive_crystal_moles(ledger.mol_by_account())
+        ):
+            return C_m_full
         # Derivation: Kress91 capacity is proportional to melt Fe inventory;
         # freeze-gate liquid_fraction is the active residual-liquid fraction,
         # so C_m_effective = C_m_full * liquid_fraction and tends to 0 at solidus.
@@ -6679,10 +6747,15 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             profile.declared_accounts,
             self.species_formula_registry,
         )
+        ledger = getattr(self, 'atom_ledger', None)
+        crystals_hold_mass = (
+            ledger is not None
+            and holds_positive_crystal_moles(ledger.mol_by_account())
+        )
         liquid_fraction_factor = (
-            self._freeze_gate_liquid_fraction_factor()
-            if self._freeze_gate_enabled()
-            else 1.0
+            1.0
+            if crystals_hold_mass or not self._freeze_gate_enabled()
+            else self._freeze_gate_liquid_fraction_factor()
         )
         frozen_cleaned_melt_kg = self.atom_ledger.kg_by_account(
             'process.cleaned_melt'
@@ -13522,6 +13595,10 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             CampaignPhase.C2B, CampaignPhase.C3_K,
             CampaignPhase.C3_NA, CampaignPhase.C4,
         )
+        # Crystal homes before the redox root, so cohort Fe is already
+        # out of the liquid. Native-Fe stays after redox. A null
+        # transition leaves the rest of this hour unchanged.
+        self._commit_phase_homes()
         self._apply_fe_redox_respeciation()
         self._apply_native_fe_saturation_split(sample_time_h=sample_time_h)
         self._refresh_oxygen_reservoir_transport_pO2_for_vapor()

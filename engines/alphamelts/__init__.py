@@ -1,12 +1,12 @@
-"""AlphaMELTS kernel-registered diagnostic provider.
+"""AlphaMELTS kernel-registered provider.
 
 Goal #8 ``ALPHAMELTS-DIAGNOSTIC-GATE`` promotes AlphaMELTS from the
 today-hook adapter scaffolding (``simulator.melt_backend.alphamelts``)
-into kernel-registered provider posture. AlphaMELTS is **diagnostic
-only** for the SILICATE_LIQUIDUS, SILICATE_EQUILIBRIUM, and
-EQUILIBRIUM_CRYSTALLIZATION intents -- the provider never emits a
-:class:`LedgerTransitionProposal`. See the binding-spec §3 authority
-matrix.
+into kernel-registered provider posture. SILICATE_LIQUIDUS,
+SILICATE_EQUILIBRIUM, and GATE_LIQUID_FRACTION stay diagnostic.
+EQUILIBRIUM_CRYSTALLIZATION emits the phase-home proposal built in
+``simulator.accounting.phase_homes``. This package does not import the
+proposal class. See the binding-spec §3 authority matrix.
 
 Public exports:
 

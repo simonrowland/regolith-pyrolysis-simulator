@@ -264,14 +264,19 @@ def test_provider_declares_silicate_intent_set():
     })
 
 
-def test_provider_owns_dispatch_but_not_ledger_authority_for_silicate_intents():
-    """Registry ownership routes diagnostics without granting ledger writes."""
+def test_provider_ledger_authority_is_crystallization_only():
+    """Liquidus, equilibrium, and the gate stay diagnostic."""
     provider = AlphaMELTSProvider(backend=None)
     profile = provider.capability_profile()
+    assert profile.is_authoritative(
+        ChemistryIntent.EQUILIBRIUM_CRYSTALLIZATION
+    )
+    assert profile.may_emit_ledger_transition(
+        ChemistryIntent.EQUILIBRIUM_CRYSTALLIZATION
+    )
     for intent in (
         ChemistryIntent.SILICATE_LIQUIDUS,
         ChemistryIntent.SILICATE_EQUILIBRIUM,
-        ChemistryIntent.EQUILIBRIUM_CRYSTALLIZATION,
         ChemistryIntent.GATE_LIQUID_FRACTION,
     ):
         assert profile.is_authoritative(intent)
@@ -1521,9 +1526,11 @@ def test_provider_raises_on_nonfinite_ec_liquid_fraction():
 
 
 def test_provider_can_be_registered_as_authoritative():
-    """The registry-level authoritative slot is the kernel's dispatch
-    mechanism. AlphaMELTSProvider being 'diagnostic-only' means
-    transition=None, not absent authority."""
+    """The registry slot is the kernel's dispatch mechanism.
+
+    Crystallization may emit a phase-home proposal. Liquidus,
+    equilibrium, and the gate stay ``transition=None``.
+    """
     registry = ProviderRegistry()
     provider = AlphaMELTSProvider(backend=None)
     registry.register(provider, [

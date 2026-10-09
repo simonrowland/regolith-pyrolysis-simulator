@@ -62,6 +62,20 @@ _LIQUID_PHASE_NAMES = frozenset({
 })
 
 
+def is_engine_liquid_phase(phase_name: str) -> bool:
+    """True for a silicate-liquid phase name.
+
+    The same names ``liquid_fraction_from_phase_masses`` counts as liquid.
+    A crystal home is a solid, so a liquid row must not become one.
+    """
+    name = str(phase_name)
+    return (
+        name in _LIQUID_PHASE_NAMES
+        or name.lower().startswith('liq')
+        or name.endswith('_Liq')
+    )
+
+
 def liquid_fraction_from_phase_masses(
     phase_masses_kg: Mapping[str, float],
 ) -> Optional[float]:
@@ -83,11 +97,7 @@ def liquid_fraction_from_phase_masses(
             continue
         phase_name = str(phase)
         total_mass_kg += mass
-        if (
-            phase_name in _LIQUID_PHASE_NAMES
-            or phase_name.lower().startswith('liq')
-            or phase_name.endswith('_Liq')
-        ):
+        if is_engine_liquid_phase(phase_name):
             liquid_mass_kg += mass
     if total_mass_kg <= 0.0:
         return None

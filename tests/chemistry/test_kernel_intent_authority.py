@@ -91,10 +91,6 @@ def test_validate_intent_authority_allows_owned_intent():
         (AlphaMELTSProvider(backend=None), ChemistryIntent.GATE_LIQUID_FRACTION),
         (AlphaMELTSProvider(backend=None), ChemistryIntent.SILICATE_LIQUIDUS),
         (AlphaMELTSProvider(backend=None), ChemistryIntent.SILICATE_EQUILIBRIUM),
-        (
-            AlphaMELTSProvider(backend=None),
-            ChemistryIntent.EQUILIBRIUM_CRYSTALLIZATION,
-        ),
         (MAGEMinShadowProvider(backend=None), ChemistryIntent.GATE_LIQUID_FRACTION),
     ],
 )
@@ -103,6 +99,14 @@ def test_validate_intent_authority_refuses_diagnostic_provider(
 ):
     with pytest.raises(UnauthorizedIntentError):
         validate_intent_authority(intent, provider.capability_profile())
+
+
+def test_validate_intent_authority_allows_equilibrium_crystallization():
+    provider = AlphaMELTSProvider(backend=None)
+    validate_intent_authority(
+        ChemistryIntent.EQUILIBRIUM_CRYSTALLIZATION,
+        provider.capability_profile(),
+    )
 
 
 def test_validate_intent_authority_accepts_builtin_condensation_route():

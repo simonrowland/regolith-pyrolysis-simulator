@@ -17,6 +17,7 @@ from simulator.account_ids import (
     STAGE_COLLECTION_BACKING_ACCOUNTS,
     STAGE_COLLECTION_SOURCE_ACCOUNTS,
 )
+from simulator.accounting.phase_homes import holds_positive_crystal_moles
 from simulator.accounting.queries import AccountingQueries
 from simulator.accounting.queries import REE_ENRICHMENT_SOURCE_IDS, REE_OXIDE_SPECIES
 from simulator.chemistry.melt_activity import melt_oxide_activity
@@ -2661,7 +2662,12 @@ class ExtractionMixin:
             # compute it here (NOT before the branch) — bakeout ticks must not pay
             # the liquidus-engine cost or hit its no-source raise for a discarded value.
             liquid_fraction = None
-            if self._freeze_gate_enabled():
+            ledger = getattr(self, 'atom_ledger', None)
+            crystals_hold_mass = (
+                ledger is not None
+                and holds_positive_crystal_moles(ledger.mol_by_account())
+            )
+            if self._freeze_gate_enabled() and not crystals_hold_mass:
                 liquid_fraction = self._freeze_gate_liquid_fraction_factor()
             if campaign == CampaignPhase.C3_K:
                 self._shuttle_inject_K(liquid_fraction=liquid_fraction)
@@ -3091,7 +3097,12 @@ class ExtractionMixin:
             return  # No Mg available
 
         liquid_fraction = None
-        if self._freeze_gate_enabled():
+        ledger = getattr(self, 'atom_ledger', None)
+        crystals_hold_mass = (
+            ledger is not None
+            and holds_positive_crystal_moles(ledger.mol_by_account())
+        )
+        if self._freeze_gate_enabled() and not crystals_hold_mass:
             liquid_fraction = self._freeze_gate_liquid_fraction_factor()
 
         # ------------------------------------------------------------------

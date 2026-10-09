@@ -110,6 +110,7 @@ KNOWN_LEDGER_ACCOUNTS: frozenset[str] = frozenset({
     "vent",
 })
 KNOWN_LEDGER_ACCOUNT_PREFIXES: tuple[str, ...] = (
+    "process.crystal.",
     "process.wall_deposit_segment_",
     "reservoir.reagent.",
 )

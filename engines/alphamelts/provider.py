@@ -7,31 +7,31 @@ First third-party adapter promoted to the kernel plane (goal #8
   (``SILICATE_LIQUIDUS``, ``SILICATE_EQUILIBRIUM``,
   ``EQUILIBRIUM_CRYSTALLIZATION``, and
   ``GATE_LIQUID_FRACTION``),
-- declares ``process.cleaned_melt`` as its sole accessible account; the
-  kernel filter drops every other account before dispatch (checklist
-  item 4),
+- declares ``process.cleaned_melt`` plus this binding's crystal
+  cohorts. Metal, gas, and residue stay out of the engine bulk
+  (checklist item 4),
 - runs the :class:`AlphaMELTSDomainGate` on the cleaned-melt
   composition before delegating to the today-hook adapter,
 - delegates to :mod:`simulator.melt_backend.alphamelts.AlphaMELTSBackend`
   for the chemistry (ThermoEngine + PetThermoTools + subprocess paths owned by the
   adapter; this module orchestrates path selection only),
 - returns a :class:`LiquidusDiagnostics` payload on
-  :attr:`IntentResult.diagnostic`, with ``transition=None`` always --
-  AlphaMELTS is **diagnostic-only** under goal #8 checklist item 5.
+  :attr:`IntentResult.diagnostic`. ``SILICATE_LIQUIDUS``,
+  ``SILICATE_EQUILIBRIUM``, and ``GATE_LIQUID_FRACTION`` stay
+  ``transition=None``. ``EQUILIBRIUM_CRYSTALLIZATION`` returns the
+  phase-home proposal built by
+  :mod:`simulator.accounting.phase_homes`.
 
-The provider class MUST NOT import :class:`LedgerTransitionProposal`
-from anywhere -- not even for type hints. The
-``test_alphamelts_provider.py::test_no_ledger_transition_import`` test
-enforces this with an AST walk over the module source.
+The provider module MUST NOT import the ledger proposal class, not even
+for a type hint. ``test_provider_module_does_not_import_ledger_transition``
+walks every import. The crystallization proposal is the object that
+function returns.
 
 Authority posture
 -----------------
 AlphaMELTS is registered as the **authoritative** provider for these
-intents in the registry sense (so the kernel can dispatch to it), but
-the provider's :meth:`dispatch` never builds a
-:class:`LedgerTransitionProposal`. The :class:`IntentResult` always has
-``transition=None``; the kernel cannot construct a ledger write from a
-None proposal. This is the "diagnostic gate" of the goal title.
+intents. Ledger authority is ``EQUILIBRIUM_CRYSTALLIZATION`` only.
+The other three intents stay diagnostic.
 
 Per goal #8 checklist item 6, the :class:`ControlAudit` records requested and
 applied T / P / fO2 with the note ``"diagnostic, not enforced"`` so a trace
@@ -102,16 +102,15 @@ _INTENTS = frozenset({
     ChemistryIntent.GATE_LIQUID_FRACTION,
 })
 
-# Sole declared account: silicate-oxide melt (binding-spec §7 isolation).
-# Checklist item 4 binds this -- the kernel filter blocks every other
-# account before dispatch.
+# Silicate liquid the engine sees. Crystal cohorts of this binding are
+# declared by sync_crystal_accounts. Metal, gas, and residue stay out.
 _DECLARED_ACCOUNT = 'process.cleaned_melt'
 
 # Note attached to the ControlAudit for every dispatch (checklist 6).
 _DIAGNOSTIC_AUDIT_NOTE = 'diagnostic, not enforced'
 
 class AlphaMELTSProvider(ChemistryProvider):
-    """Diagnostic-only provider for AlphaMELTS via the kernel.
+    """Kernel provider for AlphaMELTS silicate intents.
 
     See module docstring. The provider is constructed with a live
     :class:`simulator.melt_backend.alphamelts.AlphaMELTSBackend`
@@ -132,17 +131,38 @@ class AlphaMELTSProvider(ChemistryProvider):
 
     def __init__(self, backend: Optional[Any] = None) -> None:
         self._backend = backend
+        # Cohorts already on the ledger, plus any shell this dispatch opens.
+        # Declared here so the account view can see them and a new shell
+        # passes the kernel's account check after dispatch returns.
+        self._crystal_accounts: set[str] = set()
+
+    def sync_crystal_accounts(self, accounts: Any) -> None:
+        """Declare this binding's existing cohort accounts before dispatch."""
+        from simulator.accounting.phase_homes import (
+            MELTS_BINDING,
+            parse_crystal_account,
+        )
+
+        for account in accounts:
+            parsed = parse_crystal_account(str(account))
+            if parsed is not None and parsed[0] == MELTS_BINDING:
+                self._crystal_accounts.add(str(account))
 
     def capability_profile(self) -> CapabilityProfile:
         return CapabilityProfile(
             provider_id='alphamelts-diagnostic',
             intents=_INTENTS,
-            # Registry dispatch ownership is separate from ledger-transition
-            # authority. AlphaMELTS owns dispatch for these diagnostic intents
-            # but must never be allowed to write an authoritative transition.
+            # Dispatch ownership stays the full silicate set. Ledger
+            # authority is crystallization only: liquidus, equilibrium,
+            # and the freeze-gate read stay diagnostic.
             is_authoritative_for=_INTENTS,
-            ledger_transition_authority_for=frozenset(),
-            declared_accounts=frozenset({self.DECLARED_ACCOUNT}),
+            ledger_transition_authority_for=frozenset({
+                ChemistryIntent.EQUILIBRIUM_CRYSTALLIZATION,
+            }),
+            declared_accounts=frozenset({
+                self.DECLARED_ACCOUNT,
+                *self._crystal_accounts,
+            }),
         )
 
     def dispatch(self, request: IntentRequest) -> IntentResult:
@@ -162,7 +182,8 @@ class AlphaMELTSProvider(ChemistryProvider):
            keeps the single-T equilibration path.
         5. Projects the adapter result into a
             :class:`LiquidusDiagnostics`.
-        6. Returns the :class:`IntentResult` with ``transition=None``.
+        6. Returns the :class:`IntentResult`. Crystallization may carry
+           the phase-home proposal. The other intents carry none.
         """
         # Defence in depth: the registry routes only declared intents
         # here, but a future caller bypassing the registry must hit a
@@ -311,12 +332,28 @@ class AlphaMELTSProvider(ChemistryProvider):
         # IntentResult owns the closed kernel vocabulary. An unrecognised
         # backend status raises there; it must not become the absence token or
         # silently become refused.
+        payload = diagnostics.as_diagnostic()
+        transition = None
+        if (
+            request.intent == ChemistryIntent.EQUILIBRIUM_CRYSTALLIZATION
+            and str(backend_status) == 'ok'
+        ):
+            transition, home_note = self._phase_home_transition(
+                request,
+                equilibrium,
+            )
+            if home_note:
+                backend_diagnostics = dict(
+                    payload.get('backend_diagnostics') or {}
+                )
+                backend_diagnostics.update(home_note)
+                payload['backend_diagnostics'] = backend_diagnostics
         return IntentResult(
             intent=request.intent,
             status=backend_status,
-            transition=None,  # Diagnostic-only -- checklist item 5.
+            transition=transition,
             control_audit=control_audit,
-            diagnostic=diagnostics.as_diagnostic(),
+            diagnostic=payload,
             warnings=tuple(diagnostics.backend_warnings),
         )
 
@@ -933,6 +970,192 @@ class AlphaMELTSProvider(ChemistryProvider):
             isothermal_phase_inventories=inventories,
         ))
 
+    def _phase_home_transition(
+        self,
+        request: IntentRequest,
+        equilibrium: Any,
+    ) -> tuple[Any, dict[str, Any]]:
+        """Crystallization proposal from the current-temperature oxides.
+
+        The proposal object is built in the accounting owner. This
+        method only reads the sample, runs the locked-inventory probe,
+        and admits the cohort accounts the proposal touches. A refused
+        row, a failed probe, or a liquid that cannot fund the debit
+        returns no proposal and leaves the path status alone.
+        """
+        from simulator.accounting.phase_homes import (
+            LIQUID_ACCOUNT,
+            MELTS_BINDING,
+            locked_cohort_update,
+            locked_cohorts,
+        )
+
+        diagnostics = dict(getattr(equilibrium, 'diagnostics', {}) or {})
+        if diagnostics.get('isothermal_phase_inventory_failure'):
+            if _view_has_binding_cohort(
+                request, MELTS_BINDING,
+            ):
+                return None, {
+                    'phase_home_refusal': {
+                        'reason': _ISOTHERMAL_INVENTORY_SAMPLE_FAILED,
+                        'detail': 'locked cohorts have no accessible sample',
+                    },
+                }
+            return None, {}
+        refusals = diagnostics.get('isothermal_phase_inventory_refusals') or ()
+        if refusals:
+            first = dict(refusals[0] or {})
+            return None, {
+                'phase_home_refusal': {
+                    'reason': 'phase_home_inventory_refused',
+                    'phase': first.get('phase'),
+                    'token': first.get('token'),
+                    'detail': first.get('reason'),
+                },
+            }
+        cohorts = locked_cohorts(
+            request.account_view.accounts,
+            MELTS_BINDING,
+        )
+        if isinstance(cohorts, str):
+            return None, {
+                'phase_home_refusal': {
+                    'reason': 'phase_home_cohort_unreadable',
+                    'detail': cohorts,
+                },
+            }
+        rows = tuple(
+            getattr(equilibrium, 'isothermal_phase_inventories', ()) or ()
+        )
+        if cohorts:
+            probe_rows, probe_note = self._probe_locked_inventory(
+                request,
+                cohorts,
+            )
+            if probe_note:
+                return None, probe_note
+        else:
+            probe_rows = None
+        liquid = dict(
+            request.account_view.accounts.get(LIQUID_ACCOUNT, {}) or {}
+        )
+        update = locked_cohort_update(
+            binding=MELTS_BINDING,
+            liquid_oxide_mol=liquid,
+            accessible_phases=rows,
+            probe_phases=probe_rows,
+            locked=cohorts,
+        )
+        if update.refusal_reason:
+            return None, {
+                'phase_home_refusal': {
+                    'reason': update.refusal_reason,
+                    'detail': update.refusal_detail,
+                },
+            }
+        if update.proposal is not None:
+            self._crystal_accounts.update(update.touched_crystal_accounts)
+        note: dict[str, Any] = {}
+        if update.phases:
+            note['phase_home'] = {
+                'binding': MELTS_BINDING,
+                'phases': [
+                    dict(phase) for phase in update.phases
+                ],
+            }
+        return update.proposal, note
+
+    def _probe_locked_inventory(
+        self,
+        request: IntentRequest,
+        cohorts: tuple,
+    ) -> tuple[tuple | None, dict[str, Any]]:
+        """Equilibrate accessible liquid plus locked cohorts. Mass only."""
+        from simulator.accounting.phase_homes import LIQUID_ACCOUNT
+
+        if not python_api_available(self._backend):
+            return None, {
+                'phase_home_refusal': {
+                    'reason': 'phase_home_probe_failed',
+                    'detail': 'locked probe requires python_api',
+                },
+            }
+        combined: dict[str, float] = {}
+        liquid = dict(
+            request.account_view.accounts.get(LIQUID_ACCOUNT, {}) or {}
+        )
+        for species, moles in liquid.items():
+            value = float(moles)
+            if value > 0.0:
+                combined[species] = combined.get(species, 0.0) + value
+        for cohort in cohorts:
+            for species, moles in cohort.oxide_mol.items():
+                value = float(moles)
+                if value > 0.0:
+                    combined[species] = combined.get(species, 0.0) + value
+        registry = dict(
+            request.account_view.species_formula_registry or {}
+        )
+        try:
+            composition_wt_pct = self._composition_wt_pct(combined, registry)
+        except ValueError as exc:
+            return None, {
+                'phase_home_refusal': {
+                    'reason': 'phase_home_probe_out_of_domain',
+                    'detail': str(exc),
+                },
+            }
+        valid, _warnings, reason = (
+            AlphaMELTSDomainGate.validate_with_reason(composition_wt_pct)
+        )
+        if not valid:
+            return None, {
+                'phase_home_refusal': {
+                    'reason': 'phase_home_probe_out_of_domain',
+                    'detail': str(reason or ''),
+                },
+            }
+        evaluation_pressure_bar = max(
+            float(request.pressure_bar),
+            ALPHAMELTS_CONDENSED_PHASE_REFERENCE_PRESSURE_BAR,
+        )
+        fO2_log = (
+            float(request.fO2_log) if request.fO2_log is not None else -9.0
+        )
+        try:
+            sampled = equilibrate_via_python_api(
+                self._backend,
+                temperature_C=float(request.temperature_C),
+                pressure_bar=evaluation_pressure_bar,
+                fO2_log=fO2_log,
+                composition_mol_by_account={LIQUID_ACCOUNT: combined},
+                species_formula_registry=registry,
+            )
+        except Exception as exc:  # noqa: BLE001 - optional engine boundary
+            return None, {
+                'phase_home_refusal': {
+                    'reason': 'phase_home_probe_failed',
+                    'detail': str(exc),
+                },
+            }
+        status = getattr(sampled, 'status', None) or 'unavailable'
+        if status != 'ok':
+            return None, {
+                'phase_home_refusal': {
+                    'reason': 'phase_home_probe_failed',
+                    'detail': str(status),
+                },
+            }
+        rows, extra = _inventories_from_equilibrium(sampled)
+        if extra.get('isothermal_phase_inventory_refusals'):
+            return None, {
+                'phase_home_refusal': {
+                    'reason': 'phase_home_probe_inventory_refused',
+                    'detail': 'probe phase row did not convert',
+                },
+            }
+        return rows, {}
+
     def _engine_version(self) -> str:
         if self._backend is None:
             return 'unavailable'
@@ -943,6 +1166,22 @@ class AlphaMELTSProvider(ChemistryProvider):
             except Exception:
                 return 'unavailable'
         return 'unavailable'
+
+
+def _view_has_binding_cohort(request: IntentRequest, binding: str) -> bool:
+    """True when the account view already names one cohort of ``binding``."""
+    from simulator.accounting.phase_homes import parse_crystal_account
+
+    accounts = getattr(
+        getattr(request, 'account_view', None),
+        'accounts',
+        {},
+    ) or {}
+    for name in accounts:
+        parsed = parse_crystal_account(str(name))
+        if parsed is not None and parsed[0] == binding:
+            return True
+    return False
 
 
 def _sample_isothermal_inventories(

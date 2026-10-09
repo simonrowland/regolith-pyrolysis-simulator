@@ -320,7 +320,13 @@ def test_live_alphamelts_ec_path_runs_with_live_transport(mode):
         )
 
     path = tuple((result.diagnostic or {}).get('liquid_fraction_path') or ())
-    assert result.transition is None
+    proposal = result.transition
+    if proposal is not None:
+        touched = set(proposal.debits) | set(proposal.credits)
+        for account in touched:
+            assert account == 'process.cleaned_melt' or account.startswith(
+                'process.crystal.melts.'
+            )
     assert path
     assert all(
         a['liquid_fraction'] <= b['liquid_fraction']
