@@ -5,6 +5,10 @@ from collections.abc import Mapping
 from dataclasses import dataclass
 
 from simulator.environment import DEFAULT_VACUUM_FLOOR_BAR
+from simulator.physical_constants import (
+    MELT_DISSOCIATION_PO2_MAX_BAR,
+    MELT_DISSOCIATION_PO2_MIN_BAR,
+)
 from simulator.feedstock_composition import (
     FEOT_FROM_FE2O3,
     OXYGEN_IN_FEO,
@@ -44,9 +48,12 @@ def intrinsic_melt_fO2(
 
     A delta_iw prior replaces that sum. Sato's offset is already the
     measured log10(fO2) minus production IW, so alkali is not added again.
-    A measured Fe3+/sum-Fe prior inverts Kress91 at this temperature
-    (``kress91_fO2_log_for_fe3_fraction``); Kress91 already carries the
-    Na2O and K2O terms, so alkali is not added on top.
+    A measured Fe3+/sum-Fe prior in (0, 1) inverts Kress91 at this
+    temperature (``kress91_fO2_log_for_fe3_fraction``); Kress91 already
+    carries the Na2O and K2O terms, so alkali is not added on top.
+    Fractions of exactly 0 or 1 have no finite Kress91 root. They seed
+    the melt-dissociation envelope (``measured_fe3_fraction_seed``),
+    not this IW-plus-alkali fallthrough.
 
     Algebra, no prior: log10(fO2/bar) = feo_iw_log10_fO2_bar(T) + redox_offset.
     feo_iw_log10_fO2_bar is Holzheid, Palme & Chakraborty 1997 liquid FeO
@@ -82,14 +89,14 @@ def intrinsic_melt_fO2(
     if (
         fe_redox_prior is not None
         and fe_redox_prior.kind == "measured_fe3_fraction"
-        and 0.0 < float(fe_redox_prior.value) < 1.0
     ):
-        return kress91_fO2_log_for_fe3_fraction(
+        fO2_log, _domain = measured_fe3_fraction_seed(
             fe3_fraction=float(fe_redox_prior.value),
             composition_wt_pct=composition_wt_pct,
             T_K=temperature,
             pressure_bar=LOAD_FE_SPLIT_PRESSURE_BAR,
         )
+        return fO2_log
     feo, fe2o3 = iron_oxide_values(composition_wt_pct)
     alkali = max(0.0, float(composition_wt_pct.get("Na2O", 0.0))) + max(
         0.0, float(composition_wt_pct.get("K2O", 0.0))
@@ -841,6 +848,79 @@ def kress91_fO2_log_for_fe3_fraction(
     target_ratio = fraction / (2.0 * (1.0 - fraction))
     return (math.log(target_ratio) - math.log(ratio_at_zero)) / (
         KRESS91_LN_FO2_COEFFICIENT * math.log(10.0)
+    )
+
+
+MEASURED_FRACTION_SEED_KRESS91 = "kress91"
+MEASURED_FRACTION_SEED_DISSOCIATION_ENVELOPE = "melt_dissociation_envelope"
+
+
+def measured_fe3_fraction_seed_domain(fe3_fraction: float) -> str:
+    """Which relation seeds a measured Fe3+/sum-Fe fraction.
+
+    Kress91's molar ratio r = f / (2 (1 - f)) is zero at f = 0 and
+    infinite at f = 1, so the inversion has no finite log10(fO2).
+    Those two endpoints use the melt-dissociation envelope. Every other
+    fraction, including values the parser will later refuse, is the
+    Kress91 domain; the inversion itself still rejects f outside (0, 1).
+    """
+
+    fraction = float(fe3_fraction)
+    if fraction == 0.0 or fraction == 1.0:
+        return MEASURED_FRACTION_SEED_DISSOCIATION_ENVELOPE
+    return MEASURED_FRACTION_SEED_KRESS91
+
+
+def measured_fe3_fraction_seed(
+    *,
+    fe3_fraction: float,
+    composition_wt_pct: Mapping[str, float],
+    T_K: float,
+    pressure_bar: float,
+) -> tuple[float, str]:
+    """log10(fO2/bar) for a measured ferric fraction, and its domain.
+
+    Premise: an interior fraction inverts Kress91 once
+    (``kress91_fO2_log_for_fe3_fraction``). f = 0 and f = 1 make that
+    log ratio diverge, so there is no finite Kress91 root. Seeding both
+    of those endpoints with IW plus alkali would give one potential
+    (Holzheid IW at 1673.15 K is -9.740754, and a small alkali offset
+    does not separate the two inventories) and the forward relation
+    would read it as a small ferric fraction. The ledger still writes
+    f = 0 as all FeO and f = 1 as all Fe2O3.
+
+    The existing vapour mass-action envelope already bounds melt pO2:
+    MELT_DISSOCIATION_PO2_MIN_BAR is 1e-30 bar and
+    MELT_DISSOCIATION_PO2_MAX_BAR is 100 bar. f = 0 takes the reducing
+    bound and f = 1 the oxidizing bound. That is the dissociation
+    envelope, not a Kress91 solution.
+
+    Algebra: log10(fO2/bar) = log10(1e-30) = -30 at f = 0, and
+    log10(100) = 2 at f = 1. Interior fractions use the inversion.
+
+    Units: f is dimensionless Fe3+/sum-Fe. T_K is kelvin. pressure_bar
+    is bar. The result is dimensionless log10(fO2/bar).
+
+    Sanity: f = 0 returns -30 and f = 1 returns 2. Neither equals
+    Holzheid IW at 1673.15 K (-9.740754).
+    """
+
+    domain = measured_fe3_fraction_seed_domain(fe3_fraction)
+    if domain == MEASURED_FRACTION_SEED_DISSOCIATION_ENVELOPE:
+        bound_bar = (
+            MELT_DISSOCIATION_PO2_MIN_BAR
+            if float(fe3_fraction) == 0.0
+            else MELT_DISSOCIATION_PO2_MAX_BAR
+        )
+        return math.log10(bound_bar), domain
+    return (
+        kress91_fO2_log_for_fe3_fraction(
+            fe3_fraction=float(fe3_fraction),
+            composition_wt_pct=composition_wt_pct,
+            T_K=T_K,
+            pressure_bar=pressure_bar,
+        ),
+        domain,
     )
 
 

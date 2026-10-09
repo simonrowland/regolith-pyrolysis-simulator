@@ -393,6 +393,8 @@ from simulator.fe_redox import (
     KRESS91_LIQUID_CALIBRATION_MIN_T_C,
     kress91_ln_fO2_temperature_delta,
     kress91_split,
+    MEASURED_FRACTION_SEED_DISSOCIATION_ENVELOPE,
+    measured_fe3_fraction_seed_domain,
     melt_fO2_seed_without_ferric_iron,
     melt_mol_fractions_for_kress91,
     resolve_load_fe_redox,
@@ -6998,8 +7000,10 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         # The seed is intrinsic_melt_fO2 at T_K. With no prior that is Holzheid
         # IW plus the alkali offset (and the 0.25 ferric term only when both
         # iron oxides are present and no prior is seated). A delta_iw prior is
-        # IW(T) + delta_iw. A measured Fe3+ fraction inverts Kress91 at T_K.
-        # The headspace vacuum floor is not a melt property and is not applied.
+        # IW(T) + delta_iw. A measured Fe3+ fraction in (0, 1) inverts Kress91
+        # at T_K. Fractions of exactly 0 or 1 seed the melt-dissociation
+        # envelope, because that inversion has no finite root. The headspace
+        # vacuum floor is not a melt property and is not applied.
         # Callers before the first liquid tick pass the current temperature;
         # load_batch's 25 C value does not remain the adopted potential.
         resolution = getattr(self, "_load_fe_redox", None)
@@ -8951,6 +8955,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         if resolution is None or resolution.authority is None:
             return None
         prior = resolution.prior
+        seed_domain = None
         if resolution.authority == "lower_bound":
             message = (
                 "Ferric iron is unresolved. The ledger keeps the reported "
@@ -8966,13 +8971,23 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 "oxygen added to the batch."
             )
         else:
-            message = (
-                "Ledger FeO and Fe2O3 keep the feedstock Fe atoms and add "
-                "the ferric oxygen the total-Fe analysis omitted. The seed "
-                "is the Kress91 fO2 consistent with the measured "
-                "Fe3+/sum-Fe fraction."
-            )
-        return {
+            seed_domain = measured_fe3_fraction_seed_domain(float(prior.value))
+            if seed_domain == MEASURED_FRACTION_SEED_DISSOCIATION_ENVELOPE:
+                message = (
+                    "The measured Fe3+/sum-Fe fraction is an endpoint. "
+                    "Kress91's molar ratio has no finite root there, so "
+                    "the seed is the melt-dissociation pressure envelope, "
+                    "not a Kress91 solution. The ledger still writes that "
+                    "fraction."
+                )
+            else:
+                message = (
+                    "Ledger FeO and Fe2O3 keep the feedstock Fe atoms and add "
+                    "the ferric oxygen the total-Fe analysis omitted. The seed "
+                    "is the Kress91 fO2 consistent with the measured "
+                    "Fe3+/sum-Fe fraction."
+                )
+        notice = {
             "code": "fe_redox_split",
             "authority": resolution.authority,
             "source_id": None if prior is None else prior.source_id,
@@ -8982,6 +8997,18 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             "fe3_fraction": resolution.fe3_fraction,
             "message": message,
         }
+        if seed_domain is not None:
+            notice["seed_domain"] = seed_domain
+            if seed_domain == MEASURED_FRACTION_SEED_DISSOCIATION_ENVELOPE:
+                notice["seed_domain_reason"] = (
+                    "Kress91 molar ratio f/(2*(1-f)) is zero at f=0 and "
+                    "infinite at f=1, so the inversion has no finite "
+                    "log10(fO2). The seed is log10 of the melt-dissociation "
+                    "envelope (1e-30 bar when f=0, 100 bar when f=1). "
+                    "That envelope is the vapour mass-action bound, not a "
+                    "Kress91 root."
+                )
+        return notice
 
     def sulfur_saturation_run_notice(self) -> Dict[str, Any] | None:
         """Run-level SulfSat notice, or None when every step was in range."""

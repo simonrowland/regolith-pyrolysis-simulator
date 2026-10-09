@@ -7,6 +7,7 @@ relation. This file does not paste the inversion algebra.
 
 from __future__ import annotations
 
+import math
 from pathlib import Path
 
 import pytest
@@ -20,15 +21,22 @@ from simulator.core import PyrolysisSimulator
 from simulator.fe_redox import (
     LOAD_FE_SPLIT_PRESSURE_BAR,
     KRESS91_FO2_KEY_REFERENCE_T_K,
+    MEASURED_FRACTION_SEED_DISSOCIATION_ENVELOPE,
+    MEASURED_FRACTION_SEED_KRESS91,
     fe3_fraction_for_prior,
     feo_fe2o3_kg_from_feot,
     feo_iw_log10_fO2_bar,
     intrinsic_melt_fO2,
     kress91_fO2_log_for_fe3_fraction,
     kress91_fe3_over_sigma_fe,
+    measured_fe3_fraction_seed,
     melt_mol_fractions_for_kress91,
     omitted_ferric_oxygen_kg,
     resolve_load_fe_redox,
+)
+from simulator.physical_constants import (
+    MELT_DISSOCIATION_PO2_MAX_BAR,
+    MELT_DISSOCIATION_PO2_MIN_BAR,
 )
 from simulator.feedstock_composition import (
     FeRedoxPrior,
@@ -213,6 +221,90 @@ def test_endpoint_fractions_have_no_finite_inversion() -> None:
                 T_K=KRESS91_FO2_KEY_REFERENCE_T_K,
                 pressure_bar=LOAD_FE_SPLIT_PRESSURE_BAR,
             )
+
+
+def test_endpoint_fractions_seed_the_dissociation_envelope_on_load() -> None:
+    """f = 0 and f = 1 must not fall through to the same IW-plus-alkali seed."""
+
+    composition = {"SiO2": 45.0, "FeO": 16.5, "Na2O": 1.0}
+    bounds = {
+        0.0: MELT_DISSOCIATION_PO2_MIN_BAR,
+        1.0: MELT_DISSOCIATION_PO2_MAX_BAR,
+    }
+    iw_alkali = intrinsic_melt_fO2(composition, KRESS91_FO2_KEY_REFERENCE_T_K)
+    for fraction, bound_bar in bounds.items():
+        seeded, domain = measured_fe3_fraction_seed(
+            fe3_fraction=fraction,
+            composition_wt_pct=composition,
+            T_K=KRESS91_FO2_KEY_REFERENCE_T_K,
+            pressure_bar=LOAD_FE_SPLIT_PRESSURE_BAR,
+        )
+        assert domain == MEASURED_FRACTION_SEED_DISSOCIATION_ENVELOPE
+        assert seeded == pytest.approx(math.log10(bound_bar))
+        assert seeded != pytest.approx(iw_alkali)
+
+        feedstocks = _feedstocks()
+        entry = dict(feedstocks["lunar_mare_low_ti"])
+        entry.pop("fe_redox_prior", None)
+        feedstocks["lunar_mare_low_ti"] = entry
+        plain = _sim(feedstocks)
+        plain.load_batch("lunar_mare_low_ti", mass_kg=1000.0)
+        feot_kg = float(plain.inventory.melt_oxide_kg["FeO"])
+        fallthrough = intrinsic_melt_fO2(
+            plain._melt_oxide_wt_pct(),
+            25.0 + 273.15,
+        )
+
+        feedstocks["lunar_mare_low_ti"] = {
+            **entry,
+            "fe_redox_prior": _measured_block(fraction),
+        }
+        sim = _sim(feedstocks)
+        sim.load_batch("lunar_mare_low_ti", mass_kg=1000.0)
+        assert sim.melt.fO2_log == pytest.approx(math.log10(bound_bar))
+        assert sim.melt.fO2_log != pytest.approx(fallthrough)
+        notice = sim.melt_fO2_seed_run_notice()
+        assert notice is not None
+        assert notice["seed_domain"] == MEASURED_FRACTION_SEED_DISSOCIATION_ENVELOPE
+        assert "not a Kress91" in notice["message"]
+        assert "not a Kress91 root" in notice["seed_domain_reason"]
+        assert notice["fe3_fraction"] == pytest.approx(fraction)
+
+        melt = sim.inventory.melt_oxide_kg
+        molar_feo, molar_fe2o3, _molar_oxygen = _feo_formula_masses()
+        n_fe = (
+            float(melt.get("FeO", 0.0)) / molar_feo
+            + 2.0 * float(melt.get("Fe2O3", 0.0)) / molar_fe2o3
+        )
+        assert n_fe == pytest.approx(feot_kg / molar_feo)
+        if fraction == 0.0:
+            assert float(melt.get("Fe2O3", 0.0)) == 0.0
+            assert "feot_omitted_ferric_oxygen" not in (
+                sim.inventory.stage0_external_inputs_kg
+            )
+        else:
+            _ferrous, ferric, oxygen_kg = feo_fe2o3_kg_from_feot(feot_kg, 1.0)
+            assert float(melt.get("FeO", 0.0)) == pytest.approx(0.0)
+            assert float(melt.get("Fe2O3", 0.0)) == pytest.approx(ferric)
+            assert sim.inventory.stage0_external_inputs_kg[
+                "feot_omitted_ferric_oxygen"
+            ] == pytest.approx(oxygen_kg)
+
+    interior, interior_domain = measured_fe3_fraction_seed(
+        fe3_fraction=0.2,
+        composition_wt_pct=composition,
+        T_K=KRESS91_FO2_KEY_REFERENCE_T_K,
+        pressure_bar=LOAD_FE_SPLIT_PRESSURE_BAR,
+    )
+    assert interior_domain == MEASURED_FRACTION_SEED_KRESS91
+    assert interior == pytest.approx(
+        kress91_fO2_log_for_fe3_fraction(
+            fe3_fraction=0.2,
+            composition_wt_pct=composition,
+            T_K=KRESS91_FO2_KEY_REFERENCE_T_K,
+            pressure_bar=LOAD_FE_SPLIT_PRESSURE_BAR,
+        )
+    )
 
 
 def test_delta_iw_seed_is_production_iw_plus_the_offset_without_alkali() -> None:
