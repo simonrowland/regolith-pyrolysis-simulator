@@ -35,6 +35,7 @@ from simulator.melt_backend.alphamelts import (
     ALPHAMELTS_SUBPROCESS_MIN_TEMPERATURE_C,
     AlphaMELTSBackend,
 )
+from simulator.config import resolve_alphamelts_python_api_model
 from simulator.melt_backend.base import EquilibriumResult
 from simulator.melt_backend.melt_envelope import MELT_ENVELOPE_CONSTANTS
 from simulator.melt_backend.thermoengine import ThermoEngineBackend
@@ -787,6 +788,10 @@ def _install_python_api_transport_spy(monkeypatch, backend):
     """Fake `_run_petthermotools_isolated`; keep real entry points and parser."""
     calls: list = []
     backend._mode = 'python_api'
+    # Admit the model the way initialize() does: through the one owner resolver.
+    backend._python_api_model = resolve_alphamelts_python_api_model(
+        backend._raw_model_name
+    )
     backend._engine_version = 'test'
     backend._vaporock_available = False
     backend._pet_payload_preloaded = True
