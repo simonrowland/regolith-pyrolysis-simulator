@@ -2101,17 +2101,10 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
     _FE2O3_MOLAR_MASS_G_PER_MOL = (
         2 * _FE_MOLAR_MASS_G_PER_MOL + 3 * _O_MOLAR_MASS_G_PER_MOL
     )
+    # Oxygen in Fe2O3 beyond two FeO formulas: M_O / M_Fe2O3.
+    # 2*M_FeO + M_O = M_Fe2O3, so FeOt + this O equals FeO + Fe2O3 mass.
     _EXCESS_O_FROM_FE2O3_FACTOR = (
         _O_MOLAR_MASS_G_PER_MOL / _FE2O3_MOLAR_MASS_G_PER_MOL
-    )
-    # Lunar/Apollo bulk chemistry reports total iron as ``FeO`` / ``FeO_T`` —
-    # a spectroscopy bookkeeping convention, not literal stoichiometric FeO.
-    # MAGEMin still needs a nonzero ``O`` bulk component for the qfm buffer.
-    # When no explicit ``Fe2O3`` is present, provision redox O from the total
-    # iron inventory using the same half-O-per-Fe stoichiometry as explicit
-    # Fe2O3 excess oxygen (mass-conserving with the Fe2O3 path above).
-    _EXCESS_O_FROM_FEO_TOTAL_IRON_FACTOR = (
-        _O_MOLAR_MASS_G_PER_MOL / (2.0 * _FEO_MOLAR_MASS_G_PER_MOL)
     )
 
     # fO2 buffers MAGEMin's CLI accepts (``--buffer=``).  The simulator
@@ -2620,11 +2613,12 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
         """
         Project simulator oxide wt% into the installed MAGEMin DB bulk order.
 
-        FeO/Fe2O3 are MAGEMin's documented total-iron convention:
-        ``FeOt`` plus free ``O`` where the DB exposes an O component. Other
-        positive components absent from the selected DB order are not hidden:
-        they are listed in warnings as documented drops. Unknown component
-        names fail before the binary sees a positional vector.
+        FeO/Fe2O3 fold onto MAGEMin's total-iron component ``FeOt``.
+        Free ``O`` is only excess oxygen an explicit Fe2O3 input carries.
+        FeO with no Fe2O3 adds no O. Other positive components absent from
+        the selected DB order are not hidden: they are listed in warnings
+        as documented drops. Unknown component names fail before the
+        binary sees a positional vector.
         """
         db = str(database or self._database).lower().strip()
         if db not in self._DB_BULK_ORDERS:
@@ -2658,20 +2652,25 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
         excess_o = source.pop('O', 0.0)
         merged: List[str] = []
         if feo > 0.0:
-            merged.append('FeO->FeOt+O')
+            merged.append('FeO->FeOt')
         if fe2o3 > 0.0:
             merged.append('Fe2O3->FeOt+O')
 
-        # Fe2O3 -> FeO-equivalent mass: each Fe2O3 carries 2 Fe;
-        # total-iron-as-FeOt reports that iron as 2 FeO formula masses.
+        # Fe atoms stay in FeOt. O is only excess oxygen the input carries.
+        # Premise: catalog FeO is total iron reported as FeO. Fe2O3, when
+        # the input has it, is the only ferric inventory. MAGEMin stores
+        # that iron as FeOt and oxygen beyond the FeO formula as O.
+        # Algebra: FeOt = total_fe() = FeO + Fe2O3 * (2*M_FeO/M_Fe2O3).
+        #   O = Fe2O3 * (M_O/M_Fe2O3). FeO adds nothing to O.
+        # Mass: FeOt + O = FeO + Fe2O3, because 2*M_FeO + M_O = M_Fe2O3.
+        # Fe atoms: FeOt/M_FeO = FeO/M_FeO + 2*Fe2O3/M_Fe2O3.
+        # A buffer solve does not need O > 0. MAGEMin's ig 1e-4 mol floor
+        # exempts O (src/toolkit.c:346), and --buffer only selects a pure
+        # phase by gbase offset (src/pp_min_function.c:119 and :742). It
+        # does not rewrite bulk_rock. Do not invent O from FeO.
+        # Sanity: 16.5 wt% FeO and no Fe2O3 -> FeOt 16.5, O from iron 0,
+        # Fe moles 16.5/M_FeO preserved.
         excess_o += fe2o3 * self._EXCESS_O_FROM_FE2O3_FACTOR
-        if fe2o3 <= 0.0 and feo > 0.0:
-            # FeO key is total-iron inventory (FeO_T), not literal FeO only.
-            # Peel buffer O from the FeOt slot so FeOt + O == feo (same
-            # mass bookkeeping as the explicit Fe2O3 fold above).
-            feo_excess_o = feo * self._EXCESS_O_FROM_FEO_TOTAL_IRON_FACTOR
-            excess_o += feo_excess_o
-            feot -= feo_excess_o
 
         if feot > 0.0:
             source['FeOt'] = source.get('FeOt', 0.0) + feot

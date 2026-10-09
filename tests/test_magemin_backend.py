@@ -1327,9 +1327,9 @@ def test_magemin_db_projection_keeps_mp_mno_and_records_igad_dry_drop():
     assert mp.vector[mp.order.index("MnO")] == pytest.approx(0.4)
     assert "Cr2O3" not in mp.composition_wt_pct
     assert mp.dropped_components == ("Cr2O3",)
-    assert mp.merged_components == ("FeO->FeOt+O",)
+    assert mp.merged_components == ("FeO->FeOt",)
     assert any("Cr2O3" in warning for warning in mp.warnings)
-    assert any("FeO->FeOt+O" in warning for warning in mp.warnings)
+    assert any("FeO->FeOt" in warning for warning in mp.warnings)
 
     igad = backend._build_db_bulk_projection(composition, database="igad")
     assert "H2O" not in igad.order
@@ -1399,7 +1399,12 @@ def test_magemin_explicit_fe2o3_does_not_apply_total_iron_o_provision():
     )
 
 
-def test_magemin_ig_bulk_vector_feo_total_iron_provisions_redox_o():
+def test_magemin_ig_bulk_vector_feo_without_fe2o3_keeps_iron():
+    """FeO with no Fe2O3 stays FeOt. No oxygen is invented from that FeO.
+
+    16.5 wt% FeO is 16.5/M_FeO moles of Fe. The FeOt mass that preserves
+    those moles is 16.5. Excess O is 0 because the input has no Fe2O3.
+    """
     backend = MAGEMinBackend()
     vector = backend._build_ig_bulk_vector(
         {
@@ -1413,20 +1418,16 @@ def test_magemin_ig_bulk_vector_feo_total_iron_provisions_redox_o():
     feot_index = MAGEMinBackend._IG_BULK_ORDER.index("FeOt")
     oxygen_index = MAGEMinBackend._IG_BULK_ORDER.index("O")
 
-    feo_excess_o = 16.5 * MAGEMinBackend._EXCESS_O_FROM_FEO_TOTAL_IRON_FACTOR
-    assert vector[oxygen_index] == pytest.approx(feo_excess_o)
-    assert vector[feot_index] == pytest.approx(16.5 - feo_excess_o)
-    assert vector[feot_index] + vector[oxygen_index] == pytest.approx(16.5)
-    assert vector[oxygen_index] > 0.0
+    assert vector[feot_index] == pytest.approx(16.5)
+    assert vector[oxygen_index] == pytest.approx(0.0)
 
 
 def test_lunar_mare_low_ti_ig_bulk_vector_pin():
     """Pin the ig bulk vector for catalog lunar_mare_low_ti.
 
     The composition is data/feedstocks.yaml, restricted to the adapter
-    input basis, then ``_build_db_bulk_projection``. FeOt
-    14.662800651411391 and O 1.837199348588609 are that resolver's output;
-    their sum is the feedstock 16.5 wt% FeO.
+    input basis, then ``_build_db_bulk_projection``. With no Fe2O3, FeOt
+    equals the feedstock FeO and the O slot is 0.
     """
     feedstocks = yaml.safe_load(
         (Path(__file__).resolve().parents[1] / "data" / "feedstocks.yaml").read_text()
@@ -1448,16 +1449,19 @@ def test_lunar_mare_low_ti_ig_bulk_vector_pin():
         13.5,
         11.0,
         9.0,
-        14.662800651411391,
+        16.5,
         0.1,
         0.4,
         1.5,
-        1.837199348588609,
+        0.0,
         0.35,
         0.0,
     )
+    assert projection.vector[projection.order.index("FeOt")] == in_basis["FeO"]
+    assert projection.vector[projection.order.index("O")] == 0.0
+    assert "Fe2O3" not in in_basis
     assert projection.dropped_components == ("MnO", "P2O5", "S")
-    assert projection.merged_components == ("FeO->FeOt+O",)
+    assert projection.merged_components == ("FeO->FeOt",)
     assert projection.source_sum_wt_pct == 97.22
 
 
@@ -1945,10 +1949,10 @@ def test_magemin_live_adapter_path_fO2_changes_shadow_response():
     """Requested fO2 must move the MAGEMin shadow response.
 
     This intentionally drives the production adapter path
-    (``_build_ig_bulk_vector`` + ``_resolve_buffer``). P3-F real-binary probes
-    showed MAGEMin's qfm buffer changes GAM[O] only when ig O is nonzero; the
-    adapter provisions O from explicit Fe2O3 or from the total-iron-as-FeO
-    inventory when no ferric split is reported.
+    (``_build_ig_bulk_vector`` + ``_resolve_buffer``). The probe bulk
+    includes explicit Fe2O3, so the O component is that oxide's excess
+    oxygen. P3-F showed MAGEMin's qfm buffer changes GAM[O] when ig O
+    is nonzero.
     """
     binary = _LIVE_MAGEMIN_BINARY
     reduced = _run_magemin_adapter_buffer_probe(binary, fO2_log=-12.0)

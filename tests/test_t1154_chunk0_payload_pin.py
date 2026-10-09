@@ -8,11 +8,11 @@ on the same recorded MAGEMin 1.9.6 (04/06/2026) lunar-mare run at
     SiO2 44.5, Al2O3 13.5, CaO 11.0, MgO 9.0, FeOt 14.662801,
     K2O 0.10, Na2O 0.4, TiO2 1.5, O 1.837199, Cr2O3 0.35, H2O 0
 
-That vector is the adapter's FeO→FeOt+O fold of SiO2 44.5, TiO2 1.5,
-Al2O3 13.5, FeO 16.5, MgO 9.0, CaO 11.0, Na2O 0.4, K2O 0.10, Cr2O3 0.35.
-The seat has no engines/engines.local.toml, so these strings are the
-recorded payload. AlphaMELTS was not executed; its pin is the recorded
-Phase_main table the subprocess parser already accepts.
+That recorded bulk is the old FeO peel: 11.1% of the Fe atoms were
+moved into O. The adapter now sends FeOt 16.5 and O 0 for FeO 16.5
+with no Fe2O3. These strings stay the recorded parser payload. They
+are not a live call. AlphaMELTS was not executed; its pin is the
+recorded Phase_main table the subprocess parser already accepts.
 """
 from __future__ import annotations
 
@@ -73,6 +73,8 @@ _LUNAR_MARE_STDOUT = {
 
 # Lunar-mare majors as kg. Nothing here is outside the ig order, so the
 # in-database batch is this sum. MnO and P2O5 are the exclusion case.
+# The recorded stdout below was captured from the peeled bulk
+# (_RECORDED_PEELED_IG_BULK_WT_PCT), not from today's FeOt 16.5 / O 0 fold.
 _LUNAR_MARE_MAJORS_KG = {
     "SiO2": 44.5,
     "TiO2": 1.5,
@@ -82,6 +84,22 @@ _LUNAR_MARE_MAJORS_KG = {
     "CaO": 11.0,
     "Na2O": 0.4,
     "K2O": 0.10,
+    "Cr2O3": 0.35,
+}
+
+# Bulk that produced _LUNAR_MARE_STDOUT. FeOt + O equals the 16.5 wt% FeO
+# the peel split. Pass these keys through; do not send FeO and let the
+# current adapter fold it again.
+_RECORDED_PEELED_IG_BULK_WT_PCT = {
+    "SiO2": 44.5,
+    "Al2O3": 13.5,
+    "CaO": 11.0,
+    "MgO": 9.0,
+    "FeOt": 14.662800651411391,
+    "K2O": 0.1,
+    "Na2O": 0.4,
+    "TiO2": 1.5,
+    "O": 1.837199348588609,
     "Cr2O3": 0.35,
 }
 
@@ -324,7 +342,7 @@ def test_magemin_subprocess_scales_recorded_weight_fraction_and_keeps_oxide_wt(
 
     result = backend.equilibrate(
         float(temperature_C),
-        composition_kg=dict(_LUNAR_MARE_MAJORS_KG),
+        composition_kg=dict(_RECORDED_PEELED_IG_BULK_WT_PCT),
         fO2_log=-9.0,
         pressure_bar=1.0,
     )
@@ -332,7 +350,7 @@ def test_magemin_subprocess_scales_recorded_weight_fraction_and_keeps_oxide_wt(
     assert result.status == "ok", result.warnings
     assert any(arg == "--out_matlab=1" for arg in captured["args"])
     assert "qfm" not in result.phase_masses_kg
-    batch_kg = sum(_LUNAR_MARE_MAJORS_KG.values())
+    batch_kg = sum(_RECORDED_PEELED_IG_BULK_WT_PCT.values())
     weights = _LUNAR_MARE_WEIGHT_FRACTIONS[temperature_C]
     material = _material_modes(temperature_C)
     assert set(result.phase_masses_kg) == set(weights) == set(material)
@@ -354,7 +372,7 @@ def test_magemin_subprocess_scales_recorded_weight_fraction_and_keeps_oxide_wt(
     # One scale for every phase: fraction[wt] of the hosted assemblage.
     assert hosted_scales == pytest.approx([hosted_scales[0]] * len(hosted_scales))
     sent = MAGEMinBackend()._build_db_bulk_projection(
-        dict(_LUNAR_MARE_MAJORS_KG), database="ig",
+        dict(_RECORDED_PEELED_IG_BULK_WT_PCT), database="ig",
     )
     sent_kg = {
         ("FeO" if name == "FeOt" else name): (
