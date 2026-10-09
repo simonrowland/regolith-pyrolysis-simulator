@@ -515,3 +515,59 @@ def test_projected_phase_and_liquid_fields_pin_has_no_repair_warning():
     assert diagnostic.phase_modes_wt_pct == {'liquid': 100.0}
     assert diagnostic.liquid_composition_wt_pct == {'SiO2': 50.0, 'MgO': 50.0}
     assert diagnostic.backend_warnings == ()
+
+
+def test_projected_invalid_fields_warn_without_changing_replay_record():
+    from types import SimpleNamespace
+
+    from simulator.melt_backend.base import EquilibriumResult
+    from simulator.reduced_real_determinism import (
+        canonical_json_bytes,
+        equilibrium_payload,
+    )
+
+    equilibrium = EquilibriumResult(
+        temperature_C=1400.0,
+        phases_present=['liquid', 'olivine'],
+        phase_masses_kg={'liquid': 1.0, 'olivine': 0.0},
+        liquid_composition_wt_pct={
+            'SiO2': 50.0,
+            'MgO': 50.0,
+            'FeO': 0.0,
+            'CaO': -1.0,
+        },
+        liquid_fraction=1.0,
+    )
+    sim = SimpleNamespace(
+        backend=None,
+        _chem_registry=None,
+        _last_vapor_pressures_source={},
+        _last_vapor_pressure_diagnostic={},
+    )
+    cached_before = canonical_json_bytes(equilibrium_payload(sim, equilibrium))
+
+    diagnostic = MAGEMinShadowProvider._project_equilibrium(
+        equilibrium,
+        mode='shadow',
+        engine_version='test',
+    )
+
+    assert diagnostic.phase_masses_kg == {'liquid': 1.0}
+    assert diagnostic.phase_modes_wt_pct == {'liquid': 100.0}
+    assert diagnostic.liquid_composition_wt_pct == {'SiO2': 50.0, 'MgO': 50.0}
+    assert len(diagnostic.backend_warnings) == 3
+    assert any(
+        "phase 'olivine'" in warning and 'nonpositive' in warning
+        for warning in diagnostic.backend_warnings
+    )
+    assert any(
+        "'FeO'" in warning and 'nonpositive' in warning
+        for warning in diagnostic.backend_warnings
+    )
+    assert any(
+        "'CaO'" in warning and 'nonpositive' in warning
+        for warning in diagnostic.backend_warnings
+    )
+    cached_after = canonical_json_bytes(equilibrium_payload(sim, equilibrium))
+    assert cached_after == cached_before
+    assert equilibrium.warnings == []
