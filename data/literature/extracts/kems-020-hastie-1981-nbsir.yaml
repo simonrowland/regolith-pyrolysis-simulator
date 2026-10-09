@@ -54,6 +54,19 @@ fidelity_samples:
       page: 61
       figure: '11'
       note: Run 1 rightmost filled circle; printed x(K2O)=0.154; 300 dpi tick-calibrated render (#38b corrected x ticks)
+  - path: species.SiO.observations[hastie_1981_fig4_illite_K_SiO_digitized].values.composition_wt_pct
+    value: {Al2O3: 26.0, Fe2O3: 4.4, SiO2: 60.2, K2O: 7.4, Na2O: 0.2, MgO: 2.1}
+    locator:
+      page: 16
+      section: '8.2'
+      note: Beaver's Bend illite major-component analysis
+  - path: species.K2O.observations[hastie_1981_fig11_k1_slag_k2o_gamma_digitized].values.composition_wt_pct
+    value: {K2O: 19.5, Al2O3: 12.1, Fe2O3: 14.3, CaO: 3.8, MgO: 1.0, SiO2: 46.8, Na2O: 0.5}
+    locator:
+      page: 24
+      published_page: 24
+      table: '2'
+      note: K1 row 13 initial charge, as referenced by section 10.5
   - path: species.K.observations[hastie_1981_table2_k_logP_coefficients_quoted_20260906].values.rows[15].A
     value: 6.286
     locator:
@@ -1541,6 +1554,10 @@ species:
         Na2O_wt_pct: 17.0
         note: TMS(1) error-bar midpoint (bar log10 P -3.73 to -4.32)
         glass_initial_wt_pct: {Na2O: 17, CaO: 12, SiO2: 71}
+        composition_role:
+          value: initial_charge_only
+          locator: {page: 18, published_page: 18, pdf_page_index: 23, note: initial glass composition}
+          quote: 'glass of initial composition (wt.%): Na2O(17), CaO(12), and SiO2(71)'
         Na2CO3_impurity_wt_pct: 0.45
       uncertainty:
         note: digitisation ±0.10 dex (tick-calibrated; pass-2 residual ≤0.004 dex). KMS(1) vertical bar is the authors' maximum conceivable error.
@@ -1569,6 +1586,10 @@ species:
         residual_dex_vs_pass2: -0.003
         Na2O_wt_pct: 17.0
         glass_initial_wt_pct: {Na2O: 17, CaO: 12, SiO2: 71}
+        composition_role:
+          value: initial_charge_only
+          locator: {page: 18, published_page: 18, pdf_page_index: 23, note: initial glass composition}
+          quote: 'glass of initial composition (wt.%): Na2O(17), CaO(12), and SiO2(71)'
         Na2CO3_impurity_wt_pct: 0.45
       uncertainty:
         note: digitisation ±0.10 dex (tick-calibrated; pass-2 residual ≤0.004 dex). KMS(1) vertical bar is the authors' maximum conceivable error.
@@ -1597,6 +1618,10 @@ species:
         residual_dex_vs_pass2: -0.003
         Na2O_wt_pct: 16.9
         glass_initial_wt_pct: {Na2O: 17, CaO: 12, SiO2: 71}
+        composition_role:
+          value: initial_charge_only
+          locator: {page: 18, published_page: 18, pdf_page_index: 23, note: initial glass composition}
+          quote: 'glass of initial composition (wt.%): Na2O(17), CaO(12), and SiO2(71)'
         Na2CO3_impurity_wt_pct: 0.45
       uncertainty:
         note: digitisation ±0.10 dex (tick-calibrated; pass-2 residual ≤0.004 dex). KMS(1) vertical bar is the authors' maximum conceivable error.
@@ -1657,6 +1682,10 @@ species:
           Na2O: 17
           CaO: 12
           SiO2: 71
+        composition_role:
+          value: initial_charge_only
+          locator: {page: 18, published_page: 18, pdf_page_index: 23, note: initial glass composition}
+          quote: 'glass of initial composition (wt.%): Na2O(17), CaO(12), and SiO2(71)'
         residue_Na2O_wt_pct_as_published:
           initial: 17.0
           KMS_3_final: 13.3
@@ -2271,6 +2300,18 @@ species:
         quantity: apparent_gamma_K2O
         method_class: measured_direct
         system_class: mixed_oxide_slag
+        composition_wt_pct:
+          K2O: 19.5
+          Al2O3: 12.1
+          Fe2O3: 14.3
+          CaO: 3.8
+          MgO: 1.0
+          SiO2: 46.8
+          Na2O: 0.5
+        composition_role:
+          value: initial_charge_only
+          locator: {page: 29, published_page: 29, pdf_page_index: 34, section: '10.5'}
+          quote: 'with initial composition as indicated in table 2'
         gamma_symbol_as_printed: y(K2O)
         x_K2O_note: printed mole-fraction labels on the figure (0.154 to 0.08)
         x_K2O_uncertainty_as_published: probably uncertain by ten percent
@@ -2593,6 +2634,17 @@ species:
       values:
         quantity: partial_pressure_over_illite
         method_class: measured_direct
+        composition_wt_pct:
+          Al2O3: 26.0
+          Fe2O3: 4.4
+          SiO2: 60.2
+          K2O: 7.4
+          Na2O: 0.2
+          MgO: 2.1
+        composition_role:
+          value: initial_charge_only
+          locator: {page: 16, published_page: 16, pdf_page_index: 21, section: '8.2'}
+          quote: "Beaver's Bend illite sample was used with the following composition for the major components, in wt.%"
         figure_digitized: true
         digitization_error_dex: 0.10
         digitization:
