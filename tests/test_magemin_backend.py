@@ -905,6 +905,7 @@ def test_magemin_subprocess_timeout_clamped_to_remaining_budget(
         backend._call_magemin_subprocess(
             bulk_projection=types.SimpleNamespace(
                 vector=[1.0] * 11,
+                order=MAGEMinBackend._IG_BULK_ORDER,
                 composition_wt_pct={"SiO2": 50.0, "MgO": 50.0},
                 warnings=(),
             ),
@@ -1465,6 +1466,47 @@ def test_lunar_mare_low_ti_ig_bulk_vector_pin():
     assert projection.source_sum_wt_pct == 97.22
 
 
+def test_buffer_reservoir_adds_oxygen_without_moving_feot(monkeypatch):
+    """The reservoir is extra O. FeOt stays the feedstock iron.
+
+    An input that already carries excess O is not topped up. A
+    non-positive factor adds nothing, which is the O = 0 path.
+    """
+    backend = MAGEMinBackend()
+    projection = backend._build_db_bulk_projection(
+        {"SiO2": 44.5, "FeO": 16.5, "MgO": 9.0},
+        database="ig",
+    )
+    order = projection.order
+    feot = projection.vector[order.index("FeOt")]
+    assert feot == pytest.approx(16.5)
+    assert projection.vector[order.index("O")] == pytest.approx(0.0)
+
+    sent = backend._bulk_with_buffer_reservoir(projection, buffer_name="qfm")
+    assert sent[order.index("FeOt")] == feot
+    assert sent[order.index("O")] == pytest.approx(
+        feot * MAGEMinBackend._EXCESS_O_RESERVOIR_PER_FEOT
+    )
+    assert projection.vector[order.index("O")] == pytest.approx(0.0)
+
+    ferric = backend._build_db_bulk_projection(
+        {"SiO2": 44.5, "FeO": 10.0, "Fe2O3": 1.0},
+        database="ig",
+    )
+    resent = backend._bulk_with_buffer_reservoir(ferric, buffer_name="qfm")
+    assert resent[ferric.order.index("FeOt")] == ferric.vector[
+        ferric.order.index("FeOt")
+    ]
+    assert resent[ferric.order.index("O")] == pytest.approx(
+        ferric.vector[ferric.order.index("O")]
+    )
+
+    monkeypatch.setattr(MAGEMinBackend, "_EXCESS_O_RESERVOIR_PER_FEOT", 0.0)
+    bare = backend._bulk_with_buffer_reservoir(projection, buffer_name="qfm")
+    assert bare[order.index("FeOt")] == feot
+    assert bare[order.index("O")] == pytest.approx(0.0)
+
+
 def test_magemin_fake_bridge_populates_equilibrium_result(monkeypatch):
     # A successful call must populate phases_present, phase_masses_kg and
     # liquid_fraction from the library's phase block -- and still leave
@@ -1621,6 +1663,24 @@ def test_magemin_only_consumes_cleaned_melt_account(monkeypatch):
 # locally as a sibling clone (../MAGEMin/MAGEMin); _locate_binary also
 # checks engines/magemin/{,bin/}MAGEMin and PATH.
 _LIVE_MAGEMIN_BINARY = MAGEMinBackend._locate_binary(None)
+
+
+def _seat_magemin_binary():
+    """Binary from engines.local.toml, else the sibling/PATH probe.
+
+    Sparse seats keep the engine path in the gitignored toml.
+    ``_locate_binary(None)`` does not read that file, so a toml-only
+    seat would skip every live test.
+    """
+    from simulator.engine_local_config import configured_magemin_binary_path
+
+    configured = configured_magemin_binary_path()
+    if configured is not None:
+        return configured
+    return _LIVE_MAGEMIN_BINARY
+
+
+_SEAT_MAGEMIN_BINARY = _seat_magemin_binary()
 
 
 @pytest.mark.skipif(
@@ -1971,6 +2031,192 @@ def test_magemin_live_adapter_path_fO2_changes_shadow_response():
     )
 
 
+def _lunar_mare_low_ti_wt_pct() -> dict:
+    """Catalog lunar_mare_low_ti restricted to the adapter input basis.
+
+    Trace keys outside that basis are a typed refusal, not a MAGEMin
+    bulk. MnO, P2O5 and S stay: they are in the basis and outside the
+    ig order, which is the exclusion path.
+    """
+    feedstocks = yaml.safe_load(
+        (Path(__file__).resolve().parents[1] / "data" / "feedstocks.yaml").read_text()
+    )
+    composition = feedstocks["lunar_mare_low_ti"]["composition_wt_pct"]
+    basis = set(MAGEMinBackend._MAGEMIN_INPUT_BASIS)
+    return {
+        str(name): float(value)
+        for name, value in composition.items()
+        if str(name) in basis and float(value or 0.0) > 0.0
+    }
+
+
+@pytest.mark.skipif(
+    _SEAT_MAGEMIN_BINARY is None,
+    reason="No compiled MAGEMin binary found (build per pyproject.toml [magemin])",
+)
+def test_magemin_live_buffer_reservoir_is_independent_for_lunar_mare(monkeypatch):
+    """Lunar FeO-only bulk at one T and one fO2 offset.
+
+    The reservoir at 0.5x, 1x and 2x of FeOt * M_O / (2 * M_FeO) must
+    keep qfm active and return the same liquid fraction, phase set and
+    liquid FeO/O (the ig ferric signal) within the bulk-echo tolerance.
+    With the factor at 0, O stays 0, qfm drops out, and the adapter must
+    not report solved or requested fO2 authority.
+    """
+    binary = _SEAT_MAGEMIN_BINARY
+    backend = MAGEMinBackend()
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore", UserWarning)
+        available = backend.initialize({
+            "binary_path": str(binary),
+            "warm_worker": False,
+        })
+    if not available:
+        pytest.skip("MAGEMin binary present but backend failed to initialize")
+
+    composition = _lunar_mare_low_ti_wt_pct()
+    base = MAGEMinBackend._EXCESS_O_RESERVOIR_PER_FEOT
+    solved = []
+    for scale in (0.5, 1.0, 2.0):
+        monkeypatch.setattr(
+            MAGEMinBackend,
+            "_EXCESS_O_RESERVOIR_PER_FEOT",
+            base * scale,
+        )
+        result = backend.equilibrate(
+            1250.0,
+            composition_kg=composition,
+            fO2_log=-9.0,
+            pressure_bar=1.0,
+        )
+        assert result.status == "ok", (scale, result.status, result.warnings)
+        assert result.diagnostics["fO2_buffer_active"] is True
+        assert result.diagnostics["fO2_buffer_mode"] > 0.0
+        assert result.diagnostics["authoritative_for_solved_conditions"] is True
+        assert result.diagnostics["solved_fO2_log"] == pytest.approx(-9.0)
+        liquid = result.liquid_composition_wt_pct or {}
+        solved.append((
+            scale,
+            float(result.liquid_fraction),
+            tuple(sorted(result.phases_present)),
+            float(liquid.get("FeO", 0.0)),
+            float(liquid.get("O", 0.0)),
+            float(result.diagnostics["fO2_buffer_mode"]),
+        ))
+
+    reference = solved[1]
+    for scale, liquid_fraction, phases, feo, oxygen, _mode in solved:
+        assert phases == reference[2], (scale, phases, reference[2])
+        assert liquid_fraction == pytest.approx(reference[1], abs=1.0e-3)
+        # Oxide wt% is printed to 0.001. 2x FeO moved by that one digit
+        # (16.981 -> 16.982) while O stayed 0.139. The bulk-echo guard
+        # is 0.3 wt%; 0.01 wt% still rejects a real ferric shift.
+        assert feo == pytest.approx(reference[3], abs=1.0e-2)
+        assert oxygen == pytest.approx(reference[4], abs=1.0e-2)
+    # Extra reservoir oxygen reports as qfm mode, not as a new silicate.
+    assert solved[0][5] < solved[1][5] < solved[2][5]
+
+    monkeypatch.setattr(MAGEMinBackend, "_EXCESS_O_RESERVOIR_PER_FEOT", 0.0)
+    bare = backend.equilibrate(
+        1250.0,
+        composition_kg=composition,
+        fO2_log=-9.0,
+        pressure_bar=1.0,
+    )
+    assert bare.diagnostics["fO2_buffer_active"] is False
+    assert bare.diagnostics["operating_point"] == "unbuffered"
+    assert bare.diagnostics["backend_status_reason"] == "buffer_inactive"
+    assert bare.diagnostics["solved_fO2_log"] is None
+    assert bare.diagnostics["authoritative_for_requested_conditions"] is False
+    assert bare.diagnostics["authoritative_for_solved_conditions"] is False
+
+
+def test_magemin_liquidus_keeps_solid_samples_when_qfm_mode_is_zero(
+    monkeypatch,
+):
+    """The 400 C window floor lists qfm at mode 0 on a fully solid rock.
+
+    equilibrate still refuses solved fO2. The bracket needs that melt
+    fraction of 0, and a later sample that is buffered and molten must
+    still be able to close the solidus and liquidus. A buffer_inactive
+    sample that still has liquid stops the scan.
+    """
+    from simulator.melt_backend.base import EquilibriumResult
+
+    backend = MAGEMinBackend()
+    backend._available = True
+    backend._bridge = "subprocess"
+    backend._config["liquidus_finder_budget_s"] = 30.0
+
+    def equilibrate(temperature_C, **_kwargs):
+        temperature = float(temperature_C)
+        if temperature < 500.0:
+            return EquilibriumResult(
+                temperature_C=temperature,
+                status="out_of_domain",
+                liquid_fraction=0.0,
+                diagnostics={
+                    "backend_status_reason": "buffer_inactive",
+                    "fO2_buffer_active": False,
+                    "operating_point": "unbuffered",
+                    "solved_fO2_log": None,
+                    "authoritative_for_requested_conditions": False,
+                    "authoritative_for_solved_conditions": False,
+                },
+            )
+        if temperature < 1100.0:
+            fraction = 0.0
+        elif temperature < 1400.0:
+            fraction = (temperature - 1100.0) / 300.0
+        else:
+            fraction = 1.0
+        return EquilibriumResult(
+            temperature_C=temperature,
+            status="ok",
+            liquid_fraction=fraction,
+            diagnostics={
+                "fO2_buffer_active": True,
+                "solved_fO2_log": -9.0,
+            },
+        )
+
+    monkeypatch.setattr(backend, "equilibrate", equilibrate)
+    found = backend.find_liquidus_solidus(
+        composition_kg={"SiO2": 50.0, "FeO": 16.0, "MgO": 10.0},
+        fO2_log=-9.0,
+        pressure_bar=1.0,
+        min_T_C=400.0,
+        max_T_C=1600.0,
+        scan_step_C=100.0,
+        tolerance_C=5.0,
+    )
+    assert found.status == "ok", found.warnings
+    assert found.solidus_T_C == pytest.approx(1100.0, abs=10.0)
+    assert found.liquidus_T_C == pytest.approx(1400.0, abs=10.0)
+    assert any("qfm mode is 0" in warning for warning in found.warnings)
+
+    def equilibrate_with_liquid(temperature_C, **_kwargs):
+        return EquilibriumResult(
+            temperature_C=float(temperature_C),
+            status="out_of_domain",
+            liquid_fraction=0.4,
+            diagnostics={"backend_status_reason": "buffer_inactive"},
+        )
+
+    monkeypatch.setattr(backend, "equilibrate", equilibrate_with_liquid)
+    refused = backend.find_liquidus_solidus(
+        composition_kg={"SiO2": 50.0, "FeO": 16.0, "MgO": 10.0},
+        fO2_log=-9.0,
+        pressure_bar=1.0,
+        min_T_C=400.0,
+        max_T_C=800.0,
+        scan_step_C=100.0,
+        tolerance_C=5.0,
+    )
+    assert refused.status == "out_of_domain"
+    assert refused.solidus_T_C is None
+
+
 def test_magemin_empty_melt_composition_marks_status_out_of_domain(monkeypatch):
     # A composition with no species in MAGEMin's 14-oxide basis (only
     # native Fe / sulfide / halide) collapses to an empty wt% projection.
@@ -2044,7 +2290,14 @@ def test_magemin_subprocess_runs_in_fresh_temp_cwd(monkeypatch, tmp_path):
         pressure_bar=1e-6,
     )
 
-    assert result.status == "ok"
+    # No FeOt and no O, and the stub stdout has no qfm row, so the
+    # requested buffer is inactive. The call still ran in the temp cwd.
+    assert result.status == "out_of_domain"
+    assert result.diagnostics["backend_status_reason"] == "buffer_inactive"
+    assert result.diagnostics["operating_point"] == "unbuffered"
+    assert result.diagnostics["solved_fO2_log"] is None
+    assert result.diagnostics["authoritative_for_requested_conditions"] is False
+    assert result.diagnostics["authoritative_for_solved_conditions"] is False
     assert "cwd" in captured, "subprocess.run was not invoked"
     cwd = Path(captured["cwd"])
     assert cwd != fake_binary.parent.resolve()
@@ -2195,12 +2448,12 @@ def test_magemin_subprocess_slots_bound_concurrency(monkeypatch, tmp_path):
 
 
 @pytest.mark.skipif(
-    _LIVE_MAGEMIN_BINARY is None,
+    _SEAT_MAGEMIN_BINARY is None,
     reason="No compiled MAGEMin binary found (build per pyproject.toml [magemin])",
 )
 def test_magemin_live_subprocess_does_not_append_dump_in_engine_tree():
     """Equilibrium calls must not grow _pseudosection_output.txt in-tree."""
-    binary = _LIVE_MAGEMIN_BINARY.resolve()
+    binary = _SEAT_MAGEMIN_BINARY.resolve()
     dump_path = binary.parent / "_pseudosection_output.txt"
     size_before = dump_path.stat().st_size if dump_path.exists() else 0
 
@@ -2217,7 +2470,13 @@ def test_magemin_live_subprocess_does_not_append_dump_in_engine_tree():
         fO2_log=-8.0,
         pressure_bar=2000.0,
     )
-    assert result.status == "ok", result.warnings
+    # This bulk has no FeOt and no excess O, so qfm cannot stay active.
+    # The binary still ran; the operating point must not claim that fO2.
+    assert result.status == "out_of_domain", result.warnings
+    assert result.diagnostics["backend_status_reason"] == "buffer_inactive"
+    assert result.diagnostics["solved_fO2_log"] is None
+    assert result.diagnostics["authoritative_for_solved_conditions"] is False
+    assert result.diagnostics["authoritative_for_requested_conditions"] is False
 
     size_after = dump_path.stat().st_size if dump_path.exists() else 0
     assert size_after == size_before
@@ -2242,7 +2501,7 @@ def test_magemin_subprocess_fo2_log_substitution_recorded(monkeypatch):
         stderr = ""
         stdout = (
             "Phase : liq qfm\n"
-            "Mode  : 1.000 0.000\n"
+            "Mode  : 0.98000 0.02000\n"
         )
 
     def fake_subprocess_run(args, **kwargs):
@@ -2313,6 +2572,67 @@ def test_magemin_subprocess_fo2_log_substitution_recorded(monkeypatch):
     ]
     assert substitution_warnings, result.warnings
     assert any("-12.0" in w for w in substitution_warnings), substitution_warnings
+    assert result.diagnostics["fO2_buffer_active"] is True
+    assert result.diagnostics["authoritative_for_solved_conditions"] is True
+
+
+def test_magemin_inactive_qfm_does_not_claim_requested_fo2(monkeypatch):
+    """A qfm solve whose stdout has no qfm row is unbuffered.
+
+    The FeO bulk still sends FeOt intact. With the reservoir factor at
+    0 the O slot stays 0, which is the path that deactivates qfm.
+    """
+    captured: dict = {}
+
+    class FakeCompleted:
+        returncode = 0
+        stderr = ""
+        stdout = "Phase : liq\nMode  : 1.000\n"
+
+    def fake_subprocess_run(args, **kwargs):
+        captured["args"] = list(args)
+        _plant_liq_matlab(kwargs["cwd"])
+        return FakeCompleted()
+
+    monkeypatch.setattr(
+        MAGEMinBackend,
+        "_locate_binary",
+        staticmethod(lambda explicit: Path("/fake/MAGEMin")),
+    )
+    monkeypatch.setattr(
+        MAGEMinBackend,
+        "_import_magemin_bridge",
+        lambda self, *, requested: ("subprocess", None),
+    )
+    monkeypatch.setattr(MAGEMinBackend, "_EXCESS_O_RESERVOIR_PER_FEOT", 0.0)
+    import simulator.melt_backend.magemin as magemin_module
+    monkeypatch.setattr(magemin_module.subprocess, "run", fake_subprocess_run)
+
+    backend = MAGEMinBackend()
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore", UserWarning)
+        assert backend.initialize({"warm_worker": False}) is True
+
+    result = backend.equilibrate(
+        1250.0,
+        projected_oxide_wt_pct={"SiO2": 44.5, "FeO": 16.5, "MgO": 9.0},
+        fO2_log=-9.0,
+        pressure_bar=1.0,
+    )
+
+    bulk_arg = next(arg for arg in captured["args"] if arg.startswith("--Bulk="))
+    slots = [float(token) for token in bulk_arg.split("=", 1)[1].split(",")]
+    order = MAGEMinBackend._IG_BULK_ORDER
+    assert slots[order.index("FeOt")] == pytest.approx(16.5)
+    assert slots[order.index("O")] == pytest.approx(0.0)
+    assert result.status == "out_of_domain"
+    assert result.diagnostics["operating_point"] == "unbuffered"
+    assert result.diagnostics["backend_status_reason"] == "buffer_inactive"
+    assert result.diagnostics["fO2_buffer_active"] is False
+    assert result.diagnostics["solved_fO2_log"] is None
+    assert result.diagnostics["authoritative_for_requested_conditions"] is False
+    assert result.diagnostics["authoritative_for_solved_conditions"] is False
+    assert result.diagnostics["applied_fO2_buffer"] == "qfm"
 
 
 def test_magemin_subprocess_unknown_buffer_falls_back_with_warning(monkeypatch):

@@ -1125,6 +1125,40 @@ def _assert_magemin_bulk_echo(
             )
 
 
+def _stdout_phase_mode(stdout: str, phase_name: str) -> Optional[float]:
+    """Mode of one phase in the compact Phase/Mode block, or None if absent.
+
+    Same block ``_parse_subprocess_stdout`` reads. That parser owns the
+    unit-mass contract and drops buffer names from the material phases.
+    This read only answers whether the named buffer row was present.
+    """
+    wanted = str(phase_name).strip().lower()
+    phase_line: Optional[str] = None
+    mode_line: Optional[str] = None
+    for line in stdout.splitlines():
+        stripped = line.strip()
+        if stripped.startswith('Phase :') or stripped.startswith('Phase:'):
+            phase_line = stripped.split(':', 1)[1]
+        elif stripped.startswith('Mode'):
+            if ':' in stripped:
+                mode_line = stripped.split(':', 1)[1]
+    if phase_line is None or mode_line is None:
+        return None
+    names = phase_line.split()
+    values = mode_line.split()
+    if len(names) != len(values):
+        return None
+    found: Optional[float] = None
+    for name, raw in zip(names, values):
+        if name.lower() != wanted:
+            continue
+        try:
+            found = float(raw)
+        except ValueError:
+            return None
+    return found
+
+
 class MAGEMinBackend(MeltBackend, RealBackendAuthority):
     """
     MAGEMin silicate phase equilibrium adapter.
@@ -1644,6 +1678,35 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
         )
         return result
 
+    @staticmethod
+    def _solid_fraction_for_inactive_buffer(
+        result: EquilibriumResult,
+    ) -> Optional[float]:
+        """Melt fraction of a fully solid sample whose qfm mode is zero.
+
+        The scan window opens at 400 C. There qfm is listed with mode 0
+        even after the oxygen reservoir is added, the assemblage is fully
+        solid, and equilibrate correctly refuses solved-fO2 authority.
+        That refusal must not discard the fraction: it is 0, and the
+        bracket needs the cold end. A sample that still has liquid keeps
+        the refusal and stops the scan.
+        """
+        if result.status == 'ok':
+            return None
+        diagnostics = result.diagnostics or {}
+        if diagnostics.get('backend_status_reason') != 'buffer_inactive':
+            return None
+        fraction = result.liquid_fraction
+        if fraction is None:
+            return None
+        try:
+            value = float(fraction)
+        except (TypeError, ValueError):
+            return None
+        if not math.isfinite(value) or value != 0.0:
+            return None
+        return 0.0
+
     def find_liquidus_solidus(
         self,
         composition_kg: Optional[Dict[str, float]] = None,
@@ -1745,7 +1808,20 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
             ):
                 captured_projection = dict(projection)
             if result.status != 'ok':
-                warning = '; '.join(result.warnings) or result.status
+                solid_fraction = self._solid_fraction_for_inactive_buffer(
+                    result
+                )
+                if solid_fraction is not None:
+                    # equilibrate already cleared solved-fO2 authority.
+                    # Keep only the fraction so the cold end of the window
+                    # does not throw the bracket away.
+                    note = (
+                        'MAGEMin qfm mode is 0 on a fully solid sample; '
+                        'melt fraction 0 is kept and solved fO2 is not claimed'
+                    )
+                    if note not in sample_warnings:
+                        sample_warnings.append(note)
+                    return solid_fraction
                 # Raise the TYPED sample error so the finder preserves which
                 # kind of refusal this was.  A bare RuntimeError falls through
                 # to the finder's generic library-boundary guard, which mints
@@ -2106,6 +2182,15 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
     _EXCESS_O_FROM_FE2O3_FACTOR = (
         _O_MOLAR_MASS_G_PER_MOL / _FE2O3_MOLAR_MASS_G_PER_MOL
     )
+    # Oxygen reservoir that keeps a requested buffer alive, per unit FeOt.
+    # Half an oxygen per Fe atom converts every FeO formula to Fe2O3
+    # (2*FeO + O -> Fe2O3), so M_O / (2*M_FeO) * FeOt is the most ferric
+    # iron the silicates can hold. That is the upper bound on oxygen that
+    # is still redox capacity rather than free oxygen. It is added to
+    # bulk O. It is not subtracted from FeOt.
+    _EXCESS_O_RESERVOIR_PER_FEOT = (
+        _O_MOLAR_MASS_G_PER_MOL / (2.0 * _FEO_MOLAR_MASS_G_PER_MOL)
+    )
 
     # fO2 buffers MAGEMin's CLI accepts (``--buffer=``).  The simulator
     # works in absolute log10(fO2); MAGEMin's single-point CLI takes a
@@ -2429,9 +2514,11 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
 
         binary_path = self._binary_path.resolve()
 
-        bulk = bulk_projection.vector
         buffer_name, buffer_n, buffer_warnings = self._resolve_buffer(
             temperature_C=temperature_C, fO2_log=fO2_log,
+        )
+        bulk = self._bulk_with_buffer_reservoir(
+            bulk_projection, buffer_name=buffer_name,
         )
         solved_fO2_log: Optional[float]
         if buffer_name == 'qfm':
@@ -2529,6 +2616,12 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                 f'{stderr or "no stderr"}'
             )
 
+        self._record_buffer_activity(
+            operating_point_diagnostics,
+            buffer_name=buffer_name,
+            buffer_mode=_stdout_phase_mode(completed.stdout or '', buffer_name),
+        )
+
         try:
             phases = self._parse_subprocess_stdout(completed.stdout or '')
         except _MAGEMinModeVectorMassDeficit as exc:
@@ -2595,6 +2688,72 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
             'operating_point_diagnostics': operating_point_diagnostics,
         }
 
+    def _bulk_with_buffer_reservoir(
+        self,
+        bulk_projection: _MAGEMinBulkProjection,
+        *,
+        buffer_name: str,
+    ) -> Tuple[float, ...]:
+        """Add buffer oxygen to a copy of the bulk. FeOt stays put.
+
+        qfm contains O (magnetite, ``pp_min_function.c:668``). Bulk O of
+        0 is an absent component (``initialize.c:907``), and
+        ``pp_min_function.c:718`` deactivates every pure phase that
+        contains an absent oxide, so the buffer never runs. The added
+        mass is ``FeOt * M_O / (2 * M_FeO)``: the oxygen that takes every
+        Fe atom from an FeO formula to Fe2O3. That is the most the
+        silicates can hold as ferric iron, so it is the upper bound on
+        a reservoir that is still redox capacity. An input that already
+        carries excess O, a bulk with no FeOt, or a non-positive factor
+        adds nothing. The projection's own vector is not modified, and
+        the hosted-mass account still uses that projection, because this
+        oxygen is not part of the input batch.
+        """
+        vector = [float(value) for value in bulk_projection.vector]
+        if str(buffer_name) not in self._BUFFER_CHOICES:
+            return tuple(vector)
+        order = bulk_projection.order
+        if 'O' not in order or 'FeOt' not in order:
+            return tuple(vector)
+        oxygen_index = order.index('O')
+        iron_index = order.index('FeOt')
+        if vector[oxygen_index] > 0.0 or vector[iron_index] <= 0.0:
+            return tuple(vector)
+        reservoir = vector[iron_index] * float(self._EXCESS_O_RESERVOIR_PER_FEOT)
+        if reservoir <= 0.0:
+            return tuple(vector)
+        vector[oxygen_index] = vector[oxygen_index] + reservoir
+        return tuple(vector)
+
+    def _record_buffer_activity(
+        self,
+        diagnostics: Dict[str, Any],
+        *,
+        buffer_name: str,
+        buffer_mode: Optional[float],
+    ) -> None:
+        """Drop solved-fO2 authority when requested qfm did not stay active.
+
+        A qfm row with mode 0, or no qfm row, means MAGEMin deactivated
+        the buffer. The operating point is then unbuffered: ``solved_fO2_log``
+        is cleared and neither requested nor solved fO2 is authoritative.
+        Named buffers other than qfm already refuse solved authority in
+        ``_resolve_buffer``; this does not relabel that clamp.
+        """
+        active = buffer_mode is not None and float(buffer_mode) > 0.0
+        diagnostics['fO2_buffer_active'] = active
+        diagnostics['fO2_buffer_mode'] = buffer_mode
+        if buffer_name != 'qfm' or active:
+            return
+        diagnostics['solved_fO2_log'] = None
+        diagnostics['fO2_clamped'] = False
+        diagnostics['authoritative_for_requested_conditions'] = False
+        diagnostics['authoritative_for_solved_conditions'] = False
+        diagnostics['operating_point'] = 'unbuffered'
+        diagnostics['backend_status'] = 'out_of_domain'
+        diagnostics['backend_status_reason'] = 'buffer_inactive'
+        diagnostics.pop('operating_point_clamped', None)
+
     def _build_ig_bulk_vector(
         self, composition_wt_pct: Mapping[str, float]
     ) -> List[float]:
@@ -2656,7 +2815,8 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
         if fe2o3 > 0.0:
             merged.append('Fe2O3->FeOt+O')
 
-        # Fe atoms stay in FeOt. O is only excess oxygen the input carries.
+        # Fe atoms stay in FeOt. O on this vector is only excess oxygen
+        # the input carries.
         # Premise: catalog FeO is total iron reported as FeO. Fe2O3, when
         # the input has it, is the only ferric inventory. MAGEMin stores
         # that iron as FeOt and oxygen beyond the FeO formula as O.
@@ -2664,12 +2824,16 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
         #   O = Fe2O3 * (M_O/M_Fe2O3). FeO adds nothing to O.
         # Mass: FeOt + O = FeO + Fe2O3, because 2*M_FeO + M_O = M_Fe2O3.
         # Fe atoms: FeOt/M_FeO = FeO/M_FeO + 2*Fe2O3/M_Fe2O3.
-        # A buffer solve does not need O > 0. MAGEMin's ig 1e-4 mol floor
-        # exempts O (src/toolkit.c:346), and --buffer only selects a pure
-        # phase by gbase offset (src/pp_min_function.c:119 and :742). It
-        # does not rewrite bulk_rock. Do not invent O from FeO.
         # Sanity: 16.5 wt% FeO and no Fe2O3 -> FeOt 16.5, O from iron 0,
         # Fe moles 16.5/M_FeO preserved.
+        # A zero O component is legal (the ig 1e-4 mol floor exempts O,
+        # toolkit.c:346) but initialize.c:907 records it as an absent
+        # oxide, and pp_min_function.c:718 then drops every pure phase
+        # that contains that oxide. QIF's gbase offset is
+        # pp_min_function.c:119. QFM starts at :632, its composition is
+        # :668, and its Gibbs offset is :685. The subprocess call adds a
+        # separate O reservoir when a buffer is requested. This projection
+        # does not take that oxygen from FeOt.
         excess_o += fe2o3 * self._EXCESS_O_FROM_FE2O3_FACTOR
 
         if feot > 0.0:
