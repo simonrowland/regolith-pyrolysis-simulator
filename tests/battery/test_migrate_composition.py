@@ -7,12 +7,14 @@ from decimal import Decimal
 from pathlib import Path
 
 import yaml
+import pytest
 
 from simulator.accounting.formulas import ATOMIC_WEIGHTS_G_PER_MOL
 from simulator.battery.enums import AmountBasis
 from simulator.battery.migrate import (
     REPO_ROOT,
     _catalogue_composition_located_from_values,
+    _initial_oxide_map_from_values,
     _sample_from_plain,
     migrate,
     oxide_molar_mass,
@@ -44,6 +46,64 @@ _MLS_BULK_IDS = {
     "kems-038-matchett-2006::matchett_2006_table3_fresnel_pyrolysis_log::T=1747.15:row=mls-1a:h=23d3c0f9125e",
     "pomeroy_cardiff_2006_measurements:pomeroy_non_condensed_mass_loss_fraction",
 }
+
+
+def test_wt_percent_conversion_refuses_unsupported_numeric_components() -> None:
+    with pytest.raises(ValueError, match="B2O3"):
+        wt_pct_to_mole_fraction(
+            {
+                "SiO2": Decimal("50"),
+                "MgO": Decimal("40"),
+                "B2O3": Decimal("10"),
+            }
+        )
+
+
+def test_wt_percent_conversion_ignores_printed_total() -> None:
+    composition = wt_pct_to_mole_fraction(
+        {
+            "SiO2": Decimal("50"),
+            "MgO": Decimal("49"),
+            "sum_wt_pct": Decimal("99"),
+        }
+    )
+
+    assert composition == wt_pct_to_mole_fraction(
+        {"SiO2": Decimal("50"), "MgO": Decimal("49")}
+    )
+
+
+def test_values_with_unsupported_wt_component_do_not_yield_partial_map() -> None:
+    assert _initial_oxide_map_from_values(
+        {
+            "composition_wt_pct": {
+                "SiO2": Decimal("50"),
+                "MgO": Decimal("40"),
+                "B2O3": Decimal("10"),
+            }
+        }
+    ) is None
+
+
+def test_flat_composition_with_unsupported_numeric_key_is_refused() -> None:
+    assert _initial_oxide_map_from_values(
+        {"SiO2": Decimal("50"), "MgO": Decimal("40"), "B2O3": Decimal("10")}
+    ) is None
+
+
+def test_flat_point_composition_ignores_temperature_and_loss_fields() -> None:
+    assert _initial_oxide_map_from_values(
+        {
+            "points": [
+                {
+                    "SiO2": Decimal("50"),
+                    "MgO": Decimal("40"),
+                    "T_C": Decimal("0"),
+                    "mass_loss_pct": Decimal("0"),
+                }
+            ]
+        }
+    ) == {"SiO2": Decimal("50"), "MgO": Decimal("40")}
 
 
 def test_mass_percent_composition_keeps_printed_map_and_derives_moles() -> None:
