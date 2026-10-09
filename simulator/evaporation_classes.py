@@ -211,6 +211,17 @@ _REDOX_EVIDENCE: tuple[EvidenceRow, ...] = (
         alpha=0.02,
     ),
     EvidenceRow(
+        source_id="costa-jacobson-2015",
+        observation_id="costa_jacobson_2015_fe_olivine_kems",
+        species="Fe",
+        system_class="solid_solution_silicate",
+        transformation_class="redox_reduction_required",
+        alpha_note="0.02",
+        comparable=True,
+        role="grounding",
+        alpha=0.02,
+    ),
+    EvidenceRow(
         source_id="kems-005-fedkin-2006",
         observation_id="fedkin_2006_fe_hashimoto_langmuir_table3",
         species="Fe",

@@ -2987,16 +2987,19 @@ def test_fidelity_sample_mutation_reds():
                 f"sample[{i}] still shares identity with body — re-dump without aliases"
             )
 
-    # Mutate the surviving SiO interval pin in the extract body (sample stays fixed).
-    sio_obs = doc["species"]["SiO"]["observations"]
+    # Mutate the Fe alpha pin in the extract body (samples left untouched).
+    fe_obs = doc["species"]["Fe"]["observations"]
     target = None
-    for obs in sio_obs:
-        if obs.get("observation_id") == "costa_jacobson_2015_sio_olivine_kems":
+    for obs in fe_obs:
+        if obs.get("observation_id") == "costa_jacobson_2015_fe_olivine_kems":
             target = obs
             break
-    assert target is not None, "expected unique Costa SiO KEMS interval"
+    assert target is not None, "expected costa Fe KEMS observation"
     original = copy.deepcopy(target["values"])
-    target["values"]["alpha_range"][0] = 0.5
+    if isinstance(target["values"], dict) and "alpha" in target["values"]:
+        target["values"]["alpha"] = float(target["values"]["alpha"]) + 0.5
+    else:
+        target["values"] = {"__mutated__": True}
 
     errs = vle.check_all_fidelity_samples_match(doc, label="costa-mutated")
     assert errs, (
