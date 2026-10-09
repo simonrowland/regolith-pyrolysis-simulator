@@ -5878,6 +5878,7 @@ class _E15ResidualPoint:
     temperature_K: Decimal
     engine: str
     population: str
+    flags: tuple[str, ...]
     x_axis: str
     x: Decimal
     residual_dex: Decimal
@@ -5915,20 +5916,16 @@ def _e15_residual_point(
         return None
     if isinstance(row, Residual):
         numeric = row.numeric
-        if numeric is None or row.status is ResidualStatus.REFUSED:
+        if numeric is None:
             return None
         if numeric.operation is not MetricOperation.DEX:
             return None
         flags = flagged_strata(row.notices)
         engine = _engine_of(row)
-        exclusions = row.exclusions
         residual_dex = numeric.value
     else:
         numeric = row.get("numeric")
-        if (
-            row.get("status") == ResidualStatus.REFUSED.value
-            or not isinstance(numeric, Mapping)
-        ):
+        if not isinstance(numeric, Mapping) or numeric.get("value") is None:
             return None
         if numeric.get("operation") != MetricOperation.DEX.value:
             return None
@@ -5939,13 +5936,10 @@ def _e15_residual_point(
             if isinstance(request, Mapping) and request.get("engine")
             else str(row.get("key") or "").rsplit("::", 1)[-1]
         )
-        exclusions = tuple(row.get("exclusions") or ())
         try:
             residual_dex = as_decimal(numeric.get("value"))
         except (TypeError, ValueError, ArithmeticError):
             return None
-    if not _reference_has_measured_evidence(observation, exclusions=exclusions):
-        return None
     if (
         _is_bulk_not_liquid_composition(observation)
         or _without_outside_single_liquid_field(observation) is not None
@@ -5971,6 +5965,7 @@ def _e15_residual_point(
         temperature_K=as_decimal(temperature.value),
         engine=engine,
         population=("contested" if _E15_CONTESTED_STRATUM in flags else "liquid"),
+        flags=flags,
         x_axis=f"x({component})",
         x=as_decimal(x),
         residual_dex=residual_dex,
@@ -6023,6 +6018,7 @@ def _e15_level_shape_rows(
             "series": series,
             "temperature_K": temperature,
             "engine": engine,
+            "flags": tuple(sorted({flag for point in group for flag in point.flags})),
             "x_axis": x_axis,
             "n": n,
         }
@@ -6378,16 +6374,17 @@ def _e15_report_lines(
         "",
         "## E15 level, shape, and activity pre-check",
         "",
-        "Each group uses numeric measured-evidence residuals. Contested rows are",
-        "separate; the OLS slope is diagnostic only.",
+        "Each group uses numeric single-liquid residuals. Flags label rows and",
+        "contested rows are a separate population; the OLS slope is diagnostic only.",
         "",
-        "| population | source | table | series | T (K) | engine | line | level basis | level (dex) | shape RMS (dex) | OLS slope (dex per unit x) | axis | n |",
-        "|---|---|---|---|---:|---|---|---|---:|---:|---:|---|---:|",
+        "| population | source | table | series | T (K) | engine | flags | line | level basis | level (dex) | shape RMS (dex) | OLS slope (dex per unit x) | axis | n |",
+        "|---|---|---|---|---:|---|---|---|---|---:|---:|---:|---|---:|",
     ]
     for row in shape_rows:
         lines.append(
             f"| {row['population']} | {row['source']} | {row['table']} | "
             f"{row['series']} | {row['temperature_K']} | {row['engine']} | "
+            f"{', '.join(row['flags']) or '—'} | "
             f"{row['statistic']} | {row['level_basis'] or '—'} | "
             f"{_e15_number(row['level_dex'])} | "
             f"{_e15_number(row['shape_rms_dex'])} | "
@@ -8403,10 +8400,9 @@ class _ScorePayloadAccumulator:
         exclusions = row.get("exclusions")
         compilation_observation = metadata.observation if metadata.is_compilation else None
         measured = metadata.is_measured
-        if measured or _E15_CONTESTED_STRATUM in flags:
-            e15_point = _e15_residual_point(row, metadata.observation)
-            if e15_point is not None:
-                self.e15_points.append(e15_point)
+        e15_point = _e15_residual_point(row, metadata.observation)
+        if e15_point is not None:
+            self.e15_points.append(e15_point)
         if measured:
             if _reference_has_measured_evidence(None, exclusions=exclusions):
                 rail = str(row.get("rail") or "")

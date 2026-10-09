@@ -2483,6 +2483,7 @@ def test_e15_level_shape_pin_and_constant_offset_mutation() -> None:
             temperature_K=Decimal("1933"),
             engine=Engine.OPENIMCC.value,
             population="liquid",
+            flags=(),
             x_axis="x(CaO)",
             x=x,
             residual_dex=r,
@@ -2651,6 +2652,31 @@ def test_e15_stolyarova_1996_real_axis_slope_and_report_path() -> None:
     assert shape["x_axis"] == "x(CaO)"
     assert shape["slope_dex_per_x"].quantize(Decimal("0.01")) == Decimal("6.38")
 
+    from simulator.battery.score import (
+        _ScorePayloadAccumulator,
+        residual_to_plain,
+    )
+
+    payloads = [residual_to_plain(residual) for residual in residuals]
+    aggregate = _ScorePayloadAccumulator.from_rows(
+        payloads, context=context, engines=(Engine.OPENIMCC,)
+    )
+    production_shape = next(
+        row
+        for row in score_mod._e15_level_shape_rows(aggregate.e15_points)
+        if row["source"] == "stolyarova-1996-cao-alumina-silica-kems"
+        and row["series"] == "stolyarova_1996_table2_pCa_1933k"
+        and row["statistic"] == "shape"
+    )
+    assert production_shape["n"] == 22
+    assert production_shape["slope_dex_per_x"].quantize(
+        Decimal("0.01")
+    ) == Decimal("6.38")
+    assert (
+        score_mod.FLAGGED_STRATUM_CELL_MATERIAL_INFERRED
+        in production_shape["flags"]
+    )
+
     si_axis_points = tuple(
         replace(
             point,
@@ -2667,7 +2693,6 @@ def test_e15_stolyarova_1996_real_axis_slope_and_report_path() -> None:
         Decimal("0.01")
     ) == Decimal("-4.94")
 
-    payloads = [residual_to_plain(residual) for residual in residuals]
     contested_payload = next(
         payload
         for payload in payloads
