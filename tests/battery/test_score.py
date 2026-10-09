@@ -6725,7 +6725,9 @@ def test_admitted_model_derived_rows_emit_residuals_per_imcc_engine() -> None:
         obs.observation_id for obs in score_module.comparison_candidates(filtered)
     }
 
-    def typed_test_refusal(engine, point, *, handles, experiment):
+    def typed_test_refusal(engine, point, *, handles, experiment, bench=None, **_kwargs):
+        # compile_residual always forwards bench= when a recorded bench exists
+        # (b-693 reactive-cell path). Accept and forward it.
         if (
             point.source_id == "kems-053-stolyarova-1991"
             and isinstance(point.identity, Identity)
@@ -6736,6 +6738,7 @@ def test_admitted_model_derived_rows_emit_residuals_per_imcc_engine() -> None:
                 point,
                 handles=handles,
                 experiment=experiment,
+                bench=bench,
             )
         reason = (
             RefusalReason.IDENTITY_UNKNOWN
@@ -6784,7 +6787,12 @@ def test_admitted_model_derived_rows_emit_residuals_per_imcc_engine() -> None:
     from simulator.battery.score import headline_payload_records, headline_rows
 
     def assert_empty_measured_headlines(rows):
-        assert rows
+        # Dual-headline owners also emit all_numeric records; this assertion
+        # is about the measured/certified grid staying empty for diagnostics.
+        measured = [
+            row for row in rows if row.get("tier", "measured") == "measured"
+        ]
+        assert measured
         assert all(
             row["n"] == 0
             and row["n_refused"] == 0
@@ -6793,7 +6801,7 @@ def test_admitted_model_derived_rows_emit_residuals_per_imcc_engine() -> None:
             and row["rms_dex"] is None
             and row["band_width_dex"] is None
             and row["n_inside_band"] == 0
-            for row in rows
+            for row in measured
         )
 
     object_headlines = headline_rows(
@@ -7774,10 +7782,12 @@ def test_derived_effusion_knudsen_number_does_not_raise_apparatus_notice() -> No
     )
 
 
-def test_inferred_nonmodelled_cell_still_refuses_oxygen_balance() -> None:
+def test_inferred_nonmodelled_cell_predicts_with_reactive_notice() -> None:
     from simulator.battery.enums import CellMaterial
+    from simulator.battery.records import union_notices
+    from simulator.battery.score import _reactive_cell_not_modelled_notice
 
-    reference, context, _bench, _prediction = _cell_material_score_case(
+    reference, context, bench, prediction = _cell_material_score_case(
         CellMaterial.TA,
         Derivation(
             relation="inferred tantalum cell",
@@ -7786,18 +7796,38 @@ def test_inferred_nonmodelled_cell_still_refuses_oxygen_balance() -> None:
             output_unit="cell material",
         ),
     )
+    # Injected prediction carries the production reactive-cell notice.
+    def predict(engine, obs, **kwargs):
+        base = prediction(engine, obs, **kwargs)
+        return replace(
+            base,
+            notices=union_notices(
+                base.notices,
+                (
+                    _reactive_cell_not_modelled_notice(
+                        Quantity.P_PARTIAL, bench.cell_materials
+                    ),
+                ),
+            ),
+        )
 
     residual, _candidate = compile_residual(
         reference,
         Engine.OPENIMCC,
         context=context,
+        predict=predict,
     )
 
-    assert residual.status is ResidualStatus.REFUSED
-    assert residual.refusal is not None
-    assert residual.refusal.detail.get("reason") == "reactive_cell_oxygen_reservoir"
+    assert residual.refusal is None or residual.refusal.detail.get("reason") != (
+        "reactive_cell_oxygen_reservoir"
+    )
     assert any(
         item.kind is NoticeKind.CELL_MATERIAL_INFERRED
+        for item in residual.notices
+    )
+    assert any(
+        item.kind is NoticeKind.REACTIVE_CELL_NOT_MODELLED
+        or "reactive cell: oxygen balance of the cell not modelled" in item.reason
         for item in residual.notices
     )
 

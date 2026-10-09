@@ -401,26 +401,6 @@ def test_uniform_modelled_reactive_cell_requests_cell_oxide_reservoir(
 @pytest.mark.parametrize(
     ("materials", "reason"),
     (
-        ((CellMaterial.TA,), "reactive_cell_oxygen_reservoir"),
-        ((CellMaterial.NB,), "reactive_cell_oxygen_reservoir"),
-        ((CellMaterial.C_GRAPHITE,), "reactive_cell_oxygen_reservoir"),
-        ((CellMaterial.RE,), "reactive_cell_oxygen_reservoir"),
-        (
-            (CellMaterial.IR, CellMaterial.C_GRAPHITE),
-            "reactive_cell_oxygen_reservoir",
-        ),
-        (
-            (CellMaterial.IR, CellMaterial.W),
-            "reactive_cell_oxygen_reservoir",
-        ),
-        (
-            (CellMaterial.W, CellMaterial.RE),
-            "reactive_cell_oxygen_reservoir",
-        ),
-        (
-            (CellMaterial.MO, CellMaterial.AL2O3),
-            "reactive_cell_oxygen_reservoir",
-        ),
         ((CellMaterial.AL2O3,), "cell_material_not_inert"),
         ((CellMaterial.PT, CellMaterial.AL2O3), "cell_material_not_inert"),
         ((CellMaterial.OTHER,), "cell_material_not_inert"),
@@ -444,6 +424,45 @@ def test_noninert_knudsen_cell_refuses_oxygen_balance(
 
     assert opened == []
     assert prediction.refusal_detail["reason"] == reason
+
+
+@pytest.mark.parametrize(
+    "materials",
+    (
+        (CellMaterial.TA,),
+        (CellMaterial.NB,),
+        (CellMaterial.C_GRAPHITE,),
+        (CellMaterial.RE,),
+        (CellMaterial.IR, CellMaterial.C_GRAPHITE),
+        (CellMaterial.IR, CellMaterial.W),
+        (CellMaterial.W, CellMaterial.RE),
+        (CellMaterial.MO, CellMaterial.AL2O3),
+    ),
+)
+def test_unmodelled_reactive_knudsen_cell_predicts_with_notice(
+    materials: tuple[CellMaterial, ...],
+    monkeypatch,
+) -> None:
+    seen = _capture_cell(monkeypatch)
+    observation, experiment = _kems_partial(cell_material=None)
+
+    prediction = predict_with_engine(
+        Engine.OPENIMCC,
+        observation,
+        experiment=experiment,
+        bench=_cell_material_bench(materials),
+        isolated=False,
+    )
+
+    assert prediction.refusal_detail.get("reason") != "reactive_cell_oxygen_reservoir"
+    assert any(
+        "reactive cell: oxygen balance of the cell not modelled" in notice.reason
+        for notice in prediction.notices
+    )
+    # Without printed fo2, p_partial still needs an oxygen input or omission.
+    assert prediction.refusal_detail.get("reason") in {None, "missing_fO2"} or (
+        seen.get("mode") in {PO2_NOT_AN_INPUT, PO2_COMMANDED}
+    )
 
 
 def test_platinum_alloy_prose_without_typed_material_is_unknown(monkeypatch) -> None:
