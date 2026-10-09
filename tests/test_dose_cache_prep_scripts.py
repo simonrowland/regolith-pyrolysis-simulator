@@ -24,6 +24,7 @@ from simulator.optimize.evaluate import _cache_trace_payload
 from simulator.reduced_real_determinism import (
     PT1_EQUILIBRIUM_TABLE,
     PT1_METADATA_TABLE,
+    PT1_LEGACY_STORE_SCHEMA_VERSION,
     PT1_STORE_SCHEMA_VERSION,
     SCHEMA_VERSION,
     PT1PersistentEquilibriumStore,
@@ -226,6 +227,51 @@ def test_seed_and_merge_preserve_repair_notice_values(
             f"SELECT repair_notices_json FROM {PT1_EQUILIBRIUM_TABLE}"
         ).fetchone()
     assert stored == repair_notices_json
+
+
+@pytest.mark.parametrize("transport", ["seed", "merge"])
+def test_seed_and_merge_accept_v2_source_without_modifying_it(
+    tmp_path: Path,
+    transport: str,
+) -> None:
+    source = tmp_path / f"{transport}-legacy-v2-source.db"
+    target = tmp_path / f"{transport}-legacy-v2-target.db"
+    _put_cache_row(source, tag=f"legacy-v2-{transport}")
+    with sqlite3.connect(source) as conn:
+        key_hash, key_bytes, payload_bytes = conn.execute(
+            f"SELECT key_hash, key_bytes, payload_bytes "
+            f"FROM {PT1_EQUILIBRIUM_TABLE}"
+        ).fetchone()
+        conn.execute(
+            f"UPDATE {PT1_EQUILIBRIUM_TABLE} SET store_schema_version = ?",
+            (PT1_LEGACY_STORE_SCHEMA_VERSION,),
+        )
+        conn.execute(
+            f"UPDATE {PT1_METADATA_TABLE} SET value = ? "
+            "WHERE key = 'store_schema_version'",
+            (PT1_LEGACY_STORE_SCHEMA_VERSION,),
+        )
+        conn.execute(
+            f"ALTER TABLE {PT1_EQUILIBRIUM_TABLE} "
+            "DROP COLUMN repair_notices_json"
+        )
+    source_sha256 = hashlib.sha256(source.read_bytes()).hexdigest()
+
+    if transport == "seed":
+        result = seed_cache(target, [source])
+        assert result["inserted_rows"] == 1
+    else:
+        assert merge_grind_cache.main([str(target), str(source)]) == 0
+
+    with sqlite3.connect(target) as conn:
+        stored = conn.execute(
+            f"SELECT store_schema_version, key_bytes, payload_bytes, "
+            f"repair_notices_json FROM {PT1_EQUILIBRIUM_TABLE} "
+            "WHERE key_hash = ?",
+            (key_hash,),
+        ).fetchone()
+    assert stored == (PT1_STORE_SCHEMA_VERSION, key_bytes, payload_bytes, None)
+    assert hashlib.sha256(source.read_bytes()).hexdigest() == source_sha256
 
 
 def test_seed_cache_refuses_cross_schema_source(tmp_path: Path) -> None:

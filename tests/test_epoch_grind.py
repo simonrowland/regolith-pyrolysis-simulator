@@ -4,6 +4,7 @@ import hashlib
 import json
 import logging
 import signal
+import shutil
 import sqlite3
 import sys
 import threading
@@ -1428,6 +1429,50 @@ def test_epoch_seed_copy_preserves_repair_notice_values(
             (point_id,),
         ).fetchone()
     assert stored == repair_notices_json
+
+
+def test_epoch_merge_merges_duplicate_row_notice_superset(tmp_path: Path) -> None:
+    base = tmp_path / "duplicate-epoch-base.sqlite"
+    shard = tmp_path / "duplicate-epoch-shard.sqlite"
+    point_id = _put_pt1_cache_row(base, "duplicate-epoch-row")
+    notice_a = {"kind": "epoch_repair_a"}
+    notice_b = {"kind": "epoch_repair_b"}
+    with sqlite3.connect(base) as conn:
+        conn.execute(
+            f"UPDATE {epoch_grind.PT1_EQUILIBRIUM_TABLE} "
+            "SET repair_notices_json = ? WHERE key_hash = ?",
+            (canonical_json_bytes([notice_a]).decode("utf-8"), point_id),
+        )
+    shard.parent.mkdir(parents=True, exist_ok=True)
+    shutil.copy2(base, shard)
+    with sqlite3.connect(shard) as conn:
+        conn.execute(
+            f"UPDATE {epoch_grind.PT1_EQUILIBRIUM_TABLE} "
+            "SET repair_notices_json = ? WHERE key_hash = ?",
+            (
+                canonical_json_bytes([notice_a, notice_b]).decode("utf-8"),
+                point_id,
+            ),
+        )
+
+    summary = epoch_grind.merge_epoch_shards(base, [shard])
+
+    with sqlite3.connect(base) as conn:
+        (merged_notices,) = conn.execute(
+            f"SELECT repair_notices_json "
+            f"FROM {epoch_grind.PT1_EQUILIBRIUM_TABLE} WHERE key_hash = ?",
+            (point_id,),
+        ).fetchone()
+    with sqlite3.connect(shard) as conn:
+        (source_notices,) = conn.execute(
+            f"SELECT repair_notices_json "
+            f"FROM {epoch_grind.PT1_EQUILIBRIUM_TABLE} WHERE key_hash = ?",
+            (point_id,),
+        ).fetchone()
+
+    assert summary["inserted_rows"] == 0
+    assert json.loads(merged_notices) == [notice_a, notice_b]
+    assert json.loads(source_notices) == [notice_a, notice_b]
 
 
 def test_seed_job_cache_rejects_stale_epoch_seed_without_counting_coverage(

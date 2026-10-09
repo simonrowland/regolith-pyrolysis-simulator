@@ -373,6 +373,54 @@ def test_populate_merge_preserves_repair_notice_values(
     assert stored == repair_notices_json
 
 
+def test_populate_accepts_v2_source_and_copies_missing_notices_as_null(
+    tmp_path: Path,
+) -> None:
+    driver = _load_driver()
+    shard_db = tmp_path / "legacy-v2-shard.db"
+    target_db = tmp_path / "legacy-v2-target.db"
+    key_hash = _write_pt1_row(shard_db, _pt1_key("legacy-v2"))
+    with sqlite3.connect(shard_db) as conn:
+        key_bytes, payload_bytes = conn.execute(
+            f"SELECT key_bytes, payload_bytes FROM {driver.PT1_EQUILIBRIUM_TABLE} "
+            "WHERE key_hash = ?",
+            (key_hash,),
+        ).fetchone()
+        conn.execute(
+            f"UPDATE {driver.PT1_EQUILIBRIUM_TABLE} "
+            "SET store_schema_version = ?",
+            (rrd.PT1_LEGACY_STORE_SCHEMA_VERSION,),
+        )
+        conn.execute(
+            f"UPDATE {rrd.PT1_METADATA_TABLE} SET value = ? "
+            "WHERE key = 'store_schema_version'",
+            (rrd.PT1_LEGACY_STORE_SCHEMA_VERSION,),
+        )
+        conn.execute(
+            f"ALTER TABLE {driver.PT1_EQUILIBRIUM_TABLE} "
+            "DROP COLUMN repair_notices_json"
+        )
+    source_sha256 = hashlib.sha256(shard_db.read_bytes()).hexdigest()
+
+    summary = driver._merge_cache_shard(shard_db, target_db)
+
+    assert summary["inserted_rows"] == 1
+    with sqlite3.connect(target_db) as conn:
+        stored = conn.execute(
+            f"SELECT store_schema_version, key_bytes, payload_bytes, "
+            f"repair_notices_json FROM {driver.PT1_EQUILIBRIUM_TABLE} "
+            "WHERE key_hash = ?",
+            (key_hash,),
+        ).fetchone()
+    assert stored == (
+        rrd.PT1_STORE_SCHEMA_VERSION,
+        key_bytes,
+        payload_bytes,
+        None,
+    )
+    assert hashlib.sha256(shard_db.read_bytes()).hexdigest() == source_sha256
+
+
 def test_merge_cache_shard_rejects_stored_payload_hash_drift(tmp_path):
     driver = _load_driver()
     shard_db = tmp_path / "shard.db"

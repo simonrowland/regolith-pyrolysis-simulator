@@ -8,6 +8,8 @@ import os
 import sqlite3
 import subprocess
 import sys
+import threading
+from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 from types import SimpleNamespace
 
@@ -100,6 +102,35 @@ def _persistent_artifact_count(db_path: Path, artifact: str) -> int:
             "WHERE artifact = ?",
             (artifact,),
         ).fetchone()[0])
+
+
+def _repair_notice_test_record() -> tuple[dict[str, str], dict[str, object]]:
+    return (
+        {
+            "artifact": "freeze_gate_curve",
+            "schema_version": "test",
+            "tag": "notice-recapture",
+        },
+        {"curve": {"status": "in_range", "tag": "notice-recapture"}},
+    )
+
+
+def _store_repair_notice_test_record(
+    store: PT0DeterminismStore,
+    *,
+    notices: list[dict[str, str]],
+) -> None:
+    key, payload = _repair_notice_test_record()
+    store._store("freeze_gate_curve", key, payload, repair_notices=notices)
+
+
+def _replay_repair_notice_test_record(
+    store: PT0DeterminismStore,
+) -> tuple[dict[str, object], list[dict[str, str]]]:
+    key, _payload = _repair_notice_test_record()
+    sim = SimpleNamespace()
+    entry = store._lookup("freeze_gate_curve", key, sim=sim)
+    return entry, sim._reduced_real_repair_notices
 
 
 class _CaptureDispatchKernel:
@@ -2429,6 +2460,177 @@ def test_pt1_repair_notice_recapture_replaces_only_with_strict_superset(
     expected: str | None,
 ) -> None:
     assert rrd.monotonic_repair_notices_json(existing, incoming) == expected
+
+
+def test_pt1_recapture_hydrates_effective_notices_for_same_instance(
+    tmp_path: Path,
+) -> None:
+    db_path = tmp_path / "recapture-known-notices.db"
+    notice_a = {"kind": "repair_a"}
+    notice_b = {"kind": "repair_b"}
+    _store_repair_notice_test_record(
+        PT0DeterminismStore("capture", db_path=db_path),
+        notices=[notice_a, notice_b],
+    )
+
+    recapture = PT0DeterminismStore("capture", db_path=db_path)
+    _store_repair_notice_test_record(recapture, notices=[notice_a])
+
+    same_instance_entry, same_instance_notices = (
+        _replay_repair_notice_test_record(recapture)
+    )
+    reopened_entry, reopened_notices = _replay_repair_notice_test_record(
+        PT0DeterminismStore("replay", db_path=db_path)
+    )
+
+    _key, expected_payload = _repair_notice_test_record()
+    assert same_instance_entry == reopened_entry == expected_payload
+    assert same_instance_notices == reopened_notices == [notice_a, notice_b]
+
+
+@pytest.mark.parametrize(
+    ("base_notices", "incoming_notices", "stored_base_notices"),
+    [
+        (None, [{"kind": "repair_a"}], None),
+        ([{"kind": "repair_a"}], [{"kind": "repair_a"}, {"kind": "repair_b"}],
+         rrd.encode_repair_notices_json([{"kind": "repair_a"}])),
+    ],
+)
+def test_pt1_recapture_against_attached_base_persists_and_reopens_notice_upgrade(
+    tmp_path: Path,
+    base_notices: list[dict[str, str]] | None,
+    incoming_notices: list[dict[str, str]],
+    stored_base_notices: str | None,
+) -> None:
+    base_db = tmp_path / "attached-base.db"
+    local_db = tmp_path / "writable-shard.db"
+    base_capture = PT0DeterminismStore("capture", db_path=base_db)
+    _store_repair_notice_test_record(base_capture, notices=base_notices or [])
+    key, _payload = _repair_notice_test_record()
+    key_hash = hashlib.sha256(canonical_json_bytes(key)).hexdigest()
+    if base_notices is None:
+        with sqlite3.connect(base_db) as conn:
+            conn.execute(
+                f"UPDATE {PT1_EQUILIBRIUM_TABLE} "
+                "SET repair_notices_json = NULL WHERE key_hash = ?",
+                (key_hash,),
+            )
+
+    with sqlite3.connect(base_db) as conn:
+        base_row = conn.execute(
+            f"SELECT key_bytes, payload_bytes, repair_notices_json "
+            f"FROM {PT1_EQUILIBRIUM_TABLE} WHERE key_hash = ?",
+            (key_hash,),
+        ).fetchone()
+    assert base_row is not None
+    assert base_row[2] == stored_base_notices
+    base_sha256 = hashlib.sha256(base_db.read_bytes()).hexdigest()
+
+    recapture = PT0DeterminismStore(
+        "capture", db_path=local_db, read_only_base_db_path=base_db
+    )
+    with sqlite3.connect(local_db) as conn:
+        assert conn.execute(
+            f"SELECT 1 FROM {PT1_EQUILIBRIUM_TABLE} WHERE key_hash = ?",
+            (key_hash,),
+        ).fetchone() is None
+    _store_repair_notice_test_record(recapture, notices=incoming_notices)
+
+    with sqlite3.connect(local_db) as conn:
+        local_row = conn.execute(
+            f"SELECT key_bytes, payload_bytes, repair_notices_json "
+            f"FROM {PT1_EQUILIBRIUM_TABLE} WHERE key_hash = ?",
+            (key_hash,),
+        ).fetchone()
+    assert local_row is not None
+    assert local_row[:2] == base_row[:2]
+    assert local_row[2] == rrd.encode_repair_notices_json(incoming_notices)
+
+    same_instance_entry, same_instance_notices = (
+        _replay_repair_notice_test_record(recapture)
+    )
+    reopened_entry, reopened_notices = _replay_repair_notice_test_record(
+        PT0DeterminismStore(
+            "replay", db_path=local_db, read_only_base_db_path=base_db
+        )
+    )
+    _key, expected_payload = _repair_notice_test_record()
+    assert same_instance_entry == reopened_entry == expected_payload
+    assert same_instance_notices == reopened_notices == incoming_notices
+    with sqlite3.connect(base_db) as conn:
+        unchanged_base_row = conn.execute(
+            f"SELECT key_bytes, payload_bytes, repair_notices_json "
+            f"FROM {PT1_EQUILIBRIUM_TABLE} WHERE key_hash = ?",
+            (key_hash,),
+        ).fetchone()
+    assert unchanged_base_row == base_row
+    assert hashlib.sha256(base_db.read_bytes()).hexdigest() == base_sha256
+
+
+def test_pt1_concurrent_first_open_upgrades_legacy_schema_once(
+    tmp_path: Path,
+) -> None:
+    db_path = tmp_path / "concurrent-legacy-open.db"
+    _store_repair_notice_test_record(
+        PT0DeterminismStore("capture", db_path=db_path), notices=[]
+    )
+    with sqlite3.connect(db_path) as conn:
+        conn.execute(
+            f"ALTER TABLE {PT1_EQUILIBRIUM_TABLE} "
+            "DROP COLUMN repair_notices_json"
+        )
+        conn.execute(
+            f"UPDATE {PT1_EQUILIBRIUM_TABLE} SET store_schema_version = ?",
+            (rrd.PT1_LEGACY_STORE_SCHEMA_VERSION,),
+        )
+        conn.execute(
+            f"UPDATE {rrd.PT1_METADATA_TABLE} SET value = ? "
+            "WHERE key = 'store_schema_version'",
+            (rrd.PT1_LEGACY_STORE_SCHEMA_VERSION,),
+        )
+
+    schema_read_barrier = threading.Barrier(2)
+    pragma = f"PRAGMA table_info({PT1_EQUILIBRIUM_TABLE})"
+
+    class BarrierConnection(sqlite3.Connection):
+        synchronized = False
+
+        def execute(self, sql, parameters=()):
+            cursor = super().execute(sql, parameters)
+            if not self.synchronized and sql == pragma:
+                rows = cursor.fetchall()
+                self.synchronized = True
+                schema_read_barrier.wait(timeout=20)
+                return rows
+            return cursor
+
+    class SynchronizedStore(rrd.PT1PersistentEquilibriumStore):
+        def _connect(self):
+            conn = sqlite3.connect(
+                self.db_path,
+                timeout=60.0,
+                factory=BarrierConnection,
+            )
+            conn.row_factory = sqlite3.Row
+            return conn
+
+    def open_store(_index: int) -> str | None:
+        try:
+            SynchronizedStore(db_path)
+        except Exception as exc:
+            return f"{type(exc).__name__}: {exc}"
+        return None
+
+    with ThreadPoolExecutor(max_workers=2) as executor:
+        failures = list(executor.map(open_store, (1, 2)))
+
+    assert failures == [None, None]
+    with sqlite3.connect(db_path) as conn:
+        columns = {
+            row[1]
+            for row in conn.execute(f"PRAGMA table_info({PT1_EQUILIBRIUM_TABLE})")
+        }
+    assert "repair_notices_json" in columns
 
 
 def test_pt1_projected_gate_notice_replays_into_run_metadata(tmp_path: Path) -> None:
