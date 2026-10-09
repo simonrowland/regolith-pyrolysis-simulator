@@ -13,6 +13,7 @@ from simulator.account_ids import (
     OXYGEN_STORED_ACCOUNTS,
     OXYGEN_VENTED_ACCOUNTS,
 )
+from simulator.accounting.ledger import LedgerTransition
 from simulator.core import (
     FLOW_MASS_ACCOUNTS,
     FLOW_MASS_EXCLUDED_ACCOUNTS,
@@ -86,6 +87,48 @@ def test_flow_mass_out_includes_dynamic_wall_deposit_segment_accounts():
     )
 
     assert sim._flow_mass_out_kg() - before == pytest.approx(1.0e-6)
+
+
+def test_fifty_fifty_crystal_split_closes_the_reported_snapshot():
+    """100 kg stays closed after half of it moves into a crystal home.
+
+    The snapshot's mass_out is ``_flow_mass_out_kg``. The rump and the
+    slag read the same crystal-home list, so the split is still residue.
+    """
+    backend = InternalAnalyticalBackend()
+    backend.initialize({})
+    sim = PyrolysisSimulator(
+        backend,
+        {"campaigns": {}},
+        {"sample": {"composition_wt_pct": {"SiO2": 100.0}}},
+        {"metals": {}, "oxide_vapors": {}},
+    )
+    sim.load_batch("sample", mass_kg=100.0)
+    sim.atom_ledger.apply(LedgerTransition.move(
+        "phase_home",
+        "process.cleaned_melt",
+        "process.crystal.melts.olivine.0",
+        {"SiO2": 50.0},
+        reason="phase_home",
+        material_origin="feedstock",
+    ))
+
+    mass_in = (
+        sim.record.batch_mass_kg
+        + sum(sim.record.additives_kg.values())
+        + sum(sim.inventory.stage0_external_inputs_kg.values())
+        + float(getattr(sim, "_c7_al_credit_input_kg", 0.0) or 0.0)
+        + float(getattr(sim, "_o2_bubbler_injected_cumulative_kg", 0.0) or 0.0)
+    )
+    mass_out = sim._flow_mass_out_kg()
+    error_pct = abs(mass_in - mass_out) / mass_in * 100.0
+
+    assert mass_in == pytest.approx(100.0)
+    assert mass_out == pytest.approx(100.0)
+    assert error_pct == pytest.approx(0.0, abs=1e-9)
+    assert sim._terminal_slag_kg() == pytest.approx(100.0)
+    assert sum(sim._terminal_rump_by_species().values()) == pytest.approx(100.0)
+    assert sim._terminal_rump_by_species()["SiO2"] == pytest.approx(100.0)
 
 
 def test_flow_mass_out_includes_captured_melt_offgas_oxygen():

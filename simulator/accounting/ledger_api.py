@@ -8,7 +8,7 @@ from collections.abc import Mapping
 from typing import Any
 
 from simulator.accounting import ledger as ledger_module
-from simulator.accounting.queries import AccountingQueries, TERMINAL_RUMP_ACCOUNTS
+from simulator.accounting.queries import AccountingQueries
 from simulator.terminal_product_taxonomy import (
     build_terminal_product_taxonomy_entity,
 )
@@ -170,7 +170,7 @@ class LedgerAPI:
         terminal_product_account_or_artifact: str = "terminal_rump_accounts",
     ) -> dict[str, Any]:
         species_mol: dict[str, float] = {}
-        for account in TERMINAL_RUMP_ACCOUNTS:
+        for account in self.queries.condensed_residue_accounts():
             for species, amount in self.ledger.project_account_mol(account).items():
                 species_mol[species] = species_mol.get(species, 0.0) + float(amount)
         return build_terminal_product_taxonomy_entity(

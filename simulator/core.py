@@ -12921,9 +12921,14 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         return AccountingQueries(self).product_ledger()
 
     def _terminal_slag_kg(self) -> float:
-        return (
-            self.atom_ledger.projected_total_kg_by_account('process.cleaned_melt')
-            + self.atom_ledger.projected_total_kg_by_account('terminal.slag')
+        accounts = (
+            'process.cleaned_melt',
+            'terminal.slag',
+            *AccountingQueries(self).crystal_home_accounts(),
+        )
+        return sum(
+            self.atom_ledger.projected_total_kg_by_account(account)
+            for account in accounts
         )
 
     def _terminal_rump_by_species(self) -> Dict[str, float]:
@@ -12949,6 +12954,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             if account.startswith('reservoir.')
             or account.startswith(PIPE_SEGMENT_WALL_DEPOSIT_ACCOUNT_PREFIX)
         )
+        accounts.update(AccountingQueries(self).crystal_home_accounts())
         return sum(float(totals.get(account, 0.0)) for account in accounts)
 
     def _finalize_record(self) -> None:

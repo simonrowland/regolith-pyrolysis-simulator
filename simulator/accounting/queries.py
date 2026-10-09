@@ -582,9 +582,31 @@ class AccountingQueries:
             if float(kg) > 0.0
         }
 
+    def crystal_home_accounts(self) -> tuple[str, ...]:
+        """Crystal homes on this ledger.
+
+        One list. Closure, the terminal rump, and slag add these
+        accounts. They do not each scan the crystal prefix.
+        """
+        from simulator.accounting.phase_homes import parse_crystal_account
+
+        totals = self.ledger.total_kg_by_account()
+        return tuple(sorted(
+            str(name)
+            for name in totals
+            if parse_crystal_account(str(name)) is not None
+        ))
+
+    def condensed_residue_accounts(self) -> tuple[str, ...]:
+        """Fixed rump accounts plus every crystal home.
+
+        With no crystal home this is ``TERMINAL_RUMP_ACCOUNTS``.
+        """
+        return tuple(TERMINAL_RUMP_ACCOUNTS) + self.crystal_home_accounts()
+
     def terminal_rump_by_species(self) -> dict[str, float]:
         species_kg: dict[str, float] = {}
-        for account in TERMINAL_RUMP_ACCOUNTS:
+        for account in self.condensed_residue_accounts():
             _merge_masses(species_kg, self.ledger.project_account_kg(account))
         return {
             species: kg
@@ -706,7 +728,7 @@ class AccountingQueries:
 
         total_kg = sum(
             self.ledger.projected_total_kg_by_account(account)
-            for account in TERMINAL_RUMP_ACCOUNTS
+            for account in self.condensed_residue_accounts()
         )
         class_total_kg = sum(by_class.values())
         if total_kg > 0.0:
@@ -1216,7 +1238,7 @@ class AccountingQueries:
     def rump_element_kg(self, element: str) -> float:
         species_names = self.sim._RUMP_ELEMENT_SPECIES.get(element, ())
         total = 0.0
-        for account in TERMINAL_RUMP_ACCOUNTS:
+        for account in self.condensed_residue_accounts():
             species_kg = self.ledger.project_account_kg(account)
             for species in species_names:
                 total += max(0.0, float(species_kg.get(species, 0.0)))
