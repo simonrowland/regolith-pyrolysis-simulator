@@ -221,18 +221,18 @@ species:
           wt_pct_S_at_sat: 4.0
           N_CaS: 0.100
         - slag_no: C
-          wt_pct_CaO: 54.9
+          wt_pct_CaO: 54.0
           wt_pct_Al2O3: 34.9
-          wt_pct_SiO2: 11.50
-          N_CaO: 0.635
+          wt_pct_SiO2: 11.30
+          N_CaO: 0.645
           N_Al2O3: 0.229
           N_SiO2: 0.126
           wt_pct_S_at_sat: 3.1
           N_CaS: 0.065
         - slag_no: D
-          wt_pct_CaO: 50.6
+          wt_pct_CaO: 50.3
           wt_pct_Al2O3: 47.6
-          wt_pct_SiO2: 2.88
+          wt_pct_SiO2: 2.08
           N_CaO: 0.645
           N_Al2O3: 0.334
           N_SiO2: 0.024
@@ -240,7 +240,7 @@ species:
           N_CaS: 0.042
         - slag_no: E
           wt_pct_CaO: 56.5
-          wt_pct_Al2O3: 32.6
+          wt_pct_Al2O3: 32.0
           wt_pct_SiO2: 11.40
           N_CaO: 0.670
           N_Al2O3: 0.208
@@ -250,7 +250,7 @@ species:
         - slag_no: F
           wt_pct_CaO: 54.5
           wt_pct_Al2O3: 42.5
-          wt_pct_SiO2: 3.93
+          wt_pct_SiO2: 3.03
           N_CaO: 0.675
           N_Al2O3: 0.289
           N_SiO2: 0.035
@@ -267,7 +267,7 @@ species:
           N_CaS: 0.043
         - slag_no: H
           wt_pct_CaO: 54.4
-          wt_pct_Al2O3: 39.1
+          wt_pct_Al2O3: 38.1
           wt_pct_SiO2: 7.60
           N_CaO: 0.660
           N_Al2O3: 0.254
@@ -278,7 +278,7 @@ species:
           wt_pct_CaO: 54.0
           wt_pct_Al2O3: 32.4
           wt_pct_SiO2: 13.90
-          N_CaO: 0.658
+          N_CaO: 0.638
           N_Al2O3: 0.210
           N_SiO2: 0.153
           wt_pct_S_at_sat: 4.5
@@ -473,7 +473,7 @@ species:
         - slag_no: CA3
           run_no: 122
           time_hrs: 2
-          CO_over_CO2: 5.3
+          CO_over_CO2: 5.5
           pct_SO2: 1.35
           A_value: 1000
           S_initial_pct: 2.0
@@ -512,8 +512,8 @@ species:
           S_final_pct: 1.60
         - slag_no: CA6
           run_no: 125
-          time_hrs: 1.5
-          time_hrs_as_printed: '1 1/2'
+          time_hrs: 1.25
+          time_hrs_as_printed: '1 1/4'
           CO_over_CO2: 49
           pct_SO2: 1.3
           A_value: 5500
@@ -545,8 +545,8 @@ species:
           S_final_pct: 2.7
         - slag_no: CA6
           run_no: 139
-          time_hrs: 1.5
-          time_hrs_as_printed: '1 1/2'
+          time_hrs: 1.25
+          time_hrs_as_printed: '1 1/4'
           CO_over_CO2: 12
           pct_SO2: 1.1
           A_value: 2100
@@ -632,7 +632,7 @@ species:
         - {slag_no: F, run_no: 108, time_hrs: 1.5, time_hrs_as_printed: '1 1/2', CO_over_CO2: 3.5, pct_SO2: 1.60, A_value: 800, S_initial_pct: 1.0, S_final_pct: 1.23}
         - {slag_no: F, run_no: 117, time_hrs: 2, CO_over_CO2: 4.6, pct_SO2: 1.3, A_value: 900, S_initial_pct: 2.0, S_final_pct: 1.83}
         - {slag_no: F, run_no: 122, time_hrs: 2, CO_over_CO2: 5.3, pct_SO2: 1.35, A_value: 1000, S_initial_pct: 2.0, S_final: Sat.}
-        - {slag_no: F, run_no: 142, time_hrs: 2, CO_over_CO2: 5.5, pct_SO2: 1.30, A_value: 700, S_initial_pct: 1.0, S_final_pct: 1.20}
+        - {slag_no: F, run_no: 142, time_hrs: 2, CO_over_CO2: 3.5, pct_SO2: 1.30, A_value: 700, S_initial_pct: 1.0, S_final_pct: 1.20}
         - {slag_no: F, run_no: 143, time_hrs: 2, CO_over_CO2: 2.0, pct_SO2: 1.3, A_value: 400, S_initial_pct: 0.0, S_final_pct: 0.70}
         - {slag_no: F, run_no: 163, time_hrs: 2, CO_over_CO2: 2.7, pct_SO2: 1.16, A_value: 500, S_initial_pct: 2.0, S_final_pct: 1.45}
         - {slag_no: G, run_no: 142, time_hrs: 2, CO_over_CO2: 3.5, pct_SO2: 1.3, A_value: 700, S_initial_pct: 2.0, S_final_pct: 2.06}
@@ -660,7 +660,7 @@ species:
         - {slag_no: L, run_no: 147, time_hrs: 2, CO_over_CO2: 67.0, pct_SO2: 1.4, A_value: 6200, S_initial_pct: 4.0, S_final: Sat.}
         - {slag_no: L, run_no: 150, time_hrs: 2, CO_over_CO2: 22.0, pct_SO2: 0.9, A_value: 3300, S_initial_pct: 4.0, S_final_pct: 2.22}
         - {slag_no: L, run_no: 152, time_hrs: 2, CO_over_CO2: 56.0, pct_SO2: 1.5, A_value: 5700, S_initial_pct: 4.0, S_final_pct: 3.60}
-        - {slag_no: M, run_no: 127, time_hrs: 2, CO_over_CO2: 73.0, pct_SO2: 1.3, A_value: 6500, S_initial_pct: 4.0, S_final_pct: 2.80}
+        - {slag_no: M, run_no: 127, time_hrs: 2, CO_over_CO2: 73.0, pct_SO2: 1.3, A_value: 6500, S_initial_pct: 2.0, S_final_pct: 2.80}
         - {slag_no: M, run_no: 135, time_hrs: 2, CO_over_CO2: 33.0, pct_SO2: 1.2, A_value: 4600, S_initial_pct: 3.0, S_final_pct: 2.05}
         - {slag_no: M, run_no: 138, time_hrs: 2, CO_over_CO2: 31.0, pct_SO2: 1.6, A_value: 4400, S_initial_pct: 4.0, S_final_pct: 1.90}
         - {slag_no: M, run_no: 145, time_hrs: 2, CO_over_CO2: 20.0, pct_SO2: 1.6, A_value: 3400, S_initial_pct: 1.0, S_final_pct: 1.30}
