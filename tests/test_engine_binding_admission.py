@@ -601,3 +601,68 @@ def test_missing_selected_contributor_disables_live_cache_and_replay(
             sim,
             artifact="equilibrium_post_record",
         )
+
+
+def test_openimcc_selected_fallback_is_not_captured(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    import simulator.reduced_real_determinism as replay
+    from simulator.chemistry.kernel import ChemistryIntent
+
+    monkeypatch.setattr(
+        replay,
+        "record_binding_producer_ids",
+        lambda *_args, **_kwargs: ("openimcc",),
+    )
+    monkeypatch.setattr(
+        replay,
+        "_is_cacheable_equilibrium_result",
+        lambda _result: True,
+    )
+    monkeypatch.setattr(
+        replay,
+        "_equilibrium_payload_intent",
+        lambda _sim: ChemistryIntent.BACKEND_EQUILIBRIUM,
+    )
+    monkeypatch.setattr(
+        replay,
+        "canonical_replay_output_projection",
+        lambda *_args: {"synthetic": "payload"},
+    )
+    monkeypatch.setattr(
+        replay,
+        "_engine_version_provenance",
+        lambda *_args, **_kwargs: None,
+    )
+    monkeypatch.setattr(
+        replay,
+        "_repair_notices_for_capture",
+        lambda *_args, **_kwargs: None,
+    )
+    store = PT0DeterminismStore("capture", db_path=tmp_path / "unused.db")
+    monkeypatch.setattr(
+        store,
+        "_cached_real_binding_eligible",
+        lambda _sim: True,
+    )
+    monkeypatch.setattr(store, "_equilibrium_key", lambda _sim: {})
+    captures = []
+    monkeypatch.setattr(
+        store,
+        "_store",
+        lambda *args, **kwargs: captures.append((args, kwargs)),
+    )
+    sim = SimpleNamespace(
+        _last_vapor_pressure_diagnostic={
+            "high_t_melt_activity": {
+                "provider": "constant_gamma",
+                "fallback": True,
+            }
+        }
+    )
+
+    store.capture_equilibrium(sim, SimpleNamespace())
+
+    assert captures == []
+    assert sim._last_reduced_real_cache_state is None
