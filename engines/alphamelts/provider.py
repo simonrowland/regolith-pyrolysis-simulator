@@ -243,79 +243,111 @@ class AlphaMELTSProvider(ChemistryProvider):
                 warnings=(warning,),
             )
 
-        # Run the domain gate even when the adapter is None so callers
-        # see a meaningful rejection (rather than a silent
-        # 'unavailable' surface that hides the input issue).
-        valid, gate_warnings, gate_reason = (
-            AlphaMELTSDomainGate.validate_with_reason(composition_wt_pct)
+        # An empty cleaned-melt account is not a composition. When this
+        # binding already holds cohorts, the locked-inventory probe is
+        # the solve: the domain gate must not refuse the hour first.
+        # Empty liquid and no cohort stays out of domain.
+        from simulator.accounting.phase_homes import MELTS_BINDING
+
+        absent_accessible_liquid = (
+            request.intent == ChemistryIntent.EQUILIBRIUM_CRYSTALLIZATION
+            and not composition_wt_pct
+            and _view_has_binding_cohort(request, MELTS_BINDING)
         )
-        if not valid:
-            return IntentResult(
-                intent=request.intent,
-                status='out_of_domain',
-                transition=None,
-                control_audit=control_audit,
-                diagnostic=LiquidusDiagnostics(
-                    mode='unavailable',
-                    engine_version=self._engine_version(),
-                    backend_status='out_of_domain',
-                    backend_warnings=tuple(gate_warnings),
-                    backend_status_reason=gate_reason,
-                    backend_diagnostics=_out_of_domain_diagnostics(
-                        request,
-                        composition_wt_pct=composition_wt_pct,
-                        composition_mol_by_account=composition_mol_by_account,
-                        reason=gate_reason,
-                    ),
-                    **redox_diagnostic,
-                ).as_diagnostic(),
-                warnings=tuple(gate_warnings),
+        if absent_accessible_liquid:
+            mode = (
+                'petthermotools'
+                if python_api_available(self._backend)
+                else 'unavailable'
             )
-
-        if self._backend is None or not self._backend_available():
-            if self.transport_closed_mid_run():
-                from engines.alphamelts.thermoengine import (
-                    midrun_thermoengine_prior_close_result,
-                )
-                # A probe that never ran must not inherit the prior
-                # row's teardown — not status, reason, mode, or details.
-                status, reason, mode = midrun_thermoengine_prior_close_result()
-            else:
-                status = 'unavailable'
-                mode = 'unavailable'
-                reason = self._adapter_unavailable_reason()
-            return IntentResult(
-                intent=request.intent,
-                status=status,
-                transition=None,
-                control_audit=control_audit,
-                diagnostic=LiquidusDiagnostics(
-                    mode=mode,
-                    engine_version=self._engine_version(),
-                    backend_status=status,
-                    **redox_diagnostic,
-                ).as_diagnostic(),
-                warnings=(reason,),
-            )
-
-        if request.intent == ChemistryIntent.SILICATE_LIQUIDUS:
-            mode, equilibrium = self._run_liquidus_finder(
-                request,
-                composition_mol_by_account=composition_mol_by_account,
-            )
-        elif request.intent in (
-            ChemistryIntent.EQUILIBRIUM_CRYSTALLIZATION,
-            ChemistryIntent.GATE_LIQUID_FRACTION,
-        ):
-            mode, equilibrium = self._run_equilibrium_crystallization_path(
-                request,
-                composition_mol_by_account=composition_mol_by_account,
+            temperature_C = float(request.temperature_C)
+            equilibrium = EquilibriumCrystallizationPathResult(
+                liquidus_T_C=temperature_C,
+                solidus_T_C=temperature_C,
+                liquid_fraction=0.0,
+                status='ok',
+                liquid_fraction_path=(
+                    {
+                        'temperature_C': temperature_C,
+                        'liquid_fraction': 0.0,
+                    },
+                ),
+                diagnostics={'accessible_liquid_absent': True},
             )
         else:
-            mode, equilibrium = self._run_backend(
-                request,
-                composition_mol_by_account=composition_mol_by_account,
+            # Run the domain gate even when the adapter is None so callers
+            # see a meaningful rejection (rather than a silent
+            # 'unavailable' surface that hides the input issue).
+            valid, gate_warnings, gate_reason = (
+                AlphaMELTSDomainGate.validate_with_reason(composition_wt_pct)
             )
+            if not valid:
+                return IntentResult(
+                    intent=request.intent,
+                    status='out_of_domain',
+                    transition=None,
+                    control_audit=control_audit,
+                    diagnostic=LiquidusDiagnostics(
+                        mode='unavailable',
+                        engine_version=self._engine_version(),
+                        backend_status='out_of_domain',
+                        backend_warnings=tuple(gate_warnings),
+                        backend_status_reason=gate_reason,
+                        backend_diagnostics=_out_of_domain_diagnostics(
+                            request,
+                            composition_wt_pct=composition_wt_pct,
+                            composition_mol_by_account=composition_mol_by_account,
+                            reason=gate_reason,
+                        ),
+                        **redox_diagnostic,
+                    ).as_diagnostic(),
+                    warnings=tuple(gate_warnings),
+                )
+
+            if self._backend is None or not self._backend_available():
+                if self.transport_closed_mid_run():
+                    from engines.alphamelts.thermoengine import (
+                        midrun_thermoengine_prior_close_result,
+                    )
+                    # A probe that never ran must not inherit the prior
+                    # row's teardown — not status, reason, mode, or details.
+                    status, reason, mode = midrun_thermoengine_prior_close_result()
+                else:
+                    status = 'unavailable'
+                    mode = 'unavailable'
+                    reason = self._adapter_unavailable_reason()
+                return IntentResult(
+                    intent=request.intent,
+                    status=status,
+                    transition=None,
+                    control_audit=control_audit,
+                    diagnostic=LiquidusDiagnostics(
+                        mode=mode,
+                        engine_version=self._engine_version(),
+                        backend_status=status,
+                        **redox_diagnostic,
+                    ).as_diagnostic(),
+                    warnings=(reason,),
+                )
+
+            if request.intent == ChemistryIntent.SILICATE_LIQUIDUS:
+                mode, equilibrium = self._run_liquidus_finder(
+                    request,
+                    composition_mol_by_account=composition_mol_by_account,
+                )
+            elif request.intent in (
+                ChemistryIntent.EQUILIBRIUM_CRYSTALLIZATION,
+                ChemistryIntent.GATE_LIQUID_FRACTION,
+            ):
+                mode, equilibrium = self._run_equilibrium_crystallization_path(
+                    request,
+                    composition_mol_by_account=composition_mol_by_account,
+                )
+            else:
+                mode, equilibrium = self._run_backend(
+                    request,
+                    composition_mol_by_account=composition_mol_by_account,
+                )
         control_audit = self._build_control_audit(
             request,
             equilibrium=equilibrium,
@@ -1069,8 +1101,9 @@ class AlphaMELTSProvider(ChemistryProvider):
         rows = tuple(
             getattr(equilibrium, 'isothermal_phase_inventories', ()) or ()
         )
+        probe_state: dict[str, Any] = {}
         if cohorts:
-            probe_rows, probe_note = self._probe_locked_inventory(
+            probe_rows, probe_note, probe_state = self._probe_locked_inventory(
                 request,
                 cohorts,
             )
@@ -1078,6 +1111,29 @@ class AlphaMELTSProvider(ChemistryProvider):
                 return None, _hold_notices(request, probe_note)
         else:
             probe_rows = None
+        if diagnostics.get('accessible_liquid_absent'):
+            # No accessible equilibrate ran. The probe is the only solve,
+            # so it owns the activities and the oxygen root.
+            activities = dict(
+                probe_state.get('isothermal_liquid_activities') or {}
+            )
+            oxygen_root = probe_state.get('isothermal_oxygen_root')
+            if not activities or oxygen_root is None:
+                return None, _hold_notices(
+                    request,
+                    {
+                        'phase_home_refusal': {
+                            'reason': 'assemblage_state_incomplete',
+                            'detail': (
+                                'the locked probe did not report liquid '
+                                'activities and an oxygen root'
+                            ),
+                        },
+                        'assemblage_state_incomplete': {
+                            'reason': 'assemblage_state_incomplete',
+                        },
+                    },
+                )
         liquid = dict(
             request.account_view.accounts.get(LIQUID_ACCOUNT, {}) or {}
         )
@@ -1126,17 +1182,28 @@ class AlphaMELTSProvider(ChemistryProvider):
         self,
         request: IntentRequest,
         cohorts: tuple,
-    ) -> tuple[tuple | None, dict[str, Any]]:
-        """Equilibrate accessible liquid plus locked cohorts. Mass only."""
+    ) -> tuple[tuple | None, dict[str, Any], dict[str, Any]]:
+        """Equilibrate accessible liquid plus locked cohorts.
+
+        Rows are the mass target. The state dict is the probe's
+        activities and oxygen root, used only when no accessible
+        liquid was equilibrated.
+        """
         from simulator.accounting.phase_homes import LIQUID_ACCOUNT
 
-        if not python_api_available(self._backend):
+        def refuse(reason: str, detail: str):
             return None, {
                 'phase_home_refusal': {
-                    'reason': 'phase_home_probe_failed',
-                    'detail': 'locked probe requires python_api',
+                    'reason': reason,
+                    'detail': detail,
                 },
-            }
+            }, {}
+
+        if not python_api_available(self._backend):
+            return refuse(
+                'phase_home_probe_failed',
+                'locked probe requires python_api',
+            )
         combined: dict[str, float] = {}
         liquid = dict(
             request.account_view.accounts.get(LIQUID_ACCOUNT, {}) or {}
@@ -1156,22 +1223,12 @@ class AlphaMELTSProvider(ChemistryProvider):
         try:
             composition_wt_pct = self._composition_wt_pct(combined, registry)
         except ValueError as exc:
-            return None, {
-                'phase_home_refusal': {
-                    'reason': 'phase_home_probe_out_of_domain',
-                    'detail': str(exc),
-                },
-            }
+            return refuse('phase_home_probe_out_of_domain', str(exc))
         valid, _warnings, reason = (
             AlphaMELTSDomainGate.validate_with_reason(composition_wt_pct)
         )
         if not valid:
-            return None, {
-                'phase_home_refusal': {
-                    'reason': 'phase_home_probe_out_of_domain',
-                    'detail': str(reason or ''),
-                },
-            }
+            return refuse('phase_home_probe_out_of_domain', str(reason or ''))
         evaluation_pressure_bar = max(
             float(request.pressure_bar),
             ALPHAMELTS_CONDENSED_PHASE_REFERENCE_PRESSURE_BAR,
@@ -1189,29 +1246,17 @@ class AlphaMELTSProvider(ChemistryProvider):
                 species_formula_registry=registry,
             )
         except Exception as exc:  # noqa: BLE001 - optional engine boundary
-            return None, {
-                'phase_home_refusal': {
-                    'reason': 'phase_home_probe_failed',
-                    'detail': str(exc),
-                },
-            }
+            return refuse('phase_home_probe_failed', str(exc))
         status = getattr(sampled, 'status', None) or 'unavailable'
         if status != 'ok':
-            return None, {
-                'phase_home_refusal': {
-                    'reason': 'phase_home_probe_failed',
-                    'detail': str(status),
-                },
-            }
+            return refuse('phase_home_probe_failed', str(status))
         rows, extra = _inventories_from_equilibrium(sampled)
         if extra.get('isothermal_phase_inventory_refusals'):
-            return None, {
-                'phase_home_refusal': {
-                    'reason': 'phase_home_probe_inventory_refused',
-                    'detail': 'probe phase row did not convert',
-                },
-            }
-        return rows, {}
+            return refuse(
+                'phase_home_probe_inventory_refused',
+                'probe phase row did not convert',
+            )
+        return rows, {}, _thermodynamic_state(sampled)
 
     def _engine_version(self) -> str:
         if self._backend is None:

@@ -1123,3 +1123,123 @@ def test_openimcc_is_not_evaluated_on_an_assemblage_liquid(monkeypatch):
         below_cap_fe_activity_basis="test",
     )
     assert authority is None
+
+
+class _FullyMoltenProbe:
+    """The only call is the locked probe. It reports a pure liquid."""
+
+    def __init__(self) -> None:
+        self._mode = "python_api"
+        self.calls: list[dict] = []
+        self.liquidus_calls = 0
+
+    def is_available(self) -> bool:
+        return True
+
+    def get_engine_version(self) -> str:
+        return "chunk2-full-remelt"
+
+    def find_liquidus_solidus(self, **_kwargs):
+        self.liquidus_calls += 1
+        raise AssertionError("empty liquid must not search for a liquidus")
+
+    def equilibrate(self, **kwargs):
+        self.calls.append(kwargs)
+        return EquilibriumResult(
+            temperature_C=float(kwargs["temperature_C"]),
+            pressure_bar=float(kwargs["pressure_bar"]),
+            liquid_fraction=1.0,
+            liquid_composition_wt_pct={"SiO2": 50.0, "MgO": 50.0},
+            phases_present=["liquid"],
+            phase_masses_kg={"liquid": 100.0},
+            phase_compositions={"liquid": {"SiO2": 50.0, "MgO": 50.0}},
+            activity_coefficients={"SiO2": 0.42, "MgO": 0.17},
+            fO2_log=float(kwargs["fO2_log"]),
+            status="ok",
+        )
+
+
+def test_an_empty_liquid_with_locked_cohorts_remelts_above_the_liquidus():
+    silica = _moles(50.0, "SiO2")
+    magnesia = _moles(50.0, "MgO")
+    ledger = _strict_ledger()
+    ledger.load_external_mol(
+        _OLIVINE_0,
+        {"SiO2": silica, "MgO": magnesia},
+        material_origin="feedstock",
+    )
+    backend = _FullyMoltenProbe()
+    provider, kernel = _register(backend, ledger)
+    provider.sync_crystal_accounts(
+        crystal_accounts_for_binding(ledger.mol_by_account(), MELTS_BINDING)
+    )
+    before = _elements(ledger.mol_by_account())
+    result = _dispatch(kernel, 1400.0)
+
+    assert result.status == "ok"
+    assert backend.liquidus_calls == 0
+    assert len(backend.calls) == 1
+    probed = backend.calls[0]["composition_mol_by_account"][_LIQUID]
+    assert probed["SiO2"] == pytest.approx(silica)
+    assert probed["MgO"] == pytest.approx(magnesia)
+    assert backend.calls[0]["temperature_C"] == pytest.approx(1400.0)
+    diagnostic = result.diagnostic["backend_diagnostics"]
+    assert diagnostic["accessible_liquid_absent"] is True
+    state = diagnostic["assemblage_thermodynamic_state"]
+    assert state["liquid_activities"]["SiO2"] == pytest.approx(0.42)
+    assert state["liquid_activities"]["MgO"] == pytest.approx(0.17)
+    assert state["oxygen_root"] == pytest.approx(-9.0)
+    assert result.transition is not None
+    kernel.commit_batch(
+        ChemistryIntent.EQUILIBRIUM_CRYSTALLIZATION,
+        result.transition,
+    )
+    assert holds_positive_crystal_moles(ledger.mol_by_account()) is False
+    liquid = ledger.mol_by_account(_LIQUID)
+    assert liquid["SiO2"] == pytest.approx(silica)
+    assert liquid["MgO"] == pytest.approx(magnesia)
+    assert _elements(ledger.mol_by_account()) == pytest.approx(before)
+
+
+def test_an_empty_liquid_without_cohorts_stays_out_of_domain():
+    ledger = _strict_ledger()
+    backend = _FullyMoltenProbe()
+    _provider, kernel = _register(backend, ledger)
+    result = _dispatch(kernel, 1400.0)
+    assert result.status == "out_of_domain"
+    assert result.transition is None
+    assert backend.calls == []
+    assert any("empty composition" in warning for warning in result.warnings)
+
+
+def test_an_empty_liquid_probe_refuses_when_the_engine_is_down():
+    silica = _moles(50.0, "SiO2")
+    magnesia = _moles(50.0, "MgO")
+    ledger = _strict_ledger()
+    ledger.load_external_mol(
+        _OLIVINE_0,
+        {"SiO2": silica, "MgO": magnesia},
+        material_origin="feedstock",
+    )
+    calls: list[dict] = []
+    backend = SimpleNamespace(
+        _mode="subprocess",
+        equilibrate=lambda **kwargs: calls.append(kwargs),
+    )
+    provider = AlphaMELTSProvider(backend=backend)
+    provider.sync_crystal_accounts(
+        crystal_accounts_for_binding(ledger.mol_by_account(), MELTS_BINDING)
+    )
+    registry = ProviderRegistry()
+    registry.register(provider, [ChemistryIntent.EQUILIBRIUM_CRYSTALLIZATION])
+    kernel = ChemistryKernel(ledger, registry, species_formula_registry={})
+    result = _dispatch(kernel, 1400.0)
+    assert result.status == "ok"
+    assert result.transition is None
+    assert calls == []
+    diagnostic = result.diagnostic["backend_diagnostics"]
+    assert diagnostic["phase_home_refusal"]["reason"] == "phase_home_probe_failed"
+    assert diagnostic["assemblage_held_from_previous_hour"]["reason"] == (
+        "assemblage_held_from_previous_hour"
+    )
+    assert ledger.mol_by_account(_OLIVINE_0)["SiO2"] == pytest.approx(silica)
