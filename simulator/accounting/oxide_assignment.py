@@ -391,18 +391,17 @@ def _oxides_from_formula(
         )
 
     fe_total = float(elements.get("Fe", 0.0))
-    bare = fe3_bare + fe2_bare - fe_total
-    fe3 = fe3_bare - bare
-    fe2 = fe2_bare - bare
+    # A decimal site fraction can leave one iron count a negative
+    # 1e-16 while another count is real. Each value is judged alone.
+    bare = _zero_negative_roundoff(fe3_bare + fe2_bare - fe_total)
+    fe3 = _zero_negative_roundoff(fe3_bare - bare)
+    fe2 = _zero_negative_roundoff(fe2_bare - bare)
     if bare < 0.0 or fe2 < 0.0 or fe3 < 0.0:
-        if not (
-            _near(bare, 0.0) and _near(fe2, 0.0) and _near(min(fe3, 0.0), 0.0)
-        ):
-            raise OxideAssignmentRefusal(
-                phase=phase,
-                reason=REASON_OXIDATION_AMBIGUOUS,
-                token=token,
-            )
+        raise OxideAssignmentRefusal(
+            phase=phase,
+            reason=REASON_OXIDATION_AMBIGUOUS,
+            token=token,
+        )
     oxygen_left = float(elements.get("O", 0.0))
     oxide_per_formula: dict[str, float] = {}
     for element, (oxide, per_cation, oxygen_per_cation) in _CATION_OXIDE.items():
@@ -809,3 +808,9 @@ def _finite(value: float) -> bool:
 def _near(left: float, right: float) -> bool:
     scale = max(abs(left), abs(right), 1.0)
     return abs(left - right) <= max(1.0e-9, 1.0e-8 * scale)
+
+
+def _zero_negative_roundoff(value: float) -> float:
+    if value < 0.0 and _near(value, 0.0):
+        return 0.0
+    return value

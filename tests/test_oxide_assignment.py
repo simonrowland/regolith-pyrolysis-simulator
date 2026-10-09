@@ -63,6 +63,34 @@ def test_annotated_olivine_formula_closes_elements_and_mass():
     assert "Fe2O3" not in oxides
 
 
+def test_annotated_spinel_tolerates_per_value_iron_roundoff():
+    mass_kg = 0.01
+    # (Fe''0.1 Mg0.9)(Fe'''0.7 Al1.3)O4. The 0.1 site fractions leave a
+    # negative 1e-16 on the unannotated iron residual.
+    assignment = assign_phase_oxides([{
+        "phase": "spinel",
+        "mass_kg": mass_kg,
+        "formula": "(Fe''0.1Mg0.9)(Fe'''0.7Al1.3)O4",
+    }])
+
+    assert assignment.refusals == ()
+    oxides = assignment.species_mol["spinel"]
+    per_formula = {"Fe": 0.8, "Mg": 0.9, "Al": 1.3, "O": 4.0}
+    molar_mass_kg = sum(
+        ATOMIC_WEIGHTS_G_PER_MOL[element] * count
+        for element, count in per_formula.items()
+    ) / 1000.0
+    formula_moles = mass_kg / molar_mass_kg
+    got = _element_moles(oxides)
+    for element, count in per_formula.items():
+        assert got[element] == pytest.approx(count * formula_moles)
+    assert oxides["FeO"] == pytest.approx(0.1 * formula_moles)
+    assert oxides["MgO"] == pytest.approx(0.9 * formula_moles)
+    assert oxides["Fe2O3"] == pytest.approx(0.35 * formula_moles)
+    assert oxides["Al2O3"] == pytest.approx(0.65 * formula_moles)
+    assert sum(assignment.species_kg["spinel"].values()) == pytest.approx(mass_kg)
+
+
 def test_engine_reported_iron_split_closes():
     mass_kg = 0.02
     assignment = assign_phase_oxides([{
