@@ -3660,6 +3660,60 @@ def test_located_printed_and_initial_pins_numeric_composition() -> None:
     ]
 
 
+def test_b718_partial_pressure_point_composition_stays_on_own_point(
+    tmp_path: Path,
+) -> None:
+    point_composition = {"K2O": 7.4, "Al2O3": 26, "SiO2": 66.6}
+    extract = _scalar_extract(
+        quantity="partial_pressure",
+        units="atm",
+        values={
+            "quantity": "partial_pressure",
+            "method_class": "measured_direct",
+            "points": [
+                {
+                    "T_K": 1300,
+                    "pressure_atm": 1,
+                    "locator": {"table": "2", "note": "1"},
+                },
+                {
+                    "T_K": 1400,
+                    "pressure_atm": 2,
+                    "locator": {"table": "2", "note": "2"},
+                    "composition_wt_pct": point_composition,
+                },
+                {
+                    "T_K": 1500,
+                    "pressure_atm": 3,
+                    "locator": {"table": "2", "note": "3"},
+                },
+            ],
+        },
+    )
+
+    result = migrate(_write_min_tree(tmp_path, extract), write=False)
+    rows = sorted(
+        (
+            observation
+            for observation in result.observations.values()
+            if quantity_token(observation.identity) is Quantity.P_PARTIAL
+        ),
+        key=lambda observation: observation.identity.temperature_K.value,
+    )
+
+    assert len(rows) == 3
+    sibling_compositions = (
+        rows[0].identity.composition,
+        rows[2].identity.composition,
+    )
+    assert all(
+        composition is None or not composition.is_value
+        for composition in sibling_compositions
+    )
+    assert rows[1].identity.composition is not None
+    assert rows[1].identity.composition.value == wt_pct_to_mole_fraction(
+        {name: Decimal(str(value)) for name, value in point_composition.items()}
+    )
 def test_k01_scalar_psat_does_not_take_alpha(tmp_path: Path) -> None:
     extract = _scalar_extract(
         quantity="pure_Psat",

@@ -3071,10 +3071,6 @@ def _initial_oxide_map_from_values(
         got = _printed_initial_charge_row_map(values)
         if got:
             return got
-        for item in ranked:
-            got = _oxide_map_from_mapping(item)
-            if got:
-                return got
     got = _oxide_map_from_mapping(values)
     if got:
         return got
