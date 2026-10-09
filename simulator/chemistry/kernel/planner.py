@@ -732,10 +732,23 @@ class ChemistryKernel:
                     f"with non-committable status {result.status!r}"
                 )
             validate_intent_authority(intent, profile)
-            admitted = (
-                frozenset(provider.capability_profile().declared_accounts)
-                - profile_accounts_before
-            )
+            # A cohort this crystallization call opens is not on the
+            # pre-dispatch profile. Only a name parse_crystal_account
+            # accepts, and only this intent, joins the check.
+            # commit_batch re-reads the live profile and is a separate gate.
+            admitted: frozenset[str] = frozenset()
+            if intent == ChemistryIntent.EQUILIBRIUM_CRYSTALLIZATION:
+                from simulator.accounting.phase_homes import parse_crystal_account
+
+                opened = (
+                    frozenset(provider.capability_profile().declared_accounts)
+                    - profile_accounts_before
+                )
+                admitted = frozenset(
+                    account
+                    for account in opened
+                    if parse_crystal_account(account) is not None
+                )
             validate_proposal_accounts(
                 result.transition,
                 frozenset(declared_accounts) | admitted,

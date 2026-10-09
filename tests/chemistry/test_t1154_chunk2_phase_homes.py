@@ -573,25 +573,27 @@ def test_fifty_kilogram_remelt_uses_one_probe_and_the_hold_case_does_not():
 class _AdmitDuringDispatch(ChemistryProvider):
     name = "admit-during-dispatch"
 
-    def __init__(self) -> None:
+    def __init__(self, intent: ChemistryIntent, opened: str = _OLIVINE_0) -> None:
+        self._intent = intent
+        self._opened = opened
         self.extra: set[str] = set()
 
     def capability_profile(self) -> CapabilityProfile:
         return CapabilityProfile(
             provider_id=self.name,
-            intents=frozenset({ChemistryIntent.EVAPORATION_TRANSITION}),
-            is_authoritative_for=frozenset({ChemistryIntent.EVAPORATION_TRANSITION}),
+            intents=frozenset({self._intent}),
+            is_authoritative_for=frozenset({self._intent}),
             declared_accounts=frozenset({_LIQUID, *self.extra}),
         )
 
     def dispatch(self, request: IntentRequest) -> IntentResult:
-        self.extra.add(_OLIVINE_0)
+        self.extra.add(self._opened)
         return IntentResult(
             intent=request.intent,
             status="ok",
             transition=LedgerTransitionProposal(
                 debits={_LIQUID: {"SiO2": 0.25}},
-                credits={_OLIVINE_0: {"SiO2": 0.25}},
+                credits={self._opened: {"SiO2": 0.25}},
                 reason="phase_home",
             ),
             control_audit=None,
@@ -630,7 +632,10 @@ class _ProfileAccounts(ChemistryProvider):
         )
 
 
-def _evaporation_kernel(provider: ChemistryProvider) -> tuple[AtomLedger, ChemistryKernel]:
+def _registered_kernel(
+    provider: ChemistryProvider,
+    intent: ChemistryIntent,
+) -> tuple[AtomLedger, ChemistryKernel]:
     ledger = _strict_ledger()
     ledger.load_external_mol(
         _LIQUID,
@@ -638,33 +643,71 @@ def _evaporation_kernel(provider: ChemistryProvider) -> tuple[AtomLedger, Chemis
         material_origin="feedstock",
     )
     registry = ProviderRegistry()
-    registry.register(provider, [ChemistryIntent.EVAPORATION_TRANSITION])
+    registry.register(provider, [intent])
     return ledger, ChemistryKernel(ledger, registry, species_formula_registry={})
 
 
 def test_dispatch_admits_a_cohort_opened_during_the_call():
-    provider = _AdmitDuringDispatch()
-    ledger, kernel = _evaporation_kernel(provider)
+    intent = ChemistryIntent.EQUILIBRIUM_CRYSTALLIZATION
+    provider = _AdmitDuringDispatch(intent)
+    ledger, kernel = _registered_kernel(provider, intent)
     result = kernel.dispatch(
-        ChemistryIntent.EVAPORATION_TRANSITION,
+        intent,
         temperature_C=1400.0,
         pressure_bar=1.0,
         declared_accounts=frozenset({_LIQUID}),
     )
-    kernel.commit_batch(ChemistryIntent.EVAPORATION_TRANSITION, result.transition)
+    kernel.commit_batch(intent, result.transition)
     assert ledger.mol_by_account(_LIQUID)["SiO2"] == pytest.approx(0.75)
     assert ledger.mol_by_account(_OLIVINE_0)["SiO2"] == pytest.approx(0.25)
 
 
+def test_dispatch_rejects_a_crystal_opened_during_evaporation():
+    intent = ChemistryIntent.EVAPORATION_TRANSITION
+    provider = _AdmitDuringDispatch(intent)
+    ledger, kernel = _registered_kernel(provider, intent)
+    with pytest.raises(AccountFilterViolation):
+        kernel.dispatch(
+            intent,
+            temperature_C=1400.0,
+            pressure_bar=1.0,
+            declared_accounts=frozenset({_LIQUID}),
+        )
+    assert ledger.mol_by_account(_LIQUID)["SiO2"] == pytest.approx(1.0)
+    assert _OLIVINE_0 not in ledger.mol_by_account()
+
+
+@pytest.mark.parametrize(
+    "opened",
+    (
+        "process.overhead_gas",
+        "process.crystal.melts.olivine",
+    ),
+)
+def test_dispatch_rejects_a_non_cohort_opened_during_crystallization(opened: str):
+    intent = ChemistryIntent.EQUILIBRIUM_CRYSTALLIZATION
+    provider = _AdmitDuringDispatch(intent, opened=opened)
+    ledger, kernel = _registered_kernel(provider, intent)
+    with pytest.raises(AccountFilterViolation):
+        kernel.dispatch(
+            intent,
+            temperature_C=1400.0,
+            pressure_bar=1.0,
+        )
+    assert ledger.mol_by_account(_LIQUID)["SiO2"] == pytest.approx(1.0)
+    assert opened not in ledger.mol_by_account()
+
+
 def test_dispatch_rejects_an_account_the_profile_never_gained():
+    intent = ChemistryIntent.EVAPORATION_TRANSITION
     provider = _ProfileAccounts(
         frozenset({_LIQUID, "process.overhead_gas"}),
         _OLIVINE_0,
     )
-    ledger, kernel = _evaporation_kernel(provider)
+    ledger, kernel = _registered_kernel(provider, intent)
     with pytest.raises(AccountFilterViolation):
         kernel.dispatch(
-            ChemistryIntent.EVAPORATION_TRANSITION,
+            intent,
             temperature_C=1400.0,
             pressure_bar=1.0,
         )
@@ -673,14 +716,15 @@ def test_dispatch_rejects_an_account_the_profile_never_gained():
 
 
 def test_caller_narrowing_still_excludes_a_previously_declared_account():
+    intent = ChemistryIntent.EVAPORATION_TRANSITION
     provider = _ProfileAccounts(
         frozenset({_LIQUID, "process.overhead_gas"}),
         "process.overhead_gas",
     )
-    ledger, kernel = _evaporation_kernel(provider)
+    ledger, kernel = _registered_kernel(provider, intent)
     with pytest.raises(AccountFilterViolation):
         kernel.dispatch(
-            ChemistryIntent.EVAPORATION_TRANSITION,
+            intent,
             temperature_C=1400.0,
             pressure_bar=1.0,
             declared_accounts=frozenset({_LIQUID}),
