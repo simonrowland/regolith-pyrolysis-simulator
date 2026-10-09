@@ -139,13 +139,15 @@ species:
       units: dimensionless activity
       values:
         quantity: activity
-        method_class: derived
+        method_class: model_derived
+        evidence_class: model_derived
         admission_status: admitted
         measurement_status: author_reported_calculated_from_Ca_O_and_interaction_parameters
         derived_from: [tables:seki-2011-ca-o-solubility-fe-cao-al2o3]
         derivation:
           relation: K = a_Ca·a_O / a_CaO for CaO(s) = Ca + O
           inputs: [tables:seki-2011-ca-o-solubility-fe-cao-al2o3]
+          note: Table 2 measured concentrations are printed on p. 1372; the fitted interaction parameters are in the §4.2 context row on p. 1373.
           parameters:
           - [log_K, {state: {tag: value, value: '-4.38'}, locator: {published_page: 1373, pdf_page_index: 5, section: 4.2}}]
           - [e_O^Ca, {state: {tag: value, value: '31.8'}, locator: {published_page: 1373, pdf_page_index: 5, section: 4.2}}]
