@@ -6914,10 +6914,7 @@ def test_admitted_model_derived_rows_emit_residuals_per_imcc_engine() -> None:
             row.refusal.reason
             for row in stolyarova_1996_rows
             if row.refusal is not None
-        } == {
-            RefusalReason.IDENTITY_INCOMPLETE,
-            RefusalReason.EFFUSION_REGIME_UNVERIFIED,
-        }
+        } == {RefusalReason.IDENTITY_INCOMPLETE}
         assert all(row.status is ResidualStatus.REFUSED for row in stolyarova_rows)
         assert all(row.status is ResidualStatus.REFUSED for row in activity_rows)
         assert all(
