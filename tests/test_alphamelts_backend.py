@@ -30,6 +30,7 @@ from engines.alphamelts.parser import diagnostics_to_equilibrium
 from engines.alphamelts.result import LiquidusDiagnostics
 from simulator.chemistry.kernel import ChemistryIntent
 from simulator.accounting.formulas import resolve_species_formula
+from simulator.accounting.oxide_assignment import oxide_component_stoichiometry
 from simulator.core import CampaignPhase, PyrolysisSimulator
 from simulator.backends import BackendSelectionPolicy, resolve_backend
 from simulator.melt_backend.alphamelts import (
@@ -51,7 +52,6 @@ from simulator.melt_backend.alphamelts import (
     AlphaMELTSBackend,
     VaporPressureActivityRefusal,
     _cleanup_alphamelts_subprocess,
-    _oxide_component_stoichiometry,
     _run_alphamelts_subprocess,
     AlphaMELTSConfigurationError,
     AlphaMELTSSubprocessContractError,
@@ -7770,24 +7770,26 @@ def test_activities_times_antoine_maps_thermoengine_liquid_activity_keys():
 
 
 def test_thermoengine_endmember_oxide_projection_is_stoichiometric():
-    assert dict(_oxide_component_stoichiometry('Na2SiO3')) == {
+    assert dict(oxide_component_stoichiometry('Na2SiO3')) == {
         'Na2O': 1.0,
         'SiO2': 1.0,
     }
-    assert dict(_oxide_component_stoichiometry('KAlSiO4')) == {
+    assert dict(oxide_component_stoichiometry('KAlSiO4')) == {
         'Al2O3': 0.5,
         'K2O': 0.5,
         'SiO2': 1.0,
     }
-    assert dict(_oxide_component_stoichiometry('MgCr2O4')) == {
+    assert dict(oxide_component_stoichiometry('MgCr2O4')) == {
         'Cr2O3': 1.0,
         'MgO': 1.0,
     }
-    assert dict(_oxide_component_stoichiometry('MnSi0.5O2')) == {
+    assert dict(oxide_component_stoichiometry('MnSi0.5O2')) == {
         'MnO': 1.0,
         'SiO2': 0.5,
     }
-    assert _oxide_component_stoichiometry('H2O') == ()
+    assert oxide_component_stoichiometry('H2O') == ()
+    assert oxide_component_stoichiometry('Fe3O4') == ()
+    assert oxide_component_stoichiometry('fo') == ()
 
 
 def test_endmember_projection_never_sums_multiple_activity_carriers():

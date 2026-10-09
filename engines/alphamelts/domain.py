@@ -553,7 +553,7 @@ def melts_endmember_to_parent_oxide_activity(
     not a realizable MELTS liquid composition — every Ca endmember also
     carries SiO2 or P2O5 — so the model does not define that standard
     state. The vapor-rail proxy ``a ≈ ν · a_endmember`` in
-    ``_oxide_component_stoichiometry`` is explicitly *not* a pure-oxide
+    ``oxide_component_stoichiometry`` is explicitly *not* a pure-oxide
     chemical-potential standard state. Using either formula as a scored
     residual against experimental ``a(CaO)`` would fabricate a number
     the model does not produce.

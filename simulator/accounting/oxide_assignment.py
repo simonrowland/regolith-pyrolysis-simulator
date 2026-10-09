@@ -1,21 +1,25 @@
 """Assign an engine phase's formula or oxide weight percent to oxide moles.
 
-One conversion, built on ``parse_formula``. AlphaMELTS phase rows call this.
-The molar-mass parser in the alphaMELTS adapter and
-``composition_projection.py`` stay where they are; this module does not
-replace them.
+One conversion, built on ``parse_formula``. The MELTS endmember
+decomposition used by activity proxies is the same stoichiometry.
+AlphaMELTS phase rows call this. The molar-mass parser in the
+alphaMELTS adapter and ``composition_projection.py`` stay where they
+are; this module does not replace them.
 """
 
 from __future__ import annotations
 
+import math
 import re
 from collections import defaultdict
 from collections.abc import Mapping
 from dataclasses import dataclass
 from decimal import Decimal
+from functools import lru_cache
+from itertools import product
 
-from simulator.accounting.exceptions import AccountingError
-from simulator.accounting.formulas import parse_formula
+from simulator.accounting.exceptions import AccountingError, UnknownSpeciesError
+from simulator.accounting.formulas import parse_formula, resolve_species_formula
 
 
 # Printed oxide weight percent is not the ledger's 1e-12 kg atom tolerance.
@@ -229,11 +233,132 @@ def _oxides_from_weight_percent(
     return moles, kilograms
 
 
+@lru_cache(maxsize=None)
+def _activity_label_atoms(formula: str) -> tuple[tuple[str, float], ...]:
+    """Atoms of one MELTS activity label.
+
+    ``parse_formula`` rejects a decimal coefficient because ``.`` is a
+    hydrate boundary. ThermoEngine names such as ``MnSi0.5O2`` have no
+    groups, so a complete element-and-number cover is that decimal.
+    A parenthesized site fraction is not an activity label and stays
+    unresolved. Phase formulas use ``_formula_counts``, which accepts
+    groups, decimals, and annotated iron.
+    """
+    text = str(formula).strip().strip("\"'")
+    try:
+        atoms = dict(resolve_species_formula(text).atoms)
+    except UnknownSpeciesError:
+        tokens = list(re.finditer(r"([A-Z][a-z]?)(\d+(?:\.\d+)?)?", text))
+        if not tokens or "".join(token.group(0) for token in tokens) != text:
+            return ()
+        atoms = {}
+        for token in tokens:
+            element = token.group(1)
+            count = float(token.group(2) or 1.0)
+            atoms[element] = atoms.get(element, 0.0) + count
+    return tuple(sorted(
+        (str(element), float(count)) for element, count in atoms.items()
+    ))
+
+
+def _melts_oxide_basis() -> tuple[str, ...]:
+    return tuple(entry[0] for entry in _CATION_OXIDE.values()) + ("FeO", "Fe2O3")
+
+
+@lru_cache(maxsize=None)
+def oxide_component_stoichiometry(
+    endmember: str,
+) -> tuple[tuple[str, float], ...]:
+    """Unique MELTS-oxide decomposition of one endmember formula.
+
+    Premise: the endmember atom vector is a sum of oxide vectors on the
+    fourteen-oxide basis plus FeO and Fe2O3. For each cation the
+    coefficient is that cation's count divided by its count in the
+    oxide. Keep the mapping only when one combination reconstructs
+    every atom, including oxygen. The coefficient is mol oxide per mol
+    endmember. No unique mapping returns an empty tuple; this function
+    does not choose a refusal reason.
+
+    Sanity: Na2SiO3 is 1 Na2O + 1 SiO2; KAlSiO4 is 0.5 K2O + 0.5 Al2O3
+    + 1 SiO2; MgCr2O4 is 1 MgO + 1 Cr2O3; MnSi0.5O2 is 1 MnO + 0.5 SiO2.
+    H2O, Fe3O4, and a name such as ``fo`` return ().
+    """
+    atoms = dict(_activity_label_atoms(str(endmember)))
+    if not atoms or float(atoms.get("O", 0.0)) <= 0.0:
+        return ()
+    cations = tuple(sorted(element for element in atoms if element != "O"))
+    oxide_atoms = {
+        oxide: dict(_activity_label_atoms(oxide))
+        for oxide in _melts_oxide_basis()
+    }
+    choices: list[list[tuple[str, float]]] = []
+    for cation in cations:
+        candidates: list[tuple[str, float]] = []
+        for oxide, component_atoms in oxide_atoms.items():
+            component_cations = {
+                element for element in component_atoms if element != "O"
+            }
+            if component_cations != {cation}:
+                continue
+            coefficient = atoms[cation] / component_atoms[cation]
+            candidates.append((oxide, coefficient))
+        if not candidates:
+            return ()
+        choices.append(candidates)
+
+    decompositions: list[dict[str, float]] = []
+    for combination in product(*choices):
+        reconstructed: dict[str, float] = {}
+        coefficients: dict[str, float] = {}
+        for oxide, coefficient in combination:
+            coefficients[oxide] = coefficients.get(oxide, 0.0) + coefficient
+            for element, count in oxide_atoms[oxide].items():
+                reconstructed[element] = (
+                    reconstructed.get(element, 0.0) + coefficient * count
+                )
+        if set(reconstructed) != set(atoms):
+            continue
+        if all(
+            math.isclose(
+                reconstructed[element],
+                atoms[element],
+                rel_tol=0.0,
+                abs_tol=1e-12,
+            )
+            for element in atoms
+        ):
+            decompositions.append(coefficients)
+    if len(decompositions) != 1:
+        return ()
+    return tuple(sorted(decompositions[0].items()))
+
+
 def _oxides_from_formula(
     phase: str,
     token: str,
     mass_kg: float,
 ) -> tuple[dict[str, float], dict[str, float]]:
+    # Annotated iron and an ambiguous formula return no unique
+    # decomposition. Those stay on the phase-assignment path below.
+    decomposition = oxide_component_stoichiometry(token)
+    if decomposition:
+        try:
+            elements, molar_mass_kg = _formula_counts(token)
+        except AccountingError:
+            elements, molar_mass_kg = {}, 0.0
+        if (
+            elements
+            and _finite(molar_mass_kg)
+            and molar_mass_kg > 0.0
+        ):
+            return _moles_from_oxide_coefficients(
+                phase,
+                token,
+                mass_kg,
+                elements,
+                molar_mass_kg,
+                dict(decomposition),
+            )
     try:
         elements, molar_mass_kg = _formula_counts(_all_iron_formula(token))
         fe3_bare = _formula_counts(
@@ -334,6 +459,24 @@ def _oxides_from_formula(
                 token=token,
             )
 
+    return _moles_from_oxide_coefficients(
+        phase,
+        token,
+        mass_kg,
+        elements,
+        molar_mass_kg,
+        oxide_per_formula,
+    )
+
+
+def _moles_from_oxide_coefficients(
+    phase: str,
+    token: str,
+    mass_kg: float,
+    elements: Mapping[str, float],
+    molar_mass_kg: float,
+    oxide_per_formula: Mapping[str, float],
+) -> tuple[dict[str, float], dict[str, float]]:
     formula_moles = mass_kg / molar_mass_kg
     moles: dict[str, float] = {}
     kilograms: dict[str, float] = {}
