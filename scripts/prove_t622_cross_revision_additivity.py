@@ -1,5 +1,13 @@
 #!/usr/bin/env python3
-"""Prove t-622 catalog additivity against clean revision 97969c43."""
+"""Prove t-622 catalog additivity.
+
+The compiler baseline is d9f4f5313. That commit replaced
+``poly.evaluate`` with ``evaluate_gibbs_state``, so the evaluator
+digest of every species moved. The catalog under test stays
+97969c43 against the t-622 blob 3a36e9bb: d9f4f5313's own yaml
+already contains MnO and CoO, and archiving that tree as both
+compiler and catalog would change the species delta.
+"""
 
 from __future__ import annotations
 
@@ -15,7 +23,10 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 import prove_t609_cross_revision_additivity as shared  # noqa: E402
 
 
-BASE_REVISION = "97969c434cb679d149756cbfd119e40220763d7a"
+# d9f4f5313 carries evaluate_gibbs_state. The catalog blob compared
+# with it is still the pre-addition revision below.
+BASE_REVISION = "d9f4f53137341637b9eab46c3a8096c86e1074d3"
+BASELINE_CATALOG_REVISION = "97969c434cb679d149756cbfd119e40220763d7a"
 CANDIDATE_REVISION = "3a36e9bb6ff79a6a3f51ca969d3a2d41c4e800a9"
 EXPECTED_ADDITIONS = ("CoO_gas", "MnO_gas")
 DEFAULT_EVIDENCE = (
@@ -42,6 +53,7 @@ def _main() -> int:
         args.baseline_root,
         candidate_revision=CANDIDATE_REVISION,
         candidate_materialization="catalog_blob",
+        baseline_catalog_revision=BASELINE_CATALOG_REVISION,
     )
     evidence["proof_id"] = "t622_cross_revision_additivity_2026-08-12"
     evidence["generated_by"] = "scripts/prove_t622_cross_revision_additivity.py"

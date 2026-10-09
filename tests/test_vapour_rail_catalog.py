@@ -456,7 +456,14 @@ def test_t622_cross_revision_additivity_evidence_is_reproducible() -> None:
         in completed.stdout
     )
     assert evidence["result"] == "pass"
+    # d9f4f5313 replaced poly.evaluate with evaluate_gibbs_state, so the
+    # evaluator digest moved for every species. The baseline compiler is
+    # that revision. The catalog is still 97969c43: the d9 tree's yaml
+    # already contains MnO and CoO, and the species delta would move.
     assert evidence["method"]["baseline_revision"] == (
+        "d9f4f53137341637b9eab46c3a8096c86e1074d3"
+    )
+    assert evidence["method"]["baseline_catalog_revision"] == (
         "97969c434cb679d149756cbfd119e40220763d7a"
     )
     assert evidence["method"]["compiler_common_mode"] is False

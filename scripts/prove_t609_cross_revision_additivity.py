@@ -324,6 +324,7 @@ def _generate_evidence(
     *,
     candidate_revision: str | None = None,
     candidate_materialization: str = "revision_archive",
+    baseline_catalog_revision: str | None = None,
 ) -> dict[str, Any]:
     candidate_root = candidate_root.resolve()
     if not candidate_revision:
@@ -340,6 +341,20 @@ def _generate_evidence(
     base_commit = _run(
         ["git", "rev-parse", f"{BASE_REVISION}^{{commit}}"], cwd=candidate_root
     ).stdout.strip()
+    # t-622's compiler revision and its catalog revision are no longer one
+    # commit. d9f4f5313 changed the evaluator; that tree's own yaml already
+    # contains the t-622 additions. The catalog blob stays the pre-addition
+    # revision, written onto the archived compiler tree before the worker runs.
+    baseline_catalog_commit = None
+    if baseline_catalog_revision is not None:
+        if baseline_root is not None:
+            raise ProofFailure(
+                "baseline catalog overlay requires the archived baseline"
+            )
+        baseline_catalog_commit = _run(
+            ["git", "rev-parse", f"{baseline_catalog_revision}^{{commit}}"],
+            cwd=candidate_root,
+        ).stdout.strip()
     candidate_commit = _run(
         ["git", "rev-parse", f"{candidate_revision}^{{commit}}"],
         cwd=candidate_root,
@@ -370,6 +385,18 @@ def _generate_evidence(
         else:
             temporary_baseline_root = temp_root / "baseline"
             _archive_revision(candidate_root, base_commit, temporary_baseline_root)
+            if baseline_catalog_commit is not None:
+                catalog_text = _run(
+                    [
+                        "git",
+                        "show",
+                        f"{baseline_catalog_commit}:data/vapor_pressures.yaml",
+                    ],
+                    cwd=candidate_root,
+                ).stdout
+                (
+                    temporary_baseline_root / "data" / "vapor_pressures.yaml"
+                ).write_text(catalog_text, encoding="utf-8")
             baseline = _run_worker(
                 temporary_baseline_root, temp_root / "baseline.json"
             )
@@ -460,6 +487,11 @@ def _generate_evidence(
         "result": "pass",
         "method": {
             "baseline_revision": base_commit,
+            **(
+                {"baseline_catalog_revision": baseline_catalog_commit}
+                if baseline_catalog_commit is not None
+                else {}
+            ),
             **(
                 {"candidate_revision": candidate_commit}
                 if candidate_materialization == "revision_archive"
