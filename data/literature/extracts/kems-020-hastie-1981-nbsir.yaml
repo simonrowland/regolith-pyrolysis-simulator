@@ -2264,7 +2264,19 @@ species:
       - 1240.4
       - 1748.0
       phase: real_MHD_channel_slag_K1
-      standard_state: apparent gamma(K2O) via eq. (6); authors' "apparent" (may not be fully equilibrated)
+      standard_state:
+        state:
+          tag: value
+          value:
+            convention: raoultian_pure_endmember
+            endmember: {formula: K2O, phase: {tag: value, value: l}}
+            component_basis: K2O
+        inferred: false
+        note: >-
+          Equation 6 defines the K2O activity from the K2O(l) dissociation
+          equilibrium. The authors call the plotted gamma apparent because
+          equilibrium may be incomplete.
+        locator: {published_page: 22, equation: '6'}
       regime: mixed_kms_tms
       units: dimensionless
       values:

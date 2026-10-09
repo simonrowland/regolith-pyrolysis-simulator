@@ -5210,14 +5210,23 @@ def test_reference_prose_rejects_ambiguous_or_negated_raoult_conventions() -> No
         if row.get("observation_id") == "plante_hastie_1983_nabo2_activity_approx"
     )
     negated = reference_state_from_extract(
-        plante["standard_state"],
+        plante["standard_state"]["note"],
         species_formula="NaBO2",
         values=plante["values"],
     )
     assert negated is not None and negated.is_unknown
+    typed = reference_state_from_extract(
+        plante["standard_state"],
+        species_formula="NaBO2",
+        values=plante["values"],
+    )
+    assert typed is not None and typed.is_value
+    assert typed.value.convention is ReferenceStateConvention.RAOULTIAN_PURE_ENDMEMBER
+    assert typed.value.endmember.formula == "NaBO2"
+    assert typed.value.endmember.phase.value is Phase.L
 
 
-def test_demaria_fe_rows_do_not_print_a_reference_state(tmp_path: Path) -> None:
+def test_demaria_fe_rows_use_the_pure_iron_reference_state(tmp_path: Path) -> None:
     result = _migrate_real_extract(tmp_path, "kems-022-demaria-1971.yaml")
     expected = {
         "demaria_1971_fe_lunar_basalt_kems_main_cell",
@@ -5231,7 +5240,11 @@ def test_demaria_fe_rows_do_not_print_a_reference_state(tmp_path: Path) -> None:
     assert set(loaded) == expected
     for obs in loaded.values():
         reference = obs.identity.reference_state
-        assert reference is not None and reference.is_unknown
+        assert reference is not None and reference.is_value
+        assert reference.value.convention is ReferenceStateConvention.RAOULTIAN_PURE_ENDMEMBER
+        assert reference.value.endmember.formula == "Fe"
+        assert reference.value.endmember.phase.value is Phase.CR
+        assert reference.value.component_basis == "Fe"
 
 
 def test_tsaplin_gibbs_duhem_sio2_is_not_measured_direct(tmp_path: Path) -> None:

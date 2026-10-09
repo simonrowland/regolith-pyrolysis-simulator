@@ -65,7 +65,20 @@ species:
         metastable: false
         basis: explicit_author
         note: MgO crucible gives aMgO = 1 in the authors' equilibrium formulation.
-      standard_state: Mg and O concentration units are mass% with infinite-dilution solution reference; Table 2 prints concentrations multiplied by 10^4.
+      standard_state:
+        state:
+          tag: value
+          value:
+            convention: hypothetical_1wt_pct
+            endmember: {formula: Mg, phase: {tag: value, value: l}}
+            component_basis: Mg
+        inferred: false
+        note: >-
+          Mg and O concentrations use mass% with the infinite-dilution
+          solution reference; Table 2 prints concentrations multiplied by
+          10^4. Fe is the solvent; the original MgO-crucible note retains
+          aMgO = 1.
+        locator: {published_page: 625, table: '2'}
       regime: liquid_metal_deoxidation_equilibrium
       units: '(mass%) × 10^4 as printed; concentration columns [Mg] and [O]'
       values:

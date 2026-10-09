@@ -499,7 +499,16 @@ species:
       - 1300.0
       - 1800.0
       phase: lunar_basalt_melt_12022_12065
-      standard_state: pure Fe metal (Hultgren 1967 reference vapor-pressure line on Fig. 3)
+      standard_state:
+        state:
+          tag: value
+          value:
+            convention: raoultian_pure_endmember
+            endmember: {formula: Fe, phase: {tag: value, value: cr}}
+            component_basis: Fe
+        inferred: false
+        note: Pure Fe metal reference vapor-pressure line from Hultgren (1967), Fig. 3.
+        locator: {figure: '3', section: 'ACTIVITY OF Fe'}
       regime: kems_effusion
       units: dimensionless
       values:
@@ -546,7 +555,16 @@ species:
         line_range: 340-356
         figure: '3'
       phase: lunar_basalt_melt_12065
-      standard_state: pure Fe chips in Fe crucible (multi-rotating cell reference)
+      standard_state:
+        state:
+          tag: value
+          value:
+            convention: raoultian_pure_endmember
+            endmember: {formula: Fe, phase: {tag: value, value: cr}}
+            component_basis: Fe
+        inferred: false
+        note: Pure Fe chips in Fe crucible are the multi-rotating-cell reference.
+        locator: {figure: '3', section: ACTIVITY DETERMINATION BY MULTIPLE-ROTATING KNUDSEN CELL}
       regime: kems_effusion
       units: dimensionless
       values:
