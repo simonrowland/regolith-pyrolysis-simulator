@@ -45,6 +45,7 @@ from simulator.condensation import GAS_CONSTANT_J_MOL_K, alpha_s
 from simulator.core import PyrolysisSimulator
 from simulator.evaporation import (
     EvaporationFluxRefusal,
+    _evaporation_species_data,
     _legacy_evaporation_shadow_pressure_map,
     _load_evaporation_alpha_by_species,
     _pre_rg_effective_pressure_source,
@@ -90,22 +91,17 @@ def _series_resistance_reference_flux(
     alpha_by_species = _load_evaporation_alpha_by_species(
         sim.vapor_pressures
     )
-    metals_data = sim.vapor_pressures.get('metals', {}) or {}
-    oxide_vapors_data = sim.vapor_pressures.get('oxide_vapors', {}) or {}
     for species, P_eq_Pa in vapor_pressures_Pa.items():
         if P_eq_Pa <= 0:
             continue
 
-        sp_data = metals_data.get(species, {})
-        if not sp_data:
-            sp_data = oxide_vapors_data.get(species, {})
+        sp_data = _evaporation_species_data(sim.vapor_pressures, species)
 
         M_g_mol = sp_data.get('molar_mass_g_mol')
         if M_g_mol is None:
             M_g_mol = MOLAR_MASS.get(species)
         assert M_g_mol is not None, species
         M_kg_mol = M_g_mol / 1000.0
-        stoich = sim._evaporation_stoich(species, sp_data)
         alpha = alpha_s(
             species,
             T_K,
@@ -999,7 +995,10 @@ def test_evaporation_caller_wiring_matches_shared_helper_for_lunar_case(
         "would be vacuous"
     )
 
-    reference_flux = _series_resistance_reference_flux(sim, vapor_pressures_Pa)
+    batch_pressures, *_ = sim._resolve_evaporation_batch_flux_state(
+        equilibrium, temperature_K=sim.melt.temperature_C + 273.15
+    )
+    reference_flux = _series_resistance_reference_flux(sim, batch_pressures)
     kernel_flux = dict(sim._calculate_evaporation(equilibrium).species_kg_hr)
     refusals = sim._last_vapour_batch_report["refusals_by_species"]
     refused_reference_species = set(reference_flux) & set(refusals)
@@ -1138,12 +1137,17 @@ def test_evaporation_caller_wiring_matches_shared_helper_across_short_run(
         if not vapor_pressures_Pa:
             continue
 
-        reference_flux = _series_resistance_reference_flux(sim, vapor_pressures_Pa)
+        # Generated carriers enter through the same batch pressure owner as
+        # the caller; the backend's legacy pressure map omits those sources.
+        batch_pressures, *_ = sim._resolve_evaporation_batch_flux_state(
+            equilibrium, temperature_K=T_C + 273.15,
+        )
+        reference_flux = _series_resistance_reference_flux(sim, batch_pressures)
         kernel_flux = dict(
             sim._calculate_evaporation(equilibrium).species_kg_hr
         )
         refusals = sim._last_vapour_batch_report["refusals_by_species"]
-        refused_reference_species = set(reference_flux) & set(refusals)
+        refused_reference_species = set(vapor_pressures_Pa) & set(refusals)
         # ce14fd3 (VR-11; DESIGN-REV5 §1.2/§7.4), later pinned as b-114
         # in 1a6ad25, made batch eligibility authoritative.
         # 2026-08-05 phosphorus carrier activation 7e6bebc adds a C0b cleanup
@@ -1152,6 +1156,7 @@ def test_evaporation_caller_wiring_matches_shared_helper_across_short_run(
         # outside wiring parity. MC-4A makes CrO2 executable, so at C0b it follows
         # that same typed predicate refusal instead of missing a channel contract.
         for species in refused_reference_species:
+            assert species not in kernel_flux
             refusal = refusals[species]
             assert refusal["refusal_code"] == "inapplicable_by_declared_predicate"
             assert "c0b_p_cleanup admits only P2O5-sourced carrier rules" in (

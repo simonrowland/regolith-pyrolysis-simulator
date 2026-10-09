@@ -48,7 +48,7 @@ from simulator.vapour_rail.request import (
 
 
 DATA = Path(__file__).resolve().parents[1] / "data"
-DORMANT_CARRIERS = ("Pb", "SnO", "PbO", "WO3", "AlF3", "B2O3", "BaO", "AlF2Cl")
+DORMANT_CARRIERS = ("Pb", "PbO", "WO3", "AlF3", "B2O3", "BaO", "AlF2Cl")
 P_CARRIERS = ("P2", "P4", "P4O6", "P4O10", "PO", "PO2")
 REORDERED_ROWS = {
     "Bi",
@@ -314,42 +314,6 @@ def test_dormant_carrier_refused_at_condensation_seam(payload, species_id) -> No
     ) == expected
 
 
-# Live rows among the 45 first-batch carriers whose token is still
-# not_applicable. The yaml is not rewritten. Condensation refuses them
-# because the row is dormant.
-_TRACE_ROWS_STILL_DORMANT = (
-    "B2O3",
-    "Cs2O",
-    "Cs2O2",
-    "Cu",
-    "Cu2",
-    "CuO",
-    "Ga",
-    "Ga2O",
-    "GaO",
-    "Ge",
-    "Ge2",
-    "GeO",
-    "GeO2",
-    "In",
-    "In2O",
-    "InO",
-    "Li",
-    "Li2",
-    "Li2O",
-    "LiO",
-    "Pb",
-    "PbO",
-    "Rb2O",
-    "Rb2O2",
-    "Sn",
-    "Sn2",
-    "SnO",
-    "SnO2",
-    "VO",
-)
-
-
 def test_trace_rows_refuse_on_dormancy_not_the_applicability_token(payload) -> None:
     from simulator.vapour_rail.instrumentation import (
         VAPOUR_CARRIER_AUTHORITY_MISSING,
@@ -357,24 +321,34 @@ def test_trace_rows_refuse_on_dormancy_not_the_applicability_token(payload) -> N
     )
 
     catalog = compiled_catalog_for(payload, emit_u0_request_rules=False)
-    assert len(_TRACE_ROWS_STILL_DORMANT) == 29
-    for species_id in _TRACE_ROWS_STILL_DORMANT:
+    dormant = {
+        species_id for species_id, compiled in catalog.species.items()
+        if compiled.family_id.startswith("t1139_")
+        and compiled.code_metadata.request_rule == "dormant_pending_validation"
+    }
+    assert {"Pb", "PbO", "Cu", "B2O3", "Li", "VO"} <= dormant
+    mutated = deepcopy(payload)
+    for species_id in dormant:
+        # Prove the dormancy guard still wins with an applicable token.
+        _set_applicability(mutated, species_id, "derived_from_condensation_onset")
+    for species_id in dormant:
         compiled = catalog.species[species_id]
-        assert compiled.code_metadata.hot_train_applicability == "not_applicable"
         assert compiled.code_metadata.request_rule == "dormant_pending_validation"
         assert _condensation_admission_refusal(
-            species_id, vapor_pressure_data=payload
+            species_id, vapor_pressure_data=mutated
         ) == CONDENSATION_FLUX_DORMANT_REFUSAL
         status, reason = _promote_non_debiting_carrier_status(
             species_id,
             VAPOUR_CARRIER_AUTHORITY_MISSING,
-            vapor_pressure_data=payload,
+            vapor_pressure_data=mutated,
         )
         assert status == VAPOUR_CARRIER_AUTHORITY_REFUSED
         assert reason == CONDENSATION_FLUX_DORMANT_REFUSAL
     assert _condensation_admission_refusal(
         "Ba", vapor_pressure_data=payload
     ) == REFUSAL_INAPPLICABLE_PREDICATE
+    assert _condensation_admission_refusal("SnO", vapor_pressure_data=payload) is None
+    assert _species_has_antoine_data("SnO", vapor_pressure_data=payload)
 
 
 def test_dormant_carrier_pressure_path_is_typed_refusal(payload) -> None:
@@ -700,8 +674,16 @@ def test_admission_and_flux_dormant_promote_onto_refused_debit_status(
     assert CONDENSATION_ADMISSION_REFUSAL_NO_DATA == "antoine_data_unavailable"
 
 
-@pytest.mark.parametrize("species_id", ("BaO", "Pb", "WO3", "NaF", "MoO3"))
+@pytest.mark.parametrize("species_id", ("BaO", "WO3", "NaF", "MoO3"))
 def test_reproduction_battery_sees_unvalidated_rows(payload, species_id) -> None:
     pressure, refusal = _engine_pure_psat_pa(species_id, 1400.0, payload)
     assert isinstance(pressure, float)
     assert refusal is None
+
+
+def test_reproduction_battery_preserves_source_node_dormancy(payload) -> None:
+    pressure, refusal = _engine_pure_psat_pa("Pb", 1400.0, payload)
+    assert pressure is None
+    assert refusal == "pure_psat_out_of_certified_range"
+    row = compiled_catalog_for(payload).species["Pb"]
+    assert row.code_metadata.request_rule == "dormant_pending_validation"
