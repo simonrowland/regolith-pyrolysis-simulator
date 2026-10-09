@@ -204,7 +204,6 @@ def test_r2_f1_every_writer_carries_the_same_all_numeric_source_rows(tmp_path) -
     expected_source = {
         "source_id": "kems-022-demaria-1971",
         "n_numeric": 30,
-        "n_certified": 0,
         "n_flagged": 30,
     }
     for writer, records in out["json"].items():
@@ -213,6 +212,7 @@ def test_r2_f1_every_writer_carries_the_same_all_numeric_source_rows(tmp_path) -
         sources = vapour["sources"]
         assert len(sources) == 1, (writer, sources)
         assert {k: sources[0][k] for k in expected_source} == expected_source, writer
+        assert sources[0]["n_certified"] == 0, writer
         assert sources[0]["flag_class_counts"].get("figure_only") == 30, writer
         certified = _record(records, tier="measured", rail=Rail.VAPOUR, engine=INTERNAL)
         assert certified["n"] == 0, writer
