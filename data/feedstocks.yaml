@@ -2640,19 +2640,33 @@ mars_basalt:
       - perchlorate_to_chloride_o2
   source: "FAMILY-REPRESENTATIVE MODELED COMPOSITION (not a cited table); context basis: Curiosity/Spirit/Opportunity APXS; Phoenix lander"
   confidence: "High"
-  fe_redox_split_unknown: true
+  # Morris et al. 2006 JGR 111 E02S13 paragraph [47]: Laguna Class soils
+  # (all but 3 Gusev soils) Fe3+/FeT average +/-2s = 0.30 +/- 0.14.
+  # This entry is a soil-bearing APXS family (SO3 5-7), not Adirondack
+  # interiors (paragraph [46], 0.12 +/- 0.10, 2s). Meridiani basaltic
+  # soils are the cross-check: Fe3+/FeT ~ 0.2-0.4 (Morris et al. 2006
+  # E12S15 abstract) and Table 8 CBS1B 0.29 +/- 0.02. Herd and Benaroya
+  # 2025 mantle sources (FMQ-4 +/- 0.7 to FMQ-2 +/- 0.75) are magmatic
+  # fO2. Surface Fe3+ here is weathering. Those FMQ values are not used.
+  fe_redox_prior:
+    measured_fe3_fraction:
+      value: 0.30
+      uncertainty: 0.14
+      source_id: morris-2006-gusev-mossbauer
+      locator: "paragraph [47], Laguna Class soils, average +/-2s = 0.30 +/- 0.14; the uncertainty is that published 2s. Table 5 is the underlying target list. Adirondack rock interiors are not included."
   composition_basis:
     fe_reporting_convention: "total Fe as FeO"
   note: >
     Thousands of APXS analyses across 4 sites; +-1-2 wt% major oxides.
-    Includes SO3 and Cl as components (sulfate-bearing soil). FeO_total
-    includes both FeO and Fe2O3. Sum ~102.1 wt%  --  slight overshoot from
+    Includes SO3 and Cl as components (sulfate-bearing soil). Reported
+    iron stays total Fe as FeO; the Gusev Laguna Class prior sets the
+    ledger split. Sum ~102.1 wt%  --  slight overshoot from
     independent range midpoints; within analytical uncertainty.
   composition_wt_pct:
     SiO2:  45.5
     TiO2:   1.0
     Al2O3: 10.5
-    FeO:   18.0     # FeO + Fe2O3 total
+    FeO:   18.0     # total Fe as FeO; the Laguna Class prior sets the ledger split
     MgO:    8.5
     CaO:    7.0
     Na2O:   3.0
@@ -2747,6 +2761,11 @@ mars_sulfate_rich:
     Elevated Ca/Mg/Fe sulfates (SO3 8-15 wt% vs 5-7% baseline).
     Midpoint sum ~105.5 wt%  --  wide SO3 range causes overshoot.
     Normalise for simulation.
+    No ferric prior. Paso Robles Class (Morris et al. 2006 E02S13
+    paragraph [47], Fe3+/FeT ~ 0.83; paragraph [63], S ~ 3.2 versus
+    Laguna ~ 0.7 mol/24(O+Cl)) is one Husband Hill evaporite, not this
+    SO3 8-15 blend. The Meridiani Burns outcrop (Morris et al. 2006
+    E12S15 abstract, Fe3+/FeT ~ 0.9) is S-rich rock, not this soil.
   composition_wt_pct:
     SiO2:  45.0
     TiO2:   1.0
@@ -2826,6 +2845,8 @@ mars_phyllosilicate_clay:
     Smectite-rich deposits. Higher Al2O3 (12-18%) and bound water than
     baseline Mars basalt. Sum ~103.8 wt%  --  broad range midpoints overshoot.
     Structural water (20-100 kg/t) released during C0.
+    No ferric prior. The 2006 Gusev and Meridiani Mossbauer papers do
+    not measure Gale, Jezero, or Mawrth phyllosilicate clay.
   composition_wt_pct:
     SiO2:  46.0
     TiO2:   0.85
@@ -2895,6 +2916,8 @@ mars_perchlorate_rich:
   note: >
     Source data omits TiO2; estimated from mars_basalt range. Elevated
     oxychlorine salts (ClO4 0.4-1.5 wt%). Sum ~101.5 wt%.
+    No ferric prior. The 2006 Gusev and Meridiani Mossbauer papers do
+    not measure Phoenix or polar perchlorate soil.
   composition_wt_pct:
     SiO2:  44.5
     TiO2:   1.0     # estimated from mars_basalt

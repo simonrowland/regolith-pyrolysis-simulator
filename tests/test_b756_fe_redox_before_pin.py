@@ -2,10 +2,9 @@
 
 Measured on f2b3602ad by loading 1000 kg through PyrolysisSimulator.
 Mars basalt is supplied the Stage-0 carbon reductant that load_batch
-requires (30 kg C). The seed column is intrinsic_melt_fO2 at the stated
-kelvin temperature. With no prior seated, Fe2O3 stays absent and the
-seed stays Holzheid IW plus the alkali offset. The notice contract is
-the lower-bound wording owned by the load resolution.
+requires (30 kg C). The pin dict is that pre-prior load. The mars test
+now checks the seated Laguna Class fraction against those iron atoms.
+The seed column in the pin remains the old Holzheid IW plus alkali.
 
 C2A sio_evolved_kg (build_sio_yield_report, 24 h, engines.local.toml
 present, allow_unmeasured_alpha_fallback=True) is recorded in
@@ -89,8 +88,9 @@ def _iron_atoms(melt: dict) -> float:
     )
 
 
-def test_mars_load_iron_and_seed_stay_on_the_pre_prior_pin() -> None:
+def test_mars_prior_keeps_iron_atoms_and_inverts_the_measured_fraction() -> None:
     pin = _LOAD_PIN["mars_basalt"]
+    molar_feo = resolve_species_formula("FeO").molar_mass_g_per_mol()
     feedstocks = _feedstocks()
     carbon_kg = _required_stage0_carbon_kg(feedstocks["mars_basalt"], 1000.0)
     assert carbon_kg == pytest.approx(pin["carbon_kg"])
@@ -99,20 +99,33 @@ def test_mars_load_iron_and_seed_stay_on_the_pre_prior_pin() -> None:
         "mars_basalt", mass_kg=1000.0, additives_kg={"C": carbon_kg}
     )
     melt = sim.inventory.melt_oxide_kg
+    prior = sim._load_fe_redox.prior
     composition = sim._melt_oxide_wt_pct()
-    seeded = intrinsic_melt_fO2(composition, 1673.15)
 
-    assert melt.get("FeO", 0.0) == pytest.approx(pin["feo_kg"])
-    assert melt.get("Fe2O3", 0.0) == pytest.approx(pin["fe2o3_kg"])
-    assert seeded == pytest.approx(pin["seed_1673_15"])
-    assert seeded - feo_iw_log10_fO2_bar(1673.15) == pytest.approx(
-        pin["alkali_dex"]
+    assert _iron_atoms(melt) == pytest.approx(pin["feo_kg"] / molar_feo)
+    assert float(melt.get("Fe2O3", 0.0)) > 0.0
+    assert prior is not None
+    assert prior.kind == "measured_fe3_fraction"
+    assert prior.source_id == "morris-2006-gusev-mossbauer"
+    seeded = intrinsic_melt_fO2(
+        composition, 1673.15, fe_redox_prior=prior
+    )
+    assert seeded > pin["seed_1673_15"]
+    assert sim.melt.fO2_log == pytest.approx(
+        intrinsic_melt_fO2(
+            composition,
+            25.0 + 273.15,
+            fe_redox_prior=prior,
+        )
     )
     notice = sim.melt_fO2_seed_run_notice()
     assert notice is not None
-    assert notice["authority"] == "lower_bound"
-    assert notice["source_id"] is None
-    assert "lower bound" in notice["message"].lower()
+    assert notice["authority"] == "measured"
+    assert notice["fe3_fraction"] == pytest.approx(prior.value)
+    assert notice["source_id"] == prior.source_id
+    assert "bulk_rock_fraction_on_liquid_relation" in notice[
+        "extrapolation_reasons"
+    ]
 
 
 def test_lunar_prior_keeps_iron_atoms_and_seeds_below_the_old_iw() -> None:

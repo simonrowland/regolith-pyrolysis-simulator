@@ -52,7 +52,7 @@ def _unknown_split() -> dict:
 
 
 def test_unknown_split_metadata_covers_every_total_basis_entry_without_a_prior() -> None:
-    # CI, CM, and MGS-1 leave this set once a cited prior is seated.
+    # CI, CM, MGS-1, and mars_basalt leave this set once a cited prior is seated.
     # The six terrestrial lunar simulants are total-basis and join it.
     # NU-LHT entries stay out: they are blocked and were not named.
     expected = {
@@ -62,7 +62,6 @@ def test_unknown_split_metadata_covers_every_total_basis_entry_without_a_prior()
         "e_type_enstatite_aubrite",
         "ceres_regolith",
         "comet_nucleus",
-        "mars_basalt",
         "mars_sulfate_rich",
         "mars_phyllosilicate_clay",
         "mars_perchlorate_rich",
