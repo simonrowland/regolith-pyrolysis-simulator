@@ -499,6 +499,10 @@ def test_kor_sulfur_tables_are_typed_refusals_and_keep_24_hour_footnote() -> Non
         assert table["values"]["quantity"] == "sulfur_solubility_wt_percent"
         assert len(table["values"]["rows"]) == row_count
 
+    xxii = tables["kor_1967_table_xxii_sulphur_melt_values"]["values"]
+    average_row = next(row for row in xxii["rows"] if row[0] == "150")
+    assert average_row[3] == "0.268"
+
     xxiii = tables["kor_1967_table_xxiii_sulphur_melt_values"]["values"]
     assert xxiii["columns"][-1] == "treatment_time_hours"
     assert xxiii["rows"][-1][0] == "8800^2"
