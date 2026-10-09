@@ -76,6 +76,7 @@ from simulator.battery.migrate import (
     compilation_column_series_from_record,
     _provenance_from_extract,
     _initial_oxide_map_from_values,
+    _located_printed_and_initial,
     load_migrated_store,
     expand_queue_entries,
     group_queue_entries,
@@ -3645,6 +3646,18 @@ def _scalar_extract(*, quantity: str, units: str, values: dict, obs_type: str = 
     row["units"] = units
     row["values"] = values
     return extract
+
+
+def test_located_printed_and_initial_pins_numeric_composition() -> None:
+    _printed, initial = _located_printed_and_initial(
+        {"SiO2": Decimal("60"), "MgO": Decimal("40")}, None
+    )
+
+    assert initial is not None
+    assert to_plain(initial.state.value)["components"] == [
+        ["SiO2", "0.5015472170832676561113000772"],
+        ["MgO", "0.4984527829167323438886999229"],
+    ]
 
 
 def test_k01_scalar_psat_does_not_take_alpha(tmp_path: Path) -> None:
