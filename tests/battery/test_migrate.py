@@ -3400,7 +3400,10 @@ def test_j01_store_census_series_numeric_matches_declared_field() -> None:
     # cells, evaporation_coefficient_alpha 30->34 and n_numeric 450->454.
     assert census.get("p_partial") == 136
     assert census.get("p_sat") == 21
-    assert census.get("evaporation_coefficient_alpha") == 34
+    # Twelve repeated Fedkin table cells are no longer counted through the retired
+    # mirror; the KEMS owner extract retains the cells (Fedkin et al. 2006, Table 3,
+    # p. 212, DOI 10.1016/j.gca.2005.08.014).
+    assert census.get("evaporation_coefficient_alpha") == 22
     # Re-pinned with the d-032 store regen. _series_census skips a source with no
     # extracts-v2 sibling, and the pre-regen store was missing 26 sources' derived
     # files, so their series went uncounted: evaporation_rate 21->25,
@@ -3436,10 +3439,11 @@ def test_j01_store_census_series_numeric_matches_declared_field() -> None:
     # (starting-material initial compositions now survive migration), on top of the
     # landed 450 (scorer p_partial +61, Holzheid +33): n_numeric 450->500; t-998 adds
     # four Zhang Table 4 alpha cells, and 1164 residue components, so the merged
-    # total is 1668; mismatches remains 0.
+    # total is 1668; mismatches remains 0. The retired Fedkin mirror removes
+    # 12 duplicate Table 3 alpha cells, taking the total to 1755.
     # O'Neill & Eggins 2002 adds 91 activity_coefficient cells: n_numeric 1668->1759.
     # t-1122 adds the eight printed residue component points above: 1759->1767.
-    assert n_numeric == 1767, (n_numeric, census, n_unavailable)
+    assert n_numeric == 1755, (n_numeric, census, n_unavailable)
 
 
 def test_residue_point_condition_values_keep_their_printed_types() -> None:
@@ -6265,8 +6269,9 @@ def test_l05c1_costa_control_is_not_condensation() -> None:
     state, reason = map_quantity(
         row.get("type"), values, units=row.get("units"), row=row
     )
-    assert state.is_value and state.value is Quantity.EVAPORATION_COEFFICIENT_ALPHA
-    assert reason is None
+    assert state.is_unknown
+    assert "curation label" in state.reason
+    assert reason == state.reason
 
 
 def test_l03_per_mol_o2_ledger_lifts_delta_fg(tmp_path: Path) -> None:
@@ -7404,7 +7409,8 @@ def test_f4_antoine_and_points_and_range_restore_corroborated_quantity(
     state, _reason = map_quantity(
         costa.get("type"), costa.get("values"), units=costa.get("units"), row=costa
     )
-    assert state.is_value and state.value is Quantity.EVAPORATION_COEFFICIENT_ALPHA
+    assert state.is_unknown
+    assert "curation label" in state.reason
 
     sf04 = _extract_observation(
         "sf04-magma-companion-workbook.yaml", "sf04_workbook_tho_fe_pressure_series"
@@ -7474,10 +7480,8 @@ def test_f4_antoine_and_points_and_range_restore_corroborated_quantity(
     costa_obs = result.observations[
         "kems-007-costa-2015::costa_2015_sio_olivine_kems_alpha_multicell"
     ]
-    assert quantity_token(costa_obs.identity) is Quantity.EVAPORATION_COEFFICIENT_ALPHA
-    assert costa_obs.value.kind is ValueKind.INTERVAL
-    assert costa_obs.value.interval_low == as_decimal("0.003")
-    assert costa_obs.value.interval_high == as_decimal("0.036")
+    assert costa_obs.identity.quantity.is_unknown
+    assert costa_obs.value.kind is ValueKind.UNAVAILABLE
 
     sf04_rows = [
         o
