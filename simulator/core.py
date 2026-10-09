@@ -370,6 +370,9 @@ from simulator.accounting.ledger import (
     KNOWN_LEDGER_ACCOUNT_PREFIXES,
     snapshot_atom_ledger,
 )
+from simulator.accounting.oxide_assignment import (
+    PHASE_OXIDE_MASS_ABS_TOLERANCE_KG,
+)
 from simulator.accounting.phase_homes import holds_positive_crystal_moles
 from simulator.condensation_routing import (
     designated_stage_number,
@@ -1175,6 +1178,10 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self._poisoned_hour: PoisonedHourState | None = None
         self._last_overhead_gas_equilibrium: Dict[str, Any] = {}
         self._last_vapor_pressure_diagnostic: Dict[str, Any] = {}
+        self._phase_home_diagnostic: Dict[str, Any] = {}
+        self._assemblage_binding_active = False
+        self._assemblage_liquid_activities: Dict[str, float] = {}
+        self._assemblage_thermodynamic_state: Dict[str, Any] = {}
         self._last_evaporation_flux_diagnostic: Dict[str, Any] = {}
         self._last_partial_melt_offgassing_diagnostic: Dict[str, Any] = {}
         # b-149 silent-zero class: typed zero_because notes (diagnostic only).
@@ -3226,8 +3233,15 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         Runs only when the crystallization provider's backend is the
         Python API. A missing provider, an unavailable sample, or a
         null transition leaves the hour as it was and does not count
-        as a kernel no-op. A ledger rejection still aborts the hour.
+        as a kernel no-op. The diagnostic is kept either way. A ledger
+        rejection still aborts the hour.
         """
+        try:
+            self._dispatch_phase_homes()
+        finally:
+            self._mark_assemblage_presence()
+
+    def _dispatch_phase_homes(self) -> None:
         registry = getattr(self, '_chem_registry', None)
         if registry is None or self.atom_ledger is None:
             return
@@ -3254,12 +3268,18 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         from simulator.melt_backend.base import LiquidFractionInvalidError
         from simulator.melt_backend.liquidus import LiquidusSampleError
 
+        control_inputs: dict[str, Any] = {}
+        if self._metal_inventory_above_phase_floor():
+            # The crystallization view is silicate-only. Closed-mode
+            # redox that counts metal is not implemented, so the
+            # provider refuses instead of committing a silicate root.
+            control_inputs['metal_inventory_present'] = True
         try:
             # Same reservoir value silicate equilibrium passes. Omitting
             # it made the provider substitute absolute -9.0.
             result = self._dispatch_only(
                 ChemistryIntent.EQUILIBRIUM_CRYSTALLIZATION,
-                control_inputs={},
+                control_inputs=control_inputs,
                 fO2_log=float(
                     self.melt.oxygen_reservoir.melt_intrinsic_fO2_log
                 ),
@@ -3268,21 +3288,150 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             ProviderUnavailableError,
             LiquidusSampleError,
             LiquidFractionInvalidError,
-        ):
+        ) as exc:
+            self._phase_home_diagnostic = (
+                self._engine_failure_phase_home_diagnostic(str(exc))
+            )
             return
+        self._phase_home_diagnostic = dict(result.diagnostic or {})
         proposal = result.transition
         if proposal is None or str(result.status) != 'ok':
+            if str(result.status) != 'ok':
+                self._annotate_phase_home_engine_failure(str(result.status))
             return
         self._commit_proposal(
             ChemistryIntent.EQUILIBRIUM_CRYSTALLIZATION,
             proposal,
             diagnostic=result.diagnostic,
-            control_inputs={},
+            control_inputs=control_inputs,
             transition_source='phase_home',
         )
+        state = self._assemblage_state_from_diagnostic(result.diagnostic)
+        if state is not None:
+            self._assemblage_thermodynamic_state = state
+            self._assemblage_liquid_activities = dict(
+                state['liquid_activities']
+            )
+            reservoir = getattr(
+                getattr(self, 'melt', None),
+                'oxygen_reservoir',
+                None,
+            )
+            if reservoir is not None:
+                reservoir.melt_intrinsic_fO2_log = float(state['oxygen_root'])
         # Redox capacity reads inventory.melt_oxide_kg. Refresh it from
         # the post-split liquid before that consumer runs.
         self._project_cleaned_melt_from_atom_ledger()
+
+    @staticmethod
+    def _assemblage_state_from_diagnostic(diagnostic: Any) -> dict[str, Any] | None:
+        payload = diagnostic if isinstance(diagnostic, Mapping) else {}
+        backend = payload.get('backend_diagnostics')
+        if not isinstance(backend, Mapping):
+            return None
+        state = backend.get('assemblage_thermodynamic_state')
+        if not isinstance(state, Mapping):
+            return None
+        activities = state.get('liquid_activities')
+        oxygen_root = state.get('oxygen_root')
+        if not isinstance(activities, Mapping) or not activities:
+            return None
+        try:
+            root = float(oxygen_root)
+        except (TypeError, ValueError):
+            return None
+        if root != root or root in (float('inf'), float('-inf')):
+            return None
+        return {
+            'liquid_activities': {
+                str(name): float(value) for name, value in activities.items()
+            },
+            'oxygen_root': root,
+        }
+
+    def _metal_inventory_above_phase_floor(self) -> bool:
+        ledger = getattr(self, 'atom_ledger', None)
+        if ledger is None:
+            return False
+        for account in (
+            METAL_PHASE_ACCOUNT,
+            METAL_BOTTOM_POOL_ACCOUNT,
+            METAL_FLOAT_LAYER_ACCOUNT,
+        ):
+            if (
+                ledger.projected_total_kg_by_account(account)
+                > PHASE_OXIDE_MASS_ABS_TOLERANCE_KG
+            ):
+                return True
+        return False
+
+    def _engine_failure_phase_home_diagnostic(self, detail: str) -> dict[str, Any]:
+        """Hold flag when crystals exist; otherwise homes were never opened."""
+        backend: dict[str, Any] = {}
+        ledger = getattr(self, 'atom_ledger', None)
+        crystals = (
+            ledger is not None
+            and holds_positive_crystal_moles(ledger.mol_by_account())
+        )
+        if crystals:
+            backend['assemblage_held_from_previous_hour'] = {
+                'reason': 'assemblage_held_from_previous_hour',
+                'detail': detail,
+            }
+        else:
+            backend['species_resolved_homes_unavailable'] = {
+                'reason': 'species_resolved_homes_unavailable',
+                'detail': detail,
+            }
+        return {'backend_diagnostics': backend}
+
+    def _annotate_phase_home_engine_failure(self, status: str) -> None:
+        diagnostic = dict(self._phase_home_diagnostic)
+        backend = dict(diagnostic.get('backend_diagnostics') or {})
+        ledger = getattr(self, 'atom_ledger', None)
+        crystals = (
+            ledger is not None
+            and holds_positive_crystal_moles(ledger.mol_by_account())
+        )
+        if crystals:
+            backend.setdefault(
+                'assemblage_held_from_previous_hour',
+                {
+                    'reason': 'assemblage_held_from_previous_hour',
+                    'detail': status,
+                },
+            )
+        else:
+            backend.setdefault(
+                'species_resolved_homes_unavailable',
+                {
+                    'reason': 'species_resolved_homes_unavailable',
+                    'detail': status,
+                },
+            )
+        diagnostic['backend_diagnostics'] = backend
+        self._phase_home_diagnostic = diagnostic
+
+    def _mark_assemblage_presence(self) -> None:
+        """Binding flag and crust notice follow the post-commit ledger."""
+        ledger = getattr(self, 'atom_ledger', None)
+        present = (
+            ledger is not None
+            and holds_positive_crystal_moles(ledger.mol_by_account())
+        )
+        self._assemblage_binding_active = present
+        diagnostic = dict(getattr(self, '_phase_home_diagnostic', {}) or {})
+        backend = dict(diagnostic.get('backend_diagnostics') or {})
+        if present:
+            backend.setdefault(
+                'surface_crust_not_modeled',
+                {'reason': 'surface_crust_not_modeled'},
+            )
+        else:
+            backend.pop('surface_crust_not_modeled', None)
+        if backend or 'backend_diagnostics' in diagnostic:
+            diagnostic['backend_diagnostics'] = backend
+            self._phase_home_diagnostic = diagnostic
 
     def _o2_bubbler_external_o2_overhead_mol(self) -> float:
         return max(
@@ -9572,6 +9721,11 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 'ambient_pressure_bar': (
                     ambient_pressure_bar if ambient_pressure_bar > 0.0 else None
                 ),
+                **(
+                    {'assemblage_binding_active': True}
+                    if getattr(self, '_assemblage_binding_active', False)
+                    else {}
+                ),
                 **high_t_control_inputs,
             },
             'fO2_log': intrinsic_fO2_log,
@@ -9753,7 +9907,15 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                     getattr(result, 'vapor_pressures_source', {}) or {}
                 )
         kernel_activities = diagnostic.get('activities') or {}
-        if kernel_activities:
+        if getattr(self, '_assemblage_binding_active', False):
+            # The crystallization solve owns these. The vapour kernel is
+            # another binding and must not replace them after the split.
+            stored = dict(
+                getattr(self, '_assemblage_liquid_activities', {}) or {}
+            )
+            if stored:
+                result.activity_coefficients = stored
+        elif kernel_activities:
             result.activity_coefficients = dict(kernel_activities)
         self._last_vapor_pressures_source = dict(
             getattr(result, 'vapor_pressures_source', {}) or {}

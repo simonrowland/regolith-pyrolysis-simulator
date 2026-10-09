@@ -38,6 +38,7 @@ from simulator.chemistry.kernel import (
     IntentRequest,
     IntentResult,
     LedgerTransitionProposal,
+    ProviderAccountView,
     ProviderRegistry,
     ProviderUnavailableError,
 )
@@ -117,10 +118,16 @@ def _phase(name: str, mass_kg: float, oxide_mol: dict[str, float]) -> dict:
 class _GrowthBackend:
     """Constant half-liquid path. The current-temperature row is 0.01 kg."""
 
-    def __init__(self, *, refuse_spinel: bool = False) -> None:
+    def __init__(
+        self,
+        *,
+        refuse_spinel: bool = False,
+        report_activities: bool = True,
+    ) -> None:
         self._mode = "python_api"
         self.calls: list[dict] = []
         self.refuse_spinel = refuse_spinel
+        self.report_activities = report_activities
 
     def is_available(self) -> bool:
         return True
@@ -159,6 +166,9 @@ class _GrowthBackend:
             phases_present=present,
             phase_masses_kg=masses,
             phase_compositions=compositions,
+            activity_coefficients=(
+                {"SiO2": 0.6} if self.report_activities else {}
+            ),
             fO2_log=float(kwargs["fO2_log"]),
             status="ok",
         )
@@ -219,6 +229,7 @@ class _RemeltBackend:
             phases_present=present,
             phase_masses_kg=masses,
             phase_compositions=compositions,
+            activity_coefficients={"SiO2": 0.6},
             fO2_log=float(kwargs["fO2_log"]),
             status="ok",
         )
@@ -433,6 +444,14 @@ def test_good_olivine_commits_a_new_cohort_and_a_bad_token_blocks_it():
     assert result.status == "ok"
     assert result.transition is not None
     assert result.transition.reason == "phase_home"
+    state = result.diagnostic["backend_diagnostics"][
+        "assemblage_thermodynamic_state"
+    ]
+    assert state["liquid_activities"]["SiO2"] == pytest.approx(0.6)
+    assert state["oxygen_root"] == pytest.approx(-9.0)
+    assert result.diagnostic["backend_diagnostics"][
+        "surface_crust_not_modeled"
+    ]["reason"] == "surface_crust_not_modeled"
     path = tuple(result.diagnostic["liquid_fraction_path"])
     assert len(backend.calls) == len(path) + 1
     kernel.commit_batch(
@@ -541,6 +560,10 @@ def test_fifty_kilogram_remelt_uses_one_probe_and_the_hold_case_does_not():
     assert held_phases["olivine"]["dissolve_kg"] == pytest.approx(0.0)
     assert held_phases["olivine"]["m_new_kg"] == pytest.approx(0.0)
     assert "phase_home_refusal" not in held_result.diagnostic["backend_diagnostics"]
+    assert (
+        "assemblage_held_from_previous_hour"
+        not in held_result.diagnostic["backend_diagnostics"]
+    )
     assert held_result.transition is None
     assert held.mol_by_account(_OLIVINE_0)["MgO"] == pytest.approx(magnesia)
     assert held.mol_by_account(_LIQUID)["SiO2"] == pytest.approx(silica)
@@ -794,6 +817,7 @@ def test_phase_home_hook_does_not_count_a_null_transition_as_a_no_op(
     sim._dispatch_only = forbidden
     sim._commit_phase_homes()
     assert sim._chem_no_op_dispatch_count == before
+    assert sim._assemblage_binding_active is False
 
     backend = SimpleNamespace(_mode="subprocess")
     provider = AlphaMELTSProvider(backend=backend)
@@ -811,13 +835,30 @@ def test_phase_home_hook_does_not_count_a_null_transition_as_a_no_op(
 
     def no_transition(intent, **kwargs):
         dispatched.append((intent, kwargs.get("fO2_log")))
-        return SimpleNamespace(status="ok", transition=None, diagnostic={})
+        return SimpleNamespace(
+            status="ok",
+            transition=None,
+            diagnostic={
+                "backend_diagnostics": {
+                    "phase_home_refusal": {
+                        "reason": "phase_home_liquid_insufficient",
+                    },
+                },
+            },
+        )
 
     sim._dispatch_only = no_transition
     sim._commit_phase_homes()
     assert dispatched == [
         (ChemistryIntent.EQUILIBRIUM_CRYSTALLIZATION, reservoir_fO2),
     ]
+    assert sim._phase_home_diagnostic["backend_diagnostics"][
+        "phase_home_refusal"
+    ]["reason"] == "phase_home_liquid_insufficient"
+    assert sim._assemblage_binding_active is True
+    assert sim._phase_home_diagnostic["backend_diagnostics"][
+        "surface_crust_not_modeled"
+    ]["reason"] == "surface_crust_not_modeled"
     assert _OLIVINE_0 in provider._crystal_accounts
     assert sim._chem_no_op_dispatch_count == before
 
@@ -825,17 +866,31 @@ def test_phase_home_hook_does_not_count_a_null_transition_as_a_no_op(
     projected: list[bool] = []
 
     def with_proposal(intent, **_kwargs):
-        return SimpleNamespace(status="ok", transition=object(), diagnostic={})
+        return SimpleNamespace(
+            status="ok",
+            transition=object(),
+            diagnostic={
+                "backend_diagnostics": {
+                    "assemblage_thermodynamic_state": {
+                        "liquid_activities": {"SiO2": 0.6},
+                        "oxygen_root": -7.5,
+                    },
+                },
+            },
+        )
 
     def capture(intent, proposal, **kwargs):
         committed.append((intent, proposal, kwargs.get("transition_source")))
 
+    sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log = -9.0
     sim._dispatch_only = with_proposal
     sim._commit_proposal = capture
     sim._project_cleaned_melt_from_atom_ledger = lambda: projected.append(True)
     sim._commit_phase_homes()
     assert committed[0][2] == "phase_home"
     assert projected == [True]
+    assert sim._assemblage_liquid_activities == {"SiO2": 0.6}
+    assert sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log == pytest.approx(-7.5)
     assert sim._chem_no_op_dispatch_count == before
 
     def unavailable(*_args, **_kwargs):
@@ -852,3 +907,219 @@ def test_phase_home_hook_does_not_count_a_null_transition_as_a_no_op(
         sim._commit_phase_homes()
         assert sim._chem_no_op_dispatch_count == before
         assert len(committed) == 1
+        assert sim._phase_home_diagnostic["backend_diagnostics"][
+            "assemblage_held_from_previous_hour"
+        ]["reason"] == "assemblage_held_from_previous_hour"
+        assert sim._assemblage_binding_active is True
+
+
+def test_a_solve_without_activities_is_not_admitted():
+    ledger = _strict_ledger()
+    ledger.load_external_mol(
+        _LIQUID,
+        {"SiO2": 1.0, "MgO": 1.0},
+        material_origin="feedstock",
+    )
+    snapshot = {
+        account: dict(species)
+        for account, species in ledger.mol_by_account().items()
+    }
+    _provider, kernel = _register(
+        _GrowthBackend(report_activities=False),
+        ledger,
+    )
+    result = _dispatch(kernel, 1150.0)
+    assert result.status == "ok"
+    assert result.transition is None
+    backend = result.diagnostic["backend_diagnostics"]
+    assert backend["phase_home_refusal"]["reason"] == "assemblage_state_incomplete"
+    assert backend["assemblage_state_incomplete"]["reason"] == (
+        "assemblage_state_incomplete"
+    )
+    assert "assemblage_held_from_previous_hour" not in backend
+    assert {
+        account: dict(species)
+        for account, species in ledger.mol_by_account().items()
+    } == snapshot
+
+
+def test_metal_inventory_refuses_the_silicate_commit():
+    provider = AlphaMELTSProvider(backend=_GrowthBackend())
+
+    def request_for(accounts: dict) -> IntentRequest:
+        return IntentRequest(
+            intent=ChemistryIntent.EQUILIBRIUM_CRYSTALLIZATION,
+            account_view=ProviderAccountView(
+                accounts=accounts,
+                species_formula_registry={},
+            ),
+            temperature_C=1150.0,
+            pressure_bar=1.0,
+            fO2_log=-9.0,
+            control_inputs={"metal_inventory_present": True},
+        )
+
+    proposal, note = provider._phase_home_transition(
+        request_for({_LIQUID: {"SiO2": 1.0}}),
+        SimpleNamespace(diagnostics={}, isothermal_phase_inventories=()),
+    )
+    assert proposal is None
+    assert note["phase_home_refusal"]["reason"] == (
+        "phase_home_metal_redox_unresolved"
+    )
+    assert "assemblage_held_from_previous_hour" not in note
+
+    _proposal, held = provider._phase_home_transition(
+        request_for({_LIQUID: {"SiO2": 1.0}, _OLIVINE_0: {"MgO": 1.0}}),
+        SimpleNamespace(diagnostics={}, isothermal_phase_inventories=()),
+    )
+    assert held["assemblage_held_from_previous_hour"]["reason"] == (
+        "assemblage_held_from_previous_hour"
+    )
+    assert held["surface_crust_not_modeled"]["reason"] == (
+        "surface_crust_not_modeled"
+    )
+
+
+def test_phase_home_hook_tells_the_provider_when_metal_holds_mass(
+    vapor_pressure_data,
+    feedstocks_data,
+    setpoints_data,
+):
+    sim = _build_freeze_gate_sim(
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+        enabled=False,
+    )
+    backend = SimpleNamespace(_mode="python_api")
+    sim._chem_registry.register(
+        AlphaMELTSProvider(backend=backend),
+        [ChemistryIntent.EQUILIBRIUM_CRYSTALLIZATION],
+    )
+    sim.atom_ledger.load_external_mol(
+        "process.metal_phase",
+        {"Fe": 1.0},
+        material_origin="feedstock",
+    )
+    seen: list[dict] = []
+
+    def capture(intent, **kwargs):
+        del intent
+        seen.append(dict(kwargs.get("control_inputs") or {}))
+        return SimpleNamespace(status="ok", transition=None, diagnostic={})
+
+    sim._dispatch_only = capture
+    sim._commit_phase_homes()
+    assert seen == [{"metal_inventory_present": True}]
+
+
+def test_assemblage_activities_survive_the_vapour_refresh(
+    vapor_pressure_data,
+    feedstocks_data,
+    setpoints_data,
+):
+    sim = _build_freeze_gate_sim(
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+        enabled=False,
+    )
+    sim.melt.temperature_C = 1150.0
+    sim._assemblage_binding_active = True
+    sim._assemblage_liquid_activities = {"SiO2": 0.6}
+    seen: list[bool] = []
+
+    def capture(intent, **kwargs):
+        del intent
+        seen.append(
+            kwargs["control_inputs"].get("assemblage_binding_active") is True
+        )
+        return SimpleNamespace(
+            status="ok",
+            diagnostic={"activities": {"Na": 2.0}, "vapor_pressures_Pa": {}},
+        )
+
+    sim._dispatch_only = capture
+    result = EquilibriumResult(
+        temperature_C=1150.0,
+        pressure_bar=1.0e-8,
+        liquid_fraction=0.5,
+        activity_coefficients={"SiO2": 0.1},
+        status="ok",
+    )
+    sim._refresh_vapor_pressures_from_kernel(result)
+    assert seen == [True]
+    assert result.activity_coefficients == {"SiO2": 0.6}
+
+
+def test_vapour_dispatch_names_the_assemblage_binding():
+    from pathlib import Path
+
+    import yaml
+
+    from engines.builtin.vapor_pressure import BuiltinVaporPressureProvider
+    from simulator.melt_backend.vaporock import VAPOROCK_T_MAX_K
+
+    payload = yaml.safe_load(
+        Path("data/vapor_pressures.yaml").read_text(encoding="utf-8")
+    )
+    provider = BuiltinVaporPressureProvider(payload or {})
+    result = provider.dispatch(
+        IntentRequest(
+            intent=ChemistryIntent.VAPOR_PRESSURE,
+            account_view=ProviderAccountView(
+                accounts={
+                    _LIQUID: {
+                        "Na2O": 0.20,
+                        "K2O": 0.08,
+                        "SiO2": 5.00,
+                        "FeO": 1.00,
+                        "MgO": 1.00,
+                        "CaO": 1.00,
+                        "Al2O3": 1.00,
+                        "TiO2": 0.10,
+                    },
+                },
+                species_formula_registry={},
+            ),
+            temperature_C=(VAPOROCK_T_MAX_K + 0.1) - 273.15,
+            pressure_bar=1.0e-6,
+            control_inputs={
+                "pO2_bar": 1.0e-9,
+                "intrinsic_fO2_log": -10.0,
+                "high_t_melt_activity": "openimcc",
+                "assemblage_binding_active": True,
+            },
+        )
+    )
+    assert any(
+        str(warning).startswith("assemblage_binding_active:")
+        for warning in result.warnings
+    )
+    assert result.diagnostic.get("high_t_melt_activity") in (None, {})
+
+
+def test_openimcc_is_not_evaluated_on_an_assemblage_liquid(monkeypatch):
+    from engines.builtin.vapor_pressure import (
+        _build_high_t_melt_activity_authority,
+    )
+
+    def boom(*_args, **_kwargs):
+        raise AssertionError("openimcc evaluated on an assemblage liquid")
+
+    monkeypatch.setattr(
+        "simulator.melt_backend.openimcc_bridge.evaluate_cleaned_melt",
+        boom,
+    )
+    authority = _build_high_t_melt_activity_authority(
+        composition_mol={"SiO2": 1.0},
+        temperature_K=2000.0,
+        controls={
+            "high_t_melt_activity": "openimcc",
+            "assemblage_binding_active": True,
+        },
+        below_cap_fe_activity=0.1,
+        below_cap_fe_activity_basis="test",
+    )
+    assert authority is None

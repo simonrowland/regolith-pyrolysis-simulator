@@ -576,6 +576,12 @@ def _build_high_t_melt_activity_authority(
     activity object for the eight flux oxides when this payload is successful.
     """
 
+    # An assemblage binding owns this liquid. openimcc is another
+    # binding and must not be evaluated on it. None keeps the legacy
+    # activity object; an empty openimcc payload would not.
+    if controls.get("assemblage_binding_active"):
+        return None
+
     mode = normalize_high_t_melt_activity(
         controls.get("high_t_melt_activity", "openimcc")
     )
@@ -1883,6 +1889,11 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
             below_cap_fe_activity=below_cap_fe_activity,
             below_cap_fe_activity_basis=below_cap_fe_activity_basis,
         )
+        if controls.get("assemblage_binding_active"):
+            warnings.append(
+                "assemblage_binding_active: openimcc is not evaluated "
+                "while an assemblage binding owns the liquid"
+            )
         # An openimcc activity can move a valid carrier below the numerical
         # output floor; preserve the carrier so predict-and-flag never drops it.
         retain_high_t_openimcc_carriers = bool(

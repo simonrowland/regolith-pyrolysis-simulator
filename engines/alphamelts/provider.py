@@ -991,39 +991,81 @@ class AlphaMELTSProvider(ChemistryProvider):
         )
 
         diagnostics = dict(getattr(equilibrium, 'diagnostics', {}) or {})
-        if diagnostics.get('isothermal_phase_inventory_failure'):
-            if _view_has_binding_cohort(
-                request, MELTS_BINDING,
-            ):
-                return None, {
+        if request.control_inputs.get('metal_inventory_present'):
+            return None, _hold_notices(
+                request,
+                {
                     'phase_home_refusal': {
-                        'reason': _ISOTHERMAL_INVENTORY_SAMPLE_FAILED,
-                        'detail': 'locked cohorts have no accessible sample',
+                        'reason': 'phase_home_metal_redox_unresolved',
+                        'detail': (
+                            'closed-mode redox that counts the metal '
+                            'inventory is not implemented; the commit '
+                            'is refused'
+                        ),
                     },
+                },
+            )
+        if diagnostics.get('isothermal_phase_inventory_failure'):
+            failure: dict[str, Any] = {}
+            if _view_has_binding_cohort(request, MELTS_BINDING):
+                failure['phase_home_refusal'] = {
+                    'reason': _ISOTHERMAL_INVENTORY_SAMPLE_FAILED,
+                    'detail': 'locked cohorts have no accessible sample',
                 }
-            return None, {}
+            return None, _hold_notices(
+                request,
+                failure,
+                engine_failed=True,
+            )
         refusals = diagnostics.get('isothermal_phase_inventory_refusals') or ()
         if refusals:
             first = dict(refusals[0] or {})
-            return None, {
-                'phase_home_refusal': {
-                    'reason': 'phase_home_inventory_refused',
-                    'phase': first.get('phase'),
-                    'token': first.get('token'),
-                    'detail': first.get('reason'),
+            return None, _hold_notices(
+                request,
+                {
+                    'phase_home_refusal': {
+                        'reason': 'phase_home_inventory_refused',
+                        'phase': first.get('phase'),
+                        'token': first.get('token'),
+                        'detail': first.get('reason'),
+                    },
                 },
-            }
+            )
         cohorts = locked_cohorts(
             request.account_view.accounts,
             MELTS_BINDING,
         )
         if isinstance(cohorts, str):
-            return None, {
-                'phase_home_refusal': {
-                    'reason': 'phase_home_cohort_unreadable',
-                    'detail': cohorts,
+            return None, _hold_notices(
+                request,
+                {
+                    'phase_home_refusal': {
+                        'reason': 'phase_home_cohort_unreadable',
+                        'detail': cohorts,
+                    },
                 },
-            }
+            )
+        activities = dict(diagnostics.get('isothermal_liquid_activities') or {})
+        oxygen_root = diagnostics.get('isothermal_oxygen_root')
+        if (
+            not diagnostics.get('accessible_liquid_absent')
+            and (not activities or oxygen_root is None)
+        ):
+            return None, _hold_notices(
+                request,
+                {
+                    'phase_home_refusal': {
+                        'reason': 'assemblage_state_incomplete',
+                        'detail': (
+                            'the solve did not report liquid activities '
+                            'and an oxygen root'
+                        ),
+                    },
+                    'assemblage_state_incomplete': {
+                        'reason': 'assemblage_state_incomplete',
+                    },
+                },
+            )
         rows = tuple(
             getattr(equilibrium, 'isothermal_phase_inventories', ()) or ()
         )
@@ -1033,7 +1075,7 @@ class AlphaMELTSProvider(ChemistryProvider):
                 cohorts,
             )
             if probe_note:
-                return None, probe_note
+                return None, _hold_notices(request, probe_note)
         else:
             probe_rows = None
         liquid = dict(
@@ -1047,12 +1089,15 @@ class AlphaMELTSProvider(ChemistryProvider):
             locked=cohorts,
         )
         if update.refusal_reason:
-            return None, {
-                'phase_home_refusal': {
-                    'reason': update.refusal_reason,
-                    'detail': update.refusal_detail,
+            return None, _hold_notices(
+                request,
+                {
+                    'phase_home_refusal': {
+                        'reason': update.refusal_reason,
+                        'detail': update.refusal_detail,
+                    },
                 },
-            }
+            )
         if update.proposal is not None:
             self._crystal_accounts.update(update.touched_crystal_accounts)
         note: dict[str, Any] = {}
@@ -1063,7 +1108,19 @@ class AlphaMELTSProvider(ChemistryProvider):
                     dict(phase) for phase in update.phases
                 ],
             }
-        return update.proposal, note
+        if activities and oxygen_root is not None:
+            note['assemblage_thermodynamic_state'] = {
+                'liquid_activities': dict(activities),
+                'oxygen_root': float(oxygen_root),
+            }
+        # A successful no-move still admitted the solve. Hold is only
+        # a refusal or an engine failure, not an empty proposal.
+        admitted = update.proposal is not None or bool(cohorts)
+        return update.proposal, _hold_notices(
+            request,
+            note,
+            admitted=admitted,
+        )
 
     def _probe_locked_inventory(
         self,
@@ -1168,6 +1225,58 @@ class AlphaMELTSProvider(ChemistryProvider):
         return 'unavailable'
 
 
+def _hold_notices(
+    request: IntentRequest,
+    note: dict[str, Any],
+    *,
+    admitted: bool = False,
+    engine_failed: bool = False,
+) -> dict[str, Any]:
+    """Attach the hold, unavailable, and crust notices for this hour.
+
+    A refused commit with cohorts already on the books holds them. An
+    engine that never returned homes, and no cohort yet, is the unsplit
+    path. Crystals are not a crust area law.
+    """
+    from simulator.accounting.phase_homes import MELTS_BINDING
+
+    cohorts = _view_has_binding_cohort(request, MELTS_BINDING)
+    if cohorts and not admitted:
+        note['assemblage_held_from_previous_hour'] = {
+            'reason': 'assemblage_held_from_previous_hour',
+        }
+    if engine_failed and not cohorts:
+        note['species_resolved_homes_unavailable'] = {
+            'reason': 'species_resolved_homes_unavailable',
+        }
+    if cohorts or admitted:
+        note['surface_crust_not_modeled'] = {
+            'reason': 'surface_crust_not_modeled',
+        }
+    return note
+
+
+def _thermodynamic_state(result) -> dict[str, Any]:
+    """Liquid activities and the oxygen root from this equilibrate."""
+    raw_activities = dict(getattr(result, 'activity_coefficients', {}) or {})
+    activities = {
+        str(name): float(value)
+        for name, value in raw_activities.items()
+        if _is_finite(value)
+    }
+    oxygen_root = getattr(result, 'fO2_log', None)
+    if not _is_finite(oxygen_root):
+        diagnostics = getattr(result, 'diagnostics', {}) or {}
+        if isinstance(diagnostics, Mapping):
+            oxygen_root = diagnostics.get('solved_fO2_log')
+    state: dict[str, Any] = {}
+    if activities:
+        state['isothermal_liquid_activities'] = activities
+    if _is_finite(oxygen_root):
+        state['isothermal_oxygen_root'] = float(oxygen_root)
+    return state
+
+
 def _view_has_binding_cohort(request: IntentRequest, binding: str) -> bool:
     """True when the account view already names one cohort of ``binding``."""
     from simulator.accounting.phase_homes import parse_crystal_account
@@ -1225,7 +1334,9 @@ def _sample_isothermal_inventories(
                 'backend_status_reason': str(reason),
             },
         }
-    return _inventories_from_equilibrium(sampled)
+    rows, extra = _inventories_from_equilibrium(sampled)
+    extra.update(_thermodynamic_state(sampled))
+    return rows, extra
 
 
 def _inventories_from_equilibrium(result) -> tuple[tuple, dict[str, Any]]:
