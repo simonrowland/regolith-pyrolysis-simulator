@@ -2472,6 +2472,149 @@ def test_source_internal_inconsistency_is_flagged_reported_and_excluded() -> Non
     assert flagged_strata((ordinary_disagreement,)) == ()
 
 
+def test_e15_level_shape_pin_and_constant_offset_mutation() -> None:
+    from dataclasses import replace
+
+    from simulator.battery.score import _E15ResidualPoint, _e15_level_shape_rows
+
+    points = tuple(
+        _E15ResidualPoint(
+            source="stolyarova-1995-cao-alumina-kems",
+            table="2",
+            series="stolyarova_1995_ca_partial_pressure_table2",
+            temperature_K=Decimal("1933"),
+            engine=Engine.OPENIMCC.value,
+            population="liquid",
+            x_axis="x(CaO)",
+            x=x,
+            residual_dex=r,
+        )
+        for x, r in zip(
+            (Decimal("0.1"), Decimal("0.2"), Decimal("0.3"), Decimal("0.4")),
+            (Decimal("1"), Decimal("3"), Decimal("3"), Decimal("5")),
+        )
+    )
+    level, shape = _e15_level_shape_rows(points)
+    assert level["level_dex"] == Decimal("3")
+    assert shape["shape_rms_dex"].quantize(Decimal("0.000001")) == Decimal("1.414214")
+    assert shape["slope_dex_per_x"] == Decimal("12")
+    assert shape["x_axis"] == "x(CaO)"
+    separated = _e15_level_shape_rows(
+        (*points, replace(points[0], population="contested"))
+    )
+    assert [
+        (row["population"], row["n"])
+        for row in separated
+        if row["statistic"] == "level"
+    ] == [("contested", 1), ("liquid", 4)]
+
+    # Mutation: adding the same offset changes level while mean-removed shape
+    # remains pinned. A pure offset therefore has zero shape RMS and slope.
+    shifted = tuple(
+        replace(point, residual_dex=point.residual_dex + Decimal("7"))
+        for point in points
+    )
+    shifted_level, shifted_shape = _e15_level_shape_rows(shifted)
+    assert shifted_level["level_dex"] == Decimal("10")
+    assert shifted_shape["shape_rms_dex"] == shape["shape_rms_dex"]
+    assert shifted_shape["slope_dex_per_x"] == shape["slope_dex_per_x"]
+    constant = tuple(replace(point, residual_dex=Decimal("7")) for point in points)
+    _constant_level, constant_shape = _e15_level_shape_rows(constant)
+    assert constant_shape["shape_rms_dex"] == 0
+    assert constant_shape["slope_dex_per_x"] == 0
+
+
+def test_e15_report_rows_cover_three_stolyarova_sources() -> None:
+    from simulator.battery.migrate import to_plain
+    from simulator.battery.score import render_score_report_from_payloads
+
+    context = load_score_context(
+        sources=("stolyarova-1991", "stolyarova-1995", "stolyarova-1996")
+    )
+    selected = (
+        (
+            "kems-053-stolyarova-1991",
+            "stolyarova_1991_ca_partial_pressure_1993k_complete_evaporation",
+            "SiO2",
+        ),
+        (
+            "stolyarova-1995-cao-alumina-kems",
+            "stolyarova_1995_ca_partial_pressure_table2",
+            "CaO",
+        ),
+        (
+            "stolyarova-1996-cao-alumina-silica-kems",
+            "stolyarova_1996_table2_pCa_1933k",
+            "CaO",
+        ),
+    )
+    rows = []
+    for source, series, axis_component in selected:
+        candidates = [
+            observation
+            for observation in context.observations.values()
+            if observation.source_id == source
+            and observation.observation_id.split("::")[1] == series
+            and observation.value.point is not None
+            and axis_component
+            in dict(observation.point_conditions["composition"].state.value.components)
+        ]
+        candidates.sort(
+            key=lambda observation: dict(
+                observation.point_conditions["composition"].state.value.components
+            )[axis_component]
+        )
+        if source == "kems-053-stolyarova-1991":
+            candidates = [
+                observation
+                for observation in candidates
+                if dict(observation.point_conditions["composition"].state.value.components)[
+                    axis_component
+                ] >= Decimal("0.41")
+            ]
+        assert len(candidates) >= 3
+        for index, observation in enumerate(candidates[:3]):
+            rows.append(
+                {
+                    "key": f"e15-test::{Engine.OPENIMCC.value}",
+                    "reference": observation.observation_id,
+                    "candidate_request": {"engine": Engine.OPENIMCC.value},
+                    "rail": Rail.VAPOUR.value,
+                    "status": ResidualStatus.NO_BAND.value,
+                    "score_eligible": False,
+                    "exclusions": [],
+                    "numeric": {
+                        "operation": MetricOperation.DEX.value,
+                        "unit": "dimensionless",
+                        "value": str(index + 1),
+                    },
+                    "notices": to_plain(observation.notices),
+                }
+            )
+
+    report = render_score_report_from_payloads(
+        rows,
+        engines=(Engine.OPENIMCC,),
+        hostname="test",
+        observations=context.observations,
+    )
+    assert "## E15 level, shape, and activity pre-check" in report
+    assert "kems-053-stolyarova-1991" in report and "x(SiO2)" in report
+    assert "stolyarova-1995-cao-alumina-kems" in report and "x(CaO)" in report
+    assert "stolyarova-1996-cao-alumina-silica-kems" in report
+    assert "level anchored to the x(SiO2)=0.25 row" in report
+    assert "Table 2 partial pressures only; activities are figure_only" in report
+    assert "level tied to the absolute p(Ca) and p(O) scales" in report
+    assert "0.473 ± 0.031 | x(SiO2) | 9 |" in report
+    assert "CaO(phase unspecified) -> Ca(g) + O(g)" in report
+    assert (
+        "not computed: reference phase not printed; binding has no CaO(cr) K at 1933 K"
+        in report
+    )
+    assert "not computed: no binding K° for CaO(cr) -> Ca(g) + O(g)" in report
+    assert "not computed: no binding K° for Al2O3(cr) -> 2 Al(g) + 3 O(g)" in report
+
+
 def test_flagged_stratum_classifiers_agree_for_each_stratum() -> None:
     from simulator.battery.score import (
         FLAGGED_STRATUM_CATALOGUE_COMPOSITION,
