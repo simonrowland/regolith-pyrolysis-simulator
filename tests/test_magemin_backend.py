@@ -22,6 +22,7 @@ import warnings
 from pathlib import Path
 
 import pytest
+import yaml
 
 from simulator.engine_pool import EngineWorkerTimeout
 from engines.alphamelts.domain import AlphaMELTSDomainGate
@@ -1417,6 +1418,47 @@ def test_magemin_ig_bulk_vector_feo_total_iron_provisions_redox_o():
     assert vector[feot_index] == pytest.approx(16.5 - feo_excess_o)
     assert vector[feot_index] + vector[oxygen_index] == pytest.approx(16.5)
     assert vector[oxygen_index] > 0.0
+
+
+def test_lunar_mare_low_ti_ig_bulk_vector_pin():
+    """Pin the ig bulk vector for catalog lunar_mare_low_ti.
+
+    The composition is data/feedstocks.yaml, restricted to the adapter
+    input basis, then ``_build_db_bulk_projection``. FeOt
+    14.662800651411391 and O 1.837199348588609 are that resolver's output;
+    their sum is the feedstock 16.5 wt% FeO.
+    """
+    feedstocks = yaml.safe_load(
+        (Path(__file__).resolve().parents[1] / "data" / "feedstocks.yaml").read_text()
+    )
+    composition = feedstocks["lunar_mare_low_ti"]["composition_wt_pct"]
+    basis = set(MAGEMinBackend._MAGEMIN_INPUT_BASIS)
+    in_basis = {
+        str(name): float(value)
+        for name, value in composition.items()
+        if str(name) in basis and float(value or 0.0) > 0.0
+    }
+    projection = MAGEMinBackend()._build_db_bulk_projection(
+        in_basis, database="ig"
+    )
+
+    assert projection.order == MAGEMinBackend._IG_BULK_ORDER
+    assert projection.vector == (
+        44.5,
+        13.5,
+        11.0,
+        9.0,
+        14.662800651411391,
+        0.1,
+        0.4,
+        1.5,
+        1.837199348588609,
+        0.35,
+        0.0,
+    )
+    assert projection.dropped_components == ("MnO", "P2O5", "S")
+    assert projection.merged_components == ("FeO->FeOt+O",)
+    assert projection.source_sum_wt_pct == 97.22
 
 
 def test_magemin_fake_bridge_populates_equilibrium_result(monkeypatch):
