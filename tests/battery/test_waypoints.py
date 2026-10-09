@@ -31,6 +31,7 @@ from simulator.battery.waypoints import (
     ReadinessStatus,
     WaypointAuthority,
     WaypointFlag,
+    _engine_printed_oxides,
     charge_moles_by_species,
     consumer_readiness,
     effective_escape_area,
@@ -44,6 +45,29 @@ from simulator.battery.waypoints import (
     thermal_path,
 )
 from tests.battery import factories
+
+
+def test_engine_printed_oxides_pins_feot_and_trace_species_output() -> None:
+    result = _engine_printed_oxides(
+        {
+            "amount_basis": "mass_percent",
+            "components": [
+                ["SiO2", "50"],
+                ["FeOT", "25"],
+                ["SO3", "0.5"],
+                ["S", "0.5"],
+            ],
+        }
+    )
+
+    assert result == (
+        {"SiO2": Decimal("50"), "FeO": Decimal("25")},
+        {"FeOT", "SO3", "S"},
+        "calculated from printed FeOT; relation=total_iron_as_FeO; inputs=FeOT; "
+        "total iron reported as FeO; Fe3+/Fe2+ not printed; omitted non-oxide "
+        "SO3 0.5 wt%, S 0.5 wt%; omitted total 1 wt% <= 1.0 wt%",
+        Decimal("25"),
+    )
 
 
 def _bench(**kwargs: object) -> Bench:
