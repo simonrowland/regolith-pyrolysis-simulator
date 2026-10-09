@@ -94,7 +94,13 @@ fidelity_samples:
     independent_repeat: {pixel_coordinates: [1975, 3293], T_C: 1572.30, log10_P_i_Torr: -5.1780}
   locator: {published_page: 461, pdf_page_index: 2, figure: '4', note: 'Independent second marker-center reading for FeO(g), sample 4'}
 - path: species.Al2O3.observations[markova_1983_kems_method_and_inventory].values.cell_material_as_printed
-  value: Tungsten (W) cell
+  value:
+    value: Tungsten (W) cell
+    locator:
+      published_page: 869
+      pdf_page_index: 1
+      section: Technique
+      note: Technique described in cited companion paper [2].
   locator: {published_page: 869, pdf_page_index: 1, section: Technique, note: "Technique described in cited companion paper [2]."}
 - path: species.Al2O3.observations[markova_1983_kems_method_and_inventory].values.instrument
   value: MS-1301 mass spectrometer
@@ -293,7 +299,13 @@ species:
         cell_dimensions_as_printed: not printed
         calibration_standard_as_printed: Au standard jointly heated in the W cell
         pressure_calibration_role_as_printed: not stated
-        cell_material_as_printed: Tungsten (W) cell
+        cell_material_as_printed:
+          value: Tungsten (W) cell
+          locator:
+            published_page: 869
+            pdf_page_index: 1
+            section: Technique
+            note: Technique described in cited companion paper [2].
         heating_method_as_printed: Electron-bombardment heating up to 2500 °C
         temperature_measurement_as_printed: Optical pyrometer (±5°)
         electron_impact_energy_eV: '20'
@@ -330,7 +342,6 @@ species:
         - orifice_diameter
         - clausing_factor
         - sample_surface_area
-        - cell_material
         geometry_note: The cited companion identifies the W cell but does not print its dimensions or effusion-orifice dimensions; Au is jointly heated, but its calibration role is unstated.
         release_sequence_as_printed: (Na,K)-Fe-SiO Mg-Ca,TiO-Al
         release_sequence_note: Sequence of components release into vapor phase (or sequence of reaching

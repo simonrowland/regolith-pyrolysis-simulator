@@ -173,7 +173,13 @@ def test_plante_split_registry_foreign_keys_resolve() -> None:
             "inert",
         ),
         ("kems-023-demaria-1973.yaml", "demaria-1973-kems", None, None, "unknown"),
-        ("kems-025-markova-1983.yaml", "markova-1983-kems", None, None, "unknown"),
+        (
+            "kems-025-markova-1983.yaml",
+            "markova-1983-kems",
+            "Tungsten (W) cell",
+            None,
+            "unknown",
+        ),
         ("kems-026-markova-1984.yaml", "markova-1984-kems", None, None, "unknown"),
         ("kems-028-yakovlev-1984.yaml", "yakovlev-1984-kems", None, None, "unknown"),
         ("kems-051-allibert-1981.yaml", "allibert-1981-kems", "molybdenum", ("Mo",), "reactive"),
@@ -396,6 +402,17 @@ def test_kems_cell_material_state_survives_migration(
         assert all(item.locator == cell.locator for item in bench.cell_materials)
     assert bench_from_plain(to_plain(bench)) == bench
     assert _cell_material_class(bench.cell_materials) == expected_class
+    if extract == "kems-025-markova-1983.yaml":
+        experiment = next(
+            experiment
+            for experiment in result.experiments.values()
+            if experiment.experiment_id.endswith("::kems-025-markova-1983")
+        )
+        assert experiment.apparatus is not None
+        located_material = experiment.apparatus.cell_material_and_liner
+        assert located_material is not None
+        assert located_material.locator is not None
+        assert located_material.locator.published_page == 869
 
 
 def test_plante_cell_materials_round_trip_through_work_store(tmp_path: Path) -> None:
