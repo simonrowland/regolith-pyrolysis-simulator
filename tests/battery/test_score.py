@@ -6939,6 +6939,27 @@ def test_admitted_model_derived_rows_emit_residuals_per_imcc_engine() -> None:
         }
         assert all(row.status is ResidualStatus.REFUSED for row in stolyarova_rows)
         assert all(row.status is ResidualStatus.REFUSED for row in activity_rows)
+        # t-1123a classifies the printed x(SiO2)=0.33/0.25 activity points as
+        # two-phase bulk compositions. On a regenerated store their 12 rows
+        # correctly refuse the single-liquid engine; the diagnostic headline
+        # assertions above still exclude every model-derived row from measured
+        # headlines. The store is intentionally not regenerated in this lane.
+        class_s_activity_refs = {
+            row.reference
+            for row in activity_rows
+            if any(
+                notice.kind is NoticeKind.OUT_OF_CERTIFIED_BAND
+                and notice.band == score_module.TWO_PHASE_BULK_COMPOSITION_STATUS
+                for notice in observations[row.reference].notices
+            )
+        }
+        bulk_refused_activity_refs = {
+            row.reference
+            for row in activity_rows
+            if row.refusal is not None
+            and row.refusal.reason is RefusalReason.BULK_NOT_LIQUID_COMPOSITION
+        }
+        assert bulk_refused_activity_refs == class_s_activity_refs
         assert all(
             row.refusal is not None
                 and row.refusal.reason
@@ -6948,6 +6969,7 @@ def test_admitted_model_derived_rows_emit_residuals_per_imcc_engine() -> None:
                     RefusalReason.UNDERDETERMINED_APPARATUS,
                 }
             for row in activity_rows
+            if row.reference not in class_s_activity_refs
         )
         assert any(
             row.refusal is not None
