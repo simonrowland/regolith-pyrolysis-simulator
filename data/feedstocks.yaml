@@ -2045,7 +2045,7 @@ ci_carbonaceous_chondrite:
     composition is what enters C1-C6 campaigns.
   composition_wt_pct:
     SiO2:  25.0
-    FeO:   25.0    # FeO + Fe2O3, mostly as magnetite Fe3O4
+    FeO:   25.0    # total Fe as FeO; the Garenne prior sets the ledger split
     MgO:   18.5
     Al2O3:  2.25
     CaO:    1.75
@@ -2114,7 +2114,7 @@ ci_carbonaceous_chondrite:
     mass_per_tonne_kg: [650, 800]
     composition_wt_pct:
       SiO2:  36.0
-      FeO:   30.0    # all as FeO after conditioning blow
+      FeO:   30.0    # total Fe as FeO; the Garenne prior still splits this map at load
       MgO:   24.0
       Al2O3:  2.5
       CaO:    2.25
@@ -2132,7 +2132,7 @@ ci_carbonaceous_chondrite:
     step_2: "400-700C: phyllosilicate dehydroxylation -> H2O"
     step_3: "500-900C: sulfide decomposition -> S2 (no reductant needed)"
     step_4: "600-800C: carbonate decomposition -> CO2"
-    step_5: "800-950C: magnetite reduction by CO -> wustite (FeO)"
+    step_5: "800-950C: reported iron stays total Fe as FeO; the Garenne prior supplies Fe3+, not a reduction to wustite"
     step_6: "1000-1050C: conditioning O2 blow (desulf, decarb, re-oxidise incidental Fe)"
   potential_products:
     H2O_kg_per_tonne: [100, 170]
