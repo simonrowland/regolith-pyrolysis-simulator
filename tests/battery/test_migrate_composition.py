@@ -17,10 +17,11 @@ from simulator.battery.migrate import (
     migrate,
     oxide_molar_mass,
     sample_from_equipment,
+    to_plain,
     wt_pct_to_mole_fraction,
 )
 from simulator.battery.records import as_decimal
-from tests.battery.test_migrate import _write_min_tree
+from tests.battery.test_migrate import _migrate_real_extract, _write_min_tree
 
 
 _OBS_ROOTS = (
@@ -419,6 +420,103 @@ def test_markova_vi_lherzolite_carries_printed_five_oxide_composition() -> None:
     later_printed = _printed_wt_map(later)
     assert later_printed
     assert later_printed != printed, "ramp residual composition was collapsed into one map"
+
+
+def test_markova_1984_mass_loss_identity_uses_its_own_panel_initial_charge() -> None:
+    """Cumulative mass loss uses each panel's own T=0 charge as X0."""
+
+    store = _OBS_ROOTS[0] / "kems-026-markova-1984.yaml"
+    doc = yaml.safe_load(store.read_text(encoding="utf-8"))
+    panels = {
+        "VI_lherzolite": {"SiO2": "44.02", "MgO": "36.44"},
+        "V_alumina_basalt": {"SiO2": "52.32", "Al2O3": "19.13"},
+    }
+
+    for panel, signature in panels.items():
+        prefix = f"kems-026-markova-1984::markova_1984_table2_residual_melt_{panel}"
+        rows = [
+            obs
+            for obs in (doc.get("observations") or [])
+            if str(obs.get("observation_id") or "").startswith(prefix)
+            and _quantity(obs) == "mass_loss_fraction"
+        ]
+        assert len(rows) == 12, (panel, len(rows))
+        t0 = next(
+            obs
+            for obs in rows
+            if str(obs.get("observation_id") or "").endswith("::point:0")
+        )
+        charge = _printed_wt_map(t0)
+        for oxide, expected in signature.items():
+            assert charge[oxide] == as_decimal(expected), (panel, oxide, charge)
+        expected_x0 = dict(wt_pct_to_mole_fraction(charge).components)
+        for row in rows:
+            identity_x0 = _identity_composition_components(row)
+            assert identity_x0, (panel, row.get("observation_id"))
+            assert identity_x0.keys() == expected_x0.keys(), (panel, row.get("observation_id"))
+            assert all(
+                abs(identity_x0[oxide] - value) < as_decimal("1e-12")
+                for oxide, value in expected_x0.items()
+            ), (panel, row.get("observation_id"), identity_x0)
+
+
+def test_markova_1983_rows_use_each_points_own_printed_composition(
+    tmp_path: Path,
+) -> None:
+    source_path = (
+        REPO_ROOT
+        / "data"
+        / "literature"
+        / "extracts"
+        / "kems-025-markova-1983.yaml"
+    )
+    source = yaml.safe_load(source_path.read_text(encoding="utf-8"))
+    expected_by_temperature: dict[Decimal, dict[str, Decimal]] = {}
+    for block in (source.get("species") or {}).values():
+        for source_observation in block.get("observations") or []:
+            values = source_observation.get("values") or {}
+            for point in values.get("points") or []:
+                printed = point.get("composition_wt_pct")
+                if not isinstance(printed, dict):
+                    continue
+                temperature_k = as_decimal(point["T_C"]) + as_decimal("273.15")
+                expected_by_temperature[temperature_k] = {
+                    str(oxide): as_decimal(value)
+                    for oxide, value in printed.items()
+                }
+    assert len(expected_by_temperature) == 25
+
+    result = _migrate_real_extract(tmp_path, source_path.name, write=False)
+    rows = [
+        to_plain(observation)
+        for observation in result.observations.values()
+        if observation.point_conditions
+        and "printed_composition" in observation.point_conditions
+    ]
+    assert len(rows) == 25
+    assert {
+        row["identity"]["quantity"]["value"] for row in rows
+    } == {"p_partial"}
+
+    mismatches: list[str] = []
+    for row in rows:
+        identity = row["identity"]
+        temperature_k = as_decimal(identity["temperature_K"]["value"])
+        expected_wt = expected_by_temperature[temperature_k]
+        printed_wt = _printed_wt_map(row)
+        if printed_wt != expected_wt:
+            mismatches.append(f"{row['observation_id']}: printed map differs from source")
+            continue
+        expected_x = dict(wt_pct_to_mole_fraction(expected_wt).components)
+        actual_x = _identity_composition_components(row)
+        if actual_x.keys() != expected_x.keys() or any(
+            abs(actual_x[oxide] - value) >= as_decimal("1e-12")
+            for oxide, value in expected_x.items()
+        ):
+            mismatches.append(
+                f"{row['observation_id']}: identity does not match its printed map"
+            )
+    assert not mismatches, f"{len(mismatches)} composition mismatches: {mismatches}"
 
 
 def test_bulk_property_rows_do_not_use_sample_code_as_formula() -> None:
