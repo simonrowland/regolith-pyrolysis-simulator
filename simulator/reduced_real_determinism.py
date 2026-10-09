@@ -510,6 +510,12 @@ class PT0DeterminismStore:
         *,
         repair_notices: Sequence[Mapping[str, Any]] | None = None,
     ) -> None:
+        if not self._cached_real_binding_eligible(sim):
+            self._mark_uncacheable_capture(sim)
+            return
+        if not _selected_binding_capture_is_cacheable(sim, result):
+            self._mark_uncacheable_capture(sim)
+            return
         if not _is_cacheable_equilibrium_result(result):
             self._mark_uncacheable_capture(sim)
             return
@@ -530,6 +536,9 @@ class PT0DeterminismStore:
     def cached_equilibrium(self, sim: Any) -> EquilibriumResult | None:
         if not self.write_through_enabled:
             return None
+        if not self._cached_real_binding_eligible(sim):
+            self._mark_uncacheable_capture(sim)
+            return None
         key = self._equilibrium_key(sim)
         payload = self._lookup_optional(
             "equilibrium_post_record",
@@ -542,6 +551,7 @@ class PT0DeterminismStore:
         return self._equilibrium_from_payload(sim, payload)
 
     def replay_equilibrium(self, sim: Any) -> EquilibriumResult:
+        self._authorize_cached_real_replay(sim)
         payload = self._lookup(
             "equilibrium_post_record",
             self._equilibrium_key(sim),
@@ -642,6 +652,9 @@ class PT0DeterminismStore:
         if not _is_cacheable_gate_curve(curve):
             self._mark_uncacheable_capture(sim)
             return
+        if not self.gate_curve_cache_eligible(sim, curve):
+            self._mark_uncacheable_capture(sim)
+            return
         provider_role = _gate_provider_role_for_capture(sim, curve)
         key = canonical_replay_key(
             sim,
@@ -670,6 +683,29 @@ class PT0DeterminismStore:
         sim._last_reduced_real_cache_state = None
 
     def replay_gate_curve(self, sim: Any, *, fO2_log: float) -> dict[str, Any]:
+        roles = _gate_provider_roles_for_replay(sim)
+        from simulator.engine_binding_admission import EngineBindingAdmissionError
+
+        admitted: list[str] = []
+        refusals: list[EngineBindingAdmissionError] = []
+        for provider_role in roles:
+            try:
+                self._authorize_cached_real_replay(
+                    sim,
+                    provider_role=provider_role,
+                    artifact="freeze_gate_curve",
+                )
+            except EngineBindingAdmissionError as exc:
+                refusals.append(exc)
+            else:
+                admitted.append(provider_role)
+        roles = tuple(admitted)
+        if not roles:
+            if refusals:
+                raise refusals[0]
+            raise PT0CacheMiss(
+                "PT-0 cached replay miss: no admitted gate candidates"
+            )
         keys = tuple(
             canonical_replay_key(
                 sim,
@@ -680,11 +716,54 @@ class PT0DeterminismStore:
                 provider_role=provider_role,
                 control_quantization=self._control_quantization,
             )
-            for provider_role in _gate_provider_roles_for_replay(sim)
+            for provider_role in roles
         )
         payload = self._lookup_first_available("freeze_gate_curve", keys, sim=sim)
         sim._last_reduced_real_cache_state = self.last_cache_state
         return _curve_from_payload(payload["curve"])
+
+    def _cached_real_binding_eligible(
+        self,
+        sim: Any,
+        *,
+        provider_role: str | None = None,
+        artifact: str = "equilibrium_post_record",
+    ) -> bool:
+        from simulator.engine_binding_admission import (
+            live_binding_cache_eligibility,
+        )
+
+        return live_binding_cache_eligibility(
+            sim,
+            provider_role=provider_role,
+            artifact=artifact,
+        )
+
+    def gate_curve_cache_eligible(
+        self,
+        sim: Any,
+        curve: Mapping[str, Any],
+    ) -> bool:
+        from simulator.engine_binding_admission import gate_curve_memo_eligibility
+
+        return gate_curve_memo_eligibility(sim, curve)
+
+    def _authorize_cached_real_replay(
+        self,
+        sim: Any,
+        *,
+        provider_role: str | None = None,
+        artifact: str = "equilibrium_post_record",
+    ) -> None:
+        from simulator.engine_binding_admission import (
+            authorize_sim_binding_replay,
+        )
+
+        authorize_sim_binding_replay(
+            sim,
+            provider_role=provider_role,
+            artifact=artifact,
+        )
 
     def summary(self) -> dict[str, Any]:
         from simulator.interpolation_uncertainty import (
@@ -2293,6 +2372,77 @@ def record_dependency_vector(
     }
 
 
+def record_binding_producer_ids(
+    sim: Any,
+    *,
+    artifact: str,
+    provider_role: str | None = None,
+) -> tuple[str, ...]:
+    """Return non-backend producers selected for one cache artifact."""
+    if artifact == "freeze_gate_curve":
+        return ()
+    if artifact != "equilibrium_post_record":
+        raise ValueError(f"unsupported replay artifact: {artifact}")
+
+    vector = record_dependency_vector(
+        sim,
+        _equilibrium_payload_intent(sim),
+        artifact=artifact,
+        provider_role=provider_role,
+    )
+    selected: list[str] = []
+    pressure_provider = vector.get("vapor_pressure_provider_selection")
+    if pressure_provider == "builtin-vapor-pressure":
+        selected.append("builtin-vapor-pressure")
+        from engines.builtin.vapor_pressure import (
+            openimcc_binding_selected_by_inputs,
+        )
+
+        temperature_C = float(sim.melt.temperature_C)
+        if openimcc_binding_selected_by_inputs(
+            temperature_K=temperature_C + 273.15,
+            controls=getattr(sim, "setpoints", {}) or {},
+        ):
+            selected.append("openimcc")
+
+    sulfur_side = vector.get("sulfur_side", {})
+    sulfur_input = float(sulfur_side.get("S_input_ppm", 0.0) or 0.0)
+    if sulfur_input > 0.0 and getattr(sim, "_sulfsat_gate", None) is not None:
+        selected.append("sulfsat")
+    return tuple(selected)
+
+
+def _selected_binding_capture_is_cacheable(
+    sim: Any,
+    result: EquilibriumResult,
+) -> bool:
+    producer_ids = record_binding_producer_ids(
+        sim,
+        artifact="equilibrium_post_record",
+    )
+    if "openimcc" in producer_ids:
+        diagnostic = getattr(sim, "_last_vapor_pressure_diagnostic", {})
+        authority = (
+            diagnostic.get("high_t_melt_activity", {})
+            if isinstance(diagnostic, Mapping)
+            else {}
+        )
+        if not (
+            isinstance(authority, Mapping)
+            and authority.get("fallback") is not True
+            and authority.get("provider") == "openimcc"
+        ):
+            return False
+    if "sulfsat" in producer_ids:
+        sulfur_result = getattr(result, "sulfur_saturation", None)
+        if (
+            sulfur_result is None
+            or sulfur_result.calibration_status == "unavailable"
+        ):
+            return False
+    return True
+
+
 def replay_scope_dependency_vector(key: Mapping[str, Any]) -> dict[str, Any]:
     sulfur_side = key.get("sulfur_side", {})
     if not isinstance(sulfur_side, Mapping):
@@ -3438,6 +3588,8 @@ def _engine_version_provenance(
     *,
     provider_role: str | None = None,
 ) -> str | None:
+    from simulator.engine_binding_admission import pt1_version_provenance
+
     backend = getattr(sim, "backend", None)
     config = _cached_real_config(sim)
     if config is not None:
@@ -3451,7 +3603,7 @@ def _engine_version_provenance(
             version = str(
                 getattr(config, "authorized_backend_version", "")
             ).strip()
-            return version or "unavailable"
+            return pt1_version_provenance(lambda: version)
 
     live_backend = getattr(backend, "_live_backend", None)
     if live_backend is not None:
@@ -3629,22 +3781,22 @@ def _is_alphamelts_authorized_name(value: Any) -> bool:
 
 
 def _provider_engine_version(provider: Any) -> str | None:
+    from simulator.engine_binding_admission import pt1_version_provenance
+
     if provider is None:
-        return None
+        return pt1_version_provenance(
+            lambda: (_ for _ in ()).throw(AttributeError("version getter missing"))
+        )
     getter = getattr(provider, "_engine_version", None)
     if callable(getter):
-        try:
-            return str(getter())
-        except Exception:  # noqa: BLE001 - diagnostic only
-            return "unavailable"
+        return pt1_version_provenance(getter)
     backend = getattr(provider, "_backend", None)
     getter = getattr(backend, "get_engine_version", None)
     if callable(getter):
-        try:
-            return str(getter())
-        except Exception:  # noqa: BLE001 - diagnostic only
-            return "unavailable"
-    return "unavailable"
+        return pt1_version_provenance(getter)
+    return pt1_version_provenance(
+        lambda: (_ for _ in ()).throw(AttributeError("version getter missing"))
+    )
 
 
 def _equilibrium_payload_intent(sim: Any) -> ChemistryIntent:
@@ -3686,27 +3838,29 @@ def _sulfsat_available(gate: Any) -> bool:
 
 
 def _sulfsat_package_version(gate: Any) -> str:
+    from simulator.engine_binding_admission import pt1_version_provenance
+
     getter = getattr(gate, "package_version", None)
     if callable(getter):
-        try:
-            return str(getter())
-        except Exception:  # noqa: BLE001 - diagnostic only
-            return "unavailable"
+        return pt1_version_provenance(getter)
     module = getattr(gate, "_module", None)
     version = getattr(module, "__version__", None)
     if version is not None:
         return str(version)
-    return "unavailable"
+    return pt1_version_provenance(
+        lambda: (_ for _ in ()).throw(AttributeError("package version missing"))
+    )
 
 
 def _sulfsat_calibration_version(gate: Any) -> str:
+    from simulator.engine_binding_admission import pt1_version_provenance
+
     getter = getattr(gate, "calibration_version", None)
     if callable(getter):
-        try:
-            return str(getter())
-        except Exception:  # noqa: BLE001 - diagnostic only
-            return "unavailable"
-    return "unavailable"
+        return pt1_version_provenance(getter)
+    return pt1_version_provenance(
+        lambda: (_ for _ in ()).throw(AttributeError("calibration version missing"))
+    )
 
 
 def _cached_real_config(sim: Any) -> Any | None:
@@ -4080,15 +4234,14 @@ def _backend_class_for_key(backend: Any) -> str:
 
 
 def _backend_version_for_key(backend: Any) -> str:
+    from simulator.engine_binding_admission import pt1_version_provenance
+
     getter = getattr(backend, "get_engine_version", None)
     if callable(getter):
-        try:
-            version = str(getter()).strip()
-        except Exception:  # noqa: BLE001 - diagnostic cache identity only
-            version = "unavailable"
-        if version:
-            return version
-    return "unavailable"
+        return pt1_version_provenance(getter)
+    return pt1_version_provenance(
+        lambda: (_ for _ in ()).throw(AttributeError("version getter missing"))
+    )
 
 
 def _is_alphamelts_backend(backend: Any) -> bool:
