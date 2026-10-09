@@ -74,6 +74,7 @@ sample_characterization:
       units: as_published
       values:
         method_class: quoted_attributed
+        attribution: 'Morris 1978 (for Is/FeO = 77)'
         evidence_class: quoted_attributed
         sample_id: '15013'
         maturity_index_Is_FeO: 77
@@ -87,6 +88,7 @@ sample_characterization:
       units: as_published
       values:
         method_class: quoted_attributed
+        attribution: 'Moore et al. 1973; Des Marais et al. 1973; Kothari and Goel 1972; Muller 1973'
         evidence_class: quoted_attributed
         sample_id: '15013'
         carbon_ppm:
@@ -107,7 +109,7 @@ sample_characterization:
         evidence_class: figure_only
         quantity: grain_size_distribution
         sample_id: '15013'
-        source_attribution: 'Graf 1993'
+        attribution: 'Graf 1993'
         plotted_values: not_digitized
     - observation_id: lpi_15013_maturity_carbon_figure_only
       type: sample_characterization
@@ -118,7 +120,7 @@ sample_characterization:
         evidence_class: figure_only
         quantity: maturity_index_vs_carbon_content
         plotted_values: not_digitized
-        source_attribution: 'Moore et al. 1973; Morris 1978'
+        attribution: 'Moore et al. 1973; Morris 1978'
     - observation_id: lpi_15013_ree_normalized_pattern_figure_only
       type: composition_pattern
       locator: {source_path: /Users/simonrowland/Repos/regolith-corpus/raw/lpi-compendium-15013/lpi-compendium-15013.pdf, pdf_page_index: 2, figure: '4'}
@@ -128,7 +130,7 @@ sample_characterization:
         evidence_class: figure_only
         quantity: rare_earth_element_pattern
         sample_id: '15013'
-        source_attribution: 'Korotev 1987'
+        attribution: 'Korotev 1987'
         plotted_values: not_digitized
 chemical_composition:
   sample_15013_and_reference_materials:
@@ -204,7 +206,7 @@ chemical_composition:
         evidence_class: quoted_attributed
         quantity: low_temperature_vacuum_release_of_lm_exhaust_breakdown_products
         species_reported: [NO2, H2O, CO2]
-        source_attribution: 'Simoneit et al. 1973'
+        attribution: 'Simoneit et al. 1973'
         note: 'The page text says these products could be released at relatively low temperatures in a vacuum; it gives no numeric release temperature in prose.'
     - observation_id: lpi_15013_volatile_release_curve_figure_only
       type: volatile_release_context
@@ -215,7 +217,7 @@ chemical_composition:
         evidence_class: figure_only
         quantity: volatile_release_curve
         comparison_sample: '15020'
-        source_attribution: 'Gibson and Moore 1972'
+        attribution: 'Gibson and Moore 1972'
         plotted_values: not_digitized
 species:
   sample_15013: {observations: *sample_15013_observations}
