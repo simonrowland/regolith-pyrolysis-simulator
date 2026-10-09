@@ -5064,6 +5064,36 @@ def test_reference_prose_keeps_printed_endmember_and_does_not_stamp_one_bar() ->
     assert henry.value.endmember.phase.value is Phase.L
 
 
+def test_ts1985_and_yam1983_tridymite_reference_state_baseline() -> None:
+    ts1985 = next(
+        row
+        for row in _extract_observations("ts1985.yaml")
+        if row.get("observation_id") == "ts1985_sio2_gibbs_duhem_1200C_X0500"
+    )
+    ts_state = reference_state_from_extract(
+        ts1985["standard_state"], species_formula="SiO2", values=ts1985["values"]
+    )
+    assert ts_state is not None and ts_state.is_value
+    assert ts_state.value.endmember.polymorph is not None
+    assert ts_state.value.endmember.polymorph.is_unknown
+    assert ts_state.value.endmember.polymorph.reason == (
+        "source does not state polymorph"
+    )
+
+    yam1983 = next(
+        row
+        for row in _extract_observations("yam1983.yaml")
+        if row.get("observation_id") == "yam1983_sio2_table2_minus_log10_a_AT_B"
+    )
+    yam_state = reference_state_from_extract(
+        yam1983["standard_state"], species_formula="SiO2", values=yam1983["values"]
+    )
+    assert yam_state is not None and yam_state.is_unknown
+    assert yam_state.reason == (
+        "source standard_state does not name one reference endmember"
+    )
+
+
 def test_reference_prose_rejects_ambiguous_or_negated_raoult_conventions() -> None:
     furukawa = next(
         row
