@@ -199,10 +199,10 @@ species:
         note: Solid Al2O3 standard state as printed.
         locator: {published_page: 985, pdf_page_index: 3, section: '3.1'}
       units: dimensionless activity
-      derived_from: [unknown:ohta-1996-cao-mgo-al2o3-activities]
+      derived_from: [tables:ohta-1996-cao-mgo-al2o3-activities]
       derivation:
         relation: 'a(Al2O3)=0.14 at mark A from ΔG°spinel = −18800 − 6.3T J/mol for MgO(s)+Al2O3(s)=MgO·Al2O3(s), as printed.'
-        inputs: [unknown:ohta-1996-cao-mgo-al2o3-activities]
+        inputs: [tables:ohta-1996-cao-mgo-al2o3-activities]
         output_unit: dimensionless activity
       values:
         quantity: activity
@@ -220,10 +220,10 @@ species:
         note: Solid Al2O3 standard state as printed.
         locator: {published_page: 985, pdf_page_index: 3, section: '3.1'}
       units: dimensionless activity
-      derived_from: [unknown:ohta-1996-cao-mgo-al2o3-activities]
+      derived_from: [tables:ohta-1996-cao-mgo-al2o3-activities]
       derivation:
         relation: 'a(Al2O3)=0.13 at mark A'' from ΔG°spinel = −18800 − 6.3T J/mol for MgO(s)+Al2O3(s)=MgO·Al2O3(s), as printed.'
-        inputs: [unknown:ohta-1996-cao-mgo-al2o3-activities]
+        inputs: [tables:ohta-1996-cao-mgo-al2o3-activities]
         output_unit: dimensionless activity
       values:
         quantity: activity
@@ -241,10 +241,10 @@ species:
         note: Solid Al2O3 standard state as printed.
         locator: {published_page: 985, pdf_page_index: 3, section: '3.1'}
       units: dimensionless activity
-      derived_from: [unknown:ohta-1996-cao-mgo-al2o3-activities]
+      derived_from: [tables:ohta-1996-cao-mgo-al2o3-activities]
       derivation:
         relation: 'a(Al2O3)=0.83 at mark B from ΔG°CA2 = −16700 − 25.5T J/mol for CaO(s)+2Al2O3(s)=CaO·2Al2O3(s), using a(CaO) assessed in this study.'
-        inputs: [unknown:ohta-1996-cao-mgo-al2o3-activities]
+        inputs: [tables:ohta-1996-cao-mgo-al2o3-activities]
         output_unit: dimensionless activity
       values:
         quantity: activity
@@ -262,10 +262,10 @@ species:
         note: Solid Al2O3 standard state as printed.
         locator: {published_page: 985, pdf_page_index: 3, section: '3.1'}
       units: dimensionless activity
-      derived_from: [unknown:ohta-1996-cao-mgo-al2o3-activities]
+      derived_from: [tables:ohta-1996-cao-mgo-al2o3-activities]
       derivation:
         relation: 'a(Al2O3)=0.83 at mark B'' from ΔG°CA2 = −16700 − 25.5T J/mol for CaO(s)+2Al2O3(s)=CaO·2Al2O3(s), using a(CaO) assessed in this study.'
-        inputs: [unknown:ohta-1996-cao-mgo-al2o3-activities]
+        inputs: [tables:ohta-1996-cao-mgo-al2o3-activities]
         output_unit: dimensionless activity
       values:
         quantity: activity
@@ -343,10 +343,10 @@ species:
       phase: liquid slag
       standard_state: liquid Fe_tO
       units: dimensionless activity coefficient
-      derived_from: [unknown:ohta-1996-cao-mgo-al2o3-activities]
+      derived_from: [tables:ohta-1996-cao-mgo-al2o3-activities]
       derivation:
         relation: 'The temperature-independent γ(Fe_tO)=0.51 ± 0.23 was estimated from measured O contents, interaction coefficients for f_Al, and ΔG° = −116100 + 48.79T J/mol for Fe(l)+O=Fe_tO(l), as printed.'
-        inputs: [unknown:ohta-1996-cao-mgo-al2o3-activities]
+        inputs: [tables:ohta-1996-cao-mgo-al2o3-activities]
         output_unit: dimensionless activity coefficient
       uncertainty: {absolute: 0.23, note: 'Printed as 0.51 ± 0.23.'}
       values:
@@ -363,10 +363,10 @@ species:
       phase: liquid slag
       standard_state: solid MnO
       units: dimensionless activity coefficient
-      derived_from: [unknown:ohta-1996-cao-mgo-al2o3-activities]
+      derived_from: [tables:ohta-1996-cao-mgo-al2o3-activities]
       derivation:
         relation: 'The temperature-independent γ(MnO)=0.82 ± 0.30 was estimated from measured Mn and O contents, interaction coefficients for f_Al and f_Mn, and ΔG° = −288100 + 128.3T J/mol for Mn+O=MnO(s), as printed.'
-        inputs: [unknown:ohta-1996-cao-mgo-al2o3-activities]
+        inputs: [tables:ohta-1996-cao-mgo-al2o3-activities]
         output_unit: dimensionless activity coefficient
       uncertainty: {absolute: 0.30, note: 'Printed as 0.82 ± 0.30.'}
       values:
@@ -382,10 +382,10 @@ species:
       T_range_K: [1873.0, 1873.0]
       phase: liquid iron
       units: Wagner interaction parameter
-      derived_from: [unknown:ohta-1996-cao-mgo-al2o3-activities]
+      derived_from: [tables:ohta-1996-cao-mgo-al2o3-activities]
       derivation:
         relation: 'Eq. (9): log K''Mg − log aMgO + Σe_j^O[mass% j] + Σe_k^Mg[mass% k] = −e_O^Mg([mass% Mg] + M_Mg/M_O·[mass% O]) + log K_Mg. The 1873 K slope gives e_O^Mg = −300 ± 100, as printed.'
-        inputs: [unknown:ohta-1996-cao-mgo-al2o3-activities]
+        inputs: [tables:ohta-1996-cao-mgo-al2o3-activities]
         output_unit: Wagner interaction parameter
       uncertainty: {absolute: 100, note: 'Printed as −300 ± 100.'}
       values:
@@ -401,10 +401,10 @@ species:
       T_range_K: [1873.0, 1873.0]
       phase: liquid iron
       units: Wagner interaction parameter
-      derived_from: [unknown:ohta-1996-cao-mgo-al2o3-activities]
+      derived_from: [tables:ohta-1996-cao-mgo-al2o3-activities]
       derivation:
         relation: 'Eq. (9): log K''Mg − log aMgO + Σe_j^O[mass% j] + Σe_k^Mg[mass% k] = −e_O^Mg([mass% Mg] + M_Mg/M_O·[mass% O]) + log K_Mg. The reported coupled parameter is e_Mg^O = −460 ± 150, as printed.'
-        inputs: [unknown:ohta-1996-cao-mgo-al2o3-activities]
+        inputs: [tables:ohta-1996-cao-mgo-al2o3-activities]
         output_unit: Wagner interaction parameter
       uncertainty: {absolute: 150, note: 'Printed as −460 ± 150.'}
       values:
