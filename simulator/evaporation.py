@@ -361,7 +361,17 @@ def refuse_viscous_p_bulk_out_of_domain(
 # NOTE: the evaporation alpha default lives at engines/builtin/evaporation_flux.py
 # (_DEFAULT_EVAPORATION_ALPHA), which is the authoritative flux path; the former
 # duplicate here was dead (unused, not imported) and was removed (SC-09 / BUG-051).
-_EVAPORATION_ALPHA_GROUPS = ("metals", "oxide_vapors")
+_EVAPORATION_ALPHA_GROUPS = ("metals", "oxide_vapors", "t1139_generated_carriers")
+
+
+def _evaporation_species_data(vapor_pressures: Mapping[str, Any], species: str) -> dict:
+    for group in _EVAPORATION_ALPHA_GROUPS:
+        row = (vapor_pressures.get(group, {}) or {}).get(species, {})
+        if row:
+            return row
+    return {}
+
+
 def _diagnostic_names_composition_projected(
     diagnostic: Mapping[str, Any] | None,
 ) -> bool:
@@ -2795,9 +2805,6 @@ class EvaporationMixin:
         stoich_by_species: dict[str, dict] = {}
         available_oxide_kg: dict[str, float] = {}
 
-        metals_data = self.vapor_pressures.get('metals', {}) or {}
-        oxide_vapors_data = self.vapor_pressures.get('oxide_vapors', {}) or {}
-
         cleaned_melt_kg = self.atom_ledger.kg_by_account(
             'process.cleaned_melt')
         spent_reductant_residue_kg = self.atom_ledger.kg_by_account(
@@ -2805,9 +2812,7 @@ class EvaporationMixin:
         projection_parity_tolerance_pct = 5.0e-12
 
         for species in vapor_pressures:
-            sp_data = metals_data.get(species, {})
-            if not sp_data:
-                sp_data = oxide_vapors_data.get(species, {})
+            sp_data = _evaporation_species_data(self.vapor_pressures, species)
 
             M_g_mol = sp_data.get('molar_mass_g_mol')
             if M_g_mol is None:
@@ -3284,14 +3289,7 @@ class EvaporationMixin:
             )
             stoich = dict(stoich_by_species.get(species) or {})
             if not stoich:
-                sp_data = dict(
-                    (self.vapor_pressures.get('metals', {}) or {}).get(
-                        species, {}
-                    )
-                    or (self.vapor_pressures.get('oxide_vapors', {}) or {}).get(
-                        species, {}
-                    )
-                )
+                sp_data = dict(_evaporation_species_data(self.vapor_pressures, species))
                 if sp_data:
                     stoich = dict(self._evaporation_stoich(species, sp_data))
             o2_kg_hr = rate_kg_hr * float(
@@ -3371,8 +3369,6 @@ class EvaporationMixin:
                 for species, rate in raw_rates_kg_hr.items()
             }
 
-        metals_data = self.vapor_pressures.get('metals', {}) or {}
-        oxide_vapors_data = self.vapor_pressures.get('oxide_vapors', {}) or {}
         parent_groups: dict[str, list[dict]] = defaultdict(list)
         multi_entries: list[dict] = []
 
@@ -3383,9 +3379,7 @@ class EvaporationMixin:
             )
             if raw_rate_kg_hr <= 1e-12:
                 continue
-            sp_data = metals_data.get(species, {})
-            if not sp_data:
-                sp_data = oxide_vapors_data.get(species, {})
+            sp_data = _evaporation_species_data(self.vapor_pressures, species)
             stoich = self._evaporation_stoich(species, sp_data)
             vector = stoich.get('reactants_kg_per_vapor')
             if isinstance(vector, Mapping) and len(vector) > 1:
@@ -3748,11 +3742,7 @@ class EvaporationMixin:
                 'authority_status': authority.get('status'),
             }
 
-        metals_data = self.vapor_pressures.get('metals', {})
-        oxide_vapors_data = self.vapor_pressures.get('oxide_vapors', {})
-        sp_data = metals_data.get(species, {})
-        if not sp_data:
-            sp_data = oxide_vapors_data.get(species, {})
+        sp_data = _evaporation_species_data(self.vapor_pressures, species)
 
         stoich = self._evaporation_stoich(species, sp_data)
         if stoich is None:
