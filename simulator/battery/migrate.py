@@ -5373,7 +5373,7 @@ def lineage_parents_from_source(
             # The source's root table asset is a stable lineage link. More
             # specific table filenames resolve only when registered.
             parents.append(item)
-        elif item.startswith("tables:") and item in asset_ids:
+        elif item in asset_ids:
             parents.append(item)
         elif "::" in item:
             # Source-stated qualified pointer; kept as written. If it

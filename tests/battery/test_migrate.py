@@ -1120,6 +1120,16 @@ def test_lineage_parents_from_source_never_invents_pointer() -> None:
     assert parents == ("tables:src/t2.csv",)
     assert prose == ()
 
+    parents, prose = lineage_parents_from_source(
+        {"derived_from": ["pdf:src"]},
+        {},
+        "src",
+        set(),
+        asset_ids={"pdf:src"},
+    )
+    assert parents == ("pdf:src",)
+    assert prose == ()
+
     assert lineage_parents_from_source({}, {}, "src", {"local_a"}) == ((), ())
 
 
