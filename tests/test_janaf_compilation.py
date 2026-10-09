@@ -219,9 +219,11 @@ def test_cu020_1600k_enthalpy_uses_the_page_read_sign() -> None:
         "SHA-256 d161dc6535ffa6c579357f7489573f402610fbbf94018d703b6aa350c59d3773; "
         "printed p. 1024"
     )
-    assert enthalpy["locator"]["crop_note"].endswith(
-        "cu020-page1024-dfh-1500-1700.png; 300 dpi crop shows the "
-        "ΔfH° header and the 1500, 1600, and 1700 K rows"
+    assert enthalpy["locator"]["crop_note"] == (
+        "https://janaf.nist.gov/pdf/JANAF-FourthEd-1998-Copper.pdf#page=20; "
+        "SHA-256 d161dc6535ffa6c579357f7489573f402610fbbf94018d703b6aa350c59d3773; "
+        "printed p. 1024 / PDF p. 20, Table Cu-020, rows 1500, 1600, and 1700 K; "
+        "crop shows the ΔfH° header and row signs."
     )
 
     parsed = parse_janaf_txt(
