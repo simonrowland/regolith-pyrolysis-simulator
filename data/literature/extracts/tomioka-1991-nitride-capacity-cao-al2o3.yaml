@@ -13,7 +13,7 @@ extraction:
     (Rein & Chipman via Ozturk & Turkdogan).
   date: '2026-10-04'
   worker: empirical-cao-al2o3-slot-06
-  provenance_path: ferry-inbox/cao-al2o3-sources/tomioka-1991-nitride-capacity-cao-al2o3/
+  provenance_path: https://www.jstage.jst.go.jp/article/isijinternational1989/31/11/31_11_1316/_pdf
 review_status: draft
 fidelity_samples:
 - path: species.Al2O3.observations[tomioka_1991_alumina_activity_1].values.activity
@@ -91,9 +91,9 @@ species:
       values:
         equations_as_printed:
           equation_4: 2 Al + 3/2 O2(g) = Al2O3(s)
-          equation_5: ΔG°4 = −1554000 + 377.6 T J/mol
+          equation_5: ΔG°4 = −1 554 000 + 377.6 T J/mol
           equation_6: 1/2 Al2O3(s) + 1/2 N2(g) = AlN(s) + 3/4 O2(g)
-          equation_7: ΔG°6 = 516600 − 47.91 T J/mol
+          equation_7: ΔG°6 = 516 600 − 47.91 T J/mol
           equation_8: γ_AlN = (K6 / α_AlN) a_Al2O3^(1/2) / C_N3−
           alpha_AlN_definition: mole fraction of AlN divided by mass% N
     - observation_id: tomioka_1991_liquidus_molar_ratio_ranges
@@ -125,8 +125,7 @@ species:
       phase: liquid CaO-Al2O3 (crucible-saturated)
       units: mass ratio (Ca)/(Al); (N)x10^4 mass%; log(Po2/atm); log CN3-
       values:
-        table_title_as_printed: 'Table 1. Equilibrium data for the gas-slag experiments in CaO-Al2O3 melts using the 90%N2-10%H2
-          gas mixture.'
+        table_title_as_printed: 'Table 1. Equilibrium data for the gas-slag experiments in CaO-Al2O3 melts using the 90%N2-10%H2 gas mixture.'
         columns_as_printed: 'Time (h); (Ca)/(Al); (N)x10^4 (mass%); log(Po2/atm); log CN3-'
         footnotes_as_printed:
         - '* 0.05 mass% AlN added'
@@ -136,231 +135,420 @@ species:
         row_count_CaO_crucible: 7
         row_count_Mo_crucible: 4
         row_count_total: 30
-        note: >-
-          Full Table 1 transcription (Al2O3 + CaO + Mo crucible blocks) from page image + pdftotext -raw cross-check.
-          Asterisk footnotes mapped to boolean flags on rows. No a(CaO) invented; Fig. 7 remains figure_only.
+        note: Table 1 row data are stored in the row-level observation below; Fig. 7 remains figure_only.
+    observations:
+    - observation_id: tomioka_1991_table1_nitride_capacity
+      type: concentration_series
+      locator:
+        published_page: 1319
+        pdf_page_index: 4
+        table: '1'
+      T_range_K: [1723.0, 1923.0]
+      phase: liquid CaO-Al2O3 (crucible-saturated)
+      units: mass ratio (Ca)/(Al); (N)x10^4 mass%; log(Po2/atm); log CN3-
+      values:
+        quantity: nitride_capacity_log10
         rows:
         - T_K: 1723
-          crucible: Al2O3
+          T_K_as_printed: "1723"
+          crucible: "Al2O3"
           time_h: 2
+          time_h_as_printed: "2"
           Ca_over_Al_mass_ratio: 1.09
+          Ca_over_Al_mass_ratio_as_printed: "1.09"
           N_times_1e4_mass_pct: 3.3
+          N_times_1e4_mass_pct_as_printed: "3.3"
           log_Po2_atm: -14.53
+          log_Po2_atm_as_printed: "-14.53"
           log_CN3: -14.36
+          log_CN3_as_printed: "-14.36"
         - T_K: 1723
-          crucible: Al2O3
+          T_K_as_printed: "1723"
+          crucible: "Al2O3"
           time_h: 9
+          time_h_as_printed: "9"
           Ca_over_Al_mass_ratio: 1.07
+          Ca_over_Al_mass_ratio_as_printed: "1.07"
           N_times_1e4_mass_pct: 22.3
+          N_times_1e4_mass_pct_as_printed: "22.3"
           log_Po2_atm: -15.43
+          log_Po2_atm_as_printed: "-15.43"
           log_CN3: -14.2
+          log_CN3_as_printed: "-14.20"
         - T_K: 1723
-          crucible: Al2O3
+          T_K_as_printed: "1723"
+          crucible: "Al2O3"
           time_h: 18
+          time_h_as_printed: "18"
           Ca_over_Al_mass_ratio: 1.14
+          Ca_over_Al_mass_ratio_as_printed: "1.14"
           N_times_1e4_mass_pct: 24.0
+          N_times_1e4_mass_pct_as_printed: "24.0"
           log_Po2_atm: -15.43
+          log_Po2_atm_as_printed: "-15.43"
           log_CN3: -14.17
+          log_CN3_as_printed: "-14.17"
         - T_K: 1723
-          crucible: Al2O3
+          T_K_as_printed: "1723"
+          crucible: "Al2O3"
           time_h: 24
+          time_h_as_printed: "24"
           Ca_over_Al_mass_ratio: 1.12
+          Ca_over_Al_mass_ratio_as_printed: "1.12"
           N_times_1e4_mass_pct: 20.4
+          N_times_1e4_mass_pct_as_printed: "20.4"
           log_Po2_atm: -15.33
+          log_Po2_atm_as_printed: "-15.33"
           log_CN3: -14.16
+          log_CN3_as_printed: "-14.16"
         - T_K: 1723
-          crucible: Al2O3
+          T_K_as_printed: "1723"
+          crucible: "Al2O3"
           time_h: 18
+          time_h_as_printed: "18"
           Ca_over_Al_mass_ratio: 1.07
+          Ca_over_Al_mass_ratio_as_printed: "1.07"
           N_times_1e4_mass_pct: 12.3
+          N_times_1e4_mass_pct_as_printed: "12.3"
           log_Po2_atm: -15.09
+          log_Po2_atm_as_printed: "-15.09"
           log_CN3: -14.2
+          log_CN3_as_printed: "-14.20"
           AlN_added_0p05_mass_pct: true
         - T_K: 1723
-          crucible: Al2O3
+          T_K_as_printed: "1723"
+          crucible: "Al2O3"
           time_h: 24
+          time_h_as_printed: "24"
           Ca_over_Al_mass_ratio: 1.13
+          Ca_over_Al_mass_ratio_as_printed: "1.13"
           N_times_1e4_mass_pct: 14.1
+          N_times_1e4_mass_pct_as_printed: "14.1"
           log_Po2_atm: -15.12
+          log_Po2_atm_as_printed: "-15.12"
           log_CN3: -14.17
+          log_CN3_as_printed: "-14.17"
           AlN_added_0p05_mass_pct: true
         - T_K: 1773
-          crucible: Al2O3
+          T_K_as_printed: "1773"
+          crucible: "Al2O3"
           time_h: 18
+          time_h_as_printed: "18"
           Ca_over_Al_mass_ratio: 1.04
+          Ca_over_Al_mass_ratio_as_printed: "1.04"
           N_times_1e4_mass_pct: 13.9
+          N_times_1e4_mass_pct_as_printed: "13.9"
           log_Po2_atm: -14.14
+          log_Po2_atm_as_printed: "-14.14"
           log_CN3: -13.44
+          log_CN3_as_printed: "-13.44"
         - T_K: 1773
-          crucible: Al2O3
+          T_K_as_printed: "1773"
+          crucible: "Al2O3"
           time_h: 18
+          time_h_as_printed: "18"
           Ca_over_Al_mass_ratio: 1.05
+          Ca_over_Al_mass_ratio_as_printed: "1.05"
           N_times_1e4_mass_pct: 13.6
+          N_times_1e4_mass_pct_as_printed: "13.6"
           log_Po2_atm: -14.17
+          log_Po2_atm_as_printed: "-14.17"
           log_CN3: -13.47
+          log_CN3_as_printed: "-13.47"
           AlN_added_0p05_mass_pct: true
         - T_K: 1823
-          crucible: Al2O3
+          T_K_as_printed: "1823"
+          crucible: "Al2O3"
           time_h: 18
+          time_h_as_printed: "18"
           Ca_over_Al_mass_ratio: 0.92
+          Ca_over_Al_mass_ratio_as_printed: "0.92"
           N_times_1e4_mass_pct: 84.0
+          N_times_1e4_mass_pct_as_printed: "84.0"
           log_Po2_atm: -14.44
+          log_Po2_atm_as_printed: "-14.44"
           log_CN3: -12.88
+          log_CN3_as_printed: "-12.88"
         - T_K: 1823
-          crucible: Al2O3
+          T_K_as_printed: "1823"
+          crucible: "Al2O3"
           time_h: 18
+          time_h_as_printed: "18"
           Ca_over_Al_mass_ratio: 0.9
+          Ca_over_Al_mass_ratio_as_printed: "0.90"
           N_times_1e4_mass_pct: 88.1
+          N_times_1e4_mass_pct_as_printed: "88.1"
           log_Po2_atm: -14.41
+          log_Po2_atm_as_printed: "-14.41"
           log_CN3: -12.84
+          log_CN3_as_printed: "-12.84"
         - T_K: 1823
-          crucible: Al2O3
+          T_K_as_printed: "1823"
+          crucible: "Al2O3"
           time_h: 18
+          time_h_as_printed: "18"
           Ca_over_Al_mass_ratio: 0.89
+          Ca_over_Al_mass_ratio_as_printed: "0.89"
           N_times_1e4_mass_pct: 39.2
+          N_times_1e4_mass_pct_as_printed: "39.2"
           log_Po2_atm: -13.86
+          log_Po2_atm_as_printed: "-13.86"
           log_CN3: -12.78
+          log_CN3_as_printed: "-12.78"
           AlN_added_0p05_mass_pct: true
         - T_K: 1823
-          crucible: Al2O3
+          T_K_as_printed: "1823"
+          crucible: "Al2O3"
           time_h: 18
+          time_h_as_printed: "18"
           Ca_over_Al_mass_ratio: 0.92
+          Ca_over_Al_mass_ratio_as_printed: "0.92"
           N_times_1e4_mass_pct: 82.8
+          N_times_1e4_mass_pct_as_printed: "82.8"
           log_Po2_atm: -14.44
+          log_Po2_atm_as_printed: "-14.44"
           log_CN3: -12.89
+          log_CN3_as_printed: "-12.89"
           AlN_added_0p05_mass_pct: true
         - T_K: 1823
-          crucible: Al2O3
+          T_K_as_printed: "1823"
+          crucible: "Al2O3"
           time_h: 18
+          time_h_as_printed: "18"
           Ca_over_Al_mass_ratio: 0.91
+          Ca_over_Al_mass_ratio_as_printed: "0.91"
           N_times_1e4_mass_pct: 189.5
+          N_times_1e4_mass_pct_as_printed: "189.5"
           log_Po2_atm: -15.07
+          log_Po2_atm_as_printed: "-15.07"
           log_CN3: -13.0
+          log_CN3_as_printed: "-13.00"
         - T_K: 1873
-          crucible: Al2O3
+          T_K_as_printed: "1873"
+          crucible: "Al2O3"
           time_h: 18
+          time_h_as_printed: "18"
           Ca_over_Al_mass_ratio: 0.71
+          Ca_over_Al_mass_ratio_as_printed: "0.71"
           N_times_1e4_mass_pct: 59.8
+          N_times_1e4_mass_pct_as_printed: "59.8"
           log_Po2_atm: -13.34
+          log_Po2_atm_as_printed: "-13.34"
           log_CN3: -12.21
+          log_CN3_as_printed: "-12.21"
         - T_K: 1873
-          crucible: Al2O3
+          T_K_as_printed: "1873"
+          crucible: "Al2O3"
           time_h: 24
+          time_h_as_printed: "24"
           Ca_over_Al_mass_ratio: 0.73
+          Ca_over_Al_mass_ratio_as_printed: "0.73"
           N_times_1e4_mass_pct: 73.0
+          N_times_1e4_mass_pct_as_printed: "73.0"
           log_Po2_atm: -13.34
+          log_Po2_atm_as_printed: "-13.34"
           log_CN3: -12.12
+          log_CN3_as_printed: "-12.12"
         - T_K: 1923
-          crucible: Al2O3
+          T_K_as_printed: "1923"
+          crucible: "Al2O3"
           time_h: 12
+          time_h_as_printed: "12"
           Ca_over_Al_mass_ratio: 0.65
+          Ca_over_Al_mass_ratio_as_printed: "0.65"
           N_times_1e4_mass_pct: 230.9
+          N_times_1e4_mass_pct_as_printed: "230.9"
           log_Po2_atm: -13.41
+          log_Po2_atm_as_printed: "-13.41"
           log_CN3: -11.67
+          log_CN3_as_printed: "-11.67"
         - T_K: 1923
-          crucible: Al2O3
+          T_K_as_printed: "1923"
+          crucible: "Al2O3"
           time_h: 15
+          time_h_as_printed: "15"
           Ca_over_Al_mass_ratio: 0.63
+          Ca_over_Al_mass_ratio_as_printed: "0.63"
           N_times_1e4_mass_pct: 219.0
+          N_times_1e4_mass_pct_as_printed: "219.0"
           log_Po2_atm: -13.47
+          log_Po2_atm_as_printed: "-13.47"
           log_CN3: -11.74
+          log_CN3_as_printed: "-11.74"
         - T_K: 1923
-          crucible: Al2O3
+          T_K_as_printed: "1923"
+          crucible: "Al2O3"
           time_h: 15
+          time_h_as_printed: "15"
           Ca_over_Al_mass_ratio: 0.62
+          Ca_over_Al_mass_ratio_as_printed: "0.62"
           N_times_1e4_mass_pct: 248.3
+          N_times_1e4_mass_pct_as_printed: "248.3"
           log_Po2_atm: -13.47
+          log_Po2_atm_as_printed: "-13.47"
           log_CN3: -11.68
+          log_CN3_as_printed: "-11.68"
           AlN_added_0p05_mass_pct: true
         - T_K: 1923
-          crucible: Al2O3
+          T_K_as_printed: "1923"
+          crucible: "Al2O3"
           time_h: 16
+          time_h_as_printed: "16"
           Ca_over_Al_mass_ratio: 0.62
+          Ca_over_Al_mass_ratio_as_printed: "0.62"
           N_times_1e4_mass_pct: 23.9
+          N_times_1e4_mass_pct_as_printed: "23.9"
           log_Po2_atm: -12.14
+          log_Po2_atm_as_printed: "-12.14"
           log_CN3: -11.7
+          log_CN3_as_printed: "-11.70"
           H2SO4_75_mass_pct_in_saturator: true
         - T_K: 1723
-          crucible: CaO
+          T_K_as_printed: "1723"
+          crucible: "CaO"
           time_h: 12
+          time_h_as_printed: "12"
           Ca_over_Al_mass_ratio: 1.43
+          Ca_over_Al_mass_ratio_as_printed: "1.43"
           N_times_1e4_mass_pct: 15.7
+          N_times_1e4_mass_pct_as_printed: "15.7"
           log_Po2_atm: -15.3
+          log_Po2_atm_as_printed: "-15.30"
           log_CN3: -14.26
+          log_CN3_as_printed: "-14.26"
         - T_K: 1723
-          crucible: CaO
+          T_K_as_printed: "1723"
+          crucible: "CaO"
           time_h: 12
+          time_h_as_printed: "12"
           Ca_over_Al_mass_ratio: 1.51
+          Ca_over_Al_mass_ratio_as_printed: "1.51"
           N_times_1e4_mass_pct: 8.9
+          N_times_1e4_mass_pct_as_printed: "8.9"
           log_Po2_atm: -15.04
+          log_Po2_atm_as_printed: "-15.04"
           log_CN3: -14.31
+          log_CN3_as_printed: "-14.31"
           AlN_added_0p05_mass_pct: true
         - T_K: 1723
-          crucible: CaO
+          T_K_as_printed: "1723"
+          crucible: "CaO"
           time_h: 15
+          time_h_as_printed: "15"
           Ca_over_Al_mass_ratio: 1.37
+          Ca_over_Al_mass_ratio_as_printed: "1.37"
           N_times_1e4_mass_pct: 16.3
+          N_times_1e4_mass_pct_as_printed: "16.3"
           log_Po2_atm: -15.35
+          log_Po2_atm_as_printed: "-15.35"
           log_CN3: -14.28
+          log_CN3_as_printed: "-14.28"
         - T_K: 1773
-          crucible: CaO
+          T_K_as_printed: "1773"
+          crucible: "CaO"
           time_h: 12
+          time_h_as_printed: "12"
           Ca_over_Al_mass_ratio: 1.71
+          Ca_over_Al_mass_ratio_as_printed: "1.71"
           N_times_1e4_mass_pct: 140.8
+          N_times_1e4_mass_pct_as_printed: "140.8"
           log_Po2_atm: -16.22
+          log_Po2_atm_as_printed: "-16.22"
           log_CN3: -13.99
+          log_CN3_as_printed: "-13.99"
         - T_K: 1773
-          crucible: CaO
+          T_K_as_printed: "1773"
+          crucible: "CaO"
           time_h: 12
+          time_h_as_printed: "12"
           Ca_over_Al_mass_ratio: 1.74
+          Ca_over_Al_mass_ratio_as_printed: "1.74"
           N_times_1e4_mass_pct: 5.6
+          N_times_1e4_mass_pct_as_printed: "5.6"
           log_Po2_atm: -14.48
+          log_Po2_atm_as_printed: "-14.48"
           log_CN3: -14.09
+          log_CN3_as_printed: "-14.09"
         - T_K: 1823
-          crucible: CaO
+          T_K_as_printed: "1823"
+          crucible: "CaO"
           time_h: 6
+          time_h_as_printed: "6"
           Ca_over_Al_mass_ratio: 1.88
+          Ca_over_Al_mass_ratio_as_printed: "1.88"
           N_times_1e4_mass_pct: 7.6
+          N_times_1e4_mass_pct_as_printed: "7.6"
           log_Po2_atm: -14.25
+          log_Po2_atm_as_printed: "-14.25"
           log_CN3: -13.78
+          log_CN3_as_printed: "-13.78"
         - T_K: 1823
-          crucible: CaO
+          T_K_as_printed: "1823"
+          crucible: "CaO"
           time_h: 6
+          time_h_as_printed: "6"
           Ca_over_Al_mass_ratio: 1.9
+          Ca_over_Al_mass_ratio_as_printed: "1.90"
           N_times_1e4_mass_pct: 10.6
+          N_times_1e4_mass_pct_as_printed: "10.6"
           log_Po2_atm: -14.25
+          log_Po2_atm_as_printed: "-14.25"
           log_CN3: -13.64
+          log_CN3_as_printed: "-13.64"
           AlN_added_0p05_mass_pct: true
         - T_K: 1823
-          crucible: Mo
+          T_K_as_printed: "1823"
+          crucible: "Mo"
           time_h: 18
+          time_h_as_printed: "18"
           Ca_over_Al_mass_ratio: 1.75
+          Ca_over_Al_mass_ratio_as_printed: "1.75"
           N_times_1e4_mass_pct: 107.9
+          N_times_1e4_mass_pct_as_printed: "107.9"
           log_Po2_atm: -15.4
+          log_Po2_atm_as_printed: "-15.40"
           log_CN3: -13.49
+          log_CN3_as_printed: "-13.49"
         - T_K: 1873
-          crucible: Mo
+          T_K_as_printed: "1873"
+          crucible: "Mo"
           time_h: 18
+          time_h_as_printed: "18"
           Ca_over_Al_mass_ratio: 0.8
+          Ca_over_Al_mass_ratio_as_printed: "0.80"
           N_times_1e4_mass_pct: 12.6
+          N_times_1e4_mass_pct_as_printed: "12.6"
           log_Po2_atm: -12.87
+          log_Po2_atm_as_printed: "-12.87"
           log_CN3: -12.53
+          log_CN3_as_printed: "-12.53"
         - T_K: 1873
-          crucible: Mo
+          T_K_as_printed: "1873"
+          crucible: "Mo"
           time_h: 18
+          time_h_as_printed: "18"
           Ca_over_Al_mass_ratio: 1.73
+          Ca_over_Al_mass_ratio_as_printed: "1.73"
           N_times_1e4_mass_pct: 95.9
+          N_times_1e4_mass_pct_as_printed: "95.9"
           log_Po2_atm: -14.56
+          log_Po2_atm_as_printed: "-14.56"
           log_CN3: -12.91
+          log_CN3_as_printed: "-12.91"
         - T_K: 1923
-          crucible: Mo
+          T_K_as_printed: "1923"
+          crucible: "Mo"
           time_h: 12
+          time_h_as_printed: "12"
           Ca_over_Al_mass_ratio: 1.77
+          Ca_over_Al_mass_ratio_as_printed: "1.77"
           N_times_1e4_mass_pct: 5.9
+          N_times_1e4_mass_pct_as_printed: "5.9"
           log_Po2_atm: -12.42
+          log_Po2_atm_as_printed: "-12.42"
           log_CN3: -12.53
+          log_CN3_as_printed: "-12.53"
           H2SO4_75_mass_pct_in_saturator: true
-    observations: []
   Al2O3:
     observations:
     - observation_id: tomioka_1991_alumina_activity_1
@@ -393,6 +581,7 @@ species:
         admission_status: admitted
         reference_state_as_printed: pure solid Al2O3
         composition_anchor_as_printed: X_Al2O3 = 0.3
+        source_qualification_as_printed: 'which are not supposed to be accurately determined.'
     - observation_id: tomioka_1991_alumina_activity_2
       type: activity_coefficient
       locator:
@@ -423,6 +612,7 @@ species:
         admission_status: admitted
         reference_state_as_printed: pure solid Al2O3
         composition_anchor_as_printed: X_Al2O3 = 0.3
+        source_qualification_as_printed: 'which are not supposed to be accurately determined.'
     - observation_id: tomioka_1991_alumina_activity_3
       type: activity_coefficient
       locator:
@@ -453,6 +643,7 @@ species:
         admission_status: admitted
         reference_state_as_printed: pure solid Al2O3
         composition_anchor_as_printed: X_Al2O3 = 0.3
+        source_qualification_as_printed: 'which are not supposed to be accurately determined.'
     - observation_id: tomioka_1991_alumina_activity_4
       type: activity_coefficient
       locator:
@@ -483,6 +674,7 @@ species:
         admission_status: admitted
         reference_state_as_printed: pure solid Al2O3
         composition_anchor_as_printed: X_Al2O3 = 0.3
+        source_qualification_as_printed: 'which are not supposed to be accurately determined.'
     - observation_id: tomioka_1991_alumina_activity_5
       type: activity_coefficient
       locator:
