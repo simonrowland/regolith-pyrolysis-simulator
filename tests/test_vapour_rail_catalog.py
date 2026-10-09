@@ -1512,8 +1512,8 @@ def test_catalog_operating_envelope_no_nonphysical_pressure() -> None:
 
     Sweep reference-activity hot-train evaluators over the existing process
     envelope (T band × melt pO2 band × activity). Inventory-resolved trace
-    channels require the actual ledger gamma/X and oxygen planes; their
-    pressure ceiling is checked in the six B4 full-run acceptance cases.
+    channels use trace fractions times the production ladder's activity
+    coefficient envelope or bound, retaining the same pressure ceiling.
     Stage-0-only carriers
     (P-ladder, …) are excluded: they are gated off the hot train and
     their large negative pO2 powers at unit activity are a separate
@@ -1525,14 +1525,18 @@ def test_catalog_operating_envelope_no_nonphysical_pressure() -> None:
         CATALOG_PHYSICAL_PRESSURE_CEILING_PA,
         MELT_DISSOCIATION_PO2_MAX_BAR,
     )
+    from simulator.vapour_rail.activity import CondensedPhaseActivityProvider
 
     catalog = compile_vapour_rail_catalog(
         _yaml("vapor_pressures.yaml"), emit_u0_request_rules=False
     )
-    temperatures_K = (1400.0, 1600.0, 1800.0, 2000.0, 2200.0)
+    temperatures_K = (1400.0, 1600.0, 1800.0, 2000.0, 2200.0, 2473.15)
     # Process-representative melt pO2 band (inside the physical envelope).
     pO2_bars = (1.0e-12, 1.0e-9, 1.0e-6, 1.0e-3, 1.0, 10.0)
     activities = (1.0e-4, 0.01, 0.1, 1.0)
+    trace_fractions = (1.0e-7, 1.0e-5, 1.0e-3)
+    activity_provider = CondensedPhaseActivityProvider()
+    swept_trace_species: set[str] = set()
     ceiling = CATALOG_PHYSICAL_PRESSURE_CEILING_PA
     offenders: list[str] = []
     assert MELT_DISSOCIATION_PO2_MAX_BAR >= 10.0
@@ -1546,13 +1550,31 @@ def test_catalog_operating_envelope_no_nonphysical_pressure() -> None:
         )
         if hot in {"stage0_only", "not_applicable"}:
             continue
-        if species.code_metadata.request_rule == "trace_source_inventory":
+        trace_inventory = species.code_metadata.request_rule == "trace_source_inventory"
+        if trace_inventory:
             assert species.source_reaction_activity is not None
             assert species.code_metadata.source_account == "process.cleaned_melt"
-            continue
         for temperature_K in temperatures_K:
+            row_activities = activities
+            if trace_inventory:
+                resolved_activities: list[float] = []
+                for fraction in trace_fractions:
+                    answer = activity_provider.resolve_source_reaction_activity(
+                        species.source_reaction_activity,
+                        magemin=None, thermoengine=None,
+                        activity_exponent=evaluator.activity_exponent,
+                        mole_fraction=fraction, temperature_K=temperature_K,
+                    )
+                    assert answer.value is not None, (species_id, temperature_K, answer)
+                    assert math.isfinite(answer.value) and answer.value > 0
+                    resolved_activities.append(answer.value)
+                    if answer.ln_band is not None:
+                        for offset in answer.ln_band:
+                            assert offset is not None and math.isfinite(offset)
+                            resolved_activities.append(answer.value * math.exp(offset))
+                row_activities = tuple(resolved_activities)
             for pO2_bar in pO2_bars:
-                for activity in activities:
+                for activity in row_activities:
                     kwargs: dict[str, float] = {}
                     if evaluator.activity_exponent:
                         kwargs["source_activity"] = activity
@@ -1561,13 +1583,17 @@ def test_catalog_operating_envelope_no_nonphysical_pressure() -> None:
                     try:
                         evaluation = evaluator.evaluate(temperature_K, **kwargs)
                     except CatalogCompileError:
+                        if trace_inventory:
+                            raise
                         continue
-                    # In-domain only: OOR continuation may be multi-dex and is
-                    # already status-bearing (t-538 / b-145). The b-148 class
-                    # is non-physical pressure *claiming* a usable value.
-                    if evaluation.out_of_range:
+                    # Ordinary reference rows retain their in-band sweep.
+                    # Trace activities include extrapolated ladder endpoints
+                    # at the furnace cap and must still satisfy the ceiling.
+                    if evaluation.out_of_range and not trace_inventory:
                         continue
-                    if evaluation.pressure_pa > ceiling:
+                    if trace_inventory:
+                        swept_trace_species.add(species_id)
+                    if not math.isfinite(evaluation.pressure_pa) or evaluation.pressure_pa > ceiling:
                         offenders.append(
                             f"{species_id}: T={temperature_K:g} K "
                             f"pO2={pO2_bar:g} bar a={activity:g} "
@@ -1575,6 +1601,10 @@ def test_catalog_operating_envelope_no_nonphysical_pressure() -> None:
                             f"pO2_exp={evaluator.pO2_exponent}"
                         )
 
+    assert swept_trace_species == {
+        species_id for species_id, species in catalog.species.items()
+        if species.code_metadata.request_rule == "trace_source_inventory"
+    }
     assert not offenders, (
         "catalog operating-envelope physical ceiling exceeded "
         f"(>{ceiling:g} Pa in-domain):\n" + "\n".join(offenders[:40])
