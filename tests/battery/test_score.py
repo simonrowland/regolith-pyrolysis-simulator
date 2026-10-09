@@ -5513,9 +5513,14 @@ def test_tridymite_does_not_use_cristobalite_high_fusion_conversion() -> None:
         is Phase.CR
     )
     assert after_comparison.value.point == after.value.point
-    assert any(
-        "measured reference polymorph is tridymite" in notice.reason
+    missing_input = next(
+        notice
         for notice in after_comparison.notices
+        if notice.reason.startswith("fusion conversion missing input:")
+    )
+    assert missing_input.reason == (
+        "fusion conversion missing input: JANAF solid table O-035 represents "
+        "polymorph cristobalite_high, but measured reference polymorph is tridymite"
     )
 
 
