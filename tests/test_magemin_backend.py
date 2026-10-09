@@ -2632,6 +2632,61 @@ def test_magemin_subprocess_fo2_log_substitution_recorded(monkeypatch):
     assert result.diagnostics["authoritative_for_solved_conditions"] is True
 
 
+@pytest.mark.parametrize(
+    ("stdout", "token"),
+    [
+        ("Phase : liq qfm\nMode  : 0.98000 0.02000\n", "0.02000"),
+        ("Phase : liq qfm\nMode  : 1.000 0.000\n", "0.000"),
+    ],
+)
+def test_magemin_records_the_printed_qfm_mode_token(monkeypatch, stdout, token):
+    """The operating point stores the qfm number printed in the Mode row.
+
+    0.02000 is active. 0.000 is present and inactive. The stored value is
+    that token, not a recomputed fO2.
+    """
+
+    def fake_subprocess_run(args, **kwargs):
+        _plant_liq_matlab(kwargs["cwd"])
+        return subprocess.CompletedProcess(
+            args, 0, stdout=stdout, stderr=""
+        )
+
+    monkeypatch.setattr(
+        MAGEMinBackend,
+        "_locate_binary",
+        staticmethod(lambda explicit: Path("/fake/MAGEMin")),
+    )
+    monkeypatch.setattr(
+        MAGEMinBackend,
+        "_import_magemin_bridge",
+        lambda self, *, requested: ("subprocess", None),
+    )
+    import simulator.melt_backend.magemin as magemin_module
+    monkeypatch.setattr(
+        magemin_module.subprocess, "run", fake_subprocess_run
+    )
+
+    backend = MAGEMinBackend()
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore", UserWarning)
+        assert backend.initialize({"warm_worker": False}) is True
+
+    result = backend.equilibrate(
+        1250.0,
+        composition_mol={"SiO2": 5.0, "MgO": 3.0, "FeO": 1.0},
+        fO2_log=-9.0,
+        pressure_bar=1.0,
+    )
+
+    printed = float(token)
+    assert result.diagnostics["fO2_buffer_mode"] == printed
+    assert result.diagnostics["fO2_buffer_active"] is (printed > 0.0)
+    if printed == 0.0:
+        assert result.diagnostics["backend_status_reason"] == "buffer_inactive"
+        assert result.diagnostics["solved_fO2_log"] is None
+
+
 def test_magemin_inactive_qfm_does_not_claim_requested_fo2(monkeypatch):
     """A qfm solve whose stdout has no qfm row is unbuffered.
 
