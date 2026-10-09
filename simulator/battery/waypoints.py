@@ -10,7 +10,7 @@ from collections.abc import Iterator, Mapping
 from simulator.accounting.formulas import resolve_species_formula
 from simulator.battery.enums import AmountBasis, MethodToken, Quantity, ValueKind
 from simulator.battery.migrate import (
-    _OXIDE_COMPONENT_KEYS,
+    _is_engine_oxide_component,
     _knudsen_effusion_chamber_background_not_for_identity,
 )
 from simulator.battery.records import (
@@ -343,7 +343,7 @@ def _printed_composition_map(raw: object) -> Mapping[str, object] | None:
         return None
     if len({name for name, _value in pairs}) != len(pairs):
         return None
-    if any(name not in _OXIDE_COMPONENT_KEYS for name, _value in pairs):
+    if any(not _is_engine_oxide_component(name) for name, _value in pairs):
         return None
     try:
         amounts = [as_decimal(value) for _, value in pairs]
@@ -624,10 +624,18 @@ def _engine_mole_fraction(
     parsed = _parse_component_amounts(pairs)
     if parsed is None:
         return None
-    non_oxides = [(name, amount) for name, amount in parsed if name not in _OXIDE_COMPONENT_KEYS]
+    non_oxides = [
+        (name, amount)
+        for name, amount in parsed
+        if not _is_engine_oxide_component(name)
+    ]
     if any(amount > 0 for _name, amount in non_oxides):
         raise _EnginePrintRefused("non-oxide mole fraction")
-    oxides = {name: amount for name, amount in parsed if name in _OXIDE_COMPONENT_KEYS}
+    oxides = {
+        name: amount
+        for name, amount in parsed
+        if _is_engine_oxide_component(name)
+    }
     if not oxides or sum(oxides.values(), Decimal("0")) <= 0:
         return None
     return oxides, {name for name, _amount in non_oxides}
@@ -652,7 +660,11 @@ def _engine_printed_oxides(
     if len(set(names)) != len(names):
         return None
     has_feot = "FeOT" in names
-    non_oxides = [name for name in names if name != "FeOT" and name not in _OXIDE_COMPONENT_KEYS]
+    non_oxides = [
+        name
+        for name in names
+        if name != "FeOT" and not _is_engine_oxide_component(name)
+    ]
     if not has_feot and not non_oxides:
         return None
     parsed: list[tuple[str, Decimal]] = []
@@ -665,12 +677,16 @@ def _engine_printed_oxides(
             return None
         parsed.append((name, amount))
     by_name = {name: amount for name, amount in parsed}
-    oxides = {name: amount for name, amount in parsed if name in _OXIDE_COMPONENT_KEYS}
+    oxides = {
+        name: amount
+        for name, amount in parsed
+        if _is_engine_oxide_component(name)
+    }
     feot = by_name.get("FeOT")
     others = [
         (name, amount)
         for name, amount in parsed
-        if name != "FeOT" and name not in _OXIDE_COMPONENT_KEYS
+        if name != "FeOT" and not _is_engine_oxide_component(name)
     ]
     omitted_total = sum((amount for _name, amount in others), Decimal("0"))
     if omitted_total > _TRACE_NON_OXIDE_LIMIT_WT_PCT:
@@ -869,8 +885,8 @@ def normalized_composition(
                     if (
                         is_binary_complement
                         and output_species != input_species
-                        and output_species in _OXIDE_COMPONENT_KEYS
-                        and input_species in _OXIDE_COMPONENT_KEYS
+                        and _is_engine_oxide_component(output_species)
+                        and _is_engine_oxide_component(input_species)
                         and printed_species == {output_species, input_species}
                     ):
                         origin = "printed binary oxide wt% composition"
