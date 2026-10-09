@@ -3051,9 +3051,12 @@ def _printed_initial_charge_row_map(values: object) -> dict[str, Decimal] | None
                 return got
     for item in ranked:
         t_c = _as_dec_or_none(item.get("T_C"))
-        loss = _as_dec_or_none(
-            item.get("mass_loss_pct") or item.get("mass_loss_wt_pct")
+        loss_raw = (
+            item["mass_loss_pct"]
+            if "mass_loss_pct" in item
+            else item.get("mass_loss_wt_pct")
         )
+        loss = _as_dec_or_none(loss_raw)
         if t_c == 0 and loss == 0:
             got = _oxide_map_from_mapping(item)
             if got:
