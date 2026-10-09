@@ -16,6 +16,7 @@ def install_synthetic_binding_receipt(
     """Install a test-only receipt without certifying a real engine."""
     from simulator import engine_binding_admission as admission
     from simulator import engine_local_config
+    from simulator import reduced_real_determinism as replay
 
     pin_path = (
         Path(__file__).parent
@@ -25,6 +26,7 @@ def install_synthetic_binding_receipt(
     )
     pin = json.loads(pin_path.read_text(encoding="utf-8"))
     identity = admission.BindingIdentity.from_mapping(pin["identity"])
+    monkeypatch.setattr(replay, "record_binding_producer_ids", lambda *_args, **_kwargs: ())
     provenance = {
         "binding_provenance_verifiable": True,
         "test_fixture": "binding_admission_synthetic/synthetic-fake.json",
